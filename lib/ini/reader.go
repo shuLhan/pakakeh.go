@@ -32,10 +32,13 @@ var (
 // Reader define the INI file reader.
 //
 type Reader struct {
-	filename string
-	bb       []byte
-	lines    []parsedLine
-	sec      *section
+	filename  string
+	bb        []byte
+	lines     []parsedLine
+	sec       *section
+	buf       bytes.Buffer
+	bufSpaces bytes.Buffer
+	bufCom    bytes.Buffer
 }
 
 //
@@ -223,10 +226,11 @@ func (reader *Reader) addLine(mode lineMode, num int, in []byte) {
 
 func (reader *Reader) parseMultilineVar(start int) (end int, err error) {
 	var (
-		buf     bytes.Buffer
 		lastIdx int
 		blast   byte
 	)
+
+	reader.buf.Reset()
 
 	for end = start; end < len(reader.lines); end++ {
 		if reader.lines[end].m != lineModeVarMulti {
@@ -236,13 +240,13 @@ func (reader *Reader) parseMultilineVar(start int) (end int, err error) {
 		lastIdx = len(reader.lines[end].v) - 1
 		blast = reader.lines[end].v[lastIdx]
 		if blast == tokBackslash {
-			buf.Write(reader.lines[end].v[0:lastIdx])
+			reader.buf.Write(reader.lines[end].v[0:lastIdx])
 		} else {
-			buf.Write(reader.lines[end].v)
+			reader.buf.Write(reader.lines[end].v)
 		}
 	}
 
-	err = reader.parseVar(buf.Bytes(), start)
+	err = reader.parseVar(reader.buf.Bytes(), start)
 
 	return
 }
@@ -259,7 +263,7 @@ func (reader *Reader) parseVar(line []byte, num int) (err error) {
 
 	kv := bytes.SplitN(line, sepVar, 2)
 
-	k, ok := parseVarName(kv[0])
+	k, ok := reader.parseVarName(kv[0])
 	if !ok {
 		err = fmt.Errorf(errVarNameInvalid, num, reader.filename)
 		return
@@ -269,7 +273,7 @@ func (reader *Reader) parseVar(line []byte, num int) (err error) {
 	if len(kv) == 1 {
 		v = varValueTrue
 	} else {
-		v, comment, ok = parseVarValue(kv[1])
+		v, comment, ok = reader.parseVarValue(kv[1])
 		if !ok {
 			err = fmt.Errorf(errValueInvalid, num, reader.filename)
 			return
@@ -285,8 +289,7 @@ func (reader *Reader) parseVar(line []byte, num int) (err error) {
 // parseVarName will parse variable name from input bytes as defined in rules
 // S.5.
 //
-func parseVarName(in []byte) (out []byte, ok bool) {
-	var buf bytes.Buffer
+func (reader *Reader) parseVarName(in []byte) (out []byte, ok bool) {
 	in = bytes.ToLower(bytes.TrimSpace(in))
 
 	if len(in) == 0 {
@@ -300,22 +303,23 @@ func parseVarName(in []byte) (out []byte, ok bool) {
 		return
 	}
 
-	buf.WriteRune(rr[x])
+	reader.buf.Reset()
+	reader.buf.WriteRune(rr[x])
 
 	for x++; x < len(rr); x++ {
 		if rr[x] == '-' {
-			buf.WriteRune(rr[x])
+			reader.buf.WriteRune(rr[x])
 			continue
 		}
 		if unicode.IsLetter(rr[x]) || unicode.IsDigit(rr[x]) {
-			buf.WriteRune(rr[x])
+			reader.buf.WriteRune(rr[x])
 			continue
 		}
 
 		return
 	}
 
-	out = buf.Bytes()
+	out = append(out, reader.buf.Bytes()...)
 	ok = true
 
 	return
@@ -345,7 +349,7 @@ func parseVarName(in []byte) (out []byte, ok bool) {
 // (5.3) If not `quoted`, return immediately.
 //
 // nolint: gocyclo
-func parseVarValue(in []byte) (value, comment []byte, ok bool) {
+func (reader *Reader) parseVarValue(in []byte) (value, comment []byte, ok bool) {
 	in = bytes.TrimSpace(in)
 
 	// S.6.0
@@ -356,12 +360,9 @@ func parseVarValue(in []byte) (value, comment []byte, ok bool) {
 	}
 
 	var (
-		buf       bytes.Buffer
-		bufSpaces bytes.Buffer
-		bufCom    bytes.Buffer
-		quoted    bool
-		esc       bool
-		x         int
+		quoted bool
+		esc    bool
+		x      int
 	)
 
 	rr := bytes.Runes(in)
@@ -372,14 +373,18 @@ func parseVarValue(in []byte) (value, comment []byte, ok bool) {
 		x++
 	}
 
+	reader.buf.Reset()
+	reader.bufSpaces.Reset()
+	reader.bufCom.Reset()
+
 	for ; x < len(rr); x++ {
 		if rr[x] == ' ' || rr[x] == '\t' {
 			if quoted {
-				_, _ = buf.WriteRune(rr[x])
+				_, _ = reader.buf.WriteRune(rr[x])
 				continue
 			}
-			if buf.Len() > 0 {
-				bufSpaces.WriteRune(rr[x])
+			if reader.buf.Len() > 0 {
+				reader.bufSpaces.WriteRune(rr[x])
 			}
 			continue
 		}
@@ -387,23 +392,23 @@ func parseVarValue(in []byte) (value, comment []byte, ok bool) {
 		// (2)
 		if rr[x] == tokDoubleQuote {
 			if esc {
-				if bufSpaces.Len() > 0 {
-					_, _ = buf.Write(bufSpaces.Bytes())
-					bufSpaces.Reset()
+				if reader.bufSpaces.Len() > 0 {
+					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
+					reader.bufSpaces.Reset()
 				}
-				_, _ = buf.WriteRune('"')
+				_, _ = reader.buf.WriteRune('"')
 				esc = false
 				continue
 			}
 			if quoted {
 				if esc {
-					_, _ = buf.WriteRune('"')
+					_, _ = reader.buf.WriteRune('"')
 					esc = false
 					continue
 				}
-				if bufSpaces.Len() > 0 {
-					_, _ = buf.Write(bufSpaces.Bytes())
-					bufSpaces.Reset()
+				if reader.bufSpaces.Len() > 0 {
+					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
+					reader.bufSpaces.Reset()
 				}
 				quoted = false
 				continue
@@ -415,32 +420,32 @@ func parseVarValue(in []byte) (value, comment []byte, ok bool) {
 		// (3)
 		if rr[x] == tokHash || rr[x] == tokSemiColon {
 			if quoted {
-				if bufSpaces.Len() > 0 {
-					_, _ = buf.Write(bufSpaces.Bytes())
-					bufSpaces.Reset()
+				if reader.bufSpaces.Len() > 0 {
+					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
+					reader.bufSpaces.Reset()
 				}
-				_, _ = buf.WriteRune(rr[x])
+				_, _ = reader.buf.WriteRune(rr[x])
 				continue
 			}
 
-			if bufSpaces.Len() > 0 {
-				_, _ = bufCom.Write(bufSpaces.Bytes())
-				bufSpaces.Reset()
+			if reader.bufSpaces.Len() > 0 {
+				_, _ = reader.bufCom.Write(reader.bufSpaces.Bytes())
+				reader.bufSpaces.Reset()
 			}
-			bufCom.WriteString(string(rr[x:]))
+			reader.bufCom.WriteString(string(rr[x:]))
 			goto out
 		}
 
 		// (4)
 		if esc {
 			if rr[x] == 'n' || rr[x] == 't' || rr[x] == 'b' {
-				_, _ = buf.WriteRune(tokBackslash)
-				_, _ = buf.WriteRune(rr[x])
+				_, _ = reader.buf.WriteRune(tokBackslash)
+				_, _ = reader.buf.WriteRune(rr[x])
 				esc = false
 				continue
 			}
 			if rr[x] == '\\' {
-				_, _ = buf.WriteRune(rr[x])
+				_, _ = reader.buf.WriteRune(rr[x])
 				esc = false
 				continue
 			}
@@ -450,9 +455,9 @@ func parseVarValue(in []byte) (value, comment []byte, ok bool) {
 		// (5)
 		if rr[x] == tokBackslash {
 			if quoted {
-				if bufSpaces.Len() > 0 {
-					_, _ = buf.Write(bufSpaces.Bytes())
-					bufSpaces.Reset()
+				if reader.bufSpaces.Len() > 0 {
+					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
+					reader.bufSpaces.Reset()
 				}
 				esc = true
 				continue
@@ -461,19 +466,19 @@ func parseVarValue(in []byte) (value, comment []byte, ok bool) {
 			continue
 		}
 
-		if bufSpaces.Len() > 0 {
-			_, _ = buf.Write(bufSpaces.Bytes())
-			bufSpaces.Reset()
+		if reader.bufSpaces.Len() > 0 {
+			_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
+			reader.bufSpaces.Reset()
 		}
-		_, _ = buf.WriteRune(rr[x])
+		_, _ = reader.buf.WriteRune(rr[x])
 	}
 
 	if quoted || esc {
 		return
 	}
 out:
-	value = buf.Bytes()
-	comment = bufCom.Bytes()
+	value = append(value, reader.buf.Bytes()...)
+	comment = append(comment, reader.bufCom.Bytes()...)
 	ok = true
 
 	return
@@ -496,7 +501,6 @@ func (reader *Reader) parseSection(line []byte, num int, trim bool) (ok bool) {
 		return
 	}
 
-	var buf bytes.Buffer
 	x := 0
 	runes := bytes.Runes(line)
 
@@ -504,13 +508,15 @@ func (reader *Reader) parseSection(line []byte, num int, trim bool) (ok bool) {
 		return
 	}
 
+	reader.buf.Reset()
+
 	for ; x < len(runes); x++ {
 		if runes[x] == '-' || runes[x] == '.' {
-			buf.WriteRune(runes[x])
+			reader.buf.WriteRune(runes[x])
 			continue
 		}
 		if unicode.IsLetter(runes[x]) || unicode.IsDigit(runes[x]) {
-			buf.WriteRune(runes[x])
+			reader.buf.WriteRune(runes[x])
 			continue
 		}
 
@@ -519,7 +525,8 @@ func (reader *Reader) parseSection(line []byte, num int, trim bool) (ok bool) {
 
 	ok = true
 
-	reader.sec.name = buf.Bytes()
+	reader.sec.name = nil
+	reader.sec.name = append(reader.sec.name, reader.buf.Bytes()...)
 
 	return
 }
@@ -562,7 +569,6 @@ func (reader *Reader) parseSubsection(line []byte, num int) (ok bool) {
 	}
 
 	var (
-		buf   bytes.Buffer
 		esc   bool
 		runes = bytes.Runes(names[1][1:lastIdx])
 	)
@@ -571,10 +577,12 @@ func (reader *Reader) parseSubsection(line []byte, num int) (ok bool) {
 		log.Printf(">>> subsection name: %s", string(runes))
 	}
 
+	reader.buf.Reset()
+
 	for x := 0; x < len(runes); x++ {
 		// (3)
 		if esc {
-			buf.WriteRune(runes[x])
+			reader.buf.WriteRune(runes[x])
 			esc = false
 			continue
 		}
@@ -585,14 +593,15 @@ func (reader *Reader) parseSubsection(line []byte, num int) (ok bool) {
 		if runes[x] == tokDoubleQuote {
 			return
 		}
-		buf.WriteRune(runes[x])
+		reader.buf.WriteRune(runes[x])
 	}
 
 	if esc {
 		return
 	}
 
-	reader.sec.subName = buf.Bytes()
+	reader.sec.subName = nil
+	reader.sec.subName = append(reader.sec.subName, reader.buf.Bytes()...)
 	ok = true
 
 	return

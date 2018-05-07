@@ -57,10 +57,12 @@ func TestParseVarName(t *testing.T) {
 		in:   []byte(`na\me`),
 	}}
 
+	reader := &Reader{}
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, ok := parseVarName(c.in)
+		got, ok := reader.parseVarName(c.in)
 		if !ok {
 			test.Assert(t, c.expOK, ok, true)
 		}
@@ -160,10 +162,12 @@ func TestParseVarValue(t *testing.T) {
 		expok:  true,
 	}}
 
+	reader := &Reader{}
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		gotval, gotcom, ok := parseVarValue(c.in)
+		gotval, gotcom, ok := reader.parseVarValue(c.in)
 		if !ok {
 			test.Assert(t, c.expok, ok, true)
 		}
