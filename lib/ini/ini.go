@@ -82,6 +82,8 @@ package ini
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 )
 
@@ -105,25 +107,64 @@ func Open(filename string) (in *Ini, err error) {
 	err = reader.ParseFile(in, filename)
 
 	if debug >= debugL1 {
-		for x := 0; x < len(in.secs); x++ {
-			switch in.secs[x].m {
-			case sectionModeNormal:
-				fmt.Printf("[%s]\n", in.secs[x].name)
+		err = in.Write(os.Stdout)
+	}
 
-			case sectionModeSub:
-				fmt.Printf("[%s \"%s\"]\n", in.secs[x].name,
-					in.secs[x].subName)
+	return
+}
+
+//
+// Save will save the current parsed Ini into file `filename`. It will
+// overwrite the destination file if it's exist.
+//
+func (in *Ini) Save(filename string) (err error) {
+	f, err := os.Create(filename)
+	if err != nil {
+		return
+	}
+
+	err = in.Write(f)
+
+	errClose := f.Close()
+	if errClose != nil {
+		println("ini.Save:", errClose)
+	}
+
+	return
+}
+
+//
+// Write will write the current parsed Ini into writer `w`.
+//
+func (in *Ini) Write(w io.Writer) (err error) {
+	for x := 0; x < len(in.secs); x++ {
+		switch in.secs[x].m {
+		case sectionModeNormal:
+			_, err = fmt.Fprintf(w, "[%s]\n", in.secs[x].name)
+
+		case sectionModeSub:
+			_, err = fmt.Fprintf(w, "[%s \"%s\"]\n", in.secs[x].name,
+				in.secs[x].subName)
+
+		}
+		if err != nil {
+			return
+		}
+
+		for _, v := range in.secs[x].vars {
+			switch v.m {
+			case varModeNewline:
+				_, err = fmt.Fprintln(w)
+
+			case varModeComment:
+				_, err = fmt.Fprintf(w, "%s\n", v.c)
+
+			case varModeNormal:
+				_, err = fmt.Fprintf(w, "\t%s = %s%s\n", v.k,
+					v.v, v.c)
 			}
-
-			for _, v := range in.secs[x].vars {
-				switch v.m {
-				case varModeNewline:
-					fmt.Println()
-				case varModeComment:
-					fmt.Printf("%s\n", v.c)
-				case varModeNormal:
-					fmt.Printf("\t%s=%s%s\n", v.k, v.v, v.c)
-				}
+			if err != nil {
+				return
 			}
 		}
 	}

@@ -15,15 +15,12 @@ var (
 	inputIni *Ini
 )
 
-func TestOpen(t *testing.T) {
-	var (
-		err error
-	)
-
+func TestOpenAndSave(t *testing.T) {
 	cases := []struct {
-		desc   string
-		inFile string
-		expErr string
+		desc       string
+		inFile     string
+		expErr     string
+		expErrSave string
 	}{{
 		desc:   "With no file",
 		expErr: "open : no such file or directory",
@@ -39,10 +36,15 @@ func TestOpen(t *testing.T) {
 	for _, c := range cases {
 		t.Logf("%+v", c)
 
-		_, err = Open(c.inFile)
+		ini, err := Open(c.inFile)
 		if err != nil {
 			test.Assert(t, c.expErr, err.Error(), true)
 			continue
+		}
+
+		err = ini.Save(c.inFile + ".save")
+		if err != nil {
+			test.Assert(t, c.expErr, err.Error(), true)
 		}
 	}
 }

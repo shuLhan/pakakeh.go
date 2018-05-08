@@ -1,3 +1,4 @@
 /gofmtcomment
-*.test
 *.prof
+*.save
+*.test
