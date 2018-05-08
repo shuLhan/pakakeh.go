@@ -514,6 +514,7 @@ func (reader *Reader) parseSection(line []byte, num int, trim bool) (ok bool) {
 		return
 	}
 
+	line = bytes.ToLower(line)
 	x := 0
 	runes := bytes.Runes(line)
 
