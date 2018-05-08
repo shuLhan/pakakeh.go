@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	testdataInputIni = "testdata/input.ini"
+	testdataInputIni          = "testdata/input.ini"
+	testdataVarWithoutSection = "testdata/var_without_section.ini"
 )
 
 var (
@@ -24,8 +25,12 @@ func TestOpen(t *testing.T) {
 		inFile string
 		expErr string
 	}{{
-		desc:   "With invalid file",
+		desc:   "With no file",
 		expErr: "open : no such file or directory",
+	}, {
+		desc:   "With variable without section",
+		inFile: testdataVarWithoutSection,
+		expErr: "variable without section, line 7 at testdata/var_without_section.ini",
 	}, {
 		desc:   "With valid file",
 		inFile: "testdata/input.ini",
