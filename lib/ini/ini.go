@@ -2,6 +2,15 @@
 // Package ini implement reading and writing INI configuration as defined by
 // Git configuration file syntax [1].
 //
+// ## Feature Promises
+//
+// * Reading and writing on the same file should not change the content of
+// file (including comment), as long as no variable has been added or updated.
+//
+// ## Unsupported Features
+//
+// * Git `include` and `includeIf`
+//
 // ## Syntax
 //
 // (S.1.0) The `#` and `;` characters begin comments to the end of line.
@@ -66,13 +75,14 @@
 // (S.6.8) Other char escape sequences (including octal escape sequences) are
 // invalid.
 //
-// --
 // [1] https://git-scm.com/docs/git-config#_configuration_file
 //
 package ini
 
 import (
+	"bytes"
 	"fmt"
+	"strings"
 )
 
 //
@@ -123,15 +133,49 @@ func Open(filename string) (in *Ini, err error) {
 }
 
 //
-// Reset will clear all parsed data.
+// Reset will clear all parsed data. This function can be used if you want to
+// reuse the same Ini instance for parsing different Ini content.
 //
 func (in *Ini) Reset() {
 	in.secs = nil
 }
 
 //
-// Save will save the parsed INI values back into the same file as input.
+// Get will return the last key on section or subsection (if not empty).
+// It will return nil and false,
+// (1) If Ini file contains no sections,
+// (2) section or key parameter is empty, or
+// (3) no key found.
 //
-func (in *Ini) Save() (err error) {
+// Otherwise it will return key's value and true.
+//
+func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
+	// (1) (2)
+	if len(in.secs) == 0 || len(section) == 0 || len(key) == 0 {
+		return
+	}
+
+	x := len(in.secs) - 1
+	bsec := []byte(strings.ToLower(section))
+	bsub := []byte(subsection)
+	bkey := []byte(key)
+
+	for ; x >= 0; x-- {
+		if !bytes.Equal(in.secs[x].name, bsec) {
+			continue
+		}
+
+		if !bytes.Equal(in.secs[x].subName, bsub) {
+			continue
+		}
+
+		val, ok = in.secs[x].Get(bkey)
+		if ok {
+			return
+		}
+	}
+
+	// (3)
+	val = nil
 	return
 }

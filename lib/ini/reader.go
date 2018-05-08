@@ -99,7 +99,7 @@ func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
 		case lineModeVar:
 			// S.4.0 variable must belong to section
 			if reader.sec.m == sectionModeNone {
-				err = fmt.Errorf(errVarNoSection, x,
+				err = fmt.Errorf(errVarNoSection, x+1,
 					reader.filename)
 				return
 			}
@@ -109,7 +109,7 @@ func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
 		case lineModeVarMulti:
 			// S.4.0 variable must belong to section
 			if reader.sec.m == sectionModeNone {
-				err = fmt.Errorf(errVarNoSection, x,
+				err = fmt.Errorf(errVarNoSection, x+1,
 					reader.filename)
 				return
 			}
@@ -143,6 +143,11 @@ func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
 		if err != nil {
 			return
 		}
+	}
+
+	in.secs = append(in.secs, reader.sec)
+	reader.sec = &section{
+		m: sectionModeNormal,
 	}
 
 	return
@@ -556,6 +561,7 @@ func (reader *Reader) parseSection(line []byte, num int, trim bool) (ok bool) {
 // (3) Subsection can contains only the following escape character: '\' and
 // '"', other than that will be appended without '\' character.
 //
+// nolint: gocyclo
 func (reader *Reader) parseSubsection(line []byte, num int) (ok bool) {
 	// (0)
 	line = bytes.TrimSpace(line[1 : len(line)-1])

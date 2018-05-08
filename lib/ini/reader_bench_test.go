@@ -5,10 +5,6 @@ import (
 	"testing"
 )
 
-const (
-	inputIni = "testdata/input.ini"
-)
-
 //
 // 999f056 With bytes.Buffer in functions
 // BenchmarkParse-2  300  17007586 ns/op  6361586 B/op  78712 allocs/op/
@@ -20,7 +16,7 @@ const (
 func BenchmarkParse(b *testing.B) {
 	in := &Ini{}
 	reader := NewReader()
-	src, err := ioutil.ReadFile(inputIni)
+	src, err := ioutil.ReadFile(testdataInputIni)
 	if err != nil {
 		b.Fatal(err)
 	}
