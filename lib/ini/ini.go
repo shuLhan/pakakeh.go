@@ -96,8 +96,7 @@ type Ini struct {
 // Open will open and parse INI formatted `file` and return it as instance of
 // ini struct.
 //
-// On success it will return instance of ini without error.
-// On fail it may return incomplete instance of ini with error.
+// On fail it may return incomplete instance of Ini with error.
 //
 func Open(filename string) (in *Ini, err error) {
 	in = &Ini{}
@@ -133,7 +132,7 @@ func Open(filename string) (in *Ini, err error) {
 }
 
 //
-// Reset will clear all parsed data. This function can be used if you want to
+// Reset clear all parsed data. This function can be used if you want to
 // reuse the same Ini instance for parsing different Ini content.
 //
 func (in *Ini) Reset() {
@@ -141,7 +140,8 @@ func (in *Ini) Reset() {
 }
 
 //
-// Get will return the last key on section or subsection (if not empty).
+// Get return the last key on section and/or subsection (if not empty).
+//
 // It will return nil and false,
 // (1) If Ini file contains no sections,
 // (2) section or key parameter is empty, or

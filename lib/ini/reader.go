@@ -41,7 +41,7 @@ type Reader struct {
 }
 
 //
-// NewReader will create, initialize, and return new reader.
+// NewReader create, initialize, and return new reader.
 //
 func NewReader() (reader *Reader) {
 	reader = &Reader{}
@@ -219,7 +219,7 @@ func (reader *Reader) normalized(src []byte) (err error) {
 }
 
 //
-// addLine will add input line `in` to reader.
+// addLine add line `in` to list of lines in reader.
 //
 // (1) If line mode is section,
 // (1.1) If it's contain space, change their mode to subsection.
