@@ -33,7 +33,6 @@ var (
 //
 type Reader struct {
 	filename  string
-	bb        []byte
 	lines     []parsedLine
 	sec       *section
 	buf       bytes.Buffer
@@ -42,34 +41,48 @@ type Reader struct {
 }
 
 //
-// NewReader will open file `filename` for reading and return the reader
-// without error.
-// On fail, it will return nil reader and error.
+// NewReader will create, initialize, and return new reader.
 //
-func NewReader(filename string) (reader *Reader, err error) {
-	reader = &Reader{
-		filename: filename,
-		sec: &section{
-			m: sectionModeNone,
-		},
-	}
+func NewReader() (reader *Reader) {
+	reader = &Reader{}
+	reader.reset()
 
-	reader.bb, err = ioutil.ReadFile(filename)
+	return
+}
+
+func (reader *Reader) reset() {
+	reader.sec = &section{
+		m: sectionModeNone,
+	}
+}
+
+//
+// ParseFile will open, read, and parse INI file `filename` into `in`.
+//
+func (reader *Reader) ParseFile(in *Ini, filename string) (err error) {
+	src, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return
 	}
+
+	reader.filename = filename
+
+	err = reader.Parse(in, src)
 
 	return
 }
 
 //
-// parse will parse INI config from slice of bytes into `in`.
+// Parse will parse INI config from slice of bytes `src` into `in`.
 //
 // nolint: gocyclo
-func (reader *Reader) parse(in *Ini) (err error) {
+func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
 	var ok bool
 
-	err = reader.normalized()
+	in.Reset()
+	reader.reset()
+
+	err = reader.normalized(src)
 	if err != nil {
 		return
 	}
@@ -139,10 +152,10 @@ func (reader *Reader) parse(in *Ini) (err error) {
 // normalized will split source by lines.
 //
 // nolint: gocyclo
-func (reader *Reader) normalized() (err error) {
+func (reader *Reader) normalized(src []byte) (err error) {
 	// (0)
 	multi := false
-	lines := bytes.Split(reader.bb, sepNewline)
+	lines := bytes.Split(src, sepNewline)
 
 	for x := 0; x < len(lines); x++ {
 		orgLine := lines[x]

@@ -2,7 +2,7 @@
 // Package ini implement reading and writing INI configuration as defined by
 // Git configuration file syntax [1].
 //
-// Syntax,
+// ## Syntax
 //
 // (S.1.0) The `#` and `;` characters begin comments to the end of line.
 // (S.1.1) Blank lines are ignored.
@@ -79,20 +79,7 @@ import (
 // Ini contains the parsed file.
 //
 type Ini struct {
-	Filename string
-	secs     []*section
-}
-
-//
-// New will create, initialize default section, and return a new instance
-// of ini.
-//
-func New(file string) (in *Ini) {
-	in = &Ini{
-		Filename: file,
-	}
-
-	return
+	secs []*section
 }
 
 //
@@ -103,14 +90,10 @@ func New(file string) (in *Ini) {
 // On fail it may return incomplete instance of ini with error.
 //
 func Open(filename string) (in *Ini, err error) {
-	reader, err := NewReader(filename)
-	if err != nil {
-		return
-	}
+	in = &Ini{}
+	reader := NewReader()
 
-	in = New(filename)
-
-	err = reader.parse(in)
+	err = reader.ParseFile(in, filename)
 
 	if debug >= debugL1 {
 		for x := 0; x < len(in.secs); x++ {
@@ -137,6 +120,13 @@ func Open(filename string) (in *Ini, err error) {
 	}
 
 	return
+}
+
+//
+// Reset will clear all parsed data.
+//
+func (in *Ini) Reset() {
+	in.secs = nil
 }
 
 //
