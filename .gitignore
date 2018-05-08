@@ -1,1 +1,3 @@
 /gofmtcomment
+*.test
+*.prof
