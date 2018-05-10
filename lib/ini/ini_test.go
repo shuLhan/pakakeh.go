@@ -35,15 +35,10 @@ func TestOpen(t *testing.T) {
 	for _, c := range cases {
 		t.Logf("%+v", c)
 
-		in, err := Open(c.inFile)
+		_, err := Open(c.inFile)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
-		}
-
-		err = in.Save(c.inFile + ".save")
-		if err != nil {
-			t.Fatal(err)
 		}
 	}
 }
@@ -65,6 +60,10 @@ func TestSave(t *testing.T) {
 		desc:   "With empty output file",
 		inFile: testdataInputIni,
 		expErr: "open : no such file or directory",
+	}, {
+		desc:    "With valid output file",
+		inFile:  testdataInputIni,
+		outFile: testdataInputIni + ".save",
 	}}
 
 	for _, c := range cases {
