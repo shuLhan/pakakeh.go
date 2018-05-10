@@ -31,9 +31,9 @@ type variable struct {
 	key      []byte
 	value    []byte
 	others   []byte
-	secLower []byte
+	secLower []byte //nolint: structcheck
 	keyLower []byte
-	vars     []*variable
+	vars     []*variable //nolint: structcheck
 }
 
 //
