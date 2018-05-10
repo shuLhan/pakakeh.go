@@ -17,10 +17,9 @@ var (
 
 func TestOpen(t *testing.T) {
 	cases := []struct {
-		desc       string
-		inFile     string
-		expErr     string
-		expErrSave string
+		desc   string
+		inFile string
+		expErr string
 	}{{
 		desc:   "With no file",
 		expErr: "open : no such file or directory",
