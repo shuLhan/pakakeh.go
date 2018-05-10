@@ -47,15 +47,15 @@ func printStackTrace(t testing.TB) {
 // If comparison result is not same with `equal`, it will terminate the test
 // program.
 //
-func Assert(t *testing.T, exp, got interface{}, equal bool) {
+func Assert(t *testing.T, name string, exp, got interface{}, equal bool) {
 	if reflect.DeepEqual(exp, got) != equal {
 		runtime.Stack(trace, false)
 
 		printStackTrace(t)
 
 		t.Fatalf("\n"+
-			">>> Expecting '%+v'\n"+
-			"          got '%+v'\n", exp, got)
+			">>> Expecting %s '%+v'\n"+
+			"    got '%+v'\n", name, exp, got)
 		os.Exit(1)
 	}
 }
@@ -67,15 +67,15 @@ func Assert(t *testing.T, exp, got interface{}, equal bool) {
 // If comparison result is not same with `equal`, it will terminate the test
 // program.
 //
-func AssertBench(b *testing.B, exp, got interface{}, equal bool) {
+func AssertBench(b *testing.B, name string, exp, got interface{}, equal bool) {
 	if reflect.DeepEqual(exp, got) != equal {
 		runtime.Stack(trace, false)
 
 		printStackTrace(b)
 
 		b.Fatalf("\n"+
-			">>> Expecting '%+v'\n"+
-			"          got '%+v'\n", exp, got)
+			">>> Expecting %s '%+v'\n"+
+			"    got '%+v'\n", name, exp, got)
 		os.Exit(1)
 	}
 }
