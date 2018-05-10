@@ -50,9 +50,10 @@ func TestOpen(t *testing.T) {
 
 func TestSave(t *testing.T) {
 	cases := []struct {
-		desc   string
-		inFile string
-		expErr string
+		desc    string
+		inFile  string
+		outFile string
+		expErr  string
 	}{{
 		desc:   "With no file",
 		expErr: "open : no such file or directory",
@@ -61,8 +62,9 @@ func TestSave(t *testing.T) {
 		inFile: testdataVarWithoutSection,
 		expErr: "variable without section, line 7 at testdata/var_without_section.ini",
 	}, {
-		desc:   "With valid file",
-		inFile: "testdata/input.ini",
+		desc:   "With empty output file",
+		inFile: testdataInputIni,
+		expErr: "open : no such file or directory",
 	}}
 
 	for _, c := range cases {
@@ -74,10 +76,45 @@ func TestSave(t *testing.T) {
 			continue
 		}
 
-		err = ini.Save(c.inFile + ".save")
+		err = ini.Save(c.outFile)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 		}
+	}
+}
+
+func TestAddSection(t *testing.T) {
+	in := &Ini{}
+
+	cases := []struct {
+		desc   string
+		sec    *Section
+		expIni *Ini
+	}{{
+		desc:   "With nil section",
+		expIni: &Ini{},
+	}, {
+		desc: "With valid section",
+		sec: &Section{
+			mode:    varModeSection,
+			secName: []byte("Test"),
+			_sec:    []byte("test"),
+		},
+		expIni: &Ini{
+			secs: []*Section{{
+				mode:    varModeSection,
+				secName: []byte("Test"),
+				_sec:    []byte("test"),
+			}},
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		in.AddSection(c.sec)
+
+		test.Assert(t, "ini", c.expIni, in, true)
 	}
 }
 
