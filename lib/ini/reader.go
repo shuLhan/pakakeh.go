@@ -11,6 +11,7 @@ import (
 
 const (
 	tokBackslash   = '\\'
+	tokBackspace   = '\b'
 	tokDot         = '.'
 	tokDoubleQuote = '"'
 	tokEqual       = '='
@@ -196,6 +197,7 @@ func (reader *Reader) parse() (err error) {
 			return
 		}
 		if reader.b == tokSecStart {
+			_ = reader.br.UnreadByte()
 			err = reader.parseSectionHeader()
 			break
 		}
@@ -235,8 +237,17 @@ func (reader *Reader) parseComment() (err error) {
 func (reader *Reader) parseSectionHeader() (err error) {
 	reader.buf.Reset()
 
-	reader._var.mode = varModeSection
+	reader.b, err = reader.br.ReadByte()
+	if err != nil {
+		return errBadConfig
+	}
+
+	if reader.b != tokSecStart {
+		return errBadConfig
+	}
+
 	reader.bufFormat.WriteByte(tokSecStart)
+	reader._var.mode = varModeSection
 
 	reader.r, _, err = reader.br.ReadRune()
 	if err != nil {
@@ -352,7 +363,7 @@ func (reader *Reader) parsePossibleComment() (err error) {
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
-			return
+			break
 		}
 		if reader.b == tokNewLine {
 			reader.bufFormat.WriteByte(reader.b)
@@ -546,10 +557,21 @@ func (reader *Reader) parseVarValue() (err error) {
 				esc = false
 				continue
 			}
-			if reader.b == 'b' || reader.b == 'n' || reader.b == 't' {
-				reader.valueWriteByte(tokBackslash)
+			if reader.b == 'b' {
 				reader.bufFormat.WriteByte(reader.b)
-				reader.buf.WriteByte(reader.b)
+				reader.buf.WriteByte(tokBackspace)
+				esc = false
+				continue
+			}
+			if reader.b == 'n' {
+				reader.bufFormat.WriteByte(reader.b)
+				reader.buf.WriteByte(tokNewLine)
+				esc = false
+				continue
+			}
+			if reader.b == 't' {
+				reader.bufFormat.WriteByte(reader.b)
+				reader.buf.WriteByte(tokTab)
 				esc = false
 				continue
 			}
