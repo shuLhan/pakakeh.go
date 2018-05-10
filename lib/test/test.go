@@ -53,9 +53,10 @@ func Assert(t *testing.T, name string, exp, got interface{}, equal bool) {
 
 		printStackTrace(t)
 
-		t.Fatalf("\n"+
-			">>> Expecting %s '%+v'\n"+
-			"    got '%+v'\n", name, exp, got)
+		t.Fatalf(">>> Expecting %s,\n"+
+			"'%+v'\n"+
+			"     got,\n"+
+			"'%+v'\n", name, exp, got)
 		os.Exit(1)
 	}
 }

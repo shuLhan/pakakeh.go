@@ -19,12 +19,14 @@
 // (S.2.0) A section begins with the name of the section in square brackets.
 // (S.2.1) A section continues until the next section begins.
 // (S.2.2) Section name are case-insensitive.
-// (S.2.3) Section name only allow alphanumeric characters, `-` and `.`.
-// (S.2.4) Section can be further divided into subsections.
-// (S.2.5) Section headers cannot span multiple lines.
-// (S.2.6) You can have `[section]` if you have `[section "subsection"]`, but
+// (S.2.3) Variable name must start with an alphabetic character, no
+// whitespace before name or after '['.
+// (S.2.4) Section name only allow alphanumeric characters, `-` and `.`.
+// (S.2.5) Section can be further divided into subsections.
+// (S.2.6) Section headers cannot span multiple lines.
+// (S.2.7) You can have `[section]` if you have `[section "subsection"]`, but
 // you don’t need to.
-// (S.2.7) All the other lines (and the remainder of the line after the
+// (S.2.8) All the other lines (and the remainder of the line after the
 // section header) are recognized as setting variables, in the form
 // `name = value`.
 //
@@ -138,34 +140,10 @@ func (in *Ini) Save(filename string) (err error) {
 //
 func (in *Ini) Write(w io.Writer) (err error) {
 	for x := 0; x < len(in.secs); x++ {
-		switch in.secs[x].m {
-		case sectionModeNormal:
-			_, err = fmt.Fprintf(w, "[%s]\n", in.secs[x].name)
-
-		case sectionModeSub:
-			_, err = fmt.Fprintf(w, "[%s \"%s\"]\n", in.secs[x].name,
-				in.secs[x].subName)
-
-		}
-		if err != nil {
-			return
-		}
+		fmt.Fprint(w, in.secs[x])
 
 		for _, v := range in.secs[x].vars {
-			switch v.m {
-			case varModeNewline:
-				_, err = fmt.Fprintln(w)
-
-			case varModeComment:
-				_, err = fmt.Fprintf(w, "%s\n", v.c)
-
-			case varModeNormal:
-				_, err = fmt.Fprintf(w, "\t%s = %s%s\n", v.k,
-					v.v, v.c)
-			}
-			if err != nil {
-				return
-			}
+			fmt.Fprint(w, v)
 		}
 	}
 
@@ -178,6 +156,16 @@ func (in *Ini) Write(w io.Writer) (err error) {
 //
 func (in *Ini) Reset() {
 	in.secs = nil
+}
+
+func (in *Ini) addSection(sec *section) {
+	if sec == nil {
+		return
+	}
+	if len(sec.secName) > 0 {
+		sec.secLower = bytes.ToLower(sec.secName)
+	}
+	in.secs = append(in.secs, sec)
 }
 
 //
@@ -202,7 +190,7 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 	bkey := []byte(key)
 
 	for ; x >= 0; x-- {
-		if !bytes.Equal(in.secs[x].name, bsec) {
+		if !bytes.Equal(in.secs[x].secLower, bsec) {
 			continue
 		}
 

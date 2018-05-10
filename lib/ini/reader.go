@@ -2,58 +2,86 @@ package ini
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
-	"log"
 	"unicode"
 )
 
 const (
 	tokBackslash   = '\\'
+	tokDot         = '.'
+	tokDoubleQuote = '"'
+	tokEqual       = '='
 	tokHash        = '#'
+	tokHyphen      = '-'
+	tokNewLine     = '\n'
+	tokPercent     = '%'
 	tokSecEnd      = ']'
 	tokSecStart    = '['
 	tokSemiColon   = ';'
-	tokDoubleQuote = '"'
+	tokSpace       = ' '
+	tokTab         = '\t'
 )
 
 var (
-	errBadConfig      = "bad config line %d at %s"
+	errBadConfig      = errors.New("bad config line %d at %s")
 	errVarNoSection   = "variable without section, line %d at %s"
-	errVarNameInvalid = "invalid variable name, line %d at %s"
-	errValueInvalid   = "invalid value, line %d at %s"
+	errVarNameInvalid = errors.New("invalid variable name, line %d at %s")
+	errValueInvalid   = errors.New("invalid value, line %d at %s")
 
-	sepSubsection = []byte{' '}
-	sepNewline    = []byte{'\n'}
-	sepVar        = []byte{'='}
+	fmtStr     = []byte{'%', 's'}
+	escPercent = []byte{'%', '%'}
 )
 
 //
 // Reader define the INI file reader.
 //
 type Reader struct {
-	filename  string
-	lines     []parsedLine
-	sec       *section
-	buf       bytes.Buffer
-	bufSpaces bytes.Buffer
-	bufCom    bytes.Buffer
+	br         *bytes.Reader
+	b          byte
+	r          rune
+	lineNum    int
+	filename   string
+	_var       *variable
+	sec        *section
+	buf        bytes.Buffer
+	bufComment bytes.Buffer
+	bufFormat  bytes.Buffer
+	bufSpaces  bytes.Buffer
 }
 
 //
 // NewReader create, initialize, and return new reader.
 //
 func NewReader() (reader *Reader) {
-	reader = &Reader{}
-	reader.reset()
+	reader = &Reader{
+		br: bytes.NewReader(nil),
+	}
+	reader.reset(nil)
 
 	return
 }
 
-func (reader *Reader) reset() {
-	reader.sec = &section{
-		m: sectionModeNone,
+//
+// reset all reader attributes, excluding filename.
+//
+func (reader *Reader) reset(src []byte) {
+	reader.br.Reset(src)
+	reader.b = 0
+	reader.r = 0
+	reader.lineNum = 0
+	reader._var = &variable{
+		mode: varModeEmpty,
 	}
+	reader.sec = &section{
+		mode: varModeEmpty,
+	}
+	reader.buf.Reset()
+	reader.bufComment.Reset()
+	reader.bufFormat.Reset()
+	reader.bufSpaces.Reset()
 }
 
 //
@@ -77,552 +105,528 @@ func (reader *Reader) ParseFile(in *Ini, filename string) (err error) {
 //
 // nolint: gocyclo
 func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
-	var ok bool
-
 	in.Reset()
-	reader.reset()
+	reader.reset(src)
 
-	err = reader.normalized(src)
-	if err != nil {
-		return
-	}
-
-	for x := 0; x < len(reader.lines); x++ {
-		switch reader.lines[x].m {
-		case lineModeNewline:
-			reader.sec.pushVar(varModeNewline, nil, nil, nil)
-
-		case lineModeComment:
-			reader.sec.pushVar(varModeComment, nil, nil,
-				reader.lines[x].v)
-
-		case lineModeVar:
-			// S.4.0 variable must belong to section
-			if reader.sec.m == sectionModeNone {
-				err = fmt.Errorf(errVarNoSection, x+1,
-					reader.filename)
-				return
-			}
-
-			err = reader.parseVar(reader.lines[x].v, x)
-
-		case lineModeVarMulti:
-			// S.4.0 variable must belong to section
-			if reader.sec.m == sectionModeNone {
-				err = fmt.Errorf(errVarNoSection, x+1,
-					reader.filename)
-				return
-			}
-
-			x, err = reader.parseMultilineVar(x)
-			x--
-
-		case lineModeSection:
-			in.secs = append(in.secs, reader.sec)
-			reader.sec = &section{
-				m: sectionModeNormal,
-			}
-			ok = reader.parseSection(reader.lines[x].v, x, true)
-			if !ok {
-				err = fmt.Errorf(errBadConfig, x,
-					reader.filename)
-			}
-
-		case lineModeSubsection:
-			in.secs = append(in.secs, reader.sec)
-			reader.sec = &section{
-				m: sectionModeSub,
-			}
-			ok = reader.parseSubsection(reader.lines[x].v, x)
-			if !ok {
-				err = fmt.Errorf(errBadConfig, x,
-					reader.filename)
-			}
-		}
-
+	for {
+		err = reader.parse()
 		if err != nil {
-			return
-		}
-	}
-
-	in.secs = append(in.secs, reader.sec)
-	reader.sec = &section{
-		m: sectionModeNormal,
-	}
-
-	return
-}
-
-//
-// normalized will split source by lines.
-//
-// nolint: gocyclo
-func (reader *Reader) normalized(src []byte) (err error) {
-	// (0)
-	multi := false
-	lines := bytes.Split(src, sepNewline)
-
-	for x := 0; x < len(lines); x++ {
-		orgLine := lines[x]
-		line := bytes.TrimSpace(orgLine)
-
-		if len(line) == 0 {
-			multi = false
-			reader.addLine(lineModeNewline, x, nil)
-			continue
-		}
-
-		b0 := line[0]
-		blast := line[len(line)-1]
-
-		if multi {
-			reader.addLine(lineModeVarMulti, x, line)
-
-			if blast != tokBackslash {
-				multi = false
-			}
-			continue
-		}
-
-		if b0 == tokHash || b0 == tokSemiColon {
-			reader.addLine(lineModeComment, x, orgLine)
-			continue
-		}
-
-		if b0 == tokSecStart {
-			if blast != tokSecEnd {
-				err = fmt.Errorf(errBadConfig, x+1,
+			if err != io.EOF {
+				return fmt.Errorf(err.Error(), reader.lineNum,
 					reader.filename)
-				return
 			}
-
-			reader.addLine(lineModeSection, x, line)
-			continue
-		}
-
-		if blast != tokBackslash {
-			reader.addLine(lineModeVar, x, line)
-			continue
-		}
-
-		reader.addLine(lineModeVarMulti, x, line)
-		multi = true
-	}
-
-	if debug >= debugL2 {
-		for _, line := range reader.lines {
-			fmt.Printf("%1d %4d %s\n", line.m, line.n, line.v)
-		}
-	}
-
-	return
-}
-
-//
-// addLine add line `in` to list of lines in reader.
-//
-// (1) If line mode is section,
-// (1.1) If it's contain space, change their mode to subsection.
-//
-func (reader *Reader) addLine(mode lineMode, num int, in []byte) {
-	// (1)
-	if mode == lineModeSection {
-		itHaveSub := bytes.Index(in, sepSubsection)
-		if itHaveSub > 0 {
-			mode = lineModeSubsection
-		}
-	}
-
-	line := parsedLine{
-		m: mode,
-		n: num,
-		v: in,
-	}
-
-	reader.lines = append(reader.lines, line)
-}
-
-func (reader *Reader) parseMultilineVar(start int) (end int, err error) {
-	var (
-		lastIdx int
-		blast   byte
-	)
-
-	reader.buf.Reset()
-
-	for end = start; end < len(reader.lines); end++ {
-		if reader.lines[end].m != lineModeVarMulti {
 			break
 		}
 
-		lastIdx = len(reader.lines[end].v) - 1
-		blast = reader.lines[end].v[lastIdx]
-		if blast == tokBackslash {
-			reader.buf.Write(reader.lines[end].v[0:lastIdx])
-		} else {
-			reader.buf.Write(reader.lines[end].v)
+		if debug >= debugL1 {
+			fmt.Print(reader._var)
+		}
+
+		reader._var.lineNum = reader.lineNum
+		reader.lineNum++
+
+		if reader._var.mode&varModeSingle == varModeSingle ||
+			reader._var.mode&varModeValue == varModeValue ||
+			reader._var.mode&varModeMulti == varModeMulti {
+			if reader.sec.mode == varModeEmpty {
+				return fmt.Errorf(errVarNoSection,
+					reader.lineNum,
+					reader.filename)
+			}
+		}
+
+		if reader._var.mode&varModeSection == varModeSection ||
+			reader._var.mode&varModeSubsection == varModeSubsection {
+
+			in.addSection(reader.sec)
+
+			reader.sec = (*section)(reader._var)
+			reader._var = &variable{
+				mode: varModeEmpty,
+			}
+			continue
+		}
+
+		reader.sec.addVariable(reader._var)
+
+		reader._var = &variable{
+			mode: varModeEmpty,
 		}
 	}
 
-	err = reader.parseVar(reader.buf.Bytes(), start)
+	if debug >= debugL1 {
+		fmt.Println(reader._var)
+	}
 
+	reader.sec.addVariable(reader._var)
+	in.addSection(reader.sec)
+
+	reader._var = nil
+	reader.sec = nil
+
+	err = nil
 	return
 }
 
-//
-// parseVar will split line at line number `num` into key and value
-// using `=` as separator.
-//
-// (S.5.4) Variable name without value is a short-hand to set the value to the
-//         boolean "true".
-//
-func (reader *Reader) parseVar(line []byte, num int) (err error) {
-	var v, comment []byte
+func (reader *Reader) parse() (err error) {
+	reader.bufFormat.Reset()
 
-	kv := bytes.SplitN(line, sepVar, 2)
-
-	k, ok := reader.parseVarName(kv[0])
-	if !ok {
-		err = fmt.Errorf(errVarNameInvalid, num, reader.filename)
-		return
-	}
-
-	// (S.5.4)
-	if len(kv) == 1 {
-		v = varValueTrue
-	} else {
-		v, comment, ok = reader.parseVarValue(kv[1])
-		if !ok {
-			err = fmt.Errorf(errValueInvalid, num, reader.filename)
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			break
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(reader.b)
+			reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
 			return
 		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			reader.bufFormat.WriteByte(reader.b)
+			continue
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			_ = reader.br.UnreadByte()
+			err = reader.parseComment()
+			return
+		}
+		if reader.b == tokSecStart {
+			err = reader.parseSectionHeader()
+			break
+		}
+		_ = reader.br.UnreadByte()
+		return reader.parseVariable()
 	}
-
-	reader.sec.pushVar(varModeNormal, k, v, comment)
 
 	return
 }
 
-//
-// parseVarName will parse variable name from input bytes as defined in rules
-// S.5.
-//
-func (reader *Reader) parseVarName(in []byte) (out []byte, ok bool) {
-	in = bytes.ToLower(bytes.TrimSpace(in))
+func (reader *Reader) parseComment() (err error) {
+	reader.bufComment.Reset()
 
-	if len(in) == 0 {
-		return
+	reader._var.mode |= varModeComment
+
+	reader.bufFormat.Write(fmtStr)
+
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			break
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(reader.b)
+			break
+		}
+		_ = reader.bufComment.WriteByte(reader.b)
 	}
 
-	x := 0
-	rr := bytes.Runes(in)
+	reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+	reader._var.others = append(reader._var.others, reader.bufComment.Bytes()...)
 
-	if !unicode.IsLetter(rr[x]) {
-		return
-	}
+	return
+}
 
+// nolint: gocyclo
+func (reader *Reader) parseSectionHeader() (err error) {
 	reader.buf.Reset()
-	reader.buf.WriteRune(rr[x])
 
-	for x++; x < len(rr); x++ {
-		if rr[x] == '-' {
-			reader.buf.WriteRune(rr[x])
-			continue
-		}
-		if unicode.IsLetter(rr[x]) || unicode.IsDigit(rr[x]) {
-			reader.buf.WriteRune(rr[x])
-			continue
-		}
+	reader._var.mode = varModeSection
+	reader.bufFormat.WriteByte(tokSecStart)
 
-		return
+	reader.r, _, err = reader.br.ReadRune()
+	if err != nil {
+		return errBadConfig
 	}
 
-	out = append(out, reader.buf.Bytes()...)
-	ok = true
+	if !unicode.IsLetter(reader.r) {
+		return errBadConfig
+	}
 
-	return
+	reader.bufFormat.Write(fmtStr)
+	reader.buf.WriteRune(reader.r)
+
+	for {
+		reader.r, _, err = reader.br.ReadRune()
+		if err != nil {
+			return errBadConfig
+		}
+		if reader.r == tokSpace || reader.r == tokTab {
+			break
+		}
+		if reader.r == tokSecEnd {
+			reader.bufFormat.WriteRune(reader.r)
+
+			reader._var.secName = append(reader._var.secName, reader.buf.Bytes()...)
+
+			return reader.parsePossibleComment()
+		}
+		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) || reader.r == tokHyphen || reader.r == tokDot {
+			reader.buf.WriteRune(reader.r)
+			continue
+		}
+
+		return errBadConfig
+	}
+
+	reader.bufFormat.WriteRune(reader.r)
+	reader._var.secName = append(reader._var.secName, reader.buf.Bytes()...)
+
+	return reader.parseSubsection()
 }
 
 //
-// parseVarValue will parse variable value as defined in rules S.6.
-//
-// (0) Check for double-quote on the first rune.
-//
-// (1) If rune is space ' ' or tab '\t',
-// (1.1) If `quoted`, write to buffer
-// (1.2) If not `quoted`, write to whitespaces buffer, to be used later.
-//
-// (2) If rune is double-quote, reset quoted state, do not append the
-//     quoted character.
-//
-// (3) If next rune is '#',
-// (3.1) If we are on double-quoted, add it to buffer.
-// (3.2) If we are not on double-quoted, the rest of must be comment
-//
-// (4) If `esc` is true, check if next rune is valid escaped character,
-// otherwise return.
-//
-// (5) If next rune is '\',
-// (5.1) If `quoted` is true, set `esc` to true and continue to the next rune.
-// (5.3) If not `quoted`, return immediately.
+// (0) Skip white-spaces
 //
 // nolint: gocyclo
-func (reader *Reader) parseVarValue(in []byte) (value, comment []byte, ok bool) {
-	in = bytes.TrimSpace(in)
+func (reader *Reader) parseSubsection() (err error) {
+	reader.buf.Reset()
 
-	// S.6.0
-	if len(in) == 0 {
-		value = varValueTrue
-		ok = true
-		return
+	reader._var.mode |= varModeSubsection
+
+	// (0)
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			return errBadConfig
+		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			reader.bufFormat.WriteByte(reader.b)
+			continue
+		}
+		if reader.b != tokDoubleQuote {
+			return errBadConfig
+		}
+		break
 	}
+
+	reader.bufFormat.WriteByte(reader.b) // == tokDoubleQuote
+	reader.bufFormat.Write(fmtStr)
+
+	var esc bool
+	var end bool
+
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			return errBadConfig
+		}
+		if end {
+			if reader.b == tokSecEnd {
+				reader.bufFormat.WriteByte(reader.b)
+				break
+			}
+			return errBadConfig
+		}
+		if esc {
+			reader.buf.WriteByte(reader.b)
+			esc = false
+			continue
+		}
+		if reader.b == tokBackslash {
+			esc = true
+			continue
+		}
+		if reader.b == tokDoubleQuote {
+			reader.bufFormat.WriteByte(reader.b)
+			end = true
+			continue
+		}
+		reader.buf.WriteByte(reader.b)
+	}
+
+	reader._var.subName = append(reader._var.subName, reader.buf.Bytes()...)
+
+	return reader.parsePossibleComment()
+}
+
+//
+// parsePossibleComment will check only for whitespace and comment start
+// character.
+//
+func (reader *Reader) parsePossibleComment() (err error) {
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			return
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(reader.b)
+			break
+		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			reader.bufFormat.WriteByte(reader.b)
+			continue
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			_ = reader.br.UnreadByte()
+			err = reader.parseComment()
+			return
+		}
+		return errBadConfig
+	}
+
+	reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+
+	return
+}
+
+// nolint: gocyclo
+func (reader *Reader) parseVariable() (err error) {
+	reader.buf.Reset()
+
+	reader.r, _, err = reader.br.ReadRune()
+	if err != nil {
+		return errVarNameInvalid
+	}
+
+	if !unicode.IsLetter(reader.r) {
+		return errVarNameInvalid
+	}
+
+	reader.bufFormat.Write(fmtStr)
+	reader.buf.WriteRune(reader.r)
+
+	for {
+		reader.r, _, err = reader.br.ReadRune()
+		if err != nil {
+			break
+		}
+		if reader.r == tokNewLine {
+			reader.bufFormat.WriteRune(reader.r)
+			break
+		}
+		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) || reader.r == tokHyphen {
+			reader.buf.WriteRune(reader.r)
+			continue
+		}
+		if reader.r == tokHash || reader.r == tokSemiColon {
+			_ = reader.br.UnreadRune()
+
+			reader._var.mode = varModeSingle
+			reader._var.key = append(reader._var.key, reader.buf.Bytes()...)
+			reader._var.value = varValueTrue
+
+			err = reader.parseComment()
+			return
+		}
+		if unicode.IsSpace(reader.r) {
+			reader.bufFormat.WriteRune(reader.r)
+
+			reader._var.mode = varModeSingle
+			reader._var.key = append(reader._var.key, reader.buf.Bytes()...)
+
+			return reader.parsePossibleValue()
+		}
+		if reader.r == tokEqual {
+			reader.bufFormat.WriteRune(reader.r)
+
+			reader._var.mode = varModeSingle
+			reader._var.key = append(reader._var.key, reader.buf.Bytes()...)
+
+			return reader.parseVarValue()
+		}
+		return errVarNameInvalid
+	}
+
+	reader._var.mode = varModeSingle
+	reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+	reader._var.key = append(reader._var.key, reader.buf.Bytes()...)
+	reader._var.value = varValueTrue
+
+	return
+}
+
+//
+// parsePossibleValue will check if the next character after space is comment
+// or `=`.
+//
+func (reader *Reader) parsePossibleValue() (err error) {
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			break
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(reader.b)
+			break
+		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			reader.bufFormat.WriteByte(reader.b)
+			continue
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			_ = reader.br.UnreadByte()
+			reader._var.value = varValueTrue
+			return reader.parseComment()
+		}
+		if reader.b == tokEqual {
+			reader.bufFormat.WriteByte(reader.b)
+			return reader.parseVarValue()
+		}
+		return errVarNameInvalid
+	}
+
+	reader._var.mode = varModeSingle
+	reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+	reader._var.value = varValueTrue
+
+	return
+}
+
+//
+// At this point we found `=` on source, and we expect the rest of source will
+// be variable value.
+//
+// (0) Consume leading white-spaces.
+//
+// nolint: gocyclo
+func (reader *Reader) parseVarValue() (err error) {
+	reader.buf.Reset()
+	reader.bufSpaces.Reset()
+
+	// (0)
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+			reader._var.value = varValueTrue
+			return
+		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			reader.bufFormat.WriteByte(reader.b)
+			continue
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			_ = reader.br.UnreadByte()
+			reader._var.value = varValueTrue
+			return reader.parseComment()
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(reader.b)
+			reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+			reader._var.value = varValueTrue
+			return
+		}
+		break
+	}
+
+	reader._var.mode = varModeValue
+	_ = reader.br.UnreadByte()
 
 	var (
 		quoted bool
 		esc    bool
-		x      int
 	)
 
-	rr := bytes.Runes(in)
+	for {
+		reader.b, err = reader.br.ReadByte()
+		if err != nil {
+			break
+		}
 
-	// (0)
-	if rr[x] == tokDoubleQuote {
-		quoted = true
-		x++
+		if esc {
+			if reader.b == tokNewLine {
+				reader._var.mode = varModeMulti
+
+				reader.valueCommit(true)
+
+				reader.bufFormat.WriteByte(tokNewLine)
+
+				reader.lineNum++
+				esc = false
+				continue
+			}
+			if reader.b == tokBackslash || reader.b == tokDoubleQuote {
+				reader.valueWriteByte(reader.b)
+				esc = false
+				continue
+			}
+			if reader.b == 'b' || reader.b == 'n' || reader.b == 't' {
+				reader.valueWriteByte(tokBackslash)
+				reader.bufFormat.WriteByte(reader.b)
+				reader.buf.WriteByte(reader.b)
+				esc = false
+				continue
+			}
+			return errValueInvalid
+		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			if quoted {
+				reader.valueWriteByte(reader.b)
+				continue
+			}
+			reader.bufFormat.WriteByte(reader.b)
+			reader.bufSpaces.WriteByte(reader.b)
+			continue
+		}
+		if reader.b == tokBackslash {
+			reader.bufFormat.WriteByte(reader.b)
+			esc = true
+			continue
+		}
+		if reader.b == tokDoubleQuote {
+			reader.bufFormat.WriteByte(reader.b)
+			if quoted {
+				quoted = false
+			} else {
+				quoted = true
+			}
+			continue
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(reader.b)
+			break
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			if quoted {
+				reader.valueWriteByte(reader.b)
+				continue
+			}
+
+			reader.valueCommit(false)
+
+			_ = reader.br.UnreadByte()
+			err = reader.parseComment()
+			return
+		}
+		reader.valueWriteByte(reader.b)
 	}
+
+	if quoted {
+		return errValueInvalid
+	}
+
+	reader.valueCommit(false)
+
+	reader._var.format = append(reader._var.format, reader.bufFormat.Bytes()...)
+
+	return
+}
+
+func (reader *Reader) valueCommit(withSpaces bool) {
+	val := make([]byte, 0)
+	val = append(val, reader.buf.Bytes()...)
+
+	if withSpaces {
+		val = append(val, reader.bufSpaces.Bytes()...)
+	}
+
+	reader._var.value = append(reader._var.value, val...)
 
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()
-	reader.bufCom.Reset()
-
-	for ; x < len(rr); x++ {
-		if rr[x] == ' ' || rr[x] == '\t' {
-			if quoted {
-				_, _ = reader.buf.WriteRune(rr[x])
-				continue
-			}
-			if reader.buf.Len() > 0 {
-				reader.bufSpaces.WriteRune(rr[x])
-			}
-			continue
-		}
-
-		// (2)
-		if rr[x] == tokDoubleQuote {
-			if esc {
-				if reader.bufSpaces.Len() > 0 {
-					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
-					reader.bufSpaces.Reset()
-				}
-				_, _ = reader.buf.WriteRune('"')
-				esc = false
-				continue
-			}
-			if quoted {
-				if esc {
-					_, _ = reader.buf.WriteRune('"')
-					esc = false
-					continue
-				}
-				if reader.bufSpaces.Len() > 0 {
-					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
-					reader.bufSpaces.Reset()
-				}
-				quoted = false
-				continue
-			}
-			quoted = true
-			continue
-		}
-
-		// (3)
-		if rr[x] == tokHash || rr[x] == tokSemiColon {
-			if quoted {
-				if reader.bufSpaces.Len() > 0 {
-					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
-					reader.bufSpaces.Reset()
-				}
-				_, _ = reader.buf.WriteRune(rr[x])
-				continue
-			}
-
-			if reader.bufSpaces.Len() > 0 {
-				_, _ = reader.bufCom.Write(reader.bufSpaces.Bytes())
-				reader.bufSpaces.Reset()
-			}
-			reader.bufCom.WriteString(string(rr[x:]))
-			goto out
-		}
-
-		// (4)
-		if esc {
-			if rr[x] == 'n' || rr[x] == 't' || rr[x] == 'b' {
-				_, _ = reader.buf.WriteRune(tokBackslash)
-				_, _ = reader.buf.WriteRune(rr[x])
-				esc = false
-				continue
-			}
-			if rr[x] == '\\' {
-				_, _ = reader.buf.WriteRune(rr[x])
-				esc = false
-				continue
-			}
-			return
-		}
-
-		// (5)
-		if rr[x] == tokBackslash {
-			if quoted {
-				if reader.bufSpaces.Len() > 0 {
-					_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
-					reader.bufSpaces.Reset()
-				}
-				esc = true
-				continue
-			}
-			esc = true
-			continue
-		}
-
-		if reader.bufSpaces.Len() > 0 {
-			_, _ = reader.buf.Write(reader.bufSpaces.Bytes())
-			reader.bufSpaces.Reset()
-		}
-		_, _ = reader.buf.WriteRune(rr[x])
-	}
-
-	if quoted || esc {
-		return
-	}
-out:
-	value = append(value, reader.buf.Bytes()...)
-	comment = append(comment, reader.bufCom.Bytes()...)
-	ok = true
-
-	return
 }
 
-//
-// parseSection will parse section name from line. Line is assumed to be a
-// valid section, which is started with '[' and end with ']'.
-//
-// (0) Remove '[' and ']'
-// (1) Section name must start with alphabetic character.
-// (2) Section name must be alphanumeric, '-', or '.'.
-//
-func (reader *Reader) parseSection(line []byte, num int, trim bool) (ok bool) {
-	// (0)
-	if trim {
-		line = bytes.TrimSpace(line[1 : len(line)-1])
-	}
-	if len(line) == 0 {
-		return
+func (reader *Reader) valueWriteByte(b byte) {
+	if reader.bufSpaces.Len() > 0 {
+		reader.buf.Write(reader.bufSpaces.Bytes())
+		reader.bufSpaces.Reset()
 	}
 
-	line = bytes.ToLower(line)
-	x := 0
-	runes := bytes.Runes(line)
-
-	if !unicode.IsLetter(runes[x]) {
-		return
+	if b == tokPercent {
+		reader.bufFormat.Write(escPercent)
+	} else {
+		reader.bufFormat.WriteByte(b)
 	}
-
-	reader.buf.Reset()
-
-	for ; x < len(runes); x++ {
-		if runes[x] == '-' || runes[x] == '.' {
-			reader.buf.WriteRune(runes[x])
-			continue
-		}
-		if unicode.IsLetter(runes[x]) || unicode.IsDigit(runes[x]) {
-			reader.buf.WriteRune(runes[x])
-			continue
-		}
-
-		return
-	}
-
-	ok = true
-
-	reader.sec.name = nil
-	reader.sec.name = append(reader.sec.name, reader.buf.Bytes()...)
-
-	return
-}
-
-//
-// parseSubsection will parse section name and subsection name from line. Line
-// is assumed to be a valid section, which is started with '[' and end with
-// ']'.
-//
-// (0) Remove '[' and ']'
-// (1) Section and subsection is separated by single space ' '.
-// (2) Subsection name enclosed by double-quote.
-// (3) Subsection can contains only the following escape character: '\' and
-// '"', other than that will be appended without '\' character.
-//
-// nolint: gocyclo
-func (reader *Reader) parseSubsection(line []byte, num int) (ok bool) {
-	// (0)
-	line = bytes.TrimSpace(line[1 : len(line)-1])
-	if len(line) == 0 {
-		return
-	}
-
-	// (1)
-	names := bytes.SplitN(line, sepSubsection, 2)
-	ok = reader.parseSection(names[0], num, false)
-	if !ok {
-		return
-	}
-
-	if debug >= debugL2 {
-		log.Printf(">>> subsection names: %s", names)
-	}
-
-	// (2)
-	bfirst := names[1][0]
-	lastIdx := len(names[1]) - 1
-	blast := names[1][lastIdx]
-	if bfirst != tokDoubleQuote || blast != tokDoubleQuote {
-		return
-	}
-
-	var (
-		esc   bool
-		runes = bytes.Runes(names[1][1:lastIdx])
-	)
-
-	if debug >= debugL2 {
-		log.Printf(">>> subsection name: %s", string(runes))
-	}
-
-	reader.buf.Reset()
-
-	for x := 0; x < len(runes); x++ {
-		// (3)
-		if esc {
-			reader.buf.WriteRune(runes[x])
-			esc = false
-			continue
-		}
-		if runes[x] == tokBackslash {
-			esc = true
-			continue
-		}
-		if runes[x] == tokDoubleQuote {
-			return
-		}
-		reader.buf.WriteRune(runes[x])
-	}
-
-	if esc {
-		return
-	}
-
-	reader.sec.subName = nil
-	reader.sec.subName = append(reader.sec.subName, reader.buf.Bytes()...)
-	ok = true
-
-	return
+	reader.buf.WriteByte(b)
 }

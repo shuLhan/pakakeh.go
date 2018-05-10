@@ -5,47 +5,7 @@ import (
 	"fmt"
 )
 
-type sectionMode uint
-
-const (
-	sectionModeNone sectionMode = 1 << iota
-	sectionModeNormal
-	sectionModeSub
-)
-
-type section struct {
-	m       sectionMode
-	name    []byte
-	subName []byte
-	vars    []*variable
-}
-
-//
-// pushVar will push new variable to list if no key exist or replace existing
-// value if it's exist.
-//
-func (sec *section) pushVar(mode varMode, k, v, comment []byte) {
-	switch mode {
-	case varModeNewline:
-		sec.vars = append(sec.vars, varNewline)
-
-	case varModeComment:
-		sec.vars = append(sec.vars, &variable{
-			m: mode,
-			k: nil,
-			v: nil,
-			c: comment,
-		})
-
-	case varModeNormal:
-		sec.vars = append(sec.vars, &variable{
-			m: mode,
-			k: k,
-			v: v,
-			c: comment,
-		})
-	}
-}
+type section variable
 
 //
 // Get will return the last key's value.
@@ -60,21 +20,48 @@ func (sec *section) Get(key []byte) (val []byte, ok bool) {
 
 	for ; x >= 0; x-- {
 		if debug >= debugL2 {
-			fmt.Printf("sec: %s, var: %s %s\n", sec.name,
-				string(sec.vars[x].k),
-				string(sec.vars[x].v))
+			fmt.Printf("sec: %s, var: %s %s\n", sec.secName,
+				string(sec.vars[x].key),
+				string(sec.vars[x].value))
 		}
-		if sec.vars[x].m != varModeNormal {
-			continue
-		}
-		if !bytes.Equal(sec.vars[x].k, key) {
+		if !bytes.Equal(sec.vars[x].keyLower, key) {
 			continue
 		}
 
-		val = sec.vars[x].v
+		val = sec.vars[x].value
 		ok = true
 		break
 	}
 
 	return
+}
+
+func (sec *section) addVariable(v *variable) {
+	if v == nil {
+		return
+	}
+
+	v.keyLower = bytes.ToLower(v.key)
+	sec.vars = append(sec.vars, v)
+}
+
+//
+// String return formatted INI section header.
+// nolint: gas
+func (sec *section) String() string {
+	var buf bytes.Buffer
+	format := string(sec.format)
+
+	switch sec.mode {
+	case varModeSection:
+		_, _ = fmt.Fprintf(&buf, format, sec.secName)
+	case varModeSection | varModeComment:
+		_, _ = fmt.Fprintf(&buf, format, sec.secName, sec.others)
+	case varModeSection | varModeSubsection:
+		_, _ = fmt.Fprintf(&buf, format, sec.secName, sec.subName)
+	case varModeSection | varModeSubsection | varModeComment:
+		_, _ = fmt.Fprintf(&buf, format, sec.secName, sec.subName, sec.others)
+	}
+
+	return buf.String()
 }

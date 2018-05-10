@@ -15,7 +15,7 @@ var (
 	inputIni *Ini
 )
 
-func TestOpenAndSave(t *testing.T) {
+func TestOpen(t *testing.T) {
 	cases := []struct {
 		desc       string
 		inFile     string
@@ -36,15 +36,48 @@ func TestOpenAndSave(t *testing.T) {
 	for _, c := range cases {
 		t.Logf("%+v", c)
 
+		in, err := Open(c.inFile)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		err = in.Save(c.inFile + ".save")
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestSave(t *testing.T) {
+	cases := []struct {
+		desc   string
+		inFile string
+		expErr string
+	}{{
+		desc:   "With no file",
+		expErr: "open : no such file or directory",
+	}, {
+		desc:   "With variable without section",
+		inFile: testdataVarWithoutSection,
+		expErr: "variable without section, line 7 at testdata/var_without_section.ini",
+	}, {
+		desc:   "With valid file",
+		inFile: "testdata/input.ini",
+	}}
+
+	for _, c := range cases {
+		t.Logf("%+v", c)
+
 		ini, err := Open(c.inFile)
 		if err != nil {
-			test.Assert(t, c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
 		}
 
 		err = ini.Save(c.inFile + ".save")
 		if err != nil {
-			test.Assert(t, c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error(), true)
 		}
 	}
 }
@@ -107,11 +140,11 @@ func TestGet(t *testing.T) {
 
 		got, ok = inputIni.Get(c.sec, c.sub, c.key)
 		if !ok {
-			test.Assert(t, c.expOk, ok, true)
+			test.Assert(t, "ok", c.expOk, ok, true)
 			continue
 		}
 
-		test.Assert(t, c.expVal, got, true)
+		test.Assert(t, "value", c.expVal, got, true)
 	}
 }
 
@@ -131,7 +164,7 @@ func TestGetInputIni(t *testing.T) {
 			"autocrlf",
 		},
 		expVals: []string{
-			"false",
+			"true",
 			"default-proxy",
 			"less -R",
 			"nvim",
@@ -270,9 +303,9 @@ func TestGetInputIni(t *testing.T) {
 			"codereview pending",
 			"codereview submit",
 			"codereview sync",
-			`--no-pager log --graph --date=format:'%Y-%m-%d' --pretty=format:'%C(auto,dim)%ad %<(7,trunc) %an %Creset%m %h %s %Cgreen%d%Creset' --exclude=*/production --exclude=*/dev-* --all -n 20`,
-			`!git stash -u && git fetch origin && git rebase origin/master && git stash pop && git --no-pager log --graph --decorate --pretty=oneline --abbrev-commit origin/master~1..HEAD`,
-			`!git stash -u && git fetch origin && git rebase origin/production && git stash pop && git --no-pager log --graph --decorate --pretty=oneline --abbrev-commit origin/production~1..HEAD`,
+			`!git --no-pager log --graph 		--date=format:'%Y-%m-%d' 		--pretty=format:'%C(auto,dim)%ad %<(7,trunc) %an %Creset%m %h %s %Cgreen%d%Creset' 		--exclude=*/production 		--exclude=*/dev-* 		--all -n 20`,
+			`!git stash -u 		&& git fetch origin 		&& git rebase origin/master 		&& git stash pop 		&& git --no-pager log --graph --decorate --pretty=oneline 			--abbrev-commit origin/master~1..HEAD`,
+			`!git stash -u 		&& git fetch origin 		&& git rebase origin/production 		&& git stash pop 		&& git --no-pager log --graph --decorate --pretty=oneline 			--abbrev-commit origin/production~1..HEAD`,
 		},
 	}, {
 		sec: "url",
@@ -291,6 +324,8 @@ func TestGetInputIni(t *testing.T) {
 	)
 
 	for _, c := range cases {
+		t.Log(c)
+
 		if debug >= debugL2 {
 			t.Logf("Section header: [%s %s]", c.sec, c.sub)
 			t.Logf(">>> keys: %s", c.keys)
@@ -298,17 +333,16 @@ func TestGetInputIni(t *testing.T) {
 		}
 
 		for x, k := range c.keys {
-			if debug >= debugL2 {
-				t.Logf("Get: %s", k)
-			}
+			t.Log("  Get:", k)
+
 			got, ok = inputIni.Get(c.sec, c.sub, k)
 			if !ok {
 				t.Logf("Get: %s > %s > %s", c.sec, c.sub, k)
-				test.Assert(t, true, ok, true)
+				test.Assert(t, "ok", true, ok, true)
 				t.FailNow()
 			}
 
-			test.Assert(t, c.expVals[x], string(got), true)
+			test.Assert(t, "value", []byte(c.expVals[x]), got, true)
 		}
 	}
 }
