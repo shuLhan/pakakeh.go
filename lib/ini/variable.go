@@ -52,14 +52,12 @@ func (v *Variable) String() string {
 	case varModeEmpty:
 		if len(format) > 0 {
 			_, _ = fmt.Fprintf(&buf, format)
-		} else {
-			_, _ = fmt.Fprintln(&buf)
 		}
 	case varModeComment:
 		if len(format) > 0 {
 			_, _ = fmt.Fprintf(&buf, format, v.others)
 		} else {
-			_, _ = fmt.Fprintln(&buf, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s\n", v.others)
 		}
 	case varModeSection:
 		if len(format) > 0 {
@@ -77,7 +75,7 @@ func (v *Variable) String() string {
 		if len(format) > 0 {
 			_, _ = fmt.Fprintf(&buf, format, v.secName, v.subName)
 		} else {
-			_, _ = fmt.Fprintf(&buf, `[%s \"%s\"]\n`, v.secName, v.subName)
+			_, _ = fmt.Fprintf(&buf, `[%s "%s"]\n`, v.secName, v.subName)
 		}
 	case varModeSection | varModeSubsection | varModeComment:
 		if len(format) > 0 {
