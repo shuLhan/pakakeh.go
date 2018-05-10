@@ -150,14 +150,6 @@ func (in *Ini) Write(w io.Writer) (err error) {
 }
 
 //
-// Reset clear all parsed data. This function can be used if you want to
-// reuse the same Ini instance for parsing different Ini content.
-//
-func (in *Ini) Reset() {
-	in.secs = nil
-}
-
-//
 // AddSection append the new section to the list.
 //
 func (in *Ini) AddSection(sec *Section) {
