@@ -8,6 +8,9 @@ import (
 
 const (
 	testdataInputIni          = "testdata/input.ini"
+	testdataSectionDupIni     = "testdata/section_dup.ini"
+	testdataVarMultiEmpty     = "testdata/var_multi_empty.ini"
+	testdataVarMultiSection   = "testdata/var_multi_section.ini"
 	testdataVarWithoutSection = "testdata/var_without_section.ini"
 )
 
@@ -378,6 +381,172 @@ func TestGetInputIni(t *testing.T) {
 			}
 
 			test.Assert(t, "value", []byte(c.expVals[x]), got, true)
+		}
+	}
+}
+
+func TestGetSectionDup(t *testing.T) {
+	cases := []struct {
+		sec     string
+		sub     string
+		keys    []string
+		expOK   []bool
+		expVals []string
+	}{{
+		sec: "core",
+		keys: []string{
+			"dupkey",
+			"old",
+			"new",
+			"test",
+		},
+		expOK: []bool{
+			true,
+			true,
+			true,
+			false,
+		},
+		expVals: []string{
+			"2",
+			"value",
+			"value",
+			"",
+		},
+	}}
+
+	cfg, err := Open(testdataSectionDupIni)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, c := range cases {
+		t.Log(c)
+
+		for x, k := range c.keys {
+			t.Log("  Get:", k)
+
+			got, ok := cfg.Get(c.sec, c.sub, k)
+			if !ok {
+				test.Assert(t, "ok", c.expOK[x], ok, true)
+				continue
+			}
+
+			test.Assert(t, k, c.expVals[x], string(got), true)
+		}
+	}
+}
+
+func TestGetVarMultiEmpty(t *testing.T) {
+	cases := []struct {
+		sec     string
+		sub     string
+		keys    []string
+		expOK   []bool
+		expVals []string
+	}{{
+		sec: "alias",
+		keys: []string{
+			"tree",
+			"test",
+		},
+		expOK: []bool{
+			true,
+			false,
+		},
+		expVals: []string{
+			"!git --no-pager log --graph ",
+			"",
+		},
+	}, {
+		sec: "section",
+		keys: []string{
+			"tree",
+			"test",
+		},
+		expOK: []bool{
+			false,
+			true,
+		},
+		expVals: []string{
+			"",
+			"true",
+		},
+	}}
+
+	cfg, err := Open(testdataVarMultiEmpty)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, c := range cases {
+		t.Log(c)
+
+		for x, k := range c.keys {
+			t.Log("  Get:", k)
+
+			got, ok := cfg.Get(c.sec, c.sub, k)
+			if !ok {
+				test.Assert(t, "ok", c.expOK[x], ok, true)
+				continue
+			}
+
+			test.Assert(t, k, c.expVals[x], string(got), true)
+		}
+	}
+}
+
+func TestGetVarMultiSection(t *testing.T) {
+	cases := []struct {
+		sec     string
+		sub     string
+		keys    []string
+		expOK   []bool
+		expVals []string
+	}{{
+		sec: "alias",
+		keys: []string{
+			"tree",
+			"test",
+		},
+		expOK: []bool{
+			true,
+			true,
+		},
+		expVals: []string{
+			"!git --no-pager log --graph [section]",
+			"true",
+		},
+	}, {
+		sec: "section",
+		keys: []string{
+			"test",
+		},
+		expOK: []bool{
+			false,
+		},
+		expVals: []string{
+			"true",
+		},
+	}}
+
+	cfg, err := Open(testdataVarMultiSection)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, c := range cases {
+		t.Log(c)
+
+		for x, k := range c.keys {
+			t.Log("  Get:", k)
+
+			got, ok := cfg.Get(c.sec, c.sub, k)
+			if !ok {
+				test.Assert(t, "ok", c.expOK[x], ok, true)
+				continue
+			}
+
+			test.Assert(t, k, c.expVals[x], string(got), true)
 		}
 	}
 }
