@@ -93,7 +93,7 @@ import (
 // Ini contains the parsed file.
 //
 type Ini struct {
-	secs []*section
+	secs []*Section
 }
 
 //
@@ -157,12 +157,15 @@ func (in *Ini) Reset() {
 	in.secs = nil
 }
 
-func (in *Ini) addSection(sec *section) {
+//
+// AddSection append the new section to the list.
+//
+func (in *Ini) AddSection(sec *Section) {
 	if sec == nil {
 		return
 	}
 	if len(sec.secName) > 0 {
-		sec.secLower = bytes.ToLower(sec.secName)
+		sec._sec = bytes.ToLower(sec.secName)
 	}
 	in.secs = append(in.secs, sec)
 }
@@ -189,7 +192,7 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 	bkey := []byte(key)
 
 	for ; x >= 0; x-- {
-		if !bytes.Equal(in.secs[x].secLower, bsec) {
+		if !bytes.Equal(in.secs[x]._sec, bsec) {
 			continue
 		}
 

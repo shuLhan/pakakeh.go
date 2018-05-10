@@ -2,3 +2,4 @@
 *.prof
 *.save
 *.test
+cover.*

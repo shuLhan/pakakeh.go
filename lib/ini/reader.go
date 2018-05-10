@@ -44,8 +44,8 @@ type Reader struct {
 	r          rune
 	lineNum    int
 	filename   string
-	_var       *variable
-	sec        *section
+	_var       *Variable
+	sec        *Section
 	buf        bytes.Buffer
 	bufComment bytes.Buffer
 	bufFormat  bytes.Buffer
@@ -72,10 +72,10 @@ func (reader *Reader) reset(src []byte) {
 	reader.b = 0
 	reader.r = 0
 	reader.lineNum = 0
-	reader._var = &variable{
+	reader._var = &Variable{
 		mode: varModeEmpty,
 	}
-	reader.sec = &section{
+	reader.sec = &Section{
 		mode: varModeEmpty,
 	}
 	reader.buf.Reset()
@@ -143,18 +143,18 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 		if reader._var.mode&varModeSection == varModeSection ||
 			reader._var.mode&varModeSubsection == varModeSubsection {
 
-			in.addSection(reader.sec)
+			in.AddSection(reader.sec)
 
-			reader.sec = (*section)(reader._var)
-			reader._var = &variable{
+			reader.sec = reader._var
+			reader._var = &Variable{
 				mode: varModeEmpty,
 			}
 			continue
 		}
 
-		reader.sec.addVariable(reader._var)
+		reader.sec.add(reader._var)
 
-		reader._var = &variable{
+		reader._var = &Variable{
 			mode: varModeEmpty,
 		}
 	}
@@ -163,8 +163,8 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 		fmt.Println(reader._var)
 	}
 
-	reader.sec.addVariable(reader._var)
-	in.addSection(reader.sec)
+	reader.sec.add(reader._var)
+	in.AddSection(reader.sec)
 
 	reader._var = nil
 	reader.sec = nil
