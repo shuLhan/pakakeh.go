@@ -289,6 +289,27 @@ func TestParseVariable(t *testing.T) {
 		expFormat:  []byte("%s =%s"),
 		expComment: []byte("# a comment"),
 		expValue:   varValueTrue,
+	}, {
+		desc:      "With empty value #3",
+		in:        []byte(`name     `),
+		expErr:    io.EOF,
+		expMode:   varModeSingle,
+		expKey:    []byte("name"),
+		expFormat: []byte("%s     "),
+		expValue:  varValueTrue,
+	}, {
+		desc: "With newline",
+		in: []byte(`name 
+`),
+		expErr:    io.EOF,
+		expMode:   varModeSingle,
+		expKey:    []byte("name"),
+		expFormat: []byte("%s \n"),
+		expValue:  varValueTrue,
+	}, {
+		desc:   "With invalid char",
+		in:     []byte(`name 1`),
+		expErr: errVarNameInvalid,
 	}}
 
 	reader := NewReader()

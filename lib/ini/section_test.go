@@ -399,6 +399,8 @@ func testSectionUnsetAll(t *testing.T) {
 }
 
 func testSectionReplaceAll(t *testing.T) {
+	sec.add(nil)
+
 	sec.Add("key-3", "3")
 	sec.Add("key-3", "33")
 	sec.Add("key-3", "333")
