@@ -103,12 +103,11 @@ type Ini struct {
 // On fail it may return incomplete instance of Ini with error.
 //
 func Open(filename string) (in *Ini, err error) {
-	in = &Ini{}
 	reader := NewReader()
 
-	err = reader.ParseFile(in, filename)
+	in, err = reader.ParseFile(filename)
 
-	if debug >= debugL1 {
+	if debug >= debugL1 && err == nil {
 		err = in.Write(os.Stdout)
 	}
 

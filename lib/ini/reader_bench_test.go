@@ -13,10 +13,9 @@ import (
 // BenchmarkParse-2  500   19534400 ns/op  4656335 B/op  81163 allocs/op
 //
 // Refactor parser to use bytes.Reader
-// BenchmarkParse-2  20000    71120 ns/op    35368 B/op    549 allocs/op
+// BenchmarkParse-2  20000    72338 ns/op    35400 B/op    550 allocs/op
 //
 func BenchmarkParse(b *testing.B) {
-	in := &Ini{}
 	reader := NewReader()
 	src, err := ioutil.ReadFile(testdataInputIni)
 	if err != nil {
@@ -24,6 +23,6 @@ func BenchmarkParse(b *testing.B) {
 	}
 
 	for x := 0; x < b.N; x++ {
-		reader.Parse(in, src)
+		_, _ = reader.Parse(src)
 	}
 }

@@ -85,9 +85,12 @@ func (reader *Reader) reset(src []byte) {
 }
 
 //
-// ParseFile will open, read, and parse INI file `filename` into `in`.
+// ParseFile will open, read, and parse INI file `filename` and return an
+// instance of Ini.
 //
-func (reader *Reader) ParseFile(in *Ini, filename string) (err error) {
+// On failure, it return nil and error.
+//
+func (reader *Reader) ParseFile(filename string) (in *Ini, err error) {
 	src, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return
@@ -95,7 +98,7 @@ func (reader *Reader) ParseFile(in *Ini, filename string) (err error) {
 
 	reader.filename = filename
 
-	err = reader.Parse(in, src)
+	in, err = reader.Parse(src)
 
 	return
 }
@@ -104,16 +107,17 @@ func (reader *Reader) ParseFile(in *Ini, filename string) (err error) {
 // Parse will parse INI config from slice of bytes `src` into `in`.
 //
 // nolint: gocyclo
-func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
-	in.Reset()
+func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
+	in = &Ini{}
 	reader.reset(src)
 
 	for {
 		err = reader.parse()
 		if err != nil {
 			if err != io.EOF {
-				return fmt.Errorf(err.Error(), reader.lineNum,
+				err = fmt.Errorf(err.Error(), reader.lineNum,
 					reader.filename)
+				return nil, err
 			}
 			break
 		}
@@ -129,9 +133,10 @@ func (reader *Reader) Parse(in *Ini, src []byte) (err error) {
 			reader._var.mode&varModeValue == varModeValue ||
 			reader._var.mode&varModeMulti == varModeMulti {
 			if reader.sec.mode == varModeEmpty {
-				return fmt.Errorf(errVarNoSection,
+				err = fmt.Errorf(errVarNoSection,
 					reader.lineNum,
 					reader.filename)
+				return nil, err
 			}
 		}
 

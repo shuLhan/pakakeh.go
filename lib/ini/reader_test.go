@@ -129,6 +129,7 @@ func TestParseVariable(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c)
+
 		reader.reset(c.in)
 
 		err := reader.parseVariable()
@@ -267,8 +268,10 @@ func TestParseVarValue(t *testing.T) {
 	}}
 
 	reader := NewReader()
+
 	for _, c := range cases {
 		t.Log(c.desc)
+
 		reader.reset(c.in)
 
 		err := reader.parseVarValue()
