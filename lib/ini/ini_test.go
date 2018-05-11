@@ -186,6 +186,43 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestString(t *testing.T) {
+	cfg, err := Open(testdataInputIni)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc string
+		sec  string
+		sub  string
+		key  string
+		def  string
+		exp  string
+	}{{
+		desc: "With empty params",
+	}, {
+		desc: "With non existen key",
+		sec:  "test",
+		key:  "key",
+		def:  "def",
+		exp:  "def",
+	}, {
+		desc: "With valid key, empty default",
+		sec:  "user",
+		key:  "name",
+		exp:  "Shulhan",
+	}}
+
+	var got string
+
+	for _, c := range cases {
+		got = cfg.String(c.sec, c.sub, c.key, c.def)
+
+		test.Assert(t, "string", c.exp, got, true)
+	}
+}
+
 func TestGetInputIni(t *testing.T) {
 	cases := []struct {
 		sec     string

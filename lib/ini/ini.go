@@ -202,3 +202,18 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 	val = nil
 	return
 }
+
+//
+// String return key's value as string. if no key found it will return default
+// value.
+//
+func (in *Ini) String(section, subsection, key, def string) (out string) {
+	v, ok := in.Get(section, subsection, key)
+	if !ok {
+		out = def
+	} else {
+		out = string(v)
+	}
+
+	return
+}
