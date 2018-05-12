@@ -13,13 +13,14 @@ import (
 // Section represent section header in INI file format and their variables.
 //
 type Section struct {
-	mode   varMode
-	format []byte
-	name   []byte
-	_name  []byte
-	sub    []byte
-	others []byte
-	vars   []*Variable
+	mode    varMode
+	lineNum int
+	format  []byte
+	name    []byte
+	_name   []byte
+	sub     []byte
+	others  []byte
+	vars    []*Variable
 }
 
 //

@@ -131,8 +131,8 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 			fmt.Print(reader._var)
 		}
 
-		reader._var.lineNum = reader.lineNum
 		reader.lineNum++
+		reader._var.lineNum = reader.lineNum
 
 		if reader._var.mode&varModeSingle == varModeSingle ||
 			reader._var.mode&varModeValue == varModeValue ||
@@ -151,11 +151,12 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 			in.AddSection(reader.sec)
 
 			reader.sec = &Section{
-				mode:   reader._var.mode,
-				format: reader._var.format,
-				name:   reader._var.secName,
-				sub:    reader._var.subName,
-				others: reader._var.others,
+				mode:    reader._var.mode,
+				lineNum: reader._var.lineNum,
+				format:  reader._var.format,
+				name:    reader._var.secName,
+				sub:     reader._var.subName,
+				others:  reader._var.others,
 			}
 
 			reader._var = &Variable{
