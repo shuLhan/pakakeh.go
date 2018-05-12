@@ -102,15 +102,15 @@ func TestAddSection(t *testing.T) {
 	}, {
 		desc: "With valid section",
 		sec: &Section{
-			mode:    varModeSection,
-			secName: []byte("Test"),
-			_sec:    []byte("test"),
+			mode:  varModeSection,
+			name:  []byte("Test"),
+			_name: []byte("test"),
 		},
 		expIni: &Ini{
 			secs: []*Section{{
-				mode:    varModeSection,
-				secName: []byte("Test"),
-				_sec:    []byte("test"),
+				mode:  varModeSection,
+				name:  []byte("Test"),
+				_name: []byte("test"),
 			}},
 		},
 	}}

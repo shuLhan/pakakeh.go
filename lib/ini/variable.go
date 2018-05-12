@@ -41,7 +41,6 @@ type Variable struct {
 	others  []byte
 	_sec    []byte
 	_key    []byte
-	vars    []*Variable
 }
 
 //

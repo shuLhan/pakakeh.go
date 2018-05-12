@@ -6,13 +6,21 @@ package ini
 
 import (
 	"bytes"
+	"fmt"
 )
 
 //
-// Section is an alias of Variable, which represent section header in INI file
-// format.
+// Section represent section header in INI file format and their variables.
 //
-type Section = Variable
+type Section struct {
+	mode   varMode
+	format []byte
+	name   []byte
+	_name  []byte
+	sub    []byte
+	others []byte
+	vars   []*Variable
+}
 
 //
 // NewSection will create new section with `name` and optional subsection
@@ -25,15 +33,15 @@ func NewSection(name, subName string) (sec *Section) {
 	}
 
 	sec = &Section{
-		mode:    varModeSection,
-		secName: []byte(name),
+		mode: varModeSection,
+		name: []byte(name),
 	}
 
-	sec._sec = bytes.ToLower(sec.secName)
+	sec._name = bytes.ToLower(sec.name)
 
 	if len(subName) > 0 {
 		sec.mode |= varModeSubsection
-		sec.subName = []byte(subName)
+		sec.sub = []byte(subName)
 	}
 
 	return
@@ -44,11 +52,14 @@ func (sec *Section) add(v *Variable) {
 		return
 	}
 
-	if len(v.value) == 0 || v.value == nil {
-		v.value = varValueTrue
+	if v.mode&varModeValue == varModeValue ||
+		v.mode&varModeSingle == varModeSingle ||
+		v.mode&varModeMulti == varModeMulti {
+		if len(v.value) == 0 {
+			v.value = varValueTrue
+		}
+		v._key = bytes.ToLower(v.key)
 	}
-
-	v._key = bytes.ToLower(v.key)
 
 	sec.vars = append(sec.vars, v)
 }
@@ -246,4 +257,41 @@ func (sec *Section) Get(key []byte) (val []byte, ok bool) {
 	}
 
 	return
+}
+
+//
+// String return formatted INI section header.
+//
+//nolint: gocyclo, gas
+func (sec *Section) String() string {
+	var buf bytes.Buffer
+
+	switch sec.mode {
+	case varModeSection:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s]\n", sec.name)
+		}
+	case varModeSection | varModeComment:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.others)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", sec.name, sec.others)
+		}
+	case varModeSection | varModeSubsection:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.Sub)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"]\n", sec.name, sec.Sub)
+		}
+	case varModeSection | varModeSubsection | varModeComment:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.Sub, sec.others)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"] %s\n", sec.name, sec.Sub, sec.others)
+		}
+	}
+
+	return buf.String()
 }

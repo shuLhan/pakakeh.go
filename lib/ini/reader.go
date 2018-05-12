@@ -150,7 +150,14 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 
 			in.AddSection(reader.sec)
 
-			reader.sec = reader._var
+			reader.sec = &Section{
+				mode:   reader._var.mode,
+				format: reader._var.format,
+				name:   reader._var.secName,
+				sub:    reader._var.subName,
+				others: reader._var.others,
+			}
+
 			reader._var = &Variable{
 				mode: varModeEmpty,
 			}

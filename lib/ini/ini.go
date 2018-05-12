@@ -160,9 +160,12 @@ func (in *Ini) AddSection(sec *Section) {
 	if sec == nil {
 		return
 	}
-	if len(sec.secName) > 0 {
-		sec._sec = bytes.ToLower(sec.secName)
+	if len(sec.name) == 0 {
+		return
 	}
+
+	sec._name = bytes.ToLower(sec.name)
+
 	in.secs = append(in.secs, sec)
 }
 
@@ -188,11 +191,11 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 	bkey := []byte(key)
 
 	for ; x >= 0; x-- {
-		if !bytes.Equal(in.secs[x]._sec, bsec) {
+		if !bytes.Equal(in.secs[x]._name, bsec) {
 			continue
 		}
 
-		if !bytes.Equal(in.secs[x].subName, bsub) {
+		if !bytes.Equal(in.secs[x].sub, bsub) {
 			continue
 		}
 
