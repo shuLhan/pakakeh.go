@@ -162,6 +162,36 @@ func (sec *Section) Add(key, value string) {
 }
 
 //
+// AddNewLine to section as variable.
+//
+func (sec *Section) AddNewLine() {
+	v := &Variable{
+		mode:   varModeEmpty,
+		format: "\n",
+	}
+	sec.add(v)
+}
+
+//
+// AddComment to section as variable.
+//
+func (sec *Section) AddComment(comment string) {
+	b0 := comment[0]
+
+	if b0 != tokHash && b0 != tokSemiColon {
+		comment = "# " + comment
+	}
+
+	v := &Variable{
+		mode:   varModeComment,
+		format: "\t%s\n",
+		others: comment,
+	}
+
+	sec.add(v)
+}
+
+//
 // Unset remove the variable with name `key` on current section.
 //
 // (1) If key is empty, no variable will be removed, and it will return true.
