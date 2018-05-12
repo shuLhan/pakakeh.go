@@ -103,14 +103,14 @@ func TestAddSection(t *testing.T) {
 		desc: "With valid section",
 		sec: &Section{
 			mode:  varModeSection,
-			name:  []byte("Test"),
-			_name: []byte("test"),
+			name:  "Test",
+			_name: "test",
 		},
 		expIni: &Ini{
 			secs: []*Section{{
 				mode:  varModeSection,
-				name:  []byte("Test"),
-				_name: []byte("test"),
+				name:  "Test",
+				_name: "test",
 			}},
 		},
 	}}
@@ -127,7 +127,7 @@ func TestAddSection(t *testing.T) {
 func TestGet(t *testing.T) {
 	var (
 		err error
-		got []byte
+		got string
 		ok  bool
 	)
 
@@ -141,7 +141,7 @@ func TestGet(t *testing.T) {
 		sec    string
 		sub    string
 		key    string
-		expVal []byte
+		expVal string
 		expOk  bool
 	}{{
 		desc: `With empty section`,
@@ -151,7 +151,7 @@ func TestGet(t *testing.T) {
 		desc:   `With empty subsection`,
 		sec:    "user",
 		key:    "name",
-		expVal: []byte("Shulhan"),
+		expVal: "Shulhan",
 		expOk:  true,
 	}, {
 		desc: `With empty key`,
@@ -174,7 +174,7 @@ func TestGet(t *testing.T) {
 		desc:   `With empty value`,
 		sec:    "http",
 		key:    "sslVerify",
-		expVal: []byte("true"),
+		expVal: "true",
 	}}
 
 	for _, c := range cases {
@@ -398,7 +398,7 @@ func TestGetInputIni(t *testing.T) {
 	}}
 
 	var (
-		got []byte
+		got string
 		ok  bool
 	)
 
@@ -421,7 +421,7 @@ func TestGetInputIni(t *testing.T) {
 				t.FailNow()
 			}
 
-			test.Assert(t, "value", []byte(c.expVals[x]), got, true)
+			test.Assert(t, "value", c.expVals[x], got, true)
 		}
 	}
 }
@@ -613,96 +613,96 @@ func TestGetSections(t *testing.T) {
 		exp: []*Section{{
 			mode:    varModeSection,
 			LineNum: 8,
-			format:  []byte("[%s]\n"),
-			name:    []byte("core"),
-			_name:   []byte("core"),
+			format:  "[%s]\n",
+			name:    "core",
+			_name:   "core",
 			Vars: []*Variable{{
 				mode:    varModeComment,
 				lineNum: 9,
-				format: []byte("	%s\n"),
-				others: []byte("; Don't trust file modes"),
+				format: "	%s\n",
+				others: "; Don't trust file modes",
 			}, {
 				mode:    varModeValue,
 				lineNum: 10,
-				format: []byte("	%s = false\n"),
-				Key:   []byte("filemode"),
-				_key:  []byte("filemode"),
-				Value: []byte("false"),
+				format: "	%s = false\n",
+				Key:   "filemode",
+				_key:  "filemode",
+				Value: "false",
 			}, {
 				mode:    varModeEmpty,
 				lineNum: 11,
-				format:  []byte("\n"),
+				format:  "\n",
 			}, {
 				mode:    varModeComment,
 				lineNum: 12,
-				format:  []byte("%s\n"),
-				others:  []byte("; Our diff algorithm"),
+				format:  "%s\n",
+				others:  "; Our diff algorithm",
 			}},
 		}, {
 			mode:    varModeSection,
 			LineNum: 18,
-			format:  []byte("[%s]\n"),
-			name:    []byte("core"),
-			_name:   []byte("core"),
+			format:  "[%s]\n",
+			name:    "core",
+			_name:   "core",
 			Vars: []*Variable{{
 				mode:    varModeValue,
 				lineNum: 19,
-				format: []byte("	%s=\"ssh\" for \"kernel.org\"\n"),
-				Key:   []byte("gitProxy"),
-				_key:  []byte("gitproxy"),
-				Value: []byte("ssh for kernel.org"),
+				format: "	%s=\"ssh\" for \"kernel.org\"\n",
+				Key:   "gitProxy",
+				_key:  "gitproxy",
+				Value: "ssh for kernel.org",
 			}, {
 				mode:    varModeValue | varModeComment,
 				lineNum: 20,
-				format: []byte("	%s=default-proxy %s\n"),
-				Key:    []byte("gitProxy"),
-				_key:   []byte("gitproxy"),
-				Value:  []byte("default-proxy"),
-				others: []byte("; for the rest"),
+				format: "	%s=default-proxy %s\n",
+				Key:    "gitProxy",
+				_key:   "gitproxy",
+				Value:  "default-proxy",
+				others: "; for the rest",
 			}, {
 				mode:    varModeEmpty,
 				lineNum: 21,
-				format:  []byte("\n"),
+				format:  "\n",
 			}, {
 				mode:    varModeComment,
 				lineNum: 22,
-				format:  []byte("%s\n"),
-				others:  []byte("; User settings"),
+				format:  "%s\n",
+				others:  "; User settings",
 			}},
 		}, {
 			mode:    varModeSection,
 			LineNum: 63,
-			format:  []byte("[%s]\n"),
-			name:    []byte("core"),
-			_name:   []byte("core"),
+			format:  "[%s]\n",
+			name:    "core",
+			_name:   "core",
 			Vars: []*Variable{{
 				mode:    varModeValue,
 				lineNum: 64,
-				format: []byte("	%s = less -R\n"),
-				Key:   []byte("pager"),
-				_key:  []byte("pager"),
-				Value: []byte("less -R"),
+				format: "	%s = less -R\n",
+				Key:   "pager",
+				_key:  "pager",
+				Value: "less -R",
 			}, {
 				mode:    varModeValue,
 				lineNum: 65,
-				format: []byte("	%s = nvim\n"),
-				Key:   []byte("editor"),
-				_key:  []byte("editor"),
-				Value: []byte("nvim"),
+				format: "	%s = nvim\n",
+				Key:   "editor",
+				_key:  "editor",
+				Value: "nvim",
 			}, {
 				mode:    varModeValue,
 				lineNum: 66,
-				format: []byte("	%s = false\n"),
-				Key:   []byte("autocrlf"),
-				_key:  []byte("autocrlf"),
-				Value: []byte("false"),
+				format: "	%s = false\n",
+				Key:   "autocrlf",
+				_key:  "autocrlf",
+				Value: "false",
 			}, {
 				mode:    varModeValue,
 				lineNum: 67,
-				format: []byte("	%s = true\n"),
-				Key:   []byte("filemode"),
-				_key:  []byte("filemode"),
-				Value: []byte("true"),
+				format: "	%s = true\n",
+				Key:   "filemode",
+				_key:  "filemode",
+				Value: "true",
 			}},
 		}},
 	}}

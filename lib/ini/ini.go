@@ -86,7 +86,6 @@
 package ini
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -164,7 +163,7 @@ func (in *Ini) AddSection(sec *Section) {
 		return
 	}
 
-	sec._name = bytes.ToLower(sec.name)
+	sec._name = strings.ToLower(sec.name)
 
 	in.secs = append(in.secs, sec)
 }
@@ -179,34 +178,31 @@ func (in *Ini) AddSection(sec *Section) {
 //
 // Otherwise it will return key's value and true.
 //
-func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
+func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 	// (1) (2)
 	if len(in.secs) == 0 || len(section) == 0 || len(key) == 0 {
 		return
 	}
 
 	x := len(in.secs) - 1
-	bsec := []byte(strings.ToLower(section))
-	bsub := []byte(subsection)
-	bkey := []byte(key)
+	sec := strings.ToLower(section)
 
 	for ; x >= 0; x-- {
-		if !bytes.Equal(in.secs[x]._name, bsec) {
+		if in.secs[x]._name != sec {
 			continue
 		}
 
-		if !bytes.Equal(in.secs[x].Sub, bsub) {
+		if in.secs[x].Sub != subsection {
 			continue
 		}
 
-		val, ok = in.secs[x].Get(bkey)
+		val, ok = in.secs[x].Get(key)
 		if ok {
 			return
 		}
 	}
 
 	// (3)
-	val = nil
 	return
 }
 
@@ -215,11 +211,9 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 // default value.
 //
 func (in *Ini) GetString(section, subsection, key, def string) (out string) {
-	v, ok := in.Get(section, subsection, key)
+	out, ok := in.Get(section, subsection, key)
 	if !ok {
 		out = def
-	} else {
-		out = string(v)
 	}
 
 	return
@@ -233,10 +227,10 @@ func (in *Ini) GetSections(name string) (secs []*Section) {
 		return
 	}
 
-	bname := []byte(name)
+	name = strings.ToLower(name)
 
 	for x := 0; x < len(in.secs); x++ {
-		if !bytes.Equal(in.secs[x]._name, bname) {
+		if in.secs[x]._name != name {
 			continue
 		}
 		secs = append(secs, in.secs[x])

@@ -7,6 +7,7 @@ package ini
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 //
@@ -14,13 +15,13 @@ import (
 //
 type Section struct {
 	LineNum int
-	Sub     []byte
+	Sub     string
 	Vars    []*Variable
 	mode    varMode
-	format  []byte
-	name    []byte
-	_name   []byte
-	others  []byte
+	format  string
+	name    string
+	_name   string
+	others  string
 }
 
 //
@@ -35,14 +36,14 @@ func NewSection(name, subName string) (sec *Section) {
 
 	sec = &Section{
 		mode: varModeSection,
-		name: []byte(name),
+		name: name,
 	}
 
-	sec._name = bytes.ToLower(sec.name)
+	sec._name = strings.ToLower(sec.name)
 
 	if len(subName) > 0 {
 		sec.mode |= varModeSubsection
-		sec.Sub = []byte(subName)
+		sec.Sub = subName
 	}
 
 	return
@@ -59,7 +60,7 @@ func (sec *Section) add(v *Variable) {
 		if len(v.Value) == 0 {
 			v.Value = varValueTrue
 		}
-		v._key = bytes.ToLower(v.Key)
+		v._key = strings.ToLower(v.Key)
 	}
 
 	sec.Vars = append(sec.Vars, v)
@@ -70,11 +71,11 @@ func (sec *Section) add(v *Variable) {
 // section have duplicate `key` it will return true.
 // If no variable with key found it will return -1 and false.
 //
-func (sec *Section) getFirstIndex(key []byte) (idx int, dup bool) {
+func (sec *Section) getFirstIndex(key string) (idx int, dup bool) {
 	idx = -1
 	n := 0
 	for x := 0; x < len(sec.Vars); x++ {
-		if !bytes.Equal(sec.Vars[x]._key, key) {
+		if sec.Vars[x]._key != key {
 			continue
 		}
 		if idx < 0 {
@@ -105,10 +106,9 @@ func (sec *Section) Set(key, value string) bool {
 		return false
 	}
 
-	bkey := []byte(key)
-	lowerkey := bytes.ToLower(bkey)
+	keylow := strings.ToLower(key)
 
-	idx, dup := sec.getFirstIndex(lowerkey)
+	idx, dup := sec.getFirstIndex(keylow)
 
 	// (2)
 	if dup {
@@ -119,8 +119,8 @@ func (sec *Section) Set(key, value string) bool {
 	if idx < 0 {
 		sec.add(&Variable{
 			mode:  varModeValue,
-			Key:   bkey,
-			Value: []byte(value),
+			Key:   key,
+			Value: value,
 		})
 
 		return true
@@ -130,7 +130,7 @@ func (sec *Section) Set(key, value string) bool {
 	if len(value) == 0 {
 		sec.Vars[idx].Value = varValueTrue
 	} else {
-		sec.Vars[idx].Value = []byte(value)
+		sec.Vars[idx].Value = value
 	}
 
 	return true
@@ -152,8 +152,8 @@ func (sec *Section) Add(key, value string) {
 	}
 	v := &Variable{
 		mode:  varModeValue,
-		Key:   []byte(key),
-		Value: []byte(value),
+		Key:   key,
+		Value: value,
 	}
 	sec.add(v)
 }
@@ -174,9 +174,9 @@ func (sec *Section) Unset(key string) bool {
 		return true
 	}
 
-	bkey := bytes.ToLower([]byte(key))
+	keylow := strings.ToLower(key)
 
-	idx, dup := sec.getFirstIndex(bkey)
+	idx, dup := sec.getFirstIndex(keylow)
 
 	// (2)
 	if dup {
@@ -203,13 +203,13 @@ func (sec *Section) UnsetAll(key string) {
 	}
 
 	var (
-		vars []*Variable
-		ok   bool
+		vars   []*Variable
+		ok     bool
+		keylow = strings.ToLower(key)
 	)
-	bkey := bytes.ToLower([]byte(key))
 
 	for x := 0; x < len(sec.Vars); x++ {
-		if bytes.Equal(sec.Vars[x]._key, bkey) {
+		if sec.Vars[x]._key == keylow {
 			ok = true
 			sec.Vars[x] = nil
 			continue
@@ -240,15 +240,15 @@ func (sec *Section) ReplaceAll(key, value string) {
 // Get will return the last variable value based on key.
 // If no key found it will return nil and false.
 //
-func (sec *Section) Get(key []byte) (val []byte, ok bool) {
+func (sec *Section) Get(key string) (val string, ok bool) {
 	if len(sec.Vars) == 0 || len(key) == 0 {
 		return
 	}
 	x := len(sec.Vars) - 1
-	key = bytes.ToLower(key)
+	key = strings.ToLower(key)
 
 	for ; x >= 0; x-- {
-		if !bytes.Equal(sec.Vars[x]._key, key) {
+		if sec.Vars[x]._key != key {
 			continue
 		}
 
