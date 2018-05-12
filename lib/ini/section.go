@@ -63,7 +63,7 @@ func (sec *Section) add(v *Variable) {
 		if len(v.Value) == 0 {
 			v.Value = varValueTrue
 		}
-		v._key = strings.ToLower(v.Key)
+		v.KeyLower = strings.ToLower(v.Key)
 	}
 
 	sec.Vars = append(sec.Vars, v)
@@ -78,7 +78,7 @@ func (sec *Section) getFirstIndex(key string) (idx int, dup bool) {
 	idx = -1
 	n := 0
 	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x]._key != key {
+		if sec.Vars[x].KeyLower != key {
 			continue
 		}
 		if idx < 0 {
@@ -212,7 +212,7 @@ func (sec *Section) UnsetAll(key string) {
 	)
 
 	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x]._key == keylow {
+		if sec.Vars[x].KeyLower == keylow {
 			ok = true
 			sec.Vars[x] = nil
 			continue
@@ -251,7 +251,7 @@ func (sec *Section) Get(key string) (val string, ok bool) {
 	key = strings.ToLower(key)
 
 	for ; x >= 0; x-- {
-		if sec.Vars[x]._key != key {
+		if sec.Vars[x].KeyLower != key {
 			continue
 		}
 

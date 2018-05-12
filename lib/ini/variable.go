@@ -30,16 +30,20 @@ var (
 // Variable define the smallest building block in INI format. It represent
 // empty lines, comment, section, section with subsection, and variable.
 //
+// NOTE: Remember that variable's key is case insensitive. If you want to
+// create variable, set the KeyLower to their lowercase value, and if you
+// want to compare variable, use the KeyLower value.
+//
 type Variable struct {
-	mode    varMode
-	lineNum int
-	format  string
-	secName string
-	subName string
-	Key     string
-	Value   string
-	others  string
-	_key    string
+	mode     varMode
+	lineNum  int
+	format   string
+	secName  string
+	subName  string
+	Key      string
+	KeyLower string
+	Value    string
+	others   string
 }
 
 //
