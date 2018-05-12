@@ -20,7 +20,7 @@ import (
 // BenchmarkParse-2  20000    72338 ns/op    35400 B/op    550 allocs/op
 //
 // Replace field type in Section and Variable from []byte to string
-// BenchmarkParse-2  20000    64426 ns/op    26824 B/op    482 allocs/op
+// BenchmarkParse-2  20000    61150 ns/op    25176 B/op    482 allocs/op
 //
 func BenchmarkParse(b *testing.B) {
 	reader := NewReader()

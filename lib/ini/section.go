@@ -13,15 +13,18 @@ import (
 //
 // Section represent section header in INI file format and their variables.
 //
+// NOTE: Remember that section's name is case insensitive. When trying to
+// compare section name use the NameLower field.
+//
 type Section struct {
-	LineNum int
-	Sub     string
-	Vars    []*Variable
-	mode    varMode
-	format  string
-	name    string
-	_name   string
-	others  string
+	mode      varMode
+	LineNum   int
+	Name      string
+	Sub       string
+	format    string
+	NameLower string
+	others    string
+	Vars      []*Variable
 }
 
 //
@@ -36,10 +39,10 @@ func NewSection(name, subName string) (sec *Section) {
 
 	sec = &Section{
 		mode: varModeSection,
-		name: name,
+		Name: name,
 	}
 
-	sec._name = strings.ToLower(sec.name)
+	sec.NameLower = strings.ToLower(sec.Name)
 
 	if len(subName) > 0 {
 		sec.mode |= varModeSubsection
@@ -54,8 +57,8 @@ func (sec *Section) add(v *Variable) {
 		return
 	}
 
-	if v.mode&varModeValue == varModeValue ||
-		v.mode&varModeSingle == varModeSingle ||
+	if v.mode&varModeSingle == varModeSingle ||
+		v.mode&varModeValue == varModeValue ||
 		v.mode&varModeMulti == varModeMulti {
 		if len(v.Value) == 0 {
 			v.Value = varValueTrue
@@ -270,27 +273,27 @@ func (sec *Section) String() string {
 	switch sec.mode {
 	case varModeSection:
 		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.name)
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s]\n", sec.name)
+			_, _ = fmt.Fprintf(&buf, "[%s]\n", sec.Name)
 		}
 	case varModeSection | varModeComment:
 		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.others)
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name, sec.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", sec.name, sec.others)
+			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", sec.Name, sec.others)
 		}
 	case varModeSection | varModeSubsection:
 		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.Sub)
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name, sec.Sub)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"]\n", sec.name, sec.Sub)
+			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"]\n", sec.Name, sec.Sub)
 		}
 	case varModeSection | varModeSubsection | varModeComment:
 		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.Sub, sec.others)
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name, sec.Sub, sec.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"] %s\n", sec.name, sec.Sub, sec.others)
+			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"] %s\n", sec.Name, sec.Sub, sec.others)
 		}
 	}
 

@@ -152,11 +152,11 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 			in.AddSection(reader.sec)
 
 			reader.sec = &Section{
-				LineNum: reader._var.lineNum,
-				Sub:     reader._var.subName,
 				mode:    reader._var.mode,
+				LineNum: reader._var.lineNum,
+				Name:    reader._var.secName,
+				Sub:     reader._var.subName,
 				format:  reader._var.format,
-				name:    reader._var.secName,
 				others:  reader._var.others,
 			}
 

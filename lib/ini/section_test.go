@@ -30,19 +30,19 @@ func testNewSection(t *testing.T) {
 		desc: "With name only",
 		name: "Section",
 		expSec: &Section{
-			mode:  varModeSection,
-			name:  "Section",
-			_name: "section",
+			mode:      varModeSection,
+			Name:      "Section",
+			NameLower: "section",
 		},
 	}, {
 		desc: "With name and subname",
 		name: "Section",
 		sub:  "Subsection",
 		expSec: &Section{
-			mode:  varModeSection | varModeSubsection,
-			name:  "Section",
-			_name: "section",
-			Sub:   "Subsection",
+			mode:      varModeSection | varModeSubsection,
+			Name:      "Section",
+			NameLower: "section",
+			Sub:       "Subsection",
 		},
 	}}
 
@@ -86,18 +86,18 @@ func testSectionSet(t *testing.T) {
 	}{{
 		desc: "With empty key",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 		},
 	}, {
 		desc:  "With empty value (Key-1) (will be added)",
 		k:     "Key-1",
 		expOK: true,
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -111,9 +111,9 @@ func testSectionSet(t *testing.T) {
 		v:     "false",
 		expOK: true,
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -127,9 +127,9 @@ func testSectionSet(t *testing.T) {
 		v:     "2",
 		expOK: true,
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -147,9 +147,9 @@ func testSectionSet(t *testing.T) {
 		k:     "Key-2",
 		expOK: true,
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -189,9 +189,9 @@ func testSectionAdd(t *testing.T) {
 		desc: "Duplicate key-1 (no value)",
 		k:    "Key-1",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -214,9 +214,9 @@ func testSectionAdd(t *testing.T) {
 		k:    "Key-1",
 		v:    "1",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -302,9 +302,9 @@ func testSectionUnset(t *testing.T) {
 		k:     "key-2",
 		expOK: true,
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -327,9 +327,9 @@ func testSectionUnset(t *testing.T) {
 		k:     "key-2",
 		expOK: true,
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "Key-1",
@@ -377,17 +377,17 @@ func testSectionUnsetAll(t *testing.T) {
 		desc: "With valid key-1",
 		k:    "KEY-1",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 		},
 	}, {
 		desc: "With valid key-1 (again)",
 		k:    "KEY-1",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 		},
 	}}
 
@@ -418,9 +418,9 @@ func testSectionReplaceAll(t *testing.T) {
 	}{{
 		desc: "With empty key",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "key-3",
@@ -448,9 +448,9 @@ func testSectionReplaceAll(t *testing.T) {
 		k:    "KEY-4",
 		v:    "4",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "key-3",
@@ -483,9 +483,9 @@ func testSectionReplaceAll(t *testing.T) {
 		k:    "KEY-3",
 		v:    "replaced",
 		expSec: &Section{
-			mode:  sec.mode,
-			name:  sec.name,
-			_name: sec._name,
+			mode:      sec.mode,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
 			Vars: []*Variable{{
 				mode:  varModeValue,
 				Key:   "KEY-4",

@@ -52,7 +52,7 @@ func (v *Variable) String() string {
 	switch v.mode {
 	case varModeEmpty:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format)
+			_, _ = fmt.Fprint(&buf, v.format)
 		}
 	case varModeComment:
 		if len(v.format) > 0 {

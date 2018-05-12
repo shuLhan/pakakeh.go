@@ -159,11 +159,11 @@ func (in *Ini) AddSection(sec *Section) {
 	if sec == nil {
 		return
 	}
-	if len(sec.name) == 0 {
+	if sec.mode != varModeEmpty && len(sec.Name) == 0 {
 		return
 	}
 
-	sec._name = strings.ToLower(sec.name)
+	sec.NameLower = strings.ToLower(sec.Name)
 
 	in.secs = append(in.secs, sec)
 }
@@ -188,7 +188,7 @@ func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 	sec := strings.ToLower(section)
 
 	for ; x >= 0; x-- {
-		if in.secs[x]._name != sec {
+		if in.secs[x].NameLower != sec {
 			continue
 		}
 
@@ -230,7 +230,7 @@ func (in *Ini) GetSections(name string) (secs []*Section) {
 	name = strings.ToLower(name)
 
 	for x := 0; x < len(in.secs); x++ {
-		if in.secs[x]._name != name {
+		if in.secs[x].NameLower != name {
 			continue
 		}
 		secs = append(secs, in.secs[x])

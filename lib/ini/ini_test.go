@@ -36,7 +36,7 @@ func TestOpen(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Logf("%+v", c)
+		t.Log(c.desc)
 
 		_, err := Open(c.inFile)
 		if err != nil {
@@ -72,13 +72,13 @@ func TestSave(t *testing.T) {
 	for _, c := range cases {
 		t.Logf(c.desc)
 
-		ini, err := Open(c.inFile)
+		cfg, err := Open(c.inFile)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
 		}
 
-		err = ini.Save(c.outFile)
+		err = cfg.Save(c.outFile)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 		}
@@ -98,15 +98,15 @@ func TestAddSection(t *testing.T) {
 	}, {
 		desc: "With valid section",
 		sec: &Section{
-			mode:  varModeSection,
-			name:  "Test",
-			_name: "test",
+			mode:      varModeSection,
+			Name:      "Test",
+			NameLower: "test",
 		},
 		expIni: &Ini{
 			secs: []*Section{{
-				mode:  varModeSection,
-				name:  "Test",
-				_name: "test",
+				mode:      varModeSection,
+				Name:      "Test",
+				NameLower: "test",
 			}},
 		},
 	}}
@@ -612,11 +612,11 @@ func TestGetSections(t *testing.T) {
 		desc: "With valid name: core",
 		name: "core",
 		exp: []*Section{{
-			mode:    varModeSection,
-			LineNum: 8,
-			format:  "[%s]\n",
-			name:    "core",
-			_name:   "core",
+			mode:      varModeSection,
+			LineNum:   8,
+			Name:      "core",
+			NameLower: "core",
+			format:    "[%s]\n",
 			Vars: []*Variable{{
 				mode:    varModeComment,
 				lineNum: 9,
@@ -640,11 +640,11 @@ func TestGetSections(t *testing.T) {
 				others:  "; Our diff algorithm",
 			}},
 		}, {
-			mode:    varModeSection,
-			LineNum: 18,
-			format:  "[%s]\n",
-			name:    "core",
-			_name:   "core",
+			mode:      varModeSection,
+			LineNum:   18,
+			Name:      "core",
+			NameLower: "core",
+			format:    "[%s]\n",
 			Vars: []*Variable{{
 				mode:    varModeValue,
 				lineNum: 19,
@@ -671,11 +671,11 @@ func TestGetSections(t *testing.T) {
 				others:  "; User settings",
 			}},
 		}, {
-			mode:    varModeSection,
-			LineNum: 63,
-			format:  "[%s]\n",
-			name:    "core",
-			_name:   "core",
+			mode:      varModeSection,
+			LineNum:   63,
+			Name:      "core",
+			NameLower: "core",
+			format:    "[%s]\n",
 			Vars: []*Variable{{
 				mode:    varModeValue,
 				lineNum: 64,
