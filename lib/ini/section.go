@@ -13,14 +13,14 @@ import (
 // Section represent section header in INI file format and their variables.
 //
 type Section struct {
+	LineNum int
+	Sub     []byte
+	Vars    []*Variable
 	mode    varMode
-	lineNum int
 	format  []byte
 	name    []byte
 	_name   []byte
-	sub     []byte
 	others  []byte
-	vars    []*Variable
 }
 
 //
@@ -42,7 +42,7 @@ func NewSection(name, subName string) (sec *Section) {
 
 	if len(subName) > 0 {
 		sec.mode |= varModeSubsection
-		sec.sub = []byte(subName)
+		sec.Sub = []byte(subName)
 	}
 
 	return
@@ -62,7 +62,7 @@ func (sec *Section) add(v *Variable) {
 		v._key = bytes.ToLower(v.key)
 	}
 
-	sec.vars = append(sec.vars, v)
+	sec.Vars = append(sec.Vars, v)
 }
 
 //
@@ -73,8 +73,8 @@ func (sec *Section) add(v *Variable) {
 func (sec *Section) getFirstIndex(key []byte) (idx int, dup bool) {
 	idx = -1
 	n := 0
-	for x := 0; x < len(sec.vars); x++ {
-		if !bytes.Equal(sec.vars[x]._key, key) {
+	for x := 0; x < len(sec.Vars); x++ {
+		if !bytes.Equal(sec.Vars[x]._key, key) {
 			continue
 		}
 		if idx < 0 {
@@ -128,9 +128,9 @@ func (sec *Section) Set(key, value string) bool {
 
 	// (4)
 	if len(value) == 0 {
-		sec.vars[idx].value = varValueTrue
+		sec.Vars[idx].value = varValueTrue
 	} else {
-		sec.vars[idx].value = []byte(value)
+		sec.Vars[idx].value = []byte(value)
 	}
 
 	return true
@@ -187,9 +187,9 @@ func (sec *Section) Unset(key string) bool {
 		return true
 	}
 
-	copy(sec.vars[idx:], sec.vars[idx+1:])
-	sec.vars[len(sec.vars)-1] = nil
-	sec.vars = sec.vars[:len(sec.vars)-1]
+	copy(sec.Vars[idx:], sec.Vars[idx+1:])
+	sec.Vars[len(sec.Vars)-1] = nil
+	sec.Vars = sec.Vars[:len(sec.Vars)-1]
 
 	return true
 }
@@ -208,17 +208,17 @@ func (sec *Section) UnsetAll(key string) {
 	)
 	bkey := bytes.ToLower([]byte(key))
 
-	for x := 0; x < len(sec.vars); x++ {
-		if bytes.Equal(sec.vars[x]._key, bkey) {
+	for x := 0; x < len(sec.Vars); x++ {
+		if bytes.Equal(sec.Vars[x]._key, bkey) {
 			ok = true
-			sec.vars[x] = nil
+			sec.Vars[x] = nil
 			continue
 		}
-		vars = append(vars, sec.vars[x])
+		vars = append(vars, sec.Vars[x])
 	}
 
 	if ok {
-		sec.vars = vars
+		sec.Vars = vars
 	}
 }
 
@@ -241,18 +241,18 @@ func (sec *Section) ReplaceAll(key, value string) {
 // If no key found it will return nil and false.
 //
 func (sec *Section) Get(key []byte) (val []byte, ok bool) {
-	if len(sec.vars) == 0 || len(key) == 0 {
+	if len(sec.Vars) == 0 || len(key) == 0 {
 		return
 	}
-	x := len(sec.vars) - 1
+	x := len(sec.Vars) - 1
 	key = bytes.ToLower(key)
 
 	for ; x >= 0; x-- {
-		if !bytes.Equal(sec.vars[x]._key, key) {
+		if !bytes.Equal(sec.Vars[x]._key, key) {
 			continue
 		}
 
-		val = sec.vars[x].value
+		val = sec.Vars[x].value
 		ok = true
 		break
 	}

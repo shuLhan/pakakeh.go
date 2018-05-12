@@ -42,7 +42,7 @@ func testNewSection(t *testing.T) {
 			mode:  varModeSection | varModeSubsection,
 			name:  []byte("Section"),
 			_name: []byte("section"),
-			sub:   []byte("Subsection"),
+			Sub:   []byte("Subsection"),
 		},
 	}}
 
@@ -98,7 +98,7 @@ func testSectionSet(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -114,7 +114,7 @@ func testSectionSet(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -130,7 +130,7 @@ func testSectionSet(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -150,7 +150,7 @@ func testSectionSet(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -192,7 +192,7 @@ func testSectionAdd(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -217,7 +217,7 @@ func testSectionAdd(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -305,7 +305,7 @@ func testSectionUnset(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -330,7 +330,7 @@ func testSectionUnset(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("Key-1"),
 				_key:  []byte("key-1"),
@@ -421,7 +421,7 @@ func testSectionReplaceAll(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("key-3"),
 				_key:  []byte("key-3"),
@@ -451,7 +451,7 @@ func testSectionReplaceAll(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("key-3"),
 				_key:  []byte("key-3"),
@@ -486,7 +486,7 @@ func testSectionReplaceAll(t *testing.T) {
 			mode:  sec.mode,
 			name:  sec.name,
 			_name: sec._name,
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:  varModeValue,
 				key:   []byte("KEY-4"),
 				_key:  []byte("key-4"),

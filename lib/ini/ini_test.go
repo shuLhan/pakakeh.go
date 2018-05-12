@@ -612,11 +612,11 @@ func TestGetSections(t *testing.T) {
 		name: "core",
 		exp: []*Section{{
 			mode:    varModeSection,
-			lineNum: 8,
+			LineNum: 8,
 			format:  []byte("[%s]\n"),
 			name:    []byte("core"),
 			_name:   []byte("core"),
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:    varModeComment,
 				lineNum: 9,
 				format: []byte("	%s\n"),
@@ -640,11 +640,11 @@ func TestGetSections(t *testing.T) {
 			}},
 		}, {
 			mode:    varModeSection,
-			lineNum: 18,
+			LineNum: 18,
 			format:  []byte("[%s]\n"),
 			name:    []byte("core"),
 			_name:   []byte("core"),
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:    varModeValue,
 				lineNum: 19,
 				format: []byte("	%s=\"ssh\" for \"kernel.org\"\n"),
@@ -671,11 +671,11 @@ func TestGetSections(t *testing.T) {
 			}},
 		}, {
 			mode:    varModeSection,
-			lineNum: 63,
+			LineNum: 63,
 			format:  []byte("[%s]\n"),
 			name:    []byte("core"),
 			_name:   []byte("core"),
-			vars: []*Variable{{
+			Vars: []*Variable{{
 				mode:    varModeValue,
 				lineNum: 64,
 				format: []byte("	%s = less -R\n"),
@@ -715,13 +715,13 @@ func TestGetSections(t *testing.T) {
 		test.Assert(t, "sections length", len(c.exp), len(got), true)
 
 		for x := range c.exp {
-			test.Assert(t, "variable length", len(c.exp[x].vars),
-				len(got[x].vars), true)
+			test.Assert(t, "variable length", len(c.exp[x].Vars),
+				len(got[x].Vars), true)
 
-			for y := range c.exp[x].vars {
-				t.Logf("var %d: %+v", y, c.exp[x].vars[y])
-				test.Assert(t, "variable", *c.exp[x].vars[y],
-					*got[x].vars[y], true)
+			for y := range c.exp[x].Vars {
+				t.Logf("var %d: %+v", y, c.exp[x].Vars[y])
+				test.Assert(t, "variable", *c.exp[x].Vars[y],
+					*got[x].Vars[y], true)
 			}
 
 			t.Logf("section %d: %+v", x, c.exp[x])

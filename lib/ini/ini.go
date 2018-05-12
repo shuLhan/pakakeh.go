@@ -145,7 +145,7 @@ func (in *Ini) Write(w io.Writer) (err error) {
 	for x := 0; x < len(in.secs); x++ {
 		fmt.Fprint(w, in.secs[x])
 
-		for _, v := range in.secs[x].vars {
+		for _, v := range in.secs[x].Vars {
 			fmt.Fprint(w, v)
 		}
 	}
@@ -195,7 +195,7 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 			continue
 		}
 
-		if !bytes.Equal(in.secs[x].sub, bsub) {
+		if !bytes.Equal(in.secs[x].Sub, bsub) {
 			continue
 		}
 
