@@ -208,10 +208,10 @@ func (in *Ini) Get(section, subsection, key string) (val []byte, ok bool) {
 }
 
 //
-// String return key's value as string. if no key found it will return default
-// value.
+// GetString return key's value as string. if no key found it will return
+// default value.
 //
-func (in *Ini) String(section, subsection, key, def string) (out string) {
+func (in *Ini) GetString(section, subsection, key, def string) (out string) {
 	v, ok := in.Get(section, subsection, key)
 	if !ok {
 		out = def

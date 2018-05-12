@@ -190,7 +190,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestString(t *testing.T) {
+func TestGetString(t *testing.T) {
 	cfg, err := Open(testdataInputIni)
 	if err != nil {
 		t.Fatal(err)
@@ -221,7 +221,7 @@ func TestString(t *testing.T) {
 	var got string
 
 	for _, c := range cases {
-		got = cfg.String(c.sec, c.sub, c.key, c.def)
+		got = cfg.GetString(c.sec, c.sub, c.key, c.def)
 
 		test.Assert(t, "string", c.exp, got, true)
 	}
