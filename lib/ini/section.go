@@ -56,10 +56,10 @@ func (sec *Section) add(v *Variable) {
 	if v.mode&varModeValue == varModeValue ||
 		v.mode&varModeSingle == varModeSingle ||
 		v.mode&varModeMulti == varModeMulti {
-		if len(v.value) == 0 {
-			v.value = varValueTrue
+		if len(v.Value) == 0 {
+			v.Value = varValueTrue
 		}
-		v._key = bytes.ToLower(v.key)
+		v._key = bytes.ToLower(v.Key)
 	}
 
 	sec.Vars = append(sec.Vars, v)
@@ -119,8 +119,8 @@ func (sec *Section) Set(key, value string) bool {
 	if idx < 0 {
 		sec.add(&Variable{
 			mode:  varModeValue,
-			key:   bkey,
-			value: []byte(value),
+			Key:   bkey,
+			Value: []byte(value),
 		})
 
 		return true
@@ -128,9 +128,9 @@ func (sec *Section) Set(key, value string) bool {
 
 	// (4)
 	if len(value) == 0 {
-		sec.Vars[idx].value = varValueTrue
+		sec.Vars[idx].Value = varValueTrue
 	} else {
-		sec.Vars[idx].value = []byte(value)
+		sec.Vars[idx].Value = []byte(value)
 	}
 
 	return true
@@ -152,8 +152,8 @@ func (sec *Section) Add(key, value string) {
 	}
 	v := &Variable{
 		mode:  varModeValue,
-		key:   []byte(key),
-		value: []byte(value),
+		Key:   []byte(key),
+		Value: []byte(value),
 	}
 	sec.add(v)
 }
@@ -252,7 +252,7 @@ func (sec *Section) Get(key []byte) (val []byte, ok bool) {
 			continue
 		}
 
-		val = sec.Vars[x].value
+		val = sec.Vars[x].Value
 		ok = true
 		break
 	}

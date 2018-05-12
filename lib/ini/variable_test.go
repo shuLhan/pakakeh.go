@@ -87,14 +87,14 @@ func TestVariableString(t *testing.T) {
 		desc: "With mode single",
 		v: &Variable{
 			mode: varModeSingle,
-			key:  []byte("name"),
+			Key:  []byte("name"),
 		},
 		exp: "name = true\n",
 	}, {
 		desc: "With mode single and comment",
 		v: &Variable{
 			mode:   varModeSingle | varModeComment,
-			key:    []byte("name"),
+			Key:    []byte("name"),
 			others: []byte("; comment"),
 		},
 		exp: "name = true ; comment\n",
@@ -102,16 +102,16 @@ func TestVariableString(t *testing.T) {
 		desc: "With mode value",
 		v: &Variable{
 			mode:  varModeValue,
-			key:   []byte("name"),
-			value: []byte("value"),
+			Key:   []byte("name"),
+			Value: []byte("value"),
 		},
 		exp: "name = value\n",
 	}, {
 		desc: "With mode value and comment",
 		v: &Variable{
 			mode:   varModeValue | varModeComment,
-			key:    []byte("name"),
-			value:  []byte("value"),
+			Key:    []byte("name"),
+			Value:  []byte("value"),
 			others: []byte("; comment"),
 		},
 		exp: "name = value ; comment\n",
@@ -119,16 +119,16 @@ func TestVariableString(t *testing.T) {
 		desc: "With mode multi",
 		v: &Variable{
 			mode:  varModeMulti,
-			key:   []byte("name"),
-			value: []byte("value"),
+			Key:   []byte("name"),
+			Value: []byte("value"),
 		},
 		exp: "name = value\n",
 	}, {
 		desc: "With mode multi and comment",
 		v: &Variable{
 			mode:   varModeMulti | varModeComment,
-			key:    []byte("name"),
-			value:  []byte("value"),
+			Key:    []byte("name"),
+			Value:  []byte("value"),
 			others: []byte("; comment"),
 		},
 		exp: "name = value ; comment\n",

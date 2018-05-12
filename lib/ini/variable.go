@@ -36,8 +36,8 @@ type Variable struct {
 	format  []byte
 	secName []byte
 	subName []byte
-	key     []byte
-	value   []byte
+	Key     []byte
+	Value   []byte
 	others  []byte
 	_sec    []byte
 	_key    []byte
@@ -88,39 +88,39 @@ func (v *Variable) String() string {
 		}
 	case varModeSingle:
 		if len(format) > 0 {
-			_, _ = fmt.Fprintf(&buf, format, v.key)
+			_, _ = fmt.Fprintf(&buf, format, v.Key)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = true\n", v.key)
+			_, _ = fmt.Fprintf(&buf, "%s = true\n", v.Key)
 		}
 	case varModeSingle | varModeComment:
 		if len(format) > 0 {
-			_, _ = fmt.Fprintf(&buf, format, v.key, v.others)
+			_, _ = fmt.Fprintf(&buf, format, v.Key, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = true %s\n", v.key, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = true %s\n", v.Key, v.others)
 		}
 	case varModeValue:
 		if len(format) > 0 {
-			_, _ = fmt.Fprintf(&buf, format, v.key)
+			_, _ = fmt.Fprintf(&buf, format, v.Key)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
+			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.Key, v.Value)
 		}
 	case varModeValue | varModeComment:
 		if len(format) > 0 {
-			_, _ = fmt.Fprintf(&buf, format, v.key, v.others)
+			_, _ = fmt.Fprintf(&buf, format, v.Key, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.Key, v.Value, v.others)
 		}
 	case varModeMulti:
 		if len(format) > 0 {
-			_, _ = fmt.Fprintf(&buf, format, v.key)
+			_, _ = fmt.Fprintf(&buf, format, v.Key)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
+			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.Key, v.Value)
 		}
 	case varModeMulti | varModeComment:
 		if len(format) > 0 {
-			_, _ = fmt.Fprintf(&buf, format, v.key, v.others)
+			_, _ = fmt.Fprintf(&buf, format, v.Key, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.Key, v.Value, v.others)
 		}
 	}
 

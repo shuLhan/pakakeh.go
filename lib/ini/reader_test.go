@@ -333,8 +333,8 @@ func TestParseVariable(t *testing.T) {
 
 		test.Assert(t, "mode", c.expMode, reader._var.mode, true)
 		test.Assert(t, "format", c.expFormat, reader._var.format, true)
-		test.Assert(t, "key", c.expKey, reader._var.key, true)
-		test.Assert(t, "value", c.expValue, reader._var.value, true)
+		test.Assert(t, "key", c.expKey, reader._var.Key, true)
+		test.Assert(t, "value", c.expValue, reader._var.Value, true)
 		test.Assert(t, "comment", c.expComment, reader._var.others, true)
 	}
 }
@@ -484,7 +484,7 @@ func TestParseVarValue(t *testing.T) {
 		}
 
 		test.Assert(t, "format", c.expFormat, reader._var.format, true)
-		test.Assert(t, "value", c.expValue, reader._var.value, true)
+		test.Assert(t, "value", c.expValue, reader._var.Value, true)
 		test.Assert(t, "comment", c.expComment, reader._var.others, true)
 	}
 
