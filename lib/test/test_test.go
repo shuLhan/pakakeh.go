@@ -26,6 +26,6 @@ func TestAssert(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		Assert(t, c.exp, c.in, c.expEqual)
+		Assert(t, "interface{}", c.exp, c.in, c.expEqual)
 	}
 }
