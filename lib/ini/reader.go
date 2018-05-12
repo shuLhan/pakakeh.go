@@ -117,6 +117,8 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 	reader.reset(src)
 
 	for {
+		reader.lineNum++
+
 		err = reader.parse()
 		if err != nil {
 			if err != io.EOF {
@@ -131,7 +133,6 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 			fmt.Print(reader._var)
 		}
 
-		reader.lineNum++
 		reader._var.lineNum = reader.lineNum
 
 		if reader._var.mode&varModeSingle == varModeSingle ||
