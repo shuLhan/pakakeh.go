@@ -591,3 +591,138 @@ func TestGetVarMultiSection(t *testing.T) {
 		}
 	}
 }
+
+func TestGetSections(t *testing.T) {
+	cfg, err := Open(testdataInputIni)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc string
+		name string
+		exp  []*Section
+	}{{
+		desc: "With empty name",
+	}, {
+		desc: "With name: unknown",
+		name: "unknown",
+	}, {
+		desc: "With valid name: core",
+		name: "core",
+		exp: []*Section{{
+			mode:   varModeSection,
+			format: []byte("[%s]\n"),
+			name:   []byte("core"),
+			_name:  []byte("core"),
+			vars: []*Variable{{
+				mode:    varModeComment,
+				lineNum: 8,
+				format: []byte("	%s\n"),
+				others: []byte("; Don't trust file modes"),
+			}, {
+				mode:    varModeValue,
+				lineNum: 9,
+				format: []byte("	%s = false\n"),
+				key:   []byte("filemode"),
+				_key:  []byte("filemode"),
+				value: []byte("false"),
+			}, {
+				mode:    varModeEmpty,
+				lineNum: 10,
+				format:  []byte("\n"),
+			}, {
+				mode:    varModeComment,
+				lineNum: 11,
+				format:  []byte("%s\n"),
+				others:  []byte("; Our diff algorithm"),
+			}},
+		}, {
+			mode:   varModeSection,
+			format: []byte("[%s]\n"),
+			name:   []byte("core"),
+			_name:  []byte("core"),
+			vars: []*Variable{{
+				mode:    varModeValue,
+				lineNum: 18,
+				format: []byte("	%s=\"ssh\" for \"kernel.org\"\n"),
+				key:   []byte("gitProxy"),
+				_key:  []byte("gitproxy"),
+				value: []byte("ssh for kernel.org"),
+			}, {
+				mode:    varModeValue | varModeComment,
+				lineNum: 19,
+				format: []byte("	%s=default-proxy %s\n"),
+				key:    []byte("gitProxy"),
+				_key:   []byte("gitproxy"),
+				value:  []byte("default-proxy"),
+				others: []byte("; for the rest"),
+			}, {
+				mode:    varModeEmpty,
+				lineNum: 20,
+				format:  []byte("\n"),
+			}, {
+				mode:    varModeComment,
+				lineNum: 21,
+				format:  []byte("%s\n"),
+				others:  []byte("; User settings"),
+			}},
+		}, {
+			mode:   varModeSection,
+			format: []byte("[%s]\n"),
+			name:   []byte("core"),
+			_name:  []byte("core"),
+			vars: []*Variable{{
+				mode:    varModeValue,
+				lineNum: 63,
+				format: []byte("	%s = less -R\n"),
+				key:   []byte("pager"),
+				_key:  []byte("pager"),
+				value: []byte("less -R"),
+			}, {
+				mode:    varModeValue,
+				lineNum: 64,
+				format: []byte("	%s = nvim\n"),
+				key:   []byte("editor"),
+				_key:  []byte("editor"),
+				value: []byte("nvim"),
+			}, {
+				mode:    varModeValue,
+				lineNum: 65,
+				format: []byte("	%s = false\n"),
+				key:   []byte("autocrlf"),
+				_key:  []byte("autocrlf"),
+				value: []byte("false"),
+			}, {
+				mode:    varModeValue,
+				lineNum: 66,
+				format: []byte("	%s = true\n"),
+				key:   []byte("filemode"),
+				_key:  []byte("filemode"),
+				value: []byte("true"),
+			}},
+		}},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := cfg.GetSections(c.name)
+
+		test.Assert(t, "sections length", len(c.exp), len(got), true)
+
+		for x := range c.exp {
+			test.Assert(t, "variable length", len(c.exp[x].vars),
+				len(got[x].vars), true)
+
+			for y := range c.exp[x].vars {
+				t.Logf("var %d: %+v", y, c.exp[x].vars[y])
+				test.Assert(t, "variable", *c.exp[x].vars[y],
+					*got[x].vars[y], true)
+			}
+
+			t.Logf("section %d: %+v", x, c.exp[x])
+			test.Assert(t, "section", c.exp[x], got[x], true)
+		}
+	}
+}

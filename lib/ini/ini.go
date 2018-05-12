@@ -224,3 +224,23 @@ func (in *Ini) GetString(section, subsection, key, def string) (out string) {
 
 	return
 }
+
+//
+// GetSections return all section that match with "name" as slice.
+//
+func (in *Ini) GetSections(name string) (secs []*Section) {
+	if len(name) == 0 {
+		return
+	}
+
+	bname := []byte(name)
+
+	for x := 0; x < len(in.secs); x++ {
+		if !bytes.Equal(in.secs[x]._name, bname) {
+			continue
+		}
+		secs = append(secs, in.secs[x])
+	}
+
+	return
+}
