@@ -18,10 +18,6 @@ const (
 	testdataVarWithoutSection = "testdata/var_without_section.ini"
 )
 
-var (
-	inputIni *Ini
-)
-
 func TestOpen(t *testing.T) {
 	cases := []struct {
 		desc   string
@@ -74,7 +70,7 @@ func TestSave(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Logf("%+v", c)
+		t.Logf(c.desc)
 
 		ini, err := Open(c.inFile)
 		if err != nil {
@@ -131,7 +127,7 @@ func TestGet(t *testing.T) {
 		ok  bool
 	)
 
-	inputIni, err = Open(testdataInputIni)
+	inputIni, err := Open(testdataInputIni)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -228,6 +224,11 @@ func TestGetString(t *testing.T) {
 }
 
 func TestGetInputIni(t *testing.T) {
+	inputIni, err := Open(testdataInputIni)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	cases := []struct {
 		sec     string
 		sub     string
