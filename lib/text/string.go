@@ -20,3 +20,25 @@ func StringJSONEscape(in string) string {
 
 	return string(bout)
 }
+
+//
+// StringJSONUnescape unescape JSON string, reversing what StringJSONEscape
+// do.
+//
+// If strict is true, any unknown control character will be returned as error.
+// For example, in string "\x", "x" is not valid control character, and the
+// function will return empty string and error.
+// If strict is false, it will return "x".
+//
+func StringJSONUnescape(in string, strict bool) (string, error) {
+	if len(in) == 0 {
+		return in, nil
+	}
+
+	bin := []byte(in)
+	bout, err := BytesJSONUnescape(bin, strict)
+
+	out := string(bout)
+
+	return out, err
+}
