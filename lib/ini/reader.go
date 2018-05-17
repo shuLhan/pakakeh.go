@@ -173,11 +173,14 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 		}
 	}
 
-	if debug >= debugL1 {
-		fmt.Println(reader._var)
+	if reader._var.mode != varModeEmpty {
+		if debug >= debugL1 {
+			fmt.Println(reader._var)
+		}
+
+		reader.sec.add(reader._var)
 	}
 
-	reader.sec.add(reader._var)
 	in.AddSection(reader.sec)
 
 	reader._var = nil
