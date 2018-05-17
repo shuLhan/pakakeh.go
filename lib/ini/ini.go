@@ -100,10 +100,9 @@ type Ini struct {
 }
 
 //
-// Open will open and parse INI formatted `file` and return it as instance of
-// ini struct.
+// Open and parse INI formatted file and return it as instance of Ini struct.
 //
-// On fail it may return incomplete instance of Ini with error.
+// On fail it will return incomplete instance of Ini with error.
 //
 func Open(filename string) (in *Ini, err error) {
 	reader := NewReader()
@@ -118,8 +117,8 @@ func Open(filename string) (in *Ini, err error) {
 }
 
 //
-// Save will save the current parsed Ini into file `filename`. It will
-// overwrite the destination file if it's exist.
+// Save the current parsed Ini into file `filename`. It will overwrite the
+// destination file if it's exist.
 //
 func (in *Ini) Save(filename string) (err error) {
 	f, err := os.Create(filename)
@@ -138,7 +137,7 @@ func (in *Ini) Save(filename string) (err error) {
 }
 
 //
-// Write will write the current parsed Ini into writer `w`.
+// Write the current parsed Ini into writer `w`.
 //
 func (in *Ini) Write(w io.Writer) (err error) {
 	for x := 0; x < len(in.secs); x++ {
@@ -169,7 +168,7 @@ func (in *Ini) AddSection(sec *Section) {
 }
 
 //
-// Get return the last key on section and/or subsection (if not empty).
+// Get the last key on section and/or subsection (if not empty).
 //
 // It will return nil and false,
 // (1) If Ini file contains no sections,
@@ -207,16 +206,26 @@ func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 }
 
 //
-// GetString return key's value as string. if no key found it will return
-// default value.
+// GetSections return the last section that match with section name and/or
+// subsection name.
+// If section name is empty or no match found it will return nil.
 //
-func (in *Ini) GetString(section, subsection, key, def string) (out string) {
-	out, ok := in.Get(section, subsection, key)
-	if !ok {
-		out = def
+func (in *Ini) GetSection(section, subsection string) *Section {
+	if len(section) == 0 {
+		return nil
 	}
 
-	return
+	for x := len(in.secs) - 1; x >= 0; x-- {
+		if in.secs[x].NameLower != section {
+			continue
+		}
+		if in.secs[x].Sub != subsection {
+			continue
+		}
+		return in.secs[x]
+	}
+
+	return nil
 }
 
 //
@@ -234,6 +243,19 @@ func (in *Ini) GetSections(name string) (secs []*Section) {
 			continue
 		}
 		secs = append(secs, in.secs[x])
+	}
+
+	return
+}
+
+//
+// GetString return key's value as string. if no key found it will return
+// default value.
+//
+func (in *Ini) GetString(section, subsection, key, def string) (out string) {
+	out, ok := in.Get(section, subsection, key)
+	if !ok {
+		out = def
 	}
 
 	return

@@ -396,6 +396,22 @@ func TestGetInputIni(t *testing.T) {
 		expVals: []string{
 			"https://github.com/",
 		},
+	}, {
+		sec: "last",
+		keys: []string{
+			"valid0",
+			"valid1",
+			"valid2",
+			"valid3",
+			"valid4",
+		},
+		expVals: []string{
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+		},
 	}}
 
 	var (
@@ -589,6 +605,101 @@ func TestGetVarMultiSection(t *testing.T) {
 			}
 
 			test.Assert(t, k, c.expVals[x], string(got), true)
+		}
+	}
+}
+
+func TestGetSection(t *testing.T) {
+	cfg, err := Open(testdataInputIni)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		name    string
+		subname string
+		expKeys []string
+		expVals []string
+	}{{
+		name: "last",
+		expKeys: []string{
+			"valid0",
+			"valid1",
+			"valid2",
+			"valid3",
+			"valid4",
+		},
+		expVals: []string{
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+		},
+	}, {
+		name:    "url",
+		subname: "git@github.com:",
+		expKeys: []string{
+			"insteadOf",
+			"",
+		},
+		expVals: []string{
+			"https://github.com/",
+			"",
+		},
+	}, {
+		name: "http",
+		expKeys: []string{
+			"cookiefile",
+			"",
+		},
+		expVals: []string{
+			"/home/ms/.gitcookies",
+			"",
+		},
+	}, {
+		name: "core",
+		expKeys: []string{
+			"pager",
+			"editor",
+			"autocrlf",
+			"filemode",
+		},
+		expVals: []string{
+			"less -R",
+			"nvim",
+			"false",
+			"true",
+		},
+	}, {
+		name: "diff",
+		expKeys: []string{
+			"external",
+			"renames",
+			"",
+			"",
+		},
+		expVals: []string{
+			"/usr/local/bin/diff-wrapper",
+			"true",
+			"",
+			"",
+		},
+	}}
+
+	var got *Section
+
+	for _, c := range cases {
+		t.Log(c)
+
+		got = cfg.GetSection(c.name, c.subname)
+
+		test.Assert(t, "sub name", c.subname, got.Sub, true)
+		test.Assert(t, "length vars", len(c.expKeys), len(got.Vars), true)
+
+		for x, _ := range c.expKeys {
+			test.Assert(t, "key", c.expKeys[x], got.Vars[x].Key, true)
+			test.Assert(t, "value", c.expVals[x], got.Vars[x].Value, true)
 		}
 	}
 }
