@@ -34,3 +34,11 @@ coverbrowse: $(COVER_HTML)
 
 lint:
 	gometalinter ./...
+
+clean:
+	rm -f $(COVER_OUT) $(COVER_HTML)
+	rm -f ./**/${CPU_PROF}
+	rm -f ./**/${MEM_PROF}
+
+distclean:
+	go clean -i ./...
