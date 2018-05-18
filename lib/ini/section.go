@@ -271,12 +271,14 @@ func (sec *Section) ReplaceAll(key, value string) {
 
 //
 // Get will return the last variable value based on key.
-// If no key found it will return nil and false.
+// If no key found it will return default value and false.
 //
-func (sec *Section) Get(key string) (val string, ok bool) {
+func (sec *Section) Get(key, def string) (val string, ok bool) {
+	val = def
 	if len(sec.Vars) == 0 || len(key) == 0 {
 		return
 	}
+
 	x := len(sec.Vars) - 1
 	key = strings.ToLower(key)
 

@@ -55,27 +55,6 @@ func testNewSection(t *testing.T) {
 	}
 }
 
-func testSectionGet(t *testing.T) {
-	cases := []struct {
-		desc   string
-		k      string
-		expOK  bool
-		expVal string
-	}{{
-		desc: "On empty vars",
-		k:    "key-1",
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		got, ok := sec.Get(c.k)
-
-		test.Assert(t, "ok", c.expOK, ok, true)
-		test.Assert(t, "value", c.expVal, got, true)
-	}
-}
-
 func testSectionSet(t *testing.T) {
 	cases := []struct {
 		desc   string
@@ -509,15 +488,48 @@ func testSectionReplaceAll(t *testing.T) {
 	}
 }
 
+func testSectionGet(t *testing.T) {
+	cases := []struct {
+		desc   string
+		k      string
+		def    string
+		expOK  bool
+		expVal string
+	}{{
+		desc: "On empty vars",
+		k:    "key-1",
+	}, {
+		desc:   "On empty vars with default",
+		k:      "key-1",
+		def:    "default value",
+		expVal: "default value",
+	}, {
+		desc:   "Valid key",
+		k:      "key-3",
+		def:    "default value",
+		expOK:  true,
+		expVal: "replaced",
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got, ok := sec.Get(c.k, c.def)
+
+		test.Assert(t, "ok", c.expOK, ok, true)
+		test.Assert(t, "value", c.expVal, got, true)
+	}
+}
+
 func TestSection(t *testing.T) {
 	sec = NewSection("test", "")
 
 	t.Run("New", testNewSection)
-	t.Run("Get", testSectionGet)
 	t.Run("Set", testSectionSet)
 	t.Run("Add", testSectionAdd)
 	t.Run("Set2", testSectionSet2)
 	t.Run("Unset", testSectionUnset)
 	t.Run("UnsetAll", testSectionUnsetAll)
 	t.Run("ReplaceAll", testSectionReplaceAll)
+	t.Run("Get", testSectionGet)
 }

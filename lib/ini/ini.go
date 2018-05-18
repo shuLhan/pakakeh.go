@@ -195,7 +195,7 @@ func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 			continue
 		}
 
-		val, ok = in.secs[x].Get(key)
+		val, ok = in.secs[x].Get(key, "")
 		if ok {
 			return
 		}
