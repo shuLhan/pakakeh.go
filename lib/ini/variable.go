@@ -7,6 +7,7 @@ package ini
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 type varMode uint
@@ -44,6 +45,22 @@ type Variable struct {
 	KeyLower string
 	Value    string
 	others   string
+}
+
+//
+// IsValueBoolTrue will return true if variable contains boolean value for
+// true. The following conditions is boolean true for value: "" (empty
+// string), "true", "yes", "ya", "t", "1" (all of string is case insensitive).
+//
+func (v *Variable) IsValueBoolTrue() bool {
+	if len(v.Value) == 0 {
+		return true
+	}
+	value := strings.ToLower(v.Value)
+	if value == "true" || value == "t" || value == "ya" || value == "yes" || value == "1" {
+		return true
+	}
+	return false
 }
 
 //

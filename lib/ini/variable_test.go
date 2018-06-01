@@ -10,6 +10,62 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestVariableIsValueBoolTrue(t *testing.T) {
+	cases := []struct {
+		desc string
+		v    *Variable
+		exp  bool
+	}{{
+		desc: "With empty value",
+		v:    &Variable{},
+		exp:  true,
+	}, {
+		desc: "With value in all caps",
+		v: &Variable{
+			Value: "TRUE",
+		},
+		exp: true,
+	}, {
+		desc: "With value is yes",
+		v: &Variable{
+			Value: "YES",
+		},
+		exp: true,
+	}, {
+		desc: "With value is ya",
+		v: &Variable{
+			Value: "yA",
+		},
+		exp: true,
+	}, {
+		desc: "With value is 1",
+		v: &Variable{
+			Value: "1",
+		},
+		exp: true,
+	}, {
+		desc: "With value is 11",
+		v: &Variable{
+			Value: "11",
+		},
+		exp: false,
+	}, {
+		desc: "With value is tru (typo)",
+		v: &Variable{
+			Value: "tru",
+		},
+		exp: false,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := c.v.IsValueBoolTrue()
+
+		test.Assert(t, "", c.exp, got, true)
+	}
+}
+
 func TestVariableString(t *testing.T) {
 	cases := []struct {
 		desc string
