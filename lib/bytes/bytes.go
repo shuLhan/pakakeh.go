@@ -56,3 +56,11 @@ func ReadUint16(data []byte, x int) uint16 {
 func ReadUint32(data []byte, x int) uint32 {
 	return uint32(data[x])<<24 | uint32(data[x+1])<<16 | uint32(data[x+2])<<8 | uint32(data[x+3])
 }
+
+//
+// WriteUint16 into slice of byte.
+//
+func WriteUint16(data *[]byte, x int, v uint16) {
+	(*data)[x] = byte(v >> 8)
+	(*data)[x+1] = byte(v)
+}

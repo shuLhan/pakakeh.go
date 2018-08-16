@@ -75,97 +75,29 @@ func (msg *Message) Reset() {
 	msg.Packet = msg.Packet[:0]
 }
 
-func (msg *Message) writeUint16(x uint16) {
-	msg.Packet = append(msg.Packet, byte(x>>8))
-	msg.Packet = append(msg.Packet, byte(0x00FF&x))
-}
-
-func (msg *Message) writeLabel(label []byte) {
-	var count byte
-
-	idx := len(msg.Packet)
-	msg.Packet = append(msg.Packet, count)
-
-	for x := 0; x < len(label); x++ {
-		if label[x] == '.' {
-			// Skip label that prefixed with '.', e.g.
-			// '...test.com'
-			if count == 0 {
-				continue
-			}
-
-			msg.Packet[idx] = count
-			count = 0
-			idx = len(msg.Packet)
-			msg.Packet = append(msg.Packet, count)
-			continue
-		}
-
-		msg.Packet = append(msg.Packet, label[x])
-		count++
-	}
-	if count > 0 {
-		msg.Packet[idx] = count
-		count = 0
-	}
-	msg.Packet = append(msg.Packet, count)
-}
-
 //
-// MarshalBinary convert message into datagram packet.  The result of packing a message
-// will be saved in Packet field.
+// MarshalBinary convert message into datagram packet.  The result of packing
+// a message will be saved in Packet field and returned.
 //
 func (msg *Message) MarshalBinary() ([]byte, error) {
-	var b0, b1 byte
-
 	msg.Packet = msg.Packet[:0]
 
-	msg.Packet = append(msg.Packet, byte(msg.Header.ID>>8))
-	msg.Packet = append(msg.Packet, byte(msg.Header.ID))
+	msg.Header.ANCount = uint16(len(msg.Answer))
+	msg.Header.NSCount = uint16(len(msg.Authority))
+	msg.Header.ARCount = uint16(len(msg.Additional))
 
-	if msg.Header.IsQuery {
-		b0 = HeaderIsQuery
-	} else {
-		b0 = HeaderIsResponse
+	header, err := msg.Header.MarshalBinary()
+	if err != nil {
+		return nil, err
 	}
 
-	b0 = b0 | (0x78 & byte(msg.Header.Op<<2))
-
-	if msg.Header.IsQuery {
-		if msg.Header.IsRD {
-			b0 = b0 | HeaderIsRD
-		}
-	} else {
-		if msg.Header.IsAA {
-			b0 = b0 | HeaderIsAA
-		}
-		if msg.Header.IsTC {
-			b0 = b0 | HeaderIsTC
-		}
-		if msg.Header.IsRA {
-			b1 = b1 | HeaderIsRA
-		}
-		b1 = b1 | (0x0F & byte(msg.Header.RCode))
+	question, err := msg.Question.MarshalBinary()
+	if err != nil {
+		return nil, err
 	}
 
-	msg.Packet = append(msg.Packet, b0)
-	msg.Packet = append(msg.Packet, b1)
-
-	msg.writeUint16(msg.Header.QDCount)
-
-	if msg.Header.IsQuery {
-		msg.writeUint16(0)
-		msg.writeUint16(0)
-		msg.writeUint16(0)
-	} else {
-		msg.writeUint16(msg.Header.ANCount)
-		msg.writeUint16(msg.Header.NSCount)
-		msg.writeUint16(msg.Header.ARCount)
-	}
-
-	msg.writeLabel(msg.Question.Name)
-	msg.writeUint16(uint16(msg.Question.Type))
-	msg.writeUint16(uint16(msg.Question.Class))
+	msg.Packet = append(msg.Packet, header...)
+	msg.Packet = append(msg.Packet, question...)
 
 	if msg.Header.IsQuery {
 		return msg.Packet, nil
@@ -188,7 +120,7 @@ func (msg *Message) UnmarshalBinary(packet []byte) error {
 		return nil
 	}
 
-	err := msg.Question.UnmarshalBinary(packet[12:])
+	err := msg.Question.UnmarshalBinary(packet[sectionHeaderSize:])
 	if err != nil {
 		return err
 	}

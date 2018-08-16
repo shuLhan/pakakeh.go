@@ -118,6 +118,52 @@ func (hdr *SectionHeader) Reset() {
 }
 
 //
+// MarshalBinary pack the section header into slice of bytes.
+//
+func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
+	var b0, b1 byte
+
+	packet := make([]byte, sectionHeaderSize)
+
+	packet[0] = byte(hdr.ID >> 8)
+	packet[1] = byte(hdr.ID)
+
+	if hdr.IsQuery {
+		b0 = HeaderIsQuery
+	} else {
+		b0 = HeaderIsResponse
+	}
+
+	b0 = b0 | (0x78 & byte(hdr.Op<<2))
+
+	if !hdr.IsQuery {
+		if hdr.IsAA {
+			b0 = b0 | HeaderIsAA
+		}
+		if hdr.IsTC {
+			b0 = b0 | HeaderIsTC
+		}
+		if hdr.IsRD {
+			b0 = b0 | HeaderIsRD
+		}
+		if hdr.IsRA {
+			b1 = b1 | HeaderIsRA
+		}
+		b1 = b1 | (0x0F & byte(hdr.RCode))
+	}
+
+	packet[2] = b0
+	packet[3] = b1
+
+	libbytes.WriteUint16(&packet, 4, hdr.QDCount)
+	libbytes.WriteUint16(&packet, 6, hdr.ANCount)
+	libbytes.WriteUint16(&packet, 8, hdr.NSCount)
+	libbytes.WriteUint16(&packet, 10, hdr.ARCount)
+
+	return packet, nil
+}
+
+//
 // UnmarshalBinary unpack the DNS header section.
 //
 func (hdr *SectionHeader) UnmarshalBinary(packet []byte) error {
