@@ -11,12 +11,6 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
-const (
-	maskPointer byte  = 0xC0
-	maskOffset  byte  = 0x3F
-	maskOPTDO   int32 = 0x00008000
-)
-
 //
 // ResourceRecord The answer, authority, and additional sections all share the
 // same format: a variable number of resource records, where the number of
@@ -43,7 +37,7 @@ type ResourceRecord struct {
 
 	// An unsigned 16 bit integer that specifies the length in octets of
 	// the RDATA field.
-	RDLength uint16
+	rdlen uint16
 
 	// A variable length string of octets that describes the resource.
 	// The format of this information varies according to the TYPE and
@@ -52,20 +46,15 @@ type ResourceRecord struct {
 	// address.
 	rdata []byte
 
-	// rdataText represent A, NS, CNAME, MB, MG, NULL, PTR, and TXT.
-	rdataText *RDataText
+	// RDataText represent A, NS, CNAME, MB, MG, NULL, PTR, and TXT.
+	Text *RDataText
 
-	rdataSOA *RDataSOA
-
-	// The WKS record is used to describe the well known services
-	// supported by a particular protocol on a particular internet
-	// address.
-	rdataWKS *RDataWKS
-
-	rdataHINFO *RDataHINFO
-	rdataMINFO *RDataMINFO
-	rdataMX    *RDataMX
-	rdataOPT   *RDataOPT
+	SOA   *RDataSOA
+	WKS   *RDataWKS
+	HInfo *RDataHINFO
+	MInfo *RDataMINFO
+	MX    *RDataMX
+	OPT   *RDataOPT
 
 	offsetIdx int
 }
@@ -77,45 +66,45 @@ type ResourceRecord struct {
 // For RR with type A, NS, CNAME, MB, MG, NULL, PTR, or TXT it will return
 // slice of bytes.
 //
-// For RR with type SOA, WKS, HINFO, MINFO, or MX it will return pointer to
-// specific record type.
+// For RR with type SOA, WKS, HINFO, MINFO, MX, or OPT it will return pointer
+// to specific record type.
 //
-// For RR with absolute type (MD or MF) it will return nil.
+// For RR with obsolete type (MD or MF) it will return nil.
 //
 func (rr *ResourceRecord) RData() interface{} {
 	switch rr.Type {
 	case QueryTypeA:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeNS:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeMD:
 		return nil
 	case QueryTypeMF:
 		return nil
 	case QueryTypeCNAME:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeSOA:
-		return rr.rdataSOA
+		return rr.SOA
 	case QueryTypeMB:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeMG:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeNULL:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeWKS:
-		return rr.rdataWKS
+		return rr.WKS
 	case QueryTypePTR:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeHINFO:
-		return rr.rdataHINFO
+		return rr.HInfo
 	case QueryTypeMINFO:
-		return rr.rdataMINFO
+		return rr.MInfo
 	case QueryTypeMX:
-		return rr.rdataMX
+		return rr.MX
 	case QueryTypeTXT:
-		return rr.rdataText.v
+		return rr.Text.v
 	case QueryTypeOPT:
-		return rr.rdataOPT
+		return rr.OPT
 	}
 	return nil
 }
@@ -125,25 +114,26 @@ func (rr *ResourceRecord) RData() interface{} {
 //
 func (rr *ResourceRecord) Reset() {
 	rr.Name = rr.Name[:0]
-	rr.offsetIdx = 0
 	rr.Type = QueryTypeZERO
 	rr.Class = QueryClassZERO
 	rr.TTL = 0
-	rr.RDLength = 0
+	rr.rdlen = 0
 	rr.rdata = rr.rdata[:0]
-	rr.rdataSOA = nil
-	rr.rdataWKS = nil
-	rr.rdataHINFO = nil
-	rr.rdataMINFO = nil
-	rr.rdataMX = nil
-	rr.rdataOPT = nil
+	rr.Text = nil
+	rr.SOA = nil
+	rr.WKS = nil
+	rr.HInfo = nil
+	rr.MInfo = nil
+	rr.MX = nil
+	rr.OPT = nil
+	rr.offsetIdx = 0
 }
 
 func (rr *ResourceRecord) String() string {
 	var buf bytes.Buffer
 
-	fmt.Fprintf(&buf, "{Name:%s Type:%d Class:%d TTL:%d RDLength:%d",
-		rr.Name, rr.Type, rr.Class, rr.TTL, rr.RDLength)
+	fmt.Fprintf(&buf, "{Name:%s Type:%d Class:%d TTL:%d rdlen:%d",
+		rr.Name, rr.Type, rr.Class, rr.TTL, rr.rdlen)
 
 	rdata := rr.RData()
 	if rdata != nil {
@@ -181,14 +171,14 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx int) (int, error) {
 	x += 2
 	rr.TTL = libbytes.ReadInt32(packet, x)
 	x += 4
-	rr.RDLength = libbytes.ReadUint16(packet, x)
+	rr.rdlen = libbytes.ReadUint16(packet, x)
 	x += 2
 
-	rr.rdata = append(rr.rdata, packet[x:x+int(rr.RDLength)]...)
+	rr.rdata = append(rr.rdata, packet[x:x+int(rr.rdlen)]...)
 
 	rr.unpackRData(packet, x)
 
-	startIdx = x + int(rr.RDLength)
+	startIdx = x + int(rr.rdlen)
 
 	return startIdx, nil
 }
@@ -229,11 +219,11 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x int) er
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	switch rr.Type {
 	case QueryTypeA:
-		if rr.RDLength != rdataAddrSize || len(rr.rdata) != rdataAddrSize {
+		if rr.rdlen != rdataAddrSize || len(rr.rdata) != rdataAddrSize {
 			return ErrRDataAddrLength
 		}
-		rr.rdataText = new(RDataText)
-		rr.rdataText.v = append(rr.rdataText.v, rr.rdata...)
+		rr.Text = new(RDataText)
+		rr.Text.v = append(rr.Text.v, rr.rdata...)
 
 	//
 	// NS records cause both the usual additional section processing to
@@ -249,8 +239,8 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	// class protocols.
 	//
 	case QueryTypeNS:
-		rr.rdataText = new(RDataText)
-		return rr.unpackDomainName(&rr.rdataText.v, packet, startIdx)
+		rr.Text = new(RDataText)
+		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	// MD is obsolete.  See the definition of MX and [RFC-974] for details of
 	// the new scheme.  The recommended policy for dealing with MD RRs found in
@@ -271,74 +261,74 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	// cases.  See the description of name server logic in [RFC-1034] for
 	// details.
 	case QueryTypeCNAME:
-		rr.rdataText = new(RDataText)
-		return rr.unpackDomainName(&rr.rdataText.v, packet, startIdx)
+		rr.Text = new(RDataText)
+		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeSOA:
-		rr.rdataSOA = new(RDataSOA)
-		return rr.unpackRDataSOA(packet, startIdx)
+		rr.SOA = new(RDataSOA)
+		return rr.unpackSOA(packet, startIdx)
 
 	case QueryTypeMB:
-		rr.rdataText = new(RDataText)
-		return rr.unpackDomainName(&rr.rdataText.v, packet, startIdx)
+		rr.Text = new(RDataText)
+		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeMG:
-		rr.rdataText = new(RDataText)
-		return rr.unpackDomainName(&rr.rdataText.v, packet, startIdx)
+		rr.Text = new(RDataText)
+		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	// NULL records cause no additional section processing.
 	// NULLs are used as placeholders in some experimental extensions of
 	// the DNS.
 	case QueryTypeNULL:
-		rr.rdataText = new(RDataText)
-		endIdx := startIdx + int(rr.RDLength)
-		rr.rdataText.v = append(rr.rdataText.v, packet[startIdx:startIdx+endIdx]...)
+		rr.Text = new(RDataText)
+		endIdx := startIdx + int(rr.rdlen)
+		rr.Text.v = append(rr.Text.v, packet[startIdx:startIdx+endIdx]...)
 		return nil
 
 	case QueryTypeWKS:
-		rr.rdataWKS = new(RDataWKS)
-		endIdx := startIdx + int(rr.RDLength)
-		return rr.rdataWKS.UnmarshalBinary(packet[startIdx:endIdx])
+		rr.WKS = new(RDataWKS)
+		endIdx := startIdx + int(rr.rdlen)
+		return rr.WKS.UnmarshalBinary(packet[startIdx:endIdx])
 
 	case QueryTypePTR:
-		rr.rdataText = new(RDataText)
-		return rr.unpackDomainName(&rr.rdataText.v, packet, startIdx)
+		rr.Text = new(RDataText)
+		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeHINFO:
-		rr.rdataHINFO = new(RDataHINFO)
-		endIdx := startIdx + int(rr.RDLength)
-		return rr.rdataHINFO.UnmarshalBinary(packet[startIdx:endIdx])
+		rr.HInfo = new(RDataHINFO)
+		endIdx := startIdx + int(rr.rdlen)
+		return rr.HInfo.UnmarshalBinary(packet[startIdx:endIdx])
 
 	case QueryTypeMINFO:
-		rr.rdataMINFO = new(RDataMINFO)
-		return rr.unpackRDataMINFO(packet, startIdx)
+		rr.MInfo = new(RDataMINFO)
+		return rr.unpackMInfo(packet, startIdx)
 
 	case QueryTypeMX:
-		rr.rdataMX = new(RDataMX)
-		return rr.unpackRDataMX(packet, startIdx)
+		rr.MX = new(RDataMX)
+		return rr.unpackMX(packet, startIdx)
 
 	case QueryTypeTXT:
-		rr.rdataText = new(RDataText)
-		endIdx := startIdx + int(rr.RDLength)
+		rr.Text = new(RDataText)
+		endIdx := startIdx + int(rr.rdlen)
 
 		// The first byte of TXT is length.
-		rr.rdataText.v = append(rr.rdataText.v, packet[startIdx+1:endIdx]...)
+		rr.Text.v = append(rr.Text.v, packet[startIdx+1:endIdx]...)
 
 		return nil
 
 	case QueryTypeOPT:
-		rr.rdataOPT = new(RDataOPT)
-		return rr.unpackRDataOPT(packet, startIdx)
+		rr.OPT = new(RDataOPT)
+		return rr.unpackOPT(packet, startIdx)
 	}
 
 	return nil
 }
 
-func (rr *ResourceRecord) unpackRDataMINFO(packet []byte, startIdx int) error {
+func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx int) error {
 	x := startIdx
 	rr.offsetIdx = 0
 
-	err := rr.unpackDomainName(&rr.rdataMINFO.RMailBox, packet, x)
+	err := rr.unpackDomainName(&rr.MInfo.RMailBox, packet, x)
 	if err != nil {
 		return err
 	}
@@ -346,10 +336,10 @@ func (rr *ResourceRecord) unpackRDataMINFO(packet []byte, startIdx int) error {
 		x = rr.offsetIdx + 1
 		rr.offsetIdx = 0
 	} else {
-		x = x + len(rr.rdataMINFO.RMailBox) + 2
+		x = x + len(rr.MInfo.RMailBox) + 2
 	}
 
-	err = rr.unpackDomainName(&rr.rdataMINFO.EmailBox, packet, x)
+	err = rr.unpackDomainName(&rr.MInfo.EmailBox, packet, x)
 	if err != nil {
 		return err
 	}
@@ -357,43 +347,43 @@ func (rr *ResourceRecord) unpackRDataMINFO(packet []byte, startIdx int) error {
 	return nil
 }
 
-func (rr *ResourceRecord) unpackRDataMX(packet []byte, startIdx int) error {
-	rr.rdataMX.Preference = libbytes.ReadInt16(packet, startIdx)
+func (rr *ResourceRecord) unpackMX(packet []byte, startIdx int) error {
+	rr.MX.Preference = libbytes.ReadInt16(packet, startIdx)
 
 	rr.offsetIdx = 0
-	err := rr.unpackDomainName(&rr.rdataMX.Exchange, packet, startIdx+2)
+	err := rr.unpackDomainName(&rr.MX.Exchange, packet, startIdx+2)
 
 	return err
 }
 
-func (rr *ResourceRecord) unpackRDataOPT(packet []byte, x int) error {
+func (rr *ResourceRecord) unpackOPT(packet []byte, x int) error {
 	// Unpack extended RCODE and flags from TTL.
-	rr.rdataOPT.ExtRCode = byte(rr.TTL >> 24)
-	rr.rdataOPT.Version = byte(rr.TTL >> 16)
+	rr.OPT.ExtRCode = byte(rr.TTL >> 24)
+	rr.OPT.Version = byte(rr.TTL >> 16)
 
 	if rr.TTL&maskOPTDO == maskOPTDO {
-		rr.rdataOPT.DO = true
+		rr.OPT.DO = true
 	}
 
-	if rr.RDLength == 0 {
+	if rr.rdlen == 0 {
 		return nil
 	}
 
 	// Unpack the RDATA
-	rr.rdataOPT.Code = libbytes.ReadUint16(packet, x)
+	rr.OPT.Code = libbytes.ReadUint16(packet, x)
 	x += 2
-	rr.rdataOPT.Length = libbytes.ReadUint16(packet, x)
+	rr.OPT.Length = libbytes.ReadUint16(packet, x)
 	x += 2
-	endIdx := x + int(rr.RDLength)
-	rr.rdataOPT.Data = append(rr.rdataOPT.Data, packet[x:endIdx]...)
+	endIdx := x + int(rr.rdlen)
+	rr.OPT.Data = append(rr.OPT.Data, packet[x:endIdx]...)
 	return nil
 }
 
-func (rr *ResourceRecord) unpackRDataSOA(packet []byte, startIdx int) error {
+func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx int) error {
 	x := startIdx
 	rr.offsetIdx = 0
 
-	err := rr.unpackDomainName(&rr.rdataSOA.MName, packet, x)
+	err := rr.unpackDomainName(&rr.SOA.MName, packet, x)
 	if err != nil {
 		return err
 	}
@@ -401,10 +391,10 @@ func (rr *ResourceRecord) unpackRDataSOA(packet []byte, startIdx int) error {
 		x = rr.offsetIdx + 1
 		rr.offsetIdx = 0
 	} else {
-		x = x + len(rr.rdataSOA.MName) + 2
+		x = x + len(rr.SOA.MName) + 2
 	}
 
-	err = rr.unpackDomainName(&rr.rdataSOA.RName, packet, x)
+	err = rr.unpackDomainName(&rr.SOA.RName, packet, x)
 	if err != nil {
 		return err
 	}
@@ -412,18 +402,18 @@ func (rr *ResourceRecord) unpackRDataSOA(packet []byte, startIdx int) error {
 		x = rr.offsetIdx + 1
 		rr.offsetIdx = 0
 	} else {
-		x = x + len(rr.rdataSOA.RName) + 2
+		x = x + len(rr.SOA.RName) + 2
 	}
 
-	rr.rdataSOA.Serial = libbytes.ReadUint32(packet, x)
+	rr.SOA.Serial = libbytes.ReadUint32(packet, x)
 	x += 4
-	rr.rdataSOA.Refresh = libbytes.ReadInt32(packet, x)
+	rr.SOA.Refresh = libbytes.ReadInt32(packet, x)
 	x += 4
-	rr.rdataSOA.Retry = libbytes.ReadInt32(packet, x)
+	rr.SOA.Retry = libbytes.ReadInt32(packet, x)
 	x += 4
-	rr.rdataSOA.Expire = libbytes.ReadInt32(packet, x)
+	rr.SOA.Expire = libbytes.ReadInt32(packet, x)
 	x += 4
-	rr.rdataSOA.Minimum = libbytes.ReadUint32(packet, x)
+	rr.SOA.Minimum = libbytes.ReadUint32(packet, x)
 	x += 4
 
 	return nil

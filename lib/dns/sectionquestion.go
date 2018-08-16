@@ -36,56 +36,6 @@ type SectionQuestion struct {
 }
 
 //
-// MarshalBinary pack the section question into packet.
-//
-func (question *SectionQuestion) MarshalBinary() ([]byte, error) {
-	packet := question.marshalName()
-	x := len(packet)
-
-	packet = append(packet, make([]byte, 4)...)
-
-	libbytes.WriteUint16(&packet, x, uint16(question.Type))
-	x += 2
-	libbytes.WriteUint16(&packet, x, uint16(question.Class))
-
-	return packet, nil
-}
-
-func (question *SectionQuestion) marshalName() []byte {
-	count := byte(0)
-	countIdx := 0
-	packet := make([]byte, 1)
-
-	for x, c := range question.Name {
-		if c == '.' {
-			// Skip name that prefixed with '.', e.g.
-			// '...test.com'
-			if count == 0 {
-				continue
-			}
-
-			packet[countIdx] = count
-			count = 0
-			countIdx = x + 1
-			packet = append(packet, 0)
-
-			continue
-		}
-
-		packet = append(packet, c)
-		count++
-	}
-	if count > 0 {
-		packet[countIdx] = count
-	}
-	if len(question.Name) > 0 {
-		packet = append(packet, 0)
-	}
-
-	return packet
-}
-
-//
 // Reset the message question field to it's default values for query.
 //
 func (question *SectionQuestion) Reset() {

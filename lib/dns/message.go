@@ -6,6 +6,8 @@ package dns
 
 import (
 	"log"
+
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 //
@@ -50,6 +52,264 @@ type Message struct {
 	// Slice that hold the result of packing the message or original
 	// message from unpacking.
 	Packet []byte
+
+	// offset of curret packet when packing, equal to len(Packet).
+	off uint16
+
+	// Mapping between name and their offset for message compression.
+	dnameOff map[string]uint16
+	dname    string
+}
+
+func (msg *Message) compress() bool {
+	off, ok := msg.dnameOff[msg.dname]
+	if ok {
+		msg.Packet = append(msg.Packet, maskPointer|byte(off>>8))
+		msg.Packet = append(msg.Packet, byte(off))
+		msg.off += 2
+		return true
+	}
+	return false
+}
+
+//
+// packDomainName convert string of domain-name into DNS domain-name format.
+//
+func (msg *Message) packDomainName(dname []byte) (n int) {
+	msg.dname = string(dname)
+	ok := msg.compress()
+	if ok {
+		n = 2
+		return
+	}
+
+	count := byte(0)
+	msg.Packet = append(msg.Packet, 0)
+	msg.dnameOff[msg.dname] = msg.off
+
+	for x, c := range dname {
+		if c == '.' {
+			// Skip name that prefixed with '.', e.g.
+			// '...test.com'
+			if count == 0 {
+				continue
+			}
+
+			msg.Packet[msg.off] = count
+
+			msg.dname = string(dname[x+1:])
+			msg.off += uint16(count + 1)
+			n += int(count + 1)
+
+			ok = msg.compress()
+			if ok {
+				n += 2
+				return
+			}
+
+			count = 0
+			msg.Packet = append(msg.Packet, 0)
+			msg.dnameOff[msg.dname] = msg.off
+
+			continue
+		}
+
+		msg.Packet = append(msg.Packet, c)
+		count++
+	}
+	if count > 0 {
+		msg.Packet[msg.off] = count
+		msg.off += uint16(count + 1)
+		n += int(count + 1)
+	}
+	if len(dname) > 0 {
+		msg.Packet = append(msg.Packet, 0)
+		msg.off++
+		n++
+	}
+
+	return
+}
+
+func (msg *Message) packQuestion() {
+	msg.packDomainName(msg.Question.Name)
+	libbytes.AppendUint16(&msg.Packet, uint16(msg.Question.Type))
+	libbytes.AppendUint16(&msg.Packet, uint16(msg.Question.Class))
+	msg.off += 4
+}
+
+func (msg *Message) packRR(rr *ResourceRecord) {
+	msg.packDomainName(rr.Name)
+	libbytes.AppendUint16(&msg.Packet, uint16(rr.Type))
+	libbytes.AppendUint16(&msg.Packet, uint16(rr.Class))
+	msg.off += 4
+
+	if rr.Type == QueryTypeOPT {
+		rr.TTL = 0
+
+		// Pack extended code and version to TTL
+		rr.TTL = int32(rr.OPT.ExtRCode) << 24
+		rr.TTL = rr.TTL | int32(rr.OPT.Version)<<16
+
+		if rr.OPT.DO {
+			rr.TTL = rr.TTL | maskOPTDO
+		}
+	}
+
+	libbytes.AppendInt32(&msg.Packet, rr.TTL)
+	msg.off += 4
+
+	msg.packRData(rr)
+}
+
+func (msg *Message) packRData(rr *ResourceRecord) {
+	switch rr.Type {
+	case QueryTypeA:
+		if len(rr.Text.v) >= 4 {
+			libbytes.AppendUint16(&msg.Packet, 4)
+			msg.Packet = append(msg.Packet, rr.Text.v[:4]...)
+		}
+	case QueryTypeNS:
+		msg.packText(rr)
+	case QueryTypeMD:
+		// obsolete
+	case QueryTypeMF:
+		// obsolete
+	case QueryTypeCNAME:
+		msg.packText(rr)
+	case QueryTypeSOA:
+		msg.packSOA(rr)
+	case QueryTypeMB:
+		msg.packText(rr)
+	case QueryTypeMG:
+		msg.packText(rr)
+	case QueryTypeNULL:
+		msg.packText(rr)
+	case QueryTypeWKS:
+		msg.packWKS(rr)
+	case QueryTypePTR:
+		msg.packText(rr)
+	case QueryTypeHINFO:
+		msg.packHINFO(rr)
+	case QueryTypeMINFO:
+		msg.packMINFO(rr)
+	case QueryTypeMX:
+		msg.packMX(rr)
+	case QueryTypeTXT:
+		msg.packTXT(rr)
+	case QueryTypeOPT:
+		msg.packOPT(rr)
+	}
+}
+
+func (msg *Message) packText(rr *ResourceRecord) {
+	// Reserve two octets for rdlength
+	libbytes.AppendUint16(&msg.Packet, 0)
+	off := int(msg.off)
+	msg.off += 2
+	n := msg.packDomainName(rr.Text.v)
+	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
+}
+
+func (msg *Message) packSOA(rr *ResourceRecord) {
+	// Reserve two octets for rdlength.
+	libbytes.AppendUint16(&msg.Packet, 0)
+	off := int(msg.off)
+	msg.off += 2
+
+	n := msg.packDomainName(rr.SOA.MName)
+	n += msg.packDomainName(rr.SOA.RName)
+
+	libbytes.AppendUint32(&msg.Packet, rr.SOA.Serial)
+	libbytes.AppendInt32(&msg.Packet, rr.SOA.Refresh)
+	libbytes.AppendInt32(&msg.Packet, rr.SOA.Retry)
+	libbytes.AppendInt32(&msg.Packet, rr.SOA.Expire)
+	libbytes.AppendUint32(&msg.Packet, rr.SOA.Minimum)
+
+	// Write rdlength.
+	libbytes.WriteUint16(&msg.Packet, off, uint16(n+20))
+}
+
+func (msg *Message) packWKS(rr *ResourceRecord) {
+	// Write rdlength.
+	n := uint16(5 + len(rr.WKS.BitMap))
+	libbytes.AppendUint16(&msg.Packet, n)
+	msg.off += 2
+
+	msg.Packet = append(msg.Packet, rr.WKS.Address[:4]...)
+	msg.Packet = append(msg.Packet, rr.WKS.Protocol)
+	msg.Packet = append(msg.Packet, rr.WKS.BitMap...)
+	msg.off += n
+}
+
+func (msg *Message) packHINFO(rr *ResourceRecord) {
+	// Write rdlength.
+	n := len(rr.HInfo.CPU)
+	n += len(rr.HInfo.OS)
+	libbytes.AppendUint16(&msg.Packet, uint16(n))
+	msg.off += 2
+	msg.Packet = append(msg.Packet, rr.HInfo.CPU...)
+	msg.Packet = append(msg.Packet, rr.HInfo.OS...)
+	msg.off += uint16(n)
+}
+
+func (msg *Message) packMINFO(rr *ResourceRecord) {
+	// Reserve two octets for rdlength.
+	off := int(msg.off)
+	libbytes.AppendUint16(&msg.Packet, 0)
+	msg.off += 2
+
+	n := msg.packDomainName(rr.MInfo.RMailBox)
+	n += msg.packDomainName(rr.MInfo.EmailBox)
+
+	// Write rdlength.
+	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
+}
+
+func (msg *Message) packMX(rr *ResourceRecord) {
+	// Reserve two octets for rdlength.
+	off := int(msg.off)
+	libbytes.AppendUint16(&msg.Packet, 0)
+	msg.off += 2
+
+	libbytes.AppendInt16(&msg.Packet, rr.MX.Preference)
+	msg.off += 2
+
+	n := msg.packDomainName(rr.MX.Exchange)
+
+	// Write rdlength.
+	libbytes.WriteUint16(&msg.Packet, off, uint16(n+2))
+}
+
+func (msg *Message) packTXT(rr *ResourceRecord) {
+	n := uint16(len(rr.Text.v))
+	libbytes.AppendUint16(&msg.Packet, n+1)
+	msg.off += 2
+
+	msg.Packet = append(msg.Packet, byte(n))
+	msg.Packet = append(msg.Packet, rr.Text.v...)
+	msg.off += n
+}
+
+func (msg *Message) packOPT(rr *ResourceRecord) {
+	// Reserve two octets for rdlength.
+	off := int(msg.off)
+	libbytes.AppendUint16(&msg.Packet, 0)
+	msg.off += 2
+
+	if rr.OPT.Length == 0 {
+		return
+	}
+
+	// Pack OPT rdata
+	libbytes.AppendUint16(&msg.Packet, rr.OPT.Code)
+	libbytes.AppendUint16(&msg.Packet, rr.OPT.Length)
+	msg.off += (4 + rr.OPT.Length)
+	msg.Packet = append(msg.Packet, rr.OPT.Data[:rr.OPT.Length]...)
+
+	// Write rdlength.
+	n := 4 + rr.OPT.Length
+	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
 }
 
 //
@@ -73,6 +333,10 @@ func (msg *Message) Reset() {
 	msg.Authority = msg.Authority[:0]
 	msg.Additional = msg.Additional[:0]
 	msg.Packet = msg.Packet[:0]
+
+	msg.dname = ""
+	msg.off = 0
+	msg.dnameOff = make(map[string]uint16)
 }
 
 //
@@ -91,16 +355,23 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 		return nil, err
 	}
 
-	question, err := msg.Question.MarshalBinary()
-	if err != nil {
-		return nil, err
-	}
-
 	msg.Packet = append(msg.Packet, header...)
-	msg.Packet = append(msg.Packet, question...)
+	msg.off = uint16(sectionHeaderSize)
+
+	msg.packQuestion()
 
 	if msg.Header.IsQuery {
 		return msg.Packet, nil
+	}
+
+	for x := 0; x < len(msg.Answer); x++ {
+		msg.packRR(msg.Answer[x])
+	}
+	for x := 0; x < len(msg.Authority); x++ {
+		msg.packRR(msg.Authority[x])
+	}
+	for x := 0; x < len(msg.Additional); x++ {
+		msg.packRR(msg.Additional[x])
 	}
 
 	return msg.Packet, nil

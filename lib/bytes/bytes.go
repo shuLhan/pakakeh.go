@@ -64,3 +64,39 @@ func WriteUint16(data *[]byte, x int, v uint16) {
 	(*data)[x] = byte(v >> 8)
 	(*data)[x+1] = byte(v)
 }
+
+//
+// AppendInt16 into slice of byte.
+//
+func AppendInt16(data *[]byte, v int16) {
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
+// AppendInt32 into slice of byte.
+//
+func AppendInt32(data *[]byte, v int32) {
+	*data = append(*data, byte(v>>24))
+	*data = append(*data, byte(v>>16))
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
+// AppendUint16 into slice of byte.
+//
+func AppendUint16(data *[]byte, v uint16) {
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
+// AppendUint32 into slice of byte.
+//
+func AppendUint32(data *[]byte, v uint32) {
+	*data = append(*data, byte(v>>24))
+	*data = append(*data, byte(v>>16))
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}

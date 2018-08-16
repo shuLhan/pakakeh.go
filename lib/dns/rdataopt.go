@@ -6,7 +6,7 @@ package dns
 
 //
 // RDataOPT define format of RDATA for OPT.
-
+//
 // The extended RCODE and flags, which OPT stores in the RR Time to Live
 // (TTL) field, contains ExtRCode, Version
 //

@@ -123,7 +123,7 @@ func (hdr *SectionHeader) Reset() {
 func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
 	var b0, b1 byte
 
-	packet := make([]byte, sectionHeaderSize)
+	packet := make([]byte, 4)
 
 	packet[0] = byte(hdr.ID >> 8)
 	packet[1] = byte(hdr.ID)
@@ -155,10 +155,10 @@ func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
 	packet[2] = b0
 	packet[3] = b1
 
-	libbytes.WriteUint16(&packet, 4, hdr.QDCount)
-	libbytes.WriteUint16(&packet, 6, hdr.ANCount)
-	libbytes.WriteUint16(&packet, 8, hdr.NSCount)
-	libbytes.WriteUint16(&packet, 10, hdr.ARCount)
+	libbytes.AppendUint16(&packet, hdr.QDCount)
+	libbytes.AppendUint16(&packet, hdr.ANCount)
+	libbytes.AppendUint16(&packet, hdr.NSCount)
+	libbytes.AppendUint16(&packet, hdr.ARCount)
 
 	return packet, nil
 }

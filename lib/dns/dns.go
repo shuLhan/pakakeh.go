@@ -14,6 +14,10 @@ const (
 	// Port define default DNS remote or listen port.
 	Port = 53
 
+	maskPointer byte  = 0xC0
+	maskOffset  byte  = 0x3F
+	maskOPTDO   int32 = 0x00008000
+
 	maxLabelSize     = 63
 	maxUDPPacketSize = 512
 	rdataAddrSize    = 4

@@ -10,6 +10,81 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestMessagePackQuestion(t *testing.T) {
+	cases := []struct {
+		desc string
+		msg  *Message
+		exp  []byte
+	}{{
+		desc: "Empty name",
+		msg: &Message{
+			Question: &SectionQuestion{
+				Type:  QueryTypeA,
+				Class: QueryClassIN,
+			},
+			dnameOff: make(map[string]uint16),
+		},
+		exp: []byte{
+			0x00, 0x00, 0x01, 0x00, 0x01,
+		},
+	}, {
+		desc: "Single domain name",
+		msg: &Message{
+			Question: &SectionQuestion{
+				Name:  []byte("kilabit"),
+				Type:  QueryTypeA,
+				Class: QueryClassIN,
+			},
+			dnameOff: make(map[string]uint16),
+		},
+		exp: []byte{
+			0x07, 'k', 'i', 'l', 'a', 'b', 'i', 't', 0x00,
+			0x00, 0x01, 0x00, 0x01,
+		},
+	}, {
+		desc: "Two domain names",
+		msg: &Message{
+			Question: &SectionQuestion{
+				Name:  []byte("kilabit.info"),
+				Type:  QueryTypeA,
+				Class: QueryClassIN,
+			},
+			dnameOff: make(map[string]uint16),
+		},
+		exp: []byte{
+			0x07, 'k', 'i', 'l', 'a', 'b', 'i', 't',
+			0x04, 'i', 'n', 'f', 'o',
+			0x00,
+			0x00, 0x01, 0x00, 0x01,
+		},
+	}, {
+		desc: "Three domain names",
+		msg: &Message{
+			Question: &SectionQuestion{
+				Name:  []byte("mail.kilabit.info"),
+				Type:  QueryTypeA,
+				Class: QueryClassIN,
+			},
+			dnameOff: make(map[string]uint16),
+		},
+		exp: []byte{
+			0x04, 'm', 'a', 'i', 'l',
+			0x07, 'k', 'i', 'l', 'a', 'b', 'i', 't',
+			0x04, 'i', 'n', 'f', 'o',
+			0x00,
+			0x00, 0x01, 0x00, 0x01,
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		c.msg.packQuestion()
+
+		test.Assert(t, "packet", c.exp, c.msg.Packet, true)
+	}
+}
+
 func TestMessageMarshalBinary(t *testing.T) {
 	cases := []struct {
 		desc string
@@ -28,6 +103,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
+			dnameOff: make(map[string]uint16),
 		},
 		exp: []byte{
 			0, 1,
@@ -41,6 +117,133 @@ func TestMessageMarshalBinary(t *testing.T) {
 			0,
 			0, 1,
 			0, 1,
+		},
+	}, {
+		desc: "Response with SOA RDATA",
+		in: &Message{
+			Header: &SectionHeader{
+				ID:      2,
+				IsQuery: false,
+				Op:      OpCodeQuery,
+				IsRA:    true,
+				QDCount: 1,
+			},
+			Question: &SectionQuestion{
+				Name:  []byte("kilabit.info"),
+				Type:  QueryTypeSOA,
+				Class: QueryClassIN,
+			},
+			Answer: []*ResourceRecord{{
+				Name:  []byte("kilabit.info"),
+				Type:  QueryTypeSOA,
+				Class: QueryClassIN,
+				TTL:   10511,
+				rdlen: 56,
+				SOA: &RDataSOA{
+					MName:   []byte("ns1.dewaweb.com"),
+					RName:   []byte("monitor.dewahost.com"),
+					Serial:  2017082501,
+					Refresh: 3600,
+					Retry:   7200,
+					Expire:  1209600,
+					Minimum: 86400,
+				},
+			}},
+			dnameOff: make(map[string]uint16),
+		},
+		exp: []byte{
+			0x00, 0x02, 0x80, 0x80, 0x00, 0x01, 0x00, 0x01, //  0 -
+			0x00, 0x00, 0x00, 0x00, 0x07, 0x6b, 0x69, 0x6c, //  8 -   0   0 7 k i l
+			0x61, 0x62, 0x69, 0x74, 0x04, 0x69, 0x6e, 0x66, // 16 - a b i t 4 i n f
+			0x6f, 0x00, 0x00, 0x06, 0x00, 0x01, 0xc0, 0x0c, // 24 - o 0   6   1 ^ 20
+			0x00, 0x06, 0x00, 0x01, 0x00, 0x00, 0x29, 0x0f, // 32
+			0x00, 0x38, 0x03, 0x6e, 0x73, 0x31, 0x07, 0x64, // 40
+			0x65, 0x77, 0x61, 0x77, 0x65, 0x62, 0x03, 0x63, // 48
+			0x6f, 0x6d, 0x00, 0x07, 0x6d, 0x6f, 0x6e, 0x69, // 56
+			0x74, 0x6f, 0x72, 0x08, 0x64, 0x65, 0x77, 0x61,
+			0x68, 0x6f, 0x73, 0x74, 0xc0, 0x36, 0x78, 0x3a,
+			0x3c, 0x85, 0x00, 0x00, 0x0e, 0x10, 0x00, 0x00,
+			0x1c, 0x20, 0x00, 0x12, 0x75, 0x00, 0x00, 0x01,
+			0x51, 0x80,
+		},
+	}, {
+		desc: "RR with TXT RDATA",
+		in: &Message{
+			Header: &SectionHeader{
+				ID:      16253,
+				IsQuery: false,
+				Op:      OpCodeQuery,
+				IsRD:    true,
+				IsRA:    true,
+				QDCount: 1,
+			},
+			Question: &SectionQuestion{
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+			},
+			Answer: []*ResourceRecord{{
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   300,
+				Text: &RDataText{
+					v: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
+				},
+			}, {
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   300,
+				Text: &RDataText{
+					v: []byte("v=spf1 include:_spf.google.com ~all"),
+				},
+			}, {
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   300,
+				Text: &RDataText{
+					v: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
+				},
+			}},
+			Additional: []*ResourceRecord{{
+				Type:  QueryTypeOPT,
+				Class: 1280,
+				TTL:   0,
+				rdlen: 0,
+				OPT:   &RDataOPT{},
+			}},
+			dnameOff: make(map[string]uint16),
+		},
+		exp: []byte{
+			0x3f, 0x7d, 0x81, 0x80, 0x00, 0x01, 0x00, 0x03,
+			0x00, 0x00, 0x00, 0x01, 0x06, 0x67, 0x6f, 0x6f,
+			0x67, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d, 0x00,
+			0x00, 0x10, 0x00, 0x01, 0xc0, 0x0c, 0x00, 0x10,
+			0x00, 0x01, 0x00, 0x00, 0x01, 0x2c, 0x00, 0x3c,
+			0x3b, 0x66, 0x61, 0x63, 0x65, 0x62, 0x6f, 0x6f,
+			0x6b, 0x2d, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e,
+			0x2d, 0x76, 0x65, 0x72, 0x69, 0x66, 0x69, 0x63,
+			0x61, 0x74, 0x69, 0x6f, 0x6e, 0x3d, 0x32, 0x32,
+			0x72, 0x6d, 0x35, 0x35, 0x31, 0x63, 0x75, 0x34,
+			0x6b, 0x30, 0x61, 0x62, 0x30, 0x62, 0x78, 0x73,
+			0x77, 0x35, 0x33, 0x36, 0x74, 0x6c, 0x64, 0x73,
+			0x34, 0x68, 0x39, 0x35, 0xc0, 0x0c, 0x00, 0x10,
+			0x00, 0x01, 0x00, 0x00, 0x01, 0x2c, 0x00, 0x24,
+			0x23, 0x76, 0x3d, 0x73, 0x70, 0x66, 0x31, 0x20,
+			0x69, 0x6e, 0x63, 0x6c, 0x75, 0x64, 0x65, 0x3a,
+			0x5f, 0x73, 0x70, 0x66, 0x2e, 0x67, 0x6f, 0x6f,
+			0x67, 0x6c, 0x65, 0x2e, 0x63, 0x6f, 0x6d, 0x20,
+			0x7e, 0x61, 0x6c, 0x6c, 0xc0, 0x0c, 0x00, 0x10,
+			0x00, 0x01, 0x00, 0x00, 0x01, 0x2c, 0x00, 0x2e,
+			0x2d, 0x64, 0x6f, 0x63, 0x75, 0x73, 0x69, 0x67,
+			0x6e, 0x3d, 0x30, 0x35, 0x39, 0x35, 0x38, 0x34,
+			0x38, 0x38, 0x2d, 0x34, 0x37, 0x35, 0x32, 0x2d,
+			0x34, 0x65, 0x66, 0x32, 0x2d, 0x39, 0x35, 0x65,
+			0x62, 0x2d, 0x61, 0x61, 0x37, 0x62, 0x61, 0x38,
+			0x61, 0x33, 0x62, 0x64, 0x30, 0x65,
+			0x00, 0x00, 0x29, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 	}}
 
@@ -87,11 +290,11 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 				Class: QueryClassIN,
 			},
 			Answer: []*ResourceRecord{{
-				Name:     []byte("kilabit.info"),
-				Type:     QueryTypeSOA,
-				Class:    QueryClassIN,
-				TTL:      10511,
-				RDLength: 56,
+				Name:  []byte("kilabit.info"),
+				Type:  QueryTypeSOA,
+				Class: QueryClassIN,
+				TTL:   10511,
+				rdlen: 56,
 				rdata: []byte{
 					0x03, 0x6e, 0x73, 0x31, 0x07, 0x64, 0x65, 0x77,
 					0x61, 0x77, 0x65, 0x62, 0x03, 0x63, 0x6f, 0x6d,
@@ -101,7 +304,7 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 					0x00, 0x00, 0x0e, 0x10, 0x00, 0x00, 0x1c, 0x20,
 					0x00, 0x12, 0x75, 0x00, 0x00, 0x01, 0x51, 0x80,
 				},
-				rdataSOA: &RDataSOA{
+				SOA: &RDataSOA{
 					MName:   []byte("ns1.dewaweb.com"),
 					RName:   []byte("monitor.dewahost.com"),
 					Serial:  2017082501,
@@ -111,6 +314,7 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 					Minimum: 86400,
 				},
 			}},
+			dnameOff: make(map[string]uint16),
 		},
 	}, {
 		desc: "RR with TXT RDATA",
@@ -160,11 +364,11 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 				Class: QueryClassIN,
 			},
 			Answer: []*ResourceRecord{{
-				Name:     []byte("google.com"),
-				Type:     QueryTypeTXT,
-				Class:    QueryClassIN,
-				TTL:      300,
-				RDLength: 60,
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   300,
+				rdlen: 60,
 				rdata: []byte{
 					0x3b, 0x66, 0x61, 0x63, 0x65, 0x62, 0x6f, 0x6f,
 					0x6b, 0x2d, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e,
@@ -175,15 +379,15 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 					0x77, 0x35, 0x33, 0x36, 0x74, 0x6c, 0x64, 0x73,
 					0x34, 0x68, 0x39, 0x35,
 				},
-				rdataText: &RDataText{
+				Text: &RDataText{
 					v: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
 				},
 			}, {
-				Name:     []byte("google.com"),
-				Type:     QueryTypeTXT,
-				Class:    QueryClassIN,
-				TTL:      300,
-				RDLength: 36,
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   300,
+				rdlen: 36,
 				rdata: []byte{
 					0x23, 0x76, 0x3d, 0x73, 0x70, 0x66, 0x31, 0x20,
 					0x69, 0x6e, 0x63, 0x6c, 0x75, 0x64, 0x65, 0x3a,
@@ -191,15 +395,15 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 					0x67, 0x6c, 0x65, 0x2e, 0x63, 0x6f, 0x6d, 0x20,
 					0x7e, 0x61, 0x6c, 0x6c,
 				},
-				rdataText: &RDataText{
+				Text: &RDataText{
 					v: []byte("v=spf1 include:_spf.google.com ~all"),
 				},
 			}, {
-				Name:     []byte("google.com"),
-				Type:     QueryTypeTXT,
-				Class:    QueryClassIN,
-				TTL:      300,
-				RDLength: 46,
+				Name:  []byte("google.com"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   300,
+				rdlen: 46,
 				rdata: []byte{
 					0x2d, 0x64, 0x6f, 0x63, 0x75, 0x73, 0x69, 0x67,
 					0x6e, 0x3d, 0x30, 0x35, 0x39, 0x35, 0x38, 0x34,
@@ -208,17 +412,18 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 					0x62, 0x2d, 0x61, 0x61, 0x37, 0x62, 0x61, 0x38,
 					0x61, 0x33, 0x62, 0x64, 0x30, 0x65,
 				},
-				rdataText: &RDataText{
+				Text: &RDataText{
 					v: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
-				Type:     QueryTypeOPT,
-				Class:    QueryClassIN,
-				TTL:      0,
-				RDLength: 0,
-				rdataOPT: &RDataOPT{},
+				Type:  QueryTypeOPT,
+				Class: 0,
+				TTL:   0,
+				rdlen: 0,
+				OPT:   &RDataOPT{},
 			}},
+			dnameOff: make(map[string]uint16),
 		},
 	}}
 
@@ -245,7 +450,7 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 			test.Assert(t, "Answer.Type", c.exp.Answer[x].Type, msg.Answer[x].Type, true)
 			test.Assert(t, "Answer.Class", c.exp.Answer[x].Class, msg.Answer[x].Class, true)
 			test.Assert(t, "Answer.TTL", c.exp.Answer[x].TTL, msg.Answer[x].TTL, true)
-			test.Assert(t, "Answer.RDLength", c.exp.Answer[x].RDLength, msg.Answer[x].RDLength, true)
+			test.Assert(t, "Answer.rdlen", c.exp.Answer[x].rdlen, msg.Answer[x].rdlen, true)
 			test.Assert(t, "Answer.rdata", c.exp.Answer[x].rdata, msg.Answer[x].rdata, true)
 			test.Assert(t, "Answer.RData()", c.exp.Answer[x].RData(), msg.Answer[x].RData(), true)
 		}
