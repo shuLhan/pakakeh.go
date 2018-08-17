@@ -10,6 +10,9 @@ import (
 
 var rrPool = sync.Pool{
 	New: func() interface{} {
-		return new(ResourceRecord)
+		rr := &ResourceRecord{
+			Text: &RDataText{},
+		}
+		return rr
 	},
 }

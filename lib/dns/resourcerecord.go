@@ -121,7 +121,7 @@ func (rr *ResourceRecord) Reset() {
 	rr.TTL = 0
 	rr.rdlen = 0
 	rr.rdata = rr.rdata[:0]
-	rr.Text = nil
+	rr.Text.v = rr.Text.v[:0]
 	rr.SOA = nil
 	rr.WKS = nil
 	rr.HInfo = nil
@@ -224,7 +224,6 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		if rr.rdlen != rdataIPv4Size || len(rr.rdata) != rdataIPv4Size {
 			return ErrIPv4Length
 		}
-		rr.Text = new(RDataText)
 		rr.Text.v = append(rr.Text.v, rr.rdata...)
 
 	//
@@ -241,7 +240,6 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	// class protocols.
 	//
 	case QueryTypeNS:
-		rr.Text = new(RDataText)
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	// MD is obsolete.  See the definition of MX and [RFC-974] for details of
@@ -263,7 +261,6 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	// cases.  See the description of name server logic in [RFC-1034] for
 	// details.
 	case QueryTypeCNAME:
-		rr.Text = new(RDataText)
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeSOA:
@@ -271,18 +268,15 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		return rr.unpackSOA(packet, startIdx)
 
 	case QueryTypeMB:
-		rr.Text = new(RDataText)
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeMG:
-		rr.Text = new(RDataText)
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	// NULL records cause no additional section processing.
 	// NULLs are used as placeholders in some experimental extensions of
 	// the DNS.
 	case QueryTypeNULL:
-		rr.Text = new(RDataText)
 		endIdx := startIdx + int(rr.rdlen)
 		rr.Text.v = append(rr.Text.v, packet[startIdx:startIdx+endIdx]...)
 		return nil
@@ -293,7 +287,6 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		return rr.WKS.UnmarshalBinary(packet[startIdx:endIdx])
 
 	case QueryTypePTR:
-		rr.Text = new(RDataText)
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeHINFO:
@@ -310,7 +303,6 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		return rr.unpackMX(packet, startIdx)
 
 	case QueryTypeTXT:
-		rr.Text = new(RDataText)
 		endIdx := startIdx + int(rr.rdlen)
 
 		// The first byte of TXT is length.
@@ -322,7 +314,6 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		if rr.rdlen != rdataIPv6Size || len(rr.rdata) != rdataIPv6Size {
 			return ErrIPv6Length
 		}
-		rr.Text = new(RDataText)
 		rr.Text.v = append(rr.Text.v, rr.rdata...)
 
 	case QueryTypeOPT:
