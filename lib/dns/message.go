@@ -209,7 +209,7 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	// Reserve two octets for rdlength
 	libbytes.AppendUint16(&msg.Packet, 0)
-	off := int(msg.off)
+	off := uint(msg.off)
 	msg.off += 2
 
 	n := msg.packDomainName(rr.Text.v)
@@ -219,7 +219,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 func (msg *Message) packSOA(rr *ResourceRecord) {
 	// Reserve two octets for rdlength.
 	libbytes.AppendUint16(&msg.Packet, 0)
-	off := int(msg.off)
+	off := uint(msg.off)
 	msg.off += 2
 
 	n := msg.packDomainName(rr.SOA.MName)
@@ -261,7 +261,7 @@ func (msg *Message) packHINFO(rr *ResourceRecord) {
 
 func (msg *Message) packMINFO(rr *ResourceRecord) {
 	// Reserve two octets for rdlength.
-	off := int(msg.off)
+	off := uint(msg.off)
 	libbytes.AppendUint16(&msg.Packet, 0)
 	msg.off += 2
 
@@ -274,7 +274,7 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 
 func (msg *Message) packMX(rr *ResourceRecord) {
 	// Reserve two octets for rdlength.
-	off := int(msg.off)
+	off := uint(msg.off)
 	libbytes.AppendUint16(&msg.Packet, 0)
 	msg.off += 2
 
@@ -307,7 +307,7 @@ func (msg *Message) packAAAA(rr *ResourceRecord) {
 
 func (msg *Message) packOPT(rr *ResourceRecord) {
 	// Reserve two octets for rdlength.
-	off := int(msg.off)
+	off := uint(msg.off)
 	libbytes.AppendUint16(&msg.Packet, 0)
 	msg.off += 2
 
@@ -420,7 +420,7 @@ func (msg *Message) UnmarshalBinary(packet []byte) error {
 		log.Printf("msg.Question: %s\n", msg.Question)
 	}
 
-	startIdx := sectionHeaderSize + msg.Question.Size()
+	startIdx := uint(sectionHeaderSize + msg.Question.Size())
 
 	var x uint16
 	for ; x < msg.Header.ANCount; x++ {

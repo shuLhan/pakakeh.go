@@ -73,7 +73,7 @@ func (question *SectionQuestion) UnmarshalBinary(packet []byte) error {
 	}
 
 	count := packet[0]
-	x := 1
+	x := uint(1)
 
 	for {
 		for y := byte(0); y < count; y++ {

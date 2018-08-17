@@ -29,7 +29,7 @@ func PrintHex(title string, data []byte, col int) {
 // ReadInt16 will convert two bytes from data start at `x` into int16 and
 // return it.
 //
-func ReadInt16(data []byte, x int) int16 {
+func ReadInt16(data []byte, x uint) int16 {
 	return int16(data[x])<<8 | int16(data[x+1])
 }
 
@@ -37,7 +37,7 @@ func ReadInt16(data []byte, x int) int16 {
 // ReadInt32 will convert four bytes from data start at `x` into int32 and
 // return it.
 //
-func ReadInt32(data []byte, x int) int32 {
+func ReadInt32(data []byte, x uint) int32 {
 	return int32(data[x])<<24 | int32(data[x+1])<<16 | int32(data[x+2])<<8 | int32(data[x+3])
 }
 
@@ -45,7 +45,7 @@ func ReadInt32(data []byte, x int) int32 {
 // ReadUint16 will convert two bytes from data start at `x` into uint16 and
 // return it.
 //
-func ReadUint16(data []byte, x int) uint16 {
+func ReadUint16(data []byte, x uint) uint16 {
 	return uint16(data[x])<<8 | uint16(data[x+1])
 }
 
@@ -53,14 +53,14 @@ func ReadUint16(data []byte, x int) uint16 {
 // ReadUint32 will convert four bytes from data start at `x` into uint32 and
 // return it.
 //
-func ReadUint32(data []byte, x int) uint32 {
+func ReadUint32(data []byte, x uint) uint32 {
 	return uint32(data[x])<<24 | uint32(data[x+1])<<16 | uint32(data[x+2])<<8 | uint32(data[x+3])
 }
 
 //
 // WriteUint16 into slice of byte.
 //
-func WriteUint16(data *[]byte, x int, v uint16) {
+func WriteUint16(data *[]byte, x uint, v uint16) {
 	(*data)[x] = byte(v >> 8)
 	(*data)[x+1] = byte(v)
 }

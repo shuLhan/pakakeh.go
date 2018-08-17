@@ -56,7 +56,7 @@ type ResourceRecord struct {
 	MX    *RDataMX
 	OPT   *RDataOPT
 
-	offsetIdx int
+	offsetIdx uint
 }
 
 //
@@ -150,8 +150,8 @@ func (rr *ResourceRecord) String() string {
 //
 // Unpack the DNS resource record from DNS packet start from index `startIdx`.
 //
-func (rr *ResourceRecord) Unpack(packet []byte, startIdx int) (int, error) {
-	x := startIdx
+func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (uint, error) {
+	x := uint(startIdx)
 
 	err := rr.unpackDomainName(&rr.Name, packet, x)
 	if err != nil {
@@ -163,7 +163,7 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx int) (int, error) {
 		if len(rr.Name) == 0 {
 			x++
 		} else {
-			x = x + len(rr.Name) + 2
+			x = x + uint(len(rr.Name)+2)
 		}
 	}
 
@@ -176,16 +176,16 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx int) (int, error) {
 	rr.rdlen = libbytes.ReadUint16(packet, x)
 	x += 2
 
-	rr.rdata = append(rr.rdata, packet[x:x+int(rr.rdlen)]...)
+	rr.rdata = append(rr.rdata, packet[x:x+uint(rr.rdlen)]...)
 
 	rr.unpackRData(packet, x)
 
-	startIdx = x + int(rr.rdlen)
+	startIdx = x + uint(rr.rdlen)
 
 	return startIdx, nil
 }
 
-func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x int) error {
+func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) error {
 	count := packet[x]
 	if count == 0 {
 		return nil
@@ -197,7 +197,7 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x int) er
 			rr.offsetIdx = x + 1
 		}
 
-		err := rr.unpackDomainName(out, packet, int(offset))
+		err := rr.unpackDomainName(out, packet, uint(offset))
 		return err
 	}
 	if count > maxLabelSize {
@@ -218,7 +218,7 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x int) er
 	return err
 }
 
-func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
+func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	switch rr.Type {
 	case QueryTypeA:
 		if rr.rdlen != rdataIPv4Size || len(rr.rdata) != rdataIPv4Size {
@@ -277,13 +277,13 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	// NULLs are used as placeholders in some experimental extensions of
 	// the DNS.
 	case QueryTypeNULL:
-		endIdx := startIdx + int(rr.rdlen)
+		endIdx := startIdx + uint(rr.rdlen)
 		rr.Text.v = append(rr.Text.v, packet[startIdx:startIdx+endIdx]...)
 		return nil
 
 	case QueryTypeWKS:
 		rr.WKS = new(RDataWKS)
-		endIdx := startIdx + int(rr.rdlen)
+		endIdx := startIdx + uint(rr.rdlen)
 		return rr.WKS.UnmarshalBinary(packet[startIdx:endIdx])
 
 	case QueryTypePTR:
@@ -291,7 +291,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 
 	case QueryTypeHINFO:
 		rr.HInfo = new(RDataHINFO)
-		endIdx := startIdx + int(rr.rdlen)
+		endIdx := startIdx + uint(rr.rdlen)
 		return rr.HInfo.UnmarshalBinary(packet[startIdx:endIdx])
 
 	case QueryTypeMINFO:
@@ -303,7 +303,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		return rr.unpackMX(packet, startIdx)
 
 	case QueryTypeTXT:
-		endIdx := startIdx + int(rr.rdlen)
+		endIdx := startIdx + uint(rr.rdlen)
 
 		// The first byte of TXT is length.
 		rr.Text.v = append(rr.Text.v, packet[startIdx+1:endIdx]...)
@@ -324,7 +324,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	return nil
 }
 
-func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx int) error {
+func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
 	x := startIdx
 	rr.offsetIdx = 0
 
@@ -336,7 +336,7 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx int) error {
 		x = rr.offsetIdx + 1
 		rr.offsetIdx = 0
 	} else {
-		x = x + len(rr.MInfo.RMailBox) + 2
+		x = x + uint(len(rr.MInfo.RMailBox)+2)
 	}
 
 	err = rr.unpackDomainName(&rr.MInfo.EmailBox, packet, x)
@@ -347,7 +347,7 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx int) error {
 	return nil
 }
 
-func (rr *ResourceRecord) unpackMX(packet []byte, startIdx int) error {
+func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) error {
 	rr.MX.Preference = libbytes.ReadInt16(packet, startIdx)
 
 	rr.offsetIdx = 0
@@ -356,7 +356,7 @@ func (rr *ResourceRecord) unpackMX(packet []byte, startIdx int) error {
 	return err
 }
 
-func (rr *ResourceRecord) unpackOPT(packet []byte, x int) error {
+func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
 	// Unpack extended RCODE and flags from TTL.
 	rr.OPT.ExtRCode = byte(rr.TTL >> 24)
 	rr.OPT.Version = byte(rr.TTL >> 16)
@@ -374,12 +374,12 @@ func (rr *ResourceRecord) unpackOPT(packet []byte, x int) error {
 	x += 2
 	rr.OPT.Length = libbytes.ReadUint16(packet, x)
 	x += 2
-	endIdx := x + int(rr.rdlen)
+	endIdx := x + uint(rr.rdlen)
 	rr.OPT.Data = append(rr.OPT.Data, packet[x:endIdx]...)
 	return nil
 }
 
-func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx int) error {
+func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 	x := startIdx
 	rr.offsetIdx = 0
 
@@ -391,7 +391,7 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx int) error {
 		x = rr.offsetIdx + 1
 		rr.offsetIdx = 0
 	} else {
-		x = x + len(rr.SOA.MName) + 2
+		x = x + uint(len(rr.SOA.MName)+2)
 	}
 
 	err = rr.unpackDomainName(&rr.SOA.RName, packet, x)
@@ -402,7 +402,7 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx int) error {
 		x = rr.offsetIdx + 1
 		rr.offsetIdx = 0
 	} else {
-		x = x + len(rr.SOA.RName) + 2
+		x = x + uint(len(rr.SOA.RName)+2)
 	}
 
 	rr.SOA.Serial = libbytes.ReadUint32(packet, x)
