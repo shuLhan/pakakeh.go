@@ -108,6 +108,12 @@
 // (S.6.8) Other char escape sequences (including octal escape sequences) are
 // invalid.
 //
+// Extensions
+//
+// (Variable)
+//
+// (E.5.2) Allow dot character '.' on variable name.
+//
 // References
 //
 // [1] https://git-scm.com/docs/git-config#_configuration_file

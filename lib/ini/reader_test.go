@@ -314,6 +314,14 @@ func TestParseVariable(t *testing.T) {
 		desc:   "With invalid char",
 		in:     []byte(`name 1`),
 		expErr: errVarNameInvalid,
+	}, {
+		desc:      "With dot",
+		in:        []byte(`name.subname`),
+		expMode:   varModeSingle,
+		expErr:    io.EOF,
+		expKey:    "name.subname",
+		expFormat: "%s",
+		expValue:  varValueTrue,
 	}}
 
 	reader := NewReader()
