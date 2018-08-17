@@ -344,6 +344,10 @@ func (msg *Message) Reset() {
 // a message will be saved in Packet field and returned.
 //
 func (msg *Message) MarshalBinary() ([]byte, error) {
+	if msg.dnameOff == nil {
+		msg.dnameOff = make(map[string]uint16)
+	}
+
 	msg.Packet = msg.Packet[:0]
 
 	msg.Header.ANCount = uint16(len(msg.Answer))
@@ -381,6 +385,8 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary unpack the packet to fill the message fields.
 //
 func (msg *Message) UnmarshalBinary(packet []byte) error {
+	msg.Packet = packet
+
 	_ = msg.Header.UnmarshalBinary(packet)
 
 	if debugLevel >= 1 {
