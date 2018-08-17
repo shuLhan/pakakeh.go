@@ -66,7 +66,6 @@ func (v *Variable) IsValueBoolTrue() bool {
 //
 // String return formatted INI variable.
 //
-// nolint: gocyclo, gas
 func (v *Variable) String() string {
 	var buf bytes.Buffer
 

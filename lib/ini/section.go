@@ -298,7 +298,6 @@ func (sec *Section) Get(key, def string) (val string, ok bool) {
 //
 // String return formatted INI section header.
 //
-//nolint: gocyclo, gas
 func (sec *Section) String() string {
 	var buf bytes.Buffer
 

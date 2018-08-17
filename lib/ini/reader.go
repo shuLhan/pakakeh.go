@@ -111,7 +111,6 @@ func (reader *Reader) ParseFile(filename string) (in *Ini, err error) {
 //
 // Parse will parse INI config from slice of bytes `src` into `in`.
 //
-// nolint: gocyclo
 func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 	in = &Ini{}
 	reader.reset(src)
@@ -249,7 +248,6 @@ func (reader *Reader) parseComment() (err error) {
 	return
 }
 
-// nolint: gocyclo
 func (reader *Reader) parseSectionHeader() (err error) {
 	reader.buf.Reset()
 
@@ -309,7 +307,6 @@ func (reader *Reader) parseSectionHeader() (err error) {
 //
 // (0) Skip white-spaces
 //
-// nolint: gocyclo
 func (reader *Reader) parseSubsection() (err error) {
 	reader.buf.Reset()
 
@@ -402,7 +399,6 @@ func (reader *Reader) parsePossibleComment() (err error) {
 	return
 }
 
-// nolint: gocyclo
 func (reader *Reader) parseVariable() (err error) {
 	reader.buf.Reset()
 
@@ -511,7 +507,6 @@ func (reader *Reader) parsePossibleValue() (err error) {
 //
 // (0) Consume leading white-spaces.
 //
-// nolint: gocyclo
 func (reader *Reader) parseVarValue() (err error) {
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()
