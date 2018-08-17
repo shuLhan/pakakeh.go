@@ -11,16 +11,28 @@ import (
 var msgPool = sync.Pool{
 	New: func() interface{} {
 		msg := &Message{
-			Header: &SectionHeader{
-				IsQuery: true,
-				Op:      OpCodeQuery,
-			},
-			Question: &SectionQuestion{
-				Type:  QueryTypeA,
-				Class: QueryClassIN,
-			},
+			Header:   &SectionHeader{},
+			Question: &SectionQuestion{},
+			Packet:   make([]byte, maxUDPPacketSize),
 		}
 
 		return msg
 	},
+}
+
+//
+// AllocMessage from pool.
+//
+func AllocMessage() (msg *Message) {
+	msg = msgPool.Get().(*Message)
+	msg.Reset()
+
+	return
+}
+
+//
+// FreeMessage put the message back to the pool.
+//
+func FreeMessage(msg *Message) {
+	msgPool.Put(msg)
 }
