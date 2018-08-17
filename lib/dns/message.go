@@ -165,9 +165,11 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 func (msg *Message) packRData(rr *ResourceRecord) {
 	switch rr.Type {
 	case QueryTypeA:
-		if len(rr.Text.v) >= 4 {
-			libbytes.AppendUint16(&msg.Packet, 4)
-			msg.Packet = append(msg.Packet, rr.Text.v[:4]...)
+		if len(rr.Text.v) >= rdataAddrSize {
+			libbytes.AppendUint16(&msg.Packet, rdataAddrSize)
+			msg.off += 2
+			msg.Packet = append(msg.Packet, rr.Text.v[:rdataAddrSize]...)
+			msg.off += rdataAddrSize
 		}
 	case QueryTypeNS:
 		msg.packText(rr)
@@ -197,6 +199,8 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 		msg.packMX(rr)
 	case QueryTypeTXT:
 		msg.packTXT(rr)
+	case QueryTypeAAAA:
+		msg.packAAAA(rr)
 	case QueryTypeOPT:
 		msg.packOPT(rr)
 	}
@@ -289,6 +293,14 @@ func (msg *Message) packTXT(rr *ResourceRecord) {
 	msg.Packet = append(msg.Packet, byte(n))
 	msg.Packet = append(msg.Packet, rr.Text.v...)
 	msg.off += n
+}
+
+func (msg *Message) packAAAA(rr *ResourceRecord) {
+	libbytes.AppendUint16(&msg.Packet, rdataIPv6Size)
+	msg.off += 2
+
+	msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv6Size]...)
+	msg.off += rdataIPv6Size
 }
 
 func (msg *Message) packOPT(rr *ResourceRecord) {

@@ -21,6 +21,7 @@ const (
 	maxLabelSize     = 63
 	maxUDPPacketSize = 512
 	rdataAddrSize    = 4
+	rdataIPv6Size    = 16
 	// sectionHeaderSize define the size of section header in DNS message.
 	sectionHeaderSize = 12
 )
@@ -40,7 +41,8 @@ var (
 	//
 	ErrNewConnection   = errors.New("Lookup: can't create new connection")
 	ErrLabelSizeLimit  = errors.New("Labels should be 63 octet or less")
-	ErrRDataAddrLength = errors.New("Invalid length of RData A format")
+	ErrRDataAddrLength = errors.New("Invalid length of A RDATA format")
+	ErrIPv6Length      = errors.New("Invalid length of AAAA RDATA format")
 )
 
 type OpCode byte
@@ -73,6 +75,7 @@ const (
 	QueryTypeMINFO                  // Mailbox or mail list information
 	QueryTypeMX                     // Mail exchange
 	QueryTypeTXT                    // (16) Text strings
+	QueryTypeAAAA  QueryType = 28   // IPv6 address
 	QueryTypeOPT   QueryType = 41   // An OPT pseudo-RR (sometimes called a meta-RR)
 	QueryTypeAXFR  QueryType = 252  // A request for a transfer of an entire zone
 	QueryTypeMAILB QueryType = 253  // A request for mailbox-related records (MB, MG or MR)

@@ -63,8 +63,8 @@ type ResourceRecord struct {
 // RData will return slice of bytes, the pointer that hold specific record
 // data, or nil for obsolete type.
 //
-// For RR with type A, NS, CNAME, MB, MG, NULL, PTR, or TXT it will return
-// slice of bytes.
+// For RR with type A, NS, CNAME, MB, MG, NULL, PTR, TXT or AAAA, it will
+// return it as slice of bytes.
 //
 // For RR with type SOA, WKS, HINFO, MINFO, MX, or OPT it will return pointer
 // to specific record type.
@@ -102,6 +102,8 @@ func (rr *ResourceRecord) RData() interface{} {
 	case QueryTypeMX:
 		return rr.MX
 	case QueryTypeTXT:
+		return rr.Text.v
+	case QueryTypeAAAA:
 		return rr.Text.v
 	case QueryTypeOPT:
 		return rr.OPT
@@ -315,6 +317,13 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 		rr.Text.v = append(rr.Text.v, packet[startIdx+1:endIdx]...)
 
 		return nil
+
+	case QueryTypeAAAA:
+		if rr.rdlen != rdataIPv6Size || len(rr.rdata) != rdataIPv6Size {
+			return ErrIPv6Length
+		}
+		rr.Text = new(RDataText)
+		rr.Text.v = append(rr.Text.v, rr.rdata...)
 
 	case QueryTypeOPT:
 		rr.OPT = new(RDataOPT)
