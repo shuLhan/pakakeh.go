@@ -399,27 +399,10 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 //
 // UnmarshalBinary unpack the packet to fill the message fields.
 //
-func (msg *Message) UnmarshalBinary(packet []byte) error {
+func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
 	msg.Packet = packet
 
-	_ = msg.Header.UnmarshalBinary(packet)
-
-	if debugLevel >= 1 {
-		log.Printf("msg.Header: %+v\n", msg.Header)
-	}
-
-	if len(packet) <= sectionHeaderSize {
-		return nil
-	}
-
-	err := msg.Question.UnmarshalBinary(packet[sectionHeaderSize:])
-	if err != nil {
-		return err
-	}
-
-	if debugLevel >= 1 {
-		log.Printf("msg.Question: %s\n", msg.Question)
-	}
+	msg.UnpackHeaderQuestion()
 
 	startIdx := uint(sectionHeaderSize + msg.Question.Size())
 
@@ -467,4 +450,27 @@ func (msg *Message) UnmarshalBinary(packet []byte) error {
 	}
 
 	return nil
+}
+
+//
+// UnpackHeaderQuestion extract only DNS header and question from message
+// packet.  This method assume that message.Packet already set to DNS raw
+// message.
+//
+func (msg *Message) UnpackHeaderQuestion() {
+	_ = msg.Header.UnmarshalBinary(msg.Packet)
+
+	if debugLevel >= 1 {
+		log.Printf("msg.Header: %+v\n", msg.Header)
+	}
+
+	if len(msg.Packet) <= sectionHeaderSize {
+		return
+	}
+
+	_ = msg.Question.UnmarshalBinary(msg.Packet[sectionHeaderSize:])
+
+	if debugLevel >= 1 {
+		log.Printf("msg.Question: %s\n", msg.Question)
+	}
 }
