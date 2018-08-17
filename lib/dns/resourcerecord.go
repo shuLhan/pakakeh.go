@@ -149,12 +149,12 @@ func (rr *ResourceRecord) String() string {
 //
 // Unpack the DNS resource record from DNS packet start from index `startIdx`.
 //
-func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (uint, error) {
-	x := uint(startIdx)
+func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (x uint, err error) {
+	x = startIdx
 
-	err := rr.unpackDomainName(&rr.Name, packet, x)
+	err = rr.unpackDomainName(&rr.Name, packet, x)
 	if err != nil {
-		return 0, err
+		return
 	}
 	if rr.off > 0 {
 		x = rr.off + 1
@@ -177,11 +177,11 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (uint, error) {
 
 	rr.rdata = append(rr.rdata, packet[x:x+uint(rr.rdlen)]...)
 
-	rr.unpackRData(packet, x)
+	err = rr.unpackRData(packet, x)
 
-	startIdx = x + uint(rr.rdlen)
+	x = x + uint(rr.rdlen)
 
-	return startIdx, nil
+	return
 }
 
 func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) error {
@@ -246,14 +246,12 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	// a master file is to reject them, or to convert them to MX RRs with a
 	// preference of 0.
 	case QueryTypeMD:
-		return nil
 
 	// MF is obsolete.  See the definition of MX and [RFC-974] for details
 	// ofw the new scheme.  The recommended policy for dealing with MD RRs
 	// found in a master file is to reject them, or to convert them to MX
 	// RRs with a preference of 10.
 	case QueryTypeMF:
-		return nil
 
 	// CNAME RRs cause no additional section processing, but name servers
 	// may choose to restart the query at the canonical name in certain
@@ -413,7 +411,6 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 	rr.SOA.Expire = libbytes.ReadInt32(packet, x)
 	x += 4
 	rr.SOA.Minimum = libbytes.ReadUint32(packet, x)
-	x += 4
 
 	return nil
 }

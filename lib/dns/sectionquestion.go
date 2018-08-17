@@ -91,7 +91,6 @@ func (question *SectionQuestion) UnmarshalBinary(packet []byte) error {
 	question.Type = QueryType(libbytes.ReadUint16(packet, x))
 	x += 2
 	question.Class = uint16(libbytes.ReadUint16(packet, x))
-	x += 2
 
 	return nil
 }

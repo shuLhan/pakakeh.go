@@ -14,7 +14,7 @@ import (
 // length.
 //
 func PrintHex(title string, data []byte, col int) {
-	fmt.Printf(title)
+	fmt.Print(title)
 	for x := 0; x < len(data); x++ {
 		if x%col == 0 {
 			fmt.Printf("\n%4d -", x)

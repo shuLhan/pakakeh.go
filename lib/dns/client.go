@@ -126,7 +126,7 @@ func (cl *Client) Lookup(qtype QueryType, qclass uint16, qname []byte) (
 		goto out
 	}
 
-	msg.UnmarshalBinary(msg.Packet)
+	err = msg.UnmarshalBinary(msg.Packet)
 out:
 	udpConnPool.Put(cl.conn)
 	cl.conn = nil

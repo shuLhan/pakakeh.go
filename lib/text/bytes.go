@@ -107,7 +107,7 @@ func BytesJSONUnescape(in []byte, strict bool) ([]byte, error) {
 					return nil, err
 				}
 
-				if dec >= 0 && dec <= 31 {
+				if dec <= 31 {
 					buf.WriteByte(byte(dec))
 				} else {
 					buf.WriteRune(rune(dec))
