@@ -20,7 +20,7 @@ const (
 
 	maxLabelSize     = 63
 	maxUDPPacketSize = 512
-	rdataAddrSize    = 4
+	rdataIPv4Size    = 4
 	rdataIPv6Size    = 16
 	// sectionHeaderSize define the size of section header in DNS message.
 	sectionHeaderSize = 12
@@ -39,10 +39,10 @@ var (
 	//
 	// List of error messages.
 	//
-	ErrNewConnection   = errors.New("Lookup: can't create new connection")
-	ErrLabelSizeLimit  = errors.New("Labels should be 63 octet or less")
-	ErrRDataAddrLength = errors.New("Invalid length of A RDATA format")
-	ErrIPv6Length      = errors.New("Invalid length of AAAA RDATA format")
+	ErrNewConnection  = errors.New("Lookup: can't create new connection")
+	ErrLabelSizeLimit = errors.New("Labels should be 63 octet or less")
+	ErrIPv4Length     = errors.New("Invalid length of A RDATA format")
+	ErrIPv6Length     = errors.New("Invalid length of AAAA RDATA format")
 )
 
 type OpCode byte

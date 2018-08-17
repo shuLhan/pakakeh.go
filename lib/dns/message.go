@@ -165,11 +165,11 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 func (msg *Message) packRData(rr *ResourceRecord) {
 	switch rr.Type {
 	case QueryTypeA:
-		if len(rr.Text.v) >= rdataAddrSize {
-			libbytes.AppendUint16(&msg.Packet, rdataAddrSize)
+		if len(rr.Text.v) >= rdataIPv4Size {
+			libbytes.AppendUint16(&msg.Packet, rdataIPv4Size)
 			msg.off += 2
-			msg.Packet = append(msg.Packet, rr.Text.v[:rdataAddrSize]...)
-			msg.off += rdataAddrSize
+			msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv4Size]...)
+			msg.off += rdataIPv4Size
 		}
 	case QueryTypeNS:
 		msg.packText(rr)

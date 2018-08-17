@@ -221,8 +221,8 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x int) er
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx int) error {
 	switch rr.Type {
 	case QueryTypeA:
-		if rr.rdlen != rdataAddrSize || len(rr.rdata) != rdataAddrSize {
-			return ErrRDataAddrLength
+		if rr.rdlen != rdataIPv4Size || len(rr.rdata) != rdataIPv4Size {
+			return ErrIPv4Length
 		}
 		rr.Text = new(RDataText)
 		rr.Text.v = append(rr.Text.v, rr.rdata...)
