@@ -46,9 +46,8 @@ type ResourceRecord struct {
 	// address.
 	rdata []byte
 
-	// RDataText represent A, NS, CNAME, MB, MG, NULL, PTR, and TXT.
-	Text *RDataText
-
+	// Text represent A, NS, CNAME, MB, MG, NULL, PTR, and TXT.
+	Text  *RDataText
 	SOA   *RDataSOA
 	WKS   *RDataWKS
 	HInfo *RDataHINFO
@@ -56,7 +55,7 @@ type ResourceRecord struct {
 	MX    *RDataMX
 	OPT   *RDataOPT
 
-	offsetIdx uint
+	off uint
 }
 
 //
@@ -128,7 +127,7 @@ func (rr *ResourceRecord) Reset() {
 	rr.MInfo = nil
 	rr.MX = nil
 	rr.OPT = nil
-	rr.offsetIdx = 0
+	rr.off = 0
 }
 
 func (rr *ResourceRecord) String() string {
@@ -157,8 +156,8 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (uint, error) {
 	if err != nil {
 		return 0, err
 	}
-	if rr.offsetIdx > 0 {
-		x = rr.offsetIdx + 1
+	if rr.off > 0 {
+		x = rr.off + 1
 	} else {
 		if len(rr.Name) == 0 {
 			x++
@@ -193,8 +192,8 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) e
 	if (packet[x] & maskPointer) == maskPointer {
 		offset := uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
 
-		if rr.offsetIdx == 0 {
-			rr.offsetIdx = x + 1
+		if rr.off == 0 {
+			rr.off = x + 1
 		}
 
 		err := rr.unpackDomainName(out, packet, uint(offset))
@@ -326,15 +325,15 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 
 func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
 	x := startIdx
-	rr.offsetIdx = 0
+	rr.off = 0
 
 	err := rr.unpackDomainName(&rr.MInfo.RMailBox, packet, x)
 	if err != nil {
 		return err
 	}
-	if rr.offsetIdx > 0 {
-		x = rr.offsetIdx + 1
-		rr.offsetIdx = 0
+	if rr.off > 0 {
+		x = rr.off + 1
+		rr.off = 0
 	} else {
 		x = x + uint(len(rr.MInfo.RMailBox)+2)
 	}
@@ -350,7 +349,7 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
 func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) error {
 	rr.MX.Preference = libbytes.ReadInt16(packet, startIdx)
 
-	rr.offsetIdx = 0
+	rr.off = 0
 	err := rr.unpackDomainName(&rr.MX.Exchange, packet, startIdx+2)
 
 	return err
@@ -381,15 +380,15 @@ func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
 
 func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 	x := startIdx
-	rr.offsetIdx = 0
+	rr.off = 0
 
 	err := rr.unpackDomainName(&rr.SOA.MName, packet, x)
 	if err != nil {
 		return err
 	}
-	if rr.offsetIdx > 0 {
-		x = rr.offsetIdx + 1
-		rr.offsetIdx = 0
+	if rr.off > 0 {
+		x = rr.off + 1
+		rr.off = 0
 	} else {
 		x = x + uint(len(rr.SOA.MName)+2)
 	}
@@ -398,9 +397,9 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 	if err != nil {
 		return err
 	}
-	if rr.offsetIdx > 0 {
-		x = rr.offsetIdx + 1
-		rr.offsetIdx = 0
+	if rr.off > 0 {
+		x = rr.off + 1
+		rr.off = 0
 	} else {
 		x = x + uint(len(rr.SOA.RName)+2)
 	}
