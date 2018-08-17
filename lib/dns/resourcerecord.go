@@ -33,7 +33,7 @@ type ResourceRecord struct {
 	// discarded.  Zero values are interpreted to mean that the RR can
 	// only be used for the transaction in progress, and should not be
 	// cached.
-	TTL int32
+	TTL uint32
 
 	// An unsigned 16 bit integer that specifies the length in octets of
 	// the RDATA field.
@@ -169,7 +169,7 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx int) (int, error) {
 	x += 2
 	rr.Class = uint16(libbytes.ReadUint16(packet, x))
 	x += 2
-	rr.TTL = libbytes.ReadInt32(packet, x)
+	rr.TTL = libbytes.ReadUint32(packet, x)
 	x += 4
 	rr.rdlen = libbytes.ReadUint16(packet, x)
 	x += 2

@@ -148,15 +148,15 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		rr.TTL = 0
 
 		// Pack extended code and version to TTL
-		rr.TTL = int32(rr.OPT.ExtRCode) << 24
-		rr.TTL = rr.TTL | int32(rr.OPT.Version)<<16
+		rr.TTL = uint32(rr.OPT.ExtRCode) << 24
+		rr.TTL = rr.TTL | uint32(rr.OPT.Version)<<16
 
 		if rr.OPT.DO {
 			rr.TTL = rr.TTL | maskOPTDO
 		}
 	}
 
-	libbytes.AppendInt32(&msg.Packet, rr.TTL)
+	libbytes.AppendUint32(&msg.Packet, rr.TTL)
 	msg.off += 4
 
 	msg.packRData(rr)
