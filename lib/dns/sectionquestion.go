@@ -32,7 +32,7 @@ type SectionQuestion struct {
 
 	// A two octet code that specifies the class of the query.  For
 	// example, the QCLASS field is IN for the Internet.
-	Class QueryClass
+	Class uint16
 }
 
 //
@@ -90,7 +90,7 @@ func (question *SectionQuestion) UnmarshalBinary(packet []byte) error {
 
 	question.Type = QueryType(libbytes.ReadUint16(packet, x))
 	x += 2
-	question.Class = QueryClass(libbytes.ReadUint16(packet, x))
+	question.Class = uint16(libbytes.ReadUint16(packet, x))
 	x += 2
 
 	return nil

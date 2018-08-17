@@ -26,7 +26,7 @@ type ResourceRecord struct {
 	Type QueryType
 
 	// Two octets which specify the class of the data in the RDATA field.
-	Class QueryClass
+	Class uint16
 
 	// A 32 bit unsigned integer that specifies the time interval (in
 	// seconds) that the resource record may be cached before it should be
@@ -167,7 +167,7 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx int) (int, error) {
 
 	rr.Type = QueryType(libbytes.ReadUint16(packet, x))
 	x += 2
-	rr.Class = QueryClass(libbytes.ReadUint16(packet, x))
+	rr.Class = uint16(libbytes.ReadUint16(packet, x))
 	x += 2
 	rr.TTL = libbytes.ReadInt32(packet, x)
 	x += 4

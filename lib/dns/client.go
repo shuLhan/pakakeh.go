@@ -95,7 +95,7 @@ func (cl *Client) getRotatedNameServer() *net.UDPAddr {
 //
 // This function is safe to be used concurrently.
 //
-func (cl *Client) Lookup(qtype QueryType, qclass QueryClass, qname []byte) (
+func (cl *Client) Lookup(qtype QueryType, qclass uint16, qname []byte) (
 	msg *Message, err error,
 ) {
 	connPool := udpConnPool.Get()

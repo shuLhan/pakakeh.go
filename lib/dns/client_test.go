@@ -19,7 +19,7 @@ func TestClientLookup(t *testing.T) {
 	cases := []struct {
 		desc   string
 		qtype  QueryType
-		qclass QueryClass
+		qclass uint16
 		qname  []byte
 	}{{
 		desc:   "QType:A QClass:IN QName:kilabit.info",

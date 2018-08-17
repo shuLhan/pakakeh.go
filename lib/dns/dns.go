@@ -34,12 +34,10 @@ var (
 	// clientTimeout define read and write timeout on client request.
 	clientTimeout = 3 * time.Second
 	debugLevel    = 0
-)
 
-//
-// List of error messages.
-//
-var (
+	//
+	// List of error messages.
+	//
 	ErrNewConnection   = errors.New("Lookup: can't create new connection")
 	ErrLabelSizeLimit  = errors.New("Labels should be 63 octet or less")
 	ErrRDataAddrLength = errors.New("Invalid length of RData A format")
@@ -82,16 +80,13 @@ const (
 	QueryTypeALL   QueryType = 255  // A request for all records
 )
 
-// QueryClass define a two octet code that specifies the class of the query.
-type QueryClass uint16
-
 const (
-	QueryClassZERO QueryClass = iota // Empty query class.
-	QueryClassIN                     // The Internet
-	QueryClassCS                     // The CSNET class (Obsolete - used only for examples in some obsolete RFCs)
-	QueryClassCH                     // The CHAOS class
-	QueryClassHS                     // Hesiod [Dyer 87]
-	QueryClassANY  QueryClass = 255  // Any class
+	QueryClassZERO uint16 = iota // Empty query class.
+	QueryClassIN                 // The Internet
+	QueryClassCS                 // The CSNET class (Obsolete - used only for examples in some obsolete RFCs)
+	QueryClassCH                 // The CHAOS class
+	QueryClassHS                 // Hesiod [Dyer 87]
+	QueryClassANY  uint16 = 255  // Any class
 )
 
 // ResponseCode define response code in message header.
