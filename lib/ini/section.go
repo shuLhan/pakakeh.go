@@ -13,7 +13,7 @@ import (
 //
 // Section represent section header in INI file format and their variables.
 //
-// NOTE: Remember that section's name is case insensitive. When trying to
+// Remember that section's name is case insensitive. When trying to
 // compare section name use the NameLower field.
 //
 type Section struct {
@@ -142,7 +142,7 @@ func (sec *Section) Set(key, value string) bool {
 //
 // Add append variable with `key` and `value` to current section.
 //
-// WARNING: if section contains the same key, the value will not be replaced.
+// If section contains the same key, the value will not be replaced.
 // Use `Set` or `ReplaceAll` to set existing value with out without
 // duplication.
 //

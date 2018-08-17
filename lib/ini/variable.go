@@ -31,7 +31,7 @@ var (
 // Variable define the smallest building block in INI format. It represent
 // empty lines, comment, section, section with subsection, and variable.
 //
-// NOTE: Remember that variable's key is case insensitive. If you want to
+// Remember that variable's key is case insensitive. If you want to
 // create variable, set the KeyLower to their lowercase value, and if you
 // want to compare variable, use the KeyLower value.
 //
