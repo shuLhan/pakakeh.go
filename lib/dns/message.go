@@ -347,6 +347,7 @@ func (msg *Message) Reset() {
 	msg.Authority = msg.Authority[:0]
 	msg.Additional = msg.Additional[:0]
 	msg.Packet = msg.Packet[:0]
+	msg.Packet = append(msg.Packet, make([]byte, maxUDPPacketSize)...)
 
 	msg.dname = ""
 	msg.off = 0

@@ -119,7 +119,6 @@ func (cl *Client) Lookup(qtype QueryType, qclass uint16, qname []byte) (
 	}
 
 	msg.Reset()
-	msg.Packet = append(msg.Packet, make([]byte, maxUDPPacketSize)...)
 
 	err = cl.Recv(msg)
 	if err != nil {
