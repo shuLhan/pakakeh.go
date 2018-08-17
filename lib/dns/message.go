@@ -172,25 +172,25 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 			msg.off += rdataIPv4Size
 		}
 	case QueryTypeNS:
-		msg.packText(rr)
+		msg.packTextAsDomain(rr)
 	case QueryTypeMD:
 		// obsolete
 	case QueryTypeMF:
 		// obsolete
 	case QueryTypeCNAME:
-		msg.packText(rr)
+		msg.packTextAsDomain(rr)
 	case QueryTypeSOA:
 		msg.packSOA(rr)
 	case QueryTypeMB:
-		msg.packText(rr)
+		msg.packTextAsDomain(rr)
 	case QueryTypeMG:
-		msg.packText(rr)
+		msg.packTextAsDomain(rr)
 	case QueryTypeNULL:
-		msg.packText(rr)
+		msg.packTextAsDomain(rr)
 	case QueryTypeWKS:
 		msg.packWKS(rr)
 	case QueryTypePTR:
-		msg.packText(rr)
+		msg.packTextAsDomain(rr)
 	case QueryTypeHINFO:
 		msg.packHINFO(rr)
 	case QueryTypeMINFO:
@@ -206,11 +206,12 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 	}
 }
 
-func (msg *Message) packText(rr *ResourceRecord) {
+func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	// Reserve two octets for rdlength
 	libbytes.AppendUint16(&msg.Packet, 0)
 	off := int(msg.off)
 	msg.off += 2
+
 	n := msg.packDomainName(rr.Text.v)
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
 }
@@ -232,6 +233,7 @@ func (msg *Message) packSOA(rr *ResourceRecord) {
 
 	// Write rdlength.
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n+20))
+	msg.off += uint16(n + 20)
 }
 
 func (msg *Message) packWKS(rr *ResourceRecord) {
@@ -316,12 +318,12 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 	// Pack OPT rdata
 	libbytes.AppendUint16(&msg.Packet, rr.OPT.Code)
 	libbytes.AppendUint16(&msg.Packet, rr.OPT.Length)
-	msg.off += (4 + rr.OPT.Length)
 	msg.Packet = append(msg.Packet, rr.OPT.Data[:rr.OPT.Length]...)
 
 	// Write rdlength.
-	n := 4 + rr.OPT.Length
+	n := uint16(4 + rr.OPT.Length)
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
+	msg.off += n
 }
 
 //
