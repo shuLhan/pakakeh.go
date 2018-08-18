@@ -18,7 +18,7 @@ func TestClientLookup(t *testing.T) {
 
 	cases := []struct {
 		desc   string
-		qtype  QueryType
+		qtype  uint16
 		qclass uint16
 		qname  []byte
 	}{{

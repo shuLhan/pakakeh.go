@@ -7,6 +7,7 @@ package dns
 import (
 	"bytes"
 	"fmt"
+	"log"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
@@ -23,7 +24,7 @@ type ResourceRecord struct {
 
 	// Two octets containing one of the RR type codes.  This field
 	// specifies the meaning of the data in the RDATA field.
-	Type QueryType
+	Type uint16
 
 	// Two octets which specify the class of the data in the RDATA field.
 	Class uint16
@@ -166,7 +167,7 @@ func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (x uint, err erro
 		}
 	}
 
-	rr.Type = QueryType(libbytes.ReadUint16(packet, x))
+	rr.Type = libbytes.ReadUint16(packet, x)
 	x += 2
 	rr.Class = uint16(libbytes.ReadUint16(packet, x))
 	x += 2
@@ -317,6 +318,8 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 		rr.OPT = new(RDataOPT)
 		return rr.unpackOPT(packet, startIdx)
 	}
+
+	log.Printf("= Unknown query type: %d\n", rr.Type)
 
 	return nil
 }

@@ -53,34 +53,31 @@ const (
 	OpCodeStatus               // a server status request (STATUS)
 )
 
-// QueryType define type of query in section question and in resource records.
-type QueryType uint16
-
 // List of query types.
 const (
-	QueryTypeZERO  QueryType = iota // Empty query type.
-	QueryTypeA                      // A host address
-	QueryTypeNS                     // An authoritative name server
-	QueryTypeMD                     // A mail destination (Obsolete - use MX)
-	QueryTypeMF                     // A mail forwarder (Obsolete - use MX)
-	QueryTypeCNAME                  // The canonical name for an alias
-	QueryTypeSOA                    // Marks the start of a zone of authority
-	QueryTypeMB                     // A mailbox domain name (EXPERIMENTAL)
-	QueryTypeMG                     // A mail group member (EXPERIMENTAL)
-	QueryTypeMR                     // A mail rename domain name (EXPERIMENTAL)
-	QueryTypeNULL                   // A null RR (EXPERIMENTAL)
-	QueryTypeWKS                    // A well known service description
-	QueryTypePTR                    // A domain name pointer
-	QueryTypeHINFO                  // Host information
-	QueryTypeMINFO                  // Mailbox or mail list information
-	QueryTypeMX                     // Mail exchange
-	QueryTypeTXT                    // (16) Text strings
-	QueryTypeAAAA  QueryType = 28   // IPv6 address
-	QueryTypeOPT   QueryType = 41   // An OPT pseudo-RR (sometimes called a meta-RR)
-	QueryTypeAXFR  QueryType = 252  // A request for a transfer of an entire zone
-	QueryTypeMAILB QueryType = 253  // A request for mailbox-related records (MB, MG or MR)
-	QueryTypeMAILA QueryType = 254  // A request for mail agent RRs (Obsolete - see MX)
-	QueryTypeALL   QueryType = 255  // A request for all records
+	QueryTypeZERO  uint16 = iota // Empty query type.
+	QueryTypeA                   // A host address
+	QueryTypeNS                  // An authoritative name server
+	QueryTypeMD                  // A mail destination (Obsolete - use MX)
+	QueryTypeMF                  // A mail forwarder (Obsolete - use MX)
+	QueryTypeCNAME               // The canonical name for an alias
+	QueryTypeSOA                 // Marks the start of a zone of authority
+	QueryTypeMB                  // A mailbox domain name (EXPERIMENTAL)
+	QueryTypeMG                  // A mail group member (EXPERIMENTAL)
+	QueryTypeMR                  // A mail rename domain name (EXPERIMENTAL)
+	QueryTypeNULL                // A null RR (EXPERIMENTAL)
+	QueryTypeWKS                 // A well known service description
+	QueryTypePTR                 // A domain name pointer
+	QueryTypeHINFO               // Host information
+	QueryTypeMINFO               // Mailbox or mail list information
+	QueryTypeMX                  // Mail exchange
+	QueryTypeTXT                 // (16) Text strings
+	QueryTypeAAAA  uint16 = 28   // IPv6 address
+	QueryTypeOPT   uint16 = 41   // An OPT pseudo-RR (sometimes called a meta-RR)
+	QueryTypeAXFR  uint16 = 252  // A request for a transfer of an entire zone
+	QueryTypeMAILB uint16 = 253  // A request for mailbox-related records (MB, MG or MR)
+	QueryTypeMAILA uint16 = 254  // A request for mail agent RRs (Obsolete - see MX)
+	QueryTypeALL   uint16 = 255  // A request for all records
 )
 
 const (
