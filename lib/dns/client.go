@@ -59,11 +59,18 @@ func (cl *Client) AddRemoteAddress(address string) error {
 		udpAddr.Port = Port
 	}
 
-	cl.Lock()
-	cl.ns = append(cl.ns, udpAddr)
-	cl.Unlock()
+	cl.AddRemoteUDPAddr(udpAddr)
 
 	return nil
+}
+
+//
+// AddRemoteUDPAddr to list of parent name servers.
+//
+func (cl *Client) AddRemoteUDPAddr(addr *net.UDPAddr) {
+	cl.Lock()
+	cl.ns = append(cl.ns, addr)
+	cl.Unlock()
 }
 
 //
