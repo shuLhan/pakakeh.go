@@ -397,6 +397,16 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 }
 
 //
+// SetID in section header and in packet.
+//
+func (msg *Message) SetID(id uint16) {
+	msg.Header.ID = id
+	if len(msg.Packet) > 2 {
+		libbytes.WriteUint16(&msg.Packet, 0, id)
+	}
+}
+
+//
 // UnmarshalBinary unpack the packet to fill the message fields.
 //
 func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
