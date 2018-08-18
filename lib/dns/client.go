@@ -42,7 +42,7 @@ func NewClient(nameServers []string) (*Client, error) {
 }
 
 //
-// AddNameServer to list of remote name servers.
+// AddRemoteAddress to list of remote name servers.
 //
 // This function is safe to be used concurrently.
 //
@@ -116,6 +116,8 @@ func (cl *Client) Lookup(qtype QueryType, qclass uint16, qname []byte) (
 	msg.Question.Class = qclass
 	msg.Question.Name = append(msg.Question.Name, qname...)
 
+	_, _ = msg.MarshalBinary()
+
 	err = cl.Send(msg, nil)
 	if err != nil {
 		goto out
@@ -143,12 +145,18 @@ out:
 //
 // Send DNS message to name server using active connection in client.
 // If ns is nil it will use one of the name-server in clients.
+// The message packet must already been filled, using MarshalBinary.
 //
 func (cl *Client) Send(msg *Message, ns *net.UDPAddr) error {
-	_, _ = msg.MarshalBinary()
-
 	if ns == nil {
 		ns = cl.getRotatedNameServer()
+	}
+	if cl.conn == nil {
+		connPool := udpConnPool.Get()
+		if connPool == nil {
+			return ErrNewConnection
+		}
+		cl.conn = connPool.(*net.UDPConn)
 	}
 
 	_, err := cl.conn.WriteToUDP(msg.Packet, ns)
