@@ -8,17 +8,11 @@ import (
 	"log"
 	"net"
 	"sync"
-	"time"
 )
 
 var udpConnPool = sync.Pool{
 	New: func() interface{} {
 		conn, err := net.ListenUDP("udp", &net.UDPAddr{IP: nil, Port: 0})
-		if err != nil {
-			log.Fatal("net.ListenPacket:", err)
-			return nil
-		}
-		err = conn.SetDeadline(time.Now().Add(clientTimeout))
 		if err != nil {
 			log.Fatal("net.ListenPacket:", err)
 			return nil

@@ -7,6 +7,7 @@ package dns
 import (
 	"net"
 	"sync"
+	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
@@ -147,7 +148,7 @@ out:
 // If ns is nil it will use one of the name-server in clients.
 // The message packet must already been filled, using MarshalBinary.
 //
-func (cl *Client) Send(msg *Message, ns *net.UDPAddr) error {
+func (cl *Client) Send(msg *Message, ns *net.UDPAddr) (err error) {
 	if ns == nil {
 		ns = cl.getRotatedNameServer()
 	}
@@ -157,11 +158,16 @@ func (cl *Client) Send(msg *Message, ns *net.UDPAddr) error {
 			return ErrNewConnection
 		}
 		cl.conn = connPool.(*net.UDPConn)
+	} else {
+		err = cl.conn.SetDeadline(time.Now().Add(clientTimeout))
+		if err != nil {
+			return
+		}
 	}
 
-	_, err := cl.conn.WriteToUDP(msg.Packet, ns)
+	_, err = cl.conn.WriteToUDP(msg.Packet, ns)
 
-	return err
+	return
 }
 
 //
