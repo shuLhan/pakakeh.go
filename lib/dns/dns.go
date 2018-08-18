@@ -33,7 +33,7 @@ var (
 	}
 
 	// clientTimeout define read and write timeout on client request.
-	clientTimeout = 3 * time.Second
+	clientTimeout = 6 * time.Second
 	debugLevel    = 0
 
 	//
