@@ -11,7 +11,7 @@ import (
 )
 
 func TestClientLookup(t *testing.T) {
-	cl, err := NewClient(nil)
+	cl, err := NewClient(NameServers)
 	if err != nil {
 		t.Fatal(err)
 	}

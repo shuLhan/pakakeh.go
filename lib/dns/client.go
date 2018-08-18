@@ -31,10 +31,6 @@ type Client struct {
 func NewClient(nameServers []string) (*Client, error) {
 	cl := new(Client)
 
-	if len(nameServers) == 0 {
-		nameServers = NameServers
-	}
-
 	for x := 0; x < len(nameServers); x++ {
 		err := cl.AddRemoteAddress(nameServers[x])
 		if err != nil {
