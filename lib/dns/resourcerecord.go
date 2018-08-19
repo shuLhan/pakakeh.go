@@ -134,15 +134,8 @@ func (rr *ResourceRecord) Reset() {
 func (rr *ResourceRecord) String() string {
 	var buf bytes.Buffer
 
-	fmt.Fprintf(&buf, "{Name:%s Type:%d Class:%d TTL:%d rdlen:%d",
+	fmt.Fprintf(&buf, "{Name:%s Type:%d Class:%d TTL:%d rdlen:%d}",
 		rr.Name, rr.Type, rr.Class, rr.TTL, rr.rdlen)
-
-	rdata := rr.RData()
-	if rdata != nil {
-		fmt.Fprintf(&buf, " rdata:%s}", rdata)
-	} else {
-		buf.WriteString(" rdata:nil}")
-	}
 
 	return buf.String()
 }
