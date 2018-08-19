@@ -10,6 +10,41 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestMessageIsExpired(t *testing.T) {
+	cases := []struct {
+		desc    string
+		msg     *Message
+		elapsed uint32
+		exp     bool
+	}{{
+		desc: "Message is not expired",
+		msg: &Message{
+			Answer: []*ResourceRecord{{
+				TTL: 3600,
+			}},
+		},
+		elapsed: 3599,
+		exp:     false,
+	}, {
+		desc: "Message is expired",
+		msg: &Message{
+			Answer: []*ResourceRecord{{
+				TTL: 3600,
+			}},
+		},
+		elapsed: 3600,
+		exp:     true,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := c.msg.IsExpired(c.elapsed)
+
+		test.Assert(t, "IsExpired", c.exp, got, true)
+	}
+}
+
 func TestMessagePackQuestion(t *testing.T) {
 	cases := []struct {
 		desc string

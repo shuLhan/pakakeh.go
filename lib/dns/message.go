@@ -355,6 +355,30 @@ func (msg *Message) Reset() {
 }
 
 //
+// IsExpired will return true if at least one resource record is expired,
+// their TTL value is equal or less than elapsed value; otherwise it will
+// return false.
+//
+func (msg *Message) IsExpired(elapsed uint32) bool {
+	for x := 0; x < len(msg.Answer); x++ {
+		if msg.Answer[x].TTL <= elapsed {
+			return true
+		}
+	}
+	for x := 0; x < len(msg.Authority); x++ {
+		if msg.Authority[x].TTL <= elapsed {
+			return true
+		}
+	}
+	for x := 0; x < len(msg.Additional); x++ {
+		if msg.Additional[x].TTL <= elapsed {
+			return true
+		}
+	}
+	return false
+}
+
+//
 // MarshalBinary convert message into datagram packet.  The result of packing
 // a message will be saved in Packet field and returned.
 //
