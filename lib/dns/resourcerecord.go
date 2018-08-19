@@ -310,9 +310,10 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	case QueryTypeOPT:
 		rr.OPT = new(RDataOPT)
 		return rr.unpackOPT(packet, startIdx)
-	}
 
-	log.Printf("= Unknown query type: %d\n", rr.Type)
+	default:
+		log.Printf("= Unknown query type: %d\n", rr.Type)
+	}
 
 	return nil
 }
