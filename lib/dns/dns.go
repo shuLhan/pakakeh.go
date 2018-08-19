@@ -73,6 +73,7 @@ const (
 	QueryTypeMX                  // Mail exchange
 	QueryTypeTXT                 // (16) Text strings
 	QueryTypeAAAA  uint16 = 28   // IPv6 address
+	QueryTypeSRV   uint16 = 33   // A SRV RR for locating service.
 	QueryTypeOPT   uint16 = 41   // An OPT pseudo-RR (sometimes called a meta-RR)
 	QueryTypeAXFR  uint16 = 252  // A request for a transfer of an entire zone
 	QueryTypeMAILB uint16 = 253  // A request for mailbox-related records (MB, MG or MR)

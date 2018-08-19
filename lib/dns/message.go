@@ -76,13 +76,18 @@ func (msg *Message) compress() bool {
 //
 // packDomainName convert string of domain-name into DNS domain-name format.
 //
-func (msg *Message) packDomainName(dname []byte) (n int) {
+func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
+	var ok bool
+
 	dname = bytes.ToLower(dname)
 	msg.dname = string(dname)
-	ok := msg.compress()
-	if ok {
-		n = 2
-		return
+
+	if doCompress {
+		ok = msg.compress()
+		if ok {
+			n = 2
+			return
+		}
 	}
 
 	count := byte(0)
@@ -103,10 +108,12 @@ func (msg *Message) packDomainName(dname []byte) (n int) {
 			msg.off += uint16(count + 1)
 			n += int(count + 1)
 
-			ok = msg.compress()
-			if ok {
-				n += 2
-				return
+			if doCompress {
+				ok = msg.compress()
+				if ok {
+					n += 2
+					return
+				}
 			}
 
 			count = 0
@@ -137,14 +144,14 @@ func (msg *Message) packDomainName(dname []byte) (n int) {
 }
 
 func (msg *Message) packQuestion() {
-	msg.packDomainName(msg.Question.Name)
+	msg.packDomainName(msg.Question.Name, false)
 	libbytes.AppendUint16(&msg.Packet, uint16(msg.Question.Type))
 	libbytes.AppendUint16(&msg.Packet, uint16(msg.Question.Class))
 	msg.off += 4
 }
 
 func (msg *Message) packRR(rr *ResourceRecord) {
-	msg.packDomainName(rr.Name)
+	msg.packDomainName(rr.Name, true)
 	libbytes.AppendUint16(&msg.Packet, uint16(rr.Type))
 	libbytes.AppendUint16(&msg.Packet, uint16(rr.Class))
 	msg.off += 4
@@ -204,6 +211,8 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 		msg.packMX(rr)
 	case QueryTypeTXT:
 		msg.packTXT(rr)
+	case QueryTypeSRV:
+		msg.packSRV(rr)
 	case QueryTypeAAAA:
 		msg.packAAAA(rr)
 	case QueryTypeOPT:
@@ -217,7 +226,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	off := uint(msg.off)
 	msg.off += 2
 
-	n := msg.packDomainName(rr.Text.v)
+	n := msg.packDomainName(rr.Text.v, true)
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
 }
 
@@ -227,8 +236,8 @@ func (msg *Message) packSOA(rr *ResourceRecord) {
 	off := uint(msg.off)
 	msg.off += 2
 
-	n := msg.packDomainName(rr.SOA.MName)
-	n += msg.packDomainName(rr.SOA.RName)
+	n := msg.packDomainName(rr.SOA.MName, true)
+	n += msg.packDomainName(rr.SOA.RName, true)
 
 	libbytes.AppendUint32(&msg.Packet, rr.SOA.Serial)
 	libbytes.AppendInt32(&msg.Packet, rr.SOA.Refresh)
@@ -270,8 +279,8 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 	libbytes.AppendUint16(&msg.Packet, 0)
 	msg.off += 2
 
-	n := msg.packDomainName(rr.MInfo.RMailBox)
-	n += msg.packDomainName(rr.MInfo.EmailBox)
+	n := msg.packDomainName(rr.MInfo.RMailBox, true)
+	n += msg.packDomainName(rr.MInfo.EmailBox, true)
 
 	// Write rdlength.
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
@@ -286,7 +295,7 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 	libbytes.AppendInt16(&msg.Packet, rr.MX.Preference)
 	msg.off += 2
 
-	n := msg.packDomainName(rr.MX.Exchange)
+	n := msg.packDomainName(rr.MX.Exchange, true)
 
 	// Write rdlength.
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n+2))
@@ -300,6 +309,25 @@ func (msg *Message) packTXT(rr *ResourceRecord) {
 	msg.Packet = append(msg.Packet, byte(n))
 	msg.Packet = append(msg.Packet, rr.Text.v...)
 	msg.off += n
+}
+
+func (msg *Message) packSRV(rr *ResourceRecord) {
+	// Reserve two octets for rdlength
+	off := uint(msg.off)
+	libbytes.AppendUint16(&msg.Packet, 0)
+	msg.off += 2
+
+	libbytes.AppendUint16(&msg.Packet, rr.SRV.Priority)
+	msg.off += 2
+	libbytes.AppendUint16(&msg.Packet, rr.SRV.Weight)
+	msg.off += 2
+	libbytes.AppendUint16(&msg.Packet, rr.SRV.Port)
+	msg.off += 2
+
+	n := msg.packDomainName(rr.SRV.Target, false) + 6
+
+	// Write rdlength.
+	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
 }
 
 func (msg *Message) packAAAA(rr *ResourceRecord) {

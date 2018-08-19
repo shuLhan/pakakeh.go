@@ -55,6 +55,7 @@ type ResourceRecord struct {
 	MInfo *RDataMINFO
 	MX    *RDataMX
 	OPT   *RDataOPT
+	SRV   *RDataSRV
 
 	off uint
 }
@@ -105,6 +106,8 @@ func (rr *ResourceRecord) RData() interface{} {
 		return rr.Text.v
 	case QueryTypeAAAA:
 		return rr.Text.v
+	case QueryTypeSRV:
+		return rr.SRV
 	case QueryTypeOPT:
 		return rr.OPT
 	}
@@ -310,6 +313,10 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 		}
 		rr.Text.v = append(rr.Text.v, rr.rdata...)
 
+	case QueryTypeSRV:
+		rr.SRV = new(RDataSRV)
+		return rr.unpackSRV(packet, startIdx)
+
 	case QueryTypeOPT:
 		rr.OPT = new(RDataOPT)
 		return rr.unpackOPT(packet, startIdx)
@@ -351,6 +358,38 @@ func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) error {
 	err := rr.unpackDomainName(&rr.MX.Exchange, packet, startIdx+2)
 
 	return err
+}
+
+func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
+	// Unpack service, proto, and name from RR.Name
+	y := 0
+	for ; y < len(rr.Name); y++ {
+		if rr.Name[y] == '.' {
+			break
+		}
+		rr.SRV.Service = append(rr.SRV.Service, rr.Name[y])
+	}
+	for y++; y < len(rr.Name); y++ {
+		if rr.Name[y] == '.' {
+			break
+		}
+		rr.SRV.Proto = append(rr.SRV.Proto, rr.Name[y])
+	}
+	for y++; y < len(rr.Name); y++ {
+		rr.SRV.Name = append(rr.SRV.Name, rr.Name[y])
+	}
+
+	// Unpack RDATA
+	rr.SRV.Priority = libbytes.ReadUint16(packet, x)
+	x += 2
+	rr.SRV.Weight = libbytes.ReadUint16(packet, x)
+	x += 2
+	rr.SRV.Port = libbytes.ReadUint16(packet, x)
+	x += 2
+
+	err = rr.unpackDomainName(&rr.SRV.Target, packet, x)
+
+	return
 }
 
 func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
