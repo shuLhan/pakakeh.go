@@ -11,7 +11,7 @@ CPU_PROF:=cpu.prof
 MEM_PROF:=mem.prof
 
 .PHONY: all install lint
-.PHONE: test test.prof coverbrowse
+.PHONY: test test.prof coverbrowse
 
 all: install
 
