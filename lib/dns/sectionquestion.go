@@ -46,7 +46,7 @@ func (question *SectionQuestion) Reset() {
 
 //
 // Size return the section question size, length of name + 2 (1 octet for
-// beginning size plus 1 octer for end of label) + 2 octets of
+// beginning size plus 1 octet for end of label) + 2 octets of
 // qtype + 2 octets of qclass
 //
 func (question *SectionQuestion) Size() int {
@@ -77,6 +77,9 @@ func (question *SectionQuestion) UnmarshalBinary(packet []byte) error {
 
 	for {
 		for y := byte(0); y < count; y++ {
+			if packet[x] >= 'A' && packet[x] <= 'Z' {
+				packet[x] += 32
+			}
 			question.Name = append(question.Name, packet[x])
 			x++
 		}

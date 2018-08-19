@@ -66,7 +66,7 @@ func TestMessagePackQuestion(t *testing.T) {
 		desc: "Single domain name",
 		msg: &Message{
 			Question: &SectionQuestion{
-				Name:  []byte("kilabit"),
+				Name:  []byte("kilaBit"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
@@ -96,7 +96,7 @@ func TestMessagePackQuestion(t *testing.T) {
 		desc: "Three domain names",
 		msg: &Message{
 			Question: &SectionQuestion{
-				Name:  []byte("mail.kilabit.info"),
+				Name:  []byte("MAIL.KILABIT.INFO"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
@@ -134,7 +134,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
-				Name:  []byte("kilabit.info"),
+				Name:  []byte("kilabit.INFO"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
@@ -172,7 +172,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Class: QueryClassIN,
 			},
 			Answer: []*ResourceRecord{{
-				Name:  []byte("kilabit.info"),
+				Name:  []byte("KILABIT.INFO"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   0x00000168,
@@ -277,7 +277,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 					v: []byte("ns2.dewaweb.com"),
 				},
 			}, {
-				Name:  []byte("kilabit.info"),
+				Name:  []byte("kilabit.INFO"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
@@ -286,7 +286,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 					0x03, 0x6e, 0x73, 0x33, 0xc0, 0x2e,
 				},
 				Text: &RDataText{
-					v: []byte("ns3.dewaweb.com"),
+					v: []byte("NS3.DEWAWEB.COM"),
 				},
 			}, {
 				Name:  []byte("kilabit.info"),
@@ -404,7 +404,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 				rdlen: 56,
 				SOA: &RDataSOA{
 					MName:   []byte("ns1.dewaweb.com"),
-					RName:   []byte("monitor.dewahost.com"),
+					RName:   []byte("MONITOR.dewahost.com"),
 					Serial:  2017082501,
 					Refresh: 3600,
 					Retry:   7200,
@@ -558,7 +558,7 @@ func TestMessageMarshalBinary(t *testing.T) {
 				},
 				MX: &RDataMX{
 					Preference: 0x32,
-					Exchange:   []byte("alt4.aspmx.l.google.com"),
+					Exchange:   []byte("alt4.aspmx.l.GOOGLE.COM"),
 				},
 			}},
 			Additional: []*ResourceRecord{{

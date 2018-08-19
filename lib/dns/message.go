@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"bytes"
 	"log"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -76,6 +77,7 @@ func (msg *Message) compress() bool {
 // packDomainName convert string of domain-name into DNS domain-name format.
 //
 func (msg *Message) packDomainName(dname []byte) (n int) {
+	dname = bytes.ToLower(dname)
 	msg.dname = string(dname)
 	ok := msg.compress()
 	if ok {
@@ -114,6 +116,9 @@ func (msg *Message) packDomainName(dname []byte) (n int) {
 			continue
 		}
 
+		if c >= 'A' && c <= 'Z' {
+			c += 32
+		}
 		msg.Packet = append(msg.Packet, c)
 		count++
 	}

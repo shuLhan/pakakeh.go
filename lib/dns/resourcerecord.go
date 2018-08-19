@@ -202,6 +202,9 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) e
 
 	x++
 	for y := byte(0); y < count; y++ {
+		if packet[x] >= 'A' && packet[x] <= 'Z' {
+			packet[x] += 32
+		}
 		*out = append(*out, packet[x])
 		x++
 	}
