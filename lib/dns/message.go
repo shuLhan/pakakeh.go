@@ -6,7 +6,9 @@ package dns
 
 import (
 	"bytes"
+	"fmt"
 	"log"
+	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
@@ -461,6 +463,44 @@ func (msg *Message) SetID(id uint16) {
 	if len(msg.Packet) > 2 {
 		libbytes.WriteUint16(&msg.Packet, 0, id)
 	}
+}
+
+//
+// String return the message representation as string.
+//
+func (msg *Message) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{Header:%+v Question:%+v", msg.Header, msg.Question)
+
+	b.WriteString(" Answer:[")
+	for x := 0; x < len(msg.Answer); x++ {
+		if x > 0 {
+			b.WriteByte(' ')
+		}
+		fmt.Fprintf(&b, "%+v", msg.Answer[x])
+	}
+	b.WriteString("]")
+
+	b.WriteString(" Authority:[")
+	for x := 0; x < len(msg.Authority); x++ {
+		if x > 0 {
+			b.WriteByte(' ')
+		}
+		fmt.Fprintf(&b, "%+v", msg.Authority[x])
+	}
+	b.WriteString("]")
+
+	b.WriteString(" Additional:[")
+	for x := 0; x < len(msg.Additional); x++ {
+		if x > 0 {
+			b.WriteByte(' ')
+		}
+		fmt.Fprintf(&b, "%+v", msg.Additional[x])
+	}
+	b.WriteString("]}")
+
+	return b.String()
 }
 
 //
