@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"fmt"
 	"io/ioutil"
 	"runtime"
 
@@ -120,8 +119,6 @@ func parse(in []byte) (msgs []*Message) {
 			continue
 		}
 
-		fmt.Printf("address: %s\n", addr)
-
 		hname = hname[:0]
 
 		for ; x < len(in); x++ {
@@ -144,8 +141,6 @@ func parse(in []byte) (msgs []*Message) {
 				hname = hname[:0]
 				break
 			}
-
-			fmt.Printf("hname: %s\n", hname)
 		}
 
 		if len(hname) > 0 {
