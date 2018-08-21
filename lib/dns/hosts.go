@@ -58,6 +58,7 @@ func newMessage(addr, hname *[]byte) *Message {
 
 	msg := &Message{
 		Header: &SectionHeader{
+			QDCount: 1,
 			ANCount: 1,
 		},
 		Question: &SectionQuestion{
