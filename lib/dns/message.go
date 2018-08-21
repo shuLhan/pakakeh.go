@@ -391,25 +391,40 @@ func (msg *Message) Reset() {
 	msg.Header.Reset()
 	msg.Question.Reset()
 
-	for x := 0; x < len(msg.Answer); x++ {
-		rrPool.Put(msg.Answer[x])
-	}
-	for x := 0; x < len(msg.Authority); x++ {
-		rrPool.Put(msg.Authority[x])
-	}
-	for x := 0; x < len(msg.Additional); x++ {
-		rrPool.Put(msg.Additional[x])
-	}
+	msg.ResetRR()
 
-	msg.Answer = msg.Answer[:0]
-	msg.Authority = msg.Authority[:0]
-	msg.Additional = msg.Additional[:0]
 	msg.Packet = msg.Packet[:0]
 	msg.Packet = append(msg.Packet, make([]byte, maxUDPPacketSize)...)
 
 	msg.dname = ""
 	msg.off = 0
 	msg.dnameOff = make(map[string]uint16)
+}
+
+//
+// ResetRR free allocated resource records in message.  This function can be
+// used to release some memory after message has been packed, but the raw
+// packet may still be in use.
+//
+func (msg *Message) ResetRR() {
+	if len(msg.Answer) > 0 {
+		for x := 0; x < len(msg.Answer); x++ {
+			rrPool.Put(msg.Answer[x])
+		}
+		msg.Answer = msg.Answer[:0]
+	}
+	if len(msg.Authority) > 0 {
+		for x := 0; x < len(msg.Authority); x++ {
+			rrPool.Put(msg.Authority[x])
+		}
+		msg.Authority = msg.Authority[:0]
+	}
+	if len(msg.Additional) > 0 {
+		for x := 0; x < len(msg.Additional); x++ {
+			rrPool.Put(msg.Additional[x])
+		}
+		msg.Additional = msg.Additional[:0]
+	}
 }
 
 //
