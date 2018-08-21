@@ -7,6 +7,7 @@ package websocket
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -16,7 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/json-iterator/go"
 	"golang.org/x/sys/unix"
 )
 
@@ -375,7 +375,7 @@ func (serv *Server) handleText(conn int, f *Frame) {
 	req = _reqPool.Get().(*Request)
 	req.Reset()
 
-	err = jsoniter.Unmarshal(f.Payload, req)
+	err = json.Unmarshal(f.Payload, req)
 	if err != nil {
 		res.Code = http.StatusBadRequest
 		res.Message = err.Error()
@@ -624,7 +624,7 @@ func (serv *Server) Start() {
 // SendResponse to client.
 //
 func (serv *Server) SendResponse(conn int, res *Response) (err error) {
-	resb, err := jsoniter.Marshal(res)
+	resb, err := json.Marshal(res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "SendResponse:", err.Error())
 		return
