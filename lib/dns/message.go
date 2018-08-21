@@ -409,18 +409,21 @@ func (msg *Message) Reset() {
 func (msg *Message) ResetRR() {
 	if len(msg.Answer) > 0 {
 		for x := 0; x < len(msg.Answer); x++ {
+			msg.Answer[x].Reset()
 			rrPool.Put(msg.Answer[x])
 		}
 		msg.Answer = msg.Answer[:0]
 	}
 	if len(msg.Authority) > 0 {
 		for x := 0; x < len(msg.Authority); x++ {
+			msg.Authority[x].Reset()
 			rrPool.Put(msg.Authority[x])
 		}
 		msg.Authority = msg.Authority[:0]
 	}
 	if len(msg.Additional) > 0 {
 		for x := 0; x < len(msg.Additional); x++ {
+			msg.Additional[x].Reset()
 			rrPool.Put(msg.Additional[x])
 		}
 		msg.Additional = msg.Additional[:0]
