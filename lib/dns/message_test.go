@@ -1647,12 +1647,10 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 				},
 			}},
 			Additional: []*ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 512,
 				TTL:   0,
 				rdlen: 0,
-				rdata: []byte{},
 				OPT:   &RDataOPT{},
 			}},
 		},
