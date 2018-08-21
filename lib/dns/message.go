@@ -441,16 +441,6 @@ func (msg *Message) IsExpired(elapsed uint32) bool {
 			return true
 		}
 	}
-	for x := 0; x < len(msg.Authority); x++ {
-		if msg.Authority[x].TTL <= elapsed {
-			return true
-		}
-	}
-	for x := 0; x < len(msg.Additional); x++ {
-		if msg.Additional[x].TTL <= elapsed {
-			return true
-		}
-	}
 	return false
 }
 
