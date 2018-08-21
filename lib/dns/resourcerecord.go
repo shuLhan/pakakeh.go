@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"net"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
@@ -220,10 +221,7 @@ func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) e
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	switch rr.Type {
 	case QueryTypeA:
-		if rr.rdlen != rdataIPv4Size || len(rr.rdata) != rdataIPv4Size {
-			return ErrIPv4Length
-		}
-		rr.Text.v = append(rr.Text.v, rr.rdata...)
+		return rr.unpackA()
 
 	//
 	// NS records cause both the usual additional section processing to
@@ -308,10 +306,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 		return nil
 
 	case QueryTypeAAAA:
-		if rr.rdlen != rdataIPv6Size || len(rr.rdata) != rdataIPv6Size {
-			return ErrIPv6Length
-		}
-		rr.Text.v = append(rr.Text.v, rr.rdata...)
+		return rr.unpackAAAA()
 
 	case QueryTypeSRV:
 		rr.SRV = new(RDataSRV)
@@ -324,6 +319,28 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	default:
 		log.Printf("= Unknown query type: %d\n", rr.Type)
 	}
+
+	return nil
+}
+
+func (rr *ResourceRecord) unpackA() error {
+	if rr.rdlen != rdataIPv4Size || len(rr.rdata) != rdataIPv4Size {
+		return ErrIPv4Length
+	}
+
+	ip := net.IP(rr.rdata)
+	rr.Text.v = append(rr.Text.v, []byte(ip.String())...)
+
+	return nil
+}
+
+func (rr *ResourceRecord) unpackAAAA() error {
+	if rr.rdlen != rdataIPv6Size || len(rr.rdata) != rdataIPv6Size {
+		return ErrIPv6Length
+	}
+
+	ip := net.IP(rr.rdata)
+	rr.Text.v = append(rr.Text.v, []byte(ip.String())...)
 
 	return nil
 }

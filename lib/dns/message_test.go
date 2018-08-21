@@ -176,10 +176,8 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   0x00000168,
-				rdlen: 4,
-				rdata: []byte{0x67, 0xc8, 0x04, 0xa2},
 				Text: &RDataText{
-					v: []byte{0x67, 0xc8, 0x04, 0xa2},
+					v: []byte("103.200.4.162"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -269,10 +267,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
-				rdlen: 0x11,
-				rdata: []byte{
-					0x03, 0x6e, 0x73, 0x32, 0x07, 0x64, 0x65, 0x77, 0x61, 0x77, 0x65, 0x62, 0x03, 0x63, 0x6f, 0x6d, 0x00,
-				},
 				Text: &RDataText{
 					v: []byte("ns2.dewaweb.com"),
 				},
@@ -281,10 +275,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
-				rdlen: 6,
-				rdata: []byte{
-					0x03, 0x6e, 0x73, 0x33, 0xc0, 0x2e,
-				},
 				Text: &RDataText{
 					v: []byte("NS3.DEWAWEB.COM"),
 				},
@@ -293,10 +283,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
-				rdlen: 6,
-				rdata: []byte{
-					0x03, 0x6e, 0x73, 0x31, 0xc0, 0x2e,
-				},
 				Text: &RDataText{
 					v: []byte("ns1.dewaweb.com"),
 				},
@@ -353,8 +339,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   0x0168,
-				rdlen: 2,
-				rdata: []byte{0xc0, 0x11},
 				Text: &RDataText{
 					v: []byte("kilabit.info"),
 				},
@@ -401,7 +385,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   10511,
-				rdlen: 56,
 				SOA: &RDataSOA{
 					MName:   []byte("ns1.dewaweb.com"),
 					RName:   []byte("MONITOR.dewahost.com"),
@@ -489,14 +472,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				rdlen: 0x11,
-				rdata: []byte{
-					0x00, 0x28,
-					0x04, 0x61, 0x6c, 0x74, 0x33,
-					0x05, 0x61, 0x73, 0x70, 0x6d, 0x78,
-					0x01, 0x6c,
-					0xc0, 0x0c,
-				},
 				MX: &RDataMX{
 					Preference: 0x28,
 					Exchange:   []byte("alt3.aspmx.l.google.com"),
@@ -506,11 +481,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				rdlen: 0x04,
-				rdata: []byte{
-					0x00, 0x0a,
-					0xc0, 0x2f,
-				},
 				MX: &RDataMX{
 					Preference: 0x0a,
 					Exchange:   []byte("aspmx.l.google.com"),
@@ -520,12 +490,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				rdlen: 0x09,
-				rdata: []byte{
-					0x00, 0x14,
-					0x04, 0x61, 0x6c, 0x74, 0x31,
-					0xc0, 0x2f,
-				},
 				MX: &RDataMX{
 					Preference: 0x14,
 					Exchange:   []byte("alt1.aspmx.l.google.com"),
@@ -535,12 +499,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				rdlen: 0x09,
-				rdata: []byte{
-					0x00, 0x1e,
-					0x04, 0x61, 0x6c, 0x74, 0x32,
-					0xc0, 0x2f,
-				},
 				MX: &RDataMX{
 					Preference: 0x1e,
 					Exchange:   []byte("alt2.aspmx.l.google.com"),
@@ -550,12 +508,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				rdlen: 0x09,
-				rdata: []byte{
-					0x00, 0x32,
-					0x04, 0x61, 0x6c, 0x74, 0x34,
-					0xc0, 0x2f,
-				},
 				MX: &RDataMX{
 					Preference: 0x32,
 					Exchange:   []byte("alt4.aspmx.l.GOOGLE.COM"),
@@ -642,7 +594,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
-				rdlen: 0,
 				OPT:   &RDataOPT{},
 			}},
 			dnameOff: make(map[string]uint16),
@@ -685,17 +636,9 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Name:  []byte("google.com"),
 				Type:  QueryTypeAAAA,
 				TTL:   0x53,
-				rdlen: 16,
-				rdata: []byte{
-					0x24, 0x04, 0x68, 0x00, 0x40, 0x03, 0x0c, 0x00,
-					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8b,
-				},
 				Class: QueryClassIN,
 				Text: &RDataText{
-					v: []byte{
-						0x24, 0x04, 0x68, 0x00, 0x40, 0x03, 0x0c, 0x00,
-						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8b,
-					},
+					v: []byte("2404:6800:4003:c00::8b"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -703,8 +646,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
-				rdlen: 0,
-				rdata: []byte{},
 				OPT:   &RDataOPT{},
 			}},
 		},
@@ -797,7 +738,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				rdlen: 0x20,
 				SRV: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
@@ -812,7 +752,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				rdlen: 0x25,
 				SRV: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
@@ -827,7 +766,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				rdlen: 0x25,
 				SRV: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
@@ -842,7 +780,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				rdlen: 0x25,
 				SRV: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
@@ -857,7 +794,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				rdlen: 0x25,
 				SRV: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
@@ -873,8 +809,6 @@ func TestMessageMarshalBinary(t *testing.T) {
 				Type:  QueryTypeOPT,
 				Class: 512,
 				TTL:   0,
-				rdlen: 0,
-				rdata: []byte{},
 				OPT:   &RDataOPT{},
 			}},
 		},
@@ -937,7 +871,7 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 				rdlen: 4,
 				rdata: []byte{0x67, 0xc8, 0x04, 0xa2},
 				Text: &RDataText{
-					v: []byte{0x67, 0xc8, 0x04, 0xa2},
+					v: []byte("103.200.4.162"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -1500,10 +1434,7 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8b,
 				},
 				Text: &RDataText{
-					v: []byte{
-						0x24, 0x04, 0x68, 0x00, 0x40, 0x03, 0x0c, 0x00,
-						0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8b,
-					},
+					v: []byte("2404:6800:4003:c00::8b"),
 				},
 			}},
 			Additional: []*ResourceRecord{{

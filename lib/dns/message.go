@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"net"
 	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -179,12 +180,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 func (msg *Message) packRData(rr *ResourceRecord) {
 	switch rr.Type {
 	case QueryTypeA:
-		if len(rr.Text.v) >= rdataIPv4Size {
-			libbytes.AppendUint16(&msg.Packet, rdataIPv4Size)
-			msg.off += 2
-			msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv4Size]...)
-			msg.off += rdataIPv4Size
-		}
+		msg.packA(rr)
 	case QueryTypeNS:
 		msg.packTextAsDomain(rr)
 	case QueryTypeMD:
@@ -220,6 +216,25 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 	case QueryTypeOPT:
 		msg.packOPT(rr)
 	}
+}
+
+func (msg *Message) packA(rr *ResourceRecord) {
+	libbytes.AppendUint16(&msg.Packet, rdataIPv4Size)
+	msg.off += 2
+
+	ip := net.ParseIP(string(rr.Text.v))
+	if ip == nil {
+		msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv4Size]...)
+	} else {
+		ipv4 := ip.To4()
+		if ipv4 == nil {
+			msg.Packet = append(msg.Packet, ip[:rdataIPv4Size]...)
+		} else {
+			msg.Packet = append(msg.Packet, ipv4...)
+		}
+	}
+
+	msg.off += rdataIPv4Size
 }
 
 func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
@@ -336,7 +351,15 @@ func (msg *Message) packAAAA(rr *ResourceRecord) {
 	libbytes.AppendUint16(&msg.Packet, rdataIPv6Size)
 	msg.off += 2
 
-	msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv6Size]...)
+	ip := net.ParseIP(string(rr.Text.v))
+	if ip == nil {
+		msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv6Size]...)
+	} else {
+		msg.Packet = append(msg.Packet, ip...)
+	}
+
+	msg.off += rdataIPv6Size
+
 	msg.off += rdataIPv6Size
 }
 
