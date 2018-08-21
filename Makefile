@@ -21,16 +21,18 @@ install: test
 test: $(COVER_HTML)
 
 test.prof:
-	go test -cpuprofile $(CPU_PROF) -memprofile $(MEM_PROF) ./...
+	go test -race -cpuprofile $(CPU_PROF) -memprofile $(MEM_PROF) ./...
 
 bench.lib.websocket:
-	go test -run=none -benchmem -cpuprofile=$(CPU_PROF) -memprofile=$(MEM_PROF) -bench . ./lib/websocket
+	export CGO_ENABLED=1 && \
+	go test -race -run=none -benchmem -cpuprofile=$(CPU_PROF) -memprofile=$(MEM_PROF) -bench . ./lib/websocket
 
 $(COVER_HTML): $(COVER_OUT)
 	go tool cover -html=$< -o $@
 
 $(COVER_OUT): $(SRC) $(SRC_TEST)
-	go test -coverprofile=$@ ./...
+	export CGO_ENABLED=1 && \
+	go test -race -count=1 -coverprofile=$@ ./...
 
 coverbrowse: $(COVER_HTML)
 	xdg-open $<
