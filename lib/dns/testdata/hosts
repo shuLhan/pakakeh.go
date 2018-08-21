@@ -1,0 +1,12 @@
+
+  ## comment
+
+invalid.domain
+## Separated by tab
+127.0.0.1	alpha	beta	charlie
+
+## another comment
+::1             alpha beta   charlie
+#
+#
+127.0.0.1  	  delta  	  epsilon
