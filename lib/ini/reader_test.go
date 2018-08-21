@@ -322,6 +322,14 @@ func TestParseVariable(t *testing.T) {
 		expKey:    "name.subname",
 		expFormat: "%s",
 		expValue:  varValueTrue,
+	}, {
+		desc:      "With underscore char",
+		in:        []byte(`name_subname`),
+		expMode:   varModeSingle,
+		expErr:    io.EOF,
+		expKey:    "name_subname",
+		expFormat: "%s",
+		expValue:  varValueTrue,
 	}}
 
 	reader := NewReader()

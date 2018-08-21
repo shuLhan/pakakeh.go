@@ -112,7 +112,7 @@
 //
 // (Variable)
 //
-// (E.5.2) Allow dot character '.' on variable name.
+// (E.5.2) Allow dot ('.') and underscore ('_') characters on variable name.
 //
 // References
 //
