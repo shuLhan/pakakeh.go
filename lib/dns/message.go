@@ -398,7 +398,7 @@ func (msg *Message) Reset() {
 
 	msg.dname = ""
 	msg.off = 0
-	msg.dnameOff = make(map[string]uint16)
+	msg.dnameOff = nil
 }
 
 //
@@ -468,6 +468,7 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 
 	header, err := msg.Header.MarshalBinary()
 	if err != nil {
+		msg.dnameOff = nil
 		return nil, err
 	}
 
@@ -477,6 +478,7 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 	msg.packQuestion()
 
 	if msg.Header.IsQuery {
+		msg.dnameOff = nil
 		return msg.Packet, nil
 	}
 
@@ -489,6 +491,8 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 	for x := 0; x < len(msg.Additional); x++ {
 		msg.packRR(msg.Additional[x])
 	}
+
+	msg.dnameOff = nil
 
 	return msg.Packet, nil
 }
