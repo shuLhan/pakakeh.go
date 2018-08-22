@@ -136,15 +136,16 @@ func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
 
 	b0 = b0 | (0x78 & byte(hdr.Op<<2))
 
+	if hdr.IsRD {
+		b0 = b0 | HeaderIsRD
+	}
+
 	if !hdr.IsQuery {
 		if hdr.IsAA {
 			b0 = b0 | HeaderIsAA
 		}
 		if hdr.IsTC {
 			b0 = b0 | HeaderIsTC
-		}
-		if hdr.IsRD {
-			b0 = b0 | HeaderIsRD
 		}
 		if hdr.IsRA {
 			b1 = b1 | HeaderIsRA
