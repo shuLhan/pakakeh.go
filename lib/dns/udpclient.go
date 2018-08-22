@@ -63,7 +63,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 	msg := msgPool.Get().(*Message)
 	msg.Reset()
 
-	msg.Header.ID = getID()
+	msg.Header.ID = getNextID()
 	msg.Header.QDCount = 1
 	msg.Header.IsRD = true
 	msg.Question.Type = qtype

@@ -11,11 +11,19 @@ import (
 var idPool uint32
 
 //
-// getID return a new ID for message header.
+// getNextID increment and return ID.
 //
-func getID() uint16 {
+func getNextID() uint16 {
 	atomic.AddUint32(&idPool, 1)
 	id := atomic.LoadUint32(&idPool)
 
+	return uint16(id)
+}
+
+//
+// getID return the current ID value in pool.
+//
+func getID() uint16 {
+	id := atomic.LoadUint32(&idPool)
 	return uint16(id)
 }
