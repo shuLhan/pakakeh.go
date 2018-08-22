@@ -27,11 +27,6 @@ const (
 )
 
 var (
-	// NameServers define default name servers.
-	NameServers = []string{
-		"127.0.0.1:53",
-	}
-
 	// clientTimeout define read and write timeout on client request.
 	clientTimeout = 6 * time.Second
 	debugLevel    = 0

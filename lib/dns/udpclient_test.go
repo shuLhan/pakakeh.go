@@ -6,12 +6,10 @@ package dns
 
 import (
 	"testing"
-
-	_ "github.com/shuLhan/share/lib/test"
 )
 
-func TestClientLookup(t *testing.T) {
-	cl, err := NewClient(NameServers)
+func TestUDPClientLookup(t *testing.T) {
+	cl, err := NewUDPClient("127.0.0.1:53")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,12 +36,16 @@ func TestClientLookup(t *testing.T) {
 		qname:  []byte("kilabit.info"),
 	}}
 
+	debugLevel = 2
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_, err := cl.Lookup(c.qtype, c.qclass, c.qname)
+		msg, err := cl.Lookup(c.qtype, c.qclass, c.qname)
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		FreeMessage(msg)
 	}
 }
