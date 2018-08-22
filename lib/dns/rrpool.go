@@ -11,7 +11,9 @@ import (
 var rrPool = sync.Pool{
 	New: func() interface{} {
 		rr := &ResourceRecord{
-			Text: &RDataText{},
+			Name:  make([]byte, 0),
+			Text:  &RDataText{},
+			rdata: make([]byte, 0),
 		}
 		return rr
 	},
