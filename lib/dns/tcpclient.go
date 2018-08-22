@@ -137,6 +137,9 @@ func (cl *TCPClient) Recv(msg *Message) (err error) {
 	if err != nil {
 		return
 	}
+	if n == 0 {
+		return nil
+	}
 
 	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
 

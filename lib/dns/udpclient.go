@@ -95,6 +95,8 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 		return nil, err
 	}
 
+	FreeMessage(msg)
+
 	return resMsg, nil
 }
 
@@ -131,7 +133,7 @@ func (cl *UDPClient) Recv(msg *Message) (err error) {
 	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
 
 	if debugLevel >= 2 {
-		libbytes.PrintHex(">>> msg.Packet:", msg.Packet, 8)
+		libbytes.PrintHex(">>> UDPClient: Recv:", msg.Packet, 8)
 	}
 
 	return

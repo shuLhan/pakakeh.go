@@ -114,7 +114,7 @@ func parse(in []byte) (msgs []*Message) {
 		}
 
 		addr = addr[:0]
-		x, ok = parseAddress(&addr, x, in)
+		x, ok = parseIPAddress(&addr, x, in)
 		if !ok {
 			x = skipLine(x, in)
 			continue
@@ -157,11 +157,11 @@ func parse(in []byte) (msgs []*Message) {
 }
 
 //
-// parseAddress from input 'in' start from index 'x'.
+// parseIPAddress from input 'in' start from index 'x'.
 // It will return true if address contains valid IPv4 or IPv6 characters;
 // otherwise it will return false.
 //
-func parseAddress(addr *[]byte, x int, in []byte) (int, bool) {
+func parseIPAddress(addr *[]byte, x int, in []byte) (int, bool) {
 	x, isIPv4, isIPv6 := parseDigitOrHex(addr, x, in)
 
 	if isIPv4 {

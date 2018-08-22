@@ -12,7 +12,7 @@ import (
 
 const (
 	// Port define default DNS remote or listen port.
-	Port = 53
+	DefaultPort = 53
 
 	maskPointer byte   = 0xC0
 	maskOffset  byte   = 0x3F
@@ -36,6 +36,7 @@ var (
 	//
 	ErrNewConnection  = errors.New("Lookup: can't create new connection")
 	ErrLabelSizeLimit = errors.New("Labels should be 63 octet or less")
+	ErrInvalidAddress = errors.New("Invalid address")
 	ErrIPv4Length     = errors.New("Invalid length of A RDATA format")
 	ErrIPv6Length     = errors.New("Invalid length of AAAA RDATA format")
 )
