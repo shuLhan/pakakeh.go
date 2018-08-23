@@ -15,8 +15,9 @@ import (
 // UDPClient for DNS with UDP connection and list of remote addresses.
 //
 type UDPClient struct {
-	addr *net.UDPAddr
-	conn *net.UDPConn
+	Timeout time.Duration
+	addr    *net.UDPAddr
+	conn    *net.UDPConn
 }
 
 //
@@ -37,8 +38,9 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 	}
 
 	cl = &UDPClient{
-		addr: raddr,
-		conn: conn,
+		Timeout: clientTimeout,
+		addr:    raddr,
+		conn:    conn,
 	}
 
 	return
@@ -120,7 +122,7 @@ func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 
 	raddr := ns.(*net.UDPAddr)
 
-	err = cl.conn.SetWriteDeadline(time.Now().Add(clientTimeout))
+	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
 	if err != nil {
 		return
 	}
@@ -134,6 +136,11 @@ func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 // Recv will read DNS message from active connection in client into `msg`.
 //
 func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
+	err = cl.conn.SetReadDeadline(time.Now().Add(cl.Timeout))
+	if err != nil {
+		return
+	}
+
 	n, _, err = cl.conn.ReadFromUDP(msg.Packet)
 	if err != nil {
 		return

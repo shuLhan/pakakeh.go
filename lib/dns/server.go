@@ -103,7 +103,8 @@ func (srv *Server) ListenAndServeTCP(tcpAddr *net.TCPAddr) error {
 		}
 
 		cl := &TCPClient{
-			conn: conn,
+			Timeout: clientTimeout,
+			conn:    conn,
 		}
 
 		go srv.serveTCPClient(cl)
@@ -126,7 +127,8 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	}
 
 	sender := &UDPClient{
-		conn: srv.udp,
+		Timeout: clientTimeout,
+		conn:    srv.udp,
 	}
 
 	for {

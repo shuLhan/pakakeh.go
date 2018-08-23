@@ -15,8 +15,9 @@ import (
 // TCPClient for DNS with TCP connection and list of remote addresses.
 //
 type TCPClient struct {
-	addr *net.TCPAddr
-	conn *net.TCPConn
+	Timeout time.Duration
+	addr    *net.TCPAddr
+	conn    *net.TCPConn
 }
 
 //
@@ -31,7 +32,8 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 	}
 
 	cl := &TCPClient{
-		addr: raddr,
+		Timeout: clientTimeout,
+		addr:    raddr,
 	}
 
 	err = cl.Connect(raddr)
@@ -121,7 +123,7 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 // The addr parameter is unused.
 //
 func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
-	err = cl.conn.SetWriteDeadline(time.Now().Add(clientTimeout))
+	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
 	if err != nil {
 		return
 	}
@@ -140,6 +142,11 @@ func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
 // Recv will read DNS message from active connection in client into `msg`.
 //
 func (cl *TCPClient) Recv(msg *Message) (n int, err error) {
+	err = cl.conn.SetReadDeadline(time.Now().Add(cl.Timeout))
+	if err != nil {
+		return
+	}
+
 	n, err = cl.conn.Read(msg.Packet)
 	if err != nil {
 		return
