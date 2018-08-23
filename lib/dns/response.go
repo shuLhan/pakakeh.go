@@ -17,6 +17,14 @@ type Response struct {
 }
 
 //
+// Reset response to empty state.
+//
+func (res *Response) Reset() {
+	res.ReceivedAt = 0
+	res.Message.Reset()
+}
+
+//
 // IsExpired will return true if response message is expired, otherwise it
 // will return false.
 //
