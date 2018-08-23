@@ -24,12 +24,14 @@ var _requestPool = sync.Pool{
 type Request struct {
 	Message *Message
 	UDPAddr *net.UDPAddr
+	Sender  Sender
 }
 
 //
 // Reset message and UDP address in request.
 //
 func (req *Request) Reset() {
-	req.UDPAddr = nil
 	req.Message.Reset()
+	req.UDPAddr = nil
+	req.Sender = nil
 }

@@ -4,9 +4,15 @@
 
 package dns
 
+import (
+	"net"
+)
+
 //
-// A Handler responds to DNS request.
+// Client is interface that implement sending and receiving DNS message.
 //
-type Handler interface {
-	ServeDNS(*Request)
+type Client interface {
+	RemoteAddr() net.Addr
+	Sender
+	Receiver
 }

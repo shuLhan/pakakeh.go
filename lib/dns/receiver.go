@@ -5,8 +5,8 @@
 package dns
 
 //
-// A Handler responds to DNS request.
+// Receiver is interface for implementing receiving DNS message.
 //
-type Handler interface {
-	ServeDNS(*Request)
+type Receiver interface {
+	Recv(msg *Message) error
 }

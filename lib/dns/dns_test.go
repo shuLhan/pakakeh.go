@@ -136,7 +136,7 @@ func (h *serverHandler) generateResponses() {
 	h.responses = append(h.responses, res)
 }
 
-func (h *serverHandler) ServeDNS(req *Request) *Response {
+func (h *serverHandler) ServeDNS(req *Request) {
 	var ref *Response
 
 	qname := string(req.Message.Question.Name)
@@ -152,7 +152,8 @@ func (h *serverHandler) ServeDNS(req *Request) *Response {
 		}
 	}
 	if ref == nil {
-		return nil
+		_testServer.FreeRequest(req)
+		return
 	}
 
 	res := &Response{
@@ -167,10 +168,16 @@ func (h *serverHandler) ServeDNS(req *Request) *Response {
 
 	_, err := res.Message.MarshalBinary()
 	if err != nil {
-		return nil
+		_testServer.FreeRequest(req)
+		return
 	}
 
-	return res
+	_, err = req.Sender.Send(res.Message, req.UDPAddr)
+	if err != nil {
+		log.Println("ServeDNS: ", err)
+	}
+
+	_testServer.FreeRequest(req)
 }
 
 func TestMain(m *testing.M) {

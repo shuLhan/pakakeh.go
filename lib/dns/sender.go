@@ -4,9 +4,13 @@
 
 package dns
 
+import (
+	"net"
+)
+
 //
-// A Handler responds to DNS request.
+// Sender is interface that for implementing sending DNS message.
 //
-type Handler interface {
-	ServeDNS(*Request)
+type Sender interface {
+	Send(msg *Message, addr net.Addr) (n int, err error)
 }

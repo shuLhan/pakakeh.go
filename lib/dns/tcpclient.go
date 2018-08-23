@@ -43,6 +43,13 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 }
 
 //
+// RemoteAddr return client remote nameserver address.
+//
+func (cl *TCPClient) RemoteAddr() net.Addr {
+	return cl.addr
+}
+
+//
 // Connect to remote address.
 //
 func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {
@@ -80,7 +87,7 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, _ = msg.MarshalBinary()
 
-	err := cl.Send(msg)
+	_, err := cl.Send(msg, nil)
 	if err != nil {
 		FreeMessage(msg)
 		return nil, err
@@ -111,10 +118,10 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 // Send DNS message to name server using active connection in client.
 //
 // The message packet must already been filled, using MarshalBinary().
-// The ns parameter must not be nil.
+// The addr parameter is unused.
 //
-func (cl *TCPClient) Send(msg *Message) (err error) {
-	err = cl.conn.SetDeadline(time.Now().Add(clientTimeout))
+func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
+	err = cl.conn.SetWriteDeadline(time.Now().Add(clientTimeout))
 	if err != nil {
 		return
 	}
@@ -124,7 +131,7 @@ func (cl *TCPClient) Send(msg *Message) (err error) {
 	libbytes.AppendUint16(&packet, uint16(len(msg.Packet)))
 	packet = append(packet, msg.Packet...)
 
-	_, err = cl.conn.Write(packet)
+	n, err = cl.conn.Write(packet)
 
 	return
 }

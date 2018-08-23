@@ -45,6 +45,13 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 }
 
 //
+// RemoteAddr return client remote nameserver address.
+//
+func (cl *UDPClient) RemoteAddr() net.Addr {
+	return cl.addr
+}
+
+//
 // Lookup will query one of the name server with specific type, class, and
 // name in synchronous mode.
 //
@@ -72,7 +79,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, _ = msg.MarshalBinary()
 
-	err := cl.Send(msg, cl.addr)
+	_, err := cl.Send(msg, cl.addr)
 	if err != nil {
 		msgPool.Put(msg)
 		return nil, err
@@ -104,19 +111,21 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 // Send DNS message to name server using active connection in client.
 //
 // The message packet must already been filled, using MarshalBinary().
-// The ns parameter must not be nil.
+// The addr parameter must not be nil.
 //
-func (cl *UDPClient) Send(msg *Message, ns *net.UDPAddr) (err error) {
+func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 	if ns == nil {
 		return
 	}
 
-	err = cl.conn.SetDeadline(time.Now().Add(clientTimeout))
+	raddr := ns.(*net.UDPAddr)
+
+	err = cl.conn.SetWriteDeadline(time.Now().Add(clientTimeout))
 	if err != nil {
 		return
 	}
 
-	_, err = cl.conn.WriteToUDP(msg.Packet, ns)
+	n, err = cl.conn.WriteToUDP(msg.Packet, raddr)
 
 	return
 }

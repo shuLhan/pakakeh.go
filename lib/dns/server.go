@@ -117,6 +117,7 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	var (
 		n   int
 		err error
+		req *Request
 	)
 
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
@@ -124,40 +125,43 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 		return err
 	}
 
-	req := _requestPool.Get().(*Request)
+	sender := &UDPClient{
+		conn: srv.udp,
+	}
 
 	for {
+		if req == nil {
+			req = _requestPool.Get().(*Request)
+		}
+		req.Reset()
+
 		n, req.UDPAddr, err = srv.udp.ReadFromUDP(req.Message.Packet)
 		if err != nil {
 			log.Println(err)
-			req.Reset()
 			continue
 		}
 
 		req.Message.Packet = req.Message.Packet[:n]
 
 		req.Message.UnpackHeaderQuestion()
+		req.Sender = sender
 
-		res := srv.Handler.ServeDNS(req)
-		if res == nil {
-			req.Reset()
-			continue
-		}
-
-		_, err = srv.udp.WriteToUDP(res.Message.Packet, req.UDPAddr)
-		if err != nil {
-			log.Println("ListenAndServeUDP: WriteToUDP:", err)
-		}
-
-		req.Reset()
+		srv.Handler.ServeDNS(req)
+		req = nil
 	}
 }
 
 func (srv *Server) serveTCPClient(cl *TCPClient) {
-	var err error
-	req := _requestPool.Get().(*Request)
-
+	var (
+		err error
+		req *Request
+	)
 	for {
+		if req == nil {
+			req = _requestPool.Get().(*Request)
+		}
+		req.Reset()
+
 		err = cl.Recv(req.Message)
 		if err != nil {
 			if err == io.EOF {
@@ -169,18 +173,16 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 		}
 
 		req.Message.UnpackHeaderQuestion()
+		req.Sender = cl
 
-		res := srv.Handler.ServeDNS(req)
-		if res == nil {
-			req.Reset()
-			continue
-		}
-
-		err = cl.Send(res.Message)
-		if err != nil {
-			log.Println("serveTCPClient: Send:", err)
-		}
-
-		req.Reset()
+		srv.Handler.ServeDNS(req)
+		req = nil
 	}
+}
+
+//
+// FreeRequest put the request back to the pool.
+//
+func (srv *Server) FreeRequest(req *Request) {
+	_requestPool.Put(req)
 }
