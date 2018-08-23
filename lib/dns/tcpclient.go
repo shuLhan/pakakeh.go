@@ -95,7 +95,7 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	resMsg := AllocMessage()
 
-	err = cl.Recv(resMsg)
+	_, err = cl.Recv(resMsg)
 	if err != nil {
 		FreeMessage(msg)
 		FreeMessage(resMsg)
@@ -139,13 +139,13 @@ func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
 //
 // Recv will read DNS message from active connection in client into `msg`.
 //
-func (cl *TCPClient) Recv(msg *Message) (err error) {
-	n, err := cl.conn.Read(msg.Packet)
+func (cl *TCPClient) Recv(msg *Message) (n int, err error) {
+	n, err = cl.conn.Read(msg.Packet)
 	if err != nil {
 		return
 	}
 	if n == 0 {
-		return nil
+		return
 	}
 
 	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)

@@ -8,5 +8,5 @@ package dns
 // Receiver is interface for implementing receiving DNS message.
 //
 type Receiver interface {
-	Recv(msg *Message) error
+	Recv(msg *Message) (n int, err error)
 }

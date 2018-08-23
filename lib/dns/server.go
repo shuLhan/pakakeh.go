@@ -153,6 +153,7 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 
 func (srv *Server) serveTCPClient(cl *TCPClient) {
 	var (
+		n   int
 		err error
 		req *Request
 	)
@@ -162,14 +163,25 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 		}
 		req.Reset()
 
-		err = cl.Recv(req.Message)
-		if err != nil {
-			if err == io.EOF {
-				_requestPool.Put(req)
+		for {
+			n, err = cl.Recv(req.Message)
+			if err == nil {
 				break
 			}
-			log.Println("serveTCPClient:", err)
-			continue
+			if err != nil {
+				if err == io.EOF {
+					_requestPool.Put(req)
+					break
+				}
+				if n != 0 {
+					log.Println("serveTCPClient:", err)
+					req.Message.Reset()
+				}
+				continue
+			}
+		}
+		if err == io.EOF {
+			break
 		}
 
 		req.Message.UnpackHeaderQuestion()
@@ -177,6 +189,11 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 
 		srv.Handler.ServeDNS(req)
 		req = nil
+	}
+
+	err = cl.conn.Close()
+	if err != nil {
+		log.Println("serveTCPClient: conn.Close:", err)
 	}
 }
 

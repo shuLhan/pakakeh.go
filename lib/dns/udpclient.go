@@ -88,7 +88,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 	resMsg := msgPool.Get().(*Message)
 	resMsg.Reset()
 
-	err = cl.Recv(resMsg)
+	_, err = cl.Recv(resMsg)
 	if err != nil {
 		msgPool.Put(msg)
 		msgPool.Put(resMsg)
@@ -133,8 +133,8 @@ func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 //
 // Recv will read DNS message from active connection in client into `msg`.
 //
-func (cl *UDPClient) Recv(msg *Message) (err error) {
-	n, _, err := cl.conn.ReadFromUDP(msg.Packet)
+func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
+	n, _, err = cl.conn.ReadFromUDP(msg.Packet)
 	if err != nil {
 		return
 	}
