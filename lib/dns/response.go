@@ -4,10 +4,43 @@
 
 package dns
 
+import (
+	"time"
+)
+
 //
 // Response contains DNS reply message for client.
 //
 type Response struct {
-	ReceivedAt int
+	ReceivedAt int64
 	Message    *Message
+}
+
+//
+// IsExpired will return true if response message is expired, otherwise it
+// will return false.
+//
+func (res *Response) IsExpired() bool {
+	// Local responses from hosts file will never be expired.
+	if res.ReceivedAt == 0 {
+		return false
+	}
+
+	elapSeconds := uint32(time.Now().Unix() - res.ReceivedAt)
+
+	return res.Message.IsExpired(elapSeconds)
+}
+
+//
+// Unpack message and set received time value to current time.
+//
+func (res *Response) Unpack() (err error) {
+	err = res.Message.UnmarshalBinary(res.Message.Packet)
+	if err != nil {
+		return
+	}
+
+	res.ReceivedAt = time.Now().Unix()
+
+	return
 }
