@@ -392,9 +392,7 @@ func (msg *Message) Reset() {
 	msg.Question.Reset()
 
 	msg.ResetRR()
-
-	msg.Packet = msg.Packet[:0]
-	msg.Packet = append(msg.Packet, make([]byte, maxUDPPacketSize)...)
+	msg.Packet = append(msg.Packet[:0], make([]byte, maxUDPPacketSize)...)
 
 	msg.dname = ""
 	msg.off = 0
