@@ -100,7 +100,7 @@ func newMessage(addr, hname *[]byte) *Message {
 // [1] man 5 hosts
 //
 func parse(in []byte) (msgs []*Message) {
-	ok := false
+	var ok bool
 	addr := make([]byte, 0, 32)
 	hname := make([]byte, 0, 32)
 
