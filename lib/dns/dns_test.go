@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/shuLhan/share/lib/test"
 )
@@ -182,6 +181,7 @@ func (h *serverHandler) ServeDNS(req *Request) {
 
 func TestMain(m *testing.M) {
 	debugLevel = 2
+	log.SetFlags(log.Lmicroseconds)
 
 	_testHandler = &serverHandler{}
 
@@ -197,8 +197,6 @@ func TestMain(m *testing.M) {
 			log.Fatal("ListenAndServe: ", err)
 		}
 	}()
-
-	time.Sleep(5)
 
 	os.Exit(m.Run())
 }
