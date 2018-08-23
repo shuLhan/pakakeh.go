@@ -52,6 +52,13 @@ func (cl *TCPClient) RemoteAddr() net.Addr {
 }
 
 //
+// Close client connection.
+//
+func (cl *TCPClient) Close() error {
+	return cl.conn.Close()
+}
+
+//
 // Connect to remote address.
 //
 func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {

@@ -12,6 +12,7 @@ import (
 // Client is interface that implement sending and receiving DNS message.
 //
 type Client interface {
+	Close() error
 	RemoteAddr() net.Addr
 	Sender
 	Receiver

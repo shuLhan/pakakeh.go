@@ -54,6 +54,13 @@ func (cl *UDPClient) RemoteAddr() net.Addr {
 }
 
 //
+// Close client connection.
+//
+func (cl *UDPClient) Close() error {
+	return cl.conn.Close()
+}
+
+//
 // Lookup will query one of the name server with specific type, class, and
 // name in synchronous mode.
 //
