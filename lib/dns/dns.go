@@ -12,7 +12,7 @@ import (
 
 const (
 	// Port define default DNS remote or listen port.
-	DefaultPort = 53
+	DefaultPort uint16 = 53
 
 	maskPointer byte   = 0xC0
 	maskOffset  byte   = 0x3F

@@ -8,7 +8,8 @@ import (
 	"io"
 	"log"
 	"net"
-	"strconv"
+
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -21,33 +22,19 @@ type Server struct {
 }
 
 func parseAddress(address string) (*net.UDPAddr, *net.TCPAddr, error) {
-	host, sport, err := net.SplitHostPort(address)
+	ip, port, err := libnet.ParseIPPort(address, DefaultPort)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ip := net.ParseIP(host)
-	if ip == nil {
-		return nil, nil, ErrInvalidAddress
-	}
-
-	port := DefaultPort
-
-	if len(sport) >= 0 {
-		port, err = strconv.Atoi(sport)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
 	udpAddr := &net.UDPAddr{
 		IP:   ip,
-		Port: port,
+		Port: int(port),
 	}
 
 	tcpAddr := &net.TCPAddr{
 		IP:   ip,
-		Port: port,
+		Port: int(port),
 	}
 
 	return udpAddr, tcpAddr, nil
