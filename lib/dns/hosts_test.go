@@ -2,6 +2,8 @@ package dns
 
 import (
 	"testing"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestHostsLoad(t *testing.T) {
@@ -10,5 +12,5 @@ func TestHostsLoad(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Logf("msgs: %s\n", msgs)
+	test.Assert(t, "Length", 10, len(msgs), true)
 }

@@ -122,18 +122,11 @@ func parse(in []byte) (msgs []*Message) {
 
 		hname = hname[:0]
 
-		for ; x < len(in); x++ {
+		for x < len(in) {
 			x = skipBlanks(x, in)
 
 			if in[x] == '\n' {
 				break
-			}
-
-			if len(hname) > 0 {
-				msg := newMessage(&addr, &hname)
-				if msg != nil {
-					msgs = append(msgs, msg)
-				}
 			}
 
 			hname = hname[:0]
@@ -142,14 +135,16 @@ func parse(in []byte) (msgs []*Message) {
 				hname = hname[:0]
 				break
 			}
-		}
 
-		if len(hname) > 0 {
-			msg := newMessage(&addr, &hname)
-			if msg != nil {
-				msgs = append(msgs, msg)
+			if len(hname) > 0 {
+				msg := newMessage(&addr, &hname)
+				if msg != nil {
+					msgs = append(msgs, msg)
+				}
+				hname = hname[:0]
 			}
 		}
+
 		x = skipLine(x, in)
 	}
 
@@ -220,6 +215,9 @@ func parseDigitOrHex(addr *[]byte, x int, in []byte) (xx int, isIPv4, isIPv6 boo
 	return x, false, false
 }
 
+//
+// parseHostname from input in start from index x.
+//
 func parseHostname(hname *[]byte, x int, in []byte) (int, bool) {
 	if !libtext.IsAlnum(in[x]) {
 		return x, false

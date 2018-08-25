@@ -9,4 +9,6 @@ invalid.domain
 ::1             alpha beta   charlie
 #
 #
-127.0.0.1  	  delta  	  epsilon
+127.0.0.1  	  delta  	  eagle
+127.0.0.1  	  f
+127.0.0.1  	  g
