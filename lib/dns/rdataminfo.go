@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 type RDataMINFO struct {
 	// A <domain-name> which specifies a mailbox which is responsible for
 	// the mailing list or mailbox.  If this domain name names the root,
@@ -19,4 +24,16 @@ type RDataMINFO struct {
 	// been proposed).  If this domain name names the root, errors should
 	// be returned to the sender of the message.
 	EmailBox []byte
+}
+
+//
+// String return readable representation of MINFO record.
+//
+func (minfo *RDataMINFO) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{RMailBox:%s EmailBox:%s}", minfo.RMailBox,
+		minfo.EmailBox)
+
+	return b.String()
 }

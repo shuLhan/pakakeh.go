@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 // RDataMX MX records cause type A additional section processing for the host
 // specified by EXCHANGE.  The use of MX RRs is explained in detail in
 // [RFC-974].
@@ -15,4 +20,17 @@ type RDataMX struct {
 	// A <domain-name> which specifies a host willing to act as a mail
 	// exchange for the owner name.
 	Exchange []byte
+}
+
+//
+// String return readable representation of MX record.
+//
+func (mx *RDataMX) String() string {
+
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{Preference:%d Exchange:%s}", mx.Preference,
+		mx.Exchange)
+
+	return b.String()
 }

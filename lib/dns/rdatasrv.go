@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 type RDataSRV struct {
 	// The symbolic name of the desired service, as defined in Assigned
 	// Numbers [STD 2] or locally.  An underscore (_) is prepended to
@@ -87,4 +92,17 @@ type RDataSRV struct {
 	// A Target of "." means that the service is decidedly not
 	// available at this domain.
 	Target []byte
+}
+
+//
+// String return readable representation of SRV record.
+//
+func (srv *RDataSRV) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{Service:%s Proto:%s Name:%s Priority:%d Weight:%d Port:%d Target:%s}",
+		srv.Service, srv.Proto, srv.Name, srv.Priority, srv.Weight,
+		srv.Port, srv.Target)
+
+	return b.String()
 }

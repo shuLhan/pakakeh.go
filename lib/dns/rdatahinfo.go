@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 //
 // RDataHINFO HINFO records are used to acquire general information about a
 // host.  The main use is for protocols such as FTP that can use special
@@ -30,4 +35,15 @@ func (hinfo *RDataHINFO) UnmarshalBinary(packet []byte) error {
 	hinfo.OS = append(hinfo.OS, packet[x:]...)
 
 	return nil
+}
+
+//
+// String return readable representation of HINFO record.
+//
+func (hinfo *RDataHINFO) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{CPU:%s OS:%s}", hinfo.CPU, hinfo.OS)
+
+	return b.String()
 }

@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 //
 // RDataOPT define format of RDATA for OPT.
 //
@@ -37,4 +42,17 @@ type RDataOPT struct {
 
 	// Varies per OPTION-CODE.  MUST be treated as a bit field.
 	Data []byte
+}
+
+//
+// String return readable representation of OPT record.
+//
+func (opt *RDataOPT) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{ExtRCode:%d Version:%d DO:%v Code:%d Length:%d Data:%s}",
+		opt.ExtRCode, opt.Version, opt.DO, opt.Code, opt.Length,
+		opt.Data)
+
+	return b.String()
 }

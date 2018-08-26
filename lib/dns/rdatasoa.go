@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 //
 // RDataSOA represent SOA RDATA format in resource record.
 //
@@ -49,4 +54,17 @@ type RDataSOA struct {
 	// The unsigned 32 bit minimum TTL field that should be exported with
 	// any RR from this zone.
 	Minimum uint32
+}
+
+//
+// String return readable representation of SOA record.
+//
+func (soa *RDataSOA) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{MName:%s RName:%s Serial:%d Refresh:%d Retry:%d Expire:%d Minimum:%d}",
+		soa.MName, soa.RName, soa.Serial, soa.Refresh, soa.Retry,
+		soa.Expire, soa.Minimum)
+
+	return b.String()
 }

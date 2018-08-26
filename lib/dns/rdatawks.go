@@ -4,6 +4,11 @@
 
 package dns
 
+import (
+	"fmt"
+	"strings"
+)
+
 //
 // RDataWKS The WKS record is used to describe the well known services
 // supported by a particular protocol on a particular internet address.  The
@@ -36,4 +41,16 @@ func (wks *RDataWKS) UnmarshalBinary(packet []byte) error {
 	wks.Protocol = packet[4]
 	wks.BitMap = packet[5:]
 	return nil
+}
+
+//
+// String return readable representation of WKS record.
+//
+func (wks *RDataWKS) String() string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "{Address:%s Protocol:%d BitMap:%s}", wks.Address,
+		wks.Protocol, wks.BitMap)
+
+	return b.String()
 }
