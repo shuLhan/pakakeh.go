@@ -16,8 +16,10 @@ import (
 //
 type UDPClient struct {
 	Timeout time.Duration
-	addr    *net.UDPAddr
-	conn    *net.UDPConn
+
+	// Address of remote nameserver.
+	Addr *net.UDPAddr
+	conn *net.UDPConn
 }
 
 //
@@ -39,7 +41,7 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 
 	cl = &UDPClient{
 		Timeout: clientTimeout,
-		addr:    raddr,
+		Addr:    raddr,
 		conn:    conn,
 	}
 
@@ -50,7 +52,7 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 // RemoteAddr return client remote nameserver address.
 //
 func (cl *UDPClient) RemoteAddr() net.Addr {
-	return cl.addr
+	return cl.Addr
 }
 
 //
@@ -72,7 +74,7 @@ func (cl *UDPClient) Close() error {
 func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 	*Message, error,
 ) {
-	if cl.addr == nil || cl.conn == nil {
+	if cl.Addr == nil || cl.conn == nil {
 		return nil, nil
 	}
 
@@ -88,7 +90,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, _ = msg.MarshalBinary()
 
-	_, err := cl.Send(msg, cl.addr)
+	_, err := cl.Send(msg, cl.Addr)
 	if err != nil {
 		msgPool.Put(msg)
 		return nil, err
