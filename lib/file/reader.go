@@ -34,6 +34,15 @@ func NewReader(path string) (*Reader, error) {
 }
 
 //
+// Init initialize reader buffer from string.  This is an alternative of
+// NewReader without opening and reading from file.
+//
+func (r *Reader) Init(src string) {
+	r.p = 0
+	r.v = []byte(src)
+}
+
+//
 // ReadUntil read the content of file until one of separator found, or until
 // it reach the terminator character, or until EOF.
 // The content will be returned along the status of termination.
