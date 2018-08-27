@@ -3,6 +3,7 @@ package text
 import (
 	"bytes"
 	"fmt"
+	"math/rand"
 	"strconv"
 )
 
@@ -19,6 +20,10 @@ const (
 	bLineFeed    = '\n'
 	bCarReturn   = '\r'
 	bTab         = '\t'
+	ASCIILetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	HexaLETTERS  = "0123456789ABCDEF"
+	HexaLetters  = "0123456789abcedfABCDEF"
+	Hexaletters  = "0123456789abcedf"
 )
 
 //
@@ -165,4 +170,17 @@ func BytesJSONUnescape(in []byte, strict bool) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+//
+// Random generate random sequence of value from seed with fixed length.
+//
+// This function assume that random generator has been seeded.
+//
+func Random(seed []byte, n int) []byte {
+	b := make([]byte, n)
+	for x := 0; x < n; x++ {
+		b[x] = seed[rand.Intn(len(seed))]
+	}
+	return b
 }
