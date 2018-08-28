@@ -1,12 +1,14 @@
 
   ## comment
 
+127.0.0.1 # comment after address
+
 invalid.domain
 ## Separated by tab
-127.0.0.1	alpha	beta	charlie
+127.0.0.1	alpha	beta	charlie # comment after hostname
 
 ## another comment
-::1             alpha beta   charlie
+::1             alpha beta   charlie#comment without space
 #
 #
 127.0.0.1  	  delta  	  eagle

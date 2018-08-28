@@ -1,5 +1,6 @@
-/gofmtcomment
 *.prof
 *.save
 *.test
+/gofmtcomment
+/lib/dns/testdata/hosts.block.out
 cover.*

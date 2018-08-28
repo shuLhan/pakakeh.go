@@ -1,10 +1,11 @@
 package dns
 
 import (
-	"io/ioutil"
+	"net"
 	"runtime"
 
-	libtext "github.com/shuLhan/share/lib/text"
+	libfile "github.com/shuLhan/share/lib/file"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 const (
@@ -32,29 +33,35 @@ func HostsLoad(path string) (msgs []*Message, err error) {
 		path = GetSystemHosts()
 	}
 
-	in, err := ioutil.ReadFile(path)
+	reader, err := libfile.NewReader(path)
 	if err != nil {
 		return
 	}
 
-	msgs = parse(in)
+	msgs = parse(reader)
 
 	return
 }
 
-func newMessage(addr, hname *[]byte) *Message {
-	newAddr := make([]byte, len(*addr))
-	newHName := make([]byte, len(*hname))
-	copy(newAddr, *addr)
-	copy(newHName, *hname)
+func newMessage(addr, hname []byte) *Message {
+	if !libnet.IsHostnameValid(hname) {
+		return nil
+	}
+	ip := net.ParseIP(string(addr))
+	if ip == nil {
+		return nil
+	}
 
 	qtype := QueryTypeA
-	for x := 0; x < len(newAddr); x++ {
-		if newAddr[x] == ':' {
+	for x := 0; x < len(addr); x++ {
+		if addr[x] == ':' {
 			qtype = QueryTypeAAAA
 			break
 		}
 	}
+
+	rrName := make([]byte, len(hname))
+	copy(rrName, hname)
 
 	msg := &Message{
 		Header: &SectionHeader{
@@ -62,17 +69,17 @@ func newMessage(addr, hname *[]byte) *Message {
 			ANCount: 1,
 		},
 		Question: &SectionQuestion{
-			Name:  newHName,
+			Name:  hname,
 			Type:  qtype,
 			Class: QueryClassIN,
 		},
 		Answer: []*ResourceRecord{{
-			Name:  newHName,
+			Name:  rrName,
 			Type:  qtype,
 			Class: QueryClassIN,
 			TTL:   defaultTTL,
 			Text: &RDataText{
-				v: newAddr,
+				v: addr,
 			},
 		}},
 	}
@@ -99,160 +106,59 @@ func newMessage(addr, hname *[]byte) *Message {
 //
 // [1] man 5 hosts
 //
-func parse(in []byte) (msgs []*Message) {
-	var ok bool
-	addr := make([]byte, 0, 32)
-	hname := make([]byte, 0, 32)
-
-	for x := 0; x < len(in); x++ {
-		if libtext.IsSpace(in[x]) {
-			continue
+func parse(reader *libfile.Reader) (msgs []*Message) {
+	var (
+		seps  = []byte{'\t', '\v', ' '}
+		terms = []byte{'\n', '\f', '#'}
+	)
+	for {
+		c := reader.SkipSpace()
+		if c == 0 {
+			break
 		}
-		if in[x] == '#' {
-			x = skipLine(x, in)
-			continue
-		}
-
-		addr = addr[:0]
-		x, ok = parseIPAddress(&addr, x, in)
-		if !ok {
-			x = skipLine(x, in)
+		if c == '#' {
+			reader.SkipUntilNewline()
 			continue
 		}
 
-		hname = hname[:0]
-
-		for x < len(in) {
-			x = skipBlanks(x, in)
-
-			if in[x] == '\n' {
+		addr, isTerm, c := reader.ReadUntil(seps, terms)
+		if isTerm {
+			if c == 0 {
 				break
 			}
+			if c == '#' {
+				reader.SkipUntilNewline()
+			}
+			continue
+		}
 
-			hname = hname[:0]
-			x, ok = parseHostname(&hname, x, in)
-			if !ok {
-				hname = hname[:0]
+		for {
+			c := reader.SkipSpace()
+			if c == 0 {
 				break
 			}
-
+			if c == '#' {
+				reader.SkipUntilNewline()
+				break
+			}
+			hname, isTerm, c := reader.ReadUntil(seps, terms)
 			if len(hname) > 0 {
-				msg := newMessage(&addr, &hname)
+				msg := newMessage(addr, hname)
 				if msg != nil {
 					msgs = append(msgs, msg)
 				}
-				hname = hname[:0]
+			}
+			if isTerm {
+				if c == 0 {
+					break
+				}
+				if c == '#' {
+					reader.SkipUntilNewline()
+				}
+				break
 			}
 		}
-
-		x = skipLine(x, in)
 	}
 
 	return
-}
-
-//
-// parseIPAddress from input 'in' start from index 'x'.
-// It will return true if address contains valid IPv4 or IPv6 characters;
-// otherwise it will return false.
-//
-func parseIPAddress(addr *[]byte, x int, in []byte) (int, bool) {
-	x, isIPv4, isIPv6 := parseDigitOrHex(addr, x, in)
-
-	if isIPv4 {
-		for ; x < len(in); x++ {
-			if in[x] == ' ' || in[x] == '\t' {
-				break
-			}
-			if in[x] == '.' || libtext.IsDigit(in[x]) {
-				*addr = append(*addr, in[x])
-				continue
-			}
-			return x, false
-		}
-		return x, true
-	}
-	if isIPv6 {
-		for ; x < len(in); x++ {
-			if in[x] == ' ' || in[x] == '\t' {
-				break
-			}
-			if in[x] == ':' || libtext.IsHex(in[x]) {
-				*addr = append(*addr, in[x])
-				continue
-			}
-			return x, false
-		}
-		return x, true
-	}
-
-	return x, false
-}
-
-func parseDigitOrHex(addr *[]byte, x int, in []byte) (xx int, isIPv4, isIPv6 bool) {
-	for ; x < len(in); x++ {
-		if libtext.IsDigit(in[x]) {
-			*addr = append(*addr, in[x])
-			continue
-		}
-		if libtext.IsHex(in[x]) {
-			*addr = append(*addr, in[x])
-			x++
-			return x, false, true
-		}
-		if in[x] == '.' {
-			*addr = append(*addr, in[x])
-			x++
-			return x, true, false
-		}
-		if in[x] == ':' {
-			*addr = append(*addr, in[x])
-			x++
-			return x, false, true
-		}
-		break
-	}
-	return x, false, false
-}
-
-//
-// parseHostname from input in start from index x.
-//
-func parseHostname(hname *[]byte, x int, in []byte) (int, bool) {
-	if !libtext.IsAlnum(in[x]) {
-		return x, false
-	}
-	*hname = append(*hname, in[x])
-	x++
-	for ; x < len(in); x++ {
-		if libtext.IsSpace(in[x]) {
-			return x, true
-		}
-		if in[x] == '-' || in[x] == '.' || libtext.IsAlnum(in[x]) {
-			*hname = append(*hname, in[x])
-			continue
-		}
-		break
-	}
-	return x, false
-}
-
-func skipBlanks(x int, in []byte) int {
-	for ; x < len(in); x++ {
-		if in[x] == ' ' || in[x] == '\t' {
-			continue
-		}
-		break
-	}
-	return x
-}
-
-func skipLine(x int, in []byte) int {
-	for ; x < len(in); x++ {
-		if in[x] != '\n' {
-			continue
-		}
-		break
-	}
-	return x
 }

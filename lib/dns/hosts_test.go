@@ -14,3 +14,10 @@ func TestHostsLoad(t *testing.T) {
 
 	test.Assert(t, "Length", 10, len(msgs), true)
 }
+
+func TestHostsLoad2(t *testing.T) {
+	_, err := HostsLoad("testdata/hosts.block")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

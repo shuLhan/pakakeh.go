@@ -126,6 +126,19 @@ func (r *Reader) SkipUntil(seps []byte) {
 }
 
 //
+// SkipUntilNewline skip reading content until newline.
+//
+func (r *Reader) SkipUntilNewline() {
+	for r.p < len(r.v) {
+		if r.v[r.p] == '\n' {
+			r.p++
+			return
+		}
+		r.p++
+	}
+}
+
+//
 // String return all unreaded content as string.
 //
 func (r *Reader) String() string {
