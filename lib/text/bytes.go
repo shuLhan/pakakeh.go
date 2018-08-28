@@ -20,10 +20,6 @@ const (
 	bLineFeed    = '\n'
 	bCarReturn   = '\r'
 	bTab         = '\t'
-	ASCIILetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	HexaLETTERS  = "0123456789ABCDEF"
-	HexaLetters  = "0123456789abcedfABCDEF"
-	Hexaletters  = "0123456789abcedf"
 )
 
 //
