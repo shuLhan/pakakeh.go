@@ -46,13 +46,14 @@ func (r *Reader) Init(src string) {
 // ReadUntil read the content of file until one of separator found, or until
 // it reach the terminator character, or until EOF.
 // The content will be returned along the status of termination.
-// If terminator found, the returned isTerm value will be true, otherwise it
-// will be false.
+// If terminator or EOF found, the returned isTerm value will be true,
+// otherwise it will be false.
 //
-func (r *Reader) ReadUntil(seps []byte, terms []byte) (b []byte, isTerm bool) {
+func (r *Reader) ReadUntil(seps []byte, terms []byte) (b []byte, isTerm bool, c byte) {
 	for r.p < len(r.v) {
 		for x := 0; x < len(terms); x++ {
 			if r.v[r.p] == terms[x] {
+				c = r.v[r.p]
 				r.p++
 				isTerm = true
 				return

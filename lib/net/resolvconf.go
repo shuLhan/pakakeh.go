@@ -161,7 +161,7 @@ func (rc *ResolvConf) parse(reader *libfile.Reader) {
 			continue
 		}
 
-		tok, isTerm := reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, _ := reader.ReadUntil(spaceSeps, newLineTerms)
 		if isTerm {
 			// We found keyword without value.
 			continue
@@ -195,7 +195,7 @@ func (rc *ResolvConf) parseValue(reader *libfile.Reader, out *string) {
 		return
 	}
 
-	tok, isTerm := reader.ReadUntil(spaceSeps, newLineTerms)
+	tok, isTerm, _ := reader.ReadUntil(spaceSeps, newLineTerms)
 	if len(tok) > 0 {
 		*out = string(tok)
 	}
@@ -223,7 +223,7 @@ func (rc *ResolvConf) parseSearch(reader *libfile.Reader) {
 			break
 		}
 
-		tok, isTerm := reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, _ := reader.ReadUntil(spaceSeps, newLineTerms)
 		if len(tok) > 0 {
 			if curLen+len(tok) > maxLen {
 				break
@@ -251,7 +251,7 @@ func (rc *ResolvConf) parseOptions(reader *libfile.Reader) {
 			break
 		}
 
-		tok, isTerm := reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, c := reader.ReadUntil(spaceSeps, newLineTerms)
 		if len(tok) > 0 {
 			rc.parseOptionsKV(tok)
 		}
