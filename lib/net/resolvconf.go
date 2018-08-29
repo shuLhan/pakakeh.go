@@ -5,11 +5,11 @@
 package net
 
 import (
-	"bytes"
 	"os"
 	"strconv"
 	"strings"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	libfile "github.com/shuLhan/share/lib/file"
 )
 
@@ -167,7 +167,8 @@ func (rc *ResolvConf) parse(reader *libfile.Reader) {
 			continue
 		}
 
-		v := string(bytes.ToLower(tok))
+		libbytes.ToLower(&tok)
+		v := string(tok)
 		switch v {
 		case "domain":
 			rc.parseValue(reader, &rc.Domain)
