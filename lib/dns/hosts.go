@@ -4,6 +4,7 @@ import (
 	"net"
 	"runtime"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	libfile "github.com/shuLhan/share/lib/file"
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -60,6 +61,7 @@ func newMessage(addr, hname []byte) *Message {
 		}
 	}
 
+	libbytes.ToLower(&hname)
 	rrName := make([]byte, len(hname))
 	copy(rrName, hname)
 

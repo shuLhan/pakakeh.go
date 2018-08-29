@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -82,7 +81,7 @@ func (msg *Message) compress() bool {
 func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 	var ok bool
 
-	dname = bytes.ToLower(dname)
+	libbytes.ToLower(&dname)
 	msg.dname = string(dname)
 
 	if doCompress {

@@ -100,3 +100,27 @@ func AppendUint32(data *[]byte, v uint32) {
 	*data = append(*data, byte(v>>8))
 	*data = append(*data, byte(v))
 }
+
+//
+// ToLower convert slice of bytes to lower cases, in places.
+//
+func ToLower(data *[]byte) {
+	for x := 0; x < len(*data); x++ {
+		if (*data)[x] < 'A' || (*data)[x] > 'Z' {
+			continue
+		}
+		(*data)[x] = (*data)[x] + 32
+	}
+}
+
+//
+// ToUpper convert slice of bytes to upper cases, in places.
+//
+func ToUpper(data *[]byte) {
+	for x := 0; x < len(*data); x++ {
+		if (*data)[x] < 'a' || (*data)[x] > 'z' {
+			continue
+		}
+		(*data)[x] = (*data)[x] - 32
+	}
+}
