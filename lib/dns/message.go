@@ -153,7 +153,13 @@ func (msg *Message) packQuestion() {
 }
 
 func (msg *Message) packRR(rr *ResourceRecord) {
-	msg.packDomainName(rr.Name, true)
+	if rr.Type == QueryTypeOPT {
+		// MUST be 0 (root domain).
+		msg.Packet = append(msg.Packet, 0)
+	} else {
+		msg.packDomainName(rr.Name, true)
+	}
+
 	libbytes.AppendUint16(&msg.Packet, uint16(rr.Type))
 	libbytes.AppendUint16(&msg.Packet, uint16(rr.Class))
 	msg.off += 4
