@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package test provide library for help with testing.
+// Package test provide library for helping with testing.
 //
 package test
 

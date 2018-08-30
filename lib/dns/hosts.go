@@ -9,6 +9,7 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
+// List of known hosts file by OS.
 const (
 	HostsFilePOSIX   = "/etc/hosts"
 	HostsFileWindows = "C:\\Windows\\System32\\Drivers\\etc\\hosts"

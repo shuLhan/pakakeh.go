@@ -2,7 +2,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package dns implement DNS client and server, as defined by RFC 1035.
+// Package dns implement DNS client and server.
+//
+// This library implemented in reference to,
+//
+//	- RFC1034 DOMAIN NAMES - CONCEPTS AND FACILITIES
+//	- RFC1035 DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
+//	- RFC1886 DNS Extensions to support IP version 6.
+//	- RFC2782 A DNS RR for specifying the location of services (DNS SRV)
+//	- RFC6891 Extension Mechanisms for DNS (EDNS(0))
+//
 package dns
 
 import (
@@ -10,10 +19,10 @@ import (
 	"time"
 )
 
-const (
-	// Port define default DNS remote or listen port.
-	DefaultPort uint16 = 53
+// DefaultPort define default DNS remote or listen port.
+const DefaultPort uint16 = 53
 
+const (
 	maskPointer byte   = 0xC0
 	maskOffset  byte   = 0x3F
 	maskOPTDO   uint32 = 0x00008000
@@ -26,14 +35,10 @@ const (
 	sectionHeaderSize = 12
 )
 
+//
+// List of error messages.
+//
 var (
-	// clientTimeout define read and write timeout on client request.
-	clientTimeout = 6 * time.Second
-	debugLevel    = 0
-
-	//
-	// List of error messages.
-	//
 	ErrNewConnection  = errors.New("Lookup: can't create new connection")
 	ErrLabelSizeLimit = errors.New("Labels should be 63 octet or less")
 	ErrInvalidAddress = errors.New("Invalid address")
@@ -41,15 +46,21 @@ var (
 	ErrIPv6Length     = errors.New("Invalid length of AAAA RDATA format")
 )
 
+var (
+	// clientTimeout define read and write timeout on client request.
+	clientTimeout = 6 * time.Second
+	debugLevel    = 0
+)
+
 type OpCode byte
 
 const (
 	OpCodeQuery  OpCode = iota // a standard query (QUERY)
-	OpCodeIQuery               // an inverse query (IQUERY), obsolete by RFC 3425
+	OpCodeIQuery               // an inverse query (IQUERY), obsolete by RFC3425
 	OpCodeStatus               // a server status request (STATUS)
 )
 
-// List of query types.
+// List of known DNS query types.
 const (
 	QueryTypeZERO  uint16 = iota // Empty query type.
 	QueryTypeA                   // A host address
@@ -77,6 +88,7 @@ const (
 	QueryTypeALL   uint16 = 255  // A request for all records
 )
 
+// List of known DNS query class.
 const (
 	QueryClassZERO uint16 = iota // Empty query class.
 	QueryClassIN                 // The Internet

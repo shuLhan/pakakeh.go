@@ -1,14 +1,22 @@
-A repository contains miscellaneous tools and libraries written in Go.
+A collection of libraries and tools written in Go.
 
 ## Library
 
-- `lib/ini`, library for reading and writing INI file format (specific to Git
-  config format).
-- `lib/test`, library for simplify testing with assert function.
-- `lib/text`, library for manipulating text, as slice of bytes or as a string.
-- `lib/websocket`, library that implement websocket server or client as
-  specified by RFC6455.
+- `lib`
+  - `bytes`, Packages bytes contains common functions to manipulate slice of
+    bytes.
+  - `dns`, Package dns implement DNS client and server.
+  - `file, Package file provide a library for reading file.
+  - `ini`, Package ini implement reading and writing INI configuration as
+    defined by Git configuration file syntax.
+  - `net`, Package net provide constants and library for networking.
+  - `test`, Package test provide library for help with testing.
+  - `text`, Package text provide a library for working with text, either as
+    slice of bytes or as a string.
+  - `websocket`, Package websocket provide the websocket library for server
+    and client.
 
 ## Tools
 
-- `cmd/gofmtcomment` is a program to convert "/\*\*/" comment into "//"
+- `cmd`
+  - gofmtcomment`, Program to convert "/\*\*/" comment into "//".

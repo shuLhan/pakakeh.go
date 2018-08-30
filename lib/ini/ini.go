@@ -4,7 +4,7 @@
 
 //
 // Package ini implement reading and writing INI configuration as defined by
-// Git configuration file syntax [1].
+// Git configuration file syntax.
 //
 // Feature Promises
 //
@@ -116,7 +116,7 @@
 //
 // References
 //
-// [1] https://git-scm.com/docs/git-config#_configuration_file
+//	- https://git-scm.com/docs/git-config#_configuration_file
 //
 package ini
 

@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	HeaderIsQuery    byte = 0x00
-	HeaderIsResponse byte = 0x80
-	HeaderIsAA       byte = 0x04
-	HeaderIsTC       byte = 0x02
-	HeaderIsRD       byte = 0x01
-	HeaderIsRA       byte = 0x80
+	headerIsQuery    byte = 0x00
+	headerIsResponse byte = 0x80
+	headerIsAA       byte = 0x04
+	headerIsTC       byte = 0x02
+	headerIsRD       byte = 0x01
+	headerIsRA       byte = 0x80
 )
 
 //
@@ -129,26 +129,26 @@ func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
 	packet[1] = byte(hdr.ID)
 
 	if hdr.IsQuery {
-		b0 = HeaderIsQuery
+		b0 = headerIsQuery
 	} else {
-		b0 = HeaderIsResponse
+		b0 = headerIsResponse
 	}
 
 	b0 = b0 | (0x78 & byte(hdr.Op<<2))
 
 	if hdr.IsRD {
-		b0 = b0 | HeaderIsRD
+		b0 = b0 | headerIsRD
 	}
 
 	if !hdr.IsQuery {
 		if hdr.IsAA {
-			b0 = b0 | HeaderIsAA
+			b0 = b0 | headerIsAA
 		}
 		if hdr.IsTC {
-			b0 = b0 | HeaderIsTC
+			b0 = b0 | headerIsTC
 		}
 		if hdr.IsRA {
-			b1 = b1 | HeaderIsRA
+			b1 = b1 | headerIsRA
 		}
 		b1 = b1 | (0x0F & byte(hdr.RCode))
 	}
@@ -170,21 +170,21 @@ func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
 func (hdr *SectionHeader) UnmarshalBinary(packet []byte) error {
 	hdr.ID = libbytes.ReadUint16(packet, 0)
 
-	if packet[2]&HeaderIsResponse == HeaderIsResponse {
+	if packet[2]&headerIsResponse == headerIsResponse {
 		hdr.IsQuery = false
 	}
 	hdr.Op = OpCode((packet[2] & 0x78) >> 2)
 
-	if packet[2]&HeaderIsAA == HeaderIsAA {
+	if packet[2]&headerIsAA == headerIsAA {
 		hdr.IsAA = true
 	}
-	if packet[2]&HeaderIsTC == HeaderIsTC {
+	if packet[2]&headerIsTC == headerIsTC {
 		hdr.IsTC = true
 	}
-	if packet[2]&HeaderIsRD == HeaderIsRD {
+	if packet[2]&headerIsRD == headerIsRD {
 		hdr.IsRD = true
 	}
-	if packet[3]&HeaderIsRA == HeaderIsRA {
+	if packet[3]&headerIsRA == headerIsRA {
 		hdr.IsRA = true
 	}
 
