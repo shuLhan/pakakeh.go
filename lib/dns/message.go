@@ -380,7 +380,15 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 
 	// Pack OPT rdata
 	libbytes.AppendUint16(&msg.Packet, rr.OPT.Code)
-	libbytes.AppendUint16(&msg.Packet, rr.OPT.Length)
+
+	// Values of less than 512 bytes MUST be treated as equal to 512
+	// bytes (RFC6891 P11).
+	if rr.OPT.Length < 512 {
+		libbytes.AppendUint16(&msg.Packet, 512)
+	} else {
+		libbytes.AppendUint16(&msg.Packet, rr.OPT.Length)
+	}
+
 	msg.Packet = append(msg.Packet, rr.OPT.Data[:rr.OPT.Length]...)
 
 	// Write rdlength.
