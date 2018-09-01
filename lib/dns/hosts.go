@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	libfile "github.com/shuLhan/share/lib/file"
+	libio "github.com/shuLhan/share/lib/io"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -35,7 +35,7 @@ func HostsLoad(path string) (msgs []*Message, err error) {
 		path = GetSystemHosts()
 	}
 
-	reader, err := libfile.NewReader(path)
+	reader, err := libio.NewReader(path)
 	if err != nil {
 		return
 	}
@@ -109,7 +109,7 @@ func newMessage(addr, hname []byte) *Message {
 //
 // [1] man 5 hosts
 //
-func parse(reader *libfile.Reader) (msgs []*Message) {
+func parse(reader *libio.Reader) (msgs []*Message) {
 	var (
 		seps  = []byte{'\t', '\v', ' '}
 		terms = []byte{'\n', '\f', '#'}

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	libfile "github.com/shuLhan/share/lib/file"
+	libio "github.com/shuLhan/share/lib/io"
 	libtext "github.com/shuLhan/share/lib/text"
 )
 
@@ -37,7 +37,7 @@ func ParseDuration(s string) (time.Duration, error) {
 
 	seps := []byte{'w', 'd', 'h', 'm', 's', 'u', 'n'}
 
-	reader := &libfile.Reader{}
+	reader := &libio.Reader{}
 	reader.Init(s)
 
 	c := reader.SkipSpace()

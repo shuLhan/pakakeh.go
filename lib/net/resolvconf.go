@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	libfile "github.com/shuLhan/share/lib/file"
+	libio "github.com/shuLhan/share/lib/io"
 )
 
 const (
@@ -109,7 +109,7 @@ func NewResolvConf(path string) (*ResolvConf, error) {
 		OptMisc: make(map[string]bool),
 	}
 
-	reader, err := libfile.NewReader(path)
+	reader, err := libio.NewReader(path)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func NewResolvConf(path string) (*ResolvConf, error) {
 // Init parse resolv.conf from string.
 //
 func (rc *ResolvConf) Init(src string) {
-	reader := new(libfile.Reader)
+	reader := new(libio.Reader)
 	reader.Init(src)
 
 	rc.reset()
@@ -150,7 +150,7 @@ func (rc *ResolvConf) reset() {
 //
 // See `man resolv.conf`
 //
-func (rc *ResolvConf) parse(reader *libfile.Reader) {
+func (rc *ResolvConf) parse(reader *libio.Reader) {
 	for {
 		c := reader.SkipSpace()
 		if c == 0 {
@@ -190,7 +190,7 @@ func (rc *ResolvConf) parse(reader *libfile.Reader) {
 	rc.sanitize()
 }
 
-func (rc *ResolvConf) parseValue(reader *libfile.Reader, out *string) {
+func (rc *ResolvConf) parseValue(reader *libio.Reader, out *string) {
 	c := reader.SkipHorizontalSpace()
 	if c == '\n' || c == 0 {
 		return
@@ -210,7 +210,7 @@ func (rc *ResolvConf) parseValue(reader *libfile.Reader, out *string) {
 // (1) The domain and search keywords are mutually exclusive.  If more than
 // one instance of these keywords is present, the last instance wins.
 //
-func (rc *ResolvConf) parseSearch(reader *libfile.Reader) {
+func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 	max := 6
 	maxLen := 255
 	var curLen int
@@ -245,7 +245,7 @@ func (rc *ResolvConf) parseSearch(reader *libfile.Reader) {
 	reader.SkipUntil(newLineTerms)
 }
 
-func (rc *ResolvConf) parseOptions(reader *libfile.Reader) {
+func (rc *ResolvConf) parseOptions(reader *libio.Reader) {
 	for {
 		c := reader.SkipHorizontalSpace()
 		if c == '\n' || c == 0 {
