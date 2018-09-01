@@ -61,6 +61,7 @@ func (r *Reader) ReadUntil(seps []byte, terms []byte) (b []byte, isTerm bool, c 
 		}
 		for x := 0; x < len(seps); x++ {
 			if r.v[r.p] == seps[x] {
+				c = r.v[r.p]
 				r.p++
 				return
 			}
