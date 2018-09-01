@@ -14,3 +14,8 @@ const (
 	// HexaLetters contains list of hexadecimal characters in lower cases.
 	Hexaletters = "0123456789abcedf"
 )
+
+var (
+	// ASCIISpaces contains list of white spaces in ASCII.
+	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
+)
