@@ -64,6 +64,17 @@ type Message struct {
 	dname    string
 }
 
+//
+// NewMessage create, initialize, and return new message.
+//
+func NewMessage() *Message {
+	return &Message{
+		Header:   &SectionHeader{},
+		Question: &SectionQuestion{},
+		Packet:   make([]byte, maxUDPPacketSize),
+	}
+}
+
 func (msg *Message) compress() bool {
 	off, ok := msg.dnameOff[msg.dname]
 	if ok {

@@ -10,13 +10,7 @@ import (
 
 var msgPool = sync.Pool{
 	New: func() interface{} {
-		msg := &Message{
-			Header:   &SectionHeader{},
-			Question: &SectionQuestion{},
-			Packet:   make([]byte, maxUDPPacketSize),
-		}
-
-		return msg
+		return NewMessage()
 	},
 }
 
