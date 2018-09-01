@@ -200,6 +200,8 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 		msg.packTextAsDomain(rr)
 	case QueryTypeMG:
 		msg.packTextAsDomain(rr)
+	case QueryTypeMR:
+		msg.packTextAsDomain(rr)
 	case QueryTypeNULL:
 		msg.packTextAsDomain(rr)
 	case QueryTypeWKS:

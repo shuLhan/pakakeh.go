@@ -91,6 +91,8 @@ func (rr *ResourceRecord) RData() interface{} {
 		return rr.Text.v
 	case QueryTypeMG:
 		return rr.Text.v
+	case QueryTypeMR:
+		return rr.Text.v
 	case QueryTypeNULL:
 		return rr.Text.v
 	case QueryTypeWKS:
@@ -270,6 +272,10 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
 	case QueryTypeMG:
+		rr.Text = new(RDataText)
+		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+
+	case QueryTypeMR:
 		rr.Text = new(RDataText)
 		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
 
