@@ -96,18 +96,19 @@ func (r *Reader) SkipSpace() byte {
 // buffer.
 // On EOF it will return 0.
 //
-func (r *Reader) SkipHorizontalSpace() byte {
+func (r *Reader) SkipHorizontalSpace() (n int, c byte) {
 	for r.p < len(r.v) {
 		if r.v[r.p] == '\t' || r.v[r.p] == '\r' || r.v[r.p] == ' ' {
 			r.p++
+			n++
 			continue
 		}
 		break
 	}
 	if r.p == len(r.v) {
-		return 0
+		return n, 0
 	}
-	return r.v[r.p]
+	return n, r.v[r.p]
 
 }
 

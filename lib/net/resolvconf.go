@@ -191,7 +191,7 @@ func (rc *ResolvConf) parse(reader *libio.Reader) {
 }
 
 func (rc *ResolvConf) parseValue(reader *libio.Reader, out *string) {
-	c := reader.SkipHorizontalSpace()
+	_, c := reader.SkipHorizontalSpace()
 	if c == '\n' || c == 0 {
 		return
 	}
@@ -219,7 +219,7 @@ func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 	rc.Search = nil
 
 	for {
-		c := reader.SkipHorizontalSpace()
+		_, c := reader.SkipHorizontalSpace()
 		if c == '\n' || c == 0 {
 			break
 		}
@@ -247,7 +247,7 @@ func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 
 func (rc *ResolvConf) parseOptions(reader *libio.Reader) {
 	for {
-		c := reader.SkipHorizontalSpace()
+		_, c := reader.SkipHorizontalSpace()
 		if c == '\n' || c == 0 {
 			break
 		}
