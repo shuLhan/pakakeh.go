@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Packages bytes provide a library for working with byte or slice of bytes.
+// Package bytes provide a library for working with byte or slice of bytes.
 package bytes
 
 import (
