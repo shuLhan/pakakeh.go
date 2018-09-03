@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	libtext "github.com/shuLhan/share/lib/text"
 )
 
 //
@@ -90,7 +92,10 @@ func (msg *Message) compress() bool {
 // packDomainName convert string of domain-name into DNS domain-name format.
 //
 func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
-	var ok bool
+	var (
+		ok bool
+		d  int
+	)
 
 	libbytes.ToLower(&dname)
 	msg.dname = string(dname)
@@ -107,7 +112,36 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 	msg.Packet = append(msg.Packet, 0)
 	msg.dnameOff[msg.dname] = msg.off
 
-	for x, c := range dname {
+	for x := 0; x < len(dname); x++ {
+		c := dname[x]
+
+		if c == '\\' {
+			x++
+			if x == len(dname) {
+				return
+			}
+
+			c = dname[x]
+
+			// \DDD  where each D is a digit is the octet
+			// corresponding to the decimal number described by
+			// DDD.  The resulting octet is assumed to be text and
+			// is not checked for special meaning.
+			if libtext.IsDigit(c) {
+				if x+2 >= len(dname) {
+					return
+				}
+				d, _ = strconv.Atoi(string(dname[x : x+3]))
+				c = byte(d)
+				if c >= 'A' && c <= 'Z' {
+					c += 32
+				}
+				x += 2
+			}
+			msg.Packet = append(msg.Packet, c)
+			count++
+			continue
+		}
 		if c == '.' {
 			// Skip name that prefixed with '.', e.g.
 			// '...test.com'
@@ -133,12 +167,13 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 			msg.Packet = append(msg.Packet, 0)
 			msg.dnameOff[msg.dname] = msg.off
 
+			if x+1 == len(dname) {
+				return
+			}
+
 			continue
 		}
 
-		if c >= 'A' && c <= 'Z' {
-			c += 32
-		}
 		msg.Packet = append(msg.Packet, c)
 		count++
 	}

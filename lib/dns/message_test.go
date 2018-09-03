@@ -45,6 +45,40 @@ func TestMessageIsExpired(t *testing.T) {
 	}
 }
 
+func TestMessagePackDomainName(t *testing.T) {
+	cases := []struct {
+		in  []byte
+		exp []byte
+	}{{
+		in:  []byte("a.b"),
+		exp: []byte{1, 'a', 1, 'b', 0},
+	}, {
+		in:  []byte("a.b."),
+		exp: []byte{1, 'a', 1, 'b', 0},
+	}, {
+		in:  []byte("a\\.b.c"),
+		exp: []byte{3, 'a', '.', 'b', 1, 'c', 0},
+	}, {
+		in:  []byte("a\\065.b.c"),
+		exp: []byte{2, 'a', 'a', 1, 'b', 1, 'c', 0},
+	}, {
+		in:  []byte("a\\065"),
+		exp: []byte{2, 'a', 'a', 0},
+	}}
+
+	msg := NewMessage()
+	msg.dnameOff = make(map[string]uint16)
+
+	for _, c := range cases {
+		msg.Reset()
+		msg.Packet = msg.Packet[:0]
+
+		msg.packDomainName(c.in, false)
+
+		test.Assert(t, "packDomainName", c.exp, msg.Packet, true)
+	}
+}
+
 func TestMessagePackQuestion(t *testing.T) {
 	cases := []struct {
 		desc string
