@@ -87,7 +87,7 @@ func newMessage(addr, hname []byte) *Message {
 		}},
 	}
 
-	_, err := msg.MarshalBinary()
+	_, err := msg.Pack()
 	if err != nil {
 		return nil
 	}

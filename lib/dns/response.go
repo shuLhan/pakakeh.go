@@ -43,7 +43,7 @@ func (res *Response) IsExpired() bool {
 // Unpack message and set received time value to current time.
 //
 func (res *Response) Unpack() (err error) {
-	err = res.Message.UnmarshalBinary(res.Message.Packet)
+	err = res.Message.Unpack()
 	if err != nil {
 		return
 	}

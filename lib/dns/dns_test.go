@@ -53,9 +53,9 @@ func (h *serverHandler) generateResponses() {
 		},
 	}
 
-	_, err := res.Message.MarshalBinary()
+	_, err := res.Message.Pack()
 	if err != nil {
-		log.Fatal("MarshalBinary: ", err)
+		log.Fatal("Pack: ", err)
 	}
 
 	h.responses = append(h.responses, res)
@@ -93,9 +93,9 @@ func (h *serverHandler) generateResponses() {
 		},
 	}
 
-	_, err = res.Message.MarshalBinary()
+	_, err = res.Message.Pack()
 	if err != nil {
-		log.Fatal("MarshalBinary: ", err)
+		log.Fatal("Pack: ", err)
 	}
 
 	h.responses = append(h.responses, res)
@@ -127,9 +127,9 @@ func (h *serverHandler) generateResponses() {
 		},
 	}
 
-	_, err = res.Message.MarshalBinary()
+	_, err = res.Message.Pack()
 	if err != nil {
-		log.Fatal("MarshalBinary: ", err)
+		log.Fatal("Pack: ", err)
 	}
 
 	h.responses = append(h.responses, res)
@@ -165,7 +165,7 @@ func (h *serverHandler) ServeDNS(req *Request) {
 
 	res.Message.Header.ID = req.Message.Header.ID
 
-	_, err := res.Message.MarshalBinary()
+	_, err := res.Message.Pack()
 	if err != nil {
 		_testServer.FreeRequest(req)
 		return

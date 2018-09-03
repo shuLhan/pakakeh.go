@@ -88,7 +88,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 	msg.Question.Class = qclass
 	msg.Question.Name = append(msg.Question.Name, qname...)
 
-	_, _ = msg.MarshalBinary()
+	_, _ = msg.Pack()
 
 	_, err := cl.Send(msg, cl.Addr)
 	if err != nil {
@@ -106,7 +106,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 		return nil, err
 	}
 
-	err = resMsg.UnmarshalBinary(resMsg.Packet)
+	err = resMsg.Unpack()
 	if err != nil {
 		msgPool.Put(msg)
 		msgPool.Put(resMsg)
@@ -121,7 +121,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 //
 // Send DNS message to name server using active connection in client.
 //
-// The message packet must already been filled, using MarshalBinary().
+// The message packet must already been filled, using Pack().
 // The addr parameter must not be nil.
 //
 func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {

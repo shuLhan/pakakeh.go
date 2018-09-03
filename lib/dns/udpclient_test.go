@@ -125,7 +125,7 @@ func TestUDPClientLookup(t *testing.T) {
 
 		c.exp.Header.ID = getID()
 
-		_, err = c.exp.MarshalBinary()
+		_, err = c.exp.Pack()
 		if err != nil {
 			t.Fatal(err)
 		}

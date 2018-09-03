@@ -154,7 +154,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}
 }
 
-func TestMessageMarshalBinary(t *testing.T) {
+func TestMessagePack(t *testing.T) {
 	cases := []struct {
 		desc string
 		msg  *Message
@@ -851,13 +851,13 @@ func TestMessageMarshalBinary(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, _ := c.msg.MarshalBinary()
+		got, _ := c.msg.Pack()
 
 		test.Assert(t, c.desc, c.exp, got, true)
 	}
 }
 
-func TestMessageUnmarshalBinary(t *testing.T) {
+func TestMessageUnpack(t *testing.T) {
 	cases := []struct {
 		desc   string
 		packet []byte
@@ -1706,8 +1706,9 @@ func TestMessageUnmarshalBinary(t *testing.T) {
 		t.Log(c.desc)
 
 		msg.Reset()
+		msg.Packet = c.packet
 
-		err := msg.UnmarshalBinary(c.packet)
+		err := msg.Unpack()
 		if err != nil {
 			t.Fatal(err)
 		}

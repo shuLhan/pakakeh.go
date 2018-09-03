@@ -508,10 +508,10 @@ func (msg *Message) IsExpired(elapsed uint32) bool {
 }
 
 //
-// MarshalBinary convert message into datagram packet.  The result of packing
+// Pack convert message into datagram packet.  The result of packing
 // a message will be saved in Packet field and returned.
 //
-func (msg *Message) MarshalBinary() ([]byte, error) {
+func (msg *Message) Pack() ([]byte, error) {
 	msg.dnameOff = make(map[string]uint16)
 	msg.Packet = msg.Packet[:0]
 
@@ -599,11 +599,9 @@ func (msg *Message) String() string {
 }
 
 //
-// UnmarshalBinary unpack the packet to fill the message fields.
+// Unpack the packet to fill the message fields.
 //
-func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
-	msg.Packet = packet
-
+func (msg *Message) Unpack() (err error) {
 	msg.UnpackHeaderQuestion()
 
 	startIdx := uint(sectionHeaderSize + msg.Question.Size())
