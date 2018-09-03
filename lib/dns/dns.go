@@ -60,7 +60,7 @@ const (
 	OpCodeStatus               // a server status request (STATUS)
 )
 
-// List of known DNS query types.
+// List of code for known DNS query types.
 const (
 	QueryTypeZERO  uint16 = iota // Empty query type.
 	QueryTypeA                   // A host address
@@ -88,7 +88,31 @@ const (
 	QueryTypeALL   uint16 = 255  // A request for all records
 )
 
-// List of known DNS query class.
+//
+// QueryTypes contains a mapping between string representation of DNS query
+// type with their decimal value.
+//
+var QueryTypes = map[string]uint16{
+	"A":     QueryTypeA,
+	"NS":    QueryTypeNS,
+	"CNAME": QueryTypeCNAME,
+	"SOA":   QueryTypeSOA,
+	"MB":    QueryTypeMB,
+	"MG":    QueryTypeMG,
+	"MR":    QueryTypeMR,
+	"NULL":  QueryTypeNULL,
+	"WKS":   QueryTypeWKS,
+	"PTR":   QueryTypePTR,
+	"HINFO": QueryTypeHINFO,
+	"MINFO": QueryTypeMINFO,
+	"MX":    QueryTypeMX,
+	"TXT":   QueryTypeTXT,
+	"AAAA":  QueryTypeAAAA,
+	"SRV":   QueryTypeSRV,
+	"OPT":   QueryTypeOPT,
+}
+
+// List of code known DNS query class.
 const (
 	QueryClassZERO uint16 = iota // Empty query class.
 	QueryClassIN                 // The Internet
@@ -97,6 +121,16 @@ const (
 	QueryClassHS                 // Hesiod [Dyer 87]
 	QueryClassANY  uint16 = 255  // Any class
 )
+
+//
+// QueryClasses contains a mapping between string representation of DNS query
+// class with their decimal value.
+//
+var QueryClasses = map[string]uint16{
+	"IN": QueryClassIN,
+	"CH": QueryClassCH,
+	"HS": QueryClassHS,
+}
 
 // ResponseCode define response code in message header.
 type ResponseCode byte
