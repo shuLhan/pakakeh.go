@@ -3,6 +3,6 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package file provide a library for reading file.
+// Package io provide a library for reading file.
 //
-package file
+package io
