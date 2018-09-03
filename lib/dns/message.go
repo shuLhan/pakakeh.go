@@ -73,7 +73,8 @@ func NewMessage() *Message {
 	return &Message{
 		Header:   &SectionHeader{},
 		Question: &SectionQuestion{},
-		Packet:   make([]byte, maxUDPPacketSize),
+		Packet:   make([]byte, 0, maxUDPPacketSize),
+		dnameOff: make(map[string]uint16),
 	}
 }
 
@@ -457,7 +458,7 @@ func (msg *Message) Reset() {
 
 	msg.dname = ""
 	msg.off = 0
-	msg.dnameOff = nil
+	msg.dnameOff = make(map[string]uint16)
 }
 
 //
@@ -511,10 +512,7 @@ func (msg *Message) IsExpired(elapsed uint32) bool {
 // a message will be saved in Packet field and returned.
 //
 func (msg *Message) MarshalBinary() ([]byte, error) {
-	if msg.dnameOff == nil {
-		msg.dnameOff = make(map[string]uint16)
-	}
-
+	msg.dnameOff = make(map[string]uint16)
 	msg.Packet = msg.Packet[:0]
 
 	msg.Header.ANCount = uint16(len(msg.Answer))
