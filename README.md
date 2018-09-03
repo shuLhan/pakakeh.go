@@ -11,8 +11,7 @@ A collection of libraries and tools written in Go.
     defined by Git configuration file syntax.
   - `net`, Package net provide constants and library for networking.
   - `test`, Package test provide library for help with testing.
-  - `text`, Package text provide a library for working with text, either as
-    slice of bytes or as a string.
+  - `string`, Package string provide a library for working with string.
   - `websocket`, Package websocket provide the websocket library for server
     and client.
 

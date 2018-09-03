@@ -1,4 +1,8 @@
-package text
+// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package string
 
 import (
 	"testing"
@@ -6,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestStringJSONEscape(t *testing.T) {
+func TestJSONEscape(t *testing.T) {
 	cases := []struct {
 		in  string
 		exp string
@@ -18,8 +22,7 @@ func TestStringJSONEscape(t *testing.T) {
 		//\"☺"`,
 		exp: `\tthis\\ is\n\t\t\/\/\\\"☺\"`,
 	}, {
-		in: ` `,
-		exp: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F `,
+		in: ` `, exp: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F `,
 	}}
 
 	var got string
@@ -27,13 +30,13 @@ func TestStringJSONEscape(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c)
 
-		got = StringJSONEscape(c.in)
+		got = JSONEscape(c.in)
 
 		test.Assert(t, "", c.exp, got, true)
 	}
 }
 
-func TestStringJSONUnescape(t *testing.T) {
+func TestJSONUnescape(t *testing.T) {
 	cases := []struct {
 		in     string
 		strict bool
@@ -48,8 +51,7 @@ func TestStringJSONUnescape(t *testing.T) {
 		//\"☺"`,
 	}, {
 		in: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F\u263A `,
-		exp: `☺ `,
-	}, {
+		exp: `☺ `}, {
 		in:     `\uerror`,
 		expErr: `strconv.ParseUint: parsing "erro": invalid syntax`,
 	}, {
@@ -69,7 +71,7 @@ func TestStringJSONUnescape(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c)
 
-		got, err = StringJSONUnescape(c.in, c.strict)
+		got, err = JSONUnescape(c.in, c.strict)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error(), true)
 			continue

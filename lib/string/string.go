@@ -2,14 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package text
+// Package string provide a library for working with string.
+package string
 
 import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 //
-// StringJSONEscape escape the following character: `"` (quotation mark),
+// JSONEscape escape the following character: `"` (quotation mark),
 // `\` (reverse solidus), `/` (solidus), `\b` (backspace), `\f` (formfeed),
 // `\n` (newline), `\r` (carriage return`), `\t` (horizontal tab), and control
 // character from 0 - 31.
@@ -18,7 +19,7 @@ import (
 //
 // * https://tools.ietf.org/html/rfc7159#page-8
 //
-func StringJSONEscape(in string) string {
+func JSONEscape(in string) string {
 	if len(in) == 0 {
 		return in
 	}
@@ -30,7 +31,7 @@ func StringJSONEscape(in string) string {
 }
 
 //
-// StringJSONUnescape unescape JSON string, reversing what StringJSONEscape
+// JSONUnescape unescape JSON string, reversing what StringJSONEscape
 // do.
 //
 // If strict is true, any unknown control character will be returned as error.
@@ -38,7 +39,7 @@ func StringJSONEscape(in string) string {
 // function will return empty string and error.
 // If strict is false, it will return "x".
 //
-func StringJSONUnescape(in string, strict bool) (string, error) {
+func JSONUnescape(in string, strict bool) (string, error) {
 	if len(in) == 0 {
 		return in, nil
 	}
