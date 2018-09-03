@@ -65,9 +65,9 @@ func (question *SectionQuestion) String() string {
 }
 
 //
-// UnmarshalBinary unpack the DNS question section.
+// unpack the DNS question section.
 //
-func (question *SectionQuestion) UnmarshalBinary(packet []byte) error {
+func (question *SectionQuestion) unpack(packet []byte) error {
 	if len(packet) == 0 {
 		return nil
 	}

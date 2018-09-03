@@ -519,7 +519,7 @@ func (msg *Message) MarshalBinary() ([]byte, error) {
 	msg.Header.NSCount = uint16(len(msg.Authority))
 	msg.Header.ARCount = uint16(len(msg.Additional))
 
-	header, err := msg.Header.MarshalBinary()
+	header, err := msg.Header.pack()
 	if err != nil {
 		msg.dnameOff = nil
 		return nil, err
@@ -612,7 +612,7 @@ func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
 	for ; x < msg.Header.ANCount; x++ {
 		rr := rrPool.Get().(*ResourceRecord)
 		rr.Reset()
-		startIdx, err = rr.Unpack(packet, startIdx)
+		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
 		}
@@ -626,7 +626,7 @@ func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
 	for x = 0; x < msg.Header.NSCount; x++ {
 		rr := rrPool.Get().(*ResourceRecord)
 		rr.Reset()
-		startIdx, err = rr.Unpack(packet, startIdx)
+		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
 		}
@@ -640,7 +640,7 @@ func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
 	for x = 0; x < msg.Header.ARCount; x++ {
 		rr := rrPool.Get().(*ResourceRecord)
 		rr.Reset()
-		startIdx, err = rr.Unpack(packet, startIdx)
+		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
 		}
@@ -660,7 +660,7 @@ func (msg *Message) UnmarshalBinary(packet []byte) (err error) {
 // message.
 //
 func (msg *Message) UnpackHeaderQuestion() {
-	_ = msg.Header.UnmarshalBinary(msg.Packet)
+	_ = msg.Header.unpack(msg.Packet)
 
 	if debugLevel >= 1 {
 		log.Printf("msg.Header: %+v\n", msg.Header)
@@ -670,7 +670,7 @@ func (msg *Message) UnpackHeaderQuestion() {
 		return
 	}
 
-	_ = msg.Question.UnmarshalBinary(msg.Packet[sectionHeaderSize:])
+	_ = msg.Question.unpack(msg.Packet[sectionHeaderSize:])
 
 	if debugLevel >= 1 {
 		log.Printf("msg.Question: %s\n", msg.Question)

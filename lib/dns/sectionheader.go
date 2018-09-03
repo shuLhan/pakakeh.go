@@ -118,9 +118,9 @@ func (hdr *SectionHeader) Reset() {
 }
 
 //
-// MarshalBinary pack the section header into slice of bytes.
+// pack the section header into slice of bytes.
 //
-func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
+func (hdr *SectionHeader) pack() ([]byte, error) {
 	var b0, b1 byte
 
 	packet := make([]byte, 4)
@@ -165,9 +165,9 @@ func (hdr *SectionHeader) MarshalBinary() ([]byte, error) {
 }
 
 //
-// UnmarshalBinary unpack the DNS header section.
+// unpack the DNS header section.
 //
-func (hdr *SectionHeader) UnmarshalBinary(packet []byte) error {
+func (hdr *SectionHeader) unpack(packet []byte) error {
 	hdr.ID = libbytes.ReadUint16(packet, 0)
 
 	if packet[2]&headerIsResponse == headerIsResponse {

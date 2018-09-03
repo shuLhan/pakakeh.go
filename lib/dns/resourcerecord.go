@@ -147,9 +147,9 @@ func (rr *ResourceRecord) String() string {
 }
 
 //
-// Unpack the DNS resource record from DNS packet start from index `startIdx`.
+// unpack the DNS resource record from DNS packet start from index `startIdx`.
 //
-func (rr *ResourceRecord) Unpack(packet []byte, startIdx uint) (x uint, err error) {
+func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err error) {
 	x = startIdx
 
 	err = rr.unpackDomainName(&rr.Name, packet, x)
@@ -291,7 +291,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	case QueryTypeWKS:
 		rr.WKS = new(RDataWKS)
 		endIdx := startIdx + uint(rr.rdlen)
-		return rr.WKS.UnmarshalBinary(packet[startIdx:endIdx])
+		return rr.WKS.unpack(packet[startIdx:endIdx])
 
 	case QueryTypePTR:
 		rr.Text = new(RDataText)
@@ -300,7 +300,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	case QueryTypeHINFO:
 		rr.HInfo = new(RDataHINFO)
 		endIdx := startIdx + uint(rr.rdlen)
-		return rr.HInfo.UnmarshalBinary(packet[startIdx:endIdx])
+		return rr.HInfo.unpack(packet[startIdx:endIdx])
 
 	case QueryTypeMINFO:
 		rr.MInfo = new(RDataMINFO)

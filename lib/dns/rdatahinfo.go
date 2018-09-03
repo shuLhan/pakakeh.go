@@ -21,9 +21,9 @@ type RDataHINFO struct {
 }
 
 //
-// UnmarshalBinary unpack the HINFO RDATA from DNS message.
+// unpack the HINFO RDATA from DNS message.
 //
-func (hinfo *RDataHINFO) UnmarshalBinary(packet []byte) error {
+func (hinfo *RDataHINFO) unpack(packet []byte) error {
 	x := 0
 	for ; x < len(packet); x++ {
 		if packet[x] == 0 {

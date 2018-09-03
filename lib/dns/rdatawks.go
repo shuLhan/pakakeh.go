@@ -34,9 +34,9 @@ type RDataWKS struct {
 }
 
 //
-// UnmarshalBinary unpack the WKS record from DNS RR in packet.
+// unpack the WKS record from DNS RR in packet.
 //
-func (wks *RDataWKS) UnmarshalBinary(packet []byte) error {
+func (wks *RDataWKS) unpack(packet []byte) error {
 	wks.Address = append(wks.Address, packet[0:4]...)
 	wks.Protocol = packet[4]
 	wks.BitMap = packet[5:]
