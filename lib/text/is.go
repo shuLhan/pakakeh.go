@@ -31,6 +31,19 @@ func IsDigit(b byte) bool {
 }
 
 //
+// IsDigits will return true if all bytes are ASCII digit, otherwise it will
+// return false.
+//
+func IsDigits(data []byte) bool {
+	for x := 0; x < len(data); x++ {
+		if !IsDigit(data[x]) {
+			return false
+		}
+	}
+	return true
+}
+
+//
 // IsHex will return true if byte is hexadecimal number, otherwise it will
 // return false.
 //
