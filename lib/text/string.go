@@ -1,4 +1,12 @@
+// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package text
+
+import (
+	libbytes "github.com/shuLhan/share/lib/bytes"
+)
 
 //
 // StringJSONEscape escape the following character: `"` (quotation mark),
@@ -16,7 +24,7 @@ func StringJSONEscape(in string) string {
 	}
 
 	bin := []byte(in)
-	bout := BytesJSONEscape(bin)
+	bout := libbytes.JSONEscape(bin)
 
 	return string(bout)
 }
@@ -36,7 +44,7 @@ func StringJSONUnescape(in string, strict bool) (string, error) {
 	}
 
 	bin := []byte(in)
-	bout, err := BytesJSONUnescape(bin, strict)
+	bout, err := libbytes.JSONUnescape(bin, strict)
 
 	out := string(bout)
 

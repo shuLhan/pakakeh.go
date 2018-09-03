@@ -7,7 +7,7 @@ package file
 import (
 	"io/ioutil"
 
-	libtext "github.com/shuLhan/share/lib/text"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 //
@@ -79,7 +79,7 @@ func (r *Reader) ReadUntil(seps []byte, terms []byte) (b []byte, isTerm bool, c 
 //
 func (r *Reader) SkipSpace() byte {
 	for r.p < len(r.v) {
-		if libtext.IsSpace(r.v[r.p]) {
+		if libbytes.IsSpace(r.v[r.p]) {
 			r.p++
 			continue
 		}

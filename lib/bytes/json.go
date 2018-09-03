@@ -1,9 +1,12 @@
-package text
+// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package bytes
 
 import (
 	"bytes"
 	"fmt"
-	"math/rand"
 	"strconv"
 )
 
@@ -23,7 +26,7 @@ const (
 )
 
 //
-// BytesJSONEscape escape the following character: `"` (quotation mark),
+// JSONEscape escape the following character: `"` (quotation mark),
 // `\` (reverse solidus), `/` (solidus), `\b` (backspace), `\f` (formfeed),
 // `\n` (newline), `\r` (carriage return`), `\t` (horizontal tab), and control
 // character from 0 - 31.
@@ -32,7 +35,7 @@ const (
 //
 // * https://tools.ietf.org/html/rfc7159#page-8
 //
-func BytesJSONEscape(in []byte) []byte {
+func JSONEscape(in []byte) []byte {
 	var buf bytes.Buffer
 
 	for x := 0; x < len(in); x++ {
@@ -78,14 +81,14 @@ func BytesJSONEscape(in []byte) []byte {
 }
 
 //
-// BytesJSONUnescape unescape JSON bytes, reversing what BytesJSONEscape do.
+// JSONUnescape unescape JSON bytes, reversing what BytesJSONEscape do.
 //
 // If strict is true, any unknown control character will be returned as error.
 // For example, in string "\x", "x" is not valid control character, and the
 // function will return empty string and error.
 // If strict is false, it will return "x".
 //
-func BytesJSONUnescape(in []byte, strict bool) ([]byte, error) {
+func JSONUnescape(in []byte, strict bool) ([]byte, error) {
 	var (
 		buf bytes.Buffer
 		uni bytes.Buffer
@@ -166,17 +169,4 @@ func BytesJSONUnescape(in []byte, strict bool) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-//
-// Random generate random sequence of value from seed with fixed length.
-//
-// This function assume that random generator has been seeded.
-//
-func Random(seed []byte, n int) []byte {
-	b := make([]byte, n)
-	for x := 0; x < n; x++ {
-		b[x] = seed[rand.Intn(len(seed))]
-	}
-	return b
 }

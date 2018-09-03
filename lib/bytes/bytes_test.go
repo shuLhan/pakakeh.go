@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
-	libtext "github.com/shuLhan/share/lib/text"
 )
 
 func TestToLower(t *testing.T) {
@@ -35,7 +34,7 @@ func TestToLower(t *testing.T) {
 	}
 }
 
-var randomInput256 = libtext.Random([]byte(libtext.HexaLetters), 256)
+var randomInput256 = Random([]byte(HexaLetters), 256)
 
 func BenchmarkToLowerStd(b *testing.B) {
 	in := make([]byte, len(randomInput256))

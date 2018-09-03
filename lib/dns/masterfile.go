@@ -17,7 +17,6 @@ import (
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	libio "github.com/shuLhan/share/lib/io"
-	libtext "github.com/shuLhan/share/lib/text"
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
@@ -429,7 +428,7 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 		dur time.Duration
 	)
 
-	if libtext.IsDigits(tok) {
+	if libbytes.IsDigits(tok) {
 		v, err = strconv.ParseUint(stok, 10, 32)
 		if err != nil {
 			return
@@ -484,7 +483,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 		rr.TTL = prevRR.TTL
 		rr.Class = prevRR.Class
 
-		if libtext.IsDigit(tok[0]) {
+		if libbytes.IsDigit(tok[0]) {
 			ttl, err := parseTTL(tok, stok)
 			if err != nil {
 				return nil, err
@@ -519,7 +518,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 
 		switch m.flag {
 		case parseRRStart:
-			if libtext.IsDigit(tok[0]) {
+			if libbytes.IsDigit(tok[0]) {
 				rr.TTL, err = parseTTL(tok, stok)
 				if err != nil {
 					return nil, err
@@ -544,7 +543,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			}
 
 		case parseRRClass:
-			if libtext.IsDigit(tok[0]) {
+			if libbytes.IsDigit(tok[0]) {
 				rr.TTL, err = parseTTL(tok, stok)
 				if err != nil {
 					return nil, err

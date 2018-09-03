@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/test"
-	libtext "github.com/shuLhan/share/lib/text"
 )
 
 func TestNewResolvConf(t *testing.T) {
@@ -54,7 +54,7 @@ func TestResolvConf_Init(t *testing.T) {
 		return "kilabit.info", nil
 	}
 
-	veryLongName := string(libtext.Random([]byte(libtext.ASCIILetters), 255))
+	veryLongName := string(libbytes.Random([]byte(libbytes.ASCIILetters), 255))
 
 	cases := []struct {
 		desc           string

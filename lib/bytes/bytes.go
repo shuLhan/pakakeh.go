@@ -2,11 +2,29 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Packages bytes contains common functions to manipulate slice of bytes.
+// Packages bytes provide a library for working with byte or slice of bytes.
 package bytes
 
 import (
 	"fmt"
+)
+
+const (
+	// ASCIILetters contains list of lower and upper case characters in
+	// ASCII.
+	ASCIILetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	// HexaLETTERS contains list of hexadecimal characters in upper cases.
+	HexaLETTERS = "0123456789ABCDEF"
+	// HexaLetters contains list of hexadecimal characters in lower and
+	// upper cases.
+	HexaLetters = "0123456789abcedfABCDEF"
+	// HexaLetters contains list of hexadecimal characters in lower cases.
+	Hexaletters = "0123456789abcedf"
+)
+
+var (
+	// ASCIISpaces contains list of white spaces in ASCII.
+	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
 )
 
 //

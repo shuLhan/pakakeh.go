@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	libtext "github.com/shuLhan/share/lib/text"
 )
 
 //
@@ -128,7 +127,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 			// corresponding to the decimal number described by
 			// DDD.  The resulting octet is assumed to be text and
 			// is not checked for special meaning.
-			if libtext.IsDigit(c) {
+			if libbytes.IsDigit(c) {
 				if x+2 >= len(dname) {
 					return
 				}
