@@ -21,6 +21,10 @@ import (
 )
 
 const (
+	defMinimumTTL = 3600
+)
+
+const (
 	parseRRStart = 0
 	parseRRTTL   = 1
 	parseRRClass = 2
@@ -275,6 +279,12 @@ func (m *master) parse() (err error) {
 			m.push(rr)
 		}
 	}
+
+	if m.ttl == 0 {
+		m.ttl = defMinimumTTL
+	}
+
+	m.setMinimumTTL()
 
 	return nil
 }
@@ -824,6 +834,10 @@ out:
 		}
 	}
 
+	if m.ttl == 0 {
+		m.ttl = rr.SOA.Minimum
+	}
+
 	return
 }
 
@@ -1044,4 +1058,24 @@ func (m *master) push(rr *ResourceRecord) bool {
 	m.msgs = append(m.msgs, msg)
 
 	return true
+}
+
+func (m *master) setMinimumTTL() {
+	for _, msg := range m.msgs {
+		for x := 0; x < len(msg.Answer); x++ {
+			if msg.Answer[x].TTL < m.ttl {
+				msg.Answer[x].TTL = m.ttl
+			}
+		}
+		for x := 0; x < len(msg.Authority); x++ {
+			if msg.Authority[x].TTL < m.ttl {
+				msg.Authority[x].TTL = m.ttl
+			}
+		}
+		for x := 0; x < len(msg.Additional); x++ {
+			if msg.Additional[x].TTL < m.ttl {
+				msg.Additional[x].TTL = m.ttl
+			}
+		}
+	}
 }
