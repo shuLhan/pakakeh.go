@@ -299,7 +299,9 @@ func (m *master) parseDirectiveOrigin() (err error) {
 	m.origin = string(tok)
 
 	if isTerm {
-		m.reader.SkipUntilNewline()
+		if c == ';' {
+			m.reader.SkipUntilNewline()
+		}
 		m.lineno++
 	} else {
 		c = m.reader.SkipSpace()
@@ -503,13 +505,15 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 	for {
 		_, c := m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
-			err = fmt.Errorf("! %s:%d Invalid RR statement", m.file, m.lineno)
+			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
+				m.file, m.lineno, stok)
 			return nil, err
 		}
 
 		tok, _, c := m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
-			err = fmt.Errorf("! %s:%d Invalid RR statement", m.file, m.lineno)
+			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
+				m.file, m.lineno, stok)
 			return nil, err
 		}
 
@@ -793,17 +797,27 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	}
 out:
 	if isMultiline {
-		for c == ';' {
-			m.reader.SkipUntilNewline()
-			m.lineno++
+		if isTerm {
+			for c == ';' {
+				m.reader.SkipUntilNewline()
+				m.lineno++
+				c = m.reader.SkipSpace()
+			}
+			for c == '\n' {
+				m.lineno++
+				c = m.reader.SkipSpace()
+			}
+		} else {
 			c = m.reader.SkipSpace()
 		}
+
 		if c != ')' {
 			err = fmt.Errorf("! %s:%d Missing closing parentheses",
 				m.file, m.lineno)
 			return
 		}
-		_, c = m.reader.SkipHorizontalSpace()
+
+		_, _, c = m.reader.ReadUntil(m.seps, m.terms)
 		if c == ';' {
 			m.reader.SkipUntilNewline()
 			m.lineno++
