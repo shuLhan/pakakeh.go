@@ -980,7 +980,11 @@ out:
 }
 
 func (m *master) generateDomainName(dname []byte) []byte {
-	libbytes.ToLower(&dname)
+	if dname[0] == '@' {
+		dname = []byte(m.origin)
+	} else {
+		libbytes.ToLower(&dname)
+	}
 	if dname[len(dname)-1] != '.' {
 		dname = append(dname, '.')
 		dname = append(dname, m.origin...)
