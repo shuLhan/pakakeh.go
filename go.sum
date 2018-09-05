@@ -1,2 +1,2 @@
-golang.org/x/sys v0.0.0-20180821140842-3b58ed4ad339 h1:0w2EXzxbB03VAzqwe3csbadu4CPhMRtxCz/rjw9gkic=
-golang.org/x/sys v0.0.0-20180821140842-3b58ed4ad339/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33 h1:I6FyU15t786LL7oL/hn43zqTuEGr4PN7F4XJ1p4E3Y8=
+golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
