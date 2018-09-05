@@ -603,7 +603,7 @@ func (msg *Message) String() string {
 func (msg *Message) Unpack() (err error) {
 	msg.UnpackHeaderQuestion()
 
-	startIdx := uint(sectionHeaderSize + msg.Question.Size())
+	startIdx := uint(sectionHeaderSize + msg.Question.size())
 
 	var x uint16
 	for ; x < msg.Header.ANCount; x++ {

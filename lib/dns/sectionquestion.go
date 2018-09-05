@@ -45,11 +45,11 @@ func (question *SectionQuestion) Reset() {
 }
 
 //
-// Size return the section question size, length of name + 2 (1 octet for
+// size return the section question size, length of name + 2 (1 octet for
 // beginning size plus 1 octet for end of label) + 2 octets of
 // qtype + 2 octets of qclass
 //
-func (question *SectionQuestion) Size() int {
+func (question *SectionQuestion) size() int {
 	return len(question.Name) + 6
 }
 
