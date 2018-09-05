@@ -611,13 +611,13 @@ func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
 	case QueryTypeA, QueryTypeTXT, QueryTypeAAAA:
 		rr.Text = &RDataText{
-			v: tok,
+			Value: tok,
 		}
 
 	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG, QueryTypeMR, QueryTypePTR:
 		dname := m.generateDomainName(tok)
 		rr.Text = &RDataText{
-			v: dname,
+			Value: dname,
 		}
 
 	case QueryTypeSOA:

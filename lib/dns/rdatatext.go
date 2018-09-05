@@ -9,10 +9,10 @@ package dns
 // TEXT RDATA format.
 //
 type RDataText struct {
-	v []byte
+	Value []byte
 }
 
 // String return string representation of RDATA.
 func (text *RDataText) String() string {
-	return string(text.v)
+	return string(text.Value)
 }

@@ -45,7 +45,7 @@ func TestUDPClientLookup(t *testing.T) {
 				TTL:   3600,
 				rdlen: 4,
 				Text: &RDataText{
-					v: []byte("127.0.0.1"),
+					Value: []byte("127.0.0.1"),
 				},
 			}},
 			Authority:  []*ResourceRecord{},
@@ -107,7 +107,7 @@ func TestUDPClientLookup(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("This is a test server"),
+					Value: []byte("This is a test server"),
 				},
 			}},
 			Authority:  []*ResourceRecord{},

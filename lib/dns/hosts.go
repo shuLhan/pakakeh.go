@@ -82,7 +82,7 @@ func newMessage(addr, hname []byte) *Message {
 			Class: QueryClassIN,
 			TTL:   defaultTTL,
 			Text: &RDataText{
-				v: addr,
+				Value: addr,
 			},
 		}},
 	}

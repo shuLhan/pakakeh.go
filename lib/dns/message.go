@@ -275,9 +275,9 @@ func (msg *Message) packA(rr *ResourceRecord) {
 	libbytes.AppendUint16(&msg.Packet, rdataIPv4Size)
 	msg.off += 2
 
-	ip := net.ParseIP(string(rr.Text.v))
+	ip := net.ParseIP(string(rr.Text.Value))
 	if ip == nil {
-		msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv4Size]...)
+		msg.Packet = append(msg.Packet, rr.Text.Value[:rdataIPv4Size]...)
 	} else {
 		ipv4 := ip.To4()
 		if ipv4 == nil {
@@ -296,7 +296,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	off := uint(msg.off)
 	msg.off += 2
 
-	n := msg.packDomainName(rr.Text.v, true)
+	n := msg.packDomainName(rr.Text.Value, true)
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
 }
 
@@ -372,12 +372,12 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 }
 
 func (msg *Message) packTXT(rr *ResourceRecord) {
-	n := uint16(len(rr.Text.v))
+	n := uint16(len(rr.Text.Value))
 	libbytes.AppendUint16(&msg.Packet, n+1)
 	msg.off += 2
 
 	msg.Packet = append(msg.Packet, byte(n))
-	msg.Packet = append(msg.Packet, rr.Text.v...)
+	msg.Packet = append(msg.Packet, rr.Text.Value...)
 	msg.off += n
 }
 
@@ -404,9 +404,9 @@ func (msg *Message) packAAAA(rr *ResourceRecord) {
 	libbytes.AppendUint16(&msg.Packet, rdataIPv6Size)
 	msg.off += 2
 
-	ip := net.ParseIP(string(rr.Text.v))
+	ip := net.ParseIP(string(rr.Text.Value))
 	if ip == nil {
-		msg.Packet = append(msg.Packet, rr.Text.v[:rdataIPv6Size]...)
+		msg.Packet = append(msg.Packet, rr.Text.Value[:rdataIPv6Size]...)
 	} else {
 		msg.Packet = append(msg.Packet, ip...)
 	}

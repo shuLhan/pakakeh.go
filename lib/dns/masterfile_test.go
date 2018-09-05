@@ -199,7 +199,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("a.isi.edu."),
+					Value: []byte("a.isi.edu."),
 				},
 			}, {
 				Name:  []byte("isi.edu."),
@@ -207,7 +207,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("venera.isi.edu."),
+					Value: []byte("venera.isi.edu."),
 				},
 			}, {
 				Name:  []byte("isi.edu."),
@@ -215,7 +215,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("vaxa.isi.edu."),
+					Value: []byte("vaxa.isi.edu."),
 				},
 			}},
 		}, {
@@ -257,7 +257,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("26.3.0.103"),
+					Value: []byte("26.3.0.103"),
 				},
 			}},
 		}, {
@@ -273,7 +273,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("10.1.0.52"),
+					Value: []byte("10.1.0.52"),
 				},
 			}, {
 				Name:  []byte("venera.isi.edu."),
@@ -281,7 +281,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("128.9.0.32"),
+					Value: []byte("128.9.0.32"),
 				},
 			}},
 		}, {
@@ -297,7 +297,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("10.2.0.27"),
+					Value: []byte("10.2.0.27"),
 				},
 			}, {
 				Name:  []byte("vaxa.isi.edu."),
@@ -305,7 +305,7 @@ VAXA    A       10.2.0.27
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("128.9.0.33"),
+					Value: []byte("128.9.0.33"),
 				},
 			}},
 		}},
@@ -421,7 +421,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("ns23.pair.com."),
+					Value: []byte("ns23.pair.com."),
 				},
 			}, {
 				Name:  []byte("pcguide.com."),
@@ -429,7 +429,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("ns0.ns0.com."),
+					Value: []byte("ns0.ns0.com."),
 				},
 			}},
 		}, {
@@ -445,7 +445,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("127.0.0.1"),
+					Value: []byte("127.0.0.1"),
 				},
 			}},
 		}, {
@@ -461,7 +461,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("209.68.14.80"),
+					Value: []byte("209.68.14.80"),
 				},
 			}},
 		}, {
@@ -494,7 +494,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("pcguide.com."),
+					Value: []byte("pcguide.com."),
 				},
 			}},
 		}, {
@@ -510,7 +510,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("pcguide.com."),
+					Value: []byte("pcguide.com."),
 				},
 			}},
 		}, {
@@ -526,7 +526,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("pcguide.com."),
+					Value: []byte("pcguide.com."),
 				},
 			}},
 		}, {
@@ -542,7 +542,7 @@ relay IN CNAME relay.pair.com.
 				Class: QueryClassIN,
 				TTL:   3600,
 				Text: &RDataText{
-					v: []byte("relay.pair.com."),
+					Value: []byte("relay.pair.com."),
 				},
 			}},
 		}},

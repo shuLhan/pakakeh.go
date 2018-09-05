@@ -211,7 +211,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   0x00000168,
 				Text: &RDataText{
-					v: []byte("103.200.4.162"),
+					Value: []byte("103.200.4.162"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -302,7 +302,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   0x01336e,
 				Text: &RDataText{
-					v: []byte("ns2.dewaweb.com"),
+					Value: []byte("ns2.dewaweb.com"),
 				},
 			}, {
 				Name:  []byte("kilabit.INFO"),
@@ -310,7 +310,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   0x01336e,
 				Text: &RDataText{
-					v: []byte("NS3.DEWAWEB.COM"),
+					Value: []byte("NS3.DEWAWEB.COM"),
 				},
 			}, {
 				Name:  []byte("kilabit.info"),
@@ -318,7 +318,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   0x01336e,
 				Text: &RDataText{
-					v: []byte("ns1.dewaweb.com"),
+					Value: []byte("ns1.dewaweb.com"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -374,7 +374,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   0x0168,
 				Text: &RDataText{
-					v: []byte("kilabit.info"),
+					Value: []byte("kilabit.info"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -605,7 +605,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   300,
 				Text: &RDataText{
-					v: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
+					Value: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
 				},
 			}, {
 				Name:  []byte("google.com"),
@@ -613,7 +613,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   300,
 				Text: &RDataText{
-					v: []byte("v=spf1 include:_spf.google.com ~all"),
+					Value: []byte("v=spf1 include:_spf.google.com ~all"),
 				},
 			}, {
 				Name:  []byte("google.com"),
@@ -621,7 +621,7 @@ func TestMessagePack(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   300,
 				Text: &RDataText{
-					v: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
+					Value: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -672,7 +672,7 @@ func TestMessagePack(t *testing.T) {
 				TTL:   0x53,
 				Class: QueryClassIN,
 				Text: &RDataText{
-					v: []byte("2404:6800:4003:c00::8b"),
+					Value: []byte("2404:6800:4003:c00::8b"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -905,7 +905,7 @@ func TestMessageUnpack(t *testing.T) {
 				rdlen: 4,
 				rdata: []byte{0x67, 0xc8, 0x04, 0xa2},
 				Text: &RDataText{
-					v: []byte("103.200.4.162"),
+					Value: []byte("103.200.4.162"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -984,7 +984,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x03, 0x6e, 0x73, 0x32, 0x07, 0x64, 0x65, 0x77, 0x61, 0x77, 0x65, 0x62, 0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
 				Text: &RDataText{
-					v: []byte("ns2.dewaweb.com"),
+					Value: []byte("ns2.dewaweb.com"),
 				},
 			}, {
 				Name:  []byte("kilabit.info"),
@@ -996,7 +996,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x03, 0x6e, 0x73, 0x33, 0xc0, 0x2e,
 				},
 				Text: &RDataText{
-					v: []byte("ns3.dewaweb.com"),
+					Value: []byte("ns3.dewaweb.com"),
 				},
 			}, {
 				Name:  []byte("kilabit.info"),
@@ -1008,7 +1008,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x03, 0x6e, 0x73, 0x31, 0xc0, 0x2e,
 				},
 				Text: &RDataText{
-					v: []byte("ns1.dewaweb.com"),
+					Value: []byte("ns1.dewaweb.com"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -1068,7 +1068,7 @@ func TestMessageUnpack(t *testing.T) {
 				rdlen: 2,
 				rdata: []byte{0xc0, 0x11},
 				Text: &RDataText{
-					v: []byte("kilabit.info"),
+					Value: []byte("kilabit.info"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -1384,7 +1384,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x34, 0x68, 0x39, 0x35,
 				},
 				Text: &RDataText{
-					v: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
+					Value: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
 				},
 			}, {
 				Name:  []byte("google.com"),
@@ -1400,7 +1400,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x7e, 0x61, 0x6c, 0x6c,
 				},
 				Text: &RDataText{
-					v: []byte("v=spf1 include:_spf.google.com ~all"),
+					Value: []byte("v=spf1 include:_spf.google.com ~all"),
 				},
 			}, {
 				Name:  []byte("google.com"),
@@ -1417,7 +1417,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x61, 0x33, 0x62, 0x64, 0x30, 0x65,
 				},
 				Text: &RDataText{
-					v: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
+					Value: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 				},
 			}},
 			Additional: []*ResourceRecord{{
@@ -1476,7 +1476,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8b,
 				},
 				Text: &RDataText{
-					v: []byte("2404:6800:4003:c00::8b"),
+					Value: []byte("2404:6800:4003:c00::8b"),
 				},
 			}},
 			Additional: []*ResourceRecord{{

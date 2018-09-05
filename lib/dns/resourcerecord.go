@@ -76,29 +76,29 @@ type ResourceRecord struct {
 func (rr *ResourceRecord) RData() interface{} {
 	switch rr.Type {
 	case QueryTypeA:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeNS:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeMD:
 		return nil
 	case QueryTypeMF:
 		return nil
 	case QueryTypeCNAME:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeSOA:
 		return rr.SOA
 	case QueryTypeMB:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeMG:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeMR:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeNULL:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeWKS:
 		return rr.WKS
 	case QueryTypePTR:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeHINFO:
 		return rr.HInfo
 	case QueryTypeMINFO:
@@ -106,9 +106,9 @@ func (rr *ResourceRecord) RData() interface{} {
 	case QueryTypeMX:
 		return rr.MX
 	case QueryTypeTXT:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeAAAA:
-		return rr.Text.v
+		return rr.Text.Value
 	case QueryTypeSRV:
 		return rr.SRV
 	case QueryTypeOPT:
@@ -241,7 +241,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	//
 	case QueryTypeNS:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
 
 	// MD is obsolete.  See the definition of MX and [RFC-974] for details of
 	// the new scheme.  The recommended policy for dealing with MD RRs found in
@@ -261,7 +261,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	// details.
 	case QueryTypeCNAME:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
 
 	case QueryTypeSOA:
 		rr.SOA = new(RDataSOA)
@@ -269,15 +269,15 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 
 	case QueryTypeMB:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
 
 	case QueryTypeMG:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
 
 	case QueryTypeMR:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
 
 	// NULL records cause no additional section processing.
 	// NULLs are used as placeholders in some experimental extensions of
@@ -285,7 +285,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	case QueryTypeNULL:
 		rr.Text = new(RDataText)
 		endIdx := startIdx + uint(rr.rdlen)
-		rr.Text.v = append(rr.Text.v, packet[startIdx:startIdx+endIdx]...)
+		rr.Text.Value = append(rr.Text.Value, packet[startIdx:startIdx+endIdx]...)
 		return nil
 
 	case QueryTypeWKS:
@@ -295,7 +295,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 
 	case QueryTypePTR:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.v, packet, startIdx)
+		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
 
 	case QueryTypeHINFO:
 		rr.HInfo = new(RDataHINFO)
@@ -315,7 +315,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 		endIdx := startIdx + uint(rr.rdlen)
 
 		// The first byte of TXT is length.
-		rr.Text.v = append(rr.Text.v, packet[startIdx+1:endIdx]...)
+		rr.Text.Value = append(rr.Text.Value, packet[startIdx+1:endIdx]...)
 
 		return nil
 
@@ -344,7 +344,7 @@ func (rr *ResourceRecord) unpackA() error {
 	}
 
 	ip := net.IP(rr.rdata)
-	rr.Text.v = append(rr.Text.v, []byte(ip.String())...)
+	rr.Text.Value = append(rr.Text.Value, []byte(ip.String())...)
 
 	return nil
 }
@@ -355,7 +355,7 @@ func (rr *ResourceRecord) unpackAAAA() error {
 	}
 
 	ip := net.IP(rr.rdata)
-	rr.Text.v = append(rr.Text.v, []byte(ip.String())...)
+	rr.Text.Value = append(rr.Text.Value, []byte(ip.String())...)
 
 	return nil
 }
