@@ -1700,7 +1700,7 @@ func TestMessageUnpack(t *testing.T) {
 		},
 	}}
 
-	msg := msgPool.Get().(*Message)
+	msg := NewMessage()
 
 	for _, c := range cases {
 		t.Log(c.desc)

@@ -78,8 +78,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 		return nil, nil
 	}
 
-	msg := msgPool.Get().(*Message)
-	msg.Reset()
+	msg := NewMessage()
 
 	msg.Header.ID = getNextID()
 	msg.Header.QDCount = 1
@@ -92,28 +91,21 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, err := cl.Send(msg, cl.Addr)
 	if err != nil {
-		msgPool.Put(msg)
 		return nil, err
 	}
 
-	resMsg := msgPool.Get().(*Message)
+	resMsg := NewMessage()
 	resMsg.Reset()
 
 	_, err = cl.Recv(resMsg)
 	if err != nil {
-		msgPool.Put(msg)
-		msgPool.Put(resMsg)
 		return nil, err
 	}
 
 	err = resMsg.Unpack()
 	if err != nil {
-		msgPool.Put(msg)
-		msgPool.Put(resMsg)
 		return nil, err
 	}
-
-	FreeMessage(msg)
 
 	return resMsg, nil
 }

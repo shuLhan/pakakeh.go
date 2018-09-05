@@ -85,7 +85,7 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 		return nil, nil
 	}
 
-	msg := AllocMessage()
+	msg := NewMessage()
 
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = true
@@ -98,27 +98,20 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, err := cl.Send(msg, nil)
 	if err != nil {
-		FreeMessage(msg)
 		return nil, err
 	}
 
-	resMsg := AllocMessage()
+	resMsg := NewMessage()
 
 	_, err = cl.Recv(resMsg)
 	if err != nil {
-		FreeMessage(msg)
-		FreeMessage(resMsg)
 		return nil, err
 	}
 
 	err = resMsg.Unpack()
 	if err != nil {
-		FreeMessage(msg)
-		FreeMessage(resMsg)
 		return nil, err
 	}
-
-	FreeMessage(msg)
 
 	return resMsg, nil
 }

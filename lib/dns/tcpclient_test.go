@@ -131,7 +131,5 @@ func TestTCPClientLookup(t *testing.T) {
 		}
 
 		test.Assert(t, "Packet", c.exp.Packet, got.Packet, true)
-
-		FreeMessage(got)
 	}
 }

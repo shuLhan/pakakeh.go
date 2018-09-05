@@ -12,7 +12,7 @@ import (
 var _requestPool = sync.Pool{
 	New: func() interface{} {
 		req := &Request{
-			Message: AllocMessage(),
+			Message: NewMessage(),
 		}
 		return req
 	},

@@ -72,7 +72,7 @@ func NewMessage() *Message {
 	return &Message{
 		Header:   &SectionHeader{},
 		Question: &SectionQuestion{},
-		Packet:   make([]byte, 0, maxUDPPacketSize),
+		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 }
