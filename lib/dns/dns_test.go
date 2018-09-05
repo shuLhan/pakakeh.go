@@ -22,38 +22,36 @@ var (
 )
 
 type serverHandler struct {
-	responses []*Response
+	responses []*Message
 }
 
 func (h *serverHandler) generateResponses() {
-	res := &Response{
-		Message: &Message{
-			Header: &SectionHeader{
-				ID:      1,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: &SectionQuestion{
-				Name:  []byte("kilabit.info"),
-				Type:  QueryTypeA,
-				Class: QueryClassIN,
-			},
-			Answer: []*ResourceRecord{{
-				Name:  []byte("kilabit.info"),
-				Type:  QueryTypeA,
-				Class: QueryClassIN,
-				TTL:   3600,
-				rdlen: 4,
-				Text: &RDataText{
-					v: []byte("127.0.0.1"),
-				},
-			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+	res := &Message{
+		Header: &SectionHeader{
+			ID:      1,
+			QDCount: 1,
+			ANCount: 1,
 		},
+		Question: &SectionQuestion{
+			Name:  []byte("kilabit.info"),
+			Type:  QueryTypeA,
+			Class: QueryClassIN,
+		},
+		Answer: []*ResourceRecord{{
+			Name:  []byte("kilabit.info"),
+			Type:  QueryTypeA,
+			Class: QueryClassIN,
+			TTL:   3600,
+			rdlen: 4,
+			Text: &RDataText{
+				v: []byte("127.0.0.1"),
+			},
+		}},
+		Authority:  []*ResourceRecord{},
+		Additional: []*ResourceRecord{},
 	}
 
-	_, err := res.Message.Pack()
+	_, err := res.Pack()
 	if err != nil {
 		log.Fatal("Pack: ", err)
 	}
@@ -61,39 +59,37 @@ func (h *serverHandler) generateResponses() {
 	h.responses = append(h.responses, res)
 
 	// kilabit.info SOA
-	res = &Response{
-		Message: &Message{
-			Header: &SectionHeader{
-				ID:      2,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: &SectionQuestion{
-				Name:  []byte("kilabit.info"),
-				Type:  QueryTypeSOA,
-				Class: QueryClassIN,
-			},
-			Answer: []*ResourceRecord{{
-				Name:  []byte("kilabit.info"),
-				Type:  QueryTypeSOA,
-				Class: QueryClassIN,
-				TTL:   3600,
-				SOA: &RDataSOA{
-					MName:   []byte("kilabit.info"),
-					RName:   []byte("admin.kilabit.info"),
-					Serial:  20180832,
-					Refresh: 3600,
-					Retry:   60,
-					Expire:  3600,
-					Minimum: 3600,
-				},
-			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+	res = &Message{
+		Header: &SectionHeader{
+			ID:      2,
+			QDCount: 1,
+			ANCount: 1,
 		},
+		Question: &SectionQuestion{
+			Name:  []byte("kilabit.info"),
+			Type:  QueryTypeSOA,
+			Class: QueryClassIN,
+		},
+		Answer: []*ResourceRecord{{
+			Name:  []byte("kilabit.info"),
+			Type:  QueryTypeSOA,
+			Class: QueryClassIN,
+			TTL:   3600,
+			SOA: &RDataSOA{
+				MName:   []byte("kilabit.info"),
+				RName:   []byte("admin.kilabit.info"),
+				Serial:  20180832,
+				Refresh: 3600,
+				Retry:   60,
+				Expire:  3600,
+				Minimum: 3600,
+			},
+		}},
+		Authority:  []*ResourceRecord{},
+		Additional: []*ResourceRecord{},
 	}
 
-	_, err = res.Message.Pack()
+	_, err = res.Pack()
 	if err != nil {
 		log.Fatal("Pack: ", err)
 	}
@@ -101,33 +97,31 @@ func (h *serverHandler) generateResponses() {
 	h.responses = append(h.responses, res)
 
 	// kilabit.info TXT
-	res = &Response{
-		Message: &Message{
-			Header: &SectionHeader{
-				ID:      3,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: &SectionQuestion{
-				Name:  []byte("kilabit.info"),
-				Type:  QueryTypeTXT,
-				Class: QueryClassIN,
-			},
-			Answer: []*ResourceRecord{{
-				Name:  []byte("kilabit.info"),
-				Type:  QueryTypeTXT,
-				Class: QueryClassIN,
-				TTL:   3600,
-				Text: &RDataText{
-					v: []byte("This is a test server"),
-				},
-			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+	res = &Message{
+		Header: &SectionHeader{
+			ID:      3,
+			QDCount: 1,
+			ANCount: 1,
 		},
+		Question: &SectionQuestion{
+			Name:  []byte("kilabit.info"),
+			Type:  QueryTypeTXT,
+			Class: QueryClassIN,
+		},
+		Answer: []*ResourceRecord{{
+			Name:  []byte("kilabit.info"),
+			Type:  QueryTypeTXT,
+			Class: QueryClassIN,
+			TTL:   3600,
+			Text: &RDataText{
+				v: []byte("This is a test server"),
+			},
+		}},
+		Authority:  []*ResourceRecord{},
+		Additional: []*ResourceRecord{},
 	}
 
-	_, err = res.Message.Pack()
+	_, err = res.Pack()
 	if err != nil {
 		log.Fatal("Pack: ", err)
 	}
@@ -136,7 +130,7 @@ func (h *serverHandler) generateResponses() {
 }
 
 func (h *serverHandler) ServeDNS(req *Request) {
-	var ref *Response
+	var ref *Message
 
 	qname := string(req.Message.Question.Name)
 	switch qname {
@@ -155,23 +149,21 @@ func (h *serverHandler) ServeDNS(req *Request) {
 		return
 	}
 
-	res := &Response{
-		Message: &Message{
-			Header:   ref.Message.Header,
-			Question: ref.Message.Question,
-			Answer:   ref.Message.Answer,
-		},
+	res := &Message{
+		Header:   ref.Header,
+		Question: ref.Question,
+		Answer:   ref.Answer,
 	}
 
-	res.Message.Header.ID = req.Message.Header.ID
+	res.Header.ID = req.Message.Header.ID
 
-	_, err := res.Message.Pack()
+	_, err := res.Pack()
 	if err != nil {
 		_testServer.FreeRequest(req)
 		return
 	}
 
-	_, err = req.Sender.Send(res.Message, req.UDPAddr)
+	_, err = req.Sender.Send(res, req.UDPAddr)
 	if err != nil {
 		log.Println("ServeDNS: ", err)
 	}
@@ -180,7 +172,7 @@ func (h *serverHandler) ServeDNS(req *Request) {
 }
 
 func TestMain(m *testing.M) {
-	debugLevel = 2
+	debugLevel = 0
 	log.SetFlags(log.Lmicroseconds)
 
 	_testHandler = &serverHandler{}
