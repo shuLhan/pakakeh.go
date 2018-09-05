@@ -7,10 +7,7 @@ package dns
 import (
 	"bytes"
 	"fmt"
-	"log"
-	"os"
 	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -62,48 +59,6 @@ type master struct {
 	origin string
 	ttl    uint32
 	flag   int
-}
-
-//
-// MasterLostDir parse all master files in a directory and return it as list
-// of packed Message.
-//
-func MasterLoadDir(dir string) ([]*Message, error) {
-	if len(dir) == 0 {
-		return nil, nil
-	}
-
-	d, err := os.Open(dir)
-	if err != nil {
-		log.Println("! MasterLoadDir: ", err)
-		return nil, err
-	}
-
-	fis, err := d.Readdir(0)
-	if err != nil {
-		log.Println("! MasterLoadDir: ", err)
-		return nil, err
-	}
-
-	allMessages := make([]*Message, 0)
-
-	for x := 0; x < len(fis); x++ {
-		if fis[x].IsDir() {
-			continue
-		}
-
-		masterFile := filepath.Join(dir, fis[x].Name())
-
-		msgs, err := MasterLoad(masterFile, "", 0)
-		if err != nil {
-			log.Println("! MasterLoad:", err)
-			continue
-		}
-
-		allMessages = append(allMessages, msgs...)
-	}
-
-	return allMessages, nil
 }
 
 //
