@@ -113,6 +113,25 @@ func TestUDPClientLookup(t *testing.T) {
 			Authority:  []*ResourceRecord{},
 			Additional: []*ResourceRecord{},
 		},
+	}, {
+		desc:   "QType:AAAA QClass:IN QName:kilabit.info",
+		qtype:  QueryTypeAAAA,
+		qclass: QueryClassIN,
+		qname:  []byte("kilabit.info"),
+		exp: &Message{
+			Header: &SectionHeader{
+				ID:      11,
+				QDCount: 1,
+			},
+			Question: &SectionQuestion{
+				Name:  []byte("kilabit.info"),
+				Type:  QueryTypeAAAA,
+				Class: QueryClassIN,
+			},
+			Answer:     []*ResourceRecord{},
+			Authority:  []*ResourceRecord{},
+			Additional: []*ResourceRecord{},
+		},
 	}}
 
 	for _, c := range cases {

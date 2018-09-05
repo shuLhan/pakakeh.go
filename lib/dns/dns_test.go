@@ -26,6 +26,7 @@ type serverHandler struct {
 }
 
 func (h *serverHandler) generateResponses() {
+	// kilabit.info A
 	res := &Message{
 		Header: &SectionHeader{
 			ID:      1,
@@ -130,37 +131,40 @@ func (h *serverHandler) generateResponses() {
 }
 
 func (h *serverHandler) ServeDNS(req *Request) {
-	var ref *Message
+	var (
+		res *Message
+		err error
+	)
 
 	qname := string(req.Message.Question.Name)
 	switch qname {
 	case "kilabit.info":
 		switch req.Message.Question.Type {
 		case QueryTypeA:
-			ref = h.responses[0]
+			res = h.responses[0]
 		case QueryTypeSOA:
-			ref = h.responses[1]
+			res = h.responses[1]
 		case QueryTypeTXT:
-			ref = h.responses[2]
+			res = h.responses[2]
 		}
 	}
-	if ref == nil {
-		_testServer.FreeRequest(req)
-		return
-	}
 
-	res := &Message{
-		Header:   ref.Header,
-		Question: ref.Question,
-		Answer:   ref.Answer,
-	}
+	// Return empty answer
+	if res == nil {
+		res = &Message{
+			Header: &SectionHeader{
+				ID:      req.Message.Header.ID,
+				QDCount: 1,
+			},
+			Question: req.Message.Question,
+		}
 
-	res.Header.ID = req.Message.Header.ID
-
-	_, err := res.Pack()
-	if err != nil {
-		_testServer.FreeRequest(req)
-		return
+		_, err = res.Pack()
+		if err != nil {
+			return
+		}
+	} else {
+		res.SetID(req.Message.Header.ID)
 	}
 
 	_, err = req.Sender.Send(res, req.UDPAddr)
