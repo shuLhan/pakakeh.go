@@ -7,6 +7,7 @@ package dns
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"path"
 	"strconv"
 	"strings"
@@ -78,7 +79,7 @@ func MasterLoad(file, origin string, ttl uint32) ([]*Message, error) {
 		m.origin = path.Base(file)
 	}
 
-	m.origin = strings.ToLower(origin)
+	m.origin = strings.ToLower(m.origin)
 
 	m.reader, err = libio.NewReader(file)
 	if err != nil {
@@ -240,6 +241,7 @@ func (m *master) parse() (err error) {
 	}
 
 	m.setMinimumTTL()
+	m.pack()
 
 	return nil
 }
@@ -967,11 +969,12 @@ func (m *master) generateDomainName(dname []byte) []byte {
 		dname = []byte(m.origin)
 	} else {
 		libbytes.ToLower(&dname)
+		if dname[len(dname)-1] != '.' {
+			dname = append(dname, '.')
+			dname = append(dname, m.origin...)
+		}
 	}
-	if dname[len(dname)-1] != '.' {
-		dname = append(dname, '.')
-		dname = append(dname, m.origin...)
-	}
+	dname = bytes.TrimRight(dname, ".")
 	return dname
 }
 
@@ -1001,7 +1004,10 @@ func (m *master) push(rr *ResourceRecord) bool {
 	}
 
 	msg := &Message{
-		Header: &SectionHeader{},
+		Header: &SectionHeader{
+			IsAA:    true,
+			QDCount: 1,
+		},
 		Question: &SectionQuestion{
 			Name:  rr.Name,
 			Type:  rr.Type,
@@ -1030,6 +1036,29 @@ func (m *master) setMinimumTTL() {
 		for x := 0; x < len(msg.Additional); x++ {
 			if msg.Additional[x].TTL < m.ttl {
 				msg.Additional[x].TTL = m.ttl
+			}
+		}
+	}
+}
+
+func (m *master) pack() {
+	for _, msg := range m.msgs {
+		msg.Header.ANCount = uint16(len(msg.Answer))
+		msg.Header.NSCount = uint16(len(msg.Authority))
+		msg.Header.ARCount = uint16(len(msg.Additional))
+
+		_, err := msg.Pack()
+		if err != nil {
+			log.Printf("! pack: %s\n", err)
+			msg.Header.ANCount = 0
+		}
+
+		if debugLevel >= 1 {
+			fmt.Printf("= Header: %+v\n", msg.Header)
+			fmt.Printf("  Question: %s\n", msg.Question)
+			for x := 0; x < len(msg.Answer); x++ {
+				fmt.Printf("  Answer: %s\n", msg.Answer[x])
+				fmt.Printf("  RData: %s\n", msg.Answer[x].RData())
 			}
 		}
 	}
