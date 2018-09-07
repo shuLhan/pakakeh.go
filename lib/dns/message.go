@@ -560,6 +560,43 @@ func (msg *Message) SetID(id uint16) {
 }
 
 //
+// SubTTL subtract TTL in each resource records and in packet by n seconds.
+// If TTL is less than n, it will set to 0.
+//
+func (msg *Message) SubTTL(n uint32) {
+	for x := 0; x < len(msg.Answer); x++ {
+		if msg.Answer[x].TTL < n {
+			msg.Answer[x].TTL = 0
+		} else {
+			msg.Answer[x].TTL -= n
+		}
+		libbytes.WriteUint32(&msg.Packet, msg.Answer[x].offTTL,
+			msg.Answer[x].TTL)
+	}
+	for x := 0; x < len(msg.Authority); x++ {
+		if msg.Authority[x].TTL < n {
+			msg.Authority[x].TTL = 0
+		} else {
+			msg.Authority[x].TTL -= n
+		}
+		libbytes.WriteUint32(&msg.Packet, msg.Authority[x].offTTL,
+			msg.Authority[x].TTL)
+	}
+	for x := 0; x < len(msg.Additional); x++ {
+		if msg.Additional[x].Type == QueryTypeOPT {
+			continue
+		}
+		if msg.Additional[x].TTL < n {
+			msg.Additional[x].TTL = 0
+		} else {
+			msg.Additional[x].TTL -= n
+		}
+		libbytes.WriteUint32(&msg.Packet, msg.Additional[x].offTTL,
+			msg.Additional[x].TTL)
+	}
+}
+
+//
 // String return the message representation as string.
 //
 func (msg *Message) String() string {

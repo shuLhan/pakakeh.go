@@ -58,7 +58,8 @@ type ResourceRecord struct {
 	OPT   *RDataOPT
 	SRV   *RDataSRV
 
-	off uint
+	off    uint
+	offTTL uint
 }
 
 //
@@ -135,6 +136,7 @@ func (rr *ResourceRecord) Reset() {
 	rr.MX = nil
 	rr.OPT = nil
 	rr.off = 0
+	rr.offTTL = 0
 }
 
 func (rr *ResourceRecord) String() string {
@@ -170,6 +172,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	x += 2
 	rr.Class = uint16(libbytes.ReadUint16(packet, x))
 	x += 2
+	rr.offTTL = x
 	rr.TTL = libbytes.ReadUint32(packet, x)
 	x += 4
 	rr.rdlen = libbytes.ReadUint16(packet, x)
