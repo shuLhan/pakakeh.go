@@ -84,6 +84,16 @@ func WriteUint16(data *[]byte, x uint, v uint16) {
 }
 
 //
+// WriteUint32 into slice of byte.
+//
+func WriteUint32(data *[]byte, x uint, v uint32) {
+	(*data)[x] = byte(v >> 24)
+	(*data)[x+1] = byte(v >> 16)
+	(*data)[x+2] = byte(v >> 8)
+	(*data)[x+3] = byte(v)
+}
+
+//
 // AppendInt16 into slice of byte.
 //
 func AppendInt16(data *[]byte, v int16) {
