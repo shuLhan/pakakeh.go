@@ -88,7 +88,6 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 	msg := NewMessage()
 
 	msg.Header.ID = getNextID()
-	msg.Header.IsRD = true
 	msg.Header.QDCount = 1
 	msg.Question.Type = qtype
 	msg.Question.Class = qclass

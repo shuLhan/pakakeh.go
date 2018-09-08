@@ -70,7 +70,10 @@ type Message struct {
 //
 func NewMessage() *Message {
 	return &Message{
-		Header:   &SectionHeader{},
+		Header: &SectionHeader{
+			IsQuery: true,
+			IsRD:    true,
+		},
 		Question: &SectionQuestion{},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),

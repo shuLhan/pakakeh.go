@@ -108,7 +108,7 @@ func (hdr *SectionHeader) Reset() {
 	hdr.Op = OpCodeQuery
 	hdr.IsAA = false
 	hdr.IsTC = false
-	hdr.IsRD = false
+	hdr.IsRD = true
 	hdr.IsRA = false
 	hdr.RCode = RCodeOK
 	hdr.QDCount = 0
