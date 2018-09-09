@@ -16,7 +16,10 @@ package dns
 
 import (
 	"errors"
+	"net"
 	"time"
+
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 // DefaultPort define default DNS remote or listen port.
@@ -162,3 +165,22 @@ const (
 	// zone transfer) for particular data.
 	RCodeRefused
 )
+
+//
+// ParseNameServers parse list of nameserver into UDP addresses.
+// If one of nameserver is invalid it will stop parsing and return only valid
+// nameserver addresses with error.
+//
+func ParseNameServers(nameservers []string) ([]*net.UDPAddr, error) {
+	udpAddrs := make([]*net.UDPAddr, 0)
+
+	for _, ns := range nameservers {
+		addr, err := libnet.ParseUDPAddr(ns, DefaultPort)
+		if err != nil {
+			return udpAddrs, err
+		}
+		udpAddrs = append(udpAddrs, addr)
+	}
+
+	return udpAddrs, nil
+}
