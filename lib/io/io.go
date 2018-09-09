@@ -3,6 +3,8 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package io provide a library for reading file.
+// Package io provide a library for reading and watching file.
 //
 package io
+
+var _debug = 0
