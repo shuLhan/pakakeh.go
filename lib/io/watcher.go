@@ -57,8 +57,7 @@ func (w *Watcher) start(oldStat os.FileInfo) {
 		newStat, err := os.Stat(w.file)
 		if err != nil {
 			w.cin <- nil
-			w.Stop()
-			return
+			continue
 		}
 		if oldStat.Size() != newStat.Size() ||
 			oldStat.Mode() != newStat.Mode() ||
