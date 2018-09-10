@@ -31,10 +31,6 @@ type Watcher struct {
 // seconds).
 //
 func NewWatcher(file string, d time.Duration) (*Watcher, error) {
-	oldStat, err := os.Stat(file)
-	if err != nil {
-		return nil, err
-	}
 	if d <= 0 {
 		d = time.Second * 5
 	}
@@ -47,16 +43,22 @@ func NewWatcher(file string, d time.Duration) (*Watcher, error) {
 		ticker: time.NewTicker(d),
 	}
 
-	go watcher.start(oldStat)
+	go watcher.start()
 
 	return watcher, nil
 }
 
-func (w *Watcher) start(oldStat os.FileInfo) {
+func (w *Watcher) start() {
+	oldStat, _ := os.Stat(w.file)
 	for _ = range w.ticker.C {
 		newStat, err := os.Stat(w.file)
 		if err != nil {
 			w.cin <- nil
+			continue
+		}
+		if oldStat == nil {
+			w.cin <- &newStat
+			oldStat = newStat
 			continue
 		}
 		if oldStat.Size() != newStat.Size() ||
