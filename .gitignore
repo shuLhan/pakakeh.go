@@ -3,4 +3,5 @@
 *.test
 /gofmtcomment
 /lib/dns/testdata/hosts.block.out
+/lib/git/testdata/beku_test
 cover.*
