@@ -14,6 +14,7 @@ import (
 
 var (
 	_stderr *os.File
+	_stdin  *os.File
 	_stdout *os.File
 )
 
@@ -27,6 +28,16 @@ func Close() {
 			log.Printf("! Close: %s\n", err)
 		}
 		err = os.Remove(_stderr.Name())
+		if err != nil {
+			log.Printf("! Close: os.Remove: %s\n", err)
+		}
+	}
+	if _stdin != nil {
+		err := _stdin.Close()
+		if err != nil {
+			log.Printf("! Close: %s\n", err)
+		}
+		err = os.Remove(_stdin.Name())
 		if err != nil {
 			log.Printf("! Close: os.Remove: %s\n", err)
 		}
@@ -94,6 +105,20 @@ func Stderr() *os.File {
 }
 
 //
+// Stdin mock the standar input using temporary file.
+//
+func Stdin() *os.File {
+	var err error
+
+	_stdin, err = ioutil.TempFile("", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return _stdin
+}
+
+//
 // Stdout mock standard output to temporary file.
 //
 func Stdout() *os.File {
@@ -130,6 +155,24 @@ func ResetStderr(truncate bool) {
 	}
 	if truncate {
 		_stderr.Truncate(0)
+	}
+}
+
+//
+// ResetStdin reset mocked standard input offset back to 0.
+// If truncated is true, it also reset the size to 0.
+//
+func ResetStdin(truncate bool) {
+	if _stdin == nil {
+		return
+	}
+
+	_, err := _stdin.Seek(0, io.SeekStart)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if truncate {
+		_stdin.Truncate(0)
 	}
 }
 
