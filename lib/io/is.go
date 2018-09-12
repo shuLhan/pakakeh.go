@@ -7,6 +7,7 @@ package io
 import (
 	"io"
 	"os"
+	"path/filepath"
 )
 
 //
@@ -30,4 +31,21 @@ func IsDirEmpty(dir string) (ok bool) {
 	_ = d.Close()
 
 	return
+}
+
+//
+// IsFileExist will return true if relative path is exist on parent directory;
+// otherwise it will return false.
+//
+func IsFileExist(parent, relpath string) bool {
+	path := filepath.Join(parent, relpath)
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	if fi.IsDir() {
+		return false
+	}
+	return true
 }

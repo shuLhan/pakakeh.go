@@ -43,3 +43,39 @@ func TestIsDirEmpty(t *testing.T) {
 		test.Assert(t, "", c.exp, got, true)
 	}
 }
+
+func TestIsFileExist(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc, parent, relpath string
+		exp                   bool
+	}{{
+		desc:    "With directory",
+		relpath: "testdata",
+	}, {
+		desc:    "With non existen path",
+		parent:  "/random",
+		relpath: "file",
+	}, {
+		desc:    "With file exist without parent",
+		relpath: "testdata/file",
+		exp:     true,
+	}, {
+		desc:    "With file exist",
+		parent:  wd,
+		relpath: "testdata/file",
+		exp:     true,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := IsFileExist(c.parent, c.relpath)
+
+		test.Assert(t, "", c.exp, got, true)
+	}
+}
