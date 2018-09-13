@@ -58,7 +58,10 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 		return err
 	}
 
-	cmd = exec.Command("git")
+	cmd = exec.Command("git", "checkout")
+	if debug.Value == 0 {
+		cmd.Args = append(cmd.Args, "--quiet")
+	}
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
@@ -66,7 +69,7 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 	if len(ref) == 0 {
 		ref = _defRef
 	}
-	cmd.Args = append(cmd.Args, "checkout", "--quiet", "--track", ref)
+	cmd.Args = append(cmd.Args, "--track", ref)
 
 	if len(branch) == 0 {
 		branch = _defBranch
@@ -82,12 +85,15 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 		return err
 	}
 
-	cmd = exec.Command("git")
+	cmd = exec.Command("git", "reset")
+	if debug.Value == 0 {
+		cmd.Args = append(cmd.Args, "--quiet")
+	}
+	cmd.Args = append(cmd.Args, "--hard", revision)
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	cmd.Args = append(cmd.Args, "reset", "--quiet", "--hard", revision)
 	if debug.Value >= 1 {
 		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
 	}
@@ -111,8 +117,11 @@ func Clone(remoteURL, dest string) (err error) {
 		return
 	}
 
-	cmd := exec.Command("git")
-	cmd.Args = append(cmd.Args, "clone", "--quiet", remoteURL, ".")
+	cmd := exec.Command("git", "clone")
+	if debug.Value == 0 {
+		cmd.Args = append(cmd.Args, "--quiet")
+	}
+	cmd.Args = append(cmd.Args, remoteURL, ".")
 	cmd.Dir = dest
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
@@ -133,8 +142,11 @@ func Clone(remoteURL, dest string) (err error) {
 // FetchAll will fetch the latest commits from remote.
 //
 func FetchAll(repoDir string) error {
-	cmd := exec.Command("git")
-	cmd.Args = append(cmd.Args, "fetch", "--quiet", "--all")
+	cmd := exec.Command("git", "fetch")
+	if debug.Value == 0 {
+		cmd.Args = append(cmd.Args, "--quiet")
+	}
+	cmd.Args = append(cmd.Args, "--all")
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
