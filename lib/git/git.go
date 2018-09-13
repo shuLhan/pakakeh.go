@@ -31,7 +31,7 @@ var (
 // CheckoutRevision will set the HEAD to specific revision on specific branch.
 // Any untracked files and directories will be removed before checking out
 // existing branch or creating new branch.
-// If ref is empty, it will use default reference "origin/master".
+// If remoteName is empty, it will use default reference "origin".
 // If branch is empty, it will use default branch "master".
 // If revision is empty, it will do nothing.
 //
@@ -39,10 +39,17 @@ var (
 // Client may call FetchAll() before, to prevent checking out revision that
 // may not exist.
 //
-func CheckoutRevision(repoDir, ref, branch, revision string) error {
+func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
+	if len(remoteName) == 0 {
+		remoteName = _defRemoteName
+	}
+	if len(branch) == 0 {
+		branch = _defBranch
+	}
 	if len(revision) == 0 {
 		return nil
 	}
+	ref := remoteName + "/" + branch
 
 	cmd := exec.Command("git")
 	cmd.Args = append(cmd.Args, "clean", "-qdff")
@@ -62,19 +69,10 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 	if debug.Value == 0 {
 		cmd.Args = append(cmd.Args, "--quiet")
 	}
+	cmd.Args = append(cmd.Args, "--track", ref, "-B", branch)
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-
-	if len(ref) == 0 {
-		ref = _defRef
-	}
-	cmd.Args = append(cmd.Args, "--track", ref)
-
-	if len(branch) == 0 {
-		branch = _defBranch
-	}
-	cmd.Args = append(cmd.Args, "-B", branch)
 
 	if debug.Value >= 1 {
 		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
