@@ -290,7 +290,7 @@ func TestRemoteChange(t *testing.T) {
 	}{{
 		desc:      "With empty oldName",
 		expErr:    "RemoteChange: exit status 128",
-		expStderr: "fatal: No such remote: ''\n",
+		expStderr: "fatal: No such remote: \n",
 	}, {
 		desc:      "With empty newName",
 		oldName:   "origin",
