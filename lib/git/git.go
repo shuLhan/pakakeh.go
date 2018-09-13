@@ -267,6 +267,9 @@ func LatestTag(repoDir string) (tag string, err error) {
 	}
 
 	out := string(bytes.TrimSpace(bout))
+	if len(out) == 0 {
+		return
+	}
 
 	cmd = exec.Command("git")
 	cmd.Args = append(cmd.Args, "describe", "--tags", "--abbrev=0", out)
@@ -294,7 +297,7 @@ func LatestTag(repoDir string) (tag string, err error) {
 //
 func LatestVersion(repoDir string) (version string, err error) {
 	version, err = LatestTag(repoDir)
-	if err == nil {
+	if err == nil && len(version) > 0 {
 		return
 	}
 
