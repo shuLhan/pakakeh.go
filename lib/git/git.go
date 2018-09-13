@@ -35,6 +35,10 @@ var (
 // If branch is empty, it will use default branch "master".
 // If revision is empty, it will do nothing.
 //
+// This function assume that repository is up-to-date with remote.
+// Client may call FetchAll() before, to prevent checking out revision that
+// may not exist.
+//
 func CheckoutRevision(repoDir, ref, branch, revision string) error {
 	if len(revision) == 0 {
 		return nil
@@ -49,12 +53,6 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
 	}
 	err := cmd.Run()
-	if err != nil {
-		err = fmt.Errorf("CheckoutRevision: %s", err)
-		return err
-	}
-
-	err = FetchAll(repoDir)
 	if err != nil {
 		err = fmt.Errorf("CheckoutRevision: %s", err)
 		return err
