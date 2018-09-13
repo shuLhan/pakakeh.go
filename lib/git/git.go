@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/ini"
 )
 
@@ -22,7 +23,6 @@ const (
 )
 
 var (
-	_debug  int
 	_stdout = os.Stdout
 	_stderr = os.Stderr
 )
@@ -45,7 +45,7 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
 	}
 	err := cmd.Run()
@@ -75,7 +75,7 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 	}
 	cmd.Args = append(cmd.Args, "-B", branch)
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
 	}
 	err = cmd.Run()
@@ -90,7 +90,7 @@ func CheckoutRevision(repoDir, ref, branch, revision string) error {
 	cmd.Stderr = _stderr
 
 	cmd.Args = append(cmd.Args, "reset", "--quiet", "--hard", revision)
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
 	}
 	err = cmd.Run()
@@ -119,7 +119,7 @@ func Clone(remoteURL, dest string) (err error) {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= Clone %s %s %s\n", remoteURL, cmd.Dir, cmd.Args)
 	}
 
@@ -141,7 +141,7 @@ func FetchAll(repoDir string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= FetchAll %s %s\n", cmd.Dir, cmd.Args)
 	}
 
@@ -193,8 +193,8 @@ func GetTag(repoDir, revision string) (tag string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
-		fmt.Printf("GetTag %s %s\n", cmd.Dir, cmd.Args)
+	if debug.Value >= 1 {
+		fmt.Printf("= GetTag %s %s\n", cmd.Dir, cmd.Args)
 	}
 
 	btag, err := cmd.Output()
@@ -222,8 +222,8 @@ func LatestCommit(repoDir, ref string) (commit string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
-		fmt.Printf("LatestCommit %s %s\n", cmd.Dir, cmd.Args)
+	if debug.Value >= 1 {
+		fmt.Printf("= LatestCommit %s %s\n", cmd.Dir, cmd.Args)
 	}
 
 	bcommit, err := cmd.Output()
@@ -246,7 +246,7 @@ func LatestTag(repoDir string) (tag string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= LatestTag %s %s\n", cmd.Dir, cmd.Args)
 	}
 
@@ -263,7 +263,7 @@ func LatestTag(repoDir string) (tag string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= LatestTag %s %s\n", cmd.Dir, cmd.Args)
 	}
 
@@ -308,7 +308,7 @@ func LogRevisions(repoDir, prevRevision, nextRevision string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= CompareRevisions %s %s\n", cmd.Dir, cmd.Args)
 	}
 
@@ -335,7 +335,7 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= RemoteChange %s %s\n", cmd.Dir, cmd.Args)
 	}
 
@@ -351,7 +351,7 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		fmt.Printf("= RemoteChange %s %s\n", cmd.Dir, cmd.Args)
 	}
 
