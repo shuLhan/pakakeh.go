@@ -373,3 +373,49 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 
 	return err
 }
+
+//
+// RemoteBranches return list of remote branches.
+//
+func RemoteBranches(repoDir string) ([]string, error) {
+	if len(repoDir) == 0 {
+		return nil, nil
+	}
+
+	cmd := exec.Command("git", "--no-pager", "branch", "-r", "--format", "%(refname:lstrip=3)")
+	cmd.Dir = repoDir
+	cmd.Stderr = _stderr
+
+	if debug.Value >= 1 {
+		fmt.Printf("= RemoteBranches %s %s\n", cmd.Dir, cmd.Args)
+	}
+
+	bout, err := cmd.Output()
+	if err != nil {
+		err = fmt.Errorf("RemoteBranches: %s", err)
+		return nil, err
+	}
+
+	bbranches := bytes.Split(bout, []byte{'\n'})
+	if len(bbranches) == 0 {
+		return nil, err
+	}
+
+	var branches []string
+	bHEAD := []byte("HEAD")
+	for x := 0; x < len(bbranches); x++ {
+		if len(bbranches[x]) == 0 {
+			continue
+		}
+		if bytes.Equal(bbranches[x], bHEAD) {
+			continue
+		}
+		branches = append(branches, string(bbranches[x]))
+	}
+
+	if debug.Value >= 1 {
+		fmt.Printf("= RemoteBranches: %s\n", branches)
+	}
+
+	return branches, nil
+}
