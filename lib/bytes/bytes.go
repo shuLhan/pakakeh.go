@@ -153,10 +153,7 @@ func CutUntilToken(line, token []byte, startAt int, checkEsc bool) ([]byte, int,
 // If no `leftcap` or `rightcap` is found, it will return line as is, and
 // status will be false.
 //
-func EncloseRemove(line, leftcap, rightcap []byte) (
-	newline []byte,
-	status bool,
-) {
+func EncloseRemove(line, leftcap, rightcap []byte) ([]byte, bool) {
 	lidx := TokenFind(line, leftcap, 0)
 	ridx := TokenFind(line, rightcap, lidx+1)
 
@@ -164,14 +161,12 @@ func EncloseRemove(line, leftcap, rightcap []byte) (
 		return line, false
 	}
 
+	var newline []byte
 	newline = append(newline, line[:lidx]...)
 	newline = append(newline, line[ridx+len(rightcap):]...)
-	status = true
-
-	// Repeat
 	newline, _ = EncloseRemove(newline, leftcap, rightcap)
 
-	return
+	return newline, true
 }
 
 //
