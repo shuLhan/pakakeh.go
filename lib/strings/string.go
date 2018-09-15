@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package string provide a library for working with string.
-package string
+package strings
 
 import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
