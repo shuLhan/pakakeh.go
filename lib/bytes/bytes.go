@@ -28,6 +28,42 @@ var (
 )
 
 //
+// AppendInt16 into slice of byte.
+//
+func AppendInt16(data *[]byte, v int16) {
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
+// AppendInt32 into slice of byte.
+//
+func AppendInt32(data *[]byte, v int32) {
+	*data = append(*data, byte(v>>24))
+	*data = append(*data, byte(v>>16))
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
+// AppendUint16 into slice of byte.
+//
+func AppendUint16(data *[]byte, v uint16) {
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
+// AppendUint32 into slice of byte.
+//
+func AppendUint32(data *[]byte, v uint32) {
+	*data = append(*data, byte(v>>24))
+	*data = append(*data, byte(v>>16))
+	*data = append(*data, byte(v>>8))
+	*data = append(*data, byte(v))
+}
+
+//
 // PrintHex will print each byte in slice as hexadecimal value into N column
 // length.
 //
@@ -76,60 +112,6 @@ func ReadUint32(data []byte, x uint) uint32 {
 }
 
 //
-// WriteUint16 into slice of byte.
-//
-func WriteUint16(data *[]byte, x uint, v uint16) {
-	(*data)[x] = byte(v >> 8)
-	(*data)[x+1] = byte(v)
-}
-
-//
-// WriteUint32 into slice of byte.
-//
-func WriteUint32(data *[]byte, x uint, v uint32) {
-	(*data)[x] = byte(v >> 24)
-	(*data)[x+1] = byte(v >> 16)
-	(*data)[x+2] = byte(v >> 8)
-	(*data)[x+3] = byte(v)
-}
-
-//
-// AppendInt16 into slice of byte.
-//
-func AppendInt16(data *[]byte, v int16) {
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
-}
-
-//
-// AppendInt32 into slice of byte.
-//
-func AppendInt32(data *[]byte, v int32) {
-	*data = append(*data, byte(v>>24))
-	*data = append(*data, byte(v>>16))
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
-}
-
-//
-// AppendUint16 into slice of byte.
-//
-func AppendUint16(data *[]byte, v uint16) {
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
-}
-
-//
-// AppendUint32 into slice of byte.
-//
-func AppendUint32(data *[]byte, v uint32) {
-	*data = append(*data, byte(v>>24))
-	*data = append(*data, byte(v>>16))
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
-}
-
-//
 // ToLower convert slice of bytes to lower cases, in places.
 //
 func ToLower(data *[]byte) {
@@ -151,4 +133,22 @@ func ToUpper(data *[]byte) {
 		}
 		(*data)[x] = (*data)[x] - 32
 	}
+}
+
+//
+// WriteUint16 into slice of byte.
+//
+func WriteUint16(data *[]byte, x uint, v uint16) {
+	(*data)[x] = byte(v >> 8)
+	(*data)[x+1] = byte(v)
+}
+
+//
+// WriteUint32 into slice of byte.
+//
+func WriteUint32(data *[]byte, x uint, v uint32) {
+	(*data)[x] = byte(v >> 24)
+	(*data)[x+1] = byte(v >> 16)
+	(*data)[x+2] = byte(v >> 8)
+	(*data)[x+3] = byte(v)
 }
