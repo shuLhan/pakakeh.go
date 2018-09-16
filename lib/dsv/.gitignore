@@ -1,0 +1,8 @@
+rejected.dat
+testdata/output.dat
+testdata/output_merge_columns.dat
+testdata/output_merge_rows.dat
+testdata/output_skip.dat
+testdata/rejected.dat
+testdata/writerawcolumns.out
+testdata/writerawrows.out

@@ -1,0 +1,54 @@
+{
+	"Input"		:"input.dat"
+,	"Rejected"	:"rejected.dat"
+,	"Skip"		:1
+,	"MaxRows"	:1
+,	"InputMetadata"	:
+	[{
+		"Name"		:"id"
+	,	"Separator"	:";"
+	,	"Type"		:"integer"
+	,	"Skip"		:true
+	},{
+		"Name"		:"name"
+	,	"Separator"	:"-"
+	,	"LeftQuote"	:"\""
+	,	"RightQuote"	:"\""
+	},{
+		"Name"		:"value"
+	,	"Separator"	:";"
+	,	"LeftQuote"	:"[["
+	,	"RightQuote"	:"]]"
+	},{
+		"Name"		:"integer"
+	,	"Type"		:"integer"
+	,	"Separator"	:";"
+	},{
+		"Name"		:"real"
+	,	"Type"		:"real"
+	}]
+,	"Output"	:"testdata/output_skip.dat"
+,	"OutputMetadata":
+	[{
+		"Name"		:"real"
+	,	"Separator"	:";"
+	},{
+		"Name"		:"integer"
+	,	"Separator"	:";"
+	},{
+		"Name"		:"value"
+	,	"Separator"	:";"
+	,	"LeftQuote"	:"{{"
+	,	"RightQuote"	:"}}"
+	},{
+		"Name"		:"name"
+	,	"RightQuote"	:"#"
+	},{
+		"Name"		:"id"
+	,	"LeftQuote"	:"ID "
+	,	"Separator"	:"/"
+	},{
+		"Name"		:"invalid"
+	,	"Separator"	:";"
+	}]
+}

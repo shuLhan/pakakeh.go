@@ -1,0 +1,22 @@
+ID 1/A-B#	{{AB}};1;0.1
+ID 2/A-B-C#	{{BCD}};2;0.02
+ID 3/A;B-C,D#	{{A;B C,D}};3;0.003
+ID 4/A;B-C,D#	{{A;B C D}};4;0.0004
+ID 6/#	{{}};6;0.000006
+ID 8/ok#	{{missing right-quote];8;0.00000008
+9;"ok"-[[ok}};9;0.000000009
+ID 10/test#	{{integer}};10;0.101
+ID 12/test#	{{real}};123456789;0.123456789
+ID 13/string with#	{{string with}};13;13
+ID 14/string with" quote#	{{string with]] escape}};14;14
+ID 1/A-B#	{{AB}};1;0.1
+ID 2/A-B-C#	{{BCD}};2;0.02
+ID 3/A;B-C,D#	{{A;B C,D}};3;0.003
+ID 4/A;B-C,D#	{{A;B C D}};4;0.0004
+ID 6/#	{{}};6;0.000006
+ID 8/ok#	{{missing right-quote];8;0.00000008
+9;"ok"-[[ok}};9;0.000000009
+ID 10/test#	{{integer}};10;0.101
+ID 12/test#	{{real}};123456789;0.123456789
+ID 13/string with#	{{string with}};13;13
+ID 14/string with" quote#	{{string with]] escape}};14;14

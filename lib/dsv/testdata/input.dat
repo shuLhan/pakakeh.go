@@ -1,0 +1,15 @@
+"id","name","value","integer";"real"
+1;"A-B"-[[AB]];1;0.1
+2;"A-B-C"-[[BCD]];2;0.02
+3;"A;B-C,D"-[[A;B C,D]];3;0.003
+4;"A;B-C,D"-[[A;B C D]];4;0.0004
+5;"A;B-C,D-"[[A;B C D]];5;0.00005
+6;""-[[]];6;0.000006
+7;"ok"-[missing left-quote]];7;0.0000007
+8;"ok"-[[missing right-quote];8;0.00000008
+9;"ok"-[[ok]];9;0.000000009
+10;"test"-[[integer]];010;0.101
+11;"test"-[[integer]];1a;0.1001
+12;"test"-[[real]];123456789;00.123456789
+13;"string with" quote"-[[string with]];13;13.0
+14;"string with\" quote"-[[string with\]] escape]];14;14.0

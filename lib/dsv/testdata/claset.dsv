@@ -1,0 +1,7 @@
+{
+	"Input"		:"input.dat"
+,	"Rejected"	:"rejected.dat"
+,	"Skip"		:1
+,	"MaxRows"	:2
+,	"ClassIndex"	:3
+}

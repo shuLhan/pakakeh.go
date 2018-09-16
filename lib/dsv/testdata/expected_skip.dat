@@ -1,0 +1,11 @@
+0.1;1;{{AB}};A-B#
+0.02;2;{{BCD}};A-B-C#
+0.003;3;{{A;B C,D}};A;B-C,D#
+0.0004;4;{{A;B C D}};A;B-C,D#
+0.000006;6;{{}};#
+0.000000009;9;{{missing right-quote];8;0.00000008
+9;"ok"-[[ok}};ok#
+0.101;10;{{integer}};test#
+0.123456789;123456789;{{real}};test#
+13;13;{{string with}};string with#
+14;14;{{string with]] escape}};string with" quote#
