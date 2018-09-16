@@ -1,0 +1,113 @@
+// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package strings
+
+import (
+	"fmt"
+)
+
+func ExampleCountAlnum() {
+	fmt.Println(CountAlnum("// A b c 1 2 3"))
+	// Output: 6
+}
+
+func ExampleCountAlnumDistribution() {
+	chars, counts := CountAlnumDistribution("// A b c A b")
+	fmt.Printf("%c %v\n", chars, counts)
+	// Output: [A b c] [2 2 1]
+}
+
+func ExampleCountCharSequence() {
+	text := "aaa abcdee ffgf"
+
+	chars, counts := CountCharSequence(text)
+
+	// 'a' is not counted as 4 because its breaked by another character,
+	// space ' '.
+	fmt.Printf("%c %v\n", chars, counts)
+	// Output:
+	// [a e f] [3 2 2]
+}
+
+func ExampleCountDigit() {
+	text := "// Copyright 2018 Mhd Sulhan <ms@kilabit.info>. All rights reserved."
+	fmt.Println(CountDigit(text))
+	// Output: 4
+}
+
+func ExampleCountUniqChar() {
+	fmt.Println(CountUniqChar("abc abc"))
+	fmt.Println(CountUniqChar("abc ABC"))
+	// Output:
+	// 4
+	// 7
+}
+
+func ExampleCountUpperLower() {
+	fmt.Println(CountUpperLower("// A B C d e f g h I J K"))
+	// Output: 6 5
+}
+
+func ExampleMaxCharSequence() {
+	c, n := MaxCharSequence("aaa abcdee ffgf")
+
+	fmt.Printf("%c %d\n", c, n)
+	// Output: a 3
+}
+
+func ExampleRatioAlnum() {
+	fmt.Println(RatioAlnum("//A1"))
+	// Output: 0.5
+}
+
+func ExampleRatioDigit() {
+	fmt.Println(RatioDigit("// A b 0 1"))
+	// Output: 0.2
+}
+
+func ExampleRatioNonAlnum() {
+	fmt.Println(RatioNonAlnum("// A1", false))
+	fmt.Println(RatioNonAlnum("// A1", true))
+	// Output:
+	// 0.4
+	// 0.6
+}
+
+func ExampleRatioUpper() {
+	fmt.Println(RatioUpper("// A b c d"))
+	// Output: 0.25
+}
+
+func ExampleRatioUpperLower() {
+	fmt.Println(RatioUpperLower("// A b c d e"))
+	// Output: 0.25
+}
+
+func ExampleTextSumCountTokens() {
+	text := "[[aa]] [[AA]]"
+
+	tokens := []string{"[["}
+	fmt.Println(TextSumCountTokens(text, tokens, false))
+
+	tokens = []string{"aa"}
+	fmt.Println(TextSumCountTokens(text, tokens, false))
+
+	fmt.Println(TextSumCountTokens(text, tokens, true))
+
+	// Output:
+	// 2
+	// 2
+	// 1
+}
+
+func ExampleTextFrequencyOfTokens() {
+	text := "a b c d A B C D 1 2"
+
+	fmt.Println(TextFrequencyOfTokens(text, []string{"a"}, false))
+	fmt.Println(TextFrequencyOfTokens(text, []string{"a"}, true))
+	// Output:
+	// 0.2
+	// 0.1
+}
