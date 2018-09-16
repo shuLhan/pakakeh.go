@@ -1,0 +1,41 @@
+{
+	"Input"			:"../../testdata/iris/iris.dat"
+,	"Rejected"		:"iris.rej"
+,	"MaxRows"		:-1
+,	"ClassIndex"		:4
+,	"DatasetMode"		:"matrix"
+,	"SplitMethod"		:"gini"
+,	"NTree"			:50
+,	"NRandomFeature"	:2
+,	"RunOOB"		:true
+,	"OOBStatsFile"		:"iris.oob.stat"
+,	"PerfFile"		:"iris.perf"
+,	"StatFile"		:"iris.stat"
+,	"InputMetadata"		:
+	[{
+		"Name"			:"sepal-length"
+	,	"Separator"		:","
+	,	"Type"			:"real"
+	},{
+		"Name"			:"sepal-width"
+	,	"Separator"		:","
+	,	"Type"			:"real"
+	},{
+		"Name"			:"petal-length"
+	,	"Separator"		:","
+	,	"Type"			:"real"
+	},{
+		"Name"			:"petal-width"
+	,	"Separator"		:","
+	,	"Type"			:"real"
+	},{
+		"Name"			:"class"
+	,	"Type"			:"string"
+	,	"ValueSpace"		:
+		[
+			"Iris-setosa"
+		,	"Iris-versicolor"
+		,	"Iris-virginica"
+		]
+	}]
+}

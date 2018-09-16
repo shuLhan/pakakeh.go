@@ -1,0 +1,97 @@
+{
+	"Input"			:"fgl.data"
+,	"Rejected"		:"glass.rej"
+,	"MaxRows"		:-1
+,	"ClassMetadataIndex"	:10
+,	"ClassIndex"		:9
+,	"DatasetMode"		:"matrix"
+,	"InputMetadata"		:
+	[{
+		"Name"			:"ID"
+	,	"Separator"		:" "
+	,	"Type"			:"integer"
+	,	"Skip"			:true
+	},{
+		"Name"			:"RI"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"NA20"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"MGO"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"AL203"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"SI02"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"K20"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"CAO"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"BAO"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"FE203"
+	,	"Separator"		:" "
+	,	"Type"			:"real"
+	},{
+		"Name"			:"TYPE"
+	,	"Type"			:"string"
+	,	"ValueSpace"		:
+		[
+			"WinF"
+		,	"WinNF"
+		,	"Veh"
+		,	"Con"
+		,	"Tabl"
+		,	"Head"
+		]
+	}]
+
+,	"Output"		:"glass.out"
+,	"OutputMetadata"	:
+	[{
+		"Name"			:"RI"
+	,	"Separator"		:","
+	},{
+		"Name"			:"NA20"
+	,	"Separator"		:","
+	},{
+		"Name"			:"MGO"
+	,	"Separator"		:","
+	},{
+		"Name"			:"AL203"
+	,	"Separator"		:","
+	},{
+		"Name"			:"SI02"
+	,	"Separator"		:","
+	},{
+		"Name"			:"K20"
+	,	"Separator"		:","
+	},{
+		"Name"			:"CAO"
+	,	"Separator"		:","
+	},{
+		"Name"			:"BAO"
+	,	"Separator"		:","
+	},{
+		"Name"			:"FE203"
+	,	"Separator"		:","
+	},{
+		"Name"			:"TYPE"
+	,	"Type"			:"integer"
+	}]
+}

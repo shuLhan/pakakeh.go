@@ -1,0 +1,129 @@
+{
+	"Input"			: "wvc2010_features.lnsmote.dat"
+,	"Rejected"		: "wvc2010_features.lnsmote.rej"
+,	"DatasetMode"		: "matrix"
+,	"MaxRows"		: -1
+,	"ClassIndex"		: 27
+
+,	"NTree"			: 500
+,	"PercentBoot"		: 66
+,	"StatsFile"		: "randomforest.lnsmote.stats.dat"
+
+,	"InputMetadata"		: [{
+		"Name"		: "anonim"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "comment_length"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "size_increment"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "size_ratio"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "upper_lower_ratio"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "upper_to_all_ratio"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "digit_ratio"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "non_alnum_ratio"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "char_diversity"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "char_distribution_insert"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "compress_rate"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "good_token"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "term_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "longest_word"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "longest_char_sequence"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_vulgar_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_vulgar_impact"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_pronoun_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_pronoun_impact"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_bias_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_bias_impact"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_sex_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_sex_impact"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_bad_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_bad_impact"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_all_frequency"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "words_all_impact"
+	,	"Type"		: "real"
+	,	"Separator"	: ","
+	},{
+		"Name"		: "class"
+	,	"Type"		: "real"
+	,	"ValueSpace"	:
+		[
+			"1"
+		,	"0"
+		]
+	}]
+}

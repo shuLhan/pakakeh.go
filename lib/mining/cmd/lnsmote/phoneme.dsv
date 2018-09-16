@@ -1,0 +1,45 @@
+{
+	"Input"		: "../../testdata/phoneme/phoneme.dat"
+,	"Rejected"	: "phoneme.rej"
+,	"MaxRows"	: -1
+,	"ClassIndex"	: 5
+,	"DatasetMode"	: "matrix"
+
+,	"K"		: 5
+
+,	"PercentOver"	: 100
+,	"SyntheticFile" : "phoneme.lnsmote.dat"
+
+,	"ClassMinor"	: "1"
+
+,	"InputMetadata"	:
+	[{
+		"Name"		:"f1"
+	,	"Type"		:"real"
+	,	"Separator"	:" "
+	},{
+		"Name"		:"f2"
+	,	"Type"		:"real"
+	,	"Separator"	:" "
+	},{
+		"Name"		:"f3"
+	,	"Type"		:"real"
+	,	"Separator"	:" "
+	},{
+		"Name"		:"f4"
+	,	"Type"		:"real"
+	,	"Separator"	:" "
+	},{
+		"Name"		:"f5"
+	,	"Type"		:"real"
+	,	"Separator"	:" "
+	},{
+		"Name"		:"class"
+	,	"Type"		:"string"
+	,	"ValueSpace"	:
+		[
+			"0"
+		,	"1"
+		]
+	}]
+}
