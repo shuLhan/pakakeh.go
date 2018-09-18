@@ -195,7 +195,8 @@ func ExampleServer() {
 	}
 
 	go func() {
-		err := server.ListenAndServe(serverAddress)
+		err := server.ListenAndServe(serverAddress,
+			"testdata/domain.crt", "testdata/domain.key", true)
 		if err != nil {
 			log.Fatal("ListenAndServe: ", err)
 		}

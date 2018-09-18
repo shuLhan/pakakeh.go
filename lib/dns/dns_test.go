@@ -167,9 +167,13 @@ func (h *serverHandler) ServeDNS(req *Request) {
 		res.SetID(req.Message.Header.ID)
 	}
 
-	_, err = req.Sender.Send(res, req.UDPAddr)
-	if err != nil {
-		log.Println("ServeDNS: ", err)
+	if req.Sender != nil {
+		_, err = req.Sender.Send(res, req.UDPAddr)
+		if err != nil {
+			log.Println("ServeDNS: ", err)
+		}
+	} else if req.ChanMessage != nil {
+		req.ChanMessage <- res
 	}
 
 	_testServer.FreeRequest(req)
@@ -188,7 +192,8 @@ func TestMain(m *testing.M) {
 	}
 
 	go func() {
-		err := _testServer.ListenAndServe(testServerAddress)
+		err := _testServer.ListenAndServe(testServerAddress,
+			"testdata/domain.crt", "testdata/domain.key", true)
 		if err != nil {
 			log.Fatal("ListenAndServe: ", err)
 		}

@@ -22,9 +22,10 @@ var _requestPool = sync.Pool{
 // Request contains UDP address and DNS query message from client.
 //
 type Request struct {
-	Message *Message
-	UDPAddr *net.UDPAddr
-	Sender  Sender
+	Message     *Message
+	UDPAddr     *net.UDPAddr
+	Sender      Sender
+	ChanMessage chan *Message
 }
 
 //
@@ -34,4 +35,5 @@ func (req *Request) Reset() {
 	req.Message.Reset()
 	req.UDPAddr = nil
 	req.Sender = nil
+	req.ChanMessage = nil
 }

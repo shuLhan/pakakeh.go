@@ -36,6 +36,10 @@ const (
 	rdataIPv6Size    = 16
 	// sectionHeaderSize define the size of section header in DNS message.
 	sectionHeaderSize = 12
+
+	dohHeaderKeyAccept      = "accept"
+	dohHeaderKeyContentType = "content-type"
+	dohHeaderValDNSMessage  = "application/dns-message"
 )
 
 //
