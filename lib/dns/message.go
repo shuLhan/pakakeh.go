@@ -73,8 +73,12 @@ func NewMessage() *Message {
 		Header: &SectionHeader{
 			IsQuery: true,
 			IsRD:    true,
+			QDCount: 1,
 		},
-		Question: &SectionQuestion{},
+		Question: &SectionQuestion{
+			Type:  QueryTypeA,
+			Class: QueryClassIN,
+		},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
