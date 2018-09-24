@@ -129,28 +129,6 @@ func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 }
 
 //
-// Send DNS message to name server using active connection in client.
-//
-// The message packet must already been filled, using Pack().
-// The addr parameter is unused.
-//
-func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
-	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
-	if err != nil {
-		return
-	}
-
-	packet := make([]byte, 0)
-
-	libbytes.AppendUint16(&packet, uint16(len(msg.Packet)))
-	packet = append(packet, msg.Packet...)
-
-	n, err = cl.conn.Write(packet)
-
-	return
-}
-
-//
 // Recv will read DNS message from active connection in client into `msg`.
 //
 func (cl *TCPClient) Recv(msg *Message) (n int, err error) {
@@ -180,4 +158,41 @@ func (cl *TCPClient) Recv(msg *Message) (n int, err error) {
 	}
 
 	return
+}
+
+//
+// Send DNS message to name server using active connection in client.
+//
+// The message packet must already been filled, using Pack().
+// The addr parameter is unused.
+//
+func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
+	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
+	if err != nil {
+		return
+	}
+
+	packet := make([]byte, 0)
+
+	libbytes.AppendUint16(&packet, uint16(len(msg.Packet)))
+	packet = append(packet, msg.Packet...)
+
+	n, err = cl.conn.Write(packet)
+
+	return
+}
+
+//
+// SetRemoteAddr set the remote address for sending the packet.
+//
+func (cl *TCPClient) SetRemoteAddr(addr string) (err error) {
+	cl.addr, err = net.ResolveTCPAddr("udp", addr)
+	return
+}
+
+//
+// SetTimeout set the timeout for sending and receiving packet.
+//
+func (cl *TCPClient) SetTimeout(t time.Duration) {
+	cl.Timeout = t
 }

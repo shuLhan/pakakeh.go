@@ -121,6 +121,29 @@ func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 }
 
 //
+// Recv will read DNS message from active connection in client into `msg`.
+//
+func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
+	err = cl.conn.SetReadDeadline(time.Now().Add(cl.Timeout))
+	if err != nil {
+		return
+	}
+
+	n, _, err = cl.conn.ReadFromUDP(msg.Packet)
+	if err != nil {
+		return
+	}
+
+	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
+
+	if debugLevel >= 2 {
+		libbytes.PrintHex(">>> UDPClient: Recv:", msg.Packet, 8)
+	}
+
+	return
+}
+
+//
 // Send DNS message to name server using active connection in client.
 //
 // The message packet must already been filled, using Pack().
@@ -144,24 +167,16 @@ func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 }
 
 //
-// Recv will read DNS message from active connection in client into `msg`.
+// SetRemoteAddr set the remote address for sending the packet.
 //
-func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
-	err = cl.conn.SetReadDeadline(time.Now().Add(cl.Timeout))
-	if err != nil {
-		return
-	}
-
-	n, _, err = cl.conn.ReadFromUDP(msg.Packet)
-	if err != nil {
-		return
-	}
-
-	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
-
-	if debugLevel >= 2 {
-		libbytes.PrintHex(">>> UDPClient: Recv:", msg.Packet, 8)
-	}
-
+func (cl *UDPClient) SetRemoteAddr(addr string) (err error) {
+	cl.Addr, err = net.ResolveUDPAddr("udp", addr)
 	return
+}
+
+//
+// SetTimeout set the timeout for sending and receiving packet.
+//
+func (cl *UDPClient) SetTimeout(t time.Duration) {
+	cl.Timeout = t
 }

@@ -269,3 +269,24 @@ func (cl *DoHClient) Send(msg *Message, ns net.Addr) (int, error) {
 
 	return len(msg.Packet), nil
 }
+
+//
+// SetRemoteAddr set the remote address for sending the packet.
+//
+func (cl *DoHClient) SetRemoteAddr(addr string) (err error) {
+	cl.addr, err = url.Parse(addr)
+	if err != nil {
+		return
+	}
+
+	cl.query = cl.addr.Query()
+
+	return
+}
+
+//
+// SetTimeout set the timeout for sending and receiving packet.
+//
+func (cl *DoHClient) SetTimeout(t time.Duration) {
+	cl.conn.Timeout = t
+}

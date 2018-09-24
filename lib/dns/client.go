@@ -6,6 +6,7 @@ package dns
 
 import (
 	"net"
+	"time"
 )
 
 //
@@ -15,6 +16,8 @@ type Client interface {
 	Close() error
 	RemoteAddr() string
 	Query(req *Message, ns net.Addr) (*Message, error)
+	SetTimeout(t time.Duration)
+	SetRemoteAddr(addr string) error
 	Sender
 	Receiver
 }
