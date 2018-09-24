@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/shuLhan/share/lib/test"
 )
@@ -207,6 +208,8 @@ func TestMain(m *testing.M) {
 			log.Fatal("ListenAndServe: ", err)
 		}
 	}()
+
+	time.Sleep(500 * time.Millisecond)
 
 	os.Exit(m.Run())
 }
