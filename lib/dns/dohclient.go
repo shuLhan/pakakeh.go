@@ -10,6 +10,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -24,6 +25,7 @@ type DoHClient struct {
 	req     *http.Request
 	query   url.Values
 	conn    *http.Client
+	chRes   chan *http.Response
 }
 
 //
@@ -60,6 +62,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
 			Transport: tr,
 			Timeout:   clientTimeout,
 		},
+		chRes: make(chan *http.Response, 1),
 	}
 
 	cl.req = &http.Request{
@@ -74,6 +77,14 @@ func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
 	}
 
 	return cl, nil
+}
+
+//
+// Close all idle connections.
+//
+func (cl *DoHClient) Close() error {
+	cl.conn.CloseIdleConnections()
+	return nil
 }
 
 func (cl *DoHClient) Lookup(qtype, qclass uint16, qname []byte) (*Message, error) {
@@ -185,4 +196,76 @@ func (cl *DoHClient) Get(msg *Message) (*Message, error) {
 	}
 
 	return res, err
+}
+
+//
+// Query send DNS query to name server.  This is an alias to Get method.
+// The addr parameter is unused.
+//
+func (cl *DoHClient) Query(msg *Message, ns net.Addr) (*Message, error) {
+	return cl.Get(msg)
+}
+
+//
+// Recv read response from channel.
+//
+func (cl *DoHClient) Recv(msg *Message) (int, error) {
+	httpRes := <-cl.chRes
+
+	if httpRes.StatusCode != 200 {
+		body, err := ioutil.ReadAll(httpRes.Body)
+		if err != nil {
+			return 0, err
+		}
+		err = fmt.Errorf("%s", string(body))
+		return 0, err
+	}
+
+	packet, err := ioutil.ReadAll(httpRes.Body)
+	if err != nil {
+		httpRes.Body.Close()
+		return 0, err
+	}
+
+	msg.Packet = append(msg.Packet[:0], packet...)
+
+	httpRes.Body.Close()
+
+	if len(msg.Packet) > 20 {
+		err = msg.Unpack()
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return len(msg.Packet), nil
+}
+
+//
+// RemoteAddr return client remote nameserver address.
+//
+func (cl *DoHClient) RemoteAddr() string {
+	return cl.addr.String()
+}
+
+//
+// Send DNS message to name server using Get method.  Since HTTP client is
+// synchronous, the response is forwarded to channel to be consumed by Recv().
+//
+func (cl *DoHClient) Send(msg *Message, ns net.Addr) (int, error) {
+	packet := base64.RawURLEncoding.EncodeToString(msg.Packet)
+
+	cl.query.Set("dns", packet)
+	cl.req.Method = http.MethodGet
+	cl.req.Body = nil
+	cl.req.URL.RawQuery = cl.query.Encode()
+
+	httpRes, err := cl.conn.Do(cl.req)
+	if err != nil {
+		return 0, err
+	}
+
+	cl.chRes <- httpRes
+
+	return len(msg.Packet), nil
 }
