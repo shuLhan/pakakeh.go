@@ -13,7 +13,8 @@ import (
 //
 type Client interface {
 	Close() error
-	RemoteAddr() net.Addr
+	RemoteAddr() string
+	Query(req *Message, ns net.Addr) (*Message, error)
 	Sender
 	Receiver
 }

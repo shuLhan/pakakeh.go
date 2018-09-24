@@ -47,8 +47,8 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 //
 // RemoteAddr return client remote nameserver address.
 //
-func (cl *TCPClient) RemoteAddr() net.Addr {
-	return cl.addr
+func (cl *TCPClient) RemoteAddr() string {
+	return cl.addr.String()
 }
 
 //
@@ -95,24 +95,37 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, _ = msg.Pack()
 
-	_, err := cl.Send(msg, nil)
+	res, err := cl.Query(msg, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resMsg := NewMessage()
+	return res, nil
+}
 
-	_, err = cl.Recv(resMsg)
+//
+// Query send DNS query to name server.
+// The addr parameter is unused.
+//
+func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
+	_, err := cl.Send(msg, ns)
 	if err != nil {
 		return nil, err
 	}
 
-	err = resMsg.Unpack()
+	res := NewMessage()
+
+	_, err = cl.Recv(res)
 	if err != nil {
 		return nil, err
 	}
 
-	return resMsg, nil
+	err = res.Unpack()
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 //

@@ -51,8 +51,8 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 //
 // RemoteAddr return client remote nameserver address.
 //
-func (cl *UDPClient) RemoteAddr() net.Addr {
-	return cl.Addr
+func (cl *UDPClient) RemoteAddr() string {
+	return cl.Addr.String()
 }
 
 //
@@ -88,25 +88,36 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 
 	_, _ = msg.Pack()
 
-	_, err := cl.Send(msg, cl.Addr)
+	res, err := cl.Query(msg, cl.Addr)
 	if err != nil {
 		return nil, err
 	}
 
-	resMsg := NewMessage()
-	resMsg.Reset()
+	return res, nil
+}
 
-	_, err = cl.Recv(resMsg)
+//
+// Query send DNS query to name server "ns" and return the unpacked response.
+//
+func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
+	_, err := cl.Send(msg, ns)
 	if err != nil {
 		return nil, err
 	}
 
-	err = resMsg.Unpack()
+	res := NewMessage()
+
+	_, err = cl.Recv(res)
 	if err != nil {
 		return nil, err
 	}
 
-	return resMsg, nil
+	err = res.Unpack()
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 //
