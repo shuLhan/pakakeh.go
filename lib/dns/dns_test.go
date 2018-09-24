@@ -191,9 +191,18 @@ func TestMain(m *testing.M) {
 		Handler: _testHandler,
 	}
 
+	serverOptions := &ServerOptions{
+		IPAddress:        "127.0.0.1",
+		UDPPort:          5353,
+		TCPPort:          5353,
+		DoHPort:          8443,
+		DoHCertFile:      "testdata/domain.crt",
+		DoHKeyFile:       "testdata/domain.key",
+		DoHAllowInsecure: true,
+	}
+
 	go func() {
-		err := _testServer.ListenAndServe(testServerAddress,
-			"testdata/domain.crt", "testdata/domain.key", true)
+		err := _testServer.ListenAndServe(serverOptions)
 		if err != nil {
 			log.Fatal("ListenAndServe: ", err)
 		}

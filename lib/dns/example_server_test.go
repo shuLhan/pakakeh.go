@@ -194,9 +194,18 @@ func ExampleServer() {
 		Handler: handler,
 	}
 
+	serverOptions := &dns.ServerOptions{
+		IPAddress:        "127.0.0.1",
+		TCPPort:          5353,
+		UDPPort:          5353,
+		DoHPort:          8443,
+		DoHCertFile:      "testdata/domain.crt",
+		DoHKeyFile:       "testdata/domain.key",
+		DoHAllowInsecure: true,
+	}
+
 	go func() {
-		err := server.ListenAndServe(serverAddress,
-			"testdata/domain.crt", "testdata/domain.key", true)
+		err := server.ListenAndServe(serverOptions)
 		if err != nil {
 			log.Fatal("ListenAndServe: ", err)
 		}

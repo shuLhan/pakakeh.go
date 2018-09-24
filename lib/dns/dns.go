@@ -22,8 +22,15 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-// DefaultPort define default DNS remote or listen port.
-const DefaultPort uint16 = 53
+const (
+	// DefaultPort define default DNS remote or listen port for UDP and
+	// TCP connection.
+	DefaultPort uint16 = 53
+
+	// DefaultDoHPort define default port for DoH.
+	DefaultDoHPort        uint16        = 443
+	defaultDoHIdleTimeout time.Duration = 120 * time.Second
+)
 
 const (
 	maskPointer byte   = 0xC0

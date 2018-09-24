@@ -14,8 +14,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -28,37 +26,11 @@ type Server struct {
 	doh     *http.Server
 }
 
-func parseAddress(address string) (udp *net.UDPAddr, tcp, doh *net.TCPAddr, err error) {
-	ip, port, err := libnet.ParseIPPort(address, DefaultPort)
-	if err != nil {
-		return
-	}
-
-	udp = &net.UDPAddr{
-		IP:   ip,
-		Port: int(port),
-	}
-
-	tcp = &net.TCPAddr{
-		IP:   ip,
-		Port: int(port),
-	}
-
-	doh = &net.TCPAddr{
-		IP:   ip,
-		Port: 8443,
-	}
-
-	return
-}
-
 //
-// ListenAndServe run DNS server, listening on UDP and TCP connection.
+// ListenAndServe run DNS server on UDP, TCP, or DNS over HTTP (DoH).
 //
-func (srv *Server) ListenAndServe(address, certFile, keyFile string, allowInsecure bool) error {
-	var err error
-
-	udpAddr, tcpAddr, dohAddr, err := parseAddress(address)
+func (srv *Server) ListenAndServe(opts *ServerOptions) error {
+	err := opts.parse()
 	if err != nil {
 		return err
 	}
@@ -66,20 +38,22 @@ func (srv *Server) ListenAndServe(address, certFile, keyFile string, allowInsecu
 	cherr := make(chan error, 1)
 
 	go func() {
-		err = srv.ListenAndServeTCP(tcpAddr)
+		err = srv.ListenAndServeTCP(opts.getTCPAddress())
 		if err != nil {
 			cherr <- err
 		}
 	}()
+
 	go func() {
-		err = srv.ListenAndServeUDP(udpAddr)
+		err = srv.ListenAndServeUDP(opts.getUDPAddress())
 		if err != nil {
 			cherr <- err
 		}
 	}()
-	if len(certFile) > 0 && len(keyFile) > 0 {
+
+	if len(opts.DoHCertFile) > 0 && len(opts.DoHKeyFile) > 0 {
 		go func() {
-			err = srv.ListenAndServeDoH(dohAddr, certFile, keyFile, allowInsecure)
+			err = srv.ListenAndServeDoH(opts)
 			if err != nil {
 				cherr <- err
 			}
@@ -95,20 +69,25 @@ func (srv *Server) ListenAndServe(address, certFile, keyFile string, allowInsecu
 // ListenAndServeDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
 //
-func (srv *Server) ListenAndServeDoH(address *net.TCPAddr, certFile, keyFile string, allowInsecure bool) error {
+func (srv *Server) ListenAndServeDoH(opts *ServerOptions) error {
+	if opts.ip == nil {
+		err := opts.parse()
+		if err != nil {
+			return err
+		}
+	}
+
 	srv.doh = &http.Server{
-		Addr:        address.String(),
-		IdleTimeout: 120 * time.Second,
+		Addr:        opts.getDoHAddress().String(),
+		IdleTimeout: opts.DoHIdleTimeout,
 		TLSConfig: &tls.Config{
-			InsecureSkipVerify: allowInsecure,
+			InsecureSkipVerify: opts.DoHAllowInsecure,
 		},
 	}
 
 	http.Handle("/dns-query", srv)
 
-	err := srv.doh.ListenAndServeTLS(certFile, keyFile)
-
-	return err
+	return srv.doh.ListenAndServeTLS(opts.DoHCertFile, opts.DoHKeyFile)
 }
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
