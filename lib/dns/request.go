@@ -6,17 +6,7 @@ package dns
 
 import (
 	"net"
-	"sync"
 )
-
-var _requestPool = sync.Pool{
-	New: func() interface{} {
-		req := &Request{
-			Message: NewMessage(),
-		}
-		return req
-	},
-}
 
 //
 // Request contains UDP address and DNS query message from client.
@@ -29,11 +19,20 @@ type Request struct {
 }
 
 //
+// NewRequest create and initialize request.
+//
+func NewRequest() *Request {
+	return &Request{
+		Message:     NewMessage(),
+		ChanMessage: make(chan *Message, 1),
+	}
+}
+
+//
 // Reset message and UDP address in request.
 //
 func (req *Request) Reset() {
 	req.Message.Reset()
 	req.UDPAddr = nil
 	req.Sender = nil
-	req.ChanMessage = nil
 }

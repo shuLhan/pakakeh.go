@@ -147,9 +147,7 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
-	req := _requestPool.Get().(*Request)
-	req.Reset()
-	req.ChanMessage = make(chan *Message, 1)
+	req := NewRequest()
 	req.Message.Packet = append(req.Message.Packet[:0], raw...)
 	req.Message.UnpackHeaderQuestion()
 
@@ -208,7 +206,6 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	var (
 		n   int
 		err error
-		req *Request
 	)
 
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
@@ -222,10 +219,7 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	}
 
 	for {
-		if req == nil {
-			req = _requestPool.Get().(*Request)
-		}
-		req.Reset()
+		req := NewRequest()
 
 		n, req.UDPAddr, err = srv.udp.ReadFromUDP(req.Message.Packet)
 		if err != nil {
@@ -247,13 +241,9 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 	var (
 		n   int
 		err error
-		req *Request
 	)
 	for {
-		if req == nil {
-			req = _requestPool.Get().(*Request)
-		}
-		req.Reset()
+		req := NewRequest()
 
 		for {
 			n, err = cl.Recv(req.Message)
@@ -262,7 +252,6 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 			}
 			if err != nil {
 				if err == io.EOF {
-					_requestPool.Put(req)
 					break
 				}
 				if n != 0 {
@@ -287,11 +276,4 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 	if err != nil {
 		log.Println("serveTCPClient: conn.Close:", err)
 	}
-}
-
-//
-// FreeRequest put the request back to the pool.
-//
-func (srv *Server) FreeRequest(req *Request) {
-	_requestPool.Put(req)
 }

@@ -176,8 +176,6 @@ func (h *serverHandler) ServeDNS(req *Request) {
 	} else if req.ChanMessage != nil {
 		req.ChanMessage <- res
 	}
-
-	_testServer.FreeRequest(req)
 }
 
 func TestMain(m *testing.M) {
