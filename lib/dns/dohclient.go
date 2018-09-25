@@ -136,14 +136,12 @@ func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 	res := NewMessage()
 
 	packet, err := ioutil.ReadAll(httpRes.Body)
+	httpRes.Body.Close()
 	if err != nil {
-		httpRes.Body.Close()
 		return nil, err
 	}
 
 	res.Packet = append(res.Packet[:0], packet...)
-
-	httpRes.Body.Close()
 
 	err = res.Unpack()
 
@@ -167,26 +165,20 @@ func (cl *DoHClient) Get(msg *Message) (*Message, error) {
 		return nil, err
 	}
 
+	body, err := ioutil.ReadAll(httpRes.Body)
+	httpRes.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
 	if httpRes.StatusCode != 200 {
-		body, err := ioutil.ReadAll(httpRes.Body)
-		if err != nil {
-			return nil, err
-		}
 		err = fmt.Errorf("%s", string(body))
 		return nil, err
 	}
 
 	res := NewMessage()
 
-	packet, err := ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		httpRes.Body.Close()
-		return nil, err
-	}
-
-	res.Packet = append(res.Packet[:0], packet...)
-
-	httpRes.Body.Close()
+	res.Packet = append(res.Packet[:0], body...)
 
 	if len(res.Packet) > 20 {
 		err = res.Unpack()
@@ -212,24 +204,18 @@ func (cl *DoHClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 func (cl *DoHClient) Recv(msg *Message) (int, error) {
 	httpRes := <-cl.chRes
 
+	body, err := ioutil.ReadAll(httpRes.Body)
+	httpRes.Body.Close()
+	if err != nil {
+		return 0, err
+	}
+
 	if httpRes.StatusCode != 200 {
-		body, err := ioutil.ReadAll(httpRes.Body)
-		if err != nil {
-			return 0, err
-		}
 		err = fmt.Errorf("%s", string(body))
 		return 0, err
 	}
 
-	packet, err := ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		httpRes.Body.Close()
-		return 0, err
-	}
-
-	msg.Packet = append(msg.Packet[:0], packet...)
-
-	httpRes.Body.Close()
+	msg.Packet = append(msg.Packet[:0], body...)
 
 	if len(msg.Packet) > 20 {
 		err = msg.Unpack()
