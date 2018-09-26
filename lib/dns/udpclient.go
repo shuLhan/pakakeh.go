@@ -9,6 +9,7 @@ import (
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/debug"
 )
 
 //
@@ -140,7 +141,7 @@ func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
 
 	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
 
-	if debugLevel >= 2 {
+	if debug.Value >= 2 {
 		libbytes.PrintHex(">>> UDPClient: Recv:", msg.Packet, 8)
 	}
 

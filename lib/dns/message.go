@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/debug"
 )
 
 //
@@ -660,7 +661,7 @@ func (msg *Message) Unpack() (err error) {
 		msg.Answer = append(msg.Answer, rr)
 	}
 
-	if debugLevel >= 1 {
+	if debug.Value >= 1 {
 		log.Printf("msg.Answer: %+v\n", msg.Answer)
 	}
 
@@ -674,7 +675,7 @@ func (msg *Message) Unpack() (err error) {
 		msg.Authority = append(msg.Authority, rr)
 	}
 
-	if debugLevel >= 1 {
+	if debug.Value >= 1 {
 		log.Printf("msg.Authority: %+v\n", msg.Authority)
 	}
 
@@ -688,7 +689,7 @@ func (msg *Message) Unpack() (err error) {
 		msg.Additional = append(msg.Additional, rr)
 	}
 
-	if debugLevel >= 1 {
+	if debug.Value >= 1 {
 		log.Printf("msg.Additional: %+v\n", msg.Additional)
 	}
 
@@ -703,7 +704,7 @@ func (msg *Message) Unpack() (err error) {
 func (msg *Message) UnpackHeaderQuestion() {
 	_ = msg.Header.unpack(msg.Packet)
 
-	if debugLevel >= 1 {
+	if debug.Value >= 1 {
 		log.Printf("msg.Header: %+v\n", msg.Header)
 	}
 
@@ -713,7 +714,7 @@ func (msg *Message) UnpackHeaderQuestion() {
 
 	_ = msg.Question.unpack(msg.Packet[sectionHeaderSize:])
 
-	if debugLevel >= 1 {
+	if debug.Value >= 1 {
 		log.Printf("msg.Question: %s\n", msg.Question)
 	}
 }

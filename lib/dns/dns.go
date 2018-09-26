@@ -63,7 +63,6 @@ var (
 var (
 	// clientTimeout define read and write timeout on client request.
 	clientTimeout = 6 * time.Second
-	debugLevel    = 0
 )
 
 type OpCode byte

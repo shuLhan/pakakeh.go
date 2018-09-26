@@ -179,7 +179,6 @@ func (h *serverHandler) ServeDNS(req *Request) {
 }
 
 func TestMain(m *testing.M) {
-	debugLevel = 0
 	log.SetFlags(log.Lmicroseconds)
 
 	_testHandler = &serverHandler{}

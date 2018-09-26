@@ -14,6 +14,7 @@ import (
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/debug"
 	libio "github.com/shuLhan/share/lib/io"
 	libtime "github.com/shuLhan/share/lib/time"
 )
@@ -1053,7 +1054,7 @@ func (m *master) pack() {
 			msg.Header.ANCount = 0
 		}
 
-		if debugLevel >= 1 {
+		if debug.Value >= 1 {
 			fmt.Printf("= Header: %+v\n", msg.Header)
 			fmt.Printf("  Question: %s\n", msg.Question)
 			for x := 0; x < len(msg.Answer); x++ {
