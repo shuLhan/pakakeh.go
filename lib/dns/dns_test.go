@@ -171,10 +171,16 @@ func (h *serverHandler) ServeDNS(req *Request) {
 	if req.Sender != nil {
 		_, err = req.Sender.Send(res, req.UDPAddr)
 		if err != nil {
-			log.Println("ServeDNS: ", err)
+			log.Println("! ServeDNS: Sender.Send: ", err)
 		}
-	} else if req.ChanMessage != nil {
-		req.ChanMessage <- res
+
+		FreeRequest(req)
+	} else if req.ResponseWriter != nil {
+		_, err = req.ResponseWriter.Write(res.Packet)
+		if err != nil {
+			log.Println("! ServeDNS: ResponseWriter.Write: ", err)
+		}
+		req.ChanResponded <- true
 	}
 }
 

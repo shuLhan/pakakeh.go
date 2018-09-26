@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"time"
 )
 
 //
@@ -147,29 +146,22 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
-	req := NewRequest()
+	req := AllocRequest()
+
+	req.ResponseWriter = w
+	req.ChanResponded = make(chan bool, 1)
+
 	req.Message.Packet = append(req.Message.Packet[:0], raw...)
 	req.Message.UnpackHeaderQuestion()
 
 	srv.Handler.ServeDNS(req)
 
-	timeout := time.NewTicker(clientTimeout)
-	for {
-		select {
-		case res := <-req.ChanMessage:
-			_, err := w.Write(res.Packet)
-			if err != nil {
-				log.Printf("! handleDoHRequest: %s\n", err)
-			}
-			goto out
-
-		case <-timeout.C:
-			w.WriteHeader(http.StatusGatewayTimeout)
-			goto out
-		}
+	_, ok := <-req.ChanResponded
+	if ok {
+		FreeRequest(req)
+	} else {
+		w.WriteHeader(http.StatusGatewayTimeout)
 	}
-out:
-	timeout.Stop()
 }
 
 //
@@ -206,6 +198,7 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	var (
 		n   int
 		err error
+		req *Request
 	)
 
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
@@ -219,7 +212,9 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	}
 
 	for {
-		req := NewRequest()
+		if req == nil {
+			req = AllocRequest()
+		}
 
 		n, req.UDPAddr, err = srv.udp.ReadFromUDP(req.Message.Packet)
 		if err != nil {
@@ -241,9 +236,12 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 	var (
 		n   int
 		err error
+		req *Request
 	)
 	for {
-		req := NewRequest()
+		if req == nil {
+			req = AllocRequest()
+		}
 
 		for {
 			n, err = cl.Recv(req.Message)

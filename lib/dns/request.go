@@ -6,16 +6,18 @@ package dns
 
 import (
 	"net"
+	"net/http"
 )
 
 //
 // Request contains UDP address and DNS query message from client.
 //
 type Request struct {
-	Message     *Message
-	UDPAddr     *net.UDPAddr
-	Sender      Sender
-	ChanMessage chan *Message
+	Message        *Message
+	UDPAddr        *net.UDPAddr
+	Sender         Sender
+	ResponseWriter http.ResponseWriter
+	ChanResponded  chan bool
 }
 
 //
@@ -23,8 +25,7 @@ type Request struct {
 //
 func NewRequest() *Request {
 	return &Request{
-		Message:     NewMessage(),
-		ChanMessage: make(chan *Message, 1),
+		Message: NewMessage(),
 	}
 }
 
@@ -35,4 +36,5 @@ func (req *Request) Reset() {
 	req.Message.Reset()
 	req.UDPAddr = nil
 	req.Sender = nil
+	req.ResponseWriter = nil
 }
