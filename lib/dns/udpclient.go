@@ -100,6 +100,10 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 // Query send DNS query to name server "ns" and return the unpacked response.
 //
 func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
+	if ns == nil {
+		ns = cl.Addr
+	}
+
 	_, err := cl.Send(msg, ns)
 	if err != nil {
 		return nil, err
@@ -151,7 +155,7 @@ func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
 //
 func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 	if ns == nil {
-		return
+		ns = cl.Addr
 	}
 
 	raddr := ns.(*net.UDPAddr)
