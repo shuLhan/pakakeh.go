@@ -286,6 +286,19 @@ func (in *Ini) GetSections(name string) (secs []*Section) {
 }
 
 //
+// GetBool return key's value as boolean.  If no key found it will return
+// default value.
+//
+func (in *Ini) GetBool(section, subsection, key string, def bool) bool {
+	out, ok := in.Get(section, subsection, key)
+	if !ok {
+		return def
+	}
+
+	return IsValueBoolTrue(out)
+}
+
+//
 // GetString return key's value as string. if no key found it will return
 // default value.
 //
