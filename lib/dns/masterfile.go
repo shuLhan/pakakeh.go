@@ -1054,7 +1054,7 @@ func (m *master) pack() {
 			msg.Header.ANCount = 0
 		}
 
-		if debug.Value >= 1 {
+		if debug.Value >= 2 {
 			fmt.Printf("= Header: %+v\n", msg.Header)
 			fmt.Printf("  Question: %s\n", msg.Question)
 			for x := 0; x < len(msg.Answer); x++ {
