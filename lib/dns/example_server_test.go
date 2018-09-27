@@ -152,9 +152,36 @@ func (h *serverHandler) ServeDNS(req *dns.Request) {
 		res.SetID(req.Message.Header.ID)
 	}
 
-	_, err = req.Sender.Send(res, req.UDPAddr)
-	if err != nil {
-		log.Println("ServeDNS: ", err)
+	switch req.Kind {
+	case dns.ConnTypeUDP:
+		if req.Sender != nil {
+			_, err = req.Sender.Send(res, req.UDPAddr)
+			if err != nil {
+				log.Println("! ServeDNS: Sender.Send: ", err)
+			}
+		}
+		dns.FreeRequest(req)
+
+	case dns.ConnTypeTCP:
+		if req.Sender != nil {
+			_, err = req.Sender.Send(res, nil)
+			if err != nil {
+				log.Println("! ServeDNS: Sender.Send: ", err)
+			}
+		}
+		dns.FreeRequest(req)
+
+	case dns.ConnTypeDoH:
+		if req.ResponseWriter != nil {
+			_, err = req.ResponseWriter.Write(res.Packet)
+			if err != nil {
+				log.Println("! ServeDNS: ResponseWriter.Write: ", err)
+			}
+			req.ChanResponded <- true
+		}
+
+	default:
+		dns.FreeRequest(req)
 	}
 }
 
@@ -199,8 +226,8 @@ func ExampleServer() {
 		TCPPort:          5353,
 		UDPPort:          5353,
 		DoHPort:          8443,
-		DoHCertFile:      "testdata/domain.crt",
-		DoHKeyFile:       "testdata/domain.key",
+		DoHCert:          "testdata/domain.crt",
+		DoHCertKey:       "testdata/domain.key",
 		DoHAllowInsecure: true,
 	}
 

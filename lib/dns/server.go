@@ -50,7 +50,7 @@ func (srv *Server) ListenAndServe(opts *ServerOptions) error {
 		}
 	}()
 
-	if len(opts.DoHCertFile) > 0 && len(opts.DoHKeyFile) > 0 {
+	if len(opts.DoHCert) > 0 && len(opts.DoHCertKey) > 0 {
 		go func() {
 			err = srv.ListenAndServeDoH(opts)
 			if err != nil {
@@ -86,7 +86,7 @@ func (srv *Server) ListenAndServeDoH(opts *ServerOptions) error {
 
 	http.Handle("/dns-query", srv)
 
-	return srv.doh.ListenAndServeTLS(opts.DoHCertFile, opts.DoHKeyFile)
+	return srv.doh.ListenAndServeTLS(opts.DoHCert, opts.DoHCertKey)
 }
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +148,7 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	req := AllocRequest()
 
+	req.Kind = ConnTypeDoH
 	req.ResponseWriter = w
 	req.ChanResponded = make(chan bool, 1)
 
@@ -222,6 +223,7 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 			continue
 		}
 
+		req.Kind = ConnTypeUDP
 		req.Message.Packet = req.Message.Packet[:n]
 
 		req.Message.UnpackHeaderQuestion()
@@ -263,6 +265,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 			break
 		}
 
+		req.Kind = ConnTypeTCP
 		req.Message.UnpackHeaderQuestion()
 		req.Sender = cl
 

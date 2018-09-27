@@ -12,7 +12,8 @@ import (
 
 //
 // ServerOptions describes options for running a DNS server.
-// If certificate or key file is empty, server will not run with DoH.
+// If certificate or key file is empty, server will not run with DNS over
+// HTTPS (DoH).
 //
 type ServerOptions struct {
 	// IPAddress of server to listen to, without port number.
@@ -24,14 +25,14 @@ type ServerOptions struct {
 	// TCPPort port for TCP server, default to 53.
 	TCPPort uint16
 
-	// DoHPort port for DNS over HTTP (DoH), default to 443.
+	// DoHPort port for listening DNS over HTTP, default to 443.
 	DoHPort uint16
 
-	// DoHCertFile path to certificate file for serving DoH.
-	DoHCertFile string
+	// DoHCert path to certificate file for serving DoH.
+	DoHCert string
 
-	// DoHKeyFile path to certificate key file for serving DoH.
-	DoHKeyFile string
+	// DoHCertKey path to certificate key file for serving DoH.
+	DoHCertKey string
 
 	// DoHAllowInsecure options to allow to serve DoH with self-signed
 	// certificate.

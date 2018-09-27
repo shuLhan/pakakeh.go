@@ -168,19 +168,36 @@ func (h *serverHandler) ServeDNS(req *Request) {
 		res.SetID(req.Message.Header.ID)
 	}
 
-	if req.Sender != nil {
-		_, err = req.Sender.Send(res, req.UDPAddr)
-		if err != nil {
-			log.Println("! ServeDNS: Sender.Send: ", err)
+	switch req.Kind {
+	case ConnTypeUDP:
+		if req.Sender != nil {
+			_, err = req.Sender.Send(res, req.UDPAddr)
+			if err != nil {
+				log.Println("! ServeDNS: Sender.Send: ", err)
+			}
+		}
+		FreeRequest(req)
+
+	case ConnTypeTCP:
+		if req.Sender != nil {
+			_, err = req.Sender.Send(res, nil)
+			if err != nil {
+				log.Println("! ServeDNS: Sender.Send: ", err)
+			}
+		}
+		FreeRequest(req)
+
+	case ConnTypeDoH:
+		if req.ResponseWriter != nil {
+			_, err = req.ResponseWriter.Write(res.Packet)
+			if err != nil {
+				log.Println("! ServeDNS: ResponseWriter.Write: ", err)
+			}
+			req.ChanResponded <- true
 		}
 
+	default:
 		FreeRequest(req)
-	} else if req.ResponseWriter != nil {
-		_, err = req.ResponseWriter.Write(res.Packet)
-		if err != nil {
-			log.Println("! ServeDNS: ResponseWriter.Write: ", err)
-		}
-		req.ChanResponded <- true
 	}
 }
 
@@ -200,8 +217,8 @@ func TestMain(m *testing.M) {
 		UDPPort:          5353,
 		TCPPort:          5353,
 		DoHPort:          8443,
-		DoHCertFile:      "testdata/domain.crt",
-		DoHKeyFile:       "testdata/domain.key",
+		DoHCert:          "testdata/domain.crt",
+		DoHCertKey:       "testdata/domain.key",
 		DoHAllowInsecure: true,
 	}
 
