@@ -144,7 +144,7 @@ func FetchAll(repoDir string) error {
 	if debug.Value == 0 {
 		cmd.Args = append(cmd.Args, "--quiet")
 	}
-	cmd.Args = append(cmd.Args, "--all")
+	cmd.Args = append(cmd.Args, "--all", "--tags")
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
@@ -154,25 +154,6 @@ func FetchAll(repoDir string) error {
 	}
 
 	err := cmd.Run()
-	if err != nil {
-		err = fmt.Errorf("FetchAll: %s", err)
-	}
-
-	// Fetch all tags.
-	cmd = exec.Command("git", "fetch")
-	if debug.Value == 0 {
-		cmd.Args = append(cmd.Args, "--quiet")
-	}
-	cmd.Args = append(cmd.Args, "--tags")
-	cmd.Dir = repoDir
-	cmd.Stdout = _stdout
-	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= FetchAll %s %s\n", cmd.Dir, cmd.Args)
-	}
-
-	err = cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("FetchAll: %s", err)
 	}
