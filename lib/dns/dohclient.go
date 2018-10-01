@@ -83,7 +83,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
 // Close all idle connections.
 //
 func (cl *DoHClient) Close() error {
-	cl.conn.CloseIdleConnections()
+	cl.conn.Transport.(*http.Transport).CloseIdleConnections()
 	return nil
 }
 
