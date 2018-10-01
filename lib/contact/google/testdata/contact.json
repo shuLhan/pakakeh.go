@@ -1,0 +1,166 @@
+{
+	"id": {
+		"$t": "http://www.google.com/m8/feeds/contacts/proofndevelopers%40gmail.com/base/36211c268f24e0bb"
+	},
+	"gd$etag": "\"SXY-eDVSLit7I2A9XBZRFUoJQwA.\"",
+	"updated": {
+		"$t": "2017-08-12T21:30:48.850Z"
+	},
+	"app$edited": {
+		"xmlns$app": "http://www.w3.org/2007/app",
+		"$t": "2017-08-12T21:30:48.850Z"
+	},
+	"category": [
+		{
+			"scheme": "http://schemas.google.com/g/2005#kind",
+			"term": "http://schemas.google.com/contact/2008#contact"
+		}
+	],
+	"title": {
+		"$t": "Prefix Test Middle Last Suffix"
+	},
+	"content": {
+		"$t": "Ini adalah catatan"
+	},
+	"link": [
+		{
+			"rel": "http://schemas.google.com/contacts/2008/rel#photo",
+			"type": "image/*",
+			"href": "https://www.google.com/m8/feeds/photos/media/proofndevelopers%40gmail.com/36211c268f24e0bb?v=3.0"
+		},
+		{
+			"rel": "self",
+			"type": "application/atom+xml",
+			"href": "https://www.google.com/m8/feeds/contacts/proofndevelopers%40gmail.com/full/36211c268f24e0bb?v=3.0"
+		},
+		{
+			"rel": "edit",
+			"type": "application/atom+xml",
+			"href": "https://www.google.com/m8/feeds/contacts/proofndevelopers%40gmail.com/full/36211c268f24e0bb?v=3.0"
+		}
+	],
+	"gd$name": {
+		"gd$fullName": {
+			"$t": "Prefix Test Middle Last Suffix"
+		},
+		"gd$namePrefix": {
+			"$t": "Prefix"
+		},
+		"gd$givenName": {
+			"$t": "Test"
+		},
+		"gd$additionalName": {
+			"$t": "Middle"
+		},
+		"gd$familyName": {
+			"$t": "Last"
+		},
+		"gd$nameSuffix": {
+			"$t": "Suffix"
+		}
+	},
+	"gContact$birthday": {
+		"when": "1980-01-30"
+	},
+	"gd$organization": [
+		{
+			"rel": "http://schemas.google.com/g/2005#other",
+			"gd$orgName": {
+				"$t": "Myabuy"
+			},
+			"gd$orgTitle": {
+				"$t": "Devops"
+			}
+		}
+	],
+	"gd$email": [
+		{
+			"address": "first.tester@proofn.com",
+			"primary": "true",
+			"rel": "http://schemas.google.com/g/2005#home"
+		},
+		{
+			"address": "work@proofn.com",
+			"rel": "http://schemas.google.com/g/2005#work"
+		}
+	],
+	"gd$phoneNumber": [
+		{
+			"rel": "http://schemas.google.com/g/2005#mobile",
+			"uri": "tel:+62-856-1234-56789",
+			"$t": "856123456789"
+		},
+		{
+			"rel": "http://schemas.google.com/g/2005#work",
+			"uri": "tel:+62-22-33445566",
+			"$t": "2233445566"
+		},
+		{
+			"rel": "http://schemas.google.com/g/2005#home",
+			"$t": "9999999"
+		},
+		{
+			"rel": "http://schemas.google.com/g/2005#main",
+			"$t": "8888888"
+		}
+	],
+	"gd$structuredPostalAddress": [
+		{
+			"rel": "http://schemas.google.com/g/2005#home",
+			"gd$formattedAddress": {
+				"$t": "Jl. Tubagus Ismail VI\n40124\nBandung, Jabar 40124\nIndonesia"
+			},
+			"gd$street": {
+				"$t": "Jl. Tubagus Ismail VI"
+			},
+			"gd$pobox": {
+				"$t": "40124"
+			},
+			"gd$city": {
+				"$t": "Bandung"
+			},
+			"gd$region": {
+				"$t": "Jabar"
+			},
+			"gd$postcode": {
+				"$t": "40124"
+			},
+			"gd$country": {
+				"$t": "Indonesia"
+			}
+		},
+		{
+			"rel": "http://schemas.google.com/g/2005#work",
+			"gd$formattedAddress": {
+				"$t": "Perumahan Delima Cikutra"
+			},
+			"gd$street": {
+				"$t": "Perumahan Delima Cikutra"
+			}
+		}
+	],
+	"gContact$event": [
+		{
+			"rel": "anniversary",
+			"gd$when": {
+				"startTime": "2016-11-20"
+			}
+		}
+	],
+	"gContact$website": [
+		{
+			"href": "https://www.proofn.com",
+			"rel": "profile"
+		}
+	],
+	"gContact$groupMembershipInfo": [
+		{
+			"deleted": "false",
+			"href": "http://www.google.com/m8/feeds/groups/proofndevelopers%40gmail.com/base/3a685180d90a41c"
+		},
+		{
+			"deleted": "false",
+			"href": "http://www.google.com/m8/feeds/groups/proofndevelopers%40gmail.com/base/6"
+		}
+	]
+}

@@ -1,0 +1,68 @@
+{
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('proofndevelopers%40outlook.com')/contacts",
+    "value": [
+        {
+            "@odata.etag": "W/\"EQAAABYAAAAv5KT9h6VaTIoPZ1HZev6rAAAM/naV\"",
+            "id": "AAMkADQwNjBkNTdiLWVjZjctNGNkOS1hZDUyLTc2ZTE3YzZmMWM4OQBGAAAAAACARWRNcd4AQ7oZ0tB15rhKBwAv5KT9h6VaTIoPZ1HZev6rAAAAAAEOAAAv5KT9h6VaTIoPZ1HZev6rAAAM-PJzAAA=",
+            "createdDateTime": "2017-08-13T21:35:01Z",
+            "lastModifiedDateTime": "2017-08-13T21:36:43Z",
+            "changeKey": "EQAAABYAAAAv5KT9h6VaTIoPZ1HZev6rAAAM/naV",
+            "categories": [],
+            "parentFolderId": "AQMkADQwNjBkNTdiLWVjZjctNGNkOS1hZDUyLTc2ZTE3YzZmMWM4OQAuAAADgEVkTXHeAEO6GdLQdea4SgEAL_Sk-YelWkyKD2dR2Xr_qwAAAgEOAAAA",
+            "birthday": "1984-08-14T11:59:00Z",
+            "fileAs": "Tester, First Middle",
+            "displayName": "Prof. First Middle Tester AMD",
+            "givenName": "First",
+            "initials": null,
+            "middleName": "Middle",
+            "nickName": null,
+            "surname": "Tester",
+            "title": "Prof.",
+            "yomiGivenName": null,
+            "yomiSurname": null,
+            "yomiCompanyName": null,
+            "generation": "AMD",
+            "imAddresses": [],
+            "jobTitle": "Tester",
+            "companyName": "Myabuy",
+            "department": null,
+            "officeLocation": null,
+            "profession": null,
+            "businessHomePage": null,
+            "assistantName": null,
+            "manager": null,
+            "homePhones": [
+                "+22808080"
+            ],
+            "mobilePhone": "+62856123456789",
+            "businessPhones": [
+                "+22909090"
+            ],
+            "spouseName": "Istri",
+            "personalNotes": "This is a note.",
+            "children": [],
+            "emailAddresses": [
+                {
+                    "name": "first.tester@proofn.com",
+                    "address": "first.tester@proofn.com"
+                },
+                {
+                    "name": "tester@proofn.com",
+                    "address": "tester@proofn.com"
+                }
+            ],
+            "homeAddress": {
+                "street": "Tubagus Ismail VI",
+                "city": "Bandung",
+                "state": "JABAR",
+                "countryOrRegion": "Indonesia",
+                "postalCode": "40124"
+            },
+            "businessAddress": {
+                "street": "Cikutra",
+                "city": "Bandung"
+            },
+            "otherAddress": {}
+        }
+    ]
+}

@@ -1,0 +1,3799 @@
+{
+	"contacts": {
+		"contact": [
+			{
+				"isConnection": false,
+				"id": 19943,
+				"fields": [
+					{
+						"id": 1,
+						"type": "phone",
+						"value": "084-563-25",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19943/phone/1"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19943/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19943"
+			},
+			{
+				"isConnection": false,
+				"id": 19899,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Alden",
+							"middleName": "",
+							"familyName": "Ponte",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "41 Gladstone Terrace, Invercargill West, Invercargill 9810",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899/address/2"
+					},
+					{
+						"id": 4,
+						"type": "phone",
+						"value": "029-426-9301",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899/phone/4"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "029-426-9303",
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899/phone/3"
+					},
+					{
+						"id": 5,
+						"type": "phone",
+						"value": "029-426-9302",
+						"editedBy": "OWNER",
+						"flags": [
+							"HOME"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899/phone/5"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19899"
+			},
+			{
+				"isConnection": false,
+				"id": 19920,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Alicia",
+							"middleName": "",
+							"familyName": "Fox",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19920/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Tawastintie 91, 15150 LAHTI",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19920/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "044-070-2586",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19920/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19920/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19920"
+			},
+			{
+				"isConnection": false,
+				"id": 19914,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Amelia",
+							"middleName": "",
+							"familyName": "Fry",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19914/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Gr\u00f8nlandsgade 19, 178520K\u00f8benhavn V",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19914/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "225-649-86",
+						"editedBy": "OWNER",
+						"flags": [
+							"HOME",
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19914/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19914/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19914"
+			},
+			{
+				"isConnection": false,
+				"id": 19903,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Amy",
+							"middleName": "",
+							"familyName": "Brooker",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19903/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "22 Watson Street, THE SETTLEMENT VIC 3561",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19903/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "035-349-1061",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19903/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19903/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19903"
+			},
+			{
+				"isConnection": false,
+				"id": 19937,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Anna",
+							"middleName": "",
+							"familyName": "Pearce",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19937/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "33 Wenlock Terrace, PETHAM, CT4 5DU",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19937/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "078-885-21174",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19937/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19937/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19937"
+			},
+			{
+				"isConnection": false,
+				"id": 19912,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Anne-Lise",
+							"middleName": "",
+							"familyName": "Jakobsen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Brunnenstrasse 8, 3415 52\u00fcegsauschachen",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912/address/2"
+					},
+					{
+						"id": 5,
+						"type": "phone",
+						"value": "034-571-2537",
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912/phone/5"
+					},
+					{
+						"id": 4,
+						"type": "phone",
+						"value": "034-571-2539",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912/phone/4"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "034-571-2538",
+						"editedBy": "OWNER",
+						"flags": [
+							"HOME"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19912"
+			},
+			{
+				"isConnection": false,
+				"id": 19891,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Anthony",
+							"middleName": "",
+							"familyName": "Fitzgerald",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19891/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Erhvervsvangen 45, 8722 Hedensted",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19891/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "523-884-89",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19891/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19891/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19891"
+			},
+			{
+				"isConnection": false,
+				"id": 19906,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Ashley",
+							"middleName": "",
+							"familyName": "Pavy",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19906/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "N\u00f8rremarksvej 11, 161220K\u00f8benhavn V",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19906/address/2"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19906/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19906"
+			},
+			{
+				"isConnection": false,
+				"id": 19921,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Brayden",
+							"middleName": "",
+							"familyName": "Shoobridge",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19921/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "78 Vinegar Hill Road, Glenbervie, Whangarei 0112",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19921/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "026-509-3916",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19921/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19921/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19921"
+			},
+			{
+				"isConnection": false,
+				"id": 19917,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Caleb",
+							"middleName": "",
+							"familyName": "Ricardo",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19917/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "184 Strack Place, Mcleans Island, Christchurch 8051",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19917/address/2"
+					},
+					{
+						"id": 4,
+						"type": "phone",
+						"value": "022-160-7506",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19917/phone/4"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "022-160-7507",
+						"editedBy": "OWNER",
+						"flags": [
+							"HOME"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19917/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19917/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19917"
+			},
+			{
+				"isConnection": false,
+				"id": 19892,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Caleb",
+							"middleName": "",
+							"familyName": "McVilly",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19892/name/1"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19892/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19892"
+			},
+			{
+				"isConnection": false,
+				"id": 19929,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Celina",
+							"middleName": "",
+							"familyName": "S\u00f8rensen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19929/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "72 Gloucester Avenue, CHELTENHAM SA 5014",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19929/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "088-286-0531",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19929/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19929/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19929"
+			},
+			{
+				"isConnection": false,
+				"id": 19915,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Charlie",
+							"middleName": "",
+							"familyName": "Heath",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19915/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "S\u00f8ndre Havnekaj 54, 58381 Sk\u00e5rup Fyn",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19915/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "508-489-50",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19915/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19915/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19915"
+			},
+			{
+				"isConnection": false,
+				"id": 19898,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Christine",
+							"middleName": "",
+							"familyName": "Clausen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19898/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "63 Willow Place, Frankton, Queenstown 9300",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19898/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "020-368-6884",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19898/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19898/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19898"
+			},
+			{
+				"isConnection": false,
+				"id": 19907,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Clara",
+							"middleName": "",
+							"familyName": "Schmidt",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19907/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "50 Redcliffe Way, WOOLMERE GREEN, B60 5WL",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19907/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "077-792-76829",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19907/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19907/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19907"
+			},
+			{
+				"isConnection": false,
+				"id": 19923,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Daniel",
+							"middleName": "",
+							"familyName": "Giles",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19923/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "14 Carmana Gardens, Waikuku, Waimakariri 7400",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19923/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "029-989-1815",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19923/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19923/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19923"
+			},
+			{
+				"isConnection": false,
+				"id": 19933,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Davet",
+							"middleName": "",
+							"familyName": "Bizier",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19933/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "831 11th Ave, Calgary, AB T2P 1M6",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19933/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "403-218-2026",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19933/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19933/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19933"
+			},
+			{
+				"isConnection": false,
+				"id": 19904,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "David",
+							"middleName": "",
+							"familyName": "Whitehead",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19904/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "3136 40th Street, Calgary, AB T2N 2A7",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19904/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "403-270-8480",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19904/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19904/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19904"
+			},
+			{
+				"isConnection": false,
+				"id": 19894,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Faith",
+							"middleName": "",
+							"familyName": "Anderson",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19894/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "40 Watson Street, GUNBOWER VIC 3566",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19894/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "035-317-0079",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19894/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19894/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19894"
+			},
+			{
+				"isConnection": false,
+				"id": 19897,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Frank",
+							"middleName": "",
+							"familyName": "Verrett",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19897/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Mellemvej 25, 6200 Aabenraa",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19897/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "231-128-43",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19897/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19897/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19897"
+			},
+			{
+				"isConnection": false,
+				"id": 19938,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Frida",
+							"middleName": "",
+							"familyName": "Eriksen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19938/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "3075 5th Avenue, Spirit River, AB T0H 3G0",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19938/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "780-864-7589",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19938/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19938/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19938"
+			},
+			{
+				"isConnection": false,
+				"id": 19919,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Genevre",
+							"middleName": "",
+							"familyName": "Ang\u00e9lil",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19919/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "66 Greyfriars Road, CAPEL GARMON, LL26 9QF",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19919/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "077-405-89199",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19919/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19919/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19919"
+			},
+			{
+				"isConnection": false,
+				"id": 19924,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Grosvenor",
+							"middleName": "",
+							"familyName": "Mireault",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19924/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "3541 Kennedy Court, Bedford, MA 01730",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19924/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "774-489-8751",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19924/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19924/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19924"
+			},
+			{
+				"isConnection": false,
+				"id": 19941,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Hayden",
+							"middleName": "",
+							"familyName": "Gibbons",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19941/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "L\u00fctzelfl\u00fchstrasse 19,209510 Wil",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19941/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "071-848-5077",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19941/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19941/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19941"
+			},
+			{
+				"isConnection": false,
+				"id": 19910,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Hjalte",
+							"middleName": "",
+							"familyName": "Thorsen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19910/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Casut 51, 1688 Lieffrens",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19910/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "026-873-1159",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19910/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19910/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19910"
+			},
+			{
+				"isConnection": false,
+				"id": 19935,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Jerry",
+							"middleName": "",
+							"familyName": "Grow",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19935/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "15 Trinity Crescent, WHITBURN, EH47 0DB",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19935/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "078-277-26628",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19935/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19935/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19935"
+			},
+			{
+				"isConnection": false,
+				"id": 19925,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Jonas",
+							"middleName": "",
+							"familyName": "Schultz",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19925/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "23 Ploughley Rd, TIRABAD, LD4 2FQ",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19925/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "079-067-89004",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19925/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19925/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19925"
+			},
+			{
+				"isConnection": false,
+				"id": 19931,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Jonathan",
+							"middleName": "",
+							"familyName": "Keats",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19931/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "89 Davenport Street, MILA NSW 2632",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19931/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "026-148-7212",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19931/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19931/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19931"
+			},
+			{
+				"isConnection": false,
+				"id": 19918,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Julian",
+							"middleName": "",
+							"familyName": "Bauer",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19918/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "4014 Masonic Drive, Squaw Gap, MT 59270",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19918/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "406-569-5407",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19918/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19918/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19918"
+			},
+			{
+				"isConnection": false,
+				"id": 19916,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Julius",
+							"middleName": "",
+							"familyName": "Bang",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19916/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Lykkesholmvej 48, 5591 Gelsted",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19916/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "257-317-17",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19916/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19916/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19916"
+			},
+			{
+				"isConnection": false,
+				"id": 19900,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Lara",
+							"middleName": "",
+							"familyName": "Minahan",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19900/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "42 Telford Street, BARFORD, CV35 6US",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19900/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "078-783-24761",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19900/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19900/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19900"
+			},
+			{
+				"isConnection": false,
+				"id": 19930,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Laura",
+							"middleName": "",
+							"familyName": "Armstrong",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19930/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "1644 rue des \u00c9glises E73t, Ferme Neuve, QC J0W201C0",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19930/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "819-587-7479",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19930/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19930/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19930"
+			},
+			{
+				"isConnection": false,
+				"id": 19926,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Malka",
+							"middleName": "",
+							"familyName": "Taylor",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19926/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "3367 Harvest Moon Dr, Unionville, ON L3R 0L7",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19926/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "905-948-6502",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19926/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19926/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19926"
+			},
+			{
+				"isConnection": false,
+				"id": 19936,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Margaret",
+							"middleName": "",
+							"familyName": "Meredith",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19936/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Pappelallee 23, 98657 Themar",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19936/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "036-873-1279",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19936/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19936/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19936"
+			},
+			{
+				"isConnection": false,
+				"id": 19902,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Margaux",
+							"middleName": "",
+							"familyName": "Dodier",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19902/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "204 Koromiko Glen, Waikanae Beach, Waikanae 5036",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19902/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "021-614-5308",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19902/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19902/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19902"
+			},
+			{
+				"isConnection": false,
+				"id": 19928,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Maya",
+							"middleName": "",
+							"familyName": "Kyte",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19928/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Loorenstrasse 8, 6764 Chiggiogna",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19928/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "091-720-3390",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19928/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19928/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19928"
+			},
+			{
+				"isConnection": false,
+				"id": 19893,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Methena",
+							"middleName": "",
+							"familyName": "Guernon",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19893/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "41 Merivale Road, Stittsville, ON K2S 1B9",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19893/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "613-831-4865",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19893/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19893/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19893"
+			},
+			{
+				"isConnection": false,
+				"id": 19911,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Michael",
+							"middleName": "",
+							"familyName": "Greer",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19911/name/1"
+					},
+					{
+						"id": 2,
+						"type": "phone",
+						"value": "022-788-4441",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19911/phone/2"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19911/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19911"
+			},
+			{
+				"isConnection": false,
+				"id": 19932,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Natasha",
+							"middleName": "",
+							"familyName": "Dixon",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19932/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Puolakantie 31, 00540 HELSINKI",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19932/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "041-802-4085",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19932/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19932/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19932"
+			},
+			{
+				"isConnection": false,
+				"id": 19905,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Nathan",
+							"middleName": "",
+							"familyName": "Gough",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19905/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Gr\u00f8nvangen 9, 2720 Van6C\u00f8se",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19905/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "298-247-60",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19905/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19905/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19905"
+			},
+			{
+				"isConnection": false,
+				"id": 19901,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Olivia",
+							"middleName": "",
+							"familyName": "Kristensen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19901/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "4552 Hamilton Street, Elrose, SK S4P 3Y2",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19901/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "306-378-7148",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19901/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19901/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19901"
+			},
+			{
+				"isConnection": false,
+				"id": 19896,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Orson",
+							"middleName": "",
+							"familyName": "Plante",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19896/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Brogade 75, 6701 Esbjerg",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19896/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "232-444-02",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19896/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19896/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19896"
+			},
+			{
+				"isConnection": false,
+				"id": 19908,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Oskar",
+							"middleName": "",
+							"familyName": "Danielsen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19908/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Kongsh\u00f8j All\u00e9 29, 63430 Krus\u00e5",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19908/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "719-641-06",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19908/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19908/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19908"
+			},
+			{
+				"isConnection": false,
+				"id": 19934,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Porter",
+							"middleName": "",
+							"familyName": "Houde",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19934/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Via dalla Staziun 113, 1912 Dugny",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19934/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "027-651-7010",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19934/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19934/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19934"
+			},
+			{
+				"isConnection": false,
+				"id": 19922,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Rasmus",
+							"middleName": "",
+							"familyName": "Andresen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19922/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "63 Fulford Road, PENTRE-DOLAU-HONDDU, LD3 1NR",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19922/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "078-546-13772",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19922/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19922/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19922"
+			},
+			{
+				"isConnection": false,
+				"id": 19895,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Samantha",
+							"middleName": "",
+							"familyName": "Shaw",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19895/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "62 Campbells River Road, BEARBONG NSW 2827",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19895/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "024-062-0082",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19895/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19895/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19895"
+			},
+			{
+				"isConnection": false,
+				"id": 19942,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Stacy",
+							"middleName": "",
+							"familyName": "Black",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19942/name/1"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19942/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19942"
+			},
+			{
+				"isConnection": false,
+				"id": 19927,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Steven",
+							"middleName": "",
+							"familyName": "Hobdy",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19927/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "4 Southwell Crescent, DARDANUP WA 6236",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19927/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "089-043-1086",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19927/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19927/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19927"
+			},
+			{
+				"isConnection": false,
+				"id": 19940,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Susan",
+							"middleName": "",
+							"familyName": "Anderson",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19940/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "Borstelmannsweg 62, 927321 St\u00f6rnstein",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19940/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "096-028-97601",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19940/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19940/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19940"
+			},
+			{
+				"isConnection": false,
+				"id": 19939,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Tempeste",
+							"middleName": "",
+							"familyName": "Sabourin",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19939/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "131 Old Mill Road, Western Springs, Auckland 1022",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19939/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "028-823-1738",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19939/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19939/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19939"
+			},
+			{
+				"isConnection": false,
+				"id": 19909,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Teresa",
+							"middleName": "",
+							"familyName": "Diaz",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19909/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "232 Oakwood Circle, Newport Beach, CA 92660",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19909/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "949-287-7660",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19909/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19909/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19909"
+			},
+			{
+				"isConnection": false,
+				"id": 19944,
+				"fields": [
+					{
+						"id": 4,
+						"type": "name",
+						"value": {
+							"givenName": "Test",
+							"middleName": "Middle",
+							"familyName": "Proofn",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-10T07:55:03Z",
+						"created": "2017-08-10T07:55:03Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/name/4"
+					},
+					{
+						"id": 6,
+						"type": "jobTitle",
+						"value": "Tester",
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-10T07:55:03Z",
+						"created": "2017-08-10T07:55:03Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/jobTitle/6"
+					},
+					{
+						"id": 7,
+						"type": "link",
+						"value": "www.proofn.com",
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-10T07:55:03Z",
+						"created": "2017-08-10T07:55:03Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/link/7"
+					},
+					{
+						"id": 10,
+						"type": "company",
+						"value": "Myabuy",
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-10T07:55:03Z",
+						"created": "2017-08-10T07:55:03Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/company/10"
+					},
+					{
+						"id": 1,
+						"type": "phone",
+						"value": "084-563-21",
+						"editedBy": "OWNER",
+						"flags": [
+							"HOME"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/phone/1"
+					},
+					{
+						"id": 2,
+						"type": "phone",
+						"value": "084-563-20",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/phone/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "084-563-23",
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/phone/3"
+					},
+					{
+						"id": 9,
+						"type": "birthday",
+						"value": {
+							"day": "24",
+							"month": "1",
+							"year": "1980"
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-10T07:55:03Z",
+						"created": "2017-08-10T07:55:03Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/birthday/9"
+					},
+					{
+						"id": 8,
+						"type": "email",
+						"value": "test@proofn.com",
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-10T07:55:03Z",
+						"created": "2017-08-10T07:55:03Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/email/8"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/category/"
+					},
+					{
+						"id": -5555,
+						"created": "2017-08-10T07:56:39Z",
+						"updated": "2017-08-10T07:56:39Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-10T07:55:03Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19944"
+			},
+			{
+				"isConnection": false,
+				"id": 19913,
+				"fields": [
+					{
+						"id": 1,
+						"type": "name",
+						"value": {
+							"givenName": "Tristan",
+							"middleName": "",
+							"familyName": "Christiansen",
+							"prefix": "",
+							"suffix": "",
+							"givenNameSound": "",
+							"familyNameSound": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19913/name/1"
+					},
+					{
+						"id": 2,
+						"type": "address",
+						"value": {
+							"street": "1630 Denver Avenue, Riverside, CA 92503",
+							"city": "",
+							"stateOrProvince": "",
+							"postalCode": ""
+						},
+						"editedBy": "OWNER",
+						"flags": [
+							"WORK"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19913/address/2"
+					},
+					{
+						"id": 3,
+						"type": "phone",
+						"value": "951-343-2195",
+						"editedBy": "OWNER",
+						"flags": [
+							"MOBILE"
+						],
+						"categories": [],
+						"updated": "2017-08-08T17:28:12Z",
+						"created": "2017-08-08T17:28:12Z",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19913/phone/3"
+					}
+				],
+				"categories": [
+					{
+						"name": "Desktop",
+						"id": 1,
+						"created": "1502212006",
+						"updated": "1502212006",
+						"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19913/category/"
+					}
+				],
+				"error": 0,
+				"restoredId": 0,
+				"created": "2017-08-08T17:28:12Z",
+				"updated": "2017-08-08T17:28:12Z",
+				"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contact/19913"
+			}
+		],
+		"count": 54,
+		"total": 54,
+		"start": 0,
+		"uri": "http://social.yahooapis.com/v1/user/TWIAASSNJFOOUMBW5Y7PKOQTQY/contacts"
+	}
+}

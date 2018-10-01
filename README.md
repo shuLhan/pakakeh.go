@@ -4,6 +4,8 @@ A collection of libraries and tools written in Go.
 
 - `bytes`, Package bytes provide a library for working with byte or slice of
   bytes.
+- `contact`, Package contact provide a library to import contact from Google,
+  Microsoft, and Yahoo.
 - `dns`, Package dns implement DNS client and server.
 - `ini`, Package ini implement reading and writing INI configuration as
   defined by Git configuration file syntax.
