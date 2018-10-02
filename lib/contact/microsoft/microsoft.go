@@ -7,7 +7,7 @@
 //
 // Reference
 //
-// (1) https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
+// - https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
 //
 package microsoft
 
@@ -48,26 +48,13 @@ func ImportFromJSON(jsonb []byte) (
 }
 
 //
-// ImportWithOAuth will send a request to user's contact API using OAuth
-// authentication code, and return pointer to Contacts object.
+// ImportWithOAuth get Microsoft Live contacts using OAuth HTTP client.
 //
-// On fail, it will return nil Contacts with error.
-//
-func ImportWithOAuth(
-	tokenType string,
-	accessToken string,
-) (
-	contacts []*contact.Record,
-	err error,
-) {
-	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", apiContactsURL, nil)
+func ImportWithOAuth(client *http.Client) (contacts []*contact.Record, err error) {
+	req, err := http.NewRequest(http.MethodGet, apiContactsURL, nil)
 	if err != nil {
 		return
 	}
-
-	req.Header.Add("Authorization", tokenType+" "+accessToken)
 
 	res, err := client.Do(req)
 	if err != nil {

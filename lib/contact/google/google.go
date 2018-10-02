@@ -42,29 +42,13 @@ func ImportFromJSON(jsonb []byte) (contacts []*contact.Record, err error) {
 }
 
 //
-// ImportWithOAuth will send a request to user's contact API using OAuth
-// authentication code.
+// ImportWithOAuth get Google contact API using OAuth HTTP client.
 //
-// On success it will return pointer to OAuth token and list of contacts, with
-// nil error.
-//
-// On fail, it will return nil token, empty contacts, and error.
-//
-func ImportWithOAuth(
-	tokenType string,
-	accessToken string,
-) (
-	contacts []*contact.Record,
-	err error,
-) {
-	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", apiContactsURL, nil)
+func ImportWithOAuth(client *http.Client) (contacts []*contact.Record, err error) {
+	req, err := http.NewRequest(http.MethodGet, apiContactsURL, nil)
 	if err != nil {
 		return
 	}
-
-	req.Header.Add("Authorization", tokenType+" "+accessToken)
 
 	res, err := client.Do(req)
 	if err != nil {

@@ -47,28 +47,14 @@ func ImportFromJSON(jsonb []byte) (contacts []*contact.Record, err error) {
 }
 
 //
-// ImportWithOAuth will send a request to user's contact API using OAuth
-// authentication code, and return list of Contact.
+// ImportWithOAuth get Yahoo contacts using OAuth HTTP client.
 //
-// On fail, it will return nil Contacts with error.
-//
-func ImportWithOAuth(
-	tokenType string,
-	accessToken string,
-	guid string,
-) (
-	contacts []*contact.Record,
-	err error,
-) {
-	client := &http.Client{}
+func ImportWithOAuth(client *http.Client, guid string) (contacts []*contact.Record, err error) {
 	api := apiContactsURL + guid + apiContactsSuffix
-
-	req, err := http.NewRequest("GET", api, nil)
+	req, err := http.NewRequest(http.MethodGet, api, nil)
 	if err != nil {
 		return
 	}
-
-	req.Header.Add("Authorization", "Bearer "+accessToken)
 
 	res, err := client.Do(req)
 	if err != nil {
