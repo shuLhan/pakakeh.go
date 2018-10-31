@@ -162,6 +162,31 @@ func FetchAll(repoDir string) error {
 }
 
 //
+// FetchTags will fetch all tags from remote.
+//
+func FetchTags(repoDir string) error {
+	cmd := exec.Command("git", "fetch")
+	if debug.Value == 0 {
+		cmd.Args = append(cmd.Args, "--quiet")
+	}
+	cmd.Args = append(cmd.Args, "--tags")
+	cmd.Dir = repoDir
+	cmd.Stdout = _stdout
+	cmd.Stderr = _stderr
+
+	if debug.Value >= 1 {
+		fmt.Printf("= FetchTags %s %s\n", cmd.Dir, cmd.Args)
+	}
+
+	err := cmd.Run()
+	if err != nil {
+		err = fmt.Errorf("FetchTags: %s", err)
+	}
+
+	return err
+}
+
+//
 // GetRemoteURL return remote URL or error if repository is not git or url is
 // empty.
 // If remoteName is empty, it will be set to default ("origin").
@@ -305,6 +330,43 @@ func LatestVersion(repoDir string) (version string, err error) {
 	}
 
 	err = fmt.Errorf("GetVersion: %s", err)
+	return
+}
+
+//
+// ListTags get all tags from repository.
+//
+func ListTags(repoDir string) (tags []string, err error) {
+	err = FetchTags(repoDir)
+	if err != nil {
+		return
+	}
+
+	cmd := exec.Command("git")
+	cmd.Args = append(cmd.Args, "tag", "--list")
+	cmd.Dir = repoDir
+	cmd.Stderr = _stderr
+
+	if debug.Value >= 1 {
+		fmt.Printf("= ListTags %s %s\n", cmd.Dir, cmd.Args)
+	}
+
+	bout, err := cmd.Output()
+	if err != nil {
+		err = fmt.Errorf("ListTag: %s", err)
+		return
+	}
+
+	sep := []byte{'\n'}
+	btags := bytes.Split(bout, sep)
+
+	for x := 0; x < len(btags); x++ {
+		if len(btags[x]) == 0 {
+			continue
+		}
+		tags = append(tags, string(btags[x]))
+	}
+
 	return
 }
 

@@ -236,6 +236,30 @@ func TestLatestVersion(t *testing.T) {
 	}
 }
 
+func TestListTag(t *testing.T) {
+	cases := []struct {
+		desc   string
+		exp    []string
+		expErr string
+	}{{
+		desc: "With default repo",
+		exp:  []string{"v0.1.0", "v0.2.0"},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+		mock.Reset(true)
+
+		got, err := ListTags(_testRepoDir)
+		if err != nil {
+			test.Assert(t, "err", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "tags", c.exp, got, true)
+	}
+}
+
 func TestLogRevisions(t *testing.T) {
 	cases := []struct {
 		desc         string
