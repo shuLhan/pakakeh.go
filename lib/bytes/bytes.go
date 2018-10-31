@@ -13,6 +13,11 @@ const (
 	// ASCIILetters contains list of lower and upper case characters in
 	// ASCII.
 	ASCIILetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	// ASCIILettersNumbers contains list of lower and upper case
+	// characters in ASCII with numbers.
+	ASCIILettersNumber = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
+
 	// HexaLETTERS contains list of hexadecimal characters in upper cases.
 	HexaLETTERS = "0123456789ABCDEF"
 	// HexaLetters contains list of hexadecimal characters in lower and
