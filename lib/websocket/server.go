@@ -269,29 +269,28 @@ func (serv *Server) upgrader() {
 //
 // handleFragment will handle continuation frame (fragmentation).
 //
-//```
-// (5.4-P34)
-// o  A fragmented message consists of a single frame with the FIN bit
-//    clear and an opcode other than 0, followed by zero or more frames
-//    with the FIN bit clear and the opcode set to 0, and terminated by
-//    a single frame with the FIN bit set and an opcode of 0.  A
-//    fragmented message is conceptually equivalent to a single larger
-//    message whose payload is equal to the concatenation of the
-//    payloads of the fragments in order; however, in the presence of
-//    extensions, this may not hold true as the extension defines the
-//    interpretation of the "Extension data" present.  For instance,
-//    "Extension data" may only be present at the beginning of the first
-//    fragment and apply to subsequent fragments, or there may be
-//    "Extension data" present in each of the fragments that applies
-//    only to that particular fragment.  In the absence of "Extension
-//    data", the following example demonstrates how fragmentation works.
 //
-//    EXAMPLE: For a text message sent as three fragments, the first
-//    fragment would have an opcode of 0x1 and a FIN bit clear, the
-//    second fragment would have an opcode of 0x0 and a FIN bit clear,
-//    and the third fragment would have an opcode of 0x0 and a FIN bit
-//    that is set.
-//```
+//	(5.4-P34)
+//	o  A fragmented message consists of a single frame with the FIN bit
+//	   clear and an opcode other than 0, followed by zero or more frames
+//	   with the FIN bit clear and the opcode set to 0, and terminated by
+//	   a single frame with the FIN bit set and an opcode of 0.  A
+//	   fragmented message is conceptually equivalent to a single larger
+//	   message whose payload is equal to the concatenation of the
+//	   payloads of the fragments in order; however, in the presence of
+//	   extensions, this may not hold true as the extension defines the
+//	   interpretation of the "Extension data" present.  For instance,
+//	   "Extension data" may only be present at the beginning of the first
+//	   fragment and apply to subsequent fragments, or there may be
+//	   "Extension data" present in each of the fragments that applies
+//	   only to that particular fragment.  In the absence of "Extension
+//	   data", the following example demonstrates how fragmentation works.
+//
+//	   EXAMPLE: For a text message sent as three fragments, the first
+//	   fragment would have an opcode of 0x1 and a FIN bit clear, the
+//	   second fragment would have an opcode of 0x0 and a FIN bit clear,
+//	   and the third fragment would have an opcode of 0x0 and a FIN bit
+//	   that is set.
 //
 // The first frame and their continuation is saved on map of socket connection
 // and frame: fragments.
@@ -303,10 +302,12 @@ func (serv *Server) upgrader() {
 // request will replace any previous non-completed fragmentation.
 //
 // (2) request is the middle frame (fin = 0 && opcode = 0).
+//
 // (2.1) Check if previous fragmentation exists, if not ignore the request.
 // (2.2) Append the request payload with previous frame.
 //
 // (3) request is the last frame (fin = 1 && opcode = 0)
+//
 // (3.1) Check if previous fragmentation exists, if not ignore the request.
 // (3.2) Append the request payload with previous frame.
 // (3.3) Handle request

@@ -21,8 +21,8 @@ type UserSockets struct {
 }
 
 //
-// Add append new socket `conn` to user ID uid only if the socket is not
-// already exist.
+// Add new socket connection to user ID only if the socket is not already
+// exist.
 //
 func (us *UserSockets) Add(uid uint64, conn int) {
 	v, ok := us.Load(uid)

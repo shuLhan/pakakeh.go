@@ -9,11 +9,11 @@
 // The websocket server is implemented with epoll [3], which means it's only
 // run on Linux.
 //
-// # Constraints
+// Constraints
 //
-// * Routing is handled by proxy layer (e.g. haproxy).
+// Routing is handled by proxy layer (e.g. HAProxy).
 //
-// # References
+// References
 //
 // [1] https://tools.ietf.org/html/rfc6455
 //
@@ -60,7 +60,7 @@ var (
 )
 
 //
-// Recv all content from file descriptor into slice of bytes.
+// Recv read all content from file descriptor into slice of bytes.
 //
 // On success it will return buffer from pool. Caller must put the buffer back
 // to the pool.
@@ -137,8 +137,8 @@ func SendFrame(fd int, f *Frame, randomMask bool) (err error) {
 }
 
 //
-// GenerateHandshakeKey generate a randomly selected 16-byte value that has
-// been base64-encoded (see Section 4 of [RFC4648]).
+// GenerateHandshakeKey randomly selected 16-byte value that has been
+// base64-encoded (see Section 4 of [RFC4648]).
 //
 func GenerateHandshakeKey() (key []byte) {
 	if _rng == nil {
@@ -158,7 +158,7 @@ func GenerateHandshakeKey() (key []byte) {
 
 //
 // GenerateHandshakeAccept generate server accept key by concatenating key,
-// defined above in step 4 in Section 4.2.2, with the string
+// defined in step 4 in Section 4.2.2, with the string
 // "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", taking the SHA-1 hash of this
 // concatenated value to obtain a 20-byte value and base64-encoding (see
 // Section 4 of [RFC4648]) this 20-byte hash.
