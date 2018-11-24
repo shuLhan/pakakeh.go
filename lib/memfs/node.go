@@ -5,18 +5,22 @@
 package memfs
 
 import (
+	"mime"
+	"net/http"
 	"os"
+	"path"
 )
 
 type Node struct {
-	SysPath string
-	Path    string
-	Name    string
-	Mode    os.FileMode
-	Size    int64
-	V       []byte
-	Parent  *Node
-	Childs  []*Node
+	SysPath     string
+	Path        string
+	Name        string
+	ContentType string
+	Mode        os.FileMode
+	Size        int64
+	V           []byte
+	Parent      *Node
+	Childs      []*Node
 }
 
 func newNode(path string) (*Node, error) {
@@ -53,4 +57,41 @@ func (leaf *Node) removeChild(child *Node) {
 		child.Parent = nil
 		child.Childs = nil
 	}
+}
+
+func (leaf *Node) updateContentType() error {
+	leaf.ContentType = mime.TypeByExtension(path.Ext(leaf.Name))
+	if len(leaf.ContentType) > 0 {
+		return nil
+	}
+
+	if len(leaf.V) > 0 {
+		leaf.ContentType = http.DetectContentType(leaf.V)
+		return nil
+	}
+
+	data := make([]byte, 512)
+
+	f, err := os.Open(leaf.SysPath)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Read(data)
+	if err != nil {
+		errc := f.Close()
+		if errc != nil {
+			panic(errc)
+		}
+		return err
+	}
+
+	err = f.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	leaf.ContentType = http.DetectContentType(data)
+
+	return nil
 }

@@ -221,6 +221,8 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 		return child, nil
 	}
 
+	child.updateContentType()
+
 	if child.Size > MaxFileSize {
 		return child, nil
 	}

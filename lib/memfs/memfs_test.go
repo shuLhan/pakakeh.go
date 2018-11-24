@@ -18,9 +18,10 @@ func TestGet(t *testing.T) {
 	MaxFileSize = 15
 
 	cases := []struct {
-		path   string
-		expV   []byte
-		expErr error
+		path           string
+		expV           []byte
+		expContentType string
+		expErr         error
 	}{{
 		path: "/",
 	}, {
@@ -29,34 +30,46 @@ func TestGet(t *testing.T) {
 		path:   "/exclude/dir",
 		expErr: os.ErrNotExist,
 	}, {
-		path: "/exclude/index.css",
-		expV: []byte("body {\n}\n"),
+		path:           "/exclude/index.css",
+		expV:           []byte("body {\n}\n"),
+		expContentType: "text/css; charset=utf-8",
 	}, {
-		path: "/exclude/index.html",
-		expV: []byte("<html></html>\n"),
+		path:           "/exclude/index.html",
+		expV:           []byte("<html></html>\n"),
+		expContentType: "text/html; charset=utf-8",
 	}, {
-		path: "/exclude/index.js",
+		path:           "/exclude/index.js",
+		expContentType: "application/javascript",
 	}, {
 		path: "/include",
 	}, {
 		path:   "/include/dir",
 		expErr: os.ErrNotExist,
 	}, {
-		path: "/include/index.css",
-		expV: []byte("body {\n}\n"),
+		path:           "/include/index.css",
+		expV:           []byte("body {\n}\n"),
+		expContentType: "text/css; charset=utf-8",
 	}, {
-		path: "/include/index.html",
-		expV: []byte("<html></html>\n"),
+		path:           "/include/index.html",
+		expV:           []byte("<html></html>\n"),
+		expContentType: "text/html; charset=utf-8",
 	}, {
-		path: "/include/index.js",
+		path:           "/include/index.js",
+		expContentType: "application/javascript",
 	}, {
-		path: "/index.css",
-		expV: []byte("body {\n}\n"),
+		path:           "/index.css",
+		expV:           []byte("body {\n}\n"),
+		expContentType: "text/css; charset=utf-8",
 	}, {
-		path: "/index.html",
-		expV: []byte("<html></html>\n"),
+		path:           "/index.html",
+		expV:           []byte("<html></html>\n"),
+		expContentType: "text/html; charset=utf-8",
 	}, {
-		path: "/index.js",
+		path:           "/index.js",
+		expContentType: "application/javascript",
+	}, {
+		path:           "/plain",
+		expContentType: "application/octet-stream",
 	}}
 
 	mfs, err := New(nil, nil)
@@ -78,11 +91,12 @@ func TestGet(t *testing.T) {
 			continue
 		}
 
-		t.Log(got)
-
 		if got.Size <= MaxFileSize {
-			test.Assert(t, "node.V", string(c.expV), string(got.V), true)
+			test.Assert(t, "node.V", c.expV, got.V, true)
 		}
+
+		test.Assert(t, "node.ContentType", c.expContentType,
+			got.ContentType, true)
 	}
 }
 
@@ -117,6 +131,7 @@ func TestMount(t *testing.T) {
 			"/index.css",
 			"/index.html",
 			"/index.js",
+			"/plain",
 		},
 	}, {
 		desc: "With excludes",
@@ -134,6 +149,7 @@ func TestMount(t *testing.T) {
 			"/include/index.html",
 			"/index.css",
 			"/index.html",
+			"/plain",
 		},
 	}, {
 		desc: "With includes",
