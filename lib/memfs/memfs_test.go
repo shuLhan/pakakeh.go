@@ -18,96 +18,70 @@ func TestGet(t *testing.T) {
 	MaxFileSize = 15
 
 	cases := []struct {
-		desc    string
-		dir     string
-		paths   []string
-		exp     [][]byte
-		expErrs []error
+		path   string
+		expV   []byte
+		expErr error
 	}{{
-		desc: "With '/'",
-		dir:  filepath.Join(_testWD, "/testdata"),
-		paths: []string{
-			"/",
-
-			"/exclude",
-			"/exclude/dir",
-			"/exclude/index.css",
-			"/exclude/index.html",
-			"/exclude/index.js",
-
-			"/include",
-			"/include/dir",
-			"/include/index.css",
-			"/include/index.html",
-			"/include/index.js",
-
-			"/index.css",
-			"/index.html",
-			"/index.js",
-		},
-		exp: [][]byte{
-			nil,
-
-			nil,
-			nil,
-			[]byte("body {\n}\n"),
-			[]byte("<html></html>\n"),
-			[]byte("function X() {}\n"),
-
-			nil,
-			nil,
-			[]byte("body {\n}\n"),
-			[]byte("<html></html>\n"),
-			[]byte("function X() {}\n"),
-
-			[]byte("body {\n}\n"),
-			[]byte("<html></html>\n"),
-			[]byte("function X() {}\n"),
-		},
-		expErrs: []error{
-			nil,
-
-			nil,
-			os.ErrNotExist,
-			nil,
-			nil,
-			nil,
-
-			nil,
-			os.ErrNotExist,
-			nil,
-			nil,
-			nil,
-
-			nil,
-			nil,
-			nil,
-		},
+		path: "/",
+	}, {
+		path: "/exclude",
+	}, {
+		path:   "/exclude/dir",
+		expErr: os.ErrNotExist,
+	}, {
+		path: "/exclude/index.css",
+		expV: []byte("body {\n}\n"),
+	}, {
+		path: "/exclude/index.html",
+		expV: []byte("<html></html>\n"),
+	}, {
+		path: "/exclude/index.js",
+	}, {
+		path: "/include",
+	}, {
+		path:   "/include/dir",
+		expErr: os.ErrNotExist,
+	}, {
+		path: "/include/index.css",
+		expV: []byte("body {\n}\n"),
+	}, {
+		path: "/include/index.html",
+		expV: []byte("<html></html>\n"),
+	}, {
+		path: "/include/index.js",
+	}, {
+		path: "/index.css",
+		expV: []byte("body {\n}\n"),
+	}, {
+		path: "/index.html",
+		expV: []byte("<html></html>\n"),
+	}, {
+		path: "/index.js",
 	}}
 
+	mfs, err := New(nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mfs.Mount(filepath.Join(_testWD, "/testdata"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, c := range cases {
-		t.Log(c.desc)
+		t.Logf("Get %s", c.path)
 
-		mfs, err := New(nil, nil)
+		got, err := mfs.Get(c.path)
 		if err != nil {
-			t.Fatal(err)
+			test.Assert(t, "error", c.expErr, err, true)
+			continue
 		}
 
-		err = mfs.Mount(c.dir)
-		if err != nil {
-			t.Fatal(err)
-		}
+		t.Log(got)
 
-		for x, path := range c.paths {
-			t.Log("Get:", path)
-
-			got, err := mfs.Get(path)
-			if err != nil {
-				test.Assert(t, "error", c.expErrs[x], err, true)
-				continue
-			}
-
-			test.Assert(t, "content", c.exp[x], got, true)
+		if got.Size <= MaxFileSize {
+			test.Assert(t, "node.V", string(c.expV), string(got.V), true)
 		}
 	}
 }
@@ -196,7 +170,7 @@ func TestMount(t *testing.T) {
 	}
 }
 
-func TestFiter(t *testing.T) {
+func TestFilter(t *testing.T) {
 	cases := []struct {
 		desc    string
 		inc     []string

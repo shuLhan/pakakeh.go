@@ -28,8 +28,8 @@ var (
 type MemFS struct {
 	incRE       []*regexp.Regexp
 	excRE       []*regexp.Regexp
-	root        *node
-	mapPathNode map[string]*node
+	root        *Node
+	mapPathNode map[string]*Node
 }
 
 //
@@ -40,7 +40,7 @@ type MemFS struct {
 //
 func New(includes, excludes []string) (*MemFS, error) {
 	mfs := &MemFS{
-		mapPathNode: make(map[string]*node),
+		mapPathNode: make(map[string]*Node),
 	}
 	for _, inc := range includes {
 		re, err := regexp.Compile(inc)
@@ -61,24 +61,16 @@ func New(includes, excludes []string) (*MemFS, error) {
 }
 
 //
-// Get the content of file in path.  If path is not exist it will return
-// os.ErrNotExist.
+// Get the node representation of file in path.  If path is not exist it will
+// return os.ErrNotExist.
 //
-func (mfs *MemFS) Get(path string) ([]byte, error) {
+func (mfs *MemFS) Get(path string) (*Node, error) {
 	node, ok := mfs.mapPathNode[path]
 	if !ok {
 		return nil, os.ErrNotExist
 	}
-	if node.mode.IsDir() {
-		return nil, nil
-	}
-	if len(node.v) > 0 {
-		return node.v, nil
-	}
 
-	v, err := ioutil.ReadFile(node.sysPath)
-
-	return v, err
+	return node, nil
 }
 
 //
@@ -144,22 +136,22 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 		return errors.New("Mount must be a directory.")
 	}
 
-	mfs.root = &node{
-		sysPath: dir,
-		path:    "/",
-		name:    "/",
-		mode:    fi.Mode(),
-		size:    fi.Size(),
-		v:       nil,
-		parent:  nil,
+	mfs.root = &Node{
+		SysPath: dir,
+		Path:    "/",
+		Name:    "/",
+		Mode:    fi.Mode(),
+		Size:    fi.Size(),
+		V:       nil,
+		Parent:  nil,
 	}
 
-	mfs.mapPathNode[mfs.root.path] = mfs.root
+	mfs.mapPathNode[mfs.root.Path] = mfs.root
 
 	return nil
 }
 
-func (mfs *MemFS) scanDir(parent *node, f *os.File) error {
+func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 	fis, err := f.Readdir(0)
 	if err != nil {
 		return err
@@ -173,11 +165,11 @@ func (mfs *MemFS) scanDir(parent *node, f *os.File) error {
 		if leaf == nil {
 			continue
 		}
-		if !leaf.mode.IsDir() {
+		if !leaf.Mode.IsDir() {
 			continue
 		}
 
-		fdir, err := os.Open(leaf.sysPath)
+		fdir, err := os.Open(leaf.SysPath)
 		if err != nil {
 			return err
 		}
@@ -192,34 +184,48 @@ func (mfs *MemFS) scanDir(parent *node, f *os.File) error {
 	return nil
 }
 
-func (mfs *MemFS) addChild(parent *node, fi os.FileInfo) (*node, error) {
-	child := &node{
-		mode:   fi.Mode(),
-		size:   fi.Size(),
-		parent: parent,
+func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
+	var err error
+
+	if fi.Mode()&os.ModeSymlink != 0 {
+		symPath := filepath.Join(parent.SysPath, fi.Name())
+		absPath, err := filepath.EvalSymlinks(symPath)
+		if err != nil {
+			return nil, err
+		}
+
+		fi, err = os.Lstat(absPath)
+		if err != nil {
+			return nil, err
+		}
 	}
-	child.name = fi.Name()
-	child.sysPath = filepath.Join(parent.sysPath, child.name)
-	child.path = path.Join(parent.path, child.name)
+
+	child := &Node{
+		Mode:   fi.Mode(),
+		Size:   fi.Size(),
+		Parent: parent,
+	}
+	child.Name = fi.Name()
+	child.SysPath = filepath.Join(parent.SysPath, child.Name)
+	child.Path = path.Join(parent.Path, child.Name)
 
 	if !mfs.isIncluded(child) {
 		return nil, nil
 	}
 
-	parent.childs = append(parent.childs, child)
+	parent.Childs = append(parent.Childs, child)
 
-	mfs.mapPathNode[child.path] = child
+	mfs.mapPathNode[child.Path] = child
 
-	if child.mode.IsDir() {
+	if child.Mode.IsDir() {
 		return child, nil
 	}
 
-	if child.size > MaxFileSize {
+	if child.Size > MaxFileSize {
 		return child, nil
 	}
 
-	var err error
-	child.v, err = ioutil.ReadFile(child.sysPath)
+	child.V, err = ioutil.ReadFile(child.SysPath)
 
 	return child, err
 }
@@ -228,22 +234,22 @@ func (mfs *MemFS) addChild(parent *node, fi os.FileInfo) (*node, error) {
 // isIncluded will return true if the child node pass the included filter or
 // excluded filter; otherwise it will return false.
 //
-func (mfs *MemFS) isIncluded(child *node) bool {
+func (mfs *MemFS) isIncluded(child *Node) bool {
 	if len(mfs.incRE) == 0 && len(mfs.excRE) == 0 {
 		return true
 	}
 	for _, re := range mfs.excRE {
-		if re.MatchString(child.sysPath) {
+		if re.MatchString(child.SysPath) {
 			return false
 		}
 	}
 	if len(mfs.incRE) > 0 {
 		for _, re := range mfs.incRE {
-			if re.MatchString(child.sysPath) {
+			if re.MatchString(child.SysPath) {
 				return true
 			}
 		}
-		if child.mode.IsDir() {
+		if child.Mode.IsDir() {
 			return true
 		}
 
@@ -259,17 +265,17 @@ func (mfs *MemFS) isIncluded(child *node) bool {
 //
 func (mfs *MemFS) pruneEmptyDirs() {
 	for k, node := range mfs.mapPathNode {
-		if !node.mode.IsDir() {
+		if !node.Mode.IsDir() {
 			continue
 		}
-		if len(node.childs) != 0 {
+		if len(node.Childs) != 0 {
 			continue
 		}
-		if node.parent == nil {
+		if node.Parent == nil {
 			continue
 		}
 
-		node.parent.removeChild(node)
+		node.Parent.removeChild(node)
 		delete(mfs.mapPathNode, k)
 	}
 }
