@@ -42,6 +42,10 @@ var (
 	ctxKeyWSAccept ctxKey = 1
 )
 
+//
+// ClientRecvHandler define a custom callback type for handling response from
+// request.
+//
 type ClientRecvHandler func(ctx context.Context, resp []byte) (err error)
 
 //

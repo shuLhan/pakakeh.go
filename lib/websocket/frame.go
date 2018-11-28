@@ -11,6 +11,9 @@ import (
 	"time"
 )
 
+//
+// List of valid operation code in frame.
+//
 const (
 	OpCodeCont  = 0x0
 	OpCodeText  = 0x1

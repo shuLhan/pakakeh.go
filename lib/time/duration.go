@@ -14,11 +14,15 @@ import (
 )
 
 const (
-	Day  = 24 * time.Hour
+	// Day the duration for a day.
+	Day = 24 * time.Hour
+	// Week the duration for a week.
 	Week = 7 * Day
 )
 
 var (
+	// ErrDurationMissingValue an error when value is missing when parsing
+	// duration.
 	ErrDurationMissingValue = errors.New("Missing value in duration")
 )
 

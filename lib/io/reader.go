@@ -19,7 +19,7 @@ type Reader struct {
 }
 
 //
-// Open the file in path for reading.
+// NewReader open the file in path for reading.
 //
 func NewReader(path string) (*Reader, error) {
 	var err error

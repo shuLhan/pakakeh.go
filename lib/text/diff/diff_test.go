@@ -227,9 +227,10 @@ func TestDiffFilesLevelWords(t *testing.T) {
 	newrev = "testdata/Top_Gear_Series_14.new"
 
 	diffs = testDiffFiles(t, oldrev, newrev, LevelWords)
+	// golint:
 	compareChunks(t, diffs.Changes[0].Adds, diffs.Changes[0].Dels,
 		[]string{","},
-		[]string{"alse "},
+		[]string{"alse "}, // nolint
 	)
 
 	oldrev = "testdata/Psusennes_II.old"

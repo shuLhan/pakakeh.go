@@ -9,6 +9,9 @@ import (
 	"strings"
 )
 
+//
+// RDataSRV define a resource record for type SRV.
+//
 type RDataSRV struct {
 	// The symbolic name of the desired service, as defined in Assigned
 	// Numbers [STD 2] or locally.  An underscore (_) is prepended to

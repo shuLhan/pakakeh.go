@@ -65,8 +65,10 @@ var (
 	clientTimeout = 6 * time.Second
 )
 
+// OpCode define a custom type for DNS header operation code.
 type OpCode byte
 
+// List of valid operation code.
 const (
 	OpCodeQuery  OpCode = iota // a standard query (QUERY)
 	OpCodeIQuery               // an inverse query (IQUERY), obsolete by RFC3425

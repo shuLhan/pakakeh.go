@@ -10,9 +10,8 @@ import (
 	"github.com/shuLhan/share/lib/contact"
 )
 
+// List of field type.
 const (
-	// List of field type.
-	// nolint: golint
 	FieldTypeAddress  = "address"
 	FieldTypeBirthday = "birthday"
 	FieldTypeCompany  = "company"

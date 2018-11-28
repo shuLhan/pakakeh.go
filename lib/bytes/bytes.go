@@ -14,7 +14,7 @@ const (
 	// ASCII.
 	ASCIILetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-	// ASCIILettersNumbers contains list of lower and upper case
+	// ASCIILettersNumber contains list of lower and upper case
 	// characters in ASCII with numbers.
 	ASCIILettersNumber = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
 
@@ -23,7 +23,7 @@ const (
 	// HexaLetters contains list of hexadecimal characters in lower and
 	// upper cases.
 	HexaLetters = "0123456789abcedfABCDEF"
-	// HexaLetters contains list of hexadecimal characters in lower cases.
+	// Hexaletters contains list of hexadecimal characters in lower cases.
 	Hexaletters = "0123456789abcedf"
 )
 

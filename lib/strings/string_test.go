@@ -45,7 +45,7 @@ func TestCleanWikiMarkup(t *testing.T) {
 <br clear="all">
 {{Fifthdoctoraudios}}
 
-{{DEFAULTSORT:Eye of the Scoprion, The}}
+{{DEFAULTSORT:Eye of the Scorpion, The}}
 [[Category:Fifth Doctor audio plays]]
 [[Category:Fifth Doctor audio plays]]
 [[:Category:2001 audio plays]]

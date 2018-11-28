@@ -9,6 +9,9 @@ import (
 	"strings"
 )
 
+//
+// RDataMINFO define a resource record for type MINFO.
+//
 type RDataMINFO struct {
 	// A <domain-name> which specifies a mailbox which is responsible for
 	// the mailing list or mailbox.  If this domain name names the root,

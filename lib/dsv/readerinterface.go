@@ -360,7 +360,7 @@ func ParseLine(reader ReaderInterface, line []byte) (
 		r, e := tabula.NewRecordBy(string(v), md.GetType())
 
 		if nil != e {
-			msg := fmt.Sprintf("md %s: Type convertion error from %q to %s",
+			msg := fmt.Sprintf("md %s: Type conversion error from %q to %s",
 				md.GetName(), string(v), md.GetTypeName())
 
 			return nil, &ReaderError{

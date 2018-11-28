@@ -87,6 +87,10 @@ func (cl *DoHClient) Close() error {
 	return nil
 }
 
+//
+// Lookup will query the DoH server with specific type, class, and name in
+// synchronous mode.
+//
 func (cl *DoHClient) Lookup(qtype, qclass uint16, qname []byte) (*Message, error) {
 	if len(qname) == 0 {
 		return nil, nil

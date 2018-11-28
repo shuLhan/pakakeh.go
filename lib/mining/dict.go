@@ -6,6 +6,7 @@ package mining
 
 // VulgarWords contain list of vulgar and offensive words in informal and
 // slangs.
+// nolint: misspell
 var VulgarWords = []string{
 	"$#!+", "$1ut", "$h1t", "$hit", "$lut", "'f*ck'", "'ho", "'hobag",
 	"@ss", "@sshole", "a$$", "a$$h0!e", "a$$h01e", "a$$h0le", "a$$hole",
