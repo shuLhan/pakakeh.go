@@ -113,8 +113,8 @@ func Floats64Counts(d, classes []float64) (counts []int) {
 }
 
 //
-// Floats64MaxCountOf will count number of occurence of each element of classes
-// in data and return the class with maximum count.
+// Floats64MaxCountOf will count number of occurrence of each element of
+// classes in data and return the class with maximum count.
 //
 // If `classes` is empty, it will return -1 and false.
 // If `data` is empty, it will return -2 and false.

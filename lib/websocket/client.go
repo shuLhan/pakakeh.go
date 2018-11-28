@@ -36,6 +36,12 @@ var (
 	_defRWTO    = 10 * time.Second
 )
 
+type ctxKey int
+
+var (
+	ctxKeyWSAccept ctxKey = 1
+)
+
 type ClientRecvHandler func(ctx context.Context, resp []byte) (err error)
 
 //
@@ -43,7 +49,7 @@ type ClientRecvHandler func(ctx context.Context, resp []byte) (err error)
 //
 type Client struct {
 	State           ConnState
-	Url             *url.URL
+	URL             *url.URL
 	serverAddr      string
 	handshakePath   string
 	handshakeOrigin string
@@ -106,17 +112,17 @@ func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 // On fail it will return empty server address and error.
 //
 func (cl *Client) ParseURI(endpoint string) (serverAddr string, err error) {
-	cl.Url, err = url.ParseRequestURI(endpoint)
+	cl.URL, err = url.ParseRequestURI(endpoint)
 	if err != nil {
 		cl = nil
 		return
 	}
 
-	if cl.Url.Scheme == _schemeWSS {
+	if cl.URL.Scheme == _schemeWSS {
 		cl.IsTLS = true
 	}
 
-	cl.serverAddr = GetConnectAddr(cl.Url)
+	cl.serverAddr = GetConnectAddr(cl.URL)
 	serverAddr = cl.serverAddr
 
 	return
@@ -262,7 +268,7 @@ func (cl *Client) Open(addr string) (err error) {
 //
 func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header) (err error) {
 	if len(path) == 0 {
-		path = cl.Url.EscapedPath() + "?" + cl.Url.RawQuery
+		path = cl.URL.EscapedPath() + "?" + cl.URL.RawQuery
 	}
 
 	cl.handshakePath = path
@@ -271,7 +277,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 	key := GenerateHandshakeKey()
 	keyAccept := GenerateHandshakeAccept(key)
 
-	_, err = fmt.Fprintf(&cl.bb, _handshakeReqFormat, path, cl.Url.Host, key)
+	_, err = fmt.Fprintf(&cl.bb, _handshakeReqFormat, path, cl.URL.Host, key)
 	if err != nil {
 		return
 	}
@@ -311,7 +317,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 
 	cl.bb.Write([]byte{'\r', '\n'})
 
-	ctx := context.WithValue(context.Background(), _hdrKeyWSAccept, keyAccept)
+	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
 
 	err = cl.Send(ctx, cl.bb.Bytes(), cl.handleHandshake)
 
@@ -335,7 +341,7 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 		return
 	}
 
-	expAccept := ctx.Value(_hdrKeyWSAccept)
+	expAccept := ctx.Value(ctxKeyWSAccept)
 	gotAccept := httpRes.Header.Get(_hdrKeyWSAccept)
 	if expAccept != gotAccept {
 		err = fmt.Errorf("handleHandshake: invalid server accept key")

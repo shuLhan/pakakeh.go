@@ -50,7 +50,7 @@ func NewWatcher(file string, d time.Duration) (*Watcher, error) {
 
 func (w *Watcher) start() {
 	oldStat, _ := os.Stat(w.file)
-	for _ = range w.ticker.C {
+	for range w.ticker.C {
 		newStat, err := os.Stat(w.file)
 		if err != nil {
 			w.cin <- nil

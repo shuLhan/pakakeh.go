@@ -7,7 +7,6 @@ package websocket
 import (
 	"bytes"
 	"errors"
-	_ "fmt"
 	"net/http"
 	"sync"
 )

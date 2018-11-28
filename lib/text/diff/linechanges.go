@@ -9,7 +9,7 @@ import (
 )
 
 //
-// LineChanges represet a set of change in text.
+// LineChanges represents a set of change in text.
 //
 type LineChanges []LineChange
 

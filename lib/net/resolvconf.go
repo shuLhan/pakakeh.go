@@ -246,13 +246,18 @@ func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 }
 
 func (rc *ResolvConf) parseOptions(reader *libio.Reader) {
+	var (
+		c      byte
+		isTerm bool
+		tok    []byte
+	)
 	for {
-		_, c := reader.SkipHorizontalSpace()
+		_, c = reader.SkipHorizontalSpace()
 		if c == '\n' || c == 0 {
 			break
 		}
 
-		tok, isTerm, c := reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, _ = reader.ReadUntil(spaceSeps, newLineTerms)
 		if len(tok) > 0 {
 			rc.parseOptionsKV(tok)
 		}

@@ -349,13 +349,19 @@ func (m *master) parseDirectiveInclude() (err error) {
 }
 
 func (m *master) parseDirectiveTTL() (err error) {
-	_, c := m.reader.SkipHorizontalSpace()
+	var (
+		c      byte
+		isTerm bool
+		tok    []byte
+	)
+
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		err = fmt.Errorf("! %s:%d Empty $ttl directive", m.file, m.lineno)
 		return
 	}
 
-	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		err = fmt.Errorf("! %s:%d Empty $ttl directive", m.file, m.lineno)
 		return
@@ -478,7 +484,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			return nil, err
 		}
 
-		tok, _, c := m.reader.ReadUntil(m.seps, m.terms)
+		tok, _, _ := m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
 			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
 				m.file, m.lineno, stok)
@@ -553,10 +559,10 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			if err != nil {
 				return nil, err
 			}
-			return rr, nil
+			goto out
 		}
 	}
-
+out:
 	return rr, nil
 }
 
@@ -664,7 +670,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	}
 
 	// Get RNAME
-	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 || isTerm {
 		err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
 			m.file, m.lineno, string(tok))
@@ -679,7 +685,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	terms := []byte{'\n', ';'}
 
 	// Get '(' or serial value
-	tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
 			m.file, m.lineno, string(tok))
@@ -858,7 +864,7 @@ func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	pref, err := strconv.Atoi(string(tok))
 	if err != nil {
-		err = fmt.Errorf("! %s:%d Invalid MX Preference: %s\n",
+		err = fmt.Errorf("! %s:%d Invalid MX Preference: %s",
 			m.file, m.lineno, err)
 		return
 	}

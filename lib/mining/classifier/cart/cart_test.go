@@ -52,7 +52,7 @@ func TestCART(t *testing.T) {
 
 	testset.GetClassColumn().ClearValues()
 
-	// Classifiy test set
+	// Classify test set.
 	e = CART.ClassifySet(&testset)
 	if nil != e {
 		t.Fatal(e)

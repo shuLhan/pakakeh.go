@@ -392,16 +392,16 @@ func (crf *Runtime) runTPSet(samples tabula.ClasetInterface) {
 //
 //		prob_class = count_of_class / total_votes
 //
-// (1.1.3) Compute total of probabilites times of stage weight.
+// (1.1.3) Compute total of probabilities times of stage weight.
 //
 //		stage_prob = prob_class * stage_weight
 //
-// (1.2) Divide each class stage probabilites with
+// (1.2) Divide each class stage probabilities with
 //
 //		stage_prob = stage_prob /
 //			(sum_of_all_weights * number_of_tree_in_forest)
 //
-// (1.3) Select class label with highest probabilites.
+// (1.3) Select class label with highest probabilities.
 // (1.4) Save stage probabilities for positive class.
 // (2) Compute confusion matrix.
 //

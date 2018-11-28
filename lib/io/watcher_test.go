@@ -56,10 +56,16 @@ func TestWatcher(t *testing.T) {
 	}()
 
 	// Update file mode
-	f.Chmod(0700)
+	err = f.Chmod(0700)
+	if err != nil {
+		t.Fatal(err)
+	}
 	time.Sleep(waitInterval)
 
-	f.WriteString("Write changes")
+	_, err = f.WriteString("Write changes")
+	if err != nil {
+		t.Fatal(err)
+	}
 	time.Sleep(waitInterval)
 
 	err = f.Close()

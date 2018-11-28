@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-func ExampleIntsMax() {
+func ExampleIntsFindMax() {
 	ints := []int{5, 6, 7, 8, 9, 0, 1, 2, 3, 4}
 
 	fmt.Println(IntsFindMax(ints))

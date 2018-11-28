@@ -4,33 +4,6 @@
 
 package tabula
 
-import (
-	"os"
-)
-
-var (
-	traces = make([]byte, 1024)
-)
-
-func printStackTrace() {
-	var lines, start, end int
-
-	for x, b := range traces {
-		if b != '\n' {
-			continue
-		}
-		lines++
-		if lines == 3 {
-			start = x
-		} else if lines == 5 {
-			end = x + 1
-			break
-		}
-	}
-
-	os.Stderr.Write(traces[start:end])
-}
-
 var testColTypes = []int{
 	TInteger,
 	TInteger,

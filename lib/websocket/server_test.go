@@ -16,8 +16,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-const ()
-
 func TestNewServer(t *testing.T) {
 	cases := []struct {
 		desc   string

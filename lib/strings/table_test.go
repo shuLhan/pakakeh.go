@@ -86,7 +86,7 @@ func TestTable_IsEqual(t *testing.T) {
 		tcmp Table
 		exp  bool
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		tcmp: table,
 		exp:  true,

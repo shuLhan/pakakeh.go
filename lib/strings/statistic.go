@@ -299,7 +299,7 @@ func TextSumCountTokens(text string, tokens []string, sensitive bool) (
 
 //
 // TextFrequencyOfTokens return frequencies of tokens by counting each
-// occurence of token and divide it with total words in text.
+// occurrence of token and divide it with total words in text.
 //
 func TextFrequencyOfTokens(text string, tokens []string, sensitive bool) (
 	freq float64,

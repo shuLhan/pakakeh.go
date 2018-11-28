@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package git provide a wrapper for git comman line interface.
+// Package git provide a wrapper for git command line interface.
 package git
 
 import (
@@ -139,7 +139,7 @@ func Clone(remoteURL, dest string) (err error) {
 //
 // FetchAll will fetch the latest commits and tags from remote.
 //
-func FetchAll(repoDir string) error {
+func FetchAll(repoDir string) (err error) {
 	cmd := exec.Command("git", "fetch")
 	if debug.Value == 0 {
 		cmd.Args = append(cmd.Args, "--quiet")
@@ -153,12 +153,12 @@ func FetchAll(repoDir string) error {
 		fmt.Printf("= FetchAll %s %s\n", cmd.Dir, cmd.Args)
 	}
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("FetchAll: %s", err)
 	}
 
-	return err
+	return
 }
 
 //

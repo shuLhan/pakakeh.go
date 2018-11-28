@@ -49,6 +49,9 @@ func TestLNSmote(t *testing.T) {
 	lnsmoteRun := New(100, 5, 5, "1", "lnsmote.outliers")
 
 	e = lnsmoteRun.Resampling(&dataset)
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	fmt.Println("[lnsmote_test] # synthetic:", lnsmoteRun.Synthetics.Len())
 

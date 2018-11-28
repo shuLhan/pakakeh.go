@@ -129,7 +129,7 @@ func TestDiffFilesLevelLine(t *testing.T) {
 }
 
 func TestDiffFilesLevelWords(t *testing.T) {
-	exp_adds := libstrings.Row{
+	expAdds := libstrings.Row{
 		[]string{"pharaoh"},
 		[]string{"| "},
 		[]string{"| "},
@@ -173,7 +173,7 @@ func TestDiffFilesLevelWords(t *testing.T) {
 		[]string{"&nbsp;"},
 	}
 
-	exp_dels := libstrings.Row{
+	expDels := libstrings.Row{
 		[]string{"Pharaoh ", "| "},
 		[]string{"   ", " ", " |"},
 		[]string{"   ", " ", "|"},
@@ -214,14 +214,14 @@ func TestDiffFilesLevelWords(t *testing.T) {
 	diffs := testDiffFiles(t, oldrev, newrev, LevelWords)
 
 	compareChunks(t, diffs.Changes[0].Adds, diffs.Changes[0].Dels,
-		exp_adds[26], exp_dels[26])
+		expAdds[26], expDels[26])
 
 	oldrev = "testdata/text02.old"
 	newrev = "testdata/text02.new"
 
 	diffs = testDiffFiles(t, oldrev, newrev, LevelWords)
 	compareChunks(t, diffs.Changes[0].Adds, diffs.Changes[0].Dels,
-		exp_adds[27], exp_dels[27])
+		expAdds[27], expDels[27])
 
 	oldrev = "testdata/Top_Gear_Series_14.old"
 	newrev = "testdata/Top_Gear_Series_14.new"
@@ -237,16 +237,16 @@ func TestDiffFilesLevelWords(t *testing.T) {
 
 	diffs = testDiffFiles(t, oldrev, newrev, LevelWords)
 	for x, change := range diffs.Changes {
-		if x >= len(exp_adds) {
+		if x >= len(expAdds) {
 			break
 		}
-		compareChunks(t, change.Adds, change.Dels, exp_adds[x],
-			exp_dels[x])
+		compareChunks(t, change.Adds, change.Dels, expAdds[x],
+			expDels[x])
 	}
 
 	allDels := diffs.Changes.GetAllDels()
 	got := allDels.Join("")
-	exp := exp_dels.Join("", "")
+	exp := expDels.Join("", "")
 
 	if exp != got {
 		t.Fatalf("Expecting %s got %s\n", exp, got)
@@ -254,7 +254,7 @@ func TestDiffFilesLevelWords(t *testing.T) {
 
 	allAdds := diffs.Changes.GetAllAdds()
 	got = allAdds.Join("")
-	exp = exp_adds.Join("", "")
+	exp = expAdds.Join("", "")
 
 	if exp != got {
 		t.Fatalf("Expecting %s got %s\n", exp, got)
@@ -262,61 +262,61 @@ func TestDiffFilesLevelWords(t *testing.T) {
 }
 
 func compareChunks(t *testing.T, adds, dels text.Chunks,
-	exp_adds, exp_dels []string,
+	expAdds, expDels []string,
 ) {
-	if len(adds) != len(exp_adds) {
-		t.Fatalf("Expecting adds '%v' got '%v'", exp_adds, adds)
+	if len(adds) != len(expAdds) {
+		t.Fatalf("Expecting adds '%v' got '%v'", expAdds, adds)
 	}
 	for x, add := range adds {
 		addv := string(add.V)
-		if addv != exp_adds[x] {
+		if addv != expAdds[x] {
 			t.Fatalf("[%d] Expecting add '%v' got '%v'", x,
-				exp_adds[x], addv)
+				expAdds[x], addv)
 		}
 	}
 
-	if len(dels) != len(exp_dels) {
-		t.Fatalf("Expecting deletes '%v' got '%v'", exp_dels, dels)
+	if len(dels) != len(expDels) {
+		t.Fatalf("Expecting deletes '%v' got '%v'", expDels, dels)
 	}
 	for x, del := range dels {
 		delv := string(del.V)
-		if delv != exp_dels[x] {
+		if delv != expDels[x] {
 			t.Fatalf("[%d] Expecting delete '%v' got '%v'", x,
-				exp_dels[x], delv)
+				expDels[x], delv)
 		}
 	}
 }
 
 func testDiffLines(t *testing.T, old, new text.Line,
-	exp_adds, exp_dels []string) {
+	expAdds, expDels []string) {
 
 	adds, dels := Lines(old.V, new.V, 0, 0)
 
-	compareChunks(t, adds, dels, exp_adds, exp_dels)
+	compareChunks(t, adds, dels, expAdds, expDels)
 }
 
 func TestDiffLines(t *testing.T) {
 	old := text.Line{N: 0, V: []byte("lorem ipsum dolmet")}
 	new := text.Line{N: 0, V: []byte("lorem all ipsum")}
 
-	exp_adds := libstrings.Row{
+	expAdds := libstrings.Row{
 		[]string{"all "},
 	}
-	exp_dels := libstrings.Row{
+	expDels := libstrings.Row{
 		[]string{" dolmet"},
 	}
 
-	testDiffLines(t, old, new, exp_adds[0], exp_dels[0])
+	testDiffLines(t, old, new, expAdds[0], expDels[0])
 
 	old = text.Line{N: 0, V: []byte("lorem ipsum dolmet")}
 	new = text.Line{N: 0, V: []byte("lorem ipsum")}
 
-	testDiffLines(t, old, new, []string{}, exp_dels[0])
+	testDiffLines(t, old, new, []string{}, expDels[0])
 
 	old = text.Line{N: 0, V: []byte("lorem ipsum")}
 	new = text.Line{N: 0, V: []byte("lorem ipsum dolmet")}
 
-	testDiffLines(t, old, new, exp_dels[0], []string{})
+	testDiffLines(t, old, new, expDels[0], []string{})
 
 	old = text.Line{N: 0, V: []byte("{{Pharaoh Infobox |")}
 	new = text.Line{N: 0, V: []byte("{{Infobox pharaoh")}

@@ -114,7 +114,7 @@ func TestMount(t *testing.T) {
 	}, {
 		desc:   "With file",
 		dir:    filepath.Join(_testWD, "testdata/index.html"),
-		expErr: "Mount must be a directory.",
+		expErr: "mount must be a directory",
 	}, {
 		desc: "With directory",
 		dir:  filepath.Join(_testWD, "testdata"),

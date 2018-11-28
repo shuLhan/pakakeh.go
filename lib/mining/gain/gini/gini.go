@@ -122,7 +122,8 @@ func (gini *Gini) computeDiscreteGain(A *[]string, T *[]string, C *[]string) {
 			// compute gini index for subtarget
 			giniIndex := gini.compute(&subT, C)
 
-			// compute probabilites of discrete value through all samples
+			// compute probabilities of discrete value through all
+			// samples
 			p := ndisc / nsample
 
 			probIndex := p * giniIndex
@@ -404,8 +405,8 @@ func (gini *Gini) GetMinIndexValue() float64 {
 // The returned value is index of attribute.
 //
 func FindMaxGain(gains *[]Gini) (MaxGainIdx int) {
-	var gainValue = 0.0
-	var maxGainValue = 0.0
+	var gainValue float64
+	var maxGainValue float64
 
 	for i := range *gains {
 		if (*gains)[i].Skip {
@@ -425,8 +426,8 @@ func FindMaxGain(gains *[]Gini) (MaxGainIdx int) {
 // FindMinGiniIndex return the index of attribute that have the minimum Gini index.
 //
 func FindMinGiniIndex(ginis *[]Gini) (MinIndexIdx int) {
-	var indexV = 0.0
-	var minIndexV = 1.0
+	var indexV float64
+	minIndexV := 1.0
 
 	for i := range *ginis {
 		indexV = (*ginis)[i].GetMinIndexValue()

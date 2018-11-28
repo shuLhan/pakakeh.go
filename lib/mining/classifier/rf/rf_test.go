@@ -66,10 +66,6 @@ func getSamples() (train, test tabula.ClasetInterface) {
 }
 
 func runRandomForest() {
-	oobStatsFile := OOBStatsFile
-	perfFile := PerfFile
-	statFile := StatFile
-
 	trainset, testset := getSamples()
 
 	if MaxFeature < 0 {
@@ -78,13 +74,13 @@ func runRandomForest() {
 
 	for nfeature := MinFeature; nfeature < MaxFeature; nfeature++ {
 		// Add prefix to OOB stats file.
-		oobStatsFile = fmt.Sprintf("N%d.%s", nfeature, OOBStatsFile)
+		oobStatsFile := fmt.Sprintf("N%d.%s", nfeature, OOBStatsFile)
 
 		// Add prefix to performance file.
-		perfFile = fmt.Sprintf("N%d.%s", nfeature, PerfFile)
+		perfFile := fmt.Sprintf("N%d.%s", nfeature, PerfFile)
 
 		// Add prefix to stat file.
-		statFile = fmt.Sprintf("N%d.%s", nfeature, StatFile)
+		statFile := fmt.Sprintf("N%d.%s", nfeature, StatFile)
 
 		// Create and build random forest.
 		forest := Runtime{

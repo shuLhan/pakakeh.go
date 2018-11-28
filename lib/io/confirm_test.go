@@ -58,7 +58,10 @@ func TestConfirmYesNo(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c)
 
-		in.WriteString(c.answer + "\n")
+		_, err := in.WriteString(c.answer + "\n")
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		mock.ResetStdin(false)
 

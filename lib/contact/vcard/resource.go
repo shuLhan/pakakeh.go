@@ -5,7 +5,7 @@
 package vcard
 
 //
-// Resource define common resource located in URI or embeded in Data.
+// Resource define common resource located in URI or embedded in Data.
 //
 type Resource struct {
 	Type string

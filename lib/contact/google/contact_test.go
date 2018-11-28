@@ -57,7 +57,7 @@ func TestDecode(t *testing.T) {
 			Year:  "2016",
 		},
 		Addresses: []contact.Address{
-			contact.Address{
+			{
 				Type:        "home",
 				POBox:       "40124",
 				Street:      "Jl. Tubagus Ismail VI",
@@ -66,7 +66,7 @@ func TestDecode(t *testing.T) {
 				PostalCode:  "40124",
 				Country:     "Indonesia",
 			},
-			contact.Address{
+			{
 				Type:   "work",
 				Street: "Perumahan Delima Cikutra",
 			},

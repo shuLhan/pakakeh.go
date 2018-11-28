@@ -154,7 +154,10 @@ func ResetStderr(truncate bool) {
 		log.Fatal(err)
 	}
 	if truncate {
-		_stderr.Truncate(0)
+		err = _stderr.Truncate(0)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -172,7 +175,11 @@ func ResetStdin(truncate bool) {
 		log.Fatal(err)
 	}
 	if truncate {
-		_stdin.Truncate(0)
+		err = _stdin.Truncate(0)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 	}
 }
 
@@ -190,6 +197,9 @@ func ResetStdout(truncate bool) {
 		log.Fatal(err)
 	}
 	if truncate {
-		_stdout.Truncate(0)
+		err = _stdout.Truncate(0)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }

@@ -54,7 +54,10 @@ func ExampleUDPClient() {
 		return
 	}
 
-	res.Unpack()
+	err = res.Unpack()
+	if err != nil {
+		log.Fatal("res.Unpack: ", err)
+	}
 
 	fmt.Printf("Receiving DNS message: %s\n", res)
 	for x, answer := range res.Answer {

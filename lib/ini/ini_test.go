@@ -697,7 +697,7 @@ func TestGetSection(t *testing.T) {
 		test.Assert(t, "sub name", c.subname, got.Sub, true)
 		test.Assert(t, "length vars", len(c.expKeys), len(got.Vars), true)
 
-		for x, _ := range c.expKeys {
+		for x := range c.expKeys {
 			test.Assert(t, "key", c.expKeys[x], got.Vars[x].Key, true)
 			test.Assert(t, "value", c.expVals[x], got.Vars[x].Value, true)
 		}

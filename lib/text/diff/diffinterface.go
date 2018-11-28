@@ -193,7 +193,7 @@ func BytesRatio(old, new []byte, minTokenLen int) (
 		}
 
 		x, y = 0, 0
-		// start again from begining...
+		// start again from beginning...
 	}
 
 	ratio = float32(m) / float32(maxlen)

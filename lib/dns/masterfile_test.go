@@ -56,7 +56,6 @@ func TestMasterParseDirectiveInclude(t *testing.T) {
 		desc   string
 		in     string
 		expErr string
-		exp    string
 	}{{
 		desc:   "Without value",
 		in:     `$include`,

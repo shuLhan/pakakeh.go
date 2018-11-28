@@ -15,7 +15,7 @@ func TestCountAlnum(t *testing.T) {
 		text string
 		exp  int
 	}{{
-	// Empty
+		// Empty
 	}, {
 		text: "// 123",
 		exp:  3,
@@ -39,7 +39,7 @@ func TestCountAlnumDistribution(t *testing.T) {
 		expChars  []rune
 		expCounts []int
 	}{{
-	// Empty
+		// Empty
 	}, {
 		text:      "// 123",
 		expChars:  []rune{'1', '2', '3'},
@@ -95,7 +95,7 @@ func TestCountDigit(t *testing.T) {
 		text string
 		exp  int
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text: "// Copyright 2018 Mhd Sulhan <ms@kilabit.info>. All rights reserved.",
 		exp:  4,
@@ -114,7 +114,7 @@ func TestCountNonAlnum(t *testing.T) {
 		withspace bool
 		exp       int
 	}{{
-	// Empty
+		// Empty
 	}, {
 		text: "// 123",
 		exp:  2,
@@ -149,7 +149,7 @@ func TestCountUniqChar(t *testing.T) {
 		text string
 		exp  int
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text: "abc abc",
 		exp:  4,
@@ -217,7 +217,7 @@ func TestRatioAlnum(t *testing.T) {
 		text string
 		exp  float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text: "// A b c d",
 		exp:  0.4,
@@ -237,7 +237,7 @@ func TestRatioDigit(t *testing.T) {
 		text string
 		exp  float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text: "// A b c d",
 		exp:  0,
@@ -258,7 +258,7 @@ func TestRatioNonAlnum(t *testing.T) {
 		withspace bool
 		exp       float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text: "// A b c d",
 		exp:  0.2,
@@ -286,7 +286,7 @@ func TestRatioUpper(t *testing.T) {
 		text string
 		exp  float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text: "// A b c d",
 		exp:  0.25,
@@ -303,7 +303,7 @@ func TestRatioUpperLower(t *testing.T) {
 		text string
 		exp  float64
 	}{{
-	// Empty
+		// Empty
 	}, {
 		text: "// 134234",
 	}, {
@@ -327,7 +327,7 @@ func TestTextSumCountTokens(t *testing.T) {
 		sensitive bool
 		exp       int
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text:   "[[aa]] [[AA]]",
 		tokens: []string{"[["},
@@ -364,7 +364,7 @@ func TestTextFrequencyOfTokens(t *testing.T) {
 		sensitive bool
 		exp       float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		text:   "a b c d A B C D",
 		tokens: []string{"a"},

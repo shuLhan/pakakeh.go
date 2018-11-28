@@ -211,8 +211,8 @@ func testClientFragmentation(t *testing.T) {
 			Payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{
-			[]byte{0x8A, 0x04, 'P', 'I', 'N', 'G'},
-			[]byte{
+			{0x8A, 0x04, 'P', 'I', 'N', 'G'},
+			{
 				0x81, 0x0E,
 				'H', 'e', 'l', 'l', 'o', ',', ' ',
 				'S', 'h', 'u', 'l', 'h', 'a', 'n',

@@ -109,7 +109,7 @@ func IntsCounts(d, classes []int) (counts []int) {
 }
 
 //
-// IntsMaxCountOf will count number of occurence of each element of classes
+// IntsMaxCountOf will count number of occurrence of each element of classes
 // in data and return the class with maximum count.
 //
 // If `classes` is empty, it will return -1 and false.

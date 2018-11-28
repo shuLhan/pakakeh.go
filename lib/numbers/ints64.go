@@ -112,7 +112,7 @@ func Ints64Counts(d, classes []int64) (counts []int) {
 }
 
 //
-// Ints64MaxCountOf will count number of occurence of each element of classes
+// Ints64MaxCountOf will count number of occurrence of each element of classes
 // in data and return the class with maximum count.
 //
 // If `classes` is empty, it will return -1 and false.

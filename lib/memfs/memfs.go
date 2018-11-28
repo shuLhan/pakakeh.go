@@ -120,7 +120,7 @@ func (mfs *MemFS) Get(path string) (*Node, error) {
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
-	for k, _ := range mfs.mapPathNode {
+	for k := range mfs.mapPathNode {
 		if len(paths) == 0 {
 			paths = append(paths, k)
 			continue
@@ -178,7 +178,7 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 	}
 
 	if !fi.IsDir() {
-		return errors.New("Mount must be a directory.")
+		return errors.New("mount must be a directory")
 	}
 
 	mfs.root = &Node{
@@ -266,7 +266,10 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 		return child, nil
 	}
 
-	child.updateContentType()
+	err = child.updateContentType()
+	if err != nil {
+		return nil, err
+	}
 
 	if child.Size > MaxFileSize {
 		return child, nil
@@ -296,12 +299,7 @@ func (mfs *MemFS) isIncluded(child *Node) bool {
 				return true
 			}
 		}
-		if child.Mode.IsDir() {
-			return true
-		}
-
-		// Its neither excluded or included.
-		return false
+		return child.Mode.IsDir()
 	}
 
 	return true

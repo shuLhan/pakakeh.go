@@ -256,7 +256,7 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 
 //
 // ClassifySet given a samples predict their class by running each sample in
-// forest, adn return their class prediction with confusion matrix.
+// forest, and return their class prediction with confusion matrix.
 // `samples` is the sample that will be predicted, `sampleIds` is the index of
 // samples.
 // If `sampleIds` is not nil, then sample index will be checked in each tree,

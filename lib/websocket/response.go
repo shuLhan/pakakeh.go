@@ -8,8 +8,6 @@ import (
 	"sync"
 )
 
-const ()
-
 var (
 	_resPool = sync.Pool{
 		New: func() interface{} {

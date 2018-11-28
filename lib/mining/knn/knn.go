@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package knn implement the K Nearest Neighbor using Euclidian to compute the
+// Package knn implement the K Nearest Neighbor using Euclidean to compute the
 // distance between samples.
 //
 package knn
@@ -48,7 +48,7 @@ func (in *Runtime) ComputeEuclidianDistance(samples *tabula.Rows,
 	for x := range *samples {
 		row := (*samples)[x]
 
-		// compute euclidian distance
+		// compute euclidean distance
 		d := 0.0
 		for y, rec := range *row {
 			if y == in.ClassIndex {

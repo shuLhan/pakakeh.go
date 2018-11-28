@@ -60,10 +60,7 @@ func (neighbors *Neighbors) Len() int {
 // This is for sort interface.
 //
 func (neighbors *Neighbors) Less(i, j int) bool {
-	if neighbors.distances[i] < neighbors.distances[j] {
-		return true
-	}
-	return false
+	return neighbors.distances[i] < neighbors.distances[j]
 }
 
 //

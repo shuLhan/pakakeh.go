@@ -92,8 +92,8 @@ func (r *Reader) SkipSpace() byte {
 }
 
 //
-// SkipHorizontalSpace read until no space, carriage return, or tab occured on
-// buffer.
+// SkipHorizontalSpace read until no space, carriage return, or tab occurred
+// on buffer.
 // On EOF it will return 0.
 //
 func (r *Reader) SkipHorizontalSpace() (n int, c byte) {

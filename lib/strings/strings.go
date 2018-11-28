@@ -45,7 +45,7 @@ func CountMissRate(src []string, target []string) (
 }
 
 //
-// CountToken will return number of token occurence in words.
+// CountToken will return number of token occurrence in words.
 //
 func CountToken(words []string, token string, sensitive bool) int {
 	if !sensitive {

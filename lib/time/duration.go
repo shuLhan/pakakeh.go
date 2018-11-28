@@ -73,7 +73,6 @@ func ParseDuration(s string) (time.Duration, error) {
 				return 0, nil
 			}
 			dur += float64(rest)
-			break
 		}
 		if isTerm {
 			break

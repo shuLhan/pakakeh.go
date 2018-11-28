@@ -48,7 +48,7 @@ type ServerOptions struct {
 func (opts *ServerOptions) parse() error {
 	ip := net.ParseIP(opts.IPAddress)
 	if ip == nil {
-		err := fmt.Errorf("Invalid address '%s'\n", opts.IPAddress)
+		err := fmt.Errorf("Invalid address '%s'", opts.IPAddress)
 		return err
 	}
 

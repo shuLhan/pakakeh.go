@@ -137,7 +137,7 @@ func TestIsTokenAt(t *testing.T) {
 		p     int
 		exp   bool
 	}{{
-	// empty
+		// empty
 	}, {
 		token: []byte("world"),
 		p:     -1,

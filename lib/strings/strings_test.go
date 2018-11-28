@@ -17,7 +17,7 @@ func TestCountMissRate(t *testing.T) {
 		target []string
 		exp    float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		src:    []string{"A", "B", "C", "D"},
 		target: []string{"A", "B", "C"},
@@ -57,7 +57,7 @@ func TestCountTokens(t *testing.T) {
 		sensitive bool
 		exp       []int
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		words:  []string{"A", "B", "C", "a", "b", "c"},
 		tokens: []string{"A", "B"},
@@ -82,7 +82,7 @@ func TestFrequencyOfTokens(t *testing.T) {
 		exp           []float64
 		sensitive     bool
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		words:  []string{"a", "b", "a", "b", "a", "c"},
 		tokens: []string{"a", "b"},
@@ -165,7 +165,7 @@ func TestMostFrequentTokens(t *testing.T) {
 		sensitive     bool
 		exp           string
 	}{{
-	// Empty
+		// Empty
 	}, {
 		words:  []string{"a", "b", "A"},
 		tokens: []string{"a", "b"},
@@ -236,7 +236,7 @@ func TestTotalFrequencyOfTokens(t *testing.T) {
 		sensitive     bool
 		exp           float64
 	}{{
-	// Empty.
+		// Empty.
 	}, {
 		words:  []string{"a", "b", "a", "b", "a", "c"},
 		tokens: []string{"a", "b"},

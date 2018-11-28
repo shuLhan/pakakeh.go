@@ -10,8 +10,6 @@ import (
 	"github.com/shuLhan/share/lib/contact"
 )
 
-const ()
-
 //
 // Contact define Proofn contact format.
 //
