@@ -11,16 +11,19 @@ import (
 	"path"
 )
 
+//
+// Node represent a single file.
+//
 type Node struct {
-	SysPath     string
-	Path        string
-	Name        string
-	ContentType string
-	Mode        os.FileMode
-	Size        int64
-	V           []byte
-	Parent      *Node
-	Childs      []*Node
+	SysPath     string      // The original file path in system.
+	Path        string      // Absolute file path in memory.
+	Name        string      // File name.
+	ContentType string      // File type per MIME, e.g. "application/json".
+	Mode        os.FileMode // File mode.
+	Size        int64       // Size of file.
+	V           []byte      // Content of file.
+	Parent      *Node       // Pointer to parent directory.
+	Childs      []*Node     // List of files in directory.
 }
 
 func newNode(path string) (*Node, error) {

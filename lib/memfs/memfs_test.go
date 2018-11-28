@@ -253,11 +253,11 @@ func TestFilter(t *testing.T) {
 		desc: "With excludes and includes",
 		exc: []string{
 			`.*/exclude`,
-			`.*\.js`,
+			`.*\.js$`,
 		},
 		inc: []string{
 			`.*/include`,
-			`.*\.html`,
+			`.*\.(css|html)$`,
 		},
 		sysPath: []string{
 			filepath.Join(_testWD, "/testdata"),
@@ -279,7 +279,7 @@ func TestFilter(t *testing.T) {
 		exp: []bool{
 			true,
 			true,
-			false,
+			true,
 
 			false,
 			false,
