@@ -282,7 +282,7 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 	stat := classifier.Stat{}
 	stat.Start()
 
-	if len(sampleIds) <= 0 {
+	if len(sampleIds) == 0 {
 		fmt.Println(tag, "Classify set:", samples)
 		fmt.Println(tag, "Classify set sample (one row):",
 			samples.GetRow(0))
@@ -322,7 +322,7 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 	forest.ComputeStatFromCM(&stat, cm)
 	stat.End()
 
-	if len(sampleIds) <= 0 {
+	if len(sampleIds) == 0 {
 		fmt.Println(tag, "CM:", cm)
 		fmt.Println(tag, "Classifying stat:", stat)
 		_ = stat.Write(forest.StatFile)

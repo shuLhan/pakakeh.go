@@ -175,7 +175,7 @@ func main() {
 		train()
 	} else {
 		// (1.2)
-		if len(flag.Args()) <= 0 {
+		if len(flag.Args()) == 0 {
 			usage()
 			os.Exit(1)
 		}

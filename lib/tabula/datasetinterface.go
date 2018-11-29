@@ -262,19 +262,18 @@ func SplitRowsByValue(di DatasetInterface, colidx int, value interface{}) (
 	} else {
 		var splitval float64
 
-		switch value.(type) {
+		switch v := value.(type) {
 		case int:
-			splitval = float64(value.(int))
+			splitval = float64(v)
 		case int64:
-			splitval = float64(value.(int64))
+			splitval = float64(v)
 		case float32:
-			splitval = float64(value.(float32))
+			splitval = float64(v)
 		case float64:
-			splitval = value.(float64)
+			splitval = v
 		}
 
-		splitL, splitR, e = SplitRowsByNumeric(di, colidx,
-			splitval)
+		splitL, splitR, e = SplitRowsByNumeric(di, colidx, splitval)
 	}
 
 	if e != nil {

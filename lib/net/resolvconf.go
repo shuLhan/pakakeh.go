@@ -22,7 +22,8 @@ var (
 	spaceSeps    = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
 )
 
-var getHostname = func() (string, error) {
+// lambda to test os.Hostname.
+var getHostname = func() (string, error) { // nolint
 	return os.Hostname()
 }
 

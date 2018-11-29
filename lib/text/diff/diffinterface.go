@@ -74,11 +74,12 @@ func Bytes(oldb, newb []byte) (equal bool) {
 	// Do not compare the length, because we care about the index.
 
 	minlen := 0
-	if oldblen < newblen {
+	switch {
+	case oldblen < newblen:
 		minlen = oldblen
-	} else if oldblen == newblen {
+	case oldblen == newblen:
 		minlen = oldblen
-	} else {
+	default:
 		minlen = newblen
 	}
 
@@ -349,12 +350,14 @@ func Files(oldf, newf string, difflevel int) (diffs Data, e error) {
 			addlen := xaty - y
 			dellen := yatx - x
 
-			if addlen < dellen {
+			switch {
+			case addlen < dellen:
 				for ; y < xaty && y < newlen; y++ {
 					diffs.PushAdd(newlines[y])
 					newlines[y].V = nil
 				}
-			} else if addlen == dellen {
+
+			case addlen == dellen:
 				// Both changes occur between lines
 				for x < yatx && y < xaty {
 					diffs.PushChange(oldlines[x],
@@ -364,7 +367,7 @@ func Files(oldf, newf string, difflevel int) (diffs Data, e error) {
 					x++
 					y++
 				}
-			} else { // addlen > dellen
+			default:
 				for ; x < yatx && x < oldlen; x++ {
 					diffs.PushDel(oldlines[x])
 					oldlines[x].V = nil
@@ -626,12 +629,12 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 	v := (*oldleft)[:xx]
 	dels = append(dels, text.Chunk{StartAt: atx + *x, V: v})
 	*oldleft = (*oldleft)[xx:]
-	*x = *x + xx
+	*x += xx
 
 	v = (*newleft)[:yy]
 	adds = append(adds, text.Chunk{StartAt: aty + *y, V: v})
 	*newleft = (*newleft)[yy:]
-	*y = *y + yy
+	*y += yy
 
 	return adds, dels
 }

@@ -290,7 +290,7 @@ func unpack(in []byte) (f *Frame, x uint64) {
 
 		if f.Masked == FrameIsMasked {
 			for y := uint64(0); y < f.len; y++ {
-				f.Payload[y] = f.Payload[y] ^ f.maskKey[y%4]
+				f.Payload[y] ^= f.maskKey[y%4]
 			}
 		}
 	}
@@ -349,13 +349,14 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 	headerSize := uint64(2)
 	payloadSize := uint64(len(f.Payload))
 
-	if payloadSize > math.MaxUint16 {
+	switch {
+	case payloadSize > math.MaxUint16:
 		f.len = FrameLargePayload
 		headerSize += 8
-	} else if payloadSize > FrameSmallPayload {
+	case payloadSize > FrameSmallPayload:
 		f.len = FrameMediumPayload
 		headerSize += 2
-	} else {
+	default:
 		f.len = payloadSize
 	}
 

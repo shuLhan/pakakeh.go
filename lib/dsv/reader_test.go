@@ -279,14 +279,14 @@ func TestDatasetMode(t *testing.T) {
 		status bool
 		value  string
 	}{{
-		false,
-		string(config[0]),
+		status: false,
+		value:  config[0],
 	}, {
-		true,
-		string(config[1]),
+		status: true,
+		value:  config[1],
 	}, {
-		true,
-		string(config[2]),
+		status: true,
+		value:  config[2],
 	}}
 
 	reader := &Reader{}
@@ -511,7 +511,7 @@ func testWriteOutput(t *testing.T, r *Reader, outfile, expfile string) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, outfile, expfile, true)
+	assertFile(t, outfile, expfile)
 }
 
 func TestMergeColumns(t *testing.T) {

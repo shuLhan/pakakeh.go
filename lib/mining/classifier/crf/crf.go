@@ -444,7 +444,7 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 		stageWeight := sumWeights * float64(crf.NTree)
 
 		for x := range stageProbs {
-			stageProbs[x] = stageProbs[x] / stageWeight
+			stageProbs[x] /= stageWeight
 		}
 
 		// (1.3)

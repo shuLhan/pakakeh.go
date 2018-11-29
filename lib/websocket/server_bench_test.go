@@ -23,12 +23,12 @@ const (
 )
 
 var (
-	headerUpgrade       = string(_hdrKeyUpgrade)
-	headerConnection    = string(_hdrKeyConnection)
-	headerSecVersion    = string(_hdrKeyWSVersion)
-	headerSecProtocol   = string(_hdrKeyWSProtocol)
-	headerSecKey        = string(_hdrKeyWSKey)
-	headerSecExtensions = string(_hdrKeyWSExtensions)
+	headerUpgrade       = _hdrKeyUpgrade
+	headerConnection    = _hdrKeyConnection
+	headerSecVersion    = _hdrKeyWSVersion
+	headerSecProtocol   = _hdrKeyWSProtocol
+	headerSecKey        = _hdrKeyWSKey
+	headerSecExtensions = _hdrKeyWSExtensions
 )
 
 type upgradeCase struct {
@@ -41,7 +41,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "base",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -50,7 +50,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "lowercase",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			strings.ToLower(headerUpgrade):    []string{"websocket"},
 			strings.ToLower(headerConnection): []string{"Upgrade"},
 			strings.ToLower(headerSecVersion): []string{"13"},
@@ -59,7 +59,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "uppercase",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"WEBSOCKET"},
 			headerConnection: []string{"UPGRADE"},
 			headerSecVersion: []string{"13"},
@@ -68,7 +68,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "subproto",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:     []string{"websocket"},
 			headerConnection:  []string{"Upgrade"},
 			headerSecVersion:  []string{"13"},
@@ -78,7 +78,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "subproto_comma",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:     []string{"websocket"},
 			headerConnection:  []string{"Upgrade"},
 			headerSecVersion:  []string{"13"},
@@ -87,7 +87,7 @@ var upgradeCases = []upgradeCase{
 	},
 	{
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:       []string{"websocket"},
 			headerConnection:    []string{"Upgrade"},
 			headerSecVersion:    []string{"13"},
@@ -101,7 +101,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_http_method",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("POST", "ws://example.org", http.Header{
+		req: mustMakeRequest("POST", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -110,7 +110,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_http_proto",
 		nonce: mustMakeNonce(),
-		req: setProto(1, 0, mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: setProto(1, 0, mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -119,7 +119,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_host",
 		nonce: mustMakeNonce(),
-		req: withoutHeader("Host", mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: withoutHeader("Host", mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -128,7 +128,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_upgrade",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
 		}),
@@ -136,7 +136,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_upgrade",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			"X-Custom-Header": []string{"value"},
 			headerConnection:  []string{"Upgrade"},
 			headerSecVersion:  []string{"13"},
@@ -145,7 +145,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_upgrade",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"not-websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -154,7 +154,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_connection",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerSecVersion: []string{"13"},
 		}),
@@ -162,7 +162,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_connection",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"not-upgrade"},
 			headerSecVersion: []string{"13"},
@@ -171,7 +171,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_sec_version_x",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 		}),
@@ -179,7 +179,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_sec_version",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"upgrade"},
 			headerSecVersion: []string{"15"},
@@ -188,7 +188,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_sec_key",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -197,7 +197,7 @@ var upgradeCases = []upgradeCase{
 	{
 		label: "bad_sec_key",
 		nonce: mustMakeNonce(),
-		req: mustMakeRequest("GET", "ws://example.org", http.Header{
+		req: mustMakeRequest("GET", http.Header{
 			headerUpgrade:    []string{"websocket"},
 			headerConnection: []string{"Upgrade"},
 			headerSecVersion: []string{"13"},
@@ -207,7 +207,7 @@ var upgradeCases = []upgradeCase{
 
 func BenchmarkUpgrader(b *testing.B) {
 	for _, bench := range upgradeCases {
-		bench.req.Header.Set(headerSecKey, string(bench.nonce[:]))
+		bench.req.Header.Set(headerSecKey, string(bench.nonce))
 
 		u := Server{}
 
@@ -233,8 +233,8 @@ func BenchmarkUpgrader(b *testing.B) {
 	}
 }
 
-func mustMakeRequest(method, url string, headers http.Header) *http.Request {
-	req, err := http.NewRequest(method, url, nil)
+func mustMakeRequest(method string, headers http.Header) *http.Request {
+	req, err := http.NewRequest(method, "ws://example.org", nil)
 	if err != nil {
 		panic(err)
 	}

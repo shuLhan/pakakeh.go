@@ -20,7 +20,7 @@ import (
 // assertFile compare content of two file, print error message and exit
 // when both are different.
 //
-func assertFile(t *testing.T, a, b string, equal bool) {
+func assertFile(t *testing.T, a, b string) {
 	out, e := ioutil.ReadFile(a)
 
 	if nil != e {
@@ -37,7 +37,7 @@ func assertFile(t *testing.T, a, b string, equal bool) {
 
 	r := bytes.Compare(out, exp)
 
-	if equal && 0 != r {
+	if 0 != r {
 		debug.PrintStack()
 		t.Fatal("Comparing", a, "with", b, ": result is different (",
 			r, ")")
@@ -49,15 +49,15 @@ func checkDataset(t *testing.T, r *Reader, exp string) {
 	ds := r.GetDataset().(tabula.DatasetInterface)
 	data := ds.GetData()
 
-	switch data.(type) {
+	switch v := data.(type) {
 	case *tabula.Rows:
-		rows := data.(*tabula.Rows)
+		rows := v
 		got = fmt.Sprint(*rows)
 	case *tabula.Columns:
-		cols := data.(*tabula.Columns)
+		cols := v
 		got = fmt.Sprint(*cols)
 	case *tabula.Matrix:
-		matrix := data.(*tabula.Matrix)
+		matrix := v
 		got = fmt.Sprint(*matrix)
 	default:
 		fmt.Println("data type unknown")

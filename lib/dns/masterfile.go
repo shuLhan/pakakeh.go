@@ -464,7 +464,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			if err != nil {
 				return nil, err
 			}
-			rr.TTL = uint32(ttl)
+			rr.TTL = ttl
 			m.flag |= parseRRTTL
 		} else {
 			ok := m.parseRRClassOrType(rr, stok)

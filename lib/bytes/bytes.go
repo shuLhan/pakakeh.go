@@ -336,7 +336,7 @@ func SkipAfterToken(line, token []byte, startAt int, checkEsc bool) (int, bool) 
 		}
 
 		// We found the token at `p`
-		p = p + len(token)
+		p += len(token)
 		return p, true
 	}
 
@@ -351,7 +351,7 @@ func ToLower(data *[]byte) {
 		if (*data)[x] < 'A' || (*data)[x] > 'Z' {
 			continue
 		}
-		(*data)[x] = (*data)[x] + 32
+		(*data)[x] += 32
 	}
 }
 
@@ -363,7 +363,7 @@ func ToUpper(data *[]byte) {
 		if (*data)[x] < 'a' || (*data)[x] > 'z' {
 			continue
 		}
-		(*data)[x] = (*data)[x] - 32
+		(*data)[x] -= 32
 	}
 }
 

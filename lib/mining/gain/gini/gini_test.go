@@ -51,8 +51,8 @@ func TestComputeDiscrete(t *testing.T) {
 		fmt.Println("target:", target)
 		fmt.Println("data:", sample)
 
-		gini.ComputeDiscrete(&sample, &discreteValues, &target,
-			&classes)
+		sample := sample
+		gini.ComputeDiscrete(&sample, &discreteValues, &target, &classes)
 
 		fmt.Println(gini)
 	}

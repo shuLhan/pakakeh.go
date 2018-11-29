@@ -37,7 +37,7 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 
 	payload[0] = 'A'
 
-	for x := uint64(1); x < size; x = x * 2 {
+	for x := uint64(1); x < size; x *= 2 {
 		copy(payload[x:], payload[:x])
 	}
 

@@ -133,9 +133,8 @@ func (dataset *Dataset) GetNColumn() (ncol int) {
 		return
 	}
 
-	switch dataset.Mode {
-	case DatasetModeRows:
-		if len(dataset.Rows) <= 0 {
+	if dataset.Mode == DatasetModeRows {
+		if len(dataset.Rows) == 0 {
 			return 0
 		}
 		return dataset.Rows[0].Len()
@@ -152,7 +151,7 @@ func (dataset *Dataset) GetNRow() (nrow int) {
 	case DatasetModeRows:
 		nrow = len(dataset.Rows)
 	case DatasetModeColumns:
-		if len(dataset.Columns) <= 0 {
+		if len(dataset.Columns) == 0 {
 			nrow = 0
 		} else {
 			// get length of record in the first column
@@ -292,8 +291,7 @@ func (dataset *Dataset) GetColumn(idx int) (col *Column) {
 // GetColumnByName return column based on their `name`.
 //
 func (dataset *Dataset) GetColumnByName(name string) (col *Column) {
-	switch dataset.Mode {
-	case DatasetModeRows:
+	if dataset.Mode == DatasetModeRows {
 		dataset.TransposeToColumns()
 	}
 
@@ -439,8 +437,7 @@ func (dataset *Dataset) TransposeToColumns() {
 
 	// reset the rows data only if original mode is rows
 	// this to prevent empty data when mode is matrix.
-	switch orgmode {
-	case DatasetModeRows:
+	if orgmode == DatasetModeRows {
 		dataset.Rows = nil
 	}
 }
@@ -697,8 +694,7 @@ func (dataset *Dataset) MergeColumns(other DatasetInterface) {
 		dataset.PushColumn(col)
 	}
 
-	switch othermode {
-	case DatasetModeRows:
+	if othermode == DatasetModeRows {
 		other.TransposeToRows()
 	}
 }

@@ -97,7 +97,7 @@ func (gini *Gini) computeDiscreteGain(A *[]string, T *[]string, C *[]string) {
 	// compute gini index for each discrete values
 	for i, subPart := range gini.DiscretePart {
 		// check if sub partition has at least an element
-		if len(subPart) <= 0 {
+		if len(subPart) == 0 {
 			continue
 		}
 
@@ -167,7 +167,7 @@ func (gini *Gini) computeDiscreteGain(A *[]string, T *[]string, C *[]string) {
 //
 func (gini *Gini) createDiscretePartition(discval []string) {
 	// no discrete values ?
-	if len(discval) <= 0 {
+	if len(discval) == 0 {
 		return
 	}
 

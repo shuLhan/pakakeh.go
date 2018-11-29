@@ -268,6 +268,7 @@ func TestServerHandshake(t *testing.T) {
 
 		fmt.Fprintf(&bb, "\r\n")
 
+		c := c
 		handleHandshake := func(ctx context.Context, resp []byte) (err error) {
 			httpBuf := bufio.NewReader(bytes.NewBuffer(resp))
 

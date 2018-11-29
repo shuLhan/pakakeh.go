@@ -20,7 +20,7 @@ import (
 // List of known links: http, https, ftp, ftps, ssh, file, rsync, and ws.
 //
 func CleanURI(text string) string {
-	if len(text) <= 0 {
+	if len(text) == 0 {
 		return ""
 	}
 
@@ -132,9 +132,12 @@ func JSONUnescape(in string, strict bool) (string, error) {
 // is true it also replace two or more new lines with single new-line.
 //
 func MergeSpaces(text string, withline bool) string {
-	var out []rune
-	var isspace bool
-	var isnewline bool
+	var (
+		isspace   bool
+		isnewline bool
+	)
+
+	out := make([]rune, 0, len(text))
 
 	for _, v := range text {
 		if v == ' ' {

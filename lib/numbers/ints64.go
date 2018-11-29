@@ -76,7 +76,7 @@ func Ints64Sum(d []int64) (sum int64) {
 // Ints64Count will count number of class in data.
 //
 func Ints64Count(d []int64, class int64) (count int) {
-	if len(d) <= 0 {
+	if len(d) == 0 {
 		return
 	}
 
@@ -99,7 +99,7 @@ func Ints64Count(d []int64, class int64) (count int) {
 //	1 : 2   -> 1
 //
 func Ints64Counts(d, classes []int64) (counts []int) {
-	if len(classes) <= 0 {
+	if len(classes) == 0 {
 		return
 	}
 

@@ -349,7 +349,7 @@ func ParseLine(reader ReaderInterface, line []byte) (
 				}
 			} else {
 				v = line[p:]
-				p = p + len(line)
+				p += len(line)
 			}
 		}
 

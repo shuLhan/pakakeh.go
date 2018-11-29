@@ -646,10 +646,10 @@ func (reader *Reader) valueCommit(withSpaces bool) {
 	val := reader.buf.String()
 
 	if withSpaces {
-		val = val + reader.bufSpaces.String()
+		val += reader.bufSpaces.String()
 	}
 
-	reader._var.Value = reader._var.Value + val
+	reader._var.Value += val
 
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()

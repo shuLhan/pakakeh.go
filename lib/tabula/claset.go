@@ -175,7 +175,7 @@ func (claset *Claset) MinorityClass() string {
 // Counts return the number of each class in value-space.
 //
 func (claset *Claset) Counts() []int {
-	if len(claset.counts) <= 0 {
+	if len(claset.counts) == 0 {
 		claset.CountValueSpaces()
 	}
 	return claset.counts

@@ -489,7 +489,7 @@ func TestGetSectionDup(t *testing.T) {
 				continue
 			}
 
-			test.Assert(t, k, c.expVals[x], string(got), true)
+			test.Assert(t, k, c.expVals[x], got, true)
 		}
 	}
 }
@@ -548,7 +548,7 @@ func TestGetVarMultiEmpty(t *testing.T) {
 				continue
 			}
 
-			test.Assert(t, k, c.expVals[x], string(got), true)
+			test.Assert(t, k, c.expVals[x], got, true)
 		}
 	}
 }
@@ -604,7 +604,7 @@ func TestGetVarMultiSection(t *testing.T) {
 				continue
 			}
 
-			test.Assert(t, k, c.expVals[x], string(got), true)
+			test.Assert(t, k, c.expVals[x], got, true)
 		}
 	}
 }

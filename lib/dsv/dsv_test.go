@@ -8,6 +8,10 @@ import (
 	"testing"
 )
 
+const (
+	testdataSimpleRead = "testdata/config_simpleread.dsv"
+)
+
 //
 // doInit create read-write object.
 //
@@ -35,7 +39,7 @@ func TestReadWriter(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, rw.GetOutput(), "testdata/expected.dat", true)
+	assertFile(t, rw.GetOutput(), "testdata/expected.dat")
 }
 
 //
@@ -53,11 +57,11 @@ func TestReadWriterAll(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, rw.GetOutput(), "testdata/expected.dat", true)
+	assertFile(t, rw.GetOutput(), "testdata/expected.dat")
 }
 
 func TestSimpleReadWrite(t *testing.T) {
-	fcfg := "testdata/config_simpleread.dsv"
+	fcfg := testdataSimpleRead
 
 	reader, e := SimpleRead(fcfg, nil)
 	if e != nil {
@@ -72,12 +76,12 @@ func TestSimpleReadWrite(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, fexp, fout, true)
+	assertFile(t, fexp, fout)
 }
 
 func TestSimpleMerge(t *testing.T) {
-	fcfg1 := "testdata/config_simpleread.dsv"
-	fcfg2 := "testdata/config_simpleread.dsv"
+	fcfg1 := testdataSimpleRead
+	fcfg2 := testdataSimpleRead
 
 	reader, e := SimpleMerge(fcfg1, fcfg2, nil, nil)
 	if e != nil {
@@ -92,5 +96,5 @@ func TestSimpleMerge(t *testing.T) {
 	fexp := "testdata/expected_simplemerge.dat"
 	fout := "testdata/output.dat"
 
-	assertFile(t, fexp, fout, true)
+	assertFile(t, fexp, fout)
 }

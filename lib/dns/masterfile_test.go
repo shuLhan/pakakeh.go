@@ -47,7 +47,7 @@ func TestMasterParseDirectiveOrigin(t *testing.T) {
 			continue
 		}
 
-		libtest.Assert(t, "origin", c.exp, string(m.origin), true)
+		libtest.Assert(t, "origin", c.exp, m.origin, true)
 	}
 }
 

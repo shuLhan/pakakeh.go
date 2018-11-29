@@ -73,7 +73,7 @@ func IntsSum(d []int) (sum int) {
 // IntsCount will count number of class in data.
 //
 func IntsCount(d []int, class int) (count int) {
-	if len(d) <= 0 {
+	if len(d) == 0 {
 		return
 	}
 
@@ -96,7 +96,7 @@ func IntsCount(d []int, class int) (count int) {
 //	1 : 2   -> 1
 //
 func IntsCounts(d, classes []int) (counts []int) {
-	if len(classes) <= 0 {
+	if len(classes) == 0 {
 		return
 	}
 

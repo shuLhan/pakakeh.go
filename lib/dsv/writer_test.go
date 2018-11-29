@@ -26,7 +26,7 @@ func TestWriter(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, rw.GetOutput(), "testdata/expected.dat", true)
+	assertFile(t, rw.GetOutput(), "testdata/expected.dat")
 }
 
 //
@@ -46,7 +46,7 @@ func TestWriterWithSkip(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, rw.GetOutput(), "testdata/expected_skip.dat", true)
+	assertFile(t, rw.GetOutput(), "testdata/expected_skip.dat")
 }
 
 //
@@ -68,7 +68,7 @@ func TestWriterWithColumns(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, "testdata/expected_skip.dat", rw.GetOutput(), true)
+	assertFile(t, "testdata/expected_skip.dat", rw.GetOutput())
 }
 
 func TestWriteRawRows(t *testing.T) {
@@ -94,7 +94,7 @@ func TestWriteRawRows(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, outfile, expfile, true)
+	assertFile(t, outfile, expfile)
 }
 
 func TestWriteRawColumns(t *testing.T) {
@@ -122,5 +122,5 @@ func TestWriteRawColumns(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	assertFile(t, outfile, expfile, true)
+	assertFile(t, outfile, expfile)
 }

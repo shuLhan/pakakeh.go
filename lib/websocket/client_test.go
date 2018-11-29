@@ -53,6 +53,7 @@ func testClientPing(t *testing.T) {
 			}
 		}
 
+		c := c
 		recvHandler := func(ctx context.Context, resp []byte) (err error) {
 			test.Assert(t, "resp", c.exp, resp, true)
 			return
@@ -135,6 +136,7 @@ func testClientText(t *testing.T) {
 			}
 		}
 
+		c := c
 		recvHandler := func(ctx context.Context, resp []byte) (err error) {
 			test.Assert(t, "", c.exp, resp, true)
 			return

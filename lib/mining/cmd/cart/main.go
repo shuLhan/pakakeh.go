@@ -72,7 +72,7 @@ func main() {
 
 	flag.Parse()
 
-	if len(flag.Args()) <= 0 {
+	if len(flag.Args()) == 0 {
 		usage()
 		os.Exit(1)
 	}

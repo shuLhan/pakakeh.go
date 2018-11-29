@@ -135,7 +135,7 @@ func CountUniqChar(text string) (n int) {
 		return
 	}
 
-	var uchars []rune
+	uchars := make([]rune, 0, len(text))
 
 	for _, v := range text {
 		yes, _ := runes.Contain(uchars, v)

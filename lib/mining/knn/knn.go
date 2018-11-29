@@ -84,8 +84,7 @@ func (in *Runtime) FindNeighbors(samples *tabula.Rows, instance *tabula.Row) (
 	// Reset current input neighbours
 	in.AllNeighbors = Neighbors{}
 
-	switch in.DistanceMethod {
-	case TEuclidianDistance:
+	if in.DistanceMethod == TEuclidianDistance {
 		in.ComputeEuclidianDistance(samples, instance)
 	}
 

@@ -201,8 +201,8 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 
 func (msg *Message) packQuestion() {
 	msg.packDomainName(msg.Question.Name, false)
-	libbytes.AppendUint16(&msg.Packet, uint16(msg.Question.Type))
-	libbytes.AppendUint16(&msg.Packet, uint16(msg.Question.Class))
+	libbytes.AppendUint16(&msg.Packet, msg.Question.Type)
+	libbytes.AppendUint16(&msg.Packet, msg.Question.Class)
 	msg.off += 4
 }
 
@@ -214,8 +214,8 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		msg.packDomainName(rr.Name, true)
 	}
 
-	libbytes.AppendUint16(&msg.Packet, uint16(rr.Type))
-	libbytes.AppendUint16(&msg.Packet, uint16(rr.Class))
+	libbytes.AppendUint16(&msg.Packet, rr.Type)
+	libbytes.AppendUint16(&msg.Packet, rr.Class)
 	msg.off += 4
 
 	if rr.Type == QueryTypeOPT {
@@ -223,10 +223,10 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 
 		// Pack extended code and version to TTL
 		rr.TTL = uint32(rr.OPT.ExtRCode) << 24
-		rr.TTL = rr.TTL | uint32(rr.OPT.Version)<<16
+		rr.TTL |= (uint32(rr.OPT.Version) << 16)
 
 		if rr.OPT.DO {
-			rr.TTL = rr.TTL | maskOPTDO
+			rr.TTL |= maskOPTDO
 		}
 	}
 
@@ -448,8 +448,8 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 	msg.Packet = append(msg.Packet, rr.OPT.Data[:rr.OPT.Length]...)
 
 	// Write rdlength.
-	n := uint16(4 + rr.OPT.Length)
-	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
+	n := 4 + rr.OPT.Length
+	libbytes.WriteUint16(&msg.Packet, off, n)
 	msg.off += n
 }
 
@@ -526,11 +526,7 @@ func (msg *Message) Pack() ([]byte, error) {
 	msg.Header.NSCount = uint16(len(msg.Authority))
 	msg.Header.ARCount = uint16(len(msg.Additional))
 
-	header, err := msg.Header.pack()
-	if err != nil {
-		msg.dnameOff = nil
-		return nil, err
-	}
+	header := msg.Header.pack()
 
 	msg.Packet = append(msg.Packet, header...)
 	msg.off = uint16(sectionHeaderSize)

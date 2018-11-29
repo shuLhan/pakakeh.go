@@ -26,7 +26,7 @@ func TestParseDuration(t *testing.T) {
 		exp: time.Duration(1.5 * float64(Week)),
 	}, {
 		in:  "1w1d",
-		exp: time.Duration(1*Week + 1*Day),
+		exp: 1*Week + 1*Day,
 	}, {
 		in:  "0.5d",
 		exp: time.Duration(12) * time.Hour,

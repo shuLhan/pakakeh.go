@@ -46,10 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	re, err := regexp.Compile(`(?Us)/\*.+\*/`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	re := regexp.MustCompile(`(?Us)/\*.+\*/`)
 
 	var nshift int
 	doubleNewlines := false
@@ -73,7 +70,7 @@ func main() {
 		matchb[l-2] = '/'
 		matchb[l-1] = '/'
 
-		l = l - 3
+		l -= 3
 		for y := 2; y < l; y++ {
 			if matchb[y] != '\n' {
 				continue

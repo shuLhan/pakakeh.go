@@ -93,7 +93,7 @@ func (question *SectionQuestion) unpack(packet []byte) error {
 
 	question.Type = libbytes.ReadUint16(packet, x)
 	x += 2
-	question.Class = uint16(libbytes.ReadUint16(packet, x))
+	question.Class = libbytes.ReadUint16(packet, x)
 
 	return nil
 }

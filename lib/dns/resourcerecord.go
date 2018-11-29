@@ -164,13 +164,13 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 		if len(rr.Name) == 0 {
 			x++
 		} else {
-			x = x + uint(len(rr.Name)+2)
+			x += uint(len(rr.Name) + 2)
 		}
 	}
 
 	rr.Type = libbytes.ReadUint16(packet, x)
 	x += 2
-	rr.Class = uint16(libbytes.ReadUint16(packet, x))
+	rr.Class = libbytes.ReadUint16(packet, x)
 	x += 2
 	rr.offTTL = x
 	rr.TTL = libbytes.ReadUint32(packet, x)
@@ -182,7 +182,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 
 	err = rr.unpackRData(packet, x)
 
-	x = x + uint(rr.rdlen)
+	x += uint(rr.rdlen)
 
 	return
 }
@@ -375,7 +375,7 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
 		x = rr.off + 1
 		rr.off = 0
 	} else {
-		x = x + uint(len(rr.MInfo.RMailBox)+2)
+		x += uint(len(rr.MInfo.RMailBox) + 2)
 	}
 
 	err = rr.unpackDomainName(&rr.MInfo.EmailBox, packet, x)
@@ -462,7 +462,7 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 		x = rr.off + 1
 		rr.off = 0
 	} else {
-		x = x + uint(len(rr.SOA.MName)+2)
+		x += uint(len(rr.SOA.MName) + 2)
 	}
 
 	err = rr.unpackDomainName(&rr.SOA.RName, packet, x)
@@ -473,7 +473,7 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 		x = rr.off + 1
 		rr.off = 0
 	} else {
-		x = x + uint(len(rr.SOA.RName)+2)
+		x += uint(len(rr.SOA.RName) + 2)
 	}
 
 	rr.SOA.Serial = libbytes.ReadUint32(packet, x)

@@ -167,7 +167,7 @@ func IsEqual(a, b []string) bool {
 // If words is empty return nil string with negative (-1) index.
 //
 func Longest(words []string) (string, int) {
-	if len(words) <= 0 {
+	if len(words) == 0 {
 		return "", -1
 	}
 
@@ -246,7 +246,7 @@ func Swap(ss []string, x, y int) {
 // TotalFrequencyOfTokens return total frequency of list of token in words.
 //
 func TotalFrequencyOfTokens(words, tokens []string, sensitive bool) float64 {
-	if len(words) <= 0 || len(tokens) <= 0 {
+	if len(words) == 0 || len(tokens) == 0 {
 		return 0
 	}
 

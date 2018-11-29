@@ -138,8 +138,7 @@ func (h *serverHandler) ServeDNS(req *Request) {
 	)
 
 	qname := string(req.Message.Question.Name)
-	switch qname {
-	case "kilabit.info":
+	if qname == "kilabit.info" {
 		switch req.Message.Question.Type {
 		case QueryTypeA:
 			res = h.responses[0]

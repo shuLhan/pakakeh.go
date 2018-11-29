@@ -328,7 +328,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) {
 
 	// (2.2) (3.2)
 	f.Payload = append(f.Payload, req.Payload...)
-	f.len = f.len + req.len
+	f.len += req.len
 
 	// (2)
 	if req.Fin == 0 {

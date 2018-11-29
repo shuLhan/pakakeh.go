@@ -19,7 +19,7 @@ var (
 )
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {
-	return func(ctx context.Context, req *Request, res *Response) {
+	return func(ctx context.Context, req *Request, res *Response) { // nolint: unparam
 		test.Assert(t, "routeHandler", target, req.Target, true)
 	}
 }

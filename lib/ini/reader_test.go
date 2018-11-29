@@ -115,10 +115,10 @@ func TestParseSectionHeader(t *testing.T) {
 		}
 
 		test.Assert(t, "mode", c.expMode, reader._var.mode, true)
-		test.Assert(t, "format", c.expFormat, string(reader._var.format), true)
-		test.Assert(t, "section", c.expSecName, string(reader._var.secName), true)
-		test.Assert(t, "subsection", c.expSubName, string(reader._var.subName), true)
-		test.Assert(t, "comment", c.expComment, string(reader._var.others), true)
+		test.Assert(t, "format", c.expFormat, reader._var.format, true)
+		test.Assert(t, "section", c.expSecName, reader._var.secName, true)
+		test.Assert(t, "subsection", c.expSubName, reader._var.subName, true)
+		test.Assert(t, "comment", c.expComment, reader._var.others, true)
 	}
 
 }
@@ -171,9 +171,9 @@ func TestParseSubsection(t *testing.T) {
 		}
 
 		test.Assert(t, "mode", c.expMode, reader._var.mode, true)
-		test.Assert(t, "format", c.expFormat, string(reader._var.format), true)
-		test.Assert(t, "subsection", c.expSub, string(reader._var.subName), true)
-		test.Assert(t, "comment", c.expComment, string(reader._var.others), true)
+		test.Assert(t, "format", c.expFormat, reader._var.format, true)
+		test.Assert(t, "subsection", c.expSub, reader._var.subName, true)
+		test.Assert(t, "comment", c.expComment, reader._var.others, true)
 	}
 }
 

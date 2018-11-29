@@ -19,11 +19,11 @@ func Factorial(n int) (f int) {
 		f = 1
 	} else {
 		f = -1
-		n = n * -1
+		n *= -1
 	}
 
 	for ; n > 0; n-- {
-		f = f * n
+		f *= n
 	}
 
 	return f

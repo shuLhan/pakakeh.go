@@ -76,7 +76,7 @@ func Floats64Sum(d []float64) (sum float64) {
 // Floats64Count will count number of class in data.
 //
 func Floats64Count(d []float64, class float64) (count int) {
-	if len(d) <= 0 {
+	if len(d) == 0 {
 		return
 	}
 
@@ -100,7 +100,7 @@ func Floats64Count(d []float64, class float64) (count int) {
 //
 //
 func Floats64Counts(d, classes []float64) (counts []int) {
-	if len(classes) <= 0 {
+	if len(classes) == 0 {
 		return
 	}
 

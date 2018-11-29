@@ -206,7 +206,7 @@ func (rows *Rows) Contain(xrow *Row) (bool, int) {
 //
 func (rows *Rows) Contains(xrows Rows) (isin bool, indices []int) {
 	// No data to compare.
-	if len(xrows) <= 0 {
+	if len(xrows) == 0 {
 		return
 	}
 

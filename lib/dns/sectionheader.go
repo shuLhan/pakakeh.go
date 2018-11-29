@@ -120,7 +120,7 @@ func (hdr *SectionHeader) Reset() {
 //
 // pack the section header into slice of bytes.
 //
-func (hdr *SectionHeader) pack() ([]byte, error) {
+func (hdr *SectionHeader) pack() []byte {
 	var b0, b1 byte
 
 	packet := make([]byte, 4)
@@ -134,23 +134,23 @@ func (hdr *SectionHeader) pack() ([]byte, error) {
 		b0 = headerIsResponse
 	}
 
-	b0 = b0 | (0x78 & byte(hdr.Op<<2))
+	b0 |= (0x78 & byte(hdr.Op<<2))
 
 	if hdr.IsRD {
-		b0 = b0 | headerIsRD
+		b0 |= headerIsRD
 	}
 
 	if !hdr.IsQuery {
 		if hdr.IsAA {
-			b0 = b0 | headerIsAA
+			b0 |= headerIsAA
 		}
 		if hdr.IsTC {
-			b0 = b0 | headerIsTC
+			b0 |= headerIsTC
 		}
 		if hdr.IsRA {
-			b1 = b1 | headerIsRA
+			b1 |= headerIsRA
 		}
-		b1 = b1 | (0x0F & byte(hdr.RCode))
+		b1 |= (0x0F & byte(hdr.RCode))
 	}
 
 	packet[2] = b0
@@ -161,7 +161,7 @@ func (hdr *SectionHeader) pack() ([]byte, error) {
 	libbytes.AppendUint16(&packet, hdr.NSCount)
 	libbytes.AppendUint16(&packet, hdr.ARCount)
 
-	return packet, nil
+	return packet
 }
 
 //

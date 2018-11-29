@@ -39,8 +39,8 @@ type CM struct {
 // initByNumeric will initialize confusion matrix using numeric value space.
 //
 func (cm *CM) initByNumeric(vs []int64) {
-	var colTypes []int
-	var colNames []string
+	colTypes := make([]int, 0, len(vs))
+	colNames := make([]string, 0, len(vs))
 
 	for _, v := range vs {
 		vstr := strconv.FormatInt(v, 10)
@@ -106,8 +106,8 @@ func (cm *CM) ComputeNumeric(vs, actuals, predictions []int64) {
 // create will initialize confusion matrix using value space.
 //
 func (cm *CM) init(valueSpace []string) {
-	var colTypes []int
-	var colNames []string
+	colTypes := make([]int, 0, len(valueSpace))
+	colNames := make([]string, 0, len(valueSpace))
 
 	for _, v := range valueSpace {
 		colTypes = append(colTypes, tabula.TInteger)
@@ -271,7 +271,7 @@ func (cm *CM) GroupIndexPredictions(sampleIds []int,
 func (cm *CM) GroupIndexPredictionsStrings(sampleIds []int,
 	actuals, predictions []string,
 ) {
-	if len(sampleIds) <= 0 {
+	if len(sampleIds) == 0 {
 		return
 	}
 

@@ -294,7 +294,7 @@ func (runtime *Runtime) SelectRandomFeature(D tabula.ClasetInterface) {
 
 		// Remove skip flag on selected column
 		col := D.GetColumn(idx)
-		col.Flag = col.Flag &^ ColFlagSkip
+		col.Flag &^= ColFlagSkip
 	}
 
 	if debug.Value >= 1 {
@@ -309,8 +309,7 @@ func (runtime *Runtime) SelectRandomFeature(D tabula.ClasetInterface) {
 func (runtime *Runtime) computeGain(D tabula.ClasetInterface) (
 	gains []gini.Gini,
 ) {
-	switch runtime.SplitMethod {
-	case SplitMethodGini:
+	if runtime.SplitMethod == SplitMethodGini {
 		// create gains value for all attribute minus target class.
 		gains = make([]gini.Gini, D.GetNColumn())
 	}
@@ -418,7 +417,7 @@ func (runtime *Runtime) ClassifySet(data tabula.ClasetInterface) (e error) {
 	for i := 0; i < nrow; i++ {
 		class := runtime.Classify(data.GetRow(i))
 
-		_ = (*targetAttr).Records[i].SetValue(class, tabula.TString)
+		_ = targetAttr.Records[i].SetValue(class, tabula.TString)
 	}
 
 	return

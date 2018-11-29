@@ -400,7 +400,7 @@ func (rt *Runtime) computePerfByProbs(samples tabula.ClasetInterface,
 			stat.SetFPRate(fp, nactuals[1])
 			stat.SetPrecisionFromRate(nactuals[0], nactuals[1])
 
-			auc = auc + trapezoidArea(fp, fpprev, tp, tpprev)
+			auc += trapezoidArea(fp, fpprev, tp, tpprev)
 			stat.SetAUC(auc)
 
 			rt.perfs = append(rt.perfs, &stat)
@@ -422,8 +422,8 @@ func (rt *Runtime) computePerfByProbs(samples tabula.ClasetInterface,
 	stat.SetFPRate(fp, nactuals[1])
 	stat.SetPrecisionFromRate(nactuals[0], nactuals[1])
 
-	auc = auc + trapezoidArea(fp, fpprev, tp, tpprev)
-	auc = auc / float64(nclass[0]*nclass[1])
+	auc += trapezoidArea(fp, fpprev, tp, tpprev)
+	auc /= float64(nclass[0] * nclass[1])
 	stat.SetAUC(auc)
 
 	rt.perfs = append(rt.perfs, &stat)

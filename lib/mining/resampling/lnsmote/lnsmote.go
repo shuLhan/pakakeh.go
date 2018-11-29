@@ -74,7 +74,7 @@ func New(percentOver, k, classIndex int, classMinor, outliers string) (
 // Init will initialize LNSmote runtime by checking input values and set it to
 // default if not set or invalid.
 //
-func (in *Runtime) Init(dataset tabula.ClasetInterface) {
+func (in *Runtime) Init(dataset tabula.DatasetInterface) {
 	in.Runtime.Init()
 
 	in.NSynthetic = in.PercentOver / 100.0
@@ -95,7 +95,7 @@ func (in *Runtime) Init(dataset tabula.ClasetInterface) {
 // Resampling will run resampling process on dataset and return the synthetic
 // samples.
 //
-func (in *Runtime) Resampling(dataset tabula.ClasetInterface) (
+func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 	e error,
 ) {
 	in.Init(dataset)
@@ -169,7 +169,7 @@ func (in *Runtime) createSynthetic(p *tabula.Row, neighbors knn.Neighbors) (
 			continue
 		}
 
-		delta := in.randomGap(p, n, slp.Len(), sln.Len())
+		delta := in.randomGap(slp.Len(), sln.Len())
 		pv := (*p)[x].Float()
 		diff := (*n)[x].Float() - pv
 		srec.SetFloat(pv + delta*diff)
@@ -245,7 +245,7 @@ func (in *Runtime) safeLevel2(p, n *tabula.Row) knn.Neighbors {
 // randomGap return the neighbors gap between sample `p` and `n` using safe
 // level (number of minority neighbors) of p in `lenslp` and `n` in `lensln`.
 //
-func (in *Runtime) randomGap(p, n *tabula.Row, lenslp, lensln int) (
+func (in *Runtime) randomGap(lenslp, lensln int) (
 	delta float64,
 ) {
 	if lensln == 0 && lenslp > 0 {
@@ -253,11 +253,12 @@ func (in *Runtime) randomGap(p, n *tabula.Row, lenslp, lensln int) (
 	}
 
 	slratio := float64(lenslp) / float64(lensln)
-	if slratio == 1 {
+	switch {
+	case slratio == 1:
 		delta = rand.Float64()
-	} else if slratio > 1 {
+	case slratio > 1:
 		delta = rand.Float64() * (1 / slratio)
-	} else {
+	default:
 		delta = 1 - rand.Float64()*slratio
 	}
 

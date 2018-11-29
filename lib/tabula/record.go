@@ -152,22 +152,19 @@ func (r *Record) SetInteger(v int64) {
 // If its real the missing value is indicated by -Inf.
 //
 func (r *Record) IsMissingValue() bool {
-	switch r.v.(type) {
+	switch v := r.v.(type) {
 	case string:
-		str := r.v.(string)
-		if str == "?" {
+		if v == "?" {
 			return true
 		}
 
 	case int64:
-		i64 := r.v.(int64)
-		if i64 == math.MinInt64 {
+		if v == math.MinInt64 {
 			return true
 		}
 
 	case float64:
-		f64 := r.v.(float64)
-		return math.IsInf(f64, -1)
+		return math.IsInf(v, -1)
 	}
 
 	return false
@@ -191,15 +188,15 @@ func (r *Record) Bytes() []byte {
 // String convert record value to string.
 //
 func (r Record) String() (s string) {
-	switch r.v.(type) {
+	switch v := r.v.(type) {
 	case string:
-		s = r.v.(string)
+		s = v
 
 	case int64:
-		s = strconv.FormatInt(r.v.(int64), 10)
+		s = strconv.FormatInt(v, 10)
 
 	case float64:
-		s = strconv.FormatFloat(r.v.(float64), 'f', -1, 64)
+		s = strconv.FormatFloat(v, 'f', -1, 64)
 	}
 	return
 }
@@ -211,19 +208,19 @@ func (r Record) String() (s string) {
 func (r *Record) Float() (f64 float64) {
 	var e error
 
-	switch r.v.(type) {
+	switch v := r.v.(type) {
 	case string:
-		f64, e = strconv.ParseFloat(r.v.(string), 64)
+		f64, e = strconv.ParseFloat(v, 64)
 
 		if nil != e {
 			f64 = math.Inf(-1)
 		}
 
 	case int64:
-		f64 = float64(r.v.(int64))
+		f64 = float64(v)
 
 	case float64:
-		f64 = r.v.(float64)
+		f64 = v
 	}
 
 	return
@@ -236,19 +233,19 @@ func (r *Record) Float() (f64 float64) {
 func (r *Record) Integer() (i64 int64) {
 	var e error
 
-	switch r.v.(type) {
+	switch v := r.v.(type) {
 	case string:
-		i64, e = strconv.ParseInt(r.v.(string), 10, 64)
+		i64, e = strconv.ParseInt(v, 10, 64)
 
 		if nil != e {
 			i64 = math.MinInt64
 		}
 
 	case int64:
-		i64 = r.v.(int64)
+		i64 = v
 
 	case float64:
-		i64 = int64(r.v.(float64))
+		i64 = int64(v)
 	}
 
 	return
