@@ -8,7 +8,7 @@ A collection of libraries and tools written in Go.
 - `gofmtcomment`: Program to convert "/\*\*/" comment into "//".
 
 
-## Library
+## Libraries
 
 - `bytes`: Package bytes provide a library for working with byte or slice of
   bytes.
@@ -64,7 +64,8 @@ memory.
 - `numbers`: Package numbers provide miscellaneous functions for working with
 integer, float, slice of integer, and slice of floats.
 
-- `runes`: Package runes provide a library for working with a single rune or slice of rune.
+- `runes`: Package runes provide a library for working with a single rune or
+slice of rune.
 
 - `strings`: Package string provide a library for working with string or slice
 of string.
