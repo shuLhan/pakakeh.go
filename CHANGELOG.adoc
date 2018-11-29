@@ -1,0 +1,16 @@
+= share v0.1.0
+
+The first release of `share` package contains one command line interface (CLI)
+and several libraries.
+
+The CLI is `gofmtcomment` to convert comment from `/**/` to `//`.
+
+The libraries are `bytes`, `contact`, `dns`, `dsv`, `ini`, `io`, `memfs`,
+`mining`, `net`, `numbers`, `runes`, `strings`, `tabula`, `test`, `text`,
+`time`, and `websocket`.
+
+Documentation for each package can be viewed at,
+
+	https://godoc.org/github.com/shuLhan/share
+
+I hope it will be stay alive!
