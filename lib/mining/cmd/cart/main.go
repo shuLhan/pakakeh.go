@@ -28,12 +28,14 @@ var usage = func() {
 	flag.PrintDefaults()
 }
 
-func init() {
+func initFlags() {
 	flagUsage := []string{
 		"Number of random feature (default 0)",
 	}
 
 	flag.IntVar(&nRandomFeature, "n", 0, flagUsage[0])
+
+	flag.Parse()
 }
 
 func trace(s string) (string, time.Time) {
@@ -70,7 +72,7 @@ func createCart(fcfg string) (*cart.Runtime, error) {
 func main() {
 	defer un(trace("cart"))
 
-	flag.Parse()
+	initFlags()
 
 	if len(flag.Args()) == 0 {
 		usage()

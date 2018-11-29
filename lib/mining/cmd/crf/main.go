@@ -48,7 +48,7 @@ var usage = func() {
 	flag.PrintDefaults()
 }
 
-func init() {
+func initFlags() {
 	flagUsage := []string{
 		"Number of stage (default 200)",
 		"Number of tree in each stage (default 1)",
@@ -70,6 +70,8 @@ func init() {
 
 	flag.StringVar(&trainCfg, "train", "", flagUsage[6])
 	flag.StringVar(&testCfg, "test", "", flagUsage[7])
+
+	flag.Parse()
 }
 
 func trace() (start time.Time) {
@@ -181,7 +183,7 @@ func main() {
 	defer un(trace())
 
 	// (0)
-	flag.Parse()
+	initFlags()
 
 	fmt.Println(tag, "Training config:", trainCfg)
 	fmt.Println(tag, "Test config:", testCfg)

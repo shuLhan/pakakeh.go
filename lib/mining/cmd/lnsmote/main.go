@@ -42,7 +42,7 @@ var usage = func() {
 	flag.PrintDefaults()
 }
 
-func init() {
+func initFlags() {
 	flagUsage := []string{
 		"Percentage of oversampling (default 100)",
 		"Number of nearest neighbours (default 5)",
@@ -55,6 +55,8 @@ func init() {
 	flag.IntVar(&knn, "knn", -1, flagUsage[1])
 	flag.StringVar(&synFile, "syntheticfile", "", flagUsage[2])
 	flag.BoolVar(&merge, "merge", false, flagUsage[3])
+
+	flag.Parse()
 }
 
 func trace(s string) (string, time.Time) {
@@ -145,7 +147,7 @@ func runMerge(lnsmoteRun *lnsmote.Runtime, dataset *tabula.Claset) (e error) {
 func main() {
 	defer un(trace("lnsmote"))
 
-	flag.Parse()
+	initFlags()
 
 	if len(flag.Args()) == 0 {
 		usage()
