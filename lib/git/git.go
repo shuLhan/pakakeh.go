@@ -144,7 +144,7 @@ func FetchAll(repoDir string) (err error) {
 	if debug.Value == 0 {
 		cmd.Args = append(cmd.Args, "--quiet")
 	}
-	cmd.Args = append(cmd.Args, "--all", "--tags")
+	cmd.Args = append(cmd.Args, "--all", "--tags", "--force")
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
@@ -169,7 +169,7 @@ func FetchTags(repoDir string) error {
 	if debug.Value == 0 {
 		cmd.Args = append(cmd.Args, "--quiet")
 	}
-	cmd.Args = append(cmd.Args, "--tags")
+	cmd.Args = append(cmd.Args, "--tags", "--force")
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
