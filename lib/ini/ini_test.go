@@ -7,6 +7,7 @@ package ini
 import (
 	"testing"
 
+	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -422,7 +423,7 @@ func TestGetInputIni(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c)
 
-		if debug >= debugL2 {
+		if debug.Value >= 2 {
 			t.Logf("Section header: [%s %s]", c.sec, c.sub)
 			t.Logf(">>> keys: %s", c.keys)
 			t.Logf(">>> expVals: %s", c.expVals)

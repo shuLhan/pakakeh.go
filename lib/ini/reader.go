@@ -11,6 +11,8 @@ import (
 	"io"
 	"io/ioutil"
 	"unicode"
+
+	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -129,7 +131,7 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 			break
 		}
 
-		if debug >= debugL1 {
+		if debug.Value >= 1 {
 			fmt.Print(reader._var)
 		}
 
@@ -174,7 +176,7 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 	}
 
 	if reader._var.mode != varModeEmpty {
-		if debug >= debugL1 {
+		if debug.Value >= 1 {
 			fmt.Println(reader._var)
 		}
 

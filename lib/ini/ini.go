@@ -125,6 +125,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/shuLhan/share/lib/debug"
 )
 
 //
@@ -144,7 +146,7 @@ func Open(filename string) (in *Ini, err error) {
 
 	in, err = reader.ParseFile(filename)
 
-	if debug >= debugL1 && err == nil {
+	if debug.Value >= 1 && err == nil {
 		err = in.Write(os.Stdout)
 	}
 
