@@ -323,7 +323,7 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 //
 // The minimum length of request without HTTP line is: 144 - 16 = 128 bytes.
 //
-func (h *Handshake) Parse(req []byte) (err error) {
+func (h *Handshake) Parse(req []byte) (err error) { // nolint
 	if len(req) < 144 {
 		err = ErrRequestLength
 		return
