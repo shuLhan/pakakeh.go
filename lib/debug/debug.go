@@ -27,7 +27,6 @@ func loadEnvironment() {
 
 //
 // init initialize debug from system environment.
-//
-func init() {
+func init() { // nolint
 	once.Do(loadEnvironment)
 }
