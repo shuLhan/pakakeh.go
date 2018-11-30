@@ -9,6 +9,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/shuLhan/share/lib/debug"
 )
 
 func TestWatcher(t *testing.T) {
@@ -26,7 +28,7 @@ func TestWatcher(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _debug >= 1 {
+	if debug.Value >= 1 {
 		t.Logf("= Watching: %+v\n", fi)
 	}
 
@@ -44,12 +46,12 @@ func TestWatcher(t *testing.T) {
 	go func() {
 		for fi := range watcher.C {
 			if fi == nil {
-				if _debug >= 1 {
+				if debug.Value >= 1 {
 					t.Log("= Change: file deleted")
 				}
 				return
 			}
-			if _debug >= 1 {
+			if debug.Value >= 1 {
 				t.Logf("= Change: %+v\n", *fi)
 			}
 		}

@@ -7,5 +7,3 @@
 // from standard input.
 //
 package io
-
-var _debug = 0
