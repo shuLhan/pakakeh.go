@@ -421,7 +421,9 @@ func (reader *Reader) parseVariable() (err error) {
 			reader.bufFormat.WriteRune(reader.r)
 			break
 		}
-		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) || reader.r == tokHyphen || reader.r == tokDot || reader.r == tokUnderscore {
+		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) ||
+			reader.r == tokHyphen || reader.r == tokDot ||
+			reader.r == tokUnderscore {
 			reader.buf.WriteRune(reader.r)
 			continue
 		}

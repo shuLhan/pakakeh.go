@@ -77,9 +77,21 @@ func TestCountCharSequence(t *testing.T) {
 		expChars:  []rune{'a', 'e', 'f'},
 		expCounts: []int{3, 2, 2},
 	}, {
-		text:      " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}",
-		expChars:  []rune{'{', '0', 'F', 'f', 'o', '}', '{', '0', '2', '5', 'f', 'o', '}', '{', 'f', 'o', '}', '{', '5', '0', 'f', 'o', '}'},
-		expCounts: []int{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2},
+		text: " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}", // nolint: lll
+		expChars: []rune{
+			'{', '0', 'F', 'f', 'o',
+			'}', '{', '0', '2', '5',
+			'f', 'o', '}', '{', 'f',
+			'o', '}', '{', '5', '0',
+			'f', 'o', '}',
+		},
+		expCounts: []int{
+			2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2,
+			2, 2, 2, 2, 2,
+			2, 2, 2,
+			2, 4, 2, 2, 2,
+		},
 	}}
 
 	for _, c := range cases {
@@ -199,7 +211,7 @@ func TestMaxCharSequence(t *testing.T) {
 		char:  'a',
 		count: 3,
 	}, {
-		text:  " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}",
+		text:  " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}", // nolint: lll
 		char:  '0',
 		count: 4,
 	}}

@@ -36,7 +36,7 @@ var expSkipColumns = []string{ // nolint: gochecknoglobals
 	"[{name 0 0 [] [A;B-C,D]} {value 0 0 [] [A;B C,D]} {integer 1 0 [] [3]} {real 2 0 [] [0.003]}]",
 	"[{name 0 0 [] [A;B-C,D]} {value 0 0 [] [A;B C D]} {integer 1 0 [] [4]} {real 2 0 [] [0.0004]}]",
 	"[{name 0 0 [] []} {value 0 0 [] []} {integer 1 0 [] [6]} {real 2 0 [] [0.000006]}]",
-	"[{name 0 0 [] [ok]} {value 0 0 [] [missing right-quote];8;0.00000008\n9;\"ok\"-[[ok]} {integer 1 0 [] [9]} {real 2 0 [] [0.000000009]}]",
+	"[{name 0 0 [] [ok]} {value 0 0 [] [missing right-quote];8;0.00000008\n9;\"ok\"-[[ok]} {integer 1 0 [] [9]} {real 2 0 [] [0.000000009]}]", // nolint: lll
 	"[{name 0 0 [] [test]} {value 0 0 [] [integer]} {integer 1 0 [] [10]} {real 2 0 [] [0.101]}]",
 	"[{name 0 0 [] [test]} {value 0 0 [] [real]} {integer 1 0 [] [123456789]} {real 2 0 [] [0.123456789]}]",
 	"[{name 0 0 [] [string with]} {value 0 0 [] [string with]} {integer 1 0 [] [13]} {real 2 0 [] [13]}]",
@@ -45,14 +45,14 @@ var expSkipColumns = []string{ // nolint: gochecknoglobals
 
 var expSkipColumnsAll = []string{ // nolint: gochecknoglobals
 	"{name 0 0 [] [A-B A-B-C A;B-C,D A;B-C,D  ok test test string with string with\" quote]}",
-	"{value 0 0 [] [AB BCD A;B C,D A;B C D  missing right-quote];8;0.00000008\n9;\"ok\"-[[ok integer real string with string with]] escape]}",
+	"{value 0 0 [] [AB BCD A;B C,D A;B C D  missing right-quote];8;0.00000008\n9;\"ok\"-[[ok integer real string with string with]] escape]}", // nolint: lll
 	"{integer 1 0 [] [1 2 3 4 6 9 10 123456789 13 14]}",
 	"{real 2 0 [] [0.1 0.02 0.003 0.0004 0.000006 0.000000009 0.101 0.123456789 13 14]}",
 }
 
 var expSkipColumnsAllRev = []string{ // nolint: gochecknoglobals
 	"{name 0 0 [] [string with\" quote string with test test ok  A;B-C,D A;B-C,D A-B-C A-B]}",
-	"{value 0 0 [] [string with]] escape string with real integer missing right-quote];8;0.00000008\n9;\"ok\"-[[ok  A;B C D A;B C,D BCD AB]}",
+	"{value 0 0 [] [string with]] escape string with real integer missing right-quote];8;0.00000008\n9;\"ok\"-[[ok  A;B C D A;B C,D BCD AB]}", // nolint: lll
 	"{integer 1 0 [] [14 13 123456789 10 9 6 4 3 2 1]}",
 	"{real 2 0 [] [14 13 0.123456789 0.101 0.000000009 0.000006 0.0004 0.003 0.02 0.1]}",
 }

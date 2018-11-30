@@ -379,7 +379,7 @@ func TestDiffFilesLevelWords3(t *testing.T) {
 	oldrev := "testdata/the_singles_collection.old"
 	newrev := "testdata/the_singles_collection.new"
 	expdels := "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
-	expadds := "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
+	expadds := "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"" // nolint: lll
 
 	diffLevelWords(t, oldrev, newrev, expdels, expadds, false)
 }
