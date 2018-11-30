@@ -80,7 +80,7 @@ func (srv *Server) ListenAndServeDoH(opts *ServerOptions) error {
 		Addr:        opts.getDoHAddress().String(),
 		IdleTimeout: opts.DoHIdleTimeout,
 		TLSConfig: &tls.Config{
-			InsecureSkipVerify: opts.DoHAllowInsecure,
+			InsecureSkipVerify: opts.DoHAllowInsecure, // nolint: gosec
 		},
 	}
 
