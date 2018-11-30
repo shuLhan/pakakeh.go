@@ -20,20 +20,17 @@ func ParseIPPort(address string, defPort uint16) (ip net.IP, port uint16, err er
 	shost, sport, err := net.SplitHostPort(address)
 	if err != nil {
 		shost = address
-		err = nil
 	}
 
 	ip = net.ParseIP(shost)
 	if ip == nil {
-		err = ErrHostAddress
-		return
+		return nil, 0, ErrHostAddress
 	}
 
 	if len(sport) > 0 {
 		iport, err = strconv.Atoi(sport)
 		if err != nil {
 			iport = int(defPort)
-			err = nil
 		} else {
 			if iport < 0 || iport > maxPort {
 				iport = int(defPort)
@@ -44,7 +41,7 @@ func ParseIPPort(address string, defPort uint16) (ip net.IP, port uint16, err er
 		port = defPort
 	}
 
-	return
+	return ip, port, nil
 }
 
 //

@@ -163,5 +163,5 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 		}
 	}
 
-	return
+	return msgs
 }

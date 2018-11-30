@@ -163,5 +163,5 @@ func (c *Contact) Decode() (to *contact.Record) {
 	c.decodeLinks(to)
 	c.decodeNotes(to)
 
-	return
+	return to
 }

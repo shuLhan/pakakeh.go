@@ -119,11 +119,11 @@ func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 	// check type of column
 	coltype, e := di.GetColumnTypeAt(colidx)
 	if e != nil {
-		return
+		return nil, nil, e
 	}
 
 	if !(coltype == TInteger || coltype == TReal) {
-		return splitLess, splitGreater, ErrInvalidColType
+		return nil, nil, ErrInvalidColType
 	}
 
 	// Should we convert the data mode back later.
@@ -163,7 +163,7 @@ func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 		// do nothing, since its already filled when pushing new row.
 	}
 
-	return
+	return splitLess, splitGreater, nil
 }
 
 //
@@ -186,8 +186,7 @@ func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 // 	X'': [B,B,D,D]
 // 	Y'': [2,4,6,8]
 //
-func SplitRowsByCategorical(di DatasetInterface, colidx int,
-	splitVal []string) (
+func SplitRowsByCategorical(di DatasetInterface, colidx int, splitVal []string) (
 	splitIn DatasetInterface,
 	splitEx DatasetInterface,
 	e error,
@@ -195,11 +194,11 @@ func SplitRowsByCategorical(di DatasetInterface, colidx int,
 	// check type of column
 	coltype, e := di.GetColumnTypeAt(colidx)
 	if e != nil {
-		return
+		return nil, nil, e
 	}
 
 	if coltype != TString {
-		return splitIn, splitEx, ErrInvalidColType
+		return nil, nil, ErrInvalidColType
 	}
 
 	// should we convert the data mode back?
@@ -237,7 +236,7 @@ func SplitRowsByCategorical(di DatasetInterface, colidx int,
 		splitEx.TransposeToColumns()
 	}
 
-	return
+	return splitIn, splitEx, nil
 }
 
 //
@@ -253,7 +252,7 @@ func SplitRowsByValue(di DatasetInterface, colidx int, value interface{}) (
 ) {
 	coltype, e := di.GetColumnTypeAt(colidx)
 	if e != nil {
-		return
+		return nil, nil, e
 	}
 
 	if coltype == TString {
@@ -280,7 +279,7 @@ func SplitRowsByValue(di DatasetInterface, colidx int, value interface{}) (
 		return nil, nil, e
 	}
 
-	return
+	return splitL, splitR, nil
 }
 
 //
@@ -354,7 +353,7 @@ func RandomPickRows(dataset DatasetInterface, n int, duplicate bool) (
 		unpicked.TransposeToColumns()
 	}
 
-	return
+	return picked, unpicked, pickedIdx, unpickedIdx
 }
 
 //
@@ -365,8 +364,7 @@ func RandomPickRows(dataset DatasetInterface, n int, duplicate bool) (
 //
 // If dataset output mode is rows, it will transposed to columns.
 //
-func RandomPickColumns(dataset DatasetInterface, n int, dup bool,
-	excludeIdx []int) (
+func RandomPickColumns(dataset DatasetInterface, n int, dup bool, excludeIdx []int) (
 	picked DatasetInterface,
 	unpicked DatasetInterface,
 	pickedIdx []int,
@@ -398,7 +396,7 @@ func RandomPickColumns(dataset DatasetInterface, n int, dup bool,
 		unpicked.TransposeToRows()
 	}
 
-	return
+	return picked, unpicked, pickedIdx, unpickedIdx
 }
 
 //
@@ -437,5 +435,5 @@ func SelectColumnsByIdx(dataset DatasetInterface, colsIdx []int) (
 		// do nothing
 	}
 
-	return
+	return newset
 }

@@ -283,7 +283,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 
 	_, err = fmt.Fprintf(&cl.bb, _handshakeReqFormat, path, cl.URL.Host, key)
 	if err != nil {
-		return
+		return err
 	}
 
 	// (8)
@@ -291,7 +291,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 		cl.handshakeOrigin = origin
 		_, _ = cl.bb.WriteString(_hdrKeyOrigin + ": " + origin + "\r\n")
 		if err != nil {
-			return
+			return err
 		}
 	}
 	// (10)
@@ -299,7 +299,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 		cl.handshakeProto = proto
 		_, err = cl.bb.WriteString(_hdrKeyWSProtocol + ": " + proto + "\r\n")
 		if err != nil {
-			return
+			return err
 		}
 	}
 	// (11)
@@ -307,7 +307,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 		cl.handshakeExt = ext
 		_, err = cl.bb.WriteString(_hdrKeyWSExtensions + ": " + ext + "\r\n")
 		if err != nil {
-			return
+			return err
 		}
 	}
 	// (12)
@@ -315,7 +315,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 		cl.handshakeHeader = headers
 		err = headers.Write(&cl.bb)
 		if err != nil {
-			return
+			return err
 		}
 	}
 
@@ -323,9 +323,7 @@ func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header
 
 	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
 
-	err = cl.Send(ctx, cl.bb.Bytes(), cl.handleHandshake)
-
-	return
+	return cl.Send(ctx, cl.bb.Bytes(), cl.handleHandshake)
 }
 
 func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
@@ -417,10 +415,10 @@ func (cl *Client) Send(ctx context.Context, req []byte, handler ClientRecvHandle
 //
 // Recv message from server.
 //
-func (cl *Client) Recv() (out []byte, err error) {
+func (cl *Client) Recv() (packet []byte, err error) {
 	err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	bs := _bsPool.Get().(*[]byte)
@@ -428,11 +426,11 @@ func (cl *Client) Recv() (out []byte, err error) {
 	n, err := cl.conn.Read(*bs)
 	if err != nil {
 		_bsPool.Put(bs)
-		return
+		return nil, err
 	}
 	if n == 0 {
 		_bsPool.Put(bs)
-		return
+		return nil, nil
 	}
 
 	bb := _bbPool.Get().(*bytes.Buffer)
@@ -446,7 +444,7 @@ func (cl *Client) Recv() (out []byte, err error) {
 
 		err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		n, err = cl.conn.Read(*bs)
@@ -464,12 +462,12 @@ func (cl *Client) Recv() (out []byte, err error) {
 
 out:
 	if err == nil {
-		out = make([]byte, bb.Len())
-		copy(out, bb.Bytes())
+		packet = make([]byte, bb.Len())
+		copy(packet, bb.Bytes())
 	}
 
 	_bsPool.Put(bs)
 	_bbPool.Put(bb)
 
-	return
+	return packet, err
 }

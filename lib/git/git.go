@@ -285,13 +285,12 @@ func LatestTag(repoDir string) (tag string, err error) {
 
 	bout, err := cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("LatestTag: %s", err)
-		return
+		return "", fmt.Errorf("LatestTag: %s", err)
 	}
 
 	out := string(bytes.TrimSpace(bout))
 	if len(out) == 0 {
-		return
+		return "", nil
 	}
 
 	cmd = exec.Command("git")
@@ -305,13 +304,12 @@ func LatestTag(repoDir string) (tag string, err error) {
 
 	bout, err = cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("LatestTag: %s", err)
-		return
+		return "", fmt.Errorf("LatestTag: %s", err)
 	}
 
 	tag = string(bytes.TrimSpace(bout))
 
-	return
+	return tag, nil
 }
 
 //
@@ -339,7 +337,7 @@ func LatestVersion(repoDir string) (version string, err error) {
 func ListTags(repoDir string) (tags []string, err error) {
 	err = FetchTags(repoDir)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	cmd := exec.Command("git")
@@ -354,7 +352,7 @@ func ListTags(repoDir string) (tags []string, err error) {
 	bout, err := cmd.Output()
 	if err != nil {
 		err = fmt.Errorf("ListTag: %s", err)
-		return
+		return nil, err
 	}
 
 	sep := []byte{'\n'}
@@ -367,7 +365,7 @@ func ListTags(repoDir string) (tags []string, err error) {
 		tags = append(tags, string(btags[x]))
 	}
 
-	return
+	return tags, nil
 }
 
 //

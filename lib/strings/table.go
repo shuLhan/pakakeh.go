@@ -115,7 +115,7 @@ func Partition(ss []string, k int) (table Table) {
 			table)
 	}
 
-	return
+	return table
 }
 
 //

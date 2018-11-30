@@ -272,5 +272,6 @@ func Uniq(words []string, sensitive bool) (uniques []string) {
 
 		uniques = append(uniques, words[x])
 	}
-	return
+
+	return uniques
 }

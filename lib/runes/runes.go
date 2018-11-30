@@ -64,7 +64,7 @@ func Diff(l []rune, r []rune) (diff []rune) {
 		}
 	}
 
-	return
+	return diff
 }
 
 //

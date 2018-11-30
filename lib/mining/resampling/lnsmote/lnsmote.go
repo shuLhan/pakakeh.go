@@ -132,7 +132,7 @@ func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 		e = in.writeOutliers()
 	}
 
-	return
+	return e
 }
 
 //
@@ -175,7 +175,7 @@ func (in *Runtime) createSynthetic(p *tabula.Row, neighbors knn.Neighbors) (
 		srec.SetFloat(pv + delta*diff)
 	}
 
-	return
+	return synthetic
 }
 
 //

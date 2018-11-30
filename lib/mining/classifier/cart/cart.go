@@ -371,7 +371,7 @@ func (runtime *Runtime) computeGain(D tabula.ClasetInterface) (
 			fmt.Println("[cart] gain :", gains[x])
 		}
 	}
-	return
+	return gains
 }
 
 //

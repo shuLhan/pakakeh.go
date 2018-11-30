@@ -217,16 +217,11 @@ func (reader *Reader) Init(fcfg string, dataset interface{}) (e error) {
 	// (7)
 	e = reader.OpenRejected()
 	if nil != e {
-		return
+		return e
 	}
 
 	// (8)
-	e = reader.OpenInput()
-	if nil != e {
-		return
-	}
-
-	return
+	return reader.OpenInput()
 }
 
 //

@@ -95,7 +95,7 @@ func (cols *Columns) RandomPick(n int, dup bool, excludeIdx []int) (
 		}
 	}
 
-	return
+	return picked, unpicked, pickedIdx, unpickedIdx
 }
 
 //

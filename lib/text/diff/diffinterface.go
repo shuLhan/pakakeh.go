@@ -458,7 +458,7 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 			v := old[x:]
 			dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
 		}
-		return
+		return adds, dels
 	}
 
 	// Find the position of unmatched byte from the end
@@ -477,14 +477,14 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	if x == xend+1 {
 		v := new[y : yend+1]
 		adds = append(adds, text.Chunk{StartAt: aty + y, V: v})
-		return
+		return adds, dels
 	}
 
 	// Case 3: deletion in old line.
 	if y == yend+1 {
 		v := old[x : xend+1]
 		dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
-		return
+		return adds, dels
 	}
 
 	// Calculate possible match len.
@@ -535,7 +535,7 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 					V:       newleft,
 				})
 			}
-			return
+			return adds, dels
 		}
 		if len(newleft) == 0 {
 			if len(oldleft) > 0 {
@@ -544,7 +544,7 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 					V:       oldleft,
 				})
 			}
-			return
+			return adds, dels
 		}
 	}
 
@@ -574,7 +574,7 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 		dels = append(dels, delsleft...)
 	}
 
-	return
+	return adds, dels
 }
 
 func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (

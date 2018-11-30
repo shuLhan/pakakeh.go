@@ -184,7 +184,8 @@ func (rows *Rows) RandomPick(n int, duplicate bool) (
 			unpickedIdx = append(unpickedIdx, rid)
 		}
 	}
-	return
+
+	return picked, unpicked, pickedIdx, unpickedIdx
 }
 
 //

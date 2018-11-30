@@ -188,8 +188,7 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 	reader._var = nil
 	reader.sec = nil
 
-	err = nil
-	return
+	return in, nil
 }
 
 func (reader *Reader) parse() (err error) {
@@ -198,12 +197,12 @@ func (reader *Reader) parse() (err error) {
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
-			break
+			return err
 		}
 		if reader.b == tokNewLine {
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
-			return
+			break
 		}
 		if reader.b == tokSpace || reader.b == tokTab {
 			reader.bufFormat.WriteByte(reader.b)
@@ -211,19 +210,18 @@ func (reader *Reader) parse() (err error) {
 		}
 		if reader.b == tokHash || reader.b == tokSemiColon {
 			_ = reader.br.UnreadByte()
-			err = reader.parseComment()
-			return
+
+			return reader.parseComment()
 		}
 		if reader.b == tokSecStart {
 			_ = reader.br.UnreadByte()
-			err = reader.parseSectionHeader()
-			break
+			return reader.parseSectionHeader()
 		}
 		_ = reader.br.UnreadByte()
 		return reader.parseVariable()
 	}
 
-	return
+	return nil
 }
 
 func (reader *Reader) parseComment() (err error) {
@@ -437,8 +435,7 @@ func (reader *Reader) parseVariable() (err error) {
 			reader._var.Key = reader.buf.String()
 			reader._var.Value = varValueTrue
 
-			err = reader.parseComment()
-			return
+			return reader.parseComment()
 		}
 		if unicode.IsSpace(reader.r) {
 			reader.bufFormat.WriteRune(reader.r)
@@ -464,7 +461,7 @@ func (reader *Reader) parseVariable() (err error) {
 	reader._var.Key = reader.buf.String()
 	reader._var.Value = varValueTrue
 
-	return
+	return nil
 }
 
 //
@@ -501,7 +498,7 @@ func (reader *Reader) parsePossibleValue() (err error) {
 	reader._var.format = reader.bufFormat.String()
 	reader._var.Value = varValueTrue
 
-	return
+	return nil
 }
 
 //
@@ -520,7 +517,7 @@ func (reader *Reader) parseVarValue() (err error) {
 		if err != nil {
 			reader._var.format = reader.bufFormat.String()
 			reader._var.Value = varValueTrue
-			return
+			return err
 		}
 		if reader.b == tokSpace || reader.b == tokTab {
 			reader.bufFormat.WriteByte(reader.b)
@@ -535,7 +532,7 @@ func (reader *Reader) parseVarValue() (err error) {
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
 			reader._var.Value = varValueTrue
-			return
+			return nil
 		}
 		break
 	}
@@ -627,8 +624,8 @@ func (reader *Reader) parseVarValue() (err error) {
 			reader.valueCommit(false)
 
 			_ = reader.br.UnreadByte()
-			err = reader.parseComment()
-			return
+
+			return reader.parseComment()
 		}
 		reader.valueWriteByte(reader.b)
 	}
@@ -641,7 +638,7 @@ func (reader *Reader) parseVarValue() (err error) {
 
 	reader._var.format = reader.bufFormat.String()
 
-	return
+	return nil
 }
 
 func (reader *Reader) valueCommit(withSpaces bool) {

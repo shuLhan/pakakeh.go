@@ -237,7 +237,7 @@ type Frame struct {
 //
 func unpack(in []byte) (f *Frame, x uint64) {
 	if len(in) == 0 {
-		return
+		return nil, 0
 	}
 
 	f = new(Frame)
@@ -255,13 +255,11 @@ func unpack(in []byte) (f *Frame, x uint64) {
 	if f.Opcode == OpCodeClose || f.Opcode == OpCodePing || f.Opcode == OpCodePong {
 		// (5.4-P33)
 		if f.Fin != FrameIsFinished {
-			f = nil
-			return
+			return nil, x
 		}
 		// (5.5-P36)
 		if f.len > FrameSmallPayload {
-			f = nil
-			return
+			return nil, x
 		}
 	}
 
@@ -300,7 +298,7 @@ func unpack(in []byte) (f *Frame, x uint64) {
 		f.closeCode = binary.BigEndian.Uint16(f.Payload[0:2])
 	}
 
-	return
+	return f, x
 }
 
 //
@@ -408,5 +406,5 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 		copy(out[x:], f.Payload)
 	}
 
-	return
+	return out
 }

@@ -156,7 +156,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 
 	err = rr.unpackDomainName(&rr.Name, packet, x)
 	if err != nil {
-		return
+		return x, err
 	}
 	if rr.off > 0 {
 		x = rr.off + 1
@@ -184,7 +184,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 
 	x += uint(rr.rdlen)
 
-	return
+	return x, err
 }
 
 func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) error {

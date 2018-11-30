@@ -325,20 +325,19 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 //
 func (h *Handshake) Parse(req []byte) (err error) { // nolint
 	if len(req) < 144 {
-		err = ErrRequestLength
-		return
+		return ErrRequestLength
 	}
 
 	h.Reset(req)
 
 	err = h.parseHTTPLine()
 	if err != nil {
-		return
+		return err
 	}
 
 	if len(h.raw)-h.start < 128 {
 		err = ErrRequestHeaderLength
-		return
+		return err
 	}
 
 	var (
@@ -348,7 +347,7 @@ func (h *Handshake) Parse(req []byte) (err error) { // nolint
 	for h.start < len(h.raw) {
 		k, v, err = h.parseHeader()
 		if err != nil {
-			return
+			return err
 		}
 		if len(k) == 0 {
 			break
@@ -357,81 +356,67 @@ func (h *Handshake) Parse(req []byte) (err error) { // nolint
 		switch {
 		case bytes.Equal(k, []byte(_hdrKeyHost)):
 			if h.headerFlags&_hdrFlagHost == _hdrFlagHost {
-				err = ErrInvalidHeaderHost
-				return
+				return ErrInvalidHeaderHost
 			}
 			if len(v) == 0 {
-				err = ErrInvalidHeaderHost
-				return
+				return ErrInvalidHeaderHost
 			}
 			h.Host = v
 			h.headerFlags |= _hdrFlagHost
 
 		case bytes.Equal(k, []byte(_hdrKeyConnection)):
 			if h.headerFlags&_hdrFlagConn == _hdrFlagConn {
-				err = ErrInvalidHeaderConn
-				return
+				return ErrInvalidHeaderConn
 			}
 			if !h.headerValueContains(v, []byte(_hdrValConnectionUpgrade)) {
-				err = ErrInvalidHeaderConn
-				return
+				return ErrInvalidHeaderConn
 			}
 			h.headerFlags |= _hdrFlagConn
 
 		case bytes.Equal(k, []byte(_hdrKeyUpgrade)):
 			if h.headerFlags&_hdrFlagUpgrade == _hdrFlagUpgrade {
-				err = ErrInvalidHeaderUpgrade
-				return
+				return ErrInvalidHeaderUpgrade
 			}
 			if !h.headerValueContains(v, []byte(_hdrValUpgradeWS)) {
-				err = ErrInvalidHeaderUpgrade
-				return
+				return ErrInvalidHeaderUpgrade
 			}
 			h.headerFlags |= _hdrFlagUpgrade
 
 		case bytes.Equal(k, []byte(_hdrKeyWSKey)):
 			if h.headerFlags&_hdrFlagWSKey == _hdrFlagWSKey {
-				err = ErrInvalidHeaderWSKey
-				return
+				return ErrInvalidHeaderWSKey
 			}
 			if len(v) == 0 {
-				err = ErrInvalidHeaderWSKey
-				return
+				return ErrInvalidHeaderWSKey
 			}
 			h.Key = v
 			if len(h.Key) != 24 {
-				err = ErrInvalidHeaderWSKey
-				return
+				return ErrInvalidHeaderWSKey
 			}
 			h.headerFlags |= _hdrFlagWSKey
 
 		case bytes.Equal(k, []byte(_hdrKeyWSVersion)):
 			if h.headerFlags&_hdrFlagWSVersion == _hdrFlagWSVersion {
-				err = ErrInvalidHeaderWSVersion
-				return
+				return ErrInvalidHeaderWSVersion
 			}
 			if len(v) == 0 {
-				err = ErrInvalidHeaderWSVersion
-				return
+				return ErrInvalidHeaderWSVersion
 			}
 			if !bytes.Equal(v, []byte(_hdrValWSVersion)) {
-				err = ErrUnsupportedWSVersion
-				return
+				return ErrUnsupportedWSVersion
 			}
 			h.headerFlags |= _hdrFlagWSVersion
 
 		case bytes.Equal(k, []byte(_hdrKeyWSExtensions)):
 			if h.headerFlags&_hdrFlagWSExtensions == _hdrFlagWSExtensions {
-				err = ErrInvalidHeaderWSExtensions
-				return
+				return ErrInvalidHeaderWSExtensions
 			}
 			h.Extensions = v
 			h.headerFlags |= _hdrFlagWSExtensions
 
 		case bytes.Equal(k, []byte(_hdrKeyWSProtocol)):
 			if h.headerFlags&_hdrFlagWSProtocol == _hdrFlagWSProtocol {
-				err = ErrInvalidHeaderWSProtocol
-				return
+				return ErrInvalidHeaderWSProtocol
 			}
 			h.Protocol = v
 			h.headerFlags |= _hdrFlagWSProtocol
@@ -449,9 +434,8 @@ func (h *Handshake) Parse(req []byte) (err error) { // nolint
 	requiredFlags := _hdrFlagHost | _hdrFlagConn | _hdrFlagUpgrade | _hdrFlagWSKey | _hdrFlagWSVersion
 
 	if h.headerFlags&requiredFlags != requiredFlags {
-		err = ErrMissingRequiredHeader
-		return
+		return ErrMissingRequiredHeader
 	}
 
-	return
+	return nil
 }

@@ -111,8 +111,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 	if doCompress {
 		ok = msg.compress()
 		if ok {
-			n = 2
-			return
+			return 2
 		}
 	}
 
@@ -126,7 +125,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 		if c == '\\' {
 			x++
 			if x == len(dname) {
-				return
+				return n
 			}
 
 			c = dname[x]
@@ -137,7 +136,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 			// is not checked for special meaning.
 			if libbytes.IsDigit(c) {
 				if x+2 >= len(dname) {
-					return
+					return n
 				}
 				d, _ = strconv.Atoi(string(dname[x : x+3]))
 				c = byte(d)
@@ -167,7 +166,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 				ok = msg.compress()
 				if ok {
 					n += 2
-					return
+					return n
 				}
 			}
 
@@ -176,7 +175,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 			msg.dnameOff[msg.dname] = msg.off
 
 			if x+1 == len(dname) {
-				return
+				return n
 			}
 
 			continue
@@ -196,7 +195,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 		n++
 	}
 
-	return
+	return n
 }
 
 func (msg *Message) packQuestion() {

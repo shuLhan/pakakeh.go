@@ -156,7 +156,7 @@ func (root *rootRoute) add(method, target string, handler RouteHandler) (err err
 out:
 	_bbPool.Put(bb)
 
-	return
+	return err
 }
 
 //
@@ -166,14 +166,14 @@ func (root *rootRoute) get(method, target string) (
 	params targetParam, handler RouteHandler,
 ) {
 	if target[0] != pathSep {
-		return
+		return nil, nil
 	}
 
 	method = strings.ToUpper(method)
 
 	parent := root.getParent(method)
 	if parent == nil {
-		return
+		return nil, nil
 	}
 
 	bb := _bbPool.Get().(*bytes.Buffer)
@@ -218,5 +218,5 @@ func (root *rootRoute) get(method, target string) (
 out:
 	_bbPool.Put(bb)
 
-	return
+	return params, handler
 }

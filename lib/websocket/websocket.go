@@ -73,11 +73,11 @@ func Recv(fd int) (packet []byte, err error) {
 	n, err := unix.Read(fd, *bs)
 	if err != nil {
 		_bsPool.Put(bs)
-		return
+		return nil, err
 	}
 	if n == 0 {
 		_bsPool.Put(bs)
-		return
+		return nil, nil
 	}
 
 	bb := _bbPool.Get().(*bytes.Buffer)
@@ -111,7 +111,7 @@ out:
 	_bbPool.Put(bb)
 	_bsPool.Put(bs)
 
-	return
+	return packet, err
 }
 
 //

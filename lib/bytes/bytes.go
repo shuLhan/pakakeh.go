@@ -393,7 +393,7 @@ func TokenFind(line, token []byte, startat int) (at int) {
 			y++
 			if y == tokenlen {
 				// we found it!
-				return
+				return at
 			}
 		} else {
 			if at != -1 {
@@ -407,7 +407,8 @@ func TokenFind(line, token []byte, startat int) (at int) {
 	if y < tokenlen {
 		at = -1
 	}
-	return
+
+	return at
 }
 
 //
