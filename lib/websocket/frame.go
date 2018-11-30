@@ -109,7 +109,7 @@ const (
 //	   it encountered an unexpected condition that prevented it from
 //	   fulfilling the request.
 //
-var (
+var ( // nolint: gochecknoglobals
 	StatusNormal                = []byte{0x03, 0xE8} // 1000
 	StatusGone                  = []byte{0x03, 0xE9} // 1001
 	StatusBadRequest            = []byte{0x03, 0xEA} // 1002
@@ -122,7 +122,7 @@ var (
 )
 
 // List of unmasked control frames, MUST used only by server.
-var (
+var ( // nolint: gochecknoglobals
 	ControlFrameClose         = []byte{FrameIsFinished | OpCodeClose, 0x00}
 	ControlFrameCloseWithCode = []byte{FrameIsFinished | OpCodeClose, 0x02}
 	ControlFramePing          = []byte{FrameIsFinished | OpCodePing, 0x00}

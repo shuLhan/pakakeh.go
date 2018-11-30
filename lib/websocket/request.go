@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_reqPool = sync.Pool{
 		New: func() interface{} {
 			return new(Request)

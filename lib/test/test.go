@@ -14,11 +14,7 @@ import (
 	"testing"
 )
 
-var (
-	trace = make([]byte, 1024)
-)
-
-func printStackTrace(t testing.TB) {
+func printStackTrace(t testing.TB, trace []byte) {
 	var (
 		lines = 0
 		start = 0
@@ -49,9 +45,10 @@ func printStackTrace(t testing.TB) {
 //
 func Assert(t *testing.T, name string, exp, got interface{}, equal bool) {
 	if reflect.DeepEqual(exp, got) != equal {
+		trace := make([]byte, 1024)
 		runtime.Stack(trace, false)
 
-		printStackTrace(t)
+		printStackTrace(t, trace)
 
 		t.Fatalf(">>> Expecting %s,\n"+
 			"'%+v'\n"+
@@ -70,9 +67,10 @@ func Assert(t *testing.T, name string, exp, got interface{}, equal bool) {
 //
 func AssertBench(b *testing.B, name string, exp, got interface{}, equal bool) {
 	if reflect.DeepEqual(exp, got) != equal {
+		trace := make([]byte, 1024)
 		runtime.Stack(trace, false)
 
-		printStackTrace(b)
+		printStackTrace(b, trace)
 
 		b.Fatalf("\n"+
 			">>> Expecting %s '%+v'\n"+

@@ -21,34 +21,31 @@ const (
 	tag = "[crf]"
 )
 
-var (
+type options struct {
 	// nStage number of stage.
-	nStage = 0
+	nStage int
 	// nTree number of tree.
-	nTree = 0
+	nTree int
 	// nRandomFeature number of feature to compute.
-	nRandomFeature = 0
+	nRandomFeature int
 	// percentBoot percentage of sample for bootstraping.
-	percentBoot = 0
+	percentBoot int
 	// oobStatsFile where statistic will be written.
-	oobStatsFile = ""
+	oobStatsFile string
 	// perfFile where performance of classifier will be written.
-	perfFile = ""
+	perfFile string
 	// trainCfg point to the configuration file for training or creating
 	// a model
-	trainCfg = ""
+	trainCfg string
 	// testCfg point to the configuration file for testing
-	testCfg = ""
+	testCfg string
+}
 
-	// crforest the main object.
-	crforest crf.Runtime
-)
-
-var usage = func() {
+func usage() {
 	flag.PrintDefaults()
 }
 
-func initFlags() {
+func initFlags() (o options) {
 	flagUsage := []string{
 		"Number of stage (default 200)",
 		"Number of tree in each stage (default 1)",
@@ -60,18 +57,20 @@ func initFlags() {
 		"Test configuration",
 	}
 
-	flag.IntVar(&nStage, "nstage", -1, flagUsage[0])
-	flag.IntVar(&nTree, "ntree", -1, flagUsage[1])
-	flag.IntVar(&nRandomFeature, "nrandomfeature", -1, flagUsage[2])
-	flag.IntVar(&percentBoot, "percentboot", -1, flagUsage[3])
+	flag.IntVar(&o.nStage, "nstage", -1, flagUsage[0])
+	flag.IntVar(&o.nTree, "ntree", -1, flagUsage[1])
+	flag.IntVar(&o.nRandomFeature, "nrandomfeature", -1, flagUsage[2])
+	flag.IntVar(&o.percentBoot, "percentboot", -1, flagUsage[3])
 
-	flag.StringVar(&oobStatsFile, "oobstatsfile", "", flagUsage[4])
-	flag.StringVar(&perfFile, "perffile", "", flagUsage[5])
+	flag.StringVar(&o.oobStatsFile, "oobstatsfile", "", flagUsage[4])
+	flag.StringVar(&o.perfFile, "perffile", "", flagUsage[5])
 
-	flag.StringVar(&trainCfg, "train", "", flagUsage[6])
-	flag.StringVar(&testCfg, "test", "", flagUsage[7])
+	flag.StringVar(&o.trainCfg, "train", "", flagUsage[6])
+	flag.StringVar(&o.testCfg, "test", "", flagUsage[7])
 
 	flag.Parse()
+
+	return o
 }
 
 func trace() (start time.Time) {
@@ -91,54 +90,54 @@ func un(startTime time.Time) {
 // (1) load training configuration.
 // (2) Overwrite configuration parameter if its set from command line.
 //
-func createCRF() error {
+func createCRF(o *options) (crforest *crf.Runtime, e error) {
 	// (1)
-	config, e := ioutil.ReadFile(trainCfg)
+	config, e := ioutil.ReadFile(o.trainCfg)
 	if e != nil {
-		return e
+		return nil, e
 	}
 
-	crforest = crf.Runtime{}
+	crforest = &crf.Runtime{}
 
 	e = json.Unmarshal(config, &crforest)
 	if e != nil {
-		return e
+		return nil, e
 	}
 
 	// (2)
-	if nStage > 0 {
-		crforest.NStage = nStage
+	if o.nStage > 0 {
+		crforest.NStage = o.nStage
 	}
-	if nTree > 0 {
-		crforest.NTree = nTree
+	if o.nTree > 0 {
+		crforest.NTree = o.nTree
 	}
-	if nRandomFeature > 0 {
-		crforest.NRandomFeature = nRandomFeature
+	if o.nRandomFeature > 0 {
+		crforest.NRandomFeature = o.nRandomFeature
 	}
-	if percentBoot > 0 {
-		crforest.PercentBoot = percentBoot
+	if o.percentBoot > 0 {
+		crforest.PercentBoot = o.percentBoot
 	}
-	if oobStatsFile != "" {
-		crforest.OOBStatsFile = oobStatsFile
+	if o.oobStatsFile != "" {
+		crforest.OOBStatsFile = o.oobStatsFile
 	}
-	if perfFile != "" {
-		crforest.PerfFile = perfFile
+	if o.perfFile != "" {
+		crforest.PerfFile = o.perfFile
 	}
 
 	crforest.RunOOB = true
 
-	return nil
+	return crforest, nil
 }
 
-func train() {
-	e := createCRF()
+func train(o *options) (crforest *crf.Runtime) {
+	crforest, e := createCRF(o)
 	if e != nil {
 		panic(e)
 	}
 
 	trainset := tabula.Claset{}
 
-	_, e = dsv.SimpleRead(trainCfg, &trainset)
+	_, e = dsv.SimpleRead(o.trainCfg, &trainset)
 	if e != nil {
 		panic(e)
 	}
@@ -147,11 +146,13 @@ func train() {
 	if e != nil {
 		panic(e)
 	}
+
+	return crforest
 }
 
-func test() {
+func test(crforest *crf.Runtime, o *options) {
 	testset := tabula.Claset{}
-	_, e := dsv.SimpleRead(testCfg, &testset)
+	_, e := dsv.SimpleRead(o.testCfg, &testset)
 	if e != nil {
 		panic(e)
 	}
@@ -180,18 +181,20 @@ func test() {
 // (2.1) Test the model using data from testCfg.
 //
 func main() {
+	var crforest *crf.Runtime
+
 	defer un(trace())
 
 	// (0)
-	initFlags()
+	o := initFlags()
 
-	fmt.Println(tag, "Training config:", trainCfg)
-	fmt.Println(tag, "Test config:", testCfg)
+	fmt.Println(tag, "Training config:", o.trainCfg)
+	fmt.Println(tag, "Test config:", o.testCfg)
 
 	// (1)
-	if trainCfg != "" {
+	if o.trainCfg != "" {
 		// (1.1)
-		train()
+		crforest = train(&o)
 	} else {
 		// (1.2)
 		if len(flag.Args()) == 0 {
@@ -201,7 +204,7 @@ func main() {
 	}
 
 	// (2)
-	if testCfg != "" {
-		test()
+	if o.testCfg != "" {
+		test(crforest, &o)
 	}
 }

@@ -38,9 +38,6 @@ var (
 	errVarNoSection   = "variable without section, line %d at %s"
 	errVarNameInvalid = errors.New("invalid variable name, line %d at %s")
 	errValueInvalid   = errors.New("invalid value, line %d at %s")
-
-	fmtStr     = []byte{'%', 's'}
-	escPercent = []byte{'%', '%'}
 )
 
 //
@@ -229,7 +226,7 @@ func (reader *Reader) parseComment() (err error) {
 
 	reader._var.mode |= varModeComment
 
-	reader.bufFormat.Write(fmtStr)
+	reader.bufFormat.Write([]byte{'%', 's'})
 
 	for {
 		reader.b, err = reader.br.ReadByte()
@@ -273,7 +270,7 @@ func (reader *Reader) parseSectionHeader() (err error) {
 		return errBadConfig
 	}
 
-	reader.bufFormat.Write(fmtStr)
+	reader.bufFormat.Write([]byte{'%', 's'})
 	reader.buf.WriteRune(reader.r)
 
 	for {
@@ -330,7 +327,7 @@ func (reader *Reader) parseSubsection() (err error) {
 	}
 
 	reader.bufFormat.WriteByte(reader.b) // == tokDoubleQuote
-	reader.bufFormat.Write(fmtStr)
+	reader.bufFormat.Write([]byte{'%', 's'})
 
 	var esc bool
 	var end bool
@@ -412,7 +409,7 @@ func (reader *Reader) parseVariable() (err error) {
 		return errVarNameInvalid
 	}
 
-	reader.bufFormat.Write(fmtStr)
+	reader.bufFormat.Write([]byte{'%', 's'})
 	reader.buf.WriteRune(reader.r)
 
 	for {
@@ -661,7 +658,7 @@ func (reader *Reader) valueWriteByte(b byte) {
 	}
 
 	if b == tokPercent {
-		reader.bufFormat.Write(escPercent)
+		reader.bufFormat.Write([]byte{'%', '%'})
 	} else {
 		reader.bufFormat.WriteByte(b)
 	}

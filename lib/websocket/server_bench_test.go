@@ -22,76 +22,67 @@ const (
 	nonceSize    = 24 // base64.StdEncoding.EncodedLen(nonceKeySize)
 )
 
-var (
-	headerUpgrade       = _hdrKeyUpgrade
-	headerConnection    = _hdrKeyConnection
-	headerSecVersion    = _hdrKeyWSVersion
-	headerSecProtocol   = _hdrKeyWSProtocol
-	headerSecKey        = _hdrKeyWSKey
-	headerSecExtensions = _hdrKeyWSExtensions
-)
-
 type upgradeCase struct {
 	label string
 	nonce []byte
 	req   *http.Request
 }
 
-var upgradeCases = []upgradeCase{
+var upgradeCases = []upgradeCase{ // nolint: gochecknoglobals
 	{
 		label: "base",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "lowercase",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			strings.ToLower(headerUpgrade):    []string{"websocket"},
-			strings.ToLower(headerConnection): []string{"Upgrade"},
-			strings.ToLower(headerSecVersion): []string{"13"},
+			strings.ToLower(_hdrKeyUpgrade):    []string{"websocket"},
+			strings.ToLower(_hdrKeyConnection): []string{"Upgrade"},
+			strings.ToLower(_hdrKeyWSVersion):  []string{"13"},
 		}),
 	},
 	{
 		label: "uppercase",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"WEBSOCKET"},
-			headerConnection: []string{"UPGRADE"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"WEBSOCKET"},
+			_hdrKeyConnection: []string{"UPGRADE"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "subproto",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:     []string{"websocket"},
-			headerConnection:  []string{"Upgrade"},
-			headerSecVersion:  []string{"13"},
-			headerSecProtocol: []string{"a", "b", "c", "d"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
+			_hdrKeyWSProtocol: []string{"a", "b", "c", "d"},
 		}),
 	},
 	{
 		label: "subproto_comma",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:     []string{"websocket"},
-			headerConnection:  []string{"Upgrade"},
-			headerSecVersion:  []string{"13"},
-			headerSecProtocol: []string{"a, b, c, d"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
+			_hdrKeyWSProtocol: []string{"a, b, c, d"},
 		}),
 	},
 	{
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:       []string{"websocket"},
-			headerConnection:    []string{"Upgrade"},
-			headerSecVersion:    []string{"13"},
-			headerSecExtensions: []string{"a;foo=1", "b;bar=2", "c", "d;baz=3"},
+			_hdrKeyUpgrade:      []string{"websocket"},
+			_hdrKeyConnection:   []string{"Upgrade"},
+			_hdrKeyWSVersion:    []string{"13"},
+			_hdrKeyWSExtensions: []string{"a;foo=1", "b;bar=2", "c", "d;baz=3"},
 		}),
 	},
 
@@ -102,35 +93,35 @@ var upgradeCases = []upgradeCase{
 		label: "bad_http_method",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("POST", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "bad_http_proto",
 		nonce: mustMakeNonce(),
 		req: setProto(1, 0, mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		})),
 	},
 	{
 		label: "bad_host",
 		nonce: mustMakeNonce(),
 		req: withoutHeader("Host", mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		})),
 	},
 	{
 		label: "bad_upgrade",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
@@ -138,76 +129,76 @@ var upgradeCases = []upgradeCase{
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
 			"X-Custom-Header": []string{"value"},
-			headerConnection:  []string{"Upgrade"},
-			headerSecVersion:  []string{"13"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "bad_upgrade",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"not-websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"not-websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "bad_connection",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:   []string{"websocket"},
+			_hdrKeyWSVersion: []string{"13"},
 		}),
 	},
 	{
 		label: "bad_connection",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"not-upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"not-upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "bad_sec_version_x",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
 		}),
 	},
 	{
 		label: "bad_sec_version",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"upgrade"},
-			headerSecVersion: []string{"15"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"upgrade"},
+			_hdrKeyWSVersion:  []string{"15"},
 		}),
 	},
 	{
 		label: "bad_sec_key",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 	{
 		label: "bad_sec_key",
 		nonce: mustMakeNonce(),
 		req: mustMakeRequest("GET", http.Header{
-			headerUpgrade:    []string{"websocket"},
-			headerConnection: []string{"Upgrade"},
-			headerSecVersion: []string{"13"},
+			_hdrKeyUpgrade:    []string{"websocket"},
+			_hdrKeyConnection: []string{"Upgrade"},
+			_hdrKeyWSVersion:  []string{"13"},
 		}),
 	},
 }
 
 func BenchmarkUpgrader(b *testing.B) {
 	for _, bench := range upgradeCases {
-		bench.req.Header.Set(headerSecKey, string(bench.nonce))
+		bench.req.Header.Set(_hdrKeyWSKey, string(bench.nonce))
 
 		u := Server{}
 

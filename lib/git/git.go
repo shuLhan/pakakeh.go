@@ -22,7 +22,7 @@ const (
 	_defBranch     = "master"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_stdout = os.Stdout
 	_stderr = os.Stderr
 )

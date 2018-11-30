@@ -18,20 +18,20 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-var (
+type options struct {
 	// percentOver contain percentage of over sampling.
-	percentOver = 100
+	percentOver int
 	// knn contain number of nearest neighbours considered when
 	// oversampling.
-	knn = 5
+	knn int
 	// synFile flag for synthetic file output.
-	synFile = ""
+	synFile string
 	// merge flag, if its true the original and synthetic will be merged
 	// into `synFile`.
-	merge = false
-)
+	merge bool
+}
 
-var usage = func() {
+func usage() {
 	cmd := os.Args[0]
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n"+
 		"[-percentover number] "+
@@ -42,7 +42,7 @@ var usage = func() {
 	flag.PrintDefaults()
 }
 
-func initFlags() {
+func initFlags() (o options) {
 	flagUsage := []string{
 		"Percentage of oversampling (default 100)",
 		"Number of nearest neighbours (default 5)",
@@ -51,12 +51,14 @@ func initFlags() {
 			" written to file (default false)",
 	}
 
-	flag.IntVar(&percentOver, "percentover", -1, flagUsage[0])
-	flag.IntVar(&knn, "knn", -1, flagUsage[1])
-	flag.StringVar(&synFile, "syntheticfile", "", flagUsage[2])
-	flag.BoolVar(&merge, "merge", false, flagUsage[3])
+	flag.IntVar(&o.percentOver, "percentover", -1, flagUsage[0])
+	flag.IntVar(&o.knn, "knn", -1, flagUsage[1])
+	flag.StringVar(&o.synFile, "syntheticfile", "", flagUsage[2])
+	flag.BoolVar(&o.merge, "merge", false, flagUsage[3])
 
 	flag.Parse()
+
+	return o
 }
 
 func trace(s string) (string, time.Time) {
@@ -74,7 +76,7 @@ func un(s string, startTime time.Time) {
 // createSmote will create and initialize SMOTE object from config file and
 // from command parameter.
 //
-func createSmote(fcfg string) (smoteRun *smote.Runtime, e error) {
+func createSmote(fcfg string, o *options) (smoteRun *smote.Runtime, e error) {
 	smoteRun = &smote.Runtime{}
 
 	config, e := ioutil.ReadFile(fcfg)
@@ -88,11 +90,11 @@ func createSmote(fcfg string) (smoteRun *smote.Runtime, e error) {
 	}
 
 	// Use option value from command parameter.
-	if percentOver > 0 {
-		smoteRun.PercentOver = percentOver
+	if o.percentOver > 0 {
+		smoteRun.PercentOver = o.percentOver
 	}
-	if knn > 0 {
-		smoteRun.K = knn
+	if o.knn > 0 {
+		smoteRun.K = o.knn
 	}
 
 	if debug.Value >= 1 {
@@ -152,7 +154,7 @@ func runMerge(smote *smote.Runtime, dataset *tabula.Claset) (e error) {
 func main() {
 	defer un(trace("smote"))
 
-	initFlags()
+	o := initFlags()
 
 	if len(flag.Args()) == 0 {
 		usage()
@@ -162,7 +164,7 @@ func main() {
 	fcfg := flag.Arg(0)
 
 	// Parsing config file and parameter.
-	smote, e := createSmote(fcfg)
+	smote, e := createSmote(fcfg, &o)
 	if e != nil {
 		panic(e)
 	}
@@ -184,7 +186,7 @@ func main() {
 		panic(e)
 	}
 
-	if !merge {
+	if !o.merge {
 		return
 	}
 

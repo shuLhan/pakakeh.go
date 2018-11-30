@@ -42,7 +42,7 @@ const (
 	_qKeyTicket = "ticket"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_rng *rand.Rand
 
 	_bbPool = sync.Pool{

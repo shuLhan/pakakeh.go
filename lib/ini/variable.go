@@ -22,7 +22,7 @@ const (
 	varModeMulti              // 32
 )
 
-var (
+const (
 	varValueTrue = "true"
 )
 

@@ -12,7 +12,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var _wsClient *Client
+var _wsClient *Client // nolint: gochecknoglobals
 
 func testClientPing(t *testing.T) {
 	cases := []struct {

@@ -10,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var _userSocks = &UserSockets{}
+var _userSocks = &UserSockets{} // nolint: gochecknoglobals
 
 func testUserSocketsAdd(t *testing.T) {
 	cases := []struct {

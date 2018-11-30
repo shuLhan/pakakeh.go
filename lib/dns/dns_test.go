@@ -17,7 +17,7 @@ const (
 	testServerAddress = "127.0.0.1:5353"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_testServer  *Server
 	_testHandler *serverHandler
 )

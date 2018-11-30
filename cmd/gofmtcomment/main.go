@@ -19,7 +19,7 @@ const (
 	gapb = byte(' ')
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	twoGaps   = []byte{gapb, gapb}
 	threeGaps = []byte{gapb, gapb, gapb}
 )

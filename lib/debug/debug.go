@@ -9,24 +9,18 @@ package debug
 import (
 	"os"
 	"strconv"
-	"sync"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	// Value contains DEBUG value from environment.
 	Value = 0
-	once  sync.Once
 )
-
-func loadEnvironment() {
-	v := os.Getenv("DEBUG")
-	if len(v) > 0 {
-		Value, _ = strconv.Atoi(v)
-	}
-}
 
 //
 // init initialize debug from system environment.
 func init() { // nolint
-	once.Do(loadEnvironment)
+	v := os.Getenv("DEBUG")
+	if len(v) > 0 {
+		Value, _ = strconv.Atoi(v)
+	}
 }

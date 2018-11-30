@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-var requestPool = sync.Pool{
+var requestPool = sync.Pool{ // nolint: gochecknoglobals
 	New: func() interface{} {
 		return NewRequest()
 	},

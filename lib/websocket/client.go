@@ -31,14 +31,13 @@ const (
 		"Sec-Websocket-Version: 13\r\n"
 )
 
-var (
-	_defTimeout = 30 * time.Second
-	_defRWTO    = 10 * time.Second
+var ( // nolint: gochecknoglobals
+	_defRWTO = 10 * time.Second
 )
 
 type ctxKey int
 
-var (
+const (
 	ctxKeyWSAccept ctxKey = 1
 )
 
@@ -164,7 +163,7 @@ func GetConnectAddr(u *url.URL) (addr string) {
 //
 func (cl *Client) Open(addr string) (err error) {
 	dialer := &net.Dialer{
-		Timeout: _defTimeout,
+		Timeout: 30 * time.Second,
 	}
 
 	if cl.IsTLS {

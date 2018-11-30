@@ -4,33 +4,33 @@
 
 package tabula
 
-var testColTypes = []int{
+var testColTypes = []int{ // nolint: gochecknoglobals
 	TInteger,
 	TInteger,
 	TInteger,
 	TString,
 }
 
-var testColNames = []string{"int01", "int02", "int03", "class"}
+var testColNames = []string{"int01", "int02", "int03", "class"} // nolint: gochecknoglobals
 
 // Testing data and function for Rows and MapRows
-var rowsData = [][]string{
+var rowsData = [][]string{ // nolint: gochecknoglobals
 	{"1", "5", "9", "+"},
 	{"2", "6", "0", "-"},
 	{"3", "7", "1", "-"},
 	{"4", "8", "2", "+"},
 }
 
-var testClassIdx = 3
+var testClassIdx = 3 // nolint: gochecknoglobals
 
-var rowsExpect = []string{
+var rowsExpect = []string{ // nolint: gochecknoglobals
 	"&[1 5 9 +]",
 	"&[2 6 0 -]",
 	"&[3 7 1 -]",
 	"&[4 8 2 +]",
 }
 
-var groupByExpect = "[{+ &[1 5 9 +]&[4 8 2 +]} {- &[2 6 0 -]&[3 7 1 -]}]"
+var groupByExpect = "[{+ &[1 5 9 +]&[4 8 2 +]} {- &[2 6 0 -]&[3 7 1 -]}]" // nolint: gochecknoglobals
 
 func initRows() (rows Rows, e error) {
 	for i := range rowsData {

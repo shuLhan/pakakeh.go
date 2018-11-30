@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 )
 
-var idPool uint32
+var idPool uint32 // nolint: gochecknoglobals
 
 //
 // getNextID increment and return ID.

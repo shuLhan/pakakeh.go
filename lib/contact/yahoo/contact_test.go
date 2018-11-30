@@ -16,10 +16,6 @@ const (
 	sampleContact = "testdata/contact.json"
 )
 
-var (
-	gotContact *contact.Record
-)
-
 func parseSampleJSON(t *testing.T, input string) (contact *contact.Record) {
 	jsonb, err := ioutil.ReadFile(input)
 	if err != nil {
@@ -66,7 +62,7 @@ func TestParseJSON(t *testing.T) {
 		JobTitle: "Tester",
 	}
 
-	gotContact = parseSampleJSON(t, sampleContact)
+	gotContact := parseSampleJSON(t, sampleContact)
 
 	test.Assert(t, "Name", exp.Name, gotContact.Name, true)
 	test.Assert(t, "Birthday", exp.Birthday, gotContact.Birthday, true)

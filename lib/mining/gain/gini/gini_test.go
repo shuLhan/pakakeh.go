@@ -9,12 +9,12 @@ import (
 	"testing"
 )
 
-var data = [][]float64{
+var data = [][]float64{ // nolint: gochecknoglobals
 	{1.0, 6.0, 5.0, 4.0, 7.0, 3.0, 8.0, 7.0, 5.0},
 	{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 }
-var targetValues = []string{"P", "P", "N", "P", "N", "N", "N", "P", "N"}
-var classes = []string{"P", "N"}
+var targetValues = []string{"P", "P", "N", "P", "N", "N", "N", "P", "N"} // nolint: gochecknoglobals
+var classes = []string{"P", "N"}                                         // nolint: gochecknoglobals
 
 func TestComputeContinu(t *testing.T) {
 	target := make([]string, len(targetValues))
@@ -34,12 +34,12 @@ func TestComputeContinu(t *testing.T) {
 	fmt.Println(">>> gini:", GINI)
 }
 
-var discreteSamples = [][]string{
+var discreteSamples = [][]string{ // nolint: gochecknoglobals
 	{"T", "T", "T", "F", "F", "F", "F", "T", "F"},
 	{"T", "T", "F", "F", "T", "T", "F", "F", "T"},
 	{"T", "T", "F", "T", "F", "F", "F", "T", "F"},
 }
-var discreteValues = []string{"T", "F"}
+var discreteValues = []string{"T", "F"} // nolint: gochecknoglobals
 
 func TestComputeDiscrete(t *testing.T) {
 	gini := Gini{}

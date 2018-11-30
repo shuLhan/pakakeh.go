@@ -17,10 +17,6 @@ const (
 	sampleContact = "testdata/contact.json"
 )
 
-var (
-	gotContact *contact.Record
-)
-
 func parseContact(t *testing.T) (contact *contact.Record) {
 	googleContact := &Contact{}
 
@@ -98,7 +94,7 @@ func TestDecode(t *testing.T) {
 		JobTitle: "Devops",
 	}
 
-	gotContact = parseContact(t)
+	gotContact := parseContact(t)
 
 	test.Assert(t, "Name", exp.Name, gotContact.Name, true)
 	test.Assert(t, "Birthday", exp.Birthday, gotContact.Birthday, true)

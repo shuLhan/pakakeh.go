@@ -14,18 +14,10 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-var (
-	SampleFile string
-	PerfFile   string
-	StatFile   string
-	NStage     = 200
-	NTree      = 1
-)
-
-func runCRF(t *testing.T) {
+func runCRF(t *testing.T, sampleFile, statFile, perfFile string, nstage, ntree int) {
 	// read trainingset.
 	samples := tabula.Claset{}
-	_, e := dsv.SimpleRead(SampleFile, &samples)
+	_, e := dsv.SimpleRead(sampleFile, &samples)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -38,11 +30,11 @@ func runCRF(t *testing.T) {
 
 	crfRuntime := Runtime{
 		Runtime: classifier.Runtime{
-			StatFile: StatFile,
-			PerfFile: PerfFile,
+			StatFile: statFile,
+			PerfFile: perfFile,
 		},
-		NStage: NStage,
-		NTree:  NTree,
+		NStage: nstage,
+		NTree:  ntree,
 	}
 
 	e = crfRuntime.Build(trainset)
@@ -65,20 +57,19 @@ func runCRF(t *testing.T) {
 }
 
 func TestPhoneme200_1(t *testing.T) {
-	SampleFile = "../../testdata/phoneme/phoneme.dsv"
-	PerfFile = "phoneme_200_1.perf"
-	StatFile = "phoneme_200_1.stat"
+	sampleFile := "../../testdata/phoneme/phoneme.dsv"
+	perfFile := "phoneme_200_1.perf"
+	statFile := "phoneme_200_1.stat"
 
-	runCRF(t)
+	runCRF(t, sampleFile, statFile, perfFile, 200, 1)
 }
 
 func TestPhoneme200_10(t *testing.T) {
-	SampleFile = "../../testdata/phoneme/phoneme.dsv"
-	PerfFile = "phoneme_200_10.perf"
-	StatFile = "phoneme_200_10.stat"
-	NTree = 10
+	sampleFile := "../../testdata/phoneme/phoneme.dsv"
+	perfFile := "phoneme_200_10.perf"
+	statFile := "phoneme_200_10.stat"
 
-	runCRF(t)
+	runCRF(t, sampleFile, statFile, perfFile, 200, 10)
 }
 
 func TestMain(m *testing.M) {

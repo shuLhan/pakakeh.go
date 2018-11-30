@@ -15,7 +15,7 @@ MEM_PROF:=mem.prof
 
 all: install
 
-install: test
+install: test lint
 	go install ./...
 
 test: $(COVER_HTML)
@@ -43,7 +43,7 @@ coverbrowse: $(COVER_HTML)
 	xdg-open $<
 
 lint:
-	golangci-lint run ./...
+	golangci-lint run --enable-all -D dupl -D lll ./...
 
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)

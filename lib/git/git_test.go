@@ -15,7 +15,7 @@ import (
 
 const _testRepoDir = "testdata/beku_test"
 
-var (
+var ( // nolint: gochecknoglobals
 	_testRemoteURL string
 )
 

@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_testExternalJWT    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14"
 	_testInternalJWT    = _testExternalJWT
 	_testUID            = 100
@@ -26,7 +26,7 @@ var (
 	_testMaskKey        = [4]byte{'7', 'ú', '!', '='}
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_dummyPayload256, _dummyPayload256Masked     = generateDummyPayload(256)
 	_dummyPayload65536, _dummyPayload65536Masked = generateDummyPayload(65536)
 )

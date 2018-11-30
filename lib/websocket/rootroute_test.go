@@ -13,7 +13,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_testRootRoute = newRootRoute()
 	_testDefMethod string
 )

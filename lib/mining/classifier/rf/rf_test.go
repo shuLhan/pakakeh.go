@@ -16,7 +16,7 @@ import (
 )
 
 // Global options to run for each test.
-var (
+var ( // nolint: gochecknoglobals
 	// SampleDsvFile is the file that contain samples config.
 	SampleDsvFile string
 	// DoTest if its true then the dataset will splited into training and

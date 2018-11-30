@@ -18,24 +18,26 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-var (
-	nRandomFeature = 0
-)
+type options struct {
+	nRandomFeature int
+}
 
-var usage = func() {
+func usage() {
 	cmd := os.Args[0]
 	fmt.Fprintf(os.Stderr, "Usage of %s: [-n number] [config.dsv]\n", cmd)
 	flag.PrintDefaults()
 }
 
-func initFlags() {
+func initFlags() (opts options) {
 	flagUsage := []string{
 		"Number of random feature (default 0)",
 	}
 
-	flag.IntVar(&nRandomFeature, "n", 0, flagUsage[0])
+	flag.IntVar(&opts.nRandomFeature, "n", 0, flagUsage[0])
 
 	flag.Parse()
+
+	return opts
 }
 
 func trace(s string) (string, time.Time) {
@@ -49,7 +51,7 @@ func un(s string, startTime time.Time) {
 		endTime.Sub(startTime))
 }
 
-func createCart(fcfg string) (*cart.Runtime, error) {
+func createCart(fcfg string, opts *options) (*cart.Runtime, error) {
 	cartrt := &cart.Runtime{}
 
 	config, e := ioutil.ReadFile(fcfg)
@@ -62,8 +64,8 @@ func createCart(fcfg string) (*cart.Runtime, error) {
 		return nil, e
 	}
 
-	if nRandomFeature > 0 {
-		cartrt.NRandomFeature = nRandomFeature
+	if opts.nRandomFeature > 0 {
+		cartrt.NRandomFeature = opts.nRandomFeature
 	}
 
 	return cartrt, nil
@@ -72,7 +74,7 @@ func createCart(fcfg string) (*cart.Runtime, error) {
 func main() {
 	defer un(trace("cart"))
 
-	initFlags()
+	opts := initFlags()
 
 	if len(flag.Args()) == 0 {
 		usage()
@@ -82,7 +84,7 @@ func main() {
 	fcfg := flag.Arg(0)
 
 	// Parsing config file and check command parameter values.
-	cartrt, e := createCart(fcfg)
+	cartrt, e := createCart(fcfg, &opts)
 	if e != nil {
 		panic(e)
 	}

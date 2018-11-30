@@ -10,9 +10,8 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var dataFloat64 = []float64{0.1, 0.2, 0.3, 0.4, 0.5}
-
 func createRow() (row Row) {
+	dataFloat64 := []float64{0.1, 0.2, 0.3, 0.4, 0.5}
 	for _, v := range dataFloat64 {
 		row.PushBack(NewRecordReal(v))
 	}

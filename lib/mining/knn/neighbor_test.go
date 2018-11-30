@@ -14,7 +14,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var dataFloat64 = [][]float64{
+var dataFloat64 = [][]float64{ // nolint: gochecknoglobals
 	{0.243474, 0.505146, 0.472892, 1.34802, -0.844252, 1},
 	{0.202343, 0.485983, 0.527533, 1.47307, -0.809672, 1},
 	{0.215496, 0.523418, 0.517190, 1.43548, -0.933981, 1},
@@ -22,7 +22,7 @@ var dataFloat64 = [][]float64{
 	{0.301676, 0.554505, 0.594757, 1.21258, -0.873084, 1},
 }
 
-var distances = []int{4, 3, 2, 1, 0}
+var distances = []int{4, 3, 2, 1, 0} // nolint: gochecknoglobals
 
 func createNeigbours() (neighbors Neighbors) {
 	for x, d := range dataFloat64 {

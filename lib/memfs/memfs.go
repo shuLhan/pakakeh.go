@@ -59,7 +59,7 @@ import (
 	"regexp"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	// MaxFileSize define maximum file size that can be stored on memory.
 	// The default value is 5 MB.
 	MaxFileSize int64 = 1024 * 1024 * 5

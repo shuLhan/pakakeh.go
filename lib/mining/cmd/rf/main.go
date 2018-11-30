@@ -21,32 +21,29 @@ const (
 	tag = "[rf]"
 )
 
-var (
+type options struct {
 	// nTree number of tree.
-	nTree = 0
+	nTree int
 	// nRandomFeature number of feature to compute.
-	nRandomFeature = 0
+	nRandomFeature int
 	// percentBoot percentage of sample for bootstraping.
-	percentBoot = 0
+	percentBoot int
 	// oobStatsFile where statistic will be written.
-	oobStatsFile = ""
+	oobStatsFile string
 	// perfFile where performance of classifier will be written.
-	perfFile = ""
+	perfFile string
 	// trainCfg point to the configuration file for training or creating
 	// a model
-	trainCfg = ""
+	trainCfg string
 	// testCfg point to the configuration file for testing
-	testCfg = ""
+	testCfg string
+}
 
-	// forest the main object.
-	forest rf.Runtime
-)
-
-var usage = func() {
+func usage() {
 	flag.PrintDefaults()
 }
 
-func initFlags() {
+func initFlags() (opts options) {
 	flagUsage := []string{
 		"Number of tree in forest (default 100)",
 		"Number of feature to compute (default 0)",
@@ -57,17 +54,19 @@ func initFlags() {
 		"Test configuration",
 	}
 
-	flag.IntVar(&nTree, "ntree", -1, flagUsage[0])
-	flag.IntVar(&nRandomFeature, "nrandomfeature", -1, flagUsage[1])
-	flag.IntVar(&percentBoot, "percentboot", -1, flagUsage[2])
+	flag.IntVar(&opts.nTree, "ntree", -1, flagUsage[0])
+	flag.IntVar(&opts.nRandomFeature, "nrandomfeature", -1, flagUsage[1])
+	flag.IntVar(&opts.percentBoot, "percentboot", -1, flagUsage[2])
 
-	flag.StringVar(&oobStatsFile, "oobstatsfile", "", flagUsage[3])
-	flag.StringVar(&perfFile, "perffile", "", flagUsage[4])
+	flag.StringVar(&opts.oobStatsFile, "oobstatsfile", "", flagUsage[3])
+	flag.StringVar(&opts.perfFile, "perffile", "", flagUsage[4])
 
-	flag.StringVar(&trainCfg, "train", "", flagUsage[5])
-	flag.StringVar(&testCfg, "test", "", flagUsage[6])
+	flag.StringVar(&opts.trainCfg, "train", "", flagUsage[5])
+	flag.StringVar(&opts.testCfg, "test", "", flagUsage[6])
 
 	flag.Parse()
+
+	return opts
 }
 
 func trace() (start time.Time) {
@@ -87,49 +86,51 @@ func un(startTime time.Time) {
 // (1) load training configuration.
 // (2) Overwrite configuration parameter if its set from command line.
 //
-func createRandomForest() error {
+func createRandomForest(opts *options) (forest *rf.Runtime, e error) {
 	// (1)
-	config, e := ioutil.ReadFile(trainCfg)
+	config, e := ioutil.ReadFile(opts.trainCfg)
 	if e != nil {
-		return e
+		return nil, e
 	}
 
-	forest = rf.Runtime{}
+	forest = &rf.Runtime{}
 
 	e = json.Unmarshal(config, &forest)
 	if e != nil {
-		return e
+		return nil, e
 	}
 
 	// (2)
-	if nTree > 0 {
-		forest.NTree = nTree
+	if opts.nTree > 0 {
+		forest.NTree = opts.nTree
 	}
-	if nRandomFeature > 0 {
-		forest.NRandomFeature = nRandomFeature
+	if opts.nRandomFeature > 0 {
+		forest.NRandomFeature = opts.nRandomFeature
 	}
-	if percentBoot > 0 {
-		forest.PercentBoot = percentBoot
+	if opts.percentBoot > 0 {
+		forest.PercentBoot = opts.percentBoot
 	}
-	if oobStatsFile != "" {
-		forest.OOBStatsFile = oobStatsFile
+	if opts.oobStatsFile != "" {
+		forest.OOBStatsFile = opts.oobStatsFile
 	}
-	if perfFile != "" {
-		forest.PerfFile = perfFile
+	if opts.perfFile != "" {
+		forest.PerfFile = opts.perfFile
 	}
 
-	return nil
+	return forest, nil
 }
 
-func train() {
-	e := createRandomForest()
+func train(opts *options) (forest *rf.Runtime) {
+	var e error
+
+	forest, e = createRandomForest(opts)
 	if e != nil {
 		panic(e)
 	}
 
 	trainset := tabula.Claset{}
 
-	_, e = dsv.SimpleRead(trainCfg, &trainset)
+	_, e = dsv.SimpleRead(opts.trainCfg, &trainset)
 	if e != nil {
 		panic(e)
 	}
@@ -138,11 +139,13 @@ func train() {
 	if e != nil {
 		panic(e)
 	}
+
+	return forest
 }
 
-func test() {
+func test(forest *rf.Runtime, opts *options) {
 	testset := tabula.Claset{}
-	_, e := dsv.SimpleRead(testCfg, &testset)
+	_, e := dsv.SimpleRead(opts.testCfg, &testset)
 	if e != nil {
 		panic(e)
 	}
@@ -166,15 +169,17 @@ func test() {
 // (2.1) Test the model using data from testCfg.
 //
 func main() {
+	var forest *rf.Runtime
+
 	defer un(trace())
 
 	// (0)
-	initFlags()
+	opts := initFlags()
 
 	// (1)
-	if trainCfg != "" {
+	if opts.trainCfg != "" {
 		// (1.1)
-		train()
+		forest = train(&opts)
 	} else {
 		// (1.2)
 		if len(flag.Args()) == 0 {
@@ -184,7 +189,7 @@ func main() {
 	}
 
 	// (2)
-	if testCfg != "" {
-		test()
+	if opts.testCfg != "" {
+		test(forest, &opts)
 	}
 }

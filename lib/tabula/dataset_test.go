@@ -11,7 +11,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var datasetRows = [][]string{
+var datasetRows = [][]string{ // nolint: gochecknoglobals
 	{"0", "1", "A"},
 	{"1", "1.1", "B"},
 	{"2", "1.2", "A"},
@@ -24,19 +24,19 @@ var datasetRows = [][]string{
 	{"9", "1.9", "F"},
 }
 
-var datasetCols = [][]string{
+var datasetCols = [][]string{ // nolint: gochecknoglobals
 	{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
 	{"1", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9"},
 	{"A", "B", "A", "B", "C", "D", "C", "D", "E", "F"},
 }
 
-var datasetTypes = []int{
+var datasetTypes = []int{ // nolint: gochecknoglobals
 	TInteger,
 	TReal,
 	TString,
 }
 
-var datasetNames = []string{"int", "real", "string"}
+var datasetNames = []string{"int", "real", "string"} // nolint: gochecknoglobals
 
 func populateWithRows(dataset *Dataset) error {
 	for _, rowin := range datasetRows {

@@ -266,9 +266,9 @@ func TestTokenFind(t *testing.T) {
 	testTokenFind(t, line, token, 0, exp)
 }
 
-var randomInput256 = Random([]byte(HexaLetters), 256)
-
 func BenchmarkToLowerStd(b *testing.B) {
+	randomInput256 := Random([]byte(HexaLetters), 256)
+
 	in := make([]byte, len(randomInput256))
 	copy(in, randomInput256)
 
@@ -280,6 +280,8 @@ func BenchmarkToLowerStd(b *testing.B) {
 }
 
 func BenchmarkToLower(b *testing.B) {
+	randomInput256 := Random([]byte(HexaLetters), 256)
+
 	in := make([]byte, len(randomInput256))
 	copy(in, randomInput256)
 

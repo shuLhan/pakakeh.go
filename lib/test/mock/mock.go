@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_stderr *os.File
 	_stdin  *os.File
 	_stdout *os.File

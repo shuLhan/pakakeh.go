@@ -18,20 +18,20 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-var (
+type options struct {
 	// percentOver contain percentage of over sampling.
-	percentOver = 100
+	percentOver int
 	// knn contain number of nearest neighbours considered when
 	// oversampling.
-	knn = 5
+	knn int
 	// synFile flag for synthetic file output.
-	synFile = ""
+	synFile string
 	// merge flag, if its true the original and synthetic will be merged
 	// into `synFile`.
-	merge = false
-)
+	merge bool
+}
 
-var usage = func() {
+func usage() {
 	cmd := os.Args[0]
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n"+
 		"[-percentover number] "+
@@ -42,7 +42,9 @@ var usage = func() {
 	flag.PrintDefaults()
 }
 
-func initFlags() {
+func initFlags() (opts *options) {
+	opts = &options{}
+
 	flagUsage := []string{
 		"Percentage of oversampling (default 100)",
 		"Number of nearest neighbours (default 5)",
@@ -51,12 +53,14 @@ func initFlags() {
 			" written to file (default false)",
 	}
 
-	flag.IntVar(&percentOver, "percentover", -1, flagUsage[0])
-	flag.IntVar(&knn, "knn", -1, flagUsage[1])
-	flag.StringVar(&synFile, "syntheticfile", "", flagUsage[2])
-	flag.BoolVar(&merge, "merge", false, flagUsage[3])
+	flag.IntVar(&opts.percentOver, "percentover", -1, flagUsage[0])
+	flag.IntVar(&opts.knn, "knn", -1, flagUsage[1])
+	flag.StringVar(&opts.synFile, "syntheticfile", "", flagUsage[2])
+	flag.BoolVar(&opts.merge, "merge", false, flagUsage[3])
 
 	flag.Parse()
+
+	return opts
 }
 
 func trace(s string) (string, time.Time) {
@@ -74,7 +78,7 @@ func un(s string, startTime time.Time) {
 // createLnsmote will create and initialize SMOTE object from config file and
 // from command parameter.
 //
-func createLnsmote(fcfg string) (lnsmoteRun *lnsmote.Runtime, e error) {
+func createLnsmote(fcfg string, opts *options) (lnsmoteRun *lnsmote.Runtime, e error) {
 	lnsmoteRun = &lnsmote.Runtime{}
 
 	config, e := ioutil.ReadFile(fcfg)
@@ -88,11 +92,11 @@ func createLnsmote(fcfg string) (lnsmoteRun *lnsmote.Runtime, e error) {
 	}
 
 	// Use option value from command parameter.
-	if percentOver > 0 {
-		lnsmoteRun.PercentOver = percentOver
+	if opts.percentOver > 0 {
+		lnsmoteRun.PercentOver = opts.percentOver
 	}
-	if knn > 0 {
-		lnsmoteRun.K = knn
+	if opts.knn > 0 {
+		lnsmoteRun.K = opts.knn
 	}
 
 	if debug.Value >= 1 {
@@ -147,7 +151,7 @@ func runMerge(lnsmoteRun *lnsmote.Runtime, dataset *tabula.Claset) (e error) {
 func main() {
 	defer un(trace("lnsmote"))
 
-	initFlags()
+	opts := initFlags()
 
 	if len(flag.Args()) == 0 {
 		usage()
@@ -157,7 +161,7 @@ func main() {
 	fcfg := flag.Arg(0)
 
 	// Parsing config file and parameter.
-	lnsmoteRun, e := createLnsmote(fcfg)
+	lnsmoteRun, e := createLnsmote(fcfg, opts)
 	if e != nil {
 		panic(e)
 	}
@@ -179,7 +183,7 @@ func main() {
 		panic(e)
 	}
 
-	if !merge {
+	if !opts.merge {
 		return
 	}
 

@@ -46,7 +46,7 @@ var (
 //	Please note that according to [RFC2616], all header field names in
 //	both HTTP requests and HTTP responses are case-insensitive.
 //
-var (
+const (
 	_hdrKeyConnection        = "connection"
 	_hdrKeyHost              = "host"
 	_hdrKeyOrigin            = "origin"
@@ -59,12 +59,9 @@ var (
 	_hdrValUpgradeWS         = "websocket"
 	_hdrValConnectionUpgrade = "upgrade"
 	_hdrValWSVersion         = "13"
-	_bGET                    = []byte("GET")
-	_bHTTP                   = []byte("HTTP")
-	_bV11                    = []byte("1.1")
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	_handshakePool = sync.Pool{
 		New: func() interface{} {
 			return new(Handshake)
@@ -139,7 +136,7 @@ func (h *Handshake) getBytesChunk(sep byte, tolower bool) (chunk []byte) {
 //
 func (h *Handshake) parseHTTPLine() (err error) {
 	chunk := h.getBytesChunk(' ', false)
-	if !bytes.Equal(chunk, _bGET) {
+	if !bytes.Equal(chunk, []byte("GET")) {
 		err = ErrInvalidHTTPMethod
 		return
 	}
@@ -153,13 +150,13 @@ func (h *Handshake) parseHTTPLine() (err error) {
 	h.URI = chunk
 
 	chunk = h.getBytesChunk('/', false)
-	if !bytes.Equal(chunk, _bHTTP) {
+	if !bytes.Equal(chunk, []byte("HTTP")) {
 		err = ErrBadRequest
 		return
 	}
 
 	chunk = h.getBytesChunk('\n', false)
-	if !bytes.Equal(chunk, _bV11) {
+	if !bytes.Equal(chunk, []byte("1.1")) {
 		err = ErrInvalidHTTPVersion
 		return
 	}

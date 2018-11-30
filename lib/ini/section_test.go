@@ -10,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	sec     *Section
 	lastSec *Section
 )

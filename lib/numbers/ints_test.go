@@ -11,7 +11,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	dInts = [][]int{
 		{},
 		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
@@ -257,7 +257,7 @@ func TestIntsSortByIndex(t *testing.T) {
 	}
 }
 
-var intsInSorts = [][]int{
+var intsInSorts = [][]int{ // nolint: gochecknoglobals
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -277,7 +277,7 @@ var intsInSorts = [][]int{
 		62},
 }
 
-var intsExpSorts = [][]int{
+var intsExpSorts = [][]int{ // nolint: gochecknoglobals
 	{3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -297,7 +297,7 @@ var intsExpSorts = [][]int{
 		79},
 }
 
-var intsExpSortsDesc = [][]int{
+var intsExpSortsDesc = [][]int{ // nolint: gochecknoglobals
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},

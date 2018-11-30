@@ -17,7 +17,7 @@ const (
 	envLocaldomain = "LOCALDOMAIN"
 )
 
-var (
+var ( // nolint: gochecknoglobals
 	newLineTerms = []byte{'\n'}
 	spaceSeps    = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
 )

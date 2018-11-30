@@ -12,19 +12,13 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-var (
-	fcfg        = "../../testdata/phoneme/phoneme.dsv"
-	PercentOver = 100
-	K           = 5
-)
-
 func TestSmote(t *testing.T) {
-	smot := New(PercentOver, K, 5)
+	smot := New(100, 5, 5)
 
 	// Read samples.
 	dataset := tabula.Claset{}
 
-	_, e := dsv.SimpleRead(fcfg, &dataset)
+	_, e := dsv.SimpleRead("../../testdata/phoneme/phoneme.dsv", &dataset)
 	if nil != e {
 		t.Fatal(e)
 	}
