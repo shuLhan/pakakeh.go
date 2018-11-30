@@ -11,12 +11,14 @@ func TestCutUntilToken(t *testing.T) {
 	line := []byte(`abc \def ghi`)
 
 	cases := []struct {
-		token    []byte
-		startAt  int
-		checkEsc bool
-		exp      string
-		expIdx   int
+		token []byte
+		exp   string
+
+		startAt int
+		expIdx  int
+
 		expFound bool
+		checkEsc bool
 	}{{
 		exp:      `abc \def ghi`,
 		expIdx:   -1,
@@ -166,10 +168,12 @@ func TestSkipAfterToken(t *testing.T) {
 	line := []byte(`abc \def ghi`)
 
 	cases := []struct {
-		token    []byte
-		startAt  int
+		token []byte
+
+		startAt int
+		exp     int
+
 		checkEsc bool
-		exp      int
 		expFound bool
 	}{{
 		token:    []byte(`def`),

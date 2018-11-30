@@ -20,7 +20,6 @@ type Contact struct {
 	LastName   string `json:"lastName,omitempty"`
 	Suffix     string `json:"suffix,omitempty"`
 	FullName   string `json:"fullName,omitempty"`
-	Gender     int32  `json:"gender,omitempty"`
 	Birthday   string `json:"birthday,omitempty"`
 
 	Email       string `json:"email,omitempty"`
@@ -56,7 +55,6 @@ type Contact struct {
 	AlternatePhone string `json:"alternatePhone,omitempty"`
 	CompanyPhone   string `json:"companyPhone,omitempty"`
 
-	SpouseType  int32    `json:"spouseType,omitempty"`
 	SpouseName  string   `json:"spouseName,omitempty"`
 	Anniversary string   `json:"anniversary,omitempty"`
 	KidsName    []string `json:"kidsName,omitempty"`
@@ -66,10 +64,13 @@ type Contact struct {
 	FollowUpTopic   string   `json:"followUpTopic,omitempty"`
 	Notes           []string `json:"notes,omitempty"`
 
+	Avatar *Avatar `json:"avatar,omitempty"`
+
+	Gender     int32 `json:"gender,omitempty"`
+	SpouseType int32 `json:"spouseType,omitempty"`
+
 	IsVIP    bool `json:"isVIP,omitempty"`
 	IsActive bool `json:"isActive,omitempty"`
-
-	Avatar *Avatar `json:"avatar,omitempty"`
 }
 
 //

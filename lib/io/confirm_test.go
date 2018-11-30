@@ -13,8 +13,8 @@ import (
 
 func TestConfirmYesNo(t *testing.T) {
 	cases := []struct {
-		defIsYes bool
 		answer   string
+		defIsYes bool
 		exp      bool
 	}{{
 		defIsYes: true,

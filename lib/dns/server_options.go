@@ -19,6 +19,18 @@ type ServerOptions struct {
 	// IPAddress of server to listen to, without port number.
 	IPAddress string
 
+	// DoHCert path to certificate file for serving DoH.
+	DoHCert string
+
+	// DoHCertKey path to certificate key file for serving DoH.
+	DoHCertKey string
+
+	// DoHIdleTimeout number of seconds before considering the client of
+	// DoH connection to be closed.
+	DoHIdleTimeout time.Duration
+
+	ip net.IP
+
 	// UDPPort port for UDP server, default to 53.
 	UDPPort uint16
 
@@ -28,21 +40,9 @@ type ServerOptions struct {
 	// DoHPort port for listening DNS over HTTP, default to 443.
 	DoHPort uint16
 
-	// DoHCert path to certificate file for serving DoH.
-	DoHCert string
-
-	// DoHCertKey path to certificate key file for serving DoH.
-	DoHCertKey string
-
 	// DoHAllowInsecure options to allow to serve DoH with self-signed
 	// certificate.
 	DoHAllowInsecure bool
-
-	// DoHIdleTimeout number of seconds before considering the client of
-	// DoH connection to be closed.
-	DoHIdleTimeout time.Duration
-
-	ip net.IP
 }
 
 func (opts *ServerOptions) parse() error {
