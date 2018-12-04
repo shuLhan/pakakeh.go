@@ -1,0 +1,3 @@
+[smtpd]
+hostname = local
+domains = a,b,c,local
