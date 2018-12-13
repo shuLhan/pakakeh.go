@@ -1,4 +1,7 @@
-= share v0.1.0
+= CHANGELOG
+:toc:
+
+== share v0.1.0
 
 The first release of `share` package contains one command line interface (CLI)
 and several libraries.
