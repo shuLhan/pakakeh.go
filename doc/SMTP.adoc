@@ -1,0 +1,672 @@
+= Simple Mail Transfer Protocol (SMTP)
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc: left
+:toclevels: 4
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc5321: https://tools.ietf.org/html/rfc5321
+
+This documentation provide summary and notes on implementation of SMTP
+as defined in {url-rfc5321}[RFC 5321].
+
+== Syntax
+
+=== Format of Request
+
+// {{{
+....
+Command [ SP argument [ SP parameters ]] CRLF
+....
+
+Server SHOULD tolerate trailing white space before `CRLF`.
+
+If argument is mailbox, the syntax of local part MUST conform to receiver site
+convention.
+
+// }}}
+
+
+==== Format of Parameters
+
+The parameters is only available for MAIL and RCPT commands.
+
+// {{{
+....
+Mail-parameters  = esmtp-param *(SP esmtp-param)
+
+Rcpt-parameters  = esmtp-param *(SP esmtp-param)
+
+esmtp-param    = esmtp-keyword ["=" esmtp-value]
+
+esmtp-keyword  = (ALPHA / DIGIT) *(ALPHA / DIGIT / "-")
+
+esmtp-value    = 1*(%d33-60 / %d62-126)
+               ; any CHAR excluding "=", SP, and control
+               ; characters.  If this string is an email address,
+               ; i.e., a Mailbox, then the "xtext" syntax [32]
+               ; SHOULD be used.
+
+Keyword        = Ldh-str
+
+Argument       = Atom
+....
+// }}}
+
+
+=== Format of Response
+
+// {{{
+
+Every request MUST generate one reply (section 4.2).
+
+There are two mode of response: single line and multi line.
+
+Format for single line response,
+....
+Reply-code SP text CRLF
+....
+
+Format for multi line response,
+....
+  Reply-code "-" text CRLF
+*(Reply-code "-" text CRLF)
+  Reply-code SP text CRLF
+....
+
+// }}}
+
+=== Format of Path
+
+There are two type of path: Reverse-path and Forward-path.
+Reverse-path is used as an argument on MAIL command, while Forward-path is
+used as an argument on RCPT command.
+
+....
+Reverse-path   = Path / "<>"
+Forward-path   = Path
+Path           = "<" [ A-d-l ":" ] Mailbox ">"
+
+A-d-l          = At-domain *( "," At-domain )
+               ; Note that this form, the so-called "source
+               ; route", MUST BE accepted, SHOULD NOT be
+               ; generated, and SHOULD be ignored.
+
+At-domain      = "@" Domain
+....
+
+The use of source routes (The "A-d-l") is deprecated (RFC 5321, Appendix F.2),
+while servers MUST be prepared to receive and handle them.
+Clients SHOULD NOT transmit them and this section is included in the current
+specification only to provide context.
+
+
+=== Format of Domain
+
+....
+Domain         = sub-domain *("." sub-domain)
+
+sub-domain     = Let-dig [Ldh-str]
+
+Let-dig        = ALPHA / DIGIT
+
+Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig
+....
+
+=== Format of Mailbox
+
+....
+Mailbox        = Local-part "@" ( Domain / address-literal )
+
+Local-part     = Dot-string / Quoted-string
+               ; MAY be case-sensitive
+
+address-literal  = "[" ( IPv4-address-literal /
+                 IPv6-address-literal /
+                 General-address-literal ) "]"
+                 ; See Section 4.1.3
+
+Dot-string     = Atom *("."  Atom)
+
+Atom           = 1*atext
+
+Quoted-string  = DQUOTE *QcontentSMTP DQUOTE
+
+QcontentSMTP   = qtextSMTP / quoted-pairSMTP
+
+quoted-pairSMTP  = %d92 %d32-126
+                 ; i.e., backslash followed by any ASCII
+                 ; graphic (including itself) or SPace
+
+qtextSMTP      = %d32-33 / %d35-91 / %d93-126
+               ; i.e., within a quoted string, any
+               ; ASCII graphic or space is permitted
+               ; without blackslash-quoting except
+               ; double-quote and the backslash itself.
+
+String         = Atom / Quoted-string
+....
+
+Additional format defined in RFC 5322, section 3.2.3,
+....
+   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+                       "!" / "#" /        ;  characters not including
+                       "$" / "%" /        ;  specials.  Used for atoms.
+                       "&" / "'" /
+                       "*" / "+" /
+                       "-" / "/" /
+                       "=" / "?" /
+                       "^" / "_" /
+                       "`" / "{" /
+                       "|" / "}" /
+                       "~"
+
+   atom            =   [CFWS] 1*atext [CFWS]
+
+   dot-atom-text   =   1*atext *("." 1*atext)
+
+   dot-atom        =   [CFWS] dot-atom-text [CFWS]
+
+   specials        =   "(" / ")" /        ; Special characters that do
+                       "<" / ">" /        ;  not appear in atext
+                       "[" / "]" /
+                       ":" / ";" /
+                       "@" / "\" /
+                       "," / "." /
+                       DQUOTE
+
+   qtext           =   %d33 /             ; Printable US-ASCII
+                       %d35-91 /          ;  characters not including
+                       %d93-126 /         ;  "\" or the quote character
+                       obs-qtext
+
+   qcontent        =   qtext / quoted-pair
+
+   quoted-string   =   [CFWS]
+                       DQUOTE *([FWS] qcontent) [FWS] DQUOTE
+                       [CFWS]
+
+   quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp
+....
+
+Server SHOULD avoid defining mailboxes where the Local-part requires (or uses)
+the Quoted-string form or where the Local-part is case-sensitive.
+
+All quoted forms MUST be treated as equivalent.
+The sending system SHOULD transmit the form that uses the minimum quoting
+possible.
+
+Systems MUST NOT define mailboxes in such a way as to require the use in SMTP
+of non-ASCII characters (octets with the high order bit set to one) or ASCII
+"control characters" (decimal value 0-31 and 127).
+These characters MUST NOT be used in MAIL or RCPT commands or other commands
+that require mailbox names.
+
+Note that the backslash, "\", is a quote character, which is used to indicate
+that the next character is to be used literally (instead of its normal
+interpretation).
+
+Characters outside the set of alphabetic characters, digits, and hyphen MUST
+NOT appear in domain name labels for SMTP clients or servers.
+In particular, the underscore character is not permitted.
+
+SMTP servers that receive a command in which invalid character codes have been
+employed, and for which there are no other reasons for rejection, MUST reject
+that command with a 501 response (this rule, like others, could be overridden
+by appropriate SMTP extensions).
+
+
+== Session Initiation
+
+// {{{
+
+=== Request
+
+Client open a TCP connection to SMTP server on port 25 or 587 (with STARTTLS).
+
+=== Success Response
+
+On success, server reply with 220,
+
+....
+( "220" (SP Domain / address-literal) [ SP text ] CRLF )
+....
+
+=== Error Response
+
+On failure, server will reply with 554,
+
+....
+"554 No SMTP service here" CRLF
+....
+
+Client SHOULD wait for the response until 5 minutes.
+
+Client SHOULD wait for this greeting message before sending any commands.
+
+A server that reply with 554 MUST still wait for the client to send a QUIT
+(see Section 4.1.1.10) before closing the connection and SHOULD respond to any
+intervening commands with "503 bad sequence of commands".
+
+// }}}
+
+== Mail Transaction
+
+Mail transaction constructed by four commands, in sequence order, with message
+data and the end of transaction,
+
+* `HELO` or `EHLO`,
+* `MAIL FROM:`,
+* One or more `RCPT TO:`
+* `DATA`
+* Message data
+
+=== HELO/EHLO
+
+// {{{
+
+Server MUST support HELO.
+
+Client SHOULD start a session by EHLO.  If server return "command not
+recognized", client SHOULD fall-back to HELO.
+
+Client MUST issue EHLO/HELO before starting a mail transaction.
+
+==== Request
+
+....
+"HELO" SP Domain CRLF
+"EHLO" SP ( Domain / address-literal ) CRLF
+....
+
+Client MUST use domain name that resolved to DNS A RR (address)
+(Section 2.3.5), or SHOULD use IP address if not possible (section 4.1.4).
+
+==== Success response
+
+....
+( "250" SP Domain [ SP ehlo-greet ] CRLF )
+/ ( "250-" Domain [ SP ehlo-greet ] CRLF
+ *( "250-" ehlo-line CRLF )
+    "250" SP ehlo-line CRLF )
+
+ehlo-greet     = string of any characters other than CR or LF
+ehlo-line      = ehlo-keyword *( SP ehlo-param )
+ehlo-keyword   = (ALPHA / DIGIT) *(ALPHA / DIGIT / "-")
+ehlo-param     = any CHAR excluding <SP> and all control characters
+                 (US-ASCII 0-31 and 127 inclusive)
+....
+
+EHLO response MUST contains keywords.
+
+EHLO keyword MUST always be processed in case insensitive.
+
+Servers MUST NOT return the extended EHLO- style response to a HELO command.
+
+==== Error responses
+
+* 502 Command not implemented
+* 504 Command parameter not implemented
+* 550 Requested action not taken: command rejected for policy reasons
+
+// }}}
+
+=== MAIL
+
+// {{{
+
+==== Request
+
+....
+"MAIL FROM:" Reverse-path [SP Mail-parameters] CRLF
+....
+
+Request line MUST have no space between colon.
+
+Request line MAY also carry parameters associated with a particular service
+extension.
+
+Server MUST recognize source route syntax (section 3.3) in Reverse-path.
+
+==== Success response
+
+....
+250 [ SP text ] CRLF
+....
+
+==== Error response
+
+* 451  Requested action aborted: local error in processing
+
+* 452  Requested action not taken: insufficient system storage
+
+* 455  Server unable to accommodate parameters
+
+* 503  Bad sequence of commands
+
+* 550  Requested action not taken: mailbox unavailable (e.g., mailbox
+not found, no access, or command rejected for policy reasons)
+
+* 552  Requested mail action aborted: exceeded storage allocation
+
+* 553  Requested action not taken: mailbox name not allowed (e.g.,
+mailbox syntax incorrect)
+
+* 555  MAIL FROM/RCPT TO parameters not recognized or not implemented
+
+// }}}
+
+=== RCPT
+
+// {{{
+
+==== Request
+
+....
+"RCPT TO:" ( "<Postmaster@" Domain ">"
+	/ "<Postmaster>"
+	/ Forward-path ) [SP Rcpt-parameters] CRLF
+....
+
+MUST have no space between colon.
+
+Client SHOULD NOT generate the optional list of hosts known as a source route.
+
+Client MUST NOT transmit parameters other than those associated with a
+service extension offered by the server in its EHLO response.
+
+Server MUST recognize source route syntax (section 3.3)
+
+Server SHOULD strip off the source route specification.
+
+==== Success Response
+
+....
+250 [ SP text ] CRLF
+....
+
+==== Error Response
+
+* 450  Requested mail action not taken: mailbox unavailable (e.g.,
+mailbox busy or temporarily blocked for policy reasons)
+
+* 451  Requested action aborted: local error in processing
+
+* 452  Requested action not taken: insufficient system storage
+
+* 455  Server unable to accommodate parameters
+
+* 503  Bad sequence of commands
+
+* 550  Requested action not taken: mailbox unavailable (e.g., mailbox
+  not found, no access, or command rejected for policy reasons)
+
+* 551  User not local; please try <forward-path> (See Section 3.4)
+
+* 552  Requested mail action aborted: exceeded storage allocation
+
+* 553  Requested action not taken: mailbox name not allowed (e.g.,
+mailbox syntax incorrect)
+
+* 555  MAIL FROM/RCPT TO parameters not recognized or not implemented
+
+// }}}
+
+=== DATA
+
+// {{{
+
+==== Request
+
+....
+"DATA" CRLF
+....
+
+==== Success Response
+
+....
+"354" [ SP String ] CRLF
+....
+
+==== Error Responses
+
+* 503  Bad sequence of commands
+
+* 554  Transaction failed (Or, in the case of a connection-opening
+response, "No SMTP service here")
+
+// }}}
+
+=== Message Data
+
+// {{{
+
+Message data MUST NOT be send unless 354 reply code is received.
+
+==== Request
+
+....
+(*text)
+CRLF
+.
+CRLF
+....
+
+==== Success Response
+
+....
+250 [ SP text ] CRLF
+....
+
+==== Error Responses
+
+* 450  Requested mail action not taken: mailbox unavailable (e.g.,
+mailbox busy or temporarily blocked for policy reasons)
+
+* 451  Requested action aborted: local error in processing
+
+* 452  Requested action not taken: insufficient system storage
+
+* 550  Requested action not taken: mailbox unavailable (e.g., mailbox
+not found, no access, or command rejected for policy reasons)
+
+* 552  Requested mail action aborted: exceeded storage allocation
+
+* 554  Transaction failed (Or, in the case of a connection-opening
+response, "No SMTP service here")
+
+// }}}
+
+=== RSET
+
+// {{{
+
+This command clear the current buffer on MAIL, RCPT, and DATA, but not the
+EHLO/HELO buffer.
+
+Server MUST NOT close the connection as the result of receiving a
+RSET.
+
+==== Request
+....
+"RSET" CRLF
+....
+
+==== Success Response
+
+....
+"250 OK" CRLF
+....
+
+==== Error responses,
+
+Not available.
+
+// }}}
+
+== Others Commands
+
+The following commands does not affect mail transaction.
+
+=== VRFY
+// {{{
+
+This command is used to verify the existency of user in remote server.
+
+==== Request
+....
+"VRFY" SP String CRLF
+....
+
+String MAY be user name with or without domain name.
+
+
+==== Success Response
+
+....
+250 User name <local-part@domain>
+/ 250 local-part@domain
+....
+
+If query to String return more than one mailbox, server may return 553 with
+list of ambigous name,
+
+....
+  "553" SP "User ambiguous" CRLF
+/    "553-" Description CRLF
+  1*("553-" [ user-name ] "<" local-part@domain ">"
+     "553 " [ user-name ] "<"  local-part@domain ">"
+....
+
+==== Error Responses
+
+* 502 Command not implemented
+
+* 504 Command parameter not implemented
+
+* 550  Requested action not taken: mailbox unavailable (e.g., mailbox
+not found, no access, or command rejected for policy reasons)
+
+* 551 User not local; please try <forward-path> (See Section 3.4)
+
+// }}}
+
+=== EXPN
+
+// {{{
+
+Command to identify mailing-list, if success, it will return list of members.
+
+==== Request
+....
+"EXPN" SP String CRLF
+....
+
+==== Success Response
+
+....
+   "250-" mailing-list name
+1*("250-" [ member-name ] "<" member-address ">"
+   "250 " [ member-name ] "<" member-address ">"
+....
+
+==== Error Responses
+
+* 500  Syntax error, command unrecognized (This may include errors such
+as command line too long)
+
+* 502 Command not implemented
+
+* 504 Command parameter not implemented
+
+* 550 Requested action not taken: command rejected for policy reasons
+
+// }}}
+
+=== HELP
+
+// {{{
+Command to query information about server command.a
+
+Server SHOULD support HELP without arguments and MAY support it with
+arguments.
+
+==== Request
+....
+"HELP" [ SP String ] CRLF
+....
+
+==== Success Responses
+
+* 211  System status, or system help reply
+
+* 214  Help message (Information on how to use the receiver or the
+meaning of a particular non-standard command; this reply is useful
+only to the human user)
+
+==== Error Responses
+
+* 502 Command not implemented
+
+* 504 Command parameter not implemented
+
+// }}}
+
+=== NOOP
+
+// {{{
+
+==== Request
+
+....
+"NOOP" [ SP String ] CRLF
+....
+
+If a parameter string is specified, servers SHOULD ignore it.
+
+==== Success Response
+
+* 250 OK
+
+// }}}
+
+=== QUIT
+
+// {{{
+
+Command to issue closing the session.
+
+Server MUST NOT intentionally close the transmission channel until it receives
+and replies to a QUIT command.
+
+Client MUST NOT intentionally close the transmission channel until it sends a
+QUIT command, and it SHOULD wait until it receives the reply.
+
+Any current uncompleted mail transaction will be aborted.
+
+==== Request
+....
+"QUIT" CRLF
+....
+
+==== Success Response
+....
+"221" [ SP String ] CRLF
+....
+
+// }}}
+
+
+== Extensions
+
+* link:ESMTP_DSN.html[Delivery Status Notification]
+
+
+== Glossary
+
+UA::
+	User Agent
+MTA::
+	Mail Transfer Agent
+
+

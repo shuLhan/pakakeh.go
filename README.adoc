@@ -102,3 +102,12 @@ and client.
 == Changelog
 
 include::CHANGELOG.adoc[]
+
+
+== Documentations
+
+Beside {url-godoc}[GoDoc], that provides documentation for API in packages,
+there are also additional documentations that we can't include inside source
+code due to their scope and limitation of godoc formatting itself.
+
+* link:doc/SMTP.html[SMTP]
