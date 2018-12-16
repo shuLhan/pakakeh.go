@@ -82,45 +82,45 @@ func NewServer(root string, conn *http.Server) (srv *Server, e error) {
 // RegisterDelete register HTTP method DELETE with callback to handle it.
 //
 func (srv *Server) RegisterDelete(
-	path string, resType ResponseType, cb Callback,
+	reqPath string, resType ResponseType, cb Callback,
 ) {
-	srv.register(path, RequestMethodDelete, RequestTypeQuery, resType, cb)
+	srv.register(reqPath, RequestMethodDelete, RequestTypeQuery, resType, cb)
 }
 
 //
 // RegisterGet register HTTP method GET with callback to handle it.
 //
 func (srv *Server) RegisterGet(
-	path string, resType ResponseType, cb Callback,
+	reqPath string, resType ResponseType, cb Callback,
 ) {
-	srv.register(path, RequestMethodGet, RequestTypeQuery, resType, cb)
+	srv.register(reqPath, RequestMethodGet, RequestTypeQuery, resType, cb)
 }
 
 //
 // RegisterPatch register HTTP method PATCH with callback to handle it.
 //
 func (srv *Server) RegisterPatch(
-	path string, reqType RequestType, resType ResponseType, cb Callback,
+	reqPath string, reqType RequestType, resType ResponseType, cb Callback,
 ) {
-	srv.register(path, RequestMethodPatch, reqType, resType, cb)
+	srv.register(reqPath, RequestMethodPatch, reqType, resType, cb)
 }
 
 //
 // RegisterPost register HTTP method POST with callback to handle it.
 //
 func (srv *Server) RegisterPost(
-	path string, reqType RequestType, resType ResponseType, cb Callback,
+	reqPath string, reqType RequestType, resType ResponseType, cb Callback,
 ) {
-	srv.register(path, RequestMethodPost, reqType, resType, cb)
+	srv.register(reqPath, RequestMethodPost, reqType, resType, cb)
 }
 
 //
 // RegisterPut register HTTP method PUT with callback to handle it.
 //
 func (srv *Server) RegisterPut(
-	path string, reqType RequestType, cb Callback,
+	reqPath string, reqType RequestType, cb Callback,
 ) {
-	srv.register(path, RequestMethodPut, reqType, ResponseTypeNone, cb)
+	srv.register(reqPath, RequestMethodPut, reqType, ResponseTypeNone, cb)
 }
 
 //
@@ -322,14 +322,14 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 // register new handler with specific method, path, request type, and response
 // type.
 //
-func (srv *Server) register(path string, reqMethod RequestMethod,
+func (srv *Server) register(reqPath string, reqMethod RequestMethod,
 	reqType RequestType, resType ResponseType, cb Callback,
 ) {
 	if cb == nil {
 		return
 	}
-	if len(path) == 0 {
-		path = "/"
+	if len(reqPath) == 0 {
+		reqPath = "/"
 	}
 
 	handler := &handler{
@@ -340,14 +340,14 @@ func (srv *Server) register(path string, reqMethod RequestMethod,
 
 	switch reqMethod {
 	case RequestMethodDelete:
-		srv.regDelete[path] = handler
+		srv.regDelete[reqPath] = handler
 	case RequestMethodGet:
-		srv.regGet[path] = handler
+		srv.regGet[reqPath] = handler
 	case RequestMethodPatch:
-		srv.regPatch[path] = handler
+		srv.regPatch[reqPath] = handler
 	case RequestMethodPost:
-		srv.regPost[path] = handler
+		srv.regPost[reqPath] = handler
 	case RequestMethodPut:
-		srv.regPut[path] = handler
+		srv.regPut[reqPath] = handler
 	}
 }
