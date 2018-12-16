@@ -23,6 +23,9 @@ A collection of libraries and tools written in Go.
 
 - `git`: Package git provide a wrapper for git command line interface.
 
+- `http`: Package http implement custom HTTP server with memory file system
+and simplified routing handler.
+
 - `ini`: Package ini implement reading and writing INI configuration as
 defined by Git configuration file syntax.
 
