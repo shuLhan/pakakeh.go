@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -23,7 +22,7 @@ func TestMain(m *testing.M) {
 	var e error
 
 	conn := &http.Server{
-		Addr: ":8080",
+		Addr: "127.0.0.1:8080",
 	}
 
 	testServer, e = NewServer("testdata", conn)
@@ -51,26 +50,28 @@ func TestRegisterDelete(t *testing.T) {
 		return []byte(s), nil
 	}
 
-	testServer.RegisterDelete("/api", ResponseTypePlain, cb)
+	client := &http.Client{}
+
+	testServer.RegisterDelete("/delete", ResponseTypePlain, cb)
 
 	cases := []struct {
 		desc          string
-		req           *http.Request
+		reqURL        string
 		expStatusCode int
 		expBody       []byte
 	}{{
 		desc:          "With unknown path",
-		req:           httptest.NewRequest(http.MethodDelete, "/", nil),
+		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusNotFound,
 		expBody:       []byte{},
 	}, {
 		desc:          "With known path and subtree root",
-		req:           httptest.NewRequest(http.MethodDelete, "/api/", nil),
+		reqURL:        "http://127.0.0.1:8080/delete/",
 		expStatusCode: http.StatusNotFound,
 		expBody:       []byte{},
 	}, {
 		desc:          "With known path",
-		req:           httptest.NewRequest(http.MethodDelete, "/api?k=v", nil),
+		reqURL:        "http://127.0.0.1:8080/delete?k=v",
 		expStatusCode: http.StatusOK,
 		expBody:       []byte("map[k:[v]]\n<nil>\n"),
 	}}
@@ -78,14 +79,28 @@ func TestRegisterDelete(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		res := httptest.NewRecorder()
+		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
 
-		testServer.ServeHTTP(res, c.req)
+		res, e := client.Do(req)
+		if e != nil {
+			t.Fatal(e)
+		}
 
-		got := res.Result()
-		body, _ := ioutil.ReadAll(got.Body)
+		body, e := ioutil.ReadAll(res.Body)
+		if e != nil {
+			t.Fatal(e)
+		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, got.StatusCode, true)
+		e = res.Body.Close()
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
+			true)
 		test.Assert(t, "Body", string(c.expBody), string(body), true)
 	}
 }
@@ -100,26 +115,28 @@ func TestRegisterGet(t *testing.T) {
 		return []byte(s), nil
 	}
 
-	testServer.RegisterGet("/api", ResponseTypePlain, cb)
+	client := &http.Client{}
+
+	testServer.RegisterGet("/get", ResponseTypePlain, cb)
 
 	cases := []struct {
 		desc          string
-		req           *http.Request
+		reqURL        string
 		expStatusCode int
 		expBody       []byte
 	}{{
 		desc:          "With root path",
-		req:           httptest.NewRequest(http.MethodGet, "/", nil),
+		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusOK,
 		expBody:       []byte("<html><body>Hello, world!</body></html>\n"),
 	}, {
 		desc:          "With known path and subtree root",
-		req:           httptest.NewRequest(http.MethodGet, "/api/", nil),
+		reqURL:        "http://127.0.0.1:8080/get/",
 		expStatusCode: http.StatusNotFound,
 		expBody:       []byte{},
 	}, {
 		desc:          "With known path",
-		req:           httptest.NewRequest(http.MethodGet, "/api?k=v", nil),
+		reqURL:        "http://127.0.0.1:8080/get?k=v",
 		expStatusCode: http.StatusOK,
 		expBody:       []byte("map[k:[v]]\n<nil>\n"),
 	}}
@@ -127,14 +144,28 @@ func TestRegisterGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		res := httptest.NewRecorder()
+		req, e := http.NewRequest(http.MethodGet, c.reqURL, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
 
-		testServer.ServeHTTP(res, c.req)
+		res, e := client.Do(req)
+		if e != nil {
+			t.Fatal(e)
+		}
 
-		got := res.Result()
-		body, _ := ioutil.ReadAll(got.Body)
+		body, e := ioutil.ReadAll(res.Body)
+		if e != nil {
+			t.Fatal(e)
+		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, got.StatusCode, true)
+		e = res.Body.Close()
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
+			true)
 		test.Assert(t, "Body", string(c.expBody), string(body), true)
 	}
 }
@@ -222,7 +253,7 @@ func TestRegisterPatch(t *testing.T) {
 
 	client := &http.Client{}
 
-	testServer.RegisterPatch("/api", RequestTypeQuery, ResponseTypePlain, cb)
+	testServer.RegisterPatch("/patch", RequestTypeQuery, ResponseTypePlain, cb)
 
 	cases := []struct {
 		desc          string
@@ -236,12 +267,12 @@ func TestRegisterPatch(t *testing.T) {
 		expBody:       []byte{},
 	}, {
 		desc:          "With registered PATCH and subtree root",
-		reqURL:        "http://127.0.0.1:8080/api/",
+		reqURL:        "http://127.0.0.1:8080/patch/",
 		expStatusCode: http.StatusNotFound,
 		expBody:       []byte{},
 	}, {
 		desc:          "With registered PATCH and query",
-		reqURL:        "http://127.0.0.1:8080/api?k=v",
+		reqURL:        "http://127.0.0.1:8080/patch?k=v",
 		expStatusCode: http.StatusOK,
 		expBody:       []byte("map[k:[v]]\n<nil>\n"),
 	}}
@@ -288,7 +319,7 @@ func TestRegisterPost(t *testing.T) {
 
 	client := &http.Client{}
 
-	testServer.RegisterPost("/api", RequestTypeForm, ResponseTypePlain, cb)
+	testServer.RegisterPost("/post", RequestTypeForm, ResponseTypePlain, cb)
 
 	cases := []struct {
 		desc          string
@@ -303,12 +334,12 @@ func TestRegisterPost(t *testing.T) {
 		expBody:       []byte{},
 	}, {
 		desc:          "With registered POST and subtree root",
-		reqURL:        "http://127.0.0.1:8080/api/",
+		reqURL:        "http://127.0.0.1:8080/post/",
 		expStatusCode: http.StatusNotFound,
 		expBody:       []byte{},
 	}, {
 		desc:          "With registered POST and query",
-		reqURL:        "http://127.0.0.1:8080/api?k=v",
+		reqURL:        "http://127.0.0.1:8080/post?k=v",
 		reqBody:       []byte("k=vv"),
 		expStatusCode: http.StatusOK,
 		expBody: []byte(`map[k:[vv v]]
@@ -363,7 +394,7 @@ func TestRegisterPut(t *testing.T) {
 
 	client := &http.Client{}
 
-	testServer.RegisterPut("/api", RequestTypeForm, cb)
+	testServer.RegisterPut("/put", RequestTypeForm, cb)
 
 	cases := []struct {
 		desc          string
@@ -377,12 +408,12 @@ func TestRegisterPut(t *testing.T) {
 		expBody:       []byte{},
 	}, {
 		desc:          "With registered PUT and subtree root",
-		reqURL:        "http://127.0.0.1:8080/api/",
+		reqURL:        "http://127.0.0.1:8080/put/",
 		expStatusCode: http.StatusNotFound,
 		expBody:       []byte{},
 	}, {
 		desc:          "With registered PUT and query",
-		reqURL:        "http://127.0.0.1:8080/api?k=v",
+		reqURL:        "http://127.0.0.1:8080/put?k=v",
 		expStatusCode: http.StatusNoContent,
 		expBody:       []byte{},
 	}}
