@@ -16,7 +16,35 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var testServer *Server // nolint: gochecknoglobals
+var ( // nolint: gochecknoglobals
+	testServer *Server // nolint: gochecknoglobals
+	client     = &http.Client{}
+
+	cbNone = func(req *http.Request, reqBody []byte) ([]byte, error) {
+		return nil, nil
+	}
+
+	cbPlain = func(req *http.Request, reqBody []byte) (
+		resBody []byte, e error,
+	) {
+		s := fmt.Sprintf("%s\n", req.Form)
+		s += fmt.Sprintf("%s\n", req.PostForm)
+		s += fmt.Sprintf("%v\n", req.MultipartForm)
+		s += fmt.Sprintf("%s", reqBody)
+		return []byte(s), nil
+	}
+
+	cbJSON = func(req *http.Request, reqBody []byte) (
+		resBody []byte, e error,
+	) {
+		s := fmt.Sprintf(`{
+"form": "%s",
+"multipartForm": "%v",
+"body": %q
+}`, req.Form, req.MultipartForm, reqBody)
+		return []byte(s), nil
+	}
+)
 
 func TestMain(m *testing.M) {
 	var e error
@@ -41,43 +69,66 @@ func TestMain(m *testing.M) {
 }
 
 func TestRegisterDelete(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterDelete("/delete", ResponseTypePlain, cb)
-
 	cases := []struct {
 		desc          string
 		reqURL        string
+		resType       ResponseType
 		expStatusCode int
-		expBody       []byte
+		expBody       string
 	}{{
 		desc:          "With unknown path",
 		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With known path and subtree root",
 		reqURL:        "http://127.0.0.1:8080/delete/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
-		desc:          "With known path",
+		desc:          "With response type none",
 		reqURL:        "http://127.0.0.1:8080/delete?k=v",
+		resType:       ResponseTypeNone,
+		expStatusCode: http.StatusNoContent,
+	}, {
+		desc:          "With response type binary",
+		reqURL:        "http://127.0.0.1:8080/delete?k=v",
+		resType:       ResponseTypeBinary,
 		expStatusCode: http.StatusOK,
-		expBody:       []byte("map[k:[v]]\n<nil>\n"),
+		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
+	}, {
+		desc:          "With response type plain",
+		reqURL:        "http://127.0.0.1:8080/delete?k=v",
+		resType:       ResponseTypePlain,
+		expStatusCode: http.StatusOK,
+		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
+	}, {
+		desc:          "With response type JSON",
+		reqURL:        "http://127.0.0.1:8080/delete?k=v",
+		resType:       ResponseTypeJSON,
+		expStatusCode: http.StatusOK,
+		expBody: `{
+"form": "map[k:[v]]",
+"multipartForm": "<nil>",
+"body": ""
+}`,
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
+
+		switch c.resType {
+		case ResponseTypeNone:
+			testServer.RegisterDelete("/delete",
+				ResponseTypeNone, cbNone)
+		case ResponseTypeBinary:
+			testServer.RegisterDelete("/delete",
+				ResponseTypeBinary, cbPlain)
+		case ResponseTypeJSON:
+			testServer.RegisterDelete("/delete",
+				ResponseTypeJSON, cbJSON)
+		default:
+			testServer.RegisterDelete("/delete",
+				ResponseTypePlain, cbPlain)
+		}
 
 		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
 		if e != nil {
@@ -101,44 +152,51 @@ func TestRegisterDelete(t *testing.T) {
 
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
 			true)
-		test.Assert(t, "Body", string(c.expBody), string(body), true)
+		if c.expStatusCode != http.StatusOK {
+			continue
+		}
+
+		test.Assert(t, "Body", c.expBody, string(body), true)
+
+		var expContentType string
+		gotContentType := res.Header.Get(contentType)
+
+		switch c.resType {
+		case ResponseTypeBinary:
+			expContentType = contentTypeBinary
+		case ResponseTypeJSON:
+			expContentType = contentTypeJSON
+		default:
+			expContentType = contentTypePlain
+		}
+
+		test.Assert(t, "Content-Type", expContentType, gotContentType,
+			true)
 	}
 }
 
 func TestRegisterGet(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterGet("/get", ResponseTypePlain, cb)
+	testServer.RegisterGet("/get", ResponseTypePlain, cbPlain)
 
 	cases := []struct {
 		desc          string
 		reqURL        string
 		expStatusCode int
-		expBody       []byte
+		expBody       string
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusOK,
-		expBody:       []byte("<html><body>Hello, world!</body></html>\n"),
+		expBody:       "<html><body>Hello, world!</body></html>\n",
 	}, {
 		desc:          "With known path and subtree root",
 		reqURL:        "http://127.0.0.1:8080/get/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With known path",
 		reqURL:        "http://127.0.0.1:8080/get?k=v",
 		expStatusCode: http.StatusOK,
-		expBody:       []byte("map[k:[v]]\n<nil>\n"),
+		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}}
 
 	for _, c := range cases {
@@ -166,45 +224,34 @@ func TestRegisterGet(t *testing.T) {
 
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
 			true)
-		test.Assert(t, "Body", string(c.expBody), string(body), true)
+		test.Assert(t, "Body", c.expBody, string(body), true)
 	}
 }
 
 func TestRegisterHead(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		return
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterGet("/api", ResponseTypeJSON, cb)
+	testServer.RegisterGet("/api", ResponseTypeJSON, cbNone)
 
 	cases := []struct {
 		desc             string
 		reqURL           string
 		expStatusCode    int
-		expBody          []byte
+		expBody          string
 		expContentType   []string
 		expContentLength []string
 	}{{
 		desc:             "With root path",
 		reqURL:           "http://127.0.0.1:8080/",
 		expStatusCode:    http.StatusOK,
-		expBody:          []byte{},
 		expContentType:   []string{"text/html; charset=utf-8"},
 		expContentLength: []string{"40"},
 	}, {
 		desc:          "With registered GET and subtree root",
 		reqURL:        "http://127.0.0.1:8080/api/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:           "With registered GET",
 		reqURL:         "http://127.0.0.1:8080/api?k=v",
 		expStatusCode:  http.StatusOK,
-		expBody:        []byte{},
 		expContentType: []string{contentTypeJSON},
 	}}
 
@@ -233,7 +280,7 @@ func TestRegisterHead(t *testing.T) {
 
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
 			true)
-		test.Assert(t, "Body", string(c.expBody), string(body), true)
+		test.Assert(t, "Body", c.expBody, string(body), true)
 		test.Assert(t, "Header.ContentType", c.expContentType,
 			res.Header[contentType], true)
 		test.Assert(t, "Header.ContentLength", c.expContentLength,
@@ -242,39 +289,27 @@ func TestRegisterHead(t *testing.T) {
 }
 
 func TestRegisterPatch(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterPatch("/patch", RequestTypeQuery, ResponseTypePlain, cb)
+	testServer.RegisterPatch("/patch", RequestTypeQuery,
+		ResponseTypePlain, cbPlain)
 
 	cases := []struct {
 		desc          string
 		reqURL        string
 		expStatusCode int
-		expBody       []byte
+		expBody       string
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With registered PATCH and subtree root",
 		reqURL:        "http://127.0.0.1:8080/patch/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With registered PATCH and query",
 		reqURL:        "http://127.0.0.1:8080/patch?k=v",
 		expStatusCode: http.StatusOK,
-		expBody:       []byte("map[k:[v]]\n<nil>\n"),
+		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}}
 
 	for _, c := range cases {
@@ -302,57 +337,44 @@ func TestRegisterPatch(t *testing.T) {
 
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
 			true)
-		test.Assert(t, "Body", string(c.expBody), string(body), true)
+		test.Assert(t, "Body", c.expBody, string(body), true)
 	}
 }
 
 func TestRegisterPost(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%s\n", req.PostForm)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterPost("/post", RequestTypeForm, ResponseTypePlain, cb)
+	testServer.RegisterPost("/post", RequestTypeForm, ResponseTypePlain,
+		cbPlain)
 
 	cases := []struct {
 		desc          string
 		reqURL        string
-		reqBody       []byte
+		reqBody       string
 		expStatusCode int
-		expBody       []byte
+		expBody       string
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With registered POST and subtree root",
 		reqURL:        "http://127.0.0.1:8080/post/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With registered POST and query",
 		reqURL:        "http://127.0.0.1:8080/post?k=v",
-		reqBody:       []byte("k=vv"),
+		reqBody:       "k=vv",
 		expStatusCode: http.StatusOK,
-		expBody: []byte(`map[k:[vv v]]
+		expBody: `map[k:[vv v]]
 map[k:[vv]]
 <nil>
-`),
+`,
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
 		var buf bytes.Buffer
-		_, _ = buf.Write(c.reqBody)
+		_, _ = buf.WriteString(c.reqBody)
 
 		req, e := http.NewRequest(http.MethodPost, c.reqURL, &buf)
 		if e != nil {
@@ -378,44 +400,30 @@ map[k:[vv]]
 
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
 			true)
-		test.Assert(t, "Body", string(c.expBody), string(body), true)
+		test.Assert(t, "Body", c.expBody, string(body), true)
 	}
 }
 
 func TestRegisterPut(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterPut("/put", RequestTypeForm, cb)
+	testServer.RegisterPut("/put", RequestTypeForm, cbPlain)
 
 	cases := []struct {
 		desc          string
 		reqURL        string
 		expStatusCode int
-		expBody       []byte
+		expBody       string
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With registered PUT and subtree root",
 		reqURL:        "http://127.0.0.1:8080/put/",
 		expStatusCode: http.StatusNotFound,
-		expBody:       []byte{},
 	}, {
 		desc:          "With registered PUT and query",
 		reqURL:        "http://127.0.0.1:8080/put?k=v",
 		expStatusCode: http.StatusNoContent,
-		expBody:       []byte{},
 	}}
 
 	for _, c := range cases {
@@ -443,25 +451,14 @@ func TestRegisterPut(t *testing.T) {
 
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
 			true)
-		test.Assert(t, "Body", string(c.expBody), string(body), true)
+		test.Assert(t, "Body", c.expBody, string(body), true)
 	}
 }
 
 func TestServeHTTPOptions(t *testing.T) {
-	cb := func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	client := &http.Client{}
-
-	testServer.RegisterDelete("/options", ResponseTypePlain, cb)
+	testServer.RegisterDelete("/options", ResponseTypePlain, cbPlain)
 	testServer.RegisterPatch("/options", RequestTypeQuery,
-		ResponseTypePlain, cb)
+		ResponseTypePlain, cbPlain)
 
 	cases := []struct {
 		desc          string
