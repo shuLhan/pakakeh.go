@@ -415,3 +415,61 @@ func TestRegisterPut(t *testing.T) {
 		test.Assert(t, "Body", string(c.expBody), string(body), true)
 	}
 }
+
+func TestServeHTTPOptions(t *testing.T) {
+	cb := func(req *http.Request, reqBody []byte) (
+		resBody []byte, e error,
+	) {
+		s := fmt.Sprintf("%s\n", req.Form)
+		s += fmt.Sprintf("%v\n", req.MultipartForm)
+		s += fmt.Sprintf("%s", reqBody)
+		return []byte(s), nil
+	}
+
+	client := &http.Client{}
+
+	testServer.RegisterDelete("/options", ResponseTypePlain, cb)
+	testServer.RegisterPatch("/options", RequestTypeQuery,
+		ResponseTypePlain, cb)
+
+	cases := []struct {
+		desc          string
+		reqURL        string
+		expStatusCode int
+		expAllow      string
+	}{{
+		desc:          "With root path",
+		reqURL:        "http://127.0.0.1:8080/",
+		expStatusCode: http.StatusOK,
+		expAllow:      "GET, HEAD, OPTIONS",
+	}, {
+		desc:          "With registered PATCH and subtree root",
+		reqURL:        "http://127.0.0.1:8080/options/",
+		expStatusCode: http.StatusNotFound,
+	}, {
+		desc:          "With registered PATCH and query",
+		reqURL:        "http://127.0.0.1:8080/options?k=v",
+		expStatusCode: http.StatusOK,
+		expAllow:      "DELETE, OPTIONS, PATCH",
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		req, e := http.NewRequest(http.MethodOptions, c.reqURL, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		res, e := client.Do(req)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		gotAllow := res.Header.Get("Allow")
+
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
+			true)
+		test.Assert(t, "Allow", c.expAllow, gotAllow, true)
+	}
+}

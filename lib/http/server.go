@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -146,6 +148,10 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		srv.handleHead(res, req)
 		return
 
+	case http.MethodOptions:
+		srv.handleOptions(res, req)
+		return
+
 	case http.MethodPatch:
 		h, ok = srv.regPatch[req.URL.Path]
 
@@ -179,22 +185,32 @@ func (srv *Server) Start() error {
 	return srv.conn.ListenAndServe()
 }
 
-func (srv *Server) handleFS(
-	res http.ResponseWriter, req *http.Request, method RequestMethod,
-) {
-	node, e := srv.mfs.Get(req.URL.Path)
+func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
+	var e error
+
+	node, e = srv.mfs.Get(reqPath)
 	if e != nil {
-		res.WriteHeader(http.StatusNotFound)
-		return
+		return nil
 	}
 
 	if node.Mode.IsDir() {
-		indexHTML := path.Join(req.URL.Path, "index.html")
+		indexHTML := path.Join(reqPath, "index.html")
 		node, e = srv.mfs.Get(indexHTML)
 		if e != nil {
-			res.WriteHeader(http.StatusNotFound)
-			return
+			return nil
 		}
+	}
+
+	return node
+}
+
+func (srv *Server) handleFS(
+	res http.ResponseWriter, req *http.Request, method RequestMethod,
+) {
+	node := srv.getFSNode(req.URL.Path)
+	if node == nil {
+		res.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	res.Header().Set(contentType, node.ContentType)
@@ -207,7 +223,7 @@ func (srv *Server) handleFS(
 
 	res.WriteHeader(http.StatusOK)
 
-	_, e = res.Write(node.V)
+	_, e := res.Write(node.V)
 	if e != nil {
 		log.Println("handleFS: ", e.Error())
 	}
@@ -242,6 +258,63 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 		res.Header().Set(contentType, contentTypePlain)
 	}
 
+	res.WriteHeader(http.StatusOK)
+}
+
+//
+// handleOptions return list of allowed methods on requested path in HTTP
+// response header "Allow".
+// If no path found, it will return 404.
+//
+func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
+	methods := make(map[string]bool)
+
+	node := srv.getFSNode(req.URL.Path)
+	if node != nil {
+		methods[http.MethodGet] = true
+		methods[http.MethodHead] = true
+	}
+
+	h, ok := srv.regDelete[req.URL.Path]
+	if ok && h != nil {
+		methods[http.MethodDelete] = true
+	}
+	_, ok = srv.regGet[req.URL.Path]
+	if ok && h != nil {
+		methods[http.MethodGet] = true
+	}
+	_, ok = srv.regPatch[req.URL.Path]
+	if ok && h != nil {
+		methods[http.MethodPatch] = true
+	}
+	_, ok = srv.regPost[req.URL.Path]
+	if ok && h != nil {
+		methods[http.MethodPost] = true
+	}
+	h, ok = srv.regPut[req.URL.Path]
+	if ok && h != nil {
+		methods[http.MethodPut] = true
+	}
+
+	if len(methods) == 0 {
+		res.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	methods[http.MethodOptions] = true
+
+	var x int
+	allows := make([]string, len(methods))
+	for k, v := range methods {
+		if v {
+			allows[x] = k
+			x++
+		}
+	}
+
+	sort.Strings(allows)
+
+	res.Header().Set("Allow", strings.Join(allows, ", "))
 	res.WriteHeader(http.StatusOK)
 }
 
