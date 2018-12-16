@@ -14,4 +14,8 @@ import (
 // The function will have the query URL, request multipart form data,
 // and request body ready to read.
 //
+// The error return type should be instance of StatusError. If error is not
+// nil and not *StatusError, server will response with internal-server-error
+// status code.
+//
 type Callback func(req *http.Request, reqBody []byte) ([]byte, error)

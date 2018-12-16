@@ -5,11 +5,13 @@
 package http
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/shuLhan/share/lib/debug"
+	"github.com/shuLhan/share/lib/strings"
 )
 
 type handler struct {
@@ -58,7 +60,7 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request) {
 		log.Printf("handler.call: %d %s %s %s\n",
 			http.StatusInternalServerError,
 			req.Method, req.URL.Path, e)
-		res.WriteHeader(http.StatusInternalServerError)
+		h.error(res, e)
 		return
 	}
 
@@ -79,5 +81,47 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request) {
 	_, e = res.Write(rspb)
 	if e != nil {
 		log.Printf("handler.call: %s %s %s\n", req.Method, req.URL.Path, e)
+	}
+}
+
+func (h *handler) error(res http.ResponseWriter, e error) {
+	se, ok := e.(*StatusError)
+	if !ok {
+		se = &StatusError{
+			Code:    http.StatusInternalServerError,
+			Message: e.Error(),
+		}
+	} else {
+		if se.Code == 0 {
+			se.Code = http.StatusInternalServerError
+		}
+	}
+
+	var rsp string
+
+	switch h.resType {
+	case ResponseTypeNone:
+		res.WriteHeader(se.Code)
+		return
+
+	case ResponseTypeBinary:
+		res.Header().Set(contentType, contentTypeBinary)
+		rsp = se.Message
+
+	case ResponseTypePlain:
+		res.Header().Set(contentType, contentTypePlain)
+		rsp = se.Message
+
+	case ResponseTypeJSON:
+		res.Header().Set(contentType, contentTypeJSON)
+		rsp = fmt.Sprintf(`{"code":%d,"message":"%s"}`, se.Code,
+			strings.JSONEscape(se.Message))
+	}
+
+	res.WriteHeader(se.Code)
+
+	_, e = res.Write([]byte(rsp))
+	if e != nil {
+		log.Printf("handler.error: %s\n", e)
 	}
 }

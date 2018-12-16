@@ -501,3 +501,102 @@ func TestServeHTTPOptions(t *testing.T) {
 		test.Assert(t, "Allow", c.expAllow, gotAllow, true)
 	}
 }
+
+func TestStatusError(t *testing.T) {
+	cbError := func(req *http.Request, reqBody []byte) ([]byte, error) {
+		return nil, &StatusError{
+			Code:    http.StatusLengthRequired,
+			Message: "Length required",
+		}
+	}
+	cbNoCode := func(req *http.Request, reqBody []byte) ([]byte, error) {
+		return nil, &StatusError{
+			Message: "Internal server error",
+		}
+	}
+	cbCustomErr := func(req *http.Request, reqBody []byte) ([]byte, error) {
+		return nil, fmt.Errorf("Custom error")
+	}
+
+	testServer.RegisterPost("/error/no-body", RequestTypeQuery,
+		ResponseTypeNone, cbError)
+
+	testServer.RegisterPost("/error/binary", RequestTypeQuery,
+		ResponseTypeBinary, cbError)
+
+	testServer.RegisterPost("/error/json", RequestTypeJSON,
+		ResponseTypeJSON, cbError)
+
+	testServer.RegisterPost("/error/plain", RequestTypeQuery,
+		ResponseTypePlain, cbError)
+
+	testServer.RegisterPost("/error/no-code", RequestTypeQuery,
+		ResponseTypePlain, cbNoCode)
+
+	testServer.RegisterPost("/error/custom", RequestTypeQuery,
+		ResponseTypePlain, cbCustomErr)
+
+	cases := []struct {
+		desc          string
+		reqURL        string
+		expStatusCode int
+		expBody       string
+	}{{
+		desc:          "With registered error no body",
+		reqURL:        "http://127.0.0.1:8080/error/no-body?k=v",
+		expStatusCode: http.StatusLengthRequired,
+	}, {
+		desc:          "With registered error binary",
+		reqURL:        "http://127.0.0.1:8080/error/binary?k=v",
+		expStatusCode: http.StatusLengthRequired,
+		expBody:       "Length required",
+	}, {
+		desc:          "With registered error plain",
+		reqURL:        "http://127.0.0.1:8080/error/plain?k=v",
+		expStatusCode: http.StatusLengthRequired,
+		expBody:       "Length required",
+	}, {
+		desc:          "With registered error plain",
+		reqURL:        "http://127.0.0.1:8080/error/json?k=v",
+		expStatusCode: http.StatusLengthRequired,
+		expBody:       `{"code":411,"message":"Length required"}`,
+	}, {
+		desc:          "With registered error plain",
+		reqURL:        "http://127.0.0.1:8080/error/no-code?k=v",
+		expStatusCode: http.StatusInternalServerError,
+		expBody:       `Internal server error`,
+	}, {
+		desc:          "With registered error plain",
+		reqURL:        "http://127.0.0.1:8080/error/custom?k=v",
+		expStatusCode: http.StatusInternalServerError,
+		expBody:       `Custom error`,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		req, e := http.NewRequest(http.MethodPost, c.reqURL, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		res, e := client.Do(req)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		body, e := ioutil.ReadAll(res.Body)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		e = res.Body.Close()
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
+			true)
+		test.Assert(t, "Body", c.expBody, string(body), true)
+	}
+}
