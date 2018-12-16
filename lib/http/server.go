@@ -5,6 +5,7 @@
 package http
 
 import (
+	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -221,9 +222,23 @@ func (srv *Server) handleFS(
 		return
 	}
 
-	res.WriteHeader(http.StatusOK)
+	var (
+		v []byte
+		e error
+	)
 
-	_, e := res.Write(node.V)
+	if len(node.V) > 0 {
+		v = node.V
+	} else {
+		v, e = ioutil.ReadFile(node.SysPath)
+		if e != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
+	res.WriteHeader(http.StatusOK)
+	_, e = res.Write(v)
 	if e != nil {
 		log.Println("handleFS: ", e.Error())
 	}

@@ -13,6 +13,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -52,6 +53,9 @@ func TestMain(m *testing.M) {
 	conn := &http.Server{
 		Addr: "127.0.0.1:8080",
 	}
+
+	// Testing handleFS with large size.
+	memfs.MaxFileSize = 30
 
 	testServer, e = NewServer("testdata", conn)
 	if e != nil {
@@ -188,6 +192,11 @@ func TestRegisterGet(t *testing.T) {
 		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusOK,
 		expBody:       "<html><body>Hello, world!</body></html>\n",
+	}, {
+		desc:          "With known path",
+		reqURL:        "http://127.0.0.1:8080/index.js",
+		expStatusCode: http.StatusOK,
+		expBody:       "var a = \"Hello, world!\"\n",
 	}, {
 		desc:          "With known path and subtree root",
 		reqURL:        "http://127.0.0.1:8080/get/",
