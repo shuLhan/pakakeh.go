@@ -70,11 +70,11 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusNoContent)
 		return
 	case ResponseTypeBinary:
-		res.Header().Set(contentType, contentTypeBinary)
+		res.Header().Set(ContentType, ContentTypeBinary)
 	case ResponseTypeJSON:
-		res.Header().Set(contentType, contentTypeJSON)
+		res.Header().Set(ContentType, ContentTypeJSON)
 	case ResponseTypePlain:
-		res.Header().Set(contentType, contentTypePlain)
+		res.Header().Set(ContentType, ContentTypePlain)
 	}
 
 	res.WriteHeader(http.StatusOK)
@@ -99,7 +99,7 @@ func (h *handler) error(res http.ResponseWriter, e error) {
 	}
 
 	res.WriteHeader(se.Code)
-	res.Header().Set(contentType, contentTypeJSON)
+	res.Header().Set(ContentType, ContentTypeJSON)
 
 	rsp := fmt.Sprintf(`{"code":%d,"message":"%s"}`, se.Code,
 		strings.JSONEscape(se.Message))

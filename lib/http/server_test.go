@@ -164,15 +164,15 @@ func TestRegisterDelete(t *testing.T) {
 		test.Assert(t, "Body", c.expBody, string(body), true)
 
 		var expContentType string
-		gotContentType := res.Header.Get(contentType)
+		gotContentType := res.Header.Get(ContentType)
 
 		switch c.resType {
 		case ResponseTypeBinary:
-			expContentType = contentTypeBinary
+			expContentType = ContentTypeBinary
 		case ResponseTypeJSON:
-			expContentType = contentTypeJSON
+			expContentType = ContentTypeJSON
 		default:
-			expContentType = contentTypePlain
+			expContentType = ContentTypePlain
 		}
 
 		test.Assert(t, "Content-Type", expContentType, gotContentType,
@@ -262,7 +262,7 @@ func TestRegisterHead(t *testing.T) {
 		desc:           "With registered GET",
 		reqURL:         "http://127.0.0.1:8080/api?k=v",
 		expStatusCode:  http.StatusOK,
-		expContentType: []string{contentTypeJSON},
+		expContentType: []string{ContentTypeJSON},
 	}}
 
 	for _, c := range cases {
@@ -292,9 +292,9 @@ func TestRegisterHead(t *testing.T) {
 			true)
 		test.Assert(t, "Body", c.expBody, string(body), true)
 		test.Assert(t, "Header.ContentType", c.expContentType,
-			res.Header[contentType], true)
+			res.Header[ContentType], true)
 		test.Assert(t, "Header.ContentLength", c.expContentLength,
-			res.Header[contentLength], true)
+			res.Header[ContentLength], true)
 	}
 }
 
@@ -391,7 +391,7 @@ map[k:[vv]]
 			t.Fatal(e)
 		}
 
-		req.Header.Set(contentType, contentTypeForm)
+		req.Header.Set(ContentType, ContentTypeForm)
 
 		res, e := client.Do(req)
 		if e != nil {
@@ -555,16 +555,17 @@ func TestStatusError(t *testing.T) {
 		desc:          "With registered error no body",
 		reqURL:        "http://127.0.0.1:8080/error/no-body?k=v",
 		expStatusCode: http.StatusLengthRequired,
+		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error binary",
 		reqURL:        "http://127.0.0.1:8080/error/binary?k=v",
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       "Length required",
+		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        "http://127.0.0.1:8080/error/plain?k=v",
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       "Length required",
+		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        "http://127.0.0.1:8080/error/json?k=v",
@@ -574,12 +575,12 @@ func TestStatusError(t *testing.T) {
 		desc:          "With registered error plain",
 		reqURL:        "http://127.0.0.1:8080/error/no-code?k=v",
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `Internal server error`,
+		expBody:       `{"code":500,"message":"Internal server error"}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        "http://127.0.0.1:8080/error/custom?k=v",
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `Custom error`,
+		expBody:       `{"code":500,"message":"Custom error"}`,
 	}}
 
 	for _, c := range cases {

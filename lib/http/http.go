@@ -82,3 +82,12 @@
 // * Missing test for request with content-type multipart-form
 //
 package http
+
+const (
+	ContentLength     = "Content-Length"
+	ContentType       = "Content-Type"
+	ContentTypeBinary = "application/octet-stream"
+	ContentTypeForm   = "application/x-www-form-urlencoded"
+	ContentTypeJSON   = "application/json"
+	ContentTypePlain  = "text/plain"
+)

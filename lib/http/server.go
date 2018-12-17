@@ -18,15 +18,6 @@ import (
 	"github.com/shuLhan/share/lib/memfs"
 )
 
-const (
-	contentLength     = "Content-Length"
-	contentType       = "Content-Type"
-	contentTypeBinary = "application/octet-stream"
-	contentTypeForm   = "application/x-www-form-urlencoded"
-	contentTypeJSON   = "application/json"
-	contentTypePlain  = "text/plain"
-)
-
 //
 // Server define HTTP server.
 //
@@ -214,7 +205,7 @@ func (srv *Server) handleFS(
 		return
 	}
 
-	res.Header().Set(contentType, node.ContentType)
+	res.Header().Set(ContentType, node.ContentType)
 
 	if method == RequestMethodHead {
 		res.Header().Set("Content-Length", strconv.FormatInt(node.Size, 10))
@@ -266,11 +257,11 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusNoContent)
 		return
 	case ResponseTypeBinary:
-		res.Header().Set(contentType, contentTypeBinary)
+		res.Header().Set(ContentType, ContentTypeBinary)
 	case ResponseTypeJSON:
-		res.Header().Set(contentType, contentTypeJSON)
+		res.Header().Set(ContentType, ContentTypeJSON)
 	case ResponseTypePlain:
-		res.Header().Set(contentType, contentTypePlain)
+		res.Header().Set(ContentType, ContentTypePlain)
 	}
 
 	res.WriteHeader(http.StatusOK)
