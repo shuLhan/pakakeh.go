@@ -21,6 +21,8 @@ A collection of libraries and tools written in Go.
 - `dsv`: Package dsv is a library for working with delimited separated value
 (DSV).
 
+- `errors`: Package errors provide an error type with code.
+
 - `git`: Package git provide a wrapper for git command line interface.
 
 - `http`: Package http implement custom HTTP server with memory file system
