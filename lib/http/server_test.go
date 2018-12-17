@@ -13,6 +13,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/shuLhan/share/lib/errors"
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/test"
 )
@@ -513,13 +514,13 @@ func TestServeHTTPOptions(t *testing.T) {
 
 func TestStatusError(t *testing.T) {
 	cbError := func(req *http.Request, reqBody []byte) ([]byte, error) {
-		return nil, &StatusError{
+		return nil, &errors.E{
 			Code:    http.StatusLengthRequired,
 			Message: "Length required",
 		}
 	}
 	cbNoCode := func(req *http.Request, reqBody []byte) ([]byte, error) {
-		return nil, &StatusError{
+		return nil, &errors.E{
 			Message: "Internal server error",
 		}
 	}

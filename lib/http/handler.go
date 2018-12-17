@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/shuLhan/share/lib/debug"
+	"github.com/shuLhan/share/lib/errors"
 	"github.com/shuLhan/share/lib/strings"
 )
 
@@ -85,9 +86,9 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) error(res http.ResponseWriter, e error) {
-	se, ok := e.(*StatusError)
+	se, ok := e.(*errors.E)
 	if !ok {
-		se = &StatusError{
+		se = &errors.E{
 			Code:    http.StatusInternalServerError,
 			Message: e.Error(),
 		}
@@ -97,28 +98,11 @@ func (h *handler) error(res http.ResponseWriter, e error) {
 		}
 	}
 
-	var rsp string
-
-	switch h.resType {
-	case ResponseTypeNone:
-		res.WriteHeader(se.Code)
-		return
-
-	case ResponseTypeBinary:
-		res.Header().Set(contentType, contentTypeBinary)
-		rsp = se.Message
-
-	case ResponseTypePlain:
-		res.Header().Set(contentType, contentTypePlain)
-		rsp = se.Message
-
-	case ResponseTypeJSON:
-		res.Header().Set(contentType, contentTypeJSON)
-		rsp = fmt.Sprintf(`{"code":%d,"message":"%s"}`, se.Code,
-			strings.JSONEscape(se.Message))
-	}
-
 	res.WriteHeader(se.Code)
+	res.Header().Set(contentType, contentTypeJSON)
+
+	rsp := fmt.Sprintf(`{"code":%d,"message":"%s"}`, se.Code,
+		strings.JSONEscape(se.Message))
 
 	_, e = res.Write([]byte(rsp))
 	if e != nil {
