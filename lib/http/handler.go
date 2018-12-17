@@ -21,7 +21,9 @@ type handler struct {
 	cb      Callback
 }
 
-func (h *handler) call(res http.ResponseWriter, req *http.Request) {
+func (h *handler) call(res http.ResponseWriter, req *http.Request,
+	evaluators []Evaluator,
+) {
 	var (
 		e       error
 		reqBody []byte
@@ -54,6 +56,14 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request) {
 
 	if debug.Value > 0 {
 		log.Printf("> request body: %s\n", reqBody)
+	}
+
+	for _, eval := range evaluators {
+		e := eval.Evaluate(req, reqBody)
+		if e != nil {
+			h.error(res, e)
+			return
+		}
 	}
 
 	rspb, e := h.cb(req, reqBody)

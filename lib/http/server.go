@@ -23,6 +23,7 @@ import (
 //
 type Server struct {
 	mfs       *memfs.MemFS
+	evals     []Evaluator
 	conn      *http.Server
 	regDelete map[string]*handler
 	regGet    map[string]*handler
@@ -77,6 +78,14 @@ func (srv *Server) RegisterDelete(
 	reqPath string, resType ResponseType, cb Callback,
 ) {
 	srv.register(reqPath, RequestMethodDelete, RequestTypeQuery, resType, cb)
+}
+
+//
+// RegisterEvaluator register HTTP middleware that will be called before
+// handler callback is called.
+//
+func (srv *Server) RegisterEvaluator(eval Evaluator) {
+	srv.evals = append(srv.evals, eval)
 }
 
 //
@@ -167,7 +176,7 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	h.call(res, req)
+	h.call(res, req, srv.evals)
 }
 
 //
@@ -238,7 +247,7 @@ func (srv *Server) handleFS(
 func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 	h, ok := srv.regGet[req.URL.Path]
 	if ok {
-		h.call(res, req)
+		h.call(res, req, srv.evals)
 		return
 	}
 

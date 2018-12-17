@@ -180,6 +180,70 @@ func TestRegisterDelete(t *testing.T) {
 	}
 }
 
+type testEvaluator struct{}
+
+func (te *testEvaluator) Evaluate(req *http.Request, reqBody []byte) error {
+	k := req.Form.Get("k")
+
+	if len(k) == 0 {
+		return &errors.E{
+			Code:    http.StatusBadRequest,
+			Message: "Missing input value for k",
+		}
+	}
+
+	return nil
+}
+
+func TestRegisterEvaluator(t *testing.T) {
+	te := new(testEvaluator)
+
+	testServer.RegisterDelete("/evaluate", ResponseTypeJSON, cbPlain)
+
+	testServer.RegisterEvaluator(te)
+
+	cases := []struct {
+		desc          string
+		reqURL        string
+		expStatusCode int
+	}{{
+		desc:          "With invalid evaluate",
+		reqURL:        "http://127.0.0.1:8080/evaluate",
+		expStatusCode: http.StatusBadRequest,
+	}, {
+		desc:          "With valid evaluate",
+		reqURL:        "http://127.0.0.1:8080/evaluate?k=v",
+		expStatusCode: http.StatusOK,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		res, e := client.Do(req)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		_, e = ioutil.ReadAll(res.Body)
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		e = res.Body.Close()
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
+			true)
+	}
+}
+
 func TestRegisterGet(t *testing.T) {
 	testServer.RegisterGet("/get", ResponseTypePlain, cbPlain)
 
