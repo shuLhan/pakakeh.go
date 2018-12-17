@@ -1,6 +1,20 @@
 = CHANGELOG
 :toc:
 
+== share v0.2.0
+
+=== New Features
+
+* `lib/errors`, package errors provide a custom error with code.
+
+* `lib/http`, package http implement custom HTTP server with memory file
+system and simplified routing handler.
+
+=== Enhancements
+
+Fix warnings from linters.
+
+
 == share v0.1.0
 
 The first release of `share` package contains one command line interface (CLI)
