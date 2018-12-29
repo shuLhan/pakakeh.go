@@ -110,4 +110,5 @@ Beside {url-godoc}[GoDoc], that provides documentation for API in packages,
 there are also additional documentations that we can't include inside source
 code due to their scope and limitation of godoc formatting itself.
 
-* link:doc/SMTP.html[SMTP]
+* link:doc/SMTP.html[Simple Mail Transfer Protocol (RFC 5321)]
+* link:doc/IMF.html[Internet Message Format (RFC 5322)]
