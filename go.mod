@@ -1,3 +1,3 @@
 module github.com/shuLhan/share
 
-require golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e
+require golang.org/x/sys v0.0.0-20181228144115-9a3f9b0469bb

@@ -1,7 +1,10 @@
 = CHANGELOG
 :toc:
 
-== share v0.2.0
+This library is released each month, either at the end of month or at the
+first week of next month.
+
+== share v0.2.0 (2019-01-02)
 
 === New Features
 
@@ -15,7 +18,7 @@ system and simplified routing handler.
 Fix warnings from linters.
 
 
-== share v0.1.0
+== share v0.1.0 (2018-11-29)
 
 The first release of `share` package contains one command line interface (CLI)
 and several libraries.
