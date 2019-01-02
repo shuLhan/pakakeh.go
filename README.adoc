@@ -14,89 +14,110 @@ A collection of libraries and tools written in Go.
 
 == Command Line Interface
 
-* `gofmtcomment`: Program to convert "/\*\*/" comment into "//".
+* link:{url-godoc}/cmd/gofmtcomment[*gofmtcomment*^]: Program to convert
+"/\*\*/" comment into "//".
 
 
 == Libraries
 
-* `bytes`: Package bytes provide a library for working with byte or slice of
-  bytes.
+* link:{url-godoc}/lib/bytes[*bytes*^]: Package bytes provide a library for
+working with byte or slice of bytes.
 
-* `contact`: Package contact provide a library to import contact from Google,
-Microsoft, and Yahoo.
+* link:{url-godoc}/lib/contact[*contact*^]: Package contact provide a library
+to import contact from Google, Microsoft, and Yahoo.
 
-* `dns`: Package dns implement DNS client and server.
+* link:{url-godoc}/lib/dns[*dns*^]: Package dns implement DNS client and
+server.
 
-* `dsv`: Package dsv is a library for working with delimited separated value
-(DSV).
+* link:{url-godoc}/lib/dsv[*dsv*^]: Package dsv is a library for working with
+delimited separated value (DSV).
 
-* `errors`: Package errors provide an error type with code.
+* link:{url-godoc}/lib/errors[*errors*^]: Package errors provide an error type
+with code.
 
-* `git`: Package git provide a wrapper for git command line interface.
+* link:{url-godoc}/lib/git[*git*^]: Package git provide a wrapper for git
+command line interface.
 
-* `http`: Package http implement custom HTTP server with memory file system
-and simplified routing handler.
+* link:{url-godoc}/lib/http[*http*^]: Package http implement custom HTTP
+server with memory file system and simplified routing handler.
 
-* `ini`: Package ini implement reading and writing INI configuration as
-defined by Git configuration file syntax.
+* link:{url-godoc}/lib/ini[*ini*^]: Package ini implement reading and writing
+INI configuration as defined by Git configuration file syntax.
 
-* `io`: Package io provide a library for reading and watching file, and
-reading from standard input.
+* link:{url-godoc}/lib/io[*io*^]: Package io provide a library for reading and
+watching file, and reading from standard input.
 
-* `memfs`: Package memfs provide a library for mapping file system into
-memory.
+* link:{url-godoc}/lib/memfs[*memfs*^]: Package memfs provide a library for
+mapping file system into memory.
 
-* `mining`: Package mining provide a library for data mining.
+* link:{url-godoc}/lib/mining[*mining*^]: Package mining provide a library for
+data mining.
 
-** `classifier/cart`: Package cart implement the Classification and
-  Regression Tree by Breiman, et al.
+** link:{url-godoc}/lib/mining/classifier/cart[*classifier/cart*^]: Package
+cart implement the Classification and Regression Tree by Breiman, et al.
 
-** `classifier/crf`: Package crf implement the cascaded random forest
-  algorithm, proposed by Baumann et.al in their paper: Baumann, Florian, et
-  al.
+** link:{url-godoc}/lib/mining/classifier/crf[*classififer/crf*^]: Package crf
+implement the cascaded random forest algorithm, proposed by Baumann et.al in
+their paper: Baumann, Florian, et al.
 
-** `classifier/rf`: Package rf implement ensemble of classifiers using
-  random forest algorithm by Breiman and Cutler.
+** link:{url-godoc}/lib/mining/classifier/rf[*classifier/rf*^]: Package rf
+implement ensemble of classifiers using random forest algorithm by Breiman and
+Cutler.
 
-** `gain/gini`: Package gini contain function to calculating Gini gain.
+** link:{url-godoc}/lib/mining/gain/gini[*gain/gini*^]: Package gini contain
+function to calculating Gini gain.
 
-** `knn`: Package knn implement the K Nearest Neighbor using Euclidian to
-  compute the distance between samples.
+** link:{url-godoc}/lib/mining/knn[*knn*^]: Package knn implement the K
+Nearest Neighbor using Euclidian to compute the distance between samples.
 
-** `math`: Package math provide generic functions working with mathematic.
+** link:{url-godoc}/lib/mining/math[*math*^]: Package math provide generic
+functions working with mathematic.
 
-** `resampling/lnsmote`: Package lnsmote implement the Local-Neighborhood
-  algorithm from the paper, Maciejewski, Tomasz, and Jerzy Stefanowski.
+** link:{url-godoc}/lib/mining/resampling/lnsmote[*resampling/lnsmote*^]:
+Package lnsmote implement the Local-Neighborhood algorithm from the paper,
+Maciejewski, Tomasz, and Jerzy Stefanowski.
 
-** `resampling/smote`: Package smote resamples a dataset by applying
-  the Synthetic Minority Oversampling TEchnique (SMOTE).
+** link:{url-godoc}/lib/mining/resampling/smote[*resampling/smote*^]: Package
+smote resamples a dataset by applying the Synthetic Minority Oversampling
+TEchnique (SMOTE).
 
-** `tree/binary`: Package binary contain implementation of binary tree.
+** link:{url-godoc}/lib/mining/tree/binary[*tree/binary*^]: Package binary
+contain implementation of binary tree.
 
-* `net`: Package net provide constants and library for networking.
+* link:{url-godoc}/lib/net[*net*^]: Package net provide constants and library
+for networking.
 
-* `numbers`: Package numbers provide miscellaneous functions for working with
-integer, float, slice of integer, and slice of floats.
+* link:{url-godoc}/lib/numbers[*numbers*^]: Package numbers provide
+miscellaneous functions for working with integer, float, slice of integer, and
+slice of floats.
 
-* `runes`: Package runes provide a library for working with a single rune or
-slice of rune.
+* link:{url-godoc}/lib/runes[*runes*^]: Package runes provide a library for
+working with a single rune or slice of rune.
 
-* `strings`: Package string provide a library for working with string or slice
-of string.
+* link:{url-godoc}/lib/smtp[*smtp*^]: Package smtp provide a library for
+building SMTP server and client.
 
-* `tabula`: Package tabula is a Go library for working with rows, columns, or
-matrix (table), or in another terms working with data set.
+* link:{url-godoc}/lib/strings[*strings*^]: Package string provide a library
+for working with string or slice of string.
 
-* `test`: Package test provide library for help with testing.
+* link:{url-godoc}/lib/tabula[*tabula*^]: Package tabula is a Go library for
+working with rows, columns, or matrix (table), or in another terms working
+with data set.
 
-* `text`: Package text provide common a library for working with text.
+* link:{url-godoc}/lib/test[*test*^]: Package test provide library for helping
+with testing.
 
-** `diff`: Package diff implement text comparison.
+* link:{url-godoc}/lib/text[*text*^]: Package text provide common a library
+for working with text.
 
-* `time`: Package time provide a library for working with time.
+** link:{url-godoc}/lib/text/diff[*text/diff*^]: Package diff implement text
+comparison.
 
-* `websocket`: Package websocket provide the websocket library for server
-and client.
+* link:{url-godoc}/lib/time[*time*^]: Package time provide a library for
+working with time.
+
+* link:{url-godoc}/lib/websocket[*websocket*^]: Package websocket provide the
+websocket library for server and client.
 
 
 == Changelog
