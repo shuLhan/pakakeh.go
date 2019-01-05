@@ -25,11 +25,11 @@ type Server struct {
 	mfs       *memfs.MemFS
 	evals     []Evaluator
 	conn      *http.Server
-	regDelete map[string]*handler
-	regGet    map[string]*handler
-	regPatch  map[string]*handler
-	regPost   map[string]*handler
-	regPut    map[string]*handler
+	regDelete map[string]*Endpoint
+	regGet    map[string]*Endpoint
+	regPatch  map[string]*Endpoint
+	regPost   map[string]*Endpoint
+	regPut    map[string]*Endpoint
 }
 
 //
@@ -38,11 +38,11 @@ type Server struct {
 //
 func NewServer(root string, conn *http.Server) (srv *Server, e error) {
 	srv = &Server{
-		regDelete: make(map[string]*handler),
-		regGet:    make(map[string]*handler),
-		regPatch:  make(map[string]*handler),
-		regPost:   make(map[string]*handler),
-		regPut:    make(map[string]*handler),
+		regDelete: make(map[string]*Endpoint),
+		regGet:    make(map[string]*Endpoint),
+		regPatch:  make(map[string]*Endpoint),
+		regPost:   make(map[string]*Endpoint),
+		regPut:    make(map[string]*Endpoint),
 	}
 
 	if conn == nil {
@@ -74,15 +74,17 @@ func NewServer(root string, conn *http.Server) (srv *Server, e error) {
 //
 // RegisterDelete register HTTP method DELETE with callback to handle it.
 //
-func (srv *Server) RegisterDelete(
-	reqPath string, resType ResponseType, cb Callback,
-) {
-	srv.register(reqPath, RequestMethodDelete, RequestTypeQuery, resType, cb)
+func (srv *Server) RegisterDelete(ep *Endpoint) {
+	if ep != nil {
+		ep.Method = RequestMethodDelete
+		ep.RequestType = RequestTypeQuery
+		srv.register(ep)
+	}
 }
 
 //
 // RegisterEvaluator register HTTP middleware that will be called before
-// handler callback is called.
+// Endpoint evalutor and callback is called.
 //
 func (srv *Server) RegisterEvaluator(eval Evaluator) {
 	srv.evals = append(srv.evals, eval)
@@ -91,45 +93,51 @@ func (srv *Server) RegisterEvaluator(eval Evaluator) {
 //
 // RegisterGet register HTTP method GET with callback to handle it.
 //
-func (srv *Server) RegisterGet(
-	reqPath string, resType ResponseType, cb Callback,
-) {
-	srv.register(reqPath, RequestMethodGet, RequestTypeQuery, resType, cb)
+func (srv *Server) RegisterGet(ep *Endpoint) {
+	if ep != nil {
+		ep.Method = RequestMethodGet
+		ep.RequestType = RequestTypeQuery
+		srv.register(ep)
+	}
 }
 
 //
 // RegisterPatch register HTTP method PATCH with callback to handle it.
 //
-func (srv *Server) RegisterPatch(
-	reqPath string, reqType RequestType, resType ResponseType, cb Callback,
-) {
-	srv.register(reqPath, RequestMethodPatch, reqType, resType, cb)
+func (srv *Server) RegisterPatch(ep *Endpoint) {
+	if ep != nil {
+		ep.Method = RequestMethodPatch
+		srv.register(ep)
+	}
 }
 
 //
 // RegisterPost register HTTP method POST with callback to handle it.
 //
-func (srv *Server) RegisterPost(
-	reqPath string, reqType RequestType, resType ResponseType, cb Callback,
-) {
-	srv.register(reqPath, RequestMethodPost, reqType, resType, cb)
+func (srv *Server) RegisterPost(ep *Endpoint) {
+	if ep != nil {
+		ep.Method = RequestMethodPost
+		srv.register(ep)
+	}
 }
 
 //
 // RegisterPut register HTTP method PUT with callback to handle it.
 //
-func (srv *Server) RegisterPut(
-	reqPath string, reqType RequestType, cb Callback,
-) {
-	srv.register(reqPath, RequestMethodPut, reqType, ResponseTypeNone, cb)
+func (srv *Server) RegisterPut(ep *Endpoint) {
+	if ep != nil {
+		ep.Method = RequestMethodPut
+		ep.ResponseType = ResponseTypeNone
+		srv.register(ep)
+	}
 }
 
 //
-// ServeHTTP handle mapping of client request to registered handler.
+// ServeHTTP handle mapping of client request to registered endpoints.
 //
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	var (
-		h  *handler
+		ep *Endpoint
 		ok bool
 	)
 
@@ -139,7 +147,7 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case http.MethodDelete:
-		h, ok = srv.regDelete[req.URL.Path]
+		ep, ok = srv.regDelete[req.URL.Path]
 
 	case http.MethodGet:
 		srv.handleGet(res, req)
@@ -154,29 +162,24 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 
 	case http.MethodPatch:
-		h, ok = srv.regPatch[req.URL.Path]
+		ep, ok = srv.regPatch[req.URL.Path]
 
 	case http.MethodPost:
-		h, ok = srv.regPost[req.URL.Path]
+		ep, ok = srv.regPost[req.URL.Path]
 
 	case http.MethodPut:
-		h, ok = srv.regPut[req.URL.Path]
+		ep, ok = srv.regPut[req.URL.Path]
 
 	default:
 		res.WriteHeader(http.StatusNotImplemented)
 		return
 	}
-
 	if !ok {
 		res.WriteHeader(http.StatusNotFound)
 		return
 	}
-	if h == nil {
-		res.WriteHeader(http.StatusNotImplemented)
-		return
-	}
 
-	h.call(res, req, srv.evals)
+	ep.call(res, req, srv.evals)
 }
 
 //
@@ -245,9 +248,9 @@ func (srv *Server) handleFS(
 }
 
 func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
-	h, ok := srv.regGet[req.URL.Path]
+	ep, ok := srv.regGet[req.URL.Path]
 	if ok {
-		h.call(res, req, srv.evals)
+		ep.call(res, req, srv.evals)
 		return
 	}
 
@@ -255,13 +258,13 @@ func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 }
 
 func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
-	h, ok := srv.regGet[req.URL.Path]
+	ep, ok := srv.regGet[req.URL.Path]
 	if !ok {
 		srv.handleFS(res, req, RequestMethodHead)
 		return
 	}
 
-	switch h.resType {
+	switch ep.ResponseType {
 	case ResponseTypeNone:
 		res.WriteHeader(http.StatusNoContent)
 		return
@@ -290,24 +293,24 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 		methods[http.MethodHead] = true
 	}
 
-	h, ok := srv.regDelete[req.URL.Path]
-	if ok && h != nil {
+	ep, ok := srv.regDelete[req.URL.Path]
+	if ok && ep != nil {
 		methods[http.MethodDelete] = true
 	}
 	_, ok = srv.regGet[req.URL.Path]
-	if ok && h != nil {
+	if ok && ep != nil {
 		methods[http.MethodGet] = true
 	}
 	_, ok = srv.regPatch[req.URL.Path]
-	if ok && h != nil {
+	if ok && ep != nil {
 		methods[http.MethodPatch] = true
 	}
 	_, ok = srv.regPost[req.URL.Path]
-	if ok && h != nil {
+	if ok && ep != nil {
 		methods[http.MethodPost] = true
 	}
-	h, ok = srv.regPut[req.URL.Path]
-	if ok && h != nil {
+	ep, ok = srv.regPut[req.URL.Path]
+	if ok && ep != nil {
 		methods[http.MethodPut] = true
 	}
 
@@ -334,35 +337,27 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 }
 
 //
-// register new handler with specific method, path, request type, and response
-// type.
+// register new endpoint with specific method, path, request type, and
+// response type.
 //
-func (srv *Server) register(reqPath string, reqMethod RequestMethod,
-	reqType RequestType, resType ResponseType, cb Callback,
-) {
-	if cb == nil {
+func (srv *Server) register(ep *Endpoint) {
+	if ep == nil || ep.Call == nil {
 		return
 	}
-	if len(reqPath) == 0 {
-		reqPath = "/"
+	if len(ep.Path) == 0 {
+		ep.Path = "/"
 	}
 
-	handler := &handler{
-		reqType: reqType,
-		resType: resType,
-		cb:      cb,
-	}
-
-	switch reqMethod {
+	switch ep.Method {
 	case RequestMethodDelete:
-		srv.regDelete[reqPath] = handler
+		srv.regDelete[ep.Path] = ep
 	case RequestMethodGet:
-		srv.regGet[reqPath] = handler
+		srv.regGet[ep.Path] = ep
 	case RequestMethodPatch:
-		srv.regPatch[reqPath] = handler
+		srv.regPatch[ep.Path] = ep
 	case RequestMethodPost:
-		srv.regPost[reqPath] = handler
+		srv.regPost[ep.Path] = ep
 	case RequestMethodPut:
-		srv.regPut[reqPath] = handler
+		srv.regPut[ep.Path] = ep
 	}
 }

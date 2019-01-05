@@ -8,9 +8,9 @@ package http
 type RequestMethod int
 
 const (
+	RequestMethodGet     RequestMethod = 0
 	RequestMethodConnect RequestMethod = 1 << iota
 	RequestMethodDelete
-	RequestMethodGet
 	RequestMethodHead
 	RequestMethodOptions
 	RequestMethodPatch

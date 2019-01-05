@@ -15,13 +15,28 @@ import (
 	"github.com/shuLhan/share/lib/strings"
 )
 
-type handler struct {
-	reqType RequestType
-	resType ResponseType
-	cb      Callback
+//
+// Endpoint represent route that will be handled by server.
+// Each route have their own evaluator that will be evaluated after global
+// evaluators from server.
+//
+type Endpoint struct {
+	// Method contains HTTP method, default to GET.
+	Method RequestMethod
+	// Path contains route to be served, default to "/" if its empty.
+	Path string
+	// RequestType contains type of request, default to RequestTypeNone.
+	RequestType RequestType
+	// ResponseType contains type of request, default to ResponseTypeNone.
+	ResponseType ResponseType
+	// Eval define evaluator for route that will be called after global
+	// evaluators and before callback.
+	Eval Evaluator
+	// Call is the main process of route.
+	Call Callback
 }
 
-func (h *handler) call(res http.ResponseWriter, req *http.Request,
+func (ep *Endpoint) call(res http.ResponseWriter, req *http.Request,
 	evaluators []Evaluator,
 ) {
 	var (
@@ -29,7 +44,7 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request,
 		reqBody []byte
 	)
 
-	switch h.reqType {
+	switch ep.RequestType {
 	case RequestTypeForm:
 		e = req.ParseForm()
 
@@ -48,7 +63,7 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request,
 		reqBody, e = ioutil.ReadAll(req.Body)
 	}
 	if e != nil {
-		log.Printf("handler.call: %d %s %s %s\n",
+		log.Printf("endpoint.call: %d %s %s %s\n",
 			http.StatusBadRequest, req.Method, req.URL.Path, e)
 		res.WriteHeader(http.StatusBadRequest)
 		return
@@ -59,23 +74,31 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request,
 	}
 
 	for _, eval := range evaluators {
-		e := eval.Evaluate(req, reqBody)
+		e = eval(req, reqBody)
 		if e != nil {
-			h.error(res, e)
+			ep.error(res, e)
 			return
 		}
 	}
 
-	rspb, e := h.cb(req, reqBody)
+	if ep.Eval != nil {
+		e = ep.Eval(req, reqBody)
+		if e != nil {
+			ep.error(res, e)
+			return
+		}
+	}
+
+	rspb, e := ep.Call(req, reqBody)
 	if e != nil {
-		log.Printf("handler.call: %d %s %s %s\n",
+		log.Printf("endpoint.call: %d %s %s %s\n",
 			http.StatusInternalServerError,
 			req.Method, req.URL.Path, e)
-		h.error(res, e)
+		ep.error(res, e)
 		return
 	}
 
-	switch h.resType {
+	switch ep.ResponseType {
 	case ResponseTypeNone:
 		res.WriteHeader(http.StatusNoContent)
 		return
@@ -91,11 +114,11 @@ func (h *handler) call(res http.ResponseWriter, req *http.Request,
 
 	_, e = res.Write(rspb)
 	if e != nil {
-		log.Printf("handler.call: %s %s %s\n", req.Method, req.URL.Path, e)
+		log.Printf("endpoint.call: %s %s %s\n", req.Method, req.URL.Path, e)
 	}
 }
 
-func (h *handler) error(res http.ResponseWriter, e error) {
+func (ep *Endpoint) error(res http.ResponseWriter, e error) {
 	se, ok := e.(*errors.E)
 	if !ok {
 		se = &errors.E{
@@ -116,6 +139,6 @@ func (h *handler) error(res http.ResponseWriter, e error) {
 
 	_, e = res.Write([]byte(rsp))
 	if e != nil {
-		log.Printf("handler.error: %s\n", e)
+		log.Println("endpoint.error: ", e)
 	}
 }

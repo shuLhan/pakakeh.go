@@ -77,38 +77,64 @@ func TestRegisterDelete(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
-		resType       ResponseType
+		ep            *Endpoint
 		expStatusCode int
 		expBody       string
 	}{{
-		desc:          "With unknown path",
-		reqURL:        "http://127.0.0.1:8080/",
+		desc:   "With unknown path",
+		reqURL: "http://127.0.0.1:8080/",
+		ep: &Endpoint{
+			Path:         "/delete",
+			ResponseType: ResponseTypePlain,
+			Call:         cbPlain,
+		},
 		expStatusCode: http.StatusNotFound,
 	}, {
-		desc:          "With known path and subtree root",
-		reqURL:        "http://127.0.0.1:8080/delete/",
+		desc:   "With known path and subtree root",
+		reqURL: "http://127.0.0.1:8080/delete/",
+		ep: &Endpoint{
+			Path:         "/delete",
+			ResponseType: ResponseTypePlain,
+			Call:         cbPlain,
+		},
 		expStatusCode: http.StatusNotFound,
 	}, {
-		desc:          "With response type none",
-		reqURL:        "http://127.0.0.1:8080/delete?k=v",
-		resType:       ResponseTypeNone,
+		desc:   "With response type none",
+		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		ep: &Endpoint{
+			Path:         "/delete",
+			ResponseType: ResponseTypeNone,
+			Call:         cbNone,
+		},
 		expStatusCode: http.StatusNoContent,
 	}, {
-		desc:          "With response type binary",
-		reqURL:        "http://127.0.0.1:8080/delete?k=v",
-		resType:       ResponseTypeBinary,
+		desc:   "With response type binary",
+		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		ep: &Endpoint{
+			Path:         "/delete",
+			ResponseType: ResponseTypeBinary,
+			Call:         cbPlain,
+		},
 		expStatusCode: http.StatusOK,
 		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}, {
-		desc:          "With response type plain",
-		reqURL:        "http://127.0.0.1:8080/delete?k=v",
-		resType:       ResponseTypePlain,
+		desc:   "With response type plain",
+		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		ep: &Endpoint{
+			Path:         "/delete",
+			ResponseType: ResponseTypePlain,
+			Call:         cbPlain,
+		},
 		expStatusCode: http.StatusOK,
 		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}, {
-		desc:          "With response type JSON",
-		reqURL:        "http://127.0.0.1:8080/delete?k=v",
-		resType:       ResponseTypeJSON,
+		desc:   "With response type JSON",
+		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		ep: &Endpoint{
+			Path:         "/delete",
+			ResponseType: ResponseTypeJSON,
+			Call:         cbJSON,
+		},
 		expStatusCode: http.StatusOK,
 		expBody: `{
 "form": "map[k:[v]]",
@@ -120,20 +146,7 @@ func TestRegisterDelete(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		switch c.resType {
-		case ResponseTypeNone:
-			testServer.RegisterDelete("/delete",
-				ResponseTypeNone, cbNone)
-		case ResponseTypeBinary:
-			testServer.RegisterDelete("/delete",
-				ResponseTypeBinary, cbPlain)
-		case ResponseTypeJSON:
-			testServer.RegisterDelete("/delete",
-				ResponseTypeJSON, cbJSON)
-		default:
-			testServer.RegisterDelete("/delete",
-				ResponseTypePlain, cbPlain)
-		}
+		testServer.RegisterDelete(c.ep)
 
 		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
 		if e != nil {
@@ -166,7 +179,7 @@ func TestRegisterDelete(t *testing.T) {
 		var expContentType string
 		gotContentType := res.Header.Get(ContentType)
 
-		switch c.resType {
+		switch c.ep.ResponseType {
 		case ResponseTypeBinary:
 			expContentType = ContentTypeBinary
 		case ResponseTypeJSON:
@@ -180,9 +193,7 @@ func TestRegisterDelete(t *testing.T) {
 	}
 }
 
-type testEvaluator struct{}
-
-func (te *testEvaluator) Evaluate(req *http.Request, reqBody []byte) error {
+var testEvaluator = func(req *http.Request, reqBody []byte) error {
 	k := req.Form.Get("k")
 
 	if len(k) == 0 {
@@ -196,11 +207,14 @@ func (te *testEvaluator) Evaluate(req *http.Request, reqBody []byte) error {
 }
 
 func TestRegisterEvaluator(t *testing.T) {
-	te := new(testEvaluator)
+	epEvaluate := &Endpoint{
+		Path:         "/evaluate",
+		ResponseType: ResponseTypeJSON,
+		Call:         cbPlain,
+	}
 
-	testServer.RegisterDelete("/evaluate", ResponseTypeJSON, cbPlain)
-
-	testServer.RegisterEvaluator(te)
+	testServer.RegisterDelete(epEvaluate)
+	testServer.RegisterEvaluator(testEvaluator)
 
 	cases := []struct {
 		desc          string
@@ -245,7 +259,12 @@ func TestRegisterEvaluator(t *testing.T) {
 }
 
 func TestRegisterGet(t *testing.T) {
-	testServer.RegisterGet("/get", ResponseTypePlain, cbPlain)
+	epGet := &Endpoint{
+		Path:         "/get",
+		ResponseType: ResponseTypePlain,
+		Call:         cbPlain,
+	}
+	testServer.RegisterGet(epGet)
 
 	cases := []struct {
 		desc          string
@@ -303,7 +322,12 @@ func TestRegisterGet(t *testing.T) {
 }
 
 func TestRegisterHead(t *testing.T) {
-	testServer.RegisterGet("/api", ResponseTypeJSON, cbNone)
+	epAPI := &Endpoint{
+		Path:         "/api",
+		ResponseType: ResponseTypeJSON,
+		Call:         cbNone,
+	}
+	testServer.RegisterGet(epAPI)
 
 	cases := []struct {
 		desc             string
@@ -363,8 +387,13 @@ func TestRegisterHead(t *testing.T) {
 }
 
 func TestRegisterPatch(t *testing.T) {
-	testServer.RegisterPatch("/patch", RequestTypeQuery,
-		ResponseTypePlain, cbPlain)
+	ep := &Endpoint{
+		Path:         "/patch",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypePlain,
+		Call:         cbPlain,
+	}
+	testServer.RegisterPatch(ep)
 
 	cases := []struct {
 		desc          string
@@ -416,8 +445,14 @@ func TestRegisterPatch(t *testing.T) {
 }
 
 func TestRegisterPost(t *testing.T) {
-	testServer.RegisterPost("/post", RequestTypeForm, ResponseTypePlain,
-		cbPlain)
+	ep := &Endpoint{
+		Path:         "/post",
+		RequestType:  RequestTypeForm,
+		ResponseType: ResponseTypePlain,
+		Call:         cbPlain,
+	}
+
+	testServer.RegisterPost(ep)
 
 	cases := []struct {
 		desc          string
@@ -479,7 +514,13 @@ map[k:[vv]]
 }
 
 func TestRegisterPut(t *testing.T) {
-	testServer.RegisterPut("/put", RequestTypeForm, cbPlain)
+	ep := &Endpoint{
+		Path:        "/put",
+		RequestType: RequestTypeForm,
+		Call:        cbPlain,
+	}
+
+	testServer.RegisterPut(ep)
 
 	cases := []struct {
 		desc          string
@@ -530,9 +571,20 @@ func TestRegisterPut(t *testing.T) {
 }
 
 func TestServeHTTPOptions(t *testing.T) {
-	testServer.RegisterDelete("/options", ResponseTypePlain, cbPlain)
-	testServer.RegisterPatch("/options", RequestTypeQuery,
-		ResponseTypePlain, cbPlain)
+	epDelete := &Endpoint{
+		Path:         "/options",
+		ResponseType: ResponseTypePlain,
+		Call:         cbPlain,
+	}
+	epPatch := &Endpoint{
+		Path:         "/options",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypePlain,
+		Call:         cbPlain,
+	}
+
+	testServer.RegisterDelete(epDelete)
+	testServer.RegisterPatch(epPatch)
 
 	cases := []struct {
 		desc          string
@@ -592,23 +644,53 @@ func TestStatusError(t *testing.T) {
 		return nil, fmt.Errorf("Custom error")
 	}
 
-	testServer.RegisterPost("/error/no-body", RequestTypeQuery,
-		ResponseTypeNone, cbError)
+	epErrNoBody := &Endpoint{
+		Path:         "/error/no-body",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypeNone,
+		Call:         cbError,
+	}
+	testServer.RegisterPost(epErrNoBody)
 
-	testServer.RegisterPost("/error/binary", RequestTypeQuery,
-		ResponseTypeBinary, cbError)
+	epErrBinary := &Endpoint{
+		Path:         "/error/binary",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypeBinary,
+		Call:         cbError,
+	}
+	testServer.RegisterPost(epErrBinary)
 
-	testServer.RegisterPost("/error/json", RequestTypeJSON,
-		ResponseTypeJSON, cbError)
+	epErrJSON := &Endpoint{
+		Path:         "/error/json",
+		RequestType:  RequestTypeJSON,
+		ResponseType: ResponseTypeJSON,
+		Call:         cbError,
+	}
+	testServer.RegisterPost(epErrJSON)
 
-	testServer.RegisterPost("/error/plain", RequestTypeQuery,
-		ResponseTypePlain, cbError)
+	epErrPlain := &Endpoint{
+		Path:         "/error/plain",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypePlain,
+		Call:         cbError,
+	}
+	testServer.RegisterPost(epErrPlain)
 
-	testServer.RegisterPost("/error/no-code", RequestTypeQuery,
-		ResponseTypePlain, cbNoCode)
+	epErrNoCode := &Endpoint{
+		Path:         "/error/no-code",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypePlain,
+		Call:         cbNoCode,
+	}
+	testServer.RegisterPost(epErrNoCode)
 
-	testServer.RegisterPost("/error/custom", RequestTypeQuery,
-		ResponseTypePlain, cbCustomErr)
+	epErrCustom := &Endpoint{
+		Path:         "/error/custom",
+		RequestType:  RequestTypeQuery,
+		ResponseType: ResponseTypePlain,
+		Call:         cbCustomErr,
+	}
+	testServer.RegisterPost(epErrCustom)
 
 	cases := []struct {
 		desc          string

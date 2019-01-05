@@ -9,13 +9,7 @@ import (
 )
 
 //
-// Evaluator is an interface for middleware between actual request and handler.
+// Evaluator evaluate the request.  If request is invalid, the error will tell
+// the response code and the error message to be written back to client.
 //
-type Evaluator interface {
-	//
-	// Evaluate the request.  If request is invalid, the error will tell
-	// the response code and the error message to be written back to
-	// client.
-	//
-	Evaluate(req *http.Request, reqBody []byte) error
-}
+type Evaluator func(req *http.Request, reqBody []byte) error
