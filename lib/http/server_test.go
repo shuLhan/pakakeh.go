@@ -8,70 +8,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/errors"
-	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/test"
 )
-
-var ( // nolint: gochecknoglobals
-	testServer *Server // nolint: gochecknoglobals
-	client     = &http.Client{}
-
-	cbNone = func(req *http.Request, reqBody []byte) ([]byte, error) {
-		return nil, nil
-	}
-
-	cbPlain = func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%s\n", req.PostForm)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
-		return []byte(s), nil
-	}
-
-	cbJSON = func(req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf(`{
-"form": "%s",
-"multipartForm": "%v",
-"body": %q
-}`, req.Form, req.MultipartForm, reqBody)
-		return []byte(s), nil
-	}
-)
-
-func TestMain(m *testing.M) {
-	var e error
-
-	conn := &http.Server{
-		Addr: "127.0.0.1:8080",
-	}
-
-	// Testing handleFS with large size.
-	memfs.MaxFileSize = 30
-
-	testServer, e = NewServer("testdata", conn)
-	if e != nil {
-		log.Fatal(e)
-	}
-
-	go func() {
-		e = testServer.Start()
-		if e != nil {
-			log.Fatal(e)
-		}
-	}()
-
-	os.Exit(m.Run())
-}
 
 func TestRegisterDelete(t *testing.T) {
 	cases := []struct {
@@ -629,18 +571,26 @@ func TestServeHTTPOptions(t *testing.T) {
 }
 
 func TestStatusError(t *testing.T) {
-	cbError := func(req *http.Request, reqBody []byte) ([]byte, error) {
+	cbError := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+		[]byte, error,
+	) {
 		return nil, &errors.E{
 			Code:    http.StatusLengthRequired,
 			Message: "Length required",
 		}
 	}
-	cbNoCode := func(req *http.Request, reqBody []byte) ([]byte, error) {
+
+	cbNoCode := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+		[]byte, error,
+	) {
 		return nil, &errors.E{
 			Message: "Internal server error",
 		}
 	}
-	cbCustomErr := func(req *http.Request, reqBody []byte) ([]byte, error) {
+
+	cbCustomErr := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+		[]byte, error,
+	) {
 		return nil, fmt.Errorf("Custom error")
 	}
 

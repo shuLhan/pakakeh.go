@@ -63,16 +63,22 @@
 // User just need to focus on step 3, handling on how to process request, all
 // of process on step 1, 2, and 4 will be handled by our library.
 //
-//	server.RequestPost("/api/login", RequestTypeQuery, ResponseTypeJSON, handleLogin)
+//	epAPILogin := &libhttp.Endpoint{
+//		Path: "/api/login",
+//		RequestType: libhttp.RequestTypeQuery,
+//		ResponseType: libhttp.ResponseTypeJSON,
+//		Call: handleLogin,
+//	}
+//	server.RequestPost(epAPILogin)
 //
 // Upon receiving request to "/api/login", the library will call
 // "req.ParseForm()", read the content of body and pass them to
 // "handleLogin",
 //
-//	func handleLogin(req *http.Request, reqBody []byte) ([]byte, error)
-//	{
-//		// Process login input from req.Form and reqBody.
-//		// return response and/or error
+//	func handleLogin(req *http.Request, reqBody []byte) (resBody []byte, err error) {
+//		// Process login input from req.Form, req.PostForm, and/or
+//		// reqBody.
+//		// Return response body and error.
 //	}
 //
 // Known Bugs

@@ -89,7 +89,7 @@ func (ep *Endpoint) call(res http.ResponseWriter, req *http.Request,
 		}
 	}
 
-	rspb, e := ep.Call(req, reqBody)
+	rspb, e := ep.Call(res, req, reqBody)
 	if e != nil {
 		log.Printf("endpoint.call: %d %s %s %s\n",
 			http.StatusInternalServerError,
