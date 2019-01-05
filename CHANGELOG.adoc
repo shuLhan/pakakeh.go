@@ -4,6 +4,14 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+== share v0.3.0 (2019-xx-xx)
+
+=== New Features
+
+* `lib/http`: add parameter http.ResponseWriter to Callback.
+* `lib/http`: the RegisterXxx functions now use the Endpoint type.
+
+
 == share v0.2.0 (2019-01-02)
 
 === New Features
