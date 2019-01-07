@@ -133,3 +133,15 @@ code due to their scope and limitation of godoc formatting itself.
 
 * link:doc/SMTP.html[Simple Mail Transfer Protocol (RFC 5321)]
 * link:doc/IMF.html[Internet Message Format (RFC 5322)]
+
+=== Development
+
+The documentation created using asciidoctor.  First, install `ruby` and
+`bundler`, and then execute `bundler` on source root directory.
+
+During development of documentation execute,
+
+       $ bundler exec guard -i
+
+to watch changes on documentation files (".adoc") and regenerate the HTML
+files.
