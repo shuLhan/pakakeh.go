@@ -6,6 +6,7 @@ package smtp
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -23,7 +24,7 @@ type Client struct {
 	data       []byte
 	buf        bytes.Buffer
 	raddr      *net.TCPAddr
-	conn       *net.TCPConn
+	conn       net.Conn
 	serverInfo *ServerInfo
 }
 
@@ -63,8 +64,12 @@ func NewClient(raddr string) (cl *Client, err error) {
 //
 // Connect open a connection to server and return server greeting.
 //
-func (cl *Client) Connect() (res *Response, err error) {
-	cl.conn, err = net.DialTCP("tcp", nil, cl.raddr)
+func (cl *Client) Connect(insecure bool) (res *Response, err error) {
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: insecure,
+	}
+
+	cl.conn, err = tls.Dial("tcp", cl.raddr.String(), tlsConfig)
 	if err != nil {
 		return nil, err
 	}

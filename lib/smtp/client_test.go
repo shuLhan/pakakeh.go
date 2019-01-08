@@ -20,7 +20,7 @@ func TestConnect(t *testing.T) {
 		Message: testEnv.Hostname(),
 	}
 
-	res, err := testClient.Connect()
+	res, err := testClient.Connect(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,13 +38,13 @@ func TestEhlo(t *testing.T) {
 		desc: "With no argument",
 		exp: &Response{
 			Code:    StatusOK,
-			Message: "mail.localdomain",
+			Message: "mail.kilabit.local",
 			Body: []string{
 				"DSN",
 			},
 		},
 		expServerInfo: &ServerInfo{
-			Domain: "mail.localdomain",
+			Domain: "mail.kilabit.local",
 			Exts: []string{
 				"dsn",
 			},
@@ -129,7 +129,7 @@ func TestSendCommand(t *testing.T) {
 		cmd:  []byte("HELO 192.168.10.1\r\n"),
 		exp: &Response{
 			Code:    StatusOK,
-			Message: "mail.localdomain",
+			Message: "mail.kilabit.local",
 		},
 	}, {
 		desc: "Send NOOP",
