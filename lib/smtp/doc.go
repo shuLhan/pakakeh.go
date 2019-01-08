@@ -2,5 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//
 // Package smtp provide a library for building SMTP server and client.
+//
+// Limitations
+//
+// The server favor implicit TLS over STARTTLS (RFC8314).  When server's
+// environment is configured with certificate, server will listen on port
+// 465 only, not on port 25 and 465 and neither on port 465 and 587.
+//
 package smtp
