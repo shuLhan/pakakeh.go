@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 
 	handler := &testHandler{}
 	storage := &testStorage{}
-	testEnv, err = NewEnvironmentIni("smtpd.conf")
+	testEnv, err = NewEnvironmentIni("testdata/smtpd.conf")
 	if err != nil {
 		log.Fatal("NewEnvironmentIni: ", err)
 	}
