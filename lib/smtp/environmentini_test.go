@@ -50,6 +50,14 @@ func TestNewEnvironmentIni(t *testing.T) {
 		desc:   "With invalid domain",
 		file:   "testdata/smtpd.conf.invalid-domain",
 		expErr: "EnvironmentIni: invalid domain ''",
+	}, {
+		desc:        "With valid config",
+		file:        "testdata/smtpd.conf",
+		expHostname: "mail.kilabit.local",
+		expDomains: []string{
+			"local.localdomain",
+			"mail.kilabit.local",
+		},
 	}}
 
 	for _, c := range cases {

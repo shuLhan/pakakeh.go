@@ -5,8 +5,10 @@
 package smtp
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"sort"
@@ -18,6 +20,8 @@ import (
 
 const (
 	defFileConfig = "smtpd.conf"
+	keyCertPath   = "certificate_key"
+	keyPrivPath   = "private_key"
 	keyHostname   = "hostname"
 	keyDomains    = "domains"
 	secSMTPD      = "smtpd"
@@ -39,15 +43,22 @@ const (
 // "domains" key contains list of domain name that will be handled for
 // incoming message. Each domain is separated by comma.
 //
+// "certificate_key" contains path to TLS certificate key.
+//
+// "private_key" contains path to server private key.
+//
 // Example,
 //
 //	[smtpd]
 //	hostname = mail.local
 //	domains = local.localdomain,localhost,...
+//	certificate_key = /path/to/cert.pem
+//	private_key = /path/to/key.pem
 //
 type EnvironmentIni struct {
 	hostname string
 	domains  []string
+	cert     *tls.Certificate
 }
 
 //
@@ -86,6 +97,13 @@ func (env *EnvironmentIni) Domains() []string {
 //
 func (env *EnvironmentIni) Hostname() string {
 	return env.hostname
+}
+
+//
+// Certificate return the server certificate for TLS.
+//
+func (env *EnvironmentIni) Certificate() *tls.Certificate {
+	return env.cert
 }
 
 func (env *EnvironmentIni) init(cfg *ini.Ini) (err error) {
@@ -132,5 +150,77 @@ func (env *EnvironmentIni) init(cfg *ini.Ini) (err error) {
 
 	sort.Strings(env.domains)
 
+	err = env.loadCertificate(cfg)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (env *EnvironmentIni) loadCertificate(cfg *ini.Ini) (err error) {
+	certPEM, err := env.loadCertKey(cfg)
+	if err != nil {
+		return err
+	}
+
+	keyPEM, err := env.loadPrivateKey(cfg)
+	if err != nil {
+		return err
+	}
+	if certPEM == nil || keyPEM == nil {
+		return nil
+	}
+
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
+	if err != nil {
+		return errors.New("loadCertificate: " + err.Error())
+	}
+
+	env.cert = &cert
+
+	return nil
+}
+
+func (env *EnvironmentIni) loadCertKey(cfg *ini.Ini) (b []byte, err error) {
+	v, ok := cfg.Get(secSMTPD, "", keyCertPath)
+	if !ok {
+		return nil, nil
+	}
+	if len(v) == 0 || v == "true" {
+		log.Println("loadCertKey: certificate path is empty")
+		return nil, nil
+	}
+
+	b, err = ioutil.ReadFile(v)
+	if err != nil {
+		return nil, errors.New("loadCertKey: " + err.Error())
+	}
+
+	if len(b) == 0 {
+		return nil, errors.New("loadCertKey: empty certificate")
+	}
+
+	return b, nil
+}
+
+func (env *EnvironmentIni) loadPrivateKey(cfg *ini.Ini) (b []byte, err error) {
+	v, ok := cfg.Get(secSMTPD, "", keyPrivPath)
+	if !ok {
+		return nil, nil
+	}
+	if len(v) == 0 || v == "true" {
+		log.Println("loadPrivateKey: private key path is empty")
+		return nil, nil
+	}
+
+	b, err = ioutil.ReadFile(v)
+	if err != nil {
+		return nil, errors.New("loadPrivateKey: " + err.Error())
+	}
+	if len(b) == 0 {
+		return nil, errors.New("loadPrivateKey: empty private key")
+	}
+
+	return b, nil
 }

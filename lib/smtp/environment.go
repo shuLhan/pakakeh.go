@@ -4,6 +4,10 @@
 
 package smtp
 
+import (
+	"crypto/tls"
+)
+
 //
 // Environment define an interface for SMTP server environment.
 //
@@ -13,4 +17,8 @@ type Environment interface {
 
 	// Domains return list of domains to be handled as final destination.
 	Domains() []string
+
+	// Certificate return the server certificate for TLS or nil if no
+	// certificate.
+	Certificate() *tls.Certificate
 }
