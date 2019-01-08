@@ -67,19 +67,19 @@ type Server struct {
 // ListenAndServe start listening the SMTP request.
 // Each client connection will be handled in a single routine.
 //
-func (s *Server) ListenAndServe() (err error) {
-	err = s.init()
+func (srv *Server) ListenAndServe() (err error) {
+	err = srv.init()
 	if err != nil {
 		return
 	}
 
-	go s.processRelayQueue()
-	go s.processBounceQueue()
-	go s.processMailTxQueue()
+	go srv.processRelayQueue()
+	go srv.processBounceQueue()
+	go srv.processMailTxQueue()
 
 	for {
 		fmt.Println("ListenAndServe: waiting for client ...")
-		conn, err := s.listener.Accept()
+		conn, err := srv.listener.Accept()
 		if err != nil {
 			log.Printf("ListenAndServe.Accept: %s", err)
 			break
@@ -87,10 +87,10 @@ func (s *Server) ListenAndServe() (err error) {
 
 		recv := newReceiver(conn)
 
-		go s.handle(recv)
+		go srv.handle(recv)
 	}
 
-	err = s.listener.Close()
+	err = srv.listener.Close()
 	if err != nil {
 		log.Printf("ListenAndServe.Close: %s", err)
 	}
@@ -101,8 +101,8 @@ func (s *Server) ListenAndServe() (err error) {
 //
 // handle receiver connection.
 //
-func (s *Server) handle(recv *receiver) {
-	err := recv.sendReply(StatusReady, s.Env.Hostname(), nil)
+func (srv *Server) handle(recv *receiver) {
+	err := recv.sendReply(StatusReady, srv.Env.Hostname(), nil)
 	if err != nil {
 		log.Println("receiver.sendReply: ", err.Error())
 		recv.close()
@@ -120,7 +120,7 @@ func (s *Server) handle(recv *receiver) {
 			continue
 		}
 
-		for _, ext := range s.Exts {
+		for _, ext := range srv.Exts {
 			err = ext.ValidateCommand(cmd)
 			if err != nil {
 				break
@@ -131,7 +131,7 @@ func (s *Server) handle(recv *receiver) {
 			continue
 		}
 
-		err = s.handleCommand(recv, cmd)
+		err = srv.handleCommand(recv, cmd)
 		if err != nil {
 			log.Println("Server.handleCommand: ", err.Error())
 			break
@@ -139,7 +139,7 @@ func (s *Server) handle(recv *receiver) {
 
 		switch recv.state {
 		case CommandDATA:
-			err = s.processMailTx(recv.mail)
+			err = srv.processMailTx(recv.mail)
 			if err != nil {
 				log.Println("server.processMailTx: ", err.Error())
 				err = recv.sendError(errInProcessing)
@@ -166,7 +166,7 @@ out:
 //
 // handleCommand from client.
 //
-func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
+func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	if debug.Value > 0 {
 		log.Printf("handleCommand: %v\n", cmd)
 	}
@@ -197,12 +197,12 @@ func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	case CommandEHLO:
 		recv.clientDomain = cmd.Arg
 
-		body := make([]string, len(s.Exts))
-		for x, ext := range s.Exts {
+		body := make([]string, len(srv.Exts))
+		for x, ext := range srv.Exts {
 			body[x] = ext.Name()
 		}
 
-		err = recv.sendReply(StatusOK, s.Env.Hostname(), body)
+		err = recv.sendReply(StatusOK, srv.Env.Hostname(), body)
 		if err != nil {
 			return err
 		}
@@ -211,7 +211,7 @@ func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	case CommandHELO:
 		recv.clientDomain = cmd.Arg
 
-		err = recv.sendReply(StatusOK, s.Env.Hostname(), nil)
+		err = recv.sendReply(StatusOK, srv.Env.Hostname(), nil)
 		if err != nil {
 			return err
 		}
@@ -249,7 +249,7 @@ func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		}
 
 	case CommandVRFY:
-		res, err := s.Handler.ServeVerify(cmd.Arg)
+		res, err := srv.Handler.ServeVerify(cmd.Arg)
 		if err != nil {
 			return err
 		}
@@ -259,7 +259,7 @@ func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		}
 
 	case CommandEXPN:
-		res, err := s.Handler.ServeExpand(cmd.Arg)
+		res, err := srv.Handler.ServeExpand(cmd.Arg)
 		if err != nil {
 			return err
 		}
@@ -269,7 +269,7 @@ func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		}
 
 	case CommandHELP:
-		err = s.handleHELP(recv, cmd.Arg)
+		err = srv.handleHELP(recv, cmd.Arg)
 		if err != nil {
 			return err
 		}
@@ -289,69 +289,69 @@ func (s *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	return nil
 }
 
-func (s *Server) handleHELP(recv *receiver, arg string) (err error) {
+func (srv *Server) handleHELP(recv *receiver, arg string) (err error) {
 	return recv.sendReply(StatusHelp, "Everything will be alright", nil)
 }
 
 //
 // init initiliaze environment, handler, extensions, and connection listener.
 //
-func (s *Server) init() (err error) {
-	if s.Env == nil {
-		s.Env, err = NewEnvironmentIni("")
+func (srv *Server) init() (err error) {
+	if srv.Env == nil {
+		srv.Env, err = NewEnvironmentIni("")
 		if err != nil {
 			return
 		}
 	}
 
-	if s.Handler == nil {
-		s.Handler = &HandlerPosix{}
+	if srv.Handler == nil {
+		srv.Handler = &HandlerPosix{}
 	}
 
-	if s.Storage == nil {
-		s.Storage, err = NewStorageFile("")
+	if srv.Storage == nil {
+		srv.Storage, err = NewStorageFile("")
 		if err != nil {
 			return
 		}
 	}
 
-	if s.Exts == nil {
-		s.Exts = defaultExts
+	if srv.Exts == nil {
+		srv.Exts = defaultExts
 	} else {
-		s.Exts = append(s.Exts, defaultExts...)
+		srv.Exts = append(srv.Exts, defaultExts...)
 	}
 
-	err = s.initListener()
+	err = srv.initListener()
 	if err != nil {
 		return err
 	}
 
-	s.mailTxQueue = make(chan *MailTx, 512)
-	s.bounceQueue = make(chan *MailTx, 512)
-	s.relayQueue = make(chan *MailTx, 512)
+	srv.mailTxQueue = make(chan *MailTx, 512)
+	srv.bounceQueue = make(chan *MailTx, 512)
+	srv.relayQueue = make(chan *MailTx, 512)
 
 	return nil
 }
 
-func (s *Server) initListener() (err error) {
-	cert := s.Env.Certificate()
+func (srv *Server) initListener() (err error) {
+	cert := srv.Env.Certificate()
 	if cert == nil {
-		if len(s.Addr) == 0 {
-			s.Addr = ":25"
+		if len(srv.Addr) == 0 {
+			srv.Addr = ":25"
 		}
 	} else {
-		if len(s.Addr) == 0 {
-			s.Addr = ":465"
+		if len(srv.Addr) == 0 {
+			srv.Addr = ":465"
 		}
 	}
 
-	addr, err := net.ResolveTCPAddr("tcp", s.Addr)
+	addr, err := net.ResolveTCPAddr("tcp", srv.Addr)
 	if err != nil {
 		return err
 	}
 
 	if cert == nil {
-		s.listener, err = net.ListenTCP("tcp", addr)
+		srv.listener, err = net.ListenTCP("tcp", addr)
 	} else {
 		tlsCfg := &tls.Config{
 			Certificates: []tls.Certificate{
@@ -359,7 +359,7 @@ func (s *Server) initListener() (err error) {
 			},
 			MinVersion: tls.VersionTLS11,
 		}
-		s.listener, err = tls.Listen("tcp", s.Addr, tlsCfg)
+		srv.listener, err = tls.Listen("tcp", srv.Addr, tlsCfg)
 	}
 	if err != nil {
 		return err
@@ -368,8 +368,8 @@ func (s *Server) initListener() (err error) {
 	return nil
 }
 
-func (s *Server) isLocalDomain(d string) bool {
-	for _, domain := range s.Env.Domains() {
+func (srv *Server) isLocalDomain(d string) bool {
+	for _, domain := range srv.Env.Domains() {
 		if d == domain {
 			return true
 		}
@@ -377,8 +377,8 @@ func (s *Server) isLocalDomain(d string) bool {
 	return false
 }
 
-func (s *Server) processMailTxQueue() {
-	for mail := range s.mailTxQueue {
+func (srv *Server) processMailTxQueue() {
+	for mail := range srv.mailTxQueue {
 		if mail.isPostponed() {
 			continue
 		}
@@ -391,26 +391,26 @@ func (s *Server) processMailTxQueue() {
 
 		switch len(addr) {
 		case 2:
-			if s.isLocalDomain(addr[1]) {
-				_, err = s.Handler.ServeMailTx(mail)
+			if srv.isLocalDomain(addr[1]) {
+				_, err = srv.Handler.ServeMailTx(mail)
 			} else {
-				s.relayQueue <- mail
+				srv.relayQueue <- mail
 			}
 		case 1:
 			if addr[0] == localPostmaster {
-				_, err = s.Handler.ServeMailTx(mail)
+				_, err = srv.Handler.ServeMailTx(mail)
 			} else {
-				s.bounceQueue <- mail
+				srv.bounceQueue <- mail
 			}
 		default:
-			s.bounceQueue <- mail
+			srv.bounceQueue <- mail
 		}
 
 		if err != nil {
 			if mail.Retry < 5 {
 				mail.postpone()
 			} else {
-				s.bounceQueue <- mail
+				srv.bounceQueue <- mail
 			}
 		}
 	}
@@ -422,9 +422,9 @@ func (s *Server) processMailTxQueue() {
 // If sender domain is one of ours, call the handler; otherwise send them
 // using SMTP through relay queue.
 //
-func (s *Server) processBounceQueue() {
-	for mail := range s.bounceQueue {
-		err := s.Storage.Bounce(mail.ID)
+func (srv *Server) processBounceQueue() {
+	for mail := range srv.bounceQueue {
+		err := srv.Storage.Bounce(mail.ID)
 		if err != nil {
 			continue
 		}
@@ -434,8 +434,8 @@ func (s *Server) processBounceQueue() {
 //
 // processRelayQueue send mail to other MTA.
 //
-func (s *Server) processRelayQueue() {
-	for range s.relayQueue {
+func (srv *Server) processRelayQueue() {
+	for range srv.relayQueue {
 		// TODO:
 	}
 }
@@ -445,18 +445,18 @@ func (s *Server) processRelayQueue() {
 // mail object, storing it into storage, and push it to the queue for further
 // processing.
 //
-func (s *Server) processMailTx(mail *MailTx) (err error) {
+func (srv *Server) processMailTx(mail *MailTx) (err error) {
 	mails := make([]*MailTx, len(mail.Recipients))
 	for x, rcpt := range mail.Recipients {
 		mails[x] = NewMailTx(mail.From, []string{rcpt}, mail.Data)
 
-		err = s.Storage.Store(mails[x])
+		err = srv.Storage.Store(mails[x])
 		if err != nil {
 			return
 		}
 	}
 	for _, mail := range mails {
-		s.mailTxQueue <- mail
+		srv.mailTxQueue <- mail
 	}
 
 	return nil
