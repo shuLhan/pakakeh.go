@@ -15,7 +15,7 @@ import (
 )
 
 type receiver struct {
-	conn          *net.TCPConn
+	conn          net.Conn
 	data          []byte
 	buff          bytes.Buffer
 	state         CommandKind
@@ -25,7 +25,7 @@ type receiver struct {
 	mail          *MailTx
 }
 
-func newReceiver(conn *net.TCPConn) (recv *receiver) {
+func newReceiver(conn net.Conn) (recv *receiver) {
 	recv = &receiver{
 		conn: conn,
 		data: make([]byte, 4096),

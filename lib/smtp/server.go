@@ -5,6 +5,8 @@
 package smtp
 
 import (
+	"crypto/tls"
+	"fmt"
 	"log"
 	"net"
 	"strings"
@@ -47,8 +49,8 @@ type Server struct {
 	//
 	Storage Storage
 
-	// l a socket that listen for new connection from client.
-	l *net.TCPListener
+	// listener is a socket that listen for new connection from client.
+	listener net.Listener
 
 	// mailTxQueue hold mail objects before being relayed or stored.
 	mailTxQueue chan *MailTx
@@ -62,7 +64,7 @@ type Server struct {
 }
 
 //
-// ListenAndServe start listening the SMTP request on port 25.
+// ListenAndServe start listening the SMTP request.
 // Each client connection will be handled in a single routine.
 //
 func (s *Server) ListenAndServe() (err error) {
@@ -76,9 +78,10 @@ func (s *Server) ListenAndServe() (err error) {
 	go s.processMailTxQueue()
 
 	for {
-		conn, err := s.l.AcceptTCP()
+		fmt.Println("ListenAndServe: waiting for client ...")
+		conn, err := s.listener.Accept()
 		if err != nil {
-			log.Printf("ListenAndServe.AcceptTCP: %s", err)
+			log.Printf("ListenAndServe.Accept: %s", err)
 			break
 		}
 
@@ -87,9 +90,9 @@ func (s *Server) ListenAndServe() (err error) {
 		go s.handle(recv)
 	}
 
-	eClose := s.l.Close()
-	if eClose != nil {
-		log.Printf("ListenAndServe.Close: %s", eClose)
+	err = s.listener.Close()
+	if err != nil {
+		log.Printf("ListenAndServe.Close: %s", err)
 	}
 
 	return
@@ -291,13 +294,9 @@ func (s *Server) handleHELP(recv *receiver, arg string) (err error) {
 }
 
 //
-// init initiliazer environment, handler, extensions, and connection listener.
+// init initiliaze environment, handler, extensions, and connection listener.
 //
 func (s *Server) init() (err error) {
-	if len(s.Addr) == 0 {
-		s.Addr = ":25"
-	}
-
 	if s.Env == nil {
 		s.Env, err = NewEnvironmentIni("")
 		if err != nil {
@@ -322,21 +321,49 @@ func (s *Server) init() (err error) {
 		s.Exts = append(s.Exts, defaultExts...)
 	}
 
-	if s.l == nil {
-		addr, err := net.ResolveTCPAddr("tcp", s.Addr)
-		if err != nil {
-			return err
-		}
-
-		s.l, err = net.ListenTCP("tcp", addr)
-		if err != nil {
-			return err
-		}
+	err = s.initListener()
+	if err != nil {
+		return err
 	}
 
 	s.mailTxQueue = make(chan *MailTx, 512)
 	s.bounceQueue = make(chan *MailTx, 512)
 	s.relayQueue = make(chan *MailTx, 512)
+
+	return nil
+}
+
+func (s *Server) initListener() (err error) {
+	cert := s.Env.Certificate()
+	if cert == nil {
+		if len(s.Addr) == 0 {
+			s.Addr = ":25"
+		}
+	} else {
+		if len(s.Addr) == 0 {
+			s.Addr = ":465"
+		}
+	}
+
+	addr, err := net.ResolveTCPAddr("tcp", s.Addr)
+	if err != nil {
+		return err
+	}
+
+	if cert == nil {
+		s.listener, err = net.ListenTCP("tcp", addr)
+	} else {
+		tlsCfg := &tls.Config{
+			Certificates: []tls.Certificate{
+				*cert,
+			},
+			MinVersion: tls.VersionTLS11,
+		}
+		s.listener, err = tls.Listen("tcp", s.Addr, tlsCfg)
+	}
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
