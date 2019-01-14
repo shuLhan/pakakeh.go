@@ -41,12 +41,14 @@ func TestEhlo(t *testing.T) {
 			Message: "mail.kilabit.local",
 			Body: []string{
 				"DSN",
+				"AUTH PLAIN",
 			},
 		},
 		expServerInfo: &ServerInfo{
 			Domain: "mail.kilabit.local",
 			Exts: []string{
 				"dsn",
+				"auth",
 			},
 		},
 	}}
@@ -63,6 +65,62 @@ func TestEhlo(t *testing.T) {
 		test.Assert(t, "ServerInfo", c.expServerInfo,
 			testClient.serverInfo, true)
 	}
+}
+
+func TestAuth(t *testing.T) {
+	cases := []struct {
+		desc     string
+		mech     Mechanism
+		username string
+		password string
+		expErr   string
+		exp      *Response
+	}{{
+		desc:     "With invalid mechanism",
+		username: testUsername,
+		password: testPassword,
+		expErr:   "Authenticate: unknown mechanism",
+	}, {
+		desc:     "With invalid credential",
+		mech:     MechanismPLAIN,
+		username: testUsername,
+		password: "invalid",
+		exp: &Response{
+			Code:    StatusInvalidCredential,
+			Message: "5.7.8 Authentication credentials invalid",
+		},
+	}, {
+		desc:     "With valid credential",
+		mech:     MechanismPLAIN,
+		username: testUsername,
+		password: testPassword,
+		exp: &Response{
+			Code:    StatusAuthenticated,
+			Message: "2.7.0 Authentication successful",
+		},
+	}, {
+		desc:     "With valid credential again",
+		mech:     MechanismPLAIN,
+		username: testUsername,
+		password: testPassword,
+		exp: &Response{
+			Code:    StatusCmdBadSequence,
+			Message: "Bad sequence of commands",
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got, err := testClient.Authenticate(c.mech, c.username, c.password)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "Response", c.exp, got, true)
+	}
+
 }
 
 func TestExpand(t *testing.T) {

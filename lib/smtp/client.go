@@ -7,6 +7,7 @@ package smtp
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net"
@@ -59,6 +60,27 @@ func NewClient(raddr string) (cl *Client, err error) {
 	fmt.Printf("NewClient: %v\n", cl.raddr)
 
 	return cl, nil
+}
+
+//
+// Authenticate to server using one of SASL mechanism.
+// Currently, the only mechanism available is PLAIN.
+//
+func (cl *Client) Authenticate(mech Mechanism, username, password string) (
+	res *Response, err error,
+) {
+	var cmd []byte
+
+	switch mech {
+	case MechanismPLAIN:
+		b := []byte("\x00" + username + "\x00" + password)
+		initialResponse := base64.StdEncoding.EncodeToString(b)
+		cmd = []byte("AUTH PLAIN " + initialResponse + "\r\n")
+	default:
+		return nil, fmt.Errorf("Authenticate: unknown mechanism")
+	}
+
+	return cl.SendCommand(cmd)
 }
 
 //

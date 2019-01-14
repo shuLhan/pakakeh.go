@@ -10,6 +10,11 @@ import (
 
 // List of errors.
 var (
+	ErrInvalidCredential = &errors.E{
+		Code:    StatusInvalidCredential,
+		Message: "5.7.8 Authentication credentials invalid",
+	}
+
 	errCmdSyntaxError = &errors.E{
 		Code:    StatusCmdSyntaxError,
 		Message: "Syntax error in parameter or arguments",
@@ -27,5 +32,18 @@ var (
 	errInProcessing = &errors.E{
 		Code:    StatusLocalError,
 		Message: "Local error in processing",
+	}
+
+	errAuthMechanism = &errors.E{
+		Code:    StatusParamUnimplemented,
+		Message: "5.5.4 Command parameter not implemented",
+	}
+	errNotAuthenticated = &errors.E{
+		Code:    StatusNotAuthenticated,
+		Message: "5.7.0 Authentication required",
+	}
+	errBadSequence = &errors.E{
+		Code:    StatusCmdBadSequence,
+		Message: "Bad sequence of commands",
 	}
 )

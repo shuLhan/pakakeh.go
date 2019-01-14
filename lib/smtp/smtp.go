@@ -23,6 +23,7 @@ const (
 	StatusHelp          = 214
 	StatusReady         = 220
 	StatusClosing       = 221
+	StatusAuthenticated = 235 // RFC 4954
 	StatusOK            = 250
 	StatusAddressChange = 251 // RFC 5321, section 3.4.
 	StatusVerifyFailed  = 252 // RFC 5321, section 3.5.3.
@@ -35,6 +36,7 @@ const (
 	// SMTP client should send another command specifying this
 	// information.  This reply is used in command DATA.
 	//
+	StatusAuthReady = 334
 	StatusDataReady = 354
 
 	//
@@ -77,6 +79,8 @@ const (
 	StatusCmdNotImplemented    = 502 // RFC 5321, section 4.2.4.
 	StatusCmdBadSequence       = 503
 	StatusParamUnimplemented   = 504
+	StatusNotAuthenticated     = 530
+	StatusInvalidCredential    = 535
 	StatusMailboxNotFound      = 550
 	StatusAddressChangeAborted = 551 // RFC 5321, section 3.4.
 	StatusMailNoStorage        = 552

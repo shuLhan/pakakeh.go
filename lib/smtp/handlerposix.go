@@ -6,6 +6,12 @@ package smtp
 
 type HandlerPosix struct{}
 
+func (hp *HandlerPosix) ServeAuth(username, password string) (
+	res *Response, err error,
+) {
+	return nil, nil
+}
+
 func (hp *HandlerPosix) ServeBounce(mail *MailTx) (res *Response, err error) {
 	return nil, nil
 }

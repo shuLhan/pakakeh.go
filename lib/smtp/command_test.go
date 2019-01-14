@@ -267,6 +267,25 @@ func TestUnpack(t *testing.T) {
 			Kind: CommandVRFY,
 			Arg:  "mail@box.com",
 		},
+	}, {
+		desc:   "AUTH without argument",
+		b:      "AUTH\r\n",
+		expErr: errCmdSyntaxError,
+	}, {
+		desc: "AUTH with mechanism only",
+		b:    "AUTH PLAIN\r\n",
+		expCmd: &Command{
+			Kind: CommandAUTH,
+			Arg:  "PLAIN",
+		},
+	}, {
+		desc: "AUTH with mechanism and initial-response",
+		b:    "AUTH PLAIN AHRlc3QAMTIzNA==\r\n",
+		expCmd: &Command{
+			Kind:  CommandAUTH,
+			Arg:   "PLAIN",
+			Param: "AHRlc3QAMTIzNA==",
+		},
 	}}
 
 	cmd := newCommand()

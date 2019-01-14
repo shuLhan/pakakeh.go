@@ -9,6 +9,7 @@ package smtp
 // and handling EXPN and VRFY commands.
 //
 type Handler interface {
+	ServeAuth(username, password string) (*Response, error)
 	ServeBounce(mail *MailTx) (*Response, error)
 	ServeExpand(mailingList string) (*Response, error)
 	ServeMailTx(mail *MailTx) (*Response, error)

@@ -132,10 +132,15 @@ there are also additional documentations that we can't include inside source
 code due to their scope and limitation of godoc formatting itself.
 
 * link:doc/SASL.html[Simple Authentication and Security Layer (RFC 4422)]
+** link:doc/SASL_PLAIN.html[The PLAIN Simple Authentication and Security Layer
+(SASL) Mechanism (RFC 4616)]
+
 * link:doc/SMTP.html[Simple Mail Transfer Protocol (RFC5321)]
 ** link:doc/ESMTP_DSN.html[Delivery Status Notification (RFC3461-3464)]
 ** link:doc/ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over
 Transport Layer Security (RFC3207)]
+** link:doc/ESMTP_AUTH.html[SMTP Service Extension for Authentication
+(RFC 4954)]
 
 * link:doc/IMF.html[Internet Message Format (RFC 5322)]
 

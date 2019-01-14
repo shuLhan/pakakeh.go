@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	testAddress = "127.0.0.1:2525"
+	testAddress  = "127.0.0.1:2525"
+	testUsername = "test@mail.kilabit.local"
+	testPassword = "secret"
 )
 
 var ( // nolint: gochecknoglobals

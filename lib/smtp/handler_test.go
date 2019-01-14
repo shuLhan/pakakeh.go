@@ -6,6 +6,19 @@ package smtp
 
 type testHandler struct{}
 
+func (th *testHandler) ServeAuth(username, password string) (
+	res *Response, err error,
+) {
+	if username == testUsername && password == testPassword {
+		res = &Response{
+			Code:    StatusAuthenticated,
+			Message: "2.7.0 Authentication successful",
+		}
+		return res, nil
+	}
+	return nil, ErrInvalidCredential
+}
+
 func (th *testHandler) ServeBounce(mail *MailTx) (res *Response, err error) {
 	res = &Response{
 		Code: StatusOK,

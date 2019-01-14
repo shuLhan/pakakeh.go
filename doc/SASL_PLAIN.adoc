@@ -1,0 +1,55 @@
+= The PLAIN Simple Authentication and Security Layer (SASL) Mechanism
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc:
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc4616: https://tools.ietf.org/html/rfc4616
+
+This document provide note and summary of RFC 4616, The PLAIN Simple
+Authentication and Security Layer (SASL) Mechanism.
+
+== Introduction
+
+The name associated with this mechanism is "PLAIN".
+
+The PLAIN mechanism does not provide a security layer.
+
+== Mechanism
+
+The mechanism consists of a single message, a string of [UTF-8] encoded
+[Unicode] characters, from the client to the server.
+
+....
+message   = [authzid] UTF8NUL authcid UTF8NUL password
+authcid   = 1*SAFE ; MUST accept up to 255 octets
+authzid   = 1*SAFE ; MUST accept up to 255 octets
+password    = 1*SAFE ; MUST accept up to 255 octets
+UTF8NUL   = %x00 ; UTF-8 encoded NUL character
+
+SAFE      = UTF1 / UTF2 / UTF3 / UTF4
+               ;; any UTF-8 encoded Unicode character except NUL
+
+UTF1      = %x01-7F ;; except NUL
+UTF2      = %xC2-DF UTF0
+UTF3      = %xE0 %xA0-BF UTF0 / %xE1-EC 2(UTF0) /
+               %xED %x80-9F UTF0 / %xEE-EF 2(UTF0)
+UTF4      = %xF0 %x90-BF 2(UTF0) / %xF1-F3 3(UTF0) /
+               %xF4 %x80-8F 2(UTF0)
+UTF0      = %x80-BF
+....
+
+The form of the authorization identity (authzid) production is specific to the
+application-level protocol's.
+The authentication identity (authcid) and password productions are form-free.
+Use of non-visible characters or characters that a user may be unable to
+enter on some keyboards is discouraged.
+
+== Security Considerations
+
+By default, implementations SHOULD NOT advertise and SHOULD NOT make use of
+the PLAIN mechanism unless adequate data security services are in place,
+generally through use of Transport Layer Security (TLS) service.
+
+Clients are encouraged to have an operational mode where all mechanisms that
+are likely to reveal the user's password to the server are disabled.

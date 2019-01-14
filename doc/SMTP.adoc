@@ -662,7 +662,7 @@ Any current uncompleted mail transaction will be aborted.
 * link:ESMTP_DSN.html[Delivery Status Notification (RFC3461-3464)]
 * link:ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over Transport
 Layer Security (RFC3207)]
-
+* link:ESMTP_AUTH.html[SMTP Service Extension for Authentication (RFC4954)]
 
 == Glossary
 

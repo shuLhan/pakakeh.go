@@ -10,19 +10,21 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 
-	"github.com/shuLhan/share/lib/errors"
+	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
 type receiver struct {
-	conn          net.Conn
-	data          []byte
-	buff          bytes.Buffer
-	state         CommandKind
-	clientDomain  string
-	clientAddress string
-	localAddress  string
-	mail          *MailTx
+	conn            net.Conn
+	data            []byte
+	buff            bytes.Buffer
+	state           CommandKind
+	clientDomain    string
+	clientAddress   string
+	localAddress    string
+	mail            *MailTx
+	isAuthenticated bool
 }
 
 func newReceiver(conn net.Conn) (recv *receiver) {
@@ -46,6 +48,36 @@ func (recv *receiver) close() {
 	if err != nil {
 		log.Printf("receiver.close: %s\n", err)
 	}
+}
+
+//
+// readAuthData read AUTH initial response from client into Command Param.
+//
+func (recv *receiver) readAuthData(cmd *Command) (err error) {
+	recv.buff.Reset()
+
+	for {
+		recv.data = recv.data[0:]
+		n, err := recv.conn.Read(recv.data)
+		if n > 0 {
+			_, _ = recv.buff.Write(recv.data[:n])
+		}
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+				break
+			}
+			return err
+		}
+		if n == cap(recv.data) {
+			continue
+		}
+		break
+	}
+
+	cmd.Param = strings.TrimSpace(recv.buff.String())
+
+	return nil
 }
 
 //
@@ -123,7 +155,7 @@ func (recv *receiver) reset() {
 }
 
 func (recv *receiver) sendError(errRes error) (err error) {
-	reply, ok := errRes.(*errors.E)
+	reply, ok := errRes.(*liberrors.E)
 	if !ok {
 		reply.Code = StatusLocalError
 		reply.Message = errRes.Error()

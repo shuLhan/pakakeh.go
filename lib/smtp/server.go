@@ -5,7 +5,9 @@
 package smtp
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net"
@@ -172,7 +174,19 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	}
 
 	switch cmd.Kind {
+	case CommandAUTH:
+		err = srv.handleAUTH(recv, cmd)
+		if err != nil {
+			return err
+		}
+
 	case CommandDATA:
+		if !recv.isAuthenticated {
+			err = recv.sendError(errNotAuthenticated)
+			if err != nil {
+				return err
+			}
+		}
 		if recv.state != CommandRCPT {
 			err = recv.sendReply(StatusCmdBadSequence,
 				"Bad sequences of commands", nil)
@@ -202,6 +216,10 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 			body[x] = ext.Name()
 		}
 
+		if !recv.isAuthenticated {
+			body = append(body, "AUTH PLAIN")
+		}
+
 		err = recv.sendReply(StatusOK, srv.Env.Hostname(), body)
 		if err != nil {
 			return err
@@ -218,14 +236,19 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		recv.state = cmd.Kind
 
 	case CommandMAIL:
-		recv.mail.From = cmd.Arg
-		err = recv.sendReply(StatusOK, "OK", nil)
+		err = srv.handleMAIL(recv, cmd)
 		if err != nil {
 			return err
 		}
-		recv.state = CommandMAIL
 
 	case CommandRCPT:
+		if !recv.isAuthenticated {
+			err = recv.sendError(errNotAuthenticated)
+			if err != nil {
+				return err
+			}
+		}
+
 		recv.mail.Recipients = append(recv.mail.Recipients, cmd.Arg)
 
 		// RFC 5321, 4.5.3.1.8.  Recipients Buffer
@@ -249,6 +272,13 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		}
 
 	case CommandVRFY:
+		if !recv.isAuthenticated {
+			err = recv.sendError(errNotAuthenticated)
+			if err != nil {
+				return err
+			}
+		}
+
 		res, err := srv.Handler.ServeVerify(cmd.Arg)
 		if err != nil {
 			return err
@@ -259,6 +289,13 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		}
 
 	case CommandEXPN:
+		if !recv.isAuthenticated {
+			err = recv.sendError(errNotAuthenticated)
+			if err != nil {
+				return err
+			}
+		}
+
 		res, err := srv.Handler.ServeExpand(cmd.Arg)
 		if err != nil {
 			return err
@@ -269,6 +306,13 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		}
 
 	case CommandHELP:
+		if !recv.isAuthenticated {
+			err = recv.sendError(errNotAuthenticated)
+			if err != nil {
+				return err
+			}
+		}
+
 		err = srv.handleHELP(recv, cmd.Arg)
 		if err != nil {
 			return err
@@ -285,6 +329,93 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 			"Service closing transmission channel", nil)
 		recv.state = CommandQUIT
 	}
+
+	return nil
+}
+
+//
+// handleAUTH process the AUTH command from client.
+//
+func (srv *Server) handleAUTH(recv *receiver, cmd *Command) (err error) {
+	if recv.isAuthenticated {
+		return recv.sendError(errBadSequence)
+	}
+
+	switch recv.state {
+	case CommandMAIL, CommandRCPT, CommandDATA:
+		return recv.sendError(errBadSequence)
+	}
+
+	var username, password string
+
+	switch cmd.Arg {
+	case "PLAIN":
+		// AUTH PLAIN with two steps handshake.
+		if len(cmd.Param) == 0 {
+			err = recv.sendReply(StatusAuthReady, "", nil)
+			if err != nil {
+				return err
+			}
+
+			err = recv.readAuthData(cmd)
+			if err != nil {
+				return err
+			}
+
+			if cmd.Param == "*" {
+				err = recv.sendReply(StatusCmdSyntaxError,
+					"Authentication cancelled", nil)
+				return err
+			}
+		}
+
+		param, err := base64.StdEncoding.DecodeString(cmd.Param)
+		if err != nil {
+			_ = recv.sendError(errCmdSyntaxError)
+			return err
+		}
+
+		args := bytes.Split(param, []byte{'\x00'})
+		if len(args) != 3 {
+			return recv.sendError(errCmdSyntaxError)
+		}
+
+		username = string(args[1])
+		password = string(args[2])
+
+	default:
+		return recv.sendError(errAuthMechanism)
+	}
+
+	res, err := srv.Handler.ServeAuth(username, password)
+	if err != nil {
+		return recv.sendError(err)
+	}
+
+	err = recv.sendReply(res.Code, res.Message, res.Body)
+	if err != nil {
+		return err
+	}
+
+	recv.isAuthenticated = true
+	recv.state = CommandAUTH
+
+	return nil
+}
+
+func (srv *Server) handleMAIL(recv *receiver, cmd *Command) (err error) {
+	if !recv.isAuthenticated {
+		return recv.sendError(errNotAuthenticated)
+	}
+
+	recv.mail.From = cmd.Arg
+
+	err = recv.sendReply(StatusOK, "OK", nil)
+	if err != nil {
+		return err
+	}
+
+	recv.state = CommandMAIL
 
 	return nil
 }
@@ -377,6 +508,16 @@ func (srv *Server) isLocalDomain(d string) bool {
 	return false
 }
 
+//
+// processMailTxQueue process incoming mail transactions.
+// There are three possibilities for incoming mail.
+// First, when the recipient domain is managed by server, the mail will be
+// forwarded to handler, ServeMailTx.
+// Second, when the recipient is not managed by server, the mail will be
+// relayed to another server based on recipient's domain.
+// Last, when recipient is invalid, the mail transaction will be bounced back
+// to sender.
+//
 func (srv *Server) processMailTxQueue() {
 	for mail := range srv.mailTxQueue {
 		if mail.isPostponed() {
@@ -432,7 +573,10 @@ func (srv *Server) processBounceQueue() {
 }
 
 //
-// processRelayQueue send mail to other MTA.
+// processRelayQueue send mail to other MTA or final destination.
+// A mail transaction will be relayed on the following conditions: the
+// domain's name in MAIL FROM is managed by server and the recipient domain's
+// address is not managed by server.
 //
 func (srv *Server) processRelayQueue() {
 	for range srv.relayQueue {
