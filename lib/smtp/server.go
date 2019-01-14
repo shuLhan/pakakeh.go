@@ -214,6 +214,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 		body := make([]string, len(srv.Exts))
 		for x, ext := range srv.Exts {
 			body[x] = ext.Name()
+			body[x] += " " + ext.Params()
 		}
 
 		if !recv.isAuthenticated {

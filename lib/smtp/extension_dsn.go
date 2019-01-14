@@ -15,6 +15,13 @@ func (dsn *extDSN) Name() string {
 }
 
 //
+// Params return the SMTP extension parameters.
+//
+func (dns *extDSN) Params() string {
+	return ""
+}
+
+//
 // ValidateCommand validate command parameter for MAIL and RCPT.
 //
 func (dsn *extDSN) ValidateCommand(cmd *Command) (err error) {

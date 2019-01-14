@@ -14,6 +14,11 @@ type Extension interface {
 	Name() string
 
 	//
+	// Params return the SMTP extension parameters.
+	//
+	Params() string
+
+	//
 	// ValidateCommand validate the command parameters, if the extension
 	// provide custom parameters.
 	//
