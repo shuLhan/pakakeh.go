@@ -5,6 +5,7 @@
 package smtp
 
 import (
+	"encoding/base64"
 	"net"
 	"testing"
 	"time"
@@ -120,7 +121,43 @@ func TestAuth(t *testing.T) {
 
 		test.Assert(t, "Response", c.exp, got, true)
 	}
+}
 
+func TestAuth2(t *testing.T) {
+	cl, err := NewClient(testAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = cl.Connect(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := "AUTH PLAIN\r\n"
+	res, err := cl.SendCommand([]byte(cmd))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exp := &Response{
+		Code: StatusAuthReady,
+	}
+	test.Assert(t, "Response", exp, res, true)
+
+	cred := []byte("\x00" + testUsername + "\x00" + testPassword)
+	cmd = base64.StdEncoding.EncodeToString(cred)
+
+	res, err = cl.SendCommand([]byte(cmd))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exp = &Response{
+		Code:    StatusAuthenticated,
+		Message: "2.7.0 Authentication successful",
+	}
+	test.Assert(t, "Response", exp, res, true)
 }
 
 func TestExpand(t *testing.T) {
