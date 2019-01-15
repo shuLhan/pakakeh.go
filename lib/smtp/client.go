@@ -22,11 +22,14 @@ import (
 // Client for SMTP.
 //
 type Client struct {
-	data       []byte
-	buf        bytes.Buffer
-	raddr      *net.TCPAddr
-	conn       net.Conn
-	serverInfo *ServerInfo
+	// ServerInfo contains the server information, from the response of
+	// EHLO command.
+	ServerInfo *ServerInfo
+
+	data  []byte
+	buf   bytes.Buffer
+	raddr *net.TCPAddr
+	conn  net.Conn
 }
 
 //
@@ -128,7 +131,7 @@ func (cl *Client) Ehlo(domAddr string) (res *Response, err error) {
 	}
 
 	if res.Code == StatusOK {
-		cl.serverInfo = NewServerInfo(res)
+		cl.ServerInfo = NewServerInfo(res)
 		return res, nil
 	}
 
@@ -197,7 +200,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 	if len(mail.Recipients) == 0 {
 		return nil, errors.New("SendMailTx: empty mail 'Recipients' parameter")
 	}
-	if cl.serverInfo == nil {
+	if cl.ServerInfo == nil {
 		res, err = cl.Ehlo("localhost")
 		if err != nil {
 			return nil, err

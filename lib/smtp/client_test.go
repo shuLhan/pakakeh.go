@@ -64,7 +64,7 @@ func TestEhlo(t *testing.T) {
 
 		test.Assert(t, "Ehlo", c.exp, got, true)
 		test.Assert(t, "ServerInfo", c.expServerInfo,
-			testClient.serverInfo, true)
+			testClient.ServerInfo, true)
 	}
 }
 
