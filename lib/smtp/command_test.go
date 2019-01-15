@@ -27,9 +27,13 @@ func TestUnpack(t *testing.T) {
 		expErr: errCmdUnknown,
 	}, {
 		desc: "With length too long",
-		b: "VERIFY " + string(libbytes.Random(
+		b: "VRFY " + string(libbytes.Random(
 			[]byte(libbytes.ASCIILetters), 513)),
 		expErr: errCmdTooLong,
+	}, {
+		desc:   "Without CRLF",
+		b:      "VRFY local.part@domain",
+		expErr: errCmdSyntaxError,
 	}, {
 		desc: "DATA command",
 		b:    "DATA\r\n",
