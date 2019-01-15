@@ -13,6 +13,31 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestNewClient(t *testing.T) {
+	cases := []struct {
+		desc   string
+		raddr  string
+		expErr string
+	}{{
+		desc:   "With invalid IP",
+		raddr:  "!",
+		expErr: "lookup !: no such host",
+	}, {
+		desc:   "With no MX",
+		raddr:  "example.com",
+		expErr: "",
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		_, err := NewClient(c.raddr)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+		}
+	}
+}
+
 func TestConnect(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
