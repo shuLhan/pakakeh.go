@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	testServerAddress = "127.0.0.1:5353"
+	testServerAddress = "127.0.0.1:5300"
 )
 
 var ( // nolint: gochecknoglobals
@@ -213,8 +213,8 @@ func TestMain(m *testing.M) {
 
 	serverOptions := &ServerOptions{
 		IPAddress:        "127.0.0.1",
-		UDPPort:          5353,
-		TCPPort:          5353,
+		UDPPort:          5300,
+		TCPPort:          5300,
 		DoHPort:          8443,
 		DoHCert:          "testdata/domain.crt",
 		DoHCertKey:       "testdata/domain.key",

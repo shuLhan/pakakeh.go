@@ -210,7 +210,7 @@ func clientLookup(nameserver string) {
 }
 
 func ExampleServer() {
-	serverAddress := "127.0.0.1:5353"
+	serverAddress := "127.0.0.1:5300"
 
 	handler := &serverHandler{}
 
@@ -222,8 +222,8 @@ func ExampleServer() {
 
 	serverOptions := &dns.ServerOptions{
 		IPAddress:        "127.0.0.1",
-		TCPPort:          5353,
-		UDPPort:          5353,
+		TCPPort:          5300,
+		UDPPort:          5300,
 		DoHPort:          8443,
 		DoHCert:          "testdata/domain.crt",
 		DoHCertKey:       "testdata/domain.key",
