@@ -66,11 +66,11 @@ type ResourceRecord struct {
 // RData will return slice of bytes, the pointer that hold specific record
 // data, or nil for obsolete type.
 //
-// For RR with type A, NS, CNAME, MB, MG, NULL, PTR, TXT or AAAA, it will
+// For RR with type A, NS, CNAME, MB, MG, MR, NULL, PTR, TXT or AAAA, it will
 // return it as slice of bytes.
 //
-// For RR with type SOA, WKS, HINFO, MINFO, MX, or OPT it will return pointer
-// to specific record type.
+// For RR with type SOA, WKS, HINFO, MINFO, MX, OPT, or SRV it will return
+// pointer to specific record type.
 //
 // For RR with obsolete type (MD or MF) it will return nil.
 //
