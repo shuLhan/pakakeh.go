@@ -209,7 +209,7 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 
 	sender := &UDPClient{
 		Timeout: clientTimeout,
-		conn:    srv.udp,
+		Conn:    srv.udp,
 	}
 
 	for {
