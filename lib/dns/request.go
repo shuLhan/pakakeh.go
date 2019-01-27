@@ -9,13 +9,6 @@ import (
 	"net/http"
 )
 
-// List of known connection type.
-const (
-	ConnTypeUDP = 1
-	ConnTypeTCP = 2
-	ConnTypeDoH = 4
-)
-
 //
 // Request contains UDP address and DNS query message from client.
 //
@@ -27,7 +20,7 @@ const (
 type Request struct {
 	// Kind define the connection type that this request is belong to,
 	// e.g. UDP, TCP, or DoH.
-	Kind int
+	Kind ConnType
 
 	// Message define the DNS query.
 	Message *Message

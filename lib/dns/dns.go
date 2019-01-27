@@ -65,6 +65,15 @@ var ( // nolint: gochecknoglobals
 	clientTimeout = 6 * time.Second
 )
 
+type ConnType byte
+
+// List of known connection type.
+const (
+	ConnTypeUDP ConnType = 1 << iota
+	ConnTypeTCP
+	ConnTypeDoH
+)
+
 // OpCode define a custom type for DNS header operation code.
 type OpCode byte
 
