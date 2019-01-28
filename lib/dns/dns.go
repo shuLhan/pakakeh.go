@@ -53,11 +53,11 @@ const (
 // List of error messages.
 //
 var (
-	ErrNewConnection  = errors.New("Lookup: can't create new connection")
-	ErrLabelSizeLimit = errors.New("Labels should be 63 octet or less")
-	ErrInvalidAddress = errors.New("Invalid address")
-	ErrIPv4Length     = errors.New("Invalid length of A RDATA format")
-	ErrIPv6Length     = errors.New("Invalid length of AAAA RDATA format")
+	ErrNewConnection  = errors.New("lookup: can't create new connection")
+	ErrLabelSizeLimit = errors.New("labels should be 63 octet or less")
+	ErrInvalidAddress = errors.New("invalid address")
+	ErrIPv4Length     = errors.New("invalid length of A RDATA format")
+	ErrIPv6Length     = errors.New("invalid length of AAAA RDATA format")
 )
 
 var ( // nolint: gochecknoglobals
