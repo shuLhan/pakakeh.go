@@ -125,10 +125,8 @@ func (ep *Endpoint) error(res http.ResponseWriter, e error) {
 			Code:    http.StatusInternalServerError,
 			Message: e.Error(),
 		}
-	} else {
-		if se.Code == 0 {
-			se.Code = http.StatusInternalServerError
-		}
+	} else if se.Code == 0 {
+		se.Code = http.StatusInternalServerError
 	}
 
 	res.WriteHeader(se.Code)
