@@ -28,8 +28,7 @@ func (th *testHandler) ServeBounce(mail *MailTx) (res *Response, err error) {
 
 func (th *testHandler) ServeExpand(mailingList string) (res *Response, err error) {
 	res = &Response{}
-	switch mailingList {
-	case "list-exist":
+	if mailingList == "list-exist" {
 		res.Code = StatusOK
 		res.Message = "List Exist"
 		res.Body = []string{

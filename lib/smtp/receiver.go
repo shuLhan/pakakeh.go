@@ -159,10 +159,8 @@ func (recv *receiver) sendError(errRes error) (err error) {
 	if !ok {
 		reply.Code = StatusLocalError
 		reply.Message = errRes.Error()
-	} else {
-		if reply.Code == 0 {
-			reply.Code = StatusLocalError
-		}
+	} else if reply.Code == 0 {
+		reply.Code = StatusLocalError
 	}
 
 	_, err = fmt.Fprintf(recv.conn, "%d %s\r\n", reply.Code, reply.Message)
