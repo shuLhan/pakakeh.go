@@ -180,12 +180,10 @@ func main() {
 	if opts.trainCfg != "" {
 		// (1.1)
 		forest = train(&opts)
-	} else {
 		// (1.2)
-		if len(flag.Args()) == 0 {
-			usage()
-			os.Exit(1)
-		}
+	} else if len(flag.Args()) == 0 {
+		usage()
+		os.Exit(1)
 	}
 
 	// (2)

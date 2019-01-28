@@ -195,12 +195,10 @@ func main() {
 	if o.trainCfg != "" {
 		// (1.1)
 		crforest = train(&o)
-	} else {
 		// (1.2)
-		if len(flag.Args()) == 0 {
-			usage()
-			os.Exit(1)
-		}
+	} else if len(flag.Args()) == 0 {
+		usage()
+		os.Exit(1)
 	}
 
 	// (2)
