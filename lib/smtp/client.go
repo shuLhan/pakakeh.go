@@ -48,7 +48,7 @@ func NewClient(raddr string) (cl *Client, err error) {
 			return nil, err
 		}
 		if ip == nil {
-			err = fmt.Errorf("NewClient: '%s' does not have MX record or IP address", raddr)
+			err = fmt.Errorf("client.NewClient: '%s' does not have MX record or IP address", raddr)
 			return nil, err
 		}
 
@@ -80,7 +80,7 @@ func (cl *Client) Authenticate(mech Mechanism, username, password string) (
 		initialResponse := base64.StdEncoding.EncodeToString(b)
 		cmd = []byte("AUTH PLAIN " + initialResponse + "\r\n")
 	default:
-		return nil, fmt.Errorf("Authenticate: unknown mechanism")
+		return nil, fmt.Errorf("client.Authenticate: unknown mechanism")
 	}
 
 	return cl.SendCommand(cmd)
@@ -212,7 +212,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 
 	res, err = cl.SendCommand(cl.buf.Bytes())
 	if err != nil || res.Code != StatusOK {
-		err = fmt.Errorf("SendMailTx: MAIL FROM: %d - %s\n", res.Code, res.Message)
+		err = fmt.Errorf("client.MailTx: MAIL FROM: %d - %s", res.Code, res.Message)
 		return res, err
 	}
 
@@ -222,7 +222,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 
 		res, err = cl.SendCommand(cl.buf.Bytes())
 		if err != nil || res.Code != StatusOK {
-			err = fmt.Errorf("SendMailTx: RCPT TO: %d - %s\n", res.Code, res.Message)
+			err = fmt.Errorf("client.MailTx: RCPT TO: %d - %s", res.Code, res.Message)
 			return res, err
 		}
 	}
@@ -232,7 +232,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 
 	res, err = cl.SendCommand(cl.buf.Bytes())
 	if err != nil || res.Code != StatusDataReady {
-		err = fmt.Errorf("SendMailTx: DATA: %d - %s\n", res.Code, res.Message)
+		err = fmt.Errorf("client.MailTx: DATA: %d - %s", res.Code, res.Message)
 		return res, err
 	}
 
@@ -247,7 +247,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 
 	res, err = cl.recv()
 	if err != nil || res.Code != StatusOK {
-		err = fmt.Errorf("SendMailTx: Message: %d - %s\n", res.Code, res.Message)
+		err = fmt.Errorf("client.MailTx: Message: %d - %s", res.Code, res.Message)
 	}
 
 	return res, err

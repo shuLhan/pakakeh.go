@@ -105,7 +105,7 @@ func TestAuth(t *testing.T) {
 		desc:     "With invalid mechanism",
 		username: testUsername,
 		password: testPassword,
-		expErr:   "Authenticate: unknown mechanism",
+		expErr:   "client.Authenticate: unknown mechanism",
 	}, {
 		desc:     "With invalid credential",
 		mech:     MechanismPLAIN,
