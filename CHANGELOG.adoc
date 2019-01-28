@@ -8,6 +8,7 @@ first week of next month.
 
 === New Features
 
+* `lib/debug`: add type to store relative and difference on memory heap
 * `lib/dns`: add type of connection
 * `lib/http`: add parameter http.ResponseWriter to Callback.
 * `lib/http`: the RegisterXxx functions now use the Endpoint type.
