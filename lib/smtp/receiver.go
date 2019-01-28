@@ -64,7 +64,6 @@ func (recv *receiver) readAuthData(cmd *Command) (err error) {
 		}
 		if err != nil {
 			if err == io.EOF {
-				err = nil
 				break
 			}
 			return err
@@ -102,7 +101,6 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 		}
 		if err != nil {
 			if err == io.EOF {
-				err = nil
 				break
 			}
 			return nil, err
