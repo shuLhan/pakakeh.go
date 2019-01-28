@@ -201,7 +201,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 		return nil, errors.New("SendMailTx: empty mail 'Recipients' parameter")
 	}
 	if cl.ServerInfo == nil {
-		res, err = cl.Ehlo("localhost")
+		_, err = cl.Ehlo("localhost")
 		if err != nil {
 			return nil, err
 		}
