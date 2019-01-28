@@ -555,14 +555,12 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 		v := new[y : y+xaty]
 		adds = append(adds, text.Chunk{StartAt: aty + y, V: v})
 		newleft = new[y+xaty : yend+1]
-	} else {
-		if yatx >= 0 {
-			// Case 3: We found y token at x: yatx. Previous byte before that must
-			// be a deletion.
-			v := old[x : x+yatx]
-			dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
-			oldleft = old[x+yatx : xend+1]
-		}
+	} else if yatx >= 0 {
+		// Case 3: We found y token at x: yatx. Previous byte before that must
+		// be a deletion.
+		v := old[x : x+yatx]
+		dels = append(dels, text.Chunk{StartAt: atx + x, V: v})
+		oldleft = old[x+yatx : xend+1]
 	}
 
 	addsleft, delsleft := Lines(oldleft, newleft, atx+x, aty+y)
