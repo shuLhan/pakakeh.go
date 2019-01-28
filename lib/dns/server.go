@@ -146,7 +146,7 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
-	req := AllocRequest()
+	req := NewRequest()
 
 	req.Kind = ConnTypeDoH
 	req.ResponseWriter = w
@@ -158,9 +158,7 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	srv.Handler.ServeDNS(req)
 
 	_, ok := <-req.ChanResponded
-	if ok {
-		FreeRequest(req)
-	} else {
+	if !ok {
 		w.WriteHeader(http.StatusGatewayTimeout)
 	}
 }
@@ -195,13 +193,7 @@ func (srv *Server) ListenAndServeTCP(tcpAddr *net.TCPAddr) error {
 //
 // ListenAndServeUDP listen for request with UDP socket.
 //
-func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
-	var (
-		n   int
-		err error
-		req *Request
-	)
-
+func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) (err error) {
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
 	if err != nil {
 		return err
@@ -213,24 +205,22 @@ func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) error {
 	}
 
 	for {
-		if req == nil {
-			req = AllocRequest()
-		}
+		req := NewRequest()
 
-		n, req.UDPAddr, err = srv.udp.ReadFromUDP(req.Message.Packet)
+		n, raddr, err := srv.udp.ReadFromUDP(req.Message.Packet)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 
 		req.Kind = ConnTypeUDP
+		req.UDPAddr = raddr
 		req.Message.Packet = req.Message.Packet[:n]
 
 		req.Message.UnpackHeaderQuestion()
 		req.Sender = sender
 
 		srv.Handler.ServeDNS(req)
-		req = nil
 	}
 }
 
@@ -238,13 +228,9 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 	var (
 		n   int
 		err error
-		req *Request
 	)
 	for {
-		if req == nil {
-			req = AllocRequest()
-		}
-
+		req := NewRequest()
 		for {
 			n, err = cl.Recv(req.Message)
 			if err == nil {
@@ -270,7 +256,6 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 		req.Sender = cl
 
 		srv.Handler.ServeDNS(req)
-		req = nil
 	}
 
 	err = cl.conn.Close()

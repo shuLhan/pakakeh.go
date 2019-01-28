@@ -175,7 +175,6 @@ func (h *serverHandler) ServeDNS(req *Request) {
 				log.Println("! ServeDNS: Sender.Send: ", err)
 			}
 		}
-		FreeRequest(req)
 
 	case ConnTypeTCP:
 		if req.Sender != nil {
@@ -184,7 +183,6 @@ func (h *serverHandler) ServeDNS(req *Request) {
 				log.Println("! ServeDNS: Sender.Send: ", err)
 			}
 		}
-		FreeRequest(req)
 
 	case ConnTypeDoH:
 		if req.ResponseWriter != nil {
@@ -194,9 +192,6 @@ func (h *serverHandler) ServeDNS(req *Request) {
 			}
 			req.ChanResponded <- true
 		}
-
-	default:
-		FreeRequest(req)
 	}
 }
 
