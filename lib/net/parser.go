@@ -31,10 +31,8 @@ func ParseIPPort(address string, defPort uint16) (ip net.IP, port uint16, err er
 		iport, err = strconv.Atoi(sport)
 		if err != nil {
 			iport = int(defPort)
-		} else {
-			if iport < 0 || iport > maxPort {
-				iport = int(defPort)
-			}
+		} else if iport < 0 || iport > maxPort {
+			iport = int(defPort)
 		}
 		port = uint16(iport)
 	} else {
