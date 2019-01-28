@@ -98,14 +98,14 @@ func (rows *Rows) Del(i int) (row *Row) {
 //           [3 -]
 //
 //
-func (rows *Rows) GroupByValue(GroupIdx int) (mapRows MapRows) {
+func (rows *Rows) GroupByValue(groupIdx int) (mapRows MapRows) {
 	for {
 		row := rows.PopFront()
 		if nil == row {
 			break
 		}
 
-		key := fmt.Sprint((*row)[GroupIdx])
+		key := fmt.Sprint((*row)[groupIdx])
 
 		mapRows.AddRow(key, row)
 	}
