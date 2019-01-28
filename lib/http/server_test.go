@@ -135,7 +135,7 @@ func TestRegisterDelete(t *testing.T) {
 	}
 }
 
-var testEvaluator = func(req *http.Request, reqBody []byte) error {
+var testEvaluator = func(req *http.Request, reqBody []byte) error { // nolint: gochecknoglobals
 	k := req.Form.Get("k")
 
 	if len(k) == 0 {
