@@ -586,15 +586,13 @@ func (serv *Server) pinger() {
 	ticker := time.NewTicker(_pingDelay)
 
 	for range ticker.C {
-		serv.clients.Range(func(k, v interface{}) bool {
+		serv.clients.Range(func(k, _ interface{}) bool {
 			conn, ok := k.(int)
-			if !ok {
-				return true
-			}
-
-			_, err := unix.Write(conn, ControlFramePing)
-			if err != nil {
-				serv.clientRemove(conn)
+			if ok {
+				_, err := unix.Write(conn, ControlFramePing)
+				if err != nil {
+					serv.clientRemove(conn)
+				}
 			}
 
 			return true
