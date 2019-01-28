@@ -23,7 +23,7 @@ const (
 var (
 	// ErrDurationMissingValue an error when value is missing when parsing
 	// duration.
-	ErrDurationMissingValue = errors.New("Missing value in duration")
+	ErrDurationMissingValue = errors.New("missing value in duration")
 )
 
 //
