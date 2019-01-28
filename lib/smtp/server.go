@@ -167,8 +167,7 @@ out:
 
 //
 // handleCommand from client.
-//
-func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
+func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // nolint: gocyclo
 	if debug.Value > 0 {
 		log.Printf("handleCommand: %v\n", cmd)
 	}
