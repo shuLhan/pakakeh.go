@@ -145,10 +145,8 @@ func MergeSpaces(text string, withline bool) string {
 				continue
 			}
 			isspace = true
-		} else {
-			if isspace {
-				isspace = false
-			}
+		} else if isspace {
+			isspace = false
 		}
 		if withline {
 			if v == '\n' {
@@ -156,10 +154,8 @@ func MergeSpaces(text string, withline bool) string {
 					continue
 				}
 				isnewline = true
-			} else {
-				if isnewline {
-					isnewline = false
-				}
+			} else if isnewline {
+				isnewline = false
 			}
 		}
 		out = append(out, v)
