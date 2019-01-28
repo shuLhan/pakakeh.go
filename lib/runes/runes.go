@@ -132,12 +132,10 @@ func TokenFind(line, token []rune, startAt int) (at int) {
 				// we found it!
 				return
 			}
-		} else {
-			if at != -1 {
-				// reset back
-				y = 0
-				at = -1
-			}
+		} else if at != -1 {
+			// reset back
+			y = 0
+			at = -1
 		}
 	}
 	// x run out before y
