@@ -55,14 +55,13 @@ type Gini struct {
 }
 
 //
-// ComputeDiscrete Given an attribute A with discreate value 'discval', and the
-// target attribute T which contain N classes in C, compute the information gain
-// of A.
+// ComputeDiscrete Given an attribute "src" with discrete value 'discval', and
+// the target attribute "target" which contain n classes, compute the
+// information gain of "src".
 //
 // The result is saved as gain value in MaxGainValue for each partition.
 //
-func (gini *Gini) ComputeDiscrete(A *[]string, discval *[]string, T *[]string,
-	C *[]string) {
+func (gini *Gini) ComputeDiscrete(src, discval, target, classes *[]string) {
 	gini.IsContinu = false
 
 	// create partition for possible combination of discrete values.
@@ -77,21 +76,21 @@ func (gini *Gini) ComputeDiscrete(A *[]string, discval *[]string, T *[]string,
 	gini.MinIndexValue = 1.0
 
 	// compute gini index for all samples
-	gini.Value = gini.compute(T, C)
+	gini.Value = gini.compute(target, classes)
 
-	gini.computeDiscreteGain(A, T, C)
+	gini.computeDiscreteGain(src, target, classes)
 }
 
 //
 // computeDiscreteGain will compute Gini index and Gain for each partition.
 //
-func (gini *Gini) computeDiscreteGain(A *[]string, T *[]string, C *[]string) {
+func (gini *Gini) computeDiscreteGain(src, target, classes *[]string) {
 	// number of samples
-	nsample := float64(len(*A))
+	nsample := float64(len(*src))
 
 	if debug.Value >= 3 {
-		fmt.Println("[gini] sample:", T)
-		fmt.Printf("[gini] Gini(a=%s) = %f\n", (*A), gini.Value)
+		fmt.Println("[gini] sample:", target)
+		fmt.Printf("[gini] Gini(a=%s) = %f\n", (*src), gini.Value)
 	}
 
 	// compute gini index for each discrete values
@@ -107,7 +106,7 @@ func (gini *Gini) computeDiscreteGain(A *[]string, T *[]string, C *[]string) {
 			var subT []string
 
 			for _, el := range part {
-				for t, a := range *A {
+				for t, a := range *src {
 					if a != el {
 						continue
 					}
@@ -115,12 +114,12 @@ func (gini *Gini) computeDiscreteGain(A *[]string, T *[]string, C *[]string) {
 					// count how many sample with this discrete value
 					ndisc++
 					// split the target by discrete value
-					subT = append(subT, (*T)[t])
+					subT = append(subT, (*target)[t])
 				}
 			}
 
 			// compute gini index for subtarget
-			giniIndex := gini.compute(&subT, C)
+			giniIndex := gini.compute(&subT, classes)
 
 			// compute probabilities of discrete value through all
 			// samples
@@ -177,21 +176,21 @@ func (gini *Gini) createDiscretePartition(discval []string) {
 }
 
 //
-// ComputeContinu Given an attribute A and the target attribute T which contain
-// N classes in C, compute the information gain of A.
+// ComputeContinu Given an attribute "src" and the target attribute "target"
+// which contain n classes, compute the information gain of "src".
 //
 // The result of Gini partitions value, Gini Index, and Gini Gain is saved in
 // ContinuPart, Index, and Gain.
 //
-func (gini *Gini) ComputeContinu(A *[]float64, T *[]string, C *[]string) {
+func (gini *Gini) ComputeContinu(src *[]float64, target, classes *[]string) {
 	gini.IsContinu = true
 
 	// make a copy of attribute and target.
-	A2 := make([]float64, len(*A))
-	copy(A2, *A)
+	A2 := make([]float64, len(*src))
+	copy(A2, *src)
 
-	T2 := make([]string, len(*T))
-	copy(T2, *T)
+	T2 := make([]string, len(*target))
+	copy(T2, *target)
 
 	gini.SortedIndex = numbers.Floats64IndirectSort(A2, true)
 
@@ -211,23 +210,23 @@ func (gini *Gini) ComputeContinu(A *[]float64, T *[]string, C *[]string) {
 	gini.MinIndexValue = 1.0
 
 	// compute gini index for all samples
-	gini.Value = gini.compute(&T2, C)
+	gini.Value = gini.compute(&T2, classes)
 
-	gini.computeContinuGain(&A2, &T2, C)
+	gini.computeContinuGain(&A2, &T2, classes)
 }
 
 //
 // createContinuPartition for dividing class and computing Gini index.
 //
-// This is assuming that the data `A` has been sorted in ascending order.
+// This is assuming that the data `src` has been sorted in ascending order.
 //
-func (gini *Gini) createContinuPartition(A *[]float64) {
-	l := len(*A)
+func (gini *Gini) createContinuPartition(src *[]float64) {
+	l := len(*src)
 	gini.ContinuPart = make([]float64, 0)
 
 	// loop from first index until last index - 1
 	for i := 0; i < l-1; i++ {
-		sum := (*A)[i] + (*A)[i+1]
+		sum := (*src)[i] + (*src)[i+1]
 		med := sum / 2.0
 
 		// If median is zero, its mean both left and right value is
@@ -238,11 +237,11 @@ func (gini *Gini) createContinuPartition(A *[]float64) {
 		}
 
 		// Reject if median is contained in attribute's value.
-		// We use equality because if both A[i] and A[i+1] value is
-		// equal, the median is equal to both of them.
+		// We use equality because if both src[i] and src[i+1] value
+		// is equal, the median is equal to both of them.
 		exist := false
 		for j := 0; j <= i; j++ {
-			if (*A)[j] == med {
+			if (*src)[j] == med {
 				exist = true
 				break
 			}
@@ -260,13 +259,13 @@ func (gini *Gini) createContinuPartition(A *[]float64) {
 //
 // 1 - sum (probability of each classes in T)
 //
-func (gini *Gini) compute(T *[]string, C *[]string) float64 {
-	n := float64(len(*T))
+func (gini *Gini) compute(target, classes *[]string) float64 {
+	n := float64(len(*target))
 	if n == 0 {
 		return 0
 	}
 
-	classCount := libstrings.CountTokens(*T, *C, true)
+	classCount := libstrings.CountTokens(*target, *classes, true)
 
 	var sump2 float64
 
@@ -276,7 +275,7 @@ func (gini *Gini) compute(T *[]string, C *[]string) float64 {
 
 		if debug.Value >= 3 {
 			fmt.Printf("[gini] compute (%s): (%d/%f)^2 = %f\n",
-				(*C)[x], v, n, p*p)
+				(*classes)[x], v, n, p*p)
 		}
 
 	}
@@ -296,14 +295,14 @@ func (gini *Gini) compute(T *[]string, C *[]string) float64 {
 // - left is sub-sample from S that is less than part value.
 // - right is sub-sample from S that is greater than part value.
 //
-func (gini *Gini) computeContinuGain(A *[]float64, T *[]string, C *[]string) {
+func (gini *Gini) computeContinuGain(src *[]float64, target, classes *[]string) {
 	var gleft, gright float64
 	var tleft, tright []string
 
-	nsample := len(*A)
+	nsample := len(*src)
 
 	if debug.Value >= 2 {
-		fmt.Println("[gini] sorted data:", A)
+		fmt.Println("[gini] sorted data:", src)
 		fmt.Println("[gini] Gini.Value:", gini.Value)
 	}
 
@@ -312,7 +311,7 @@ func (gini *Gini) computeContinuGain(A *[]float64, T *[]string, C *[]string) {
 		// find the split of samples between partition based on
 		// partition value
 		partidx := nsample
-		for x, attrVal := range *A {
+		for x, attrVal := range *src {
 			if attrVal > contVal {
 				partidx = x
 				break
@@ -325,17 +324,17 @@ func (gini *Gini) computeContinuGain(A *[]float64, T *[]string, C *[]string) {
 		pright := float64(nright) / float64(nsample)
 
 		if partidx > 0 {
-			tleft = (*T)[0:partidx]
-			tright = (*T)[partidx:]
+			tleft = (*target)[0:partidx]
+			tright = (*target)[partidx:]
 
-			gleft = gini.compute(&tleft, C)
-			gright = gini.compute(&tright, C)
+			gleft = gini.compute(&tleft, classes)
+			gright = gini.compute(&tright, classes)
 		} else {
 			tleft = nil
-			tright = (*T)[0:]
+			tright = (*target)[0:]
 
 			gleft = 0
-			gright = gini.compute(&tright, C)
+			gright = gini.compute(&tright, classes)
 		}
 
 		// count class in partition
@@ -404,7 +403,7 @@ func (gini *Gini) GetMinIndexValue() float64 {
 // FindMaxGain find the attribute and value that have the maximum gain.
 // The returned value is index of attribute.
 //
-func FindMaxGain(gains *[]Gini) (MaxGainIdx int) {
+func FindMaxGain(gains *[]Gini) (maxGainIdx int) {
 	var gainValue float64
 	var maxGainValue float64
 
@@ -415,7 +414,7 @@ func FindMaxGain(gains *[]Gini) (MaxGainIdx int) {
 		gainValue = (*gains)[i].GetMaxGainValue()
 		if gainValue > maxGainValue {
 			maxGainValue = gainValue
-			MaxGainIdx = i
+			maxGainIdx = i
 		}
 	}
 
@@ -425,7 +424,7 @@ func FindMaxGain(gains *[]Gini) (MaxGainIdx int) {
 //
 // FindMinGiniIndex return the index of attribute that have the minimum Gini index.
 //
-func FindMinGiniIndex(ginis *[]Gini) (MinIndexIdx int) {
+func FindMinGiniIndex(ginis *[]Gini) (minIndexIdx int) {
 	var indexV float64
 	minIndexV := 1.0
 
@@ -433,7 +432,7 @@ func FindMinGiniIndex(ginis *[]Gini) (MinIndexIdx int) {
 		indexV = (*ginis)[i].GetMinIndexValue()
 		if indexV > minIndexV {
 			minIndexV = indexV
-			MinIndexIdx = i
+			minIndexIdx = i
 		}
 	}
 

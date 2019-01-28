@@ -61,7 +61,7 @@ type Runtime struct {
 //
 // New create new Runtime object.
 //
-func New(D tabula.ClasetInterface, splitMethod string, nRandomFeature int) (
+func New(claset tabula.ClasetInterface, splitMethod string, nRandomFeature int) (
 	*Runtime, error,
 ) {
 	runtime := &Runtime{
@@ -70,7 +70,7 @@ func New(D tabula.ClasetInterface, splitMethod string, nRandomFeature int) (
 		Tree:           binary.Tree{},
 	}
 
-	e := runtime.Build(D)
+	e := runtime.Build(claset)
 	if e != nil {
 		return nil, e
 	}
@@ -81,7 +81,7 @@ func New(D tabula.ClasetInterface, splitMethod string, nRandomFeature int) (
 //
 // Build will create a tree using CART algorithm.
 //
-func (runtime *Runtime) Build(D tabula.ClasetInterface) (e error) {
+func (runtime *Runtime) Build(claset tabula.ClasetInterface) (e error) {
 	// Re-check input configuration.
 	switch runtime.SplitMethod {
 	case SplitMethodGini:
@@ -91,7 +91,7 @@ func (runtime *Runtime) Build(D tabula.ClasetInterface) (e error) {
 		runtime.SplitMethod = SplitMethodGini
 	}
 
-	runtime.Tree.Root, e = runtime.splitTreeByGain(D)
+	runtime.Tree.Root, e = runtime.splitTreeByGain(claset)
 
 	return
 }
@@ -102,27 +102,27 @@ func (runtime *Runtime) Build(D tabula.ClasetInterface) (e error) {
 //
 // Return node with the split information.
 //
-func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
+func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 	node *binary.BTNode,
 	e error,
 ) {
 	node = &binary.BTNode{}
 
-	D.RecountMajorMinor()
+	claset.RecountMajorMinor()
 
 	// if dataset is empty return node labeled with majority classes in
 	// dataset.
-	nrow := D.GetNRow()
+	nrow := claset.GetNRow()
 
 	if nrow <= 0 {
 		if debug.Value >= 2 {
 			fmt.Printf("[cart] empty dataset (%s) : %v\n",
-				D.MajorityClass(), D)
+				claset.MajorityClass(), claset)
 		}
 
 		node.Value = NodeValue{
 			IsLeaf: true,
-			Class:  D.MajorityClass(),
+			Class:  claset.MajorityClass(),
 			Size:   0,
 		}
 		return node, nil
@@ -130,11 +130,11 @@ func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
 
 	// if all dataset is in the same class, return node as leaf with class
 	// is set to that class.
-	single, name := D.IsInSingleClass()
+	single, name := claset.IsInSingleClass()
 	if single {
 		if debug.Value >= 2 {
 			fmt.Printf("[cart] in single class (%s): %v\n", name,
-				D.GetColumns())
+				claset.GetColumns())
 		}
 
 		node.Value = NodeValue{
@@ -146,11 +146,11 @@ func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
 	}
 
 	if debug.Value >= 2 {
-		fmt.Println("[cart] D:", D)
+		fmt.Println("[cart] claset:", claset)
 	}
 
 	// calculate the Gini gain for each attribute.
-	gains := runtime.computeGain(D)
+	gains := runtime.computeGain(claset)
 
 	// get attribute with maximum Gini gain.
 	MaxGainIdx := gini.FindMaxGain(&gains)
@@ -161,20 +161,20 @@ func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
 	if MaxGain.GetMaxGainValue() == 0 {
 		if debug.Value >= 2 {
 			fmt.Println("[cart] max gain 0 with target",
-				D.GetClassAsStrings(),
-				" and majority class is ", D.MajorityClass())
+				claset.GetClassAsStrings(),
+				" and majority class is ", claset.MajorityClass())
 		}
 
 		node.Value = NodeValue{
 			IsLeaf: true,
-			Class:  D.MajorityClass(),
+			Class:  claset.MajorityClass(),
 			Size:   0,
 		}
 		return node, nil
 	}
 
 	// using the sorted index in MaxGain, sort all field in dataset
-	tabula.SortColumnsByIndex(D, MaxGain.SortedIndex)
+	tabula.SortColumnsByIndex(claset, MaxGain.SortedIndex)
 
 	if debug.Value >= 2 {
 		fmt.Println("[cart] maxgain:", MaxGain)
@@ -203,7 +203,7 @@ func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
 	}
 
 	node.Value = NodeValue{
-		SplitAttrName: D.GetColumn(MaxGainIdx).GetName(),
+		SplitAttrName: claset.GetColumn(MaxGainIdx).GetName(),
 		IsLeaf:        false,
 		IsContinu:     MaxGain.IsContinu,
 		Size:          nrow,
@@ -211,7 +211,7 @@ func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
 		SplitV:        splitV,
 	}
 
-	dsL, dsR, e := tabula.SplitRowsByValue(D, MaxGainIdx, splitV)
+	dsL, dsR, e := tabula.SplitRowsByValue(claset, MaxGainIdx, splitV)
 
 	if e != nil {
 		return node, e
@@ -258,13 +258,13 @@ func (runtime *Runtime) splitTreeByGain(D tabula.ClasetInterface) (
 
 // SelectRandomFeature if NRandomFeature is greater than zero, select and
 // compute gain in n random features instead of in all features
-func (runtime *Runtime) SelectRandomFeature(D tabula.ClasetInterface) {
+func (runtime *Runtime) SelectRandomFeature(claset tabula.ClasetInterface) {
 	if runtime.NRandomFeature <= 0 {
 		// all features selected
 		return
 	}
 
-	ncols := D.GetNColumn()
+	ncols := claset.GetNColumn()
 
 	// count all features minus class
 	nfeature := ncols - 1
@@ -275,8 +275,8 @@ func (runtime *Runtime) SelectRandomFeature(D tabula.ClasetInterface) {
 	}
 
 	// exclude class index and parent node index
-	excludeIdx := []int{D.GetClassIndex()}
-	cols := D.GetColumns()
+	excludeIdx := []int{claset.GetClassIndex()}
+	cols := claset.GetColumns()
 	for x, col := range *cols {
 		if (col.Flag & ColFlagParent) == ColFlagParent {
 			excludeIdx = append(excludeIdx, x)
@@ -293,34 +293,34 @@ func (runtime *Runtime) SelectRandomFeature(D tabula.ClasetInterface) {
 		pickedIdx = append(pickedIdx, idx)
 
 		// Remove skip flag on selected column
-		col := D.GetColumn(idx)
+		col := claset.GetColumn(idx)
 		col.Flag &^= ColFlagSkip
 	}
 
 	if debug.Value >= 1 {
 		fmt.Println("[cart] selected random features:", pickedIdx)
-		fmt.Println("[cart] selected columns        :", D.GetColumns())
+		fmt.Println("[cart] selected columns        :", claset.GetColumns())
 	}
 }
 
 //
 // computeGain calculate the gini index for each value in each attribute.
 //
-func (runtime *Runtime) computeGain(D tabula.ClasetInterface) (
+func (runtime *Runtime) computeGain(claset tabula.ClasetInterface) (
 	gains []gini.Gini,
 ) {
 	if runtime.SplitMethod == SplitMethodGini {
 		// create gains value for all attribute minus target class.
-		gains = make([]gini.Gini, D.GetNColumn())
+		gains = make([]gini.Gini, claset.GetNColumn())
 	}
 
-	runtime.SelectRandomFeature(D)
+	runtime.SelectRandomFeature(claset)
 
-	classVS := D.GetClassValueSpace()
-	classIdx := D.GetClassIndex()
-	classType := D.GetClassType()
+	classVS := claset.GetClassValueSpace()
+	classIdx := claset.GetClassIndex()
+	classType := claset.GetClassType()
 
-	for x, col := range *D.GetColumns() {
+	for x, col := range *claset.GetColumns() {
 		// skip class attribute.
 		if x == classIdx {
 			continue
@@ -343,11 +343,11 @@ func (runtime *Runtime) computeGain(D tabula.ClasetInterface) (
 			attr := col.ToFloatSlice()
 
 			if classType == tabula.TString {
-				target := D.GetClassAsStrings()
+				target := claset.GetClassAsStrings()
 				gains[x].ComputeContinu(&attr, &target,
 					&classVS)
 			} else {
-				targetReal := D.GetClassAsReals()
+				targetReal := claset.GetClassAsReals()
 				classVSReal := libstrings.ToFloat64(classVS)
 
 				gains[x].ComputeContinuFloat(&attr,
@@ -362,7 +362,7 @@ func (runtime *Runtime) computeGain(D tabula.ClasetInterface) (
 				fmt.Println("[cart] attrV:", attrV)
 			}
 
-			target := D.GetClassAsStrings()
+			target := claset.GetClassAsStrings()
 			gains[x].ComputeDiscrete(&attr, &attrV, &target,
 				&classVS)
 		}

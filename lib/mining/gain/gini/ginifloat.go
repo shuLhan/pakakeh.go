@@ -25,20 +25,20 @@ import (
 // (3) Create temporary space for gini index and gini gain.
 // (4) Compute gini index for all target.
 //
-func (gini *Gini) ComputeContinuFloat(A, T, C *[]float64) {
+func (gini *Gini) ComputeContinuFloat(src, target, classes *[]float64) {
 	gini.IsContinu = true
 
-	gini.SortedIndex = numbers.Floats64IndirectSort(*A, true)
+	gini.SortedIndex = numbers.Floats64IndirectSort(*src, true)
 
 	if debug.Value >= 1 {
-		fmt.Println("[gini] attr sorted :", A)
+		fmt.Println("[gini] attr sorted :", src)
 	}
 
 	// (1)
-	numbers.Floats64SortByIndex(T, gini.SortedIndex)
+	numbers.Floats64SortByIndex(target, gini.SortedIndex)
 
 	// (2)
-	gini.createContinuPartition(A)
+	gini.createContinuPartition(src)
 
 	// (3)
 	gini.Index = make([]float64, len(gini.ContinuPart))
@@ -46,25 +46,25 @@ func (gini *Gini) ComputeContinuFloat(A, T, C *[]float64) {
 	gini.MinIndexValue = 1.0
 
 	// (4)
-	gini.Value = gini.computeFloat(T, C)
+	gini.Value = gini.computeFloat(target, classes)
 
-	gini.computeContinuGainFloat(A, T, C)
+	gini.computeContinuGainFloat(src, target, classes)
 }
 
 //
-// computeFloat will compute Gini value for attribute T.
+// computeFloat will compute Gini value for attribute "target".
 //
 // Gini value is computed using formula,
 //
-//	1 - sum (probability of each classes in T)
+//	1 - sum (probability of each classes in target)
 //
-func (gini *Gini) computeFloat(T, C *[]float64) float64 {
-	n := float64(len(*T))
+func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
+	n := float64(len(*target))
 	if n == 0 {
 		return 0
 	}
 
-	classCount := numbers.Floats64Counts(*T, *C)
+	classCount := numbers.Floats64Counts(*target, *classes)
 
 	var sump2 float64
 
@@ -74,7 +74,7 @@ func (gini *Gini) computeFloat(T, C *[]float64) float64 {
 
 		if debug.Value >= 3 {
 			fmt.Printf("[gini] compute (%f): (%d/%f)^2 = %f\n",
-				(*C)[x], v, n, p*p)
+				(*classes)[x], v, n, p*p)
 		}
 
 	}
@@ -99,14 +99,14 @@ func (gini *Gini) computeFloat(T, C *[]float64) float64 {
 // (0.1) Find the split of samples between partition based on partition value.
 // (0.2) Count class in partition.
 //
-func (gini *Gini) computeContinuGainFloat(A, T, C *[]float64) {
+func (gini *Gini) computeContinuGainFloat(src, target, classes *[]float64) {
 	var gainLeft, gainRight float64
 	var tleft, tright []float64
 
-	nsample := len(*A)
+	nsample := len(*src)
 
 	if debug.Value >= 2 {
-		fmt.Println("[gini] sorted data:", A)
+		fmt.Println("[gini] sorted data:", src)
 		fmt.Println("[gini] Gini.Value:", gini.Value)
 	}
 
@@ -115,7 +115,7 @@ func (gini *Gini) computeContinuGainFloat(A, T, C *[]float64) {
 
 		// (0.1)
 		partidx := nsample
-		for x, attrVal := range *A {
+		for x, attrVal := range *src {
 			if attrVal > contVal {
 				partidx = x
 				break
@@ -128,17 +128,17 @@ func (gini *Gini) computeContinuGainFloat(A, T, C *[]float64) {
 		probRight := nright / float64(nsample)
 
 		if partidx > 0 {
-			tleft = (*T)[0:partidx]
-			tright = (*T)[partidx:]
+			tleft = (*target)[0:partidx]
+			tright = (*target)[partidx:]
 
-			gainLeft = gini.computeFloat(&tleft, C)
-			gainRight = gini.computeFloat(&tright, C)
+			gainLeft = gini.computeFloat(&tleft, classes)
+			gainRight = gini.computeFloat(&tright, classes)
 		} else {
 			tleft = nil
-			tright = (*T)[0:]
+			tright = (*target)[0:]
 
 			gainLeft = 0
-			gainRight = gini.computeFloat(&tright, C)
+			gainRight = gini.computeFloat(&tright, classes)
 		}
 
 		// (0.2)
