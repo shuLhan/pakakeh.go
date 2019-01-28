@@ -16,7 +16,7 @@ const (
 
 // List of error messages.
 var (
-	ErrHostAddress = errors.New("Invalid host address")
+	ErrHostAddress = errors.New("invalid host address")
 )
 
 // Type of network.
