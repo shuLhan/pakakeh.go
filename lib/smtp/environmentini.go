@@ -25,6 +25,7 @@ const (
 	keyHostname   = "hostname"
 	keyDomains    = "domains"
 	secSMTPD      = "smtpd"
+	valTrue       = "true"
 )
 
 //
@@ -126,7 +127,7 @@ func (env *EnvironmentIni) init(cfg *ini.Ini) (err error) {
 	}
 
 	v, ok := cfg.Get(secSMTPD, "", keyDomains)
-	if !ok || v == "true" {
+	if !ok || v == valTrue {
 		env.domains = append(env.domains, env.hostname)
 		return nil
 	}
@@ -187,7 +188,7 @@ func (env *EnvironmentIni) loadCertKey(cfg *ini.Ini) (b []byte, err error) {
 	if !ok {
 		return nil, nil
 	}
-	if len(v) == 0 || v == "true" {
+	if len(v) == 0 || v == valTrue {
 		log.Println("loadCertKey: certificate path is empty")
 		return nil, nil
 	}
@@ -209,7 +210,7 @@ func (env *EnvironmentIni) loadPrivateKey(cfg *ini.Ini) (b []byte, err error) {
 	if !ok {
 		return nil, nil
 	}
-	if len(v) == 0 || v == "true" {
+	if len(v) == 0 || v == valTrue {
 		log.Println("loadPrivateKey: private key path is empty")
 		return nil, nil
 	}
