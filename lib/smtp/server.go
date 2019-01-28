@@ -115,7 +115,7 @@ func (srv *Server) handle(recv *receiver) {
 		cmd, err := recv.readCommand()
 		if err != nil {
 			log.Println("receiver.readCommand: ", err)
-			recv.sendError(err)
+			_ = recv.sendError(err)
 			break
 		}
 		if cmd == nil {
