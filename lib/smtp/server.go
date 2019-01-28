@@ -313,7 +313,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 			}
 		}
 
-		err = srv.handleHELP(recv, cmd.Arg)
+		err = srv.handleHELP(recv)
 		if err != nil {
 			return err
 		}
@@ -420,7 +420,7 @@ func (srv *Server) handleMAIL(recv *receiver, cmd *Command) (err error) {
 	return nil
 }
 
-func (srv *Server) handleHELP(recv *receiver, arg string) (err error) {
+func (srv *Server) handleHELP(recv *receiver) (err error) {
 	return recv.sendReply(StatusHelp, "Everything will be alright", nil)
 }
 
