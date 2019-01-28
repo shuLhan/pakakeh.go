@@ -17,7 +17,7 @@ func (dsn *extDSN) Name() string {
 //
 // Params return the SMTP extension parameters.
 //
-func (dns *extDSN) Params() string {
+func (dsn *extDSN) Params() string {
 	return ""
 }
 
