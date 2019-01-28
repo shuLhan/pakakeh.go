@@ -228,16 +228,16 @@ func (reader *Reader) Init(fcfg string, dataset interface{}) (e error) {
 // SetDefault options for global config and each metadata.
 //
 func (reader *Reader) SetDefault() {
-	if "" == strings.TrimSpace(reader.Rejected) {
+	if strings.TrimSpace(reader.Rejected) == "" {
 		reader.Rejected = DefaultRejected
 	}
-	if 0 == reader.MaxRows {
+	if reader.MaxRows == 0 {
 		reader.MaxRows = DefaultMaxRows
 	}
-	if "" == strings.TrimSpace(reader.DatasetMode) {
+	if strings.TrimSpace(reader.DatasetMode) == "" {
 		reader.DatasetMode = DefDatasetMode
 	}
-	if nil == reader.dataset {
+	if reader.dataset == nil {
 		reader.dataset = &tabula.Dataset{}
 	}
 }

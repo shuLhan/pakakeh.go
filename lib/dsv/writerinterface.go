@@ -35,7 +35,7 @@ func InitWriter(writer WriterInterface) error {
 	out := writer.GetOutput()
 
 	// Exit immediately if no output file is defined in config.
-	if "" == out {
+	if len(out) == 0 {
 		return ErrNoOutput
 	}
 

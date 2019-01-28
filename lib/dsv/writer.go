@@ -177,7 +177,7 @@ func (writer *Writer) WriteRow(row *tabula.Row, recordMd []MetadataInterface) (
 		recV := (*row)[rIdx].Bytes()
 		lq := md.GetLeftQuote()
 
-		if "" != lq {
+		if lq != "" {
 			v = append(v, []byte(lq)...)
 		}
 
@@ -190,22 +190,20 @@ func (writer *Writer) WriteRow(row *tabula.Row, recordMd []MetadataInterface) (
 		}
 
 		// Escape the right quote in field content before writing it.
-		if "" != rq && md.T == tabula.TString {
+		if rq != "" && md.T == tabula.TString {
 			recV, _ = libbytes.EncloseToken(recV, []byte(rq), esc, nil)
-		} else {
+		} else if sep != "" && md.T == tabula.TString {
 			// Escape the separator
-			if "" != sep && md.T == tabula.TString {
-				recV, _ = libbytes.EncloseToken(recV, []byte(sep), esc, nil)
-			}
+			recV, _ = libbytes.EncloseToken(recV, []byte(sep), esc, nil)
 		}
 
 		v = append(v, recV...)
 
-		if "" != rq {
+		if rq != "" {
 			v = append(v, []byte(rq)...)
 		}
 
-		if "" != sep {
+		if sep != "" {
 			v = append(v, []byte(sep)...)
 		}
 	}

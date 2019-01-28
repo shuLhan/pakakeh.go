@@ -23,21 +23,21 @@ import (
 func assertFile(t *testing.T, a, b string) {
 	out, e := ioutil.ReadFile(a)
 
-	if nil != e {
+	if e != nil {
 		debug.PrintStack()
 		t.Error(e)
 	}
 
 	exp, e := ioutil.ReadFile(b)
 
-	if nil != e {
+	if e != nil {
 		debug.PrintStack()
 		t.Error(e)
 	}
 
 	r := bytes.Compare(out, exp)
 
-	if 0 != r {
+	if r != 0 {
 		debug.PrintStack()
 		t.Fatal("Comparing", a, "with", b, ": result is different (",
 			r, ")")
