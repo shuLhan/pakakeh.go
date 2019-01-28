@@ -19,9 +19,9 @@ const (
 
 // List of route error values.
 var (
-	ErrRouteInvMethod = errors.New("Invalid method")
-	ErrRouteInvTarget = errors.New("Invalid target")
-	ErrRouteDupParam  = errors.New("Duplicate parameter on route")
+	ErrRouteInvMethod = errors.New("invalid method")
+	ErrRouteInvTarget = errors.New("invalid target")
+	ErrRouteDupParam  = errors.New("duplicate parameter on route")
 )
 
 type rootRoute struct {

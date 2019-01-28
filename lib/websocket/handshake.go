@@ -24,21 +24,21 @@ const (
 
 // List of errors.
 var (
-	ErrBadRequest                = errors.New("Bad request")
-	ErrRequestLength             = errors.New("Bad request: length is less than minimum")
-	ErrRequestHeaderLength       = errors.New("Bad request: header length is less than minimum")
-	ErrInvalidHTTPMethod         = errors.New("Invalid HTTP method")
-	ErrInvalidHTTPVersion        = errors.New("Invalid HTTP version")
-	ErrInvalidHeaderUpgrade      = errors.New("Invalid Upgrade header")
-	ErrInvalidHeaderFormat       = errors.New("Invalid Header format")
-	ErrInvalidHeaderHost         = errors.New("Invalid Host header")
-	ErrInvalidHeaderWSKey        = errors.New("Invalid Sec-Websocket-Key header")
-	ErrInvalidHeaderWSVersion    = errors.New("Invalid Sec-Websocket-Version header")
-	ErrInvalidHeaderWSExtensions = errors.New("Invalid Sec-Websocket-Extensions header")
-	ErrInvalidHeaderWSProtocol   = errors.New("Invalid Sec-Websocket-Protocol header")
-	ErrInvalidHeaderConn         = errors.New("Invalid Connection header")
-	ErrMissingRequiredHeader     = errors.New("Missing required headers")
-	ErrUnsupportedWSVersion      = errors.New("Unsupported Sec-WebSocket-Version")
+	ErrBadRequest                = errors.New("bad request")
+	ErrRequestLength             = errors.New("bad request: length is less than minimum")
+	ErrRequestHeaderLength       = errors.New("bad request: header length is less than minimum")
+	ErrInvalidHTTPMethod         = errors.New("invalid HTTP method")
+	ErrInvalidHTTPVersion        = errors.New("invalid HTTP version")
+	ErrInvalidHeaderUpgrade      = errors.New("invalid Upgrade header")
+	ErrInvalidHeaderFormat       = errors.New("invalid Header format")
+	ErrInvalidHeaderHost         = errors.New("invalid Host header")
+	ErrInvalidHeaderWSKey        = errors.New("invalid Sec-Websocket-Key header")
+	ErrInvalidHeaderWSVersion    = errors.New("invalid Sec-Websocket-Version header")
+	ErrInvalidHeaderWSExtensions = errors.New("invalid Sec-Websocket-Extensions header")
+	ErrInvalidHeaderWSProtocol   = errors.New("invalid Sec-Websocket-Protocol header")
+	ErrInvalidHeaderConn         = errors.New("invalid Connection header")
+	ErrMissingRequiredHeader     = errors.New("missing required headers")
+	ErrUnsupportedWSVersion      = errors.New("unsupported Sec-WebSocket-Version")
 )
 
 //
@@ -198,10 +198,8 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 		if hv[x] != ',' {
 			if hv[x] == ' ' {
 				start++
-			} else {
-				if hv[x] >= 'A' && hv[x] <= 'Z' {
-					hv[x] += 32
-				}
+			} else if hv[x] >= 'A' && hv[x] <= 'Z' {
+				hv[x] += 32
 			}
 			continue
 		}

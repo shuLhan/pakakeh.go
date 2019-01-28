@@ -32,7 +32,7 @@ const (
 )
 
 var (
-	errClientCtxNotFound = errors.New("Client context not found")
+	errClientCtxNotFound = errors.New("client context not found")
 )
 
 //
