@@ -91,7 +91,7 @@ func (cl *Client) Authenticate(mech Mechanism, username, password string) (
 //
 func (cl *Client) Connect(insecure bool) (res *Response, err error) {
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify: insecure,
+		InsecureSkipVerify: insecure, // nolint: gosec
 	}
 
 	cl.conn, err = tls.Dial("tcp", cl.raddr.String(), tlsConfig)
