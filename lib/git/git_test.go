@@ -59,7 +59,7 @@ func TestCheckoutRevision(t *testing.T) {
 		desc: "With empty revision",
 	}, {
 		desc:     "With unknown revision",
-		branch:   "beku",
+		branch:   "master",
 		revision: "xxxyyyzzz",
 		expErr:   "CheckoutRevision: exit status 128",
 		expStderr: `fatal: ambiguous argument 'xxxyyyzzz': unknown revision or path not in the working tree.
@@ -68,7 +68,7 @@ Use '--' to separate paths from revisions, like this:
 `,
 	}, {
 		desc:     "With valid revision",
-		branch:   "beku",
+		branch:   "master",
 		revision: "d6ad9da",
 	}}
 
