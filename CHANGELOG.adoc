@@ -1,34 +1,48 @@
-= CHANGELOG
+=  CHANGELOG
 :toc:
 
 This library is released each month, either at the end of month or at the
 first week of next month.
 
-== share v0.3.0 (2019-xx-xx)
+==  share v0.3.0 (2019-xx-xx)
 
-=== New Features
+===  Features Changes
 
-* `lib/debug`: add type to store relative and difference on memory heap
-* `lib/dns`: add type of connection
-* `lib/http`: add parameter http.ResponseWriter to Callback.
-* `lib/http`: the RegisterXxx functions now use the Endpoint type.
+*  `lib/debug`: add type to store relative and difference on memory heap
+*  `lib/dns`: remove request pool
+*  `lib/dns`: export the connection field on UDPClient
+*  `lib/dns`: add type of connection
+*  `lib/http`: add parameter http.ResponseWriter to Callback.
+*  `lib/http`: the RegisterXxx functions now use the Endpoint type.
+
+===  Enhancements
+
+*  Various fixes suggested by linters
+*  doc: add summary note of Simple Authentication and Security Layer (SASL)
+*  doc: add summary on SMTP over TLS (RFC3207)
+*  doc: add notes for Internet Message Format (RFC 5322)
+*  doc: add documentation for SMTP and DSN
+
+===  Fixes
+
+*  `lib/git`: fix testdata and test input
 
 
-== share v0.2.0 (2019-01-02)
+==  share v0.2.0 (2019-01-02)
 
-=== New Features
+===  New Features
 
-* `lib/errors`, package errors provide a custom error with code.
+*  `lib/errors`, package errors provide a custom error with code.
 
-* `lib/http`, package http implement custom HTTP server with memory file
+*  `lib/http`, package http implement custom HTTP server with memory file
 system and simplified routing handler.
 
-=== Enhancements
+===  Enhancements
 
 Fix warnings from linters.
 
 
-== share v0.1.0 (2018-11-29)
+==  share v0.1.0 (2018-11-29)
 
 The first release of `share` package contains one command line interface (CLI)
 and several libraries.
