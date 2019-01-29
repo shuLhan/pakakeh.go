@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="author" content="Shulhan">
+<title>SMTP Service Extension for Authentication</title>
+<link rel="stylesheet" href="./solarized.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>SMTP Service Extension for Authentication</h1>
+<div class="details">
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_ehlo_extension">1. EHLO Extension</a>
+<ul class="sectlevel2">
+<li><a href="#_common_response">1.1. Common Response</a></li>
+</ul>
+</li>
+<li><a href="#_auth_command">2. AUTH Command</a>
+<ul class="sectlevel2">
+<li><a href="#_direct_handshake">2.1. Direct Handshake</a></li>
+<li><a href="#_indirect_handshake">2.2. Indirect Handshake</a></li>
+<li><a href="#_response">2.3. Response</a>
+<ul class="sectlevel3">
+<li><a href="#_success_response">2.3.1. Success Response</a></li>
+<li><a href="#_error_response">2.3.2. Error Response</a></li>
+</ul>
+</li>
+<li><a href="#_canceling_auth">2.4. Canceling AUTH</a></li>
+</ul>
+</li>
+<li><a href="#_auth_parameter_for_mail_from_command">3. AUTH Parameter for MAIL FROM Command</a></li>
+<li><a href="#_additional_requirements_on_servers">4. Additional Requirements on Servers</a></li>
+<li><a href="#_security_considerations">5. Security Considerations</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document provide note and summary of RFC 4954, SMTP Service Extension for
+Authentication.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ehlo_extension">1. EHLO Extension</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The EHLO keyword associated with this extension is "AUTH".</p>
+</div>
+<div class="paragraph">
+<p>This extension provide one command "AUTH".</p>
+</div>
+<div class="paragraph">
+<p>This extension add one optional parameter to MAIL FROM command: "AUTH"</p>
+</div>
+<div class="paragraph">
+<p>This extension extends the maximum line length of the MAIL FROM command to 500
+characters.</p>
+</div>
+<div class="sect2">
+<h3 id="_common_response">1.1. Common Response</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>530 5.7.0 Authentication required</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response SHOULD be returned by command MAIL, RCPT, DATA, VRFY, EXPN, and
+HELP, when server policy requires authentication in order to perform the
+requested action.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_auth_command">2. AUTH Command</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre>"AUTH" mechanism ( initial-response / "=" ) CRLF
+
+mechanism        = A string identifying a [SASL] authentication mechanism.
+
+initial-response = base64</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Initial-response MUST be encoded in base64 and may or may not empty, depends
+on mechanism.</p>
+</div>
+<div class="paragraph">
+<p>Initial-response "=" is response with zero length, to indicate that the
+response is present.</p>
+</div>
+<div class="paragraph">
+<p>After a successful AUTH command completes, a server MUST reject any further
+AUTH commands with a 503 reply.</p>
+</div>
+<div class="paragraph">
+<p>An AUTH command issued during a mail transaction MUST be rejected with a 503
+reply.</p>
+</div>
+<div class="paragraph">
+<p>There are two modes of AUTH handshakes: directly with initial-response and
+non-directly with initial-response in the second response.</p>
+</div>
+<div class="sect2">
+<h3 id="_direct_handshake">2.1. Direct Handshake</h3>
+<div class="paragraph">
+<p>In this mode, the $INITIAL_RESPONSE contains non empty text other than "=".
+This mode SHOULD be used when length of command line less than maximum (512
+octets), to minimize round-trip to server.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>; TLS handshake
+; EHLO handshake
+C: AUTH $MECHANISM $INITIAL_RESPONSE
+S: 235 2.7.0 Authentication successful</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_indirect_handshake">2.2. Indirect Handshake</h3>
+<div class="paragraph">
+<p>In this mode, the $INITIAL_RESPONSE is empty, which cost client additional
+step.
+This mode MUST be used when AUTH line is exceeding maximum command line (512
+octets, see RFC 5321, section 4.5.3).</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>; TLS handshake
+; EHLO handshake
+C: AUTH $MECHANISM
+S: "334" SP [ $SERVER_CHALLENGE ] CRLF
+C: $INITIAL_RESPONSE
+S: 235 2.7.0 Authentication successful</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>$SERVER_CHALLENGE is encoded in base64 and may or may not present depends on
+$MECHANISM.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_response">2.3. Response</h3>
+<div class="sect3">
+<h4 id="_success_response">2.3.1. Success Response</h4>
+<div class="literalblock">
+<div class="content">
+<pre>"235" SP "2.7.0 Authentication successful" CRLF</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The client SHOULD send an EHLO command as the first command after a successful
+SASL negotiation that results in the enabling of a security layer.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_error_response">2.3.2. Error Response</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>432 4.7.12 A password transition is needed</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response indicates that the user needs to transition to the selected
+authentication mechanism.
+This is typically done by authenticating once using the [PLAIN] authentication
+mechanism.
+The selected mechanism SHOULD then work for authentications in subsequent
+sessions.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>454 4.7.0 Temporary authentication failure</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response indicates that the authentication failed due to a temporary
+server failure.
+The client SHOULD NOT prompt the user for another password in this case, and
+should instead notify the user of server failure.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>500 5.5.6 Authentication Exchange line is too long</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response indicates that the authentication failed due to the client
+sending a [BASE64] response that is longer than the maximum buffer size
+available for the currently selected SASL mechanism.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>501 Syntax error in parameters or arguments</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response indicates that client canceling authentication or server failed
+to decode base64 from handshake.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>504 5.5.4 Command parameter not implemented</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If the requested authentication mechanism is invalid (e.g., is not supported
+or requires an encryption layer).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>534 5.7.9 Authentication mechanism is too weak</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response indicates that the selected authentication mechanism is weaker
+than server policy permits for that user.
+The client SHOULD retry with a new authentication mechanism.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>535 5.7.8 Authentication credentials invalid</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This response indicates that the authentication failed due to invalid or
+insufficient authentication credentials.
+The client SHOULD ask the user to supply new credentials (such as by
+presenting a password dialog box).</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_canceling_auth">2.4. Canceling AUTH</h3>
+<div class="paragraph">
+<p>Client can cancel authentication, for example when client can&#8217;t decode base64
+from server, by sending,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>"*" CRLF</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and server MUST reject the AUTH by response with 501 status code.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_auth_parameter_for_mail_from_command">3. AUTH Parameter for MAIL FROM Command</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre>"AUTH=" (mailbox / "&lt;&gt;")</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the server trusts the authenticated identity of the client to assert that
+the message was originally submitted by the supplied &lt;mailbox&gt;, then the
+server SHOULD supply the same &lt;mailbox&gt; in an AUTH parameter when relaying the
+message to any other server which supports the AUTH extension.
+For this reason, servers that advertise support for this extension MUST
+support the AUTH parameter to the MAIL FROM command even when the client has
+not authenticated itself to the server.</p>
+</div>
+<div class="paragraph">
+<p>A parameter of AUTH=&lt;&gt; indicates that the original submitter of the
+message is not known.
+The server MUST NOT treat the message as having been originally submitted by
+the authenticated identity that resulted from the AUTH command.</p>
+</div>
+<div class="paragraph">
+<p>If the AUTH parameter is not supplied and the client has authenticated, and
+the server believes the message is an original submission,
+the server MAY generate a &lt;mailbox&gt; from the user&#8217;s authenticated identity for
+use in an AUTH parameter when relaying the message to any server which
+supports the AUTH extension.
+The generated &lt;mailbox&gt; is implementation specific, but it MUST conform to the
+syntax of [SMTP].
+If the implementation cannot generate a valid &lt;mailbox&gt;, it MUST transmit
+AUTH=&lt;&gt; when relaying this message.</p>
+</div>
+<div class="paragraph">
+<p>If the server does not sufficiently trust the authenticated identity of the
+client, or if the client is not authenticated, then the server MUST behave as
+if the AUTH=&lt;&gt; parameter was supplied.
+The server MAY, however, write the value of any supplied AUTH parameter to a
+log file.</p>
+</div>
+<div class="paragraph">
+<p>If an AUTH=&lt;&gt; parameter was supplied, either explicitly or due to the
+requirement in the previous paragraph, then the server MUST supply the AUTH=&lt;&gt;
+parameter when relaying the message to any server which it has authenticated
+to using the AUTH extension.</p>
+</div>
+<div class="paragraph">
+<p>A server MAY treat expansion of a mailing list as a new submission, setting
+the AUTH parameter to the mailing list address or mailing list administration
+address when relaying the message to list subscribers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_additional_requirements_on_servers">4. Additional Requirements on Servers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Upon successful authentication, a server SHOULD use the "ESMTPA" or the
+"ESMTPSA" [SMTP-TT] (when appropriate) keyword in the "with" clause of the
+Received header field.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_security_considerations">5. Security Considerations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Clients and servers MUST discard any knowledge obtained prior to the start of
+the SASL negotiation upon the establishment of a security layer.</p>
+</div>
+<div class="paragraph">
+<p>Servers MAY implement a policy whereby the connection is dropped after a
+number of failed authentication attempts.
+If they do so, they SHOULD NOT drop the connection until at least 3 attempts
+to authenticate have failed.</p>
+</div>
+<div class="paragraph">
+<p>The implementation MUST support at least one configuration where these SASL
+mechanisms are not advertised or used without the presence of an external
+security layer such as [TLS].</p>
+</div>
+<div class="paragraph">
+<p>If an SMTP client is willing to use SASL PLAIN over TLS to authenticate to the
+SMTP server, the client verifies the server certificate according to the rules
+of [X509].
+If the server has not provided any certificate, or if the certificate
+verification fails, the client MUST NOT attempt to authenticate using the SASL
+PLAIN mechanism.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2019-01-14 16:25:48 +0700
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="author" content="Shulhan">
+<title>Delivery Status Notification (DSN)</title>
+<link rel="stylesheet" href="./solarized.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>Delivery Status Notification (DSN)</h1>
+<div class="details">
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#SMTP-extension-DSN">1. Extension for DSN (RFC 3461)</a>
+<ul class="sectlevel2">
+<li><a href="#_relaying_to_other_confirming_smtp_server">1.1. Relaying to other confirming SMTP server</a></li>
+<li><a href="#_relaying_to_non_conforming_smtp_server">1.2. Relaying to non-conforming SMTP server</a></li>
+<li><a href="#_local_delivery">1.3. Local Delivery</a></li>
+<li><a href="#_delays_in_delivery">1.4. Delays in delivery</a></li>
+<li><a href="#_failure_on_delivery">1.5. Failure on delivery</a></li>
+<li><a href="#_mailing_list">1.6. Mailing List</a></li>
+<li><a href="#_mail_ret_parameter">1.7. MAIL RET Parameter</a></li>
+<li><a href="#_mail_envid_parameter">1.8. MAIL ENVID Parameter</a></li>
+<li><a href="#_rcpt_notify_parameter">1.9. RCPT NOTIFY Parameter</a></li>
+<li><a href="#_rcpt_orcpt_parameter">1.10. RCPT ORCPT Parameter</a></li>
+<li><a href="#_format_of_delivery_notifications">1.11. Format of delivery notifications</a></li>
+</ul>
+</li>
+<li><a href="#_multipart_report_content_type_rfc_3462">2. Multipart-Report Content Type (RFC 3462)</a>
+<ul class="sectlevel2">
+<li><a href="#_the_textrfc822_headers_content_type">2.1. The text/rfc822-headers content-type</a></li>
+</ul>
+</li>
+<li><a href="#status-codes">3. Enhanced Mail System Status Codes (RFC 3463)</a>
+<ul class="sectlevel2">
+<li><a href="#_class">3.1. Class</a></li>
+<li><a href="#_subject">3.2. Subject</a></li>
+</ul>
+</li>
+<li><a href="#_message_format_for_dsn_rfc_3464">4. Message Format for DSN (RFC 3464)</a>
+<ul class="sectlevel2">
+<li><a href="#_human_readable_explanation_of_the_dsn">4.1. Human readable explanation of the DSN</a></li>
+<li><a href="#_machine_readable_explanation_of_dsn">4.2. Machine readable explanation of DSN</a>
+<ul class="sectlevel3">
+<li><a href="#_format_for_message_fields">4.2.1. Format for message-fields</a></li>
+<li><a href="#_format_for_recipient_fields">4.2.2. Format for recipient-fields</a>
+<ul class="sectlevel4">
+<li><a href="#_original_recipient_and_final_recipient">Original-Recipient and Final-Recipient</a></li>
+<li><a href="#_action">Action</a></li>
+<li><a href="#_status">Status</a></li>
+<li><a href="#_remote_mta">Remote-MTA</a></li>
+<li><a href="#_diagnostic_code">Diagnostic-Code</a></li>
+<li><a href="#_last_attempt_date">Last-Attempt-Date</a></li>
+<li><a href="#_final_log_id">Final-Log-ID</a></li>
+<li><a href="#_will_retry_until">Will-Retry-Until</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_original_message">4.3. Original message</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The DSN specifications contains four document set describing the delivery
+status report service: Simple Mail Transfer Protocol (SMTP) extensions
+to request delivery status reports
+<a href="https://tools.ietf.org/html/rfc3461">(RFC 3461)</a>,
+a MIME content for the reporting of delivery reports
+<a href="https://tools.ietf.org/html/rfc3462">(RFC 3462)</a>,
+an enumeration of extended status codes
+<a href="https://tools.ietf.org/html/rfc3463">(RFC 3463)</a>,
+and a multipart container for the delivery report
+<a href="https://tools.ietf.org/html/rfc3464">(RFC 3464)</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="SMTP-extension-DSN">1. Extension for DSN (RFC 3461)</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre>xtext = *( xchar / hexchar )
+
+xchar = any ASCII CHAR between "!" (33) and "~" (126) inclusive,
+        except for "+" and "=".
+
+; "hexchar"s are intended to encode octets that cannot appear
+; as ASCII characters within an esmtp-value.
+
+hexchar = ASCII "+" immediately followed by two upper case hexadecimal digits</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The EHLO extension name is <code>DSN</code>.</p>
+</div>
+<div class="paragraph">
+<p>This extension add two optional parameters to MAIL commands: <code>RET</code> and
+<code>ENVID</code>.</p>
+</div>
+<div class="paragraph">
+<p>This extension add two optional parameters to RCTP commands: <code>NOTIFY</code> and
+<code>ORCPT</code>.</p>
+</div>
+<div class="paragraph">
+<p>SMTP server MUST return the same reply-code as it would to the same MAIL/RCPT
+command without parameters.</p>
+</div>
+<div class="paragraph">
+<p>SMTP server MUST NOT refuse a MAIL/RCPT command based on the absence or
+presence of valid parameters.</p>
+</div>
+<div class="paragraph">
+<p>If the value is invalid or more than one ENVID or RET in MAIL command,
+the server MUST issue the reply-code "501 syntax error in parameter".</p>
+</div>
+<div class="paragraph">
+<p>A DSN MUST NOT be returned to the sender if SMTP MAIL command was NULL ("&lt;&gt;"),
+even if the sender&#8217;s address is available from other sources (e.g., the
+message header).
+Instead, it SHOULD inform the local postmaster of delivery failures.</p>
+</div>
+<div class="sect2">
+<h3 id="_relaying_to_other_confirming_smtp_server">1.1. Relaying to other confirming SMTP server</h3>
+<div class="paragraph">
+<p>Any DSN extension parameter that is received MUST also appear on MAIL and/or
+RCPT command which the message is relayed.</p>
+</div>
+<div class="paragraph">
+<p>An ORCPT parameter MAY be added to the RCPT command when the message is
+relayed using address from RCPT command.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_relaying_to_non_conforming_smtp_server">1.2. Relaying to non-conforming SMTP server</h3>
+<div class="paragraph">
+<p>If NOTIFY paramater contains SUCCESS and SMTP server return a success
+(2xx) to RCPT command, client MUST issue a "relayed" DSN for that recipient.</p>
+</div>
+<div class="paragraph">
+<p>If NOTIFY parameter contains "FAILURE" and SMTP server return a permanent
+failure (5xx) to RCPT command, client MUST issue a "failed" DSN for that
+recipient.</p>
+</div>
+<div class="paragraph">
+<p>If NOTIFY parameter contains NEVER and SMTP server return a success or
+permanent failure (5xx) to RCPT command, client MUST NOT issue a DSN that
+recipient.
+Client MAY inform the local postmaster of the delivery failure.</p>
+</div>
+<div class="paragraph">
+<p>If NOTIFY parameter contains NEVER, client MAY use "&lt;&gt;" on
+separate MAIL command.</p>
+</div>
+<div class="paragraph">
+<p>If no NOTIFY parameter, and server return a success, client MUST NOT issue any
+DSN for that recipient.</p>
+</div>
+<div class="paragraph">
+<p>If no NOTIFY parameter, and server return 5xx, client MUST issue a "failed"
+DSN for that recipient.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_local_delivery">1.3. Local Delivery</h3>
+<div class="paragraph">
+<p>If NOTIFY contains SUCCESS, MTA MUST issue "delivered" DSN for that
+recipient.</p>
+</div>
+<div class="paragraph">
+<p>If NOTIFY contains SUCCESS or no NOTIFY parameter, MTA MUST NOT issue a DSN
+for that recipient.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_delays_in_delivery">1.4. Delays in delivery</h3>
+<div class="paragraph">
+<p>If NOTIFY contains DELAY or no NOTIFY parameter, MTA MAY issue "delayed" DSN
+for that recipient.</p>
+</div>
+<div class="paragraph">
+<p>If NOTIFY parameter is issued without DELAY keyword, MTA MUST NOT issue
+"delayed" DSN for that recipient.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_failure_on_delivery">1.5. Failure on delivery</h3>
+<div class="paragraph">
+<p>If NOTIFY parameter contains FAILURE or no NOTIFY parameter, a "failed"
+DSN MUST be issued.</p>
+</div>
+<div class="paragraph">
+<p>If NOTIFY parameter does not contains FAILURE, DSN MUST NOT be issued, but
+it MAY inform the local postmaster via mechanism that does not using DSN.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mailing_list">1.6. Mailing List</h3>
+<div class="paragraph">
+<p>If NOTIFY parameter contains SUCCESS, and the message is placed on list&#8217;s
+mailbox or accepted by list&#8217;s server, a "delivered" DSN must be issued.</p>
+</div>
+<div class="paragraph">
+<p>When redistributed to members of mailing list,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The envelope return address is rewritten to point to the list maintainer.</p>
+</li>
+<li>
+<p>The ENVID, NOTIFY, RET, and ORCPT parameters MUST NOT be derived from the
+original message.</p>
+</li>
+<li>
+<p>The NOTIFY and RET parameters MAY be specified by the list administrator.</p>
+</li>
+<li>
+<p>ORCPT parameter SHOULD contain the address of member.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mail_ret_parameter">1.7. MAIL RET Parameter</h3>
+<div class="literalblock">
+<div class="content">
+<pre>"RET=" "FULL" / "HDRS"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>FULL</code> requests that the entire message be returned in any "failed" DSN issued
+for this recipient.</p>
+</div>
+<div class="paragraph">
+<p><code>HDRS</code> only the headers of the message be returned.</p>
+</div>
+<div class="paragraph">
+<p>It MAY be up to 8 characters.</p>
+</div>
+<div class="paragraph">
+<p>The parameter value is case insensitive.</p>
+</div>
+<div class="paragraph">
+<p>If no RET parameter is defined or their value is emtpy, MTA MAY return headers
+only or full message.</p>
+</div>
+<div class="paragraph">
+<p>If a DSN contains no indications of delivery failure, only the headers of the
+message SHOULD be returned.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mail_envid_parameter">1.8. MAIL ENVID Parameter</h3>
+<div class="literalblock">
+<div class="content">
+<pre>"ENVID=" *xtext</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ENVID, or enveloper identifier, purpose is to allow the sender of a message to
+identify the transaction for which the DSN was issued.</p>
+</div>
+<div class="paragraph">
+<p>It MAY be up to 100 characters.</p>
+</div>
+<div class="paragraph">
+<p>The ENVID MUST consist of printable (graphic and white space) characters from
+the US-ASCII.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rcpt_notify_parameter">1.9. RCPT NOTIFY Parameter</h3>
+<div class="literalblock">
+<div class="content">
+<pre>"NOTIFY=" "NEVER" / ("SUCCESS" [ "," "FAILURE"] [ "," "DELAY" ])</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The NEVER keyword MUST appear by itself.</p>
+</div>
+<div class="paragraph">
+<p>"NEVER" requests that a DSN not be returned to the sender under any
+conditions.</p>
+</div>
+<div class="paragraph">
+<p>"SUCCESS" or "FAILURE" value indicated that a DSN be issued on successful
+delivery or delivery failure, respectively.</p>
+</div>
+<div class="paragraph">
+<p>"DELAY" indicates the sender&#8217;s willingness to receive "delayed" DSNs.</p>
+</div>
+<div class="paragraph">
+<p>It MAY be up to 28 characters.</p>
+</div>
+<div class="paragraph">
+<p>The absence of a NOTIFY parameter MAY be interpreted as either
+<code>NOTIFY=FAILURE</code> or <code>NOTIFY=FAILURE,DELAY</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rcpt_orcpt_parameter">1.10. RCPT ORCPT Parameter</h3>
+<div class="literalblock">
+<div class="content">
+<pre>"ORCPT=" addr-type ";" xtext</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ORCPT parameter is used to specify an "original" recipient address that
+corresponds to the actual recipient.</p>
+</div>
+<div class="paragraph">
+<p>It MUST have an associated value.</p>
+</div>
+<div class="paragraph">
+<p>It MAY be up to 500 characters.</p>
+</div>
+<div class="paragraph">
+<p>When used on personal message, it MUST contain the same address as the RCPT TO
+address.</p>
+</div>
+<div class="paragraph">
+<p>When used on mailing-list, the ORCPT parameter MUST match the new RCPT TO
+address of each recipient, not the address specified by the original sender of
+the message.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_format_of_delivery_notifications">1.11. Format of delivery notifications</h3>
+<div class="paragraph">
+<p>MAIL command argument MUST be a null ("&lt;&gt;").</p>
+</div>
+<div class="paragraph">
+<p>RCPT command argument is copied from the original message MAIL command.</p>
+</div>
+<div class="paragraph">
+<p>The RET parameter MUST NOT be used.
+The NOTIFY parameter MAY be used, with value MUST be NEVER.
+The ENVID and/or ORCPT parameter MAY be used.</p>
+</div>
+<div class="paragraph">
+<p>The MIME message is "multipart/report" with "report-type" is
+"delivery-status".</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_multipart_report_content_type_rfc_3462">2. Multipart-Report Content Type (RFC 3462)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section provide summary and notes on implementation of "multipart/report"
+MIME type on SMTP protocol as defined in <a href="https://tools.ietf.org/html/rfc3462">RFC 3462</a>.</p>
+</div>
+<div class="paragraph">
+<p>The Multipart/Report Multipurpose Internet Mail Extensions (MIME) content-type
+is a general "family" or "container" type for electronic mail reports of any
+kind.</p>
+</div>
+<div class="paragraph">
+<p>Format of content-type,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>"Content-Type:" SP "multipart/report;"
+	FWS "report-type=" report-type ";"
+	FWS "boundary=" boundary</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When used to send a report, it MUST be the top-level MIME content type.</p>
+</div>
+<div class="paragraph">
+<p>The Multipart/Report content-type contains either two or three sub-
+parts, in the following order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>(Required) The first body part contains human readable message.</p>
+</li>
+<li>
+<p>(Required) A machine parse-able body part containing an account of
+the reported message handling event.  The purpose of this body part is
+to provide a machine-readable description of the conditions that
+caused the report to be generated, along with details not present in
+the first body part that may be useful to human experts.  An initial
+body part, "message/delivery-status" is defined in RFC 3464 (see below).</p>
+</li>
+<li>
+<p>(Optional) A body part containing the returned message or a portion
+thereof.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_the_textrfc822_headers_content_type">2.1. The text/rfc822-headers content-type</h3>
+<div class="paragraph">
+<p>Format,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>"Content-Type:" SP "text/rfc822-headers"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The text/rfc822-headers body part should contain all the RFC822 header lines
+from the message which caused the report.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="status-codes">3. Enhanced Mail System Status Codes (RFC 3463)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Syntax,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>status-code = class "." subject "." detail
+class = "2"/"4"/"5"
+subject = 1*3digit
+detail = 1*3digit</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>White-space characters and comments are NOT allowed within a status-code.</p>
+</div>
+<div class="paragraph">
+<p>Each numeric sub-code within the status-code MUST be expressed without leading
+zero digits.</p>
+</div>
+<div class="sect2">
+<h3 id="_class">3.1. Class</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>2.XXX.XXX   Success</p>
+</li>
+<li>
+<p>4.XXX.XXX   Persistent Transient Failure</p>
+</li>
+<li>
+<p>5.XXX.XXX   Permanent Failure</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_subject">3.2. Subject</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>X.0.XXX   Other or Undefined Status</p>
+</li>
+<li>
+<p>X.1.XXX Addressing Status.  Problem on sender&#8217;s recipient address.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.1.0     Other address status</p>
+</li>
+<li>
+<p>X.1.1     Bad destination mailbox address</p>
+</li>
+<li>
+<p>X.1.2     Bad destination system address</p>
+</li>
+<li>
+<p>X.1.3     Bad destination mailbox address syntax</p>
+</li>
+<li>
+<p>X.1.4     Destination mailbox address ambiguous</p>
+</li>
+<li>
+<p>X.1.5     Destination mailbox address valid</p>
+</li>
+<li>
+<p>X.1.6     Mailbox has moved</p>
+</li>
+<li>
+<p>X.1.7     Bad sender&#8217;s mailbox address syntax</p>
+</li>
+<li>
+<p>X.1.8     Bad sender&#8217;s system address</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>X.2.XXX Mailbox Status.  Problem on receiver.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.2.0     Other or undefined mailbox status</p>
+</li>
+<li>
+<p>X.2.1     Mailbox disabled, not accepting messages</p>
+</li>
+<li>
+<p>X.2.2     Mailbox full</p>
+</li>
+<li>
+<p>X.2.3     Message length exceeds administrative limit.</p>
+</li>
+<li>
+<p>X.2.4     Mailing list expansion problem</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>X.3.XXX Mail System Status.  Problem on receiver (destination MTA).</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.3.0     Other or undefined mail system status</p>
+</li>
+<li>
+<p>X.3.1     Mail system full</p>
+</li>
+<li>
+<p>X.3.2     System not accepting network messages</p>
+</li>
+<li>
+<p>X.3.3     System not capable of selected features</p>
+</li>
+<li>
+<p>X.3.4     Message too big for system</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>X.4.XXX Network and Routing Status. Problem receiver (destination MTA).</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.4.0     Other or undefined network or routing status</p>
+</li>
+<li>
+<p>X.4.1     No answer from host</p>
+</li>
+<li>
+<p>X.4.2     Bad connection</p>
+</li>
+<li>
+<p>X.4.3     Routing server failure</p>
+</li>
+<li>
+<p>X.4.4     Unable to route</p>
+</li>
+<li>
+<p>X.4.5     Network congestion</p>
+</li>
+<li>
+<p>X.4.6     Routing loop detected</p>
+</li>
+<li>
+<p>X.4.7     Delivery time expired</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>X.5.XXX Mail Delivery Protocol Status</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.5.0     Other or undefined protocol status</p>
+</li>
+<li>
+<p>X.5.1     Invalid command</p>
+</li>
+<li>
+<p>X.5.2     Syntax error</p>
+</li>
+<li>
+<p>X.5.3     Too many recipients</p>
+</li>
+<li>
+<p>X.5.4     Invalid command arguments</p>
+</li>
+<li>
+<p>X.5.5     Wrong protocol version</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>X.6.XXX Message Content or Media Status.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.6.0     Other or undefined media error</p>
+</li>
+<li>
+<p>X.6.1     Media not supported</p>
+</li>
+<li>
+<p>X.6.2     Conversion required and prohibited</p>
+</li>
+<li>
+<p>X.6.3     Conversion required but not supported</p>
+</li>
+<li>
+<p>X.6.4     Conversion with loss performed</p>
+</li>
+<li>
+<p>X.6.5     Conversion failed</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>X.7.XXX Security or Policy Status.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>X.7.0     Other or undefined security status</p>
+</li>
+<li>
+<p>X.7.1     Delivery not authorized, message refused</p>
+</li>
+<li>
+<p>X.7.2     Mailing list expansion prohibited</p>
+</li>
+<li>
+<p>X.7.3     Security conversion required but not possible</p>
+</li>
+<li>
+<p>X.7.4     Security features not supported</p>
+</li>
+<li>
+<p>X.7.5     Cryptographic failure</p>
+</li>
+<li>
+<p>X.7.6     Cryptographic algorithm not supported</p>
+</li>
+<li>
+<p>X.7.7     Message integrity failure</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_message_format_for_dsn_rfc_3464">4. Message Format for DSN (RFC 3464)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section provide summary and notes on implementation of DSN on SMTP
+protocol as defined in <a href="https://tools.ietf.org/html/rfc3464">RFC 3464</a>.</p>
+</div>
+<div class="paragraph">
+<p>A DSN is a "multipart/report" MIME message with three components,</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Human readable explanation of the DSN</p>
+</li>
+<li>
+<p>Machine readable delivery-status</p>
+</li>
+<li>
+<p>Original message</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_human_readable_explanation_of_the_dsn">4.1. Human readable explanation of the DSN</h3>
+<div class="paragraph">
+<p>Format,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Date: {timestamp-with-zone}
+From: Mail Delivery Subsystem &lt;MAILER-DAEMON@CS.UTK.EDU&gt;
+To: &lt;owner-info-mime@cs.utk.edu&gt;
+MIME-Version: 1.0
+Content-Type: message/report;
+	report-type=delivery-status;
+	boundary="{boundary}"
+Subject: Returned mail: Cannot send message for 5 days
+
+--{boundary}
+
+	(Explain the notification in human readable format)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The "From" field of message header of DSN SHOULD contain the address of human
+who responsible at Reporting-MTA and SHOULD be chosen so that DSN will not
+generate mail loops.</p>
+</div>
+<div class="paragraph">
+<p>The "To" field of message header and "RCPT TO:" parameter is return-path from
+"MAIL FROM:" command.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_machine_readable_explanation_of_dsn">4.2. Machine readable explanation of DSN</h3>
+<div class="paragraph">
+<p>Header format,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>CRLF
+"--" boundary CRLF
+"Content-Type: message/delivery-status" CRLF
+CRLF
+message-fields
+CRLF
+1*(recipient-fields)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The body of this sub-part contain message-fields and one or more
+recipient-fields.</p>
+</div>
+<div class="paragraph">
+<p>Any header that start with "X-" are extension fields; such names are reserved
+for experimental use.</p>
+</div>
+<div class="paragraph">
+<p>Each sender-specified recipient address SHOULD result in at most one
+"delivered" or "failed" DSN for that recipient</p>
+</div>
+<div class="sect3">
+<h4 id="_format_for_message_fields">4.2.1. Format for message-fields</h4>
+<div class="literalblock">
+<div class="content">
+<pre>[ "Original-Envelope-Id:" SP envelope-id CRLF ]
+"Reporting-MTA:" SP mta-type ";" MTA-name CRLF
+[ "DSN-Gateway:" SP "dns;" MTA-name CRLF ]
+[ "Received-From-MTA:" SP "dns;" MTA-name CRLF ]
+[ "Arrival-Date" ":" date-time CRLF ]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The "Original-Envelope-ID" MUST be supplied if original message MAIL command
+contains ENVID, except when a DSN is issued by the sender&#8217;s MTA itself (Sender
+MTA = Reporting MTA)</p>
+</div>
+<div class="paragraph">
+<p>If no ENVID parameter, the "Original-Envelope-ID" field MUST NOT be supplied.</p>
+</div>
+<div class="paragraph">
+<p>The "envelope-id" is CASE-SENSITIVE.
+The DSN MUST preserve the original case and spelling of the envelope-id.</p>
+</div>
+<div class="paragraph">
+<p>MTA-type MUST be "dns" if MTA is connected to internet, otherwise it SHOULD be
+"x-local-hostname".</p>
+</div>
+<div class="paragraph">
+<p>MTA-name are case sensitive.
+MTA-name SHOULD be valid Internet domain names.
+If such domain names are not available, a domain-literal containing the
+internet protocol address is acceptable.</p>
+</div>
+<div class="paragraph">
+<p>DSN-Gateway field MUST appear in any DSN that was translated by a gateway from
+a foreign system into DSN format, and MUST NOT appear otherwise.</p>
+</div>
+<div class="paragraph">
+<p>Received-From-MTA field indicates the name of the Reporting MTA.</p>
+</div>
+<div class="paragraph">
+<p>Arrival-Date field indicates the date and time at which the message arrived at
+the Reporting MTA.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_format_for_recipient_fields">4.2.2. Format for recipient-fields</h4>
+<div class="literalblock">
+<div class="content">
+<pre>[ "Original-Recipient:" SP address-type ";" generic-address CRLF ]
+"Final-Recipient:" SP address-type ";" generic-address CRLF
+"Action:" SP action-value CRLF
+"Status:" SP status-code CRLF
+[ "Remote-MTA: dns;" mta-name CRLF ]
+[ "Diagnostic-Code:" SP diagnostic-type ";" *text CRLF ]
+[ "Last-Attempt-Date:" date-time CRLF ]
+[ "Final-Log-ID:" *text CRLF ]
+[ "Will-Retry-Until" ":" date-time CRLF ]</pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_original_recipient_and_final_recipient">Original-Recipient and Final-Recipient</h5>
+<div class="paragraph">
+<p>address-type field is "rfc822".</p>
+</div>
+<div class="paragraph">
+<p>address-type field is "unknown" if the Reporting MTA cannot determine the type
+of the original recipient address from the message envelope.</p>
+</div>
+<div class="paragraph">
+<p>The generic-address sub-field of Original-Recipient field is recipient address
+in the message envelope.</p>
+</div>
+<div class="paragraph">
+<p>The generic-address sub-field of the Final-Recipient field MUST contain the
+mailbox address of the recipient (from the transport envelope), as it was when
+the Reporting MTA accepted the message for delivery.</p>
+</div>
+<div class="paragraph">
+<p>The case of alphabetic characters in the address MUST be preserved.</p>
+</div>
+<div class="paragraph">
+<p>If sender supplied ORCPT parameter, the Original-Recipient MUST be supplied,
+otherwise this field MUST NOT appear.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_action">Action</h5>
+<div class="paragraph">
+<p>action-value is case insensitive, with one of the following values,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"failed" indicates that the message could not be delivered to the recipient.</p>
+</li>
+<li>
+<p>"delayed" indicates that the Reporting MTA has so far been unable
+to deliver or relay the message, but it will continue to attempt to do so.</p>
+</li>
+<li>
+<p>"delivered" indicates that the message was successfully delivered to
+the recipient address specified by the sender.
+It does not indicate that the message has been read.
+This is a terminal state and no further DSN for this recipient should be
+expected.</p>
+</li>
+<li>
+<p>"relayed" indicates that the message has been relayed or gateway-ed
+into an environment that does not accept responsibility for generating DSNs
+upon successful delivery.
+This action-value SHOULD NOT be used unless the sender has requested
+notification of successful delivery for this recipient.</p>
+</li>
+<li>
+<p>"expanded" indicates that the message has been successfully delivered to the
+recipient address as specified by the sender, and forwarded by the
+Reporting-MTA beyond that destination to multiple additional recipient
+addresses.
+An action-value of "expanded" differs from "delivered" in that "expanded" is
+not a terminal state.
+Further "failed" and/or "delayed" notifications may be provided.
+This value SHOULD NOT be used with a DSN issued on delivery of a message to a
+"mailing list".</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_status">Status</h5>
+<div class="paragraph">
+<p>Each numeric sub-field within the status-code MUST be expressed without
+leading zero digits.</p>
+</div>
+<div class="paragraph">
+<p>See section <a href="#status-codes">Enhanced Mail System Status Codes (RFC 3463)</a> for its value.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_remote_mta">Remote-MTA</h5>
+<div class="paragraph">
+<p>For DSNs resulting from attempts to relay a message to one or more recipients
+via SMTP, the Remote-MTA field MUST be supplied for each of those recipients.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_diagnostic_code">Diagnostic-Code</h5>
+<div class="paragraph">
+<p>For DSNs resulting from attempts to relay a message to one or more recipients
+via SMTP, the Diagnostic-Code MUST be supplied for each of those recipients,
+with diagnostic-type is set to "smtp".</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_last_attempt_date">Last-Attempt-Date</h5>
+<div class="paragraph">
+<p>The Last-Attempt-Date field gives the date and time of the last attempt to
+relay, gateway, or deliver the message (whether successful or unsuccessful) by
+the Reporting MTA.</p>
+</div>
+<div class="paragraph">
+<p>It MUST NOT be included if the actual date and time of the last delivery
+attempt are not available.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_final_log_id">Final-Log-ID</h5>
+<div class="paragraph">
+<p>This can be useful as an index to the final-mta&#8217;s log entry for that delivery
+attempt.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_will_retry_until">Will-Retry-Until</h5>
+<div class="paragraph">
+<p>This header is for "delayed" status, which inform the final MTA the data and
+time when the message will be abandoned if delivery is keep failing.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_original_message">4.3. Original message</h3>
+<div class="paragraph">
+<p>This sub-part contains the original message headers and/or message data,
+depends on the value of RET parameter on RCPT command.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-12-31 20:35:09 +0700
+</div>
+</div>
+</body>
+</html>
