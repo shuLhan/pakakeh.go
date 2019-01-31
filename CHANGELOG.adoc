@@ -8,6 +8,7 @@ first week of next month.
 
 ===  Features Changes
 
+*  `lib/debug`: add function to write heap profile to file
 *  `lib/debug`: add type to store relative and difference on memory heap
 *  `lib/dns`: remove request pool
 *  `lib/dns`: export the connection field on UDPClient
