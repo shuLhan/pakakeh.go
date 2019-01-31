@@ -96,8 +96,9 @@ working with a single rune or slice of rune.
 
 * link:{url-godoc}/lib/smtp[*smtp*^]: Package smtp provide a library for
 building SMTP server and client.
+This package is working in progress.
 
-* link:{url-godoc}/lib/strings[*strings*^]: Package string provide a library
+* link:{url-godoc}/lib/strings[*strings*^]: Package strings provide a library
 for working with string or slice of string.
 
 * link:{url-godoc}/lib/tabula[*tabula*^]: Package tabula is a Go library for
@@ -122,7 +123,7 @@ websocket library for server and client.
 
 == Changelog
 
-include::CHANGELOG.adoc[]
+See include::CHANGELOG.adoc[]
 
 
 == Documentations
@@ -149,8 +150,6 @@ Transport Layer Security (RFC3207)]
 (RFC 4954)]
 
 * link:doc/IMF.html[Internet Message Format (RFC 5322)]
-
-=== Development
 
 The documentation created using asciidoctor.  First, install `ruby` and
 `bundler`, and then execute `bundler` on source root directory.
