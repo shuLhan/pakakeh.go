@@ -135,6 +135,12 @@ code due to their scope and limitation of godoc formatting itself.
 ** link:doc/SASL_PLAIN.html[The PLAIN Simple Authentication and Security Layer
 (SASL) Mechanism (RFC 4616)]
 
+* link:doc/DKIM_OVERVIEW.html[DomainKeys Identified Mail Service Overview (RFC 5585)]
+** link:doc/DKIM_THREATS.html[Analysis of Threats Motivating DKIM (RFC 4686)]
+** link:doc/DKIM_DEVOPS.html[DKIM Development, Deployment, and Operations (RFC
+5863)]
+** link:doc/DKIM_SIGNATURES.html[DKIM Signatures (RFC 6379)]
+
 * link:doc/SMTP.html[Simple Mail Transfer Protocol (RFC5321)]
 ** link:doc/ESMTP_DSN.html[Delivery Status Notification (RFC3461-3464)]
 ** link:doc/ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over

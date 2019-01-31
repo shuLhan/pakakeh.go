@@ -15,13 +15,124 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_share_v0_1_0">share v0.1.0</a></li>
+<li><a href="#_share_v0_3_0_2019_xx_xx">share v0.3.0 (2019-xx-xx)</a>
+<ul class="sectlevel2">
+<li><a href="#_features_changes">Features Changes</a></li>
+<li><a href="#_enhancements">Enhancements</a></li>
+<li><a href="#_fixes">Fixes</a></li>
+</ul>
+</li>
+<li><a href="#_share_v0_2_0_2019_01_02">share v0.2.0 (2019-01-02)</a>
+<ul class="sectlevel2">
+<li><a href="#_new_features">New Features</a></li>
+<li><a href="#_enhancements_2">Enhancements</a></li>
+</ul>
+</li>
+<li><a href="#_share_v0_1_0_2018_11_29">share v0.1.0 (2018-11-29)</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This library is released each month, either at the end of month or at the
+first week of next month.</p>
+</div>
+</div>
+</div>
 <div class="sect1">
-<h2 id="_share_v0_1_0">share v0.1.0</h2>
+<h2 id="_share_v0_3_0_2019_xx_xx">share v0.3.0 (2019-xx-xx)</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_features_changes">Features Changes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>lib/debug</code>: add type to store relative and difference on memory heap</p>
+</li>
+<li>
+<p><code>lib/dns</code>: remove request pool</p>
+</li>
+<li>
+<p><code>lib/dns</code>: export the connection field on UDPClient</p>
+</li>
+<li>
+<p><code>lib/dns</code>: add type of connection</p>
+</li>
+<li>
+<p><code>lib/http</code>: add parameter http.ResponseWriter to Callback.</p>
+</li>
+<li>
+<p><code>lib/http</code>: the RegisterXxx functions now use the Endpoint type.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_enhancements">Enhancements</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Various fixes suggested by linters</p>
+</li>
+<li>
+<p>doc: add four summary and notes about DKIM</p>
+</li>
+<li>
+<p>doc: add summary of Simple Authentication and Security Layer (SASL)</p>
+</li>
+<li>
+<p>doc: add summary on SMTP over TLS (RFC3207)</p>
+</li>
+<li>
+<p>doc: add notes for Internet Message Format (RFC 5322)</p>
+</li>
+<li>
+<p>doc: add documentation for SMTP and DSN</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fixes">Fixes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>lib/git</code>: fix testdata and test input</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_share_v0_2_0_2019_01_02">share v0.2.0 (2019-01-02)</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_new_features">New Features</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>lib/errors</code>, package errors provide a custom error with code.</p>
+</li>
+<li>
+<p><code>lib/http</code>, package http implement custom HTTP server with memory file
+system and simplified routing handler.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_enhancements_2">Enhancements</h3>
+<div class="paragraph">
+<p>Fix warnings from linters.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_share_v0_1_0_2018_11_29">share v0.1.0 (2018-11-29)</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The first release of <code>share</code> package contains one command line interface (CLI)
@@ -51,7 +162,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-12-08 16:24:48 +0700
+Last updated 2019-01-31 08:56:34 +0700
 </div>
 </div>
 </body>

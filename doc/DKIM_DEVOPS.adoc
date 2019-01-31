@@ -1,0 +1,867 @@
+= DomainKeys Identified Mail (DKIM) Development, Deployment, and Operations
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc:
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc5863: https://tools.ietf.org/html/rfc5863
+
+This document provide note and summary of RFC 5863, DKIM Development,
+Deployment, and Operations.
+
+==  Introduction
+
+This document provides practical tips for those who are developing DKIM
+software, mailing list managers, filtering strategies based on the output from
+DKIM verification, and DNS servers.
+
+==  Using DKIM as Part of Trust Assessment
+
+===  A Systems View of Email Trust Assessment
+
+DKIM only claim about message content is that the content cited in the
+"DKIM-Signature:" field's "h=" tag has been delivered without modification.
+That is, it asserts message content integrity -- between signing and verifying
+-- not message content validity.
+
+....
+     +------+------+                            +------+------+
+     |   Author    |                            |  Recipient  |
+     +------+------+                            +------+------+
+            |                                          ^
+            |                                          |
+            |                                   +------+------+
+            |                                -->|  Handling   |<--
+            |                                -->|   Filter    |<--
+            |                                   +-------------+
+            |                                          ^
+            V                  Responsible             |
+     +-------------+           Identifier       +------+------+
+     | Responsible |. .       . . . . . . . . .>|  Identity   |
+     |  Identity   |  .       .                 |  Assessor   |
+     +------+------+  .       .                 +-------------+
+            |         V       .                       ^ ^
+            V         .       .                       | |
+   +------------------.-------.--------------------+  | |
+   | +------+------+  . . . > .   +-------------+  |  | |  +-----------+
+   | | Identifier  |              | Identifier  +--|--+ +--+ Assessment|
+   | |   Signer    +------------->| Validator   |  |       | Databases |
+   | +-------------+              +-------------+  |       +-----------+
+   |                 DKIM Service                  |
+   +-----------------------------------------------+
+
+              Figure 1: Actors in a Trust Sequence Using DKIM
+....
+
+===  Choosing a DKIM Tag for the Assessment Identifier
+
+DKIM has three values that specify identification information and it is easy
+to confuse their use, although only one defines the formal input and output of
+DKIM, with the other two being used for internal protocol functioning and
+adjunct purposes, such as auditing and debugging.
+
+DKIM's primary task is to communicate from the Signer to a recipient-side
+Identity Assessor a single Signing Domain Identifier (SDID) that refers to a
+responsible identity.
+DKIM MAY optionally provide a single responsible Agent or User Identifier
+(AUID).
+A receive-side DKIM verifier MUST communicate the Signing Domain Identifier
+(d=) to a consuming Identity Assessor module and MAY communicate the User
+Agent Identifier (i=) if present.
+To the extent that a receiver attempts to intuit any structured semantics for
+either of the identifiers, this is a heuristic function that is outside the
+scope of DKIM's specification and semantics.
+
+The single, mandatory value that DKIM supplies as its output is:
+
+*d=*
+This tag specify domain name of signing identity, also called Signing Domain
+Identifier (SDID).
+
+The adjunct values are:
+
+*s=*
+This tag specifies the selector, to discriminate among different keys that can
+be used for the same SDID.
+As discussed in Section 4.3 of [RFC5585],
+
+"If verifiers were to employ the selector as part of an assessment mechanism,
+then there would be no remaining mechanism for making a transition from an
+old, or compromised, key to a new one".
+
+Consequently, the selector is not appropriate for use as part or all of the
+identifier used to make assessments.
+
+*i=*
+This tag is optional and provides the Agent or User Identifier (AUID)
+on behalf of which the SDID is taking responsibility [RFC5672].
+The identity can be in the syntax of an entire email address or only a domain
+name.
+The domain name can be the same as for "d=" or it can be a sub-name of the
+"d=" name.
+
+NOTE: Although the "i=" identity has the syntax of an email address, it is not
+required to have those semantics.
+That is, "the identity of the user" need not be the same as the user's
+mailbox.
+For example, the signer might wish to use "i=" to encode user-related audit
+information, such as how they were accessing the service at the time of
+message posting.
+Therefore, it is not possible to conclude anything from the "i=" string's
+(dis)similarity to email addresses elsewhere in the header.
+
+So, "i=" can have any of these properties:
+
+*  Be a valid domain when it is the same as "d="
+
+*  Appear to be a subdomain of "d=" but might not even exist
+
+*  Look like a mailbox address but might have different semantics and
+therefore not function as a valid email address
+
+*  Be unique for each message, such as indicating access details of the user
+for the specific posting
+
+This underscores why the tag needs to be treated as being opaque, since it can
+represent any semantics, known only to the signer.
+
+Hence, "i=" serves well as a token that is usable like a Web cookie, for
+return to the signing Administrative Management Domain (ADMD) -- such as for
+auditing and debugging.
+Of course in some scenarios the "i=" string might provide a useful adjunct
+value for additional (heuristic) processing by the Handling Filter.
+
+===  Choosing the Signing Domain Name
+
+For an entity creating DKIM signatures, it is likely that different portions
+of its mail will warrant different levels of trust.
+
+It is therefore likely to be useful for a signer to use different "d="
+subdomain names, for different message traffic streams, so that receivers can
+make differential assessments.
+
+Generally, in a trust system, legitimate signers have an incentive to pick a
+small stable set of identities, so that recipients and others can attribute
+reputations to them.
+
+Hence, the challenge is to determine a useful scheme for labeling different
+traffic streams.
+The most obvious choices are among different types of content and/or different
+types of authors.
+Although stability is essential, it is likely that the choices will change,
+over time, so the scheme needs to be flexible.
+
+===  Recipient-Based Assessments
+
+With DKIM, the Assessor can know that two messages with the same SDID are, in
+fact, signed by the same person or organization.
+This permits a far more stable and accurate assessment of mail traffic.
+
+With the identifier(s) supplied by DKIM, the Assessor can consult an
+independent assessment service about the entity associated with the
+identifier(s).
+Another possibility is that the Assessor can develop its own reputation rating
+for the identifier(s).
+
+===  Filtering
+
+.Trust versus Risk Handling Tradeoffs Example
+|===
+.2+^.^| Stream Risk 3+^| Organizational Trust
+^| Low ^| Medium ^| High
+
+| Low
+| BENIGN: Moderate filter
+| DILIGENT: Mild filter
+| PRISTINE: Accept
+
+| Medium
+| UNKNOWN: Strong filter
+| TYPICAL: Targeted filter
+| PROTECTED: Accept and Contact
+
+| High
+| MALICIOUS: Block and Counter
+| NEGLIGENT: Block
+| COMPROMISED: Block and Contact
+|===
+
+Stream Risk::
+This is a measure of the recent history of a message stream and the severity
+of problems it has presented.
+
+Organizational Trust::
+This combines longer-term history about possible stream problems from that
+organization, and its responsiveness to problem handling.
+
+Labels for the cells are meant as a general assessment of an
+organization producing that type of mail stream under that
+circumstance.
+
+Benign::
+There is some history of sending good messages, with very few harmful messages
+having been received.
+This stream warrants filtering that does not search for problems very
+aggressively, in order to reduce the likelihood of false positives.
+
+Diligent::
+The stream has had a limited degree of problems and the organization is
+consistently successful at controlling their abuse issues and in a timely
+manner.
+
+Pristine::
+There is a history of a clean message stream with no problems, from an organization with an excellent reputation.
+So, the filter primarily needs to ensure that messages are delivered; catching
+stray problem messages is a lesser concern.
+In other words, the paramount concern, here, is false positives.
+
+Unknown::
+There is no history with the organization.
+Apply an aggressive level of "naive" filtering, given the nature of the public
+email environment.
+
+Typical::
+The stream suffers significant abuse issues and the organization has
+demonstrated a record of having difficulties resolving them in a timely
+manner, in spite of legitimate efforts.
+Unfortunately, this is the typical case for service providers with an easy and
+open subscription policy.
+
+Protected::
+An organization with a good history and/or providing an important message
+stream for the receiving site is subject to a local policy that messages are
+not allowed to be blocked, but the stream is producing a problematic stream.
+The receiver delivers messages, but works quickly with the organization to
+resolve the matter.
+
+Malicious::
+A persistently problematic message stream is coming from an organization that
+appears to contribute to the problem.
+The stream will be blocked, but the organization's role is sufficiently
+troubling to warrant following up with others in the anti-abuse or legal
+communities, to constrain or end their impact.
+
+Negligent::
+A persistently problematic message stream is coming from an organization that
+does not appear to be contributing to the problem, but also does not appear to
+be working to eliminate it.
+At the least, the stream needs to be blocked.
+
+Compromised::
+An organization with a good history has a stream that changes and becomes too
+problematic to be delivered.
+The receiver blocks the stream and works quickly with the organization to
+resolve the matter.
+
+
+==  DKIM Key Generation, Storage, and Management
+
+===  Private Key Management: Deployment and Ongoing Operations
+
+Best practices on key managements,
+
+*  The signing key itself needs to be under direct control of as few key
+holders as possible.
+
+*  If a key holder were to leave the organization, all signing keys held by
+that key holder need to be withdrawn from service and, if appropriate,
+replaced.
+
+*  If key management hardware support is available, it needs to be used.
+
+*  If keys are stored in software, appropriate file control protections
+need to be employed, and any location in which the private key is stored in
+plaintext form needs to be excluded from regular backup processes and is best
+not accessible through any form of network including private local area
+networks.
+
+*  A signature key needs to exist in exactly one location and be erased when
+no longer used.
+
+*  Ideally, a signature key pair needs to be generated as close to the signing
+point as possible, and only the public key component transferred to another
+party.
+If this is not possible, the private key needs to be transported in an
+encrypted format that protects the confidentiality of the signing key.
+
+*  Key escrow schemes (managed by third party) are not necessary and are best
+not used.
+
+* An operational practice in which the private key is stored in tamper-proof
+hardware and changed once a year is considerably more desirable than one in
+which the signature key is changed on an hourly basis but maintained in
+software.
+
+To enable accountability and auditing:
+
+*  Responsibility for the security of a signing key needs to ultimately vest
+in a single named individual.
+
+*  Where multiple parties are authorized to sign messages, each signer needs
+to use a different key to enable accountability and auditing.
+
+===  Storing Public Keys: DNS Server Software Considerations
+
+Ideally, DNS Security (DNSSEC) [RFC4034] needs to be employed in a
+configuration that provides protection against record insertion attacks and
+zone enumeration.
+
+===  Assignment of Selectors
+
+It is intended that assessments of DKIM identities be based on the domain
+name, and not include the selector.
+
+===  Per-User Signing Key Management Issues
+
+If per-user signing keys are assigned for internal purposes, the following
+issues need to be considered before using such signatures as an alternative to
+traditional edge signing at the outbound MTA:
+
+*  External verifiers will be unable to make use of the additional signature
+granularity without access to additional information passed out of band
+with respect to [RFC4871].
+
+*  If the number of user keys is large, the efficiency of local caching of key
+records by verifiers will be lower.
+
+*  A large number of end users is be less likely to do an adequate job of
+managing private key data securely on their personal computers than is an
+administrator running an edge MTA.
+
+===  Third-Party Signer Key Management and Selector Administration
+
+Best practices when signer is handled by other provider,
+
+*  Signature keys used by a third-party signer need to be kept entirely
+separate from those used by the domain holder and other third-party signers.
+
+*  The signature key pair needs to be generated by the third-party signer and
+the public component of the key transmitted to the domain holder, rather
+than have the domain holder generate the key pair and transmit the private
+component to the third-party signer.
+
+===  Key Pair / Selector Life Cycle Management
+
+Example of key deployment process,
+
+.  A Key Pair is generated by the signing device.
+
+.  A proposed key selector record is generated and transmitted to the DNS
+administration infrastructure.
+
+.  The DNS administration infrastructure verifies the authenticity
+of the key selector registration request.  If accepted:
+..  A key selector is assigned.
+..  The corresponding key record is published in the DNS.
+..  Wait for DNS updates to propagate (if necessary).
+..  Report assigned key selector to signing device.
+
+.  The signer verifies correct registration of the key record.
+
+.  The signer begins generating signatures using the new key pair.
+
+.  The signer terminates any private keys that are no longer required due to issue of replacement.
+
+
+Example of key termination process,
+
+.  The signer stops using the private key for signature operations.
+
+.  The signer deletes all records of the private key, including in-memory
+copies at the signing device.
+
+.  The signer notifies the DNS administration infrastructure that the signing
+key is withdrawn from service and that the corresponding key records can be
+withdrawn from service at a specified future date.
+
+.  The DNS administration infrastructure verifies the authenticity of the key
+selector termination request.  If accepted,
+
+..  The key selector is scheduled for deletion at a future time determined by
+site policy
+
+..  Wait for deletion time to arrive.
+
+..  The signer either publishes a revocation key selector with an empty
+public-key data (p=) field, or deletes the key selector record entirely.
+
+.  As far as the verifier is concerned, there is no functional difference
+between verifying against a key selector with an empty "p=" field, and
+verifying against a missing key selector: both result in a failed signature
+and the signature needs to be treated as if it had not been there.
+However, there is a minor semantic difference: with the empty "p=" field, the
+signer is explicitly stating that the key has been revoked.
+The empty "p=" record provides a gravestone for an old selector, making it less
+likely that the selector might be accidentally reused with a different public
+key.
+
+
+== Signing
+
+Signing a message require two services,
+
+* A DNS service where one can maintain domain name and their resource record.
+* A trusted service where outgoing email within organization will be added the
+"DKIM-Signature:" header field.
+
+===  DNS Record
+
+Initial DKIM DNS information is contained within TXT RRs.
+
+The "DKIM-Signature:" header in the message contains the "d=" tag with the
+basic domain name doing the signing and serving as output to the Identity
+Assessor and the s= tag with the selector that is added to the name, for
+finding the specific public key.
+Hence, the relevant "<selector>._domainkey.<domain-name>" DNS record needs to
+contain a DKIM-related RR that provides the public key information
+
+===  Signing Module
+
+The module doing signing can be placed anywhere within an organization's
+trusted Administrative Management Domain (ADMD); obvious choices include
+department-level posting agents, as well as  outbound boundary MTAs to the
+open Internet.
+
+Given that DKIM is intended for use during email transit, rather than for
+long-term storage, it is expected that keys will be changed regularly.
+For administrative convenience, it is best not to hard-code key information
+into software.
+
+===  Signing Policies and Practices
+
+Every organization (ADMD) will have its own policies and practices for
+deciding when to sign messages (message stream) and with what domain name,
+selector, and key.
+
+
+==  Verifying
+
+===  Intended Scope of Use
+
+DKIM requires that a message with a signature that is found to be invalid is
+to be treated as if the message had not been signed at all.
+
+If a DKIM signature fails to verify, it is entirely possible that the message
+is valid and that either there is a configuration error in the signer's system
+(e.g., a missing key record) or that the message was inadvertently modified in
+transit.
+If messages with invalid signatures were to be treated preferentially to
+messages with no signatures whatsoever, attackers will simply add invalid
+signature blocks to gain the preferential treatment.
+
+===  Signature Scope
+
+Verifiers need to consider only the part of the message that is inside the
+scope of the message as being authenticated by the signature.
+
+===  Design Scope of Use
+
+Valid DKIM signature does not represent proof positive that a valid claim of
+responsibility was made for it by the indicated party, that the message is
+authentic, or that the message is not abusive.
+In particular:
+
+*  The legitimate private key holder might have lost control of its private
+key.
+
+*  The legitimate domain holder might have lost control of the DNS server for
+the zone from which the key record was retrieved.
+
+*  The key record might not have been delivered from the legitimate DNS server
+for the zone from which the key record was retrieved.
+
+*  Ownership of the DNS zone might have changed.
+
+===  Inbound Mail Filtering
+
+Messages that carry a valid DKIM signature from a trusted source can be
+whitelisted, avoiding the need to perform computation and hence
+energy-intensive content analysis to determine the disposition of the message.
+
+*Non-Verifying Adaptive Spam Filtering Systems*.
+Adaptive (or learning) spam filtering mechanisms that are not capable of
+verifying DKIM signatures need to, at minimum, be configured to ignore DKIM
+header data entirely.
+
+===   Messages Sent through Mailing Lists and Other Intermediaries
+
+The intermediary that change the message content are strongly encouraged to
+deploy DKIM signing so that a verifiable claim of responsibility remains
+available to parties attempting to verify the modified message.
+
+===  Generation, Transmission, and Use of Results Headers
+
+Consider the cases where:
+
+*  The application relying on DKIM signature verification is not capable of
+performing the verification.
+
+*  The message can be modified after the signature verification is performed.
+
+*  The signature key cannot be available by the time that the message is read.
+
+In such cases, it is important that the communication link between the
+signature verifier and the relying application be sufficiently secure to
+prevent insertion of a message that carries a bogus results header.
+
+
+==  Taxonomy of Signatures
+
+===  Single Domain Signature
+
+The simplest case is when an organization use their own domain in the SDID of
+the signatures.
+The addresses in the "RFC5322.From" field would also be organization's domain
+name.
+
+===  Parent Domain Signature
+
+An organization with multiple active subdomains may apply the same (single)
+signature domain to mail from all subdomains.
+
+Another approach to distinguishing the streams using a single DKIM key would
+be to leverage the AUID [RFC5672] (i= tag) in the DKIM signature to
+differentiate the mail streams.
+For example, marketing email would be signed with
+"i=@marketing.domain.example" and "d=domain.example".
+
+===  Third Party Signature
+
+A signature whose domain does not match the domain of the RFC5322.From address
+is sometimes referred to as a third-party signature.
+
+Third-party signatures encompass a wide range of identities.
+Some of the more common are:
+
+*Service Provider*:
+An organization may outsourced their email to other provider.
+Such provider can DKIM-sign outbound mail with their own identifier.
+
+*Parent Domain*:
+As discussed above, organizations choosing to apply a parent-domain signature
+to mail originating from subdomains can have their signatures treated as third
+party by some verifiers, depending on whether or not the "t=s" tag is used to
+constrain the parent signature to apply only to its own specific domain.
+
+*Reputation Provider*:
+Such a signature would indicate to receivers that the message was being
+vouched for by that third party.
+
+===  Using Trusted Third Party (TTP) Senders
+
+A different model arises when an organization uses a trusted third-party
+sender for certain key business functions, but still wants that email to
+benefit from the organization's own identity and reputation.
+
+This can be done by having the third party generate a key pair that is
+designated uniquely for use by that trusted third party and publishing the
+public key in the controlling organization's DNS domain, thus enabling the
+third party to sign mail using the signature of the controlling organization.
+
+====  DNS Delegation
+
+In this case, Company A would create a subdomain benefits.companya.example,
+and delegate the DNS management of that subdomain to the benefits company
+so it could maintain its own key records.
+When revocation becomes necessary, Company A could simply remove the DNS
+delegation record.
+
+===  Multiple Signatures
+
+One important caveat to the use of multiple signatures is that there is
+currently no clear consensus among receivers on how they plan to handle them.
+The opinions range from ignoring all but one signature (and the specification
+of which of them is verified differs from receiver to receiver), to verifying
+all signatures present and applying a weighted blend of the trust assessments
+for those identifiers, to verifying all signatures present and simply using
+the identifier that represents the most positive trust assessment.
+It is likely that the industry will evolve to accept multiple signatures using
+either the second or third of these, but it can take some time before one
+approach becomes pervasive.
+
+There are a number of situations where applying more than one DKIM signature
+to the same message might make sense.
+A few examples are:
+
+*  Companies with multiple subdomain identities.
+A company that has multiple subdomains sending distinct categories of mail
+might choose to sign with distinct subdomain identities to enable each
+subdomain to manage its own identity.
+However, it might also want to provide a common identity that cuts across all of the distinct subdomains.
+For example, Company A can sign mail for its sales department with a signature
+where "d=sales.companya.example" and a second signature where
+"d=companya.example".
+
+*  Service Providers.
+A service provider can, as described above, choose to sign outbound messages
+with either its own identity or an identity unique to each of its clients
+(possibly delegated).
+However, it can also do both: sign each outbound message with its own identity
+as well as with the identity of each individual client.
+For example, ESP A might sign mail for its client Company B with its service
+provider signature "d=espa.example", and a second client-specific signature
+where "d=" either "companyb.example" or "companyb.espa.example".
+
+*  Forwarders.
+Some forwarders such as mailing lists or "forward article to a friend"
+services might choose to add their own signatures to outbound messages to
+vouch for them having legitimately originated from the designated service.
+In this case, the signature would be added even in the presence of a
+preexisting signature, and both signatures would be relevant to the verifier.
+
+Any forwarder that modifies messages in ways that will break preexisting DKIM
+signatures needs to sign its forwarded messages.
+
+*  Reputation Providers.
+It is possible that they, or other organizations willing to put their "seal of
+approval" on an email stream, might choose to use a DKIM signature to do it.
+In nearly all cases, this "reputation" signature would be in addition to the
+author or originator signature.
+
+==  Example Usage Scenarios
+
+This section provides some examples of usage scenarios for DKIM deployments.
+
+===  Author's Organization - Simple
+
+In this scenario, Company A need only generate a single signing key and
+publish it under their top-level domain (companya.example); the signing module
+would then tailor the AUID value as needed at signing time.
+
+===  Author's Organization - Differentiated Types of Mail
+
+An organization may distinguish email from several department, where each
+department may have their own subdomain with its unique signing keys.
+
+===  Author Domain Signing Practices (ADSP)
+
+====  Introduction
+
+A domain might decide to sign all of their outgoing mail.
+In such a configuration, the absence of a signature would be more significant
+than for the general case.
+
+Sending domains that do not control all legitimate outbound mail purporting to
+be from their domain are likely to experience delivery problems with some
+percentage of that mail.
+Administrators evaluating ADSP for their domains needs to carefully weigh the
+risk of phishing attacks against the likelihood of undelivered mail.
+
+==== A Few Definitions
+
+An address in the RFC5322.From header field of a message is defined as an
+"Author Address", and an "Author Domain" is defined as anything to the right
+of the '@' in an author address.
+
+An "Author Signature" is thus any valid signature where the value of the SDID
+matches an author domain in the message.
+
+Signers wishing to publish an Author Domain Signing Practices (ADSP)
+[RFC5617] record describing their signing practices will thus want to
+include an author signature on their outbound mail to avoid ADSP verification
+failures.
+
+====  Some ADSP Examples
+
+An organization (Company A) can specify its signing practices by
+publishing an ADSP record with "dkim=all" or "dkim=discardable".
+Any email with an RFC5322.From address that uses the domain where the ADSP
+record is published that does not have a valid author signature is at risk of
+being misdelivered or discarded.
+
+For example, email with an RFC5322.From address of "bob@companyA.example"
+needs to have an author signature where the SDID value is "companyA.example"
+or it will fail an ADSP validation.
+If a message with an RFC5322.From address of "newsletter@companyA.example" has
+a signature with "d=marketing.companyA.example", that message will fail the
+ADSP check because the signature would not be considered a valid author
+signature.
+
+In particular, in order to prevent mail from being negatively impacted or even
+discarded at the receiver, it is essential to perform a thorough survey of
+outbound mail from a domain before publishing an ADSP policy of anything
+stronger than "unknown".
+
+===  Delegated Signing
+
+A company might outsource its department's mail service to other provider.
+For example, Company A with marketing department, marketing.company-a.example,
+might be managed by provider X.
+
+Security concerns dictate that the keys be generated by the organization that
+plans to do the signing so that there is no need to transfer the private key.
+In other words, the provider X would generate keys.
+
+===  Independent Third-Party Service Providers
+
+An Email Service Provider (ESP A) might want to share its own mailing
+reputation with its clients, and might sign all outgoing mail from its clients
+with its own d= domain (e.g., d=espa.example).
+
+When the ESP wants to distinguish among its clients, it has two options:
+
+*  Share the SDID domain and use the AUID value to distinguish among the
+clients, e.g., a signature on behalf of client A would have "d=espa.example"
+and "i=@clienta.espa.example" (or "i=clienta@espa.example").
+
+*  Extend the SDID domain, so there is a unique value (and subdomain) for each
+client, e.g., a signature on behalf of client A would have
+"d=clienta.espa.example".
+
+===  Mail Streams Based on Behavioral Assessment
+
+An ISP (ISP A) might want to assign signatures to outbound mail from its users
+according to each user's past sending behavior (reputation).
+ISP A (ispa.example) can configure subdomains corresponding to the assessment
+categories (e.g., good.ispa.example, neutral.ispa.example, bad.ispa.example),
+and use these subdomains in the "d=" value of the signature.
+
+The signing module can also set the AUID value to have a unique user ID
+(distinct from the local-part of the user's email address), for example,
+"user3456@neutral.domain.example".
+
+===  Agent or Mediator Signatures
+
+Some examples of agents might be a mailing list manager, or the "forward
+article to a friend" service that many online publications offer.
+In most of these cases, the signature is asserting that the message originated
+with, or was relayed by, the service asserting responsibility.
+In general, if the service is configured in such a way that its forwarding
+would break existing DKIM signatures, it needs to always add its own
+signature.
+
+
+==  Usage Considerations
+
+===  A Non-Standard Submission and Delivery Scenarios
+
+The robustness of DKIM's verification mechanism is based on the fact
+that only authorized signing modules have access to the designated
+private key.
+This has the side effect that email submission and delivery scenarios that
+originate or relay messages from outside the domain of the authorized signing
+module will not have access to that protected private key, and thus will be
+unable to attach the expected domain signature to those messages.
+Such scenarios include mailing lists, courtesy forwarders, MTAs at hotels,
+hotspot networks used by traveling users, and other paths that could add
+or modify headers, or modify the message body.
+
+For example, assume that Joe have email address at joe@company-a.example,
+joe@isp-1.example, and joe@isp-2.example.
+
+When Joe send email through "isp-1" as "joe@company-a.example", that email
+cannot have a signature with d=company-a.example, because "isp-1"
+have no access to company-a.example's private key.
+The email will have signature from "isp-1.example" instead.
+
+===  Protection of Internal Mail
+
+If the organization signs all of its mail, then its boundary MTAs can look for
+mail purporting to be from the organization that does not contain a verifiable
+signature.
+Such mail can, in most cases, be presumed to be spurious.
+
+However, other paths could add or modify the can modify messages in ways that
+will invalidate an existing DKIM signature.
+Such breakage is particularly relevant in the presence of Author Domain
+Signing Practices.
+
+===  Signature Granularity
+
+It is possible to administer subdomains or otherwise adjust signatures in a
+way that supports per-user identification.
+This user-level granularity can be specified in two ways: either by sharing
+the signing identity and specifying an extension to the "i=" value that has a
+per-user granularity or by creating and signing with unique per-user keys.
+
+In most cases, it would be impractical to sign email on a per-user
+granularity.
+Such an approach would be
+
+*likely to be ignored:*
+In most cases today, if receivers are verifying DKIM signatures, they are in
+general taking the simplest possible approach.
+In many cases, maintaining reputation information at a per-user granularity is
+not interesting to them, in large part because the per-user volume is too
+small to be useful or interesting.
+
+*difficult to manage:*
+Any scheme that involves maintenance of a significant number of public keys
+might require infrastructure enhancements or extensive administrative
+expertise.
+This can create significant and often unnecessary management complexity.
+
+For those who choose to represent user-level granularity in signatures, the
+performance and management considerations above suggest that it would be more
+effective to do so by specifying a local part or subdomain extension in the
+"i=" tag rather than by extending the "d=" domain and publishing individual
+keys.
+
+===  Email Infrastructure Agents
+
+*Outbound*
+
+An MSA or an outbound MTA used for mail submission needs to ensure that the
+message sent is in compliance with the advertised email sending policy.
+If email messages does not comply it needs to be able to generate an operator
+alert.
+
+If MUAs add their own signature, and MSA needs to perform operation on a
+message to make it comply with its email sending policy, it needs to do so in
+a way that would not break those signatures.
+
+MUA are generally not under direct control of organization and more vulnerable
+to attack and compromise, which would jeopardize the integrity and reputation
+of the organization.
+So, MUA ability to sign is not encouraged.
+
+*Inbound*
+
+When an organization deploys DKIM, it needs to make sure that its email
+infrastructure components that do not have primary roles in DKIM handling do
+not modify message in ways that prevent subsequent verification.
+
+*Intermediaries*
+An email intermediary is both an inbound and outbound MTA.
+If the intermediary modifies a message in a way that breaks the signature, the
+intermediary,
+
+*  needs to deploy abuse filtering measures on the inbound mail, and
+*  probably also needs to remove all signatures that will be broken.
+
+The intermediary can,
+
+*  verify the message signature prior to modification.
+
+*  incorporate an indication of the verification results into the message,
+such as using an Authentication-Results header field [RFC5451].
+
+*  sign the modified message including the verification results (e.g., the
+Authentication-Results header field).
+
+
+===  Mail User Agent
+
+*Outbound*
+
+An MUA can sign a message, even if its not encouraged.
+In this case the signature from MUA is an addition to signature added by MSA.
+If user  software act as MSA and employed for sending directly to a receiving
+ADMD, the user software need to be considere an outbound MTA.
+
+*Inbound*
+
+An MUA can rely on report of DKIM verification from inbound MTA/MDA, or they
+can perform verification directly.
+If verification fails, the message is to be treated the same as a message that
+does not have a signature.
+
+An MUA that looks for an Authentication-Results header field needs to be
+configurable to choose which Authentication-Results header fields are
+considered trustable.
+The MUA developer is encouraged to re-read the Security Considerations of
+[RFC5451].
+
+Verified DKIM signature cannot be used by an MUA to indicate that a message is
+to be treated better than a message without a verified DKIM signature.
+However, it can be used as input into a reputation system.

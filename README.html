@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="author" content="Shulhan">
+<title>github/shuLhan/share</title>
+<link rel="stylesheet" href="./doc/solarized.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>github/shuLhan/share</h1>
+<div class="details">
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_command_line_interface">1. Command Line Interface</a></li>
+<li><a href="#_libraries">2. Libraries</a></li>
+<li><a href="#_changelog">3. Changelog</a></li>
+<li><a href="#_documentations">4. Documentations</a>
+<ul class="sectlevel2">
+<li><a href="#_development">4.1. Development</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="image"><a class="image" href="https://godoc.org/github.com/shuLhan/share"><img src="https://godoc.org/github.com/shuLhan/share?status.svg" alt="GoDoc"></a></span>
+<span class="image"><a class="image" href="https://goreportcard.com/report/github.com/shuLhan/share"><img src="https://goreportcard.com/badge/github.com/shuLhan/share" alt="Go Report Card"></a></span></p>
+</div>
+<div class="paragraph">
+<p>A collection of libraries and tools written in Go.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_command_line_interface">1. Command Line Interface</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/cmd/gofmtcomment" target="_blank" rel="noopener"><strong>gofmtcomment</strong></a>: Program to convert
+"/*\*/" comment into "//".</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_libraries">2. Libraries</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/bytes" target="_blank" rel="noopener"><strong>bytes</strong></a>: Package bytes provide a library for
+working with byte or slice of bytes.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/contact" target="_blank" rel="noopener"><strong>contact</strong></a>: Package contact provide a library
+to import contact from Google, Microsoft, and Yahoo.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/dns" target="_blank" rel="noopener"><strong>dns</strong></a>: Package dns implement DNS client and
+server.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/dsv" target="_blank" rel="noopener"><strong>dsv</strong></a>: Package dsv is a library for working with
+delimited separated value (DSV).</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/errors" target="_blank" rel="noopener"><strong>errors</strong></a>: Package errors provide an error type
+with code.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/git" target="_blank" rel="noopener"><strong>git</strong></a>: Package git provide a wrapper for git
+command line interface.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/http" target="_blank" rel="noopener"><strong>http</strong></a>: Package http implement custom HTTP
+server with memory file system and simplified routing handler.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/ini" target="_blank" rel="noopener"><strong>ini</strong></a>: Package ini implement reading and writing
+INI configuration as defined by Git configuration file syntax.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/io" target="_blank" rel="noopener"><strong>io</strong></a>: Package io provide a library for reading and
+watching file, and reading from standard input.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/memfs" target="_blank" rel="noopener"><strong>memfs</strong></a>: Package memfs provide a library for
+mapping file system into memory.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining" target="_blank" rel="noopener"><strong>mining</strong></a>: Package mining provide a library for
+data mining.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/cart" target="_blank" rel="noopener"><strong>classifier/cart</strong></a>: Package
+cart implement the Classification and Regression Tree by Breiman, et al.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/crf" target="_blank" rel="noopener"><strong>classififer/crf</strong></a>: Package crf
+implement the cascaded random forest algorithm, proposed by Baumann et.al in
+their paper: Baumann, Florian, et al.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/rf" target="_blank" rel="noopener"><strong>classifier/rf</strong></a>: Package rf
+implement ensemble of classifiers using random forest algorithm by Breiman and
+Cutler.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/gain/gini" target="_blank" rel="noopener"><strong>gain/gini</strong></a>: Package gini contain
+function to calculating Gini gain.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/knn" target="_blank" rel="noopener"><strong>knn</strong></a>: Package knn implement the K
+Nearest Neighbor using Euclidian to compute the distance between samples.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/math" target="_blank" rel="noopener"><strong>math</strong></a>: Package math provide generic
+functions working with mathematic.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/resampling/lnsmote" target="_blank" rel="noopener"><strong>resampling/lnsmote</strong></a>:
+Package lnsmote implement the Local-Neighborhood algorithm from the paper,
+Maciejewski, Tomasz, and Jerzy Stefanowski.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/resampling/smote" target="_blank" rel="noopener"><strong>resampling/smote</strong></a>: Package
+smote resamples a dataset by applying the Synthetic Minority Oversampling
+TEchnique (SMOTE).</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/tree/binary" target="_blank" rel="noopener"><strong>tree/binary</strong></a>: Package binary
+contain implementation of binary tree.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/net" target="_blank" rel="noopener"><strong>net</strong></a>: Package net provide constants and library
+for networking.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/numbers" target="_blank" rel="noopener"><strong>numbers</strong></a>: Package numbers provide
+miscellaneous functions for working with integer, float, slice of integer, and
+slice of floats.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/runes" target="_blank" rel="noopener"><strong>runes</strong></a>: Package runes provide a library for
+working with a single rune or slice of rune.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/smtp" target="_blank" rel="noopener"><strong>smtp</strong></a>: Package smtp provide a library for
+building SMTP server and client.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/strings" target="_blank" rel="noopener"><strong>strings</strong></a>: Package string provide a library
+for working with string or slice of string.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/tabula" target="_blank" rel="noopener"><strong>tabula</strong></a>: Package tabula is a Go library for
+working with rows, columns, or matrix (table), or in another terms working
+with data set.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/test" target="_blank" rel="noopener"><strong>test</strong></a>: Package test provide library for helping
+with testing.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/text" target="_blank" rel="noopener"><strong>text</strong></a>: Package text provide common a library
+for working with text.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/text/diff" target="_blank" rel="noopener"><strong>text/diff</strong></a>: Package diff implement text
+comparison.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/time" target="_blank" rel="noopener"><strong>time</strong></a>: Package time provide a library for
+working with time.</p>
+</li>
+<li>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/websocket" target="_blank" rel="noopener"><strong>websocket</strong></a>: Package websocket provide the
+websocket library for server and client.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_changelog">3. Changelog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="CHANGELOG.adoc" class="bare">CHANGELOG.adoc</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_documentations">4. Documentations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Beside <a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>, that provides documentation for API in packages,
+there are also additional documentations that we can&#8217;t include inside source
+code due to their scope and limitation of godoc formatting itself.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="doc/SASL.html">Simple Authentication and Security Layer (RFC 4422)</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="doc/SASL_PLAIN.html">The PLAIN Simple Authentication and Security Layer
+(SASL) Mechanism (RFC 4616)</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="doc/DKIM_OVERVIEW.html">DomainKeys Identified Mail Service Overview (RFC 5585)</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="doc/DKIM_THREATS.html">Analysis of Threats Motivating DKIM (RFC 4686)</a></p>
+</li>
+<li>
+<p><a href="doc/DKIM_DEVOPS.html">DKIM Development, Deployment, and Operations (RFC
+5863)</a></p>
+</li>
+<li>
+<p><a href="doc/DKIM_SIGNATURES.html">DKIM Signatures (RFC 6379)</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="doc/SMTP.html">Simple Mail Transfer Protocol (RFC5321)</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="doc/ESMTP_DSN.html">Delivery Status Notification (RFC3461-3464)</a></p>
+</li>
+<li>
+<p><a href="doc/ESMTP_TLS.html">SMTP Service Extension for Secure SMTP over
+Transport Layer Security (RFC3207)</a></p>
+</li>
+<li>
+<p><a href="doc/ESMTP_AUTH.html">SMTP Service Extension for Authentication
+(RFC 4954)</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="doc/IMF.html">Internet Message Format (RFC 5322)</a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_development">4.1. Development</h3>
+<div class="paragraph">
+<p>The documentation created using asciidoctor.  First, install <code>ruby</code> and
+<code>bundler</code>, and then execute <code>bundler</code> on source root directory.</p>
+</div>
+<div class="paragraph">
+<p>During development of documentation execute,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ bundler exec guard -i</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to watch changes on documentation files (".adoc") and regenerate the HTML
+files.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2019-01-22 11:41:46 +0700
+</div>
+</div>
+</body>
+</html>

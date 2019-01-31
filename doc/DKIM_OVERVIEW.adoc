@@ -1,0 +1,305 @@
+= DomainKeys Identified Mail (DKIM) Service Overview
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc:
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc5585: https://tools.ietf.org/html/rfc5585
+
+This document provide note and summary of RFC 5585, DKIM Service Overview.
+
+==  Introduction
+
+DKIM defines a domain-level digital signature authentication framework for
+email through the use of private-/public-key (asymmetric) cryptography and
+using the Domain Name System (DNS) as its key server technology.
+
+DKIM uses a domain name as an identifier.
+Identifier refer to the identity of a responsible person or organization.
+The same identity can have multiple identifiers.
+This identifier is called the Signing Domain IDentifier (SDID) and is
+contained in the DKIM-Signature header fields "d=" tag.
+The owner of the SDID is declaring that they accept responsibility for the
+message and can thus be held accountable for it.
+
+
+A DKIM signature:
+
+*  Does not authenticate or verify the contents of the message header or body,
+such as the author "From" field, beyond certifying data integrity between the
+time of signing and the time of verifying.
+
+*  Does not offer any assertions about the behaviors of the signer.
+
+*  Does not prescribe any specific actions for receivers to take upon
+successful signature verification.
+
+*  Does not provide protection after signature verification.
+
+*  Does not protect against re-sending (replay of) a message that
+already has a verified signature; therefore, a transit intermediary or a
+recipient can re-post the message -- that is, post it as a new message -- with
+the original signature remaining verifiable, even though the new recipient(s)
+might be different from those who were originally specified by the
+author.
+
+==  The DKIM Value Proposition
+
+===  Identity Verification
+
+An assessment service that uses DKIM can differentiate between a domain (SDID)
+used by a known organization and a domain used by others.
+As such, DKIM performs the positive step of identifying messages associated
+with verifiable identities, rather than the negative step of identifying
+messages with problematic use of identities.
+Whether a verified identity belongs to a Good Actor or a Bad Actor is a
+question for later stages of assessment.
+
+===  Enabling Trust Assessments
+
+A valid DKIM signature neither lowers nor raises the level of trust associated
+with the message, but it enables other mechanisms to be used for doing so.
+
+An organization might build upon its use of DKIM by publishing information
+about its Signing Practices (SP).
+This could permit detecting some messages that purport to be associated with a
+domain, but which are not.
+As such, an SP can cause the trust assessment to be reduced, or leave it
+unchanged.
+
+===  Establishing Message Validity
+
+An interesting side effect of the cryptographic method used by DKIM is that it
+is possible to be certain that a signed message (or, if "l=" is used, the
+signed portion of a message) has not been modified between the time of signing
+and the time of verifying.
+If it has been changed in any way, then the message will not be verified
+successfully with DKIM.
+
+
+==  DKIM Goals
+
+===  Functional Goals
+
+*Use Domain-Level Granularity for Assurance*.
+DKIM binds a signing key record to a Domain Name as the SDID.
+Further benefits of using domain names include simplifying key management,
+enabling signing by the infrastructure as opposed to the MUA, and
+reducing privacy concerns.
+
+*Implementation Locality*.
+Any party, anywhere along the transit path, can implement DKIM signing.
+Its use is not confined to particular systems, such as the author's MUA or the
+inbound boundary MTA, and there can be more than one signature per message.
+
+*Allow Delegation of Signing to Independent Parties*.
+DKIM was designed to support signing by any of these different parties and to
+permit them to sign with any domain name that they deem appropriate (and for
+which they hold authorized signing keys).
+
+*Distinguish the Core Authentication Mechanism from Its Derivative Uses*.
+An authenticated identity can be subject to a variety of assessment policies,
+either ad-hoc or standardized.
+DKIM separates basic authentication from assessment.
+The only semantics inherent to a DKIM signature are that the signer is
+asserting some kind of responsibility for the message.
+
+*Retain Ability to Have Anonymous Email*.
+DKIM is compatible with this goal since it permits authentication of the email
+system operator, rather than the content author.
+If it is possible to obtain effectively anonymous accounts at example.com,
+knowing that a message definitely came from example.com does not threaten
+the anonymity of the user who authored it.
+
+
+=== Operational Goals
+
+*Make Presence of Signature Transparent to Non-Supporting Recipients*.
+Recipient that does not support DKIM still can read the message.
+
+*Treat Verification Failure the Same as No Signature Present*.
+If verification of the message's signature failed, the message will revert to
+normal handling, through the receiver's existing filtering mechanisms.
+
+*Permit Incremental Adoption for Incremental Benefit*.
+DKIM allows pairwise sets of email providers and spam filtering companies to
+distinguish mail that is associated with a known organization, versus mail
+that might deceptively purport to have the affiliation.
+This in turn allows the development of "whitelist" schemes whereby
+authenticated mail from a known source with good reputation is allowed to
+bypass some anti-abuse filters.
+
+*Minimize the Amount of Required Infrastructure*.
+DKIM makes no changes to the core Internet Mail service and its reliance on
+the Domain Name System (DNS) greatly reduces the amount of new administrative
+infrastructure that is needed across the open Internet.
+
+*Permit a Wide Range of Deployment Choices*.
+DKIM can be deployed at a variety of places within an organization's
+email service.
+This affords flexibility in terms of who administers its use, as well as what
+traffic carries a DKIM signature.
+
+
+==  DKIM Function
+
+===  Basic Signing
+
+With the DKIM signature mechanism, a signer chooses an SDID, performs digital
+signing on the message, and adds the signature information using a DKIM header
+field.
+A verifier obtains the domain name and the "selector" from the DKIM header
+field, obtains the public key associated with the name, and verifies the
+signature.
+
+===  Characteristics of a DKIM Signature
+
+A DKIM signature applies to the message body and selected header fields.
+The signer computes a hash of the selected header fields and another hash of
+the body.
+The signer then uses a private key to cryptographically encode this
+information, along with other signing parameters.
+Signature information is placed into "DKIM-Signature:", a new [RFC5322]
+message header field.
+
+===  The Selector Construct
+
+A single SDID can have multiple signing keys and/or multiple potential
+signers.
+To support this, DKIM identifies a particular signature as using a combination
+of the SDID and an added field, called the "selector", specified in a separate
+"DKIM-Signature:" header field parameter.
+
+===  Verification
+
+Message recipients can verify the signature by querying the DNS for the
+signer's domain directly, to retrieve the appropriate public key, and thereby
+confirm that the message was signed by a party in possession of the private
+key for the SDID.
+
+Typically, verification will be done by an agent in the Administrative
+Management Domain (ADMD) of the message recipient.
+
+===  Sub-Domain Assessment
+
+To permit assessments that are independent, one method is for an organization
+to use different sub-domains as the SDID tag.
+
+
+==  Service Architecture
+
+DKIM uses external service components, such as for key retrieval and relaying
+email.
+This specification defines an initial set, using DNS and SMTP, for basic
+interoperability.
+
+....
+                                  |
+                                  |- RFC5322 Message
+                                  V
+     +--------+    +--------------------------------+
+     | Private|    |  ORIGINATING OR RELAYING ADMD  |
+     | Key    +...>|  Sign Message with SDID        |
+     | Store  |    +---------------+----------------+
+     +--------+                    |
+      (paired)                 [Internet]
+     +--------+                    |                     +-----------+
+     | Public |    +--------------------------------+    | Remote    |
+     | Key    |    |  RELAYING OR DELIVERING ADMD   |    | Sender    |
+     | Store  |    |  Message Signed?               |    | Practices |
+     +----+---+    +-----+--------------------+-----+    +-----+-----+
+          .              |yes                 |no              .
+          .              V                    |                .
+          .        +-------------+            |                .
+          +.......>|  Verify     +--------+   |                .
+                   |  Signature  |        |   |                .
+                   +------+------+        |   |                .
+                      pass|           fail|   |                .
+                          V               |   |                .
+                   +-------------+        |   |                .
+                   |             |        |   |                .
+          +.......>| Assessments |        |   |                .
+          .        |             |        V   V                .
+          .        +-----+--+----+      +-------+              .
+          .              |  |          / Check   \<............+
+          .              |  +-------->/  Signing  \
+          .              |           /   Practices \<..........+
+          .              |          +-------+-------+          .
+          .              |                  |                  .
+          .              |                  V                  .
+     +----+--------+     |            +-----------+     +------+-----+
+     |Reputation/  |     |            | Message   |     | Local Info |
+     |Accreditation|     +----------->| Filtering |     | on Sender  |
+     |Info         |                  | Engine    |     | Practices  |
+     +-------------+                  +-----------+     +------------+
+
+                    Figure 1: DKIM Service Architecture
+....
+
+*Signing*
+
+Signing can be performed by a component of the ADMD that creates the message,
+and/or within any ADMD along the relay path.
+The signer uses the appropriate private key that is associated with the SDID.
+
+*Verifying*
+
+Verifying is performed by an authorized module within the verifying ADMD.
+Within a delivering ADMD, verifying might be performed by an MTA, MDA, or MUA.
+The module verifies the signature or determines whether a particular signature
+was required.
+Verifying the signature uses public information from the Key Store.
+If the signature passes, reputation information is used to assess the signer
+and that information is passed to the message filtering system.
+If the signature fails or there is no signature using the author's domain,
+information about signing practices related to the author can be retrieved
+remotely and/or locally, and that information is passed to the message
+filtering system.
+
+Messages lacking a valid author signature can prompt a query for any
+published "signing practices" information, as an aid in determining whether
+the author information has been used without authorization.
+
+*Assessing*
+
+A popular use of reputation information is as input to a Filtering Engine that
+decides whether to deliver -- and possibly whether to specially mark -- a
+message.
+
+Their details are outside of the scope of DKIM, other than the expectation
+that the verified identity produced by DKIM can accumulate its own reputation,
+and will be added to the varied soup of rules used by the engines.
+
+*Key Store*
+
+DKIM uses public-/private-key (asymmetric) cryptography.
+The signer uses a private key and the verifier uses the corresponding public
+key.
+The current DKIM Signing specification provides for querying the Domain Names
+Service (DNS), to permit a verifier to obtain the public key.
+The signing organization therefore needs to have a means of adding a key to
+the DNS, for every selector/SDID combination.
+Further, the signing organization needs policies for distributing and revising
+keys.
+
+*Reputation/Accreditation*
+
+If a message contains a valid signature, then the verifier can evaluate the
+associated domain name's reputation, in order to determine appropriate
+delivery or display options for that message.
+
+*Signing Practices (SP)*
+
+Separate from determining the validity of a signature, and separate from
+assessing the reputation of the organization that is associated with the
+signed identity, there is an opportunity to determine any organizational
+practices concerning a domain name.
+
+The statements of practice are made at the level of a domain name, and are
+distinct from assessments made about particular messages, as occur in a
+Message Filtering Engine.
+
+As practices are defined, each domain name owner needs to consider what
+information to publish.
+The nature and degree of checking practices, if any are performed, is optional
+to the evaluating site and is strictly a matter of local policy.

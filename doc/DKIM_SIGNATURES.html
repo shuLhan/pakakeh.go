@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="author" content="Shulhan">
+<title>DomainKeys Identified Mail (DKIM) Signatures</title>
+<link rel="stylesheet" href="./solarized.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>DomainKeys Identified Mail (DKIM) Signatures</h1>
+<div class="details">
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_signing_identity">1.1. Signing Identity</a></li>
+<li><a href="#_scalability">1.2. Scalability</a></li>
+<li><a href="#_simple_key_management">1.3. Simple Key Management</a></li>
+<li><a href="#_data_integrity">1.4. Data Integrity</a></li>
+</ul>
+</li>
+<li><a href="#_terminology_and_definitions">2. Terminology and Definitions</a></li>
+<li><a href="#_protocol_elements">3. Protocol Elements</a>
+<ul class="sectlevel2">
+<li><a href="#_selectors">3.1. Selectors</a></li>
+<li><a href="#_tagvalue_lists">3.2. Tag=Value Lists</a></li>
+<li><a href="#_signing_and_verification_algorithms">3.3. Signing and Verification Algorithms</a></li>
+<li><a href="#_canonicalization">3.4. Canonicalization</a></li>
+</ul>
+</li>
+<li><a href="#_the_dkim_signature_header_field">4. The DKIM-Signature Header Field</a>
+<ul class="sectlevel2">
+<li><a href="#_key_management_and_representation">4.1. Key Management and Representation</a></li>
+<li><a href="#_computing_the_message_hashes">4.2. Computing the Message Hashes</a></li>
+<li><a href="#_input_requirements">4.3. Input Requirements</a></li>
+<li><a href="#_output_requirements">4.4. Output Requirements</a></li>
+<li><a href="#_signing_by_parent_domains">4.5. Signing by Parent Domains</a></li>
+<li><a href="#_relationship_between_sdid_and_auid">4.6. Relationship between SDID and AUID</a></li>
+<li><a href="#_semantics_of_multiple_signatures">4.7. Semantics of Multiple Signatures</a></li>
+</ul>
+</li>
+<li><a href="#_signer_actions">5. Signer Actions</a>
+<ul class="sectlevel2">
+<li><a href="#_determine_whether_the_email_should_be_signed_and_by_whom">5.1. Determine Whether the Email Should Be Signed and by Whom</a></li>
+<li><a href="#_select_a_private_key_and_corresponding_selector_information">5.2. Select a Private Key and Corresponding Selector Information</a></li>
+<li><a href="#_normalize_the_message_to_prevent_transport_conversions">5.3. Normalize the Message to Prevent Transport Conversions</a></li>
+<li><a href="#_determine_the_header_fields_to_sign">5.4. Determine the Header Fields to Sign</a></li>
+<li><a href="#_compute_the_message_hash_and_signature">5.5. Compute the Message Hash and Signature</a></li>
+<li><a href="#_insert_the_dkim_signature_header_field">5.6. Insert the DKIM-Signature Header Field</a></li>
+</ul>
+</li>
+<li><a href="#_verifier_actions">6. Verifier Actions</a>
+<ul class="sectlevel2">
+<li><a href="#_extract_signatures_from_the_message">6.1. Extract Signatures from the Message</a></li>
+<li><a href="#_communicate_verification_results">6.2. Communicate Verification Results</a></li>
+<li><a href="#_interpret_resultapply_local_policy">6.3. Interpret Result/Apply Local Policy</a></li>
+</ul>
+</li>
+<li><a href="#_security_considerations">7. Security Considerations</a>
+<ul class="sectlevel2">
+<li><a href="#_ascii_art_attacks">7.1. ASCII Art Attacks</a></li>
+<li><a href="#_misuse_of_body_length_limits_l_tag">7.2. Misuse of Body Length Limits ("l=" Tag)</a></li>
+<li><a href="#_misappropriated_private_key">7.3. Misappropriated Private Key</a></li>
+<li><a href="#_key_server_denial_of_service_attacks">7.4. Key Server Denial-of-Service Attacks</a></li>
+<li><a href="#_attacks_against_the_dns">7.5. Attacks against the DNS</a></li>
+<li><a href="#_replayspam_attacks">7.6. Replay/Spam Attacks</a></li>
+<li><a href="#_limits_on_revoking_keys">7.7. Limits on Revoking Keys</a></li>
+<li><a href="#_intentionally_malformed_key_records">7.8. Intentionally Malformed Key Records</a></li>
+<li><a href="#_intentionally_malformed_dkim_signature_header_fields">7.9. Intentionally Malformed DKIM-Signature Header Fields</a></li>
+<li><a href="#_information_leakage">7.10. Information Leakage</a></li>
+<li><a href="#_remote_timing_attacks">7.11. Remote Timing Attacks</a></li>
+<li><a href="#_reordered_header_fields">7.12. Reordered Header Fields</a></li>
+<li><a href="#_rsa_attacks">7.13. RSA Attacks</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document provide note and summary of RFC 6379, DomainKeys Identified Mail
+(DKIM) Signatures.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://tools.ietf.org/html/rfc4685" target="_blank" rel="noopener">RFC 4685</a> provide a background for the development of
+DKIM,
+<a href="https://tools.ietf.org/html/rfc5585" target="_blank" rel="noopener">RFC 5585</a> provide an overview of the service, and
+<a href="https://tools.ietf.org/html/rfc5863" target="_blank" rel="noopener">RFC 5863</a> provide deployment and operations guidance and
+advice.</p>
+</div>
+<div class="paragraph">
+<p>The approach taken by DKIM differs from previous approaches to message signing
+(e.g., Secure/Multipurpose Internet Mail Extensions (S/MIME), OpenPGP).</p>
+</div>
+<div class="sect2">
+<h3 id="_signing_identity">1.1. Signing Identity</h3>
+<div class="paragraph">
+<p>The signing identity is included as part of the signature header field, and is
+not required to match an address in any particular header fields.</p>
+</div>
+<div class="paragraph">
+<p>The message signature is written as a message header field so that neither
+human recipients nor existing Mail User Agent (MUA) software is confused by
+signature-related content appearing in the message body.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_scalability">1.2. Scalability</h3>
+<div class="paragraph">
+<p>DKIM is designed to support the extreme scalability requirements that
+characterize the email identification problem.
+DKIM compatible with the existing email infrastructure and transparent to the
+fullest extent possible.
+There is no dependency on the deployment of any new Internet protocols or
+services for public-key distribution or revocation.
+DKIM can be implemented independently of clients in order to reduce deployment
+time.
+DKIM  can be deployed incrementally and allows delegation of signing to third
+parties.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_simple_key_management">1.3. Simple Key Management</h3>
+<div class="paragraph">
+<p>DKIM require no certificate authority infrastructure.
+DKIM currently depends on DNS administration and the security of the DNS
+system.
+The Verifier requests the public key from a repository in the domain of the
+claimed Signer directly rather than from a third party.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_data_integrity">1.4. Data Integrity</h3>
+<div class="paragraph">
+<p>Verifying the signature asserts that the hashed content has not changed since
+it was signed and asserts nothing else about "protecting" the end-to-end
+integrity of the message.</p>
+</div>
+<div class="paragraph">
+<p>No attempt is made to include encryption as part of the mechanism.
+Signature verification failure does not force rejection of the message.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_terminology_and_definitions">2. Terminology and Definitions</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Identity</dt>
+<dd>
+<p>A person, role, or organization.</p>
+</dd>
+<dt class="hdlist1">Identifier</dt>
+<dd>
+<p>A label that refers to an identity.</p>
+</dd>
+<dt class="hdlist1">Signing Domain Identifier (SDID)</dt>
+<dd>
+<p>A single domain name that is the mandatory payload output of DKIM and that
+refers to the identity claiming some responsibility for the message by signing
+it.</p>
+</dd>
+<dt class="hdlist1">Agent or User Identifier (AUID)</dt>
+<dd>
+<p>A single identifier that refers to the agent or user on behalf of whom the
+Signing Domain Identifier (SDID) has taken responsibility.
+The AUID comprises an optional &lt;local-part&gt; and a domain name.
+The domain name is the same as that used for the SDID or is a subdomain of it.</p>
+</dd>
+<dt class="hdlist1">Signers</dt>
+<dd>
+<p>Signers is an elements in the mail system that sign messages on
+behalf of SDID.</p>
+</dd>
+<dt class="hdlist1">Verifiers</dt>
+<dd>
+<p>Verifiers is an element that verify signatures in the message.</p>
+</dd>
+<dt class="hdlist1">Identity Assessor</dt>
+<dd>
+<p>An element in the mail system that consumes DKIM&#8217;s payload, which is the
+responsible Signing Domain Identifier (SDID).
+The Identity Assessor is dedicated to the assessment of the delivered
+identifier.</p>
+</dd>
+<dt class="hdlist1">Whitespace</dt>
+<dd>
+<p>There are three forms of whitespace:</p>
+</dd>
+</dl>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>SP                       = ; Space
+HTAB                     = ; Horizontal tab
+WSP                      =   SP / HTAB         ; whitespace
+LWSP (linear whitespace) =  *(WSP / CRLF WSP)  ; linear whitespace
+FWS (folding whitespace) =   [*WSP CRLF] 1*WSP ; folding whitespace</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Common ABNF Tokens</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+                       "!" / "#" /        ;  characters not including
+                       "$" / "%" /        ;  specials.  Used for atoms.
+                       "&amp;" / "'" /
+                       "*" / "+" /
+                       "-" / "/" /
+                       "=" / "?" /
+                       "^" / "_" /
+                       "`" / "{" /
+                       "|" / "}" /
+                       "~"
+   Atom            =  1*atext
+
+   hyphenated-word =  ALPHA [ *(ALPHA / DIGIT / "-") (ALPHA / DIGIT) ]
+
+   ALPHADIGITPS    =  (ALPHA / DIGIT / "+" / "/")
+
+   base64string    =  ALPHADIGITPS *([FWS] ALPHADIGITPS)
+                      [ [FWS] "=" [ [FWS] "=" ] ]
+
+   hdr-name        =  field-name
+
+   qp-hdr-value    =  dkim-quoted-printable    ; with "|" encoded</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Local-part</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Local-part       = Dot-string / Quoted-string
+                 ; MAY be case-sensitive
+
+Dot-string       = Atom *("."  Atom)
+
+Quoted-string    = DQUOTE *QcontentSMTP DQUOTE
+
+QcontentSMTP     = qtextSMTP / quoted-pairSMTP
+
+qtextSMTP        = %d32-33 / %d35-91 / %d93-126
+                 ; i.e., within a quoted string, any
+                 ; ASCII graphic or space is permitted
+                 ; without blackslash-quoting except
+                 ; double-quote and the backslash itself.
+
+quoted-pairSMTP  = %d92 %d32-126
+                 ; i.e., backslash followed by any ASCII
+                 ; graphic (including itself) or SPace</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>sub-domain</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sub-domain     = Let-dig [Ldh-str]
+
+Let-dig        = ALPHA / DIGIT
+
+Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>field-name</strong></p>
+</div>
+<div class="paragraph">
+<p>Name of header field,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>   field-name      =   1*ftext
+
+   ftext           =   %d33-57 /          ; Printable US-ASCII
+                       %d59-126           ;  characters not including
+                                          ;  ":".</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>dot-atom-text</strong></p>
+</div>
+<div class="paragraph">
+<p>In the local-part of an email address,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dot-atom-text   =   1*atext *("." 1*atext)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>qp-section</strong></p>
+</div>
+<div class="paragraph">
+<p>A single line of quoted-printable-encoded text,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>     qp-section  = [*(ptext / SPACE / TAB) ptext]
+
+     ptext       = hex-octet / safe-char
+
+     hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
+                   ; Octet must be used for characters &gt; 127, =,
+                   ; SPACEs or TABs at the ends of lines, and is
+                   ; recommended for any character not listed in
+                   ; RFC 2049 as "mail-safe".
+
+     safe-char   = &lt;any octet with decimal value of 33 through
+                   60 inclusive, and 62 through 126&gt;
+                   ; Characters not listed as "mail-safe" in
+                   ; RFC 2049 are also not recommended.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>DKIM-Quoted-Printable</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>   dkim-quoted-printable =  *(FWS / hex-octet / dkim-safe-char)
+                               ; hex-octet is from RFC2045
+   dkim-safe-char        =  %x21-3A / %x3C / %x3E-7E
+                               ; '!' - ':', '&lt;', '&gt;' - '~'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DKIM-Quoted-Printable differs from Quoted-Printable as defined in [RFC2045] in
+several important ways:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Whitespace in the input text, including CR and LF, must be encoded.
+[RFC2045] does not require such encoding, and does not permit encoding of CR
+or LF characters that are part of a CRLF line break.</p>
+</li>
+<li>
+<p>Whitespace in the encoded text is ignored.
+This is to allow tags encoded using DKIM-Quoted-Printable to be wrapped as
+needed.
+In particular, [RFC2045] requires that line breaks in the input be represented
+as physical line breaks; that is not the case here.</p>
+</li>
+<li>
+<p>The "soft line break" syntax ("=" as the last non-whitespace character on
+the line) does not apply.</p>
+</li>
+<li>
+<p>It does not require that encoded lines be no more than 76 characters long
+(although there may be other requirements depending on the context in which
+the encoded text is being used).</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_protocol_elements">3. Protocol Elements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Protocol Elements are conceptual parts of the protocol that are not specific
+to either Signers or Verifiers.</p>
+</div>
+<div class="sect2">
+<h3 id="_selectors">3.1. Selectors</h3>
+<div class="literalblock">
+<div class="content">
+<pre>selector =   sub-domain *( "." sub-domain )</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The key namespace is subdivided using "selectors", to support multiple
+concurrent public keys per signing domain.</p>
+</div>
+<div class="paragraph">
+<p>Selectors are needed to support some important use cases.
+For example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Domains that want to delegate signing capability for a specific address for
+a given duration to a partner, such as an advertising provider or other
+outsourced function.</p>
+</li>
+<li>
+<p>Domains that want to allow frequent travelers to send messages locally
+without the need to connect with a particular MSA.</p>
+</li>
+<li>
+<p>"Affinity" domains (e.g., college alumni associations) that provide
+forwarding of incoming mail, but that do not operate a mail submission
+agent for outgoing mail.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Reusing a selector with a new key (for example, changing the key associated
+with a user&#8217;s name) makes it impossible to tell the difference between a
+message that didn&#8217;t verify because the key is no longer valid and a message
+that is actually forged.
+For this reason, Signers are ill-advised to reuse selectors for new keys.
+A better strategy is to assign new keys to new selectors.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tagvalue_lists">3.2. Tag=Value Lists</h3>
+<div class="paragraph">
+<p>DKIM uses a simple "tag=value" syntax in several contexts, including in
+messages and domain signature records.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>tag-list  =  tag-spec *( ";" tag-spec ) [ ";" ]
+tag-spec  =  [FWS] tag-name [FWS] "=" [FWS] tag-value [FWS]
+tag-name  =  ALPHA *ALNUMPUNC
+tag-value =  [ tval *( 1*(WSP / FWS) tval ) ]
+          ; Prohibits WSP and FWS at beginning and end
+tval      =  1*VALCHAR
+VALCHAR   =  %x21-3A / %x3C-7E
+          ; EXCLAMATION to TILDE except SEMICOLON
+ALNUMPUNC =  ALPHA / DIGIT / "_"</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Values are a series of strings containing either plain text, "base64" text,
+"qp-section", or "dkim-quoted-printable".</p>
+</li>
+<li>
+<p>The name of the tag will determine the encoding of each value.</p>
+</li>
+<li>
+<p>Unencoded semicolon (";") characters MUST NOT occur in the tag value, since
+that separates tag-specs.</p>
+</li>
+<li>
+<p>Tags MUST be interpreted in a case-sensitive manner.</p>
+</li>
+<li>
+<p>Values MUST be processed as case sensitive unless the specific tag
+description of semantics specifies case insensitivity.</p>
+</li>
+<li>
+<p>Tags with duplicate names MUST NOT occur within a single tag-list;
+if a tag name does occur more than once, the entire tag-list is invalid.</p>
+</li>
+<li>
+<p>Whitespace within a value MUST be retained unless explicitly excluded
+by the specific tag description.</p>
+</li>
+<li>
+<p>Tag=value pairs that represent the default value MAY be included to
+aid legibility.</p>
+</li>
+<li>
+<p>Unrecognized tags MUST be ignored.</p>
+</li>
+<li>
+<p>Tags that have an empty value are not the same as omitted tags.
+An omitted tag is treated as having the default value; a tag with an empty
+value explicitly designates the empty string as the value.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_signing_and_verification_algorithms">3.3. Signing and Verification Algorithms</h3>
+<div class="paragraph">
+<p>Two algorithms are defined by this specification at this time: rsa-sha1 and
+rsa-sha256.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Signers MUST implement and SHOULD sign using rsa-sha256.</p>
+</li>
+<li>
+<p>Verifiers MUST implement both rsa-sha1 and rsa-sha256.</p>
+</li>
+<li>
+<p>Other algorithms MAY be defined in the future.</p>
+</li>
+<li>
+<p>Verifiers MUST ignore any signatures using algorithms that they do not
+implement.</p>
+</li>
+<li>
+<p>The rsa-sha1 computes a message hash using SHA-1 and then the hash is then
+signed using the RSA algorithm and the Signer&#8217;s private key.</p>
+</li>
+<li>
+<p>The rsa-sha256 computes a message hash using SHA-256 and then the hash is
+signed using the RSA algorithm and the Signer&#8217;s private key.</p>
+</li>
+<li>
+<p>Signers MUST use RSA keys of at least 1024 bits for long-lived keys.</p>
+</li>
+<li>
+<p>Verifiers MUST be able to validate signatures with keys ranging from 512
+bits to 2048 bits, and they MAY be able to validate signatures with larger
+keys.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Factors that should influence the key size choice include the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The practical constraint that large (e.g., 4096-bit) keys might not fit
+within a 512-byte DNS UDP response packet</p>
+</li>
+<li>
+<p>The security constraint that keys smaller than 1024 bits are subject to
+off-line attacks</p>
+</li>
+<li>
+<p>Larger keys impose higher CPU costs to verify and sign email</p>
+</li>
+<li>
+<p>Keys can be replaced on a regular basis; thus, their lifetime can be
+relatively short</p>
+</li>
+<li>
+<p>The security goals of this specification are modest compared to typical
+goals of other systems that employ digital signatures</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_canonicalization">3.4. Canonicalization</h3>
+<div class="paragraph">
+<p>Canonicalization is a process for converting data that has more than one
+possible representation into a "standard", "normal", or canonical form.</p>
+</div>
+<div class="paragraph">
+<p>Canonicalization is only used to prepare the email for signing or verifying;
+it does not affect the transmitted email in any way.</p>
+</div>
+<div class="paragraph">
+<p>Two canonicalization algorithms are defined for each of the header and the
+body, a "simple" and "relaxed" algorithms.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A "simple" algorithm tolerates almost no modification.</p>
+</li>
+<li>
+<p>A "relaxed" algorithm tolerates common modifications such as whitespace
+replacement and header field line rewrapping.</p>
+</li>
+<li>
+<p>A Signer MAY specify either algorithm for header or body.</p>
+</li>
+<li>
+<p>If no canonicalization algorithm is specified by the Signer, the "simple"
+algorithm defaults for both header and body.</p>
+</li>
+<li>
+<p>Verifiers MUST implement both canonicalization algorithms.</p>
+</li>
+<li>
+<p>The header and body may use different canonicalization algorithms.</p>
+</li>
+<li>
+<p>Further canonicalization algorithms MAY be defined in the future; Verifiers
+MUST ignore any signatures that use unrecognized canonicalization algorithms.</p>
+</li>
+<li>
+<p>Canonicalization algorithms MUST NOT change the transmitted data in any
+way.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_the_simple_canonicalization_algorithm">3.4.1. The "simple" Canonicalization Algorithm</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Header fields MUST be presented to the signing or verification algorithm
+exactly as they are in the message being signed or verified.</p>
+</li>
+<li>
+<p>In particular, header field names MUST NOT be case folded and whitespace
+MUST NOT be changed.</p>
+</li>
+<li>
+<p>Its converts "*CRLF" at the end of the body to a single "CRLF".
+If there is no body or no trailing CRLF on the message body, a CRLF is added.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_relaxed_canonicalization_algorithm">3.4.2. The "relaxed" Canonicalization Algorithm</h4>
+<div class="paragraph">
+<p>The "relaxed" header canonicalization algorithm MUST apply the following steps
+in order:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Convert all header field names (not the header field values) to lowercase.
+For example, convert "SUBJect: AbC" to "subject: AbC".</p>
+</li>
+<li>
+<p>Unfold all header field continuation lines as described in [RFC5322];
+in particular, lines with terminators embedded in continued header field
+values (that is, CRLF sequences followed by WSP) MUST be interpreted without
+the CRLF.
+Implementations MUST NOT remove the CRLF at the end of the header field value.</p>
+</li>
+<li>
+<p>Convert all sequences of one or more WSP characters to a single SP character.
+WSP characters here include those before and after a line folding boundary.</p>
+</li>
+<li>
+<p>Delete all WSP characters at the end of each unfolded header field value.</p>
+</li>
+<li>
+<p>Delete any WSP characters remaining before and after the colon separating
+the header field name from the header field value.
+The colon separator MUST be retained.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The "relaxed" body canonicalization algorithm MUST apply the following steps
+(a) and (b) in order:</p>
+</div>
+<div class="olist loweralpha">
+<ol class="loweralpha">
+<li>
+<p>Reduce whitespace:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ignore all whitespace at the end of lines.
+Implementations MUST NOT remove the CRLF at the end of the line.</p>
+</li>
+<li>
+<p>Reduce all sequences of WSP within a line to a single SP character.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Ignore all empty lines at the end of the message body.
+If the body is non-empty but does not end with a CRLF, a CRLF is added.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_example">3.4.3. Example</h4>
+<div class="paragraph">
+<p>A message reading:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>A: &lt;SP&gt; X &lt;CRLF&gt;
+B &lt;SP&gt; : &lt;SP&gt; Y &lt;HTAB&gt;&lt;CRLF&gt;
+&lt;HTAB&gt; Z &lt;SP&gt;&lt;SP&gt;&lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;SP&gt; C &lt;SP&gt;&lt;CRLF&gt;
+D &lt;SP&gt;&lt;HTAB&gt;&lt;SP&gt; E &lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;CRLF&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Output for "simple" canonicalization,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>A: &lt;SP&gt; X &lt;CRLF&gt;
+B &lt;SP&gt; : &lt;SP&gt; Y &lt;HTAB&gt;&lt;CRLF&gt;
+&lt;HTAB&gt; Z &lt;SP&gt;&lt;SP&gt;&lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;SP&gt; C &lt;SP&gt;&lt;CRLF&gt;
+D &lt;SP&gt;&lt;HTAB&gt;&lt;SP&gt; E &lt;CRLF&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Output for relaxed canonicalization,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>a:X &lt;CRLF&gt;
+b:Y &lt;SP&gt; Z &lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;SP&gt; C &lt;CRLF&gt;
+D &lt;SP&gt; E &lt;CRLF&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_dkim_signature_header_field">4. The DKIM-Signature Header Field</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>The DKIM-Signature header field SHOULD be treated as though it were a
+trace header field as defined in Section 3.6 of [RFC5322].</p>
+</li>
+<li>
+<p>Its SHOULD NOT be reordered</p>
+</li>
+<li>
+<p>Its SHOULD be prepended to the message</p>
+</li>
+<li>
+<p>The DKIM-Signature header field being created or verified is always
+included in the signature calculation, after the rest of the header fields
+being signed;
+however, when calculating or verifying the signature, the value of the "b="
+tag (signature value) of that DKIM-Signature header field MUST be treated as
+though it were an empty string.</p>
+</li>
+<li>
+<p>Unknown tags in the DKIM-Signature header field MUST be included in the
+signature calculation</p>
+</li>
+<li>
+<p>Unknown tags MUST be ignored by Verifiers</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Tags on the DKIM-Signature header field along with their type and requirement
+status are shown below.</p>
+</div>
+<div class="paragraph">
+<p><strong>v=</strong> (plain-text; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-v-tag       = %x76 [FWS] "=" [FWS] 1*DIGIT</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The version of this specification.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It MUST have the value "1" for implementations compliant with this version
+of DKIM.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>a=</strong> (plain-text; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-a-tag       = %x61 [FWS] "=" [FWS] sig-a-tag-alg
+sig-a-tag-alg   = sig-a-tag-k "-" sig-a-tag-h
+sig-a-tag-k     = "rsa" / x-sig-a-tag-k
+sig-a-tag-h     = "sha1" / "sha256" / x-sig-a-tag-h
+x-sig-a-tag-k   = ALPHA *(ALPHA / DIGIT)
+                ; for later extension
+x-sig-a-tag-h   = ALPHA *(ALPHA / DIGIT)
+                ; for later extension</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The algorithm used to generate the signature.</p>
+</div>
+<div class="paragraph">
+<p><strong>b=</strong> (base64; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-b-tag       = %x62 [FWS] "=" [FWS] sig-b-tag-data
+sig-b-tag-data  = base64string</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The signature data.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Whitespace is ignored in this value and MUST be ignored when reassembling
+the original signature.</p>
+</li>
+<li>
+<p>The signing process can safely insert FWS in this value in arbitrary places
+to conform to line-length limits.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>bh=</strong> (base64; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-bh-tag      = %x62 %x68 [FWS] "=" [FWS] sig-bh-tag-data
+sig-bh-tag-data = base64string</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The hash of the canonicalized body part of the message as limited by the "l="
+tag.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Whitespace is ignored in this value and MUST be ignored when reassembling
+the original signature.</p>
+</li>
+<li>
+<p>The signing process can safely insert FWS in this value in arbitrary places
+to conform to line-length limits.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>c=</strong> (plain-text; OPTIONAL, default is "simple/simple")</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-c-tag       = %x63 [FWS] "=" [FWS] sig-c-tag-alg
+                  ["/" sig-c-tag-alg]
+sig-c-tag-alg   = "simple" / "relaxed" / x-sig-c-tag-alg
+x-sig-c-tag-alg = hyphenated-word
+                ; for later extension</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Type of canonicalization used to prepare the message for signing.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It consists of two names separated by a "slash" (%d47) character,
+corresponding to the header and body canonicalization algorithms,
+respectively.</p>
+</li>
+<li>
+<p>If only one algorithm is named, that algorithm is used for the header and
+"simple" is used for the body.
+For example, "c=relaxed" is treated the same as "c=relaxed/simple".</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>d=</strong> (plain-text; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-d-tag       = %x64 [FWS] "=" [FWS] domain-name
+domain-name     = sub-domain 1*("." sub-domain)
+                ; from [RFC5321] Domain, excluding address-literal</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The SDID.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It MUST correspond to a valid DNS name under which the DKIM key record
+is published.</p>
+</li>
+<li>
+<p>When presented with a signature that does not meet these requirements,
+Verifiers MUST consider the signature as invalid.</p>
+</li>
+<li>
+<p>Internationalized domain names MUST be encoded as A-labels, as described in
+Section 2.3 of [RFC5890].</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>h=</strong> (plain-text; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-h-tag       = %x68 [FWS] "=" [FWS] hdr-name
+                  *( [FWS] ":" [FWS] hdr-name )</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A colon-separated list of header field names that presented to the signing
+algorithm.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The field MUST contain the complete list of header fields in the order
+presented to the signing algorithm.</p>
+</li>
+<li>
+<p>The field MAY contain names of header fields that do not exist when signed;
+nonexistent header fields do not contribute to the signature computation.
+By "signing" header fields that do not actually exist, a Signer can allow a
+Verifier to detect insertion of those header fields after signing and
+also prevents adding fields with no values.</p>
+</li>
+<li>
+<p>The field MAY contain multiple instances of a header field name, meaning
+multiple occurrences of the corresponding header field are included in the
+header hash.</p>
+</li>
+<li>
+<p>The field MUST NOT include the DKIM-Signature header field that is being
+created or verified but may include others.</p>
+</li>
+<li>
+<p>Folding whitespace (FWS) MAY be included on either side of the colon
+separator.</p>
+</li>
+<li>
+<p>Header field names MUST be compared against actual header field names in a
+case-insensitive manner.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>i=</strong> (dkim-quoted-printable; OPTIONAL; default is "@" + "d=" value)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-i-tag       = %x69 [FWS] "=" [FWS] [ Local-part ] "@" domain-name</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Agent or User Identifier (AUID).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The local-part MAY be omitted, because in some cases a Signer may not be
+able to establish a verified individual identity.</p>
+</li>
+<li>
+<p>The local-part MAY be drawn from a namespace unrelated to any mailbox.</p>
+</li>
+<li>
+<p>The domain-name MUST be the same as, or a subdomain of, the value of the
+"d=" tag.</p>
+</li>
+<li>
+<p>The domain-name need not be registered in the DNS&#8201;&#8212;&#8201;so it might not
+resolve in a query</p>
+</li>
+<li>
+<p>If no "i=" tag, the Verifier MUST behave as though the value of that tag
+were "@d", where "d" is the value from the "d=" tag.</p>
+</li>
+<li>
+<p>The Signer MAY choose to use the same namespace for its AUIDs as its users'
+email addresses or MAY choose other means of representing its users.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>l=</strong>  (plain-text unsigned decimal integer; OPTIONAL, default is entire body)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-l-tag    = %x6c [FWS] "=" [FWS] 1*76DIGIT</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The number of octets in the body of the email after canonicalization included
+in the cryptographic hash, starting from 0 immediately following the CRLF
+preceding the body.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>This value MUST NOT be larger than the actual number of octets in the
+canonicalized message body.</p>
+</li>
+<li>
+<p>The value of the "l=" tag is constrained to 76 decimal digits.</p>
+</li>
+<li>
+<p>Implementers MAY need to limit the actual value expressed to a value
+smaller than <code>10^76</code>, e.g., to allow a message to fit within the available
+storage space.</p>
+</li>
+<li>
+<p>If the body length count is not specified, the entire message body is
+signed.</p>
+</li>
+<li>
+<p>The body length count MUST be calculated following the canonicalization
+algorithm; for example, any whitespace ignored by a canonicalization algorithm
+is not included as part of the body length count.</p>
+</li>
+<li>
+<p>A body length count of zero means that the body is completely unsigned.</p>
+</li>
+<li>
+<p>Signers wishing to ensure that no modification of any sort can occur
+should specify the "simple" canonicalization algorithm for both header and
+body and omit the body length count.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>q=</strong> (plain-text; OPTIONAL)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-q-tag        = %x71 [FWS] "=" [FWS] sig-q-tag-method
+                       *([FWS] ":" [FWS] sig-q-tag-method)
+sig-q-tag-method = "dns/txt" / x-sig-q-tag-type
+                       ["/" x-sig-q-tag-args]
+x-sig-q-tag-type = hyphenated-word  ; for future extension
+x-sig-q-tag-args = qp-hdr-value</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A colon-separated list of query methods used to retrieve the public key.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Each query method is of the form "type[/options]", where the syntax and
+semantics of the options depend on the type and specified options.</p>
+</li>
+<li>
+<p>If there are multiple query mechanisms listed, the choice of query
+mechanism MUST NOT change the interpretation of the signature.</p>
+</li>
+<li>
+<p>Implementations MUST use the recognized query mechanisms in the order
+presented.</p>
+</li>
+<li>
+<p>Unrecognized query mechanisms MUST be ignored.</p>
+</li>
+<li>
+<p>Default is "dns/txt", which defines the DNS TXT resource record (RR) lookup
+algorithm,</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The only option defined for the "dns" query type is "txt", which MUST be
+included.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Verifiers and Signers MUST support "dns/txt".</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>s=</strong> (plain-text; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-s-tag    = %x73 [FWS] "=" [FWS] selector</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The selector subdividing the namespace for the "d=" tag.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Internationalized selector names MUST be encoded as A-labels, as described in
+Section 2.3 of [RFC5890].</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>t=</strong> (plain-text unsigned decimal integer; RECOMMENDED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-t-tag    = %x74 [FWS] "=" [FWS] 1*12DIGIT</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The time that this signature was created.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The format is the number of seconds since 00:00:00 on January 1, 1970 in
+the UTC time zone.</p>
+</li>
+<li>
+<p>The value is expressed as an unsigned integer in decimal ASCII.</p>
+</li>
+<li>
+<p>This value is not constrained to fit into a 31- or 32-bit integer.</p>
+</li>
+<li>
+<p>Implementations SHOULD be prepared to handle values up to at least <code>10^12</code>
+(until approximately AD 200,000; this fits into 40 bits).</p>
+</li>
+<li>
+<p>To avoid denial-of-service attacks, implementations MAY consider any value
+longer than 12 digits to be infinite.</p>
+</li>
+<li>
+<p>Leap seconds are not counted.</p>
+</li>
+<li>
+<p>Implementations MAY ignore signatures that have a timestamp in the future.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>x=</strong> (plain-text unsigned decimal integer; RECOMMENDED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-x-tag    = %x78 [FWS] "=" [FWS] 1*12DIGIT</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Signature Expiration.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Default is no expiration</p>
+</li>
+<li>
+<p>The format is the same as in the "t=" tag, represented as an absolute date,
+not as a time delta from the signing timestamp.</p>
+</li>
+<li>
+<p>The value is expressed as an unsigned integer in decimal ASCII, with the
+same constraints on the value in the "t=" tag.</p>
+</li>
+<li>
+<p>Signatures MAY be considered invalid if the verification time at the
+Verifier is past the expiration date.</p>
+</li>
+<li>
+<p>The verification time should be the time that the message was first
+received at the administrative domain of the Verifier if that time is
+reliably available; otherwise, the current time should be used.</p>
+</li>
+<li>
+<p>The value of the "x=" tag MUST be greater than the value of the "t=" tag if
+both are present.</p>
+</li>
+<li>
+<p>The "x=" tag is not intended as an anti-replay defense.</p>
+</li>
+<li>
+<p>Due to clock drift, the receiver&#8217;s notion of when to consider the signature
+expired may not exactly match what the sender is expecting.
+Receivers MAY add a 'fudge factor' to allow for such possible drift.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>z=</strong> (dkim-quoted-printable; OPTIONAL)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>sig-z-tag      = %x7A [FWS] "=" [FWS] sig-z-tag-copy
+                 *( "|" [FWS] sig-z-tag-copy )
+sig-z-tag-copy = hdr-name [FWS] ":" qp-hdr-value</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copied header fields.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A vertical-bar-separated list of selected header fields present when the
+message was signed, including both the field name and value.</p>
+</li>
+<li>
+<p>Default is null</p>
+</li>
+<li>
+<p>It is not required to include all header fields present at the time of
+signing.</p>
+</li>
+<li>
+<p>This field need not contain the same header fields listed in the "h=" tag.</p>
+</li>
+<li>
+<p>The header field text itself must encode the vertical bar ("|", %x7C)
+character (i.e., vertical bars in the "z=" text are meta-characters, and
+any actual vertical bar characters in a copied header field must be encoded).</p>
+</li>
+<li>
+<p>All whitespace must be encoded, including whitespace between the colon and
+the header field value.</p>
+</li>
+<li>
+<p>After encoding, FWS MAY be added at arbitrary locations in order to avoid
+excessively long lines; such whitespace is NOT part of the value of the
+header field and MUST be removed before decoding.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>DKIM-Signature: v=1; a=rsa-sha256; d=example.net; s=brisbane;
+      c=simple; q=dns/txt; i=@eng.example.net;
+      t=1117574938; x=1118006938;
+      h=from:to:subject:date;
+      z=From:foo@eng.example.net|To:joe@example.com|
+       Subject:demo=20run|Date:July=205,=202005=203:44:08=20PM=20-0700;
+      bh=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=;
+      b=dzdVyOfAKCdLXdJOc9G2q8LoXSlEniSbav+yuU4zGeeruD00lszZVoG4ZHRNiYzR</pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_key_management_and_representation">4.1. Key Management and Representation</h3>
+<div class="paragraph">
+<p>Parameters to the key lookup algorithm are the type of the lookup (the "q="
+tag), the domain of the Signer (the "d=" tag of the DKIM-Signature header
+field), and the selector (the "s=" tag).</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>public_key = dkim_find_key(q_val, d_val, s_val)</pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_textual_representation">4.1.1. Textual Representation</h4>
+<div class="paragraph">
+<p>The current valid tags are described below.
+Other tags MAY be present and MUST be ignored by any implementation that does
+not understand them.</p>
+</div>
+<div class="paragraph">
+<p><strong>v=</strong> (plain-text; RECOMMENDED, default is "DKIM1")</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-v-tag    = %x76 [FWS] "=" [FWS] %x44.4B.49.4D.31</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Version of the DKIM key record.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If specified, this tag MUST be set to "DKIM1" (without the quotes).</p>
+</li>
+<li>
+<p>This tag MUST be the first tag in the record.</p>
+</li>
+<li>
+<p>Records beginning with a "v=" tag with any other value MUST be discarded.</p>
+</li>
+<li>
+<p>Verifiers must do a string comparison on this value; for example, "DKIM1"
+is not the same as "DKIM1.0"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>h=</strong> (plain-text; OPTIONAL, defaults to allowing all algorithms)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-h-tag       = %x68 [FWS] "=" [FWS] key-h-tag-alg
+                  *( [FWS] ":" [FWS] key-h-tag-alg )
+key-h-tag-alg   = "sha1" / "sha256" / x-key-h-tag-alg
+x-key-h-tag-alg = hyphenated-word   ; for future extension</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A colon-separated list of hash algorithms that might be used.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Unrecognized algorithms MUST be ignored.</p>
+</li>
+<li>
+<p>The set of algorithms listed in this tag in each record is an operational
+choice made by the Signer.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>k=</strong> (plain-text; OPTIONAL, default is "rsa").</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-k-tag        = %x76 [FWS] "=" [FWS] key-k-tag-type
+key-k-tag-type   = "rsa" / x-key-k-tag-type
+x-key-k-tag-type = hyphenated-word   ; for future extension</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Key type.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Signers and Verifiers MUST support the "rsa" key type.</p>
+</li>
+<li>
+<p>The "rsa" key type indicates that an ASN.1 DER-encoded [ITU-X660-1997]
+RSAPublicKey (see [RFC3447], Sections 3.1 and A.1.1) is being used in the
+"p=" tag.
+(Note: the "p=" tag further encodes the value using the base64 algorithm.)</p>
+</li>
+<li>
+<p>Unrecognized key types MUST be ignored.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>n=</strong> (qp-section; OPTIONAL, default is empty)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-n-tag    = %x6e [FWS] "=" [FWS] qp-section</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notes that might be of interest to a human.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>No interpretation is made by any program.</p>
+</li>
+<li>
+<p>This tag should be used sparingly in any key server mechanism that has
+space limitations (notably DNS).</p>
+</li>
+<li>
+<p>This is intended for use by administrators, not end users.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>p=</strong> (base64; REQUIRED)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-p-tag    = %x70 [FWS] "=" [ [FWS] base64string]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Public-key data.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An empty value means that this public key has been revoked.</p>
+</li>
+<li>
+<p>The syntax and semantics of this tag value before being encoded in base64
+are defined by the "k=" tag.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If a private key has been compromised or otherwise disabled, a Signer might want to explicitly state that it knows about the selector, but all messages using that selector should fail verification.
+Verifiers SHOULD return an error code for any DKIM-Signature header field with
+a selector referencing a revoked key.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A base64string is permitted to include whitespace (FWS) at arbitrary
+places; however, any CRLFs must be followed by at least one WSP character.</p>
+</li>
+<li>
+<p>Implementers and administrators are cautioned to ensure that selector TXT
+RRs conform to this specification.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>s=</strong> (plain-text; OPTIONAL; default is "*").</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-s-tag        = %x73 [FWS] "=" [FWS] key-s-tag-type
+                   *( [FWS] ":" [FWS] key-s-tag-type )
+key-s-tag-type   = "email" / "*" / x-key-s-tag-type
+x-key-s-tag-type = hyphenated-word   ; for future extension</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A colon-separated list of service types to which this record applies.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Verifiers for a given service type MUST ignore this record if the
+appropriate type is not listed.</p>
+</li>
+<li>
+<p>Unrecognized service types MUST be ignored.</p>
+</li>
+<li>
+<p>Currently defined service types are as follows:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>"*"  matches all service types</p>
+</li>
+<li>
+<p>"email"   electronic mail (not necessarily limited to SMTP)</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This tag is intended to constrain the use of keys for other purposes, should
+use of DKIM be defined by other services in the future.</p>
+</div>
+<div class="paragraph">
+<p><strong>t=</strong> (plain-text; OPTIONAL, default is no flags set)</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key-t-tag        = %x74 [FWS] "=" [FWS] key-t-tag-flag
+                 *( [FWS] ":" [FWS] key-t-tag-flag )
+key-t-tag-flag   = "y" / "s" / x-key-t-tag-flag
+x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A colon-separated list of flags.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Unrecognized flags MUST be ignored.</p>
+</li>
+<li>
+<p>The defined flags are as follows:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>y</strong>:  This domain is testing DKIM.
+Verifiers MUST NOT treat messages from Signers in testing mode differently from unsigned email, even should the signature fail to verify.
+Verifiers MAY wish to track testing mode results to assist the Signer.</p>
+</li>
+<li>
+<p><strong>s</strong>:  Any DKIM-Signature header fields using the "i=" tag MUST have
+the same domain value on the right-hand side of the "@" in the "i=" tag and
+the value of the "d=" tag.
+That is, the "i=" domain MUST NOT be a subdomain of "d=".
+Use of this flag is RECOMMENDED unless subdomaining is required.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_dns_binding">4.1.2. DNS Binding</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>All implementations MUST support this binding.</p>
+</li>
+<li>
+<p>All DKIM keys are stored in a subdomain named "_domainkey".
+Given a DKIM-Signature field with a "d=" tag of "example.com" and an "s=" tag
+of "foo.bar", the DNS query will be for "foo.bar._domainkey.example.com".</p>
+</li>
+<li>
+<p>The query type "q=" in lookup function specify DNS Resource Record.
+The only option defined in this base specification is "txt", indicating the
+use of a TXT RR.</p>
+</li>
+<li>
+<p>Strings in a TXT RR MUST be concatenated together before use with no
+intervening whitespace.</p>
+</li>
+<li>
+<p>TXT RRs MUST be unique for a particular selector name; that is, if there
+are multiple records in an RRset, the results are undefined.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_computing_the_message_hashes">4.2. Computing the Message Hashes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The Signer/Verifier MUST compute two hashes: one over the body of the
+message and one over the selected header fields of the message.</p>
+</li>
+<li>
+<p>Signers MUST compute them in the order shown</p>
+</li>
+<li>
+<p>Verifiers MAY compute them in any order convenient to the Verifier</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Steps to compute message hash,</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The Signer/Verifier MUST hash the message body</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>The body canonicalized using algorithm specified in the "c=" tag</p>
+</li>
+<li>
+<p>The body then truncated to the length specified in the "l=" tag</p>
+</li>
+<li>
+<p>That hash value is then converted to base64 form</p>
+</li>
+<li>
+<p>For Signer, the hash value then inserted into "bh=" tag</p>
+</li>
+<li>
+<p>For Verifier, the hash value then compared with value of "bh=" tag</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>The Signer/Verifier MUST pass the following to the hash algorithm in the
+indicated order,</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>The header fields specified by the "h=" tag, in the order specified in
+that tag.</p>
+</li>
+<li>
+<p>The header fields then canonicalized using the header canonicalization
+algorithm specified in the "c=" tag.</p>
+</li>
+<li>
+<p>Each header field MUST be terminated with a single CRLF.</p>
+</li>
+<li>
+<p>All tags and their values in the DKIM-Signature header field are included
+in the cryptographic hash with the sole exception of the value portion of the
+"b=" (signature) tag, which MUST be treated as the null string.</p>
+</li>
+<li>
+<p>The DKIM-Signature header field MUST NOT be included in its own "h=" tag,
+although other DKIM-Signature header fields MAY be signed</p>
+</li>
+<li>
+<p>All tags MUST be included even if they might not be understood by the
+Verifier.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Another considerations when computing hash,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When calculating the hash on messages that will be transmitted using
+base64 or quoted-printable encoding, Signers MUST compute the hash after the
+encoding, and Verifier MUST incorporate the values into hash before decoding.</p>
+</li>
+<li>
+<p>The hash MUST be computed before transport-level encodings such as SMTP
+"dot-stuffing" (the modification of lines beginning with a "." to avoid
+confusion with the SMTP end-of-message marker.</p>
+</li>
+<li>
+<p>DKIM messages MAY be either in plain-text or in MIME format; no special
+treatment is afforded to MIME content.</p>
+</li>
+<li>
+<p>Message attachments in MIME format MUST be included in the content that is
+signed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>More formally, pseudo-code for the signature algorithm is:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>body-hash    =  hash-alg (canon-body, l-param)
+data-hash    =  hash-alg (h-headers, D-SIG, body-hash)
+signature    =  sig-alg (d-domain, selector, data-hash)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where,</p>
+</div>
+<div class="paragraph">
+<p>body-hash:   is the output from hashing the body, using hash-alg.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">hash-alg</dt>
+<dd>
+<p>is the hashing algorithm specified in the "a" parameter.</p>
+</dd>
+<dt class="hdlist1">canon-body</dt>
+<dd>
+<p>is a canonicalized representation of the body, produced
+using the body algorithm specified in the "c" parameter.</p>
+</dd>
+<dt class="hdlist1">l-param</dt>
+<dd>
+<p>is the length-of-body value of the "l" parameter.</p>
+</dd>
+<dt class="hdlist1">data-hash</dt>
+<dd>
+<p>is the output from using the hash-alg algorithm, to hash
+the header including the DKIM-Signature header, and the body hash.</p>
+</dd>
+<dt class="hdlist1">h-headers</dt>
+<dd>
+<p>is the list of headers to be signed, as specified in the "h="
+parameter.</p>
+</dd>
+<dt class="hdlist1">D-SIG</dt>
+<dd>
+<p>is the canonicalized DKIM-Signature field itself without the
+signature value portion of the parameter, that is, an empty parameter value.</p>
+</dd>
+<dt class="hdlist1">signature</dt>
+<dd>
+<p>is the signature value produced by the signing algorithm.</p>
+</dd>
+<dt class="hdlist1">sig-alg</dt>
+<dd>
+<p>is the signature algorithm specified by the "a" parameter.</p>
+</dd>
+<dt class="hdlist1">d-domain</dt>
+<dd>
+<p>is the domain name specified in the "d" parameter.</p>
+</dd>
+<dt class="hdlist1">selector</dt>
+<dd>
+<p>is the selector value specified in the "s" parameter.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_input_requirements">4.3. Input Requirements</h3>
+<div class="paragraph">
+<p>Signers and Verifiers SHOULD take reasonable steps to ensure that the messages
+they are processing are valid according to [RFC5322], [RFC2045], and any other
+relevant message format standards.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_output_requirements">4.4. Output Requirements</h3>
+<div class="paragraph">
+<p>The evaluation of each signature ends in one of three states,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SUCCESS:  a successful verification</p>
+</li>
+<li>
+<p>PERMFAIL:  a permanent, non-recoverable error such as a signature
+verification failure</p>
+</li>
+<li>
+<p>TEMPFAIL:  a temporary, recoverable error such as a DNS query timeout</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For each signature that verifies successfully or produces a TEMPFAIL result,
+output of the DKIM algorithm MUST include the set of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The domain name, taken from the "d=" signature tag; and</p>
+</li>
+<li>
+<p>The result of the verification attempt for that signature.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The output MAY include other signature properties or result meta-data,
+including PERMFAILed or otherwise ignored signatures, for use by modules
+that consume those results.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_signing_by_parent_domains">4.5. Signing by Parent Domains</h3>
+<div class="paragraph">
+<p>By default, private keys corresponding to a domain can be used to sign
+messages for any subdomain.
+For example, a key record for the domain "example.com" can be used to verify
+messages where the AUID ("i=" tag of the signature) is "sub.example.com", or
+even "sub1.sub2.example.com".</p>
+</div>
+<div class="paragraph">
+<p>In order to limit the capability of such keys when this is not intended, the
+"s" flag MAY be set in the "t=" tag of the key record, to constrain the
+validity of the domain of the AUID.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the referenced key record contains the "s" flag as part of the "t=" tag,
+the domain of the AUID ("i=" flag) MUST be the same as that of the SDID (d=)
+domain.</p>
+</li>
+<li>
+<p>If this flag is absent, the domain of the AUID MUST be the same as, or a
+subdomain of, the SDID.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_relationship_between_sdid_and_auid">4.6. Relationship between SDID and AUID</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>DKIM MAY optionally provide a single responsible Agent or User Identifier
+(AUID) through "i=" tag.</p>
+</li>
+<li>
+<p>Upon successfully verifying the signature, a receive-side DKIM Verifier
+MUST communicate the Signing Domain Identifier (d=) to a consuming Identity
+Assessor module and MAY communicate the Agent or User Identifier (i=) if
+present.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_semantics_of_multiple_signatures">4.7. Semantics of Multiple Signatures</h3>
+<div class="sect3">
+<h4 id="_example_scenarios">4.7.1. Example Scenarios</h4>
+<div class="paragraph">
+<p>A Signer might sign a message including all header fields and no "l=" tag
+(to satisfy strict Verifiers) and a second time with a limited set of
+header fields and an "l=" tag.
+Verifiers could then choose which signature they prefer.</p>
+</div>
+<div class="paragraph">
+<p>A message might also have multiple signatures because it passed through
+multiple Signers.
+A common case is expected to be that of a signed message that passes through a
+mailing list that also signs all messages.
+Assuming both of those signatures verify, a recipient might choose to accept
+the message if either of those signatures were known to come from trusted
+sources.</p>
+</div>
+<div class="paragraph">
+<p>Another related example of multiple Signers might be forwarding services, such
+as those commonly associated with academic alumni sites.
+For example, a recipient might have an address at members.example.org, a site
+that has anti-abuse protection that is somewhat less effective than the
+recipient would prefer.
+Such a recipient might have specific authors whose messages would be trusted
+absolutely, but messages from unknown authors that had passed the forwarder&#8217;s
+scrutiny would have only medium trust.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_interpretation">4.7.2. Interpretation</h4>
+<div class="paragraph">
+<p>If a header field with multiple instances is signed, those header fields are
+always signed from the bottom up.
+Thus, it is not possible to sign only specific DKIM-Signature header fields.
+For example, if the message being signed already contains three DKIM-Signature
+header fields A, B, and C, it is possible to sign all of them, B and C only,
+or C only, but not A only, B only, A and B only, or A and C only.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A Signer MAY add more than one DKIM-Signature header field using different
+parameters.</p>
+</li>
+<li>
+<p>Signers SHOULD NOT remove any DKIM-Signature header fields from messages
+they are signing, even if they know that the signatures cannot be verified.</p>
+</li>
+<li>
+<p>Verifier SHOULD evaluate signatures independently and on their own merits.
+For example, a Verifier that by policy chooses not to accept signatures with
+deprecated cryptographic algorithms would consider such signatures invalid.</p>
+</li>
+<li>
+<p>Verifiers MAY process signatures in any order of their choice; for example,
+some Verifiers might choose to process signatures corresponding to the From
+field in the message header before other signatures.</p>
+</li>
+<li>
+<p>Verifiers SHOULD continue to check signatures until a signature
+successfully verifies to the satisfaction of the Verifier.</p>
+</li>
+<li>
+<p>To limit potential denial-of-service attacks, Verifiers MAY limit the total
+number of signatures they will attempt to verify.</p>
+</li>
+<li>
+<p>If a Verifier module reports signatures whose evaluations produced PERMFAIL
+results, Identity Assessors SHOULD ignore those signatures, acting as
+though they were not present in the message.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_signer_actions">5. Signer Actions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following steps are performed in order by Signers.</p>
+</div>
+<div class="sect2">
+<h3 id="_determine_whether_the_email_should_be_signed_and_by_whom">5.1. Determine Whether the Email Should Be Signed and by Whom</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>SUBMISSION servers might only sign messages from users that are properly
+authenticated and authorized.a</p>
+</li>
+<li>
+<p>SUBMISSION servers should not sign Received header fields if the outgoing
+gateway MTA obfuscates Received header fields, for example, to hide the
+details of internal topology.</p>
+</li>
+<li>
+<p>If an email cannot be signed for some reason, it is a local policy decision
+as to what to do with that email.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_select_a_private_key_and_corresponding_selector_information">5.2. Select a Private Key and Corresponding Selector Information</h3>
+<div class="paragraph">
+<p>Currently, all selectors are equal as far as this specification is concerned,
+so the decision should largely be a matter of administrative convenience.</p>
+</div>
+<div class="paragraph">
+<p>A Signer should not sign with a private key when the selector containing the
+corresponding public key is expected to be revoked or removed before the
+Verifier has an opportunity to validate the signature.</p>
+</div>
+<div class="paragraph">
+<p>When rotating to a new key pair, signing should immediately commence with the
+new private key, and the old public key should be retained for a reasonable
+validation interval before being removed from the key server.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_normalize_the_message_to_prevent_transport_conversions">5.3. Normalize the Message to Prevent Transport Conversions</h3>
+<div class="paragraph">
+<p>Some messages, particularly those using 8-bit characters, are subject to
+modification during transit, notably conversion to 7-bit form.
+Such conversions will break DKIM signatures.</p>
+</div>
+<div class="paragraph">
+<p>In order to minimize the chances of such breakage, Signers SHOULD convert the
+message to a suitable MIME content-transfer encoding such as quoted-printable
+or base64 as described in [RFC2045] before signing.</p>
+</div>
+<div class="paragraph">
+<p>If the message is submitted to the Signer with any local encoding that will be
+modified before transmission, that modification to canonical [RFC5322] form
+MUST be done before signing.
+In particular, bare CR or LF characters (used by some systems as a local line
+separator convention) MUST be converted to the SMTP-standard CRLF sequence
+before the message is signed.</p>
+</div>
+<div class="paragraph">
+<p>The Signer MUST sign the message as it is expected to be received by the
+Verifier rather than in some local or internal form.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_determine_the_header_fields_to_sign">5.4. Determine the Header Fields to Sign</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The From header field MUST be signed.</p>
+</li>
+<li>
+<p>Signers SHOULD NOT sign an existing header field likely to be legitimately
+modified or removed in transit.</p>
+</li>
+<li>
+<p>Signers MAY include any other header fields present at the time of signing
+at the discretion of the Signer</p>
+</li>
+<li>
+<p>Strategies to choose header fields,</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Sign all existing, non-repeatable header fields.</p>
+</li>
+<li>
+<p>Sign only header fields that are likely to be displayed to or otherwise
+be likely to affect the processing of the message at the receiver.</p>
+</li>
+<li>
+<p>Sign only "well-known" headers.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Verifiers may treat unsigned header fields with extreme skepticism,
+including refusing to display them to the end user or even ignoring the
+signature if it does not cover certain header fields.
+For this reason, signing fields present in the message such as Date, Subject,
+Reply-To, Sender, and all MIME header fields are highly advised.</p>
+</li>
+<li>
+<p>The DKIM-Signature header field is always implicitly signed and MUST NOT be
+included in the "h=" tag except to indicate that other preexisting signatures
+are also signed.</p>
+</li>
+<li>
+<p>Signers MAY claim to have signed header fields that do not exist.
+When computing the signature, the nonexisting header field MUST be treated
+as the null string.
+This allows Signers to explicitly assert the absence of a header field; if
+that header field is added later, the signature will fail.</p>
+</li>
+<li>
+<p>A header field name need only be listed once more than the actual number of
+that header field in a message at the time of signing in order to prevent any
+further additions.
+For example, if there is a single Comments header field at the time of
+signing, listing Comments twice in the "h=" tag is sufficient to prevent any
+number of Comments header fields from being appended; it is not necessary (but
+is legal) to list Comments three or more times in the "h=" tag.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Signers need to be careful of signing header fields that might have additional
+instances added later in the delivery process, since such header fields might
+be inserted after the signed instance or otherwise reordered.
+Trace header fields (such as Received) and Resent-* blocks are the only fields
+prohibited by [RFC5322] from being reordered.
+In particular, since DKIM-Signature header fields may be reordered by some
+intermediate MTAs, signing existing DKIM-Signature header fields is
+error-prone.</p>
+</div>
+<div class="paragraph">
+<p>All end-user visible header fields should be signed to avoid possible
+"indirect spamming".
+For example, if the Subject header field is not signed, a spammer can resend a
+previously signed mail, replacing the legitimate subject with a one-line spam.</p>
+</div>
+<div class="sect3">
+<h4 id="_recommended_signature_content">5.4.1. Recommended Signature Content</h4>
+<div class="paragraph">
+<p>Common examples of fields with addresses and fields with textual content
+related to the body are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>From (REQUIRED; see Section 5.4)</p>
+</li>
+<li>
+<p>Reply-To</p>
+</li>
+<li>
+<p>Subject</p>
+</li>
+<li>
+<p>Date</p>
+</li>
+<li>
+<p>To, Cc</p>
+</li>
+<li>
+<p>Resent-Date, Resent-From, Resent-To, Resent-Cc</p>
+</li>
+<li>
+<p>In-Reply-To, References</p>
+</li>
+<li>
+<p>List-Id, List-Help, List-Unsubscribe, List-Subscribe, List-Post,
+List-Owner, List-Archive</p>
+</li>
+<li>
+<p>If the "l=" signature tag is in use, the Content-Type field is also a
+candidate for being included as it could be replaced in a way that causes
+completely different content to be rendered to the receiving user.</p>
+</li>
+<li>
+<p>Another class of fields that may be of interest are those that convey
+security-related information about the message, such as
+Authentication-Results.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The basic rule for choosing fields to exclude is to select those fields for
+which there are multiple fields with the same name and fields that are
+modified in transit.
+Examples of these are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Return-Path</p>
+</li>
+<li>
+<p>Received</p>
+</li>
+<li>
+<p>Comments, Keywords</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Signers SHOULD choose canonicalization algorithms based on the types of
+messages they process and their aversion to risk.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_signatures_involving_multiple_instances_of_a_field">5.4.2. Signatures Involving Multiple Instances of a Field</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Signers choosing to sign an existing header field that occurs more
+than once in the message (such as Received) MUST sign the physically
+last instance of that header field in the header block.</p>
+</li>
+<li>
+<p>Signers wishing to sign multiple instances of such a header field MUST
+include the header field name multiple times in the "h=" tag of the
+DKIM-Signature header field and MUST sign such header fields in order
+from the bottom of the header field block to the top.</p>
+</li>
+<li>
+<p>The Signer MAY include more instances of a header field name in "h=" than
+there are actual corresponding header fields so that the signature will not
+verify if additional header fields of that name are added.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="paragraph">
+<p>If the Signer wishes to sign two existing Received header fields, and the
+existing header contains:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Received: &lt;A&gt;
+Received: &lt;B&gt;
+Received: &lt;C&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>then the resulting DKIM-Signature header field should read:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>DKIM-Signature: ... h=Received : Received :...</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and Received header fields &lt;C&gt; and &lt;B&gt; will be signed in that order.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compute_the_message_hash_and_signature">5.5. Compute the Message Hash and Signature</h3>
+<div class="paragraph">
+<p>The Signer MUST compute the message hash as and then sign it using the
+selected public-key algorithm.</p>
+</div>
+<div class="paragraph">
+<p>Entities such as mailing list managers that implement DKIM and that modify the
+message or a header field (for example, inserting unsubscribe information)
+before retransmitting the message SHOULD check any existing signature on input
+and MUST make such modifications before re-signing the message.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_insert_the_dkim_signature_header_field">5.6. Insert the DKIM-Signature Header Field</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The Signer MUST insert the DKIM-Signature header field created in the
+previous step prior to transmitting the email.</p>
+</li>
+<li>
+<p>The DKIM-Signature header field MUST be inserted before any other
+DKIM-Signature fields in the header block.</p>
+</li>
+<li>
+<p>It may be placed before any existing "Received" header fields.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_verifier_actions">6. Verifier Actions</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Deferring verification until the message is accessed by the end user is
+discouraged.</p>
+</li>
+<li>
+<p>MTA who has performed verification MAY communicate the result of that
+verification by adding a verification header field to incoming messages.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_extract_signatures_from_the_message">6.1. Extract Signatures from the Message</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Verifiers MAY try signatures in any order they like.</p>
+</li>
+<li>
+<p>Verifiers MUST NOT attribute ultimate meaning to the order of multiple
+DKIM-Signature header fields.
+In particular, there is reason to believe that some relays will reorder the
+header fields in potentially arbitrary ways.</p>
+</li>
+<li>
+<p>Verifier SHOULD NOT treat a message that has one or more bad signatures and
+no good signatures differently from a message with no signature at all.</p>
+</li>
+<li>
+<p>A Verifier MAY limit the number of signatures it tries, in order to avoid
+denial-of-service attacks.</p>
+</li>
+<li>
+<p>If the status is "PERMFAIL", the signature failed and should not be
+reconsidered.</p>
+</li>
+<li>
+<p>If the status is "TEMPFAIL", the signature could not be verified at
+this time but may be tried again later.</p>
+</li>
+<li>
+<p>A Verifier MAY either arrange to defer the message for later processing or
+try another signature; if no good signature is found and any of the
+signatures resulted in a TEMPFAIL status, the Verifier MAY arrange to defer
+the message for later processing.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_validate_the_signature_header_field">6.1.1. Validate the Signature Header Field</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Implementers MUST meticulously validate the format and values in the
+DKIM-Signature header field; any inconsistency or unexpected values
+MUST cause the header field to be completely ignored and the Verifier
+to return PERMFAIL (signature syntax error).</p>
+</li>
+<li>
+<p>Verifiers MUST return PERMFAIL (incompatible version) when presented a
+DKIM-Signature header field with a "v=" tag that is inconsistent with this
+specification.</p>
+</li>
+<li>
+<p>If any tag listed as "required" in Section 3.5 is omitted from the
+DKIM-Signature header field, the Verifier MUST ignore the DKIM-Signature
+header field and return PERMFAIL (signature missing required tag).</p>
+</li>
+<li>
+<p>If "d=" tag is not same or parent domain of "i=" tag, the DKIM-Signature
+header field MUST be ignored, and the Verifier should return PERMFAIL (domain
+mismatch).</p>
+</li>
+<li>
+<p>If the "h=" tag does not include the From header field, the Verifier
+MUST ignore the DKIM-Signature header field and return PERMFAIL (From
+field not signed).</p>
+</li>
+<li>
+<p>Verifiers MAY ignore the DKIM-Signature header field and return
+PERMFAIL (signature expired) if it contains an "x=" tag and the
+signature has expired.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_get_the_public_key">6.1.2. Get the Public Key</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>The Verifier MUST validate the key record and MUST ignore any public-key
+records that are malformed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A Verifier MUST perform the following steps in a manner that is semantically
+the same as performing them in the order indicated,</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The Verifier retrieves the public key using the algorithm in the "q=" tag,
+the domain from the "d=" tag, and the selector from the "s=" tag.</p>
+</li>
+<li>
+<p>If the query for the public key fails to respond, the Verifier MAY seek a
+later verification attempt by returning TEMPFAIL (key unavailable).</p>
+</li>
+<li>
+<p>If the query for the public key fails because the corresponding
+key record does not exist, the Verifier MUST immediately return
+PERMFAIL (no key for signature).</p>
+</li>
+<li>
+<p>If the query for the public key returns multiple key records, the Verifier
+can choose one of the key records or may cycle through the key records</p>
+</li>
+<li>
+<p>If the result returned from the query does not adhere to the format defined
+in this specification, the Verifier MUST ignore the key record and return
+PERMFAIL (key syntax error).</p>
+</li>
+<li>
+<p>If the "h=" tag exists in the public-key record and the hash algorithm
+implied by the "a=" tag in the DKIM-Signature header field is not included in
+the contents of the "h=" tag, the Verifier MUST ignore the key record and
+return PERMFAIL (inappropriate hash algorithm).</p>
+</li>
+<li>
+<p>If the public-key data (the "p=" tag) is empty, then this key has been
+revoked and the Verifier MUST treat this as a failed signature check and
+return PERMFAIL (key revoked).</p>
+</li>
+<li>
+<p>If the public-key data is not suitable for use with the algorithm and key
+types defined by the "a=" and "k=" tags in the DKIM-Signature header field,
+the Verifier MUST immediately return PERMFAIL (inappropriate key algorithm).</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_compute_the_verification">6.1.3. Compute the Verification</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Based on the algorithm defined in the "c=" tag, the body length specified
+in the "l=" tag, and the header field names in the "h=" tag, prepare a
+canonicalized version of the message.
+Note that this canonicalized version does not actually replace the original
+content.</p>
+</li>
+<li>
+<p>Based on the algorithm indicated in the "a=" tag, compute the message
+hashes from the canonical copy.</p>
+</li>
+<li>
+<p>Verify that the hash of the canonicalized message body computed in the
+previous step matches the hash value conveyed in the "bh=" tag.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If the hash does not match, the Verifier SHOULD ignore the signature and
+return PERMFAIL (body hash did not verify).</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Verifiers might treat a message that contains bytes beyond the indicated
+body length with suspicion and can choose to treat the signature as if it were
+invalid (e.g., by returning PERMFAIL (unsigned content)).</p>
+</li>
+<li>
+<p>Using the signature conveyed in the "b=" tag, verify the signature against
+the header hash using the mechanism appropriate for the public-key algorithm
+described in the "a=" tag.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If the signature does not validate, the Verifier SHOULD ignore the
+signature and return PERMFAIL (signature did not verify).</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Signature has correctly verified</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_communicate_verification_results">6.2. Communicate Verification Results</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Implementations might choose to add an email header
+"Authentication-Results" (RFC5451) field to the message before passing it on.</p>
+</li>
+<li>
+<p>Any such header field SHOULD be inserted before any existing DKIM-Signature
+or preexisting authentication status header fields in the header field block.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_interpret_resultapply_local_policy">6.3. Interpret Result/Apply Local Policy</h3>
+<div class="paragraph">
+<p>It is beyond the scope of this specification to describe what actions an
+Identity Assessor can make, but mail carrying a validated SDID presents an
+opportunity to an Identity Assessor that unauthenticated email does not.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_security_considerations">7. Security Considerations</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_ascii_art_attacks">7.1. ASCII Art Attacks</h3>
+<div class="paragraph">
+<p>The "relaxed" body canonicalization algorithm may enable certain types of
+extremely crude "ASCII Art" attacks where a message may be conveyed by
+adjusting the spacing between words.
+If this is a concern, the "simple" body canonicalization algorithm should be
+used instead.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_misuse_of_body_length_limits_l_tag">7.2. Misuse of Body Length Limits ("l=" Tag)</h3>
+<div class="paragraph">
+<p>Use of the "l=" tag might allow display of fraudulent content without
+appropriate warning to end users.</p>
+</div>
+<div class="paragraph">
+<p>An example of such an attack includes altering the MIME structure, exploiting
+lax HTML parsing in the MUA, and defeating duplicate message detection
+algorithms.</p>
+</div>
+<div class="paragraph">
+<p>To avoid this attack, Signers should be extremely wary of using this tag,
+and Assessors might wish to ignore signatures that use the tag.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_misappropriated_private_key">7.3. Misappropriated Private Key</h3>
+<div class="paragraph">
+<p>Private keys issued to users, rather than one used by an ADministrative
+Management Domain (ADMD) itself, create the usual problem of securing data
+stored on personal resources that can affect the ADMD.</p>
+</div>
+<div class="paragraph">
+<p>A more secure architecture involves sending messages through an outgoing MTA
+that can authenticate the submitter using existing techniques (e.g. SMTP
+Authentication).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_key_server_denial_of_service_attacks">7.4. Key Server Denial-of-Service Attacks</h3>
+<div class="paragraph">
+<p>Given the low overhead of verification compared with handling of the email
+message itself, such an attack would be difficult to mount.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_attacks_against_the_dns">7.5. Attacks against the DNS</h3>
+<div class="paragraph">
+<p>A DKIM Verifier, while verifying a DKIM-Signature header field, could be
+prompted to retrieve a key record of an attacker&#8217;s choosing.
+This threat can be minimized by ensuring that name servers, including
+recursive name servers, used by the Verifier enforce strict checking of "glue"
+and other additional information in DNS responses and are therefore not
+vulnerable to this attack.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_replayspam_attacks">7.6. Replay/Spam Attacks</h3>
+<div class="paragraph">
+<p>A spammer sends a piece of spam through an MTA that signs it, banking on the
+reputation of the signing domain (e.g., a large popular mailbox provider)
+rather than its own, and then re-sends that message to a large number of
+intended recipients.</p>
+</div>
+<div class="paragraph">
+<p>Partial solutions to this problem involve the use of reputation services to
+convey the fact that the specific email address is being used for spam and
+that messages from that Signer are likely to be spam.</p>
+</div>
+<div class="paragraph">
+<p>However, such measures might be prone to abuse, if, for example, an attacker
+re-sent a large number of messages received from a victim in order to make the
+victim appear to be a spammer.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_limits_on_revoking_keys">7.7. Limits on Revoking Keys</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_intentionally_malformed_key_records">7.8. Intentionally Malformed Key Records</h3>
+<div class="paragraph">
+<p>Verifiers MUST thoroughly verify all key records retrieved from the DNS and be
+robust against intentionally as well as unintentionally malformed key records.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_intentionally_malformed_dkim_signature_header_fields">7.9. Intentionally Malformed DKIM-Signature Header Fields</h3>
+<div class="paragraph">
+<p>Verifiers MUST be prepared to receive messages with malformed DKIM-Signature
+header fields and thoroughly verify the header field before depending on any
+of its contents.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_information_leakage">7.10. Information Leakage</h3>
+<div class="paragraph">
+<p>An attacker could determine when a particular signature was verified by using
+a per-message selector and then monitoring their DNS traffic for the key
+lookup.
+This would act as the equivalent of a "web bug" for verification time rather
+than the time the message was read.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_remote_timing_attacks">7.11. Remote Timing Attacks</h3>
+<div class="paragraph">
+<p>In some cases, it may be possible to extract private keys using a remote
+timing attack [BONEH03].
+Implementations should consider obfuscating the timing to prevent such
+attacks.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reordered_header_fields">7.12. Reordered Header Fields</h3>
+<div class="paragraph">
+<p>Signers that sign any existing DKIM-Signature fields run the risk of having
+messages incorrectly fail to verify.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rsa_attacks">7.13. RSA Attacks</h3>
+<div class="paragraph">
+<p>Verifiers might avoid this attack by refusing to verify signatures that
+reference selectors with public keys having unreasonable exponents.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2019-01-30 03:19:40 +0700
+</div>
+</div>
+</body>
+</html>

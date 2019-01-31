@@ -18,7 +18,8 @@ first week of next month.
 ===  Enhancements
 
 *  Various fixes suggested by linters
-*  doc: add summary note of Simple Authentication and Security Layer (SASL)
+*  doc: add four summary and notes about DKIM
+*  doc: add summary of Simple Authentication and Security Layer (SASL)
 *  doc: add summary on SMTP over TLS (RFC3207)
 *  doc: add notes for Internet Message Format (RFC 5322)
 *  doc: add documentation for SMTP and DSN
