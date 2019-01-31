@@ -4,7 +4,8 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
-==  share v0.3.0 (2019-xx-xx)
+
+==  share v0.3.0 (2019-02-01)
 
 ===  Features Changes
 
