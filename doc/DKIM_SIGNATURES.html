@@ -220,29 +220,29 @@ FWS (folding whitespace) =   [*WSP CRLF] 1*WSP ; folding whitespace</pre>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
-                       "!" / "#" /        ;  characters not including
-                       "$" / "%" /        ;  specials.  Used for atoms.
-                       "&amp;" / "'" /
-                       "*" / "+" /
-                       "-" / "/" /
-                       "=" / "?" /
-                       "^" / "_" /
-                       "`" / "{" /
-                       "|" / "}" /
-                       "~"
-   Atom            =  1*atext
+<pre>atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+                    "!" / "#" /        ;  characters not including
+                    "$" / "%" /        ;  specials.  Used for atoms.
+                    "&amp;" / "'" /
+                    "*" / "+" /
+                    "-" / "/" /
+                    "=" / "?" /
+                    "^" / "_" /
+                    "`" / "{" /
+                    "|" / "}" /
+                    "~"
+Atom            =  1*atext
 
-   hyphenated-word =  ALPHA [ *(ALPHA / DIGIT / "-") (ALPHA / DIGIT) ]
+hyphenated-word =  ALPHA [ *(ALPHA / DIGIT / "-") (ALPHA / DIGIT) ]
 
-   ALPHADIGITPS    =  (ALPHA / DIGIT / "+" / "/")
+ALPHADIGITPS    =  (ALPHA / DIGIT / "+" / "/")
 
-   base64string    =  ALPHADIGITPS *([FWS] ALPHADIGITPS)
-                      [ [FWS] "=" [ [FWS] "=" ] ]
+base64string    =  ALPHADIGITPS *([FWS] ALPHADIGITPS)
+                   [ [FWS] "=" [ [FWS] "=" ] ]
 
-   hdr-name        =  field-name
+hdr-name        =  field-name
 
-   qp-hdr-value    =  dkim-quoted-printable    ; with "|" encoded</pre>
+qp-hdr-value    =  dkim-quoted-printable    ; with "|" encoded</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -316,20 +316,20 @@ Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig</pre>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>     qp-section  = [*(ptext / SPACE / TAB) ptext]
+<pre>qp-section  = [*(ptext / SPACE / TAB) ptext]
 
-     ptext       = hex-octet / safe-char
+ptext       = hex-octet / safe-char
 
-     hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
-                   ; Octet must be used for characters &gt; 127, =,
-                   ; SPACEs or TABs at the ends of lines, and is
-                   ; recommended for any character not listed in
-                   ; RFC 2049 as "mail-safe".
+hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
+            ; Octet must be used for characters &gt; 127, =,
+            ; SPACEs or TABs at the ends of lines, and is
+            ; recommended for any character not listed in
+            ; RFC 2049 as "mail-safe".
 
-     safe-char   = &lt;any octet with decimal value of 33 through
-                   60 inclusive, and 62 through 126&gt;
-                   ; Characters not listed as "mail-safe" in
-                   ; RFC 2049 are also not recommended.</pre>
+safe-char   = ; any octet with decimal value of 33 through
+              ; 60 inclusive, and 62 through 126.
+              ; Characters not listed as "mail-safe" in
+              ; RFC 2049 are also not recommended.</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -337,10 +337,10 @@ Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig</pre>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>   dkim-quoted-printable =  *(FWS / hex-octet / dkim-safe-char)
-                               ; hex-octet is from RFC2045
-   dkim-safe-char        =  %x21-3A / %x3C / %x3E-7E
-                               ; '!' - ':', '&lt;', '&gt;' - '~'</pre>
+<pre>dkim-quoted-printable =  *(FWS / hex-octet / dkim-safe-char)
+                      ; hex-octet is from RFC 2045
+dkim-safe-char        =  %x21-3A / %x3C / %x3E-7E
+                      ; '!' - ':', '&lt;', '&gt;' - '~'</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -351,15 +351,15 @@ several important ways:</p>
 <ol class="arabic">
 <li>
 <p>Whitespace in the input text, including CR and LF, must be encoded.
-[RFC2045] does not require such encoding, and does not permit encoding of CR
-or LF characters that are part of a CRLF line break.</p>
+[RFC2045] does not require such encoding, and does not permit encoding of
+CR or LF characters that are part of a CRLF line break.</p>
 </li>
 <li>
 <p>Whitespace in the encoded text is ignored.
 This is to allow tags encoded using DKIM-Quoted-Printable to be wrapped as
 needed.
-In particular, [RFC2045] requires that line breaks in the input be represented
-as physical line breaks; that is not the case here.</p>
+In particular, [RFC2045] requires that line breaks in the input be
+represented as physical line breaks; that is not the case here.</p>
 </li>
 <li>
 <p>The "soft line break" syntax ("=" as the last non-whitespace character on
@@ -585,11 +585,11 @@ algorithm defaults for both header and body.</p>
 <p>Verifiers MUST implement both canonicalization algorithms.</p>
 </li>
 <li>
-<p>The header and body may use different canonicalization algorithms.</p>
+<p>The header and body MAY use different canonicalization algorithms.</p>
 </li>
 <li>
-<p>Further canonicalization algorithms MAY be defined in the future; Verifiers
-MUST ignore any signatures that use unrecognized canonicalization algorithms.</p>
+<p>Verifiers MUST ignore any signatures that use unrecognized canonicalization
+algorithms.</p>
 </li>
 <li>
 <p>Canonicalization algorithms MUST NOT change the transmitted data in any
@@ -606,12 +606,15 @@ way.</p>
 exactly as they are in the message being signed or verified.</p>
 </li>
 <li>
-<p>In particular, header field names MUST NOT be case folded and whitespace
-MUST NOT be changed.</p>
+<p>Header field names MUST NOT be case folded and whitespace MUST NOT be
+changed.</p>
 </li>
 <li>
-<p>Its converts "*CRLF" at the end of the body to a single "CRLF".
-If there is no body or no trailing CRLF on the message body, a CRLF is added.</p>
+<p>Converts multiple CRLF at the end of the body to a single CRLF.</p>
+</li>
+<li>
+<p>If there is no body or no trailing CRLF on the message body, a CRLF is
+added.</p>
 </li>
 </ul>
 </div>
@@ -625,27 +628,27 @@ in order:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Convert all header field names (not the header field values) to lowercase.
-For example, convert "SUBJect: AbC" to "subject: AbC".</p>
+<p>Convert all header field names (not the header field values) to lowercase.</p>
 </li>
 <li>
-<p>Unfold all header field continuation lines as described in [RFC5322];
-in particular, lines with terminators embedded in continued header field
-values (that is, CRLF sequences followed by WSP) MUST be interpreted without
-the CRLF.
-Implementations MUST NOT remove the CRLF at the end of the header field value.</p>
+<p>Unfold all header field continuation lines, CRLF and WSP, and remove CRLF.</p>
 </li>
 <li>
-<p>Convert all sequences of one or more WSP characters to a single SP character.
-WSP characters here include those before and after a line folding boundary.</p>
+<p>Implementations MUST NOT remove the CRLF at the end of the header field
+value.</p>
+</li>
+<li>
+<p>Convert all sequences of one or more WSP characters to a single SP
+character.</p>
 </li>
 <li>
 <p>Delete all WSP characters at the end of each unfolded header field value.</p>
 </li>
 <li>
-<p>Delete any WSP characters remaining before and after the colon separating
-the header field name from the header field value.
-The colon separator MUST be retained.</p>
+<p>Delete any WSP characters before and after the colon.</p>
+</li>
+<li>
+<p>The colon separator MUST be retained.</p>
 </li>
 </ul>
 </div>
@@ -670,8 +673,14 @@ Implementations MUST NOT remove the CRLF at the end of the line.</p>
 </div>
 </li>
 <li>
-<p>Ignore all empty lines at the end of the message body.
-If the body is non-empty but does not end with a CRLF, a CRLF is added.</p>
+<p>Ignore all empty lines at the end of the message body.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If the body is non-empty but does not end with a CRLF, a CRLF is added.</p>
+</li>
+</ul>
+</div>
 </li>
 </ol>
 </div>
@@ -742,8 +751,8 @@ trace header field as defined in Section 3.6 of [RFC5322].</p>
 included in the signature calculation, after the rest of the header fields
 being signed;
 however, when calculating or verifying the signature, the value of the "b="
-tag (signature value) of that DKIM-Signature header field MUST be treated as
-though it were an empty string.</p>
+tag (signature value) of that DKIM-Signature header field MUST be treated
+as though it were an empty string.</p>
 </li>
 <li>
 <p>Unknown tags in the DKIM-Signature header field MUST be included in the
@@ -1018,8 +1027,8 @@ signed.</p>
 </li>
 <li>
 <p>The body length count MUST be calculated following the canonicalization
-algorithm; for example, any whitespace ignored by a canonicalization algorithm
-is not included as part of the body length count.</p>
+algorithm; for example, any whitespace ignored by a canonicalization
+algorithm is not included as part of the body length count.</p>
 </li>
 <li>
 <p>A body length count of zero means that the body is completely unsigned.</p>
@@ -1095,8 +1104,8 @@ included.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Internationalized selector names MUST be encoded as A-labels, as described in
-Section 2.3 of [RFC5890].</p>
+<p>Internationalized selector names MUST be encoded as A-labels, as described
+in Section 2.3 of [RFC5890].</p>
 </li>
 </ul>
 </div>
@@ -1218,7 +1227,8 @@ signing.</p>
 <li>
 <p>The header field text itself must encode the vertical bar ("|", %x7C)
 character (i.e., vertical bars in the "z=" text are meta-characters, and
-any actual vertical bar characters in a copied header field must be encoded).</p>
+any actual vertical bar characters in a copied header field must be
+encoded).</p>
 </li>
 <li>
 <p>All whitespace must be encoded, including whitespace between the colon and
@@ -1392,15 +1402,15 @@ space limitations (notably DNS).</p>
 <p>The syntax and semantics of this tag value before being encoded in base64
 are defined by the "k=" tag.</p>
 </li>
-</ul>
-</div>
-<div class="paragraph">
-<p>If a private key has been compromised or otherwise disabled, a Signer might want to explicitly state that it knows about the selector, but all messages using that selector should fail verification.
-Verifiers SHOULD return an error code for any DKIM-Signature header field with
-a selector referencing a revoked key.</p>
-</div>
-<div class="ulist">
-<ul>
+<li>
+<p>If a private key has been compromised or otherwise disabled, a Signer might
+want to explicitly state that it knows about the selector, but all messages
+using that selector should fail verification.</p>
+</li>
+<li>
+<p>Verifiers SHOULD return an error code for any DKIM-Signature header field
+with a selector referencing a revoked key.</p>
+</li>
 <li>
 <p>A base64string is permitted to include whitespace (FWS) at arbitrary
 places; however, any CRLFs must be followed by at least one WSP character.</p>
@@ -1478,13 +1488,14 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
 <ul>
 <li>
 <p><strong>y</strong>:  This domain is testing DKIM.
-Verifiers MUST NOT treat messages from Signers in testing mode differently from unsigned email, even should the signature fail to verify.
+Verifiers MUST NOT treat messages from Signers in testing mode differently
+from unsigned email, even should the signature fail to verify.
 Verifiers MAY wish to track testing mode results to assist the Signer.</p>
 </li>
 <li>
 <p><strong>s</strong>:  Any DKIM-Signature header fields using the "i=" tag MUST have
-the same domain value on the right-hand side of the "@" in the "i=" tag and
-the value of the "d=" tag.
+the same domain value on the right-hand side of the "@" in the "i=" tag
+and the value of the "d=" tag.
 That is, the "i=" domain MUST NOT be a subdomain of "d=".
 Use of this flag is RECOMMENDED unless subdomaining is required.</p>
 </li>
@@ -1503,8 +1514,9 @@ Use of this flag is RECOMMENDED unless subdomaining is required.</p>
 </li>
 <li>
 <p>All DKIM keys are stored in a subdomain named "_domainkey".
-Given a DKIM-Signature field with a "d=" tag of "example.com" and an "s=" tag
-of "foo.bar", the DNS query will be for "foo.bar._domainkey.example.com".</p>
+Given a DKIM-Signature field with a "d=" tag of "example.com" and an "s="
+tag of "foo.bar", the DNS query will be for
+"foo.bar._domainkey.example.com".</p>
 </li>
 <li>
 <p>The query type "q=" in lookup function specify DNS Resource Record.
@@ -1584,8 +1596,8 @@ algorithm specified in the "c=" tag.</p>
 </li>
 <li>
 <p>All tags and their values in the DKIM-Signature header field are included
-in the cryptographic hash with the sole exception of the value portion of the
-"b=" (signature) tag, which MUST be treated as the null string.</p>
+in the cryptographic hash with the sole exception of the value portion of
+the "b=" (signature) tag, which MUST be treated as the null string.</p>
 </li>
 <li>
 <p>The DKIM-Signature header field MUST NOT be included in its own "h=" tag,
@@ -1607,8 +1619,9 @@ Verifier.</p>
 <ul>
 <li>
 <p>When calculating the hash on messages that will be transmitted using
-base64 or quoted-printable encoding, Signers MUST compute the hash after the
-encoding, and Verifier MUST incorporate the values into hash before decoding.</p>
+base64 or quoted-printable encoding, Signers MUST compute the hash after
+the encoding, and Verifier MUST incorporate the values into hash before
+decoding.</p>
 </li>
 <li>
 <p>The hash MUST be computed before transport-level encodings such as SMTP
@@ -1755,8 +1768,8 @@ validity of the domain of the AUID.</p>
 <ul>
 <li>
 <p>If the referenced key record contains the "s" flag as part of the "t=" tag,
-the domain of the AUID ("i=" flag) MUST be the same as that of the SDID (d=)
-domain.</p>
+the domain of the AUID ("i=" flag) MUST be the same as that of the SDID
+(d=) domain.</p>
 </li>
 <li>
 <p>If this flag is absent, the domain of the AUID MUST be the same as, or a
@@ -1834,8 +1847,9 @@ they are signing, even if they know that the signatures cannot be verified.</p>
 </li>
 <li>
 <p>Verifier SHOULD evaluate signatures independently and on their own merits.
-For example, a Verifier that by policy chooses not to accept signatures with
-deprecated cryptographic algorithms would consider such signatures invalid.</p>
+For example, a Verifier that by policy chooses not to accept signatures
+with deprecated cryptographic algorithms would consider such signatures
+invalid.</p>
 </li>
 <li>
 <p>Verifiers MAY process signatures in any order of their choice; for example,
@@ -1965,13 +1979,13 @@ be likely to affect the processing of the message at the receiver.</p>
 <p>Verifiers may treat unsigned header fields with extreme skepticism,
 including refusing to display them to the end user or even ignoring the
 signature if it does not cover certain header fields.
-For this reason, signing fields present in the message such as Date, Subject,
-Reply-To, Sender, and all MIME header fields are highly advised.</p>
+For this reason, signing fields present in the message such as Date,
+Subject, Reply-To, Sender, and all MIME header fields are highly advised.</p>
 </li>
 <li>
 <p>The DKIM-Signature header field is always implicitly signed and MUST NOT be
-included in the "h=" tag except to indicate that other preexisting signatures
-are also signed.</p>
+included in the "h=" tag except to indicate that other preexisting
+signatures are also signed.</p>
 </li>
 <li>
 <p>Signers MAY claim to have signed header fields that do not exist.
@@ -1982,12 +1996,13 @@ that header field is added later, the signature will fail.</p>
 </li>
 <li>
 <p>A header field name need only be listed once more than the actual number of
-that header field in a message at the time of signing in order to prevent any
-further additions.
+that header field in a message at the time of signing in order to prevent
+any further additions.
 For example, if there is a single Comments header field at the time of
-signing, listing Comments twice in the "h=" tag is sufficient to prevent any
-number of Comments header fields from being appended; it is not necessary (but
-is legal) to list Comments three or more times in the "h=" tag.</p>
+signing, listing Comments twice in the "h=" tag is sufficient to prevent
+any number of Comments header fields from being appended; it is not
+necessary (but is legal) to list Comments three or more times in the "h="
+tag.</p>
 </li>
 </ul>
 </div>
@@ -2232,8 +2247,8 @@ header field and return PERMFAIL (signature missing required tag).</p>
 </li>
 <li>
 <p>If "d=" tag is not same or parent domain of "i=" tag, the DKIM-Signature
-header field MUST be ignored, and the Verifier should return PERMFAIL (domain
-mismatch).</p>
+header field MUST be ignored, and the Verifier should return PERMFAIL
+(domain mismatch).</p>
 </li>
 <li>
 <p>If the "h=" tag does not include the From header field, the Verifier
@@ -2288,9 +2303,9 @@ PERMFAIL (key syntax error).</p>
 </li>
 <li>
 <p>If the "h=" tag exists in the public-key record and the hash algorithm
-implied by the "a=" tag in the DKIM-Signature header field is not included in
-the contents of the "h=" tag, the Verifier MUST ignore the key record and
-return PERMFAIL (inappropriate hash algorithm).</p>
+implied by the "a=" tag in the DKIM-Signature header field is not included
+in the contents of the "h=" tag, the Verifier MUST ignore the key record
+and return PERMFAIL (inappropriate hash algorithm).</p>
 </li>
 <li>
 <p>If the public-key data (the "p=" tag) is empty, then this key has been
@@ -2334,13 +2349,13 @@ return PERMFAIL (body hash did not verify).</p>
 </li>
 <li>
 <p>Verifiers might treat a message that contains bytes beyond the indicated
-body length with suspicion and can choose to treat the signature as if it were
-invalid (e.g., by returning PERMFAIL (unsigned content)).</p>
+body length with suspicion and can choose to treat the signature as if it
+were invalid (e.g., by returning PERMFAIL (unsigned content)).</p>
 </li>
 <li>
 <p>Using the signature conveyed in the "b=" tag, verify the signature against
-the header hash using the mechanism appropriate for the public-key algorithm
-described in the "a=" tag.</p>
+the header hash using the mechanism appropriate for the public-key
+algorithm described in the "a=" tag.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
@@ -2363,11 +2378,13 @@ signature and return PERMFAIL (signature did not verify).</p>
 <ul>
 <li>
 <p>Implementations might choose to add an email header
-"Authentication-Results" (RFC5451) field to the message before passing it on.</p>
+"Authentication-Results" (RFC5451) field to the message before passing it
+on.</p>
 </li>
 <li>
 <p>Any such header field SHOULD be inserted before any existing DKIM-Signature
-or preexisting authentication status header fields in the header field block.</p>
+or preexisting authentication status header fields in the header field
+block.</p>
 </li>
 </ul>
 </div>
@@ -2518,7 +2535,7 @@ reference selectors with public keys having unreasonable exponents.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-01-30 03:19:40 +0700
+Last updated 2019-02-01 11:31:58 +0700
 </div>
 </div>
 </body>

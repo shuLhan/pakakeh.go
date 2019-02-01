@@ -95,7 +95,6 @@ Whitespace::
 There are three forms of whitespace:
 
 ....
-
 SP                       = ; Space
 HTAB                     = ; Horizontal tab
 WSP                      =   SP / HTAB         ; whitespace
@@ -106,29 +105,29 @@ FWS (folding whitespace) =   [*WSP CRLF] 1*WSP ; folding whitespace
 *Common ABNF Tokens*
 
 ....
-   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
-                       "!" / "#" /        ;  characters not including
-                       "$" / "%" /        ;  specials.  Used for atoms.
-                       "&" / "'" /
-                       "*" / "+" /
-                       "-" / "/" /
-                       "=" / "?" /
-                       "^" / "_" /
-                       "`" / "{" /
-                       "|" / "}" /
-                       "~"
-   Atom            =  1*atext
+atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+                    "!" / "#" /        ;  characters not including
+                    "$" / "%" /        ;  specials.  Used for atoms.
+                    "&" / "'" /
+                    "*" / "+" /
+                    "-" / "/" /
+                    "=" / "?" /
+                    "^" / "_" /
+                    "`" / "{" /
+                    "|" / "}" /
+                    "~"
+Atom            =  1*atext
 
-   hyphenated-word =  ALPHA [ *(ALPHA / DIGIT / "-") (ALPHA / DIGIT) ]
+hyphenated-word =  ALPHA [ *(ALPHA / DIGIT / "-") (ALPHA / DIGIT) ]
 
-   ALPHADIGITPS    =  (ALPHA / DIGIT / "+" / "/")
+ALPHADIGITPS    =  (ALPHA / DIGIT / "+" / "/")
 
-   base64string    =  ALPHADIGITPS *([FWS] ALPHADIGITPS)
-                      [ [FWS] "=" [ [FWS] "=" ] ]
+base64string    =  ALPHADIGITPS *([FWS] ALPHADIGITPS)
+                   [ [FWS] "=" [ [FWS] "=" ] ]
 
-   hdr-name        =  field-name
+hdr-name        =  field-name
 
-   qp-hdr-value    =  dkim-quoted-printable    ; with "|" encoded
+qp-hdr-value    =  dkim-quoted-printable    ; with "|" encoded
 ....
 
 *Local-part*
@@ -187,50 +186,50 @@ dot-atom-text   =   1*atext *("." 1*atext)
 
 A single line of quoted-printable-encoded text,
 ....
-     qp-section  = [*(ptext / SPACE / TAB) ptext]
+qp-section  = [*(ptext / SPACE / TAB) ptext]
 
-     ptext       = hex-octet / safe-char
+ptext       = hex-octet / safe-char
 
-     hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
-                   ; Octet must be used for characters > 127, =,
-                   ; SPACEs or TABs at the ends of lines, and is
-                   ; recommended for any character not listed in
-                   ; RFC 2049 as "mail-safe".
+hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
+            ; Octet must be used for characters > 127, =,
+            ; SPACEs or TABs at the ends of lines, and is
+            ; recommended for any character not listed in
+            ; RFC 2049 as "mail-safe".
 
-     safe-char   = <any octet with decimal value of 33 through
-                   60 inclusive, and 62 through 126>
-                   ; Characters not listed as "mail-safe" in
-                   ; RFC 2049 are also not recommended.
+safe-char   = ; any octet with decimal value of 33 through
+              ; 60 inclusive, and 62 through 126.
+              ; Characters not listed as "mail-safe" in
+              ; RFC 2049 are also not recommended.
 ....
 
 *DKIM-Quoted-Printable*
 
 ....
-   dkim-quoted-printable =  *(FWS / hex-octet / dkim-safe-char)
-                               ; hex-octet is from RFC2045
-   dkim-safe-char        =  %x21-3A / %x3C / %x3E-7E
-                               ; '!' - ':', '<', '>' - '~'
+dkim-quoted-printable =  *(FWS / hex-octet / dkim-safe-char)
+                      ; hex-octet is from RFC 2045
+dkim-safe-char        =  %x21-3A / %x3C / %x3E-7E
+                      ; '!' - ':', '<', '>' - '~'
 ....
 
 DKIM-Quoted-Printable differs from Quoted-Printable as defined in [RFC2045] in
 several important ways:
 
 .  Whitespace in the input text, including CR and LF, must be encoded.
-[RFC2045] does not require such encoding, and does not permit encoding of CR
-or LF characters that are part of a CRLF line break.
+   [RFC2045] does not require such encoding, and does not permit encoding of
+   CR or LF characters that are part of a CRLF line break.
 
 .  Whitespace in the encoded text is ignored.
-This is to allow tags encoded using DKIM-Quoted-Printable to be wrapped as
-needed.
-In particular, [RFC2045] requires that line breaks in the input be represented
-as physical line breaks; that is not the case here.
+   This is to allow tags encoded using DKIM-Quoted-Printable to be wrapped as
+   needed.
+   In particular, [RFC2045] requires that line breaks in the input be
+   represented as physical line breaks; that is not the case here.
 
 .  The "soft line break" syntax ("=" as the last non-whitespace character on
-the line) does not apply.
+   the line) does not apply.
 
 .  It does not require that encoded lines be no more than 76 characters long
-(although there may be other requirements depending on the context in which
-the encoded text is being used).
+   (although there may be other requirements depending on the context in which
+   the encoded text is being used).
 
 
 ==  Protocol Elements
@@ -251,15 +250,15 @@ Selectors are needed to support some important use cases.
 For example:
 
 *  Domains that want to delegate signing capability for a specific address for
-a given duration to a partner, such as an advertising provider or other
-outsourced function.
+   a given duration to a partner, such as an advertising provider or other
+   outsourced function.
 
 *  Domains that want to allow frequent travelers to send messages locally
-without the need to connect with a particular MSA.
+   without the need to connect with a particular MSA.
 
 *  "Affinity" domains (e.g., college alumni associations) that provide
-forwarding of incoming mail, but that do not operate a mail submission
-agent for outgoing mail.
+   forwarding of incoming mail, but that do not operate a mail submission
+   agent for outgoing mail.
 
 Reusing a selector with a new key (for example, changing the key associated
 with a user's name) makes it impossible to tell the difference between a
@@ -286,32 +285,32 @@ ALNUMPUNC =  ALPHA / DIGIT / "_"
 ....
 
 *  Values are a series of strings containing either plain text, "base64" text,
-"qp-section", or "dkim-quoted-printable".
+   "qp-section", or "dkim-quoted-printable".
 
 *  The name of the tag will determine the encoding of each value.
 
 *  Unencoded semicolon (";") characters MUST NOT occur in the tag value, since
-that separates tag-specs.
+   that separates tag-specs.
 
 *  Tags MUST be interpreted in a case-sensitive manner.
 
 *  Values MUST be processed as case sensitive unless the specific tag
-description of semantics specifies case insensitivity.
+   description of semantics specifies case insensitivity.
 
 *  Tags with duplicate names MUST NOT occur within a single tag-list;
-if a tag name does occur more than once, the entire tag-list is invalid.
+   if a tag name does occur more than once, the entire tag-list is invalid.
 
 *  Whitespace within a value MUST be retained unless explicitly excluded
-by the specific tag description.
+   by the specific tag description.
 
 *  Tag=value pairs that represent the default value MAY be included to
-aid legibility.
+   aid legibility.
 
 *  Unrecognized tags MUST be ignored.
 
 *  Tags that have an empty value are not the same as omitted tags.
-An omitted tag is treated as having the default value; a tag with an empty
-value explicitly designates the empty string as the value.
+   An omitted tag is treated as having the default value; a tag with an empty
+   value explicitly designates the empty string as the value.
 
 ===  Signing and Verification Algorithms
 
@@ -325,35 +324,35 @@ rsa-sha256.
 *  Other algorithms MAY be defined in the future.
 
 *  Verifiers MUST ignore any signatures using algorithms that they do not
-implement.
+   implement.
 
 *  The rsa-sha1 computes a message hash using SHA-1 and then the hash is then
-signed using the RSA algorithm and the Signer's private key.
+   signed using the RSA algorithm and the Signer's private key.
 
 *  The rsa-sha256 computes a message hash using SHA-256 and then the hash is
-signed using the RSA algorithm and the Signer's private key.
+   signed using the RSA algorithm and the Signer's private key.
 
 *  Signers MUST use RSA keys of at least 1024 bits for long-lived keys.
 
 *  Verifiers MUST be able to validate signatures with keys ranging from 512
-bits to 2048 bits, and they MAY be able to validate signatures with larger
-keys.
+   bits to 2048 bits, and they MAY be able to validate signatures with larger
+   keys.
 
 Factors that should influence the key size choice include the following:
 
 *  The practical constraint that large (e.g., 4096-bit) keys might not fit
-within a 512-byte DNS UDP response packet
+   within a 512-byte DNS UDP response packet
 
 *  The security constraint that keys smaller than 1024 bits are subject to
-off-line attacks
+   off-line attacks
 
 *  Larger keys impose higher CPU costs to verify and sign email
 
 *  Keys can be replaced on a regular basis; thus, their lifetime can be
-relatively short
+   relatively short
 
 *  The security goals of this specification are modest compared to typical
-goals of other systems that employ digital signatures
+   goals of other systems that employ digital signatures
 
 ===  Canonicalization
 
@@ -369,33 +368,36 @@ body, a "simple" and "relaxed" algorithms.
 *  A "simple" algorithm tolerates almost no modification.
 
 *  A "relaxed" algorithm tolerates common modifications such as whitespace
-replacement and header field line rewrapping.
+   replacement and header field line rewrapping.
 
 *  A Signer MAY specify either algorithm for header or body.
 
 *  If no canonicalization algorithm is specified by the Signer, the "simple"
-algorithm defaults for both header and body.
+   algorithm defaults for both header and body.
 
 *  Verifiers MUST implement both canonicalization algorithms.
 
-*  The header and body may use different canonicalization algorithms.
+*  The header and body MAY use different canonicalization algorithms.
 
-*  Further canonicalization algorithms MAY be defined in the future; Verifiers
-MUST ignore any signatures that use unrecognized canonicalization algorithms.
+*  Verifiers MUST ignore any signatures that use unrecognized canonicalization
+   algorithms.
 
 *  Canonicalization algorithms MUST NOT change the transmitted data in any
-way.
+   way.
 
 ====  The "simple" Canonicalization Algorithm
 
 *  Header fields MUST be presented to the signing or verification algorithm
-exactly as they are in the message being signed or verified.
+   exactly as they are in the message being signed or verified.
 
-*  In particular, header field names MUST NOT be case folded and whitespace
-MUST NOT be changed.
+*  Header field names MUST NOT be case folded and whitespace MUST NOT be
+   changed.
 
-*  Its converts "*CRLF" at the end of the body to a single "CRLF".
-If there is no body or no trailing CRLF on the message body, a CRLF is added.
+*  Converts multiple CRLF at the end of the body to a single CRLF.
+
+*  If there is no body or no trailing CRLF on the message body, a CRLF is
+   added.
+
 
 ====  The "relaxed" Canonicalization Algorithm
 
@@ -403,22 +405,20 @@ The "relaxed" header canonicalization algorithm MUST apply the following steps
 in order:
 
 *  Convert all header field names (not the header field values) to lowercase.
-For example, convert "SUBJect: AbC" to "subject: AbC".
 
-*  Unfold all header field continuation lines as described in [RFC5322];
-in particular, lines with terminators embedded in continued header field
-values (that is, CRLF sequences followed by WSP) MUST be interpreted without
-the CRLF.
-Implementations MUST NOT remove the CRLF at the end of the header field value.
+*  Unfold all header field continuation lines, CRLF and WSP, and remove CRLF.
 
-*  Convert all sequences of one or more WSP characters to a single SP character.
-WSP characters here include those before and after a line folding boundary.
+*  Implementations MUST NOT remove the CRLF at the end of the header field
+   value.
+
+*  Convert all sequences of one or more WSP characters to a single SP
+   character.
 
 *  Delete all WSP characters at the end of each unfolded header field value.
 
-*  Delete any WSP characters remaining before and after the colon separating
-the header field name from the header field value.
-The colon separator MUST be retained.
+*  Delete any WSP characters before and after the colon.
+
+*  The colon separator MUST be retained.
 
 The "relaxed" body canonicalization algorithm MUST apply the following steps
 (a) and (b) in order:
@@ -426,12 +426,13 @@ The "relaxed" body canonicalization algorithm MUST apply the following steps
 a.  Reduce whitespace:
 
 **  Ignore all whitespace at the end of lines.
-Implementations MUST NOT remove the CRLF at the end of the line.
+    Implementations MUST NOT remove the CRLF at the end of the line.
 
 **  Reduce all sequences of WSP within a line to a single SP character.
 
 b.  Ignore all empty lines at the end of the message body.
-If the body is non-empty but does not end with a CRLF, a CRLF is added.
+
+**  If the body is non-empty but does not end with a CRLF, a CRLF is added.
 
 ====  Example
 
@@ -470,21 +471,21 @@ D <SP> E <CRLF>
 == The DKIM-Signature Header Field
 
 *  The DKIM-Signature header field SHOULD be treated as though it were a
-trace header field as defined in Section 3.6 of [RFC5322].
+   trace header field as defined in Section 3.6 of [RFC5322].
 
 *  Its SHOULD NOT be reordered
 
 *  Its SHOULD be prepended to the message
 
 *  The DKIM-Signature header field being created or verified is always
-included in the signature calculation, after the rest of the header fields
-being signed;
-however, when calculating or verifying the signature, the value of the "b="
-tag (signature value) of that DKIM-Signature header field MUST be treated as
-though it were an empty string.
+   included in the signature calculation, after the rest of the header fields
+   being signed;
+   however, when calculating or verifying the signature, the value of the "b="
+   tag (signature value) of that DKIM-Signature header field MUST be treated
+   as though it were an empty string.
 
 *  Unknown tags in the DKIM-Signature header field MUST be included in the
-signature calculation
+   signature calculation
 
 *  Unknown tags MUST be ignored by Verifiers
 
@@ -501,7 +502,7 @@ sig-v-tag       = %x76 [FWS] "=" [FWS] 1*DIGIT
 The version of this specification.
 
 * It MUST have the value "1" for implementations compliant with this version
-of DKIM.
+  of DKIM.
 
 
 *a=* (plain-text; REQUIRED)
@@ -530,10 +531,10 @@ sig-b-tag-data  = base64string
 The signature data.
 
 *  Whitespace is ignored in this value and MUST be ignored when reassembling
-the original signature.
+   the original signature.
 
 *  The signing process can safely insert FWS in this value in arbitrary places
-to conform to line-length limits.
+   to conform to line-length limits.
 
 
 *bh=* (base64; REQUIRED)
@@ -547,10 +548,10 @@ The hash of the canonicalized body part of the message as limited by the "l="
 tag.
 
 *  Whitespace is ignored in this value and MUST be ignored when reassembling
-the original signature.
+   the original signature.
 
 *  The signing process can safely insert FWS in this value in arbitrary places
-to conform to line-length limits.
+   to conform to line-length limits.
 
 
 *c=* (plain-text; OPTIONAL, default is "simple/simple")
@@ -566,12 +567,12 @@ x-sig-c-tag-alg = hyphenated-word
 Type of canonicalization used to prepare the message for signing.
 
 *  It consists of two names separated by a "slash" (%d47) character,
-corresponding to the header and body canonicalization algorithms,
-respectively.
+   corresponding to the header and body canonicalization algorithms,
+   respectively.
 
 *  If only one algorithm is named, that algorithm is used for the header and
-"simple" is used for the body.
-For example, "c=relaxed" is treated the same as "c=relaxed/simple".
+   "simple" is used for the body.
+   For example, "c=relaxed" is treated the same as "c=relaxed/simple".
 
 
 *d=* (plain-text; REQUIRED)
@@ -585,13 +586,13 @@ domain-name     = sub-domain 1*("." sub-domain)
 The SDID.
 
 *  It MUST correspond to a valid DNS name under which the DKIM key record
-is published.
+   is published.
 
 *  When presented with a signature that does not meet these requirements,
-Verifiers MUST consider the signature as invalid.
+   Verifiers MUST consider the signature as invalid.
 
 *  Internationalized domain names MUST be encoded as A-labels, as described in
-Section 2.3 of [RFC5890].
+   Section 2.3 of [RFC5890].
 
 
 *h=* (plain-text; REQUIRED)
@@ -605,26 +606,26 @@ A colon-separated list of header field names that presented to the signing
 algorithm.
 
 *  The field MUST contain the complete list of header fields in the order
-presented to the signing algorithm.
+   presented to the signing algorithm.
 
 *  The field MAY contain names of header fields that do not exist when signed;
-nonexistent header fields do not contribute to the signature computation.
-By "signing" header fields that do not actually exist, a Signer can allow a
-Verifier to detect insertion of those header fields after signing and
-also prevents adding fields with no values.
+   nonexistent header fields do not contribute to the signature computation.
+   By "signing" header fields that do not actually exist, a Signer can allow a
+   Verifier to detect insertion of those header fields after signing and
+   also prevents adding fields with no values.
 
 *  The field MAY contain multiple instances of a header field name, meaning
-multiple occurrences of the corresponding header field are included in the
-header hash.
+   multiple occurrences of the corresponding header field are included in the
+   header hash.
 
 *  The field MUST NOT include the DKIM-Signature header field that is being
-created or verified but may include others.
+   created or verified but may include others.
 
 *  Folding whitespace (FWS) MAY be included on either side of the colon
-separator.
+   separator.
 
 *  Header field names MUST be compared against actual header field names in a
-case-insensitive manner.
+   case-insensitive manner.
 
 
 *i=* (dkim-quoted-printable; OPTIONAL; default is "@" + "d=" value)
@@ -636,21 +637,21 @@ sig-i-tag       = %x69 [FWS] "=" [FWS] [ Local-part ] "@" domain-name
 The Agent or User Identifier (AUID).
 
 *  The local-part MAY be omitted, because in some cases a Signer may not be
-able to establish a verified individual identity.
+   able to establish a verified individual identity.
 
 *  The local-part MAY be drawn from a namespace unrelated to any mailbox.
 
 *  The domain-name MUST be the same as, or a subdomain of, the value of the
-"d=" tag.
+   "d=" tag.
 
 *  The domain-name need not be registered in the DNS -- so it might not
-resolve in a query
+   resolve in a query
 
 *  If no "i=" tag, the Verifier MUST behave as though the value of that tag
-were "@d", where "d" is the value from the "d=" tag.
+   were "@d", where "d" is the value from the "d=" tag.
 
 *  The Signer MAY choose to use the same namespace for its AUIDs as its users'
-email addresses or MAY choose other means of representing its users.
+   email addresses or MAY choose other means of representing its users.
 
 
 *l=*  (plain-text unsigned decimal integer; OPTIONAL, default is entire body)
@@ -664,26 +665,26 @@ in the cryptographic hash, starting from 0 immediately following the CRLF
 preceding the body.
 
 *  This value MUST NOT be larger than the actual number of octets in the
-canonicalized message body.
+   canonicalized message body.
 
 *  The value of the "l=" tag is constrained to 76 decimal digits.
 
 *  Implementers MAY need to limit the actual value expressed to a value
-smaller than `10^76`, e.g., to allow a message to fit within the available
-storage space.
+   smaller than `10^76`, e.g., to allow a message to fit within the available
+   storage space.
 
 *  If the body length count is not specified, the entire message body is
-signed.
+   signed.
 
 *  The body length count MUST be calculated following the canonicalization
-algorithm; for example, any whitespace ignored by a canonicalization algorithm
-is not included as part of the body length count.
+   algorithm; for example, any whitespace ignored by a canonicalization
+   algorithm is not included as part of the body length count.
 
 *  A body length count of zero means that the body is completely unsigned.
 
 *  Signers wishing to ensure that no modification of any sort can occur
-should specify the "simple" canonicalization algorithm for both header and
-body and omit the body length count.
+   should specify the "simple" canonicalization algorithm for both header and
+   body and omit the body length count.
 
 
 *q=* (plain-text; OPTIONAL)
@@ -700,21 +701,21 @@ x-sig-q-tag-args = qp-hdr-value
 A colon-separated list of query methods used to retrieve the public key.
 
 *  Each query method is of the form "type[/options]", where the syntax and
-semantics of the options depend on the type and specified options.
+   semantics of the options depend on the type and specified options.
 
 *  If there are multiple query mechanisms listed, the choice of query
-mechanism MUST NOT change the interpretation of the signature.
+   mechanism MUST NOT change the interpretation of the signature.
 
 *  Implementations MUST use the recognized query mechanisms in the order
-presented.
+   presented.
 
 *  Unrecognized query mechanisms MUST be ignored.
 
 *  Default is "dns/txt", which defines the DNS TXT resource record (RR) lookup
-algorithm,
+   algorithm,
 
 **  The only option defined for the "dns" query type is "txt", which MUST be
-included.
+    included.
 
 *  Verifiers and Signers MUST support "dns/txt".
 
@@ -727,8 +728,8 @@ sig-s-tag    = %x73 [FWS] "=" [FWS] selector
 
 The selector subdividing the namespace for the "d=" tag.
 
-*  Internationalized selector names MUST be encoded as A-labels, as described in
-Section 2.3 of [RFC5890].
+*  Internationalized selector names MUST be encoded as A-labels, as described
+   in Section 2.3 of [RFC5890].
 
 
 *t=* (plain-text unsigned decimal integer; RECOMMENDED)
@@ -740,17 +741,17 @@ sig-t-tag    = %x74 [FWS] "=" [FWS] 1*12DIGIT
 The time that this signature was created.
 
 *  The format is the number of seconds since 00:00:00 on January 1, 1970 in
-the UTC time zone.
+   the UTC time zone.
 
 *  The value is expressed as an unsigned integer in decimal ASCII.
 
 *  This value is not constrained to fit into a 31- or 32-bit integer.
 
 *  Implementations SHOULD be prepared to handle values up to at least `10^12`
-(until approximately AD 200,000; this fits into 40 bits).
+   (until approximately AD 200,000; this fits into 40 bits).
 
 *  To avoid denial-of-service attacks, implementations MAY consider any value
-longer than 12 digits to be infinite.
+   longer than 12 digits to be infinite.
 
 *  Leap seconds are not counted.
 
@@ -768,26 +769,26 @@ Signature Expiration.
 *  Default is no expiration
 
 *  The format is the same as in the "t=" tag, represented as an absolute date,
-not as a time delta from the signing timestamp.
+   not as a time delta from the signing timestamp.
 
 *  The value is expressed as an unsigned integer in decimal ASCII, with the
-same constraints on the value in the "t=" tag.
+   same constraints on the value in the "t=" tag.
 
 *  Signatures MAY be considered invalid if the verification time at the
-Verifier is past the expiration date.
+   Verifier is past the expiration date.
 
 *  The verification time should be the time that the message was first
-received at the administrative domain of the Verifier if that time is
-reliably available; otherwise, the current time should be used.
+   received at the administrative domain of the Verifier if that time is
+   reliably available; otherwise, the current time should be used.
 
 *  The value of the "x=" tag MUST be greater than the value of the "t=" tag if
-both are present.
+   both are present.
 
 *  The "x=" tag is not intended as an anti-replay defense.
 
 *  Due to clock drift, the receiver's notion of when to consider the signature
-expired may not exactly match what the sender is expecting.
-Receivers MAY add a 'fudge factor' to allow for such possible drift.
+   expired may not exactly match what the sender is expecting.
+   Receivers MAY add a 'fudge factor' to allow for such possible drift.
 
 
 *z=* (dkim-quoted-printable; OPTIONAL)
@@ -801,25 +802,26 @@ sig-z-tag-copy = hdr-name [FWS] ":" qp-hdr-value
 Copied header fields.
 
 *  A vertical-bar-separated list of selected header fields present when the
-message was signed, including both the field name and value.
+   message was signed, including both the field name and value.
 
 *  Default is null
 
 *  It is not required to include all header fields present at the time of
-signing.
+   signing.
 
 *  This field need not contain the same header fields listed in the "h=" tag.
 
 *  The header field text itself must encode the vertical bar ("|", %x7C)
-character (i.e., vertical bars in the "z=" text are meta-characters, and
-any actual vertical bar characters in a copied header field must be encoded).
+   character (i.e., vertical bars in the "z=" text are meta-characters, and
+   any actual vertical bar characters in a copied header field must be
+   encoded).
 
 *  All whitespace must be encoded, including whitespace between the colon and
-the header field value.
+   the header field value.
 
 *  After encoding, FWS MAY be added at arbitrary locations in order to avoid
-excessively long lines; such whitespace is NOT part of the value of the
-header field and MUST be removed before decoding.
+   excessively long lines; such whitespace is NOT part of the value of the
+   header field and MUST be removed before decoding.
 
 
 *Example*
@@ -884,7 +886,7 @@ A colon-separated list of hash algorithms that might be used.
 *  Unrecognized algorithms MUST be ignored.
 
 *  The set of algorithms listed in this tag in each record is an operational
-choice made by the Signer.
+   choice made by the Signer.
 
 *k=* (plain-text; OPTIONAL, default is "rsa").
 
@@ -897,10 +899,12 @@ x-key-k-tag-type = hyphenated-word   ; for future extension
 Key type.
 
 *  Signers and Verifiers MUST support the "rsa" key type.
+
 *  The "rsa" key type indicates that an ASN.1 DER-encoded [ITU-X660-1997]
-RSAPublicKey (see [RFC3447], Sections 3.1 and A.1.1) is being used in the
-"p=" tag.
-(Note: the "p=" tag further encodes the value using the base64 algorithm.)
+   RSAPublicKey (see [RFC3447], Sections 3.1 and A.1.1) is being used in the
+   "p=" tag.
+   (Note: the "p=" tag further encodes the value using the base64 algorithm.)
+
 *  Unrecognized key types MUST be ignored.
 
 *n=* (qp-section; OPTIONAL, default is empty)
@@ -912,8 +916,10 @@ key-n-tag    = %x6e [FWS] "=" [FWS] qp-section
 Notes that might be of interest to a human.
 
 *  No interpretation is made by any program.
+
 *  This tag should be used sparingly in any key server mechanism that has
-space limitations (notably DNS).
+   space limitations (notably DNS).
+
 *  This is intended for use by administrators, not end users.
 
 
@@ -928,17 +934,20 @@ Public-key data.
 *  An empty value means that this public key has been revoked.
 
 *  The syntax and semantics of this tag value before being encoded in base64
-are defined by the "k=" tag.
+   are defined by the "k=" tag.
 
-If a private key has been compromised or otherwise disabled, a Signer might want to explicitly state that it knows about the selector, but all messages using that selector should fail verification.
-Verifiers SHOULD return an error code for any DKIM-Signature header field with
-a selector referencing a revoked key.
+*  If a private key has been compromised or otherwise disabled, a Signer might
+   want to explicitly state that it knows about the selector, but all messages
+   using that selector should fail verification.
+
+*  Verifiers SHOULD return an error code for any DKIM-Signature header field
+   with a selector referencing a revoked key.
 
 *  A base64string is permitted to include whitespace (FWS) at arbitrary
-places; however, any CRLFs must be followed by at least one WSP character.
+   places; however, any CRLFs must be followed by at least one WSP character.
 
 *  Implementers and administrators are cautioned to ensure that selector TXT
-RRs conform to this specification.
+  RRs conform to this specification.
 
 
 *s=* (plain-text; OPTIONAL; default is "*").
@@ -953,7 +962,7 @@ x-key-s-tag-type = hyphenated-word   ; for future extension
 A colon-separated list of service types to which this record applies.
 
 *  Verifiers for a given service type MUST ignore this record if the
-appropriate type is not listed.
+   appropriate type is not listed.
 
 *  Unrecognized service types MUST be ignored.
 
@@ -983,14 +992,15 @@ A colon-separated list of flags.
 *  The defined flags are as follows:
 
 **  *y*:  This domain is testing DKIM.
-Verifiers MUST NOT treat messages from Signers in testing mode differently from unsigned email, even should the signature fail to verify.
-Verifiers MAY wish to track testing mode results to assist the Signer.
+    Verifiers MUST NOT treat messages from Signers in testing mode differently
+    from unsigned email, even should the signature fail to verify.
+    Verifiers MAY wish to track testing mode results to assist the Signer.
 
 **  *s*:  Any DKIM-Signature header fields using the "i=" tag MUST have
-the same domain value on the right-hand side of the "@" in the "i=" tag and
-the value of the "d=" tag.
-That is, the "i=" domain MUST NOT be a subdomain of "d=".
-Use of this flag is RECOMMENDED unless subdomaining is required.
+    the same domain value on the right-hand side of the "@" in the "i=" tag
+    and the value of the "d=" tag.
+    That is, the "i=" domain MUST NOT be a subdomain of "d=".
+    Use of this flag is RECOMMENDED unless subdomaining is required.
 
 
 ====  DNS Binding
@@ -998,24 +1008,25 @@ Use of this flag is RECOMMENDED unless subdomaining is required.
 *  All implementations MUST support this binding.
 
 *  All DKIM keys are stored in a subdomain named "_domainkey".
-Given a DKIM-Signature field with a "d=" tag of "example.com" and an "s=" tag
-of "foo.bar", the DNS query will be for "foo.bar._domainkey.example.com".
+   Given a DKIM-Signature field with a "d=" tag of "example.com" and an "s="
+   tag of "foo.bar", the DNS query will be for
+   "foo.bar._domainkey.example.com".
 
 *  The query type "q=" in lookup function specify DNS Resource Record.
-The only option defined in this base specification is "txt", indicating the
-use of a TXT RR.
+   The only option defined in this base specification is "txt", indicating the
+   use of a TXT RR.
 
 *  Strings in a TXT RR MUST be concatenated together before use with no
-intervening whitespace.
+   intervening whitespace.
 
 *  TXT RRs MUST be unique for a particular selector name; that is, if there
-are multiple records in an RRset, the results are undefined.
+   are multiple records in an RRset, the results are undefined.
 
 
 ===  Computing the Message Hashes
 
 *  The Signer/Verifier MUST compute two hashes: one over the body of the
-message and one over the selected header fields of the message.
+   message and one over the selected header fields of the message.
 
 *  Signers MUST compute them in the order shown
 
@@ -1032,36 +1043,37 @@ Steps to compute message hash,
 ..  For Verifier, the hash value then compared with value of "bh=" tag
 
 .  The Signer/Verifier MUST pass the following to the hash algorithm in the
-indicated order,
+   indicated order,
 
 ..  The header fields specified by the "h=" tag, in the order specified in
-that tag.
+    that tag.
 ..  The header fields then canonicalized using the header canonicalization
-algorithm specified in the "c=" tag.
+    algorithm specified in the "c=" tag.
 ..  Each header field MUST be terminated with a single CRLF.
 ..  All tags and their values in the DKIM-Signature header field are included
-in the cryptographic hash with the sole exception of the value portion of the
-"b=" (signature) tag, which MUST be treated as the null string.
+    in the cryptographic hash with the sole exception of the value portion of
+    the "b=" (signature) tag, which MUST be treated as the null string.
 ..  The DKIM-Signature header field MUST NOT be included in its own "h=" tag,
-although other DKIM-Signature header fields MAY be signed
+    although other DKIM-Signature header fields MAY be signed
 ..  All tags MUST be included even if they might not be understood by the
-Verifier.
+    Verifier.
 
 Another considerations when computing hash,
 
 *  When calculating the hash on messages that will be transmitted using
-base64 or quoted-printable encoding, Signers MUST compute the hash after the
-encoding, and Verifier MUST incorporate the values into hash before decoding.
+   base64 or quoted-printable encoding, Signers MUST compute the hash after
+   the encoding, and Verifier MUST incorporate the values into hash before
+   decoding.
 
 *  The hash MUST be computed before transport-level encodings such as SMTP
-"dot-stuffing" (the modification of lines beginning with a "." to avoid
-confusion with the SMTP end-of-message marker.
+   "dot-stuffing" (the modification of lines beginning with a "." to avoid
+   confusion with the SMTP end-of-message marker.
 
 *  DKIM messages MAY be either in plain-text or in MIME format; no special
-treatment is afforded to MIME content.
+   treatment is afforded to MIME content.
 
 *  Message attachments in MIME format MUST be included in the content that is
-signed.
+   signed.
 
 More formally, pseudo-code for the signature algorithm is:
 
@@ -1114,7 +1126,7 @@ The evaluation of each signature ends in one of three states,
 *  SUCCESS:  a successful verification
 
 *  PERMFAIL:  a permanent, non-recoverable error such as a signature
-verification failure
+   verification failure
 
 *  TEMPFAIL:  a temporary, recoverable error such as a DNS query timeout
 
@@ -1143,22 +1155,22 @@ In order to limit the capability of such keys when this is not intended, the
 validity of the domain of the AUID.
 
 *  If the referenced key record contains the "s" flag as part of the "t=" tag,
-the domain of the AUID ("i=" flag) MUST be the same as that of the SDID (d=)
-domain.
+   the domain of the AUID ("i=" flag) MUST be the same as that of the SDID
+   (d=) domain.
 
 *  If this flag is absent, the domain of the AUID MUST be the same as, or a
-subdomain of, the SDID.
+   subdomain of, the SDID.
 
 
 ===  Relationship between SDID and AUID
 
 *  DKIM MAY optionally provide a single responsible Agent or User Identifier
-(AUID) through "i=" tag.
+   (AUID) through "i=" tag.
 
 *  Upon successfully verifying the signature, a receive-side DKIM Verifier
-MUST communicate the Signing Domain Identifier (d=) to a consuming Identity
-Assessor module and MAY communicate the Agent or User Identifier (i=) if
-present.
+   MUST communicate the Signing Domain Identifier (d=) to a consuming Identity
+   Assessor module and MAY communicate the Agent or User Identifier (i=) if
+   present.
 
 
 ===  Semantics of Multiple Signatures
@@ -1197,28 +1209,29 @@ header fields A, B, and C, it is possible to sign all of them, B and C only,
 or C only, but not A only, B only, A and B only, or A and C only.
 
 *  A Signer MAY add more than one DKIM-Signature header field using different
-parameters.
+   parameters.
 
 *  Signers SHOULD NOT remove any DKIM-Signature header fields from messages
-they are signing, even if they know that the signatures cannot be verified.
+   they are signing, even if they know that the signatures cannot be verified.
 
 *  Verifier SHOULD evaluate signatures independently and on their own merits.
-For example, a Verifier that by policy chooses not to accept signatures with
-deprecated cryptographic algorithms would consider such signatures invalid.
+   For example, a Verifier that by policy chooses not to accept signatures
+   with deprecated cryptographic algorithms would consider such signatures
+   invalid.
 
 *  Verifiers MAY process signatures in any order of their choice; for example,
-some Verifiers might choose to process signatures corresponding to the From
-field in the message header before other signatures.
+   some Verifiers might choose to process signatures corresponding to the From
+   field in the message header before other signatures.
 
 *  Verifiers SHOULD continue to check signatures until a signature
-successfully verifies to the satisfaction of the Verifier.
+   successfully verifies to the satisfaction of the Verifier.
 
 *  To limit potential denial-of-service attacks, Verifiers MAY limit the total
-number of signatures they will attempt to verify.
+   number of signatures they will attempt to verify.
 
 *  If a Verifier module reports signatures whose evaluations produced PERMFAIL
-results, Identity Assessors SHOULD ignore those signatures, acting as
-though they were not present in the message.
+   results, Identity Assessors SHOULD ignore those signatures, acting as
+   though they were not present in the message.
 
 
 ==  Signer Actions
@@ -1228,14 +1241,14 @@ The following steps are performed in order by Signers.
 ===  Determine Whether the Email Should Be Signed and by Whom
 
 *  SUBMISSION servers might only sign messages from users that are properly
-authenticated and authorized.a
+   authenticated and authorized.a
 
 *  SUBMISSION servers should not sign Received header fields if the outgoing
-gateway MTA obfuscates Received header fields, for example, to hide the
-details of internal topology.
+   gateway MTA obfuscates Received header fields, for example, to hide the
+   details of internal topology.
 
 *  If an email cannot be signed for some reason, it is a local policy decision
-as to what to do with that email.
+   as to what to do with that email.
 
 ===  Select a Private Key and Corresponding Selector Information
 
@@ -1275,43 +1288,44 @@ Verifier rather than in some local or internal form.
 *  The From header field MUST be signed.
 
 *  Signers SHOULD NOT sign an existing header field likely to be legitimately
-modified or removed in transit.
+   modified or removed in transit.
 
 *  Signers MAY include any other header fields present at the time of signing
-at the discretion of the Signer
+   at the discretion of the Signer
 
 *  Strategies to choose header fields,
 
 **  Sign all existing, non-repeatable header fields.
 
 **  Sign only header fields that are likely to be displayed to or otherwise
-be likely to affect the processing of the message at the receiver.
+    be likely to affect the processing of the message at the receiver.
 
 **  Sign only "well-known" headers.
 
 *  Verifiers may treat unsigned header fields with extreme skepticism,
-including refusing to display them to the end user or even ignoring the
-signature if it does not cover certain header fields.
-For this reason, signing fields present in the message such as Date, Subject,
-Reply-To, Sender, and all MIME header fields are highly advised.
+   including refusing to display them to the end user or even ignoring the
+   signature if it does not cover certain header fields.
+   For this reason, signing fields present in the message such as Date,
+   Subject, Reply-To, Sender, and all MIME header fields are highly advised.
 
 *  The DKIM-Signature header field is always implicitly signed and MUST NOT be
-included in the "h=" tag except to indicate that other preexisting signatures
-are also signed.
+   included in the "h=" tag except to indicate that other preexisting
+   signatures are also signed.
 
 *  Signers MAY claim to have signed header fields that do not exist.
-When computing the signature, the nonexisting header field MUST be treated
-as the null string.
-This allows Signers to explicitly assert the absence of a header field; if
-that header field is added later, the signature will fail.
+   When computing the signature, the nonexisting header field MUST be treated
+   as the null string.
+   This allows Signers to explicitly assert the absence of a header field; if
+   that header field is added later, the signature will fail.
 
 *  A header field name need only be listed once more than the actual number of
-that header field in a message at the time of signing in order to prevent any
-further additions.
-For example, if there is a single Comments header field at the time of
-signing, listing Comments twice in the "h=" tag is sufficient to prevent any
-number of Comments header fields from being appended; it is not necessary (but
-is legal) to list Comments three or more times in the "h=" tag.
+   that header field in a message at the time of signing in order to prevent
+   any further additions.
+   For example, if there is a single Comments header field at the time of
+   signing, listing Comments twice in the "h=" tag is sufficient to prevent
+   any number of Comments header fields from being appended; it is not
+   necessary (but is legal) to list Comments three or more times in the "h="
+   tag.
 
 Signers need to be careful of signing header fields that might have additional
 instances added later in the delivery process, since such header fields might
@@ -1333,22 +1347,29 @@ Common examples of fields with addresses and fields with textual content
 related to the body are:
 
 *  From (REQUIRED; see Section 5.4)
+
 *  Reply-To
+
 *  Subject
+
 *  Date
+
 *  To, Cc
+
 *  Resent-Date, Resent-From, Resent-To, Resent-Cc
+
 *  In-Reply-To, References
+
 *  List-Id, List-Help, List-Unsubscribe, List-Subscribe, List-Post,
-List-Owner, List-Archive
+   List-Owner, List-Archive
 
 *  If the "l=" signature tag is in use, the Content-Type field is also a
-candidate for being included as it could be replaced in a way that causes
-completely different content to be rendered to the receiving user.
+   candidate for being included as it could be replaced in a way that causes
+   completely different content to be rendered to the receiving user.
 
 *  Another class of fields that may be of interest are those that convey
-security-related information about the message, such as
-Authentication-Results.
+   security-related information about the message, such as
+   Authentication-Results.
 
 The basic rule for choosing fields to exclude is to select those fields for
 which there are multiple fields with the same name and fields that are
@@ -1365,17 +1386,17 @@ messages they process and their aversion to risk.
 ====  Signatures Involving Multiple Instances of a Field
 
 *  Signers choosing to sign an existing header field that occurs more
-than once in the message (such as Received) MUST sign the physically
-last instance of that header field in the header block.
+   than once in the message (such as Received) MUST sign the physically
+   last instance of that header field in the header block.
 
 *  Signers wishing to sign multiple instances of such a header field MUST
-include the header field name multiple times in the "h=" tag of the
-DKIM-Signature header field and MUST sign such header fields in order
-from the bottom of the header field block to the top.
+   include the header field name multiple times in the "h=" tag of the
+   DKIM-Signature header field and MUST sign such header fields in order
+   from the bottom of the header field block to the top.
 
 *  The Signer MAY include more instances of a header field name in "h=" than
-there are actual corresponding header fields so that the signature will not
-verify if additional header fields of that name are added.
+   there are actual corresponding header fields so that the signature will not
+   verify if additional header fields of that name are added.
 
 *Example*
 
@@ -1409,10 +1430,10 @@ and MUST make such modifications before re-signing the message.
 ===  Insert the DKIM-Signature Header Field
 
 *  The Signer MUST insert the DKIM-Signature header field created in the
-previous step prior to transmitting the email.
+   previous step prior to transmitting the email.
 
 *  The DKIM-Signature header field MUST be inserted before any other
-DKIM-Signature fields in the header block.
+   DKIM-Signature fields in the header block.
 
 *  It may be placed before any existing "Received" header fields.
 
@@ -1420,130 +1441,130 @@ DKIM-Signature fields in the header block.
 ==  Verifier Actions
 
 *  Deferring verification until the message is accessed by the end user is
-discouraged.
+   discouraged.
 
 *  MTA who has performed verification MAY communicate the result of that
-verification by adding a verification header field to incoming messages.
+   verification by adding a verification header field to incoming messages.
 
 ===  Extract Signatures from the Message
 
 *  Verifiers MAY try signatures in any order they like.
 
 *  Verifiers MUST NOT attribute ultimate meaning to the order of multiple
-DKIM-Signature header fields.
-In particular, there is reason to believe that some relays will reorder the
-header fields in potentially arbitrary ways.
+   DKIM-Signature header fields.
+   In particular, there is reason to believe that some relays will reorder the
+   header fields in potentially arbitrary ways.
 
 *  Verifier SHOULD NOT treat a message that has one or more bad signatures and
-no good signatures differently from a message with no signature at all.
+   no good signatures differently from a message with no signature at all.
 
 *  A Verifier MAY limit the number of signatures it tries, in order to avoid
-denial-of-service attacks.
+   denial-of-service attacks.
 
 *  If the status is "PERMFAIL", the signature failed and should not be
-reconsidered.
+   reconsidered.
 
 *  If the status is "TEMPFAIL", the signature could not be verified at
-this time but may be tried again later.
+   this time but may be tried again later.
 
 *  A Verifier MAY either arrange to defer the message for later processing or
-try another signature; if no good signature is found and any of the
-signatures resulted in a TEMPFAIL status, the Verifier MAY arrange to defer
-the message for later processing.
+   try another signature; if no good signature is found and any of the
+   signatures resulted in a TEMPFAIL status, the Verifier MAY arrange to defer
+   the message for later processing.
 
 ====  Validate the Signature Header Field
 
 *  Implementers MUST meticulously validate the format and values in the
-DKIM-Signature header field; any inconsistency or unexpected values
-MUST cause the header field to be completely ignored and the Verifier
-to return PERMFAIL (signature syntax error).
+   DKIM-Signature header field; any inconsistency or unexpected values
+   MUST cause the header field to be completely ignored and the Verifier
+   to return PERMFAIL (signature syntax error).
 
 *  Verifiers MUST return PERMFAIL (incompatible version) when presented a
-DKIM-Signature header field with a "v=" tag that is inconsistent with this
-specification.
+   DKIM-Signature header field with a "v=" tag that is inconsistent with this
+   specification.
 
 *  If any tag listed as "required" in Section 3.5 is omitted from the
-DKIM-Signature header field, the Verifier MUST ignore the DKIM-Signature
-header field and return PERMFAIL (signature missing required tag).
+   DKIM-Signature header field, the Verifier MUST ignore the DKIM-Signature
+   header field and return PERMFAIL (signature missing required tag).
 
 *  If "d=" tag is not same or parent domain of "i=" tag, the DKIM-Signature
-header field MUST be ignored, and the Verifier should return PERMFAIL (domain
-mismatch).
+   header field MUST be ignored, and the Verifier should return PERMFAIL
+   (domain mismatch).
 
 *  If the "h=" tag does not include the From header field, the Verifier
-MUST ignore the DKIM-Signature header field and return PERMFAIL (From
-field not signed).
+   MUST ignore the DKIM-Signature header field and return PERMFAIL (From
+   field not signed).
 
 *  Verifiers MAY ignore the DKIM-Signature header field and return
-PERMFAIL (signature expired) if it contains an "x=" tag and the
-signature has expired.
+   PERMFAIL (signature expired) if it contains an "x=" tag and the
+   signature has expired.
 
 ====  Get the Public Key
 
 *  The Verifier MUST validate the key record and MUST ignore any public-key
-records that are malformed.
+   records that are malformed.
 
 A Verifier MUST perform the following steps in a manner that is semantically
 the same as performing them in the order indicated,
 
 .  The Verifier retrieves the public key using the algorithm in the "q=" tag,
-the domain from the "d=" tag, and the selector from the "s=" tag.
+   the domain from the "d=" tag, and the selector from the "s=" tag.
 
 .  If the query for the public key fails to respond, the Verifier MAY seek a
-later verification attempt by returning TEMPFAIL (key unavailable).
+   later verification attempt by returning TEMPFAIL (key unavailable).
 
 .  If the query for the public key fails because the corresponding
-key record does not exist, the Verifier MUST immediately return
-PERMFAIL (no key for signature).
+   key record does not exist, the Verifier MUST immediately return
+   PERMFAIL (no key for signature).
 
 .  If the query for the public key returns multiple key records, the Verifier
-can choose one of the key records or may cycle through the key records
+   can choose one of the key records or may cycle through the key records
 
 .  If the result returned from the query does not adhere to the format defined
-in this specification, the Verifier MUST ignore the key record and return
-PERMFAIL (key syntax error).
+   in this specification, the Verifier MUST ignore the key record and return
+   PERMFAIL (key syntax error).
 
 .  If the "h=" tag exists in the public-key record and the hash algorithm
-implied by the "a=" tag in the DKIM-Signature header field is not included in
-the contents of the "h=" tag, the Verifier MUST ignore the key record and
-return PERMFAIL (inappropriate hash algorithm).
+   implied by the "a=" tag in the DKIM-Signature header field is not included
+   in the contents of the "h=" tag, the Verifier MUST ignore the key record
+   and return PERMFAIL (inappropriate hash algorithm).
 
 .  If the public-key data (the "p=" tag) is empty, then this key has been
-revoked and the Verifier MUST treat this as a failed signature check and
-return PERMFAIL (key revoked).
+   revoked and the Verifier MUST treat this as a failed signature check and
+   return PERMFAIL (key revoked).
 
 .  If the public-key data is not suitable for use with the algorithm and key
-types defined by the "a=" and "k=" tags in the DKIM-Signature header field,
-the Verifier MUST immediately return PERMFAIL (inappropriate key algorithm).
+   types defined by the "a=" and "k=" tags in the DKIM-Signature header field,
+   the Verifier MUST immediately return PERMFAIL (inappropriate key algorithm).
 
 
 ====  Compute the Verification
 
 .  Based on the algorithm defined in the "c=" tag, the body length specified
-in the "l=" tag, and the header field names in the "h=" tag, prepare a
-canonicalized version of the message.
-Note that this canonicalized version does not actually replace the original
-content.
+   in the "l=" tag, and the header field names in the "h=" tag, prepare a
+   canonicalized version of the message.
+   Note that this canonicalized version does not actually replace the original
+   content.
 
 .  Based on the algorithm indicated in the "a=" tag, compute the message
-hashes from the canonical copy.
+   hashes from the canonical copy.
 
 .  Verify that the hash of the canonicalized message body computed in the
-previous step matches the hash value conveyed in the "bh=" tag.
+   previous step matches the hash value conveyed in the "bh=" tag.
 
 ..  If the hash does not match, the Verifier SHOULD ignore the signature and
-return PERMFAIL (body hash did not verify).
+    return PERMFAIL (body hash did not verify).
 
 .  Verifiers might treat a message that contains bytes beyond the indicated
-body length with suspicion and can choose to treat the signature as if it were
-invalid (e.g., by returning PERMFAIL (unsigned content)).
+   body length with suspicion and can choose to treat the signature as if it
+   were invalid (e.g., by returning PERMFAIL (unsigned content)).
 
 .  Using the signature conveyed in the "b=" tag, verify the signature against
-the header hash using the mechanism appropriate for the public-key algorithm
-described in the "a=" tag.
+   the header hash using the mechanism appropriate for the public-key
+   algorithm described in the "a=" tag.
 
 ..  If the signature does not validate, the Verifier SHOULD ignore the
-signature and return PERMFAIL (signature did not verify).
+    signature and return PERMFAIL (signature did not verify).
 
 .  Signature has correctly verified
 
@@ -1551,10 +1572,12 @@ signature and return PERMFAIL (signature did not verify).
 ===  Communicate Verification Results
 
 *  Implementations might choose to add an email header
-"Authentication-Results" (RFC5451) field to the message before passing it on.
+   "Authentication-Results" (RFC5451) field to the message before passing it
+   on.
 
 *  Any such header field SHOULD be inserted before any existing DKIM-Signature
-or preexisting authentication status header fields in the header field block.
+   or preexisting authentication status header fields in the header field
+   block.
 
 
 ===  Interpret Result/Apply Local Policy
