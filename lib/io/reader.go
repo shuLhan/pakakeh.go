@@ -43,6 +43,14 @@ func (r *Reader) Init(src string) {
 }
 
 //
+// InitBytes initialize reader buffer from slice of byte.
+//
+func (r *Reader) InitBytes(src []byte) {
+	r.p = 0
+	r.v = src
+}
+
+//
 // ReadUntil read the content of file until one of separator found, or until
 // it reach the terminator character, or until EOF.
 // The content will be returned along the status of termination.
@@ -70,6 +78,64 @@ func (r *Reader) ReadUntil(seps []byte, terms []byte) (b []byte, isTerm bool, c 
 		r.p++
 	}
 	return
+}
+
+//
+// ScanInt64 convert textual representation of number into int64 and return
+// it.
+// Any spaces before actual reading of text will be ignored.
+// The number may prefixed with '-' or '+', if its '-', the returned value
+// must be negative.
+//
+// On success, c is non digit character that terminate scan, if its 0, its
+// mean EOF.
+//
+func (r *Reader) ScanInt64() (n int64, c byte) {
+	var min int64 = 1
+	if len(r.v) == r.p {
+		return
+	}
+
+	for ; r.p < len(r.v); r.p++ {
+		c = r.v[r.p]
+		if !libbytes.IsSpace(c) {
+			break
+		}
+	}
+	if c == '-' {
+		min = -1
+		r.p++
+	} else if c == '+' {
+		r.p++
+	}
+	for r.p < len(r.v) {
+		c = r.v[r.p]
+		if !libbytes.IsDigit(c) {
+			break
+		}
+		c = c - '0'
+		n *= 10
+		n += int64(c)
+		r.p++
+	}
+	n *= min
+	if r.p == len(r.v) {
+		return n, 0
+	}
+
+	return n, c
+}
+
+//
+// SkipN skip reading n bytes from buffer and return true if EOF.
+//
+func (r *Reader) SkipN(n int) bool {
+	r.p += n
+	if r.p >= len(r.v) {
+		r.p = len(r.v)
+		return true
+	}
+	return false
 }
 
 //
