@@ -141,7 +141,7 @@ func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
 
 	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		libbytes.PrintHex(">>> UDPClient: Recv:", msg.Packet, 8)
 	}
 

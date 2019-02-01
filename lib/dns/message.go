@@ -656,7 +656,7 @@ func (msg *Message) Unpack() (err error) {
 		msg.Answer = append(msg.Answer, rr)
 	}
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("msg.Answer: %+v\n", msg.Answer)
 	}
 
@@ -670,7 +670,7 @@ func (msg *Message) Unpack() (err error) {
 		msg.Authority = append(msg.Authority, rr)
 	}
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("msg.Authority: %+v\n", msg.Authority)
 	}
 
@@ -684,7 +684,7 @@ func (msg *Message) Unpack() (err error) {
 		msg.Additional = append(msg.Additional, rr)
 	}
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("msg.Additional: %+v\n", msg.Additional)
 	}
 
@@ -699,7 +699,7 @@ func (msg *Message) Unpack() (err error) {
 func (msg *Message) UnpackHeaderQuestion() {
 	_ = msg.Header.unpack(msg.Packet)
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("msg.Header: %+v\n", msg.Header)
 	}
 
@@ -709,7 +709,7 @@ func (msg *Message) UnpackHeaderQuestion() {
 
 	_ = msg.Question.unpack(msg.Packet[sectionHeaderSize:])
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("msg.Question: %s\n", msg.Question)
 	}
 }
