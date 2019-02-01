@@ -6,12 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.8">
 <meta name="author" content="Shulhan">
-<title>github/shuLhan/share</title>
+<title>import github/shuLhan/share</title>
 <link rel="stylesheet" href="./doc/solarized.css">
 </head>
 <body class="article">
 <div id="header">
-<h1>github/shuLhan/share</h1>
+<h1>import github/shuLhan/share</h1>
 <div class="details">
 <span id="author" class="author">Shulhan</span><br>
 <span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
@@ -45,7 +45,7 @@
 <ul>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/cmd/gofmtcomment" target="_blank" rel="noopener"><strong>gofmtcomment</strong></a>: Program to convert
-"/*\*/" comment into "//".</p>
+multilines "/*\*/" comment into single line "//" format.</p>
 </li>
 </ul>
 </div>
@@ -73,8 +73,8 @@ server.</p>
 delimited separated value (DSV).</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/errors" target="_blank" rel="noopener"><strong>errors</strong></a>: Package errors provide an error type
-with code.</p>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/errors" target="_blank" rel="noopener"><strong>errors</strong></a>: Package errors provide an error
+type with code.</p>
 </li>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/lib/git" target="_blank" rel="noopener"><strong>git</strong></a>: Package git provide a wrapper for git
@@ -97,8 +97,8 @@ watching file, and reading from standard input.</p>
 mapping file system into memory.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining" target="_blank" rel="noopener"><strong>mining</strong></a>: Package mining provide a library for
-data mining.</p>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining" target="_blank" rel="noopener"><strong>mining</strong></a>: Package mining provide a library
+for data mining.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -106,14 +106,14 @@ data mining.</p>
 cart implement the Classification and Regression Tree by Breiman, et al.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/crf" target="_blank" rel="noopener"><strong>classififer/crf</strong></a>: Package crf
-implement the cascaded random forest algorithm, proposed by Baumann et.al in
-their paper: Baumann, Florian, et al.</p>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/crf" target="_blank" rel="noopener"><strong>classififer/crf</strong></a>: Package
+crf implement the cascaded random forest algorithm, proposed by Baumann
+et.al in their paper: Baumann, Florian, et al.</p>
 </li>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/rf" target="_blank" rel="noopener"><strong>classifier/rf</strong></a>: Package rf
-implement ensemble of classifiers using random forest algorithm by Breiman and
-Cutler.</p>
+implement ensemble of classifiers using random forest algorithm by Breiman
+and Cutler.</p>
 </li>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/gain/gini" target="_blank" rel="noopener"><strong>gain/gini</strong></a>: Package gini contain
@@ -150,8 +150,8 @@ for networking.</p>
 </li>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/lib/numbers" target="_blank" rel="noopener"><strong>numbers</strong></a>: Package numbers provide
-miscellaneous functions for working with integer, float, slice of integer, and
-slice of floats.</p>
+miscellaneous functions for working with integer, float, slice of integer,
+and slice of floats.</p>
 </li>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/lib/runes" target="_blank" rel="noopener"><strong>runes</strong></a>: Package runes provide a library for
@@ -167,13 +167,13 @@ This package is working in progress.</p>
 for working with string or slice of string.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/tabula" target="_blank" rel="noopener"><strong>tabula</strong></a>: Package tabula is a Go library for
-working with rows, columns, or matrix (table), or in another terms working
-with data set.</p>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/tabula" target="_blank" rel="noopener"><strong>tabula</strong></a>: Package tabula provide a library
+for working with rows, columns, or matrix (table), or in another terms
+working with data set.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/test" target="_blank" rel="noopener"><strong>test</strong></a>: Package test provide library for helping
-with testing.</p>
+<p><a href="https://godoc.org/github.com/shuLhan/share/lib/test" target="_blank" rel="noopener"><strong>test</strong></a>: Package test provide library for
+helping with testing.</p>
 </li>
 <li>
 <p><a href="https://godoc.org/github.com/shuLhan/share/lib/text" target="_blank" rel="noopener"><strong>text</strong></a>: Package text provide common a library
@@ -203,7 +203,7 @@ websocket library for server and client.</p>
 <h2 id="_changelog">3. Changelog</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>See include::CHANGELOG.adoc[]</p>
+<p><a href="CHANGELOG.adoc" class="bare">CHANGELOG.adoc</a></p>
 </div>
 </div>
 </div>
@@ -215,29 +215,45 @@ websocket library for server and client.</p>
 there are also additional documentations that we can&#8217;t include inside source
 code due to their scope and limitation of godoc formatting itself.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The links below is used to be viewed locally, not through Github.
+</td>
+</tr>
+</table>
+</div>
 <div class="ulist">
 <ul>
+<li>
+<p><a href="doc/IMF.html">Internet Message Format (RFC 5322)</a></p>
+</li>
 <li>
 <p><a href="doc/SASL.html">Simple Authentication and Security Layer (RFC 4422)</a></p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="doc/SASL_PLAIN.html">The PLAIN Simple Authentication and Security Layer
-(SASL) Mechanism (RFC 4616)</a></p>
+<p><a href="doc/SASL_PLAIN.html">The PLAIN Simple Authentication and Security
+Layer (SASL) Mechanism (RFC 4616)</a></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><a href="doc/DKIM_OVERVIEW.html">DomainKeys Identified Mail Service Overview (RFC 5585)</a></p>
+<p><a href="doc/DKIM_OVERVIEW.html">DomainKeys Identified Mail Service Overview
+(RFC 5585)</a></p>
 <div class="ulist">
 <ul>
 <li>
 <p><a href="doc/DKIM_THREATS.html">Analysis of Threats Motivating DKIM (RFC 4686)</a></p>
 </li>
 <li>
-<p><a href="doc/DKIM_DEVOPS.html">DKIM Development, Deployment, and Operations (RFC
-5863)</a></p>
+<p><a href="doc/DKIM_DEVOPS.html">DKIM Development, Deployment, and Operations
+(RFC 5863)</a></p>
 </li>
 <li>
 <p><a href="doc/DKIM_SIGNATURES.html">DKIM Signatures (RFC 6379)</a></p>
@@ -263,10 +279,10 @@ Transport Layer Security (RFC3207)</a></p>
 </ul>
 </div>
 </li>
-<li>
-<p><a href="doc/IMF.html">Internet Message Format (RFC 5322)</a></p>
-</li>
 </ul>
+</div>
+<div class="paragraph">
+<p><strong>Development</strong></p>
 </div>
 <div class="paragraph">
 <p>The documentation created using asciidoctor.  First, install <code>ruby</code> and
@@ -289,7 +305,7 @@ files.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-01 06:07:13 +0700
+Last updated 2019-02-02 03:46:09 +0700
 </div>
 </div>
 </body>
