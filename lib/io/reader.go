@@ -81,6 +81,13 @@ func (r *Reader) ReadUntil(seps, terms []byte) (b []byte, isTerm bool, c byte) {
 }
 
 //
+// Rest return the rest of unreaded buffer.
+//
+func (r *Reader) Rest() []byte {
+	return r.v[r.p:]
+}
+
+//
 // ScanInt64 convert textual representation of number into int64 and return
 // it.
 // Any spaces before actual reading of text will be ignored.
