@@ -179,16 +179,18 @@ func (r *Reader) SkipHorizontalSpace() (n int, c byte) {
 //
 // SkipUntil skip reading content until one of separator found or EOF.
 //
-func (r *Reader) SkipUntil(seps []byte) {
+func (r *Reader) SkipUntil(seps []byte) (c byte) {
 	for r.p < len(r.v) {
+		c = r.v[r.p]
 		for x := 0; x < len(seps); x++ {
-			if r.v[r.p] == seps[x] {
+			if c == seps[x] {
 				r.p++
-				return
+				return c
 			}
 		}
 		r.p++
 	}
+	return 0
 }
 
 //
