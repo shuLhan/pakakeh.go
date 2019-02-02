@@ -81,7 +81,7 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 		goto invalid
 	}
 
-	field.SetName(raw[:x])
+	field.setName(raw[:x])
 	x++
 	start = x
 
@@ -126,7 +126,7 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 		return nil, nil, err
 	}
 
-	field.SetValue(raw[start:x])
+	field.setValue(raw[start:x])
 
 	if len(field.Value) == 0 {
 		goto invalid
@@ -149,7 +149,7 @@ invalid:
 }
 
 //
-// SetName set field Name by canonicalizing raw field name using "simple" and
+// setName set field Name by canonicalizing raw field name using "simple" and
 // "relaxed" algorithms.
 //.
 // "simple" algorithm store raw field name as is.
@@ -157,7 +157,7 @@ invalid:
 // "relaxed" algorithm convert field name to lowercase and removing trailing
 // whitespaces.
 //
-func (field *Field) SetName(raw []byte) {
+func (field *Field) setName(raw []byte) {
 	field.oriName = raw
 	field.Name = make([]byte, 0, len(raw))
 	for x := 0; x < len(raw); x++ {
@@ -174,7 +174,7 @@ func (field *Field) SetName(raw []byte) {
 }
 
 //
-// SetValue set the field Value by canonicalizing raw input using "simple" and
+// setValue set the field Value by canonicalizing raw input using "simple" and
 // "relaxed" algorithms.
 //
 // "simple" algorithm store raw field value as is.
@@ -182,7 +182,7 @@ func (field *Field) SetName(raw []byte) {
 // "relaxed" algorithm remove leading and trailing WSP, replacing all
 // CFWS with single space, but not removing CRLF at end.
 //
-func (field *Field) SetValue(raw []byte) {
+func (field *Field) setValue(raw []byte) {
 	field.oriValue = raw
 	field.Value = make([]byte, 0, len(raw))
 
@@ -258,8 +258,6 @@ func (field *Field) updateType() {
 //      minute      = 2DIGIT
 //      second      = 2DIGIT
 //	zone        = ("+" / "-") 4DIGIT
-//
-//
 //
 func (field *Field) unpackDate() (err error) {
 	var (

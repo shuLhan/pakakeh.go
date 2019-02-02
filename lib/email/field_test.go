@@ -242,7 +242,7 @@ func TestUnpackDate(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		field.SetValue(c.value)
+		field.setValue(c.value)
 
 		err := field.Unpack()
 		if err != nil {
