@@ -57,7 +57,7 @@ func (r *Reader) InitBytes(src []byte) {
 // If terminator or EOF found, the returned isTerm value will be true,
 // otherwise it will be false.
 //
-func (r *Reader) ReadUntil(seps []byte, terms []byte) (b []byte, isTerm bool, c byte) {
+func (r *Reader) ReadUntil(seps, terms []byte) (b []byte, isTerm bool, c byte) {
 	for r.p < len(r.v) {
 		for x := 0; x < len(terms); x++ {
 			if r.v[r.p] == terms[x] {
