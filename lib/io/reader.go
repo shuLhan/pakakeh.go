@@ -143,18 +143,16 @@ func (r *Reader) SkipN(n int) bool {
 // is not white spaces.
 // On EOF, it will return 0.
 //
-func (r *Reader) SkipSpace() byte {
+func (r *Reader) SkipSpace() (c byte) {
 	for r.p < len(r.v) {
-		if libbytes.IsSpace(r.v[r.p]) {
+		c = r.v[r.p]
+		if libbytes.IsSpace(c) {
 			r.p++
 			continue
 		}
-		break
+		return c
 	}
-	if r.p == len(r.v) {
-		return 0
-	}
-	return r.v[r.p]
+	return 0
 }
 
 //
