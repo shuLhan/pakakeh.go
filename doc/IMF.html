@@ -119,7 +119,7 @@ syntactic and semantic evaluation.</p>
 <div class="content">
 <pre>CFWS            =   (1*([FWS] comment) [FWS]) / FWS
 
-FWS             =   ([*WSP CRLF] 1*WSP) /  obs-FWS
+FWS             =   ([*WSP CRLF] 1*WSP) / obs-FWS
                 ; Folding white space
 
 comment         =   "(" *([FWS] ccontent) [FWS] ")"
@@ -131,7 +131,7 @@ ctext           =   %d33-39 /          ; Printable US-ASCII
                     %d93-126 /         ;  "(", ")", or "\"
                     obs-ctext
 
-quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp</pre>
+quoted-pair     =   "\" (VCHAR / WSP) / obs-qp</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -185,9 +185,9 @@ as they appear as a quoted-pair.</p>
 <h3 id="_atom">1.2. Atom</h3>
 <div class="literalblock">
 <div class="content">
-<pre>word            =   atom / quoted-string
+<pre>phrase          =   1*word / obs-phrase
 
-phrase          =   1*word / obs-phrase
+word            =   atom / quoted-string
 
 atom            =   [CFWS] 1*atext [CFWS]
 
@@ -322,11 +322,15 @@ of seconds allowing for a leap second.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>group-list      =   mailbox-list / CFWS / obs-group-list
+<pre>address-list    =   (address *("," address)) / obs-addr-list
+
+address         =   mailbox / group
+
+group           =   display-name ":" [group-list] ";" [CFWS]
+
+group-list      =   mailbox-list / CFWS / obs-group-list
 
 mailbox-list    =   (mailbox *("," mailbox)) / obs-mbox-list
-
-address-list    =   (address *("," address)) / obs-addr-list
 
 address         =   mailbox / group
 
@@ -336,8 +340,6 @@ name-addr       =   [display-name] angle-addr
 
 angle-addr      =   [CFWS] "&lt;" addr-spec "&gt;" [CFWS] /
                     obs-angle-addr
-
-group           =   display-name ":" [group-list] ";" [CFWS]
 
 display-name    =   phrase
 
@@ -573,9 +575,8 @@ address field(s) (which is "From", "Sender", and "Reply-To").</p>
 <div class="sect2">
 <h3 id="_date_field">2.1. Date Field</h3>
 <div class="paragraph">
-<p>The origination date specifies the date and time at which the creator of the
-message indicated that the message was complete and ready to enter the mail
-delivery system.</p>
+<p>The date and time at which the creator of the message indicated that the
+message was completed, not the time the message transferred.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -594,25 +595,32 @@ sender          =   "Sender:" mailbox CRLF
 reply-to        =   "Reply-To:" address-list CRLF</pre>
 </div>
 </div>
-<div class="paragraph">
-<p>If the from field contains more than one mailbox, then the sender field MUST
-appear in the message.</p>
-</div>
-<div class="paragraph">
-<p>If the originator of the message can be indicated by a single mailbox and the
-author and transmitter are identical, the "Sender:" field SHOULD NOT be used.
+<div class="ulist">
+<ul>
+<li>
+<p>If the "From:"  field contains more than one mailbox, then the sender field
+MUST appear in the message.</p>
+</li>
+<li>
+<p>If the originator of the message can be indicated by a single mailbox and
+the author and transmitter are identical, the "Sender:" field SHOULD NOT be
+used.
 Otherwise, both fields SHOULD appear.</p>
-</div>
-<div class="paragraph">
-<p>When the "Reply-To:" field is present, it indicates the address(es) to which
-the author of the message suggests that replies be sent.
-In the absence of the "Reply-To:" field, replies SHOULD by default be sent to
-the mailbox(es) specified in the "From:" field unless otherwise specified by
-the person composing the reply.</p>
-</div>
-<div class="paragraph">
-<p>In all cases, the "From:" field SHOULD NOT contain any mailbox that does not
-belong to the author(s) of the message.</p>
+</li>
+<li>
+<p>When the "Reply-To:" field is present, it indicates the address(es) to
+which the author of the message suggests that replies be sent.</p>
+</li>
+<li>
+<p>In the absence of the "Reply-To:" field, replies SHOULD by default be sent
+to the mailbox(es) specified in the "From:" field unless otherwise
+specified by the person composing the reply.</p>
+</li>
+<li>
+<p>In all cases, the "From:" field SHOULD NOT contain any mailbox that does
+not belong to the author(s) of the message.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
@@ -952,7 +960,7 @@ field name.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-02 02:24:54 +0700
+Last updated 2019-02-02 08:02:56 +0700
 </div>
 </div>
 </body>

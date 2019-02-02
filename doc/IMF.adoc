@@ -60,7 +60,7 @@ text            =   %d1-9 /            ; Characters excluding CR
 ....
 CFWS            =   (1*([FWS] comment) [FWS]) / FWS
 
-FWS             =   ([*WSP CRLF] 1*WSP) /  obs-FWS
+FWS             =   ([*WSP CRLF] 1*WSP) / obs-FWS
                 ; Folding white space
 
 comment         =   "(" *([FWS] ccontent) [FWS] ")"
@@ -72,7 +72,7 @@ ctext           =   %d33-39 /          ; Printable US-ASCII
                     %d93-126 /         ;  "(", ")", or "\"
                     obs-ctext
 
-quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp
+quoted-pair     =   "\" (VCHAR / WSP) / obs-qp
 ....
 
 _Folding_ is a function to split a line into multiline with CRLF and WSP. For
@@ -109,9 +109,9 @@ input.
 ===  Atom
 
 ....
-word            =   atom / quoted-string
-
 phrase          =   1*word / obs-phrase
+
+word            =   atom / quoted-string
 
 atom            =   [CFWS] 1*atext [CFWS]
 
@@ -223,11 +223,15 @@ An address may either be an individual mailbox, or a group of mailboxes.
 
 Format,
 ....
+address-list    =   (address *("," address)) / obs-addr-list
+
+address         =   mailbox / group
+
+group           =   display-name ":" [group-list] ";" [CFWS]
+
 group-list      =   mailbox-list / CFWS / obs-group-list
 
 mailbox-list    =   (mailbox *("," mailbox)) / obs-mbox-list
-
-address-list    =   (address *("," address)) / obs-addr-list
 
 address         =   mailbox / group
 
@@ -237,8 +241,6 @@ name-addr       =   [display-name] angle-addr
 
 angle-addr      =   [CFWS] "<" addr-spec ">" [CFWS] /
                     obs-angle-addr
-
-group           =   display-name ":" [group-list] ";" [CFWS]
 
 display-name    =   phrase
 
@@ -332,9 +334,8 @@ fields          =   *(trace
 
 ===  Date Field
 
-The origination date specifies the date and time at which the creator of the
-message indicated that the message was complete and ready to enter the mail
-delivery system.
+The date and time at which the creator of the message indicated that the
+message was completed, not the time the message transferred.
 
 ....
 orig-date       =   "Date:" date-time CRLF
@@ -350,21 +351,23 @@ sender          =   "Sender:" mailbox CRLF
 reply-to        =   "Reply-To:" address-list CRLF
 ....
 
-If the from field contains more than one mailbox, then the sender field MUST
-appear in the message.
+*  If the "From:"  field contains more than one mailbox, then the sender field
+   MUST appear in the message.
 
-If the originator of the message can be indicated by a single mailbox and the
-author and transmitter are identical, the "Sender:" field SHOULD NOT be used.
-Otherwise, both fields SHOULD appear.
+*  If the originator of the message can be indicated by a single mailbox and
+   the author and transmitter are identical, the "Sender:" field SHOULD NOT be
+   used.
+   Otherwise, both fields SHOULD appear.
 
-When the "Reply-To:" field is present, it indicates the address(es) to which
-the author of the message suggests that replies be sent.
-In the absence of the "Reply-To:" field, replies SHOULD by default be sent to
-the mailbox(es) specified in the "From:" field unless otherwise specified by
-the person composing the reply.
+*  When the "Reply-To:" field is present, it indicates the address(es) to
+   which the author of the message suggests that replies be sent.
 
-In all cases, the "From:" field SHOULD NOT contain any mailbox that does not
-belong to the author(s) of the message.
+*  In the absence of the "Reply-To:" field, replies SHOULD by default be sent
+   to the mailbox(es) specified in the "From:" field unless otherwise
+   specified by the person composing the reply.
+
+*  In all cases, the "From:" field SHOULD NOT contain any mailbox that does
+   not belong to the author(s) of the message.
 
 
 ===  Destination Fields
