@@ -14,17 +14,12 @@ import (
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
-var (
-	FieldNameDate = []byte("date")
-)
-
 //
 // Field represent field name and value in header.
 //
 type Field struct {
 	// Type of field, the numeric representation of field name.
 	Type FieldType
-
 	// Name contains "relaxed" canonicalization of field name.
 	Name []byte
 	// Value contains "relaxed" canonicalization of field value.
@@ -35,7 +30,8 @@ type Field struct {
 	// oriValue contains "simple" canonicalization of field value.
 	oriValue []byte
 
-	date *time.Time
+	date   *time.Time
+	mboxes []*Mailbox
 }
 
 //
@@ -226,6 +222,36 @@ func (field *Field) Unpack() (err error) {
 	switch field.Type {
 	case FieldTypeDate:
 		err = field.unpackDate()
+
+	case FieldTypeFrom:
+		err = field.unpackMailboxList()
+	case FieldTypeSender:
+		err = field.unpackMailbox()
+	case FieldTypeReplyTo:
+		err = field.unpackMailboxList()
+
+	case FieldTypeTo:
+		err = field.unpackMailboxList()
+	case FieldTypeCC:
+		err = field.unpackMailboxList()
+	case FieldTypeBCC:
+		err = field.unpackMailboxList()
+
+	case FieldTypeResentDate:
+		err = field.unpackDate()
+	case FieldTypeResentFrom:
+		err = field.unpackMailboxList()
+	case FieldTypeResentSender:
+		err = field.unpackMailbox()
+	case FieldTypeResentTo:
+		err = field.unpackMailboxList()
+	case FieldTypeResentCC:
+		err = field.unpackMailboxList()
+	case FieldTypeResentBCC:
+		err = field.unpackMailboxList()
+
+	case FieldTypeReturnPath:
+		err = field.unpackMailbox()
 	}
 
 	return err
@@ -235,12 +261,13 @@ func (field *Field) Unpack() (err error) {
 // updateType update the field type based on field name.
 //
 func (field *Field) updateType() {
-	switch {
-	case bytes.Equal(FieldNameDate, field.Name):
-		field.Type = FieldTypeDate
-	default:
-		field.Type = FieldTypeOptional
+	for k, v := range FieldNames {
+		if bytes.Equal(v, field.Name) {
+			field.Type = k
+			return
+		}
 	}
+	field.Type = FieldTypeOptional
 }
 
 //
@@ -358,4 +385,29 @@ func computeOffSeconds(off int64) int {
 	hour := int(off / 100)
 	min := int(off) - (hour * 100)
 	return ((hour * 60) + min) * 60
+}
+
+//
+// unpackMailboxList unpack list of mailbox from field Value.
+//
+func (field *Field) unpackMailboxList() (err error) {
+	field.mboxes, err = ParseAddress(field.Value)
+	return err
+}
+
+//
+// unpackMailbox unpack the raw addresses in field Value.
+// It will return an error if address is invalid or contains multiple
+// addresses.
+//
+func (field *Field) unpackMailbox() (err error) {
+	mboxes, err := ParseAddress(field.Value)
+	if err != nil {
+		return err
+	}
+	if len(mboxes) != 1 {
+		return fmt.Errorf("multiple address in %s: '%s'", field.Name,
+			field.Value)
+	}
+	return nil
 }
