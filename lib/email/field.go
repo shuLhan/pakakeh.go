@@ -308,7 +308,7 @@ func (field *Field) unpackDate() (err error) {
 		hour, min, sec int64
 		off            int64
 		month          time.Month
-		loc            *time.Location = time.UTC
+		loc            *time.Location
 	)
 
 	if len(field.Value) == 0 {
@@ -335,7 +335,7 @@ func (field *Field) unpackDate() (err error) {
 	}
 	// Get month ...
 	r.SkipSpace()
-	v, _, c = r.ReadUntil(space, nil)
+	v, _, _ = r.ReadUntil(space, nil)
 	month, ok = libtime.ShortMonths[string(v)]
 	if !ok {
 		return fmt.Errorf("unpackDate: invalid month: '%s'", v)
@@ -373,7 +373,7 @@ func (field *Field) unpackDate() (err error) {
 	// Get second ...
 	if c == ':' {
 		r.SkipN(1)
-		sec, c = r.ScanInt64()
+		sec, _ = r.ScanInt64()
 		if sec < 0 || sec > 59 {
 			return fmt.Errorf("unpackDate: invalid second: %d", sec)
 		}
@@ -384,7 +384,7 @@ func (field *Field) unpackDate() (err error) {
 	if c == 0 {
 		return fmt.Errorf("unpackDate: missing zone")
 	}
-	off, c = r.ScanInt64()
+	off, _ = r.ScanInt64()
 
 	loc = time.FixedZone("UTC", computeOffSeconds(off))
 	td := time.Date(int(year), month, int(day), int(hour), int(min), int(sec), 0, loc)

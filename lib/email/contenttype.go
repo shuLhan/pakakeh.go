@@ -85,7 +85,7 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 			}
 			param.Quoted = true
 		} else {
-			param.Value, _, c = r.ReadUntil(vsep, nil)
+			param.Value, _, _ = r.ReadUntil(vsep, nil)
 		}
 		if !isValidToken(param.Value, param.Quoted) {
 			err = fmt.Errorf("ParseContentType: invalid parameter value: '%s'", param.Value)
