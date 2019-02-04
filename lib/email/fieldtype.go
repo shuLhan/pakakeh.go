@@ -39,12 +39,19 @@ const (
 	// Trace fields, RFC 5322 section 3.6.7.
 	FieldTypeReturnPath
 	FieldTypeReceived
+
+	// MIME header fields, RFC 2045
+	FieldTypeMIMEVersion
+	FieldTypeContentType
+	FieldTypeContentTransferEncoding
+	FieldTypeContentID
+	FieldTypeContentDescription
 )
 
 //
-// FieldNames contains a mapping between field type and their lowercase name.
+// fieldNames contains mapping between field type and their lowercase name.
 //
-var FieldNames = map[FieldType][]byte{
+var fieldNames = map[FieldType][]byte{ // nolint: gochecknoglobals
 	FieldTypeDate: []byte("date"),
 
 	FieldTypeFrom:    []byte("from"),
@@ -73,4 +80,10 @@ var FieldNames = map[FieldType][]byte{
 
 	FieldTypeReturnPath: []byte("return-path"),
 	FieldTypeReceived:   []byte("received"),
+
+	FieldTypeMIMEVersion:             []byte("mime-version"),
+	FieldTypeContentType:             []byte("content-type"),
+	FieldTypeContentTransferEncoding: []byte("content-transfer-encoding"),
+	FieldTypeContentID:               []byte("content-id"),
+	FieldTypeContentDescription:      []byte("content-description"),
 }

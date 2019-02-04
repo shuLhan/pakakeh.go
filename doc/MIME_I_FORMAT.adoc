@@ -1,0 +1,394 @@
+=  MIME Part One: Format of Internet Message Bodies
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc:
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc2046: https://tools.ietf.org/html/rfc2046
+
+This document provide note and summary of RFC 2045, Multipurpose Internet Mail
+Extensions (MIME) Part One: Format of Internet Message Bodies.
+
+
+==  MIME Header Fields
+
+MIME header fields can occur in message header (RFC 5322) or in a MIME body
+part header within a multipart construct.
+
+....
+MIME-message-headers := entity-headers
+                        fields
+                        version CRLF
+
+MIME-part-headers    := entity-headers
+                        [ fields ]
+
+entity-headers       := [ content CRLF ]
+                        [ encoding CRLF ]
+                        [ id CRLF ]
+                        [ description CRLF ]
+                        *( MIME-extension-field CRLF )
+....
+
+
+==  MIME Version Header Field
+
+....
+version := "MIME-Version" ":" 1*DIGIT "." 1*DIGIT
+....
+
+*  Valid value is "1.0".
+
+*  Comment strings that are present MUST be ignored.
+
+*  MIME-Version header field is required at the top level of a message.  It is
+   not required for each body part of a multipart entity.
+
+*  In the absence of a MIME-Version field, a receiving mail user agent
+   MAY optionally choose to interpret the body of the message according to
+   local conventions.
+
+
+==  Content-Type Header Field
+
+....
+content         := "Content-Type" ":" type "/" subtype *(";" parameter)
+
+type            := discrete-type / composite-type
+
+discrete-type   := "text" / "image" / "audio" / "video" /
+                   "application" / extension-token
+
+composite-type  := "message" / "multipart" / extension-token
+
+extension-token := ietf-token / x-token
+
+ietf-token      := <An extension token defined by a standards-track RFC and
+                   registered with IANA.>
+
+x-token         := <The two characters "X-" or "x-" followed, with
+                   no intervening white space, by any token>
+
+subtype         := extension-token / iana-token
+
+iana-token      := <A publicly-defined extension token. Tokens
+                    of this form must be registered with IANA
+                    as specified in RFC 2048.>
+
+parameter       := attribute "=" value
+
+attribute       := token
+
+value           := token / quoted-string
+
+token           := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
+
+tspecials       :=  "(" / ")" / "<" / ">" / "@" /
+                    "," / ";" / ":" / "\" / <">
+                    "/" / "[" / "]" / "?" / "="
+....
+
+*  Default value,
+
+	Content-type: text/plain; charset=us-ascii
+
+*  Content-Type field is to describe the data contained in the body.
+
+*  The value in this field is called a media type.
+
+*  Matching of media type and subtype is ALWAYS case-insensitive.
+
+*  Subtype specification is MANDATORY, no default value for it.
+
+*  Matching of attributes is ALWAYS case-insensitive.
+
+*  Parameters may be required by their defining content type or subtype or
+   they may be optional.
+
+*  Special character MUST be in quoted-string, to use within parameter
+   values.
+   The quotation marks itself is not part of value.
+
+*  Value may be case insensitive, depends on attribute name.
+
+*  Implementations MUST ignore any parameters whose names they do not
+   recognize.
+
+
+==  Content-Transfer-Encoding Header Field
+
+....
+encoding  := "Content-Transfer-Encoding" ":" mechanism
+
+mechanism := "7bit" / "8bit" / "binary" /
+             "quoted-printable" / "base64" /
+             ietf-token / x-token
+....
+
+*  Default value is "7bit"
+
+*  This value is case insensitive
+
+*  Values "7bit", "8bit", and "binary" all mean that the identity (i.e. NO)
+   encoding transformation has been performed.
+
+**  "7bit" data refers to octets with decimal values greater than 127
+    are not allowed and neither are NULs (octet with decimal value 0).
+    CR (decimal value 13) and LF (decimal value 10) octets only occur as
+    part of CRLF line separation sequences.
+
+**  "8bit" data allow octets with decimal values greater than 127.
+    CR and LF octets only occur as part of CRLF line separation sequences and
+    no NULs are allowed.
+
+**  "Binary data" refers to data where any sequence of octets whatsoever
+    is allowed.
+
+*  The proper Content-Transfer-Encoding label MUST always be used.
+   Labelling unencoded data containing 8bit characters as "7bit" is not
+   allowed, nor is labelling unencoded non-line-oriented data as anything
+   other than "binary" allowed.
+
+*  Mail transport for unencoded 8bit data is defined in RFC 6152.
+
+*  Private values, MUST use an x-token, e.g. "Content-Type-Encoding: x-new".
+
+*  If the header field appears as part of a message header, it applies to the
+   entire body of that message.
+   If the header field appears as part of an entity's headers, it applies only
+   to the body of that entity.
+
+*  It is EXPRESSLY FORBIDDEN to use any encodings other than "7bit", "8bit",
+   or "binary" with any composite media type.
+   Composite media types are "multipart" and "message".
+
+*  Any entity with an unrecognized Content-Transfer-Encoding MUST be
+   treated as "application/octet-stream", regardless of what the Content-Type
+   header field actually says.
+
+*  When converting from quoted-printable to base64, a hard line break in the
+   quoted-printable form represents a CRLF sequence in the canonical form of
+   the data.
+   It MUST therefore be converted to a corresponding encoded CRLF in the
+   base64 form of the data.
+   Similarly, a CRLF sequence in the canonical form of the data obtained after
+   base64 decoding MUST be converted to a quoted-printable hard line break,
+   but ONLY when converting text data.
+
+*  A canonical model for encoding is presented in RFC 2049.
+
+
+===  Quoted-Printable Content-Transfer-Encoding
+
+....
+quoted-printable := qp-line *(CRLF qp-line)
+
+qp-line          := *(qp-segment transport-padding CRLF)
+                    qp-part transport-padding
+
+qp-segment       := qp-section *(SPACE / TAB) "="
+                  ; Maximum length of 76 characters
+
+qp-part          := qp-section
+                  ; Maximum length of 76 characters
+
+qp-section       := [*(ptext / SPACE / TAB) ptext]
+
+ptext            := hex-octet / safe-char
+
+hex-octet        := "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
+                  ; Octet must be used for characters > 127, =,
+                  ; SPACEs or TABs at the ends of lines, and is
+                  ; recommended for any character not listed in
+                  ; RFC 2049 as "mail-safe".
+
+safe-char        := <any octet with decimal value of 33 through
+                     60 inclusive, and 62 through 126>
+                  ; Characters not listed as "mail-safe" in
+                  ; RFC 2049 are also not recommended.
+
+transport-padding := *LWSP-char
+                   ; Composers MUST NOT generate non-zero length transport
+                   ; padding, but receivers MUST be able to handle padding
+                   ; added by message transports.
+....
+
+In this encoding, octets are to be represented as determined by the following
+rules:
+
+.  (General 8bit representation) Any octet, except a CRLF line break of the
+   canonical (standard) form of the data being encoded, may be represented by
+   an "=" followed by a two digit hexadecimal representation of the octet's
+   value.
+   Uppercase letters MUST be used.
+   A way to get reasonably reliable transport through EBCDIC gateways is to
+   also quote the US-ASCII characters
+
+     !"#$@[\]^`{|}~
+
+.  (Literal representation) Octets with decimal values of 33 through 60
+   inclusive, and 62 through 126, inclusive, MAY be represented as the
+   US-ASCII characters.
+
+.  (White Space) Octets with values of 9 and 32 MAY be represented as US-ASCII
+   TAB (HT) and SPACE characters, but MUST NOT be so represented at the end
+   of an encoded line.
+
+   *  Any TAB (HT) or SPACE characters on an encoded line MUST thus be
+      followed on that line by a printable character.
+
+   *  An "=" at the end of an encoded line, indicating a soft line break
+      (see rule #5) may follow one or more TAB (HT) or SPACE characters.
+
+   *  When decoding a Quoted-Printable body, any trailing white space on a
+      line MUST be deleted
+
+.  (Line Breaks) A line break in a text body, represented as a CRLF sequence
+   in the text canonical form, MUST be represented by a (RFC 822) line break.
+   A CR or LF in binary data should be encoded as "=0D" and "=0A".
+
+.  (Soft Line Breaks) The Quoted-Printable encoding REQUIRES that encoded
+   lines be no more than 76 characters long.
+   If longer lines are to be encoded with the Quoted-Printable encoding,
+   "soft" line breaks MUST be used.
+   An equal sign as the last character on a encoded line indicates such a
+   non-significant ("soft") line break in the encoded text.
+
+   *  The 76 character limit does not count the trailing CRLF, but counts all
+      other characters, including any equal signs.
+
+*  A good strategy is to choose a boundary that includes a character sequence
+   such as "=_" which can never appear in a quoted-printable body.
+
+Several kinds of substrings cannot be generated according to the encoding
+rules for the quoted-printable content-transfer-encoding, and hence are
+formally illegal if they appear in the output of a quoted-printable encoder.
+Such cases are,
+
+.  An "=" followed by two hexadecimal digits, one or both of which are
+   lowercase letters in "abcdef", is formally illegal.
+   A robust implementation might choose to recognize them as the corresponding
+   uppercase letters.
+
+.  An "=" followed by a character that is neither a hexadecimal digit
+   (including "abcdef") nor the CR character of a CRLF pair is illegal.
+   A reasonable approach by a robust implementation might be to include the
+   "=" character and the following character in the decoded data without any
+   transformation and, if possible, indicate to the user that proper decoding
+   was not possible at this point in the data.
+
+.  An "=" cannot be the ultimate or penultimate character in an encoded
+   object.
+
+.  Control characters other than TAB, or CR and LF as parts of CRLF pairs,
+   MUST not appear.
+   The same is true for octets with decimal values greater than 126.
+   If decoder found it, a robust implementation might exclude them from the
+   decoded data and warn the user that illegal characters were discovered.
+
+.  If longer lines are found in encoded data, a robust implementation might
+   nevertheless decode the lines, and might report the erroneous encoding to
+   the user
+
+
+===  Base64 Content-Transfer-Encoding
+
+A 65-character subset of US-ASCII is used, enabling 6 bits to be represented
+per printable character.
+(The extra 65th character, "=", is used to signify a special processing
+ function.)
+
+....
+                Table 1: The Base64 Alphabet
+
+     Value Encoding  Value Encoding  Value Encoding  Value Encoding
+         0 A            17 R            34 i            51 z
+         1 B            18 S            35 j            52 0
+         2 C            19 T            36 k            53 1
+         3 D            20 U            37 l            54 2
+         4 E            21 V            38 m            55 3
+         5 F            22 W            39 n            56 4
+         6 G            23 X            40 o            57 5
+         7 H            24 Y            41 p            58 6
+         8 I            25 Z            42 q            59 7
+         9 J            26 a            43 r            60 8
+        10 K            27 b            44 s            61 9
+        11 L            28 c            45 t            62 +
+        12 M            29 d            46 u            63 /
+        13 N            30 e            47 v
+        14 O            31 f            48 w         (pad) =
+        15 P            32 g            49 x
+        16 Q            33 h            50 y
+....
+
+Algorithm for encoding,
+
+.  Text line breaks MUST be converted into CRLF sequences prior to base64
+   encoding.
+
+.  The encoding process represents 24-bit groups of input bits as output
+   strings of 4 encoded characters.
+
+.  Proceeding from left to right, a 24-bit input group is formed by
+   concatenating 3 8bit input groups.
+
+.  These 24 bits are then treated as 4 concatenated 6-bit groups, each
+   of which is translated into a single digit in the base64 alphabet.
+   The following cases can arise:
+
+..  The final quantum of encoding input is an integral multiple of 24 bits;
+    here, the final unit of encoded output will be an integral multiple of 4
+    characters with no "=" padding
+
+..  The final quantum of encoding input is exactly 8 bits; here, the final
+    unit of encoded output will be two characters followed by two "="
+    padding characters
+
+..  The final quantum of encoding input is exactly 16 bits; here, the final
+    unit of encoded output will be three characters followed by one "="
+    padding character.
+
+
+Additional rules,
+
+*  When encoding a bit stream via the base64 encoding, the bit stream
+   MUST be presumed to be ordered with the most-significant-bit first.
+
+*  The encoded output stream MUST be represented in lines of no more
+   than 76 characters each.
+
+*  Other characters not found in Table 1 MUST be ignored by decoding software.
+   This probably indicate a transmission error, about which a warning message
+   or even a message rejection might be appropriate under some circumstances.
+
+
+==  Content-ID Header Field
+
+....
+id := "Content-ID" ":" msg-id
+....
+
+*  The Content-ID field allow one body to make reference to another.
+
+*  Its syntactically identical to the "Message-ID" header field
+
+*  Content-ID values MUST be generated to be world-unique.
+
+*  The Content-ID value may be used for uniquely identifying MIME entities in
+   several contexts, particularly for caching data referenced by the
+   message/external-body mechanism.
+
+*  Its use is MANDATORY in implementations which generate data of the optional
+   MIME media type "message/external-body".
+
+*  The Content-ID value has special semantics in the case of the
+   multipart/alternative media type (see RFC 2046).
+
+
+==  Content-Description Header Field
+
+....
+description := "Content-Description" ":" *text
+....
+
+*  This field is optional

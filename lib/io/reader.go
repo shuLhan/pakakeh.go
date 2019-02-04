@@ -51,6 +51,17 @@ func (r *Reader) InitBytes(src []byte) {
 }
 
 //
+// Current return the byte at current index position or 0 if EOB
+// (End-Of-Buffer).
+//
+func (r *Reader) Current() byte {
+	if r.p == len(r.v) {
+		return 0
+	}
+	return r.v[r.p]
+}
+
+//
 // ReadUntil read the content of file until one of separator found, or until
 // it reach the terminator character, or until EOF.
 // The content will be returned along the status of termination.

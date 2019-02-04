@@ -253,3 +253,112 @@ func TestUnpackDate(t *testing.T) {
 		test.Assert(t, "date", c.exp.String(), field.date.String(), true)
 	}
 }
+
+func TestUnpackMailbox(t *testing.T) {
+	cases := []struct {
+		in     []byte
+		expErr string
+		exp    string
+	}{{
+		in:     []byte("Sender: local\r\n"),
+		expErr: "ParseAddress: empty or invalid address",
+	}, {
+		in:     []byte("Sender: test@one, test@two\r\n"),
+		expErr: "multiple address in sender: 'test@one, test@two\r\n'",
+	}, {
+		in:  []byte("Sender: <test@one>\r\n"),
+		exp: "sender:<test@one>\r\n",
+	}}
+
+	for _, c := range cases {
+		t.Logf("%s", c.in)
+
+		field, _, err := ParseField(c.in)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		err = field.Unpack()
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "Sender:", c.exp, field.String(), true)
+	}
+}
+
+func TestUnpackMailboxList(t *testing.T) {
+	cases := []struct {
+		in     []byte
+		expErr string
+		exp    string
+	}{{
+		in:     []byte("From: \r\n"),
+		expErr: "ParseField: invalid input",
+	}, {
+		in:  []byte("From: test@one, test@two\r\n"),
+		exp: "from:test@one, test@two\r\n",
+	}}
+
+	for _, c := range cases {
+		t.Logf("%s", c.in)
+
+		field, _, err := ParseField(c.in)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		err = field.Unpack()
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "From:", c.exp, field.String(), true)
+	}
+}
+
+func TestUnpackContentType(t *testing.T) {
+	cases := []struct {
+		in     []byte
+		expErr string
+		exp    string
+	}{{
+		in:     []byte("Content-Type: text;\r\n"),
+		expErr: "ParseContentType: missing subtype",
+	}, {
+		in:  []byte("Content-Type: text/plain;\r\n"),
+		exp: "text/plain;",
+	}}
+
+	for _, c := range cases {
+		t.Logf("%s", c.in)
+
+		field, _, err := ParseField(c.in)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		err = field.Unpack()
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "Content-Type", c.exp, field.ContentType.String(), true)
+		test.Assert(t, "field.unpacked", true, field.unpacked, true)
+
+		err = field.Unpack()
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "Content-Type", c.exp, field.ContentType.String(), true)
+		test.Assert(t, "field.unpacked", true, field.unpacked, true)
+	}
+}

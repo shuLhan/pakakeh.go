@@ -32,6 +32,14 @@ type Field struct {
 
 	date   *time.Time
 	mboxes []*Mailbox
+
+	// ContentType contains unpacked value of field with Name
+	// "Content-Type" or nil if still packed.
+	ContentType *ContentType
+
+	// true if field.Unpack has been called, false when field.setValue is
+	// called again.
+	unpacked bool
 }
 
 //
@@ -205,6 +213,7 @@ func (field *Field) setValue(raw []byte) {
 	if len(field.Value) > 0 {
 		field.Value = append(field.Value, crlf...)
 	}
+	field.unpacked = false
 }
 
 //
@@ -252,6 +261,9 @@ func (field *Field) Unpack() (err error) {
 
 	case FieldTypeReturnPath:
 		err = field.unpackMailbox()
+
+	case FieldTypeContentType:
+		err = field.unpackContentType()
 	}
 
 	return err
@@ -261,7 +273,7 @@ func (field *Field) Unpack() (err error) {
 // updateType update the field type based on field name.
 //
 func (field *Field) updateType() {
-	for k, v := range FieldNames {
+	for k, v := range fieldNames {
 		if bytes.Equal(v, field.Name) {
 			field.Type = k
 			return
@@ -377,6 +389,7 @@ func (field *Field) unpackDate() (err error) {
 	loc = time.FixedZone("UTC", computeOffSeconds(off))
 	td := time.Date(int(year), month, int(day), int(hour), int(min), int(sec), 0, loc)
 	field.date = &td
+	field.unpacked = true
 
 	return err
 }
@@ -392,6 +405,9 @@ func computeOffSeconds(off int64) int {
 //
 func (field *Field) unpackMailboxList() (err error) {
 	field.mboxes, err = ParseAddress(field.Value)
+	if err == nil {
+		field.unpacked = true
+	}
 	return err
 }
 
@@ -409,5 +425,27 @@ func (field *Field) unpackMailbox() (err error) {
 		return fmt.Errorf("multiple address in %s: '%s'", field.Name,
 			field.Value)
 	}
+
+	field.unpacked = true
+
+	return nil
+}
+
+//
+// unpackContentType parse "Content-Type" from field Value.
+//
+func (field *Field) unpackContentType() (err error) {
+	if field.unpacked {
+		return nil
+	}
+
+	ContentType, err := ParseContentType(field.Value)
+	if err != nil {
+		return err
+	}
+
+	field.ContentType = ContentType
+	field.unpacked = true
+
 	return nil
 }
