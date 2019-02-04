@@ -4,6 +4,24 @@
 
 package email
 
+// List of known parameter name in header field's value.
+var (
+	// Parameter for Text Media Type, RFC 2046 section 4.1.
+	ParamNameCharset = []byte("charset")
+
+	// Parameters for "application/octet-stream", RFC 2046 section 4.5.1.
+	ParamNameType    = []byte("type")
+	ParamNamePadding = []byte("padding")
+
+	// Parameter for "multipart", RFC 2046 section 5.1.
+	ParamNameBoundary = []byte("boundary")
+
+	// PArameters for "mulitpart/partial", RFC 2046 section 5.2.2.
+	ParamNameID     = []byte("id")
+	ParamNameNumber = []byte("number")
+	ParamNameTotal  = []byte("total")
+)
+
 //
 // Param represent a key-value in slice of bytes.
 //

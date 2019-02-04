@@ -137,6 +137,7 @@ NOTE: The links below is used to be viewed locally, not through Github.
 *  link:doc/IMF.html[Internet Message Format (RFC 5322)]
 **  link:doc/MIME_I_FORMAT.html[MIME Part One: Format of Internet Message
     Bodies (RFC 2045)]
+**  link:doc/MIME_II_MEDIA_TYPES.html[MIME Part Two: Media Types (RFC 2046)]
 
 *  link:doc/SASL.html[Simple Authentication and Security Layer (RFC 4422)]
 **   link:doc/SASL_PLAIN.html[The PLAIN Simple Authentication and Security

@@ -1,0 +1,323 @@
+=  MIME Part Two: Media Types
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc:
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc2046: https://tools.ietf.org/html/rfc2046
+
+This document provide note and summary of {url-rfc2046}[RFC 2046^],
+Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types.
+
+==  Introduction
+
+There are two groups media type: discrete and composite.
+Discrete media type are "text", "image", "audio", "video", and "application".
+Composite media type are "multipart" and "message".
+
+
+==  Text Media Type
+
+*  Canonical form of any MIME "text" subtype MUST always represent a
+   line break as a CRLF sequence.
+   Use of CR and LF outside of line break sequences is forbidden.
+
+*  Unrecognized subtypes of "text" should be treated as subtype "plain"
+   as long as the MIME implementation knows how to handle the charset.
+
+*  Unrecognized subtypes which also specify an unrecognized charset
+   should be treated as "application/octet-stream".
+
+
+===  Plain Subtype
+
+*  Subtype "plain" is seen simply as a linear sequence of characters, possibly
+   interrupted by line breaks or page breaks.
+
+*  A "charset" parameter may be used to indicate the character set of the body
+
+**  Default charset is US-ASCII.
+
+**  The values of the charset parameter are NOT case sensitive.
+
+**  It is strongly recommended that new user agents explicitly specify a
+    character set as a media type parameter in the Content-Type header field.
+
+
+== Image Media Type
+
+*  A media type of "image" indicates that the body contains an image.
+
+*  The subtype names the specific image format, defined in RFC 2048.
+
+*  Unrecognized subtypes of "image" should at a minimum be treated as
+   "application/octet-stream".
+
+
+==  Audio Media Type
+
+*  A media type of "audio" indicates that the body contains audio data.
+
+*  Unrecognized subtypes of "audio" should at a miniumum be treated as
+   "application/octet-stream".
+
+
+==  Video Media Type
+
+*  A media type of "video" indicates that the body contains a
+   time-varying-picture image, possibly with color and coordinated sound.
+
+*  The subtype "mpeg" refers to video coded according to the MPEG standard
+   [MPEG].
+
+*  Unrecognized subtypes of "video" should at a minumum be treated as
+   "application/octet-stream".
+
+
+==  Application Media Type
+
+*  The "application" media type is to be used for discrete data which do
+   not fit in any of the other categories, and particularly for data to
+   be processed by some type of application program.
+
+
+===  Octet-Stream Subtype
+
+The "octet-stream" subtype is used to indicate that a body contains arbitrary
+binary data.
+This subtype define the following optional parameters:
+
+.  TYPE -- the general type or category of binary data.
+   This is intended as information for the human recipient rather than for
+   any automatic processing.
+
+.  PADDING -- the number of bits of padding that were appended to the
+   bit-stream comprising the actual contents to produce the enclosed 8bit
+   byte-oriented data.
+   This is useful for enclosing a bit-stream in a body when the total number
+   of bits is not a multiple of 8.
+
+
+===  Postscript Subtype
+
+A media type of "application/postscript" indicates a PostScript program.
+
+*  The execution of general-purpose PostScript interpreters entails
+   serious security risks, and implementors are discouraged from simply
+   sending PostScript bodies to "off-the-shelf" interpreters.
+
+
+== Multipart Media Type
+
+*  A "multipart" media type field MUST appear in the entity's header.
+
+*  The body MUST then contain one or more body parts, each preceded by a
+   boundary delimiter line, and the last one followed by a closing boundary
+   delimiter line.
+
+**  After its boundary delimiter line, each body part then consists of a
+    header area, a blank line, and a body area.
+
+**  The boundary delimiter MUST NOT appear inside any of the encapsulated
+    parts, on a line by itself or as the prefix of any line.
+
+*  A body part is an entity and hence is NOT to be interpreted as actually
+   being an RFC 822 message.
+
+*  NO header fields are actually required in body parts.
+
+*  The only header fields that have defined meaning for body parts are
+   those the names of which begin with "Content-".
+   All other header fields may be ignored in body parts.
+
+*  All present and future subtypes of the "multipart" type MUST use an
+   identical syntax.
+
+
+===  Common Syntax
+
+*  The Content-Type field for multipart entities requires one parameter,
+   "boundary".
+
+*  The boundary delimiter line is then defined as a line consisting entirely
+   of two hyphen characters ("-", decimal value 45) followed by the boundary
+   parameter value, optional linear whitespace, and a terminating CRLF.
+
+*  The boundary delimiter MUST occur at the beginning of a line
+
+*  The boundary may be followed by zero or more characters of linear
+   whitespace
+
+*  The CRLF preceding the boundary delimiter line is conceptually
+   attached to the boundary so that it is possible to have a part that
+   does not end with a CRLF
+
+*  Boundary MUST be no longer than 70 characters, not counting the two
+   leading hyphens.
+
+*  Boundary with two hyphen at the end indicated the end of message body.
+
+
+===  Mixed Subtype
+
+*  The "mixed" subtype of "multipart" is intended for use when the body
+   parts are independent and need to be bundled in a particular order.
+
+*  Any "multipart" subtypes that an implementation does not recognize
+   MUST be treated as being of subtype "mixed".
+
+
+===  Alternative Subtype
+
+In "multipart/alternative", each of the body parts is an "alternative" version
+of the same information.
+
+*  The order of body parts is significant.
+
+*  The best choice is the LAST part of a type supported by the recipient
+   system's local environment.
+
+*  User agents that compose "multipart/alternative" entities MUST place the
+   body parts in increasing order of preference, that is, with the preferred
+   format last.
+
+
+===  Digest Subtype
+
+The "multipart/digest" Content-Type is intended to be used to send collections of messages.
+
+*  In a digest, the default Content-Type value for a body part is changed from
+   "text/plain" to "message/rfc822".
+
+*  If a "text/plain" part is needed, it should be included as a seperate
+   part of a "multipart/mixed" message.
+
+
+===  Parallel Subtype
+
+in a parallel entity, the order of body parts is not significant.
+
+
+==  Message Media Type
+
+It is frequently desirable, in sending mail, to encapsulate another mail
+message.
+A special media type, "message", is defined to encapsulate another mail
+message.
+The "rfc822" subtype of "message" is used to encapsulate RFC 822 messages.
+
+
+===  RFC822 Subtype
+
+*  "message/rfc822" body must include a "From", "Date", and at least one
+   destination header is removed and replaced with the requirement that
+   at least one of "From", "Subject", or "Date" must be present.
+
+*  "message/rfc822" entity isn't restricted to material in strict
+   conformance to RFC822, it could well be a News article or a MIME message.
+
+*  No encoding other than "7bit", "8bit", or "binary" is permitted for the
+   body of a "message/rfc822" entity.
+
+*  The message header fields are always US-ASCII in any cases.
+
+
+===  Partial Subtype
+
+The "partial" subtype is defined to allow large entities to be delivered as
+several separate pieces of mail and automatically reassembled by a receiving
+user agent.
+
+*  Entities of type "message/partial" must always have a
+   content-transfer-encoding of 7bit (the default).
+
+*  The use of a content-transfer-encoding of "8bit" or "binary" is explicitly
+   prohibited.
+
+*  When generating and reassembling the pieces of a "message/partial"
+   message, the headers of the encapsulated message must be merged with
+   the headers of the enclosing entities
+
+**  The result is always a complete MIME entity, which may have its own
+    Content-Type header field, and thus may contain any other data type.
+
+Three parameters must be specified, in no particular order,
+
+.  *"id"*, is a unique identifier, as close to a world-unique identifier as
+   possible, to be used to match the fragments together.
+   In general, the identifier is essentially a message-id.
+
+.  *"number"*, an integer, is the fragment number, which indicates where this
+   fragment fits into the sequence of fragments.
+
+*  Fragment numbering begins with 1, not 0.
+
+.  *"total"*, another integer, is the total number of fragments.
+
+When generating and reassembling the fragments, the following rules MUST be
+observed:
+
+.  Fragmentation agents must split messages at line boundaries only.
+
+.  All of the header fields from the initial enclosing message, except those
+   that start with "Content-" and the specific header fields "Subject",
+   "Message-ID", "Encrypted", and "MIME-Version", must be copied, in order,
+   to the new message.
+
+.  All of the header fields from the second and any subsequent enclosing
+   messages are discarded by the reassembly process.
+
+
+===  External-Body Subtype
+
+The external-body subtype indicates that the actual body data are not
+included, but merely referenced.
+In this case, the parameters describe a mechanism for accessing the external
+data.
+
+*  "message/external-body" consists of a header, two consecutive CRLFs, and
+   the message header for the encapsulated message.
+
+*  If another pair of consecutive CRLFs appears, this of course ends the
+   message header for the encapsulated message.
+
+*  Any text after encapsulated message header, also called "phantom body", is
+   ignored.
+
+**  The only access-type defined in this document that uses the phantom body
+    is "mail-server"
+
+*  The encapsulated headers in ALL "message/external-body" entities MUST
+   include a Content-ID header field to give a unique identifier by
+   which to reference the data.
+
+**  This identifier may be used for caching mechanisms, and for recognizing
+    the receipt of the data when the access-type is "mail-server".
+
+*  The tokens that describe external-body data, such as file names and mail
+   server commands, are required to be in the US-ASCII character set.
+
+*  MIME entities of type "message/external-body" MUST have a
+   content-transfer-encoding of 7bit (the default).
+
+The parameters that may be used with any "message/external-body" are:
+
+.  ACCESS-TYPE -- A word indicating the supported access mechanism by which
+   the file or data may be obtained.
+   This word is not case sensitive.
+
+..  Values include, but are not limited to, "FTP", "ANON-FTP", "TFTP",
+    "LOCAL-FILE", and "MAIL-SERVER".
+
+..  This parameter is unconditionally mandatory and MUST be present.
+
+.  EXPIRATION -- The date after which the existence of the external data is
+   not guaranteed.
+
+..   This parameter may be used with ANY access-type and is ALWAYS optional.
+
+.  SIZE -- The size (in octets) of the data in its canonical form, that is,
+   before any Content-Transfer-Encoding has been applied or after the data
+   have been decoded.
+
+..  This parameter may be used with ANY access-type and is ALWAYS optional.
