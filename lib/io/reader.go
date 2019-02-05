@@ -62,6 +62,27 @@ func (r *Reader) Current() byte {
 }
 
 //
+// ReadLine read one line including the line feed '\n' character.
+//
+func (r *Reader) ReadLine() (line []byte) {
+	if r.p == len(r.v) {
+		return nil
+	}
+	start := r.p
+	for r.p < len(r.v) {
+		c := r.v[r.p]
+		if c == '\n' {
+			r.p++
+			line = r.v[start:r.p]
+			return line
+		}
+		r.p++
+	}
+	line = r.v[start:]
+	return line
+}
+
+//
 // ReadUntil read the content of file until one of separator found, or until
 // it reach the terminator character, or until EOF.
 // The content will be returned along the status of termination.
