@@ -1,0 +1,125 @@
+=  MIME Part Five: Conformance Criteria and Examples
+:author: Shulhan
+:email: <ms@kilabit.info>
+:toc:
+:sectnums:
+:stylesheet: solarized.css
+:url-rfc2049: https://tools.ietf.org/html/rfc2049
+
+This document provide note and summary of RFC 2046, Multipurpose Internet Mail
+Extensions (MIME) Part Five: Conformance Criteria and Examples
+
+
+==  MIME Conformance
+
+The concept of "MIME-conformance" is to define a certain level of
+implementation that allows the useful interworking of messages with content
+that differs from US-ASCII text.
+
+A MUA that is MIME-conformant MUST:
+
+.  Always generate "MIME-Version: 1.0" in header field
+
+.  Enable to decode using quoted-printable or base64.
+   Sending non-7bit data without encoding MUST use content-transfer-encoding
+   8bit or binary, as appropriate.
+   If the underlying transport does not support 8bit or binary, sender must
+   encode and label data using quoted-printable or base64.
+
+.  Treat unrecognized Content-Transfer-Encoding as Content-Type of
+   "application/octet-stream", regardless their actual type.
+
+.  Avoid showing users raw data when a Content-Type field other than text.
+
+.  Ignore any content-type parameters whose names they do not recognize.
+
+.  Explicitly handle the following media type values,
+
+..  Text
+
+...  Recognize and display "text" with "US-ASCII"
+
+...  Recognize other charset, at least being able to inform the user about
+     charset the message uses
+
+...  For unrecognized subtypes in a known charset, offer to show the user the
+     "raw" version of data after conversion from canonical to local form
+
+...  Treat material in an unknown charset as "application/octet-stream"
+
+..  Image, audio, and video
+
+...  Treat any unrecognized subtypes as "application/octet-stream"
+
+..  Application
+
+...  Offer the ability to remove encodings and put the resulting information
+     in a user file
+
+..  Multipart
+
+...  Recognize the mixed subtype
+
+...  Recognize the "alternative" subtype, and avoid showing the user redundant
+     parts.
+
+...  Recognize the "digest" subtype, specifically using "message/rfc822"
+     rather than "text/plain" as the default media type for body parts
+
+...  Treat unrecognized subtypes as "mixed"
+
+..  Message
+
+...  Recognize and display RFC822 message encapsulation (message/rfc822)
+
+...  Treat unrecognized subtypes as "application/octet-stream"
+
+.  Treat unrecognized Content-Type as "application/octet-stream"
+
+.  Using non-US-ASCII without a MIME-Version field is strongly discouraged.
+
+.  Ensure that any string that begins with "=?" and ends with "?=" in field
+   body to be valid encoded-word.
+
+.  Able to distinguish encoded-words from "text", "ctext", or "word"s
+
+
+==  Guidelines for Sending Email Data
+
+The list is NOT recommended practices for MTAs.
+
+
+==  Canonical Encoding Model
+
+Conversion steps from local to canonical form,
+
+.  Creation of local form
+   The body to be transmitted is created in the system's native format.
+
+.  Conversion to canonical form.
+   The entire body, including "out-of-band" information such as record lengths
+   and possibly file attribute information, is converted to a universal
+   canonical form.
+   For example, in case of "text/plain", the text MUST be converted to a
+   supported charset and lines MUST be delimited with CRLF.
+
+.  Apply transfer encoding.
+   It may be appropriate to base the choice of base64 or quoted-printable on
+   character frequency counts.
+
+.  Insertion into entity.
+   The encoded body then inserted into MIME entity with appropriate headers.
+   The entity is then inserted into the body of higher-level entity (message
+   or multipart).
+
+Conversion from canonical form to local form is accomplished by reversing
+these steps.
+
+For example, a message with the following header fields,
+
+	Content-type: text/foo; charset=bar
+	Content-Transfer-Encoding: base64
+
+MUST be first represented in the "text/foo" form, then represented in the
+"bar" character set, and finally transformed via the base64 algorithm into
+mail-safe form.
