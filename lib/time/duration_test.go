@@ -13,9 +13,16 @@ import (
 
 func TestParseDuration(t *testing.T) {
 	cases := []struct {
-		in  string
-		exp time.Duration
+		in     string
+		expErr string
+		exp    time.Duration
 	}{{
+		in:     "w",
+		expErr: ErrDurationMissingValue.Error(),
+	}, {
+		in:     "1aw",
+		expErr: `strconv.ParseFloat: parsing "1a": invalid syntax`,
+	}, {
 		in:  "1w",
 		exp: time.Duration(1) * Week,
 	}, {
@@ -30,6 +37,14 @@ func TestParseDuration(t *testing.T) {
 	}, {
 		in:  "0.5d",
 		exp: time.Duration(12) * time.Hour,
+	}, {
+		in:  "1d0.5h",
+		exp: time.Duration(24)*time.Hour + (time.Minute * time.Duration(30)),
+	}, {
+		in:     "100  w",
+		expErr: `time: unknown unit   in duration 100 `,
+	}, {
+		in: "100",
 	}}
 
 	for _, c := range cases {
@@ -37,7 +52,8 @@ func TestParseDuration(t *testing.T) {
 
 		got, err := ParseDuration(c.in)
 		if err != nil {
-			t.Log(err)
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
 		}
 
 		test.Assert(t, "duration", c.exp, got, true)

@@ -42,7 +42,7 @@ func ParseDuration(s string) (time.Duration, error) {
 	seps := []byte{'w', 'd', 'h', 'm', 's', 'u', 'n'}
 
 	reader := &libio.Reader{}
-	reader.Init(s)
+	reader.Init([]byte(s))
 
 	c := reader.SkipSpace()
 	if !libbytes.IsDigit(c) {
@@ -50,36 +50,30 @@ func ParseDuration(s string) (time.Duration, error) {
 	}
 
 	for {
-		tok, isTerm, c := reader.ReadUntil(seps, libbytes.ASCIISpaces)
-		if len(tok) == 0 {
+		tok, _, c := reader.ReadUntil(seps, libbytes.ASCIISpaces)
+		if c == 0 {
 			break
 		}
 
 		stok := string(tok)
 
+		v, err = strconv.ParseFloat(stok, 64)
+		if err != nil {
+			return 0, err
+		}
+
 		switch c {
 		case 'w':
-			v, err = strconv.ParseFloat(stok, 64)
-			if err != nil {
-				return 0, err
-			}
 			dur += v * float64(Week)
 		case 'd':
-			v, err = strconv.ParseFloat(stok, 64)
+			dur += v * float64(Day)
+		default:
+			stok += string(c)
+			rest, err := time.ParseDuration(stok)
 			if err != nil {
 				return 0, err
 			}
-			dur += v * float64(Day)
-		default:
-			s := stok + reader.String()
-			rest, err := time.ParseDuration(s)
-			if err != nil {
-				return 0, nil
-			}
 			dur += float64(rest)
-		}
-		if isTerm {
-			break
 		}
 	}
 
