@@ -69,9 +69,11 @@ func (r *Reader) Current() byte {
 // otherwise it will be false.
 //
 func (r *Reader) ReadUntil(seps, terms []byte) (b []byte, isTerm bool, c byte) {
+	start := r.p
 	for r.p < len(r.v) {
 		for x := 0; x < len(terms); x++ {
 			if r.v[r.p] == terms[x] {
+				b = r.v[start:r.p]
 				c = r.v[r.p]
 				r.p++
 				isTerm = true
@@ -80,14 +82,15 @@ func (r *Reader) ReadUntil(seps, terms []byte) (b []byte, isTerm bool, c byte) {
 		}
 		for x := 0; x < len(seps); x++ {
 			if r.v[r.p] == seps[x] {
+				b = r.v[start:r.p]
 				c = r.v[r.p]
 				r.p++
 				return
 			}
 		}
-		b = append(b, r.v[r.p])
 		r.p++
 	}
+	b = r.v[start:]
 	return
 }
 
