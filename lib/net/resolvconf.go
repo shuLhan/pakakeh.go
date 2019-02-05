@@ -19,7 +19,6 @@ const (
 
 var ( // nolint: gochecknoglobals
 	newLineTerms = []byte{'\n'}
-	spaceSeps    = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
 )
 
 // lambda to test os.Hostname.
@@ -162,7 +161,7 @@ func (rc *ResolvConf) parse(reader *libio.Reader) {
 			continue
 		}
 
-		tok, isTerm, _ := reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, _ := reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
 		if isTerm {
 			// We found keyword without value.
 			continue
@@ -197,7 +196,7 @@ func (rc *ResolvConf) parseValue(reader *libio.Reader, out *string) {
 		return
 	}
 
-	tok, isTerm, _ := reader.ReadUntil(spaceSeps, newLineTerms)
+	tok, isTerm, _ := reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
 	if len(tok) > 0 {
 		*out = string(tok)
 	}
@@ -225,7 +224,7 @@ func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 			break
 		}
 
-		tok, isTerm, _ := reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, _ := reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
 		if len(tok) > 0 {
 			if curLen+len(tok) > maxLen {
 				break
@@ -258,7 +257,7 @@ func (rc *ResolvConf) parseOptions(reader *libio.Reader) {
 			break
 		}
 
-		tok, isTerm, _ = reader.ReadUntil(spaceSeps, newLineTerms)
+		tok, isTerm, _ = reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
 		if len(tok) > 0 {
 			rc.parseOptionsKV(tok)
 		}
