@@ -101,3 +101,90 @@ func TestParseBody(t *testing.T) {
 		test.Assert(t, "body", c.exp, body.String(), true)
 	}
 }
+
+func TestBodyRelaxed(t *testing.T) {
+	cases := []struct {
+		desc string
+		in   string
+		exp  string
+	}{{
+		desc: "With empty body",
+		in:   "",
+		exp:  "",
+	}, {
+		desc: "With only CRL",
+		in:   "\r\n",
+		exp:  "\r\n",
+	}, {
+		desc: "With space at the end",
+		in:   "\r\n\t \t \t",
+		exp:  "\r\n",
+	}, {
+		desc: "With content and single CRLF",
+		in:   "T\r\n",
+		exp:  "T\r\n",
+	}, {
+		desc: "With content, space, and single CRLF",
+		in:   "Th \t \r\nis\r\n",
+		exp:  "Th \r\nis\r\n",
+	}, {
+		desc: "With text and multiple CRLF",
+		in:   "Th\r\nis\r\n\r\n\r\n",
+		exp:  "Th\r\nis\r\n",
+	}, {
+		desc: "With multiple spaces",
+		in:   " C \r\nD \t E\r\nF \r G\r\nH \n I\r\n",
+		exp:  " C\r\nD E\r\nF G\r\nH I\r\n",
+	}}
+
+	body := &Body{}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		body.raw = []byte(c.in)
+		got := body.Relaxed()
+
+		test.Assert(t, "Relaxed", c.exp, string(got), true)
+	}
+
+}
+
+func TestBodySimple(t *testing.T) {
+	cases := []struct {
+		desc string
+		in   string
+		exp  string
+	}{{
+		desc: "With empty body",
+		in:   "",
+		exp:  "\r\n",
+	}, {
+		desc: "With empty body and multiple CRLF",
+		in:   "\r\n\r\n\r\n",
+		exp:  "\r\n",
+	}, {
+		desc: "With content and single CRLF",
+		in:   "T\r\n",
+		exp:  "T\r\n",
+	}, {
+		desc: "With content and single CRLF",
+		in:   "Th\r\nis\r\n",
+		exp:  "Th\r\nis\r\n",
+	}, {
+		desc: "With text and multiple CRLF",
+		in:   "Th\r\nis\r\n\r\n\r\n",
+		exp:  "Th\r\nis\r\n",
+	}}
+
+	body := &Body{}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		body.raw = []byte(c.in)
+		got := body.Simple()
+
+		test.Assert(t, "Simple", []byte(c.exp), got, true)
+	}
+}

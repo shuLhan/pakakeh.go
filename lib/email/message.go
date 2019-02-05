@@ -12,9 +12,8 @@ import (
 // Message represent an unpacked internet message format.
 //
 type Message struct {
-	Header  *Header
-	Body    *Body
-	oriBody []byte // oriBody contains original message body.
+	Header *Header
+	Body   *Body
 }
 
 //
@@ -32,7 +31,6 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 		return nil, rest, err
 	}
 
-	msg.oriBody = rest
 	boundary := msg.Header.Boundary()
 
 	msg.Body, rest, err = ParseBody(rest, boundary)

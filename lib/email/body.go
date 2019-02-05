@@ -19,6 +19,7 @@ type Body struct {
 	// Parts contains one or more message body.
 	//
 	Parts []*MIME // nolint: structcheck,unused
+	raw   []byte  // raw contains original message body.
 }
 
 //
@@ -28,12 +29,15 @@ func ParseBody(raw, boundary []byte) (body *Body, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, nil, nil
 	}
+
+	body = &Body{
+		raw: raw,
+	}
+
 	if len(boundary) == 0 {
-		body = &Body{
-			Parts: []*MIME{{
-				Content: raw,
-			}},
-		}
+		body.Parts = append(body.Parts, &MIME{
+			Content: raw,
+		})
 		return body, nil, nil
 	}
 
@@ -52,9 +56,6 @@ func ParseBody(raw, boundary []byte) (body *Body, rest []byte, err error) {
 		}
 		if mime == nil {
 			break
-		}
-		if body == nil {
-			body = &Body{}
 		}
 
 		body.Parts = append(body.Parts, mime)
@@ -105,4 +106,115 @@ func (body *Body) String() string {
 	}
 
 	return sb.String()
+}
+
+//
+// Relaxed canonicalize the original body with "relaxed" algorithm as defined
+// in RFC 6376 section 3.4.4.
+// It remove all trailing whitespaces, reduce sequence of whitespaces inside
+// line into single space, and remove all empty line at the end of body.
+// If body is not empty and not end with CRLF, a CRLF is added.
+//
+// This function is expensive for message with large body, its better if we
+// call it once and store it somewhere.
+//
+func (body *Body) Relaxed() (out []byte) {
+	if len(body.raw) == 0 {
+		return
+	}
+
+	out = make([]byte, 0, len(body.raw))
+	x := len(body.raw) - 1
+
+	// Remove trailing whitespaces.
+	for ; x >= 0; x-- {
+		if body.raw[x] == '\t' || body.raw[x] == ' ' {
+			continue
+		}
+		break
+	}
+
+	// Remove empty lines ...
+	hasCRLF := false
+	for x > 2 {
+		if body.raw[x-1] == cr && body.raw[x] == lf {
+			hasCRLF = true
+			x -= 2
+			continue
+		}
+		break
+	}
+
+	// Reduce sequence of WSP.
+	end := x
+	hasSpace := 0
+	for x = 0; x <= end; x++ {
+		if body.raw[x] == '\t' || body.raw[x] == ' ' || body.raw[x] == '\n' {
+			hasSpace++
+			continue
+		}
+		if body.raw[x] == '\r' {
+			x++
+			if body.raw[x] == '\n' {
+				if hasSpace > 1 {
+					out = append(out, ' ')
+				}
+				out = append(out, cr)
+				out = append(out, lf)
+				hasSpace = 0
+				continue
+			}
+			hasSpace++
+			continue
+		}
+		if hasSpace > 0 {
+			out = append(out, ' ')
+			hasSpace = 0
+		}
+		out = append(out, body.raw[x])
+	}
+	if len(out) >= 2 {
+		if out[len(out)-2] == cr && out[len(out)-1] == lf {
+			return out
+		}
+	}
+	if hasCRLF {
+		out = append(out, "\r\n"...)
+	}
+
+	return out
+}
+
+//
+// Simple canonicalize the original body with "simple" algorithm as defined in
+// RFC 6376 section 3.4.3.
+// Basically, it converts "*CRLF" at the end of body to a single CRLF.
+// If no message body or no trailing CRLF, a CRLF is added.
+//
+func (body *Body) Simple() (out []byte) {
+	if len(body.raw) == 0 {
+		return []byte{cr, lf}
+	}
+
+	out = make([]byte, len(body.raw))
+	copy(out, body.raw)
+
+	x := len(out) - 1
+	for x > 2 {
+		if out[x-1] == cr && out[x] == lf {
+			out = out[:len(out)-2]
+			x -= 2
+			continue
+		}
+		break
+	}
+	switch x {
+	case 1:
+	default:
+		if out[x-1] != cr && out[x] != lf {
+			out = append(out, "\r\n"...)
+		}
+	}
+
+	return out
 }
