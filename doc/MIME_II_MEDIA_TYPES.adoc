@@ -109,6 +109,44 @@ A media type of "application/postscript" indicates a PostScript program.
 
 == Multipart Media Type
 
+....
+multipart-body    := [preamble CRLF]
+                     dash-boundary transport-padding CRLF
+                     body-part *encapsulation
+                     close-delimiter transport-padding
+                     [CRLF epilogue]
+
+dash-boundary     := "--" boundary
+
+transport-padding := *LWSP-char
+                   ; Composers MUST NOT generate non-zero length transport
+                   ; padding, but receivers MUST be able to handle padding
+                   ; added by message transports.
+
+encapsulation     := delimiter transport-padding CRLF
+                     body-part
+
+delimiter         := CRLF dash-boundary
+
+close-delimiter   := delimiter "--"
+
+preamble          := discard-text
+
+epilogue          := discard-text
+
+discard-text      := *(*text CRLF) *text
+                   ; May be ignored or discarded.
+
+body-part         := MIME-part-headers [CRLF *OCTET]
+                   ; Lines in a body-part must not start with the specified
+		   ; dash-boundary and the delimiter must not appear anywhere
+                   ; in the body part.  Note that the ; semantics of a
+		   ; body-part differ from the semantics of a message, as
+                   ; described in the text.
+
+OCTET             := <any 0-255 octet value>
+....
+
 *  A "multipart" media type field MUST appear in the entity's header.
 
 *  The body MUST then contain one or more body parts, each preceded by a
@@ -135,6 +173,16 @@ A media type of "application/postscript" indicates a PostScript program.
 
 
 ===  Common Syntax
+
+....
+boundary      := 0*69<bchars> bcharsnospace
+
+bchars        := bcharsnospace / " "
+
+bcharsnospace := DIGIT / ALPHA / "'" / "(" / ")" /
+                 "+" / "_" / "," / "-" / "." /
+                 "/" / ":" / "=" / "?"
+....
 
 *  The Content-Type field for multipart entities requires one parameter,
    "boundary".

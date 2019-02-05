@@ -10,6 +10,53 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestHeaderBoundary(t *testing.T) {
+	cases := []struct {
+		desc string
+		in   string
+		exp  []byte
+	}{{
+		desc: "With no content-type",
+		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
+			"To: Ned Freed <ned@innosoft.com>\r\n" +
+			"Date: Sun, 21 Mar 1993 23:56:48 -0800 (PST)\r\n" +
+			"Subject: Sample message\r\n" +
+			"\r\n",
+	}, {
+		desc: "With invalid content-type",
+		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
+			"To: Ned Freed <ned@innosoft.com>\r\n" +
+			"Date: Sun, 21 Mar 1993 23:56:48 -0800 (PST)\r\n" +
+			"Subject: Sample message\r\n" +
+			"MIME-Version: 1.0\r\n" +
+			"Content-type: multipart/mixed; boundary=simple:boundary\r\n" +
+			"\r\n",
+	}, {
+		desc: "With boundary",
+		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
+			"To: Ned Freed <ned@innosoft.com>\r\n" +
+			"Date: Sun, 21 Mar 1993 23:56:48 -0800 (PST)\r\n" +
+			"Subject: Sample message\r\n" +
+			"MIME-Version: 1.0\r\n" +
+			"Content-type: multipart/mixed; boundary=\"simple boundary\"\r\n" +
+			"\r\n",
+		exp: []byte("simple boundary"),
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		header := &Header{}
+
+		_, err := header.Unpack([]byte(c.in))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, "Boundary", c.exp, header.Boundary(), true)
+	}
+}
+
 func TestHeaderUnpack(t *testing.T) {
 	cases := []struct {
 		desc    string
@@ -22,10 +69,10 @@ func TestHeaderUnpack(t *testing.T) {
 	}, {
 		desc:   "With whitespaces only",
 		raw:    []byte(" \t"),
-		expErr: "Header.Unpack: invalid end of header: ' \t'",
+		expErr: "ParseField: invalid character at index 1",
 	}, {
 		desc:    "With CRLF only",
-		raw:     crlf,
+		raw:     []byte("\r\n"),
 		expRest: []byte{},
 	}, {
 		desc:   "With invalid end",

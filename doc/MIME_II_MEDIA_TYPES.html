@@ -234,6 +234,45 @@ sending PostScript bodies to "off-the-shelf" interpreters.</p>
 <div class="sect1">
 <h2 id="_multipart_media_type">7. Multipart Media Type</h2>
 <div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre>multipart-body    := [preamble CRLF]
+                     dash-boundary transport-padding CRLF
+                     body-part *encapsulation
+                     close-delimiter transport-padding
+                     [CRLF epilogue]
+
+dash-boundary     := "--" boundary
+
+transport-padding := *LWSP-char
+                   ; Composers MUST NOT generate non-zero length transport
+                   ; padding, but receivers MUST be able to handle padding
+                   ; added by message transports.
+
+encapsulation     := delimiter transport-padding CRLF
+                     body-part
+
+delimiter         := CRLF dash-boundary
+
+close-delimiter   := delimiter "--"
+
+preamble          := discard-text
+
+epilogue          := discard-text
+
+discard-text      := *(*text CRLF) *text
+                   ; May be ignored or discarded.
+
+body-part         := MIME-part-headers [CRLF *OCTET]
+                   ; Lines in a body-part must not start with the specified
+		   ; dash-boundary and the delimiter must not appear anywhere
+                   ; in the body part.  Note that the ; semantics of a
+		   ; body-part differ from the semantics of a message, as
+                   ; described in the text.
+
+OCTET             := &lt;any 0-255 octet value&gt;</pre>
+</div>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -276,6 +315,17 @@ identical syntax.</p>
 </div>
 <div class="sect2">
 <h3 id="_common_syntax">7.1. Common Syntax</h3>
+<div class="literalblock">
+<div class="content">
+<pre>boundary      := 0*69&lt;bchars&gt; bcharsnospace
+
+bchars        := bcharsnospace / " "
+
+bcharsnospace := DIGIT / ALPHA / "'" / "(" / ")" /
+                 "+" / "_" / "," / "-" / "." /
+                 "/" / ":" / "=" / "?"</pre>
+</div>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -591,7 +641,7 @@ have been decoded.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-05 00:22:46 +0700
+Last updated 2019-02-05 03:31:14 +0700
 </div>
 </div>
 </body>

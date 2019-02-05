@@ -6,21 +6,58 @@ package email
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
 //
 // Header represent list of field.
 //
-// We are not using map here it to prevent the header being reordeded when
-// packing the message back into raw format.
 //
 type Header struct {
+	// We are not using map here it to prevent the header being reordeded when
+	// packing the message back into raw format.
 	fields []*Field
 }
 
 //
+// Boundary return the message body boundary defined in Content-Type.
+// If no field Content-Type or no boundary it will return nil.
+//
+func (hdr *Header) Boundary() []byte {
+	ct := hdr.ContentType()
+	if ct == nil {
+		return nil
+	}
+	return ct.GetParamValue(ParamNameBoundary)
+}
+
+//
+// ContentType return the unpacked value of field "Content-Type", or nil if no
+// field Content-Type exist or there is an error when unpacking.
+//
+func (hdr *Header) ContentType() *ContentType {
+	for _, f := range hdr.fields {
+		if f.Type != FieldTypeContentType {
+			continue
+		}
+		if f.ContentType == nil {
+			err := f.Unpack()
+			if err != nil {
+				log.Println("ContentType: ", err)
+				return nil
+			}
+		}
+		return f.ContentType
+	}
+	return nil
+}
+
+//
 // Unpack the raw header from top to bottom.
+//
+// Raw header that start with CRLF indicate an empty header.  This function
+// will remove the leading CRLF on return.
 //
 // The raw header may end with optional CRLF, an empty line that separate
 // header from body of message.
@@ -33,33 +70,27 @@ func (hdr *Header) Unpack(raw []byte) ([]byte, error) {
 		field *Field
 		err   error
 	)
+	if len(raw) == 0 {
+		return nil, nil
+	}
 
-	for len(raw) > 2 {
+	for len(raw) >= 2 {
+		if raw[0] == '\r' && raw[1] == '\n' {
+			raw = raw[2:]
+			return raw, nil
+		}
+
 		field, raw, err = ParseField(raw)
 		if err != nil {
 			return raw, err
 		}
 		hdr.fields = append(hdr.fields, field)
-		if len(raw) > 2 {
-			if raw[0] == crlf[0] && raw[1] == crlf[1] {
-				break
-			}
-		}
+	}
+	if len(raw) == 0 {
+		return raw, nil
 	}
 
-	switch len(raw) {
-	case 0:
-	case 1:
-		err = fmt.Errorf("Header.Unpack: invalid end of header: '%s'", raw)
-	case 2:
-		if raw[0] != crlf[0] || raw[1] != crlf[1] {
-			err = fmt.Errorf("Header.Unpack: invalid end of header: '%s'", raw)
-		} else {
-			raw = raw[2:]
-		}
-	default:
-		raw = raw[2:]
-	}
+	err = fmt.Errorf("Header.Unpack: invalid end of header: '%s'", raw)
 
 	return raw, err
 }

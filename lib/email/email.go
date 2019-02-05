@@ -5,7 +5,8 @@
 package email
 
 var ( // nolint: gochecknoglobals
-	crlf = []byte{'\r', '\n'}
+	crlf      = []byte{'\r', '\n'}
+	boundSeps = []byte{'-', '-'}
 )
 
 //
@@ -27,7 +28,9 @@ func (email *Email) Unpack(raw []byte) ([]byte, error) {
 		return raw, err
 	}
 
-	raw, err = email.Body.Unpack(raw, nil)
+	boundary := email.Header.Boundary()
+
+	raw, err = email.Body.Unpack(raw, boundary)
 
 	return raw, err
 }
