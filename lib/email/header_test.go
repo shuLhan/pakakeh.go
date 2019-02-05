@@ -46,9 +46,7 @@ func TestHeaderBoundary(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		header := &Header{}
-
-		_, err := header.Unpack([]byte(c.in))
+		header, _, err := ParseHeader([]byte(c.in))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -57,7 +55,7 @@ func TestHeaderBoundary(t *testing.T) {
 	}
 }
 
-func TestHeaderUnpack(t *testing.T) {
+func TestParseHeader(t *testing.T) {
 	cases := []struct {
 		desc    string
 		raw     []byte
@@ -77,7 +75,7 @@ func TestHeaderUnpack(t *testing.T) {
 	}, {
 		desc:   "With invalid end",
 		raw:    []byte("a: 1\r\nx"),
-		expErr: "Header.Unpack: invalid end of header: 'x'",
+		expErr: "ParseHeader: invalid end of header: 'x'",
 	}, {
 		desc:   "With invalid field: missing value",
 		raw:    []byte("a:\r\n\t"),
@@ -105,11 +103,12 @@ func TestHeaderUnpack(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		header := &Header{}
-
-		rest, err := header.Unpack(c.raw)
+		header, rest, err := ParseHeader(c.raw)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+		if header == nil {
 			continue
 		}
 

@@ -16,7 +16,7 @@ import (
 // MIME represent part of message body with their header and content.
 //
 type MIME struct {
-	Header  Header
+	Header  *Header
 	Content []byte
 }
 
@@ -64,7 +64,7 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	}
 
 	mime = &MIME{}
-	rest, err = mime.Header.Unpack(r.Rest())
+	mime.Header, rest, err = ParseHeader(r.Rest())
 	if err != nil {
 		return nil, raw, err
 	}
@@ -107,7 +107,9 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 func (mime *MIME) String() string {
 	var sb strings.Builder
 
-	sb.WriteString(mime.Header.String())
+	if mime.Header != nil {
+		sb.WriteString(mime.Header.String())
+	}
 	sb.WriteString("\r\n")
 	sb.Write(mime.Content)
 

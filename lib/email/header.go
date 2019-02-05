@@ -21,6 +21,52 @@ type Header struct {
 }
 
 //
+// ParseHeader parse the raw header from top to bottom.
+//
+// Raw header that start with CRLF indicate an empty header.
+// In this case, it will return nil Header, indicating that no header was
+// parsed, and remove the leading CRLF on returned "rest".
+//
+// The raw header may end with optional CRLF, an empty line that separate
+// header from body of message.
+//
+// On success it will return the rest of raw input (possible message's body)
+// without leading CRLF.
+//
+func ParseHeader(raw []byte) (hdr *Header, rest []byte, err error) {
+	var (
+		field *Field
+	)
+	if len(raw) == 0 {
+		return nil, nil, nil
+	}
+
+	rest = raw
+	for len(rest) >= 2 {
+		if rest[0] == '\r' && rest[1] == '\n' {
+			rest = rest[2:]
+			return hdr, rest, nil
+		}
+
+		field, rest, err = ParseField(rest)
+		if err != nil {
+			return nil, rest, err
+		}
+		if hdr == nil {
+			hdr = &Header{}
+		}
+		hdr.fields = append(hdr.fields, field)
+	}
+	if len(rest) == 0 {
+		return hdr, rest, nil
+	}
+
+	err = fmt.Errorf("ParseHeader: invalid end of header: '%s'", rest)
+
+	return nil, rest, err
+}
+
+//
 // Boundary return the message body boundary defined in Content-Type.
 // If no field Content-Type or no boundary it will return nil.
 //
@@ -51,48 +97,6 @@ func (hdr *Header) ContentType() *ContentType {
 		return f.ContentType
 	}
 	return nil
-}
-
-//
-// Unpack the raw header from top to bottom.
-//
-// Raw header that start with CRLF indicate an empty header.  This function
-// will remove the leading CRLF on return.
-//
-// The raw header may end with optional CRLF, an empty line that separate
-// header from body of message.
-//
-// On success it will return the rest of raw input (possible message's body)
-// without leading CRLF.
-//
-func (hdr *Header) Unpack(raw []byte) ([]byte, error) {
-	var (
-		field *Field
-		err   error
-	)
-	if len(raw) == 0 {
-		return nil, nil
-	}
-
-	for len(raw) >= 2 {
-		if raw[0] == '\r' && raw[1] == '\n' {
-			raw = raw[2:]
-			return raw, nil
-		}
-
-		field, raw, err = ParseField(raw)
-		if err != nil {
-			return raw, err
-		}
-		hdr.fields = append(hdr.fields, field)
-	}
-	if len(raw) == 0 {
-		return raw, nil
-	}
-
-	err = fmt.Errorf("Header.Unpack: invalid end of header: '%s'", raw)
-
-	return raw, err
 }
 
 //

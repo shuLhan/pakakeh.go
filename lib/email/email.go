@@ -17,7 +17,7 @@ var ( // nolint: gochecknoglobals
 // Message represent an unpacked internet message format.
 //
 type Message struct {
-	Header  Header
+	Header  *Header
 	Body    Body
 	oriBody []byte // oriBody contains original message body.
 }
@@ -32,7 +32,7 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 
 	msg = &Message{}
 
-	rest, err = msg.Header.Unpack(raw)
+	msg.Header, rest, err = ParseHeader(raw)
 	if err != nil {
 		return nil, rest, err
 	}
@@ -51,7 +51,9 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 func (msg *Message) String() string {
 	var sb strings.Builder
 
-	sb.WriteString(msg.Header.String())
+	if msg.Header != nil {
+		sb.WriteString(msg.Header.String())
+	}
 	sb.WriteString("\r\n")
 	sb.WriteString(msg.Body.String())
 
