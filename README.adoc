@@ -148,7 +148,7 @@ NOTE: The links below is used to be viewed locally, not through Github.
 **  link:doc/DKIM_THREATS.html[Analysis of Threats Motivating DKIM (RFC 4686)]
 **  link:doc/DKIM_DEVOPS.html[DKIM Development, Deployment, and Operations
     (RFC 5863)]
-**  link:doc/DKIM_SIGNATURES.html[DKIM Signatures (RFC 6379)]
+**  link:doc/DKIM_SIGNATURES.html[DKIM Signatures (RFC 6376)]
 
 *  link:doc/SMTP.html[Simple Mail Transfer Protocol (RFC5321)]
 **  link:doc/ESMTP_DSN.html[Delivery Status Notification (RFC3461-3464)]

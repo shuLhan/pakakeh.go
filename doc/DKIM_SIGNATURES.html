@@ -88,7 +88,7 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document provide note and summary of RFC 6379, DomainKeys Identified Mail
+<p>This document provide note and summary of RFC 6376, DomainKeys Identified Mail
 (DKIM) Signatures.</p>
 </div>
 </div>
@@ -609,6 +609,13 @@ exactly as they are in the message being signed or verified.</p>
 <p>Header field names MUST NOT be case folded and whitespace MUST NOT be
 changed.</p>
 </li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The "simple" body canonicalization algorithm,</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
 <p>Converts multiple CRLF at the end of the body to a single CRLF.</p>
 </li>
@@ -616,7 +623,7 @@ changed.</p>
 <p>If there is no body or no trailing CRLF on the message body, a CRLF is
 added.</p>
 </li>
-</ul>
+</ol>
 </div>
 </div>
 <div class="sect3">
@@ -1920,27 +1927,25 @@ validation interval before being removed from the key server.</p>
 </div>
 <div class="sect2">
 <h3 id="_normalize_the_message_to_prevent_transport_conversions">5.3. Normalize the Message to Prevent Transport Conversions</h3>
-<div class="paragraph">
-<p>Some messages, particularly those using 8-bit characters, are subject to
-modification during transit, notably conversion to 7-bit form.
-Such conversions will break DKIM signatures.</p>
-</div>
-<div class="paragraph">
-<p>In order to minimize the chances of such breakage, Signers SHOULD convert the
-message to a suitable MIME content-transfer encoding such as quoted-printable
-or base64 as described in [RFC2045] before signing.</p>
-</div>
-<div class="paragraph">
-<p>If the message is submitted to the Signer with any local encoding that will be
-modified before transmission, that modification to canonical [RFC5322] form
-MUST be done before signing.
-In particular, bare CR or LF characters (used by some systems as a local line
-separator convention) MUST be converted to the SMTP-standard CRLF sequence
-before the message is signed.</p>
-</div>
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
+<p>In order to minimize the chances of such breakage, Signers SHOULD convert
+the message to a suitable MIME content-transfer encoding such as
+quoted-printable or base64 before signing.</p>
+</li>
+<li>
+<p>If the message is submitted to the Signer with any local encoding that will
+be modified before transmission, that modification to canonical [RFC5322]
+form MUST be done before signing.
+In particular, bare CR or LF characters MUST be converted to the
+SMTP-standard CRLF sequence before the message is signed.</p>
+</li>
+<li>
 <p>The Signer MUST sign the message as it is expected to be received by the
 Verifier rather than in some local or internal form.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
@@ -2535,7 +2540,7 @@ reference selectors with public keys having unreasonable exponents.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-01 11:31:58 +0700
+Last updated 2019-02-05 10:11:18 +0700
 </div>
 </div>
 </body>

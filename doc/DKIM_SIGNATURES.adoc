@@ -7,9 +7,9 @@
 :url-rfc4685: https://tools.ietf.org/html/rfc4685
 :url-rfc5585: https://tools.ietf.org/html/rfc5585
 :url-rfc5863: https://tools.ietf.org/html/rfc5863
-:url-rfc6379: https://tools.ietf.org/html/rfc6379
+:url-rfc6376: https://tools.ietf.org/html/rfc6376
 
-This document provide note and summary of RFC 6379, DomainKeys Identified Mail
+This document provide note and summary of RFC 6376, DomainKeys Identified Mail
 (DKIM) Signatures.
 
 ==  Introduction
@@ -393,9 +393,11 @@ body, a "simple" and "relaxed" algorithms.
 *  Header field names MUST NOT be case folded and whitespace MUST NOT be
    changed.
 
-*  Converts multiple CRLF at the end of the body to a single CRLF.
+The "simple" body canonicalization algorithm,
 
-*  If there is no body or no trailing CRLF on the message body, a CRLF is
+.  Converts multiple CRLF at the end of the body to a single CRLF.
+
+.  If there is no body or no trailing CRLF on the message body, a CRLF is
    added.
 
 
@@ -1265,23 +1267,19 @@ validation interval before being removed from the key server.
 
 ===  Normalize the Message to Prevent Transport Conversions
 
-Some messages, particularly those using 8-bit characters, are subject to
-modification during transit, notably conversion to 7-bit form.
-Such conversions will break DKIM signatures.
+*  In order to minimize the chances of such breakage, Signers SHOULD convert
+   the message to a suitable MIME content-transfer encoding such as
+   quoted-printable or base64 before signing.
 
-In order to minimize the chances of such breakage, Signers SHOULD convert the
-message to a suitable MIME content-transfer encoding such as quoted-printable
-or base64 as described in [RFC2045] before signing.
+*  If the message is submitted to the Signer with any local encoding that will
+   be modified before transmission, that modification to canonical [RFC5322]
+   form MUST be done before signing.
+   In particular, bare CR or LF characters MUST be converted to the
+   SMTP-standard CRLF sequence before the message is signed.
 
-If the message is submitted to the Signer with any local encoding that will be
-modified before transmission, that modification to canonical [RFC5322] form
-MUST be done before signing.
-In particular, bare CR or LF characters (used by some systems as a local line
-separator convention) MUST be converted to the SMTP-standard CRLF sequence
-before the message is signed.
+*  The Signer MUST sign the message as it is expected to be received by the
+   Verifier rather than in some local or internal form.
 
-The Signer MUST sign the message as it is expected to be received by the
-Verifier rather than in some local or internal form.
 
 ===  Determine the Header Fields to Sign
 
