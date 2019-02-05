@@ -153,7 +153,7 @@ func (rc *ResolvConf) reset() {
 //
 func (rc *ResolvConf) parse(reader *libio.Reader) {
 	for {
-		c := reader.SkipSpace()
+		c := reader.SkipSpaces()
 		if c == 0 {
 			break
 		}

@@ -319,13 +319,13 @@ func (field *Field) unpackDate() (err error) {
 	r := &libio.Reader{}
 	r.Init(field.Value)
 
-	c = r.SkipSpace()
+	c = r.SkipSpaces()
 	if !libbytes.IsDigit(c) {
 		v, _, c = r.ReadUntil([]byte{','}, nil)
 		if len(v) == 0 || c != ',' {
 			return fmt.Errorf("unpackDate: invalid date format")
 		}
-		if c = r.SkipSpace(); c == 0 {
+		if c = r.SkipSpaces(); c == 0 {
 			return fmt.Errorf("unpackDate: invalid date format")
 		}
 	}
@@ -335,7 +335,7 @@ func (field *Field) unpackDate() (err error) {
 		return fmt.Errorf("unpackDate: missing month")
 	}
 	// Get month ...
-	r.SkipSpace()
+	r.SkipSpaces()
 	v, _, _ = r.ReadUntil(space, nil)
 	month, ok = libtime.ShortMonths[string(v)]
 	if !ok {
@@ -343,7 +343,7 @@ func (field *Field) unpackDate() (err error) {
 	}
 
 	// Get year ...
-	r.SkipSpace()
+	r.SkipSpaces()
 	if year, c = r.ScanInt64(); c == 0 || c != ' ' {
 		return fmt.Errorf("unpackDate: invalid year")
 	}
@@ -381,7 +381,7 @@ func (field *Field) unpackDate() (err error) {
 	}
 
 	// Get zone offset ...
-	c = r.SkipSpace()
+	c = r.SkipSpaces()
 	if c == 0 {
 		return fmt.Errorf("unpackDate: missing zone")
 	}

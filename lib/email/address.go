@@ -100,7 +100,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 		state   = stateBegin
 	)
 
-	_ = r.SkipSpace()
+	_ = r.SkipSpaces()
 	tok, _, c = r.ReadUntil(seps, nil)
 	for {
 		switch c {
@@ -120,7 +120,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 			isGroup = true
 			value = nil
 			state = stateDisplayName
-			_ = r.SkipSpace()
+			_ = r.SkipSpaces()
 
 		case '<':
 			if state >= stateLocalPart {
@@ -283,7 +283,7 @@ func skipComment(r *libio.Reader) (c byte, err error) {
 				return c, err
 			}
 		case ')':
-			c = r.SkipSpace()
+			c = r.SkipSpaces()
 			if c != '(' {
 				goto out
 			}

@@ -59,7 +59,7 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 		return ct, nil
 	}
 
-	c = r.SkipSpace()
+	c = r.SkipSpaces()
 	ksep := []byte{'='}
 	qsep := []byte{'"'}
 	vsep := []byte{' '}
@@ -95,7 +95,7 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 		param.Key = bytes.ToLower(param.Key)
 		ct.Params = append(ct.Params, param)
 
-		c = r.SkipSpace()
+		c = r.SkipSpaces()
 	}
 
 	return ct, nil

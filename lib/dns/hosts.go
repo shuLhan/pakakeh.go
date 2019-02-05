@@ -115,7 +115,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 		terms = []byte{'\n', '\f', '#'}
 	)
 	for {
-		c := reader.SkipSpace()
+		c := reader.SkipSpaces()
 		if c == 0 {
 			break
 		}
@@ -136,7 +136,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 		}
 
 		for {
-			c := reader.SkipSpace()
+			c := reader.SkipSpaces()
 			if c == 0 {
 				break
 			}

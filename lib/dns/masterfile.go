@@ -270,7 +270,7 @@ func (m *master) parseDirectiveOrigin() (err error) {
 		}
 		m.lineno++
 	} else {
-		c = m.reader.SkipSpace()
+		c = m.reader.SkipSpaces()
 		if c == 0 {
 			return nil
 		}
@@ -307,7 +307,7 @@ func (m *master) parseDirectiveInclude() (err error) {
 
 	// check if include followed by domain name.
 	if !isTerm {
-		c = m.reader.SkipSpace()
+		c = m.reader.SkipSpaces()
 	}
 
 	if c == ';' {
@@ -316,7 +316,7 @@ func (m *master) parseDirectiveInclude() (err error) {
 	} else if c != 0 {
 		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 		if !isTerm {
-			c = m.reader.SkipSpace()
+			c = m.reader.SkipSpaces()
 		}
 		if c != ';' {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
@@ -372,7 +372,7 @@ func (m *master) parseDirectiveTTL() (err error) {
 		m.reader.SkipLine()
 		m.lineno++
 	} else {
-		c = m.reader.SkipSpace()
+		c = m.reader.SkipSpaces()
 		if c == 0 {
 			return nil
 		}
@@ -700,11 +700,11 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 
 	for {
 		if isMultiline {
-			c = m.reader.SkipSpace()
+			c = m.reader.SkipSpaces()
 			if c == ';' {
 				m.reader.SkipLine()
 				m.lineno++
-				_ = m.reader.SkipSpace()
+				_ = m.reader.SkipSpaces()
 			}
 		} else {
 			_, c = m.reader.SkipHorizontalSpace()
@@ -721,7 +721,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		if c == ';' {
 			m.reader.SkipLine()
 			m.lineno++
-			_ = m.reader.SkipSpace()
+			_ = m.reader.SkipSpaces()
 		}
 
 		v, err = strconv.Atoi(string(tok))
@@ -765,14 +765,14 @@ out:
 			for c == ';' {
 				m.reader.SkipLine()
 				m.lineno++
-				c = m.reader.SkipSpace()
+				c = m.reader.SkipSpaces()
 			}
 			for c == '\n' {
 				m.lineno++
-				c = m.reader.SkipSpace()
+				c = m.reader.SkipSpaces()
 			}
 		} else {
-			c = m.reader.SkipSpace()
+			c = m.reader.SkipSpaces()
 		}
 
 		if c != ')' {

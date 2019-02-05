@@ -179,11 +179,11 @@ func (r *Reader) SkipN(n int) bool {
 }
 
 //
-// SkipSpace read until no white spaces found and return the first byte that
+// SkipSpaces read until no white spaces found and return the first byte that
 // is not white spaces.
 // On EOF, it will return 0.
 //
-func (r *Reader) SkipSpace() (c byte) {
+func (r *Reader) SkipSpaces() (c byte) {
 	for r.X < len(r.V) {
 		c = r.V[r.X]
 		if libbytes.IsSpace(c) {

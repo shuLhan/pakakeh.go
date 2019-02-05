@@ -44,7 +44,7 @@ func ParseDuration(s string) (time.Duration, error) {
 	reader := &libio.Reader{}
 	reader.Init([]byte(s))
 
-	c := reader.SkipSpace()
+	c := reader.SkipSpaces()
 	if !libbytes.IsDigit(c) {
 		return 0, ErrDurationMissingValue
 	}

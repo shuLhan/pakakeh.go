@@ -99,7 +99,7 @@ func (res *Response) parseMessage(
 
 	res.Message = string(bytes.TrimSpace(bb))
 
-	c = reader.SkipSpace()
+	c = reader.SkipSpaces()
 	if !isMultiline && c != 0 {
 		return errors.New("trailing characters at message line")
 	}
@@ -137,7 +137,7 @@ func (res *Response) parseBody(reader *libio.Reader, code, seps, terms []byte) (
 			res.Body = append(res.Body, string(bb))
 		}
 		if isLastLine {
-			c = reader.SkipSpace()
+			c = reader.SkipSpaces()
 			if c != 0 {
 				return errors.New("trailing characters")
 			}

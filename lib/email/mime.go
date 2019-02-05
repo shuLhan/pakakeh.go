@@ -40,7 +40,7 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	)
 
 	// find boundary ...
-	r.SkipSpace()
+	r.SkipSpaces()
 	line = r.ReadLine()
 	if len(line) == 0 {
 		rest = r.Rest()
