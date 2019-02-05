@@ -10,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestBodyUnpack(t *testing.T) {
+func TestParseBody(t *testing.T) {
 	cases := []struct {
 		desc     string
 		in       string
@@ -88,11 +88,12 @@ func TestBodyUnpack(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		body := &Body{}
-
-		rest, err := body.Unpack([]byte(c.in), []byte(c.boundary))
+		body, rest, err := ParseBody([]byte(c.in), []byte(c.boundary))
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+		if body == nil {
 			continue
 		}
 

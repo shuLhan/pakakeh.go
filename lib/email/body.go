@@ -22,18 +22,19 @@ type Body struct {
 }
 
 //
-// Unpack the message's body using boundary.
+// ParseBody parse the the raw message's body using boundary.
 //
-func (body *Body) Unpack(raw, boundary []byte) (rest []byte, err error) {
+func ParseBody(raw, boundary []byte) (body *Body, rest []byte, err error) {
 	if len(raw) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 	if len(boundary) == 0 {
-		part := &MIME{
-			Content: raw,
+		body = &Body{
+			Parts: []*MIME{{
+				Content: raw,
+			}},
 		}
-		body.Parts = append(body.Parts, part)
-		return nil, nil
+		return body, nil, nil
 	}
 
 	var (
@@ -43,14 +44,17 @@ func (body *Body) Unpack(raw, boundary []byte) (rest []byte, err error) {
 		minlen = len(boundary) + 6
 	)
 
-	rest = body.skipPreamble(raw, boundary)
+	rest = skipPreamble(raw, boundary)
 	for {
 		mime, rest, err = ParseBodyPart(rest, boundary)
 		if err != nil {
-			return rest, err
+			return nil, rest, err
 		}
 		if mime == nil {
 			break
+		}
+		if body == nil {
+			body = &Body{}
 		}
 
 		body.Parts = append(body.Parts, mime)
@@ -60,10 +64,10 @@ func (body *Body) Unpack(raw, boundary []byte) (rest []byte, err error) {
 		}
 	}
 
-	return rest, nil
+	return body, rest, nil
 }
 
-func (body *Body) skipPreamble(raw, boundary []byte) []byte {
+func skipPreamble(raw, boundary []byte) []byte {
 	r := &libio.Reader{}
 	r.InitBytes(raw)
 

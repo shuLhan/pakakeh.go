@@ -18,7 +18,7 @@ var ( // nolint: gochecknoglobals
 //
 type Message struct {
 	Header  *Header
-	Body    Body
+	Body    *Body
 	oriBody []byte // oriBody contains original message body.
 }
 
@@ -40,7 +40,7 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 	msg.oriBody = rest
 	boundary := msg.Header.Boundary()
 
-	rest, err = msg.Body.Unpack(rest, boundary)
+	msg.Body, rest, err = ParseBody(rest, boundary)
 
 	return msg, rest, err
 }
@@ -55,7 +55,9 @@ func (msg *Message) String() string {
 		sb.WriteString(msg.Header.String())
 	}
 	sb.WriteString("\r\n")
-	sb.WriteString(msg.Body.String())
+	if msg.Body != nil {
+		sb.WriteString(msg.Body.String())
+	}
 
 	return sb.String()
 }
