@@ -49,7 +49,7 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	if len(line) < minlen {
 		return nil, raw, errors.New("ParseBodyPart: missing boundary line")
 	}
-	if line[len(line)-2] != '\r' {
+	if line[len(line)-2] != cr {
 		return nil, raw, errors.New("ParseBodyPart: invalid boundary line: missing CR")
 	}
 	if !bytes.Equal(line[:2], boundSeps) {
@@ -80,7 +80,7 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 			mime.Content = append(mime.Content, line...)
 			continue
 		}
-		if line[len(line)-2] != '\r' {
+		if line[len(line)-2] != cr {
 			mime.Content = append(mime.Content, line...)
 			continue
 		}
@@ -110,7 +110,8 @@ func (mime *MIME) String() string {
 	if mime.Header != nil {
 		sb.WriteString(mime.Header.String())
 	}
-	sb.WriteString("\r\n")
+	sb.WriteByte(cr)
+	sb.WriteByte(lf)
 	sb.Write(mime.Content)
 
 	return sb.String()

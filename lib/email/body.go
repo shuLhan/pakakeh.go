@@ -79,7 +79,7 @@ func skipPreamble(raw, boundary []byte) []byte {
 		if len(line) < len(boundary)+4 {
 			continue
 		}
-		if line[len(line)-2] != '\r' {
+		if line[len(line)-2] != cr {
 			continue
 		}
 		if !bytes.Equal(line[:2], boundSeps) {

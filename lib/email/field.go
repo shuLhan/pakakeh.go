@@ -103,7 +103,7 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 			if raw[x] == '\t' || raw[x] == ' ' {
 				continue
 			}
-			if raw[x] == '\r' {
+			if raw[x] == cr {
 				x++
 				break
 			}
@@ -111,7 +111,7 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 				goto invalid
 			}
 		}
-		if x == len(raw) || raw[x] != '\n' {
+		if x == len(raw) || raw[x] != lf {
 			goto invalid
 		}
 		if x++; x == len(raw) {
@@ -304,7 +304,7 @@ func (field *Field) unpackDate() (err error) {
 		v              []byte
 		ok             bool
 		c              byte
-		space          = []byte{' ', '\r', '\n'}
+		space          = []byte{' ', cr, lf}
 		day, year      int64
 		hour, min, sec int64
 		off            int64

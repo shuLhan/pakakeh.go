@@ -49,7 +49,8 @@ func (msg *Message) String() string {
 	if msg.Header != nil {
 		sb.WriteString(msg.Header.String())
 	}
-	sb.WriteString("\r\n")
+	sb.WriteByte(cr)
+	sb.WriteByte(lf)
 	if msg.Body != nil {
 		sb.WriteString(msg.Body.String())
 	}

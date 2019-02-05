@@ -43,7 +43,7 @@ func ParseHeader(raw []byte) (hdr *Header, rest []byte, err error) {
 
 	rest = raw
 	for len(rest) >= 2 {
-		if rest[0] == '\r' && rest[1] == '\n' {
+		if rest[0] == cr && rest[1] == lf {
 			rest = rest[2:]
 			return hdr, rest, nil
 		}
