@@ -69,7 +69,7 @@ func ParseBody(raw, boundary []byte) (body *Body, rest []byte, err error) {
 
 func skipPreamble(raw, boundary []byte) []byte {
 	r := &libio.Reader{}
-	r.InitBytes(raw)
+	r.Init(raw)
 
 	for {
 		line := r.ReadLine()

@@ -88,7 +88,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 	}
 
 	r := &libio.Reader{}
-	r.InitBytes(raw)
+	r.Init(raw)
 
 	var (
 		seps    = []byte{'(', ':', '<', '@', '>', ',', ';'}

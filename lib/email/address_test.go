@@ -224,7 +224,7 @@ func TestSkipComment(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		r.InitBytes(c.in)
+		r.Init(c.in)
 
 		r.SkipN(1)
 		_, err := skipComment(r)

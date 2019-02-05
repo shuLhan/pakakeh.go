@@ -317,7 +317,7 @@ func (field *Field) unpackDate() (err error) {
 	}
 
 	r := &libio.Reader{}
-	r.InitBytes(field.Value)
+	r.Init(field.Value)
 
 	c = r.SkipSpace()
 	if !libbytes.IsDigit(c) {

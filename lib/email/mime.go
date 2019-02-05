@@ -33,7 +33,7 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	}
 
 	r := &libio.Reader{}
-	r.InitBytes(raw)
+	r.Init(raw)
 	var (
 		line   []byte
 		minlen = len(boundary) + 2
@@ -69,7 +69,7 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 		return nil, raw, err
 	}
 
-	r.InitBytes(rest)
+	r.Init(rest)
 
 	for {
 		line = r.ReadLine()

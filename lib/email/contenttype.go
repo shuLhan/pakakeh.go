@@ -40,7 +40,7 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 	}
 
 	r := &libio.Reader{}
-	r.InitBytes(raw)
+	r.Init(raw)
 	var c byte
 
 	ct.Top, _, c = r.ReadUntil([]byte{'/'}, nil)
