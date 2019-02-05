@@ -303,7 +303,7 @@ func TestLookup(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "IP", c.exp, got, true)
+		test.Assert(t, "IP", c.exp.String(), got.String(), true)
 	}
 }
 

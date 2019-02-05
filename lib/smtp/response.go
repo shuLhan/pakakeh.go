@@ -47,7 +47,7 @@ func NewResponse(raw []byte) (res *Response, err error) {
 	seps := []byte{'-', ' '}
 	terms := []byte{'\n'}
 
-	reader.Init(string(raw[4:]))
+	reader.Init(raw[4:])
 
 	err = res.parseMessage(reader, isMultiline, terms)
 	if err != nil {
