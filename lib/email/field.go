@@ -181,7 +181,7 @@ func (field *Field) setName(raw []byte) {
 // setValue set the field Value by canonicalizing raw input using "simple" and
 // "relaxed" algorithms.
 //
-// "simple" algorithm store raw field value as is.
+// "simple" algorithm store raw field value as is in oriValue.
 //
 // "relaxed" algorithm remove leading and trailing WSP, replacing all
 // CFWS with single space, but not removing CRLF at end.
@@ -211,7 +211,8 @@ func (field *Field) setValue(raw []byte) {
 		field.Value = append(field.Value, raw[x])
 	}
 	if len(field.Value) > 0 {
-		field.Value = append(field.Value, crlf...)
+		field.Value = append(field.Value, cr)
+		field.Value = append(field.Value, lf)
 	}
 	field.unpacked = false
 }

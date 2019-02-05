@@ -13,7 +13,6 @@ import (
 
 func TestMessageUnpack(t *testing.T) {
 	cases := []struct {
-		desc    string
 		in      string
 		exp     string
 		expErr  string
