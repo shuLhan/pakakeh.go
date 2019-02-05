@@ -233,3 +233,16 @@ func (r *Reader) SkipUntilNewline() {
 func (r *Reader) String() string {
 	return string(r.v[r.p:])
 }
+
+//
+// Unread the buffer N characters and return the character its pointed to.
+// If N greater than, it will reset the pointer index back to zero.
+//
+func (r *Reader) UnreadN(n int) byte {
+	if n > r.p {
+		r.p = 0
+	} else {
+		r.p -= n
+	}
+	return r.v[r.p]
+}
