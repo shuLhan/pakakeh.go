@@ -87,22 +87,22 @@ const (
 // List of code for known DNS query types.
 const (
 	QueryTypeZERO  uint16 = iota // Empty query type.
-	QueryTypeA                   // A host address
-	QueryTypeNS                  // An authoritative name server
-	QueryTypeMD                  // A mail destination (Obsolete - use MX)
-	QueryTypeMF                  // A mail forwarder (Obsolete - use MX)
-	QueryTypeCNAME               // The canonical name for an alias
-	QueryTypeSOA                 // Marks the start of a zone of authority
-	QueryTypeMB                  // A mailbox domain name (EXPERIMENTAL)
-	QueryTypeMG                  // A mail group member (EXPERIMENTAL)
-	QueryTypeMR                  // A mail rename domain name (EXPERIMENTAL)
-	QueryTypeNULL                // A null RR (EXPERIMENTAL)
-	QueryTypeWKS                 // A well known service description
-	QueryTypePTR                 // A domain name pointer
-	QueryTypeHINFO               // Host information
-	QueryTypeMINFO               // Mailbox or mail list information
-	QueryTypeMX                  // Mail exchange
-	QueryTypeTXT                 // (16) Text strings
+	QueryTypeA                   //  1 - A host address
+	QueryTypeNS                  //  2 - An authoritative name server
+	QueryTypeMD                  //  3 - A mail destination (Obsolete - use MX)
+	QueryTypeMF                  //  4 - A mail forwarder (Obsolete - use MX)
+	QueryTypeCNAME               //  5 - The canonical name for an alias
+	QueryTypeSOA                 //  6 - Marks the start of a zone of authority
+	QueryTypeMB                  //  7 - A mailbox domain name (EXPERIMENTAL)
+	QueryTypeMG                  //  8 - A mail group member (EXPERIMENTAL)
+	QueryTypeMR                  //  9 - A mail rename domain name (EXPERIMENTAL)
+	QueryTypeNULL                // 10 - A null RR (EXPERIMENTAL)
+	QueryTypeWKS                 // 11 - A well known service description
+	QueryTypePTR                 // 12 - A domain name pointer
+	QueryTypeHINFO               // 13 - Host information
+	QueryTypeMINFO               // 14 - Mailbox or mail list information
+	QueryTypeMX                  // 15 - Mail exchange
+	QueryTypeTXT                 // 16 - Text strings
 	QueryTypeAAAA  uint16 = 28   // IPv6 address
 	QueryTypeSRV   uint16 = 33   // A SRV RR for locating service.
 	QueryTypeOPT   uint16 = 41   // An OPT pseudo-RR (sometimes called a meta-RR)
