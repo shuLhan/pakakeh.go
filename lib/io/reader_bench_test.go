@@ -9,14 +9,13 @@ import (
 	"testing"
 )
 
-//
 // Before:
 //
-//	BenchmarkReaderReadUntil-4       3000000               395 ns/op          20.22 MB/s          80 B/op          7 allocs/op
+//	BenchmarkReaderReadUntil-4  5000000  247 ns/op  32.35 MB/s  32 B/op  1 allocs/op
 //
 // After:
 //
-//	BenchmarkReaderReadUntil-4       5000000               247 ns/op          32.35 MB/s          32 B/op          1 allocs/op
+//	BenchmarkReaderReadUntil-4  5000000  239 ns/op  33.37 MB/s  32 B/op  1 allocs/op
 //
 func BenchmarkReaderReadUntil(b *testing.B) {
 	r := &Reader{}
@@ -25,31 +24,35 @@ func BenchmarkReaderReadUntil(b *testing.B) {
 	terms := []byte{'\n'}
 
 	b.SetBytes(8)
+	var (
+		tok []byte
+		c   byte
+	)
 
 	for x := 0; x < b.N; x++ {
-		r.InitBytes([]byte("xxx|yyy|zzz|000|111|222"))
+		r.Init([]byte("xxx|yyy|zzz|000|111|222"))
 
-		tok, _, c := r.ReadUntil(seps, terms)
+		tok, _, _ = r.ReadUntil(seps, terms)
 		if !bytes.Equal(tok, []byte("xxx")) {
 			b.Fatal("first token not match!")
 		}
 
-		tok, _, c = r.ReadUntil(seps, terms)
+		tok, _, _ = r.ReadUntil(seps, terms)
 		if !bytes.Equal(tok, []byte("yyy")) {
 			b.Fatal("second token not match!")
 		}
 
-		tok, _, c = r.ReadUntil(seps, terms)
+		tok, _, _ = r.ReadUntil(seps, terms)
 		if !bytes.Equal(tok, []byte("zzz")) {
 			b.Fatal("third token not match!")
 		}
 
-		tok, _, c = r.ReadUntil(seps, terms)
+		tok, _, _ = r.ReadUntil(seps, terms)
 		if !bytes.Equal(tok, []byte("000")) {
 			b.Fatal("fourth token not match!")
 		}
 
-		tok, _, c = r.ReadUntil(seps, terms)
+		tok, _, _ = r.ReadUntil(seps, terms)
 		if !bytes.Equal(tok, []byte("111")) {
 			b.Fatal("fifth token not match!")
 		}

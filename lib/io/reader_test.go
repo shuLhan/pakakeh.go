@@ -59,7 +59,7 @@ func TestReaderScanInt64(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		r.InitBytes(c.src)
+		r.Init(c.src)
 
 		got, gotc := r.ScanInt64()
 
