@@ -4,33 +4,56 @@
 
 package email
 
+import (
+	"strings"
+)
+
 var ( // nolint: gochecknoglobals
 	crlf      = []byte{'\r', '\n'}
 	boundSeps = []byte{'-', '-'}
 )
 
 //
-// Email represent an internet message.
+// Message represent an unpacked internet message format.
 //
-type Email struct {
-	Header Header
-	Body   Body
+type Message struct {
+	Header  Header
+	Body    Body
+	oriBody []byte // oriBody contains original message body.
 }
 
 //
-// Unpack the raw message header and body.
+// ParseMessage parse the raw message header and body.
 //
-func (email *Email) Unpack(raw []byte) ([]byte, error) {
-	var err error
-
-	raw, err = email.Header.Unpack(raw)
-	if err != nil {
-		return raw, err
+func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
+	if len(raw) == 0 {
+		return nil, nil, nil
 	}
 
-	boundary := email.Header.Boundary()
+	msg = &Message{}
 
-	raw, err = email.Body.Unpack(raw, boundary)
+	rest, err = msg.Header.Unpack(raw)
+	if err != nil {
+		return nil, rest, err
+	}
 
-	return raw, err
+	msg.oriBody = rest
+	boundary := msg.Header.Boundary()
+
+	rest, err = msg.Body.Unpack(rest, boundary)
+
+	return msg, rest, err
+}
+
+//
+// String return the text representation of Message object.
+//
+func (msg *Message) String() string {
+	var sb strings.Builder
+
+	sb.WriteString(msg.Header.String())
+	sb.WriteString("\r\n")
+	sb.WriteString(msg.Body.String())
+
+	return sb.String()
 }
