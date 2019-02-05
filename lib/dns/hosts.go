@@ -120,7 +120,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 			break
 		}
 		if c == '#' {
-			reader.SkipUntilNewline()
+			reader.SkipLine()
 			continue
 		}
 
@@ -130,7 +130,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 				break
 			}
 			if c == '#' {
-				reader.SkipUntilNewline()
+				reader.SkipLine()
 			}
 			continue
 		}
@@ -141,7 +141,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 				break
 			}
 			if c == '#' {
-				reader.SkipUntilNewline()
+				reader.SkipLine()
 				break
 			}
 			hname, isTerm, c := reader.ReadUntil(seps, terms)
@@ -156,7 +156,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 					break
 				}
 				if c == '#' {
-					reader.SkipUntilNewline()
+					reader.SkipLine()
 				}
 				break
 			}

@@ -114,7 +114,7 @@ func (m *master) Init(data, origin string, ttl uint32) {
 	if m.reader == nil {
 		m.reader = new(libio.Reader)
 	}
-	m.reader.Init(data)
+	m.reader.Init([]byte(data))
 }
 
 //
@@ -199,7 +199,7 @@ func (m *master) parse() (err error) {
 			break
 		}
 		if c == '\n' || c == ';' {
-			m.reader.SkipUntilNewline()
+			m.reader.SkipLine()
 			m.lineno++
 			continue
 		}
@@ -221,7 +221,7 @@ func (m *master) parse() (err error) {
 		case "$TTL":
 			err = m.parseDirectiveTTL()
 		case "@":
-			rr, err = m.parseRR(nil, []byte(m.origin))
+			rr, err = m.parseRR(nil, tok)
 		default:
 			if n == 0 {
 				rr, err = m.parseRR(nil, tok)
@@ -266,7 +266,7 @@ func (m *master) parseDirectiveOrigin() (err error) {
 
 	if isTerm {
 		if c == ';' {
-			m.reader.SkipUntilNewline()
+			m.reader.SkipLine()
 		}
 		m.lineno++
 	} else {
@@ -275,7 +275,7 @@ func (m *master) parseDirectiveOrigin() (err error) {
 			return nil
 		}
 		if c == ';' {
-			m.reader.SkipUntilNewline()
+			m.reader.SkipLine()
 			m.lineno++
 		} else {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
@@ -311,7 +311,7 @@ func (m *master) parseDirectiveInclude() (err error) {
 	}
 
 	if c == ';' {
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 	} else if c != 0 {
 		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
@@ -323,7 +323,7 @@ func (m *master) parseDirectiveInclude() (err error) {
 				m.file, m.lineno, c, tok)
 		}
 
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 
 		if len(tok) > 0 {
@@ -369,7 +369,7 @@ func (m *master) parseDirectiveTTL() (err error) {
 	}
 
 	if isTerm {
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 	} else {
 		c = m.reader.SkipSpace()
@@ -377,7 +377,7 @@ func (m *master) parseDirectiveTTL() (err error) {
 			return nil
 		}
 		if c == ';' {
-			m.reader.SkipUntilNewline()
+			m.reader.SkipLine()
 			m.lineno++
 		} else {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
@@ -450,7 +450,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			rr.Class = QueryClassIN
 		}
 	} else {
-		rr.Name = prevRR.Name
+		rr.Name = append(rr.Name, prevRR.Name...)
 		rr.TTL = prevRR.TTL
 		rr.Class = prevRR.Class
 
@@ -702,7 +702,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		if isMultiline {
 			c = m.reader.SkipSpace()
 			if c == ';' {
-				m.reader.SkipUntilNewline()
+				m.reader.SkipLine()
 				m.lineno++
 				_ = m.reader.SkipSpace()
 			}
@@ -719,7 +719,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 				m.file, m.lineno, string(tok))
 		}
 		if c == ';' {
-			m.reader.SkipUntilNewline()
+			m.reader.SkipLine()
 			m.lineno++
 			_ = m.reader.SkipSpace()
 		}
@@ -763,7 +763,7 @@ out:
 	if isMultiline {
 		if isTerm {
 			for c == ';' {
-				m.reader.SkipUntilNewline()
+				m.reader.SkipLine()
 				m.lineno++
 				c = m.reader.SkipSpace()
 			}
@@ -782,7 +782,7 @@ out:
 
 		_, _, c = m.reader.ReadUntil(m.seps, m.terms)
 		if c == ';' {
-			m.reader.SkipUntilNewline()
+			m.reader.SkipLine()
 			m.lineno++
 		}
 	}
@@ -815,7 +815,7 @@ func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rr.HInfo.OS = tok
 
 	if !isTerm {
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 	}
 
@@ -843,7 +843,7 @@ func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rr.MInfo.EmailBox = tok
 
 	if !isTerm {
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 	}
 
@@ -875,7 +875,7 @@ func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	rr.MX.Exchange = m.generateDomainName(tok)
 
 	if !isTerm {
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 	}
 
@@ -947,25 +947,27 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 out:
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == ';' {
-		m.reader.SkipUntilNewline()
+		m.reader.SkipLine()
 		m.lineno++
 	}
 
 	return nil
 }
 
-func (m *master) generateDomainName(dname []byte) []byte {
-	if dname[0] == '@' {
-		dname = []byte(m.origin)
-	} else {
-		libbytes.ToLower(&dname)
-		if dname[len(dname)-1] != '.' {
-			dname = append(dname, '.')
-			dname = append(dname, m.origin...)
-		}
+func (m *master) generateDomainName(dname []byte) (out []byte) {
+	libbytes.ToLower(&dname)
+	switch {
+	case dname[0] == '@':
+		out = []byte(m.origin)
+	case dname[len(dname)-1] == '.':
+		out = dname
+	default:
+		out = append(out, dname...)
+		out = append(out, '.')
+		out = append(out, m.origin...)
 	}
-	dname = bytes.TrimRight(dname, ".")
-	return dname
+	out = bytes.TrimRight(out, ".")
+	return out
 }
 
 //
@@ -978,7 +980,6 @@ func (m *master) generateDomainName(dname []byte) []byte {
 //
 func (m *master) push(rr *ResourceRecord) bool {
 	m.lastRR = rr
-
 	for x := 0; x < len(m.msgs); x++ {
 		if !bytes.Equal(m.msgs[x].Question.Name, rr.Name) {
 			continue
