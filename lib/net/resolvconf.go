@@ -125,7 +125,7 @@ func NewResolvConf(path string) (*ResolvConf, error) {
 //
 func (rc *ResolvConf) Init(src string) {
 	reader := new(libio.Reader)
-	reader.Init(src)
+	reader.Init([]byte(src))
 
 	rc.reset()
 
