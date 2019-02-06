@@ -254,6 +254,36 @@ func PrintHex(title string, data []byte, col int) {
 }
 
 //
+// ReadHexByte read two characters from data start from index "x" and convert
+// them to byte.
+//
+func ReadHexByte(data []byte, x int) (b byte, ok bool) {
+	if len(data) < x+2 {
+		return 0, false
+	}
+	var y uint = 4
+	for {
+		switch {
+		case data[x] >= '0' && data[x] <= '9':
+			b |= byte(data[x]-'0') << y
+		case data[x] >= 'A' && data[x] <= 'F':
+			b |= byte(data[x]-('A'-10)) << y
+		case data[x] >= 'a' && data[x] <= 'f':
+			b |= byte(data[x]-('a'-10)) << y
+		default:
+			return b, false
+		}
+		if y == 0 {
+			break
+		}
+		y -= 4
+		x++
+	}
+
+	return b, true
+}
+
+//
 // ReadInt16 will convert two bytes from data start at `x` into int16 and
 // return it.
 //

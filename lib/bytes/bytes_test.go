@@ -164,6 +164,52 @@ func TestIsTokenAt(t *testing.T) {
 	}
 }
 
+func TestReadHexByte(t *testing.T) {
+	cases := []struct {
+		in    []byte
+		exp   byte
+		expOK bool
+	}{{
+		in: []byte{},
+	}, {
+		in: []byte("x0"),
+	}, {
+		in: []byte("0x"),
+	}, {
+		in:    []byte("00"),
+		expOK: true,
+	}, {
+		in:    []byte("01"),
+		exp:   1,
+		expOK: true,
+	}, {
+		in:    []byte("10"),
+		exp:   16,
+		expOK: true,
+	}, {
+		in:    []byte("1A"),
+		exp:   26,
+		expOK: true,
+	}, {
+		in:    []byte("1a"),
+		exp:   26,
+		expOK: true,
+	}, {
+		in:    []byte("a1"),
+		exp:   161,
+		expOK: true,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.in)
+
+		got, ok := ReadHexByte(c.in, 0)
+
+		test.Assert(t, "b", c.exp, got, true)
+		test.Assert(t, "ok", c.expOK, ok, true)
+	}
+}
+
 func TestSkipAfterToken(t *testing.T) {
 	line := []byte(`abc \def ghi`)
 
