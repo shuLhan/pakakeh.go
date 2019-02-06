@@ -57,11 +57,13 @@ func TestHeaderBoundary(t *testing.T) {
 
 func TestParseHeader(t *testing.T) {
 	cases := []struct {
-		desc    string
-		raw     []byte
-		expErr  string
-		exp     string
-		expRest []byte
+		desc       string
+		raw        []byte
+		expErr     string
+		exp        string
+		expRelaxed string
+		expSimple  string
+		expRest    []byte
 	}{{
 		desc: "With empty input",
 	}, {
@@ -81,23 +83,31 @@ func TestParseHeader(t *testing.T) {
 		raw:    []byte("a:\r\n\t"),
 		expErr: "ParseField: invalid input",
 	}, {
-		desc: "With single field",
-		raw:  []byte("a:1\r\n"),
-		exp:  "a:1\r\n",
+		desc:       "With single field",
+		raw:        []byte("a:1\r\n"),
+		exp:        "a:1\r\n",
+		expRelaxed: "a:1\r\n",
+		expSimple:  "a:1\r\n",
 	}, {
-		desc: "With multiple fields",
-		raw:  []byte("a:1\r\nb : 2\r\n"),
-		exp:  "a:1\r\nb:2\r\n",
+		desc:       "With multiple fields",
+		raw:        []byte("a:1\r\nb : 2\r\n"),
+		exp:        "a:1\r\nb:2\r\n",
+		expRelaxed: "a:1\r\nb:2\r\n",
+		expSimple:  "a:1\r\nb : 2\r\n",
 	}, {
-		desc:    "With empty line at the end",
-		raw:     []byte("a:1\r\nb : 2\r\n\r\n"),
-		exp:     "a:1\r\nb:2\r\n",
-		expRest: []byte{},
+		desc:       "With empty line at the end",
+		raw:        []byte("a:1\r\nb : 2\r\n\r\n"),
+		exp:        "a:1\r\nb:2\r\n",
+		expRest:    []byte{},
+		expRelaxed: "a:1\r\nb:2\r\n",
+		expSimple:  "a:1\r\nb : 2\r\n",
 	}, {
-		desc:    "With body",
-		raw:     []byte("a:1\r\nb : 2\r\n\r\nBody."),
-		exp:     "a:1\r\nb:2\r\n",
-		expRest: []byte("Body."),
+		desc:       "With body",
+		raw:        []byte("a:1\r\nb : 2\r\n\r\nBody."),
+		exp:        "a:1\r\nb:2\r\n",
+		expRest:    []byte("Body."),
+		expRelaxed: "a:1\r\nb:2\r\n",
+		expSimple:  "a:1\r\nb : 2\r\n",
 	}}
 
 	for _, c := range cases {
@@ -114,5 +124,8 @@ func TestParseHeader(t *testing.T) {
 
 		test.Assert(t, "Header.String", c.exp, header.String(), true)
 		test.Assert(t, "rest", c.expRest, rest, true)
+
+		test.Assert(t, "Header.Relaxed", []byte(c.expRelaxed), header.Relaxed(), true)
+		test.Assert(t, "Header.Simple", []byte(c.expSimple), header.Simple(), true)
 	}
 }

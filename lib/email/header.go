@@ -5,6 +5,7 @@
 package email
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"strings"
@@ -12,7 +13,6 @@ import (
 
 //
 // Header represent list of field.
-//
 //
 type Header struct {
 	// We are not using map here it to prevent the header being reordeded when
@@ -97,6 +97,40 @@ func (hdr *Header) ContentType() *ContentType {
 		return f.ContentType
 	}
 	return nil
+}
+
+//
+// Relaxed canonicalize the header using "relaxed" algorithm and return it.
+//
+func (hdr *Header) Relaxed() []byte {
+	var bb bytes.Buffer
+
+	for _, f := range hdr.fields {
+		if len(f.Name) > 0 && len(f.Value) > 0 {
+			bb.Write(f.Name)
+			bb.WriteByte(':')
+			bb.Write(f.Value)
+		}
+	}
+
+	return bb.Bytes()
+}
+
+//
+// Simple canonicalize the header using "simple" algorithm and return it.
+//
+func (hdr *Header) Simple() []byte {
+	var bb bytes.Buffer
+
+	for _, f := range hdr.fields {
+		if len(f.oriName) > 0 && len(f.oriValue) > 0 {
+			bb.Write(f.oriName)
+			bb.WriteByte(':')
+			bb.Write(f.oriValue)
+		}
+	}
+
+	return bb.Bytes()
 }
 
 //
