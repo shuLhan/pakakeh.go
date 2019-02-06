@@ -321,7 +321,7 @@ Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig</pre>
 ptext       = hex-octet / safe-char
 
 hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
-            ; Octet must be used for characters &gt; 127, =,
+            ; Octet MUST be used for characters &gt; 127, =,
             ; SPACEs or TABs at the ends of lines, and is
             ; recommended for any character not listed in
             ; RFC 2049 as "mail-safe".
@@ -350,7 +350,7 @@ several important ways:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Whitespace in the input text, including CR and LF, must be encoded.
+<p>Whitespace in the input text, including CR and LF, MUST be encoded.
 [RFC2045] does not require such encoding, and does not permit encoding of
 CR or LF characters that are part of a CRLF line break.</p>
 </li>
@@ -463,8 +463,7 @@ that separates tag-specs.</p>
 description of semantics specifies case insensitivity.</p>
 </li>
 <li>
-<p>Tags with duplicate names MUST NOT occur within a single tag-list;
-if a tag name does occur more than once, the entire tag-list is invalid.</p>
+<p>Tags MUST NOT duplicate, otherwise entire tags list is invalid.</p>
 </li>
 <li>
 <p>Whitespace within a value MUST be retained unless explicitly excluded
@@ -478,9 +477,8 @@ aid legibility.</p>
 <p>Unrecognized tags MUST be ignored.</p>
 </li>
 <li>
-<p>Tags that have an empty value are not the same as omitted tags.
-An omitted tag is treated as having the default value; a tag with an empty
-value explicitly designates the empty string as the value.</p>
+<p>Tag with an empty value explicitly designates the empty string as the
+value.</p>
 </li>
 </ul>
 </div>
@@ -865,8 +863,7 @@ to conform to line-length limits.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>sig-c-tag       = %x63 [FWS] "=" [FWS] sig-c-tag-alg
-                  ["/" sig-c-tag-alg]
+<pre>sig-c-tag       = %x63 [FWS] "=" [FWS] sig-c-tag-alg ["/" sig-c-tag-alg]
 sig-c-tag-alg   = "simple" / "relaxed" / x-sig-c-tag-alg
 x-sig-c-tag-alg = hyphenated-word
                 ; for later extension</pre>
@@ -1052,12 +1049,10 @@ body and omit the body length count.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>sig-q-tag        = %x71 [FWS] "=" [FWS] sig-q-tag-method
-                       *([FWS] ":" [FWS] sig-q-tag-method)
-sig-q-tag-method = "dns/txt" / x-sig-q-tag-type
-                       ["/" x-sig-q-tag-args]
-x-sig-q-tag-type = hyphenated-word  ; for future extension
-x-sig-q-tag-args = qp-hdr-value</pre>
+<pre>sig-q-tag   = %x71 [FWS] "=" [FWS] qmethod *([FWS] ":" [FWS] qmethod )
+qmethod     = "dns/txt" / qtype ["/" qoption]
+qtype       = hyphenated-word  ; for future extension
+qoption     = qp-hdr-value</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1232,13 +1227,13 @@ signing.</p>
 <p>This field need not contain the same header fields listed in the "h=" tag.</p>
 </li>
 <li>
-<p>The header field text itself must encode the vertical bar ("|", %x7C)
+<p>The header field text itself MUST encode the vertical bar ("|", %x7C)
 character (i.e., vertical bars in the "z=" text are meta-characters, and
-any actual vertical bar characters in a copied header field must be
+any actual vertical bar characters in a copied header field MUST be
 encoded).</p>
 </li>
 <li>
-<p>All whitespace must be encoded, including whitespace between the colon and
+<p>All whitespace MUST be encoded, including whitespace between the colon and
 the header field value.</p>
 </li>
 <li>
@@ -1305,7 +1300,7 @@ not understand them.</p>
 <p>Records beginning with a "v=" tag with any other value MUST be discarded.</p>
 </li>
 <li>
-<p>Verifiers must do a string comparison on this value; for example, "DKIM1"
+<p>Verifiers MUST do a string comparison on this value; for example, "DKIM1"
 is not the same as "DKIM1.0"</p>
 </li>
 </ul>
@@ -1420,7 +1415,7 @@ with a selector referencing a revoked key.</p>
 </li>
 <li>
 <p>A base64string is permitted to include whitespace (FWS) at arbitrary
-places; however, any CRLFs must be followed by at least one WSP character.</p>
+places; however, any CRLFs MUST be followed by at least one WSP character.</p>
 </li>
 <li>
 <p>Implementers and administrators are cautioned to ensure that selector TXT
@@ -1721,8 +1716,16 @@ relevant message format standards.</p>
 <div class="sect2">
 <h3 id="_output_requirements">4.4. Output Requirements</h3>
 <div class="paragraph">
-<p>The evaluation of each signature ends in one of three states,</p>
+<p>For each signature verifying result, output of the DKIM algorithm MUST include
+the set of:</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>The SDID tag value</p>
+</li>
+<li>
+<p>The result of each signature, which ends in one of three states,</p>
 <div class="ulist">
 <ul>
 <li>
@@ -1737,17 +1740,6 @@ verification failure</p>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>For each signature that verifies successfully or produces a TEMPFAIL result,
-output of the DKIM algorithm MUST include the set of:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The domain name, taken from the "d=" signature tag; and</p>
-</li>
-<li>
-<p>The result of the verification attempt for that signature.</p>
 </li>
 </ul>
 </div>
@@ -1894,7 +1886,7 @@ though they were not present in the message.</p>
 <ul>
 <li>
 <p>SUBMISSION servers might only sign messages from users that are properly
-authenticated and authorized.a</p>
+authenticated and authorized.</p>
 </li>
 <li>
 <p>SUBMISSION servers should not sign Received header fields if the outgoing
@@ -2540,7 +2532,7 @@ reference selectors with public keys having unreasonable exponents.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-05 10:11:18 +0700
+Last updated 2019-02-06 17:23:19 +0700
 </div>
 </div>
 </body>

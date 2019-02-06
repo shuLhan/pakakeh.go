@@ -191,7 +191,7 @@ qp-section  = [*(ptext / SPACE / TAB) ptext]
 ptext       = hex-octet / safe-char
 
 hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
-            ; Octet must be used for characters > 127, =,
+            ; Octet MUST be used for characters > 127, =,
             ; SPACEs or TABs at the ends of lines, and is
             ; recommended for any character not listed in
             ; RFC 2049 as "mail-safe".
@@ -214,7 +214,7 @@ dkim-safe-char        =  %x21-3A / %x3C / %x3E-7E
 DKIM-Quoted-Printable differs from Quoted-Printable as defined in [RFC2045] in
 several important ways:
 
-.  Whitespace in the input text, including CR and LF, must be encoded.
+.  Whitespace in the input text, including CR and LF, MUST be encoded.
    [RFC2045] does not require such encoding, and does not permit encoding of
    CR or LF characters that are part of a CRLF line break.
 
@@ -297,8 +297,7 @@ ALNUMPUNC =  ALPHA / DIGIT / "_"
 *  Values MUST be processed as case sensitive unless the specific tag
    description of semantics specifies case insensitivity.
 
-*  Tags with duplicate names MUST NOT occur within a single tag-list;
-   if a tag name does occur more than once, the entire tag-list is invalid.
+*  Tags MUST NOT duplicate, otherwise entire tags list is invalid.
 
 *  Whitespace within a value MUST be retained unless explicitly excluded
    by the specific tag description.
@@ -308,9 +307,8 @@ ALNUMPUNC =  ALPHA / DIGIT / "_"
 
 *  Unrecognized tags MUST be ignored.
 
-*  Tags that have an empty value are not the same as omitted tags.
-   An omitted tag is treated as having the default value; a tag with an empty
-   value explicitly designates the empty string as the value.
+*  Tag with an empty value explicitly designates the empty string as the
+   value.
 
 ===  Signing and Verification Algorithms
 
@@ -559,8 +557,7 @@ tag.
 *c=* (plain-text; OPTIONAL, default is "simple/simple")
 
 ....
-sig-c-tag       = %x63 [FWS] "=" [FWS] sig-c-tag-alg
-                  ["/" sig-c-tag-alg]
+sig-c-tag       = %x63 [FWS] "=" [FWS] sig-c-tag-alg ["/" sig-c-tag-alg]
 sig-c-tag-alg   = "simple" / "relaxed" / x-sig-c-tag-alg
 x-sig-c-tag-alg = hyphenated-word
                 ; for later extension
@@ -692,12 +689,10 @@ preceding the body.
 *q=* (plain-text; OPTIONAL)
 
 ....
-sig-q-tag        = %x71 [FWS] "=" [FWS] sig-q-tag-method
-                       *([FWS] ":" [FWS] sig-q-tag-method)
-sig-q-tag-method = "dns/txt" / x-sig-q-tag-type
-                       ["/" x-sig-q-tag-args]
-x-sig-q-tag-type = hyphenated-word  ; for future extension
-x-sig-q-tag-args = qp-hdr-value
+sig-q-tag   = %x71 [FWS] "=" [FWS] qmethod *([FWS] ":" [FWS] qmethod )
+qmethod     = "dns/txt" / qtype ["/" qoption]
+qtype       = hyphenated-word  ; for future extension
+qoption     = qp-hdr-value
 ....
 
 A colon-separated list of query methods used to retrieve the public key.
@@ -813,12 +808,12 @@ Copied header fields.
 
 *  This field need not contain the same header fields listed in the "h=" tag.
 
-*  The header field text itself must encode the vertical bar ("|", %x7C)
+*  The header field text itself MUST encode the vertical bar ("|", %x7C)
    character (i.e., vertical bars in the "z=" text are meta-characters, and
-   any actual vertical bar characters in a copied header field must be
+   any actual vertical bar characters in a copied header field MUST be
    encoded).
 
-*  All whitespace must be encoded, including whitespace between the colon and
+*  All whitespace MUST be encoded, including whitespace between the colon and
    the header field value.
 
 *  After encoding, FWS MAY be added at arbitrary locations in order to avoid
@@ -871,7 +866,7 @@ Version of the DKIM key record.
 
 *  Records beginning with a "v=" tag with any other value MUST be discarded.
 
-*  Verifiers must do a string comparison on this value; for example, "DKIM1"
+*  Verifiers MUST do a string comparison on this value; for example, "DKIM1"
 is not the same as "DKIM1.0"
 
 *h=* (plain-text; OPTIONAL, defaults to allowing all algorithms)
@@ -946,7 +941,7 @@ Public-key data.
    with a selector referencing a revoked key.
 
 *  A base64string is permitted to include whitespace (FWS) at arbitrary
-   places; however, any CRLFs must be followed by at least one WSP character.
+   places; however, any CRLFs MUST be followed by at least one WSP character.
 
 *  Implementers and administrators are cautioned to ensure that selector TXT
   RRs conform to this specification.
@@ -1123,21 +1118,19 @@ relevant message format standards.
 
 ===  Output Requirements
 
-The evaluation of each signature ends in one of three states,
+For each signature verifying result, output of the DKIM algorithm MUST include
+the set of:
 
-*  SUCCESS:  a successful verification
+*  The SDID tag value
 
-*  PERMFAIL:  a permanent, non-recoverable error such as a signature
-   verification failure
+*  The result of each signature, which ends in one of three states,
 
-*  TEMPFAIL:  a temporary, recoverable error such as a DNS query timeout
+**  SUCCESS:  a successful verification
 
-For each signature that verifies successfully or produces a TEMPFAIL result,
-output of the DKIM algorithm MUST include the set of:
+**  PERMFAIL:  a permanent, non-recoverable error such as a signature
+    verification failure
 
-*  The domain name, taken from the "d=" signature tag; and
-
-*  The result of the verification attempt for that signature.
+**  TEMPFAIL:  a temporary, recoverable error such as a DNS query timeout
 
 The output MAY include other signature properties or result meta-data,
 including PERMFAILed or otherwise ignored signatures, for use by modules
@@ -1243,7 +1236,7 @@ The following steps are performed in order by Signers.
 ===  Determine Whether the Email Should Be Signed and by Whom
 
 *  SUBMISSION servers might only sign messages from users that are properly
-   authenticated and authorized.a
+   authenticated and authorized.
 
 *  SUBMISSION servers should not sign Received header fields if the outgoing
    gateway MTA obfuscates Received header fields, for example, to hide the
