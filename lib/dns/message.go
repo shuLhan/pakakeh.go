@@ -85,6 +85,19 @@ func NewMessage() *Message {
 	}
 }
 
+//
+// FilterAnswers return resource record in Answer that match only with
+// specific query type.
+//
+func (msg *Message) FilterAnswers(t uint16) (answers []*ResourceRecord) {
+	for _, rr := range msg.Answer {
+		if rr.Type == t {
+			answers = append(answers, rr)
+		}
+	}
+	return
+}
+
 func (msg *Message) compress() bool {
 	off, ok := msg.dnameOff[msg.dname]
 	if ok {
