@@ -6,6 +6,7 @@ package dns
 
 import (
 	"net"
+	"sync"
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -13,14 +14,16 @@ import (
 )
 
 //
-// UDPClient for DNS with UDP connection and list of remote addresses.
+// UDPClient for DNS with UDP connection.
+//
+// Any implementation that need to query DNS message in multiple Go routines
+// should create one client per routine.
 //
 type UDPClient struct {
 	Timeout time.Duration
-
-	// Address of remote nameserver.
-	Addr *net.UDPAddr
-	Conn *net.UDPConn
+	Addr    *net.UDPAddr // Addr contains address of remote nameserver.
+	Conn    *net.UDPConn
+	sync.Mutex
 }
 
 //
@@ -105,8 +108,11 @@ func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 		ns = cl.Addr
 	}
 
+	cl.Lock()
+
 	_, err := cl.Send(msg, ns)
 	if err != nil {
+		cl.Unlock()
 		return nil, err
 	}
 
@@ -114,8 +120,11 @@ func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 
 	_, err = cl.Recv(res)
 	if err != nil {
+		cl.Unlock()
 		return nil, err
 	}
+
+	cl.Unlock()
 
 	err = res.Unpack()
 	if err != nil {
