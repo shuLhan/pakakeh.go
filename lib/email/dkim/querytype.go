@@ -16,6 +16,10 @@ const (
 	QueryTypeDNS QueryType = iota // "dns" (default)
 )
 
-var queryTypeNames = map[QueryType][]byte{
+//
+// queryTypeNames contains a mapping betweend query type and their text
+// representation.
+//
+var queryTypeNames = map[QueryType][]byte{ // nolint: gochecknoglobals
 	QueryTypeDNS: []byte("dns"),
 }

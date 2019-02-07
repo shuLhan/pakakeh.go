@@ -20,7 +20,7 @@ const (
 //
 // signAlgNames contains mapping between known algorithm type and their names.
 //
-var signAlgNames = map[SignAlg][]byte{
+var signAlgNames = map[SignAlg][]byte{ // nolint: gochecknoglobals
 	SignAlgRS256: []byte("rsa-sha256"),
 	SignAlgRS1:   []byte("rsa-sha1"),
 }

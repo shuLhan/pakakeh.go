@@ -21,7 +21,7 @@ const (
 // canonNames contains mapping between canonical type and their human
 // readabale names.
 //
-var canonNames = map[Canon][]byte{
+var canonNames = map[Canon][]byte{ // nolint: gochecknoglobals
 	CanonSimple:  []byte("simple"),
 	CanonRelaxed: []byte("relaxed"),
 }

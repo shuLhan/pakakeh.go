@@ -16,6 +16,10 @@ const (
 	QueryOptionTXT QueryOption = iota // "txt" (default)
 )
 
-var queryOptionNames = map[QueryOption][]byte{
+//
+// queryOptionNames contains a mapping between query option and their text
+// representation.
+//
+var queryOptionNames = map[QueryOption][]byte{ // nolint: gochecknoglobals
 	QueryOptionTXT: []byte("txt"),
 }
