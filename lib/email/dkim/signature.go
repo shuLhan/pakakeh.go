@@ -89,10 +89,9 @@ type Signature struct {
 	// ("l=", text, OPTIONAL).
 	BodyLength *uint64
 
-	// QType and QOption define a method used to retrieve the public keys.
+	// QMethod define a type and option used to retrieve the public keys.
 	// ("q=type/option", text, OPTIONAL).  Default is "dns/txt".
-	QType   *QueryType
-	QOption *QueryOption
+	QMethod *QueryMethod
 
 	// raw contains original Signature field value, for Simple
 	// canonicalization.
@@ -147,12 +146,10 @@ func Parse(value []byte) (sig *Signature, err error) {
 func (sig *Signature) Relaxed() []byte {
 	var bb bytes.Buffer
 
-	_, _ = fmt.Fprintf(&bb, "v=%s; a=%s; d=%s; s=%s;\r\n"+
-		"\th=%s;\r\n\tbh=%s;\r\n\tb=%s;\r\n",
+	_, _ = fmt.Fprintf(&bb, "v=%s; a=%s; d=%s; s=%s;\r\n\t"+
+		"h=%s;\r\n\tbh=%s;\r\n\tb=%s;\r\n\t",
 		sig.Version, signAlgNames[*sig.Alg], sig.SDID, sig.Selector,
 		bytes.Join(sig.Headers, sepHeaders), sig.BodyHash, sig.Value)
-
-	bb.WriteByte('\t')
 
 	if sig.CreatedAt > 0 {
 		_, _ = fmt.Fprintf(&bb, "t=%d; ", sig.CreatedAt)
@@ -165,19 +162,17 @@ func (sig *Signature) Relaxed() []byte {
 		_, _ = fmt.Fprintf(&bb, "c=%s", canonNames[*sig.CanonHeader])
 
 		if sig.CanonBody != nil {
-			_, _ = fmt.Fprintf(&bb, "/%s;\r\n",
+			_, _ = fmt.Fprintf(&bb, "/%s;\r\n\t",
 				canonNames[*sig.CanonBody])
 		} else {
-			bb.WriteString(";\r\n")
+			bb.WriteString(";\r\n\t")
 		}
 	}
 
 	if len(sig.PresentHeaders) > 0 {
-		_, _ = fmt.Fprintf(&bb, "\tz=%s;\r\n",
+		_, _ = fmt.Fprintf(&bb, "z=%s;\r\n\t",
 			bytes.Join(sig.PresentHeaders, []byte{'|', '\r', '\n', '\t', ' '}))
 	}
-
-	bb.WriteByte('\t')
 
 	if len(sig.AUID) > 0 {
 		_, _ = fmt.Fprintf(&bb, "i=%s; ", sig.AUID)
@@ -185,10 +180,10 @@ func (sig *Signature) Relaxed() []byte {
 	if sig.BodyLength != nil {
 		_, _ = fmt.Fprintf(&bb, "l=%d; ", *sig.BodyLength)
 	}
-	if sig.QType != nil && sig.QOption != nil {
+	if sig.QMethod != nil {
 		_, _ = fmt.Fprintf(&bb, "q=%s/%s;\r\n",
-			queryTypeNames[*sig.QType],
-			queryOptionNames[*sig.QOption])
+			queryTypeNames[sig.QMethod.Type],
+			queryOptionNames[sig.QMethod.Option])
 	} else {
 		bb.WriteString("\r\n")
 	}
@@ -420,8 +415,7 @@ func (sig *Signature) setQueryMethods(v []byte) {
 		}
 		err := sig.setQueryMethod(qtype, qopt)
 		if err != nil {
-			sig.QType = nil
-			sig.QOption = nil
+			sig.QMethod = nil
 			// Ignore error, use default query method.
 		}
 	}
@@ -434,10 +428,13 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 	if len(qtype) == 0 {
 		return nil
 	}
+
+	sig.QMethod = &QueryMethod{}
+
 	found := false
 	for k, typ := range queryTypeNames {
 		if bytes.Equal(qtype, typ) {
-			sig.QType = &k
+			sig.QMethod.Type = k
 			found = true
 			break
 		}
@@ -452,7 +449,7 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 	found = false
 	for k, opt := range queryOptionNames {
 		if bytes.Equal(qopt, opt) {
-			sig.QOption = &k
+			sig.QMethod.Option = k
 			found = true
 			break
 		}
