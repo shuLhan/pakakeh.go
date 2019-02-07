@@ -12,12 +12,6 @@ import (
 	"time"
 )
 
-var (
-	sepHeaders        = []byte{':'}
-	sepMethods        = []byte{':'}
-	sepPresentHeaders = []byte{'|'}
-)
-
 //
 // Signature represents the value of DKIM-Signature header field tag.
 //
@@ -149,7 +143,7 @@ func (sig *Signature) Relaxed() []byte {
 	_, _ = fmt.Fprintf(&bb, "v=%s; a=%s; d=%s; s=%s;\r\n\t"+
 		"h=%s;\r\n\tbh=%s;\r\n\tb=%s;\r\n\t",
 		sig.Version, signAlgNames[*sig.Alg], sig.SDID, sig.Selector,
-		bytes.Join(sig.Headers, sepHeaders), sig.BodyHash, sig.Value)
+		bytes.Join(sig.Headers, sepColon), sig.BodyHash, sig.Value)
 
 	if sig.CreatedAt > 0 {
 		_, _ = fmt.Fprintf(&bb, "t=%d; ", sig.CreatedAt)
@@ -233,7 +227,6 @@ func (sig *Signature) Verify() (err error) {
 
 	found := false
 	for x := 0; x < len(sig.Headers); x++ {
-		fmt.Printf("h[%d]=%s\n", x, sig.Headers[x])
 		if bytes.EqualFold(sig.Headers[x], []byte("from")) {
 			found = true
 			break
@@ -265,7 +258,6 @@ func (sig *Signature) Verify() (err error) {
 		if len(bb) != 2 {
 			return fmt.Errorf("dkim: missing AUID domain: '%s'", sig.AUID)
 		}
-		fmt.Printf("AUID domain: %s\n", bb[1])
 		if !bytes.HasSuffix(bb[1], sig.SDID) {
 			return fmt.Errorf("dkim: invalid AUID: '%s'", sig.AUID)
 		}
@@ -291,6 +283,7 @@ func (sig *Signature) set(t *tag) (err error) {
 	case tagAlg:
 		for k, name := range signAlgNames {
 			if bytes.Equal(t.value, name) {
+				k := k
 				sig.Alg = &k
 				return nil
 			}
@@ -301,7 +294,7 @@ func (sig *Signature) set(t *tag) (err error) {
 		sig.SDID = t.value
 
 	case tagHeaders:
-		sig.Headers = bytes.Split(t.value, sepHeaders)
+		sig.Headers = bytes.Split(t.value, sepColon)
 
 	case tagSelector:
 		sig.Selector = t.value
@@ -322,7 +315,7 @@ func (sig *Signature) set(t *tag) (err error) {
 		err = sig.setCanons(t.value)
 
 	case tagPresentHeaders:
-		sig.PresentHeaders = bytes.Split(t.value, sepPresentHeaders)
+		sig.PresentHeaders = bytes.Split(t.value, sepVBar)
 
 	case tagAUID:
 		sig.AUID = t.value
@@ -357,7 +350,7 @@ func (sig *Signature) setCanons(v []byte) (err error) {
 		canonHeader = canons[0]
 		canonBody = canons[1]
 	default:
-		err = fmt.Errorf("dkim: invalid canonicalization: '%s'", v)
+		return fmt.Errorf("dkim: invalid canonicalization: '%s'", v)
 	}
 
 	t, err := parseCanonValue(canonHeader)
@@ -388,6 +381,7 @@ func parseCanonValue(v []byte) (*Canon, error) {
 	}
 	for k, cname := range canonNames {
 		if bytes.Equal(v, cname) {
+			k := k
 			return &k, nil
 		}
 	}
@@ -399,7 +393,7 @@ func parseCanonValue(v []byte) (*Canon, error) {
 // based on first match.
 //
 func (sig *Signature) setQueryMethods(v []byte) {
-	methods := bytes.Split(v, sepMethods)
+	methods := bytes.Split(v, sepColon)
 
 	for _, m := range methods {
 		var qtype, qopt []byte

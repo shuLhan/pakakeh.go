@@ -18,29 +18,53 @@ type tagKey int
 //
 const (
 	tagUnknown tagKey = 0
+
+	// Tags in DKIM-Signature field value, ordered by priority.
+
 	// Required tags.
-	tagVersion tagKey = 1 << iota
-	tagAlg
-	tagSDID
-	tagSelector
-	tagHeaders
-	tagBodyHash
-	tagSignature
+	tagVersion   tagKey = 1 << iota // v=
+	tagAlg                          // a=
+	tagSDID                         // d=
+	tagSelector                     // s=
+	tagHeaders                      // h=
+	tagBodyHash                     // bh=
+	tagSignature                    // b=
 	// Recommended tags.
-	tagCreatedAt
-	tagExpiredAt
+	tagCreatedAt // t=
+	tagExpiredAt // x=
 	// Optional tags.
-	tagCanon
-	tagPresentHeaders
-	tagAUID
-	tagBodyLength
-	tagQueryMethod
+	tagCanon          // c=
+	tagPresentHeaders // z=
+	tagAUID           // i=
+	tagBodyLength     // l=
+	tagQueryMethod    // q=
+
+	// Tags in DNS TXT record.
+
+	// Required tags.
+	tagDNSPublicKey // p=
+	// Optional tags.
+	tagDNSKeyType // k=
+	tagDNSNotes   // n=
+)
+
+//
+// Mapping between tag in DKIM-Signature and tag in DKIM domain record,
+// since both have the same text representation.
+//
+const (
+	// Recommended tags.
+	tagDNSVersion tagKey = tagVersion // v=
+	// Optional tags.
+	tagDNSHashAlgs = tagHeaders   // h=
+	tagDNSServices = tagSelector  // s=
+	tagDNSFlags    = tagCreatedAt // t=
 )
 
 //
 // Mapping between tag key in numeric and their human readable form.
 //
-var tagKeys = map[tagKey][]byte{
+var tagKeys = map[tagKey][]byte{ // nolint: gochecknoglobals
 	tagVersion:        []byte("v"),
 	tagAlg:            []byte("a"),
 	tagSDID:           []byte("d"),
@@ -55,6 +79,10 @@ var tagKeys = map[tagKey][]byte{
 	tagAUID:           []byte("i"),
 	tagBodyLength:     []byte("l"),
 	tagQueryMethod:    []byte("q"),
+
+	tagDNSPublicKey: []byte("p"),
+	tagDNSKeyType:   []byte("k"),
+	tagDNSNotes:     []byte("n"),
 }
 
 //
