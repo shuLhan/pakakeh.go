@@ -11,6 +11,7 @@ import (
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -29,10 +30,13 @@ type UDPClient struct {
 //
 // NewUDPClient will create new DNS client with UDP network connection.
 //
+// The nameserver contains the IP address, not host name, of parent DNS
+// server.  Default port is 53, if not set.
+//
 func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 	network := "udp"
 
-	raddr, err := net.ResolveUDPAddr(network, nameserver)
+	remoteIP, remotePort, err := libnet.ParseIPPort(nameserver, DefaultPort)
 	if err != nil {
 		return
 	}
@@ -45,8 +49,11 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 
 	cl = &UDPClient{
 		Timeout: clientTimeout,
-		Addr:    raddr,
-		Conn:    conn,
+		Addr: &net.UDPAddr{
+			IP:   remoteIP,
+			Port: int(remotePort),
+		},
+		Conn: conn,
 	}
 
 	return

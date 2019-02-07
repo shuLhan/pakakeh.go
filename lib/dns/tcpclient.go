@@ -10,6 +10,7 @@ import (
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -24,12 +25,18 @@ type TCPClient struct {
 //
 // NewTCPClient will create new DNS client with TCP network connection.
 //
+// The nameserver contains the IP address, not host name, of parent DNS
+// server.  Default port is 53, if not set.
+//
 func NewTCPClient(nameserver string) (*TCPClient, error) {
-	network := "tcp"
-
-	raddr, err := net.ResolveTCPAddr(network, nameserver)
+	remoteIP, remotePort, err := libnet.ParseIPPort(nameserver, DefaultPort)
 	if err != nil {
 		return nil, err
+	}
+
+	raddr := &net.TCPAddr{
+		IP:   remoteIP,
+		Port: int(remotePort),
 	}
 
 	cl := &TCPClient{
