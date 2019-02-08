@@ -4,6 +4,11 @@
 
 package dkim
 
+import (
+	"bytes"
+	"fmt"
+)
+
 //
 // Canon define type of canonicalization algorithm.
 //
@@ -24,4 +29,54 @@ const (
 var canonNames = map[Canon][]byte{ // nolint: gochecknoglobals
 	CanonSimple:  []byte("simple"),
 	CanonRelaxed: []byte("relaxed"),
+}
+
+//
+// unpackCanons unpack Signature canonicalization algorithms.
+//
+func unpackCanons(v []byte) (canonHeader, canonBody *Canon, err error) {
+	var vHeader, vBody []byte
+
+	canons := bytes.Split(v, sepSlash)
+
+	switch len(canons) {
+	case 0:
+	case 1:
+		vHeader = canons[0]
+	case 2:
+		vHeader = canons[0]
+		vBody = canons[1]
+	default:
+		err = fmt.Errorf("dkim: invalid canonicalization: '%s'", v)
+		return nil, nil, err
+	}
+
+	canonHeader, err = parseCanonValue(vHeader)
+	if err != nil {
+		return nil, nil, err
+	}
+	if canonHeader != nil {
+		canonBody, err = parseCanonValue(vBody)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return canonHeader, canonBody, nil
+}
+
+//
+// parseCanonValue parse canonicalization name and return their numeric type.
+//
+func parseCanonValue(v []byte) (*Canon, error) {
+	if len(v) == 0 {
+		return nil, nil
+	}
+	for k, cname := range canonNames {
+		if bytes.Equal(v, cname) {
+			k := k
+			return &k, nil
+		}
+	}
+	return nil, fmt.Errorf("dkim: invalid canonicalization: '%s'", v)
 }

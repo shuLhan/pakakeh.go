@@ -331,7 +331,7 @@ func (sig *Signature) set(t *tag) (err error) {
 		err = sig.verifyTime()
 
 	case tagCanon:
-		err = sig.setCanons(t.value)
+		sig.CanonHeader, sig.CanonBody, err = unpackCanons(t.value)
 
 	case tagPresentHeaders:
 		z := bytes.Split(t.value, sepVBar)
@@ -355,61 +355,6 @@ func (sig *Signature) set(t *tag) (err error) {
 	}
 
 	return err
-}
-
-//
-// setCanons set Signature canonicalization algorithm for header and body
-// based on text in "v".
-//
-func (sig *Signature) setCanons(v []byte) (err error) {
-	var canonHeader, canonBody []byte
-
-	canons := bytes.Split(v, sepSlash)
-
-	switch len(canons) {
-	case 0:
-	case 1:
-		canonHeader = canons[0]
-	case 2:
-		canonHeader = canons[0]
-		canonBody = canons[1]
-	default:
-		return fmt.Errorf("dkim: invalid canonicalization: '%s'", v)
-	}
-
-	t, err := parseCanonValue(canonHeader)
-	if err != nil {
-		return err
-	}
-	if t != nil {
-		sig.CanonHeader = t
-
-		t, err = parseCanonValue(canonBody)
-		if err != nil {
-			return err
-		}
-		if t != nil {
-			sig.CanonBody = t
-		}
-	}
-
-	return nil
-}
-
-//
-// parseCanonValue parse canonicalization name and return their numeric type.
-//
-func parseCanonValue(v []byte) (*Canon, error) {
-	if len(v) == 0 {
-		return nil, nil
-	}
-	for k, cname := range canonNames {
-		if bytes.Equal(v, cname) {
-			k := k
-			return &k, nil
-		}
-	}
-	return nil, fmt.Errorf("dkim: invalid canonicalization: '%s'", v)
 }
 
 //
