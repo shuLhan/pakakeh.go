@@ -6,7 +6,11 @@ package dkim
 
 import (
 	"bytes"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/shuLhan/share/lib/dns"
 )
@@ -52,6 +56,13 @@ type Key struct {
 	// Flags contains list of flags.
 	// ("t=", plain-text colon-separated, OPTIONAL, default is no flags set)
 	Flags []KeyFlag
+
+	// RSA contains parsed Public key.
+	RSA *rsa.PublicKey
+
+	// ExpiredAt define time when the key will be expired.
+	// This is a local value derived from lookup time + RR TTL.
+	ExpiredAt int64
 }
 
 //
@@ -72,7 +83,7 @@ func LookupKey(qmethod QueryMethod, sdid, selector []byte) (key *Key, err error)
 //
 // ParseTXT parse DNS TXT resource record into Key.
 //
-func ParseTXT(txt []byte) (key *Key, err error) {
+func ParseTXT(txt []byte, ttl uint32) (key *Key, err error) {
 	p := newParser(txt)
 
 	key = &Key{}
@@ -89,6 +100,8 @@ func ParseTXT(txt []byte) (key *Key, err error) {
 			return nil, err
 		}
 	}
+
+	key.ExpiredAt = time.Now().Unix() + int64(ttl)
 
 	return key, nil
 }
@@ -142,7 +155,7 @@ func lookupDNSTXT(sdid, selector []byte) (key *Key, err error) {
 
 	txt := answers[0].RData().([]byte)
 
-	return ParseTXT(txt)
+	return ParseTXT(txt, answers[0].TTL)
 }
 
 func newDNSClientPool() (err error) {
@@ -215,6 +228,18 @@ func (key *Key) set(t *tag) (err error) {
 	}
 	switch t.key {
 	case tagDNSPublicKey:
+		pkey, err := base64.RawStdEncoding.DecodeString(string(t.value))
+		if err != nil {
+			err = fmt.Errorf("dkim: error decode public key: " + err.Error())
+			return err
+		}
+		pk, err := x509.ParsePKIXPublicKey(pkey)
+		if err != nil {
+			err = fmt.Errorf("dkim: error parsing public key: " + err.Error())
+			return err
+		}
+
+		key.RSA = pk.(*rsa.PublicKey)
 		key.Public = t.value
 
 	case tagDNSVersion:
