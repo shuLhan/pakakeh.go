@@ -131,16 +131,33 @@ func (t *tag) setValue(val []byte) (err error) {
 	if len(val) == 0 {
 		return nil
 	}
+	var (
+		isBase64 bool
+		b64      = make([]byte, 0, len(val))
+	)
+	if t.key == tagSignature || t.key == tagBodyHash || t.key == tagDNSPublicKey {
+		isBase64 = true
+	}
 	for x := 0; x < len(val); x++ {
-		if libbytes.IsSpace(val[x]) {
+		switch {
+		case libbytes.IsSpace(val[x]):
 			continue
-		}
-		if val[x] < 0x21 || val[x] == 0x3B || val[x] > 0x7E {
-			return fmt.Errorf("dkim: invalid value: '%s'", val)
+		case val[x] < 0x21 || val[x] == 0x3B || val[x] > 0x7E:
+			if !isBase64 {
+				return fmt.Errorf("dkim: invalid value: '%s'", val)
+			}
+		default:
+			if isBase64 {
+				b64 = append(b64, val[x])
+			}
 		}
 	}
 
-	t.value = val
+	if isBase64 {
+		t.value = b64
+	} else {
+		t.value = val
+	}
 
 	return nil
 }
