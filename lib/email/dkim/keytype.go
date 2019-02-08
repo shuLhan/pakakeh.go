@@ -28,12 +28,12 @@ var keyTypeNames = map[KeyType][]byte{ // nolint: gochecknoglobals
 	KeyTypeRSA: []byte("rsa"),
 }
 
-func parseKeyType(in []byte) (t KeyType) {
+func parseKeyType(in []byte) (t *KeyType) {
 	for k, name := range keyTypeNames {
 		if bytes.Equal(in, name) {
-			return k
+			k := k
+			return &k
 		}
 	}
-	// I know that this is unnecessary, but for readibility.
-	return KeyTypeRSA
+	return nil
 }

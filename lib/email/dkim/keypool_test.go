@@ -75,16 +75,16 @@ func TestKeyPoolGet(t *testing.T) {
 		dname: "",
 	}, {
 		dname: "example.com",
-		exp:   "p=example.com; k=rsa;",
+		exp:   "p=example.com",
 	}, {
 		dname: "example.net",
-		exp:   "p=example.net; k=rsa;",
+		exp:   "p=example.net",
 	}, {
 		dname:  "example.org",
 		expErr: "dkim: LookupKey: multiple TXT records on 'example.org'",
 	}, {
 		dname: "ug7nbtf4gccmlpwj322ax3p6ow6yfsug._domainkey.amazonses.com",
-		exp:   "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKkjP6XucgQ06cVZ89Ue/sQDu4v1/AJVd6mMK4bS2YmXk5PzWw4KWtWNUZlg77hegAChx1pG85lUbJ+x4awp28VXqRi3/jZoC6W+3ELysDvVohZPMRMadc+KVtyTiTH4BL38/8ZV9zkj4ZIaaYyiLAiYX+c3+lZQEF3rKDptRcpwIDAQAB; k=rsa;",
+		exp:   "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKkjP6XucgQ06cVZ89Ue/sQDu4v1/AJVd6mMK4bS2YmXk5PzWw4KWtWNUZlg77hegAChx1pG85lUbJ+x4awp28VXqRi3/jZoC6W+3ELysDvVohZPMRMadc+KVtyTiTH4BL38/8ZV9zkj4ZIaaYyiLAiYX+c3+lZQEF3rKDptRcpwIDAQAB", //nolint:lll
 	}}
 
 	for _, c := range cases {

@@ -61,7 +61,7 @@ func newParser(value []byte) (p *parser) {
 }
 
 //
-// fetchTag single tag.
+// fetchTag parse and return single tag from reader.
 //
 func (p *parser) fetchTag() (t *tag, err error) {
 	p.c = p.r.SkipSpaces()
@@ -90,7 +90,7 @@ func (p *parser) fetchTagKey() (t *tag, err error) {
 		return nil, err
 	}
 
-	if p.isTerm {
+	if p.isTerm || p.c == 0 {
 		p.c = p.r.SkipSpaces()
 		if p.c != '=' {
 			return nil, fmt.Errorf("dkim: missing '=': '%s'", p.r.Rest())
@@ -115,8 +115,9 @@ func (p *parser) fetchTagKey() (t *tag, err error) {
 //
 func (p *parser) fetchTagValue(t *tag) (err error) {
 	var v []byte
+	sepCR := []byte{'\r'}
 	for {
-		p.tok, p.isTerm, p.c = p.r.ReadUntil(libbytes.ASCIISpaces, p.sepVal)
+		p.tok, p.isTerm, p.c = p.r.ReadUntil(sepCR, p.sepVal)
 		v = append(v, p.tok...)
 		if p.isTerm || p.c == 0 {
 			break

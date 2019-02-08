@@ -139,10 +139,15 @@ func Parse(value []byte) (sig *Signature, err error) {
 //
 func (sig *Signature) Relaxed() []byte {
 	var bb bytes.Buffer
+	var sigAlg = signAlgNames[SignAlgRS256]
+
+	if sig.Alg != nil {
+		sigAlg = signAlgNames[*sig.Alg]
+	}
 
 	_, _ = fmt.Fprintf(&bb, "v=%s; a=%s; d=%s; s=%s;\r\n\t"+
 		"h=%s;\r\n\tbh=%s;\r\n\tb=%s;\r\n\t",
-		sig.Version, signAlgNames[*sig.Alg], sig.SDID, sig.Selector,
+		sig.Version, sigAlg, sig.SDID, sig.Selector,
 		bytes.Join(sig.Headers, sepColon), sig.BodyHash, sig.Value)
 
 	if sig.CreatedAt > 0 {
@@ -189,6 +194,9 @@ func (sig *Signature) Relaxed() []byte {
 // Simple return the "simple" canonicalization of Signature.
 //
 func (sig *Signature) Simple() []byte {
+	if len(sig.raw) == 0 {
+		return sig.Relaxed()
+	}
 	return sig.raw
 }
 
@@ -210,60 +218,41 @@ func (sig *Signature) Simple() []byte {
 //
 func (sig *Signature) Verify() (err error) {
 	if len(sig.Version) == 0 || sig.Version[0] != '1' {
-		return fmt.Errorf("dkim: invalid version number: '%s'", sig.Version)
+		return fmt.Errorf("dkim: invalid version: '%s'", sig.Version)
 	}
 	if sig.Alg == nil {
-		return fmt.Errorf("dkim: tag algorithm 'a=' is not defined")
+		return errEmptySignAlg
 	}
 	if len(sig.SDID) == 0 {
-		return fmt.Errorf("dkim: tag SDID 'd=' is not defined")
+		return errEmptySDID
 	}
 	if len(sig.Selector) == 0 {
-		return fmt.Errorf("dkim: tag selector 's=' is not defined")
+		return errEmptySelector
 	}
 	if len(sig.Headers) == 0 {
-		return fmt.Errorf("dkim: tag header 'h=' is empty")
+		return errEmptyHeader
 	}
 
-	found := false
-	for x := 0; x < len(sig.Headers); x++ {
-		if bytes.EqualFold(sig.Headers[x], []byte("from")) {
-			found = true
-			break
-		}
-	}
-	if !found {
-		return fmt.Errorf("dkim: 'From' field not signed")
+	err = sig.verifyHeaders()
+	if err != nil {
+		return err
 	}
 
 	if len(sig.BodyHash) == 0 {
-		return fmt.Errorf("dkim: tag body hash 'bh=' is empty")
+		return errEmptyBodyHash
 	}
 	if len(sig.Value) == 0 {
-		return fmt.Errorf("dkim: tag signature 'h=' is empty")
+		return errEmptySignature
 	}
 
-	if sig.ExpiredAt != 0 {
-		if sig.CreatedAt != 0 && sig.ExpiredAt < sig.CreatedAt {
-			return fmt.Errorf("dkim: invalid expiration/creation time")
-		}
-		exp := time.Unix(int64(sig.ExpiredAt), 0)
-		now := time.Now().Add(time.Hour * -1).Unix()
-		if uint64(now) > sig.ExpiredAt {
-			return fmt.Errorf("dkim: signature is expired at '%s'", exp)
-		}
-	}
-	if len(sig.AUID) > 0 {
-		bb := bytes.Split(sig.AUID, []byte{'@'})
-		if len(bb) != 2 {
-			return fmt.Errorf("dkim: missing AUID domain: '%s'", sig.AUID)
-		}
-		if !bytes.HasSuffix(bb[1], sig.SDID) {
-			return fmt.Errorf("dkim: invalid AUID: '%s'", sig.AUID)
-		}
+	err = sig.verifyTime()
+	if err != nil {
+		return err
 	}
 
-	return nil
+	err = sig.verifyAUID()
+
+	return err
 }
 
 //
@@ -278,6 +267,9 @@ func (sig *Signature) set(t *tag) (err error) {
 
 	switch t.key {
 	case tagVersion:
+		if len(t.value) != 1 || t.value[0] != '1' {
+			return fmt.Errorf("dkim: invalid version: '%s'", t.value)
+		}
 		sig.Version = t.value
 
 	case tagAlg:
@@ -288,37 +280,69 @@ func (sig *Signature) set(t *tag) (err error) {
 				return nil
 			}
 		}
-		err = fmt.Errorf("dkim: unknown algorithm: '%s'", t.value)
+		return fmt.Errorf("dkim: unknown algorithm: '%s'", t.value)
 
 	case tagSDID:
+		if len(t.value) == 0 {
+			return errEmptySDID
+		}
 		sig.SDID = t.value
 
 	case tagHeaders:
-		sig.Headers = bytes.Split(t.value, sepColon)
+		if len(t.value) == 0 {
+			return errEmptyHeader
+		}
+		headers := bytes.Split(t.value, sepColon)
+		for x := 0; x < len(headers); x++ {
+			sig.Headers = append(sig.Headers, bytes.TrimSpace(headers[x]))
+		}
+		err = sig.verifyHeaders()
 
 	case tagSelector:
+		if len(t.value) == 0 {
+			return errEmptySelector
+		}
 		sig.Selector = t.value
 
 	case tagBodyHash:
+		if len(t.value) == 0 {
+			return errEmptyBodyHash
+		}
 		sig.BodyHash = t.value
 
 	case tagSignature:
+		if len(t.value) == 0 {
+			return errEmptySignature
+		}
 		sig.Value = t.value
 
 	case tagCreatedAt:
 		sig.CreatedAt, err = strconv.ParseUint(string(t.value), 10, 64)
+		if err != nil {
+			return errors.New("dkim: t=: " + err.Error())
+		}
+		err = sig.verifyTime()
 
 	case tagExpiredAt:
 		sig.ExpiredAt, err = strconv.ParseUint(string(t.value), 10, 64)
+		if err != nil {
+			return errors.New("dkim: x=: " + err.Error())
+		}
+		err = sig.verifyTime()
 
 	case tagCanon:
 		err = sig.setCanons(t.value)
 
 	case tagPresentHeaders:
-		sig.PresentHeaders = bytes.Split(t.value, sepVBar)
+		z := bytes.Split(t.value, sepVBar)
+		for x := 0; x < len(z); x++ {
+			z[x] = bytes.TrimSpace(z[x])
+			sig.PresentHeaders = append(sig.PresentHeaders, z[x])
+		}
 
 	case tagAUID:
 		sig.AUID = t.value
+		err = sig.verifyAUID()
 
 	case tagBodyLength:
 		l, err = strconv.ParseUint(string(t.value), 10, 64)
@@ -340,7 +364,7 @@ func (sig *Signature) set(t *tag) (err error) {
 func (sig *Signature) setCanons(v []byte) (err error) {
 	var canonHeader, canonBody []byte
 
-	canons := bytes.Split(v, []byte{'/'})
+	canons := bytes.Split(v, sepSlash)
 
 	switch len(canons) {
 	case 0:
@@ -398,7 +422,7 @@ func (sig *Signature) setQueryMethods(v []byte) {
 	for _, m := range methods {
 		var qtype, qopt []byte
 
-		kv := bytes.Split(m, []byte{'/'})
+		kv := bytes.Split(m, sepSlash)
 		switch len(kv) {
 		case 0:
 		case 1:
@@ -412,6 +436,8 @@ func (sig *Signature) setQueryMethods(v []byte) {
 			sig.QMethod = nil
 			// Ignore error, use default query method.
 		}
+		qtype = nil
+		qopt = nil
 	}
 }
 
@@ -450,6 +476,51 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 	}
 	if !found {
 		return fmt.Errorf("dkim: unknown query option: '%s'", qopt)
+	}
+
+	return nil
+}
+
+//
+// verifyHeaders verify value of header tag "h=".
+//
+func (sig *Signature) verifyHeaders() (err error) {
+	for x := 0; x < len(sig.Headers); x++ {
+		if bytes.EqualFold(sig.Headers[x], []byte("from")) {
+			return nil
+		}
+	}
+	return errFromHeader
+}
+
+func (sig *Signature) verifyTime() (err error) {
+	if sig.ExpiredAt == 0 || sig.CreatedAt == 0 {
+		return nil
+	}
+	if sig.ExpiredAt < sig.CreatedAt {
+		return errCreatedTime
+	}
+
+	exp := time.Unix(int64(sig.ExpiredAt), 0)
+	now := time.Now().Add(time.Hour * -1).Unix()
+	if uint64(now) > sig.ExpiredAt {
+		return fmt.Errorf("dkim: signature is expired at '%s'", exp)
+	}
+
+	return nil
+}
+
+func (sig *Signature) verifyAUID() (err error) {
+	if len(sig.AUID) == 0 {
+		return nil
+	}
+
+	bb := bytes.Split(sig.AUID, []byte{'@'})
+	if len(bb) != 2 {
+		return fmt.Errorf("dkim: no domain in AUID 'i=' tag: '%s'", sig.AUID)
+	}
+	if !bytes.HasSuffix(bb[1], sig.SDID) {
+		return fmt.Errorf("dkim: invalid AUID: '%s'", sig.AUID)
 	}
 
 	return nil

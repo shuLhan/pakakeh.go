@@ -38,7 +38,7 @@ type Key struct {
 
 	// Type of key.
 	// ("k=", plain-text, OPTIONAL, default is "rsa").
-	Type KeyType
+	Type *KeyType
 
 	// HashAlgs contains list of hash algorithm that might be used.
 	// ("h=", plain-text colon-separated,  OPTIONAL, defaults to allowing
@@ -84,6 +84,10 @@ func LookupKey(qmethod QueryMethod, dname string) (key *Key, err error) {
 // ParseTXT parse DNS TXT resource record into Key.
 //
 func ParseTXT(txt []byte, ttl uint32) (key *Key, err error) {
+	if len(txt) == 0 {
+		return nil, nil
+	}
+
 	p := newParser(txt)
 
 	key = &Key{}
@@ -114,6 +118,10 @@ func lookupDNS(opt QueryOption, dname string) (key *Key, err error) {
 }
 
 func lookupDNSTXT(dname string) (key *Key, err error) {
+	if len(dname) == 0 {
+		return nil, nil
+	}
+
 	if dnsClientPool == nil {
 		err = newDNSClientPool()
 		if err != nil {
@@ -128,6 +136,11 @@ func lookupDNSTXT(dname string) (key *Key, err error) {
 	if err != nil {
 		dnsClientPool.Put(dnsClient)
 		return nil, fmt.Errorf("dkim: LookupKey: " + err.Error())
+	}
+	if dnsMsg.Header.RCode != dns.RCodeOK {
+		dnsClientPool.Put(dnsClient)
+		return nil, fmt.Errorf("dkim: LookupKey: DNS response status: %d",
+			dnsMsg.Header.RCode)
 	}
 	if len(dnsMsg.Answer) == 0 {
 		dnsClientPool.Put(dnsClient)
@@ -170,43 +183,59 @@ func newDNSClientPool() (err error) {
 // Pack the key to be used in DNS TXT record.
 //
 func (key *Key) Pack() string {
+	if key == nil {
+		return ""
+	}
+
 	var bb strings.Builder
+	sep := []byte{';', ' '}
 
 	if len(key.Version) > 0 {
 		bb.WriteString("v=")
 		bb.Write(key.Version)
-		bb.WriteByte(';')
 	}
 	if len(key.Public) > 0 {
 		if bb.Len() > 0 {
-			bb.WriteByte(' ')
+			bb.Write(sep)
 		}
 		bb.WriteString("p=")
 		bb.Write(key.Public)
-		bb.WriteByte(';')
 	}
 
-	bb.WriteString(" k=")
-	bb.Write(keyTypeNames[key.Type])
-	bb.WriteByte(';')
+	if key.Type != nil {
+		if bb.Len() > 0 {
+			bb.Write(sep)
+		}
+		bb.WriteString("k=")
+		bb.Write(keyTypeNames[*key.Type])
+	}
 
 	if len(key.HashAlgs) > 0 {
-		bb.WriteString(" h=")
+		if bb.Len() > 0 {
+			bb.Write(sep)
+		}
+		bb.WriteString("h=")
 		bb.Write(packHashAlgs(key.HashAlgs))
-		bb.WriteByte(';')
 	}
 	if len(key.Notes) > 0 {
-		bb.WriteString(" n=")
+		if bb.Len() > 0 {
+			bb.Write(sep)
+		}
+		bb.WriteString("n=")
 		bb.Write(key.Notes)
-		bb.WriteByte(';')
 	}
 	if len(key.Services) > 0 {
-		bb.WriteString(" s=")
+		if bb.Len() > 0 {
+			bb.Write(sep)
+		}
+		bb.WriteString("s=")
 		bb.Write(bytes.Join(key.Services, sepColon))
-		bb.WriteByte(';')
 	}
 	if len(key.Flags) > 0 {
-		bb.WriteString(" t=")
+		if bb.Len() > 0 {
+			bb.Write(sep)
+		}
+		bb.WriteString("t=")
 		bb.Write(packKeyFlags(key.Flags))
 	}
 
@@ -259,5 +288,5 @@ func (key *Key) set(t *tag) (err error) {
 	case tagDNSFlags:
 		key.Flags = unpackKeyFlags(t.value)
 	}
-	return err
+	return nil
 }

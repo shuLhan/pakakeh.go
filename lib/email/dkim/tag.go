@@ -102,13 +102,13 @@ func newTag(key []byte) (t *tag, err error) {
 		return nil, nil
 	}
 	if !libbytes.IsAlpha(key[0]) {
-		return nil, fmt.Errorf("dkim: invalid key: '%s'", key)
+		return nil, fmt.Errorf("dkim: invalid tag key: '%s'", key)
 	}
 	for x := 0; x < len(key); x++ {
 		if libbytes.IsAlnum(key[x]) || key[x] == '_' {
 			continue
 		}
-		return nil, fmt.Errorf("dkim: invalid key: '%s'", key)
+		return nil, fmt.Errorf("dkim: invalid tag key: '%s'", key)
 	}
 
 	t = &tag{
@@ -142,9 +142,9 @@ func (t *tag) setValue(val []byte) (err error) {
 		switch {
 		case libbytes.IsSpace(val[x]):
 			continue
-		case val[x] < 0x21 || val[x] == 0x3B || val[x] > 0x7E:
+		case val[x] < '!' || val[x] == ';' || val[x] > '~':
 			if !isBase64 {
-				return fmt.Errorf("dkim: invalid value: '%s'", val)
+				return fmt.Errorf("dkim: invalid tag value: '%s'", val)
 			}
 		default:
 			if isBase64 {

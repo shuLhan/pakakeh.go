@@ -4,6 +4,10 @@
 
 package dkim
 
+import (
+	"errors"
+)
+
 //
 // DefaultNameServers contains list of nameserver's IP addresses.
 //
@@ -25,5 +29,17 @@ var DefaultKeyPool = &KeyPool{ // nolint:gochecknoglobals
 
 var ( // nolint:gochecknoglobals
 	sepColon = []byte{':'}
+	sepSlash = []byte{'/'}
 	sepVBar  = []byte{'|'}
+)
+
+var (
+	errEmptySignAlg   = errors.New("dkim: tag algorithm 'a=' is empty")
+	errEmptySDID      = errors.New("dkim: tag SDID 'd=' is empty")
+	errEmptySelector  = errors.New("dkim: tag selector 's=' is empty")
+	errEmptyHeader    = errors.New("dkim: tag header 'h=' is empty")
+	errEmptyBodyHash  = errors.New("dkim: tag body hash 'bh=' is empty")
+	errEmptySignature = errors.New("dkim: tag signature 'h=' is empty")
+	errFromHeader     = errors.New("dkim: 'From' field is not in header tag")
+	errCreatedTime    = errors.New("dkim: invalid expiration/creation time")
 )

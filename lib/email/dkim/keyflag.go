@@ -38,14 +38,26 @@ var keyFlagNames = map[KeyFlag]byte{ // nolint: gochecknoglobals
 func unpackKeyFlags(in []byte) (out []KeyFlag) {
 	flags := bytes.Split(in, sepColon)
 	for x := 0; x < len(flags); x++ {
+		if len(flags[x]) != 1 {
+			continue
+		}
 		for k, v := range keyFlagNames {
 			if flags[x][0] == v {
-				out = append(out, k)
+				insertKeyFlag(&out, k)
 				break
 			}
 		}
 	}
 	return out
+}
+
+func insertKeyFlag(flags *[]KeyFlag, key KeyFlag) {
+	for _, v := range *flags {
+		if v == key {
+			return
+		}
+	}
+	*flags = append(*flags, key)
 }
 
 func packKeyFlags(flags []KeyFlag) []byte {
