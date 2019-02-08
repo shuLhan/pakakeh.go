@@ -5,7 +5,8 @@
 package dkim
 
 //
-// QueryMethod define a method to retrieve public key.
+// QueryMethod define a type and option to retrieve public key.
+// An empty QueryMethod will use default type and option, which is "dns/txt".
 //
 type QueryMethod struct {
 	Type   QueryType

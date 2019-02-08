@@ -15,31 +15,31 @@ func TestLookupKey(t *testing.T) {
 	qmethod := QueryMethod{}
 
 	cases := []struct {
-		sdid     string
-		selector string
-		exp      string
-		expErr   string
+		domainName string
+		exp        string
+		expErr     string
 	}{{
-		expErr: "dkim: LookupKey: empty SDID",
+		expErr: "dkim: LookupKey: empty domain name",
 	}, {
-		sdid:     "amazonses.com",
-		selector: "ug7nbtf4gccmlpwj322ax3p6ow6yfsug",
-		exp:      "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKkjP6XucgQ06cVZ89Ue/sQDu4v1/AJVd6mMK4bS2YmXk5PzWw4KWtWNUZlg77hegAChx1pG85lUbJ+x4awp28VXqRi3/jZoC6W+3ELysDvVohZPMRMadc+KVtyTiTH4BL38/8ZV9zkj4ZIaaYyiLAiYX+c3+lZQEF3rKDptRcpwIDAQAB; k=rsa;",
+		domainName: "ug7nbtf4gccmlpwj322ax3p6ow6yfsug._domainkey.amazonses.com",
+		exp:        "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKkjP6XucgQ06cVZ89Ue/sQDu4v1/AJVd6mMK4bS2YmXk5PzWw4KWtWNUZlg77hegAChx1pG85lUbJ+x4awp28VXqRi3/jZoC6W+3ELysDvVohZPMRMadc+KVtyTiTH4BL38/8ZV9zkj4ZIaaYyiLAiYX+c3+lZQEF3rKDptRcpwIDAQAB; k=rsa;",
 	}, {
-		sdid:     "wikimedia-or-id.20150623.gappssmtp.com",
-		selector: "20150623",
-		exp:      "v=DKIM1; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2UMfREvlgajdSp3jv1tJ9nLpi/mRYnGyKC3inEQ9a7zqUjLq/yXukgpXs9AEHlvBvioxlgAVCPQQsuc1xp9+KXQGgJ8jTsn5OtKm8u+YBCt6OfvpeCpvt0l9JXMMHBNYV4c0XiPE5RHX2ltI0Av20CfEy+vMecpFtVDg4rMngjLws/ro6qT63S20A4zyVs/V19WW5F2Lulgv+l+EJzz9XummIJHOlU5n5ChcWU3Rw5RVGTtNjTZnFUaNXly3fW0ahKcG5Qc3e0Rhztp57JJQTl3OmHiMR5cHsCnrl1VnBi3kaOoQBYsSuBm+KRhMIw/X9wkLY67VLdkrwlX3xxsp6wIDAQAB; k=rsa;",
+		domainName: "20150623._domainkey.wikimedia-or-id.20150623.gappssmtp.com",
+		exp:        "v=DKIM1; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2UMfREvlgajdSp3jv1tJ9nLpi/mRYnGyKC3inEQ9a7zqUjLq/yXukgpXs9AEHlvBvioxlgAVCPQQsuc1xp9+KXQGgJ8jTsn5OtKm8u+YBCt6OfvpeCpvt0l9JXMMHBNYV4c0XiPE5RHX2ltI0Av20CfEy+vMecpFtVDg4rMngjLws/ro6qT63S20A4zyVs/V19WW5F2Lulgv+l+EJzz9XummIJHOlU5n5ChcWU3Rw5RVGTtNjTZnFUaNXly3fW0ahKcG5Qc3e0Rhztp57JJQTl3OmHiMR5cHsCnrl1VnBi3kaOoQBYsSuBm+KRhMIw/X9wkLY67VLdkrwlX3xxsp6wIDAQAB; k=rsa;",
 	}}
 
 	for _, c := range cases {
-		t.Logf("%s._domainkey.%s", c.selector, c.sdid)
+		t.Log(c.domainName)
 
-		got, err := LookupKey(qmethod, []byte(c.sdid), []byte(c.selector))
+		got, err := LookupKey(qmethod, c.domainName)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
 		}
+		if got == nil {
+			continue
+		}
 
-		test.Assert(t, "Key", c.exp, string(got.Bytes()), true)
+		test.Assert(t, "Key", c.exp, got.Pack(), true)
 	}
 }

@@ -6,12 +6,24 @@ package dkim
 
 //
 // DefaultNameServers contains list of nameserver's IP addresses.
-// If its not empty, the public key lookup using DNS/TXT will use this values.
 //
-var DefaultNameServers []string // nolint: gochecknoglobals
+// If its not empty, the public key lookup using DNS/TXT will use this values;
+// otherwise it will try to use the system name servers.
+//
+var DefaultNameServers []string // nolint:gochecknoglobals
 
-var ( // nolint: gochecknoglobals
-	sepColon      = []byte{':'}
-	sepVBar       = []byte{'|'}
-	dkimSubdomain = []byte("_domainkey")
+//
+// DefaultKeyPool contains cached DKIM key.
+//
+// Implementor of this library can use the KeyPool.Get method to retrieve key
+// instead of LookupKey to minimize network traffic and process to decode and
+// parse public key.
+//
+var DefaultKeyPool = &KeyPool{ // nolint:gochecknoglobals
+	pool: make(map[string]*Key),
+}
+
+var ( // nolint:gochecknoglobals
+	sepColon = []byte{':'}
+	sepVBar  = []byte{'|'}
 )

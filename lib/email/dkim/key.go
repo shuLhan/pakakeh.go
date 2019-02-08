@@ -10,6 +10,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/shuLhan/share/lib/dns"
@@ -66,16 +67,15 @@ type Key struct {
 }
 
 //
-// LookupKey DKIM (public) key using specific query method, domain name
-// (SDID), and selector.
-// The sdid MUST NOT be empty, but the selector MAY be empty.
+// LookupKey DKIM (public) key using specific query method and DKIM domain
+// name (selector plus SDID).
 //
-func LookupKey(qmethod QueryMethod, sdid, selector []byte) (key *Key, err error) {
-	if len(sdid) == 0 {
-		return nil, fmt.Errorf("dkim: LookupKey: empty SDID")
+func LookupKey(qmethod QueryMethod, dname string) (key *Key, err error) {
+	if len(dname) == 0 {
+		return nil, nil
 	}
 	if qmethod.Type == QueryTypeDNS {
-		key, err = lookupDNS(qmethod.Option, sdid, selector)
+		key, err = lookupDNS(qmethod.Option, dname)
 	}
 	return key, err
 }
@@ -106,14 +106,14 @@ func ParseTXT(txt []byte, ttl uint32) (key *Key, err error) {
 	return key, nil
 }
 
-func lookupDNS(opt QueryOption, sdid, selector []byte) (key *Key, err error) {
+func lookupDNS(opt QueryOption, dname string) (key *Key, err error) {
 	if opt == QueryOptionTXT {
-		key, err = lookupDNSTXT(sdid, selector)
+		key, err = lookupDNSTXT(dname)
 	}
 	return key, err
 }
 
-func lookupDNSTXT(sdid, selector []byte) (key *Key, err error) {
+func lookupDNSTXT(dname string) (key *Key, err error) {
 	if dnsClientPool == nil {
 		err = newDNSClientPool()
 		if err != nil {
@@ -123,34 +123,25 @@ func lookupDNSTXT(sdid, selector []byte) (key *Key, err error) {
 
 	dnsClient := dnsClientPool.Get()
 
-	var bb bytes.Buffer
-	if len(selector) > 0 {
-		bb.Write(selector)
-		bb.WriteByte('.')
-	}
-	bb.Write(dkimSubdomain)
-	bb.WriteByte('.')
-	bb.Write(sdid)
-
-	qname := bb.Bytes()
-	dnsMsg, err := dnsClient.Lookup(dns.QueryTypeTXT, dns.QueryClassIN, qname)
+	dnsMsg, err := dnsClient.Lookup(dns.QueryTypeTXT, dns.QueryClassIN,
+		[]byte(dname))
 	if err != nil {
 		dnsClientPool.Put(dnsClient)
 		return nil, fmt.Errorf("dkim: LookupKey: " + err.Error())
 	}
 	if len(dnsMsg.Answer) == 0 {
 		dnsClientPool.Put(dnsClient)
-		return nil, fmt.Errorf("dkim: LookupKey: empty answer on '%s'", qname)
+		return nil, fmt.Errorf("dkim: LookupKey: empty answer on '%s'", dname)
 	}
 
 	dnsClientPool.Put(dnsClient)
 
 	answers := dnsMsg.FilterAnswers(dns.QueryTypeTXT)
 	if len(answers) == 0 {
-		return nil, fmt.Errorf("dkim: LookupKey: no TXT record on '%s'", qname)
+		return nil, fmt.Errorf("dkim: LookupKey: no TXT record on '%s'", dname)
 	}
 	if len(answers) != 1 {
-		return nil, fmt.Errorf("dkim: LookupKey: multiple TXT record on '%s'", qname)
+		return nil, fmt.Errorf("dkim: LookupKey: multiple TXT records on '%s'", dname)
 	}
 
 	txt := answers[0].RData().([]byte)
@@ -176,10 +167,10 @@ func newDNSClientPool() (err error) {
 }
 
 //
-// Bytes return text representation of Key.
+// Pack the key to be used in DNS TXT record.
 //
-func (key *Key) Bytes() []byte {
-	var bb bytes.Buffer
+func (key *Key) Pack() string {
+	var bb strings.Builder
 
 	if len(key.Version) > 0 {
 		bb.WriteString("v=")
@@ -219,7 +210,15 @@ func (key *Key) Bytes() []byte {
 		bb.Write(packKeyFlags(key.Flags))
 	}
 
-	return bb.Bytes()
+	return bb.String()
+}
+
+//
+// IsExpired will return true if key ExpiredAt time is less than current time;
+// otherwise it will return false.
+//
+func (key *Key) IsExpired() bool {
+	return key.ExpiredAt < time.Now().Unix()
 }
 
 func (key *Key) set(t *tag) (err error) {
