@@ -201,7 +201,7 @@ func (sig *Signature) Simple() []byte {
 }
 
 //
-// Verify the tag list.
+// Validate the tag values.
 //
 // Rules of tags,
 //
@@ -216,7 +216,7 @@ func (sig *Signature) Simple() []byte {
 //
 // *  The "d=" value MUST be the same or parent domain of "i="
 //
-func (sig *Signature) Verify() (err error) {
+func (sig *Signature) Validate() (err error) {
 	if len(sig.Version) == 0 || sig.Version[0] != '1' {
 		return fmt.Errorf("dkim: invalid version: '%s'", sig.Version)
 	}

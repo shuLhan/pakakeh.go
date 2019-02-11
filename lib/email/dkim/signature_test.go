@@ -12,12 +12,12 @@ import (
 
 func TestSignatureParse(t *testing.T) {
 	cases := []struct {
-		desc         string
-		in           string
-		expErr       string
-		expRelaxed   string
-		expSimple    string
-		expVerifyErr string
+		desc           string
+		in             string
+		expErr         string
+		expRelaxed     string
+		expSimple      string
+		expValidateErr string
 	}{{
 		desc: "With empty input",
 	}, {
@@ -81,11 +81,11 @@ func TestSignatureParse(t *testing.T) {
 		in:     "a=rsa-sha256;\r\nc=simple/relax\r\n",
 		expErr: "dkim: invalid canonicalization: 'relax'",
 	}, {
-		desc:         "With invalid query method",
-		in:           "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=/;\r\n",
-		expSimple:    "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=/;\r\n",
-		expRelaxed:   "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
-		expVerifyErr: "dkim: invalid version: '2'",
+		desc:           "With invalid query method",
+		in:             "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=/;\r\n",
+		expSimple:      "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=/;\r\n",
+		expRelaxed:     "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
+		expValidateErr: "dkim: invalid version: '2'",
 	}, {
 		desc:       "With invalid query type",
 		in:         "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=s/;\r\n",
@@ -107,11 +107,11 @@ func TestSignatureParse(t *testing.T) {
 		expSimple:  "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/;\r\n",
 		expRelaxed: "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\tq=dns/txt;\r\n",
 	}, {
-		desc:         "With unknown tag",
-		in:           "v=1;\r\n j=unknown;\r\n a=rsa-sha256; l=512\r\n",
-		expRelaxed:   "v=1; a=rsa-sha256; d=; s=;\r\n\th=;\r\n\tbh=;\r\n\tb=;\r\n\tl=512; \r\n",
-		expSimple:    "v=1;\r\n j=unknown;\r\n a=rsa-sha256; l=512\r\n",
-		expVerifyErr: errEmptySDID.Error(),
+		desc:           "With unknown tag",
+		in:             "v=1;\r\n j=unknown;\r\n a=rsa-sha256; l=512\r\n",
+		expRelaxed:     "v=1; a=rsa-sha256; d=; s=;\r\n\th=;\r\n\tbh=;\r\n\tb=;\r\n\tl=512; \r\n",
+		expSimple:      "v=1;\r\n j=unknown;\r\n a=rsa-sha256; l=512\r\n",
+		expValidateErr: errEmptySDID.Error(),
 	}, {
 		desc:   "Without domain in AUID",
 		in:     "v=1; a=rsa-sha256; d=x; bh=bh; b=b; i=my-auid\r\n",
@@ -159,7 +159,7 @@ func TestSignatureParse(t *testing.T) {
 			"\t Subject:demo=20run|\r\n" +
 			"\t Date:July=205,=202005=203:44:08=20PM=20-0700;\r\n" +
 			"\ti=@eng.example.net; q=dns/txt;\r\n",
-		expVerifyErr: "dkim: signature is expired at '2005-06-05 21:28:58 +0000 UTC'",
+		expValidateErr: "dkim: signature is expired at '2005-06-05 21:28:58 +0000 UTC'",
 	}, {
 		desc: "RFC 6376 section A.2",
 		in: "v=1; a=rsa-sha256; s=brisbane; d=example.com;\r\n" +
@@ -204,14 +204,14 @@ func TestSignatureParse(t *testing.T) {
 		test.Assert(t, "Signature.Relaxed", c.expRelaxed, string(sig.Relaxed()), true)
 		test.Assert(t, "Signature.Simple", c.expSimple, string(sig.Simple()), true)
 
-		err = sig.Verify()
+		err = sig.Validate()
 		if err != nil {
-			test.Assert(t, "Verify: error", c.expVerifyErr, err.Error(), true)
+			test.Assert(t, "Validate error", c.expValidateErr, err.Error(), true)
 		}
 	}
 }
 
-func TestSignatureVerify(t *testing.T) {
+func TestSignatureValidate(t *testing.T) {
 	signAlg := SignAlgRS256
 	canonSimple := CanonSimple
 
@@ -335,7 +335,7 @@ func TestSignatureVerify(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		err := c.sig.Verify()
+		err := c.sig.Validate()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
