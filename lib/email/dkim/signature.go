@@ -233,7 +233,7 @@ func (sig *Signature) Validate() (err error) {
 		return errEmptyHeader
 	}
 
-	err = sig.verifyHeaders()
+	err = sig.validateHeaders()
 	if err != nil {
 		return err
 	}
@@ -245,12 +245,12 @@ func (sig *Signature) Validate() (err error) {
 		return errEmptySignature
 	}
 
-	err = sig.verifyTime()
+	err = sig.validateTime()
 	if err != nil {
 		return err
 	}
 
-	err = sig.verifyAUID()
+	err = sig.validateAUID()
 
 	return err
 }
@@ -296,7 +296,7 @@ func (sig *Signature) set(t *tag) (err error) {
 		for x := 0; x < len(headers); x++ {
 			sig.Headers = append(sig.Headers, bytes.TrimSpace(headers[x]))
 		}
-		err = sig.verifyHeaders()
+		err = sig.validateHeaders()
 
 	case tagSelector:
 		if len(t.value) == 0 {
@@ -321,14 +321,14 @@ func (sig *Signature) set(t *tag) (err error) {
 		if err != nil {
 			return errors.New("dkim: t=: " + err.Error())
 		}
-		err = sig.verifyTime()
+		err = sig.validateTime()
 
 	case tagExpiredAt:
 		sig.ExpiredAt, err = strconv.ParseUint(string(t.value), 10, 64)
 		if err != nil {
 			return errors.New("dkim: x=: " + err.Error())
 		}
-		err = sig.verifyTime()
+		err = sig.validateTime()
 
 	case tagCanon:
 		sig.CanonHeader, sig.CanonBody, err = unpackCanons(t.value)
@@ -342,7 +342,7 @@ func (sig *Signature) set(t *tag) (err error) {
 
 	case tagAUID:
 		sig.AUID = t.value
-		err = sig.verifyAUID()
+		err = sig.validateAUID()
 
 	case tagBodyLength:
 		l, err = strconv.ParseUint(string(t.value), 10, 64)
@@ -427,9 +427,10 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 }
 
 //
-// verifyHeaders verify value of header tag "h=".
+// validateHeaders validate value of header tag "h=" that it MUST contains
+// "from".
 //
-func (sig *Signature) verifyHeaders() (err error) {
+func (sig *Signature) validateHeaders() (err error) {
 	for x := 0; x < len(sig.Headers); x++ {
 		if bytes.EqualFold(sig.Headers[x], []byte("from")) {
 			return nil
@@ -438,7 +439,7 @@ func (sig *Signature) verifyHeaders() (err error) {
 	return errFromHeader
 }
 
-func (sig *Signature) verifyTime() (err error) {
+func (sig *Signature) validateTime() (err error) {
 	if sig.ExpiredAt == 0 || sig.CreatedAt == 0 {
 		return nil
 	}
@@ -455,7 +456,7 @@ func (sig *Signature) verifyTime() (err error) {
 	return nil
 }
 
-func (sig *Signature) verifyAUID() (err error) {
+func (sig *Signature) validateAUID() (err error) {
 	if len(sig.AUID) == 0 {
 		return nil
 	}
