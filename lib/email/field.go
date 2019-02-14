@@ -7,9 +7,11 @@ package email
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/debug"
 	libio "github.com/shuLhan/share/lib/io"
 	libtime "github.com/shuLhan/share/lib/time"
 )
@@ -68,20 +70,24 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 			break
 		}
 		if raw[x] < 33 || raw[x] > 126 {
+			err = fmt.Errorf("email: invalid field at '%s'", raw[:x])
 			goto invalid
 		}
 	}
 	if len(raw) == x {
+		err = fmt.Errorf("email: invalid field at '%s'", raw[:x])
 		goto invalid
 	}
 
-	// Skip spaces before ':'.
-	for ; x < len(raw) && raw[x] == ' '; x++ {
+	// Skip WSP before ':'.
+	for ; x < len(raw) && (raw[x] == '\t' || raw[x] == ' '); x++ {
 	}
 	if len(raw) == x {
+		err = fmt.Errorf("email: invalid field at '%s'", raw[:x])
 		goto invalid
 	}
 	if raw[x] != ':' {
+		err = fmt.Errorf("email: missing field separator at '%s'", raw[:x])
 		goto invalid
 	}
 
@@ -92,7 +98,9 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 	// Skip WSP after ':'.
 	for ; x < len(raw) && (raw[x] == '\t' || raw[x] == ' '); x++ {
 	}
+
 	if len(raw) == x {
+		err = fmt.Errorf("email: empty field value at '%s'", raw[:x])
 		goto invalid
 	}
 
@@ -108,10 +116,12 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 				break
 			}
 			if raw[x] < 33 || raw[x] > 126 {
+				err = fmt.Errorf("email: invalid field value at '%s'", raw[:x])
 				goto invalid
 			}
 		}
 		if x == len(raw) || raw[x] != lf {
+			err = fmt.Errorf("email: field value without CRLF at '%s'", raw[:x])
 			goto invalid
 		}
 		if x++; x == len(raw) {
@@ -126,13 +136,14 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 		break
 	}
 	if !isFolded && x > 1000 {
-		err = fmt.Errorf("ParseField: line greater than 998 characters")
+		err = fmt.Errorf("email: field line greater than 998 characters")
 		return nil, nil, err
 	}
 
 	field.setValue(raw[start:x])
 
 	if len(field.Value) == 0 {
+		err = fmt.Errorf("email: empty field value at '%s'", raw[:x])
 		goto invalid
 	}
 
@@ -144,10 +155,10 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: 
 
 invalid:
 	if x < len(raw) {
-		err = fmt.Errorf("ParseField: invalid character at index %d", x)
+		if debug.Value >= 3 {
+			log.Printf("! email: invalid field '%s'\n", raw[:x])
+		}
 		rest = raw[x:]
-	} else {
-		err = fmt.Errorf("ParseField: invalid input")
 	}
 	return nil, rest, err
 }

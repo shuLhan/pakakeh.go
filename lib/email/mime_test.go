@@ -55,7 +55,7 @@ func TestParseBodyPart(t *testing.T) {
 		in: "--boundary\r\n" +
 			"Content-Encoding:\r\n\r\n",
 		boundary: "boundary",
-		expErr:   "ParseField: invalid character at index 19",
+		expErr:   "email: empty field value at 'Content-Encoding:\r\n'",
 	}, {
 		desc: "With end of body",
 		in: "--boundary--\r\n\r\n" +
