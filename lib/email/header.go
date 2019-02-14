@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"strings"
 )
 
 //
@@ -169,7 +168,7 @@ func (hdr *Header) Relaxed() []byte {
 }
 
 //
-// Simple canonicalize the header using "simple" algorithm and return it.
+// Simple canonicalize the header using "simple" algorithm.
 //
 func (hdr *Header) Simple() []byte {
 	var bb bytes.Buffer
@@ -183,20 +182,6 @@ func (hdr *Header) Simple() []byte {
 	}
 
 	return bb.Bytes()
-}
-
-//
-// String return the text representation of header, by concatenating all
-// sanitized fields with CRLF.
-//
-func (hdr *Header) String() string {
-	var sb strings.Builder
-
-	for _, f := range hdr.fields {
-		sb.Write(f.Relaxed())
-	}
-
-	return sb.String()
 }
 
 //

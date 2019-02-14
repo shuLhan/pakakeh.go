@@ -15,11 +15,10 @@ import (
 // Body represent single or multiple message body parts.
 //
 type Body struct {
-	//
 	// Parts contains one or more message body.
-	//
-	Parts []*MIME // nolint: structcheck,unused
-	raw   []byte  // raw contains original message body.
+	Parts []*MIME
+	// raw contains original message body.
+	raw []byte
 }
 
 //

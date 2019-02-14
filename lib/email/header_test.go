@@ -122,7 +122,7 @@ func TestParseHeader(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "Header.String", c.exp, header.String(), true)
+		test.Assert(t, "Header.Relaxed", []byte(c.exp), header.Relaxed(), true)
 		test.Assert(t, "rest", c.expRest, rest, true)
 
 		test.Assert(t, "Header.Relaxed", []byte(c.expRelaxed), header.Relaxed(), true)

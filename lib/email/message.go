@@ -164,7 +164,7 @@ func (msg *Message) String() string {
 	var sb strings.Builder
 
 	if msg.Header != nil {
-		sb.WriteString(msg.Header.String())
+		sb.Write(msg.Header.Relaxed())
 	}
 	sb.WriteByte(cr)
 	sb.WriteByte(lf)

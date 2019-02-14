@@ -108,7 +108,7 @@ func (mime *MIME) String() string {
 	var sb strings.Builder
 
 	if mime.Header != nil {
-		sb.WriteString(mime.Header.String())
+		sb.Write(mime.Header.Relaxed())
 	}
 	sb.WriteByte(cr)
 	sb.WriteByte(lf)
