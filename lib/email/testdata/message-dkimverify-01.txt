@@ -1,0 +1,98 @@
+Return-Path: <bounce+a1fd2e.c798e-ms=kilabit.info@mg.papercall.io>
+Delivered-To: ms@kilabit.info
+Received: from sg09.dewaweb.com
+	by sg09.dewaweb.com with LMTP id wMf4LtQoX1yYywMAqbov4Q
+	for <ms@kilabit.info>; Sun, 10 Feb 2019 03:24:04 +0800
+Return-path: <bounce+a1fd2e.c798e-ms=kilabit.info@mg.papercall.io>
+Envelope-to: ms@kilabit.info
+Delivery-date: Sun, 10 Feb 2019 03:24:04 +0800
+Received: from rs250.mailgun.us ([209.61.151.250]:56124)
+	by sg09.dewaweb.com with esmtps (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+	(Exim 4.91)
+	(envelope-from <bounce+a1fd2e.c798e-ms=kilabit.info@mg.papercall.io>)
+	id 1gsYEO-0013LK-Di
+	for ms@kilabit.info; Sun, 10 Feb 2019 03:24:04 +0800
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.papercall.io; q=dns/txt;
+ s=pic; t=1549740201; h=Content-Transfer-Encoding: Content-Type:
+ Mime-Version: Subject: Message-ID: To: From: Date: Sender;
+ bh=0XnauXi9gVM/wkuEASsRt9emJYn4kZqMiTrZur8m0Q8=; b=hPe/kKl1RZy52wOtHXM6HAvOABNeXTpFTs4L767xOkP0vZ8GAFp+3mV6GP8+FdVO+mfscPpd
+ Wl8Y/D18caeYZX9fqDXA4izNqlIRNckRlOiJOiE9uD6bOYAxHQM1eFg86d0lgiQRGf4JmcNC
+ 4IFFgVFtSKVwfDCARGp6enlmORs=
+X-Mailgun-Sending-Ip: 209.61.151.250
+X-Mailgun-Sid: WyIxZjk4NSIsICJtc0BraWxhYml0LmluZm8iLCAiYzc5OGUiXQ==
+Sender: support=papercall.io@mg.papercall.io
+Received: from papercall.io (217.138.232.35.bc.googleusercontent.com [35.232.138.217])
+ by mxa.mailgun.org with ESMTP id 5c5f28a7.7fab26e09730-smtp-out-n03;
+ Sat, 09 Feb 2019 19:23:19 -0000 (UTC)
+Date: Sat, 09 Feb 2019 19:23:18 +0000
+From: support@papercall.io
+To: ms@kilabit.info
+Message-ID: <5c5f28a6ea891_73fcc8c8a7abc1527923@papercall-prod-workers-6658fd8747-69wcb.mail>
+Subject: Welcome to PaperCall!
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5c5f28a6e9f3f_73fcc8c8a7abc1527831";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_5c5f28a6e9f3f_73fcc8c8a7abc1527831
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+</style>
+
+Hey Shulhan,
+
+Welcome to PaperCall! We're excited to help you share your expertise with more events than ever, with PaperCall it's never been easier.
+
+To get started, we recommend starting to put your talk abstracts into PaperCall. You can save them without submitting them immediately. Once you find an event that's a good fit, you'll be able to make some last minute edits for that event before you submit.
+
+Want to share your talks with non PaperCall events? You can even mark a talk as Public and share the link. Speakers can also create slugs to share their talks and profiles with others. This is a great way to showcase your talk portfolio.
+
+Ready to start submitting? Head over to [papercall.io/cfps](papercall.io/cfps) and find your next speaking engagement.
+
+Happy Submitting and Good Luck!
+
+
+
+
+----==_mimepart_5c5f28a6e9f3f_73fcc8c8a7abc1527831
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+</style>
+
+<p>Hey Shulhan,</p>
+
+<p>Welcome to PaperCall! We=E2=80=99re excited to help you share your exp=
+ertise with more events than ever, with PaperCall it=E2=80=99s never been=
+ easier.</p>
+
+<p>To get started, we recommend starting to put your talk abstracts into =
+PaperCall. You can save them without submitting them immediately. Once yo=
+u find an event that=E2=80=99s a good fit, you=E2=80=99ll be able to make=
+ some last minute edits for that event before you submit.</p>
+
+<p>Want to share your talks with non PaperCall events? You can even mark =
+a talk as Public and share the link. Speakers can also create slugs to sh=
+are their talks and profiles with others. This is a great way to showcase=
+ your talk portfolio.</p>
+
+<p>Ready to start submitting? Head over to <a href=3D"papercall.io/cfps">=
+papercall.io/cfps</a> and find your next speaking engagement.</p>
+
+<p>Happy Submitting and Good Luck!</p>
+
+
+----==_mimepart_5c5f28a6e9f3f_73fcc8c8a7abc1527831--

@@ -5,6 +5,7 @@
 package dkim
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -113,7 +114,11 @@ func TestKeyLookupDNSTXT(t *testing.T) {
 
 		got, err := lookupDNSTXT(c.dname)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			serr := err.Error()
+			if strings.Contains(serr, "timeout") {
+				continue
+			}
+			test.Assert(t, "error", c.expErr, serr, true)
 			continue
 		}
 		if got == nil {

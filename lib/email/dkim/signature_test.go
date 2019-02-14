@@ -15,7 +15,7 @@ func TestSignatureParse(t *testing.T) {
 		desc           string
 		in             string
 		expErr         string
-		expRelaxed     string
+		expPack        string
 		expSimple      string
 		expValidateErr string
 	}{{
@@ -84,32 +84,32 @@ func TestSignatureParse(t *testing.T) {
 		desc:           "With invalid query method",
 		in:             "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=/;\r\n",
 		expSimple:      "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=/;\r\n",
-		expRelaxed:     "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
+		expPack:        "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
 		expValidateErr: "dkim: invalid version: '2'",
 	}, {
-		desc:       "With invalid query type",
-		in:         "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=s/;\r\n",
-		expSimple:  "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=s/;\r\n",
-		expRelaxed: "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
+		desc:      "With invalid query type",
+		in:        "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=s/;\r\n",
+		expSimple: "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=s/;\r\n",
+		expPack:   "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
 	}, {
-		desc:       "With invalid query option",
-		in:         "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/relax;\r\n",
-		expSimple:  "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/relax;\r\n",
-		expRelaxed: "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
+		desc:      "With invalid query option",
+		in:        "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/relax;\r\n",
+		expSimple: "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/relax;\r\n",
+		expPack:   "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\t\r\n",
 	}, {
-		desc:       "Without query type",
-		in:         "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns;\r\n",
-		expSimple:  "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns;\r\n",
-		expRelaxed: "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\tq=dns/txt;\r\n",
+		desc:      "Without query type",
+		in:        "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns;\r\n",
+		expSimple: "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns;\r\n",
+		expPack:   "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\tq=dns/txt;\r\n",
 	}, {
-		desc:       "With empty query type",
-		in:         "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/;\r\n",
-		expSimple:  "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/;\r\n",
-		expRelaxed: "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\tq=dns/txt;\r\n",
+		desc:      "With empty query type",
+		in:        "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/;\r\n",
+		expSimple: "v=1; a=rsa-sha256; d=x; s=s; h=from; bh=bh; b=h; q=dns/;\r\n",
+		expPack:   "v=1; a=rsa-sha256; d=x; s=s;\r\n\th=from;\r\n\tbh=bh;\r\n\tb=h;\r\n\tq=dns/txt;\r\n",
 	}, {
 		desc:           "With unknown tag",
 		in:             "v=1;\r\n j=unknown;\r\n a=rsa-sha256; l=512\r\n",
-		expRelaxed:     "v=1; a=rsa-sha256; d=; s=;\r\n\th=;\r\n\tbh=;\r\n\tb=;\r\n\tl=512; \r\n",
+		expPack:        "v=1; a=rsa-sha256; d=; s=;\r\n\th=;\r\n\tbh=;\r\n\tb=;\r\n\tl=512; \r\n",
 		expSimple:      "v=1;\r\n j=unknown;\r\n a=rsa-sha256; l=512\r\n",
 		expValidateErr: errEmptySDID.Error(),
 	}, {
@@ -149,7 +149,7 @@ func TestSignatureParse(t *testing.T) {
 			"  Subject:demo=20run|Date:July=205,=202005=203:44:08=20PM=20-0700;\r\n" +
 			" bh=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=;\r\n" +
 			" b=dzdVyOfAKCdLXdJOc9G2q8LoXSlEniSbav+yuU4zGeeruD00lszZVoG4ZHRNiYzR\r\n",
-		expRelaxed: "v=1; a=rsa-sha256; d=example.net; s=brisbane;\r\n" +
+		expPack: "v=1; a=rsa-sha256; d=example.net; s=brisbane;\r\n" +
 			"\th=from:to:subject:date;\r\n" +
 			"\tbh=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=;\r\n" +
 			"\tb=dzdVyOfAKCdLXdJOc9G2q8LoXSlEniSbav+yuU4zGeeruD00lszZVoG4ZHRNiYzR;\r\n" +
@@ -178,8 +178,8 @@ func TestSignatureParse(t *testing.T) {
 			"\t4nujc7YopdG5dWLSdNg6xNAZpOPr+kHxt1IrE+NahM6L/LbvaHut\r\n" +
 			"\tKVdkLLkpVaVVQPzeRDI009SO2Il5Lu7rDNH6mZckBdrIx0orEtZV\r\n" +
 			"\t4bmp/YzhwvcubU4=;\r\n",
-		expRelaxed: "v=1; a=rsa-sha256; d=example.com; s=brisbane;\r\n" +
-			"\th=Received:From:To:Subject:Date:Message-ID;\r\n" +
+		expPack: "v=1; a=rsa-sha256; d=example.com; s=brisbane;\r\n" +
+			"\th=received:from:to:subject:date:message-id;\r\n" +
 			"\tbh=2jUSOH9NhtVGCQWNr9BrIAPreKQjO6Sn7XIkfJVOzv8=;\r\n" +
 			"\tb=AuUoFEfDxTDkHlLXSZEpZj79LICEps6eda7W3deTVFOk4yAUoqOB" +
 			"4nujc7YopdG5dWLSdNg6xNAZpOPr+kHxt1IrE+NahM6L/LbvaHut" +
@@ -201,7 +201,7 @@ func TestSignatureParse(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "Signature.Relaxed", c.expRelaxed, string(sig.Relaxed()), true)
+		test.Assert(t, "Signature.Pack", c.expPack, string(sig.Pack()), true)
 		test.Assert(t, "Signature.Simple", c.expSimple, string(sig.Simple()), true)
 
 		err = sig.Validate()

@@ -1,0 +1,286 @@
+Delivered-To: m.shulhan@gmail.com
+Received: by 2002:ab0:728b:0:0:0:0:0 with SMTP id w11csp444832uao;
+        Wed, 13 Feb 2019 15:37:02 -0800 (PST)
+X-Received: by 2002:a65:46c7:: with SMTP id n7mr772211pgr.182.1550101022489;
+        Wed, 13 Feb 2019 15:37:02 -0800 (PST)
+ARC-Seal: i=3; a=rsa-sha256; t=1550101022; cv=pass;
+        d=google.com; s=arc-20160816;
+        b=PreVyJmPhhaGeCzu+hMjMrF4uEg/w9m83K4ufGH8zMIGWAHtZgziJXbR6APkXok4+1
+         2TMZqmLoIjSbn2IMn2A6pyY4QmU6vGKhiM7Tofp6EHO+MV6eeBS4F8kg3qzjQ1BEgEZD
+         bdCgGghHiWFfxOVXWC8oiS7F+O3ebsq6jJc+pwWO2/WsV5BhX68WpPVRINJnbWNWRQZ8
+         HfSqWkmp+W/JGTF9DBbmsiW2sGDAL5cwxhwyEg+mVwXEoINLSdexJUUOjsvo65sZ8erY
+         GcFEmCuYsczJMQBKTVmiYhMChNqPQuMbnqvd60mK3ELwBDRU7DP7gbxpBsdGvWB5ASP9
+         u1CQ==
+ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=list-unsubscribe:list-subscribe:list-archive:list-help:list-post
+         :list-id:mailing-list:precedence:subject:message-id:to:mime-version
+         :from:date:sender:dkim-signature;
+        bh=ECCBIbUmKsGxz3pZCAPY/DklKIm61YWnOanzho5mfuY=;
+        b=CjSp6xUMYWgS8bZtxCDY4iu9s3lk9uhLWCfTT+f3j16ZTe1jTAfNU3zm8MEosIzqU1
+         3X72P1VL6g3mbC5bUGZFSlXMfMSuuMNBH6cvUeJRz1fy4I+dwNB7mdyiDLs5wp1Uc2G5
+         M8ni8XnpAhzO9C9xiqm77YV1D4bsaUQKMAj0/00bICojmp8x5kyxvZpM6q113y5n7vZp
+         c2nBXbUeMsLTvTtOMfa0wIZ3kZLL+oCF8VKoPgAUzU6jC3Anxcv4jbaz7YkvXDbNeFg1
+         WzG7tdcBCmcn/Oq6EUyhBX5t4K0N6mHMorX7t9oDSbZE72yWIILF3zasIqbabrbn9XxT
+         ILvA==
+ARC-Authentication-Results: i=3; mx.google.com;
+       dkim=pass header.i=@googlegroups.com header.s=20161025 header.b=OkekljEM;
+       arc=pass (i=2 spf=pass spfdomain=sendgrid.net dkim=pass dkdomain=sendgrid.net);
+       spf=pass (google.com: domain of golang-wikichanges+bncbdu5nj73yqgrbhouslrqkgqeyu7ngqa@googlegroups.com designates 209.85.220.55 as permitted sender) smtp.mailfrom=golang-wikichanges+bncBDU5NJ73YQGRBHOUSLRQKGQEYU7NGQA@googlegroups.com;
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=golang.org
+Return-Path: <golang-wikichanges+bncBDU5NJ73YQGRBHOUSLRQKGQEYU7NGQA@googlegroups.com>
+Received: from mail-sor-f55.google.com (mail-sor-f55.google.com. [209.85.220.55])
+        by mx.google.com with SMTPS id l20sor1148800pgj.4.2019.02.13.15.37.01
+        (Google Transport Security);
+        Wed, 13 Feb 2019 15:37:02 -0800 (PST)
+Received-SPF: pass (google.com: domain of golang-wikichanges+bncbdu5nj73yqgrbhouslrqkgqeyu7ngqa@googlegroups.com designates 209.85.220.55 as permitted sender) client-ip=209.85.220.55;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@googlegroups.com header.s=20161025 header.b=OkekljEM;
+       arc=pass (i=2 spf=pass spfdomain=sendgrid.net dkim=pass dkdomain=sendgrid.net);
+       spf=pass (google.com: domain of golang-wikichanges+bncbdu5nj73yqgrbhouslrqkgqeyu7ngqa@googlegroups.com designates 209.85.220.55 as permitted sender) smtp.mailfrom=golang-wikichanges+bncBDU5NJ73YQGRBHOUSLRQKGQEYU7NGQA@googlegroups.com;
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=golang.org
+ARC-Seal: i=2; a=rsa-sha256; t=1550101021; cv=pass;
+        d=google.com; s=arc-20160816;
+        b=lLU337+gNlBMissfLvORCfXoz/GmLhMUPnjmWyQ3HZgmIyEvAb2/sHkVkjh3MKfJdW
+         4Ha2q6xV8yu3bkm93cwTy/7tQjxwnzcySxYEbNmSL6fAYlvfbkRN/WuDB9xi8l0adT1y
+         ErQugtlQN6ncNVCjYW729dbw55f0Rrzo+Y1p/FwX4vHRztsbE6/qQOd8Yk2iD4MBWt1W
+         X30eDCTxZeHQEhYVZpnkfk9aGwPay95yZhEOAyp1AIuvq3uyHe4CC34xb0ZH2kvXZLF7
+         srTCQZsQ1//8l/uXTNFGh+YK+q/hsK6oJTdZVLouFBOnf4xLrVGhMrIiEGgLH/wbHT/X
+         QLbA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=list-unsubscribe:list-subscribe:list-archive:list-help:list-post
+         :list-id:mailing-list:precedence:subject:message-id:to:mime-version
+         :from:date:sender:dkim-signature;
+        bh=ECCBIbUmKsGxz3pZCAPY/DklKIm61YWnOanzho5mfuY=;
+        b=MoHkdTr/bJYQKaAWUvVu0Ik7Xsi4MMrFu1DqXDov4Pqj/C6qaBXCK8Vt570b1wla7f
+         Uv812MND0/uL7m9yzYu21kFZ0p2KxpdAuxyaW3ZxxdYCW1Q8QIQ+W/U5OlbZbUgLWG8P
+         dDRx0vUsHXLUrZfyTsHK846nG7gZcZdFOnrti3NGasJe9/1GrqCfyTzvwxSSYbDftEfz
+         THL0/dwyliz7GIJcaZKc8Fht/TUbeY4weqjfXmXetQoyKAGHUfKZB5BW2D9gsKac4ZUn
+         vPAWSjxhGIwHbXT7Rd911l6gL0SparjlFeXuPk54f7so1doIV/0FKsroVozPT4ESb6mu
+         L4Zw==
+ARC-Authentication-Results: i=2; gmr-mx.google.com;
+       dkim=pass header.i=@sendgrid.net header.s=smtpapi header.b=rfNPcb5t;
+       spf=pass (google.com: domain of bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net designates 167.89.106.64 as permitted sender) smtp.mailfrom="bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net";
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=golang.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlegroups.com; s=20161025;
+        h=sender:date:from:mime-version:to:message-id:subject
+         :x-original-sender:x-original-authentication-results:precedence
+         :mailing-list:list-id:list-post:list-help:list-archive
+         :list-subscribe:list-unsubscribe;
+        bh=ECCBIbUmKsGxz3pZCAPY/DklKIm61YWnOanzho5mfuY=;
+        b=OkekljEMwFMhpwR9KwCt8kohH+Pa3FNS3ES/5AnoYRfBh/tCWgMBhWP//kQi1mMuHR
+         GhreHnAtmGsxAazKZBGLrZeQ6WWjYY6W86TtV3CVW6Uf7CvWPHfRhdypdDs6GN/jXK43
+         KQs0qnTIefGCKZ7sDOsj8/YY1U2TLyDYBWCb9YckQxkQwSYKURh41WGdqlAl0KrAeuAX
+         BphFcHiZmWHHK3EGPU2SKGrXXag8nhvlDkY7c0ZKVn7y89VSLWYcp0W6iPmKc8MeusnK
+         DRR6M/Te9/kfKpcUmSzWofNh6EdJpcoD3uABY28MiNdyc2f31H5tunvghVjDMJ3MP9Ej
+         Sneg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=sender:x-gm-message-state:date:from:mime-version:to:message-id
+         :subject:x-original-sender:x-original-authentication-results
+         :precedence:mailing-list:list-id:x-spam-checked-in-group:list-post
+         :list-help:list-archive:list-subscribe:list-unsubscribe;
+        bh=ECCBIbUmKsGxz3pZCAPY/DklKIm61YWnOanzho5mfuY=;
+        b=Y2tkcVO6DHfchSIpq8hy7nTGFWcVOCOyyFpoBoe93VTZcU23tfSKz8SzsXFBp/9hHl
+         sN6vGzzhvYgvAziiPcedBOD6ATs5zwq4Zliy95un3BkS9W7Ssv4lg95OaioRTQnULvHr
+         W6Klfi+M9567CqxnkYhOgy0fakUlPWX/+qREI3EN82T0wNnTkv7k5OBDYbB96phC0+C5
+         ZUMW+0nrV8NcEUkOWEK64k38oLak4dpHVfAd1ELeNem3QaYvTcpYBQMItmB+UfFkF2m8
+         hzYFdL8XHbMdiyLkpaOmeTDxJ37lsqiEjJP1EM7Zzz9+yPmrEp810a9BPwsUxYIHWs4d
+         /O7Q==
+Sender: golang-wikichanges@googlegroups.com
+X-Gm-Message-State: AHQUAubiDS33Jiotf88dl03TCJjnzVz7iWuqsLRZ3FibOikmeWMQ/YVD
+	sfPd8dv2Qs+k64eozFvVpss=
+X-Google-Smtp-Source: AHgI3IabU2TrVQ6C1cDPuNTxJgxJvrgwiIfJSmPsxZzDRMjpCvAdwE25x9lru5IZDiIVQWfh+2dQGg==
+X-Received: by 2002:a63:20a:: with SMTP id 10mr2240pgc.6.1550101021492;
+        Wed, 13 Feb 2019 15:37:01 -0800 (PST)
+X-BeenThere: golang-wikichanges@googlegroups.com
+Received: by 2002:a62:68c5:: with SMTP id d188ls82290pfc.4.gmail; Wed, 13 Feb
+ 2019 15:37:01 -0800 (PST)
+X-Received: by 2002:a63:5806:: with SMTP id m6mr333248pgb.15.1550101021199;
+        Wed, 13 Feb 2019 15:37:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1550101021; cv=none;
+        d=google.com; s=arc-20160816;
+        b=SBuDI1Y69iO97WMb3QSD8l+qNiMfH//lMrSPe19limbMJ+E/YbFuBDvhFtHoeqHfSL
+         aX4HHVzbyPb9xkKZMV7WhCb+1BsYC2C3Zgn10Hfacp2glDVsMgL6R/1Rzq3r8XF3XnZJ
+         PiSGLD809CT0GuCv0VCIe94aeyPYI4pqDjv516xTO5GOsbn6tKEVwKhFvAqxSc2eg5Sm
+         k7cSQvEzriljrSYpqrbE2scV8ZnWYxtji9iMvImGNbsMY5Xl7XuJYs0DNUsQc4myeKpr
+         bYgQ5MH1JkRjOGca+vjg3kIn8tH0UVSSL936Qe4DerbA76/TyH872fstxaaf/nId42/h
+         tlTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=subject:message-id:to:mime-version:from:date:dkim-signature;
+        bh=mQgtYefd+szQRG4cWPDqSHPBiumLjYbp3OLe121UaE0=;
+        b=kzaXLVGVUrbdMbyq6wLA7UH2tS+c1aLn08PbOK7VsG6Q0EeHnmfUwuEpgZl+5CMjJL
+         8WQe1Qsj73/8WArmJ1DyFd4OXpYZYbE2ag4IB69U7bI3uBEef8CWfHnqcMtMGZBEGVo5
+         y7XyTEngy+W0OyuoFl4oUohJz8G3pOQxPHMlICVK5iqDMbu3b462fAJ60SH+hOQkKXG9
+         F2KVS0vQa5Daej1UjAetroh1xLNHQlfDoqRv/pEzNDMsqLcMY9Fh+rAvHfhKkSMmIMOc
+         1XOIedyCRK/r6nxK6b85HphT7Pkk5fWvkIcrhUs9LCXr6lAqxb2sKA5QqPYoQRreBXrP
+         l5kQ==
+ARC-Authentication-Results: i=1; gmr-mx.google.com;
+       dkim=pass header.i=@sendgrid.net header.s=smtpapi header.b=rfNPcb5t;
+       spf=pass (google.com: domain of bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net designates 167.89.106.64 as permitted sender) smtp.mailfrom="bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net";
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=golang.org
+Received: from xtrwsxqh.outbound-mail.sendgrid.net (xtrwsxqh.outbound-mail.sendgrid.net. [167.89.106.64])
+        by gmr-mx.google.com with ESMTPS id t16si42445pfa.3.2019.02.13.15.36.59
+        for <golang-wikichanges@googlegroups.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 13 Feb 2019 15:37:01 -0800 (PST)
+Received-SPF: pass (google.com: domain of bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net designates 167.89.106.64 as permitted sender) client-ip=167.89.106.64;
+Received: by filter0048p3iad2.sendgrid.net with SMTP id filter0048p3iad2-24331-5C64AA12-27
+        2019-02-13 23:36:50.699092596 +0000 UTC m=+71358.114575013
+Received: from OTM4NDAyNw (112.245.203.35.gae.googleusercontent.com [35.203.245.112])
+	by ismtpd0002p1iad1.sendgrid.net (SG) with HTTP id vrG_7wiHR5mTSigcsYeqnA
+	Wed, 13 Feb 2019 23:36:50.562 +0000 (UTC)
+Content-Type: multipart/alternative; boundary=779096e9c5637a3c38df30fc7d064d4b32102ba02c96b438b57b38f1fcaf
+Date: Wed, 13 Feb 2019 23:36:50 +0000 (UTC)
+From: "WikiDiffBot" <nobody@golang.org>
+Mime-Version: 1.0
+To: golang-wikichanges@googlegroups.com
+Message-ID: <vrG_7wiHR5mTSigcsYeqnA@ismtpd0002p1iad1.sendgrid.net>
+Subject: golang.org/wiki/Go2ErrorHandlingFeedback was updated
+X-SG-EID: HvVnZ7GPOPb674XCjzs+q2WknScFY5acsa8tQlbEB2wFlBh2VDxkFbMhsz3wk9jGhgLG8YgxdZWgPz
+ a0o+W1DMuwm4x60VpnAW8AOMYkQZg+WE/6ZpInelBkH2VjtNjBHuEph0t4xeXSieganp4VVDj/+BtO
+ ChER4QGkevqtrVZ8ynbtViKSEycwqe2J5adxo6uQEMoniN4fPGcHLXYOk07KmHEvPLHYes1AfV8udU
+ EWS/49NU1aHHcEJZyi1ONx
+X-Original-Sender: nobody@golang.org
+X-Original-Authentication-Results: gmr-mx.google.com;       dkim=pass
+ header.i=@sendgrid.net header.s=smtpapi header.b=rfNPcb5t;       spf=pass
+ (google.com: domain of bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net
+ designates 167.89.106.64 as permitted sender) smtp.mailfrom="bounces+9384027-d445-golang-wikichanges=googlegroups.com@sendgrid.net";
+       dmarc=fail (p=NONE sp=NONE dis=NONE) header.from=golang.org
+Precedence: list
+Mailing-list: list golang-wikichanges@googlegroups.com; contact golang-wikichanges+owners@googlegroups.com
+List-ID: <golang-wikichanges.googlegroups.com>
+X-Spam-Checked-In-Group: golang-wikichanges@googlegroups.com
+X-Google-Group-Id: 515194939164
+List-Post: <https://groups.google.com/group/golang-wikichanges/post>, <mailto:golang-wikichanges@googlegroups.com>
+List-Help: <https://groups.google.com/support/>, <mailto:golang-wikichanges+help@googlegroups.com>
+List-Archive: <https://groups.google.com/group/golang-wikichanges
+List-Subscribe: <https://groups.google.com/group/golang-wikichanges/subscribe>,
+ <mailto:golang-wikichanges+subscribe@googlegroups.com>
+List-Unsubscribe: <mailto:googlegroups-manage+515194939164+unsubscribe@googlegroups.com>,
+ <https://groups.google.com/group/golang-wikichanges/subscribe>
+
+--779096e9c5637a3c38df30fc7d064d4b32102ba02c96b438b57b38f1fcaf
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+
+commit a2ce08d4a12362593bcbaa1e79ac92e6ac117418
+Author: Pasha Osipyants <pavelmaxosip@mail.ru>
+Date:   Thu Feb 14 02:36:43 2019 +0300
+
+    Updated Go2ErrorHandlingFeedback (markdown)
+
+diff --git a/Go2ErrorHandlingFeedback.md b/Go2ErrorHandlingFeedback.md
+index c38ee16..087a88f 100644
+--- a/Go2ErrorHandlingFeedback.md
++++ b/Go2ErrorHandlingFeedback.md
+@@ -212,6 +212,8 @@ Concepts that appear repeatedly among the suggestions b=
+elow.
+=20
+ Please help categorize the rest of the proposals here.
+=20
++- Pasha Osipyants, =E2=80=9C[Using proposed error handling mechanism using=
+ current go possibilities](https://u9384027.ct.sendgrid.net/wf/click?upn=3D=
+kBTxD-2FEGIfUvyQT5XzCuR1gOvLWd-2FeFi2FkwHFyrxYMW3kdp4bPsAp1bZFzwGi9I-2B2tnW=
+8K2wiSnE-2FyvZg-2FPkw-3D-3D_-2Bktm0GSidEDk6Q1oF2bGWb-2Bknm7-2F6rmU5kb1QusMU=
+F5ua11nAL1FwhA-2BhW8oyd-2BHfRJGzDys77KB-2FKyOtRWDmiXqV6J6nyX371J7w4E9Ksp-2B=
+t-2ByF12XKOElx9BB5GHCwomrj4AuMsbe9cBxnqwZ68-2Fot9XWofdByAa-2Bwpqv6TZ1lCgieI=
+5bArx-2FpKIbL6agf-2BINqPvl3H4KUiGXejuc9ohNs7NXOIfVZ5XYmux2Ipfw-3D February =
+2019
++
+ - DeedleFake, "[Feedback for Go 2 Design Drafts](https://u9384027.ct.sendg=
+rid.net/wf/click?upn=3DkBTxD-2FEGIfUvyQT5XzCuR1jwwIoAhe3jMLgJBa-2FTO-2FlOzA=
+ZkpoCu-2B-2BLZo6PQdh-2B6QQJ2Yc4KG-2F4Qz6qgB77u4nLK2-2FemDF4mKsWLm5nJFGk-3D_=
+-2Bktm0GSidEDk6Q1oF2bGWb-2Bknm7-2F6rmU5kb1QusMUF5ua11nAL1FwhA-2BhW8oyd-2BHf=
+RJGzDys77KB-2FKyOtRWDmi6VPoNpiAJtq08GIowoEmXf7BsVZ2EUqyFVeOJD4IgpaBZhgMD47j=
+ZClekNkCoPX6ZxP1U-2BF3yXXRKG3zgZFJsuaR4RQU9ZR64QTVcyKNiD6k97kQTQ-2BDYvw5jRv=
+BeKVEM-2B76ap5e37n961PTvLNYw-3D", August 2018
+=20
+ - Loki Verloren, =E2=80=9C[Go 2 error handling feedback and my thoughts on=
+ how to improve programmer's efficiency and experience](https://u9384027.ct=
+.sendgrid.net/wf/click?upn=3DkBTxD-2FEGIfUvyQT5XzCuR6btDtrJ-2BccHWic7GTjgch=
+IMZt1NwIHgx1yndkgYoHcNHcJcIoR9YJ8QBTZcfczotSaPA0g6MUKPqjNDsT0myXWVseb3kOzn-=
+2BWrsPREkrL6o_-2Bktm0GSidEDk6Q1oF2bGWb-2Bknm7-2F6rmU5kb1QusMUF5ua11nAL1FwhA=
+-2BhW8oyd-2BHfRJGzDys77KB-2FKyOtRWDmgJ8ODju5tQ4j26kAvSWsQHKwwj4N8XeBS2QNe2h=
+I4M9zVktlLBdt2RmdFvMcfVhC-2FAIqN3dAgzD3iLepCVWkY2BzjnAy8V888NN-2FTjI0BbLlza=
+gwt3iNzOslD-2FrAiwgqKLYZZQC5idj-2F5XFwuv4oiE-3D September 2018
+
+--=20
+You received this message because you are subscribed to the Google Groups "=
+golang-wikichanges" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to golang-wikichanges+unsubscribe@googlegroups.com.
+To post to this group, send email to golang-wikichanges@googlegroups.com.
+To view this discussion on the web visit https://groups.google.com/d/msgid/=
+golang-wikichanges/vrG_7wiHR5mTSigcsYeqnA%40ismtpd0002p1iad1.sendgrid.net.
+For more options, visit https://groups.google.com/d/optout.
+
+--779096e9c5637a3c38df30fc7d064d4b32102ba02c96b438b57b38f1fcaf
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="UTF-8"
+Mime-Version: 1.0
+
+<p><a href=3D"https://u9384027.ct.sendgrid.net/wf/click?upn=3DkBTxD-2FEGIfU=
+vyQT5XzCuR5QjBY-2FJdgEbaL1jjOqrFncDRuuwCU5N1cjjnWITjkHdK30NN4wbReKGc7AJL8ba=
+Fw-3D-3D_-2Bktm0GSidEDk6Q1oF2bGWb-2Bknm7-2F6rmU5kb1QusMUF5ua11nAL1FwhA-2BhW=
+8oyd-2BHfRJGzDys77KB-2FKyOtRWDmoMVzP6ydUTDspcCGn5IDUajn2x8DHhcSsRY8fzr6RuZK=
+5pFdcexh-2FIDwNL2Vx6SbPkQHISO5UX-2BLpxkeoJnZYqw95V7UJxJmmWb4PjCHK6K9wed27lB=
+VEeV8zOtg4N8CxyHcJS8M4QUSIcffa5gJaM-3D">View page</a></p>
+<pre style=3D"font-family: monospace,monospace; white-space: pre-wrap;">com=
+mit a2ce08d4a12362593bcbaa1e79ac92e6ac117418
+Author: Pasha Osipyants &lt;pavelmaxosip@mail.ru&gt;
+Date:   Thu Feb 14 02:36:43 2019 &#43;0300
+
+    Updated Go2ErrorHandlingFeedback (markdown)
+
+diff --git a/Go2ErrorHandlingFeedback.md b/Go2ErrorHandlingFeedback.md
+index c38ee16..087a88f 100644
+--- a/Go2ErrorHandlingFeedback.md
+&#43;&#43;&#43; b/Go2ErrorHandlingFeedback.md
+@@ -212,6 &#43;212,8 @@ Concepts that appear repeatedly among the suggestio=
+ns below.
+=20
+ Please help categorize the rest of the proposals here.
+=20
+&#43;- Pasha Osipyants, =E2=80=9C[Using proposed error handling mechanism u=
+sing current go possibilities](https://godoc.org/github.com/pashaosipyants/=
+errors)=E2=80=9D, February 2019
+&#43;
+ - DeedleFake, &#34;[Feedback for Go 2 Design Drafts](https://deedlefake.co=
+m/2018/08/feedback-for-go-2-design-drafts/)&#34;, August 2018
+=20
+ - Loki Verloren, =E2=80=9C[Go 2 error handling feedback and my thoughts on=
+ how to improve programmer&#39;s efficiency and experience](https://gist.gi=
+thub.com/l0k1verloren/8aec03b8c48fdb5d3dab3a77153ce162)=E2=80=9D, September=
+ 2018
+</pre>
+<img src=3D"https://u9384027.ct.sendgrid.net/wf/open?upn=3D-2Bktm0GSidEDk6Q=
+1oF2bGWb-2Bknm7-2F6rmU5kb1QusMUF5ua11nAL1FwhA-2BhW8oyd-2BHfRJGzDys77KB-2FKy=
+OtRWDmlzEICaMb9VlLbNwO4s21TCDJODKDT5XM-2BgNtOEesxBuOLAsF6BXwUmDJvvCS5YZ-2Bz=
+ClsjQg45zyc4ekdJHtA6vdD83oLWO-2FahBXmA44SUpz5caahWy3KnR7AWLD87mnfeOkAZuEHIt=
+ctHEeuarwF1hVI8JmwGto4iKwkxAR3EOB" alt=3D"" width=3D"1" height=3D"1" border=
+=3D"0" style=3D"height:1px !important;width:1px !important;border-width:0 !=
+important;margin-top:0 !important;margin-bottom:0 !important;margin-right:0=
+ !important;margin-left:0 !important;padding-top:0 !important;padding-botto=
+m:0 !important;padding-right:0 !important;padding-left:0 !important;"/>
+
+<p></p>
+
+-- <br />
+You received this message because you are subscribed to the Google Groups &=
+quot;golang-wikichanges&quot; group.<br />
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to <a href=3D"mailto:golang-wikichanges+unsubscribe@googlegroups.com">=
+golang-wikichanges+unsubscribe@googlegroups.com</a>.<br />
+To post to this group, send email to <a href=3D"mailto:golang-wikichanges@g=
+ooglegroups.com">golang-wikichanges@googlegroups.com</a>.<br />
+To view this discussion on the web visit <a href=3D"https://groups.google.c=
+om/d/msgid/golang-wikichanges/vrG_7wiHR5mTSigcsYeqnA%40ismtpd0002p1iad1.sen=
+dgrid.net?utm_medium=3Demail&utm_source=3Dfooter">https://groups.google.com=
+/d/msgid/golang-wikichanges/vrG_7wiHR5mTSigcsYeqnA%40ismtpd0002p1iad1.sendg=
+rid.net</a>.<br />
+For more options, visit <a href=3D"https://groups.google.com/d/optout">http=
+s://groups.google.com/d/optout</a>.<br />
+
+--779096e9c5637a3c38df30fc7d064d4b32102ba02c96b438b57b38f1fcaf--

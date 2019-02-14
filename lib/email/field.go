@@ -218,11 +218,25 @@ func (field *Field) setValue(raw []byte) {
 }
 
 //
-// String return the relaxed canonicalization of field name and value
-// separated by colon.
+// Relaxed return the relaxed canonicalization of field name and value.
 //
-func (field *Field) String() string {
-	return string(field.Name) + ":" + string(field.Value)
+func (field *Field) Relaxed() (out []byte) {
+	out = make([]byte, 0, len(field.Name)+len(field.Value)+1)
+	out = append(out, field.Name...)
+	out = append(out, ':')
+	out = append(out, field.Value...)
+	return
+}
+
+//
+// Simple return the simple canonicalization of field name and value.
+//
+func (field *Field) Simple() (out []byte) {
+	out = make([]byte, 0, len(field.oriName)+len(field.oriValue)+1)
+	out = append(out, field.oriName...)
+	out = append(out, ':')
+	out = append(out, field.oriValue...)
+	return
 }
 
 //

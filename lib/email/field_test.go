@@ -285,7 +285,7 @@ func TestUnpackMailbox(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "Sender:", c.exp, field.String(), true)
+		test.Assert(t, "Sender:", []byte(c.exp), field.Relaxed(), true)
 	}
 }
 
@@ -317,7 +317,7 @@ func TestUnpackMailboxList(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "From:", c.exp, field.String(), true)
+		test.Assert(t, "From:", []byte(c.exp), field.Relaxed(), true)
 	}
 }
 

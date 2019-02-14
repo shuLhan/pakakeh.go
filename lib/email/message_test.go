@@ -8,10 +8,11 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/shuLhan/share/lib/email/dkim"
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestMessageUnpack(t *testing.T) {
+func TestMessageParseMessage(t *testing.T) {
 	cases := []struct {
 		in      string
 		exp     string
@@ -73,5 +74,45 @@ func TestMessageUnpack(t *testing.T) {
 
 		test.Assert(t, "rest", c.expRest, string(rest), true)
 		test.Assert(t, "Message", c.exp, msg.String(), true)
+	}
+}
+
+//
+// NOTE: this test require call to DNS to get the public key.
+//
+func TestMessageDKIMVerify(t *testing.T) {
+	cases := []struct {
+		inFile    string
+		expErr    string
+		expStatus *dkim.Status
+	}{{
+		inFile: "testdata/message-dkimverify-00.txt",
+		expStatus: &dkim.Status{
+			Type: dkim.StatusOK,
+			SDID: []byte("googlegroups.com"),
+		},
+	}, {
+		inFile: "testdata/message-dkimverify-01.txt",
+		expStatus: &dkim.Status{
+			Type: dkim.StatusOK,
+			SDID: []byte("mg.papercall.io"),
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.inFile)
+
+		msg, _, err := ParseFile(c.inFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		gotStatus, err := msg.DKIMVerify()
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "dkim.Status", c.expStatus, gotStatus, true)
 	}
 }

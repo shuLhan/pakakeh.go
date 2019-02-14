@@ -39,3 +39,43 @@ func DecodeQP(raw []byte) (out []byte) {
 
 	return out
 }
+
+//
+// Canonicalize a simple or relaxed input of DKIM-Signature value by removing
+// the value of tag "b=" and CRLF at the end.
+//
+// For example, "v=1; b=base64; bh=base64\r\n" would become
+// "v=1; b=; bh=base64".
+//
+func Canonicalize(raw []byte) (out []byte) {
+	// Find "b=" ...
+	x := 0
+	for ; x < len(raw); x++ {
+		if raw[x] == '=' {
+			if x > 1 && raw[x-1] == 'b' {
+				x++
+				break
+			}
+		}
+	}
+	if x == len(raw) {
+		return nil
+	}
+	out = append(out, raw[:x]...)
+
+	// Skip until ';' ...
+	for ; x < len(raw); x++ {
+		if raw[x] == ';' {
+			out = append(out, raw[x:]...)
+			break
+		}
+	}
+
+	// Remove CRLF at the end ...
+	x = len(out)
+	if out[x-2] == '\r' && out[x-1] == '\n' {
+		out = out[:x-2]
+	}
+
+	return out
+}

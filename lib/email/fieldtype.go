@@ -11,7 +11,8 @@ type FieldType int
 
 const (
 	FieldTypeOptional FieldType = 0
-	FieldTypeDate     FieldType = 1 << iota
+	// The origination date field, RFC 5322 section 3.6.1.
+	FieldTypeDate FieldType = 1 << iota
 	// Originator fields, RFC 5322 section 3.6.2.
 	FieldTypeFrom
 	FieldTypeSender
@@ -46,6 +47,9 @@ const (
 	FieldTypeContentTransferEncoding
 	FieldTypeContentID
 	FieldTypeContentDescription
+
+	// DKIM Signature, RFC 6376.
+	FieldTypeDKIMSignature
 )
 
 //
@@ -86,4 +90,6 @@ var fieldNames = map[FieldType][]byte{ // nolint: gochecknoglobals
 	FieldTypeContentTransferEncoding: []byte("content-transfer-encoding"),
 	FieldTypeContentID:               []byte("content-id"),
 	FieldTypeContentDescription:      []byte("content-description"),
+
+	FieldTypeDKIMSignature: []byte("dkim-signature"),
 }

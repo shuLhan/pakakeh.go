@@ -6,6 +6,9 @@ package dkim
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/rsa"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
@@ -112,7 +115,7 @@ func Parse(value []byte) (sig *Signature, err error) {
 	for {
 		tag, err := p.fetchTag()
 		if err != nil {
-			return nil, err
+			return sig, err
 		}
 		if tag == nil {
 			break
@@ -122,22 +125,22 @@ func Parse(value []byte) (sig *Signature, err error) {
 		}
 		err = sig.set(tag)
 		if err != nil {
-			return nil, err
+			return sig, err
 		}
 	}
 
 	sig.raw = value
 
-	return sig, err
+	return sig, nil
 }
 
 //
-// Relaxed return the relaxed canonicalization of Signature ordered by tag
-// priority: required, recommended, and optional.
+// Pack the Signature into stream.  Each non empty tag field is printed,
+// ordered by tag priority: required, recommended, and optional.
 // Recommended and optional field values will be printed only if its not
 // empty.
 //
-func (sig *Signature) Relaxed() []byte {
+func (sig *Signature) Pack() []byte {
 	var bb bytes.Buffer
 	var sigAlg = signAlgNames[SignAlgRS256]
 
@@ -195,13 +198,13 @@ func (sig *Signature) Relaxed() []byte {
 //
 func (sig *Signature) Simple() []byte {
 	if len(sig.raw) == 0 {
-		return sig.Relaxed()
+		return sig.Pack()
 	}
 	return sig.raw
 }
 
 //
-// Validate the tag values.
+// Validate the signature's tag values.
 //
 // Rules of tags,
 //
@@ -255,6 +258,20 @@ func (sig *Signature) Validate() (err error) {
 	return err
 }
 
+func (sig *Signature) Verify(key *Key, hashed []byte) (err error) {
+	b64sig, err := base64.StdEncoding.DecodeString(string(sig.Value))
+	if err != nil {
+		return err
+	}
+
+	cryptoHash := crypto.SHA256
+	if *sig.Alg == SignAlgRS1 {
+		cryptoHash = crypto.SHA1
+	}
+
+	return rsa.VerifyPKCS1v15(key.RSA, cryptoHash, hashed[:], b64sig)
+}
+
 //
 // set the signature field value with value from tag.
 //
@@ -294,7 +311,8 @@ func (sig *Signature) set(t *tag) (err error) {
 		}
 		headers := bytes.Split(t.value, sepColon)
 		for x := 0; x < len(headers); x++ {
-			sig.Headers = append(sig.Headers, bytes.TrimSpace(headers[x]))
+			headers[x] = bytes.ToLower(bytes.TrimSpace(headers[x]))
+			sig.Headers = append(sig.Headers, headers[x])
 		}
 		err = sig.validateHeaders()
 
@@ -432,7 +450,7 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 //
 func (sig *Signature) validateHeaders() (err error) {
 	for x := 0; x < len(sig.Headers); x++ {
-		if bytes.EqualFold(sig.Headers[x], []byte("from")) {
+		if bytes.Equal(sig.Headers[x], []byte("from")) {
 			return nil
 		}
 	}
