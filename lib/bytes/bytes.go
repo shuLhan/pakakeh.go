@@ -69,6 +69,19 @@ func AppendUint32(data *[]byte, v uint32) {
 }
 
 //
+// Copy slice of bytes from parameter.
+//
+func Copy(src []byte) (dst *[]byte) {
+	if src == nil || len(src) == 0 {
+		return nil
+	}
+	cp := make([]byte, len(src))
+	copy(cp, src)
+	dst = &cp
+	return
+}
+
+//
 // CutUntilToken cut line until we found token.
 //
 // If token found, it will return all cutted bytes before token, positition of
