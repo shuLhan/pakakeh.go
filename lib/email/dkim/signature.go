@@ -7,7 +7,10 @@ package dkim
 import (
 	"bytes"
 	"crypto"
+	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -135,62 +138,176 @@ func Parse(value []byte) (sig *Signature, err error) {
 }
 
 //
+// NewSignature create and initialize new signature using SDID ("d=") and
+// selector ("s=") and default value for the rest of field.
+//
+func NewSignature(sdid, selector []byte) (sig *Signature) {
+	sig = &Signature{
+		SDID:     sdid,
+		Selector: selector,
+	}
+
+	sig.SetDefault()
+
+	return sig
+}
+
+//
+// Hash compute the hash of input using the defined signature algorithm and
+// return their binary and base64 representation.
+//
+func (sig *Signature) Hash(in []byte) (h, h64 []byte) {
+	if sig.Alg == nil || *sig.Alg == SignAlgRS256 {
+		h256 := sha256.Sum256(in)
+		h = h256[:]
+	} else {
+		h1 := sha1.Sum(in)
+		h = h1[:]
+	}
+
+	h64 = make([]byte, base64.StdEncoding.EncodedLen(len(h)))
+	base64.StdEncoding.Encode(h64, h)
+
+	return
+}
+
+//
 // Pack the Signature into stream.  Each non empty tag field is printed,
 // ordered by tag priority: required, recommended, and optional.
 // Recommended and optional field values will be printed only if its not
 // empty.
 //
-func (sig *Signature) Pack() []byte {
-	var bb bytes.Buffer
+func (sig *Signature) Pack(simple bool) []byte {
+	bb := new(bytes.Buffer)
 	var sigAlg = signAlgNames[SignAlgRS256]
 
 	if sig.Alg != nil {
 		sigAlg = signAlgNames[*sig.Alg]
 	}
 
-	_, _ = fmt.Fprintf(&bb, "v=%s; a=%s; d=%s; s=%s;\r\n\t"+
-		"h=%s;\r\n\tbh=%s;\r\n\tb=%s;\r\n\t",
-		sig.Version, sigAlg, sig.SDID, sig.Selector,
-		bytes.Join(sig.Headers, sepColon), sig.BodyHash, sig.Value)
+	_, _ = fmt.Fprintf(bb, "v=%s; a=%s; d=%s; s=%s;",
+		sig.Version, sigAlg, sig.SDID, sig.Selector)
+	wrap(bb, simple)
+
+	_, _ = fmt.Fprintf(bb, "h=%s;", bytes.Join(sig.Headers, sepColon))
+	wrap(bb, simple)
+	_, _ = fmt.Fprintf(bb, "bh=%s;", sig.BodyHash)
+	wrap(bb, simple)
+	_, _ = fmt.Fprintf(bb, "b=%s;", sig.Value)
+	wrap(bb, simple)
 
 	if sig.CreatedAt > 0 {
-		_, _ = fmt.Fprintf(&bb, "t=%d; ", sig.CreatedAt)
+		_, _ = fmt.Fprintf(bb, "t=%d; ", sig.CreatedAt)
 	}
 	if sig.ExpiredAt > 0 {
-		_, _ = fmt.Fprintf(&bb, "x=%d; ", sig.ExpiredAt)
+		_, _ = fmt.Fprintf(bb, "x=%d; ", sig.ExpiredAt)
 	}
 
 	if sig.CanonHeader != nil {
-		_, _ = fmt.Fprintf(&bb, "c=%s", canonNames[*sig.CanonHeader])
+		_, _ = fmt.Fprintf(bb, "c=%s", canonNames[*sig.CanonHeader])
 
 		if sig.CanonBody != nil {
-			_, _ = fmt.Fprintf(&bb, "/%s;\r\n\t",
-				canonNames[*sig.CanonBody])
+			_, _ = fmt.Fprintf(bb, "/%s;", canonNames[*sig.CanonBody])
 		} else {
-			bb.WriteString(";\r\n\t")
+			bb.WriteByte(';')
 		}
+		wrap(bb, simple)
 	}
 
 	if len(sig.PresentHeaders) > 0 {
-		_, _ = fmt.Fprintf(&bb, "z=%s;\r\n\t",
-			bytes.Join(sig.PresentHeaders, []byte{'|', '\r', '\n', '\t', ' '}))
+		bb.WriteString("z=")
+		for x := 0; x < len(sig.PresentHeaders); x++ {
+			if x > 0 {
+				bb.WriteByte('|')
+				wrap(bb, simple)
+			}
+			bb.Write(sig.PresentHeaders[x])
+		}
+		bb.WriteByte(';')
+		wrap(bb, simple)
 	}
 
 	if len(sig.AUID) > 0 {
-		_, _ = fmt.Fprintf(&bb, "i=%s; ", sig.AUID)
+		_, _ = fmt.Fprintf(bb, "i=%s; ", sig.AUID)
 	}
 	if sig.BodyLength != nil {
-		_, _ = fmt.Fprintf(&bb, "l=%d; ", *sig.BodyLength)
+		_, _ = fmt.Fprintf(bb, "l=%d; ", *sig.BodyLength)
 	}
 	if sig.QMethod != nil {
-		_, _ = fmt.Fprintf(&bb, "q=%s/%s;\r\n",
+		_, _ = fmt.Fprintf(bb, "q=%s/%s",
 			queryTypeNames[sig.QMethod.Type],
 			queryOptionNames[sig.QMethod.Option])
-	} else {
-		bb.WriteString("\r\n")
 	}
+	bb.WriteByte('\r')
+	bb.WriteByte('\n')
 
 	return bb.Bytes()
+}
+
+func wrap(bb *bytes.Buffer, simple bool) {
+	if simple {
+		bb.WriteByte('\r')
+		bb.WriteByte('\n')
+	}
+	bb.WriteByte(' ')
+}
+
+//
+// SetDefault signature field's values.
+//
+// The default values are "sha-rsa256" for signing algorithm, and
+// "relaxed/relaxed" for canonicalization in header and body.
+//
+func (sig *Signature) SetDefault() {
+	if len(sig.Version) == 0 {
+		sig.Version = append(sig.Version, '1')
+	}
+	if sig.Alg == nil {
+		signAlg := SignAlgRS256
+		sig.Alg = &signAlg
+	}
+	if sig.CanonHeader == nil {
+		canonHeader := CanonRelaxed
+		sig.CanonHeader = &canonHeader
+	}
+	if sig.CanonBody == nil {
+		canonBody := CanonRelaxed
+		sig.CanonBody = &canonBody
+	}
+}
+
+//
+// Sign compute the signature of message hash header using specific private
+// key and store the base64 result in Signature.Value ("b=").
+//
+func (sig *Signature) Sign(pk *rsa.PrivateKey, hashHeader []byte) (err error) {
+	if pk == nil {
+		return fmt.Errorf("email/dkim: empty private key for signing")
+	}
+
+	cryptoHash := crypto.SHA256
+	if sig.Alg != nil && *sig.Alg == SignAlgRS1 {
+		cryptoHash = crypto.SHA1
+	}
+
+	rng := rand.Reader
+	b, err := rsa.SignPKCS1v15(rng, pk, cryptoHash, hashHeader[:])
+	if err != nil {
+		err = fmt.Errorf("email/dkim: failed to sign message: %s", err.Error())
+		return err
+	}
+
+	sig.Value = make([]byte, base64.StdEncoding.EncodedLen(len(b)))
+	base64.StdEncoding.Encode(sig.Value, b)
+
+	return nil
+}
+
+//
+// Relaxed return the "relaxed" canonicalization of Signature.
+//
+func (sig *Signature) Relaxed() []byte {
+	return sig.Pack(false)
 }
 
 //
@@ -198,7 +315,7 @@ func (sig *Signature) Pack() []byte {
 //
 func (sig *Signature) Simple() []byte {
 	if len(sig.raw) == 0 {
-		return sig.Pack()
+		return sig.Pack(true)
 	}
 	return sig.raw
 }
@@ -258,18 +375,36 @@ func (sig *Signature) Validate() (err error) {
 	return err
 }
 
-func (sig *Signature) Verify(key *Key, hashed []byte) (err error) {
-	b64sig, err := base64.StdEncoding.DecodeString(string(sig.Value))
-	if err != nil {
-		return err
+//
+// Verify the signature value ("b=") using DKIM public key record and computed
+// hash of message header.
+//
+func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
+	if key == nil {
+		return fmt.Errorf("email/dkim: key record is empty")
+	}
+	if key.RSA == nil {
+		return fmt.Errorf("email/dkim: public key is empty")
 	}
 
+	sigValue := make([]byte, base64.StdEncoding.DecodedLen(len(sig.Value)))
+	n, err := base64.StdEncoding.Decode(sigValue, sig.Value)
+	if err != nil {
+		return fmt.Errorf("email/dkim: failed to decode signature: %s", err.Error())
+	}
+	sigValue = sigValue[:n]
+
 	cryptoHash := crypto.SHA256
-	if *sig.Alg == SignAlgRS1 {
+	if sig.Alg != nil && *sig.Alg == SignAlgRS1 {
 		cryptoHash = crypto.SHA1
 	}
 
-	return rsa.VerifyPKCS1v15(key.RSA, cryptoHash, hashed[:], b64sig)
+	err = rsa.VerifyPKCS1v15(key.RSA, cryptoHash, headerHash[:], sigValue)
+	if err != nil {
+		err = fmt.Errorf("email/dkim: verification failed: %s", err.Error())
+	}
+
+	return err
 }
 
 //

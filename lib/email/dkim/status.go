@@ -5,7 +5,7 @@
 package dkim
 
 //
-// Status represent the result of DKIM verify.
+// Status represent the result of DKIM verification.
 //
 type Status struct {
 	Type  StatusType // Type of status.

@@ -151,6 +151,13 @@ func (hdr *Header) Filter(ft FieldType) (fields []*Field) {
 }
 
 //
+// PushTop put the field at the top of header.
+//
+func (hdr *Header) PushTop(f *Field) {
+	hdr.fields = append([]*Field{f}, hdr.fields...)
+}
+
+//
 // Relaxed canonicalize the header using "relaxed" algorithm and return it.
 //
 func (hdr *Header) Relaxed() []byte {

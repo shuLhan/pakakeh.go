@@ -5,6 +5,7 @@
 package dkim
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -22,7 +23,6 @@ func TestKeyPoolClear(t *testing.T) {
 }
 
 func TestKeyPoolPut(t *testing.T) {
-
 	cases := []struct {
 		dname string
 		key   *Key
@@ -92,7 +92,11 @@ func TestKeyPoolGet(t *testing.T) {
 
 		key, err := DefaultKeyPool.Get(c.dname)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			serr := err.Error()
+			if strings.Contains(serr, "timeout") {
+				continue
+			}
+			test.Assert(t, "error", c.expErr, serr, true)
 			continue
 		}
 		if key == nil {

@@ -6,13 +6,9 @@ package email
 
 import (
 	"bytes"
-	"crypto/sha1"
-	"crypto/sha256"
-	"encoding/base64"
+	"crypto/rsa"
 	"fmt"
-	"hash"
 	"io/ioutil"
-	"log"
 	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -27,7 +23,6 @@ type Message struct {
 	Body          *Body
 	DKIMSignature *dkim.Signature
 	dkimStatus    *dkim.Status
-	hasher        hash.Hash
 }
 
 //
@@ -62,6 +57,72 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 	msg.Body, rest, err = ParseBody(rest, boundary)
 
 	return msg, rest, err
+}
+
+//
+// DKIMSign sign the message using the private key and signature.
+// The only required fields in signature is SDID and Selector, any other
+// required fields that are empty will be initialized with default values.
+//
+// Upon calling this function, any field values in header and body MUST be
+// already encoded.
+//
+func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error) {
+	if pk == nil {
+		return fmt.Errorf("email: empty private key for signing")
+	}
+	if sig == nil {
+		return fmt.Errorf("email: empty signature for signing")
+	}
+
+	sig.SetDefault()
+	msg.setDKIMHeaders(sig)
+
+	// Set the body hash and signature to dummy value, to enable
+	// validating it.
+	dummy := []byte{0}
+	sig.BodyHash = dummy
+	sig.Value = dummy
+
+	err = sig.Validate()
+	if err != nil {
+		return err
+	}
+
+	// Reset the body hash and value back to nil.
+	sig.BodyHash = nil
+	sig.Value = nil
+	msg.DKIMSignature = sig
+
+	_, sig.BodyHash = sig.Hash(msg.CanonBody())
+
+	dkimField := &Field{
+		Type:     FieldTypeDKIMSignature,
+		Name:     fieldNames[FieldTypeDKIMSignature],
+		Value:    sig.Pack(false),
+		oriName:  []byte("DKIM-Signature"),
+		oriValue: sig.Pack(true),
+	}
+
+	subHeader := &Header{
+		fields: make([]*Field, len(msg.Header.fields)),
+	}
+	copy(subHeader.fields, msg.Header.fields)
+
+	hh, _ := sig.Hash(msg.CanonHeader(subHeader, dkimField))
+
+	err = sig.Sign(pk, hh)
+	if err != nil {
+		return err
+	}
+
+	// Regenerate the DKIM field again with non empty signature "b=".
+	dkimField.Value = sig.Pack(false)
+	dkimField.oriValue = sig.Pack(true)
+
+	msg.Header.PushTop(dkimField)
+
+	return nil
 }
 
 //
@@ -127,32 +188,27 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 
 	msg.DKIMSignature = sig
 
-	msg.createHasher()
+	canonBody := msg.CanonBody()
+	_, bh64 := sig.Hash(canonBody)
 
-	_, err = msg.dkimVerifyBody()
-	if err != nil {
+	if !bytes.Equal(sig.BodyHash, bh64) {
+		err = fmt.Errorf("email: body hash did not verify")
 		msg.dkimStatus.Type = dkim.StatusPermFail
 		msg.dkimStatus.Error = err
-		msg.hasher = nil
 		return nil, err
 	}
 
-	msg.hasher.Reset()
+	canonHeader := msg.CanonHeader(subHeader, subHeader.fields[0])
+	hh, _ := sig.Hash(canonHeader)
 
-	msg.dkimHashHeaders(subHeader)
-
-	hashed := msg.hasher.Sum(nil)
-
-	err = sig.Verify(key, hashed)
+	err = sig.Verify(key, hh)
 	if err != nil {
 		msg.dkimStatus.Type = dkim.StatusPermFail
 		msg.dkimStatus.Error = err
-		msg.hasher = nil
 		return msg.dkimStatus, err
 	}
 
 	msg.dkimStatus.Type = dkim.StatusOK
-	msg.hasher = nil
 
 	return msg.dkimStatus, nil
 }
@@ -175,18 +231,7 @@ func (msg *Message) String() string {
 	return sb.String()
 }
 
-func (msg *Message) createHasher() {
-	switch *msg.DKIMSignature.Alg {
-	case dkim.SignAlgRS1:
-		msg.hasher = sha1.New()
-	case dkim.SignAlgRS256:
-		msg.hasher = sha256.New()
-	}
-}
-
-func (msg *Message) dkimVerifyBody() (h []byte, err error) {
-	var body []byte
-
+func (msg *Message) CanonBody() (body []byte) {
 	if msg.DKIMSignature.CanonBody == nil || *msg.DKIMSignature.CanonBody == dkim.CanonSimple {
 		body = msg.Body.Simple()
 	} else {
@@ -202,64 +247,61 @@ func (msg *Message) dkimVerifyBody() (h []byte, err error) {
 	default:
 		body = body[:*msg.DKIMSignature.BodyLength]
 	}
-	if len(body) == 0 {
-		return
-	}
 
-	msg.hasher.Write(body)
-
-	h = msg.hasher.Sum(nil)
-	bodyHash := make([]byte, base64.StdEncoding.EncodedLen(len(h)))
-	base64.StdEncoding.Encode(bodyHash, h)
-
-	if !bytes.Equal(msg.DKIMSignature.BodyHash, bodyHash) {
-		err = fmt.Errorf("email: body hash did not verify")
-		return nil, err
-	}
-
-	return h, nil
+	return
 }
 
 //
-// dkimHashHeaders compute hash for each header om "h=" DKIMSignature.Headers
-// followed by the canonicalization of DKIM-Signature itself.
+// CanonHeader generate the canonicalization of sub-header and DKIM-Signature
+// field.
 //
-func (msg *Message) dkimHashHeaders(subHeader *Header) {
+func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
+	var bb bytes.Buffer
+
+	canonType := dkim.CanonRelaxed
+	if msg.DKIMSignature.CanonHeader == nil || *msg.DKIMSignature.CanonHeader == dkim.CanonSimple {
+		canonType = dkim.CanonSimple
+	}
+
 	for x := 0; x < len(msg.DKIMSignature.Headers); x++ {
 		signedField := subHeader.popByName(msg.DKIMSignature.Headers[x])
 		if signedField == nil {
-			log.Printf("email: dkimHashHeaders: field '%s' not found\n",
-				msg.DKIMSignature.Headers[x])
 			continue
 		}
-
-		msg.dkimHashField(signedField)
+		if canonType == dkim.CanonSimple {
+			bb.Write(signedField.Simple())
+		} else {
+			bb.Write(signedField.Relaxed())
+		}
 	}
 
 	// The last one to hash is DKIM-Signature itself without "b=" value
 	// and CRLF.
-	var canonDKIM []byte
-	if msg.DKIMSignature.CanonHeader == nil || *msg.DKIMSignature.CanonHeader == dkim.CanonSimple {
-		canonDKIM = append(canonDKIM, subHeader.fields[0].oriName...)
-		canonDKIM = append(canonDKIM, ':')
-		v := dkim.Canonicalize(subHeader.fields[0].oriValue)
-		canonDKIM = append(canonDKIM, v...)
+	if canonType == dkim.CanonSimple {
+		bb.Write(dkimField.oriName)
+		bb.WriteByte(':')
+		bb.Write(dkim.Canonicalize(dkimField.oriValue))
 	} else {
-		canonDKIM = append(canonDKIM, subHeader.fields[0].Name...)
-		canonDKIM = append(canonDKIM, ':')
-		v := dkim.Canonicalize(subHeader.fields[0].Value)
-		canonDKIM = append(canonDKIM, v...)
+		bb.Write(dkimField.Name)
+		bb.WriteByte(':')
+		bb.Write(dkim.Canonicalize(dkimField.Value))
 	}
 
-	msg.hasher.Write(canonDKIM)
+	return bb.Bytes()
 }
 
-func (msg *Message) dkimHashField(f *Field) {
-	var fb []byte
-	if msg.DKIMSignature.CanonHeader == nil || *msg.DKIMSignature.CanonHeader == dkim.CanonSimple {
-		fb = f.Simple()
-	} else {
-		fb = f.Relaxed()
+//
+// setDKIMHeaders set the DKIM signature headers ("h=") value with current
+// list of headers name in message.
+//
+func (msg *Message) setDKIMHeaders(sig *dkim.Signature) {
+	if len(sig.Headers) > 0 {
+		return
 	}
-	msg.hasher.Write(fb)
+
+	sig.Headers = make([][]byte, 0, len(msg.Header.fields))
+
+	for _, f := range msg.Header.fields {
+		sig.Headers = append(sig.Headers, f.Name)
+	}
 }

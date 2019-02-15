@@ -53,6 +53,8 @@ func (kp *KeyPool) Get(dname string) (key *Key, err error) {
 		return nil, err
 	}
 
+	kp.Put(dname, key)
+
 	return key, nil
 }
 

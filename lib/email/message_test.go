@@ -116,3 +116,61 @@ func TestMessageDKIMVerify(t *testing.T) {
 		test.Assert(t, "dkim.Status", c.expStatus, gotStatus, true)
 	}
 }
+
+func TestMessageDKIMSign(t *testing.T) {
+	if privateKey == nil || publicKey == nil {
+		initKeys(t)
+	}
+
+	canonSimple := dkim.CanonSimple
+
+	cases := []struct {
+		inFile       string
+		sig          *dkim.Signature
+		expBodyHash  string
+		expSignature string
+		expStatus    *dkim.Status
+	}{{
+		inFile: "testdata/message-dkimsign-00.txt",
+		sig: &dkim.Signature{
+			SDID:        []byte("example.com"),
+			Selector:    []byte("brisbane"),
+			CanonHeader: &canonSimple,
+			CanonBody:   &canonSimple,
+			AUID:        []byte("joe@football.example.com"),
+			QMethod:     &dkim.QueryMethod{},
+		},
+		expBodyHash:  "2jUSOH9NhtVGCQWNr9BrIAPreKQjO6Sn7XIkfJVOzv8=",
+		expSignature: "r4xRAHbEEmL8BwGSZkYzCmDT2Y6ttIEc8boo0UZSENC0unBX4JjjaGALuBjlUiTw6t78PeMx3kgIoX3sjkcquw4TvZgfJNKPEDhTq11IU+2QPJSQa245Tjs3eMZCq/cooax4vEPiJIN9UDNT1BNqbF7cMPGjn5RQQtjbHXxRHjI=", // nolint: lll
+		expStatus: &dkim.Status{
+			Type: dkim.StatusOK,
+			SDID: []byte("example.com"),
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.inFile)
+
+		msg, _, err := ParseFile(c.inFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = msg.DKIMSign(privateKey, c.sig)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, "BodyHash", c.expBodyHash,
+			string(msg.DKIMSignature.BodyHash), true)
+		test.Assert(t, "Signature", c.expSignature,
+			string(msg.DKIMSignature.Value), true)
+
+		gotStatus, err := msg.DKIMVerify()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, "dkim.Status", c.expStatus, gotStatus, true)
+	}
+}
