@@ -11,10 +11,10 @@ type StatusType byte
 
 const (
 	// StatusUnverify means that the signature has not been verified.
-	StatusUnverify StatusType = 0
+	StatusUnverify StatusType = iota
 
 	// StatusNoSignature no dkim signature in message.
-	StatusNoSignature = 1 << iota
+	StatusNoSignature
 
 	// StatusOK the signature is valid.
 	StatusOK

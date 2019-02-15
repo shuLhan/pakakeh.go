@@ -17,9 +17,9 @@ type HashAlg byte
 // List of valid and known hash algorithms.
 //
 const (
-	HashAlgALL    HashAlg = 0         // (default to allow all)
-	HashAlgSHA256         = 1 << iota // sha256
-	HashAlgSHA1                       // sha1
+	HashAlgALL    HashAlg = iota // (default to allow all)
+	HashAlgSHA256                // sha256
+	HashAlgSHA1                  // sha1
 )
 
 //

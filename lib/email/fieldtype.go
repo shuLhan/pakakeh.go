@@ -10,9 +10,9 @@ package email
 type FieldType int
 
 const (
-	FieldTypeOptional FieldType = 0
+	FieldTypeOptional FieldType = iota
 	// The origination date field, RFC 5322 section 3.6.1.
-	FieldTypeDate FieldType = 1 << iota
+	FieldTypeDate
 	// Originator fields, RFC 5322 section 3.6.2.
 	FieldTypeFrom
 	FieldTypeSender

@@ -17,18 +17,18 @@ type tagKey int
 // List of known tag keys.
 //
 const (
-	tagUnknown tagKey = 0
+	tagUnknown tagKey = iota
 
 	// Tags in DKIM-Signature field value, ordered by priority.
 
 	// Required tags.
-	tagVersion   tagKey = 1 << iota // v=
-	tagAlg                          // a=
-	tagSDID                         // d=
-	tagSelector                     // s=
-	tagHeaders                      // h=
-	tagBodyHash                     // bh=
-	tagSignature                    // b=
+	tagVersion   // v=
+	tagAlg       // a=
+	tagSDID      // d=
+	tagSelector  // s=
+	tagHeaders   // h=
+	tagBodyHash  // bh=
+	tagSignature // b=
 	// Recommended tags.
 	tagCreatedAt // t=
 	tagExpiredAt // x=
