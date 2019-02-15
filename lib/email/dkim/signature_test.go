@@ -339,7 +339,7 @@ func TestSignatureSign(t *testing.T) {
 
 		sig.Alg = &c.hashAlg
 
-		hashed, _ := sig.Hash([]byte(c.input))
+		hashed, _ := sig.Hash(c.input)
 
 		sig.Alg = &c.signAlg
 

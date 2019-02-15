@@ -9,7 +9,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
+	"crypto/sha1" // nolint: gosec
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
@@ -161,7 +161,7 @@ func (sig *Signature) Hash(in []byte) (h, h64 []byte) {
 		h256 := sha256.Sum256(in)
 		h = h256[:]
 	} else {
-		h1 := sha1.Sum(in)
+		h1 := sha1.Sum(in) // nolint: gosec
 		h = h1[:]
 	}
 
@@ -244,6 +244,7 @@ func (sig *Signature) Pack(simple bool) []byte {
 	return bb.Bytes()
 }
 
+// nolint: interfacer
 func wrap(bb *bytes.Buffer, simple bool) {
 	if simple {
 		bb.WriteByte('\r')
@@ -291,7 +292,7 @@ func (sig *Signature) Sign(pk *rsa.PrivateKey, hashHeader []byte) (err error) {
 	}
 
 	rng := rand.Reader
-	b, err := rsa.SignPKCS1v15(rng, pk, cryptoHash, hashHeader[:])
+	b, err := rsa.SignPKCS1v15(rng, pk, cryptoHash, hashHeader)
 	if err != nil {
 		err = fmt.Errorf("email/dkim: failed to sign message: %s", err.Error())
 		return err
@@ -399,7 +400,7 @@ func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
 		cryptoHash = crypto.SHA1
 	}
 
-	err = rsa.VerifyPKCS1v15(key.RSA, cryptoHash, headerHash[:], sigValue)
+	err = rsa.VerifyPKCS1v15(key.RSA, cryptoHash, headerHash, sigValue)
 	if err != nil {
 		err = fmt.Errorf("email/dkim: verification failed: %s", err.Error())
 	}
