@@ -96,4 +96,5 @@ const (
 	ContentTypeForm   = "application/x-www-form-urlencoded"
 	ContentTypeJSON   = "application/json"
 	ContentTypePlain  = "text/plain"
+	HeaderLocation    = "Location"
 )

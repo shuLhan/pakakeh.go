@@ -72,6 +72,17 @@ func NewServer(root string, conn *http.Server) (srv *Server, e error) {
 }
 
 //
+// RedirectTemp make the request to temporary redirect (307) to new URL.
+//
+func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
+	if len(redirectURL) == 0 {
+		redirectURL = "/"
+	}
+	res.Header().Set(HeaderLocation, redirectURL)
+	res.WriteHeader(http.StatusTemporaryRedirect)
+}
+
+//
 // RegisterDelete register HTTP method DELETE with callback to handle it.
 //
 func (srv *Server) RegisterDelete(ep *Endpoint) {
