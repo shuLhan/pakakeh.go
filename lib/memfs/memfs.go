@@ -63,6 +63,10 @@ var ( // nolint: gochecknoglobals
 	// MaxFileSize define maximum file size that can be stored on memory.
 	// The default value is 5 MB.
 	MaxFileSize int64 = 1024 * 1024 * 5
+
+	// Development define a flag to bypass file in memory.  If its
+	// true, any call to Get will result in direct read to file system.
+	Development bool
 )
 
 //
@@ -111,6 +115,12 @@ func (mfs *MemFS) Get(path string) (*Node, error) {
 	node, ok := mfs.mapPathNode[path]
 	if !ok {
 		return nil, os.ErrNotExist
+	}
+
+	if Development {
+		path = filepath.Join("/", path)
+		path = filepath.Join(mfs.root.SysPath, path)
+		return newNode(path)
 	}
 
 	return node, nil
