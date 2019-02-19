@@ -95,6 +95,6 @@ const (
 	ContentTypeBinary = "application/octet-stream"
 	ContentTypeForm   = "application/x-www-form-urlencoded"
 	ContentTypeJSON   = "application/json"
-	ContentTypePlain  = "text/plain"
+	ContentTypePlain  = "text/plain; charset=utf-8"
 	HeaderLocation    = "Location"
 )
