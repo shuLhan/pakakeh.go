@@ -150,6 +150,10 @@ func (mfs *MemFS) ListNames() (paths []string) {
 // access file "a" we call Get("/a"), not Get("/tmp/a").
 //
 func (mfs *MemFS) Mount(dir string) error {
+	if len(dir) == 0 {
+		return nil
+	}
+
 	f, err := os.Open(dir)
 	if err != nil {
 		return err
@@ -168,7 +172,7 @@ func (mfs *MemFS) Mount(dir string) error {
 
 	mfs.pruneEmptyDirs()
 
-	return err
+	return nil
 }
 
 func (mfs *MemFS) createRoot(dir string, f *os.File) error {
