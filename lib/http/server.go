@@ -196,8 +196,13 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 //
 // Start the HTTP server.
 //
-func (srv *Server) Start() error {
-	return srv.conn.ListenAndServe()
+func (srv *Server) Start() (err error) {
+	if srv.conn.TLSConfig == nil {
+		err = srv.conn.ListenAndServe()
+	} else {
+		err = srv.conn.ListenAndServeTLS("", "")
+	}
+	return err
 }
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
