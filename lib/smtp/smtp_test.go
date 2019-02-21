@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	testAddress  = "127.0.0.1:2525"
-	testUsername = "test@mail.kilabit.local"
-	testPassword = "secret"
+	testAddress    = "127.0.0.1:2525"
+	testTLSAddress = "127.0.0.1:2533"
+	testUsername   = "test@mail.kilabit.local"
+	testPassword   = "secret"
 )
 
 var ( // nolint: gochecknoglobals
@@ -42,25 +43,30 @@ func TestMain(m *testing.M) {
 	}
 
 	testServer = &Server{
-		Addr:    testAddress,
-		Env:     testEnv,
-		Handler: handler,
-		Storage: storage,
+		Address:    testAddress,
+		TLSAddress: testTLSAddress,
+		Env:        testEnv,
+		Handler:    handler,
+		Storage:    storage,
 	}
 
 	go func() {
-		e := testServer.ListenAndServe()
+		e := testServer.Start()
 		if e != nil {
 			log.Fatal("ListenAndServe:", e.Error())
 		}
 	}()
 
-	testClient, err = NewClient(testAddress)
+	testClient, err = NewClient(testTLSAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	os.Exit(m.Run())
+	s := m.Run()
+
+	testServer.Stop()
+
+	os.Exit(s)
 }
 
 func TestParsePath(t *testing.T) {

@@ -103,6 +103,7 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 			if err == io.EOF {
 				break
 			}
+			err = fmt.Errorf("smtp: recv: readCommand: " + err.Error())
 			return nil, err
 		}
 		if n == cap(recv.data) {
@@ -113,6 +114,7 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 
 	err = cmd.unpack(recv.buff.Bytes())
 	if err != nil {
+		err = fmt.Errorf("smtp: cmd.unpack: " + err.Error())
 		return nil, err
 	}
 
@@ -155,6 +157,7 @@ func (recv *receiver) reset() {
 func (recv *receiver) sendError(errRes error) (err error) {
 	reply, ok := errRes.(*liberrors.E)
 	if !ok {
+		reply = &liberrors.E{}
 		reply.Code = StatusLocalError
 		reply.Message = errRes.Error()
 	} else if reply.Code == 0 {

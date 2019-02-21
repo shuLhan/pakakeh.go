@@ -149,7 +149,7 @@ func TestAuth(t *testing.T) {
 }
 
 func TestAuth2(t *testing.T) {
-	cl, err := NewClient(testAddress)
+	cl, err := NewClient(testTLSAddress)
 	if err != nil {
 		t.Fatal(err)
 	}

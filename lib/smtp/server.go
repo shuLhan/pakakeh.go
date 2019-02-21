@@ -12,6 +12,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"sync"
 
 	"github.com/shuLhan/share/lib/debug"
 )
@@ -25,7 +26,10 @@ const (
 //
 type Server struct {
 	// Addr to listen for incoming connections.
-	Addr string
+	Address string
+
+	// TLSAddress address when listening with security layer.
+	TLSAddress string
 
 	//
 	// Env define the environment of SMTP server.
@@ -55,6 +59,10 @@ type Server struct {
 	// listener is a socket that listen for new connection from client.
 	listener net.Listener
 
+	// tlsListener is a socket that listen for new connection from client
+	// on secure layer, usually on port 465.
+	tlsListener net.Listener
+
 	// mailTxQueue hold mail objects before being relayed or stored.
 	mailTxQueue chan *MailTx
 
@@ -64,41 +72,103 @@ type Server struct {
 
 	// relayQueue hold mail objects that need to be relayed to other MTA.
 	relayQueue chan *MailTx
+
+	wg      sync.WaitGroup
+	running bool
 }
 
 //
-// ListenAndServe start listening the SMTP request.
+// Start listening for SMTP connections.
 // Each client connection will be handled in a single routine.
 //
-func (srv *Server) ListenAndServe() (err error) {
+func (srv *Server) Start() (err error) {
 	err = srv.init()
 	if err != nil {
 		return
 	}
 
+	srv.running = true
+
+	srv.wg.Add(1)
 	go srv.processRelayQueue()
+
+	srv.wg.Add(1)
 	go srv.processBounceQueue()
+
+	srv.wg.Add(1)
 	go srv.processMailTxQueue()
 
+	srv.wg.Add(1)
+	go srv.serve()
+
+	if srv.tlsListener != nil {
+		srv.wg.Add(1)
+		go srv.serveTLS()
+	}
+
+	srv.wg.Wait()
+	srv.running = false
+
+	return nil
+}
+
+//
+// Stop the server.
+//
+func (srv *Server) Stop() {
+	if srv.tlsListener != nil {
+		err := srv.tlsListener.Close()
+		if err != nil {
+			log.Printf("smtp: tlsListener.Close: %s", err)
+		}
+	}
+
+	err := srv.listener.Close()
+	if err != nil {
+		log.Printf("smtp: listener.Close: %s", err)
+	}
+
+	close(srv.mailTxQueue)
+	close(srv.bounceQueue)
+	close(srv.relayQueue)
+}
+
+func (srv *Server) serve() {
 	for {
-		fmt.Println("ListenAndServe: waiting for client ...")
+		if debug.Value >= 2 {
+			fmt.Println("smtp: serve: waiting for client ...")
+		}
+
 		conn, err := srv.listener.Accept()
 		if err != nil {
-			log.Printf("ListenAndServe.Accept: %s", err)
-			break
+			log.Printf("smtp: listener.Accept: %s", err)
+			srv.wg.Done()
+			return
 		}
 
 		recv := newReceiver(conn)
 
 		go srv.handle(recv)
 	}
+}
 
-	err = srv.listener.Close()
-	if err != nil {
-		log.Printf("ListenAndServe.Close: %s", err)
+func (srv *Server) serveTLS() {
+	for {
+		if debug.Value >= 2 {
+			fmt.Println("smtp: serveTLS: waiting for client ...")
+		}
+
+		conn, err := srv.tlsListener.Accept()
+		if err != nil {
+			log.Printf("smtp: tlsListener.Accept: %s", err)
+			srv.wg.Done()
+			return
+		}
+
+		recv := newReceiver(conn)
+
+		go srv.handle(recv)
 	}
-
-	return
 }
 
 //
@@ -112,10 +182,10 @@ func (srv *Server) handle(recv *receiver) {
 		return
 	}
 
-	for {
+	for srv.running {
 		cmd, err := recv.readCommand()
 		if err != nil {
-			log.Println("receiver.readCommand: ", err)
+			log.Println(err)
 			_ = recv.sendError(err)
 			break
 		}
@@ -463,38 +533,39 @@ func (srv *Server) init() (err error) {
 }
 
 func (srv *Server) initListener() (err error) {
+	if len(srv.Address) == 0 {
+		srv.Address = ":25"
+	}
+
+	addr, err := net.ResolveTCPAddr("tcp", srv.Address)
+	if err != nil {
+		return err
+	}
+
+	srv.listener, err = net.ListenTCP("tcp", addr)
+	if err != nil {
+		return err
+	}
+
 	cert := srv.Env.Certificate()
 	if cert == nil {
-		if len(srv.Addr) == 0 {
-			srv.Addr = ":25"
-		}
-	} else {
-		if len(srv.Addr) == 0 {
-			srv.Addr = ":465"
-		}
+		return nil
 	}
 
-	addr, err := net.ResolveTCPAddr("tcp", srv.Addr)
-	if err != nil {
-		return err
+	tlsCfg := &tls.Config{
+		Certificates: []tls.Certificate{
+			*cert,
+		},
+		MinVersion: tls.VersionTLS11,
 	}
 
-	if cert == nil {
-		srv.listener, err = net.ListenTCP("tcp", addr)
-	} else {
-		tlsCfg := &tls.Config{
-			Certificates: []tls.Certificate{
-				*cert,
-			},
-			MinVersion: tls.VersionTLS11,
-		}
-		srv.listener, err = tls.Listen("tcp", srv.Addr, tlsCfg)
-	}
-	if err != nil {
-		return err
+	if len(srv.TLSAddress) == 0 {
+		srv.TLSAddress = ":465"
 	}
 
-	return nil
+	srv.tlsListener, err = tls.Listen("tcp", srv.TLSAddress, tlsCfg)
+
+	return err
 }
 
 func (srv *Server) isLocalDomain(d string) bool {
@@ -517,7 +588,7 @@ func (srv *Server) isLocalDomain(d string) bool {
 // to sender.
 //
 func (srv *Server) processMailTxQueue() {
-	for mail := range srv.mailTxQueue {
+	for mail, ok := <-srv.mailTxQueue; ok; {
 		if mail.isPostponed() {
 			continue
 		}
@@ -553,6 +624,7 @@ func (srv *Server) processMailTxQueue() {
 			}
 		}
 	}
+	srv.wg.Done()
 }
 
 //
@@ -562,12 +634,13 @@ func (srv *Server) processMailTxQueue() {
 // using SMTP through relay queue.
 //
 func (srv *Server) processBounceQueue() {
-	for mail := range srv.bounceQueue {
+	for mail, ok := <-srv.bounceQueue; ok; {
 		err := srv.Storage.Bounce(mail.ID)
 		if err != nil {
 			continue
 		}
 	}
+	srv.wg.Done()
 }
 
 //
@@ -577,9 +650,10 @@ func (srv *Server) processBounceQueue() {
 // address is not managed by server.
 //
 func (srv *Server) processRelayQueue() {
-	for range srv.relayQueue {
+	for _, ok := <-srv.relayQueue; ok; {
 		// TODO:
 	}
+	srv.wg.Done()
 }
 
 //
