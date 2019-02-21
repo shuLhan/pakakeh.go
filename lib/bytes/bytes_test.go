@@ -312,6 +312,22 @@ func TestTokenFind(t *testing.T) {
 	testTokenFind(t, line, token, 0, exp)
 }
 
+func TestInReplace(t *testing.T) {
+	cases := []struct {
+		in  string
+		exp string
+	}{{
+		in:  "/a/path/to/file.ext",
+		exp: "_a_path_to_file_ext",
+	}}
+
+	for _, c := range cases {
+		got := InReplace([]byte(c.in), []byte(ASCIILettersNumber), '_')
+
+		test.Assert(t, "InReplace", c.exp, string(got), true)
+	}
+}
+
 func BenchmarkToLowerStd(b *testing.B) {
 	randomInput256 := Random([]byte(HexaLetters), 256)
 

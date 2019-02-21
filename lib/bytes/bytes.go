@@ -329,6 +329,34 @@ func ReadUint32(data []byte, x uint) uint32 {
 }
 
 //
+// InReplace do a reverse replace on input, any characters that is not on
+// allowed, will be replaced with character c.
+//
+func InReplace(in, allowed []byte, c byte) (out []byte) {
+	if len(in) == 0 {
+		return
+	}
+
+	out = make([]byte, len(in))
+	copy(out, in)
+	found := false
+	for x := 0; x < len(in); x++ {
+		found = false
+		for y := 0; y < len(allowed); y++ {
+			if in[x] == allowed[y] {
+				found = true
+				break
+			}
+		}
+		if !found {
+			out[x] = c
+		}
+	}
+
+	return
+}
+
+//
 // SkipAfterToken skip all bytes until matched token is found and return the
 // index after the token and boolean true.
 //

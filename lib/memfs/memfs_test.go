@@ -117,7 +117,10 @@ func TestMount(t *testing.T) {
 		expErr: "mount must be a directory",
 	}, {
 		desc: "With directory",
-		dir:  filepath.Join(_testWD, "testdata"),
+		excs: []string{
+			"memfs_generate.go$",
+		},
+		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
 			"/",
 			"/exclude",
@@ -131,12 +134,14 @@ func TestMount(t *testing.T) {
 			"/index.css",
 			"/index.html",
 			"/index.js",
+			"/memfs_generate_test.go",
 			"/plain",
 		},
 	}, {
 		desc: "With excludes",
 		excs: []string{
 			`.*\.js$`,
+			"memfs_generate.go$",
 		},
 		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
@@ -149,12 +154,16 @@ func TestMount(t *testing.T) {
 			"/include/index.html",
 			"/index.css",
 			"/index.html",
+			"/memfs_generate_test.go",
 			"/plain",
 		},
 	}, {
 		desc: "With includes",
 		incs: []string{
 			`.*\.js$`,
+		},
+		excs: []string{
+			"memfs_generate.go$",
 		},
 		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
