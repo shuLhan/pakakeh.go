@@ -1,3 +1,0 @@
-[smtpd]
-hostname = mail.local
-domains = test,

@@ -12,13 +12,13 @@ import (
 // Environment define an interface for SMTP server environment.
 //
 type Environment interface {
-	// Hostname return the primary domain name.
-	Hostname() string
+	// Certificate return the server certificate for TLS or nil if no
+	// certificate.
+	Certificate() *tls.Certificate
 
 	// Domains return list of domains to be handled as final destination.
 	Domains() []string
 
-	// Certificate return the server certificate for TLS or nil if no
-	// certificate.
-	Certificate() *tls.Certificate
+	// Hostname return the primary domain name.
+	Hostname() string
 }

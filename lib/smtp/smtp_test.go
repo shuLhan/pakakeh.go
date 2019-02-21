@@ -21,17 +21,24 @@ const (
 var ( // nolint: gochecknoglobals
 	testClient *Client
 	testServer *Server
-	testEnv    *EnvironmentIni
+	testEnv    *EnvDirect
 )
 
 func TestMain(m *testing.M) {
-	var err error
-
 	handler := &testHandler{}
 	storage := &testStorage{}
-	testEnv, err = NewEnvironmentIni("testdata/smtpd.conf")
+	testEnv = &EnvDirect{
+		hostname: "mail.kilabit.local",
+		domains: []string{
+			"local.localdomain",
+		},
+	}
+	err := testEnv.LoadCertificate(
+		"testdata/mail.kilabit.local.chain.cert.pem",
+		"testdata/mail.kilabit.local.key.pem",
+	)
 	if err != nil {
-		log.Fatal("NewEnvironmentIni: ", err)
+		log.Fatal(err)
 	}
 
 	testServer = &Server{

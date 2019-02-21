@@ -28,8 +28,9 @@ type Server struct {
 	Addr string
 
 	//
-	// Env define the environment of SMTP server.  Default environment is
-	// EnvironmentIni, which read configuration through ini formated file.
+	// Env define the environment of SMTP server.
+	// There is no default environment, implementor should define their
+	// environment by implementing the interface.
 	//
 	Env Environment
 
@@ -429,10 +430,7 @@ func (srv *Server) handleHELP(recv *receiver) (err error) {
 //
 func (srv *Server) init() (err error) {
 	if srv.Env == nil {
-		srv.Env, err = NewEnvironmentIni("")
-		if err != nil {
-			return
-		}
+		return fmt.Errorf("smtp: environment is not defined")
 	}
 
 	if srv.Handler == nil {
