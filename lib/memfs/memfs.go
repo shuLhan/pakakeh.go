@@ -84,6 +84,10 @@ func (mfs *MemFS) Get(path string) (*Node, error) {
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
+	if len(mfs.mapPathNode) > 0 {
+		paths = make([]string, 0, len(mfs.mapPathNode))
+	}
+
 	for k := range mfs.mapPathNode {
 		if len(paths) == 0 {
 			paths = append(paths, k)
