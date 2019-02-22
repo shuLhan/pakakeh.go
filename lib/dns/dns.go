@@ -136,6 +136,30 @@ var QueryTypes = map[string]uint16{ // nolint: gochecknoglobals
 	"OPT":   QueryTypeOPT,
 }
 
+//
+// QueryTypeNames contains mapping between query type and and their string
+// representation.
+//
+var QueryTypeNames = map[uint16]string{
+	QueryTypeA:     "A",
+	QueryTypeNS:    "NS",
+	QueryTypeCNAME: "CNAME",
+	QueryTypeSOA:   "SOA",
+	QueryTypeMB:    "MB",
+	QueryTypeMG:    "MG",
+	QueryTypeMR:    "MR",
+	QueryTypeNULL:  "NULL",
+	QueryTypeWKS:   "WKS",
+	QueryTypePTR:   "PTR",
+	QueryTypeHINFO: "HINFO",
+	QueryTypeMINFO: "MINFO",
+	QueryTypeMX:    "MX",
+	QueryTypeTXT:   "TXT",
+	QueryTypeAAAA:  "AAAA",
+	QueryTypeSRV:   "SRV",
+	QueryTypeOPT:   "OPT",
+}
+
 // List of code known DNS query class.
 const (
 	QueryClassZERO uint16 = iota // Empty query class.

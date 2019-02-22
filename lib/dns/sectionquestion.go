@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"bytes"
 	"fmt"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -57,11 +56,8 @@ func (question *SectionQuestion) size() int {
 // String will return the string representation of section question structure.
 //
 func (question *SectionQuestion) String() string {
-	var buf bytes.Buffer
-
-	fmt.Fprintf(&buf, "&{Name:%s Type:%d Class:%d}", question.Name, question.Type, question.Class)
-
-	return buf.String()
+	return fmt.Sprintf("&{Name:%s Type:%s}", question.Name,
+		QueryTypeNames[question.Type])
 }
 
 //
