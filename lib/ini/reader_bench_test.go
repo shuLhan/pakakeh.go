@@ -23,7 +23,7 @@ import (
 // BenchmarkParse-2  20000    61150 ns/op    25176 B/op    482 allocs/op
 //
 func BenchmarkParse(b *testing.B) {
-	reader := NewReader()
+	reader := newReader()
 	src, err := ioutil.ReadFile(testdataInputIni)
 	if err != nil {
 		b.Fatal(err)

@@ -142,15 +142,24 @@ type Ini struct {
 // On fail it will return incomplete instance of Ini with error.
 //
 func Open(filename string) (in *Ini, err error) {
-	reader := NewReader()
+	reader := newReader()
 
-	in, err = reader.ParseFile(filename)
+	in, err = reader.parseFile(filename)
 
 	if debug.Value >= 1 && err == nil {
 		err = in.Write(os.Stdout)
 	}
 
 	return
+}
+
+//
+// Parse INI format from text.
+//
+func Parse(text []byte) (in *Ini, err error) {
+	reader := newReader()
+
+	return reader.Parse(text)
 }
 
 //

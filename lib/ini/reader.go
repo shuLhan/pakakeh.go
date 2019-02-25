@@ -41,9 +41,9 @@ var (
 )
 
 //
-// Reader define the INI file reader.
+// reader define the INI file reader.
 //
-type Reader struct {
+type reader struct {
 	br         *bytes.Reader
 	b          byte
 	r          rune
@@ -58,13 +58,13 @@ type Reader struct {
 }
 
 //
-// NewReader create, initialize, and return new reader.
+// newReader create, initialize, and return new reader.
 //
-func NewReader() (reader *Reader) {
-	reader = &Reader{
+func newReader() (r *reader) {
+	r = &reader{
 		br: bytes.NewReader(nil),
 	}
-	reader.reset(nil)
+	r.reset(nil)
 
 	return
 }
@@ -72,7 +72,7 @@ func NewReader() (reader *Reader) {
 //
 // reset all reader attributes, excluding filename.
 //
-func (reader *Reader) reset(src []byte) {
+func (reader *reader) reset(src []byte) {
 	reader.br.Reset(src)
 	reader.b = 0
 	reader.r = 0
@@ -90,12 +90,12 @@ func (reader *Reader) reset(src []byte) {
 }
 
 //
-// ParseFile will open, read, and parse INI file `filename` and return an
+// parseFile will open, read, and parse INI file `filename` and return an
 // instance of Ini.
 //
 // On failure, it return nil and error.
 //
-func (reader *Reader) ParseFile(filename string) (in *Ini, err error) {
+func (reader *reader) parseFile(filename string) (in *Ini, err error) {
 	src, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return
@@ -111,7 +111,7 @@ func (reader *Reader) ParseFile(filename string) (in *Ini, err error) {
 //
 // Parse will parse INI config from slice of bytes `src` into `in`.
 //
-func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
+func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 	in = &Ini{}
 	reader.reset(src)
 
@@ -188,7 +188,7 @@ func (reader *Reader) Parse(src []byte) (in *Ini, err error) {
 	return in, nil
 }
 
-func (reader *Reader) parse() (err error) {
+func (reader *reader) parse() (err error) {
 	reader.bufFormat.Reset()
 
 	for {
@@ -221,7 +221,7 @@ func (reader *Reader) parse() (err error) {
 	return nil
 }
 
-func (reader *Reader) parseComment() (err error) {
+func (reader *reader) parseComment() (err error) {
 	reader.bufComment.Reset()
 
 	reader._var.mode |= varModeComment
@@ -246,7 +246,7 @@ func (reader *Reader) parseComment() (err error) {
 	return
 }
 
-func (reader *Reader) parseSectionHeader() (err error) {
+func (reader *reader) parseSectionHeader() (err error) {
 	reader.buf.Reset()
 
 	reader.b, err = reader.br.ReadByte()
@@ -305,7 +305,7 @@ func (reader *Reader) parseSectionHeader() (err error) {
 //
 // (0) Skip white-spaces
 //
-func (reader *Reader) parseSubsection() (err error) {
+func (reader *reader) parseSubsection() (err error) {
 	reader.buf.Reset()
 
 	reader._var.mode |= varModeSubsection
@@ -370,7 +370,7 @@ func (reader *Reader) parseSubsection() (err error) {
 // parsePossibleComment will check only for whitespace and comment start
 // character.
 //
-func (reader *Reader) parsePossibleComment() (err error) {
+func (reader *reader) parsePossibleComment() (err error) {
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
@@ -397,7 +397,7 @@ func (reader *Reader) parsePossibleComment() (err error) {
 	return
 }
 
-func (reader *Reader) parseVariable() (err error) {
+func (reader *reader) parseVariable() (err error) {
 	reader.buf.Reset()
 
 	reader.r, _, err = reader.br.ReadRune()
@@ -467,7 +467,7 @@ func (reader *Reader) parseVariable() (err error) {
 // parsePossibleValue will check if the next character after space is comment
 // or `=`.
 //
-func (reader *Reader) parsePossibleValue() (err error) {
+func (reader *reader) parsePossibleValue() (err error) {
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
@@ -506,7 +506,7 @@ func (reader *Reader) parsePossibleValue() (err error) {
 //
 // (0) Consume leading white-spaces.
 //
-func (reader *Reader) parseVarValue() (err error) {
+func (reader *reader) parseVarValue() (err error) {
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()
 
@@ -640,7 +640,7 @@ func (reader *Reader) parseVarValue() (err error) {
 	return nil
 }
 
-func (reader *Reader) valueCommit(withSpaces bool) {
+func (reader *reader) valueCommit(withSpaces bool) {
 	val := reader.buf.String()
 
 	if withSpaces {
@@ -653,7 +653,7 @@ func (reader *Reader) valueCommit(withSpaces bool) {
 	reader.bufSpaces.Reset()
 }
 
-func (reader *Reader) valueWriteByte(b byte) {
+func (reader *reader) valueWriteByte(b byte) {
 	if reader.bufSpaces.Len() > 0 {
 		reader.buf.Write(reader.bufSpaces.Bytes())
 		reader.bufSpaces.Reset()

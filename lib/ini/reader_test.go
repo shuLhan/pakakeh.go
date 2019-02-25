@@ -99,7 +99,7 @@ func TestParseSectionHeader(t *testing.T) {
 		expComment: "# comment",
 	}}
 
-	reader := NewReader()
+	reader := newReader()
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -155,7 +155,7 @@ func TestParseSubsection(t *testing.T) {
 		expSub:    `subsection"`,
 	}}
 
-	reader := NewReader()
+	reader := newReader()
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -332,7 +332,7 @@ func TestParseVariable(t *testing.T) {
 		expValue:  varValueTrue,
 	}}
 
-	reader := NewReader()
+	reader := newReader()
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -484,7 +484,7 @@ func TestParseVarValue(t *testing.T) {
 		expErr: errValueInvalid,
 	}}
 
-	reader := NewReader()
+	reader := newReader()
 
 	for _, c := range cases {
 		t.Log(c.desc)
