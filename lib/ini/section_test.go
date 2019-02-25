@@ -10,12 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var ( // nolint: gochecknoglobals
-	sec     *Section
-	lastSec *Section
-)
-
-func testNewSection(t *testing.T) {
+func TestNewSection(t *testing.T) {
 	cases := []struct {
 		desc   string
 		name   string
@@ -55,7 +50,7 @@ func testNewSection(t *testing.T) {
 	}
 }
 
-func testSectionSet(t *testing.T) {
+func TestSectionSet(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
@@ -155,7 +150,7 @@ func testSectionSet(t *testing.T) {
 	}
 }
 
-func testSectionAdd(t *testing.T) {
+func TestSectionAdd(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
@@ -231,7 +226,7 @@ func testSectionAdd(t *testing.T) {
 	}
 }
 
-func testSectionSet2(t *testing.T) {
+func TestSectionSet2(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
@@ -262,7 +257,7 @@ func testSectionSet2(t *testing.T) {
 	}
 }
 
-func testSectionUnset(t *testing.T) {
+func TestSectionUnset(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
@@ -340,7 +335,7 @@ func testSectionUnset(t *testing.T) {
 	}
 }
 
-func testSectionUnsetAll(t *testing.T) {
+func TestSectionUnsetAll(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
@@ -381,7 +376,7 @@ func testSectionUnsetAll(t *testing.T) {
 	}
 }
 
-func testSectionReplaceAll(t *testing.T) {
+func TestSectionReplaceAll(t *testing.T) {
 	sec.add(nil)
 
 	sec.Add("key-3", "3")
@@ -488,7 +483,7 @@ func testSectionReplaceAll(t *testing.T) {
 	}
 }
 
-func testSectionGet(t *testing.T) {
+func TestSectionGet(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
@@ -521,15 +516,37 @@ func testSectionGet(t *testing.T) {
 	}
 }
 
-func TestSection(t *testing.T) {
-	sec = NewSection("test", "")
+func TestSectionGets(t *testing.T) {
+	sec.Add("dup", "value 1")
+	sec.Add("dup", "value 2")
 
-	t.Run("New", testNewSection)
-	t.Run("Set", testSectionSet)
-	t.Run("Add", testSectionAdd)
-	t.Run("Set2", testSectionSet2)
-	t.Run("Unset", testSectionUnset)
-	t.Run("UnsetAll", testSectionUnsetAll)
-	t.Run("ReplaceAll", testSectionReplaceAll)
-	t.Run("Get", testSectionGet)
+	cases := []struct {
+		desc  string
+		key   string
+		defs  []string
+		exps  []string
+		expOK bool
+	}{{
+		desc: "With empty key",
+	}, {
+		desc: "With no key found",
+		key:  "noop",
+		defs: []string{"default"},
+		exps: []string{"default"},
+	}, {
+		desc:  "With key found",
+		key:   "dup",
+		defs:  []string{"default"},
+		exps:  []string{"value 1", "value 2"},
+		expOK: true,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got, ok := sec.Gets(c.key, c.defs)
+
+		test.Assert(t, "Gets value", c.exps, got, true)
+		test.Assert(t, "Gets ok", c.expOK, ok, true)
+	}
 }

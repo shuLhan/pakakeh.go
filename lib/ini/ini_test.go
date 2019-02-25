@@ -5,6 +5,7 @@
 package ini
 
 import (
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -18,6 +19,16 @@ const (
 	testdataVarMultiSection   = "testdata/var_multi_section.ini"
 	testdataVarWithoutSection = "testdata/var_without_section.ini"
 )
+
+var (
+	sec     *Section //nolint: gochecknoglobals
+	lastSec *Section //nolint: gochecknoglobals
+)
+
+func TestMain(m *testing.M) {
+	sec = NewSection("test", "")
+	os.Exit(m.Run())
+}
 
 func TestOpen(t *testing.T) {
 	cases := []struct {

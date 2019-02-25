@@ -296,6 +296,28 @@ func (sec *Section) Get(key, def string) (val string, ok bool) {
 }
 
 //
+// Gets all variable values that have the same key under section from top to
+// bottom.
+// If no key found it will return default values and false.
+//
+func (sec *Section) Gets(key string, defs []string) (vals []string, ok bool) {
+	if len(sec.Vars) == 0 || len(key) == 0 {
+		return defs, false
+	}
+
+	key = strings.ToLower(key)
+	for x := 0; x < len(sec.Vars); x++ {
+		if sec.Vars[x].KeyLower == key {
+			vals = append(vals, sec.Vars[x].Value)
+		}
+	}
+	if len(vals) == 0 {
+		return defs, false
+	}
+	return vals, true
+}
+
+//
 // String return formatted INI section header.
 //
 func (sec *Section) String() string {
