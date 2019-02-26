@@ -15,14 +15,14 @@ import (
 
 const (
 	defDirBounce = "bounce"
-	defDirSpool  = "/var/spool/smtpd"
+	defDirSpool  = "/var/spool/smtp"
 )
 
 //
-// StorageFile implement the Storage interface where mail object is save and
+// LocalStorage implement the Storage interface where mail object is save and
 // retrieved in file system inside a directory.
 //
-type StorageFile struct {
+type LocalStorage struct {
 	dir  string
 	buff bytes.Buffer
 	enc  *gob.Encoder
@@ -30,10 +30,10 @@ type StorageFile struct {
 }
 
 //
-// NewStorageFile create and initialize new file storage.  If directory is
-// empty, the default storage is located at "/var/spool/smtpd/".
+// NewLocalStorage create and initialize new file storage.  If directory is
+// empty, the default storage is located at "/var/spool/smtp/".
 //
-func NewStorageFile(dir string) (fs *StorageFile, err error) {
+func NewLocalStorage(dir string) (storage Storage, err error) {
 	if len(dir) == 0 {
 		dir = defDirSpool
 	}
@@ -50,7 +50,7 @@ func NewStorageFile(dir string) (fs *StorageFile, err error) {
 		return nil, err
 	}
 
-	fs = &StorageFile{
+	fs := &LocalStorage{
 		dir: dir,
 	}
 
@@ -64,7 +64,7 @@ func NewStorageFile(dir string) (fs *StorageFile, err error) {
 // MailBounce move the incoming mail to bounced state.  In this storage
 // service, the mail file is moved to "{dir}/bounce".
 //
-func (fs *StorageFile) MailBounce(id string) error {
+func (fs *LocalStorage) MailBounce(id string) error {
 	oldp := filepath.Join(fs.dir, id)
 	newp := filepath.Join(fs.dir, defDirBounce, id)
 
@@ -74,7 +74,7 @@ func (fs *StorageFile) MailBounce(id string) error {
 //
 // MailDelete the mail object on file system by ID.
 //
-func (fs *StorageFile) MailDelete(id string) (err error) {
+func (fs *LocalStorage) MailDelete(id string) (err error) {
 	if len(id) == 0 {
 		return
 	}
@@ -86,7 +86,7 @@ func (fs *StorageFile) MailDelete(id string) (err error) {
 //
 // MailLoad read the mail object from file system by ID.
 //
-func (fs *StorageFile) MailLoad(id string) (mail *MailTx, err error) {
+func (fs *LocalStorage) MailLoad(id string) (mail *MailTx, err error) {
 	if len(id) == 0 {
 		return
 	}
@@ -104,7 +104,7 @@ func (fs *StorageFile) MailLoad(id string) (mail *MailTx, err error) {
 //
 // MailLoadAll mail objects from file system.
 //
-func (fs *StorageFile) MailLoadAll() (mails []*MailTx, err error) {
+func (fs *LocalStorage) MailLoadAll() (mails []*MailTx, err error) {
 	d, err := os.Open(fs.dir)
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func (fs *StorageFile) MailLoadAll() (mails []*MailTx, err error) {
 
 		mail, err := fs.MailLoad(fi.Name())
 		if err != nil {
-			log.Printf("StorageFile.Load: %s\n", err)
+			log.Printf("LocalStorage.Load: %s\n", err)
 			continue
 		}
 
@@ -135,7 +135,7 @@ func (fs *StorageFile) MailLoadAll() (mails []*MailTx, err error) {
 //
 // MailSave save the mail object into file system.
 //
-func (fs *StorageFile) MailSave(mail *MailTx) (err error) {
+func (fs *LocalStorage) MailSave(mail *MailTx) (err error) {
 	if mail == nil {
 		return
 	}
@@ -151,7 +151,7 @@ func (fs *StorageFile) MailSave(mail *MailTx) (err error) {
 	return ioutil.WriteFile(fpath, fs.buff.Bytes(), 0600)
 }
 
-func (fs *StorageFile) loadRaw(b []byte) (mail *MailTx, err error) {
+func (fs *LocalStorage) loadRaw(b []byte) (mail *MailTx, err error) {
 	fs.buff.Reset()
 	fs.buff.Write(b)
 

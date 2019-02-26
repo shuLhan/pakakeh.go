@@ -11,9 +11,9 @@ import (
 )
 
 func TestStore(t *testing.T) {
-	testFS, err := NewStorageFile("./testdata")
+	testFS, err := NewLocalStorage("./testdata")
 	if err != nil {
-		t.Fatalf("NewStorageFile: %s\n", err)
+		t.Fatalf("NewLocalStorage: %s\n", err)
 	}
 
 	cases := []struct {
@@ -49,9 +49,9 @@ func TestStore(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	testFS, err := NewStorageFile("./testdata")
+	testFS, err := NewLocalStorage("./testdata")
 	if err != nil {
-		t.Fatalf("NewStorageFile: %s\n", err)
+		t.Fatalf("NewLocalStorage: %s\n", err)
 	}
 
 	mails, err := testFS.MailLoadAll()
@@ -62,7 +62,7 @@ func TestDelete(t *testing.T) {
 	for _, mail := range mails {
 		err = testFS.MailDelete(mail.ID)
 		if err != nil {
-			t.Fatalf("StorageFile.Delete: %s\n", err)
+			t.Fatalf("LocalStorage.Delete: %s\n", err)
 		}
 	}
 }
