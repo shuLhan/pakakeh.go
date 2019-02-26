@@ -5,23 +5,23 @@
 package smtp
 
 //
-// Domain contains a host name and list of accounts.
+// Domain contains a host name and list of accounts in domain.
 //
 type Domain struct {
 	Name     string
-	Accounts []*Account
+	Accounts map[string]*Account
 }
 
 //
 // NewDomain create new domain with single main user, "postmaster".
 //
 func NewDomain(name string) (domain *Domain) {
-	accPostmaster := NewAccount("Postmaster", "postmaster", "")
+	accPostmaster, _ := NewAccount("Postmaster", "postmaster", "", "")
 
 	domain = &Domain{
 		Name: name,
-		Accounts: []*Account{
-			accPostmaster,
+		Accounts: map[string]*Account{
+			"postmaster": accPostmaster,
 		},
 	}
 

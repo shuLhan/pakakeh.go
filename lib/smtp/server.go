@@ -42,13 +42,8 @@ type Server struct {
 	// on address defined in TLSAddress.
 	TLSCert *tls.Certificate
 
-	// PrimaryDomain of the SMTP server.
-	// This field is required.
-	PrimaryDomain *Domain
-
-	// VirtualDomains contains list of virtual domain handled by server.
-	// This field is optional.
-	VirtualDomains []*Domain
+	// Env contains server environment.
+	Env *Environment
 
 	//
 	// Exts define list of custom extensions that the server will provide.
@@ -58,15 +53,10 @@ type Server struct {
 	//
 	// Handler define an interface that will process the bouncing email,
 	// incoming email, EXPN command, and VRFY command.
+	// This field is optional, if not set, it will default to
+	// LocalHandler.
 	//
 	Handler Handler
-
-	//
-	// Storage define the storage that will be used to load and store
-	// email.  Default Storage is StorageFile, where incoming email will
-	// be stored on file system.
-	//
-	Storage Storage
 
 	// listener is a socket that listen for new connection from client.
 	listener net.Listener
@@ -201,7 +191,7 @@ func (srv *Server) serveTLS() {
 // handle receiver connection.
 //
 func (srv *Server) handle(recv *receiver) {
-	err := recv.sendReply(StatusReady, srv.PrimaryDomain.Name, nil)
+	err := recv.sendReply(StatusReady, srv.Env.PrimaryDomain.Name, nil)
 	if err != nil {
 		log.Println("receiver.sendReply: ", err.Error())
 		recv.close()
@@ -252,6 +242,7 @@ func (srv *Server) handle(recv *receiver) {
 			if err != nil {
 				goto out
 			}
+
 			recv.reset()
 
 		case CommandQUIT:
@@ -317,7 +308,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 			body = append(body, "AUTH PLAIN")
 		}
 
-		err = recv.sendReply(StatusOK, srv.PrimaryDomain.Name, body)
+		err = recv.sendReply(StatusOK, srv.Env.PrimaryDomain.Name, body)
 		if err != nil {
 			return err
 		}
@@ -326,7 +317,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 	case CommandHELO:
 		recv.clientDomain = cmd.Arg
 
-		err = recv.sendReply(StatusOK, srv.PrimaryDomain.Name, nil)
+		err = recv.sendReply(StatusOK, srv.Env.PrimaryDomain.Name, nil)
 		if err != nil {
 			return err
 		}
@@ -525,19 +516,15 @@ func (srv *Server) handleHELP(recv *receiver) (err error) {
 // initialize handler, storage, extensions, and listeners.
 //
 func (srv *Server) initialize() (err error) {
-	if srv.PrimaryDomain == nil {
-		return fmt.Errorf("smtp: primary domain is not defined")
+	if srv.Env == nil {
+		return fmt.Errorf("smtp: server environment is not defined")
+	}
+	if srv.Env.PrimaryDomain == nil {
+		return fmt.Errorf("smtp: server primary domain is not defined")
 	}
 
 	if srv.Handler == nil {
-		srv.Handler = &HandlerPosix{}
-	}
-
-	if srv.Storage == nil {
-		srv.Storage, err = NewStorageFile("")
-		if err != nil {
-			return
-		}
+		srv.Handler = NewLocalHandler(srv.Env)
 	}
 
 	if srv.Exts == nil {
@@ -594,10 +581,10 @@ func (srv *Server) initListener() (err error) {
 }
 
 func (srv *Server) isOurDomain(d string) bool {
-	if d == srv.PrimaryDomain.Name {
+	if d == srv.Env.PrimaryDomain.Name {
 		return true
 	}
-	for _, domain := range srv.VirtualDomains {
+	for _, domain := range srv.Env.VirtualDomains {
 		if d == domain.Name {
 			return true
 		}
@@ -607,13 +594,17 @@ func (srv *Server) isOurDomain(d string) bool {
 
 //
 // processMailTxQueue process incoming mail transactions.
-// There are three possibilities for incoming mail.
-// First, when the recipient domain is managed by server, the mail will be
-// forwarded to handler, ServeMailTx.
-// Second, when the recipient is not managed by server, the mail will be
-// relayed to another server based on recipient's domain.
-// Last, when recipient is invalid, the mail transaction will be bounced back
-// to sender.
+//
+// There are three possibilities for incoming mail:
+//
+// (1) when the recipient domain is managed by server, the mail will be
+// forwarded to handler ServeMailTx; the email transaction is terminated.
+//
+// (2) when the recipient domain is not managed by server, the mail will be
+// relayed to another server based on recipient's domain address.
+//
+// (3) when recipient address is unknown or invalid, the mail transaction will
+// be bounced back to sender.
 //
 func (srv *Server) processMailTxQueue() {
 	for mail, ok := <-srv.mailTxQueue; ok; {
@@ -630,11 +621,15 @@ func (srv *Server) processMailTxQueue() {
 		switch len(addr) {
 		case 2:
 			if srv.isOurDomain(addr[1]) {
+				// This is the first case.
 				_, err = srv.Handler.ServeMailTx(mail)
 			} else {
+				// This is the second case.
 				srv.relayQueue <- mail
 			}
 		case 1:
+			// The first case, where recipient domain is assumed
+			// to be primary domain.
 			if addr[0] == localPostmaster {
 				_, err = srv.Handler.ServeMailTx(mail)
 			} else {
@@ -662,8 +657,10 @@ func (srv *Server) processMailTxQueue() {
 // using SMTP through relay queue.
 //
 func (srv *Server) processBounceQueue() {
+	var err error
+
 	for mail, ok := <-srv.bounceQueue; ok; {
-		err := srv.Storage.MailBounce(mail.ID)
+		_, err = srv.Handler.ServeBounce(mail)
 		if err != nil {
 			continue
 		}
@@ -693,11 +690,6 @@ func (srv *Server) processMailTx(mail *MailTx) (err error) {
 	mails := make([]*MailTx, len(mail.Recipients))
 	for x, rcpt := range mail.Recipients {
 		mails[x] = NewMailTx(mail.From, []string{rcpt}, mail.Data)
-
-		err = srv.Storage.MailSave(mails[x])
-		if err != nil {
-			return
-		}
 	}
 	for _, mail := range mails {
 		srv.mailTxQueue <- mail

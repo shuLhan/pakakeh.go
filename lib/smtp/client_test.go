@@ -43,7 +43,7 @@ func TestConnect(t *testing.T) {
 
 	expRes := &Response{
 		Code:    220,
-		Message: testServer.PrimaryDomain.Name,
+		Message: testServer.Env.PrimaryDomain.Name,
 	}
 
 	res, err := testClient.Connect(true)
@@ -103,13 +103,13 @@ func TestAuth(t *testing.T) {
 		exp      *Response
 	}{{
 		desc:     "With invalid mechanism",
-		username: testUsername,
+		username: testAccountFirst.Short(),
 		password: testPassword,
 		expErr:   "client.Authenticate: unknown mechanism",
 	}, {
 		desc:     "With invalid credential",
 		mech:     MechanismPLAIN,
-		username: testUsername,
+		username: testAccountFirst.Short(),
 		password: "invalid",
 		exp: &Response{
 			Code:    StatusInvalidCredential,
@@ -118,7 +118,7 @@ func TestAuth(t *testing.T) {
 	}, {
 		desc:     "With valid credential",
 		mech:     MechanismPLAIN,
-		username: testUsername,
+		username: testAccountFirst.Short(),
 		password: testPassword,
 		exp: &Response{
 			Code:    StatusAuthenticated,
@@ -127,7 +127,7 @@ func TestAuth(t *testing.T) {
 	}, {
 		desc:     "With valid credential again",
 		mech:     MechanismPLAIN,
-		username: testUsername,
+		username: testAccountFirst.Short(),
 		password: testPassword,
 		exp: &Response{
 			Code:    StatusCmdBadSequence,
@@ -170,7 +170,7 @@ func TestAuth2(t *testing.T) {
 	}
 	test.Assert(t, "Response", exp, res, true)
 
-	cred := []byte("\x00" + testUsername + "\x00" + testPassword)
+	cred := []byte("\x00" + testAccountFirst.Short() + "\x00" + testPassword)
 	cmd = base64.StdEncoding.EncodeToString(cred)
 
 	res, err = cl.SendCommand([]byte(cmd))
@@ -191,14 +191,11 @@ func TestExpand(t *testing.T) {
 		mlist string
 		exp   *Response
 	}{{
-		desc:  "With mailing-list exist",
-		mlist: "list-exist",
+		desc:  "With mailing-list",
+		mlist: "mailing-list@test",
 		exp: &Response{
-			Code:    StatusOK,
-			Message: "List Exist",
-			Body: []string{
-				"Member A <member-a@mail.local>",
-			},
+			Code:    StatusCmdNotImplemented,
+			Message: "Command not implemented",
 		},
 	}}
 
@@ -359,29 +356,17 @@ func TestVerify(t *testing.T) {
 		exp     *Response
 	}{{
 		desc:    "With mailbox exist",
-		mailbox: "exist",
+		mailbox: testAccountFirst.Short(),
 		exp: &Response{
 			Code:    StatusOK,
-			Message: "Exist <exist@mail.local>",
+			Message: "First Tester <first@mail.kilabit.local>",
 		},
 	}, {
-		desc:    "With mailbox not exit",
-		mailbox: "notexist",
+		desc:    "With mailbox not exist",
+		mailbox: "notexist@mail",
 		exp: &Response{
 			Code:    StatusMailboxNotFound,
-			Message: "No such user here",
-		},
-	}, {
-		desc:    "With ambigous user",
-		mailbox: "ambigous",
-		exp: &Response{
-			Code:    StatusMailboxIncorrect,
-			Message: "User ambigous",
-			Body: []string{
-				"Ambigous A <a@mail.local>",
-				"Ambigous B <b@mail.local>",
-				"Ambigous C <c@mail.local>",
-			},
+			Message: "mailbox not found",
 		},
 	}}
 

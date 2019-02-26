@@ -14,26 +14,46 @@ import (
 
 const (
 	testAddress    = "127.0.0.1:2525"
-	testTLSAddress = "127.0.0.1:2533"
-	testUsername   = "test@mail.kilabit.local"
+	testDomain     = "mail.kilabit.local"
 	testPassword   = "secret"
+	testTLSAddress = "127.0.0.1:2533"
 )
 
 var (
-	testClient *Client // nolint: gochecknoglobals
-	testServer *Server // nolint: gochecknoglobals
+	testClient        *Client  // nolint: gochecknoglobals
+	testServer        *Server  // nolint: gochecknoglobals
+	testAccountFirst  *Account // nolint: gochecknoglobals
+	testAccountSecond *Account // nolint: gochecknoglobals
 )
 
 func TestMain(m *testing.M) {
-	testServer = &Server{
-		Address:       testAddress,
-		TLSAddress:    testTLSAddress,
-		PrimaryDomain: NewDomain("mail.kilabit.local"),
-		Handler:       &testHandler{},
-		Storage:       &testStorage{},
+	var err error
+
+	testAccountFirst, err = NewAccount("First Tester", "first", testDomain, testPassword)
+	if err != nil {
+		log.Fatal(err)
+	}
+	testAccountSecond, err = NewAccount("Second Tester", "second", testDomain, testPassword)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	err := testServer.LoadCertificate(
+	primaryDomain := NewDomain(testDomain)
+	primaryDomain.Accounts["first"] = testAccountFirst
+	primaryDomain.Accounts["second"] = testAccountSecond
+
+	env := &Environment{
+		PrimaryDomain: primaryDomain,
+	}
+
+	testServer = &Server{
+		Address:    testAddress,
+		TLSAddress: testTLSAddress,
+		Env:        env,
+		Handler:    NewLocalHandler(env),
+	}
+
+	err = testServer.LoadCertificate(
 		"testdata/mail.kilabit.local.chain.cert.pem",
 		"testdata/mail.kilabit.local.key.pem",
 	)
