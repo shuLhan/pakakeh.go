@@ -76,10 +76,10 @@ func (cmd *Command) parsePath(b []byte) error {
 
 	cmd.Arg = string(mb)
 	if x < len(b) {
-		err = cmd.parseParams(b[x+1:])
+		cmd.parseParams(b[x+1:])
 	}
 
-	return err
+	return nil
 }
 
 //
@@ -88,7 +88,7 @@ func (cmd *Command) parsePath(b []byte) error {
 //
 //	key=value [ SP key=value ]
 //
-func (cmd *Command) parseParams(line []byte) error {
+func (cmd *Command) parseParams(line []byte) {
 	var x int
 	var k, v []byte
 
@@ -124,8 +124,6 @@ func (cmd *Command) parseParams(line []byte) error {
 		k = nil
 		v = nil
 	}
-
-	return nil
 }
 
 //
