@@ -61,9 +61,20 @@ func NewStorageFile(dir string) (fs *StorageFile, err error) {
 }
 
 //
-// Delete the mail object on file system by ID.
+// MailBounce move the incoming mail to bounced state.  In this storage
+// service, the mail file is moved to "{dir}/bounce".
 //
-func (fs *StorageFile) Delete(id string) (err error) {
+func (fs *StorageFile) MailBounce(id string) error {
+	oldp := filepath.Join(fs.dir, id)
+	newp := filepath.Join(fs.dir, defDirBounce, id)
+
+	return os.Rename(oldp, newp)
+}
+
+//
+// MailDelete the mail object on file system by ID.
+//
+func (fs *StorageFile) MailDelete(id string) (err error) {
 	if len(id) == 0 {
 		return
 	}
@@ -73,9 +84,9 @@ func (fs *StorageFile) Delete(id string) (err error) {
 }
 
 //
-// Load read the mail object from file system by ID.
+// MailLoad read the mail object from file system by ID.
 //
-func (fs *StorageFile) Load(id string) (mail *MailTx, err error) {
+func (fs *StorageFile) MailLoad(id string) (mail *MailTx, err error) {
 	if len(id) == 0 {
 		return
 	}
@@ -91,9 +102,9 @@ func (fs *StorageFile) Load(id string) (mail *MailTx, err error) {
 }
 
 //
-// LoadAll mail objects from file system.
+// MailLoadAll mail objects from file system.
 //
-func (fs *StorageFile) LoadAll() (mails []*MailTx, err error) {
+func (fs *StorageFile) MailLoadAll() (mails []*MailTx, err error) {
 	d, err := os.Open(fs.dir)
 	if err != nil {
 		return nil, err
@@ -109,7 +120,7 @@ func (fs *StorageFile) LoadAll() (mails []*MailTx, err error) {
 			continue
 		}
 
-		mail, err := fs.Load(fi.Name())
+		mail, err := fs.MailLoad(fi.Name())
 		if err != nil {
 			log.Printf("StorageFile.Load: %s\n", err)
 			continue
@@ -122,20 +133,9 @@ func (fs *StorageFile) LoadAll() (mails []*MailTx, err error) {
 }
 
 //
-// Bounce move the incoming mail to bounced state.  In this storage
-// service, the mail file is moved to "{dir}/bounce".
+// MailSave save the mail object into file system.
 //
-func (fs *StorageFile) Bounce(id string) error {
-	oldp := filepath.Join(fs.dir, id)
-	newp := filepath.Join(fs.dir, defDirBounce, id)
-
-	return os.Rename(oldp, newp)
-}
-
-//
-// Store the mail object into file system.
-//
-func (fs *StorageFile) Store(mail *MailTx) (err error) {
+func (fs *StorageFile) MailSave(mail *MailTx) (err error) {
 	if mail == nil {
 		return
 	}

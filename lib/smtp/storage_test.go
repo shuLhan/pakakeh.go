@@ -6,22 +6,22 @@ package smtp
 
 type testStorage struct{}
 
-func (ts *testStorage) Delete(id string) (err error) {
+func (ts *testStorage) MailBounce(id string) (err error) {
+	return
+}
+
+func (ts *testStorage) MailDelete(id string) (err error) {
 	return nil
 }
 
-func (ts *testStorage) Load(id string) (mail *MailTx, err error) {
+func (ts *testStorage) MailLoad(id string) (mail *MailTx, err error) {
 	return nil, nil
 }
 
-func (ts *testStorage) LoadAll() (mail []*MailTx, err error) {
+func (ts *testStorage) MailLoadAll() (mail []*MailTx, err error) {
 	return
 }
 
-func (ts *testStorage) Bounce(id string) (err error) {
-	return
-}
-
-func (ts *testStorage) Store(mail *MailTx) (err error) {
+func (ts *testStorage) MailSave(mail *MailTx) (err error) {
 	return
 }

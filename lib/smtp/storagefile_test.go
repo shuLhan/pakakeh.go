@@ -30,7 +30,7 @@ func TestStore(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		err := testFS.Store(c.mail)
+		err := testFS.MailSave(c.mail)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err, true)
 			continue
@@ -38,7 +38,7 @@ func TestStore(t *testing.T) {
 
 		var got *MailTx
 		if c.mail != nil {
-			got, err = testFS.Load(c.mail.ID)
+			got, err = testFS.MailLoad(c.mail.ID)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -54,13 +54,13 @@ func TestDelete(t *testing.T) {
 		t.Fatalf("NewStorageFile: %s\n", err)
 	}
 
-	mails, err := testFS.LoadAll()
+	mails, err := testFS.MailLoadAll()
 	if err != nil {
 		t.Fatalf("LoadAll: %s\n", err)
 	}
 
 	for _, mail := range mails {
-		err = testFS.Delete(mail.ID)
+		err = testFS.MailDelete(mail.ID)
 		if err != nil {
 			t.Fatalf("StorageFile.Delete: %s\n", err)
 		}

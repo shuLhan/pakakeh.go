@@ -9,9 +9,9 @@ package smtp
 // permanent storage (for example, file system or database).
 //
 type Storage interface {
-	Delete(id string) error
-	Load(id string) (mail *MailTx, err error)
-	LoadAll() (mail []*MailTx, err error)
-	Bounce(id string) error
-	Store(mail *MailTx) error
+	MailBounce(id string) error
+	MailDelete(id string) error
+	MailLoad(id string) (mail *MailTx, err error)
+	MailLoadAll() (mail []*MailTx, err error)
+	MailSave(mail *MailTx) error
 }
