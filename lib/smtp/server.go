@@ -25,18 +25,30 @@ const (
 // Server defines parameters for running an SMTP server.
 //
 type Server struct {
-	// Addr to listen for incoming connections.
+	// Address to listen for incoming connections.
+	// This field is optional and exported only for the purpose of
+	// testing.
+	// If its empty, it will set default to ":25".
 	Address string
 
 	// TLSAddress address when listening with security layer.
+	// This field is optional and exported only for the purpose of
+	// testing.
+	// If its empty, it will set default to ":465".
 	TLSAddress string
 
-	//
-	// Env define the environment of SMTP server.
-	// There is no default environment, implementor should define their
-	// environment by implementing the interface.
-	//
-	Env Environment
+	// TLSCert the server certificate for TLS or nil if no certificate.
+	// This field is optional, if its non nil, the server will also listen
+	// on address defined in TLSAddress.
+	TLSCert *tls.Certificate
+
+	// PrimaryDomain of the SMTP server.
+	// This field is required.
+	PrimaryDomain *Domain
+
+	// VirtualDomains contains list of virtual domain handled by server.
+	// This field is optional.
+	VirtualDomains []*Domain
 
 	//
 	// Exts define list of custom extensions that the server will provide.
@@ -78,11 +90,25 @@ type Server struct {
 }
 
 //
+// LoadCertificate load TLS certificate and its private key from file.
+//
+func (srv *Server) LoadCertificate(certFile, keyFile string) (err error) {
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return fmt.Errorf("smtp: LoadCertificate: " + err.Error())
+	}
+
+	srv.TLSCert = &cert
+
+	return nil
+}
+
+//
 // Start listening for SMTP connections.
 // Each client connection will be handled in a single routine.
 //
 func (srv *Server) Start() (err error) {
-	err = srv.init()
+	err = srv.initialize()
 	if err != nil {
 		return
 	}
@@ -175,7 +201,7 @@ func (srv *Server) serveTLS() {
 // handle receiver connection.
 //
 func (srv *Server) handle(recv *receiver) {
-	err := recv.sendReply(StatusReady, srv.Env.Hostname(), nil)
+	err := recv.sendReply(StatusReady, srv.PrimaryDomain.Name, nil)
 	if err != nil {
 		log.Println("receiver.sendReply: ", err.Error())
 		recv.close()
@@ -291,7 +317,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 			body = append(body, "AUTH PLAIN")
 		}
 
-		err = recv.sendReply(StatusOK, srv.Env.Hostname(), body)
+		err = recv.sendReply(StatusOK, srv.PrimaryDomain.Name, body)
 		if err != nil {
 			return err
 		}
@@ -300,7 +326,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 	case CommandHELO:
 		recv.clientDomain = cmd.Arg
 
-		err = recv.sendReply(StatusOK, srv.Env.Hostname(), nil)
+		err = recv.sendReply(StatusOK, srv.PrimaryDomain.Name, nil)
 		if err != nil {
 			return err
 		}
@@ -496,11 +522,11 @@ func (srv *Server) handleHELP(recv *receiver) (err error) {
 }
 
 //
-// init initiliaze environment, handler, extensions, and connection listener.
+// initialize handler, storage, extensions, and listeners.
 //
-func (srv *Server) init() (err error) {
-	if srv.Env == nil {
-		return fmt.Errorf("smtp: environment is not defined")
+func (srv *Server) initialize() (err error) {
+	if srv.PrimaryDomain == nil {
+		return fmt.Errorf("smtp: primary domain is not defined")
 	}
 
 	if srv.Handler == nil {
@@ -547,14 +573,13 @@ func (srv *Server) initListener() (err error) {
 		return err
 	}
 
-	cert := srv.Env.Certificate()
-	if cert == nil {
+	if srv.TLSCert == nil {
 		return nil
 	}
 
 	tlsCfg := &tls.Config{
 		Certificates: []tls.Certificate{
-			*cert,
+			*srv.TLSCert,
 		},
 		MinVersion: tls.VersionTLS11,
 	}
@@ -568,9 +593,12 @@ func (srv *Server) initListener() (err error) {
 	return err
 }
 
-func (srv *Server) isLocalDomain(d string) bool {
-	for _, domain := range srv.Env.Domains() {
-		if d == domain {
+func (srv *Server) isOurDomain(d string) bool {
+	if d == srv.PrimaryDomain.Name {
+		return true
+	}
+	for _, domain := range srv.VirtualDomains {
+		if d == domain.Name {
 			return true
 		}
 	}
@@ -601,7 +629,7 @@ func (srv *Server) processMailTxQueue() {
 
 		switch len(addr) {
 		case 2:
-			if srv.isLocalDomain(addr[1]) {
+			if srv.isOurDomain(addr[1]) {
 				_, err = srv.Handler.ServeMailTx(mail)
 			} else {
 				srv.relayQueue <- mail
@@ -635,7 +663,7 @@ func (srv *Server) processMailTxQueue() {
 //
 func (srv *Server) processBounceQueue() {
 	for mail, ok := <-srv.bounceQueue; ok; {
-		err := srv.Storage.Bounce(mail.ID)
+		err := srv.Storage.MailBounce(mail.ID)
 		if err != nil {
 			continue
 		}
@@ -666,7 +694,7 @@ func (srv *Server) processMailTx(mail *MailTx) (err error) {
 	for x, rcpt := range mail.Recipients {
 		mails[x] = NewMailTx(mail.From, []string{rcpt}, mail.Data)
 
-		err = srv.Storage.Store(mails[x])
+		err = srv.Storage.MailSave(mails[x])
 		if err != nil {
 			return
 		}

@@ -19,35 +19,26 @@ const (
 	testPassword   = "secret"
 )
 
-var ( // nolint: gochecknoglobals
-	testClient *Client
-	testServer *Server
-	testEnv    *EnvDirect
+var (
+	testClient *Client // nolint: gochecknoglobals
+	testServer *Server // nolint: gochecknoglobals
 )
 
 func TestMain(m *testing.M) {
-	handler := &testHandler{}
-	storage := &testStorage{}
-	testEnv = &EnvDirect{
-		hostname: "mail.kilabit.local",
-		domains: []string{
-			"local.localdomain",
-		},
+	testServer = &Server{
+		Address:       testAddress,
+		TLSAddress:    testTLSAddress,
+		PrimaryDomain: NewDomain("mail.kilabit.local"),
+		Handler:       &testHandler{},
+		Storage:       &testStorage{},
 	}
-	err := testEnv.LoadCertificate(
+
+	err := testServer.LoadCertificate(
 		"testdata/mail.kilabit.local.chain.cert.pem",
 		"testdata/mail.kilabit.local.key.pem",
 	)
 	if err != nil {
 		log.Fatal(err)
-	}
-
-	testServer = &Server{
-		Address:    testAddress,
-		TLSAddress: testTLSAddress,
-		Env:        testEnv,
-		Handler:    handler,
-		Storage:    storage,
 	}
 
 	go func() {

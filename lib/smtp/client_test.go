@@ -43,7 +43,7 @@ func TestConnect(t *testing.T) {
 
 	expRes := &Response{
 		Code:    220,
-		Message: testEnv.Hostname(),
+		Message: testServer.PrimaryDomain.Name,
 	}
 
 	res, err := testClient.Connect(true)
