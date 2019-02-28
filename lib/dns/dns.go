@@ -74,6 +74,13 @@ const (
 	ConnTypeDoH
 )
 
+// ConnTypeNames contains a mapping between connection type and its name.
+var ConnTypeNames = map[ConnType]string{
+	ConnTypeUDP: "UDP",
+	ConnTypeTCP: "TCP",
+	ConnTypeDoH: "DoH",
+}
+
 // OpCode define a custom type for DNS header operation code.
 type OpCode byte
 
