@@ -33,3 +33,11 @@ var ( // nolint: gochecknoglobals
 		"Dec": time.December,
 	}
 )
+
+//
+// Microsecond return the microsecond value of time.
+//
+func Microsecond(t *time.Time) int {
+	seconds := t.Unix() * int64(time.Second)
+	return int(t.UnixNano()-seconds) / int(time.Microsecond)
+}
