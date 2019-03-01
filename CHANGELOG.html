@@ -15,17 +15,24 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_share_v0_3_0_2019_02_01">share v0.3.0 (2019-02-01)</a>
+<li><a href="#_share_v0_4_0_2019_03_01">share v0.4.0 (2019-03-01)</a>
 <ul class="sectlevel2">
-<li><a href="#_features_changes">Features Changes</a></li>
+<li><a href="#_new_features">New Features</a></li>
 <li><a href="#_enhancements">Enhancements</a></li>
 <li><a href="#_fixes">Fixes</a></li>
 </ul>
 </li>
+<li><a href="#_share_v0_3_0_2019_02_01">share v0.3.0 (2019-02-01)</a>
+<ul class="sectlevel2">
+<li><a href="#_features_changes">Features Changes</a></li>
+<li><a href="#_enhancements_2">Enhancements</a></li>
+<li><a href="#_fixes_2">Fixes</a></li>
+</ul>
+</li>
 <li><a href="#_share_v0_2_0_2019_01_02">share v0.2.0 (2019-01-02)</a>
 <ul class="sectlevel2">
-<li><a href="#_new_features">New Features</a></li>
-<li><a href="#_enhancements_2">Enhancements</a></li>
+<li><a href="#_new_features_2">New Features</a></li>
+<li><a href="#_enhancements_3">Enhancements</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_1_0_2018_11_29">share v0.1.0 (2018-11-29)</a></li>
@@ -38,6 +45,184 @@
 <div class="paragraph">
 <p>This library is released each month, either at the end of month or at the
 first week of next month.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_share_v0_4_0_2019_03_01">share v0.4.0 (2019-03-01)</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_new_features">New Features</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>email</code>: new package for working with Internet Message Format (RFC 5322)</p>
+</li>
+<li>
+<p><code>email/dkim</code>: new package for parsing and creating DKIM signature
+(RFC 6376)</p>
+</li>
+<li>
+<p><code>email/maildir</code>: new package to manage email using maildir format</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_enhancements">Enhancements</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>bytes</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>add function to copy slice</p>
+</li>
+<li>
+<p>add function to convert hexadecimal into byte</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>dns</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>add mapping of connection types and its names</p>
+</li>
+<li>
+<p>print the section question type by string</p>
+</li>
+<li>
+<p>add method to filter Message.Answer by specific query type</p>
+</li>
+<li>
+<p>add pool for UDP client</p>
+</li>
+<li>
+<p>add function to get list of system name servers</p>
+</li>
+<li>
+<p>make UDPClient Query routine safe</p>
+</li>
+<li>
+<p>increase the internal debug level from 2 to 3</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>http</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>add the charset type to content-type "text/plain"</p>
+</li>
+<li>
+<p>listen and serve using TLS if TLSConfig is defined</p>
+</li>
+<li>
+<p>add method to temporary redirect request to other location</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>ini</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>unexport the reader</p>
+</li>
+<li>
+<p>add method to get all variable values with the same key</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>io</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>rename Reader SkipSpace to SkipSpaces</p>
+</li>
+<li>
+<p>refactoring, export all fields for easy access on Reader</p>
+</li>
+<li>
+<p>add method read one line with line feed</p>
+</li>
+<li>
+<p>add method to unread N characters on Reader</p>
+</li>
+<li>
+<p>optimize ReadUntil without append</p>
+</li>
+<li>
+<p>add method to return the rest of unreaded buffer on Reader</p>
+</li>
+<li>
+<p>return the character separator that found on SkipUntil</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>memfs</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>add method to dump files as Go generated source</p>
+</li>
+<li>
+<p>add variable for allowing bypass file in memory</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>smtp</code> (work in progress)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>rename StorageFile to LocalStorage</p>
+</li>
+<li>
+<p>implement server with local handler</p>
+</li>
+<li>
+<p>add prefix Mail to methods in Storage interface</p>
+</li>
+<li>
+<p>use different port between normal listener and TLS listener</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>time</code>:  add function to get micro seconds</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fixes">Fixes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>all: fix the usage of "iota"</p>
+</li>
+<li>
+<p><code>dns</code>: fix creating new UDP/TCP client without port number</p>
+</li>
+<li>
+<p><code>memfs</code>: check for empty directory on Mount</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -73,7 +258,7 @@ first week of next month.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_enhancements">Enhancements</h3>
+<h3 id="_enhancements_2">Enhancements</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -98,7 +283,7 @@ first week of next month.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fixes">Fixes</h3>
+<h3 id="_fixes_2">Fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -113,7 +298,7 @@ first week of next month.</p>
 <h2 id="_share_v0_2_0_2019_01_02">share v0.2.0 (2019-01-02)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_new_features">New Features</h3>
+<h3 id="_new_features_2">New Features</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -127,7 +312,7 @@ system and simplified routing handler.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_enhancements_2">Enhancements</h3>
+<h3 id="_enhancements_3">Enhancements</h3>
 <div class="paragraph">
 <p>Fix warnings from linters.</p>
 </div>
@@ -165,7 +350,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-01 06:12:17 +0700
+Last updated 2019-03-01 10:14:07 +0700
 </div>
 </div>
 </body>

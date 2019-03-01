@@ -5,6 +5,67 @@ This library is released each month, either at the end of month or at the
 first week of next month.
 
 
+==  share v0.4.0 (2019-03-01)
+
+===  New Features
+
+*  `email`: new package for working with Internet Message Format (RFC 5322)
+*  `email/dkim`: new package for parsing and creating DKIM signature
+   (RFC 6376)
+*  `email/maildir`: new package to manage email using maildir format
+
+===  Enhancements
+
+*  `bytes`
+**  add function to copy slice
+**  add function to convert hexadecimal into byte
+
+*  `dns`
+**  add mapping of connection types and its names
+**  print the section question type by string
+**  add method to filter Message.Answer by specific query type
+**  add pool for UDP client
+**  add function to get list of system name servers
+**  make UDPClient Query routine safe
+**  increase the internal debug level from 2 to 3
+
+*  `http`
+**  add the charset type to content-type "text/plain"
+**  listen and serve using TLS if TLSConfig is defined
+**  add method to temporary redirect request to other location
+
+*  `ini`
+**  unexport the reader
+**  add method to get all variable values with the same key
+
+*  `io`
+**  rename Reader SkipSpace to SkipSpaces
+**  refactoring, export all fields for easy access on Reader
+**  add method read one line with line feed
+**  add method to unread N characters on Reader
+**  optimize ReadUntil without append
+**  add method to return the rest of unreaded buffer on Reader
+**  return the character separator that found on SkipUntil
+
+*  `memfs`
+**  add method to dump files as Go generated source
+**  add variable for allowing bypass file in memory
+
+*  `smtp` (work in progress)
+**  rename StorageFile to LocalStorage
+**  implement server with local handler
+**  add prefix Mail to methods in Storage interface
+**  use different port between normal listener and TLS listener
+
+*  `time`:  add function to get micro seconds
+
+===  Fixes
+
+*  all: fix the usage of "iota"
+*  `dns`: fix creating new UDP/TCP client without port number
+*  `memfs`: check for empty directory on Mount
+
+
 ==  share v0.3.0 (2019-02-01)
 
 ===  Features Changes
