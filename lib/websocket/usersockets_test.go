@@ -5,48 +5,66 @@
 package websocket
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
 
-var _userSocks = &UserSockets{} // nolint: gochecknoglobals
+func TestUserSocketsAdd(t *testing.T) {
+	userSocks := &UserSockets{}
 
-func testUserSocketsAdd(t *testing.T) {
 	cases := []struct {
 		desc     string
 		uid      uint64
 		conn     int
 		expConns []int
+		expUIDs  string
 	}{{
 		desc:     `With new connection`,
 		uid:      1,
 		conn:     1,
 		expConns: []int{1},
+		expUIDs:  "map[1:1]",
 	}, {
 		desc:     `With same connection`,
 		uid:      1,
 		conn:     1,
 		expConns: []int{1},
+		expUIDs:  "map[1:1]",
 	}, {
 		desc:     `With different connection`,
 		uid:      1,
 		conn:     2,
 		expConns: []int{1, 2},
+		expUIDs:  "map[1:1 2:1]",
+	}, {
+		desc:     "With same connection different UID",
+		uid:      2,
+		conn:     1,
+		expConns: []int{1},
+		expUIDs:  "map[1:2 2:1]",
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_userSocks.Add(c.uid, c.conn)
+		userSocks.Add(c.uid, c.conn)
 
-		got, _ := _userSocks.Load(c.uid)
+		got, _ := userSocks.Load(c.uid)
+		gotUIDs := fmt.Sprintf("%v", userSocks.uid)
 
 		test.Assert(t, "conns", c.expConns, got, true)
+		test.Assert(t, "UserSockets.uid", c.expUIDs, gotUIDs, true)
 	}
 }
 
-func testUserSocketsRemove(t *testing.T) {
+func TestUserSocketsRemove(t *testing.T) {
+	userSocks := &UserSockets{}
+	userSocks.Add(1, 1)
+	userSocks.Add(1, 2)
+	userSocks.Add(2, 1)
+
 	cases := []struct {
 		desc     string
 		uid      uint64
@@ -58,12 +76,12 @@ func testUserSocketsRemove(t *testing.T) {
 		uid:      1,
 		conn:     99,
 		expOK:    true,
-		expConns: []int{1, 2},
+		expConns: []int{2},
 	}, {
-		desc:     `With valid connection`,
+		desc:     `With invalid connection (2)`,
 		uid:      1,
 		conn:     1,
-		expOK:    true,
+		expOK:    false,
 		expConns: []int{2},
 	}, {
 		desc: `With valid connection`,
@@ -74,9 +92,9 @@ func testUserSocketsRemove(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_userSocks.Remove(c.uid, c.conn)
+		userSocks.Remove(c.uid, c.conn)
 
-		v, ok := _userSocks.Load(c.uid)
+		v, ok := userSocks.Load(c.uid)
 		if ok {
 			got := v.([]int)
 			test.Assert(t, "conns", c.expConns, got, true)
@@ -84,9 +102,4 @@ func testUserSocketsRemove(t *testing.T) {
 			test.Assert(t, "ok", c.expOK, ok, true)
 		}
 	}
-}
-
-func TestUserSockets(t *testing.T) {
-	t.Run("add", testUserSocketsAdd)
-	t.Run("remove", testUserSocketsRemove)
 }

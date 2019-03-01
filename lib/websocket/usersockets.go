@@ -17,7 +17,13 @@ import (
 // server can broadcast a message.
 //
 type UserSockets struct {
+	sync.Mutex
 	sync.Map
+
+	// uid contains a one-to-one mapping between socket and user ID.
+	// This mapping is to prevent the same file descriptor to be added to
+	// other user ID.
+	uid map[int]uint64
 }
 
 //
@@ -25,6 +31,20 @@ type UserSockets struct {
 // exist.
 //
 func (us *UserSockets) Add(uid uint64, conn int) {
+	us.Lock()
+	// Check if socket already exist.
+	prevUID, ok := us.uid[conn]
+	us.Unlock()
+	if ok {
+		// Delete the previous reference.
+		us.Remove(prevUID, conn)
+	}
+
+	if us.uid == nil {
+		us.uid = make(map[int]uint64)
+	}
+	us.uid[conn] = uid
+
 	v, ok := us.Load(uid)
 	if !ok {
 		us.Store(uid, []int{conn})
@@ -48,6 +68,10 @@ func (us *UserSockets) Add(uid uint64, conn int) {
 // Remove socket from list of user's connection.
 //
 func (us *UserSockets) Remove(uid uint64, conn int) {
+	us.Lock()
+	delete(us.uid, conn)
+	us.Unlock()
+
 	v, ok := us.Load(uid)
 	if !ok {
 		return
