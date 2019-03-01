@@ -4,6 +4,10 @@
 
 package numbers
 
+import (
+	"github.com/shuLhan/share/lib/ints"
+)
+
 //
 // Floats64FindMax given slice of float, find the maximum value in slice and
 // and return it with their index.
@@ -136,7 +140,7 @@ func Floats64MaxCountOf(d, classes []float64) (float64, bool) {
 
 	counts := Floats64Counts(d, classes)
 
-	_, maxi, _ := IntsFindMax(counts)
+	_, maxi, _ := ints.Max(counts)
 	if maxi < 0 {
 		return -1, false
 	}
@@ -187,12 +191,12 @@ func Floats64InsertionSort(d []float64, ids []int, l, r int, asc bool) {
 		for y := x + 1; y < r; y++ {
 			if asc {
 				if d[x] > d[y] {
-					IntsSwap(ids, x, y)
+					ints.Swap(ids, x, y)
 					Floats64Swap(d, x, y)
 				}
 			} else {
 				if d[x] < d[y] {
-					IntsSwap(ids, x, y)
+					ints.Swap(ids, x, y)
 					Floats64Swap(d, x, y)
 				}
 			}
@@ -342,7 +346,7 @@ func floats64MoveY(d []float64, x, y, r int, asc bool) int {
 
 func floats64Multiswap(d []float64, idx []int, x, y, ylast int) int {
 	for y < ylast {
-		IntsSwap(idx, x, y)
+		ints.Swap(idx, x, y)
 		Floats64Swap(d, x, y)
 		x++
 		y++

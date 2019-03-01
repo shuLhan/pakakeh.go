@@ -2,29 +2,30 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package numbers
+package ints
 
 import (
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
 
 var (
-	dInts = [][]int{ //nolint: gochecknoglobals
+	d = [][]int{ //nolint: gochecknoglobals
 		{},
 		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
 		{0, 1, 0, 1, 0, 1, 0, 1, 0},
 		{1, 1, 2, 2, 3, 1, 2},
 	}
-	dIntsSorted = [][]int{ //nolint: gochecknoglobals
+	dSorted = [][]int{ //nolint: gochecknoglobals
 		{},
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 		{0, 0, 0, 0, 0, 1, 1, 1, 1},
 		{1, 1, 1, 2, 2, 2, 3},
 	}
-	dIntsSortedDesc = [][]int{ //nolint: gochecknoglobals
+	dSortedDesc = [][]int{ //nolint: gochecknoglobals
 		{},
 		{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 		{1, 1, 1, 1, 0, 0, 0, 0, 0},
@@ -32,147 +33,147 @@ var (
 	}
 )
 
-func TestIntsFindMaxEmpty(t *testing.T) {
-	maxv, maxi, ok := IntsFindMax(dInts[0])
+func TestMaxEmpty(t *testing.T) {
+	maxv, maxi, ok := Max(d[0])
 
-	test.Assert(t, "", -1, maxv, true)
-	test.Assert(t, "", -1, maxi, true)
+	test.Assert(t, "", 0, maxv, true)
+	test.Assert(t, "", 0, maxi, true)
 	test.Assert(t, "", false, ok, true)
 }
 
-func TestIntsFindMax(t *testing.T) {
-	maxv, maxi, ok := IntsFindMax(dInts[1])
+func TestMax(t *testing.T) {
+	maxv, maxi, ok := Max(d[1])
 
 	test.Assert(t, "", 9, maxv, true)
 	test.Assert(t, "", 4, maxi, true)
 	test.Assert(t, "", true, ok, true)
 }
 
-func TestIntsFindMinEmpty(t *testing.T) {
-	minv, mini, ok := IntsFindMin(dInts[0])
+func TestMinEmpty(t *testing.T) {
+	minv, mini, ok := Min(d[0])
 
-	test.Assert(t, "", -1, minv, true)
-	test.Assert(t, "", -1, mini, true)
+	test.Assert(t, "", 0, minv, true)
+	test.Assert(t, "", 0, mini, true)
 	test.Assert(t, "", false, ok, true)
 }
 
-func TestIntsFindMin(t *testing.T) {
-	minv, mini, ok := IntsFindMin(dInts[1])
+func TestMin(t *testing.T) {
+	minv, mini, ok := Min(d[1])
 
 	test.Assert(t, "", 0, minv, true)
 	test.Assert(t, "", 5, mini, true)
 	test.Assert(t, "", true, ok, true)
 }
 
-func TestIntsSum(t *testing.T) {
-	got := IntsSum(dInts[1])
+func TestSum(t *testing.T) {
+	got := Sum(d[1])
 
 	test.Assert(t, "", 45, got, true)
 }
 
-func TestIntsCount(t *testing.T) {
-	got := IntsCount(dInts[0], 0)
+func TestCount(t *testing.T) {
+	got := Count(d[0], 0)
 
 	test.Assert(t, "", 0, got, true)
 
-	got = IntsCount(dInts[1], 1)
+	got = Count(d[1], 1)
 
 	test.Assert(t, "", 1, got, true)
 
-	got = IntsCount(dInts[2], 1)
+	got = Count(d[2], 1)
 
 	test.Assert(t, "", 4, got, true)
 
-	got = IntsCount(dInts[3], 0)
+	got = Count(d[3], 0)
 
 	test.Assert(t, "", 0, got, true)
 
-	got = IntsCount(dInts[3], 3)
+	got = Count(d[3], 3)
 
 	test.Assert(t, "", 1, got, true)
 }
 
-func TestIntsCountsEmpty(t *testing.T) {
+func TestCountsEmpty(t *testing.T) {
 	classes := []int{1, 2, 3}
 	exp := []int{0, 0, 0}
 
-	got := IntsCounts(dInts[0], classes)
+	got := Counts(d[0], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestIntsCountsEmptyClasses(t *testing.T) {
+func TestCountsEmptyClasses(t *testing.T) {
 	classes := []int{}
 	var exp []int
 
-	got := IntsCounts(dInts[1], classes)
+	got := Counts(d[1], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestIntsCounts(t *testing.T) {
+func TestCounts(t *testing.T) {
 	classes := []int{1, 2, 3}
 	exp := []int{3, 3, 1}
 
-	got := IntsCounts(dInts[3], classes)
+	got := Counts(d[3], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestIntsMaxCountOf(t *testing.T) {
+func TestMaxCountOf(t *testing.T) {
 	classes := []int{0, 1}
 	exp := int(0)
-	got, _ := IntsMaxCountOf(dInts[2], classes)
+	got, _ := MaxCountOf(d[2], classes)
 
 	test.Assert(t, "", exp, got, true)
 
 	// Swap the class values.
 	classes = []int{1, 0}
-	got, _ = IntsMaxCountOf(dInts[2], classes)
+	got, _ = MaxCountOf(d[2], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestIntsSwapEmpty(t *testing.T) {
+func TestSwapEmpty(t *testing.T) {
 	exp := []int{}
 
-	IntsSwap(dInts[0], 1, 6)
+	Swap(d[0], 1, 6)
 
-	test.Assert(t, "", exp, dInts[0], true)
+	test.Assert(t, "", exp, d[0], true)
 }
 
-func TestIntsSwapEqual(t *testing.T) {
-	in := make([]int, len(dInts[1]))
-	copy(in, dInts[1])
+func TestSwapEqual(t *testing.T) {
+	in := make([]int, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]int, len(in))
 	copy(exp, in)
 
-	IntsSwap(in, 1, 1)
+	Swap(in, 1, 1)
 
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestIntsSwapOutOfRange(t *testing.T) {
-	in := make([]int, len(dInts[1]))
-	copy(in, dInts[1])
+func TestSwapOutOfRange(t *testing.T) {
+	in := make([]int, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]int, len(in))
 	copy(exp, in)
 
-	IntsSwap(in, 1, 100)
+	Swap(in, 1, 100)
 
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestIntsSwap(t *testing.T) {
-	in := make([]int, len(dInts[1]))
-	copy(in, dInts[1])
+func TestSwap(t *testing.T) {
+	in := make([]int, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]int, len(in))
 	copy(exp, in)
 
-	IntsSwap(in, 0, len(in)-1)
+	Swap(in, 0, len(in)-1)
 
 	test.Assert(t, "", exp, in, false)
 
@@ -183,62 +184,62 @@ func TestIntsSwap(t *testing.T) {
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestIntsIsExist(t *testing.T) {
+func TestIsExist(t *testing.T) {
 	var s bool
 
 	// True positive.
-	for _, d := range dInts {
+	for _, d := range d {
 		for _, v := range d {
-			s = IntsIsExist(d, v)
+			s = IsExist(d, v)
 
 			test.Assert(t, "", true, s, true)
 		}
 	}
 
 	// False positive.
-	for _, d := range dInts {
-		s = IntsIsExist(d, -1)
+	for _, d := range d {
+		s = IsExist(d, -1)
 		test.Assert(t, "", false, s, true)
-		s = IntsIsExist(d, 10)
+		s = IsExist(d, 10)
 		test.Assert(t, "", false, s, true)
 	}
 }
 
-func TestIntsInsertionSort(t *testing.T) {
-	for x := range dInts {
-		d := make([]int, len(dInts[x]))
+func TestInplaceInsertionSort(t *testing.T) {
+	for x := range d {
+		data := make([]int, len(d[x]))
 
-		copy(d, dInts[x])
+		copy(data, d[x])
 
-		ids := make([]int, len(d))
+		ids := make([]int, len(data))
 		for x := range ids {
 			ids[x] = x
 		}
 
-		IntsInsertionSort(d, ids, 0, len(ids), true)
+		InplaceInsertionSort(data, ids, 0, len(ids), true)
 
-		test.Assert(t, "", dIntsSorted[x], d, true)
+		test.Assert(t, "", dSorted[x], data, true)
 	}
 }
 
-func TestIntsInsertionSortDesc(t *testing.T) {
-	for x := range dInts {
-		d := make([]int, len(dInts[x]))
+func TestInplaceInsertionSortDesc(t *testing.T) {
+	for x := range d {
+		data := make([]int, len(d[x]))
 
-		copy(d, dInts[x])
+		copy(data, d[x])
 
-		ids := make([]int, len(d))
+		ids := make([]int, len(data))
 		for x := range ids {
 			ids[x] = x
 		}
 
-		IntsInsertionSort(d, ids, 0, len(ids), false)
+		InplaceInsertionSort(data, ids, 0, len(ids), false)
 
-		test.Assert(t, "", dIntsSortedDesc[x], d, true)
+		test.Assert(t, "", dSortedDesc[x], data, true)
 	}
 }
 
-func TestIntsSortByIndex(t *testing.T) {
+func TestSortByIndex(t *testing.T) {
 	ids := [][]int{
 		{},
 		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
@@ -246,18 +247,18 @@ func TestIntsSortByIndex(t *testing.T) {
 		{0, 1, 5, 6, 2, 3, 4},
 	}
 
-	for x := range dInts {
-		d := make([]int, len(dInts[x]))
+	for x := range d {
+		data := make([]int, len(d[x]))
 
-		copy(d, dInts[x])
+		copy(data, d[x])
 
-		IntsSortByIndex(&d, ids[x])
+		SortByIndex(&data, ids[x])
 
-		test.Assert(t, "", dIntsSorted[x], d, true)
+		test.Assert(t, "", dSorted[x], data, true)
 	}
 }
 
-var intsInSorts = [][]int{ // nolint: gochecknoglobals
+var intsInSorts = [][]int{ // nolint: gochecknoglobals,dupl
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -277,7 +278,7 @@ var intsInSorts = [][]int{ // nolint: gochecknoglobals
 		62},
 }
 
-var intsExpSorts = [][]int{ // nolint: gochecknoglobals
+var intsExpSorts = [][]int{ // nolint: gochecknoglobals,dupl
 	{3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -297,7 +298,7 @@ var intsExpSorts = [][]int{ // nolint: gochecknoglobals
 		79},
 }
 
-var intsExpSortsDesc = [][]int{ // nolint: gochecknoglobals
+var intsExpSortsDesc = [][]int{ // nolint: gochecknoglobals,dupl
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
@@ -317,11 +318,23 @@ var intsExpSortsDesc = [][]int{ // nolint: gochecknoglobals
 		30},
 }
 
-func TestIntsIndirectSort(t *testing.T) {
+func TestCompareSort(t *testing.T) {
+	d1 := make([]int, n)
+	generateRandomInts(d1)
+	d2 := make([]int, len(d1))
+	copy(d2, d1)
+
+	sort.Ints(d1)
+	IndirectSort(d2, true)
+
+	test.Assert(t, "Compare sort", d1, d2, true)
+}
+
+func TestIndirectSort2(t *testing.T) {
 	var res, exp string
 
 	for i := range intsInSorts {
-		IntsIndirectSort(intsInSorts[i], true)
+		IndirectSort(intsInSorts[i], true)
 
 		res = fmt.Sprint(intsInSorts[i])
 		exp = fmt.Sprint(intsExpSorts[i])
@@ -330,11 +343,11 @@ func TestIntsIndirectSort(t *testing.T) {
 	}
 }
 
-func TestIntsIndirectSortDesc(t *testing.T) {
+func TestIndirectSortDesc(t *testing.T) {
 	var res, exp string
 
 	for i := range intsInSorts {
-		IntsIndirectSort(intsInSorts[i], false)
+		IndirectSort(intsInSorts[i], false)
 
 		res = fmt.Sprint(intsInSorts[i])
 		exp = fmt.Sprint(intsExpSortsDesc[i])
@@ -343,42 +356,42 @@ func TestIntsIndirectSortDesc(t *testing.T) {
 	}
 }
 
-func TestIntsIndirectSort_Stability(t *testing.T) {
+func TestIndirectSort_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	got := IntsIndirectSort(intsInSorts[5], true)
+	got := IndirectSort(intsInSorts[5], true)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestIntsIndirectSortDesc_Stability(t *testing.T) {
+func TestIndirectSortDesc_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	got := IntsIndirectSort(intsInSorts[5], false)
+	got := IndirectSort(intsInSorts[5], false)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestIntsInplaceMergesort(t *testing.T) {
+func TestInplaceMergesort(t *testing.T) {
 	size := len(intsInSorts[6])
 	idx := make([]int, size)
 
-	IntsInplaceMergesort(intsInSorts[6], idx, 0, size, true)
+	InplaceMergesort(intsInSorts[6], idx, 0, size, true)
 
 	test.Assert(t, "", intsExpSorts[6], intsInSorts[6], true)
 }
 
-func TestIntsIndirectSort_SortByIndex(t *testing.T) {
+func TestIndirectSort_SortByIndex(t *testing.T) {
 	expIds := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in1 := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in2 := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	exp := fmt.Sprint(in1)
 
-	sortedIds := IntsIndirectSort(in1, true)
+	sortedIds := IndirectSort(in1, true)
 
 	test.Assert(t, "", expIds, sortedIds, true)
 
 	// Reverse the sort.
-	IntsSortByIndex(&in2, sortedIds)
+	SortByIndex(&in2, sortedIds)
 
 	got := fmt.Sprint(in2)
 
