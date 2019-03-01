@@ -23,6 +23,7 @@ import (
 // Recv on the same routine before putting the client back to pool.
 //
 type UDPClientPool struct {
+	sync.Mutex
 	pool *sync.Pool
 	ns   []string
 	seq  int // sequence for the next name server.
@@ -63,12 +64,14 @@ func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 // newClient create a new udp client.
 //
 func (ucp *UDPClientPool) newClient() interface{} {
+	ucp.Lock()
 	ucp.seq %= len(ucp.ns)
 	cl, err := NewUDPClient(ucp.ns[ucp.seq])
 	if err != nil {
 		log.Fatal("udp: UDPClientPool: cannot create new client: ", err)
 	}
 	ucp.seq++
+	ucp.Unlock()
 	return cl
 }
 
