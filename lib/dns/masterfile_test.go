@@ -336,7 +336,7 @@ VAXA    A       10.2.0.27
 
 	m := newMaster()
 
-	for _, c := range cases {
+	for _, c := range cases { //nolint: dupl
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
@@ -609,7 +609,7 @@ relay IN CNAME relay.pair.com.
 
 	m := newMaster()
 
-	for _, c := range cases {
+	for _, c := range cases { //nolint: dupl
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
@@ -735,7 +735,7 @@ angularjs.doc       A  127.0.0.1
 
 	m := newMaster()
 
-	for _, c := range cases {
+	for _, c := range cases { //nolint: dupl
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)

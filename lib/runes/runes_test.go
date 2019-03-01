@@ -40,7 +40,7 @@ func TestDiff(t *testing.T) {
 	}
 }
 
-func TestEncloseRemove(t *testing.T) {
+func TestEncloseRemove(t *testing.T) { //nolint: dupl
 	line := []rune(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 
 	cases := []struct {

@@ -53,7 +53,7 @@ func TestCutUntilToken(t *testing.T) {
 	}
 }
 
-func TestEncloseRemove(t *testing.T) {
+func TestEncloseRemove(t *testing.T) { //nolint:dupl
 	line := []byte(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 
 	cases := []struct {

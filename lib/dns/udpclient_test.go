@@ -16,7 +16,7 @@ func TestUDPClientLookup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
+	cases := []struct { //nolint: dupl
 		desc   string
 		qtype  uint16
 		qclass uint16

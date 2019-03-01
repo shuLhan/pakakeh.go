@@ -43,7 +43,7 @@ coverbrowse: $(COVER_HTML)
 	xdg-open $<
 
 lint:
-	golangci-lint run --enable-all -D dupl ./...
+	golangci-lint run --enable-all ./...
 
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)
