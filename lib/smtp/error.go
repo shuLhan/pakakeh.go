@@ -29,10 +29,11 @@ var (
 		Code:    StatusCmdUnknown,
 		Message: "Syntax error, command unknown",
 	}
-	errInProcessing = &errors.E{
-		Code:    StatusLocalError,
-		Message: "Local error in processing",
-	}
+	// TODO:
+	//	errInProcessing = &errors.E{
+	//		Code:    StatusLocalError,
+	//		Message: "Local error in processing",
+	//	}
 
 	errAuthMechanism = &errors.E{
 		Code:    StatusParamUnimplemented,

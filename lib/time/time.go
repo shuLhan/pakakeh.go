@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-var ( // nolint: gochecknoglobals
-	ShortDayNames = []string{
+var (
+	ShortDayNames = []string{ //nolint: gochecknoglobals
 		"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
 	}
 
@@ -18,7 +18,7 @@ var ( // nolint: gochecknoglobals
 	// ShortMonths provide mapping between text of month, in English,
 	// short format to their time.Month value
 	//
-	ShortMonths = map[string]time.Month{
+	ShortMonths = map[string]time.Month{ //nolint: gochecknoglobals
 		"Jan": time.January,
 		"Feb": time.February,
 		"Mar": time.March,

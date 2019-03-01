@@ -63,9 +63,9 @@ func (question *SectionQuestion) String() string {
 //
 // unpack the DNS question section.
 //
-func (question *SectionQuestion) unpack(packet []byte) error {
+func (question *SectionQuestion) unpack(packet []byte) {
 	if len(packet) == 0 {
-		return nil
+		return
 	}
 
 	count := packet[0]
@@ -90,6 +90,4 @@ func (question *SectionQuestion) unpack(packet []byte) error {
 	question.Type = libbytes.ReadUint16(packet, x)
 	x += 2
 	question.Class = libbytes.ReadUint16(packet, x)
-
-	return nil
 }

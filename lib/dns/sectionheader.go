@@ -167,7 +167,7 @@ func (hdr *SectionHeader) pack() []byte {
 //
 // unpack the DNS header section.
 //
-func (hdr *SectionHeader) unpack(packet []byte) error {
+func (hdr *SectionHeader) unpack(packet []byte) {
 	hdr.ID = libbytes.ReadUint16(packet, 0)
 
 	if packet[2]&headerIsResponse == headerIsResponse {
@@ -194,6 +194,4 @@ func (hdr *SectionHeader) unpack(packet []byte) error {
 	hdr.ANCount = libbytes.ReadUint16(packet, 6)
 	hdr.NSCount = libbytes.ReadUint16(packet, 8)
 	hdr.ARCount = libbytes.ReadUint16(packet, 10)
-
-	return nil
 }

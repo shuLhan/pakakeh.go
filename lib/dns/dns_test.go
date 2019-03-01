@@ -17,9 +17,9 @@ const (
 	testServerAddress = "127.0.0.1:5300"
 )
 
-var ( // nolint: gochecknoglobals
-	_testServer  *Server
-	_testHandler *serverHandler
+var (
+	_testServer  *Server        //nolint: gochecknoglobals
+	_testHandler *serverHandler //nolint: gochecknoglobals
 )
 
 type serverHandler struct {

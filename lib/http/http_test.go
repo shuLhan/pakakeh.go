@@ -14,17 +14,17 @@ import (
 	libmemfs "github.com/shuLhan/share/lib/memfs"
 )
 
-var ( // nolint: gochecknoglobals
-	testServer *Server // nolint: gochecknoglobals
-	client     = &http.Client{}
+var (
+	testServer *Server          // nolint: gochecknoglobals
+	client     = &http.Client{} //nolint: gochecknoglobals
 
-	cbNone = func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+	cbNone = func(res http.ResponseWriter, req *http.Request, reqBody []byte) ( //nolint: gochecknoglobals
 		[]byte, error,
 	) {
 		return nil, nil
 	}
 
-	cbPlain = func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+	cbPlain = func(res http.ResponseWriter, req *http.Request, reqBody []byte) ( //nolint: gochecknoglobals
 		resBody []byte, e error,
 	) {
 		s := fmt.Sprintf("%s\n", req.Form)
@@ -34,7 +34,7 @@ var ( // nolint: gochecknoglobals
 		return []byte(s), nil
 	}
 
-	cbJSON = func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+	cbJSON = func(res http.ResponseWriter, req *http.Request, reqBody []byte) ( //nolint: gochecknoglobals
 		resBody []byte, e error,
 	) {
 		s := fmt.Sprintf(`{

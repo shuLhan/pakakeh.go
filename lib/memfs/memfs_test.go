@@ -9,8 +9,8 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var ( // nolint: gochecknoglobals
-	_testWD string
+var (
+	_testWD string //nolint: gochecknoglobals
 )
 
 func TestGet(t *testing.T) {

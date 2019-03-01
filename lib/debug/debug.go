@@ -11,9 +11,9 @@ import (
 	"strconv"
 )
 
-var ( // nolint: gochecknoglobals
+var (
 	// Value contains DEBUG value from environment.
-	Value = 0
+	Value = 0 //nolint: gochecknoglobals
 )
 
 //

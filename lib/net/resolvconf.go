@@ -17,8 +17,8 @@ const (
 	envLocaldomain = "LOCALDOMAIN"
 )
 
-var ( // nolint: gochecknoglobals
-	newLineTerms = []byte{'\n'}
+var (
+	newLineTerms = []byte{'\n'} //nolint: gochecknoglobals
 )
 
 // lambda to test os.Hostname.

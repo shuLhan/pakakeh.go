@@ -13,14 +13,14 @@ import (
 	"regexp"
 )
 
-var ( // nolint: gochecknoglobals
+var (
 	// MaxFileSize define maximum file size that can be stored on memory.
 	// The default value is 5 MB.
-	MaxFileSize int64 = 1024 * 1024 * 5
+	MaxFileSize int64 = 1024 * 1024 * 5 //nolint: gochecknoglobals
 
 	// Development define a flag to bypass file in memory.  If its
 	// true, any call to Get will result in direct read to file system.
-	Development bool
+	Development bool //nolint: gochecknoglobals
 )
 
 //

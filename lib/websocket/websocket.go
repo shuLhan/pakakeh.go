@@ -42,22 +42,20 @@ const (
 	_qKeyTicket = "ticket"
 )
 
-var ( // nolint: gochecknoglobals
-	_rng *rand.Rand
+var _rng *rand.Rand //nolint: gochecknoglobals
 
-	_bbPool = sync.Pool{
-		New: func() interface{} {
-			return new(bytes.Buffer)
-		},
-	}
+var _bbPool = sync.Pool{ //nolint: gochecknoglobals
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
 
-	_bsPool = sync.Pool{
-		New: func() interface{} {
-			bs := make([]byte, _maxBuffer)
-			return &bs
-		},
-	}
-)
+var _bsPool = sync.Pool{ //nolint: gochecknoglobals
+	New: func() interface{} {
+		bs := make([]byte, _maxBuffer)
+		return &bs
+	},
+}
 
 //
 // Recv read all content from file descriptor into slice of bytes.

@@ -28,9 +28,9 @@ var DefaultKeyPool = &KeyPool{ // nolint:gochecknoglobals
 }
 
 var ( // nolint:gochecknoglobals
-	sepColon = []byte{':'}
-	sepSlash = []byte{'/'}
-	sepVBar  = []byte{'|'}
+	sepColon = []byte{':'} //nolint:gochecknoglobals
+	sepSlash = []byte{'/'} //nolint:gochecknoglobals
+	sepVBar  = []byte{'|'} //nolint:gochecknoglobals
 )
 
 var (

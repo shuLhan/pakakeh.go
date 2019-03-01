@@ -8,8 +8,8 @@ import (
 	"sync"
 )
 
-var ( // nolint: gochecknoglobals
-	_resPool = sync.Pool{
+var (
+	_resPool = sync.Pool{ //nolint: gochecknoglobals
 		New: func() interface{} {
 			return new(Response)
 		},

@@ -31,8 +31,8 @@ const (
 		"Sec-Websocket-Version: 13\r\n"
 )
 
-var ( // nolint: gochecknoglobals
-	_defRWTO = 10 * time.Second
+var (
+	_defRWTO = 10 * time.Second //nolint: gochecknoglobals
 )
 
 type ctxKey int

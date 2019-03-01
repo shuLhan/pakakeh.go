@@ -13,9 +13,9 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var ( // nolint: gochecknoglobals
-	_testRootRoute = newRootRoute()
-	_testDefMethod string
+var (
+	_testRootRoute = newRootRoute() //nolint: gochecknoglobals
+	_testDefMethod string           //nolint: gochecknoglobals
 )
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {

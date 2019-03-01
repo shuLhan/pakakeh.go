@@ -27,9 +27,9 @@ const (
 	Hexaletters = "0123456789abcedf"
 )
 
-var ( // nolint: gochecknoglobals
+var (
 	// ASCIISpaces contains list of white spaces in ASCII.
-	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
+	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '} //nolint: gochecknoglobals
 )
 
 //
@@ -72,7 +72,7 @@ func AppendUint32(data *[]byte, v uint32) {
 // Copy slice of bytes from parameter.
 //
 func Copy(src []byte) (dst *[]byte) {
-	if src == nil || len(src) == 0 {
+	if len(src) == 0 {
 		return nil
 	}
 	cp := make([]byte, len(src))
@@ -278,11 +278,11 @@ func ReadHexByte(data []byte, x int) (b byte, ok bool) {
 	for {
 		switch {
 		case data[x] >= '0' && data[x] <= '9':
-			b |= byte(data[x]-'0') << y
+			b |= (data[x] - '0') << y
 		case data[x] >= 'A' && data[x] <= 'F':
-			b |= byte(data[x]-('A'-10)) << y
+			b |= (data[x] - ('A' - 10)) << y
 		case data[x] >= 'a' && data[x] <= 'f':
-			b |= byte(data[x]-('a'-10)) << y
+			b |= (data[x] - ('a' - 10)) << y
 		default:
 			return b, false
 		}
@@ -339,7 +339,7 @@ func InReplace(in, allowed []byte, c byte) (out []byte) {
 
 	out = make([]byte, len(in))
 	copy(out, in)
-	found := false
+	var found bool
 	for x := 0; x < len(in); x++ {
 		found = false
 		for y := 0; y < len(allowed); y++ {

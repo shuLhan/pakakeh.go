@@ -11,26 +11,24 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var ( // nolint: gochecknoglobals
-	dInts64 = [][]int64{
-		{},
-		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
-		{0, 1, 0, 1, 0, 1, 0, 1, 0},
-		{1, 1, 2, 2, 3, 1, 2},
-	}
-	dInts64Sorted = [][]int64{
-		{},
-		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-		{0, 0, 0, 0, 0, 1, 1, 1, 1},
-		{1, 1, 1, 2, 2, 2, 3},
-	}
-	dInts64SortedDesc = [][]int64{
-		{},
-		{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
-		{1, 1, 1, 1, 0, 0, 0, 0, 0},
-		{3, 2, 2, 2, 1, 1, 1},
-	}
-)
+var dInts64 = [][]int64{ //nolint: gochecknoglobals
+	{},
+	{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
+	{0, 1, 0, 1, 0, 1, 0, 1, 0},
+	{1, 1, 2, 2, 3, 1, 2},
+}
+var dInts64Sorted = [][]int64{ //nolint: gochecknoglobals
+	{},
+	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+	{0, 0, 0, 0, 0, 1, 1, 1, 1},
+	{1, 1, 1, 2, 2, 2, 3},
+}
+var dInts64SortedDesc = [][]int64{ //nolint: gochecknoglobals
+	{},
+	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
+	{1, 1, 1, 1, 0, 0, 0, 0, 0},
+	{3, 2, 2, 2, 1, 1, 1},
+}
 
 func TestInts64FindMaxEmpty(t *testing.T) {
 	gotv, goti, gotok := Ints64FindMax(dInts64[0])

@@ -710,7 +710,7 @@ func (msg *Message) Unpack() (err error) {
 // message.
 //
 func (msg *Message) UnpackHeaderQuestion() {
-	_ = msg.Header.unpack(msg.Packet)
+	msg.Header.unpack(msg.Packet)
 
 	if debug.Value >= 3 {
 		log.Printf("msg.Header: %+v\n", msg.Header)
@@ -720,7 +720,7 @@ func (msg *Message) UnpackHeaderQuestion() {
 		return
 	}
 
-	_ = msg.Question.unpack(msg.Packet[sectionHeaderSize:])
+	msg.Question.unpack(msg.Packet[sectionHeaderSize:])
 
 	if debug.Value >= 3 {
 		log.Printf("msg.Question: %s\n", msg.Question)

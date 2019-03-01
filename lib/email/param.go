@@ -5,21 +5,21 @@
 package email
 
 // List of known parameter name in header field's value.
-var ( // nolint: gochecknoglobals
+var (
 	// Parameter for Text Media Type, RFC 2046 section 4.1.
-	ParamNameCharset = []byte("charset")
+	ParamNameCharset = []byte("charset") //nolint: gochecknoglobals
 
 	// Parameters for "application/octet-stream", RFC 2046 section 4.5.1.
-	ParamNameType    = []byte("type")
-	ParamNamePadding = []byte("padding")
+	ParamNameType    = []byte("type")    //nolint: gochecknoglobals
+	ParamNamePadding = []byte("padding") //nolint: gochecknoglobals
 
 	// Parameter for "multipart", RFC 2046 section 5.1.
-	ParamNameBoundary = []byte("boundary")
+	ParamNameBoundary = []byte("boundary") //nolint: gochecknoglobals
 
 	// PArameters for "mulitpart/partial", RFC 2046 section 5.2.2.
-	ParamNameID     = []byte("id")
-	ParamNameNumber = []byte("number")
-	ParamNameTotal  = []byte("total")
+	ParamNameID     = []byte("id")     //nolint: gochecknoglobals
+	ParamNameNumber = []byte("number") //nolint: gochecknoglobals
+	ParamNameTotal  = []byte("total")  //nolint: gochecknoglobals
 )
 
 //

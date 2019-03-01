@@ -75,8 +75,6 @@ func TestMain(m *testing.M) {
 
 	s := m.Run()
 
-	testServer.Stop()
-
 	os.Exit(s)
 }
 

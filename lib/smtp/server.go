@@ -228,15 +228,16 @@ func (srv *Server) handle(recv *receiver) {
 
 		switch recv.state {
 		case CommandDATA:
-			err = srv.processMailTx(recv.mail)
-			if err != nil {
-				log.Println("server.processMailTx: ", err.Error())
-				err = recv.sendError(errInProcessing)
-				if err != nil {
-					goto out
-				}
-				continue
-			}
+			srv.processMailTx(recv.mail)
+			// TODO: add return error and check it.
+			//			if err != nil {
+			//				log.Println("server.processMailTx: ", err.Error())
+			//				err = recv.sendError(errInProcessing)
+			//				if err != nil {
+			//					goto out
+			//				}
+			//				continue
+			//			}
 
 			err = recv.sendReply(StatusOK, "OK", nil)
 			if err != nil {
@@ -686,7 +687,7 @@ func (srv *Server) processRelayQueue() {
 // mail object, storing it into storage, and push it to the queue for further
 // processing.
 //
-func (srv *Server) processMailTx(mail *MailTx) (err error) {
+func (srv *Server) processMailTx(mail *MailTx) {
 	mails := make([]*MailTx, len(mail.Recipients))
 	for x, rcpt := range mail.Recipients {
 		mails[x] = NewMailTx(mail.From, []string{rcpt}, mail.Data)
@@ -694,6 +695,4 @@ func (srv *Server) processMailTx(mail *MailTx) (err error) {
 	for _, mail := range mails {
 		srv.mailTxQueue <- mail
 	}
-
-	return nil
 }

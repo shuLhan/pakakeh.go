@@ -40,93 +40,74 @@ const (
 // List of close code in network byte order.  The name of status is
 // mimicking the "net/http" status code.
 //
+// Endpoints MAY use the following pre-defined status codes when sending
+// a Close frame.
+//
 // Status code 1004-1006, and 1015 is reserved and MUST NOT be used on Close
 // payload.
 //
-//	RFC6455 7.4.1-P45
+// See RFC6455 7.4.1-P45 for more information.
 //
-//	7.4.1.  Defined Status Codes
-//
-//	Endpoints MAY use the following pre-defined status codes when sending
-//	a Close frame.
-//
-//	1000
-//
-//	   1000 indicates a normal closure, meaning that the purpose for
-//	   which the connection was established has been fulfilled.
-//
-//	1001
-//
-//	   1001 indicates that an endpoint is "going away", such as a server
-//	   going down or a browser having navigated away from a page.
-//
-//	1002
-//
-//	   1002 indicates that an endpoint is terminating the connection due
-//	   to a protocol error.
-//
-//	1003
-//
-//	   1003 indicates that an endpoint is terminating the connection
-//	   because it has received a type of data it cannot accept (e.g., an
-//	   endpoint that understands only text data MAY send this if it
-//	   receives a binary message).
-//
-//	1007
-//
-//	   1007 indicates that an endpoint is terminating the connection
-//	   because it has received data within a message that was not
-//	   consistent with the type of the message (e.g., non-UTF-8 [RFC3629]
-//	   data within a text message).
-//
-//	1008
-//
-//	   1008 indicates that an endpoint is terminating the connection
-//	   because it has received a message that violates its policy.  This
-//	   is a generic status code that can be returned when there is no
-//	   other more suitable status code (e.g., 1003 or 1009) or if there
-//	   is a need to hide specific details about the policy.
-//
-//	1009
-//
-//	   1009 indicates that an endpoint is terminating the connection
-//	   because it has received a message that is too big for it to
-//	   process.
-//
-//	1010
-//
-//	   1010 indicates that an endpoint (client) is terminating the
-//	   connection because it has expected the server to negotiate one or
-//	   more extension, but the server didn't return them in the response
-//	   message of the WebSocket handshake.  The list of extensions that
-//	   are needed SHOULD appear in the /reason/ part of the Close frame.
-//	   Note that this status code is not used by the server, because it
-//	   can fail the WebSocket handshake instead.
-//
-//	1011
-//
-//	   1011 indicates that a server is terminating the connection because
-//	   it encountered an unexpected condition that prevented it from
-//	   fulfilling the request.
-//
-var ( // nolint: gochecknoglobals
-	StatusNormal                = []byte{0x03, 0xE8} // 1000
-	StatusGone                  = []byte{0x03, 0xE9} // 1001
-	StatusBadRequest            = []byte{0x03, 0xEA} // 1002
-	StatusUnsupportedType       = []byte{0x03, 0xEB} // 1003
-	StatusInvalidData           = []byte{0x03, 0xEF} // 1007
-	StatusForbidden             = []byte{0x03, 0xF0} // 1008
-	StatusRequestEntityTooLarge = []byte{0x03, 0xF1} // 1009
-	StatusBadGateway            = []byte{0x03, 0xF2} // 1010
-	StatusInternalError         = []byte{0x03, 0xF3} // 1011
+var (
+	// StatusNormal (1000) indicates a normal closure, meaning that the
+	// purpose for which the connection was established has been
+	// fulfilled.
+	StatusNormal = []byte{0x03, 0xE8} //nolint: gochecknoglobals
+
+	// StatusGone (1001) indicates that an endpoint is "going away", such
+	// as a server going down or a browser having navigated away from a
+	// page.
+	StatusGone = []byte{0x03, 0xE9} //nolint: gochecknoglobals
+
+	// StatusBadRequest (1002) indicates that an endpoint is terminating
+	// the connection due to a protocol error.
+	StatusBadRequest = []byte{0x03, 0xEA} //nolint: gochecknoglobals
+
+	// StatusUnsupportedType (1003) indicates that an endpoint is
+	// terminating the connection because it has received a type of data
+	// it cannot accept (e.g., an endpoint that understands only text data
+	// MAY send this if it receives a binary message).
+	StatusUnsupportedType = []byte{0x03, 0xEB} //nolint: gochecknoglobals
+
+	// StatusInvalidData (1007) indicates that an endpoint is terminating
+	// the connection because it has received data within a message that
+	// was not consistent with the type of the message (e.g., non-UTF-8
+	// [RFC3629] data within a text message).
+	StatusInvalidData = []byte{0x03, 0xEF} //nolint: gochecknoglobals
+
+	// StatusForbidden (1008) indicates that an endpoint is terminating
+	// the connection because it has received a message that violates its
+	// policy.  This is a generic status code that can be returned when
+	// there is no other more suitable status code (e.g., 1003 or 1009) or
+	// if there is a need to hide specific details about the policy.
+	StatusForbidden = []byte{0x03, 0xF0} //nolint: gochecknoglobals
+
+	// StatusRequestEntityTooLarge (1009) indicates that an endpoint is
+	// terminating the connection because it has received a message that
+	// is too big for it to process.
+	StatusRequestEntityTooLarge = []byte{0x03, 0xF1} //nolint: gochecknoglobals
+
+	// StatusBadGateway (1010) indicates that an endpoint (client) is
+	// terminating the connection because it has expected the server to
+	// negotiate one or more extension, but the server didn't return them
+	// in the response message of the WebSocket handshake.  The list of
+	// extensions that are needed SHOULD appear in the /reason/ part of
+	// the Close frame.  Note that this status code is not used by the
+	// server, because it can fail the WebSocket handshake instead.
+	StatusBadGateway = []byte{0x03, 0xF2} //nolint: gochecknoglobals
+
+	// StatusInternalError or 1011 indicates that a server is terminating
+	// the connection because it encountered an unexpected condition that
+	// prevented it from fulfilling the request.
+	StatusInternalError = []byte{0x03, 0xF3} //nolint: gochecknoglobals
 )
 
 // List of unmasked control frames, MUST used only by server.
-var ( // nolint: gochecknoglobals
-	ControlFrameClose         = []byte{FrameIsFinished | OpCodeClose, 0x00}
-	ControlFrameCloseWithCode = []byte{FrameIsFinished | OpCodeClose, 0x02}
-	ControlFramePing          = []byte{FrameIsFinished | OpCodePing, 0x00}
-	ControlFramePong          = []byte{FrameIsFinished | OpCodePong, 0x00}
+var (
+	ControlFrameClose         = []byte{FrameIsFinished | OpCodeClose, 0x00} //nolint: gochecknoglobals
+	ControlFrameCloseWithCode = []byte{FrameIsFinished | OpCodeClose, 0x02} //nolint: gochecknoglobals
+	ControlFramePing          = []byte{FrameIsFinished | OpCodePing, 0x00}  //nolint: gochecknoglobals
+	ControlFramePong          = []byte{FrameIsFinished | OpCodePong, 0x00}  //nolint: gochecknoglobals
 )
 
 //

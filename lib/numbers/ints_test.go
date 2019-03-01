@@ -11,20 +11,20 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var ( // nolint: gochecknoglobals
-	dInts = [][]int{
+var (
+	dInts = [][]int{ //nolint: gochecknoglobals
 		{},
 		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
 		{0, 1, 0, 1, 0, 1, 0, 1, 0},
 		{1, 1, 2, 2, 3, 1, 2},
 	}
-	dIntsSorted = [][]int{
+	dIntsSorted = [][]int{ //nolint: gochecknoglobals
 		{},
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 		{0, 0, 0, 0, 0, 1, 1, 1, 1},
 		{1, 1, 1, 2, 2, 2, 3},
 	}
-	dIntsSortedDesc = [][]int{
+	dIntsSortedDesc = [][]int{ //nolint: gochecknoglobals
 		{},
 		{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 		{1, 1, 1, 1, 0, 0, 0, 0, 0},

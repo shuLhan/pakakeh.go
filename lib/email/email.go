@@ -4,8 +4,9 @@
 
 package email
 
-var ( // nolint: gochecknoglobals
-	cr        byte = '\r'
-	lf        byte = '\n'
-	boundSeps      = []byte{'-', '-'}
+const (
+	cr byte = '\r'
+	lf byte = '\n'
 )
+
+var boundSeps = []byte{'-', '-'} //nolint: gochecknoglobals

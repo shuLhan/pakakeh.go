@@ -15,8 +15,8 @@ import (
 
 const _testRepoDir = "testdata/beku_test"
 
-var ( // nolint: gochecknoglobals
-	_testRemoteURL string
+var (
+	_testRemoteURL string //nolint: gochecknoglobals
 )
 
 func TestClone(t *testing.T) {

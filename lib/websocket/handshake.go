@@ -61,8 +61,8 @@ const (
 	_hdrValWSVersion         = "13"
 )
 
-var ( // nolint: gochecknoglobals
-	_handshakePool = sync.Pool{
+var (
+	_handshakePool = sync.Pool{ //nolint: gochecknoglobals
 		New: func() interface{} {
 			return new(Handshake)
 		},

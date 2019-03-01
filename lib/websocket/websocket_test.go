@@ -14,20 +14,31 @@ import (
 	"testing"
 )
 
-var ( // nolint: gochecknoglobals
-	_testExternalJWT    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14" // nolint: lll
-	_testInternalJWT    = _testExternalJWT
-	_testUID            = 100
-	_testPort           = 9001
-	_testServer         *Server
-	_testWSAddr         string
+var (
+	//nolint: lll, gochecknoglobals
+	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14"
+	//nolint: lll, gochecknoglobals
+	_testInternalJWT = _testExternalJWT
+	//nolint: lll, gochecknoglobals
+	_testUID = 100
+	//nolint: lll, gochecknoglobals
+	_testPort = 9001
+	//nolint: lll, gochecknoglobals
+	_testServer *Server
+	//nolint: lll, gochecknoglobals
+	_testWSAddr string
+	//nolint: lll, gochecknoglobals
 	_testHdrValWSAccept = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo="
-	_testHdrValWSKey    = "dGhlIHNhbXBsZSBub25jZQ=="
-	_testMaskKey        = [4]byte{'7', 'ú', '!', '='}
+	//nolint: lll, gochecknoglobals
+	_testHdrValWSKey = "dGhlIHNhbXBsZSBub25jZQ=="
+	//nolint: lll, gochecknoglobals
+	_testMaskKey = [4]byte{'7', 'ú', '!', '='}
 )
 
-var ( // nolint: gochecknoglobals
-	_dummyPayload256, _dummyPayload256Masked     = generateDummyPayload(256)
+var (
+	//nolint: gochecknoglobals
+	_dummyPayload256, _dummyPayload256Masked = generateDummyPayload(256)
+	//nolint: gochecknoglobals
 	_dummyPayload65536, _dummyPayload65536Masked = generateDummyPayload(65536)
 )
 

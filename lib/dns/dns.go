@@ -60,9 +60,9 @@ var (
 	ErrIPv6Length     = errors.New("invalid length of AAAA RDATA format")
 )
 
-var ( // nolint: gochecknoglobals
+var (
 	// clientTimeout define read and write timeout on client request.
-	clientTimeout = 6 * time.Second
+	clientTimeout = 6 * time.Second //nolint: gochecknoglobals
 )
 
 type ConnType byte
@@ -75,7 +75,7 @@ const (
 )
 
 // ConnTypeNames contains a mapping between connection type and its name.
-var ConnTypeNames = map[ConnType]string{
+var ConnTypeNames = map[ConnType]string{ //nolint: gochecknoglobals
 	ConnTypeUDP: "UDP",
 	ConnTypeTCP: "TCP",
 	ConnTypeDoH: "DoH",
@@ -147,7 +147,7 @@ var QueryTypes = map[string]uint16{ // nolint: gochecknoglobals
 // QueryTypeNames contains mapping between query type and and their string
 // representation.
 //
-var QueryTypeNames = map[uint16]string{
+var QueryTypeNames = map[uint16]string{ //nolint: gochecknoglobals
 	QueryTypeA:     "A",
 	QueryTypeNS:    "NS",
 	QueryTypeCNAME: "CNAME",
