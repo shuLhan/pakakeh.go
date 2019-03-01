@@ -6,6 +6,8 @@ package websocket
 
 import (
 	"sync"
+
+	"github.com/shuLhan/share/lib/ints"
 )
 
 //
@@ -18,12 +20,25 @@ import (
 //
 type UserSockets struct {
 	sync.Mutex
-	sync.Map
+
+	// conns contains a one-to-many mapping between user ID and their
+	// connections.
+	conns map[uint64][]int
 
 	// uid contains a one-to-one mapping between socket and user ID.
 	// This mapping is to prevent the same file descriptor to be added to
 	// other user ID.
 	uid map[int]uint64
+}
+
+//
+// NewUserSockets create and initialize new user sockets.
+//
+func NewUserSockets() *UserSockets {
+	return &UserSockets{
+		conns: make(map[uint64][]int),
+		uid:   make(map[int]uint64),
+	}
 }
 
 //
@@ -35,33 +50,23 @@ func (us *UserSockets) Add(uid uint64, conn int) {
 	// Check if socket already exist.
 	prevUID, ok := us.uid[conn]
 	us.Unlock()
+
 	if ok {
-		// Delete the previous reference.
+		// Delete the previous socket reference on other user ID.
 		us.Remove(prevUID, conn)
 	}
 
-	if us.uid == nil {
-		us.uid = make(map[int]uint64)
-	}
+	us.Lock()
 	us.uid[conn] = uid
 
-	v, ok := us.Load(uid)
+	conns, ok := us.conns[uid]
 	if !ok {
-		us.Store(uid, []int{conn})
-		return
+		us.conns[uid] = []int{conn}
+	} else if !ints.IsExist(conns, conn) {
+		conns = append(conns, conn)
+		us.conns[uid] = conns
 	}
-
-	conns := v.([]int)
-
-	for x := 0; x < len(conns); x++ {
-		if conns[x] == conn {
-			return
-		}
-	}
-
-	conns = append(conns, conn)
-
-	us.Store(uid, conns)
+	us.Unlock()
 }
 
 //
@@ -69,26 +74,19 @@ func (us *UserSockets) Add(uid uint64, conn int) {
 //
 func (us *UserSockets) Remove(uid uint64, conn int) {
 	us.Lock()
+
 	delete(us.uid, conn)
-	us.Unlock()
 
-	v, ok := us.Load(uid)
-	if !ok {
-		return
-	}
+	conns, ok := us.conns[uid]
+	if ok {
+		conns, _ = ints.Remove(conns, conn)
 
-	conns := v.([]int)
-
-	for x := 0; x < len(conns); x++ {
-		if conns[x] != conn {
-			continue
-		}
-
-		conns = append(conns[:x], conns[x+1:]...)
-		if len(conns) > 0 {
-			us.Store(uid, conns)
+		if len(conns) == 0 {
+			delete(us.conns, uid)
 		} else {
-			us.Delete(uid)
+			us.conns[uid] = conns
 		}
 	}
+
+	us.Unlock()
 }
