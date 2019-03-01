@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package numbers
+package ints64
 
 import (
 	"fmt"
@@ -11,166 +11,166 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var dInts64 = [][]int64{ //nolint: gochecknoglobals
+var d = [][]int64{ //nolint: gochecknoglobals
 	{},
 	{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
 	{0, 1, 0, 1, 0, 1, 0, 1, 0},
 	{1, 1, 2, 2, 3, 1, 2},
 }
-var dInts64Sorted = [][]int64{ //nolint: gochecknoglobals
+var dSorted = [][]int64{ //nolint: gochecknoglobals
 	{},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 	{0, 0, 0, 0, 0, 1, 1, 1, 1},
 	{1, 1, 1, 2, 2, 2, 3},
 }
-var dInts64SortedDesc = [][]int64{ //nolint: gochecknoglobals
+var dSortedDesc = [][]int64{ //nolint: gochecknoglobals
 	{},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{1, 1, 1, 1, 0, 0, 0, 0, 0},
 	{3, 2, 2, 2, 1, 1, 1},
 }
 
-func TestInts64FindMaxEmpty(t *testing.T) {
-	gotv, goti, gotok := Ints64FindMax(dInts64[0])
+func TestMaxEmpty(t *testing.T) {
+	gotv, goti, gotok := Max(d[0])
 
-	test.Assert(t, "", int64(-1), gotv, true)
-	test.Assert(t, "", -1, goti, true)
+	test.Assert(t, "", int64(0), gotv, true)
+	test.Assert(t, "", 0, goti, true)
 	test.Assert(t, "", false, gotok, true)
 }
 
-func TestInts64FindMax(t *testing.T) {
-	gotv, goti, gotok := Ints64FindMax(dInts64[1])
+func TestMax(t *testing.T) {
+	gotv, goti, gotok := Max(d[1])
 
 	test.Assert(t, "", int64(9), gotv, true)
 	test.Assert(t, "", 4, goti, true)
 	test.Assert(t, "", true, gotok, true)
 }
 
-func TestInts64FindMinEmpty(t *testing.T) {
-	gotv, goti, gotok := Ints64FindMin(dInts64[0])
+func TestMinEmpty(t *testing.T) {
+	gotv, goti, gotok := Min(d[0])
 
-	test.Assert(t, "", int64(-1), gotv, true)
-	test.Assert(t, "", -1, goti, true)
+	test.Assert(t, "", int64(0), gotv, true)
+	test.Assert(t, "", 0, goti, true)
 	test.Assert(t, "", false, gotok, true)
 }
 
-func TestInts64FindMin(t *testing.T) {
-	gotv, goti, gotok := Ints64FindMin(dInts64[1])
+func TestMin(t *testing.T) {
+	gotv, goti, gotok := Min(d[1])
 
 	test.Assert(t, "", int64(0), gotv, true)
 	test.Assert(t, "", 5, goti, true)
 	test.Assert(t, "", true, gotok, true)
 }
 
-func TestInts64Sum(t *testing.T) {
-	got := Ints64Sum(dInts64[1])
+func TestSum(t *testing.T) {
+	got := Sum(d[1])
 
 	test.Assert(t, "", int64(45), got, true)
 }
 
-func TestInts64Count(t *testing.T) {
-	got := Ints64Count(dInts64[0], 0)
+func TestCount(t *testing.T) {
+	got := Count(d[0], 0)
 
 	test.Assert(t, "", 0, got, true)
 
-	got = Ints64Count(dInts64[1], 1)
+	got = Count(d[1], 1)
 
 	test.Assert(t, "", 1, got, true)
 
-	got = Ints64Count(dInts64[2], 1)
+	got = Count(d[2], 1)
 
 	test.Assert(t, "", 4, got, true)
 
-	got = Ints64Count(dInts64[3], 0)
+	got = Count(d[3], 0)
 
 	test.Assert(t, "", 0, got, true)
 
-	got = Ints64Count(dInts64[3], 3)
+	got = Count(d[3], 3)
 
 	test.Assert(t, "", 1, got, true)
 }
 
-func TestInts64CountsEmpty(t *testing.T) {
+func TestCountsEmpty(t *testing.T) {
 	classes := []int64{1, 2, 3}
 	exp := []int{0, 0, 0}
 
-	got := Ints64Counts(dInts64[0], classes)
+	got := Counts(d[0], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestInts64CountsEmptyClasses(t *testing.T) {
+func TestCountsEmptyClasses(t *testing.T) {
 	classes := []int64{}
 	var exp []int
 
-	got := Ints64Counts(dInts64[1], classes)
+	got := Counts(d[1], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestInts64Counts(t *testing.T) {
+func TestCounts(t *testing.T) {
 	classes := []int64{1, 2, 3}
 	exp := []int{3, 3, 1}
 
-	got := Ints64Counts(dInts64[3], classes)
+	got := Counts(d[3], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestInts6464MaxCountOf(t *testing.T) {
+func Test64MaxCountOf(t *testing.T) {
 	classes := []int64{0, 1}
 	exp := int64(0)
-	got, _ := Ints64MaxCountOf(dInts64[2], classes)
+	got, _ := MaxCountOf(d[2], classes)
 
 	test.Assert(t, "", exp, got, true)
 
 	// Swap the class values.
 	classes = []int64{1, 0}
-	got, _ = Ints64MaxCountOf(dInts64[2], classes)
+	got, _ = MaxCountOf(d[2], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestInts64SwapEmpty(t *testing.T) {
+func TestSwapEmpty(t *testing.T) {
 	exp := []int64{}
 
-	Ints64Swap(dInts64[0], 1, 6)
+	Swap(d[0], 1, 6)
 
-	test.Assert(t, "", exp, dInts64[0], true)
+	test.Assert(t, "", exp, d[0], true)
 }
 
-func TestInts64SwapEqual(t *testing.T) {
-	in := make([]int64, len(dInts64[1]))
-	copy(in, dInts64[1])
+func TestSwapEqual(t *testing.T) {
+	in := make([]int64, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]int64, len(in))
 	copy(exp, in)
 
-	Ints64Swap(in, 1, 1)
+	Swap(in, 1, 1)
 
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestInts64SwapOutOfRange(t *testing.T) {
-	in := make([]int64, len(dInts64[1]))
-	copy(in, dInts64[1])
+func TestSwapOutOfRange(t *testing.T) {
+	in := make([]int64, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]int64, len(in))
 	copy(exp, in)
 
-	Ints64Swap(in, 1, 100)
+	Swap(in, 1, 100)
 
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestInts64Swap(t *testing.T) {
-	in := make([]int64, len(dInts64[1]))
-	copy(in, dInts64[1])
+func TestSwap(t *testing.T) {
+	in := make([]int64, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]int64, len(in))
 	copy(exp, in)
 
-	Ints64Swap(in, 0, len(in)-1)
+	Swap(in, 0, len(in)-1)
 
 	test.Assert(t, "", exp, in, false)
 
@@ -181,62 +181,62 @@ func TestInts64Swap(t *testing.T) {
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestInts64IsExist(t *testing.T) {
+func TestIsExist(t *testing.T) {
 	var s bool
 
 	// True positive.
-	for _, d := range dInts64 {
+	for _, d := range d {
 		for _, v := range d {
-			s = Ints64IsExist(d, v)
+			s = IsExist(d, v)
 
 			test.Assert(t, "", true, s, true)
 		}
 	}
 
 	// False positive.
-	for _, d := range dInts64 {
-		s = Ints64IsExist(d, -1)
+	for _, d := range d {
+		s = IsExist(d, -1)
 		test.Assert(t, "", false, s, true)
-		s = Ints64IsExist(d, 10)
+		s = IsExist(d, 10)
 		test.Assert(t, "", false, s, true)
 	}
 }
 
-func TestInts64InsertionSort(t *testing.T) {
-	for x := range dInts64 {
-		d := make([]int64, len(dInts64[x]))
+func TestInsertionSortWithIndices(t *testing.T) {
+	for x := range d {
+		data := make([]int64, len(d[x]))
 
-		copy(d, dInts64[x])
+		copy(data, d[x])
 
-		ids := make([]int, len(d))
+		ids := make([]int, len(data))
 		for x := range ids {
 			ids[x] = x
 		}
 
-		Ints64InsertionSort(d, ids, 0, len(ids), true)
+		InsertionSortWithIndices(data, ids, 0, len(ids), true)
 
-		test.Assert(t, "", dInts64Sorted[x], d, true)
+		test.Assert(t, "", dSorted[x], data, true)
 	}
 }
 
-func TestInts64InsertionSortDesc(t *testing.T) {
-	for x := range dInts64 {
-		d := make([]int64, len(dInts64[x]))
+func TestInsertionSortWithIndicesDesc(t *testing.T) {
+	for x := range d {
+		data := make([]int64, len(d[x]))
 
-		copy(d, dInts64[x])
+		copy(data, d[x])
 
-		ids := make([]int, len(d))
+		ids := make([]int, len(data))
 		for x := range ids {
 			ids[x] = x
 		}
 
-		Ints64InsertionSort(d, ids, 0, len(ids), false)
+		InsertionSortWithIndices(data, ids, 0, len(ids), false)
 
-		test.Assert(t, "", dInts64SortedDesc[x], d, true)
+		test.Assert(t, "", dSortedDesc[x], data, true)
 	}
 }
 
-func TestInts64SortByIndex(t *testing.T) {
+func TestSortByIndex(t *testing.T) {
 	ids := [][]int{
 		{},
 		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
@@ -244,18 +244,18 @@ func TestInts64SortByIndex(t *testing.T) {
 		{0, 1, 5, 6, 2, 3, 4},
 	}
 
-	for x := range dInts64 {
-		d := make([]int64, len(dInts64[x]))
+	for x := range d {
+		data := make([]int64, len(d[x]))
 
-		copy(d, dInts64[x])
+		copy(data, d[x])
 
-		Ints64SortByIndex(&d, ids[x])
+		SortByIndex(&data, ids[x])
 
-		test.Assert(t, "", dInts64Sorted[x], d, true)
+		test.Assert(t, "", dSorted[x], data, true)
 	}
 }
 
-var ints64InSorts = [][]int64{ // nolint: gochecknoglobals
+var ints64InSorts = [][]int64{ // nolint: gochecknoglobals,dupl
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -275,7 +275,7 @@ var ints64InSorts = [][]int64{ // nolint: gochecknoglobals
 		62},
 }
 
-var ints64ExpSorts = [][]int64{ // nolint: gochecknoglobals
+var ints64ExpSorts = [][]int64{ // nolint: gochecknoglobals,dupl
 	{3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -295,7 +295,7 @@ var ints64ExpSorts = [][]int64{ // nolint: gochecknoglobals
 		79},
 }
 
-var ints64ExpSortsDesc = [][]int64{ // nolint: gochecknoglobals
+var ints64ExpSortsDesc = [][]int64{ // nolint: gochecknoglobals,dupl
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
@@ -315,11 +315,11 @@ var ints64ExpSortsDesc = [][]int64{ // nolint: gochecknoglobals
 		30},
 }
 
-func TestInts64IndirectSort(t *testing.T) {
+func TestIndirectSort(t *testing.T) {
 	var res, exp string
 
 	for i := range ints64InSorts {
-		Ints64IndirectSort(ints64InSorts[i], true)
+		IndirectSort(ints64InSorts[i], true)
 
 		res = fmt.Sprint(ints64InSorts[i])
 		exp = fmt.Sprint(ints64ExpSorts[i])
@@ -328,11 +328,11 @@ func TestInts64IndirectSort(t *testing.T) {
 	}
 }
 
-func TestInts64IndirectSortDesc(t *testing.T) {
+func TestIndirectSortDesc(t *testing.T) {
 	var res, exp string
 
 	for i := range ints64InSorts {
-		Ints64IndirectSort(ints64InSorts[i], false)
+		IndirectSort(ints64InSorts[i], false)
 
 		res = fmt.Sprint(ints64InSorts[i])
 		exp = fmt.Sprint(ints64ExpSortsDesc[i])
@@ -341,42 +341,42 @@ func TestInts64IndirectSortDesc(t *testing.T) {
 	}
 }
 
-func TestInts64IndirectSort_Stability(t *testing.T) {
+func TestIndirectSort_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	got := Ints64IndirectSort(ints64InSorts[5], true)
+	got := IndirectSort(ints64InSorts[5], true)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestInts64IndirectSortDesc_Stability(t *testing.T) {
+func TestIndirectSortDesc_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	got := Ints64IndirectSort(ints64InSorts[5], false)
+	got := IndirectSort(ints64InSorts[5], false)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestInts64InplaceMergesort(t *testing.T) {
+func TestInplaceMergesort(t *testing.T) {
 	size := len(ints64InSorts[6])
 	idx := make([]int, size)
 
-	Ints64InplaceMergesort(ints64InSorts[6], idx, 0, size, true)
+	InplaceMergesort(ints64InSorts[6], idx, 0, size, true)
 
 	test.Assert(t, "", ints64ExpSorts[6], ints64InSorts[6], true)
 }
 
-func TestInts64IndirectSort_SortByIndex(t *testing.T) {
+func TestIndirectSort_SortByIndex(t *testing.T) {
 	expIds := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in1 := []int64{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in2 := []int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	exp := fmt.Sprint(in1)
 
-	sortedIds := Ints64IndirectSort(in1, true)
+	sortedIds := IndirectSort(in1, true)
 
 	test.Assert(t, "", expIds, sortedIds, true)
 
 	// Reverse the sort.
-	Ints64SortByIndex(&in2, sortedIds)
+	SortByIndex(&in2, sortedIds)
 
 	got := fmt.Sprint(in2)
 
