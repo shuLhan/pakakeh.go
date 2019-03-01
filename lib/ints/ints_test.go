@@ -397,3 +397,33 @@ func TestIndirectSort_SortByIndex(t *testing.T) {
 
 	test.Assert(t, "", exp, got, true)
 }
+
+func TestRemove(t *testing.T) {
+	cases := []struct {
+		d   []int
+		v   int
+		exp []int
+	}{{
+		d:   []int{},
+		v:   1,
+		exp: []int{},
+	}, {
+		d:   []int{1},
+		v:   1,
+		exp: []int{},
+	}, {
+		d:   []int{1, 2, 3, 4},
+		v:   5,
+		exp: []int{1, 2, 3, 4},
+	}, {
+		d:   []int{1, 2, 3, 4},
+		v:   1,
+		exp: []int{2, 3, 4},
+	}}
+
+	for _, c := range cases {
+		got, _ := Remove(c.d, c.v)
+
+		test.Assert(t, "Remove", c.exp, got, true)
+	}
+}

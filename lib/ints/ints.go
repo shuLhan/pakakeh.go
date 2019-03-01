@@ -233,6 +233,20 @@ func MinRange(d []int, l, r int) (v, i int) {
 }
 
 //
+// Remove value "v" from slice if its exist and return new slice and true;
+// otherwise, if not found, return unmodified slice and false.
+//
+func Remove(d []int, v int) ([]int, bool) {
+	for x := 0; x < len(d); x++ {
+		if d[x] == v {
+			d = append(d[:x], d[x+1:]...)
+			return d, true
+		}
+	}
+	return d, false
+}
+
+//
 // SortByIndex will sort the slice `d` using sorted index `sortedIds`.
 //
 func SortByIndex(d *[]int, sortedIds []int) {
