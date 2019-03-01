@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
-	libnumbers "github.com/shuLhan/share/lib/numbers"
+	"github.com/shuLhan/share/lib/ints"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
@@ -225,8 +225,8 @@ func (claset *Claset) CountValueSpaces() {
 func (claset *Claset) RecountMajorMinor() {
 	claset.CountValueSpaces()
 
-	_, maxIdx, maxok := libnumbers.IntsFindMax(claset.counts)
-	_, minIdx, minok := libnumbers.IntsFindMin(claset.counts)
+	_, maxIdx, maxok := ints.Max(claset.counts)
+	_, minIdx, minok := ints.Min(claset.counts)
 
 	if maxok {
 		claset.major = claset.vs[maxIdx]

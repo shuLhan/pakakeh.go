@@ -18,9 +18,10 @@ import (
 	"math"
 
 	"github.com/shuLhan/share/lib/debug"
+	"github.com/shuLhan/share/lib/floats64"
+	"github.com/shuLhan/share/lib/ints"
 	"github.com/shuLhan/share/lib/mining/classifier"
 	"github.com/shuLhan/share/lib/mining/classifier/cart"
-	"github.com/shuLhan/share/lib/numbers"
 	libstrings "github.com/shuLhan/share/lib/strings"
 	"github.com/shuLhan/share/lib/tabula"
 )
@@ -305,7 +306,7 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 		// (1.2)
 		classProbs := libstrings.FrequencyOfTokens(votes, vs, false)
 
-		_, idx, ok := numbers.Floats64FindMax(classProbs)
+		_, idx, ok := floats64.Max(classProbs)
 
 		if ok {
 			predicts = append(predicts, vs[idx])
@@ -346,7 +347,7 @@ func (forest *Runtime) Votes(sample *tabula.Row, sampleIdx int) (
 	for x, tree := range forest.trees {
 		// (1)
 		if sampleIdx >= 0 {
-			exist := numbers.IntsIsExist(forest.bagIndices[x],
+			exist := ints.IsExist(forest.bagIndices[x],
 				sampleIdx)
 			if exist {
 				continue

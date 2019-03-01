@@ -14,7 +14,7 @@ import (
 	"fmt"
 
 	"github.com/shuLhan/share/lib/debug"
-	"github.com/shuLhan/share/lib/numbers"
+	"github.com/shuLhan/share/lib/floats64"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
@@ -192,7 +192,7 @@ func (gini *Gini) ComputeContinu(src *[]float64, target, classes *[]string) {
 	T2 := make([]string, len(*target))
 	copy(T2, *target)
 
-	gini.SortedIndex = numbers.Floats64IndirectSort(A2, true)
+	gini.SortedIndex = floats64.IndirectSort(A2, true)
 
 	if debug.Value >= 1 {
 		fmt.Println("[gini] attr sorted :", A2)

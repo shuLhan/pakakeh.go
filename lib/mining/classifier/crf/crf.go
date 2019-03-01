@@ -19,6 +19,7 @@ import (
 	"sort"
 
 	"github.com/shuLhan/share/lib/debug"
+	"github.com/shuLhan/share/lib/floats64"
 	"github.com/shuLhan/share/lib/mining/classifier"
 	"github.com/shuLhan/share/lib/mining/classifier/rf"
 	"github.com/shuLhan/share/lib/numbers"
@@ -416,7 +417,7 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 	vs := samples.GetClassValueSpace()
 	stageProbs := make([]float64, len(vs))
 	stageSumProbs := make([]float64, len(vs))
-	sumWeights := numbers.Floats64Sum(crf.weights)
+	sumWeights := floats64.Sum(crf.weights)
 
 	// (1)
 	rows := samples.GetDataAsRows()
@@ -448,7 +449,7 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 		}
 
 		// (1.3)
-		_, maxi, ok := numbers.Floats64FindMax(stageProbs)
+		_, maxi, ok := floats64.Max(stageProbs)
 		if ok {
 			predicts = append(predicts, vs[maxi])
 		}

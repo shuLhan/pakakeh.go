@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/shuLhan/share/lib/numbers"
+	"github.com/shuLhan/share/lib/ints"
 	"github.com/shuLhan/share/lib/runes"
 )
 
@@ -179,7 +179,7 @@ func MaxCharSequence(text string) (rune, int) {
 		return 0, 0
 	}
 
-	_, idx, _ := numbers.IntsFindMax(counts)
+	_, idx, _ := ints.Max(counts)
 
 	return chars[idx], counts[idx]
 }

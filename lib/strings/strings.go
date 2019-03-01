@@ -11,7 +11,7 @@ package strings
 import (
 	"strings"
 
-	"github.com/shuLhan/share/lib/numbers"
+	"github.com/shuLhan/share/lib/ints"
 )
 
 //
@@ -203,7 +203,7 @@ func MostFrequentTokens(words []string, tokens []string, sensitive bool) string 
 	}
 
 	tokensCount := CountTokens(words, tokens, sensitive)
-	_, maxIdx, _ := numbers.IntsFindMax(tokensCount)
+	_, maxIdx, _ := ints.Max(tokensCount)
 
 	return tokens[maxIdx]
 }

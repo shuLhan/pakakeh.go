@@ -10,6 +10,8 @@ import (
 
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/dsv"
+	"github.com/shuLhan/share/lib/floats64"
+	"github.com/shuLhan/share/lib/ints"
 	"github.com/shuLhan/share/lib/numbers"
 	libstrings "github.com/shuLhan/share/lib/strings"
 	"github.com/shuLhan/share/lib/tabula"
@@ -353,8 +355,7 @@ func (rt *Runtime) Performance(samples tabula.ClasetInterface,
 	// (1)
 	actuals := samples.GetClassAsStrings()
 	sortedIds := numbers.IntCreateSeq(0, len(probs)-1)
-	numbers.Floats64InplaceMergesort(probs, sortedIds, 0, len(probs),
-		false)
+	floats64.InplaceMergesort(probs, sortedIds, 0, len(probs), false)
 
 	// (2)
 	libstrings.SortByIndex(&actuals, sortedIds)
@@ -382,7 +383,7 @@ func (rt *Runtime) computePerfByProbs(samples tabula.ClasetInterface,
 	actuals []string, probs []float64,
 ) {
 	vs := samples.GetClassValueSpace()
-	nactuals := numbers.IntsTo64(samples.Counts())
+	nactuals := ints.To64(samples.Counts())
 	nclass := libstrings.CountTokens(actuals, vs, false)
 
 	pprev := math.Inf(-1)

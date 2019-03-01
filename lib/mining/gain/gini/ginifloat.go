@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/shuLhan/share/lib/debug"
-	"github.com/shuLhan/share/lib/numbers"
+	"github.com/shuLhan/share/lib/floats64"
 )
 
 //
@@ -28,14 +28,14 @@ import (
 func (gini *Gini) ComputeContinuFloat(src, target, classes *[]float64) {
 	gini.IsContinu = true
 
-	gini.SortedIndex = numbers.Floats64IndirectSort(*src, true)
+	gini.SortedIndex = floats64.IndirectSort(*src, true)
 
 	if debug.Value >= 1 {
 		fmt.Println("[gini] attr sorted :", src)
 	}
 
 	// (1)
-	numbers.Floats64SortByIndex(target, gini.SortedIndex)
+	floats64.SortByIndex(target, gini.SortedIndex)
 
 	// (2)
 	gini.createContinuPartition(src)
@@ -64,7 +64,7 @@ func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 		return 0
 	}
 
-	classCount := numbers.Floats64Counts(*target, *classes)
+	classCount := floats64.Counts(*target, *classes)
 
 	var sump2 float64
 
