@@ -5,4 +5,5 @@
 /lib/dns/testdata/hosts.block.out
 /lib/git/testdata/beku_test
 cover.*
+lib/email/maildir/testdata/
 lib/memfs/testdata/memfs_generate.go
