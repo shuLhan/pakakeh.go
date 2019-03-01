@@ -2,175 +2,176 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package numbers
+package floats64
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/shuLhan/share/lib/numbers"
 	"github.com/shuLhan/share/lib/test"
 )
 
-var dFloats64 = [][]float64{ //nolint: gochecknoglobals
+var d = [][]float64{ //nolint: gochecknoglobals
 	{},
 	{0.5, 0.6, 0.7, 0.8, 0.9, 0.0, 0.1, 0.2, 0.3, 0.4},
 	{0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0},
 	{1, 1, 2, 2, 3, 1, 2},
 }
-var dFloats64Sorted = [][]float64{ //nolint: gochecknoglobals
+var dSorted = [][]float64{ //nolint: gochecknoglobals
 	{},
 	{0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9},
 	{0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1},
 	{1, 1, 1, 2, 2, 2, 3},
 }
-var dFloats64SortedDesc = [][]float64{ //nolint: gochecknoglobals
+var dSortedDesc = [][]float64{ //nolint: gochecknoglobals
 	{},
 	{0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0},
 	{0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0},
 	{3, 2, 2, 2, 1, 1, 1},
 }
 
-func TestFloats64FindMaxEmpty(t *testing.T) {
-	gotv, goti, gotok := Floats64FindMax(dFloats64[0])
+func TestMaxEmpty(t *testing.T) {
+	gotv, goti, gotok := Max(d[0])
 
-	test.Assert(t, "", float64(-1), gotv, true)
-	test.Assert(t, "", -1, goti, true)
+	test.Assert(t, "", float64(0), gotv, true)
+	test.Assert(t, "", 0, goti, true)
 	test.Assert(t, "", false, gotok, true)
 }
 
-func TestFloats64FindMax(t *testing.T) {
-	gotv, goti, gotok := Floats64FindMax(dFloats64[1])
+func TestMax(t *testing.T) {
+	gotv, goti, gotok := Max(d[1])
 
 	test.Assert(t, "", float64(0.9), gotv, true)
 	test.Assert(t, "", 4, goti, true)
 	test.Assert(t, "", true, gotok, true)
 }
 
-func TestFloats64FindMinEmpty(t *testing.T) {
-	gotv, goti, gotok := Floats64FindMin(dFloats64[0])
+func TestMinEmpty(t *testing.T) {
+	gotv, goti, gotok := Min(d[0])
 
-	test.Assert(t, "", gotv, float64(-1), true)
-	test.Assert(t, "", goti, -1, true)
+	test.Assert(t, "", gotv, float64(0), true)
+	test.Assert(t, "", goti, 0, true)
 	test.Assert(t, "", gotok, false, true)
 }
 
-func TestFloats64FindMin(t *testing.T) {
-	gotv, goti, gotok := Floats64FindMin(dFloats64[1])
+func TestMin(t *testing.T) {
+	gotv, goti, gotok := Min(d[1])
 
 	test.Assert(t, "", gotv, float64(0.0), true)
 	test.Assert(t, "", goti, 5, true)
 	test.Assert(t, "", gotok, true, true)
 }
 
-func TestFloats64Sum(t *testing.T) {
-	got := Floats64Sum(dFloats64[1])
+func TestSum(t *testing.T) {
+	got := Sum(d[1])
 
-	test.Assert(t, "", float64(4.5), Float64Round(got, 1), true)
+	test.Assert(t, "", float64(4.5), numbers.Float64Round(got, 1), true)
 }
 
-func TestFloats64Count(t *testing.T) {
-	got := Floats64Count(dFloats64[0], 0)
+func TestCount(t *testing.T) {
+	got := Count(d[0], 0)
 
 	test.Assert(t, "", 0, got, true)
 
-	got = Floats64Count(dFloats64[1], 0.1)
+	got = Count(d[1], 0.1)
 
 	test.Assert(t, "", 1, got, true)
 
-	got = Floats64Count(dFloats64[2], 0.1)
+	got = Count(d[2], 0.1)
 
 	test.Assert(t, "", 4, got, true)
 
-	got = Floats64Count(dFloats64[3], 0.1)
+	got = Count(d[3], 0.1)
 
 	test.Assert(t, "", 0, got, true)
 
-	got = Floats64Count(dFloats64[3], 3)
+	got = Count(d[3], 3)
 
 	test.Assert(t, "", 1, got, true)
 }
 
-func TestFloats64CountsEmpty(t *testing.T) {
+func TestCountsEmpty(t *testing.T) {
 	classes := []float64{1, 2, 3}
 	exp := []int{0, 0, 0}
 
-	got := Floats64Counts(dFloats64[0], classes)
+	got := Counts(d[0], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestFloats64CountsEmptyClasses(t *testing.T) {
+func TestCountsEmptyClasses(t *testing.T) {
 	classes := []float64{}
 	var exp []int
 
-	got := Floats64Counts(dFloats64[1], classes)
+	got := Counts(d[1], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestFloats64Counts(t *testing.T) {
+func TestCounts(t *testing.T) {
 	classes := []float64{1, 2, 3}
 	exp := []int{3, 3, 1}
 
-	got := Floats64Counts(dFloats64[3], classes)
+	got := Counts(d[3], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestFloats64MaxCountOf(t *testing.T) {
+func TestMaxCountOf(t *testing.T) {
 	classes := []float64{0, 1}
 	exp := float64(0)
-	got, _ := Floats64MaxCountOf(dFloats64[2], classes)
+	got, _ := MaxCountOf(d[2], classes)
 
 	test.Assert(t, "", exp, got, true)
 
 	// Swap the class values.
 	classes = []float64{1, 0}
-	got, _ = Floats64MaxCountOf(dFloats64[2], classes)
+	got, _ = MaxCountOf(d[2], classes)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestFloats64SwapEmpty(t *testing.T) {
+func TestSwapEmpty(t *testing.T) {
 	exp := []float64{}
 
-	Floats64Swap(dFloats64[0], 1, 6)
+	Swap(d[0], 1, 6)
 
-	test.Assert(t, "", exp, dFloats64[0], true)
+	test.Assert(t, "", exp, d[0], true)
 }
 
-func TestFloats64SwapEqual(t *testing.T) {
-	in := make([]float64, len(dFloats64[1]))
-	copy(in, dFloats64[1])
+func TestSwapEqual(t *testing.T) {
+	in := make([]float64, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]float64, len(in))
 	copy(exp, in)
 
-	Floats64Swap(in, 1, 1)
+	Swap(in, 1, 1)
 
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestFloats64SwapOutOfRange(t *testing.T) {
-	in := make([]float64, len(dFloats64[1]))
-	copy(in, dFloats64[1])
+func TestSwapOutOfRange(t *testing.T) {
+	in := make([]float64, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]float64, len(in))
 	copy(exp, in)
 
-	Floats64Swap(in, 1, 100)
+	Swap(in, 1, 100)
 
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestFloats64Swap(t *testing.T) {
-	in := make([]float64, len(dFloats64[1]))
-	copy(in, dFloats64[1])
+func TestSwap(t *testing.T) {
+	in := make([]float64, len(d[1]))
+	copy(in, d[1])
 
 	exp := make([]float64, len(in))
 	copy(exp, in)
 
-	Floats64Swap(in, 0, len(in)-1)
+	Swap(in, 0, len(in)-1)
 
 	test.Assert(t, "", exp, in, false)
 
@@ -181,55 +182,55 @@ func TestFloats64Swap(t *testing.T) {
 	test.Assert(t, "", exp, in, true)
 }
 
-func TestFloats64IsExist(t *testing.T) {
-	got := Floats64IsExist(dFloats64[0], 0)
+func TestIsExist(t *testing.T) {
+	got := IsExist(d[0], 0)
 
 	test.Assert(t, "", false, got, true)
 
-	got = Floats64IsExist(dFloats64[1], float64(0))
+	got = IsExist(d[1], float64(0))
 
 	test.Assert(t, "", true, got, true)
 
-	got = Floats64IsExist(dFloats64[1], float64(0.01))
+	got = IsExist(d[1], float64(0.01))
 
 	test.Assert(t, "", false, got, true)
 }
 
-func TestFloats64InsertionSort(t *testing.T) {
-	for x := range dFloats64 {
-		d := make([]float64, len(dFloats64[x]))
+func TestInplaceInsertionSort(t *testing.T) {
+	for x := range d {
+		data := make([]float64, len(d[x]))
 
-		copy(d, dFloats64[x])
+		copy(data, d[x])
 
-		ids := make([]int, len(d))
+		ids := make([]int, len(data))
 		for x := range ids {
 			ids[x] = x
 		}
 
-		Floats64InsertionSort(d, ids, 0, len(ids), true)
+		InplaceInsertionSort(data, ids, 0, len(ids), true)
 
-		test.Assert(t, "", dFloats64Sorted[x], d, true)
+		test.Assert(t, "", dSorted[x], data, true)
 	}
 }
 
-func TestFloats64InsertionSortDesc(t *testing.T) {
-	for x := range dFloats64 {
-		d := make([]float64, len(dFloats64[x]))
+func TestInplaceInsertionSortDesc(t *testing.T) {
+	for x := range d {
+		data := make([]float64, len(d[x]))
 
-		copy(d, dFloats64[x])
+		copy(data, d[x])
 
-		ids := make([]int, len(d))
+		ids := make([]int, len(data))
 		for x := range ids {
 			ids[x] = x
 		}
 
-		Floats64InsertionSort(d, ids, 0, len(ids), false)
+		InplaceInsertionSort(data, ids, 0, len(ids), false)
 
-		test.Assert(t, "", dFloats64SortedDesc[x], d, true)
+		test.Assert(t, "", dSortedDesc[x], data, true)
 	}
 }
 
-func TestFloats64SortByIndex(t *testing.T) {
+func TestSortByIndex(t *testing.T) {
 	ids := [][]int{
 		{},
 		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
@@ -237,18 +238,18 @@ func TestFloats64SortByIndex(t *testing.T) {
 		{0, 1, 5, 6, 2, 3, 4},
 	}
 
-	for x := range dFloats64 {
-		d := make([]float64, len(dFloats64[x]))
+	for x := range d {
+		data := make([]float64, len(d[x]))
 
-		copy(d, dFloats64[x])
+		copy(data, d[x])
 
-		Floats64SortByIndex(&d, ids[x])
+		SortByIndex(&data, ids[x])
 
-		test.Assert(t, "", dFloats64Sorted[x], d, true)
+		test.Assert(t, "", dSorted[x], data, true)
 	}
 }
 
-var inSorts = [][]float64{ // nolint: gochecknoglobals
+var inSorts = [][]float64{ // nolint: gochecknoglobals,dupl
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0},
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0},
 	{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
@@ -268,7 +269,7 @@ var inSorts = [][]float64{ // nolint: gochecknoglobals
 		6.2},
 }
 
-var expSorts = [][]float64{ // nolint: gochecknoglobals
+var expSorts = [][]float64{ // nolint: gochecknoglobals,dupl
 	{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
 	{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
 	{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
@@ -288,7 +289,7 @@ var expSorts = [][]float64{ // nolint: gochecknoglobals
 		7.9},
 }
 
-var expSortsDesc = [][]float64{ // nolint: gochecknoglobals
+var expSortsDesc = [][]float64{ // nolint: gochecknoglobals,dupl
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0},
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0},
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0},
@@ -307,11 +308,11 @@ var expSortsDesc = [][]float64{ // nolint: gochecknoglobals
 		5.5, 5.5, 5.5, 5.4, 5.2, 5.1, 5, 5, 4.9, 4.9, 3},
 }
 
-func TestFloats64IndirectSort(t *testing.T) {
+func TestIndirectSort(t *testing.T) {
 	var res, exp string
 
 	for i := range inSorts {
-		Floats64IndirectSort(inSorts[i], true)
+		IndirectSort(inSorts[i], true)
 
 		res = fmt.Sprint(inSorts[i])
 		exp = fmt.Sprint(expSorts[i])
@@ -320,11 +321,11 @@ func TestFloats64IndirectSort(t *testing.T) {
 	}
 }
 
-func TestFloats64IndirectSortDesc(t *testing.T) {
+func TestIndirectSortDesc(t *testing.T) {
 	var res, exp string
 
 	for i := range inSorts {
-		Floats64IndirectSort(inSorts[i], false)
+		IndirectSort(inSorts[i], false)
 
 		res = fmt.Sprint(inSorts[i])
 		exp = fmt.Sprint(expSortsDesc[i])
@@ -333,42 +334,42 @@ func TestFloats64IndirectSortDesc(t *testing.T) {
 	}
 }
 
-func TestFloats64IndirectSort_Stability(t *testing.T) {
+func TestIndirectSort_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	got := Floats64IndirectSort(inSorts[5], true)
+	got := IndirectSort(inSorts[5], true)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestFloats64IndirectSortDesc_Stability(t *testing.T) {
+func TestIndirectSortDesc_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	got := Floats64IndirectSort(inSorts[5], false)
+	got := IndirectSort(inSorts[5], false)
 
 	test.Assert(t, "", exp, got, true)
 }
 
-func TestFloats64InplaceMergesort(t *testing.T) {
+func TestInplaceMergesort(t *testing.T) {
 	size := len(inSorts[6])
 	idx := make([]int, size)
 
-	Floats64InplaceMergesort(inSorts[6], idx, 0, size, true)
+	InplaceMergesort(inSorts[6], idx, 0, size, true)
 
 	test.Assert(t, "", expSorts[6], inSorts[6], true)
 }
 
-func TestFloats64IndirectSort_SortByIndex(t *testing.T) {
+func TestIndirectSort_SortByIndex(t *testing.T) {
 	expIds := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in1 := []float64{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0}
 	in2 := []float64{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0}
 
 	exp := fmt.Sprint(in1)
 
-	sortedIds := Floats64IndirectSort(in1, true)
+	sortedIds := IndirectSort(in1, true)
 
 	test.Assert(t, "", expIds, sortedIds, true)
 
 	// Reverse the sort.
-	Floats64SortByIndex(&in2, sortedIds)
+	SortByIndex(&in2, sortedIds)
 
 	got := fmt.Sprint(in2)
 
