@@ -4,6 +4,19 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+==  share v0.5.0 (2019-04-xx)
+
+===  New Features
+
+*  `ints`: new package for working with slice of integer
+*  `ints64`: new package for working with slice of 64 bit integer
+*  `floats64`: new package for working with slice of 64 bit float
+
+===  Enhancements
+
+*  `ints`: add function to remove value from slice
+*  `websockets`: replace sync.Map in UserSockets with normal map and Mutex
+
 
 ==  share v0.4.0 (2019-03-01)
 
