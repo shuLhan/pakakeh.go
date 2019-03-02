@@ -10,7 +10,7 @@ type ConnState int
 // List of socket connection status.
 const (
 	ConnStateClosed ConnState = 0
-	ConnStateOpen             = 1 << iota
+	ConnStateOpen             = iota
 	ConnStateConnected
 	ConnStateError
 )
