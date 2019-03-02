@@ -259,38 +259,36 @@ func (cl *Client) connect() (err error) {
 }
 
 //
-// Send message to server.
+// Send message to server, read the response and pass it to handler.
+// If handler is nil, no response will be read from server.
 //
 func (cl *Client) Send(ctx context.Context, req []byte, handler ClientRecvHandler) (err error) {
 	if len(req) == 0 {
-		return
+		return nil
 	}
 
 	err = cl.conn.SetWriteDeadline(time.Now().Add(_defRWTO))
 	if err != nil {
-		return
+		return err
 	}
 
 	_, err = cl.conn.Write(req)
 	if err != nil {
-		return
+		return err
 	}
 
-	if handler == nil {
-		return
+	// Client can send a packet without requiring a handler, i.e. when
+	// sending control frame PONG.
+	if handler != nil {
+		resp, err := cl.Recv()
+		if err != nil {
+			return err
+		}
+
+		return handler(ctx, resp)
 	}
 
-	resp, err := cl.Recv()
-	if err != nil {
-		return
-	}
-	if len(resp) == 0 {
-		return
-	}
-
-	err = handler(ctx, resp)
-
-	return
+	return nil
 }
 
 //
