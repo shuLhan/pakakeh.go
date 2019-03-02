@@ -5,6 +5,7 @@
 package websocket
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 	"sync"
@@ -61,7 +62,7 @@ type Request struct {
 }
 
 //
-// Reset all field's value to zero or empty.
+// Reset all Request field's value to zero.
 //
 func (req *Request) Reset() {
 	req.ID = 0
@@ -69,22 +70,23 @@ func (req *Request) Reset() {
 	req.Target = ""
 	req.Body = ""
 	req.Path = ""
-	req.Params = nil
-	req.Query = nil
+	req.Params = make(targetParam)
+	req.Query = make(url.Values)
 }
 
 //
 // unpack the request, parse parameters and query from target.
 //
 func (req *Request) unpack(routes *rootRoute) (handler RouteHandler, err error) {
-	pathQuery := strings.SplitN(req.Target, pathQuerySep, 2)
-	if len(pathQuery) == 0 {
+	if len(req.Target) == 0 {
 		return
 	}
 
+	pathQuery := strings.SplitN(req.Target, pathQuerySep, 2)
+
 	req.Path = pathQuery[0]
 
-	req.Params, handler = routes.get(req.Method, req.Target)
+	req.Params, handler = routes.get(req.Method, req.Path)
 	if handler == nil {
 		return
 	}
@@ -92,7 +94,8 @@ func (req *Request) unpack(routes *rootRoute) (handler RouteHandler, err error) 
 	if len(pathQuery) == 2 {
 		req.Query, err = url.ParseQuery(pathQuery[1])
 		if err != nil {
-			return
+			err = fmt.Errorf("websocket: Request.unpack: %s", err.Error())
+			return nil, err
 		}
 	}
 

@@ -165,6 +165,9 @@ out:
 func (root *rootRoute) get(method, target string) (
 	params targetParam, handler RouteHandler,
 ) {
+	if len(method) == 0 || len(target) == 0 {
+		return nil, nil
+	}
 	if target[0] != pathSep {
 		return nil, nil
 	}
