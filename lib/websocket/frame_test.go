@@ -10,8 +10,199 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func testFramePack(t *testing.T) {
+func TestNewFrameBin(t *testing.T) {
+	cases := []struct {
+		desc     string
+		isMasked bool
+		payload  []byte
+		exp      *Frame
+	}{{
+		desc:    "With unmasked",
+		payload: []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodeBin,
+			Payload: []byte("Hello!"),
+		},
+	}, {
+		desc:     "With masked",
+		isMasked: true,
+		payload:  []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodeBin,
+			Masked:  FrameIsMasked,
+			Payload: []byte("Hello!"),
+		},
+	}}
 
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		packet := NewFrameBin(c.isMasked, c.payload)
+		frames := Unpack(packet)
+
+		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.Opcode", c.exp.Opcode, frames[0].Opcode, true)
+		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
+		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+	}
+}
+
+func TestNewFrameClose(t *testing.T) {
+	cases := []struct {
+		desc    string
+		payload []byte
+		exp     *Frame
+	}{{
+		desc:    "With small payload",
+		payload: []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodeClose,
+			Masked:  FrameIsMasked,
+			Payload: []byte("Hello!"),
+		},
+	}, {
+		desc:    "With overflow payload",
+		payload: _dummyPayload256,
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodeClose,
+			Masked:  FrameIsMasked,
+			Payload: _dummyPayload256[:125],
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		packet := NewFrameClose(c.payload)
+		frames := Unpack(packet)
+
+		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.Opcode", c.exp.Opcode, frames[0].Opcode, true)
+		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
+		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+	}
+}
+
+func TestNewFramePing(t *testing.T) {
+	cases := []struct {
+		desc    string
+		payload []byte
+		exp     *Frame
+	}{{
+		desc:    "With small payload",
+		payload: []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodePing,
+			Masked:  FrameIsMasked,
+			Payload: []byte("Hello!"),
+		},
+	}, {
+		desc:    "With overflow payload",
+		payload: _dummyPayload256,
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodePing,
+			Masked:  FrameIsMasked,
+			Payload: _dummyPayload256[:125],
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		packet := NewFramePing(c.payload)
+		frames := Unpack(packet)
+
+		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.Opcode", c.exp.Opcode, frames[0].Opcode, true)
+		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
+		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+	}
+}
+
+func TestNewFramePong(t *testing.T) {
+	cases := []struct {
+		desc    string
+		payload []byte
+		exp     *Frame
+	}{{
+		desc:    "With small payload",
+		payload: []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodePong,
+			Masked:  FrameIsMasked,
+			Payload: []byte("Hello!"),
+		},
+	}, {
+		desc:    "With overflow payload",
+		payload: _dummyPayload256,
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodePong,
+			Masked:  FrameIsMasked,
+			Payload: _dummyPayload256[:125],
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		packet := NewFramePong(c.payload)
+		frames := Unpack(packet)
+
+		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.Opcode", c.exp.Opcode, frames[0].Opcode, true)
+		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
+		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+	}
+}
+
+func TestNewFrameText(t *testing.T) {
+	cases := []struct {
+		desc     string
+		isMasked bool
+		payload  []byte
+		exp      *Frame
+	}{{
+		desc:    "With unmasked",
+		payload: []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodeText,
+			Payload: []byte("Hello!"),
+		},
+	}, {
+		desc:     "With masked",
+		isMasked: true,
+		payload:  []byte("Hello!"),
+		exp: &Frame{
+			Fin:     FrameIsFinished,
+			Opcode:  OpCodeText,
+			Masked:  FrameIsMasked,
+			Payload: []byte("Hello!"),
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		packet := NewFrameText(c.isMasked, c.payload)
+		frames := Unpack(packet)
+
+		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.Opcode", c.exp.Opcode, frames[0].Opcode, true)
+		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
+		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+	}
+}
+
+func TestFramePack(t *testing.T) {
 	cases := []struct {
 		desc string
 		f    Frame
@@ -141,12 +332,14 @@ func testFramePack(t *testing.T) {
 	}
 }
 
-func testFrameUnpack(t *testing.T) {
+func TestFrameUnpack(t *testing.T) {
 	cases := []struct {
 		desc string
 		in   []byte
 		exp  *Frame
 	}{{
+		desc: "With empty input",
+	}, {
 		desc: "A single-frame unmasked text message",
 		in:   []byte{0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 		exp: &Frame{
@@ -287,11 +480,8 @@ func testFrameUnpack(t *testing.T) {
 
 		gots := Unpack(c.in)
 
-		test.Assert(t, "", c.exp, gots[0], true)
+		if len(gots) > 0 {
+			test.Assert(t, "", c.exp, gots[0], true)
+		}
 	}
-}
-
-func TestFrame(t *testing.T) {
-	t.Run("Pack", testFramePack)
-	t.Run("Unpack", testFrameUnpack)
 }

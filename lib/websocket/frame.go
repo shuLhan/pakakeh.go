@@ -198,6 +198,78 @@ type Frame struct {
 }
 
 //
+// NewFrameBin create a single binary data frame with optional payload.
+// Client frame must be masked.
+//
+func NewFrameBin(isMasked bool, payload []byte) []byte {
+	return newFrame(OpCodeBin, isMasked, payload)
+}
+
+//
+// NewFrameClose create a masked CLOSE control frame.
+// Server must use predefined, unmasked, packet ControlFrameClose, while
+// client frame must be masked.
+//
+func NewFrameClose(payload []byte) []byte {
+	return newControlFrame(OpCodeClose, payload)
+}
+
+//
+// NewFramePing create a masked PING control frame.
+// Server must use predefined unmasked packet ControlFramePing, while client
+// frame must be masked.
+//
+func NewFramePing(payload []byte) (packet []byte) {
+	return newControlFrame(OpCodePing, payload)
+}
+
+//
+// NewFramePong create a masked PONG control frame to be used by client.
+// Server must use predefined unmasked packet ControlFramePong.
+// Client frame must be masked.
+//
+func NewFramePong(payload []byte) (packet []byte) {
+	return newControlFrame(OpCodePong, payload)
+}
+
+//
+// NewFrameText create a single text data frame with optional payload.
+// Client frame must be masked.
+//
+func NewFrameText(isMasked bool, payload []byte) []byte {
+	return newFrame(OpCodeText, isMasked, payload)
+}
+
+//
+// newControlFrame create new control frame with specific operation code and
+// optional payload.
+//
+func newControlFrame(opcode byte, payload []byte) []byte {
+	if len(payload) > FrameSmallPayload {
+		// All control frames MUST have a payload length of 125 bytes
+		// or less and MUST NOT be fragmented.
+		payload = payload[:FrameSmallPayload]
+	}
+	return newFrame(opcode, true, payload)
+}
+
+//
+// newFrame create a single frame with specific operation code and optional
+// payload.
+//
+func newFrame(opcode byte, isMasked bool, payload []byte) []byte {
+	f := &Frame{
+		Fin:     FrameIsFinished,
+		Opcode:  opcode,
+		Payload: payload,
+	}
+	if isMasked {
+		f.Masked = FrameIsMasked
+	}
+	return f.Pack(isMasked)
+}
+
+//
 // unpack websocket data protocol from raw bytes to single frame.
 //
 //	RFC6455
