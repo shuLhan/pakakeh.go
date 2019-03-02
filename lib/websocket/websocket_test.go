@@ -17,21 +17,21 @@ import (
 var (
 	//nolint: lll, gochecknoglobals
 	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14"
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testInternalJWT = _testExternalJWT
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testUID = 100
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testPort = 9001
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testServer *Server
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testWSAddr string
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testHdrValWSAccept = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo="
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testHdrValWSKey = "dGhlIHNhbXBsZSBub25jZQ=="
-	//nolint: lll, gochecknoglobals
+	//nolint: gochecknoglobals
 	_testMaskKey = [4]byte{'7', 'ú', '!', '='}
 )
 
@@ -96,7 +96,7 @@ func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 	return
 }
 
-func TestMain(m *testing.M) {
+func runTestServer() {
 	var err error
 
 	_testWSAddr = "ws://127.0.0.1:" + strconv.Itoa(_testPort) + "/"
@@ -112,6 +112,11 @@ func TestMain(m *testing.M) {
 	_testServer.HandleAuth = testHandleAuth
 
 	go _testServer.Start()
+
+}
+
+func TestMain(m *testing.M) {
+	runTestServer()
 
 	s := m.Run()
 

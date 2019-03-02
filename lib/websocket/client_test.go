@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"testing"
 
@@ -13,6 +14,46 @@ import (
 )
 
 var _wsClient *Client // nolint: gochecknoglobals
+
+//
+// TestNewClient this test require a websocket server to be run.
+//
+func TestNewClient(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	cases := []struct {
+		desc     string
+		endpoint string
+		headers  http.Header
+		expErr   string
+	}{{
+		desc:   "With empty endpoint",
+		expErr: "websocket: NewClient: parse : empty url",
+	}, {
+		desc:     "With custom header",
+		endpoint: _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT,
+		headers: http.Header{
+			"Host":   []string{"myhost"},
+			"Origin": []string{"localhost"},
+		},
+	}, {
+		desc:     "Without credential",
+		endpoint: _testWSAddr,
+		expErr:   "websocket: NewClient: 400 Missing authorization",
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		_, err := NewClient(c.endpoint, c.headers)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error(), true)
+			continue
+		}
+	}
+}
 
 func testClientPing(t *testing.T) {
 	cases := []struct {
@@ -47,7 +88,7 @@ func testClientPing(t *testing.T) {
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := _wsClient.Reconnect()
+			err := _wsClient.connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -130,7 +171,7 @@ func testClientText(t *testing.T) {
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := _wsClient.Reconnect()
+			err := _wsClient.connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -226,7 +267,7 @@ func testClientFragmentation(t *testing.T) {
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := _wsClient.Reconnect()
+			err := _wsClient.connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -265,7 +306,7 @@ func TestClient(t *testing.T) {
 		os.Exit(1)
 	}
 
-	if _wsClient.State != ConnStateConnected {
+	if _wsClient.state != ConnStateConnected {
 		t.Fatal("Client is not connected")
 		os.Exit(1)
 	}

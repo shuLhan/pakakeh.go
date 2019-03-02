@@ -238,7 +238,7 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		wsAccept := GenerateHandshakeAccept(req.Key)
+		wsAccept := generateHandshakeAccept(req.Key)
 		_handshakePool.Put(req)
 
 		bb := _bbPool.Get().(*bytes.Buffer)

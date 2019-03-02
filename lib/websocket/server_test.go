@@ -41,13 +41,13 @@ func TestNewServer(t *testing.T) {
 func createClient(t *testing.T, endpoint string) (cl *Client) {
 	cl = &Client{}
 
-	serverAddr, err := cl.ParseURI(endpoint)
+	err := cl.parseURI(endpoint)
 	if err != nil {
 		t.Fatal(err)
 		return
 	}
 
-	err = cl.Open(serverAddr)
+	err = cl.open()
 	if err != nil {
 		t.Fatal(err)
 		return

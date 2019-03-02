@@ -13,7 +13,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -51,17 +50,13 @@ type ClientRecvHandler func(ctx context.Context, resp []byte) (err error)
 // Client for websocket.
 //
 type Client struct {
-	State           ConnState
-	URL             *url.URL
-	serverAddr      string
-	handshakePath   string
-	handshakeOrigin string
-	handshakeExt    string
-	handshakeProto  string
+	state           ConnState
+	remoteURL       *url.URL
+	remoteAddr      string
 	handshakeHeader http.Header
 	conn            net.Conn
 	bb              bytes.Buffer
-	IsTLS           bool
+	isTLS           bool
 }
 
 //
@@ -70,249 +65,137 @@ type Client struct {
 //
 // The endpoint use the following format,
 //
+//	ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
+//	wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
 //
-//	3.  WebSocket URIs
+// The port component is OPTIONAL; the default for "ws" is port 80, while the
+// default for "wss" is port 443.
 //
-//	   This specification defines two URI schemes, using the ABNF syntax
-//	   defined in RFC 5234 [RFC5234], and terminology and ABNF productions
-//	   defined by the URI specification RFC 3986 [RFC3986].
+// The headers parameter can be used to pass custom headers, except primary
+// header fields ("host", "upgrade", "connection", "sec-websocket-key",
+// "sec-websocket-version") will be deleted.
 //
-//	     ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
-//	     wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
-//
-//	     ...
-//
-//	   The port component is OPTIONAL; the default for "ws" is port 80,
-//	   while the default for "wss" is port 443.
-//
+// On success it will return client thats connected to endpoint.
+// On fail it will return nil and error.
 //
 func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 	cl = &Client{}
 
-	cl.serverAddr, err = cl.ParseURI(endpoint)
+	err = cl.parseURI(endpoint)
 	if err != nil {
-		cl = nil
-		return
+		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
+	}
+
+	if len(headers) > 0 {
+		headers.Del(_hdrKeyHost)
+		headers.Del(_hdrKeyUpgrade)
+		headers.Del(_hdrKeyOrigin)
+		headers.Del(_hdrKeyWSKey)
+		headers.Del(_hdrKeyWSVersion)
 	}
 
 	cl.handshakeHeader = headers
 
-	err = cl.Reconnect()
+	err = cl.connect()
 	if err != nil {
-		cl = nil
+		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
 	}
 
-	return
+	return cl, nil
 }
 
 //
-// ParseURI of websocket connection scheme from "endpoint" and set client URL
-// and TLS status to true if scheme is "wss://".
+// parseURI parse websocket connection URI from "endpoint" and set the
+// remoteURL.
 //
-// On success it will set and return server address that can be used on
-// Open().
+// On success it will set the remote address that can be used on open().
+// On fail it will return an error.
 //
-// On fail it will return empty server address and error.
-//
-func (cl *Client) ParseURI(endpoint string) (serverAddr string, err error) {
-	cl.URL, err = url.ParseRequestURI(endpoint)
+func (cl *Client) parseURI(endpoint string) (err error) {
+	cl.remoteURL, err = url.ParseRequestURI(endpoint)
 	if err != nil {
 		cl = nil
 		return
 	}
 
-	if cl.URL.Scheme == _schemeWSS {
-		cl.IsTLS = true
+	if cl.remoteURL.Scheme == _schemeWSS {
+		cl.isTLS = true
 	}
 
-	cl.serverAddr = GetConnectAddr(cl.URL)
-	serverAddr = cl.serverAddr
+	cl.parseRemoteAddr()
 
 	return
 }
 
 //
-// GetConnectAddr return "host:port" from value in URL. By default, if no port
-// is given, it will set to 80.
+// parseRemoteAddr parse "host:port" from value in remote URL. By default, if
+// no port is given, it will set to 80 or 433, depends on URL scheme.
 //
-func GetConnectAddr(u *url.URL) (addr string) {
-	serverPort := u.Port()
+func (cl *Client) parseRemoteAddr() {
+	serverPort := cl.remoteURL.Port()
 
-	if len(serverPort) == 0 {
-		switch u.Scheme {
-		case _schemeWS:
-			serverPort = _defPort
-		case _schemeWSS:
-			serverPort = _defPortSecure
-		default:
-			serverPort = _defPort
-		}
-
-		addr = u.Hostname() + ":" + serverPort
-	} else {
-		addr = u.Host
+	if len(serverPort) != 0 {
+		cl.remoteAddr = cl.remoteURL.Host
+		return
 	}
 
-	return
+	switch cl.remoteURL.Scheme {
+	case _schemeWS:
+		serverPort = _defPort
+	case _schemeWSS:
+		serverPort = _defPortSecure
+	default:
+		serverPort = _defPort
+	}
+
+	cl.remoteAddr = cl.remoteURL.Hostname() + ":" + serverPort
 }
 
 //
-// Open TCP connection to websocket server address in "host:port" format.
-// If client "IsTLS" field is true, the connection is opened with TLS protocol
+// open TCP connection to websocket remote address.
+// If client "isTLS" field is true, the connection is opened with TLS protocol
 // and the remote name MUST have a valid certificate.
 //
-func (cl *Client) Open(addr string) (err error) {
+func (cl *Client) open() (err error) {
 	dialer := &net.Dialer{
 		Timeout: 30 * time.Second,
 	}
 
-	if cl.IsTLS {
+	if cl.isTLS {
 		cfg := &tls.Config{
-			InsecureSkipVerify: cl.IsTLS, //nolint:gas
+			InsecureSkipVerify: cl.isTLS, //nolint:gas
 		}
 
-		cl.conn, err = tls.DialWithDialer(dialer, _netNameTCP, addr, cfg)
+		cl.conn, err = tls.DialWithDialer(dialer, _netNameTCP,
+			cl.remoteAddr, cfg)
 	} else {
-		cl.conn, err = dialer.Dial(_netNameTCP, addr)
+		cl.conn, err = dialer.Dial(_netNameTCP, cl.remoteAddr)
 	}
 	if err != nil {
-		return
+		return fmt.Errorf("websocket: open: " + err.Error())
 	}
 
-	cl.State = ConnStateOpen
+	cl.state = ConnStateOpen
 
 	return
 }
 
 //
-// Handshake send the websocket opening handshake.
+// handshake send the websocket opening handshake.
 //
-//	RFC6455 P17-P19
-//	1.   The handshake MUST be a valid HTTP request as specified by
-//	     [RFC2616].
-//
-//	2.   The method of the request MUST be GET, and the HTTP version MUST
-//	     be at least 1.1.
-//
-//	     For example, if the WebSocket URI is "ws://example.com/chat",
-//	     the first line sent should be "GET /chat HTTP/1.1".
-//
-//	3.   The "Request-URI" part of the request MUST match the /resource
-//	     name/ defined in Section 3 (a relative URI) or be an absolute
-//	     http/https URI that, when parsed, has a /resource name/, /host/,
-//	     and /port/ that match the corresponding ws/wss URI.
-//
-//	4.   The request MUST contain a |Host| header field whose value
-//	     contains /host/ plus optionally ":" followed by /port/ (when not
-//	     using the default port).
-//
-//	5.   The request MUST contain an |Upgrade| header field whose value
-//	     MUST include the "websocket" keyword.
-//
-//	6.   The request MUST contain a |Connection| header field whose value
-//	     MUST include the "Upgrade" token.
-//
-//	7.   The request MUST include a header field with the name
-//	     |Sec-WebSocket-Key|.  The value of this header field MUST be a
-//	     nonce consisting of a randomly selected 16-byte value that has
-//	     been base64-encoded (see Section 4 of [RFC4648]).  The nonce
-//	     MUST be selected randomly for each connection.
-//
-//	     NOTE: As an example, if the randomly selected value was the
-//	     sequence of bytes 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09
-//	     0x0a 0x0b 0x0c 0x0d 0x0e 0x0f 0x10, the value of the header
-//	     field would be "AQIDBAUGBwgJCgsMDQ4PEC=="
-//
-//	8.   The request MUST include a header field with the name |Origin|
-//	     [RFC6454] if the request is coming from a browser client.  If
-//	     the connection is from a non-browser client, the request MAY
-//	     include this header field if the semantics of that client match
-//	     the use-case described here for browser clients.  The value of
-//	     this header field is the ASCII serialization of origin of the
-//	     context in which the code establishing the connection is
-//	     running.  See [RFC6454] for the details of how this header field
-//	     value is constructed.
-//
-//	     As an example, if code downloaded from www.example.com attempts
-//	     to establish a connection to ww2.example.com, the value of the
-//	     header field would be "http://www.example.com".
-//
-//	9.   The request MUST include a header field with the name
-//	     |Sec-WebSocket-Version|.  The value of this header field MUST be
-//	     13.
-//
-//	     NOTE: Although draft versions of this document (-09, -10, -11,
-//	     and -12) were posted (they were mostly comprised of editorial
-//	     changes and clarifications and not changes to the wire
-//	     protocol), values 9, 10, 11, and 12 were not used as valid
-//	     values for Sec-WebSocket-Version.  These values were reserved in
-//	     the IANA registry but were not and will not be used.
-//
-//	10.  The request MAY include a header field with the name
-//	     |Sec-WebSocket-Protocol|.  If present, this value indicates one
-//	     or more comma-separated subprotocol the client wishes to speak,
-//	     ordered by preference.  The elements that comprise this value
-//	     MUST be non-empty strings with characters in the range U+0021 to
-//	     U+007E not including separator characters as defined in
-//	     [RFC2616] and MUST all be unique strings.  The ABNF for the
-//	     value of this header field is 1#token, where the definitions of
-//	     constructs and rules are as given in [RFC2616].
-//
-//	11.  The request MAY include a header field with the name
-//	     |Sec-WebSocket-Extensions|.  If present, this value indicates
-//	     the protocol-level extension(s) the client wishes to speak.  The
-//	     interpretation and format of this header field is described in
-//	     Section 9.1.
-//
-//	12.  The request MAY include any other header fields, for example,
-//	     cookies [RFC6265] and/or authentication-related header fields
-//	     such as the |Authorization| header field [RFC2616], which are
-//	     processed according to documents that define them.
-//
-func (cl *Client) Handshake(path, origin, proto, ext string, headers http.Header) (err error) {
-	if len(path) == 0 {
-		path = cl.URL.EscapedPath() + "?" + cl.URL.RawQuery
-	}
-
-	cl.handshakePath = path
-
+func (cl *Client) handshake() (err error) {
 	cl.bb.Reset()
-	key := GenerateHandshakeKey()
-	keyAccept := GenerateHandshakeAccept(key)
+	path := cl.remoteURL.EscapedPath() + "?" + cl.remoteURL.RawQuery
+	key := generateHandshakeKey()
+	keyAccept := generateHandshakeAccept(key)
 
-	_, err = fmt.Fprintf(&cl.bb, _handshakeReqFormat, path, cl.URL.Host, key)
+	_, err = fmt.Fprintf(&cl.bb, _handshakeReqFormat, path, cl.remoteURL.Host, key)
 	if err != nil {
 		return err
 	}
 
-	// (8)
-	if len(origin) > 0 {
-		cl.handshakeOrigin = origin
-		_, _ = cl.bb.WriteString(_hdrKeyOrigin + ": " + origin + "\r\n")
-		if err != nil {
-			return err
-		}
-	}
-	// (10)
-	if len(proto) > 0 {
-		cl.handshakeProto = proto
-		_, err = cl.bb.WriteString(_hdrKeyWSProtocol + ": " + proto + "\r\n")
-		if err != nil {
-			return err
-		}
-	}
-	// (11)
-	if len(ext) > 0 {
-		cl.handshakeExt = ext
-		_, err = cl.bb.WriteString(_hdrKeyWSExtensions + ": " + ext + "\r\n")
-		if err != nil {
-			return err
-		}
-	}
-	// (12)
-	if len(headers) > 0 {
-		cl.handshakeHeader = headers
-		err = headers.Write(&cl.bb)
+	if len(cl.handshakeHeader) > 0 {
+		err = cl.handshakeHeader.Write(&cl.bb)
 		if err != nil {
 			return err
 		}
@@ -330,48 +213,47 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 
 	httpRes, err := http.ReadResponse(httpBuf, nil)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "handleHandshake:", err)
-		cl.State = ConnStateError
-		return
+		err = fmt.Errorf("websocket: client.handleHandshake: " + err.Error())
+		cl.state = ConnStateError
+		return err
 	}
 
 	if httpRes.StatusCode != http.StatusSwitchingProtocols {
-		err = fmt.Errorf("handleHandshake:" + httpRes.Status)
-		cl.State = ConnStateError
+		err = fmt.Errorf("websocket: client.handleHandshake: " + httpRes.Status)
+		cl.state = ConnStateError
 		httpRes.Body.Close()
-		return
+		return err
 	}
 
 	expAccept := ctx.Value(ctxKeyWSAccept)
 	gotAccept := httpRes.Header.Get(_hdrKeyWSAccept)
 	if expAccept != gotAccept {
-		err = fmt.Errorf("handleHandshake: invalid server accept key")
-		cl.State = ConnStateError
+		err = fmt.Errorf("websocket: client.handleHandshake: invalid server accept key")
+		cl.state = ConnStateError
 		httpRes.Body.Close()
-		return
+		return err
 	}
 
-	cl.State = ConnStateConnected
+	cl.state = ConnStateConnected
 	httpRes.Body.Close()
 
 	return
 }
 
 //
-// Reconnect to server using previous address and handshake parameters.
+// connect to server remote address and handshake parameters.
 //
-func (cl *Client) Reconnect() (err error) {
+func (cl *Client) connect() (err error) {
 	if cl.conn != nil {
 		_ = cl.conn.Close()
 	}
 
-	err = cl.Open(cl.serverAddr)
+	err = cl.open()
 	if err != nil {
 		return
 	}
 
-	err = cl.Handshake(cl.handshakePath, cl.handshakeOrigin,
-		cl.handshakeProto, cl.handshakeExt, cl.handshakeHeader)
+	err = cl.handshake()
 
 	return
 }

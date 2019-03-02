@@ -4,9 +4,9 @@
 
 //
 // Package websocket provide the websocket library for server and
-// client. [1][2]
+// client.
 //
-// The websocket server is implemented with epoll [3], which means it's only
+// The websocket server is implemented with epoll, which means it's only
 // run on Linux.
 //
 // Constraints
@@ -15,11 +15,11 @@
 //
 // References
 //
-// [1] https://tools.ietf.org/html/rfc6455
+// - https://tools.ietf.org/html/rfc6455
 //
-// [2] https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
+// - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
 //
-// [3] http://man7.org/linux/man-pages/man7/epoll.7.html
+// - http://man7.org/linux/man-pages/man7/epoll.7.html
 //
 package websocket
 
@@ -135,10 +135,10 @@ func SendFrame(fd int, f *Frame, randomMask bool) (err error) {
 }
 
 //
-// GenerateHandshakeKey randomly selected 16-byte value that has been
+// generateHandshakeKey randomly selected 16-byte value that has been
 // base64-encoded (see Section 4 of [RFC4648]).
 //
-func GenerateHandshakeKey() (key []byte) {
+func generateHandshakeKey() (key []byte) {
 	if _rng == nil {
 		_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
@@ -155,13 +155,13 @@ func GenerateHandshakeKey() (key []byte) {
 }
 
 //
-// GenerateHandshakeAccept generate server accept key by concatenating key,
+// generateHandshakeAccept generate server accept key by concatenating key,
 // defined in step 4 in Section 4.2.2, with the string
 // "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", taking the SHA-1 hash of this
 // concatenated value to obtain a 20-byte value and base64-encoding (see
 // Section 4 of [RFC4648]) this 20-byte hash.
 //
-func GenerateHandshakeAccept(key []byte) string {
+func generateHandshakeAccept(key []byte) string {
 	key = append(key, _magic...)
 	sum := sha1.Sum(key) // nolint: gosec
 	return base64.StdEncoding.EncodeToString(sum[:])
