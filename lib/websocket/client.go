@@ -286,6 +286,9 @@ func (cl *Client) connect() (err error) {
 // If handler is nil, no response will be read from server.
 //
 func (cl *Client) Send(ctx context.Context, req []byte, handler ClientRecvHandler) (err error) {
+	if cl.state == ConnStateConnected {
+		return fmt.Errorf("websocket: client.Send: client is not connected")
+	}
 	if len(req) == 0 {
 		return nil
 	}
@@ -327,6 +330,10 @@ func (cl *Client) SendPong(payload []byte) error {
 // Recv message from server.
 //
 func (cl *Client) Recv() (packet []byte, err error) {
+	if cl.state == ConnStateConnected {
+		return nil, fmt.Errorf("websocket: client.Send: client is not connected")
+	}
+
 	err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
 	if err != nil {
 		return nil, err
