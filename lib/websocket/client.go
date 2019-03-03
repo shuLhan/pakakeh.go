@@ -10,6 +10,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -56,6 +57,7 @@ type Client struct {
 	handshakeHeader http.Header
 	conn            net.Conn
 	bb              bytes.Buffer
+	pingQueue       chan *Frame
 	isTLS           bool
 }
 
@@ -79,7 +81,9 @@ type Client struct {
 // On fail it will return nil and error.
 //
 func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
-	cl = &Client{}
+	cl = &Client{
+		pingQueue: make(chan *Frame, 24),
+	}
 
 	err = cl.parseURI(endpoint)
 	if err != nil {
@@ -101,7 +105,26 @@ func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
 	}
 
+	go cl.handlePing()
+
 	return cl, nil
+}
+
+//
+// handlePing handle received control frame PING from server, by replying with
+// PONG.
+//
+// If client error when sending PONG, the connection will be force closed.
+//
+func (cl *Client) handlePing() {
+	for f := range cl.pingQueue {
+		err := cl.SendPong(f.Payload)
+		if err != nil {
+			log.Println("websocket: client.handlePing: " + err.Error())
+			cl.Quit()
+			return
+		}
+	}
 }
 
 //
@@ -292,6 +315,15 @@ func (cl *Client) Send(ctx context.Context, req []byte, handler ClientRecvHandle
 }
 
 //
+// SendPong send the control frame PONG to server, by using payload from PING
+// frame.
+//
+func (cl *Client) SendPong(payload []byte) error {
+	packet := NewFramePong(payload)
+	return cl.Send(nil, packet, nil)
+}
+
+//
 // Recv message from server.
 //
 func (cl *Client) Recv() (packet []byte, err error) {
@@ -349,4 +381,17 @@ out:
 	_bbPool.Put(bb)
 
 	return packet, err
+}
+
+//
+// Quit force close the client connection without sending CLOSE control frame.
+// This function MUST be used only when error receiving packet from server
+// (e.g. lost connection) to release the resource.
+//
+func (cl *Client) Quit() {
+	err := cl.conn.Close()
+	if err != nil {
+		log.Println("websocket: client.Close: " + err.Error())
+	}
+	cl.state = ConnStateClosed
 }
