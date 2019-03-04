@@ -283,7 +283,7 @@ func TestServerHandshake(t *testing.T) {
 			return
 		}
 
-		err = cl.Send(context.Background(), bb.Bytes(), handleHandshake)
+		err = cl.send(context.Background(), bb.Bytes(), handleHandshake)
 		if err != nil {
 			t.Fatal(err)
 		}

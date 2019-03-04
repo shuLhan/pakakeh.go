@@ -7,13 +7,10 @@ package websocket
 import (
 	"context"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
-
-var _wsClient *Client // nolint: gochecknoglobals
 
 //
 // TestNewClient this test require a websocket server to be run.
@@ -55,7 +52,18 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func testClientPing(t *testing.T) {
+func TestClientPing(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+
+	testClient, err := NewClient(endpoint, nil)
+	if err != nil {
+		t.Fatal("TestClientPing: " + err.Error())
+	}
+
 	cases := []struct {
 		desc      string
 		reconnect bool
@@ -84,30 +92,42 @@ func testClientPing(t *testing.T) {
 		},
 	}}
 
+	recvHandler := func(ctx context.Context, resp []byte) (err error) {
+		exp := ctx.Value(ctxKeyBytes).([]byte)
+		test.Assert(t, "resp", exp, resp, true)
+		return
+	}
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := _wsClient.connect()
+			err := testClient.connect()
 			if err != nil {
 				t.Fatal(err)
 			}
 		}
 
-		c := c
-		recvHandler := func(ctx context.Context, resp []byte) (err error) {
-			test.Assert(t, "resp", c.exp, resp, true)
-			return
-		}
-
-		err := _wsClient.Send(context.Background(), c.req, recvHandler)
+		ctx := context.WithValue(context.Background(), ctxKeyBytes, c.exp)
+		err := testClient.send(ctx, c.req, recvHandler)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 }
 
-func testClientText(t *testing.T) {
+func TestClientText(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+
+	testClient, err := NewClient(endpoint, nil)
+	if err != nil {
+		t.Fatal("TestClientText: " + err.Error())
+	}
+
 	cases := []struct {
 		desc      string
 		reconnect bool
@@ -167,30 +187,42 @@ func testClientText(t *testing.T) {
 		}, _dummyPayload65536...),
 	}}
 
+	recvHandler := func(ctx context.Context, resp []byte) (err error) {
+		exp := ctx.Value(ctxKeyBytes).([]byte)
+		test.Assert(t, "", exp, resp, true)
+		return
+	}
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := _wsClient.connect()
+			err := testClient.connect()
 			if err != nil {
 				t.Fatal(err)
 			}
 		}
 
-		c := c
-		recvHandler := func(ctx context.Context, resp []byte) (err error) {
-			test.Assert(t, "", c.exp, resp, true)
-			return
-		}
-
-		err := _wsClient.Send(context.Background(), c.req, recvHandler)
+		ctx := context.WithValue(context.Background(), ctxKeyBytes, c.exp)
+		err := testClient.send(ctx, c.req, recvHandler)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 }
 
-func testClientFragmentation(t *testing.T) {
+func TestClientFragmentation(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+
+	testClient, err := NewClient(endpoint, nil)
+	if err != nil {
+		t.Fatal("TestClientText: " + err.Error())
+	}
+
 	cases := []struct {
 		desc      string
 		reconnect bool
@@ -267,7 +299,7 @@ func testClientFragmentation(t *testing.T) {
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := _wsClient.connect()
+			err := testClient.connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -276,14 +308,14 @@ func testClientFragmentation(t *testing.T) {
 		for x := 0; x < len(c.frames); x++ {
 			req := c.frames[x].Pack(true)
 
-			err := _wsClient.Send(context.Background(), req, nil)
+			err := testClient.send(context.Background(), req, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 		}
 
 		for x := 0; x < len(c.exps); x++ {
-			res, err := _wsClient.Recv()
+			res, err := testClient.recv()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -291,27 +323,4 @@ func testClientFragmentation(t *testing.T) {
 			test.Assert(t, "res", c.exps[x], res, true)
 		}
 	}
-}
-
-func TestClient(t *testing.T) {
-	var (
-		err error
-	)
-
-	addr := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	_wsClient, err = NewClient(addr, nil)
-	if err != nil {
-		t.Fatal(err)
-		os.Exit(1)
-	}
-
-	if _wsClient.state != ConnStateConnected {
-		t.Fatal("Client is not connected")
-		os.Exit(1)
-	}
-
-	t.Run("Ping", testClientPing)
-	t.Run("Text", testClientText)
-	t.Run("Fragmentation", testClientFragmentation)
 }

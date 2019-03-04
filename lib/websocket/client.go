@@ -38,14 +38,21 @@ var (
 type ctxKey int
 
 const (
-	ctxKeyWSAccept ctxKey = 1
+	ctxKeyBytes    ctxKey = iota // ctxKeyBytes context key for slice of byte.
+	ctxKeyWSAccept               // ctxKeyWSAccept context key for WebSocket accept key.
 )
 
 //
-// ClientRecvHandler define a custom callback type for handling response from
-// request.
+// clientRawHandler define a callback type for handling raw packet from
+// send().
 //
-type ClientRecvHandler func(ctx context.Context, resp []byte) (err error)
+type clientRawHandler func(ctx context.Context, resp []byte) (err error)
+
+//
+// ClientRecvHandler define a custom callback type for handling response from
+// request in the form of frames.
+//
+type ClientRecvHandler func(ctx context.Context, frames *Frames) (err error)
 
 //
 // Client for websocket.
@@ -105,22 +112,21 @@ func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
 	}
 
-	go cl.handlePing()
+	go cl.servePing()
 
 	return cl, nil
 }
 
 //
-// handlePing handle received control frame PING from server, by replying with
-// PONG.
+// servePing serve control frame PING from server, by replying with PONG.
 //
 // If client error when sending PONG, the connection will be force closed.
 //
-func (cl *Client) handlePing() {
+func (cl *Client) servePing() {
 	for f := range cl.pingQueue {
 		err := cl.SendPong(f.Payload)
 		if err != nil {
-			log.Println("websocket: client.handlePing: " + err.Error())
+			log.Println("websocket: client.servePing: " + err.Error())
 			cl.Quit()
 			return
 		}
@@ -228,7 +234,7 @@ func (cl *Client) handshake() (err error) {
 
 	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
 
-	return cl.Send(ctx, cl.bb.Bytes(), cl.handleHandshake)
+	return cl.send(ctx, cl.bb.Bytes(), cl.handleHandshake)
 }
 
 func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
@@ -236,13 +242,11 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 
 	httpRes, err := http.ReadResponse(httpBuf, nil)
 	if err != nil {
-		err = fmt.Errorf("websocket: client.handleHandshake: " + err.Error())
 		cl.state = ConnStateError
 		return err
 	}
 
 	if httpRes.StatusCode != http.StatusSwitchingProtocols {
-		err = fmt.Errorf("websocket: client.handleHandshake: " + httpRes.Status)
 		cl.state = ConnStateError
 		httpRes.Body.Close()
 		return err
@@ -282,39 +286,42 @@ func (cl *Client) connect() (err error) {
 }
 
 //
-// Send message to server, read the response and pass it to handler.
+// SendBin send data frame as binary to server.
 // If handler is nil, no response will be read from server.
 //
-func (cl *Client) Send(ctx context.Context, req []byte, handler ClientRecvHandler) (err error) {
-	if cl.state == ConnStateConnected {
-		return fmt.Errorf("websocket: client.Send: client is not connected")
-	}
-	if len(req) == 0 {
-		return nil
-	}
+func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHandler) error {
+	return cl.sendData(ctx, bin, OpCodeBin, handler)
+}
 
-	err = cl.conn.SetWriteDeadline(time.Now().Add(_defRWTO))
-	if err != nil {
-		return err
-	}
-
-	_, err = cl.conn.Write(req)
-	if err != nil {
-		return err
-	}
-
-	// Client can send a packet without requiring a handler, i.e. when
-	// sending control frame PONG.
-	if handler != nil {
-		resp, err := cl.Recv()
-		if err != nil {
-			return err
-		}
-
-		return handler(ctx, resp)
+//
+// SendClose send the control CLOSE frame to server.
+// If waitResponse is true, client will wait for CLOSE response from server
+// before closing the connection.
+//
+func (cl *Client) SendClose(waitResponse bool) (err error) {
+	packet := NewFrameClose(nil)
+	if waitResponse {
+		err = cl.send(nil, packet, cl.handleClose)
+	} else {
+		err = cl.send(nil, packet, nil)
 	}
 
-	return nil
+	errClose := cl.conn.Close()
+	if errClose != nil {
+		log.Println("websocket: Client.SendClose: " + err.Error())
+	}
+	cl.conn = nil
+	cl.state = ConnStateClosed
+
+	return err
+}
+
+//
+// SendPing send control PING frame to server, expecting PONG as response.
+//
+func (cl *Client) SendPing(payload []byte) error {
+	packet := NewFramePing(payload)
+	return cl.send(nil, packet, cl.handlePing)
 }
 
 //
@@ -323,71 +330,75 @@ func (cl *Client) Send(ctx context.Context, req []byte, handler ClientRecvHandle
 //
 func (cl *Client) SendPong(payload []byte) error {
 	packet := NewFramePong(payload)
-	return cl.Send(nil, packet, nil)
+	return cl.send(nil, packet, nil)
 }
 
 //
-// Recv message from server.
+// SendText send data frame as text to server.
+// If handler is nil, no response will be read from server.
 //
-func (cl *Client) Recv() (packet []byte, err error) {
+func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvHandler) (err error) {
+	return cl.sendData(ctx, text, OpCodeText, handler)
+}
+
+//
+// Recv read message as frames from server.
+// One should not use this method manually, instead of the handler in Send()
+// method.
+//
+func (cl *Client) Recv() (frames *Frames, err error) {
 	if cl.state == ConnStateConnected {
 		return nil, fmt.Errorf("websocket: client.Send: client is not connected")
 	}
 
-	err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
-	if err != nil {
-		return nil, err
-	}
-
+	cl.bb.Reset()
+	frames = &Frames{}
 	bs := _bsPool.Get().(*[]byte)
 
-	n, err := cl.conn.Read(*bs)
-	if err != nil {
-		_bsPool.Put(bs)
-		return nil, err
-	}
-	if n == 0 {
-		_bsPool.Put(bs)
-		return nil, nil
-	}
-
-	bb := _bbPool.Get().(*bytes.Buffer)
-	bb.Reset()
-
-	for n == _maxBuffer {
-		_, err = bb.Write((*bs)[:n])
-		if err != nil {
-			goto out
-		}
-
+	// Read all packet until we received frame with Fin or operation code
+	// CLOSE.
+	for {
 		err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
 		if err != nil {
-			return nil, err
-		}
-
-		n, err = cl.conn.Read(*bs)
-		if err != nil {
 			goto out
 		}
 
-	}
-	if n > 0 {
-		_, err = bb.Write((*bs)[:n])
+		n, err := cl.conn.Read(*bs)
 		if err != nil {
 			goto out
+		}
+		_, err = cl.bb.Write((*bs)[:n])
+		if err != nil {
+			goto out
+		}
+		if n == _maxBuffer {
+			continue
+		}
+
+		f, _ := frameUnpack(cl.bb.Bytes())
+		if f == nil {
+			goto out
+		}
+		switch f.Opcode {
+		case OpCodePing:
+			cl.pingQueue <- f
+		case OpCodePong:
+			// Ignore control PONG frame.
+		case OpCodeClose:
+			frames.Append(f)
+			goto out
+		default:
+			frames.Append(f)
+			if f.Fin == FrameIsFinished {
+				goto out
+			}
 		}
 	}
 
 out:
-	if err == nil {
-		packet = make([]byte, bb.Len())
-		copy(packet, bb.Bytes())
-	}
-
 	_bsPool.Put(bs)
-	_bbPool.Put(bb)
 
-	return packet, err
+	return frames, err
 }
 
 //
@@ -400,5 +411,133 @@ func (cl *Client) Quit() {
 	if err != nil {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
+	cl.conn = nil
 	cl.state = ConnStateClosed
+}
+
+//
+// handleClose define a callback for SendClose() that expect server to
+// response with CLOSE frame.
+//
+func (cl *Client) handleClose(ctx context.Context, packet []byte) error {
+	f, _ := frameUnpack(packet)
+	if f == nil {
+		return fmt.Errorf("websocket: Client.handleClose: empty response")
+	}
+	if f.Opcode != OpCodeClose {
+		return fmt.Errorf("websocket: Client.handleClose: expecting CLOSE frame, got %d",
+			f.Opcode)
+	}
+	return nil
+}
+
+//
+// handlePing define a callback for SendPing() that expect server to response
+// with PONG frame.
+//
+func (cl *Client) handlePing(ctx context.Context, packet []byte) error {
+	f, _ := frameUnpack(packet)
+	if f == nil {
+		return fmt.Errorf("websocket: Client.handlePing: empty response")
+	}
+	if f.Opcode != OpCodePong {
+		return fmt.Errorf("websocket: Client.handleClose: expecting PONG frame, got %d",
+			f.Opcode)
+	}
+	return nil
+}
+
+//
+// recv read raw stream from server.
+//
+func (cl *Client) recv() (packet []byte, err error) {
+	cl.bb.Reset()
+	bs := _bsPool.Get().(*[]byte)
+
+	for {
+		err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
+		if err != nil {
+			break
+		}
+
+		n, err := cl.conn.Read(*bs)
+		if err != nil {
+			break
+		}
+
+		_, err = cl.bb.Write((*bs)[:n])
+		if err != nil {
+			break
+		}
+
+		if n != _maxBuffer {
+			break
+		}
+	}
+
+	packet = cl.bb.Bytes()
+
+	_bsPool.Put(bs)
+
+	return packet, err
+}
+
+//
+// send raw stream to server, read the response, and pass it to handler.
+//
+func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
+	err = cl.conn.SetWriteDeadline(time.Now().Add(_defRWTO))
+	if err != nil {
+		return err
+	}
+
+	_, err = cl.conn.Write(req)
+	if err != nil {
+		return err
+	}
+
+	if handleRaw != nil {
+		resp, err := cl.recv()
+		if err != nil {
+			return err
+		}
+		err = handleRaw(ctx, resp)
+	}
+
+	return err
+}
+
+func (cl *Client) sendData(ctx context.Context, req []byte, opcode int, handler ClientRecvHandler) (err error) {
+	if cl.state == ConnStateConnected {
+		return fmt.Errorf("websocket: client.SendBin: client is not connected")
+	}
+
+	var packet []byte
+
+	if opcode == OpCodeText {
+		packet = NewFrameText(true, req)
+	} else {
+		packet = NewFrameBin(true, req)
+	}
+
+	err = cl.conn.SetWriteDeadline(time.Now().Add(_defRWTO))
+	if err != nil {
+		return err
+	}
+
+	_, err = cl.conn.Write(packet)
+	if err != nil {
+		return err
+	}
+
+	if handler != nil {
+		frames, err := cl.Recv()
+		if err != nil {
+			return err
+		}
+
+		err = handler(ctx, frames)
+	}
+
+	return err
 }
