@@ -532,39 +532,39 @@ func (serv *Server) reader() {
 				continue
 			}
 
-			reqs := Unpack(packet)
+			frames := Unpack(packet)
 
-			if len(reqs) == 0 {
+			if frames == nil || frames.Len() == 0 {
 				serv.clientRemove(conn)
 				continue
 			}
 
-			for _, req := range reqs {
+			for _, frame := range frames.v {
 				// (5.1-P27)
-				if req.masked != frameIsMasked {
+				if frame.masked != frameIsMasked {
 					serv.handleBadRequest(conn)
 					break
 				}
 
-				switch req.opcode {
+				switch frame.opcode {
 				case opcodeCont:
-					serv.handleFragment(conn, req)
+					serv.handleFragment(conn, frame)
 				case opcodeText:
-					if req.fin != frameIsFinished {
-						serv.handleFragment(conn, req)
+					if frame.fin != frameIsFinished {
+						serv.handleFragment(conn, frame)
 					} else {
-						go serv.HandleText(conn, req)
+						go serv.HandleText(conn, frame)
 					}
 				case opcodeBin:
-					if req.fin != frameIsFinished {
-						serv.handleFragment(conn, req)
+					if frame.fin != frameIsFinished {
+						serv.handleFragment(conn, frame)
 					} else {
-						go serv.HandleBin(conn, req)
+						go serv.HandleBin(conn, frame)
 					}
 				case opcodeClose:
-					serv.HandleClose(conn, req)
+					serv.HandleClose(conn, frame)
 				case opcodePing:
-					serv.HandlePing(conn, req)
+					serv.HandlePing(conn, frame)
 				case opcodePong:
 					continue
 				}

@@ -269,35 +269,6 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 }
 
 //
-// Unpack websocket data protocol from raw bytes to one or more frames.
-//
-// On success it will return one or more frames.
-// On fail it will return zero frame.
-//
-func Unpack(in []byte) (fs []*Frame) {
-	if len(in) == 0 {
-		return
-	}
-
-	for {
-		f, x := frameUnpack(in)
-		if f == nil {
-			break
-		}
-
-		fs = append(fs, f)
-
-		if x >= uint64(len(in)) {
-			break
-		}
-
-		in = in[x:]
-	}
-
-	return
-}
-
-//
 // IsData return true if frame is either text or binary data frame.
 //
 func (f *Frame) IsData() bool {

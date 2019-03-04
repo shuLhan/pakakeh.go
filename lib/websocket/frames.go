@@ -17,6 +17,34 @@ type Frames struct {
 }
 
 //
+// Unpack websocket data protocol from raw bytes to one or more frames.
+//
+// On success it will return one or more frames.
+// On fail it will return zero frame.
+//
+func Unpack(in []byte) (frames *Frames) {
+	if len(in) == 0 {
+		return
+	}
+
+	frames = &Frames{}
+	for {
+		f, x := frameUnpack(in)
+		if f == nil {
+			break
+		}
+
+		frames.Append(f)
+		if x >= uint64(len(in)) {
+			break
+		}
+		in = in[x:]
+	}
+
+	return
+}
+
+//
 // Append a frame as part of continuous frame.
 // This function does not check if the appended frame is valid (i.e. zero
 // operation code on second or later frame).
