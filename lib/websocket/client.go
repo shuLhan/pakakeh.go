@@ -466,7 +466,8 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 	}
 
 	if handleRaw != nil {
-		resp, err := cl.recv()
+		var resp []byte
+		resp, err = cl.recv()
 		if err != nil {
 			return err
 		}
@@ -500,7 +501,8 @@ func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handl
 	}
 
 	if handler != nil {
-		frames, err := cl.Recv()
+		var frames *Frames
+		frames, err = cl.Recv()
 		if err != nil {
 			return err
 		}
