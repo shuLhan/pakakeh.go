@@ -270,25 +270,14 @@ func newFrame(opcode byte, isMasked bool, payload []byte) []byte {
 }
 
 //
-// unpack websocket data protocol from raw bytes to single frame.
+// frameUnpack unpack the websocket data protocol from raw bytes into single
+// frame.
 //
-//	RFC6455
-//	(5.4-P33)
-//	o  Control frames (see Section 5.5) MAY be injected in the middle of a
-//	   fragmented message.  Control frames themselves MUST NOT be
-//	   fragmented.
-//
-//	(5.5-P36)
-//	All control frames MUST have a payload length of 125 bytes or less
-//	and MUST NOT be fragmented.
-//
-//
-// On success it will return non nil frame.  It is the responsibility of the
-// caller to handle continuation frames.
-//
+// On success it will return non nil frame, and the index to the rest of
+// unprocessed packet.
 // On fail, it will return nil frame.
 //
-func unpack(in []byte) (f *Frame, x uint64) {
+func frameUnpack(in []byte) (f *Frame, x uint64) {
 	if len(in) == 0 {
 		return nil, 0
 	}
@@ -366,7 +355,7 @@ func Unpack(in []byte) (fs []*Frame) {
 	}
 
 	for {
-		f, x := unpack(in)
+		f, x := frameUnpack(in)
 		if f == nil {
 			break
 		}
