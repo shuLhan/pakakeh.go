@@ -270,9 +270,9 @@ func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHan
 func (cl *Client) SendClose(waitResponse bool) (err error) {
 	packet := NewFrameClose(true, 0, nil)
 	if waitResponse {
-		err = cl.send(nil, packet, cl.handleClose)
+		err = cl.send(context.Background(), packet, cl.handleClose)
 	} else {
-		err = cl.send(nil, packet, nil)
+		err = cl.send(context.Background(), packet, nil)
 	}
 
 	errClose := cl.conn.Close()
@@ -290,7 +290,7 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 //
 func (cl *Client) SendPing(payload []byte) error {
 	packet := NewFramePing(true, payload)
-	return cl.send(nil, packet, cl.handlePing)
+	return cl.send(context.Background(), packet, cl.handlePing)
 }
 
 //
@@ -299,7 +299,7 @@ func (cl *Client) SendPing(payload []byte) error {
 //
 func (cl *Client) SendPong(payload []byte) error {
 	packet := NewFramePong(true, payload)
-	return cl.send(nil, packet, nil)
+	return cl.send(context.Background(), packet, nil)
 }
 
 //
