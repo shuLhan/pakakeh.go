@@ -321,15 +321,15 @@ func (serv *Server) handleFragment(conn int, req *Frame) {
 	}
 
 	// (2.2) (3.2)
-	f.Payload = append(f.Payload, req.Payload...)
+	f.payload = append(f.payload, req.payload...)
 	f.len += req.len
 
 	// (2)
-	if req.Fin == 0 {
+	if req.fin == 0 {
 		return
 	}
 
-	req.Fin = frameIsFinished
+	req.fin = frameIsFinished
 
 	// (3.3)
 	if f.opcode == opcodeText {
@@ -370,7 +370,7 @@ func (serv *Server) handleText(conn int, f *Frame) {
 	req = _reqPool.Get().(*Request)
 	req.Reset()
 
-	err = json.Unmarshal(f.Payload, req)
+	err = json.Unmarshal(f.payload, req)
 	if err != nil {
 		res.Code = http.StatusBadRequest
 		res.Message = err.Error()
@@ -417,7 +417,7 @@ func (serv *Server) handleBin(conn int, req *Frame) {
 //
 func (serv *Server) handleClose(conn int, req *Frame) {
 	req.opcode = opcodeClose
-	req.Masked = 0
+	req.masked = 0
 
 	res := req.Pack(false)
 
@@ -472,7 +472,7 @@ func (serv *Server) handleBadRequest(conn int) {
 //
 func (serv *Server) handlePing(conn int, req *Frame) {
 	req.opcode = opcodePong
-	req.Masked = 0
+	req.masked = 0
 
 	res := req.Pack(false)
 
@@ -541,7 +541,7 @@ func (serv *Server) reader() {
 
 			for _, req := range reqs {
 				// (5.1-P27)
-				if req.Masked != frameIsMasked {
+				if req.masked != frameIsMasked {
 					serv.handleBadRequest(conn)
 					break
 				}
@@ -550,13 +550,13 @@ func (serv *Server) reader() {
 				case opcodeCont:
 					serv.handleFragment(conn, req)
 				case opcodeText:
-					if req.Fin != frameIsFinished {
+					if req.fin != frameIsFinished {
 						serv.handleFragment(conn, req)
 					} else {
 						go serv.HandleText(conn, req)
 					}
 				case opcodeBin:
-					if req.Fin != frameIsFinished {
+					if req.fin != frameIsFinished {
 						serv.handleFragment(conn, req)
 					} else {
 						go serv.HandleBin(conn, req)

@@ -53,8 +53,8 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 // handleRequest from websocket by echo-ing back the payload.
 //
 func handleRequest(conn int, req *Frame) {
-	req.Fin = frameIsFinished
-	req.Masked = 0
+	req.fin = frameIsFinished
+	req.masked = 0
 
 	err := SendFrame(conn, req, false)
 	if err != nil {

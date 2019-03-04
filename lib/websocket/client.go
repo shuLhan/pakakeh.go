@@ -96,7 +96,7 @@ func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 //
 func (cl *Client) servePing() {
 	for f := range cl.pingQueue {
-		err := cl.SendPong(f.Payload)
+		err := cl.SendPong(f.payload)
 		if err != nil {
 			log.Println("websocket: client.servePing: " + err.Error())
 			cl.Quit()
@@ -324,7 +324,7 @@ func (cl *Client) Recv() (frames *Frames, err error) {
 	frames = &Frames{}
 	bs := _bsPool.Get().(*[]byte)
 
-	// Read all packet until we received frame with Fin or operation code
+	// Read all packet until we received frame with fin or operation code
 	// CLOSE.
 	for {
 		err = cl.conn.SetReadDeadline(time.Now().Add(defaultTimeout))
@@ -358,7 +358,7 @@ func (cl *Client) Recv() (frames *Frames, err error) {
 			goto out
 		default:
 			frames.Append(f)
-			if f.Fin == frameIsFinished {
+			if f.fin == frameIsFinished {
 				goto out
 			}
 		}

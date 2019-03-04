@@ -225,13 +225,13 @@ func TestClientFragmentation(t *testing.T) {
 	}{{
 		desc: "Two text frames, unmasked",
 		frames: []Frame{{
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeText,
-			Payload: []byte{'H', 'e', 'l'},
+			payload: []byte{'H', 'e', 'l'},
 		}, {
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeCont,
-			Payload: []byte{'l', 'o'},
+			payload: []byte{'l', 'o'},
 		}},
 		exps: [][]byte{
 			NewFrameClose(false, StatusBadRequest, nil),
@@ -240,17 +240,17 @@ func TestClientFragmentation(t *testing.T) {
 		desc:      "Three text frames, unmasked",
 		reconnect: true,
 		frames: []Frame{{
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeText,
-			Payload: []byte("Hel"),
+			payload: []byte("Hel"),
 		}, {
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeCont,
-			Payload: []byte("lo, "),
+			payload: []byte("lo, "),
 		}, {
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeCont,
-			Payload: []byte("Shulhan"),
+			payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{
 			NewFrameClose(false, StatusBadRequest, nil),
@@ -259,25 +259,25 @@ func TestClientFragmentation(t *testing.T) {
 		desc:      "Three text frames with control message in the middle",
 		reconnect: true,
 		frames: []Frame{{
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeText,
-			Masked:  frameIsMasked,
-			Payload: []byte("Hel"),
+			masked:  frameIsMasked,
+			payload: []byte("Hel"),
 		}, {
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeCont,
-			Masked:  frameIsMasked,
-			Payload: []byte("lo, "),
+			masked:  frameIsMasked,
+			payload: []byte("lo, "),
 		}, {
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePing,
-			Masked:  frameIsMasked,
-			Payload: []byte("PING"),
+			masked:  frameIsMasked,
+			payload: []byte("PING"),
 		}, {
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeCont,
-			Masked:  frameIsMasked,
-			Payload: []byte("Shulhan"),
+			masked:  frameIsMasked,
+			payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{
 			{0x8A, 0x04, 'P', 'I', 'N', 'G'},

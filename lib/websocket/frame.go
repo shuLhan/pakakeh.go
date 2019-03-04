@@ -14,36 +14,45 @@ import (
 //
 // Frame represent a websocket data protocol.
 //
-//	   0                   1                   2                   3
-//	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-//	  +-+-+-+-+-------+-+-------------+-------------------------------+
-//	  |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
-//	  |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
-//	  |N|V|V|V|       |S|             |   (if payload len==126/127)   |
-//	  | |1|2|3|       |K|             |                               |
-//	  +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-//	  |     Extended payload length continued, if payload len == 127  |
-//	  + - - - - - - - - - - - - - - - +-------------------------------+
-//	  |                               |Masking-key, if MASK set to 1  |
-//	  +-------------------------------+-------------------------------+
-//	  | Masking-key (continued)       |          Payload Data         |
-//	  +-------------------------------- - - - - - - - - - - - - - - - +
-//	  :                     Payload Data continued ...                :
-//	  + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-//	  |                     Payload Data continued ...                |
-//	  +---------------------------------------------------------------+
-//
 type Frame struct {
-	Fin    byte
+	//
+	// Websocket data protocol,
+	//
+	//	   0                   1                   2                   3
+	//	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	//	  +-+-+-+-+-------+-+-------------+-------------------------------+
+	//	  |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+	//	  |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+	//	  |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+	//	  | |1|2|3|       |K|             |                               |
+	//	  +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+	//	  |     Extended payload length continued, if payload len == 127  |
+	//	  + - - - - - - - - - - - - - - - +-------------------------------+
+	//	  |                               |Masking-key, if MASK set to 1  |
+	//	  +-------------------------------+-------------------------------+
+	//	  | Masking-key (continued)       |          Payload Data         |
+	//	  +-------------------------------- - - - - - - - - - - - - - - - +
+	//	  :                     Payload Data continued ...                :
+	//	  + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+	//	  |                     Payload Data continued ...                |
+	//	  +---------------------------------------------------------------+
+
+	// fin Indicates that this is the final fragment in a message.
+	// The first fragment MAY also be the final fragment.
+	fin byte
+
+	// opcode (4 bits) defines the interpretation of the "Payload data".
+	// If an unknown opcode is received, the receiving endpoint MUST _Fail
+	// the WebSocket Connection_.  The following values are defined.
 	opcode opcode
 
 	//
-	// Masked (1 bit) defines whether the "Payload data" is masked.
+	// masked (1 bit) defines whether the "Payload data" is masked.
 	// If set to 1, a masking key is present in masking-key, and this is
 	// used to unmask the "Payload data" as per Section 5.3.  All frames
 	// sent from client to server have this bit set to 1.
 	//
-	Masked byte
+	masked byte
 
 	// closeCode represent the status of control frame close request.
 	closeCode CloseCode
@@ -100,7 +109,7 @@ type Frame struct {
 	// is equal to the payload length minus the length of the "Extension
 	// data".
 	//
-	Payload []byte
+	payload []byte
 }
 
 //
@@ -174,12 +183,12 @@ func newControlFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 //
 func newFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 	f := &Frame{
-		Fin:     frameIsFinished,
+		fin:     frameIsFinished,
 		opcode:  opcode,
-		Payload: payload,
+		payload: payload,
 	}
 	if isMasked {
-		f.Masked = frameIsMasked
+		f.masked = frameIsMasked
 	}
 	return f.Pack(isMasked)
 }
@@ -199,19 +208,19 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 
 	f = new(Frame)
 
-	f.Fin = in[x] & frameIsFinished
+	f.fin = in[x] & frameIsFinished
 	f.opcode = opcode(in[x] & 0x0F)
 	x++
 
 	if len(in) >= 2 {
-		f.Masked = in[x] & frameIsMasked
+		f.masked = in[x] & frameIsMasked
 		f.len = uint64(in[x] & 0x7F)
 		x++
 	}
 
 	if f.opcode == opcodeClose || f.opcode == opcodePing || f.opcode == opcodePong {
 		// (5.4-P33)
-		if f.Fin != frameIsFinished {
+		if f.fin != frameIsFinished {
 			return nil, x
 		}
 		// (5.5-P36)
@@ -228,7 +237,7 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 		x += 2
 	}
 
-	if f.Masked == frameIsMasked {
+	if f.masked == frameIsMasked {
 		f.maskKey[0] = in[x]
 		x++
 		f.maskKey[1] = in[x]
@@ -240,20 +249,20 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 	}
 
 	if f.len > 0 {
-		f.Payload = make([]byte, f.len)
-		copy(f.Payload, in[x:])
+		f.payload = make([]byte, f.len)
+		copy(f.payload, in[x:])
 
-		if f.Masked == frameIsMasked {
+		if f.masked == frameIsMasked {
 			for y := uint64(0); y < f.len; y++ {
-				f.Payload[y] ^= f.maskKey[y%4]
+				f.payload[y] ^= f.maskKey[y%4]
 			}
 		}
 	}
 	x += f.len
 
 	if f.opcode == opcodeClose {
-		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.Payload[0:2]))
-		f.Payload = f.Payload[2:]
+		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[0:2]))
+		f.payload = f.payload[2:]
 	}
 
 	return f, x
@@ -298,19 +307,19 @@ func (f *Frame) IsData() bool {
 //
 // Pack websocket Frame into packet that can be sent through network.
 //
-// Caller must set frame fields Fin, opcode, Masked, and Payload.
+// Caller must set frame fields Fin, opcode, masked, and payload.
 //
 // Frame payload len will be set based on length of payload.
 //
-// Frame maskKey will be set randomly only if Masked is set and randomMask
+// Frame maskKey will be set randomly only if masked is set and randomMask
 // parameter is true.
 //
-//	RFC6455 5.1-P27
-//	A server MUST NOT mask any frames that it sends to the client.
+// A server MUST NOT mask any frames that it sends to the client. (
+// (RFC 6455 5.1-P27).
 //
 func (f *Frame) Pack(randomMask bool) (out []byte) {
 	headerSize := uint64(2)
-	payloadSize := uint64(len(f.Payload))
+	payloadSize := uint64(len(f.payload))
 
 	switch {
 	case payloadSize > math.MaxUint16:
@@ -323,7 +332,7 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 		f.len = payloadSize
 	}
 
-	if f.Masked == frameIsMasked {
+	if f.masked == frameIsMasked {
 		headerSize += 4
 	}
 
@@ -332,10 +341,10 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 
 	x := 0
 
-	out[x] = f.Fin | byte(f.opcode)
+	out[x] = f.fin | byte(f.opcode)
 	x++
 
-	out[x] = f.Masked | uint8(f.len)
+	out[x] = f.masked | uint8(f.len)
 	x++
 
 	if f.len == frameLargePayload {
@@ -353,7 +362,7 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 		binary.LittleEndian.PutUint32(f.maskKey[0:], _rng.Uint32())
 	}
 
-	if f.Masked == frameIsMasked {
+	if f.masked == frameIsMasked {
 		out[x] = f.maskKey[0]
 		x++
 		out[x] = f.maskKey[1]
@@ -364,11 +373,11 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 		x++
 
 		for y := uint64(0); y < payloadSize; y++ {
-			out[x] = f.Payload[y] ^ f.maskKey[y%4]
+			out[x] = f.payload[y] ^ f.maskKey[y%4]
 			x++
 		}
 	} else {
-		copy(out[x:], f.Payload)
+		copy(out[x:], f.payload)
 	}
 
 	return out

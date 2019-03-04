@@ -65,7 +65,7 @@ func (frames *Frames) Len() int {
 // The first frame must be a data frame, either text or binary, otherwise it
 // will be considered empty payload, even if frames list is not empty.
 //
-// Any control CLOSE frame of frame with Fin set will considered the last
+// Any control CLOSE frame of frame with fin set will considered the last
 // frame.
 //
 func (frames *Frames) Payload() (payload []byte) {
@@ -81,9 +81,9 @@ func (frames *Frames) Payload() (payload []byte) {
 			break
 		}
 
-		payload = append(payload, frames.v[x].Payload...)
+		payload = append(payload, frames.v[x].payload...)
 
-		if frames.v[x].Fin == frameIsFinished {
+		if frames.v[x].fin == frameIsFinished {
 			break
 		}
 	}

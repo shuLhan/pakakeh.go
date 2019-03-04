@@ -26,7 +26,7 @@ func TestFramesAppend(t *testing.T) {
 		desc: "With non nil frames",
 		f: &Frame{
 			opcode:  opcodeText,
-			Payload: []byte("A"),
+			payload: []byte("A"),
 		},
 		expLen:     1,
 		expPayload: "A",
@@ -38,7 +38,7 @@ func TestFramesAppend(t *testing.T) {
 		frames.Append(c.f)
 
 		test.Assert(t, "Frames.Len", c.expLen, frames.Len(), true)
-		test.Assert(t, "Frames.Payload", c.expPayload,
+		test.Assert(t, "Frames.payload", c.expPayload,
 			string(frames.Payload()), true)
 	}
 }
@@ -48,15 +48,15 @@ func TestFramesGet(t *testing.T) {
 
 	f0 := &Frame{
 		opcode:  opcodeText,
-		Payload: []byte("A"),
+		payload: []byte("A"),
 	}
 	f1 := &Frame{
 		opcode:  opcodeText,
-		Payload: []byte("B"),
+		payload: []byte("B"),
 	}
 	f2 := &Frame{
 		opcode:  opcodeText,
-		Payload: []byte("C"),
+		payload: []byte("C"),
 	}
 
 	frames.Append(f0)
@@ -136,26 +136,26 @@ func TestFramesPayload(t *testing.T) {
 		desc: "With the first frame is CLOSE",
 		fs: &Frames{
 			v: []*Frame{{
-				Fin:     frameIsFinished,
+				fin:     frameIsFinished,
 				opcode:  opcodeClose,
-				Payload: []byte{0, 0},
+				payload: []byte{0, 0},
 			}},
 		},
 	}, {
 		desc: "With data frame",
 		fs: &Frames{
 			v: []*Frame{{
-				Fin:     0,
+				fin:     0,
 				opcode:  opcodeText,
-				Payload: []byte("Hel"),
+				payload: []byte("Hel"),
 			}, {
-				Fin:     0,
+				fin:     0,
 				opcode:  0,
-				Payload: []byte("lo "),
+				payload: []byte("lo "),
 			}, {
-				Fin:     frameIsFinished,
+				fin:     frameIsFinished,
 				opcode:  0,
-				Payload: []byte("world!"),
+				payload: []byte("world!"),
 			}},
 		},
 		exp: "Hello world!",
@@ -163,35 +163,35 @@ func TestFramesPayload(t *testing.T) {
 		desc: "With interjected CLOSE frame",
 		fs: &Frames{
 			v: []*Frame{{
-				Fin:     0,
+				fin:     0,
 				opcode:  opcodeText,
-				Payload: []byte("Hel"),
+				payload: []byte("Hel"),
 			}, {
-				Fin:     frameIsFinished,
+				fin:     frameIsFinished,
 				opcode:  opcodeClose,
-				Payload: []byte("lo "),
+				payload: []byte("lo "),
 			}, {
-				Fin:     frameIsFinished,
+				fin:     frameIsFinished,
 				opcode:  opcodeCont,
-				Payload: []byte("world!"),
+				payload: []byte("world!"),
 			}},
 		},
 		exp: "Hel",
 	}, {
-		desc: "With Fin frame in the middle",
+		desc: "With fin frame in the middle",
 		fs: &Frames{
 			v: []*Frame{{
-				Fin:     0,
+				fin:     0,
 				opcode:  opcodeText,
-				Payload: []byte("Hel"),
+				payload: []byte("Hel"),
 			}, {
-				Fin:     frameIsFinished,
+				fin:     frameIsFinished,
 				opcode:  opcodeCont,
-				Payload: []byte("lo "),
+				payload: []byte("lo "),
 			}, {
-				Fin:     frameIsFinished,
+				fin:     frameIsFinished,
 				opcode:  opcodeCont,
-				Payload: []byte("world!"),
+				payload: []byte("world!"),
 			}},
 		},
 		exp: "Hello ",
@@ -202,6 +202,6 @@ func TestFramesPayload(t *testing.T) {
 
 		got := c.fs.Payload()
 
-		test.Assert(t, "Frames.Payload", c.exp, string(got), true)
+		test.Assert(t, "Frames.payload", c.exp, string(got), true)
 	}
 }

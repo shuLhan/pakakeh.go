@@ -21,19 +21,19 @@ func TestNewFrameBin(t *testing.T) { //nolint: dupl
 		desc:    "With unmasked",
 		payload: []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Payload: []byte("Hello!"),
+			payload: []byte("Hello!"),
 		},
 	}, {
 		desc:     "With masked",
 		isMasked: true,
 		payload:  []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  frameIsMasked,
-			Payload: []byte("Hello!"),
+			masked:  frameIsMasked,
+			payload: []byte("Hello!"),
 		},
 	}}
 
@@ -43,10 +43,10 @@ func TestNewFrameBin(t *testing.T) { //nolint: dupl
 		packet := NewFrameBin(c.isMasked, c.payload)
 		frames := Unpack(packet)
 
-		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frames[0].fin, true)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frames[0].opcode, true)
-		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
-		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+		test.Assert(t, "Frame.masked", c.exp.masked, frames[0].masked, true)
+		test.Assert(t, "Frame.payload", c.exp.payload, frames[0].payload, true)
 	}
 }
 
@@ -59,21 +59,21 @@ func TestNewFrameClose(t *testing.T) {
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
-			Fin:       frameIsFinished,
+			fin:       frameIsFinished,
 			opcode:    opcodeClose,
 			closeCode: StatusBadRequest,
-			Masked:    frameIsMasked,
-			Payload:   []byte("Hello!"),
+			masked:    frameIsMasked,
+			payload:   []byte("Hello!"),
 		},
 	}, {
 		desc:    "With overflow payload",
 		payload: _dummyPayload256,
 		exp: &Frame{
-			Fin:       frameIsFinished,
+			fin:       frameIsFinished,
 			opcode:    opcodeClose,
 			closeCode: StatusBadRequest,
-			Masked:    frameIsMasked,
-			Payload:   _dummyPayload256[:123],
+			masked:    frameIsMasked,
+			payload:   _dummyPayload256[:123],
 		},
 	}}
 
@@ -84,11 +84,11 @@ func TestNewFrameClose(t *testing.T) {
 		libbytes.PrintHex("CLOSE frame unmasked", packet, 8)
 		frames := Unpack(packet)
 
-		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frames[0].fin, true)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frames[0].opcode, true)
 		test.Assert(t, "Frame.closeCode", c.exp.closeCode, frames[0].closeCode, true)
-		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
-		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+		test.Assert(t, "Frame.masked", c.exp.masked, frames[0].masked, true)
+		test.Assert(t, "Frame.payload", c.exp.payload, frames[0].payload, true)
 	}
 }
 
@@ -101,19 +101,19 @@ func TestNewFramePing(t *testing.T) { //nolint:dupl
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePing,
-			Masked:  frameIsMasked,
-			Payload: []byte("Hello!"),
+			masked:  frameIsMasked,
+			payload: []byte("Hello!"),
 		},
 	}, {
 		desc:    "With overflow payload",
 		payload: _dummyPayload256,
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePing,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload256[:125],
+			masked:  frameIsMasked,
+			payload: _dummyPayload256[:125],
 		},
 	}}
 
@@ -123,10 +123,10 @@ func TestNewFramePing(t *testing.T) { //nolint:dupl
 		packet := NewFramePing(true, c.payload)
 		frames := Unpack(packet)
 
-		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frames[0].fin, true)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frames[0].opcode, true)
-		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
-		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+		test.Assert(t, "Frame.masked", c.exp.masked, frames[0].masked, true)
+		test.Assert(t, "Frame.payload", c.exp.payload, frames[0].payload, true)
 	}
 }
 
@@ -139,19 +139,19 @@ func TestNewFramePong(t *testing.T) { //nolint: dupl
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePong,
-			Masked:  frameIsMasked,
-			Payload: []byte("Hello!"),
+			masked:  frameIsMasked,
+			payload: []byte("Hello!"),
 		},
 	}, {
 		desc:    "With overflow payload",
 		payload: _dummyPayload256,
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePong,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload256[:125],
+			masked:  frameIsMasked,
+			payload: _dummyPayload256[:125],
 		},
 	}}
 
@@ -161,10 +161,10 @@ func TestNewFramePong(t *testing.T) { //nolint: dupl
 		packet := NewFramePong(true, c.payload)
 		frames := Unpack(packet)
 
-		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frames[0].fin, true)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frames[0].opcode, true)
-		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
-		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+		test.Assert(t, "Frame.masked", c.exp.masked, frames[0].masked, true)
+		test.Assert(t, "Frame.payload", c.exp.payload, frames[0].payload, true)
 	}
 }
 
@@ -178,19 +178,19 @@ func TestNewFrameText(t *testing.T) { //nolint: dupl
 		desc:    "With unmasked",
 		payload: []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeText,
-			Payload: []byte("Hello!"),
+			payload: []byte("Hello!"),
 		},
 	}, {
 		desc:     "With masked",
 		isMasked: true,
 		payload:  []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeText,
-			Masked:  frameIsMasked,
-			Payload: []byte("Hello!"),
+			masked:  frameIsMasked,
+			payload: []byte("Hello!"),
 		},
 	}}
 
@@ -200,10 +200,10 @@ func TestNewFrameText(t *testing.T) { //nolint: dupl
 		packet := NewFrameText(c.isMasked, c.payload)
 		frames := Unpack(packet)
 
-		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frames[0].fin, true)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frames[0].opcode, true)
-		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
-		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
+		test.Assert(t, "Frame.masked", c.exp.masked, frames[0].masked, true)
+		test.Assert(t, "Frame.payload", c.exp.payload, frames[0].payload, true)
 	}
 }
 
@@ -215,19 +215,19 @@ func TestFramePack(t *testing.T) {
 	}{{
 		desc: "A single-frame unmasked text message",
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeText,
-			Masked:  0,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  0,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 		},
 		exp: []byte{0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 	}, {
 		desc: "A single-frame masked text message",
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeText,
-			Masked:  frameIsMasked,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  frameIsMasked,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			maskKey: _testMaskKey,
 		},
 		exp: []byte{
@@ -238,37 +238,37 @@ func TestFramePack(t *testing.T) {
 	}, {
 		desc: "A fragmented unmasked text message",
 		f: Frame{
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeText,
-			Masked:  0,
-			Payload: []byte{'H', 'e', 'l'},
+			masked:  0,
+			payload: []byte{'H', 'e', 'l'},
 		},
 		exp: []byte{0x01, 0x03, 0x48, 0x65, 0x6c},
 	}, {
 		desc: "A fragmented unmasked text message",
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeCont,
-			Masked:  0,
-			Payload: []byte{'l', 'o'},
+			masked:  0,
+			payload: []byte{'l', 'o'},
 		},
 		exp: []byte{0x80, 0x02, 0x6c, 0x6f},
 	}, {
 		desc: `Unmasked Ping request (contains a body of "Hello")`,
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePing,
-			Masked:  0,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  0,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 		},
 		exp: []byte{0x89, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 	}, {
-		desc: `Masked Ping response (Pong)`,
+		desc: `masked Ping response (Pong)`,
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePong,
-			Masked:  frameIsMasked,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  frameIsMasked,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			maskKey: _testMaskKey,
 		},
 		exp: []byte{
@@ -279,19 +279,19 @@ func TestFramePack(t *testing.T) {
 	}, {
 		desc: `256 bytes binary message in a single unmasked frame`,
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  0,
-			Payload: _dummyPayload256,
+			masked:  0,
+			payload: _dummyPayload256,
 		},
 		exp: concatBytes([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256...),
 	}, {
 		desc: `256 bytes binary message in a single masked frame`,
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload256,
+			masked:  frameIsMasked,
+			payload: _dummyPayload256,
 			maskKey: _testMaskKey,
 		},
 		exp: concatBytes([]byte{
@@ -302,10 +302,10 @@ func TestFramePack(t *testing.T) {
 	}, {
 		desc: `65536 binary message in a single unmasked frame`,
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  0,
-			Payload: _dummyPayload65536,
+			masked:  0,
+			payload: _dummyPayload65536,
 		},
 		exp: concatBytes([]byte{
 			0x82, 0x7F,
@@ -314,10 +314,10 @@ func TestFramePack(t *testing.T) {
 	}, {
 		desc: `65536 binary message in a single masked frame`,
 		f: Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload65536,
+			masked:  frameIsMasked,
+			payload: _dummyPayload65536,
 			maskKey: _testMaskKey,
 			len:     65536,
 		},
@@ -348,10 +348,10 @@ func TestFrameUnpack(t *testing.T) {
 		desc: "A single-frame unmasked text message",
 		in:   []byte{0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeText,
-			Masked:  0,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  0,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			len:     5,
 		},
 	}, {
@@ -362,10 +362,10 @@ func TestFrameUnpack(t *testing.T) {
 			0x7f, 0x9f, 0x4d, 0x51, 0x58,
 		},
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeText,
-			Masked:  frameIsMasked,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  frameIsMasked,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			maskKey: _testMaskKey,
 			len:     5,
 		},
@@ -373,30 +373,30 @@ func TestFrameUnpack(t *testing.T) {
 		desc: "A fragmented unmasked text message",
 		in:   []byte{0x01, 0x03, 0x48, 0x65, 0x6c},
 		exp: &Frame{
-			Fin:     0,
+			fin:     0,
 			opcode:  opcodeText,
-			Masked:  0,
-			Payload: []byte{'H', 'e', 'l'},
+			masked:  0,
+			payload: []byte{'H', 'e', 'l'},
 			len:     3,
 		},
 	}, {
 		desc: "A fragmented unmasked text message",
 		in:   []byte{0x80, 0x02, 0x6c, 0x6f},
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeCont,
-			Masked:  0,
-			Payload: []byte{'l', 'o'},
+			masked:  0,
+			payload: []byte{'l', 'o'},
 			len:     2,
 		},
 	}, {
 		desc: `Unmasked Ping request (contains a body of "Hello")`,
 		in:   []byte{0x89, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePing,
-			Masked:  0,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  0,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			len:     5,
 		},
 	}, {
@@ -406,9 +406,9 @@ func TestFrameUnpack(t *testing.T) {
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
 		},
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePong,
-			Masked:  frameIsMasked,
+			masked:  frameIsMasked,
 			maskKey: _testMaskKey,
 		},
 	}, {
@@ -419,10 +419,10 @@ func TestFrameUnpack(t *testing.T) {
 			0x7f, 0x9f, 0x4d, 0x51, 0x58,
 		},
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodePong,
-			Masked:  frameIsMasked,
-			Payload: []byte{'H', 'e', 'l', 'l', 'o'},
+			masked:  frameIsMasked,
+			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			maskKey: _testMaskKey,
 			len:     5,
 		},
@@ -430,10 +430,10 @@ func TestFrameUnpack(t *testing.T) {
 		desc: `256 bytes binary message in a single unmasked frame`,
 		in:   concatBytes([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256...),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  0,
-			Payload: _dummyPayload256,
+			masked:  0,
+			payload: _dummyPayload256,
 			len:     256,
 		},
 	}, {
@@ -443,10 +443,10 @@ func TestFrameUnpack(t *testing.T) {
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
 		}, _dummyPayload256Masked...),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload256,
+			masked:  frameIsMasked,
+			payload: _dummyPayload256,
 			maskKey: _testMaskKey,
 			len:     256,
 		},
@@ -457,10 +457,10 @@ func TestFrameUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 		}, _dummyPayload65536...),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  0,
-			Payload: _dummyPayload65536,
+			masked:  0,
+			payload: _dummyPayload65536,
 			len:     65536,
 		},
 	}, {
@@ -471,10 +471,10 @@ func TestFrameUnpack(t *testing.T) {
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
 		}, _dummyPayload65536Masked...),
 		exp: &Frame{
-			Fin:     frameIsFinished,
+			fin:     frameIsFinished,
 			opcode:  opcodeBin,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload65536,
+			masked:  frameIsMasked,
+			payload: _dummyPayload65536,
 			maskKey: _testMaskKey,
 			len:     65536,
 		},
