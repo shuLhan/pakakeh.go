@@ -6,7 +6,7 @@ package websocket
 
 import (
 	"bytes"
-	"crypto/sha1"
+	"crypto/sha1" //nolint: gosec
 	"encoding/base64"
 	"encoding/binary"
 	"math/rand"
