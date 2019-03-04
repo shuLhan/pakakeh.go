@@ -7,10 +7,11 @@ package websocket
 import (
 	"testing"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestNewFrameBin(t *testing.T) {
+func TestNewFrameBin(t *testing.T) { //nolint: dupl
 	cases := []struct {
 		desc     string
 		isMasked bool
@@ -58,36 +59,40 @@ func TestNewFrameClose(t *testing.T) {
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
-			Fin:     frameIsFinished,
-			opcode:  opcodeClose,
-			Masked:  frameIsMasked,
-			Payload: []byte("Hello!"),
+			Fin:       frameIsFinished,
+			opcode:    opcodeClose,
+			closeCode: StatusBadRequest,
+			Masked:    frameIsMasked,
+			Payload:   []byte("Hello!"),
 		},
 	}, {
 		desc:    "With overflow payload",
 		payload: _dummyPayload256,
 		exp: &Frame{
-			Fin:     frameIsFinished,
-			opcode:  opcodeClose,
-			Masked:  frameIsMasked,
-			Payload: _dummyPayload256[:125],
+			Fin:       frameIsFinished,
+			opcode:    opcodeClose,
+			closeCode: StatusBadRequest,
+			Masked:    frameIsMasked,
+			Payload:   _dummyPayload256[:123],
 		},
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		packet := NewFrameClose(c.payload)
+		packet := NewFrameClose(true, StatusBadRequest, c.payload)
+		libbytes.PrintHex("CLOSE frame unmasked", packet, 8)
 		frames := Unpack(packet)
 
 		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frames[0].opcode, true)
+		test.Assert(t, "Frame.closeCode", c.exp.closeCode, frames[0].closeCode, true)
 		test.Assert(t, "Frame.Masked", c.exp.Masked, frames[0].Masked, true)
 		test.Assert(t, "Frame.Payload", c.exp.Payload, frames[0].Payload, true)
 	}
 }
 
-func TestNewFramePing(t *testing.T) {
+func TestNewFramePing(t *testing.T) { //nolint:dupl
 	cases := []struct {
 		desc    string
 		payload []byte
@@ -115,7 +120,7 @@ func TestNewFramePing(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		packet := NewFramePing(c.payload)
+		packet := NewFramePing(true, c.payload)
 		frames := Unpack(packet)
 
 		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
@@ -125,7 +130,7 @@ func TestNewFramePing(t *testing.T) {
 	}
 }
 
-func TestNewFramePong(t *testing.T) {
+func TestNewFramePong(t *testing.T) { //nolint: dupl
 	cases := []struct {
 		desc    string
 		payload []byte
@@ -153,7 +158,7 @@ func TestNewFramePong(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		packet := NewFramePong(c.payload)
+		packet := NewFramePong(true, c.payload)
 		frames := Unpack(packet)
 
 		test.Assert(t, "Frame.Fin", c.exp.Fin, frames[0].Fin, true)
@@ -163,7 +168,7 @@ func TestNewFramePong(t *testing.T) {
 	}
 }
 
-func TestNewFrameText(t *testing.T) {
+func TestNewFrameText(t *testing.T) { //nolint: dupl
 	cases := []struct {
 		desc     string
 		isMasked bool

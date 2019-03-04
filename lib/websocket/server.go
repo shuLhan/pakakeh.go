@@ -450,7 +450,7 @@ func (serv *Server) handleBadRequest(conn int) {
 		return
 	}
 
-	resClose := concatBytes(ControlFrameCloseWithCode, StatusBadRequest...)
+	resClose := NewFrameClose(false, StatusBadRequest, nil)
 
 	_, err = unix.Write(conn, resClose)
 	if err != nil {
@@ -583,7 +583,7 @@ func (serv *Server) pinger() {
 		serv.clients.Range(func(k, _ interface{}) bool {
 			conn, ok := k.(int)
 			if ok {
-				_, err := unix.Write(conn, ControlFramePing)
+				_, err := unix.Write(conn, NewFramePing(false, nil))
 				if err != nil {
 					serv.clientRemove(conn)
 				}

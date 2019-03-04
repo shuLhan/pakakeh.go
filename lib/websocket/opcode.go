@@ -11,9 +11,9 @@ type opcode byte
 //
 const (
 	opcodeCont  opcode = 0x0
-	opcodeText         = 0x1
-	opcodeBin          = 0x2
-	opcodeClose        = 0x8
-	opcodePing         = 0x9
-	opcodePong         = 0xA
+	opcodeText  opcode = 0x1
+	opcodeBin   opcode = 0x2
+	opcodeClose opcode = 0x8
+	opcodePing  opcode = 0x9
+	opcodePong  opcode = 0xA
 )

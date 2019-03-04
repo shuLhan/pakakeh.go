@@ -268,7 +268,7 @@ func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHan
 // before closing the connection.
 //
 func (cl *Client) SendClose(waitResponse bool) (err error) {
-	packet := NewFrameClose(nil)
+	packet := NewFrameClose(true, 0, nil)
 	if waitResponse {
 		err = cl.send(nil, packet, cl.handleClose)
 	} else {
@@ -289,7 +289,7 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 // SendPing send control PING frame to server, expecting PONG as response.
 //
 func (cl *Client) SendPing(payload []byte) error {
-	packet := NewFramePing(payload)
+	packet := NewFramePing(true, payload)
 	return cl.send(nil, packet, cl.handlePing)
 }
 
@@ -298,7 +298,7 @@ func (cl *Client) SendPing(payload []byte) error {
 // frame.
 //
 func (cl *Client) SendPong(payload []byte) error {
-	packet := NewFramePong(payload)
+	packet := NewFramePong(true, payload)
 	return cl.send(nil, packet, nil)
 }
 
@@ -476,7 +476,7 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 	return err
 }
 
-func (cl *Client) sendData(ctx context.Context, req []byte, opcode int, handler ClientRecvHandler) (err error) {
+func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handler ClientRecvHandler) (err error) {
 	if cl.state == connStateConnected {
 		return fmt.Errorf("websocket: client.SendBin: client is not connected")
 	}

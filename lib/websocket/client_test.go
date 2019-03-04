@@ -71,13 +71,13 @@ func TestClientPing(t *testing.T) {
 		exp       []byte
 	}{{
 		desc: "Without payload, unmasked",
-		req:  ControlFramePing,
-		exp:  concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+		req:  NewFramePing(false, nil),
+		exp:  NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "With payload, unmasked",
 		reconnect: true,
 		req:       []byte{0x89, 0x05, 'H', 'e', 'l', 'l', 'o'},
-		exp:       concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+		exp:       NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "With payload, masked",
 		reconnect: true,
@@ -86,10 +86,7 @@ func TestClientPing(t *testing.T) {
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
 			0x7f, 0x9f, 0x4d, 0x51, 0x58,
 		},
-		exp: []byte{
-			0x8A, 0x05,
-			'H', 'e', 'l', 'l', 'o',
-		},
+		exp: NewFramePong(false, []byte("Hello")),
 	}}
 
 	recvHandler := func(ctx context.Context, resp []byte) (err error) {
@@ -139,7 +136,7 @@ func TestClientText(t *testing.T) {
 			0x81, 0x05,
 			'H', 'e', 'l', 'l', 'o',
 		},
-		exp: concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+		exp: NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Small payload, masked",
 		reconnect: true,
@@ -148,14 +145,11 @@ func TestClientText(t *testing.T) {
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
 			0x7f, 0x9f, 0x4d, 0x51, 0x58,
 		},
-		exp: []byte{
-			0x81, 0x05,
-			'H', 'e', 'l', 'l', 'o',
-		},
+		exp: NewFrameText(false, []byte("Hello")),
 	}, {
 		desc: "Medium payload 256, unmasked",
 		req:  concatBytes([]byte{0x81, 0x7E, 0x01, 0x00}, _dummyPayload256...),
-		exp:  concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+		exp:  NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Medium payload 256, masked",
 		reconnect: true,
@@ -172,7 +166,7 @@ func TestClientText(t *testing.T) {
 			0x81, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 		}, _dummyPayload65536...),
-		exp: concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+		exp: NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Large payload 65536, masked",
 		reconnect: true,
@@ -240,7 +234,7 @@ func TestClientFragmentation(t *testing.T) {
 			Payload: []byte{'l', 'o'},
 		}},
 		exps: [][]byte{
-			concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+			NewFrameClose(false, StatusBadRequest, nil),
 		},
 	}, {
 		desc:      "Three text frames, unmasked",
@@ -259,7 +253,7 @@ func TestClientFragmentation(t *testing.T) {
 			Payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{
-			concatBytes(ControlFrameCloseWithCode, StatusBadRequest...),
+			NewFrameClose(false, StatusBadRequest, nil),
 		},
 	}, {
 		desc:      "Three text frames with control message in the middle",
