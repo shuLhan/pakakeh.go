@@ -15,31 +15,21 @@ import (
 )
 
 var (
-	//nolint: lll, gochecknoglobals
-	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14"
-	//nolint: gochecknoglobals
-	_testInternalJWT = _testExternalJWT
-	//nolint: gochecknoglobals
-	_testUID = 100
-	//nolint: gochecknoglobals
-	_testPort = 9001
-	//nolint: gochecknoglobals
-	_testServer *Server
-	//nolint: gochecknoglobals
-	_testWSAddr string
-	//nolint: gochecknoglobals
-	_testHdrValWSAccept = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo="
-	//nolint: gochecknoglobals
-	_testHdrValWSKey = "dGhlIHNhbXBsZSBub25jZQ=="
-	//nolint: gochecknoglobals
-	_testMaskKey = [4]byte{'7', 'ú', '!', '='}
+	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14" //nolint: lll, gochecknoglobals
+
+	_testInternalJWT    = _testExternalJWT               //nolint: gochecknoglobals
+	_testUID            = 100                            //nolint: gochecknoglobals
+	_testPort           = 9001                           //nolint: gochecknoglobals
+	_testServer         *Server                          //nolint: gochecknoglobals
+	_testWSAddr         string                           //nolint: gochecknoglobals
+	_testHdrValWSAccept = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=" //nolint: gochecknoglobals
+	_testHdrValWSKey    = "dGhlIHNhbXBsZSBub25jZQ=="     //nolint: gochecknoglobals
+	_testMaskKey        = [4]byte{'7', 'ú', '!', '='}    //nolint: gochecknoglobals
 )
 
 var (
-	//nolint: gochecknoglobals
-	_dummyPayload256, _dummyPayload256Masked = generateDummyPayload(256)
-	//nolint: gochecknoglobals
-	_dummyPayload65536, _dummyPayload65536Masked = generateDummyPayload(65536)
+	_dummyPayload256, _dummyPayload256Masked     = generateDummyPayload(256)   //nolint: gochecknoglobals
+	_dummyPayload65536, _dummyPayload65536Masked = generateDummyPayload(65536) //nolint: gochecknoglobals
 )
 
 func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
