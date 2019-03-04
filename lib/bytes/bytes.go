@@ -7,6 +7,7 @@ package bytes
 
 import (
 	"fmt"
+	"reflect"
 )
 
 const (
@@ -66,6 +67,35 @@ func AppendUint32(data *[]byte, v uint32) {
 	*data = append(*data, byte(v>>16))
 	*data = append(*data, byte(v>>8))
 	*data = append(*data, byte(v))
+}
+
+//
+// Concat merge one or more slice of byte or string in arguments into slice of
+// byte.
+// Any type that is not []byte or string in arguments will be ignored.
+//
+func Concat(sb []byte, args ...interface{}) (out []byte) {
+	if len(sb) > 0 {
+		out = append(out, sb...)
+	}
+	for _, arg := range args {
+		v := reflect.ValueOf(arg)
+		if v.Kind() == reflect.String {
+			out = append(out, arg.(string)...)
+		}
+		if v.Kind() != reflect.Slice {
+			continue
+		}
+		if v.Len() == 0 {
+			continue
+		}
+		if v.Index(0).Kind() != reflect.Uint8 {
+			continue
+		}
+		b := v.Bytes()
+		out = append(out, b...)
+	}
+	return
 }
 
 //

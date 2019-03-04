@@ -7,6 +7,38 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestConcat(t *testing.T) {
+	var exp []byte
+	t.Log("With one parameter")
+	got := Concat([]byte{})
+	test.Assert(t, "Concat", exp, got, true)
+
+	t.Log("With first parameter is empty")
+	got = Concat([]byte{}, []byte("B"))
+	exp = []byte("B")
+	test.Assert(t, "Concat", exp, got, true)
+
+	t.Log("With two parameters")
+	got = Concat([]byte("A"), []byte("B"))
+	exp = []byte("AB")
+	test.Assert(t, "Concat", exp, got, true)
+
+	t.Log("With three parameters")
+	got = Concat([]byte("A"), []byte("B"), []byte("C"))
+	exp = []byte("ABC")
+	test.Assert(t, "Concat", exp, got, true)
+
+	t.Log("With one parameter is string")
+	got = Concat([]byte("A"), "B", []byte("C"))
+	exp = []byte("ABC")
+	test.Assert(t, "Concat", exp, got, true)
+
+	t.Log("With some parameter is not []byte or string")
+	got = Concat([]byte("A"), 1, []int{2}, []byte{}, []byte("C"))
+	exp = []byte("AC")
+	test.Assert(t, "Concat", exp, got, true)
+}
+
 func TestCutUntilToken(t *testing.T) {
 	line := []byte(`abc \def ghi`)
 
