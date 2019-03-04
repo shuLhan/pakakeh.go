@@ -107,7 +107,7 @@ func concatBytes(bs0 []byte, bs1 ...byte) (out []byte) {
 // Section 4 of [RFC4648]) this 20-byte hash.
 //
 func generateHandshakeAccept(key []byte) string {
-	key = append(key, _magic...)
+	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
 	sum := sha1.Sum(key) // nolint: gosec
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
