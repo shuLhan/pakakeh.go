@@ -21,18 +21,12 @@ import (
 )
 
 const (
-	_pingDelay          = 16 * time.Second
-	_maxQueueUpgrade    = 128
-	_maxEpollReadEvents = 128
+	_maxQueueUpgrade = 128
 
 	_resUpgradeOK = "HTTP/1.1 101 Switching Protocols\r\n" +
 		"Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" +
 		"Sec-Websocket-Accept: %s\r\n\r\n"
-)
-
-var (
-	errClientCtxNotFound = errors.New("client context not found")
 )
 
 //
@@ -315,7 +309,7 @@ func (serv *Server) upgrader() {
 //
 func (serv *Server) handleFragment(conn int, req *Frame) {
 	// (1)
-	if req.Opcode != OpCodeCont {
+	if req.opcode != opcodeCont {
 		serv.fragments[conn] = req
 		return
 	}
@@ -335,12 +329,12 @@ func (serv *Server) handleFragment(conn int, req *Frame) {
 		return
 	}
 
-	req.Fin = FrameIsFinished
+	req.Fin = frameIsFinished
 
 	// (3.3)
-	if f.Opcode == OpCodeText {
+	if f.opcode == opcodeText {
 		go serv.HandleText(conn, f)
-	} else if f.Opcode == OpCodeBin {
+	} else if f.opcode == opcodeBin {
 		go serv.HandleBin(conn, f)
 	}
 
@@ -365,7 +359,7 @@ func (serv *Server) handleText(conn int, f *Frame) {
 
 	v, ok := serv.clients.Load(conn)
 	if !ok {
-		err = errClientCtxNotFound
+		err = errors.New("client context not found")
 		res.Code = http.StatusInternalServerError
 		res.Message = err.Error()
 		goto out
@@ -422,7 +416,7 @@ func (serv *Server) handleBin(conn int, req *Frame) {
 // handleClose request from client.
 //
 func (serv *Server) handleClose(conn int, req *Frame) {
-	req.Opcode = OpCodeClose
+	req.opcode = opcodeClose
 	req.Masked = 0
 
 	res := req.Pack(false)
@@ -477,7 +471,7 @@ func (serv *Server) handleBadRequest(conn int) {
 //```
 //
 func (serv *Server) handlePing(conn int, req *Frame) {
-	req.Opcode = OpCodePong
+	req.opcode = opcodePong
 	req.Masked = 0
 
 	res := req.Pack(false)
@@ -510,7 +504,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 //
 func (serv *Server) reader() {
 	var (
-		events [_maxEpollReadEvents]unix.EpollEvent
+		events [128]unix.EpollEvent
 	)
 
 	for {
@@ -547,31 +541,31 @@ func (serv *Server) reader() {
 
 			for _, req := range reqs {
 				// (5.1-P27)
-				if req.Masked != FrameIsMasked {
+				if req.Masked != frameIsMasked {
 					serv.handleBadRequest(conn)
 					break
 				}
 
-				switch req.Opcode {
-				case OpCodeCont:
+				switch req.opcode {
+				case opcodeCont:
 					serv.handleFragment(conn, req)
-				case OpCodeText:
-					if req.Fin != FrameIsFinished {
+				case opcodeText:
+					if req.Fin != frameIsFinished {
 						serv.handleFragment(conn, req)
 					} else {
 						go serv.HandleText(conn, req)
 					}
-				case OpCodeBin:
-					if req.Fin != FrameIsFinished {
+				case opcodeBin:
+					if req.Fin != frameIsFinished {
 						serv.handleFragment(conn, req)
 					} else {
 						go serv.HandleBin(conn, req)
 					}
-				case OpCodeClose:
+				case opcodeClose:
 					serv.HandleClose(conn, req)
-				case OpCodePing:
+				case opcodePing:
 					serv.HandlePing(conn, req)
-				case OpCodePong:
+				case opcodePong:
 					continue
 				}
 			}
@@ -583,7 +577,7 @@ func (serv *Server) reader() {
 // pinger iterate on all clients and send control Ping frame every N seconds.
 //
 func (serv *Server) pinger() {
-	ticker := time.NewTicker(_pingDelay)
+	ticker := time.NewTicker(16 * time.Second)
 
 	for range ticker.C {
 		serv.clients.Range(func(k, _ interface{}) bool {

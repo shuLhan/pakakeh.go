@@ -232,11 +232,11 @@ func TestClientFragmentation(t *testing.T) {
 		desc: "Two text frames, unmasked",
 		frames: []Frame{{
 			Fin:     0,
-			Opcode:  OpCodeText,
+			opcode:  opcodeText,
 			Payload: []byte{'H', 'e', 'l'},
 		}, {
-			Fin:     FrameIsFinished,
-			Opcode:  OpCodeCont,
+			Fin:     frameIsFinished,
+			opcode:  opcodeCont,
 			Payload: []byte{'l', 'o'},
 		}},
 		exps: [][]byte{
@@ -247,15 +247,15 @@ func TestClientFragmentation(t *testing.T) {
 		reconnect: true,
 		frames: []Frame{{
 			Fin:     0,
-			Opcode:  OpCodeText,
+			opcode:  opcodeText,
 			Payload: []byte("Hel"),
 		}, {
 			Fin:     0,
-			Opcode:  OpCodeCont,
+			opcode:  opcodeCont,
 			Payload: []byte("lo, "),
 		}, {
-			Fin:     FrameIsFinished,
-			Opcode:  OpCodeCont,
+			Fin:     frameIsFinished,
+			opcode:  opcodeCont,
 			Payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{
@@ -266,23 +266,23 @@ func TestClientFragmentation(t *testing.T) {
 		reconnect: true,
 		frames: []Frame{{
 			Fin:     0,
-			Opcode:  OpCodeText,
-			Masked:  FrameIsMasked,
+			opcode:  opcodeText,
+			Masked:  frameIsMasked,
 			Payload: []byte("Hel"),
 		}, {
 			Fin:     0,
-			Opcode:  OpCodeCont,
-			Masked:  FrameIsMasked,
+			opcode:  opcodeCont,
+			Masked:  frameIsMasked,
 			Payload: []byte("lo, "),
 		}, {
-			Fin:     FrameIsFinished,
-			Opcode:  OpCodePing,
-			Masked:  FrameIsMasked,
+			Fin:     frameIsFinished,
+			opcode:  opcodePing,
+			Masked:  frameIsMasked,
 			Payload: []byte("PING"),
 		}, {
-			Fin:     FrameIsFinished,
-			Opcode:  OpCodeCont,
-			Masked:  FrameIsMasked,
+			Fin:     frameIsFinished,
+			opcode:  opcodeCont,
+			Masked:  frameIsMasked,
 			Payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{

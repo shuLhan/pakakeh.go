@@ -8,15 +8,17 @@ import (
 	"context"
 )
 
-// ContextKey define a type for context.
-type ContextKey uint64
+//
+// clientRawHandler define a callback type for handling raw packet from
+// send().
+//
+type clientRawHandler func(ctx context.Context, resp []byte) (err error)
 
-// List of valid context key.
-const (
-	CtxKeyExternalJWT ContextKey = 1 << iota
-	CtxKeyInternalJWT
-	CtxKeyUID
-)
+//
+// ClientRecvHandler define a custom callback type for handling response from
+// request in the form of frames.
+//
+type ClientRecvHandler func(ctx context.Context, frames *Frames) (err error)
 
 // HandlerFn callback type to handle handshake request.
 type HandlerFn func(conn int, req *Frame)

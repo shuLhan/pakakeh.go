@@ -31,12 +31,27 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+// List of frame length.
+const (
+	frameSmallPayload  = 125
+	frameMediumPayload = 126
+	frameLargePayload  = 127
+)
+
+// List of frame FIN and MASK values.
+const (
+	frameIsFinished = 0x80
+	frameIsMasked   = 0x80
+)
+
 const (
 	_maxBuffer = 8096
 	_magic     = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
 	_qKeyTicket = "ticket"
 )
+
+var defaultTimeout = 10 * time.Second //nolint: gochecknoglobals
 
 var _rng *rand.Rand //nolint: gochecknoglobals
 

@@ -45,7 +45,7 @@ func (frames *Frames) IsClosed() bool {
 		return false
 	}
 	for x := 0; x < len(frames.v); x++ {
-		if frames.v[x].Opcode == OpCodeClose {
+		if frames.v[x].opcode == opcodeClose {
 			return true
 		}
 	}
@@ -77,13 +77,13 @@ func (frames *Frames) Payload() (payload []byte) {
 	}
 
 	for x := 0; x < len(frames.v); x++ {
-		if frames.v[x].Opcode == OpCodeClose {
+		if frames.v[x].opcode == opcodeClose {
 			break
 		}
 
 		payload = append(payload, frames.v[x].Payload...)
 
-		if frames.v[x].Fin == FrameIsFinished {
+		if frames.v[x].Fin == frameIsFinished {
 			break
 		}
 	}

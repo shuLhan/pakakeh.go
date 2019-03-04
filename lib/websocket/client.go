@@ -18,11 +18,6 @@ import (
 )
 
 const (
-	_defPort            = "80"
-	_defPortSecure      = "443"
-	_netNameTCP         = "tcp"
-	_schemeWS           = "ws"
-	_schemeWSS          = "wss"
 	_handshakeReqFormat = "GET %s HTTP/1.1\r\n" +
 		"Host: %s\r\n" +
 		"Upgrade: websocket\r\n" +
@@ -31,34 +26,11 @@ const (
 		"Sec-Websocket-Version: 13\r\n"
 )
 
-var (
-	_defRWTO = 10 * time.Second //nolint: gochecknoglobals
-)
-
-type ctxKey int
-
-const (
-	ctxKeyBytes    ctxKey = iota // ctxKeyBytes context key for slice of byte.
-	ctxKeyWSAccept               // ctxKeyWSAccept context key for WebSocket accept key.
-)
-
-//
-// clientRawHandler define a callback type for handling raw packet from
-// send().
-//
-type clientRawHandler func(ctx context.Context, resp []byte) (err error)
-
-//
-// ClientRecvHandler define a custom callback type for handling response from
-// request in the form of frames.
-//
-type ClientRecvHandler func(ctx context.Context, frames *Frames) (err error)
-
 //
 // Client for websocket.
 //
 type Client struct {
-	state           ConnState
+	state           connState
 	remoteURL       *url.URL
 	remoteAddr      string
 	handshakeHeader http.Header
@@ -147,7 +119,7 @@ func (cl *Client) parseURI(endpoint string) (err error) {
 		return
 	}
 
-	if cl.remoteURL.Scheme == _schemeWSS {
+	if cl.remoteURL.Scheme == "wss" {
 		cl.isTLS = true
 	}
 
@@ -158,7 +130,7 @@ func (cl *Client) parseURI(endpoint string) (err error) {
 
 //
 // parseRemoteAddr parse "host:port" from value in remote URL. By default, if
-// no port is given, it will set to 80 or 433, depends on URL scheme.
+// no port is given, it will set to 80 or 443, depends on URL scheme.
 //
 func (cl *Client) parseRemoteAddr() {
 	serverPort := cl.remoteURL.Port()
@@ -169,12 +141,10 @@ func (cl *Client) parseRemoteAddr() {
 	}
 
 	switch cl.remoteURL.Scheme {
-	case _schemeWS:
-		serverPort = _defPort
-	case _schemeWSS:
-		serverPort = _defPortSecure
+	case "wss":
+		serverPort = "443"
 	default:
-		serverPort = _defPort
+		serverPort = "80"
 	}
 
 	cl.remoteAddr = cl.remoteURL.Hostname() + ":" + serverPort
@@ -195,16 +165,15 @@ func (cl *Client) open() (err error) {
 			InsecureSkipVerify: cl.isTLS, //nolint:gas
 		}
 
-		cl.conn, err = tls.DialWithDialer(dialer, _netNameTCP,
-			cl.remoteAddr, cfg)
+		cl.conn, err = tls.DialWithDialer(dialer, "tcp", cl.remoteAddr, cfg)
 	} else {
-		cl.conn, err = dialer.Dial(_netNameTCP, cl.remoteAddr)
+		cl.conn, err = dialer.Dial("tcp", cl.remoteAddr)
 	}
 	if err != nil {
 		return fmt.Errorf("websocket: open: " + err.Error())
 	}
 
-	cl.state = ConnStateOpen
+	cl.state = connStateOpen
 
 	return
 }
@@ -242,12 +211,12 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 
 	httpRes, err := http.ReadResponse(httpBuf, nil)
 	if err != nil {
-		cl.state = ConnStateError
+		cl.state = connStateError
 		return err
 	}
 
 	if httpRes.StatusCode != http.StatusSwitchingProtocols {
-		cl.state = ConnStateError
+		cl.state = connStateError
 		httpRes.Body.Close()
 		return err
 	}
@@ -256,12 +225,12 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 	gotAccept := httpRes.Header.Get(_hdrKeyWSAccept)
 	if expAccept != gotAccept {
 		err = fmt.Errorf("websocket: client.handleHandshake: invalid server accept key")
-		cl.state = ConnStateError
+		cl.state = connStateError
 		httpRes.Body.Close()
 		return err
 	}
 
-	cl.state = ConnStateConnected
+	cl.state = connStateConnected
 	httpRes.Body.Close()
 
 	return
@@ -290,7 +259,7 @@ func (cl *Client) connect() (err error) {
 // If handler is nil, no response will be read from server.
 //
 func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHandler) error {
-	return cl.sendData(ctx, bin, OpCodeBin, handler)
+	return cl.sendData(ctx, bin, opcodeBin, handler)
 }
 
 //
@@ -311,7 +280,7 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 		log.Println("websocket: Client.SendClose: " + err.Error())
 	}
 	cl.conn = nil
-	cl.state = ConnStateClosed
+	cl.state = connStateClosed
 
 	return err
 }
@@ -338,7 +307,7 @@ func (cl *Client) SendPong(payload []byte) error {
 // If handler is nil, no response will be read from server.
 //
 func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvHandler) (err error) {
-	return cl.sendData(ctx, text, OpCodeText, handler)
+	return cl.sendData(ctx, text, opcodeText, handler)
 }
 
 //
@@ -347,7 +316,7 @@ func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvH
 // method.
 //
 func (cl *Client) Recv() (frames *Frames, err error) {
-	if cl.state == ConnStateConnected {
+	if cl.state == connStateConnected {
 		return nil, fmt.Errorf("websocket: client.Send: client is not connected")
 	}
 
@@ -358,7 +327,7 @@ func (cl *Client) Recv() (frames *Frames, err error) {
 	// Read all packet until we received frame with Fin or operation code
 	// CLOSE.
 	for {
-		err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
+		err = cl.conn.SetReadDeadline(time.Now().Add(defaultTimeout))
 		if err != nil {
 			goto out
 		}
@@ -379,17 +348,17 @@ func (cl *Client) Recv() (frames *Frames, err error) {
 		if f == nil {
 			goto out
 		}
-		switch f.Opcode {
-		case OpCodePing:
+		switch f.opcode {
+		case opcodePing:
 			cl.pingQueue <- f
-		case OpCodePong:
+		case opcodePong:
 			// Ignore control PONG frame.
-		case OpCodeClose:
+		case opcodeClose:
 			frames.Append(f)
 			goto out
 		default:
 			frames.Append(f)
-			if f.Fin == FrameIsFinished {
+			if f.Fin == frameIsFinished {
 				goto out
 			}
 		}
@@ -412,7 +381,7 @@ func (cl *Client) Quit() {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
 	cl.conn = nil
-	cl.state = ConnStateClosed
+	cl.state = connStateClosed
 }
 
 //
@@ -424,9 +393,9 @@ func (cl *Client) handleClose(ctx context.Context, packet []byte) error {
 	if f == nil {
 		return fmt.Errorf("websocket: Client.handleClose: empty response")
 	}
-	if f.Opcode != OpCodeClose {
+	if f.opcode != opcodeClose {
 		return fmt.Errorf("websocket: Client.handleClose: expecting CLOSE frame, got %d",
-			f.Opcode)
+			f.opcode)
 	}
 	return nil
 }
@@ -440,9 +409,9 @@ func (cl *Client) handlePing(ctx context.Context, packet []byte) error {
 	if f == nil {
 		return fmt.Errorf("websocket: Client.handlePing: empty response")
 	}
-	if f.Opcode != OpCodePong {
+	if f.opcode != opcodePong {
 		return fmt.Errorf("websocket: Client.handleClose: expecting PONG frame, got %d",
-			f.Opcode)
+			f.opcode)
 	}
 	return nil
 }
@@ -455,7 +424,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 	bs := _bsPool.Get().(*[]byte)
 
 	for {
-		err = cl.conn.SetReadDeadline(time.Now().Add(_defRWTO))
+		err = cl.conn.SetReadDeadline(time.Now().Add(defaultTimeout))
 		if err != nil {
 			break
 		}
@@ -486,7 +455,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 // send raw stream to server, read the response, and pass it to handler.
 //
 func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
-	err = cl.conn.SetWriteDeadline(time.Now().Add(_defRWTO))
+	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
 		return err
 	}
@@ -508,19 +477,19 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 }
 
 func (cl *Client) sendData(ctx context.Context, req []byte, opcode int, handler ClientRecvHandler) (err error) {
-	if cl.state == ConnStateConnected {
+	if cl.state == connStateConnected {
 		return fmt.Errorf("websocket: client.SendBin: client is not connected")
 	}
 
 	var packet []byte
 
-	if opcode == OpCodeText {
+	if opcode == opcodeText {
 		packet = NewFrameText(true, req)
 	} else {
 		packet = NewFrameBin(true, req)
 	}
 
-	err = cl.conn.SetWriteDeadline(time.Now().Add(_defRWTO))
+	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
 		return err
 	}

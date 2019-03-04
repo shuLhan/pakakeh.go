@@ -12,31 +12,6 @@ import (
 )
 
 //
-// List of valid operation code in frame.
-//
-const (
-	OpCodeCont  = 0x0
-	OpCodeText  = 0x1
-	OpCodeBin   = 0x2
-	OpCodeClose = 0x8
-	OpCodePing  = 0x9
-	OpCodePong  = 0xA
-)
-
-// List of frame length.
-const (
-	FrameSmallPayload  = 125
-	FrameMediumPayload = 126
-	FrameLargePayload  = 127
-)
-
-// List of frame FIN and MASK values.
-const (
-	FrameIsFinished = 0x80
-	FrameIsMasked   = 0x80
-)
-
-//
 // List of close code in network byte order.  The name of status is
 // mimicking the "net/http" status code.
 //
@@ -104,10 +79,10 @@ var (
 
 // List of unmasked control frames, MUST used only by server.
 var (
-	ControlFrameClose         = []byte{FrameIsFinished | OpCodeClose, 0x00} //nolint: gochecknoglobals
-	ControlFrameCloseWithCode = []byte{FrameIsFinished | OpCodeClose, 0x02} //nolint: gochecknoglobals
-	ControlFramePing          = []byte{FrameIsFinished | OpCodePing, 0x00}  //nolint: gochecknoglobals
-	ControlFramePong          = []byte{FrameIsFinished | OpCodePong, 0x00}  //nolint: gochecknoglobals
+	ControlFrameClose         = []byte{frameIsFinished | opcodeClose, 0x00} //nolint: gochecknoglobals
+	ControlFrameCloseWithCode = []byte{frameIsFinished | opcodeClose, 0x02} //nolint: gochecknoglobals
+	ControlFramePing          = []byte{frameIsFinished | opcodePing, 0x00}  //nolint: gochecknoglobals
+	ControlFramePong          = []byte{frameIsFinished | opcodePong, 0x00}  //nolint: gochecknoglobals
 )
 
 //
@@ -188,7 +163,7 @@ var (
 //
 type Frame struct {
 	Fin    byte
-	Opcode byte
+	opcode opcode
 	Masked byte
 	// closeCode represent the status of control frame close request.
 	closeCode uint16
@@ -202,7 +177,7 @@ type Frame struct {
 // Client frame must be masked.
 //
 func NewFrameBin(isMasked bool, payload []byte) []byte {
-	return newFrame(OpCodeBin, isMasked, payload)
+	return newFrame(opcodeBin, isMasked, payload)
 }
 
 //
@@ -211,7 +186,7 @@ func NewFrameBin(isMasked bool, payload []byte) []byte {
 // client frame must be masked.
 //
 func NewFrameClose(payload []byte) []byte {
-	return newControlFrame(OpCodeClose, payload)
+	return newControlFrame(opcodeClose, payload)
 }
 
 //
@@ -220,7 +195,7 @@ func NewFrameClose(payload []byte) []byte {
 // frame must be masked.
 //
 func NewFramePing(payload []byte) (packet []byte) {
-	return newControlFrame(OpCodePing, payload)
+	return newControlFrame(opcodePing, payload)
 }
 
 //
@@ -229,7 +204,7 @@ func NewFramePing(payload []byte) (packet []byte) {
 // Client frame must be masked.
 //
 func NewFramePong(payload []byte) (packet []byte) {
-	return newControlFrame(OpCodePong, payload)
+	return newControlFrame(opcodePong, payload)
 }
 
 //
@@ -237,18 +212,18 @@ func NewFramePong(payload []byte) (packet []byte) {
 // Client frame must be masked.
 //
 func NewFrameText(isMasked bool, payload []byte) []byte {
-	return newFrame(OpCodeText, isMasked, payload)
+	return newFrame(opcodeText, isMasked, payload)
 }
 
 //
 // newControlFrame create new control frame with specific operation code and
 // optional payload.
 //
-func newControlFrame(opcode byte, payload []byte) []byte {
-	if len(payload) > FrameSmallPayload {
+func newControlFrame(opcode opcode, payload []byte) []byte {
+	if len(payload) > frameSmallPayload {
 		// All control frames MUST have a payload length of 125 bytes
 		// or less and MUST NOT be fragmented.
-		payload = payload[:FrameSmallPayload]
+		payload = payload[:frameSmallPayload]
 	}
 	return newFrame(opcode, true, payload)
 }
@@ -257,14 +232,14 @@ func newControlFrame(opcode byte, payload []byte) []byte {
 // newFrame create a single frame with specific operation code and optional
 // payload.
 //
-func newFrame(opcode byte, isMasked bool, payload []byte) []byte {
+func newFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 	f := &Frame{
-		Fin:     FrameIsFinished,
-		Opcode:  opcode,
+		Fin:     frameIsFinished,
+		opcode:  opcode,
 		Payload: payload,
 	}
 	if isMasked {
-		f.Masked = FrameIsMasked
+		f.Masked = frameIsMasked
 	}
 	return f.Pack(isMasked)
 }
@@ -284,36 +259,36 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 
 	f = new(Frame)
 
-	f.Fin = in[x] & FrameIsFinished
-	f.Opcode = in[x] & 0x0F
+	f.Fin = in[x] & frameIsFinished
+	f.opcode = opcode(in[x] & 0x0F)
 	x++
 
 	if len(in) >= 2 {
-		f.Masked = in[x] & FrameIsMasked
+		f.Masked = in[x] & frameIsMasked
 		f.len = uint64(in[x] & 0x7F)
 		x++
 	}
 
-	if f.Opcode == OpCodeClose || f.Opcode == OpCodePing || f.Opcode == OpCodePong {
+	if f.opcode == opcodeClose || f.opcode == opcodePing || f.opcode == opcodePong {
 		// (5.4-P33)
-		if f.Fin != FrameIsFinished {
+		if f.Fin != frameIsFinished {
 			return nil, x
 		}
 		// (5.5-P36)
-		if f.len > FrameSmallPayload {
+		if f.len > frameSmallPayload {
 			return nil, x
 		}
 	}
 
-	if f.len == FrameLargePayload {
+	if f.len == frameLargePayload {
 		f.len = binary.BigEndian.Uint64(in[x : x+8])
 		x += 8
-	} else if f.len == FrameMediumPayload {
+	} else if f.len == frameMediumPayload {
 		f.len = uint64(binary.BigEndian.Uint16(in[x : x+2]))
 		x += 2
 	}
 
-	if f.Masked == FrameIsMasked {
+	if f.Masked == frameIsMasked {
 		f.maskKey[0] = in[x]
 		x++
 		f.maskKey[1] = in[x]
@@ -328,7 +303,7 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 		f.Payload = make([]byte, f.len)
 		copy(f.Payload, in[x:])
 
-		if f.Masked == FrameIsMasked {
+		if f.Masked == frameIsMasked {
 			for y := uint64(0); y < f.len; y++ {
 				f.Payload[y] ^= f.maskKey[y%4]
 			}
@@ -336,7 +311,7 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 	}
 	x += f.len
 
-	if f.Opcode == OpCodeClose {
+	if f.opcode == opcodeClose {
 		f.closeCode = binary.BigEndian.Uint16(f.Payload[0:2])
 	}
 
@@ -376,13 +351,13 @@ func Unpack(in []byte) (fs []*Frame) {
 // IsData return true if frame is either text or binary data frame.
 //
 func (f *Frame) IsData() bool {
-	return f.Opcode == OpCodeText || f.Opcode == OpCodeBin
+	return f.opcode == opcodeText || f.opcode == opcodeBin
 }
 
 //
 // Pack websocket Frame into packet that can be sent through network.
 //
-// Caller must set frame fields Fin, Opcode, Masked, and Payload.
+// Caller must set frame fields Fin, opcode, Masked, and Payload.
 //
 // Frame payload len will be set based on length of payload.
 //
@@ -398,16 +373,16 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 
 	switch {
 	case payloadSize > math.MaxUint16:
-		f.len = FrameLargePayload
+		f.len = frameLargePayload
 		headerSize += 8
-	case payloadSize > FrameSmallPayload:
-		f.len = FrameMediumPayload
+	case payloadSize > frameSmallPayload:
+		f.len = frameMediumPayload
 		headerSize += 2
 	default:
 		f.len = payloadSize
 	}
 
-	if f.Masked == FrameIsMasked {
+	if f.Masked == frameIsMasked {
 		headerSize += 4
 	}
 
@@ -416,16 +391,16 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 
 	x := 0
 
-	out[x] = f.Fin | f.Opcode
+	out[x] = f.Fin | byte(f.opcode)
 	x++
 
 	out[x] = f.Masked | uint8(f.len)
 	x++
 
-	if f.len == FrameLargePayload {
+	if f.len == frameLargePayload {
 		binary.BigEndian.PutUint64(out[x:x+8], payloadSize)
 		x += 8
-	} else if f.len == FrameMediumPayload {
+	} else if f.len == frameMediumPayload {
 		binary.BigEndian.PutUint16(out[x:x+2], uint16(payloadSize))
 		x += 2
 	}
@@ -437,7 +412,7 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 		binary.LittleEndian.PutUint32(f.maskKey[0:], _rng.Uint32())
 	}
 
-	if f.Masked == FrameIsMasked {
+	if f.Masked == frameIsMasked {
 		out[x] = f.maskKey[0]
 		x++
 		out[x] = f.maskKey[1]

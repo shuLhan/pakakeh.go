@@ -4,13 +4,13 @@
 
 package websocket
 
-// ConnState represent socket connection status.
-type ConnState int
+// connState represent socket connection status.
+type connState int
 
 // List of socket connection status.
 const (
-	ConnStateClosed ConnState = 0
-	ConnStateOpen             = iota
-	ConnStateConnected
-	ConnStateError
+	connStateClosed connState = 0
+	connStateOpen             = iota
+	connStateConnected
+	connStateError
 )
