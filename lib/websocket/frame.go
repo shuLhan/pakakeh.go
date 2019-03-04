@@ -373,6 +373,13 @@ func Unpack(in []byte) (fs []*Frame) {
 }
 
 //
+// IsData return true if frame is either text or binary data frame.
+//
+func (f *Frame) IsData() bool {
+	return f.Opcode == OpCodeText || f.Opcode == OpCodeBin
+}
+
+//
 // Pack websocket Frame into packet that can be sent through network.
 //
 // Caller must set frame fields Fin, Opcode, Masked, and Payload.
