@@ -9,10 +9,6 @@
 // The websocket server is implemented with epoll, which means it's only
 // run on Linux.
 //
-// Constraints
-//
-// Routing is handled by proxy layer (e.g. HAProxy).
-//
 // References
 //
 // - https://tools.ietf.org/html/rfc6455
