@@ -18,6 +18,8 @@ import (
 	"time"
 
 	"golang.org/x/sys/unix"
+
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 const (
@@ -138,33 +140,30 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 }
 
 //
-// handleUpgrade parse and validate websocket HTTP handshake.
+// handleUpgrade parse and validate websocket HTTP handshake from client.
+// If HandleAuth is not nil, the HTTP handshake will be passed to that
+// function to allow custom authentication.
+//
+// On success it will return the context from authentication and the WebSocket
+// key.
 //
 func (serv *Server) handleUpgrade(httpRequest []byte) (
-	ctx context.Context, req *Handshake, err error,
+	ctx context.Context, key []byte, err error,
 ) {
-	req = _handshakePool.Get().(*Handshake)
+	handshake := _handshakePool.Get().(*Handshake)
 
-	err = req.Parse(httpRequest)
-	if err != nil {
-		_handshakePool.Put(req)
-		req = nil
-		return
-	}
-
-	// (7)
-	if serv.HandleAuth != nil {
-		ctx, err = serv.HandleAuth(req)
-		if err != nil {
-			_handshakePool.Put(req)
-			req = nil
-			return
+	err = handshake.Parse(httpRequest)
+	if err == nil {
+		key = libbytes.Copy(handshake.Key)
+		if serv.HandleAuth != nil {
+			ctx, err = serv.HandleAuth(handshake)
 		}
-	} else {
-		ctx = context.Background()
 	}
 
-	return
+	handshake.Reset(nil)
+	_handshakePool.Put(handshake)
+
+	return ctx, key, err
 }
 
 func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
@@ -226,14 +225,13 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		ctx, req, err := serv.handleUpgrade(packet)
+		ctx, key, err := serv.handleUpgrade(packet)
 		if err != nil {
 			serv.handleError(conn, http.StatusBadRequest, err.Error())
 			continue
 		}
 
-		wsAccept := generateHandshakeAccept(req.Key)
-		_handshakePool.Put(req)
+		wsAccept := generateHandshakeAccept(key)
 
 		bb := _bbPool.Get().(*bytes.Buffer)
 		bb.Reset()
