@@ -150,7 +150,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	sig, err := dkim.Parse(subHeader.fields[0].Value)
 
 	if sig != nil && len(sig.SDID) > 0 {
-		msg.dkimStatus.SDID = *libbytes.Copy(sig.SDID)
+		msg.dkimStatus.SDID = libbytes.Copy(sig.SDID)
 	}
 	if err != nil {
 		msg.dkimStatus.Type = dkim.StatusPermFail

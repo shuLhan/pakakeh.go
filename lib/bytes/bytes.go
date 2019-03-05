@@ -101,13 +101,12 @@ func Concat(sb []byte, args ...interface{}) (out []byte) {
 //
 // Copy slice of bytes from parameter.
 //
-func Copy(src []byte) (dst *[]byte) {
+func Copy(src []byte) (dst []byte) {
 	if len(src) == 0 {
-		return nil
+		return
 	}
-	cp := make([]byte, len(src))
-	copy(cp, src)
-	dst = &cp
+	dst = make([]byte, len(src))
+	copy(dst, src)
 	return
 }
 
