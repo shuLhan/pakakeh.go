@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"testing"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -148,37 +149,37 @@ func TestClientText(t *testing.T) {
 		exp: NewFrameText(false, []byte("Hello")),
 	}, {
 		desc: "Medium payload 256, unmasked",
-		req:  concatBytes([]byte{0x81, 0x7E, 0x01, 0x00}, _dummyPayload256...),
+		req:  libbytes.Concat([]byte{0x81, 0x7E, 0x01, 0x00}, _dummyPayload256),
 		exp:  NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Medium payload 256, masked",
 		reconnect: true,
-		req: concatBytes([]byte{
+		req: libbytes.Concat([]byte{
 			0x81, 0xFE, 0x01, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload256Masked...),
-		exp: concatBytes([]byte{
+		}, _dummyPayload256Masked),
+		exp: libbytes.Concat([]byte{
 			0x81, 0x7E, 0x01, 0x00,
-		}, _dummyPayload256...),
+		}, _dummyPayload256),
 	}, {
 		desc: "Large payload 65536, unmasked",
-		req: concatBytes([]byte{
+		req: libbytes.Concat([]byte{
 			0x81, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-		}, _dummyPayload65536...),
+		}, _dummyPayload65536),
 		exp: NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Large payload 65536, masked",
 		reconnect: true,
-		req: concatBytes([]byte{
+		req: libbytes.Concat([]byte{
 			0x81, 0xFF,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload65536Masked...),
-		exp: concatBytes([]byte{
+		}, _dummyPayload65536Masked),
+		exp: libbytes.Concat([]byte{
 			0x81, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-		}, _dummyPayload65536...),
+		}, _dummyPayload65536),
 	}}
 
 	recvHandler := func(ctx context.Context, resp []byte) (err error) {

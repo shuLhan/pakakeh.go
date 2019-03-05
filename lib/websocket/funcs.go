@@ -49,7 +49,6 @@ func Recv(fd int) (packet []byte, err error) {
 		if err != nil {
 			goto out
 		}
-
 	}
 	if n > 0 {
 		_, err = bb.Write((*bs)[:n])
@@ -90,13 +89,6 @@ func SendFrame(fd int, f *Frame, randomMask bool) (err error) {
 	packet := f.Pack(randomMask)
 
 	return Send(fd, packet)
-}
-
-func concatBytes(bs0 []byte, bs1 ...byte) (out []byte) {
-	out = append(out, bs0...)
-	out = append(out, bs1...)
-
-	return
 }
 
 //

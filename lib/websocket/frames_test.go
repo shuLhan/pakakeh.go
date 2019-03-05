@@ -7,6 +7,7 @@ package websocket
 import (
 	"testing"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -101,7 +102,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `256 bytes binary message in a single unmasked frame`,
-		in:   concatBytes([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256...),
+		in:   libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256),
 		exp: &Frame{
 			fin:     frameIsFinished,
 			opcode:  opcodeBin,
@@ -111,10 +112,10 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `256 bytes binary message in a single masked frame`,
-		in: concatBytes([]byte{
+		in: libbytes.Concat([]byte{
 			0x82, 0xFE, 0x01, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload256Masked...),
+		}, _dummyPayload256Masked),
 		exp: &Frame{
 			fin:     frameIsFinished,
 			opcode:  opcodeBin,
@@ -125,10 +126,10 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `65536 binary message in a single unmasked frame`,
-		in: concatBytes([]byte{
+		in: libbytes.Concat([]byte{
 			0x82, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-		}, _dummyPayload65536...),
+		}, _dummyPayload65536),
 		exp: &Frame{
 			fin:     frameIsFinished,
 			opcode:  opcodeBin,
@@ -138,11 +139,11 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `65536 binary message in a single masked frame`,
-		in: concatBytes([]byte{
+		in: libbytes.Concat([]byte{
 			0x82, 0xFF,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload65536Masked...),
+		}, _dummyPayload65536Masked),
 		exp: &Frame{
 			fin:     frameIsFinished,
 			opcode:  opcodeBin,

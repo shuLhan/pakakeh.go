@@ -289,7 +289,7 @@ func TestFramePack(t *testing.T) {
 			masked:  0,
 			payload: _dummyPayload256,
 		},
-		exp: concatBytes([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256...),
+		exp: libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256),
 	}, {
 		desc: `256 bytes binary message in a single masked frame`,
 		f: Frame{
@@ -299,11 +299,11 @@ func TestFramePack(t *testing.T) {
 			payload: _dummyPayload256,
 			maskKey: _testMaskKey,
 		},
-		exp: concatBytes([]byte{
+		exp: libbytes.Concat([]byte{
 			0x82, 0xFE,
 			0x01, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload256Masked...),
+		}, _dummyPayload256Masked),
 	}, {
 		desc: `65536 binary message in a single unmasked frame`,
 		f: Frame{
@@ -312,10 +312,10 @@ func TestFramePack(t *testing.T) {
 			masked:  0,
 			payload: _dummyPayload65536,
 		},
-		exp: concatBytes([]byte{
+		exp: libbytes.Concat([]byte{
 			0x82, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-		}, _dummyPayload65536...),
+		}, _dummyPayload65536),
 	}, {
 		desc: `65536 binary message in a single masked frame`,
 		f: Frame{
@@ -326,11 +326,11 @@ func TestFramePack(t *testing.T) {
 			maskKey: _testMaskKey,
 			len:     65536,
 		},
-		exp: concatBytes([]byte{
+		exp: libbytes.Concat([]byte{
 			0x82, 0xFF,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload65536Masked...),
+		}, _dummyPayload65536Masked),
 	}}
 
 	for _, c := range cases {
