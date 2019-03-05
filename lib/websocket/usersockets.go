@@ -42,6 +42,16 @@ func NewUserSockets() *UserSockets {
 }
 
 //
+// Conns return list of connections by user ID.
+//
+func (us *UserSockets) Conns(uid uint64) (conns []int) {
+	us.Lock()
+	conns = us.conns[uid]
+	us.Unlock()
+	return
+}
+
+//
 // Add new socket connection to user ID only if the socket is not already
 // exist.
 //
