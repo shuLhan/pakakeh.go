@@ -14,7 +14,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -35,10 +34,11 @@ const (
 // Server for websocket.
 //
 type Server struct {
+	Clients *ClientManager
+
 	sock      int
 	chUpgrade chan int
 	epollRead int
-	clients   sync.Map
 	fragments map[int]*Frame
 	routes    *rootRoute
 
@@ -57,6 +57,7 @@ type Server struct {
 func NewServer(port int) (serv *Server, err error) {
 	serv = &Server{
 		chUpgrade: make(chan int, _maxQueueUpgrade),
+		Clients:   newClientManager(),
 		fragments: make(map[int]*Frame),
 		routes:    newRootRoute(),
 	}
@@ -166,6 +167,9 @@ func (serv *Server) handleUpgrade(httpRequest []byte) (
 	return ctx, key, err
 }
 
+//
+// clientAdd add the new client connection to epoll and to list of clients.
+//
 func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 	event := unix.EpollEvent{
 		Events: unix.EPOLLIN | unix.EPOLLONESHOT,
@@ -182,19 +186,28 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 		return
 	}
 
-	serv.clients.Store(conn, ctx)
+	if ctx != nil {
+		serv.Clients.add(ctx, conn)
 
-	return
-}
-
-func (serv *Server) clientRemove(conn int) {
-	v, ok := serv.clients.Load(conn)
-	if ok {
-		ctx := v.(context.Context)
-		go serv.HandleClientRemove(ctx, conn)
+		if serv.HandleClientAdd != nil {
+			go serv.HandleClientAdd(ctx, conn)
+		}
 	}
 
-	serv.clients.Delete(conn)
+	return nil
+}
+
+//
+// ClientRemove remove client connection from server.
+//
+func (serv *Server) ClientRemove(conn int) {
+	ctx := serv.Clients.ctx[conn]
+	if ctx != nil && serv.HandleClientRemove != nil {
+		serv.HandleClientRemove(ctx, conn)
+	}
+
+	serv.Clients.remove(conn)
+
 	delete(serv.fragments, conn)
 
 	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, conn, nil)
@@ -251,10 +264,7 @@ func (serv *Server) upgrader() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			unix.Close(conn)
-			continue
 		}
-
-		serv.HandleClientAdd(ctx, conn)
 	}
 }
 
@@ -355,15 +365,13 @@ func (serv *Server) handleText(conn int, f *Frame) {
 	res := _resPool.Get().(*Response)
 	res.Reset()
 
-	v, ok := serv.clients.Load(conn)
+	ctx, ok := serv.Clients.ctx[conn]
 	if !ok {
 		err = errors.New("client context not found")
 		res.Code = http.StatusInternalServerError
 		res.Message = err.Error()
 		goto out
 	}
-
-	ctx = v.(context.Context)
 
 	req = _reqPool.Get().(*Request)
 	req.Reset()
@@ -394,7 +402,7 @@ func (serv *Server) handleText(conn int, f *Frame) {
 out:
 	err = serv.SendResponse(conn, res)
 	if err != nil {
-		serv.clientRemove(conn)
+		serv.ClientRemove(conn)
 	}
 
 	if req != nil {
@@ -424,7 +432,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	serv.clientRemove(conn)
+	serv.ClientRemove(conn)
 }
 
 //
@@ -432,30 +440,14 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 // Close frame.
 //
 func (serv *Server) handleBadRequest(conn int) {
-	v, ok := serv.clients.Load(conn)
-	if ok {
-		ctx := v.(context.Context)
-		go serv.HandleClientRemove(ctx, conn)
-	}
-
-	serv.clients.Delete(conn)
-	delete(serv.fragments, conn)
-
-	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, conn, nil)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		serv.clientClose(conn)
-		return
-	}
-
 	resClose := NewFrameClose(false, StatusBadRequest, nil)
 
-	_, err = unix.Write(conn, resClose)
+	_, err := unix.Write(conn, resClose)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	serv.clientClose(conn)
+	serv.ClientRemove(conn)
 }
 
 //
@@ -477,7 +469,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	_, err := unix.Write(conn, res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		serv.clientRemove(conn)
+		serv.ClientRemove(conn)
 		return
 	}
 }
@@ -517,7 +509,7 @@ func (serv *Server) reader() {
 
 			packet, err := Recv(conn)
 			if err != nil || len(packet) == 0 {
-				serv.clientRemove(conn)
+				serv.ClientRemove(conn)
 				continue
 			}
 
@@ -533,7 +525,7 @@ func (serv *Server) reader() {
 			frames := Unpack(packet)
 
 			if frames == nil || frames.Len() == 0 {
-				serv.clientRemove(conn)
+				serv.ClientRemove(conn)
 				continue
 			}
 
@@ -572,23 +564,36 @@ func (serv *Server) reader() {
 }
 
 //
-// pinger iterate on all clients and send control Ping frame every N seconds.
+// pinger is a routine that send control PING frame to all client connections
+// every N seconds.
 //
 func (serv *Server) pinger() {
 	ticker := time.NewTicker(16 * time.Second)
+	framePing := NewFramePing(false, nil)
 
 	for range ticker.C {
-		serv.clients.Range(func(k, _ interface{}) bool {
-			conn, ok := k.(int)
-			if ok {
-				_, err := unix.Write(conn, NewFramePing(false, nil))
-				if err != nil {
-					serv.clientRemove(conn)
-				}
-			}
+		serv.Clients.Lock()
 
-			return true
-		})
+		if len(serv.Clients.all) == 0 {
+			serv.Clients.Unlock()
+			continue
+		}
+
+		// Make a copy of all client connections to prevent race
+		// condition.
+		conns := make([]int, len(serv.Clients.all))
+		copy(conns, serv.Clients.all)
+
+		serv.Clients.Unlock()
+
+		for _, conn := range conns {
+			_, err := unix.Write(conn, framePing)
+			if err != nil {
+				// Error on sending PING will be assumed as
+				// bad connection.
+				serv.ClientRemove(conn)
+			}
+		}
 	}
 }
 

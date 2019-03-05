@@ -81,7 +81,7 @@ func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 
 	ctx = context.WithValue(context.Background(), CtxKeyExternalJWT, extJWT)
 	ctx = context.WithValue(ctx, CtxKeyInternalJWT, _testInternalJWT)
-	ctx = context.WithValue(ctx, CtxKeyUID, _testUID)
+	ctx = context.WithValue(ctx, CtxKeyUID, uint64(_testUID))
 
 	return
 }
