@@ -190,7 +190,7 @@ func newFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 	if isMasked {
 		f.masked = frameIsMasked
 	}
-	return f.Pack(isMasked)
+	return f.pack(isMasked)
 }
 
 //
@@ -276,7 +276,7 @@ func (f *Frame) IsData() bool {
 }
 
 //
-// Pack websocket Frame into packet that can be sent through network.
+// pack websocket Frame into packet that can be sent through network.
 //
 // Caller must set frame fields Fin, opcode, masked, and payload.
 //
@@ -288,7 +288,7 @@ func (f *Frame) IsData() bool {
 // A server MUST NOT mask any frames that it sends to the client. (
 // (RFC 6455 5.1-P27).
 //
-func (f *Frame) Pack(randomMask bool) (out []byte) {
+func (f *Frame) pack(randomMask bool) (out []byte) {
 	headerSize := uint64(2)
 	payloadSize := uint64(len(f.payload))
 

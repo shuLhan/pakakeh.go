@@ -86,7 +86,7 @@ func SendFrame(fd int, f *Frame, randomMask bool) (err error) {
 		return
 	}
 
-	packet := f.Pack(randomMask)
+	packet := f.pack(randomMask)
 
 	return Send(fd, packet)
 }

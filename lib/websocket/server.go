@@ -425,7 +425,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	req.opcode = opcodeClose
 	req.masked = 0
 
-	res := req.Pack(false)
+	res := req.pack(false)
 
 	_, err := unix.Write(conn, res)
 	if err != nil {
@@ -464,7 +464,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	req.opcode = opcodePong
 	req.masked = 0
 
-	res := req.Pack(false)
+	res := req.pack(false)
 
 	_, err := unix.Write(conn, res)
 	if err != nil {
