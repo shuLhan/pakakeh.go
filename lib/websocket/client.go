@@ -61,7 +61,7 @@ type Client struct {
 //
 func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 	cl = &Client{
-		pingQueue: make(chan *Frame, 24),
+		handlePing: handlePing,
 	}
 
 	err = cl.parseURI(endpoint)
@@ -83,8 +83,6 @@ func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
 	}
-
-	go cl.servePing()
 
 	return cl, nil
 }
@@ -237,12 +235,18 @@ func (cl *Client) connect() (err error) {
 
 	err = cl.open()
 	if err != nil {
-		return
+		return err
 	}
 
 	err = cl.handshake()
+	if err != nil {
+		return err
+	}
 
-	return
+	cl.pingQueue = make(chan *Frame, 24)
+	go cl.servePing()
+
+	return nil
 }
 
 //
@@ -272,6 +276,7 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 	}
 	cl.conn = nil
 	cl.state = connStateClosed
+	close(cl.pingQueue)
 
 	return err
 }
@@ -279,9 +284,9 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 //
 // SendPing send control PING frame to server, expecting PONG as response.
 //
-func (cl *Client) SendPing(payload []byte) error {
+func (cl *Client) SendPing(ctx context.Context, payload []byte) error {
 	packet := NewFramePing(true, payload)
-	return cl.send(context.Background(), packet, cl.handlePing)
+	return cl.send(ctx, packet, cl.handlePing)
 }
 
 //
@@ -373,6 +378,7 @@ func (cl *Client) Quit() {
 	}
 	cl.conn = nil
 	cl.state = connStateClosed
+	close(cl.pingQueue)
 }
 
 //
