@@ -53,19 +53,15 @@ type Server struct {
 	// connection being removed and closed by server.
 	HandleClientRemove HandlerClientFn
 
-	// HandleClose callback that will be called when client send control
-	// CLOSE frame.
-	HandleClose HandlerFn
-
 	// HandleText callback that will be called after receiving data
 	// frame(s) text from client.
 	// Default handle parse the payload into Request and pass it to
 	// registered routes.
-	HandleText HandlerPayload
+	HandleText HandlerPayloadFn
 
 	// HandleBin callback that will be called after receiving data
 	// frame(s) binary from client.
-	HandleBin HandlerPayload
+	HandleBin HandlerPayloadFn
 }
 
 //
@@ -90,7 +86,6 @@ func NewServer(port int) (serv *Server, err error) {
 
 	serv.HandleText = serv.handleText
 	serv.HandleBin = serv.handleBin
-	serv.HandleClose = nil
 	serv.HandleClientAdd = nil
 	serv.HandleClientRemove = nil
 
@@ -229,11 +224,7 @@ func (serv *Server) ClientRemove(conn int) {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	serv.clientClose(conn)
-}
-
-func (serv *Server) clientClose(conn int) {
-	err := unix.Close(conn)
+	err = unix.Close(conn)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
@@ -429,9 +420,6 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	_, err := unix.Write(conn, res)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-	}
-	if serv.HandleClose != nil {
-		serv.HandleClose(conn, req)
 	}
 
 	serv.ClientRemove(conn)
