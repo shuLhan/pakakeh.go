@@ -52,6 +52,17 @@ func newClientManager() *ClientManager {
 }
 
 //
+// All return a copy of all client connections.
+//
+func (cls *ClientManager) All() (conns []int) {
+	cls.Lock()
+	conns = make([]int, len(cls.all))
+	copy(conns, cls.all)
+	cls.Unlock()
+	return
+}
+
+//
 // Conns return list of connections by user ID.
 //
 // Each user may have more than one connection (e.g. from Android, iOS, or

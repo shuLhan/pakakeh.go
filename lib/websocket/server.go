@@ -559,21 +559,9 @@ func (serv *Server) pinger() {
 	framePing := NewFramePing(false, nil)
 
 	for range ticker.C {
-		serv.Clients.Lock()
+		all := serv.Clients.All()
 
-		if len(serv.Clients.all) == 0 {
-			serv.Clients.Unlock()
-			continue
-		}
-
-		// Make a copy of all client connections to prevent race
-		// condition.
-		conns := make([]int, len(serv.Clients.all))
-		copy(conns, serv.Clients.all)
-
-		serv.Clients.Unlock()
-
-		for _, conn := range conns {
+		for _, conn := range all {
 			_, err := unix.Write(conn, framePing)
 			if err != nil {
 				// Error on sending PING will be assumed as
