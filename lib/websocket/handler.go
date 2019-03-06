@@ -28,3 +28,6 @@ type HandlerAuthFn func(req *Handshake) (ctx context.Context, err error)
 
 // HandlerClientFn callback type to handle client request.
 type HandlerClientFn func(ctx context.Context, conn int)
+
+// HandlerPayload define a callback type to handle data frame.
+type HandlerPayload func(conn int, payload []byte)

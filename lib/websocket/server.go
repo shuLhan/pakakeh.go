@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	_maxQueueUpgrade = 128
+	_maxQueue = 128
 
 	_resUpgradeOK = "HTTP/1.1 101 Switching Protocols\r\n" +
 		"Upgrade: websocket\r\n" +
@@ -39,16 +39,33 @@ type Server struct {
 	sock      int
 	chUpgrade chan int
 	epollRead int
-	fragments map[int]*Frame
 	routes    *rootRoute
 
-	HandleText         HandlerFn
-	HandleBin          HandlerFn
-	HandleClose        HandlerFn
-	HandlePing         HandlerFn
-	HandleAuth         HandlerAuthFn
-	HandleClientAdd    HandlerClientFn
+	// HandleAuth callback that will be called when receiving
+	// client handshake.
+	HandleAuth HandlerAuthFn
+
+	// HandleClientAdd callback that will called after client handshake
+	// and, if HandleAuth is defined, after client is authenticated.
+	HandleClientAdd HandlerClientFn
+
+	// HandleClientRemove callback that will be called before client
+	// connection being removed and closed by server.
 	HandleClientRemove HandlerClientFn
+
+	// HandleClose callback that will be called when client send control
+	// CLOSE frame.
+	HandleClose HandlerFn
+
+	// HandleText callback that will be called after receiving data
+	// frame(s) text from client.
+	// Default handle parse the payload into Request and pass it to
+	// registered routes.
+	HandleText HandlerPayload
+
+	// HandleBin callback that will be called after receiving data
+	// frame(s) binary from client.
+	HandleBin HandlerPayload
 }
 
 //
@@ -56,9 +73,8 @@ type Server struct {
 //
 func NewServer(port int) (serv *Server, err error) {
 	serv = &Server{
-		chUpgrade: make(chan int, _maxQueueUpgrade),
+		chUpgrade: make(chan int, _maxQueue),
 		Clients:   newClientManager(),
-		fragments: make(map[int]*Frame),
 		routes:    newRootRoute(),
 	}
 
@@ -74,10 +90,9 @@ func NewServer(port int) (serv *Server, err error) {
 
 	serv.HandleText = serv.handleText
 	serv.HandleBin = serv.handleBin
-	serv.HandleClose = serv.handleClose
-	serv.HandlePing = serv.handlePing
-	serv.HandleClientAdd = func(ctx context.Context, conn int) {}
-	serv.HandleClientRemove = func(ctx context.Context, conn int) {}
+	serv.HandleClose = nil
+	serv.HandleClientAdd = nil
+	serv.HandleClientRemove = nil
 
 	return
 }
@@ -110,7 +125,7 @@ func (serv *Server) createSockServer(port int) (err error) {
 		return
 	}
 
-	err = unix.Listen(serv.sock, _maxQueueUpgrade)
+	err = unix.Listen(serv.sock, _maxQueue)
 
 	return
 }
@@ -201,14 +216,13 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 // ClientRemove remove client connection from server.
 //
 func (serv *Server) ClientRemove(conn int) {
-	ctx := serv.Clients.ctx[conn]
+	ctx := serv.Clients.Context(conn)
+
 	if ctx != nil && serv.HandleClientRemove != nil {
 		serv.HandleClientRemove(ctx, conn)
 	}
 
 	serv.Clients.remove(conn)
-
-	delete(serv.fragments, conn)
 
 	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, conn, nil)
 	if err != nil {
@@ -271,90 +285,75 @@ func (serv *Server) upgrader() {
 //
 // handleFragment will handle continuation frame (fragmentation).
 //
+// (RFC 6455 Section 5.4 Page 34)
+// A fragmented message consists of a single frame with the FIN bit
+// clear and an opcode other than 0, followed by zero or more frames
+// with the FIN bit clear and the opcode set to 0, and terminated by
+// a single frame with the FIN bit set and an opcode of 0.  A
+// fragmented message is conceptually equivalent to a single larger
+// message whose payload is equal to the concatenation of the
+// payloads of the fragments in order; however, in the presence of
+// extensions, this may not hold true as the extension defines the
+// interpretation of the "Extension data" present.  For instance,
+// "Extension data" may only be present at the beginning of the first
+// fragment and apply to subsequent fragments, or there may be
+// "Extension data" present in each of the fragments that applies
+// only to that particular fragment.  In the absence of "Extension
+// data", the following example demonstrates how fragmentation works.
 //
-//	(5.4-P34)
-//	o  A fragmented message consists of a single frame with the FIN bit
-//	   clear and an opcode other than 0, followed by zero or more frames
-//	   with the FIN bit clear and the opcode set to 0, and terminated by
-//	   a single frame with the FIN bit set and an opcode of 0.  A
-//	   fragmented message is conceptually equivalent to a single larger
-//	   message whose payload is equal to the concatenation of the
-//	   payloads of the fragments in order; however, in the presence of
-//	   extensions, this may not hold true as the extension defines the
-//	   interpretation of the "Extension data" present.  For instance,
-//	   "Extension data" may only be present at the beginning of the first
-//	   fragment and apply to subsequent fragments, or there may be
-//	   "Extension data" present in each of the fragments that applies
-//	   only to that particular fragment.  In the absence of "Extension
-//	   data", the following example demonstrates how fragmentation works.
-//
-//	   EXAMPLE: For a text message sent as three fragments, the first
-//	   fragment would have an opcode of 0x1 and a FIN bit clear, the
-//	   second fragment would have an opcode of 0x0 and a FIN bit clear,
-//	   and the third fragment would have an opcode of 0x0 and a FIN bit
-//	   that is set.
-//
-// The first frame and their continuation is saved on map of socket connection
-// and frame: fragments.
-//
-// For each request frame, there are three possible cases:
-//
-// (1) request is the first frame (fin = 0 && opcode != 0).
-//
-// request will replace any previous non-completed fragmentation.
-//
-// (2) request is the middle frame (fin = 0 && opcode = 0).
-//
-// (2.1) Check if previous fragmentation exists, if not ignore the request.
-// (2.2) Append the request payload with previous frame.
-//
-// (3) request is the last frame (fin = 1 && opcode = 0)
-//
-// (3.1) Check if previous fragmentation exists, if not ignore the request.
-// (3.2) Append the request payload with previous frame.
-// (3.3) Handle request
-// (3.4) Clear cache of fragmentations
+// EXAMPLE: For a text message sent as three fragments, the first
+// fragment would have an opcode of 0x1 and a FIN bit clear, the
+// second fragment would have an opcode of 0x0 and a FIN bit clear,
+// and the third fragment would have an opcode of 0x0 and a FIN bit
+// that is set.
+// (RFC 6455 Section 5.4 Page 34)
 //
 func (serv *Server) handleFragment(conn int, req *Frame) {
-	// (1)
-	if req.opcode != opcodeCont {
-		serv.fragments[conn] = req
-		return
-	}
+	frames := serv.Clients.Frames(conn)
 
-	// (2.1) (3.1)
-	f, ok := serv.fragments[conn]
-	if !ok {
-		return
-	}
-
-	// (2.2) (3.2)
-	f.payload = append(f.payload, req.payload...)
-	f.len += req.len
-
-	// (2)
 	if req.fin == 0 {
-		return
+		if frames == nil {
+			frames = &Frames{}
+		}
+		if req.opcode == opcodeBin || req.opcode == opcodeText {
+			// Non-zero opcode indicate first fragment, so we
+			// clear any previous fragmentations.
+			frames.v = frames.v[:0]
+		}
+
+		frames.Append(req)
+
+		serv.Clients.SetFrames(conn, frames)
+	} else {
+		var (
+			payload []byte
+			oc      opcode
+		)
+
+		if frames == nil {
+			payload = req.payload
+			oc = req.opcode
+		} else {
+			frames.Append(req)
+
+			payload = frames.Payload()
+			oc = frames.v[0].opcode
+		}
+
+		serv.Clients.SetFrames(conn, nil)
+
+		if oc == opcodeText {
+			go serv.HandleText(conn, payload)
+		} else {
+			go serv.HandleBin(conn, payload)
+		}
 	}
-
-	req.fin = frameIsFinished
-
-	// (3.3)
-	if f.opcode == opcodeText {
-		go serv.HandleText(conn, f)
-	} else if f.opcode == opcodeBin {
-		go serv.HandleBin(conn, f)
-	}
-
-	// (3.4)
-	serv.fragments[conn] = nil
-	delete(serv.fragments, conn)
 }
 
 //
 // handleText message from client.
 //
-func (serv *Server) handleText(conn int, f *Frame) {
+func (serv *Server) handleText(conn int, payload []byte) {
 	var (
 		handler RouteHandler
 		err     error
@@ -376,7 +375,7 @@ func (serv *Server) handleText(conn int, f *Frame) {
 	req = _reqPool.Get().(*Request)
 	req.Reset()
 
-	err = json.Unmarshal(f.payload, req)
+	err = json.Unmarshal(payload, req)
 	if err != nil {
 		res.Code = http.StatusBadRequest
 		res.Message = err.Error()
@@ -413,9 +412,9 @@ out:
 
 //
 // handleBin message from client.  This is the dummy handler, that can be
-// overwriten by implementor.
+// overwritten by implementer.
 //
-func (serv *Server) handleBin(conn int, req *Frame) {
+func (serv *Server) handleBin(conn int, payload []byte) {
 }
 
 //
@@ -431,18 +430,25 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
+	if serv.HandleClose != nil {
+		serv.HandleClose(conn, req)
+	}
 
 	serv.ClientRemove(conn)
 }
 
 //
-// handleBadRequest by removing client connection first and then by sending
-// Close frame.
+// handleBadRequest by sending Close frame with status.
 //
 func (serv *Server) handleBadRequest(conn int) {
-	resClose := NewFrameClose(false, StatusBadRequest, nil)
+	frameClose := NewFrameClose(false, StatusBadRequest, nil)
 
-	_, err := unix.Write(conn, resClose)
+	err := Send(conn, frameClose)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	_, err = Recv(conn)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
@@ -477,20 +483,14 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 //
 // reader read request from client.
 //
-//```RFC6455
-// (5.1-P27)
-// To avoid confusing network intermediaries (such as
-// intercepting proxies) and for security reasons that are further
-// discussed in Section 10.3, a client MUST mask all frames that it
-// sends to the server (see Section 5.3 for further details).  (Note
-// that masking is done whether or not the WebSocket Protocol is running
-// over TLS.)  The server MUST close the connection upon receiving a
-// frame that is not masked.  In this case, a server MAY send a Close
-// frame with a status code of 1002 (protocol error) as defined in
-// Section 7.4.1.
-//```
-//
-// (1) See https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
+// To avoid confusing network intermediaries (such as intercepting proxies)
+// and for security reasons that are further discussed in Section 10.3, a
+// client MUST mask all frames that it sends to the server (see Section 5.3
+// for further details).  (Note that masking is done whether or not the
+// WebSocket Protocol is running over TLS.)  The server MUST close the
+// connection upon receiving a frame that is not masked.  In this case, a
+// server MAY send a Close frame with a status code of 1002 (protocol error)
+// as defined in Section 7.4.1. (RFC 6455, section 5.1, P27).
 //
 func (serv *Server) reader() {
 	var (
@@ -513,51 +513,40 @@ func (serv *Server) reader() {
 				continue
 			}
 
-			// (1)
-			events[x].Events = unix.EPOLLIN | unix.EPOLLONESHOT
-
-			err = unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_MOD, conn, &events[x])
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				continue
-			}
-
 			frames := Unpack(packet)
-
-			if frames == nil || frames.Len() == 0 {
+			if frames == nil {
 				serv.ClientRemove(conn)
 				continue
 			}
-
 			for _, frame := range frames.v {
-				// (5.1-P27)
 				if frame.masked != frameIsMasked {
 					serv.handleBadRequest(conn)
-					break
+					continue
 				}
 
 				switch frame.opcode {
 				case opcodeCont:
 					serv.handleFragment(conn, frame)
 				case opcodeText:
-					if frame.fin != frameIsFinished {
-						serv.handleFragment(conn, frame)
-					} else {
-						go serv.HandleText(conn, frame)
-					}
+					serv.handleFragment(conn, frame)
 				case opcodeBin:
-					if frame.fin != frameIsFinished {
-						serv.handleFragment(conn, frame)
-					} else {
-						go serv.HandleBin(conn, frame)
-					}
+					serv.handleFragment(conn, frame)
 				case opcodeClose:
-					serv.HandleClose(conn, frame)
+					serv.handleClose(conn, frame)
 				case opcodePing:
-					serv.HandlePing(conn, frame)
+					serv.handlePing(conn, frame)
 				case opcodePong:
-					continue
+					// Ignore pong from client.
 				}
+			}
+
+			// See https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
+			events[x].Events = unix.EPOLLIN | unix.EPOLLONESHOT
+
+			err = unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_MOD, conn, &events[x])
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				continue
 			}
 		}
 	}

@@ -63,19 +63,6 @@ func Send(fd int, packet []byte) (err error) {
 }
 
 //
-// SendFrame by packing websocket frame first and write into it.
-//
-func SendFrame(fd int, f *Frame, randomMask bool) (err error) {
-	if fd == 0 || f == nil {
-		return
-	}
-
-	packet := f.pack(randomMask)
-
-	return Send(fd, packet)
-}
-
-//
 // generateHandshakeAccept generate server accept key by concatenating key,
 // defined in step 4 in Section 4.2.2, with the string
 // "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", taking the SHA-1 hash of this

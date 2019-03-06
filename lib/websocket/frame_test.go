@@ -82,7 +82,6 @@ func TestNewFrameClose(t *testing.T) {
 		t.Log(c.desc)
 
 		packet := NewFrameClose(true, StatusBadRequest, c.payload)
-		libbytes.PrintHex("CLOSE frame unmasked", packet, 8)
 		frames := Unpack(packet)
 		frame := frames.v[0]
 

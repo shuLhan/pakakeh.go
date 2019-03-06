@@ -184,8 +184,15 @@ func TestClientText(t *testing.T) {
 
 	recvHandler := func(ctx context.Context, resp []byte) (err error) {
 		exp := ctx.Value(ctxKeyBytes).([]byte)
+
 		test.Assert(t, "", exp, resp, true)
-		return
+
+		frames := Unpack(resp)
+		if frames.IsClosed() {
+			testClient.SendClose(false)
+		}
+
+		return nil
 	}
 
 	for _, c := range cases {
@@ -281,7 +288,7 @@ func TestClientFragmentation(t *testing.T) {
 			payload: []byte("Shulhan"),
 		}},
 		exps: [][]byte{
-			{0x8A, 0x04, 'P', 'I', 'N', 'G'},
+			{0x8A, 0x04, 'P', 'I', 'N', 'G'}, // PONG with payload PING.
 			{
 				0x81, 0x0E,
 				'H', 'e', 'l', 'l', 'o', ',', ' ',
@@ -316,6 +323,12 @@ func TestClientFragmentation(t *testing.T) {
 			}
 
 			test.Assert(t, "res", c.exps[x], res, true)
+
+			frames := Unpack(res)
+			if frames.IsClosed() {
+				testClient.SendClose(false)
+				break
+			}
 		}
 	}
 }

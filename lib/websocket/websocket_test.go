@@ -50,15 +50,26 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 }
 
 //
-// handleRequest from websocket by echo-ing back the payload.
+// testHandleText from websocket by echo-ing back the payload.
 //
-func handleRequest(conn int, req *Frame) {
-	req.fin = frameIsFinished
-	req.masked = 0
+func testHandleText(conn int, payload []byte) {
+	packet := NewFrameText(false, payload)
 
-	err := SendFrame(conn, req, false)
+	err := Send(conn, packet)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "handleRequest: error:", err.Error())
+		fmt.Fprintln(os.Stderr, "handlePayloadText: error:", err.Error())
+	}
+}
+
+//
+// testHandleBin from websocket by echo-ing back the payload.
+//
+func testHandleBin(conn int, payload []byte) {
+	packet := NewFrameBin(false, payload)
+
+	err := Send(conn, packet)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "handlePayloadBin: error:", err.Error())
 	}
 }
 
@@ -97,12 +108,11 @@ func runTestServer() {
 		os.Exit(2)
 	}
 
-	_testServer.HandleText = handleRequest
-	_testServer.HandleBin = handleRequest
 	_testServer.HandleAuth = testHandleAuth
+	_testServer.HandleBin = testHandleBin
+	_testServer.HandleText = testHandleText
 
 	go _testServer.Start()
-
 }
 
 func TestMain(m *testing.M) {
