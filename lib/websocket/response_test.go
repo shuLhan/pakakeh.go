@@ -13,7 +13,7 @@ import (
 func TestResponseReset(t *testing.T) {
 	res := _resPool.Get().(*Response)
 
-	res.Reset()
+	res.reset()
 
 	test.Assert(t, "Response.ID", uint64(0), res.ID, true)
 	test.Assert(t, "Response.Code", int32(0), res.Code, true)

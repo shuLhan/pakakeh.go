@@ -353,7 +353,7 @@ func (serv *Server) handleText(conn int, payload []byte) {
 	)
 
 	res := _resPool.Get().(*Response)
-	res.Reset()
+	res.reset()
 
 	ctx, ok := serv.Clients.ctx[conn]
 	if !ok {
@@ -364,7 +364,7 @@ func (serv *Server) handleText(conn int, payload []byte) {
 	}
 
 	req = _reqPool.Get().(*Request)
-	req.Reset()
+	req.reset()
 
 	err = json.Unmarshal(payload, req)
 	if err != nil {

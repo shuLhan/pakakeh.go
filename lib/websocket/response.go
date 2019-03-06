@@ -52,9 +52,9 @@ type Response struct {
 }
 
 //
-// Reset all field's value to zero or empty.
+// reset all field's value to zero or empty.
 //
-func (res *Response) Reset() {
+func (res *Response) reset() {
 	res.ID = 0
 	res.Code = 0
 	res.Message = ""

@@ -62,9 +62,9 @@ type Request struct {
 }
 
 //
-// Reset all Request field's value to zero.
+// reset all Request field's value to zero.
 //
-func (req *Request) Reset() {
+func (req *Request) reset() {
 	req.ID = 0
 	req.Method = ""
 	req.Target = ""

@@ -16,7 +16,7 @@ import (
 func TestRequestReset(t *testing.T) {
 	req := _reqPool.Get().(*Request)
 
-	req.Reset()
+	req.reset()
 
 	test.Assert(t, "Request.ID", uint64(0), req.ID, true)
 	test.Assert(t, "Request.Method", "", req.Method, true)
