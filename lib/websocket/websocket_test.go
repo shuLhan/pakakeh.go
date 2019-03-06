@@ -7,7 +7,7 @@ package websocket
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strconv"
@@ -57,7 +57,7 @@ func testHandleText(conn int, payload []byte) {
 
 	err := Send(conn, packet)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "handlePayloadText: error:", err.Error())
+		log.Println("handlePayloadText: " + err.Error())
 	}
 }
 
@@ -69,7 +69,7 @@ func testHandleBin(conn int, payload []byte) {
 
 	err := Send(conn, packet)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "handlePayloadBin: error:", err.Error())
+		log.Println("handlePayloadBin: " + err.Error())
 	}
 }
 
@@ -104,7 +104,7 @@ func runTestServer() {
 
 	_testServer, err = NewServer(_testPort)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("runTestServer: " + err.Error())
 		os.Exit(2)
 	}
 

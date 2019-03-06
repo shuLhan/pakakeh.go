@@ -10,9 +10,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -144,7 +144,7 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 
 	_, err := unix.Write(conn, []byte(rspBody))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		log.Println("websocket: server.handleError: " + err.Error())
 	}
 
 	unix.Close(conn)
@@ -221,12 +221,12 @@ func (serv *Server) ClientRemove(conn int) {
 
 	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, conn, nil)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("websocket: server.ClientRemove: " + err.Error())
 	}
 
 	err = unix.Close(conn)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("websocket: server.ClientRemove: " + err.Error())
 	}
 }
 
@@ -234,7 +234,7 @@ func (serv *Server) upgrader() {
 	for conn := range serv.chUpgrade {
 		packet, err := Recv(conn)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			log.Println("websocket: server.upgrader: " + err.Error())
 			unix.Close(conn)
 			continue
 		}
@@ -260,14 +260,14 @@ func (serv *Server) upgrader() {
 		_bbPool.Put(bb)
 
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			log.Println("websocket: server.upgrader: " + err.Error())
 			unix.Close(conn)
 			continue
 		}
 
 		err = serv.clientAdd(ctx, conn)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			log.Println("websocket: server.upgrader: " + err.Error())
 			unix.Close(conn)
 		}
 	}
@@ -419,7 +419,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 
 	_, err := unix.Write(conn, res)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("websocket: server.handleClose: " + err.Error())
 	}
 
 	serv.ClientRemove(conn)
@@ -433,12 +433,12 @@ func (serv *Server) handleBadRequest(conn int) {
 
 	err := Send(conn, frameClose)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("websocket: server.handleBadRequest: " + err.Error())
 	}
 
 	_, err = Recv(conn)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("websocket: server.handleBadRequest: " + err.Error())
 	}
 
 	serv.ClientRemove(conn)
@@ -462,7 +462,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 
 	_, err := unix.Write(conn, res)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println("websocket: server.handlePing: " + err.Error())
 		serv.ClientRemove(conn)
 		return
 	}
@@ -488,7 +488,7 @@ func (serv *Server) reader() {
 	for {
 		nevents, err := unix.EpollWait(serv.epollRead, events[:], -1)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			log.Println("websocket: server.reader: unix.EpollWait: " + err.Error())
 			break
 		}
 
@@ -533,7 +533,7 @@ func (serv *Server) reader() {
 
 			err = unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_MOD, conn, &events[x])
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				log.Println("websocket: server.reader: unix.EpollCtl: " + err.Error())
 				continue
 			}
 		}
@@ -585,7 +585,7 @@ func (serv *Server) Start() {
 	for {
 		conn, _, err := unix.Accept(serv.sock)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			log.Println("websocket: unix.Accept: " + err.Error())
 			return
 		}
 
@@ -599,13 +599,13 @@ func (serv *Server) Start() {
 func (serv *Server) SendResponse(conn int, res *Response) (err error) {
 	resb, err := json.Marshal(res)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "SendResponse:", err.Error())
+		log.Println("websocket: server.SendResponse: " + err.Error())
 		return
 	}
 
 	_, err = unix.Write(conn, resb)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "SendResponse:", err.Error())
+		log.Println("websocket: server.SendResponse: " + err.Error())
 	}
 
 	return
