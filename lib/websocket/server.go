@@ -390,7 +390,7 @@ func (serv *Server) handleText(conn int, payload []byte) {
 	handler(ctx, req, res)
 
 out:
-	err = serv.SendResponse(conn, res)
+	err = serv.sendResponse(conn, res)
 	if err != nil {
 		serv.ClientRemove(conn)
 	}
@@ -604,18 +604,18 @@ func (serv *Server) Start() {
 }
 
 //
-// SendResponse to client.
+// sendResponse to client.
 //
-func (serv *Server) SendResponse(conn int, res *Response) (err error) {
+func (serv *Server) sendResponse(conn int, res *Response) (err error) {
 	resb, err := json.Marshal(res)
 	if err != nil {
-		log.Println("websocket: server.SendResponse: " + err.Error())
+		log.Println("websocket: server.sendResponse: " + err.Error())
 		return
 	}
 
 	_, err = unix.Write(conn, resb)
 	if err != nil {
-		log.Println("websocket: server.SendResponse: " + err.Error())
+		log.Println("websocket: server.sendResponse: " + err.Error())
 	}
 
 	return
