@@ -260,7 +260,7 @@ func frameUnpack(in []byte) (f *Frame, x uint64) {
 	}
 	x += f.len
 
-	if f.opcode == opcodeClose {
+	if f.opcode == opcodeClose && f.len > 0 {
 		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[0:2]))
 		f.payload = f.payload[2:]
 	}
