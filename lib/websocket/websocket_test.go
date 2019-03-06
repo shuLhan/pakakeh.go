@@ -6,7 +6,7 @@ package websocket
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -79,15 +79,14 @@ func testHandleBin(conn int, payload []byte) {
 func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 	URL, err := url.ParseRequestURI(string(req.URI))
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	q := URL.Query()
 
 	extJWT := q.Get(_qKeyTicket)
 	if len(extJWT) == 0 {
-		err = errors.New("Missing authorization")
-		return
+		return nil, fmt.Errorf("Missing authorization")
 	}
 
 	ctx = context.WithValue(context.Background(), CtxKeyExternalJWT, extJWT)

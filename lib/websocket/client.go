@@ -30,7 +30,6 @@ const (
 // Client for websocket.
 //
 type Client struct {
-	state           connState
 	remoteURL       *url.URL
 	remoteAddr      string
 	handshakeHeader http.Header
@@ -161,12 +160,10 @@ func (cl *Client) open() (err error) {
 		cl.conn, err = dialer.Dial("tcp", cl.remoteAddr)
 	}
 	if err != nil {
-		return fmt.Errorf("websocket: open: " + err.Error())
+		return err
 	}
 
-	cl.state = connStateOpen
-
-	return
+	return nil
 }
 
 //
@@ -201,14 +198,13 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 	httpBuf := bufio.NewReader(bytes.NewBuffer(resp))
 
 	httpRes, err := http.ReadResponse(httpBuf, nil)
+	httpRes.Body.Close()
 	if err != nil {
-		cl.state = connStateError
 		return err
 	}
 
 	if httpRes.StatusCode != http.StatusSwitchingProtocols {
-		cl.state = connStateError
-		httpRes.Body.Close()
+		err = fmt.Errorf(httpRes.Status)
 		return err
 	}
 
@@ -216,15 +212,10 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 	gotAccept := httpRes.Header.Get(_hdrKeyWSAccept)
 	if expAccept != gotAccept {
 		err = fmt.Errorf("websocket: client.handleHandshake: invalid server accept key")
-		cl.state = connStateError
-		httpRes.Body.Close()
 		return err
 	}
 
-	cl.state = connStateConnected
-	httpRes.Body.Close()
-
-	return
+	return nil
 }
 
 //
@@ -242,6 +233,7 @@ func (cl *Client) connect() (err error) {
 
 	err = cl.handshake()
 	if err != nil {
+		_ = cl.conn.Close()
 		return err
 	}
 
@@ -277,7 +269,6 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 		log.Println("websocket: Client.SendClose: " + err.Error())
 	}
 	cl.conn = nil
-	cl.state = connStateClosed
 	close(cl.pingQueue)
 
 	return err
@@ -314,7 +305,7 @@ func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvH
 // method.
 //
 func (cl *Client) Recv() (frames *Frames, err error) {
-	if cl.state == connStateConnected {
+	if cl.conn == nil {
 		return nil, fmt.Errorf("websocket: client.Send: client is not connected")
 	}
 
@@ -379,7 +370,6 @@ func (cl *Client) Quit() {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
 	cl.conn = nil
-	cl.state = connStateClosed
 	close(cl.pingQueue)
 }
 
@@ -419,6 +409,10 @@ func handlePing(ctx context.Context, packet []byte) error {
 // recv read raw stream from server.
 //
 func (cl *Client) recv() (packet []byte, err error) {
+	if cl.conn == nil {
+		return nil, fmt.Errorf("websocket: client.SendBin: client is not connected")
+	}
+
 	cl.bb.Reset()
 	bs := _bsPool.Get().(*[]byte)
 
@@ -454,6 +448,10 @@ func (cl *Client) recv() (packet []byte, err error) {
 // send raw stream to server, read the response, and pass it to handler.
 //
 func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
+	if cl.conn == nil {
+		return fmt.Errorf("websocket: client.SendBin: client is not connected")
+	}
+
 	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
 		return err
@@ -477,7 +475,7 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 }
 
 func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handler ClientRecvHandler) (err error) {
-	if cl.state == connStateConnected {
+	if cl.conn == nil {
 		return fmt.Errorf("websocket: client.SendBin: client is not connected")
 	}
 

@@ -42,8 +42,8 @@ func TestNewClient(t *testing.T) {
 		expErr:   "websocket: NewClient: 400 Missing authorization",
 	}, {
 		desc:     "With closed connection",
-		endpoint: "ws://127.0.0.1",
-		expErr:   "websocket: NewClient: dial tcp 127.0.0.1:80: connect: connection refused",
+		endpoint: "ws://127.0.0.1:4444",
+		expErr:   "websocket: NewClient: dial tcp 127.0.0.1:4444: connect: connection refused",
 	}}
 
 	for _, c := range cases {
