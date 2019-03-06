@@ -25,39 +25,23 @@ import (
 //
 func Recv(fd int) (packet []byte, err error) {
 	bs := _bsPool.Get().(*[]byte)
-
-	n, err := unix.Read(fd, *bs)
-	if err != nil {
-		_bsPool.Put(bs)
-		return nil, err
-	}
-	if n == 0 {
-		_bsPool.Put(bs)
-		return nil, nil
-	}
-
 	bb := _bbPool.Get().(*bytes.Buffer)
 	bb.Reset()
 
-	for n == _maxBuffer {
+	for { // n == _maxBuffer
+		n, err := unix.Read(fd, *bs)
+		if err != nil {
+			break
+		}
 		_, err = bb.Write((*bs)[:n])
 		if err != nil {
-			goto out
+			break
 		}
-
-		n, err = unix.Read(fd, *bs)
-		if err != nil {
-			goto out
-		}
-	}
-	if n > 0 {
-		_, err = bb.Write((*bs)[:n])
-		if err != nil {
-			goto out
+		if n != _maxBuffer {
+			break
 		}
 	}
 
-out:
 	if err == nil {
 		packet = make([]byte, bb.Len())
 		copy(packet, bb.Bytes())
