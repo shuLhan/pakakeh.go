@@ -482,7 +482,8 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 //
 func (serv *Server) reader() {
 	var (
-		events [128]unix.EpollEvent
+		events    [128]unix.EpollEvent
+		isClosing bool
 	)
 
 	for {
@@ -506,10 +507,13 @@ func (serv *Server) reader() {
 				serv.ClientRemove(conn)
 				continue
 			}
+
+			isClosing = false
 			for _, frame := range frames.v {
 				if frame.masked != frameIsMasked {
 					serv.handleBadRequest(conn)
-					continue
+					isClosing = true
+					break
 				}
 
 				switch frame.opcode {
@@ -521,20 +525,26 @@ func (serv *Server) reader() {
 					serv.handleFragment(conn, frame)
 				case opcodeClose:
 					serv.handleClose(conn, frame)
+					isClosing = true
 				case opcodePing:
 					serv.handlePing(conn, frame)
 				case opcodePong:
 					// Ignore pong from client.
 				}
+				if isClosing {
+					break
+				}
 			}
 
-			// See https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
-			events[x].Events = unix.EPOLLIN | unix.EPOLLONESHOT
+			if !isClosing {
+				// See https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
+				events[x].Events = unix.EPOLLIN | unix.EPOLLONESHOT
 
-			err = unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_MOD, conn, &events[x])
-			if err != nil {
-				log.Println("websocket: server.reader: unix.EpollCtl: " + err.Error())
-				continue
+				err = unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_MOD, conn, &events[x])
+				if err != nil {
+					log.Println("websocket: server.reader: unix.EpollCtl: " + err.Error())
+					continue
+				}
 			}
 		}
 	}

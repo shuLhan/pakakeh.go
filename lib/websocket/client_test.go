@@ -92,7 +92,14 @@ func TestClientPing(t *testing.T) {
 
 	recvHandler := func(ctx context.Context, resp []byte) (err error) {
 		exp := ctx.Value(ctxKeyBytes).([]byte)
+
 		test.Assert(t, "resp", exp, resp, true)
+
+		frames := Unpack(resp)
+		if frames.IsClosed() {
+			testClient.SendClose(false)
+		}
+
 		return
 	}
 
