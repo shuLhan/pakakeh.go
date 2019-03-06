@@ -326,14 +326,14 @@ func (f *Frame) pack(randomMask bool) (out []byte) {
 		x += 2
 	}
 
-	if randomMask {
-		if _rng == nil {
-			_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-		}
-		binary.LittleEndian.PutUint32(f.maskKey[0:], _rng.Uint32())
-	}
-
 	if f.masked == frameIsMasked {
+		if randomMask {
+			if _rng == nil {
+				_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+			}
+			binary.LittleEndian.PutUint32(f.maskKey[0:], _rng.Uint32())
+		}
+
 		out[x] = f.maskKey[0]
 		x++
 		out[x] = f.maskKey[1]
