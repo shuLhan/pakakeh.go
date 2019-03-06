@@ -38,6 +38,8 @@ type Client struct {
 	bb              bytes.Buffer
 	pingQueue       chan *Frame
 	isTLS           bool
+
+	handlePing clientRawHandler
 }
 
 //
@@ -401,7 +403,7 @@ func (cl *Client) handleClose(ctx context.Context, packet []byte) error {
 // handlePing define a callback for SendPing() that expect server to response
 // with PONG frame.
 //
-func (cl *Client) handlePing(ctx context.Context, packet []byte) error {
+func handlePing(ctx context.Context, packet []byte) error {
 	f, _ := frameUnpack(packet)
 	if f == nil {
 		return fmt.Errorf("websocket: Client.handlePing: empty response")

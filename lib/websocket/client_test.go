@@ -40,6 +40,10 @@ func TestNewClient(t *testing.T) {
 		desc:     "Without credential",
 		endpoint: _testWSAddr,
 		expErr:   "websocket: NewClient: 400 Missing authorization",
+	}, {
+		desc:     "With closed connection",
+		endpoint: "ws://127.0.0.1",
+		expErr:   "websocket: NewClient: dial tcp 127.0.0.1:80: connect: connection refused",
 	}}
 
 	for _, c := range cases {
@@ -229,7 +233,7 @@ func TestClientFragmentation(t *testing.T) {
 
 	testClient, err := NewClient(endpoint, nil)
 	if err != nil {
-		t.Fatal("TestClientText: " + err.Error())
+		t.Fatal("TestClientFragmentation: " + err.Error())
 	}
 
 	cases := []struct {
@@ -336,6 +340,135 @@ func TestClientFragmentation(t *testing.T) {
 				testClient.SendClose(false)
 				break
 			}
+		}
+	}
+}
+
+func TestClientSendBin(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+
+	testClient, err := NewClient(endpoint, nil)
+	if err != nil {
+		t.Fatal("TestSendBin: NewClient: " + err.Error())
+	}
+
+	cases := []struct {
+		desc      string
+		reconnect bool
+		payload   []byte
+		exp       *Frame
+	}{{
+		desc:    "Single bin frame",
+		payload: []byte("Hello"),
+		exp: &Frame{
+			fin:     frameIsFinished,
+			opcode:  opcodeBin,
+			len:     5,
+			payload: []byte("Hello"),
+		},
+	}}
+
+	checkBinResponse := func(ctx context.Context, frames *Frames) error {
+		exp := ctx.Value(ctxKeyFrame).(*Frame)
+
+		test.Assert(t, "SendBin response", exp, frames.v[0], true)
+
+		if frames.IsClosed() {
+			testClient.SendClose(false)
+		}
+
+		return nil
+	}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		if c.reconnect {
+			err := testClient.connect()
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		ctx := context.WithValue(context.Background(), ctxKeyFrame, c.exp)
+
+		err := testClient.SendBin(ctx, c.payload, checkBinResponse)
+		if err != nil {
+			t.Fatal("TestSendBin: " + err.Error())
+		}
+	}
+}
+
+func TestClientSendPing(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+
+	testClient, err := NewClient(endpoint, nil)
+	if err != nil {
+		t.Fatal("TestSendBin: NewClient: " + err.Error())
+	}
+
+	cases := []struct {
+		desc      string
+		reconnect bool
+		payload   []byte
+		exp       *Frame
+	}{{
+		desc: "Without payload",
+		exp: &Frame{
+			fin:    frameIsFinished,
+			opcode: opcodePong,
+			len:    0,
+		},
+	}, {
+		desc:    "With payload",
+		payload: []byte("Test"),
+		exp: &Frame{
+			fin:     frameIsFinished,
+			opcode:  opcodePong,
+			len:     4,
+			payload: []byte("Test"),
+		},
+	}}
+
+	handlePing := func(ctx context.Context, packet []byte) error {
+		frames := Unpack(packet)
+
+		exp := ctx.Value(ctxKeyFrame).(*Frame)
+
+		test.Assert(t, "SendPing response", exp, frames.v[0], true)
+
+		if frames.IsClosed() {
+			testClient.SendClose(false)
+		}
+
+		return nil
+	}
+
+	testClient.handlePing = handlePing
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		if c.reconnect {
+			err := testClient.connect()
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		ctx := context.WithValue(context.Background(), ctxKeyFrame, c.exp)
+
+		err := testClient.SendPing(ctx, c.payload)
+		if err != nil {
+			t.Fatal("TestSendPing: " + err.Error())
 		}
 	}
 }
