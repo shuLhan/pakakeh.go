@@ -109,6 +109,11 @@ func (frames *Frames) Payload() (payload []byte) {
 			break
 		}
 
+		// Ignore control PING or PONG frame.
+		if frames.v[x].opcode == opcodePing || frames.v[x].opcode == opcodePong {
+			continue
+		}
+
 		payload = append(payload, frames.v[x].payload...)
 
 		if frames.v[x].fin == frameIsFinished {
