@@ -106,8 +106,10 @@ func (cl *Client) servePing() {
 }
 
 //
-// parseURI parse websocket connection URI from "endpoint" and set the
-// remoteURL.
+// parseURI parse websocket connection URI from "endpoint" and get the remote
+// URL (for checking up scheme) and remote address.
+// By default, if no port is given, it will set to 80 for URL with any scheme
+// or 443 for "wss" scheme.
 //
 // On success it will set the remote address that can be used on open().
 // On fail it will return an error.
@@ -116,38 +118,27 @@ func (cl *Client) parseURI(endpoint string) (err error) {
 	cl.remoteURL, err = url.ParseRequestURI(endpoint)
 	if err != nil {
 		cl = nil
-		return
+		return err
 	}
 
-	if cl.remoteURL.Scheme == "wss" {
-		cl.isTLS = true
-	}
-
-	cl.parseRemoteAddr()
-
-	return
-}
-
-//
-// parseRemoteAddr parse "host:port" from value in remote URL. By default, if
-// no port is given, it will set to 80 or 443, depends on URL scheme.
-//
-func (cl *Client) parseRemoteAddr() {
 	serverPort := cl.remoteURL.Port()
 
 	if len(serverPort) != 0 {
 		cl.remoteAddr = cl.remoteURL.Host
-		return
+		return nil
 	}
 
 	switch cl.remoteURL.Scheme {
 	case "wss":
 		serverPort = "443"
+		cl.isTLS = true
 	default:
 		serverPort = "80"
 	}
 
 	cl.remoteAddr = cl.remoteURL.Hostname() + ":" + serverPort
+
+	return nil
 }
 
 //
