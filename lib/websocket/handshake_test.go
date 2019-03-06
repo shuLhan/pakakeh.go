@@ -50,7 +50,7 @@ func TestHandshakeParseHTTPLine(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		h.Reset([]byte(c.req))
+		h.reset([]byte(c.req))
 
 		err := h.parseHTTPLine()
 		if err != nil {

@@ -87,9 +87,9 @@ type Handshake struct {
 }
 
 //
-// Reset all handshake values to zero or empty.
+// reset all handshake values to zero or empty.
 //
-func (h *Handshake) Reset(req []byte) {
+func (h *Handshake) reset(req []byte) {
 	h.start = 0
 	h.end = 0
 	h.headerFlags = 0
@@ -213,7 +213,7 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 }
 
 //
-// Parse HTTP request.
+// parse HTTP handshake request from client.
 //
 //	RFC6455 4.1-P17-19
 //
@@ -318,12 +318,12 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 //
 // The minimum length of request without HTTP line is: 144 - 16 = 128 bytes.
 //
-func (h *Handshake) Parse(req []byte) (err error) { // nolint
+func (h *Handshake) parse(req []byte) (err error) { // nolint
 	if len(req) < 144 {
 		return ErrRequestLength
 	}
 
-	h.Reset(req)
+	h.reset(req)
 
 	err = h.parseHTTPLine()
 	if err != nil {

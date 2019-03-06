@@ -163,7 +163,7 @@ func (serv *Server) handleUpgrade(httpRequest []byte) (
 ) {
 	handshake := _handshakePool.Get().(*Handshake)
 
-	err = handshake.Parse(httpRequest)
+	err = handshake.parse(httpRequest)
 	if err == nil {
 		key = libbytes.Copy(handshake.Key)
 		if serv.HandleAuth != nil {
@@ -171,7 +171,7 @@ func (serv *Server) handleUpgrade(httpRequest []byte) (
 		}
 	}
 
-	handshake.Reset(nil)
+	handshake.reset(nil)
 	_handshakePool.Put(handshake)
 
 	return ctx, key, err
