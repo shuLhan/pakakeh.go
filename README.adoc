@@ -44,13 +44,22 @@ A collection of libraries and tools written in Go.
 *  link:{url-godoc}/lib/errors[*errors*^]: Package errors provide an error
    type with code.
 
+*  link:{url-godoc}/lib/floats[*floats*^]: A library for working with slice of
+   floats.
+
 *  link:{url-godoc}/lib/git[*git*^]: A wrapper for git command line interface.
 
 *  link:{url-godoc}/lib/http[*http*^]: Custom HTTP server with memory file
    system and simplified routing handler.
 
-*  link:{url-godoc}/lib/ini[*ini*^]: Implement reading and writing INI
+*  link:{url-godoc}/lib/ini[*ini*^]: A library for reading and writing INI
    configuration as defined by Git configuration file syntax.
+
+*  link:{url-godoc}/lib/ints[*ints*^]: A library for working with slice of
+   integer.
+
+*  link:{url-godoc}/lib/ints[*ints64*^]: A library for working with slice of
+   64 bit integer.
 
 *  link:{url-godoc}/lib/io[*io*^]: A library for reading and watching file,
    and reading from standard input.

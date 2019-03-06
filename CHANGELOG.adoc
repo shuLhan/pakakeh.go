@@ -14,8 +14,17 @@ first week of next month.
 
 ===  Enhancements
 
+*  `bytes`:
+**  change the Copy return type to non pointer
+**  add function to concat slice of byte or string into []byte
+
 *  `ints`: add function to remove value from slice
-*  `websockets`: replace sync.Map in UserSockets with normal map and Mutex
+
+*  `websockets`:
+**  Rewrite most of client and server APIs to be more simple
+**  Minimize global variables and unexport internal constants and functions
+**  Handle interjected PING control frame from server
+**  Generate random mask only if masked field is set
 
 
 ==  share v0.4.0 (2019-03-01)

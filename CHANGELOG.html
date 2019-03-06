@@ -78,10 +78,39 @@ first week of next month.</p>
 <div class="ulist">
 <ul>
 <li>
+<p><code>bytes</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>change the Copy return type to non pointer</p>
+</li>
+<li>
+<p>add function to concat slice of byte or string into []byte</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><code>ints</code>: add function to remove value from slice</p>
 </li>
 <li>
-<p><code>websockets</code>: replace sync.Map in UserSockets with normal map and Mutex</p>
+<p><code>websockets</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Rewrite most of client and server APIs to be more simple</p>
+</li>
+<li>
+<p>Minimize global variables and unexport internal constants and functions</p>
+</li>
+<li>
+<p>Handle interjected PING control frame from server</p>
+</li>
+<li>
+<p>Generate random mask only if masked field is set</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
@@ -390,7 +419,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-03-02 06:31:21 +0700
+Last updated 2019-03-06 17:26:29 +0700
 </div>
 </div>
 </body>
