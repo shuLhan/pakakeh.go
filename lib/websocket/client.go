@@ -300,7 +300,7 @@ func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvH
 }
 
 //
-// Recv read message as frames from server.
+// Recv read one data frame from server.
 // One should not use this method manually, instead of the handler in Send()
 // method.
 //
@@ -309,53 +309,39 @@ func (cl *Client) Recv() (frames *Frames, err error) {
 		return nil, fmt.Errorf("websocket: client.Send: client is not connected")
 	}
 
-	cl.bb.Reset()
 	frames = &Frames{}
-	bs := _bsPool.Get().(*[]byte)
 
-	// Read all packet until we received frame with fin or operation code
-	// CLOSE.
+	// Read until we received frame with fin or control CLOSE frame.
 	for {
-		err = cl.conn.SetReadDeadline(time.Now().Add(defaultTimeout))
+		packet, err := cl.recv()
 		if err != nil {
-			goto out
+			return nil, err
 		}
 
-		n, err := cl.conn.Read(*bs)
-		if err != nil {
-			goto out
+		fs := Unpack(packet)
+		if fs == nil {
+			// Empty frames received, connection maybe lost.
+			return nil, fmt.Errorf("websocket: client.Recv: uncomplete frames")
 		}
-		_, err = cl.bb.Write((*bs)[:n])
-		if err != nil {
-			goto out
-		}
-		if n == _maxBuffer {
-			continue
-		}
-
-		f, _ := frameUnpack(cl.bb.Bytes())
-		if f == nil {
-			goto out
-		}
-		switch f.opcode {
-		case opcodePing:
-			cl.pingQueue <- f
-		case opcodePong:
-			// Ignore control PONG frame.
-		case opcodeClose:
-			frames.Append(f)
-			goto out
-		default:
-			frames.Append(f)
-			if f.fin == frameIsFinished {
+		for _, f := range fs.v {
+			switch f.opcode {
+			case opcodePing:
+				cl.pingQueue <- f
+			case opcodePong:
+				// Ignore control PONG frame.
+			case opcodeClose:
+				frames.Append(f)
 				goto out
+			default:
+				frames.Append(f)
+				if f.fin == frameIsFinished {
+					goto out
+				}
 			}
 		}
 	}
 
 out:
-	_bsPool.Put(bs)
-
 	return frames, err
 }
 
