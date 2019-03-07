@@ -17,6 +17,7 @@ import (
 var (
 	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14" //nolint: lll, gochecknoglobals
 
+	_testEndpointAuth   string                           //nolint: gochecknoglobals
 	_testInternalJWT    = _testExternalJWT               //nolint: gochecknoglobals
 	_testUID            = 100                            //nolint: gochecknoglobals
 	_testPort           = 9001                           //nolint: gochecknoglobals
@@ -100,6 +101,7 @@ func runTestServer() {
 	var err error
 
 	_testWSAddr = "ws://127.0.0.1:" + strconv.Itoa(_testPort) + "/"
+	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
 
 	_testServer, err = NewServer(_testPort)
 	if err != nil {

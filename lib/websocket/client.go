@@ -26,6 +26,10 @@ const (
 		"Sec-Websocket-Version: 13\r\n"
 )
 
+var (
+	errConnClosed = fmt.Errorf("websocket: client is not connected")
+)
+
 //
 // Client for websocket.
 //
@@ -306,7 +310,7 @@ func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvH
 //
 func (cl *Client) Recv() (frames *Frames, err error) {
 	if cl.conn == nil {
-		return nil, fmt.Errorf("websocket: client.Send: client is not connected")
+		return nil, errConnClosed
 	}
 
 	frames = &Frames{}
@@ -396,7 +400,7 @@ func handlePing(ctx context.Context, packet []byte) error {
 //
 func (cl *Client) recv() (packet []byte, err error) {
 	if cl.conn == nil {
-		return nil, fmt.Errorf("websocket: client.SendBin: client is not connected")
+		return nil, errConnClosed
 	}
 
 	cl.bb.Reset()
@@ -435,7 +439,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 //
 func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
 	if cl.conn == nil {
-		return fmt.Errorf("websocket: client.SendBin: client is not connected")
+		return errConnClosed
 	}
 
 	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
@@ -462,7 +466,7 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 
 func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handler ClientRecvHandler) (err error) {
 	if cl.conn == nil {
-		return fmt.Errorf("websocket: client.SendBin: client is not connected")
+		return errConnClosed
 	}
 
 	var packet []byte

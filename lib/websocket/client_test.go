@@ -32,7 +32,7 @@ func TestNewClient(t *testing.T) {
 		expErr: "websocket: NewClient: parse : empty url",
 	}, {
 		desc:     "With custom header",
-		endpoint: _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT,
+		endpoint: _testEndpointAuth,
 		headers: http.Header{
 			"Host":   []string{"myhost"},
 			"Origin": []string{"localhost"},
@@ -63,9 +63,7 @@ func TestClientPing(t *testing.T) {
 		runTestServer()
 	}
 
-	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	testClient, err := NewClient(endpoint, nil)
+	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		t.Fatal("TestClientPing: " + err.Error())
 	}
@@ -131,9 +129,7 @@ func TestClientText(t *testing.T) {
 		runTestServer()
 	}
 
-	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	testClient, err := NewClient(endpoint, nil)
+	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		t.Fatal("TestClientText: " + err.Error())
 	}
@@ -230,9 +226,7 @@ func TestClientFragmentation(t *testing.T) {
 		runTestServer()
 	}
 
-	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	testClient, err := NewClient(endpoint, nil)
+	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		t.Fatal("TestClientFragmentation: " + err.Error())
 	}
@@ -350,9 +344,7 @@ func TestClientSendBin(t *testing.T) {
 		runTestServer()
 	}
 
-	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	testClient, err := NewClient(endpoint, nil)
+	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		t.Fatal("TestSendBin: NewClient: " + err.Error())
 	}
@@ -402,6 +394,8 @@ func TestClientSendBin(t *testing.T) {
 			t.Fatal("TestSendBin: " + err.Error())
 		}
 	}
+
+	testClient.SendClose(true)
 }
 
 func TestClientSendPing(t *testing.T) {
@@ -409,37 +403,12 @@ func TestClientSendPing(t *testing.T) {
 		runTestServer()
 	}
 
-	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	testClient, err := NewClient(endpoint, nil)
+	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		t.Fatal("TestSendBin: NewClient: " + err.Error())
 	}
 
-	cases := []struct {
-		desc      string
-		reconnect bool
-		payload   []byte
-		exp       *Frame
-	}{{
-		desc: "Without payload",
-		exp: &Frame{
-			fin:    frameIsFinished,
-			opcode: opcodePong,
-			len:    0,
-		},
-	}, {
-		desc:    "With payload",
-		payload: []byte("Test"),
-		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  opcodePong,
-			len:     4,
-			payload: []byte("Test"),
-		},
-	}}
-
-	handlePing := func(ctx context.Context, packet []byte) error {
+	testHandlePing := func(ctx context.Context, packet []byte) error {
 		frames := Unpack(packet)
 
 		exp := ctx.Value(ctxKeyFrame).(*Frame)
@@ -453,7 +422,35 @@ func TestClientSendPing(t *testing.T) {
 		return nil
 	}
 
-	testClient.handlePing = handlePing
+	cases := []struct {
+		desc      string
+		reconnect bool
+		handler   clientRawHandler
+		payload   []byte
+		exp       *Frame
+	}{{
+		desc:    "Without payload",
+		handler: testHandlePing,
+		exp: &Frame{
+			fin:    frameIsFinished,
+			opcode: opcodePong,
+			len:    0,
+		},
+	}, {
+		desc:    "With payload",
+		handler: testHandlePing,
+		payload: []byte("Test"),
+		exp: &Frame{
+			fin:     frameIsFinished,
+			opcode:  opcodePong,
+			len:     4,
+			payload: []byte("Test"),
+		},
+	}, {
+		desc:    "With default handler",
+		handler: handlePing,
+		payload: []byte("Test"),
+	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -465,6 +462,8 @@ func TestClientSendPing(t *testing.T) {
 			}
 		}
 
+		testClient.handlePing = c.handler
+
 		ctx := context.WithValue(context.Background(), ctxKeyFrame, c.exp)
 
 		err := testClient.SendPing(ctx, c.payload)
@@ -472,6 +471,8 @@ func TestClientSendPing(t *testing.T) {
 			t.Fatal("TestSendPing: " + err.Error())
 		}
 	}
+
+	testClient.SendClose(true)
 }
 
 func cleanupServePing() {
@@ -506,9 +507,7 @@ func TestClientServePing(t *testing.T) {
 		wg.Done()
 	}
 
-	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
-
-	testClient, err := NewClient(endpoint, nil)
+	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		cleanupServePing()
 		t.Fatal("TestClientServePing: NewClient: " + err.Error())
@@ -529,4 +528,59 @@ func TestClientServePing(t *testing.T) {
 	wg.Done()
 
 	cleanupServePing()
+
+	testClient.SendClose(true)
+}
+
+func TestClientSendClose(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	testClient, err := NewClient(_testEndpointAuth, nil)
+	if err != nil {
+		t.Fatal("TestClientSendClose: NewClient: " + err.Error())
+	}
+
+	err = testClient.SendClose(true)
+	if err != nil {
+		t.Fatal("TestClientSendClose: " + err.Error())
+	}
+
+	test.Assert(t, "client.conn", nil, testClient.conn, true)
+
+	err = testClient.SendPing(context.Background(), nil)
+
+	test.Assert(t, "error", errConnClosed, err, true)
+}
+
+func TestClientQuit(t *testing.T) {
+	var wg sync.WaitGroup
+
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	_testServer.HandleClientRemove = func(ctx context.Context, conn int) {
+		gotUID := ctx.Value(CtxKeyUID).(uint64)
+		test.Assert(t, "context uid", uint64(_testUID), gotUID, true)
+		wg.Done()
+	}
+
+	testClient, err := NewClient(_testEndpointAuth, nil)
+	if err != nil {
+		t.Fatal("TestClientSendClose: NewClient: " + err.Error())
+	}
+
+	wg.Add(1)
+	testClient.Quit()
+
+	test.Assert(t, "client.conn", nil, testClient.conn, true)
+
+	err = testClient.SendPing(context.Background(), nil)
+
+	test.Assert(t, "error", errConnClosed, err, true)
+
+	wg.Wait()
+	_testServer.HandleClientRemove = nil
 }
