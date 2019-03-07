@@ -14,7 +14,10 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
+
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 const (
@@ -34,11 +37,13 @@ var (
 // Client for websocket.
 //
 type Client struct {
+	sync.Mutex
+	bb   bytes.Buffer
+	conn net.Conn
+
 	remoteURL       *url.URL
 	remoteAddr      string
 	handshakeHeader http.Header
-	conn            net.Conn
-	bb              bytes.Buffer
 	pingQueue       chan *Frame
 	isTLS           bool
 
@@ -195,7 +200,7 @@ func (cl *Client) handshake() (err error) {
 
 	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
 
-	return cl.send(ctx, cl.bb.Bytes(), cl.handleHandshake)
+	return cl.send(ctx, libbytes.Copy(cl.bb.Bytes()), cl.handleHandshake)
 }
 
 func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
@@ -227,7 +232,7 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 //
 func (cl *Client) connect() (err error) {
 	if cl.conn != nil {
-		_ = cl.conn.Close()
+		cl.Quit()
 	}
 
 	err = cl.open()
@@ -238,6 +243,7 @@ func (cl *Client) connect() (err error) {
 	err = cl.handshake()
 	if err != nil {
 		_ = cl.conn.Close()
+		cl.conn = nil
 		return err
 	}
 
@@ -268,12 +274,7 @@ func (cl *Client) SendClose(waitResponse bool) (err error) {
 		err = cl.send(context.Background(), packet, nil)
 	}
 
-	errClose := cl.conn.Close()
-	if errClose != nil {
-		log.Println("websocket: Client.SendClose: " + err.Error())
-	}
-	cl.conn = nil
-	close(cl.pingQueue)
+	cl.Quit()
 
 	return err
 }
@@ -355,12 +356,18 @@ out:
 // (e.g. lost connection) to release the resource.
 //
 func (cl *Client) Quit() {
+	cl.Lock()
+	if cl.conn == nil {
+		cl.Unlock()
+		return
+	}
 	err := cl.conn.Close()
 	if err != nil {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
 	cl.conn = nil
 	close(cl.pingQueue)
+	cl.Unlock()
 }
 
 //
@@ -389,7 +396,7 @@ func handlePing(ctx context.Context, packet []byte) error {
 		return fmt.Errorf("websocket: Client.handlePing: empty response")
 	}
 	if f.opcode != opcodePong {
-		return fmt.Errorf("websocket: Client.handleClose: expecting PONG frame, got %d",
+		return fmt.Errorf("websocket: Client.handlePing: expecting PONG frame, got %d",
 			f.opcode)
 	}
 	return nil
@@ -399,7 +406,9 @@ func handlePing(ctx context.Context, packet []byte) error {
 // recv read raw stream from server.
 //
 func (cl *Client) recv() (packet []byte, err error) {
+	cl.Lock()
 	if cl.conn == nil {
+		cl.Unlock()
 		return nil, errConnClosed
 	}
 
@@ -430,19 +439,25 @@ func (cl *Client) recv() (packet []byte, err error) {
 // send raw stream to server, read the response, and pass it to handler.
 //
 func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
+	cl.Lock()
 	if cl.conn == nil {
+		cl.Unlock()
 		return errConnClosed
 	}
 
 	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
+		cl.Unlock()
 		return err
 	}
 
 	_, err = cl.conn.Write(req)
 	if err != nil {
+		cl.Unlock()
 		return err
 	}
+
+	cl.Unlock()
 
 	if handleRaw != nil {
 		var resp []byte
@@ -450,14 +465,16 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 		if err != nil {
 			return err
 		}
-		err = handleRaw(ctx, resp)
+		return handleRaw(ctx, resp)
 	}
 
-	return err
+	return nil
 }
 
 func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handler ClientRecvHandler) (err error) {
+	cl.Lock()
 	if cl.conn == nil {
+		cl.Unlock()
 		return errConnClosed
 	}
 
@@ -471,13 +488,17 @@ func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handl
 
 	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
+		cl.Unlock()
 		return err
 	}
 
 	_, err = cl.conn.Write(packet)
 	if err != nil {
+		cl.Unlock()
 		return err
 	}
+
+	cl.Unlock()
 
 	if handler != nil {
 		var frames *Frames
@@ -486,8 +507,8 @@ func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handl
 			return err
 		}
 
-		err = handler(ctx, frames)
+		return handler(ctx, frames)
 	}
 
-	return err
+	return nil
 }

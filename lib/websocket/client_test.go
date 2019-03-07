@@ -5,6 +5,7 @@
 package websocket
 
 import (
+	"bytes"
 	"context"
 	"net/http"
 	"sync"
@@ -50,11 +51,13 @@ func TestNewClient(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_, err := NewClient(c.endpoint, c.headers)
+		testClient, err := NewClient(c.endpoint, c.headers)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
 		}
+
+		testClient.SendClose(true)
 	}
 }
 
@@ -122,6 +125,8 @@ func TestClientPing(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+
+	testClient.Quit()
 }
 
 func TestClientText(t *testing.T) {
@@ -141,63 +146,47 @@ func TestClientText(t *testing.T) {
 		exp       []byte
 	}{{
 		desc: "Small payload, unmasked",
-		req: []byte{
-			0x81, 0x05,
-			'H', 'e', 'l', 'l', 'o',
-		},
-		exp: NewFrameClose(false, StatusBadRequest, nil),
+		req:  NewFrameText(false, []byte("Hello")),
+		exp:  NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Small payload, masked",
 		reconnect: true,
-		req: []byte{
-			0x81, 0x85,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-			0x7f, 0x9f, 0x4d, 0x51, 0x58,
-		},
-		exp: NewFrameText(false, []byte("Hello")),
+		req:       NewFrameText(true, []byte("Hello")),
+		exp:       []byte("Hello"),
 	}, {
 		desc: "Medium payload 256, unmasked",
-		req:  libbytes.Concat([]byte{0x81, 0x7E, 0x01, 0x00}, _dummyPayload256),
-		exp:  NewFrameClose(false, StatusBadRequest, nil),
+		req:  NewFrameText(false, _dummyPayload256),
 	}, {
 		desc:      "Medium payload 256, masked",
 		reconnect: true,
-		req: libbytes.Concat([]byte{
-			0x81, 0xFE, 0x01, 0x00,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload256Masked),
-		exp: libbytes.Concat([]byte{
-			0x81, 0x7E, 0x01, 0x00,
-		}, _dummyPayload256),
+		req:       NewFrameText(true, _dummyPayload256),
+		exp:       _dummyPayload256,
 	}, {
 		desc: "Large payload 65536, unmasked",
-		req: libbytes.Concat([]byte{
-			0x81, 0x7F,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-		}, _dummyPayload65536),
-		exp: NewFrameClose(false, StatusBadRequest, nil),
+		req:  NewFrameText(false, _dummyPayload65536),
 	}, {
 		desc:      "Large payload 65536, masked",
 		reconnect: true,
-		req: libbytes.Concat([]byte{
-			0x81, 0xFF,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
-		}, _dummyPayload65536Masked),
-		exp: libbytes.Concat([]byte{
-			0x81, 0x7F,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-		}, _dummyPayload65536),
+		req:       NewFrameText(true, _dummyPayload65536),
+		exp:       _dummyPayload65536,
 	}}
 
 	recvHandler := func(ctx context.Context, resp []byte) (err error) {
 		exp := ctx.Value(ctxKeyBytes).([]byte)
 
-		test.Assert(t, "", exp, resp, true)
+		if len(exp) != len(resp) {
+			t.Logf("recvHandler first 4 bytes: % x\n", resp[:4])
+			t.Logf("recvHandler last  4 bytes: % x\n", resp[len(resp)-4:])
+		}
 
 		frames := Unpack(resp)
 		if frames.IsClosed() {
+			t.Log("sending close...")
 			testClient.SendClose(false)
+		} else {
+			got := frames.Payload()
+			test.Assert(t, "TestClientText len", len(exp), len(got), true)
+			test.Assert(t, "TestClientText", exp, got, true)
 		}
 
 		return nil
@@ -219,6 +208,9 @@ func TestClientText(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+
+	t.Log("Quit ...")
+	testClient.Quit()
 }
 
 func TestClientFragmentation(t *testing.T) {
@@ -235,7 +227,7 @@ func TestClientFragmentation(t *testing.T) {
 		desc      string
 		reconnect bool
 		frames    []Frame
-		exps      [][]byte
+		exp       []byte
 	}{{
 		desc: "Two text frames, unmasked",
 		frames: []Frame{{
@@ -247,9 +239,7 @@ func TestClientFragmentation(t *testing.T) {
 			opcode:  opcodeCont,
 			payload: []byte{'l', 'o'},
 		}},
-		exps: [][]byte{
-			NewFrameClose(false, StatusBadRequest, nil),
-		},
+		exp: NewFrameClose(false, StatusBadRequest, nil),
 	}, {
 		desc:      "Three text frames, unmasked",
 		reconnect: true,
@@ -266,11 +256,9 @@ func TestClientFragmentation(t *testing.T) {
 			opcode:  opcodeCont,
 			payload: []byte("Shulhan"),
 		}},
-		exps: [][]byte{
-			NewFrameClose(false, StatusBadRequest, nil),
-		},
+		exp: NewFrameClose(false, StatusBadRequest, nil),
 	}, {
-		desc:      "Three text frames with control message in the middle",
+		desc:      "Three text frames, masked",
 		reconnect: true,
 		frames: []Frame{{
 			fin:     0,
@@ -284,23 +272,11 @@ func TestClientFragmentation(t *testing.T) {
 			payload: []byte("lo, "),
 		}, {
 			fin:     frameIsFinished,
-			opcode:  opcodePing,
-			masked:  frameIsMasked,
-			payload: []byte("PING"),
-		}, {
-			fin:     frameIsFinished,
 			opcode:  opcodeCont,
 			masked:  frameIsMasked,
 			payload: []byte("Shulhan"),
 		}},
-		exps: [][]byte{
-			{0x8A, 0x04, 'P', 'I', 'N', 'G'}, // PONG with payload PING.
-			{
-				0x81, 0x0E,
-				'H', 'e', 'l', 'l', 'o', ',', ' ',
-				'S', 'h', 'u', 'l', 'h', 'a', 'n',
-			},
-		},
+		exp: NewFrameText(false, []byte("Hello, Shulhan")),
 	}}
 
 	for _, c := range cases {
@@ -322,21 +298,122 @@ func TestClientFragmentation(t *testing.T) {
 			}
 		}
 
-		for x := 0; x < len(c.exps); x++ {
-			res, err := testClient.recv()
-			if err != nil {
-				t.Fatal(err)
-			}
+		res, err := testClient.recv()
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			test.Assert(t, "res", c.exps[x], res, true)
+		test.Assert(t, "res", c.exp, res, true)
 
-			frames := Unpack(res)
-			if frames.IsClosed() {
-				testClient.SendClose(false)
-				break
-			}
+		frames := Unpack(res)
+		if frames.IsClosed() {
+			testClient.SendClose(false)
+			break
 		}
 	}
+
+	testClient.Quit()
+}
+
+func TestClientFragmentation2(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	testClient, err := NewClient(_testEndpointAuth, nil)
+	if err != nil {
+		t.Fatal("TestClientFragmentation2: " + err.Error())
+	}
+
+	frames := []Frame{{
+		fin:     0,
+		opcode:  opcodeText,
+		masked:  frameIsMasked,
+		payload: []byte("Hel"),
+	}, {
+		fin:     0,
+		opcode:  opcodeCont,
+		masked:  frameIsMasked,
+		payload: []byte("lo, "),
+	}, {
+		fin:     frameIsFinished,
+		opcode:  opcodePing,
+		masked:  frameIsMasked,
+		payload: []byte("PING"),
+	}, {
+		fin:     frameIsFinished,
+		opcode:  opcodeCont,
+		masked:  frameIsMasked,
+		payload: []byte("Shulhan"),
+	}}
+
+	exps := [][]byte{{
+		0x8A, 0x04, 'P', 'I', 'N', 'G',
+	}, {
+		0x81, 0x0E, 'H', 'e', 'l', 'l', 'o', ',', ' ',
+		'S', 'h', 'u', 'l', 'h', 'a', 'n',
+	}}
+
+	// Server may send PONG and data frame in one packet.
+	expMulti := [][]byte{
+		libbytes.Concat(exps[0], exps[1]),
+		libbytes.Concat(exps[1], exps[0]),
+	}
+
+	for x := 0; x < len(frames); x++ {
+		req := frames[x].pack(true)
+
+		err := testClient.send(context.Background(), req, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got, err := testClient.recv()
+	if err != nil {
+		t.Fatal("TestClientFragmentation2: recv: " + err.Error())
+	}
+
+	var foundMulti bool
+	for _, exp := range expMulti {
+		if bytes.Equal(exp, got) {
+			foundMulti = true
+			break
+		}
+	}
+	if foundMulti {
+		return
+	}
+	var foundPong, foundText bool
+	switch {
+	case bytes.Equal(exps[0], got):
+		foundPong = true
+	case bytes.Equal(exps[1], got):
+		foundText = true
+	}
+
+	got, err = testClient.recv()
+	if err != nil {
+		t.Fatal("TestClientFragmentation2: recv: " + err.Error())
+	}
+	switch {
+	case bytes.Equal(exps[0], got):
+		foundPong = true
+	case bytes.Equal(exps[1], got):
+		foundText = true
+	}
+
+	if foundPong && foundText {
+		return
+	}
+
+	if foundPong {
+		t.Fatal("No text response received")
+	} else {
+		t.Fatal("No pong response received")
+	}
+
+	testClient.SendClose(true)
 }
 
 func TestClientSendBin(t *testing.T) {
@@ -395,7 +472,7 @@ func TestClientSendBin(t *testing.T) {
 		}
 	}
 
-	testClient.SendClose(true)
+	testClient.Quit()
 }
 
 func TestClientSendPing(t *testing.T) {
@@ -416,6 +493,7 @@ func TestClientSendPing(t *testing.T) {
 		test.Assert(t, "SendPing response", exp, frames.v[0], true)
 
 		if frames.IsClosed() {
+			t.Log("TestClientSendPing closing ...")
 			testClient.SendClose(false)
 		}
 
@@ -472,7 +550,7 @@ func TestClientSendPing(t *testing.T) {
 		}
 	}
 
-	testClient.SendClose(true)
+	testClient.Quit()
 }
 
 func cleanupServePing() {
@@ -489,20 +567,22 @@ func TestClientServePing(t *testing.T) {
 	expPayload := []byte("ping from server")
 
 	//
-	// When client accepted by server, send ping immediately and expect to
-	// receive PONG response.
+	// When client accepted by server, send control PING immediately and
+	// expect to receive PONG response.
 	//
 	_testServer.HandleClientAdd = func(ctx context.Context, conn int) {
 		framePing := NewFramePing(false, expPayload)
-		err := Send(conn, framePing)
-		if err != nil {
-			cleanupServePing()
-			t.Fatal("TestClientServePing: handleClientAdd: Send: " + err.Error())
+		for x := 0; x < 3; x++ {
+			err := Send(conn, framePing)
+			if err != nil {
+				t.Fatal("TestClientServePing: HandleClientAdd: Send: " + err.Error())
+			}
 		}
+		t.Logf("TestClientServePing: HandleClientAdd: PING\n")
 	}
 
 	_testServer.handlePong = func(conn int, frame *Frame) {
-		cleanupServePing()
+		t.Logf("TestClientServePing: handlePong: % x\n", frame.payload)
 		test.Assert(t, "TestClientServePing", expPayload, frame.payload, true)
 		wg.Done()
 	}
@@ -513,23 +593,27 @@ func TestClientServePing(t *testing.T) {
 		t.Fatal("TestClientServePing: NewClient: " + err.Error())
 	}
 
-	packet, err := testClient.recv()
-	if err != nil {
-		cleanupServePing()
-		t.Fatal("TestClientServePing: Recv: " + err.Error())
+	// Read PING from server.HandleClientAdd.
+	var frames *Frames
+	for frames == nil {
+		packet, err := testClient.recv()
+		if err != nil {
+			cleanupServePing()
+			t.Fatal("TestClientServePing: Recv: " + err.Error())
+		}
 
+		frames = Unpack(packet)
 	}
 
-	frame, _ := frameUnpack(packet)
-	test.Assert(t, "Client receive", expPayload, frame.payload, true)
+	test.Assert(t, "Client receive", expPayload, frames.v[0].payload, true)
 
 	wg.Add(1)
-	testClient.pingQueue <- frame
-	wg.Done()
+	testClient.pingQueue <- frames.v[0]
+	wg.Wait()
 
 	cleanupServePing()
 
-	testClient.SendClose(true)
+	testClient.Quit()
 }
 
 func TestClientSendClose(t *testing.T) {
