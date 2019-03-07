@@ -19,7 +19,7 @@ var (
 
 	_testEndpointAuth   string                           //nolint: gochecknoglobals
 	_testInternalJWT    = _testExternalJWT               //nolint: gochecknoglobals
-	_testUID            = 100                            //nolint: gochecknoglobals
+	_testUID            = uint64(100)                    //nolint: gochecknoglobals
 	_testPort           = 9001                           //nolint: gochecknoglobals
 	_testServer         *Server                          //nolint: gochecknoglobals
 	_testWSAddr         string                           //nolint: gochecknoglobals
@@ -92,7 +92,7 @@ func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 
 	ctx = context.WithValue(context.Background(), CtxKeyExternalJWT, extJWT)
 	ctx = context.WithValue(ctx, CtxKeyInternalJWT, _testInternalJWT)
-	ctx = context.WithValue(ctx, CtxKeyUID, uint64(_testUID))
+	ctx = context.WithValue(ctx, CtxKeyUID, _testUID)
 
 	return
 }

@@ -563,7 +563,7 @@ func TestClientQuit(t *testing.T) {
 
 	_testServer.HandleClientRemove = func(ctx context.Context, conn int) {
 		gotUID := ctx.Value(CtxKeyUID).(uint64)
-		test.Assert(t, "context uid", uint64(_testUID), gotUID, true)
+		test.Assert(t, "context uid", _testUID, gotUID, true)
 		wg.Done()
 	}
 
