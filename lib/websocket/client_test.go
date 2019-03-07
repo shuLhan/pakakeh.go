@@ -7,6 +7,7 @@ package websocket
 import (
 	"context"
 	"net/http"
+	"sync"
 	"testing"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -471,4 +472,61 @@ func TestClientSendPing(t *testing.T) {
 			t.Fatal("TestSendPing: " + err.Error())
 		}
 	}
+}
+
+func cleanupServePing() {
+	_testServer.HandleClientAdd = nil
+	_testServer.handlePong = nil
+}
+
+func TestClientServePing(t *testing.T) {
+	if _testServer == nil {
+		runTestServer()
+	}
+
+	var wg sync.WaitGroup
+	expPayload := []byte("ping from server")
+
+	//
+	// When client accepted by server, send ping immediately and expect to
+	// receive PONG response.
+	//
+	_testServer.HandleClientAdd = func(ctx context.Context, conn int) {
+		framePing := NewFramePing(false, expPayload)
+		err := Send(conn, framePing)
+		if err != nil {
+			cleanupServePing()
+			t.Fatal("TestClientServePing: handleClientAdd: Send: " + err.Error())
+		}
+	}
+
+	_testServer.handlePong = func(conn int, frame *Frame) {
+		cleanupServePing()
+		test.Assert(t, "TestClientServePing", expPayload, frame.payload, true)
+		wg.Done()
+	}
+
+	endpoint := _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+
+	testClient, err := NewClient(endpoint, nil)
+	if err != nil {
+		cleanupServePing()
+		t.Fatal("TestClientServePing: NewClient: " + err.Error())
+	}
+
+	packet, err := testClient.recv()
+	if err != nil {
+		cleanupServePing()
+		t.Fatal("TestClientServePing: Recv: " + err.Error())
+
+	}
+
+	frame, _ := frameUnpack(packet)
+	test.Assert(t, "Client receive", expPayload, frame.payload, true)
+
+	wg.Add(1)
+	testClient.pingQueue <- frame
+	wg.Done()
+
+	cleanupServePing()
 }

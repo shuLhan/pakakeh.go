@@ -62,6 +62,10 @@ type Server struct {
 	// HandleBin callback that will be called after receiving data
 	// frame(s) binary from client.
 	HandleBin HandlerPayloadFn
+
+	// handlePong callback that will be called after receiving control
+	// PONG frame from client. Default is nil, used only for testing.
+	handlePong handlerFrameFn
 }
 
 //
@@ -529,7 +533,9 @@ func (serv *Server) reader() {
 				case opcodePing:
 					serv.handlePing(conn, frame)
 				case opcodePong:
-					// Ignore pong from client.
+					if serv.handlePong != nil {
+						go serv.handlePong(conn, frame)
+					}
 				}
 				if isClosing {
 					break
