@@ -146,7 +146,7 @@ func (serv *Server) RegisterTextHandler(method, target string, handler RouteHand
 func (serv *Server) handleError(conn int, code int, msg string) {
 	rspBody := "HTTP/1.1 " + strconv.Itoa(code) + " " + msg + "\r\n\r\n"
 
-	_, err := unix.Write(conn, []byte(rspBody))
+	err := Send(conn, []byte(rspBody))
 	if err != nil {
 		log.Println("websocket: server.handleError: " + err.Error())
 	}
@@ -260,7 +260,7 @@ func (serv *Server) upgrader() {
 
 		fmt.Fprintf(bb, _resUpgradeOK, wsAccept)
 
-		_, err = unix.Write(conn, bb.Bytes())
+		err = Send(conn, libbytes.Copy(bb.Bytes()))
 		_bbPool.Put(bb)
 
 		if err != nil {
@@ -421,7 +421,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 
 	res := req.pack(false)
 
-	_, err := unix.Write(conn, res)
+	err := Send(conn, res)
 	if err != nil {
 		log.Println("websocket: server.handleClose: " + err.Error())
 	}
@@ -464,7 +464,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 
 	res := req.pack(false)
 
-	_, err := unix.Write(conn, res)
+	err := Send(conn, res)
 	if err != nil {
 		log.Println("websocket: server.handlePing: " + err.Error())
 		serv.ClientRemove(conn)
@@ -568,7 +568,7 @@ func (serv *Server) pinger() {
 		all := serv.Clients.All()
 
 		for _, conn := range all {
-			_, err := unix.Write(conn, framePing)
+			err := Send(conn, framePing)
 			if err != nil {
 				// Error on sending PING will be assumed as
 				// bad connection.
@@ -607,7 +607,7 @@ func (serv *Server) sendResponse(conn int, res *Response) (err error) {
 		return
 	}
 
-	_, err = unix.Write(conn, resb)
+	err = Send(conn, resb)
 	if err != nil {
 		log.Println("websocket: server.sendResponse: " + err.Error())
 	}
