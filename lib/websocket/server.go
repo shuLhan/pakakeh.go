@@ -5,11 +5,9 @@
 package websocket
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -27,7 +25,7 @@ const (
 	_resUpgradeOK = "HTTP/1.1 101 Switching Protocols\r\n" +
 		"Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" +
-		"Sec-Websocket-Accept: %s\r\n\r\n"
+		"Sec-Websocket-Accept: "
 )
 
 //
@@ -255,23 +253,18 @@ func (serv *Server) upgrader() {
 
 		wsAccept := generateHandshakeAccept(key)
 
-		bb := _bbPool.Get().(*bytes.Buffer)
-		bb.Reset()
+		httpRes := _resUpgradeOK + wsAccept + "\r\n\r\n"
 
-		fmt.Fprintf(bb, _resUpgradeOK, wsAccept)
-
-		err = Send(conn, libbytes.Copy(bb.Bytes()))
-		_bbPool.Put(bb)
-
+		err = Send(conn, []byte(httpRes))
 		if err != nil {
-			log.Println("websocket: server.upgrader: " + err.Error())
+			log.Println("websocket: server.upgrader: Send: " + err.Error())
 			unix.Close(conn)
 			continue
 		}
 
 		err = serv.clientAdd(ctx, conn)
 		if err != nil {
-			log.Println("websocket: server.upgrader: " + err.Error())
+			log.Println("websocket: server.upgrader: clientAdd: " + err.Error())
 			unix.Close(conn)
 		}
 	}
