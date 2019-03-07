@@ -16,8 +16,6 @@ import (
 	"net/url"
 	"sync"
 	"time"
-
-	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 const (
@@ -38,7 +36,6 @@ var (
 //
 type Client struct {
 	sync.Mutex
-	bb   bytes.Buffer
 	conn net.Conn
 
 	remoteURL       *url.URL
@@ -179,28 +176,29 @@ func (cl *Client) open() (err error) {
 // handshake send the websocket opening handshake.
 //
 func (cl *Client) handshake() (err error) {
-	cl.bb.Reset()
+	var bb bytes.Buffer
+
 	path := cl.remoteURL.EscapedPath() + "?" + cl.remoteURL.RawQuery
 	key := generateHandshakeKey()
 	keyAccept := generateHandshakeAccept(key)
 
-	_, err = fmt.Fprintf(&cl.bb, _handshakeReqFormat, path, cl.remoteURL.Host, key)
+	_, err = fmt.Fprintf(&bb, _handshakeReqFormat, path, cl.remoteURL.Host, key)
 	if err != nil {
 		return err
 	}
 
 	if len(cl.handshakeHeader) > 0 {
-		err = cl.handshakeHeader.Write(&cl.bb)
+		err = cl.handshakeHeader.Write(&bb)
 		if err != nil {
 			return err
 		}
 	}
 
-	cl.bb.Write([]byte{'\r', '\n'})
+	bb.WriteString("\r\n")
 
 	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
 
-	return cl.send(ctx, libbytes.Copy(cl.bb.Bytes()), cl.handleHandshake)
+	return cl.send(ctx, bb.Bytes(), cl.handleHandshake)
 }
 
 func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
