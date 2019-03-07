@@ -403,8 +403,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 		return nil, errConnClosed
 	}
 
-	cl.bb.Reset()
-	bs := _bsPool.Get().(*[]byte)
+	buf := make([]byte, 512)
 
 	for {
 		err = cl.conn.SetReadDeadline(time.Now().Add(defaultTimeout))
@@ -412,24 +411,17 @@ func (cl *Client) recv() (packet []byte, err error) {
 			break
 		}
 
-		n, err := cl.conn.Read(*bs)
-		if err != nil {
+		n, err := cl.conn.Read(buf)
+		if err != nil || n == 0 {
 			break
 		}
-
-		_, err = cl.bb.Write((*bs)[:n])
-		if err != nil {
-			break
-		}
-
-		if n != _maxBuffer {
+		packet = append(packet, buf[:n]...)
+		if n < len(buf) {
 			break
 		}
 	}
 
-	packet = cl.bb.Bytes()
-
-	_bsPool.Put(bs)
+	cl.Unlock()
 
 	return packet, err
 }

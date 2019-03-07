@@ -53,10 +53,3 @@ var _bbPool = sync.Pool{ //nolint: gochecknoglobals
 		return new(bytes.Buffer)
 	},
 }
-
-var _bsPool = sync.Pool{ //nolint: gochecknoglobals
-	New: func() interface{} {
-		bs := make([]byte, _maxBuffer)
-		return &bs
-	},
-}

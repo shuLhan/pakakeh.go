@@ -5,7 +5,6 @@
 package websocket
 
 import (
-	"bytes"
 	"crypto/sha1" //nolint: gosec
 	"encoding/base64"
 	"encoding/binary"
@@ -24,31 +23,18 @@ import (
 // On fail it will return nil buffer and error.
 //
 func Recv(fd int) (packet []byte, err error) {
-	bs := _bsPool.Get().(*[]byte)
-	bb := _bbPool.Get().(*bytes.Buffer)
-	bb.Reset()
+	buf := make([]byte, 512)
 
 	for { // n == _maxBuffer
-		n, err := unix.Read(fd, *bs)
-		if err != nil {
+		n, err := unix.Read(fd, buf)
+		if err != nil || n == 0 {
 			break
 		}
-		_, err = bb.Write((*bs)[:n])
-		if err != nil {
-			break
-		}
-		if n != _maxBuffer {
+		packet = append(packet, buf[:n]...)
+		if n < len(buf) {
 			break
 		}
 	}
-
-	if err == nil {
-		packet = make([]byte, bb.Len())
-		copy(packet, bb.Bytes())
-	}
-
-	_bbPool.Put(bb)
-	_bsPool.Put(bs)
 
 	return packet, err
 }
