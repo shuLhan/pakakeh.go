@@ -1,3 +1,5 @@
+This note document a benchmark between gobwas vs our websocket library.
+
 # github.com/gobwas/ws@v0.1.0
 
 ## Go v1.10.3
@@ -81,28 +83,61 @@ BenchmarkUpgrader/bad_sec_key#01-8               5000000              369 ns/op 
 PASS
 ok      github.com/shuLhan/share/lib/websocket  50.192s
 
-## Go version devel +23d7031dcf (>1.12)
+## Go v1.12
+
+websocket version: 8dec8c9
+Benchmark date   : Thu  7 Mar 22:09:17 WIB 2019
 
 goos: linux
 goarch: amd64
 pkg: github.com/shuLhan/share/lib/websocket
-BenchmarkUpgrader/base-8                        10000000               159 ns/op              32 B/op          1 allocs/op
-BenchmarkUpgrader/lowercase-8                   10000000               156 ns/op              32 B/op          1 allocs/op
-BenchmarkUpgrader/uppercase-8                   10000000               155 ns/op              32 B/op          1 allocs/op
-BenchmarkUpgrader/subproto-8                    10000000               134 ns/op               0 B/op          0 allocs/op
-BenchmarkUpgrader/subproto_comma-8              10000000               183 ns/op              32 B/op          1 allocs/op
-BenchmarkUpgrader/#00-8                         10000000               139 ns/op               0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_http_method-8             50000000                25.6 ns/op             0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_http_proto-8              50000000                32.1 ns/op             0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_host-8                    50000000                25.0 ns/op             0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_upgrade-8                 50000000                24.5 ns/op             0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_upgrade#01-8               5000000               371 ns/op             453 B/op          6 allocs/op
+BenchmarkUpgrader/base-8                        10000000               165 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/lowercase-8                   10000000               165 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/uppercase-8                   10000000               163 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/subproto-8                    10000000               133 ns/op               0 B/op          0 allocs/op
+BenchmarkUpgrader/subproto_comma-8              10000000               192 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/#00-8                         10000000               144 ns/op               0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_http_method-8             50000000                25.4 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_http_proto-8              50000000                30.9 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_host-8                    50000000                24.2 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_upgrade-8                 50000000                24.3 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_upgrade#01-8               5000000               381 ns/op             453 B/op          6 allocs/op
 BenchmarkUpgrader/bad_upgrade#02-8              10000000               133 ns/op               0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_connection-8              50000000                24.8 ns/op             0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_connection#01-8           20000000                93.2 ns/op             0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_sec_version_x-8           50000000                24.9 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_connection-8              50000000                24.4 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_connection#01-8           20000000                91.8 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_sec_version_x-8           50000000                24.4 ns/op             0 B/op          0 allocs/op
 BenchmarkUpgrader/bad_sec_version-8             20000000               112 ns/op               0 B/op          0 allocs/op
-BenchmarkUpgrader/bad_sec_key-8                 10000000               158 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/bad_sec_key-8                 10000000               165 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/bad_sec_key#01-8              10000000               166 ns/op              32 B/op          1 allocs/op
+PASS
+ok      github.com/shuLhan/share/lib/websocket  49.379s
+
+
+## Go version devel +05b3db24 (>1.12)
+
+websocket version: 8dec8c9
+Benchmark date   : Thu  7 Mar 22:09:17 WIB 2019
+
+goos: linux
+goarch: amd64
+pkg: github.com/shuLhan/share/lib/websocket
+BenchmarkUpgrader/base-8                        10000000               156 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/lowercase-8                   10000000               160 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/uppercase-8                   10000000               153 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/subproto-8                    10000000               137 ns/op               0 B/op          0 allocs/op
+BenchmarkUpgrader/subproto_comma-8              10000000               181 ns/op              32 B/op          1 allocs/op
+BenchmarkUpgrader/#00-8                         10000000               143 ns/op               0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_http_method-8             50000000                25.0 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_http_proto-8              50000000                31.6 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_host-8                    50000000                24.6 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_upgrade-8                 50000000                24.5 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_upgrade#01-8               5000000               372 ns/op             453 B/op          6 allocs/op
+BenchmarkUpgrader/bad_upgrade#02-8              10000000               133 ns/op               0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_connection-8             100000000                23.4 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_connection#01-8           20000000                92.7 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_sec_version_x-8          100000000                23.3 ns/op             0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_sec_version-8             20000000               113 ns/op               0 B/op          0 allocs/op
+BenchmarkUpgrader/bad_sec_key-8                 10000000               154 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/bad_sec_key#01-8              10000000               157 ns/op              32 B/op          1 allocs/op
 PASS
-ok      github.com/shuLhan/share/lib/websocket  48.943s
+ok      github.com/shuLhan/share/lib/websocket  52.285s
