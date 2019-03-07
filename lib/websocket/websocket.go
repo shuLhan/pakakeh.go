@@ -40,7 +40,6 @@ const (
 )
 
 const (
-	_maxBuffer  = 8096
 	_qKeyTicket = "ticket"
 )
 
