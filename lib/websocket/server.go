@@ -34,10 +34,12 @@ const (
 type Server struct {
 	Clients *ClientManager
 
-	sock      int
-	chUpgrade chan int
-	epollRead int
-	routes    *rootRoute
+	pingTicker *time.Ticker
+	port       int
+	sock       int
+	chUpgrade  chan int
+	epollRead  int
+	routes     *rootRoute
 
 	// HandleAuth callback that will be called when receiving
 	// client handshake.
@@ -71,19 +73,9 @@ type Server struct {
 //
 func NewServer(port int) (serv *Server, err error) {
 	serv = &Server{
-		chUpgrade: make(chan int, _maxQueue),
-		Clients:   newClientManager(),
-		routes:    newRootRoute(),
-	}
-
-	err = serv.createEpoolRead()
-	if err != nil {
-		return
-	}
-
-	err = serv.createSockServer(port)
-	if err != nil {
-		return
+		port:    port,
+		Clients: newClientManager(),
+		routes:  newRootRoute(),
 	}
 
 	serv.HandleText = serv.handleText
@@ -103,7 +95,7 @@ func (serv *Server) createEpoolRead() (err error) {
 	return
 }
 
-func (serv *Server) createSockServer(port int) (err error) {
+func (serv *Server) createSockServer() (err error) {
 	serv.sock, err = unix.Socket(unix.AF_INET, unix.SOCK_STREAM, 0)
 	if err != nil {
 		return
@@ -114,7 +106,7 @@ func (serv *Server) createSockServer(port int) (err error) {
 		return
 	}
 
-	addr := unix.SockaddrInet4{Port: port}
+	addr := unix.SockaddrInet4{Port: serv.port}
 	copy(addr.Addr[:], net.ParseIP("0.0.0.0").To4())
 
 	err = unix.Bind(serv.sock, &addr)
@@ -554,10 +546,10 @@ func (serv *Server) reader() {
 // every N seconds.
 //
 func (serv *Server) pinger() {
-	ticker := time.NewTicker(16 * time.Second)
+	serv.pingTicker = time.NewTicker(16 * time.Second)
 	framePing := NewFramePing(false, nil)
 
-	for range ticker.C {
+	for range serv.pingTicker.C {
 		all := serv.Clients.All()
 
 		for _, conn := range all {
@@ -569,18 +561,32 @@ func (serv *Server) pinger() {
 			}
 		}
 	}
+	// The ticker only closed by Stop.
 }
 
 //
 // Start accepting incoming connection from clients.
 //
-func (serv *Server) Start() {
+func (serv *Server) Start() (err error) {
+	err = serv.createSockServer()
+	if err != nil {
+		return
+	}
+
+	serv.chUpgrade = make(chan int, _maxQueue)
 	go serv.upgrader()
+
+	err = serv.createEpoolRead()
+	if err != nil {
+		return
+	}
 	go serv.reader()
+
 	go serv.pinger()
 
+	var conn int
 	for {
-		conn, _, err := unix.Accept(serv.sock)
+		conn, _, err = unix.Accept(serv.sock)
 		if err != nil {
 			log.Println("websocket: unix.Accept: " + err.Error())
 			return
@@ -588,6 +594,22 @@ func (serv *Server) Start() {
 
 		serv.chUpgrade <- conn
 	}
+}
+
+//
+// Stop the server.
+//
+func (serv *Server) Stop() {
+	err := unix.Close(serv.sock)
+	if err != nil {
+		log.Println("websocket: Stop: unix.Close: " + err.Error())
+	}
+
+	serv.pingTicker.Stop()
+
+	unix.Close(serv.epollRead)
+
+	close(serv.chUpgrade)
 }
 
 //
