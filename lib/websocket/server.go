@@ -564,7 +564,8 @@ func (serv *Server) reader() {
 				case opcodeCont, opcodeText, opcodeBin:
 					serv.handleFragment(conn, frame)
 				case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
-					serv.handleFragment(conn, frame)
+					serv.handleBadRequest(conn)
+					isClosing = true
 				case opcodeClose:
 					serv.handleClose(conn, frame)
 					isClosing = true
@@ -577,6 +578,9 @@ func (serv *Server) reader() {
 				case opcodeControlRsvB, opcodeControlRsvC, opcodeControlRsvD, opcodeControlRsvE, opcodeControlRsvF:
 					if serv.HandleRsvControl != nil {
 						serv.HandleRsvControl(conn, frame)
+					} else {
+						serv.handleClose(conn, frame)
+						isClosing = true
 					}
 				}
 				if isClosing {
