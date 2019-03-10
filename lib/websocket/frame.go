@@ -283,12 +283,12 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	}
 
 	if f.len > 0 {
-		if len(in)-x < int(f.len) {
-			f.payload = make([]byte, len(in)-x)
-		} else {
-			f.payload = make([]byte, f.len)
+		f.payload = make([]byte, 0, f.len)
+		paylen := len(in) - x
+		if uint64(paylen) > f.len {
+			paylen = int(f.len)
 		}
-		copy(f.payload, in[x:])
+		f.payload = append(f.payload, in[x:x+paylen]...)
 
 		if f.masked == frameIsMasked {
 			for y := 0; y < len(f.payload); y++ {
