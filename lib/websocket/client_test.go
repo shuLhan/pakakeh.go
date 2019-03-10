@@ -587,9 +587,10 @@ func TestClientServePing(t *testing.T) {
 		wg.Done()
 	}
 
+	defer cleanupServePing()
+
 	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
-		cleanupServePing()
 		t.Fatal("TestClientServePing: NewClient: " + err.Error())
 	}
 
@@ -598,7 +599,6 @@ func TestClientServePing(t *testing.T) {
 	for frames == nil {
 		packet, err := testClient.recv()
 		if err != nil {
-			cleanupServePing()
 			t.Fatal("TestClientServePing: Recv: " + err.Error())
 		}
 
@@ -610,8 +610,6 @@ func TestClientServePing(t *testing.T) {
 	wg.Add(1)
 	testClient.pingQueue <- frames.v[0]
 	wg.Wait()
-
-	cleanupServePing()
 
 	testClient.Quit()
 }
@@ -651,6 +649,10 @@ func TestClientQuit(t *testing.T) {
 		wg.Done()
 	}
 
+	defer func() {
+		_testServer.HandleClientRemove = nil
+	}()
+
 	testClient, err := NewClient(_testEndpointAuth, nil)
 	if err != nil {
 		t.Fatal("TestClientSendClose: NewClient: " + err.Error())
@@ -666,5 +668,4 @@ func TestClientQuit(t *testing.T) {
 	test.Assert(t, "error", errConnClosed, err, true)
 
 	wg.Wait()
-	_testServer.HandleClientRemove = nil
 }
