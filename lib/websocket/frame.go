@@ -19,6 +19,11 @@ type Frame struct {
 	// The first fragment MAY also be the final fragment.
 	fin byte
 
+	// rsv1, rsv2, and rsv3 is reserved bits in frame.
+	rsv1 byte
+	rsv2 byte
+	rsv3 byte
+
 	// opcode (4 bits) defines the interpretation of the "Payload data".
 	// If an unknown opcode is received, the receiving endpoint MUST _Fail
 	// the WebSocket Connection_.  The following values are defined.
@@ -209,6 +214,9 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	x := 0
 
 	f.fin = in[x] & frameIsFinished
+	f.rsv1 = in[x] & 0x40
+	f.rsv2 = in[x] & 0x20
+	f.rsv3 = in[x] & 0x10
 	f.opcode = opcode(in[x] & 0x0F)
 	x++
 	if x >= len(in) {

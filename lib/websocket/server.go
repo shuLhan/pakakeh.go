@@ -72,6 +72,10 @@ type Server struct {
 	// handlePong callback that will be called after receiving control
 	// PONG frame from client. Default is nil, used only for testing.
 	handlePong HandlerFrameFn
+
+	allowRsv1 bool
+	allowRsv2 bool
+	allowRsv3 bool
 }
 
 //
@@ -91,6 +95,21 @@ func NewServer(port int) (serv *Server, err error) {
 	serv.HandleText = serv.handleText
 
 	return
+}
+
+//
+// AllowReservedBits allow receiving frame with RSV1, RSV2, or RSV3 bit set.
+// Calling this function means server has negotiated the extension that use
+// the reserved bits through handshake with client using HandleAuth.
+//
+// If a nonzero value is received in reserved bits and none of the negotiated
+// extensions defines the meaning of such a nonzero value, server will close
+// the connection (RFC 6455, section 5.2).
+//
+func (serv *Server) AllowReservedBits(one, two, three bool) {
+	serv.allowRsv1 = one
+	serv.allowRsv2 = two
+	serv.allowRsv3 = three
 }
 
 func (serv *Server) createEpoolRead() (err error) {
@@ -521,6 +540,21 @@ func (serv *Server) reader() {
 			isClosing = false
 			for _, frame := range frames.v {
 				if frame.masked != frameIsMasked {
+					serv.handleBadRequest(conn)
+					isClosing = true
+					break
+				}
+				if frame.rsv1 > 0 && !serv.allowRsv1 {
+					serv.handleBadRequest(conn)
+					isClosing = true
+					break
+				}
+				if frame.rsv2 > 0 && !serv.allowRsv2 {
+					serv.handleBadRequest(conn)
+					isClosing = true
+					break
+				}
+				if frame.rsv3 > 0 && !serv.allowRsv3 {
 					serv.handleBadRequest(conn)
 					isClosing = true
 					break
