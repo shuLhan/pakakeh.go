@@ -113,7 +113,12 @@ func runTestServer() {
 	_testServer.HandleBin = testHandleBin
 	_testServer.HandleText = testHandleText
 
-	go _testServer.Start()
+	go func() {
+		err = _testServer.Start()
+		if err != nil {
+			log.Fatal("runTestServer: " + err.Error())
+		}
+	}()
 }
 
 func TestMain(m *testing.M) {
