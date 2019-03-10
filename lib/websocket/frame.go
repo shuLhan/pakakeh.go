@@ -298,9 +298,16 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	}
 	x += len(f.payload)
 
-	if f.opcode == opcodeClose && len(f.payload) >= 2 {
-		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[:2]))
-		f.payload = f.payload[2:]
+	if f.opcode == opcodeClose {
+		switch len(f.payload) {
+		case 0:
+			f.closeCode = StatusNormal
+		case 1:
+			f.closeCode = StatusBadRequest
+		default:
+			f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[:2]))
+			f.payload = f.payload[2:]
+		}
 	}
 
 	return f, in[x:]
