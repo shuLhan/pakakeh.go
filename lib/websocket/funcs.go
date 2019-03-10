@@ -43,9 +43,16 @@ func Recv(fd int) (packet []byte, err error) {
 // Send the packet through web socket file descriptor `fd`.
 //
 func Send(fd int, packet []byte) (err error) {
-	_, err = unix.Write(fd, packet)
+	var n int
+	for len(packet) > 0 {
+		n, err = unix.Write(fd, packet)
+		if err != nil {
+			break
+		}
+		packet = packet[n:]
+	}
 
-	return
+	return err
 }
 
 //
