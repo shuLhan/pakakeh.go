@@ -15,28 +15,6 @@ import (
 // Frame represent a websocket data protocol.
 //
 type Frame struct {
-	//
-	// Websocket data protocol,
-	//
-	//	   0                   1                   2                   3
-	//	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-	//	  +-+-+-+-+-------+-+-------------+-------------------------------+
-	//	  |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
-	//	  |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
-	//	  |N|V|V|V|       |S|             |   (if payload len==126/127)   |
-	//	  | |1|2|3|       |K|             |                               |
-	//	  +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-	//	  |     Extended payload length continued, if payload len == 127  |
-	//	  + - - - - - - - - - - - - - - - +-------------------------------+
-	//	  |                               |Masking-key, if MASK set to 1  |
-	//	  +-------------------------------+-------------------------------+
-	//	  | Masking-key (continued)       |          Payload Data         |
-	//	  +-------------------------------- - - - - - - - - - - - - - - - +
-	//	  :                     Payload Data continued ...                :
-	//	  + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-	//	  |                     Payload Data continued ...                |
-	//	  +---------------------------------------------------------------+
-
 	// fin Indicates that this is the final fragment in a message.
 	// The first fragment MAY also be the final fragment.
 	fin byte
@@ -201,71 +179,123 @@ func newFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 // unprocessed packet.
 // On fail, it will return nil frame.
 //
-func frameUnpack(in []byte) (f *Frame, x uint64) {
+// Websocket data protocol,
+//
+//	   0                   1                   2                   3
+//	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//	  +-+-+-+-+-------+-+-------------+-------------------------------+
+//	  |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+//	  |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+//	  |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+//	  | |1|2|3|       |K|             |                               |
+//	  +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+//	  |     Extended payload length continued, if payload len == 127  |
+//	  + - - - - - - - - - - - - - - - +-------------------------------+
+//	  |                               |Masking-key, if MASK set to 1  |
+//	  +-------------------------------+-------------------------------+
+//	  | Masking-key (continued)       |          Payload Data         |
+//	  +-------------------------------- - - - - - - - - - - - - - - - +
+//	  :                     Payload Data continued ...                :
+//	  + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+//	  |                     Payload Data continued ...                |
+//	  +---------------------------------------------------------------+
+//
+func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	if len(in) == 0 {
-		return nil, 0
+		return nil, nil
 	}
 
 	f = new(Frame)
+	x := 0
 
 	f.fin = in[x] & frameIsFinished
 	f.opcode = opcode(in[x] & 0x0F)
 	x++
+	if x >= len(in) {
+		return f, in[x:]
+	}
 
-	if len(in) >= 2 {
-		f.masked = in[x] & frameIsMasked
-		f.len = uint64(in[x] & 0x7F)
-		x++
+	f.masked = in[x] & frameIsMasked
+	f.len = uint64(in[x] & 0x7F)
+	x++
+	if x >= len(in) {
+		// Unmasked frame, with 0 payload.
+		if f.masked == 0 {
+			return f, in[x:]
+		}
+		// Missing mask.
+		return nil, nil
 	}
 
 	if f.opcode == opcodeClose || f.opcode == opcodePing || f.opcode == opcodePong {
-		// (5.4-P33)
+		// Control frame must set the fin.
 		if f.fin != frameIsFinished {
-			return nil, x
+			return nil, nil
 		}
-		// (5.5-P36)
+		// Control frame payload must not larger than 125.
 		if f.len > frameSmallPayload {
-			return nil, x
+			return nil, nil
 		}
 	}
 
-	if f.len == frameLargePayload {
+	switch f.len {
+	case frameLargePayload:
 		f.len = binary.BigEndian.Uint64(in[x : x+8])
 		x += 8
-	} else if f.len == frameMediumPayload {
+	case frameMediumPayload:
 		f.len = uint64(binary.BigEndian.Uint16(in[x : x+2]))
 		x += 2
 	}
 
 	if f.masked == frameIsMasked {
+		if x >= len(in) {
+			return nil, nil
+		}
+
 		f.maskKey[0] = in[x]
 		x++
+		if x >= len(in) {
+			return nil, nil
+		}
+
 		f.maskKey[1] = in[x]
 		x++
+		if x >= len(in) {
+			return nil, nil
+		}
+
 		f.maskKey[2] = in[x]
 		x++
+		if x >= len(in) {
+			return nil, nil
+		}
+
 		f.maskKey[3] = in[x]
 		x++
 	}
 
 	if f.len > 0 {
-		f.payload = make([]byte, f.len)
+		if len(in)-x < int(f.len) {
+			f.payload = make([]byte, len(in)-x)
+		} else {
+			f.payload = make([]byte, f.len)
+		}
 		copy(f.payload, in[x:])
 
 		if f.masked == frameIsMasked {
-			for y := uint64(0); y < f.len; y++ {
+			for y := 0; y < len(f.payload); y++ {
 				f.payload[y] ^= f.maskKey[y%4]
 			}
 		}
 	}
-	x += f.len
+	x += len(f.payload)
 
-	if f.opcode == opcodeClose && f.len > 0 {
-		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[0:2]))
+	if f.opcode == opcodeClose && len(f.payload) >= 2 {
+		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[:2]))
 		f.payload = f.payload[2:]
 	}
 
-	return f, x
+	return f, in[x:]
 }
 
 //
@@ -318,10 +348,11 @@ func (f *Frame) pack(randomMask bool) (out []byte) {
 	out[x] = f.masked | uint8(f.len)
 	x++
 
-	if f.len == frameLargePayload {
+	switch f.len {
+	case frameLargePayload:
 		binary.BigEndian.PutUint64(out[x:x+8], payloadSize)
 		x += 8
-	} else if f.len == frameMediumPayload {
+	case frameMediumPayload:
 		binary.BigEndian.PutUint16(out[x:x+2], uint16(payloadSize))
 		x += 2
 	}
