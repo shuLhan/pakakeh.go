@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"unicode/utf8"
 
 	"golang.org/x/sys/unix"
 
@@ -355,7 +356,12 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) bool {
 
 	switch frame.opcode {
 	case opcodeText:
-		serv.HandleText(conn, frame.payload)
+		if !utf8.Valid(frame.payload) {
+			serv.handleInvalidData(conn)
+			isClosing = true
+		} else {
+			serv.HandleText(conn, frame.payload)
+		}
 	case opcodeBin:
 		serv.HandleBin(conn, frame.payload)
 	case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
@@ -410,7 +416,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) bool {
 // that is set.
 // (RFC 6455 Section 5.4 Page 34)
 //
-func (serv *Server) handleFragment(conn int, req *Frame) {
+func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	frame, ok := serv.Clients.Frame(conn)
 
 	if debug.Value >= 3 {
@@ -429,13 +435,13 @@ func (serv *Server) handleFragment(conn int, req *Frame) {
 
 	if req.fin == 0 {
 		serv.Clients.SetFrame(conn, frame)
-		return
+		return false
 	}
 
 	// Frame with fin set with chopped payload.
 	if uint64(len(frame.payload)) < frame.len {
 		serv.Clients.SetFrame(conn, frame)
-		return
+		return false
 	}
 
 	if ok {
@@ -443,10 +449,15 @@ func (serv *Server) handleFragment(conn int, req *Frame) {
 	}
 
 	if frame.opcode == opcodeText {
+		if !utf8.Valid(frame.payload) {
+			return true
+		}
 		serv.HandleText(conn, frame.payload)
 	} else {
 		serv.HandleBin(conn, frame.payload)
 	}
+
+	return false
 }
 
 //
@@ -553,6 +564,25 @@ func (serv *Server) handleBadRequest(conn int) {
 	_, err = Recv(conn)
 	if err != nil {
 		log.Println("websocket: server.handleBadRequest: " + err.Error())
+	}
+
+	serv.ClientRemove(conn)
+}
+
+//
+// handleInvalidData by sending Close frame with status 1007.
+//
+func (serv *Server) handleInvalidData(conn int) {
+	frameClose := NewFrameClose(false, StatusInvalidData, nil)
+
+	err := Send(conn, frameClose)
+	if err != nil {
+		log.Println("websocket: server.handleInvalidData: " + err.Error())
+	}
+
+	_, err = Recv(conn)
+	if err != nil {
+		log.Println("websocket: server.handleInvalidData: " + err.Error())
 	}
 
 	serv.ClientRemove(conn)
@@ -667,7 +697,11 @@ func (serv *Server) reader() {
 
 				switch frame.opcode {
 				case opcodeCont, opcodeText, opcodeBin:
-					serv.handleFragment(conn, frame)
+					isInvalid := serv.handleFragment(conn, frame)
+					if isInvalid {
+						serv.handleInvalidData(conn)
+						isClosing = true
+					}
 				case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
 					serv.handleBadRequest(conn)
 					isClosing = true
