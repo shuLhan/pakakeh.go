@@ -56,8 +56,10 @@ func newClientManager() *ClientManager {
 //
 func (cls *ClientManager) All() (conns []int) {
 	cls.Lock()
-	conns = make([]int, len(cls.all))
-	copy(conns, cls.all)
+	if len(cls.all) > 0 {
+		conns = make([]int, len(cls.all))
+		copy(conns, cls.all)
+	}
 	cls.Unlock()
 	return
 }
