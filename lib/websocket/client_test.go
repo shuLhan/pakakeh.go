@@ -290,7 +290,7 @@ func TestClientFragmentation(t *testing.T) {
 		}
 
 		for x := 0; x < len(c.frames); x++ {
-			req := c.frames[x].pack(true)
+			req := c.frames[x].Pack(true)
 
 			err := testClient.send(context.Background(), req, nil)
 			if err != nil {
@@ -361,7 +361,7 @@ func TestClientFragmentation2(t *testing.T) {
 	}
 
 	for x := 0; x < len(frames); x++ {
-		req := frames[x].pack(true)
+		req := frames[x].Pack(true)
 
 		err := testClient.send(context.Background(), req, nil)
 		if err != nil {

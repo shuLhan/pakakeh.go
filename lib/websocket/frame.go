@@ -95,7 +95,7 @@ type Frame struct {
 // Client frame must be masked.
 //
 func NewFrameBin(isMasked bool, payload []byte) []byte {
-	return newFrame(opcodeBin, isMasked, payload)
+	return NewFrame(opcodeBin, isMasked, payload)
 }
 
 //
@@ -139,7 +139,7 @@ func NewFramePong(isMasked bool, payload []byte) (packet []byte) {
 // Client frame must be masked.
 //
 func NewFrameText(isMasked bool, payload []byte) []byte {
-	return newFrame(opcodeText, isMasked, payload)
+	return NewFrame(opcodeText, isMasked, payload)
 }
 
 //
@@ -152,14 +152,14 @@ func newControlFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 		// or less and MUST NOT be fragmented.
 		payload = payload[:frameSmallPayload]
 	}
-	return newFrame(opcode, isMasked, payload)
+	return NewFrame(opcode, isMasked, payload)
 }
 
 //
-// newFrame create a single frame with specific operation code and optional
-// payload.
+// NewFrame create a single finished frame with specific operation code and
+// optional payload.
 //
-func newFrame(opcode opcode, isMasked bool, payload []byte) []byte {
+func NewFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 	f := &Frame{
 		fin:     frameIsFinished,
 		opcode:  opcode,
@@ -168,7 +168,7 @@ func newFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 	if isMasked {
 		f.masked = frameIsMasked
 	}
-	return f.pack(isMasked)
+	return f.Pack(isMasked)
 }
 
 //
@@ -306,19 +306,24 @@ func (f *Frame) IsData() bool {
 }
 
 //
-// pack websocket Frame into packet that can be sent through network.
+// Opcode return the frame operation code.
 //
-// Caller must set frame fields Fin, opcode, masked, and payload.
+func (f *Frame) Opcode() opcode {
+	return f.opcode
+}
+
+//
+// Pack websocket Frame into packet that can be written into socket.
 //
 // Frame payload len will be set based on length of payload.
 //
 // Frame maskKey will be set randomly only if masked is set and randomMask
 // parameter is true.
 //
-// A server MUST NOT mask any frames that it sends to the client. (
+// A server MUST NOT mask any frames that it sends to the client.
 // (RFC 6455 5.1-P27).
 //
-func (f *Frame) pack(randomMask bool) (out []byte) {
+func (f *Frame) Pack(randomMask bool) (out []byte) {
 	headerSize := uint64(2)
 	payloadSize := uint64(len(f.payload))
 
@@ -383,4 +388,11 @@ func (f *Frame) pack(randomMask bool) (out []byte) {
 	}
 
 	return out
+}
+
+//
+// Payload return the frame payload.
+//
+func (f *Frame) Payload() []byte {
+	return f.payload
 }

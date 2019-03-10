@@ -17,6 +17,7 @@ import (
 	"golang.org/x/sys/unix"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -53,6 +54,11 @@ type Server struct {
 	// connection being removed and closed by server.
 	HandleClientRemove HandlerClientFn
 
+	// HandleRsvControl callback that will be called when server received
+	// reserved control frame (opcode 0xB-F) from client.
+	// Default handle is nil.
+	HandleRsvControl HandlerFrameFn
+
 	// HandleText callback that will be called after receiving data
 	// frame(s) text from client.
 	// Default handle parse the payload into Request and pass it to
@@ -65,7 +71,7 @@ type Server struct {
 
 	// handlePong callback that will be called after receiving control
 	// PONG frame from client. Default is nil, used only for testing.
-	handlePong handlerFrameFn
+	handlePong HandlerFrameFn
 }
 
 //
@@ -78,10 +84,11 @@ func NewServer(port int) (serv *Server, err error) {
 		routes:  newRootRoute(),
 	}
 
-	serv.HandleText = serv.handleText
 	serv.HandleBin = serv.handleBin
 	serv.HandleClientAdd = nil
 	serv.HandleClientRemove = nil
+	serv.HandleRsvControl = nil
+	serv.HandleText = serv.handleText
 
 	return
 }
@@ -404,7 +411,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	req.opcode = opcodeClose
 	req.masked = 0
 
-	res := req.pack(false)
+	res := req.Pack(false)
 
 	err := Send(conn, res)
 	if err != nil {
@@ -444,10 +451,14 @@ func (serv *Server) handleBadRequest(conn int) {
 //```
 //
 func (serv *Server) handlePing(conn int, req *Frame) {
+	if debug.Value >= 3 {
+		log.Printf("websocket: Server.handlePing: %d\n", conn)
+	}
+
 	req.opcode = opcodePong
 	req.masked = 0
 
-	res := req.pack(false)
+	res := req.Pack(false)
 
 	err := Send(conn, res)
 	if err != nil {
@@ -491,10 +502,20 @@ func (serv *Server) reader() {
 				continue
 			}
 
+			if debug.Value >= 3 {
+				log.Printf("websocket: Server.reader: packet: % x\n", packet)
+			}
+
 			frames := Unpack(packet)
 			if frames == nil {
 				serv.ClientRemove(conn)
 				continue
+			}
+
+			if debug.Value >= 3 {
+				if frames != nil {
+					log.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
+				}
 			}
 
 			isClosing = false
@@ -506,11 +527,9 @@ func (serv *Server) reader() {
 				}
 
 				switch frame.opcode {
-				case opcodeCont:
+				case opcodeCont, opcodeText, opcodeBin:
 					serv.handleFragment(conn, frame)
-				case opcodeText:
-					serv.handleFragment(conn, frame)
-				case opcodeBin:
+				case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
 					serv.handleFragment(conn, frame)
 				case opcodeClose:
 					serv.handleClose(conn, frame)
@@ -520,6 +539,10 @@ func (serv *Server) reader() {
 				case opcodePong:
 					if serv.handlePong != nil {
 						go serv.handlePong(conn, frame)
+					}
+				case opcodeControlRsvB, opcodeControlRsvC, opcodeControlRsvD, opcodeControlRsvE, opcodeControlRsvF:
+					if serv.HandleRsvControl != nil {
+						serv.HandleRsvControl(conn, frame)
 					}
 				}
 				if isClosing {

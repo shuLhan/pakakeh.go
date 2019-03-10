@@ -32,7 +32,7 @@ type HandlerClientFn func(ctx context.Context, conn int)
 type HandlerPayloadFn func(conn int, payload []byte)
 
 //
-// handlerFrameFn define a server callback type to handle client request with
+// HandlerFrameFn define a server callback type to handle client request with
 // single frame.
 //
-type handlerFrameFn func(conn int, frame *Frame)
+type HandlerFrameFn func(conn int, frame *Frame)
