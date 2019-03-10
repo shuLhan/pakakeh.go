@@ -112,7 +112,7 @@ func NewFrameBin(isMasked bool, payload []byte) []byte {
 //
 func NewFrameClose(isMasked bool, code CloseCode, payload []byte) []byte {
 	if code == 0 {
-		return newControlFrame(opcodeClose, isMasked, nil)
+		code = StatusNormal
 	}
 
 	// If there is a body, the first two bytes of the body MUST be a
