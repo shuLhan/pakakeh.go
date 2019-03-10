@@ -116,9 +116,14 @@ func (cls *ClientManager) SetFrame(conn int, frame *Frame) {
 // add new socket connection to user ID with its context.
 //
 func (cls *ClientManager) add(ctx context.Context, conn int) {
+	var uid uint64
+
 	// Delete the previous socket reference on other user ID.
 	cls.remove(conn)
-	uid := ctx.Value(CtxKeyUID).(uint64)
+	v := ctx.Value(CtxKeyUID)
+	if v != nil {
+		uid = v.(uint64)
+	}
 
 	cls.Lock()
 
@@ -148,11 +153,15 @@ func (cls *ClientManager) remove(conn int) {
 	cls.Lock()
 
 	delete(cls.frame, conn)
-	ints.Remove(cls.all, conn)
+	cls.all, _ = ints.Remove(cls.all, conn)
 
 	ctx, ok := cls.ctx[conn]
 	if ok {
-		uid := ctx.Value(CtxKeyUID).(uint64)
+		var uid uint64
+		v := ctx.Value(CtxKeyUID)
+		if v != nil {
+			uid = v.(uint64)
+		}
 		delete(cls.ctx, conn)
 
 		conns, ok := cls.conns[uid]
