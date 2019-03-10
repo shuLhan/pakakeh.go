@@ -35,9 +35,9 @@ type ClientManager struct {
 	// HandleAuth on Server.
 	ctx map[int]context.Context
 
-	// frames contains a one-to-one mapping between a socket connection
+	// frame contains a one-to-one mapping between a socket connection
 	// and a continuous frame.
-	frames map[int]*Frames
+	frame map[int]*Frame
 }
 
 //
@@ -45,9 +45,9 @@ type ClientManager struct {
 //
 func newClientManager() *ClientManager {
 	return &ClientManager{
-		conns:  make(map[uint64][]int),
-		ctx:    make(map[int]context.Context),
-		frames: make(map[int]*Frames),
+		conns: make(map[uint64][]int),
+		ctx:   make(map[int]context.Context),
+		frame: make(map[int]*Frame),
 	}
 }
 
@@ -87,25 +87,25 @@ func (cls *ClientManager) Context(conn int) (ctx context.Context) {
 }
 
 //
-// Frames return continuous frame on a client connection.
+// Frame return continuous frame on a client connection.
 //
-func (cls *ClientManager) Frames(conn int) (frames *Frames) {
+func (cls *ClientManager) Frame(conn int) (frame *Frame, ok bool) {
 	cls.Lock()
-	frames = cls.frames[conn]
+	frame, ok = cls.frame[conn]
 	cls.Unlock()
 	return
 }
 
 //
-// SetFrames set the continuous frame on client connection.  If frames is nil,
-// it will delete the mapping.
+// SetFrame set the continuous frame on client connection.  If frame is nil,
+// it will delete the stored frame in connection.
 //
-func (cls *ClientManager) SetFrames(conn int, frames *Frames) {
+func (cls *ClientManager) SetFrame(conn int, frame *Frame) {
 	cls.Lock()
-	if frames == nil {
-		delete(cls.frames, conn)
+	if frame == nil {
+		delete(cls.frame, conn)
 	} else {
-		cls.frames[conn] = frames
+		cls.frame[conn] = frame
 	}
 	cls.Unlock()
 }
@@ -145,7 +145,7 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 func (cls *ClientManager) remove(conn int) {
 	cls.Lock()
 
-	delete(cls.frames, conn)
+	delete(cls.frame, conn)
 	ints.Remove(cls.all, conn)
 
 	ctx, ok := cls.ctx[conn]

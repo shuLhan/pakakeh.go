@@ -315,44 +315,29 @@ func (serv *Server) upgrader() {
 // (RFC 6455 Section 5.4 Page 34)
 //
 func (serv *Server) handleFragment(conn int, req *Frame) {
-	frames := serv.Clients.Frames(conn)
+	frame, ok := serv.Clients.Frame(conn)
+
+	if frame == nil {
+		frame = req
+	} else {
+		frame.payload = append(frame.payload, req.payload...)
+		if req.len > 0 {
+			frame.len += req.len
+		}
+	}
 
 	if req.fin == 0 {
-		if frames == nil {
-			frames = &Frames{}
-		}
-		if req.opcode == opcodeBin || req.opcode == opcodeText {
-			// Non-zero opcode indicate first fragment, so we
-			// clear any previous fragmentations.
-			frames.v = frames.v[:0]
-		}
+		serv.Clients.SetFrame(conn, frame)
+		return
+	}
+	if ok {
+		serv.Clients.SetFrame(conn, nil)
+	}
 
-		frames.Append(req)
-
-		serv.Clients.SetFrames(conn, frames)
+	if frame.opcode == opcodeText {
+		go serv.HandleText(conn, frame.payload)
 	} else {
-		var (
-			payload []byte
-			oc      opcode
-		)
-
-		if frames == nil {
-			payload = req.payload
-			oc = req.opcode
-		} else {
-			frames.Append(req)
-
-			payload = frames.Payload()
-			oc = frames.v[0].opcode
-		}
-
-		serv.Clients.SetFrames(conn, nil)
-
-		if oc == opcodeText {
-			go serv.HandleText(conn, payload)
-		} else {
-			go serv.HandleBin(conn, payload)
-		}
+		go serv.HandleBin(conn, frame.payload)
 	}
 }
 
@@ -471,7 +456,7 @@ func (serv *Server) handleBadRequest(conn int) {
 //
 func (serv *Server) handlePing(conn int, req *Frame) {
 	if debug.Value >= 3 {
-		log.Printf("websocket: Server.handlePing: %d\n", conn)
+		log.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n", conn, req)
 	}
 
 	req.opcode = opcodePong
@@ -522,7 +507,8 @@ func (serv *Server) reader() {
 			}
 
 			if debug.Value >= 3 {
-				log.Printf("websocket: Server.reader: packet: % x\n", packet)
+				log.Printf("websocket: Server.reader: packet: len:%d value:% x\n",
+					len(packet), packet)
 			}
 
 			frames := Unpack(packet)
