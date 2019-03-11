@@ -498,6 +498,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 		// If a connection does not have continuous frame, then
 		// current frame opcode must not be 0.
 		if req.opcode == opcodeCont {
+			serv.handleBadRequest(conn)
 			return true
 		}
 		frames = new(Frames)
@@ -505,6 +506,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 		// If a connection have continuous frame, the next frame
 		// opcode must be 0.
 		if req.opcode != opcodeCont {
+			serv.handleBadRequest(conn)
 			return true
 		}
 	}
@@ -526,6 +528,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 
 	if frame.opcode == opcodeText {
 		if !utf8.Valid(frame.payload) {
+			serv.handleInvalidData(conn)
 			return true
 		}
 		serv.HandleText(conn, frame.payload)
@@ -832,7 +835,6 @@ func (serv *Server) reader() {
 				case opcodeCont, opcodeText, opcodeBin:
 					isInvalid := serv.handleFragment(conn, frame)
 					if isInvalid {
-						serv.handleInvalidData(conn)
 						isClosing = true
 					}
 				case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
