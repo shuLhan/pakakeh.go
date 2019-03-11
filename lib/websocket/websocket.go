@@ -2,21 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
-// Package websocket provide the websocket library for server and
-// client.
-//
-// The websocket server is implemented with epoll, which means it's only
-// run on Linux.
-//
-// References
-//
-// - https://tools.ietf.org/html/rfc6455
-//
-// - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
-//
-// - http://man7.org/linux/man-pages/man7/epoll.7.html
-//
 package websocket
 
 import (
