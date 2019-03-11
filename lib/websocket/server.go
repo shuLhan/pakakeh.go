@@ -313,21 +313,39 @@ func (serv *Server) upgrader() {
 //
 // handleChopped handle possible chopped payload.
 //
-// It will return true if continuous frame exist and its length is greater
-// than payload.
+// There are three possible cases that will returned from this function.
+// First, there is no continuous frame.  Packet is new frame, return it as
+// (rest, false) and let the caller unpacke the packet as frame.
 //
-// It will return false if no continuous frame exist.
+// Second, continuous frame exist but its length and payload size already
+// equal.  The result is similar with the first case.
 //
-func (serv *Server) handleChopped(x, conn int, packet []byte) bool {
+// Third, continuous frame exist and its payload less than frame's length.
+// The packet then will be assumed as part of frame's payload.  If packet
+// is not completing the frame payload, we expect to receive another packet,
+// so we return empty "rest" and false.
+//
+// Fourth, continuous frame exist and all or part of packet complete the
+// payload.  We process the frame and return the rest of unprocess packet if
+// available.  The function may return isClosing = true if frame is control
+// CLOSE frame or contains invalid UTF-8 text on data TEXT frame.
+//
+func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isClosing bool) {
 	frame, _ := serv.Clients.Frame(conn)
 
 	if frame == nil {
-		return false
+		return packet, false
 	}
 	if frame.len == uint64(len(frame.payload)) {
 		// Connection contains continuous frame, but its already
 		// filled.
-		return false
+		return packet, false
+	}
+
+	exp := frame.len - uint64(len(frame.payload))
+	if uint64(len(packet)) > exp {
+		rest = packet[exp:]
+		packet = packet[:exp]
 	}
 
 	start := len(frame.payload) % 4
@@ -341,18 +359,15 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) bool {
 		// We still got unfinished payload.
 		serv.Clients.SetFrame(conn, frame)
 		serv.epollRegisterRead(x, conn)
-		return true
+		return rest, false
 	}
 	if frame.fin == 0 {
 		serv.Clients.SetFrame(conn, frame)
 		serv.epollRegisterRead(x, conn)
-		return true
+		return rest, false
 	}
 
 	serv.Clients.SetFrame(conn, nil)
-
-	// Handle full frame.
-	var isClosing bool
 
 	switch frame.opcode {
 	case opcodeText:
@@ -387,7 +402,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) bool {
 	if !isClosing {
 		serv.epollRegisterRead(x, conn)
 	}
-	return true
+	return rest, isClosing
 }
 
 //
@@ -439,6 +454,11 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	}
 
 	// Frame with fin set with chopped payload.
+	if debug.Value >= 3 {
+		log.Printf("handleFragment: payload.len:%d frame.len:%d\n",
+			len(frame.payload), frame.len)
+	}
+
 	if uint64(len(frame.payload)) < frame.len {
 		serv.Clients.SetFrame(conn, frame)
 		return false
@@ -693,8 +713,8 @@ func (serv *Server) reader() {
 			}
 
 			// Handle chopped, unfinished payload.
-			isChopped := serv.handleChopped(x, conn, packet)
-			if isChopped {
+			packet, isClosing = serv.handleChopped(x, conn, packet)
+			if isClosing || len(packet) == 0 {
 				continue
 			}
 
