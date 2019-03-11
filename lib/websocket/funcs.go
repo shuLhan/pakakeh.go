@@ -8,11 +8,14 @@ import (
 	"crypto/sha1" //nolint: gosec
 	"encoding/base64"
 	"encoding/binary"
+	"log"
 	"math/rand"
 	"time"
 
 	"golang.org/x/sys/unix"
 )
+
+const maxBuffer = 1024
 
 //
 // Recv read all content from file descriptor into slice of bytes.
@@ -23,15 +26,17 @@ import (
 // On fail it will return nil buffer and error.
 //
 func Recv(fd int) (packet []byte, err error) {
-	buf := make([]byte, 512)
+	buf := make([]byte, maxBuffer)
 
-	for { // n == _maxBuffer
+	for {
 		n, err := unix.Read(fd, buf)
-		if err != nil || n == 0 {
+		if err != nil {
 			break
 		}
-		packet = append(packet, buf[:n]...)
-		if n < len(buf) {
+		if n > 0 {
+			packet = append(packet, buf[:n]...)
+		}
+		if n < maxBuffer {
 			break
 		}
 	}
@@ -43,13 +48,32 @@ func Recv(fd int) (packet []byte, err error) {
 // Send the packet through web socket file descriptor `fd`.
 //
 func Send(fd int, packet []byte) (err error) {
-	var n int
+	var (
+		n, max int
+	)
+
 	for len(packet) > 0 {
-		n, err = unix.Write(fd, packet)
-		if err != nil {
-			break
+		if len(packet) < maxBuffer {
+			max = len(packet)
+		} else {
+			max = maxBuffer
 		}
-		packet = packet[n:]
+
+		n, err = unix.Write(fd, packet[:max])
+		if err != nil {
+			errno, ok := err.(unix.Errno)
+			if ok {
+				log.Printf("websocket: Send: errno: %d %d\n", errno, unix.EAGAIN)
+				if errno == unix.EAGAIN {
+					continue
+				}
+			}
+			return err
+		}
+
+		if n > 0 {
+			packet = packet[n:]
+		}
 	}
 
 	return err
