@@ -764,6 +764,20 @@ func (serv *Server) reader() {
 					isClosing = true
 					break
 				}
+				if frame.opcode == opcodeClose || frame.opcode == opcodePing || frame.opcode == opcodePong {
+					if frame.fin == 0 {
+						// Control frame must set the fin.
+						serv.handleBadRequest(conn)
+						isClosing = true
+						break
+					}
+					// Control frame payload must not larger than 125.
+					if frame.len > frameSmallPayload {
+						serv.handleBadRequest(conn)
+						isClosing = true
+						break
+					}
+				}
 
 				switch frame.opcode {
 				case opcodeCont, opcodeText, opcodeBin:

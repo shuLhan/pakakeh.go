@@ -235,17 +235,6 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 		return nil, nil
 	}
 
-	if f.opcode == opcodeClose || f.opcode == opcodePing || f.opcode == opcodePong {
-		// Control frame must set the fin.
-		if f.fin != frameIsFinished {
-			return nil, nil
-		}
-		// Control frame payload must not larger than 125.
-		if f.len > frameSmallPayload {
-			return nil, nil
-		}
-	}
-
 	switch f.len {
 	case frameLargePayload:
 		if x+8 >= len(in) {
