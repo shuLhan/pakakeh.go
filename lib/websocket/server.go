@@ -431,10 +431,10 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 			serv.handleInvalidData(conn)
 			isClosing = true
 		} else {
-			serv.HandleText(conn, frame.payload)
+			go serv.HandleText(conn, frame.payload)
 		}
 	case opcodeBin:
-		serv.HandleBin(conn, frame.payload)
+		go serv.HandleBin(conn, frame.payload)
 	case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
 		serv.handleBadRequest(conn)
 		isClosing = true
@@ -491,7 +491,8 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	frames, ok := serv.Clients.Frames(conn)
 
 	if debug.Value >= 3 {
-		log.Printf("websocket: Server.handleFragment: frame: %+v\n", req)
+		log.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
+			req.fin, req.opcode, req.masked, req.len, len(req.payload))
 	}
 
 	if frames == nil {
@@ -512,9 +513,13 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	}
 
 	if req.fin == 0 {
-		frames.Append(req)
-		serv.Clients.SetFrame(conn, req)
-		serv.Clients.SetFrames(conn, frames)
+		if uint64(len(req.payload)) < req.len {
+			serv.Clients.SetFrame(conn, req)
+		} else {
+			frames.Append(req)
+			serv.Clients.SetFrame(conn, nil)
+			serv.Clients.SetFrames(conn, frames)
+		}
 		return false
 	}
 
@@ -531,9 +536,9 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 			serv.handleInvalidData(conn)
 			return true
 		}
-		serv.HandleText(conn, frame.payload)
+		go serv.HandleText(conn, frame.payload)
 	} else {
-		serv.HandleBin(conn, frame.payload)
+		go serv.HandleBin(conn, frame.payload)
 	}
 
 	return false
@@ -656,7 +661,6 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 
 	if debug.Value >= 3 {
 		log.Printf("websocket: Server.handleClose: req: %+v\n", req)
-		log.Printf("websocket: Server.handleClose: packet: % x\n", packet)
 	}
 
 	err := Send(conn, packet)
@@ -767,8 +771,7 @@ func (serv *Server) reader() {
 			}
 
 			if debug.Value >= 3 {
-				log.Printf("websocket: Server.reader: packet: len:%d value:% x\n",
-					len(packet), packet)
+				log.Printf("websocket: Server.reader: packet: {len:%d value:% x\n", len(packet), packet[:16])
 			}
 
 			// Handle chopped, unfinished packet or payload.
