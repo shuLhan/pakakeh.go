@@ -35,9 +35,13 @@ type ClientManager struct {
 	// HandleAuth on Server.
 	ctx map[int]context.Context
 
-	// frame contains a one-to-one mapping between a socket connection
-	// and a continuous frame.
+	// frame contains a one-to-one mapping between a socket and a frame.
+	// Its usually used to handle chopped frame.
 	frame map[int]*Frame
+
+	// frames contains a one-to-one mapping between a socket and
+	// continuous frame.
+	frames map[int]*Frames
 }
 
 //
@@ -45,10 +49,29 @@ type ClientManager struct {
 //
 func newClientManager() *ClientManager {
 	return &ClientManager{
-		conns: make(map[uint64][]int),
-		ctx:   make(map[int]context.Context),
-		frame: make(map[int]*Frame),
+		conns:  make(map[uint64][]int),
+		ctx:    make(map[int]context.Context),
+		frame:  make(map[int]*Frame),
+		frames: make(map[int]*Frames),
 	}
+}
+
+//
+// AddFrame add a frame as part of continuous frame on a client connection.
+//
+func (cls *ClientManager) AddFrame(conn int, frame *Frame) {
+	cls.Lock()
+	frames, ok := cls.frames[conn]
+	if !ok {
+		frames = new(Frames)
+	}
+	frames.Append(frame)
+	if !ok {
+		cls.frames[conn] = frames
+	}
+	delete(cls.frame, conn)
+	cls.Unlock()
+	return
 }
 
 //
@@ -60,6 +83,39 @@ func (cls *ClientManager) All() (conns []int) {
 		conns = make([]int, len(cls.all))
 		copy(conns, cls.all)
 	}
+	cls.Unlock()
+	return
+}
+
+//
+// finFrames merge all continuous frames into single frame and clear the
+// stored frame and frames on behalf of connection.
+//
+func (cls *ClientManager) finFrames(conn int, fin *Frame) (f *Frame) {
+	cls.Lock()
+	frames, ok := cls.frames[conn]
+	if !ok {
+		cls.Unlock()
+		return fin
+	}
+
+	f = frames.v[0]
+	for x := 1; x < len(frames.v); x++ {
+		if frames.v[x].opcode == opcodeClose {
+			break
+		}
+
+		// Ignore control PING or PONG frame.
+		if frames.v[x].opcode == opcodePing || frames.v[x].opcode == opcodePong {
+			continue
+		}
+
+		f.payload = append(f.payload, frames.v[x].payload...)
+	}
+	f.payload = append(f.payload, fin.payload...)
+	delete(cls.frames, conn)
+	delete(cls.frame, conn)
+
 	cls.Unlock()
 	return
 }
@@ -89,7 +145,7 @@ func (cls *ClientManager) Context(conn int) (ctx context.Context) {
 }
 
 //
-// Frame return continuous frame on a client connection.
+// Frame return an active frame on a client connection.
 //
 func (cls *ClientManager) Frame(conn int) (frame *Frame, ok bool) {
 	cls.Lock()
@@ -99,8 +155,18 @@ func (cls *ClientManager) Frame(conn int) (frame *Frame, ok bool) {
 }
 
 //
-// SetFrame set the continuous frame on client connection.  If frame is nil,
-// it will delete the stored frame in connection.
+// Frames return continuous frames on behalf of connection.
+//
+func (cls *ClientManager) Frames(conn int) (frames *Frames, ok bool) {
+	cls.Lock()
+	frames, ok = cls.frames[conn]
+	cls.Unlock()
+	return
+}
+
+//
+// SetFrame set the active, chopped frame on client connection.  If frame is
+// nil, it will delete the stored frame in connection.
 //
 func (cls *ClientManager) SetFrame(conn int, frame *Frame) {
 	cls.Lock()
@@ -108,6 +174,20 @@ func (cls *ClientManager) SetFrame(conn int, frame *Frame) {
 		delete(cls.frame, conn)
 	} else {
 		cls.frame[conn] = frame
+	}
+	cls.Unlock()
+}
+
+//
+// SetFrames set continuous frames on client connection.  If frames is nil it
+// will clear the stored frames.
+//
+func (cls *ClientManager) SetFrames(conn int, frames *Frames) {
+	cls.Lock()
+	if frames == nil {
+		delete(cls.frames, conn)
+	} else {
+		cls.frames[conn] = frames
 	}
 	cls.Unlock()
 }
@@ -153,6 +233,7 @@ func (cls *ClientManager) remove(conn int) {
 	cls.Lock()
 
 	delete(cls.frame, conn)
+	delete(cls.frames, conn)
 	cls.all, _ = ints.Remove(cls.all, conn)
 
 	ctx, ok := cls.ctx[conn]

@@ -95,6 +95,16 @@ func (frames *Frames) Len() int {
 }
 
 //
+// Opcode return the operation code of the first frame.
+//
+func (frames *Frames) Opcode() opcode {
+	if len(frames.v) == 0 {
+		return opcodeCont
+	}
+	return frames.v[0].opcode
+}
+
+//
 // Payload return the concatenation of continuous data frame's payload.
 //
 // The first frame must be a data frame, either text or binary, otherwise it

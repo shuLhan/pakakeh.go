@@ -25,7 +25,7 @@ var (
 	_testWSAddr         string                           //nolint: gochecknoglobals
 	_testHdrValWSAccept = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=" //nolint: gochecknoglobals
 	_testHdrValWSKey    = "dGhlIHNhbXBsZSBub25jZQ=="     //nolint: gochecknoglobals
-	_testMaskKey        = [4]byte{'7', 'ú', '!', '='}    //nolint: gochecknoglobals
+	_testMaskKey        = []byte{'7', 'ú', '!', '='}     //nolint: gochecknoglobals
 )
 
 var (

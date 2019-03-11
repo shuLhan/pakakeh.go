@@ -39,6 +39,7 @@ type Frame struct {
 
 	// closeCode represent the status of control frame close request.
 	closeCode CloseCode
+	codes     []byte
 
 	//
 	// len represent Payload length:  7 bits, 7+16 bits, or 7+64 bits
@@ -68,7 +69,7 @@ type Frame struct {
 	// is set to 0.  See Section 5.3 for further information on client-
 	// to-server masking.
 	//
-	maskKey [4]byte
+	maskKey []byte
 
 	//
 	// Payload data:  (x+y) bytes
@@ -93,6 +94,12 @@ type Frame struct {
 	// data".
 	//
 	payload []byte
+
+	//
+	// chopped contains the unfinished frame, excluding mask keys and
+	// payload.
+	//
+	chopped []byte
 }
 
 //
@@ -220,32 +227,33 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	f.opcode = opcode(in[x] & 0x0F)
 	x++
 	if x >= len(in) {
-		return f, in[x:]
+		f.chopped = append(f.chopped, in...)
+		return f, nil
 	}
 
 	f.masked = in[x] & frameIsMasked
 	f.len = uint64(in[x] & 0x7F)
 	x++
 	if x >= len(in) {
-		// Unmasked frame, with 0 payload.
-		if f.masked == 0 {
-			return f, in[x:]
+		if f.len > 0 {
+			f.chopped = append(f.chopped, in...)
 		}
-		// Missing mask.
-		return nil, nil
+		return f, nil
 	}
 
 	switch f.len {
 	case frameLargePayload:
 		if x+8 >= len(in) {
-			return nil, nil
+			f.chopped = append(f.chopped, in...)
+			return f, nil
 		}
 
 		f.len = binary.BigEndian.Uint64(in[x : x+8])
 		x += 8
 	case frameMediumPayload:
 		if x+2 >= len(in) {
-			return nil, nil
+			f.chopped = append(f.chopped, in...)
+			return f, nil
 		}
 
 		f.len = uint64(binary.BigEndian.Uint16(in[x : x+2]))
@@ -254,28 +262,32 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 
 	if f.masked == frameIsMasked {
 		if x >= len(in) {
-			return nil, nil
+			f.chopped = append(f.chopped, in...)
+			return f, nil
 		}
 
-		f.maskKey[0] = in[x]
+		f.maskKey = append(f.maskKey, in[x])
 		x++
 		if x >= len(in) {
-			return nil, nil
+			f.chopped = append(f.chopped, in...)
+			return f, nil
 		}
 
-		f.maskKey[1] = in[x]
+		f.maskKey = append(f.maskKey, in[x])
 		x++
 		if x >= len(in) {
-			return nil, nil
+			f.chopped = append(f.chopped, in...)
+			return f, nil
 		}
 
-		f.maskKey[2] = in[x]
+		f.maskKey = append(f.maskKey, in[x])
 		x++
 		if x >= len(in) {
-			return nil, nil
+			f.chopped = append(f.chopped, in...)
+			return f, nil
 		}
 
-		f.maskKey[3] = in[x]
+		f.maskKey = append(f.maskKey, in[x])
 		x++
 	}
 
@@ -298,10 +310,13 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	if f.opcode == opcodeClose {
 		switch len(f.payload) {
 		case 0:
+			f.codes = []byte{0, 0}
 			f.closeCode = StatusNormal
 		case 1:
+			f.codes = []byte{f.payload[0], 0}
 			f.closeCode = StatusBadRequest
 		default:
+			f.codes = []byte{f.payload[0], f.payload[1]}
 			f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[:2]))
 			f.payload = f.payload[2:]
 		}
@@ -379,7 +394,8 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 			if _rng == nil {
 				_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 			}
-			binary.LittleEndian.PutUint32(f.maskKey[0:], _rng.Uint32())
+			f.maskKey = make([]byte, 4)
+			binary.LittleEndian.PutUint32(f.maskKey, _rng.Uint32())
 		}
 
 		out[x] = f.maskKey[0]
@@ -407,4 +423,107 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 //
 func (f *Frame) Payload() []byte {
 	return f.payload
+}
+
+//
+// continueUnpack unpack frame header (fin, opcode, masked, length, and mask
+// keys) based on chopped length.
+//
+func (f *Frame) continueUnpack(packet []byte) []byte {
+	var isHaveLen bool
+
+	for len(packet) > 0 && !isHaveLen {
+		switch len(f.chopped) {
+		case 0:
+			f.fin = packet[0] & frameIsFinished
+			f.rsv1 = packet[0] & 0x40
+			f.rsv2 = packet[0] & 0x20
+			f.rsv3 = packet[0] & 0x10
+			f.opcode = opcode(packet[0] & 0x0F)
+			f.chopped = append(f.chopped, packet[0])
+			packet = packet[1:]
+		case 1:
+			f.masked = packet[0] & frameIsMasked
+			f.len = uint64(packet[0] & 0x7F)
+			f.chopped = append(f.chopped, packet[0])
+			packet = packet[1:]
+		default:
+			// We got the masked and len, lets check and get the
+			// extended length.
+			switch f.len {
+			case frameLargePayload:
+				if len(f.chopped) < 10 {
+					exp := 10 - len(f.chopped)
+					if len(packet) < exp {
+						f.chopped = append(f.chopped, packet...)
+						return nil
+					}
+					// chopped: 81 FF 0 0 0 1 0 0 = 10 - 8) = 2
+					// exp: 0 0
+					f.chopped = append(f.chopped, packet[:exp]...)
+					f.len = binary.BigEndian.Uint64(f.chopped[2:10])
+					packet = packet[exp:]
+				}
+			case frameMediumPayload:
+				if len(f.chopped) < 4 {
+					exp := 4 - len(f.chopped)
+					if len(packet) < exp {
+						f.chopped = append(f.chopped, packet...)
+						return nil
+					}
+					f.chopped = append(f.chopped, packet[:exp]...)
+					f.len = uint64(binary.BigEndian.Uint16(f.chopped[2:4]))
+					packet = packet[exp:]
+				}
+			}
+			isHaveLen = true
+		}
+	}
+	if len(packet) == 0 {
+		return nil
+	}
+	if f.masked == frameIsMasked && len(f.maskKey) != 4 {
+		exp := 4 - len(f.maskKey)
+		if len(packet) < exp {
+			f.maskKey = append(f.maskKey, packet...)
+			return nil
+		}
+
+		f.maskKey = append(f.maskKey, packet[:exp]...)
+
+		packet = packet[exp:]
+	}
+	if f.opcode == opcodeClose && len(f.codes) != 2 {
+		exp := 2 - len(f.codes)
+		if len(packet) < exp {
+			f.codes = append(f.codes, packet...)
+			return nil
+		}
+		f.codes = append(f.codes, packet[:exp]...)
+		f.closeCode = CloseCode(binary.BigEndian.Uint16(f.codes))
+		packet = packet[exp:]
+	}
+	if f.len > 0 && cap(f.payload) == 0 {
+		f.payload = make([]byte, 0, f.len)
+
+		if len(packet) > 0 {
+			paclen := len(packet)
+			if uint64(paclen) > f.len {
+				paclen = int(f.len)
+			}
+
+			f.payload = append(f.payload, packet[:paclen]...)
+
+			if f.masked == frameIsMasked {
+				for x := 0; x < paclen; x++ {
+					f.payload[x] ^= f.maskKey[x%4]
+				}
+			}
+
+			packet = packet[paclen:]
+		}
+	}
+	f.chopped = nil
+
+	return packet
 }
