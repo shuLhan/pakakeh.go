@@ -1,0 +1,110 @@
+=  Autobahn WebSocket Testsuite Status Report
+
+This document track the status report from autobahn testsuite [1].
+
+==  Setting up Autobahn Testsuite
+
+The following instruction describe how to setup autobahn testsuite on this
+package,
+
+	$ cd testdata
+	$ virtualenv .
+	$ source ./bin/activate
+	$ pip install autobahntestsuite
+
+==  Testing Server
+
+First, run our WebSocket test server,
+
+	$ cd testdata/server
+	$ go build .
+	$ ./server
+
+Second, open new terminal and run the autobahn test server,
+
+	$ cd testdata/server
+	$ source ../bin/activate
+	$ wstest -m fuzzingclient
+
+Wait for the test to complete.  After that, we can view the reports on
+"reports/index.html".
+
+==  Server Status Report
+
+Summary of autobahn testsuite that fail or missing,
+
+1.  Framing (14/16)
+1.1.  Text Messages (8/8)
+1.2.  Binary Messages (8/8)
+2.  Pings/Pongs (11/11)
+3.  Reserved Bits (7/7)
+4.  Opcodes (10/10)
+4.1.  Non-Control Opcodes (5/5)
+4.2.  Control Opcodes (5/5)
+5.  Fragmentation (20/20)
+6.  UTF-8 Handling  (145/145)
+6.1.  Valid UTF-8 with zero payload fragments  (3/3)
+6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
+code-points  (4/4)
+6.3.  Invalid UTF-8 differently fragmented  (2/2)
+6.4.  Fail-fast on invalid UTF-8  (4/4)
+6.5.  Some valid UTF-8 sequences  (5/5)
+6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code
+points  (11/11)
+6.7.  First possible sequence of a certain length (4/4)
+6.8.  First possible sequence length 5/6 (invalid codepoints) (2/2)
+6.9.  Last possible sequence of a certain length (4/4)
+6.10.  Last possible sequence length 4/5/6 (invalid codepoints) (3/3)
+6.11.  Other boundary conditions  (5/5)
+6.12.  Unexpected continuation bytes  (8/8)
+6.13.  Lonely start characters  (5/5)
+6.14.  Sequences with last continuation byte missing  (10/10)
+6.15.  Concatenation of incomplete sequences  (1/1)
+6.16.  Impossible bytes  (3/3)
+6.17.  Examples of an overlong ASCII character  (5/5)
+6.18.  Maximum overlong sequences  (5/5)
+6.19.  Overlong representation of the NUL character  (5/5)
+6.20.  Single UTF-16 surrogates  (7/7)
+6.21.   Paired UTF-16 surrogates  (8/8)
+6.22.  Non-character code points (valid UTF-8)  (34/34)
+6.23.  Unicode specials (i.e. replacement char)  (7/7)
+7.  Close Handling  (22/37)
+7.1.  Basic close behavior (fuzzer initiated)  (6/6)
+7.2.  -
+7.3.  Close frame structure: payload length (fuzzer initiated)  (6/6)
+7.4.  -
+7.5.  Close frame structure: payload value (fuzzer initiated)  (1/1)
+7.6.  -
+7.7.  Close frame structure: valid close codes (fuzzer initiated)  (13/13)
+7.8.  -
+7.9.  Close frame structure: invalid close codes (fuzzer initiated)  (9/9)
+7.10.  -
+7.11.  -
+7.12.  -
+7.13.  Informational close information (fuzzer initiated)  (2/2)
+8.  (-/-)
+9.  Limits/Performance  (54/54)
+9.1.  Text Message (increasing size)  (6/6)
+9.2.  Binary Message (increasing size)  (6/6)
+9.3.  Fragmented Text Message (fixed size, increasing fragment size)  (9/9)
+9.4.  Fragmented Binary Message (fixed size, increasing fragment size)  (9/9)
+9.5.  Text Message (fixed size, increasing chop size)  (6/6)
+9.6.  Binary Text Message (fixed size, increasing chop size)  (6/6)
+9.7.  Text Message Roundtrip Time (fixed number, increasing size)  (6/6)
+9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)
+10.  Misc  (1/1)
+10.1.  Auto-Fragmentation  (1/1)
+11.  (-/-)
+12.  WebSocket Compression (different payloads)  (-/-)
+13.  WebSocket Compression (different parameters)  (-/-)
+(excluded)
+
+
+Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Total success cases: 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+
+Success Rate = 100%
+
+==  Reference
+
+[1]  https://github.com/crossbario/autobahn-testsuite

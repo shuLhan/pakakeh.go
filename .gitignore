@@ -3,7 +3,13 @@
 *.test
 /gofmtcomment
 /lib/dns/testdata/hosts.block.out
+/lib/email/maildir/testdata/
 /lib/git/testdata/beku_test
+/lib/memfs/testdata/memfs_generate.go
+/lib/websocket/testdata/bin
+/lib/websocket/testdata/include
+/lib/websocket/testdata/lib
+/lib/websocket/testdata/pip-selfcheck.json
+/lib/websocket/testdata/server/reports
+/lib/websocket/testdata/server/server
 cover.*
-lib/email/maildir/testdata/
-lib/memfs/testdata/memfs_generate.go

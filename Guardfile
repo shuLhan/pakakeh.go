@@ -9,6 +9,9 @@ guard 'shell' do
 	watch(%r{doc/.+\.adoc$}) {|m|
 		Asciidoctor.convert_file m[0]
 	}
+	watch(%r{lib/websocket/AUTOBAHN.+\.adoc$}) {|m|
+		Asciidoctor.convert_file m[0]
+	}
 end
 
 guard 'livereload' do

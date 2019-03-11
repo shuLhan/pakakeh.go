@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<title>Autobahn WebSocket Testsuite Status Report</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Autobahn WebSocket Testsuite Status Report</h1>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document track the status report from autobahn testsuite [1].</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setting_up_autobahn_testsuite">Setting up Autobahn Testsuite</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following instruction describe how to setup autobahn testsuite on this
+package,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cd testdata
+$ virtualenv .
+$ source ./bin/activate
+$ pip install autobahntestsuite</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_testing_server">Testing Server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First, run our WebSocket test server,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cd testdata/server
+$ go build .
+$ ./server</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Second, open new terminal and run the autobahn test server,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cd testdata/server
+$ source ../bin/activate
+$ wstest -m fuzzingclient</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Wait for the test to complete.  After that, we can view the reports on
+"reports/index.html".</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_server_status_report">Server Status Report</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Summary of autobahn testsuite that fail or missing,</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Framing (14/16)
+1.1.  Text Messages (8/8)
+1.2.  Binary Messages (8/8)</p>
+</li>
+<li>
+<p>Pings/Pongs (9/11)</p>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p>&#10003; 2.1</p>
+</li>
+<li>
+<p>&#10003; 2.2</p>
+</li>
+<li>
+<p>&#10003; 2.3</p>
+</li>
+<li>
+<p>&#10003; 2.4</p>
+</li>
+<li>
+<p>&#10003; 2.5</p>
+</li>
+<li>
+<p>&#10063; 2.6</p>
+</li>
+<li>
+<p>&#10003; 2.7</p>
+</li>
+<li>
+<p>&#10003; 2.8</p>
+</li>
+<li>
+<p>&#10003; 2.9</p>
+</li>
+<li>
+<p>&#10003; 2.10</p>
+</li>
+<li>
+<p>&#10063; 2.11</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Reserved Bits (7/7)</p>
+</li>
+<li>
+<p>Opcodes (10/10)
+4.1.  Non-Control Opcodes (5/5)
+4.2.  Control Opcodes (5/5)</p>
+</li>
+<li>
+<p>Fragmentation (10/20)</p>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p>&#10003; 5.1</p>
+</li>
+<li>
+<p>&#10003; 5.2</p>
+</li>
+<li>
+<p>&#10003; 5.3</p>
+</li>
+<li>
+<p>&#10003; 5.4</p>
+</li>
+<li>
+<p>&#10063; 5.5</p>
+</li>
+<li>
+<p>&#10003; 5.6</p>
+</li>
+<li>
+<p>&#10003; 5.7</p>
+</li>
+<li>
+<p>&#10063; 5.8</p>
+</li>
+<li>
+<p>&#10063; 5.9</p>
+</li>
+<li>
+<p>&#10063; 5.10</p>
+</li>
+<li>
+<p>&#10003; 5.11</p>
+</li>
+<li>
+<p>&#10063; 5.12</p>
+</li>
+<li>
+<p>&#10063; 5.13</p>
+</li>
+<li>
+<p>&#10003; 5.14</p>
+</li>
+<li>
+<p>&#10063; 5.15</p>
+</li>
+<li>
+<p>&#10063; 5.16</p>
+</li>
+<li>
+<p>&#10063; 5.17</p>
+</li>
+<li>
+<p>&#10063; 5.18</p>
+</li>
+<li>
+<p>&#10003; 5.19</p>
+</li>
+<li>
+<p>&#10003; 5.20</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UTF-8 Handling  (143/145)
+6.1.  Valid UTF-8 with zero payload fragments  (3/3)
+6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
+code-points  (4/4)
+6.3.  Invalid UTF-8 differently fragmented  (2/2)
+6.4.  Fail-fast on invalid UTF-8  (2/4)</p>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p>&#10063; 6.4.1</p>
+</li>
+<li>
+<p>&#10063; 6.4.2</p>
+</li>
+<li>
+<p>&#10003; 6.4.3</p>
+</li>
+<li>
+<p>&#10003; 6.4.4
+6.5.  Some valid UTF-8 sequences  (5/5)
+6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code
+points  (11/11)
+6.7.  First possible sequence of a certain length (4/4)
+6.8.  First possible sequence length 5/6 (invalid codepoints) (2/2)
+6.9.  Last possible sequence of a certain length (4/4)
+6.10.  Last possible sequence length 4/5/6 (invalid codepoints) (3/3)
+6.11.  Other boundary conditions  (5/5)
+6.12.  Unexpected continuation bytes  (8/8)
+6.13.  Lonely start characters  (5/5)
+6.14.  Sequences with last continuation byte missing  (10/10)
+6.15.  Concatenation of incomplete sequences  (1/1)
+6.16.  Impossible bytes  (3/3)
+6.17.  Examples of an overlong ASCII character  (5/5)
+6.18.  Maximum overlong sequences  (5/5)
+6.19.  Overlong representation of the NUL character  (5/5)
+6.20.  Single UTF-16 surrogates  (7/7)
+6.21.   Paired UTF-16 surrogates  (8/8)
+6.22.  Non-character code points (valid UTF-8)  (34/34)
+6.23.  Unicode specials (i.e. replacement char)  (7/7)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Close Handling  (22/37)
+7.1.  Basic close behavior (fuzzer initiated)  (6/6)
+7.2.  -
+7.3.  Close frame structure: payload length (fuzzer initiated)  (6/6)
+7.4.  -
+7.5.  Close frame structure: payload value (fuzzer initiated)  (1/1)
+7.6.  -
+7.7.  Close frame structure: valid close codes (fuzzer initiated)  (13/13)
+7.8.  -
+7.9.  Close frame structure: invalid close codes (fuzzer initiated)  (9/9)
+7.10.  -
+7.11.  -
+7.12.  -
+7.13.  Informational close information (fuzzer initiated)  (2/2)</p>
+</li>
+<li>
+<p>(-/-)</p>
+</li>
+<li>
+<p>Limits/Performance  (-/-)</p>
+</li>
+<li>
+<p>Misc  (1/1)
+10.1.  Auto-Fragmentation  (1/1)</p>
+</li>
+<li>
+<p>(-/-)</p>
+</li>
+<li>
+<p>WebSocket Compression (different payloads)  (-/-)</p>
+</li>
+<li>
+<p>WebSocket Compression (different parameters)  (-/-)
+(excluded)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 1 = 247
+Total success cases: 16 +  9 + 7 + 10 + 10 + 143 + 37 + 1 = 233</p>
+</div>
+<div class="paragraph">
+<p>Success Rate = 0.94</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reference">Reference</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>[1]  <a href="https://github.com/crossbario/autobahn-testsuite" class="bare">https://github.com/crossbario/autobahn-testsuite</a></p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2019-03-11 05:57:21 +0700
+</div>
+</div>
+</body>
+</html>
