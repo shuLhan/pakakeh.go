@@ -440,6 +440,12 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	}
 
 	if frame == nil {
+		// If a connection does not have continuous frame, then
+		// current frame opcode must not be 0.
+		if req.opcode == opcodeCont {
+			return true
+		}
+
 		frame = req
 	} else {
 		// If a connection have continuous frame, the next frame
