@@ -442,6 +442,12 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	if frame == nil {
 		frame = req
 	} else {
+		// If a connection have continuous frame, the next frame
+		// opcode must be 0.
+		if req.opcode != opcodeCont {
+			return true
+		}
+
 		frame.payload = append(frame.payload, req.payload...)
 		if req.len > 0 {
 			frame.len += req.len
