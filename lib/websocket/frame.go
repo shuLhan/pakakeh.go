@@ -248,9 +248,17 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 
 	switch f.len {
 	case frameLargePayload:
+		if x+8 >= len(in) {
+			return nil, nil
+		}
+
 		f.len = binary.BigEndian.Uint64(in[x : x+8])
 		x += 8
 	case frameMediumPayload:
+		if x+2 >= len(in) {
+			return nil, nil
+		}
+
 		f.len = uint64(binary.BigEndian.Uint16(in[x : x+2]))
 		x += 2
 	}
