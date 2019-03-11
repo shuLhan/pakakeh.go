@@ -102,7 +102,7 @@ func TestClientPing(t *testing.T) {
 		test.Assert(t, "resp", exp, resp, true)
 
 		frames := Unpack(resp)
-		if frames.IsClosed() {
+		if frames.isClosed() {
 			testClient.SendClose(false)
 		}
 
@@ -180,11 +180,11 @@ func TestClientText(t *testing.T) {
 		}
 
 		frames := Unpack(resp)
-		if frames.IsClosed() {
+		if frames.isClosed() {
 			t.Log("sending close...")
 			testClient.SendClose(false)
 		} else {
-			got := frames.Payload()
+			got := frames.payload()
 			test.Assert(t, "TestClientText len", len(exp), len(got), true)
 			test.Assert(t, "TestClientText", exp, got, true)
 		}
@@ -306,7 +306,7 @@ func TestClientFragmentation(t *testing.T) {
 		test.Assert(t, "res", c.exp, res, true)
 
 		frames := Unpack(res)
-		if frames.IsClosed() {
+		if frames.isClosed() {
 			testClient.SendClose(false)
 			break
 		}
@@ -447,7 +447,7 @@ func TestClientSendBin(t *testing.T) {
 
 		test.Assert(t, "SendBin response", exp, frames.v[0], true)
 
-		if frames.IsClosed() {
+		if frames.isClosed() {
 			testClient.SendClose(false)
 		}
 
@@ -492,7 +492,7 @@ func TestClientSendPing(t *testing.T) {
 
 		test.Assert(t, "SendPing response", exp, frames.v[0], true)
 
-		if frames.IsClosed() {
+		if frames.isClosed() {
 			t.Log("TestClientSendPing closing ...")
 			testClient.SendClose(false)
 		}

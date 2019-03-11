@@ -331,8 +331,8 @@ func (serv *Server) upgrader() {
 // CLOSE frame or contains invalid UTF-8 text on data TEXT frame.
 //
 func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isClosing bool) {
-	frame, _ := serv.Clients.Frame(conn)
-	frames, _ := serv.Clients.Frames(conn)
+	frame, _ := serv.Clients.getFrame(conn)
+	frames, _ := serv.Clients.getFrames(conn)
 
 	if frame == nil {
 		return packet, false
@@ -342,7 +342,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 	if len(frame.chopped) > 0 {
 		packet = frame.continueUnpack(packet)
 		if len(packet) == 0 {
-			serv.Clients.SetFrame(conn, frame)
+			serv.Clients.setFrame(conn, frame)
 			serv.epollRegisterRead(x, conn)
 			return nil, false
 		}
@@ -369,7 +369,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 	frame.payload = append(frame.payload, packet...)
 	if uint64(len(frame.payload)) < frame.len {
 		// We got frame with unfinished payload.
-		serv.Clients.SetFrame(conn, frame)
+		serv.Clients.setFrame(conn, frame)
 		serv.epollRegisterRead(x, conn)
 		return rest, false
 	}
@@ -383,7 +383,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 		}
 		// We got frame with finished payload but with unfinished
 		// frames.
-		serv.Clients.AddFrame(conn, frame)
+		serv.Clients.addFrame(conn, frame)
 		serv.epollRegisterRead(x, conn)
 		return rest, false
 	}
@@ -401,7 +401,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 
 		frame = serv.Clients.finFrames(conn, frame)
 	} else {
-		serv.Clients.SetFrame(conn, nil)
+		serv.Clients.setFrame(conn, nil)
 	}
 
 	if frame.masked != frameIsMasked {
@@ -488,7 +488,7 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 // (RFC 6455 Section 5.4 Page 34)
 //
 func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
-	frames, ok := serv.Clients.Frames(conn)
+	frames, ok := serv.Clients.getFrames(conn)
 
 	if debug.Value >= 3 {
 		log.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
@@ -514,18 +514,18 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 
 	if req.fin == 0 {
 		if uint64(len(req.payload)) < req.len {
-			serv.Clients.SetFrame(conn, req)
+			serv.Clients.setFrame(conn, req)
 		} else {
 			frames.Append(req)
-			serv.Clients.SetFrame(conn, nil)
-			serv.Clients.SetFrames(conn, frames)
+			serv.Clients.setFrame(conn, nil)
+			serv.Clients.setFrames(conn, frames)
 		}
 		return false
 	}
 
 	if !ok && uint64(len(req.payload)) < req.len {
 		// Finished frame with unfinished payload.
-		serv.Clients.SetFrame(conn, req)
+		serv.Clients.setFrame(conn, req)
 		return false
 	}
 
@@ -795,7 +795,7 @@ func (serv *Server) reader() {
 			isClosing = false
 			for _, frame := range frames.v {
 				if len(frame.chopped) > 0 {
-					serv.Clients.SetFrame(conn, frame)
+					serv.Clients.setFrame(conn, frame)
 					continue
 				}
 

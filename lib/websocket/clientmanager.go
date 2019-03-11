@@ -57,9 +57,9 @@ func newClientManager() *ClientManager {
 }
 
 //
-// AddFrame add a frame as part of continuous frame on a client connection.
+// addFrame add a frame as part of continuous frame on a client connection.
 //
-func (cls *ClientManager) AddFrame(conn int, frame *Frame) {
+func (cls *ClientManager) addFrame(conn int, frame *Frame) {
 	cls.Lock()
 	frames, ok := cls.frames[conn]
 	if !ok {
@@ -145,9 +145,9 @@ func (cls *ClientManager) Context(conn int) (ctx context.Context) {
 }
 
 //
-// Frame return an active frame on a client connection.
+// getFrame return an active frame on a client connection.
 //
-func (cls *ClientManager) Frame(conn int) (frame *Frame, ok bool) {
+func (cls *ClientManager) getFrame(conn int) (frame *Frame, ok bool) {
 	cls.Lock()
 	frame, ok = cls.frame[conn]
 	cls.Unlock()
@@ -155,9 +155,9 @@ func (cls *ClientManager) Frame(conn int) (frame *Frame, ok bool) {
 }
 
 //
-// Frames return continuous frames on behalf of connection.
+// getFrames return continuous frames on behalf of connection.
 //
-func (cls *ClientManager) Frames(conn int) (frames *Frames, ok bool) {
+func (cls *ClientManager) getFrames(conn int) (frames *Frames, ok bool) {
 	cls.Lock()
 	frames, ok = cls.frames[conn]
 	cls.Unlock()
@@ -165,10 +165,10 @@ func (cls *ClientManager) Frames(conn int) (frames *Frames, ok bool) {
 }
 
 //
-// SetFrame set the active, chopped frame on client connection.  If frame is
+// setFrame set the active, chopped frame on client connection.  If frame is
 // nil, it will delete the stored frame in connection.
 //
-func (cls *ClientManager) SetFrame(conn int, frame *Frame) {
+func (cls *ClientManager) setFrame(conn int, frame *Frame) {
 	cls.Lock()
 	if frame == nil {
 		delete(cls.frame, conn)
@@ -179,10 +179,10 @@ func (cls *ClientManager) SetFrame(conn int, frame *Frame) {
 }
 
 //
-// SetFrames set continuous frames on client connection.  If frames is nil it
+// setFrames set continuous frames on client connection.  If frames is nil it
 // will clear the stored frames.
 //
-func (cls *ClientManager) SetFrames(conn int, frames *Frames) {
+func (cls *ClientManager) setFrames(conn int, frames *Frames) {
 	cls.Lock()
 	if frames == nil {
 		delete(cls.frames, conn)

@@ -159,7 +159,7 @@ func TestFrameUnpack(t *testing.T) {
 
 		gots := Unpack(c.in)
 
-		if gots != nil && gots.Len() > 0 {
+		if gots != nil && len(gots.v) > 0 {
 			test.Assert(t, "", c.exp, gots.v[0], true)
 		}
 	}
@@ -192,54 +192,9 @@ func TestFramesAppend(t *testing.T) {
 
 		frames.Append(c.f)
 
-		test.Assert(t, "Frames.Len", c.expLen, frames.Len(), true)
+		test.Assert(t, "Frames.Len", c.expLen, len(frames.v), true)
 		test.Assert(t, "Frames.payload", c.expPayload,
-			string(frames.Payload()), true)
-	}
-}
-
-func TestFramesGet(t *testing.T) {
-	frames := &Frames{}
-
-	f0 := &Frame{
-		opcode:  opcodeText,
-		payload: []byte("A"),
-	}
-	f1 := &Frame{
-		opcode:  opcodeText,
-		payload: []byte("B"),
-	}
-	f2 := &Frame{
-		opcode:  opcodeText,
-		payload: []byte("C"),
-	}
-
-	frames.Append(f0)
-	frames.Append(f1)
-	frames.Append(f2)
-
-	cases := []struct {
-		desc string
-		x    int
-		exp  *Frame
-	}{{
-		desc: "With negative index",
-		x:    -1,
-	}, {
-		desc: "With out of range index",
-		x:    frames.Len(),
-	}, {
-		desc: "With valid index",
-		x:    0,
-		exp:  f0,
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		got := frames.Get(c.x)
-
-		test.Assert(t, "Frames.Get", c.exp, got, true)
+			string(frames.payload()), true)
 	}
 }
 
@@ -274,8 +229,8 @@ func TestFramesIsClosed(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		got := c.frames.IsClosed()
-		test.Assert(t, "Frames.IsClosed", c.exp, got, true)
+		got := c.frames.isClosed()
+		test.Assert(t, "Frames.isClosed", c.exp, got, true)
 	}
 }
 
@@ -355,7 +310,7 @@ func TestFramesPayload(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got := c.fs.Payload()
+		got := c.fs.payload()
 
 		test.Assert(t, "Frames.payload", c.exp, string(got), true)
 	}

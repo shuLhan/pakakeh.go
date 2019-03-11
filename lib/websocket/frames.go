@@ -63,19 +63,9 @@ func (frames *Frames) Append(f *Frame) {
 }
 
 //
-// Get frame at specific index or nil if index out of range.
+// isClosed will return true if one of the frame is control CLOSE frame.
 //
-func (frames *Frames) Get(x int) *Frame {
-	if x < 0 || x >= len(frames.v) {
-		return nil
-	}
-	return frames.v[x]
-}
-
-//
-// IsClosed will return true if one of the frame is control CLOSE frame.
-//
-func (frames *Frames) IsClosed() bool {
+func (frames *Frames) isClosed() bool {
 	if len(frames.v) == 0 {
 		return false
 	}
@@ -85,13 +75,6 @@ func (frames *Frames) IsClosed() bool {
 		}
 	}
 	return false
-}
-
-//
-// Len return the number of frame.
-//
-func (frames *Frames) Len() int {
-	return len(frames.v)
 }
 
 //
@@ -105,7 +88,7 @@ func (frames *Frames) Opcode() opcode {
 }
 
 //
-// Payload return the concatenation of continuous data frame's payload.
+// payload return the concatenation of continuous data frame's payload.
 //
 // The first frame must be a data frame, either text or binary, otherwise it
 // will be considered empty payload, even if frames list is not empty.
@@ -113,7 +96,7 @@ func (frames *Frames) Opcode() opcode {
 // Any control CLOSE frame of frame with fin set will considered the last
 // frame.
 //
-func (frames *Frames) Payload() (payload []byte) {
+func (frames *Frames) payload() (payload []byte) {
 	if len(frames.v) == 0 {
 		return
 	}
