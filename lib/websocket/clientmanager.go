@@ -57,23 +57,6 @@ func newClientManager() *ClientManager {
 }
 
 //
-// addFrame add a frame as part of continuous frame on a client connection.
-//
-func (cls *ClientManager) addFrame(conn int, frame *Frame) {
-	cls.Lock()
-	frames, ok := cls.frames[conn]
-	if !ok {
-		frames = new(Frames)
-	}
-	frames.Append(frame)
-	if !ok {
-		cls.frames[conn] = frames
-	}
-	delete(cls.frame, conn)
-	cls.Unlock()
-}
-
-//
 // All return a copy of all client connections.
 //
 func (cls *ClientManager) All() (conns []int) {

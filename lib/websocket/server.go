@@ -332,7 +332,6 @@ func (serv *Server) upgrader() {
 //
 func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isClosing bool) {
 	frame, _ := serv.Clients.getFrame(conn)
-	frames, _ := serv.Clients.getFrames(conn)
 
 	if frame == nil {
 		return packet, false
@@ -373,73 +372,8 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 		serv.epollRegisterRead(x, conn)
 		return rest, false
 	}
-	if frame.fin == 0 {
-		if frames == nil {
-			if frame.opcode == 0 {
-				serv.handleBadRequest(conn)
-				isClosing = true
-				return
-			}
-		}
-		// We got frame with finished payload but with unfinished
-		// frames.
-		serv.Clients.addFrame(conn, frame)
-		serv.epollRegisterRead(x, conn)
-		return rest, false
-	}
 
-	// FIN:0x80
-
-	if frame.opcode == 0 {
-		if frames == nil {
-			// Got frame with opcode CONT in non fragmented
-			// frames.
-			serv.handleBadRequest(conn)
-			isClosing = true
-			return
-		}
-
-		frame = serv.Clients.finFrames(conn, frame)
-	} else {
-		serv.Clients.setFrame(conn, nil)
-	}
-
-	if !serv.isValidFrame(frame) {
-		serv.handleBadRequest(conn)
-		isClosing = true
-		return
-	}
-
-	switch frame.opcode {
-	case OpcodeText:
-		if !utf8.Valid(frame.payload) {
-			serv.handleInvalidData(conn)
-			isClosing = true
-		} else {
-			go serv.HandleText(conn, frame.payload)
-		}
-	case OpcodeBin:
-		go serv.HandleBin(conn, frame.payload)
-	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
-		serv.handleBadRequest(conn)
-		isClosing = true
-	case OpcodeClose:
-		serv.handleClose(conn, frame)
-		isClosing = true
-	case OpcodePing:
-		serv.handlePing(conn, frame)
-	case OpcodePong:
-		if serv.handlePong != nil {
-			serv.handlePong(conn, frame)
-		}
-	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
-		if serv.HandleRsvControl != nil {
-			serv.HandleRsvControl(conn, frame)
-		} else {
-			serv.handleClose(conn, frame)
-			isClosing = true
-		}
-	}
+	isClosing = serv.handleFrame(conn, frame)
 	if !isClosing {
 		serv.epollRegisterRead(x, conn)
 	}
@@ -481,24 +415,27 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	}
 
 	if frames == nil {
-		// If a connection does not have continuous frame, then
-		// current frame opcode must not be 0.
 		if req.opcode == OpcodeCont {
+			// If a connection does not have continuous frame,
+			// then current frame opcode must not be 0.
 			serv.handleBadRequest(conn)
 			return true
 		}
-		frames = new(Frames)
+	} else if req.opcode != OpcodeCont {
 		// If a connection have continuous frame, the next frame
 		// opcode must be 0.
-	} else if req.opcode != OpcodeCont {
 		serv.handleBadRequest(conn)
 		return true
 	}
 
 	if req.fin == 0 {
 		if uint64(len(req.payload)) < req.len {
+			// Continuous frame with unfinished payload.
 			serv.Clients.setFrame(conn, req)
 		} else {
+			if frames == nil {
+				frames = new(Frames)
+			}
 			frames.Append(req)
 			serv.Clients.setFrame(conn, nil)
 			serv.Clients.setFrames(conn, frames)
@@ -507,7 +444,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	}
 
 	if !ok && uint64(len(req.payload)) < req.len {
-		// Finished frame with unfinished payload.
+		// Final frame with unfinished payload.
 		serv.Clients.setFrame(conn, req)
 		return false
 	}
@@ -525,6 +462,44 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	}
 
 	return false
+}
+
+//
+// handleFrame handle a single frame from client.
+//
+func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
+	if !serv.isValidFrame(frame) {
+		serv.handleBadRequest(conn)
+		return true
+	}
+
+	switch frame.opcode {
+	case OpcodeCont, OpcodeText, OpcodeBin:
+		isInvalid := serv.handleFragment(conn, frame)
+		if isInvalid {
+			isClosing = true
+		}
+	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
+		serv.handleBadRequest(conn)
+		isClosing = true
+	case OpcodeClose:
+		serv.handleClose(conn, frame)
+		isClosing = true
+	case OpcodePing:
+		serv.handlePing(conn, frame)
+	case OpcodePong:
+		if serv.handlePong != nil {
+			go serv.handlePong(conn, frame)
+		}
+	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
+		if serv.HandleRsvControl != nil {
+			serv.HandleRsvControl(conn, frame)
+		} else {
+			serv.handleClose(conn, frame)
+			isClosing = true
+		}
+	}
+	return isClosing
 }
 
 //
@@ -816,43 +791,11 @@ func (serv *Server) reader() {
 					continue
 				}
 
-				if !serv.isValidFrame(frame) {
-					serv.handleBadRequest(conn)
-					isClosing = true
-					break
-				}
-
-				switch frame.opcode {
-				case OpcodeCont, OpcodeText, OpcodeBin:
-					isInvalid := serv.handleFragment(conn, frame)
-					if isInvalid {
-						isClosing = true
-					}
-				case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
-					serv.handleBadRequest(conn)
-					isClosing = true
-				case OpcodeClose:
-					serv.handleClose(conn, frame)
-					isClosing = true
-				case OpcodePing:
-					serv.handlePing(conn, frame)
-				case OpcodePong:
-					if serv.handlePong != nil {
-						go serv.handlePong(conn, frame)
-					}
-				case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
-					if serv.HandleRsvControl != nil {
-						serv.HandleRsvControl(conn, frame)
-					} else {
-						serv.handleClose(conn, frame)
-						isClosing = true
-					}
-				}
+				isClosing = serv.handleFrame(conn, frame)
 				if isClosing {
 					break
 				}
 			}
-
 			if !isClosing {
 				serv.epollRegisterRead(x, conn)
 			}
