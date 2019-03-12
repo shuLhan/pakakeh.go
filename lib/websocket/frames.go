@@ -70,7 +70,7 @@ func (frames *Frames) isClosed() bool {
 		return false
 	}
 	for x := 0; x < len(frames.v); x++ {
-		if frames.v[x].opcode == opcodeClose {
+		if frames.v[x].opcode == OpcodeClose {
 			return true
 		}
 	}
@@ -80,9 +80,9 @@ func (frames *Frames) isClosed() bool {
 //
 // Opcode return the operation code of the first frame.
 //
-func (frames *Frames) Opcode() opcode {
+func (frames *Frames) Opcode() Opcode {
 	if len(frames.v) == 0 {
-		return opcodeCont
+		return OpcodeCont
 	}
 	return frames.v[0].opcode
 }
@@ -105,12 +105,12 @@ func (frames *Frames) payload() (payload []byte) {
 	}
 
 	for x := 0; x < len(frames.v); x++ {
-		if frames.v[x].opcode == opcodeClose {
+		if frames.v[x].opcode == OpcodeClose {
 			break
 		}
 
 		// Ignore control PING or PONG frame.
-		if frames.v[x].opcode == opcodePing || frames.v[x].opcode == opcodePong {
+		if frames.v[x].opcode == OpcodePing || frames.v[x].opcode == OpcodePong {
 			continue
 		}
 

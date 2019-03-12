@@ -232,11 +232,11 @@ func TestClientFragmentation(t *testing.T) {
 		desc: "Two text frames, unmasked",
 		frames: []Frame{{
 			fin:     0,
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			payload: []byte{'H', 'e', 'l'},
 		}, {
 			fin:     frameIsFinished,
-			opcode:  opcodeCont,
+			opcode:  OpcodeCont,
 			payload: []byte{'l', 'o'},
 		}},
 		exp: NewFrameClose(false, StatusBadRequest, nil),
@@ -245,15 +245,15 @@ func TestClientFragmentation(t *testing.T) {
 		reconnect: true,
 		frames: []Frame{{
 			fin:     0,
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			payload: []byte("Hel"),
 		}, {
 			fin:     0,
-			opcode:  opcodeCont,
+			opcode:  OpcodeCont,
 			payload: []byte("lo, "),
 		}, {
 			fin:     frameIsFinished,
-			opcode:  opcodeCont,
+			opcode:  OpcodeCont,
 			payload: []byte("Shulhan"),
 		}},
 		exp: NewFrameClose(false, StatusBadRequest, nil),
@@ -262,17 +262,17 @@ func TestClientFragmentation(t *testing.T) {
 		reconnect: true,
 		frames: []Frame{{
 			fin:     0,
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			masked:  frameIsMasked,
 			payload: []byte("Hel"),
 		}, {
 			fin:     0,
-			opcode:  opcodeCont,
+			opcode:  OpcodeCont,
 			masked:  frameIsMasked,
 			payload: []byte("lo, "),
 		}, {
 			fin:     frameIsFinished,
-			opcode:  opcodeCont,
+			opcode:  OpcodeCont,
 			masked:  frameIsMasked,
 			payload: []byte("Shulhan"),
 		}},
@@ -327,22 +327,22 @@ func TestClientFragmentation2(t *testing.T) {
 
 	frames := []Frame{{
 		fin:     0,
-		opcode:  opcodeText,
+		opcode:  OpcodeText,
 		masked:  frameIsMasked,
 		payload: []byte("Hel"),
 	}, {
 		fin:     0,
-		opcode:  opcodeCont,
+		opcode:  OpcodeCont,
 		masked:  frameIsMasked,
 		payload: []byte("lo, "),
 	}, {
 		fin:     frameIsFinished,
-		opcode:  opcodePing,
+		opcode:  OpcodePing,
 		masked:  frameIsMasked,
 		payload: []byte("PING"),
 	}, {
 		fin:     frameIsFinished,
-		opcode:  opcodeCont,
+		opcode:  OpcodeCont,
 		masked:  frameIsMasked,
 		payload: []byte("Shulhan"),
 	}}
@@ -436,7 +436,7 @@ func TestClientSendBin(t *testing.T) {
 		payload: []byte("Hello"),
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeBin,
+			opcode:  OpcodeBin,
 			len:     5,
 			payload: []byte("Hello"),
 		},
@@ -511,7 +511,7 @@ func TestClientSendPing(t *testing.T) {
 		handler: testHandlePing,
 		exp: &Frame{
 			fin:    frameIsFinished,
-			opcode: opcodePong,
+			opcode: OpcodePong,
 			len:    0,
 		},
 	}, {
@@ -520,7 +520,7 @@ func TestClientSendPing(t *testing.T) {
 		payload: []byte("Test"),
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodePong,
+			opcode:  OpcodePong,
 			len:     4,
 			payload: []byte("Test"),
 		},

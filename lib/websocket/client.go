@@ -256,7 +256,7 @@ func (cl *Client) connect() (err error) {
 // If handler is nil, no response will be read from server.
 //
 func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHandler) error {
-	return cl.sendData(ctx, bin, opcodeBin, handler)
+	return cl.sendData(ctx, bin, OpcodeBin, handler)
 }
 
 //
@@ -299,7 +299,7 @@ func (cl *Client) SendPong(payload []byte) error {
 // If handler is nil, no response will be read from server.
 //
 func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvHandler) (err error) {
-	return cl.sendData(ctx, text, opcodeText, handler)
+	return cl.sendData(ctx, text, OpcodeText, handler)
 }
 
 //
@@ -328,11 +328,11 @@ func (cl *Client) Recv() (frames *Frames, err error) {
 		}
 		for _, f := range fs.v {
 			switch f.opcode {
-			case opcodePing:
+			case OpcodePing:
 				cl.pingQueue <- f
-			case opcodePong:
+			case OpcodePong:
 				// Ignore control PONG frame.
-			case opcodeClose:
+			case OpcodeClose:
 				frames.Append(f)
 				goto out
 			default:
@@ -377,7 +377,7 @@ func (cl *Client) handleClose(ctx context.Context, packet []byte) error {
 	if f == nil {
 		return fmt.Errorf("websocket: Client.handleClose: empty response")
 	}
-	if f.opcode != opcodeClose {
+	if f.opcode != OpcodeClose {
 		return fmt.Errorf("websocket: Client.handleClose: expecting CLOSE frame, got %d",
 			f.opcode)
 	}
@@ -393,7 +393,7 @@ func handlePing(ctx context.Context, packet []byte) error {
 	if f == nil {
 		return fmt.Errorf("websocket: Client.handlePing: empty response")
 	}
-	if f.opcode != opcodePong {
+	if f.opcode != OpcodePong {
 		return fmt.Errorf("websocket: Client.handlePing: expecting PONG frame, got %d",
 			f.opcode)
 	}
@@ -469,7 +469,7 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 	return nil
 }
 
-func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handler ClientRecvHandler) (err error) {
+func (cl *Client) sendData(ctx context.Context, req []byte, opcode Opcode, handler ClientRecvHandler) (err error) {
 	cl.Lock()
 	if cl.conn == nil {
 		cl.Unlock()
@@ -478,7 +478,7 @@ func (cl *Client) sendData(ctx context.Context, req []byte, opcode opcode, handl
 
 	var packet []byte
 
-	if opcode == opcodeText {
+	if opcode == OpcodeText {
 		packet = NewFrameText(true, req)
 	} else {
 		packet = NewFrameBin(true, req)

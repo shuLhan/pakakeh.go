@@ -23,7 +23,7 @@ func TestFrameUnpack(t *testing.T) {
 		in:   []byte{0x81, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			masked:  0,
 			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			len:     5,
@@ -37,7 +37,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			masked:  frameIsMasked,
 			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			maskKey: _testMaskKey,
@@ -48,7 +48,7 @@ func TestFrameUnpack(t *testing.T) {
 		in:   []byte{0x01, 0x03, 0x48, 0x65, 0x6c},
 		exp: &Frame{
 			fin:     0,
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			masked:  0,
 			payload: []byte{'H', 'e', 'l'},
 			len:     3,
@@ -58,7 +58,7 @@ func TestFrameUnpack(t *testing.T) {
 		in:   []byte{0x80, 0x02, 0x6c, 0x6f},
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeCont,
+			opcode:  OpcodeCont,
 			masked:  0,
 			payload: []byte{'l', 'o'},
 			len:     2,
@@ -68,7 +68,7 @@ func TestFrameUnpack(t *testing.T) {
 		in:   []byte{0x89, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f},
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodePing,
+			opcode:  OpcodePing,
 			masked:  0,
 			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			len:     5,
@@ -81,7 +81,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodePong,
+			opcode:  OpcodePong,
 			masked:  frameIsMasked,
 			maskKey: _testMaskKey,
 		},
@@ -94,7 +94,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodePong,
+			opcode:  OpcodePong,
 			masked:  frameIsMasked,
 			payload: []byte{'H', 'e', 'l', 'l', 'o'},
 			maskKey: _testMaskKey,
@@ -105,7 +105,7 @@ func TestFrameUnpack(t *testing.T) {
 		in:   libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256),
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeBin,
+			opcode:  OpcodeBin,
 			masked:  0,
 			payload: _dummyPayload256,
 			len:     256,
@@ -118,7 +118,7 @@ func TestFrameUnpack(t *testing.T) {
 		}, _dummyPayload256Masked),
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeBin,
+			opcode:  OpcodeBin,
 			masked:  frameIsMasked,
 			payload: _dummyPayload256,
 			maskKey: _testMaskKey,
@@ -132,7 +132,7 @@ func TestFrameUnpack(t *testing.T) {
 		}, _dummyPayload65536),
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeBin,
+			opcode:  OpcodeBin,
 			masked:  0,
 			payload: _dummyPayload65536,
 			len:     65536,
@@ -146,7 +146,7 @@ func TestFrameUnpack(t *testing.T) {
 		}, _dummyPayload65536Masked),
 		exp: &Frame{
 			fin:     frameIsFinished,
-			opcode:  opcodeBin,
+			opcode:  OpcodeBin,
 			masked:  frameIsMasked,
 			payload: _dummyPayload65536,
 			maskKey: _testMaskKey,
@@ -180,7 +180,7 @@ func TestFramesAppend(t *testing.T) {
 	}, {
 		desc: "With non nil frames",
 		f: &Frame{
-			opcode:  opcodeText,
+			opcode:  OpcodeText,
 			payload: []byte("A"),
 		},
 		expLen:     1,
@@ -210,18 +210,18 @@ func TestFramesIsClosed(t *testing.T) {
 		desc: "With no close frames",
 		frames: &Frames{
 			v: []*Frame{{
-				opcode: opcodeText,
+				opcode: OpcodeText,
 			}},
 		},
 	}, {
 		desc: "With close frames at the end",
 		frames: &Frames{
 			v: []*Frame{{
-				opcode: opcodeText,
+				opcode: OpcodeText,
 			}, {
-				opcode: opcodeText,
+				opcode: OpcodeText,
 			}, {
-				opcode: opcodeClose,
+				opcode: OpcodeClose,
 			}},
 		},
 		exp: true,
@@ -247,7 +247,7 @@ func TestFramesPayload(t *testing.T) {
 		fs: &Frames{
 			v: []*Frame{{
 				fin:     frameIsFinished,
-				opcode:  opcodeClose,
+				opcode:  OpcodeClose,
 				payload: []byte{0, 0},
 			}},
 		},
@@ -256,7 +256,7 @@ func TestFramesPayload(t *testing.T) {
 		fs: &Frames{
 			v: []*Frame{{
 				fin:     0,
-				opcode:  opcodeText,
+				opcode:  OpcodeText,
 				payload: []byte("Hel"),
 			}, {
 				fin:     0,
@@ -274,15 +274,15 @@ func TestFramesPayload(t *testing.T) {
 		fs: &Frames{
 			v: []*Frame{{
 				fin:     0,
-				opcode:  opcodeText,
+				opcode:  OpcodeText,
 				payload: []byte("Hel"),
 			}, {
 				fin:     frameIsFinished,
-				opcode:  opcodeClose,
+				opcode:  OpcodeClose,
 				payload: []byte("lo "),
 			}, {
 				fin:     frameIsFinished,
-				opcode:  opcodeCont,
+				opcode:  OpcodeCont,
 				payload: []byte("world!"),
 			}},
 		},
@@ -292,15 +292,15 @@ func TestFramesPayload(t *testing.T) {
 		fs: &Frames{
 			v: []*Frame{{
 				fin:     0,
-				opcode:  opcodeText,
+				opcode:  OpcodeText,
 				payload: []byte("Hel"),
 			}, {
 				fin:     frameIsFinished,
-				opcode:  opcodeCont,
+				opcode:  OpcodeCont,
 				payload: []byte("lo "),
 			}, {
 				fin:     frameIsFinished,
-				opcode:  opcodeCont,
+				opcode:  OpcodeCont,
 				payload: []byte("world!"),
 			}},
 		},

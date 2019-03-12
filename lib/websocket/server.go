@@ -426,28 +426,28 @@ func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isCl
 	}
 
 	switch frame.opcode {
-	case opcodeText:
+	case OpcodeText:
 		if !utf8.Valid(frame.payload) {
 			serv.handleInvalidData(conn)
 			isClosing = true
 		} else {
 			go serv.HandleText(conn, frame.payload)
 		}
-	case opcodeBin:
+	case OpcodeBin:
 		go serv.HandleBin(conn, frame.payload)
-	case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
+	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
 		serv.handleBadRequest(conn)
 		isClosing = true
-	case opcodeClose:
+	case OpcodeClose:
 		serv.handleClose(conn, frame)
 		isClosing = true
-	case opcodePing:
+	case OpcodePing:
 		serv.handlePing(conn, frame)
-	case opcodePong:
+	case OpcodePong:
 		if serv.handlePong != nil {
 			serv.handlePong(conn, frame)
 		}
-	case opcodeControlRsvB, opcodeControlRsvC, opcodeControlRsvD, opcodeControlRsvE, opcodeControlRsvF:
+	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
 		if serv.HandleRsvControl != nil {
 			serv.HandleRsvControl(conn, frame)
 		} else {
@@ -498,18 +498,16 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	if frames == nil {
 		// If a connection does not have continuous frame, then
 		// current frame opcode must not be 0.
-		if req.opcode == opcodeCont {
+		if req.opcode == OpcodeCont {
 			serv.handleBadRequest(conn)
 			return true
 		}
 		frames = new(Frames)
-	} else {
 		// If a connection have continuous frame, the next frame
 		// opcode must be 0.
-		if req.opcode != opcodeCont {
-			serv.handleBadRequest(conn)
-			return true
-		}
+	} else if req.opcode != OpcodeCont {
+		serv.handleBadRequest(conn)
+		return true
 	}
 
 	if req.fin == 0 {
@@ -531,7 +529,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 
 	frame := serv.Clients.finFrames(conn, req)
 
-	if frame.opcode == opcodeText {
+	if frame.opcode == OpcodeText {
 		if !utf8.Valid(frame.payload) {
 			serv.handleInvalidData(conn)
 			return true
@@ -724,7 +722,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 		log.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n", conn, req)
 	}
 
-	req.opcode = opcodePong
+	req.opcode = OpcodePong
 	req.masked = 0
 
 	res := req.Pack(false)
@@ -819,7 +817,7 @@ func (serv *Server) reader() {
 					isClosing = true
 					break
 				}
-				if frame.opcode == opcodeClose || frame.opcode == opcodePing || frame.opcode == opcodePong {
+				if frame.opcode == OpcodeClose || frame.opcode == OpcodePing || frame.opcode == OpcodePong {
 					if frame.fin == 0 {
 						// Control frame must set the fin.
 						serv.handleBadRequest(conn)
@@ -835,24 +833,24 @@ func (serv *Server) reader() {
 				}
 
 				switch frame.opcode {
-				case opcodeCont, opcodeText, opcodeBin:
+				case OpcodeCont, OpcodeText, OpcodeBin:
 					isInvalid := serv.handleFragment(conn, frame)
 					if isInvalid {
 						isClosing = true
 					}
-				case opcodeDataRsv3, opcodeDataRsv4, opcodeDataRsv5, opcodeDataRsv6, opcodeDataRsv7:
+				case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
 					serv.handleBadRequest(conn)
 					isClosing = true
-				case opcodeClose:
+				case OpcodeClose:
 					serv.handleClose(conn, frame)
 					isClosing = true
-				case opcodePing:
+				case OpcodePing:
 					serv.handlePing(conn, frame)
-				case opcodePong:
+				case OpcodePong:
 					if serv.handlePong != nil {
 						go serv.handlePong(conn, frame)
 					}
-				case opcodeControlRsvB, opcodeControlRsvC, opcodeControlRsvD, opcodeControlRsvE, opcodeControlRsvF:
+				case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
 					if serv.HandleRsvControl != nil {
 						serv.HandleRsvControl(conn, frame)
 					} else {

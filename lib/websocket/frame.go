@@ -27,7 +27,7 @@ type Frame struct {
 	// opcode (4 bits) defines the interpretation of the "Payload data".
 	// If an unknown opcode is received, the receiving endpoint MUST _Fail
 	// the WebSocket Connection_.  The following values are defined.
-	opcode opcode
+	opcode Opcode
 
 	//
 	// masked (1 bit) defines whether the "Payload data" is masked.
@@ -107,7 +107,7 @@ type Frame struct {
 // Client frame must be masked.
 //
 func NewFrameBin(isMasked bool, payload []byte) []byte {
-	return NewFrame(opcodeBin, isMasked, payload)
+	return NewFrame(OpcodeBin, isMasked, payload)
 }
 
 //
@@ -129,21 +129,21 @@ func NewFrameClose(isMasked bool, code CloseCode, payload []byte) []byte {
 	binary.BigEndian.PutUint16(packet[:2], uint16(code))
 	copy(packet[2:], payload)
 
-	return newControlFrame(opcodeClose, isMasked, packet)
+	return newControlFrame(OpcodeClose, isMasked, packet)
 }
 
 //
 // NewFramePing create a masked PING control frame.
 //
 func NewFramePing(isMasked bool, payload []byte) (packet []byte) {
-	return newControlFrame(opcodePing, isMasked, payload)
+	return newControlFrame(OpcodePing, isMasked, payload)
 }
 
 //
 // NewFramePong create a masked PONG control frame to be used by client.
 //
 func NewFramePong(isMasked bool, payload []byte) (packet []byte) {
-	return newControlFrame(opcodePong, isMasked, payload)
+	return newControlFrame(OpcodePong, isMasked, payload)
 }
 
 //
@@ -151,14 +151,14 @@ func NewFramePong(isMasked bool, payload []byte) (packet []byte) {
 // Client frame must be masked.
 //
 func NewFrameText(isMasked bool, payload []byte) []byte {
-	return NewFrame(opcodeText, isMasked, payload)
+	return NewFrame(OpcodeText, isMasked, payload)
 }
 
 //
 // newControlFrame create new control frame with specific operation code and
 // optional payload.
 //
-func newControlFrame(opcode opcode, isMasked bool, payload []byte) []byte {
+func newControlFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	if len(payload) > frameSmallPayload {
 		// All control frames MUST have a payload length of 125 bytes
 		// or less and MUST NOT be fragmented.
@@ -171,7 +171,7 @@ func newControlFrame(opcode opcode, isMasked bool, payload []byte) []byte {
 // NewFrame create a single finished frame with specific operation code and
 // optional payload.
 //
-func NewFrame(opcode opcode, isMasked bool, payload []byte) []byte {
+func NewFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	f := &Frame{
 		fin:     frameIsFinished,
 		opcode:  opcode,
@@ -224,7 +224,7 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	f.rsv1 = in[x] & 0x40
 	f.rsv2 = in[x] & 0x20
 	f.rsv3 = in[x] & 0x10
-	f.opcode = opcode(in[x] & 0x0F)
+	f.opcode = Opcode(in[x] & 0x0F)
 	x++
 	if x >= len(in) {
 		f.chopped = append(f.chopped, in...)
@@ -307,7 +307,7 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 	}
 	x += len(f.payload)
 
-	if f.opcode == opcodeClose {
+	if f.opcode == OpcodeClose {
 		switch len(f.payload) {
 		case 0:
 			f.codes = []byte{0, 0}
@@ -329,13 +329,13 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 // IsData return true if frame is either text or binary data frame.
 //
 func (f *Frame) IsData() bool {
-	return f.opcode == opcodeText || f.opcode == opcodeBin
+	return f.opcode == OpcodeText || f.opcode == OpcodeBin
 }
 
 //
 // Opcode return the frame operation code.
 //
-func (f *Frame) Opcode() opcode {
+func (f *Frame) Opcode() Opcode {
 	return f.opcode
 }
 
@@ -439,7 +439,7 @@ func (f *Frame) continueUnpack(packet []byte) []byte {
 			f.rsv1 = packet[0] & 0x40
 			f.rsv2 = packet[0] & 0x20
 			f.rsv3 = packet[0] & 0x10
-			f.opcode = opcode(packet[0] & 0x0F)
+			f.opcode = Opcode(packet[0] & 0x0F)
 			f.chopped = append(f.chopped, packet[0])
 			packet = packet[1:]
 		case 1:
@@ -493,7 +493,7 @@ func (f *Frame) continueUnpack(packet []byte) []byte {
 
 		packet = packet[exp:]
 	}
-	if f.opcode == opcodeClose && len(f.codes) != 2 {
+	if f.opcode == OpcodeClose && len(f.codes) != 2 {
 		exp := 2 - len(f.codes)
 		if len(packet) < exp {
 			f.codes = append(f.codes, packet...)

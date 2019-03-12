@@ -101,12 +101,12 @@ func (cls *ClientManager) finFrames(conn int, fin *Frame) (f *Frame) {
 
 	f = frames.v[0]
 	for x := 1; x < len(frames.v); x++ {
-		if frames.v[x].opcode == opcodeClose {
+		if frames.v[x].opcode == OpcodeClose {
 			break
 		}
 
 		// Ignore control PING or PONG frame.
-		if frames.v[x].opcode == opcodePing || frames.v[x].opcode == opcodePong {
+		if frames.v[x].opcode == OpcodePing || frames.v[x].opcode == OpcodePong {
 			continue
 		}
 
