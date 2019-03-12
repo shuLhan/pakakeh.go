@@ -763,7 +763,11 @@ func (serv *Server) reader() {
 			}
 
 			if debug.Value >= 3 {
-				log.Printf("websocket: Server.reader: packet: {len:%d value:% x\n", len(packet), packet[:16])
+				max := len(packet)
+				if max > 16 {
+					max = 16
+				}
+				log.Printf("websocket: Server.reader: packet {len:%d value:% x ...}\n", len(packet), packet[:max])
 			}
 
 			// Handle chopped, unfinished packet or payload.
