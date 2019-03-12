@@ -71,7 +71,6 @@ func (cls *ClientManager) addFrame(conn int, frame *Frame) {
 	}
 	delete(cls.frame, conn)
 	cls.Unlock()
-	return
 }
 
 //
