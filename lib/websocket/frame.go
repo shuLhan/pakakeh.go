@@ -192,6 +192,51 @@ func (f *Frame) IsData() bool {
 }
 
 //
+// isValid will return true if a frame is valid.
+// If isMasked is true, the frame masked MUST be set, otherwise it will return
+// false; and vice versa.
+// Parameter allowRsv1, allowRsv2, and allowRsv3 are to allow one or more
+// frame reserved bits to be set, in order.
+// If reserved bit 1 is set but parameter allowRsv1 is false, it will return
+// false; and so on.
+// If its control frame the fin field should be set and payload must be less
+// than 125.
+//
+func (f *Frame) isValid(isMasked, allowRsv1, allowRsv2, allowRsv3 bool) bool {
+	if isMasked {
+		if f.masked != frameIsMasked {
+			return false
+		}
+	} else {
+		if f.masked == frameIsMasked {
+			return false
+		}
+	}
+	if f.rsv1 > 0 && !allowRsv1 {
+		return false
+	}
+	if f.rsv2 > 0 && !allowRsv2 {
+		return false
+	}
+	if f.rsv3 > 0 && !allowRsv3 {
+		return false
+	}
+
+	if f.opcode >= OpcodeClose {
+		if f.fin == 0 {
+			// Control frame must set the fin.
+			return false
+		}
+		// Control frame payload must not larger than 125.
+		if f.len > frameSmallPayload {
+			return false
+		}
+	}
+
+	return true
+}
+
+//
 // Opcode return the frame operation code.
 //
 func (f *Frame) Opcode() Opcode {

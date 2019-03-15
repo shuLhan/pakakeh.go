@@ -398,7 +398,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 // handleFrame handle a single frame from client.
 //
 func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
-	if !serv.isValidFrame(frame) {
+	if !frame.isValid(true, serv.allowRsv1, serv.allowRsv2, serv.allowRsv3) {
 		serv.handleBadRequest(conn)
 		return true
 	}
@@ -625,40 +625,6 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 		serv.ClientRemove(conn)
 		return
 	}
-}
-
-//
-// isValidFrame will return true if a frame from client is valid:
-// it's masked, the reserved bits is not set (unless allowed by server), and
-// if its control frame the fin should be set and payload must be less than
-// 125.
-//
-func (serv *Server) isValidFrame(frame *Frame) bool {
-	if frame.masked != frameIsMasked {
-		return false
-	}
-	if frame.rsv1 > 0 && !serv.allowRsv1 {
-		return false
-	}
-	if frame.rsv2 > 0 && !serv.allowRsv2 {
-		return false
-	}
-	if frame.rsv3 > 0 && !serv.allowRsv3 {
-		return false
-	}
-
-	if frame.opcode == OpcodeClose || frame.opcode == OpcodePing || frame.opcode == OpcodePong {
-		if frame.fin == 0 {
-			// Control frame must set the fin.
-			return false
-		}
-		// Control frame payload must not larger than 125.
-		if frame.len > frameSmallPayload {
-			return false
-		}
-	}
-
-	return true
 }
 
 //

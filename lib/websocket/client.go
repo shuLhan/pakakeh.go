@@ -452,7 +452,7 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 // handleFrame handle a single frame from client.
 //
 func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
-	if !cl.isValidFrame(frame) {
+	if !frame.isValid(false, cl.allowRsv1, cl.allowRsv2, cl.allowRsv3) {
 		cl.handleBadRequest()
 		return true
 	}
@@ -525,40 +525,6 @@ func (cl *Client) handleInvalidData() {
 	if err != nil {
 		log.Println("websocket: Client.handleInvalidData: " + err.Error())
 	}
-}
-
-//
-// isValidFrame will return true if a frame from server is valid:
-// it's not masked, the reserved bits is not set (unless negotiated with
-// server), and if its control frame the fin should be set and payload must be
-// less than 125.
-//
-func (cl *Client) isValidFrame(frame *Frame) bool {
-	if frame.masked == frameIsMasked {
-		return false
-	}
-	if frame.rsv1 > 0 && !cl.allowRsv1 {
-		return false
-	}
-	if frame.rsv2 > 0 && !cl.allowRsv2 {
-		return false
-	}
-	if frame.rsv3 > 0 && !cl.allowRsv3 {
-		return false
-	}
-
-	if frame.opcode == OpcodeClose || frame.opcode == OpcodePing || frame.opcode == OpcodePong {
-		if frame.fin == 0 {
-			// Control frame must set the fin.
-			return false
-		}
-		// Control frame payload must not larger than 125.
-		if frame.len > frameSmallPayload {
-			return false
-		}
-	}
-
-	return true
 }
 
 //
