@@ -335,7 +335,7 @@ func TestFramePack(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got := c.f.Pack(false)
+		got := c.f.Pack()
 
 		test.Assert(t, "", c.exp, got, true)
 	}

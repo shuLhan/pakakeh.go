@@ -181,7 +181,7 @@ func NewFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	if isMasked {
 		f.masked = frameIsMasked
 	}
-	return f.Pack(isMasked)
+	return f.Pack()
 }
 
 //
@@ -203,13 +203,12 @@ func (f *Frame) Opcode() Opcode {
 //
 // Frame payload len will be set based on length of payload.
 //
-// Frame maskKey will be set randomly only if masked is set and randomMask
-// parameter is true.
+// Frame maskKey will be set randomly only if its is empty.
 //
 // A server MUST NOT mask any frames that it sends to the client.
 // (RFC 6455 5.1-P27).
 //
-func (f *Frame) Pack(randomMask bool) (out []byte) {
+func (f *Frame) Pack() (out []byte) {
 	headerSize := uint64(2)
 	payloadSize := uint64(len(f.payload))
 
@@ -249,7 +248,7 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 	}
 
 	if f.masked == frameIsMasked {
-		if randomMask {
+		if len(f.maskKey) != 4 {
 			f.maskKey = make([]byte, 4)
 			binary.LittleEndian.PutUint32(f.maskKey, rand.Uint32())
 		}

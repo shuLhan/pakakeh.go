@@ -617,7 +617,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	req.opcode = OpcodePong
 	req.masked = 0
 
-	res := req.Pack(false)
+	res := req.Pack()
 
 	err := Send(conn, res)
 	if err != nil {
