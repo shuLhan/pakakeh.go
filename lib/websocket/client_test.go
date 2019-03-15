@@ -90,34 +90,35 @@ func TestClientPing(t *testing.T) {
 		desc: "Without payload, unmasked",
 		req:  NewFramePing(false, nil),
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "With payload, unmasked",
 		reconnect: true,
 		req:       NewFramePing(false, []byte("Hello")),
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "With payload, masked",
 		reconnect: true,
 		req:       NewFramePing(true, []byte("Hello")),
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodePong,
-			len:     5,
-			payload: []byte("Hello"),
+			fin:        frameIsFinished,
+			opcode:     OpcodePong,
+			len:        5,
+			payload:    []byte("Hello"),
+			isComplete: true,
 		},
 	}}
 
@@ -192,64 +193,67 @@ func TestClientText(t *testing.T) {
 		desc: "Small payload, unmasked",
 		req:  NewFrameText(false, []byte("Hello")),
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "Small payload, masked",
 		reconnect: true,
 		req:       NewFrameText(true, []byte("Hello")),
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodeText,
-			len:     5,
-			payload: []byte("Hello"),
+			fin:        frameIsFinished,
+			opcode:     OpcodeText,
+			len:        5,
+			payload:    []byte("Hello"),
+			isComplete: true,
 		},
 	}, {
 		desc: "Medium payload 256, unmasked",
 		req:  NewFrameText(false, _dummyPayload256),
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "Medium payload 256, masked",
 		reconnect: true,
 		req:       NewFrameText(true, _dummyPayload256),
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodeText,
-			len:     uint64(len(_dummyPayload256)),
-			payload: _dummyPayload256,
+			fin:        frameIsFinished,
+			opcode:     OpcodeText,
+			len:        uint64(len(_dummyPayload256)),
+			payload:    _dummyPayload256,
+			isComplete: true,
 		},
 	}, {
 		desc: "Large payload 65536, unmasked",
 		req:  NewFrameText(false, _dummyPayload65536),
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "Large payload 65536, masked",
 		reconnect: true,
 		req:       NewFrameText(true, _dummyPayload65536),
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodeText,
-			len:     uint64(len(_dummyPayload65536)),
-			payload: _dummyPayload65536,
+			fin:        frameIsFinished,
+			opcode:     OpcodeText,
+			len:        uint64(len(_dummyPayload65536)),
+			payload:    _dummyPayload65536,
+			isComplete: true,
 		},
 	}}
 
@@ -327,12 +331,12 @@ func TestClientFragmentation(t *testing.T) {
 			payload: []byte{'l', 'o'},
 		}},
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "Three text frames, unmasked",
@@ -351,12 +355,12 @@ func TestClientFragmentation(t *testing.T) {
 			payload: []byte("Shulhan"),
 		}},
 		expClose: &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusBadRequest,
-			codes:     []byte{0x03, 0xEA},
-			len:       2,
-			payload:   []byte{0x03, 0xEA},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusBadRequest,
+			len:        2,
+			payload:    []byte{0x03, 0xEA},
+			isComplete: true,
 		},
 	}, {
 		desc:      "Three text frames, masked",
@@ -378,10 +382,11 @@ func TestClientFragmentation(t *testing.T) {
 			payload: []byte("Shulhan"),
 		}},
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodeText,
-			len:     14,
-			payload: []byte("Hello, Shulhan"),
+			fin:        frameIsFinished,
+			opcode:     OpcodeText,
+			len:        14,
+			payload:    []byte("Hello, Shulhan"),
+			isComplete: true,
 		},
 	}}
 
@@ -469,10 +474,11 @@ func TestClientFragmentation2(t *testing.T) {
 
 	testClient.handlePong = func(got *Frame) error {
 		exp := &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodePong,
-			len:     4,
-			payload: []byte("PING"),
+			fin:        frameIsFinished,
+			opcode:     OpcodePong,
+			len:        4,
+			payload:    []byte("PING"),
+			isComplete: true,
 		}
 		test.Assert(t, "handlePong", exp, got, true)
 		wg.Done()
@@ -481,10 +487,11 @@ func TestClientFragmentation2(t *testing.T) {
 
 	testClient.HandleText = func(got *Frame) error {
 		exp := &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodeText,
-			len:     14,
-			payload: []byte("Hello, Shulhan"),
+			fin:        frameIsFinished,
+			opcode:     OpcodeText,
+			len:        14,
+			payload:    []byte("Hello, Shulhan"),
+			isComplete: true,
 		}
 		test.Assert(t, "handlePong", exp, got, true)
 		wg.Done()
@@ -531,10 +538,11 @@ func TestClientSendBin(t *testing.T) {
 		desc:    "Single bin frame",
 		payload: []byte("Hello"),
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodeBin,
-			len:     5,
-			payload: []byte("Hello"),
+			fin:        frameIsFinished,
+			opcode:     OpcodeBin,
+			len:        5,
+			payload:    []byte("Hello"),
+			isComplete: true,
 		},
 	}}
 
@@ -592,18 +600,20 @@ func TestClientSendPing(t *testing.T) {
 	}{{
 		desc: "Without payload",
 		exp: &Frame{
-			fin:    frameIsFinished,
-			opcode: OpcodePong,
-			len:    0,
+			fin:        frameIsFinished,
+			opcode:     OpcodePong,
+			len:        0,
+			isComplete: true,
 		},
 	}, {
 		desc:    "With payload",
 		payload: []byte("Test"),
 		exp: &Frame{
-			fin:     frameIsFinished,
-			opcode:  OpcodePong,
-			len:     4,
-			payload: []byte("Test"),
+			fin:        frameIsFinished,
+			opcode:     OpcodePong,
+			len:        4,
+			payload:    []byte("Test"),
+			isComplete: true,
 		},
 	}}
 
@@ -649,12 +659,12 @@ func TestClientSendClose(t *testing.T) {
 
 	testClient.handleClose = func(got *Frame) error {
 		exp := &Frame{
-			fin:       frameIsFinished,
-			opcode:    OpcodeClose,
-			closeCode: StatusNormal,
-			codes:     []byte{0x03, 0xE8},
-			len:       8,
-			payload:   []byte{0x03, 0xE8, 'n', 'o', 'r', 'm', 'a', 'l'},
+			fin:        frameIsFinished,
+			opcode:     OpcodeClose,
+			closeCode:  StatusNormal,
+			len:        8,
+			payload:    []byte{0x03, 0xE8, 'n', 'o', 'r', 'm', 'a', 'l'},
+			isComplete: true,
 		}
 		test.Assert(t, "handleClose", exp, got, true)
 		testClient.Quit()

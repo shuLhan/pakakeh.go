@@ -35,17 +35,10 @@ func Unpack(in []byte) (frames *Frames) {
 
 	frames = &Frames{}
 	packet := in
-	var f *Frame
-	for {
-		f, packet = frameUnpack(packet)
-		if f == nil {
-			break
-		}
-
+	for len(packet) > 0 {
+		f := &Frame{}
+		packet = f.unpack(packet)
 		frames.Append(f)
-		if len(packet) == 0 {
-			break
-		}
 	}
 
 	return

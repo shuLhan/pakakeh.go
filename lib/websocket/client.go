@@ -316,37 +316,6 @@ func (cl *Client) handleBadRequest() {
 	}
 }
 
-func (cl *Client) handleChopped(packet []byte) (rest []byte, isClosing bool) {
-	if cl.frame == nil {
-		return packet, false
-	}
-
-	// Check if frame contains chopped packet.
-	if len(cl.frame.chopped) > 0 {
-		packet = cl.frame.continueUnpack(packet)
-		if len(packet) == 0 {
-			return nil, false
-		}
-	}
-
-	exp := cl.frame.len - uint64(len(cl.frame.payload))
-	if uint64(len(packet)) > exp {
-		rest = packet[exp:]
-		packet = packet[:exp]
-	}
-
-	cl.frame.payload = append(cl.frame.payload, packet...)
-	if uint64(len(cl.frame.payload)) < cl.frame.len {
-		return rest, false
-	}
-
-	frame := cl.frame
-	cl.frame = nil
-	isClosing = cl.handleFrame(frame)
-
-	return rest, isClosing
-}
-
 //
 // onClose request from server.
 //
@@ -661,11 +630,18 @@ func (cl *Client) serve() {
 			log.Printf("websocket: Client.serve: packet: % x\n", packet)
 		}
 
-		var isClosing bool
 		if cl.frame != nil {
-			packet, isClosing := cl.handleChopped(packet)
-			if isClosing || len(packet) == 0 {
-				return
+			packet = cl.frame.unpack(packet)
+			if cl.frame.isComplete {
+				frame := cl.frame
+				cl.frame = nil
+				isClosing := cl.handleFrame(frame)
+				if isClosing {
+					return
+				}
+			}
+			if len(packet) == 0 {
+				continue
 			}
 		}
 
@@ -676,7 +652,11 @@ func (cl *Client) serve() {
 		}
 
 		for _, f := range frames.v {
-			isClosing = cl.handleFrame(f)
+			if !f.isComplete {
+				cl.frame = f
+				continue
+			}
+			isClosing := cl.handleFrame(f)
 			if isClosing {
 				return
 			}

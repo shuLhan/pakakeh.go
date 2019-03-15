@@ -311,76 +311,6 @@ func (serv *Server) upgrader() {
 }
 
 //
-// handleChopped handle possible chopped packet or payload.
-//
-// There are three possible cases that will returned from this function.
-// First, there is no continuous frame.  Packet is new frame, return it as
-// (rest, false) and let the caller unpacke the packet as frame.
-//
-// Second, continuous frame exist but its length and payload size already
-// equal.  The result is similar with the first case.
-//
-// Third, continuous frame exist and its payload less than frame's length.
-// The packet then will be assumed as part of frame's payload.  If packet
-// is not completing the frame payload, we expect to receive another packet,
-// so we return empty "rest" and false.
-//
-// Fourth, continuous frame exist and all or part of packet complete the
-// payload.  We process the frame and return the rest of unprocess packet if
-// available.  The function may return isClosing = true if frame is control
-// CLOSE frame or contains invalid UTF-8 text on data TEXT frame.
-//
-func (serv *Server) handleChopped(x, conn int, packet []byte) (rest []byte, isClosing bool) {
-	frame, _ := serv.Clients.getFrame(conn)
-
-	if frame == nil {
-		return packet, false
-	}
-
-	// Check if frame contains chopped packet.
-	if len(frame.chopped) > 0 {
-		packet = frame.continueUnpack(packet)
-		if len(packet) == 0 {
-			serv.Clients.setFrame(conn, frame)
-			serv.epollRegisterRead(x, conn)
-			return nil, false
-		}
-	}
-
-	if frame.len == uint64(len(frame.payload)) {
-		// Connection contains continuous frame, but its already
-		// filled.
-		return packet, false
-	}
-
-	exp := frame.len - uint64(len(frame.payload))
-	if uint64(len(packet)) > exp {
-		rest = packet[exp:]
-		packet = packet[:exp]
-	}
-
-	start := len(frame.payload) % 4
-	for y := 0; y < len(packet); y++ {
-		packet[y] ^= frame.maskKey[start%4]
-		start++
-	}
-
-	frame.payload = append(frame.payload, packet...)
-	if uint64(len(frame.payload)) < frame.len {
-		// We got frame with unfinished payload.
-		serv.Clients.setFrame(conn, frame)
-		serv.epollRegisterRead(x, conn)
-		return rest, false
-	}
-
-	isClosing = serv.handleFrame(conn, frame)
-	if !isClosing {
-		serv.epollRegisterRead(x, conn)
-	}
-	return rest, isClosing
-}
-
-//
 // handleFragment will handle continuation frame (fragmentation).
 //
 // (RFC 6455 Section 5.4 Page 34)
@@ -744,10 +674,6 @@ func (serv *Server) isValidFrame(frame *Frame) bool {
 // as defined in Section 7.4.1. (RFC 6455, section 5.1, P27).
 //
 func (serv *Server) reader() {
-	var (
-		isClosing bool
-	)
-
 	for {
 		nevents, err := unix.EpollWait(serv.epollRead, serv.epollEvents[:], -1)
 		if err != nil {
@@ -773,9 +699,20 @@ func (serv *Server) reader() {
 			}
 
 			// Handle chopped, unfinished packet or payload.
-			packet, isClosing = serv.handleChopped(x, conn, packet)
-			if isClosing || len(packet) == 0 {
-				continue
+			frame, _ := serv.Clients.getFrame(conn)
+			if frame != nil {
+				packet = frame.unpack(packet)
+				if frame.isComplete {
+					serv.Clients.setFrame(conn, nil)
+					isClosing := serv.handleFrame(conn, frame)
+					if isClosing {
+						continue
+					}
+				}
+				if len(packet) == 0 {
+					serv.epollRegisterRead(x, conn)
+					continue
+				}
 			}
 
 			frames := Unpack(packet)
@@ -784,15 +721,13 @@ func (serv *Server) reader() {
 				continue
 			}
 
-			if debug.Value >= 3 {
-				if frames != nil {
-					log.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
-				}
+			if debug.Value >= 3 && frames != nil {
+				log.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
 			}
 
-			isClosing = false
+			var isClosing bool
 			for _, frame := range frames.v {
-				if len(frame.chopped) > 0 {
+				if !frame.isComplete {
 					serv.Clients.setFrame(conn, frame)
 					continue
 				}
