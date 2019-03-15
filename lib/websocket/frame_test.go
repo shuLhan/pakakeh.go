@@ -64,7 +64,7 @@ func TestNewFrameClose(t *testing.T) {
 			opcode:    OpcodeClose,
 			closeCode: StatusBadRequest,
 			masked:    frameIsMasked,
-			payload:   []byte("Hello!"),
+			payload:   libbytes.Concat([]byte{0x03, 0xEA}, []byte("Hello!")),
 		},
 	}, {
 		desc:    "With overflow payload",
@@ -74,7 +74,7 @@ func TestNewFrameClose(t *testing.T) {
 			opcode:    OpcodeClose,
 			closeCode: StatusBadRequest,
 			masked:    frameIsMasked,
-			payload:   _dummyPayload256[:123],
+			payload:   libbytes.Concat([]byte{0x03, 0xEA}, _dummyPayload256[:123]),
 		},
 	}}
 

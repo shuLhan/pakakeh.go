@@ -317,7 +317,6 @@ func frameUnpack(in []byte) (f *Frame, rest []byte) {
 		default:
 			f.codes = []byte{f.payload[0], f.payload[1]}
 			f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[:2]))
-			f.payload = f.payload[2:]
 		}
 	}
 

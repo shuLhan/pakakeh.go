@@ -609,7 +609,9 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 		// The interpretation of these codes is undefined by this
 		// protocol.
 	}
-	if len(req.payload) > 0 {
+	if len(req.payload) >= 2 {
+		// Cut the close code from actual payload.
+		req.payload = req.payload[2:]
 		if !utf8.Valid(req.payload) {
 			req.closeCode = StatusBadRequest
 		}
