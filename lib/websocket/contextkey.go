@@ -14,8 +14,5 @@ const (
 	CtxKeyUID
 
 	// Internal context keys used by client.
-
-	ctxKeyBytes    // ctxKeyBytes context key for slice of byte, used on testing.
-	ctxKeyFrame    // ctxKeyFrame context key for a frame, used on testing.
 	ctxKeyWSAccept // ctxKeyWSAccept context key for WebSocket accept key.
 )

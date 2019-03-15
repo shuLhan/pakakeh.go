@@ -16,6 +16,9 @@ import (
 	"net/url"
 	"sync"
 	"time"
+	"unicode/utf8"
+
+	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -28,86 +31,186 @@ const (
 )
 
 var (
-	errConnClosed = fmt.Errorf("websocket: client is not connected")
+	ErrConnClosed = fmt.Errorf("websocket: client is not connected")
 )
 
 //
-// Client for websocket.
+// Client for WebSocket protocol.
+//
+// Unlike HTTP client or other most commmon TCP oriented client, the WebSocket
+// client is actually asynchronous or passive-active instead of synchronous.
+// At any time client connection is open to server, client can receive a
+// message broadcast from server.
+//
+// Case examples: if client send "A" to server, and expect that server
+// response with "A+", server may send message "B" before sending "A+".
+// Another case is when client connection is open, server may send "B" and "C"
+// in any order without any request send by client previously.
+//
+// Due to this model, the way to handle response from server is centralized
+// using handlers instead of using single send request-response.
+//
+// Client Example
+//
+// The following snippet show how to create a client and handling response
+// from request or broadcast from server,
+//
+//	cl := &Client{
+//		Endpoint: "ws://127.0.0.1:9001",
+//		HandleText: func(frame *Frame) error {
+//			// Process response from request or broadcast from
+//			// server.
+//			return nil
+//		}
+//	}
+//
+//	err := cl.Connect()
+//	if err != nil {
+//		log.Fatal("Connect: "+ err.Error())
+//	}
+//
+//	err := cl.SendText([]byte("Hello from client"))
+//	if err != nil {
+//		log.Fatal("Connect: "+ err.Error())
+//	}
+//
+// At any time, server may send PING or CLOSE the connection.  For this
+// messages, client already handled it by sending PONG message or by closing
+// underlying connection automatically.
+// Implementor can check closed connection from error returned from Send
+// methods to match with ErrConnClosed.
 //
 type Client struct {
 	sync.Mutex
 	conn net.Conn
 
-	remoteURL       *url.URL
-	remoteAddr      string
-	handshakeHeader http.Header
-	pingQueue       chan *Frame
-	isTLS           bool
+	//
+	// Endpoint contains URI of remote server.  The endpoint use the
+	// following format,
+	//
+	//	ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
+	//	wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
+	//
+	// The port component is OPTIONAL, default is 80 for "ws" scheme, and
+	// 443 for "wss" scheme.
+	//
+	Endpoint string
 
-	handlePing clientRawHandler
+	frame  *Frame
+	frames *Frames
+
+	// HandleBin callback that will be called after receiving data
+	// frame binary from server.
+	HandleBin ClientHandler
+
+	// handleClose function that will be called when client receive
+	// control CLOSE frame from server.  Default handle is to response
+	// with control CLOSE frame with the same payload.
+	// This field is not exported, and only defined to allow testing.
+	handleClose ClientHandler
+
+	// handlePing function that will be called when client receive control
+	// PING frame from server.  Default handler is to response with PONG.
+	// This field is not exported, and only defined to allow testing.
+	handlePing ClientHandler
+
+	// handlePong a function that will be called when client receive
+	// control PONG frame from server.  Default is nil.
+	handlePong ClientHandler
+
+	// HandleRsvControl callback that will be called when server received
+	// reserved control frame (opcode 0xB-F) from server.
+	// Default handler is nil.
+	HandleRsvControl ClientHandler
+
+	// HandleText callback that will be called after receiving data
+	// frame text from server.
+	HandleText ClientHandler
+
+	// Headers The headers field can be used to pass custom headers during
+	// handshake with server.  Any primary header fields ("host",
+	// "upgrade", "connection", "sec-websocket-key",
+	// "sec-websocket-version") will be deleted before handshake.
+	Headers http.Header
+
+	remoteURL  *url.URL
+	remoteAddr string
+
+	allowRsv1 bool
+	allowRsv2 bool
+	allowRsv3 bool
+	isTLS     bool
 }
 
 //
-// NewClient create a new client connection to websocket server with a
-// handshake.
+// Connect to endpoint.
 //
-// The endpoint use the following format,
-//
-//	ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
-//	wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
-//
-// The port component is OPTIONAL; the default for "ws" is port 80, while the
-// default for "wss" is port 443.
-//
-// The headers parameter can be used to pass custom headers, except primary
-// header fields ("host", "upgrade", "connection", "sec-websocket-key",
-// "sec-websocket-version") will be deleted.
-//
-// On success it will return client thats connected to endpoint.
-// On fail it will return nil and error.
-//
-func NewClient(endpoint string, headers http.Header) (cl *Client, err error) {
-	cl = &Client{
-		handlePing: handlePing,
-	}
-
-	err = cl.parseURI(endpoint)
+func (cl *Client) Connect() (err error) {
+	err = cl.init()
 	if err != nil {
-		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
+		return fmt.Errorf("websocket: Connect: " + err.Error())
 	}
 
-	if len(headers) > 0 {
-		headers.Del(_hdrKeyHost)
-		headers.Del(_hdrKeyUpgrade)
-		headers.Del(_hdrKeyOrigin)
-		headers.Del(_hdrKeyWSKey)
-		headers.Del(_hdrKeyWSVersion)
+	if cl.conn != nil {
+		cl.Quit()
 	}
 
-	cl.handshakeHeader = headers
-
-	err = cl.connect()
+	err = cl.open()
 	if err != nil {
-		return nil, fmt.Errorf("websocket: NewClient: " + err.Error())
+		return fmt.Errorf("websocket: Connect: " + err.Error())
 	}
 
-	return cl, nil
+	err = cl.handshake()
+	if err != nil {
+		_ = cl.conn.Close()
+		cl.conn = nil
+		return fmt.Errorf("websocket: Connect: " + err.Error())
+	}
+
+	go cl.serve()
+
+	return nil
 }
 
 //
-// servePing serve control frame PING from server, by replying with PONG.
+// dummyHandle define dummy handle for HandleText and HandleBin.
 //
-// If client error when sending PONG, the connection will be force closed.
+func (cl *Client) dummyHandle(frame *Frame) error {
+	return nil
+}
+
 //
-func (cl *Client) servePing() {
-	for f := range cl.pingQueue {
-		err := cl.SendPong(f.payload)
-		if err != nil {
-			log.Println("websocket: client.servePing: " + err.Error())
-			cl.Quit()
-			return
-		}
+// init parse the endpoint URI and (re) initialize the client remote address
+// and headers.
+//
+func (cl *Client) init() (err error) {
+	if cl.HandleBin == nil {
+		cl.HandleBin = cl.dummyHandle
 	}
+	if cl.handleClose == nil {
+		cl.handleClose = cl.onClose
+	}
+	if cl.handlePing == nil {
+		cl.handlePing = cl.onPing
+	}
+	if cl.HandleText == nil {
+		cl.HandleText = cl.dummyHandle
+	}
+
+	err = cl.parseURI()
+	if err != nil {
+		return err
+	}
+
+	if len(cl.Headers) > 0 {
+		cl.Headers.Del(_hdrKeyHost)
+		cl.Headers.Del(_hdrKeyUpgrade)
+		cl.Headers.Del(_hdrKeyOrigin)
+		cl.Headers.Del(_hdrKeyWSKey)
+		cl.Headers.Del(_hdrKeyWSVersion)
+	}
+
+	return nil
 }
 
 //
@@ -119,8 +222,8 @@ func (cl *Client) servePing() {
 // On success it will set the remote address that can be used on open().
 // On fail it will return an error.
 //
-func (cl *Client) parseURI(endpoint string) (err error) {
-	cl.remoteURL, err = url.ParseRequestURI(endpoint)
+func (cl *Client) parseURI() (err error) {
+	cl.remoteURL, err = url.ParseRequestURI(cl.Endpoint)
 	if err != nil {
 		cl = nil
 		return err
@@ -187,8 +290,8 @@ func (cl *Client) handshake() (err error) {
 		return err
 	}
 
-	if len(cl.handshakeHeader) > 0 {
-		err = cl.handshakeHeader.Write(&bb)
+	if len(cl.Headers) > 0 {
+		err = cl.Headers.Write(&bb)
 		if err != nil {
 			return err
 		}
@@ -198,7 +301,225 @@ func (cl *Client) handshake() (err error) {
 
 	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
 
-	return cl.send(ctx, bb.Bytes(), cl.handleHandshake)
+	return cl.sendWithHandler(ctx, bb.Bytes(), cl.handleHandshake)
+}
+
+//
+// handleBadRequest by sending Close frame with status.
+//
+func (cl *Client) handleBadRequest() {
+	frameClose := NewFrameClose(true, StatusBadRequest, nil)
+
+	err := cl.send(frameClose)
+	if err != nil {
+		log.Println("websocket: server.handleBadRequest: " + err.Error())
+	}
+}
+
+func (cl *Client) handleChopped(packet []byte) (rest []byte, isClosing bool) {
+	if cl.frame == nil {
+		return packet, false
+	}
+
+	// Check if frame contains chopped packet.
+	if len(cl.frame.chopped) > 0 {
+		packet = cl.frame.continueUnpack(packet)
+		if len(packet) == 0 {
+			return nil, false
+		}
+	}
+
+	exp := cl.frame.len - uint64(len(cl.frame.payload))
+	if uint64(len(packet)) > exp {
+		rest = packet[exp:]
+		packet = packet[:exp]
+	}
+
+	cl.frame.payload = append(cl.frame.payload, packet...)
+	if uint64(len(cl.frame.payload)) < cl.frame.len {
+		return rest, false
+	}
+
+	frame := cl.frame
+	cl.frame = nil
+	isClosing = cl.handleFrame(frame)
+
+	return rest, isClosing
+}
+
+//
+// onClose request from server.
+//
+func (cl *Client) onClose(frame *Frame) error {
+	switch {
+	case frame.closeCode == 0:
+		frame.closeCode = StatusBadRequest
+	case frame.closeCode < StatusNormal:
+		frame.closeCode = StatusBadRequest
+	case frame.closeCode == 1004:
+		// Reserved.  The specific meaning might be defined in the future.
+		frame.closeCode = StatusBadRequest
+	case frame.closeCode == 1005:
+		// 1005 is a reserved value and MUST NOT be set as a status
+		// code in a Close control frame by an endpoint.  It is
+		// designated for use in applications expecting a status code
+		// to indicate that no status code was actually present.
+		frame.closeCode = StatusBadRequest
+	case frame.closeCode == 1006:
+		// 1006 is a reserved value and MUST NOT be set as a status
+		// code in a Close control frame by an endpoint.  It is
+		// designated for use in applications expecting a status code
+		// to indicate that the connection was closed abnormally,
+		// e.g., without sending or receiving a Close control frame.
+		frame.closeCode = StatusBadRequest
+	case frame.closeCode >= 1015 && frame.closeCode <= 2999:
+		frame.closeCode = StatusBadRequest
+	case frame.closeCode >= 3000 && frame.closeCode <= 3999:
+		// Status codes in the range 3000-3999 are reserved for use by
+		// libraries, frameworks, and applications.  These status
+		// codes are registered directly with IANA.  The
+		// interpretation of these codes is undefined by this
+		// protocol.
+	case frame.closeCode >= 4000 && frame.closeCode <= 4999:
+		// Status codes in the range 4000-4999 are reserved for
+		// private use and thus can't be registered.  Such codes can
+		// be used by prior agreements between WebSocket applications.
+		// The interpretation of these codes is undefined by this
+		// protocol.
+	}
+	if len(frame.payload) >= 2 {
+		frame.payload = frame.payload[2:]
+		if !utf8.Valid(frame.payload) {
+			frame.closeCode = StatusBadRequest
+		}
+	}
+
+	packet := NewFrameClose(true, frame.closeCode, frame.payload)
+
+	if debug.Value >= 3 {
+		log.Printf("websocket: Client.onClose: %+v\n", frame)
+	}
+
+	err := cl.send(packet)
+	if err != nil {
+		log.Println("websocket: Client.onClose: Send: " + err.Error())
+	}
+
+	cl.Quit()
+
+	return nil
+}
+
+//
+// handleFragment will handle continuation frame (fragmentation).
+//
+func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
+	if debug.Value >= 3 {
+		log.Printf("websocket: Client.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
+			frame.fin, frame.opcode, frame.masked, frame.len,
+			len(frame.payload))
+	}
+
+	if cl.frames == nil {
+		if frame.opcode == OpcodeCont {
+			// If a connection does not have continuous frame,
+			// then current frame opcode must not be 0.
+			cl.handleBadRequest()
+			return true
+		}
+	} else if frame.opcode != OpcodeCont {
+		// If a connection have continuous frame, the next frame
+		// opcode must be 0.
+		cl.handleBadRequest()
+		return true
+	}
+
+	if frame.fin == 0 {
+		if uint64(len(frame.payload)) < frame.len {
+			// Continuous frame with unfinished payload.
+			cl.frame = frame
+		} else {
+			if cl.frames == nil {
+				cl.frames = new(Frames)
+			}
+			cl.frames.Append(frame)
+			cl.frame = nil
+		}
+		return false
+	}
+
+	if cl.frame == nil && uint64(len(frame.payload)) < frame.len {
+		// Final frame with unfinished payload.
+		cl.frame = frame
+		return false
+	}
+
+	if cl.frames != nil {
+		frame = cl.frames.fin(frame)
+	}
+
+	cl.frame = nil
+	cl.frames = nil
+
+	var err error
+	if frame.opcode == OpcodeText {
+		if !utf8.Valid(frame.payload) {
+			cl.handleInvalidData()
+			return true
+		}
+		err = cl.HandleText(frame)
+	} else {
+		err = cl.HandleBin(frame)
+	}
+	if err != nil {
+		cl.handleBadRequest()
+		return true
+	}
+
+	return false
+}
+
+//
+// handleFrame handle a single frame from client.
+//
+func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
+	if !cl.isValidFrame(frame) {
+		cl.handleBadRequest()
+		return true
+	}
+
+	if debug.Value >= 3 {
+		log.Printf("websocket: Client.handleFrame: %+v\n", frame)
+	}
+
+	switch frame.opcode {
+	case OpcodeCont, OpcodeText, OpcodeBin:
+		isInvalid := cl.handleFragment(frame)
+		if isInvalid {
+			isClosing = true
+		}
+	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
+		cl.handleBadRequest()
+		return true
+	case OpcodeClose:
+		cl.handleClose(frame)
+		return true
+	case OpcodePing:
+		_ = cl.handlePing(frame)
+	case OpcodePong:
+		if cl.handlePong != nil {
+			_ = cl.handlePong(frame)
+		}
+	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
+		if cl.HandleRsvControl != nil {
+			_ = cl.HandleRsvControl(frame)
+		} else {
+			cl.handleClose(frame)
+			isClosing = true
+		}
+	}
+
+	return isClosing
 }
 
 func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
@@ -226,37 +547,58 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 }
 
 //
-// connect to server remote address and handshake parameters.
+// handleInvalidData by sending Close frame with status 1007.
 //
-func (cl *Client) connect() (err error) {
-	if cl.conn != nil {
-		cl.Quit()
-	}
+func (cl *Client) handleInvalidData() {
+	frameClose := NewFrameClose(true, StatusInvalidData, nil)
 
-	err = cl.open()
+	err := cl.send(frameClose)
 	if err != nil {
-		return err
+		log.Println("websocket: Client.handleInvalidData: " + err.Error())
+	}
+}
+
+//
+// isValidFrame will return true if a frame from server is valid:
+// it's not masked, the reserved bits is not set (unless negotiated with
+// server), and if its control frame the fin should be set and payload must be
+// less than 125.
+//
+func (cl *Client) isValidFrame(frame *Frame) bool {
+	if frame.masked == frameIsMasked {
+		return false
+	}
+	if frame.rsv1 > 0 && !cl.allowRsv1 {
+		return false
+	}
+	if frame.rsv2 > 0 && !cl.allowRsv2 {
+		return false
+	}
+	if frame.rsv3 > 0 && !cl.allowRsv3 {
+		return false
 	}
 
-	err = cl.handshake()
-	if err != nil {
-		_ = cl.conn.Close()
-		cl.conn = nil
-		return err
+	if frame.opcode == OpcodeClose || frame.opcode == OpcodePing || frame.opcode == OpcodePong {
+		if frame.fin == 0 {
+			// Control frame must set the fin.
+			return false
+		}
+		// Control frame payload must not larger than 125.
+		if frame.len > frameSmallPayload {
+			return false
+		}
 	}
 
-	cl.pingQueue = make(chan *Frame, 24)
-	go cl.servePing()
-
-	return nil
+	return true
 }
 
 //
 // SendBin send data frame as binary to server.
 // If handler is nil, no response will be read from server.
 //
-func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHandler) error {
-	return cl.sendData(ctx, bin, OpcodeBin, handler)
+func (cl *Client) SendBin(payload []byte) error {
+	packet := NewFrameBin(true, payload)
+	return cl.send(packet)
 }
 
 //
@@ -264,25 +606,17 @@ func (cl *Client) SendBin(ctx context.Context, bin []byte, handler ClientRecvHan
 // If waitResponse is true, client will wait for CLOSE response from server
 // before closing the connection.
 //
-func (cl *Client) SendClose(waitResponse bool) (err error) {
-	packet := NewFrameClose(true, 0, nil)
-	if waitResponse {
-		err = cl.send(context.Background(), packet, cl.handleClose)
-	} else {
-		err = cl.send(context.Background(), packet, nil)
-	}
-
-	cl.Quit()
-
-	return err
+func (cl *Client) SendClose(status CloseCode, payload []byte) (err error) {
+	packet := NewFrameClose(true, status, payload)
+	return cl.send(packet)
 }
 
 //
 // SendPing send control PING frame to server, expecting PONG as response.
 //
-func (cl *Client) SendPing(ctx context.Context, payload []byte) error {
+func (cl *Client) SendPing(payload []byte) error {
 	packet := NewFramePing(true, payload)
-	return cl.send(ctx, packet, cl.handlePing)
+	return cl.send(packet)
 }
 
 //
@@ -291,61 +625,63 @@ func (cl *Client) SendPing(ctx context.Context, payload []byte) error {
 //
 func (cl *Client) SendPong(payload []byte) error {
 	packet := NewFramePong(true, payload)
-	return cl.send(context.Background(), packet, nil)
+	return cl.send(packet)
 }
 
 //
 // SendText send data frame as text to server.
 // If handler is nil, no response will be read from server.
 //
-func (cl *Client) SendText(ctx context.Context, text []byte, handler ClientRecvHandler) (err error) {
-	return cl.sendData(ctx, text, OpcodeText, handler)
+func (cl *Client) SendText(payload []byte) (err error) {
+	packet := NewFrameText(true, payload)
+	return cl.send(packet)
 }
 
 //
-// Recv read one data frame from server.
-// One should not use this method manually, instead of the handler in Send()
-// method.
+// serve read one data frame at a time from server and propagated to handler.
 //
-func (cl *Client) Recv() (frames *Frames, err error) {
+func (cl *Client) serve() {
 	if cl.conn == nil {
-		return nil, errConnClosed
+		log.Println("websocket: Client.serve: client is not connected")
+		return
 	}
 
-	frames = &Frames{}
-
-	// Read until we received frame with fin or control CLOSE frame.
 	for {
 		packet, err := cl.recv()
 		if err != nil {
-			return nil, err
+			log.Printf("websocket: Client.serve: " + err.Error())
+			return
+		}
+		if len(packet) == 0 {
+			log.Printf("websocket: Client.serve: empty packet received, closing")
+			return
 		}
 
-		fs := Unpack(packet)
-		if fs == nil {
-			// Empty frames received, connection maybe lost.
-			return nil, fmt.Errorf("websocket: client.Recv: uncomplete frames")
+		if debug.Value >= 3 {
+			log.Printf("websocket: Client.serve: packet: % x\n", packet)
 		}
-		for _, f := range fs.v {
-			switch f.opcode {
-			case OpcodePing:
-				cl.pingQueue <- f
-			case OpcodePong:
-				// Ignore control PONG frame.
-			case OpcodeClose:
-				frames.Append(f)
-				goto out
-			default:
-				frames.Append(f)
-				if f.fin == frameIsFinished {
-					goto out
-				}
+
+		var isClosing bool
+		if cl.frame != nil {
+			packet, isClosing := cl.handleChopped(packet)
+			if isClosing || len(packet) == 0 {
+				return
+			}
+		}
+
+		frames := Unpack(packet)
+		if frames == nil {
+			log.Println("websocket: client.serve: uncomplete frames received")
+			continue
+		}
+
+		for _, f := range frames.v {
+			isClosing = cl.handleFrame(f)
+			if isClosing {
+				return
 			}
 		}
 	}
-
-out:
-	return frames, err
 }
 
 //
@@ -354,50 +690,26 @@ out:
 // (e.g. lost connection) to release the resource.
 //
 func (cl *Client) Quit() {
-	cl.Lock()
 	if cl.conn == nil {
-		cl.Unlock()
 		return
 	}
 	err := cl.conn.Close()
 	if err != nil {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
+	cl.Lock()
 	cl.conn = nil
-	close(cl.pingQueue)
 	cl.Unlock()
 }
 
 //
-// handleClose define a callback for SendClose() that expect server to
-// response with CLOSE frame.
+// onPing default handler when client receive control PING frame from server.
 //
-func (cl *Client) handleClose(ctx context.Context, packet []byte) error {
-	f, _ := frameUnpack(packet)
-	if f == nil {
-		return fmt.Errorf("websocket: Client.handleClose: empty response")
+func (cl *Client) onPing(frame *Frame) error {
+	if frame == nil {
+		return nil
 	}
-	if f.opcode != OpcodeClose {
-		return fmt.Errorf("websocket: Client.handleClose: expecting CLOSE frame, got %d",
-			f.opcode)
-	}
-	return nil
-}
-
-//
-// handlePing define a callback for SendPing() that expect server to response
-// with PONG frame.
-//
-func handlePing(ctx context.Context, packet []byte) error {
-	f, _ := frameUnpack(packet)
-	if f == nil {
-		return fmt.Errorf("websocket: Client.handlePing: empty response")
-	}
-	if f.opcode != OpcodePong {
-		return fmt.Errorf("websocket: Client.handlePing: expecting PONG frame, got %d",
-			f.opcode)
-	}
-	return nil
+	return cl.SendPong(frame.payload)
 }
 
 //
@@ -407,7 +719,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 	cl.Lock()
 	if cl.conn == nil {
 		cl.Unlock()
-		return nil, errConnClosed
+		return nil, ErrConnClosed
 	}
 
 	buf := make([]byte, 512)
@@ -433,29 +745,46 @@ func (cl *Client) recv() (packet []byte, err error) {
 	return packet, err
 }
 
-//
-// send raw stream to server, read the response, and pass it to handler.
-//
-func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
-	cl.Lock()
+func (cl *Client) send(packet []byte) (err error) {
 	if cl.conn == nil {
-		cl.Unlock()
-		return errConnClosed
+		return ErrConnClosed
 	}
 
 	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
-		cl.Unlock()
+		return err
+	}
+
+	if debug.Value >= 3 {
+		log.Printf("websocket: Client.send: % x\n", packet)
+	}
+
+	_, err = cl.conn.Write(packet)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//
+// sendWithHandler send message to server, read the response, and pass it to
+// handler.
+//
+func (cl *Client) sendWithHandler(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
+	if cl.conn == nil {
+		return ErrConnClosed
+	}
+
+	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
+	if err != nil {
 		return err
 	}
 
 	_, err = cl.conn.Write(req)
 	if err != nil {
-		cl.Unlock()
 		return err
 	}
-
-	cl.Unlock()
 
 	if handleRaw != nil {
 		var resp []byte
@@ -464,48 +793,6 @@ func (cl *Client) send(ctx context.Context, req []byte, handleRaw clientRawHandl
 			return err
 		}
 		return handleRaw(ctx, resp)
-	}
-
-	return nil
-}
-
-func (cl *Client) sendData(ctx context.Context, req []byte, opcode Opcode, handler ClientRecvHandler) (err error) {
-	cl.Lock()
-	if cl.conn == nil {
-		cl.Unlock()
-		return errConnClosed
-	}
-
-	var packet []byte
-
-	if opcode == OpcodeText {
-		packet = NewFrameText(true, req)
-	} else {
-		packet = NewFrameBin(true, req)
-	}
-
-	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
-	if err != nil {
-		cl.Unlock()
-		return err
-	}
-
-	_, err = cl.conn.Write(packet)
-	if err != nil {
-		cl.Unlock()
-		return err
-	}
-
-	cl.Unlock()
-
-	if handler != nil {
-		var frames *Frames
-		frames, err = cl.Recv()
-		if err != nil {
-			return err
-		}
-
-		return handler(ctx, frames)
 	}
 
 	return nil

@@ -15,10 +15,10 @@ import (
 type clientRawHandler func(ctx context.Context, resp []byte) (err error)
 
 //
-// ClientRecvHandler define a custom callback type for client to handle
-// response from request in the form of frames.
+// ClientHandler define a callback type for client to handle packet from
+// server (either broadcast or from response of request) in the form of frame.
 //
-type ClientRecvHandler func(ctx context.Context, frames *Frames) (err error)
+type ClientHandler func(frame *Frame) (err error)
 
 // HandlerAuthFn define server callback type to handle authentication request.
 type HandlerAuthFn func(req *Handshake) (ctx context.Context, err error)

@@ -39,9 +39,11 @@ func TestNewServer(t *testing.T) {
 }
 
 func createClient(t *testing.T, endpoint string) (cl *Client) {
-	cl = &Client{}
+	cl = &Client{
+		Endpoint: endpoint,
+	}
 
-	err := cl.parseURI(endpoint)
+	err := cl.parseURI()
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -283,7 +285,7 @@ func TestServerHandshake(t *testing.T) {
 			return
 		}
 
-		err = cl.send(context.Background(), bb.Bytes(), handleHandshake)
+		err = cl.sendWithHandler(context.Background(), bb.Bytes(), handleHandshake)
 		if err != nil {
 			t.Fatal(err)
 		}
