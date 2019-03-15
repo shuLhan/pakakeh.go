@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"math"
 	"math/rand"
-	"time"
 )
 
 //
@@ -391,11 +390,8 @@ func (f *Frame) Pack(randomMask bool) (out []byte) {
 
 	if f.masked == frameIsMasked {
 		if randomMask {
-			if _rng == nil {
-				_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-			}
 			f.maskKey = make([]byte, 4)
-			binary.LittleEndian.PutUint32(f.maskKey, _rng.Uint32())
+			binary.LittleEndian.PutUint32(f.maskKey, rand.Uint32())
 		}
 
 		out[x] = f.maskKey[0]

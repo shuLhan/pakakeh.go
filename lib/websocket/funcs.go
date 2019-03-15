@@ -10,7 +10,6 @@ import (
 	"encoding/binary"
 	"log"
 	"math/rand"
-	"time"
 
 	"golang.org/x/sys/unix"
 )
@@ -97,14 +96,10 @@ func generateHandshakeAccept(key []byte) string {
 // base64-encoded (see Section 4 of [RFC4648]).
 //
 func generateHandshakeKey() (key []byte) {
-	if _rng == nil {
-		_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	}
-
 	bkey := make([]byte, 16)
 
-	binary.LittleEndian.PutUint64(bkey[0:8], _rng.Uint64())
-	binary.LittleEndian.PutUint64(bkey[8:16], _rng.Uint64())
+	binary.LittleEndian.PutUint64(bkey[0:8], rand.Uint64())
+	binary.LittleEndian.PutUint64(bkey[8:16], rand.Uint64())
 
 	key = make([]byte, base64.StdEncoding.EncodedLen(len(bkey)))
 	base64.StdEncoding.Encode(key, bkey)

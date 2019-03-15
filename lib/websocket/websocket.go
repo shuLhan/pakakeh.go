@@ -30,10 +30,12 @@ const (
 
 var defaultTimeout = 10 * time.Second //nolint: gochecknoglobals
 
-var _rng *rand.Rand //nolint: gochecknoglobals
-
 var _bbPool = sync.Pool{ //nolint: gochecknoglobals
 	New: func() interface{} {
 		return new(bytes.Buffer)
 	},
+}
+
+func init() { //nolint: gochecknoinits
+	rand.Seed(time.Now().UnixNano())
 }
