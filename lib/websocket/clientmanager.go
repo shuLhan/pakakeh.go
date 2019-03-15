@@ -73,28 +73,17 @@ func (cls *ClientManager) All() (conns []int) {
 // finFrames merge all continuous frames into single frame and clear the
 // stored frame and frames on behalf of connection.
 //
-func (cls *ClientManager) finFrames(conn int, fin *Frame) (f *Frame) {
+func (cls *ClientManager) finFrames(conn int, last *Frame) (f *Frame) {
 	cls.Lock()
+
 	frames, ok := cls.frames[conn]
 	if !ok {
 		cls.Unlock()
-		return fin
+		return last
 	}
 
-	f = frames.v[0]
-	for x := 1; x < len(frames.v); x++ {
-		if frames.v[x].opcode == OpcodeClose {
-			break
-		}
+	f = frames.fin(last)
 
-		// Ignore control PING or PONG frame.
-		if frames.v[x].opcode == OpcodePing || frames.v[x].opcode == OpcodePong {
-			continue
-		}
-
-		f.payload = append(f.payload, frames.v[x].payload...)
-	}
-	f.payload = append(f.payload, fin.payload...)
 	delete(cls.frames, conn)
 	delete(cls.frame, conn)
 

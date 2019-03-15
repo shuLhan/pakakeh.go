@@ -63,6 +63,32 @@ func (frames *Frames) Append(f *Frame) {
 }
 
 //
+// fin merge all continuous frame with last frame and return it as single
+// frame.
+//
+func (frames *Frames) fin(last *Frame) (frame *Frame) {
+	frame = frames.v[0]
+
+	for x := 1; x < len(frames.v); x++ {
+		if frames.v[x].opcode == OpcodeClose {
+			break
+		}
+
+		// Ignore control PING or PONG frame.
+		if frames.v[x].opcode == OpcodePing || frames.v[x].opcode == OpcodePong {
+			continue
+		}
+
+		frame.payload = append(frame.payload, frames.v[x].payload...)
+	}
+	if last != nil {
+		frame.payload = append(frame.payload, last.payload...)
+	}
+
+	return frame
+}
+
+//
 // isClosed will return true if one of the frame is control CLOSE frame.
 //
 func (frames *Frames) isClosed() bool {
