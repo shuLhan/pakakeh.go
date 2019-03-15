@@ -181,7 +181,7 @@ func NewFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	if isMasked {
 		f.masked = frameIsMasked
 	}
-	return f.Pack()
+	return f.pack()
 }
 
 //
@@ -244,7 +244,7 @@ func (f *Frame) Opcode() Opcode {
 }
 
 //
-// Pack WebSocket Frame into packet that can be written into socket.
+// pack WebSocket Frame into packet that can be written into socket.
 //
 // Frame payload len will be set based on length of payload.
 //
@@ -253,7 +253,7 @@ func (f *Frame) Opcode() Opcode {
 // A server MUST NOT mask any frames that it sends to the client.
 // (RFC 6455 5.1-P27).
 //
-func (f *Frame) Pack() (out []byte) {
+func (f *Frame) pack() (out []byte) {
 	headerSize := uint64(2)
 	payloadSize := uint64(len(f.payload))
 
