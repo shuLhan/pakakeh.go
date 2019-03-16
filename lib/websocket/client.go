@@ -607,12 +607,14 @@ func (cl *Client) serve() {
 	for {
 		packet, err := cl.recv()
 		if err != nil {
-			log.Printf("websocket: Client.serve: " + err.Error())
-			return
+			log.Println("websocket: Client.serve: " + err.Error())
+			break
 		}
 		if len(packet) == 0 {
-			log.Printf("websocket: Client.serve: empty packet received, closing")
-			return
+			// Empty packet may indicated that server has closed
+			// the connection abnormally.
+			log.Println("websocket: Client.serve: empty packet received, closing")
+			break
 		}
 
 		if debug.Value >= 3 {
@@ -651,6 +653,7 @@ func (cl *Client) serve() {
 			}
 		}
 	}
+	cl.Quit()
 }
 
 //
