@@ -18,7 +18,7 @@ type clientRawHandler func(ctx context.Context, resp []byte) (err error)
 // ClientHandler define a callback type for client to handle packet from
 // server (either broadcast or from response of request) in the form of frame.
 //
-type ClientHandler func(frame *Frame) (err error)
+type ClientHandler func(cl *Client, frame *Frame) (err error)
 
 // HandlerAuthFn define server callback type to handle authentication request.
 type HandlerAuthFn func(req *Handshake) (ctx context.Context, err error)

@@ -133,7 +133,7 @@ func TestClientPing(t *testing.T) {
 			}
 		}
 
-		testClient.handleClose = func(got *Frame) error {
+		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
 			test.Assert(t, "close", exp, got, true)
 
@@ -141,13 +141,13 @@ func TestClientPing(t *testing.T) {
 				got.payload = got.payload[2:]
 			}
 
-			testClient.SendClose(got.closeCode, got.payload)
-			testClient.Quit()
+			cl.SendClose(got.closeCode, got.payload)
+			cl.Quit()
 			wg.Done()
 			return nil
 		}
 
-		testClient.handlePong = func(got *Frame) (err error) {
+		testClient.handlePong = func(cl *Client, got *Frame) (err error) {
 			exp := c.exp
 			test.Assert(t, "handlePong", exp, got, true)
 			wg.Done()
@@ -268,16 +268,16 @@ func TestClientText(t *testing.T) {
 			}
 		}
 
-		testClient.handleClose = func(got *Frame) error {
+		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
 			test.Assert(t, "close", exp, got, true)
-			testClient.SendClose(got.closeCode, got.payload)
-			testClient.Quit()
+			cl.SendClose(got.closeCode, got.payload)
+			cl.Quit()
 			wg.Done()
 			return nil
 		}
 
-		testClient.HandleText = func(got *Frame) error {
+		testClient.HandleText = func(cl *Client, got *Frame) error {
 			exp := c.exp
 			test.Assert(t, "text", exp, got, true)
 			wg.Done()
@@ -401,16 +401,16 @@ func TestClientFragmentation(t *testing.T) {
 			}
 		}
 
-		testClient.handleClose = func(got *Frame) error {
+		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
 			test.Assert(t, "close", exp, got, true)
-			testClient.SendClose(got.closeCode, got.payload)
-			testClient.Quit()
+			cl.SendClose(got.closeCode, got.payload)
+			cl.Quit()
 			wg.Done()
 			return nil
 		}
 
-		testClient.HandleText = func(got *Frame) error {
+		testClient.HandleText = func(cl *Client, got *Frame) error {
 			exp := c.exp
 			test.Assert(t, "text", exp, got, true)
 			wg.Done()
@@ -472,7 +472,7 @@ func TestClientFragmentation2(t *testing.T) {
 		payload: []byte("Shulhan"),
 	}}
 
-	testClient.handlePong = func(got *Frame) error {
+	testClient.handlePong = func(cl *Client, got *Frame) error {
 		exp := &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodePong,
@@ -485,7 +485,7 @@ func TestClientFragmentation2(t *testing.T) {
 		return nil
 	}
 
-	testClient.HandleText = func(got *Frame) error {
+	testClient.HandleText = func(cl *Client, got *Frame) error {
 		exp := &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeText,
@@ -557,7 +557,7 @@ func TestClientSendBin(t *testing.T) {
 			}
 		}
 
-		testClient.HandleBin = func(got *Frame) error {
+		testClient.HandleBin = func(cl *Client, got *Frame) error {
 			exp := c.exp
 			test.Assert(t, "HandleBin", exp, got, true)
 			wg.Done()
@@ -621,7 +621,7 @@ func TestClientSendPing(t *testing.T) {
 		c := c
 		t.Log(c.desc)
 
-		testClient.handlePong = func(got *Frame) error {
+		testClient.handlePong = func(cl *Client, got *Frame) error {
 			exp := c.exp
 			test.Assert(t, "handlePong", exp, got, true)
 			wg.Done()
@@ -657,7 +657,7 @@ func TestClientSendClose(t *testing.T) {
 		t.Fatal("TestClientSendClose: Connect: " + err.Error())
 	}
 
-	testClient.handleClose = func(got *Frame) error {
+	testClient.handleClose = func(cl *Client, got *Frame) error {
 		exp := &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
@@ -667,7 +667,7 @@ func TestClientSendClose(t *testing.T) {
 			isComplete: true,
 		}
 		test.Assert(t, "handleClose", exp, got, true)
-		testClient.Quit()
+		cl.Quit()
 		wg.Done()
 		return nil
 	}

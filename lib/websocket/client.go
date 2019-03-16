@@ -57,7 +57,7 @@ var (
 //
 //	cl := &Client{
 //		Endpoint: "ws://127.0.0.1:9001",
-//		HandleText: func(frame *Frame) error {
+//		HandleText: func(cl *Client, frame *Frame) error {
 //			// Process response from request or broadcast from
 //			// server.
 //			return nil
@@ -175,7 +175,7 @@ func (cl *Client) Connect() (err error) {
 //
 // dummyHandle define dummy handle for HandleText and HandleBin.
 //
-func (cl *Client) dummyHandle(frame *Frame) error {
+func dummyHandle(cl *Client, frame *Frame) error {
 	return nil
 }
 
@@ -185,16 +185,16 @@ func (cl *Client) dummyHandle(frame *Frame) error {
 //
 func (cl *Client) init() (err error) {
 	if cl.HandleBin == nil {
-		cl.HandleBin = cl.dummyHandle
+		cl.HandleBin = dummyHandle
 	}
 	if cl.handleClose == nil {
-		cl.handleClose = cl.onClose
+		cl.handleClose = clientOnClose
 	}
 	if cl.handlePing == nil {
-		cl.handlePing = cl.onPing
+		cl.handlePing = clientOnPing
 	}
 	if cl.HandleText == nil {
-		cl.HandleText = cl.dummyHandle
+		cl.HandleText = dummyHandle
 	}
 
 	err = cl.parseURI()
@@ -317,9 +317,9 @@ func (cl *Client) handleBadRequest() {
 }
 
 //
-// onClose request from server.
+// clientOnClose request from server.
 //
-func (cl *Client) onClose(frame *Frame) error {
+func clientOnClose(cl *Client, frame *Frame) error {
 	switch {
 	case frame.closeCode == 0:
 		frame.closeCode = StatusBadRequest
@@ -436,9 +436,9 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 			cl.handleInvalidData()
 			return true
 		}
-		err = cl.HandleText(frame)
+		err = cl.HandleText(cl, frame)
 	} else {
-		err = cl.HandleBin(frame)
+		err = cl.HandleBin(cl, frame)
 	}
 	if err != nil {
 		cl.handleBadRequest()
@@ -471,19 +471,19 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		cl.handleBadRequest()
 		return true
 	case OpcodeClose:
-		cl.handleClose(frame)
+		cl.handleClose(cl, frame)
 		return true
 	case OpcodePing:
-		_ = cl.handlePing(frame)
+		_ = cl.handlePing(cl, frame)
 	case OpcodePong:
 		if cl.handlePong != nil {
-			_ = cl.handlePong(frame)
+			_ = cl.handlePong(cl, frame)
 		}
 	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
 		if cl.HandleRsvControl != nil {
-			_ = cl.HandleRsvControl(frame)
+			_ = cl.HandleRsvControl(cl, frame)
 		} else {
-			cl.handleClose(frame)
+			cl.handleClose(cl, frame)
 			isClosing = true
 		}
 	}
@@ -492,15 +492,25 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 }
 
 func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
+	if debug.Value >= 3 {
+		max := 512
+		if len(resp) < 512 {
+			max = len(resp)
+		}
+		fmt.Printf("websocket: Client.handleHandshake:\n%s\n--\n", resp[:max])
+	}
 	httpBuf := bufio.NewReader(bytes.NewBuffer(resp))
 
 	httpRes, err := http.ReadResponse(httpBuf, nil)
-	httpRes.Body.Close()
 	if err != nil {
+		fmt.Printf("websocket: Client.handleHandshake: http.ReadResponse")
 		return err
 	}
 
+	httpRes.Body.Close()
+
 	if httpRes.StatusCode != http.StatusSwitchingProtocols {
+		fmt.Printf("websocket: Client.handleHandshake: status code: %d\n", httpRes.StatusCode)
 		err = fmt.Errorf(httpRes.Status)
 		return err
 	}
@@ -649,9 +659,10 @@ func (cl *Client) Quit() {
 }
 
 //
-// onPing default handler when client receive control PING frame from server.
+// clientOnPing default handler when client receive control PING frame from
+// server.
 //
-func (cl *Client) onPing(frame *Frame) error {
+func clientOnPing(cl *Client, frame *Frame) error {
 	if frame == nil {
 		return nil
 	}
