@@ -646,14 +646,15 @@ func (cl *Client) serve() {
 // (e.g. lost connection) to release the resource.
 //
 func (cl *Client) Quit() {
+	cl.Lock()
 	if cl.conn == nil {
+		cl.Unlock()
 		return
 	}
 	err := cl.conn.Close()
 	if err != nil {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
-	cl.Lock()
 	cl.conn = nil
 	cl.Unlock()
 }
@@ -673,9 +674,7 @@ func clientOnPing(cl *Client, frame *Frame) error {
 // recv read raw stream from server.
 //
 func (cl *Client) recv() (packet []byte, err error) {
-	cl.Lock()
 	if cl.conn == nil {
-		cl.Unlock()
 		return nil, ErrConnClosed
 	}
 
@@ -696,8 +695,6 @@ func (cl *Client) recv() (packet []byte, err error) {
 			break
 		}
 	}
-
-	cl.Unlock()
 
 	return packet, err
 }
