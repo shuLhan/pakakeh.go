@@ -17,15 +17,14 @@ import (
 var (
 	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14" //nolint: lll, gochecknoglobals
 
-	_testEndpointAuth   string                           //nolint: gochecknoglobals
-	_testInternalJWT    = _testExternalJWT               //nolint: gochecknoglobals
-	_testUID            = uint64(100)                    //nolint: gochecknoglobals
-	_testPort           = 9001                           //nolint: gochecknoglobals
-	_testServer         *Server                          //nolint: gochecknoglobals
-	_testWSAddr         string                           //nolint: gochecknoglobals
-	_testHdrValWSAccept = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=" //nolint: gochecknoglobals
-	_testHdrValWSKey    = "dGhlIHNhbXBsZSBub25jZQ=="     //nolint: gochecknoglobals
-	_testMaskKey        = []byte{'7', 'ú', '!', '='}     //nolint: gochecknoglobals
+	_testEndpointAuth string                       //nolint: gochecknoglobals
+	_testInternalJWT  = _testExternalJWT           //nolint: gochecknoglobals
+	_testUID          = uint64(100)                //nolint: gochecknoglobals
+	_testPort         = 9001                       //nolint: gochecknoglobals
+	_testServer       *Server                      //nolint: gochecknoglobals
+	_testWSAddr       string                       //nolint: gochecknoglobals
+	_testHdrValWSKey  = "dGhlIHNhbXBsZSBub25jZQ==" //nolint: gochecknoglobals
+	_testMaskKey      = []byte{'7', 'ú', '!', '='} //nolint: gochecknoglobals
 )
 
 var (

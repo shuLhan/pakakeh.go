@@ -5,9 +5,7 @@
 package websocket
 
 import (
-	"bufio"
 	"bytes"
-	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -65,11 +63,10 @@ func TestServerHandshake(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc        string
-		req         *http.Request
-		query       url.Values
-		expKey      string
-		expRespCode int
+		desc     string
+		req      *http.Request
+		query    url.Values
+		expError string
 	}{{
 		desc: "With valid request and authorization",
 		req: &http.Request{
@@ -86,8 +83,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expKey:      _testHdrValWSAccept,
-		expRespCode: http.StatusSwitchingProtocols,
+		expError: "invalid server accept key",
 	}, {
 		desc: "Without GET",
 		req: &http.Request{
@@ -104,7 +100,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 invalid HTTP method",
 	}, {
 		desc: "Without HTTP header Host",
 		req: &http.Request{
@@ -119,7 +115,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 bad request: header length is less than minimum",
 	}, {
 		desc: "Without HTTP header Connection",
 		req: &http.Request{
@@ -135,7 +131,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 bad request: header length is less than minimum",
 	}, {
 		desc: "With invalid HTTP header Connection",
 		req: &http.Request{
@@ -152,7 +148,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 invalid Connection header",
 	}, {
 		desc: "Without HTTP header Upgrade",
 		req: &http.Request{
@@ -168,7 +164,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 bad request: header length is less than minimum",
 	}, {
 		desc: "Without HTTP header 'Sec-Websocket-Key'",
 		req: &http.Request{
@@ -184,7 +180,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 bad request: header length is less than minimum",
 	}, {
 		desc: "Without HTTP header 'Sec-Websocket-Version'",
 		req: &http.Request{
@@ -200,7 +196,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 bad request: header length is less than minimum",
 	}, {
 		desc: "With unsupported websocket version",
 		req: &http.Request{
@@ -217,7 +213,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			_qKeyTicket: []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 unsupported Sec-WebSocket-Version",
 	}, {
 		desc: "Without authorization",
 		req: &http.Request{
@@ -231,7 +227,7 @@ func TestServerHandshake(t *testing.T) {
 				_hdrKeyWSVersion:  []string{_hdrValWSVersion},
 			},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 Missing authorization",
 	}, {
 		desc: "Without invalid HTTP header 'Authorization'",
 		req: &http.Request{
@@ -248,7 +244,7 @@ func TestServerHandshake(t *testing.T) {
 		query: url.Values{
 			"Basic": []string{_testExternalJWT},
 		},
-		expRespCode: http.StatusBadRequest,
+		expError: "400 Missing authorization",
 	}}
 
 	var bb bytes.Buffer
@@ -270,24 +266,9 @@ func TestServerHandshake(t *testing.T) {
 
 		fmt.Fprintf(&bb, "\r\n")
 
-		c := c
-		handleHandshake := func(ctx context.Context, resp []byte) (err error) {
-			httpBuf := bufio.NewReader(bytes.NewBuffer(resp))
-
-			httpRes, err := http.ReadResponse(httpBuf, nil)
-			if err != nil {
-				t.Fatal(err)
-				return
-			}
-
-			test.Assert(t, "expRespCode", c.expRespCode, httpRes.StatusCode, true)
-
-			return
-		}
-
-		err = cl.sendWithHandler(context.Background(), bb.Bytes(), handleHandshake)
+		err = cl.doHandshake("", bb.Bytes())
 		if err != nil {
-			t.Fatal(err)
+			test.Assert(t, "error", c.expError, err.Error(), true)
 		}
 	}
 }

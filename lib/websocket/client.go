@@ -7,7 +7,6 @@ package websocket
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"crypto/tls"
 	"fmt"
 	"log"
@@ -311,10 +310,27 @@ func (cl *Client) handshake() (err error) {
 	}
 
 	bb.WriteString("\r\n")
+	req := bb.Bytes()
 
-	ctx := context.WithValue(context.Background(), ctxKeyWSAccept, keyAccept)
+	if debug.Value >= 3 {
+		fmt.Printf("websocket: Client.handshake:\n%s\n--\n", req)
+	}
 
-	return cl.sendWithHandler(ctx, bb.Bytes(), cl.handleHandshake)
+	return cl.doHandshake(keyAccept, req)
+}
+
+func (cl *Client) doHandshake(keyAccept string, req []byte) (err error) {
+	err = cl.send(req)
+	if err != nil {
+		return err
+	}
+
+	resp, err := cl.recv()
+	if err != nil {
+		return err
+	}
+
+	return cl.handleHandshake(keyAccept, resp)
 }
 
 //
@@ -504,7 +520,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 	return isClosing
 }
 
-func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) {
+func (cl *Client) handleHandshake(keyAccept string, resp []byte) (err error) {
 	if debug.Value >= 3 {
 		max := 512
 		if len(resp) < 512 {
@@ -523,16 +539,12 @@ func (cl *Client) handleHandshake(ctx context.Context, resp []byte) (err error) 
 	httpRes.Body.Close()
 
 	if httpRes.StatusCode != http.StatusSwitchingProtocols {
-		fmt.Printf("websocket: Client.handleHandshake: status code: %d\n", httpRes.StatusCode)
-		err = fmt.Errorf(httpRes.Status)
-		return err
+		return fmt.Errorf(httpRes.Status)
 	}
 
-	expAccept := ctx.Value(ctxKeyWSAccept)
 	gotAccept := httpRes.Header.Get(_hdrKeyWSAccept)
-	if expAccept != gotAccept {
-		err = fmt.Errorf("websocket: client.handleHandshake: invalid server accept key")
-		return err
+	if keyAccept != gotAccept {
+		return fmt.Errorf("invalid server accept key")
 	}
 
 	return nil
@@ -735,37 +747,6 @@ func (cl *Client) send(packet []byte) (err error) {
 	_, err = cl.conn.Write(packet)
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-//
-// sendWithHandler send message to server, read the response, and pass it to
-// handler.
-//
-func (cl *Client) sendWithHandler(ctx context.Context, req []byte, handleRaw clientRawHandler) (err error) {
-	if cl.conn == nil {
-		return ErrConnClosed
-	}
-
-	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
-	if err != nil {
-		return err
-	}
-
-	_, err = cl.conn.Write(req)
-	if err != nil {
-		return err
-	}
-
-	if handleRaw != nil {
-		var resp []byte
-		resp, err = cl.recv()
-		if err != nil {
-			return err
-		}
-		return handleRaw(ctx, resp)
 	}
 
 	return nil

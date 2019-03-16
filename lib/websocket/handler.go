@@ -9,12 +9,6 @@ import (
 )
 
 //
-// clientRawHandler define a callback type for handling raw packet from
-// send().
-//
-type clientRawHandler func(ctx context.Context, resp []byte) (err error)
-
-//
 // ClientHandler define a callback type for client to handle packet from
 // server (either broadcast or from response of request) in the form of frame.
 //

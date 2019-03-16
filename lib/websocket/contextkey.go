@@ -12,7 +12,4 @@ const (
 	CtxKeyExternalJWT ContextKey = 1 << iota
 	CtxKeyInternalJWT
 	CtxKeyUID
-
-	// Internal context keys used by client.
-	ctxKeyWSAccept // ctxKeyWSAccept context key for WebSocket accept key.
 )
