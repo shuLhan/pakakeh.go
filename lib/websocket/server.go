@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -340,7 +341,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	frames, ok := serv.Clients.getFrames(conn)
 
 	if debug.Value >= 3 {
-		log.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
+		fmt.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
 			req.fin, req.opcode, req.masked, req.len, len(req.payload))
 	}
 
@@ -550,7 +551,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	packet := NewFrameClose(false, req.closeCode, req.payload)
 
 	if debug.Value >= 3 {
-		log.Printf("websocket: Server.handleClose: req: %+v\n", req)
+		fmt.Printf("websocket: Server.handleClose: req: %+v\n", req)
 	}
 
 	err := Send(conn, packet)
@@ -611,7 +612,7 @@ func (serv *Server) handleInvalidData(conn int) {
 //
 func (serv *Server) handlePing(conn int, req *Frame) {
 	if debug.Value >= 3 {
-		log.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n", conn, req)
+		fmt.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n", conn, req)
 	}
 
 	req.opcode = OpcodePong
@@ -661,7 +662,7 @@ func (serv *Server) reader() {
 				if max > 16 {
 					max = 16
 				}
-				log.Printf("websocket: Server.reader: packet {len:%d value:% x ...}\n", len(packet), packet[:max])
+				fmt.Printf("websocket: Server.reader: packet {len:%d value:% x ...}\n", len(packet), packet[:max])
 			}
 
 			// Handle chopped, unfinished packet or payload.
@@ -688,7 +689,7 @@ func (serv *Server) reader() {
 			}
 
 			if debug.Value >= 3 && frames != nil {
-				log.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
+				fmt.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
 			}
 
 			var isClosing bool

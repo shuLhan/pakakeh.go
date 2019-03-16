@@ -263,6 +263,10 @@ func (cl *Client) open() (err error) {
 		Timeout: 30 * time.Second,
 	}
 
+	if debug.Value >= 3 {
+		fmt.Printf("websocket: Client.open: remoteAddr: %s\n", cl.remoteAddr)
+	}
+
 	if cl.isTLS {
 		cfg := &tls.Config{
 			InsecureSkipVerify: cl.isTLS, //nolint:gas
@@ -341,7 +345,7 @@ func (cl *Client) handleBadRequest() {
 
 	err := cl.send(frameClose)
 	if err != nil {
-		log.Println("websocket: server.handleBadRequest: " + err.Error())
+		log.Println("websocket: Client.handleBadRequest: " + err.Error())
 	}
 }
 
@@ -395,12 +399,12 @@ func clientOnClose(cl *Client, frame *Frame) error {
 	packet := NewFrameClose(true, frame.closeCode, frame.payload)
 
 	if debug.Value >= 3 {
-		log.Printf("websocket: Client.onClose: %+v\n", frame)
+		fmt.Printf("websocket: clientOnClose: payload: %s\n", frame.payload)
 	}
 
 	err := cl.send(packet)
 	if err != nil {
-		log.Println("websocket: Client.onClose: Send: " + err.Error())
+		log.Println("websocket: clientOnClose: send: " + err.Error())
 	}
 
 	cl.Quit()
@@ -413,7 +417,7 @@ func clientOnClose(cl *Client, frame *Frame) error {
 //
 func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 	if debug.Value >= 3 {
-		log.Printf("websocket: Client.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
+		fmt.Printf("websocket: Client.handleFragment: frame:{fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
 			frame.fin, frame.opcode, frame.masked, frame.len,
 			len(frame.payload))
 	}
@@ -486,10 +490,6 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		return true
 	}
 
-	if debug.Value >= 3 {
-		log.Printf("websocket: Client.handleFrame: %+v\n", frame)
-	}
-
 	switch frame.opcode {
 	case OpcodeCont, OpcodeText, OpcodeBin:
 		isInvalid := cl.handleFragment(frame)
@@ -528,11 +528,11 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (err error) {
 		}
 		fmt.Printf("websocket: Client.handleHandshake:\n%s\n--\n", resp[:max])
 	}
+
 	httpBuf := bufio.NewReader(bytes.NewBuffer(resp))
 
 	httpRes, err := http.ReadResponse(httpBuf, nil)
 	if err != nil {
-		fmt.Printf("websocket: Client.handleHandshake: http.ReadResponse")
 		return err
 	}
 
@@ -630,7 +630,11 @@ func (cl *Client) serve() {
 		}
 
 		if debug.Value >= 3 {
-			log.Printf("websocket: Client.serve: packet: % x\n", packet)
+			max := len(packet)
+			if max > 16 {
+				max = 16
+			}
+			fmt.Printf("websocket: Client.serve: packet: len:%d % x\n", len(packet), packet[:max])
 		}
 
 		if cl.frame != nil {
@@ -721,6 +725,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 		if err != nil || n == 0 {
 			break
 		}
+
 		packet = append(packet, buf[:n]...)
 		if n < len(buf) {
 			break
@@ -741,7 +746,11 @@ func (cl *Client) send(packet []byte) (err error) {
 	}
 
 	if debug.Value >= 3 {
-		log.Printf("websocket: Client.send: % x\n", packet)
+		max := len(packet)
+		if max > 16 {
+			max = 16
+		}
+		fmt.Printf("websocket: Client.send: % x\n", packet[:max])
 	}
 
 	_, err = cl.conn.Write(packet)
