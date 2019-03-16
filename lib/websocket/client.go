@@ -118,7 +118,12 @@ type Client struct {
 	// control PONG frame from server.  Default is nil.
 	handlePong ClientHandler
 
-	// HandleRsvControl callback that will be called when server received
+	// HandleQuit function that will be called when client connection is
+	// closed.
+	// Default is nil.
+	HandleQuit func()
+
+	// HandleRsvControl function that will be called when client received
 	// reserved control frame (opcode 0xB-F) from server.
 	// Default handler is nil.
 	HandleRsvControl ClientHandler
@@ -657,6 +662,9 @@ func (cl *Client) Quit() {
 	}
 	cl.conn = nil
 	cl.Unlock()
+	if cl.HandleQuit != nil {
+		cl.HandleQuit()
+	}
 }
 
 //
