@@ -286,7 +286,15 @@ func (cl *Client) open() (err error) {
 func (cl *Client) handshake() (err error) {
 	var bb bytes.Buffer
 
-	path := cl.remoteURL.EscapedPath() + "?" + cl.remoteURL.RawQuery
+	path := cl.remoteURL.EscapedPath()
+	if len(path) == 0 {
+		path = "/"
+	}
+
+	if len(cl.remoteURL.RawQuery) > 0 {
+		path += "?" + cl.remoteURL.RawQuery
+	}
+
 	key := generateHandshakeKey()
 	keyAccept := generateHandshakeAccept(key)
 
