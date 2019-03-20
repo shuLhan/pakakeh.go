@@ -266,7 +266,7 @@ func TestServerHandshake(t *testing.T) {
 
 		fmt.Fprintf(&bb, "\r\n")
 
-		err = cl.doHandshake("", bb.Bytes())
+		_, err = cl.doHandshake("", bb.Bytes())
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 		}
