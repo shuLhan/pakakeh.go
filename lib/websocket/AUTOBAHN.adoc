@@ -29,9 +29,9 @@ Second, open new terminal and run the autobahn test server,
 Wait for the test to complete.  After that, we can view the reports on
 "reports/index.html".
 
-==  Server Status Report
+===  Server Reports Status
 
-Summary of autobahn testsuite that fail or missing,
+Summary of autobahn testsuite reports for server,
 
 1.  Framing (14/16)
 1.1.  Text Messages (8/8)
