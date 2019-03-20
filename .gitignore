@@ -7,6 +7,8 @@
 /lib/git/testdata/beku_test
 /lib/memfs/testdata/memfs_generate.go
 /lib/websocket/testdata/bin
+/lib/websocket/testdata/client/client
+/lib/websocket/testdata/client/reports
 /lib/websocket/testdata/include
 /lib/websocket/testdata/lib
 /lib/websocket/testdata/pip-selfcheck.json
