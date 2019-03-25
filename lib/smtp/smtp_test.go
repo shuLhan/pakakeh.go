@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/shuLhan/share/lib/test"
 )
@@ -70,7 +71,8 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	testClient, err = NewClient(testSMTPSAddress, true)
+	time.Sleep(1 * time.Second)
+	testClient, err = NewClient("", testSMTPSAddress, true)
 	if err != nil {
 		log.Fatal(err)
 	}

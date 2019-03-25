@@ -20,35 +20,17 @@ func TestNewClient(t *testing.T) {
 	}{{
 		desc:   "With invalid IP",
 		raddr:  "smtp://1234",
-		expErr: "lookup !: no such host",
-	}, {
-		desc:   "With no MX",
-		raddr:  "smtp://example.com",
-		expErr: "",
+		expErr: "dial tcp 0.0.4.210:25: connect: invalid argument",
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_, err := NewClient(c.raddr, true)
+		_, err := NewClient("", c.raddr, true)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 		}
 	}
-}
-
-func TestConnect(t *testing.T) {
-	expRes := &Response{
-		Code:    220,
-		Message: testServer.Env.PrimaryDomain.Name,
-	}
-
-	res, err := testClient.Connect()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	test.Assert(t, "connect", expRes, res, true)
 }
 
 func TestEhlo(t *testing.T) {
@@ -82,7 +64,7 @@ func TestEhlo(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.Ehlo(c.arg)
+		got, err := testClient.ehlo(c.arg)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -151,12 +133,7 @@ func TestAuth(t *testing.T) {
 }
 
 func TestAuth2(t *testing.T) {
-	cl, err := NewClient(testClientSMTPAddress, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = cl.Connect()
+	cl, err := NewClient("", testClientSMTPAddress, true)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -41,6 +41,10 @@ type Client struct {
 //
 // NewClient create and initialize connection to remote SMTP server.
 //
+// The localName define the client domain address, used when issuing EHLO
+// command to server.  If its empty, it will set to current operating system's
+// hostname.
+//
 // The remoteURL use the following format,
 //
 //	remoteURL = [ scheme "://" ](domain | IP-address [":" port])
@@ -56,9 +60,13 @@ type Client struct {
 // The "insecure" parameter, if set to true, will disable verifying
 // remote certificate when connecting with TLS or STARTTLS.
 //
-// Note that, the returned client is not connected to the remote yet.
+// On success, it will return connected client, with implicit EHLO command
+// issued to server immediately.  If scheme is "smtp+starttls", the connection
+// also automatically upgraded to TLS after EHLO command success.
 //
-func NewClient(remoteURL string, insecure bool) (cl *Client, err error) {
+// On fail, it will return nil client with an error.
+//
+func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err error) {
 	var (
 		rurl   *url.URL
 		port   uint16
@@ -107,7 +115,16 @@ func NewClient(remoteURL string, insecure bool) (cl *Client, err error) {
 	cl.raddr.Port = int(port)
 
 	if debug.Value >= 3 {
-		fmt.Printf("smtp: NewClient: %v\n", cl.raddr)
+		fmt.Printf("smtp: NewClient remote address '%v'\n", cl.raddr)
+	}
+
+	_, err = cl.connect(localName)
+	if err != nil {
+		return nil, err
+	}
+
+	if debug.Value >= 3 {
+		fmt.Printf("smtp: ServerInfo: %+v\n", cl.ServerInfo)
 	}
 
 	return cl, nil
@@ -135,11 +152,12 @@ func (cl *Client) Authenticate(mech Mechanism, username, password string) (
 }
 
 //
-// Connect open a connection to server and return server greeting.
+// connect open a connection to server and issue EHLO command immediately.
+//
 // If remoteURL scheme is "smtp+starttls", the client will issue STARTTLS
 // command immediately after connect.
 //
-func (cl *Client) Connect() (res *Response, err error) {
+func (cl *Client) connect(localName string) (res *Response, err error) {
 	cl.conn, err = net.DialTCP("tcp", nil, cl.raddr)
 	if err != nil {
 		return nil, err
@@ -162,6 +180,11 @@ func (cl *Client) Connect() (res *Response, err error) {
 		return res, fmt.Errorf("server return %d, want 220", res.Code)
 	}
 
+	res, err = cl.ehlo(localName)
+	if err != nil {
+		return res, err
+	}
+
 	if cl.isStartTLS {
 		return cl.startTLS()
 	}
@@ -170,28 +193,29 @@ func (cl *Client) Connect() (res *Response, err error) {
 }
 
 //
-// Ehlo initialize the SMTP session by sending the EHLO command to server.
-// If server does not support EHLO it would be fall back to HELO.
+// ehlo initialize the SMTP session by sending the EHLO command to server.
+// If server does not support EHLO it would return an error, there is no
+// fallback to HELO.
 //
-// Client MUST use domain name that resolved to DNS A RR (address) (RFC 5321,
+// Client MUST use localName that resolved to DNS A RR (address) (RFC 5321,
 // section 2.3.5), or SHOULD use IP address if not possible (RFC 5321, section
 // 4.1.4).
 //
-func (cl *Client) Ehlo(domAddr string) (res *Response, err error) {
-	if len(domAddr) == 0 {
-		domAddr = getUnicastAddress()
-		if domAddr == "" {
-			domAddr, err = os.Hostname()
-			if err != nil {
-				err = errors.New("unable to get unicast address or hostname")
+func (cl *Client) ehlo(localName string) (res *Response, err error) {
+	if len(localName) == 0 {
+		localName, err = os.Hostname()
+		if err != nil {
+			localName = getUnicastAddress()
+			if len(localName) == 0 {
+				err = errors.New("smtp: unable to get hostname or unicast address")
 				return nil, err
 			}
-		} else {
-			domAddr = "[" + domAddr + "]"
+
+			localName = "[" + localName + "]"
 		}
 	}
 
-	req := []byte("EHLO " + domAddr + "\r\n")
+	req := []byte("EHLO " + localName + "\r\n")
 	res, err = cl.SendCommand(req)
 	if err != nil {
 		return nil, err
@@ -202,9 +226,9 @@ func (cl *Client) Ehlo(domAddr string) (res *Response, err error) {
 		return res, nil
 	}
 
-	req = []byte("HELO " + domAddr + "\r\n")
+	err = fmt.Errorf("smtp: EHLO response code %d, want 250", res.Code)
 
-	return cl.SendCommand(req)
+	return res, err
 }
 
 //
@@ -247,9 +271,6 @@ func (cl *Client) Quit() (res *Response, err error) {
 // The MailTx.Data must be internet message format which contains headers and
 // content as defined by RFC 5322.
 //
-// The mail transaction will invoke Ehlo function, only if its never called
-// before by client.
-//
 // On success, it will return the last response, which is the success status
 // of data transaction (250).
 //
@@ -266,12 +287,6 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 	}
 	if len(mail.Recipients) == 0 {
 		return nil, errors.New("SendMailTx: empty mail 'Recipients' parameter")
-	}
-	if cl.ServerInfo == nil {
-		_, err = cl.Ehlo("localhost")
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	cl.buf.Reset()
@@ -325,7 +340,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 //
 func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
 	if debug.Value >= 3 {
-		fmt.Printf("smtp: Client.SendCommand: %s", cmd)
+		fmt.Printf(">>> smtp: Client.SendCommand: %s", cmd)
 	}
 
 	_, err = cl.conn.Write(cmd)
@@ -414,8 +429,8 @@ func (cl *Client) recv() (res *Response, err error) {
 		break
 	}
 
-	if debug.Value > 0 {
-		fmt.Printf("Client.recv: %s", cl.buf.Bytes())
+	if debug.Value >= 3 {
+		fmt.Printf("<<< smtp: Client.recv: %s", cl.buf.Bytes())
 	}
 
 	res, err = NewResponse(cl.buf.Bytes())
@@ -427,11 +442,6 @@ func (cl *Client) recv() (res *Response, err error) {
 }
 
 func (cl *Client) startTLS() (res *Response, err error) {
-	res, err = cl.Ehlo("localhost")
-	if err != nil {
-		return nil, err
-	}
-
 	req := []byte("STARTTLS\r\n")
 	res, err = cl.SendCommand(req)
 	if err != nil {
