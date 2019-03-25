@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"fmt"
 	"net"
 	"sync"
 	"time"
@@ -36,9 +37,9 @@ type UDPClient struct {
 func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 	network := "udp"
 
-	remoteIP, remotePort, err := libnet.ParseIPPort(nameserver, DefaultPort)
-	if err != nil {
-		return
+	_, remoteIP, remotePort := libnet.ParseIPPort(nameserver, DefaultPort)
+	if remoteIP == nil {
+		return nil, fmt.Errorf("dns: invalid address '%s'", nameserver)
 	}
 
 	laddr := &net.UDPAddr{IP: nil, Port: 0}

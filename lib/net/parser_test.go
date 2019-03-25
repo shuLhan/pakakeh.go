@@ -15,49 +15,57 @@ func TestParseIPPort(t *testing.T) {
 	localIP := net.ParseIP("127.0.0.1")
 
 	cases := []struct {
-		desc    string
-		address string
-		expErr  error
-		expIP   net.IP
-		expPort uint16
+		desc        string
+		address     string
+		expHostname string
+		expIP       net.IP
+		expPort     uint16
 	}{{
-		desc:   "Empty address",
-		expErr: ErrHostAddress,
+		desc:    "Empty address",
+		expPort: 1,
 	}, {
-		desc:    "Invalid address",
-		address: "address",
-		expErr:  ErrHostAddress,
+		desc:        "With hostname",
+		address:     "address",
+		expHostname: "address",
+		expPort:     1,
 	}, {
-		desc:    "Empty port",
+		desc:        "With hostname and port",
+		address:     "address:555",
+		expHostname: "address",
+		expPort:     555,
+	}, {
+		desc:    "With empty port",
 		address: "127.0.0.1",
 		expIP:   localIP,
 		expPort: 1,
 	}, {
-		desc:    "Invalid port",
+		desc:    "With invalid port",
 		address: "127.0.0.1:a",
 		expIP:   localIP,
 		expPort: 1,
 	}, {
-		desc:    "Invalid port < 0",
+		desc:    "With invalid port < 0",
 		address: "127.0.0.1:-1",
 		expIP:   localIP,
 		expPort: 1,
 	}, {
-		desc:    "Invalid port > 65535",
+		desc:    "With invalid port > 65535",
 		address: "127.0.0.1:65536",
 		expIP:   localIP,
 		expPort: 1,
+	}, {
+		desc:    "With valid port",
+		address: "127.0.0.1:555",
+		expIP:   localIP,
+		expPort: 555,
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ip, port, err := ParseIPPort(c.address, 1)
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
-			continue
-		}
+		hostname, ip, port := ParseIPPort(c.address, 1)
 
+		test.Assert(t, "hostname", c.expHostname, hostname, true)
 		test.Assert(t, "ip", c.expIP, ip, true)
 		test.Assert(t, "port", c.expPort, port, true)
 	}

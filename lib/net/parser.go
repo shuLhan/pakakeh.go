@@ -5,16 +5,18 @@
 package net
 
 import (
+	"fmt"
 	"net"
 	"strconv"
 )
 
 //
 // ParseIPPort parse address into IP and port.
-// In case of port is empty or invalid, it will set to default port value in
-// defPort.
+// If address is not an IP address, it will the address as hostname (without
+// port number if its exist) with nil on ip.
+// In case of port is empty or invalid, it will set to defPort.
 //
-func ParseIPPort(address string, defPort uint16) (ip net.IP, port uint16, err error) {
+func ParseIPPort(address string, defPort uint16) (hostname string, ip net.IP, port uint16) {
 	var iport int
 
 	shost, sport, err := net.SplitHostPort(address)
@@ -24,9 +26,8 @@ func ParseIPPort(address string, defPort uint16) (ip net.IP, port uint16, err er
 
 	ip = net.ParseIP(shost)
 	if ip == nil {
-		return nil, 0, ErrHostAddress
+		hostname = shost
 	}
-
 	if len(sport) > 0 {
 		iport, err = strconv.Atoi(sport)
 		if err != nil {
@@ -39,17 +40,18 @@ func ParseIPPort(address string, defPort uint16) (ip net.IP, port uint16, err er
 		port = defPort
 	}
 
-	return ip, port, nil
+	return hostname, ip, port
 }
 
 //
 // ParseUDPAddr parse IP address into standard library UDP address.
+// If address is not contains IP address, it will return nil with error.
 // In case of port is empty, it will set to default port value in defPort.
 //
 func ParseUDPAddr(address string, defPort uint16) (udp *net.UDPAddr, err error) {
-	ip, port, err := ParseIPPort(address, defPort)
-	if err != nil {
-		return
+	_, ip, port := ParseIPPort(address, defPort)
+	if ip == nil {
+		return nil, fmt.Errorf("net: invalid IP address: %s", address)
 	}
 
 	udp = &net.UDPAddr{
@@ -62,12 +64,13 @@ func ParseUDPAddr(address string, defPort uint16) (udp *net.UDPAddr, err error) 
 
 //
 // ParseTCPAddr parse IP address into standard library TCP address.
+// If address is not contains IP address, it will return nil with error.
 // In case of port is empty, it will set to default port value in defPort.
 //
 func ParseTCPAddr(address string, defPort uint16) (udp *net.TCPAddr, err error) {
-	ip, port, err := ParseIPPort(address, defPort)
-	if err != nil {
-		return
+	_, ip, port := ParseIPPort(address, defPort)
+	if ip == nil {
+		return nil, fmt.Errorf("net: invalid IP address: %s", address)
 	}
 
 	udp = &net.TCPAddr{

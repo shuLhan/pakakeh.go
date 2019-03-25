@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -29,9 +30,9 @@ type TCPClient struct {
 // server.  Default port is 53, if not set.
 //
 func NewTCPClient(nameserver string) (*TCPClient, error) {
-	remoteIP, remotePort, err := libnet.ParseIPPort(nameserver, DefaultPort)
-	if err != nil {
-		return nil, err
+	_, remoteIP, remotePort := libnet.ParseIPPort(nameserver, DefaultPort)
+	if remoteIP == nil {
+		return nil, fmt.Errorf("dns: invalid address '%s'", nameserver)
 	}
 
 	raddr := &net.TCPAddr{
@@ -44,7 +45,7 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 		addr:    raddr,
 	}
 
-	err = cl.Connect(raddr)
+	err := cl.Connect(raddr)
 	if err != nil {
 		return nil, err
 	}

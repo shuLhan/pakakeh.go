@@ -25,7 +25,7 @@ func TestNewUDPClientPool(t *testing.T) {
 			testServerAddress,
 			"notipaddress",
 		},
-		expErr: "invalid host address",
+		expErr: "dns: invalid address 'notipaddress'",
 	}, {
 		desc: "With single name server",
 		ns: []string{
