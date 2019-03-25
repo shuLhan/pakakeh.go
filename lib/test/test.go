@@ -8,7 +8,6 @@
 package test
 
 import (
-	"os"
 	"reflect"
 	"runtime"
 	"testing"
@@ -40,41 +39,40 @@ func printStackTrace(t testing.TB, trace []byte) {
 // Assert will compare two interfaces: `exp` and `got` whether its same with
 // `equal` value.
 //
-// If comparison result is not same with `equal`, it will terminate the test
-// program.
+// If comparison result is not same with `equal`, it will print the result and
+// expectation and then terminate the test routine.
 //
 func Assert(t *testing.T, name string, exp, got interface{}, equal bool) {
-	if reflect.DeepEqual(exp, got) != equal {
-		trace := make([]byte, 1024)
-		runtime.Stack(trace, false)
-
-		printStackTrace(t, trace)
-
-		t.Fatalf(">>> Expecting %s,\n"+
-			"'%+v'\n"+
-			"     got,\n"+
-			"'%+v'\n", name, exp, got)
-		os.Exit(1)
+	if reflect.DeepEqual(exp, got) == equal {
+		return
 	}
+
+	trace := make([]byte, 1024)
+	runtime.Stack(trace, false)
+
+	printStackTrace(t, trace)
+
+	t.Fatalf(">>> Got %s:\n\t'%+v';\n"+
+		"     want:\n\t'%+v'\n", name, got, exp)
 }
 
 //
 // AssertBench will compare two interfaces: `exp` and `got` whether its same
 // with `equal` value.
 //
-// If comparison result is not same with `equal`, it will terminate the test
-// program.
+// If comparison result is not same with `equal`, it will print the result and
+// expectation and then terminate the test routine.
 //
 func AssertBench(b *testing.B, name string, exp, got interface{}, equal bool) {
-	if reflect.DeepEqual(exp, got) != equal {
-		trace := make([]byte, 1024)
-		runtime.Stack(trace, false)
-
-		printStackTrace(b, trace)
-
-		b.Fatalf("\n"+
-			">>> Expecting %s '%+v'\n"+
-			"    got '%+v'\n", name, exp, got)
-		os.Exit(1)
+	if reflect.DeepEqual(exp, got) == equal {
+		return
 	}
+
+	trace := make([]byte, 1024)
+	runtime.Stack(trace, false)
+
+	printStackTrace(b, trace)
+
+	b.Fatalf(">>> Got %s:\n\t'%+v';\n"+
+		"     want:\n\t'%+v'\n", name, got, exp)
 }
