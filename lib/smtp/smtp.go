@@ -185,7 +185,10 @@ func parseLocalDomain(data []byte, allow []byte) (out []byte) {
 	if data[0] == '.' || data[len(data)-1] == '.' {
 		return nil
 	}
-	isDot := false
+	var (
+		found bool
+		isDot bool
+	)
 	for x := 0; x < len(data); x++ {
 		if data[x] == '(' {
 			x = skipComment(data, x)
@@ -205,11 +208,16 @@ func parseLocalDomain(data []byte, allow []byte) (out []byte) {
 			out = append(out, data[x])
 			continue
 		}
+		found = false
 		for _, c := range allow {
 			if c == data[x] {
 				out = append(out, data[x])
+				found = true
 				break
 			}
+		}
+		if found {
+			continue
 		}
 		if data[x] == '.' {
 			isDot = true
