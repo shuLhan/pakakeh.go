@@ -18,6 +18,7 @@ const (
 	testPassword          = "secret"
 	testTLSAddress        = "127.0.0.1:2533"
 	testClientSMTPAddress = "smtp://127.0.0.1:2525"
+	testSMTPSAddress      = "smtps://127.0.0.1:2533"
 )
 
 var (
@@ -69,7 +70,7 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	testClient, err = NewClient(testClientSMTPAddress, true)
+	testClient, err = NewClient(testSMTPSAddress, true)
 	if err != nil {
 		log.Fatal(err)
 	}

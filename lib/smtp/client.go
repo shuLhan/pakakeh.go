@@ -35,32 +35,34 @@ type Client struct {
 	conn       net.Conn
 	insecure   bool
 	isTLS      bool
+	isStartTLS bool
 }
 
 //
 // NewClient create and initialize connection to remote SMTP server.
+//
 // The remoteURL use the following format,
 //
 //	remoteURL = [ scheme "://" ](domain | IP-address [":" port])
-//	scheme    = "smtp" / "smtps"
+//	scheme    = "smtp" / "smtps" / "smtp+starttls"
 //
 // If scheme is "smtp" and no port is given, client will connect to remote
-// address at port "25".
+// address at port 25.
 // If scheme is "smtps" and no port is given, client will connect to remote
-// address at port "465" (implicit TLS).
+// address at port 465 (implicit TLS).
+// If scheme is "smtp+starttls" and no port is given, client will connect to
+// remote address at port 587.
 //
-// The second parameter "insecure", if set to true, will disable verifying
-// remote certificate when connecting with TLS.
+// The "insecure" parameter, if set to true, will disable verifying
+// remote certificate when connecting with TLS or STARTTLS.
 //
 // Note that, the returned client is not connected to the remote yet.
 //
 func NewClient(remoteURL string, insecure bool) (cl *Client, err error) {
 	var (
-		rurl     *url.URL
-		ip       net.IP
-		hostname string
-		port     uint16
-		isTLS    bool
+		rurl   *url.URL
+		port   uint16
+		scheme string
 	)
 
 	rurl, err = url.Parse(remoteURL)
@@ -68,38 +70,41 @@ func NewClient(remoteURL string, insecure bool) (cl *Client, err error) {
 		return nil, fmt.Errorf("smtp: NewClient: " + err.Error())
 	}
 
-	if strings.ToLower(rurl.Scheme) == "smtps" {
-		port = 465
-		isTLS = true
-	} else {
-		port = 25
+	cl = &Client{
+		raddr: &net.TCPAddr{},
 	}
 
-	hostname, ip, port = libnet.ParseIPPort(rurl.Host, port)
-	if ip == nil {
-		ip, err = lookup(hostname)
+	scheme = strings.ToLower(rurl.Scheme)
+	switch scheme {
+	case "smtp":
+		port = 25
+	case "smtps":
+		port = 465
+		cl.isTLS = true
+	case "smtp+starttls":
+		port = 587
+		cl.isStartTLS = true
+	default:
+		return nil, fmt.Errorf("smtp: NewClient: invalid scheme '%s'", scheme)
+	}
+
+	cl.serverName, cl.raddr.IP, port = libnet.ParseIPPort(rurl.Host, port)
+	if cl.raddr.IP == nil {
+		cl.raddr.IP, err = lookup(cl.serverName)
 		if err != nil {
 			return nil, err
 		}
-		if ip == nil {
+		if cl.raddr.IP == nil {
 			err = fmt.Errorf("smtp: NewClient: '%s' does not have MX record or IP address", cl.serverName)
 			return nil, err
 		}
 	}
-	if len(hostname) == 0 {
-		insecure = true
+	if len(cl.serverName) == 0 {
+		cl.insecure = true
 	}
 
-	cl = &Client{
-		data:       make([]byte, 4096),
-		serverName: hostname,
-		raddr: &net.TCPAddr{
-			IP:   ip,
-			Port: int(port),
-		},
-		insecure: insecure,
-		isTLS:    isTLS,
-	}
+	cl.data = make([]byte, 4096)
+	cl.raddr.Port = int(port)
 
 	if debug.Value >= 3 {
 		fmt.Printf("smtp: NewClient: %v\n", cl.raddr)
@@ -131,13 +136,22 @@ func (cl *Client) Authenticate(mech Mechanism, username, password string) (
 
 //
 // Connect open a connection to server and return server greeting.
-// If remoteURL scheme is "smtps", the client will issue STARTTLS command
-// immediately after connect.
+// If remoteURL scheme is "smtp+starttls", the client will issue STARTTLS
+// command immediately after connect.
 //
 func (cl *Client) Connect() (res *Response, err error) {
 	cl.conn, err = net.DialTCP("tcp", nil, cl.raddr)
 	if err != nil {
 		return nil, err
+	}
+
+	if cl.isTLS {
+		tlsConfig := &tls.Config{
+			ServerName:         cl.serverName,
+			InsecureSkipVerify: cl.insecure, // nolint: gosec
+		}
+
+		cl.conn = tls.Client(cl.conn, tlsConfig)
 	}
 
 	res, err = cl.recv()
@@ -148,11 +162,11 @@ func (cl *Client) Connect() (res *Response, err error) {
 		return res, fmt.Errorf("server return %d, want 220", res.Code)
 	}
 
-	if !cl.isTLS {
-		return res, nil
+	if cl.isStartTLS {
+		return cl.startTLS()
 	}
 
-	return cl.startTLS()
+	return res, nil
 }
 
 //
@@ -413,6 +427,11 @@ func (cl *Client) recv() (res *Response, err error) {
 }
 
 func (cl *Client) startTLS() (res *Response, err error) {
+	res, err = cl.Ehlo("localhost")
+	if err != nil {
+		return nil, err
+	}
+
 	req := []byte("STARTTLS\r\n")
 	res, err = cl.SendCommand(req)
 	if err != nil {
