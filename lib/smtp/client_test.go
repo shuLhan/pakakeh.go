@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"net"
 	"testing"
-	"time"
 
 	"github.com/shuLhan/share/lib/test"
 )
@@ -20,18 +19,18 @@ func TestNewClient(t *testing.T) {
 		expErr string
 	}{{
 		desc:   "With invalid IP",
-		raddr:  "!",
+		raddr:  "smtp://1234",
 		expErr: "lookup !: no such host",
 	}, {
 		desc:   "With no MX",
-		raddr:  "example.com",
+		raddr:  "smtp://example.com",
 		expErr: "",
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_, err := NewClient(c.raddr)
+		_, err := NewClient(c.raddr, true)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 		}
@@ -39,14 +38,12 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestConnect(t *testing.T) {
-	time.Sleep(1 * time.Second)
-
 	expRes := &Response{
 		Code:    220,
 		Message: testServer.Env.PrimaryDomain.Name,
 	}
 
-	res, err := testClient.Connect(true)
+	res, err := testClient.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,12 +146,12 @@ func TestAuth(t *testing.T) {
 }
 
 func TestAuth2(t *testing.T) {
-	cl, err := NewClient(testTLSAddress)
+	cl, err := NewClient(testClientSMTPAddress, true)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = cl.Connect(true)
+	_, err = cl.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/url"
 	"os"
 	"strings"
 
@@ -26,41 +27,83 @@ type Client struct {
 	// EHLO command.
 	ServerInfo *ServerInfo
 
-	data  []byte
-	buf   bytes.Buffer
-	raddr *net.TCPAddr
-	conn  net.Conn
+	data []byte
+	buf  bytes.Buffer
+
+	serverName string
+	raddr      *net.TCPAddr
+	conn       net.Conn
+	insecure   bool
+	isTLS      bool
 }
 
 //
-// NewClient create and initialize TCP address to remote SMTP server.  The
-// returned client is not connected to the server yet.
+// NewClient create and initialize connection to remote SMTP server.
+// The remoteURL use the following format,
 //
-func NewClient(raddr string) (cl *Client, err error) {
-	cl = &Client{
-		data: make([]byte, 4096),
+//	remoteURL = [ scheme "://" ](domain | IP-address [":" port])
+//	scheme    = "smtp" / "smtps"
+//
+// If scheme is "smtp" and no port is given, client will connect to remote
+// address at port "25".
+// If scheme is "smtps" and no port is given, client will connect to remote
+// address at port "465" (implicit TLS).
+//
+// The second parameter "insecure", if set to true, will disable verifying
+// remote certificate when connecting with TLS.
+//
+// Note that, the returned client is not connected to the remote yet.
+//
+func NewClient(remoteURL string, insecure bool) (cl *Client, err error) {
+	var (
+		rurl     *url.URL
+		ip       net.IP
+		hostname string
+		port     uint16
+		isTLS    bool
+	)
+
+	rurl, err = url.Parse(remoteURL)
+	if err != nil {
+		return nil, fmt.Errorf("smtp: NewClient: " + err.Error())
 	}
 
-	ip, port, err := libnet.ParseIPPort(raddr, 25)
-	if err != nil {
-		ip, err = lookup(raddr)
+	if strings.ToLower(rurl.Scheme) == "smtps" {
+		port = 465
+		isTLS = true
+	} else {
+		port = 25
+	}
+
+	hostname, ip, port = libnet.ParseIPPort(rurl.Host, port)
+	if ip == nil {
+		ip, err = lookup(hostname)
 		if err != nil {
 			return nil, err
 		}
 		if ip == nil {
-			err = fmt.Errorf("client.NewClient: '%s' does not have MX record or IP address", raddr)
+			err = fmt.Errorf("smtp: NewClient: '%s' does not have MX record or IP address", cl.serverName)
 			return nil, err
 		}
-
-		port = 25
+	}
+	if len(hostname) == 0 {
+		insecure = true
 	}
 
-	cl.raddr = &net.TCPAddr{
-		IP:   ip,
-		Port: int(port),
+	cl = &Client{
+		data:       make([]byte, 4096),
+		serverName: hostname,
+		raddr: &net.TCPAddr{
+			IP:   ip,
+			Port: int(port),
+		},
+		insecure: insecure,
+		isTLS:    isTLS,
 	}
 
-	fmt.Printf("NewClient: %v\n", cl.raddr)
+	if debug.Value >= 3 {
+		fmt.Printf("smtp: NewClient: %v\n", cl.raddr)
+	}
 
 	return cl, nil
 }
@@ -88,18 +131,28 @@ func (cl *Client) Authenticate(mech Mechanism, username, password string) (
 
 //
 // Connect open a connection to server and return server greeting.
+// If remoteURL scheme is "smtps", the client will issue STARTTLS command
+// immediately after connect.
 //
-func (cl *Client) Connect(insecure bool) (res *Response, err error) {
-	tlsConfig := &tls.Config{
-		InsecureSkipVerify: insecure, // nolint: gosec
-	}
-
-	cl.conn, err = tls.Dial("tcp", cl.raddr.String(), tlsConfig)
+func (cl *Client) Connect() (res *Response, err error) {
+	cl.conn, err = net.DialTCP("tcp", nil, cl.raddr)
 	if err != nil {
 		return nil, err
 	}
 
-	return cl.recv()
+	res, err = cl.recv()
+	if err != nil {
+		return res, err
+	}
+	if res.Code != StatusReady {
+		return res, fmt.Errorf("server return %d, want 220", res.Code)
+	}
+
+	if !cl.isTLS {
+		return res, nil
+	}
+
+	return cl.startTLS()
 }
 
 //
@@ -257,6 +310,10 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 // SendCommand send any custom command to server.
 //
 func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
+	if debug.Value >= 3 {
+		fmt.Printf("smtp: Client.SendCommand: %s", cmd)
+	}
+
 	_, err = cl.conn.Write(cmd)
 	if err != nil {
 		return nil, err
@@ -344,13 +401,35 @@ func (cl *Client) recv() (res *Response, err error) {
 	}
 
 	if debug.Value > 0 {
-		fmt.Printf("Client.recv: %s\n", cl.buf.Bytes())
+		fmt.Printf("Client.recv: %s", cl.buf.Bytes())
 	}
 
 	res, err = NewResponse(cl.buf.Bytes())
 	if err != nil {
 		return nil, err
 	}
+
+	return res, nil
+}
+
+func (cl *Client) startTLS() (res *Response, err error) {
+	req := []byte("STARTTLS\r\n")
+	res, err = cl.SendCommand(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Code != StatusReady {
+		return nil, fmt.Errorf("smtp: STARTTLS response %d, want 220",
+			res.Code)
+	}
+
+	tlsConfig := &tls.Config{
+		ServerName:         cl.serverName,
+		InsecureSkipVerify: cl.insecure, // nolint: gosec
+	}
+
+	cl.conn = tls.Client(cl.conn, tlsConfig)
 
 	return res, nil
 }

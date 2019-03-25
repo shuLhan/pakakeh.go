@@ -13,10 +13,11 @@ import (
 )
 
 const (
-	testAddress    = "127.0.0.1:2525"
-	testDomain     = "mail.kilabit.local"
-	testPassword   = "secret"
-	testTLSAddress = "127.0.0.1:2533"
+	testAddress           = "127.0.0.1:2525"
+	testDomain            = "mail.kilabit.local"
+	testPassword          = "secret"
+	testTLSAddress        = "127.0.0.1:2533"
+	testClientSMTPAddress = "smtp://127.0.0.1:2525"
 )
 
 var (
@@ -68,7 +69,7 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	testClient, err = NewClient(testTLSAddress)
+	testClient, err = NewClient(testClientSMTPAddress, true)
 	if err != nil {
 		log.Fatal(err)
 	}
