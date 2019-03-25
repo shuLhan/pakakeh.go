@@ -69,9 +69,12 @@ func TestEhlo(t *testing.T) {
 		},
 		expServerInfo: &ServerInfo{
 			Domain: "mail.kilabit.local",
-			Exts: []string{
-				"dsn",
-				"auth",
+			Info:   "mail.kilabit.local",
+			Exts: map[string][]string{
+				"dsn": nil,
+				"auth": {
+					"PLAIN",
+				},
 			},
 		},
 	}}
@@ -85,8 +88,10 @@ func TestEhlo(t *testing.T) {
 		}
 
 		test.Assert(t, "Ehlo", c.exp, got, true)
-		test.Assert(t, "ServerInfo", c.expServerInfo,
-			testClient.ServerInfo, true)
+		test.Assert(t, "ServerInfo.Domain", c.expServerInfo.Domain,
+			testClient.ServerInfo.Domain, true)
+		test.Assert(t, "ServerInfo.Info", c.expServerInfo.Info,
+			testClient.ServerInfo.Info, true)
 	}
 }
 

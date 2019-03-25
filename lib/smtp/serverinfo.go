@@ -15,7 +15,7 @@ import (
 type ServerInfo struct {
 	Domain string
 	Info   string
-	Exts   []string
+	Exts   map[string][]string
 }
 
 //
@@ -31,14 +31,13 @@ func NewServerInfo(res *Response) (srvInfo *ServerInfo) {
 	domInfo := strings.Split(res.Message, " ")
 
 	srvInfo.Domain = domInfo[0]
-	if len(domInfo) == 2 {
-		srvInfo.Info = domInfo[1]
-	}
+	srvInfo.Info = res.Message
 
-	srvInfo.Exts = make([]string, len(res.Body))
-	for x, body := range res.Body {
-		extParam := strings.Split(body, " ")
-		srvInfo.Exts[x] = strings.ToLower(extParam[0])
+	srvInfo.Exts = make(map[string][]string, len(res.Body))
+	for _, body := range res.Body {
+		extParams := strings.Split(body, " ")
+		extName := strings.ToLower(extParams[0])
+		srvInfo.Exts[extName] = extParams[1:]
 	}
 
 	return srvInfo
