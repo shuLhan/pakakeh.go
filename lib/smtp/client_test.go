@@ -133,7 +133,7 @@ func TestAuth(t *testing.T) {
 }
 
 func TestAuth2(t *testing.T) {
-	cl, err := NewClient("", testClientSMTPAddress, true)
+	cl, err := NewClient("", testSMTPSAddress, true)
 	if err != nil {
 		t.Fatal(err)
 	}

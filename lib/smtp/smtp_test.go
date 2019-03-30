@@ -14,12 +14,11 @@ import (
 )
 
 const (
-	testAddress           = "127.0.0.1:2525"
-	testDomain            = "mail.kilabit.local"
-	testPassword          = "secret"
-	testTLSAddress        = "127.0.0.1:2533"
-	testClientSMTPAddress = "smtp://127.0.0.1:2525"
-	testSMTPSAddress      = "smtps://127.0.0.1:2533"
+	testAddress      = "127.0.0.1:2525"
+	testDomain       = "mail.kilabit.local"
+	testPassword     = "secret"
+	testTLSAddress   = "127.0.0.1:2533"
+	testSMTPSAddress = "smtps://127.0.0.1:2533"
 )
 
 var (
