@@ -19,35 +19,35 @@ func TestClientManagerAdd(t *testing.T) {
 	ctx2 := context.WithValue(context.Background(), CtxKeyUID, uint64(2))
 
 	cases := []struct {
-		desc     string
-		ctx      context.Context
-		conn     int
-		expConns string
-		expCtx   string
+		desc      string
+		ctx       context.Context
+		conn      int
+		expConns  string
+		expCtxLen int
 	}{{
-		desc:     `With new connection`,
-		ctx:      ctx1,
-		conn:     1000,
-		expConns: "map[1:[1000]]",
-		expCtx:   "map[1000:context.Background.WithValue(0x4, 0x1)]",
+		desc:      `With new connection`,
+		ctx:       ctx1,
+		conn:      1000,
+		expConns:  "map[1:[1000]]",
+		expCtxLen: 1,
 	}, {
-		desc:     `With same connection`,
-		ctx:      ctx1,
-		conn:     1000,
-		expConns: "map[1:[1000]]",
-		expCtx:   "map[1000:context.Background.WithValue(0x4, 0x1)]",
+		desc:      `With same connection`,
+		ctx:       ctx1,
+		conn:      1000,
+		expConns:  "map[1:[1000]]",
+		expCtxLen: 1,
 	}, {
-		desc:     `With different connection`,
-		ctx:      ctx1,
-		conn:     2000,
-		expConns: "map[1:[1000 2000]]",
-		expCtx:   "map[1000:context.Background.WithValue(0x4, 0x1) 2000:context.Background.WithValue(0x4, 0x1)]",
+		desc:      `With different connection`,
+		ctx:       ctx1,
+		conn:      2000,
+		expConns:  "map[1:[1000 2000]]",
+		expCtxLen: 2,
 	}, {
-		desc:     "With same connection different UID",
-		ctx:      ctx2,
-		conn:     1000,
-		expConns: "map[1:[2000] 2:[1000]]",
-		expCtx:   "map[1000:context.Background.WithValue(0x4, 0x2) 2000:context.Background.WithValue(0x4, 0x1)]",
+		desc:      "With same connection different UID",
+		ctx:       ctx2,
+		conn:      1000,
+		expConns:  "map[1:[2000] 2:[1000]]",
+		expCtxLen: 2,
 	}}
 
 	for _, c := range cases {
@@ -56,10 +56,10 @@ func TestClientManagerAdd(t *testing.T) {
 		clients.add(c.ctx, c.conn)
 
 		gotConns := fmt.Sprintf("%v", clients.conns)
-		gotCtx := fmt.Sprintf("%v", clients.ctx)
+		gotCtxLen := len(clients.ctx)
 
 		test.Assert(t, "ClientManager.conns", c.expConns, gotConns, true)
-		test.Assert(t, "ClientManager.ctx", c.expCtx, gotCtx, true)
+		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen, true)
 	}
 }
 
@@ -74,25 +74,25 @@ func TestClientManagerRemove(t *testing.T) {
 	clients.add(ctx2, 1000)
 
 	cases := []struct {
-		desc     string
-		conn     int
-		expConns string
-		expCtx   string
+		desc      string
+		conn      int
+		expConns  string
+		expCtxLen int
 	}{{
-		desc:     `With invalid connection`,
-		conn:     99,
-		expConns: "map[1:[2000] 2:[1000]]",
-		expCtx:   "map[1000:context.Background.WithValue(0x4, 0x2) 2000:context.Background.WithValue(0x4, 0x1)]",
+		desc:      `With invalid connection`,
+		conn:      99,
+		expConns:  "map[1:[2000] 2:[1000]]",
+		expCtxLen: 2,
 	}, {
-		desc:     `With valid connection`,
-		conn:     1000,
-		expConns: "map[1:[2000]]",
-		expCtx:   "map[2000:context.Background.WithValue(0x4, 0x1)]",
+		desc:      `With valid connection`,
+		conn:      1000,
+		expConns:  "map[1:[2000]]",
+		expCtxLen: 1,
 	}, {
-		desc:     `With valid connection`,
-		conn:     2000,
-		expConns: "map[]",
-		expCtx:   "map[]",
+		desc:      `With valid connection`,
+		conn:      2000,
+		expConns:  "map[]",
+		expCtxLen: 0,
 	}}
 
 	for _, c := range cases {
@@ -101,9 +101,9 @@ func TestClientManagerRemove(t *testing.T) {
 		clients.remove(c.conn)
 
 		gotConns := fmt.Sprintf("%v", clients.conns)
-		gotCtx := fmt.Sprintf("%v", clients.ctx)
+		gotCtxLen := len(clients.ctx)
 
 		test.Assert(t, "conns", c.expConns, gotConns, true)
-		test.Assert(t, "ClientManager.ctx", c.expCtx, gotCtx, true)
+		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen, true)
 	}
 }

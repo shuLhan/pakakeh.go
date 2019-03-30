@@ -164,17 +164,13 @@ func (cls *ClientManager) setFrames(conn int, frames *Frames) {
 }
 
 //
-// add new socket connection to user ID with its context.
+// add new socket connection to user ID in context.
 //
 func (cls *ClientManager) add(ctx context.Context, conn int) {
 	var uid uint64
 
 	// Delete the previous socket reference on other user ID.
 	cls.remove(conn)
-	v := ctx.Value(CtxKeyUID)
-	if v != nil {
-		uid = v.(uint64)
-	}
 
 	cls.Lock()
 
@@ -184,6 +180,10 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 
 	cls.ctx[conn] = ctx
 
+	v := ctx.Value(CtxKeyUID)
+	if v != nil {
+		uid, _ = v.(uint64)
+	}
 	if uid > 0 {
 		conns, ok := cls.conns[uid]
 		if !ok {
@@ -212,18 +212,20 @@ func (cls *ClientManager) remove(conn int) {
 		var uid uint64
 		v := ctx.Value(CtxKeyUID)
 		if v != nil {
-			uid = v.(uint64)
+			uid, _ = v.(uint64)
 		}
 		delete(cls.ctx, conn)
 
-		conns, ok := cls.conns[uid]
-		if ok {
-			conns, _ = ints.Remove(conns, conn)
+		if uid > 0 {
+			conns, ok := cls.conns[uid]
+			if ok {
+				conns, _ = ints.Remove(conns, conn)
 
-			if len(conns) == 0 {
-				delete(cls.conns, uid)
-			} else {
-				cls.conns[uid] = conns
+				if len(conns) == 0 {
+					delete(cls.conns, uid)
+				} else {
+					cls.conns[uid] = conns
+				}
 			}
 		}
 	}
