@@ -186,7 +186,7 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 	}
 
 	if cl.isStartTLS {
-		return cl.startTLS()
+		return cl.StartTLS()
 	}
 
 	return res, nil
@@ -441,7 +441,12 @@ func (cl *Client) recv() (res *Response, err error) {
 	return res, nil
 }
 
-func (cl *Client) startTLS() (res *Response, err error) {
+//
+// StartTLS upgrade the underlying connection to TLS.  This method only works
+// if client connected to remote URL using scheme "smtp+starttls" or on port
+// 587, and on server that support STARTTLS extension.
+//
+func (cl *Client) StartTLS() (res *Response, err error) {
 	req := []byte("STARTTLS\r\n")
 	res, err = cl.SendCommand(req)
 	if err != nil {
