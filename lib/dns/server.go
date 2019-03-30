@@ -236,16 +236,14 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 			if err == nil {
 				break
 			}
-			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				if n != 0 {
-					log.Println("serveTCPClient:", err)
-					req.Message.Reset()
-				}
-				continue
+			if err == io.EOF {
+				break
 			}
+			if n != 0 {
+				log.Println("serveTCPClient:", err)
+				req.Message.Reset()
+			}
+			continue
 		}
 		if err == io.EOF {
 			break
