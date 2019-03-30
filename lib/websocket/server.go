@@ -688,7 +688,7 @@ func (serv *Server) reader() {
 				continue
 			}
 
-			if debug.Value >= 3 && frames != nil {
+			if debug.Value >= 3 {
 				fmt.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
 			}
 
