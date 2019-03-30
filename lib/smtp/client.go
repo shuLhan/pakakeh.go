@@ -293,9 +293,12 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 	fmt.Fprintf(&cl.buf, "MAIL FROM:<%s>\r\n", mail.From)
 
 	res, err = cl.SendCommand(cl.buf.Bytes())
-	if err != nil || res.Code != StatusOK {
+	if err != nil {
+		return nil, err
+	}
+	if res.Code != StatusOK {
 		err = fmt.Errorf("client.MailTx: MAIL FROM: %d - %s", res.Code, res.Message)
-		return res, err
+		return nil, err
 	}
 
 	for _, to := range mail.Recipients {
