@@ -49,8 +49,8 @@ func TestMain(m *testing.M) {
 	}
 
 	testServer = &Server{
-		Address:    testAddress,
-		TLSAddress: testTLSAddress,
+		address:    testAddress,
+		tlsAddress: testTLSAddress,
 		Env:        env,
 		Handler:    NewLocalHandler(env),
 	}

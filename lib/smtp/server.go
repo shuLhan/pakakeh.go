@@ -25,17 +25,15 @@ const (
 // Server defines parameters for running an SMTP server.
 //
 type Server struct {
-	// Address to listen for incoming connections.
-	// This field is optional and exported only for the purpose of
-	// testing.
+	// address to listen for incoming connections.
+	// This field is optional and exist only for the purpose of testing.
 	// If its empty, it will set default to ":25".
-	Address string
+	address string
 
-	// TLSAddress address when listening with security layer.
-	// This field is optional and exported only for the purpose of
-	// testing.
+	// tlsAddress define an address when listening with security layer.
+	// This field is optional and exist only for the purpose of testing.
 	// If its empty, it will set default to ":465".
-	TLSAddress string
+	tlsAddress string
 
 	// TLSCert the server certificate for TLS or nil if no certificate.
 	// This field is optional, if its non nil, the server will also listen
@@ -62,7 +60,7 @@ type Server struct {
 	listener net.Listener
 
 	// tlsListener is a socket that listen for new connection from client
-	// on secure layer, usually on port 465.
+	// on secure layer on port 465.
 	tlsListener net.Listener
 
 	// mailTxQueue hold mail objects before being relayed or stored.
@@ -547,11 +545,11 @@ func (srv *Server) initialize() (err error) {
 }
 
 func (srv *Server) initListener() (err error) {
-	if len(srv.Address) == 0 {
-		srv.Address = ":25"
+	if len(srv.address) == 0 {
+		srv.address = ":25"
 	}
 
-	addr, err := net.ResolveTCPAddr("tcp", srv.Address)
+	addr, err := net.ResolveTCPAddr("tcp", srv.address)
 	if err != nil {
 		return err
 	}
@@ -572,11 +570,11 @@ func (srv *Server) initListener() (err error) {
 		MinVersion: tls.VersionTLS11,
 	}
 
-	if len(srv.TLSAddress) == 0 {
-		srv.TLSAddress = ":465"
+	if len(srv.tlsAddress) == 0 {
+		srv.tlsAddress = ":465"
 	}
 
-	srv.tlsListener, err = tls.Listen("tcp", srv.TLSAddress, tlsCfg)
+	srv.tlsListener, err = tls.Listen("tcp", srv.tlsAddress, tlsCfg)
 
 	return err
 }
