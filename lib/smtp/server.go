@@ -562,7 +562,7 @@ func (srv *Server) initListener() (err error) {
 	}
 
 	if srv.TLSCert == nil {
-		return nil
+		return fmt.Errorf("smtp: server certificate is not defined")
 	}
 
 	tlsCfg := &tls.Config{
