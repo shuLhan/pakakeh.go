@@ -1,0 +1,17 @@
+Received: by mail.proofn.com (Proofn, from userid 1000)
+	id 70C81C433F4; Tue, 26 Mar 2019 09:15:54 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.proofn.com 70C81C433F4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=proofn.com;
+	s=default; t=1553591754;
+	bh=z6TUz85EdYrACGMHYgZhJGvVy5oQI0dooVMKa2ZT7c4=;
+	h=From:To:Date:Subject:From;
+	b=D0RDGiZnZzFTFDd4g/CZoL0681HKYDxPfmgMIj+2Dt7WrYsOyzby2e9vc4mJEJLBh
+	 onKDK9cc8IdspwuUOAs7raJHta79DL40gef53O23lau9LYTIm8/NPJEbj5H9HZ8h03
+	 5eMEfQ7umLRet8Ft8lC5YBMvtx7b2tAR7Msqq8a4=
+From: shulhan@proofn.com
+To: m.shulhan@gmail.com
+Date: Mon, 25 Mar 2019 08:54:43 +0000
+Subject: smtpcli: testdata/email_received-by
+Message-Id: <20190326091554.70C81C433F4@mail.proofn.com>
+
+Hello world!

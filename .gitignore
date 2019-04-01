@@ -1,6 +1,7 @@
 *.prof
 *.save
 *.test
+/cmd/smtpcli/smtpcli
 /gofmtcomment
 /lib/dns/testdata/hosts.block.out
 /lib/email/maildir/testdata/
