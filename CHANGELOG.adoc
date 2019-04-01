@@ -4,10 +4,16 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
-==  share v0.5.0 (2019-04-xx)
+
+==  share v0.5.0 (2019-04-02)
+
+This minor release is dedicated for websocket package.  Major refactoring on
+server and client API to make it easy and extensible.  The websocket is now
+100% pass the autobahn testsuite (minus compression feature).
 
 ===  New Features
 
+*  `cmd/smtpcli`: command line interface to SMTP client protocol
 *  `ints`: new package for working with slice of integer
 *  `ints64`: new package for working with slice of 64 bit integer
 *  `floats64`: new package for working with slice of 64 bit float
@@ -21,7 +27,8 @@ first week of next month.
 *  `ints`: add function to remove value from slice
 
 *  `websockets`:
-**  Rewrite most of client and server APIs to be more simple
+**  Rewrite most of client and server APIs to be more simple and pass autobahn
+    testsuite
 **  Minimize global variables and unexport internal constants and functions
 **  Handle interjected PING control frame from server
 **  Generate random mask only if masked field is set
