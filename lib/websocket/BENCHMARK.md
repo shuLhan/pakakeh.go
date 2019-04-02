@@ -4,6 +4,7 @@ This note document a benchmark between gobwas vs our websocket library.
 
 ## Go v1.10.3
 
+```
 goos: linux
 goarch: amd64
 pkg: github.com/gobwas/ws
@@ -27,9 +28,11 @@ BenchmarkUpgrader/bad_sec_key-8                  5000000               379 ns/op
 BenchmarkUpgrader/bad_sec_key#01-8               5000000               382 ns/op               0 B/op          0 allocs/op
 PASS
 ok      github.com/gobwas/ws    58.827s
+```
 
 ## Go version devel +d6a27e8edc
 
+```
 goos: linux
 goarch: amd64
 pkg: github.com/gobwas/ws
@@ -53,12 +56,13 @@ BenchmarkUpgrader/bad_sec_key-8                  5000000               398 ns/op
 BenchmarkUpgrader/bad_sec_key#01-8               5000000               391 ns/op               0 B/op          0 allocs/op
 PASS
 ok      github.com/gobwas/ws    57.334s
-
+```
 
 # github.com/shuLhan/share/lib/websocket
 
 ## Go v1.10.3
 
+```
 goos: linux
 goarch: amd64
 pkg: github.com/shuLhan/share/lib/websocket
@@ -82,9 +86,11 @@ BenchmarkUpgrader/bad_sec_key-8                  5000000              343 ns/op 
 BenchmarkUpgrader/bad_sec_key#01-8               5000000              369 ns/op             176 B/op          1 allocs/op
 PASS
 ok      github.com/shuLhan/share/lib/websocket  50.192s
+```
 
 ## Go v1.12
 
+```
 websocket version: 8dec8c9
 Benchmark date   : Thu  7 Mar 22:09:17 WIB 2019
 
@@ -111,10 +117,11 @@ BenchmarkUpgrader/bad_sec_key-8                 10000000               165 ns/op
 BenchmarkUpgrader/bad_sec_key#01-8              10000000               166 ns/op              32 B/op          1 allocs/op
 PASS
 ok      github.com/shuLhan/share/lib/websocket  49.379s
-
+```
 
 ## Go version devel +05b3db24 (>1.12)
 
+```
 websocket version: 8dec8c9
 Benchmark date   : Thu  7 Mar 22:09:17 WIB 2019
 
@@ -141,3 +148,4 @@ BenchmarkUpgrader/bad_sec_key-8                 10000000               154 ns/op
 BenchmarkUpgrader/bad_sec_key#01-8              10000000               157 ns/op              32 B/op          1 allocs/op
 PASS
 ok      github.com/shuLhan/share/lib/websocket  52.285s
+```
