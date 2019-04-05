@@ -10,15 +10,20 @@ import (
 	"testing"
 	"time"
 
+	libcrypto "github.com/shuLhan/share/lib/crypto"
+	"github.com/shuLhan/share/lib/email/dkim"
 	"github.com/shuLhan/share/lib/test"
 )
 
 const (
-	testAddress      = "127.0.0.1:2525"
-	testDomain       = "mail.kilabit.local"
-	testPassword     = "secret"
-	testTLSAddress   = "127.0.0.1:2533"
-	testSMTPSAddress = "smtps://127.0.0.1:2533"
+	testAddress         = "127.0.0.1:2525"
+	testDomain          = "mail.kilabit.local"
+	testPassword        = "secret"
+	testTLSAddress      = "127.0.0.1:2533"
+	testSMTPAddress     = "smtp://" + testAddress
+	testSMTPSAddress    = "smtps://" + testTLSAddress
+	testFileCertificate = "testdata/" + testDomain + ".cert.pem"
+	testFilePrivateKey  = "testdata/" + testDomain + ".key.pem"
 )
 
 var (
@@ -28,7 +33,7 @@ var (
 	testAccountSecond *Account // nolint: gochecknoglobals
 )
 
-func TestMain(m *testing.M) {
+func testRunServer() {
 	var err error
 
 	testAccountFirst, err = NewAccount("First Tester", "first", testDomain, testPassword)
@@ -40,7 +45,16 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	primaryDomain := NewDomain(testDomain)
+	primaryKey, err := libcrypto.LoadPrivateKey(testFilePrivateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	primaryDKIMOpts := &DKIMOptions{
+		Signature:  dkim.NewSignature([]byte(testDomain), []byte("default")),
+		PrivateKey: primaryKey,
+	}
+	primaryDomain := NewDomain(testDomain, primaryDKIMOpts)
 	primaryDomain.Accounts["first"] = testAccountFirst
 	primaryDomain.Accounts["second"] = testAccountSecond
 
@@ -56,21 +70,28 @@ func TestMain(m *testing.M) {
 	}
 
 	err = testServer.LoadCertificate(
-		"testdata/mail.kilabit.local.chain.cert.pem",
-		"testdata/mail.kilabit.local.key.pem",
+		testFileCertificate,
+		testFilePrivateKey,
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	go func() {
-		e := testServer.Start()
-		if e != nil {
-			log.Fatal("ListenAndServe:", e.Error())
+		err = testServer.Start()
+		if err != nil {
+			log.Fatal("ListenAndServe:" + err.Error())
 		}
 	}()
+}
 
-	time.Sleep(1 * time.Second)
+func TestMain(m *testing.M) {
+	var err error
+
+	testRunServer()
+
+	time.Sleep(100 * time.Millisecond)
+
 	testClient, err = NewClient("", testSMTPSAddress, true)
 	if err != nil {
 		log.Fatal(err)
