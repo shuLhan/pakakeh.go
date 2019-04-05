@@ -172,6 +172,10 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 		cl.conn = tls.Client(cl.conn, tlsConfig)
 	}
 
+	if debug.Value >= 3 {
+		fmt.Println(">>> Connected ...")
+	}
+
 	res, err = cl.recv()
 	if err != nil {
 		return res, err
