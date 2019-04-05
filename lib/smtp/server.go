@@ -113,12 +113,10 @@ func (srv *Server) Start() (err error) {
 	go srv.processMailTxQueue()
 
 	srv.wg.Add(1)
-	go srv.serve()
+	go srv.serveIncoming()
 
-	if srv.tlsListener != nil {
-		srv.wg.Add(1)
-		go srv.serveTLS()
-	}
+	srv.wg.Add(1)
+	go srv.serveTLS()
 
 	srv.wg.Wait()
 	srv.running = false
@@ -130,14 +128,12 @@ func (srv *Server) Start() (err error) {
 // Stop the server.
 //
 func (srv *Server) Stop() {
-	if srv.tlsListener != nil {
-		err := srv.tlsListener.Close()
-		if err != nil {
-			log.Printf("smtp: tlsListener.Close: %s", err)
-		}
+	err := srv.tlsListener.Close()
+	if err != nil {
+		log.Printf("smtp: tlsListener.Close: %s", err)
 	}
 
-	err := srv.listener.Close()
+	err = srv.listener.Close()
 	if err != nil {
 		log.Printf("smtp: listener.Close: %s", err)
 	}
@@ -147,10 +143,14 @@ func (srv *Server) Stop() {
 	close(srv.relayQueue)
 }
 
-func (srv *Server) serve() {
+//
+// serveIncoming serve incoming message from other mail transfer agent on port
+// 25.
+//
+func (srv *Server) serveIncoming() {
 	for {
 		if debug.Value >= 2 {
-			fmt.Println("smtp: serve: waiting for client ...")
+			fmt.Println("smtp: server: MTA ready ...")
 		}
 
 		conn, err := srv.listener.Accept()
@@ -160,7 +160,7 @@ func (srv *Server) serve() {
 			return
 		}
 
-		recv := newReceiver(conn)
+		recv := newReceiver(conn, receiverModeServer)
 
 		go srv.handle(recv)
 	}
@@ -169,7 +169,7 @@ func (srv *Server) serve() {
 func (srv *Server) serveTLS() {
 	for {
 		if debug.Value >= 2 {
-			fmt.Println("smtp: serveTLS: waiting for client ...")
+			fmt.Println("smtp: server: MSA ready ...")
 		}
 
 		conn, err := srv.tlsListener.Accept()
@@ -179,7 +179,7 @@ func (srv *Server) serveTLS() {
 			return
 		}
 
-		recv := newReceiver(conn)
+		recv := newReceiver(conn, receiverModeClient)
 
 		go srv.handle(recv)
 	}
@@ -262,56 +262,12 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 	switch cmd.Kind {
 	case CommandAUTH:
 		err = srv.handleAUTH(recv, cmd)
-		if err != nil {
-			return err
-		}
 
 	case CommandDATA:
-		if !recv.isAuthenticated {
-			err = recv.sendError(errNotAuthenticated)
-			if err != nil {
-				return err
-			}
-		}
-		if recv.state != CommandRCPT {
-			err = recv.sendReply(StatusCmdBadSequence,
-				"Bad sequences of commands", nil)
-			if err != nil {
-				return err
-			}
-			recv.reset()
-			return nil
-		}
-
-		err = recv.sendReply(StatusDataReady, "Start mail input.", nil)
-		if err != nil {
-			return err
-		}
-
-		err = recv.readDATA()
-		if err != nil {
-			return err
-		}
-		recv.state = CommandDATA
+		err = srv.handleDATA(recv, cmd)
 
 	case CommandEHLO:
-		recv.clientDomain = cmd.Arg
-
-		body := make([]string, len(srv.Exts))
-		for x, ext := range srv.Exts {
-			body[x] = ext.Name()
-			body[x] += " " + ext.Params()
-		}
-
-		if !recv.isAuthenticated {
-			body = append(body, "AUTH PLAIN")
-		}
-
-		err = recv.sendReply(StatusOK, srv.Env.PrimaryDomain.Name, body)
-		if err != nil {
-			return err
-		}
-		recv.state = cmd.Kind
+		err = srv.handleEHLO(recv, cmd)
 
 	case CommandHELO:
 		recv.clientDomain = cmd.Arg
@@ -324,31 +280,9 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 
 	case CommandMAIL:
 		err = srv.handleMAIL(recv, cmd)
-		if err != nil {
-			return err
-		}
 
 	case CommandRCPT:
-		if !recv.isAuthenticated {
-			err = recv.sendError(errNotAuthenticated)
-			if err != nil {
-				return err
-			}
-		}
-
-		recv.mail.Recipients = append(recv.mail.Recipients, cmd.Arg)
-
-		// RFC 5321, 4.5.3.1.8.  Recipients Buffer
-		if len(recv.mail.Recipients) > 100 {
-			err = recv.sendReply(StatusNoStorage,
-				"Too many recipients", nil)
-		} else {
-			err = recv.sendReply(StatusOK, "OK", nil)
-		}
-		if err != nil {
-			return err
-		}
-		recv.state = CommandRCPT
+		err = srv.handleRCPT(recv, cmd)
 
 	case CommandRSET:
 		recv.reset()
@@ -359,41 +293,13 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 		}
 
 	case CommandVRFY:
-		if !recv.isAuthenticated {
-			err = recv.sendError(errNotAuthenticated)
-			if err != nil {
-				return err
-			}
-		}
-
-		res, err := srv.Handler.ServeVerify(cmd.Arg)
-		if err != nil {
-			return err
-		}
-		err = recv.sendReply(res.Code, res.Message, res.Body)
-		if err != nil {
-			return err
-		}
+		err = srv.handleVRFY(recv, cmd)
 
 	case CommandEXPN:
-		if !recv.isAuthenticated {
-			err = recv.sendError(errNotAuthenticated)
-			if err != nil {
-				return err
-			}
-		}
-
-		res, err := srv.Handler.ServeExpand(cmd.Arg)
-		if err != nil {
-			return err
-		}
-		err = recv.sendReply(res.Code, res.Message, res.Body)
-		if err != nil {
-			return err
-		}
+		err = srv.handleEXPN(recv, cmd)
 
 	case CommandHELP:
-		if !recv.isAuthenticated {
+		if !recv.isAuthenticated() {
 			err = recv.sendError(errNotAuthenticated)
 			if err != nil {
 				return err
@@ -407,9 +313,6 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 
 	case CommandNOOP:
 		err = recv.sendReply(StatusOK, "OK", nil)
-		if err != nil {
-			return err
-		}
 
 	case CommandQUIT:
 		_ = recv.sendReply(StatusClosing,
@@ -417,14 +320,18 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 		recv.state = CommandQUIT
 	}
 
-	return nil
+	return err
 }
 
 //
 // handleAUTH process the AUTH command from client.
 //
 func (srv *Server) handleAUTH(recv *receiver, cmd *Command) (err error) {
-	if recv.isAuthenticated {
+	if recv.mode == receiverModeServer {
+		return recv.sendError(errCmdUnknown)
+	}
+
+	if recv.isAuthenticated() {
 		return recv.sendError(errBadSequence)
 	}
 
@@ -484,14 +391,91 @@ func (srv *Server) handleAUTH(recv *receiver, cmd *Command) (err error) {
 		return err
 	}
 
-	recv.isAuthenticated = true
+	recv.authenticated = true
 	recv.state = CommandAUTH
 
 	return nil
 }
 
+func (srv *Server) handleDATA(recv *receiver, cmd *Command) (err error) {
+	if !recv.isAuthenticated() {
+		err = recv.sendError(errNotAuthenticated)
+		if err != nil {
+			return err
+		}
+	}
+	if recv.state != CommandRCPT {
+		err = recv.sendReply(StatusCmdBadSequence,
+			"Bad sequences of commands", nil)
+		if err != nil {
+			return err
+		}
+		recv.reset()
+		return nil
+	}
+
+	err = recv.sendReply(StatusDataReady, "Start mail input.", nil)
+	if err != nil {
+		return err
+	}
+
+	err = recv.readDATA()
+	if err != nil {
+		return err
+	}
+
+	recv.state = CommandDATA
+
+	return nil
+}
+
+func (srv *Server) handleEHLO(recv *receiver, cmd *Command) (err error) {
+	recv.clientDomain = cmd.Arg
+
+	body := make([]string, len(srv.Exts))
+	for x, ext := range srv.Exts {
+		body[x] = ext.Name()
+		body[x] += " " + ext.Params()
+	}
+
+	if !recv.isAuthenticated() {
+		body = append(body, "AUTH PLAIN")
+	}
+
+	err = recv.sendReply(StatusOK, srv.Env.PrimaryDomain.Name, body)
+	if err != nil {
+		return err
+	}
+
+	recv.state = cmd.Kind
+
+	return nil
+}
+
+func (srv *Server) handleEXPN(recv *receiver, cmd *Command) (err error) {
+	if recv.mode == receiverModeServer {
+		return recv.sendError(errCmdUnknown)
+	}
+
+	if !recv.isAuthenticated() {
+		err = recv.sendError(errNotAuthenticated)
+		if err != nil {
+			return err
+		}
+	}
+
+	res, err := srv.Handler.ServeExpand(cmd.Arg)
+	if err != nil {
+		return err
+	}
+
+	err = recv.sendReply(res.Code, res.Message, res.Body)
+
+	return err
+}
+
 func (srv *Server) handleMAIL(recv *receiver, cmd *Command) (err error) {
-	if !recv.isAuthenticated {
+	if !recv.isAuthenticated() {
 		return recv.sendError(errNotAuthenticated)
 	}
 
@@ -509,6 +493,54 @@ func (srv *Server) handleMAIL(recv *receiver, cmd *Command) (err error) {
 
 func (srv *Server) handleHELP(recv *receiver) (err error) {
 	return recv.sendReply(StatusHelp, "Everything will be alright", nil)
+}
+
+func (srv *Server) handleRCPT(recv *receiver, cmd *Command) (err error) {
+	if !recv.isAuthenticated() {
+		err = recv.sendError(errNotAuthenticated)
+		if err != nil {
+			return err
+		}
+	}
+
+	recv.mail.Recipients = append(recv.mail.Recipients, cmd.Arg)
+
+	// RFC 5321, 4.5.3.1.8.  Recipients Buffer
+	if len(recv.mail.Recipients) > 100 {
+		err = recv.sendReply(StatusNoStorage,
+			"Too many recipients", nil)
+	} else {
+		err = recv.sendReply(StatusOK, "OK", nil)
+	}
+	if err != nil {
+		return err
+	}
+
+	recv.state = CommandRCPT
+
+	return nil
+}
+
+func (srv *Server) handleVRFY(recv *receiver, cmd *Command) (err error) {
+	if recv.mode == receiverModeServer {
+		return recv.sendError(errCmdUnknown)
+	}
+
+	if !recv.isAuthenticated() {
+		err = recv.sendError(errNotAuthenticated)
+		if err != nil {
+			return err
+		}
+	}
+
+	res, err := srv.Handler.ServeVerify(cmd.Arg)
+	if err != nil {
+		return err
+	}
+
+	err = recv.sendReply(res.Code, res.Message, res.Body)
+
+	return err
 }
 
 //

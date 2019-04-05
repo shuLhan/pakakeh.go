@@ -15,21 +15,40 @@ import (
 	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
+type receiverMode int
+
+const (
+	// receiverModeServer accept incoming email only from other server,
+	// without authentication, through port 25 on the server.
+	receiverModeServer receiverMode = iota
+
+	// receiverModeClient accept incoming email from client, with
+	// authentication, through port 465 on the server.
+	receiverModeClient
+)
+
+//
+// receiver represent a connection that receive incoming email in server.
+//
 type receiver struct {
-	conn            net.Conn
-	data            []byte
-	buff            bytes.Buffer
-	state           CommandKind
-	clientDomain    string
-	clientAddress   string
-	localAddress    string
-	mail            *MailTx
-	isAuthenticated bool
+	mode receiverMode
+
+	data          []byte
+	buff          bytes.Buffer
+	conn          net.Conn
+	clientDomain  string
+	clientAddress string
+	localAddress  string
+
+	state         CommandKind
+	mail          *MailTx
+	authenticated bool
 }
 
-func newReceiver(conn net.Conn) (recv *receiver) {
+func newReceiver(conn net.Conn, mode receiverMode) (recv *receiver) {
 	recv = &receiver{
 		conn: conn,
+		mode: mode,
 		data: make([]byte, 4096),
 		mail: &MailTx{},
 	}
@@ -48,6 +67,17 @@ func (recv *receiver) close() {
 	if err != nil {
 		log.Printf("receiver.close: %s\n", err)
 	}
+}
+
+//
+// isAuthenticated will return true if receiver mode is client and user has
+// authenticated to system.
+//
+func (recv *receiver) isAuthenticated() bool {
+	if recv.mode == receiverModeClient && recv.authenticated {
+		return true
+	}
+	return false
 }
 
 //
