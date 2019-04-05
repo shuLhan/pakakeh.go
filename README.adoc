@@ -27,6 +27,9 @@ A collection of libraries and tools written in Go.
 *  link:{url-godoc}/lib/contact[*contact*^]: A library to import contact from
    Google, Microsoft, or Yahoo
 
+*  link:{url-godoc}/lib/crypto[*crypto*^]: Package crypto provide a wrapper
+   for standard crypto package.
+
 *  link:{url-godoc}/lib/dns[*dns*^]: A library for working with Domain Name
    System (DNS) protocol.
 
