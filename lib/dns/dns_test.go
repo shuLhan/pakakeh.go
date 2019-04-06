@@ -211,21 +211,21 @@ func TestMain(m *testing.M) {
 		UDPPort:          5300,
 		TCPPort:          5300,
 		DoHPort:          8443,
-		DoHCert:          "testdata/domain.crt",
-		DoHCertKey:       "testdata/domain.key",
+		CertFile:         "testdata/domain.crt",
+		PrivateKeyFile:   "testdata/domain.key",
 		DoHAllowInsecure: true,
 	}
 
-	go func() {
-		err := _testServer.ListenAndServe(serverOptions)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-	}()
+	err := _testServer.Start(serverOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	time.Sleep(500 * time.Millisecond)
 
-	os.Exit(m.Run())
+	s := m.Run()
+
+	os.Exit(s)
 }
 
 func TestQueryType(t *testing.T) {

@@ -7,86 +7,185 @@ package dns
 import (
 	"crypto/tls"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 //
 // Server defines DNS server.
 //
 type Server struct {
-	Handler Handler
-	udp     *net.UDPConn
-	tcp     *net.TCPListener
-	doh     *http.Server
+	Handler     Handler
+	udp         *net.UDPConn
+	tcp         *net.TCPListener
+	doh         *http.Server
+	errListener chan error
 }
 
-//
-// ListenAndServe run DNS server on UDP, TCP, or DNS over HTTP (DoH).
-//
-func (srv *Server) ListenAndServe(opts *ServerOptions) error {
-	err := opts.parse()
+func (srv *Server) init(opts *ServerOptions) (err error) {
+	err = opts.init()
 	if err != nil {
-		return err
+		return
 	}
 
-	cherr := make(chan error, 1)
-
-	go func() {
-		err = srv.ListenAndServeTCP(opts.getTCPAddress())
-		if err != nil {
-			cherr <- err
-		}
-	}()
-
-	go func() {
-		err = srv.ListenAndServeUDP(opts.getUDPAddress())
-		if err != nil {
-			cherr <- err
-		}
-	}()
-
-	if len(opts.DoHCert) > 0 && len(opts.DoHCertKey) > 0 {
-		go func() {
-			err = srv.ListenAndServeDoH(opts)
-			if err != nil {
-				cherr <- err
-			}
-		}()
+	udpAddr := opts.getUDPAddress()
+	srv.udp, err = net.ListenUDP("udp", udpAddr)
+	if err != nil {
+		return fmt.Errorf("dns: error listening on UDP '%v': %s",
+			udpAddr, err.Error())
 	}
 
-	err = <-cherr
+	tcpAddr := opts.getTCPAddress()
+	srv.tcp, err = net.ListenTCP("tcp", tcpAddr)
+	if err != nil {
+		return fmt.Errorf("dns: error listening on TCP '%v': %s",
+			tcpAddr, err.Error())
+	}
 
-	return err
+	srv.errListener = make(chan error, 1)
+
+	return nil
 }
 
 //
-// ListenAndServeDoH listen for request over HTTPS using certificate and key
+// Start the server, listening and serve query from clients.
+//
+func (srv *Server) Start(opts *ServerOptions) (err error) {
+	err = srv.init(opts)
+	if err != nil {
+		return
+	}
+
+	if opts.cert != nil {
+		dohAddress := opts.getDoHAddress()
+		go srv.serveDoH(dohAddress, opts.DoHIdleTimeout, *opts.cert,
+			opts.DoHAllowInsecure)
+		opts.cert = nil
+	}
+
+	go srv.serveTCP()
+	go srv.serveUDP()
+
+	return nil
+}
+
+//
+// Stop the server, close all listeners.
+//
+func (srv *Server) Stop() {
+	err := srv.udp.Close()
+	if err != nil {
+		log.Println("dns: error when closing UDP: " + err.Error())
+	}
+	err = srv.tcp.Close()
+	if err != nil {
+		log.Println("dns: error when closing TCP: " + err.Error())
+	}
+	err = srv.doh.Close()
+	if err != nil {
+		log.Println("dns: error when closing DoH: " + err.Error())
+	}
+}
+
+//
+// Wait for server to be Stop()-ed or when one of listener throw an error.
+//
+func (srv *Server) Wait() {
+	err := <-srv.errListener
+	if err != nil && err != io.EOF {
+		log.Println(err)
+	}
+
+	srv.Stop()
+}
+
+//
+// serveDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
 //
-func (srv *Server) ListenAndServeDoH(opts *ServerOptions) error {
-	if opts.ip == nil {
-		err := opts.parse()
-		if err != nil {
-			return err
-		}
-	}
-
+func (srv *Server) serveDoH(addr *net.TCPAddr, idleTimeout time.Duration,
+	cert tls.Certificate, allowInsecure bool,
+) {
 	srv.doh = &http.Server{
-		Addr:        opts.getDoHAddress().String(),
-		IdleTimeout: opts.DoHIdleTimeout,
+		Addr:        addr.String(),
+		IdleTimeout: idleTimeout,
 		TLSConfig: &tls.Config{
-			InsecureSkipVerify: opts.DoHAllowInsecure, // nolint: gosec
+			Certificates: []tls.Certificate{
+				cert,
+			},
+			InsecureSkipVerify: allowInsecure, // nolint: gosec
 		},
 	}
 
 	http.Handle("/dns-query", srv)
 
-	return srv.doh.ListenAndServeTLS(opts.DoHCert, opts.DoHCertKey)
+	err := srv.doh.ListenAndServeTLS("", "")
+	if err != io.EOF {
+		err = fmt.Errorf("dns: error on DoH: " + err.Error())
+	}
+
+	srv.errListener <- err
+}
+
+//
+// serveTCP serve DNS request from TCP connection.
+//
+func (srv *Server) serveTCP() {
+	for {
+		conn, err := srv.tcp.AcceptTCP()
+		if err != nil {
+			if err != io.EOF {
+				err = fmt.Errorf("dns: error on accepting TCP connection: " + err.Error())
+			}
+			srv.errListener <- err
+			return
+		}
+
+		cl := &TCPClient{
+			Timeout: clientTimeout,
+			conn:    conn,
+		}
+
+		go srv.serveTCPClient(cl)
+	}
+}
+
+//
+// serveUDP serve DNS request from UDP connection.
+//
+func (srv *Server) serveUDP() {
+	sender := &UDPClient{
+		Timeout: clientTimeout,
+		Conn:    srv.udp,
+	}
+
+	for {
+		req := NewRequest()
+
+		n, raddr, err := srv.udp.ReadFromUDP(req.Message.Packet)
+		if err != nil {
+			if err != io.EOF {
+				err = fmt.Errorf("dns: error when reading from UDP: " + err.Error())
+			}
+			srv.errListener <- err
+			return
+		}
+
+		req.Kind = ConnTypeUDP
+		req.UDPAddr = raddr
+		req.Message.Packet = req.Message.Packet[:n]
+
+		req.Message.UnpackHeaderQuestion()
+		req.Sender = sender
+
+		srv.Handler.ServeDNS(req)
+	}
 }
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -160,67 +259,6 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	_, ok := <-req.ChanResponded
 	if !ok {
 		w.WriteHeader(http.StatusGatewayTimeout)
-	}
-}
-
-//
-// ListenAndServeTCP listen for request with TCP socket.
-//
-func (srv *Server) ListenAndServeTCP(tcpAddr *net.TCPAddr) error {
-	var err error
-
-	srv.tcp, err = net.ListenTCP("tcp", tcpAddr)
-	if err != nil {
-		return err
-	}
-
-	for {
-		conn, err := srv.tcp.AcceptTCP()
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		cl := &TCPClient{
-			Timeout: clientTimeout,
-			conn:    conn,
-		}
-
-		go srv.serveTCPClient(cl)
-	}
-}
-
-//
-// ListenAndServeUDP listen for request with UDP socket.
-//
-func (srv *Server) ListenAndServeUDP(udpAddr *net.UDPAddr) (err error) {
-	srv.udp, err = net.ListenUDP("udp", udpAddr)
-	if err != nil {
-		return err
-	}
-
-	sender := &UDPClient{
-		Timeout: clientTimeout,
-		Conn:    srv.udp,
-	}
-
-	for {
-		req := NewRequest()
-
-		n, raddr, err := srv.udp.ReadFromUDP(req.Message.Packet)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		req.Kind = ConnTypeUDP
-		req.UDPAddr = raddr
-		req.Message.Packet = req.Message.Packet[:n]
-
-		req.Message.UnpackHeaderQuestion()
-		req.Sender = sender
-
-		srv.Handler.ServeDNS(req)
 	}
 }
 

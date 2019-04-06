@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"time"
@@ -16,20 +17,25 @@ import (
 // HTTPS (DoH).
 //
 type ServerOptions struct {
-	// IPAddress of server to listen to, without port number.
+	// IPAddress ip address to serve query, without port number.
+	// This field is optional, default to "0.0.0.0".
 	IPAddress string
 
-	// DoHCert path to certificate file for serving DoH.
-	DoHCert string
+	// CertFile path to certificate file for serving DoH.
+	// This field is optional.  If its defined, the DoHPrivateKeyFile must
+	// also be defined.
+	CertFile string
 
-	// DoHCertKey path to certificate key file for serving DoH.
-	DoHCertKey string
+	// PrivateKeyFile path to certificate private key file for serving
+	// DoH.
+	// This field is optional.  If its defined, the CertFile must also
+	// be defined.
+	PrivateKeyFile string
 
 	// DoHIdleTimeout number of seconds before considering the client of
 	// DoH connection to be closed.
+	// This field is optional, default to 120 seconds.
 	DoHIdleTimeout time.Duration
-
-	ip net.IP
 
 	// UDPPort port for UDP server, default to 53.
 	UDPPort uint16
@@ -40,16 +46,34 @@ type ServerOptions struct {
 	// DoHPort port for listening DNS over HTTP, default to 443.
 	DoHPort uint16
 
-	// DoHAllowInsecure options to allow to serve DoH with self-signed
+	// DoHAllowInsecure option to allow to serve DoH with self-signed
 	// certificate.
+	// This field is optional.
 	DoHAllowInsecure bool
+
+	ip   net.IP
+	cert *tls.Certificate
 }
 
-func (opts *ServerOptions) parse() error {
-	ip := net.ParseIP(opts.IPAddress)
-	if ip == nil {
-		err := fmt.Errorf("invalid address '%s'", opts.IPAddress)
-		return err
+//
+// init initialize the server options.
+//
+func (opts *ServerOptions) init() (err error) {
+	if len(opts.IPAddress) == 0 {
+		opts.IPAddress = "0.0.0.0"
+	}
+
+	opts.ip = net.ParseIP(opts.IPAddress)
+	if opts.ip == nil {
+		return fmt.Errorf("dns: invalid address '%s'", opts.IPAddress)
+	}
+
+	if len(opts.CertFile) > 0 && len(opts.PrivateKeyFile) > 0 {
+		cert, err := tls.LoadX509KeyPair(opts.CertFile, opts.PrivateKeyFile)
+		if err != nil {
+			return fmt.Errorf("dns: error loading certificate: " + err.Error())
+		}
+		opts.cert = &cert
 	}
 
 	if opts.UDPPort == 0 {

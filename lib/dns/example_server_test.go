@@ -220,17 +220,17 @@ func ExampleServer() {
 		TCPPort:          5300,
 		UDPPort:          5300,
 		DoHPort:          8443,
-		DoHCert:          "testdata/domain.crt",
-		DoHCertKey:       "testdata/domain.key",
+		CertFile:         "testdata/domain.crt",
+		PrivateKeyFile:   "testdata/domain.key",
 		DoHAllowInsecure: true,
 	}
 
-	go func() {
-		err := server.ListenAndServe(serverOptions)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-	}()
+	err := server.Start(serverOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	clientLookup(serverAddress)
+
+	server.Stop()
 }
