@@ -7,6 +7,7 @@ package dns
 import (
 	"log"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -23,6 +24,7 @@ var (
 )
 
 type serverHandler struct {
+	sync.Mutex
 	responses []*Message
 }
 
@@ -149,6 +151,8 @@ func (h *serverHandler) ServeDNS(req *Request) {
 		}
 	}
 
+	h.Lock()
+
 	// Return empty answer
 	if res == nil {
 		res = &Message{
@@ -161,6 +165,7 @@ func (h *serverHandler) ServeDNS(req *Request) {
 
 		_, err = res.Pack()
 		if err != nil {
+			h.Unlock()
 			return
 		}
 	} else {
@@ -193,6 +198,8 @@ func (h *serverHandler) ServeDNS(req *Request) {
 			req.ChanResponded <- true
 		}
 	}
+
+	h.Unlock()
 }
 
 func TestMain(m *testing.M) {
