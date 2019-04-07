@@ -242,6 +242,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		}
 	}
 
+	rr.offTTL = uint(msg.off)
 	libbytes.AppendUint32(&msg.Packet, rr.TTL)
 	msg.off += 4
 
