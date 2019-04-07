@@ -28,7 +28,7 @@ type serverHandler struct {
 	responses []*Message
 }
 
-func (h *serverHandler) generateResponses() {
+func generateTestResponses() (responses []*Message) {
 	// kilabit.info A
 	res := &Message{
 		Header: &SectionHeader{
@@ -60,7 +60,7 @@ func (h *serverHandler) generateResponses() {
 		log.Fatal("Pack: ", err)
 	}
 
-	h.responses = append(h.responses, res)
+	responses = append(responses, res)
 
 	// kilabit.info SOA
 	res = &Message{
@@ -98,7 +98,7 @@ func (h *serverHandler) generateResponses() {
 		log.Fatal("Pack: ", err)
 	}
 
-	h.responses = append(h.responses, res)
+	responses = append(responses, res)
 
 	// kilabit.info TXT
 	res = &Message{
@@ -130,7 +130,9 @@ func (h *serverHandler) generateResponses() {
 		log.Fatal("Pack: ", err)
 	}
 
-	h.responses = append(h.responses, res)
+	responses = append(responses, res)
+
+	return responses
 }
 
 func (h *serverHandler) ServeDNS(req *Request) {
@@ -207,7 +209,7 @@ func TestMain(m *testing.M) {
 
 	_testHandler = &serverHandler{}
 
-	_testHandler.generateResponses()
+	_testHandler.responses = generateTestResponses()
 
 	_testServer = &Server{
 		Handler: _testHandler,
