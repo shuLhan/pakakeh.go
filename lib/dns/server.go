@@ -16,7 +16,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 //
@@ -43,17 +42,13 @@ import (
 type Server struct {
 	Handler Handler
 
+	opts        *ServerOptions
 	errListener chan error
 	caches      *caches
 
 	udp *net.UDPConn
 	tcp *net.TCPListener
-
-	doh              *http.Server
-	dohAddress       string
-	dohIdleTimeout   time.Duration
-	dohCert          *tls.Certificate
-	dohAllowInsecure bool
+	doh *http.Server
 }
 
 //
@@ -66,11 +61,8 @@ func NewServer(opts *ServerOptions, handler Handler) (srv *Server, err error) {
 	}
 
 	srv = &Server{
-		Handler:          handler,
-		dohAddress:       opts.getDoHAddress().String(),
-		dohIdleTimeout:   opts.DoHIdleTimeout,
-		dohCert:          opts.cert,
-		dohAllowInsecure: opts.DoHAllowInsecure,
+		Handler: handler,
+		opts:    opts,
 	}
 
 	udpAddr := opts.getUDPAddress()
@@ -89,8 +81,6 @@ func NewServer(opts *ServerOptions, handler Handler) (srv *Server, err error) {
 
 	srv.errListener = make(chan error, 1)
 	srv.caches = newCaches(opts.PruneDelay, opts.PruneThreshold)
-
-	opts.cert = nil
 
 	return srv, nil
 }
@@ -236,7 +226,7 @@ func (srv *Server) populateCaches(msgs []*Message) {
 // Start the server, listening and serve query from clients.
 //
 func (srv *Server) Start() {
-	if srv.dohCert != nil {
+	if srv.opts.DoHCertificate != nil {
 		go srv.serveDoH()
 	}
 
@@ -280,13 +270,13 @@ func (srv *Server) Wait() {
 //
 func (srv *Server) serveDoH() {
 	srv.doh = &http.Server{
-		Addr:        srv.dohAddress,
-		IdleTimeout: srv.dohIdleTimeout,
+		Addr:        srv.opts.getDoHAddress().String(),
+		IdleTimeout: srv.opts.DoHIdleTimeout,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{
-				*srv.dohCert,
+				*srv.opts.DoHCertificate,
 			},
-			InsecureSkipVerify: srv.dohAllowInsecure, // nolint: gosec
+			InsecureSkipVerify: srv.opts.DoHAllowInsecure, // nolint: gosec
 		},
 	}
 

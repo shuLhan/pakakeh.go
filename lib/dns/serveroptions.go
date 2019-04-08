@@ -17,24 +17,11 @@ import (
 
 //
 // ServerOptions describes options for running a DNS server.
-// If certificate or key file is empty, server will not run with DNS over
-// HTTPS (DoH).
 //
 type ServerOptions struct {
 	// IPAddress ip address to serve query, without port number.
 	// This field is optional, default to "0.0.0.0".
 	IPAddress string
-
-	// CertFile path to certificate file for serving DoH.
-	// This field is optional.  If its defined, the DoHPrivateKeyFile must
-	// also be defined.
-	CertFile string
-
-	// PrivateKeyFile path to certificate private key file for serving
-	// DoH.
-	// This field is optional.  If its defined, the CertFile must also
-	// be defined.
-	PrivateKeyFile string
 
 	// DoHIdleTimeout number of seconds before considering the client of
 	// DoH connection to be closed.
@@ -75,6 +62,11 @@ type ServerOptions struct {
 	//
 	NameServers []string
 
+	// DoHCertificate contains certificate for serving DNS over HTTPS.
+	// This field is optional, if its empty, server will not listening on
+	// HTTPS port.
+	DoHCertificate *tls.Certificate
+
 	// DoHAllowInsecure option to allow to serve DoH with self-signed
 	// certificate.
 	// This field is optional.
@@ -96,8 +88,7 @@ type ServerOptions struct {
 	// accessed in the last 1 minute will be removed from cache.
 	PruneThreshold time.Duration
 
-	ip   net.IP
-	cert *tls.Certificate
+	ip net.IP
 
 	// udpServers contains list of parent name server addresses using UDP
 	// protocol.
@@ -123,14 +114,6 @@ func (opts *ServerOptions) init() (err error) {
 	opts.ip = net.ParseIP(opts.IPAddress)
 	if opts.ip == nil {
 		return fmt.Errorf("dns: invalid IP address '%s'", opts.IPAddress)
-	}
-
-	if len(opts.CertFile) > 0 && len(opts.PrivateKeyFile) > 0 {
-		cert, err := tls.LoadX509KeyPair(opts.CertFile, opts.PrivateKeyFile)
-		if err != nil {
-			return fmt.Errorf("dns: error loading certificate: " + err.Error())
-		}
-		opts.cert = &cert
 	}
 
 	if opts.UDPPort == 0 {
