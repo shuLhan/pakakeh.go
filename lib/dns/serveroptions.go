@@ -51,6 +51,22 @@ type ServerOptions struct {
 	// This field is optional.
 	DoHAllowInsecure bool
 
+	// PruneDelay define a delay where caches will be pruned.
+	// This field is optional, minimum value is 1 minute, and default
+	// value is 1 hour.
+	// For example, if its set to 1 hour, every 1 hour the caches will be
+	// inspected to remove answers that has not been accessed more than or
+	// equal to PruneThreshold.
+	PruneDelay time.Duration
+
+	// PruneThreshold define negative duration where answers will be
+	// pruned from caches.
+	// This field is optional, minimum value is -1 minute, and default
+	// value is -1 hour,
+	// For example, if its set to -1 minute, any answers that has not been
+	// accessed in the last 1 minute will be removed from cache.
+	PruneThreshold time.Duration
+
 	ip   net.IP
 	cert *tls.Certificate
 }
@@ -87,6 +103,12 @@ func (opts *ServerOptions) init() (err error) {
 	}
 	if opts.DoHIdleTimeout <= 0 {
 		opts.DoHIdleTimeout = defaultDoHIdleTimeout
+	}
+	if opts.PruneDelay.Minutes() < 1 {
+		opts.PruneDelay = time.Hour
+	}
+	if opts.PruneThreshold.Minutes() > -1 {
+		opts.PruneThreshold = -1 * time.Hour
 	}
 
 	return nil

@@ -3,6 +3,7 @@ package dns_test
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/shuLhan/share/lib/dns"
 )
@@ -211,10 +212,6 @@ func ExampleServer() {
 
 	handler.generateResponses()
 
-	server := &dns.Server{
-		Handler: handler,
-	}
-
 	serverOptions := &dns.ServerOptions{
 		IPAddress:        "127.0.0.1",
 		TCPPort:          5300,
@@ -225,10 +222,15 @@ func ExampleServer() {
 		DoHAllowInsecure: true,
 	}
 
-	err := server.Start(serverOptions)
+	server, err := dns.NewServer(serverOptions, handler)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	server.Start()
+
+	// Wait for all listeners running.
+	time.Sleep(500 * time.Millisecond)
 
 	clientLookup(serverAddress)
 

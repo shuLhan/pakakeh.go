@@ -13,6 +13,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -20,59 +22,226 @@ import (
 //
 // Server defines DNS server.
 //
+// Caches
+//
+// There are two type of answer: local and non-local.
+// Local answer is a DNS record that is loaded from hosts file or master
+// zone file.
+// Non-local answer is a DNS record that is received from parent name
+// servers.
+//
+// Server caches the DNS answers in two storages: map and list.
+// The map caches store local and non local answers, using domain name as a
+// key and list of answers as value,
+//
+//	domain-name -> [{A,IN,...},{AAAA,IN,...}]
+//
+// The list caches store non-local answers, ordered by last accessed time,
+// it is used to prune least frequently accessed answers.
+// Local caches will never get pruned.
+//
 type Server struct {
-	Handler     Handler
-	udp         *net.UDPConn
-	tcp         *net.TCPListener
-	doh         *http.Server
+	Handler Handler
+
 	errListener chan error
+	caches      *caches
+
+	udp *net.UDPConn
+	tcp *net.TCPListener
+
+	doh              *http.Server
+	dohAddress       string
+	dohIdleTimeout   time.Duration
+	dohCert          *tls.Certificate
+	dohAllowInsecure bool
 }
 
-func (srv *Server) init(opts *ServerOptions) (err error) {
+//
+// NewServer create and initialize server using the options and a .handler.
+//
+func NewServer(opts *ServerOptions, handler Handler) (srv *Server, err error) {
 	err = opts.init()
 	if err != nil {
-		return
+		return nil, err
+	}
+
+	srv = &Server{
+		Handler:          handler,
+		dohAddress:       opts.getDoHAddress().String(),
+		dohIdleTimeout:   opts.DoHIdleTimeout,
+		dohCert:          opts.cert,
+		dohAllowInsecure: opts.DoHAllowInsecure,
 	}
 
 	udpAddr := opts.getUDPAddress()
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
 	if err != nil {
-		return fmt.Errorf("dns: error listening on UDP '%v': %s",
+		return nil, fmt.Errorf("dns: error listening on UDP '%v': %s",
 			udpAddr, err.Error())
 	}
 
 	tcpAddr := opts.getTCPAddress()
 	srv.tcp, err = net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
-		return fmt.Errorf("dns: error listening on TCP '%v': %s",
+		return nil, fmt.Errorf("dns: error listening on TCP '%v': %s",
 			tcpAddr, err.Error())
 	}
 
 	srv.errListener = make(chan error, 1)
+	srv.caches = newCaches(opts.PruneDelay, opts.PruneThreshold)
 
-	return nil
+	opts.cert = nil
+
+	return srv, nil
+}
+
+//
+// LoadHostsDir populate caches with DNS record from hosts formatted files in
+// directory "dir".
+//
+func (srv *Server) LoadHostsDir(dir string) {
+	if len(dir) == 0 {
+		return
+	}
+
+	d, err := os.Open(dir)
+	if err != nil {
+		log.Println("dns: LoadHostsDir: ", err)
+		return
+	}
+
+	fis, err := d.Readdir(0)
+	if err != nil {
+		log.Println("dns: LoadHostsDir: ", err)
+		err = d.Close()
+		if err != nil {
+			log.Println("dns: LoadHostsDir: ", err)
+		}
+		return
+	}
+
+	for x := 0; x < len(fis); x++ {
+		if fis[x].IsDir() {
+			continue
+		}
+
+		hostsFile := filepath.Join(dir, fis[x].Name())
+
+		srv.LoadHostsFile(hostsFile)
+	}
+
+	err = d.Close()
+	if err != nil {
+		log.Println("dns: LoadHostsDir: ", err)
+	}
+}
+
+//
+// LoadHostsFile populate caches with DNS record from hosts formatted file.
+//
+func (srv *Server) LoadHostsFile(path string) {
+	if len(path) == 0 {
+		fmt.Println("dns: loading system hosts file")
+	} else {
+		fmt.Printf("dns: loading hosts file '%s'\n", path)
+	}
+
+	msgs, err := HostsLoad(path)
+	if err != nil {
+		log.Println("dns: LoadHostsFile: " + err.Error())
+	}
+
+	srv.populateCaches(msgs)
+}
+
+//
+// LoadMasterDir populate caches with DNS record from master (zone) formatted
+// files in directory "dir".
+//
+func (srv *Server) LoadMasterDir(dir string) {
+	if len(dir) == 0 {
+		return
+	}
+
+	d, err := os.Open(dir)
+	if err != nil {
+		log.Println("dns: LoadMasterDir: ", err)
+		return
+	}
+
+	fis, err := d.Readdir(0)
+	if err != nil {
+		log.Println("dns: LoadMasterDir: ", err)
+		err = d.Close()
+		if err != nil {
+			log.Println("dns: LoadMasterDir: ", err)
+		}
+		return
+	}
+
+	for x := 0; x < len(fis); x++ {
+		if fis[x].IsDir() {
+			continue
+		}
+
+		masterFile := filepath.Join(dir, fis[x].Name())
+
+		srv.LoadMasterFile(masterFile)
+	}
+
+	err = d.Close()
+	if err != nil {
+		log.Println("dns: LoadMasterDir: error closing directory:", err)
+	}
+}
+
+//
+// LostMasterFile populate caches with DNS record from master (zone) formatted
+// file.
+//
+func (srv *Server) LoadMasterFile(path string) {
+	fmt.Printf("dns: loading master file '%s'\n", path)
+
+	msgs, err := MasterLoad(path, "", 0)
+	if err != nil {
+		log.Println("dns: LoadMasterFile: " + err.Error())
+	}
+
+	srv.populateCaches(msgs)
+}
+
+//
+// populateCaches add list of message to caches.
+//
+func (srv *Server) populateCaches(msgs []*Message) {
+	var (
+		n        int
+		inserted bool
+		isLocal  = true
+	)
+
+	for x := 0; x < len(msgs); x++ {
+		an := newAnswer(msgs[x], isLocal)
+		inserted = srv.caches.upsert(an)
+		if inserted {
+			n++
+		}
+		msgs[x] = nil
+	}
+
+	fmt.Printf("dns: %d out of %d records cached\n", n, len(msgs))
 }
 
 //
 // Start the server, listening and serve query from clients.
 //
-func (srv *Server) Start(opts *ServerOptions) (err error) {
-	err = srv.init(opts)
-	if err != nil {
-		return
-	}
-
-	if opts.cert != nil {
-		dohAddress := opts.getDoHAddress()
-		go srv.serveDoH(dohAddress, opts.DoHIdleTimeout, *opts.cert,
-			opts.DoHAllowInsecure)
-		opts.cert = nil
+func (srv *Server) Start() {
+	if srv.dohCert != nil {
+		go srv.serveDoH()
 	}
 
 	go srv.serveTCP()
 	go srv.serveUDP()
-
-	return nil
 }
 
 //
@@ -109,17 +278,15 @@ func (srv *Server) Wait() {
 // serveDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
 //
-func (srv *Server) serveDoH(addr *net.TCPAddr, idleTimeout time.Duration,
-	cert tls.Certificate, allowInsecure bool,
-) {
+func (srv *Server) serveDoH() {
 	srv.doh = &http.Server{
-		Addr:        addr.String(),
-		IdleTimeout: idleTimeout,
+		Addr:        srv.dohAddress,
+		IdleTimeout: srv.dohIdleTimeout,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{
-				cert,
+				*srv.dohCert,
 			},
-			InsecureSkipVerify: allowInsecure, // nolint: gosec
+			InsecureSkipVerify: srv.dohAllowInsecure, // nolint: gosec
 		},
 	}
 

@@ -205,15 +205,13 @@ func (h *serverHandler) ServeDNS(req *Request) {
 }
 
 func TestMain(m *testing.M) {
+	var err error
+
 	log.SetFlags(log.Lmicroseconds)
 
 	_testHandler = &serverHandler{}
 
 	_testHandler.responses = generateTestResponses()
-
-	_testServer = &Server{
-		Handler: _testHandler,
-	}
 
 	serverOptions := &ServerOptions{
 		IPAddress:        "127.0.0.1",
@@ -225,11 +223,14 @@ func TestMain(m *testing.M) {
 		DoHAllowInsecure: true,
 	}
 
-	err := _testServer.Start(serverOptions)
+	_testServer, err = NewServer(serverOptions, _testHandler)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	_testServer.Start()
+
+	// Wait for all listeners running.
 	time.Sleep(500 * time.Millisecond)
 
 	s := m.Run()
