@@ -30,6 +30,7 @@ func TestUDPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      8,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -59,6 +60,7 @@ func TestUDPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      9,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -93,6 +95,7 @@ func TestUDPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      10,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -121,6 +124,8 @@ func TestUDPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      11,
+				IsAA:    true,
+				IsRD:    true,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{

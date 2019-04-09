@@ -30,6 +30,7 @@ func TestTCPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      5,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -59,6 +60,7 @@ func TestTCPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      6,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -93,6 +95,7 @@ func TestTCPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      7,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},

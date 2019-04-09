@@ -40,8 +40,6 @@ import (
 // Local caches will never get pruned.
 //
 type Server struct {
-	Handler Handler
-
 	opts        *ServerOptions
 	errListener chan error
 	caches      *caches
@@ -49,20 +47,22 @@ type Server struct {
 	udp *net.UDPConn
 	tcp *net.TCPListener
 	doh *http.Server
+
+	requestq chan *Request
 }
 
 //
 // NewServer create and initialize server using the options and a .handler.
 //
-func NewServer(opts *ServerOptions, handler Handler) (srv *Server, err error) {
+func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	err = opts.init()
 	if err != nil {
 		return nil, err
 	}
 
 	srv = &Server{
-		Handler: handler,
-		opts:    opts,
+		opts:     opts,
+		requestq: make(chan *Request, 512),
 	}
 
 	udpAddr := opts.getUDPAddress()
@@ -226,6 +226,8 @@ func (srv *Server) populateCaches(msgs []*Message) {
 // Start the server, listening and serve query from clients.
 //
 func (srv *Server) Start() {
+	go srv.processRequest()
+
 	if srv.opts.DoHCertificate != nil {
 		go srv.serveDoH()
 	}
@@ -250,6 +252,8 @@ func (srv *Server) Stop() {
 	if err != nil {
 		log.Println("dns: error when closing DoH: " + err.Error())
 	}
+
+	close(srv.requestq)
 }
 
 //
@@ -341,7 +345,7 @@ func (srv *Server) serveUDP() {
 		req.Message.UnpackHeaderQuestion()
 		req.Sender = sender
 
-		srv.Handler.ServeDNS(req)
+		srv.requestq <- req
 	}
 }
 
@@ -411,7 +415,7 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	req.Message.Packet = append(req.Message.Packet[:0], raw...)
 	req.Message.UnpackHeaderQuestion()
 
-	srv.Handler.ServeDNS(req)
+	srv.requestq <- req
 
 	_, ok := <-req.ChanResponded
 	if !ok {
@@ -448,11 +452,57 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 		req.Message.UnpackHeaderQuestion()
 		req.Sender = cl
 
-		srv.Handler.ServeDNS(req)
+		srv.requestq <- req
 	}
 
 	err = cl.conn.Close()
 	if err != nil {
 		log.Println("serveTCPClient: conn.Close:", err)
+	}
+}
+
+//
+// processRequest from client.
+//
+func (srv *Server) processRequest() {
+	var (
+		resp []byte
+	)
+
+	for req := range srv.requestq {
+		ans, an := srv.caches.get(string(req.Message.Question.Name),
+			req.Message.Question.Type,
+			req.Message.Question.Class)
+
+		if ans == nil {
+			req.Message.SetResponseCode(RCodeErrName)
+		}
+		if an == nil {
+			req.Message.SetQuery(false)
+			req.Message.SetAuthorativeAnswer(true)
+			resp = req.Message.Packet
+		} else {
+			an.msg.SetID(req.Message.Header.ID)
+			resp = an.get()
+		}
+
+		switch req.Kind {
+		case ConnTypeUDP, ConnTypeTCP:
+			if req.Sender != nil {
+				_, err := req.Sender.Send(resp, req.UDPAddr)
+				if err != nil {
+					log.Println("dns: processRequest: Sender.Send:" + err.Error())
+				}
+			}
+
+		case ConnTypeDoH:
+			if req.ResponseWriter != nil {
+				_, err := req.ResponseWriter.Write(resp)
+				if err != nil {
+					log.Println("dns: processRequest: ResponseWriter.Write:", err)
+				}
+				req.ChanResponded <- true
+			}
+		}
 	}
 }

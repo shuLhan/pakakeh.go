@@ -8,7 +8,6 @@ import (
 	"crypto/tls"
 	"log"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -20,199 +19,13 @@ const (
 )
 
 var (
-	_testServer  *Server        //nolint: gochecknoglobals
-	_testHandler *serverHandler //nolint: gochecknoglobals
+	_testServer *Server //nolint: gochecknoglobals
 )
-
-type serverHandler struct {
-	sync.Mutex
-	responses []*Message
-}
-
-func generateTestResponses() (responses []*Message) {
-	// kilabit.info A
-	res := &Message{
-		Header: &SectionHeader{
-			ID:      1,
-			QDCount: 1,
-			ANCount: 1,
-		},
-		Question: &SectionQuestion{
-			Name:  []byte("kilabit.info"),
-			Type:  QueryTypeA,
-			Class: QueryClassIN,
-		},
-		Answer: []*ResourceRecord{{
-			Name:  []byte("kilabit.info"),
-			Type:  QueryTypeA,
-			Class: QueryClassIN,
-			TTL:   3600,
-			rdlen: 4,
-			Text: &RDataText{
-				Value: []byte("127.0.0.1"),
-			},
-		}},
-		Authority:  []*ResourceRecord{},
-		Additional: []*ResourceRecord{},
-	}
-
-	_, err := res.Pack()
-	if err != nil {
-		log.Fatal("Pack: ", err)
-	}
-
-	responses = append(responses, res)
-
-	// kilabit.info SOA
-	res = &Message{
-		Header: &SectionHeader{
-			ID:      2,
-			QDCount: 1,
-			ANCount: 1,
-		},
-		Question: &SectionQuestion{
-			Name:  []byte("kilabit.info"),
-			Type:  QueryTypeSOA,
-			Class: QueryClassIN,
-		},
-		Answer: []*ResourceRecord{{
-			Name:  []byte("kilabit.info"),
-			Type:  QueryTypeSOA,
-			Class: QueryClassIN,
-			TTL:   3600,
-			SOA: &RDataSOA{
-				MName:   []byte("kilabit.info"),
-				RName:   []byte("admin.kilabit.info"),
-				Serial:  20180832,
-				Refresh: 3600,
-				Retry:   60,
-				Expire:  3600,
-				Minimum: 3600,
-			},
-		}},
-		Authority:  []*ResourceRecord{},
-		Additional: []*ResourceRecord{},
-	}
-
-	_, err = res.Pack()
-	if err != nil {
-		log.Fatal("Pack: ", err)
-	}
-
-	responses = append(responses, res)
-
-	// kilabit.info TXT
-	res = &Message{
-		Header: &SectionHeader{
-			ID:      3,
-			QDCount: 1,
-			ANCount: 1,
-		},
-		Question: &SectionQuestion{
-			Name:  []byte("kilabit.info"),
-			Type:  QueryTypeTXT,
-			Class: QueryClassIN,
-		},
-		Answer: []*ResourceRecord{{
-			Name:  []byte("kilabit.info"),
-			Type:  QueryTypeTXT,
-			Class: QueryClassIN,
-			TTL:   3600,
-			Text: &RDataText{
-				Value: []byte("This is a test server"),
-			},
-		}},
-		Authority:  []*ResourceRecord{},
-		Additional: []*ResourceRecord{},
-	}
-
-	_, err = res.Pack()
-	if err != nil {
-		log.Fatal("Pack: ", err)
-	}
-
-	responses = append(responses, res)
-
-	return responses
-}
-
-func (h *serverHandler) ServeDNS(req *Request) {
-	var (
-		res *Message
-		err error
-	)
-
-	qname := string(req.Message.Question.Name)
-	if qname == "kilabit.info" {
-		switch req.Message.Question.Type {
-		case QueryTypeA:
-			res = h.responses[0]
-		case QueryTypeSOA:
-			res = h.responses[1]
-		case QueryTypeTXT:
-			res = h.responses[2]
-		}
-	}
-
-	h.Lock()
-
-	// Return empty answer
-	if res == nil {
-		res = &Message{
-			Header: &SectionHeader{
-				ID:      req.Message.Header.ID,
-				QDCount: 1,
-			},
-			Question: req.Message.Question,
-		}
-
-		_, err = res.Pack()
-		if err != nil {
-			h.Unlock()
-			return
-		}
-	} else {
-		res.SetID(req.Message.Header.ID)
-	}
-
-	switch req.Kind {
-	case ConnTypeUDP:
-		if req.Sender != nil {
-			_, err = req.Sender.Send(res, req.UDPAddr)
-			if err != nil {
-				log.Println("! ServeDNS: Sender.Send: ", err)
-			}
-		}
-
-	case ConnTypeTCP:
-		if req.Sender != nil {
-			_, err = req.Sender.Send(res, nil)
-			if err != nil {
-				log.Println("! ServeDNS: Sender.Send: ", err)
-			}
-		}
-
-	case ConnTypeDoH:
-		if req.ResponseWriter != nil {
-			_, err = req.ResponseWriter.Write(res.Packet)
-			if err != nil {
-				log.Println("! ServeDNS: ResponseWriter.Write: ", err)
-			}
-			req.ChanResponded <- true
-		}
-	}
-
-	h.Unlock()
-}
 
 func TestMain(m *testing.M) {
 	var err error
 
 	log.SetFlags(log.Lmicroseconds)
-
-	_testHandler = &serverHandler{}
-
-	_testHandler.responses = generateTestResponses()
 
 	cert, err := tls.LoadX509KeyPair("testdata/domain.crt", "testdata/domain.key")
 	if err != nil {
@@ -228,10 +41,12 @@ func TestMain(m *testing.M) {
 		DoHAllowInsecure: true,
 	}
 
-	_testServer, err = NewServer(serverOptions, _testHandler)
+	_testServer, err = NewServer(serverOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_testServer.LoadMasterFile("testdata/kilabit.info")
 
 	_testServer.Start()
 

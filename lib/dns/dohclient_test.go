@@ -32,6 +32,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -61,6 +62,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -95,6 +97,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -123,6 +126,8 @@ func TestDoHClient_Lookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
+				IsRD:    true,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
@@ -175,6 +180,7 @@ func TestDoHClient_Post(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -204,6 +210,7 @@ func TestDoHClient_Post(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -238,6 +245,7 @@ func TestDoHClient_Post(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
@@ -266,6 +274,8 @@ func TestDoHClient_Post(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
+				IsAA:    true,
+				IsRD:    true,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{

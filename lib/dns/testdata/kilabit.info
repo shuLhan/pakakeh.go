@@ -1,0 +1,9 @@
+@  3600  IN  SOA  @  admin (
+20180832 ; SERIAL
+3600     ; REFRESH
+60       ; RETRY
+3600     ; EXPIRE
+3600 )   ; MINIMUM
+
+@  IN A   127.0.0.1
+      TXT "This is a test server"
