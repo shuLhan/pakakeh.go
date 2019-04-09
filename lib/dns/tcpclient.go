@@ -117,7 +117,7 @@ func (cl *TCPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 // The addr parameter is unused.
 //
 func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
-	_, err := cl.Send(msg, ns)
+	_, err := cl.Send(msg.Packet, ns)
 	if err != nil {
 		return nil, err
 	}
@@ -172,19 +172,18 @@ func (cl *TCPClient) Recv(msg *Message) (n int, err error) {
 //
 // Send DNS message to name server using active connection in client.
 //
-// The message packet must already been filled, using Pack().
 // The addr parameter is unused.
 //
-func (cl *TCPClient) Send(msg *Message, addr net.Addr) (n int, err error) {
+func (cl *TCPClient) Send(msg []byte, addr net.Addr) (n int, err error) {
 	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
 	if err != nil {
 		return
 	}
 
-	packet := make([]byte, 0)
+	packet := make([]byte, 0, 2+len(msg))
 
-	libbytes.AppendUint16(&packet, uint16(len(msg.Packet)))
-	packet = append(packet, msg.Packet...)
+	libbytes.AppendUint16(&packet, uint16(len(msg)))
+	packet = append(packet, msg...)
 
 	n, err = cl.conn.Write(packet)
 

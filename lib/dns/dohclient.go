@@ -242,8 +242,8 @@ func (cl *DoHClient) RemoteAddr() string {
 // Send DNS message to name server using Get method.  Since HTTP client is
 // synchronous, the response is forwarded to channel to be consumed by Recv().
 //
-func (cl *DoHClient) Send(msg *Message, ns net.Addr) (int, error) {
-	packet := base64.RawURLEncoding.EncodeToString(msg.Packet)
+func (cl *DoHClient) Send(msg []byte, ns net.Addr) (int, error) {
+	packet := base64.RawURLEncoding.EncodeToString(msg)
 
 	cl.query.Set("dns", packet)
 	cl.req.Method = http.MethodGet
@@ -257,7 +257,7 @@ func (cl *DoHClient) Send(msg *Message, ns net.Addr) (int, error) {
 
 	cl.chRes <- httpRes
 
-	return len(msg.Packet), nil
+	return len(msg), nil
 }
 
 //

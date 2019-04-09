@@ -40,7 +40,7 @@ func ExampleUDPClient() {
 		return
 	}
 
-	_, err = cl.Send(req, ns)
+	_, err = cl.Send(req.Packet, ns)
 	if err != nil {
 		log.Println(err)
 		return

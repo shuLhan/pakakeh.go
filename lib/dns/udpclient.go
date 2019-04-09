@@ -118,7 +118,7 @@ func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 
 	cl.Lock()
 
-	_, err := cl.Send(msg, ns)
+	_, err := cl.Send(msg.Packet, ns)
 	if err != nil {
 		cl.Unlock()
 		return nil, err
@@ -168,10 +168,9 @@ func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
 //
 // Send DNS message to name server using active connection in client.
 //
-// The message packet must already been filled, using Pack().
-// The addr parameter must not be nil.
+// The "ns" parameter must not be nil.
 //
-func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
+func (cl *UDPClient) Send(msg []byte, ns net.Addr) (n int, err error) {
 	if ns == nil {
 		ns = cl.Addr
 	}
@@ -183,7 +182,7 @@ func (cl *UDPClient) Send(msg *Message, ns net.Addr) (n int, err error) {
 		return
 	}
 
-	n, err = cl.Conn.WriteToUDP(msg.Packet, raddr)
+	n, err = cl.Conn.WriteToUDP(msg, raddr)
 
 	return
 }

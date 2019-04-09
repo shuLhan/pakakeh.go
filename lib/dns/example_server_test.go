@@ -156,7 +156,7 @@ func (h *serverHandler) ServeDNS(req *dns.Request) {
 	switch req.Kind {
 	case dns.ConnTypeUDP:
 		if req.Sender != nil {
-			_, err = req.Sender.Send(res, req.UDPAddr)
+			_, err = req.Sender.Send(res.Packet, req.UDPAddr)
 			if err != nil {
 				log.Println("! ServeDNS: Sender.Send: ", err)
 			}
@@ -164,7 +164,7 @@ func (h *serverHandler) ServeDNS(req *dns.Request) {
 
 	case dns.ConnTypeTCP:
 		if req.Sender != nil {
-			_, err = req.Sender.Send(res, nil)
+			_, err = req.Sender.Send(res.Packet, nil)
 			if err != nil {
 				log.Println("! ServeDNS: Sender.Send: ", err)
 			}

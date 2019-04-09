@@ -9,8 +9,8 @@ import (
 )
 
 //
-// Sender is interface that for implementing sending DNS message.
+// Sender is interface that for implementing sending raw DNS packet.
 //
 type Sender interface {
-	Send(msg *Message, addr net.Addr) (n int, err error)
+	Send(packet []byte, addr net.Addr) (n int, err error)
 }
