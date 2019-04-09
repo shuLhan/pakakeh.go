@@ -1012,6 +1012,50 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 	}
 }
 
+func TestMessageSetResponseCode(t *testing.T) {
+	msgQuery := &Message{
+		Header: &SectionHeader{
+			ID:      1,
+			IsQuery: true,
+			IsAA:    true,
+			IsRD:    true,
+		},
+		Question: &SectionQuestion{},
+		Packet:   make([]byte, maxUDPPacketSize),
+		dnameOff: make(map[string]uint16),
+	}
+
+	_, err := msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc string
+		msg  *Message
+		code ResponseCode
+		exp  []byte
+	}{{
+		desc: "With code is error format",
+		msg:  msgQuery,
+		code: RCodeErrName,
+		exp:  []byte{0x00, 0x01, 0x01, 0x03},
+	}, {
+		desc: "With code is 0",
+		msg:  msgQuery,
+		code: 0,
+		exp:  []byte{0x00, 0x01, 0x01, 0x00},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		c.msg.SetResponseCode(c.code)
+
+		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+	}
+}
+
 func TestMessageUnpack(t *testing.T) {
 	cases := []struct {
 		desc   string

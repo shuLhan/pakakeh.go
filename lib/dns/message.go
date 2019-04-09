@@ -627,6 +627,20 @@ func (msg *Message) SetRecursionDesired(isRD bool) {
 }
 
 //
+// SetResponseCode in message header and in packet.
+//
+func (msg *Message) SetResponseCode(code ResponseCode) {
+	msg.Header.RCode = code
+	if len(msg.Packet) > 3 {
+		if code == RCodeOK {
+			msg.Packet[3] &= 0xF0
+		} else {
+			msg.Packet[3] |= (0x0F & byte(code))
+		}
+	}
+}
+
+//
 // SubTTL subtract TTL in each resource records and in packet by n seconds.
 // If TTL is less than n, it will set to 0.
 //
