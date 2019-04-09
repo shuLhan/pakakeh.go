@@ -567,12 +567,62 @@ func (msg *Message) Pack() ([]byte, error) {
 }
 
 //
+// SetAuthorativeAnswer set the header authoritative answer to true (1) or
+// false (0).
+//
+func (msg *Message) SetAuthorativeAnswer(isAA bool) {
+	msg.Header.IsAA = isAA
+	if len(msg.Packet) > 2 {
+		if isAA {
+			msg.Packet[2] |= headerIsAA
+		} else {
+			msg.Packet[2] = (msg.Packet[2] & 0xFB)
+		}
+	}
+}
+
+//
 // SetID in section header and in packet.
 //
 func (msg *Message) SetID(id uint16) {
 	msg.Header.ID = id
 	if len(msg.Packet) > 2 {
 		libbytes.WriteUint16(&msg.Packet, 0, id)
+	}
+}
+
+//
+// SetQuery set the message as query (0) or as response (1) in header and in
+// packet.
+// Setting the message as query will also turning off AA, TC, and RA flags.
+//
+func (msg *Message) SetQuery(isQuery bool) {
+	msg.Header.IsQuery = isQuery
+	if len(msg.Packet) > 3 {
+		if isQuery {
+			// Turn off query, authoritative answer, and truncated
+			// flags.
+			msg.Packet[2] &= 0x71
+			// Turn off recursion available flag.
+			msg.Packet[3] &= 0x7F
+		} else {
+			msg.Packet[2] |= headerIsResponse
+		}
+	}
+}
+
+//
+// SetRecursionDesired set the message to allow recursion (true=1) or
+// not (false=0) in header and packet.
+//
+func (msg *Message) SetRecursionDesired(isRD bool) {
+	msg.Header.IsRD = isRD
+	if len(msg.Packet) > 2 {
+		if isRD {
+			msg.Packet[2] |= headerIsRD
+		} else {
+			msg.Packet[2] &= 0xFE
+		}
 	}
 }
 

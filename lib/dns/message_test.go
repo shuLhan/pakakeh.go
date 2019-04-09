@@ -857,6 +857,161 @@ func TestMessagePack(t *testing.T) {
 	}
 }
 
+func TestMessageSetAuthoritativeAnswer(t *testing.T) {
+	msgQuery := &Message{
+		Header: &SectionHeader{
+			ID:      1,
+			IsQuery: true,
+			IsAA:    true,
+			IsRD:    true,
+		},
+		Question: &SectionQuestion{},
+		Packet:   make([]byte, maxUDPPacketSize),
+		dnameOff: make(map[string]uint16),
+	}
+
+	_, err := msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	msgResponse := &Message{
+		Header: &SectionHeader{
+			ID:   1,
+			IsAA: true,
+			IsRD: true,
+			IsRA: true,
+		},
+		Question: &SectionQuestion{},
+		Packet:   make([]byte, maxUDPPacketSize),
+		dnameOff: make(map[string]uint16),
+	}
+
+	_, err = msgResponse.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc string
+		msg  *Message
+		isAA bool
+		exp  []byte
+	}{{
+		desc: "With query and isAA is false",
+		msg:  msgQuery,
+		exp:  []byte{0x00, 0x01, 0x01, 0x00},
+	}, {
+		desc: "With query and isAA is true",
+		msg:  msgQuery,
+		isAA: true,
+		exp:  []byte{0x00, 0x01, 0x05, 0x00},
+	}, {
+		desc: "With response and isAA is false",
+		msg:  msgResponse,
+		exp:  []byte{0x00, 0x01, 0x81, 0x80},
+	}, {
+		desc: "With response and isAA is true",
+		msg:  msgResponse,
+		isAA: true,
+		exp:  []byte{0x00, 0x01, 0x85, 0x80},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		c.msg.SetAuthorativeAnswer(c.isAA)
+
+		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+	}
+}
+
+func TestMessageSetQuery(t *testing.T) {
+	msgQuery := &Message{
+		Header: &SectionHeader{
+			ID:      1,
+			IsQuery: true,
+			IsAA:    true,
+			IsRD:    true,
+		},
+		Question: &SectionQuestion{},
+		Packet:   make([]byte, maxUDPPacketSize),
+		dnameOff: make(map[string]uint16),
+	}
+
+	_, err := msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc    string
+		msg     *Message
+		isQuery bool
+		exp     []byte
+	}{{
+		desc: "With isQuery is false",
+		msg:  msgQuery,
+		exp:  []byte{0x00, 0x01, 0x81, 0x00},
+	}, {
+		desc:    "With isQuery is true",
+		msg:     msgQuery,
+		isQuery: true,
+		exp:     []byte{0x00, 0x01, 0x01, 0x00},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		c.msg.SetQuery(c.isQuery)
+
+		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+	}
+}
+
+func TestMessageSetRecursionDesired(t *testing.T) {
+	msgQuery := &Message{
+		Header: &SectionHeader{
+			ID:      1,
+			IsQuery: true,
+			IsAA:    true,
+			IsRD:    true,
+		},
+		Question: &SectionQuestion{},
+		Packet:   make([]byte, maxUDPPacketSize),
+		dnameOff: make(map[string]uint16),
+	}
+
+	_, err := msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc string
+		msg  *Message
+		isRD bool
+		exp  []byte
+	}{{
+		desc: "With isRD is false",
+		msg:  msgQuery,
+		exp:  []byte{0x00, 0x01, 0x00, 0x00},
+	}, {
+		desc: "With isRD is true",
+		msg:  msgQuery,
+		isRD: true,
+		exp:  []byte{0x00, 0x01, 0x01, 0x00},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		c.msg.SetRecursionDesired(c.isRD)
+
+		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+	}
+}
+
 func TestMessageUnpack(t *testing.T) {
 	cases := []struct {
 		desc   string
