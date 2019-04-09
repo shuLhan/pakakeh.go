@@ -109,7 +109,7 @@ func TestCachesGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got := ca.get(c.qname, c.qtype, c.qclass)
+		_, got := ca.get(c.qname, c.qtype, c.qclass)
 		gotList := ca.list()
 
 		test.Assert(t, "caches.get", c.exp, got, true)

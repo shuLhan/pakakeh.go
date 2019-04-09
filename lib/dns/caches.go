@@ -61,15 +61,21 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 
 //
 // get an answer from cache based on domain-name, query type, and query class.
+//
+// If query name exist but the query type or class does not exist,
+// it will return list of answer and nil answer.
+//
 // If answer exist on cache, their accessed time will be updated to current
 // time.
 //
-func (c *caches) get(qname string, qtype, qclass uint16) (an *answer) {
+func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *answer) {
 	c.Lock()
 
-	answers, found := c.v[qname]
+	var found bool
+
+	ans, found = c.v[qname]
 	if found {
-		an, _ = answers.get(qtype, qclass)
+		an, _ = ans.get(qtype, qclass)
 		if an != nil {
 			// Move the answer to the back of LRU if its not
 			// local.
