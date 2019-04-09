@@ -775,5 +775,76 @@ angularjs.doc       A  127.0.0.1
 			}
 		}
 	}
+}
 
+func TestMasterParseTXT(t *testing.T) {
+	cases := []struct {
+		in       string
+		exp      []*Message
+		expError string
+	}{{
+		in: `@ IN TXT "This is a test"`,
+		exp: []*Message{{
+			Header: &SectionHeader{
+				IsAA:    true,
+				QDCount: 1,
+				ANCount: 1,
+			},
+			Question: &SectionQuestion{
+				Name:  []byte("kilabit.local"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+			},
+			Answer: []*ResourceRecord{{
+				Name:  []byte("kilabit.local"),
+				Type:  QueryTypeTXT,
+				Class: QueryClassIN,
+				TTL:   3600,
+				Text: &RDataText{
+					Value: []byte(`This is a test`),
+				},
+			}},
+		}},
+	}}
+
+	m := newMaster()
+
+	for _, c := range cases {
+		m.Init(c.in, "kilabit.local", 3600)
+
+		err := m.parse()
+		if err != nil {
+			libtest.Assert(t, "error", c.expError, err.Error(), true)
+			continue
+		}
+
+		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
+
+		for x, msg := range m.msgs {
+			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
+			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
+
+			for y, answer := range msg.Answer {
+				libtest.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name, true)
+				libtest.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type, true)
+				libtest.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class, true)
+				libtest.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL, true)
+				libtest.Assert(t, "Answer.RData()", c.exp[x].Answer[y].RData(), answer.RData(), true)
+			}
+			for y, auth := range msg.Authority {
+				libtest.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name, true)
+				libtest.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type, true)
+				libtest.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class, true)
+				libtest.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL, true)
+				libtest.Assert(t, "Authority.RData()", c.exp[x].Authority[y].RData(), auth.RData(), true)
+			}
+			for y, add := range msg.Additional {
+				libtest.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name, true)
+				libtest.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type, true)
+				libtest.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class, true)
+				libtest.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL, true)
+				libtest.Assert(t, "Additional.RData()", c.exp[x].Additional[y].RData(), add.RData(), true)
+			}
+		}
+	}
 }

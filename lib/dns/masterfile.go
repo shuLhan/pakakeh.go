@@ -206,7 +206,7 @@ func (m *master) parse() (err error) {
 
 		tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 		if isTerm {
-			err = fmt.Errorf("! %s:%d Invalid line", m.file, m.lineno)
+			err = fmt.Errorf("! %s:%d invalid line %q", m.file, m.lineno, m.reader.Rest())
 			return
 		}
 
@@ -433,11 +433,14 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 // order is different from the order used in examples and the order used in
 // the actual RRs; the given order allows easier parsing and defaulting.)
 //
-func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, error) {
-	var err error
+func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord, err error) {
+	var (
+		isTerm bool
+	)
+
 	stok := string(tok)
 
-	rr := &ResourceRecord{}
+	rr = &ResourceRecord{}
 
 	m.flag = 0
 
@@ -479,13 +482,14 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			return nil, err
 		}
 
-		tok, _, _ := m.reader.ReadUntil(m.seps, m.terms)
+		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
 			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
 				m.file, m.lineno, stok)
 			return nil, err
 		}
 
+		orgtok := libbytes.Copy(tok)
 		libbytes.ToUpper(&tok)
 		stok = string(tok)
 
@@ -550,7 +554,14 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (*ResourceRecord, e
 			parseRRTTL | parseRRType,
 			parseRRClass | parseRRType,
 			parseRRTTL | parseRRClass | parseRRType:
-			err := m.parseRRData(rr, tok)
+
+			if rr.Type == QueryTypeTXT {
+				if !isTerm {
+					orgtok = append(orgtok, c)
+				}
+			}
+
+			err := m.parseRRData(rr, orgtok)
 			if err != nil {
 				return nil, err
 			}
@@ -613,7 +624,7 @@ func (m *master) parseRRType(rr *ResourceRecord, stok string) bool {
 
 func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
-	case QueryTypeA, QueryTypeTXT, QueryTypeAAAA:
+	case QueryTypeA, QueryTypeAAAA:
 		rr.Text = &RDataText{
 			Value: tok,
 		}
@@ -644,6 +655,9 @@ func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 
 	case QueryTypeMX:
 		err = m.parseMX(rr, tok)
+
+	case QueryTypeTXT:
+		err = m.parseTXT(rr, tok)
 
 	case QueryTypeSRV:
 		err = m.parseSRV(rr, tok)
@@ -877,6 +891,32 @@ func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	if !isTerm {
 		m.reader.SkipLine()
 		m.lineno++
+	}
+
+	return nil
+}
+
+//
+// parseTXT parse TXT resource data.  The TXT rdata use the following format,
+//
+//	DQUOTE text DQUOTE
+//
+// The rdata MUST contains double quote at the beginning and end of text.
+//
+func (m *master) parseTXT(rr *ResourceRecord, v []byte) (err error) {
+	tok, _, _ := m.reader.ReadUntil(nil, []byte{'\n'})
+	v = append(v, tok...)
+	v = bytes.TrimSpace(v)
+	if v[0] != '"' {
+		return fmt.Errorf("dns: missing start quote on TXT data")
+	}
+	if v[len(v)-1] != '"' {
+		return fmt.Errorf("dns: missing end quote on TXT data")
+	}
+	v = v[1 : len(v)-1]
+
+	rr.Text = &RDataText{
+		Value: v,
 	}
 
 	return nil
