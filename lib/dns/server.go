@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
@@ -49,6 +50,9 @@ type Server struct {
 	doh *http.Server
 
 	requestq chan *Request
+	forwardq chan *Request
+
+	hasForwarders bool
 }
 
 //
@@ -63,6 +67,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	srv = &Server{
 		opts:     opts,
 		requestq: make(chan *Request, 512),
+		forwardq: make(chan *Request, 512),
 	}
 
 	udpAddr := opts.getUDPAddress()
@@ -83,6 +88,30 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	srv.caches = newCaches(opts.PruneDelay, opts.PruneThreshold)
 
 	return srv, nil
+}
+
+//
+// isResponseValid check if request name, type, and class match with response.
+// It will return true if both matched, otherwise it will return false.
+//
+func isResponseValid(req *Request, res *Message) bool {
+	if !bytes.Equal(req.Message.Question.Name, res.Question.Name) {
+		log.Printf("dns: unmatched response name, got %s want %s\n",
+			req.Message.Question.Name, res.Question.Name)
+		return false
+	}
+	if req.Message.Question.Type != res.Question.Type {
+		log.Printf("dns: unmatched response type, got %s want %s\n",
+			req.Message.Question, res.Question)
+		return false
+	}
+	if req.Message.Question.Class != res.Question.Class {
+		log.Printf("dns: unmatched response class, got %s want %s\n",
+			req.Message.Question, res.Question)
+		return false
+	}
+
+	return true
 }
 
 //
@@ -226,6 +255,8 @@ func (srv *Server) populateCaches(msgs []*Message) {
 // Start the server, listening and serve query from clients.
 //
 func (srv *Server) Start() {
+	srv.runForwarders()
+
 	go srv.processRequest()
 
 	if srv.opts.DoHCertificate != nil {
@@ -466,7 +497,8 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 //
 func (srv *Server) processRequest() {
 	var (
-		resp []byte
+		res     *Message
+		isLocal bool
 	)
 
 	for req := range srv.requestq {
@@ -475,34 +507,160 @@ func (srv *Server) processRequest() {
 			req.Message.Question.Class)
 
 		if ans == nil {
+			if req.Message.Header.IsRD && srv.hasForwarders {
+				srv.forwardq <- req
+				continue
+			}
+
 			req.Message.SetResponseCode(RCodeErrName)
 		}
+
+		isLocal = false
 		if an == nil {
+			if req.Message.Header.IsRD && srv.hasForwarders {
+				srv.forwardq <- req
+				continue
+			}
+
 			req.Message.SetQuery(false)
 			req.Message.SetAuthorativeAnswer(true)
-			resp = req.Message.Packet
+			res = req.Message
+			isLocal = true
 		} else {
+			if an.msg.IsExpired() && srv.hasForwarders {
+				srv.forwardq <- req
+				continue
+			}
+
 			an.msg.SetID(req.Message.Header.ID)
-			resp = an.get()
+			res = an.msg
+			isLocal = (an.receivedAt == 0)
 		}
 
-		switch req.Kind {
-		case ConnTypeUDP, ConnTypeTCP:
-			if req.Sender != nil {
-				_, err := req.Sender.Send(resp, req.UDPAddr)
-				if err != nil {
-					log.Println("dns: processRequest: Sender.Send:" + err.Error())
-				}
-			}
+		srv.processResponse(req, res, isLocal)
+	}
+}
 
-		case ConnTypeDoH:
-			if req.ResponseWriter != nil {
-				_, err := req.ResponseWriter.Write(resp)
-				if err != nil {
-					log.Println("dns: processRequest: ResponseWriter.Write:", err)
-				}
-				req.ChanResponded <- true
+func (srv *Server) processResponse(req *Request, res *Message, isLocal bool) {
+	if !isLocal {
+		if !isResponseValid(req, res) {
+			return
+		}
+	}
+
+	switch req.Kind {
+	case ConnTypeUDP:
+		if req.Sender != nil {
+			_, err := req.Sender.Send(res.Packet, req.UDPAddr)
+			if err != nil {
+				log.Println("dns: failed to send UDP reply:", err)
+				return
 			}
 		}
+
+	case ConnTypeTCP:
+		if req.Sender != nil {
+			_, err := req.Sender.Send(res.Packet, nil)
+			if err != nil {
+				log.Println("dns: failed to send TCP reply:", err)
+				return
+			}
+		}
+
+	case ConnTypeDoH:
+		if req.ResponseWriter != nil {
+			_, err := req.ResponseWriter.Write(res.Packet)
+			req.ChanResponded <- true
+			if err != nil {
+				log.Println("dns: failed to send DoH reply:", err)
+				return
+			}
+		}
+	}
+
+	if !isLocal {
+		if res.Header.RCode != 0 {
+			log.Printf("dns: response error %s, code: %s\n",
+				res.Question, rcodeNames[res.Header.RCode])
+			return
+		}
+
+		an := newAnswer(res, false)
+		srv.caches.upsert(an)
+	}
+}
+
+func (srv *Server) runForwarders() {
+	nforwarders := 0
+	for x := 0; x < len(srv.opts.udpServers); x++ {
+		go srv.runUDPForwarder(srv.opts.udpServers[x])
+		nforwarders++
+	}
+
+	for x := 0; x < len(srv.opts.tcpServers); x++ {
+		go srv.runTCPForwarder(srv.opts.tcpServers[x])
+		nforwarders++
+	}
+
+	for x := 0; x < len(srv.opts.dohServers); x++ {
+		go srv.runDohForwarder(srv.opts.dohServers[x])
+		nforwarders++
+	}
+
+	if nforwarders > 0 {
+		srv.hasForwarders = true
+	}
+}
+
+func (srv *Server) runDohForwarder(nameserver string) {
+	forwarder, err := NewDoHClient(nameserver, false)
+	if err != nil {
+		log.Fatal("dns: failed to create DoH forwarder: " + err.Error())
+	}
+
+	for req := range srv.forwardq {
+		res, err := forwarder.Query(req.Message, nil)
+		if err != nil {
+			log.Println("dns: failed to query DoH: " + err.Error())
+			continue
+		}
+
+		srv.processResponse(req, res, false)
+	}
+}
+
+func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
+	for req := range srv.forwardq {
+		cl, err := NewTCPClient(remoteAddr.String())
+		if err != nil {
+			log.Println("dns: failed to create TCP client: " + err.Error())
+			continue
+		}
+
+		res, err := cl.Query(req.Message, nil)
+		cl.Close()
+		if err != nil {
+			log.Println("dns: failed to query TCP: " + err.Error())
+			continue
+		}
+
+		srv.processResponse(req, res, false)
+	}
+}
+
+func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
+	forwarder, err := NewUDPClient(remoteAddr.String())
+	if err != nil {
+		log.Fatal("dns: failed to create UDP forwarder: " + err.Error())
+	}
+
+	for req := range srv.forwardq {
+		res, err := forwarder.Query(req.Message, remoteAddr)
+		if err != nil {
+			log.Println("dns: failed to query UDP: " + err.Error())
+			continue
+		}
+
+		srv.processResponse(req, res, false)
 	}
 }

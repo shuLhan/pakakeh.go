@@ -137,6 +137,18 @@ func TestUDPClientLookup(t *testing.T) {
 			Authority:  []*ResourceRecord{},
 			Additional: []*ResourceRecord{},
 		},
+	}, {
+		desc:           "IsRD:true QType:AAAA QClass:IN QName:kilabit.info",
+		allowRecursion: true,
+		qtype:          QueryTypeAAAA,
+		qclass:         QueryClassIN,
+		qname:          []byte("kilabit.info"),
+	}, {
+		desc:           "IsRD:true QType:A QClass:IN QName:random",
+		allowRecursion: true,
+		qtype:          QueryTypeA,
+		qclass:         QueryClassIN,
+		qname:          []byte("random"),
 	}}
 
 	for _, c := range cases {
@@ -147,17 +159,17 @@ func TestUDPClientLookup(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		c.exp.Header.ID = getID()
+		if !c.allowRecursion {
+			c.exp.Header.ID = getID()
 
-		_, err = c.exp.Pack()
-		if err != nil {
-			t.Fatal(err)
-		}
+			_, err = c.exp.Pack()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		if c.allowRecursion {
-			t.Logf("got recursive answer: %+v\n", got)
-		} else {
 			test.Assert(t, "Packet", c.exp.Packet, got.Packet, true)
+		} else {
+			t.Logf("Got recursive answer: %+v\n", got)
 		}
 	}
 }
