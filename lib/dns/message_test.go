@@ -12,34 +12,31 @@ import (
 
 func TestMessageIsExpired(t *testing.T) {
 	cases := []struct {
-		desc    string
-		msg     *Message
-		elapsed uint32
-		exp     bool
+		desc string
+		msg  *Message
+		exp  bool
 	}{{
 		desc: "Message is not expired",
 		msg: &Message{
 			Answer: []*ResourceRecord{{
-				TTL: 3600,
+				TTL: 1,
 			}},
 		},
-		elapsed: 3599,
-		exp:     false,
+		exp: false,
 	}, {
 		desc: "Message is expired",
 		msg: &Message{
 			Answer: []*ResourceRecord{{
-				TTL: 3600,
+				TTL: 0,
 			}},
 		},
-		elapsed: 3600,
-		exp:     true,
+		exp: true,
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got := c.msg.IsExpired(c.elapsed)
+		got := c.msg.IsExpired()
 
 		test.Assert(t, "IsExpired", c.exp, got, true)
 	}

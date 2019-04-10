@@ -514,13 +514,12 @@ func (msg *Message) ResetRR() {
 }
 
 //
-// IsExpired will return true if at least one resource record is expired,
-// their TTL value is equal or less than elapsed value; otherwise it will
-// return false.
+// IsExpired will return true if at least one resource record in answer is
+// expired, their TTL value is equal 0; otherwise it will return false.
 //
-func (msg *Message) IsExpired(elapsed uint32) bool {
+func (msg *Message) IsExpired() bool {
 	for x := 0; x < len(msg.Answer); x++ {
-		if msg.Answer[x].TTL <= elapsed {
+		if msg.Answer[x].TTL == 0 {
 			return true
 		}
 	}
