@@ -369,7 +369,7 @@ func (srv *Server) serveUDP() {
 			return
 		}
 
-		req.kind = ConnTypeUDP
+		req.kind = connTypeUDP
 		req.udpAddr = raddr
 		req.message.Packet = req.message.Packet[:n]
 
@@ -439,7 +439,7 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	req := newRequest()
 
-	req.kind = ConnTypeDoH
+	req.kind = connTypeDoH
 	req.responseWriter = w
 	req.chanResponded = make(chan bool, 1)
 
@@ -479,7 +479,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 			break
 		}
 
-		req.kind = ConnTypeTCP
+		req.kind = connTypeTCP
 		req.message.UnpackHeaderQuestion()
 		req.sender = cl
 
@@ -549,7 +549,7 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 	}
 
 	switch req.kind {
-	case ConnTypeUDP:
+	case connTypeUDP:
 		if req.sender != nil {
 			_, err := req.sender.Send(res.Packet, req.udpAddr)
 			if err != nil {
@@ -558,7 +558,7 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 			}
 		}
 
-	case ConnTypeTCP:
+	case connTypeTCP:
 		if req.sender != nil {
 			_, err := req.sender.Send(res.Packet, nil)
 			if err != nil {
@@ -567,7 +567,7 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 			}
 		}
 
-	case ConnTypeDoH:
+	case connTypeDoH:
 		if req.responseWriter != nil {
 			_, err := req.responseWriter.Write(res.Packet)
 			req.chanResponded <- true

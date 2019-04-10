@@ -20,7 +20,7 @@ import (
 type request struct {
 	// Kind define the connection type that this request is belong to,
 	// e.g. UDP, TCP, or DoH.
-	kind ConnType
+	kind connType
 
 	// Message define the DNS query.
 	message *Message
