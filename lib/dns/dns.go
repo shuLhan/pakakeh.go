@@ -214,3 +214,16 @@ const (
 	// zone transfer) for particular data.
 	RCodeRefused
 )
+
+//
+// rcodeNames contains mapping of response code with their human readable
+// names.
+//
+var rcodeNames = map[ResponseCode]string{
+	RCodeOK:             "OK",
+	RCodeErrFormat:      "ERR_FORMAT",
+	RCodeErrServer:      "ERR_SERVER",
+	RCodeErrName:        "ERR_NAME",
+	RCodeNotImplemented: "ERR_NOT_IMPLEMENTED",
+	RCodeRefused:        "ERR_REFUSED",
+}
