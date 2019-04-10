@@ -10,52 +10,42 @@ import (
 )
 
 //
-// Request contains UDP address and DNS query message from client.
+// request contains UDP address and DNS query message from client.
 //
 // If Kind is UDP, Sender and UDPAddr must be non nil.
 // If Kind is TCP, Sender must be non nil.
 // If Kind is DoH, both Sender and UDPAddr must be nil and ResponseWriter and
 // ChanResponded must be non nil and initialized.
 //
-type Request struct {
+type request struct {
 	// Kind define the connection type that this request is belong to,
 	// e.g. UDP, TCP, or DoH.
-	Kind ConnType
+	kind ConnType
 
 	// Message define the DNS query.
-	Message *Message
+	message *Message
 
 	// UDPAddr is address of client if connection is from UDP.
-	UDPAddr *net.UDPAddr
+	udpAddr *net.UDPAddr
 
 	// Sender is server connection that receive the query and responsible
 	// to answer back to client.
-	Sender Sender
+	sender Sender
 
 	// ResponseWriter is HTTP response writer, where answer for DoH
 	// client query will be written.
-	ResponseWriter http.ResponseWriter
+	responseWriter http.ResponseWriter
 
 	// ChanResponded is a channel that notify the DoH handler when answer
 	// has been written to ResponseWriter.
-	ChanResponded chan bool
+	chanResponded chan bool
 }
 
 //
-// NewRequest create and initialize request.
+// newRequest create and initialize request.
 //
-func NewRequest() *Request {
-	return &Request{
-		Message: NewMessage(),
+func newRequest() *request {
+	return &request{
+		message: NewMessage(),
 	}
-}
-
-//
-// Reset message and UDP address in request.
-//
-func (req *Request) Reset() {
-	req.Message.Reset()
-	req.UDPAddr = nil
-	req.Sender = nil
-	req.ResponseWriter = nil
 }
