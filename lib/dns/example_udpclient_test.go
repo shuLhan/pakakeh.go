@@ -36,27 +36,14 @@ func ExampleUDPClient() {
 
 	_, err = req.Pack()
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 		return
 	}
 
-	_, err = cl.Send(req.Packet, ns)
+	res, err := cl.Query(req, ns)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 		return
-	}
-
-	res := dns.NewMessage()
-
-	_, err = cl.Recv(res)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	err = res.Unpack()
-	if err != nil {
-		log.Fatal("res.Unpack: ", err)
 	}
 
 	fmt.Printf("Receiving DNS message: %s\n", res)

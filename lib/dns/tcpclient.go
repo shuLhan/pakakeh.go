@@ -125,7 +125,7 @@ func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 
 	res := NewMessage()
 
-	_, err = cl.Recv(res)
+	_, err = cl.recv(res)
 	if err != nil {
 		return nil, err
 	}
@@ -139,9 +139,9 @@ func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 }
 
 //
-// Recv will read DNS message from active connection in client into `msg`.
+// recv will read DNS message from active connection in client into `msg`.
 //
-func (cl *TCPClient) Recv(msg *Message) (n int, err error) {
+func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 	err = cl.conn.SetReadDeadline(time.Now().Add(cl.Timeout))
 	if err != nil {
 		return

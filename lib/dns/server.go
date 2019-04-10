@@ -462,7 +462,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 	for {
 		req := newRequest()
 		for {
-			n, err = cl.Recv(req.message)
+			n, err = cl.recv(req.message)
 			if err == nil {
 				break
 			}

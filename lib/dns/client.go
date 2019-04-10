@@ -19,5 +19,4 @@ type Client interface {
 	SetTimeout(t time.Duration)
 	SetRemoteAddr(addr string) error
 	Sender
-	Receiver
 }

@@ -127,7 +127,7 @@ func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 
 	res := NewMessage()
 
-	_, err = cl.Recv(res)
+	_, err = cl.recv(res)
 	if err != nil {
 		cl.Unlock()
 		return nil, err
@@ -144,9 +144,9 @@ func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 }
 
 //
-// Recv will read DNS message from active connection in client into `msg`.
+// recv will read DNS message from active connection in client into `msg`.
 //
-func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
+func (cl *UDPClient) recv(msg *Message) (n int, err error) {
 	err = cl.Conn.SetReadDeadline(time.Now().Add(cl.Timeout))
 	if err != nil {
 		return
@@ -160,7 +160,7 @@ func (cl *UDPClient) Recv(msg *Message) (n int, err error) {
 	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
 
 	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> UDPClient: Recv:", msg.Packet, 8)
+		libbytes.PrintHex(">>> UDPClient: recv:", msg.Packet, 8)
 	}
 
 	return
