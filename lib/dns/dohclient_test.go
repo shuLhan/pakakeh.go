@@ -19,11 +19,12 @@ func TestDoHClient_Lookup(t *testing.T) {
 	}
 
 	cases := []struct { //nolint: dupl
-		desc   string
-		qtype  uint16
-		qclass uint16
-		qname  []byte
-		exp    *Message
+		desc           string
+		allowRecursion bool
+		qtype          uint16
+		qclass         uint16
+		qname          []byte
+		exp            *Message
 	}{{
 		desc:   "QType:A QClass:IN QName:kilabit.info",
 		qtype:  QueryTypeA,
@@ -127,7 +128,6 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Header: &SectionHeader{
 				ID:      0,
 				IsAA:    true,
-				IsRD:    true,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
@@ -144,7 +144,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.qtype, c.qclass, c.qname)
+		got, err := cl.Lookup(c.allowRecursion, c.qtype, c.qclass, c.qname)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -167,11 +167,12 @@ func TestDoHClient_Post(t *testing.T) {
 	}
 
 	cases := []struct { //nolint: dupl
-		desc   string
-		qtype  uint16
-		qclass uint16
-		qname  []byte
-		exp    *Message
+		desc           string
+		allowRecursion bool
+		qtype          uint16
+		qclass         uint16
+		qname          []byte
+		exp            *Message
 	}{{
 		desc:   "QType:A QClass:IN QName:kilabit.info",
 		qtype:  QueryTypeA,
@@ -275,7 +276,6 @@ func TestDoHClient_Post(t *testing.T) {
 			Header: &SectionHeader{
 				ID:      0,
 				IsAA:    true,
-				IsRD:    true,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
@@ -294,6 +294,7 @@ func TestDoHClient_Post(t *testing.T) {
 
 		msg := NewMessage()
 
+		msg.Header.IsRD = c.allowRecursion
 		msg.Question.Type = c.qtype
 		msg.Question.Class = c.qclass
 		msg.Question.Name = append(msg.Question.Name, c.qname...)

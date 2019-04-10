@@ -14,7 +14,7 @@ func ExampleTCPClient_Lookup() {
 		return
 	}
 
-	msg, err := cl.Lookup(dns.QueryTypeA, dns.QueryClassIN, []byte("kilabit.info"))
+	msg, err := cl.Lookup(false, dns.QueryTypeA, dns.QueryClassIN, []byte("kilabit.info"))
 	if err != nil {
 		log.Println(err)
 		return

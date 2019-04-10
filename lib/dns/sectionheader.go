@@ -183,7 +183,10 @@ func (hdr *SectionHeader) unpack(packet []byte) {
 	}
 	if packet[2]&headerIsRD == headerIsRD {
 		hdr.IsRD = true
+	} else {
+		hdr.IsRD = false
 	}
+
 	if packet[3]&headerIsRA == headerIsRA {
 		hdr.IsRA = true
 	}

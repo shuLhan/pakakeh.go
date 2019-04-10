@@ -1311,7 +1311,7 @@ func TestMessageUnpack(t *testing.T) {
 				ID:      2,
 				IsQuery: false,
 				Op:      OpCodeQuery,
-				IsRD:    true,
+				IsRD:    false,
 				IsRA:    true,
 				QDCount: 1,
 				ANCount: 1,

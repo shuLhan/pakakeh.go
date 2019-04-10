@@ -91,7 +91,7 @@ func (cl *DoHClient) Close() error {
 // Lookup will query the DoH server with specific type, class, and name in
 // synchronous mode.
 //
-func (cl *DoHClient) Lookup(qtype, qclass uint16, qname []byte) (*Message, error) {
+func (cl *DoHClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []byte) (*Message, error) {
 	if len(qname) == 0 {
 		return nil, nil
 	}
@@ -104,6 +104,7 @@ func (cl *DoHClient) Lookup(qtype, qclass uint16, qname []byte) (*Message, error
 
 	msg := NewMessage()
 
+	msg.Header.IsRD = allowRecursion
 	msg.Question.Type = qtype
 	msg.Question.Class = qclass
 	msg.Question.Name = append(msg.Question.Name, qname...)

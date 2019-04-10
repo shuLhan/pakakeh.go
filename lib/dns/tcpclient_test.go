@@ -17,11 +17,12 @@ func TestTCPClientLookup(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		qtype  uint16
-		qclass uint16
-		qname  []byte
-		exp    *Message
+		desc           string
+		allowRecursion bool
+		qtype          uint16
+		qclass         uint16
+		qname          []byte
+		exp            *Message
 	}{{
 		desc:   "QType:A QClass:IN QName:kilabit.info",
 		qtype:  QueryTypeA,
@@ -121,7 +122,7 @@ func TestTCPClientLookup(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.qtype, c.qclass, c.qname)
+		got, err := cl.Lookup(c.allowRecursion, c.qtype, c.qclass, c.qname)
 		if err != nil {
 			t.Fatal(err)
 		}

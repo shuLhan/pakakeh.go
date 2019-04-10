@@ -83,7 +83,7 @@ func (cl *UDPClient) Close() error {
 //
 // This function is safe to be used concurrently.
 //
-func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
+func (cl *UDPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []byte) (
 	*Message, error,
 ) {
 	if cl.Addr == nil || cl.Conn == nil {
@@ -93,6 +93,7 @@ func (cl *UDPClient) Lookup(qtype uint16, qclass uint16, qname []byte) (
 	msg := NewMessage()
 
 	msg.Header.ID = getNextID()
+	msg.Header.IsRD = allowRecursion
 	msg.Header.QDCount = 1
 	msg.Question.Type = qtype
 	msg.Question.Class = qclass

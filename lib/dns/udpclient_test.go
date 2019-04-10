@@ -17,11 +17,12 @@ func TestUDPClientLookup(t *testing.T) {
 	}
 
 	cases := []struct { //nolint: dupl
-		desc   string
-		qtype  uint16
-		qclass uint16
-		qname  []byte
-		exp    *Message
+		desc           string
+		allowRecursion bool
+		qtype          uint16
+		qclass         uint16
+		qname          []byte
+		exp            *Message
 	}{{
 		desc:   "QType:A QClass:IN QName:kilabit.info",
 		qtype:  QueryTypeA,
@@ -125,7 +126,6 @@ func TestUDPClientLookup(t *testing.T) {
 			Header: &SectionHeader{
 				ID:      11,
 				IsAA:    true,
-				IsRD:    true,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
@@ -142,7 +142,7 @@ func TestUDPClientLookup(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.qtype, c.qclass, c.qname)
+		got, err := cl.Lookup(c.allowRecursion, c.qtype, c.qclass, c.qname)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -154,6 +154,10 @@ func TestUDPClientLookup(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Packet", c.exp.Packet, got.Packet, true)
+		if c.allowRecursion {
+			t.Logf("got recursive answer: %+v\n", got)
+		} else {
+			test.Assert(t, "Packet", c.exp.Packet, got.Packet, true)
+		}
 	}
 }
