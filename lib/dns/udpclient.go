@@ -101,7 +101,7 @@ func (cl *UDPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 
 	_, _ = msg.Pack()
 
-	res, err := cl.Query(msg, cl.Addr)
+	res, err := cl.Query(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -112,11 +112,7 @@ func (cl *UDPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 //
 // Query send DNS query to name server "ns" and return the unpacked response.
 //
-func (cl *UDPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
-	if ns == nil {
-		ns = cl.Addr
-	}
-
+func (cl *UDPClient) Query(msg *Message) (*Message, error) {
 	cl.Lock()
 
 	_, err := cl.Write(msg.Packet)

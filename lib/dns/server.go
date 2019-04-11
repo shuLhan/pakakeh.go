@@ -593,7 +593,7 @@ func (srv *Server) runDohForwarder(nameserver string) {
 	}
 
 	for req := range srv.forwardq {
-		res, err := forwarder.Query(req.message, nil)
+		res, err := forwarder.Query(req.message)
 		if err != nil {
 			log.Println("dns: failed to query DoH: " + err.Error())
 			continue
@@ -611,7 +611,7 @@ func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
 			continue
 		}
 
-		res, err := cl.Query(req.message, nil)
+		res, err := cl.Query(req.message)
 		cl.Close()
 		if err != nil {
 			log.Println("dns: failed to query TCP: " + err.Error())
@@ -629,7 +629,7 @@ func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
 	}
 
 	for req := range srv.forwardq {
-		res, err := forwarder.Query(req.message, remoteAddr)
+		res, err := forwarder.Query(req.message)
 		if err != nil {
 			log.Println("dns: failed to query UDP: " + err.Error())
 			continue

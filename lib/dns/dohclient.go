@@ -10,7 +10,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -200,10 +199,10 @@ func (cl *DoHClient) Get(msg *Message) (*Message, error) {
 }
 
 //
-// Query send DNS query to name server.  This is an alias to Get method.
-// The addr parameter is unused.
+// Query send DNS query to name server.  This is an alias to Get method, to
+// make it consistent with other DNS clients.
 //
-func (cl *DoHClient) Query(msg *Message, ns net.Addr) (*Message, error) {
+func (cl *DoHClient) Query(msg *Message) (*Message, error) {
 	return cl.Get(msg)
 }
 

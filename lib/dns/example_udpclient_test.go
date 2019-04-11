@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/shuLhan/share/lib/dns"
-	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -14,12 +13,6 @@ import (
 //
 func ExampleUDPClient() {
 	cl, err := dns.NewUDPClient("127.0.0.1:53")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	ns, err := libnet.ParseUDPAddr("127.0.0.1", 53)
 	if err != nil {
 		log.Println(err)
 		return
@@ -40,7 +33,7 @@ func ExampleUDPClient() {
 		return
 	}
 
-	res, err := cl.Query(req, ns)
+	res, err := cl.Query(req)
 	if err != nil {
 		log.Fatal(err)
 		return

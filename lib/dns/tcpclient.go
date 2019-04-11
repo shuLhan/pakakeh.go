@@ -105,7 +105,7 @@ func (cl *TCPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 
 	_, _ = msg.Pack()
 
-	res, err := cl.Query(msg, nil)
+	res, err := cl.Query(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (cl *TCPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 // Query send DNS query to name server.
 // The addr parameter is unused.
 //
-func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
+func (cl *TCPClient) Query(msg *Message) (*Message, error) {
 	_, err := cl.Write(msg.Packet)
 	if err != nil {
 		return nil, err
