@@ -25,7 +25,12 @@ type DoHClient struct {
 	req     *http.Request
 	query   url.Values
 	conn    *http.Client
-	chRes   chan *http.Response
+
+	// w hold the ResponseWriter on receiver side.
+	w http.ResponseWriter
+	// responded is a channel to signal the underlying receiver that the
+	// response has ready to be send to client.
+	responded chan bool
 }
 
 //
@@ -62,7 +67,6 @@ func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
 			Transport: tr,
 			Timeout:   clientTimeout,
 		},
-		chRes: make(chan *http.Response, 1),
 	}
 
 	cl.req = &http.Request{
@@ -204,61 +208,10 @@ func (cl *DoHClient) Query(msg *Message, ns net.Addr) (*Message, error) {
 }
 
 //
-// recv read response from channel.
-//
-func (cl *DoHClient) recv(msg *Message) (int, error) {
-	httpRes := <-cl.chRes
-
-	body, err := ioutil.ReadAll(httpRes.Body)
-	httpRes.Body.Close()
-	if err != nil {
-		return 0, err
-	}
-
-	if httpRes.StatusCode != 200 {
-		err = fmt.Errorf("%s", string(body))
-		return 0, err
-	}
-
-	msg.Packet = append(msg.Packet[:0], body...)
-
-	if len(msg.Packet) > 20 {
-		err = msg.Unpack()
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	return len(msg.Packet), nil
-}
-
-//
 // RemoteAddr return client remote nameserver address.
 //
 func (cl *DoHClient) RemoteAddr() string {
 	return cl.addr.String()
-}
-
-//
-// Send DNS message to name server using Get method.  Since HTTP client is
-// synchronous, the response is forwarded to channel to be consumed by recv().
-//
-func (cl *DoHClient) Send(msg []byte, ns net.Addr) (int, error) {
-	packet := base64.RawURLEncoding.EncodeToString(msg)
-
-	cl.query.Set("dns", packet)
-	cl.req.Method = http.MethodGet
-	cl.req.Body = nil
-	cl.req.URL.RawQuery = cl.query.Encode()
-
-	httpRes, err := cl.conn.Do(cl.req)
-	if err != nil {
-		return 0, err
-	}
-
-	cl.chRes <- httpRes
-
-	return len(msg), nil
 }
 
 //
@@ -280,4 +233,31 @@ func (cl *DoHClient) SetRemoteAddr(addr string) (err error) {
 //
 func (cl *DoHClient) SetTimeout(t time.Duration) {
 	cl.conn.Timeout = t
+}
+
+//
+// Write the raw DNS response message to active connection.
+// This method is only used by server to write the response of query to
+// client.
+//
+func (cl *DoHClient) Write(packet []byte) (n int, err error) {
+	n, err = cl.w.Write(packet)
+	if err != nil {
+		cl.responded <- false
+		return
+	}
+	cl.responded <- true
+	return
+}
+
+//
+// waitResponse wait for http.ResponseWriter being called by server.
+// This method is to prevent the function that process the HTTP request
+// terminated and write empty response.
+//
+func (cl *DoHClient) waitResponse() {
+	success, ok := <-cl.responded
+	if !success || !ok {
+		cl.w.WriteHeader(http.StatusGatewayTimeout)
+	}
 }

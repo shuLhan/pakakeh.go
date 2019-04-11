@@ -352,11 +352,6 @@ func (srv *Server) serveTCP() {
 // serveUDP serve DNS request from UDP connection.
 //
 func (srv *Server) serveUDP() {
-	sender := &UDPClient{
-		Timeout: clientTimeout,
-		Conn:    srv.udp,
-	}
-
 	for {
 		req := newRequest()
 
@@ -370,11 +365,14 @@ func (srv *Server) serveUDP() {
 		}
 
 		req.kind = connTypeUDP
-		req.udpAddr = raddr
 		req.message.Packet = req.message.Packet[:n]
 
 		req.message.UnpackHeaderQuestion()
-		req.sender = sender
+		req.writer = &UDPClient{
+			Timeout: clientTimeout,
+			Conn:    srv.udp,
+			Addr:    raddr,
+		}
 
 		srv.requestq <- req
 	}
@@ -440,18 +438,18 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	req := newRequest()
 
 	req.kind = connTypeDoH
-	req.responseWriter = w
-	req.chanResponded = make(chan bool, 1)
+	cl := &DoHClient{
+		w:         w,
+		responded: make(chan bool, 1),
+	}
 
+	req.writer = cl
 	req.message.Packet = append(req.message.Packet[:0], raw...)
 	req.message.UnpackHeaderQuestion()
 
 	srv.requestq <- req
 
-	_, ok := <-req.chanResponded
-	if !ok {
-		w.WriteHeader(http.StatusGatewayTimeout)
-	}
+	cl.waitResponse()
 }
 
 func (srv *Server) serveTCPClient(cl *TCPClient) {
@@ -481,7 +479,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 
 		req.kind = connTypeTCP
 		req.message.UnpackHeaderQuestion()
-		req.sender = cl
+		req.writer = cl
 
 		srv.requestq <- req
 	}
@@ -548,34 +546,10 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 		}
 	}
 
-	switch req.kind {
-	case connTypeUDP:
-		if req.sender != nil {
-			_, err := req.sender.Send(res.Packet, req.udpAddr)
-			if err != nil {
-				log.Println("dns: failed to send UDP reply:", err)
-				return
-			}
-		}
-
-	case connTypeTCP:
-		if req.sender != nil {
-			_, err := req.sender.Send(res.Packet, nil)
-			if err != nil {
-				log.Println("dns: failed to send TCP reply:", err)
-				return
-			}
-		}
-
-	case connTypeDoH:
-		if req.responseWriter != nil {
-			_, err := req.responseWriter.Write(res.Packet)
-			req.chanResponded <- true
-			if err != nil {
-				log.Println("dns: failed to send DoH reply:", err)
-				return
-			}
-		}
+	_, err := req.writer.Write(res.Packet)
+	if err != nil {
+		log.Println("dns: processResponse: ", err.Error())
+		return
 	}
 
 	if !isLocal {

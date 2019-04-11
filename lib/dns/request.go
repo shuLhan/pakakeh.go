@@ -5,8 +5,7 @@
 package dns
 
 import (
-	"net"
-	"net/http"
+	"io"
 )
 
 //
@@ -25,20 +24,13 @@ type request struct {
 	// Message define the DNS query.
 	message *Message
 
-	// UDPAddr is address of client if connection is from UDP.
-	udpAddr *net.UDPAddr
-
-	// Sender is server connection that receive the query and responsible
-	// to answer back to client.
-	sender Sender
-
-	// ResponseWriter is HTTP response writer, where answer for DoH
-	// client query will be written.
-	responseWriter http.ResponseWriter
-
-	// ChanResponded is a channel that notify the DoH handler when answer
-	// has been written to ResponseWriter.
-	chanResponded chan bool
+	// writer represent client connection on server that receive the query
+	// and responsible to write the answer back.
+	// On UDP connection, writer is an instance of UDPClient with
+	// connection reference to UDP server and with peer address.
+	// On TCP connection, writer is a TCP connection from accept.
+	// On Doh connection, writer is http ResponseWriter.
+	writer io.Writer
 }
 
 //

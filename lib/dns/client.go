@@ -18,5 +18,4 @@ type Client interface {
 	Query(req *Message, ns net.Addr) (*Message, error)
 	SetTimeout(t time.Duration)
 	SetRemoteAddr(addr string) error
-	Sender
 }

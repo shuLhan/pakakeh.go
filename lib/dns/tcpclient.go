@@ -118,7 +118,7 @@ func (cl *TCPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 // The addr parameter is unused.
 //
 func (cl *TCPClient) Query(msg *Message, ns net.Addr) (*Message, error) {
-	_, err := cl.Send(msg.Packet, ns)
+	_, err := cl.Write(msg.Packet)
 	if err != nil {
 		return nil, err
 	}
@@ -171,11 +171,11 @@ func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 }
 
 //
-// Send DNS message to name server using active connection in client.
+// Write raw DNS response message on active connection.
+// This method is only used by server to write the response of query to
+// client.
 //
-// The addr parameter is unused.
-//
-func (cl *TCPClient) Send(msg []byte, addr net.Addr) (n int, err error) {
+func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
 	if err != nil {
 		return
