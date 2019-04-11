@@ -340,7 +340,7 @@ func (srv *Server) serveTCP() {
 		}
 
 		cl := &TCPClient{
-			Timeout: clientTimeout,
+			timeout: clientTimeout,
 			conn:    conn,
 		}
 
@@ -369,9 +369,9 @@ func (srv *Server) serveUDP() {
 
 		req.message.UnpackHeaderQuestion()
 		req.writer = &UDPClient{
-			Timeout: clientTimeout,
-			Conn:    srv.udp,
-			Addr:    raddr,
+			timeout: clientTimeout,
+			conn:    srv.udp,
+			addr:    raddr,
 		}
 
 		srv.requestq <- req

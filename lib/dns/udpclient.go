@@ -22,9 +22,10 @@ import (
 // should create one client per routine.
 //
 type UDPClient struct {
-	Timeout time.Duration
-	Addr    *net.UDPAddr // Addr contains address of remote nameserver.
-	Conn    *net.UDPConn
+	timeout time.Duration
+	// addr contains address of remote connection.
+	addr *net.UDPAddr
+	conn *net.UDPConn
 	sync.Mutex
 }
 
@@ -49,12 +50,12 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 	}
 
 	cl = &UDPClient{
-		Timeout: clientTimeout,
-		Addr: &net.UDPAddr{
+		timeout: clientTimeout,
+		addr: &net.UDPAddr{
 			IP:   remoteIP,
 			Port: int(remotePort),
 		},
-		Conn: conn,
+		conn: conn,
 	}
 
 	return
@@ -64,14 +65,14 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 // RemoteAddr return client remote nameserver address.
 //
 func (cl *UDPClient) RemoteAddr() string {
-	return cl.Addr.String()
+	return cl.addr.String()
 }
 
 //
 // Close client connection.
 //
 func (cl *UDPClient) Close() error {
-	return cl.Conn.Close()
+	return cl.conn.Close()
 }
 
 //
@@ -86,7 +87,7 @@ func (cl *UDPClient) Close() error {
 func (cl *UDPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []byte) (
 	*Message, error,
 ) {
-	if cl.Addr == nil || cl.Conn == nil {
+	if cl.addr == nil || cl.conn == nil {
 		return nil, nil
 	}
 
@@ -143,12 +144,12 @@ func (cl *UDPClient) Query(msg *Message) (*Message, error) {
 // recv will read DNS message from active connection in client into `msg`.
 //
 func (cl *UDPClient) recv(msg *Message) (n int, err error) {
-	err = cl.Conn.SetReadDeadline(time.Now().Add(cl.Timeout))
+	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
 		return
 	}
 
-	n, _, err = cl.Conn.ReadFromUDP(msg.Packet)
+	n, _, err = cl.conn.ReadFromUDP(msg.Packet)
 	if err != nil {
 		return
 	}
@@ -168,25 +169,25 @@ func (cl *UDPClient) recv(msg *Message) (n int, err error) {
 // client.
 //
 func (cl *UDPClient) Write(msg []byte) (n int, err error) {
-	err = cl.Conn.SetWriteDeadline(time.Now().Add(cl.Timeout))
+	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
 		return
 	}
 
-	return cl.Conn.WriteToUDP(msg, cl.Addr)
+	return cl.conn.WriteToUDP(msg, cl.addr)
 }
 
 //
 // SetRemoteAddr set the remote address for sending the packet.
 //
 func (cl *UDPClient) SetRemoteAddr(addr string) (err error) {
-	cl.Addr, err = net.ResolveUDPAddr("udp", addr)
+	cl.addr, err = net.ResolveUDPAddr("udp", addr)
 	return
 }
 
 //
-// SetTimeout set the timeout for sending and receiving packet.
+// SetTimeout for sending and receiving packet.
 //
 func (cl *UDPClient) SetTimeout(t time.Duration) {
-	cl.Timeout = t
+	cl.timeout = t
 }
