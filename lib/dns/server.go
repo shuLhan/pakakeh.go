@@ -58,7 +58,7 @@ import (
 //	+ : new answer is added to caches
 //	# : the expired answer is renewed and updated on caches
 //
-// Following the prefix is message ID and question, separated by colon.
+// Following the prefix is connection type, message ID, and question.
 //
 type Server struct {
 	opts        *ServerOptions
@@ -520,7 +520,9 @@ func (srv *Server) processRequest() {
 
 	for req := range srv.requestq {
 		if debug.Value >= 1 {
-			fmt.Printf("dns: < %d:%s\n", req.message.Header.ID,
+			fmt.Printf("dns: < %s %d:%s\n",
+				connTypeNames[req.kind],
+				req.message.Header.ID,
 				req.message.Question)
 		}
 
@@ -548,13 +550,15 @@ func (srv *Server) processRequest() {
 			res = req.message
 
 			if debug.Value >= 1 {
-				fmt.Printf("dns: ! %d:%s\n",
+				fmt.Printf("dns: ! %s %d:%s\n",
+					connTypeNames[req.kind],
 					res.Header.ID, res.Question)
 			}
 		} else {
 			if an.msg.IsExpired() && srv.hasForwarders {
 				if debug.Value >= 1 {
-					fmt.Printf("dns: ~ %d:%s\n",
+					fmt.Printf("dns: ~ %s %d:%s\n",
+						connTypeNames[req.kind],
 						req.message.Header.ID,
 						req.message.Question)
 				}
@@ -566,7 +570,8 @@ func (srv *Server) processRequest() {
 			res = an.msg
 
 			if debug.Value >= 1 {
-				fmt.Printf("dns: > %d:%s\n",
+				fmt.Printf("dns: > %s %d:%s\n",
+					connTypeNames[req.kind],
 					res.Header.ID, res.Question)
 			}
 		}
@@ -606,9 +611,13 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 
 	if debug.Value >= 1 {
 		if inserted {
-			fmt.Printf("dns: + %d:%s\n", res.Header.ID, res.Question)
+			fmt.Printf("dns: + %s %d:%s\n",
+				connTypeNames[req.kind],
+				res.Header.ID, res.Question)
 		} else {
-			fmt.Printf("dns: # %d:%s\n", res.Header.ID, res.Question)
+			fmt.Printf("dns: # %s %d:%s\n",
+				connTypeNames[req.kind],
+				res.Header.ID, res.Question)
 		}
 	}
 }
@@ -643,8 +652,8 @@ func (srv *Server) runDohForwarder(nameserver string) {
 
 	for req := range srv.forwardq {
 		if debug.Value >= 1 {
-			fmt.Printf("dns: ^ %d:%s\n", req.message.Header.ID,
-				req.message.Question)
+			fmt.Printf("dns: ^ DoH %d:%s\n",
+				req.message.Header.ID, req.message.Question)
 		}
 
 		res, err := forwarder.Query(req.message)
@@ -660,8 +669,8 @@ func (srv *Server) runDohForwarder(nameserver string) {
 func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
 	for req := range srv.forwardq {
 		if debug.Value >= 1 {
-			fmt.Printf("dns: ^ %d:%s\n", req.message.Header.ID,
-				req.message.Question)
+			fmt.Printf("dns: ^ TCP %d:%s\n",
+				req.message.Header.ID, req.message.Question)
 		}
 
 		cl, err := NewTCPClient(remoteAddr.String())
@@ -689,8 +698,8 @@ func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
 
 	for req := range srv.forwardq {
 		if debug.Value >= 1 {
-			fmt.Printf("dns: ^ %d:%s\n", req.message.Header.ID,
-				req.message.Question)
+			fmt.Printf("dns: ^ UDP %d:%s\n",
+				req.message.Header.ID, req.message.Question)
 		}
 
 		res, err := forwarder.Query(req.message)
