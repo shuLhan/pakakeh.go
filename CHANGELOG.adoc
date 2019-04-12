@@ -4,6 +4,46 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+==  share v0.6.0 (2019-05-xx)
+
+This release bring major changes on dns package.
+Most notable changes are adding caches and query forwarding (recursion), and
+removing the server handler.
+
+
+===  Breaking Changes
+
+* `dns`:
+**  refactor server to use Start(), Wait(), and Stop()
+**  use direct certificate instance on ServerOptions
+**  rename Send to Write, and change the parameter type to slice of byte
+**  remove "elapsed" parameter on Message.IsExpired()
+**  unexport the Request type
+**  remove receiver interface
+**  unexport connection type
+**  remove unused address parameter on client's Query()
+**  unexport all fields from UDP and TCP clients
+**  remove TCPPort on ServerOptions
+
+===  New Features
+
+* `crypto`: new package that provide a wrapper for standard crypto
+
+* `dns`:
+**  add caches to server
+**  add method to set AA, Query, RD, RCode on Message
+**  add mapping of response code to human readable names
+**  implement recursion, forwarding request to parent name servers
+
+* `smtp`: add field DKIMOptions to Domain
+
+===  Bug Fixes
+
+*  `dns`:
+**  fix data race issue when running test
+**  set the TTL offset when packing resource record
+**  fix parsing TXT from zone file
+
 
 ==  share v0.5.0 (2019-04-02)
 

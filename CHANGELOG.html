@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="generator" content="Asciidoctor 2.0.5">
 <title>CHANGELOG</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <link rel="stylesheet" href="./asciidoctor.css">
@@ -15,15 +15,22 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_share_v0_5_0_2019_04_xx">share v0.5.0 (2019-04-xx)</a>
+<li><a href="#_share_v0_6_0_2019_05_xx">share v0.6.0 (2019-05-xx)</a>
 <ul class="sectlevel2">
+<li><a href="#_breaking_changes">Breaking Changes</a></li>
 <li><a href="#_new_features">New Features</a></li>
+<li><a href="#_bug_fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a href="#_share_v0_5_0_2019_04_02">share v0.5.0 (2019-04-02)</a>
+<ul class="sectlevel2">
+<li><a href="#_new_features_2">New Features</a></li>
 <li><a href="#_enhancements">Enhancements</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_4_0_2019_03_01">share v0.4.0 (2019-03-01)</a>
 <ul class="sectlevel2">
-<li><a href="#_new_features_2">New Features</a></li>
+<li><a href="#_new_features_3">New Features</a></li>
 <li><a href="#_enhancements_2">Enhancements</a></li>
 <li><a href="#_fixes">Fixes</a></li>
 </ul>
@@ -37,7 +44,7 @@
 </li>
 <li><a href="#_share_v0_2_0_2019_01_02">share v0.2.0 (2019-01-02)</a>
 <ul class="sectlevel2">
-<li><a href="#_new_features_3">New Features</a></li>
+<li><a href="#_new_features_4">New Features</a></li>
 <li><a href="#_enhancements_4">Enhancements</a></li>
 </ul>
 </li>
@@ -55,12 +62,129 @@ first week of next month.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_share_v0_5_0_2019_04_xx">share v0.5.0 (2019-04-xx)</h2>
+<h2 id="_share_v0_6_0_2019_05_xx">share v0.6.0 (2019-05-xx)</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>This release bring major changes on dns package.
+Most notable changes are adding caches and query forwarding (recursion), and
+removing the server handler.</p>
+</div>
+<div class="sect2">
+<h3 id="_breaking_changes">Breaking Changes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>dns</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>refactor server to use Start(), Wait(), and Stop()</p>
+</li>
+<li>
+<p>use direct certificate instance on ServerOptions</p>
+</li>
+<li>
+<p>rename Send to Write, and change the parameter type to slice of byte</p>
+</li>
+<li>
+<p>remove "elapsed" parameter on Message.IsExpired()</p>
+</li>
+<li>
+<p>unexport the Request type</p>
+</li>
+<li>
+<p>remove receiver interface</p>
+</li>
+<li>
+<p>unexport connection type</p>
+</li>
+<li>
+<p>remove unused address parameter on client&#8217;s Query()</p>
+</li>
+<li>
+<p>unexport all fields from UDP and TCP clients</p>
+</li>
+<li>
+<p>remove TCPPort on ServerOptions</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_new_features">New Features</h3>
 <div class="ulist">
 <ul>
+<li>
+<p><code>crypto</code>: new package that provide a wrapper for standard crypto</p>
+</li>
+<li>
+<p><code>dns</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>add caches to server</p>
+</li>
+<li>
+<p>add method to set AA, Query, RD, RCode on Message</p>
+</li>
+<li>
+<p>add mapping of response code to human readable names</p>
+</li>
+<li>
+<p>implement recursion, forwarding request to parent name servers</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>smtp</code>: add field DKIMOptions to Domain</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bug_fixes">Bug Fixes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>dns</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>fix data race issue when running test</p>
+</li>
+<li>
+<p>set the TTL offset when packing resource record</p>
+</li>
+<li>
+<p>fix parsing TXT from zone file</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_share_v0_5_0_2019_04_02">share v0.5.0 (2019-04-02)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This minor release is dedicated for websocket package.  Major refactoring on
+server and client API to make it easy and extensible.  The websocket is now
+100% pass the autobahn testsuite (minus compression feature).</p>
+</div>
+<div class="sect2">
+<h3 id="_new_features_2">New Features</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>cmd/smtpcli</code>: command line interface to SMTP client protocol</p>
+</li>
 <li>
 <p><code>ints</code>: new package for working with slice of integer</p>
 </li>
@@ -98,7 +222,8 @@ first week of next month.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Rewrite most of client and server APIs to be more simple</p>
+<p>Rewrite most of client and server APIs to be more simple and pass autobahn
+testsuite</p>
 </li>
 <li>
 <p>Minimize global variables and unexport internal constants and functions</p>
@@ -121,7 +246,7 @@ first week of next month.</p>
 <h2 id="_share_v0_4_0_2019_03_01">share v0.4.0 (2019-03-01)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_new_features_2">New Features</h3>
+<h3 id="_new_features_3">New Features</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -367,7 +492,7 @@ first week of next month.</p>
 <h2 id="_share_v0_2_0_2019_01_02">share v0.2.0 (2019-01-02)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_new_features_3">New Features</h3>
+<h3 id="_new_features_4">New Features</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -419,7 +544,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-03-06 17:26:29 +0700
+Last updated 2019-04-12 18:35:37 +0700
 </div>
 </div>
 </body>
