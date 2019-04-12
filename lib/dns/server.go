@@ -17,6 +17,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/shuLhan/share/lib/debug"
 )
 
 //
@@ -39,6 +41,23 @@ import (
 // The list caches store non-local answers, ordered by last accessed time,
 // it is used to prune least frequently accessed answers.
 // Local caches will never get pruned.
+//
+// Debugging
+//
+// If debug.Value is set to value greater than 1, server will print each
+// processed request, forward, and response.
+// The debug information prefixed with single character to differentiate
+// single action,
+//
+//	< : incoming request from client
+//	> : the answer is sent to client
+//	! : no answer found on cache and the query is not recursive
+//	^ : request is forwarded to parent name server
+//	- : answer exist on cache but its expired
+//	+ : new answer is added to caches
+//	# : the expired answer is renewed and updated on caches
+//
+// Following the prefix is message ID and question, separated by colon.
 //
 type Server struct {
 	opts        *ServerOptions
@@ -499,6 +518,11 @@ func (srv *Server) processRequest() {
 	)
 
 	for req := range srv.requestq {
+		if debug.Value >= 1 {
+			fmt.Printf("dns: < %d:%s\n", req.message.Header.ID,
+				req.message.Question)
+		}
+
 		ans, an := srv.caches.get(string(req.message.Question.Name),
 			req.message.Question.Type,
 			req.message.Question.Class)
@@ -521,14 +545,29 @@ func (srv *Server) processRequest() {
 			req.message.SetQuery(false)
 			req.message.SetAuthorativeAnswer(true)
 			res = req.message
+
+			if debug.Value >= 1 {
+				fmt.Printf("dns: ! %d:%s\n",
+					res.Header.ID, res.Question)
+			}
 		} else {
 			if an.msg.IsExpired() && srv.hasForwarders {
+				if debug.Value >= 1 {
+					fmt.Printf("dns: - %d:%s\n",
+						req.message.Header.ID,
+						req.message.Question)
+				}
 				srv.forwardq <- req
 				continue
 			}
 
 			an.msg.SetID(req.message.Header.ID)
 			res = an.msg
+
+			if debug.Value >= 1 {
+				fmt.Printf("dns: > %d:%s\n",
+					res.Header.ID, res.Question)
+			}
 		}
 
 		srv.processResponse(req, res, true)
@@ -538,6 +577,9 @@ func (srv *Server) processRequest() {
 func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 	if !isLocal {
 		if !isResponseValid(req, res) {
+			log.Printf("dns: invalid response, got %d:%s, want %d:%s\n",
+				req.message.Header.ID, req.message.Question,
+				res.Header.ID, res.Question)
 			return
 		}
 	}
@@ -548,15 +590,25 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 		return
 	}
 
-	if !isLocal {
-		if res.Header.RCode != 0 {
-			log.Printf("dns: response error %s, code: %s\n",
-				res.Question, rcodeNames[res.Header.RCode])
-			return
-		}
+	if isLocal {
+		return
+	}
 
-		an := newAnswer(res, false)
-		srv.caches.upsert(an)
+	if res.Header.RCode != 0 {
+		log.Printf("dns: response error %s, code: %s\n",
+			res.Question, rcodeNames[res.Header.RCode])
+		return
+	}
+
+	an := newAnswer(res, false)
+	inserted := srv.caches.upsert(an)
+
+	if debug.Value >= 1 {
+		if inserted {
+			fmt.Printf("dns: + %d:%s\n", res.Header.ID, res.Question)
+		} else {
+			fmt.Printf("dns: # %d:%s\n", res.Header.ID, res.Question)
+		}
 	}
 }
 
@@ -589,6 +641,11 @@ func (srv *Server) runDohForwarder(nameserver string) {
 	}
 
 	for req := range srv.forwardq {
+		if debug.Value >= 1 {
+			fmt.Printf("dns: ^ %d:%s\n", req.message.Header.ID,
+				req.message.Question)
+		}
+
 		res, err := forwarder.Query(req.message)
 		if err != nil {
 			log.Println("dns: failed to query DoH: " + err.Error())
@@ -601,6 +658,11 @@ func (srv *Server) runDohForwarder(nameserver string) {
 
 func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
 	for req := range srv.forwardq {
+		if debug.Value >= 1 {
+			fmt.Printf("dns: ^ %d:%s\n", req.message.Header.ID,
+				req.message.Question)
+		}
+
 		cl, err := NewTCPClient(remoteAddr.String())
 		if err != nil {
 			log.Println("dns: failed to create TCP client: " + err.Error())
@@ -625,6 +687,11 @@ func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
 	}
 
 	for req := range srv.forwardq {
+		if debug.Value >= 1 {
+			fmt.Printf("dns: ^ %d:%s\n", req.message.Header.ID,
+				req.message.Question)
+		}
+
 		res, err := forwarder.Query(req.message)
 		if err != nil {
 			log.Println("dns: failed to query UDP: " + err.Error())
