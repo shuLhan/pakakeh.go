@@ -259,7 +259,7 @@ func TestCachesUpsert(t *testing.T) {
 		desc:    "With update on answer",
 		nu:      an1Update,
 		expLen:  2,
-		expList: []*answer{an2, an1},
+		expList: []*answer{an1, an2},
 	}, {
 		desc:    "With update on answer (2)",
 		nu:      an2Update,

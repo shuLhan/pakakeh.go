@@ -66,7 +66,7 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 // it will return list of answer and nil answer.
 //
 // If answer exist on cache, their accessed time will be updated to current
-// time.
+// time and moved to back of LRU to prevent being pruned later.
 //
 func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *answer) {
 	c.Lock()
@@ -78,9 +78,10 @@ func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *answ
 		an, _ = ans.get(qtype, qclass)
 		if an != nil {
 			// Move the answer to the back of LRU if its not
-			// local.
+			// local and update its accessed time.
 			if an.receivedAt > 0 {
 				c.lru.MoveToBack(an.el)
+				an.accessedAt = time.Now().Unix()
 			}
 		}
 	}
@@ -164,10 +165,6 @@ func (c *caches) upsert(nu *answer) (inserted bool) {
 				// Push the new answer to LRU if new answer is
 				// not local and its inserted to list.
 				nu.el = c.lru.PushBack(nu)
-			}
-		} else {
-			if nu.receivedAt > 0 {
-				c.lru.MoveToBack(an.el)
 			}
 		}
 	}
