@@ -495,8 +495,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 //
 func (srv *Server) processRequest() {
 	var (
-		res     *Message
-		isLocal bool
+		res *Message
 	)
 
 	for req := range srv.requestq {
@@ -513,7 +512,6 @@ func (srv *Server) processRequest() {
 			req.message.SetResponseCode(RCodeErrName)
 		}
 
-		isLocal = false
 		if an == nil {
 			if req.message.Header.IsRD && srv.hasForwarders {
 				srv.forwardq <- req
@@ -523,7 +521,6 @@ func (srv *Server) processRequest() {
 			req.message.SetQuery(false)
 			req.message.SetAuthorativeAnswer(true)
 			res = req.message
-			isLocal = true
 		} else {
 			if an.msg.IsExpired() && srv.hasForwarders {
 				srv.forwardq <- req
@@ -532,10 +529,9 @@ func (srv *Server) processRequest() {
 
 			an.msg.SetID(req.message.Header.ID)
 			res = an.msg
-			isLocal = (an.receivedAt == 0)
 		}
 
-		srv.processResponse(req, res, isLocal)
+		srv.processResponse(req, res, true)
 	}
 }
 
