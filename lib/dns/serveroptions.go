@@ -28,11 +28,8 @@ type ServerOptions struct {
 	// This field is optional, default to 120 seconds.
 	DoHIdleTimeout time.Duration
 
-	// UDPPort port for UDP server, default to 53.
-	UDPPort uint16
-
-	// TCPPort port for TCP server, default to 53.
-	TCPPort uint16
+	// Port port for UDP and TCP server, default to 53.
+	Port uint16
 
 	// DoHPort port for listening DNS over HTTP, default to 443.
 	DoHPort uint16
@@ -116,11 +113,8 @@ func (opts *ServerOptions) init() (err error) {
 		return fmt.Errorf("dns: invalid IP address '%s'", opts.IPAddress)
 	}
 
-	if opts.UDPPort == 0 {
-		opts.UDPPort = DefaultPort
-	}
-	if opts.TCPPort == 0 {
-		opts.TCPPort = DefaultPort
+	if opts.Port == 0 {
+		opts.Port = DefaultPort
 	}
 	if opts.DoHPort == 0 {
 		opts.DoHPort = DefaultDoHPort
@@ -151,14 +145,14 @@ func (opts *ServerOptions) init() (err error) {
 func (opts *ServerOptions) getUDPAddress() *net.UDPAddr {
 	return &net.UDPAddr{
 		IP:   opts.ip,
-		Port: int(opts.UDPPort),
+		Port: int(opts.Port),
 	}
 }
 
 func (opts *ServerOptions) getTCPAddress() *net.TCPAddr {
 	return &net.TCPAddr{
 		IP:   opts.ip,
-		Port: int(opts.TCPPort),
+		Port: int(opts.Port),
 	}
 }
 

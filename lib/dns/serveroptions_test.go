@@ -26,8 +26,7 @@ func TestServerOptionsInit(t *testing.T) {
 		exp: &ServerOptions{
 			IPAddress:      "0.0.0.0",
 			DoHIdleTimeout: defaultDoHIdleTimeout,
-			UDPPort:        DefaultPort,
-			TCPPort:        DefaultPort,
+			Port:           DefaultPort,
 			DoHPort:        DefaultDoHPort,
 			PruneDelay:     time.Hour,
 			PruneThreshold: -1 * time.Hour,
@@ -57,8 +56,7 @@ func TestServerOptionsInit(t *testing.T) {
 		exp: &ServerOptions{
 			IPAddress:      "0.0.0.0",
 			DoHIdleTimeout: defaultDoHIdleTimeout,
-			UDPPort:        DefaultPort,
-			TCPPort:        DefaultPort,
+			Port:           DefaultPort,
 			DoHPort:        DefaultDoHPort,
 			NameServers: []string{
 				"udp://127.0.0.1",

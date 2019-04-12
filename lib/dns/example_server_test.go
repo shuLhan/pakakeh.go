@@ -44,8 +44,7 @@ func ExampleServer() {
 
 	serverOptions := &dns.ServerOptions{
 		IPAddress:        "127.0.0.1",
-		TCPPort:          5300,
-		UDPPort:          5300,
+		Port:             5300,
 		DoHPort:          8443,
 		DoHCertificate:   &cert,
 		DoHAllowInsecure: true,
