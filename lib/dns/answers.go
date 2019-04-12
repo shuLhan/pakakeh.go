@@ -58,17 +58,16 @@ func (ans *answers) remove(qtype, qclass uint16) {
 
 //
 // upsert update or insert new answer to list.
-// If answer is updated, it will return the old answer; otherwise new insert
-// is inserted to list and it will return nil instead.
+// If new answer is updated, it will return the old answer.
+// If new answer is inserted, it will return nil instead.
 //
 func (ans *answers) upsert(nu *answer) (an *answer) {
 	if nu == nil || nu.msg == nil {
 		return
 	}
-	var x int
-	an, x = ans.get(nu.qtype, nu.qclass)
+	an, _ = ans.get(nu.qtype, nu.qclass)
 	if an != nil {
-		ans.v[x].update(nu)
+		an.update(nu)
 	} else {
 		ans.v = append(ans.v, nu)
 	}
