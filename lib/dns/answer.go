@@ -41,7 +41,7 @@ type answer struct {
 // to current timestamp.
 //
 func newAnswer(msg *Message, isLocal bool) (an *answer) {
-	if msg == nil || msg.Question == nil || len(msg.Answer) == 0 {
+	if msg == nil || msg.Question == nil {
 		return nil
 	}
 
