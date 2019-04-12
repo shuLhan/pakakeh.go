@@ -53,7 +53,8 @@ import (
 //	> : the answer is sent to client
 //	! : no answer found on cache and the query is not recursive
 //	^ : request is forwarded to parent name server
-//	- : answer exist on cache but its expired
+//	~ : answer exist on cache but its expired
+//	- : answer is pruned from caches
 //	+ : new answer is added to caches
 //	# : the expired answer is renewed and updated on caches
 //
@@ -553,7 +554,7 @@ func (srv *Server) processRequest() {
 		} else {
 			if an.msg.IsExpired() && srv.hasForwarders {
 				if debug.Value >= 1 {
-					fmt.Printf("dns: - %d:%s\n",
+					fmt.Printf("dns: ~ %d:%s\n",
 						req.message.Header.ID,
 						req.message.Question)
 				}

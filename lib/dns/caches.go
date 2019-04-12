@@ -6,8 +6,11 @@ package dns
 
 import (
 	"container/list"
+	"fmt"
 	"sync"
 	"time"
+
+	"github.com/shuLhan/share/lib/debug"
 )
 
 //
@@ -38,7 +41,7 @@ type caches struct {
 // newCaches create new in memory caches with specific prune delay and
 // threshold.
 // The prune delay MUST be greater than 1 minute or it will set to 1 hour.
-// The prune threshold MUST be greater than -1 minute or it will be set to 1
+// The prune threshold MUST be greater than -1 minute or it will be set to -1
 // hour.
 //
 func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
@@ -55,6 +58,8 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 		pruneDelay:     pruneDelay,
 		pruneThreshold: pruneThreshold,
 	}
+
+	go ca.startWorker()
 
 	return
 }
@@ -117,6 +122,10 @@ func (c *caches) prune() {
 			break
 		}
 
+		if debug.Value >= 1 {
+			fmt.Printf("dns: - 0:%s\n", an.msg.Question)
+		}
+
 		next := e.Next()
 		_ = c.lru.Remove(e)
 		c.remove(an)
@@ -172,4 +181,21 @@ func (c *caches) upsert(nu *answer) (inserted bool) {
 	c.Unlock()
 
 	return inserted
+}
+
+//
+// startWorker start the worker pruning process.
+//
+// The worker prune process will run based on prune delay and it will remove
+// any cached answer that has not been accessed less than prune threshold
+// value.
+//
+func (c *caches) startWorker() {
+	ticker := time.NewTicker(c.pruneDelay)
+
+	for t := range ticker.C {
+		fmt.Printf("dns: pruning at %v\n", t)
+
+		c.prune()
+	}
 }
