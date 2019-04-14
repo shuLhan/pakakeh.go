@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"sort"
 	"strconv"
@@ -216,7 +217,18 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 	node, e = srv.mfs.Get(reqPath)
 	if e != nil {
-		return nil
+		if e != os.ErrNotExist {
+			log.Println("http: getFSNode: " + e.Error())
+			return nil
+		}
+
+		reqPath = path.Join(reqPath, "index.html")
+
+		node, e = srv.mfs.Get(reqPath)
+		if e != nil {
+			log.Println("http: getFSNode: " + e.Error())
+			return nil
+		}
 	}
 
 	if node.Mode.IsDir() {
