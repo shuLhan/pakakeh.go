@@ -36,7 +36,7 @@ type Server struct {
 // NewServer create and initialize new HTTP server that serve root directory
 // with custom connection.
 //
-func NewServer(root string, conn *http.Server) (srv *Server, e error) {
+func NewServer(opts *ServerOptions) (srv *Server, e error) {
 	srv = &Server{
 		regDelete: make(map[string]*Endpoint),
 		regGet:    make(map[string]*Endpoint),
@@ -45,25 +45,31 @@ func NewServer(root string, conn *http.Server) (srv *Server, e error) {
 		regPut:    make(map[string]*Endpoint),
 	}
 
-	if conn == nil {
+	if len(opts.Address) == 0 {
+		opts.Address = ":80"
+	}
+
+	if opts.Conn == nil {
 		srv.conn = &http.Server{
-			Addr:           ":80",
+			Addr:           opts.Address,
 			Handler:        srv,
 			ReadTimeout:    5 * time.Second,
 			WriteTimeout:   5 * time.Second,
 			MaxHeaderBytes: 1 << 20,
 		}
 	} else {
-		conn.Handler = srv
-		srv.conn = conn
+		opts.Conn.Handler = srv
+		srv.conn = opts.Conn
 	}
 
-	srv.mfs, e = memfs.New(nil, nil)
+	memfs.Development = opts.Development
+
+	srv.mfs, e = memfs.New(opts.Includes, opts.Excludes)
 	if e != nil {
 		return nil, e
 	}
 
-	e = srv.mfs.Mount(root)
+	e = srv.mfs.Mount(opts.Root)
 	if e != nil {
 		return nil, e
 	}

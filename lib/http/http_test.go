@@ -49,14 +49,15 @@ var (
 func TestMain(m *testing.M) {
 	var err error
 
-	conn := &http.Server{
-		Addr: "127.0.0.1:8080",
+	opts := &ServerOptions{
+		Address: "127.0.0.1:8080",
+		Root:    "./testdata",
 	}
 
 	// Testing handleFS with large size.
 	libmemfs.MaxFileSize = 30
 
-	testServer, err = NewServer("testdata", conn)
+	testServer, err = NewServer(opts)
 	if err != nil {
 		log.Fatal(err)
 	}
