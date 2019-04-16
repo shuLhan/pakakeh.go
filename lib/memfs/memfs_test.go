@@ -134,7 +134,6 @@ func TestMount(t *testing.T) {
 			"/index.css",
 			"/index.html",
 			"/index.js",
-			"/memfs_generate_test.go",
 			"/plain",
 		},
 	}, {
@@ -154,7 +153,6 @@ func TestMount(t *testing.T) {
 			"/include/index.html",
 			"/index.css",
 			"/index.html",
-			"/memfs_generate_test.go",
 			"/plain",
 		},
 	}, {

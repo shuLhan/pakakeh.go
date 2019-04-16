@@ -6,7 +6,7 @@
 /lib/dns/testdata/hosts.block.out
 /lib/email/maildir/testdata/
 /lib/git/testdata/beku_test
-/lib/memfs/testdata/memfs_generate.go
+/lib/memfs/generate_test/memfs_generate.go
 /lib/websocket/testdata/bin
 /lib/websocket/testdata/client/client
 /lib/websocket/testdata/client/reports

@@ -19,44 +19,12 @@ func generateTemplate() (tmpl *template.Template, err error) {
 package {{.}}
 
 import (
-	"os"
+	"github.com/shuLhan/share/lib/memfs"
 )
-
-var pathNode = map[string]*Node{}
-
-//
-// Node represent a single file.
-//
-type Node struct {
-	SysPath     string      // The original file path in system.
-	Path        string      // Absolute file path in memory.
-	Name        string      // File name.
-	ContentType string      // File type per MIME, e.g. "application/json".
-	Mode        os.FileMode // File mode.
-	Size        int64       // Size of file.
-	V           []byte      // Content of file.
-	Parent      *Node       // Pointer to parent directory.
-	Childs      []*Node     // List of files in directory.
-}
-
-//
-// Get node at path, or nil if path is not exist.
-//
-func Get(path string) *Node {
-	node, ok := pathNode[path]
-	if ok {
-		return node
-	}
-	f, ok := pathFuncs[path]
-	if ok {
-		return f()
-	}
-	return nil
-}
 {{end}}
 {{define "GENERATE_NODE"}}
-func generate{{ funcname .Path | printf "%s"}}() *Node {
-	node := &Node{
+func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
+	node := &memfs.Node{
 		SysPath:     "{{.SysPath}}",
 		Path:        "{{.Path}}",
 		Name:        "{{.Name}}",
@@ -72,20 +40,19 @@ func generate{{ funcname .Path | printf "%s"}}() *Node {
 		},
 	}
 {{ end }}
-	pathNode["{{.Path}}"] = node
+	memfs.GeneratedPathNode.Set("{{.Path}}", node)
 	return node
 }
 {{end}}
 {{define "PATHFUNCS"}}
-{{- $maxlen := pathlen . }}
-var pathFuncs = map[string]func() *Node{
+func init() {
+	memfs.GeneratedPathNode = memfs.NewPathNode()
 {{- range $path, $node := .}}
-	"{{$path}}":{{pad $maxlen $path | printf "%s"}}generate{{funcname $node.Path | printf "%s"}},
+	memfs.GeneratedPathNode.SetFunc("{{$path}}", generate{{funcname $node.Path | printf "%s" }})
 {{- end}}
 }
 {{end}}
 `
-
 	tmplFuncs := template.FuncMap{
 		"funcname": func(path string) []byte {
 			return libbytes.InReplace([]byte(path), []byte(libbytes.ASCIILettersNumber), '_')
@@ -98,21 +65,6 @@ var pathFuncs = map[string]func() *Node{
 		},
 		"isdir": func(fm os.FileMode) bool {
 			return fm.IsDir()
-		},
-		"pathlen": func(paths map[string]*Node) (l int) {
-			for k := range paths {
-				if l < len(k) {
-					l = len(k)
-				}
-			}
-			return
-		},
-		"pad": func(maxlen int, path string) (spaces []byte) {
-			spaces = make([]byte, 0, maxlen-len(path))
-			for x := 0; x <= maxlen-len(path); x++ {
-				spaces = append(spaces, ' ')
-			}
-			return
 		},
 	}
 

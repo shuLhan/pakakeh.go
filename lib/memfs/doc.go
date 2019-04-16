@@ -3,7 +3,8 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package memfs provide a library for mapping file system into memory.
+// Package memfs provide a library for mapping file system into memory and to
+// generate a go file.
 //
 // Usage
 //
@@ -24,8 +25,7 @@
 //	}
 //	mfs, err := memfs.New(incs, excs)
 //
-// and then we mount the system directory that we want into memory using
-// "Mount()",
+// and then we mount the directory that we want into memory using "Mount()",
 //
 //	err := mfs.Mount("./testdata")
 //
@@ -55,7 +55,7 @@
 //
 //	mfs.GoGenerate("mypackage", "output/path/file.go")
 //
-// The Go generate file will be defined with package named "mypackage" in file
-// "output/path/file.go".
+// The Go generated file will be defined with package named "mypackage" in
+// file "output/path/file.go".
 //
 package memfs

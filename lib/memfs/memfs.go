@@ -21,27 +21,46 @@ var (
 	// Development define a flag to bypass file in memory.  If its
 	// true, any call to Get will result in direct read to file system.
 	Development bool //nolint: gochecknoglobals
+
+	// GeneratedPathNode contains the mapping of path and node.  Its will
+	// be used and initialized by ".go" file generated from GoGenerate().
+	GeneratedPathNode *PathNode //nolint: gochecknoglobals
 )
 
 //
 // MemFS contains the configuration and content of memory file system.
 //
 type MemFS struct {
-	incRE       []*regexp.Regexp
-	excRE       []*regexp.Regexp
-	root        *Node
-	mapPathNode map[string]*Node
+	incRE []*regexp.Regexp
+	excRE []*regexp.Regexp
+	root  *Node
+	pn    *PathNode
 }
 
 //
 // New create and initialize new memory file system using list of regular
 // expresssion for including or excluding files.
+//
 // The includes and excludes pattern applied to path of file in file system,
 // not to the path in memory.
 //
+// On directory that contains output from GoGenerate(), the includes and
+// excludes does not have any effect, since the content of path and nodes will
+// be overwritten by GeneratedPathNode.
+//
 func New(includes, excludes []string) (*MemFS, error) {
+	if !Development && GeneratedPathNode != nil {
+		mfs := &MemFS{
+			pn: GeneratedPathNode,
+		}
+		return mfs, nil
+	}
+
 	mfs := &MemFS{
-		mapPathNode: make(map[string]*Node),
+		pn: &PathNode{
+			v: make(map[string]*Node),
+			f: nil,
+		},
 	}
 	for _, inc := range includes {
 		re, err := regexp.Compile(inc)
@@ -66,8 +85,8 @@ func New(includes, excludes []string) (*MemFS, error) {
 // will return os.ErrNotExist.
 //
 func (mfs *MemFS) Get(path string) (*Node, error) {
-	node, ok := mfs.mapPathNode[path]
-	if !ok {
+	node := mfs.pn.Get(path)
+	if node == nil {
 		return nil, os.ErrNotExist
 	}
 
@@ -84,11 +103,11 @@ func (mfs *MemFS) Get(path string) (*Node, error) {
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
-	if len(mfs.mapPathNode) > 0 {
-		paths = make([]string, 0, len(mfs.mapPathNode))
+	if len(mfs.pn.v) > 0 {
+		paths = make([]string, 0, len(mfs.pn.v))
 	}
 
-	for k := range mfs.mapPathNode {
+	for k := range mfs.pn.v {
 		if len(paths) == 0 {
 			paths = append(paths, k)
 			continue
@@ -117,8 +136,14 @@ func (mfs *MemFS) ListNames() (paths []string) {
 // For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
 // access file "a" we call Get("/a"), not Get("/tmp/a").
 //
+// Mount does not have any effect if current directory contains ".go"
+// generated file from GoGenerate().
+//
 func (mfs *MemFS) Mount(dir string) error {
 	if len(dir) == 0 {
+		return nil
+	}
+	if !Development && GeneratedPathNode != nil {
 		return nil
 	}
 
@@ -163,7 +188,7 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 		Parent:  nil,
 	}
 
-	mfs.mapPathNode[mfs.root.Path] = mfs.root
+	mfs.pn.v[mfs.root.Path] = mfs.root
 
 	return nil
 }
@@ -232,7 +257,7 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 
 	parent.Childs = append(parent.Childs, child)
 
-	mfs.mapPathNode[child.Path] = child
+	mfs.pn.v[child.Path] = child
 
 	if child.Mode.IsDir() {
 		return child, nil
@@ -281,7 +306,7 @@ func (mfs *MemFS) isIncluded(child *Node) bool {
 // pruneEmptyDirs remove node that is directory and does not have childs.
 //
 func (mfs *MemFS) pruneEmptyDirs() {
-	for k, node := range mfs.mapPathNode {
+	for k, node := range mfs.pn.v {
 		if !node.Mode.IsDir() {
 			continue
 		}
@@ -293,6 +318,6 @@ func (mfs *MemFS) pruneEmptyDirs() {
 		}
 
 		node.Parent.removeChild(node)
-		delete(mfs.mapPathNode, k)
+		delete(mfs.pn.v, k)
 	}
 }

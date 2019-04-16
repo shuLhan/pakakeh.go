@@ -38,14 +38,14 @@ func (mfs *MemFS) GoGenerate(pkgName, out string) (err error) {
 		goto fail
 	}
 
-	for _, node := range mfs.mapPathNode {
+	for _, node := range mfs.pn.v {
 		err = tmpl.ExecuteTemplate(f, "GENERATE_NODE", node)
 		if err != nil {
 			goto fail
 		}
 	}
 
-	err = tmpl.ExecuteTemplate(f, "PATHFUNCS", mfs.mapPathNode)
+	err = tmpl.ExecuteTemplate(f, "PATHFUNCS", mfs.pn.v)
 	if err != nil {
 		goto fail
 	}

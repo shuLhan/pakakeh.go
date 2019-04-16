@@ -10,10 +10,7 @@ import (
 )
 
 func TestGoGenerate(t *testing.T) {
-	excs := []string{
-		"memfs_generate.go",
-	}
-	mfs, err := New(nil, excs)
+	mfs, err := New(nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +20,7 @@ func TestGoGenerate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = mfs.GoGenerate("testdata", "testdata/memfs_generate.go")
+	err = mfs.GoGenerate("test", "generate_test/memfs_generate.go")
 	if err != nil {
 		t.Fatal(err)
 	}
