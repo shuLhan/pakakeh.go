@@ -176,6 +176,8 @@ NOTE: The links below is used to be viewed locally, not through Github.
 **  link:doc/ESMTP_AUTH.html[SMTP Service Extension for Authentication
     (RFC 4954)]
 
+*  link:doc/SPF.html[Sender Policy Framework version 1 (RFC 7208)]
+
 *Development*
 
 The documentation created using asciidoctor.  First, install `ruby` and
