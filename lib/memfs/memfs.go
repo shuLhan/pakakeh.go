@@ -302,7 +302,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (*Node, error) {
 		return nil, nil
 	}
 
-	child, err := newNode(parent, fi, mfs.withContent)
+	child, err := NewNode(parent, fi, mfs.withContent)
 	if err != nil {
 		return nil, err
 	}

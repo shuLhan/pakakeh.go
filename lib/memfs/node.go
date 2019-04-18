@@ -32,20 +32,31 @@ type Node struct {
 }
 
 //
-// newNode create a new node based on file information "fi".
+// NewNode create a new node based on file information "fi".
 // If withContent is true, the file content and its type will be saved in
 // node as V and ContentType.
 //
-func newNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err error) {
-	if parent == nil || fi == nil {
+func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err error) {
+	if fi == nil {
 		return nil, nil
 	}
 
-	sysPath := filepath.Join(parent.SysPath, fi.Name())
+	var (
+		sysPath string
+		absPath string
+	)
+
+	if parent != nil {
+		sysPath = filepath.Join(parent.SysPath, fi.Name())
+		absPath = path.Join(parent.Path, fi.Name())
+	} else {
+		sysPath = fi.Name()
+		absPath = fi.Name()
+	}
 
 	node = &Node{
 		SysPath: sysPath,
-		Path:    path.Join(parent.Path, fi.Name()),
+		Path:    absPath,
 		Name:    fi.Name(),
 		ModTime: fi.ModTime(),
 		Mode:    fi.Mode(),
