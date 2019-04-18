@@ -5,69 +5,138 @@
 package io
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"time"
+
+	"github.com/shuLhan/share/lib/debug"
+	"github.com/shuLhan/share/lib/memfs"
 )
 
 //
-// A Watcher hold a channel that deliver file information when file is
-// changed.
-// If file is deleted, it will send a nil file information to channel and stop
-// watching the file.
-//
-// This is a naive implementation of file event change notification.
+// Watcher is a naive implementation of file event change notification.
 //
 type Watcher struct {
-	C      <-chan *os.FileInfo
-	cin    chan *os.FileInfo
-	file   string
+	// path to file that we want to watch.
+	path string
+
+	// Delay define a duration when the new changes will be fetched from
+	// system.
+	// This field is optional, minimum is 100 millisecond and default is
+	// 5 seconds.
+	delay time.Duration
+
+	// cb define a function that will be called when file modified or
+	// deleted.
+	cb WatchCallback
+
 	ticker *time.Ticker
+	node   *memfs.Node
 }
 
 //
 // NewWatcher return a new file watcher that will inspect the file for changes
 // with period specified by duration `d` argument.
-// If duration is less or equal to zero, it will be set to default duration (5
-// seconds).
 //
-func NewWatcher(file string, d time.Duration) (*Watcher, error) {
-	if d <= 0 {
+// If duration is less or equal to 100 millisecond, it will be set to default
+// duration (5 seconds).
+//
+func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err error) {
+	if len(path) == 0 {
+		return nil, fmt.Errorf("lib/io: NewWatcher: path is empty")
+	}
+	if cb == nil {
+		return nil, fmt.Errorf("lib/io: NewWatcher: callback is not defined")
+	}
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		return nil, fmt.Errorf("lib/io: NewWatcher: " + err.Error())
+	}
+	if fi.Mode().IsDir() {
+		return nil, fmt.Errorf("lib/io: NewWatcher: path is directory")
+	}
+
+	node, err := memfs.NewNode(nil, fi, false)
+	if err != nil {
+		return nil, fmt.Errorf("lib/io: NewWatcher: " + err.Error())
+	}
+
+	if d < 100*time.Millisecond {
 		d = time.Second * 5
 	}
 
-	c := make(chan *os.FileInfo, 1)
-	watcher := &Watcher{
-		C:      c,
-		cin:    c,
-		file:   file,
+	node.SysPath = path
+	node.Path = path
+
+	w = &Watcher{
+		path:   path,
+		delay:  d,
+		cb:     cb,
 		ticker: time.NewTicker(d),
+		node:   node,
 	}
 
-	go watcher.start()
+	go w.start()
 
-	return watcher, nil
+	return w, nil
 }
 
 func (w *Watcher) start() {
-	oldStat, _ := os.Stat(w.file)
+	if debug.Value >= 2 {
+		fmt.Printf("lib/io: Watcher watching %q\n", w.path)
+	}
 	for range w.ticker.C {
-		newStat, err := os.Stat(w.file)
+		newInfo, err := os.Stat(w.path)
 		if err != nil {
-			w.cin <- nil
+			if !os.IsNotExist(err) {
+				log.Println("lib/io: Watcher: " + err.Error())
+				continue
+			}
+
+			if debug.Value >= 2 {
+				fmt.Printf("lib/io: Watcher: deleted %q\n", w.node.SysPath)
+			}
+
+			ns := &NodeState{
+				Node:  w.node,
+				State: FileStateDeleted,
+			}
+			w.cb(ns)
+			w.node = nil
+			return
+		}
+		if w.node.Mode != newInfo.Mode() {
+			if debug.Value >= 2 {
+				fmt.Printf("lib/io: Watcher: mode modified %q\n", w.node.SysPath)
+			}
+
+			w.node.Mode = newInfo.Mode()
+			ns := &NodeState{
+				Node:  w.node,
+				State: FileStateModified,
+			}
+			w.cb(ns)
 			continue
 		}
-		if oldStat == nil {
-			w.cin <- &newStat
-			oldStat = newStat
+		if w.node.ModTime.Equal(newInfo.ModTime()) {
 			continue
 		}
-		if oldStat.Size() != newStat.Size() ||
-			oldStat.Mode() != newStat.Mode() ||
-			oldStat.ModTime() != newStat.ModTime() {
-			w.cin <- &newStat
-			oldStat = newStat
-			continue
+
+		if debug.Value >= 2 {
+			fmt.Printf("lib/io: Watcher: content modified %q\n", w.node.SysPath)
 		}
+
+		w.node.ModTime = newInfo.ModTime()
+		w.node.Size = newInfo.Size()
+
+		ns := &NodeState{
+			Node:  w.node,
+			State: FileStateModified,
+		}
+
+		w.cb(ns)
 	}
 }
 
