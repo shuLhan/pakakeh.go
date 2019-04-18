@@ -315,6 +315,18 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (*Node, error) {
 }
 
 //
+// RemoveChild remove a child on parent, including its map on PathNode.
+// If child is not part if node's childrens it will return nil.
+//
+func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
+	removed = parent.removeChild(child)
+	if removed != nil {
+		delete(mfs.pn.v, removed.Path)
+	}
+	return
+}
+
+//
 // isIncluded will return true if the child node pass the included filter or
 // excluded filter; otherwise it will return false.
 //

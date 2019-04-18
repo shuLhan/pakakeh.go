@@ -72,7 +72,11 @@ func newNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 	return node, nil
 }
 
-func (leaf *Node) removeChild(child *Node) {
+//
+// removeChild remove a children node from list.  If child is not exist, it
+// will return nil.
+//
+func (leaf *Node) removeChild(child *Node) *Node {
 	for x := 0; x < len(leaf.Childs); x++ {
 		if leaf.Childs[x] != child {
 			continue
@@ -85,7 +89,11 @@ func (leaf *Node) removeChild(child *Node) {
 
 		child.Parent = nil
 		child.Childs = nil
+
+		return child
 	}
+
+	return nil
 }
 
 //
