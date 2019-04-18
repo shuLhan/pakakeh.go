@@ -98,9 +98,10 @@ func (mfs *MemFS) Get(path string) (*Node, error) {
 	}
 
 	if Development {
-		path = filepath.Join("/", path)
-		path = filepath.Join(mfs.root.SysPath, path)
-		return newNode(path)
+		err = node.update(nil, mfs.withContent)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return node, nil
@@ -198,6 +199,24 @@ func (mfs *MemFS) Mount(dir string) error {
 func (mfs *MemFS) Unmount() {
 	mfs.root = nil
 	mfs.pn = nil
+}
+
+//
+// Update the node content and information in memory based on new file
+// information.
+// This method only check if the node name is equal with file name, but it's
+// not checking whether the node is part of memfs (node is parent or have the
+// same root node).
+//
+func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
+	if node == nil || newInfo == nil {
+		return
+	}
+
+	err := node.update(newInfo, mfs.withContent)
+	if err != nil {
+		log.Println("lib/memfs: Update: " + err.Error())
+	}
 }
 
 func (mfs *MemFS) createRoot(dir string, f *os.File) error {

@@ -5,6 +5,8 @@
 package memfs
 
 import (
+	"fmt"
+	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
@@ -60,6 +62,55 @@ func (leaf *Node) removeChild(child *Node) {
 		child.Parent = nil
 		child.Childs = nil
 	}
+}
+
+//
+// update the node content and information based on new file information.
+//
+// If the newInfo is nil, it will read the file information based on node's
+// SysPath.
+//
+// There are two possible changes that will happened: its either change on
+// mode or change on content (size and modtime).
+// Change on mode will not affect the content of node.
+//
+func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
+	if newInfo == nil {
+		newInfo, err = os.Stat(leaf.SysPath)
+		if err != nil {
+			return fmt.Errorf("lib/memfs: Node.update %q: %s",
+				leaf.Path, err.Error())
+		}
+	}
+
+	if leaf.Mode != newInfo.Mode() {
+		leaf.Mode = newInfo.Mode()
+		return nil
+	}
+
+	leaf.Size = newInfo.Size()
+
+	if !withContent || newInfo.IsDir() {
+		return nil
+	}
+
+	return leaf.updateContent()
+}
+
+//
+// updateContent read the content of file.
+//
+func (leaf *Node) updateContent() (err error) {
+	if leaf.Size > MaxFileSize {
+		return nil
+	}
+
+	leaf.V, err = ioutil.ReadFile(leaf.SysPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (leaf *Node) updateContentType() error {
