@@ -6,9 +6,8 @@ package memfs
 
 import (
 	"errors"
-	"io/ioutil"
+	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 )
@@ -91,8 +90,8 @@ func New(includes, excludes []string, withContent bool) (*MemFS, error) {
 // Get the node representation of file in memory.  If path is not exist it
 // will return os.ErrNotExist.
 //
-func (mfs *MemFS) Get(path string) (*Node, error) {
-	node := mfs.pn.Get(path)
+func (mfs *MemFS) Get(path string) (node *Node, err error) {
+	node = mfs.pn.Get(path)
 	if node == nil {
 		return nil, os.ErrNotExist
 	}
@@ -293,44 +292,20 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 		}
 	}
 
-	child := &Node{
-		Mode:   fi.Mode(),
-		Size:   fi.Size(),
-		Parent: parent,
-	}
-	child.Name = fi.Name()
-	child.SysPath = filepath.Join(parent.SysPath, child.Name)
-	child.Path = path.Join(parent.Path, child.Name)
+	sysPath := filepath.Join(parent.SysPath, fi.Name())
 
-	if !mfs.isIncluded(child) {
+	if !mfs.isIncluded(sysPath, fi.Mode()) {
 		return nil, nil
+	}
+
+	child, err := newNode(parent, fi, mfs.withContent)
+	if err != nil {
+		return nil, err
 	}
 
 	parent.Childs = append(parent.Childs, child)
 
 	mfs.pn.v[child.Path] = child
-
-	if child.Mode.IsDir() {
-		return child, nil
-	}
-
-	if !mfs.withContent {
-		return child, nil
-	}
-
-	err = child.updateContentType()
-	if err != nil {
-		return nil, err
-	}
-
-	if child.Size > MaxFileSize {
-		return child, nil
-	}
-
-	child.V, err = ioutil.ReadFile(child.SysPath)
-	if err != nil {
-		return nil, err
-	}
 
 	return child, nil
 }
@@ -339,22 +314,22 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 // isIncluded will return true if the child node pass the included filter or
 // excluded filter; otherwise it will return false.
 //
-func (mfs *MemFS) isIncluded(child *Node) bool {
+func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 	if len(mfs.incRE) == 0 && len(mfs.excRE) == 0 {
 		return true
 	}
 	for _, re := range mfs.excRE {
-		if re.MatchString(child.SysPath) {
+		if re.MatchString(sysPath) {
 			return false
 		}
 	}
 	if len(mfs.incRE) > 0 {
 		for _, re := range mfs.incRE {
-			if re.MatchString(child.SysPath) {
+			if re.MatchString(sysPath) {
 				return true
 			}
 		}
-		return child.Mode.IsDir()
+		return mode.IsDir()
 	}
 
 	return true

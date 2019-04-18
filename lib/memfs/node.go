@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 //
@@ -28,21 +29,41 @@ type Node struct {
 	Childs      []*Node     // List of files in directory.
 }
 
-func newNode(path string) (*Node, error) {
-	fi, err := os.Stat(path)
+//
+// newNode create a new node based on file information "fi".
+// If withContent is true, the file content and its type will be saved in
+// node as V and ContentType.
+//
+func newNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err error) {
+	if parent == nil || fi == nil {
+		return nil, nil
+	}
+
+	sysPath := filepath.Join(parent.SysPath, fi.Name())
+
+	node = &Node{
+		SysPath: sysPath,
+		Path:    path.Join(parent.Path, fi.Name()),
+		Name:    fi.Name(),
+		Mode:    fi.Mode(),
+		Size:    fi.Size(),
+		V:       nil,
+		Parent:  parent,
+		Childs:  make([]*Node, 0),
+	}
+
+	if node.Mode.IsDir() || !withContent {
+		return node, nil
+	}
+
+	err = node.updateContent()
 	if err != nil {
 		return nil, err
 	}
 
-	node := &Node{
-		SysPath: path,
-		Path:    "/",
-		Name:    "/",
-		Mode:    fi.Mode(),
-		Size:    fi.Size(),
-		V:       nil,
-		Parent:  nil,
-		Childs:  make([]*Node, 0),
+	err = node.updateContentType()
+	if err != nil {
+		return nil, err
 	}
 
 	return node, nil

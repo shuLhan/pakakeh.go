@@ -311,12 +311,12 @@ func TestFilter(t *testing.T) {
 		}
 
 		for x, sysPath := range c.sysPath {
-			node, err := newNode(sysPath)
+			fi, err := os.Stat(sysPath)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			got := mfs.isIncluded(node)
+			got := mfs.isIncluded(sysPath, fi.Mode())
 
 			test.Assert(t, sysPath, c.exp[x], got, true)
 		}
