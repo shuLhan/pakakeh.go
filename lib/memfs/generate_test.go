@@ -10,7 +10,7 @@ import (
 )
 
 func TestGoGenerate(t *testing.T) {
-	mfs, err := New(nil, nil)
+	mfs, err := New(nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}

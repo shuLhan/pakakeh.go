@@ -72,7 +72,7 @@ func TestGet(t *testing.T) {
 		expContentType: "application/octet-stream",
 	}}
 
-	mfs, err := New(nil, nil)
+	mfs, err := New(nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,7 +177,7 @@ func TestMount(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New(c.incs, c.excs)
+		mfs, err := New(c.incs, c.excs, true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -305,7 +305,7 @@ func TestFilter(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New(c.inc, c.exc)
+		mfs, err := New(c.inc, c.exc, true)
 		if err != nil {
 			t.Fatal(err)
 		}

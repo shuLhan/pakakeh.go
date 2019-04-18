@@ -65,7 +65,7 @@ func NewServer(opts *ServerOptions) (srv *Server, e error) {
 
 	memfs.Development = opts.Development
 
-	srv.mfs, e = memfs.New(opts.Includes, opts.Excludes)
+	srv.mfs, e = memfs.New(opts.Includes, opts.Excludes, true)
 	if e != nil {
 		return nil, e
 	}

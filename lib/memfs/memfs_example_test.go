@@ -14,7 +14,7 @@ func ExampleNew() {
 		`.*/exclude`,
 	}
 
-	mfs, err := New(incs, excs)
+	mfs, err := New(incs, excs, true)
 	if err != nil {
 		log.Fatal(err)
 	}

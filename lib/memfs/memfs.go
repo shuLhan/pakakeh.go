@@ -28,13 +28,14 @@ var (
 )
 
 //
-// MemFS contains the configuration and content of memory file system.
+// MemFS contains directory tree of file system in memory.
 //
 type MemFS struct {
-	incRE []*regexp.Regexp
-	excRE []*regexp.Regexp
-	root  *Node
-	pn    *PathNode
+	incRE       []*regexp.Regexp
+	excRE       []*regexp.Regexp
+	root        *Node
+	pn          *PathNode
+	withContent bool
 }
 
 //
@@ -44,11 +45,15 @@ type MemFS struct {
 // The includes and excludes pattern applied to path of file in file system,
 // not to the path in memory.
 //
+// The "withContent" parameter tell the MemFS to read the content of file and
+// detect its content type.  If this paramater is false, the content of file
+// will not be mapped to memory, the MemFS will behave as directory tree.
+//
 // On directory that contains output from GoGenerate(), the includes and
 // excludes does not have any effect, since the content of path and nodes will
 // be overwritten by GeneratedPathNode.
 //
-func New(includes, excludes []string) (*MemFS, error) {
+func New(includes, excludes []string, withContent bool) (*MemFS, error) {
 	if !Development && GeneratedPathNode != nil {
 		mfs := &MemFS{
 			pn: GeneratedPathNode,
@@ -61,7 +66,9 @@ func New(includes, excludes []string) (*MemFS, error) {
 			v: make(map[string]*Node),
 			f: nil,
 		},
+		withContent: withContent,
 	}
+
 	for _, inc := range includes {
 		re, err := regexp.Compile(inc)
 		if err != nil {
@@ -163,7 +170,9 @@ func (mfs *MemFS) Mount(dir string) error {
 		return err
 	}
 
-	mfs.pruneEmptyDirs()
+	if mfs.withContent {
+		mfs.pruneEmptyDirs()
+	}
 
 	return nil
 }
@@ -263,6 +272,10 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 		return child, nil
 	}
 
+	if !mfs.withContent {
+		return child, nil
+	}
+
 	err = child.updateContentType()
 	if err != nil {
 		return nil, err
@@ -273,8 +286,11 @@ func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
 	}
 
 	child.V, err = ioutil.ReadFile(child.SysPath)
+	if err != nil {
+		return nil, err
+	}
 
-	return child, err
+	return child, nil
 }
 
 //
