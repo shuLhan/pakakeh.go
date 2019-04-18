@@ -139,6 +139,14 @@ func (mfs *MemFS) ListNames() (paths []string) {
 }
 
 //
+// IsMounted will return true if a directory in file system has been mounted
+// to memory; otherwise it will return false.
+//
+func (mfs *MemFS) IsMounted() bool {
+	return mfs.root != nil
+}
+
+//
 // Mount the directory recursively into the memory as root directory.
 // For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
 // access file "a" we call Get("/a"), not Get("/tmp/a").
