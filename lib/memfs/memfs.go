@@ -251,7 +251,7 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 	}
 
 	for _, fi := range fis {
-		leaf, err := mfs.addChild(parent, fi)
+		leaf, err := mfs.AddChild(parent, fi)
 		if err != nil {
 			return err
 		}
@@ -277,7 +277,10 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 	return nil
 }
 
-func (mfs *MemFS) addChild(parent *Node, fi os.FileInfo) (*Node, error) {
+//
+// AddChild add new child to parent node.
+//
+func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (*Node, error) {
 	var err error
 
 	if fi.Mode()&os.ModeSymlink != 0 {
