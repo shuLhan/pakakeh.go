@@ -232,6 +232,7 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 		SysPath: dir,
 		Path:    "/",
 		Name:    "/",
+		ModTime: fi.ModTime(),
 		Mode:    fi.Mode(),
 		Size:    fi.Size(),
 		V:       nil,

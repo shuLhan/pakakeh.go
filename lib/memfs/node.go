@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 //
@@ -22,6 +23,7 @@ type Node struct {
 	Path        string      // Absolute file path in memory.
 	Name        string      // File name.
 	ContentType string      // File type per MIME, e.g. "application/json".
+	ModTime     time.Time   // ModTime contains file modification time.
 	Mode        os.FileMode // File mode.
 	Size        int64       // Size of file.
 	V           []byte      // Content of file.
@@ -45,6 +47,7 @@ func newNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 		SysPath: sysPath,
 		Path:    path.Join(parent.Path, fi.Name()),
 		Name:    fi.Name(),
+		ModTime: fi.ModTime(),
 		Mode:    fi.Mode(),
 		Size:    fi.Size(),
 		V:       nil,
@@ -109,6 +112,7 @@ func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
 		return nil
 	}
 
+	leaf.ModTime = newInfo.ModTime()
 	leaf.Size = newInfo.Size()
 
 	if !withContent || newInfo.IsDir() {
