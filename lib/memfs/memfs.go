@@ -154,6 +154,13 @@ func (mfs *MemFS) Mount(dir string) error {
 		return nil
 	}
 
+	if mfs.pn == nil {
+		mfs.pn = &PathNode{
+			v: make(map[string]*Node),
+			f: nil,
+		}
+	}
+
 	f, err := os.Open(dir)
 	if err != nil {
 		return err
@@ -175,6 +182,14 @@ func (mfs *MemFS) Mount(dir string) error {
 	}
 
 	return nil
+}
+
+//
+// Unmount the root directory from memory.
+//
+func (mfs *MemFS) Unmount() {
+	mfs.root = nil
+	mfs.pn = nil
 }
 
 func (mfs *MemFS) createRoot(dir string, f *os.File) error {
