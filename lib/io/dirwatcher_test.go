@@ -7,6 +7,7 @@ package io
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -42,7 +43,7 @@ func TestDirWatcher(t *testing.T) {
 		path:  "/new.adoc",
 	}, {
 		state: FileStateDeleted,
-		path:  "/new.adoc",
+		path:  filepath.Join(dir, "/new.adoc"),
 	}, {
 		state: FileStateCreated,
 		path:  "/sub",
@@ -51,14 +52,16 @@ func TestDirWatcher(t *testing.T) {
 		path:  "/sub/new.adoc",
 	}, {
 		state: FileStateDeleted,
-		path:  "/sub/new.adoc",
+		path:  filepath.Join(dir, "/sub/new.adoc"),
 	}, {
 		state: FileStateCreated,
 		path:  "/assets/new",
+	}, {
+		state: FileStateDeleted,
+		path:  filepath.Join(dir, "/assets/new"),
 	}}
 
-	expIdx := 0
-
+	x := 0
 	dw := &DirWatcher{
 		Path:  dir,
 		Delay: 150 * time.Millisecond,
@@ -70,14 +73,13 @@ func TestDirWatcher(t *testing.T) {
 			`.*\.html$`,
 		},
 		Callback: func(ns *NodeState) {
-			tt := t
-			if exps[expIdx].path != ns.Node.Path {
-				tt.Fatalf("Callback got node path %q, want %q\n", ns.Node.Path, exps[expIdx].path)
+			if exps[x].path != ns.Node.Path {
+				log.Fatalf("TestDirWatcher got node path %q, want %q\n", ns.Node.Path, exps[x].path)
 			}
-			if exps[expIdx].state != ns.State {
-				tt.Fatalf("Callback got state %d, want %d\n", ns.State, exps[expIdx].state)
+			if exps[x].state != ns.State {
+				log.Fatalf("TestDirWatcher got state %d, want %d\n", ns.State, exps[x].state)
 			}
-			expIdx++
+			x++
 			wg.Done()
 		},
 	}
@@ -88,7 +90,7 @@ func TestDirWatcher(t *testing.T) {
 	}
 
 	// Delete the directory being watched.
-	fmt.Printf(">>> Deleting root directory %q ...\n", dir)
+	t.Logf("Deleting root directory %q ...\n", dir)
 	wg.Add(1)
 	err = os.Remove(dir)
 	if err != nil {
@@ -98,7 +100,7 @@ func TestDirWatcher(t *testing.T) {
 
 	// Create the watched directory back with sub directory
 	dirAssets := filepath.Join(dir, "assets")
-	fmt.Printf(">>> Re-create root directory %q ...\n", dirAssets)
+	t.Logf("Re-create root directory %q ...\n", dirAssets)
 	wg.Add(1)
 	err = os.MkdirAll(dirAssets, 0770)
 	if err != nil {
@@ -108,7 +110,7 @@ func TestDirWatcher(t *testing.T) {
 
 	// Modify the permission on root directory
 	wg.Add(1)
-	fmt.Printf(">>> Modify root directory %q ...\n", dir)
+	t.Logf("Modify root directory %q ...\n", dir)
 	err = os.Chmod(dir, 0700)
 	if err != nil {
 		t.Fatal(err)
@@ -117,7 +119,7 @@ func TestDirWatcher(t *testing.T) {
 
 	// Add new file to watched directory.
 	newFile := filepath.Join(dir, "new.adoc")
-	fmt.Printf(">>> Create new file %q ...\n", newFile)
+	t.Logf("Create new file on root directory: %q ...\n", newFile)
 	wg.Add(1)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
@@ -126,7 +128,7 @@ func TestDirWatcher(t *testing.T) {
 	wg.Wait()
 
 	// Remove file.
-	fmt.Printf(">>> Remove file %q ...\n", newFile)
+	t.Logf("Remove file on root directory: %q ...\n", newFile)
 	wg.Add(1)
 	err = os.Remove(newFile)
 	if err != nil {
@@ -136,7 +138,7 @@ func TestDirWatcher(t *testing.T) {
 
 	// Create sub-directory.
 	subDir := filepath.Join(dir, "sub")
-	fmt.Printf(">>> Create new sub-directory %q ...\n", subDir)
+	t.Logf("Create new sub-directory: %q ...\n", subDir)
 	wg.Add(1)
 	err = os.Mkdir(subDir, 0770)
 	if err != nil {
@@ -146,7 +148,7 @@ func TestDirWatcher(t *testing.T) {
 
 	// Add new file in sub directory.
 	newFile = filepath.Join(subDir, "new.adoc")
-	fmt.Printf(">>> Create new file %q ...\n", newFile)
+	t.Logf("Create new file in sub directory: %q ...\n", newFile)
 	wg.Add(1)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
@@ -155,7 +157,7 @@ func TestDirWatcher(t *testing.T) {
 	wg.Wait()
 
 	// Remove file in sub directory.
-	fmt.Printf(">>> Remove file %q ...\n", newFile)
+	t.Logf("Remove file in sub directory: %q ...\n", newFile)
 	wg.Add(1)
 	err = os.Remove(newFile)
 	if err != nil {
@@ -165,16 +167,7 @@ func TestDirWatcher(t *testing.T) {
 
 	// Create exclude file, should not trigger event.
 	newFile = filepath.Join(subDir, "new.html")
-	fmt.Printf(">>> Create exclude file %q ...\n", newFile)
-	err = ioutil.WriteFile(newFile, nil, 0600)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Create file without extension in sub directory, should not trigger
-	// event.
-	newFile = filepath.Join(subDir, "new")
-	fmt.Printf(">>> Create new file %q ...\n", newFile)
+	t.Logf("Create excluded file in sub directory: %q ...\n", newFile)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
@@ -183,7 +176,7 @@ func TestDirWatcher(t *testing.T) {
 	// Create file without extension in white list directory "assets",
 	// should trigger event.
 	newFile = filepath.Join(dirAssets, "new")
-	fmt.Printf(">>> Create new file %q ...\n", newFile)
+	t.Logf("Create new file on assets: %q ...\n", newFile)
 	wg.Add(1)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
@@ -191,5 +184,6 @@ func TestDirWatcher(t *testing.T) {
 	}
 	wg.Wait()
 
+	wg.Add(1)
 	dw.Stop()
 }

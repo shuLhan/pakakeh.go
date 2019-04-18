@@ -105,6 +105,10 @@ func (dw *DirWatcher) Stop() {
 func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
 	for _, child := range node.Childs {
 		if !child.Mode.IsDir() {
+			_, err := NewWatcher(child.SysPath, dw.Delay, dw.Callback)
+			if err != nil {
+				log.Println(err)
+			}
 			continue
 		}
 
@@ -157,31 +161,24 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 	}
 
 	// Find deleted files in directory.
-	for _, child := range node.Childs {
+	for x := 0; x < len(node.Childs); x++ {
 		found := false
 		for _, newInfo := range fis {
-			if child.Name == newInfo.Name() {
+			if node.Childs[x].Name == newInfo.Name() {
 				found = true
 				break
 			}
 		}
 		if !found {
 			if debug.Value >= 2 {
-				fmt.Printf("lib/io: DirWatcher.onContentChange: deleted %+v\n", child)
+				fmt.Printf("lib/io: DirWatcher.onContentChange: deleted %+v\n", node.Childs[x])
 			}
 
-			// A node is deleted in node's childs.
-			ns := &NodeState{
-				Node:  child,
-				State: FileStateDeleted,
-			}
-			dw.Callback(ns)
-
-			if child.Mode.IsDir() {
-				dw.unmapSubdirs(child)
+			if node.Childs[x].Mode.IsDir() {
+				dw.unmapSubdirs(node.Childs[x])
 			}
 
-			dw.fs.RemoveChild(node, child)
+			dw.fs.RemoveChild(node, node.Childs[x])
 			continue
 		}
 	}
@@ -222,7 +219,11 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 
 		if newChild.Mode.IsDir() {
 			dw.dirs[newChild.Path] = newChild
+			continue
 		}
+
+		// Start watching the file for modification.
+		NewWatcher(newChild.SysPath, dw.Delay, dw.Callback)
 	}
 }
 
@@ -335,7 +336,7 @@ func (dw *DirWatcher) start() {
 
 func (dw *DirWatcher) processSubdirs() {
 	for _, node := range dw.dirs {
-		if debug.Value >= 2 {
+		if debug.Value >= 3 {
 			fmt.Printf("lib/io: DirWatcher: processSubdirs: %q\n", node.SysPath)
 		}
 
