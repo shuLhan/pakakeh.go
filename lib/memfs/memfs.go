@@ -93,6 +93,14 @@ func New(includes, excludes []string, withContent bool) (*MemFS, error) {
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	node = mfs.pn.Get(path)
 	if node == nil {
+		if Development {
+			node, err = mfs.refresh(path)
+			if err != nil {
+				log.Println("lib/memfs: Get: " + err.Error())
+				return nil, os.ErrNotExist
+			}
+			return node, nil
+		}
 		return nil, os.ErrNotExist
 	}
 
@@ -369,4 +377,39 @@ func (mfs *MemFS) pruneEmptyDirs() {
 		node.Parent.removeChild(node)
 		delete(mfs.pn.v, k)
 	}
+}
+
+//
+// refresh the tree by rescanning from the root.
+//
+func (mfs *MemFS) refresh(url string) (node *Node, err error) {
+	syspath := filepath.Join(mfs.root.SysPath, url)
+
+	_, err = os.Stat(syspath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Path exist on file system, try to refresh directory.
+	f, err := os.Open(mfs.root.SysPath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = mfs.scanDir(mfs.root, f)
+	if err != nil {
+		return nil, err
+	}
+
+	err = f.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	node = mfs.pn.Get(url)
+	if node == nil {
+		return nil, os.ErrNotExist
+	}
+
+	return node, nil
 }
