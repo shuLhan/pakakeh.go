@@ -288,8 +288,8 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 //
 // AddChild add new child to parent node.
 //
-func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (*Node, error) {
-	var err error
+func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
+	sysPath := filepath.Join(parent.SysPath, fi.Name())
 
 	if fi.Mode()&os.ModeSymlink != 0 {
 		symPath := filepath.Join(parent.SysPath, fi.Name())
@@ -304,16 +304,16 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (*Node, error) {
 		}
 	}
 
-	sysPath := filepath.Join(parent.SysPath, fi.Name())
-
 	if !mfs.isIncluded(sysPath, fi.Mode()) {
 		return nil, nil
 	}
 
-	child, err := NewNode(parent, fi, mfs.withContent)
+	child, err = NewNode(parent, fi, mfs.withContent)
 	if err != nil {
 		return nil, err
 	}
+
+	child.SysPath = sysPath
 
 	parent.Childs = append(parent.Childs, child)
 
