@@ -523,6 +523,17 @@ func (msg *Message) IsExpired() bool {
 			return true
 		}
 	}
+	for x := 0; x < len(msg.Authority); x++ {
+		if msg.Authority[x].TTL == 0 {
+			return true
+		}
+	}
+	for x := 0; x < len(msg.Additional); x++ {
+		if msg.Additional[x].TTL == 0 {
+			return true
+		}
+	}
+
 	return false
 }
 
