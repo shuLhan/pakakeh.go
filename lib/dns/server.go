@@ -51,7 +51,8 @@ import (
 //
 //	< : incoming request from client
 //	> : the answer is sent to client
-//	! : no answer found on cache and the query is not recursive
+//	! : no answer found on cache and the query is not recursive, or
+//	    response contains error code
 //	^ : request is forwarded to parent name server
 //	~ : answer exist on cache but its expired
 //	- : answer is pruned from caches
@@ -599,8 +600,9 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 	}
 
 	if res.Header.RCode != 0 {
-		log.Printf("dns: response error %s, code: %s\n",
-			res.Question, rcodeNames[res.Header.RCode])
+		log.Printf("dns: ! %s %s %d:%s\n",
+			connTypeNames[req.kind], rcodeNames[res.Header.RCode],
+			res.Header.ID, res.Question)
 		return
 	}
 
