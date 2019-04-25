@@ -691,23 +691,29 @@ func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
 }
 
 func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
-	forwarder, err := NewUDPClient(remoteAddr.String())
-	if err != nil {
-		log.Fatal("dns: failed to create UDP forwarder: " + err.Error())
-	}
-
-	for req := range srv.forwardq {
-		if debug.Value >= 1 {
-			fmt.Printf("dns: ^ UDP %d:%s\n",
-				req.message.Header.ID, req.message.Question)
-		}
-
-		res, err := forwarder.Query(req.message)
+	for {
+		forwarder, err := NewUDPClient(remoteAddr.String())
 		if err != nil {
-			log.Println("dns: failed to query UDP: " + err.Error())
-			continue
+			log.Fatal("dns: failed to create UDP forwarder: " + err.Error())
 		}
 
-		srv.processResponse(req, res, false)
+		for req := range srv.forwardq {
+			if debug.Value >= 1 {
+				fmt.Printf("dns: ^ UDP %d:%s\n",
+					req.message.Header.ID, req.message.Question)
+			}
+
+			res, err := forwarder.Query(req.message)
+			if err != nil {
+				log.Println("dns: failed to query UDP: " + err.Error())
+				break
+			}
+
+			srv.processResponse(req, res, false)
+		}
+
+		forwarder.Close()
+
+		log.Println("dns: restarting UDP forwarder for " + remoteAddr.String())
 	}
 }
