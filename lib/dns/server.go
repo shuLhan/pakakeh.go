@@ -583,9 +583,7 @@ func (srv *Server) processRequest() {
 func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 	if !isLocal {
 		if !isResponseValid(req, res) {
-			log.Printf("dns: invalid response, got %d:%s, want %d:%s\n",
-				req.message.Header.ID, req.message.Question,
-				res.Header.ID, res.Question)
+			srv.requestq <- req
 			return
 		}
 	}
