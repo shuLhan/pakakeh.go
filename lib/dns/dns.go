@@ -219,7 +219,7 @@ const (
 // rcodeNames contains mapping of response code with their human readable
 // names.
 //
-var rcodeNames = map[ResponseCode]string{
+var rcodeNames = map[ResponseCode]string{ //nolint: gochecknoglobals
 	RCodeOK:             "OK",
 	RCodeErrFormat:      "ERR_FORMAT",
 	RCodeErrServer:      "ERR_SERVER",
