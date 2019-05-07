@@ -56,7 +56,8 @@ type MemFS struct {
 func New(includes, excludes []string, withContent bool) (*MemFS, error) {
 	if !Development && GeneratedPathNode != nil {
 		mfs := &MemFS{
-			pn: GeneratedPathNode,
+			pn:   GeneratedPathNode,
+			root: GeneratedPathNode.Get("/"),
 		}
 		return mfs, nil
 	}
