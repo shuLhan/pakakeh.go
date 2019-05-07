@@ -20,7 +20,6 @@ const (
 	testDomain          = "mail.kilabit.local"
 	testPassword        = "secret"
 	testTLSAddress      = "127.0.0.1:2533"
-	testSMTPAddress     = "smtp://" + testAddress
 	testSMTPSAddress    = "smtps://" + testTLSAddress
 	testFileCertificate = "testdata/" + testDomain + ".cert.pem"
 	testFilePrivateKey  = "testdata/" + testDomain + ".key.pem"
