@@ -33,12 +33,15 @@ func (mfs *MemFS) GoGenerate(pkgName, out string) (err error) {
 		return fmt.Errorf("memfs: GoGenerate: " + err.Error())
 	}
 
+	names := mfs.ListNames()
+
 	err = tmpl.ExecuteTemplate(f, "HEADER", pkgName)
 	if err != nil {
 		goto fail
 	}
 
-	for _, node := range mfs.pn.v {
+	for x := 0; x < len(names); x++ {
+		node := mfs.pn.v[names[x]]
 		err = tmpl.ExecuteTemplate(f, "GENERATE_NODE", node)
 		if err != nil {
 			goto fail
