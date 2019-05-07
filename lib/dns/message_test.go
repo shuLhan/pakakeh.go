@@ -923,6 +923,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	}
 }
 
+//nolint:dupl
 func TestMessageSetQuery(t *testing.T) {
 	msgQuery := &Message{
 		Header: &SectionHeader{
@@ -966,6 +967,7 @@ func TestMessageSetQuery(t *testing.T) {
 	}
 }
 
+//nolint:dupl
 func TestMessageSetRecursionDesired(t *testing.T) {
 	msgQuery := &Message{
 		Header: &SectionHeader{

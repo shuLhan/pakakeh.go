@@ -349,6 +349,7 @@ VAXA    A       10.2.0.27
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
+		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
@@ -622,6 +623,7 @@ relay IN CNAME relay.pair.com.
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
+		//nolint: dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
@@ -748,6 +750,7 @@ angularjs.doc       A  127.0.0.1
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
+		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
@@ -820,6 +823,7 @@ func TestMasterParseTXT(t *testing.T) {
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
+		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
