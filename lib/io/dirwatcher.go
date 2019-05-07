@@ -223,7 +223,10 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 		}
 
 		// Start watching the file for modification.
-		NewWatcher(newChild.SysPath, dw.Delay, dw.Callback)
+		_, err = NewWatcher(newChild.SysPath, dw.Delay, dw.Callback)
+		if err != nil {
+			log.Println("io: NewWatcher: " + err.Error())
+		}
 	}
 }
 
