@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.8">
+<meta name="generator" content="Asciidoctor 2.0.9">
 <title>Autobahn WebSocket Testsuite Status Report</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <link rel="stylesheet" href="./asciidoctor.css">
@@ -65,13 +65,10 @@ $ wstest -m fuzzingclient</pre>
 <p>Wait for the test to complete.  After that, we can view the reports on
 "reports/index.html".</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_server_status_report">Server Status Report</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_server_reports_status">Server Reports Status</h3>
 <div class="paragraph">
-<p>Summary of autobahn testsuite that fail or missing,</p>
+<p>Summary of autobahn testsuite reports for server,</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -81,44 +78,7 @@ $ wstest -m fuzzingclient</pre>
 1.2.  Binary Messages (8/8)</p>
 </li>
 <li>
-<p>Pings/Pongs (9/11)</p>
-<div class="ulist checklist">
-<ul class="checklist">
-<li>
-<p>&#10003; 2.1</p>
-</li>
-<li>
-<p>&#10003; 2.2</p>
-</li>
-<li>
-<p>&#10003; 2.3</p>
-</li>
-<li>
-<p>&#10003; 2.4</p>
-</li>
-<li>
-<p>&#10003; 2.5</p>
-</li>
-<li>
-<p>&#10063; 2.6</p>
-</li>
-<li>
-<p>&#10003; 2.7</p>
-</li>
-<li>
-<p>&#10003; 2.8</p>
-</li>
-<li>
-<p>&#10003; 2.9</p>
-</li>
-<li>
-<p>&#10003; 2.10</p>
-</li>
-<li>
-<p>&#10063; 2.11</p>
-</li>
-</ul>
-</div>
+<p>Pings/Pongs (11/11)</p>
 </li>
 <li>
 <p>Reserved Bits (7/7)</p>
@@ -129,92 +89,15 @@ $ wstest -m fuzzingclient</pre>
 4.2.  Control Opcodes (5/5)</p>
 </li>
 <li>
-<p>Fragmentation (10/20)</p>
-<div class="ulist checklist">
-<ul class="checklist">
-<li>
-<p>&#10003; 5.1</p>
+<p>Fragmentation (20/20)</p>
 </li>
 <li>
-<p>&#10003; 5.2</p>
-</li>
-<li>
-<p>&#10003; 5.3</p>
-</li>
-<li>
-<p>&#10003; 5.4</p>
-</li>
-<li>
-<p>&#10063; 5.5</p>
-</li>
-<li>
-<p>&#10003; 5.6</p>
-</li>
-<li>
-<p>&#10003; 5.7</p>
-</li>
-<li>
-<p>&#10063; 5.8</p>
-</li>
-<li>
-<p>&#10063; 5.9</p>
-</li>
-<li>
-<p>&#10063; 5.10</p>
-</li>
-<li>
-<p>&#10003; 5.11</p>
-</li>
-<li>
-<p>&#10063; 5.12</p>
-</li>
-<li>
-<p>&#10063; 5.13</p>
-</li>
-<li>
-<p>&#10003; 5.14</p>
-</li>
-<li>
-<p>&#10063; 5.15</p>
-</li>
-<li>
-<p>&#10063; 5.16</p>
-</li>
-<li>
-<p>&#10063; 5.17</p>
-</li>
-<li>
-<p>&#10063; 5.18</p>
-</li>
-<li>
-<p>&#10003; 5.19</p>
-</li>
-<li>
-<p>&#10003; 5.20</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UTF-8 Handling  (143/145)
+<p>UTF-8 Handling  (145/145)
 6.1.  Valid UTF-8 with zero payload fragments  (3/3)
 6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
 code-points  (4/4)
 6.3.  Invalid UTF-8 differently fragmented  (2/2)
-6.4.  Fail-fast on invalid UTF-8  (2/4)</p>
-<div class="ulist checklist">
-<ul class="checklist">
-<li>
-<p>&#10063; 6.4.1</p>
-</li>
-<li>
-<p>&#10063; 6.4.2</p>
-</li>
-<li>
-<p>&#10003; 6.4.3</p>
-</li>
-<li>
-<p>&#10003; 6.4.4
+6.4.  Fail-fast on invalid UTF-8  (4/4)
 6.5.  Some valid UTF-8 sequences  (5/5)
 6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code
 points  (11/11)
@@ -236,8 +119,143 @@ points  (11/11)
 6.22.  Non-character code points (valid UTF-8)  (34/34)
 6.23.  Unicode specials (i.e. replacement char)  (7/7)</p>
 </li>
-</ul>
+<li>
+<p>Close Handling  (22/37)
+7.1.  Basic close behavior (fuzzer initiated)  (6/6)
+7.2.  -
+7.3.  Close frame structure: payload length (fuzzer initiated)  (6/6)
+7.4.  -
+7.5.  Close frame structure: payload value (fuzzer initiated)  (1/1)
+7.6.  -
+7.7.  Close frame structure: valid close codes (fuzzer initiated)  (13/13)
+7.8.  -
+7.9.  Close frame structure: invalid close codes (fuzzer initiated)  (9/9)
+7.10.  -
+7.11.  -
+7.12.  -
+7.13.  Informational close information (fuzzer initiated)  (2/2)</p>
+</li>
+<li>
+<p>(-/-)</p>
+</li>
+<li>
+<p>Limits/Performance  (54/54)
+9.1.  Text Message (increasing size)  (6/6)
+9.2.  Binary Message (increasing size)  (6/6)
+9.3.  Fragmented Text Message (fixed size, increasing fragment size)  (9/9)
+9.4.  Fragmented Binary Message (fixed size, increasing fragment size)  (9/9)
+9.5.  Text Message (fixed size, increasing chop size)  (6/6)
+9.6.  Binary Text Message (fixed size, increasing chop size)  (6/6)
+9.7.  Text Message Roundtrip Time (fixed number, increasing size)  (6/6)
+9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)</p>
+</li>
+<li>
+<p>Misc  (1/1)
+10.1.  Auto-Fragmentation  (1/1)</p>
+</li>
+<li>
+<p>(-/-)</p>
+</li>
+<li>
+<p>WebSocket Compression (different payloads)  (-/-)</p>
+</li>
+<li>
+<p>WebSocket Compression (different parameters)  (-/-)
+(excluded)</p>
+</li>
+</ol>
 </div>
+<div class="paragraph">
+<p>Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Total success cases: 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301</p>
+</div>
+<div class="paragraph">
+<p>Success Rate = 100%</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_testing_client">Testing Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First, run the autobahn test server,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cd testdata/client
+$ source ../bin/activate
+$ wstest -m fuzzingserver</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Second, run our WebSocket test client,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cd testdata/client
+$ go build .
+$ ./client</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Wait for the test to complete.  After that, open the browser at
+<a href="http://127.0.0.1:8080/test_browser.html" class="bare">http://127.0.0.1:8080/test_browser.html</a> , and click on "Update Reports
+(Manual)" to update client reports at "testdata/client/reports/index.html".</p>
+</div>
+<div class="sect2">
+<h3 id="_client_reports_status">Client Reports Status</h3>
+<div class="paragraph">
+<p>Summary of autobahn testsuite reports for client,</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Framing (14/16)
+1.1.  Text Messages (8/8)
+1.2.  Binary Messages (8/8)</p>
+</li>
+<li>
+<p>Pings/Pongs (11/11)</p>
+</li>
+<li>
+<p>Reserved Bits (7/7)</p>
+</li>
+<li>
+<p>Opcodes (10/10)
+4.1.  Non-Control Opcodes (5/5)
+4.2.  Control Opcodes (5/5)</p>
+</li>
+<li>
+<p>Fragmentation (20/20)</p>
+</li>
+<li>
+<p>UTF-8 Handling  (145/145)
+6.1.  Valid UTF-8 with zero payload fragments  (3/3)
+6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
+code-points  (4/4)
+6.3.  Invalid UTF-8 differently fragmented  (2/2)
+6.4.  Fail-fast on invalid UTF-8  (4/4)
+6.5.  Some valid UTF-8 sequences  (5/5)
+6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code
+points  (11/11)
+6.7.  First possible sequence of a certain length (4/4)
+6.8.  First possible sequence length 5/6 (invalid codepoints) (2/2)
+6.9.  Last possible sequence of a certain length (4/4)
+6.10.  Last possible sequence length 4/5/6 (invalid codepoints) (3/3)
+6.11.  Other boundary conditions  (5/5)
+6.12.  Unexpected continuation bytes  (8/8)
+6.13.  Lonely start characters  (5/5)
+6.14.  Sequences with last continuation byte missing  (10/10)
+6.15.  Concatenation of incomplete sequences  (1/1)
+6.16.  Impossible bytes  (3/3)
+6.17.  Examples of an overlong ASCII character  (5/5)
+6.18.  Maximum overlong sequences  (5/5)
+6.19.  Overlong representation of the NUL character  (5/5)
+6.20.  Single UTF-16 surrogates  (7/7)
+6.21.   Paired UTF-16 surrogates  (8/8)
+6.22.  Non-character code points (valid UTF-8)  (34/34)
+6.23.  Unicode specials (i.e. replacement char)  (7/7)</p>
 </li>
 <li>
 <p>Close Handling  (22/37)
@@ -259,7 +277,15 @@ points  (11/11)
 <p>(-/-)</p>
 </li>
 <li>
-<p>Limits/Performance  (-/-)</p>
+<p>Limits/Performance  (54/54)
+9.1.  Text Message (increasing size)  (6/6)
+9.2.  Binary Message (increasing size)  (6/6)
+9.3.  Fragmented Text Message (fixed size, increasing fragment size)  (9/9)
+9.4.  Fragmented Binary Message (fixed size, increasing fragment size)  (9/9)
+9.5.  Text Message (fixed size, increasing chop size)  (6/6)
+9.6.  Binary Text Message (fixed size, increasing chop size)  (6/6)
+9.7.  Text Message Roundtrip Time (fixed number, increasing size)  (6/6)
+9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)</p>
 </li>
 <li>
 <p>Misc  (1/1)
@@ -278,11 +304,12 @@ points  (11/11)
 </ol>
 </div>
 <div class="paragraph">
-<p>Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 1 = 247
-Total success cases: 16 +  9 + 7 + 10 + 10 + 143 + 37 + 1 = 233</p>
+<p>Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Total success cases: 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301</p>
 </div>
 <div class="paragraph">
-<p>Success Rate = 0.94</p>
+<p>Success Rate = 100%</p>
+</div>
 </div>
 </div>
 </div>
@@ -297,7 +324,7 @@ Total success cases: 16 +  9 + 7 + 10 + 10 + 143 + 37 + 1 = 233</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-03-11 05:57:21 +0700
+Last updated 2019-04-04 13:49:10 +0700
 </div>
 </div>
 </body>
