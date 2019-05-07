@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -61,7 +62,8 @@ func TestDirWatcher(t *testing.T) {
 		path:  filepath.Join(dir, "/assets/new"),
 	}}
 
-	x := 0
+	var x int32
+
 	dw := &DirWatcher{
 		Path:  dir,
 		Delay: 150 * time.Millisecond,
@@ -73,13 +75,14 @@ func TestDirWatcher(t *testing.T) {
 			`.*\.html$`,
 		},
 		Callback: func(ns *NodeState) {
-			if exps[x].path != ns.Node.Path {
+			localx := atomic.LoadInt32(&x)
+			if exps[localx].path != ns.Node.Path {
 				log.Fatalf("TestDirWatcher got node path %q, want %q\n", ns.Node.Path, exps[x].path)
 			}
-			if exps[x].state != ns.State {
+			if exps[localx].state != ns.State {
 				log.Fatalf("TestDirWatcher got state %d, want %d\n", ns.State, exps[x].state)
 			}
-			x++
+			atomic.AddInt32(&x, 1)
 			wg.Done()
 		},
 	}
