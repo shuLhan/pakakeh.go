@@ -625,12 +625,12 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 func (srv *Server) runForwarders() {
 	nforwarders := 0
 	for x := 0; x < len(srv.opts.udpServers); x++ {
-		go srv.runUDPForwarder(srv.opts.udpServers[x])
+		go srv.runUDPForwarder(srv.opts.udpServers[x].String())
 		nforwarders++
 	}
 
 	for x := 0; x < len(srv.opts.tcpServers); x++ {
-		go srv.runTCPForwarder(srv.opts.tcpServers[x])
+		go srv.runTCPForwarder(srv.opts.tcpServers[x].String())
 		nforwarders++
 	}
 
@@ -666,14 +666,14 @@ func (srv *Server) runDohForwarder(nameserver string) {
 	}
 }
 
-func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
+func (srv *Server) runTCPForwarder(remoteAddr string) {
 	for req := range srv.forwardq {
 		if debug.Value >= 1 {
 			fmt.Printf("dns: ^ TCP %d:%s\n",
 				req.message.Header.ID, req.message.Question)
 		}
 
-		cl, err := NewTCPClient(remoteAddr.String())
+		cl, err := NewTCPClient(remoteAddr)
 		if err != nil {
 			log.Println("dns: failed to create TCP client: " + err.Error())
 			continue
@@ -690,9 +690,9 @@ func (srv *Server) runTCPForwarder(remoteAddr *net.TCPAddr) {
 	}
 }
 
-func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
+func (srv *Server) runUDPForwarder(remoteAddr string) {
 	for {
-		forwarder, err := NewUDPClient(remoteAddr.String())
+		forwarder, err := NewUDPClient(remoteAddr)
 		if err != nil {
 			log.Fatal("dns: failed to create UDP forwarder: " + err.Error())
 		}
@@ -714,6 +714,6 @@ func (srv *Server) runUDPForwarder(remoteAddr *net.UDPAddr) {
 
 		forwarder.Close()
 
-		log.Println("dns: restarting UDP forwarder for " + remoteAddr.String())
+		log.Println("dns: restarting UDP forwarder for " + remoteAddr)
 	}
 }
