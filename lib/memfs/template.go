@@ -6,7 +6,6 @@ package memfs
 
 import (
 	"fmt"
-	"os"
 	"text/template"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -31,15 +30,12 @@ func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
 		ContentType: "{{.ContentType}}",
 		Mode:        {{printf "%d" .Mode}},
 		Size:        {{.Size}},
-{{- if isdir .Mode }}
-		V:           []byte{},
-	}
-{{- else }}
+{{- if .V }}
 		V: []byte{
 			{{range $x, $c := .V}}{{ if maxline $x }}{{ printf "\n\t\t\t" }}{{else if $x}} {{end}}{{ printf "%d," $c }}{{end}}
 		},
+{{- end }}
 	}
-{{ end }}
 	memfs.GeneratedPathNode.Set("{{.Path}}", node)
 	return node
 }
@@ -62,9 +58,6 @@ func init() {
 				return true
 			}
 			return false
-		},
-		"isdir": func(fm os.FileMode) bool {
-			return fm.IsDir()
 		},
 	}
 
