@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 )
 
 var (
@@ -118,32 +119,22 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
-	if len(mfs.pn.v) > 0 {
-		paths = make([]string, 0, len(mfs.pn.v))
+	paths = make([]string, 0, len(mfs.pn.f)+len(mfs.pn.v))
+
+	for k := range mfs.pn.f {
+		paths = append(paths, k)
 	}
 
 	for k := range mfs.pn.v {
-		if len(paths) == 0 {
+		_, ok := mfs.pn.f[k]
+		if !ok {
 			paths = append(paths, k)
-			continue
-		}
-
-		x := 0
-		for ; x < len(paths); x++ {
-			if k > paths[x] {
-				continue
-			}
-			break
-		}
-		if x == len(paths) {
-			paths = append(paths, k)
-		} else {
-			paths = append(paths, k)
-			copy(paths[x+1:], paths[x:])
-			paths[x] = k
 		}
 	}
-	return
+
+	sort.Strings(paths)
+
+	return paths
 }
 
 //

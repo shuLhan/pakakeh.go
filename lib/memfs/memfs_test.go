@@ -109,8 +109,9 @@ func TestMount(t *testing.T) {
 		expErr     string
 		expMapKeys []string
 	}{{
-		desc:   "With empty dir",
-		expErr: "open : no such file or directory",
+		desc:       "With empty dir",
+		expErr:     "open : no such file or directory",
+		expMapKeys: make([]string, 0, 0),
 	}, {
 		desc:   "With file",
 		dir:    filepath.Join(_testWD, "testdata/index.html"),
