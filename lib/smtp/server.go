@@ -264,7 +264,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // 
 		err = srv.handleAUTH(recv, cmd)
 
 	case CommandDATA:
-		err = srv.handleDATA(recv, cmd)
+		err = srv.handleDATA(recv)
 
 	case CommandEHLO:
 		err = srv.handleEHLO(recv, cmd)
@@ -397,7 +397,7 @@ func (srv *Server) handleAUTH(recv *receiver, cmd *Command) (err error) {
 	return nil
 }
 
-func (srv *Server) handleDATA(recv *receiver, cmd *Command) (err error) {
+func (srv *Server) handleDATA(recv *receiver) (err error) {
 	if !recv.isAuthenticated() {
 		err = recv.sendError(errNotAuthenticated)
 		if err != nil {
