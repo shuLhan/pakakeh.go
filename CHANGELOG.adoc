@@ -4,7 +4,7 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
-==  share v0.6.0 (2019-05-xx)
+==  share v0.6.0 (2019-05-07)
 
 This release bring major changes on dns package.
 Most notable changes are adding caches and query forwarding (recursion), and
@@ -13,7 +13,7 @@ removing the server handler.
 
 ===  Breaking Changes
 
-* `dns`:
+*  `dns`:
 **  refactor server to use Start(), Wait(), and Stop()
 **  use direct certificate instance on ServerOptions
 **  rename Send to Write, and change the parameter type to slice of byte
@@ -25,17 +25,38 @@ removing the server handler.
 **  unexport all fields from UDP and TCP clients
 **  remove TCPPort on ServerOptions
 
+*  `http`:
+**  change server initialization using options
+
+*  `io`:
+**  simplify Watcher to use callback instead of channel
+
+*  `memfs`:
+**  refactoring go generate file to use type from memfs
+
 ===  New Features
 
-* `crypto`: new package that provide a wrapper for standard crypto
+*  `crypto`: new package that provide a wrapper for standard crypto library
 
-* `dns`:
+*  `dns`:
 **  add caches to server
 **  add method to set AA, Query, RD, RCode on Message
 **  add mapping of response code to human readable names
 **  implement recursion, forwarding request to parent name servers
+**  check for zero TTL on authorities and additionals RR on IsExpired
 
-* `smtp`: add field DKIMOptions to Domain
+*  `io`:
+**  implement naive directory change notification, DirWatcher
+
+*  `memfs`:
+**  add parameter to make reading file content become optional
+**  add method to unmount directory
+**  add method to check if memfs contains mounted directory
+**  add method to update node content and information
+**  export the method to add new child
+**  add method to remove child from any node
+
+*  `smtp`: add field DKIMOptions to Domain
 
 ===  Bug Fixes
 
@@ -43,6 +64,17 @@ removing the server handler.
 **  fix data race issue when running test
 **  set the TTL offset when packing resource record
 **  fix parsing TXT from zone file
+
+*  `http`:
+**  allow serving directory with slash
+
+*  `memfs`:
+**  fix possible invalid system path on file with symbolic link
+**  refresh the directory tree in Development mode if page not found
+
+===  Documentation
+
+*  add documentation for Sender Policy Framework (RFC 7208)
 
 
 ==  share v0.5.0 (2019-04-02)

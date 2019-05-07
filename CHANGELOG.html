@@ -15,11 +15,12 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_share_v0_6_0_2019_05_xx">share v0.6.0 (2019-05-xx)</a>
+<li><a href="#_share_v0_6_0_2019_05_07">share v0.6.0 (2019-05-07)</a>
 <ul class="sectlevel2">
 <li><a href="#_breaking_changes">Breaking Changes</a></li>
 <li><a href="#_new_features">New Features</a></li>
 <li><a href="#_bug_fixes">Bug Fixes</a></li>
+<li><a href="#_documentation">Documentation</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_5_0_2019_04_02">share v0.5.0 (2019-04-02)</a>
@@ -62,7 +63,7 @@ first week of next month.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_share_v0_6_0_2019_05_xx">share v0.6.0 (2019-05-xx)</h2>
+<h2 id="_share_v0_6_0_2019_05_07">share v0.6.0 (2019-05-07)</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This release bring major changes on dns package.
@@ -110,6 +111,36 @@ removing the server handler.</p>
 </ul>
 </div>
 </li>
+<li>
+<p><code>http</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>change server initialization using options</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>io</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>simplify Watcher to use callback instead of channel</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>memfs</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>refactoring go generate file to use type from memfs</p>
+</li>
+</ul>
+</div>
+</li>
 </ul>
 </div>
 </div>
@@ -118,7 +149,7 @@ removing the server handler.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>crypto</code>: new package that provide a wrapper for standard crypto</p>
+<p><code>crypto</code>: new package that provide a wrapper for standard crypto library</p>
 </li>
 <li>
 <p><code>dns</code>:</p>
@@ -135,6 +166,44 @@ removing the server handler.</p>
 </li>
 <li>
 <p>implement recursion, forwarding request to parent name servers</p>
+</li>
+<li>
+<p>check for zero TTL on authorities and additionals RR on IsExpired</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>io</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>implement naive directory change notification, DirWatcher</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>memfs</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>add parameter to make reading file content become optional</p>
+</li>
+<li>
+<p>add method to unmount directory</p>
+</li>
+<li>
+<p>add method to check if memfs contains mounted directory</p>
+</li>
+<li>
+<p>add method to update node content and information</p>
+</li>
+<li>
+<p>export the method to add new child</p>
+</li>
+<li>
+<p>add method to remove child from any node</p>
 </li>
 </ul>
 </div>
@@ -164,6 +233,39 @@ removing the server handler.</p>
 </li>
 </ul>
 </div>
+</li>
+<li>
+<p><code>http</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>allow serving directory with slash</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>memfs</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>fix possible invalid system path on file with symbolic link</p>
+</li>
+<li>
+<p>refresh the directory tree in Development mode if page not found</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_documentation">Documentation</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>add documentation for Sender Policy Framework (RFC 7208)</p>
 </li>
 </ul>
 </div>
@@ -544,7 +646,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-04-12 18:35:37 +0700
+Last updated 2019-05-07 19:29:56 +0700
 </div>
 </div>
 </body>
