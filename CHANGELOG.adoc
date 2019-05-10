@@ -4,6 +4,15 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+==  share v0.6.1 (2019-05-11)
+
+*  `memfs`:
+**  fix empty list names from MemFS created from GeneratedPathNode
+**  set root if GeneratedPathNode is not empty
+**  sort the generated file names
+**  fix template when generating empty content
+
+
 ==  share v0.6.0 (2019-05-07)
 
 This release bring major changes on dns package.
