@@ -219,6 +219,8 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 
 		if newChild.Mode.IsDir() {
 			dw.dirs[newChild.Path] = newChild
+			dw.mapSubdirs(newChild)
+			dw.onContentChange(newChild)
 			continue
 		}
 
