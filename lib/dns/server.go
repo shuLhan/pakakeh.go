@@ -568,6 +568,7 @@ func (srv *Server) processRequest() {
 			}
 
 			an.msg.SetID(req.message.Header.ID)
+			an.updateTTL()
 			res = an.msg
 
 			if debug.Value >= 1 {

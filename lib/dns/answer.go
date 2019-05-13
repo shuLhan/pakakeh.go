@@ -75,11 +75,7 @@ func (an *answer) clear() {
 // based on received time.
 //
 func (an *answer) get() (packet []byte) {
-	if an.receivedAt > 0 {
-		an.accessedAt = time.Now().Unix()
-		ttl := uint32(an.accessedAt - an.receivedAt)
-		an.msg.SubTTL(ttl)
-	}
+	an.updateTTL()
 
 	packet = make([]byte, len(an.msg.Packet))
 	copy(packet, an.msg.Packet)
@@ -101,4 +97,17 @@ func (an *answer) update(nu *answer) {
 
 	an.msg = nu.msg
 	nu.msg = nil
+}
+
+//
+// updateTTL decrease the answer TTLs based on time when message received.
+//
+func (an *answer) updateTTL() {
+	if an.receivedAt == 0 {
+		return
+	}
+
+	an.accessedAt = time.Now().Unix()
+	ttl := uint32(an.accessedAt - an.receivedAt)
+	an.msg.SubTTL(ttl)
 }
