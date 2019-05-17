@@ -1,6 +1,9 @@
 package net
 
 import (
+	"net"
+	"strings"
+
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
@@ -43,4 +46,40 @@ func IsHostnameValid(hname []byte, isFQDN bool) bool {
 		return false
 	}
 	return true
+}
+
+//
+// IsIPv4 will return true if string representation of IP contains three dots,
+// for example "127.0.0.1".
+//
+func IsIPv4(ip net.IP) bool {
+	if ip == nil {
+		return false
+	}
+	sip := ip.String()
+	if len(sip) == 0 {
+		return false
+	}
+	if strings.Count(sip, ".") == 3 {
+		return true
+	}
+	return false
+}
+
+//
+// IsIPv6 will return true if string representation of IP contains two or more
+// colons ":", for example, "::1".
+//
+func IsIPv6(ip net.IP) bool {
+	if ip == nil {
+		return false
+	}
+	sip := ip.String()
+	if len(sip) == 0 {
+		return false
+	}
+	if strings.Count(sip, ":") >= 2 {
+		return true
+	}
+	return false
 }

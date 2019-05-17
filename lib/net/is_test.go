@@ -1,6 +1,7 @@
 package net
 
 import (
+	"net"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -53,5 +54,49 @@ func TestIsHostnameValid(t *testing.T) {
 		got := IsHostnameValid(c.in, c.isFQDN)
 
 		test.Assert(t, "IsHostnameValid", c.exp, got, true)
+	}
+}
+
+func TestIsIPv4(t *testing.T) {
+	cases := []struct {
+		ip  string
+		exp bool
+	}{{
+		ip: "",
+	}, {
+		ip: "127.0.0",
+	}, {
+		ip:  "127.0.0.1",
+		exp: true,
+	}, {
+		ip: "127.0.0.1.",
+	}}
+
+	for _, c := range cases {
+		ip := net.ParseIP(c.ip)
+		got := IsIPv4(ip)
+		test.Assert(t, "IsIPv4: "+c.ip, c.exp, got, true)
+	}
+}
+
+func TestIsIPv6(t *testing.T) {
+	cases := []struct {
+		ip  string
+		exp bool
+	}{{
+		ip: "",
+	}, {
+		ip: "127.0.0.1:50",
+	}, {
+		ip: ":1",
+	}, {
+		ip:  "::1",
+		exp: true,
+	}}
+
+	for _, c := range cases {
+		ip := net.ParseIP(c.ip)
+		got := IsIPv6(ip)
+		test.Assert(t, "IsIPv4", c.exp, got, true)
 	}
 }
