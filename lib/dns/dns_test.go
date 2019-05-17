@@ -25,7 +25,7 @@ var (
 func TestMain(m *testing.M) {
 	var err error
 
-	log.SetFlags(log.Lmicroseconds)
+	log.SetFlags(0)
 
 	cert, err := tls.LoadX509KeyPair("testdata/domain.crt", "testdata/domain.key")
 	if err != nil {
