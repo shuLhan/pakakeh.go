@@ -218,7 +218,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	node, e = srv.mfs.Get(reqPath)
 	if e != nil {
 		if e != os.ErrNotExist {
-			log.Println("http: getFSNode: " + e.Error())
+			log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
 			return nil
 		}
 
@@ -226,7 +226,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 		node, e = srv.mfs.Get(reqPath)
 		if e != nil {
-			log.Println("http: getFSNode: " + e.Error())
+			log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
 			return nil
 		}
 	}
