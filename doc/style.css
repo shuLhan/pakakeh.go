@@ -1,0 +1,188 @@
+body {
+	margin: 0;
+	font-family: sans-serif;
+	background-color: #fff;
+	line-height: 1.3;
+	color: black;
+}
+a {
+	text-decoration: none;
+	color: #375eab;
+}
+pre,
+code {
+	font-family: Menlo, monospace;
+	font-size: 0.875rem;
+}
+pre {
+	line-height: 1.4;
+	overflow-x: auto;
+	background: #efefef;
+	padding: 0.625rem;
+	border-radius: 0.3125rem;
+}
+p,
+li {
+	max-width: 50rem;
+	word-wrap: break-word;
+}
+p,
+pre,
+ul,
+ol {
+	margin: 1.25rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	margin: 1.25rem 0 1.25rem;
+	padding: 0;
+	color: #375eab;
+	font-weight: bold;
+}
+h1 {
+	font-size: 1.75rem;
+	line-height: 1;
+}
+h1 .text-muted {
+	color: #777;
+}
+h2 {
+	clear: right;
+	font-size: 1.25rem;
+	background: #e0ebf5;
+	padding: 0.5rem;
+	line-height: 1.25;
+	font-weight: normal;
+	overflow: auto;
+	overflow-wrap: break-word;
+}
+h2 a {
+	font-weight: bold;
+}
+h3 {
+	font-size: 1.25rem;
+	line-height: 1.25;
+	overflow: auto;
+	overflow-wrap: break-word;
+}
+h3,
+h4 {
+	margin: 1.25rem 0.3125rem;
+}
+h4 {
+	font-size: 1rem;
+}
+
+h2 > span,
+h3 > span {
+	float: right;
+	margin: 0 25px 0 0;
+	font-weight: normal;
+	color: #5279c7;
+}
+
+dl {
+	margin: 1.25rem;
+}
+dd {
+	margin: 0 0 0 1.25rem;
+}
+dl,
+dd {
+	font-size: 0.875rem;
+}
+
+/**
+ * Custom classes for pages
+ */
+
+.topbar {
+	background: #e0ebf5;
+	height: 4rem;
+	overflow: hidden;
+}
+
+.topbar .top-heading,
+.topbar .menu {
+	padding: 1.313rem 0;
+	font-size: 1.25rem;
+	font-weight: normal;
+}
+
+.topbar .top-heading {
+	float: left;
+}
+.topbar .top-heading a {
+	color: #222;
+}
+
+.topbar .menu {
+	float: right;
+}
+.topbar .menu a {
+	margin: 0.625rem 0.125rem;
+	padding: 0.625rem;
+	color: white;
+	background: #375eab;
+	border: 0.0625rem solid #375eab;
+	border-radius: 5px;
+}
+
+/** Custom classes for asciidoc */
+.article {
+	padding: 0px 1.25em;
+}
+#toctitle {
+	display: none;
+}
+#toc {
+	margin: 0px;
+	padding: 0px;
+}
+#toc li {
+	list-style: none;
+}
+#toc ul .sectlevel1 {
+	padding: 0px;
+	margin: 4px;
+}
+#toc ul .sectlevel2 {
+	margin: 4px;
+}
+
+h1 a.anchor,
+h2 a.anchor,
+h3 a.anchor,
+h4 a.anchor,
+h5 a.anchor,
+h6 a.anchor {
+	visibility: hidden;
+	color: #375eab;
+}
+
+h1 a.anchor:before,
+h2 a.anchor:before,
+h3 a.anchor:before,
+h4 a.anchor:before,
+h5 a.anchor:before,
+h6 a.anchor:before {
+	content: "¶ ";
+}
+
+h1:hover > a.anchor,
+h2:hover > a.anchor,
+h3:hover > a.anchor,
+h4:hover > a.anchor,
+h5:hover > a.anchor,
+h6:hover > a.anchor {
+	visibility: visible;
+}
+
+@media screen and (max-width: 992px) {
+	#toc {
+		all: unset;
+	}
+}

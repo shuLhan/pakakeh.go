@@ -2,8 +2,7 @@
 :author: Shulhan
 :email: <ms@kilabit.info>
 :toc:
-:sectnums:
-:stylesheet: doc/solarized.css
+:stylesheet: doc/style.css
 :url-gocard: https://goreportcard.com/report/github.com/shuLhan/share
 :url-godoc: https://godoc.org/github.com/shuLhan/share
 :url-github-master: https://github.com/shuLhan/share/tree/master
@@ -178,17 +177,21 @@ NOTE: The links below is used to be viewed locally, not through Github.
 
 *  link:doc/SPF.html[Sender Policy Framework version 1 (RFC 7208)]
 
-*Development*
+
+===  Development
 
 The documentation created using asciidoctor.  First, install `ruby` and
 `bundler`, and then execute `bundler` on source root directory.
 
 During development of documentation execute,
 
-       $ bundler exec guard -i
+----
+$ bundler exec guard -i
+----
 
 to watch changes on documentation files (".adoc") and regenerate the HTML
 files.
+
 
 ==  Credits
 

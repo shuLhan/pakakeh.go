@@ -7,7 +7,7 @@
 <meta name="generator" content="Asciidoctor 2.0.9">
 <meta name="author" content="Shulhan">
 <title>import github/shuLhan/share</title>
-<link rel="stylesheet" href="./doc/solarized.css">
+<link rel="stylesheet" href="./doc/style.css">
 </head>
 <body class="article">
 <div id="header">
@@ -19,11 +19,15 @@
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_command_line_interface">1. Command Line Interface</a></li>
-<li><a href="#_libraries">2. Libraries</a></li>
-<li><a href="#_changelog">3. Changelog</a></li>
-<li><a href="#_documentations">4. Documentations</a></li>
-<li><a href="#_credits">5. Credits</a></li>
+<li><a href="#_command_line_interface">Command Line Interface</a></li>
+<li><a href="#_libraries">Libraries</a></li>
+<li><a href="#_changelog">Changelog</a></li>
+<li><a href="#_documentations">Documentations</a>
+<ul class="sectlevel2">
+<li><a href="#_development">Development</a></li>
+</ul>
+</li>
+<li><a href="#_credits">Credits</a></li>
 </ul>
 </div>
 </div>
@@ -40,7 +44,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_command_line_interface">1. Command Line Interface</h2>
+<h2 id="_command_line_interface">Command Line Interface</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -53,7 +57,7 @@ multilines "/*\*/" comment into single line "//" format.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_libraries">2. Libraries</h2>
+<h2 id="_libraries">Libraries</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -228,7 +232,7 @@ reports</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_changelog">3. Changelog</h2>
+<h2 id="_changelog">Changelog</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="CHANGELOG.adoc" class="bare">CHANGELOG.adoc</a></p>
@@ -236,7 +240,7 @@ reports</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_documentations">4. Documentations</h2>
+<h2 id="_documentations">Documentations</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Beside <a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>, that provides documentation for API in packages,
@@ -327,9 +331,8 @@ Transport Layer Security (RFC3207)</a></p>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p><strong>Development</strong></p>
-</div>
+<div class="sect2">
+<h3 id="_development">Development</h3>
 <div class="paragraph">
 <p>The documentation created using asciidoctor.  First, install <code>ruby</code> and
 <code>bundler</code>, and then execute <code>bundler</code> on source root directory.</p>
@@ -337,7 +340,7 @@ Transport Layer Security (RFC3207)</a></p>
 <div class="paragraph">
 <p>During development of documentation execute,</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
 <pre>$ bundler exec guard -i</pre>
 </div>
@@ -348,8 +351,9 @@ files.</p>
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_credits">5. Credits</h2>
+<h2 id="_credits">Credits</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -363,7 +367,7 @@ files.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-05-07 19:36:23 +0700
+Last updated 2019-05-18 01:23:21 +0700
 </div>
 </div>
 </body>

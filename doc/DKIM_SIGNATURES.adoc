@@ -3,7 +3,7 @@
 :email: <ms@kilabit.info>
 :toc:
 :sectnums:
-:stylesheet: solarized.css
+:stylesheet: style.css
 :url-rfc4685: https://tools.ietf.org/html/rfc4685
 :url-rfc5585: https://tools.ietf.org/html/rfc5585
 :url-rfc5863: https://tools.ietf.org/html/rfc5863

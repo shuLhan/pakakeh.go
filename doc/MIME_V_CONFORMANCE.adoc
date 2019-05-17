@@ -3,7 +3,7 @@
 :email: <ms@kilabit.info>
 :toc:
 :sectnums:
-:stylesheet: solarized.css
+:stylesheet: style.css
 :url-rfc2049: https://tools.ietf.org/html/rfc2049
 
 This document provide note and summary of RFC 2046, Multipurpose Internet Mail

@@ -4,7 +4,7 @@
 :toc: left
 :toclevels: 4
 :sectnums:
-:stylesheet: solarized.css
+:stylesheet: style.css
 :url-rfc4954: https://tools.ietf.org/html/rfc4954
 
 This document provide note and summary of RFC 4954, SMTP Service Extension for

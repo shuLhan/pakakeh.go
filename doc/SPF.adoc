@@ -3,18 +3,23 @@
 :email: <ms@kilabit.info>
 :toc:
 :sectnums:
-:stylesheet: solarized.css
+:sectanchors:
+:stylesheet: style.css
 :url-rfc7208: https://tools.ietf.org/html/rfc7208
 
-This document provide note and summary of RFC 7208, Sender Policy Framework
-(SPF) for Authorizing Use of Domains in Email, Version 1.
+This document provide note and summary of
+https://tools.ietf.org/html/rfc7208[RFC 7208],
+Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version
+1.
 The content of this document are merged with errata that are reported before
 2019-04-04.
 
+
 ==  Introduction
 
-This document defines a protocol by which ADMDs can authorize hosts to use
-their domain names in the "MAIL FROM" or "HELO" identities.
+This document defines a protocol by which ADministrative Management Domains
+(ADMD) can authorize hosts to use their domain names in the "MAIL FROM" or
+"HELO" identities.
 Compliant ADMDs publish Sender Policy Framework (SPF) records in the DNS
 specifying which hosts are permitted to use their names, and compliant mail
 receivers use the published SPF records to test the authorization of sending
@@ -105,16 +110,17 @@ of the MAIL command, and uses the MAIL FROM value and the client IP address.
 Performing the check at later times or with other input can cause problems
 such as the following:
 
--  It might be difficult to accurately extract the required information from
+*  It might be difficult to accurately extract the required information from
    potentially deceptive headers.
 
--  Legitimate email might fail the authorization check because the sender's
+*  Legitimate email might fail the authorization check because the sender's
    policy has since changed.
 
 
 ===  Results of Evaluation
 
-Moved to 4.1.
+Moved to <<#_results,section 4.2>>.
+
 
 ==  SPF Records
 
@@ -140,12 +146,15 @@ MUST be treated as if those strings are concatenated together without adding
 spaces.
 For example:
 
-        IN TXT "v=spf1 .... first" "second string..."
+----
+IN TXT "v=spf1 .... first" "second string..."
+----
 
 is equivalent to:
 
-        IN TXT "v=spf1 .... firstsecond string..."
-
+----
+IN TXT "v=spf1 .... firstsecond string..."
+----
 
 ===  Record Size
 
@@ -174,53 +183,54 @@ in order to cover all domains in use in outgoing mail.
 
 ==  The check_host() Function
 
-The check_host() function fetches SPF records, parses them, and
+The `check_host()` function fetches SPF records, parses them, and
 evaluates them to determine whether a particular host is or is not
 permitted to send mail with a given identity.
 Receiving ADMDs that perform this check MUST correctly evaluate the
-check_host() function as described here.
+`check_host()` function as described here.
 
 ===  Arguments
 
-The check_host() function takes these arguments:
+The `check_host()` function takes these arguments:
 
--  `<ip>`: the IP address of the SMTP client that is emitting the mail, either
+*  `<ip>`: the IP address of the SMTP client that is emitting the mail, either
    IPv4 or IPv6.
 
--  `<domain>`: the domain that provides the sought-after authorization
+*  `<domain>`: the domain that provides the sought-after authorization
    information; initially, the domain portion of the "MAIL FROM" or "HELO"
    identity.
 
--  `<sender>`: the "MAIL FROM" or "HELO" identity.
+*  `<sender>`: the "MAIL FROM" or "HELO" identity.
 
 ===  Results
 
 This section enumerates and briefly defines the possible outputs of
-check_host() function.
+`check_host()` function.
 
--  "none": means either (a) no syntactically valid DNS domain name was
-   extracted from the SMTP session that could be used as the one to be
-   authorized, or (b) no SPF records were retrieved from the DNS.
+*  "none": means either,
+**  no syntactically valid DNS domain name was extracted from the SMTP session
+    that could be used as the one to be authorized, or
+**  no SPF records were retrieved from the DNS. 
 
--  "neutral": means the ADMD has explicitly stated that it is not asserting
+*  "neutral": means the ADMD has explicitly stated that it is not asserting
    whether the IP address is authorized.
 
--  "pass": an explicit statement that the client is authorized to inject mail
+*  "pass": an explicit statement that the client is authorized to inject mail
    with the given identity.
 
--  "fail": an explicit statement that the client is not authorized to use the
+*  "fail": an explicit statement that the client is not authorized to use the
    domain in the given identity.
 
--  "softfail": a weak statement by the publishing ADMD that the host is
+*  "softfail": a weak statement by the publishing ADMD that the host is
    probably not authorized.
    It has not published a stronger, more definitive policy that results in a
    "fail".
 
--  "temperror":  the SPF verifier encountered a transient (generally DNS)
+*  "temperror":  the SPF verifier encountered a transient (generally DNS)
    error while performing the check.
    A later retry may succeed without further DNS operator action.
 
--  "permerror":  the domain's published records could not be correctly
+*  "permerror":  the domain's published records could not be correctly
    interpreted.
    This signals an error condition that definitely requires DNS operator
    intervention to be resolved.
@@ -241,41 +251,48 @@ A DNS query needs to be made for the <domain> name, querying for type TXT
 only.
 
 If the DNS lookup returns a server failure (RCODE 2) or some other error
-(RCODE other than 0 or 3), or if the lookup times out, then check_host()
+(RCODE other than 0 or 3), or if the lookup times out, then `check_host()`
 terminates immediately with the result "temperror".
 
 ===  Selecting Records
 
 Records begin with a version section:
 
-        record           = version terms *SP
-        version          = "v=spf1"
+----
+record   = version terms *SP
+version  = "v=spf1"
+----
 
-If the resultant record set includes no records, check_host() produces the
+If the resultant record set includes no records, `check_host()` produces the
 "none" result.
-If the resultant record set includes more than one record, check_host()
+If the resultant record set includes more than one record, `check_host()`
 produces the "permerror" result.
 
 ===  Record Evaluation
 
-The check_host() function parses and interprets the SPF record to find a
+The `check_host()` function parses and interprets the SPF record to find a
 result for the current test.
+if there are any syntax errors anywhere in the record, `check_host()` returns
+immediately with the result "permerror", without further interpretation or
+evaluation.
 
 ====  Term Evaluation
 
 There are two types of terms: mechanisms and modifiers.
 
-        terms            = *( 1*SP ( directive / modifier ) )
+----
+terms            = *( 1*SP ( directive / modifier ) )
 
-        directive        = [ qualifier ] mechanism
-        qualifier        = "+" / "-" / "?" / "~"
-        mechanism        = ( all / include
-                             / a / mx / ptr / ip4 / ip6 / exists )
-        modifier         = redirect / explanation / unknown-modifier
-        unknown-modifier = name "=" macro-string
-                         ; where name is not any known modifier
+directive        = [ qualifier ] mechanism
+qualifier        = "+" / "-" / "?" / "~"
+mechanism        = ( all / include
+                   / a / mx / ptr / ip4 / ip6 / exists )
+modifier         = redirect / explanation / unknown-modifier
+unknown-modifier = name "=" macro-string
+                 ; where name is not any known modifier
 
-        name             = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
+name             = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
+----
 
 Most mechanisms allow a ":" or "/" character after the name.
 
@@ -300,13 +317,15 @@ If it does not match, processing continues with the next mechanism.
 If it returns an exception, mechanism processing ends and the exception value
 is returned.
 
-The possible qualifiers, and the results they cause check_host() to return,
+The possible qualifiers, and the results they cause `check_host()` to return,
 are as follows:
 
-        "+" pass
-        "-" fail
-        "~" softfail
-        "?" neutral
+----
+"+" pass
+"-" fail
+"~" softfail
+"?" neutral
+----
 
 The qualifier is optional and defaults to "+".
 
@@ -326,18 +345,17 @@ evaluated.
 
 ====  DNS Lookup Limits
 
-*  The following terms cause DNS queries: the "include", "a", "mx", "ptr", and
-   "exists" mechanisms, and the "redirect" modifier.
+The following terms cause DNS queries: the "include", "a", "mx", "ptr", and
+"exists" mechanisms, and the "redirect" modifier.
 
-*  SPF implementations MUST limit the total number of those terms to 10 during
-   SPF evaluation, to avoid unreasonable load on the DNS.
+SPF implementations MUST limit the total number of those terms to 10 during
+SPF evaluation, to avoid unreasonable load on the DNS.
+If this limit is exceeded, the implementation MUST return "permerror".
 
-*  If this limit is exceeded, the implementation MUST return "permerror".
-
-*  The other terms -- the "all", "ip4", and "ip6" mechanisms, and the "exp"
-   modifier -- do not cause DNS queries at the time of SPF evaluation (the
-   "exp" modifier only causes a lookup at a later time), and their use is not
-   subject to this limit.
+The other terms -- the "all", "ip4", and "ip6" mechanisms, and the "exp"
+modifier -- do not cause DNS queries at the time of SPF evaluation (the
+"exp" modifier only causes a lookup at a later time), and their use is not
+subject to this limit.
 
 When evaluating the "mx" mechanism, the number of "MX" resource records
 queried is included in the overall limit of 10 mechanisms/modifiers that
@@ -357,7 +375,7 @@ records.
 If this limit is exceeded, all records other than the first 10 MUST be
 ignored.
 
-The check_host() elapsed time SHOULD have limited to least 20 seconds.
+The `check_host()` elapsed time SHOULD have limited to least 20 seconds.
 If such a limit is exceeded, the result of authorization SHOULD be
 "temperror".
 
@@ -383,12 +401,15 @@ It is better to use either a "redirect" modifier or an "all" mechanism to
 explicitly terminate processing.
 For example:
 
-        v=spf1 +mx -all
+----
+v=spf1 +mx -all
+----
 
 or
 
-        v=spf1 +mx redirect=_spf.example.com
-
+----
+v=spf1 +mx redirect=_spf.example.com
+----
 
 ===  Domain Specification
 
@@ -421,19 +442,23 @@ Basic mechanisms contribute to the language framework.
 They do not specify a particular type of authorization scheme.
 The basic mechanisms are as follows:
 
-        all
-        include
+----
+all
+include
+----
 
 Designated sender mechanisms are used to identify a set of <ip> addresses as
 being permitted or not permitted to use the <domain> for sending mail.
 The designated sender mechanisms are as follows:
 
-        a
-        mx
-        ptr (do not use)
-        ip4
-        ip6
-        exists
+----
+a
+mx
+ptr (do not use)
+ip4
+ip6
+exists
+----
 
 The following conventions apply to all mechanisms that perform a comparison
 between <ip> and an IP address at any point:
@@ -462,62 +487,67 @@ records.
 
 ===  "all"
 
-        all              = "all"
+----
+all = "all"
+----
 
-*  The "all" mechanism is a test that always matches.
+The "all" mechanism is a test that always matches.
+It is used as the rightmost mechanism in a record to provide an explicit
+default.
+For example:
 
-*  It is used as the rightmost mechanism in a record to provide an explicit
-   default.
-   For example:
-+
-        v=spf1 a mx -all
-+
-*  Mechanisms after "all" will never be tested.
+----
+v=spf1 a mx -all
+----
 
-*  Mechanisms listed after "all" MUST be ignored.
+Mechanisms after "all" will never be tested and MUST be ignored.
 
-*  Any "redirect" modifier MUST be ignored when there is an "all" mechanism in
-   the record, regardless of the relative ordering of the terms.
+Any "redirect" modifier MUST be ignored when there is an "all" mechanism in
+the record, regardless of the relative ordering of the terms.
 
 
 ===  "include"
 
-        include          = "include"  ":" domain-spec
+----
+include = "include"  ":" domain-spec
+----
 
-The "include" mechanism triggers a recursive evaluation of check_host().
+The "include" mechanism triggers a recursive evaluation of `check_host()`.
 
-.  The <domain-spec> is expanded as per Section 7.
+.  The `<domain-spec>` is expanded as per <<_macros,section 7>>.
 
-.  check_host() is evaluated with the resulting string as the <domain>.
-   The <ip> and <sender> arguments remain the same as in the current
-   evaluation of check_host().
+.  `check_host()` is evaluated with the resulting string as the `<domain>`.
+   The `<ip>` and `<sender>` arguments remain the same as in the current
+   evaluation of `check_host()`.
 
 .  The recursive evaluation returns match, not-match, or an error.
 
 .  If it returns match, then the appropriate result for the "include"
-   mechanism is used (e.g., include or +include produces a "pass" result and
-   -include produces "fail").
+   mechanism is used (e.g., "include" or "+include" produces a "pass" result
+   and "-include" produces "fail").
 
-.  If it returns not-match or an error, the parent check_host() resumes
-   processing as per the table below, with the previous value of <domain>
+.  If it returns not-match or an error, the parent `check_host()` resumes
+   processing as per the table below, with the previous value of `<domain>`
    restored.
 
 The "include" mechanism makes it possible for one domain to designate
 multiple administratively independent domains.
 For example, a vanity domain "example.net" might send mail using the servers
-of administratively independent domains example.com and example.org.
+of administratively independent domains "example.com" and "example.org".
 
 Example.net could say
 
-        IN TXT "v=spf1 include:example.com include:example.org -all"
+----
+IN TXT "v=spf1 include:example.com include:example.org -all"
+----
 
-This would direct check_host() to, in effect, check the records of example.com
-and example.org for a "pass" result.
+This would direct `check_host()` to, in effect, check the records of
+"example.com" and "example.org" for a "pass" result.
 Only if the host were not permitted for either of those domains would the
 result be "fail".
 
 Whether this mechanism matches, does not match, or returns an exception
-depends on the result of the recursive evaluation of check_host():
+depends on the result of the recursive evaluation of `check_host()`:
 
 [cols="2*"]
 |===
@@ -533,29 +563,31 @@ depends on the result of the recursive evaluation of check_host():
 |===
 
 
-*  The "include" mechanism is intended for crossing administrative boundaries.
+The "include" mechanism is intended for crossing administrative boundaries.
 
-*  When remaining within one administrative authority, "include" is usually
-   not the best choice.
-   For example, if example.com and example.org were managed by the same
-   entity, and if the permitted set of hosts for both domains was
-   "mx:example.com", it would be possible for example.org to specify
-   "include:example.com", but it would be preferable to specify
-   "redirect=example.com" or even "mx:example.com".
+When remaining within one administrative authority, "include" is usually
+not the best choice.
+For example, if example.com and example.org were managed by the same
+entity, and if the permitted set of hosts for both domains was
+"mx:example.com", it would be possible for example.org to specify
+"include:example.com", but it would be preferable to specify
+"redirect=example.com" or even "mx:example.com".
 
-*  The "redirect" modifier is more suitable for consolidating both
-   authorizations and policy into a common set to be shared within an ADMD.
-   Redirect is much more like a common code element to be shared among records
-   in a single ADMD.
-   It is possible to control both authorized hosts and policy for an arbitrary
-   number of domains from a single record.
+The "redirect" modifier is more suitable for consolidating both authorizations
+and policy into a common set to be shared within an ADMD.
+Redirect is much more like a common code element to be shared among records
+in a single ADMD.
+It is possible to control both authorized hosts and policy for an arbitrary
+number of domains from a single record.
 
 ===  "a"
 
+----
+a = "a" [ ":" domain-spec ] [ dual-cidr-length ]
+----
+
 This mechanism matches if <ip> is one of the <target-name>'s IP addresses.
 For clarity, this means the "a" mechanism also matches AAAA records.
-
-  a                = "a"      [ ":" domain-spec ] [ dual-cidr-length ]
 
 An address lookup is done on the <target-name> using the type of lookup (A or
 AAAA) appropriate for the connection type (IPv4 or IPv6).
@@ -587,7 +619,7 @@ name.
    the implicit MX rules of [RFC5321] by querying for an A or AAAA
    record for the same name.
 
-
+[#_mechanism_ptr]
 ===  "ptr" (do not use)
 
 This mechanism tests whether the DNS reverse-mapping for <ip> exists and
@@ -984,15 +1016,17 @@ parts are rejoined using "." and not the original splitting characters.
    It is intended for humans to read.
 
 *  The "p" macro expands to the validated domain name of <ip>.
-   The procedure for finding the validated domain name is defined in Section
-   5.5.
+   The procedure for finding the validated domain name is defined in
+   <<_mechanism_ptr,Section 5.5>>.
 **  If the <domain> is present in the list of validated domains, it SHOULD be
     used.
 **  Otherwise, if a subdomain of the <domain> is present, it SHOULD be used.
 **  Otherwise, any name from the list can be used.
 **  If there are no validated domain names or if a DNS error occurs, the
     string "unknown" is used.
-**  This macro SHOULD NOT be published (see Section 5.5 for the discussion).
+**  This macro SHOULD NOT be published (see
+    <<_mechanism_ptr,Section 5.5>>
+    for the discussion).
 
 *  The "h" macro expands to the parameter that was provided to the SMTP
    server via the HELO or EHLO SMTP verb.

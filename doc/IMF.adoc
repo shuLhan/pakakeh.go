@@ -4,7 +4,7 @@
 :toc: left
 :toclevels: 4
 :sectnums:
-:stylesheet: solarized.css
+:stylesheet: style.css
 :url-rfc5322: https://tools.ietf.org/html/rfc5322
 
 This documentation provide summary and notes on implementation of Internet
