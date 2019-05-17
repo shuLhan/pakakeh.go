@@ -12,9 +12,12 @@ import (
 // Host names may contain only alphanumeric characters, minus signs ("-"),
 // underscore ("_"), and periods (".").
 //
+// If isFQDN is true, the hostname must at least contains two labels;
+// otherwise it will be invalid.
+//
 // See rfc952 and rfc1123.
 //
-func IsHostnameValid(hname []byte) bool {
+func IsHostnameValid(hname []byte, isFQDN bool) bool {
 	n := len(hname)
 	if n == 0 {
 		return false
@@ -25,13 +28,18 @@ func IsHostnameValid(hname []byte) bool {
 	if !libbytes.IsAlnum(hname[n-1]) {
 		return false
 	}
+	var ndot int
 	for x := 1; x < n-1; x++ {
-		if hname[x] == '-' || hname[x] == '_' || hname[x] == '.' {
+		if hname[x] == '.' {
+			ndot++
 			continue
 		}
-		if libbytes.IsAlnum(hname[x]) {
+		if hname[x] == '-' || hname[x] == '_' || libbytes.IsAlnum(hname[x]) {
 			continue
 		}
+		return false
+	}
+	if isFQDN && ndot == 0 {
 		return false
 	}
 	return true

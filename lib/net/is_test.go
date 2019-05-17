@@ -8,8 +8,9 @@ import (
 
 func TestIsHostnameValid(t *testing.T) {
 	cases := []struct {
-		in  []byte
-		exp bool
+		in     []byte
+		isFQDN bool
+		exp    bool
 	}{{
 		in: []byte(""),
 	}, {
@@ -36,12 +37,20 @@ func TestIsHostnameValid(t *testing.T) {
 	}, {
 		in:  []byte("a.1"),
 		exp: true,
+	}, {
+		in:     []byte("a"),
+		isFQDN: true,
+		exp:    false,
+	}, {
+		in:     []byte("a.b"),
+		isFQDN: true,
+		exp:    true,
 	}}
 
 	for _, c := range cases {
-		t.Log("input: ", c.in)
+		t.Logf("input: %s", c.in)
 
-		got := IsHostnameValid(c.in)
+		got := IsHostnameValid(c.in, c.isFQDN)
 
 		test.Assert(t, "IsHostnameValid", c.exp, got, true)
 	}

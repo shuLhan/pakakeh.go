@@ -46,7 +46,7 @@ func HostsLoad(path string) (msgs []*Message, err error) {
 }
 
 func newMessage(addr, hname []byte) *Message {
-	if !libnet.IsHostnameValid(hname) {
+	if !libnet.IsHostnameValid(hname, false) {
 		return nil
 	}
 	ip := net.ParseIP(string(addr))
