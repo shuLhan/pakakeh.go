@@ -5,6 +5,7 @@
 package net
 
 import (
+	"net"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -187,5 +188,23 @@ func TestIsTypeTransport(t *testing.T) {
 		got := IsTypeTransport(netType)
 
 		test.Assert(t, "IsTypeTransport", c.exp, got, true)
+	}
+}
+
+func TestToDotIPv6(t *testing.T) {
+	cases := []struct {
+		ip  net.IP
+		exp []byte
+	}{{
+		ip:  net.ParseIP("2001:db8::68"),
+		exp: []byte("2.0.0.1.0.d.b.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.8"),
+	}, {
+		ip:  net.ParseIP("::1"),
+		exp: []byte("0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1"),
+	}}
+
+	for _, c := range cases {
+		got := ToDotIPv6(c.ip)
+		test.Assert(t, "ToDotIPv6", c.exp, got, true)
 	}
 }

@@ -7,6 +7,7 @@ package net
 
 import (
 	"errors"
+	"net"
 	"strings"
 )
 
@@ -103,4 +104,55 @@ func IsTypeUDP(t Type) bool {
 //
 func IsTypeTransport(t Type) bool {
 	return IsTypeTCP(t) || IsTypeUDP(t)
+}
+
+//
+// ToDotIPv6 convert the IPv6 address format from "::1" format into
+// "0.0.0.0 ... 0.0.0.1".
+//
+// This function only useful for expanding SPF macro "i" or when generating
+// query for DNS PTR.
+//
+func ToDotIPv6(ip net.IP) (out []byte) {
+	addrs := strings.Split(ip.String(), ":")
+
+	var notempty int
+	for x := 0; x < len(addrs); x++ {
+		if len(addrs[x]) != 0 {
+			notempty++
+		}
+	}
+	gap := 8 - notempty
+
+	for x := 0; x < len(addrs); x++ {
+		addr := addrs[x]
+
+		// Fill the gap "::" with one or more "0.0.0.0".
+		if len(addr) == 0 {
+			for ; gap > 0; gap-- {
+				if len(out) > 0 {
+					out = append(out, '.')
+				}
+				out = append(out, []byte("0.0.0.0")...)
+			}
+			continue
+		}
+
+		// Fill the sub address with zero.
+		for y := len(addr); y < 4; y++ {
+			if len(out) > 0 {
+				out = append(out, '.')
+			}
+			out = append(out, '0')
+		}
+
+		for y := 0; y < len(addr); y++ {
+			if len(out) > 0 {
+				out = append(out, '.')
+			}
+			out = append(out, addr[y])
+		}
+	}
+
+	return
 }
