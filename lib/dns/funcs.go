@@ -5,9 +5,9 @@
 package dns
 
 import (
+	"bytes"
 	"fmt"
 	"net"
-	"strings"
 
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -94,78 +94,31 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 // reverseIP reverse the IP address by dot.
 //
 func reverseIP(ip net.IP) (revIP []byte, isIPv4 bool) {
-	strIP := ip.String()
-
-	if strings.Count(strIP, ".") == 3 {
-		isIPv4 = true
-		revIP = reverseIPv4(strIP)
+	isIPv4 = libnet.IsIPv4(ip)
+	if isIPv4 {
+		revIP = reverseByDot([]byte(ip.String()))
 		return
 	}
-	if strings.Count(strIP, ":") >= 2 {
-		revIP = reverseIPv6(strIP)
+	if libnet.IsIPv6(ip) {
+		revIP = reverseByDot(libnet.ToDotIPv6(ip))
 		return
 	}
-
 	return nil, false
 }
 
 //
-// reverseIPv4 reverse the IPv4 address. For example, given "127.0.0.1" it
-// will return "1.0.0.127".
+// reverseByDot reverse the IP address by dot.
+// For example, IPv4 with address "127.0.0.1" it will return "1.0.0.127".
+// For IPv6 with address "2001:db8::cb01" it will return
+// "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.2".
 //
-func reverseIPv4(ip string) (rev []byte) {
-	addrs := strings.Split(ip, ".")
+func reverseByDot(ip []byte) (rev []byte) {
+	addrs := bytes.Split(ip, []byte{'.'})
 	for x := len(addrs) - 1; x >= 0; x-- {
 		if len(rev) > 0 {
 			rev = append(rev, '.')
 		}
 		rev = append(rev, addrs[x]...)
 	}
-	return
-}
-
-//
-// reverseIPv6 reverse the IPv6 address.  For example, given "2001:db8::cb01"
-// it will return "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.2".
-//
-func reverseIPv6(ip string) (rev []byte) {
-	addrs := strings.Split(ip, ":")
-
-	var notempty int
-	for x := 0; x < len(addrs); x++ {
-		if len(addrs[x]) != 0 {
-			notempty++
-		}
-	}
-	gap := 8 - notempty
-
-	for x := len(addrs) - 1; x >= 0; x-- {
-		addr := addrs[x]
-
-		// Fill the gap with "0.0.0.0".
-		if len(addr) == 0 {
-			for ; gap > 0; gap-- {
-				if len(rev) > 0 {
-					rev = append(rev, '.')
-				}
-				rev = append(rev, []byte("0.0.0.0")...)
-			}
-			continue
-		}
-
-		// Reverse the sub address "2001" into "1.0.0.2".
-		for y := len(addr) - 1; y >= 0; y-- {
-			if len(rev) > 0 {
-				rev = append(rev, '.')
-			}
-			rev = append(rev, addr[y])
-		}
-
-		// Fill the sub address with zero.
-		for y := len(addr); y < 4; y++ {
-			rev = append(rev, []byte(".0")...)
-		}
-	}
-
 	return
 }
