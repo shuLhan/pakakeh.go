@@ -163,6 +163,55 @@ func Parse(text []byte) (in *Ini, err error) {
 }
 
 //
+// AsMap return the INI contents as mapping of
+// (section-name ":" subsection-name ":" variable-name) as key
+// and the variable's values as slice of string.
+// For example, given the following INI file,
+//
+//	[section1]
+//	key = value
+//
+//	[section2 "sub"]
+//	key2 = value2
+//	key2 = value3
+//
+// it will be mapped as,
+//
+//	map["section1::key"] = []string{"value"}
+//	map["section2:sub:key2"] = []string{"value2", "value3"}
+//
+func (in *Ini) AsMap() (out map[string][]string) {
+	sep := ":"
+	out = make(map[string][]string)
+
+	for x := 0; x < len(in.secs); x++ {
+		sec := in.secs[x]
+
+		for y := 0; y < len(sec.Vars); y++ {
+			v := sec.Vars[y]
+
+			if v.mode == varModeEmpty {
+				continue
+			}
+			if v.mode&varModeSection > 0 || v.mode&varModeSubsection > 0 {
+				continue
+			}
+
+			key := sec.NameLower + sep + sec.Sub + sep + v.KeyLower
+
+			vals, ok := out[key]
+			if !ok {
+				out[key] = []string{v.Value}
+			} else {
+				out[key] = libstrings.AppendUniq(vals, v.Value)
+			}
+		}
+	}
+
+	return
+}
+
+//
 // Save the current parsed Ini into file `filename`. It will overwrite the
 // destination file if it's exist.
 //
