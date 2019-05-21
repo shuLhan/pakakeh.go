@@ -514,8 +514,15 @@ func (msg *Message) ResetRR() {
 }
 
 //
-// IsExpired will return true if at least one resource record in answer is
-// expired, their TTL value is equal 0; otherwise it will return false.
+// IsExpired will return true if at least one resource record in answers is
+// expired, where their TTL value is equal to 0.
+// As long as the answers RR exist and no TTL is 0, it will return false.
+//
+// If RR answers is empty, then the TTL on authority RR will be checked for
+// zero.
+//
+// There is no check to be done on additional RR, since its may contain EDNS
+// with zero TTL.
 //
 func (msg *Message) IsExpired() bool {
 	for x := 0; x < len(msg.Answer); x++ {
@@ -523,13 +530,12 @@ func (msg *Message) IsExpired() bool {
 			return true
 		}
 	}
+	if len(msg.Answer) > 0 {
+		return false
+	}
+
 	for x := 0; x < len(msg.Authority); x++ {
 		if msg.Authority[x].TTL == 0 {
-			return true
-		}
-	}
-	for x := 0; x < len(msg.Additional); x++ {
-		if msg.Additional[x].TTL == 0 {
 			return true
 		}
 	}
