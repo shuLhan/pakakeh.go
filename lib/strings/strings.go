@@ -15,6 +15,30 @@ import (
 )
 
 //
+// AppendUniq append case-insensitive strings to slice of input without
+// duplicate.
+//
+func AppendUniq(in []string, vals ...string) []string {
+	var found bool
+
+	for x := 0; x < len(vals); x++ {
+		found = false
+		for y := 0; y < len(in); y++ {
+			if vals[x] == in[y] {
+				found = true
+				break
+			}
+		}
+		if found {
+			continue
+		}
+		in = append(in, vals[x])
+	}
+
+	return in
+}
+
+//
 // CountMissRate given two slice of string, count number of string that is
 // not equal with each other, and return the miss rate as
 //

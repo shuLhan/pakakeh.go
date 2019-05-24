@@ -8,6 +8,17 @@ import (
 	"fmt"
 )
 
+func ExampleAppendUniq() {
+	in := []string{"a", "", "b", "c"}
+	vals := []string{"b", "", "C", "d"}
+
+	in = AppendUniq(in, vals...)
+
+	fmt.Println(in)
+	// Output:
+	// [a  b c C d]
+}
+
 func ExampleCountMissRate() {
 	src := []string{"A", "B", "C", "D"}
 	tgt := []string{"A", "B", "C", "D"}
