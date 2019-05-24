@@ -75,13 +75,3 @@ func ExampleTrimNonAlnum() {
 	// '1alpha0'
 	// ''
 }
-
-func ExampleUniq() {
-	words := []string{"a", "", "A"}
-	fmt.Printf("%s %s\n", Uniq(words, false), words)
-	words = []string{"a", "", "A"}
-	fmt.Printf("%s %s\n", Uniq(words, true), words)
-	// Output:
-	// [a] [a  ]
-	// [a A] [a  A]
-}

@@ -282,3 +282,45 @@ func TotalFrequencyOfTokens(words, tokens []string, sensitive bool) float64 {
 
 	return sumfreq
 }
+
+//
+// Uniq remove duplicate string from `words`.  It modify the content of slice
+// in words by replacing duplicate word with empty string ("") and return only
+// unique words.
+// If sensitive is true then compare the string with case sensitive.
+//
+func Uniq(words []string, sensitive bool) (uniques []string) {
+	var xcmp, ycmp string
+
+	for x := 0; x < len(words); x++ {
+		if len(words[x]) == 0 {
+			continue
+		}
+
+		if sensitive {
+			xcmp = words[x]
+		} else {
+			xcmp = strings.ToLower(words[x])
+		}
+
+		for y := x + 1; y < len(words); y++ {
+			if len(words[y]) == 0 {
+				continue
+			}
+
+			if sensitive {
+				ycmp = words[y]
+			} else {
+				ycmp = strings.ToLower(words[y])
+			}
+
+			if xcmp == ycmp {
+				words[y] = ""
+			}
+		}
+
+		uniques = append(uniques, words[x])
+	}
+
+	return uniques
+}

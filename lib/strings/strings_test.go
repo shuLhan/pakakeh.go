@@ -249,3 +249,27 @@ func TestTotalFrequencyOfTokens(t *testing.T) {
 		test.Assert(t, "", c.exp, numbers.Float64Round(got, 3), true)
 	}
 }
+
+func TestUniq(t *testing.T) {
+	cases := []struct {
+		words     []string
+		sensitive bool
+		expReturn []string
+		expWords  []string
+	}{{
+		words:     []string{"a", "A"},
+		sensitive: true,
+		expReturn: []string{"a", "A"},
+		expWords:  []string{"a", "A"},
+	}, {
+		words:     []string{"a", "A"},
+		expReturn: []string{"a"},
+		expWords:  []string{"a", ""},
+	}}
+
+	for _, c := range cases {
+		got := Uniq(c.words, c.sensitive)
+		test.Assert(t, "unique", c.expReturn, got, true)
+		test.Assert(t, "words", c.expWords, c.words, true)
+	}
+}

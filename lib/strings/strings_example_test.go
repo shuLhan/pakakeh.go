@@ -156,3 +156,13 @@ func ExampleTotalFrequencyOfTokens() {
 	// 0.6666666666666666
 	// 0.3333333333333333
 }
+
+func ExampleUniq() {
+	words := []string{"a", "", "A"}
+	fmt.Printf("%s %s\n", Uniq(words, false), words)
+	words = []string{"a", "", "A"}
+	fmt.Printf("%s %s\n", Uniq(words, true), words)
+	// Output:
+	// [a] [a  ]
+	// [a A] [a  A]
+}
