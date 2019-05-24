@@ -11,15 +11,14 @@ import (
 
 type varMode uint
 
-const varModeEmpty varMode = 0
-
 const (
-	varModeComment    varMode = 1 << iota
-	varModeSection            // 2
-	varModeSubsection         // 4
-	varModeSingle             // 8
-	varModeValue              // 16
-	varModeMulti              // 32
+	varModeEmpty      varMode = 0
+	varModeComment            = 1
+	varModeSection            = 2
+	varModeSubsection         = 4
+	varModeSingle             = 8
+	varModeValue              = 16
+	varModeMulti              = 32
 )
 
 const (
