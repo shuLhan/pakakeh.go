@@ -150,15 +150,10 @@ func (in *Ini) AddSection(sec *Section) {
 //
 // Get the last key on section and/or subsection (if not empty).
 //
-// It will return nil and false,
-// (1) If Ini file contains no sections,
-// (2) section or key parameter is empty, or
-// (3) no key found.
-//
-// Otherwise it will return key's value and true.
+// If section, subsection, and key found it will return key's value and true;
+// otherwise it will return nil and false.
 //
 func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
-	// (1) (2)
 	if len(in.secs) == 0 || len(section) == 0 || len(key) == 0 {
 		return
 	}
@@ -181,7 +176,6 @@ func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 		}
 	}
 
-	// (3)
 	return
 }
 

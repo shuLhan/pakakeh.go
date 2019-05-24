@@ -96,40 +96,34 @@ func (sec *Section) getFirstIndex(key string) (idx int, dup bool) {
 
 //
 // Set will replace variable with matching key with value.
-// (1) If key is empty, no variable will be changed neither added, and it will
+// If key is empty, no variable will be changed or added, and it will
 // return false.
-// (2) If section contains two or more variable with the same `key`, it will
+// If section contains two or more variable with the same `key`, it will
 // return false.
-// (3) If no variable key matched, the new variable will be added to list.
-// (4) If value is empty, it will be set to true.
+// If no variable key matched, the new variable will be added to list.
+// If value is empty, it will be set to true.
 //
 func (sec *Section) Set(key, value string) bool {
-	// (1)
 	if len(key) == 0 {
 		return false
 	}
 
-	keylow := strings.ToLower(key)
+	keyLower := strings.ToLower(key)
 
-	idx, dup := sec.getFirstIndex(keylow)
-
-	// (2)
+	idx, dup := sec.getFirstIndex(keyLower)
 	if dup {
 		return false
 	}
 
-	// (3)
 	if idx < 0 {
 		sec.add(&Variable{
 			mode:  varModeValue,
 			Key:   key,
 			Value: value,
 		})
-
 		return true
 	}
 
-	// (4)
 	if len(value) == 0 {
 		sec.Vars[idx].Value = varValueTrue
 	} else {
@@ -142,12 +136,10 @@ func (sec *Section) Set(key, value string) bool {
 //
 // Add append variable with `key` and `value` to current section.
 //
-// If section contains the same key, the value will not be replaced.
-// Use `Set` or `ReplaceAll` to set existing value with out without
-// duplication.
-//
+// If section already contains the same key, the value will not be replaced.
+// Use Set() or ReplaceAll() to set existing value without duplication.
 // If key is empty, no variable will be appended.
-// If value is empty, it will set to true.
+// If value is empty, it will be set to true.
 //
 func (sec *Section) Add(key, value string) {
 	if len(key) == 0 {
@@ -162,7 +154,7 @@ func (sec *Section) Add(key, value string) {
 }
 
 //
-// AddComment to section as variable.
+// AddComment to section body.
 //
 func (sec *Section) AddComment(comment string) {
 	b0 := comment[0]
@@ -173,7 +165,7 @@ func (sec *Section) AddComment(comment string) {
 
 	v := &Variable{
 		mode:   varModeComment,
-		format: "\t%s\n",
+		format: "%s\n",
 		others: comment,
 	}
 
@@ -183,28 +175,25 @@ func (sec *Section) AddComment(comment string) {
 //
 // Unset remove the variable with name `key` on current section.
 //
-// (1) If key is empty, no variable will be removed, and it will return true.
-// (2) If current section contains two or more variables with the same key,
+// If key is empty, no variable will be removed, and it will return true.
+//
+// If current section contains two or more variables with the same key,
 // no variables will be removed and it will return false.
 //
 // On success, where no variable removed or one variable is removed, it will
 // return true.
 //
 func (sec *Section) Unset(key string) bool {
-	// (1)
 	if len(key) == 0 {
 		return true
 	}
 
-	keylow := strings.ToLower(key)
+	key = strings.ToLower(key)
 
-	idx, dup := sec.getFirstIndex(keylow)
-
-	// (2)
+	idx, dup := sec.getFirstIndex(key)
 	if dup {
 		return false
 	}
-
 	if idx < 0 {
 		return true
 	}
@@ -225,13 +214,13 @@ func (sec *Section) UnsetAll(key string) {
 	}
 
 	var (
-		vars   []*Variable
-		ok     bool
-		keylow = strings.ToLower(key)
+		vars []*Variable
+		ok   bool
 	)
+	key = strings.ToLower(key)
 
 	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x].KeyLower == keylow {
+		if sec.Vars[x].KeyLower == key {
 			ok = true
 			sec.Vars[x] = nil
 			continue
