@@ -242,6 +242,67 @@ func (in *Ini) Gets(section, subsection, key string) (out []string) {
 }
 
 //
+// Prune remove all empty lines, comments, and merge all section and
+// subsection with the same name into one group.
+//
+func (in *Ini) Prune() {
+	newSecs := make([]*Section, 0, len(in.secs))
+
+	for _, sec := range in.secs {
+		if sec.mode == varModeEmpty {
+			continue
+		}
+		newSec := &Section{
+			mode:      varModeSection,
+			Name:      sec.Name,
+			NameLower: sec.NameLower,
+		}
+		if len(sec.Sub) > 0 {
+			newSec.mode |= varModeSubsection
+			newSec.Sub = sec.Sub
+		}
+		for _, v := range sec.Vars {
+			if v.mode == varModeEmpty || v.mode == varModeComment {
+				continue
+			}
+
+			newValue := v.Value
+			if len(v.Value) == 0 {
+				newValue = "true"
+			}
+
+			newSec.AddUniqValue(v.Key, newValue)
+		}
+		newSecs = mergeSection(newSecs, newSec)
+	}
+
+	in.secs = newSecs
+}
+
+//
+// mergeSection merge a section (and subsection) into slice.
+//
+func mergeSection(secs []*Section, newSec *Section) []*Section {
+	for x := 0; x < len(secs); x++ {
+		if secs[x].NameLower != newSec.NameLower {
+			continue
+		}
+		if secs[x].Sub != newSec.Sub {
+			continue
+		}
+		for _, v := range newSec.Vars {
+			if v.mode == varModeEmpty || v.mode == varModeComment {
+				continue
+			}
+			secs[x].AddUniqValue(v.KeyLower, v.Value)
+		}
+		return secs
+	}
+	secs = append(secs, newSec)
+	return secs
+}
+
+//
 // Save the current parsed Ini into file `filename`. It will overwrite the
 // destination file if it's exist.
 //

@@ -173,6 +173,33 @@ func (sec *Section) AddComment(comment string) {
 }
 
 //
+// AddUniqValue add a new variable with uniq value to section.
+// If variable with the same key and value found, that variable will be moved
+// to end of list, to make the last declared variable still at the end of
+// list.
+//
+func (sec *Section) AddUniqValue(key, value string) {
+	keyLower := strings.ToLower(key)
+	for x := 0; x < len(sec.Vars); x++ {
+		if sec.Vars[x].KeyLower == keyLower {
+			if sec.Vars[x].Value == value {
+				tmp := sec.Vars[x]
+				sec.Vars = append(sec.Vars[:x], sec.Vars[x+1:]...)
+				sec.Vars = append(sec.Vars, tmp)
+				return
+			}
+		}
+	}
+	v := &Variable{
+		mode:     varModeValue,
+		Key:      key,
+		KeyLower: keyLower,
+		Value:    value,
+	}
+	sec.Vars = append(sec.Vars, v)
+}
+
+//
 // Unset remove the variable with name `key` on current section.
 //
 // If key is empty, no variable will be removed, and it will return true.
