@@ -48,6 +48,22 @@ func Parse(text []byte) (in *Ini, err error) {
 }
 
 //
+// AddSection append the new section to the list.
+//
+func (in *Ini) AddSection(sec *Section) {
+	if sec == nil {
+		return
+	}
+	if sec.mode != varModeEmpty && len(sec.Name) == 0 {
+		return
+	}
+
+	sec.NameLower = strings.ToLower(sec.Name)
+
+	in.secs = append(in.secs, sec)
+}
+
+//
 // AsMap return the INI contents as mapping of
 // (section-name ":" subsection-name ":" variable-name) as key
 // and the variable's values as slice of string.
@@ -97,57 +113,6 @@ func (in *Ini) AsMap() (out map[string][]string) {
 }
 
 //
-// Save the current parsed Ini into file `filename`. It will overwrite the
-// destination file if it's exist.
-//
-func (in *Ini) Save(filename string) (err error) {
-	f, err := os.Create(filename)
-	if err != nil {
-		return
-	}
-
-	err = in.Write(f)
-
-	errClose := f.Close()
-	if errClose != nil {
-		println("ini.Save:", errClose)
-	}
-
-	return
-}
-
-//
-// Write the current parsed Ini into writer `w`.
-//
-func (in *Ini) Write(w io.Writer) (err error) {
-	for x := 0; x < len(in.secs); x++ {
-		fmt.Fprint(w, in.secs[x])
-
-		for _, v := range in.secs[x].Vars {
-			fmt.Fprint(w, v)
-		}
-	}
-
-	return
-}
-
-//
-// AddSection append the new section to the list.
-//
-func (in *Ini) AddSection(sec *Section) {
-	if sec == nil {
-		return
-	}
-	if sec.mode != varModeEmpty && len(sec.Name) == 0 {
-		return
-	}
-
-	sec.NameLower = strings.ToLower(sec.Name)
-
-	in.secs = append(in.secs, sec)
-}
-
-//
 // Get the last key on section and/or subsection (if not empty).
 //
 // If section, subsection, and key found it will return key's value and true;
@@ -177,6 +142,19 @@ func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 	}
 
 	return
+}
+
+//
+// GetBool return key's value as boolean.  If no key found it will return
+// default value.
+//
+func (in *Ini) GetBool(section, subsection, key string, def bool) bool {
+	out, ok := in.Get(section, subsection, key)
+	if !ok {
+		return def
+	}
+
+	return IsValueBoolTrue(out)
 }
 
 //
@@ -225,19 +203,6 @@ func (in *Ini) GetSections(name string) (secs []*Section) {
 }
 
 //
-// GetBool return key's value as boolean.  If no key found it will return
-// default value.
-//
-func (in *Ini) GetBool(section, subsection, key string, def bool) bool {
-	out, ok := in.Get(section, subsection, key)
-	if !ok {
-		return def
-	}
-
-	return IsValueBoolTrue(out)
-}
-
-//
 // GetString return key's value as string. if no key found it will return
 // default value.
 //
@@ -273,5 +238,40 @@ func (in *Ini) Gets(section, subsection, key string) (out []string) {
 
 		out = libstrings.AppendUniq(out, vals...)
 	}
+	return
+}
+
+//
+// Save the current parsed Ini into file `filename`. It will overwrite the
+// destination file if it's exist.
+//
+func (in *Ini) Save(filename string) (err error) {
+	f, err := os.Create(filename)
+	if err != nil {
+		return
+	}
+
+	err = in.Write(f)
+
+	errClose := f.Close()
+	if errClose != nil {
+		println("ini.Save:", errClose)
+	}
+
+	return
+}
+
+//
+// Write the current parsed Ini into writer `w`.
+//
+func (in *Ini) Write(w io.Writer) (err error) {
+	for x := 0; x < len(in.secs); x++ {
+		fmt.Fprint(w, in.secs[x])
+
+		for _, v := range in.secs[x].Vars {
+			fmt.Fprint(w, v)
+		}
+	}
+
 	return
 }
