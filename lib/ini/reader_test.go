@@ -16,7 +16,7 @@ func TestParseSectionHeader(t *testing.T) {
 		desc       string
 		in         string
 		expErr     error
-		expMode    varMode
+		expMode    lineMode
 		expFormat  string
 		expSecName string
 		expSubName string
@@ -69,14 +69,14 @@ func TestParseSectionHeader(t *testing.T) {
 		desc:       "With valid name",
 		in:         `[section-.]`,
 		expErr:     io.EOF,
-		expMode:    varModeSection,
+		expMode:    lineModeSection,
 		expSecName: "section-.",
 		expFormat:  "[%s]",
 	}, {
 		desc:       "With valid name and comment",
 		in:         `[section-.] ; a comment`,
 		expErr:     io.EOF,
-		expMode:    varModeSection | varModeComment,
+		expMode:    lineModeSection | lineModeComment,
 		expSecName: "section-.",
 		expFormat:  "[%s] %s",
 		expComment: "; a comment",
@@ -84,7 +84,7 @@ func TestParseSectionHeader(t *testing.T) {
 		desc:       "With valid name and sub",
 		in:         `[section-. "su\bsec\tio\n"]`,
 		expErr:     io.EOF,
-		expMode:    varModeSection | varModeSubsection,
+		expMode:    lineModeSection | lineModeSubsection,
 		expSecName: "section-.",
 		expSubName: "subsection",
 		expFormat:  `[%s "%s"]`,
@@ -92,7 +92,7 @@ func TestParseSectionHeader(t *testing.T) {
 		desc:       "With valid name, sub, and comment",
 		in:         `[section-. "su\bsec\tio\n"]   # comment`,
 		expErr:     io.EOF,
-		expMode:    varModeSection | varModeSubsection | varModeComment,
+		expMode:    lineModeSection | lineModeSubsection | lineModeComment,
 		expSecName: "section-.",
 		expSubName: "subsection",
 		expFormat:  `[%s "%s"]   %s`,
@@ -128,7 +128,7 @@ func TestParseSubsection(t *testing.T) {
 		desc       string
 		in         string
 		expErr     error
-		expMode    varMode
+		expMode    lineMode
 		expFormat  string
 		expSub     string
 		expComment string
@@ -143,14 +143,14 @@ func TestParseSubsection(t *testing.T) {
 		desc:      "With leading space",
 		in:        `" "]`,
 		expErr:    io.EOF,
-		expMode:   varModeSubsection,
+		expMode:   lineModeSubsection,
 		expFormat: `"%s"]`,
 		expSub:    ` `,
 	}, {
 		desc:      "With valid subsection",
 		in:        `"subsection\""]`,
 		expErr:    io.EOF,
-		expMode:   varModeSubsection,
+		expMode:   lineModeSubsection,
 		expFormat: `"%s"]`,
 		expSub:    `subsection"`,
 	}}
@@ -182,7 +182,7 @@ func TestParseVariable(t *testing.T) {
 		desc       string
 		in         []byte
 		expErr     error
-		expMode    varMode
+		expMode    lineMode
 		expFormat  string
 		expComment string
 		expKey     string
@@ -202,7 +202,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "Digit at end",
 		in:        []byte("name0"),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expFormat: "%s",
 		expKey:    "name0",
 		expValue:  varValueTrue,
@@ -210,7 +210,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "Digit at middle",
 		in:        []byte("na0me"),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expFormat: "%s",
 		expKey:    "na0me",
 		expValue:  varValueTrue,
@@ -222,7 +222,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "Hyphen at end",
 		in:        []byte("name-"),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expFormat: "%s",
 		expKey:    "name-",
 		expValue:  varValueTrue,
@@ -230,7 +230,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "hyphen at middle",
 		in:        []byte("na-me"),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expFormat: "%s",
 		expKey:    "na-me",
 		expValue:  varValueTrue,
@@ -254,7 +254,7 @@ func TestParseVariable(t *testing.T) {
 		desc:       "With comment #1",
 		in:         []byte(`name; comment`),
 		expErr:     io.EOF,
-		expMode:    varModeSingle | varModeComment,
+		expMode:    lineModeSingle | lineModeComment,
 		expKey:     "name",
 		expComment: "; comment",
 		expFormat:  "%s%s",
@@ -263,7 +263,7 @@ func TestParseVariable(t *testing.T) {
 		desc:       "With comment #2",
 		in:         []byte(`name ; comment`),
 		expErr:     io.EOF,
-		expMode:    varModeSingle | varModeComment,
+		expMode:    lineModeSingle | lineModeComment,
 		expKey:     "name",
 		expComment: "; comment",
 		expFormat:  "%s %s",
@@ -272,7 +272,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "With empty value #1",
 		in:        []byte(`name=`),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expKey:    "name",
 		expFormat: "%s=",
 		expValue:  varValueTrue,
@@ -280,7 +280,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "With empty value #2",
 		in:        []byte(`name =`),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expKey:    "name",
 		expFormat: "%s =",
 		expValue:  varValueTrue,
@@ -288,7 +288,7 @@ func TestParseVariable(t *testing.T) {
 		desc:       "With empty value and comment",
 		in:         []byte(`name =# a comment`),
 		expErr:     io.EOF,
-		expMode:    varModeSingle | varModeComment,
+		expMode:    lineModeSingle | lineModeComment,
 		expKey:     "name",
 		expFormat:  "%s =%s",
 		expComment: "# a comment",
@@ -297,7 +297,7 @@ func TestParseVariable(t *testing.T) {
 		desc:      "With empty value #3",
 		in:        []byte(`name     `),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expKey:    "name",
 		expFormat: "%s     ",
 		expValue:  varValueTrue,
@@ -306,7 +306,7 @@ func TestParseVariable(t *testing.T) {
 		in: []byte(`name 
 `),
 		expErr:    io.EOF,
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expKey:    "name",
 		expFormat: "%s \n",
 		expValue:  varValueTrue,
@@ -317,7 +317,7 @@ func TestParseVariable(t *testing.T) {
 	}, {
 		desc:      "With dot",
 		in:        []byte(`name.subname`),
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expErr:    io.EOF,
 		expKey:    "name.subname",
 		expFormat: "%s",
@@ -325,7 +325,7 @@ func TestParseVariable(t *testing.T) {
 	}, {
 		desc:      "With underscore char",
 		in:        []byte(`name_subname`),
-		expMode:   varModeSingle,
+		expMode:   lineModeSingle,
 		expErr:    io.EOF,
 		expKey:    "name_subname",
 		expFormat: "%s",

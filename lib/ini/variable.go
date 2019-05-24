@@ -9,18 +9,6 @@ import (
 	"fmt"
 )
 
-type varMode uint
-
-const (
-	varModeEmpty      varMode = 0
-	varModeComment            = 1
-	varModeSection            = 2
-	varModeSubsection         = 4
-	varModeSingle             = 8
-	varModeValue              = 16
-	varModeMulti              = 32
-)
-
 const (
 	varValueTrue = "true"
 )
@@ -34,7 +22,7 @@ const (
 // want to compare variable, use the KeyLower value.
 //
 type variable struct {
-	mode     varMode
+	mode     lineMode
 	lineNum  int
 	format   string
 	secName  string
@@ -52,71 +40,71 @@ func (v *variable) String() string {
 	var buf bytes.Buffer
 
 	switch v.mode {
-	case varModeEmpty:
+	case lineModeEmpty:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprint(&buf, v.format)
 		}
-	case varModeComment:
+	case lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s\n", v.others)
 		}
-	case varModeSection:
+	case lineModeSection:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.secName)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "[%s]\n", v.secName)
 		}
-	case varModeSection | varModeComment:
+	case lineModeSection | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.secName, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", v.secName, v.others)
 		}
-	case varModeSection | varModeSubsection:
+	case lineModeSection | lineModeSubsection:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.secName, v.subName)
 		} else {
 			_, _ = fmt.Fprintf(&buf, `[%s "%s"]\n`, v.secName, v.subName)
 		}
-	case varModeSection | varModeSubsection | varModeComment:
+	case lineModeSection | lineModeSubsection | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.secName, v.subName, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, `[%s "%s"] %s\n`, v.secName, v.subName, v.others)
 		}
-	case varModeSingle:
+	case lineModeSingle:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = true\n", v.key)
 		}
-	case varModeSingle | varModeComment:
+	case lineModeSingle | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = true %s\n", v.key, v.others)
 		}
-	case varModeValue:
+	case lineModeValue:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
 		}
-	case varModeValue | varModeComment:
+	case lineModeValue | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
 		}
-	case varModeMulti:
+	case lineModeMulti:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
 		}
-	case varModeMulti | varModeComment:
+	case lineModeMulti | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
 		} else {

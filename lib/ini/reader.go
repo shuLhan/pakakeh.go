@@ -78,10 +78,10 @@ func (reader *reader) reset(src []byte) {
 	reader.r = 0
 	reader.lineNum = 0
 	reader._var = &variable{
-		mode: varModeEmpty,
+		mode: lineModeEmpty,
 	}
 	reader.sec = &section{
-		mode: varModeEmpty,
+		mode: lineModeEmpty,
 	}
 	reader.buf.Reset()
 	reader.bufComment.Reset()
@@ -134,10 +134,10 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 
 		reader._var.lineNum = reader.lineNum
 
-		if reader._var.mode&varModeSingle == varModeSingle ||
-			reader._var.mode&varModeValue == varModeValue ||
-			reader._var.mode&varModeMulti == varModeMulti {
-			if reader.sec.mode == varModeEmpty {
+		if reader._var.mode&lineModeSingle == lineModeSingle ||
+			reader._var.mode&lineModeValue == lineModeValue ||
+			reader._var.mode&lineModeMulti == lineModeMulti {
+			if reader.sec.mode == lineModeEmpty {
 				err = fmt.Errorf(errVarNoSection,
 					reader.lineNum,
 					reader.filename)
@@ -145,8 +145,8 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 			}
 		}
 
-		if reader._var.mode&varModeSection == varModeSection ||
-			reader._var.mode&varModeSubsection == varModeSubsection {
+		if reader._var.mode&lineModeSection == lineModeSection ||
+			reader._var.mode&lineModeSubsection == lineModeSubsection {
 
 			in.addSection(reader.sec)
 
@@ -160,7 +160,7 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 			}
 
 			reader._var = &variable{
-				mode: varModeEmpty,
+				mode: lineModeEmpty,
 			}
 			continue
 		}
@@ -168,11 +168,11 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 		reader.sec.addVariable(reader._var)
 
 		reader._var = &variable{
-			mode: varModeEmpty,
+			mode: lineModeEmpty,
 		}
 	}
 
-	if reader._var.mode != varModeEmpty {
+	if reader._var.mode != lineModeEmpty {
 		if debug.Value >= 1 {
 			fmt.Println(reader._var)
 		}
@@ -224,7 +224,7 @@ func (reader *reader) parse() (err error) {
 func (reader *reader) parseComment() (err error) {
 	reader.bufComment.Reset()
 
-	reader._var.mode |= varModeComment
+	reader._var.mode |= lineModeComment
 
 	reader.bufFormat.Write([]byte{'%', 's'})
 
@@ -259,7 +259,7 @@ func (reader *reader) parseSectionHeader() (err error) {
 	}
 
 	reader.bufFormat.WriteByte(tokSecStart)
-	reader._var.mode = varModeSection
+	reader._var.mode = lineModeSection
 
 	reader.r, _, err = reader.br.ReadRune()
 	if err != nil {
@@ -308,7 +308,7 @@ func (reader *reader) parseSectionHeader() (err error) {
 func (reader *reader) parseSubsection() (err error) {
 	reader.buf.Reset()
 
-	reader._var.mode |= varModeSubsection
+	reader._var.mode |= lineModeSubsection
 
 	// (0)
 	for {
@@ -430,7 +430,7 @@ func (reader *reader) parseVariable() (err error) {
 		if reader.r == tokHash || reader.r == tokSemiColon {
 			_ = reader.br.UnreadRune()
 
-			reader._var.mode = varModeSingle
+			reader._var.mode = lineModeSingle
 			reader._var.key = reader.buf.String()
 			reader._var.value = varValueTrue
 
@@ -439,7 +439,7 @@ func (reader *reader) parseVariable() (err error) {
 		if unicode.IsSpace(reader.r) {
 			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = varModeSingle
+			reader._var.mode = lineModeSingle
 			reader._var.key = reader.buf.String()
 
 			return reader.parsePossibleValue()
@@ -447,7 +447,7 @@ func (reader *reader) parseVariable() (err error) {
 		if reader.r == tokEqual {
 			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = varModeSingle
+			reader._var.mode = lineModeSingle
 			reader._var.key = reader.buf.String()
 
 			return reader.parseVarValue()
@@ -455,7 +455,7 @@ func (reader *reader) parseVariable() (err error) {
 		return errVarNameInvalid
 	}
 
-	reader._var.mode = varModeSingle
+	reader._var.mode = lineModeSingle
 	reader._var.format = reader.bufFormat.String()
 	reader._var.key = reader.buf.String()
 	reader._var.value = varValueTrue
@@ -493,7 +493,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 		return errVarNameInvalid
 	}
 
-	reader._var.mode = varModeSingle
+	reader._var.mode = lineModeSingle
 	reader._var.format = reader.bufFormat.String()
 	reader._var.value = varValueTrue
 
@@ -536,7 +536,7 @@ func (reader *reader) parseVarValue() (err error) {
 		break
 	}
 
-	reader._var.mode = varModeValue
+	reader._var.mode = lineModeValue
 	_ = reader.br.UnreadByte()
 
 	var (
@@ -552,7 +552,7 @@ func (reader *reader) parseVarValue() (err error) {
 
 		if esc {
 			if reader.b == tokNewLine {
-				reader._var.mode = varModeMulti
+				reader._var.mode = lineModeMulti
 
 				reader.valueCommit(true)
 

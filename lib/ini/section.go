@@ -17,7 +17,7 @@ import (
 // compare section name use the NameLower field.
 //
 type section struct {
-	mode      varMode
+	mode      lineMode
 	lineNum   int
 	name      string
 	sub       string
@@ -38,14 +38,14 @@ func newSection(name, subName string) (sec *section) {
 	}
 
 	sec = &section{
-		mode: varModeSection,
+		mode: lineModeSection,
 		name: name,
 	}
 
 	sec.nameLower = strings.ToLower(sec.name)
 
 	if len(subName) > 0 {
-		sec.mode |= varModeSubsection
+		sec.mode |= lineModeSubsection
 		sec.sub = subName
 	}
 
@@ -140,9 +140,9 @@ func (sec *section) addVariable(v *variable) {
 		return
 	}
 
-	if v.mode&varModeSingle == varModeSingle ||
-		v.mode&varModeValue == varModeValue ||
-		v.mode&varModeMulti == varModeMulti {
+	if v.mode&lineModeSingle == lineModeSingle ||
+		v.mode&lineModeValue == lineModeValue ||
+		v.mode&lineModeMulti == lineModeMulti {
 		if len(v.value) == 0 {
 			v.value = varValueTrue
 		}
@@ -262,7 +262,7 @@ func (sec *section) set(key, value string) bool {
 
 	if idx < 0 {
 		sec.addVariable(&variable{
-			mode:  varModeValue,
+			mode:  lineModeValue,
 			key:   key,
 			value: value,
 		})

@@ -54,7 +54,7 @@ func (in *Ini) addSection(sec *section) {
 	if sec == nil {
 		return
 	}
-	if sec.mode != varModeEmpty && len(sec.name) == 0 {
+	if sec.mode != lineModeEmpty && len(sec.name) == 0 {
 		return
 	}
 
@@ -91,10 +91,10 @@ func (in *Ini) AsMap() (out map[string][]string) {
 		for y := 0; y < len(sec.vars); y++ {
 			v := sec.vars[y]
 
-			if v.mode == varModeEmpty {
+			if v.mode == lineModeEmpty {
 				continue
 			}
-			if v.mode&varModeSection > 0 || v.mode&varModeSubsection > 0 {
+			if v.mode&lineModeSection > 0 || v.mode&lineModeSubsection > 0 {
 				continue
 			}
 
@@ -164,7 +164,7 @@ func (in *Ini) Gets(section, subsection, key string) (out []string) {
 	section = strings.ToLower(section)
 
 	for _, sec := range in.secs {
-		if sec.mode&varModeSection == 0 {
+		if sec.mode&lineModeSection == 0 {
 			continue
 		}
 		if sec.nameLower != section {
@@ -191,20 +191,20 @@ func (in *Ini) Prune() {
 	newSecs := make([]*section, 0, len(in.secs))
 
 	for _, sec := range in.secs {
-		if sec.mode == varModeEmpty {
+		if sec.mode == lineModeEmpty {
 			continue
 		}
 		newSec := &section{
-			mode:      varModeSection,
+			mode:      lineModeSection,
 			name:      sec.name,
 			nameLower: sec.nameLower,
 		}
 		if len(sec.sub) > 0 {
-			newSec.mode |= varModeSubsection
+			newSec.mode |= lineModeSubsection
 			newSec.sub = sec.sub
 		}
 		for _, v := range sec.vars {
-			if v.mode == varModeEmpty || v.mode == varModeComment {
+			if v.mode == lineModeEmpty || v.mode == lineModeComment {
 				continue
 			}
 
@@ -233,7 +233,7 @@ func mergeSection(secs []*section, newSec *section) []*section {
 			continue
 		}
 		for _, v := range newSec.vars {
-			if v.mode == varModeEmpty || v.mode == varModeComment {
+			if v.mode == lineModeEmpty || v.mode == lineModeComment {
 				continue
 			}
 			secs[x].addUniqValue(v.keyLower, v.value)

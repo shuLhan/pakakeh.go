@@ -18,19 +18,19 @@ func TestVariableString(t *testing.T) {
 	}{{
 		desc: "With mode empty #1",
 		v: &variable{
-			mode: varModeEmpty,
+			mode: lineModeEmpty,
 		},
 	}, {
 		desc: "With mode empty #2",
 		v: &variable{
-			mode: varModeEmpty,
+			mode: lineModeEmpty,
 			format: "	",
 		},
 		exp: "	",
 	}, {
 		desc: "With mode comment #1",
 		v: &variable{
-			mode:   varModeComment,
+			mode:   lineModeComment,
 			format: "  %s",
 			others: "; comment",
 		},
@@ -38,21 +38,21 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode comment #2",
 		v: &variable{
-			mode:   varModeComment,
+			mode:   lineModeComment,
 			others: "; comment",
 		},
 		exp: "; comment\n",
 	}, {
 		desc: "With mode section",
 		v: &variable{
-			mode:    varModeSection,
+			mode:    lineModeSection,
 			secName: "section",
 		},
 		exp: "[section]\n",
 	}, {
 		desc: "With mode section and comment #1",
 		v: &variable{
-			mode:    varModeSection | varModeComment,
+			mode:    lineModeSection | lineModeComment,
 			secName: "section",
 			others:  "; comment",
 		},
@@ -60,7 +60,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode section and comment #2",
 		v: &variable{
-			mode:    varModeSection | varModeComment,
+			mode:    lineModeSection | lineModeComment,
 			format:  " [%s]   %s",
 			secName: "section",
 			others:  "; comment",
@@ -69,7 +69,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode section and subsection",
 		v: &variable{
-			mode:    varModeSection | varModeSubsection,
+			mode:    lineModeSection | lineModeSubsection,
 			secName: "section",
 			subName: "subsection",
 		},
@@ -77,7 +77,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode section, subsection, and comment",
 		v: &variable{
-			mode:    varModeSection | varModeSubsection | varModeComment,
+			mode:    lineModeSection | lineModeSubsection | lineModeComment,
 			secName: "section",
 			subName: "subsection",
 			others:  "; comment",
@@ -86,14 +86,14 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode single",
 		v: &variable{
-			mode: varModeSingle,
+			mode: lineModeSingle,
 			key:  "name",
 		},
 		exp: "name = true\n",
 	}, {
 		desc: "With mode single and comment",
 		v: &variable{
-			mode:   varModeSingle | varModeComment,
+			mode:   lineModeSingle | lineModeComment,
 			key:    "name",
 			others: "; comment",
 		},
@@ -101,7 +101,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode value",
 		v: &variable{
-			mode:  varModeValue,
+			mode:  lineModeValue,
 			key:   "name",
 			value: "value",
 		},
@@ -109,7 +109,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode value and comment",
 		v: &variable{
-			mode:   varModeValue | varModeComment,
+			mode:   lineModeValue | lineModeComment,
 			key:    "name",
 			value:  "value",
 			others: "; comment",
@@ -118,7 +118,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode multi",
 		v: &variable{
-			mode:  varModeMulti,
+			mode:  lineModeMulti,
 			key:   "name",
 			value: "value",
 		},
@@ -126,7 +126,7 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode multi and comment",
 		v: &variable{
-			mode:   varModeMulti | varModeComment,
+			mode:   lineModeMulti | lineModeComment,
 			key:    "name",
 			value:  "value",
 			others: "; comment",
