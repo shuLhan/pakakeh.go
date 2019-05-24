@@ -127,6 +127,7 @@ import (
 	"strings"
 
 	"github.com/shuLhan/share/lib/debug"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 //
@@ -368,5 +369,31 @@ func (in *Ini) GetString(section, subsection, key, def string) (out string) {
 		out = def
 	}
 
+	return
+}
+
+//
+// Gets key's values as slice of string in the same section and subsection.
+//
+func (in *Ini) Gets(section, subsection, key string) (out []string) {
+	section = strings.ToLower(section)
+
+	for _, sec := range in.secs {
+		if sec.mode&varModeSection == 0 {
+			continue
+		}
+		if sec.NameLower != section {
+			continue
+		}
+		if sec.Sub != subsection {
+			continue
+		}
+		vals, ok := sec.Gets(key, nil)
+		if !ok {
+			continue
+		}
+
+		out = libstrings.AppendUniq(out, vals...)
+	}
 	return
 }
