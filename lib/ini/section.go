@@ -162,17 +162,6 @@ func (sec *Section) Add(key, value string) {
 }
 
 //
-// AddNewLine to section as variable.
-//
-func (sec *Section) AddNewLine() {
-	v := &Variable{
-		mode:   varModeEmpty,
-		format: "\n",
-	}
-	sec.add(v)
-}
-
-//
 // AddComment to section as variable.
 //
 func (sec *Section) AddComment(comment string) {
