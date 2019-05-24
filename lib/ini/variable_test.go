@@ -13,23 +13,23 @@ import (
 func TestVariableString(t *testing.T) {
 	cases := []struct {
 		desc string
-		v    *Variable
+		v    *variable
 		exp  string
 	}{{
 		desc: "With mode empty #1",
-		v: &Variable{
+		v: &variable{
 			mode: varModeEmpty,
 		},
 	}, {
 		desc: "With mode empty #2",
-		v: &Variable{
+		v: &variable{
 			mode: varModeEmpty,
 			format: "	",
 		},
 		exp: "	",
 	}, {
 		desc: "With mode comment #1",
-		v: &Variable{
+		v: &variable{
 			mode:   varModeComment,
 			format: "  %s",
 			others: "; comment",
@@ -37,21 +37,21 @@ func TestVariableString(t *testing.T) {
 		exp: "  ; comment",
 	}, {
 		desc: "With mode comment #2",
-		v: &Variable{
+		v: &variable{
 			mode:   varModeComment,
 			others: "; comment",
 		},
 		exp: "; comment\n",
 	}, {
 		desc: "With mode section",
-		v: &Variable{
+		v: &variable{
 			mode:    varModeSection,
 			secName: "section",
 		},
 		exp: "[section]\n",
 	}, {
 		desc: "With mode section and comment #1",
-		v: &Variable{
+		v: &variable{
 			mode:    varModeSection | varModeComment,
 			secName: "section",
 			others:  "; comment",
@@ -59,7 +59,7 @@ func TestVariableString(t *testing.T) {
 		exp: "[section] ; comment\n",
 	}, {
 		desc: "With mode section and comment #2",
-		v: &Variable{
+		v: &variable{
 			mode:    varModeSection | varModeComment,
 			format:  " [%s]   %s",
 			secName: "section",
@@ -68,7 +68,7 @@ func TestVariableString(t *testing.T) {
 		exp: " [section]   ; comment",
 	}, {
 		desc: "With mode section and subsection",
-		v: &Variable{
+		v: &variable{
 			mode:    varModeSection | varModeSubsection,
 			secName: "section",
 			subName: "subsection",
@@ -76,7 +76,7 @@ func TestVariableString(t *testing.T) {
 		exp: `[section "subsection"]\n`,
 	}, {
 		desc: "With mode section, subsection, and comment",
-		v: &Variable{
+		v: &variable{
 			mode:    varModeSection | varModeSubsection | varModeComment,
 			secName: "section",
 			subName: "subsection",
@@ -85,50 +85,50 @@ func TestVariableString(t *testing.T) {
 		exp: `[section "subsection"] ; comment\n`,
 	}, {
 		desc: "With mode single",
-		v: &Variable{
+		v: &variable{
 			mode: varModeSingle,
-			Key:  "name",
+			key:  "name",
 		},
 		exp: "name = true\n",
 	}, {
 		desc: "With mode single and comment",
-		v: &Variable{
+		v: &variable{
 			mode:   varModeSingle | varModeComment,
-			Key:    "name",
+			key:    "name",
 			others: "; comment",
 		},
 		exp: "name = true ; comment\n",
 	}, {
 		desc: "With mode value",
-		v: &Variable{
+		v: &variable{
 			mode:  varModeValue,
-			Key:   "name",
-			Value: "value",
+			key:   "name",
+			value: "value",
 		},
 		exp: "name = value\n",
 	}, {
 		desc: "With mode value and comment",
-		v: &Variable{
+		v: &variable{
 			mode:   varModeValue | varModeComment,
-			Key:    "name",
-			Value:  "value",
+			key:    "name",
+			value:  "value",
 			others: "; comment",
 		},
 		exp: "name = value ; comment\n",
 	}, {
 		desc: "With mode multi",
-		v: &Variable{
+		v: &variable{
 			mode:  varModeMulti,
-			Key:   "name",
-			Value: "value",
+			key:   "name",
+			value: "value",
 		},
 		exp: "name = value\n",
 	}, {
 		desc: "With mode multi and comment",
-		v: &Variable{
+		v: &variable{
 			mode:   varModeMulti | varModeComment,
-			Key:    "name",
-			Value:  "value",
+			key:    "name",
+			value:  "value",
 			others: "; comment",
 		},
 		exp: "name = value ; comment\n",

@@ -18,11 +18,11 @@ import (
 // Ini contains the parsed file.
 //
 type Ini struct {
-	secs []*Section
+	secs []*section
 }
 
 //
-// Open and parse INI formatted file and return it as instance of Ini struct.
+// Open and parse INI formatted file.
 //
 // On fail it will return incomplete instance of Ini with error.
 //
@@ -48,17 +48,17 @@ func Parse(text []byte) (in *Ini, err error) {
 }
 
 //
-// AddSection append the new section to the list.
+// addSection append the new section to the list.
 //
-func (in *Ini) AddSection(sec *Section) {
+func (in *Ini) addSection(sec *section) {
 	if sec == nil {
 		return
 	}
-	if sec.mode != varModeEmpty && len(sec.Name) == 0 {
+	if sec.mode != varModeEmpty && len(sec.name) == 0 {
 		return
 	}
 
-	sec.NameLower = strings.ToLower(sec.Name)
+	sec.nameLower = strings.ToLower(sec.name)
 
 	in.secs = append(in.secs, sec)
 }
@@ -88,8 +88,8 @@ func (in *Ini) AsMap() (out map[string][]string) {
 	for x := 0; x < len(in.secs); x++ {
 		sec := in.secs[x]
 
-		for y := 0; y < len(sec.Vars); y++ {
-			v := sec.Vars[y]
+		for y := 0; y < len(sec.vars); y++ {
+			v := sec.vars[y]
 
 			if v.mode == varModeEmpty {
 				continue
@@ -98,13 +98,13 @@ func (in *Ini) AsMap() (out map[string][]string) {
 				continue
 			}
 
-			key := sec.NameLower + sep + sec.Sub + sep + v.KeyLower
+			key := sec.nameLower + sep + sec.sub + sep + v.keyLower
 
 			vals, ok := out[key]
 			if !ok {
-				out[key] = []string{v.Value}
+				out[key] = []string{v.value}
 			} else {
-				out[key] = libstrings.AppendUniq(vals, v.Value)
+				out[key] = libstrings.AppendUniq(vals, v.value)
 			}
 		}
 	}
@@ -113,35 +113,35 @@ func (in *Ini) AsMap() (out map[string][]string) {
 }
 
 //
-// Get the last key on section and/or subsection (if not empty).
+// Get the last key on section and/or subsection.
 //
-// If section, subsection, and key found it will return key's value and true;
-// otherwise it will return nil and false.
+// If key found it will return its value and true; otherwise it will return
+// default value in def and false.
 //
-func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
+func (in *Ini) Get(section, subsection, key, def string) (val string, ok bool) {
 	if len(in.secs) == 0 || len(section) == 0 || len(key) == 0 {
-		return
+		return def, false
 	}
 
 	x := len(in.secs) - 1
 	sec := strings.ToLower(section)
 
 	for ; x >= 0; x-- {
-		if in.secs[x].NameLower != sec {
+		if in.secs[x].nameLower != sec {
 			continue
 		}
 
-		if in.secs[x].Sub != subsection {
+		if in.secs[x].sub != subsection {
 			continue
 		}
 
-		val, ok = in.secs[x].Get(key, "")
+		val, ok = in.secs[x].get(key, def)
 		if ok {
 			return
 		}
 	}
 
-	return
+	return def, false
 }
 
 //
@@ -149,70 +149,12 @@ func (in *Ini) Get(section, subsection, key string) (val string, ok bool) {
 // default value.
 //
 func (in *Ini) GetBool(section, subsection, key string, def bool) bool {
-	out, ok := in.Get(section, subsection, key)
+	out, ok := in.Get(section, subsection, key, "false")
 	if !ok {
 		return def
 	}
 
 	return IsValueBoolTrue(out)
-}
-
-//
-// GetSection return the last section that match with section name and/or
-// subsection name.
-// If section name is empty or no match found it will return nil.
-//
-func (in *Ini) GetSection(section, subsection string) *Section {
-	if len(section) == 0 {
-		return nil
-	}
-
-	section = strings.ToLower(section)
-
-	for x := len(in.secs) - 1; x >= 0; x-- {
-		if in.secs[x].NameLower != section {
-			continue
-		}
-		if in.secs[x].Sub != subsection {
-			continue
-		}
-		return in.secs[x]
-	}
-
-	return nil
-}
-
-//
-// GetSections return all section that match with "name" as slice.
-//
-func (in *Ini) GetSections(name string) (secs []*Section) {
-	if len(name) == 0 {
-		return
-	}
-
-	name = strings.ToLower(name)
-
-	for x := 0; x < len(in.secs); x++ {
-		if in.secs[x].NameLower != name {
-			continue
-		}
-		secs = append(secs, in.secs[x])
-	}
-
-	return
-}
-
-//
-// GetString return key's value as string. if no key found it will return
-// default value.
-//
-func (in *Ini) GetString(section, subsection, key, def string) (out string) {
-	out, ok := in.Get(section, subsection, key)
-	if !ok {
-		out = def
-	}
-
-	return
 }
 
 //
@@ -225,13 +167,13 @@ func (in *Ini) Gets(section, subsection, key string) (out []string) {
 		if sec.mode&varModeSection == 0 {
 			continue
 		}
-		if sec.NameLower != section {
+		if sec.nameLower != section {
 			continue
 		}
-		if sec.Sub != subsection {
+		if sec.sub != subsection {
 			continue
 		}
-		vals, ok := sec.Gets(key, nil)
+		vals, ok := sec.gets(key, nil)
 		if !ok {
 			continue
 		}
@@ -246,32 +188,32 @@ func (in *Ini) Gets(section, subsection, key string) (out []string) {
 // subsection with the same name into one group.
 //
 func (in *Ini) Prune() {
-	newSecs := make([]*Section, 0, len(in.secs))
+	newSecs := make([]*section, 0, len(in.secs))
 
 	for _, sec := range in.secs {
 		if sec.mode == varModeEmpty {
 			continue
 		}
-		newSec := &Section{
+		newSec := &section{
 			mode:      varModeSection,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
+			name:      sec.name,
+			nameLower: sec.nameLower,
 		}
-		if len(sec.Sub) > 0 {
+		if len(sec.sub) > 0 {
 			newSec.mode |= varModeSubsection
-			newSec.Sub = sec.Sub
+			newSec.sub = sec.sub
 		}
-		for _, v := range sec.Vars {
+		for _, v := range sec.vars {
 			if v.mode == varModeEmpty || v.mode == varModeComment {
 				continue
 			}
 
-			newValue := v.Value
-			if len(v.Value) == 0 {
+			newValue := v.value
+			if len(v.value) == 0 {
 				newValue = "true"
 			}
 
-			newSec.AddUniqValue(v.Key, newValue)
+			newSec.addUniqValue(v.key, newValue)
 		}
 		newSecs = mergeSection(newSecs, newSec)
 	}
@@ -282,19 +224,19 @@ func (in *Ini) Prune() {
 //
 // mergeSection merge a section (and subsection) into slice.
 //
-func mergeSection(secs []*Section, newSec *Section) []*Section {
+func mergeSection(secs []*section, newSec *section) []*section {
 	for x := 0; x < len(secs); x++ {
-		if secs[x].NameLower != newSec.NameLower {
+		if secs[x].nameLower != newSec.nameLower {
 			continue
 		}
-		if secs[x].Sub != newSec.Sub {
+		if secs[x].sub != newSec.sub {
 			continue
 		}
-		for _, v := range newSec.Vars {
+		for _, v := range newSec.vars {
 			if v.mode == varModeEmpty || v.mode == varModeComment {
 				continue
 			}
-			secs[x].AddUniqValue(v.KeyLower, v.Value)
+			secs[x].addUniqValue(v.keyLower, v.value)
 		}
 		return secs
 	}
@@ -338,7 +280,7 @@ func (in *Ini) Write(w io.Writer) (err error) {
 	for x := 0; x < len(in.secs); x++ {
 		fmt.Fprint(w, in.secs[x])
 
-		for _, v := range in.secs[x].Vars {
+		for _, v := range in.secs[x].vars {
 			fmt.Fprint(w, v)
 		}
 	}

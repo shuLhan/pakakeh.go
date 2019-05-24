@@ -26,29 +26,29 @@ const (
 )
 
 //
-// Variable define the smallest building block in INI format. It represent
+// variable define the smallest building block in INI format. It represent
 // empty lines, comment, section, section with subsection, and variable.
 //
 // Remember that variable's key is case insensitive. If you want to
 // create variable, set the KeyLower to their lowercase value, and if you
 // want to compare variable, use the KeyLower value.
 //
-type Variable struct {
+type variable struct {
 	mode     varMode
 	lineNum  int
 	format   string
 	secName  string
 	subName  string
-	Key      string
-	KeyLower string
-	Value    string
+	key      string
+	keyLower string
+	value    string
 	others   string
 }
 
 //
 // String return formatted INI variable.
 //
-func (v *Variable) String() string {
+func (v *variable) String() string {
 	var buf bytes.Buffer
 
 	switch v.mode {
@@ -88,39 +88,39 @@ func (v *Variable) String() string {
 		}
 	case varModeSingle:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.Key)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = true\n", v.Key)
+			_, _ = fmt.Fprintf(&buf, "%s = true\n", v.key)
 		}
 	case varModeSingle | varModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.Key, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = true %s\n", v.Key, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = true %s\n", v.key, v.others)
 		}
 	case varModeValue:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.Key)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.Key, v.Value)
+			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
 		}
 	case varModeValue | varModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.Key, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.Key, v.Value, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
 		}
 	case varModeMulti:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.Key)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.Key, v.Value)
+			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
 		}
 	case varModeMulti | varModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.Key, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.Key, v.Value, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
 		}
 	}
 

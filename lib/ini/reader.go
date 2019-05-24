@@ -49,8 +49,8 @@ type reader struct {
 	r          rune
 	lineNum    int
 	filename   string
-	_var       *Variable
-	sec        *Section
+	_var       *variable
+	sec        *section
 	buf        bytes.Buffer
 	bufComment bytes.Buffer
 	bufFormat  bytes.Buffer
@@ -77,10 +77,10 @@ func (reader *reader) reset(src []byte) {
 	reader.b = 0
 	reader.r = 0
 	reader.lineNum = 0
-	reader._var = &Variable{
+	reader._var = &variable{
 		mode: varModeEmpty,
 	}
-	reader.sec = &Section{
+	reader.sec = &section{
 		mode: varModeEmpty,
 	}
 	reader.buf.Reset()
@@ -148,26 +148,26 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 		if reader._var.mode&varModeSection == varModeSection ||
 			reader._var.mode&varModeSubsection == varModeSubsection {
 
-			in.AddSection(reader.sec)
+			in.addSection(reader.sec)
 
-			reader.sec = &Section{
+			reader.sec = &section{
 				mode:    reader._var.mode,
-				LineNum: reader._var.lineNum,
-				Name:    reader._var.secName,
-				Sub:     reader._var.subName,
+				lineNum: reader._var.lineNum,
+				name:    reader._var.secName,
+				sub:     reader._var.subName,
 				format:  reader._var.format,
 				others:  reader._var.others,
 			}
 
-			reader._var = &Variable{
+			reader._var = &variable{
 				mode: varModeEmpty,
 			}
 			continue
 		}
 
-		reader.sec.add(reader._var)
+		reader.sec.addVariable(reader._var)
 
-		reader._var = &Variable{
+		reader._var = &variable{
 			mode: varModeEmpty,
 		}
 	}
@@ -177,10 +177,10 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 			fmt.Println(reader._var)
 		}
 
-		reader.sec.add(reader._var)
+		reader.sec.addVariable(reader._var)
 	}
 
-	in.AddSection(reader.sec)
+	in.addSection(reader.sec)
 
 	reader._var = nil
 	reader.sec = nil
@@ -431,8 +431,8 @@ func (reader *reader) parseVariable() (err error) {
 			_ = reader.br.UnreadRune()
 
 			reader._var.mode = varModeSingle
-			reader._var.Key = reader.buf.String()
-			reader._var.Value = varValueTrue
+			reader._var.key = reader.buf.String()
+			reader._var.value = varValueTrue
 
 			return reader.parseComment()
 		}
@@ -440,7 +440,7 @@ func (reader *reader) parseVariable() (err error) {
 			reader.bufFormat.WriteRune(reader.r)
 
 			reader._var.mode = varModeSingle
-			reader._var.Key = reader.buf.String()
+			reader._var.key = reader.buf.String()
 
 			return reader.parsePossibleValue()
 		}
@@ -448,7 +448,7 @@ func (reader *reader) parseVariable() (err error) {
 			reader.bufFormat.WriteRune(reader.r)
 
 			reader._var.mode = varModeSingle
-			reader._var.Key = reader.buf.String()
+			reader._var.key = reader.buf.String()
 
 			return reader.parseVarValue()
 		}
@@ -457,8 +457,8 @@ func (reader *reader) parseVariable() (err error) {
 
 	reader._var.mode = varModeSingle
 	reader._var.format = reader.bufFormat.String()
-	reader._var.Key = reader.buf.String()
-	reader._var.Value = varValueTrue
+	reader._var.key = reader.buf.String()
+	reader._var.value = varValueTrue
 
 	return nil
 }
@@ -483,7 +483,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 		}
 		if reader.b == tokHash || reader.b == tokSemiColon {
 			_ = reader.br.UnreadByte()
-			reader._var.Value = varValueTrue
+			reader._var.value = varValueTrue
 			return reader.parseComment()
 		}
 		if reader.b == tokEqual {
@@ -495,7 +495,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 
 	reader._var.mode = varModeSingle
 	reader._var.format = reader.bufFormat.String()
-	reader._var.Value = varValueTrue
+	reader._var.value = varValueTrue
 
 	return nil
 }
@@ -515,7 +515,7 @@ func (reader *reader) parseVarValue() (err error) {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			reader._var.format = reader.bufFormat.String()
-			reader._var.Value = varValueTrue
+			reader._var.value = varValueTrue
 			return err
 		}
 		if reader.b == tokSpace || reader.b == tokTab {
@@ -524,13 +524,13 @@ func (reader *reader) parseVarValue() (err error) {
 		}
 		if reader.b == tokHash || reader.b == tokSemiColon {
 			_ = reader.br.UnreadByte()
-			reader._var.Value = varValueTrue
+			reader._var.value = varValueTrue
 			return reader.parseComment()
 		}
 		if reader.b == tokNewLine {
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
-			reader._var.Value = varValueTrue
+			reader._var.value = varValueTrue
 			return nil
 		}
 		break
@@ -647,7 +647,7 @@ func (reader *reader) valueCommit(withSpaces bool) {
 		val += reader.bufSpaces.String()
 	}
 
-	reader._var.Value += val
+	reader._var.value += val
 
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()

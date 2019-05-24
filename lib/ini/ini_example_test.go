@@ -92,7 +92,7 @@ key=value1
 
 	for _, sec := range in.secs {
 		fmt.Printf("%s", sec)
-		for _, v := range sec.Vars {
+		for _, v := range sec.vars {
 			fmt.Printf("%s", v)
 		}
 	}
@@ -144,7 +144,7 @@ func ExampleIni_Rebase() {
 
 	for _, sec := range in.secs {
 		fmt.Printf("%s", sec)
-		for _, v := range sec.Vars {
+		for _, v := range sec.vars {
 			fmt.Printf("%s", v)
 		}
 	}

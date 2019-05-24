@@ -11,48 +11,131 @@ import (
 )
 
 //
-// Section represent section header in INI file format and their variables.
+// section represent section header in INI file format and their variables.
 //
 // Remember that section's name is case insensitive. When trying to
 // compare section name use the NameLower field.
 //
-type Section struct {
+type section struct {
 	mode      varMode
-	LineNum   int
-	Name      string
-	Sub       string
+	lineNum   int
+	name      string
+	sub       string
 	format    string
-	NameLower string
+	nameLower string
 	others    string
-	Vars      []*Variable
+	vars      []*variable
 }
 
 //
-// NewSection will create new section with `name` and optional subsection
+// newSection will create new section with `name` and optional subsection
 // `subName`.
 // If section `name` is empty, it will return nil.
 //
-func NewSection(name, subName string) (sec *Section) {
+func newSection(name, subName string) (sec *section) {
 	if len(name) == 0 {
 		return
 	}
 
-	sec = &Section{
+	sec = &section{
 		mode: varModeSection,
-		Name: name,
+		name: name,
 	}
 
-	sec.NameLower = strings.ToLower(sec.Name)
+	sec.nameLower = strings.ToLower(sec.name)
 
 	if len(subName) > 0 {
 		sec.mode |= varModeSubsection
-		sec.Sub = subName
+		sec.sub = subName
 	}
 
 	return
 }
 
-func (sec *Section) add(v *Variable) {
+//
+// String return formatted INI section header.
+//
+func (sec *section) String() string {
+	var buf bytes.Buffer
+
+	switch sec.mode {
+	case lineModeSection:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s]\n", sec.name)
+		}
+	case lineModeSection | lineModeComment:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.others)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", sec.name, sec.others)
+		}
+	case lineModeSection | lineModeSubsection:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.sub)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"]\n", sec.name, sec.sub)
+		}
+	case lineModeSection | lineModeSubsection | lineModeComment:
+		if len(sec.format) > 0 {
+			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.sub, sec.others)
+		} else {
+			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"] %s\n", sec.name, sec.sub, sec.others)
+		}
+	}
+
+	return buf.String()
+}
+
+//
+// add append variable with `key` and `value` to current section.
+//
+// If section already contains the same key, the value will not be replaced.
+// Use set() or ReplaceAll() to set existing value without duplication.
+// If key is empty, no variable will be appended.
+// If value is empty, it will be set to true.
+//
+func (sec *section) add(key, value string) {
+	if len(key) == 0 {
+		return
+	}
+	v := &variable{
+		mode:  lineModeValue,
+		key:   key,
+		value: value,
+	}
+	sec.addVariable(v)
+}
+
+//
+// addUniqValue add a new variable with uniq value to section.
+// If variable with the same key and value found, that variable will be moved
+// to end of list, to make the last declared variable still at the end of
+// list.
+//
+func (sec *section) addUniqValue(key, value string) {
+	keyLower := strings.ToLower(key)
+	for x := 0; x < len(sec.vars); x++ {
+		if sec.vars[x].keyLower == keyLower {
+			if sec.vars[x].value == value {
+				tmp := sec.vars[x]
+				sec.vars = append(sec.vars[:x], sec.vars[x+1:]...)
+				sec.vars = append(sec.vars, tmp)
+				return
+			}
+		}
+	}
+	v := &variable{
+		mode:     lineModeValue,
+		key:      key,
+		keyLower: keyLower,
+		value:    value,
+	}
+	sec.vars = append(sec.vars, v)
+}
+
+func (sec *section) addVariable(v *variable) {
 	if v == nil {
 		return
 	}
@@ -60,13 +143,13 @@ func (sec *Section) add(v *Variable) {
 	if v.mode&varModeSingle == varModeSingle ||
 		v.mode&varModeValue == varModeValue ||
 		v.mode&varModeMulti == varModeMulti {
-		if len(v.Value) == 0 {
-			v.Value = varValueTrue
+		if len(v.value) == 0 {
+			v.value = varValueTrue
 		}
-		v.KeyLower = strings.ToLower(v.Key)
+		v.keyLower = strings.ToLower(v.key)
 	}
 
-	sec.Vars = append(sec.Vars, v)
+	sec.vars = append(sec.vars, v)
 }
 
 //
@@ -74,11 +157,11 @@ func (sec *Section) add(v *Variable) {
 // section have duplicate `key` it will return true.
 // If no variable with key found it will return -1 and false.
 //
-func (sec *Section) getFirstIndex(key string) (idx int, dup bool) {
+func (sec *section) getFirstIndex(key string) (idx int, dup bool) {
 	idx = -1
 	n := 0
-	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x].KeyLower != key {
+	for x := 0; x < len(sec.vars); x++ {
+		if sec.vars[x].keyLower != key {
 			continue
 		}
 		if idx < 0 {
@@ -95,7 +178,69 @@ func (sec *Section) getFirstIndex(key string) (idx int, dup bool) {
 }
 
 //
-// Set will replace variable with matching key with value.
+// get will return the last variable value based on key.
+// If no key found it will return default value and false.
+//
+func (sec *section) get(key, def string) (val string, ok bool) {
+	val = def
+	if len(sec.vars) == 0 || len(key) == 0 {
+		return
+	}
+
+	x := len(sec.vars) - 1
+	key = strings.ToLower(key)
+
+	for ; x >= 0; x-- {
+		if sec.vars[x].keyLower != key {
+			continue
+		}
+
+		val = sec.vars[x].value
+		ok = true
+		break
+	}
+
+	return
+}
+
+//
+// gets all variable values that have the same key under section from top to
+// bottom.
+// If no key found it will return default values and false.
+//
+func (sec *section) gets(key string, defs []string) (vals []string, ok bool) {
+	if len(sec.vars) == 0 || len(key) == 0 {
+		return defs, false
+	}
+
+	key = strings.ToLower(key)
+	for x := 0; x < len(sec.vars); x++ {
+		if sec.vars[x].keyLower == key {
+			vals = append(vals, sec.vars[x].value)
+		}
+	}
+	if len(vals) == 0 {
+		return defs, false
+	}
+	return vals, true
+}
+
+//
+// replaceAll change the value of variable reference with `key` into new
+// `value`. This is basically `unsetAll` and `Add`.
+//
+// If no variable found, the new variable with `key` and `value` will be
+// added.
+// If section contains duplicate keys, all duplicate keys will be
+// removed, and replaced with one key only.
+//
+func (sec *section) replaceAll(key, value string) {
+	sec.unsetAll(key)
+	sec.add(key, value)
+}
+
+//
+// set will replace variable with matching key with value.
 // If key is empty, no variable will be changed or added, and it will
 // return false.
 // If section contains two or more variable with the same `key`, it will
@@ -103,7 +248,7 @@ func (sec *Section) getFirstIndex(key string) (idx int, dup bool) {
 // If no variable key matched, the new variable will be added to list.
 // If value is empty, it will be set to true.
 //
-func (sec *Section) Set(key, value string) bool {
+func (sec *section) set(key, value string) bool {
 	if len(key) == 0 {
 		return false
 	}
@@ -116,91 +261,25 @@ func (sec *Section) Set(key, value string) bool {
 	}
 
 	if idx < 0 {
-		sec.add(&Variable{
+		sec.addVariable(&variable{
 			mode:  varModeValue,
-			Key:   key,
-			Value: value,
+			key:   key,
+			value: value,
 		})
 		return true
 	}
 
 	if len(value) == 0 {
-		sec.Vars[idx].Value = varValueTrue
+		sec.vars[idx].value = varValueTrue
 	} else {
-		sec.Vars[idx].Value = value
+		sec.vars[idx].value = value
 	}
 
 	return true
 }
 
 //
-// Add append variable with `key` and `value` to current section.
-//
-// If section already contains the same key, the value will not be replaced.
-// Use Set() or ReplaceAll() to set existing value without duplication.
-// If key is empty, no variable will be appended.
-// If value is empty, it will be set to true.
-//
-func (sec *Section) Add(key, value string) {
-	if len(key) == 0 {
-		return
-	}
-	v := &Variable{
-		mode:  varModeValue,
-		Key:   key,
-		Value: value,
-	}
-	sec.add(v)
-}
-
-//
-// AddComment to section body.
-//
-func (sec *Section) AddComment(comment string) {
-	b0 := comment[0]
-
-	if b0 != tokHash && b0 != tokSemiColon {
-		comment = "# " + comment
-	}
-
-	v := &Variable{
-		mode:   varModeComment,
-		format: "%s\n",
-		others: comment,
-	}
-
-	sec.add(v)
-}
-
-//
-// AddUniqValue add a new variable with uniq value to section.
-// If variable with the same key and value found, that variable will be moved
-// to end of list, to make the last declared variable still at the end of
-// list.
-//
-func (sec *Section) AddUniqValue(key, value string) {
-	keyLower := strings.ToLower(key)
-	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x].KeyLower == keyLower {
-			if sec.Vars[x].Value == value {
-				tmp := sec.Vars[x]
-				sec.Vars = append(sec.Vars[:x], sec.Vars[x+1:]...)
-				sec.Vars = append(sec.Vars, tmp)
-				return
-			}
-		}
-	}
-	v := &Variable{
-		mode:     varModeValue,
-		Key:      key,
-		KeyLower: keyLower,
-		Value:    value,
-	}
-	sec.Vars = append(sec.Vars, v)
-}
-
-//
-// Unset remove the variable with name `key` on current section.
+// unset remove the variable with name `key` on current section.
 //
 // If key is empty, no variable will be removed, and it will return true.
 //
@@ -210,7 +289,7 @@ func (sec *Section) AddUniqValue(key, value string) {
 // On success, where no variable removed or one variable is removed, it will
 // return true.
 //
-func (sec *Section) Unset(key string) bool {
+func (sec *section) unset(key string) bool {
 	if len(key) == 0 {
 		return true
 	}
@@ -225,135 +304,37 @@ func (sec *Section) Unset(key string) bool {
 		return true
 	}
 
-	copy(sec.Vars[idx:], sec.Vars[idx+1:])
-	sec.Vars[len(sec.Vars)-1] = nil
-	sec.Vars = sec.Vars[:len(sec.Vars)-1]
+	copy(sec.vars[idx:], sec.vars[idx+1:])
+	sec.vars[len(sec.vars)-1] = nil
+	sec.vars = sec.vars[:len(sec.vars)-1]
 
 	return true
 }
 
 //
-// UnsetAll remove all variables with `key`.
+// unsetAll remove all variables with `key`.
 //
-func (sec *Section) UnsetAll(key string) {
+func (sec *section) unsetAll(key string) {
 	if len(key) == 0 {
 		return
 	}
 
 	var (
-		vars []*Variable
+		vars []*variable
 		ok   bool
 	)
 	key = strings.ToLower(key)
 
-	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x].KeyLower == key {
+	for x := 0; x < len(sec.vars); x++ {
+		if sec.vars[x].keyLower == key {
 			ok = true
-			sec.Vars[x] = nil
+			sec.vars[x] = nil
 			continue
 		}
-		vars = append(vars, sec.Vars[x])
+		vars = append(vars, sec.vars[x])
 	}
 
 	if ok {
-		sec.Vars = vars
+		sec.vars = vars
 	}
-}
-
-//
-// ReplaceAll change the value of variable reference with `key` into new
-// `value`. This is basically `UnsetAll` and `Add`.
-//
-// If no variable found, the new variable with `key` and `value` will be
-// added.
-// If section contains duplicate keys, all duplicate keys will be
-// removed, and replaced with one key only.
-//
-func (sec *Section) ReplaceAll(key, value string) {
-	sec.UnsetAll(key)
-	sec.Add(key, value)
-}
-
-//
-// Get will return the last variable value based on key.
-// If no key found it will return default value and false.
-//
-func (sec *Section) Get(key, def string) (val string, ok bool) {
-	val = def
-	if len(sec.Vars) == 0 || len(key) == 0 {
-		return
-	}
-
-	x := len(sec.Vars) - 1
-	key = strings.ToLower(key)
-
-	for ; x >= 0; x-- {
-		if sec.Vars[x].KeyLower != key {
-			continue
-		}
-
-		val = sec.Vars[x].Value
-		ok = true
-		break
-	}
-
-	return
-}
-
-//
-// Gets all variable values that have the same key under section from top to
-// bottom.
-// If no key found it will return default values and false.
-//
-func (sec *Section) Gets(key string, defs []string) (vals []string, ok bool) {
-	if len(sec.Vars) == 0 || len(key) == 0 {
-		return defs, false
-	}
-
-	key = strings.ToLower(key)
-	for x := 0; x < len(sec.Vars); x++ {
-		if sec.Vars[x].KeyLower == key {
-			vals = append(vals, sec.Vars[x].Value)
-		}
-	}
-	if len(vals) == 0 {
-		return defs, false
-	}
-	return vals, true
-}
-
-//
-// String return formatted INI section header.
-//
-func (sec *Section) String() string {
-	var buf bytes.Buffer
-
-	switch sec.mode {
-	case varModeSection:
-		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s]\n", sec.Name)
-		}
-	case varModeSection | varModeComment:
-		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name, sec.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", sec.Name, sec.others)
-		}
-	case varModeSection | varModeSubsection:
-		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name, sec.Sub)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"]\n", sec.Name, sec.Sub)
-		}
-	case varModeSection | varModeSubsection | varModeComment:
-		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.Name, sec.Sub, sec.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"] %s\n", sec.Name, sec.Sub, sec.others)
-		}
-	}
-
-	return buf.String()
 }

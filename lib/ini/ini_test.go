@@ -21,12 +21,12 @@ const (
 )
 
 var (
-	sec     *Section //nolint: gochecknoglobals
-	lastSec *Section //nolint: gochecknoglobals
+	sec     *section //nolint: gochecknoglobals
+	lastSec *section //nolint: gochecknoglobals
 )
 
 func TestMain(m *testing.M) {
-	sec = NewSection("test", "")
+	sec = newSection("test", "")
 	os.Exit(m.Run())
 }
 
@@ -102,23 +102,23 @@ func TestAddSection(t *testing.T) {
 
 	cases := []struct {
 		desc   string
-		sec    *Section
+		sec    *section
 		expIni *Ini
 	}{{
 		desc:   "With nil section",
 		expIni: &Ini{},
 	}, {
 		desc: "With valid section",
-		sec: &Section{
+		sec: &section{
 			mode:      varModeSection,
-			Name:      "Test",
-			NameLower: "test",
+			name:      "Test",
+			nameLower: "test",
 		},
 		expIni: &Ini{
-			secs: []*Section{{
+			secs: []*section{{
 				mode:      varModeSection,
-				Name:      "Test",
-				NameLower: "test",
+				name:      "Test",
+				nameLower: "test",
 			}},
 		},
 	}}
@@ -126,7 +126,7 @@ func TestAddSection(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		in.AddSection(c.sec)
+		in.addSection(c.sec)
 
 		test.Assert(t, "ini", c.expIni, in, true)
 	}
@@ -188,7 +188,7 @@ func TestGet(t *testing.T) {
 	for _, c := range cases {
 		t.Logf("%+v", c)
 
-		got, ok = inputIni.Get(c.sec, c.sub, c.key)
+		got, ok = inputIni.Get(c.sec, c.sub, c.key, "")
 		if !ok {
 			test.Assert(t, "ok", c.expOk, ok, true)
 			continue
@@ -198,7 +198,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestGetString(t *testing.T) {
+func TestGetDefault(t *testing.T) {
 	cfg, err := Open(testdataInputIni)
 	if err != nil {
 		t.Fatal(err)
@@ -226,10 +226,10 @@ func TestGetString(t *testing.T) {
 		exp:  "Shulhan",
 	}}
 
-	var got string
-
 	for _, c := range cases {
-		got = cfg.GetString(c.sec, c.sub, c.key, c.def)
+		t.Log(c.desc)
+
+		got, _ := cfg.Get(c.sec, c.sub, c.key, c.def)
 
 		test.Assert(t, "string", c.exp, got, true)
 	}
@@ -443,7 +443,7 @@ func TestGetInputIni(t *testing.T) {
 		for x, k := range c.keys {
 			t.Log("  Get:", k)
 
-			got, ok = inputIni.Get(c.sec, c.sub, k)
+			got, ok = inputIni.Get(c.sec, c.sub, k, "")
 			if !ok {
 				t.Logf("Get: %s > %s > %s", c.sec, c.sub, k)
 				test.Assert(t, "ok", true, ok, true)
@@ -495,7 +495,7 @@ func TestGetSectionDup(t *testing.T) {
 		for x, k := range c.keys {
 			t.Log("  Get:", k)
 
-			got, ok := cfg.Get(c.sec, c.sub, k)
+			got, ok := cfg.Get(c.sec, c.sub, k, "")
 			if !ok {
 				test.Assert(t, "ok", c.expOK[x], ok, true)
 				continue
@@ -554,7 +554,7 @@ func TestGetVarMultiEmpty(t *testing.T) {
 		for x, k := range c.keys {
 			t.Log("  Get:", k)
 
-			got, ok := cfg.Get(c.sec, c.sub, k)
+			got, ok := cfg.Get(c.sec, c.sub, k, "")
 			if !ok {
 				test.Assert(t, "ok", c.expOK[x], ok, true)
 				continue
@@ -610,246 +610,13 @@ func TestGetVarMultiSection(t *testing.T) {
 		for x, k := range c.keys {
 			t.Log("  Get:", k)
 
-			got, ok := cfg.Get(c.sec, c.sub, k)
+			got, ok := cfg.Get(c.sec, c.sub, k, "")
 			if !ok {
 				test.Assert(t, "ok", c.expOK[x], ok, true)
 				continue
 			}
 
 			test.Assert(t, k, c.expVals[x], got, true)
-		}
-	}
-}
-
-func TestGetSection(t *testing.T) {
-	cfg, err := Open(testdataInputIni)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
-		name    string
-		subname string
-		expKeys []string
-		expVals []string
-	}{{
-		name: "last",
-		expKeys: []string{
-			"valid0",
-			"valid1",
-			"valid2",
-			"valid3",
-			"valid4",
-		},
-		expVals: []string{
-			"true",
-			"true",
-			"true",
-			"true",
-			"true",
-		},
-	}, {
-		name:    "url",
-		subname: "git@github.com:",
-		expKeys: []string{
-			"insteadOf",
-			"",
-		},
-		expVals: []string{
-			"https://github.com/",
-			"",
-		},
-	}, {
-		name: "http",
-		expKeys: []string{
-			"cookiefile",
-			"",
-		},
-		expVals: []string{
-			"/home/ms/.gitcookies",
-			"",
-		},
-	}, {
-		name: "core",
-		expKeys: []string{
-			"pager",
-			"editor",
-			"autocrlf",
-			"filemode",
-		},
-		expVals: []string{
-			"less -R",
-			"nvim",
-			"false",
-			"true",
-		},
-	}, {
-		name: "diff",
-		expKeys: []string{
-			"external",
-			"renames",
-			"",
-			"",
-		},
-		expVals: []string{
-			"/usr/local/bin/diff-wrapper",
-			"true",
-			"",
-			"",
-		},
-	}}
-
-	var got *Section
-
-	for _, c := range cases {
-		t.Log(c)
-
-		got = cfg.GetSection(c.name, c.subname)
-
-		test.Assert(t, "sub name", c.subname, got.Sub, true)
-		test.Assert(t, "length vars", len(c.expKeys), len(got.Vars), true)
-
-		for x := range c.expKeys {
-			test.Assert(t, "key", c.expKeys[x], got.Vars[x].Key, true)
-			test.Assert(t, "value", c.expVals[x], got.Vars[x].Value, true)
-		}
-	}
-}
-
-func TestGetSections(t *testing.T) {
-	cfg, err := Open(testdataInputIni)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
-		desc string
-		name string
-		exp  []*Section
-	}{{
-		desc: "With empty name",
-	}, {
-		desc: "With name: unknown",
-		name: "unknown",
-	}, {
-		desc: "With valid name: core",
-		name: "core",
-		exp: []*Section{{
-			mode:      varModeSection,
-			LineNum:   8,
-			Name:      "core",
-			NameLower: "core",
-			format:    "[%s]\n",
-			Vars: []*Variable{{
-				mode:    varModeComment,
-				lineNum: 9,
-				format: "	%s\n",
-				others: "; Don't trust file modes",
-			}, {
-				mode:    varModeValue,
-				lineNum: 10,
-				format: "	%s = false\n",
-				Key:      "filemode",
-				KeyLower: "filemode",
-				Value:    "false",
-			}, {
-				mode:    varModeEmpty,
-				lineNum: 11,
-				format:  "\n",
-			}, {
-				mode:    varModeComment,
-				lineNum: 12,
-				format:  "%s\n",
-				others:  "; Our diff algorithm",
-			}},
-		}, {
-			mode:      varModeSection,
-			LineNum:   18,
-			Name:      "core",
-			NameLower: "core",
-			format:    "[%s]\n",
-			Vars: []*Variable{{
-				mode:    varModeValue,
-				lineNum: 19,
-				format: "	%s=\"ssh\" for \"kernel.org\"\n",
-				Key:      "gitProxy",
-				KeyLower: "gitproxy",
-				Value:    "ssh for kernel.org",
-			}, {
-				mode:    varModeValue | varModeComment,
-				lineNum: 20,
-				format: "	%s=default-proxy %s\n",
-				Key:      "gitProxy",
-				KeyLower: "gitproxy",
-				Value:    "default-proxy",
-				others:   "; for the rest",
-			}, {
-				mode:    varModeEmpty,
-				lineNum: 21,
-				format:  "\n",
-			}, {
-				mode:    varModeComment,
-				lineNum: 22,
-				format:  "%s\n",
-				others:  "; User settings",
-			}},
-		}, {
-			mode:      varModeSection,
-			LineNum:   63,
-			Name:      "core",
-			NameLower: "core",
-			format:    "[%s]\n",
-			Vars: []*Variable{{
-				mode:    varModeValue,
-				lineNum: 64,
-				format: "	%s = less -R\n",
-				Key:      "pager",
-				KeyLower: "pager",
-				Value:    "less -R",
-			}, {
-				mode:    varModeValue,
-				lineNum: 65,
-				format: "	%s = nvim\n",
-				Key:      "editor",
-				KeyLower: "editor",
-				Value:    "nvim",
-			}, {
-				mode:    varModeValue,
-				lineNum: 66,
-				format: "	%s = false\n",
-				Key:      "autocrlf",
-				KeyLower: "autocrlf",
-				Value:    "false",
-			}, {
-				mode:    varModeValue,
-				lineNum: 67,
-				format: "	%s = true\n",
-				Key:      "filemode",
-				KeyLower: "filemode",
-				Value:    "true",
-			}},
-		}},
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		got := cfg.GetSections(c.name)
-
-		test.Assert(t, "sections length", len(c.exp), len(got), true)
-
-		for x := range c.exp {
-			test.Assert(t, "variable length", len(c.exp[x].Vars),
-				len(got[x].Vars), true)
-
-			for y := range c.exp[x].Vars {
-				t.Logf("var %d: %+v", y, c.exp[x].Vars[y])
-				test.Assert(t, "variable", *c.exp[x].Vars[y],
-					*got[x].Vars[y], true)
-			}
-
-			t.Logf("section %d: %+v", x, c.exp[x])
-			test.Assert(t, "section", c.exp[x], got[x], true)
 		}
 	}
 }

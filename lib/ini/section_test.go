@@ -15,7 +15,7 @@ func TestNewSection(t *testing.T) {
 		desc   string
 		name   string
 		sub    string
-		expSec *Section
+		expSec *section
 	}{{
 		desc: "With empty name",
 	}, {
@@ -24,27 +24,27 @@ func TestNewSection(t *testing.T) {
 	}, {
 		desc: "With name only",
 		name: "Section",
-		expSec: &Section{
+		expSec: &section{
 			mode:      varModeSection,
-			Name:      "Section",
-			NameLower: "section",
+			name:      "Section",
+			nameLower: "section",
 		},
 	}, {
 		desc: "With name and subname",
 		name: "Section",
 		sub:  "Subsection",
-		expSec: &Section{
+		expSec: &section{
 			mode:      varModeSection | varModeSubsection,
-			Name:      "Section",
-			NameLower: "section",
-			Sub:       "Subsection",
+			name:      "Section",
+			nameLower: "section",
+			sub:       "Subsection",
 		},
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got := NewSection(c.name, c.sub)
+		got := newSection(c.name, c.sub)
 
 		test.Assert(t, "section", c.expSec, got, true)
 	}
@@ -56,27 +56,27 @@ func TestSectionSet(t *testing.T) {
 		k      string
 		v      string
 		expOK  bool
-		expSec *Section
+		expSec *section
 	}{{
 		desc: "With empty key",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
+			name:      sec.name,
+			nameLower: sec.nameLower,
 		},
 	}, {
 		desc:  "With empty value (Key-1) (will be added)",
 		k:     "Key-1",
 		expOK: true,
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "true",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "true",
 			}},
 		},
 	}, {
@@ -84,15 +84,15 @@ func TestSectionSet(t *testing.T) {
 		k:     "Key-1",
 		v:     "false",
 		expOK: true,
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}},
 		},
 	}, {
@@ -100,40 +100,40 @@ func TestSectionSet(t *testing.T) {
 		k:     "Key-2",
 		v:     "2",
 		expOK: true,
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-2",
-				KeyLower: "key-2",
-				Value:    "2",
+				key:      "Key-2",
+				keyLower: "key-2",
+				value:    "2",
 			}},
 		},
 	}, {
 		desc:  "With empty value on Key-2 (true)",
 		k:     "Key-2",
 		expOK: true,
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-2",
-				KeyLower: "key-2",
-				Value:    "true",
+				key:      "Key-2",
+				keyLower: "key-2",
+				value:    "true",
 			}},
 		},
 	}}
@@ -141,7 +141,7 @@ func TestSectionSet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ok := sec.Set(c.k, c.v)
+		ok := sec.set(c.k, c.v)
 
 		test.Assert(t, "ok", c.expOK, ok, true)
 		test.Assert(t, "section", c.expSec, sec, true)
@@ -155,62 +155,62 @@ func TestSectionAdd(t *testing.T) {
 		desc   string
 		k      string
 		v      string
-		expSec *Section
+		expSec *section
 	}{{
 		desc:   "Empty key (no change)",
 		expSec: lastSec,
 	}, {
 		desc: "Duplicate key-1 (no value)",
 		k:    "Key-1",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-2",
-				KeyLower: "key-2",
-				Value:    "true",
+				key:      "Key-2",
+				keyLower: "key-2",
+				value:    "true",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "true",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "true",
 			}},
 		},
 	}, {
 		desc: "Duplicate key-1 (1)",
 		k:    "Key-1",
 		v:    "1",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-2",
-				KeyLower: "key-2",
-				Value:    "true",
+				key:      "Key-2",
+				keyLower: "key-2",
+				value:    "true",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "true",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "true",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "1",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "1",
 			}},
 		},
 	}}
@@ -218,7 +218,7 @@ func TestSectionAdd(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		sec.Add(c.k, c.v)
+		sec.add(c.k, c.v)
 
 		test.Assert(t, "section", c.expSec, sec, true)
 
@@ -232,7 +232,7 @@ func TestSectionSet2(t *testing.T) {
 		k      string
 		v      string
 		expOK  bool
-		expSec *Section
+		expSec *section
 	}{{
 		desc:   "Set duplicate Key-1",
 		k:      "Key-1",
@@ -248,7 +248,7 @@ func TestSectionSet2(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ok := sec.Set(c.k, c.v)
+		ok := sec.set(c.k, c.v)
 
 		test.Assert(t, "ok", c.expOK, ok, true)
 		test.Assert(t, "section", c.expSec, sec, true)
@@ -262,7 +262,7 @@ func TestSectionUnset(t *testing.T) {
 		desc   string
 		k      string
 		expOK  bool
-		expSec *Section
+		expSec *section
 	}{{
 		desc:   "With empty key",
 		expOK:  true,
@@ -275,50 +275,50 @@ func TestSectionUnset(t *testing.T) {
 		desc:  "With valid key-2",
 		k:     "key-2",
 		expOK: true,
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "true",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "true",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "1",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "1",
 			}},
 		},
 	}, {
 		desc:  "With valid key-2 (again)",
 		k:     "key-2",
 		expOK: true,
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "false",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "false",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "true",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "true",
 			}, {
 				mode:     varModeValue,
-				Key:      "Key-1",
-				KeyLower: "key-1",
-				Value:    "1",
+				key:      "Key-1",
+				keyLower: "key-1",
+				value:    "1",
 			}},
 		},
 	}}
@@ -326,7 +326,7 @@ func TestSectionUnset(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ok := sec.Unset(c.k)
+		ok := sec.unset(c.k)
 
 		test.Assert(t, "ok", c.expOK, ok, true)
 		test.Assert(t, "section", c.expSec, sec, true)
@@ -339,7 +339,7 @@ func TestSectionUnsetAll(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
-		expSec *Section
+		expSec *section
 	}{{
 		desc:   "With empty key",
 		expSec: lastSec,
@@ -350,25 +350,25 @@ func TestSectionUnsetAll(t *testing.T) {
 	}, {
 		desc: "With valid key-1",
 		k:    "KEY-1",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
+			name:      sec.name,
+			nameLower: sec.nameLower,
 		},
 	}, {
 		desc: "With valid key-1 (again)",
 		k:    "KEY-1",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
+			name:      sec.name,
+			nameLower: sec.nameLower,
 		},
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		sec.UnsetAll(c.k)
+		sec.unsetAll(c.k)
 
 		test.Assert(t, "section", c.expSec, sec, true)
 
@@ -377,99 +377,99 @@ func TestSectionUnsetAll(t *testing.T) {
 }
 
 func TestSectionReplaceAll(t *testing.T) {
-	sec.add(nil)
+	sec.addVariable(nil)
 
-	sec.Add("key-3", "3")
-	sec.Add("key-3", "33")
-	sec.Add("key-3", "333")
-	sec.Add("key-3", "3333")
+	sec.add("key-3", "3")
+	sec.add("key-3", "33")
+	sec.add("key-3", "333")
+	sec.add("key-3", "3333")
 
 	cases := []struct {
 		desc   string
 		k      string
 		v      string
-		expSec *Section
+		expSec *section
 	}{{
 		desc: "With empty key",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "3",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "3",
 			}, {
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "33",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "33",
 			}, {
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "333",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "333",
 			}, {
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "3333",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "3333",
 			}},
 		},
 	}, {
 		desc: "With invalid key-4 (will be added)",
 		k:    "KEY-4",
 		v:    "4",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "3",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "3",
 			}, {
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "33",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "33",
 			}, {
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "333",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "333",
 			}, {
 				mode:     varModeValue,
-				Key:      "key-3",
-				KeyLower: "key-3",
-				Value:    "3333",
+				key:      "key-3",
+				keyLower: "key-3",
+				value:    "3333",
 			}, {
 				mode:     varModeValue,
-				Key:      "KEY-4",
-				KeyLower: "key-4",
-				Value:    "4",
+				key:      "KEY-4",
+				keyLower: "key-4",
+				value:    "4",
 			}},
 		},
 	}, {
 		desc: "With valid key-3",
 		k:    "KEY-3",
 		v:    "replaced",
-		expSec: &Section{
+		expSec: &section{
 			mode:      sec.mode,
-			Name:      sec.Name,
-			NameLower: sec.NameLower,
-			Vars: []*Variable{{
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
 				mode:     varModeValue,
-				Key:      "KEY-4",
-				KeyLower: "key-4",
-				Value:    "4",
+				key:      "KEY-4",
+				keyLower: "key-4",
+				value:    "4",
 			}, {
 				mode:     varModeValue,
-				Key:      "KEY-3",
-				KeyLower: "key-3",
-				Value:    "replaced",
+				key:      "KEY-3",
+				keyLower: "key-3",
+				value:    "replaced",
 			}},
 		},
 	}}
@@ -477,7 +477,7 @@ func TestSectionReplaceAll(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		sec.ReplaceAll(c.k, c.v)
+		sec.replaceAll(c.k, c.v)
 
 		test.Assert(t, "section", c.expSec, sec, true)
 	}
@@ -509,7 +509,7 @@ func TestSectionGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, ok := sec.Get(c.k, c.def)
+		got, ok := sec.get(c.k, c.def)
 
 		test.Assert(t, "ok", c.expOK, ok, true)
 		test.Assert(t, "value", c.expVal, got, true)
@@ -517,8 +517,8 @@ func TestSectionGet(t *testing.T) {
 }
 
 func TestSectionGets(t *testing.T) {
-	sec.Add("dup", "value 1")
-	sec.Add("dup", "value 2")
+	sec.add("dup", "value 1")
+	sec.add("dup", "value 2")
 
 	cases := []struct {
 		desc  string
@@ -544,7 +544,7 @@ func TestSectionGets(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, ok := sec.Gets(c.key, c.defs)
+		got, ok := sec.gets(c.key, c.defs)
 
 		test.Assert(t, "Gets value", c.exps, got, true)
 		test.Assert(t, "Gets ok", c.expOK, ok, true)
