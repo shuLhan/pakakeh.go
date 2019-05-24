@@ -106,3 +106,55 @@ key=value1
 	// key = value2
 	// key = value1
 }
+
+func ExampleIni_Rebase() {
+	input := []byte(`
+		[section]
+		key=value1
+		key2=
+
+		[section "sub"]
+		key=value1
+`)
+
+	other := []byte(`
+		[section]
+		key=value2
+		key2=false
+
+		[section "sub"]
+		key=value2
+		key=value1
+`)
+
+	in, err := Parse(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	in2, err := Parse(other)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	in.Prune()
+	in2.Prune()
+
+	in.Rebase(in2)
+
+	for _, sec := range in.secs {
+		fmt.Printf("%s", sec)
+		for _, v := range sec.Vars {
+			fmt.Printf("%s", v)
+		}
+	}
+	// Output:
+	// [section]
+	// key = value1
+	// key2 = true
+	// key = value2
+	// key2 = false
+	// [section "sub"]
+	// key = value2
+	// key = value1
+}

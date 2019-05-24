@@ -303,6 +303,15 @@ func mergeSection(secs []*Section, newSec *Section) []*Section {
 }
 
 //
+// Rebase merge the other INI sections into this INI sections.
+//
+func (in *Ini) Rebase(other *Ini) {
+	for _, otherSec := range other.secs {
+		in.secs = mergeSection(in.secs, otherSec)
+	}
+}
+
+//
 // Save the current parsed Ini into file `filename`. It will overwrite the
 // destination file if it's exist.
 //
