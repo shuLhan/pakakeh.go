@@ -24,7 +24,6 @@ const (
 	tokHash        = '#'
 	tokHyphen      = '-'
 	tokNewLine     = '\n'
-	tokPercent     = '%'
 	tokSecEnd      = ']'
 	tokSecStart    = '['
 	tokSemiColon   = ';'
@@ -134,9 +133,7 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 
 		reader._var.lineNum = reader.lineNum
 
-		if reader._var.mode&lineModeSingle == lineModeSingle ||
-			reader._var.mode&lineModeValue == lineModeValue ||
-			reader._var.mode&lineModeMulti == lineModeMulti {
+		if isLineModeVar(reader._var.mode) {
 			if reader.sec.mode == lineModeEmpty {
 				err = fmt.Errorf(errVarNoSection,
 					reader.lineNum,
@@ -189,33 +186,36 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 }
 
 func (reader *reader) parse() (err error) {
+	var isNewline bool
+
 	reader.bufFormat.Reset()
 
-	for {
+	for !isNewline {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			return err
 		}
-		if reader.b == tokNewLine {
+		switch reader.b {
+		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
-			break
-		}
-		if reader.b == tokSpace || reader.b == tokTab {
-			reader.bufFormat.WriteByte(reader.b)
-			continue
-		}
-		if reader.b == tokHash || reader.b == tokSemiColon {
-			_ = reader.br.UnreadByte()
+			isNewline = true
 
+		case tokSpace, tokTab:
+			reader.bufFormat.WriteByte(reader.b)
+
+		case tokHash, tokSemiColon:
+			_ = reader.br.UnreadByte()
 			return reader.parseComment()
-		}
-		if reader.b == tokSecStart {
+
+		case tokSecStart:
 			_ = reader.br.UnreadByte()
 			return reader.parseSectionHeader()
+
+		default:
+			_ = reader.br.UnreadByte()
+			return reader.parseVariable()
 		}
-		_ = reader.br.UnreadByte()
-		return reader.parseVariable()
 	}
 
 	return nil
@@ -270,30 +270,31 @@ func (reader *reader) parseSectionHeader() (err error) {
 		return errBadConfig
 	}
 
+	var isNewline bool
 	reader.bufFormat.Write([]byte{'%', 's'})
 	reader.buf.WriteRune(reader.r)
 
-	for {
+	for !isNewline {
 		reader.r, _, err = reader.br.ReadRune()
 		if err != nil {
 			return errBadConfig
 		}
-		if reader.r == tokSpace || reader.r == tokTab {
-			break
-		}
-		if reader.r == tokSecEnd {
+		switch {
+		case reader.r == tokSpace, reader.r == tokTab:
+			isNewline = true
+
+		case reader.r == tokSecEnd:
 			reader.bufFormat.WriteRune(reader.r)
-
 			reader._var.secName = reader.buf.String()
-
 			return reader.parsePossibleComment()
-		}
-		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) || reader.r == tokHyphen || reader.r == tokDot {
-			reader.buf.WriteRune(reader.r)
-			continue
-		}
 
-		return errBadConfig
+		case unicode.IsLetter(reader.r), unicode.IsDigit(reader.r),
+			reader.r == tokHyphen, reader.r == tokDot:
+			reader.buf.WriteRune(reader.r)
+
+		default:
+			return errBadConfig
+		}
 	}
 
 	reader.bufFormat.WriteRune(reader.r)
@@ -302,15 +303,12 @@ func (reader *reader) parseSectionHeader() (err error) {
 	return reader.parseSubsection()
 }
 
-//
-// (0) Skip white-spaces
-//
 func (reader *reader) parseSubsection() (err error) {
 	reader.buf.Reset()
 
 	reader._var.mode |= lineModeSubsection
 
-	// (0)
+	// Skip white-spaces
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
@@ -371,25 +369,26 @@ func (reader *reader) parseSubsection() (err error) {
 // character.
 //
 func (reader *reader) parsePossibleComment() (err error) {
-	for {
+	var isNewline bool
+
+	for !isNewline {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			break
 		}
-		if reader.b == tokNewLine {
+		switch reader.b {
+		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
-			break
-		}
-		if reader.b == tokSpace || reader.b == tokTab {
+			isNewline = true
+		case tokSpace, tokTab:
 			reader.bufFormat.WriteByte(reader.b)
-			continue
-		}
-		if reader.b == tokHash || reader.b == tokSemiColon {
+		case tokHash, tokSemiColon:
 			_ = reader.br.UnreadByte()
-			err = reader.parseComment()
-			return
+			return reader.parseComment()
+
+		default:
+			return errBadConfig
 		}
-		return errBadConfig
 	}
 
 	reader._var.format = reader.bufFormat.String()
@@ -409,25 +408,34 @@ func (reader *reader) parseVariable() (err error) {
 		return errVarNameInvalid
 	}
 
+	var isNewline bool
 	reader.bufFormat.Write([]byte{'%', 's'})
 	reader.buf.WriteRune(reader.r)
 
-	for {
+	for !isNewline {
 		reader.r, _, err = reader.br.ReadRune()
 		if err != nil {
 			break
 		}
-		if reader.r == tokNewLine {
+		switch {
+		case reader.r == tokEqual:
 			reader.bufFormat.WriteRune(reader.r)
-			break
-		}
-		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) ||
-			reader.r == tokHyphen || reader.r == tokDot ||
-			reader.r == tokUnderscore {
+
+			reader._var.mode = lineModeSingle
+			reader._var.key = reader.buf.String()
+
+			return reader.parseVarValue()
+
+		case reader.r == tokNewLine:
+			reader.bufFormat.WriteRune(reader.r)
+			isNewline = true
+
+		case unicode.IsLetter(reader.r), unicode.IsDigit(reader.r),
+			reader.r == tokHyphen, reader.r == tokDot,
+			reader.r == tokUnderscore:
 			reader.buf.WriteRune(reader.r)
-			continue
-		}
-		if reader.r == tokHash || reader.r == tokSemiColon {
+
+		case reader.r == tokHash, reader.r == tokSemiColon:
 			_ = reader.br.UnreadRune()
 
 			reader._var.mode = lineModeSingle
@@ -435,24 +443,18 @@ func (reader *reader) parseVariable() (err error) {
 			reader._var.value = varValueTrue
 
 			return reader.parseComment()
-		}
-		if unicode.IsSpace(reader.r) {
+
+		case unicode.IsSpace(reader.r):
 			reader.bufFormat.WriteRune(reader.r)
 
 			reader._var.mode = lineModeSingle
 			reader._var.key = reader.buf.String()
 
 			return reader.parsePossibleValue()
-		}
-		if reader.r == tokEqual {
-			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = lineModeSingle
-			reader._var.key = reader.buf.String()
-
-			return reader.parseVarValue()
+		default:
+			return errVarNameInvalid
 		}
-		return errVarNameInvalid
 	}
 
 	reader._var.mode = lineModeSingle
@@ -468,29 +470,30 @@ func (reader *reader) parseVariable() (err error) {
 // or `=`.
 //
 func (reader *reader) parsePossibleValue() (err error) {
-	for {
+	var isNewline bool
+	for !isNewline {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			break
 		}
-		if reader.b == tokNewLine {
+		switch reader.b {
+		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
-			break
-		}
-		if reader.b == tokSpace || reader.b == tokTab {
+			isNewline = true
+
+		case tokSpace, tokTab:
 			reader.bufFormat.WriteByte(reader.b)
-			continue
-		}
-		if reader.b == tokHash || reader.b == tokSemiColon {
+
+		case tokHash, tokSemiColon:
 			_ = reader.br.UnreadByte()
 			reader._var.value = varValueTrue
 			return reader.parseComment()
-		}
-		if reader.b == tokEqual {
+		case tokEqual:
 			reader.bufFormat.WriteByte(reader.b)
 			return reader.parseVarValue()
+		default:
+			return errVarNameInvalid
 		}
-		return errVarNameInvalid
 	}
 
 	reader._var.mode = lineModeSingle
@@ -504,13 +507,12 @@ func (reader *reader) parsePossibleValue() (err error) {
 // At this point we found `=` on source, and we expect the rest of source will
 // be variable value.
 //
-// (0) Consume leading white-spaces.
-//
 func (reader *reader) parseVarValue() (err error) {
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()
 
-	// (0)
+	// Consume leading white-spaces.
+consume_spaces:
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
@@ -518,16 +520,17 @@ func (reader *reader) parseVarValue() (err error) {
 			reader._var.value = varValueTrue
 			return err
 		}
-		if reader.b == tokSpace || reader.b == tokTab {
+		switch reader.b {
+		case tokSpace, tokTab:
 			reader.bufFormat.WriteByte(reader.b)
-			continue
-		}
-		if reader.b == tokHash || reader.b == tokSemiColon {
+			continue consume_spaces
+
+		case tokHash, tokSemiColon:
 			_ = reader.br.UnreadByte()
 			reader._var.value = varValueTrue
 			return reader.parseComment()
-		}
-		if reader.b == tokNewLine {
+
+		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
 			reader._var.value = varValueTrue
@@ -536,97 +539,91 @@ func (reader *reader) parseVarValue() (err error) {
 		break
 	}
 
+	reader.bufFormat.Write([]byte{'%', 's'})
 	reader._var.mode = lineModeValue
 	_ = reader.br.UnreadByte()
 
 	var (
-		quoted bool
-		esc    bool
+		quoted    bool
+		esc       bool
+		isNewline bool
 	)
 
-	for {
+	for !isNewline {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			break
 		}
 
 		if esc {
-			if reader.b == tokNewLine {
+			switch reader.b {
+			case tokNewLine:
 				reader._var.mode = lineModeMulti
-
 				reader.valueCommit(true)
-
-				reader.bufFormat.WriteByte(tokNewLine)
-
 				reader.lineNum++
 				esc = false
 				continue
-			}
-			if reader.b == tokBackslash || reader.b == tokDoubleQuote {
+
+			case tokBackslash, tokDoubleQuote:
 				reader.valueWriteByte(reader.b)
 				esc = false
 				continue
-			}
-			if reader.b == 'b' {
-				reader.bufFormat.WriteByte(reader.b)
+
+			case 'b':
 				reader.buf.WriteByte(tokBackspace)
 				esc = false
 				continue
-			}
-			if reader.b == 'n' {
-				reader.bufFormat.WriteByte(reader.b)
+
+			case 'n':
 				reader.buf.WriteByte(tokNewLine)
 				esc = false
 				continue
-			}
-			if reader.b == 't' {
-				reader.bufFormat.WriteByte(reader.b)
+			case 't':
 				reader.buf.WriteByte(tokTab)
 				esc = false
 				continue
 			}
 			return errValueInvalid
 		}
-		if reader.b == tokSpace || reader.b == tokTab {
+
+		switch reader.b {
+		case tokSpace, tokTab:
 			if quoted {
 				reader.valueWriteByte(reader.b)
 				continue
 			}
-			reader.bufFormat.WriteByte(reader.b)
 			reader.bufSpaces.WriteByte(reader.b)
-			continue
-		}
-		if reader.b == tokBackslash {
-			reader.bufFormat.WriteByte(reader.b)
+
+		case tokBackslash:
 			esc = true
-			continue
-		}
-		if reader.b == tokDoubleQuote {
-			reader.bufFormat.WriteByte(reader.b)
+
+		case tokDoubleQuote:
 			if quoted {
 				quoted = false
 			} else {
 				quoted = true
 			}
-			continue
-		}
-		if reader.b == tokNewLine {
+
+		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
-			break
-		}
-		if reader.b == tokHash || reader.b == tokSemiColon {
+			isNewline = true
+
+		case tokHash, tokSemiColon:
 			if quoted {
 				reader.valueWriteByte(reader.b)
 				continue
 			}
 
+			reader.bufFormat.Write(reader.bufSpaces.Bytes())
 			reader.valueCommit(false)
 
 			_ = reader.br.UnreadByte()
 
 			return reader.parseComment()
+
+		default:
+			reader.valueWriteByte(reader.b)
 		}
-		reader.valueWriteByte(reader.b)
 	}
 
 	if quoted {
@@ -659,10 +656,5 @@ func (reader *reader) valueWriteByte(b byte) {
 		reader.bufSpaces.Reset()
 	}
 
-	if b == tokPercent {
-		reader.bufFormat.Write([]byte{'%', '%'})
-	} else {
-		reader.bufFormat.WriteByte(b)
-	}
 	reader.buf.WriteByte(b)
 }

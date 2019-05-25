@@ -64,25 +64,25 @@ func (v *variable) String() string {
 		}
 	case lineModeValue:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
 		}
 	case lineModeValue | lineModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
 		}
 	case lineModeMulti:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
 		}
 	case lineModeMulti | lineModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value, v.others)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
 		}

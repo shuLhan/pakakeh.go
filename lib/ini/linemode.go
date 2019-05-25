@@ -15,3 +15,21 @@ const (
 	lineModeValue      lineMode = 16
 	lineModeMulti      lineMode = 32
 )
+
+//
+// isLineModeVar will return true if mode is variable, which is either
+// lineModeSingle, lineModeValue, or lineModeMulti; otherwise it will return
+// false.
+//
+func isLineModeVar(mode lineMode) bool {
+	if mode&lineModeSingle > 0 {
+		return true
+	}
+	if mode&lineModeValue > 0 {
+		return true
+	}
+	if mode&lineModeMulti > 0 {
+		return true
+	}
+	return false
+}
