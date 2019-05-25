@@ -3,7 +3,40 @@ package ini
 import (
 	"fmt"
 	"log"
+	"os"
 )
+
+func ExampleIni_Add() {
+	ini := new(Ini)
+
+	ini.Add("", "", "k1", "v1")
+	ini.Add("s1", "", "", "v2")
+
+	ini.Add("s1", "", "k1", "")
+	ini.Add("s1", "", "k1", "v1")
+	ini.Add("s1", "", "k1", "v2")
+	ini.Add("s1", "", "k1", "v1")
+
+	ini.Add("s1", "sub", "k1", "v1")
+	ini.Add("s1", "sub", "k1", "v1")
+
+	ini.Add("s2", "sub", "k1", "v1")
+
+	err := ini.Write(os.Stdout)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Output:
+	// [s1]
+	// k1 = true
+	// k1 = v1
+	// k1 = v2
+	// [s1 "sub"]
+	// k1 = v1
+	// [s2 "sub"]
+	// k1 = v1
+}
 
 func ExampleIni_Gets() {
 	input := []byte(`
@@ -157,4 +190,107 @@ func ExampleIni_Rebase() {
 	// [section "sub"]
 	// key = value2
 	// key = value1
+}
+
+func ExampleIni_Set() {
+	input := []byte(`
+[section]
+key=value1 # comment
+key2= ; another comment
+
+[section "sub"]
+key=value1
+
+[section] ; here is comment on section
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value1
+`)
+
+	ini, err := Parse(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ini.Set("", "sub", "key", "value3")
+	ini.Set("sectionnotexist", "sub", "key", "value3")
+	ini.Set("section", "sub", "key", "value3")
+	ini.Set("section", "", "key", "value4")
+	ini.Set("section", "", "keynotexist", "value4")
+
+	err = ini.Write(os.Stdout)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Output:
+	//[section]
+	//key=value1 # comment
+	//key2= ; another comment
+	//
+	//[section "sub"]
+	//key=value1
+	//
+	//[section] ; here is comment on section
+	//key=value4
+	//key2=false
+	//
+	//[section "sub"]
+	//key=value2
+	//key=value3
+}
+
+func ExampleIni_Unset() {
+	input := []byte(`
+[section]
+key=value1 # comment
+key2= ; another comment
+
+[section "sub"]
+key=value1
+
+; here is comment on section
+[section]
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value1
+`)
+
+	ini, err := Parse(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ini.Unset("", "sub", "keynotexist")
+	ini.Unset("sectionnotexist", "sub", "keynotexist")
+	ini.Unset("section", "sub", "keynotexist")
+	ini.Unset("section", "sub", "key")
+	ini.Unset("section", "", "keynotexist")
+	ini.Unset("section", "", "key")
+
+	err = ini.Write(os.Stdout)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Output:
+	//[section]
+	//key=value1 # comment
+	//key2= ; another comment
+	//
+	//[section "sub"]
+	//key=value1
+	//
+	//; here is comment on section
+	//[section]
+	//key2=false
+	//
+	//[section "sub"]
+	//key=value2
 }

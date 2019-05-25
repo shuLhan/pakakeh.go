@@ -48,6 +48,89 @@ func Parse(text []byte) (in *Ini, err error) {
 }
 
 //
+// Add the new key and value to the last item in section and/or subsection.
+//
+// If section or subsection is not exist it will create a new one.
+// If section or key is empty, or value already exist it will not modify the
+// INI object.
+//
+// It will return true if new variable is added, otherwise it will return
+// false.
+//
+func (in *Ini) Add(secName, subName, key, value string) bool {
+	if len(secName) == 0 || len(key) == 0 {
+		return false
+	}
+
+	secName = strings.ToLower(secName)
+
+	sec := in.getSection(secName, subName)
+	if sec != nil {
+		return sec.add(key, value)
+	}
+
+	if len(value) == 0 {
+		value = varValueTrue
+	}
+
+	sec = newSection(secName, subName)
+	v := &variable{
+		mode:     lineModeValue,
+		key:      key,
+		keyLower: strings.ToLower(key),
+		value:    value,
+	}
+	sec.vars = append(sec.vars, v)
+	in.secs = append(in.secs, sec)
+
+	return true
+}
+
+//
+// Set the last variable's value in section-subsection that match with the
+// key.
+// If key found it will return true; otherwise it will return false.
+//
+func (in *Ini) Set(secName, subName, key, value string) bool {
+	if len(secName) == 0 || len(key) == 0 {
+		return false
+	}
+
+	secName = strings.ToLower(secName)
+
+	sec := in.getSection(secName, subName)
+	if sec == nil {
+		return false
+	}
+
+	key = strings.ToLower(key)
+
+	return sec.set(key, value)
+}
+
+//
+// Unset remove the last variable's in section and/or subsection that match
+// with the key.
+// If key found it will return true, otherwise it will return false.
+//
+func (in *Ini) Unset(secName, subName, key string) bool {
+	if len(secName) == 0 || len(key) == 0 {
+		return false
+	}
+
+	secName = strings.ToLower(secName)
+
+	sec := in.getSection(secName, subName)
+	if sec == nil {
+		return false
+	}
+
+	sec.unset(key)
+
+	return true
+}
+
+//
 // addSection append the new section to the list.
 //
 func (in *Ini) addSection(sec *section) {
@@ -264,13 +347,11 @@ func (in *Ini) Save(filename string) (err error) {
 	}
 
 	err = in.Write(f)
-
-	errClose := f.Close()
-	if errClose != nil {
-		println("ini.Save:", errClose)
+	if err != nil {
+		return
 	}
 
-	return
+	return f.Close()
 }
 
 //
@@ -286,4 +367,26 @@ func (in *Ini) Write(w io.Writer) (err error) {
 	}
 
 	return
+}
+
+//
+// getSection return the last section that have the same name and/or with
+// subsection's name.
+// Section's name MUST have in lowercase.
+//
+func (in *Ini) getSection(secName, subName string) *section {
+	x := len(in.secs) - 1
+	for ; x >= 0; x-- {
+		if in.secs[x].mode == lineModeEmpty || in.secs[x].mode == lineModeComment {
+			continue
+		}
+		if in.secs[x].nameLower != secName {
+			continue
+		}
+		if in.secs[x].sub != subName {
+			continue
+		}
+		return in.secs[x]
+	}
+	return nil
 }
