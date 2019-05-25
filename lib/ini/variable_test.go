@@ -10,6 +10,28 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestVariableEscape(t *testing.T) {
+	cases := []struct {
+		desc string
+		in   string
+		exp  string
+	}{{
+		desc: "With empty input",
+		in:   "",
+		exp:  `""`,
+	}, {
+		desc: "With escaped characters",
+		in:   "x\b\n\t\\\"x",
+		exp:  `"x\b\n\t\\\"x"`,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+		got := escape(c.in)
+		test.Assert(t, "escape", c.exp, got, true)
+	}
+}
+
 func TestVariableString(t *testing.T) {
 	cases := []struct {
 		desc string

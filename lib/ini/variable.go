@@ -31,13 +31,23 @@ type variable struct {
 	keyLower string
 	value    string
 	others   string
+	isQuoted bool
 }
 
 //
 // String return formatted INI variable.
 //
 func (v *variable) String() string {
-	var buf bytes.Buffer
+	var (
+		buf bytes.Buffer
+		val string
+	)
+
+	if v.isQuoted {
+		val = escape(v.value)
+	} else {
+		val = v.value
+	}
 
 	switch v.mode {
 	case lineModeEmpty:
@@ -64,29 +74,58 @@ func (v *variable) String() string {
 		}
 	case lineModeValue:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
+			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, val)
 		}
 	case lineModeValue | lineModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, val, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, val, v.others)
 		}
 	case lineModeMulti:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, v.value)
+			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, val)
 		}
 	case lineModeMulti | lineModeComment:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.value, v.others)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, val, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, v.value, v.others)
+			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, val, v.others)
 		}
 	}
+
+	return buf.String()
+}
+
+func escape(value string) (out string) {
+	var buf bytes.Buffer
+
+	buf.Grow(len(value) + 2)
+
+	buf.WriteByte('"')
+
+	for _, c := range value {
+		switch c {
+		case '\b':
+			buf.WriteString(`\b`)
+		case '\n':
+			buf.WriteString(`\n`)
+		case '\t':
+			buf.WriteString(`\t`)
+		case '\\':
+			buf.WriteString(`\\`)
+		case '"':
+			buf.WriteString(`\"`)
+		default:
+			buf.WriteRune(c)
+		}
+	}
+
+	buf.WriteByte('"')
 
 	return buf.String()
 }

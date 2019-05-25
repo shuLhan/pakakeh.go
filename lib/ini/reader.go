@@ -601,6 +601,7 @@ consume_spaces:
 			if quoted {
 				quoted = false
 			} else {
+				reader._var.isQuoted = true
 				quoted = true
 			}
 
