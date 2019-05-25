@@ -51,6 +51,23 @@ func TestNewSection(t *testing.T) {
 }
 
 func TestSectionSet(t *testing.T) {
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+		vars: []*variable{{
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v1",
+		}, {
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v2",
+		}},
+	}
+
 	cases := []struct {
 		desc   string
 		k      string
@@ -58,15 +75,8 @@ func TestSectionSet(t *testing.T) {
 		expOK  bool
 		expSec *section
 	}{{
-		desc: "With empty key",
-		expSec: &section{
-			mode:      sec.mode,
-			name:      sec.name,
-			nameLower: sec.nameLower,
-		},
-	}, {
-		desc:  "With empty value (Key-1) (will be added)",
-		k:     "Key-1",
+		desc:  "With empty value",
+		k:     "k",
 		expOK: true,
 		expSec: &section{
 			mode:      sec.mode,
@@ -74,14 +84,19 @@ func TestSectionSet(t *testing.T) {
 			nameLower: sec.nameLower,
 			vars: []*variable{{
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
+			}, {
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
 				value:    "true",
 			}},
 		},
 	}, {
-		desc:  "With new value (Key-1)",
-		k:     "Key-1",
+		desc:  "With value",
+		k:     "k",
 		v:     "false",
 		expOK: true,
 		expSec: &section{
@@ -90,50 +105,14 @@ func TestSectionSet(t *testing.T) {
 			nameLower: sec.nameLower,
 			vars: []*variable{{
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "false",
-			}},
-		},
-	}, {
-		desc:  "With key not found (Key-2) (added)",
-		k:     "Key-2",
-		v:     "2",
-		expOK: true,
-		expSec: &section{
-			mode:      sec.mode,
-			name:      sec.name,
-			nameLower: sec.nameLower,
-			vars: []*variable{{
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "false",
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
 			}, {
 				mode:     lineModeValue,
-				key:      "Key-2",
-				keyLower: "key-2",
-				value:    "2",
-			}},
-		},
-	}, {
-		desc:  "With empty value on Key-2 (true)",
-		k:     "Key-2",
-		expOK: true,
-		expSec: &section{
-			mode:      sec.mode,
-			name:      sec.name,
-			nameLower: sec.nameLower,
-			vars: []*variable{{
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
+				key:      "k",
+				keyLower: "k",
 				value:    "false",
-			}, {
-				mode:     lineModeValue,
-				key:      "Key-2",
-				keyLower: "key-2",
-				value:    "true",
 			}},
 		},
 	}}
@@ -145,72 +124,97 @@ func TestSectionSet(t *testing.T) {
 
 		test.Assert(t, "ok", c.expOK, ok, true)
 		test.Assert(t, "section", c.expSec, sec, true)
-
-		lastSec = c.expSec
 	}
 }
 
 func TestSectionAdd(t *testing.T) {
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+		vars: []*variable{{
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v1",
+		}, {
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v2",
+		}},
+	}
+
 	cases := []struct {
 		desc   string
 		k      string
 		v      string
 		expSec *section
 	}{{
-		desc:   "Empty key (no change)",
-		expSec: lastSec,
-	}, {
-		desc: "Duplicate key-1 (no value)",
-		k:    "Key-1",
+		desc: "With empty key",
 		expSec: &section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "false",
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
 			}, {
 				mode:     lineModeValue,
-				key:      "Key-2",
-				keyLower: "key-2",
-				value:    "true",
+				key:      "k",
+				keyLower: "k",
+				value:    "v2",
+			}},
+		},
+	}, {
+		desc: "With no value",
+		k:    "k",
+		expSec: &section{
+			mode:      sec.mode,
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
 			}, {
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
+				key:      "k",
+				keyLower: "k",
+				value:    "v2",
+			}, {
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
 				value:    "true",
 			}},
 		},
 	}, {
-		desc: "Duplicate key-1 (1)",
-		k:    "Key-1",
-		v:    "1",
+		desc: "Duplicate key and value",
+		k:    "k",
+		v:    "v1",
 		expSec: &section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "false",
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
 			}, {
 				mode:     lineModeValue,
-				key:      "Key-2",
-				keyLower: "key-2",
+				key:      "k",
+				keyLower: "k",
+				value:    "v2",
+			}, {
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
 				value:    "true",
-			}, {
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "true",
-			}, {
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "1",
 			}},
 		},
 	}}
@@ -221,84 +225,54 @@ func TestSectionAdd(t *testing.T) {
 		sec.add(c.k, c.v)
 
 		test.Assert(t, "section", c.expSec, sec, true)
-
-		lastSec = c.expSec
-	}
-}
-
-func TestSectionSet2(t *testing.T) {
-	cases := []struct {
-		desc   string
-		k      string
-		v      string
-		expOK  bool
-		expSec *section
-	}{{
-		desc:   "Set duplicate Key-1",
-		k:      "Key-1",
-		v:      "new value",
-		expSec: lastSec,
-	}, {
-		desc:   "Set duplicate key-1",
-		k:      "key-1",
-		v:      "new value",
-		expSec: lastSec,
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		ok := sec.set(c.k, c.v)
-
-		test.Assert(t, "ok", c.expOK, ok, true)
-		test.Assert(t, "section", c.expSec, sec, true)
-
-		lastSec = c.expSec
 	}
 }
 
 func TestSectionUnset(t *testing.T) {
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+		vars: []*variable{{
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v1",
+		}, {
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v2",
+		}},
+	}
+
 	cases := []struct {
 		desc   string
 		k      string
 		expOK  bool
 		expSec *section
 	}{{
-		desc:   "With empty key",
-		expOK:  true,
-		expSec: lastSec,
-	}, {
-		desc:   "With duplicate key-1",
-		k:      "key-1",
-		expSec: lastSec,
-	}, {
-		desc:  "With valid key-2",
-		k:     "key-2",
-		expOK: true,
+		desc:  "With empty key",
+		expOK: false,
 		expSec: &section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "false",
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
 			}, {
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "true",
-			}, {
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "1",
+				key:      "k",
+				keyLower: "k",
+				value:    "v2",
 			}},
 		},
 	}, {
-		desc:  "With valid key-2 (again)",
-		k:     "key-2",
+		desc:  "With duplicate key",
+		k:     "k",
 		expOK: true,
 		expSec: &section{
 			mode:      sec.mode,
@@ -306,20 +280,34 @@ func TestSectionUnset(t *testing.T) {
 			nameLower: sec.nameLower,
 			vars: []*variable{{
 				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "false",
-			}, {
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "true",
-			}, {
-				mode:     lineModeValue,
-				key:      "Key-1",
-				keyLower: "key-1",
-				value:    "1",
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
 			}},
+		},
+	}, {
+		desc: "With invalid key",
+		k:    "key-2",
+		expSec: &section{
+			mode:      sec.mode,
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
+			}},
+		},
+	}, {
+		desc:  "With valid key (again)",
+		k:     "k",
+		expOK: true,
+		expSec: &section{
+			mode:      sec.mode,
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars:      []*variable{},
 		},
 	}}
 
@@ -330,34 +318,79 @@ func TestSectionUnset(t *testing.T) {
 
 		test.Assert(t, "ok", c.expOK, ok, true)
 		test.Assert(t, "section", c.expSec, sec, true)
-
-		lastSec = c.expSec
 	}
 }
 
 func TestSectionUnsetAll(t *testing.T) {
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+		vars: []*variable{{
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v1",
+		}, {
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v2",
+		}},
+	}
+
 	cases := []struct {
 		desc   string
 		k      string
 		expSec *section
 	}{{
-		desc:   "With empty key",
-		expSec: lastSec,
+		desc: "With empty key",
+		expSec: &section{
+			mode:      sec.mode,
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
+			}, {
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
+				value:    "v2",
+			}},
+		},
 	}, {
-		desc:   "With invalid key-3",
-		k:      "key-3",
-		expSec: lastSec,
+		desc: "With unmatch key",
+		k:    "unmatch",
+		expSec: &section{
+			mode:      sec.mode,
+			name:      sec.name,
+			nameLower: sec.nameLower,
+			vars: []*variable{{
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
+				value:    "v1",
+			}, {
+				mode:     lineModeValue,
+				key:      "k",
+				keyLower: "k",
+				value:    "v2",
+			}},
+		},
 	}, {
-		desc: "With valid key-1",
-		k:    "KEY-1",
+		desc: "With valid k",
+		k:    "K",
 		expSec: &section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
 		},
 	}, {
-		desc: "With valid key-1 (again)",
-		k:    "KEY-1",
+		desc: "With valid key (again)",
+		k:    "K",
 		expSec: &section{
 			mode:      sec.mode,
 			name:      sec.name,
@@ -371,13 +404,15 @@ func TestSectionUnsetAll(t *testing.T) {
 		sec.unsetAll(c.k)
 
 		test.Assert(t, "section", c.expSec, sec, true)
-
-		lastSec = c.expSec
 	}
 }
 
 func TestSectionReplaceAll(t *testing.T) {
-	sec.addVariable(nil)
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+	}
 
 	sec.add("key-3", "3")
 	sec.add("key-3", "33")
@@ -418,7 +453,7 @@ func TestSectionReplaceAll(t *testing.T) {
 			}},
 		},
 	}, {
-		desc: "With invalid key-4 (will be added)",
+		desc: "With invalid key",
 		k:    "KEY-4",
 		v:    "4",
 		expSec: &section{
@@ -453,7 +488,7 @@ func TestSectionReplaceAll(t *testing.T) {
 			}},
 		},
 	}, {
-		desc: "With valid key-3",
+		desc: "With valid key",
 		k:    "KEY-3",
 		v:    "replaced",
 		expSec: &section{
@@ -484,6 +519,23 @@ func TestSectionReplaceAll(t *testing.T) {
 }
 
 func TestSectionGet(t *testing.T) {
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+		vars: []*variable{{
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v1",
+		}, {
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v2",
+		}},
+	}
+
 	cases := []struct {
 		desc   string
 		k      string
@@ -491,19 +543,16 @@ func TestSectionGet(t *testing.T) {
 		expOK  bool
 		expVal string
 	}{{
-		desc: "On empty vars",
-		k:    "key-1",
-	}, {
-		desc:   "On empty vars with default",
+		desc:   "With invalid key and default",
 		k:      "key-1",
 		def:    "default value",
 		expVal: "default value",
 	}, {
 		desc:   "Valid key",
-		k:      "key-3",
+		k:      "k",
 		def:    "default value",
 		expOK:  true,
-		expVal: "replaced",
+		expVal: "v2",
 	}}
 
 	for _, c := range cases {
@@ -517,6 +566,23 @@ func TestSectionGet(t *testing.T) {
 }
 
 func TestSectionGets(t *testing.T) {
+	sec := &section{
+		mode:      lineModeSection,
+		name:      "section",
+		nameLower: "section",
+		vars: []*variable{{
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v1",
+		}, {
+			mode:     lineModeValue,
+			key:      "k",
+			keyLower: "k",
+			value:    "v2",
+		}},
+	}
+
 	sec.add("dup", "value 1")
 	sec.add("dup", "value 2")
 

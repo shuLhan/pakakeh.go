@@ -91,21 +91,46 @@ func (sec *section) String() string {
 //
 // add append variable with `key` and `value` to current section.
 //
-// If section already contains the same key, the value will not be replaced.
-// Use set() or ReplaceAll() to set existing value without duplication.
 // If key is empty, no variable will be appended.
 // If value is empty, it will be set to true.
+// If key and value already exist, no variable will be appended.
+// Use set() or replaceAll() to set existing value without duplication.
 //
-func (sec *section) add(key, value string) {
+// It will return true if new variable is appended, otherwise it will return
+// false.
+//
+func (sec *section) add(key, value string) bool {
 	if len(key) == 0 {
-		return
+		return false
 	}
+	if len(value) == 0 {
+		value = varValueTrue
+	}
+
+	keyLower := strings.ToLower(key)
+
+	for x := 0; x < len(sec.vars); x++ {
+		if !isLineModeVar(sec.vars[x].mode) {
+			continue
+		}
+		if sec.vars[x].keyLower != keyLower {
+			continue
+		}
+		if sec.vars[x].value == value {
+			return false
+		}
+	}
+
 	v := &variable{
-		mode:  lineModeValue,
-		key:   key,
-		value: value,
+		mode:     lineModeValue,
+		key:      key,
+		keyLower: keyLower,
+		value:    value,
 	}
-	sec.addVariable(v)
+
+	sec.vars = append(sec.vars, v)
+
+	return true
 }
 
 //
@@ -153,31 +178,6 @@ func (sec *section) addVariable(v *variable) {
 }
 
 //
-// getFirstIndex will return the first index of variable `key`. If current
-// section have duplicate `key` it will return true.
-// If no variable with key found it will return -1 and false.
-//
-func (sec *section) getFirstIndex(key string) (idx int, dup bool) {
-	idx = -1
-	n := 0
-	for x := 0; x < len(sec.vars); x++ {
-		if sec.vars[x].keyLower != key {
-			continue
-		}
-		if idx < 0 {
-			idx = x
-		}
-		n++
-		if n > 1 {
-			dup = true
-			return
-		}
-	}
-
-	return
-}
-
-//
 // get will return the last variable value based on key.
 // If no key found it will return default value and false.
 //
@@ -201,6 +201,25 @@ func (sec *section) get(key, def string) (val string, ok bool) {
 	}
 
 	return
+}
+
+//
+// getVariable return the last variable that have the same key.
+// The key MUST have been converted to lowercase.
+//
+func (sec *section) getVariable(key string) (idx int, v *variable) {
+	idx = len(sec.vars) - 1
+	for ; idx >= 0; idx-- {
+		if !isLineModeVar(sec.vars[idx].mode) {
+			continue
+		}
+		if sec.vars[idx].keyLower == key {
+			v = sec.vars[idx]
+			return
+		}
+	}
+
+	return 0, nil
 }
 
 //
@@ -241,67 +260,45 @@ func (sec *section) replaceAll(key, value string) {
 
 //
 // set will replace variable with matching key with value.
-// If key is empty, no variable will be changed or added, and it will
-// return false.
-// If section contains two or more variable with the same `key`, it will
-// return false.
-// If no variable key matched, the new variable will be added to list.
+// The key MUST be not empty and has been converted to lowercase.
 // If value is empty, it will be set to true.
 //
 func (sec *section) set(key, value string) bool {
-	if len(key) == 0 {
+	if len(sec.vars) == 0 || len(key) == 0 {
 		return false
 	}
 
-	keyLower := strings.ToLower(key)
+	key = strings.ToLower(key)
 
-	idx, dup := sec.getFirstIndex(keyLower)
-	if dup {
+	_, v := sec.getVariable(key)
+	if v == nil {
 		return false
 	}
-
-	if idx < 0 {
-		sec.addVariable(&variable{
-			mode:  lineModeValue,
-			key:   key,
-			value: value,
-		})
-		return true
-	}
-
 	if len(value) == 0 {
-		sec.vars[idx].value = varValueTrue
-	} else {
-		sec.vars[idx].value = value
+		value = varValueTrue
 	}
+
+	v.value = value
 
 	return true
 }
 
 //
-// unset remove the variable with name `key` on current section.
+// unset remove the last variable with name `key` on current section.
 //
-// If key is empty, no variable will be removed, and it will return true.
-//
-// If current section contains two or more variables with the same key,
-// no variables will be removed and it will return false.
-//
-// On success, where no variable removed or one variable is removed, it will
-// return true.
+// On success, where a variable removed or one variable is removed, it will
+// return true, otherwise it will be removed.
 //
 func (sec *section) unset(key string) bool {
 	if len(key) == 0 {
-		return true
+		return false
 	}
 
 	key = strings.ToLower(key)
 
-	idx, dup := sec.getFirstIndex(key)
-	if dup {
+	idx, v := sec.getVariable(key)
+	if v == nil {
 		return false
-	}
-	if idx < 0 {
-		return true
 	}
 
 	copy(sec.vars[idx:], sec.vars[idx+1:])
