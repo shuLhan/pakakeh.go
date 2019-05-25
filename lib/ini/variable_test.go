@@ -43,47 +43,6 @@ func TestVariableString(t *testing.T) {
 		},
 		exp: "; comment\n",
 	}, {
-		desc: "With mode section",
-		v: &variable{
-			mode:    lineModeSection,
-			secName: "section",
-		},
-		exp: "[section]\n",
-	}, {
-		desc: "With mode section and comment #1",
-		v: &variable{
-			mode:    lineModeSection | lineModeComment,
-			secName: "section",
-			others:  "; comment",
-		},
-		exp: "[section] ; comment\n",
-	}, {
-		desc: "With mode section and comment #2",
-		v: &variable{
-			mode:    lineModeSection | lineModeComment,
-			format:  " [%s]   %s",
-			secName: "section",
-			others:  "; comment",
-		},
-		exp: " [section]   ; comment",
-	}, {
-		desc: "With mode section and subsection",
-		v: &variable{
-			mode:    lineModeSection | lineModeSubsection,
-			secName: "section",
-			subName: "subsection",
-		},
-		exp: `[section "subsection"]\n`,
-	}, {
-		desc: "With mode section, subsection, and comment",
-		v: &variable{
-			mode:    lineModeSection | lineModeSubsection | lineModeComment,
-			secName: "section",
-			subName: "subsection",
-			others:  "; comment",
-		},
-		exp: `[section "subsection"] ; comment\n`,
-	}, {
 		desc: "With mode single",
 		v: &variable{
 			mode: lineModeSingle,

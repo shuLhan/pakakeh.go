@@ -50,30 +50,6 @@ func (v *variable) String() string {
 		} else {
 			_, _ = fmt.Fprintf(&buf, "%s\n", v.others)
 		}
-	case lineModeSection:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.secName)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s]\n", v.secName)
-		}
-	case lineModeSection | lineModeComment:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.secName, v.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", v.secName, v.others)
-		}
-	case lineModeSection | lineModeSubsection:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.secName, v.subName)
-		} else {
-			_, _ = fmt.Fprintf(&buf, `[%s "%s"]\n`, v.secName, v.subName)
-		}
-	case lineModeSection | lineModeSubsection | lineModeComment:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.secName, v.subName, v.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, `[%s "%s"] %s\n`, v.secName, v.subName, v.others)
-		}
 	case lineModeSingle:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key)
