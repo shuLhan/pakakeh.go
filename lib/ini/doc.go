@@ -6,10 +6,12 @@
 // Package ini implement reading and writing INI configuration as defined by
 // Git configuration file syntax.
 //
-// Feature Promises
+// Features
 //
-// Reading and writing on the same file should not change the content of
+// *  Reading and writing on the same file should not change the content of
 // file (including comment).
+//
+// *  Template friendly, through Val(), Vals(), and Subs().
 //
 // Unsupported Features
 //

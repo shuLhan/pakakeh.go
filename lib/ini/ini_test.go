@@ -91,20 +91,20 @@ func TestAddSection(t *testing.T) {
 
 	cases := []struct {
 		desc   string
-		sec    *section
+		sec    *Section
 		expIni *Ini
 	}{{
 		desc:   "With nil section",
 		expIni: &Ini{},
 	}, {
 		desc: "With valid section",
-		sec: &section{
+		sec: &Section{
 			mode:      lineModeSection,
 			name:      "Test",
 			nameLower: "test",
 		},
 		expIni: &Ini{
-			secs: []*section{{
+			secs: []*Section{{
 				mode:      lineModeSection,
 				name:      "Test",
 				nameLower: "test",

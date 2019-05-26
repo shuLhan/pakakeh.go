@@ -18,7 +18,7 @@ import (
 // Ini contains the parsed file.
 //
 type Ini struct {
-	secs []*section
+	secs []*Section
 }
 
 //
@@ -133,7 +133,7 @@ func (in *Ini) Unset(secName, subName, key string) bool {
 //
 // addSection append the new section to the list.
 //
-func (in *Ini) addSection(sec *section) {
+func (in *Ini) addSection(sec *Section) {
 	if sec == nil {
 		return
 	}
@@ -201,20 +201,20 @@ func (in *Ini) AsMap() (out map[string][]string) {
 // If key found it will return its value and true; otherwise it will return
 // default value in def and false.
 //
-func (in *Ini) Get(section, subsection, key, def string) (val string, ok bool) {
-	if len(in.secs) == 0 || len(section) == 0 || len(key) == 0 {
+func (in *Ini) Get(secName, subName, key, def string) (val string, ok bool) {
+	if len(in.secs) == 0 || len(secName) == 0 || len(key) == 0 {
 		return def, false
 	}
 
 	x := len(in.secs) - 1
-	sec := strings.ToLower(section)
+	sec := strings.ToLower(secName)
 
 	for ; x >= 0; x-- {
 		if in.secs[x].nameLower != sec {
 			continue
 		}
 
-		if in.secs[x].sub != subsection {
+		if in.secs[x].sub != subName {
 			continue
 		}
 
@@ -231,8 +231,8 @@ func (in *Ini) Get(section, subsection, key, def string) (val string, ok bool) {
 // GetBool return key's value as boolean.  If no key found it will return
 // default value.
 //
-func (in *Ini) GetBool(section, subsection, key string, def bool) bool {
-	out, ok := in.Get(section, subsection, key, "false")
+func (in *Ini) GetBool(secName, subName, key string, def bool) bool {
+	out, ok := in.Get(secName, subName, key, "false")
 	if !ok {
 		return def
 	}
@@ -243,17 +243,17 @@ func (in *Ini) GetBool(section, subsection, key string, def bool) bool {
 //
 // Gets key's values as slice of string in the same section and subsection.
 //
-func (in *Ini) Gets(section, subsection, key string) (out []string) {
-	section = strings.ToLower(section)
+func (in *Ini) Gets(secName, subName, key string) (out []string) {
+	secName = strings.ToLower(secName)
 
 	for _, sec := range in.secs {
 		if sec.mode&lineModeSection == 0 {
 			continue
 		}
-		if sec.nameLower != section {
+		if sec.nameLower != secName {
 			continue
 		}
-		if sec.sub != subsection {
+		if sec.sub != subName {
 			continue
 		}
 		vals, ok := sec.gets(key, nil)
@@ -271,13 +271,13 @@ func (in *Ini) Gets(section, subsection, key string) (out []string) {
 // subsection with the same name into one group.
 //
 func (in *Ini) Prune() {
-	newSecs := make([]*section, 0, len(in.secs))
+	newSecs := make([]*Section, 0, len(in.secs))
 
 	for _, sec := range in.secs {
 		if sec.mode == lineModeEmpty {
 			continue
 		}
-		newSec := &section{
+		newSec := &Section{
 			mode:      lineModeSection,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -307,7 +307,7 @@ func (in *Ini) Prune() {
 //
 // mergeSection merge a section (and subsection) into slice.
 //
-func mergeSection(secs []*section, newSec *section) []*section {
+func mergeSection(secs []*Section, newSec *Section) []*Section {
 	for x := 0; x < len(secs); x++ {
 		if secs[x].nameLower != newSec.nameLower {
 			continue
@@ -355,6 +355,83 @@ func (in *Ini) Save(filename string) (err error) {
 }
 
 //
+// Subs return all non empty subsections (and its variable) that have the same
+// section name.
+//
+// This function is shortcut to be used in templating.
+//
+func (in *Ini) Subs(secName string) (subs []*Section) {
+	if len(secName) == 0 {
+		return
+	}
+
+	secName = strings.ToLower(secName)
+
+	for x := 0; x < len(in.secs); x++ {
+		if in.secs[x].mode == lineModeEmpty || in.secs[x].mode == lineModeComment {
+			continue
+		}
+		if len(in.secs[x].sub) == 0 {
+			continue
+		}
+		if in.secs[x].nameLower != secName {
+			continue
+		}
+
+		subs = mergeSection(subs, in.secs[x])
+	}
+
+	return subs
+}
+
+//
+// Val return the last variable value using a string as combination of
+// section, subsection, and key with ":" as separator.  If key not found, it
+// will return empty string.
+//
+// For example, to get the value of key "k" in section "s" and subsection
+// "sub", call
+//
+//	V("s:sub:k")
+//
+// This function is shortcut to be used in templating.
+//
+func (in *Ini) Val(keyPath string) (val string) {
+	keys := strings.Split(keyPath, ":")
+	if len(keys) != 3 {
+		return
+	}
+
+	val, _ = in.Get(keys[0], keys[1], keys[2], "")
+
+	return
+}
+
+//
+// Vals return all values as slice of string.
+// The keyPath is combination of section, subsection, and key using colon ":"
+// as separator.
+// If key not found, it will return an empty slice.
+//
+// For example, to get all values of key "k" in section "s" and subsection
+// "sub", call
+//
+//	Vals("s:sub:k")
+//
+// This function is shortcut to be used in templating.
+//
+func (in *Ini) Vals(keyPath string) (vals []string) {
+	keys := strings.Split(keyPath, ":")
+	if len(keys) != 3 {
+		return
+	}
+
+	vals = in.Gets(keys[0], keys[1], keys[2])
+
+	return
+}
+
+//
 // Write the current parsed Ini into writer `w`.
 //
 func (in *Ini) Write(w io.Writer) (err error) {
@@ -374,7 +451,7 @@ func (in *Ini) Write(w io.Writer) (err error) {
 // subsection's name.
 // Section's name MUST have in lowercase.
 //
-func (in *Ini) getSection(secName, subName string) *section {
+func (in *Ini) getSection(secName, subName string) *Section {
 	x := len(in.secs) - 1
 	for ; x >= 0; x-- {
 		if in.secs[x].mode == lineModeEmpty || in.secs[x].mode == lineModeComment {

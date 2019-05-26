@@ -243,6 +243,38 @@ key=value1
 	//key=value3
 }
 
+func ExampleIni_Subs() {
+	input := []byte(`
+[section]
+key=value1 # comment
+key2= ; another comment
+
+[section "sub"]
+key=value1
+
+[section] ; here is comment on section
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value1
+`)
+
+	ini, err := Parse(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	subs := ini.Subs("section")
+
+	for _, sub := range subs {
+		fmt.Println(sub.SubName(), sub.Vals("key"))
+	}
+	// Output:
+	// sub [value2 value1]
+}
+
 func ExampleIni_Unset() {
 	input := []byte(`
 [section]
@@ -293,4 +325,73 @@ key=value1
 	//
 	//[section "sub"]
 	//key=value2
+}
+
+func ExampleIni_Val() {
+	input := `
+[section]
+key=value1
+key2=
+
+[section "sub"]
+key=value1
+
+[section]
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value3
+`
+
+	ini, err := Parse([]byte(input))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(ini.Val("section:sub:key"))
+	fmt.Println(ini.Val("section:sub:key2"))
+	fmt.Println(ini.Val("section::key"))
+	fmt.Println(ini.Val("section:key"))
+	// Output:
+	// value3
+	//
+	// value2
+	//
+}
+
+func ExampleIni_Vals() {
+	input := `
+[section]
+key=value1
+key2=
+
+[section "sub"]
+key=value1
+key=value2
+
+[section]
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value3
+`
+
+	ini, err := Parse([]byte(input))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(ini.Vals("section:key"))
+	fmt.Println(ini.Vals("section::key"))
+	fmt.Println(ini.Vals("section:sub:key2"))
+	fmt.Println(ini.Vals("section:sub:key"))
+	// Output:
+	// []
+	// [value1 value2]
+	// []
+	// [value1 value2 value3]
 }

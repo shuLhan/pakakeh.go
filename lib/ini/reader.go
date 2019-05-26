@@ -49,7 +49,7 @@ type reader struct {
 	lineNum    int
 	filename   string
 	_var       *variable
-	sec        *section
+	sec        *Section
 	buf        bytes.Buffer
 	bufComment bytes.Buffer
 	bufFormat  bytes.Buffer
@@ -79,7 +79,7 @@ func (reader *reader) reset(src []byte) {
 	reader._var = &variable{
 		mode: lineModeEmpty,
 	}
-	reader.sec = &section{
+	reader.sec = &Section{
 		mode: lineModeEmpty,
 	}
 	reader.buf.Reset()
@@ -147,7 +147,7 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 
 			in.addSection(reader.sec)
 
-			reader.sec = &section{
+			reader.sec = &Section{
 				mode:    reader._var.mode,
 				lineNum: reader._var.lineNum,
 				name:    reader._var.secName,

@@ -15,7 +15,7 @@ func TestNewSection(t *testing.T) {
 		desc   string
 		name   string
 		sub    string
-		expSec *section
+		expSec *Section
 	}{{
 		desc: "With empty name",
 	}, {
@@ -24,7 +24,7 @@ func TestNewSection(t *testing.T) {
 	}, {
 		desc: "With name only",
 		name: "Section",
-		expSec: &section{
+		expSec: &Section{
 			mode:      lineModeSection,
 			name:      "Section",
 			nameLower: "section",
@@ -33,7 +33,7 @@ func TestNewSection(t *testing.T) {
 		desc: "With name and subname",
 		name: "Section",
 		sub:  "Subsection",
-		expSec: &section{
+		expSec: &Section{
 			mode:      lineModeSection | lineModeSubsection,
 			name:      "Section",
 			nameLower: "section",
@@ -51,7 +51,7 @@ func TestNewSection(t *testing.T) {
 }
 
 func TestSectionSet(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
@@ -73,12 +73,12 @@ func TestSectionSet(t *testing.T) {
 		k      string
 		v      string
 		expOK  bool
-		expSec *section
+		expSec *Section
 	}{{
 		desc:  "With empty value",
 		k:     "k",
 		expOK: true,
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -99,7 +99,7 @@ func TestSectionSet(t *testing.T) {
 		k:     "k",
 		v:     "false",
 		expOK: true,
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -128,7 +128,7 @@ func TestSectionSet(t *testing.T) {
 }
 
 func TestSectionAdd(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
@@ -149,10 +149,10 @@ func TestSectionAdd(t *testing.T) {
 		desc   string
 		k      string
 		v      string
-		expSec *section
+		expSec *Section
 	}{{
 		desc: "With empty key",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -171,7 +171,7 @@ func TestSectionAdd(t *testing.T) {
 	}, {
 		desc: "With no value",
 		k:    "k",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -196,7 +196,7 @@ func TestSectionAdd(t *testing.T) {
 		desc: "Duplicate key and value",
 		k:    "k",
 		v:    "v1",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -229,7 +229,7 @@ func TestSectionAdd(t *testing.T) {
 }
 
 func TestSectionUnset(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
@@ -250,11 +250,11 @@ func TestSectionUnset(t *testing.T) {
 		desc   string
 		k      string
 		expOK  bool
-		expSec *section
+		expSec *Section
 	}{{
 		desc:  "With empty key",
 		expOK: false,
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -274,7 +274,7 @@ func TestSectionUnset(t *testing.T) {
 		desc:  "With duplicate key",
 		k:     "k",
 		expOK: true,
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -288,7 +288,7 @@ func TestSectionUnset(t *testing.T) {
 	}, {
 		desc: "With invalid key",
 		k:    "key-2",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -303,7 +303,7 @@ func TestSectionUnset(t *testing.T) {
 		desc:  "With valid key (again)",
 		k:     "k",
 		expOK: true,
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -322,7 +322,7 @@ func TestSectionUnset(t *testing.T) {
 }
 
 func TestSectionUnsetAll(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
@@ -342,10 +342,10 @@ func TestSectionUnsetAll(t *testing.T) {
 	cases := []struct {
 		desc   string
 		k      string
-		expSec *section
+		expSec *Section
 	}{{
 		desc: "With empty key",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -364,7 +364,7 @@ func TestSectionUnsetAll(t *testing.T) {
 	}, {
 		desc: "With unmatch key",
 		k:    "unmatch",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -383,7 +383,7 @@ func TestSectionUnsetAll(t *testing.T) {
 	}, {
 		desc: "With valid k",
 		k:    "K",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -391,7 +391,7 @@ func TestSectionUnsetAll(t *testing.T) {
 	}, {
 		desc: "With valid key (again)",
 		k:    "K",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -408,7 +408,7 @@ func TestSectionUnsetAll(t *testing.T) {
 }
 
 func TestSectionReplaceAll(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
@@ -423,10 +423,10 @@ func TestSectionReplaceAll(t *testing.T) {
 		desc   string
 		k      string
 		v      string
-		expSec *section
+		expSec *Section
 	}{{
 		desc: "With empty key",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -456,7 +456,7 @@ func TestSectionReplaceAll(t *testing.T) {
 		desc: "With invalid key",
 		k:    "KEY-4",
 		v:    "4",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -491,7 +491,7 @@ func TestSectionReplaceAll(t *testing.T) {
 		desc: "With valid key",
 		k:    "KEY-3",
 		v:    "replaced",
-		expSec: &section{
+		expSec: &Section{
 			mode:      sec.mode,
 			name:      sec.name,
 			nameLower: sec.nameLower,
@@ -519,7 +519,7 @@ func TestSectionReplaceAll(t *testing.T) {
 }
 
 func TestSectionGet(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
@@ -566,7 +566,7 @@ func TestSectionGet(t *testing.T) {
 }
 
 func TestSectionGets(t *testing.T) {
-	sec := &section{
+	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
 		nameLower: "section",
