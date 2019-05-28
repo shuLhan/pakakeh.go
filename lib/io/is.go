@@ -8,7 +8,60 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
+
+//
+// IsBinary will return true if content of file is binary.
+// If file is not exist or there is an error when reading or closing the file,
+// it will return false.
+//
+func IsBinary(file string) bool {
+	var (
+		total     int
+		printable int
+	)
+
+	f, err := os.Open(file)
+	if err != nil {
+		return false
+	}
+
+	content := make([]byte, 768)
+
+	for total < 512 {
+		n, err := f.Read(content)
+		if err != nil {
+			break
+		}
+
+		content = content[:n]
+
+		for x := 0; x < len(content); x++ {
+			if libbytes.IsSpace(content[x]) {
+				continue
+			}
+			if content[x] >= 33 && content[x] <= 126 {
+				printable++
+			}
+			total++
+		}
+	}
+
+	err = f.Close()
+	if err != nil {
+		return false
+	}
+
+	ratio := float64(printable) / float64(total)
+
+	if ratio > float64(0.75) {
+		return false
+	}
+
+	return true
+}
 
 //
 // IsDirEmpty will return true if directory is not exist or empty; otherwise
