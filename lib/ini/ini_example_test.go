@@ -71,6 +71,7 @@ key2=
 
 [section "sub"]
 key=value1
+key2=
 
 [section]
 key=value2
@@ -86,15 +87,27 @@ key=value3
 		log.Fatal(err)
 	}
 
-	iniMap := inis.AsMap()
+	iniMap := inis.AsMap("", "")
 
 	for k, v := range iniMap {
 		fmt.Println(k, "=", v)
 	}
+
+	iniMap = inis.AsMap("section", "sub")
+
+	fmt.Println()
+	for k, v := range iniMap {
+		fmt.Println(k, "=", v)
+	}
+
 	// Unordered output:
 	// section::key = [value1 value2]
 	// section::key2 = [true false]
 	// section:sub:key = [value1 value2 value3]
+	// section:sub:key2 = [true]
+	//
+	// key = [value1 value2 value3]
+	// key2 = [true]
 }
 
 func ExampleIni_Prune() {

@@ -150,26 +150,22 @@ func (in *Ini) addSection(sec *Section) {
 // AsMap return the INI contents as mapping of
 // (section-name ":" subsection-name ":" variable-name) as key
 // and the variable's values as slice of string.
-// For example, given the following INI file,
 //
-//	[section1]
-//	key = value
+// If section name is not empty, only the keys will be listed in the map.
 //
-//	[section2 "sub"]
-//	key2 = value2
-//	key2 = value3
-//
-// it will be mapped as,
-//
-//	map["section1::key"] = []string{"value"}
-//	map["section2:sub:key2"] = []string{"value2", "value3"}
-//
-func (in *Ini) AsMap() (out map[string][]string) {
+func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 	sep := ":"
 	out = make(map[string][]string)
 
 	for x := 0; x < len(in.secs); x++ {
 		sec := in.secs[x]
+
+		if len(sectionName) > 0 && sectionName != sec.nameLower {
+			continue
+		}
+		if len(sectionName) > 0 && subName != sec.sub {
+			continue
+		}
 
 		for y := 0; y < len(sec.vars); y++ {
 			v := sec.vars[y]
@@ -181,7 +177,15 @@ func (in *Ini) AsMap() (out map[string][]string) {
 				continue
 			}
 
-			key := sec.nameLower + sep + sec.sub + sep + v.keyLower
+			var key string
+
+			if len(sectionName) > 0 && len(subName) > 0 {
+				key += v.key
+			} else {
+				key += sec.nameLower + sep
+				key += sec.sub + sep
+				key += v.key
+			}
 
 			vals, ok := out[key]
 			if !ok {
