@@ -17,6 +17,10 @@ import (
 // environment where the SSH program started.
 //
 type ClientConfig struct {
+	// Environments contains system environment variables that will be
+	// passed to Execute().
+	Environments map[string]string
+
 	// WorkingDir contains the directory where the SSH client started.
 	// This value is required when client want to copy file from/to
 	// remote.

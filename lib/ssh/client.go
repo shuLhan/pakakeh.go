@@ -80,6 +80,10 @@ func (cl *Client) Execute(cmd string) (err error) {
 	sess.Stdout = os.Stdout
 	sess.Stderr = os.Stderr
 
+	for k, v := range cl.cfg.Environments {
+		sess.Setenv(k, v)
+	}
+
 	err = sess.Run(cmd)
 	if err != nil {
 		err = fmt.Errorf("ssh: Run %q: %s", cmd, err.Error())
