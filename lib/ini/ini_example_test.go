@@ -408,3 +408,42 @@ key=value3
 	// []
 	// [value1 value2 value3]
 }
+
+func ExampleIni_Vars() {
+	input := `
+[section]
+key=value1
+key2=
+
+[section "sub"]
+key=value1
+key=value2
+
+[section]
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value3
+`
+
+	ini, err := Parse([]byte(input))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for k, v := range ini.Vars("section:") {
+		fmt.Println(k, "=", v)
+	}
+
+	fmt.Println()
+	for k, v := range ini.Vars("section:sub") {
+		fmt.Println(k, "=", v)
+	}
+	// Unordered output:
+	// section::key = value2
+	// section::key2 = false
+	//
+	// key = value3
+}

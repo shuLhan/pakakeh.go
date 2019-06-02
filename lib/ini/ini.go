@@ -436,6 +436,33 @@ func (in *Ini) Vals(keyPath string) (vals []string) {
 }
 
 //
+// Vars return all variables in section and/or subsection as map of string.
+// If there is a duplicate in key's name, only the last key value that will be
+// store on map value.
+//
+// This method is a shortcut that can be used in templating.
+//
+func (in *Ini) Vars(sectionPath string) (vars map[string]string) {
+	names := strings.Split(sectionPath, ":")
+	switch len(names) {
+	case 0:
+		return
+	case 1:
+		names = append(names, "")
+	}
+
+	asmap := in.AsMap(names[0], names[1])
+	if len(asmap) > 0 {
+		vars = make(map[string]string, len(asmap))
+	}
+	for k, v := range asmap {
+		vars[k] = v[len(v)-1]
+	}
+
+	return
+}
+
+//
 // Write the current parsed Ini into writer `w`.
 //
 func (in *Ini) Write(w io.Writer) (err error) {
