@@ -205,6 +205,40 @@ func ExampleIni_Rebase() {
 	// key = value1
 }
 
+func ExampleIni_Section() {
+	input := []byte(`
+[section]
+key=value1 # comment
+key2= ; another comment
+
+[section "sub"]
+key=value1
+
+[section] ; here is comment on section
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value1
+`)
+
+	ini, err := Parse(input)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sec := ini.Section("section", "")
+	for _, v := range sec.vars {
+		fmt.Println(v.key, "=", v.value)
+	}
+	// Output:
+	// key = value1
+	// key2 = true
+	// key = value2
+	// key2 = false
+}
+
 func ExampleIni_Set() {
 	input := []byte(`
 [section]

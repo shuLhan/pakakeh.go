@@ -87,6 +87,37 @@ func (in *Ini) Add(secName, subName, key, value string) bool {
 }
 
 //
+// Section given section and/or subsection name, return the Section object
+// that match with it.
+// If section name is empty, it will return nil.
+// If ini contains duplicate section (or subsection) it will merge all
+// of its variables into one section.
+//
+func (in *Ini) Section(secName, subName string) (sec *Section) {
+	if len(secName) == 0 {
+		return nil
+	}
+
+	sec = &Section{
+		name: secName,
+		sub:  subName,
+	}
+
+	secName = strings.ToLower(secName)
+	for x := 0; x < len(in.secs); x++ {
+		if secName != in.secs[x].nameLower {
+			continue
+		}
+		if subName != in.secs[x].sub {
+			continue
+		}
+
+		sec.merge(in.secs[x])
+	}
+	return
+}
+
+//
 // Set the last variable's value in section-subsection that match with the
 // key.
 // If key found it will return true; otherwise it will return false.

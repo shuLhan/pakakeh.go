@@ -274,6 +274,19 @@ func (sec *Section) gets(key string, defs []string) (vals []string, ok bool) {
 }
 
 //
+// merge other Section variables on this section, ignoring empty or comment
+// mode.
+//
+func (sec *Section) merge(other *Section) {
+	for x := 0; x < len(other.vars); x++ {
+		if !isLineModeVar(other.vars[x].mode) {
+			continue
+		}
+		sec.vars = append(sec.vars, other.vars[x])
+	}
+}
+
+//
 // replaceAll change the value of variable reference with `key` into new
 // `value`. This is basically `unsetAll` and `Add`.
 //
