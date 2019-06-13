@@ -113,7 +113,7 @@ func (cl *Client) Get(remote, local string) (err error) {
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.RemoteUser, cl.cfg.RemoteHost,
 		remote)
 
-	cmd := exec.Command("scp", "-i", cl.cfg.PrivateKeyFile,
+	cmd := exec.Command("scp", "-r", "-i", cl.cfg.PrivateKeyFile,
 		"-P", cl.cfg.remotePort, remote, local)
 
 	cmd.Dir = cl.cfg.WorkingDir
@@ -147,7 +147,7 @@ func (cl *Client) Put(local, remote string) (err error) {
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.RemoteUser, cl.cfg.RemoteHost,
 		remote)
 
-	cmd := exec.Command("scp", "-i", cl.cfg.PrivateKeyFile,
+	cmd := exec.Command("scp", "-r", "-i", cl.cfg.PrivateKeyFile,
 		"-P", cl.cfg.remotePort, local, remote)
 
 	cmd.Dir = cl.cfg.WorkingDir
