@@ -12,10 +12,11 @@ import (
 	"os"
 )
 
+//nolint:gochecknoglobals
 var (
-	_stderr *os.File //nolint: gochecknoglobals
-	_stdin  *os.File //nolint: gochecknoglobals
-	_stdout *os.File //nolint: gochecknoglobals
+	_stderr *os.File
+	_stdin  *os.File
+	_stdout *os.File
 )
 
 //

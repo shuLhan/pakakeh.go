@@ -25,7 +25,8 @@ const (
 //
 // hashAlgNames contains mapping between type value and their names.
 //
-var hashAlgNames = map[HashAlg][]byte{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var hashAlgNames = map[HashAlg][]byte{
 	HashAlgSHA256: []byte("sha256"),
 	HashAlgSHA1:   []byte("sha1"),
 }

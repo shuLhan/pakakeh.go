@@ -28,9 +28,10 @@ const (
 	Hexaletters = "0123456789abcedf"
 )
 
+//nolint:gochecknoglobals
 var (
 	// ASCIISpaces contains list of white spaces in ASCII.
-	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '} //nolint: gochecknoglobals
+	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
 )
 
 //

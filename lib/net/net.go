@@ -154,5 +154,5 @@ func ToDotIPv6(ip net.IP) (out []byte) {
 		}
 	}
 
-	return
+	return out
 }

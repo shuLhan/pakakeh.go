@@ -13,9 +13,10 @@ import (
 	"time"
 )
 
+//nolint:gochecknoglobals
 var (
-	privateKey *rsa.PrivateKey //nolint: gochecknoglobals
-	publicKey  *rsa.PublicKey  //nolint: gochecknoglobals
+	privateKey *rsa.PrivateKey
+	publicKey  *rsa.PublicKey
 )
 
 func initKeys(t *testing.T) {

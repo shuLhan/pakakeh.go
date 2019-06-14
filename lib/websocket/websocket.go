@@ -5,7 +5,7 @@
 package websocket
 
 import (
-	"bytes" // nolint: gosec
+	"bytes" //nolint:gosec
 	"math/rand"
 	"sync"
 	"time"
@@ -28,14 +28,18 @@ const (
 	_qKeyTicket = "ticket"
 )
 
-var defaultTimeout = 10 * time.Second //nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var (
+	defaultTimeout = 10 * time.Second
 
-var _bbPool = sync.Pool{ //nolint: gochecknoglobals
-	New: func() interface{} {
-		return new(bytes.Buffer)
-	},
-}
+	_bbPool = sync.Pool{
+		New: func() interface{} {
+			return new(bytes.Buffer)
+		},
+	}
+)
 
-func init() { //nolint: gochecknoinits
+//nolint:gochecknoinits
+func init() {
 	rand.Seed(time.Now().UnixNano())
 }

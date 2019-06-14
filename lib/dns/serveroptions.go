@@ -18,7 +18,7 @@ import (
 //
 // ServerOptions describes options for running a DNS server.
 //
-//nolint: maligned
+//nolint:maligned
 type ServerOptions struct {
 	// IPAddress ip address to serve query, without port number.
 	// This field is optional, default to "0.0.0.0".

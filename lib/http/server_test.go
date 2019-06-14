@@ -135,7 +135,8 @@ func TestRegisterDelete(t *testing.T) {
 	}
 }
 
-var testEvaluator = func(req *http.Request, reqBody []byte) error { // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var testEvaluator = func(req *http.Request, reqBody []byte) error {
 	k := req.Form.Get("k")
 
 	if len(k) == 0 {
@@ -552,14 +553,14 @@ func TestServeHTTPOptions(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodOptions, c.reqURL, nil)
-		if e != nil {
-			t.Fatal(e)
+		req, err := http.NewRequest(http.MethodOptions, c.reqURL, nil)
+		if err != nil {
+			t.Fatal(err)
 		}
 
-		res, e := client.Do(req)
-		if e != nil {
-			t.Fatal(e)
+		res, err := client.Do(req) //nolint:bodyclose
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		gotAllow := res.Header.Get("Allow")

@@ -17,14 +17,13 @@ const (
 	envLocaldomain = "LOCALDOMAIN"
 )
 
+//nolint:gochecknoglobals
 var (
-	newLineTerms = []byte{'\n'} //nolint: gochecknoglobals
-)
+	newLineTerms = []byte{'\n'}
 
-// lambda to test os.Hostname.
-var getHostname = func() (string, error) { // nolint
-	return os.Hostname()
-}
+	// lambda to test os.Hostname.
+	getHostname = os.Hostname
+)
 
 //
 // ResolvConf contains value of resolver configuration file.

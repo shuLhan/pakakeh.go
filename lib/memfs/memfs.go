@@ -13,18 +13,19 @@ import (
 	"sort"
 )
 
+//nolint:gochecknoglobals
 var (
 	// MaxFileSize define maximum file size that can be stored on memory.
 	// The default value is 5 MB.
-	MaxFileSize int64 = 1024 * 1024 * 5 //nolint: gochecknoglobals
+	MaxFileSize int64 = 1024 * 1024 * 5
 
 	// Development define a flag to bypass file in memory.  If its
 	// true, any call to Get will result in direct read to file system.
-	Development bool //nolint: gochecknoglobals
+	Development bool
 
 	// GeneratedPathNode contains the mapping of path and node.  Its will
 	// be used and initialized by ".go" file generated from GoGenerate().
-	GeneratedPathNode *PathNode //nolint: gochecknoglobals
+	GeneratedPathNode *PathNode
 )
 
 //

@@ -56,11 +56,7 @@ func IsBinary(file string) bool {
 
 	ratio := float64(printable) / float64(total)
 
-	if ratio > float64(0.75) {
-		return false
-	}
-
-	return true
+	return ratio <= float64(0.75)
 }
 
 //

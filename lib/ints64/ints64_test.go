@@ -11,24 +11,27 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var d = [][]int64{ //nolint: gochecknoglobals
-	{},
-	{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
-	{0, 1, 0, 1, 0, 1, 0, 1, 0},
-	{1, 1, 2, 2, 3, 1, 2},
-}
-var dSorted = [][]int64{ //nolint: gochecknoglobals
-	{},
-	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-	{0, 0, 0, 0, 0, 1, 1, 1, 1},
-	{1, 1, 1, 2, 2, 2, 3},
-}
-var dSortedDesc = [][]int64{ //nolint: gochecknoglobals
-	{},
-	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
-	{1, 1, 1, 1, 0, 0, 0, 0, 0},
-	{3, 2, 2, 2, 1, 1, 1},
-}
+//nolint:gochecknoglobals
+var (
+	d = [][]int64{
+		{},
+		{5, 6, 7, 8, 9, 0, 1, 2, 3, 4},
+		{0, 1, 0, 1, 0, 1, 0, 1, 0},
+		{1, 1, 2, 2, 3, 1, 2},
+	}
+	dSorted = [][]int64{
+		{},
+		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1},
+		{1, 1, 1, 2, 2, 2, 3},
+	}
+	dSortedDesc = [][]int64{
+		{},
+		{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
+		{1, 1, 1, 1, 0, 0, 0, 0, 0},
+		{3, 2, 2, 2, 1, 1, 1},
+	}
+)
 
 func TestMaxEmpty(t *testing.T) {
 	gotv, goti, gotok := Max(d[0])
@@ -255,7 +258,8 @@ func TestSortByIndex(t *testing.T) {
 	}
 }
 
-var ints64InSorts = [][]int64{ // nolint: gochecknoglobals,dupl
+//nolint:gochecknoglobals,dupl
+var ints64InSorts = [][]int64{
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -275,7 +279,8 @@ var ints64InSorts = [][]int64{ // nolint: gochecknoglobals,dupl
 		62},
 }
 
-var ints64ExpSorts = [][]int64{ // nolint: gochecknoglobals,dupl
+//nolint:gochecknoglobals,dupl
+var ints64ExpSorts = [][]int64{
 	{3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -295,7 +300,8 @@ var ints64ExpSorts = [][]int64{ // nolint: gochecknoglobals,dupl
 		79},
 }
 
-var ints64ExpSortsDesc = [][]int64{ // nolint: gochecknoglobals,dupl
+//nolint:gochecknoglobals,dupl
+var ints64ExpSortsDesc = [][]int64{
 	{9, 8, 7, 6, 5, 4, 3},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
 	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0},

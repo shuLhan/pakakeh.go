@@ -11,14 +11,17 @@ import (
 	"strconv"
 )
 
+//nolint:gochecknoglobals
 var (
 	// Value contains DEBUG value from environment.
-	Value = 0 //nolint: gochecknoglobals
+	Value = 0
 )
 
 //
 // init initialize debug from system environment.
-func init() { // nolint
+//
+//nolint:gochecknoinits
+func init() {
 	v := os.Getenv("DEBUG")
 	if len(v) > 0 {
 		Value, _ = strconv.Atoi(v)

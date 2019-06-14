@@ -254,7 +254,9 @@ out:
 
 //
 // handleCommand from client.
-func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) { // nolint: gocyclo
+//
+//nolint:gocyclo
+func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	if debug.Value > 0 {
 		log.Printf("handleCommand: %v\n", cmd)
 	}

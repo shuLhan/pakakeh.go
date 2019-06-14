@@ -28,7 +28,8 @@ type upgradeCase struct {
 	req   *http.Request
 }
 
-var upgradeCases = []upgradeCase{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var upgradeCases = []upgradeCase{
 	{
 		label: "base",
 		nonce: mustMakeNonce(),

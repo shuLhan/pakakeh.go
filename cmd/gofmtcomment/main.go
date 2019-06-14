@@ -19,9 +19,10 @@ const (
 	gapb = byte(' ')
 )
 
+//nolint:gochecknoglobals
 var (
-	twoGaps   = []byte{gapb, gapb}       //nolint: gochecknoglobals
-	threeGaps = []byte{gapb, gapb, gapb} //nolint: gochecknoglobals
+	twoGaps   = []byte{gapb, gapb}
+	threeGaps = []byte{gapb, gapb, gapb}
 )
 
 func usage() {

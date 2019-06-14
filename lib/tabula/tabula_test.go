@@ -4,33 +4,36 @@
 
 package tabula
 
-var testColTypes = []int{ // nolint: gochecknoglobals
-	TInteger,
-	TInteger,
-	TInteger,
-	TString,
-}
+//nolint:gochecknoglobals
+var (
+	testColTypes = []int{
+		TInteger,
+		TInteger,
+		TInteger,
+		TString,
+	}
 
-var testColNames = []string{"int01", "int02", "int03", "class"} // nolint: gochecknoglobals
+	testColNames = []string{"int01", "int02", "int03", "class"}
 
-// Testing data and function for Rows and MapRows
-var rowsData = [][]string{ // nolint: gochecknoglobals
-	{"1", "5", "9", "+"},
-	{"2", "6", "0", "-"},
-	{"3", "7", "1", "-"},
-	{"4", "8", "2", "+"},
-}
+	// Testing data and function for Rows and MapRows
+	rowsData = [][]string{
+		{"1", "5", "9", "+"},
+		{"2", "6", "0", "-"},
+		{"3", "7", "1", "-"},
+		{"4", "8", "2", "+"},
+	}
 
-var testClassIdx = 3 // nolint: gochecknoglobals
+	testClassIdx = 3
 
-var rowsExpect = []string{ // nolint: gochecknoglobals
-	"&[1 5 9 +]",
-	"&[2 6 0 -]",
-	"&[3 7 1 -]",
-	"&[4 8 2 +]",
-}
+	rowsExpect = []string{
+		"&[1 5 9 +]",
+		"&[2 6 0 -]",
+		"&[3 7 1 -]",
+		"&[4 8 2 +]",
+	}
 
-var groupByExpect = "[{+ &[1 5 9 +]&[4 8 2 +]} {- &[2 6 0 -]&[3 7 1 -]}]" // nolint: gochecknoglobals
+	groupByExpect = "[{+ &[1 5 9 +]&[4 8 2 +]} {- &[2 6 0 -]&[3 7 1 -]}]"
+)
 
 func initRows() (rows Rows, e error) {
 	for i := range rowsData {

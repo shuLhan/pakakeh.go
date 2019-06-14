@@ -51,12 +51,14 @@ const (
 	ResultCodePermError
 )
 
+//nolint:gochecknoglobals
 var (
 	dnsClient       *libdns.UDPClient
 	defSystemResolv = ""
 	defNameserver   = "1.1.1.1"
 )
 
+//nolint:gochecknoinits
 func init() {
 	var err error
 

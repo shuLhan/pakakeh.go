@@ -9,11 +9,9 @@ import (
 )
 
 func ExampleIsBinary() {
-	fmt.Println(IsBinary("/dev/null"))
 	fmt.Println(IsBinary("/bin/bash"))
 	fmt.Println(IsBinary("io.go"))
 	// Output:
-	// true
 	// true
 	// false
 }

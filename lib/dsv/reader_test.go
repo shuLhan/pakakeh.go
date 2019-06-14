@@ -14,7 +14,8 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var jsonSample = []string{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var jsonSample = []string{
 	`{}`,
 	`{
 		"Input"		:"testdata/input.dat"
@@ -88,7 +89,8 @@ var jsonSample = []string{ // nolint: gochecknoglobals
 	}`,
 }
 
-var readers = []*Reader{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var readers = []*Reader{
 	{},
 	{
 		Input: "testdata/input.dat",

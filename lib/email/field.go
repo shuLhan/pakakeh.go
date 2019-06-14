@@ -53,7 +53,8 @@ type Field struct {
 // On error, it will return nil Field, and rest will contains the beginning of
 // invalid input.
 //
-func ParseField(raw []byte) (field *Field, rest []byte, err error) { // nolint: gocyclo
+//nolint:gocyclo
+func ParseField(raw []byte) (field *Field, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, nil, nil
 	}

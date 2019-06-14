@@ -30,7 +30,8 @@ const (
 // keyFlagNames contains mapping between key flag and their text
 // representation.
 //
-var keyFlagNames = map[KeyFlag]byte{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var keyFlagNames = map[KeyFlag]byte{
 	KeyFlagTesting: 'y',
 	KeyFlagStrict:  's',
 }

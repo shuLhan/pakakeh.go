@@ -4,7 +4,8 @@
 
 package email
 
-var specialChars = map[byte]struct{}{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var specialChars = map[byte]struct{}{
 	'(': {}, ')': {},
 	'<': {}, '>': {},
 	'[': {}, ']': {},

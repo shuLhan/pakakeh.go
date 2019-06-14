@@ -55,7 +55,8 @@ const (
 //
 // fieldNames contains mapping between field type and their lowercase name.
 //
-var fieldNames = map[FieldType][]byte{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var fieldNames = map[FieldType][]byte{
 	FieldTypeDate: []byte("date"),
 
 	FieldTypeFrom:    []byte("from"),

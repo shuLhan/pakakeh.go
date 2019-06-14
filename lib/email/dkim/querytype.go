@@ -20,6 +20,7 @@ const (
 // queryTypeNames contains a mapping betweend query type and their text
 // representation.
 //
-var queryTypeNames = map[QueryType][]byte{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var queryTypeNames = map[QueryType][]byte{
 	QueryTypeDNS: []byte("dns"),
 }

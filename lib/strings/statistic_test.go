@@ -61,6 +61,7 @@ func TestCountAlnumDistribution(t *testing.T) {
 	}
 }
 
+//nolint:lll
 func TestCountCharSequence(t *testing.T) {
 	cases := []struct {
 		text      string
@@ -77,7 +78,7 @@ func TestCountCharSequence(t *testing.T) {
 		expChars:  []rune{'a', 'e', 'f'},
 		expCounts: []int{3, 2, 2},
 	}, {
-		text: " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}", // nolint: lll
+		text: " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}",
 		expChars: []rune{
 			'{', '0', 'F', 'f', 'o',
 			'}', '{', '0', '2', '5',
@@ -195,6 +196,7 @@ func TestCountUpperLower(t *testing.T) {
 	}
 }
 
+//nolint:lll
 func TestMaxCharSequence(t *testing.T) {
 	cases := []struct {
 		text  string
@@ -211,7 +213,7 @@ func TestMaxCharSequence(t *testing.T) {
 		char:  'a',
 		count: 3,
 	}, {
-		text:  " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}", // nolint: lll
+		text:  " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}",
 		char:  '0',
 		count: 4,
 	}}

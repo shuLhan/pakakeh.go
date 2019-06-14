@@ -117,6 +117,7 @@ func TestMessageDKIMVerify(t *testing.T) {
 	}
 }
 
+//nolint:lll
 func TestMessageDKIMSign(t *testing.T) {
 	if privateKey == nil || publicKey == nil {
 		initKeys(t)
@@ -141,7 +142,7 @@ func TestMessageDKIMSign(t *testing.T) {
 			QMethod:     &dkim.QueryMethod{},
 		},
 		expBodyHash:  "2jUSOH9NhtVGCQWNr9BrIAPreKQjO6Sn7XIkfJVOzv8=",
-		expSignature: "r4xRAHbEEmL8BwGSZkYzCmDT2Y6ttIEc8boo0UZSENC0unBX4JjjaGALuBjlUiTw6t78PeMx3kgIoX3sjkcquw4TvZgfJNKPEDhTq11IU+2QPJSQa245Tjs3eMZCq/cooax4vEPiJIN9UDNT1BNqbF7cMPGjn5RQQtjbHXxRHjI=", // nolint: lll
+		expSignature: "r4xRAHbEEmL8BwGSZkYzCmDT2Y6ttIEc8boo0UZSENC0unBX4JjjaGALuBjlUiTw6t78PeMx3kgIoX3sjkcquw4TvZgfJNKPEDhTq11IU+2QPJSQa245Tjs3eMZCq/cooax4vEPiJIN9UDNT1BNqbF7cMPGjn5RQQtjbHXxRHjI=",
 		expStatus: &dkim.Status{
 			Type: dkim.StatusOK,
 			SDID: []byte("example.com"),

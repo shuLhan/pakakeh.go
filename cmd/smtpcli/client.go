@@ -14,10 +14,11 @@ import (
 	"github.com/shuLhan/share/lib/smtp"
 )
 
+//nolint:gochecknoglobals
 var (
-	stdin  = os.Stdin           // nolint: gochecknoglobals
-	stdout = os.Stdout          // nolint: gochecknoglobals
-	noop   = []byte("NOOP\r\n") // nolint: gochecknoglobals
+	stdin  = os.Stdin
+	stdout = os.Stdout
+	noop   = []byte("NOOP\r\n")
 )
 
 type client struct {

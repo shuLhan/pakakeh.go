@@ -105,7 +105,7 @@ func TestParseResponseHeader(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, rest, err := ParseResponseHeader(c.raw)
+		got, rest, err := ParseResponseHeader(c.raw) //nolint:bodyclose
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue

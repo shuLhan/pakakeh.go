@@ -81,7 +81,8 @@ func (mbox *Mailbox) String() string {
 //
 //	"(" text [comment] ")"
 //
-func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocyclo
+//nolint:gocyclo
+func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) {
 	raw = bytes.TrimSpace(raw)
 	if len(raw) == 0 {
 		return nil, errors.New("ParseAddress: empty address")
@@ -163,7 +164,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
 			if state == stateDomain {
-				if !libnet.IsHostnameValid(value) {
+				if !libnet.IsHostnameValid(value, false) {
 					return nil, fmt.Errorf("ParseAddress: invalid domain: '%s'", value)
 				}
 			}
@@ -184,7 +185,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 			value = bytes.TrimSpace(value)
 			switch state {
 			case stateDomain:
-				if !libnet.IsHostnameValid(value) {
+				if !libnet.IsHostnameValid(value, false) {
 					return nil, fmt.Errorf("ParseAddress: invalid domain: '%s'", value)
 				}
 				mbox.Domain = value
@@ -209,7 +210,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 			value = bytes.TrimSpace(value)
 			switch state {
 			case stateDomain:
-				if !libnet.IsHostnameValid(value) {
+				if !libnet.IsHostnameValid(value, false) {
 					return nil, fmt.Errorf("ParseAddress: invalid domain: '%s'", value)
 				}
 				mbox.Domain = value
@@ -242,7 +243,7 @@ func ParseAddress(raw []byte) (mboxes []*Mailbox, err error) { // nolint: gocycl
 			}
 
 			if state == stateDomain {
-				if !libnet.IsHostnameValid(value) {
+				if !libnet.IsHostnameValid(value, false) {
 					return nil, fmt.Errorf("ParseAddress: invalid domain: '%s'", value)
 				}
 				mbox.Domain = value

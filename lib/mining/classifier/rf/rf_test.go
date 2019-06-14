@@ -15,30 +15,33 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
+//
 // Global options to run for each test.
+//
+//nolint:gochecknoglobals
 var (
 	// SampleDsvFile is the file that contain samples config.
-	SampleDsvFile string //nolint: gochecknoglobals
+	SampleDsvFile string
 	// DoTest if its true then the dataset will splited into training and
 	// test set with random selection without replacement.
-	DoTest = false //nolint: gochecknoglobals
+	DoTest = false
 	// NTree number of tree to generate.
-	NTree = 100 //nolint: gochecknoglobals
+	NTree = 100
 	// NBootstrap percentage of sample used as subsample.
-	NBootstrap = 66 //nolint: gochecknoglobals
+	NBootstrap = 66
 	// MinFeature number of feature to begin with.
-	MinFeature = 1 //nolint: gochecknoglobals
+	MinFeature = 1
 	// MaxFeature maximum number of feature to test
-	MaxFeature = -1 //nolint: gochecknoglobals
+	MaxFeature = -1
 	// RunOOB if its true the the OOB samples will be used to test the
 	// model in each iteration.
-	RunOOB = true //nolint: gochecknoglobals
+	RunOOB = true
 	// OOBStatsFile is the file where OOB statistic will be saved.
-	OOBStatsFile string //nolint: gochecknoglobals
+	OOBStatsFile string
 	// PerfFile is the file where performance statistic will be saved.
-	PerfFile string //nolint: gochecknoglobals
+	PerfFile string
 	// StatFile is the file where classifying statistic will be saved.
-	StatFile string //nolint: gochecknoglobals
+	StatFile string
 )
 
 func getSamples() (train, test tabula.ClasetInterface) {

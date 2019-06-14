@@ -18,8 +18,9 @@ const (
 	testServerAddress = "127.0.0.1:5300"
 )
 
+//nolint:gochecknoglobals
 var (
-	_testServer *Server //nolint: gochecknoglobals
+	_testServer *Server
 )
 
 func TestMain(m *testing.M) {

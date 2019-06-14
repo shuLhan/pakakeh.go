@@ -8,7 +8,8 @@ import (
 	"sync"
 )
 
-var rrPool = sync.Pool{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var rrPool = sync.Pool{
 	New: func() interface{} {
 		rr := &ResourceRecord{
 			Name:  make([]byte, 0),

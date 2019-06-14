@@ -14,22 +14,21 @@ import (
 	"testing"
 )
 
+//nolint:lll,gochecknoglobals
 var (
-	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14" //nolint: lll, gochecknoglobals
+	_testExternalJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA0NjU2MDYsImhhc2giOiJiYmJiYmJiYi1iYmJiLWJiYmItYmJiYi1iYmJiYmJiYmJiYmIiLCJpYXQiOjE1MzAyMDY0MDYsIm5hZiI6MTUzMjc5ODQwNn0.15quj_gkeo9cWkLN98_2rXjtjihQym16Kn_9BQjYC14"
 
-	_testEndpointAuth string                       //nolint: gochecknoglobals
-	_testInternalJWT  = _testExternalJWT           //nolint: gochecknoglobals
-	_testUID          = uint64(100)                //nolint: gochecknoglobals
-	_testPort         = 9001                       //nolint: gochecknoglobals
-	_testServer       *Server                      //nolint: gochecknoglobals
-	_testWSAddr       string                       //nolint: gochecknoglobals
-	_testHdrValWSKey  = "dGhlIHNhbXBsZSBub25jZQ==" //nolint: gochecknoglobals
-	_testMaskKey      = []byte{'7', 'ú', '!', '='} //nolint: gochecknoglobals
-)
+	_testEndpointAuth string
+	_testInternalJWT  = _testExternalJWT
+	_testUID          = uint64(100)
+	_testPort         = 9001
+	_testServer       *Server
+	_testWSAddr       string
+	_testHdrValWSKey  = "dGhlIHNhbXBsZSBub25jZQ=="
+	_testMaskKey      = []byte{'7', 'ú', '!', '='}
 
-var (
-	_dummyPayload256, _dummyPayload256Masked     = generateDummyPayload(256)   //nolint: gochecknoglobals
-	_dummyPayload65536, _dummyPayload65536Masked = generateDummyPayload(65536) //nolint: gochecknoglobals
+	_dummyPayload256, _dummyPayload256Masked     = generateDummyPayload(256)
+	_dummyPayload65536, _dummyPayload65536Masked = generateDummyPayload(65536)
 )
 
 func generateDummyPayload(size uint64) (payload []byte, masked []byte) {

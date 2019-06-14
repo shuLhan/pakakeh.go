@@ -18,7 +18,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cases := []struct { //nolint: dupl
+	cases := []struct { //nolint:dupl
 		desc           string
 		allowRecursion bool
 		qtype          uint16
@@ -166,7 +166,7 @@ func TestDoHClient_Post(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cases := []struct { //nolint: dupl
+	cases := []struct { //nolint:dupl
 		desc           string
 		allowRecursion bool
 		qtype          uint16

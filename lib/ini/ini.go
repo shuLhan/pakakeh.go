@@ -227,7 +227,7 @@ func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 		}
 	}
 
-	return
+	return out
 }
 
 //

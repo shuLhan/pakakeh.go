@@ -18,16 +18,16 @@ import (
 
 const (
 	macroSender       byte = 's'
-	macroSenderLocal       = 'l'
-	macroSenderDomain      = 'o'
-	macroDomain            = 'd'
-	macroIP                = 'i'
-	macroPtr               = 'p'
-	macroInAddr            = 'v'
-	macroEhloDomain        = 'h'
-	macroExpClientIP       = 'c'
-	macroExpDomain         = 'r'
-	macroExpCurTime        = 't'
+	macroSenderLocal  byte = 'l'
+	macroSenderDomain byte = 'o'
+	macroDomain       byte = 'd'
+	macroIP           byte = 'i'
+	macroPtr          byte = 'p'
+	macroInAddr       byte = 'v'
+	macroEhloDomain   byte = 'h'
+	macroExpClientIP  byte = 'c'
+	macroExpDomain    byte = 'r'
+	macroExpCurTime   byte = 't'
 )
 
 type macro struct {

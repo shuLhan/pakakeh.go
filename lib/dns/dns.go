@@ -57,9 +57,10 @@ var (
 	ErrIPv6Length     = errors.New("invalid length of AAAA RDATA format")
 )
 
+//nolint:gochecknoglobals
 var (
 	// clientTimeout define read and write timeout on client request.
-	clientTimeout = 6 * time.Second //nolint: gochecknoglobals
+	clientTimeout = 6 * time.Second
 )
 
 type connType byte
@@ -71,8 +72,11 @@ const (
 	connTypeDoH
 )
 
+//
 // connTypeNames contains a mapping between connection type and its name.
-var connTypeNames = map[connType]string{ //nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
+var connTypeNames = map[connType]string{
 	connTypeUDP: "UDP",
 	connTypeTCP: "TCP",
 	connTypeDoH: "DoH",
@@ -120,7 +124,8 @@ const (
 // QueryTypes contains a mapping between string representation of DNS query
 // type with their decimal value.
 //
-var QueryTypes = map[string]uint16{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var QueryTypes = map[string]uint16{
 	"A":     QueryTypeA,
 	"NS":    QueryTypeNS,
 	"CNAME": QueryTypeCNAME,
@@ -144,7 +149,8 @@ var QueryTypes = map[string]uint16{ // nolint: gochecknoglobals
 // QueryTypeNames contains mapping between query type and and their string
 // representation.
 //
-var QueryTypeNames = map[uint16]string{ //nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var QueryTypeNames = map[uint16]string{
 	QueryTypeA:     "A",
 	QueryTypeNS:    "NS",
 	QueryTypeCNAME: "CNAME",
@@ -178,7 +184,8 @@ const (
 // QueryClasses contains a mapping between string representation of DNS query
 // class with their decimal value.
 //
-var QueryClasses = map[string]uint16{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var QueryClasses = map[string]uint16{
 	"IN": QueryClassIN,
 	"CH": QueryClassCH,
 	"HS": QueryClassHS,
@@ -219,7 +226,8 @@ const (
 // rcodeNames contains mapping of response code with their human readable
 // names.
 //
-var rcodeNames = map[ResponseCode]string{ //nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var rcodeNames = map[ResponseCode]string{
 	RCodeOK:             "OK",
 	RCodeErrFormat:      "ERR_FORMAT",
 	RCodeErrServer:      "ERR_SERVER",

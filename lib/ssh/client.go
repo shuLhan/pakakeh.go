@@ -37,7 +37,7 @@ func NewClient(cfg *ClientConfig) (cl *Client, err error) {
 
 	pkeyRaw, err := ioutil.ReadFile(cfg.PrivateKeyFile)
 	if err != nil {
-		err = fmt.Errorf("ssh: error when reading private key file %q: %s\n",
+		err = fmt.Errorf("ssh: error when reading private key file %q: %s",
 			cfg.PrivateKeyFile, err)
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func NewClient(cfg *ClientConfig) (cl *Client, err error) {
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(sshSigner),
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), //nolint:gosec
 	}
 
 	cl = &Client{
@@ -81,7 +81,10 @@ func (cl *Client) Execute(cmd string) (err error) {
 	sess.Stderr = os.Stderr
 
 	for k, v := range cl.cfg.Environments {
-		sess.Setenv(k, v)
+		err = sess.Setenv(k, v)
+		if err != nil {
+			return fmt.Errorf("ssh: client.Execute:" + err.Error())
+		}
 	}
 
 	err = sess.Run(cmd)
@@ -122,7 +125,7 @@ func (cl *Client) Get(remote, local string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("ssh: Get %q: %s\n", cmd.Args, err.Error())
+		return fmt.Errorf("ssh: Get %q: %s", cmd.Args, err.Error())
 	}
 
 	return nil
@@ -156,7 +159,7 @@ func (cl *Client) Put(local, remote string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("ssh: Put: %q: %s\n", cmd.Args, err.Error())
+		return fmt.Errorf("ssh: Put: %q: %s", cmd.Args, err.Error())
 	}
 
 	return nil

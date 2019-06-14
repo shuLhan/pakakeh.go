@@ -332,7 +332,7 @@ func (srv *Server) serveDoH() {
 			Certificates: []tls.Certificate{
 				*srv.opts.DoHCertificate,
 			},
-			InsecureSkipVerify: srv.opts.DoHAllowInsecure, // nolint: gosec
+			InsecureSkipVerify: srv.opts.DoHAllowInsecure, //nolint:gosec
 		},
 	}
 

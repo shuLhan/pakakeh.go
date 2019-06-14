@@ -11,8 +11,9 @@ import (
 	"sync"
 )
 
+//nolint:gochecknoglobals
 var (
-	_reqPool = sync.Pool{ //nolint: gochecknoglobals
+	_reqPool = sync.Pool{
 		New: func() interface{} {
 			return new(Request)
 		},

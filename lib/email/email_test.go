@@ -15,9 +15,10 @@ import (
 	"github.com/shuLhan/share/lib/email/dkim"
 )
 
+//nolint:gochecknoglobals
 var (
-	privateKey *rsa.PrivateKey //nolint: gochecknoglobals
-	publicKey  *rsa.PublicKey  //nolint: gochecknoglobals
+	privateKey *rsa.PrivateKey
+	publicKey  *rsa.PublicKey
 )
 
 func initKeys(t *testing.T) {

@@ -9,8 +9,9 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+//nolint:gochecknoglobals
 var (
-	_testWD string //nolint: gochecknoglobals
+	_testWD string
 )
 
 func TestGet(t *testing.T) {
@@ -111,7 +112,7 @@ func TestMount(t *testing.T) {
 	}{{
 		desc:       "With empty dir",
 		expErr:     "open : no such file or directory",
-		expMapKeys: make([]string, 0, 0),
+		expMapKeys: make([]string, 0),
 	}, {
 		desc:   "With file",
 		dir:    filepath.Join(_testWD, "testdata/index.html"),

@@ -22,9 +22,10 @@ const (
 	_defBranch     = "master"
 )
 
+//nolint:gochecknoglobals
 var (
-	_stdout = os.Stdout //nolint: gochecknoglobals
-	_stderr = os.Stderr //nolint: gochecknoglobals
+	_stdout = os.Stdout
+	_stderr = os.Stderr
 )
 
 //
@@ -204,7 +205,7 @@ func GetRemoteURL(repoDir, remoteName string) (url string, err error) {
 		return
 	}
 
-	url, ok := gitIni.Get("remote", remoteName, "url")
+	url, ok := gitIni.Get("remote", remoteName, "url", "")
 	if !ok {
 		err = fmt.Errorf("GetRemote: Empty or invalid remote name")
 	}

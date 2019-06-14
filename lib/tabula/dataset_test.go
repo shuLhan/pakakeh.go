@@ -11,32 +11,35 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var datasetRows = [][]string{ // nolint: gochecknoglobals
-	{"0", "1", "A"},
-	{"1", "1.1", "B"},
-	{"2", "1.2", "A"},
-	{"3", "1.3", "B"},
-	{"4", "1.4", "C"},
-	{"5", "1.5", "D"},
-	{"6", "1.6", "C"},
-	{"7", "1.7", "D"},
-	{"8", "1.8", "E"},
-	{"9", "1.9", "F"},
-}
+//nolint:gochecknoglobals
+var (
+	datasetRows = [][]string{
+		{"0", "1", "A"},
+		{"1", "1.1", "B"},
+		{"2", "1.2", "A"},
+		{"3", "1.3", "B"},
+		{"4", "1.4", "C"},
+		{"5", "1.5", "D"},
+		{"6", "1.6", "C"},
+		{"7", "1.7", "D"},
+		{"8", "1.8", "E"},
+		{"9", "1.9", "F"},
+	}
 
-var datasetCols = [][]string{ // nolint: gochecknoglobals
-	{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
-	{"1", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9"},
-	{"A", "B", "A", "B", "C", "D", "C", "D", "E", "F"},
-}
+	datasetCols = [][]string{
+		{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
+		{"1", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9"},
+		{"A", "B", "A", "B", "C", "D", "C", "D", "E", "F"},
+	}
 
-var datasetTypes = []int{ // nolint: gochecknoglobals
-	TInteger,
-	TReal,
-	TString,
-}
+	datasetTypes = []int{
+		TInteger,
+		TReal,
+		TString,
+	}
 
-var datasetNames = []string{"int", "real", "string"} // nolint: gochecknoglobals
+	datasetNames = []string{"int", "real", "string"}
+)
 
 func populateWithRows(dataset *Dataset) error {
 	for _, rowin := range datasetRows {

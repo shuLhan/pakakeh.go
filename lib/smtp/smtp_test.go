@@ -25,11 +25,12 @@ const (
 	testFilePrivateKey  = "testdata/" + testDomain + ".key.pem"
 )
 
+//nolint:gochecknoglobals
 var (
-	testClient        *Client  // nolint: gochecknoglobals
-	testServer        *Server  // nolint: gochecknoglobals
-	testAccountFirst  *Account // nolint: gochecknoglobals
-	testAccountSecond *Account // nolint: gochecknoglobals
+	testClient        *Client
+	testServer        *Server
+	testAccountFirst  *Account
+	testAccountSecond *Account
 )
 
 func testRunServer() {

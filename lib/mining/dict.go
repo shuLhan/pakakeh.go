@@ -4,10 +4,12 @@
 
 package mining
 
+//
 // VulgarWords contain list of vulgar and offensive words in informal and
 // slangs.
-// nolint: misspell
-var VulgarWords = []string{ // nolint: gochecknoglobals
+//
+//nolint:misspell,gochecknoglobals
+var VulgarWords = []string{
 	"$#!+", "$1ut", "$h1t", "$hit", "$lut", "'f*ck'", "'ho", "'hobag",
 	"@ss", "@sshole", "a$$", "a$$h0!e", "a$$h01e", "a$$h0le", "a$$hole",
 	"a55", "a55hole", "aeolus", "ahole", "analprobe", "anilingus",
@@ -129,9 +131,12 @@ var VulgarWords = []string{ // nolint: gochecknoglobals
 	"x-rated", "xxx", "yeasty", "yobbo", "zoophile",
 }
 
+//
 // PronounWords contains list of first and second person pronouns including
 // slangs.
-var PronounWords = []string{ // nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
+var PronounWords = []string{
 	"i", "me", "mine", "my", "myself", "our", "ours", "ourself",
 	"ourselves", "selves", "thee", "thine", "thou", "thy", "thyself",
 	"us", "we", "y'all", "y'all", "y'all's", "yis", "you", "you-uns",
@@ -139,8 +144,11 @@ var PronounWords = []string{ // nolint: gochecknoglobals
 	"yous's", "youse", "youse",
 }
 
+//
 // BiasedWords contain list of colloquial words with high bias.
-var BiasedWords = []string{ // nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
+var BiasedWords = []string{
 	"cutting-edge", "single-handedly", "well-established", "well-known",
 	"world-class", "absolute", "acclaimed", "amazing", "astonishing",
 	"authoritative", "beautiful", "best", "boreing", "boring",
@@ -160,15 +168,21 @@ var BiasedWords = []string{ // nolint: gochecknoglobals
 	"weird", "worst",
 }
 
+//
 // SexWords contain list of non-vulgar sex-related words.
-var SexWords = []string{ // nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
+var SexWords = []string{
 	"anal", "breast", "breasts", "buttocks", "dildo", "dildos", "erect",
 	"nipple", "nipples", "penis", "sex", "sodomized", "sodomy", "vagina",
 	"vibrator", "vibrators",
 }
 
+//
 // BadWords contain list of colloquial words or bad writing words.
-var BadWords = []string{ // nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
+var BadWords = []string{
 	"666", "da", "dont", "dosent", "whatever", "guy", "hi", "nazi", "sup",
 	"guise", "loser", "thats", "ugly", "wanna", "whats", "wont", "gotta",
 	"bloody", "fart", "pot", "prick", "stink", "smells", "smelly", "alot",

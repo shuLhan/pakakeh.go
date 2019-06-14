@@ -11,7 +11,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-// nolint: lll
+//nolint:lll
 func TestKeyLookupKey(t *testing.T) {
 	qmethod := QueryMethod{}
 

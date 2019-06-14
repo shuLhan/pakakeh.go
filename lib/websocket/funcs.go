@@ -5,7 +5,7 @@
 package websocket
 
 import (
-	"crypto/sha1" //nolint: gosec
+	"crypto/sha1" //nolint:gosec
 	"encoding/base64"
 	"encoding/binary"
 	"log"
@@ -87,7 +87,7 @@ func Send(fd int, packet []byte) (err error) {
 //
 func generateHandshakeAccept(key []byte) string {
 	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
-	sum := sha1.Sum(key) // nolint: gosec
+	sum := sha1.Sum(key) //nolint:gosec
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
 

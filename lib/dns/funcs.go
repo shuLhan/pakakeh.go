@@ -50,7 +50,7 @@ func ParseNameServers(nameservers []string) ([]*net.UDPAddr, error) {
 
 //
 // LookupPTR accept an IP address (either IPv4 or IPv6) and return a single
-// answer as domain name on sucess or an error on failed.
+// answer as domain name on success or an error on failed.
 // If IP address does not contains PTR record it will return an empty string
 // without error.
 //
@@ -87,7 +87,7 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 
 	answer = string(banswer)
 
-	return
+	return answer, nil
 }
 
 //

@@ -9,4 +9,5 @@ const (
 	lf byte = '\n'
 )
 
-var boundSeps = []byte{'-', '-'} //nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var boundSeps = []byte{'-', '-'}

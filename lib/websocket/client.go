@@ -553,7 +553,7 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, e
 
 	var httpRes *http.Response
 
-	httpRes, rest, err = libhttp.ParseResponseHeader(resp)
+	httpRes, rest, err = libhttp.ParseResponseHeader(resp) //nolint:bodyclose
 	if err != nil {
 		return nil, err
 	}

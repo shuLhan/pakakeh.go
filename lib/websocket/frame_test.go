@@ -11,7 +11,8 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestNewFrameBin(t *testing.T) { //nolint: dupl
+//nolint:dupl
+func TestNewFrameBin(t *testing.T) {
 	cases := []struct {
 		desc     string
 		isMasked bool
@@ -93,7 +94,8 @@ func TestNewFrameClose(t *testing.T) {
 	}
 }
 
-func TestNewFramePing(t *testing.T) { //nolint:dupl
+//nolint:dupl
+func TestNewFramePing(t *testing.T) {
 	cases := []struct {
 		desc    string
 		payload []byte
@@ -132,7 +134,8 @@ func TestNewFramePing(t *testing.T) { //nolint:dupl
 	}
 }
 
-func TestNewFramePong(t *testing.T) { //nolint: dupl
+//nolint:dupl
+func TestNewFramePong(t *testing.T) {
 	cases := []struct {
 		desc    string
 		payload []byte
@@ -171,7 +174,8 @@ func TestNewFramePong(t *testing.T) { //nolint: dupl
 	}
 }
 
-func TestNewFrameText(t *testing.T) { //nolint: dupl
+//nolint:dupl
+func TestNewFrameText(t *testing.T) {
 	cases := []struct {
 		desc     string
 		isMasked bool

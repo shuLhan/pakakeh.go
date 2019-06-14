@@ -25,6 +25,7 @@ type Extension interface {
 	ValidateCommand(cmd *Command) error
 }
 
-var defaultExts = []Extension{ // nolint: gochecknoglobals
+//nolint:gochecknoglobals
+var defaultExts = []Extension{
 	&extDSN{},
 }

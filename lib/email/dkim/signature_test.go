@@ -275,6 +275,7 @@ func TestSignatureHash(t *testing.T) {
 	}
 }
 
+//nolint:lll
 func TestSignatureSign(t *testing.T) {
 	if privateKey == nil {
 		initKeys(t)
@@ -304,34 +305,34 @@ func TestSignatureSign(t *testing.T) {
 		pk:      privateKey,
 		hashAlg: SignAlgRS1,
 		signAlg: SignAlgRS1,
-		exp:     "jPS+9gKtcUOlO5ITvvu0vRW9WnroERAqgGQuzsN7yrfdK5qTcT1UFtF1Mdkz3vu0YVDItX5UrgCVEM8sqwy2g7CfWIbNTKgxfkGZCnPUiVmbJcM6TvMoGqmbPNMDN8VGibfp6uVEm5bxPSFBZvrc5OX2fqvUt0NfQYHiUluYdY8=", // nolint: lll
+		exp:     "jPS+9gKtcUOlO5ITvvu0vRW9WnroERAqgGQuzsN7yrfdK5qTcT1UFtF1Mdkz3vu0YVDItX5UrgCVEM8sqwy2g7CfWIbNTKgxfkGZCnPUiVmbJcM6TvMoGqmbPNMDN8VGibfp6uVEm5bxPSFBZvrc5OX2fqvUt0NfQYHiUluYdY8=",
 	}, {
 		desc:    "With CRLF, sha1",
 		pk:      privateKey,
 		hashAlg: SignAlgRS1,
 		signAlg: SignAlgRS1,
 		input:   []byte("\r\n"),
-		exp:     "5XAKcEb55b7wZrOzrKNjykgRXdloRIdtkuXIQ36Ux9/G2QHJ+kHT7uGY5IjhzSvmYHwKN+tPy1iSZl35XuPWlcupyU+1h+5rwrrvF6JGz1HBVEP23oCzM82opIJF80Dde9YDHH1/Q62WVcM3zAgp9MoCJeO7JToHKKTU/OKXmvo=", // nolint: lll
+		exp:     "5XAKcEb55b7wZrOzrKNjykgRXdloRIdtkuXIQ36Ux9/G2QHJ+kHT7uGY5IjhzSvmYHwKN+tPy1iSZl35XuPWlcupyU+1h+5rwrrvF6JGz1HBVEP23oCzM82opIJF80Dde9YDHH1/Q62WVcM3zAgp9MoCJeO7JToHKKTU/OKXmvo=",
 	}, {
 		desc:    "With empty hash, sha256",
 		pk:      privateKey,
 		hashAlg: SignAlgRS256,
 		signAlg: SignAlgRS256,
-		exp:     "X5VCoHS9jdAuk/fujKm9SNJQPQOHnngURIrTnTDGoxpFzwuejsVYs+QqNi+gch4st5rpDklulCxrIT6grT+XEo6nYnUUs/i5cOAnsWHw+1jg15GSk37eHKZDYW9qHgxpZqiPQjorDfCvLsKWpb5DKzelkkB6lerS3amBuv8gkkw=", // nolint: lll
+		exp:     "X5VCoHS9jdAuk/fujKm9SNJQPQOHnngURIrTnTDGoxpFzwuejsVYs+QqNi+gch4st5rpDklulCxrIT6grT+XEo6nYnUUs/i5cOAnsWHw+1jg15GSk37eHKZDYW9qHgxpZqiPQjorDfCvLsKWpb5DKzelkkB6lerS3amBuv8gkkw=",
 	}, {
 		desc:    "With CRLF, sha256",
 		pk:      privateKey,
 		hashAlg: SignAlgRS256,
 		signAlg: SignAlgRS256,
 		input:   []byte("\r\n"),
-		exp:     "LwMB2vdR7qDcHr8VS758WUtTECOrwAIlS9eRZUoEGP1SCpl5RzVJ1mmMD7bq72djTQ3loMA4JyBJSm/PUahkECuWuyCu+LkkX4QcoosrWJj01cNA9SG3VuDBoDELbf7rR9Z9h7ObWCTzodrWsCeg0tRpI1Z2AM9mRJWSVBEjdKI=", // nolint: lll
+		exp:     "LwMB2vdR7qDcHr8VS758WUtTECOrwAIlS9eRZUoEGP1SCpl5RzVJ1mmMD7bq72djTQ3loMA4JyBJSm/PUahkECuWuyCu+LkkX4QcoosrWJj01cNA9SG3VuDBoDELbf7rR9Z9h7ObWCTzodrWsCeg0tRpI1Z2AM9mRJWSVBEjdKI=",
 	}, {
 		desc:    "With text, sha256",
 		pk:      privateKey,
 		hashAlg: SignAlgRS256,
 		signAlg: SignAlgRS256,
 		input:   []byte("text"),
-		exp:     "wJOt/N8VsUR4dczLN/8MqxMBXgDyl0lS8AC7sJYSukbrqO2hhIeNcBHccx2sWo/CGVPWton7DNzQfPv56y0kXjlrDOzZCSU3sqEb81S7n4BYkLuBnOoWsQKZrUr/PnuUGS48/Jz/c+X99y4iFx0myOI0iHCGK47uaQE/XNwUBXs=", // nolint: lll
+		exp:     "wJOt/N8VsUR4dczLN/8MqxMBXgDyl0lS8AC7sJYSukbrqO2hhIeNcBHccx2sWo/CGVPWton7DNzQfPv56y0kXjlrDOzZCSU3sqEb81S7n4BYkLuBnOoWsQKZrUr/PnuUGS48/Jz/c+X99y4iFx0myOI0iHCGK47uaQE/XNwUBXs=",
 	}}
 
 	for _, c := range cases {
@@ -489,6 +490,7 @@ func TestSignatureValidate(t *testing.T) {
 	}
 }
 
+//nolint:lll
 func TestSignatureVerify(t *testing.T) {
 	if publicKey == nil {
 		initKeys(t)
@@ -529,7 +531,7 @@ func TestSignatureVerify(t *testing.T) {
 	}, {
 		desc:     "With CRLF, sha1",
 		sigAlg:   SignAlgRS1,
-		sigValue: "5XAKcEb55b7wZrOzrKNjykgRXdloRIdtkuXIQ36Ux9/G2QHJ+kHT7uGY5IjhzSvmYHwKN+tPy1iSZl35XuPWlcupyU+1h+5rwrrvF6JGz1HBVEP23oCzM82opIJF80Dde9YDHH1/Q62WVcM3zAgp9MoCJeO7JToHKKTU/OKXmvo=", // nolint: lll
+		sigValue: "5XAKcEb55b7wZrOzrKNjykgRXdloRIdtkuXIQ36Ux9/G2QHJ+kHT7uGY5IjhzSvmYHwKN+tPy1iSZl35XuPWlcupyU+1h+5rwrrvF6JGz1HBVEP23oCzM82opIJF80Dde9YDHH1/Q62WVcM3zAgp9MoCJeO7JToHKKTU/OKXmvo=",
 		key: &Key{
 			RSA: publicKey,
 		},
@@ -537,7 +539,7 @@ func TestSignatureVerify(t *testing.T) {
 	}, {
 		desc:     "With CRLF, sha256",
 		sigAlg:   SignAlgRS256,
-		sigValue: "LwMB2vdR7qDcHr8VS758WUtTECOrwAIlS9eRZUoEGP1SCpl5RzVJ1mmMD7bq72djTQ3loMA4JyBJSm/PUahkECuWuyCu+LkkX4QcoosrWJj01cNA9SG3VuDBoDELbf7rR9Z9h7ObWCTzodrWsCeg0tRpI1Z2AM9mRJWSVBEjdKI=", // nolint: lll
+		sigValue: "LwMB2vdR7qDcHr8VS758WUtTECOrwAIlS9eRZUoEGP1SCpl5RzVJ1mmMD7bq72djTQ3loMA4JyBJSm/PUahkECuWuyCu+LkkX4QcoosrWJj01cNA9SG3VuDBoDELbf7rR9Z9h7ObWCTzodrWsCeg0tRpI1Z2AM9mRJWSVBEjdKI=",
 		key: &Key{
 			RSA: publicKey,
 		},
@@ -545,7 +547,7 @@ func TestSignatureVerify(t *testing.T) {
 	}, {
 		desc:     "With text, sha256",
 		sigAlg:   SignAlgRS256,
-		sigValue: "wJOt/N8VsUR4dczLN/8MqxMBXgDyl0lS8AC7sJYSukbrqO2hhIeNcBHccx2sWo/CGVPWton7DNzQfPv56y0kXjlrDOzZCSU3sqEb81S7n4BYkLuBnOoWsQKZrUr/PnuUGS48/Jz/c+X99y4iFx0myOI0iHCGK47uaQE/XNwUBXs=", // nolint: lll
+		sigValue: "wJOt/N8VsUR4dczLN/8MqxMBXgDyl0lS8AC7sJYSukbrqO2hhIeNcBHccx2sWo/CGVPWton7DNzQfPv56y0kXjlrDOzZCSU3sqEb81S7n4BYkLuBnOoWsQKZrUr/PnuUGS48/Jz/c+X99y4iFx0myOI0iHCGK47uaQE/XNwUBXs=",
 		key: &Key{
 			RSA: publicKey,
 		},
