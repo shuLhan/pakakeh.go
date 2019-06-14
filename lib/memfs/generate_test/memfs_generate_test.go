@@ -38,7 +38,6 @@ func TestGeneratePathNode(t *testing.T) {
 			ContentType: "",
 			Mode:        2147484141,
 			Size:        4096,
-			V:           []byte{},
 		},
 	}, {
 		path: "/exclude/index.html",
