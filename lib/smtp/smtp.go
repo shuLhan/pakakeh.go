@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"errors"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 // List of SMTP status codes.
@@ -204,7 +204,7 @@ func parseLocalDomain(data []byte, allow []byte) (out []byte) {
 			out = append(out, '.')
 			isDot = false
 		}
-		if libbytes.IsAlnum(data[x]) {
+		if ascii.IsAlnum(data[x]) {
 			out = append(out, data[x])
 			continue
 		}

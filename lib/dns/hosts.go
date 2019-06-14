@@ -4,7 +4,7 @@ import (
 	"net"
 	"runtime"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -62,7 +62,7 @@ func newMessage(addr, hname []byte) *Message {
 		}
 	}
 
-	libbytes.ToLower(&hname)
+	ascii.ToLower(&hname)
 	rrName := make([]byte, len(hname))
 	copy(rrName, hname)
 

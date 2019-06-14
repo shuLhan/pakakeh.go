@@ -7,7 +7,7 @@ package smtp
 import (
 	"testing"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -26,9 +26,8 @@ func TestUnpack(t *testing.T) {
 		b:      "DAT\r\n",
 		expErr: errCmdUnknown,
 	}, {
-		desc: "With length too long",
-		b: "VRFY " + string(libbytes.Random(
-			[]byte(libbytes.ASCIILetters), 513)),
+		desc:   "With length too long",
+		b:      "VRFY " + string(ascii.Random([]byte(ascii.Letters), 513)),
 		expErr: errCmdTooLong,
 	}, {
 		desc:   "Without CRLF",

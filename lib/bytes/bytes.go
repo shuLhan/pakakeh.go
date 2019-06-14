@@ -10,30 +10,6 @@ import (
 	"reflect"
 )
 
-const (
-	// ASCIILetters contains list of lower and upper case characters in
-	// ASCII.
-	ASCIILetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-	// ASCIILettersNumber contains list of lower and upper case
-	// characters in ASCII with numbers.
-	ASCIILettersNumber = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890"
-
-	// HexaLETTERS contains list of hexadecimal characters in upper cases.
-	HexaLETTERS = "0123456789ABCDEF"
-	// HexaLetters contains list of hexadecimal characters in lower and
-	// upper cases.
-	HexaLetters = "0123456789abcedfABCDEF"
-	// Hexaletters contains list of hexadecimal characters in lower cases.
-	Hexaletters = "0123456789abcedf"
-)
-
-//nolint:gochecknoglobals
-var (
-	// ASCIISpaces contains list of white spaces in ASCII.
-	ASCIISpaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
-)
-
 //
 // AppendInt16 into slice of byte.
 //
@@ -442,30 +418,6 @@ func SkipAfterToken(line, token []byte, startAt int, checkEsc bool) (int, bool) 
 	}
 
 	return p, false
-}
-
-//
-// ToLower convert slice of bytes to lower cases, in places.
-//
-func ToLower(data *[]byte) {
-	for x := 0; x < len(*data); x++ {
-		if (*data)[x] < 'A' || (*data)[x] > 'Z' {
-			continue
-		}
-		(*data)[x] += 32
-	}
-}
-
-//
-// ToUpper convert slice of bytes to upper cases, in places.
-//
-func ToUpper(data *[]byte) {
-	for x := 0; x < len(*data); x++ {
-		if (*data)[x] < 'a' || (*data)[x] > 'z' {
-			continue
-		}
-		(*data)[x] -= 32
-	}
 }
 
 //

@@ -1,9 +1,9 @@
 package bytes
 
 import (
-	"bytes"
 	"testing"
 
+	"github.com/shuLhan/share/lib/ascii"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -280,33 +280,6 @@ func TestSkipAfterToken(t *testing.T) {
 	}
 }
 
-func TestToLower(t *testing.T) {
-	cases := []struct {
-		in  []byte
-		exp []byte
-	}{{
-		in:  []byte("@ABCDEFG"),
-		exp: []byte("@abcdefg"),
-	}, {
-		in:  []byte("@ABCDEFG12345678"),
-		exp: []byte("@abcdefg12345678"),
-	}, {
-		in:  []byte("@ABCDEFGhijklmno12345678"),
-		exp: []byte("@abcdefghijklmno12345678"),
-	}, {
-		in:  []byte("@ABCDEFGhijklmnoPQRSTUVW12345678"),
-		exp: []byte("@abcdefghijklmnopqrstuvw12345678"),
-	}, {
-		in:  []byte("@ABCDEFGhijklmnoPQRSTUVWxyz{12345678"),
-		exp: []byte("@abcdefghijklmnopqrstuvwxyz{12345678"),
-	}}
-
-	for _, c := range cases {
-		ToLower(&c.in)
-		test.Assert(t, "ToLower", c.exp, c.in, true)
-	}
-}
-
 func testTokenFind(t *testing.T, line, token []byte, startat int, exp []int) {
 	got := []int{}
 	tokenlen := len(token)
@@ -354,35 +327,8 @@ func TestInReplace(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got := InReplace([]byte(c.in), []byte(ASCIILettersNumber), '_')
+		got := InReplace([]byte(c.in), []byte(ascii.LettersNumber), '_')
 
 		test.Assert(t, "InReplace", c.exp, string(got), true)
-	}
-}
-
-func BenchmarkToLowerStd(b *testing.B) {
-	randomInput256 := Random([]byte(HexaLetters), 256)
-
-	in := make([]byte, len(randomInput256))
-	copy(in, randomInput256)
-
-	b.ResetTimer()
-
-	for x := 0; x < b.N; x++ {
-		bytes.ToLower(in)
-	}
-}
-
-func BenchmarkToLower(b *testing.B) {
-	randomInput256 := Random([]byte(HexaLetters), 256)
-
-	in := make([]byte, len(randomInput256))
-	copy(in, randomInput256)
-
-	b.ResetTimer()
-
-	for x := 0; x < b.N; x++ {
-		ToLower(&in)
-		copy(in, randomInput256)
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"errors"
 	"strconv"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
 )
 
@@ -70,7 +70,7 @@ func (res *Response) parseCode(raw []byte) (code []byte, isMultiline bool, err e
 	code = raw[0:3]
 
 	for _, b := range code {
-		if !libbytes.IsDigit(b) {
+		if !ascii.IsDigit(b) {
 			return code, false, errors.New("invalid response code")
 		}
 	}

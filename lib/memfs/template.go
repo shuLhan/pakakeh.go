@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
@@ -51,7 +52,7 @@ func init() {
 `
 	tmplFuncs := template.FuncMap{
 		"funcname": func(path string) []byte {
-			return libbytes.InReplace([]byte(path), []byte(libbytes.ASCIILettersNumber), '_')
+			return libbytes.InReplace([]byte(path), []byte(ascii.LettersNumber), '_')
 		},
 		"maxline": func(x int) bool {
 			if x != 0 && x%16 == 0 {

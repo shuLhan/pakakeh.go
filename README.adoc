@@ -23,6 +23,9 @@ A collection of libraries and tools written in Go.
 
 ==  Libraries
 
+*  link:{url-godoc}/lib/ascii[*ascii*^]: A library for working with ASCII
+   characters.
+
 *  link:{url-godoc}/lib/bytes[*bytes*^]: A library for working with slice of
    bytes.
 

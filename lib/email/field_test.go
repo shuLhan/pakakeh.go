@@ -8,12 +8,12 @@ import (
 	"testing"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	"github.com/shuLhan/share/lib/test"
 )
 
 func TestParseField(t *testing.T) {
-	longValue := string(libbytes.Random([]byte(libbytes.ASCIILetters), 994))
+	longValue := string(ascii.Random([]byte(ascii.Letters), 994))
 
 	cases := []struct {
 		desc    string

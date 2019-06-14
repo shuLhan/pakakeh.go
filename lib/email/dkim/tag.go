@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"fmt"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 type tagKey int
@@ -102,11 +102,11 @@ func newTag(key []byte) (t *tag, err error) {
 	if len(key) == 0 {
 		return nil, nil
 	}
-	if !libbytes.IsAlpha(key[0]) {
+	if !ascii.IsAlpha(key[0]) {
 		return nil, fmt.Errorf("dkim: invalid tag key: '%s'", key)
 	}
 	for x := 0; x < len(key); x++ {
-		if libbytes.IsAlnum(key[x]) || key[x] == '_' {
+		if ascii.IsAlnum(key[x]) || key[x] == '_' {
 			continue
 		}
 		return nil, fmt.Errorf("dkim: invalid tag key: '%s'", key)
@@ -141,7 +141,7 @@ func (t *tag) setValue(val []byte) (err error) {
 	}
 	for x := 0; x < len(val); x++ {
 		switch {
-		case libbytes.IsSpace(val[x]):
+		case ascii.IsSpace(val[x]):
 			continue
 		case val[x] < '!' || val[x] == ';' || val[x] > '~':
 			if !isBase64 {

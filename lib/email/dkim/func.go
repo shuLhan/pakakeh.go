@@ -5,6 +5,7 @@
 package dkim
 
 import (
+	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
@@ -19,7 +20,7 @@ func DecodeQP(raw []byte) (out []byte) {
 	out = make([]byte, 0, len(raw))
 
 	for x := 0; x < len(raw); x++ {
-		if libbytes.IsSpace(raw[x]) {
+		if ascii.IsSpace(raw[x]) {
 			continue
 		}
 		if raw[x] == '=' {

@@ -7,7 +7,7 @@ package dkim
 import (
 	"fmt"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
 )
 
@@ -83,7 +83,7 @@ func (p *parser) fetchTag() (t *tag, err error) {
 // fetchTagKey parse and fetch tag's key.
 //
 func (p *parser) fetchTagKey() (t *tag, err error) {
-	p.tok, p.isTerm, p.c = p.r.ReadUntil(p.sepKey, libbytes.ASCIISpaces)
+	p.tok, p.isTerm, p.c = p.r.ReadUntil(p.sepKey, ascii.Spaces)
 
 	t, err = newTag(p.tok)
 	if err != nil || t == nil {

@@ -10,7 +10,7 @@ import (
 	"log"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	"github.com/shuLhan/share/lib/debug"
 	libio "github.com/shuLhan/share/lib/io"
 	libtime "github.com/shuLhan/share/lib/time"
@@ -205,14 +205,14 @@ func (field *Field) setValue(raw []byte) {
 	x := 0
 	// Skip leading spaces.
 	for ; x < len(raw); x++ {
-		if !libbytes.IsSpace(raw[x]) {
+		if !ascii.IsSpace(raw[x]) {
 			break
 		}
 	}
 
 	spaces := 0
 	for ; x < len(raw); x++ {
-		if libbytes.IsSpace(raw[x]) {
+		if ascii.IsSpace(raw[x]) {
 			spaces++
 			continue
 		}
@@ -346,7 +346,7 @@ func (field *Field) unpackDate() (err error) {
 	r.Init(field.Value)
 
 	c = r.SkipSpaces()
-	if !libbytes.IsDigit(c) {
+	if !ascii.IsDigit(c) {
 		v, _, c = r.ReadUntil([]byte{','}, nil)
 		if len(v) == 0 || c != ',' {
 			return fmt.Errorf("unpackDate: invalid date format")

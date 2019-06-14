@@ -4,7 +4,7 @@ import (
 	"net"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 //
@@ -25,10 +25,10 @@ func IsHostnameValid(hname []byte, isFQDN bool) bool {
 	if n == 0 {
 		return false
 	}
-	if !libbytes.IsAlnum(hname[0]) && hname[0] != '_' {
+	if !ascii.IsAlnum(hname[0]) && hname[0] != '_' {
 		return false
 	}
-	if !libbytes.IsAlnum(hname[n-1]) {
+	if !ascii.IsAlnum(hname[n-1]) {
 		return false
 	}
 	var ndot int
@@ -37,7 +37,7 @@ func IsHostnameValid(hname []byte, isFQDN bool) bool {
 			ndot++
 			continue
 		}
-		if hname[x] == '-' || hname[x] == '_' || libbytes.IsAlnum(hname[x]) {
+		if hname[x] == '-' || hname[x] == '_' || ascii.IsAlnum(hname[x]) {
 			continue
 		}
 		return false

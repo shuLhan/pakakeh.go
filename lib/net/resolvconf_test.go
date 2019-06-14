@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -54,7 +54,7 @@ func TestResolvConf_Init(t *testing.T) {
 		return "kilabit.info", nil
 	}
 
-	veryLongName := string(libbytes.Random([]byte(libbytes.ASCIILetters), 255))
+	veryLongName := string(ascii.Random([]byte(ascii.Letters), 255))
 
 	cases := []struct {
 		desc           string

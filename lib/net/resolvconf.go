@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
 )
 
@@ -160,13 +160,13 @@ func (rc *ResolvConf) parse(reader *libio.Reader) {
 			continue
 		}
 
-		tok, isTerm, _ := reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
+		tok, isTerm, _ := reader.ReadUntil(ascii.Spaces, newLineTerms)
 		if isTerm {
 			// We found keyword without value.
 			continue
 		}
 
-		libbytes.ToLower(&tok)
+		ascii.ToLower(&tok)
 		v := string(tok)
 		switch v {
 		case "domain":
@@ -195,7 +195,7 @@ func (rc *ResolvConf) parseValue(reader *libio.Reader, out *string) {
 		return
 	}
 
-	tok, isTerm, _ := reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
+	tok, isTerm, _ := reader.ReadUntil(ascii.Spaces, newLineTerms)
 	if len(tok) > 0 {
 		*out = string(tok)
 	}
@@ -223,7 +223,7 @@ func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 			break
 		}
 
-		tok, isTerm, _ := reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
+		tok, isTerm, _ := reader.ReadUntil(ascii.Spaces, newLineTerms)
 		if len(tok) > 0 {
 			if curLen+len(tok) > maxLen {
 				break
@@ -256,7 +256,7 @@ func (rc *ResolvConf) parseOptions(reader *libio.Reader) {
 			break
 		}
 
-		tok, isTerm, _ = reader.ReadUntil(libbytes.ASCIISpaces, newLineTerms)
+		tok, isTerm, _ = reader.ReadUntil(ascii.Spaces, newLineTerms)
 		if len(tok) > 0 {
 			rc.parseOptionsKV(tok)
 		}

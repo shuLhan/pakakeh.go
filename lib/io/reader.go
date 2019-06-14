@@ -7,7 +7,7 @@ package io
 import (
 	"io/ioutil"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 //
@@ -138,7 +138,7 @@ func (r *Reader) ScanInt64() (n int64, c byte) {
 
 	for ; r.X < len(r.V); r.X++ {
 		c = r.V[r.X]
-		if !libbytes.IsSpace(c) {
+		if !ascii.IsSpace(c) {
 			break
 		}
 	}
@@ -150,7 +150,7 @@ func (r *Reader) ScanInt64() (n int64, c byte) {
 	}
 	for r.X < len(r.V) {
 		c = r.V[r.X]
-		if !libbytes.IsDigit(c) {
+		if !ascii.IsDigit(c) {
 			break
 		}
 		c -= '0'
@@ -186,7 +186,7 @@ func (r *Reader) SkipN(n int) bool {
 func (r *Reader) SkipSpaces() (c byte) {
 	for r.X < len(r.V) {
 		c = r.V[r.X]
-		if libbytes.IsSpace(c) {
+		if ascii.IsSpace(c) {
 			r.X++
 			continue
 		}

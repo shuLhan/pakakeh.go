@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 //
@@ -39,7 +39,7 @@ func IsBinary(file string) bool {
 		content = content[:n]
 
 		for x := 0; x < len(content); x++ {
-			if libbytes.IsSpace(content[x]) {
+			if ascii.IsSpace(content[x]) {
 				continue
 			}
 			if content[x] >= 33 && content[x] <= 126 {

@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
 	libio "github.com/shuLhan/share/lib/io"
@@ -210,7 +211,7 @@ func (m *master) parse() (err error) {
 			return
 		}
 
-		libbytes.ToUpper(&tok)
+		ascii.ToUpper(&tok)
 		stok := string(tok)
 
 		switch stok {
@@ -261,7 +262,7 @@ func (m *master) parseDirectiveOrigin() (err error) {
 		return fmt.Errorf("! %s:%d Empty $origin directive", m.file, m.lineno)
 	}
 
-	libbytes.ToLower(&tok)
+	ascii.ToLower(&tok)
 	m.origin = string(tok)
 
 	if isTerm {
@@ -302,7 +303,7 @@ func (m *master) parseDirectiveInclude() (err error) {
 
 	var incfile, dname string
 
-	libbytes.ToLower(&tok)
+	ascii.ToLower(&tok)
 	incfile = string(tok)
 
 	// check if include followed by domain name.
@@ -360,7 +361,7 @@ func (m *master) parseDirectiveTTL() (err error) {
 		return fmt.Errorf("! %s:%d Empty $ttl directive", m.file, m.lineno)
 	}
 
-	libbytes.ToLower(&tok)
+	ascii.ToLower(&tok)
 	stok := string(tok)
 
 	m.ttl, err = parseTTL(tok, stok)
@@ -397,7 +398,7 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 		dur time.Duration
 	)
 
-	if libbytes.IsDigits(tok) {
+	if ascii.IsDigits(tok) {
 		v, err = strconv.ParseUint(stok, 10, 32)
 		if err != nil {
 			return 0, err
@@ -457,7 +458,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 		rr.TTL = prevRR.TTL
 		rr.Class = prevRR.Class
 
-		if libbytes.IsDigit(tok[0]) {
+		if ascii.IsDigit(tok[0]) {
 			ttl, err := parseTTL(tok, stok)
 			if err != nil {
 				return nil, err
@@ -490,12 +491,12 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 		}
 
 		orgtok := libbytes.Copy(tok)
-		libbytes.ToUpper(&tok)
+		ascii.ToUpper(&tok)
 		stok = string(tok)
 
 		switch m.flag {
 		case parseRRStart:
-			if libbytes.IsDigit(tok[0]) {
+			if ascii.IsDigit(tok[0]) {
 				rr.TTL, err = parseTTL(tok, stok)
 				if err != nil {
 					return nil, err
@@ -520,7 +521,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 			}
 
 		case parseRRClass:
-			if libbytes.IsDigit(tok[0]) {
+			if ascii.IsDigit(tok[0]) {
 				rr.TTL, err = parseTTL(tok, stok)
 				if err != nil {
 					return nil, err
@@ -667,7 +668,7 @@ func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
-	libbytes.ToLower(&tok)
+	ascii.ToLower(&tok)
 
 	rr.SOA = &RDataSOA{
 		MName: m.generateDomainName(tok),
@@ -685,7 +686,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 			m.file, m.lineno, string(tok))
 	}
 
-	libbytes.ToLower(&tok)
+	ascii.ToLower(&tok)
 	rr.SOA.RName = m.generateDomainName(tok)
 
 	var v int
@@ -995,7 +996,7 @@ out:
 }
 
 func (m *master) generateDomainName(dname []byte) (out []byte) {
-	libbytes.ToLower(&dname)
+	ascii.ToLower(&dname)
 	switch {
 	case dname[0] == '@':
 		out = []byte(m.origin)

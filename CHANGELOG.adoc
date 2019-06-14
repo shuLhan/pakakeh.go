@@ -4,6 +4,18 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+==  share v0.8.0 (2019-07-xx)
+
+===  Breaking changes
+
+*  All ASCII related contants and functions now being moved from `bytes`
+   package to `ascii` package.
+
+===  New Features
+
+*  ascii: new library for working with ASCII characters.
+
+
 ==  share v0.7.0 (2019-06-14)
 
 This release bring major refactoring on `ini` package to provide a clean and

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
 )
 
@@ -45,12 +45,12 @@ func ParseDuration(s string) (time.Duration, error) {
 	reader.Init([]byte(s))
 
 	c := reader.SkipSpaces()
-	if !libbytes.IsDigit(c) {
+	if !ascii.IsDigit(c) {
 		return 0, ErrDurationMissingValue
 	}
 
 	for {
-		tok, _, c := reader.ReadUntil(seps, libbytes.ASCIISpaces)
+		tok, _, c := reader.ReadUntil(seps, ascii.Spaces)
 		if c == 0 {
 			break
 		}

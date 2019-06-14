@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 	libdns "github.com/shuLhan/share/lib/dns"
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -144,13 +144,13 @@ func (m *macro) parse(data []byte) (err error) {
 
 		// *DIGIT [ "r" ] *delimiter
 		case 3:
-			if libbytes.IsDigit(data[x]) {
+			if ascii.IsDigit(data[x]) {
 				digits := make([]byte, 0, 3)
 
 				digits = append(digits, data[x])
 				x++
 				for ; x < len(data); x++ {
-					if !libbytes.IsDigit(data[x]) {
+					if !ascii.IsDigit(data[x]) {
 						break
 					}
 					digits = append(digits, data[x])
