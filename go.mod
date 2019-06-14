@@ -3,6 +3,6 @@ module github.com/shuLhan/share
 go 1.12
 
 require (
-	golang.org/x/crypto v0.0.0-20190506204251-e1dfcc566284
-	golang.org/x/sys v0.0.0-20190507053917-2953c62de483
+	golang.org/x/crypto v0.0.0-20190611184440-5c40567a22f8
+	golang.org/x/sys v0.0.0-20190614084037-d442b75600c5
 )
