@@ -1,4 +1,4 @@
-=  import github/shuLhan/share
+=  import "github/shuLhan/share"
 :author: Shulhan
 :email: <ms@kilabit.info>
 :toc:
@@ -16,6 +16,9 @@ A collection of libraries and tools written in Go.
 
 *  link:{url-godoc}/cmd/gofmtcomment[*gofmtcomment*^]: Program to convert
    multilines "/\*\*/" comment into single line "//" format.
+
+*  link:{url-godoc}/cmd/smtpcli[*smtpcli*^]: Command smtpcli provide a command
+   line interface to SMTP client protocol.
 
 
 ==  Libraries
