@@ -4,6 +4,48 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+==  share v0.7.0 (2019-06-14)
+
+This release bring major refactoring on `ini` package to provide a clean and
+simple API.
+
+===  Breaking Changes
+
+*  ini: major refactoring
+*  net: add parameter to check Fully Qualified Domain Name on IsHostnameValid
+
+===  New Features
+
+*  spf: implementation of Sender Policy Framework (RFC 7208)
+*  ssh: package ssh provide a wrapper to golang.org/x/crypto/ssh
+
+===  Enhancements
+
+*  dns: add function to lookup PTR record by IP address
+*  dns: export Lookup method as part of Client interface
+*  doc: regenerate to use new style
+*  http: print the not-found path on Server's getFSNode()
+*  ini: add method Vars that return all variables as map
+*  ini: add method to Rebase other INI object
+*  ini: add method to add, set, and unset variable
+*  ini: add method to convert key-value to map
+*  ini: add method to get section object by section and/or subsection name
+*  ini: add method to get variable values as slice of string
+*  ini: add method to prune INI variables
+*  ini: add methods to support templating
+*  io: add function to check if content of file is binary
+*  net: add function to check if IP address is IPv4 or IPv6
+*  net: add function to convert IPv6 into dot format
+*  ns: set log flag to 0, without time prefix
+*  strings: add function to append uniq values to slice of strings
+
+===  Bug Fixes
+
+*  io: watch changes on sub of sub directories on DirWatcher
+*  dns: substract the message TTL when the answer found on cache
+*  dns: always return true when answers RR exist and no TTL is zero
+
+
 ==  share v0.6.1 (2019-05-11)
 
 *  `memfs`:
