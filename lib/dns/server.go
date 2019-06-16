@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/shuLhan/share/lib/debug"
 )
@@ -73,7 +74,14 @@ type Server struct {
 	requestq chan *request
 	forwardq chan *request
 
+	// fwGroup maintain reference counting for all forwarders.
+	fwGroup *sync.WaitGroup
+
 	hasForwarders bool
+
+	// isForwarding define a state that allow forwarding to run or to
+	// stop.
+	isForwarding bool
 }
 
 //
@@ -89,6 +97,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 		opts:     opts,
 		requestq: make(chan *request, 512),
 		forwardq: make(chan *request, 512),
+		fwGroup:  &sync.WaitGroup{},
 	}
 
 	udpAddr := opts.getUDPAddress()
@@ -270,6 +279,23 @@ func (srv *Server) populateCaches(msgs []*Message) {
 	}
 
 	fmt.Printf("dns: %d out of %d records cached\n", n, len(msgs))
+}
+
+//
+// RestartForwarders stop and start new forwarders with new nameserver address
+// and protocol.
+// Empty nameservers means server will run without forwarding request.
+//
+func (srv *Server) RestartForwarders(nameServers []string) {
+	srv.opts.NameServers = nameServers
+	srv.opts.parseNameServers()
+
+	srv.stopForwarders()
+	srv.runForwarders()
+
+	if !srv.hasForwarders {
+		log.Println("dns: no valid forward nameservers")
+	}
 }
 
 //
@@ -624,6 +650,8 @@ func (srv *Server) processResponse(req *request, res *Message, isLocal bool) {
 }
 
 func (srv *Server) runForwarders() {
+	srv.isForwarding = true
+
 	nforwarders := 0
 	for x := 0; x < len(srv.opts.udpServers); x++ {
 		go srv.runUDPForwarder(srv.opts.udpServers[x].String())
@@ -646,75 +674,129 @@ func (srv *Server) runForwarders() {
 }
 
 func (srv *Server) runDohForwarder(nameserver string) {
-	forwarder, err := NewDoHClient(nameserver, false)
-	if err != nil {
-		log.Fatal("dns: failed to create DoH forwarder: " + err.Error())
-	}
+	srv.fwGroup.Add(1)
+	log.Printf("dns: starting DoH forwarder at %s", nameserver)
 
-	for req := range srv.forwardq {
-		if debug.Value >= 1 {
-			fmt.Printf("dns: ^ DoH %d:%s\n",
-				req.message.Header.ID, req.message.Question)
-		}
-
-		res, err := forwarder.Query(req.message)
+	for srv.isForwarding {
+		forwarder, err := NewDoHClient(nameserver, false)
 		if err != nil {
-			log.Println("dns: failed to query DoH: " + err.Error())
-			continue
+			log.Fatal("dns: failed to create DoH forwarder: " + err.Error())
 		}
 
-		srv.processResponse(req, res, false)
+		for srv.isForwarding { //nolint:gosimple
+			select {
+			case req, ok := <-srv.forwardq:
+				if !ok {
+					goto out
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: ^ DoH %d:%s\n",
+						req.message.Header.ID, req.message.Question)
+				}
+
+				res, err := forwarder.Query(req.message)
+				if err != nil {
+					log.Println("dns: failed to query DoH: " + err.Error())
+					continue
+				}
+
+				srv.processResponse(req, res, false)
+			}
+		}
 	}
+out:
+	srv.fwGroup.Done()
+	log.Printf("dns: DoH forwarder for %s has been stopped", nameserver)
 }
 
 func (srv *Server) runTCPForwarder(remoteAddr string) {
-	for req := range srv.forwardq {
-		if debug.Value >= 1 {
-			fmt.Printf("dns: ^ TCP %d:%s\n",
-				req.message.Header.ID, req.message.Question)
-		}
+	srv.fwGroup.Add(1)
+	log.Printf("dns: starting TCP forwarder at %s", remoteAddr)
 
-		cl, err := NewTCPClient(remoteAddr)
-		if err != nil {
-			log.Println("dns: failed to create TCP client: " + err.Error())
-			continue
-		}
+	for srv.isForwarding { //nolint:gosimple
+		select {
+		case req, ok := <-srv.forwardq:
+			if !ok {
+				goto out
+			}
+			if debug.Value >= 1 {
+				fmt.Printf("dns: ^ TCP %d:%s\n",
+					req.message.Header.ID, req.message.Question)
+			}
 
-		res, err := cl.Query(req.message)
-		cl.Close()
-		if err != nil {
-			log.Println("dns: failed to query TCP: " + err.Error())
-			continue
-		}
+			cl, err := NewTCPClient(remoteAddr)
+			if err != nil {
+				log.Println("dns: failed to create TCP client: " + err.Error())
+				continue
+			}
 
-		srv.processResponse(req, res, false)
+			res, err := cl.Query(req.message)
+			cl.Close()
+			if err != nil {
+				log.Println("dns: failed to query TCP: " + err.Error())
+				continue
+			}
+
+			srv.processResponse(req, res, false)
+		}
 	}
+out:
+	srv.fwGroup.Done()
+	log.Printf("dns: TCP forwarder for %s has been stopped", remoteAddr)
 }
 
+//
+// runUDPForwarder create a UDP client that consume request from forward queue
+// and forward it to parent server at "remoteAddr".
+//
 func (srv *Server) runUDPForwarder(remoteAddr string) {
-	for {
+	srv.fwGroup.Add(1)
+	log.Printf("dns: starting UDP forwarder at %s", remoteAddr)
+
+	// The first loop handle broken connection of UDP client.
+	for srv.isForwarding {
 		forwarder, err := NewUDPClient(remoteAddr)
 		if err != nil {
 			log.Fatal("dns: failed to create UDP forwarder: " + err.Error())
 		}
 
-		for req := range srv.forwardq {
-			if debug.Value >= 1 {
-				fmt.Printf("dns: ^ UDP %d:%s\n",
-					req.message.Header.ID, req.message.Question)
-			}
+		// The second loop consume the forward queue.
+		for srv.isForwarding { //nolint:gosimple
+			select {
+			case req, ok := <-srv.forwardq:
+				if !ok {
+					goto out
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: ^ UDP %d:%s\n",
+						req.message.Header.ID, req.message.Question)
+				}
 
-			res, err := forwarder.Query(req.message)
-			if err != nil {
-				log.Println("dns: failed to query UDP: " + err.Error())
-				break
-			}
+				res, err := forwarder.Query(req.message)
+				if err != nil {
+					log.Println("dns: failed to query UDP: " + err.Error())
+					goto brokenClient
+				}
 
-			srv.processResponse(req, res, false)
+				srv.processResponse(req, res, false)
+			}
 		}
-
+	brokenClient:
 		forwarder.Close()
 
-		log.Println("dns: restarting UDP forwarder for " + remoteAddr)
+		if srv.isForwarding {
+			log.Println("dns: restarting UDP forwarder for " + remoteAddr)
+		}
 	}
+out:
+	srv.fwGroup.Done()
+	log.Printf("dns: TCP forwarder for %s has been stopped", remoteAddr)
+}
+
+//
+// stopForwarders stop all forwarder connections.
+//
+func (srv *Server) stopForwarders() {
+	srv.isForwarding = false
+	srv.fwGroup.Wait()
 }

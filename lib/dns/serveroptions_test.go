@@ -112,10 +112,14 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 			"tcp://localhost:53",
 		},
 	}, {
-		desc: "With invalid scheme",
+		desc: "With no scheme",
 		nameServers: []string{
 			"127.0.0.1",
 		},
+		expUDPServers: []*net.UDPAddr{{
+			IP:   ip,
+			Port: 53,
+		}},
 	}, {
 		desc: "With valid name servers",
 		nameServers: []string{

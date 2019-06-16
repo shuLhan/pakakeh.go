@@ -167,10 +167,14 @@ func (opts *ServerOptions) getDoHAddress() *net.TCPAddr {
 //
 // parseNameServers parse each name server in NameServers list based on scheme
 // and store the result either in udpServers, tcpServers, or dohServers.
-// If the name server format is invalid, for example no scheme, it will be
-// skipped.
+//
+// If the name server format contains no scheme, it will be assumed as "udp".
 //
 func (opts *ServerOptions) parseNameServers() {
+	opts.udpServers = nil
+	opts.tcpServers = nil
+	opts.dohServers = nil
+
 	for _, ns := range opts.NameServers {
 		dnsURL, err := url.Parse(ns)
 		if err != nil {
@@ -201,9 +205,13 @@ func (opts *ServerOptions) parseNameServers() {
 			opts.dohServers = append(opts.dohServers, ns)
 
 		default:
-			udpAddr, err := libnet.ParseUDPAddr(dnsURL.Host, DefaultPort)
+			if len(dnsURL.Host) > 0 {
+				ns = dnsURL.Host
+			}
+
+			udpAddr, err := libnet.ParseUDPAddr(ns, DefaultPort)
 			if err != nil {
-				log.Printf("dns: invalid UDP IP address %q", dnsURL.Host)
+				log.Printf("dns: invalid UDP IP address %q", ns)
 				continue
 			}
 
