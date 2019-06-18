@@ -35,11 +35,12 @@ type ServerOptions struct {
 	// DoHPort port for listening DNS over HTTP, default to 443.
 	DoHPort uint16
 
+	//
 	// NameServers contains list of parent name servers.
 	//
 	// Answer that does not exist on local will be forwarded to parent
-	// name servers.  If this is empty, any query that does not have an
-	// answer in local caches, will be returned with response code
+	// name servers.  If this field is empty, any query that does not have
+	// an answer in local caches, will be returned with response code
 	// RCodeErrName (3).
 	//
 	// The name server use the URI format,
@@ -59,6 +60,14 @@ type ServerOptions struct {
 	//	https://cloudflare-dns.com/dns-query
 	//
 	NameServers []string
+
+	//
+	// FallbackNS contains list of parent name servers that will be
+	// queried if the primary NameServers return an error.
+	//
+	// This field use the same format as NameServers.
+	//
+	FallbackNS []string
 
 	// DoHCertificate contains certificate for serving DNS over HTTPS.
 	// This field is optional, if its empty, server will not listening on
@@ -88,17 +97,21 @@ type ServerOptions struct {
 
 	ip net.IP
 
-	// udpServers contains list of parent name server addresses using UDP
+	// primaryUDP contains list of parent name server addresses using UDP
 	// protocol.
-	udpServers []*net.UDPAddr
+	primaryUDP []*net.UDPAddr
 
-	// tcpServers contains list of parent name server addresses using TCP
+	// primaryTCP contains list of parent name server addresses using TCP
 	// protocol.
-	tcpServers []*net.TCPAddr
+	primaryTCP []*net.TCPAddr
 
-	// dohServers contains list of parent name server addresses using DoH
+	// primaryDoh contains list of parent name server addresses using DoH
 	// protocol.
-	dohServers []string
+	primaryDoh []string
+
+	fallbackUDP []*net.UDPAddr
+	fallbackTCP []*net.TCPAddr
+	fallbackDoh []string
 }
 
 //
@@ -136,7 +149,7 @@ func (opts *ServerOptions) init() (err error) {
 
 	opts.parseNameServers()
 
-	if len(opts.udpServers) == 0 && len(opts.tcpServers) == 0 && len(opts.dohServers) == 0 {
+	if len(opts.primaryUDP) == 0 && len(opts.primaryTCP) == 0 && len(opts.primaryDoh) == 0 {
 		return fmt.Errorf("dns: no valid name servers")
 	}
 
@@ -166,16 +179,14 @@ func (opts *ServerOptions) getDoHAddress() *net.TCPAddr {
 
 //
 // parseNameServers parse each name server in NameServers list based on scheme
-// and store the result either in udpServers, tcpServers, or dohServers.
+// and store the result either in udpAddrs, tcpAddrs, or dohAddrs.
 //
 // If the name server format contains no scheme, it will be assumed as "udp".
 //
-func (opts *ServerOptions) parseNameServers() {
-	opts.udpServers = nil
-	opts.tcpServers = nil
-	opts.dohServers = nil
-
-	for _, ns := range opts.NameServers {
+func parseNameServers(nameServers []string) (
+	udpAddrs []*net.UDPAddr, tcpAddrs []*net.TCPAddr, dohAddrs []string,
+) {
+	for _, ns := range nameServers {
 		dnsURL, err := url.Parse(ns)
 		if err != nil {
 			log.Printf("dns: invalid name server URI %q", ns)
@@ -190,7 +201,7 @@ func (opts *ServerOptions) parseNameServers() {
 				continue
 			}
 
-			opts.udpServers = append(opts.udpServers, udpAddr)
+			udpAddrs = append(udpAddrs, udpAddr)
 
 		case "tcp":
 			tcpAddr, err := libnet.ParseTCPAddr(dnsURL.Host, DefaultPort)
@@ -199,10 +210,10 @@ func (opts *ServerOptions) parseNameServers() {
 				continue
 			}
 
-			opts.tcpServers = append(opts.tcpServers, tcpAddr)
+			tcpAddrs = append(tcpAddrs, tcpAddr)
 
 		case "https":
-			opts.dohServers = append(opts.dohServers, ns)
+			dohAddrs = append(dohAddrs, ns)
 
 		default:
 			if len(dnsURL.Host) > 0 {
@@ -215,7 +226,14 @@ func (opts *ServerOptions) parseNameServers() {
 				continue
 			}
 
-			opts.udpServers = append(opts.udpServers, udpAddr)
+			udpAddrs = append(udpAddrs, udpAddr)
 		}
 	}
+
+	return udpAddrs, tcpAddrs, dohAddrs
+}
+
+func (opts *ServerOptions) parseNameServers() {
+	opts.primaryUDP, opts.primaryTCP, opts.primaryDoh = parseNameServers(opts.NameServers)
+	opts.fallbackUDP, opts.fallbackTCP, opts.fallbackDoh = parseNameServers(opts.FallbackNS)
 }

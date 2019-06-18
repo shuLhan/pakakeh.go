@@ -64,7 +64,7 @@ func TestServerOptionsInit(t *testing.T) {
 			PruneDelay:     time.Hour,
 			PruneThreshold: -1 * time.Hour,
 			ip:             ip,
-			udpServers: []*net.UDPAddr{{
+			primaryUDP: []*net.UDPAddr{{
 				IP:   net.ParseIP("127.0.0.1"),
 				Port: 53,
 			}},
@@ -147,8 +147,8 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 
 		so.parseNameServers()
 
-		test.Assert(t, "udpServers", c.expUDPServers, so.udpServers, true)
-		test.Assert(t, "tcpServers", c.expTCPServers, so.tcpServers, true)
-		test.Assert(t, "dohServers", c.expDoHServers, so.dohServers, true)
+		test.Assert(t, "primaryUDP", c.expUDPServers, so.primaryUDP, true)
+		test.Assert(t, "primaryTCP", c.expTCPServers, so.primaryTCP, true)
+		test.Assert(t, "primaryDoh", c.expDoHServers, so.primaryDoh, true)
 	}
 }

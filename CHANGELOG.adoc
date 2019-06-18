@@ -13,7 +13,13 @@ first week of next month.
 
 ===  New Features
 
-*  ascii: new library for working with ASCII characters.
+*  ascii: new library for working with ASCII characters
+
+===  Enhancements
+
+*  dns: add method to restart forwarders
+*  dns: add fallback nameservers
+*  ini: create new section or variable if not exist on Set
 
 
 ==  share v0.7.0 (2019-06-14)
