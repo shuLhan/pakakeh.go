@@ -306,20 +306,26 @@ func (sec *Section) replaceAll(key, value string) {
 // If value is empty, it will be set to true.
 //
 func (sec *Section) set(key, value string) bool {
-	if len(sec.vars) == 0 || len(key) == 0 {
+	if len(key) == 0 {
 		return false
 	}
 
-	key = strings.ToLower(key)
-
-	_, v := sec.getVariable(key)
-	if v == nil {
-		return false
-	}
+	keyLower := strings.ToLower(key)
 	if len(value) == 0 {
 		value = varValueTrue
 	}
 
+	_, v := sec.getVariable(keyLower)
+	if v == nil {
+		v := &variable{
+			mode:     lineModeValue,
+			key:      key,
+			keyLower: strings.ToLower(key),
+			value:    value,
+		}
+		sec.vars = append(sec.vars, v)
+		return true
+	}
 	v.value = value
 
 	return true

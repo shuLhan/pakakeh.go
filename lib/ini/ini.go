@@ -120,7 +120,12 @@ func (in *Ini) Section(secName, subName string) (sec *Section) {
 //
 // Set the last variable's value in section-subsection that match with the
 // key.
-// If key found it will return true; otherwise it will return false.
+// If section or subsection is not found, the new section-subsection will be
+// created.
+// If key not found, the new key-value variable will be added to the section.
+//
+// It will return true if new key added or updated; otherwise it will return
+// false.
 //
 func (in *Ini) Set(secName, subName, key, value string) bool {
 	if len(secName) == 0 || len(key) == 0 {
@@ -131,7 +136,16 @@ func (in *Ini) Set(secName, subName, key, value string) bool {
 
 	sec := in.getSection(secName, subName)
 	if sec == nil {
-		return false
+		sec = newSection(secName, subName)
+		v := &variable{
+			mode:     lineModeValue,
+			key:      key,
+			keyLower: strings.ToLower(key),
+			value:    value,
+		}
+		sec.vars = append(sec.vars, v)
+		in.secs = append(in.secs, sec)
+		return true
 	}
 
 	key = strings.ToLower(key)

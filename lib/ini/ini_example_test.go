@@ -285,9 +285,12 @@ key=value1
 	//key=value4
 	//key2=false
 	//
+	//keynotexist = value4
 	//[section "sub"]
 	//key=value2
 	//key=value3
+	//[sectionnotexist "sub"]
+	//key = value3
 }
 
 func ExampleIni_Subs() {
