@@ -511,11 +511,28 @@ func (in *Ini) Vars(sectionPath string) (vars map[string]string) {
 // Write the current parsed Ini into writer `w`.
 //
 func (in *Ini) Write(w io.Writer) (err error) {
+	var (
+		endWithVar bool
+		v          *variable
+	)
+
 	for x := 0; x < len(in.secs); x++ {
+		// Add an empty line before section statement.
+		if endWithVar {
+			fmt.Fprintln(w)
+		}
+
 		fmt.Fprint(w, in.secs[x])
 
-		for _, v := range in.secs[x].vars {
+		for _, v = range in.secs[x].vars {
 			fmt.Fprint(w, v)
+		}
+
+		// Check if the last variable is an empty line.
+		if isLineModeVar(v.mode) {
+			endWithVar = true
+		} else {
+			endWithVar = false
 		}
 	}
 

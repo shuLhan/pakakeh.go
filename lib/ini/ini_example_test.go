@@ -32,8 +32,10 @@ func ExampleIni_Add() {
 	// k1 = true
 	// k1 = v1
 	// k1 = v2
+	//
 	// [s1 "sub"]
 	// k1 = v1
+	//
 	// [s2 "sub"]
 	// k1 = v1
 }
@@ -136,11 +138,9 @@ key=value1
 
 	in.Prune()
 
-	for _, sec := range in.secs {
-		fmt.Printf("%s", sec)
-		for _, v := range sec.vars {
-			fmt.Printf("%s", v)
-		}
+	err = in.Write(os.Stdout)
+	if err != nil {
+		log.Fatal(err)
 	}
 	// Output:
 	// [section]
@@ -148,6 +148,7 @@ key=value1
 	// key2 = true
 	// key = value2
 	// key2 = false
+	//
 	// [section "sub"]
 	// key = value2
 	// key = value1
@@ -188,11 +189,9 @@ func ExampleIni_Rebase() {
 
 	in.Rebase(in2)
 
-	for _, sec := range in.secs {
-		fmt.Printf("%s", sec)
-		for _, v := range sec.vars {
-			fmt.Printf("%s", v)
-		}
+	err = in.Write(os.Stdout)
+	if err != nil {
+		log.Fatal(err)
 	}
 	// Output:
 	// [section]
@@ -200,6 +199,7 @@ func ExampleIni_Rebase() {
 	// key2 = true
 	// key = value2
 	// key2 = false
+	//
 	// [section "sub"]
 	// key = value2
 	// key = value1
@@ -286,9 +286,11 @@ key=value1
 	//key2=false
 	//
 	//keynotexist = value4
+	//
 	//[section "sub"]
 	//key=value2
 	//key=value3
+	//
 	//[sectionnotexist "sub"]
 	//key = value3
 }
