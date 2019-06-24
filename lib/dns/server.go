@@ -793,6 +793,8 @@ out:
 // and forward it to parent server at "remoteAddr".
 //
 func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *request) {
+	var isSuccess bool
+
 	srv.fwGroup.Add(1)
 	log.Printf("dns: starting UDP forwarder at %s", remoteAddr)
 
@@ -803,8 +805,10 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			log.Fatal("dns: failed to create UDP forwarder: " + err.Error())
 		}
 
+		isSuccess = true
+
 		// The second loop consume the forward queue.
-		for srv.isForwarding { //nolint:gosimple
+		for srv.isForwarding && isSuccess { //nolint:gosimple
 			select {
 			case req, ok := <-primaryq:
 				if !ok {
@@ -822,13 +826,13 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 					if fallbackq != nil {
 						fallbackq <- req
 					}
-					goto brokenClient
+					isSuccess = false
+				} else {
+					srv.processResponse(req, res, fallbackq)
 				}
-
-				srv.processResponse(req, res, fallbackq)
 			}
 		}
-	brokenClient:
+
 		forwarder.Close()
 
 		if srv.isForwarding {
