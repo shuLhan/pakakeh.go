@@ -700,6 +700,8 @@ func (srv *Server) runForwarders() {
 }
 
 func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *request) {
+	var isSuccess bool
+
 	srv.fwGroup.Add(1)
 	log.Printf("dns: starting DoH forwarder at %s", nameserver)
 
@@ -709,7 +711,8 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 			log.Fatal("dns: failed to create DoH forwarder: " + err.Error())
 		}
 
-		for srv.isForwarding { //nolint:gosimple
+		isSuccess = true
+		for srv.isForwarding && isSuccess { //nolint:gosimple
 			select {
 			case req, ok := <-primaryq:
 				if !ok {
@@ -727,11 +730,17 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 					if fallbackq != nil {
 						fallbackq <- req
 					}
-					continue
+					isSuccess = false
+				} else {
+					srv.processResponse(req, res, fallbackq)
 				}
-
-				srv.processResponse(req, res, fallbackq)
 			}
+		}
+
+		forwarder.Close()
+
+		if srv.isForwarding {
+			log.Println("dns: restarting DoH forwarder for " + nameserver)
 		}
 	}
 out:
