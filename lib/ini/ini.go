@@ -5,9 +5,11 @@
 package ini
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -45,6 +47,126 @@ func Parse(text []byte) (in *Ini, err error) {
 	reader := newReader()
 
 	return reader.Parse(text)
+}
+
+//
+// Marshal encode the struct of v into stream of ini formatted string.
+//
+// To encode a struct, an exported fields must have tagged with "ini" key;
+// untagged field will not be exported.
+//
+// Each exported field in the struct must have at least one tag: a section
+// where the field's name (the key) and field's value will be saved.
+// An optional subsection can be defined by adding a string separated by colon
+// ":" after section's name.
+// An optional key's name also can be defined by adding string after
+// subsection name.
+// If key's name is not defined it would be default to lowercase string of
+// field's name.
+//
+// An array or slice will be encoded as multiple keys.
+//
+// One exception to above rule is map type.
+// A map's key will override the key defined in tag.
+//
+func Marshal(v interface{}) (b []byte, err error) {
+	rtipe := reflect.TypeOf(v)
+	rvalue := reflect.ValueOf(v)
+	kind := rtipe.Kind()
+
+	for kind == reflect.Ptr {
+		rtipe = rtipe.Elem()
+		rvalue = rvalue.Elem()
+		kind = rtipe.Kind()
+	}
+	if kind != reflect.Struct {
+		return nil, fmt.Errorf("marshal: expecting struct, got %v", kind)
+	}
+
+	numField := rtipe.NumField()
+	if numField == 0 {
+		return nil, nil
+	}
+
+	ini := &Ini{}
+
+	for x := 0; x < numField; x++ {
+		field := rtipe.Field(x)
+		fvalue := rvalue.Field(x)
+
+		tag := field.Tag.Get("ini")
+		if len(tag) == 0 {
+			continue
+		}
+
+		var sec, sub, key, value string
+
+		tags := strings.Split(tag, ":")
+
+		switch len(tags) {
+		case 0:
+			continue
+		case 1:
+			sec = tags[0]
+			key = field.Name
+		case 2:
+			sec = tags[0]
+			sub = tags[1]
+			key = field.Name
+		default:
+			sec = tags[0]
+			sub = tags[1]
+			key = tags[2]
+		}
+		key = strings.ToLower(key)
+
+		ftype := field.Type
+		kind = ftype.Kind()
+		for kind == reflect.Ptr {
+			ftype = ftype.Elem()
+			kind = ftype.Kind()
+			fvalue = fvalue.Elem()
+		}
+
+		switch kind {
+		case reflect.String:
+			ini.Set(sec, sub, key, fvalue.String())
+
+		case reflect.Array, reflect.Slice:
+			for x := 0; x < fvalue.Len(); x++ {
+				value = fmt.Sprintf("%v", fvalue.Index(x))
+				ini.Add(sec, sub, key, value)
+			}
+
+		case reflect.Map:
+			iter := fvalue.MapRange()
+			for iter.Next() {
+				mk := iter.Key()
+				mv := iter.Value()
+				key = strings.ToLower(fmt.Sprintf("%v", mk))
+				value = fmt.Sprintf("%v", mv)
+				ini.Set(sec, sub, key, value)
+			}
+
+		case reflect.Invalid, reflect.Chan, reflect.Func,
+			reflect.UnsafePointer, reflect.Interface:
+			// Do nothing.
+
+		default:
+			value = fmt.Sprintf("%v", fvalue)
+			ini.Set(sec, sub, key, value)
+		}
+	}
+
+	buf := bytes.NewBuffer(nil)
+	err = ini.Write(buf)
+	if err != nil {
+		return nil, err
+	}
+
+	b = buf.Bytes()
+
+	return b, nil
 }
 
 //

@@ -112,6 +112,65 @@ key=value3
 	// key2 = [true]
 }
 
+func ExampleMarshal() {
+	type T struct {
+		String      string            `ini:"section::string"`
+		Int         int               `ini:"section::int"`
+		Bool        bool              `ini:"section::bool"`
+		SliceString []string          `ini:"section:slice:string"`
+		SliceInt    []int             `ini:"section:slice:int"`
+		SliceBool   []bool            `ini:"section:slice:bool"`
+		Map         map[string]string `ini:"section:map:string"`
+		PtrString   *string           `ini:"section:pointer"`
+		PtrInt      *int              `ini:"section:pointer"`
+	}
+
+	ptrString := "b"
+	ptrInt := int(2)
+
+	t := &T{
+		String:      "a",
+		Int:         1,
+		Bool:        true,
+		SliceString: []string{"c", "d"},
+		SliceInt:    []int{2, 3},
+		SliceBool:   []bool{true, false},
+		Map: map[string]string{
+			"key": "value",
+		},
+
+		PtrString: &ptrString,
+		PtrInt:    &ptrInt,
+	}
+
+	iniText, err := Marshal(t)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s\n", iniText)
+	// Output:
+	// [section]
+	// string = a
+	// int = 1
+	// bool = true
+	//
+	// [section "slice"]
+	// string = c
+	// string = d
+	// int = 2
+	// int = 3
+	// bool = true
+	// bool = false
+	//
+	// [section "map"]
+	// key = value
+	//
+	// [section "pointer"]
+	// ptrstring = b
+	// ptrint = 2
+}
+
 func ExampleIni_Prune() {
 	input := []byte(`
 [section]
