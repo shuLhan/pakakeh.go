@@ -112,19 +112,21 @@ key=value3
 	// key2 = [true]
 }
 
-func ExampleMarshal() {
-	type T struct {
-		String      string            `ini:"section::string"`
-		Int         int               `ini:"section::int"`
-		Bool        bool              `ini:"section::bool"`
-		SliceString []string          `ini:"section:slice:string"`
-		SliceInt    []int             `ini:"section:slice:int"`
-		SliceBool   []bool            `ini:"section:slice:bool"`
-		Map         map[string]string `ini:"section:map:string"`
-		PtrString   *string           `ini:"section:pointer"`
-		PtrInt      *int              `ini:"section:pointer"`
-	}
+type T struct {
+	String      string            `ini:"section::string"`
+	Int         int               `ini:"section::int"`
+	Bool        bool              `ini:"section::bool"`
+	SliceString []string          `ini:"section:slice:string"`
+	SliceInt    []int             `ini:"section:slice:int"`
+	SliceUint   []uint            `ini:"section:slice:uint"`
+	SliceBool   []bool            `ini:"section:slice:bool"`
+	MapString   map[string]string `ini:"section:mapstring"`
+	MapInt      map[string]int    `ini:"section:mapint"`
+	PtrString   *string           `ini:"section:pointer"`
+	PtrInt      *int              `ini:"section:pointer"`
+}
 
+func ExampleMarshal() {
 	ptrString := "b"
 	ptrInt := int(2)
 
@@ -134,11 +136,14 @@ func ExampleMarshal() {
 		Bool:        true,
 		SliceString: []string{"c", "d"},
 		SliceInt:    []int{2, 3},
+		SliceUint:   []uint{4, 5},
 		SliceBool:   []bool{true, false},
-		Map: map[string]string{
-			"key": "value",
+		MapString: map[string]string{
+			"k": "v",
 		},
-
+		MapInt: map[string]int{
+			"keyInt": 6,
+		},
 		PtrString: &ptrString,
 		PtrInt:    &ptrInt,
 	}
@@ -162,13 +167,77 @@ func ExampleMarshal() {
 	// int = 3
 	// bool = true
 	// bool = false
+	// uint = 4
+	// uint = 5
 	//
-	// [section "map"]
-	// key = value
+	// [section "mapstring"]
+	// k = v
+	//
+	// [section "mapint"]
+	// k = 6
 	//
 	// [section "pointer"]
 	// ptrstring = b
 	// ptrint = 2
+}
+
+func ExampleUnmarshal() {
+	iniText := `
+[section]
+string = a
+int = 1
+bool = true
+
+[section "slice"]
+string = c
+string = d
+int = 2
+int = 3
+bool = true
+bool = false
+uint = 4
+uint = 5
+
+[section "mapstring"]
+k = v
+
+[section "mapint"]
+k = 6
+
+[section "pointer"]
+ptrstring = b
+ptrint = 2
+`
+	t := &T{}
+
+	err := Unmarshal([]byte(iniText), t)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("String: %v\n", t.String)
+	fmt.Printf("Int: %v\n", t.Int)
+	fmt.Printf("Bool: %v\n", t.Bool)
+	fmt.Printf("SliceString: %v\n", t.SliceString)
+	fmt.Printf("SliceInt: %v\n", t.SliceInt)
+	fmt.Printf("SliceUint: %v\n", t.SliceUint)
+	fmt.Printf("SliceBool: %v\n", t.SliceBool)
+	fmt.Printf("MapString: %v\n", t.MapString)
+	fmt.Printf("MapInt: %v\n", t.MapInt)
+	fmt.Printf("PtrString: %v\n", *t.PtrString)
+	fmt.Printf("PtrInt: %v\n", *t.PtrInt)
+	// Output:
+	// String: a
+	// Int: 1
+	// Bool: true
+	// SliceString: [c d]
+	// SliceInt: [2 3]
+	// SliceUint: [4 5]
+	// SliceBool: [true false]
+	// MapString: map[k:v]
+	// MapInt: map[k:6]
+	// PtrString: b
+	// PtrInt: 2
 }
 
 func ExampleIni_Prune() {

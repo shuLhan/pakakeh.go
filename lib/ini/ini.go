@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -167,6 +168,393 @@ func Marshal(v interface{}) (b []byte, err error) {
 	b = buf.Bytes()
 
 	return b, nil
+}
+
+//
+// Unmarshal parse the INI stream as slice of byte and store its value into
+// struct of `v`.
+// All the property and specification of field's tag follow the Marshal
+// function.
+//
+func Unmarshal(b []byte, v interface{}) (err error) {
+	ini, err := Parse(b)
+	if err != nil {
+		return err
+	}
+
+	rtipe := reflect.TypeOf(v)
+	rvalue := reflect.ValueOf(v)
+	kind := rtipe.Kind()
+
+	for kind != reflect.Ptr {
+		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
+	}
+
+	rtipe = rtipe.Elem()
+	rvalue = rvalue.Elem()
+	kind = rtipe.Kind()
+	if kind != reflect.Struct {
+		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
+	}
+
+	numField := rtipe.NumField()
+	if numField == 0 {
+		return nil
+	}
+
+	for x := 0; x < numField; x++ {
+		field := rtipe.Field(x)
+		fvalue := rvalue.Field(x)
+
+		if !fvalue.CanSet() {
+			continue
+		}
+
+		tag := field.Tag.Get("ini")
+		if len(tag) == 0 {
+			continue
+		}
+
+		var sec, sub, key string
+
+		tags := strings.Split(tag, ":")
+
+		switch len(tags) {
+		case 0:
+			continue
+		case 1:
+			sec = tags[0]
+			key = field.Name
+		case 2:
+			sec = tags[0]
+			sub = tags[1]
+			key = field.Name
+		default:
+			sec = tags[0]
+			sub = tags[1]
+			key = tags[2]
+		}
+		key = strings.ToLower(key)
+
+		ftype := field.Type
+		kind = ftype.Kind()
+
+		switch kind {
+		case reflect.Bool:
+			valString, _ := ini.Get(sec, sub, key, "")
+			if IsValueBoolTrue(valString) {
+				fvalue.SetBool(true)
+			}
+
+		case reflect.String:
+			valString, _ := ini.Get(sec, sub, key, "")
+			fvalue.SetString(valString)
+
+		case reflect.Int, reflect.Int8, reflect.Int16,
+			reflect.Int32, reflect.Int64:
+			valString, _ := ini.Get(sec, sub, key, "")
+
+			i64, err := strconv.ParseInt(valString, 10, 64)
+			if err != nil {
+				continue
+			}
+			fvalue.SetInt(i64)
+
+		case reflect.Uint, reflect.Uint8, reflect.Uint16,
+			reflect.Uint32, reflect.Uint64:
+			valString, _ := ini.Get(sec, sub, key, "")
+
+			u64, err := strconv.ParseUint(valString, 10, 64)
+			if err != nil {
+				continue
+			}
+			fvalue.SetUint(u64)
+
+		case reflect.Float32, reflect.Float64:
+			valString, _ := ini.Get(sec, sub, key, "")
+
+			f64, err := strconv.ParseFloat(valString, 64)
+			if err != nil {
+				continue
+			}
+			fvalue.SetFloat(f64)
+
+		case reflect.Array:
+			vals := ini.Gets(sec, sub, key)
+			fvalue.Set(unmarshalSlice(ftype.Elem(), fvalue, vals))
+
+		case reflect.Slice:
+			vals := ini.Gets(sec, sub, key)
+			fvalue.Set(unmarshalSlice(ftype.Elem(), fvalue, vals))
+
+		case reflect.Map:
+			if ftype.Key().Kind() != reflect.String {
+				continue
+			}
+
+			vals := ini.AsMap(sec, sub)
+			amap := reflect.MakeMap(ftype)
+			fvalue.Set(unmarshalMap(ftype.Elem(), amap, vals))
+
+		case reflect.Ptr:
+			for kind == reflect.Ptr {
+				ftype = ftype.Elem()
+				kind = ftype.Kind()
+			}
+
+			valString, _ := ini.Get(sec, sub, key, "")
+
+			ptrval := reflect.New(ftype)
+			unmarshalPtr(ftype, ptrval.Elem(), valString)
+			fvalue.Set(ptrval)
+
+		case reflect.Invalid, reflect.Chan, reflect.Func,
+			reflect.UnsafePointer, reflect.Interface:
+			// Do nothing.
+		}
+	}
+
+	return nil
+}
+
+func unmarshalPtr(ftype reflect.Type, fvalue reflect.Value, valString string) bool {
+	switch ftype.Kind() {
+	case reflect.Bool:
+		if IsValueBoolTrue(valString) {
+			fvalue.SetBool(true)
+		}
+
+	case reflect.String:
+		fvalue.SetString(valString)
+
+	case reflect.Int, reflect.Int8, reflect.Int16,
+		reflect.Int32, reflect.Int64:
+		i64, err := strconv.ParseInt(valString, 10, 64)
+		if err != nil {
+			return false
+		}
+		fvalue.SetInt(i64)
+
+	case reflect.Uint, reflect.Uint8, reflect.Uint16,
+		reflect.Uint32, reflect.Uint64:
+		u64, err := strconv.ParseUint(valString, 10, 64)
+		if err != nil {
+			return false
+		}
+		fvalue.SetUint(u64)
+
+	case reflect.Float32, reflect.Float64:
+		f64, err := strconv.ParseFloat(valString, 64)
+		if err != nil {
+			return false
+		}
+		fvalue.SetFloat(f64)
+
+	default:
+		return false
+	}
+	return true
+}
+
+func unmarshalMap(
+	valueType reflect.Type,
+	amap reflect.Value,
+	vals map[string][]string,
+) reflect.Value {
+	for k, vals := range vals {
+		if len(k) == 0 || len(vals) == 0 {
+			continue
+		}
+
+		key := reflect.ValueOf(k)
+
+		switch valueType.Kind() {
+		case reflect.String:
+			amap.SetMapIndex(key, reflect.ValueOf(vals[0]))
+
+		case reflect.Int:
+			i64, err := strconv.ParseInt(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int(i64)))
+		case reflect.Int8:
+			i64, err := strconv.ParseInt(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int8(i64)))
+		case reflect.Int16:
+			i64, err := strconv.ParseInt(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int16(i64)))
+		case reflect.Int32:
+			i64, err := strconv.ParseInt(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int32(i64)))
+		case reflect.Int64:
+			i64, err := strconv.ParseInt(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(i64))
+
+		case reflect.Uint:
+			u64, err := strconv.ParseUint(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int(u64)))
+		case reflect.Uint8:
+			u64, err := strconv.ParseUint(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int8(u64)))
+		case reflect.Uint16:
+			u64, err := strconv.ParseUint(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int16(u64)))
+		case reflect.Uint32:
+			u64, err := strconv.ParseUint(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(int32(u64)))
+		case reflect.Uint64:
+			u64, err := strconv.ParseUint(vals[0], 10, 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(u64))
+
+		case reflect.Float32:
+			f64, err := strconv.ParseFloat(vals[0], 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(float32(f64)))
+		case reflect.Float64:
+			f64, err := strconv.ParseFloat(vals[0], 64)
+			if err != nil {
+				continue
+			}
+			amap.SetMapIndex(key, reflect.ValueOf(f64))
+		}
+	}
+
+	return amap
+}
+
+func unmarshalSlice(t reflect.Type, slice reflect.Value, vals []string) reflect.Value {
+	for x := 0; x < len(vals); x++ {
+		switch t.Kind() {
+		case reflect.Bool:
+			if IsValueBoolTrue(vals[x]) {
+				slice = reflect.Append(slice, reflect.ValueOf(true))
+			} else {
+				slice = reflect.Append(slice, reflect.ValueOf(false))
+			}
+
+		case reflect.String:
+			slice = reflect.Append(slice, reflect.ValueOf(vals[x]))
+
+		case reflect.Int:
+			i64, err := strconv.ParseInt(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(int(i64)))
+
+		case reflect.Int8:
+			i64, err := strconv.ParseInt(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(int8(i64)))
+
+		case reflect.Int16:
+			i64, err := strconv.ParseInt(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(int16(i64)))
+
+		case reflect.Int32:
+			i64, err := strconv.ParseInt(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(int32(i64)))
+
+		case reflect.Int64:
+			i64, err := strconv.ParseInt(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(i64))
+
+		case reflect.Uint:
+			u64, err := strconv.ParseUint(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(uint(u64)))
+
+		case reflect.Uint8:
+			u64, err := strconv.ParseUint(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(uint8(u64)))
+
+		case reflect.Uint16:
+			u64, err := strconv.ParseUint(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(uint16(u64)))
+
+		case reflect.Uint32:
+			u64, err := strconv.ParseUint(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(uint32(u64)))
+
+		case reflect.Uint64:
+			u64, err := strconv.ParseUint(vals[x], 10, 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(u64))
+
+		case reflect.Float32:
+			f64, err := strconv.ParseFloat(vals[x], 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(float32(f64)))
+
+		case reflect.Float64:
+			f64, err := strconv.ParseFloat(vals[x], 64)
+			if err != nil {
+				continue
+			}
+			slice = reflect.Append(slice, reflect.ValueOf(f64))
+
+		default:
+			// Do nothing for other types.
+		}
+	}
+
+	return slice
 }
 
 //
