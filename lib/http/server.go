@@ -253,6 +253,10 @@ func (srv *Server) handleFS(
 
 	res.Header().Set(ContentType, node.ContentType)
 
+	if len(node.ContentEncoding) > 0 {
+		res.Header().Set(ContentEncoding, node.ContentEncoding)
+	}
+
 	if method == RequestMethodHead {
 		res.Header().Set("Content-Length", strconv.FormatInt(node.Size, 10))
 		res.WriteHeader(http.StatusOK)

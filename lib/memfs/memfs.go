@@ -5,12 +5,24 @@
 package memfs
 
 import (
+	"bytes"
+	"compress/gzip"
 	"errors"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
+)
+
+//
+// List of valid content encoding for ContentEncode().
+//
+const (
+	EncodingGzip = "gzip"
 )
 
 //nolint:gochecknoglobals
@@ -90,6 +102,62 @@ func New(includes, excludes []string, withContent bool) (*MemFS, error) {
 }
 
 //
+// ContentEncode encode each node's content into specific encoding, in other
+// words this method can be used to compress the content of file in memory
+// or before being served or written.
+//
+// Only file with size greater than 0 will be encoded.
+//
+// List of known encoding is "gzip".
+//
+func (mfs *MemFS) ContentEncode(encoding string) (err error) {
+	var (
+		buf     bytes.Buffer
+		encoder io.WriteCloser
+	)
+
+	encoding = strings.ToLower(encoding)
+
+	switch encoding {
+	case EncodingGzip:
+		encoder = gzip.NewWriter(&buf)
+	default:
+		return fmt.Errorf("ContentEncode: invalid encoding " + encoding)
+	}
+
+	for _, node := range mfs.pn.v {
+		if node.Mode.IsDir() || len(node.V) == 0 {
+			continue
+		}
+
+		_, err = encoder.Write(node.V)
+		if err != nil {
+			return fmt.Errorf("ContentEncode: " + err.Error())
+		}
+
+		err = encoder.Close()
+		if err != nil {
+			return fmt.Errorf("ContentEncode: " + err.Error())
+		}
+
+		node.V = make([]byte, buf.Len())
+		copy(node.V, buf.Bytes())
+
+		node.ContentEncoding = encoding
+		node.Size = int64(len(node.V))
+
+		buf.Reset()
+
+		if encoding == EncodingGzip {
+			gziper := encoder.(*gzip.Writer)
+			gziper.Reset(&buf)
+		}
+	}
+
+	return nil
+}
+
+//
 // Get the node representation of file in memory.  If path is not exist it
 // will return os.ErrNotExist.
 //
@@ -153,7 +221,7 @@ func (mfs *MemFS) IsMounted() bool {
 // access file "a" we call Get("/a"), not Get("/tmp/a").
 //
 // Mount does not have any effect if current directory contains ".go"
-// generated file from GoGenerate().
+// file generated from GoGenerate().
 //
 func (mfs *MemFS) Mount(dir string) error {
 	if len(dir) == 0 {

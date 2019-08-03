@@ -20,7 +20,7 @@ func TestGoGenerate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = mfs.GoGenerate("test", "generate_test/memfs_generate.go")
+	err = mfs.GoGenerate("test", "generate_test/memfs_generate.go", "")
 	if err != nil {
 		t.Fatal(err)
 	}

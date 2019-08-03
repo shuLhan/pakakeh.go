@@ -90,6 +90,7 @@
 package http
 
 const (
+	ContentEncoding   = "Content-Encoding"
 	ContentLength     = "Content-Length"
 	ContentType       = "Content-Type"
 	ContentTypeBinary = "application/octet-stream"

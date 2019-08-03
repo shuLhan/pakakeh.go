@@ -19,16 +19,17 @@ import (
 // Node represent a single file.
 //
 type Node struct {
-	SysPath     string      // The original file path in system.
-	Path        string      // Absolute file path in memory.
-	Name        string      // File name.
-	ContentType string      // File type per MIME, e.g. "application/json".
-	ModTime     time.Time   // ModTime contains file modification time.
-	Mode        os.FileMode // File mode.
-	Size        int64       // Size of file.
-	V           []byte      // Content of file.
-	Parent      *Node       // Pointer to parent directory.
-	Childs      []*Node     // List of files in directory.
+	SysPath         string      // The original file path in system.
+	Path            string      // Absolute file path in memory.
+	Name            string      // File name.
+	ContentType     string      // File type per MIME, for example "application/json".
+	ContentEncoding string      // File type encoding, for example "gzip".
+	ModTime         time.Time   // ModTime contains file modification time.
+	Mode            os.FileMode // File mode.
+	Size            int64       // Size of file.
+	V               []byte      // Content of file.
+	Parent          *Node       // Pointer to parent directory.
+	Childs          []*Node     // List of files in directory.
 }
 
 //

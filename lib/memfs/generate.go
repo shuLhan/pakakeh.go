@@ -15,7 +15,13 @@ import (
 // If out is not defined it will be default "memfs_generate.go" and saved in
 // current directory.
 //
-func (mfs *MemFS) GoGenerate(pkgName, out string) (err error) {
+// If contentEncoding is not empty, it will encode the content of node and set
+// the node ContentEncoding.
+// List of available encoding is "gzip".
+// For example, if contentEncoding is "gzip" it will compress the content of
+// file using gzip and set "ContentEncoding" to "gzip".
+//
+func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 	if len(pkgName) == 0 {
 		pkgName = "main"
 	}
@@ -31,6 +37,13 @@ func (mfs *MemFS) GoGenerate(pkgName, out string) (err error) {
 	f, err := os.Create(out)
 	if err != nil {
 		return fmt.Errorf("memfs: GoGenerate: " + err.Error())
+	}
+
+	if len(contentEncoding) > 0 {
+		err = mfs.ContentEncode(contentEncoding)
+		if err != nil {
+			return fmt.Errorf("GoGenerate: " + err.Error())
+		}
 	}
 
 	names := mfs.ListNames()

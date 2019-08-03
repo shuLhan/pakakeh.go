@@ -53,9 +53,10 @@
 // memfs also support generating the files into Go generated source file.
 // After we Mount the directory, we can call,
 //
-//	mfs.GoGenerate("mypackage", "output/path/file.go")
+//	mfs.GoGenerate("mypackage", "output/path/file.go", memfs.EncodingGzip)
 //
 // The Go generated file will be defined with package named "mypackage" in
-// file "output/path/file.go".
+// file "output/path/file.go" with each content encoded (compressed) using
+// gzip.
 //
 package memfs
