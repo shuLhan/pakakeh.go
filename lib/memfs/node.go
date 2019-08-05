@@ -68,6 +68,7 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 	}
 
 	if node.Mode.IsDir() || !withContent {
+		node.Size = 0
 		return node, nil
 	}
 
