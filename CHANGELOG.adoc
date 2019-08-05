@@ -4,6 +4,33 @@
 This library is released each month, either at the end of month or at the
 first week of next month.
 
+
+==  share v0.8.1 (2019-08-05)
+
+===  Enhancements
+
+*  lib/ini: add functions to marshal/unmarshal bytes from/to struct.
++
+The format to marshal/unmarshal ini stream is behave like JSON.
+
+*  lib/memfs: add method to encode the content of file.
++
+The ContentEncode() method encode each node's content into specific
+encoding, in other words this method can be used to compress the content
+of file in memory before being served or written.
++
+Only file with size greater than 0 will be encoded.
++
+List of known encoding is "gzip".
+
+*  lib/memfs: ignore generated output filename on GoGenerate
++
+In case the user Mount() the directory that include the generated output
+file, we want that file to be excluded from .go static source.
+
+*  lib/memfs: set the Node Size to be zero if node is directory
+
+
 ==  share v0.8.0 (2019-07-09)
 
 ===  Breaking changes
