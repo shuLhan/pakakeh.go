@@ -86,13 +86,18 @@ func CheckHost(ip net.IP, domain, sender, hostname string) (result *Result) {
 
 	result = newResult(ip, domain, sender, hostname)
 	if result.Code != 0 {
-		return
+		return result
 	}
 
 	result.lookup()
 	if result.Code != 0 {
-		return
+		return result
 	}
 
-	return
+	result.evaluateSPFRecord()
+	if result.Code != 0 {
+		return result
+	}
+
+	return result
 }

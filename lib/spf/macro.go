@@ -25,9 +25,11 @@ const (
 	macroPtr          byte = 'p'
 	macroInAddr       byte = 'v'
 	macroEhloDomain   byte = 'h'
-	macroExpClientIP  byte = 'c'
-	macroExpDomain    byte = 'r'
-	macroExpCurTime   byte = 't'
+
+	// The following macro letters are allowed only in "exp".
+	macroExpClientIP byte = 'c'
+	macroExpDomain   byte = 'r'
+	macroExpCurTime  byte = 't'
 )
 
 type macro struct {
@@ -36,14 +38,14 @@ type macro struct {
 
 	// mode is either mechanism "include", modifier "redirect", or
 	// modifier "exp".
-	mode       int
-	letter     byte
+	mode       string
 	nright     int
 	dels       []byte
+	letter     byte
 	isReversed bool
 }
 
-func macroExpand(ref *Result, mode int, data []byte) (out []byte, err error) {
+func macroExpand(ref *Result, mode string, data []byte) (out []byte, err error) {
 	m := &macro{
 		ref:  ref,
 		mode: mode,
@@ -79,7 +81,7 @@ func isDelimiter(c byte) bool {
 //
 // Letter "c", "r", and "t" only valid if modifier is "exp".
 //
-func isMacroLetter(mode int, c byte) bool {
+func isMacroLetter(mode string, c byte) bool {
 	if c == macroSender || c == macroSenderLocal ||
 		c == macroSenderDomain || c == macroDomain || c == macroIP ||
 		c == macroPtr || c == macroEhloDomain || c == macroInAddr {
@@ -259,7 +261,7 @@ func (m *macro) expandLetter() (value []byte) {
 	case macroExpClientIP:
 		value = toDotIP(m.ref.IP)
 	case macroExpDomain:
-		value = []byte(m.ref.Hostname)
+		value = m.ref.Hostname
 	case macroExpCurTime:
 		now := time.Now()
 		strNow := fmt.Sprintf("%d", now.Unix())

@@ -8,13 +8,11 @@ package spf
 // List of modifiers.
 //
 const (
-	modifierRedirect int = iota
-	modifierExp
-	modifierUnknown
+	modifierExp      = "exp"
+	modifierRedirect = "redirect"
 )
 
 type modifier struct {
-	kind  byte
 	name  string
 	value string
 }

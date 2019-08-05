@@ -17,16 +17,16 @@ import (
 // Result contains the output of CheckHost function.
 //
 type Result struct {
-	IP       net.IP
-	Domain   []byte
-	Sender   []byte
+	IP       net.IP // The IP address of sender.
+	Domain   []byte // The domain address of sender from SMTP EHLO or MAIL FROM command.
+	Sender   []byte // The email address of sender.
 	Hostname []byte
-	Code     byte
+	Code     byte // Result of check host.
 	Err      string
 
-	senderLocal  []byte
-	senderDomain []byte
-	rdata        []byte // rdata contains raw DNS resource record data that have SPF record.
+	senderLocal  []byte // The local part of sender.
+	senderDomain []byte // The domain part of sender.
+	terms        []byte // terms contains raw DNS RR that have SPF record.
 	dirs         []*directive
 	mods         []*modifier
 }
@@ -34,11 +34,11 @@ type Result struct {
 //
 // newResult initialize new SPF result on single domain.
 //
-func newResult(ip net.IP, domain, sender, hostname string) (r *Result) {
+func newResult(ip net.IP, domain, sender, hostname string) (result *Result) {
 	bsender := []byte(sender)
 
 	at := bytes.Index(bsender, []byte{'@'})
-	r = &Result{
+	result = &Result{
 		IP:           ip,
 		Domain:       []byte(domain),
 		Sender:       []byte(sender),
@@ -47,9 +47,9 @@ func newResult(ip net.IP, domain, sender, hostname string) (r *Result) {
 		senderDomain: bsender[at+1:],
 	}
 
-	if !libnet.IsHostnameValid(r.Domain, true) {
-		r.Code = ResultCodeNone
-		r.Err = "invalid domain name"
+	if !libnet.IsHostnameValid(result.Domain, true) {
+		result.Code = ResultCodeNone
+		result.Err = "invalid domain name"
 		return
 	}
 
@@ -59,14 +59,14 @@ func newResult(ip net.IP, domain, sender, hostname string) (r *Result) {
 //
 // Error return the string representation of the result as error message.
 //
-func (r *Result) Error() string {
-	return fmt.Sprintf("spf: %q %s", r.Domain, r.Err)
+func (result *Result) Error() string {
+	return fmt.Sprintf("spf: %q %s", result.Domain, result.Err)
 }
 
 //
 // lookup the TXT record that contains SPF record on domain name.
 //
-func (r *Result) lookup() {
+func (result *Result) lookup() {
 	var (
 		dnsMsg *libdns.Message
 		err    error
@@ -74,29 +74,29 @@ func (r *Result) lookup() {
 	)
 
 	dnsMsg, err = dnsClient.Lookup(true, libdns.QueryTypeTXT,
-		libdns.QueryClassIN, r.Domain)
+		libdns.QueryClassIN, result.Domain)
 	if err != nil {
-		r.Code = ResultCodeTempError
-		r.Err = err.Error()
+		result.Code = ResultCodeTempError
+		result.Err = err.Error()
 		return
 	}
 
 	switch dnsMsg.Header.RCode {
 	case libdns.RCodeOK:
 	case libdns.RCodeErrName:
-		r.Code = ResultCodeNone
-		r.Err = "domain name does not exist"
+		result.Code = ResultCodeNone
+		result.Err = "domain name does not exist"
 		return
 	default:
-		r.Code = ResultCodeTempError
-		r.Err = "server failure"
+		result.Code = ResultCodeTempError
+		result.Err = "server failure"
 		return
 	}
 
 	txts = dnsMsg.FilterAnswers(libdns.QueryTypeTXT)
 	if len(txts) == 0 {
-		r.Code = ResultCodeNone
-		r.Err = "no SPF record found"
+		result.Code = ResultCodeNone
+		result.Err = "no SPF record found"
 		return
 	}
 
@@ -111,39 +111,68 @@ func (r *Result) lookup() {
 		if bytes.HasPrefix(rdata, []byte("v=spf1")) {
 			found++
 			if found == 1 {
-				r.rdata = rdata
+				result.terms = rdata
 			}
 		}
 	}
 	if found == 0 {
-		r.Code = ResultCodeNone
-		r.Err = "no SPF record found"
+		result.Code = ResultCodeNone
+		result.Err = "no SPF record found"
 		return
 	}
 	if found > 1 {
-		r.Code = ResultCodePermError
-		r.Err = "multiple SPF records found"
+		result.Code = ResultCodePermError
+		result.Err = "multiple SPF records found"
 		return
 	}
 
-	r.rdata = bytes.ToLower(r.rdata)
+	result.terms = bytes.ToLower(result.terms)
 }
 
 //
 // evaluateSPFRecord parse and evaluate each directive with its modifiers
 // in the SPF record.
 //
-func (r *Result) evaluateSPFRecord(rdata []byte) {
-	terms := bytes.Fields(rdata)
+//	terms            = *( 1*SP ( directive / modifier ) )
+//
+//	directive        = [ qualifier ] mechanism
+//	qualifier        = "+" / "-" / "?" / "~"
+//	mechanism        = ( all / include
+//	                 / a / mx / ptr / ip4 / ip6 / exists )
+//	modifier         = redirect / explanation / unknown-modifier
+//	unknown-modifier = name "=" macro-string
+//	                 ; where name is not any known modifier
+//
+//	name             = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
+//
+func (result *Result) evaluateSPFRecord() {
+	terms := bytes.Fields(result.terms)
 
 	// Ignore the first field "v=spf1".
 
 	for x := 1; x < len(terms); x++ {
-		dir := r.parseDirective(terms[x])
+		dir := result.parseDirective(terms[x])
 		if dir != nil {
+			result.dirs = append(result.dirs, dir)
+
+			// Mechanisms after "all" will never be tested and MUST be
+			// ignored -- RFC 7208 section 5.1.
+			if dir.mech == mechanismAll {
+				return
+			}
 			continue
 		}
-		r.dirs = append(r.dirs, dir)
+
+		if result.Code != 0 {
+			return
+		}
+
+		mod := result.parseModifier(terms[x])
+		if mod == nil {
+			return
+		}
+
+		result.mods = append(result.mods, mod)
 	}
 }
 
@@ -152,55 +181,79 @@ func (r *Result) evaluateSPFRecord(rdata []byte) {
 // It will return non-nil if term is a directive, otherwise it will return
 // nil.
 //
-func (r *Result) parseDirective(term []byte) (dir *directive) {
+func (result *Result) parseDirective(term []byte) (dir *directive) {
 	var (
-		qual int = -1
+		qual byte
 		err  error
 	)
 
 	switch term[0] {
-	case '+':
-		qual = qualifierPass
-	case '-':
-		qual = qualifierFail
-	case '~':
-		qual = qualifierSoftfail
-	case '?':
-		qual = qualifierNeutral
-	}
-
-	if qual == -1 {
-		qual = qualifierPass
-	} else {
+	case qualifierPass, qualifierNeutral, qualifierSoftfail, qualifierFail:
+		qual = term[0]
 		term = term[1:]
+	default:
+		qual = qualifierPass
 	}
 
 	// Try to split the term to get the mechanism and domain-spec.
 	kv := bytes.Split(term, []byte{':'})
 
-	switch {
-	case bytes.Equal(kv[0], []byte("all")):
+	mech := string(kv[0])
+
+	switch mech {
+	case mechanismAll:
 		dir = &directive{
 			qual: qual,
-			mech: mechanismAll,
+			mech: mech,
 		}
 		return dir
 
-	case bytes.Equal(kv[0], []byte("include")):
+	case mechanismInclude:
 		dir = &directive{
 			qual: qual,
-			mech: mechanismInclude,
+			mech: mech,
 		}
 		if len(kv) >= 2 {
-			dir.value, err = macroExpand(r, mechanismInclude, kv[1])
+			dir.value, err = macroExpand(result, mechanismInclude, kv[1])
 			if err != nil {
-				r.Code = ResultCodePermError
-				r.Err = err.Error()
+				result.Code = ResultCodePermError
+				result.Err = err.Error()
 				return nil
 			}
 		}
 		return dir
+
+	case mechanismA:
+
+	case mechanismMx:
+
+	case mechanismPtr:
+
+	case mechanismIP4:
+
+	case mechanismIP6:
+
+	case mechanismExist:
 	}
 
 	return nil
+}
+
+func (result *Result) parseModifier(term []byte) (mod *modifier) {
+	kv := bytes.Split(term, []byte{'='})
+
+	mod = &modifier{
+		name: string(kv[0]),
+	}
+	if len(kv) >= 2 {
+		mod.value = string(kv[1])
+	}
+
+	switch mod.name {
+	case modifierExp:
+		return mod
+	case modifierRedirect:
+		return mod
+	}
+	return mod
 }

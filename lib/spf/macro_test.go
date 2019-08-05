@@ -16,7 +16,7 @@ func TestMacroExpandIPv4(t *testing.T) {
 		"strong-bad@email.example.com", "mail.localhost")
 
 	cases := []struct {
-		mode   int
+		mode   string
 		data   string
 		exp    string
 		expErr string
@@ -121,7 +121,7 @@ func TestMacroExpandIPv4(t *testing.T) {
 
 		got, err := macroExpand(ref, c.mode, []byte(c.data))
 		if err != nil {
-			test.Assert(t, "error", string(c.expErr), err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
 		}
 
@@ -134,7 +134,7 @@ func TestMacroExpandIPv6(t *testing.T) {
 		"strong-bad@email.example.com", "email.localhost")
 
 	cases := []struct {
-		mode   int
+		mode   string
 		data   string
 		exp    string
 		expErr string
@@ -148,7 +148,7 @@ func TestMacroExpandIPv6(t *testing.T) {
 
 		got, err := macroExpand(ref, c.mode, []byte(c.data))
 		if err != nil {
-			test.Assert(t, "error", string(c.expErr), string(got), true)
+			test.Assert(t, "error", c.expErr, string(got), true)
 			continue
 		}
 
