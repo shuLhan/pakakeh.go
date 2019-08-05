@@ -7,6 +7,7 @@ package memfs
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 //
@@ -54,6 +55,11 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 	}
 
 	for x := 0; x < len(names); x++ {
+		if strings.HasSuffix(names[x], out) {
+			delete(mfs.pn.v, names[x])
+			continue
+		}
+
 		node := mfs.pn.v[names[x]]
 		err = tmpl.ExecuteTemplate(f, "GENERATE_NODE", node)
 		if err != nil {
