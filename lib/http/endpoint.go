@@ -5,6 +5,7 @@
 package http
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -39,29 +40,24 @@ type Endpoint struct {
 func (ep *Endpoint) call(res http.ResponseWriter, req *http.Request,
 	evaluators []Evaluator,
 ) {
-	var (
-		e       error
-		reqBody []byte
-	)
+	reqBody, e := ioutil.ReadAll(req.Body)
+	if e != nil {
+		log.Printf("endpoint.call: " + e.Error())
+		res.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	req.Body.Close()
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
 	switch ep.RequestType {
-	case RequestTypeForm:
-		e = req.ParseForm()
-
-	case RequestTypeQuery:
+	case RequestTypeForm, RequestTypeQuery, RequestTypeJSON:
 		e = req.ParseForm()
 
 	case RequestTypeMultipartForm:
 		e = req.ParseMultipartForm(0)
-
-	case RequestTypeJSON:
-		e = req.ParseForm()
-		if e != nil {
-			res.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		reqBody, e = ioutil.ReadAll(req.Body)
 	}
+
 	if e != nil {
 		log.Printf("endpoint.call: %d %s %s %s\n",
 			http.StatusBadRequest, req.Method, req.URL.Path, e)

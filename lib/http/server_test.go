@@ -419,7 +419,7 @@ func TestRegisterPost(t *testing.T) {
 		expBody: `map[k:[vv v]]
 map[k:[vv]]
 <nil>
-`,
+k=vv`,
 	}}
 
 	for _, c := range cases {
