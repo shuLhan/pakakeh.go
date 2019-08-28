@@ -193,7 +193,7 @@ email.
 This specification defines an initial set, using DNS and SMTP, for basic
 interoperability.
 
-....
+----
                                   |
                                   |- RFC5322 Message
                                   V
@@ -234,7 +234,7 @@ interoperability.
      +-------------+                  +-----------+     +------------+
 
                     Figure 1: DKIM Service Architecture
-....
+----
 
 *Signing*
 

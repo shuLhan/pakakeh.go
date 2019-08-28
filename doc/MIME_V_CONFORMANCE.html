@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>MIME Part Five: Conformance Criteria and Examples</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article">
-<div id="header">
-<h1>MIME Part Five: Conformance Criteria and Examples</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>MIME Part Five: Conformance Criteria and Examples</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>MIME Part Five: Conformance Criteria and Examples</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_mime_conformance">1. MIME Conformance</a></li>
-<li><a href="#_guidelines_for_sending_email_data">2. Guidelines for Sending Email Data</a></li>
-<li><a href="#_canonical_encoding_model">3. Canonical Encoding Model</a></li>
+<li><a href="#_mime_conformance">MIME Conformance</a></li>
+<li><a href="#_guidelines_for_sending_email_data">Guidelines for Sending Email Data</a></li>
+<li><a href="#_canonical_encoding_model">Canonical Encoding Model</a></li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -35,10 +43,10 @@ Extensions (MIME) Part Five: Conformance Criteria and Examples</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mime_conformance">1. MIME Conformance</h2>
+<h2 id="_mime_conformance">MIME Conformance</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The concept of "MIME-conformance" is to define a certain level of
+<p>The concept of &#34;MIME-conformance&#34; is to define a certain level of
 implementation that allows the useful interworking of messages with content
 that differs from US-ASCII text.</p>
 </div>
@@ -48,18 +56,18 @@ that differs from US-ASCII text.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Always generate "MIME-Version: 1.0" in header field</p>
+<p>Always generate &#34;MIME-Version: 1.0&#34; in header field</p>
 </li>
 <li>
 <p>Enable to decode using quoted-printable or base64.
-Sending non-7bit data without encoding MUST use content-transfer-encoding
-8bit or binary, as appropriate.
-If the underlying transport does not support 8bit or binary, sender must
-encode and label data using quoted-printable or base64.</p>
+   Sending non-7bit data without encoding MUST use content-transfer-encoding
+   8bit or binary, as appropriate.
+   If the underlying transport does not support 8bit or binary, sender must
+   encode and label data using quoted-printable or base64.</p>
 </li>
 <li>
 <p>Treat unrecognized Content-Transfer-Encoding as Content-Type of
-"application/octet-stream", regardless their actual type.</p>
+   &#34;application/octet-stream&#34;, regardless their actual type.</p>
 </li>
 <li>
 <p>Avoid showing users raw data when a Content-Type field other than text.</p>
@@ -76,18 +84,18 @@ encode and label data using quoted-printable or base64.</p>
 <div class="olist lowerroman">
 <ol class="lowerroman" type="i">
 <li>
-<p>Recognize and display "text" with "US-ASCII"</p>
+<p>Recognize and display &#34;text&#34; with &#34;US-ASCII&#34;</p>
 </li>
 <li>
 <p>Recognize other charset, at least being able to inform the user about
-charset the message uses</p>
+     charset the message uses</p>
 </li>
 <li>
 <p>For unrecognized subtypes in a known charset, offer to show the user the
-"raw" version of data after conversion from canonical to local form</p>
+     &#34;raw&#34; version of data after conversion from canonical to local form</p>
 </li>
 <li>
-<p>Treat material in an unknown charset as "application/octet-stream"</p>
+<p>Treat material in an unknown charset as &#34;application/octet-stream&#34;</p>
 </li>
 </ol>
 </div>
@@ -97,7 +105,7 @@ charset the message uses</p>
 <div class="olist lowerroman">
 <ol class="lowerroman" type="i">
 <li>
-<p>Treat any unrecognized subtypes as "application/octet-stream"</p>
+<p>Treat any unrecognized subtypes as &#34;application/octet-stream&#34;</p>
 </li>
 </ol>
 </div>
@@ -108,7 +116,7 @@ charset the message uses</p>
 <ol class="lowerroman" type="i">
 <li>
 <p>Offer the ability to remove encodings and put the resulting information
-in a user file</p>
+     in a user file</p>
 </li>
 </ol>
 </div>
@@ -121,15 +129,15 @@ in a user file</p>
 <p>Recognize the mixed subtype</p>
 </li>
 <li>
-<p>Recognize the "alternative" subtype, and avoid showing the user redundant
-parts.</p>
+<p>Recognize the &#34;alternative&#34; subtype, and avoid showing the user redundant
+     parts.</p>
 </li>
 <li>
-<p>Recognize the "digest" subtype, specifically using "message/rfc822"
-rather than "text/plain" as the default media type for body parts</p>
+<p>Recognize the &#34;digest&#34; subtype, specifically using &#34;message/rfc822&#34;
+     rather than &#34;text/plain&#34; as the default media type for body parts</p>
 </li>
 <li>
-<p>Treat unrecognized subtypes as "mixed"</p>
+<p>Treat unrecognized subtypes as &#34;mixed&#34;</p>
 </li>
 </ol>
 </div>
@@ -142,7 +150,7 @@ rather than "text/plain" as the default media type for body parts</p>
 <p>Recognize and display RFC822 message encapsulation (message/rfc822)</p>
 </li>
 <li>
-<p>Treat unrecognized subtypes as "application/octet-stream"</p>
+<p>Treat unrecognized subtypes as &#34;application/octet-stream&#34;</p>
 </li>
 </ol>
 </div>
@@ -151,24 +159,24 @@ rather than "text/plain" as the default media type for body parts</p>
 </div>
 </li>
 <li>
-<p>Treat unrecognized Content-Type as "application/octet-stream"</p>
+<p>Treat unrecognized Content-Type as &#34;application/octet-stream&#34;</p>
 </li>
 <li>
 <p>Using non-US-ASCII without a MIME-Version field is strongly discouraged.</p>
 </li>
 <li>
-<p>Ensure that any string that begins with "=?" and ends with "?=" in field
-body to be valid encoded-word.</p>
+<p>Ensure that any string that begins with &#34;=?&#34; and ends with &#34;?=&#34; in field
+   body to be valid encoded-word.</p>
 </li>
 <li>
-<p>Able to distinguish encoded-words from "text", "ctext", or "word"s</p>
+<p>Able to distinguish encoded-words from &#34;text&#34;, &#34;ctext&#34;, or &#34;word&#34;s</p>
 </li>
 </ol>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_guidelines_for_sending_email_data">2. Guidelines for Sending Email Data</h2>
+<h2 id="_guidelines_for_sending_email_data">Guidelines for Sending Email Data</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The list is NOT recommended practices for MTAs.</p>
@@ -176,7 +184,7 @@ body to be valid encoded-word.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_canonical_encoding_model">3. Canonical Encoding Model</h2>
+<h2 id="_canonical_encoding_model">Canonical Encoding Model</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Conversion steps from local to canonical form,</p>
@@ -185,26 +193,26 @@ body to be valid encoded-word.</p>
 <ol class="arabic">
 <li>
 <p>Creation of local form
-The body to be transmitted is created in the system&#8217;s native format.</p>
+   The body to be transmitted is created in the system&#39;s native format.</p>
 </li>
 <li>
 <p>Conversion to canonical form.
-The entire body, including "out-of-band" information such as record lengths
-and possibly file attribute information, is converted to a universal
-canonical form.
-For example, in case of "text/plain", the text MUST be converted to a
-supported charset and lines MUST be delimited with CRLF.</p>
+   The entire body, including &#34;out-of-band&#34; information such as record lengths
+   and possibly file attribute information, is converted to a universal
+   canonical form.
+   For example, in case of &#34;text/plain&#34;, the text MUST be converted to a
+   supported charset and lines MUST be delimited with CRLF.</p>
 </li>
 <li>
 <p>Apply transfer encoding.
-It may be appropriate to base the choice of base64 or quoted-printable on
-character frequency counts.</p>
+   It may be appropriate to base the choice of base64 or quoted-printable on
+   character frequency counts.</p>
 </li>
 <li>
 <p>Insertion into entity.
-The encoded body then inserted into MIME entity with appropriate headers.
-The entity is then inserted into the body of higher-level entity (message
-or multipart).</p>
+   The encoded body then inserted into MIME entity with appropriate headers.
+   The entity is then inserted into the body of higher-level entity (message
+   or multipart).</p>
 </li>
 </ol>
 </div>
@@ -217,22 +225,27 @@ these steps.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>Content-type: text/foo; charset=bar
-Content-Transfer-Encoding: base64</pre>
+<pre>	Content-type: text/foo; charset=bar
+	Content-Transfer-Encoding: base64</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>MUST be first represented in the "text/foo" form, then represented in the
-"bar" character set, and finally transformed via the base64 algorithm into
+<p>MUST be first represented in the &#34;text/foo&#34; form, then represented in the
+&#34;bar&#34; character set, and finally transformed via the base64 algorithm into
 mail-safe form.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

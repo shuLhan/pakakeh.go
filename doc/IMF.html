@@ -1,56 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>Internet Message Format (IMF)</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article toc2 toc-left">
-<div id="header">
-<h1>Internet Message Format (IMF)</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc2">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>Internet Message Format (IMF)</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>Internet Message Format (IMF)</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_syntax">1. Syntax</a>
+<li><a href="#_syntax">Syntax</a>
 <ul class="sectlevel2">
-<li><a href="#_folding_white_space_and_comments">1.1. Folding White Space and Comments</a></li>
-<li><a href="#_atom">1.2. Atom</a></li>
-<li><a href="#_quoted_strings">1.3. Quoted Strings</a></li>
-<li><a href="#_date_and_time_specification">1.4. Date and Time Specification</a></li>
-<li><a href="#_address_specification">1.5. Address Specification</a></li>
+<li><a href="#_folding_white_space_and_comments">Folding White Space and Comments</a></li>
+<li><a href="#_atom">Atom</a></li>
+<li><a href="#_quoted_strings">Quoted Strings</a></li>
+<li><a href="#_date_and_time_specification">Date and Time Specification</a></li>
+<li><a href="#_address_specification">Address Specification</a></li>
 </ul>
 </li>
-<li><a href="#_header">2. Header</a>
+<li><a href="#_header">Header</a>
 <ul class="sectlevel2">
-<li><a href="#_date_field">2.1. Date Field</a></li>
-<li><a href="#_originator_fields">2.2. Originator Fields</a></li>
-<li><a href="#_destination_fields">2.3. Destination Fields</a></li>
-<li><a href="#_identification_field">2.4. Identification Field</a></li>
-<li><a href="#_informational_fields">2.5. Informational Fields</a></li>
-<li><a href="#_resent_fields">2.6. Resent Fields</a></li>
-<li><a href="#_trace_fields">2.7. Trace Fields</a></li>
-<li><a href="#_optional_fields">2.8. Optional Fields</a></li>
+<li><a href="#_date_field">Date Field</a></li>
+<li><a href="#_originator_fields">Originator Fields</a></li>
+<li><a href="#_destination_fields">Destination Fields</a></li>
+<li><a href="#_identification_field">Identification Field</a></li>
+<li><a href="#_informational_fields">Informational Fields</a></li>
+<li><a href="#_resent_fields">Resent Fields</a></li>
+<li><a href="#_trace_fields">Trace Fields</a></li>
+<li><a href="#_optional_fields">Optional Fields</a></li>
 </ul>
 </li>
-<li><a href="#_obsolete_specification">3. Obsolete Specification</a>
+<li><a href="#_obsolete_specification">Obsolete Specification</a>
 <ul class="sectlevel2">
-<li><a href="#_obsolete_date_and_time">3.1. Obsolete Date and Time</a></li>
-<li><a href="#_obsolete_addressing">3.2. Obsolete Addressing</a></li>
-<li><a href="#_obsolete_header_fields">3.3. Obsolete Header Fields</a></li>
+<li><a href="#_obsolete_date_and_time">Obsolete Date and Time</a></li>
+<li><a href="#_obsolete_addressing">Obsolete Addressing</a></li>
+<li><a href="#_obsolete_header_fields">Obsolete Header Fields</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -60,7 +68,7 @@ Message Format as defined in <a href="https://tools.ietf.org/html/rfc5322">RFC 5
 </div>
 </div>
 <div class="sect1">
-<h2 id="_syntax">1. Syntax</h2>
+<h2 id="_syntax">Syntax</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -101,20 +109,20 @@ text            =   %d1-9 /            ; Characters excluding CR
 </li>
 <li>
 <p>CR and LF MUST only occur together as CRLF; they MUST NOT appear
-independently in the body.</p>
+   independently in the body.</p>
 </li>
 <li>
 <p>Each header field SHOULD be treated in its unfolded form for further
-syntactic and semantic evaluation.</p>
+   syntactic and semantic evaluation.</p>
 </li>
 <li>
-<p>"field-body" MUST NOT include CR and LF except when used in "folding" and
-"unfolding".</p>
+<p>&#34;field-body&#34; MUST NOT include CR and LF except when used in &#34;folding&#34; and
+   &#34;unfolding&#34;.</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_folding_white_space_and_comments">1.1. Folding White Space and Comments</h3>
+<h3 id="_folding_white_space_and_comments">Folding White Space and Comments</h3>
 <div class="literalblock">
 <div class="content">
 <pre>CFWS            =   (1*([FWS] comment) [FWS]) / FWS
@@ -160,20 +168,20 @@ input.</p>
 <ul>
 <li>
 <p>An unfolded header field has no length restriction and therefore may be
-indeterminately long.</p>
+   indeterminately long.</p>
 </li>
 <li>
-<p>Any CRLF that appears in FWS is semantically "invisible".</p>
+<p>Any CRLF that appears in FWS is semantically &#34;invisible&#34;.</p>
 </li>
 <li>
-<p>The "\" in any quoted-pair is semantically "invisible".</p>
+<p>The &#34;\&#34; in any quoted-pair is semantically &#34;invisible&#34;.</p>
 </li>
 <li>
 <p>Folding is permitted within the comment.</p>
 </li>
 <li>
 <p>The parentheses and backslash characters may appear in a comment, so long
-as they appear as a quoted-pair.</p>
+   as they appear as a quoted-pair.</p>
 </li>
 <li>
 <p>Comment is not including the enclosing paretheses.</p>
@@ -182,7 +190,7 @@ as they appear as a quoted-pair.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_atom">1.2. Atom</h3>
+<h3 id="_atom">Atom</h3>
 <div class="literalblock">
 <div class="content">
 <pre>phrase          =   1*word / obs-phrase
@@ -198,7 +206,7 @@ dot-atom-text   =   1*atext *("." 1*atext)
 atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
                     "!" / "#" /        ;  characters not including
                     "$" / "%" /        ;  specials.  Used for atoms.
-                    "&amp;" / "'" /
+                    "&" / "'" /
                     "*" / "+" /
                     "-" / "/" /
                     "=" / "?" /
@@ -208,7 +216,7 @@ atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
                     "~"
 
 specials        =   "(" / ")" /        ; Special characters that do
-                    "&lt;" / "&gt;" /        ;  not appear in atext
+                    "<" / ">" /        ;  not appear in atext
                     "[" / "]" /
                     ":" / ";" /
                     "@" / "\" /
@@ -220,13 +228,13 @@ specials        =   "(" / ")" /        ; Special characters that do
 <ul>
 <li>
 <p>The optional comments and FWS surrounding the rest of the characters are
-not part of the atom.</p>
+   not part of the atom.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quoted_strings">1.3. Quoted Strings</h3>
+<h3 id="_quoted_strings">Quoted Strings</h3>
 <div class="literalblock">
 <div class="content">
 <pre>quoted-string   =   [CFWS]
@@ -243,7 +251,7 @@ qtext           =   %d33 /             ; Printable US-ASCII
 </div>
 </div>
 <div class="sect2">
-<h3 id="_date_and_time_specification">1.4. Date and Time Specification</h3>
+<h3 id="_date_and_time_specification">Date and Time Specification</h3>
 <div class="paragraph">
 <p>Syntax,</p>
 </div>
@@ -284,13 +292,13 @@ zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone</pre>
 <p>The date and time-of-day SHOULD express local time.</p>
 </li>
 <li>
-<p>The form "+0000" on zone SHOULD be used to indicate a time zone at
-Universal Time.</p>
+<p>The form &#34;&#43;0000&#34; on zone SHOULD be used to indicate a time zone at
+   Universal Time.</p>
 </li>
 <li>
-<p>The form "-0000" on zone indicate that the time was generated on a system
-that may be in a local time zone other than Universal Time and that the
-date-time contains no information about the local time zone.</p>
+<p>The form &#34;-0000&#34; on zone indicate that the time was generated on a system
+   that may be in a local time zone other than Universal Time and that the
+   date-time contains no information about the local time zone.</p>
 </li>
 <li>
 <p>A date-time specification MUST be semantically valid.</p>
@@ -300,11 +308,11 @@ date-time contains no information about the local time zone.</p>
 </li>
 <li>
 <p>The numeric day-of-month MUST be between 1 and the number of days allowed
-for the specified month (in the specified year).</p>
+   for the specified month (in the specified year).</p>
 </li>
 <li>
 <p>The time-of-day MUST be in the range 00:00:00 through 23:59:60 (the number
-of seconds allowing for a leap second.</p>
+   of seconds allowing for a leap second.</p>
 </li>
 <li>
 <p>The last two digits of the zone MUST be within the range 00 through 59.</p>
@@ -313,7 +321,7 @@ of seconds allowing for a leap second.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_address_specification">1.5. Address Specification</h3>
+<h3 id="_address_specification">Address Specification</h3>
 <div class="paragraph">
 <p>An address may either be an individual mailbox, or a group of mailboxes.</p>
 </div>
@@ -338,7 +346,7 @@ mailbox         =   name-addr / addr-spec
 
 name-addr       =   [display-name] angle-addr
 
-angle-addr      =   [CFWS] "&lt;" addr-spec "&gt;" [CFWS] /
+angle-addr      =   [CFWS] "<" addr-spec ">" [CFWS] /
                     obs-angle-addr
 
 display-name    =   phrase
@@ -365,8 +373,8 @@ dtext           =   %d33-90 /          ; Printable US-ASCII
 <p>quoted-string form SHOULD NOT be used;</p>
 </li>
 <li>
-<p>Comments and folding white space SHOULD NOT be used around the "@" in the
-addr-spec.</p>
+<p>Comments and folding white space SHOULD NOT be used around the &#34;@&#34; in the
+   addr-spec.</p>
 </li>
 </ul>
 </div>
@@ -374,7 +382,7 @@ addr-spec.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_header">2. Header</h2>
+<h2 id="_header">Header</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Format,</p>
@@ -406,174 +414,53 @@ addr-spec.</p>
                     optional-field)</pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 10%;">
-<col style="width: 10%;">
-<col style="width: 60%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Field</th>
-<th class="tableblock halign-left valign-middle">Min number</th>
-<th class="tableblock halign-left valign-top">Max number</th>
-<th class="tableblock halign-left valign-top">Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">trace</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Block prepended - see 3.6.7</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-date</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block, required if other resent fields are present - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-from</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-sender</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block, MUST occur with multi-address resent-from - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-to</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-cc</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-bcc</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">resent-msg-id</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">orig-date</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">from</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">See sender and 3.6.2</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">sender</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">MUST occur withmulti-address from - see 3.6.2</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">reply-to</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">to</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">cc</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">bcc</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">message-id</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SHOULD be present - see 3.6.4</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">in-reply-to</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SHOULD occur in some replies - see 3.6.4</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">references</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SHOULD occur in some replies - see 3.6.4</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">subject</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">comments</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">keywords</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">optional-field</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>|===
+| Field          | Min number      | Max number | Notes</p>
+</div>
+<div class="paragraph">
+<p>| trace          | 0  | unlimited  | Block prepended - see 3.6.7
+| resent-date    | 0* | unlimited* | One per block, required if other resent fields are present - see 3.6.6
+| resent-from    | 0  | unlimited* | One per block - see 3.6.6
+| resent-sender  | 0* | unlimited* | One per block, MUST occur with multi-address resent-from - see 3.6.6
+| resent-to      | 0  | unlimited* | One per block - see 3.6.6
+| resent-cc      | 0  | unlimited* | One per block - see 3.6.6
+| resent-bcc     | 0  | unlimited* | One per block - see 3.6.6
+| resent-msg-id  | 0  | unlimited* | One per block - see 3.6.6
+| orig-date      | 1  | 1          |
+| from           | 1  | 1          | See sender and 3.6.2
+| sender         | 0* | 1          | MUST occur withmulti-address from - see 3.6.2
+| reply-to       | 0  | 1          |
+| to             | 0  | 1          |
+| cc             | 0  | 1          |
+| bcc            | 0  | 1          |
+| message-id     | 0* | 1          | SHOULD be present - see 3.6.4
+| in-reply-to    | 0* | 1          | SHOULD occur in some replies - see 3.6.4
+| references     | 0* | 1          | SHOULD occur in some replies - see 3.6.4
+| subject        | 0  | 1          |
+| comments       | 0  | unlimited  |
+| keywords       | 0  | unlimited  |
+| optional-field | 0  | unlimited  |
+|===</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
 <p>Header fields SHOULD NOT be reordered when a message is transported or
-transformed.</p>
+   transformed.</p>
 </li>
 <li>
 <p>The trace header fields and resent header fields MUST NOT be
-reordered, and SHOULD be kept in blocks prepended to the message.</p>
+   reordered, and SHOULD be kept in blocks prepended to the message.</p>
 </li>
 <li>
-<p>The only required header fields are the "Date" field and the originator
-address field(s) (which is "From", "Sender", and "Reply-To").</p>
+<p>The only required header fields are the &#34;Date&#34; field and the originator
+   address field(s) (which is &#34;From&#34;, &#34;Sender&#34;, and &#34;Reply-To&#34;).</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_date_field">2.1. Date Field</h3>
+<h3 id="_date_field">Date Field</h3>
 <div class="paragraph">
 <p>The date and time at which the creator of the message indicated that the
 message was completed, not the time the message transferred.</p>
@@ -585,7 +472,7 @@ message was completed, not the time the message transferred.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_originator_fields">2.2. Originator Fields</h3>
+<h3 id="_originator_fields">Originator Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>from            =   "From:" mailbox-list CRLF
@@ -598,33 +485,33 @@ reply-to        =   "Reply-To:" address-list CRLF</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>If the "From:"  field contains more than one mailbox, then the sender field
-MUST appear in the message.</p>
+<p>If the &#34;From:&#34;  field contains more than one mailbox, then the sender field
+   MUST appear in the message.</p>
 </li>
 <li>
 <p>If the originator of the message can be indicated by a single mailbox and
-the author and transmitter are identical, the "Sender:" field SHOULD NOT be
-used.
-Otherwise, both fields SHOULD appear.</p>
+   the author and transmitter are identical, the &#34;Sender:&#34; field SHOULD NOT be
+   used.
+   Otherwise, both fields SHOULD appear.</p>
 </li>
 <li>
-<p>When the "Reply-To:" field is present, it indicates the address(es) to
-which the author of the message suggests that replies be sent.</p>
+<p>When the &#34;Reply-To:&#34; field is present, it indicates the address(es) to
+   which the author of the message suggests that replies be sent.</p>
 </li>
 <li>
-<p>In the absence of the "Reply-To:" field, replies SHOULD by default be sent
-to the mailbox(es) specified in the "From:" field unless otherwise
-specified by the person composing the reply.</p>
+<p>In the absence of the &#34;Reply-To:&#34; field, replies SHOULD by default be sent
+   to the mailbox(es) specified in the &#34;From:&#34; field unless otherwise
+   specified by the person composing the reply.</p>
 </li>
 <li>
-<p>In all cases, the "From:" field SHOULD NOT contain any mailbox that does
-not belong to the author(s) of the message.</p>
+<p>In all cases, the &#34;From:&#34; field SHOULD NOT contain any mailbox that does
+   not belong to the author(s) of the message.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_destination_fields">2.3. Destination Fields</h3>
+<h3 id="_destination_fields">Destination Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>to  =   "To:" address-list CRLF
@@ -635,53 +522,53 @@ bcc =   "Bcc:" [address-list / CFWS] CRLF</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The "To:" field contains the address(es) of the primary recipient(s) of the
+<p>The &#34;To:&#34; field contains the address(es) of the primary recipient(s) of the
 message.</p>
 </div>
 <div class="paragraph">
-<p>The "Cc:" field (where the "Cc" means "Carbon Copy" in the sense of making a
+<p>The &#34;Cc:&#34; field (where the &#34;Cc&#34; means &#34;Carbon Copy&#34; in the sense of making a
 copy on a typewriter using carbon paper) contains the addresses of others who
 are to receive the message, though the content of the message may not be
 directed at them.</p>
 </div>
 <div class="paragraph">
-<p>The "Bcc:" field (where the "Bcc" means "Blind Carbon Copy") contains
+<p>The &#34;Bcc:&#34; field (where the &#34;Bcc&#34; means &#34;Blind Carbon Copy&#34;) contains
 addresses of recipients of the message whose addresses are not to be
 revealed to other recipients of the message.</p>
 </div>
 <div class="paragraph">
-<p>There are three ways in which the "Bcc:" field is used,</p>
+<p>There are three ways in which the &#34;Bcc:&#34; field is used,</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>The "Bcc:" line is removed even though all of the recipients (including
-those specified in the "Bcc:" field) are sent a copy of the message.</p>
+<p>The &#34;Bcc:&#34; line is removed even though all of the recipients (including
+   those specified in the &#34;Bcc:&#34; field) are sent a copy of the message.</p>
 </li>
 <li>
-<p>Recipients specified in the "To:" and "Cc:" lines each are sent
-a copy of the message with the "Bcc:" line removed as above, but the
-recipients on the "Bcc:" line get a separate copy of the message
-containing a "Bcc:" line.  (When there are multiple recipient
-addresses in the "Bcc:" field, some implementations actually send a
-separate copy of the message to each recipient with a "Bcc:"
-containing only the address of that particular recipient.)</p>
+<p>Recipients specified in the &#34;To:&#34; and &#34;Cc:&#34; lines each are sent
+   a copy of the message with the &#34;Bcc:&#34; line removed as above, but the
+   recipients on the &#34;Bcc:&#34; line get a separate copy of the message
+   containing a &#34;Bcc:&#34; line.  (When there are multiple recipient
+   addresses in the &#34;Bcc:&#34; field, some implementations actually send a
+   separate copy of the message to each recipient with a &#34;Bcc:&#34;
+   containing only the address of that particular recipient.)</p>
 </li>
 <li>
-<p>Since a "Bcc:" field may contain no addresses, a "Bcc:" field can be
-sent without any addresses indicating to the recipients that blind
-copies were sent to someone.</p>
+<p>Since a &#34;Bcc:&#34; field may contain no addresses, a &#34;Bcc:&#34; field can be
+   sent without any addresses indicating to the recipients that blind
+   copies were sent to someone.</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>Which method to use with "Bcc:" fields is implementation dependent, but refer
-to the "Security Considerations" section of this document for a discussion of
+<p>Which method to use with &#34;Bcc:&#34; fields is implementation dependent, but refer
+to the &#34;Security Considerations&#34; section of this document for a discussion of
 each.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_identification_field">2.4. Identification Field</h3>
+<h3 id="_identification_field">Identification Field</h3>
 <div class="paragraph">
 <p>Format,</p>
 </div>
@@ -693,7 +580,7 @@ in-reply-to     =   "In-Reply-To:" 1*msg-id CRLF
 
 references      =   "References:" 1*msg-id CRLF
 
-msg-id          =   [CFWS] "&lt;" id-left "@" id-right "&gt;" [CFWS]
+msg-id          =   [CFWS] "<" id-left "@" id-right ">" [CFWS]
 
 id-left         =   dot-atom-text / obs-id-left
 
@@ -705,10 +592,10 @@ no-fold-literal =   "[" *dtext "]"</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Every message SHOULD have a "Message-ID:" field.</p>
+<p>Every message SHOULD have a &#34;Message-ID:&#34; field.</p>
 </li>
 <li>
-<p>Reply messages SHOULD have "In-Reply-To:" and "References:" fields.</p>
+<p>Reply messages SHOULD have &#34;In-Reply-To:&#34; and &#34;References:&#34; fields.</p>
 </li>
 </ul>
 </div>
@@ -721,14 +608,14 @@ humans.</p>
 RECOMMENDED.</p>
 </div>
 <div class="paragraph">
-<p>The "In-Reply-To:" and "References:" fields are used when creating a
+<p>The &#34;In-Reply-To:&#34; and &#34;References:&#34; fields are used when creating a
 reply to a message.
-"In-Reply-To:" field may be used to identify the message (or messages) to
-which the new message is a reply (one or more parent), while the "References:"
-field may be used to identify a "thread" of conversation.</p>
+&#34;In-Reply-To:&#34; field may be used to identify the message (or messages) to
+which the new message is a reply (one or more parent), while the &#34;References:&#34;
+field may be used to identify a &#34;thread&#34; of conversation.</p>
 </div>
 <div class="paragraph">
-<p>Trying to form a "References:" field for a reply that has multiple parents is
+<p>Trying to form a &#34;References:&#34; field for a reply that has multiple parents is
 discouraged.</p>
 </div>
 <div class="paragraph">
@@ -741,7 +628,7 @@ msg-id is what is contained between the two angle bracket characters.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_informational_fields">2.5. Informational Fields</h3>
+<h3 id="_informational_fields">Informational Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>subject         =   "Subject:" unstructured CRLF
@@ -752,16 +639,16 @@ keywords        =   "Keywords:" phrase *("," phrase) CRLF</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>When used in a reply, the "Subject" body MAY start with the string "Re: " (an
-abbreviation of the Latin "in re", meaning "in the matter of")
-followed by the contents of the "Subject:" field body of the original message.
-If this is done, only one instance of the literal string "Re: " ought to be
+<p>When used in a reply, the &#34;Subject&#34; body MAY start with the string &#34;Re: &#34; (an
+abbreviation of the Latin &#34;in re&#34;, meaning &#34;in the matter of&#34;)
+followed by the contents of the &#34;Subject:&#34; field body of the original message.
+If this is done, only one instance of the literal string &#34;Re: &#34; ought to be
 used since use of other strings or more than one instance can lead to
 undesirable consequences.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_resent_fields">2.6. Resent Fields</h3>
+<h3 id="_resent_fields">Resent Fields</h3>
 <div class="paragraph">
 <p>Each of the resent fields corresponds to a particular field elsewhere in the
 syntax.</p>
@@ -787,49 +674,49 @@ resent-msg-id   =   "Resent-Message-ID:" msg-id CRLF</pre>
 <ul>
 <li>
 <p>Resent fields SHOULD be added to any message that is reintroduced by
-a user into the transport system.</p>
+   a user into the transport system.</p>
 </li>
 <li>
 <p>A separate set of resent fields SHOULD be added each time this is done.</p>
 </li>
 <li>
 <p>All of the resent fields corresponding to a particular resending of the
-message SHOULD be grouped together.</p>
+   message SHOULD be grouped together.</p>
 </li>
 <li>
 <p>Each new set of resent fields is prepended to the message; that is, the
-most recent set of resent fields appears earlier in the message.</p>
+   most recent set of resent fields appears earlier in the message.</p>
 </li>
 <li>
 <p>No other fields in the message are changed when resent fields are added.</p>
 </li>
 <li>
-<p>When resent fields are used, the "Resent-From:" and "Resent-Date:"
-fields MUST be sent.</p>
+<p>When resent fields are used, the &#34;Resent-From:&#34; and &#34;Resent-Date:&#34;
+   fields MUST be sent.</p>
 </li>
 <li>
-<p>The "Resent-Message-ID:" field SHOULD be sent.</p>
+<p>The &#34;Resent-Message-ID:&#34; field SHOULD be sent.</p>
 </li>
 <li>
-<p>"Resent-Sender:" SHOULD NOT be used if "Resent-Sender:" would be identical
-to "Resent-From:".</p>
+<p>&#34;Resent-Sender:&#34; SHOULD NOT be used if &#34;Resent-Sender:&#34; would be identical
+   to &#34;Resent-From:&#34;.</p>
 </li>
 <li>
-<p>The "Resent-Message-ID:" field provides a unique identifier for the resent
-message.</p>
+<p>The &#34;Resent-Message-ID:&#34; field provides a unique identifier for the resent
+   message.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_trace_fields">2.7. Trace Fields</h3>
+<h3 id="_trace_fields">Trace Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>trace           =   [return] 1*received
 
 return          =   "Return-Path:" path CRLF
 
-path            =   angle-addr / ([CFWS] "&lt;" [CFWS] "&gt;" [CFWS])
+path            =   angle-addr / ([CFWS] "<" [CFWS] ">" [CFWS])
 
 received        =   "Received:" *received-token ";" date-time CRLF
 
@@ -838,7 +725,7 @@ received-token  =   word / angle-addr / addr-spec / domain</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_optional_fields">2.8. Optional Fields</h3>
+<h3 id="_optional_fields">Optional Fields</h3>
 <div class="paragraph">
 <p>The field names of any optional field MUST NOT be identical to any field name
 specified elsewhere in this document.</p>
@@ -852,10 +739,10 @@ specified elsewhere in this document.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_obsolete_specification">3. Obsolete Specification</h2>
+<h2 id="_obsolete_specification">Obsolete Specification</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_obsolete_date_and_time">3.1. Obsolete Date and Time</h3>
+<h3 id="_obsolete_date_and_time">Obsolete Date and Time</h3>
 <div class="paragraph">
 <p>The syntax for the obsolete date format allows</p>
 </div>
@@ -877,12 +764,12 @@ interpreted as follows:</p>
 <ol class="arabic">
 <li>
 <p>If a two digit year is encountered whose value is between 00 and 49, the
-year is interpreted by adding 2000, ending up with a value between 2000 and
-2049.</p>
+  year is interpreted by adding 2000, ending up with a value between 2000 and
+  2049.</p>
 </li>
 <li>
 <p>If a two digit year is encountered with a value between 50 and 99, or any
-three digit year is encountered, the year is interpreted by adding 1900.</p>
+  three digit year is encountered, the year is interpreted by adding 1900.</p>
 </li>
 </ol>
 </div>
@@ -903,12 +790,12 @@ PST is semantically equivalent to -0800</pre>
 </div>
 <div class="paragraph">
 <p>However, because of the error in [RFC0822], any time zones SHOULD all be
-considered equivalent to "-0000" unless there is out-of-band information
+considered equivalent to &#34;-0000&#34; unless there is out-of-band information
 confirming their meaning.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_obsolete_addressing">3.2. Obsolete Addressing</h3>
+<h3 id="_obsolete_addressing">Obsolete Addressing</h3>
 <div class="paragraph">
 <p>There are four primary differences in addressing.</p>
 </div>
@@ -916,30 +803,30 @@ confirming their meaning.</p>
 <ol class="arabic">
 <li>
 <p>mailbox addresses were allowed to have a route portion before the
-addr-spec when enclosed in "&lt;" and "&gt;".
-The route is simply a comma-separated list of domain names, each preceded
-by "@", and the list terminated by a colon.</p>
+   addr-spec when enclosed in &#34;&lt;&#34; and &#34;&gt;&#34;.
+   The route is simply a comma-separated list of domain names, each preceded
+   by &#34;@&#34;, and the list terminated by a colon.</p>
 </li>
 <li>
 <p>CFWS were allowed between the period-separated elements of local-part and
-domain (i.e., dot-atom was not used).
-In addition, local-part is allowed to contain quoted-string in addition to
-just atom.</p>
+   domain (i.e., dot-atom was not used).
+   In addition, local-part is allowed to contain quoted-string in addition to
+   just atom.</p>
 </li>
 <li>
-<p>mailbox-list and address-list were allowed to have "null" members.
-That is, there could be two or more commas in such a list with nothing in
-between them, or commas at the beginning or end of the list.</p>
+<p>mailbox-list and address-list were allowed to have &#34;null&#34; members.
+   That is, there could be two or more commas in such a list with nothing in
+   between them, or commas at the beginning or end of the list.</p>
 </li>
 <li>
 <p>US-ASCII control characters and quoted-pairs were allowed in domain
-literals and are added here.</p>
+   literals and are added here.</p>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_obsolete_header_fields">3.3. Obsolete Header Fields</h3>
+<h3 id="_obsolete_header_fields">Obsolete Header Fields</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -949,19 +836,24 @@ literals and are added here.</p>
 <p>Fields may occur in any order.</p>
 </li>
 <li>
-<p>Any amount of white space is allowed before the ":" at the end of the
-field name.</p>
+<p>Any amount of white space is allowed before the &#34;:&#34; at the end of the
+   field name.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

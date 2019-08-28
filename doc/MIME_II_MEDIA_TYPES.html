@@ -1,107 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>MIME Part Two: Media Types</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article">
-<div id="header">
-<h1>MIME Part Two: Media Types</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>MIME Part Two: Media Types</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>MIME Part Two: Media Types</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a></li>
-<li><a href="#_text_media_type">2. Text Media Type</a>
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_text_media_type">Text Media Type</a>
 <ul class="sectlevel2">
-<li><a href="#_plain_subtype">2.1. Plain Subtype</a></li>
+<li><a href="#_plain_subtype">Plain Subtype</a></li>
 </ul>
 </li>
-<li><a href="#_image_media_type">3. Image Media Type</a></li>
-<li><a href="#_audio_media_type">4. Audio Media Type</a></li>
-<li><a href="#_video_media_type">5. Video Media Type</a></li>
-<li><a href="#_application_media_type">6. Application Media Type</a>
+<li><a href="#_image_media_type">Image Media Type</a></li>
+<li><a href="#_audio_media_type">Audio Media Type</a></li>
+<li><a href="#_video_media_type">Video Media Type</a></li>
+<li><a href="#_application_media_type">Application Media Type</a>
 <ul class="sectlevel2">
-<li><a href="#_octet_stream_subtype">6.1. Octet-Stream Subtype</a></li>
-<li><a href="#_postscript_subtype">6.2. Postscript Subtype</a></li>
+<li><a href="#_octet_stream_subtype">Octet-Stream Subtype</a></li>
+<li><a href="#_postscript_subtype">Postscript Subtype</a></li>
 </ul>
 </li>
-<li><a href="#_multipart_media_type">7. Multipart Media Type</a>
+<li><a href="#_multipart_media_type">Multipart Media Type</a>
 <ul class="sectlevel2">
-<li><a href="#_common_syntax">7.1. Common Syntax</a></li>
-<li><a href="#_mixed_subtype">7.2. Mixed Subtype</a></li>
-<li><a href="#_alternative_subtype">7.3. Alternative Subtype</a></li>
-<li><a href="#_digest_subtype">7.4. Digest Subtype</a></li>
-<li><a href="#_parallel_subtype">7.5. Parallel Subtype</a></li>
+<li><a href="#_common_syntax">Common Syntax</a></li>
+<li><a href="#_mixed_subtype">Mixed Subtype</a></li>
+<li><a href="#_alternative_subtype">Alternative Subtype</a></li>
+<li><a href="#_digest_subtype">Digest Subtype</a></li>
+<li><a href="#_parallel_subtype">Parallel Subtype</a></li>
 </ul>
 </li>
-<li><a href="#_message_media_type">8. Message Media Type</a>
+<li><a href="#_message_media_type">Message Media Type</a>
 <ul class="sectlevel2">
-<li><a href="#_rfc822_subtype">8.1. RFC822 Subtype</a></li>
-<li><a href="#_partial_subtype">8.2. Partial Subtype</a></li>
-<li><a href="#_external_body_subtype">8.3. External-Body Subtype</a></li>
+<li><a href="#_rfc822_subtype">RFC822 Subtype</a></li>
+<li><a href="#_partial_subtype">Partial Subtype</a></li>
+<li><a href="#_external_body_subtype">External-Body Subtype</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document provide note and summary of <a href="https://tools.ietf.org/html/rfc2046" target="_blank" rel="noopener">RFC 2046</a>,
+<p>This document provide note and summary of <a href="https://tools.ietf.org/html/rfc2046">RFC 2046^</a>,
 Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">1. Introduction</h2>
+<h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There are two groups media type: discrete and composite.
-Discrete media type are "text", "image", "audio", "video", and "application".
-Composite media type are "multipart" and "message".</p>
+Discrete media type are &#34;text&#34;, &#34;image&#34;, &#34;audio&#34;, &#34;video&#34;, and &#34;application&#34;.
+Composite media type are &#34;multipart&#34; and &#34;message&#34;.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_text_media_type">2. Text Media Type</h2>
+<h2 id="_text_media_type">Text Media Type</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>Canonical form of any MIME "text" subtype MUST always represent a
-line break as a CRLF sequence.
-Use of CR and LF outside of line break sequences is forbidden.</p>
+<p>Canonical form of any MIME &#34;text&#34; subtype MUST always represent a
+   line break as a CRLF sequence.
+   Use of CR and LF outside of line break sequences is forbidden.</p>
 </li>
 <li>
-<p>Unrecognized subtypes of "text" should be treated as subtype "plain"
-as long as the MIME implementation knows how to handle the charset.</p>
+<p>Unrecognized subtypes of &#34;text&#34; should be treated as subtype &#34;plain&#34;
+   as long as the MIME implementation knows how to handle the charset.</p>
 </li>
 <li>
 <p>Unrecognized subtypes which also specify an unrecognized charset
-should be treated as "application/octet-stream".</p>
+   should be treated as &#34;application/octet-stream&#34;.</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_plain_subtype">2.1. Plain Subtype</h3>
+<h3 id="_plain_subtype">Plain Subtype</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>Subtype "plain" is seen simply as a linear sequence of characters, possibly
-interrupted by line breaks or page breaks.</p>
+<p>Subtype &#34;plain&#34; is seen simply as a linear sequence of characters, possibly
+   interrupted by line breaks or page breaks.</p>
 </li>
 <li>
-<p>A "charset" parameter may be used to indicate the character set of the body</p>
+<p>A &#34;charset&#34; parameter may be used to indicate the character set of the body</p>
 <div class="ulist">
 <ul>
 <li>
@@ -112,7 +120,7 @@ interrupted by line breaks or page breaks.</p>
 </li>
 <li>
 <p>It is strongly recommended that new user agents explicitly specify a
-character set as a media type parameter in the Content-Type header field.</p>
+    character set as a media type parameter in the Content-Type header field.</p>
 </li>
 </ul>
 </div>
@@ -123,108 +131,108 @@ character set as a media type parameter in the Content-Type header field.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_image_media_type">3. Image Media Type</h2>
+<h2 id="_image_media_type">Image Media Type</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>A media type of "image" indicates that the body contains an image.</p>
+<p>A media type of &#34;image&#34; indicates that the body contains an image.</p>
 </li>
 <li>
 <p>The subtype names the specific image format, defined in RFC 2048.</p>
 </li>
 <li>
-<p>Unrecognized subtypes of "image" should at a minimum be treated as
-"application/octet-stream".</p>
+<p>Unrecognized subtypes of &#34;image&#34; should at a minimum be treated as
+   &#34;application/octet-stream&#34;.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_audio_media_type">4. Audio Media Type</h2>
+<h2 id="_audio_media_type">Audio Media Type</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>A media type of "audio" indicates that the body contains audio data.</p>
+<p>A media type of &#34;audio&#34; indicates that the body contains audio data.</p>
 </li>
 <li>
-<p>Unrecognized subtypes of "audio" should at a miniumum be treated as
-"application/octet-stream".</p>
+<p>Unrecognized subtypes of &#34;audio&#34; should at a miniumum be treated as
+   &#34;application/octet-stream&#34;.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_video_media_type">5. Video Media Type</h2>
+<h2 id="_video_media_type">Video Media Type</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>A media type of "video" indicates that the body contains a
-time-varying-picture image, possibly with color and coordinated sound.</p>
+<p>A media type of &#34;video&#34; indicates that the body contains a
+   time-varying-picture image, possibly with color and coordinated sound.</p>
 </li>
 <li>
-<p>The subtype "mpeg" refers to video coded according to the MPEG standard
-[MPEG].</p>
+<p>The subtype &#34;mpeg&#34; refers to video coded according to the MPEG standard
+   [MPEG].</p>
 </li>
 <li>
-<p>Unrecognized subtypes of "video" should at a minumum be treated as
-"application/octet-stream".</p>
+<p>Unrecognized subtypes of &#34;video&#34; should at a minumum be treated as
+   &#34;application/octet-stream&#34;.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_application_media_type">6. Application Media Type</h2>
+<h2 id="_application_media_type">Application Media Type</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>The "application" media type is to be used for discrete data which do
-not fit in any of the other categories, and particularly for data to
-be processed by some type of application program.</p>
+<p>The &#34;application&#34; media type is to be used for discrete data which do
+   not fit in any of the other categories, and particularly for data to
+   be processed by some type of application program.</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_octet_stream_subtype">6.1. Octet-Stream Subtype</h3>
+<h3 id="_octet_stream_subtype">Octet-Stream Subtype</h3>
 <div class="paragraph">
-<p>The "octet-stream" subtype is used to indicate that a body contains arbitrary
+<p>The &#34;octet-stream&#34; subtype is used to indicate that a body contains arbitrary
 binary data.
 This subtype define the following optional parameters:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>TYPE&#8201;&#8212;&#8201;the general type or category of binary data.
-This is intended as information for the human recipient rather than for
-any automatic processing.</p>
+<p>TYPE -- the general type or category of binary data.
+   This is intended as information for the human recipient rather than for
+   any automatic processing.</p>
 </li>
 <li>
-<p>PADDING&#8201;&#8212;&#8201;the number of bits of padding that were appended to the
-bit-stream comprising the actual contents to produce the enclosed 8bit
-byte-oriented data.
-This is useful for enclosing a bit-stream in a body when the total number
-of bits is not a multiple of 8.</p>
+<p>PADDING -- the number of bits of padding that were appended to the
+   bit-stream comprising the actual contents to produce the enclosed 8bit
+   byte-oriented data.
+   This is useful for enclosing a bit-stream in a body when the total number
+   of bits is not a multiple of 8.</p>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_postscript_subtype">6.2. Postscript Subtype</h3>
+<h3 id="_postscript_subtype">Postscript Subtype</h3>
 <div class="paragraph">
-<p>A media type of "application/postscript" indicates a PostScript program.</p>
+<p>A media type of &#34;application/postscript&#34; indicates a PostScript program.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p>The execution of general-purpose PostScript interpreters entails
-serious security risks, and implementors are discouraged from simply
-sending PostScript bodies to "off-the-shelf" interpreters.</p>
+   serious security risks, and implementors are discouraged from simply
+   sending PostScript bodies to &#34;off-the-shelf&#34; interpreters.</p>
 </li>
 </ul>
 </div>
@@ -232,7 +240,7 @@ sending PostScript bodies to "off-the-shelf" interpreters.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_multipart_media_type">7. Multipart Media Type</h2>
+<h2 id="_multipart_media_type">Multipart Media Type</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -270,54 +278,54 @@ body-part         := MIME-part-headers [CRLF *OCTET]
 		   ; body-part differ from the semantics of a message, as
                    ; described in the text.
 
-OCTET             := &lt;any 0-255 octet value&gt;</pre>
+OCTET             := <any 0-255 octet value></pre>
 </div>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>A "multipart" media type field MUST appear in the entity&#8217;s header.</p>
+<p>A &#34;multipart&#34; media type field MUST appear in the entity&#39;s header.</p>
 </li>
 <li>
 <p>The body MUST then contain one or more body parts, each preceded by a
-boundary delimiter line, and the last one followed by a closing boundary
-delimiter line.</p>
+   boundary delimiter line, and the last one followed by a closing boundary
+   delimiter line.</p>
 <div class="ulist">
 <ul>
 <li>
 <p>After its boundary delimiter line, each body part then consists of a
-header area, a blank line, and a body area.</p>
+    header area, a blank line, and a body area.</p>
 </li>
 <li>
 <p>The boundary delimiter MUST NOT appear inside any of the encapsulated
-parts, on a line by itself or as the prefix of any line.</p>
+    parts, on a line by itself or as the prefix of any line.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
 <p>A body part is an entity and hence is NOT to be interpreted as actually
-being an RFC 822 message.</p>
+   being an RFC 822 message.</p>
 </li>
 <li>
 <p>NO header fields are actually required in body parts.</p>
 </li>
 <li>
 <p>The only header fields that have defined meaning for body parts are
-those the names of which begin with "Content-".
-All other header fields may be ignored in body parts.</p>
+   those the names of which begin with &#34;Content-&#34;.
+   All other header fields may be ignored in body parts.</p>
 </li>
 <li>
-<p>All present and future subtypes of the "multipart" type MUST use an
-identical syntax.</p>
+<p>All present and future subtypes of the &#34;multipart&#34; type MUST use an
+   identical syntax.</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_common_syntax">7.1. Common Syntax</h3>
+<h3 id="_common_syntax">Common Syntax</h3>
 <div class="literalblock">
 <div class="content">
-<pre>boundary      := 0*69&lt;bchars&gt; bcharsnospace
+<pre>boundary      := 0*69<bchars> bcharsnospace
 
 bchars        := bcharsnospace / " "
 
@@ -330,28 +338,28 @@ bcharsnospace := DIGIT / ALPHA / "'" / "(" / ")" /
 <ul>
 <li>
 <p>The Content-Type field for multipart entities requires one parameter,
-"boundary".</p>
+   &#34;boundary&#34;.</p>
 </li>
 <li>
 <p>The boundary delimiter line is then defined as a line consisting entirely
-of two hyphen characters ("-", decimal value 45) followed by the boundary
-parameter value, optional linear whitespace, and a terminating CRLF.</p>
+   of two hyphen characters (&#34;-&#34;, decimal value 45) followed by the boundary
+   parameter value, optional linear whitespace, and a terminating CRLF.</p>
 </li>
 <li>
 <p>The boundary delimiter MUST occur at the beginning of a line</p>
 </li>
 <li>
 <p>The boundary may be followed by zero or more characters of linear
-whitespace</p>
+   whitespace</p>
 </li>
 <li>
 <p>The CRLF preceding the boundary delimiter line is conceptually
-attached to the boundary so that it is possible to have a part that
-does not end with a CRLF</p>
+   attached to the boundary so that it is possible to have a part that
+   does not end with a CRLF</p>
 </li>
 <li>
 <p>Boundary MUST be no longer than 70 characters, not counting the two
-leading hyphens.</p>
+   leading hyphens.</p>
 </li>
 <li>
 <p>Boundary with two hyphen at the end indicated the end of message body.</p>
@@ -360,24 +368,24 @@ leading hyphens.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mixed_subtype">7.2. Mixed Subtype</h3>
+<h3 id="_mixed_subtype">Mixed Subtype</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>The "mixed" subtype of "multipart" is intended for use when the body
-parts are independent and need to be bundled in a particular order.</p>
+<p>The &#34;mixed&#34; subtype of &#34;multipart&#34; is intended for use when the body
+   parts are independent and need to be bundled in a particular order.</p>
 </li>
 <li>
-<p>Any "multipart" subtypes that an implementation does not recognize
-MUST be treated as being of subtype "mixed".</p>
+<p>Any &#34;multipart&#34; subtypes that an implementation does not recognize
+   MUST be treated as being of subtype &#34;mixed&#34;.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_alternative_subtype">7.3. Alternative Subtype</h3>
+<h3 id="_alternative_subtype">Alternative Subtype</h3>
 <div class="paragraph">
-<p>In "multipart/alternative", each of the body parts is an "alternative" version
+<p>In &#34;multipart/alternative&#34;, each of the body parts is an &#34;alternative&#34; version
 of the same information.</p>
 </div>
 <div class="ulist">
@@ -387,36 +395,36 @@ of the same information.</p>
 </li>
 <li>
 <p>The best choice is the LAST part of a type supported by the recipient
-system&#8217;s local environment.</p>
+   system&#39;s local environment.</p>
 </li>
 <li>
-<p>User agents that compose "multipart/alternative" entities MUST place the
-body parts in increasing order of preference, that is, with the preferred
-format last.</p>
+<p>User agents that compose &#34;multipart/alternative&#34; entities MUST place the
+   body parts in increasing order of preference, that is, with the preferred
+   format last.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_digest_subtype">7.4. Digest Subtype</h3>
+<h3 id="_digest_subtype">Digest Subtype</h3>
 <div class="paragraph">
-<p>The "multipart/digest" Content-Type is intended to be used to send collections of messages.</p>
+<p>The &#34;multipart/digest&#34; Content-Type is intended to be used to send collections of messages.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p>In a digest, the default Content-Type value for a body part is changed from
-"text/plain" to "message/rfc822".</p>
+   &#34;text/plain&#34; to &#34;message/rfc822&#34;.</p>
 </li>
 <li>
-<p>If a "text/plain" part is needed, it should be included as a seperate
-part of a "multipart/mixed" message.</p>
+<p>If a &#34;text/plain&#34; part is needed, it should be included as a seperate
+   part of a &#34;multipart/mixed&#34; message.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_parallel_subtype">7.5. Parallel Subtype</h3>
+<h3 id="_parallel_subtype">Parallel Subtype</h3>
 <div class="paragraph">
 <p>in a parallel entity, the order of body parts is not significant.</p>
 </div>
@@ -424,31 +432,31 @@ part of a "multipart/mixed" message.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_message_media_type">8. Message Media Type</h2>
+<h2 id="_message_media_type">Message Media Type</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>It is frequently desirable, in sending mail, to encapsulate another mail
 message.
-A special media type, "message", is defined to encapsulate another mail
+A special media type, &#34;message&#34;, is defined to encapsulate another mail
 message.
-The "rfc822" subtype of "message" is used to encapsulate RFC 822 messages.</p>
+The &#34;rfc822&#34; subtype of &#34;message&#34; is used to encapsulate RFC 822 messages.</p>
 </div>
 <div class="sect2">
-<h3 id="_rfc822_subtype">8.1. RFC822 Subtype</h3>
+<h3 id="_rfc822_subtype">RFC822 Subtype</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>"message/rfc822" body must include a "From", "Date", and at least one
-destination header is removed and replaced with the requirement that
-at least one of "From", "Subject", or "Date" must be present.</p>
+<p>&#34;message/rfc822&#34; body must include a &#34;From&#34;, &#34;Date&#34;, and at least one
+   destination header is removed and replaced with the requirement that
+   at least one of &#34;From&#34;, &#34;Subject&#34;, or &#34;Date&#34; must be present.</p>
 </li>
 <li>
-<p>"message/rfc822" entity isn&#8217;t restricted to material in strict
-conformance to RFC822, it could well be a News article or a MIME message.</p>
+<p>&#34;message/rfc822&#34; entity isn&#39;t restricted to material in strict
+   conformance to RFC822, it could well be a News article or a MIME message.</p>
 </li>
 <li>
-<p>No encoding other than "7bit", "8bit", or "binary" is permitted for the
-body of a "message/rfc822" entity.</p>
+<p>No encoding other than &#34;7bit&#34;, &#34;8bit&#34;, or &#34;binary&#34; is permitted for the
+   body of a &#34;message/rfc822&#34; entity.</p>
 </li>
 <li>
 <p>The message header fields are always US-ASCII in any cases.</p>
@@ -457,31 +465,31 @@ body of a "message/rfc822" entity.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_partial_subtype">8.2. Partial Subtype</h3>
+<h3 id="_partial_subtype">Partial Subtype</h3>
 <div class="paragraph">
-<p>The "partial" subtype is defined to allow large entities to be delivered as
+<p>The &#34;partial&#34; subtype is defined to allow large entities to be delivered as
 several separate pieces of mail and automatically reassembled by a receiving
 user agent.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Entities of type "message/partial" must always have a
-content-transfer-encoding of 7bit (the default).</p>
+<p>Entities of type &#34;message/partial&#34; must always have a
+   content-transfer-encoding of 7bit (the default).</p>
 </li>
 <li>
-<p>The use of a content-transfer-encoding of "8bit" or "binary" is explicitly
-prohibited.</p>
+<p>The use of a content-transfer-encoding of &#34;8bit&#34; or &#34;binary&#34; is explicitly
+   prohibited.</p>
 </li>
 <li>
-<p>When generating and reassembling the pieces of a "message/partial"
-message, the headers of the encapsulated message must be merged with
-the headers of the enclosing entities</p>
+<p>When generating and reassembling the pieces of a &#34;message/partial&#34;
+   message, the headers of the encapsulated message must be merged with
+   the headers of the enclosing entities</p>
 <div class="ulist">
 <ul>
 <li>
 <p>The result is always a complete MIME entity, which may have its own
-Content-Type header field, and thus may contain any other data type.</p>
+    Content-Type header field, and thus may contain any other data type.</p>
 </li>
 </ul>
 </div>
@@ -494,13 +502,13 @@ Content-Type header field, and thus may contain any other data type.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><strong>"id"</strong>, is a unique identifier, as close to a world-unique identifier as
-possible, to be used to match the fragments together.
-In general, the identifier is essentially a message-id.</p>
+<p><strong>&#34;id&#34;</strong>, is a unique identifier, as close to a world-unique identifier as
+   possible, to be used to match the fragments together.
+   In general, the identifier is essentially a message-id.</p>
 </li>
 <li>
-<p><strong>"number"</strong>, an integer, is the fragment number, which indicates where this
-fragment fits into the sequence of fragments.</p>
+<p><strong>&#34;number&#34;</strong>, an integer, is the fragment number, which indicates where this
+   fragment fits into the sequence of fragments.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -510,7 +518,7 @@ fragment fits into the sequence of fragments.</p>
 </div>
 </li>
 <li>
-<p><strong>"total"</strong>, another integer, is the total number of fragments.</p>
+<p><strong>&#34;total&#34;</strong>, another integer, is the total number of fragments.</p>
 </li>
 </ol>
 </div>
@@ -525,19 +533,19 @@ observed:</p>
 </li>
 <li>
 <p>All of the header fields from the initial enclosing message, except those
-that start with "Content-" and the specific header fields "Subject",
-"Message-ID", "Encrypted", and "MIME-Version", must be copied, in order,
-to the new message.</p>
+   that start with &#34;Content-&#34; and the specific header fields &#34;Subject&#34;,
+   &#34;Message-ID&#34;, &#34;Encrypted&#34;, and &#34;MIME-Version&#34;, must be copied, in order,
+   to the new message.</p>
 </li>
 <li>
 <p>All of the header fields from the second and any subsequent enclosing
-messages are discarded by the reassembly process.</p>
+   messages are discarded by the reassembly process.</p>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_external_body_subtype">8.3. External-Body Subtype</h3>
+<h3 id="_external_body_subtype">External-Body Subtype</h3>
 <div class="paragraph">
 <p>The external-body subtype indicates that the actual body data are not
 included, but merely referenced.
@@ -547,62 +555,62 @@ data.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>"message/external-body" consists of a header, two consecutive CRLFs, and
-the message header for the encapsulated message.</p>
+<p>&#34;message/external-body&#34; consists of a header, two consecutive CRLFs, and
+   the message header for the encapsulated message.</p>
 </li>
 <li>
 <p>If another pair of consecutive CRLFs appears, this of course ends the
-message header for the encapsulated message.</p>
+   message header for the encapsulated message.</p>
 </li>
 <li>
-<p>Any text after encapsulated message header, also called "phantom body", is
-ignored.</p>
+<p>Any text after encapsulated message header, also called &#34;phantom body&#34;, is
+   ignored.</p>
 <div class="ulist">
 <ul>
 <li>
 <p>The only access-type defined in this document that uses the phantom body
-is "mail-server"</p>
+    is &#34;mail-server&#34;</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>The encapsulated headers in ALL "message/external-body" entities MUST
-include a Content-ID header field to give a unique identifier by
-which to reference the data.</p>
+<p>The encapsulated headers in ALL &#34;message/external-body&#34; entities MUST
+   include a Content-ID header field to give a unique identifier by
+   which to reference the data.</p>
 <div class="ulist">
 <ul>
 <li>
 <p>This identifier may be used for caching mechanisms, and for recognizing
-the receipt of the data when the access-type is "mail-server".</p>
+    the receipt of the data when the access-type is &#34;mail-server&#34;.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
 <p>The tokens that describe external-body data, such as file names and mail
-server commands, are required to be in the US-ASCII character set.</p>
+   server commands, are required to be in the US-ASCII character set.</p>
 </li>
 <li>
-<p>MIME entities of type "message/external-body" MUST have a
-content-transfer-encoding of 7bit (the default).</p>
+<p>MIME entities of type &#34;message/external-body&#34; MUST have a
+   content-transfer-encoding of 7bit (the default).</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The parameters that may be used with any "message/external-body" are:</p>
+<p>The parameters that may be used with any &#34;message/external-body&#34; are:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>ACCESS-TYPE&#8201;&#8212;&#8201;A word indicating the supported access mechanism by which
-the file or data may be obtained.
-This word is not case sensitive.</p>
+<p>ACCESS-TYPE -- A word indicating the supported access mechanism by which
+   the file or data may be obtained.
+   This word is not case sensitive.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Values include, but are not limited to, "FTP", "ANON-FTP", "TFTP",
-"LOCAL-FILE", and "MAIL-SERVER".</p>
+<p>Values include, but are not limited to, &#34;FTP&#34;, &#34;ANON-FTP&#34;, &#34;TFTP&#34;,
+    &#34;LOCAL-FILE&#34;, and &#34;MAIL-SERVER&#34;.</p>
 </li>
 <li>
 <p>This parameter is unconditionally mandatory and MUST be present.</p>
@@ -611,8 +619,8 @@ This word is not case sensitive.</p>
 </div>
 </li>
 <li>
-<p>EXPIRATION&#8201;&#8212;&#8201;The date after which the existence of the external data is
-not guaranteed.</p>
+<p>EXPIRATION -- The date after which the existence of the external data is
+   not guaranteed.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
@@ -622,9 +630,9 @@ not guaranteed.</p>
 </div>
 </li>
 <li>
-<p>SIZE&#8201;&#8212;&#8201;The size (in octets) of the data in its canonical form, that is,
-before any Content-Transfer-Encoding has been applied or after the data
-have been decoded.</p>
+<p>SIZE -- The size (in octets) of the data in its canonical form, that is,
+   before any Content-Transfer-Encoding has been applied or after the data
+   have been decoded.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
@@ -638,11 +646,16 @@ have been decoded.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

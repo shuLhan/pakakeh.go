@@ -1,7 +1,7 @@
 = SMTP Service Extension for Authentication
 :author: Shulhan
 :email: <ms@kilabit.info>
-:toc: left
+:toc:
 :toclevels: 4
 :sectnums:
 :stylesheet: style.css

@@ -1,46 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>SMTP Service Extension for Secure SMTP over Transport Layer Security</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article toc2 toc-left">
-<div id="header">
-<h1>SMTP Service Extension for Secure SMTP over Transport Layer Security</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc2">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>SMTP Service Extension for Secure SMTP over Transport Layer Security</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>SMTP Service Extension for Secure SMTP over Transport Layer Security</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_service_extension">1. Service Extension</a></li>
-<li><a href="#_starttls_command">2. STARTTLS command</a>
+<li><a href="#_service_extension">Service Extension</a></li>
+<li><a href="#_starttls_command">STARTTLS command</a>
 <ul class="sectlevel2">
-<li><a href="#_request">2.1. Request</a>
+<li><a href="#_request">Request</a>
 <ul class="sectlevel3">
-<li><a href="#_success_response">2.1.1. Success Response</a></li>
-<li><a href="#_error_response">2.1.2. Error Response</a></li>
+<li><a href="#_success_response">Success Response</a></li>
+<li><a href="#_error_response">Error Response</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_post_tls_handshake">3. Post TLS Handshake</a>
+<li><a href="#_post_tls_handshake">Post TLS Handshake</a>
 <ul class="sectlevel2">
-<li><a href="#_client">3.1. Client</a></li>
-<li><a href="#_server">3.2. Server</a></li>
+<li><a href="#_client">Client</a></li>
+<li><a href="#_server">Server</a></li>
 </ul>
 </li>
-<li><a href="#_security_considerations">4. Security Considerations</a></li>
+<li><a href="#_security_considerations">Security Considerations</a></li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -51,14 +59,14 @@ defined in <a href="https://tools.ietf.org/html/rfc3207">RFC3207</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_service_extension">1. Service Extension</h2>
+<h2 id="_service_extension">Service Extension</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The EHLO keyword value associated with the extension is "STARTTLS" with no
+<p>The EHLO keyword value associated with the extension is &#34;STARTTLS&#34; with no
 parameter.</p>
 </div>
 <div class="paragraph">
-<p>A new SMTP command "STARTTLS" is defined.</p>
+<p>A new SMTP command &#34;STARTTLS&#34; is defined.</p>
 </div>
 <div class="paragraph">
 <p>A publicly-referenced SMTP server (on port 25) MUST NOT require use of the
@@ -67,17 +75,17 @@ STARTTLS extension in order to deliver mail locally.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_starttls_command">2. STARTTLS command</h2>
+<h2 id="_starttls_command">STARTTLS command</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_request">2.1. Request</h3>
+<h3 id="_request">Request</h3>
 <div class="literalblock">
 <div class="content">
 <pre>"STARTTLS" CRLF</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response">2.1.1. Success Response</h4>
+<h4 id="_success_response">Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"220" SP *text CRLF</pre>
@@ -92,7 +100,7 @@ abort the connection.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response">2.1.2. Error Response</h4>
+<h4 id="_error_response">Error Response</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -127,10 +135,10 @@ If the client and server are using the ENHANCEDSTATUSCODES ESMTP extension
 </div>
 </div>
 <div class="sect1">
-<h2 id="_post_tls_handshake">3. Post TLS Handshake</h2>
+<h2 id="_post_tls_handshake">Post TLS Handshake</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_client">3.1. Client</h3>
+<h3 id="_client">Client</h3>
 <div class="paragraph">
 <p>The client MUST discard any knowledge obtained from the server, such as the
 list of SMTP service extensions, which was not obtained from the TLS
@@ -149,7 +157,7 @@ active.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_server">3.2. Server</h3>
+<h3 id="_server">Server</h3>
 <div class="paragraph">
 <p>The server MUST discard any knowledge obtained from the client, such as the
 argument to the EHLO command, which was not obtained from the TLS negotiation
@@ -163,7 +171,7 @@ received after a TLS handshake has completed.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_security_considerations">4. Security Considerations</h2>
+<h2 id="_security_considerations">Security Considerations</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If the SMTP client decides that the level of authentication or privacy is not
@@ -185,11 +193,16 @@ client (other than a QUIT command) with,</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

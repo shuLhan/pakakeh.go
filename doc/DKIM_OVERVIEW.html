@@ -1,52 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>DomainKeys Identified Mail (DKIM) Service Overview</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article">
-<div id="header">
-<h1>DomainKeys Identified Mail (DKIM) Service Overview</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>DomainKeys Identified Mail (DKIM) Service Overview</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>DomainKeys Identified Mail (DKIM) Service Overview</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a></li>
-<li><a href="#_the_dkim_value_proposition">2. The DKIM Value Proposition</a>
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_the_dkim_value_proposition">The DKIM Value Proposition</a>
 <ul class="sectlevel2">
-<li><a href="#_identity_verification">2.1. Identity Verification</a></li>
-<li><a href="#_enabling_trust_assessments">2.2. Enabling Trust Assessments</a></li>
-<li><a href="#_establishing_message_validity">2.3. Establishing Message Validity</a></li>
+<li><a href="#_identity_verification">Identity Verification</a></li>
+<li><a href="#_enabling_trust_assessments">Enabling Trust Assessments</a></li>
+<li><a href="#_establishing_message_validity">Establishing Message Validity</a></li>
 </ul>
 </li>
-<li><a href="#_dkim_goals">3. DKIM Goals</a>
+<li><a href="#_dkim_goals">DKIM Goals</a>
 <ul class="sectlevel2">
-<li><a href="#_functional_goals">3.1. Functional Goals</a></li>
-<li><a href="#_operational_goals">3.2. Operational Goals</a></li>
+<li><a href="#_functional_goals">Functional Goals</a></li>
+<li><a href="#_operational_goals">Operational Goals</a></li>
 </ul>
 </li>
-<li><a href="#_dkim_function">4. DKIM Function</a>
+<li><a href="#_dkim_function">DKIM Function</a>
 <ul class="sectlevel2">
-<li><a href="#_basic_signing">4.1. Basic Signing</a></li>
-<li><a href="#_characteristics_of_a_dkim_signature">4.2. Characteristics of a DKIM Signature</a></li>
-<li><a href="#_the_selector_construct">4.3. The Selector Construct</a></li>
-<li><a href="#_verification">4.4. Verification</a></li>
-<li><a href="#_sub_domain_assessment">4.5. Sub-Domain Assessment</a></li>
+<li><a href="#_basic_signing">Basic Signing</a></li>
+<li><a href="#_characteristics_of_a_dkim_signature">Characteristics of a DKIM Signature</a></li>
+<li><a href="#_the_selector_construct">The Selector Construct</a></li>
+<li><a href="#_verification">Verification</a></li>
+<li><a href="#_sub_domain_assessment">Sub-Domain Assessment</a></li>
 </ul>
 </li>
-<li><a href="#_service_architecture">5. Service Architecture</a></li>
+<li><a href="#_service_architecture">Service Architecture</a></li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -55,7 +63,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">1. Introduction</h2>
+<h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>DKIM defines a domain-level digital signature authentication framework for
@@ -67,7 +75,7 @@ using the Domain Name System (DNS) as its key server technology.</p>
 Identifier refer to the identity of a responsible person or organization.
 The same identity can have multiple identifiers.
 This identifier is called the Signing Domain IDentifier (SDID) and is
-contained in the DKIM-Signature header fields "d=" tag.
+contained in the DKIM-Signature header fields &#34;d=&#34; tag.
 The owner of the SDID is declaring that they accept responsibility for the
 message and can thus be held accountable for it.</p>
 </div>
@@ -78,7 +86,7 @@ message and can thus be held accountable for it.</p>
 <ul>
 <li>
 <p>Does not authenticate or verify the contents of the message header or body,
-such as the author "From" field, beyond certifying data integrity between the
+such as the author &#34;From&#34; field, beyond certifying data integrity between the
 time of signing and the time of verifying.</p>
 </li>
 <li>
@@ -94,7 +102,7 @@ successful signature verification.</p>
 <li>
 <p>Does not protect against re-sending (replay of) a message that
 already has a verified signature; therefore, a transit intermediary or a
-recipient can re-post the message&#8201;&#8212;&#8201;that is, post it as a new message&#8201;&#8212;&#8201;with
+recipient can re-post the message -- that is, post it as a new message -- with
 the original signature remaining verifiable, even though the new recipient(s)
 might be different from those who were originally specified by the
 author.</p>
@@ -104,10 +112,10 @@ author.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_dkim_value_proposition">2. The DKIM Value Proposition</h2>
+<h2 id="_the_dkim_value_proposition">The DKIM Value Proposition</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_identity_verification">2.1. Identity Verification</h3>
+<h3 id="_identity_verification">Identity Verification</h3>
 <div class="paragraph">
 <p>An assessment service that uses DKIM can differentiate between a domain (SDID)
 used by a known organization and a domain used by others.
@@ -119,7 +127,7 @@ question for later stages of assessment.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_enabling_trust_assessments">2.2. Enabling Trust Assessments</h3>
+<h3 id="_enabling_trust_assessments">Enabling Trust Assessments</h3>
 <div class="paragraph">
 <p>A valid DKIM signature neither lowers nor raises the level of trust associated
 with the message, but it enables other mechanisms to be used for doing so.</p>
@@ -134,10 +142,10 @@ unchanged.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_establishing_message_validity">2.3. Establishing Message Validity</h3>
+<h3 id="_establishing_message_validity">Establishing Message Validity</h3>
 <div class="paragraph">
 <p>An interesting side effect of the cryptographic method used by DKIM is that it
-is possible to be certain that a signed message (or, if "l=" is used, the
+is possible to be certain that a signed message (or, if &#34;l=&#34; is used, the
 signed portion of a message) has not been modified between the time of signing
 and the time of verifying.
 If it has been changed in any way, then the message will not be verified
@@ -147,10 +155,10 @@ successfully with DKIM.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dkim_goals">3. DKIM Goals</h2>
+<h2 id="_dkim_goals">DKIM Goals</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_functional_goals">3.1. Functional Goals</h3>
+<h3 id="_functional_goals">Functional Goals</h3>
 <div class="paragraph">
 <p><strong>Use Domain-Level Granularity for Assurance</strong>.
 DKIM binds a signing key record to a Domain Name as the SDID.
@@ -161,7 +169,7 @@ reducing privacy concerns.</p>
 <div class="paragraph">
 <p><strong>Implementation Locality</strong>.
 Any party, anywhere along the transit path, can implement DKIM signing.
-Its use is not confined to particular systems, such as the author&#8217;s MUA or the
+Its use is not confined to particular systems, such as the author&#39;s MUA or the
 inbound boundary MTA, and there can be more than one signature per message.</p>
 </div>
 <div class="paragraph">
@@ -188,22 +196,22 @@ the anonymity of the user who authored it.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_operational_goals">3.2. Operational Goals</h3>
+<h3 id="_operational_goals">Operational Goals</h3>
 <div class="paragraph">
 <p><strong>Make Presence of Signature Transparent to Non-Supporting Recipients</strong>.
 Recipient that does not support DKIM still can read the message.</p>
 </div>
 <div class="paragraph">
 <p><strong>Treat Verification Failure the Same as No Signature Present</strong>.
-If verification of the message&#8217;s signature failed, the message will revert to
-normal handling, through the receiver&#8217;s existing filtering mechanisms.</p>
+If verification of the message&#39;s signature failed, the message will revert to
+normal handling, through the receiver&#39;s existing filtering mechanisms.</p>
 </div>
 <div class="paragraph">
 <p><strong>Permit Incremental Adoption for Incremental Benefit</strong>.
 DKIM allows pairwise sets of email providers and spam filtering companies to
 distinguish mail that is associated with a known organization, versus mail
 that might deceptively purport to have the affiliation.
-This in turn allows the development of "whitelist" schemes whereby
+This in turn allows the development of &#34;whitelist&#34; schemes whereby
 authenticated mail from a known source with good reputation is allowed to
 bypass some anti-abuse filters.</p>
 </div>
@@ -215,7 +223,7 @@ infrastructure that is needed across the open Internet.</p>
 </div>
 <div class="paragraph">
 <p><strong>Permit a Wide Range of Deployment Choices</strong>.
-DKIM can be deployed at a variety of places within an organization&#8217;s
+DKIM can be deployed at a variety of places within an organization&#39;s
 email service.
 This affords flexibility in terms of who administers its use, as well as what
 traffic carries a DKIM signature.</p>
@@ -224,46 +232,46 @@ traffic carries a DKIM signature.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dkim_function">4. DKIM Function</h2>
+<h2 id="_dkim_function">DKIM Function</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_basic_signing">4.1. Basic Signing</h3>
+<h3 id="_basic_signing">Basic Signing</h3>
 <div class="paragraph">
 <p>With the DKIM signature mechanism, a signer chooses an SDID, performs digital
 signing on the message, and adds the signature information using a DKIM header
 field.
-A verifier obtains the domain name and the "selector" from the DKIM header
+A verifier obtains the domain name and the &#34;selector&#34; from the DKIM header
 field, obtains the public key associated with the name, and verifies the
 signature.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_characteristics_of_a_dkim_signature">4.2. Characteristics of a DKIM Signature</h3>
+<h3 id="_characteristics_of_a_dkim_signature">Characteristics of a DKIM Signature</h3>
 <div class="paragraph">
 <p>A DKIM signature applies to the message body and selected header fields.
 The signer computes a hash of the selected header fields and another hash of
 the body.
 The signer then uses a private key to cryptographically encode this
 information, along with other signing parameters.
-Signature information is placed into "DKIM-Signature:", a new [RFC5322]
+Signature information is placed into &#34;DKIM-Signature:&#34;, a new [RFC5322]
 message header field.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_selector_construct">4.3. The Selector Construct</h3>
+<h3 id="_the_selector_construct">The Selector Construct</h3>
 <div class="paragraph">
 <p>A single SDID can have multiple signing keys and/or multiple potential
 signers.
 To support this, DKIM identifies a particular signature as using a combination
-of the SDID and an added field, called the "selector", specified in a separate
-"DKIM-Signature:" header field parameter.</p>
+of the SDID and an added field, called the &#34;selector&#34;, specified in a separate
+&#34;DKIM-Signature:&#34; header field parameter.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_verification">4.4. Verification</h3>
+<h3 id="_verification">Verification</h3>
 <div class="paragraph">
 <p>Message recipients can verify the signature by querying the DNS for the
-signer&#8217;s domain directly, to retrieve the appropriate public key, and thereby
+signer&#39;s domain directly, to retrieve the appropriate public key, and thereby
 confirm that the message was signed by a party in possession of the private
 key for the SDID.</p>
 </div>
@@ -273,7 +281,7 @@ Management Domain (ADMD) of the message recipient.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sub_domain_assessment">4.5. Sub-Domain Assessment</h3>
+<h3 id="_sub_domain_assessment">Sub-Domain Assessment</h3>
 <div class="paragraph">
 <p>To permit assessments that are independent, one method is for an organization
 to use different sub-domains as the SDID tag.</p>
@@ -282,7 +290,7 @@ to use different sub-domains as the SDID tag.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_service_architecture">5. Service Architecture</h2>
+<h2 id="_service_architecture">Service Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>DKIM uses external service components, such as for key retrieval and relaying
@@ -290,7 +298,7 @@ email.
 This specification defines an initial set, using DNS and SMTP, for basic
 interoperability.</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
 <pre>                                  |
                                   |- RFC5322 Message
@@ -353,14 +361,14 @@ was required.
 Verifying the signature uses public information from the Key Store.
 If the signature passes, reputation information is used to assess the signer
 and that information is passed to the message filtering system.
-If the signature fails or there is no signature using the author&#8217;s domain,
+If the signature fails or there is no signature using the author&#39;s domain,
 information about signing practices related to the author can be retrieved
 remotely and/or locally, and that information is passed to the message
 filtering system.</p>
 </div>
 <div class="paragraph">
 <p>Messages lacking a valid author signature can prompt a query for any
-published "signing practices" information, as an aid in determining whether
+published &#34;signing practices&#34; information, as an aid in determining whether
 the author information has been used without authorization.</p>
 </div>
 <div class="paragraph">
@@ -368,7 +376,7 @@ the author information has been used without authorization.</p>
 </div>
 <div class="paragraph">
 <p>A popular use of reputation information is as input to a Filtering Engine that
-decides whether to deliver&#8201;&#8212;&#8201;and possibly whether to specially mark&#8201;&#8212;&#8201;a
+decides whether to deliver -- and possibly whether to specially mark -- a
 message.</p>
 </div>
 <div class="paragraph">
@@ -395,7 +403,7 @@ keys.</p>
 </div>
 <div class="paragraph">
 <p>If a message contains a valid signature, then the verifier can evaluate the
-associated domain name&#8217;s reputation, in order to determine appropriate
+associated domain name&#39;s reputation, in order to determine appropriate
 delivery or display options for that message.</p>
 </div>
 <div class="paragraph">
@@ -420,11 +428,16 @@ to the evaluating site and is strictly a matter of local policy.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

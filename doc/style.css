@@ -1,13 +1,10 @@
 body {
 	margin: 0;
-	font-family: sans-serif;
+	font-family: Arial, sans-serif;
 	background-color: #fff;
 	line-height: 1.3;
-	color: black;
-}
-a {
-	text-decoration: none;
-	color: #375eab;
+	text-align: center;
+	color: #222;
 }
 pre,
 code {
@@ -21,15 +18,20 @@ pre {
 	padding: 0.625rem;
 	border-radius: 0.3125rem;
 }
+a {
+	color: #375eab;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
 p,
 li {
 	max-width: 50rem;
 	word-wrap: break-word;
 }
-p,
-pre,
-ul,
-ol {
+pre {
 	margin: 1.25rem;
 }
 
@@ -117,6 +119,7 @@ dd {
 }
 .topbar .top-heading a {
 	color: #222;
+	text-decoration: none;
 }
 
 .topbar .menu {
@@ -130,17 +133,31 @@ dd {
 	border: 0.0625rem solid #375eab;
 	border-radius: 5px;
 }
+.page {
+	width: 100%;
+}
+
+.page > .container,
+.topbar > .container {
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0 1.25rem;
+}
+
+.footer {
+	text-align: center;
+	color: #666;
+	font-size: 0.875rem;
+	margin: 2.5rem 0;
+}
 
 /** Custom classes for asciidoc */
-.article {
-	padding: 0px 1.25em;
-}
 #toctitle {
 	display: none;
 }
 #toc {
-	margin: 0px;
-	padding: 0px;
+	font-size: 14px;
 }
 #toc li {
 	list-style: none;
@@ -151,34 +168,6 @@ dd {
 }
 #toc ul .sectlevel2 {
 	margin: 4px;
-}
-
-h1 a.anchor,
-h2 a.anchor,
-h3 a.anchor,
-h4 a.anchor,
-h5 a.anchor,
-h6 a.anchor {
-	visibility: hidden;
-	color: #375eab;
-}
-
-h1 a.anchor:before,
-h2 a.anchor:before,
-h3 a.anchor:before,
-h4 a.anchor:before,
-h5 a.anchor:before,
-h6 a.anchor:before {
-	content: "¶ ";
-}
-
-h1:hover > a.anchor,
-h2:hover > a.anchor,
-h3:hover > a.anchor,
-h4:hover > a.anchor,
-h5:hover > a.anchor,
-h6:hover > a.anchor {
-	visibility: visible;
 }
 
 @media screen and (max-width: 992px) {

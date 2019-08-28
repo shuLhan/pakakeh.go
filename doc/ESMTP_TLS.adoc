@@ -1,7 +1,7 @@
 = SMTP Service Extension for Secure SMTP over Transport Layer Security
 :author: Shulhan
 :email: <ms@kilabit.info>
-:toc: left
+:toc:
 :toclevels: 4
 :sectnums:
 :stylesheet: style.css

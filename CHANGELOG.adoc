@@ -1,8 +1,8 @@
 =  CHANGELOG
+:stylesheet: doc/style.css
 :toc:
 
-This library is released each month, either at the end of month or at the
-first week of next month.
+This library is released each month, usually at the first week of month.
 
 
 ==  share v0.8.1 (2019-08-05)

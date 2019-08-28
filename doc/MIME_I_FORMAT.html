@@ -1,39 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>MIME Part One: Format of Internet Message Bodies</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article">
-<div id="header">
-<h1>MIME Part One: Format of Internet Message Bodies</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>MIME Part One: Format of Internet Message Bodies</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>MIME Part One: Format of Internet Message Bodies</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_mime_header_fields">1. MIME Header Fields</a></li>
-<li><a href="#_mime_version_header_field">2. MIME Version Header Field</a></li>
-<li><a href="#_content_type_header_field">3. Content-Type Header Field</a></li>
-<li><a href="#_content_transfer_encoding_header_field">4. Content-Transfer-Encoding Header Field</a>
+<li><a href="#_mime_header_fields">MIME Header Fields</a></li>
+<li><a href="#_mime_version_header_field">MIME Version Header Field</a></li>
+<li><a href="#_content_type_header_field">Content-Type Header Field</a></li>
+<li><a href="#_content_transfer_encoding_header_field">Content-Transfer-Encoding Header Field</a>
 <ul class="sectlevel2">
-<li><a href="#_quoted_printable_content_transfer_encoding">4.1. Quoted-Printable Content-Transfer-Encoding</a></li>
-<li><a href="#_base64_content_transfer_encoding">4.2. Base64 Content-Transfer-Encoding</a></li>
+<li><a href="#_quoted_printable_content_transfer_encoding">Quoted-Printable Content-Transfer-Encoding</a></li>
+<li><a href="#_base64_content_transfer_encoding">Base64 Content-Transfer-Encoding</a></li>
 </ul>
 </li>
-<li><a href="#_content_id_header_field">5. Content-ID Header Field</a></li>
-<li><a href="#_content_description_header_field">6. Content-Description Header Field</a></li>
+<li><a href="#_content_id_header_field">Content-ID Header Field</a></li>
+<li><a href="#_content_description_header_field">Content-Description Header Field</a></li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -43,7 +51,7 @@ Extensions (MIME) Part One: Format of Internet Message Bodies.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mime_header_fields">1. MIME Header Fields</h2>
+<h2 id="_mime_header_fields">MIME Header Fields</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>MIME header fields can occur in message header (RFC 5322) or in a MIME body
@@ -68,7 +76,7 @@ entity-headers       := [ content CRLF ]
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mime_version_header_field">2. MIME Version Header Field</h2>
+<h2 id="_mime_version_header_field">MIME Version Header Field</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -78,26 +86,26 @@ entity-headers       := [ content CRLF ]
 <div class="ulist">
 <ul>
 <li>
-<p>Valid value is "1.0".</p>
+<p>Valid value is &#34;1.0&#34;.</p>
 </li>
 <li>
 <p>Comment strings that are present MUST be ignored.</p>
 </li>
 <li>
 <p>MIME-Version header field is required at the top level of a message.  It is
-not required for each body part of a multipart entity.</p>
+   not required for each body part of a multipart entity.</p>
 </li>
 <li>
 <p>In the absence of a MIME-Version field, a receiving mail user agent
-MAY optionally choose to interpret the body of the message according to
-local conventions.</p>
+   MAY optionally choose to interpret the body of the message according to
+   local conventions.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_content_type_header_field">3. Content-Type Header Field</h2>
+<h2 id="_content_type_header_field">Content-Type Header Field</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -112,17 +120,17 @@ composite-type  := "message" / "multipart" / extension-token
 
 extension-token := ietf-token / x-token
 
-ietf-token      := &lt;An extension token defined by a standards-track RFC and
-                   registered with IANA.&gt;
+ietf-token      := <An extension token defined by a standards-track RFC and
+                   registered with IANA.>
 
-x-token         := &lt;The two characters "X-" or "x-" followed, with
-                   no intervening white space, by any token&gt;
+x-token         := <The two characters "X-" or "x-" followed, with
+                   no intervening white space, by any token>
 
 subtype         := extension-token / iana-token
 
-iana-token      := &lt;A publicly-defined extension token. Tokens
+iana-token      := <A publicly-defined extension token. Tokens
                     of this form must be registered with IANA
-                    as specified in RFC 2048.&gt;
+                    as specified in RFC 2048.>
 
 parameter       := attribute "=" value
 
@@ -130,10 +138,10 @@ attribute       := token
 
 value           := token / quoted-string
 
-token           := 1*&lt;any (US-ASCII) CHAR except SPACE, CTLs, or tspecials&gt;
+token           := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
 
-tspecials       :=  "(" / ")" / "&lt;" / "&gt;" / "@" /
-                    "," / ";" / ":" / "\" / &lt;"&gt;
+tspecials       :=  "(" / ")" / "<" / ">" / "@" /
+                    "," / ";" / ":" / "\" / <">
                     "/" / "[" / "]" / "?" / "="</pre>
 </div>
 </div>
@@ -141,12 +149,16 @@ tspecials       :=  "(" / ")" / "&lt;" / "&gt;" / "@" /
 <ul>
 <li>
 <p>Default value,</p>
+</li>
+</ul>
+</div>
 <div class="literalblock">
 <div class="content">
-<pre>Content-type: text/plain; charset=us-ascii</pre>
+<pre>	Content-type: text/plain; charset=us-ascii</pre>
 </div>
 </div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>Content-Type field is to describe the data contained in the body.</p>
 </li>
@@ -164,26 +176,26 @@ tspecials       :=  "(" / ")" / "&lt;" / "&gt;" / "@" /
 </li>
 <li>
 <p>Parameters may be required by their defining content type or subtype or
-they may be optional.</p>
+   they may be optional.</p>
 </li>
 <li>
 <p>Special character MUST be in quoted-string, to use within parameter
-values.
-The quotation marks itself is not part of value.</p>
+   values.
+   The quotation marks itself is not part of value.</p>
 </li>
 <li>
 <p>Value may be case insensitive, depends on attribute name.</p>
 </li>
 <li>
 <p>Implementations MUST ignore any parameters whose names they do not
-recognize.</p>
+   recognize.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_content_transfer_encoding_header_field">4. Content-Transfer-Encoding Header Field</h2>
+<h2 id="_content_transfer_encoding_header_field">Content-Transfer-Encoding Header Field</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -197,71 +209,71 @@ mechanism := "7bit" / "8bit" / "binary" /
 <div class="ulist">
 <ul>
 <li>
-<p>Default value is "7bit"</p>
+<p>Default value is &#34;7bit&#34;</p>
 </li>
 <li>
 <p>This value is case insensitive</p>
 </li>
 <li>
-<p>Values "7bit", "8bit", and "binary" all mean that the identity (i.e. NO)
-encoding transformation has been performed.</p>
+<p>Values &#34;7bit&#34;, &#34;8bit&#34;, and &#34;binary&#34; all mean that the identity (i.e. NO)
+   encoding transformation has been performed.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>"7bit" data refers to octets with decimal values greater than 127
-are not allowed and neither are NULs (octet with decimal value 0).
-CR (decimal value 13) and LF (decimal value 10) octets only occur as
-part of CRLF line separation sequences.</p>
+<p>&#34;7bit&#34; data refers to octets with decimal values greater than 127
+    are not allowed and neither are NULs (octet with decimal value 0).
+    CR (decimal value 13) and LF (decimal value 10) octets only occur as
+    part of CRLF line separation sequences.</p>
 </li>
 <li>
-<p>"8bit" data allow octets with decimal values greater than 127.
-CR and LF octets only occur as part of CRLF line separation sequences and
-no NULs are allowed.</p>
+<p>&#34;8bit&#34; data allow octets with decimal values greater than 127.
+    CR and LF octets only occur as part of CRLF line separation sequences and
+    no NULs are allowed.</p>
 </li>
 <li>
-<p>"Binary data" refers to data where any sequence of octets whatsoever
-is allowed.</p>
+<p>&#34;Binary data&#34; refers to data where any sequence of octets whatsoever
+    is allowed.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
 <p>The proper Content-Transfer-Encoding label MUST always be used.
-Labelling unencoded data containing 8bit characters as "7bit" is not
-allowed, nor is labelling unencoded non-line-oriented data as anything
-other than "binary" allowed.</p>
+   Labelling unencoded data containing 8bit characters as &#34;7bit&#34; is not
+   allowed, nor is labelling unencoded non-line-oriented data as anything
+   other than &#34;binary&#34; allowed.</p>
 </li>
 <li>
 <p>Mail transport for unencoded 8bit data is defined in RFC 6152.</p>
 </li>
 <li>
-<p>Private values, MUST use an x-token, e.g. "Content-Type-Encoding: x-new".</p>
+<p>Private values, MUST use an x-token, e.g. &#34;Content-Type-Encoding: x-new&#34;.</p>
 </li>
 <li>
 <p>If the header field appears as part of a message header, it applies to the
-entire body of that message.
-If the header field appears as part of an entity&#8217;s headers, it applies only
-to the body of that entity.</p>
+   entire body of that message.
+   If the header field appears as part of an entity&#39;s headers, it applies only
+   to the body of that entity.</p>
 </li>
 <li>
-<p>It is EXPRESSLY FORBIDDEN to use any encodings other than "7bit", "8bit",
-or "binary" with any composite media type.
-Composite media types are "multipart" and "message".</p>
+<p>It is EXPRESSLY FORBIDDEN to use any encodings other than &#34;7bit&#34;, &#34;8bit&#34;,
+   or &#34;binary&#34; with any composite media type.
+   Composite media types are &#34;multipart&#34; and &#34;message&#34;.</p>
 </li>
 <li>
 <p>Any entity with an unrecognized Content-Transfer-Encoding MUST be
-treated as "application/octet-stream", regardless of what the Content-Type
-header field actually says.</p>
+   treated as &#34;application/octet-stream&#34;, regardless of what the Content-Type
+   header field actually says.</p>
 </li>
 <li>
 <p>When converting from quoted-printable to base64, a hard line break in the
-quoted-printable form represents a CRLF sequence in the canonical form of
-the data.
-It MUST therefore be converted to a corresponding encoded CRLF in the
-base64 form of the data.
-Similarly, a CRLF sequence in the canonical form of the data obtained after
-base64 decoding MUST be converted to a quoted-printable hard line break,
-but ONLY when converting text data.</p>
+   quoted-printable form represents a CRLF sequence in the canonical form of
+   the data.
+   It MUST therefore be converted to a corresponding encoded CRLF in the
+   base64 form of the data.
+   Similarly, a CRLF sequence in the canonical form of the data obtained after
+   base64 decoding MUST be converted to a quoted-printable hard line break,
+   but ONLY when converting text data.</p>
 </li>
 <li>
 <p>A canonical model for encoding is presented in RFC 2049.</p>
@@ -269,7 +281,7 @@ but ONLY when converting text data.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_quoted_printable_content_transfer_encoding">4.1. Quoted-Printable Content-Transfer-Encoding</h3>
+<h3 id="_quoted_printable_content_transfer_encoding">Quoted-Printable Content-Transfer-Encoding</h3>
 <div class="literalblock">
 <div class="content">
 <pre>quoted-printable := qp-line *(CRLF qp-line)
@@ -288,13 +300,13 @@ qp-section       := [*(ptext / SPACE / TAB) ptext]
 ptext            := hex-octet / safe-char
 
 hex-octet        := "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
-                  ; Octet must be used for characters &gt; 127, =,
+                  ; Octet must be used for characters > 127, =,
                   ; SPACEs or TABs at the ends of lines, and is
                   ; recommended for any character not listed in
                   ; RFC 2049 as "mail-safe".
 
-safe-char        := &lt;any octet with decimal value of 33 through
-                     60 inclusive, and 62 through 126&gt;
+safe-char        := <any octet with decimal value of 33 through
+                     60 inclusive, and 62 through 126>
                   ; Characters not listed as "mail-safe" in
                   ; RFC 2049 are also not recommended.
 
@@ -312,65 +324,69 @@ rules:</p>
 <ol class="arabic">
 <li>
 <p>(General 8bit representation) Any octet, except a CRLF line break of the
-canonical (standard) form of the data being encoded, may be represented by
-an "=" followed by a two digit hexadecimal representation of the octet&#8217;s
-value.
-Uppercase letters MUST be used.
-A way to get reasonably reliable transport through EBCDIC gateways is to
-also quote the US-ASCII characters</p>
+   canonical (standard) form of the data being encoded, may be represented by
+   an &#34;=&#34; followed by a two digit hexadecimal representation of the octet&#39;s
+   value.
+   Uppercase letters MUST be used.
+   A way to get reasonably reliable transport through EBCDIC gateways is to
+   also quote the US-ASCII characters</p>
+</li>
+</ol>
+</div>
 <div class="literalblock">
 <div class="content">
 <pre>!"#$@[\]^`{|}~</pre>
 </div>
 </div>
-</li>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
 <p>(Literal representation) Octets with decimal values of 33 through 60
-inclusive, and 62 through 126, inclusive, MAY be represented as the
-US-ASCII characters.</p>
+   inclusive, and 62 through 126, inclusive, MAY be represented as the
+   US-ASCII characters.</p>
 </li>
 <li>
 <p>(White Space) Octets with values of 9 and 32 MAY be represented as US-ASCII
-TAB (HT) and SPACE characters, but MUST NOT be so represented at the end
-of an encoded line.</p>
+   TAB (HT) and SPACE characters, but MUST NOT be so represented at the end
+   of an encoded line.</p>
 <div class="ulist">
 <ul>
 <li>
 <p>Any TAB (HT) or SPACE characters on an encoded line MUST thus be
-followed on that line by a printable character.</p>
+      followed on that line by a printable character.</p>
 </li>
 <li>
-<p>An "=" at the end of an encoded line, indicating a soft line break
-(see rule #5) may follow one or more TAB (HT) or SPACE characters.</p>
+<p>An &#34;=&#34; at the end of an encoded line, indicating a soft line break
+      (see rule #5) may follow one or more TAB (HT) or SPACE characters.</p>
 </li>
 <li>
 <p>When decoding a Quoted-Printable body, any trailing white space on a
-line MUST be deleted</p>
+      line MUST be deleted</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
 <p>(Line Breaks) A line break in a text body, represented as a CRLF sequence
-in the text canonical form, MUST be represented by a (RFC 822) line break.
-A CR or LF in binary data should be encoded as "=0D" and "=0A".</p>
+   in the text canonical form, MUST be represented by a (RFC 822) line break.
+   A CR or LF in binary data should be encoded as &#34;=0D&#34; and &#34;=0A&#34;.</p>
 </li>
 <li>
 <p>(Soft Line Breaks) The Quoted-Printable encoding REQUIRES that encoded
-lines be no more than 76 characters long.
-If longer lines are to be encoded with the Quoted-Printable encoding,
-"soft" line breaks MUST be used.
-An equal sign as the last character on a encoded line indicates such a
-non-significant ("soft") line break in the encoded text.</p>
+   lines be no more than 76 characters long.
+   If longer lines are to be encoded with the Quoted-Printable encoding,
+   &#34;soft&#34; line breaks MUST be used.
+   An equal sign as the last character on a encoded line indicates such a
+   non-significant (&#34;soft&#34;) line break in the encoded text.</p>
 <div class="ulist">
 <ul>
 <li>
 <p>The 76 character limit does not count the trailing CRLF, but counts all
-other characters, including any equal signs.</p>
+      other characters, including any equal signs.</p>
 </li>
 <li>
 <p>A good strategy is to choose a boundary that includes a character sequence
-such as "=_" which can never appear in a quoted-printable body.</p>
+   such as &#34;=_&#34; which can never appear in a quoted-printable body.</p>
 </li>
 </ul>
 </div>
@@ -386,44 +402,44 @@ Such cases are,</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>An "=" followed by two hexadecimal digits, one or both of which are
-lowercase letters in "abcdef", is formally illegal.
-A robust implementation might choose to recognize them as the corresponding
-uppercase letters.</p>
+<p>An &#34;=&#34; followed by two hexadecimal digits, one or both of which are
+   lowercase letters in &#34;abcdef&#34;, is formally illegal.
+   A robust implementation might choose to recognize them as the corresponding
+   uppercase letters.</p>
 </li>
 <li>
-<p>An "=" followed by a character that is neither a hexadecimal digit
-(including "abcdef") nor the CR character of a CRLF pair is illegal.
-A reasonable approach by a robust implementation might be to include the
-"=" character and the following character in the decoded data without any
-transformation and, if possible, indicate to the user that proper decoding
-was not possible at this point in the data.</p>
+<p>An &#34;=&#34; followed by a character that is neither a hexadecimal digit
+   (including &#34;abcdef&#34;) nor the CR character of a CRLF pair is illegal.
+   A reasonable approach by a robust implementation might be to include the
+   &#34;=&#34; character and the following character in the decoded data without any
+   transformation and, if possible, indicate to the user that proper decoding
+   was not possible at this point in the data.</p>
 </li>
 <li>
-<p>An "=" cannot be the ultimate or penultimate character in an encoded
-object.</p>
+<p>An &#34;=&#34; cannot be the ultimate or penultimate character in an encoded
+   object.</p>
 </li>
 <li>
 <p>Control characters other than TAB, or CR and LF as parts of CRLF pairs,
-MUST not appear.
-The same is true for octets with decimal values greater than 126.
-If decoder found it, a robust implementation might exclude them from the
-decoded data and warn the user that illegal characters were discovered.</p>
+   MUST not appear.
+   The same is true for octets with decimal values greater than 126.
+   If decoder found it, a robust implementation might exclude them from the
+   decoded data and warn the user that illegal characters were discovered.</p>
 </li>
 <li>
 <p>If longer lines are found in encoded data, a robust implementation might
-nevertheless decode the lines, and might report the erroneous encoding to
-the user</p>
+   nevertheless decode the lines, and might report the erroneous encoding to
+   the user</p>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_base64_content_transfer_encoding">4.2. Base64 Content-Transfer-Encoding</h3>
+<h3 id="_base64_content_transfer_encoding">Base64 Content-Transfer-Encoding</h3>
 <div class="paragraph">
 <p>A 65-character subset of US-ASCII is used, enabling 6 bits to be represented
 per printable character.
-(The extra 65th character, "=", is used to signify a special processing
+(The extra 65th character, &#34;=&#34;, is used to signify a special processing
  function.)</p>
 </div>
 <div class="literalblock">
@@ -457,36 +473,36 @@ per printable character.
 <ol class="arabic">
 <li>
 <p>Text line breaks MUST be converted into CRLF sequences prior to base64
-encoding.</p>
+   encoding.</p>
 </li>
 <li>
 <p>The encoding process represents 24-bit groups of input bits as output
-strings of 4 encoded characters.</p>
+   strings of 4 encoded characters.</p>
 </li>
 <li>
 <p>Proceeding from left to right, a 24-bit input group is formed by
-concatenating 3 8bit input groups.</p>
+   concatenating 3 8bit input groups.</p>
 </li>
 <li>
 <p>These 24 bits are then treated as 4 concatenated 6-bit groups, each
-of which is translated into a single digit in the base64 alphabet.
-The following cases can arise:</p>
+   of which is translated into a single digit in the base64 alphabet.
+   The following cases can arise:</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
 <p>The final quantum of encoding input is an integral multiple of 24 bits;
-here, the final unit of encoded output will be an integral multiple of 4
-characters with no "=" padding</p>
+    here, the final unit of encoded output will be an integral multiple of 4
+    characters with no &#34;=&#34; padding</p>
 </li>
 <li>
 <p>The final quantum of encoding input is exactly 8 bits; here, the final
-unit of encoded output will be two characters followed by two "="
-padding characters</p>
+    unit of encoded output will be two characters followed by two &#34;=&#34;
+    padding characters</p>
 </li>
 <li>
 <p>The final quantum of encoding input is exactly 16 bits; here, the final
-unit of encoded output will be three characters followed by one "="
-padding character.</p>
+    unit of encoded output will be three characters followed by one &#34;=&#34;
+    padding character.</p>
 </li>
 </ol>
 </div>
@@ -500,16 +516,16 @@ padding character.</p>
 <ul>
 <li>
 <p>When encoding a bit stream via the base64 encoding, the bit stream
-MUST be presumed to be ordered with the most-significant-bit first.</p>
+   MUST be presumed to be ordered with the most-significant-bit first.</p>
 </li>
 <li>
 <p>The encoded output stream MUST be represented in lines of no more
-than 76 characters each.</p>
+   than 76 characters each.</p>
 </li>
 <li>
 <p>Other characters not found in Table 1 MUST be ignored by decoding software.
-This probably indicate a transmission error, about which a warning message
-or even a message rejection might be appropriate under some circumstances.</p>
+   This probably indicate a transmission error, about which a warning message
+   or even a message rejection might be appropriate under some circumstances.</p>
 </li>
 </ul>
 </div>
@@ -517,7 +533,7 @@ or even a message rejection might be appropriate under some circumstances.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_content_id_header_field">5. Content-ID Header Field</h2>
+<h2 id="_content_id_header_field">Content-ID Header Field</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -530,30 +546,30 @@ or even a message rejection might be appropriate under some circumstances.</p>
 <p>The Content-ID field allow one body to make reference to another.</p>
 </li>
 <li>
-<p>Its syntactically identical to the "Message-ID" header field</p>
+<p>Its syntactically identical to the &#34;Message-ID&#34; header field</p>
 </li>
 <li>
 <p>Content-ID values MUST be generated to be world-unique.</p>
 </li>
 <li>
 <p>The Content-ID value may be used for uniquely identifying MIME entities in
-several contexts, particularly for caching data referenced by the
-message/external-body mechanism.</p>
+   several contexts, particularly for caching data referenced by the
+   message/external-body mechanism.</p>
 </li>
 <li>
 <p>Its use is MANDATORY in implementations which generate data of the optional
-MIME media type "message/external-body".</p>
+   MIME media type &#34;message/external-body&#34;.</p>
 </li>
 <li>
 <p>The Content-ID value has special semantics in the case of the
-multipart/alternative media type (see RFC 2046).</p>
+   multipart/alternative media type (see RFC 2046).</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_content_description_header_field">6. Content-Description Header Field</h2>
+<h2 id="_content_description_header_field">Content-Description Header Field</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -569,11 +585,16 @@ multipart/alternative media type (see RFC 2046).</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

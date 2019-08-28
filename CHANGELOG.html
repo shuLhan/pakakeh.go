@@ -1,18 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<title>CHANGELOG</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
-<link rel="stylesheet" href="./asciidoctor.css">
-</head>
-<body class="article">
-<div id="header">
-<h1>CHANGELOG</h1>
-<div id="toc" class="toc">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>CHANGELOG</title>
+		<link rel="stylesheet" href="doc/style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>CHANGELOG</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_share_v0_8_1_2019_08_05">share v0.8.1 (2019-08-05)</a>
@@ -73,13 +87,10 @@
 <li><a href="#_share_v0_1_0_2018_11_29">share v0.1.0 (2018-11-29)</a></li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This library is released each month, either at the end of month or at the
-first week of next month.</p>
+<p>This library is released each month, usually at the first week of month.</p>
 </div>
 </div>
 </div>
@@ -99,15 +110,13 @@ first week of next month.</p>
 <li>
 <p>lib/memfs: add method to encode the content of file.</p>
 <div class="paragraph">
-<p>The ContentEncode() method encode each node&#8217;s content into specific
+<p>The ContentEncode() method encode each node&#39;s content into specific
 encoding, in other words this method can be used to compress the content
-of file in memory before being served or written.</p>
-</div>
-<div class="paragraph">
-<p>Only file with size greater than 0 will be encoded.</p>
-</div>
-<div class="paragraph">
-<p>List of known encoding is "gzip".</p>
+of file in memory before being served or written.
+&#43;
+Only file with size greater than 0 will be encoded.
+&#43;
+List of known encoding is &#34;gzip&#34;.</p>
 </div>
 </li>
 <li>
@@ -134,7 +143,7 @@ file, we want that file to be excluded from .go static source.</p>
 <ul>
 <li>
 <p>All ASCII related contants and functions now being moved from <code>bytes</code>
-package to <code>ascii</code> package.</p>
+   package to <code>ascii</code> package.</p>
 </li>
 </ul>
 </div>
@@ -214,7 +223,7 @@ simple API.</p>
 <p>doc: regenerate to use new style</p>
 </li>
 <li>
-<p>http: print the not-found path on Server&#8217;s getFSNode()</p>
+<p>http: print the not-found path on Server&#39;s getFSNode()</p>
 </li>
 <li>
 <p>ini: add method Vars that return all variables as map</p>
@@ -330,7 +339,7 @@ removing the server handler.</p>
 <p>rename Send to Write, and change the parameter type to slice of byte</p>
 </li>
 <li>
-<p>remove "elapsed" parameter on Message.IsExpired()</p>
+<p>remove &#34;elapsed&#34; parameter on Message.IsExpired()</p>
 </li>
 <li>
 <p>unexport the Request type</p>
@@ -342,7 +351,7 @@ removing the server handler.</p>
 <p>unexport connection type</p>
 </li>
 <li>
-<p>remove unused address parameter on client&#8217;s Query()</p>
+<p>remove unused address parameter on client&#39;s Query()</p>
 </li>
 <li>
 <p>unexport all fields from UDP and TCP clients</p>
@@ -567,7 +576,7 @@ server and client API to make it easy and extensible.  The websocket is now
 <ul>
 <li>
 <p>Rewrite most of client and server APIs to be more simple and pass autobahn
-testsuite</p>
+    testsuite</p>
 </li>
 <li>
 <p>Minimize global variables and unexport internal constants and functions</p>
@@ -598,7 +607,7 @@ testsuite</p>
 </li>
 <li>
 <p><code>email/dkim</code>: new package for parsing and creating DKIM signature
-(RFC 6376)</p>
+   (RFC 6376)</p>
 </li>
 <li>
 <p><code>email/maildir</code>: new package to manage email using maildir format</p>
@@ -656,7 +665,7 @@ testsuite</p>
 <div class="ulist">
 <ul>
 <li>
-<p>add the charset type to content-type "text/plain"</p>
+<p>add the charset type to content-type &#34;text/plain&#34;</p>
 </li>
 <li>
 <p>listen and serve using TLS if TLSConfig is defined</p>
@@ -751,7 +760,7 @@ testsuite</p>
 <div class="ulist">
 <ul>
 <li>
-<p>all: fix the usage of "iota"</p>
+<p>all: fix the usage of &#34;iota&#34;</p>
 </li>
 <li>
 <p><code>dns</code>: fix creating new UDP/TCP client without port number</p>
@@ -877,7 +886,7 @@ and several libraries.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>https://godoc.org/github.com/shuLhan/share</pre>
+<pre>	https://godoc.org/github.com/shuLhan/share</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -885,11 +894,16 @@ and several libraries.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-08-05 12:52:47 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>

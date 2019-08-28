@@ -1,7 +1,7 @@
 = Simple Mail Transfer Protocol (SMTP)
 :author: Shulhan
 :email: <ms@kilabit.info>
-:toc: left
+:toc:
 :toclevels: 4
 :sectnums:
 :stylesheet: style.css

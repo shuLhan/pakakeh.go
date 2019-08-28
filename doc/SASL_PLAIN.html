@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.9">
-<meta name="author" content="Shulhan">
-<title>The PLAIN Simple Authentication and Security Layer (SASL) Mechanism</title>
-<link rel="stylesheet" href="./style.css">
-</head>
-<body class="article">
-<div id="header">
-<h1>The PLAIN Simple Authentication and Security Layer (SASL) Mechanism</h1>
-<div class="details">
-<span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email">&lt;<a href="mailto:ms@kilabit.info">ms@kilabit.info</a>&gt;</span><br>
-</div>
-<div id="toc" class="toc">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#375EAB" />
+
+		<title>The PLAIN Simple Authentication and Security Layer (SASL) Mechanism</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="topbar">
+			<div class="container">
+				<div class="top-heading">
+					<a href="/">github.com/shuLhan/share</a>
+				</div>
+				<div class="menu">
+					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
+				</div>
+				<div class="menu">
+					<a href="/CHANGELOG.html">Changelog</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="page">
+			<div class="container">
+				<h1>The PLAIN Simple Authentication and Security Layer (SASL) Mechanism</h1>
+				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a></li>
-<li><a href="#_mechanism">2. Mechanism</a></li>
-<li><a href="#_security_considerations">3. Security Considerations</a></li>
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_mechanism">Mechanism</a></li>
+<li><a href="#_security_considerations">Security Considerations</a></li>
 </ul>
 </div>
-</div>
-<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -35,10 +43,10 @@ Authentication and Security Layer (SASL) Mechanism.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">1. Introduction</h2>
+<h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The name associated with this mechanism is "PLAIN".</p>
+<p>The name associated with this mechanism is &#34;PLAIN&#34;.</p>
 </div>
 <div class="paragraph">
 <p>The PLAIN mechanism does not provide a security layer.</p>
@@ -46,7 +54,7 @@ Authentication and Security Layer (SASL) Mechanism.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mechanism">2. Mechanism</h2>
+<h2 id="_mechanism">Mechanism</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The mechanism consists of a single message, a string of [UTF-8] encoded
@@ -74,7 +82,7 @@ UTF0      = %x80-BF</pre>
 </div>
 <div class="paragraph">
 <p>The form of the authorization identity (authzid) production is specific to the
-application-level protocol&#8217;s.
+application-level protocol&#39;s.
 The authentication identity (authcid) and password productions are form-free.
 Use of non-visible characters or characters that a user may be unable to
 enter on some keyboards is discouraged.</p>
@@ -82,7 +90,7 @@ enter on some keyboards is discouraged.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_security_considerations">3. Security Considerations</h2>
+<h2 id="_security_considerations">Security Considerations</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>By default, implementations SHOULD NOT advertise and SHOULD NOT make use of
@@ -91,15 +99,20 @@ generally through use of Transport Layer Security (TLS) service.</p>
 </div>
 <div class="paragraph">
 <p>Clients are encouraged to have an operational mode where all mechanisms that
-are likely to reveal the user&#8217;s password to the server are disabled.</p>
+are likely to reveal the user&#39;s password to the server are disabled.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2019-05-18 01:23:21 +0700
-</div>
-</div>
-</body>
+			</div>
+			
+		</div>
+		
+
+		<div class="footer">
+			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
+			<br />
+			Use of this source code is governed by a BSD-style license that can be
+			found in the <a href="/LICENSE">LICENSE</a> file.
+		</div>
+	</body>
 </html>
