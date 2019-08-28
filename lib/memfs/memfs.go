@@ -371,7 +371,8 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 
 	child, err = NewNode(parent, fi, mfs.withContent)
 	if err != nil {
-		return nil, err
+		log.Printf("memfs: AddChild %s: %s", fi.Name(), err.Error())
+		return nil, nil
 	}
 
 	child.SysPath = sysPath
