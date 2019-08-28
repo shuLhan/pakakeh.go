@@ -60,7 +60,8 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 
 	node, err := memfs.NewNode(nil, fi, false)
 	if err != nil {
-		return nil, fmt.Errorf("lib/io: NewWatcher: " + err.Error())
+		log.Printf("lib/io: NewWatcher %s: %s", fi.Name(), err.Error())
+		return nil, nil
 	}
 
 	if d < 100*time.Millisecond {
