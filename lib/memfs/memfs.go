@@ -66,16 +66,18 @@ type MemFS struct {
 // excludes does not have any effect, since the content of path and nodes will
 // be overwritten by GeneratedPathNode.
 //
-func New(includes, excludes []string, withContent bool) (*MemFS, error) {
-	if !Development && GeneratedPathNode != nil {
-		mfs := &MemFS{
-			pn:   GeneratedPathNode,
-			root: GeneratedPathNode.Get("/"),
+func New(includes, excludes []string, withContent bool) (mfs *MemFS, err error) {
+	if GeneratedPathNode != nil {
+		if !Development {
+			mfs = &MemFS{
+				pn:   GeneratedPathNode,
+				root: GeneratedPathNode.Get("/"),
+			}
+			return mfs, nil
 		}
-		return mfs, nil
 	}
 
-	mfs := &MemFS{
+	mfs = &MemFS{
 		pn: &PathNode{
 			v: make(map[string]*Node),
 			f: nil,
@@ -227,8 +229,10 @@ func (mfs *MemFS) Mount(dir string) error {
 	if len(dir) == 0 {
 		return nil
 	}
-	if !Development && GeneratedPathNode != nil {
-		return nil
+	if GeneratedPathNode != nil {
+		if !Development {
+			return nil
+		}
 	}
 
 	if mfs.pn == nil {
