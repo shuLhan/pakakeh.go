@@ -5,6 +5,41 @@
 This library is released each month, usually at the first week of month.
 
 
+==  share v0.8.2 (2019-09-05)
+
+===  Enhancements
+
+*  http: make the request body always available even after ParseForm()
++
+Previously, if the request type is query, form, or JSON, we call the
+ParseForm() to let the http.Request read the Body POST form data and fill
+the Form and/or PostForm fields.  This  method will cause the request
+Body will become empty since its already read and closed.
+One of use case of POST with form data is to check the integrity of POST
+body using checksum, which is not possible using only ParseForm().
+This commit read all the body first into reqBody and recreate the request
+Body back using ioutil.NopCloser and bytes.Buffer.
+
+*  all: replace document generator from asciidoctor to ciigo
++
+Previously, generating HTML files from asciidoc files require installing
+ruby, asciidoctor, and its dependency through Gemfile.
+To simplify this, we replace it with ciigo.  Ciigo not only can convert
+the asciidoc files but it also support serving the file inside HTTP
+server and watching changes on asciidoc files during development for
+local previewing.
+
+*  memfs: log and ignore error from NewNode
++
+An error for calling NewNode should not stop processing all files
+in directory.
+
+*  io: log and ignore error from NewNode
++
+An error for calling NewNode should not stop processing all files
+in directory.
+
+
 ==  share v0.8.1 (2019-08-05)
 
 ===  Enhancements
@@ -18,9 +53,7 @@ The format to marshal/unmarshal ini stream is behave like JSON.
 The ContentEncode() method encode each node's content into specific
 encoding, in other words this method can be used to compress the content
 of file in memory before being served or written.
-+
 Only file with size greater than 0 will be encoded.
-+
 List of known encoding is "gzip".
 
 *  lib/memfs: ignore generated output filename on GoGenerate
