@@ -267,7 +267,7 @@ func TestLookup(t *testing.T) {
 	}, {
 		desc:    "With MX",
 		address: "kilabit.info",
-		exp:     net.ParseIP("64.233.176.14"),
+		exp:     net.ParseIP("103.200.4.162"),
 	}}
 
 	for _, c := range cases {

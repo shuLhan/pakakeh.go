@@ -165,16 +165,16 @@ func ExampleMarshal() {
 	// string = d
 	// int = 2
 	// int = 3
-	// bool = true
-	// bool = false
 	// uint = 4
 	// uint = 5
+	// bool = true
+	// bool = false
 	//
 	// [section "mapstring"]
 	// k = v
 	//
 	// [section "mapint"]
-	// k = 6
+	// keyint = 6
 	//
 	// [section "pointer"]
 	// ptrstring = b

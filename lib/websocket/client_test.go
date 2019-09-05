@@ -27,7 +27,7 @@ func TestConnect(t *testing.T) {
 		expErr   string
 	}{{
 		desc:   "With empty endpoint",
-		expErr: "websocket: Connect: parse : empty url",
+		expErr: `websocket: Connect: parse "": empty url`,
 	}, {
 		desc:     "With custom header",
 		endpoint: _testEndpointAuth,
