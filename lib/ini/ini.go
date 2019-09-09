@@ -1039,7 +1039,7 @@ func (in *Ini) Write(w io.Writer) (err error) {
 		}
 
 		// Check if the last variable is an empty line.
-		if isLineModeVar(v.mode) {
+		if v != nil && isLineModeVar(v.mode) {
 			endWithVar = true
 		} else {
 			endWithVar = false
