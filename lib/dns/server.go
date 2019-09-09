@@ -567,7 +567,7 @@ func (srv *Server) processRequest() {
 			req.message.Question.Class)
 
 		if ans == nil {
-			if req.message.Header.IsRD && srv.hasForwarders {
+			if srv.hasForwarders {
 				srv.primaryq <- req
 				continue
 			}
@@ -576,7 +576,7 @@ func (srv *Server) processRequest() {
 		}
 
 		if an == nil {
-			if req.message.Header.IsRD && srv.hasForwarders {
+			if srv.hasForwarders {
 				srv.primaryq <- req
 				continue
 			}
