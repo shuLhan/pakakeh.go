@@ -34,7 +34,7 @@ func Open(filename string) (in *Ini, err error) {
 
 	in, err = reader.parseFile(filename)
 
-	if debug.Value >= 1 && err == nil {
+	if debug.Value >= 3 && err == nil {
 		err = in.Write(os.Stdout)
 	}
 
