@@ -24,21 +24,29 @@ import (
 type Endpoint struct {
 	// Method contains HTTP method, default to GET.
 	Method RequestMethod
+
 	// Path contains route to be served, default to "/" if its empty.
 	Path string
+
 	// RequestType contains type of request, default to RequestTypeNone.
 	RequestType RequestType
+
 	// ResponseType contains type of request, default to ResponseTypeNone.
 	ResponseType ResponseType
+
 	// Eval define evaluator for route that will be called after global
 	// evaluators and before callback.
 	Eval Evaluator
+
 	// Call is the main process of route.
 	Call Callback
 }
 
-func (ep *Endpoint) call(res http.ResponseWriter, req *http.Request,
+func (ep *Endpoint) call(
+	res http.ResponseWriter,
+	req *http.Request,
 	evaluators []Evaluator,
+	vals map[string]string,
 ) {
 	reqBody, e := ioutil.ReadAll(req.Body)
 	if e != nil {
@@ -67,6 +75,11 @@ func (ep *Endpoint) call(res http.ResponseWriter, req *http.Request,
 
 	if debug.Value > 0 {
 		log.Printf("> request body: %s\n", reqBody)
+	}
+	for k, v := range vals {
+		if len(k) > 0 && len(v) > 0 {
+			req.Form.Set(k, v)
+		}
 	}
 
 	for _, eval := range evaluators {

@@ -23,14 +23,14 @@ import (
 // Server define HTTP server.
 //
 type Server struct {
-	mfs       *memfs.MemFS
-	evals     []Evaluator
-	conn      *http.Server
-	regDelete map[string]*Endpoint
-	regGet    map[string]*Endpoint
-	regPatch  map[string]*Endpoint
-	regPost   map[string]*Endpoint
-	regPut    map[string]*Endpoint
+	mfs          *memfs.MemFS
+	evals        []Evaluator
+	conn         *http.Server
+	routeDeletes []*route
+	routeGets    []*route
+	routePatches []*route
+	routePosts   []*route
+	routePuts    []*route
 }
 
 //
@@ -38,13 +38,7 @@ type Server struct {
 // with custom connection.
 //
 func NewServer(opts *ServerOptions) (srv *Server, e error) {
-	srv = &Server{
-		regDelete: make(map[string]*Endpoint),
-		regGet:    make(map[string]*Endpoint),
-		regPatch:  make(map[string]*Endpoint),
-		regPost:   make(map[string]*Endpoint),
-		regPut:    make(map[string]*Endpoint),
-	}
+	srv = &Server{}
 
 	if len(opts.Address) == 0 {
 		opts.Address = ":80"
@@ -90,14 +84,33 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 }
 
 //
-// RegisterDelete register HTTP method DELETE with callback to handle it.
+// RegisterDelete register HTTP method DELETE with specific endpoint to handle
+// it.
 //
-func (srv *Server) RegisterDelete(ep *Endpoint) {
-	if ep != nil {
-		ep.Method = RequestMethodDelete
-		ep.RequestType = RequestTypeQuery
-		srv.register(ep)
+func (srv *Server) RegisterDelete(ep *Endpoint) (err error) {
+	if ep == nil || ep.Call == nil {
+		return nil
 	}
+
+	ep.Method = RequestMethodDelete
+	ep.RequestType = RequestTypeQuery
+
+	// Check if the same route already registered.
+	for _, rute := range srv.routeDeletes {
+		_, ok := rute.parse(ep.Path)
+		if ok {
+			return ErrEndpointAmbiguous
+		}
+	}
+
+	rute, err := newRoute(ep)
+	if err != nil {
+		return err
+	}
+
+	srv.routeDeletes = append(srv.routeDeletes, rute)
+
+	return nil
 }
 
 //
@@ -111,93 +124,152 @@ func (srv *Server) RegisterEvaluator(eval Evaluator) {
 //
 // RegisterGet register HTTP method GET with callback to handle it.
 //
-func (srv *Server) RegisterGet(ep *Endpoint) {
-	if ep != nil {
-		ep.Method = RequestMethodGet
-		ep.RequestType = RequestTypeQuery
-		srv.register(ep)
+func (srv *Server) RegisterGet(ep *Endpoint) (err error) {
+	if ep == nil || ep.Call == nil {
+		return nil
 	}
+
+	ep.Method = RequestMethodGet
+	ep.RequestType = RequestTypeQuery
+
+	// Check if the same route already registered.
+	for _, rute := range srv.routeGets {
+		_, ok := rute.parse(ep.Path)
+		if ok {
+			return ErrEndpointAmbiguous
+		}
+	}
+
+	rute, err := newRoute(ep)
+	if err != nil {
+		return err
+	}
+
+	srv.routeGets = append(srv.routeGets, rute)
+
+	return nil
 }
 
 //
 // RegisterPatch register HTTP method PATCH with callback to handle it.
 //
-func (srv *Server) RegisterPatch(ep *Endpoint) {
-	if ep != nil {
-		ep.Method = RequestMethodPatch
-		srv.register(ep)
+func (srv *Server) RegisterPatch(ep *Endpoint) (err error) {
+	if ep == nil || ep.Call == nil {
+		return nil
 	}
+
+	ep.Method = RequestMethodPatch
+
+	// Check if the same route already registered.
+	for _, rute := range srv.routePatches {
+		_, ok := rute.parse(ep.Path)
+		if ok {
+			return ErrEndpointAmbiguous
+		}
+	}
+
+	rute, err := newRoute(ep)
+	if err != nil {
+		return err
+	}
+
+	srv.routePatches = append(srv.routePatches, rute)
+
+	return nil
 }
 
 //
 // RegisterPost register HTTP method POST with callback to handle it.
 //
-func (srv *Server) RegisterPost(ep *Endpoint) {
-	if ep != nil {
-		ep.Method = RequestMethodPost
-		srv.register(ep)
+func (srv *Server) RegisterPost(ep *Endpoint) (err error) {
+	if ep == nil || ep.Call == nil {
+		return nil
 	}
+
+	ep.Method = RequestMethodPost
+
+	// Check if the same route already registered.
+	for _, rute := range srv.routePosts {
+		_, ok := rute.parse(ep.Path)
+		if ok {
+			return ErrEndpointAmbiguous
+		}
+	}
+
+	rute, err := newRoute(ep)
+	if err != nil {
+		return err
+	}
+
+	srv.routePosts = append(srv.routePosts, rute)
+
+	return nil
+
 }
 
 //
 // RegisterPut register HTTP method PUT with callback to handle it.
 //
-func (srv *Server) RegisterPut(ep *Endpoint) {
-	if ep != nil {
-		ep.Method = RequestMethodPut
-		ep.ResponseType = ResponseTypeNone
-		srv.register(ep)
+func (srv *Server) RegisterPut(ep *Endpoint) (err error) {
+	if ep == nil || ep.Call == nil {
+		return nil
 	}
+
+	ep.Method = RequestMethodPut
+	ep.ResponseType = ResponseTypeNone
+
+	// Check if the same route already registered.
+	for _, rute := range srv.routePuts {
+		_, ok := rute.parse(ep.Path)
+		if ok {
+			return ErrEndpointAmbiguous
+		}
+	}
+
+	rute, err := newRoute(ep)
+	if err != nil {
+		return err
+	}
+
+	srv.routePuts = append(srv.routePuts, rute)
+
+	return nil
 }
 
 //
 // ServeHTTP handle mapping of client request to registered endpoints.
 //
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	var (
-		ep *Endpoint
-		ok bool
-	)
-
 	if debug.Value > 0 {
 		log.Printf("> ServeHTTP: %s %+v\n", req.Method, req.URL)
 	}
 
 	switch req.Method {
 	case http.MethodDelete:
-		ep, ok = srv.regDelete[req.URL.Path]
+		srv.handleDelete(res, req)
 
 	case http.MethodGet:
 		srv.handleGet(res, req)
-		return
 
 	case http.MethodHead:
 		srv.handleHead(res, req)
-		return
 
 	case http.MethodOptions:
 		srv.handleOptions(res, req)
-		return
 
 	case http.MethodPatch:
-		ep, ok = srv.regPatch[req.URL.Path]
+		srv.handlePatch(res, req)
 
 	case http.MethodPost:
-		ep, ok = srv.regPost[req.URL.Path]
+		srv.handlePost(res, req)
 
 	case http.MethodPut:
-		ep, ok = srv.regPut[req.URL.Path]
+		srv.handlePut(res, req)
 
 	default:
 		res.WriteHeader(http.StatusNotImplemented)
 		return
 	}
-	if !ok {
-		res.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	ep.call(res, req, srv.evals)
 }
 
 //
@@ -240,6 +312,21 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	}
 
 	return node
+}
+
+//
+// handleDelete handle the DELETE request by searching the registered route
+// and calling the endpoint.
+//
+func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
+	for _, rute := range srv.routeDeletes {
+		vals, ok := rute.parse(req.URL.Path)
+		if ok {
+			rute.endpoint.call(res, req, srv.evals, vals)
+			return
+		}
+	}
+	res.WriteHeader(http.StatusNotFound)
 }
 
 func (srv *Server) handleFS(
@@ -285,24 +372,41 @@ func (srv *Server) handleFS(
 	}
 }
 
+//
+// handleGet handle the GET request by searching the registered route and
+// calling the endpoint.
+//
 func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
-	ep, ok := srv.regGet[req.URL.Path]
-	if ok {
-		ep.call(res, req, srv.evals)
-		return
+	for _, rute := range srv.routeGets {
+		vals, ok := rute.parse(req.URL.Path)
+		if ok {
+			log.Printf("handleGet: %s %s\n", req.URL.Path, vals)
+			rute.endpoint.call(res, req, srv.evals, vals)
+			return
+		}
 	}
 
 	srv.handleFS(res, req, RequestMethodGet)
 }
 
 func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
-	ep, ok := srv.regGet[req.URL.Path]
+	var (
+		rute *route
+		ok   bool
+	)
+
+	for _, rute = range srv.routeGets {
+		_, ok = rute.parse(req.URL.Path)
+		if ok {
+			break
+		}
+	}
 	if !ok {
 		srv.handleFS(res, req, RequestMethodHead)
 		return
 	}
 
-	switch ep.ResponseType {
+	switch rute.endpoint.ResponseType {
 	case ResponseTypeNone:
 		res.WriteHeader(http.StatusNoContent)
 		return
@@ -331,25 +435,44 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 		methods[http.MethodHead] = true
 	}
 
-	ep, ok := srv.regDelete[req.URL.Path]
-	if ok && ep != nil {
-		methods[http.MethodDelete] = true
+	for _, rute := range srv.routeDeletes {
+		_, ok := rute.parse(req.URL.Path)
+		if ok {
+			methods[http.MethodDelete] = true
+			break
+		}
 	}
-	_, ok = srv.regGet[req.URL.Path]
-	if ok && ep != nil {
-		methods[http.MethodGet] = true
+
+	for _, rute := range srv.routeGets {
+		_, ok := rute.parse(req.URL.Path)
+		if ok {
+			methods[http.MethodGet] = true
+			break
+		}
 	}
-	_, ok = srv.regPatch[req.URL.Path]
-	if ok && ep != nil {
-		methods[http.MethodPatch] = true
+
+	for _, rute := range srv.routePatches {
+		_, ok := rute.parse(req.URL.Path)
+		if ok {
+			methods[http.MethodPatch] = true
+			break
+		}
 	}
-	_, ok = srv.regPost[req.URL.Path]
-	if ok && ep != nil {
-		methods[http.MethodPost] = true
+
+	for _, rute := range srv.routePosts {
+		_, ok := rute.parse(req.URL.Path)
+		if ok {
+			methods[http.MethodPost] = true
+			break
+		}
 	}
-	ep, ok = srv.regPut[req.URL.Path]
-	if ok && ep != nil {
-		methods[http.MethodPut] = true
+
+	for _, rute := range srv.routePuts {
+		_, ok := rute.parse(req.URL.Path)
+		if ok {
+			methods[http.MethodPut] = true
+			break
+		}
 	}
 
 	if len(methods) == 0 {
@@ -375,27 +498,46 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 }
 
 //
-// register new endpoint with specific method, path, request type, and
-// response type.
+// handlePatch handle the PATCH request by searching the registered route and
+// calling the endpoint.
 //
-func (srv *Server) register(ep *Endpoint) {
-	if ep == nil || ep.Call == nil {
-		return
+func (srv *Server) handlePatch(res http.ResponseWriter, req *http.Request) {
+	for _, rute := range srv.routePatches {
+		vals, ok := rute.parse(req.URL.Path)
+		if ok {
+			rute.endpoint.call(res, req, srv.evals, vals)
+			return
+		}
 	}
-	if len(ep.Path) == 0 {
-		ep.Path = "/"
-	}
+	res.WriteHeader(http.StatusNotFound)
+}
 
-	switch ep.Method {
-	case RequestMethodDelete:
-		srv.regDelete[ep.Path] = ep
-	case RequestMethodGet:
-		srv.regGet[ep.Path] = ep
-	case RequestMethodPatch:
-		srv.regPatch[ep.Path] = ep
-	case RequestMethodPost:
-		srv.regPost[ep.Path] = ep
-	case RequestMethodPut:
-		srv.regPut[ep.Path] = ep
+//
+// handlePost handle the POST request by searching the registered route and
+// calling the endpoint.
+//
+func (srv *Server) handlePost(res http.ResponseWriter, req *http.Request) {
+	for _, rute := range srv.routePosts {
+		vals, ok := rute.parse(req.URL.Path)
+		if ok {
+			rute.endpoint.call(res, req, srv.evals, vals)
+			return
+		}
 	}
+	res.WriteHeader(http.StatusNotFound)
+}
+
+//
+// handlePut handle the PUT request by searching the registered route and
+// calling the endpoint.
+//
+func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
+	for _, rute := range srv.routePuts {
+		vals, ok := rute.parse(req.URL.Path)
+		if ok {
+			rute.endpoint.call(res, req, srv.evals, vals)
+			return
+		}
+	}
+	res.WriteHeader(http.StatusNotFound)
 }

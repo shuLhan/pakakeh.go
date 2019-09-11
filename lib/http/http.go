@@ -69,7 +69,7 @@
 //		ResponseType: libhttp.ResponseTypeJSON,
 //		Call: handleLogin,
 //	}
-//	server.RequestPost(epAPILogin)
+//	server.RegisterPost(epAPILogin)
 //
 // Upon receiving request to "/api/login", the library will call
 // "req.ParseForm()", read the content of body and pass them to
@@ -81,13 +81,54 @@
 //		// Return response body and error.
 //	}
 //
-// Known Bugs
+// Routing
+//
+// The Endpoint allow binding the unique key into path using colon ":" as the
+// first character.
+//
+// For example, after registering the following Endpoint,
+//
+//	epBinding := &libhttp.Endpoint{
+//		Path: "/category/:name",
+//		RequestType: libhttp.RequestTypeQuery,
+//		ResponseType: libhttp.ResponseTypeJSON,
+//		Call: handleCategory,
+//	}
+//	server.RegisterGet(epBinding)
+//
+// when the server receiving GET request using path "/category/book?limit=10",
+// it will put the "book" and "10" into http.Request's Form with key is "name"
+// and "limit"
+//
+//	fmt.Printf("request.Form:", req.Form)
+//	// request.Form: map[name:[book] limit:[10]]
+//
+// The key binding must be unique between path and query.  If query has the
+// same key then it will be overridden by value in path.  For example, using
+// the above endpoint, request with "/category/book?name=Hitchiker" will
+// result in Request.Form:
+//
+//	map[name:[book]]
+//
+// not
+//
+//	map[name:[book Hitchiker]]
+//
+// Known Bugs and Limitations
 //
 // * The server does not handle CONNECT method
 //
 // * Missing test for request with content-type multipart-form
 //
+// * We can not register path with ambigous route.  For example, "/:x" and
+// "/y" are ambiguous because one is dynamic path using key binding "x" and
+// the last one is static path to "y".
+//
 package http
+
+import (
+	"errors"
+)
 
 const (
 	ContentEncoding   = "Content-Encoding"
@@ -98,4 +139,25 @@ const (
 	ContentTypeJSON   = "application/json"
 	ContentTypePlain  = "text/plain; charset=utf-8"
 	HeaderLocation    = "Location"
+)
+
+var (
+	//
+	// ErrEndpointAmbiguous define an error when registering path that
+	// already exist.  For example, after registering "/:x", registering
+	// "/:y" or "/z" on the same HTTP method will result in ambiguous.
+	//
+	ErrEndpointAmbiguous = errors.New("ambigous endpoint")
+
+	//
+	// ErrEndpointKeyDuplicate define an error when registering path with
+	// the same keys, for example "/:x/:x".
+	//
+	ErrEndpointKeyDuplicate = errors.New("duplicate key in route")
+
+	//
+	// ErrEndpointKeyEmpty define an error when path contains an empty
+	// key, for example "/:/y".
+	//
+	ErrEndpointKeyEmpty = errors.New("empty route's key")
 )

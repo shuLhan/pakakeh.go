@@ -17,78 +17,118 @@ import (
 
 func TestRegisterDelete(t *testing.T) {
 	cases := []struct {
-		desc          string
-		reqURL        string
-		ep            *Endpoint
-		expStatusCode int
-		expBody       string
+		desc           string
+		reqURL         string
+		ep             *Endpoint
+		expStatusCode  int
+		expContentType string
+		expBody        string
+		expError       string
 	}{{
-		desc:   "With unknown path",
-		reqURL: "http://127.0.0.1:8080/",
+		desc: "With new endpoint",
 		ep: &Endpoint{
 			Path:         "/delete",
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
 		},
-		expStatusCode: http.StatusNotFound,
 	}, {
-		desc:   "With known path and subtree root",
-		reqURL: "http://127.0.0.1:8080/delete/",
+		desc: "With duplicate endpoint",
 		ep: &Endpoint{
 			Path:         "/delete",
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
 		},
+		expError: ErrEndpointAmbiguous.Error(),
+	}, {
+		desc:          "With unknown path",
+		reqURL:        "http://127.0.0.1:8080/",
 		expStatusCode: http.StatusNotFound,
 	}, {
-		desc:   "With response type none",
-		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		desc:           "With known path and subtree root",
+		reqURL:         "http://127.0.0.1:8080/delete/",
+		expStatusCode:  http.StatusOK,
+		expContentType: ContentTypePlain,
+		expBody:        "map[]\nmap[]\n<nil>\n",
+	}, {
+		desc: "With response type none",
 		ep: &Endpoint{
-			Path:         "/delete",
+			Path:         "/delete/none",
 			ResponseType: ResponseTypeNone,
 			Call:         cbNone,
 		},
+		reqURL:        "http://127.0.0.1:8080/delete/none?k=v",
 		expStatusCode: http.StatusNoContent,
 	}, {
-		desc:   "With response type binary",
-		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		desc: "With response type binary",
 		ep: &Endpoint{
-			Path:         "/delete",
+			Path:         "/delete/bin",
 			ResponseType: ResponseTypeBinary,
 			Call:         cbPlain,
 		},
-		expStatusCode: http.StatusOK,
-		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
+		reqURL:         "http://127.0.0.1:8080/delete/bin?k=v",
+		expStatusCode:  http.StatusOK,
+		expContentType: ContentTypeBinary,
+		expBody:        "map[k:[v]]\nmap[]\n<nil>\n",
 	}, {
-		desc:   "With response type plain",
-		reqURL: "http://127.0.0.1:8080/delete?k=v",
-		ep: &Endpoint{
-			Path:         "/delete",
-			ResponseType: ResponseTypePlain,
-			Call:         cbPlain,
-		},
-		expStatusCode: http.StatusOK,
-		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
+		desc:           "With response type plain",
+		reqURL:         "http://127.0.0.1:8080/delete?k=v",
+		expStatusCode:  http.StatusOK,
+		expContentType: ContentTypePlain,
+		expBody:        "map[k:[v]]\nmap[]\n<nil>\n",
 	}, {
-		desc:   "With response type JSON",
-		reqURL: "http://127.0.0.1:8080/delete?k=v",
+		desc: "With response type JSON",
 		ep: &Endpoint{
-			Path:         "/delete",
+			Path:         "/delete/json",
 			ResponseType: ResponseTypeJSON,
 			Call:         cbJSON,
 		},
-		expStatusCode: http.StatusOK,
+		reqURL:         "http://127.0.0.1:8080/delete/json?k=v",
+		expStatusCode:  http.StatusOK,
+		expContentType: ContentTypeJSON,
 		expBody: `{
 "form": "map[k:[v]]",
 "multipartForm": "<nil>",
 "body": ""
 }`,
+	}, {
+		desc: "With ambigous path",
+		ep: &Endpoint{
+			Path:         "/delete/:id",
+			ResponseType: ResponseTypePlain,
+			Call:         cbPlain,
+		},
+		expError: ErrEndpointAmbiguous.Error(),
+	}, {
+		desc: "With key",
+		ep: &Endpoint{
+			Path:         "/delete/:id/x",
+			ResponseType: ResponseTypePlain,
+			Call:         cbPlain,
+		},
+		reqURL:         "http://127.0.0.1:8080/delete/1/x?k=v",
+		expStatusCode:  http.StatusOK,
+		expContentType: ContentTypePlain,
+		expBody:        "map[id:[1] k:[v]]\nmap[]\n<nil>\n",
+	}, {
+		desc:           "With duplicate key in query",
+		reqURL:         "http://127.0.0.1:8080/delete/1/x?id=v",
+		expStatusCode:  http.StatusOK,
+		expContentType: ContentTypePlain,
+		expBody:        "map[id:[1]]\nmap[]\n<nil>\n",
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		testServer.RegisterDelete(c.ep)
+		err := testServer.RegisterDelete(c.ep)
+		if err != nil {
+			test.Assert(t, "error", c.expError, err.Error(), true)
+			continue
+		}
+
+		if len(c.reqURL) == 0 {
+			continue
+		}
 
 		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
 		if e != nil {
@@ -118,20 +158,9 @@ func TestRegisterDelete(t *testing.T) {
 
 		test.Assert(t, "Body", c.expBody, string(body), true)
 
-		var expContentType string
 		gotContentType := res.Header.Get(ContentType)
 
-		switch c.ep.ResponseType {
-		case ResponseTypeBinary:
-			expContentType = ContentTypeBinary
-		case ResponseTypeJSON:
-			expContentType = ContentTypeJSON
-		default:
-			expContentType = ContentTypePlain
-		}
-
-		test.Assert(t, "Content-Type", expContentType, gotContentType,
-			true)
+		test.Assert(t, "Content-Type", c.expContentType, gotContentType, true)
 	}
 }
 
@@ -156,7 +185,11 @@ func TestRegisterEvaluator(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	testServer.RegisterDelete(epEvaluate)
+	err := testServer.RegisterDelete(epEvaluate)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	testServer.RegisterEvaluator(testEvaluator)
 
 	cases := []struct {
@@ -202,12 +235,18 @@ func TestRegisterEvaluator(t *testing.T) {
 }
 
 func TestRegisterGet(t *testing.T) {
+	testServer.evals = nil
+
 	epGet := &Endpoint{
 		Path:         "/get",
 		ResponseType: ResponseTypePlain,
 		Call:         cbPlain,
 	}
-	testServer.RegisterGet(epGet)
+
+	err := testServer.RegisterGet(epGet)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc          string
@@ -227,7 +266,8 @@ func TestRegisterGet(t *testing.T) {
 	}, {
 		desc:          "With known path and subtree root",
 		reqURL:        "http://127.0.0.1:8080/get/",
-		expStatusCode: http.StatusNotFound,
+		expStatusCode: http.StatusOK,
+		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With known path",
 		reqURL:        "http://127.0.0.1:8080/get?k=v",
@@ -258,19 +298,24 @@ func TestRegisterGet(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode, true)
 		test.Assert(t, "Body", c.expBody, string(body), true)
 	}
 }
 
 func TestRegisterHead(t *testing.T) {
+	testServer.routeGets = nil
+
 	epAPI := &Endpoint{
 		Path:         "/api",
 		ResponseType: ResponseTypeJSON,
 		Call:         cbNone,
 	}
-	testServer.RegisterGet(epAPI)
+
+	err := testServer.RegisterGet(epAPI)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc             string
@@ -286,9 +331,10 @@ func TestRegisterHead(t *testing.T) {
 		expContentType:   []string{"text/html; charset=utf-8"},
 		expContentLength: []string{"40"},
 	}, {
-		desc:          "With registered GET and subtree root",
-		reqURL:        "http://127.0.0.1:8080/api/",
-		expStatusCode: http.StatusNotFound,
+		desc:           "With registered GET and subtree root",
+		reqURL:         "http://127.0.0.1:8080/api/",
+		expStatusCode:  http.StatusOK,
+		expContentType: []string{ContentTypeJSON},
 	}, {
 		desc:           "With registered GET",
 		reqURL:         "http://127.0.0.1:8080/api?k=v",
@@ -336,7 +382,11 @@ func TestRegisterPatch(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbPlain,
 	}
-	testServer.RegisterPatch(ep)
+
+	err := testServer.RegisterPatch(ep)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc          string
@@ -350,7 +400,8 @@ func TestRegisterPatch(t *testing.T) {
 	}, {
 		desc:          "With registered PATCH and subtree root",
 		reqURL:        "http://127.0.0.1:8080/patch/",
-		expStatusCode: http.StatusNotFound,
+		expStatusCode: http.StatusOK,
+		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With registered PATCH and query",
 		reqURL:        "http://127.0.0.1:8080/patch?k=v",
@@ -395,7 +446,10 @@ func TestRegisterPost(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	testServer.RegisterPost(ep)
+	err := testServer.RegisterPost(ep)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc          string
@@ -410,7 +464,8 @@ func TestRegisterPost(t *testing.T) {
 	}, {
 		desc:          "With registered POST and subtree root",
 		reqURL:        "http://127.0.0.1:8080/post/",
-		expStatusCode: http.StatusNotFound,
+		expStatusCode: http.StatusOK,
+		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With registered POST and query",
 		reqURL:        "http://127.0.0.1:8080/post?k=v",
@@ -463,7 +518,10 @@ func TestRegisterPut(t *testing.T) {
 		Call:        cbPlain,
 	}
 
-	testServer.RegisterPut(ep)
+	err := testServer.RegisterPut(ep)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc          string
@@ -477,7 +535,7 @@ func TestRegisterPut(t *testing.T) {
 	}, {
 		desc:          "With registered PUT and subtree root",
 		reqURL:        "http://127.0.0.1:8080/put/",
-		expStatusCode: http.StatusNotFound,
+		expStatusCode: http.StatusNoContent,
 	}, {
 		desc:          "With registered PUT and query",
 		reqURL:        "http://127.0.0.1:8080/put?k=v",
@@ -526,8 +584,15 @@ func TestServeHTTPOptions(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	testServer.RegisterDelete(epDelete)
-	testServer.RegisterPatch(epPatch)
+	err := testServer.RegisterDelete(epDelete)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = testServer.RegisterPatch(epPatch)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc          string
@@ -542,7 +607,8 @@ func TestServeHTTPOptions(t *testing.T) {
 	}, {
 		desc:          "With registered PATCH and subtree root",
 		reqURL:        "http://127.0.0.1:8080/options/",
-		expStatusCode: http.StatusNotFound,
+		expStatusCode: http.StatusOK,
+		expAllow:      "DELETE, OPTIONS, PATCH",
 	}, {
 		desc:          "With registered PATCH and query",
 		reqURL:        "http://127.0.0.1:8080/options?k=v",
@@ -601,7 +667,10 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeNone,
 		Call:         cbError,
 	}
-	testServer.RegisterPost(epErrNoBody)
+	err := testServer.RegisterPost(epErrNoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	epErrBinary := &Endpoint{
 		Path:         "/error/binary",
@@ -609,7 +678,10 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeBinary,
 		Call:         cbError,
 	}
-	testServer.RegisterPost(epErrBinary)
+	err = testServer.RegisterPost(epErrBinary)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	epErrJSON := &Endpoint{
 		Path:         "/error/json",
@@ -617,7 +689,10 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeJSON,
 		Call:         cbError,
 	}
-	testServer.RegisterPost(epErrJSON)
+	err = testServer.RegisterPost(epErrJSON)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	epErrPlain := &Endpoint{
 		Path:         "/error/plain",
@@ -625,7 +700,10 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbError,
 	}
-	testServer.RegisterPost(epErrPlain)
+	err = testServer.RegisterPost(epErrPlain)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	epErrNoCode := &Endpoint{
 		Path:         "/error/no-code",
@@ -633,7 +711,10 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbNoCode,
 	}
-	testServer.RegisterPost(epErrNoCode)
+	err = testServer.RegisterPost(epErrNoCode)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	epErrCustom := &Endpoint{
 		Path:         "/error/custom",
@@ -641,7 +722,10 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbCustomErr,
 	}
-	testServer.RegisterPost(epErrCustom)
+	err = testServer.RegisterPost(epErrCustom)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases := []struct {
 		desc          string

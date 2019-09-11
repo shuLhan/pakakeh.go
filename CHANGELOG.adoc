@@ -5,6 +5,28 @@
 This library is released each month, usually at the first week of month.
 
 
+==  share v0.9.0 (2019-10-xx)
+
+===  New Features
+
+*  http: implement key binding in registered Endpoint's Path
++
+Previously, only raw path can be registered on Endpoint.  This changes
+implement key binding using colon ":" on path.  For example, registering
+path "/:x/y" will bind key "x" to a string value that can be accessed on
+http.Request.Form using Get method.
+
+
+===  Bug Fixes
+
+*  ini: check for possible nil variable on Write
+
+*  dns: allow message with non recursive-desired to be forwarded
++
+On macOS, turn out, all DNS queries have RD flag set to zero.  This cause
+no DNS queries forwarded to parent server.
+
+
 ==  share v0.8.2 (2019-09-05)
 
 ===  Enhancements
