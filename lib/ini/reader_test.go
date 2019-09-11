@@ -275,7 +275,7 @@ func TestParseVariable(t *testing.T) {
 		expMode:   lineModeSingle,
 		expKey:    "name",
 		expFormat: "%s=",
-		expValue:  varValueTrue,
+		expValue:  "",
 	}, {
 		desc:      "With empty value #2",
 		in:        []byte(`name =`),
@@ -283,7 +283,7 @@ func TestParseVariable(t *testing.T) {
 		expMode:   lineModeSingle,
 		expKey:    "name",
 		expFormat: "%s =",
-		expValue:  varValueTrue,
+		expValue:  "",
 	}, {
 		desc:       "With empty value and comment",
 		in:         []byte(`name =# a comment`),
@@ -292,7 +292,7 @@ func TestParseVariable(t *testing.T) {
 		expKey:     "name",
 		expFormat:  "%s =%s",
 		expComment: "# a comment",
-		expValue:   varValueTrue,
+		expValue:   "",
 	}, {
 		desc:      "With empty value #3",
 		in:        []byte(`name     `),
@@ -366,19 +366,19 @@ func TestParseVarValue(t *testing.T) {
 	}{{
 		desc:     `Empty input`,
 		expErr:   io.EOF,
-		expValue: varValueTrue,
+		expValue: "",
 	}, {
 		desc:      `Input with spaces`,
 		in:        []byte(`   `),
 		expErr:    io.EOF,
 		expFormat: `   `,
-		expValue:  varValueTrue,
+		expValue:  "",
 	}, {
 		desc: `Input with tab`,
 		in: []byte(`	`),
 		expErr: io.EOF,
 		expFormat: `	`,
-		expValue: varValueTrue,
+		expValue: "",
 	}, {
 		desc: `Input with newline`,
 		in: []byte(`
@@ -386,7 +386,7 @@ func TestParseVarValue(t *testing.T) {
 		expErr: nil,
 		expFormat: `
 `,
-		expValue: varValueTrue,
+		expValue: "",
 	}, {
 		desc:      `Double quoted with spaces`,
 		in:        []byte(`"   "`),

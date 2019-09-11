@@ -517,7 +517,7 @@ consume_spaces:
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			reader._var.format = reader.bufFormat.String()
-			reader._var.value = varValueTrue
+			reader._var.value = ""
 			return err
 		}
 		switch reader.b {
@@ -527,13 +527,13 @@ consume_spaces:
 
 		case tokHash, tokSemiColon:
 			_ = reader.br.UnreadByte()
-			reader._var.value = varValueTrue
+			reader._var.value = ""
 			return reader.parseComment()
 
 		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
-			reader._var.value = varValueTrue
+			reader._var.value = ""
 			return nil
 		}
 		break

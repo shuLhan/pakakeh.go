@@ -16,6 +16,22 @@ implement key binding using colon ":" on path.  For example, registering
 path "/:x/y" will bind key "x" to a string value that can be accessed on
 http.Request.Form using Get method.
 
+===  Breaking Changes
+
+*  ini: set variable with "=" without a value default to empty string
+
+Previously, a variable end with "=" will have value set to "true".
+For example,
+
+----
+[section]
+var =
+----
+
+set the "var" value to string "true".
+
+This changes make the variable that end with "=" without any value
+to be an empty string, so "var" value is equal to "".
 
 ===  Bug Fixes
 
