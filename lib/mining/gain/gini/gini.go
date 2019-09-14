@@ -277,7 +277,6 @@ func (gini *Gini) compute(target, classes *[]string) float64 {
 			fmt.Printf("[gini] compute (%s): (%d/%f)^2 = %f\n",
 				(*classes)[x], v, n, p*p)
 		}
-
 	}
 
 	return 1 - sump2
@@ -307,7 +306,6 @@ func (gini *Gini) computeContinuGain(src *[]float64, target, classes *[]string) 
 	}
 
 	for p, contVal := range gini.ContinuPart {
-
 		// find the split of samples between partition based on
 		// partition value
 		partidx := nsample
@@ -417,8 +415,7 @@ func FindMaxGain(gains *[]Gini) (maxGainIdx int) {
 			maxGainIdx = i
 		}
 	}
-
-	return
+	return maxGainIdx
 }
 
 //
@@ -435,8 +432,7 @@ func FindMinGiniIndex(ginis *[]Gini) (minIndexIdx int) {
 			minIndexIdx = i
 		}
 	}
-
-	return
+	return minIndexIdx
 }
 
 //
@@ -457,5 +453,5 @@ func (gini Gini) String() (s string) {
 		"  ContinuPart   :", gini.ContinuPart, "\n",
 		"  DiscretePart  :", gini.DiscretePart, "\n",
 		"}")
-	return
+	return s
 }

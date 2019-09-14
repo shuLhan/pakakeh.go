@@ -147,7 +147,6 @@ func TestBodyRelaxed(t *testing.T) {
 
 		test.Assert(t, "Relaxed", c.exp, string(got), true)
 	}
-
 }
 
 func TestBodySimple(t *testing.T) {

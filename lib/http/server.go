@@ -209,7 +209,6 @@ func (srv *Server) RegisterPost(ep *Endpoint) (err error) {
 	srv.routePosts = append(srv.routePosts, rute)
 
 	return nil
-
 }
 
 //

@@ -289,8 +289,8 @@ func compareChunks(t *testing.T, adds, dels text.Chunks,
 }
 
 func testDiffLines(t *testing.T, old, new text.Line,
-	expAdds, expDels []string) {
-
+	expAdds, expDels []string,
+) {
 	adds, dels := Lines(old.V, new.V, 0, 0)
 
 	compareChunks(t, adds, dels, expAdds, expDels)

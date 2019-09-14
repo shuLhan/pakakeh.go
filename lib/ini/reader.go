@@ -144,7 +144,6 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 
 		if reader._var.mode&lineModeSection == lineModeSection ||
 			reader._var.mode&lineModeSubsection == lineModeSubsection {
-
 			in.addSection(reader.sec)
 
 			reader.sec = &Section{

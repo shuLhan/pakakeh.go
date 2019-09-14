@@ -116,7 +116,6 @@ func TestGetRemoteURL(t *testing.T) {
 		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
 		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
 	}
-
 }
 
 func TestGetTag(t *testing.T) {

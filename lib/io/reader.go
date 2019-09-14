@@ -213,7 +213,6 @@ func (r *Reader) SkipHorizontalSpace() (n int, c byte) {
 		return n, 0
 	}
 	return n, r.V[r.X]
-
 }
 
 //

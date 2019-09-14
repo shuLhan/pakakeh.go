@@ -488,7 +488,6 @@ func TestSplitRowsByValue(t *testing.T) {
 // testWriteOutput will write merged reader and check with expected file output.
 //
 func testWriteOutput(t *testing.T, r *Reader, outfile, expfile string) {
-
 	writer, e := NewWriter("")
 	if e != nil {
 		t.Fatal(e)

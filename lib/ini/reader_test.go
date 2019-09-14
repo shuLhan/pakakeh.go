@@ -120,7 +120,6 @@ func TestParseSectionHeader(t *testing.T) {
 		test.Assert(t, "subsection", c.expSubName, reader._var.subName, true)
 		test.Assert(t, "comment", c.expComment, reader._var.others, true)
 	}
-
 }
 
 func TestParseSubsection(t *testing.T) {
@@ -503,5 +502,4 @@ func TestParseVarValue(t *testing.T) {
 		test.Assert(t, "value", c.expValue, reader._var.value, true)
 		test.Assert(t, "comment", c.expComment, reader._var.others, true)
 	}
-
 }

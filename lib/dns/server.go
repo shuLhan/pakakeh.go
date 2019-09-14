@@ -656,7 +656,6 @@ func (srv *Server) processResponse(req *request, res *Message, fallbackq chan *r
 				res.Header.ID, res.Question)
 		}
 	}
-
 }
 
 func (srv *Server) runForwarders() {
