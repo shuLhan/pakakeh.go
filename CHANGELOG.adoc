@@ -9,6 +9,10 @@ This library is released each month, usually at the first week of month.
 
 ===  New Features
 
+*  sanitize: new package to sanitize markup document into plain text
++
+Current implementation have a function to sanitize the content of HTML.
+
 *  http: implement key binding in registered Endpoint's Path
 +
 Previously, only raw path can be registered on Endpoint.  This changes

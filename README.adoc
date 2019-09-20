@@ -118,6 +118,9 @@ A collection of libraries and tools written in Go.
 *  link:{url-godoc}/lib/runes[*runes*]: A library for working with slice of
    rune.
 
+*  link:{url-godoc}/lib/sanitize[*sanitize*]: A library to sanitize markup
+   document into plain text.
+
 *  link:{url-godoc}/lib/smtp[*smtp*]: A library for building SMTP server or
    client.
    This package is working in progress.
