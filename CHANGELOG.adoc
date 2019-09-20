@@ -48,6 +48,15 @@ to be an empty string, so "var" value is equal to "".
 On macOS, turn out, all DNS queries have RD flag set to zero.  This cause
 no DNS queries forwarded to parent server.
 
+===  Enhancements
+
+*  http: export the Memfs field on Server
++
+User of HTTP can use the Memfs field to get the content manually or
+to Search the content.
+
+*  http: add content and response type HTML and XML
+
 
 ==  share v0.8.2 (2019-09-05)
 

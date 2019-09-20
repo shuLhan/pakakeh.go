@@ -23,7 +23,12 @@ import (
 // Server define HTTP server.
 //
 type Server struct {
-	mfs          *memfs.MemFS
+	// Memfs contains the content of file systems to be served in memory.
+	// It will be initialized only if ServerOptions's Root is not empty or
+	// if the current directory contains generated Go file from
+	// memfs.GoGenerate.
+	Memfs *memfs.MemFS
+
 	evals        []Evaluator
 	conn         *http.Server
 	routeDeletes []*route
@@ -59,12 +64,12 @@ func NewServer(opts *ServerOptions) (srv *Server, e error) {
 
 	memfs.Development = opts.Development
 
-	srv.mfs, e = memfs.New(opts.Includes, opts.Excludes, true)
+	srv.Memfs, e = memfs.New(opts.Includes, opts.Excludes, true)
 	if e != nil {
 		return nil, e
 	}
 
-	e = srv.mfs.Mount(opts.Root)
+	e = srv.Memfs.Mount(opts.Root)
 	if e != nil {
 		return nil, e
 	}
@@ -287,7 +292,7 @@ func (srv *Server) Start() (err error) {
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	var e error
 
-	node, e = srv.mfs.Get(reqPath)
+	node, e = srv.Memfs.Get(reqPath)
 	if e != nil {
 		if e != os.ErrNotExist {
 			log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
@@ -296,7 +301,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 		reqPath = path.Join(reqPath, "index.html")
 
-		node, e = srv.mfs.Get(reqPath)
+		node, e = srv.Memfs.Get(reqPath)
 		if e != nil {
 			log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
 			return nil
@@ -305,7 +310,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 	if node.Mode.IsDir() {
 		indexHTML := path.Join(reqPath, "index.html")
-		node, e = srv.mfs.Get(indexHTML)
+		node, e = srv.Memfs.Get(indexHTML)
 		if e != nil {
 			return nil
 		}
