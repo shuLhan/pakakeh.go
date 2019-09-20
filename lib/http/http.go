@@ -136,8 +136,10 @@ const (
 	ContentType       = "Content-Type"
 	ContentTypeBinary = "application/octet-stream"
 	ContentTypeForm   = "application/x-www-form-urlencoded"
+	ContentTypeHTML   = "text/html; charset=utf-8"
 	ContentTypeJSON   = "application/json"
 	ContentTypePlain  = "text/plain; charset=utf-8"
+	ContentTypeXML    = "text/xml; charset=utf-8"
 	HeaderLocation    = "Location"
 )
 

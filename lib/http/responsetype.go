@@ -11,6 +11,8 @@ type ResponseType int
 const (
 	ResponseTypeNone   ResponseType = 0
 	ResponseTypeBinary              = 1 << iota
-	ResponseTypePlain
+	ResponseTypeHTML
 	ResponseTypeJSON
+	ResponseTypePlain
+	ResponseTypeXML
 )
