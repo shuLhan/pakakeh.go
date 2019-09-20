@@ -33,3 +33,29 @@ func ExampleNew() {
 	// Output:
 	// <html></html>
 }
+
+func ExampleMemFS_Search() {
+	mfs, err := New(nil, nil, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = mfs.Mount("./testdata")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results := mfs.Search("body", 0)
+
+	for _, result := range results {
+		fmt.Printf("Path: %s\n", result.Path)
+		fmt.Printf("Snippets: %q\n", result.Snippets)
+	}
+	// Unordered output:
+	// Path: /include/index.css
+	// Snippets: ["body { }"]
+	// Path: /exclude/index.css
+	// Snippets: ["body { }"]
+	// Path: /index.css
+	// Snippets: ["body { }"]
+}

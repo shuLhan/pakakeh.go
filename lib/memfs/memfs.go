@@ -16,6 +16,8 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/shuLhan/share/lib/sanitize"
 )
 
 //
@@ -478,4 +480,82 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	}
 
 	return node, nil
+}
+
+//
+// Search the string "q" in each content of files.
+//
+func (mfs *MemFS) Search(q string, snippetLen int) (results []SearchResult) {
+	if len(q) == 0 {
+		return nil
+	}
+	if snippetLen <= 0 {
+		snippetLen = 60
+	}
+
+	sep := bytes.ToLower([]byte(q))
+	for _, node := range mfs.pn.v {
+		var v []byte
+
+		if node.Mode.IsDir() {
+			continue
+		}
+
+		if !strings.HasPrefix(node.ContentType, "text/") {
+			continue
+		}
+
+		if len(node.plainv) == 0 {
+			err := node.decode()
+			if err != nil {
+				log.Printf("memfs.Search: " + err.Error())
+			}
+
+			if strings.HasPrefix(node.ContentType, "text/html") {
+				node.plainv = sanitize.HTML(node.plainv)
+			}
+
+			node.lowerv = bytes.ToLower(node.plainv)
+		}
+
+		result := SearchResult{
+			Path: node.Path,
+		}
+
+		offset := 0
+		v = node.lowerv
+		for {
+			s := bytes.Index(v, sep)
+			if s == -1 {
+				break
+			}
+
+			start := offset
+			end := offset
+
+			if s > snippetLen {
+				start += s - snippetLen
+			}
+			if s+len(q)+snippetLen > len(v) {
+				end += len(v)
+			} else {
+				end += s + len(q) + snippetLen
+			}
+
+			snippet := strings.TrimSpace(string(node.plainv[start:end]))
+			snippet = strings.ReplaceAll(snippet, "\r", "")
+			snippet = strings.ReplaceAll(snippet, "\n", " ")
+			offset += s + len(q)
+
+			v = v[s+len(q):]
+
+			result.Snippets = append(result.Snippets, snippet)
+		}
+
+		if len(result.Snippets) > 0 {
+			results = append(results, result)
+		}
+	}
+
+	return results
 }

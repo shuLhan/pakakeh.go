@@ -5,7 +5,10 @@
 package memfs
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -30,6 +33,8 @@ type Node struct {
 	V               []byte      // Content of file.
 	Parent          *Node       // Pointer to parent directory.
 	Childs          []*Node     // List of files in directory.
+	plainv          []byte      // Content of file in plain text.
+	lowerv          []byte      // Content of file in lower cases.
 }
 
 //
@@ -83,6 +88,39 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 	}
 
 	return node, nil
+}
+
+func (leaf *Node) decode() (err error) {
+	if len(leaf.ContentEncoding) == 0 {
+		leaf.plainv = leaf.V
+		return nil
+	}
+
+	leaf.plainv = leaf.plainv[:0]
+
+	if leaf.ContentEncoding == EncodingGzip {
+		r, err := gzip.NewReader(bytes.NewReader(leaf.V))
+		if err != nil {
+			return err
+		}
+
+		buf := make([]byte, 1024)
+
+		for {
+			n, err := r.Read(buf)
+			if n > 0 {
+				leaf.plainv = append(leaf.plainv, buf...)
+			}
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 //
