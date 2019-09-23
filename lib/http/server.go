@@ -385,7 +385,6 @@ func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routeGets {
 		vals, ok := rute.parse(req.URL.Path)
 		if ok {
-			log.Printf("handleGet: %s %s\n", req.URL.Path, vals)
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
 		}
