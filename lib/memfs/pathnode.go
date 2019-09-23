@@ -48,14 +48,3 @@ func (pn *PathNode) Set(path string, node *Node) {
 	}
 	pn.v[path] = node
 }
-
-//
-// SetFunc set mapping of path as function that return a Node.
-// Both path and function parameters should have values.
-//
-func (pn *PathNode) SetFunc(path string, fn func() *Node) {
-	if len(path) == 0 || fn == nil {
-		return
-	}
-	pn.f[path] = fn
-}

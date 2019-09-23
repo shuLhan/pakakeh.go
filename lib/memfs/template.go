@@ -69,7 +69,7 @@ func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
 func init() {
 	memfs.GeneratedPathNode = memfs.NewPathNode()
 {{- range $path, $node := .}}
-	memfs.GeneratedPathNode.SetFunc("{{$path}}", generate{{funcname $node.Path | printf "%s" }})
+	memfs.GeneratedPathNode.Set("{{$path}}", generate{{funcname $node.Path | printf "%s" }}())
 {{- end}}
 }
 {{end}}
