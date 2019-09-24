@@ -19,6 +19,8 @@ This library is released each month, usually at the first week of month.
 +
 Current implementation have a function to sanitize the content of HTML.
 
+*  strings: add function to convert slice of string to slice of slice of bytes
+
 *  http: implement key binding in registered Endpoint's Path
 +
 Previously, only raw path can be registered on Endpoint.  This changes

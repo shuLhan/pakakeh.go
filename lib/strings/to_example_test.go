@@ -8,6 +8,13 @@ import (
 	"fmt"
 )
 
+func ExampleToBytes() {
+	ss := []string{"This", "is", "a", "string"}
+	fmt.Printf("%s\n", ToBytes(ss))
+	// Output:
+	// [This is a string]
+}
+
 func ExampleToFloat64() {
 	in := []string{"0", "1.1", "e", "3"}
 

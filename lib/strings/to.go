@@ -10,6 +10,16 @@ import (
 )
 
 //
+// ToBytes convert slice of string into slice of slice of bytes.
+//
+func ToBytes(ss []string) (sv [][]byte) {
+	for x := 0; x < len(ss); x++ {
+		sv = append(sv, []byte(ss[x]))
+	}
+	return sv
+}
+
+//
 // ToFloat64 convert slice of string to slice of float64. If converted
 // string return error it will set the float value to 0.
 //
