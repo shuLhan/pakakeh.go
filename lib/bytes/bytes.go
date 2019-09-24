@@ -6,6 +6,7 @@
 package bytes
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 )
@@ -360,6 +361,29 @@ func InReplace(in, allowed []byte, c byte) (out []byte) {
 	}
 
 	return
+}
+
+//
+// Indexes returns the index of the all instance of token in s, or nil if
+// token is not present in s.
+//
+func Indexes(s []byte, token []byte) (idxs []int) {
+	if len(s) == 0 || len(token) == 0 {
+		return nil
+	}
+
+	offset := 0
+	for {
+		idx := bytes.Index(s, token)
+		if idx == -1 {
+			break
+		}
+		idxs = append(idxs, offset+idx)
+		skip := idx + len(token)
+		offset += skip
+		s = s[skip:]
+	}
+	return idxs
 }
 
 //

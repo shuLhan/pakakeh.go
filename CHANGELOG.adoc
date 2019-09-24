@@ -9,6 +9,8 @@ This library is released each month, usually at the first week of month.
 
 ===  New Features
 
+*  bytes: add function to get all indexes of token in string
+
 *  memfs: add method to Search content of files
 
 *  sanitize: new package to sanitize markup document into plain text

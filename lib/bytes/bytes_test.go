@@ -171,7 +171,7 @@ func TestIsTokenAt(t *testing.T) {
 		p     int
 		exp   bool
 	}{{
-		// empty
+	// empty
 	}, {
 		token: []byte("world"),
 		p:     -1,
@@ -330,5 +330,33 @@ func TestInReplace(t *testing.T) {
 		got := InReplace([]byte(c.in), []byte(ascii.LettersNumber), '_')
 
 		test.Assert(t, "InReplace", c.exp, string(got), true)
+	}
+}
+
+func TestIndexes(t *testing.T) {
+	cases := []struct {
+		desc  string
+		s     []byte
+		token []byte
+		exp   []int
+	}{{
+		desc:  "With empty string",
+		token: []byte("moo"),
+	}, {
+		desc: "With empty token",
+		s:    []byte("moo moo"),
+	}, {
+		desc:  "With non empty string and token",
+		s:     []byte("moo moomoo"),
+		token: []byte("moo"),
+		exp:   []int{0, 4, 7},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := Indexes(c.s, c.token)
+
+		test.Assert(t, "Indexes", c.exp, got, true)
 	}
 }

@@ -54,6 +54,16 @@ func ExampleEncloseToken() {
 	// '// Copyright 2016-2018 \"_Shulhan <ms@kilabit.info>\"_. All rights reserved.' true
 }
 
+func ExampleIndexes() {
+	s := []byte("moo moomoo")
+	token := []byte("moo")
+
+	idxs := Indexes(s, token)
+	fmt.Println(idxs)
+	// Output:
+	// [0 4 7]
+}
+
 func ExampleIsTokenAt() {
 	line := []byte("Hello, world")
 	token := []byte("world")
