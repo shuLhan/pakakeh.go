@@ -445,6 +445,29 @@ func SkipAfterToken(line, token []byte, startAt int, checkEsc bool) (int, bool) 
 }
 
 //
+// SnippetByIndexes take snippet in between of each index with minimum
+// snippet length.  The sniplen is the length before and after index, not the
+// length of all snippet.
+//
+func SnippetByIndexes(s []byte, indexes []int, sniplen int) (snippets [][]byte) {
+	var start, end int
+	for _, idx := range indexes {
+		start = idx - sniplen
+		if start < 0 {
+			start = 0
+		}
+		end = idx + sniplen
+		if end > len(s) {
+			end = len(s)
+		}
+
+		snippets = append(snippets, s[start:end])
+	}
+
+	return snippets
+}
+
+//
 // TokenFind return the first index of matched token in line, start at custom
 // index.
 // If "startat" parameter is less than 0, then it will be set to 0.

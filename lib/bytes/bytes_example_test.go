@@ -105,6 +105,20 @@ func ExampleSkipAfterToken() {
 	// 12 true
 }
 
+func ExampleSnippetByIndexes() {
+	s := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
+	indexes := []int{3, 20, len(s) - 4}
+
+	snippets := SnippetByIndexes(s, indexes, 5)
+	for _, snip := range snippets {
+		fmt.Printf("%s\n", snip)
+	}
+	// Output:
+	// // Copyr
+	// 18, Shulha
+	// reserved.
+}
+
 func ExampleTokenFind() {
 	line := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
 	token := []byte("right")
