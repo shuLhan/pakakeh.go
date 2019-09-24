@@ -137,7 +137,6 @@ func (rt *Runtime) ComputeCM(sampleIds []int,
 // ComputeStatFromCM will compute statistic using confusion matrix.
 //
 func (rt *Runtime) ComputeStatFromCM(stat *Stat, cm *CM) {
-
 	stat.OobError = cm.GetFalseRate()
 
 	stat.OobErrorMean = rt.oobStatTotal.OobError /

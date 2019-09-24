@@ -180,7 +180,6 @@ func ResetStdin(truncate bool) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 	}
 }
 

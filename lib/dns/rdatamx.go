@@ -26,7 +26,6 @@ type RDataMX struct {
 // String return readable representation of MX record.
 //
 func (mx *RDataMX) String() string {
-
 	var b strings.Builder
 
 	fmt.Fprintf(&b, "{Preference:%d Exchange:%s}", mx.Preference,

@@ -64,5 +64,4 @@ func ExampleTable_JoinCombination() {
 	fmt.Println(table.JoinCombination(s))
 	// Output:
 	// [[[a X] [b] [c]] [[a] [b X] [c]] [[a] [b] [c X]]]
-
 }

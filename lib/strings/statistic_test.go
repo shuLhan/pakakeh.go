@@ -394,5 +394,4 @@ func TestTextFrequencyOfTokens(t *testing.T) {
 		got := TextFrequencyOfTokens(c.text, c.tokens, c.sensitive)
 		test.Assert(t, "", c.exp, got, true)
 	}
-
 }

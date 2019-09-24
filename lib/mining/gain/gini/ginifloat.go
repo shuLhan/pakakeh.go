@@ -76,7 +76,6 @@ func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 			fmt.Printf("[gini] compute (%f): (%d/%f)^2 = %f\n",
 				(*classes)[x], v, n, p*p)
 		}
-
 	}
 
 	return 1 - sump2
@@ -112,7 +111,6 @@ func (gini *Gini) computeContinuGainFloat(src, target, classes *[]float64) {
 
 	// (0)
 	for p, contVal := range gini.ContinuPart {
-
 		// (0.1)
 		partidx := nsample
 		for x, attrVal := range *src {
