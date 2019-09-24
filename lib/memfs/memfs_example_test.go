@@ -45,7 +45,8 @@ func ExampleMemFS_Search() {
 		log.Fatal(err)
 	}
 
-	results := mfs.Search("body", 0)
+	q := []string{"body"}
+	results := mfs.Search(q, 0)
 
 	for _, result := range results {
 		fmt.Printf("Path: %s\n", result.Path)
@@ -53,9 +54,9 @@ func ExampleMemFS_Search() {
 	}
 	// Unordered output:
 	// Path: /include/index.css
-	// Snippets: ["body { }"]
+	// Snippets: ["body {\n}\n"]
 	// Path: /exclude/index.css
-	// Snippets: ["body { }"]
+	// Snippets: ["body {\n}\n"]
 	// Path: /index.css
-	// Snippets: ["body { }"]
+	// Snippets: ["body {\n}\n"]
 }
