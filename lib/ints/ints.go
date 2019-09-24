@@ -5,6 +5,10 @@
 // Packages ints provide a library for working with slice of integer.
 package ints
 
+import (
+	"sort"
+)
+
 //
 // Count number of class in data.
 //
@@ -193,6 +197,40 @@ func MaxRange(d []int, l, r int) (v, i int) {
 		}
 	}
 	return
+}
+
+//
+// MergeByDistance merge two slice of integers by their distance between each
+// others.
+//
+// For example, if slice a contains "{1, 5, 9}" and b contains
+// "{4, 11, 15}" and the distance is 3, the output of merged is
+// "{1, 5, 9, 15}".  The 4 and 11 are not included because 4 is in
+// range between 1 and (1+3), and 11 is in range between 9 and 9+3.
+//
+func MergeByDistance(a, b []int, distance int) (out []int) {
+	lenab := len(a) + len(b)
+	if lenab == 0 {
+		return nil
+	}
+
+	ab := make([]int, 0, lenab)
+	ab = append(ab, a...)
+	ab = append(ab, b...)
+
+	sort.Ints(ab)
+
+	out = append(out, ab[0])
+	last := ab[0]
+	for x := 1; x < len(ab); x++ {
+		if ab[x] > last+distance {
+			out = append(out, ab[x])
+			last = ab[x]
+			continue
+		}
+	}
+
+	return out
 }
 
 //
