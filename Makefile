@@ -45,6 +45,9 @@ coverbrowse: $(COVER_HTML)
 lint:
 	golangci-lint run --enable-all ./...
 
+genhtml:
+	ciigo -template=html.tmpl convert .
+
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)
 	rm -f ./**/${CPU_PROF}
