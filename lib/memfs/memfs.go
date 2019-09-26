@@ -109,6 +109,54 @@ func New(includes, excludes []string, withContent bool) (mfs *MemFS, err error) 
 }
 
 //
+// AddFile add the file directly as child of root.
+// The directory and subdirectories in the path will be keep as separated
+// nodes,
+//
+func (mfs *MemFS) AddFile(path string) (*Node, error) {
+	if len(path) == 0 {
+		return nil, nil
+	}
+
+	var parent *Node
+
+	path = filepath.ToSlash(filepath.Clean(path))
+	paths := strings.Split(path, "/")
+	path = ""
+
+	for _, p := range paths {
+		path = filepath.Join(path, p)
+		node, _ := mfs.Get(path)
+		if node != nil {
+			parent = node
+			continue
+		}
+
+		fi, err := os.Stat(path)
+		if err != nil {
+			return nil, fmt.Errorf("memfs.AddFile: " + err.Error())
+		}
+
+		node, err = NewNode(parent, fi, mfs.withContent)
+		if err != nil {
+			return nil, fmt.Errorf("memfs.AddFile: " + err.Error())
+		}
+
+		if parent == nil {
+			mfs.root.Childs = append(mfs.root.Childs, node)
+		} else {
+			parent.Childs = append(parent.Childs, node)
+		}
+
+		mfs.pn.v[node.Path] = node
+
+		parent = node
+	}
+
+	return parent, nil
+}
+
+//
 // ContentEncode encode each node's content into specific encoding, in other
 // words this method can be used to compress the content of file in memory
 // or before being served or written.

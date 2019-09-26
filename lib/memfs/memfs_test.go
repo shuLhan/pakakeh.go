@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/shuLhan/share/lib/test"
 )
@@ -13,6 +14,88 @@ import (
 var (
 	_testWD string
 )
+
+func TestAddFile(t *testing.T) {
+	cases := []struct {
+		desc     string
+		path     string
+		exp      *Node
+		expError string
+	}{{
+		desc: "With empty path",
+	}, {
+		desc:     "With path is not exist",
+		path:     "is/not/exist",
+		expError: "memfs.AddFile: stat is: no such file or directory",
+	}, {
+		desc: "With file exist",
+		path: "testdata/direct/add/file",
+		exp: &Node{
+			SysPath:     "testdata/direct/add/file",
+			Path:        "testdata/direct/add/file",
+			Name:        "file",
+			ContentType: "text/plain; charset=utf-8",
+			Size:        22,
+			V:           []byte("Test direct add file.\n"),
+		},
+	}, {
+		desc: "With directories exist",
+		path: "testdata/direct/add/file2",
+		exp: &Node{
+			SysPath:     "testdata/direct/add/file2",
+			Path:        "testdata/direct/add/file2",
+			Name:        "file2",
+			ContentType: "text/plain; charset=utf-8",
+			Size:        24,
+			V:           []byte("Test direct add file 2.\n"),
+		},
+	}}
+
+	mfs, err := New(nil, nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mfs.Mount("testdata")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got, err := mfs.AddFile(c.path)
+		if err != nil {
+			test.Assert(t, "error", c.expError, err.Error(), true)
+			continue
+		}
+
+		if got != nil {
+			got.ModTime = time.Time{}
+			got.Mode = 0
+			got.Parent = nil
+			got.Childs = nil
+		}
+
+		test.Assert(t, "AddFile", c.exp, got, true)
+
+		if c.exp != nil {
+			got, err := mfs.Get(c.path)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if got != nil {
+				got.ModTime = time.Time{}
+				got.Mode = 0
+				got.Parent = nil
+				got.Childs = nil
+			}
+
+			test.Assert(t, "Get", c.exp, got, true)
+		}
+	}
+}
 
 func TestGet(t *testing.T) {
 	// Limit file size to allow testing Get from disk on file "index.js".
@@ -121,6 +204,7 @@ func TestMount(t *testing.T) {
 		desc: "With directory",
 		excs: []string{
 			"memfs_generate.go$",
+			"direct$",
 		},
 		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
@@ -143,6 +227,7 @@ func TestMount(t *testing.T) {
 		excs: []string{
 			`.*\.js$`,
 			"memfs_generate.go$",
+			"direct$",
 		},
 		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
@@ -164,6 +249,7 @@ func TestMount(t *testing.T) {
 		},
 		excs: []string{
 			"memfs_generate.go$",
+			"direct$",
 		},
 		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{

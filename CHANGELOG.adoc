@@ -15,6 +15,8 @@ This library is released each month, usually at the first week of month.
 
 *  ints: add function to merge two slices by distance
 
+*  memfs: add method to add file directly as child of root
+
 *  memfs: add method to Search content of files
 
 *  sanitize: new package to sanitize markup document into plain text
