@@ -90,10 +90,14 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 	return node, nil
 }
 
-func (leaf *Node) decode() (err error) {
+//
+// Decode the contents of node (for example, uncompress with gzip) and return
+// it.
+//
+func (leaf *Node) Decode() ([]byte, error) {
 	if len(leaf.ContentEncoding) == 0 {
 		leaf.plainv = leaf.V
-		return nil
+		return leaf.plainv, nil
 	}
 
 	leaf.plainv = leaf.plainv[:0]
@@ -101,26 +105,26 @@ func (leaf *Node) decode() (err error) {
 	if leaf.ContentEncoding == EncodingGzip {
 		r, err := gzip.NewReader(bytes.NewReader(leaf.V))
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		buf := make([]byte, 1024)
-
 		for {
 			n, err := r.Read(buf)
 			if n > 0 {
-				leaf.plainv = append(leaf.plainv, buf...)
+				leaf.plainv = append(leaf.plainv, buf[:n]...)
 			}
 			if err != nil {
 				if err == io.EOF {
 					break
 				}
-				return err
+				return nil, err
 			}
+			buf = buf[0:]
 		}
 	}
 
-	return nil
+	return leaf.plainv, nil
 }
 
 //

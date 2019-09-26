@@ -511,7 +511,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		}
 
 		if len(node.lowerv) == 0 {
-			err := node.decode()
+			_, err := node.Decode()
 			if err != nil {
 				log.Printf("memfs.Search: " + err.Error())
 				continue

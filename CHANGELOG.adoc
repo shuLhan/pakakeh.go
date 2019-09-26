@@ -65,6 +65,8 @@ to Search the content.
 
 *  http: add content and response type HTML and XML
 
+*  memfs: export the Decode method on Node
+
 
 ==  share v0.8.2 (2019-09-05)
 
