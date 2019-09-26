@@ -578,7 +578,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 
 		var allIndexes []int
 		for _, token := range tokens {
-			indexes := libbytes.Indexes(node.lowerv, token)
+			indexes := libbytes.WordIndexes(node.lowerv, token)
 			allIndexes = append(allIndexes, indexes...)
 		}
 		if len(allIndexes) == 0 {
