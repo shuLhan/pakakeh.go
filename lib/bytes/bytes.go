@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"unicode"
 )
 
 //
@@ -507,6 +508,37 @@ func TokenFind(line, token []byte, startat int) (at int) {
 	}
 
 	return at
+}
+
+//
+// WordIndexes returns the index of the all instance of word in s as long as
+// word is separated by space or at the beginning or end of s.
+//
+func WordIndexes(s []byte, word []byte) (idxs []int) {
+	tmp := Indexes(s, word)
+	if len(tmp) == 0 {
+		return nil
+	}
+
+	for _, idx := range tmp {
+		x := idx - 1
+		if x >= 0 {
+			if !unicode.IsSpace(rune(s[x])) {
+				continue
+			}
+		}
+		x = idx + len(word)
+		if x >= len(s) {
+			idxs = append(idxs, idx)
+			continue
+		}
+		if !unicode.IsSpace(rune(s[x])) {
+			continue
+		}
+		idxs = append(idxs, idx)
+	}
+
+	return idxs
 }
 
 //

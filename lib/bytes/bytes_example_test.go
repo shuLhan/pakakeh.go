@@ -128,3 +128,13 @@ func ExampleTokenFind() {
 	fmt.Printf("%d\n", at)
 	// Output: 7
 }
+
+func ExampleWordIndexes() {
+	s := []byte("moo moomoo moo")
+	token := []byte("moo")
+
+	idxs := WordIndexes(s, token)
+	fmt.Println(idxs)
+	// Output:
+	// [0 11]
+}
