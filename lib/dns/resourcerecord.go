@@ -188,6 +188,9 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 }
 
 func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) error {
+	if x >= uint(len(packet)) {
+		return ErrLabelSizeLimit
+	}
 	count := packet[x]
 	if count == 0 {
 		return nil
