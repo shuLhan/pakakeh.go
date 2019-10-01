@@ -19,6 +19,10 @@ import (
 	"github.com/shuLhan/share/lib/memfs"
 )
 
+const (
+	defRWTimeout = 30 * time.Second
+)
+
 //
 // Server define HTTP server.
 //
@@ -51,15 +55,22 @@ func NewServer(opts *ServerOptions) (srv *Server, e error) {
 
 	if opts.Conn == nil {
 		srv.conn = &http.Server{
-			Addr:           opts.Address,
-			Handler:        srv,
-			ReadTimeout:    5 * time.Second,
-			WriteTimeout:   5 * time.Second,
+			ReadTimeout:    defRWTimeout,
+			WriteTimeout:   defRWTimeout,
 			MaxHeaderBytes: 1 << 20,
 		}
 	} else {
-		opts.Conn.Handler = srv
 		srv.conn = opts.Conn
+	}
+
+	srv.conn.Addr = opts.Address
+	srv.conn.Handler = srv
+
+	if srv.conn.ReadTimeout == 0 {
+		srv.conn.ReadTimeout = defRWTimeout
+	}
+	if srv.conn.WriteTimeout == 0 {
+		srv.conn.WriteTimeout = defRWTimeout
 	}
 
 	memfs.Development = opts.Development
