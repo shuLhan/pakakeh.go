@@ -12,27 +12,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestNewClient(t *testing.T) {
-	cases := []struct {
-		desc   string
-		raddr  string
-		expErr string
-	}{{
-		desc:   "With invalid IP",
-		raddr:  "smtp://1234",
-		expErr: "dial tcp 0.0.4.210:25: connect: invalid argument",
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		_, err := NewClient("", c.raddr, true)
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
-		}
-	}
-}
-
 func TestEhlo(t *testing.T) {
 	cases := []struct {
 		desc          string
