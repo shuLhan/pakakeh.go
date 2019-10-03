@@ -39,9 +39,6 @@ func TestMain(m *testing.M) {
 		DoHPort:          8443,
 		DoHCertificate:   &cert,
 		DoHAllowInsecure: true,
-		NameServers: []string{
-			"https://cloudflare-dns.com/dns-query",
-		},
 	}
 
 	_testServer, err = NewServer(serverOptions)
