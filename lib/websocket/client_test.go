@@ -572,8 +572,6 @@ func TestClientSendBin(t *testing.T) {
 
 		wg.Wait()
 	}
-
-	testClient.Quit()
 }
 
 func TestClientSendPing(t *testing.T) {
