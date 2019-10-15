@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/shuLhan/share/lib/debug"
 	libstrings "github.com/shuLhan/share/lib/strings"
@@ -253,6 +254,16 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 		case reflect.Int, reflect.Int8, reflect.Int16,
 			reflect.Int32, reflect.Int64:
 			valString, _ := ini.Get(sec, sub, key, "")
+
+			_, ok := fvalue.Interface().(time.Duration)
+			if ok {
+				dur, err := time.ParseDuration(valString)
+				if err != nil {
+					continue
+				}
+				fvalue.Set(reflect.ValueOf(dur))
+				continue
+			}
 
 			i64, err := strconv.ParseInt(valString, 10, 64)
 			if err != nil {
