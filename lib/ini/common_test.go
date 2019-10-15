@@ -17,7 +17,6 @@ func TestIsValueBoolTrue(t *testing.T) {
 		exp  bool
 	}{{
 		desc: "With empty value",
-		exp:  true,
 	}, {
 		desc: "With value in all caps",
 		v:    "TRUE",

@@ -15,7 +15,7 @@ import (
 //
 func IsValueBoolTrue(v string) bool {
 	if len(v) == 0 {
-		return true
+		return false
 	}
 	v = strings.ToLower(v)
 	if v == "true" || v == "t" || v == "ya" || v == "yes" || v == "1" {
