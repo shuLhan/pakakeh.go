@@ -86,19 +86,35 @@ func Marshal(v interface{}) (b []byte, err error) {
 		return nil, fmt.Errorf("marshal: expecting struct, got %v", kind)
 	}
 
-	numField := rtipe.NumField()
-	if numField == 0 {
-		return nil, nil
+	ini := &Ini{}
+
+	marshalStruct(ini, rtipe, rvalue)
+
+	buf := bytes.NewBuffer(nil)
+	err = ini.Write(buf)
+	if err != nil {
+		return nil, err
 	}
 
-	ini := &Ini{}
+	b = buf.Bytes()
+
+	return b, nil
+}
+
+func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
+	numField := rtipe.NumField()
+	if numField == 0 {
+		return
+	}
 
 	for x := 0; x < numField; x++ {
 		field := rtipe.Field(x)
 		fvalue := rvalue.Field(x)
+		ftype := field.Type
+		kind := ftype.Kind()
 
 		tag := field.Tag.Get("ini")
-		if len(tag) == 0 {
+		if len(tag) == 0 && kind != reflect.Struct {
 			continue
 		}
 
@@ -113,7 +129,9 @@ func Marshal(v interface{}) (b []byte, err error) {
 
 		switch len(tags) {
 		case 0:
-			continue
+			if kind != reflect.Struct {
+				continue
+			}
 		case 1:
 			sec = tags[0]
 			key = field.Name
@@ -128,8 +146,6 @@ func Marshal(v interface{}) (b []byte, err error) {
 		}
 		key = strings.ToLower(key)
 
-		ftype := field.Type
-		kind = ftype.Kind()
 		for kind == reflect.Ptr {
 			ftype = ftype.Elem()
 			kind = ftype.Kind()
@@ -157,12 +173,14 @@ func Marshal(v interface{}) (b []byte, err error) {
 			}
 
 		case reflect.Struct:
-			t, ok := fvalue.Interface().(time.Time)
+			vi := fvalue.Interface()
+			t, ok := vi.(time.Time)
 			if ok {
 				value = t.Format(layout)
 				ini.Set(sec, sub, key, value)
 				continue
 			}
+			marshalStruct(ini, reflect.TypeOf(vi), reflect.ValueOf(vi))
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:
@@ -173,16 +191,6 @@ func Marshal(v interface{}) (b []byte, err error) {
 			ini.Set(sec, sub, key, value)
 		}
 	}
-
-	buf := bytes.NewBuffer(nil)
-	err = ini.Write(buf)
-	if err != nil {
-		return nil, err
-	}
-
-	b = buf.Bytes()
-
-	return b, nil
 }
 
 //
@@ -212,21 +220,29 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
 	}
 
+	unmarshalStruct(ini, rtipe, rvalue)
+
+	return nil
+}
+
+func unmarshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 	numField := rtipe.NumField()
 	if numField == 0 {
-		return nil
+		return
 	}
 
 	for x := 0; x < numField; x++ {
 		field := rtipe.Field(x)
 		fvalue := rvalue.Field(x)
+		ftype := field.Type
+		kind := ftype.Kind()
 
 		if !fvalue.CanSet() {
 			continue
 		}
 
 		tag := field.Tag.Get("ini")
-		if len(tag) == 0 {
+		if len(tag) == 0 && kind != reflect.Struct {
 			continue
 		}
 
@@ -241,7 +257,9 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 
 		switch len(tags) {
 		case 0:
-			continue
+			if kind != reflect.Struct {
+				continue
+			}
 		case 1:
 			sec = tags[0]
 			key = field.Name
@@ -255,9 +273,6 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 			key = tags[2]
 		}
 		key = strings.ToLower(key)
-
-		ftype := field.Type
-		kind = ftype.Kind()
 
 		switch kind {
 		case reflect.Bool:
@@ -339,10 +354,12 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 			fvalue.Set(ptrval)
 
 		case reflect.Struct:
-			valString, _ := ini.Get(sec, sub, key, "")
+			vi := fvalue.Interface()
 
-			_, ok := fvalue.Interface().(time.Time)
+			_, ok := vi.(time.Time)
 			if ok {
+				valString, _ := ini.Get(sec, sub, key, "")
+
 				t, err := time.Parse(layout, valString)
 				if err != nil {
 					log.Printf("ini.Unmarshal: " + err.Error())
@@ -352,13 +369,13 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 				continue
 			}
 
+			unmarshalStruct(ini, reflect.TypeOf(vi), fvalue.Addr().Elem())
+
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:
 			// Do nothing.
 		}
 	}
-
-	return nil
 }
 
 func unmarshalPtr(ftype reflect.Type, fvalue reflect.Value, valString string) bool {

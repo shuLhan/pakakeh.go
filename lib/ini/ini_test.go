@@ -19,6 +19,21 @@ const (
 	testdataVarWithoutSection = "testdata/var_without_section.ini"
 )
 
+type A struct {
+	X int  `ini:"a::x"`
+	Y bool `ini:"a::y"`
+}
+
+type B struct {
+	A
+	Z float64 `ini:"b::z"`
+}
+
+type C struct {
+	B
+	XX byte `ini:"c::xx"`
+}
+
 func TestOpen(t *testing.T) {
 	cases := []struct {
 		desc   string
@@ -609,4 +624,63 @@ func TestGetVarMultiSection(t *testing.T) {
 			test.Assert(t, k, c.expVals[x], got, true)
 		}
 	}
+}
+
+func TestMarshal_embedded(t *testing.T) {
+	c := &C{
+		B: B{
+			A: A{
+				X: 1,
+				Y: true,
+			},
+			Z: 2.3,
+		},
+		XX: 4,
+	}
+	exp := `[a]
+x = 1
+y = true
+
+[b]
+z = 2.3
+
+[c]
+xx = 4
+`
+
+	got, err := Marshal(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "TestMarshal_embedded", exp, string(got), true)
+}
+
+func TestUnmarshal_embedded(t *testing.T) {
+	got := &C{}
+	content := []byte(`[a]
+x = 1
+y = true
+[b]
+z = 2.3
+[c]
+xx = 4
+`)
+	exp := &C{
+		B: B{
+			A: A{
+				X: 1,
+				Y: true,
+			},
+			Z: 2.3,
+		},
+		XX: 4,
+	}
+
+	err := Unmarshal(content, got)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "TestUnmarshal_embedded", exp, got, true)
 }
