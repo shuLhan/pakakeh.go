@@ -315,10 +315,7 @@ func (srv *Server) Start() {
 
 	go srv.processRequest()
 
-	if srv.opts.DoHCertificate != nil {
-		go srv.serveDoH()
-	}
-
+	go srv.serveDoH()
 	go srv.serveTCP()
 	go srv.serveUDP()
 }
@@ -360,20 +357,29 @@ func (srv *Server) Wait() {
 // file in parameter.  The path to request is static "/dns-query".
 //
 func (srv *Server) serveDoH() {
+	var err error
+
 	srv.doh = &http.Server{
 		Addr:        srv.opts.getDoHAddress().String(),
 		IdleTimeout: srv.opts.DoHIdleTimeout,
-		TLSConfig: &tls.Config{
+	}
+
+	if srv.opts.DoHCertificate != nil {
+		srv.doh.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{
 				*srv.opts.DoHCertificate,
 			},
 			InsecureSkipVerify: srv.opts.DoHAllowInsecure, //nolint:gosec
-		},
+		}
 	}
 
 	http.Handle("/dns-query", srv)
 
-	err := srv.doh.ListenAndServeTLS("", "")
+	if srv.doh.TLSConfig != nil {
+		err = srv.doh.ListenAndServeTLS("", "")
+	} else {
+		err = srv.doh.ListenAndServe()
+	}
 	if err != io.EOF {
 		err = fmt.Errorf("dns: error on DoH: " + err.Error())
 	}
