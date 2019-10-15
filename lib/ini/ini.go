@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -101,6 +102,11 @@ func Marshal(v interface{}) (b []byte, err error) {
 			continue
 		}
 
+		layout := field.Tag.Get("layout")
+		if len(layout) == 0 {
+			layout = time.RFC3339
+		}
+
 		var sec, sub, key, value string
 
 		tags := strings.Split(tag, ":")
@@ -148,6 +154,14 @@ func Marshal(v interface{}) (b []byte, err error) {
 				key = strings.ToLower(fmt.Sprintf("%v", mk))
 				value = fmt.Sprintf("%v", mv)
 				ini.Set(sec, sub, key, value)
+			}
+
+		case reflect.Struct:
+			t, ok := fvalue.Interface().(time.Time)
+			if ok {
+				value = t.Format(layout)
+				ini.Set(sec, sub, key, value)
+				continue
 			}
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
@@ -214,6 +228,11 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 		tag := field.Tag.Get("ini")
 		if len(tag) == 0 {
 			continue
+		}
+
+		layout := field.Tag.Get("layout")
+		if len(layout) == 0 {
+			layout = time.RFC3339
 		}
 
 		var sec, sub, key string
@@ -318,6 +337,20 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 			ptrval := reflect.New(ftype)
 			unmarshalPtr(ftype, ptrval.Elem(), valString)
 			fvalue.Set(ptrval)
+
+		case reflect.Struct:
+			valString, _ := ini.Get(sec, sub, key, "")
+
+			_, ok := fvalue.Interface().(time.Time)
+			if ok {
+				t, err := time.Parse(layout, valString)
+				if err != nil {
+					log.Printf("ini.Unmarshal: " + err.Error())
+					continue
+				}
+				fvalue.Set(reflect.ValueOf(t))
+				continue
+			}
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:

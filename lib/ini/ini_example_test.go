@@ -118,6 +118,7 @@ type T struct {
 	Int         int               `ini:"section::int"`
 	Bool        bool              `ini:"section::bool"`
 	Duration    time.Duration     `ini:"section::duration"`
+	Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
 	SliceString []string          `ini:"section:slice:string"`
 	SliceInt    []int             `ini:"section:slice:int"`
 	SliceUint   []uint            `ini:"section:slice:uint"`
@@ -137,6 +138,7 @@ func ExampleMarshal() {
 		Int:         1,
 		Bool:        true,
 		Duration:    time.Minute,
+		Time:        time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC),
 		SliceString: []string{"c", "d"},
 		SliceInt:    []int{2, 3},
 		SliceUint:   []uint{4, 5},
@@ -163,6 +165,7 @@ func ExampleMarshal() {
 	// int = 1
 	// bool = true
 	// duration = 1m0s
+	// time = 2006-01-02 15:04:05
 	//
 	// [section "slice"]
 	// string = c
@@ -192,6 +195,7 @@ string = a
 int = 1
 bool = true
 duration = 1s
+time = 2006-01-02 15:04:05
 
 [section "slice"]
 string = c
@@ -224,6 +228,7 @@ ptrint = 2
 	fmt.Printf("Int: %v\n", t.Int)
 	fmt.Printf("Bool: %v\n", t.Bool)
 	fmt.Printf("Duration: %v\n", t.Duration)
+	fmt.Printf("Time: %v\n", t.Time)
 	fmt.Printf("SliceString: %v\n", t.SliceString)
 	fmt.Printf("SliceInt: %v\n", t.SliceInt)
 	fmt.Printf("SliceUint: %v\n", t.SliceUint)
@@ -237,6 +242,7 @@ ptrint = 2
 	// Int: 1
 	// Bool: true
 	// Duration: 1s
+	// Time: 2006-01-02 15:04:05 +0000 UTC
 	// SliceString: [c d]
 	// SliceInt: [2 3]
 	// SliceUint: [4 5]
