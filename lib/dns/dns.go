@@ -11,6 +11,7 @@
 //	- RFC1886 DNS Extensions to support IP version 6.
 //	- RFC2782 A DNS RR for specifying the location of services (DNS SRV)
 //	- RFC6891 Extension Mechanisms for DNS (EDNS(0))
+//	- RFC8484 DNS Queries over HTTPS (DoH)
 //
 package dns
 
