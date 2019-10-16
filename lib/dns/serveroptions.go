@@ -52,9 +52,9 @@ type ServerOptions struct {
 	//
 	// Example,
 	//
-	//	udp://1.1.1.1
-	//	tcp://192.168.1.1:5353
-	//	https://cloudflare-dns.com/dns-query
+	//	udp://35.240.172.103
+	//	tcp://35.240.172.103:5353
+	//	https://kilabit.info/dns-query
 	//
 	NameServers []string `ini:"dns:server:parent"`
 
