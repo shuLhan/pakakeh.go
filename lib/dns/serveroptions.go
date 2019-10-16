@@ -20,20 +20,17 @@ import (
 //
 //nolint:maligned
 type ServerOptions struct {
-	// IPAddress ip address to serve query, without port number.
-	// This field is optional, default to "0.0.0.0".
-	IPAddress string
+	// ListenAddress ip address and port number to serve query.
+	// This field is optional, default to "0.0.0.0:53".
+	ListenAddress string `ini:"dns:server:listen"`
 
-	// DoHIdleTimeout number of seconds before considering the client of
-	// DoH connection to be closed.
+	// HTTPIdleTimeout number of seconds before considering the client of
+	// HTTP connection to be closed.
 	// This field is optional, default to 120 seconds.
-	DoHIdleTimeout time.Duration
+	HTTPIdleTimeout time.Duration `ini:"dns:server:http.idle_timeout"`
 
-	// Port port for UDP and TCP server, default to 53.
-	Port uint16
-
-	// DoHPort port for listening DNS over HTTP, default to 443.
-	DoHPort uint16
+	// HTTPPort port for listening DNS over HTTP, default to 443.
+	HTTPPort uint16 `ini:"dns:server:http.port"`
 
 	//
 	// NameServers contains list of parent name servers.
@@ -59,7 +56,7 @@ type ServerOptions struct {
 	//	tcp://192.168.1.1:5353
 	//	https://cloudflare-dns.com/dns-query
 	//
-	NameServers []string
+	NameServers []string `ini:"dns:server:parent"`
 
 	//
 	// FallbackNS contains list of parent name servers that will be
@@ -69,15 +66,15 @@ type ServerOptions struct {
 	//
 	FallbackNS []string
 
-	// DoHCertificate contains certificate for serving DNS over HTTPS.
-	// This field is optional, if its empty, server will not listening on
-	// HTTPS port.
-	DoHCertificate *tls.Certificate
+	// TLSCertificate contains certificate for serving DNS over HTTP.
+	// This field is optional, if its empty, server will listening on
+	// unsecure HTTP connection.
+	TLSCertificate *tls.Certificate
 
-	// DoHAllowInsecure option to allow to serve DoH with self-signed
+	// TLSAllowInsecure option to allow to serve DoH with self-signed
 	// certificate.
 	// This field is optional.
-	DoHAllowInsecure bool
+	TLSAllowInsecure bool `ini:"dns:server:allow_insecure"`
 
 	// PruneDelay define a delay where caches will be pruned.
 	// This field is optional, minimum value is 1 minute, and default
@@ -85,7 +82,7 @@ type ServerOptions struct {
 	// For example, if its set to 1 hour, every 1 hour the caches will be
 	// inspected to remove answers that has not been accessed more than or
 	// equal to PruneThreshold.
-	PruneDelay time.Duration
+	PruneDelay time.Duration `ini:"dns:server:cache.prune_delay"`
 
 	// PruneThreshold define negative duration where answers will be
 	// pruned from caches.
@@ -93,9 +90,10 @@ type ServerOptions struct {
 	// value is -1 hour,
 	// For example, if its set to -1 minute, any answers that has not been
 	// accessed in the last 1 minute will be removed from cache.
-	PruneThreshold time.Duration
+	PruneThreshold time.Duration `ini:"dns:server:cache.prune_threshold"`
 
-	ip net.IP
+	ip   net.IP
+	port uint16
 
 	// primaryUDP contains list of parent name server addresses using UDP
 	// protocol.
@@ -118,23 +116,20 @@ type ServerOptions struct {
 // init initialize the server options.
 //
 func (opts *ServerOptions) init() (err error) {
-	if len(opts.IPAddress) == 0 {
-		opts.IPAddress = "0.0.0.0"
+	if len(opts.ListenAddress) == 0 {
+		opts.ListenAddress = "0.0.0.0:53"
 	}
 
-	opts.ip = net.ParseIP(opts.IPAddress)
+	_, opts.ip, opts.port = libnet.ParseIPPort(opts.ListenAddress, DefaultPort)
 	if opts.ip == nil {
-		return fmt.Errorf("dns: invalid IP address '%s'", opts.IPAddress)
+		return fmt.Errorf("dns: invalid IP address '%s'", opts.ListenAddress)
 	}
 
-	if opts.Port == 0 {
-		opts.Port = DefaultPort
+	if opts.HTTPPort == 0 {
+		opts.HTTPPort = DefaultHTTPPort
 	}
-	if opts.DoHPort == 0 {
-		opts.DoHPort = DefaultDoHPort
-	}
-	if opts.DoHIdleTimeout <= 0 {
-		opts.DoHIdleTimeout = defaultDoHIdleTimeout
+	if opts.HTTPIdleTimeout <= 0 {
+		opts.HTTPIdleTimeout = defaultHTTPIdleTimeout
 	}
 	if opts.PruneDelay.Minutes() < 1 {
 		opts.PruneDelay = time.Hour
@@ -159,21 +154,21 @@ func (opts *ServerOptions) init() (err error) {
 func (opts *ServerOptions) getUDPAddress() *net.UDPAddr {
 	return &net.UDPAddr{
 		IP:   opts.ip,
-		Port: int(opts.Port),
+		Port: int(opts.port),
 	}
 }
 
 func (opts *ServerOptions) getTCPAddress() *net.TCPAddr {
 	return &net.TCPAddr{
 		IP:   opts.ip,
-		Port: int(opts.Port),
+		Port: int(opts.port),
 	}
 }
 
-func (opts *ServerOptions) getDoHAddress() *net.TCPAddr {
+func (opts *ServerOptions) getHTTPAddress() *net.TCPAddr {
 	return &net.TCPAddr{
 		IP:   opts.ip,
-		Port: int(opts.DoHPort),
+		Port: int(opts.HTTPPort),
 	}
 }
 

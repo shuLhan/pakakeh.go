@@ -360,16 +360,16 @@ func (srv *Server) serveDoH() {
 	var err error
 
 	srv.doh = &http.Server{
-		Addr:        srv.opts.getDoHAddress().String(),
-		IdleTimeout: srv.opts.DoHIdleTimeout,
+		Addr:        srv.opts.getHTTPAddress().String(),
+		IdleTimeout: srv.opts.HTTPIdleTimeout,
 	}
 
-	if srv.opts.DoHCertificate != nil {
+	if srv.opts.TLSCertificate != nil {
 		srv.doh.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{
-				*srv.opts.DoHCertificate,
+				*srv.opts.TLSCertificate,
 			},
-			InsecureSkipVerify: srv.opts.DoHAllowInsecure, //nolint:gosec
+			InsecureSkipVerify: srv.opts.TLSAllowInsecure, //nolint:gosec
 		}
 	}
 

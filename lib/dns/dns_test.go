@@ -34,11 +34,10 @@ func TestMain(m *testing.M) {
 	}
 
 	serverOptions := &ServerOptions{
-		IPAddress:        "127.0.0.1",
-		Port:             5300,
-		DoHPort:          8443,
-		DoHCertificate:   &cert,
-		DoHAllowInsecure: true,
+		ListenAddress:    "127.0.0.1:5300",
+		HTTPPort:         8443,
+		TLSCertificate:   &cert,
+		TLSAllowInsecure: true,
 	}
 
 	_testServer, err = NewServer(serverOptions)

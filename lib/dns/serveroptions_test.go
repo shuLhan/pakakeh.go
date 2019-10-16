@@ -24,18 +24,18 @@ func TestServerOptionsInit(t *testing.T) {
 		desc: "With empty value",
 		so:   &ServerOptions{},
 		exp: &ServerOptions{
-			IPAddress:      "0.0.0.0",
-			DoHIdleTimeout: defaultDoHIdleTimeout,
-			Port:           DefaultPort,
-			DoHPort:        DefaultDoHPort,
-			PruneDelay:     time.Hour,
-			PruneThreshold: -1 * time.Hour,
-			ip:             ip,
+			ListenAddress:   "0.0.0.0:53",
+			HTTPIdleTimeout: defaultHTTPIdleTimeout,
+			HTTPPort:        DefaultHTTPPort,
+			PruneDelay:      time.Hour,
+			PruneThreshold:  -1 * time.Hour,
+			ip:              ip,
+			port:            53,
 		},
 	}, {
 		desc: "With invalid IP address",
 		so: &ServerOptions{
-			IPAddress: "0.0.0",
+			ListenAddress: "0.0.0",
 		},
 		expError: `dns: invalid IP address '0.0.0'`,
 	}, {
@@ -54,16 +54,16 @@ func TestServerOptionsInit(t *testing.T) {
 			},
 		},
 		exp: &ServerOptions{
-			IPAddress:      "0.0.0.0",
-			DoHIdleTimeout: defaultDoHIdleTimeout,
-			Port:           DefaultPort,
-			DoHPort:        DefaultDoHPort,
+			ListenAddress:   "0.0.0.0:53",
+			HTTPIdleTimeout: defaultHTTPIdleTimeout,
+			HTTPPort:        DefaultHTTPPort,
 			NameServers: []string{
 				"udp://127.0.0.1",
 			},
 			PruneDelay:     time.Hour,
 			PruneThreshold: -1 * time.Hour,
 			ip:             ip,
+			port:           53,
 			primaryUDP: []*net.UDPAddr{{
 				IP:   net.ParseIP("127.0.0.1"),
 				Port: 53,

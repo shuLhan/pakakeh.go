@@ -43,11 +43,10 @@ func ExampleServer() {
 	}
 
 	serverOptions := &dns.ServerOptions{
-		IPAddress:        "127.0.0.1",
-		Port:             5300,
-		DoHPort:          8443,
-		DoHCertificate:   &cert,
-		DoHAllowInsecure: true,
+		ListenAddress:    "127.0.0.1:5300",
+		HTTPPort:         8443,
+		TLSCertificate:   &cert,
+		TLSAllowInsecure: true,
 	}
 
 	server, err := dns.NewServer(serverOptions)

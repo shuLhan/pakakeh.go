@@ -24,9 +24,9 @@ const (
 	// TCP connection.
 	DefaultPort uint16 = 53
 
-	// DefaultDoHPort define default port for DoH.
-	DefaultDoHPort        uint16        = 443
-	defaultDoHIdleTimeout time.Duration = 120 * time.Second
+	// DefaultHTTPPort define default port for DNS over HTTP.
+	DefaultHTTPPort        uint16        = 443
+	defaultHTTPIdleTimeout time.Duration = 120 * time.Second
 )
 
 const (
