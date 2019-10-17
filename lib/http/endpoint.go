@@ -119,8 +119,6 @@ func (ep *Endpoint) call(
 		res.Header().Set(ContentType, ContentTypePlain)
 	}
 
-	res.WriteHeader(http.StatusOK)
-
 	_, e = res.Write(rspb)
 	if e != nil {
 		log.Printf("endpoint.call: %s %s %s\n", req.Method, req.URL.Path, e)
