@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"crypto/tls"
 	"log"
 	"os"
 	"testing"
@@ -30,16 +29,12 @@ func TestMain(m *testing.M) {
 
 	log.SetFlags(0)
 
-	cert, err := tls.LoadX509KeyPair("testdata/domain.crt", "testdata/domain.key")
-	if err != nil {
-		log.Fatal("dns: error loading certificate: " + err.Error())
-	}
-
 	serverOptions := &ServerOptions{
 		ListenAddress:    "127.0.0.1:5300",
 		HTTPPort:         8443,
 		TLSPort:          testTLSPort,
-		TLSCertificate:   &cert,
+		TLSCertFile:      "testdata/domain.crt",
+		TLSPrivateKey:    "testdata/domain.key",
 		TLSAllowInsecure: true,
 	}
 

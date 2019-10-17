@@ -128,10 +128,15 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 			tcpAddr, err.Error())
 	}
 
-	if opts.TLSCertificate != nil {
+	if len(opts.TLSCertFile) > 0 && len(opts.TLSPrivateKey) > 0 {
+		cert, err := tls.LoadX509KeyPair(opts.TLSCertFile, opts.TLSPrivateKey)
+		if err != nil {
+			return nil, fmt.Errorf("dns: error loading certificate: " + err.Error())
+		}
+
 		srv.tlsConfig = &tls.Config{
 			Certificates: []tls.Certificate{
-				*opts.TLSCertificate,
+				cert,
 			},
 			InsecureSkipVerify: opts.TLSAllowInsecure, //nolint:gosec
 		}

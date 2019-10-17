@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
@@ -70,11 +69,14 @@ type ServerOptions struct {
 	//
 	FallbackNS []string
 
-	// TLSCertificate contains certificate for serving DNS over TLS and
-	// HTTPS.
+	// TLSCertFile contains path to certificate for serving DNS over TLS
+	// and HTTPS.
 	// This field is optional, if its empty, server will listening on
-	// unsecure TCP and HTTP connection.
-	TLSCertificate *tls.Certificate
+	// unsecure HTTP connection only.
+	TLSCertFile string `ini:"dns:server:tls.certificate"`
+
+	// TLSPrivateKey contains path to certificate private key file.
+	TLSPrivateKey string `ini:"dns:server:tls.private_key"`
 
 	// TLSAllowInsecure option to allow to serve DoH with self-signed
 	// certificate.

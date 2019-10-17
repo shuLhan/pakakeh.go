@@ -1,7 +1,6 @@
 package dns_test
 
 import (
-	"crypto/tls"
 	"fmt"
 	"log"
 	"time"
@@ -37,15 +36,11 @@ func clientLookup(nameserver string) {
 func ExampleServer() {
 	serverAddress := "127.0.0.1:5300"
 
-	cert, err := tls.LoadX509KeyPair("testdata/domain.crt", "testdata/domain.key")
-	if err != nil {
-		log.Fatal("dns: error loading certificate: " + err.Error())
-	}
-
 	serverOptions := &dns.ServerOptions{
 		ListenAddress:    "127.0.0.1:5300",
 		HTTPPort:         8443,
-		TLSCertificate:   &cert,
+		TLSCertFile:      "testdata/domain.crt",
+		TLSPrivateKey:    "testdata/domain.key",
 		TLSAllowInsecure: true,
 	}
 
