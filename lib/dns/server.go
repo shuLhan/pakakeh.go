@@ -443,7 +443,7 @@ func (srv *Server) serveDoT() {
 				conn:    conn,
 			}
 
-			go srv.serveTCPClient(cl)
+			go srv.serveTCPClient(cl, connTypeDoT)
 		}
 	}
 }
@@ -469,7 +469,7 @@ func (srv *Server) serveTCP() {
 			conn:    conn,
 		}
 
-		go srv.serveTCPClient(cl)
+		go srv.serveTCPClient(cl, connTypeTCP)
 	}
 }
 
@@ -579,7 +579,7 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	cl.waitResponse()
 }
 
-func (srv *Server) serveTCPClient(cl *TCPClient) {
+func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 	var (
 		n   int
 		err error
@@ -604,7 +604,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient) {
 			break
 		}
 
-		req.kind = connTypeTCP
+		req.kind = kind
 		req.message.UnpackHeaderQuestion()
 		req.writer = cl
 

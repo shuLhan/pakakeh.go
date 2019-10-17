@@ -72,6 +72,7 @@ const (
 	connTypeUDP connType = 1 << iota
 	connTypeTCP
 	connTypeDoH
+	connTypeDoT
 )
 
 //
@@ -82,6 +83,7 @@ var connTypeNames = map[connType]string{
 	connTypeUDP: "UDP",
 	connTypeTCP: "TCP",
 	connTypeDoH: "DoH",
+	connTypeDoT: "DoT",
 }
 
 // OpCode define a custom type for DNS header operation code.
