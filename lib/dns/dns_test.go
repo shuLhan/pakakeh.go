@@ -15,7 +15,9 @@ import (
 )
 
 const (
-	testServerAddress = "127.0.0.1:5300"
+	testServerAddress    = "127.0.0.1:5300"
+	testDoTServerAddress = "127.0.0.1:8053"
+	testTLSPort          = 8053
 )
 
 //nolint:gochecknoglobals
@@ -36,6 +38,7 @@ func TestMain(m *testing.M) {
 	serverOptions := &ServerOptions{
 		ListenAddress:    "127.0.0.1:5300",
 		HTTPPort:         8443,
+		TLSPort:          testTLSPort,
 		TLSCertificate:   &cert,
 		TLSAllowInsecure: true,
 	}

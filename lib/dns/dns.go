@@ -23,9 +23,10 @@ import (
 const (
 	// DefaultPort define default DNS remote or listen port for UDP and
 	// TCP connection.
-	DefaultPort uint16 = 53
+	DefaultPort    uint16 = 53
+	DefaultTLSPort uint16 = 853
 
-	// DefaultHTTPPort define default port for DNS over HTTP.
+	// DefaultHTTPPort define default port for DNS over HTTPS.
 	DefaultHTTPPort        uint16        = 443
 	defaultHTTPIdleTimeout time.Duration = 120 * time.Second
 )

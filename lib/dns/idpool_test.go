@@ -11,8 +11,8 @@ import (
 )
 
 func TestIDPool(t *testing.T) {
-	test.Assert(t, "getNextID()=5", getNextID(), uint16(5), true)
-	test.Assert(t, "getNextID()=6", getNextID(), uint16(6), true)
-	test.Assert(t, "getNextID()=7", getNextID(), uint16(7), true)
 	test.Assert(t, "getNextID()=8", getNextID(), uint16(8), true)
+	test.Assert(t, "getNextID()=9", getNextID(), uint16(9), true)
+	test.Assert(t, "getNextID()=10", getNextID(), uint16(10), true)
+	test.Assert(t, "getNextID()=11", getNextID(), uint16(11), true)
 }
