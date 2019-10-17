@@ -32,6 +32,9 @@ type ServerOptions struct {
 	// HTTPPort port for listening DNS over HTTP, default to 443.
 	HTTPPort uint16 `ini:"dns:server:http.port"`
 
+	// TLSPort port for listening DNS over TLS, default to 853.
+	TLSPort uint16 `ini:"dns:server:tls.port"`
+
 	//
 	// NameServers contains list of parent name servers.
 	//
@@ -54,7 +57,8 @@ type ServerOptions struct {
 	//
 	//	udp://35.240.172.103
 	//	tcp://35.240.172.103:5353
-	//	https://kilabit.info/dns-query
+	//	https://35.240.172.103:853 (DNS over TLS)
+	//	https://kilabit.info/dns-query (DNS over HTTPS)
 	//
 	NameServers []string `ini:"dns:server:parent"`
 
@@ -66,9 +70,10 @@ type ServerOptions struct {
 	//
 	FallbackNS []string
 
-	// TLSCertificate contains certificate for serving DNS over HTTP.
+	// TLSCertificate contains certificate for serving DNS over TLS and
+	// HTTPS.
 	// This field is optional, if its empty, server will listening on
-	// unsecure HTTP connection.
+	// unsecure TCP and HTTP connection.
 	TLSCertificate *tls.Certificate
 
 	// TLSAllowInsecure option to allow to serve DoH with self-signed
@@ -107,6 +112,10 @@ type ServerOptions struct {
 	// protocol.
 	primaryDoh []string
 
+	// primaryDoT contains list of parent name server addresses using DoT
+	// protocol.
+	primaryDoT []string
+
 	fallbackUDP []*net.UDPAddr
 	fallbackTCP []*net.TCPAddr
 	fallbackDoh []string
@@ -127,6 +136,9 @@ func (opts *ServerOptions) init() (err error) {
 
 	if opts.HTTPPort == 0 {
 		opts.HTTPPort = DefaultHTTPPort
+	}
+	if opts.TLSPort == 0 {
+		opts.TLSPort = DefaultTLSPort
 	}
 	if opts.HTTPIdleTimeout <= 0 {
 		opts.HTTPIdleTimeout = defaultHTTPIdleTimeout
@@ -169,6 +181,13 @@ func (opts *ServerOptions) getHTTPAddress() *net.TCPAddr {
 	return &net.TCPAddr{
 		IP:   opts.ip,
 		Port: int(opts.HTTPPort),
+	}
+}
+
+func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
+	return &net.TCPAddr{
+		IP:   opts.ip,
+		Port: int(opts.TLSPort),
 	}
 }
 

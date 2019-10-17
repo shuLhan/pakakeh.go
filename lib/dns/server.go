@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/shuLhan/share/lib/debug"
 )
@@ -29,6 +30,11 @@ const (
 
 //
 // Server defines DNS server.
+//
+// Services
+//
+// The server will listening for DNS over TLS only if certificates file is
+// exist and valid.
 //
 // Caches
 //
@@ -73,8 +79,11 @@ type Server struct {
 	errListener chan error
 	caches      *caches
 
+	tlsConfig *tls.Config
+
 	udp *net.UDPConn
 	tcp *net.TCPListener
+	dot net.Listener
 	doh *http.Server
 
 	requestq        chan *request
@@ -117,6 +126,15 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("dns: error listening on TCP '%v': %s",
 			tcpAddr, err.Error())
+	}
+
+	if opts.TLSCertificate != nil {
+		srv.tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{
+				*opts.TLSCertificate,
+			},
+			InsecureSkipVerify: opts.TLSAllowInsecure, //nolint:gosec
+		}
 	}
 
 	srv.errListener = make(chan error, 1)
@@ -315,6 +333,7 @@ func (srv *Server) Start() {
 
 	go srv.processRequest()
 
+	go srv.serveDoT()
 	go srv.serveDoH()
 	go srv.serveTCP()
 	go srv.serveUDP()
@@ -362,20 +381,12 @@ func (srv *Server) serveDoH() {
 	srv.doh = &http.Server{
 		Addr:        srv.opts.getHTTPAddress().String(),
 		IdleTimeout: srv.opts.HTTPIdleTimeout,
-	}
-
-	if srv.opts.TLSCertificate != nil {
-		srv.doh.TLSConfig = &tls.Config{
-			Certificates: []tls.Certificate{
-				*srv.opts.TLSCertificate,
-			},
-			InsecureSkipVerify: srv.opts.TLSAllowInsecure, //nolint:gosec
-		}
+		TLSConfig:   srv.tlsConfig,
 	}
 
 	http.Handle("/dns-query", srv)
 
-	if srv.doh.TLSConfig != nil {
+	if srv.tlsConfig != nil {
 		err = srv.doh.ListenAndServeTLS("", "")
 	} else {
 		err = srv.doh.ListenAndServe()
@@ -385,6 +396,47 @@ func (srv *Server) serveDoH() {
 	}
 
 	srv.errListener <- err
+}
+
+func (srv *Server) serveDoT() {
+	var (
+		err error
+	)
+
+	if srv.tlsConfig == nil {
+		return
+	}
+
+	dotAddr := srv.opts.getDoTAddress()
+
+	for {
+		srv.dot, err = tls.Listen("tcp", dotAddr.String(), srv.tlsConfig)
+		if err != nil {
+			log.Println("dns: Server.serveDoT: " + err.Error())
+			time.Sleep(3 * time.Second)
+			continue
+		}
+
+		log.Println("dns: listening for DNS over TLS at", dotAddr.String())
+
+		for {
+			conn, err := srv.dot.Accept()
+			if err != nil {
+				if err != io.EOF {
+					err = fmt.Errorf("dns: error on accepting DoT connection: " + err.Error())
+				}
+				srv.errListener <- err
+				break
+			}
+
+			cl := &TCPClient{
+				timeout: clientTimeout,
+				conn:    conn,
+			}
+
+			go srv.serveTCPClient(cl)
+		}
+	}
 }
 
 //

@@ -20,7 +20,7 @@ import (
 type TCPClient struct {
 	timeout time.Duration
 	addr    *net.TCPAddr
-	conn    *net.TCPConn
+	conn    net.Conn
 }
 
 //

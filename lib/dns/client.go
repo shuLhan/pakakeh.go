@@ -14,8 +14,8 @@ import (
 type Client interface {
 	Close() error
 	Lookup(allowRecursion bool, qtype, qclass uint16, qname []byte) (*Message, error)
-	RemoteAddr() string
 	Query(req *Message) (*Message, error)
-	SetTimeout(t time.Duration)
+	RemoteAddr() string
 	SetRemoteAddr(addr string) error
+	SetTimeout(t time.Duration)
 }

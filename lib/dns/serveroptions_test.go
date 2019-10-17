@@ -27,6 +27,7 @@ func TestServerOptionsInit(t *testing.T) {
 			ListenAddress:   "0.0.0.0:53",
 			HTTPIdleTimeout: defaultHTTPIdleTimeout,
 			HTTPPort:        DefaultHTTPPort,
+			TLSPort:         DefaultTLSPort,
 			PruneDelay:      time.Hour,
 			PruneThreshold:  -1 * time.Hour,
 			ip:              ip,
@@ -57,6 +58,7 @@ func TestServerOptionsInit(t *testing.T) {
 			ListenAddress:   "0.0.0.0:53",
 			HTTPIdleTimeout: defaultHTTPIdleTimeout,
 			HTTPPort:        DefaultHTTPPort,
+			TLSPort:         DefaultTLSPort,
 			NameServers: []string{
 				"udp://127.0.0.1",
 			},
