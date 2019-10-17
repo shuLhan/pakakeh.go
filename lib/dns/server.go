@@ -383,8 +383,10 @@ func (srv *Server) Wait() {
 func (srv *Server) serveDoH() {
 	var err error
 
+	addr := srv.opts.getHTTPAddress().String()
+
 	srv.doh = &http.Server{
-		Addr:        srv.opts.getHTTPAddress().String(),
+		Addr:        addr,
 		IdleTimeout: srv.opts.HTTPIdleTimeout,
 		TLSConfig:   srv.tlsConfig,
 	}
@@ -392,8 +394,10 @@ func (srv *Server) serveDoH() {
 	http.Handle("/dns-query", srv)
 
 	if srv.tlsConfig != nil {
+		log.Println("dns.Server: listening for DNS over HTTPS at", addr)
 		err = srv.doh.ListenAndServeTLS("", "")
 	} else {
+		log.Println("dns.Server: listening for DNS over HTTP at", addr)
 		err = srv.doh.ListenAndServe()
 	}
 	if err != io.EOF {
@@ -422,7 +426,7 @@ func (srv *Server) serveDoT() {
 			continue
 		}
 
-		log.Println("dns: listening for DNS over TLS at", dotAddr.String())
+		log.Println("dns.Server: listening for DNS over TLS at", dotAddr.String())
 
 		for {
 			conn, err := srv.dot.Accept()
@@ -448,6 +452,8 @@ func (srv *Server) serveDoT() {
 // serveTCP serve DNS request from TCP connection.
 //
 func (srv *Server) serveTCP() {
+	log.Println("dns.Server: listening for DNS over TCP at", srv.tcp.Addr())
+
 	for {
 		conn, err := srv.tcp.AcceptTCP()
 		if err != nil {
@@ -471,6 +477,8 @@ func (srv *Server) serveTCP() {
 // serveUDP serve DNS request from UDP connection.
 //
 func (srv *Server) serveUDP() {
+	log.Println("dns.Server: listening for DNS over UDP at", srv.udp.LocalAddr())
+
 	for {
 		req := newRequest()
 
