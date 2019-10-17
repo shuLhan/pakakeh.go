@@ -81,7 +81,7 @@ type ServerOptions struct {
 	// TLSAllowInsecure option to allow to serve DoH with self-signed
 	// certificate.
 	// This field is optional.
-	TLSAllowInsecure bool `ini:"dns:server:allow_insecure"`
+	TLSAllowInsecure bool `ini:"dns:server:tls.allow_insecure"`
 
 	// DoHBehindProxy allow serving DNS over insecure HTTP, even if
 	// certificate file is defined.
