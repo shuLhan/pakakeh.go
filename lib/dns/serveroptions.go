@@ -83,6 +83,12 @@ type ServerOptions struct {
 	// This field is optional.
 	TLSAllowInsecure bool `ini:"dns:server:allow_insecure"`
 
+	// DoHBehindProxy allow serving DNS over insecure HTTP, even if
+	// certificate file is defined.
+	// This option allow serving DNS request forwarded by another proxy
+	// server.
+	DoHBehindProxy bool `ini:"dns:server:doh.behind_proxy"`
+
 	// PruneDelay define a delay where caches will be pruned.
 	// This field is optional, minimum value is 1 minute, and default
 	// value is 1 hour.

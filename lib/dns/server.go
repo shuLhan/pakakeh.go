@@ -388,13 +388,13 @@ func (srv *Server) serveDoH() {
 	srv.doh = &http.Server{
 		Addr:        addr,
 		IdleTimeout: srv.opts.HTTPIdleTimeout,
-		TLSConfig:   srv.tlsConfig,
 	}
 
 	http.Handle("/dns-query", srv)
 
-	if srv.tlsConfig != nil {
+	if srv.tlsConfig != nil && !srv.opts.DoHBehindProxy {
 		log.Println("dns.Server: listening for DNS over HTTPS at", addr)
+		srv.doh.TLSConfig = srv.tlsConfig
 		err = srv.doh.ListenAndServeTLS("", "")
 	} else {
 		log.Println("dns.Server: listening for DNS over HTTP at", addr)
