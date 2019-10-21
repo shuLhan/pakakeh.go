@@ -46,7 +46,7 @@ func ExampleSplit() {
 	// Output:
 	// [a b c [A] B C]
 	// [a b c A B C]
-	// [a b c [A] B C]
+	// [a b c [A]]
 	// [a b c]
 }
 

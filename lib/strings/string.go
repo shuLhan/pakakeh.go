@@ -172,25 +172,24 @@ func MergeSpaces(text string, withline bool) string {
 // If cleanit is true remove any non-alphanumeric in the start and the end of
 // each words.
 //
-// If uniq is true remove duplicate words.
+// If uniq is true remove duplicate words, in case insensitive manner.
 //
 func Split(text string, cleanit bool, uniq bool) (words []string) {
 	words = strings.Fields(text)
 
-	if !cleanit {
-		return
+	if cleanit {
+		// Remove non-alphanumeric character from start and end of each word.
+		for x, word := range words {
+			words[x] = TrimNonAlnum(word)
+		}
+
 	}
 
-	// Remove non-alphanumeric character from start and end of each word.
-	for x, word := range words {
-		words[x] = TrimNonAlnum(word)
+	if uniq {
+		return Uniq(words, false)
 	}
 
-	if !uniq {
-		return
-	}
-
-	return Uniq(words, false)
+	return words
 }
 
 //
