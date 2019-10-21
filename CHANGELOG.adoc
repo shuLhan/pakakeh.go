@@ -30,6 +30,8 @@ This library is released each month, usually at the first week of month.
 
 *  ini: fix return value for empty string in IsValueBoolTrue
 
+*  dns: return error code 4 if server receive unknown message class or type
+
 
 ==  share v0.9.0 (2019-10-08)
 

@@ -617,6 +617,28 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 	}
 }
 
+func (srv *Server) isImplemented(msg *Message) bool {
+	switch msg.Question.Class {
+	case QueryClassCS, QueryClassCH, QueryClassHS:
+		log.Printf("dns: class %d is not implemented\n", msg.Question.Class)
+		return false
+	}
+
+	if msg.Question.Type >= QueryTypeA && msg.Question.Type <= QueryTypeTXT {
+		return true
+	}
+	switch msg.Question.Type {
+	case QueryTypeAAAA, QueryTypeSRV, QueryTypeOPT, QueryTypeAXFR,
+		QueryTypeMAILB, QueryTypeMAILA:
+		return true
+	}
+
+	log.Printf("dns: type %d is not implemented\n",
+		msg.Question.Type)
+
+	return false
+}
+
 //
 // processRequest from client.
 //
@@ -626,6 +648,18 @@ func (srv *Server) processRequest() {
 	)
 
 	for req := range srv.requestq {
+		if !srv.isImplemented(req.message) {
+			req.message.SetQuery(false)
+			req.message.SetResponseCode(RCodeNotImplemented)
+			res = req.message
+
+			_, err := req.writer.Write(res.Packet)
+			if err != nil {
+				log.Println("dns: processRequest: ", err.Error())
+			}
+			continue
+		}
+
 		if debug.Value >= 1 {
 			fmt.Printf("dns: < %s %d:%s\n",
 				connTypeNames[req.kind],
