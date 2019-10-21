@@ -231,6 +231,9 @@ func (msg *Message) String() string {
 	return sb.String()
 }
 
+//
+// CanonBody return the canonincal representation of Message.
+//
 func (msg *Message) CanonBody() (body []byte) {
 	if msg.DKIMSignature.CanonBody == nil || *msg.DKIMSignature.CanonBody == dkim.CanonSimple {
 		body = msg.Body.Simple()

@@ -140,6 +140,7 @@ import (
 	"errors"
 )
 
+// List of known HTTP header keys and values.
 const (
 	ContentEncoding   = "Content-Encoding"
 	ContentLength     = "Content-Length"

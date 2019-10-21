@@ -4,6 +4,7 @@
 
 package websocket
 
+// Opcode represent the websocket operation code.
 type Opcode byte
 
 //

@@ -23,7 +23,10 @@ import (
 const (
 	// DefaultPort define default DNS remote or listen port for UDP and
 	// TCP connection.
-	DefaultPort    uint16 = 53
+	DefaultPort uint16 = 53
+
+	// DefaultTLSPort define default remote and listen port for DNS over
+	// TLS.
 	DefaultTLSPort uint16 = 853
 
 	// DefaultHTTPPort define default port for DNS over HTTPS.

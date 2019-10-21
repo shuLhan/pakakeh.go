@@ -30,6 +30,8 @@ const (
 )
 
 var (
+	// ErrConnClosed define an error if client connection is not
+	// connected.
 	ErrConnClosed = fmt.Errorf("websocket: client is not connected")
 )
 

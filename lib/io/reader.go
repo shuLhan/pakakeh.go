@@ -253,7 +253,8 @@ func (r *Reader) String() string {
 }
 
 //
-// Unread the buffer N characters and return the character its pointed to.
+// UnreadN unread the buffer N characters and return the character its pointed
+// to.
 // If N greater than buffer length, it will reset the pointer index back to
 // zero.
 //

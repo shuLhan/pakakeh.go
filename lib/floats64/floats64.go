@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Packages floats64 provide a library for working with slice of 64 bit float.
+// Package floats64 provide a library for working with slice of 64 bit float.
 package floats64
 
 import (

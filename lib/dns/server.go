@@ -273,7 +273,7 @@ func (srv *Server) LoadMasterDir(dir string) {
 }
 
 //
-// LostMasterFile populate caches with DNS record from master (zone) formatted
+// LoadMasterFile populate caches with DNS record from master (zone) formatted
 // file.
 //
 func (srv *Server) LoadMasterFile(path string) {

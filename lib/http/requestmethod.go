@@ -7,6 +7,7 @@ package http
 // RequestMethod define type of HTTP method.
 type RequestMethod int
 
+// List of known HTTP methods.
 const (
 	RequestMethodGet     RequestMethod = 0
 	RequestMethodConnect RequestMethod = 1 << iota

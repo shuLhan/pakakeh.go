@@ -9,6 +9,7 @@ package email
 //
 type FieldType int
 
+// List of valid email envelope headers.
 const (
 	FieldTypeOptional FieldType = iota
 	// The origination date field, RFC 5322 section 3.6.1.

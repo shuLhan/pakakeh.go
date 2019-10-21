@@ -8,6 +8,7 @@ import (
 	"bytes"
 )
 
+// CommandKind represent the numeric value of SMTP command.
 type CommandKind int
 
 // List of SMTP commands.
@@ -27,6 +28,10 @@ const (
 	CommandQUIT
 )
 
+//
+// Command represent a single SMTP command with its parsed argument and
+// parameters.
+//
 type Command struct {
 	Kind   CommandKind
 	Arg    string

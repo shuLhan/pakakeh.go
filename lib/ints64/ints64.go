@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Packages ints64 provide a library for working with slice of 64 bit integer.
+// Package ints64 provide a library for working with slice of 64 bit integer.
 package ints64
 
 import (
