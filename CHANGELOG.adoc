@@ -8,9 +8,7 @@ This library is released each month, usually at the first week of month.
 
 ===  New Features
 
-*  dns: implement server for DNS over TLS
-
-*  dns: implement client for DNS over TLS
+*  dns: implement client and server for DNS over TLS
 
 ===  Breaking Changes
 
@@ -28,9 +26,13 @@ This library is released each month, usually at the first week of month.
 
 ===  Bug Fixes
 
+*  dns: return error code 4 if server receive unknown message class or type
+
+*  dns: return an error if section question contains invalid packet
+
 *  ini: fix return value for empty string in IsValueBoolTrue
 
-*  dns: return error code 4 if server receive unknown message class or type
+*  strings: fix logic of Split function
 
 
 ==  share v0.9.0 (2019-10-08)
