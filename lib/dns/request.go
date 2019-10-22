@@ -6,6 +6,7 @@ package dns
 
 import (
 	"io"
+	"log"
 )
 
 //
@@ -39,5 +40,18 @@ type request struct {
 func newRequest() *request {
 	return &request{
 		message: NewMessage(),
+	}
+}
+
+//
+// error set the request message as an error.
+//
+func (req *request) error(rcode ResponseCode) {
+	req.message.SetQuery(false)
+	req.message.SetResponseCode(rcode)
+
+	_, err := req.writer.Write(req.message.Packet)
+	if err != nil {
+		log.Println("dns: request.error:", err.Error())
 	}
 }

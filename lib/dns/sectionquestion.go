@@ -63,31 +63,52 @@ func (question *SectionQuestion) String() string {
 //
 // unpack the DNS question section.
 //
-func (question *SectionQuestion) unpack(packet []byte) {
+func (question *SectionQuestion) unpack(packet []byte) (err error) {
 	if len(packet) == 0 {
-		return
+		return nil
 	}
 
 	count := packet[0]
-	x := uint(1)
+	x := 1
 
 	for {
+		if count == 0 {
+			question.Name = append(question.Name, '.')
+			count = packet[x]
+			x++
+			if x >= len(packet) {
+				return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
+			}
+			continue
+		}
 		for y := byte(0); y < count; y++ {
 			if packet[x] >= 'A' && packet[x] <= 'Z' {
 				packet[x] += 32
 			}
 			question.Name = append(question.Name, packet[x])
 			x++
+			if x >= len(packet) {
+				return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
+			}
 		}
 		count = packet[x]
 		x++
 		if count == 0 {
 			break
 		}
+		if x >= len(packet) {
+			return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
+		}
 		question.Name = append(question.Name, '.')
 	}
 
-	question.Type = libbytes.ReadUint16(packet, x)
+	if x+4 > len(packet) {
+		return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
+	}
+
+	question.Type = libbytes.ReadUint16(packet, uint(x))
 	x += 2
-	question.Class = libbytes.ReadUint16(packet, x)
+	question.Class = libbytes.ReadUint16(packet, uint(x))
+
+	return nil
 }

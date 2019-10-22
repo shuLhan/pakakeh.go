@@ -736,7 +736,10 @@ func (msg *Message) String() string {
 // Unpack the packet to fill the message fields.
 //
 func (msg *Message) Unpack() (err error) {
-	msg.UnpackHeaderQuestion()
+	err = msg.UnpackHeaderQuestion()
+	if err != nil {
+		return err
+	}
 
 	startIdx := uint(sectionHeaderSize + msg.Question.size())
 
@@ -791,7 +794,7 @@ func (msg *Message) Unpack() (err error) {
 // packet.  This method assume that message.Packet already set to DNS raw
 // message.
 //
-func (msg *Message) UnpackHeaderQuestion() {
+func (msg *Message) UnpackHeaderQuestion() (err error) {
 	msg.Header.unpack(msg.Packet)
 
 	if debug.Value >= 3 {
@@ -799,12 +802,17 @@ func (msg *Message) UnpackHeaderQuestion() {
 	}
 
 	if len(msg.Packet) <= sectionHeaderSize {
-		return
+		return fmt.Errorf("Message.UnpackHeaderQuestion: missing question")
 	}
 
-	msg.Question.unpack(msg.Packet[sectionHeaderSize:])
+	err = msg.Question.unpack(msg.Packet[sectionHeaderSize:])
+	if err != nil {
+		return err
+	}
 
 	if debug.Value >= 3 {
 		log.Printf("msg.Question: %s\n", msg.Question)
 	}
+
+	return nil
 }

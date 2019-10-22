@@ -493,12 +493,17 @@ func (srv *Server) serveUDP() {
 
 		req.kind = connTypeUDP
 		req.message.Packet = req.message.Packet[:n]
-
-		req.message.UnpackHeaderQuestion()
 		req.writer = &UDPClient{
 			timeout: clientTimeout,
 			conn:    srv.udp,
 			addr:    raddr,
+		}
+
+		err = req.message.UnpackHeaderQuestion()
+		if err != nil {
+			log.Println(err)
+			req.error(RCodeErrServer)
+			continue
 		}
 
 		srv.requestq <- req
@@ -572,7 +577,13 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 
 	req.writer = cl
 	req.message.Packet = append(req.message.Packet[:0], raw...)
-	req.message.UnpackHeaderQuestion()
+
+	err := req.message.UnpackHeaderQuestion()
+	if err != nil {
+		log.Println(err)
+		req.error(RCodeErrServer)
+		return
+	}
 
 	srv.requestq <- req
 
@@ -605,8 +616,14 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 		}
 
 		req.kind = kind
-		req.message.UnpackHeaderQuestion()
 		req.writer = cl
+
+		err = req.message.UnpackHeaderQuestion()
+		if err != nil {
+			log.Println(err)
+			req.error(RCodeErrServer)
+			continue
+		}
 
 		srv.requestq <- req
 	}
@@ -649,14 +666,7 @@ func (srv *Server) processRequest() {
 
 	for req := range srv.requestq {
 		if !srv.isImplemented(req.message) {
-			req.message.SetQuery(false)
-			req.message.SetResponseCode(RCodeNotImplemented)
-			res = req.message
-
-			_, err := req.writer.Write(res.Packet)
-			if err != nil {
-				log.Println("dns: processRequest: ", err.Error())
-			}
+			req.error(RCodeNotImplemented)
 			continue
 		}
 
