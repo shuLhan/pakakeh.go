@@ -819,7 +819,10 @@ func (srv *Server) runForwarders() {
 }
 
 func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *request) {
-	var asWhat = asPrimary
+	var (
+		res    *Message
+		asWhat = asPrimary
+	)
 
 	if fallbackq == nil {
 		asWhat = asFallback
@@ -849,7 +852,7 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 						req.message.Header.ID, req.message.Question)
 				}
 
-				res, err := forwarder.Query(req.message)
+				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Println("dns: failed to query DoH: " + err.Error())
 					if fallbackq != nil {
@@ -873,6 +876,7 @@ out:
 }
 
 func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *request) {
+	var res *Message
 	var asWhat = asPrimary
 
 	if fallbackq == nil {
@@ -903,7 +907,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 						req.message.Header.ID, req.message.Question)
 				}
 
-				res, err := forwarder.Query(req.message)
+				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Println("dns: failed to query DoT: " + err.Error())
 					if fallbackq != nil {
@@ -983,7 +987,10 @@ out:
 // and forward it to parent server at "remoteAddr".
 //
 func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *request) {
-	var asWhat = asPrimary
+	var (
+		res    *Message
+		asWhat = asPrimary
+	)
 
 	if fallbackq == nil {
 		asWhat = asFallback
@@ -1016,7 +1023,7 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 						req.message.Header.ID, req.message.Question)
 				}
 
-				res, err := forwarder.Query(req.message)
+				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Println("dns: failed to query UDP: " + err.Error())
 					if fallbackq != nil {
