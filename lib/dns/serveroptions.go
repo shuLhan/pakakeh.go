@@ -120,13 +120,14 @@ type ServerOptions struct {
 	// protocol.
 	primaryDoh []string
 
-	// primaryDoT contains list of parent name server addresses using DoT
+	// primaryDot contains list of parent name server addresses using DoT
 	// protocol.
-	primaryDoT []string
+	primaryDot []string
 
 	fallbackUDP []*net.UDPAddr
 	fallbackTCP []*net.TCPAddr
 	fallbackDoh []string
+	fallbackDot []string
 }
 
 //
@@ -164,7 +165,7 @@ func (opts *ServerOptions) init() (err error) {
 
 	opts.parseNameServers()
 
-	if len(opts.primaryUDP) == 0 && len(opts.primaryTCP) == 0 && len(opts.primaryDoh) == 0 {
+	if len(opts.primaryUDP) == 0 && len(opts.primaryTCP) == 0 && len(opts.primaryDoh) == 0 && len(opts.primaryDot) == 0 {
 		return fmt.Errorf("dns: no valid name servers")
 	}
 
@@ -206,7 +207,7 @@ func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
 // If the name server format contains no scheme, it will be assumed as "udp".
 //
 func parseNameServers(nameServers []string) (
-	udpAddrs []*net.UDPAddr, tcpAddrs []*net.TCPAddr, dohAddrs []string,
+	udpAddrs []*net.UDPAddr, tcpAddrs []*net.TCPAddr, dohAddrs, dotAddrs []string,
 ) {
 	for _, ns := range nameServers {
 		dnsURL, err := url.Parse(ns)
@@ -235,7 +236,12 @@ func parseNameServers(nameServers []string) (
 			tcpAddrs = append(tcpAddrs, tcpAddr)
 
 		case "https":
-			dohAddrs = append(dohAddrs, ns)
+			ip := net.ParseIP(dnsURL.Hostname())
+			if ip != nil {
+				dotAddrs = append(dotAddrs, dnsURL.Host)
+			} else {
+				dohAddrs = append(dohAddrs, ns)
+			}
 
 		default:
 			if len(dnsURL.Host) > 0 {
@@ -252,10 +258,10 @@ func parseNameServers(nameServers []string) (
 		}
 	}
 
-	return udpAddrs, tcpAddrs, dohAddrs
+	return udpAddrs, tcpAddrs, dohAddrs, dotAddrs
 }
 
 func (opts *ServerOptions) parseNameServers() {
-	opts.primaryUDP, opts.primaryTCP, opts.primaryDoh = parseNameServers(opts.NameServers)
-	opts.fallbackUDP, opts.fallbackTCP, opts.fallbackDoh = parseNameServers(opts.FallbackNS)
+	opts.primaryUDP, opts.primaryTCP, opts.primaryDoh, opts.primaryDot = parseNameServers(opts.NameServers)
+	opts.fallbackUDP, opts.fallbackTCP, opts.fallbackDoh, opts.fallbackDot = parseNameServers(opts.FallbackNS)
 }

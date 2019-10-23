@@ -782,14 +782,16 @@ func (srv *Server) runForwarders() {
 		go srv.runUDPForwarder(srv.opts.primaryUDP[x].String(), srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
-
 	for x := 0; x < len(srv.opts.primaryTCP); x++ {
 		go srv.runTCPForwarder(srv.opts.primaryTCP[x].String(), srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
-
 	for x := 0; x < len(srv.opts.primaryDoh); x++ {
 		go srv.runDohForwarder(srv.opts.primaryDoh[x], srv.primaryq, srv.fallbackq)
+		nforwarders++
+	}
+	for x := 0; x < len(srv.opts.primaryDot); x++ {
+		go srv.runTLSForwarder(srv.opts.primaryDot[x], srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
 
@@ -802,14 +804,16 @@ func (srv *Server) runForwarders() {
 		go srv.runUDPForwarder(srv.opts.fallbackUDP[x].String(), srv.fallbackq, nil)
 		nforwarders++
 	}
-
 	for x := 0; x < len(srv.opts.fallbackTCP); x++ {
 		go srv.runTCPForwarder(srv.opts.fallbackTCP[x].String(), srv.fallbackq, nil)
 		nforwarders++
 	}
-
 	for x := 0; x < len(srv.opts.fallbackDoh); x++ {
 		go srv.runDohForwarder(srv.opts.fallbackDoh[x], srv.fallbackq, nil)
+		nforwarders++
+	}
+	for x := 0; x < len(srv.opts.fallbackDot); x++ {
+		go srv.runTLSForwarder(srv.opts.fallbackDot[x], srv.fallbackq, nil)
 		nforwarders++
 	}
 }
@@ -866,6 +870,60 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 out:
 	srv.fwGroup.Done()
 	fmt.Printf("dns: DoH %s forwarder %s has been stopped\n", asWhat, nameserver)
+}
+
+func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *request) {
+	var asWhat = asPrimary
+
+	if fallbackq == nil {
+		asWhat = asFallback
+	}
+
+	stop := make(chan bool)
+	srv.forwardStoppers = append(srv.forwardStoppers, stop)
+	srv.fwGroup.Add(1)
+
+	fmt.Printf("dns: starting %s DoT forwarder at %s\n", asWhat, nameserver)
+
+	for {
+		forwarder, err := NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
+		if err != nil {
+			log.Fatal("dns: failed to create DoT forwarder: " + err.Error())
+		}
+
+		for err == nil {
+			select {
+			case req, ok := <-primaryq:
+				if !ok {
+					break
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: ^ DoT %s %d:%s\n",
+						nameserver,
+						req.message.Header.ID, req.message.Question)
+				}
+
+				res, err := forwarder.Query(req.message)
+				if err != nil {
+					log.Println("dns: failed to query DoT: " + err.Error())
+					if fallbackq != nil {
+						fallbackq <- req
+					}
+				} else {
+					srv.processResponse(req, res, fallbackq)
+				}
+			case <-stop:
+				goto out
+			}
+		}
+
+		forwarder.Close()
+
+		log.Println("dns: restarting DoT forwarder for " + nameserver)
+	}
+out:
+	srv.fwGroup.Done()
+	fmt.Printf("dns: DoT %s forwarder %s has been stopped\n", asWhat, nameserver)
 }
 
 func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *request) {
