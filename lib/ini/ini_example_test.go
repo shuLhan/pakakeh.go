@@ -66,6 +66,31 @@ key=value2
 	//[value2 value4 value2]
 }
 
+func ExampleIni_GetsUniq() {
+	input := []byte(`
+[section]
+key=value1
+
+[section "sub"]
+key=value2
+
+[section]
+key=value3
+
+[section "sub"]
+key=value4
+key=value2
+`)
+
+	inis, _ := Parse(input)
+
+	fmt.Println(inis.GetsUniq("section", "", "key", true))
+	fmt.Println(inis.GetsUniq("section", "sub", "key", true))
+	//Output:
+	//[value1 value3]
+	//[value2 value4]
+}
+
 func ExampleIni_AsMap() {
 	input := []byte(`
 [section]
@@ -587,6 +612,41 @@ key=value3
 	// [value1 value2]
 	// []
 	// [value1 value2 value2 value3]
+}
+
+func ExampleIni_ValsUniq() {
+	input := `
+[section]
+key=value1
+key2=
+
+[section "sub"]
+key=value1
+key=value2
+
+[section]
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value3
+`
+
+	ini, err := Parse([]byte(input))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(ini.ValsUniq("section:key", true))
+	fmt.Println(ini.ValsUniq("section::key", true))
+	fmt.Println(ini.ValsUniq("section:sub:key2", true))
+	fmt.Println(ini.ValsUniq("section:sub:key", true))
+	// Output:
+	// []
+	// [value1 value2]
+	// []
+	// [value1 value2 value3]
 }
 
 func ExampleIni_Vars() {

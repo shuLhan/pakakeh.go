@@ -887,6 +887,14 @@ func (in *Ini) Gets(secName, subName, key string) (out []string) {
 }
 
 //
+// GetsUniq key's values as slice of string in the same section and
+// subsection.
+//
+func (in *Ini) GetsUniq(secName, subName, key string, caseSensitive bool) (out []string) {
+	return libstrings.Uniq(in.Gets(secName, subName, key), caseSensitive)
+}
+
+//
 // Prune remove all empty lines, comments, and merge all section and
 // subsection with the same name into one group.
 //
@@ -1049,6 +1057,13 @@ func (in *Ini) Vals(keyPath string) (vals []string) {
 	vals = in.Gets(keys[0], keys[1], keys[2])
 
 	return
+}
+
+//
+// ValsUniq return all values as slice of string without any duplication.
+//
+func (in *Ini) ValsUniq(keyPath string, caseSensitive bool) (vals []string) {
+	return libstrings.Uniq(in.Vals(keyPath), caseSensitive)
 }
 
 //
