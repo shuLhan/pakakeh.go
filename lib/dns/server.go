@@ -367,13 +367,15 @@ func (srv *Server) Stop() {
 //
 // Wait for server to be Stop()-ed or when one of listener throw an error.
 //
-func (srv *Server) Wait() {
-	err := <-srv.errListener
+func (srv *Server) Wait() (err error) {
+	err = <-srv.errListener
 	if err != nil && err != io.EOF {
 		log.Println(err)
 	}
 
 	srv.Stop()
+
+	return err
 }
 
 //
