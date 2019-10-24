@@ -63,7 +63,7 @@ key=value2
 	fmt.Println(inis.Gets("section", "sub", "key"))
 	//Output:
 	//[value1 value3]
-	//[value2 value4]
+	//[value2 value4 value2]
 }
 
 func ExampleIni_AsMap() {
@@ -586,7 +586,7 @@ key=value3
 	// []
 	// [value1 value2]
 	// []
-	// [value1 value2 value3]
+	// [value1 value2 value2 value3]
 }
 
 func ExampleIni_Vars() {

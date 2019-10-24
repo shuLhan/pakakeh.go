@@ -881,7 +881,7 @@ func (in *Ini) Gets(secName, subName, key string) (out []string) {
 			continue
 		}
 
-		out = libstrings.AppendUniq(out, vals...)
+		out = append(out, vals...)
 	}
 	return
 }
