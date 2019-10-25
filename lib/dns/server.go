@@ -86,13 +86,13 @@ type Server struct {
 	dot net.Listener
 	doh *http.Server
 
-	requestq        chan *request
-	primaryq        chan *request
-	fallbackq       chan *request
-	forwardStoppers []chan bool
+	requestq  chan *request
+	primaryq  chan *request
+	fallbackq chan *request
 
-	// fwGroup maintain reference counting for all forwarders.
-	fwGroup *sync.WaitGroup
+	fwLocker   sync.Mutex
+	fwStoppers []chan bool
+	fwGroup    *sync.WaitGroup // fwGroup maintain reference counting for all forwarders.
 
 	hasForwarders bool
 }
@@ -774,7 +774,7 @@ func (srv *Server) processResponse(req *request, res *Message, fallbackq chan *r
 
 func (srv *Server) runForwarders() {
 	srv.hasForwarders = false
-	srv.forwardStoppers = nil
+	srv.fwStoppers = nil
 
 	nforwarders := 0
 	for x := 0; x < len(srv.opts.primaryUDP); x++ {
@@ -830,9 +830,7 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 		res *Message
 	)
 
-	stop := make(chan bool)
-	srv.forwardStoppers = append(srv.forwardStoppers, stop)
-	srv.fwGroup.Add(1)
+	stopper := srv.newStopper()
 
 	log.Printf("dns: starting %s for %s ...\n", tag, nameserver)
 
@@ -841,7 +839,7 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 		if err != nil {
 			log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
 			select {
-			case <-stop:
+			case <-stopper:
 				goto out
 			default:
 				time.Sleep(5 * time.Second)
@@ -870,7 +868,7 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 				} else {
 					srv.processResponse(req, res, fallbackq)
 				}
-			case <-stop:
+			case <-stopper:
 				goto out
 			}
 		}
@@ -889,9 +887,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 		res *Message
 	)
 
-	stop := make(chan bool)
-	srv.forwardStoppers = append(srv.forwardStoppers, stop)
-	srv.fwGroup.Add(1)
+	stopper := srv.newStopper()
 
 	log.Printf("dns: starting forwarder %s for %s ...\n", tag, nameserver)
 
@@ -900,7 +896,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 		if err != nil {
 			log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
 			select {
-			case <-stop:
+			case <-stopper:
 				goto out
 			default:
 				time.Sleep(5 * time.Second)
@@ -929,7 +925,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 				} else {
 					srv.processResponse(req, res, fallbackq)
 				}
-			case <-stop:
+			case <-stopper:
 				goto out
 			}
 		}
@@ -944,9 +940,7 @@ out:
 }
 
 func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *request, tag string) {
-	stop := make(chan bool)
-	srv.forwardStoppers = append(srv.forwardStoppers, stop)
-	srv.fwGroup.Add(1)
+	stopper := srv.newStopper()
 
 	log.Printf("dns: starting forwarder %s for %s\n", tag, remoteAddr)
 
@@ -980,7 +974,7 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			}
 
 			srv.processResponse(req, res, fallbackq)
-		case <-stop:
+		case <-stopper:
 			goto out
 		}
 	}
@@ -998,9 +992,7 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 		res *Message
 	)
 
-	stop := make(chan bool)
-	srv.forwardStoppers = append(srv.forwardStoppers, stop)
-	srv.fwGroup.Add(1)
+	stopper := srv.newStopper()
 
 	log.Printf("dns: starting forwarder %s for %s ...\n", tag, remoteAddr)
 
@@ -1010,7 +1002,7 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 		if err != nil {
 			log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
 			select {
-			case <-stop:
+			case <-stopper:
 				goto out
 			default:
 				time.Sleep(5 * time.Second)
@@ -1040,7 +1032,7 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 				} else {
 					srv.processResponse(req, res, fallbackq)
 				}
-			case <-stop:
+			case <-stopper:
 				goto out
 			}
 		}
@@ -1057,10 +1049,22 @@ out:
 // stopForwarders stop all forwarder connections.
 //
 func (srv *Server) stopForwarders() {
-	for _, forwardStop := range srv.forwardStoppers {
-		forwardStop <- true
+	for _, stopper := range srv.fwStoppers {
+		stopper <- true
 	}
 	srv.fwGroup.Wait()
 	srv.hasForwarders = false
 	fmt.Println("dns: all forwarders has been stopped")
+}
+
+func (srv *Server) newStopper() (stopper chan bool) {
+	srv.fwLocker.Lock()
+
+	stopper = make(chan bool)
+	srv.fwStoppers = append(srv.fwStoppers, stopper)
+	srv.fwGroup.Add(1)
+
+	srv.fwLocker.Unlock()
+
+	return
 }
