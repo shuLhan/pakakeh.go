@@ -241,12 +241,14 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 func (dw *DirWatcher) onRootCreated() {
 	err := dw.fs.Mount(dw.Path)
 	if err != nil {
-		log.Fatal("lib/io: DirWatcher.onRootCreated: " + err.Error())
+		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
+		return
 	}
 
 	dw.root, err = dw.fs.Get("/")
 	if err != nil {
-		log.Fatal("lib/io: DirWatcher.onRootCreated: " + err.Error())
+		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
+		return
 	}
 
 	dw.dirs = make(map[string]*memfs.Node)
