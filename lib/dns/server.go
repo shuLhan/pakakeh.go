@@ -753,9 +753,6 @@ func (srv *Server) processResponse(req *request, res *Message, fallbackq chan *r
 		log.Printf("dns: ! %s %s %d:%s\n",
 			connTypeNames[req.kind], rcodeNames[res.Header.RCode],
 			res.Header.ID, res.Question)
-		if fallbackq != nil {
-			fallbackq <- req
-		}
 		return
 	}
 
