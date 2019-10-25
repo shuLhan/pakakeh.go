@@ -739,7 +739,7 @@ func (srv *Server) processRequest() {
 
 func (srv *Server) processResponse(req *request, res *Message, fallbackq chan *request) {
 	if !isResponseValid(req, res) {
-		srv.requestq <- req
+		req.error(RCodeErrServer)
 		return
 	}
 
