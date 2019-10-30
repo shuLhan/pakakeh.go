@@ -839,24 +839,25 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 			log.Printf("dns: failed to create forwarder %s: %s\n",
 				tag, err.Error())
 
-			select {
-			case req, ok := <-primaryq:
-				if !ok {
-					log.Println("dns: primary queue has been closed")
-					goto out
-				}
-
-				if debug.Value >= 1 {
+			t := time.NewTicker(3 * time.Second)
+			isDropping := true
+			for isDropping {
+				select {
+				case req, ok := <-primaryq:
+					if !ok {
+						log.Println("dns: primary queue has been closed")
+						goto out
+					}
 					fmt.Printf("dns: * %s %s %d:%s\n",
 						tag, nameserver,
 						req.message.Header.ID, req.message.Question)
-				}
-				req.error(RCodeErrServer)
+					req.error(RCodeErrServer)
 
-			case <-stopper:
-				goto out
-			default:
-				time.Sleep(5 * time.Second)
+				case <-stopper:
+					goto out
+				case <-t.C:
+					isDropping = false
+				}
 			}
 			continue
 		}
@@ -912,23 +913,25 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 			log.Printf("dns: failed to create forwarder %s: %s\n",
 				tag, err.Error())
 
-			select {
-			case req, ok := <-primaryq:
-				if !ok {
-					log.Println("dns: primary queue has been closed")
-					goto out
-				}
-				if debug.Value >= 1 {
+			t := time.NewTicker(3 * time.Second)
+			isDropping := true
+			for isDropping {
+				select {
+				case req, ok := <-primaryq:
+					if !ok {
+						log.Println("dns: primary queue has been closed")
+						goto out
+					}
 					fmt.Printf("dns: * %s %s %d:%s\n",
 						tag, nameserver,
 						req.message.Header.ID, req.message.Question)
-				}
-				req.error(RCodeErrServer)
+					req.error(RCodeErrServer)
 
-			case <-stopper:
-				goto out
-			default:
-				time.Sleep(5 * time.Second)
+				case <-stopper:
+					goto out
+				case <-t.C:
+					isDropping = false
+				}
 			}
 			continue
 		}
@@ -1034,23 +1037,25 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			log.Printf("dns: failed to create forwarder %s: %s\n",
 				tag, err.Error())
 
-			select {
-			case req, ok := <-primaryq:
-				if !ok {
-					log.Println("dns: primary queue has been closed")
-					goto out
-				}
-				if debug.Value >= 1 {
+			t := time.NewTicker(3 * time.Second)
+			isDropping := true
+			for isDropping {
+				select {
+				case req, ok := <-primaryq:
+					if !ok {
+						log.Println("dns: primary queue has been closed")
+						goto out
+					}
 					fmt.Printf("dns: * %s %s %d:%s\n",
 						tag, remoteAddr,
 						req.message.Header.ID, req.message.Question)
-				}
-				req.error(RCodeErrServer)
+					req.error(RCodeErrServer)
 
-			case <-stopper:
-				goto out
-			default:
-				time.Sleep(5 * time.Second)
+				case <-stopper:
+					goto out
+				case <-t.C:
+					isDropping = false
+				}
 			}
 			continue
 		}
