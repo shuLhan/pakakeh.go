@@ -66,6 +66,7 @@ const (
 //	! : no answer found on cache and the query is not recursive, or
 //	    response contains error code
 //	^ : request is forwarded to parent name server
+//      * : request is dropped from queue
 //	~ : answer exist on cache but its expired
 //	- : answer is pruned from caches
 //	+ : new answer is added to caches
@@ -832,13 +833,26 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 
 	stopper := srv.newStopper()
 
-	log.Printf("dns: starting %s for %s ...\n", tag, nameserver)
-
 	for {
 		forwarder, err := NewDoHClient(nameserver, false)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
+			log.Printf("dns: failed to create forwarder %s: %s\n",
+				tag, err.Error())
+
 			select {
+			case req, ok := <-primaryq:
+				if !ok {
+					log.Println("dns: primary queue has been closed")
+					goto out
+				}
+
+				if debug.Value >= 1 {
+					fmt.Printf("dns: * %s %s %d:%s\n",
+						tag, nameserver,
+						req.message.Header.ID, req.message.Question)
+				}
+				req.error(RCodeErrServer)
+
 			case <-stopper:
 				goto out
 			default:
@@ -847,11 +861,14 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 			continue
 		}
 
+		log.Printf("dns: starting %s for %s ...\n", tag, nameserver)
+
 		for err == nil {
 			select {
 			case req, ok := <-primaryq:
 				if !ok {
-					break
+					log.Println("dns: primary queue has been closed")
+					goto out
 				}
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
@@ -889,13 +906,25 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 
 	stopper := srv.newStopper()
 
-	log.Printf("dns: starting forwarder %s for %s ...\n", tag, nameserver)
-
 	for {
 		forwarder, err := NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
+			log.Printf("dns: failed to create forwarder %s: %s\n",
+				tag, err.Error())
+
 			select {
+			case req, ok := <-primaryq:
+				if !ok {
+					log.Println("dns: primary queue has been closed")
+					goto out
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: * %s %s %d:%s\n",
+						tag, nameserver,
+						req.message.Header.ID, req.message.Question)
+				}
+				req.error(RCodeErrServer)
+
 			case <-stopper:
 				goto out
 			default:
@@ -904,11 +933,14 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 			continue
 		}
 
+		log.Printf("dns: starting forwarder %s for %s ...\n", tag, nameserver)
+
 		for err == nil {
 			select {
 			case req, ok := <-primaryq:
 				if !ok {
-					break
+					log.Println("dns: primary queue has been closed")
+					goto out
 				}
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
@@ -948,7 +980,8 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 		select {
 		case req, ok := <-primaryq:
 			if !ok {
-				break
+				log.Println("dns: primary queue has been closed")
+				goto out
 			}
 			if debug.Value >= 1 {
 				fmt.Printf("dns: ^ %s %s %d:%s\n",
@@ -994,14 +1027,26 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 
 	stopper := srv.newStopper()
 
-	log.Printf("dns: starting forwarder %s for %s ...\n", tag, remoteAddr)
-
 	// The first loop handle broken connection.
 	for {
 		forwarder, err := NewUDPClient(remoteAddr)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
+			log.Printf("dns: failed to create forwarder %s: %s\n",
+				tag, err.Error())
+
 			select {
+			case req, ok := <-primaryq:
+				if !ok {
+					log.Println("dns: primary queue has been closed")
+					goto out
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: * %s %s %d:%s\n",
+						tag, remoteAddr,
+						req.message.Header.ID, req.message.Question)
+				}
+				req.error(RCodeErrServer)
+
 			case <-stopper:
 				goto out
 			default:
@@ -1010,11 +1055,14 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			continue
 		}
 
+		log.Printf("dns: starting forwarder %s for %s ...\n", tag, remoteAddr)
+
 		// The second loop consume the forward queue.
 		for err == nil {
 			select {
 			case req, ok := <-primaryq:
 				if !ok {
+					log.Println("dns: primary queue has been closed")
 					break
 				}
 				if debug.Value >= 1 {
