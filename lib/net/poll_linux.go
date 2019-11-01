@@ -1,0 +1,83 @@
+// +build linux
+
+import (
+	"fmt"
+	"log"
+
+	"golang.org/x/sys/unix"
+)
+
+type epoll struct {
+	events [maxQueue]unix.EpollEvent
+	read   int
+}
+
+//
+// NewPoll create and initialize new poll using epoll for Linux system or
+// kqueue for BSD or Darwin (macOS).
+//
+func NewPoll() (poll Poll, err error) {
+	poll = &epoll{}
+
+	poll.read, err = unix.EpollCreate1(0)
+	if err != nil {
+		return fmt.Errorf("epoll.NewPoll: %s", err.Error())
+	}
+
+	return poll, nil
+}
+
+func (poll *epoll) Close() {
+	unix.Close(read)
+}
+
+func (poll *epoll) RegisterRead(fd int) (err error) {
+	event := unix.EpollEvent{
+		Events: unix.EPOLLIN | unix.EPOLLONESHOT,
+		Fd:     int32(fd),
+	}
+
+	err = unix.SetNonblock(fd, true)
+	if err != nil {
+		return fmt.Errorf("epoll.RegisterRead: %s", err.Error())
+	}
+
+	err = unix.EpollCtl(poll.read, unix.EPOLL_CTL_ADD, fd, &event)
+	if err != nil {
+		return fmt.Errorf("epoll.RegisterRead: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (poll *epoll) ReregisterRead(idx, fd int) {
+	poll.events[idx].Events = unix.EPOLLIN | unix.EPOLLONESHOT
+
+	err := unix.EpollCtl(serv.read, unix.EPOLL_CTL_MOD, fd, &poll.events[idx])
+	if err != nil {
+		log.Println("epoll.RegisterRead: unix.EpollCtl: " + err.Error())
+		poll.UnregisterRead(fd)
+	}
+}
+
+func (poll *epoll) UnregisterRead(fd int) (err error) {
+	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, fd, nil)
+	if err != nil {
+		return fmt.Errorf("epoll.UnregisterRead: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (poll *epoll) WaitRead() (fds []int, err error) {
+	readEvents, err := unix.EpollWait(poll.read, poll.events[:], -1)
+	if err != nil {
+		return nil, fmt.Errorf("epoll.WaitRead: %s", err.Error())
+	}
+
+	for x := 0; x < len(readEvents); x++ {
+		fds = append(fds, int(readEvents[x].Fd))
+	}
+
+	return fds, nil
+}
