@@ -20,6 +20,7 @@ import (
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 const (
@@ -42,8 +43,7 @@ type Server struct {
 	sock       int
 	chUpgrade  chan int
 
-	epollEvents [128]unix.EpollEvent
-	epollRead   int
+	poll libnet.Poll
 
 	routes *rootRoute
 
@@ -115,15 +115,6 @@ func (serv *Server) AllowReservedBits(one, two, three bool) {
 	serv.allowRsv1 = one
 	serv.allowRsv2 = two
 	serv.allowRsv3 = three
-}
-
-func (serv *Server) createEpoolRead() (err error) {
-	serv.epollRead, err = unix.EpollCreate1(0)
-	if err != nil {
-		return
-	}
-
-	return
 }
 
 func (serv *Server) createSockServer() (err error) {
@@ -206,19 +197,9 @@ func (serv *Server) handleUpgrade(httpRequest []byte) (
 // clientAdd add the new client connection to epoll and to list of clients.
 //
 func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
-	event := unix.EpollEvent{
-		Events: unix.EPOLLIN | unix.EPOLLONESHOT,
-		Fd:     int32(conn),
-	}
-
-	err = unix.SetNonblock(conn, true)
+	err = serv.poll.RegisterRead(conn)
 	if err != nil {
-		return
-	}
-
-	err = unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_ADD, conn, &event)
-	if err != nil {
-		return
+		return fmt.Errorf("websocket: Server.clientAdd: " + err.Error())
 	}
 
 	if ctx != nil {
@@ -244,7 +225,7 @@ func (serv *Server) ClientRemove(conn int) {
 
 	serv.Clients.remove(conn)
 
-	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, conn, nil)
+	err := serv.poll.UnregisterRead(conn)
 	if err != nil {
 		log.Println("websocket: server.ClientRemove: " + err.Error())
 	}
@@ -252,20 +233,6 @@ func (serv *Server) ClientRemove(conn int) {
 	err = unix.Close(conn)
 	if err != nil {
 		log.Println("websocket: server.ClientRemove: " + err.Error())
-	}
-}
-
-//
-// epollRegisterRead register the connection for read in epoll.
-//
-func (serv *Server) epollRegisterRead(idx, conn int) {
-	// See https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
-	serv.epollEvents[idx].Events = unix.EPOLLIN | unix.EPOLLONESHOT
-
-	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_MOD, conn, &serv.epollEvents[idx])
-	if err != nil {
-		log.Println("websocket: server.reader: unix.EpollCtl: " + err.Error())
-		serv.ClientRemove(conn)
 	}
 }
 
@@ -642,14 +609,14 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 //
 func (serv *Server) reader() {
 	for {
-		nevents, err := unix.EpollWait(serv.epollRead, serv.epollEvents[:], -1)
+		fds, err := serv.poll.WaitRead()
 		if err != nil {
-			log.Println("websocket: server.reader: unix.EpollWait: " + err.Error())
+			log.Println("websocket: Server.reader: " + err.Error())
 			break
 		}
 
-		for x := 0; x < nevents; x++ {
-			conn := int(serv.epollEvents[x].Fd)
+		for x := 0; x < len(fds); x++ {
+			conn := fds[x]
 
 			packet, err := Recv(conn)
 			if err != nil || len(packet) == 0 {
@@ -677,7 +644,7 @@ func (serv *Server) reader() {
 					}
 				}
 				if len(packet) == 0 {
-					serv.epollRegisterRead(x, conn)
+					serv.poll.ReregisterRead(x, conn)
 					continue
 				}
 			}
@@ -705,7 +672,7 @@ func (serv *Server) reader() {
 				}
 			}
 			if !isClosing {
-				serv.epollRegisterRead(x, conn)
+				serv.poll.ReregisterRead(x, conn)
 			}
 		}
 	}
@@ -746,7 +713,7 @@ func (serv *Server) Start() (err error) {
 	serv.chUpgrade = make(chan int, _maxQueue)
 	go serv.upgrader()
 
-	err = serv.createEpoolRead()
+	serv.poll, err = libnet.NewPoll()
 	if err != nil {
 		return
 	}
@@ -777,7 +744,7 @@ func (serv *Server) Stop() {
 
 	serv.pingTicker.Stop()
 
-	unix.Close(serv.epollRead)
+	serv.poll.Close()
 
 	close(serv.chUpgrade)
 }
