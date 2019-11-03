@@ -1,4 +1,10 @@
+// Copyright 2019, Shulhan <m.shulhan@gmail.com>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // +build linux
+
+package net
 
 import (
 	"fmt"
@@ -16,19 +22,21 @@ type epoll struct {
 // NewPoll create and initialize new poll using epoll for Linux system or
 // kqueue for BSD or Darwin (macOS).
 //
-func NewPoll() (poll Poll, err error) {
-	poll = &epoll{}
+func NewPoll() (Poll, error) {
+	var err error
 
-	poll.read, err = unix.EpollCreate1(0)
+	ep := &epoll{}
+
+	ep.read, err = unix.EpollCreate1(0)
 	if err != nil {
-		return fmt.Errorf("epoll.NewPoll: %s", err.Error())
+		return nil, fmt.Errorf("epoll.NewPoll: %s", err.Error())
 	}
 
-	return poll, nil
+	return ep, nil
 }
 
 func (poll *epoll) Close() {
-	unix.Close(read)
+	unix.Close(poll.read)
 }
 
 func (poll *epoll) RegisterRead(fd int) (err error) {
@@ -53,7 +61,7 @@ func (poll *epoll) RegisterRead(fd int) (err error) {
 func (poll *epoll) ReregisterRead(idx, fd int) {
 	poll.events[idx].Events = unix.EPOLLIN | unix.EPOLLONESHOT
 
-	err := unix.EpollCtl(serv.read, unix.EPOLL_CTL_MOD, fd, &poll.events[idx])
+	err := unix.EpollCtl(poll.read, unix.EPOLL_CTL_MOD, fd, &poll.events[idx])
 	if err != nil {
 		log.Println("epoll.RegisterRead: unix.EpollCtl: " + err.Error())
 		poll.UnregisterRead(fd)
@@ -61,7 +69,7 @@ func (poll *epoll) ReregisterRead(idx, fd int) {
 }
 
 func (poll *epoll) UnregisterRead(fd int) (err error) {
-	err := unix.EpollCtl(serv.epollRead, unix.EPOLL_CTL_DEL, fd, nil)
+	err = unix.EpollCtl(poll.read, unix.EPOLL_CTL_DEL, fd, nil)
 	if err != nil {
 		return fmt.Errorf("epoll.UnregisterRead: %s", err.Error())
 	}
@@ -70,13 +78,13 @@ func (poll *epoll) UnregisterRead(fd int) (err error) {
 }
 
 func (poll *epoll) WaitRead() (fds []int, err error) {
-	readEvents, err := unix.EpollWait(poll.read, poll.events[:], -1)
+	n, err := unix.EpollWait(poll.read, poll.events[:], -1)
 	if err != nil {
 		return nil, fmt.Errorf("epoll.WaitRead: %s", err.Error())
 	}
 
-	for x := 0; x < len(readEvents); x++ {
-		fds = append(fds, int(readEvents[x].Fd))
+	for x := 0; x < n; x++ {
+		fds = append(fds, int(poll.events[x].Fd))
 	}
 
 	return fds, nil
