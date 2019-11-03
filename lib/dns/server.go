@@ -855,32 +855,17 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 			log.Printf("dns: failed to create forwarder %s: %s\n",
 				tag, err.Error())
 
-			t := time.NewTicker(3 * time.Second)
-			isDropping := true
-			for isDropping {
-				select {
-				case req, ok := <-primaryq:
-					if !ok {
-						log.Println("dns: primary queue has been closed")
-						isRunning = false
-						goto out
-					}
-					fmt.Printf("dns: * %s %s %d:%s\n",
-						tag, nameserver,
-						req.message.Header.ID, req.message.Question)
-					req.error(RCodeErrServer)
-
-				case <-stopper:
-					isRunning = false
-					goto out
-				case <-t.C:
-					isDropping = false
-				}
+			select {
+			case <-stopper:
+				isRunning = false
+				goto out
+			default:
+				time.Sleep(3 * time.Second)
 			}
 			continue
 		}
 
-		log.Printf("dns: starting %s for %s ...\n", tag, nameserver)
+		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, nameserver)
 		srv.incForwarder()
 
 		for err == nil {
@@ -912,7 +897,7 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 			}
 		}
 
-		log.Printf("dns: restarting forwarder %s for %s\n", tag, nameserver)
+		log.Printf("dns: reconnect forwarder %s for %s\n", tag, nameserver)
 	out:
 		forwarder.Close()
 		srv.decForwarder()
@@ -934,32 +919,17 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 			log.Printf("dns: failed to create forwarder %s: %s\n",
 				tag, err.Error())
 
-			t := time.NewTicker(3 * time.Second)
-			isDropping := true
-			for isDropping {
-				select {
-				case req, ok := <-primaryq:
-					if !ok {
-						log.Println("dns: primary queue has been closed")
-						isRunning = false
-						goto out
-					}
-					fmt.Printf("dns: * %s %s %d:%s\n",
-						tag, nameserver,
-						req.message.Header.ID, req.message.Question)
-					req.error(RCodeErrServer)
-
-				case <-stopper:
-					isRunning = false
-					goto out
-				case <-t.C:
-					isDropping = false
-				}
+			select {
+			case <-stopper:
+				isRunning = false
+				goto out
+			default:
+				time.Sleep(3 * time.Second)
 			}
 			continue
 		}
 
-		log.Printf("dns: starting forwarder %s for %s ...\n", tag, nameserver)
+		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, nameserver)
 		srv.incForwarder()
 
 		for err == nil {
@@ -991,7 +961,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 			}
 		}
 
-		log.Printf("dns: restarting forwarder %s for %s\n", tag, nameserver)
+		log.Printf("dns: reconnect forwarder %s for %s\n", tag, nameserver)
 	out:
 		forwarder.Close()
 		srv.decForwarder()
@@ -1070,32 +1040,17 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			log.Printf("dns: failed to create forwarder %s: %s\n",
 				tag, err.Error())
 
-			t := time.NewTicker(3 * time.Second)
-			isDropping := true
-			for isDropping {
-				select {
-				case req, ok := <-primaryq:
-					if !ok {
-						log.Println("dns: primary queue has been closed")
-						isRunning = false
-						goto out
-					}
-					fmt.Printf("dns: * %s %s %d:%s\n",
-						tag, remoteAddr,
-						req.message.Header.ID, req.message.Question)
-					req.error(RCodeErrServer)
-
-				case <-stopper:
-					isRunning = false
-					goto out
-				case <-t.C:
-					isDropping = false
-				}
+			select {
+			case <-stopper:
+				isRunning = false
+				goto out
+			default:
+				time.Sleep(3 * time.Second)
 			}
 			continue
 		}
 
-		log.Printf("dns: starting forwarder %s for %s ...\n", tag, remoteAddr)
+		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, remoteAddr)
 		srv.incForwarder()
 
 		// The second loop consume the forward queue.
@@ -1128,7 +1083,7 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			}
 		}
 
-		log.Printf("dns: restarting forwarder %s for %s\n", tag, remoteAddr)
+		log.Printf("dns: reconnect forwarder %s for %s\n", tag, remoteAddr)
 	out:
 		forwarder.Close()
 		srv.decForwarder()
