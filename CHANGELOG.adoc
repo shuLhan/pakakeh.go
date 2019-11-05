@@ -4,43 +4,35 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.10.0 (2019-11-xx)
+==  share v0.10.0 (2019-11-05)
 
 ===  New Features
 
 *  dns: implement client and server for DNS over TLS
-
 *  ini: add method GetsUniq and ValsUniq that return uniq values only
-
 *  net: implement network polling using epoll and kqueue
 
 ===  Breaking Changes
 
 *  dns: change the server certificate options to load from files
-
 *  ini: change Gets return as is, with duplicate values
 
 ===  Enhancements
 
 *  dns: allow listening on DoH without requiring certificate
-
 *  ini: support marshaling and un-marshaling time.Duration
-
 *  ini: support marshaling and un-marshaling time.Time
-
 *  ini: support marshaling and un-marshaling embedded structs
-
 *  websocket: websocket: replace epoll implementation with libnet.Poll
 
 ===  Bug Fixes
 
 *  dns: return error code 4 if server receive unknown message class or type
-
 *  dns: return an error if section question contains invalid packet
-
 *  ini: fix return value for empty string in IsValueBoolTrue
-
 *  strings: fix logic of Split function
+*  websocket: set the response ID after calling handler on handleText
+*  websocket: wrap the response with frame on sendResponse
 
 
 ==  share v0.9.0 (2019-10-08)
@@ -48,17 +40,11 @@ This library is released each month, usually at the first week of month.
 ===  New Features
 
 *  bytes: add function to get all indexes of word in string
-
 *  bytes: add function to take snippets from string by indexes
-
 *  bytes: add function to get all indexes of token in string
-
 *  ints: add function to merge two slices by distance
-
 *  memfs: add method to add file directly as child of root
-
 *  memfs: add method to Search content of files
-
 *  sanitize: new package to sanitize markup document into plain text
 +
 Current implementation have a function to sanitize the content of HTML.
