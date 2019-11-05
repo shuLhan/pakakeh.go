@@ -716,8 +716,8 @@ func (serv *Server) Start() (err error) {
 	if err != nil {
 		return
 	}
-	go serv.reader()
 
+	go serv.reader()
 	go serv.pinger()
 
 	var conn int
@@ -758,7 +758,9 @@ func (serv *Server) sendResponse(conn int, res *Response) (err error) {
 		return
 	}
 
-	err = Send(conn, resb)
+	packet := NewFrameText(false, resb)
+
+	err = Send(conn, packet)
 	if err != nil {
 		log.Println("websocket: server.sendResponse: " + err.Error())
 	}
