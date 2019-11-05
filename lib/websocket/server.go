@@ -432,8 +432,6 @@ func (serv *Server) handleText(conn int, payload []byte) {
 		goto out
 	}
 
-	res.ID = req.ID
-
 	handler, err = req.unpack(serv.routes)
 	if err != nil {
 		res.Code = http.StatusBadRequest
@@ -442,12 +440,13 @@ func (serv *Server) handleText(conn int, payload []byte) {
 	}
 	if handler == nil {
 		res.Code = http.StatusNotFound
-		res.Message = req.Target
+		res.Message = req.Method + " " + req.Target
 		goto out
 	}
 
 	handler(ctx, req, res)
 
+	res.ID = req.ID
 out:
 	err = serv.sendResponse(conn, res)
 	if err != nil {
