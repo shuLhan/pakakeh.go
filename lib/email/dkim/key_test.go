@@ -110,7 +110,7 @@ func TestKeyLookupDNSTXT(t *testing.T) {
 		expErr: "dkim: LookupKey: no TXT record on 'www.amazon.com'",
 	}, {
 		dname:  "www.google.com",
-		expErr: "dkim: LookupKey: no TXT record on 'www.google.com'",
+		expErr: "dkim: LookupKey: empty answer on 'www.google.com'",
 	}}
 
 	for _, c := range cases {
