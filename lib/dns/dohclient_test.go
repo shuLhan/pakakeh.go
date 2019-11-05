@@ -127,7 +127,8 @@ func TestDoHClient_Lookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
-				IsAA:    true,
+				IsAA:    false,
+				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
@@ -275,7 +276,8 @@ func TestDoHClient_Post(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      0,
-				IsAA:    true,
+				IsAA:    false,
+				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{

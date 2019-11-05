@@ -125,7 +125,8 @@ func TestUDPClientLookup(t *testing.T) {
 		exp: &Message{
 			Header: &SectionHeader{
 				ID:      11,
-				IsAA:    true,
+				IsAA:    false,
+				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
 			Question: &SectionQuestion{
