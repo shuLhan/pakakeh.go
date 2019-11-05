@@ -429,8 +429,6 @@ func TestClientFragmentation(t *testing.T) {
 
 		wg.Wait()
 	}
-
-	testClient.Quit()
 }
 
 func TestClientFragmentation2(t *testing.T) {
@@ -509,7 +507,6 @@ func TestClientFragmentation2(t *testing.T) {
 	}
 
 	wg.Wait()
-	testClient.Quit()
 }
 
 func TestClientSendBin(t *testing.T) {
