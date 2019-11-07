@@ -4,6 +4,13 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.10.1 (2019-12-xx)
+
+===  Bug Fixes
+
+*  websocket: fix zero response ID when error on handleText
+
+
 ==  share v0.10.0 (2019-11-05)
 
 ===  New Features

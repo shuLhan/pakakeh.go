@@ -446,8 +446,9 @@ func (serv *Server) handleText(conn int, payload []byte) {
 
 	handler(ctx, req, res)
 
-	res.ID = req.ID
 out:
+	res.ID = req.ID
+
 	err = serv.sendResponse(conn, res)
 	if err != nil {
 		serv.ClientRemove(conn)
