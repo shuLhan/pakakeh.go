@@ -620,27 +620,17 @@ func (srv *Server) incForwarder() {
 
 func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 	var (
-		n   int
 		err error
 	)
 	for {
 		req := newRequest()
-		for {
-			n, err = cl.recv(req.message)
-			if err == nil {
-				break
-			}
+
+		_, err = cl.recv(req.message)
+		if err != nil {
 			if err == io.EOF {
-				break
-			}
-			if n != 0 {
-				log.Println("serveTCPClient:", err)
-				req.message.Reset()
+				goto out
 			}
 			continue
-		}
-		if err == io.EOF {
-			break
 		}
 
 		req.kind = kind
@@ -655,7 +645,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 
 		srv.requestq <- req
 	}
-
+out:
 	err = cl.conn.Close()
 	if err != nil {
 		log.Println("serveTCPClient: conn.Close:", err)
