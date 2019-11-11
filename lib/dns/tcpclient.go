@@ -54,13 +54,6 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 }
 
 //
-// RemoteAddr return client remote nameserver address.
-//
-func (cl *TCPClient) RemoteAddr() string {
-	return cl.addr.String()
-}
-
-//
 // Close client connection.
 //
 func (cl *TCPClient) Close() error {
@@ -148,6 +141,50 @@ func (cl *TCPClient) Query(msg *Message) (*Message, error) {
 }
 
 //
+// RemoteAddr return client remote nameserver address.
+//
+func (cl *TCPClient) RemoteAddr() string {
+	return cl.addr.String()
+}
+
+//
+// SetRemoteAddr set the remote address for sending the packet.
+//
+func (cl *TCPClient) SetRemoteAddr(addr string) (err error) {
+	cl.addr, err = net.ResolveTCPAddr("udp", addr)
+	return
+}
+
+//
+// SetTimeout for sending and receiving packet.
+//
+func (cl *TCPClient) SetTimeout(t time.Duration) {
+	cl.timeout = t
+}
+
+//
+// Write raw DNS response message on active connection.
+// This method is only used by server to write the response of query to
+// client.
+//
+func (cl *TCPClient) Write(msg []byte) (n int, err error) {
+	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
+	if err != nil {
+		return
+	}
+
+	lenmsg := len(msg)
+	packet := make([]byte, 0, 2+lenmsg)
+
+	libbytes.AppendUint16(&packet, uint16(lenmsg))
+	packet = append(packet, msg...)
+
+	n, err = cl.conn.Write(packet)
+
+	return
+}
+
+//
 // recv will read DNS message from active connection in client into `msg`.
 //
 func (cl *TCPClient) recv(msg *Message) (n int, err error) {
@@ -177,40 +214,4 @@ func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 	}
 
 	return
-}
-
-//
-// Write raw DNS response message on active connection.
-// This method is only used by server to write the response of query to
-// client.
-//
-func (cl *TCPClient) Write(msg []byte) (n int, err error) {
-	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
-	if err != nil {
-		return
-	}
-
-	packet := make([]byte, 0, 2+len(msg))
-
-	libbytes.AppendUint16(&packet, uint16(len(msg)))
-	packet = append(packet, msg...)
-
-	n, err = cl.conn.Write(packet)
-
-	return
-}
-
-//
-// SetRemoteAddr set the remote address for sending the packet.
-//
-func (cl *TCPClient) SetRemoteAddr(addr string) (err error) {
-	cl.addr, err = net.ResolveTCPAddr("udp", addr)
-	return
-}
-
-//
-// SetTimeout for sending and receiving packet.
-//
-func (cl *TCPClient) SetTimeout(t time.Duration) {
-	cl.timeout = t
 }
