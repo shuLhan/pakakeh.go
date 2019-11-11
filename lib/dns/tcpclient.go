@@ -96,6 +96,12 @@ func (cl *TCPClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 	if cl.addr == nil || cl.conn == nil {
 		return nil, nil
 	}
+	if qtype == 0 {
+		qtype = QueryTypeA
+	}
+	if qclass == 0 {
+		qclass = QueryClassIN
+	}
 
 	msg := NewMessage()
 
