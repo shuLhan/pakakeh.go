@@ -64,7 +64,10 @@ func (cl *TCPClient) RemoteAddr() string {
 // Close client connection.
 //
 func (cl *TCPClient) Close() error {
-	return cl.conn.Close()
+	if cl.conn != nil {
+		return cl.conn.Close()
+	}
+	return nil
 }
 
 //
