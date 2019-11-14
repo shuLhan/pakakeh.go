@@ -7,6 +7,8 @@
 /lib/email/maildir/testdata/
 /lib/git/testdata/beku_test
 /lib/memfs/generate_test/memfs_generate.go
+/lib/websocket/examples/cmd/client/client
+/lib/websocket/examples/cmd/server/server
 /lib/websocket/testdata/.Python
 /lib/websocket/testdata/bin
 /lib/websocket/testdata/client/client

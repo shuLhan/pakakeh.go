@@ -1,0 +1,35 @@
+==  WebSocket examples
+
+This package contains an example of chat server and client written using
+WebSocket.
+
+To run the WebSocket server, go to directory "cmd/server" and execute,
+
+----
+$ go run .
+----
+
+There are three known user in the server: "Groot", "Thanos", and "Hulk"; all
+of them are represented by ID 1, 2, and 3; in order.
+
+The client example is in directory "cmd/client", go to that directory and
+connect to the server as user "Groot" by executing
+
+----
+$ go run . 1
+----
+
+or as user "Thanos",
+
+----
+$ go run . 2
+----
+
+or as user "Hulk",
+
+----
+$ go run . 2
+----
+
+Run the server and then two or three clients, and start chatting with each
+others.
