@@ -6,8 +6,8 @@
 // Package websocket provide a library for creating WebSocket server or
 // client.
 //
-// The websocket server is implemented with epoll, which means it's only
-// run on Linux.
+// The websocket server is implemented with epoll and kqueue, which means it's
+// only run on Linux, Darwin, or BSD.
 //
 // Pub-Sub Example
 //
@@ -30,7 +30,7 @@
 //
 //		q := URL.Query()
 //
-//		extJWT := q.Get(_qKeyTicket)
+//		extJWT := q.Get("ticket")
 //		if len(extJWT) == 0 {
 //			return nil, fmt.Errorf("Missing authorization")
 //		}
