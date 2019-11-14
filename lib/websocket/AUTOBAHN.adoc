@@ -7,24 +7,30 @@ This document track the status report from autobahn testsuite [1].
 The following instruction describe how to setup autobahn testsuite on this
 package,
 
-	$ cd testdata
-	$ virtualenv .
-	$ source ./bin/activate
-	$ pip install autobahntestsuite
+----
+$ cd testdata
+$ virtualenv .
+$ source ./bin/activate
+$ pip install autobahntestsuite
+----
 
 ==  Testing Server
 
 First, run our WebSocket test server,
 
-	$ cd testdata/server
-	$ go build .
-	$ ./server
+----
+$ cd testdata/server
+$ go build .
+$ ./server
+----
 
 Second, open new terminal and run the autobahn test server,
 
-	$ cd testdata/server
-	$ source ../bin/activate
-	$ wstest -m fuzzingclient
+----
+$ cd testdata/server
+$ source ../bin/activate
+$ wstest -m fuzzingclient
+----
 
 Wait for the test to complete.  After that, we can view the reports on
 "reports/index.html".
@@ -33,6 +39,7 @@ Wait for the test to complete.  After that, we can view the reports on
 
 Summary of autobahn testsuite reports for server,
 
+----
 1.  Framing (14/16)
 1.1.  Text Messages (8/8)
 1.2.  Binary Messages (8/8)
@@ -98,6 +105,7 @@ points  (11/11)
 12.  WebSocket Compression (different payloads)  (-/-)
 13.  WebSocket Compression (different parameters)  (-/-)
 (excluded)
+----
 
 
 Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
@@ -109,16 +117,19 @@ Success Rate = 100%
 
 First, run the autobahn test server,
 
-	$ cd testdata/client
-	$ source ../bin/activate
-	$ wstest -m fuzzingserver
-
+----
+$ cd testdata/client
+$ source ../bin/activate
+$ wstest -m fuzzingserver
+----
 
 Second, run our WebSocket test client,
 
-	$ cd testdata/client
-	$ go build .
-	$ ./client
+----
+$ cd testdata/client
+$ go build .
+$ ./client
+----
 
 Wait for the test to complete.  After that, open the browser at
 http://127.0.0.1:8080/test_browser.html , and click on "Update Reports
@@ -128,6 +139,7 @@ http://127.0.0.1:8080/test_browser.html , and click on "Update Reports
 
 Summary of autobahn testsuite reports for client,
 
+----
 1.  Framing (14/16)
 1.1.  Text Messages (8/8)
 1.2.  Binary Messages (8/8)
@@ -193,6 +205,7 @@ points  (11/11)
 12.  WebSocket Compression (different payloads)  (-/-)
 13.  WebSocket Compression (different parameters)  (-/-)
 (excluded)
+----
 
 
 Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
