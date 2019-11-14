@@ -101,11 +101,7 @@ func runTestServer() {
 	_testWSAddr = "ws://127.0.0.1:" + strconv.Itoa(_testPort) + "/"
 	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
 
-	_testServer, err = NewServer(_testPort)
-	if err != nil {
-		log.Println("runTestServer: " + err.Error())
-		os.Exit(2)
-	}
+	_testServer = NewServer(_testPort)
 
 	_testServer.HandleAuth = testHandleAuth
 	_testServer.HandleBin = testHandleBin

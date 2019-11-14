@@ -8,7 +8,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/websocket"
@@ -43,11 +42,7 @@ func handleText(conn int, payload []byte) {
 }
 
 func main() {
-	srv, err := websocket.NewServer(9001)
-	if err != nil {
-		log.Println("internal/server: " + err.Error())
-		os.Exit(2)
-	}
+	srv := websocket.NewServer(9001)
 
 	srv.HandleBin = handleBin
 	srv.HandleText = handleText

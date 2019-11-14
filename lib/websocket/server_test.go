@@ -14,27 +14,9 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestNewServer(t *testing.T) {
-	cases := []struct {
-		desc   string
-		port   int
-		expErr string
-	}{{
-		desc:   "With invalid port",
-		port:   -1,
-		expErr: "invalid argument",
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		_, err := NewServer(c.port)
-		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
-			continue
-		}
-	}
-}
+const (
+	_qKeyTicket = "ticket"
+)
 
 func createClient(t *testing.T, endpoint string) (cl *Client) {
 	cl = &Client{

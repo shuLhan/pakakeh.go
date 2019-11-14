@@ -24,10 +24,6 @@ const (
 	frameIsMasked   = 0x80
 )
 
-const (
-	_qKeyTicket = "ticket"
-)
-
 //nolint:gochecknoglobals
 var (
 	defaultTimeout = 10 * time.Second
