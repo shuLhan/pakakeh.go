@@ -67,12 +67,12 @@ var (
 //
 //	err := cl.Connect()
 //	if err != nil {
-//		log.Fatal("Connect: "+ err.Error())
+//		log.Fatal(err.Error())
 //	}
 //
 //	err := cl.SendText([]byte("Hello from client"))
 //	if err != nil {
-//		log.Fatal("Connect: "+ err.Error())
+//		log.Fatal(err.Error())
 //	}
 //
 // At any time, server may send PING or CLOSE the connection.  For this
@@ -748,7 +748,14 @@ func (cl *Client) recv() (packet []byte, err error) {
 		}
 
 		n, err := cl.conn.Read(buf)
-		if err != nil || n == 0 {
+		if err != nil {
+			neterr, ok := err.(net.Error)
+			if ok && neterr.Timeout() {
+				continue
+			}
+			break
+		}
+		if n == 0 {
 			break
 		}
 
