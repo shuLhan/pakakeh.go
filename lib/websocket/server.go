@@ -86,7 +86,7 @@ type Server struct {
 //
 // NewServer will create new web-socket server that listen on port number.
 //
-func NewServer(port int) (serv *Server, err error) {
+func NewServer(port int) (serv *Server) {
 	serv = &Server{
 		port:    port,
 		Clients: newClientManager(),
@@ -99,7 +99,7 @@ func NewServer(port int) (serv *Server, err error) {
 	serv.HandleRsvControl = nil
 	serv.HandleText = serv.handleText
 
-	return
+	return serv
 }
 
 //
