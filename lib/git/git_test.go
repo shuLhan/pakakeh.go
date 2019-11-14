@@ -13,10 +13,9 @@ import (
 	"github.com/shuLhan/share/lib/test/mock"
 )
 
-const _testRepoDir = "testdata/beku_test"
-
 //nolint:gochecknoglobals
 var (
+	_testRepoDir   string
 	_testRemoteURL string
 )
 
@@ -342,13 +341,16 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	_testRemoteURL = wd + "/testdata/beku_test.git"
+	_testRemoteURL = "file://" + wd + "/testdata/beku_test.git"
+	_testRepoDir = wd + "/testdata/repotest"
 
 	_stdout = mock.Stdout()
 	_stderr = mock.Stderr()
 
 	fmt.Printf("stdout: %+v\n", _stdout.Name())
-	fmt.Printf("stderr: %+v\n", _stderr.Name())
+	fmt.Printf("stderr    : %+v\n", _stderr.Name())
+	fmt.Printf("remote URL: %s\n", _testRemoteURL)
+	fmt.Printf("repo dir  : %s\n", _testRepoDir)
 
 	// Cleaning up for TestClone
 	os.RemoveAll(_testRepoDir)
