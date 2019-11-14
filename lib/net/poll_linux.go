@@ -78,9 +78,16 @@ func (poll *epoll) UnregisterRead(fd int) (err error) {
 }
 
 func (poll *epoll) WaitRead() (fds []int, err error) {
-	n, err := unix.EpollWait(poll.read, poll.events[:], -1)
-	if err != nil {
-		return nil, fmt.Errorf("epoll.WaitRead: %s", err.Error())
+	var n int
+	for {
+		n, err = unix.EpollWait(poll.read, poll.events[:], -1)
+		if err != nil {
+			if err == unix.EINTR {
+				continue
+			}
+			return nil, fmt.Errorf("epoll.WaitRead: %s", err.Error())
+		}
+		break
 	}
 
 	for x := 0; x < n; x++ {
