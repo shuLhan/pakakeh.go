@@ -56,7 +56,10 @@ func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err err
 // Close the client connection.
 //
 func (cl *DoTClient) Close() error {
-	return cl.conn.Close()
+	if cl.conn != nil {
+		return cl.conn.Close()
+	}
+	return nil
 }
 
 //
