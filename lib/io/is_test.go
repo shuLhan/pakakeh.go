@@ -62,12 +62,12 @@ func TestIsFileExist(t *testing.T) {
 		relpath: "file",
 	}, {
 		desc:    "With file exist without parent",
-		relpath: "testdata/file",
+		relpath: "testdata/.empty",
 		exp:     true,
 	}, {
 		desc:    "With file exist",
 		parent:  wd,
-		relpath: "testdata/file",
+		relpath: "testdata/.empty",
 		exp:     true,
 	}}
 
