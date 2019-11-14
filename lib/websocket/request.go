@@ -60,6 +60,9 @@ type Request struct {
 
 	// Query is Target query.
 	Query url.Values `json:"-"`
+
+	// Conn is the client connection, where the request come from.
+	Conn int
 }
 
 //

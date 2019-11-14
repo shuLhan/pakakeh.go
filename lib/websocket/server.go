@@ -444,6 +444,8 @@ func (serv *Server) handleText(conn int, payload []byte) {
 		goto out
 	}
 
+	req.Conn = conn
+
 	handler(ctx, req, res)
 
 out:
