@@ -66,6 +66,13 @@ func (cc *ClientConfig) initialize() (err error) {
 		}
 	}
 
+	if len(cc.RemoteUser) == 0 {
+		return fmt.Errorf("ssh: remote user is not defined")
+	}
+	if len(cc.RemoteHost) == 0 {
+		return fmt.Errorf("ssh: remote host is not defined")
+	}
+
 	if len(cc.PrivateKeyFile) == 0 {
 		cc.PrivateKeyFile = filepath.Join(userHomeDir, ".ssh", "id_rsa")
 	}
@@ -78,12 +85,6 @@ func (cc *ClientConfig) initialize() (err error) {
 		return fmt.Errorf("ssh: os.Stat %q: %s", cc.PrivateKeyFile, err)
 	}
 
-	if len(cc.RemoteUser) == 0 {
-		return fmt.Errorf("ssh: remote user is not defined")
-	}
-	if len(cc.RemoteHost) == 0 {
-		return fmt.Errorf("ssh: remote host is not defined")
-	}
 	if cc.RemotePort <= 0 || cc.RemotePort >= 65535 {
 		log.Printf("ssh: using default port instead of %d\n", cc.RemotePort)
 		cc.RemotePort = 22

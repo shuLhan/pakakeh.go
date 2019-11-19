@@ -5,6 +5,7 @@
 package ssh
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -17,10 +18,13 @@ func TestClientConfig_initialize(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	privateKeyFile := filepath.Join(userHomeDir, ".ssh", "id_rsa")
 
 	cases := []struct {
 		cfg    *ClientConfig
@@ -36,6 +40,8 @@ func TestClientConfig_initialize(t *testing.T) {
 		expErr: "ssh: remote host is not defined",
 	}, {
 		cfg: &ClientConfig{
+			RemoteUser:     "hodor",
+			RemoteHost:     "127.0.0.1",
 			PrivateKeyFile: "notexist",
 		},
 		expErr: `ssh: private key path "notexist" does not exist`,
@@ -44,9 +50,10 @@ func TestClientConfig_initialize(t *testing.T) {
 			RemoteUser: "hodor",
 			RemoteHost: "127.0.0.1",
 		},
+		expErr: fmt.Sprintf(`ssh: private key path "%s" does not exist`, privateKeyFile),
 		exp: &ClientConfig{
 			WorkingDir:     wd,
-			PrivateKeyFile: filepath.Join(userHomeDir, ".ssh", "id_rsa"),
+			PrivateKeyFile: privateKeyFile,
 			RemoteUser:     "hodor",
 			RemoteHost:     "127.0.0.1",
 			RemotePort:     22,
