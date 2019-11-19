@@ -27,7 +27,7 @@ func TestGeneratePathNode(t *testing.T) {
 		exp      *memfs.Node
 		expError string
 	}{{
-		path:     "/memfs_generate.go",
+		path:     "/gen_test.go",
 		expError: "file does not exist",
 	}, {
 		path: "/",
@@ -65,6 +65,8 @@ func TestGeneratePathNode(t *testing.T) {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
 		}
+
+		got.SysPath = strings.Replace(got.SysPath, "xxx/", wd, -1)
 
 		test.Assert(t, "Node", c.exp, got, true)
 	}

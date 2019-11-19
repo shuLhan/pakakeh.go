@@ -26,7 +26,6 @@
 /lib/dsv/testdata/writerawrows.out
 /lib/email/maildir/testdata/
 /lib/git/testdata/repotest
-/lib/memfs/generate_test/memfs_generate.go
 /lib/mining/cmd/cart/cart
 /lib/mining/cmd/crf/crf
 /lib/mining/cmd/lnsmote/lnsmote

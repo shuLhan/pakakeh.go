@@ -72,6 +72,8 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 		goto fail
 	}
 
+	_ = f.Sync()
+
 	err = f.Close()
 	if err != nil {
 		return fmt.Errorf("memfs: GoGenerate: " + err.Error())
