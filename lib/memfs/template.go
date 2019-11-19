@@ -61,7 +61,6 @@ func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
 		},
 {{- end }}
 	}
-	memfs.GeneratedPathNode.Set("{{.Path}}", node)
 	return node
 }
 {{end}}
