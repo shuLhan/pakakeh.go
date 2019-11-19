@@ -26,9 +26,6 @@ func TestConnect(t *testing.T) {
 		headers  http.Header
 		expErr   string
 	}{{
-		desc:   "With empty endpoint",
-		expErr: `websocket: Connect: parse "": empty url`,
-	}, {
 		desc:     "With custom header",
 		endpoint: _testEndpointAuth,
 		headers: http.Header{
