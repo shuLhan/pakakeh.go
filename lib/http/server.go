@@ -46,7 +46,7 @@ type Server struct {
 // NewServer create and initialize new HTTP server that serve root directory
 // with custom connection.
 //
-func NewServer(opts *ServerOptions) (srv *Server, e error) {
+func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	srv = &Server{}
 
 	if len(opts.Address) == 0 {
@@ -75,14 +75,16 @@ func NewServer(opts *ServerOptions) (srv *Server, e error) {
 
 	memfs.Development = opts.Development
 
-	srv.Memfs, e = memfs.New(opts.Includes, opts.Excludes, true)
-	if e != nil {
-		return nil, e
-	}
+	if len(opts.Root) > 0 {
+		srv.Memfs, err = memfs.New(opts.Includes, opts.Excludes, true)
+		if err != nil {
+			return nil, err
+		}
 
-	e = srv.Memfs.Mount(opts.Root)
-	if e != nil {
-		return nil, e
+		err = srv.Memfs.Mount(opts.Root)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return srv, nil
@@ -300,6 +302,10 @@ func (srv *Server) Start() (err error) {
 }
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
+	if srv.Memfs == nil {
+		return nil
+	}
+
 	var e error
 
 	node, e = srv.Memfs.Get(reqPath)
