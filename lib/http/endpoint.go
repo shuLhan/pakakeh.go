@@ -42,6 +42,34 @@ type Endpoint struct {
 	Call Callback
 }
 
+//
+// HTTPMethod return the string representation of HTTP method as predefined
+// in "net/http".
+//
+func (ep *Endpoint) HTTPMethod() string {
+	switch ep.Method {
+	case RequestMethodGet:
+		return http.MethodGet
+	case RequestMethodConnect:
+		return http.MethodConnect
+	case RequestMethodDelete:
+		return http.MethodDelete
+	case RequestMethodHead:
+		return http.MethodHead
+	case RequestMethodOptions:
+		return http.MethodOptions
+	case RequestMethodPatch:
+		return http.MethodPatch
+	case RequestMethodPost:
+		return http.MethodPost
+	case RequestMethodPut:
+		return http.MethodPut
+	case RequestMethodTrace:
+		return http.MethodTrace
+	}
+	return http.MethodGet
+}
+
 func (ep *Endpoint) call(
 	res http.ResponseWriter,
 	req *http.Request,
