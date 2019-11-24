@@ -1107,7 +1107,7 @@ func (srv *Server) stopForwarders() {
 func (srv *Server) newStopper() (stopper chan bool) {
 	srv.fwLocker.Lock()
 
-	stopper = make(chan bool)
+	stopper = make(chan bool, 1)
 	srv.fwStoppers = append(srv.fwStoppers, stopper)
 	srv.fwGroup.Add(1)
 
