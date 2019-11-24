@@ -889,7 +889,9 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 
 		log.Printf("dns: reconnect forwarder %s for %s\n", tag, nameserver)
 	out:
-		forwarder.Close()
+		if forwarder != nil {
+			forwarder.Close()
+		}
 		srv.decForwarder()
 	}
 	srv.fwGroup.Done()
@@ -953,7 +955,9 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 
 		log.Printf("dns: reconnect forwarder %s for %s\n", tag, nameserver)
 	out:
-		forwarder.Close()
+		if forwarder != nil {
+			forwarder.Close()
+		}
 		srv.decForwarder()
 	}
 	srv.fwGroup.Done()
@@ -1075,7 +1079,9 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 
 		log.Printf("dns: reconnect forwarder %s for %s\n", tag, remoteAddr)
 	out:
-		forwarder.Close()
+		if forwarder != nil {
+			forwarder.Close()
+		}
 		srv.decForwarder()
 	}
 	srv.fwGroup.Done()
