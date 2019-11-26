@@ -748,7 +748,7 @@ func (srv *Server) processRequest() {
 	}
 }
 
-func (srv *Server) processResponse(req *request, res *Message, fallbackq chan *request) {
+func (srv *Server) processResponse(req *request, res *Message) {
 	if !isResponseValid(req, res) {
 		req.error(RCodeErrServer)
 		return
@@ -856,7 +856,10 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 		}
 
 		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, nameserver)
-		srv.incForwarder()
+
+		if fallbackq != nil {
+			srv.incForwarder()
+		}
 
 		for err == nil {
 			select {
@@ -879,7 +882,7 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 						fallbackq <- req
 					}
 				} else {
-					srv.processResponse(req, res, fallbackq)
+					srv.processResponse(req, res)
 				}
 			case <-stopper:
 				isRunning = false
@@ -892,7 +895,9 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 		if forwarder != nil {
 			forwarder.Close()
 		}
-		srv.decForwarder()
+		if fallbackq != nil {
+			srv.decForwarder()
+		}
 	}
 	srv.fwGroup.Done()
 	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, nameserver)
@@ -922,7 +927,10 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 		}
 
 		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, nameserver)
-		srv.incForwarder()
+
+		if fallbackq != nil {
+			srv.incForwarder()
+		}
 
 		for err == nil {
 			select {
@@ -945,7 +953,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 						fallbackq <- req
 					}
 				} else {
-					srv.processResponse(req, res, fallbackq)
+					srv.processResponse(req, res)
 				}
 			case <-stopper:
 				isRunning = false
@@ -958,7 +966,9 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 		if forwarder != nil {
 			forwarder.Close()
 		}
-		srv.decForwarder()
+		if fallbackq != nil {
+			srv.decForwarder()
+		}
 	}
 	srv.fwGroup.Done()
 	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, nameserver)
@@ -971,7 +981,10 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 	)
 
 	log.Printf("dns: starting forwarder %s for %s\n", tag, remoteAddr)
-	srv.incForwarder()
+
+	if fallbackq != nil {
+		srv.incForwarder()
+	}
 
 	for isRunning {
 		select {
@@ -1004,14 +1017,16 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 				continue
 			}
 
-			srv.processResponse(req, res, fallbackq)
+			srv.processResponse(req, res)
 		case <-stopper:
 			isRunning = false
 			goto out
 		}
 	}
 out:
-	srv.decForwarder()
+	if fallbackq != nil {
+		srv.decForwarder()
+	}
 	srv.fwGroup.Done()
 	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, remoteAddr)
 }
@@ -1045,7 +1060,10 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 		}
 
 		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, remoteAddr)
-		srv.incForwarder()
+
+		if fallbackq != nil {
+			srv.incForwarder()
+		}
 
 		// The second loop consume the forward queue.
 		for err == nil {
@@ -1069,7 +1087,7 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 						fallbackq <- req
 					}
 				} else {
-					srv.processResponse(req, res, fallbackq)
+					srv.processResponse(req, res)
 				}
 			case <-stopper:
 				isRunning = false
@@ -1082,7 +1100,9 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 		if forwarder != nil {
 			forwarder.Close()
 		}
-		srv.decForwarder()
+		if fallbackq != nil {
+			srv.decForwarder()
+		}
 	}
 	srv.fwGroup.Done()
 	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, remoteAddr)
