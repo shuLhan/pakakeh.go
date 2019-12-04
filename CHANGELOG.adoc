@@ -8,8 +8,34 @@ This library is released each month, usually at the first week of month.
 
 ===  Bug Fixes
 
+*  dns: close the connection if receiving zero packet on serveTCPClient
+*  dns: increase and decrease number of forwarders only for primary forwarders
+*  dns: make the stopper channel to be buffered
+*  dns: check for nil forwarder
+*  dns: check for nil connection on DoTClient's Close
+*  dns: check for zero query type and class on TCPClient Lookup method
+*  dns: check for nil connection on Close at TCPClient
+*  dns: minimize double looping on checking error at serveTCPClient
+*  git: fix the test using full path URL and repository directory
+*  io: fix test using existing file instead of generate file
+*  net: handle interrupted system call on epoll Wait
+*  ssh: fix test ClientConfig initialize on Github Actions
+*  websocket: remove test for empty endpoint due to different format
 *  websocket: fix zero response ID when error on handleText
 
+===  Enhancements
+
+*  dns: remove the use of pointer on Message fields
+*  dns: remove the use of ResourceRecord pool
+*  http: add method HTTPMethod to Endpoint
+*  http: disable creating Memfs if Root options is empty
+*  memfs: remove unneeded call to GeneratedPathNode.Set
+*  mining: move commands to root
+*  websocket: add examples of WebSocket as chat server and client
+*  websocket: add new function to create broadcast response
+*  websocket: add field Conn to represent connection in Request
+*  websocket: check for read timeout on recv
+*  websocket: remove unused error on NewServer
 
 ==  share v0.10.0 (2019-11-05)
 
