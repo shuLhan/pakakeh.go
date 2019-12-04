@@ -39,12 +39,12 @@
 <p>The following instruction describe how to setup autobahn testsuite on this
 package,</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre>	$ cd testdata
-	$ virtualenv .
-	$ source ./bin/activate
-	$ pip install autobahntestsuite</pre>
+<pre>$ cd testdata
+$ virtualenv .
+$ source ./bin/activate
+$ pip install autobahntestsuite</pre>
 </div>
 </div>
 </div>
@@ -55,21 +55,21 @@ package,</p>
 <div class="paragraph">
 <p>First, run our WebSocket test server,</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre>	$ cd testdata/server
-	$ go build .
-	$ ./server</pre>
+<pre>$ cd testdata/server
+$ go build .
+$ ./server</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Second, open new terminal and run the autobahn test server,</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre>	$ cd testdata/server
-	$ source ../bin/activate
-	$ wstest -m fuzzingclient</pre>
+<pre>$ cd testdata/server
+$ source ../bin/activate
+$ wstest -m fuzzingclient</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -81,29 +81,18 @@ package,</p>
 <div class="paragraph">
 <p>Summary of autobahn testsuite reports for server,</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Framing (14/16)
+<div class="listingblock">
+<div class="content">
+<pre>1.  Framing (14/16)
 1.1.  Text Messages (8/8)
-1.2.  Binary Messages (8/8)</p>
-</li>
-<li>
-<p>Pings/Pongs (11/11)</p>
-</li>
-<li>
-<p>Reserved Bits (7/7)</p>
-</li>
-<li>
-<p>Opcodes (10/10)
+1.2.  Binary Messages (8/8)
+2.  Pings/Pongs (11/11)
+3.  Reserved Bits (7/7)
+4.  Opcodes (10/10)
 4.1.  Non-Control Opcodes (5/5)
-4.2.  Control Opcodes (5/5)</p>
-</li>
-<li>
-<p>Fragmentation (20/20)</p>
-</li>
-<li>
-<p>UTF-8 Handling  (145/145)
+4.2.  Control Opcodes (5/5)
+5.  Fragmentation (20/20)
+6.  UTF-8 Handling  (145/145)
 6.1.  Valid UTF-8 with zero payload fragments  (3/3)
 6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
 code-points  (4/4)
@@ -128,10 +117,8 @@ points  (11/11)
 6.20.  Single UTF-16 surrogates  (7/7)
 6.21.   Paired UTF-16 surrogates  (8/8)
 6.22.  Non-character code points (valid UTF-8)  (34/34)
-6.23.  Unicode specials (i.e. replacement char)  (7/7)</p>
-</li>
-<li>
-<p>Close Handling  (22/37)
+6.23.  Unicode specials (i.e. replacement char)  (7/7)
+7.  Close Handling  (22/37)
 7.1.  Basic close behavior (fuzzer initiated)  (6/6)
 7.2.  -
 7.3.  Close frame structure: payload length (fuzzer initiated)  (6/6)
@@ -144,13 +131,9 @@ points  (11/11)
 7.10.  -
 7.11.  -
 7.12.  -
-7.13.  Informational close information (fuzzer initiated)  (2/2)</p>
-</li>
-<li>
-<p>(-/-)</p>
-</li>
-<li>
-<p>Limits/Performance  (54/54)
+7.13.  Informational close information (fuzzer initiated)  (2/2)
+8.  (-/-)
+9.  Limits/Performance  (54/54)
 9.1.  Text Message (increasing size)  (6/6)
 9.2.  Binary Message (increasing size)  (6/6)
 9.3.  Fragmented Text Message (fixed size, increasing fragment size)  (9/9)
@@ -158,23 +141,14 @@ points  (11/11)
 9.5.  Text Message (fixed size, increasing chop size)  (6/6)
 9.6.  Binary Text Message (fixed size, increasing chop size)  (6/6)
 9.7.  Text Message Roundtrip Time (fixed number, increasing size)  (6/6)
-9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)</p>
-</li>
-<li>
-<p>Misc  (1/1)
-10.1.  Auto-Fragmentation  (1/1)</p>
-</li>
-<li>
-<p>(-/-)</p>
-</li>
-<li>
-<p>WebSocket Compression (different payloads)  (-/-)</p>
-</li>
-<li>
-<p>WebSocket Compression (different parameters)  (-/-)
-(excluded)</p>
-</li>
-</ol>
+9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)
+10.  Misc  (1/1)
+10.1.  Auto-Fragmentation  (1/1)
+11.  (-/-)
+12.  WebSocket Compression (different payloads)  (-/-)
+13.  WebSocket Compression (different parameters)  (-/-)
+(excluded)</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Total test cases   : 16 &#43; 11 &#43; 7 &#43; 10 &#43; 20 &#43; 145 &#43; 37 &#43; 0 &#43; 54 &#43; 1 &#43; 0 &#43; 0 &#43; 0 = 301
@@ -192,21 +166,21 @@ Total success cases: 16 &#43; 11 &#43; 7 &#43; 10 &#43; 20 &#43; 145 &#43; 37 &#
 <div class="paragraph">
 <p>First, run the autobahn test server,</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre>	$ cd testdata/client
-	$ source ../bin/activate
-	$ wstest -m fuzzingserver</pre>
+<pre>$ cd testdata/client
+$ source ../bin/activate
+$ wstest -m fuzzingserver</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Second, run our WebSocket test client,</p>
 </div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre>	$ cd testdata/client
-	$ go build .
-	$ ./client</pre>
+<pre>$ cd testdata/client
+$ go build .
+$ ./client</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -219,29 +193,18 @@ Total success cases: 16 &#43; 11 &#43; 7 &#43; 10 &#43; 20 &#43; 145 &#43; 37 &#
 <div class="paragraph">
 <p>Summary of autobahn testsuite reports for client,</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Framing (14/16)
+<div class="listingblock">
+<div class="content">
+<pre>1.  Framing (14/16)
 1.1.  Text Messages (8/8)
-1.2.  Binary Messages (8/8)</p>
-</li>
-<li>
-<p>Pings/Pongs (11/11)</p>
-</li>
-<li>
-<p>Reserved Bits (7/7)</p>
-</li>
-<li>
-<p>Opcodes (10/10)
+1.2.  Binary Messages (8/8)
+2.  Pings/Pongs (11/11)
+3.  Reserved Bits (7/7)
+4.  Opcodes (10/10)
 4.1.  Non-Control Opcodes (5/5)
-4.2.  Control Opcodes (5/5)</p>
-</li>
-<li>
-<p>Fragmentation (20/20)</p>
-</li>
-<li>
-<p>UTF-8 Handling  (145/145)
+4.2.  Control Opcodes (5/5)
+5.  Fragmentation (20/20)
+6.  UTF-8 Handling  (145/145)
 6.1.  Valid UTF-8 with zero payload fragments  (3/3)
 6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
 code-points  (4/4)
@@ -266,10 +229,8 @@ points  (11/11)
 6.20.  Single UTF-16 surrogates  (7/7)
 6.21.   Paired UTF-16 surrogates  (8/8)
 6.22.  Non-character code points (valid UTF-8)  (34/34)
-6.23.  Unicode specials (i.e. replacement char)  (7/7)</p>
-</li>
-<li>
-<p>Close Handling  (22/37)
+6.23.  Unicode specials (i.e. replacement char)  (7/7)
+7.  Close Handling  (22/37)
 7.1.  Basic close behavior (fuzzer initiated)  (6/6)
 7.2.  -
 7.3.  Close frame structure: payload length (fuzzer initiated)  (6/6)
@@ -282,13 +243,9 @@ points  (11/11)
 7.10.  -
 7.11.  -
 7.12.  -
-7.13.  Informational close information (fuzzer initiated)  (2/2)</p>
-</li>
-<li>
-<p>(-/-)</p>
-</li>
-<li>
-<p>Limits/Performance  (54/54)
+7.13.  Informational close information (fuzzer initiated)  (2/2)
+8.  (-/-)
+9.  Limits/Performance  (54/54)
 9.1.  Text Message (increasing size)  (6/6)
 9.2.  Binary Message (increasing size)  (6/6)
 9.3.  Fragmented Text Message (fixed size, increasing fragment size)  (9/9)
@@ -296,23 +253,14 @@ points  (11/11)
 9.5.  Text Message (fixed size, increasing chop size)  (6/6)
 9.6.  Binary Text Message (fixed size, increasing chop size)  (6/6)
 9.7.  Text Message Roundtrip Time (fixed number, increasing size)  (6/6)
-9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)</p>
-</li>
-<li>
-<p>Misc  (1/1)
-10.1.  Auto-Fragmentation  (1/1)</p>
-</li>
-<li>
-<p>(-/-)</p>
-</li>
-<li>
-<p>WebSocket Compression (different payloads)  (-/-)</p>
-</li>
-<li>
-<p>WebSocket Compression (different parameters)  (-/-)
-(excluded)</p>
-</li>
-</ol>
+9.8.  Binary Message Roundtrip Time (fixed number, increasing size)  (6/6)
+10.  Misc  (1/1)
+10.1.  Auto-Fragmentation  (1/1)
+11.  (-/-)
+12.  WebSocket Compression (different payloads)  (-/-)
+13.  WebSocket Compression (different parameters)  (-/-)
+(excluded)</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Total test cases   : 16 &#43; 11 &#43; 7 &#43; 10 &#43; 20 &#43; 145 &#43; 37 &#43; 0 &#43; 54 &#43; 1 &#43; 0 &#43; 0 &#43; 0 = 301
