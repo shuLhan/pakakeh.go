@@ -49,7 +49,7 @@ func TestCachesGet(t *testing.T) {
 		qtype:      1,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 1,
 			},
 		},
@@ -60,7 +60,7 @@ func TestCachesGet(t *testing.T) {
 		qtype:      2,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 2,
 			},
 		},
@@ -71,7 +71,7 @@ func TestCachesGet(t *testing.T) {
 		qtype:      3,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 3,
 			},
 		},
@@ -127,7 +127,7 @@ func TestCachesPrune(t *testing.T) {
 		qtype:      1,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 1,
 			},
 		},
@@ -139,7 +139,7 @@ func TestCachesPrune(t *testing.T) {
 		qtype:      2,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 2,
 			},
 		},
@@ -151,7 +151,7 @@ func TestCachesPrune(t *testing.T) {
 		qtype:      3,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 3,
 			},
 		},
@@ -196,7 +196,7 @@ func TestCachesUpsert(t *testing.T) {
 		qtype:      1,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 1,
 			},
 		},
@@ -208,7 +208,7 @@ func TestCachesUpsert(t *testing.T) {
 		qtype:      1,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 3,
 			},
 		},
@@ -220,7 +220,7 @@ func TestCachesUpsert(t *testing.T) {
 		qtype:      2,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 2,
 			},
 		},
@@ -232,7 +232,7 @@ func TestCachesUpsert(t *testing.T) {
 		qtype:      2,
 		qclass:     1,
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID: 4,
 			},
 		},

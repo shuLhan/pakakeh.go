@@ -130,26 +130,8 @@ func (rr *ResourceRecord) RData() interface{} {
 }
 
 //
-// Reset the resource record fields to zero values.
+// String return the text representation of ResourceRecord for human.
 //
-func (rr *ResourceRecord) Reset() {
-	rr.Name = rr.Name[:0]
-	rr.Type = QueryTypeZERO
-	rr.Class = QueryClassZERO
-	rr.TTL = 0
-	rr.rdlen = 0
-	rr.rdata = rr.rdata[:0]
-	rr.Text = nil
-	rr.SOA = nil
-	rr.WKS = nil
-	rr.HInfo = nil
-	rr.MInfo = nil
-	rr.MX = nil
-	rr.OPT = nil
-	rr.off = 0
-	rr.offTTL = 0
-}
-
 func (rr *ResourceRecord) String() string {
 	var buf bytes.Buffer
 

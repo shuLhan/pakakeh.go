@@ -31,18 +31,18 @@ func TestDoHClient_Lookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -52,8 +52,8 @@ func TestDoHClient_Lookup(t *testing.T) {
 					Value: []byte("127.0.0.1"),
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:SOA QClass:IN QName:kilabit.info",
@@ -61,18 +61,18 @@ func TestDoHClient_Lookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -87,8 +87,8 @@ func TestDoHClient_Lookup(t *testing.T) {
 					Minimum: 3600,
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:TXT QClass:IN QName:kilabit.info",
@@ -96,18 +96,18 @@ func TestDoHClient_Lookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
@@ -116,8 +116,8 @@ func TestDoHClient_Lookup(t *testing.T) {
 					Value: []byte("This is a test server"),
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:AAAA QClass:IN QName:kilabit.info",
@@ -125,20 +125,20 @@ func TestDoHClient_Lookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    false,
 				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeAAAA,
 				Class: QueryClassIN,
 			},
-			Answer:     []*ResourceRecord{},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Answer:     []ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}}
 
@@ -180,18 +180,18 @@ func TestDoHClient_Post(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -201,8 +201,8 @@ func TestDoHClient_Post(t *testing.T) {
 					Value: []byte("127.0.0.1"),
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:SOA QClass:IN QName:kilabit.info",
@@ -210,18 +210,18 @@ func TestDoHClient_Post(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -236,8 +236,8 @@ func TestDoHClient_Post(t *testing.T) {
 					Minimum: 3600,
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:TXT QClass:IN QName:kilabit.info",
@@ -245,18 +245,18 @@ func TestDoHClient_Post(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
@@ -265,8 +265,8 @@ func TestDoHClient_Post(t *testing.T) {
 					Value: []byte("This is a test server"),
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:AAAA QClass:IN QName:kilabit.info",
@@ -274,20 +274,20 @@ func TestDoHClient_Post(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0,
 				IsAA:    false,
 				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeAAAA,
 				Class: QueryClassIN,
 			},
-			Answer:     []*ResourceRecord{},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Answer:     []ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}}
 

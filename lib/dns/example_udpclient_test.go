@@ -19,8 +19,8 @@ func ExampleUDPClient() {
 	}
 
 	req := &dns.Message{
-		Header: &dns.SectionHeader{},
-		Question: &dns.SectionQuestion{
+		Header: dns.SectionHeader{},
+		Question: dns.SectionQuestion{
 			Name:  []byte("kilabit.info"),
 			Type:  dns.QueryTypeA,
 			Class: dns.QueryClassIN,

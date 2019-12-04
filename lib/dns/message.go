@@ -49,11 +49,11 @@ import (
 // [1] RFC 1035 - 4.1. Format
 //
 type Message struct {
-	Header     *SectionHeader
-	Question   *SectionQuestion
-	Answer     []*ResourceRecord
-	Authority  []*ResourceRecord
-	Additional []*ResourceRecord
+	Header     SectionHeader
+	Question   SectionQuestion
+	Answer     []ResourceRecord
+	Authority  []ResourceRecord
+	Additional []ResourceRecord
 
 	// Slice that hold the result of packing the message or original
 	// message from unpacking.
@@ -72,12 +72,12 @@ type Message struct {
 //
 func NewMessage() *Message {
 	return &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			IsQuery: true,
 			IsRD:    true,
 			QDCount: 1,
 		},
-		Question: &SectionQuestion{
+		Question: SectionQuestion{
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 		},
@@ -90,7 +90,7 @@ func NewMessage() *Message {
 // FilterAnswers return resource record in Answer that match only with
 // specific query type.
 //
-func (msg *Message) FilterAnswers(t uint16) (answers []*ResourceRecord) {
+func (msg *Message) FilterAnswers(t uint16) (answers []ResourceRecord) {
 	for _, rr := range msg.Answer {
 		if rr.Type == t {
 			answers = append(answers, rr)
@@ -548,13 +548,13 @@ func (msg *Message) Pack() ([]byte, error) {
 	}
 
 	for x := 0; x < len(msg.Answer); x++ {
-		msg.packRR(msg.Answer[x])
+		msg.packRR(&msg.Answer[x])
 	}
 	for x := 0; x < len(msg.Authority); x++ {
-		msg.packRR(msg.Authority[x])
+		msg.packRR(&msg.Authority[x])
 	}
 	for x := 0; x < len(msg.Additional); x++ {
-		msg.packRR(msg.Additional[x])
+		msg.packRR(&msg.Additional[x])
 	}
 
 	msg.dnameOff = nil
@@ -724,11 +724,17 @@ func (msg *Message) Unpack() (err error) {
 
 	var x uint16
 	for ; x < msg.Header.ANCount; x++ {
-		rr := NewResourceRecord()
+		rr := ResourceRecord{
+			Name:  make([]byte, 0),
+			Text:  &RDataText{},
+			rdata: make([]byte, 0),
+		}
+
 		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
 		}
+
 		msg.Answer = append(msg.Answer, rr)
 	}
 
@@ -737,7 +743,12 @@ func (msg *Message) Unpack() (err error) {
 	}
 
 	for x = 0; x < msg.Header.NSCount; x++ {
-		rr := NewResourceRecord()
+		rr := ResourceRecord{
+			Name:  make([]byte, 0),
+			Text:  &RDataText{},
+			rdata: make([]byte, 0),
+		}
+
 		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
@@ -750,11 +761,17 @@ func (msg *Message) Unpack() (err error) {
 	}
 
 	for x = 0; x < msg.Header.ARCount; x++ {
-		rr := NewResourceRecord()
+		rr := ResourceRecord{
+			Name:  make([]byte, 0),
+			Text:  &RDataText{},
+			rdata: make([]byte, 0),
+		}
+
 		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
 		}
+
 		msg.Additional = append(msg.Additional, rr)
 	}
 
@@ -787,7 +804,7 @@ func (msg *Message) UnpackHeaderQuestion() (err error) {
 	}
 
 	if debug.Value >= 3 {
-		log.Printf("msg.Question: %s\n", msg.Question)
+		log.Printf("msg.Question: %s\n", msg.Question.String())
 	}
 
 	return nil

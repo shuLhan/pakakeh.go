@@ -67,17 +67,17 @@ func newMessage(addr, hname []byte) *Message {
 	copy(rrName, hname)
 
 	msg := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			IsAA:    true,
 			QDCount: 1,
 			ANCount: 1,
 		},
-		Question: &SectionQuestion{
+		Question: SectionQuestion{
 			Name:  hname,
 			Type:  qtype,
 			Class: QueryClassIN,
 		},
-		Answer: []*ResourceRecord{{
+		Answer: []ResourceRecord{{
 			Name:  rrName,
 			Type:  qtype,
 			Class: QueryClassIN,

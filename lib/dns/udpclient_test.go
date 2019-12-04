@@ -29,18 +29,18 @@ func TestUDPClientLookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      8,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -50,8 +50,8 @@ func TestUDPClientLookup(t *testing.T) {
 					Value: []byte("127.0.0.1"),
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:SOA QClass:IN QName:kilabit.info",
@@ -59,18 +59,18 @@ func TestUDPClientLookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      9,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -85,8 +85,8 @@ func TestUDPClientLookup(t *testing.T) {
 					Minimum: 3600,
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:TXT QClass:IN QName:kilabit.info",
@@ -94,18 +94,18 @@ func TestUDPClientLookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      10,
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
@@ -114,8 +114,8 @@ func TestUDPClientLookup(t *testing.T) {
 					Value: []byte("This is a test server"),
 				},
 			}},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:   "QType:AAAA QClass:IN QName:kilabit.info",
@@ -123,20 +123,20 @@ func TestUDPClientLookup(t *testing.T) {
 		qclass: QueryClassIN,
 		qname:  []byte("kilabit.info"),
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      11,
 				IsAA:    false,
 				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeAAAA,
 				Class: QueryClassIN,
 			},
-			Answer:     []*ResourceRecord{},
-			Authority:  []*ResourceRecord{},
-			Additional: []*ResourceRecord{},
+			Answer:     []ResourceRecord{},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
 		},
 	}, {
 		desc:           "IsRD:true QType:AAAA QClass:IN QName:kilabit.info",

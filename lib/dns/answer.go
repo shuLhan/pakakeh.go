@@ -41,10 +41,6 @@ type answer struct {
 // to current timestamp.
 //
 func newAnswer(msg *Message, isLocal bool) (an *answer) {
-	if msg == nil || msg.Question == nil {
-		return nil
-	}
-
 	an = &answer{
 		qname:  string(msg.Question.Name),
 		qtype:  msg.Question.Type,

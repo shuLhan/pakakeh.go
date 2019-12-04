@@ -1031,21 +1031,21 @@ func (m *master) push(rr *ResourceRecord) bool {
 		if m.msgs[x].Question.Class != rr.Class {
 			continue
 		}
-		m.msgs[x].Answer = append(m.msgs[x].Answer, rr)
+		m.msgs[x].Answer = append(m.msgs[x].Answer, *rr)
 		return false
 	}
 
 	msg := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			IsAA:    true,
 			QDCount: 1,
 		},
-		Question: &SectionQuestion{
+		Question: SectionQuestion{
 			Name:  rr.Name,
 			Type:  rr.Type,
 			Class: rr.Class,
 		},
-		Answer: []*ResourceRecord{rr},
+		Answer: []ResourceRecord{*rr},
 	}
 
 	m.msgs = append(m.msgs, msg)
@@ -1087,9 +1087,9 @@ func (m *master) pack() {
 
 		if debug.Value >= 3 {
 			fmt.Printf("= Header: %+v\n", msg.Header)
-			fmt.Printf("  Question: %s\n", msg.Question)
+			fmt.Printf("  Question: %s\n", msg.Question.String())
 			for x := 0; x < len(msg.Answer); x++ {
-				fmt.Printf("  Answer: %s\n", msg.Answer[x])
+				fmt.Printf("  Answer: %s\n", msg.Answer[x].String())
 				fmt.Printf("  RData: %s\n", msg.Answer[x].RData())
 			}
 		}

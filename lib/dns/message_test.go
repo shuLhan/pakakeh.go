@@ -18,7 +18,7 @@ func TestMessageIsExpired(t *testing.T) {
 	}{{
 		desc: "Message is not expired",
 		msg: &Message{
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				TTL: 1,
 			}},
 		},
@@ -26,7 +26,7 @@ func TestMessageIsExpired(t *testing.T) {
 	}, {
 		desc: "Message is expired",
 		msg: &Message{
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				TTL: 0,
 			}},
 		},
@@ -84,7 +84,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}{{
 		desc: "Empty name",
 		msg: &Message{
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
@@ -96,7 +96,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}, {
 		desc: "Single domain name",
 		msg: &Message{
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilaBit"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -110,7 +110,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}, {
 		desc: "Two domain names",
 		msg: &Message{
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -126,7 +126,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}, {
 		desc: "Three domain names",
 		msg: &Message{
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("MAIL.KILABIT.INFO"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -159,12 +159,12 @@ func TestMessagePack(t *testing.T) {
 	}{{
 		desc: "Simple query",
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      1,
 				IsQuery: true,
 				QDCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.INFO"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -187,7 +187,7 @@ func TestMessagePack(t *testing.T) {
 	}, {
 		desc: "Response with A RDATA",
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x8cdb,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -197,12 +197,12 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("KILABIT.INFO"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -211,7 +211,7 @@ func TestMessagePack(t *testing.T) {
 					Value: []byte("103.200.4.162"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -277,7 +277,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0xd4a6,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -288,12 +288,12 @@ func TestMessagePack(t *testing.T) {
 				NSCount: 0,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
@@ -318,7 +318,7 @@ func TestMessagePack(t *testing.T) {
 					Value: []byte("ns1.dewaweb.com"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -350,7 +350,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x8a38,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -360,12 +360,12 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("mail.kilabit.info"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("mail.kilabit.info"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
@@ -374,7 +374,7 @@ func TestMessagePack(t *testing.T) {
 					Value: []byte("kilabit.info"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -399,19 +399,19 @@ func TestMessagePack(t *testing.T) {
 			0x51, 0x80,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      2,
 				IsQuery: false,
 				Op:      OpCodeQuery,
 				IsRA:    true,
 				QDCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -483,7 +483,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x9eef,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -493,12 +493,12 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
@@ -544,7 +544,7 @@ func TestMessagePack(t *testing.T) {
 					Exchange:   []byte("alt4.aspmx.l.GOOGLE.COM"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -583,7 +583,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x29, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      16253,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -591,12 +591,12 @@ func TestMessagePack(t *testing.T) {
 				IsRA:    true,
 				QDCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
@@ -621,7 +621,7 @@ func TestMessagePack(t *testing.T) {
 					Value: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
@@ -650,7 +650,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x2c90,
 				IsRD:    true,
 				IsRA:    true,
@@ -658,12 +658,12 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeAAAA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeAAAA,
 				TTL:   0x53,
@@ -672,7 +672,7 @@ func TestMessagePack(t *testing.T) {
 					Value: []byte("2404:6800:4003:c00::8b"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 1280,
@@ -751,7 +751,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x2cb4,
 				IsRD:    true,
 				IsRA:    true,
@@ -759,12 +759,12 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("_xmpp-server._tcp.google.com"),
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("_xmpp-server._tcp.google.com"),
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
@@ -835,7 +835,7 @@ func TestMessagePack(t *testing.T) {
 					Target:   []byte("alt3.xmpp-server.l.google.com"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 512,
@@ -856,13 +856,13 @@ func TestMessagePack(t *testing.T) {
 
 func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	msgQuery := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: &SectionQuestion{},
+		Question: SectionQuestion{},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -873,13 +873,13 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	}
 
 	msgResponse := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID:   1,
 			IsAA: true,
 			IsRD: true,
 			IsRA: true,
 		},
-		Question: &SectionQuestion{},
+		Question: SectionQuestion{},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -926,13 +926,13 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 //nolint:dupl
 func TestMessageSetQuery(t *testing.T) {
 	msgQuery := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: &SectionQuestion{},
+		Question: SectionQuestion{},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -970,13 +970,13 @@ func TestMessageSetQuery(t *testing.T) {
 //nolint:dupl
 func TestMessageSetRecursionDesired(t *testing.T) {
 	msgQuery := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: &SectionQuestion{},
+		Question: SectionQuestion{},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -1013,13 +1013,13 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 
 func TestMessageSetResponseCode(t *testing.T) {
 	msgQuery := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: &SectionQuestion{},
+		Question: SectionQuestion{},
 		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -1080,7 +1080,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x8cdb,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1090,12 +1090,12 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -1106,7 +1106,7 @@ func TestMessageUnpack(t *testing.T) {
 					Value: []byte("103.200.4.162"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
@@ -1156,7 +1156,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0xd4a6,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1167,12 +1167,12 @@ func TestMessageUnpack(t *testing.T) {
 				NSCount: 0,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
@@ -1209,7 +1209,7 @@ func TestMessageUnpack(t *testing.T) {
 					Value: []byte("ns1.dewaweb.com"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
@@ -1243,7 +1243,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x8a38,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1253,12 +1253,12 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("mail.kilabit.info"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("mail.kilabit.info"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
@@ -1269,7 +1269,7 @@ func TestMessageUnpack(t *testing.T) {
 					Value: []byte("kilabit.info"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  make([]byte, 0),
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
@@ -1306,7 +1306,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x01, 0x51, 0x80,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      2,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1315,12 +1315,12 @@ func TestMessageUnpack(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -1402,7 +1402,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x9eef,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1412,12 +1412,12 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
@@ -1494,7 +1494,7 @@ func TestMessageUnpack(t *testing.T) {
 					Exchange:   []byte("alt4.aspmx.l.google.com"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
@@ -1551,7 +1551,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      16253,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1561,12 +1561,12 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 3,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
@@ -1619,7 +1619,7 @@ func TestMessageUnpack(t *testing.T) {
 					Value: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 1280,
@@ -1651,7 +1651,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x2c90,
 				IsRD:    true,
 				IsRA:    true,
@@ -1659,12 +1659,12 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeAAAA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("google.com"),
 				Type:  QueryTypeAAAA,
 				Class: QueryClassIN,
@@ -1678,7 +1678,7 @@ func TestMessageUnpack(t *testing.T) {
 					Value: []byte("2404:6800:4003:c00::8b"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 1280,
@@ -1759,7 +1759,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				ID:      0x2cb4,
 				IsRD:    true,
 				IsRA:    true,
@@ -1767,12 +1767,12 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("_xmpp-server._tcp.google.com"),
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("_xmpp-server._tcp.google.com"),
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
@@ -1887,7 +1887,7 @@ func TestMessageUnpack(t *testing.T) {
 					Target:   []byte("alt3.xmpp-server.l.google.com"),
 				},
 			}},
-			Additional: []*ResourceRecord{{
+			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 512,
@@ -1912,8 +1912,8 @@ func TestMessageUnpack(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Header", *c.exp.Header, *msg.Header, true)
-		test.Assert(t, "Question", *c.exp.Question, *msg.Question, true)
+		test.Assert(t, "Header", c.exp.Header, msg.Header, true)
+		test.Assert(t, "Question", c.exp.Question, msg.Question, true)
 		test.Assert(t, "Answer Length", len(c.exp.Answer), len(msg.Answer), true)
 		test.Assert(t, "Authority Length", len(c.exp.Authority), len(msg.Authority), true)
 		test.Assert(t, "Additional Length", len(c.exp.Additional), len(msg.Additional), true)

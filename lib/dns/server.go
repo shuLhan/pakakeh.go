@@ -160,12 +160,12 @@ func isResponseValid(req *request, res *Message) bool {
 	}
 	if req.message.Question.Type != res.Question.Type {
 		log.Printf("dns: unmatched response type, got %s want %s\n",
-			req.message.Question, res.Question)
+			req.message.Question.String(), res.Question.String())
 		return false
 	}
 	if req.message.Question.Class != res.Question.Class {
 		log.Printf("dns: unmatched response class, got %s want %s\n",
-			req.message.Question, res.Question)
+			req.message.Question.String(), res.Question.String())
 		return false
 	}
 
@@ -688,7 +688,7 @@ func (srv *Server) processRequest() {
 			fmt.Printf("dns: < %s %d:%s\n",
 				connTypeNames[req.kind],
 				req.message.Header.ID,
-				req.message.Question)
+				req.message.Question.String())
 		}
 
 		ans, an := srv.caches.get(string(req.message.Question.Name),
@@ -703,7 +703,7 @@ func (srv *Server) processRequest() {
 					fmt.Printf("dns: * %s %d:%s\n",
 						connTypeNames[req.kind],
 						req.message.Header.ID,
-						req.message.Question)
+						req.message.Question.String())
 				}
 				req.error(RCodeErrServer)
 			}
@@ -716,7 +716,7 @@ func (srv *Server) processRequest() {
 					fmt.Printf("dns: ~ %s %d:%s\n",
 						connTypeNames[req.kind],
 						req.message.Header.ID,
-						req.message.Question)
+						req.message.Question.String())
 				}
 				srv.primaryq <- req
 			} else {
@@ -724,7 +724,7 @@ func (srv *Server) processRequest() {
 					fmt.Printf("dns: * %s %d:%s\n",
 						connTypeNames[req.kind],
 						req.message.Header.ID,
-						req.message.Question)
+						req.message.Question.String())
 				}
 				req.error(RCodeErrServer)
 			}
@@ -738,7 +738,7 @@ func (srv *Server) processRequest() {
 		if debug.Value >= 1 {
 			fmt.Printf("dns: > %s %d:%s\n",
 				connTypeNames[req.kind],
-				res.Header.ID, res.Question)
+				res.Header.ID, res.Question.String())
 		}
 
 		_, err := req.writer.Write(res.Packet)
@@ -763,7 +763,7 @@ func (srv *Server) processResponse(req *request, res *Message) {
 	if res.Header.RCode != 0 {
 		log.Printf("dns: ! %s %s %d:%s\n",
 			connTypeNames[req.kind], rcodeNames[res.Header.RCode],
-			res.Header.ID, res.Question)
+			res.Header.ID, res.Question.String())
 		return
 	}
 
@@ -774,11 +774,11 @@ func (srv *Server) processResponse(req *request, res *Message) {
 		if inserted {
 			fmt.Printf("dns: + %s %d:%s\n",
 				connTypeNames[req.kind],
-				res.Header.ID, res.Question)
+				res.Header.ID, res.Question.String())
 		} else {
 			fmt.Printf("dns: # %s %d:%s\n",
 				connTypeNames[req.kind],
-				res.Header.ID, res.Question)
+				res.Header.ID, res.Question.String())
 		}
 	}
 }
@@ -872,7 +872,8 @@ func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
 						tag, nameserver,
-						req.message.Header.ID, req.message.Question)
+						req.message.Header.ID,
+						req.message.Question.String())
 				}
 
 				res, err = forwarder.Query(req.message)
@@ -943,7 +944,8 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
 						tag, nameserver,
-						req.message.Header.ID, req.message.Question)
+						req.message.Header.ID,
+						req.message.Question.String())
 				}
 
 				res, err = forwarder.Query(req.message)
@@ -997,7 +999,8 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			if debug.Value >= 1 {
 				fmt.Printf("dns: ^ %s %s %d:%s\n",
 					tag, remoteAddr,
-					req.message.Header.ID, req.message.Question)
+					req.message.Header.ID,
+					req.message.Question.String())
 			}
 
 			cl, err := NewTCPClient(remoteAddr)
@@ -1077,7 +1080,8 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
 						tag, remoteAddr,
-						req.message.Header.ID, req.message.Question)
+						req.message.Header.ID,
+						req.message.Question.String())
 				}
 
 				res, err = forwarder.Query(req.message)

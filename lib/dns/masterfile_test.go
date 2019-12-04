@@ -164,17 +164,17 @@ VAXA    A       10.2.0.27
 
 `,
 		exp: []*Message{{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -190,17 +190,17 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 3,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
@@ -226,17 +226,17 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
@@ -256,17 +256,17 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("a.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("a.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -276,17 +276,17 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("venera.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("venera.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -304,17 +304,17 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("vaxa.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("vaxa.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -411,17 +411,17 @@ mail IN CNAME @
 relay IN CNAME relay.pair.com.
 `,
 		exp: []*Message{{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
@@ -437,17 +437,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
@@ -465,17 +465,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("localhost.pcguide.com"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("localhost.pcguide.com"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -485,17 +485,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -505,17 +505,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
@@ -526,17 +526,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("www.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("www.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
@@ -546,17 +546,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("ftp.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("ftp.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
@@ -566,17 +566,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("mail.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("mail.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
@@ -586,17 +586,17 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("relay.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("relay.pcguide.com"),
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
@@ -673,17 +673,17 @@ dev.kilabit.com.   A  127.0.0.1
 angularjs.doc       A  127.0.0.1
 `,
 		exp: []*Message{{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("dev.kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("dev.kilabit.info"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -693,17 +693,17 @@ angularjs.doc       A  127.0.0.1
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("dev.kilabit.com"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("dev.kilabit.com"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -713,17 +713,17 @@ angularjs.doc       A  127.0.0.1
 				},
 			}},
 		}, {
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("angularjs.doc.localdomain"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("angularjs.doc.localdomain"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
@@ -788,17 +788,17 @@ func TestMasterParseTXT(t *testing.T) {
 	}{{
 		in: `@ IN TXT "This is a test"`,
 		exp: []*Message{{
-			Header: &SectionHeader{
+			Header: SectionHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: &SectionQuestion{
+			Question: SectionQuestion{
 				Name:  []byte("kilabit.local"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
-			Answer: []*ResourceRecord{{
+			Answer: []ResourceRecord{{
 				Name:  []byte("kilabit.local"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,

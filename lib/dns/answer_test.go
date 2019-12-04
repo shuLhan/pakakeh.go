@@ -16,15 +16,15 @@ func TestNewAnswer(t *testing.T) {
 	at := time.Now().Unix()
 
 	msg1 := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID: 1,
 		},
-		Question: &SectionQuestion{
+		Question: SectionQuestion{
 			Name:  []byte("test"),
 			Type:  1,
 			Class: 1,
 		},
-		Answer: []*ResourceRecord{{
+		Answer: []ResourceRecord{{
 			Name:  []byte("test"),
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
@@ -46,8 +46,6 @@ func TestNewAnswer(t *testing.T) {
 		expQClass uint16
 		isLocal   bool
 	}{{
-		desc: "With nil msg",
-	}, {
 		desc:    "With local message",
 		msg:     msg1,
 		isLocal: true,
@@ -124,17 +122,17 @@ func TestAnswerClear(t *testing.T) {
 func TestAnswerGet(t *testing.T) {
 	// kilabit.info A
 	res := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID:      1,
 			QDCount: 1,
 			ANCount: 1,
 		},
-		Question: &SectionQuestion{
+		Question: SectionQuestion{
 			Name:  []byte("kilabit.info"),
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 		},
-		Answer: []*ResourceRecord{{
+		Answer: []ResourceRecord{{
 			Name:  []byte("kilabit.info"),
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
@@ -144,8 +142,8 @@ func TestAnswerGet(t *testing.T) {
 				Value: []byte("127.0.0.1"),
 			},
 		}},
-		Authority:  []*ResourceRecord{},
-		Additional: []*ResourceRecord{},
+		Authority:  []ResourceRecord{},
+		Additional: []ResourceRecord{},
 	}
 
 	_, err := res.Pack()
@@ -189,8 +187,8 @@ func TestAnswerGet(t *testing.T) {
 		test.Assert(t, "receivedAt", an.receivedAt >= at-5, true, true)
 		test.Assert(t, "accessedAt", an.accessedAt >= at, true, true)
 		got := &Message{
-			Header:   &SectionHeader{},
-			Question: &SectionQuestion{},
+			Header:   SectionHeader{},
+			Question: SectionQuestion{},
 			Packet:   gotPacket,
 		}
 		err := got.Unpack()
@@ -206,12 +204,12 @@ func TestAnswerGet(t *testing.T) {
 func TestAnswerUpdate(t *testing.T) {
 	at := time.Now().Unix() - 5
 	msg1 := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID: 1,
 		},
 	}
 	msg2 := &Message{
-		Header: &SectionHeader{
+		Header: SectionHeader{
 			ID: 1,
 		},
 	}

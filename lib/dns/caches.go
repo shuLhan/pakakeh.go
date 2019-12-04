@@ -123,7 +123,7 @@ func (c *caches) prune() {
 		}
 
 		if debug.Value >= 1 {
-			fmt.Printf("dns: - 0:%s\n", an.msg.Question)
+			fmt.Printf("dns: - 0:%s\n", an.msg.Question.String())
 		}
 
 		next := e.Next()
