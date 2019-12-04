@@ -70,7 +70,7 @@ func (result *Result) lookup() {
 	var (
 		dnsMsg *libdns.Message
 		err    error
-		txts   []*libdns.ResourceRecord
+		txts   []libdns.ResourceRecord
 	)
 
 	dnsMsg, err = dnsClient.Lookup(true, libdns.QueryTypeTXT,

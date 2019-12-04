@@ -488,30 +488,9 @@ func (msg *Message) Reset() {
 // packet may still be in use.
 //
 func (msg *Message) ResetRR() {
-	if len(msg.Answer) > 0 {
-		for x := 0; x < len(msg.Answer); x++ {
-			msg.Answer[x].Reset()
-			rrPool.Put(msg.Answer[x])
-			msg.Answer[x] = nil
-		}
-		msg.Answer = nil
-	}
-	if len(msg.Authority) > 0 {
-		for x := 0; x < len(msg.Authority); x++ {
-			msg.Authority[x].Reset()
-			rrPool.Put(msg.Authority[x])
-			msg.Authority[x] = nil
-		}
-		msg.Authority = nil
-	}
-	if len(msg.Additional) > 0 {
-		for x := 0; x < len(msg.Additional); x++ {
-			msg.Additional[x].Reset()
-			rrPool.Put(msg.Additional[x])
-			msg.Additional[x] = nil
-		}
-		msg.Additional = nil
-	}
+	msg.Answer = nil
+	msg.Authority = nil
+	msg.Additional = nil
 }
 
 //
@@ -745,8 +724,7 @@ func (msg *Message) Unpack() (err error) {
 
 	var x uint16
 	for ; x < msg.Header.ANCount; x++ {
-		rr := rrPool.Get().(*ResourceRecord)
-		rr.Reset()
+		rr := NewResourceRecord()
 		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
@@ -759,8 +737,7 @@ func (msg *Message) Unpack() (err error) {
 	}
 
 	for x = 0; x < msg.Header.NSCount; x++ {
-		rr := rrPool.Get().(*ResourceRecord)
-		rr.Reset()
+		rr := NewResourceRecord()
 		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err
@@ -773,8 +750,7 @@ func (msg *Message) Unpack() (err error) {
 	}
 
 	for x = 0; x < msg.Header.ARCount; x++ {
-		rr := rrPool.Get().(*ResourceRecord)
-		rr.Reset()
+		rr := NewResourceRecord()
 		startIdx, err = rr.unpack(msg.Packet, startIdx)
 		if err != nil {
 			return err

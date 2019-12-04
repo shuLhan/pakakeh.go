@@ -63,6 +63,17 @@ type ResourceRecord struct {
 }
 
 //
+// NewResourceRecord create and initialize new ResourceRecord.
+//
+func NewResourceRecord() *ResourceRecord {
+	return &ResourceRecord{
+		Name:  make([]byte, 0),
+		Text:  &RDataText{},
+		rdata: make([]byte, 0),
+	}
+}
+
+//
 // RData will return slice of bytes, the pointer that hold specific record
 // data, or nil for obsolete type.
 //
