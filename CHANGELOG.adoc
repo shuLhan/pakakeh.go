@@ -4,6 +4,14 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.10.2 (2019-12-07)
+
+===  Bug Fixes
+
+*  dns: check for bad certificate when reading DoT request
+*  dns: fix the use of goroutine on runForwarders
+
+
 ==  share v0.10.1 (2019-12-05)
 
 ===  Bug Fixes
