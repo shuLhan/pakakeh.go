@@ -201,16 +201,10 @@ func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
+	msg.Packet = msg.Packet[2:n]
 
 	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> TCP msg.Packet:", msg.Packet, 8)
-	}
-
-	msg.Packet = append(msg.Packet[:0], msg.Packet[2:]...)
-
-	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> DNS msg.Packet:", msg.Packet, 8)
+		libbytes.PrintHex(">>> TCPClient: recv: ", msg.Packet, 8)
 	}
 
 	return
