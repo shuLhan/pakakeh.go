@@ -145,11 +145,10 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	msg.Packet = append(msg.Packet[:0], msg.Packet[:n]...)
-	msg.Packet = append(msg.Packet[:0], msg.Packet[2:]...)
+	msg.Packet = msg.Packet[2:n]
 
 	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> DNS msg.Packet:", msg.Packet, 8)
+		libbytes.PrintHex(">>> DoTClient: recv: ", msg.Packet, 8)
 	}
 
 	return
