@@ -64,7 +64,10 @@ func (poll *epoll) ReregisterRead(idx, fd int) {
 	err := unix.EpollCtl(poll.read, unix.EPOLL_CTL_MOD, fd, &poll.events[idx])
 	if err != nil {
 		log.Println("epoll.RegisterRead: unix.EpollCtl: " + err.Error())
-		poll.UnregisterRead(fd)
+		err = poll.UnregisterRead(fd)
+		if err != nil {
+			log.Println("epoll.RegisterRead: " + err.Error())
+		}
 	}
 }
 
