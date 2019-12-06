@@ -785,22 +785,26 @@ func (srv *Server) runForwarders() {
 	nforwarders := 0
 	for x := 0; x < len(srv.opts.primaryUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", nforwarders, asPrimary)
-		go srv.runUDPForwarder(srv.opts.primaryUDP[x].String(), srv.primaryq, srv.fallbackq, tag)
+		nameserver := srv.opts.primaryUDP[x].String()
+		go srv.runUDPForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryTCP); x++ {
 		tag := fmt.Sprintf("TCP-%d-%s", nforwarders, asPrimary)
-		go srv.runTCPForwarder(srv.opts.primaryTCP[x].String(), srv.primaryq, srv.fallbackq, tag)
+		nameserver := srv.opts.primaryTCP[x].String()
+		go srv.runTCPForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryDoh); x++ {
 		tag := fmt.Sprintf("DoH-%d-%s", nforwarders, asPrimary)
-		go srv.runDohForwarder(srv.opts.primaryDoh[x], srv.primaryq, srv.fallbackq, tag)
+		nameserver := srv.opts.primaryDoh[x]
+		go srv.runDohForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryDot); x++ {
 		tag := fmt.Sprintf("DoT-%d-%s", nforwarders, asPrimary)
-		go srv.runTLSForwarder(srv.opts.primaryDot[x], srv.primaryq, srv.fallbackq, tag)
+		nameserver := srv.opts.primaryDot[x]
+		go srv.runTLSForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
 		nforwarders++
 	}
 
@@ -808,22 +812,26 @@ func (srv *Server) runForwarders() {
 
 	for x := 0; x < len(srv.opts.fallbackUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", nforwarders, asFallback)
-		go srv.runUDPForwarder(srv.opts.fallbackUDP[x].String(), srv.fallbackq, nil, tag)
+		nameserver := srv.opts.fallbackUDP[x].String()
+		go srv.runUDPForwarder(nameserver, srv.fallbackq, nil, tag)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackTCP); x++ {
 		tag := fmt.Sprintf("TCP-%d-%s", nforwarders, asFallback)
-		go srv.runTCPForwarder(srv.opts.fallbackTCP[x].String(), srv.fallbackq, nil, tag)
+		nameserver := srv.opts.fallbackTCP[x].String()
+		go srv.runTCPForwarder(nameserver, srv.fallbackq, nil, tag)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackDoh); x++ {
 		tag := fmt.Sprintf("DoH-%d-%s", nforwarders, asFallback)
-		go srv.runDohForwarder(srv.opts.fallbackDoh[x], srv.fallbackq, nil, tag)
+		nameserver := srv.opts.fallbackDoh[x]
+		go srv.runDohForwarder(nameserver, srv.fallbackq, nil, tag)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackDot); x++ {
 		tag := fmt.Sprintf("DoT-%d-%s", nforwarders, asFallback)
-		go srv.runTLSForwarder(srv.opts.fallbackDot[x], srv.fallbackq, nil, tag)
+		nameserver := srv.opts.fallbackDot[x]
+		go srv.runTLSForwarder(nameserver, srv.fallbackq, nil, tag)
 		nforwarders++
 	}
 }
