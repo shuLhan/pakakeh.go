@@ -623,6 +623,8 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 			if err == io.EOF {
 				goto out
 			}
+			log.Printf("serveTCPClient: %s: %s",
+				connTypeNames[kind], err.Error())
 			continue
 		}
 		if n == 0 || len(req.message.Packet) == 0 {
@@ -644,7 +646,8 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 out:
 	err := cl.conn.Close()
 	if err != nil {
-		log.Println("serveTCPClient: conn.Close:", err)
+		log.Printf("serveTCPClient: conn.Close: %s: %s",
+			connTypeNames[kind], err.Error())
 	}
 }
 
