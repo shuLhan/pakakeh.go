@@ -324,10 +324,6 @@ func (srv *Server) RestartForwarders(nameServers, fallbackNS []string) {
 
 	srv.stopForwarders()
 	srv.runForwarders()
-
-	if !srv.hasForwarders() {
-		log.Println("dns: no valid forward nameservers")
-	}
 }
 
 //
