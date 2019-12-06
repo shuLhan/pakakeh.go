@@ -1115,14 +1115,13 @@ func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *
 // stopForwarders stop all forwarder connections.
 //
 func (srv *Server) stopForwarders() {
-	for _, stopper := range srv.fwStoppers {
-		stopper <- true
+	for x := 0; x < len(srv.fwStoppers); x++ {
+		srv.fwStoppers[x] <- true
 	}
 	srv.fwGroup.Wait()
-
-	srv.fwLocker.Lock()
-	srv.fwn = 0
-	srv.fwLocker.Unlock()
+	for x := 0; x < len(srv.fwStoppers); x++ {
+		close(srv.fwStoppers[x])
+	}
 
 	fmt.Println("dns: all forwarders has been stopped")
 }
