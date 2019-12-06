@@ -977,10 +977,7 @@ func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *
 }
 
 func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *request, tag string) {
-	var (
-		isRunning = true
-		stopper   = srv.newStopper()
-	)
+	stopper := srv.newStopper()
 
 	log.Printf("dns: starting forwarder %s for %s\n", tag, remoteAddr)
 
@@ -988,12 +985,11 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 		srv.incForwarder()
 	}
 
-	for isRunning {
+	for {
 		select {
 		case req, ok := <-primaryq:
 			if !ok {
 				log.Println("dns: primary queue has been closed")
-				isRunning = false
 				goto out
 			}
 			if debug.Value >= 1 {
@@ -1022,7 +1018,6 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 
 			srv.processResponse(req, res)
 		case <-stopper:
-			isRunning = false
 			goto out
 		}
 	}
