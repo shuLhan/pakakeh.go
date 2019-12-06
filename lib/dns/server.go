@@ -615,20 +615,28 @@ func (srv *Server) incForwarder() {
 }
 
 func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
+	var (
+		n   int
+		err error
+	)
 	for {
 		req := newRequest()
 
-		n, err := cl.recv(req.message)
-		if err != nil {
-			if err == io.EOF {
+		for {
+			n, err = cl.recv(req.message)
+			if err != nil {
+				if err == io.EOF {
+					goto out
+				}
+				if strings.Contains(err.Error(), "bad certificate") {
+					goto out
+				}
+				continue
+			}
+			if n == 0 || len(req.message.Packet) == 0 {
 				goto out
 			}
-			log.Printf("serveTCPClient: %s: %s",
-				connTypeNames[kind], err.Error())
-			continue
-		}
-		if n == 0 || len(req.message.Packet) == 0 {
-			goto out
+			break
 		}
 
 		req.kind = kind
@@ -644,7 +652,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 		srv.requestq <- req
 	}
 out:
-	err := cl.conn.Close()
+	err = cl.conn.Close()
 	if err != nil {
 		log.Printf("serveTCPClient: conn.Close: %s: %s",
 			connTypeNames[kind], err.Error())
