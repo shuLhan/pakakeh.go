@@ -110,7 +110,7 @@ func (c *caches) list() (list []*answer) {
 //
 // prune will remove old answers on caches based on accessed time.
 //
-func (c *caches) prune() {
+func (c *caches) prune() (n int) {
 	c.Lock()
 
 	exp := time.Now().Add(c.pruneThreshold).Unix()
@@ -129,11 +129,14 @@ func (c *caches) prune() {
 		next := e.Next()
 		_ = c.lru.Remove(e)
 		c.remove(an)
+		n++
 
 		e = next
 	}
 
 	c.Unlock()
+
+	return n
 }
 
 //
@@ -193,9 +196,8 @@ func (c *caches) upsert(nu *answer) (inserted bool) {
 func (c *caches) startWorker() {
 	ticker := time.NewTicker(c.pruneDelay)
 
-	for t := range ticker.C {
-		fmt.Printf("dns: pruning at %v\n", t)
-
-		c.prune()
+	for range ticker.C {
+		n := c.prune()
+		fmt.Printf("dns: pruning %d records from cache\n", n)
 	}
 }
