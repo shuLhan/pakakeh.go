@@ -18,9 +18,10 @@ import (
 // TCPClient for DNS with TCP connection and list of remote addresses.
 //
 type TCPClient struct {
-	timeout time.Duration
-	addr    *net.TCPAddr
-	conn    net.Conn
+	readTimeout  time.Duration
+	writeTimeout time.Duration
+	addr         *net.TCPAddr
+	conn         net.Conn
 }
 
 //
@@ -41,8 +42,9 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 	}
 
 	cl := &TCPClient{
-		timeout: clientTimeout,
-		addr:    raddr,
+		readTimeout:  clientTimeout,
+		writeTimeout: clientTimeout,
+		addr:         raddr,
 	}
 
 	err := cl.Connect(raddr)
@@ -159,7 +161,8 @@ func (cl *TCPClient) SetRemoteAddr(addr string) (err error) {
 // SetTimeout for sending and receiving packet.
 //
 func (cl *TCPClient) SetTimeout(t time.Duration) {
-	cl.timeout = t
+	cl.readTimeout = t
+	cl.writeTimeout = t
 }
 
 //
@@ -168,9 +171,11 @@ func (cl *TCPClient) SetTimeout(t time.Duration) {
 // client.
 //
 func (cl *TCPClient) Write(msg []byte) (n int, err error) {
-	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
-	if err != nil {
-		return
+	if cl.writeTimeout > 0 {
+		err = cl.conn.SetWriteDeadline(time.Now().Add(cl.writeTimeout))
+		if err != nil {
+			return
+		}
 	}
 
 	lenmsg := len(msg)
@@ -188,9 +193,11 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 // recv will read DNS message from active connection in client into `msg`.
 //
 func (cl *TCPClient) recv(msg *Message) (n int, err error) {
-	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
-	if err != nil {
-		return
+	if cl.readTimeout > 0 {
+		err = cl.conn.SetReadDeadline(time.Now().Add(cl.readTimeout))
+		if err != nil {
+			return
+		}
 	}
 
 	n, err = cl.conn.Read(msg.Packet)

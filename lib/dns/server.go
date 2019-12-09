@@ -437,8 +437,8 @@ func (srv *Server) serveDoT() {
 			}
 
 			cl := &TCPClient{
-				timeout: clientTimeout,
-				conn:    conn,
+				writeTimeout: clientTimeout,
+				conn:         conn,
 			}
 
 			go srv.serveTCPClient(cl, connTypeDoT)
@@ -463,8 +463,8 @@ func (srv *Server) serveTCP() {
 		}
 
 		cl := &TCPClient{
-			timeout: clientTimeout,
-			conn:    conn,
+			writeTimeout: clientTimeout,
+			conn:         conn,
 		}
 
 		go srv.serveTCPClient(cl, connTypeTCP)
@@ -615,27 +615,16 @@ func (srv *Server) incForwarder() {
 }
 
 func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
-	var (
-		n   int
-		err error
-	)
 	for {
 		req := newRequest()
 
-		for {
-			n, err = cl.recv(req.message)
-			if err != nil {
-				if err == io.EOF {
-					goto out
-				}
-				if strings.Contains(err.Error(), "bad certificate") {
-					goto out
-				}
-				continue
-			}
-			if n == 0 || len(req.message.Packet) == 0 {
-				goto out
-			}
+		n, err := cl.recv(req.message)
+		if err != nil {
+			log.Printf("serveTCPClient: %s: %s",
+				connTypeNames[kind], err.Error())
+			break
+		}
+		if n == 0 || len(req.message.Packet) == 0 {
 			break
 		}
 
@@ -651,8 +640,8 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 
 		srv.requestq <- req
 	}
-out:
-	err = cl.conn.Close()
+
+	err := cl.conn.Close()
 	if err != nil {
 		log.Printf("serveTCPClient: conn.Close: %s: %s",
 			connTypeNames[kind], err.Error())
