@@ -7,6 +7,7 @@ package memfs
 import (
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,6 +17,11 @@ import (
 	"path"
 	"path/filepath"
 	"time"
+)
+
+var (
+	errOffset = errors.New("Seek: invalid offset")
+	errWhence = errors.New("Seek: invalid whence")
 )
 
 //
@@ -35,6 +41,7 @@ type Node struct {
 	Childs          []*Node     // List of files in directory.
 	plainv          []byte      // Content of file in plain text.
 	lowerv          []byte      // Content of file in lower cases.
+	off             int64       // The cursor position when doing Read or Seek.
 }
 
 //
@@ -91,6 +98,14 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 }
 
 //
+// Close reset the offset position back to zero.
+//
+func (leaf *Node) Close() error {
+	leaf.off = 0
+	return nil
+}
+
+//
 // Decode the contents of node (for example, uncompress with gzip) and return
 // it.
 //
@@ -125,6 +140,47 @@ func (leaf *Node) Decode() ([]byte, error) {
 	}
 
 	return leaf.plainv, nil
+}
+
+//
+// Read the content of node into p.
+//
+func (leaf *Node) Read(p []byte) (n int, err error) {
+	// Implementations of Read are discouraged from returning a zero byte
+	// count with a nil error, except when len(p) == 0.
+	if len(p) == 0 {
+		return 0, nil
+	}
+	if leaf.off >= leaf.Size {
+		return 0, io.EOF
+	}
+	n = copy(p, leaf.V[leaf.off:])
+	leaf.off += int64(n)
+	return n, nil
+}
+
+//
+// Seek sets the offset for the next Read offset, interpreted according to
+// whence: SeekStart means relative to the start of the file, SeekCurrent
+// means relative to the current offset, and SeekEnd means relative to the
+// end. Seek returns the new offset relative to the start of the file and an
+// error, if any.
+//
+func (leaf *Node) Seek(offset int64, whence int) (int64, error) {
+	switch whence {
+	case io.SeekStart:
+	case io.SeekCurrent:
+		offset += leaf.off
+	case io.SeekEnd:
+		offset += leaf.Size
+	default:
+		return 0, errWhence
+	}
+	if offset < 0 {
+		return 0, errOffset
+	}
+	leaf.off = offset
+	return leaf.off, nil
 }
 
 //
