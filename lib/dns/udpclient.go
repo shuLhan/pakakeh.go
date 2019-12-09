@@ -149,12 +149,14 @@ func (cl *UDPClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	n, _, err = cl.conn.ReadFromUDP(msg.Packet)
+	packet := make([]byte, maxUDPPacketSize)
+
+	n, _, err = cl.conn.ReadFromUDP(packet)
 	if err != nil {
 		return
 	}
 
-	msg.Packet = msg.Packet[:n]
+	msg.Packet = libbytes.Copy(packet[:n])
 
 	if debug.Value >= 3 {
 		libbytes.PrintHex(">>> UDPClient: recv:", msg.Packet, 8)

@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
 )
 
@@ -477,10 +478,11 @@ func (srv *Server) serveTCP() {
 func (srv *Server) serveUDP() {
 	log.Println("dns.Server: listening for DNS over UDP at", srv.udp.LocalAddr())
 
+	packet := make([]byte, maxUDPPacketSize)
 	for {
 		req := newRequest()
 
-		n, raddr, err := srv.udp.ReadFromUDP(req.message.Packet)
+		n, raddr, err := srv.udp.ReadFromUDP(packet)
 		if err != nil {
 			if err != io.EOF {
 				err = fmt.Errorf("dns: error when reading from UDP: " + err.Error())
@@ -489,8 +491,9 @@ func (srv *Server) serveUDP() {
 			return
 		}
 
+		req.message.Packet = libbytes.Copy(packet[:n])
+
 		req.kind = connTypeUDP
-		req.message.Packet = req.message.Packet[:n]
 		req.writer = &UDPClient{
 			timeout: clientTimeout,
 			conn:    srv.udp,

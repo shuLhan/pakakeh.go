@@ -143,13 +143,11 @@ func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 
 	res := NewMessage()
 
-	packet, err := ioutil.ReadAll(httpRes.Body)
+	res.Packet, err = ioutil.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-
-	res.Packet = append(res.Packet[:0], packet...)
 
 	err = res.Unpack()
 
@@ -173,20 +171,17 @@ func (cl *DoHClient) Get(msg *Message) (*Message, error) {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(httpRes.Body)
+	res := NewMessage()
+
+	res.Packet, err = ioutil.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-
 	if httpRes.StatusCode != 200 {
-		err = fmt.Errorf("%s", string(body))
+		err = fmt.Errorf("%s", string(res.Packet))
 		return nil, err
 	}
-
-	res := NewMessage()
-
-	res.Packet = append(res.Packet[:0], body...)
 
 	if len(res.Packet) > 20 {
 		err = res.Unpack()

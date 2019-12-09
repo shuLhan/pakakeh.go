@@ -200,7 +200,9 @@ func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 		}
 	}
 
-	n, err = cl.conn.Read(msg.Packet)
+	packet := make([]byte, maxUDPPacketSize)
+
+	n, err = cl.conn.Read(packet)
 	if err != nil {
 		return
 	}
@@ -208,7 +210,7 @@ func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	msg.Packet = msg.Packet[2:n]
+	msg.Packet = libbytes.Copy(packet[2:n])
 
 	if debug.Value >= 3 {
 		libbytes.PrintHex(">>> TCPClient: recv: ", msg.Packet, 8)

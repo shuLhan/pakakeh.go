@@ -81,7 +81,6 @@ func NewMessage() *Message {
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 		},
-		Packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 }
