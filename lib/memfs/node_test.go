@@ -7,6 +7,7 @@ package memfs
 import (
 	"io"
 	"os"
+	"sort"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -86,20 +87,20 @@ func TestNode_Readdir(t *testing.T) {
 	}{{
 		desc: "Readdir 0",
 		expFileNames: []string{
-			"plain",
-			"index.css",
 			"direct",
-			"index.html",
-			"include",
 			"exclude",
+			"include",
+			"index.css",
+			"index.html",
 			"index.js",
+			"plain",
 		},
 	}, {
 		desc:  "Readdir 2 (1)",
 		count: 2,
 		expFileNames: []string{
-			"plain",
 			"index.css",
+			"plain",
 		},
 	}, {
 		desc:  "Readdir 2 (2)",
@@ -112,8 +113,8 @@ func TestNode_Readdir(t *testing.T) {
 		desc:  "Readdir 2 (3)",
 		count: 2,
 		expFileNames: []string{
-			"include",
 			"exclude",
+			"include",
 		},
 	}, {
 		desc:  "Readdir 2 (4)",
@@ -143,6 +144,7 @@ func gotFileNames(fis []os.FileInfo) (names []string) {
 	for _, fi := range fis {
 		names = append(names, fi.Name())
 	}
+	sort.Strings(names)
 	return
 }
 
