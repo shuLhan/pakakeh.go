@@ -28,14 +28,16 @@ var (
 // Node represent a single file.
 //
 type Node struct {
+	os.FileInfo
+
 	SysPath         string      // The original file path in system.
 	Path            string      // Absolute file path in memory.
-	Name            string      // File name.
+	name            string      // File name.
 	ContentType     string      // File type per MIME, for example "application/json".
 	ContentEncoding string      // File type encoding, for example "gzip".
-	ModTime         time.Time   // ModTime contains file modification time.
-	Mode            os.FileMode // File mode.
-	Size            int64       // Size of file.
+	modTime         time.Time   // ModTime contains file modification time.
+	mode            os.FileMode // File mode.
+	size            int64       // Size of file.
 	V               []byte      // Content of file.
 	Parent          *Node       // Pointer to parent directory.
 	Childs          []*Node     // List of files in directory.
@@ -70,17 +72,17 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 	node = &Node{
 		SysPath: sysPath,
 		Path:    absPath,
-		Name:    fi.Name(),
-		ModTime: fi.ModTime(),
-		Mode:    fi.Mode(),
-		Size:    fi.Size(),
+		name:    fi.Name(),
+		modTime: fi.ModTime(),
+		mode:    fi.Mode(),
+		size:    fi.Size(),
 		V:       nil,
 		Parent:  parent,
 		Childs:  make([]*Node, 0),
 	}
 
-	if node.Mode.IsDir() || !withContent {
-		node.Size = 0
+	if node.mode.IsDir() || !withContent {
+		node.size = 0
 		return node, nil
 	}
 
@@ -142,6 +144,22 @@ func (leaf *Node) Decode() ([]byte, error) {
 	return leaf.plainv, nil
 }
 
+func (leaf *Node) IsDir() bool {
+	return leaf.mode.IsDir()
+}
+
+func (leaf *Node) ModTime() time.Time {
+	return leaf.modTime
+}
+
+func (leaf *Node) Mode() os.FileMode {
+	return leaf.mode
+}
+
+func (leaf *Node) Name() string {
+	return leaf.name
+}
+
 //
 // Read the content of node into p.
 //
@@ -151,7 +169,7 @@ func (leaf *Node) Read(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
-	if leaf.off >= leaf.Size {
+	if leaf.off >= leaf.size {
 		return 0, io.EOF
 	}
 	n = copy(p, leaf.V[leaf.off:])
@@ -172,7 +190,7 @@ func (leaf *Node) Seek(offset int64, whence int) (int64, error) {
 	case io.SeekCurrent:
 		offset += leaf.off
 	case io.SeekEnd:
-		offset += leaf.Size
+		offset += leaf.size
 	default:
 		return 0, errWhence
 	}
@@ -181,6 +199,42 @@ func (leaf *Node) Seek(offset int64, whence int) (int64, error) {
 	}
 	leaf.off = offset
 	return leaf.off, nil
+}
+
+//
+// SetModTime set the file modification time.
+//
+func (leaf *Node) SetModTime(modTime time.Time) {
+	leaf.modTime = modTime
+}
+
+//
+// SetMode set the mode of file.
+//
+func (leaf *Node) SetMode(mode os.FileMode) {
+	leaf.mode = mode
+}
+
+//
+// SetName set the name of file.
+//
+func (leaf *Node) SetName(name string) {
+	leaf.name = name
+}
+
+//
+// SetSize set the file size.
+//
+func (leaf *Node) SetSize(size int64) {
+	leaf.size = size
+}
+
+func (leaf *Node) Size() int64 {
+	return leaf.size
+}
+
+func (leaf *Node) Sys() interface{} {
+	return leaf
 }
 
 //
@@ -226,13 +280,13 @@ func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
 		}
 	}
 
-	if leaf.Mode != newInfo.Mode() {
-		leaf.Mode = newInfo.Mode()
+	if leaf.mode != newInfo.Mode() {
+		leaf.mode = newInfo.Mode()
 		return nil
 	}
 
-	leaf.ModTime = newInfo.ModTime()
-	leaf.Size = newInfo.Size()
+	leaf.modTime = newInfo.ModTime()
+	leaf.size = newInfo.Size()
 
 	if !withContent || newInfo.IsDir() {
 		return nil
@@ -245,7 +299,7 @@ func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
 // updateContent read the content of file.
 //
 func (leaf *Node) updateContent() (err error) {
-	if leaf.Size > MaxFileSize {
+	if leaf.size > MaxFileSize {
 		return nil
 	}
 
@@ -258,7 +312,7 @@ func (leaf *Node) updateContent() (err error) {
 }
 
 func (leaf *Node) updateContentType() error {
-	leaf.ContentType = mime.TypeByExtension(path.Ext(leaf.Name))
+	leaf.ContentType = mime.TypeByExtension(path.Ext(leaf.name))
 	if len(leaf.ContentType) > 0 {
 		return nil
 	}

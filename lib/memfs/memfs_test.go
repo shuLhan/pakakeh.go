@@ -33,9 +33,9 @@ func TestAddFile(t *testing.T) {
 		exp: &Node{
 			SysPath:     "testdata/direct/add/file",
 			Path:        "testdata/direct/add/file",
-			Name:        "file",
+			name:        "file",
 			ContentType: "text/plain; charset=utf-8",
-			Size:        22,
+			size:        22,
 			V:           []byte("Test direct add file.\n"),
 		},
 	}, {
@@ -44,9 +44,9 @@ func TestAddFile(t *testing.T) {
 		exp: &Node{
 			SysPath:     "testdata/direct/add/file2",
 			Path:        "testdata/direct/add/file2",
-			Name:        "file2",
+			name:        "file2",
 			ContentType: "text/plain; charset=utf-8",
-			Size:        24,
+			size:        24,
 			V:           []byte("Test direct add file 2.\n"),
 		},
 	}}
@@ -71,8 +71,8 @@ func TestAddFile(t *testing.T) {
 		}
 
 		if got != nil {
-			got.ModTime = time.Time{}
-			got.Mode = 0
+			got.modTime = time.Time{}
+			got.mode = 0
 			got.Parent = nil
 			got.Childs = nil
 		}
@@ -86,8 +86,8 @@ func TestAddFile(t *testing.T) {
 			}
 
 			if got != nil {
-				got.ModTime = time.Time{}
-				got.Mode = 0
+				got.modTime = time.Time{}
+				got.mode = 0
 				got.Parent = nil
 				got.Childs = nil
 			}
@@ -175,7 +175,7 @@ func TestGet(t *testing.T) {
 			continue
 		}
 
-		if got.Size <= MaxFileSize {
+		if got.size <= MaxFileSize {
 			test.Assert(t, "node.V", c.expV, got.V, true)
 		}
 

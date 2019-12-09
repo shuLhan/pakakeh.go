@@ -181,7 +181,7 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 	}
 
 	for _, node := range mfs.pn.v {
-		if node.Mode.IsDir() || len(node.V) == 0 {
+		if node.mode.IsDir() || len(node.V) == 0 {
 			continue
 		}
 
@@ -199,7 +199,7 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 		copy(node.V, buf.Bytes())
 
 		node.ContentEncoding = encoding
-		node.Size = int64(len(node.V))
+		node.size = int64(len(node.V))
 
 		buf.Reset()
 
@@ -357,10 +357,10 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 	mfs.root = &Node{
 		SysPath: dir,
 		Path:    "/",
-		Name:    "/",
-		ModTime: fi.ModTime(),
-		Mode:    fi.Mode(),
-		Size:    fi.Size(),
+		name:    "/",
+		modTime: fi.ModTime(),
+		mode:    fi.Mode(),
+		size:    fi.Size(),
 		V:       nil,
 		Parent:  nil,
 	}
@@ -384,7 +384,7 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 		if leaf == nil {
 			continue
 		}
-		if !leaf.Mode.IsDir() {
+		if !leaf.mode.IsDir() {
 			continue
 		}
 
@@ -483,7 +483,7 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 //
 func (mfs *MemFS) pruneEmptyDirs() {
 	for k, node := range mfs.pn.v {
-		if !node.Mode.IsDir() {
+		if !node.mode.IsDir() {
 			continue
 		}
 		if len(node.Childs) != 0 {
@@ -550,7 +550,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 	}
 
 	for _, node := range mfs.pn.v {
-		if node.Mode.IsDir() {
+		if node.mode.IsDir() {
 			continue
 		}
 

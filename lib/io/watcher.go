@@ -54,7 +54,7 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 	if err != nil {
 		return nil, fmt.Errorf("lib/io: NewWatcher: " + err.Error())
 	}
-	if fi.Mode().IsDir() {
+	if fi.IsDir() {
 		return nil, fmt.Errorf("lib/io: NewWatcher: path is directory")
 	}
 
@@ -108,12 +108,12 @@ func (w *Watcher) start() {
 			w.node = nil
 			return
 		}
-		if w.node.Mode != newInfo.Mode() {
+		if w.node.Mode() != newInfo.Mode() {
 			if debug.Value >= 2 {
 				fmt.Printf("lib/io: Watcher: mode modified %q\n", w.node.SysPath)
 			}
 
-			w.node.Mode = newInfo.Mode()
+			w.node.SetMode(newInfo.Mode())
 			ns := &NodeState{
 				Node:  w.node,
 				State: FileStateModified,
@@ -121,7 +121,7 @@ func (w *Watcher) start() {
 			w.cb(ns)
 			continue
 		}
-		if w.node.ModTime.Equal(newInfo.ModTime()) {
+		if w.node.ModTime().Equal(newInfo.ModTime()) {
 			continue
 		}
 
@@ -129,8 +129,8 @@ func (w *Watcher) start() {
 			fmt.Printf("lib/io: Watcher: content modified %q\n", w.node.SysPath)
 		}
 
-		w.node.ModTime = newInfo.ModTime()
-		w.node.Size = newInfo.Size()
+		w.node.SetModTime(newInfo.ModTime())
+		w.node.SetSize(newInfo.Size())
 
 		ns := &NodeState{
 			Node:  w.node,

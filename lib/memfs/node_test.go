@@ -13,7 +13,7 @@ import (
 
 func TestNode_Read(t *testing.T) {
 	node := &Node{
-		Size: 3,
+		size: 3,
 		V:    []byte("123"),
 	}
 
@@ -63,7 +63,7 @@ func TestNode_Read(t *testing.T) {
 
 func TestNode_Seek(t *testing.T) {
 	node := &Node{
-		Size: 3,
+		size: 3,
 		V:    []byte("123"),
 	}
 

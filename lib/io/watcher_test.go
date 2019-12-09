@@ -45,11 +45,11 @@ func TestWatcher(t *testing.T) {
 		if exps[x].state != ns.State {
 			log.Fatalf("Got state %d, want %d\n", ns.State, exps[x].state)
 		}
-		if exps[x].mode != ns.Node.Mode {
-			log.Fatalf("Got mode %d, want %d\n", ns.Node.Mode, exps[x].mode)
+		if exps[x].mode != ns.Node.Mode() {
+			log.Fatalf("Got mode %d, want %d\n", ns.Node.Mode(), exps[x].mode)
 		}
-		if exps[x].size != ns.Node.Size {
-			log.Fatalf("Got size %d, want %d\n", ns.Node.Size, exps[x].size)
+		if exps[x].size != ns.Node.Size() {
+			log.Fatalf("Got size %d, want %d\n", ns.Node.Size(), exps[x].size)
 		}
 		x++
 		wg.Done()

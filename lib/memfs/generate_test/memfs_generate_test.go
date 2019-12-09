@@ -22,6 +22,25 @@ func TestGeneratePathNode(t *testing.T) {
 
 	wd = strings.TrimSuffix(wd, "generate_test")
 
+	expRoot := &memfs.Node{
+		SysPath: filepath.Join(wd, "testdata"),
+		Path:    "/",
+	}
+	expRoot.SetMode(2147484141)
+	expRoot.SetName("/")
+	expRoot.SetSize(4096)
+
+	expExcludeIndexHTML := &memfs.Node{
+		SysPath:     filepath.Join(wd, "testdata", "exclude", "index.html"),
+		Path:        "/exclude/index.html",
+		ContentType: "text/html; charset=utf-8",
+		V:           []byte("<html></html>\n"),
+	}
+
+	expExcludeIndexHTML.SetMode(420) //nolint: staticcheck
+	expExcludeIndexHTML.SetName("index.html")
+	expExcludeIndexHTML.SetSize(14)
+
 	cases := []struct {
 		path     string
 		exp      *memfs.Node
@@ -31,25 +50,10 @@ func TestGeneratePathNode(t *testing.T) {
 		expError: "file does not exist",
 	}, {
 		path: "/",
-		exp: &memfs.Node{
-			SysPath:     filepath.Join(wd, "testdata"),
-			Path:        "/",
-			Name:        "/",
-			ContentType: "",
-			Mode:        2147484141,
-			Size:        4096,
-		},
+		exp:  expRoot,
 	}, {
 		path: "/exclude/index.html",
-		exp: &memfs.Node{
-			SysPath:     filepath.Join(wd, "testdata", "exclude", "index.html"),
-			Path:        "/exclude/index.html",
-			Name:        "index.html",
-			ContentType: "text/html; charset=utf-8",
-			Mode:        420,
-			Size:        14,
-			V:           []byte("<html></html>\n"),
-		},
+		exp:  expExcludeIndexHTML,
 	}}
 
 	mfs, err := memfs.New(nil, nil, true)

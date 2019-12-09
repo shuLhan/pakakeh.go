@@ -324,7 +324,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 		}
 	}
 
-	if node.Mode.IsDir() {
+	if node.IsDir() {
 		indexHTML := path.Join(reqPath, "index.html")
 		node, e = srv.Memfs.Get(indexHTML)
 		if e != nil {
@@ -366,7 +366,7 @@ func (srv *Server) handleFS(
 	}
 
 	if method == RequestMethodHead {
-		res.Header().Set("Content-Length", strconv.FormatInt(node.Size, 10))
+		res.Header().Set("Content-Length", strconv.FormatInt(node.Size(), 10))
 		res.WriteHeader(http.StatusOK)
 		return
 	}

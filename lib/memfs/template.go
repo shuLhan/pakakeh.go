@@ -50,17 +50,17 @@ func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "{{.SysPath}}",
 		Path:            "{{.Path}}",
-		Name:            "{{.Name}}",
 		ContentType:     "{{.ContentType}}",
 		ContentEncoding: "{{.ContentEncoding}}",
-		Mode:            {{printf "%d" .Mode}},
-		Size:            {{.Size}},
 {{- if .V }}
 		V: []byte{
 			{{range $x, $c := .V}}{{ if maxline $x }}{{ printf "\n\t\t\t" }}{{else if $x}} {{end}}{{ printf "%d," $c }}{{end}}
 		},
 {{- end }}
 	}
+	node.SetMode({{printf "%d" .Mode}})
+	node.SetName("{{.Name}}")
+	node.SetSize({{.Size}})
 	return node
 }
 {{end}}

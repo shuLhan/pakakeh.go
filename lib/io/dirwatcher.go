@@ -104,7 +104,7 @@ func (dw *DirWatcher) Stop() {
 //
 func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
 	for _, child := range node.Childs {
-		if !child.Mode.IsDir() {
+		if !child.IsDir() {
 			_, err := NewWatcher(child.SysPath, dw.Delay, dw.Callback)
 			if err != nil {
 				log.Println(err)
@@ -123,7 +123,7 @@ func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
 //
 func (dw *DirWatcher) unmapSubdirs(node *memfs.Node) {
 	for _, child := range node.Childs {
-		if !child.Mode.IsDir() {
+		if !child.IsDir() {
 			continue
 		}
 
@@ -164,7 +164,7 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 	for x := 0; x < len(node.Childs); x++ {
 		found := false
 		for _, newInfo := range fis {
-			if node.Childs[x].Name == newInfo.Name() {
+			if node.Childs[x].Name() == newInfo.Name() {
 				found = true
 				break
 			}
@@ -174,7 +174,7 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 				fmt.Printf("lib/io: DirWatcher.onContentChange: deleted %+v\n", node.Childs[x])
 			}
 
-			if node.Childs[x].Mode.IsDir() {
+			if node.Childs[x].IsDir() {
 				dw.unmapSubdirs(node.Childs[x])
 			}
 
@@ -187,7 +187,7 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 	for _, newInfo := range fis {
 		found := false
 		for _, child := range node.Childs {
-			if newInfo.Name() == child.Name {
+			if newInfo.Name() == child.Name() {
 				found = true
 				break
 			}
@@ -217,7 +217,7 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 
 		dw.Callback(ns)
 
-		if newChild.Mode.IsDir() {
+		if newChild.IsDir() {
 			dw.dirs[newChild.Path] = newChild
 			dw.mapSubdirs(newChild)
 			dw.onContentChange(newChild)
@@ -326,11 +326,11 @@ func (dw *DirWatcher) start() {
 			dw.onRootCreated()
 			continue
 		}
-		if dw.root.Mode != newDirInfo.Mode() {
+		if dw.root.Mode() != newDirInfo.Mode() {
 			dw.onModified(dw.root, newDirInfo)
 			continue
 		}
-		if dw.root.ModTime.Equal(newDirInfo.ModTime()) {
+		if dw.root.ModTime().Equal(newDirInfo.ModTime()) {
 			dw.processSubdirs()
 			continue
 		}
@@ -356,11 +356,11 @@ func (dw *DirWatcher) processSubdirs() {
 			dw.unmapSubdirs(node)
 			continue
 		}
-		if node.Mode != newDirInfo.Mode() {
+		if node.Mode() != newDirInfo.Mode() {
 			dw.onModified(node, newDirInfo)
 			continue
 		}
-		if node.ModTime.Equal(newDirInfo.ModTime()) {
+		if node.ModTime().Equal(newDirInfo.ModTime()) {
 			continue
 		}
 
