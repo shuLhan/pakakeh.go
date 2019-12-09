@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -49,6 +50,8 @@ var (
 // MemFS contains directory tree of file system in memory.
 //
 type MemFS struct {
+	http.FileSystem
+
 	incRE       []*regexp.Regexp
 	excRE       []*regexp.Regexp
 	root        *Node
@@ -238,6 +241,14 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	return node, nil
+}
+
+//
+// Open the named file for reading.
+// This is an alias to Get() method, to make it implement http.FileSystem.
+//
+func (mfs *MemFS) Open(path string) (http.File, error) {
+	return mfs.Get(path)
 }
 
 //
