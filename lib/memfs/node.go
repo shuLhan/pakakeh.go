@@ -29,6 +29,7 @@ var (
 //
 type Node struct {
 	os.FileInfo
+	http.File
 
 	SysPath         string      // The original file path in system.
 	Path            string      // Absolute file path in memory.
@@ -178,6 +179,45 @@ func (leaf *Node) Read(p []byte) (n int, err error) {
 }
 
 //
+// Readdir reads the contents of the directory associated with file and
+// returns a slice of up to n FileInfo values, as would be returned by Lstat,
+// in directory order.
+// Subsequent calls on the same file will yield further FileInfos.
+//
+func (leaf *Node) Readdir(count int) (fis []os.FileInfo, err error) {
+	if !leaf.IsDir() {
+		return nil, nil
+	}
+	if count <= 0 || count >= len(leaf.Childs) {
+		fis = make([]os.FileInfo, len(leaf.Childs))
+		for x := 0; x < len(leaf.Childs); x++ {
+			fis[x] = leaf.Childs[x]
+		}
+		leaf.off = 0
+		return fis, nil
+	}
+	if leaf.off >= int64(len(leaf.Childs)) {
+		return nil, nil
+	}
+
+	if int(leaf.off)+count >= len(leaf.Childs) {
+		count = len(leaf.Childs)
+	} else {
+		count += int(leaf.off)
+	}
+
+	fis = make([]os.FileInfo, 0, count)
+
+	for _, child := range leaf.Childs[leaf.off:count] {
+		fis = append(fis, child)
+	}
+
+	leaf.off = int64(count)
+
+	return fis, nil
+}
+
+//
 // Seek sets the offset for the next Read offset, interpreted according to
 // whence: SeekStart means relative to the start of the file, SeekCurrent
 // means relative to the current offset, and SeekEnd means relative to the
@@ -229,10 +269,23 @@ func (leaf *Node) SetSize(size int64) {
 	leaf.size = size
 }
 
+//
+// Size return the file size information.
+//
 func (leaf *Node) Size() int64 {
 	return leaf.size
 }
 
+//
+// Stat return the file information.
+//
+func (leaf *Node) Stat() (os.FileInfo, error) {
+	return leaf, nil
+}
+
+//
+// Sys return the underlying data source (can return nil).
+//
 func (leaf *Node) Sys() interface{} {
 	return leaf
 }
