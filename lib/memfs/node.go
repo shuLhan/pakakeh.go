@@ -291,6 +291,22 @@ func (leaf *Node) Sys() interface{} {
 }
 
 //
+// addChild add new node as sub-directory or file of this node.
+//
+func (leaf *Node) addChild(sysPath string, fi os.FileInfo, withContent bool) (child *Node, err error) {
+	child, err = NewNode(leaf, fi, withContent)
+	if err != nil {
+		return nil, err
+	}
+
+	child.SysPath = sysPath
+
+	leaf.Childs = append(leaf.Childs, child)
+
+	return child, nil
+}
+
+//
 // removeChild remove a children node from list.  If child is not exist, it
 // will return nil.
 //
