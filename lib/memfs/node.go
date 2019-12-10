@@ -200,13 +200,12 @@ func (leaf *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 		return nil, nil
 	}
 
-	if int(leaf.off)+count >= len(leaf.Childs) {
+	count += int(leaf.off)
+	if count >= len(leaf.Childs) {
 		count = len(leaf.Childs)
-	} else {
-		count += int(leaf.off)
 	}
 
-	fis = make([]os.FileInfo, 0, count)
+	fis = make([]os.FileInfo, 0, count-int(leaf.off))
 
 	for _, child := range leaf.Childs[leaf.off:count] {
 		fis = append(fis, child)

@@ -79,65 +79,35 @@ func TestNode_Readdir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		desc         string
-		count        int
-		expFileNames []string
-		expError     string
-	}{{
-		desc: "Readdir 0",
-		expFileNames: []string{
-			"direct",
-			"exclude",
-			"include",
-			"index.css",
-			"index.html",
-			"index.js",
-			"plain",
-		},
-	}, {
-		desc:  "Readdir 2 (1)",
-		count: 2,
-		expFileNames: []string{
-			"index.css",
-			"plain",
-		},
-	}, {
-		desc:  "Readdir 2 (2)",
-		count: 2,
-		expFileNames: []string{
-			"direct",
-			"index.html",
-		},
-	}, {
-		desc:  "Readdir 2 (3)",
-		count: 2,
-		expFileNames: []string{
-			"exclude",
-			"include",
-		},
-	}, {
-		desc:  "Readdir 2 (4)",
-		count: 2,
-		expFileNames: []string{
-			"index.js",
-		},
-	}, {
-		desc:  "Readdir 2 (5)",
-		count: 2,
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		fis, err := f.Readdir(c.count)
-		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
-			continue
-		}
-
-		test.Assert(t, "Readdir", c.expFileNames, gotFileNames(fis), true)
+	expFileNames := []string{
+		"direct",
+		"exclude",
+		"include",
+		"index.css",
+		"index.html",
+		"index.js",
+		"plain",
 	}
+
+	fis, err := f.Readdir(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "Readdir(0)", expFileNames, gotFileNames(fis), true)
+
+	// Test reading two nodes at a time.
+
+	allFis := make([]os.FileInfo, 0, len(expFileNames))
+	for {
+		fis, _ := f.Readdir(2)
+		if fis == nil {
+			break
+		}
+		allFis = append(allFis, fis...)
+	}
+
+	test.Assert(t, "Readdir(2)", expFileNames, gotFileNames(allFis), true)
 }
 
 func gotFileNames(fis []os.FileInfo) (names []string) {
