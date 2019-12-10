@@ -4,6 +4,25 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.11.0 (2019-12-xx)
+
+===  New Features
+
+*  memfs: implement http.FileSystem on MemFS
+*  memfs: implement http.File on Node
+*  memfs: implement os.FileInfo on Node
+*  memfs: implement io.Closer, io.Reader, and io.Seeker on Node
+
+===  Enhancements
+
+*  dns: allocate raw packet on receive
+*  dns: log the number of pruned records
+
+===  Bug Fixes
+
+*  dns: split between read and write timeout for TCPClient
+
+
 ==  share v0.10.2 (2019-12-07)
 
 ===  Bug Fixes
