@@ -24,11 +24,6 @@ import (
 	"github.com/shuLhan/share/lib/debug"
 )
 
-const (
-	asFallback = "fallback"
-	asPrimary  = "primary"
-)
-
 //
 // Server defines DNS server.
 //
@@ -155,17 +150,17 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 //
 func isResponseValid(req *request, res *Message) bool {
 	if !bytes.Equal(req.message.Question.Name, res.Question.Name) {
-		log.Printf("dns: unmatched response name, got %s want %s\n",
+		log.Printf("dns: unmatched response name, got %s want %s",
 			req.message.Question.Name, res.Question.Name)
 		return false
 	}
 	if req.message.Question.Type != res.Question.Type {
-		log.Printf("dns: unmatched response type, got %s want %s\n",
+		log.Printf("dns: unmatched response type, got %s want %s",
 			req.message.Question.String(), res.Question.String())
 		return false
 	}
 	if req.message.Question.Class != res.Question.Class {
-		log.Printf("dns: unmatched response class, got %s want %s\n",
+		log.Printf("dns: unmatched response class, got %s want %s",
 			req.message.Question.String(), res.Question.String())
 		return false
 	}
@@ -323,15 +318,15 @@ func (srv *Server) RestartForwarders(nameServers, fallbackNS []string) {
 
 	srv.opts.parseNameServers()
 
-	srv.stopForwarders()
-	srv.runForwarders()
+	srv.stopAllForwarders()
+	srv.startAllForwarders()
 }
 
 //
 // Start the server, listening and serve query from clients.
 //
 func (srv *Server) Start() {
-	srv.runForwarders()
+	srv.startAllForwarders()
 
 	go srv.processRequest()
 
@@ -654,7 +649,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 func (srv *Server) isImplemented(msg *Message) bool {
 	switch msg.Question.Class {
 	case QueryClassCS, QueryClassCH, QueryClassHS:
-		log.Printf("dns: class %d is not implemented\n", msg.Question.Class)
+		log.Printf("dns: class %d is not implemented", msg.Question.Class)
 		return false
 	}
 
@@ -667,8 +662,7 @@ func (srv *Server) isImplemented(msg *Message) bool {
 		return true
 	}
 
-	log.Printf("dns: type %d is not implemented\n",
-		msg.Question.Type)
+	log.Printf("dns: type %d is not implemented", msg.Question.Type)
 
 	return false
 }
@@ -760,7 +754,7 @@ func (srv *Server) processResponse(req *request, res *Message) {
 	}
 
 	if res.Header.RCode != 0 {
-		log.Printf("dns: ! %s %s %d:%s\n",
+		log.Printf("dns: ! %s %s %d:%s",
 			connTypeNames[req.kind], rcodeNames[res.Header.RCode],
 			res.Header.ID, res.Question.String())
 		return
@@ -782,32 +776,34 @@ func (srv *Server) processResponse(req *request, res *Message) {
 	}
 }
 
-func (srv *Server) runForwarders() {
+func (srv *Server) startAllForwarders() {
 	srv.fwStoppers = nil
+	asFallback := "fallback"
+	asPrimary := "primary"
 
 	nforwarders := 0
 	for x := 0; x < len(srv.opts.primaryUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", nforwarders, asPrimary)
 		nameserver := srv.opts.primaryUDP[x].String()
-		go srv.runUDPForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
+		go srv.runUDPForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryTCP); x++ {
 		tag := fmt.Sprintf("TCP-%d-%s", nforwarders, asPrimary)
 		nameserver := srv.opts.primaryTCP[x].String()
-		go srv.runTCPForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
+		go srv.runTCPForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryDoh); x++ {
 		tag := fmt.Sprintf("DoH-%d-%s", nforwarders, asPrimary)
 		nameserver := srv.opts.primaryDoh[x]
-		go srv.runDohForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
+		go srv.runDohForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryDot); x++ {
 		tag := fmt.Sprintf("DoT-%d-%s", nforwarders, asPrimary)
 		nameserver := srv.opts.primaryDot[x]
-		go srv.runTLSForwarder(nameserver, srv.primaryq, srv.fallbackq, tag)
+		go srv.runTLSForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
 		nforwarders++
 	}
 
@@ -816,199 +812,203 @@ func (srv *Server) runForwarders() {
 	for x := 0; x < len(srv.opts.fallbackUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", nforwarders, asFallback)
 		nameserver := srv.opts.fallbackUDP[x].String()
-		go srv.runUDPForwarder(nameserver, srv.fallbackq, nil, tag)
+		go srv.runUDPForwarder(tag, nameserver, srv.fallbackq, nil)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackTCP); x++ {
 		tag := fmt.Sprintf("TCP-%d-%s", nforwarders, asFallback)
 		nameserver := srv.opts.fallbackTCP[x].String()
-		go srv.runTCPForwarder(nameserver, srv.fallbackq, nil, tag)
+		go srv.runTCPForwarder(tag, nameserver, srv.fallbackq, nil)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackDoh); x++ {
 		tag := fmt.Sprintf("DoH-%d-%s", nforwarders, asFallback)
 		nameserver := srv.opts.fallbackDoh[x]
-		go srv.runDohForwarder(nameserver, srv.fallbackq, nil, tag)
+		go srv.runDohForwarder(tag, nameserver, srv.fallbackq, nil)
 		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackDot); x++ {
 		tag := fmt.Sprintf("DoT-%d-%s", nforwarders, asFallback)
 		nameserver := srv.opts.fallbackDot[x]
-		go srv.runTLSForwarder(nameserver, srv.fallbackq, nil, tag)
+		go srv.runTLSForwarder(tag, nameserver, srv.fallbackq, nil)
 		nforwarders++
 	}
 }
 
-func (srv *Server) runDohForwarder(nameserver string, primaryq, fallbackq chan *request, tag string) {
-	var (
-		res       *Message
-		isRunning = true
-		stopper   = srv.newStopper()
-	)
-
-	for isRunning {
-		forwarder, err := NewDoHClient(nameserver, false)
-		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s\n",
-				tag, err.Error())
-
-			select {
-			case <-stopper:
-				isRunning = false
-				goto out
-			default:
-				time.Sleep(3 * time.Second)
-			}
-			continue
-		}
-
-		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, nameserver)
-
-		if fallbackq != nil {
-			srv.incForwarder()
-		}
-
-		for err == nil {
-			select {
-			case req, ok := <-primaryq:
-				if !ok {
-					log.Println("dns: primary queue has been closed")
-					isRunning = false
-					goto out
-				}
-				if debug.Value >= 1 {
-					fmt.Printf("dns: ^ %s %s %d:%s\n",
-						tag, nameserver,
-						req.message.Header.ID,
-						req.message.Question.String())
-				}
-
-				res, err = forwarder.Query(req.message)
-				if err != nil {
-					log.Printf("dns: %s forward failed: %s\n", tag, err.Error())
-					if fallbackq != nil {
-						fallbackq <- req
-					}
-				} else {
-					srv.processResponse(req, res)
-				}
-			case <-stopper:
-				isRunning = false
-				goto out
-			}
-		}
-
-		log.Printf("dns: reconnect forwarder %s for %s\n", tag, nameserver)
-	out:
-		if forwarder != nil {
-			forwarder.Close()
-		}
-		if fallbackq != nil {
-			srv.decForwarder()
-		}
-	}
-	srv.fwGroup.Done()
-	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, nameserver)
-}
-
-func (srv *Server) runTLSForwarder(nameserver string, primaryq, fallbackq chan *request, tag string) {
-	var (
-		res       *Message
-		isRunning = true
-		stopper   = srv.newStopper()
-	)
-
-	for isRunning {
-		forwarder, err := NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
-		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s\n",
-				tag, err.Error())
-
-			select {
-			case <-stopper:
-				isRunning = false
-				goto out
-			default:
-				time.Sleep(3 * time.Second)
-			}
-			continue
-		}
-
-		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, nameserver)
-
-		if fallbackq != nil {
-			srv.incForwarder()
-		}
-
-		for err == nil {
-			select {
-			case req, ok := <-primaryq:
-				if !ok {
-					log.Println("dns: primary queue has been closed")
-					isRunning = false
-					goto out
-				}
-				if debug.Value >= 1 {
-					fmt.Printf("dns: ^ %s %s %d:%s\n",
-						tag, nameserver,
-						req.message.Header.ID,
-						req.message.Question.String())
-				}
-
-				res, err = forwarder.Query(req.message)
-				if err != nil {
-					log.Printf("dns: %s forward failed: %s\n", tag, err.Error())
-					if fallbackq != nil {
-						fallbackq <- req
-					}
-				} else {
-					srv.processResponse(req, res)
-				}
-			case <-stopper:
-				isRunning = false
-				goto out
-			}
-		}
-
-		log.Printf("dns: reconnect forwarder %s for %s\n", tag, nameserver)
-	out:
-		if forwarder != nil {
-			forwarder.Close()
-		}
-		if fallbackq != nil {
-			srv.decForwarder()
-		}
-	}
-	srv.fwGroup.Done()
-	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, nameserver)
-}
-
-func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *request, tag string) {
+func (srv *Server) runDohForwarder(tag, nameserver string,
+	primaryq <-chan *request, fallbackq chan<- *request,
+) {
 	stopper := srv.newStopper()
 
-	log.Printf("dns: starting forwarder %s for %s\n", tag, remoteAddr)
+	defer func() {
+		srv.fwGroup.Done()
+		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
+	}()
+
+	for {
+		forwarder, err := NewDoHClient(nameserver, false)
+		if err != nil {
+			log.Printf("dns: failed to create forwarder %s: %s",
+				tag, err.Error())
+
+			select {
+			case <-stopper:
+				srv.stopForwarder(nil, fallbackq == nil)
+				return
+			default:
+				time.Sleep(3 * time.Second)
+			}
+			continue
+		}
+
+		log.Printf("dns: forwarder %s for %s has been connected ...", tag, nameserver)
+
+		if fallbackq != nil {
+			srv.incForwarder()
+		}
+
+		isRunning := true
+		for isRunning {
+			select {
+			case req, ok := <-primaryq:
+				if !ok {
+					log.Println("dns: primary queue has been closed")
+					srv.stopForwarder(forwarder, fallbackq == nil)
+					return
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: ^ %s %s %d:%s\n",
+						tag, nameserver,
+						req.message.Header.ID,
+						req.message.Question.String())
+				}
+
+				res, err := forwarder.Query(req.message)
+				if err != nil {
+					log.Printf("dns: %s forward failed: %s", tag, err.Error())
+					if fallbackq != nil {
+						fallbackq <- req
+					}
+					isRunning = false
+					continue
+				}
+				srv.processResponse(req, res)
+			case <-stopper:
+				srv.stopForwarder(forwarder, fallbackq == nil)
+				return
+			}
+		}
+
+		log.Printf("dns: reconnect forwarder %s for %s", tag, nameserver)
+		srv.stopForwarder(forwarder, fallbackq == nil)
+	}
+}
+
+func (srv *Server) runTLSForwarder(tag, nameserver string,
+	primaryq <-chan *request, fallbackq chan<- *request,
+) {
+	stopper := srv.newStopper()
+
+	defer func() {
+		srv.fwGroup.Done()
+		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
+	}()
+
+	for {
+		forwarder, err := NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
+		if err != nil {
+			log.Printf("dns: failed to create forwarder %s: %s",
+				tag, err.Error())
+
+			select {
+			case <-stopper:
+				srv.stopForwarder(nil, fallbackq == nil)
+				return
+			default:
+				time.Sleep(3 * time.Second)
+			}
+			continue
+		}
+
+		log.Printf("dns: forwarder %s for %s has been connected ...", tag, nameserver)
+
+		if fallbackq != nil {
+			srv.incForwarder()
+		}
+
+		isRunning := true
+		for isRunning {
+			select {
+			case req, ok := <-primaryq:
+				if !ok {
+					log.Println("dns: primary queue has been closed")
+					srv.stopForwarder(forwarder, fallbackq == nil)
+					return
+				}
+				if debug.Value >= 1 {
+					fmt.Printf("dns: ^ %s %s %d:%s\n",
+						tag, nameserver,
+						req.message.Header.ID,
+						req.message.Question.String())
+				}
+
+				res, err := forwarder.Query(req.message)
+				if err != nil {
+					log.Printf("dns: %s forward failed: %s", tag, err.Error())
+					if fallbackq != nil {
+						fallbackq <- req
+					}
+					isRunning = false
+					continue
+				}
+
+				srv.processResponse(req, res)
+			case <-stopper:
+				srv.stopForwarder(forwarder, fallbackq == nil)
+				return
+			}
+		}
+
+		log.Printf("dns: reconnect forwarder %s for %s", tag, nameserver)
+		srv.stopForwarder(forwarder, fallbackq == nil)
+	}
+}
+
+func (srv *Server) runTCPForwarder(tag, nameserver string,
+	primaryq <-chan *request, fallbackq chan<- *request,
+) {
+	stopper := srv.newStopper()
+
+	log.Printf("dns: starting forwarder %s for %s", tag, nameserver)
 
 	if fallbackq != nil {
 		srv.incForwarder()
 	}
+
+	defer func() {
+		if fallbackq != nil {
+			srv.decForwarder()
+		}
+		srv.fwGroup.Done()
+		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
+	}()
 
 	for {
 		select {
 		case req, ok := <-primaryq:
 			if !ok {
 				log.Println("dns: primary queue has been closed")
-				goto out
+				return
 			}
 			if debug.Value >= 1 {
-				fmt.Printf("dns: ^ %s %s %d:%s\n",
-					tag, remoteAddr,
+				fmt.Printf("dns: ^ %s %s %d:%s\n", tag, nameserver,
 					req.message.Header.ID,
 					req.message.Question.String())
 			}
 
-			cl, err := NewTCPClient(remoteAddr)
+			cl, err := NewTCPClient(nameserver)
 			if err != nil {
-				log.Printf("dns: failed to create forwarder %s: %s\n", tag, err.Error())
+				log.Printf("dns: failed to create forwarder %s: %s", tag, err.Error())
 				err = nil
 				continue
 			}
@@ -1016,7 +1016,7 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 			res, err := cl.Query(req.message)
 			cl.Close()
 			if err != nil {
-				log.Printf("dns: %s forward failed: %s\n", tag, err.Error())
+				log.Printf("dns: %s forward failed: %s", tag, err.Error())
 				if fallbackq != nil {
 					fallbackq <- req
 				}
@@ -1025,99 +1025,99 @@ func (srv *Server) runTCPForwarder(remoteAddr string, primaryq, fallbackq chan *
 
 			srv.processResponse(req, res)
 		case <-stopper:
-			goto out
+			return
 		}
 	}
-out:
-	if fallbackq != nil {
-		srv.decForwarder()
-	}
-	srv.fwGroup.Done()
-	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, remoteAddr)
 }
 
 //
 // runUDPForwarder create a UDP client that consume request from forward queue
-// and forward it to parent server at "remoteAddr".
+// and forward it to parent server at "nameserver".
 //
-func (srv *Server) runUDPForwarder(remoteAddr string, primaryq, fallbackq chan *request, tag string) {
-	var (
-		res       *Message
-		isRunning = true
-		stopper   = srv.newStopper()
-	)
+func (srv *Server) runUDPForwarder(tag, nameserver string,
+	primaryq <-chan *request, fallbackq chan<- *request,
+) {
+	stopper := srv.newStopper()
+
+	defer func() {
+		srv.fwGroup.Done()
+		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
+	}()
 
 	// The first loop handle broken connection.
-	for isRunning {
-		forwarder, err := NewUDPClient(remoteAddr)
+	for {
+		forwarder, err := NewUDPClient(nameserver)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s\n",
+			log.Printf("dns: failed to create forwarder %s: %s",
 				tag, err.Error())
 
 			select {
 			case <-stopper:
-				isRunning = false
-				goto out
+				srv.stopForwarder(nil, fallbackq == nil)
+				return
 			default:
 				time.Sleep(3 * time.Second)
 			}
 			continue
 		}
 
-		log.Printf("dns: forwarder %s for %s has been connected ...\n", tag, remoteAddr)
+		log.Printf("dns: forwarder %s for %s has been connected ...", tag, nameserver)
 
 		if fallbackq != nil {
 			srv.incForwarder()
 		}
 
 		// The second loop consume the forward queue.
-		for err == nil {
+		isRunning := true
+		for isRunning {
 			select {
 			case req, ok := <-primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
-					isRunning = false
-					break
+					srv.stopForwarder(forwarder, fallbackq == nil)
+					return
 				}
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
-						tag, remoteAddr,
+						tag, nameserver,
 						req.message.Header.ID,
 						req.message.Question.String())
 				}
 
-				res, err = forwarder.Query(req.message)
+				res, err := forwarder.Query(req.message)
 				if err != nil {
-					log.Printf("dns: %s forward failed: %s\n", tag, err.Error())
+					log.Printf("dns: %s forward failed: %s", tag, err.Error())
 					if fallbackq != nil {
 						fallbackq <- req
 					}
-				} else {
-					srv.processResponse(req, res)
+					isRunning = false
+					continue
 				}
+				srv.processResponse(req, res)
 			case <-stopper:
-				isRunning = false
-				goto out
+				srv.stopForwarder(forwarder, fallbackq == nil)
+				return
 			}
 		}
 
-		log.Printf("dns: reconnect forwarder %s for %s\n", tag, remoteAddr)
-	out:
-		if forwarder != nil {
-			forwarder.Close()
-		}
-		if fallbackq != nil {
-			srv.decForwarder()
-		}
+		log.Printf("dns: reconnect forwarder %s for %s", tag, nameserver)
+		srv.stopForwarder(forwarder, fallbackq == nil)
 	}
-	srv.fwGroup.Done()
-	log.Printf("dns: forwarder %s for %s has been stopped\n", tag, remoteAddr)
+}
+
+func (srv *Server) stopForwarder(fw Client, hasFallback bool) {
+	if fw != nil {
+		fw.Close()
+	}
+	if hasFallback {
+		srv.decForwarder()
+	}
 }
 
 //
-// stopForwarders stop all forwarder connections.
+// stopAllForwarders stop all forwarder connections.
 //
-func (srv *Server) stopForwarders() {
+func (srv *Server) stopAllForwarders() {
 	for x := 0; x < len(srv.fwStoppers); x++ {
 		srv.fwStoppers[x] <- true
 	}
@@ -1129,14 +1129,14 @@ func (srv *Server) stopForwarders() {
 	fmt.Println("dns: all forwarders has been stopped")
 }
 
-func (srv *Server) newStopper() (stopper chan bool) {
+func (srv *Server) newStopper() <-chan bool {
 	srv.fwLocker.Lock()
 
-	stopper = make(chan bool, 1)
+	stopper := make(chan bool, 1)
 	srv.fwStoppers = append(srv.fwStoppers, stopper)
 	srv.fwGroup.Add(1)
 
 	srv.fwLocker.Unlock()
 
-	return
+	return stopper
 }
