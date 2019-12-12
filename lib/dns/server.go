@@ -781,57 +781,46 @@ func (srv *Server) startAllForwarders() {
 	asFallback := "fallback"
 	asPrimary := "primary"
 
-	nforwarders := 0
 	for x := 0; x < len(srv.opts.primaryUDP); x++ {
-		tag := fmt.Sprintf("UDP-%d-%s", nforwarders, asPrimary)
+		tag := fmt.Sprintf("UDP-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryUDP[x].String()
 		go srv.runUDPForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
-		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryTCP); x++ {
-		tag := fmt.Sprintf("TCP-%d-%s", nforwarders, asPrimary)
+		tag := fmt.Sprintf("TCP-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryTCP[x].String()
 		go srv.runTCPForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
-		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryDoh); x++ {
-		tag := fmt.Sprintf("DoH-%d-%s", nforwarders, asPrimary)
+		tag := fmt.Sprintf("DoH-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryDoh[x]
 		go srv.runDohForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
-		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.primaryDot); x++ {
-		tag := fmt.Sprintf("DoT-%d-%s", nforwarders, asPrimary)
+		tag := fmt.Sprintf("DoT-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryDot[x]
 		go srv.runTLSForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
-		nforwarders++
 	}
-
-	nforwarders = 0
 
 	for x := 0; x < len(srv.opts.fallbackUDP); x++ {
-		tag := fmt.Sprintf("UDP-%d-%s", nforwarders, asFallback)
+		tag := fmt.Sprintf("UDP-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackUDP[x].String()
 		go srv.runUDPForwarder(tag, nameserver, srv.fallbackq, nil)
-		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackTCP); x++ {
-		tag := fmt.Sprintf("TCP-%d-%s", nforwarders, asFallback)
+		tag := fmt.Sprintf("TCP-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackTCP[x].String()
 		go srv.runTCPForwarder(tag, nameserver, srv.fallbackq, nil)
-		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackDoh); x++ {
-		tag := fmt.Sprintf("DoH-%d-%s", nforwarders, asFallback)
+		tag := fmt.Sprintf("DoH-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackDoh[x]
 		go srv.runDohForwarder(tag, nameserver, srv.fallbackq, nil)
-		nforwarders++
 	}
 	for x := 0; x < len(srv.opts.fallbackDot); x++ {
-		tag := fmt.Sprintf("DoT-%d-%s", nforwarders, asFallback)
+		tag := fmt.Sprintf("DoT-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackDot[x]
 		go srv.runTLSForwarder(tag, nameserver, srv.fallbackq, nil)
-		nforwarders++
 	}
 }
 
