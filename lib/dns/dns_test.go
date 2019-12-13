@@ -45,14 +45,12 @@ func TestMain(m *testing.M) {
 
 	_testServer.LoadMasterFile("testdata/kilabit.info")
 
-	_testServer.Start()
+	go _testServer.ListenAndServe()
 
 	// Wait for all listeners running.
 	time.Sleep(500 * time.Millisecond)
 
-	s := m.Run()
-
-	os.Exit(s)
+	os.Exit(m.Run())
 }
 
 func TestQueryType(t *testing.T) {

@@ -323,17 +323,21 @@ func (srv *Server) RestartForwarders(nameServers, fallbackNS []string) {
 }
 
 //
-// Start the server, listening and serve query from clients.
+// ListenAndServe start listening and serve queries from clients.
 //
-func (srv *Server) Start() {
+func (srv *Server) ListenAndServe() (err error) {
 	srv.startAllForwarders()
 
 	go srv.processRequest()
-
 	go srv.serveDoT()
 	go srv.serveDoH()
 	go srv.serveTCP()
 	go srv.serveUDP()
+
+	err = <-srv.errListener
+	srv.Stop()
+
+	return err
 }
 
 //
@@ -348,26 +352,16 @@ func (srv *Server) Stop() {
 	if err != nil {
 		log.Println("dns: error when closing TCP: " + err.Error())
 	}
+	err = srv.dot.Close()
+	if err != nil {
+		log.Println("dns: error when closing DoT: " + err.Error())
+	}
 	err = srv.doh.Close()
 	if err != nil {
 		log.Println("dns: error when closing DoH: " + err.Error())
 	}
 
 	close(srv.requestq)
-}
-
-//
-// Wait for server to be Stop()-ed or when one of listener throw an error.
-//
-func (srv *Server) Wait() (err error) {
-	err = <-srv.errListener
-	if err != nil && err != io.EOF {
-		log.Println(err)
-	}
-
-	srv.Stop()
-
-	return err
 }
 
 //

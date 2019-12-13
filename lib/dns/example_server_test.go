@@ -52,7 +52,7 @@ func ExampleServer() {
 	// Load records to be served from master file.
 	server.LoadMasterFile("testdata/kilabit.info")
 
-	server.Start()
+	go server.ListenAndServe()
 
 	// Wait for all listeners running.
 	time.Sleep(500 * time.Millisecond)
