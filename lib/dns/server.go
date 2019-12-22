@@ -89,8 +89,7 @@ type Server struct {
 
 	fwLocker   sync.Mutex
 	fwStoppers []chan bool
-	fwGroup    *sync.WaitGroup // fwGroup maintain reference counting for all forwarders.
-	fwn        int             // Number of forwarders currently running.
+	fwn        int // Number of forwarders currently running.
 }
 
 //
@@ -107,7 +106,6 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 		requestq:  make(chan *request, 512),
 		primaryq:  make(chan *request, 512),
 		fallbackq: make(chan *request, 512),
-		fwGroup:   &sync.WaitGroup{},
 	}
 
 	udpAddr := opts.getUDPAddress()
@@ -824,7 +822,6 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 	stopper := srv.newStopper()
 
 	defer func() {
-		srv.fwGroup.Done()
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
@@ -893,7 +890,6 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 	stopper := srv.newStopper()
 
 	defer func() {
-		srv.fwGroup.Done()
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
@@ -972,10 +968,10 @@ func (srv *Server) runTCPForwarder(tag, nameserver string,
 		if fallbackq != nil {
 			srv.decForwarder()
 		}
-		srv.fwGroup.Done()
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
+	ticker := time.NewTicker(aliveInterval)
 	for {
 		select {
 		case req, ok := <-primaryq:
@@ -1023,7 +1019,6 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 	stopper := srv.newStopper()
 
 	defer func() {
-		srv.fwGroup.Done()
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
@@ -1104,7 +1099,6 @@ func (srv *Server) stopAllForwarders() {
 	for x := 0; x < len(srv.fwStoppers); x++ {
 		srv.fwStoppers[x] <- true
 	}
-	srv.fwGroup.Wait()
 	for x := 0; x < len(srv.fwStoppers); x++ {
 		close(srv.fwStoppers[x])
 	}
@@ -1117,7 +1111,6 @@ func (srv *Server) newStopper() <-chan bool {
 
 	stopper := make(chan bool, 1)
 	srv.fwStoppers = append(srv.fwStoppers, stopper)
-	srv.fwGroup.Add(1)
 
 	srv.fwLocker.Unlock()
 
