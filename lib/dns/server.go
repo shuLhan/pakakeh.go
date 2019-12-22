@@ -24,6 +24,10 @@ import (
 	"github.com/shuLhan/share/lib/debug"
 )
 
+const (
+	aliveInterval = 10 * time.Second
+)
+
 //
 // Server defines DNS server.
 //
@@ -848,6 +852,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 		}
 
 		isRunning := true
+		ticker := time.NewTicker(aliveInterval)
 		for isRunning {
 			select {
 			case req, ok := <-primaryq:
@@ -873,6 +878,10 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 					continue
 				}
 				srv.processResponse(req, res)
+			case <-ticker.C:
+				if debug.Value >= 2 {
+					log.Printf("dns: %s alive", tag)
+				}
 			case <-stopper:
 				srv.stopForwarder(forwarder, fallbackq == nil)
 				return
@@ -916,6 +925,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 		}
 
 		isRunning := true
+		ticker := time.NewTicker(aliveInterval)
 		for isRunning {
 			select {
 			case req, ok := <-primaryq:
@@ -942,6 +952,10 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 				}
 
 				srv.processResponse(req, res)
+			case <-ticker.C:
+				if debug.Value >= 2 {
+					log.Printf("dns: %s alive", tag)
+				}
 			case <-stopper:
 				srv.stopForwarder(forwarder, fallbackq == nil)
 				return
@@ -1003,6 +1017,10 @@ func (srv *Server) runTCPForwarder(tag, nameserver string,
 			}
 
 			srv.processResponse(req, res)
+		case <-ticker.C:
+			if debug.Value >= 2 {
+				log.Printf("dns: %s alive", tag)
+			}
 		case <-stopper:
 			return
 		}
@@ -1047,6 +1065,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 
 		// The second loop consume the forward queue.
 		isRunning := true
+		ticker := time.NewTicker(aliveInterval)
 		for isRunning {
 			select {
 			case req, ok := <-primaryq:
@@ -1072,6 +1091,10 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 					continue
 				}
 				srv.processResponse(req, res)
+			case <-ticker.C:
+				if debug.Value >= 2 {
+					log.Printf("dns: %s alive", tag)
+				}
 			case <-stopper:
 				srv.stopForwarder(forwarder, fallbackq == nil)
 				return
