@@ -10,20 +10,32 @@ import (
 )
 
 //
-// E define custom error type with code.
+// E define custom error that wrap underlying error with custom code, message,
+// and name.
+//
+// The Code field is required, used to communicate the HTTP response code.
+// The Message field is optional, it's used to communicate the actual error
+// message from server, to be readable by human.
+// The Name field is optional, intended to be consumed by program, for
+// example, to provide a key as translation of Message into user's locale
+// defined language.
 //
 type E struct {
-	Code    int
-	Message string
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+	Name    string `json:"name,omitempty"`
+	err     error
 }
 
 //
-// Internal define an error for internal server.
+// Internal define an error caused by server.
 //
-func Internal() *E {
+func Internal(err error) *E {
 	return &E{
 		Code:    http.StatusInternalServerError,
-		Message: "Internal server error",
+		Message: "internal server error",
+		Name:    "ERR_INTERNAL",
+		err:     err,
 	}
 }
 
@@ -33,7 +45,8 @@ func Internal() *E {
 func InvalidInput(field string) *E {
 	return &E{
 		Code:    http.StatusBadRequest,
-		Message: "Invalid input: " + field,
+		Message: "invalid input: " + field,
+		Name:    "ERR_INVALID_INPUT",
 	}
 }
 
@@ -42,4 +55,11 @@ func InvalidInput(field string) *E {
 //
 func (e *E) Error() string {
 	return e.Message
+}
+
+//
+// Unwrap return the internal error.
+//
+func (e *E) Unwrap() error {
+	return e.err
 }

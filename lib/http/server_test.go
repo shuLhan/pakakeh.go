@@ -650,9 +650,7 @@ func TestStatusError(t *testing.T) {
 	cbNoCode := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
 		[]byte, error,
 	) {
-		return nil, &errors.E{
-			Message: "Internal server error",
-		}
+		return nil, errors.Internal(nil)
 	}
 
 	cbCustomErr := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
@@ -756,12 +754,12 @@ func TestStatusError(t *testing.T) {
 		desc:          "With registered error plain",
 		reqURL:        "http://127.0.0.1:8080/error/no-code?k=v",
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `{"code":500,"message":"Internal server error"}`,
+		expBody:       `{"code":500,"message":"internal server error","name":"ERR_INTERNAL"}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        "http://127.0.0.1:8080/error/custom?k=v",
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `{"code":500,"message":"Custom error"}`,
+		expBody:       `{"code":500,"message":"internal server error","name":"ERR_INTERNAL"}`,
 	}}
 
 	for _, c := range cases {

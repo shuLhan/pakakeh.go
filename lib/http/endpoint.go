@@ -6,14 +6,13 @@ package http
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/errors"
-	"github.com/shuLhan/share/lib/strings"
 )
 
 //
@@ -156,10 +155,7 @@ func (ep *Endpoint) call(
 func (ep *Endpoint) error(res http.ResponseWriter, e error) {
 	se, ok := e.(*errors.E)
 	if !ok {
-		se = &errors.E{
-			Code:    http.StatusInternalServerError,
-			Message: e.Error(),
-		}
+		se = errors.Internal(e)
 	} else if se.Code == 0 {
 		se.Code = http.StatusInternalServerError
 	}
@@ -167,8 +163,11 @@ func (ep *Endpoint) error(res http.ResponseWriter, e error) {
 	res.WriteHeader(se.Code)
 	res.Header().Set(ContentType, ContentTypeJSON)
 
-	rsp := fmt.Sprintf(`{"code":%d,"message":"%s"}`, se.Code,
-		strings.JSONEscape(se.Message))
+	rsp, err := json.Marshal(se)
+	if err != nil {
+		log.Println("endpoint.error: ", e)
+		return
+	}
 
 	_, e = res.Write([]byte(rsp))
 	if e != nil {
