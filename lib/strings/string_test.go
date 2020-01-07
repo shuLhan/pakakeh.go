@@ -169,6 +169,22 @@ func TestMergeSpaces(t *testing.T) {
 	}
 }
 
+func TestReverse(t *testing.T) {
+	cases := []struct {
+		input string
+		exp   string
+	}{{
+		input: "The quick bròwn 狐 jumped over the lazy 犬",
+		exp:   "犬 yzal eht revo depmuj 狐 nwòrb kciuq ehT",
+	}}
+
+	for _, c := range cases {
+		got := Reverse(c.input)
+
+		test.Assert(t, "Reverse", c.exp, got, true)
+	}
+}
+
 func TestSplit(t *testing.T) {
 	cases := []struct {
 		text string

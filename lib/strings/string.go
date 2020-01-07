@@ -164,6 +164,21 @@ func MergeSpaces(text string, withline bool) string {
 }
 
 //
+// Reverse the string.
+//
+func Reverse(input string) string {
+	r := []rune(input)
+	x := 0
+	y := len(r) - 1
+	for x < len(r)/2 {
+		r[x], r[y] = r[y], r[x]
+		x += 1
+		y -= 1
+	}
+	return string(r)
+}
+
+//
 // Split given a text, return all words in text.
 //
 // A word is any sequence of character which have length equal or greater than
