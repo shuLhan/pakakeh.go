@@ -106,7 +106,7 @@ func JSONEscape(in string) string {
 }
 
 //
-// JSONUnescape unescape JSON string, reversing what StringJSONEscape
+// JSONUnescape unescape JSON string, reversing what JSONEscape
 // do.
 //
 // If strict is true, any unknown control character will be returned as error.
