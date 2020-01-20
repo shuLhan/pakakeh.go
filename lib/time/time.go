@@ -38,7 +38,7 @@ var (
 //
 // Microsecond return the microsecond value of time.
 //
-func Microsecond(t *time.Time) int {
+func Microsecond(t *time.Time) int64 {
 	seconds := t.Unix() * int64(time.Second)
-	return int(t.UnixNano()-seconds) / int(time.Microsecond)
+	return (t.UnixNano() - seconds) / int64(time.Microsecond)
 }
