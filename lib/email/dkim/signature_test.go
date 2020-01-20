@@ -160,6 +160,7 @@ func TestSignatureParse(t *testing.T) {
 			" Subject:demo=20run|" +
 			" Date:July=205,=202005=203:44:08=20PM=20-0700;" +
 			" i=@eng.example.net; q=dns/txt\r\n",
+		expErr:         "dkim: signature is expired at '2019-12-31 17:00:00 +0000 UTC'",
 		expValidateErr: "dkim: signature is expired at '2005-06-05 21:28:58 +0000 UTC'",
 	}, {
 		desc: "RFC 6376 section A.2",
@@ -473,6 +474,7 @@ func TestSignatureValidate(t *testing.T) {
 			"t=1000; x=1577811600; c=simple;\r\n " +
 			"z=Sender:me@domain.com;\r\n " +
 			"i=my@test.com; \r\n",
+		expErr: "dkim: signature is expired at '2019-12-31 17:00:00 +0000 UTC'",
 	}}
 
 	for _, c := range cases {

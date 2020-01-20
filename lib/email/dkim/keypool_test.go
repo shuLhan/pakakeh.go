@@ -75,10 +75,10 @@ func TestKeyPoolGet(t *testing.T) {
 		dname: "",
 	}, {
 		dname: "example.com",
-		exp:   "p=example.com",
+		exp:   "v=spf1 -all",
 	}, {
 		dname: "example.net",
-		exp:   "p=example.net",
+		exp:   "v=spf1 -all",
 	}, {
 		dname:  "amazon.com",
 		expErr: "dkim: LookupKey: multiple TXT records on 'amazon.com'",
