@@ -4,6 +4,21 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.12.0 (2020-01-xx)
+
+===  Breaking changes
+
+*  time: change the Microsecond return type from int to int64
+
+===  New features
+
+*  xmlrpc: new package for working with XML-RPC
+
+===  Enhancements
+
+*  strings: add function to reverse a string
+
+
 ==  share v0.11.0 (2019-12-26)
 
 ===  Breaking changes
