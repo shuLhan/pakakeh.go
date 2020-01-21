@@ -35,12 +35,12 @@ func newAffix(name string, isPrefix, isCrossProduct bool, nrules int) (afx *affi
 //
 // addRule to affix.
 //
-func (afx *affix) addRule(spell *Spell,
+func (afx *affix) addRule(opts *affixOptions,
 	stripping, affix, condition string, morphemes []string,
 ) (
 	err error,
 ) {
-	rule, err := newAffixRule(spell, afx.isPrefix, stripping,
+	rule, err := newAffixRule(opts, afx.isPrefix, stripping,
 		affix, condition, morphemes)
 	if err != nil {
 		return err

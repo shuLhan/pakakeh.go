@@ -138,20 +138,20 @@ func (s *stem) parse(line string) (err error) {
 //
 // unpack parse the stem and flags.
 //
-func (s *stem) unpack(spell *Spell) (derivatives []string, err error) {
+func (s *stem) unpack(opts *affixOptions) (derivatives []string, err error) {
 	if s.value[0] == '*' {
 		s.isForbidden = true
 		s.value = s.value[1:]
 	}
 
-	if len(spell.afAliases) > 1 {
+	if len(opts.afAliases) > 1 {
 		afIdx, err := strconv.Atoi(s.flags)
 		if err == nil {
-			s.flags = spell.afAliases[afIdx]
+			s.flags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(spell.flag, s.flags)
+	flags, err := unpackFlags(opts.flag, s.flags)
 	if err != nil {
 		return nil, err
 	}
@@ -160,17 +160,17 @@ func (s *stem) unpack(spell *Spell) (derivatives []string, err error) {
 	}
 
 	for x, flag := range flags {
-		pfx, ok := spell.prefixes[flag]
+		pfx, ok := opts.prefixes[flag]
 		if ok {
 			words := pfx.apply(s.value)
 			derivatives = append(derivatives, words...)
 			if pfx.isCrossProduct {
-				words = s.applySuffixes(spell, flags[x+1:], words)
+				words = s.applySuffixes(opts, flags[x+1:], words)
 				derivatives = append(derivatives, words...)
 			}
 			continue
 		}
-		sfx, ok := spell.suffixes[flag]
+		sfx, ok := opts.suffixes[flag]
 		if ok {
 			words := sfx.apply(s.value)
 			derivatives = append(derivatives, words...)
@@ -186,12 +186,12 @@ func (s *stem) unpack(spell *Spell) (derivatives []string, err error) {
 // applySuffixes apply any cross-product "suffixes" in "flags" for each word
 // in "words".
 //
-func (s *stem) applySuffixes(spell *Spell, flags, words []string) (
+func (s *stem) applySuffixes(opts *affixOptions, flags, words []string) (
 	derivatives []string,
 ) {
 	for _, word := range words {
 		for _, s := range flags {
-			sfx, ok := spell.suffixes[s]
+			sfx, ok := opts.suffixes[s]
 			if !ok {
 				continue
 			}

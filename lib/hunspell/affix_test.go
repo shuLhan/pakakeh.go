@@ -13,7 +13,9 @@ import (
 func TestPrefix_apply(t *testing.T) {
 	isPrefix := true
 	spell := &Spell{
-		flag: FlagASCII,
+		opts: affixOptions{
+			flag: FlagASCII,
+		},
 	}
 
 	rawrules := []struct {
@@ -28,7 +30,7 @@ func TestPrefix_apply(t *testing.T) {
 	afx := newAffix("P", isPrefix, true, len(rawrules))
 
 	for _, r := range rawrules {
-		err := afx.addRule(spell, r.stripping, r.affix, r.condition,
+		err := afx.addRule(&spell.opts, r.stripping, r.affix, r.condition,
 			r.morphemes)
 		if err != nil {
 			t.Fatal(err)
@@ -56,7 +58,9 @@ func TestPrefix_apply(t *testing.T) {
 func TestSuffix_apply(t *testing.T) {
 	isPrefix := false
 	spell := &Spell{
-		flag: FlagASCII,
+		opts: affixOptions{
+			flag: FlagASCII,
+		},
 	}
 
 	rawrules := []struct {
@@ -71,7 +75,7 @@ func TestSuffix_apply(t *testing.T) {
 	afx := newAffix("S", isPrefix, true, len(rawrules))
 
 	for _, r := range rawrules {
-		err := afx.addRule(spell, r.stripping, r.affix, r.condition,
+		err := afx.addRule(&spell.opts, r.stripping, r.affix, r.condition,
 			r.morphemes)
 		if err != nil {
 			t.Fatal(err)

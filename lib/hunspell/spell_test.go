@@ -39,13 +39,13 @@ func TestSpell_parseMap(t *testing.T) {
 	spell := &Spell{}
 
 	for _, c := range cases {
-		spell.charsMaps = make([]charsmap, 0, 1)
+		spell.opts.charsMaps = make([]charsmap, 0, 1)
 
-		err := spell.parseMap(c.arg)
+		err := spell.opts.parseMap(c.arg)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Map", c.exp, spell.charsMaps, true)
+		test.Assert(t, "Map", c.exp, spell.opts.charsMaps, true)
 	}
 }

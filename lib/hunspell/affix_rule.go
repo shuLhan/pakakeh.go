@@ -42,19 +42,19 @@ type affixRule struct {
 	morphemes []string
 }
 
-func newAffixRule(spell *Spell, isPrefix bool,
+func newAffixRule(opts *affixOptions, isPrefix bool,
 	stripping, affix, condition string, morphemes []string,
 ) (
 	rule *affixRule, err error,
 ) {
-	affixes := spell.suffixes
+	affixes := opts.suffixes
 
 	rule = &affixRule{
 		morphemes: morphemes,
 	}
 
 	if isPrefix {
-		affixes = spell.prefixes
+		affixes = opts.prefixes
 	}
 
 	if stripping != "0" {
@@ -69,7 +69,7 @@ func newAffixRule(spell *Spell, isPrefix bool,
 		if len(affixflag) > 1 {
 			rule.flags = affixflag[1]
 
-			err = rule.unpackFlags(spell, affixes)
+			err = rule.unpackFlags(opts, affixes)
 			if err != nil {
 				return nil, err
 			}
@@ -93,15 +93,15 @@ func newAffixRule(spell *Spell, isPrefix bool,
 //
 // unpackFlags apply each of flag rule to the "root" string.
 //
-func (rule *affixRule) unpackFlags(spell *Spell, affixes map[string]*affix) (err error) {
-	if len(spell.afAliases) > 1 {
+func (rule *affixRule) unpackFlags(opts *affixOptions, affixes map[string]*affix) (err error) {
+	if len(opts.afAliases) > 1 {
 		afIdx, err := strconv.Atoi(rule.flags)
 		if err == nil {
-			rule.flags = spell.afAliases[afIdx]
+			rule.flags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(spell.flag, rule.flags)
+	flags, err := unpackFlags(opts.flag, rule.flags)
 	if err != nil {
 		return err
 	}

@@ -128,6 +128,7 @@ const (
 
 // List of default values.
 const (
-	DefaultEncoding = EncodingUTF8
-	DefaultFlag     = FlagASCII
+	DefaultEncoding        = EncodingUTF8
+	DefaultFlag            = FlagASCII
+	defaultMinimumCompound = 3
 )

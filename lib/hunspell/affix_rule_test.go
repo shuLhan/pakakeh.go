@@ -14,7 +14,9 @@ import (
 func TestNewAffixRule_prefix(t *testing.T) {
 	var isPrefix = true
 	var spell = &Spell{
-		flag: FlagASCII,
+		opts: affixOptions{
+			flag: FlagASCII,
+		},
 	}
 
 	cases := []struct {
@@ -48,7 +50,7 @@ func TestNewAffixRule_prefix(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got, err := newAffixRule(spell, isPrefix,
+		got, err := newAffixRule(&spell.opts, isPrefix,
 			c.stripping, c.affix, c.condition, nil)
 		if err != nil {
 			t.Fatal(err)
