@@ -688,13 +688,7 @@ func (srv *Server) processRequest() {
 			if srv.hasForwarders() {
 				srv.primaryq <- req
 			} else {
-				if debug.Value >= 1 {
-					fmt.Printf("dns: * %s %d:%s\n",
-						connTypeNames[req.kind],
-						req.message.Header.ID,
-						req.message.Question.String())
-				}
-				req.error(RCodeErrServer)
+				srv.fallbackq <- req
 			}
 			continue
 		}
@@ -709,13 +703,7 @@ func (srv *Server) processRequest() {
 				}
 				srv.primaryq <- req
 			} else {
-				if debug.Value >= 1 {
-					fmt.Printf("dns: * %s %d:%s\n",
-						connTypeNames[req.kind],
-						req.message.Header.ID,
-						req.message.Question.String())
-				}
-				req.error(RCodeErrServer)
+				srv.fallbackq <- req
 			}
 			continue
 		}
