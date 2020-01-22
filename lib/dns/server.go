@@ -106,10 +106,9 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	}
 
 	srv = &Server{
-		opts:      opts,
-		requestq:  make(chan *request, 512),
-		primaryq:  make(chan *request, 512),
-		fallbackq: make(chan *request, 512),
+		opts:     opts,
+		requestq: make(chan *request, 512),
+		primaryq: make(chan *request, 512),
 	}
 
 	udpAddr := opts.getUDPAddress()
@@ -687,8 +686,16 @@ func (srv *Server) processRequest() {
 		if ans == nil || an == nil {
 			if srv.hasForwarders() {
 				srv.primaryq <- req
-			} else {
+			} else if srv.fallbackq != nil {
 				srv.fallbackq <- req
+			} else {
+				if debug.Value >= 1 {
+					fmt.Printf("dns: * %s %d:%s\n",
+						connTypeNames[req.kind],
+						req.message.Header.ID,
+						req.message.Question.String())
+				}
+				req.error(RCodeErrServer)
 			}
 			continue
 		}
@@ -702,8 +709,16 @@ func (srv *Server) processRequest() {
 						req.message.Question.String())
 				}
 				srv.primaryq <- req
-			} else {
+			} else if srv.fallbackq != nil {
 				srv.fallbackq <- req
+			} else {
+				if debug.Value >= 1 {
+					fmt.Printf("dns: * %s %d:%s\n",
+						connTypeNames[req.kind],
+						req.message.Header.ID,
+						req.message.Question.String())
+				}
+				req.error(RCodeErrServer)
 			}
 			continue
 		}
@@ -765,6 +780,12 @@ func (srv *Server) startAllForwarders() {
 	asFallback := "fallback"
 	asPrimary := "primary"
 
+	if srv.opts.hasFallback() && srv.fallbackq == nil {
+		srv.fallbackq = make(chan *request, 512)
+	} else {
+		srv.fallbackq = nil
+	}
+
 	for x := 0; x < len(srv.opts.primaryUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryUDP[x].String()
@@ -784,6 +805,10 @@ func (srv *Server) startAllForwarders() {
 		tag := fmt.Sprintf("DoT-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryDot[x]
 		go srv.runTLSForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
+	}
+
+	if !srv.opts.hasFallback() {
+		return
 	}
 
 	for x := 0; x < len(srv.opts.fallbackUDP); x++ {
