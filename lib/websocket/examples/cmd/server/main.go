@@ -118,7 +118,7 @@ func handleClientRemove(ctx context.Context, conn int) {
 //
 // handlePostMessage handle message that is send to server by client.
 //
-func handlePostMessage(ctx context.Context, req *websocket.Request, res *websocket.Response) {
+func handlePostMessage(ctx context.Context, req *websocket.Request) (res websocket.Response) {
 	uid := ctx.Value(websocket.CtxKeyUID).(int64)
 	user := examples.Users[uid]
 
@@ -129,7 +129,7 @@ func handlePostMessage(ctx context.Context, req *websocket.Request, res *websock
 	if err != nil {
 		res.Code = http.StatusInternalServerError
 		res.Body = err.Error()
-		return
+		return res
 	}
 
 	// Broadcast the message to all connected clients, including our
@@ -147,4 +147,6 @@ func handlePostMessage(ctx context.Context, req *websocket.Request, res *websock
 
 	// Set the response status to success.
 	res.Code = http.StatusOK
+
+	return res
 }

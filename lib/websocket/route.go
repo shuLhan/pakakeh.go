@@ -14,7 +14,7 @@ import (
 // RouteHandler is a function that will be called when registered method and
 // target match with request.
 //
-type RouteHandler func(ctx context.Context, req *Request, res *Response)
+type RouteHandler func(ctx context.Context, req *Request) (res Response)
 
 type route struct {
 	name    string

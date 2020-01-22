@@ -20,8 +20,9 @@ var (
 )
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {
-	return func(ctx context.Context, req *Request, res *Response) { //nolint:unparam
+	return func(ctx context.Context, req *Request) (res Response) { //nolint:unparam
 		test.Assert(t, "routeHandler", target, req.Target, true)
+		return
 	}
 }
 
@@ -235,7 +236,7 @@ func testRootRouteGet(t *testing.T) {
 		test.Assert(t, "params", c.expParams, gotParams, true)
 
 		if gotHandler != nil {
-			gotHandler(context.Background(), &Request{Target: c.expTarget}, nil)
+			gotHandler(context.Background(), &Request{Target: c.expTarget})
 		}
 	}
 }

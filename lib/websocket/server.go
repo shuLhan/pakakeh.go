@@ -446,7 +446,7 @@ func (serv *Server) handleText(conn int, payload []byte) {
 
 	req.Conn = conn
 
-	handler(ctx, req, res)
+	*res = handler(ctx, req)
 
 out:
 	res.ID = req.ID
