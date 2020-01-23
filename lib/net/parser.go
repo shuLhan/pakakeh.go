@@ -12,8 +12,8 @@ import (
 
 //
 // ParseIPPort parse address into IP and port.
-// If address is not an IP address, it will the address as hostname (without
-// port number if its exist) with nil on ip.
+// If address is not an IP address, it will return the address as hostname
+// (without port number if its exist) and nil on ip.
 // In case of port is empty or invalid, it will set to defPort.
 //
 func ParseIPPort(address string, defPort uint16) (hostname string, ip net.IP, port uint16) {
