@@ -13,7 +13,8 @@ import (
 //
 type ServerOptions struct {
 	// Root contains path to file system to be served.
-	// This field is required.
+	// This field is options, if its empty the server will not serve the
+	// file system only registered handler.
 	Root string
 
 	// Address define listen address, using ip:port format.
