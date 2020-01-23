@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"time"
 )
 
 //nolint:lll,gochecknoglobals
@@ -113,12 +114,12 @@ func runTestServer() {
 			log.Fatal("runTestServer: " + err.Error())
 		}
 	}()
+
+	time.Sleep(1 * time.Second)
 }
 
 func TestMain(m *testing.M) {
 	runTestServer()
 
-	s := m.Run()
-
-	os.Exit(s)
+	os.Exit(m.Run())
 }
