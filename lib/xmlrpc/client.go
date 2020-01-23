@@ -15,6 +15,7 @@ import (
 	"time"
 
 	libhttp "github.com/shuLhan/share/lib/http"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 const (
@@ -50,31 +51,20 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 		timeout = defaultTimeout
 	}
 
+	host, ip, port := libnet.ParseIPPort(url.Host, 0)
+
 	client = &Client{
 		url:     url,
 		timeout: timeout,
 	}
 
-	raddr, err := net.ResolveTCPAddr("tcp", url.Host)
-	if err != nil {
-		return nil, fmt.Errorf("NewClient: %w", err)
-	}
-
-	var (
-		host string
-	)
-
 	if url.Scheme == schemeIsHTTPS {
 		var insecure bool
-
-		host, _, err = net.SplitHostPort(url.Host)
-		if err != nil {
-			return nil, fmt.Errorf("NewClient: %w", err)
-		}
-
-		ip := net.ParseIP(host)
 		if ip != nil {
 			insecure = true
+		}
+		if port == 0 {
+			host += ":443"
 		}
 
 		config := &tls.Config{
@@ -82,12 +72,16 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 			InsecureSkipVerify: insecure, //nolint: gosec
 		}
 
-		client.conn, err = tls.Dial("tcp", url.Host, config)
+		client.conn, err = tls.Dial("tcp", host, config)
 	} else {
-		client.conn, err = net.DialTCP("tcp", nil, raddr)
+		if port == 0 {
+			host += ":80"
+		}
+
+		client.conn, err = net.Dial("tcp", host)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("NewClient: %w", err)
+		return nil, fmt.Errorf("NewClient: Dial: %w", err)
 	}
 
 	return client, nil
