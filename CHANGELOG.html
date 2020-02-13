@@ -29,11 +29,12 @@
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_share_v0_12_0_2020_01_xx">share v0.12.0 (2020-01-xx)</a>
+<li><a href="#_share_v0_12_0_2020_02_13">share v0.12.0 (2020-02-13)</a>
 <ul class="sectlevel2">
 <li><a href="#_breaking_changes">Breaking changes</a></li>
 <li><a href="#_new_features">New features</a></li>
 <li><a href="#_enhancements">Enhancements</a></li>
+<li><a href="#_bug_fixes">Bug fixes</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_11_0_2019_12_26">share v0.11.0 (2019-12-26)</a>
@@ -41,17 +42,17 @@
 <li><a href="#_breaking_changes_2">Breaking changes</a></li>
 <li><a href="#_new_features_2">New features</a></li>
 <li><a href="#_enhancements_2">Enhancements</a></li>
-<li><a href="#_bug_fixes">Bug fixes</a></li>
+<li><a href="#_bug_fixes_2">Bug fixes</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_10_2_2019_12_07">share v0.10.2 (2019-12-07)</a>
 <ul class="sectlevel2">
-<li><a href="#_bug_fixes_2">Bug Fixes</a></li>
+<li><a href="#_bug_fixes_3">Bug Fixes</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_10_1_2019_12_05">share v0.10.1 (2019-12-05)</a>
 <ul class="sectlevel2">
-<li><a href="#_bug_fixes_3">Bug Fixes</a></li>
+<li><a href="#_bug_fixes_4">Bug Fixes</a></li>
 <li><a href="#_enhancements_3">Enhancements</a></li>
 </ul>
 </li>
@@ -60,14 +61,14 @@
 <li><a href="#_new_features_3">New Features</a></li>
 <li><a href="#_breaking_changes_3">Breaking Changes</a></li>
 <li><a href="#_enhancements_4">Enhancements</a></li>
-<li><a href="#_bug_fixes_4">Bug Fixes</a></li>
+<li><a href="#_bug_fixes_5">Bug Fixes</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_9_0_2019_10_08">share v0.9.0 (2019-10-08)</a>
 <ul class="sectlevel2">
 <li><a href="#_new_features_4">New Features</a></li>
 <li><a href="#_breaking_changes_4">Breaking Changes</a></li>
-<li><a href="#_bug_fixes_5">Bug Fixes</a></li>
+<li><a href="#_bug_fixes_6">Bug Fixes</a></li>
 <li><a href="#_enhancements_5">Enhancements</a></li>
 </ul>
 </li>
@@ -93,7 +94,7 @@
 <li><a href="#_breaking_changes_6">Breaking Changes</a></li>
 <li><a href="#_new_features_6">New Features</a></li>
 <li><a href="#_enhancements_9">Enhancements</a></li>
-<li><a href="#_bug_fixes_6">Bug Fixes</a></li>
+<li><a href="#_bug_fixes_7">Bug Fixes</a></li>
 </ul>
 </li>
 <li><a href="#_share_v0_6_1_2019_05_11">share v0.6.1 (2019-05-11)</a></li>
@@ -101,7 +102,7 @@
 <ul class="sectlevel2">
 <li><a href="#_breaking_changes_7">Breaking Changes</a></li>
 <li><a href="#_new_features_7">New Features</a></li>
-<li><a href="#_bug_fixes_7">Bug Fixes</a></li>
+<li><a href="#_bug_fixes_8">Bug Fixes</a></li>
 <li><a href="#_documentation">Documentation</a></li>
 </ul>
 </li>
@@ -142,17 +143,23 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="_share_v0_12_0_2020_01_xx">share v0.12.0 (2020-01-xx)</h2>
+<h2 id="_share_v0_12_0_2020_02_13">share v0.12.0 (2020-02-13)</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_breaking_changes">Breaking changes</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>websocket: change the RouteHandler signature to return Response</p>
+<p>bytes: move function JSONEscape and JSONUnescape to package json</p>
+</li>
+<li>
+<p>strings: move JSONEscape and JSONUnescape to package json</p>
 </li>
 <li>
 <p>time: change the Microsecond return type from int to int64</p>
+</li>
+<li>
+<p>websocket: change the RouteHandler signature to return Response</p>
 </li>
 </ul>
 </div>
@@ -161,6 +168,12 @@
 <h3 id="_new_features">New features</h3>
 <div class="ulist">
 <ul>
+<li>
+<p>json: new packages to work with JSON</p>
+</li>
+<li>
+<p>sql: a new package as an extension to &#34;database/sql&#34;</p>
+</li>
 <li>
 <p>xmlrpc: new package for working with XML-RPC</p>
 </li>
@@ -173,6 +186,16 @@
 <ul>
 <li>
 <p>strings: add function to reverse a string</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bug_fixes">Bug fixes</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>dns: fix index out of range when unpacking OPT RR</p>
 </li>
 </ul>
 </div>
@@ -228,7 +251,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bug_fixes">Bug fixes</h3>
+<h3 id="_bug_fixes_2">Bug fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -243,7 +266,7 @@
 <h2 id="_share_v0_10_2_2019_12_07">share v0.10.2 (2019-12-07)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_bug_fixes_2">Bug Fixes</h3>
+<h3 id="_bug_fixes_3">Bug Fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -261,7 +284,7 @@
 <h2 id="_share_v0_10_1_2019_12_05">share v0.10.1 (2019-12-05)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_bug_fixes_3">Bug Fixes</h3>
+<h3 id="_bug_fixes_4">Bug Fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -406,7 +429,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bug_fixes_4">Bug Fixes</h3>
+<h3 id="_bug_fixes_5">Bug Fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -506,7 +529,7 @@ to be an empty string, so &#34;var&#34; value is equal to &#34;&#34;.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bug_fixes_5">Bug Fixes</h3>
+<h3 id="_bug_fixes_6">Bug Fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -766,7 +789,7 @@ simple API.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bug_fixes_6">Bug Fixes</h3>
+<h3 id="_bug_fixes_7">Bug Fixes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -964,7 +987,7 @@ removing the server handler.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bug_fixes_7">Bug Fixes</h3>
+<h3 id="_bug_fixes_8">Bug Fixes</h3>
 <div class="ulist">
 <ul>
 <li>

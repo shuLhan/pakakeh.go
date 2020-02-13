@@ -4,20 +4,28 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.12.0 (2020-01-xx)
+==  share v0.12.0 (2020-02-13)
 
 ===  Breaking changes
 
-*  websocket: change the RouteHandler signature to return Response
+*  bytes: move function JSONEscape and JSONUnescape to package json
+*  strings: move JSONEscape and JSONUnescape to package json
 *  time: change the Microsecond return type from int to int64
+*  websocket: change the RouteHandler signature to return Response
 
 ===  New features
 
+*  json: new packages to work with JSON
+*  sql: a new package as an extension to "database/sql"
 *  xmlrpc: new package for working with XML-RPC
 
 ===  Enhancements
 
 *  strings: add function to reverse a string
+
+===  Bug fixes
+
+*  dns: fix index out of range when unpacking OPT RR
 
 
 ==  share v0.11.0 (2019-12-26)
