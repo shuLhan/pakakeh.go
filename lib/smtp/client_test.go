@@ -6,7 +6,6 @@ package smtp
 
 import (
 	"encoding/base64"
-	"net"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -231,34 +230,6 @@ func TestSendCommand(t *testing.T) {
 		}
 
 		test.Assert(t, "SendCommand", c.exp, got, true)
-	}
-}
-
-func TestLookup(t *testing.T) {
-	cases := []struct {
-		desc    string
-		address string
-		exp     net.IP
-		expErr  string
-	}{{
-		desc:   "With empty address",
-		expErr: "lookup : no such host",
-	}, {
-		desc:    "With MX",
-		address: "kilabit.info",
-		exp:     net.ParseIP("103.200.4.162"),
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		got, err := lookup(c.address)
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
-			continue
-		}
-
-		test.Assert(t, "IP", c.exp.String(), got.String(), true)
 	}
 }
 
