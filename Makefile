@@ -43,7 +43,14 @@ coverbrowse: $(COVER_HTML)
 	xdg-open $<
 
 lint:
-	golangci-lint run --enable-all --disable=funlen --disable=godox ./...
+	golangci-lint run --enable-all \
+		--disable=dupl \
+		--disable=funlen \
+		--disable=godox \
+		--disable=gomnd \
+		--disable=wsl \
+		--disable=gocognit \
+		./...
 
 genhtml:
 	ciigo -template=html.tmpl convert .
