@@ -10,6 +10,13 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+func TestEscape(t *testing.T) {
+	in := []byte("\"\\/\b\f\n\r\t")
+	exp := []byte(`\"\\\/\b\f\n\r\t`)
+	got := Escape(in)
+	test.Assert(t, "Escape", exp, got, true)
+}
+
 func TestToMapStringFloat64(t *testing.T) {
 	in := map[string]interface{}{
 		"string": "1",
@@ -30,4 +37,14 @@ func TestToMapStringFloat64(t *testing.T) {
 	}
 
 	test.Assert(t, "ToMapStringFloat64", exp, got, true)
+}
+
+func TestUnescape(t *testing.T) {
+	in := []byte(`\"\\\/\b\f\n\r\t`)
+	exp := []byte("\"\\/\b\f\n\r\t")
+	got, err := Unescape(in, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	test.Assert(t, "Unescape", exp, got, true)
 }
