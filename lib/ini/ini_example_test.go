@@ -7,6 +7,26 @@ import (
 	"time"
 )
 
+const (
+	testInput = `
+[section]
+key=value1
+key2=
+
+[section "sub"]
+key=value1
+key=value2
+
+[section]
+key=value2
+key2=false
+
+[section "sub"]
+key=value2
+key=value3
+`
+)
+
 func ExampleIni_Add() {
 	ini := new(Ini)
 
@@ -580,25 +600,7 @@ key=value3
 }
 
 func ExampleIni_Vals() {
-	input := `
-[section]
-key=value1
-key2=
-
-[section "sub"]
-key=value1
-key=value2
-
-[section]
-key=value2
-key2=false
-
-[section "sub"]
-key=value2
-key=value3
-`
-
-	ini, err := Parse([]byte(input))
+	ini, err := Parse([]byte(testInput))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -615,25 +617,7 @@ key=value3
 }
 
 func ExampleIni_ValsUniq() {
-	input := `
-[section]
-key=value1
-key2=
-
-[section "sub"]
-key=value1
-key=value2
-
-[section]
-key=value2
-key2=false
-
-[section "sub"]
-key=value2
-key=value3
-`
-
-	ini, err := Parse([]byte(input))
+	ini, err := Parse([]byte(testInput))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -650,25 +634,7 @@ key=value3
 }
 
 func ExampleIni_Vars() {
-	input := `
-[section]
-key=value1
-key2=
-
-[section "sub"]
-key=value1
-key=value2
-
-[section]
-key=value2
-key2=false
-
-[section "sub"]
-key=value2
-key=value3
-`
-
-	ini, err := Parse([]byte(input))
+	ini, err := Parse([]byte(testInput))
 	if err != nil {
 		log.Fatal(err)
 	}
