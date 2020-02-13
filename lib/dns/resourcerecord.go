@@ -6,6 +6,7 @@ package dns
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -442,6 +443,9 @@ func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
 	rr.OPT.Length = libbytes.ReadUint16(packet, x)
 	x += 2
 	endIdx := x + uint(rr.rdlen)
+	if int(endIdx) >= len(packet) {
+		return errors.New("RR OPT length is out of range")
+	}
 	rr.OPT.Data = append(rr.OPT.Data, packet[x:endIdx]...)
 	return nil
 }
