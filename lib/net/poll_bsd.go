@@ -88,8 +88,7 @@ func (poll *kqueue) WaitRead() (fds []int, err error) {
 	}
 
 	for x := 0; x < n; x++ {
-		switch poll.events[x].Filter {
-		case unix.EVFILT_READ:
+		if poll.events[x].Filter == unix.EVFILT_READ {
 			fds = append(fds, int(poll.events[x].Ident))
 		}
 	}
