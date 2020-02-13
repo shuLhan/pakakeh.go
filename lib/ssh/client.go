@@ -116,6 +116,7 @@ func (cl *Client) Get(remote, local string) (err error) {
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.RemoteUser, cl.cfg.RemoteHost,
 		remote)
 
+	//nolint: gosec
 	cmd := exec.Command("scp", "-r", "-i", cl.cfg.PrivateKeyFile,
 		"-P", cl.cfg.remotePort, remote, local)
 
@@ -150,6 +151,7 @@ func (cl *Client) Put(local, remote string) (err error) {
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.RemoteUser, cl.cfg.RemoteHost,
 		remote)
 
+	//nolint: gosec
 	cmd := exec.Command("scp", "-r", "-i", cl.cfg.PrivateKeyFile,
 		"-P", cl.cfg.remotePort, local, remote)
 
