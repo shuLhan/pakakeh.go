@@ -684,11 +684,12 @@ func (srv *Server) processRequest() {
 			req.message.Question.Class)
 
 		if ans == nil || an == nil {
-			if srv.hasForwarders() {
+			switch {
+			case srv.hasForwarders():
 				srv.primaryq <- req
-			} else if srv.fallbackq != nil {
+			case srv.fallbackq != nil:
 				srv.fallbackq <- req
-			} else {
+			default:
 				if debug.Value >= 1 {
 					fmt.Printf("dns: * %s %d:%s\n",
 						connTypeNames[req.kind],
@@ -701,7 +702,8 @@ func (srv *Server) processRequest() {
 		}
 
 		if an.msg.IsExpired() {
-			if srv.hasForwarders() {
+			switch {
+			case srv.hasForwarders():
 				if debug.Value >= 1 {
 					fmt.Printf("dns: ~ %s %d:%s\n",
 						connTypeNames[req.kind],
@@ -709,9 +711,11 @@ func (srv *Server) processRequest() {
 						req.message.Question.String())
 				}
 				srv.primaryq <- req
-			} else if srv.fallbackq != nil {
+
+			case srv.fallbackq != nil:
 				srv.fallbackq <- req
-			} else {
+
+			default:
 				if debug.Value >= 1 {
 					fmt.Printf("dns: * %s %d:%s\n",
 						connTypeNames[req.kind],
