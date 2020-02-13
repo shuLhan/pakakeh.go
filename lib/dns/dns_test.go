@@ -45,7 +45,12 @@ func TestMain(m *testing.M) {
 
 	_testServer.LoadMasterFile("testdata/kilabit.info")
 
-	go _testServer.ListenAndServe()
+	go func() {
+		err = _testServer.ListenAndServe()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	// Wait for all listeners running.
 	time.Sleep(500 * time.Millisecond)
