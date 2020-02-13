@@ -325,7 +325,7 @@ func (field *Field) updateType() {
 //      second      = 2DIGIT
 //	zone        = ("+" / "-") 4DIGIT
 //
-func (field *Field) unpackDate() (err error) {
+func (field *Field) unpackDate() (err error) { //nolint: gocognit
 	var (
 		v              []byte
 		ok             bool

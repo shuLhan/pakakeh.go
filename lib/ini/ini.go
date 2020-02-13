@@ -225,6 +225,7 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 	return nil
 }
 
+//nolint: gocyclo
 func unmarshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 	numField := rtipe.NumField()
 	if numField == 0 {

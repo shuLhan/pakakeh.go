@@ -117,7 +117,7 @@ func (body *Body) String() string {
 // This function is expensive for message with large body, its better if we
 // call it once and store it somewhere.
 //
-func (body *Body) Relaxed() (out []byte) {
+func (body *Body) Relaxed() (out []byte) { //nolint: gocognit
 	if len(body.raw) == 0 {
 		return
 	}

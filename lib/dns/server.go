@@ -1123,6 +1123,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 	}
 }
 
+//nolint: interfacer
 func (srv *Server) stopForwarder(fw Client, hasFallback bool) {
 	if fw != nil {
 		fw.Close()
