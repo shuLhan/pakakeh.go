@@ -169,7 +169,7 @@ func (ep *Endpoint) error(res http.ResponseWriter, e error) {
 		return
 	}
 
-	_, e = res.Write([]byte(rsp))
+	_, e = res.Write(rsp)
 	if e != nil {
 		log.Println("endpoint.error: ", e)
 	}
