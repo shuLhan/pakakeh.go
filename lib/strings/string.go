@@ -128,8 +128,8 @@ func Reverse(input string) string {
 	y := len(r) - 1
 	for x < len(r)/2 {
 		r[x], r[y] = r[y], r[x]
-		x += 1
-		y -= 1
+		x++
+		y--
 	}
 	return string(r)
 }
