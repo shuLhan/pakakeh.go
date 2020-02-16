@@ -97,6 +97,12 @@ type Client struct {
 	//
 	Endpoint string
 
+	//
+	// TLSConfig define custom TLS configuration when connecting to secure
+	// WebSocket server.
+	//
+	TLSConfig *tls.Config
+
 	frame  *Frame
 	frames *Frames
 
@@ -145,7 +151,6 @@ type Client struct {
 	allowRsv1 bool
 	allowRsv2 bool
 	allowRsv3 bool
-	isTLS     bool
 }
 
 //
@@ -257,7 +262,9 @@ func (cl *Client) parseURI() (err error) {
 	switch cl.remoteURL.Scheme {
 	case "wss":
 		serverPort = "443"
-		cl.isTLS = true
+		if cl.TLSConfig == nil {
+			cl.TLSConfig = &tls.Config{}
+		}
 	default:
 		serverPort = "80"
 	}
@@ -269,8 +276,8 @@ func (cl *Client) parseURI() (err error) {
 
 //
 // open TCP connection to WebSocket remote address.
-// If client "isTLS" field is true, the connection is opened with TLS protocol
-// and the remote name MUST have a valid certificate.
+// If client "TLSConfig" field is not nil, the connection is opened with TLS
+// protocol and the remote name MUST have a valid certificate.
 //
 func (cl *Client) open() (err error) {
 	dialer := &net.Dialer{
@@ -281,12 +288,9 @@ func (cl *Client) open() (err error) {
 		fmt.Printf("websocket: Client.open: remoteAddr: %s\n", cl.remoteAddr)
 	}
 
-	if cl.isTLS {
-		cfg := &tls.Config{
-			InsecureSkipVerify: cl.isTLS, //nolint:gas
-		}
-
-		cl.conn, err = tls.DialWithDialer(dialer, "tcp", cl.remoteAddr, cfg)
+	if cl.TLSConfig != nil {
+		cl.conn, err = tls.DialWithDialer(dialer, "tcp",
+			cl.remoteAddr, cl.TLSConfig)
 	} else {
 		cl.conn, err = dialer.Dial("tcp", cl.remoteAddr)
 	}
