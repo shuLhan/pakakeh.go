@@ -353,9 +353,11 @@ func (srv *Server) Stop() {
 	if err != nil {
 		log.Println("dns: error when closing TCP: " + err.Error())
 	}
-	err = srv.dot.Close()
-	if err != nil {
-		log.Println("dns: error when closing DoT: " + err.Error())
+	if srv.dot != nil {
+		err = srv.dot.Close()
+		if err != nil {
+			log.Println("dns: error when closing DoT: " + err.Error())
+		}
 	}
 	err = srv.doh.Close()
 	if err != nil {
