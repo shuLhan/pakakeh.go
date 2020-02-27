@@ -61,8 +61,8 @@ const (
 // The debug information prefixed with single character to differentiate
 // single action,
 //
-//	< : incoming request from client
-//	> : the answer is sent to client
+//	> : incoming request from client
+//	< : the answer is sent to client
 //	! : no answer found on cache and the query is not recursive, or
 //	    response contains error code
 //	^ : request is forwarded to parent name server
@@ -675,7 +675,7 @@ func (srv *Server) processRequest() {
 		}
 
 		if debug.Value >= 1 {
-			fmt.Printf("dns: < %s %d:%s\n",
+			fmt.Printf("dns: > %s %d:%s\n",
 				connTypeNames[req.kind],
 				req.message.Header.ID,
 				req.message.Question.String())
@@ -734,7 +734,7 @@ func (srv *Server) processRequest() {
 		res := an.msg
 
 		if debug.Value >= 1 {
-			fmt.Printf("dns: > %s %d:%s\n",
+			fmt.Printf("dns: < %s %d:%s\n",
 				connTypeNames[req.kind],
 				res.Header.ID, res.Question.String())
 		}
