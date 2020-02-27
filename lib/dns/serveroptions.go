@@ -201,11 +201,8 @@ func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
 }
 
 func (opts *ServerOptions) hasFallback() bool {
-	if len(opts.fallbackUDP) > 0 || len(opts.fallbackTCP) > 0 ||
-		len(opts.fallbackDot) > 0 || len(opts.fallbackDoh) > 0 {
-		return true
-	}
-	return false
+	return len(opts.fallbackUDP) > 0 || len(opts.fallbackTCP) > 0 ||
+		len(opts.fallbackDot) > 0 || len(opts.fallbackDoh) > 0
 }
 
 //
