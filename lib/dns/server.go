@@ -795,22 +795,22 @@ func (srv *Server) startAllForwarders() {
 	for x := 0; x < len(srv.opts.primaryUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryUDP[x].String()
-		go srv.runUDPForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
+		go srv.runUDPForwarder(true, tag, nameserver, srv.primaryq, srv.fallbackq)
 	}
 	for x := 0; x < len(srv.opts.primaryTCP); x++ {
 		tag := fmt.Sprintf("TCP-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryTCP[x].String()
-		go srv.runTCPForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
+		go srv.runTCPForwarder(true, tag, nameserver, srv.primaryq, srv.fallbackq)
 	}
 	for x := 0; x < len(srv.opts.primaryDoh); x++ {
 		tag := fmt.Sprintf("DoH-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryDoh[x]
-		go srv.runDohForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
+		go srv.runDohForwarder(true, tag, nameserver, srv.primaryq, srv.fallbackq)
 	}
 	for x := 0; x < len(srv.opts.primaryDot); x++ {
 		tag := fmt.Sprintf("DoT-%d-%s", x, asPrimary)
 		nameserver := srv.opts.primaryDot[x]
-		go srv.runTLSForwarder(tag, nameserver, srv.primaryq, srv.fallbackq)
+		go srv.runTLSForwarder(true, tag, nameserver, srv.primaryq, srv.fallbackq)
 	}
 
 	if !srv.opts.hasFallback() {
@@ -820,26 +820,26 @@ func (srv *Server) startAllForwarders() {
 	for x := 0; x < len(srv.opts.fallbackUDP); x++ {
 		tag := fmt.Sprintf("UDP-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackUDP[x].String()
-		go srv.runUDPForwarder(tag, nameserver, srv.fallbackq, nil)
+		go srv.runUDPForwarder(false, tag, nameserver, srv.fallbackq, nil)
 	}
 	for x := 0; x < len(srv.opts.fallbackTCP); x++ {
 		tag := fmt.Sprintf("TCP-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackTCP[x].String()
-		go srv.runTCPForwarder(tag, nameserver, srv.fallbackq, nil)
+		go srv.runTCPForwarder(false, tag, nameserver, srv.fallbackq, nil)
 	}
 	for x := 0; x < len(srv.opts.fallbackDoh); x++ {
 		tag := fmt.Sprintf("DoH-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackDoh[x]
-		go srv.runDohForwarder(tag, nameserver, srv.fallbackq, nil)
+		go srv.runDohForwarder(false, tag, nameserver, srv.fallbackq, nil)
 	}
 	for x := 0; x < len(srv.opts.fallbackDot); x++ {
 		tag := fmt.Sprintf("DoT-%d-%s", x, asFallback)
 		nameserver := srv.opts.fallbackDot[x]
-		go srv.runTLSForwarder(tag, nameserver, srv.fallbackq, nil)
+		go srv.runTLSForwarder(false, tag, nameserver, srv.fallbackq, nil)
 	}
 }
 
-func (srv *Server) runDohForwarder(tag, nameserver string,
+func (srv *Server) runDohForwarder(isPrimary bool, tag, nameserver string,
 	primaryq <-chan *request, fallbackq chan<- *request,
 ) {
 	stopper := srv.newStopper()
@@ -856,7 +856,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 
 			select {
 			case <-stopper:
-				srv.stopForwarder(nil, fallbackq == nil)
+				srv.stopForwarder(isPrimary, nil)
 				return
 			default:
 				time.Sleep(3 * time.Second)
@@ -866,7 +866,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 
 		log.Printf("dns: forwarder %s for %s has been connected ...", tag, nameserver)
 
-		if fallbackq != nil {
+		if isPrimary {
 			srv.incForwarder()
 		}
 
@@ -877,7 +877,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 			case req, ok := <-primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
-					srv.stopForwarder(forwarder, fallbackq == nil)
+					srv.stopForwarder(isPrimary, forwarder)
 					return
 				}
 				if debug.Value >= 1 {
@@ -902,17 +902,17 @@ func (srv *Server) runDohForwarder(tag, nameserver string,
 					log.Printf("dns: %s alive", tag)
 				}
 			case <-stopper:
-				srv.stopForwarder(forwarder, fallbackq == nil)
+				srv.stopForwarder(isPrimary, forwarder)
 				return
 			}
 		}
 
 		log.Printf("dns: reconnect forwarder %s for %s", tag, nameserver)
-		srv.stopForwarder(forwarder, fallbackq == nil)
+		srv.stopForwarder(isPrimary, forwarder)
 	}
 }
 
-func (srv *Server) runTLSForwarder(tag, nameserver string,
+func (srv *Server) runTLSForwarder(isPrimary bool, tag, nameserver string,
 	primaryq <-chan *request, fallbackq chan<- *request,
 ) {
 	stopper := srv.newStopper()
@@ -929,7 +929,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 
 			select {
 			case <-stopper:
-				srv.stopForwarder(nil, fallbackq == nil)
+				srv.stopForwarder(isPrimary, nil)
 				return
 			default:
 				time.Sleep(3 * time.Second)
@@ -939,7 +939,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 
 		log.Printf("dns: forwarder %s for %s has been connected ...", tag, nameserver)
 
-		if fallbackq != nil {
+		if isPrimary {
 			srv.incForwarder()
 		}
 
@@ -950,7 +950,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 			case req, ok := <-primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
-					srv.stopForwarder(forwarder, fallbackq == nil)
+					srv.stopForwarder(isPrimary, forwarder)
 					return
 				}
 				if debug.Value >= 1 {
@@ -976,29 +976,29 @@ func (srv *Server) runTLSForwarder(tag, nameserver string,
 					log.Printf("dns: %s alive", tag)
 				}
 			case <-stopper:
-				srv.stopForwarder(forwarder, fallbackq == nil)
+				srv.stopForwarder(isPrimary, forwarder)
 				return
 			}
 		}
 
 		log.Printf("dns: reconnect forwarder %s for %s", tag, nameserver)
-		srv.stopForwarder(forwarder, fallbackq == nil)
+		srv.stopForwarder(isPrimary, forwarder)
 	}
 }
 
-func (srv *Server) runTCPForwarder(tag, nameserver string,
+func (srv *Server) runTCPForwarder(isPrimary bool, tag, nameserver string,
 	primaryq <-chan *request, fallbackq chan<- *request,
 ) {
 	stopper := srv.newStopper()
 
 	log.Printf("dns: starting forwarder %s for %s", tag, nameserver)
 
-	if fallbackq != nil {
+	if isPrimary {
 		srv.incForwarder()
 	}
 
 	defer func() {
-		if fallbackq != nil {
+		if isPrimary {
 			srv.decForwarder()
 		}
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
@@ -1050,7 +1050,7 @@ func (srv *Server) runTCPForwarder(tag, nameserver string,
 // runUDPForwarder create a UDP client that consume request from forward queue
 // and forward it to parent server at "nameserver".
 //
-func (srv *Server) runUDPForwarder(tag, nameserver string,
+func (srv *Server) runUDPForwarder(isPrimary bool, tag, nameserver string,
 	primaryq <-chan *request, fallbackq chan<- *request,
 ) {
 	stopper := srv.newStopper()
@@ -1068,7 +1068,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 
 			select {
 			case <-stopper:
-				srv.stopForwarder(nil, fallbackq == nil)
+				srv.stopForwarder(isPrimary, nil)
 				return
 			default:
 				time.Sleep(3 * time.Second)
@@ -1078,7 +1078,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 
 		log.Printf("dns: forwarder %s for %s has been connected ...", tag, nameserver)
 
-		if fallbackq != nil {
+		if isPrimary {
 			srv.incForwarder()
 		}
 
@@ -1090,7 +1090,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 			case req, ok := <-primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
-					srv.stopForwarder(forwarder, fallbackq == nil)
+					srv.stopForwarder(isPrimary, forwarder)
 					return
 				}
 				if debug.Value >= 1 {
@@ -1115,22 +1115,22 @@ func (srv *Server) runUDPForwarder(tag, nameserver string,
 					log.Printf("dns: %s alive", tag)
 				}
 			case <-stopper:
-				srv.stopForwarder(forwarder, fallbackq == nil)
+				srv.stopForwarder(isPrimary, forwarder)
 				return
 			}
 		}
 
 		log.Printf("dns: reconnect forwarder %s for %s", tag, nameserver)
-		srv.stopForwarder(forwarder, fallbackq == nil)
+		srv.stopForwarder(isPrimary, forwarder)
 	}
 }
 
 //nolint: interfacer
-func (srv *Server) stopForwarder(fw Client, hasFallback bool) {
+func (srv *Server) stopForwarder(isPrimary bool, fw Client) {
 	if fw != nil {
 		fw.Close()
 	}
-	if hasFallback {
+	if isPrimary {
 		srv.decForwarder()
 	}
 }
