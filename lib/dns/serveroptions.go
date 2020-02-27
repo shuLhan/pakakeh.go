@@ -110,11 +110,11 @@ type ServerOptions struct {
 
 	// primaryUDP contains list of parent name server addresses using UDP
 	// protocol.
-	primaryUDP []*net.UDPAddr
+	primaryUDP []net.Addr
 
 	// primaryTCP contains list of parent name server addresses using TCP
 	// protocol.
-	primaryTCP []*net.TCPAddr
+	primaryTCP []net.Addr
 
 	// primaryDoh contains list of parent name server addresses using DoH
 	// protocol.
@@ -124,8 +124,8 @@ type ServerOptions struct {
 	// protocol.
 	primaryDot []string
 
-	fallbackUDP []*net.UDPAddr
-	fallbackTCP []*net.TCPAddr
+	fallbackUDP []net.Addr
+	fallbackTCP []net.Addr
 	fallbackDoh []string
 	fallbackDot []string
 }
@@ -210,12 +210,13 @@ func (opts *ServerOptions) hasFallback() bool {
 
 //
 // parseNameServers parse each name server in NameServers list based on scheme
-// and store the result either in udpAddrs, tcpAddrs, or dohAddrs.
+// and store the result either in udpAddrs, tcpAddrs, dohAddrs, or dotAddrs.
 //
-// If the name server format contains no scheme, it will be assumed as "udp".
+// If the name server format contains no scheme, it will be assumed to be
+// "udp".
 //
 func parseNameServers(nameServers []string) (
-	udpAddrs []*net.UDPAddr, tcpAddrs []*net.TCPAddr, dohAddrs, dotAddrs []string,
+	udpAddrs, tcpAddrs []net.Addr, dohAddrs, dotAddrs []string,
 ) {
 	for _, ns := range nameServers {
 		dnsURL, err := url.Parse(ns)

@@ -66,10 +66,12 @@ func TestServerOptionsInit(t *testing.T) {
 			PruneThreshold: -1 * time.Hour,
 			ip:             ip,
 			port:           53,
-			primaryUDP: []*net.UDPAddr{{
-				IP:   net.ParseIP("127.0.0.1"),
-				Port: 53,
-			}},
+			primaryUDP: []net.Addr{
+				&net.UDPAddr{
+					IP:   net.ParseIP("127.0.0.1"),
+					Port: 53,
+				},
+			},
 		},
 	}}
 
@@ -93,8 +95,8 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 	cases := []struct {
 		desc          string
 		nameServers   []string
-		expUDPServers []*net.UDPAddr
-		expTCPServers []*net.TCPAddr
+		expUDPServers []net.Addr
+		expTCPServers []net.Addr
 		expDoHServers []string
 	}{{
 		desc: "With empty input",
@@ -118,7 +120,7 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 		nameServers: []string{
 			"127.0.0.1",
 		},
-		expUDPServers: []*net.UDPAddr{{
+		expUDPServers: []net.Addr{&net.UDPAddr{
 			IP:   ip,
 			Port: 53,
 		}},
@@ -129,11 +131,11 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 			"tcp://127.0.0.1:5353",
 			"https://localhost/dns-query",
 		},
-		expUDPServers: []*net.UDPAddr{{
+		expUDPServers: []net.Addr{&net.UDPAddr{
 			IP:   ip,
 			Port: 53,
 		}},
-		expTCPServers: []*net.TCPAddr{{
+		expTCPServers: []net.Addr{&net.TCPAddr{
 			IP:   ip,
 			Port: 5353,
 		}},
