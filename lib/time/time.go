@@ -6,6 +6,7 @@
 package time
 
 import (
+	"strconv"
 	"time"
 )
 
@@ -41,4 +42,19 @@ var (
 func Microsecond(t *time.Time) int64 {
 	seconds := t.Unix() * int64(time.Second)
 	return (t.UnixNano() - seconds) / int64(time.Microsecond)
+}
+
+//
+// UnixMilli returns t as a Unix time, the number of milliseconds elapsed
+// since January 1, 1970 UTC.
+//
+func UnixMilli(t time.Time) int64 {
+	return t.UnixNano() / int64(time.Millisecond)
+}
+
+//
+// UnixMilliString returns the UnixMilli() as string.
+//
+func UnixMilliString(t time.Time) string {
+	return strconv.FormatInt(UnixMilli(t), 10)
 }

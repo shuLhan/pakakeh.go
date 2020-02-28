@@ -7,6 +7,8 @@ package time
 import (
 	"testing"
 	"time"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestMicrosecond(t *testing.T) {
@@ -19,4 +21,14 @@ func TestMicrosecond(t *testing.T) {
 	t.Logf("Seconds 0  : %d\n", seconds0)
 	t.Logf("Nanosecond : %d\n", nanos)
 	t.Logf("Microsecond: %d\n", micros)
+}
+
+func TestUnixMilliString(t *testing.T) {
+	ms := int64(123 * time.Millisecond)
+	tt := time.Unix(1000000000, ms)
+
+	exp := "1000000000123"
+	got := UnixMilliString(tt)
+
+	test.Assert(t, "UnixMilliString", exp, got, true)
 }
