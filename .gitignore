@@ -25,8 +25,9 @@
 /lib/dsv/testdata/writerawcolumns.out
 /lib/dsv/testdata/writerawrows.out
 /lib/email/maildir/testdata/
-/lib/git/testdata/repotest
 /lib/git/testdata/beku_test
+/lib/git/testdata/repotest
+/lib/hunspell/testdata/out.dic
 /lib/io/testdata/output.txt
 /lib/mining/cmd/cart/cart
 /lib/mining/cmd/crf/crf

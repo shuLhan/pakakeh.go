@@ -7,6 +7,17 @@
 //
 package hunspell
 
+import (
+	"fmt"
+	"os"
+	"sort"
+	"strings"
+
+	"github.com/shuLhan/share/lib/ascii"
+	libio "github.com/shuLhan/share/lib/io"
+	"github.com/shuLhan/share/lib/parser"
+)
+
 //
 // List of affix file general options.
 //
@@ -132,3 +143,74 @@ const (
 	DefaultFlag            = FlagASCII
 	defaultMinimumCompound = 3
 )
+
+//
+// MergeDictionaries merge two or more dictionaries into single file.
+// The outFile define the output of merged dictionaries.
+// If the outFile already exist it will be truncated, otherwise it will be
+// created.
+// The inFiles contains list of input dictionary files.
+//
+// On success it will return number of words merged into output file.
+//
+func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
+	if len(inFiles) == 0 {
+		return 0, nil
+	}
+
+	if len(inFiles) == 1 {
+		err = libio.Copy(outFile, inFiles[0])
+		return 0, err
+	}
+
+	dict := make(map[string]string, 1024)
+
+	for x := 0; x < len(inFiles); x++ {
+		lines, err := parser.Lines(inFiles[x])
+		if err != nil {
+			return 0, err
+		}
+
+		// Skip the first line that may contains number of words.
+		y := 0
+		if ascii.IsDigit(lines[y][0]) {
+			y = 1
+		}
+
+		for ; y < len(lines); y++ {
+			ss := strings.Split(lines[y], "/")
+			key := ss[0]
+			attr := dict[key] + strings.Join(ss[1:], "")
+			dict[key] = attr
+		}
+	}
+
+	words := make([]string, 0, len(dict))
+
+	for word, attr := range dict {
+		if len(attr) == 0 {
+			words = append(words, word)
+		} else {
+			words = append(words, word+"/"+attr)
+		}
+	}
+
+	sort.Strings(words)
+
+	fout, err := os.OpenFile(outFile, os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return 0, err
+	}
+
+	fmt.Fprintf(fout, "%d\n", len(words))
+	for x := 0; x < len(words); x++ {
+		fmt.Fprintf(fout, "%s\n", words[x])
+	}
+
+	err = fout.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	return len(words), nil
+}
