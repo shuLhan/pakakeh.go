@@ -5,10 +5,16 @@
 This library is released each month, usually at the first week of month.
 
 
-==  share v0.12.x (2020-03-xx)
+==  share v0.13.0 (2020-03-xx)
+
+===  New features
+
+*  hunspell: a library to parse the Hunspell file format
+*  parser: provide a common text parser, using delimiters
 
 ===  Enhancements
 
+*  io: add function to copy file
 *  websocket: allow custom TLS configuration on client
 
 

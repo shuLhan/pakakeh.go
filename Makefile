@@ -53,7 +53,7 @@ lint:
 		./...
 
 genhtml:
-	ciigo -template=html.tmpl convert .
+	ciigo -template=html.tmpl convert doc/
 
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)
