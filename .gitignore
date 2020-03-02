@@ -27,6 +27,7 @@
 /lib/email/maildir/testdata/
 /lib/git/testdata/repotest
 /lib/git/testdata/beku_test
+/lib/io/testdata/output.txt
 /lib/mining/cmd/cart/cart
 /lib/mining/cmd/crf/crf
 /lib/mining/cmd/lnsmote/lnsmote
