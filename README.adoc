@@ -159,32 +159,32 @@ code due to their scope and limitation of godoc formatting itself.
 
 NOTE: The links below is used to be viewed locally, not through Github.
 
-*  link:doc/IMF.html[Internet Message Format (RFC 5322)]
-**  link:doc/MIME_I_FORMAT.html[MIME Part One: Format of Internet Message
+*  link:IMF.html[Internet Message Format (RFC 5322)]
+**  link:MIME_I_FORMAT.html[MIME Part One: Format of Internet Message
     Bodies (RFC 2045)]
-**  link:doc/MIME_II_MEDIA_TYPES.html[MIME Part Two: Media Types (RFC 2046)]
-**  link:doc/MIME_V_CONFORMANCE.html[MIME Part Five: Conformance Criteria and
+**  link:MIME_II_MEDIA_TYPES.html[MIME Part Two: Media Types (RFC 2046)]
+**  link:MIME_V_CONFORMANCE.html[MIME Part Five: Conformance Criteria and
     Examples (RFC 2049)]
 
-*  link:doc/SASL.html[Simple Authentication and Security Layer (RFC 4422)]
-**   link:doc/SASL_PLAIN.html[The PLAIN Simple Authentication and Security
+*  link:SASL.html[Simple Authentication and Security Layer (RFC 4422)]
+**   link:SASL_PLAIN.html[The PLAIN Simple Authentication and Security
      Layer (SASL) Mechanism (RFC 4616)]
 
-*  link:doc/DKIM_OVERVIEW.html[DomainKeys Identified Mail Service Overview
+*  link:DKIM_OVERVIEW.html[DomainKeys Identified Mail Service Overview
    (RFC 5585)]
-**  link:doc/DKIM_THREATS.html[Analysis of Threats Motivating DKIM (RFC 4686)]
-**  link:doc/DKIM_DEVOPS.html[DKIM Development, Deployment, and Operations
+**  link:DKIM_THREATS.html[Analysis of Threats Motivating DKIM (RFC 4686)]
+**  link:DKIM_DEVOPS.html[DKIM Development, Deployment, and Operations
     (RFC 5863)]
-**  link:doc/DKIM_SIGNATURES.html[DKIM Signatures (RFC 6376)]
+**  link:DKIM_SIGNATURES.html[DKIM Signatures (RFC 6376)]
 
-*  link:doc/SMTP.html[Simple Mail Transfer Protocol (RFC5321)]
-**  link:doc/ESMTP_DSN.html[Delivery Status Notification (RFC3461-3464)]
-**  link:doc/ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over
+*  link:SMTP.html[Simple Mail Transfer Protocol (RFC5321)]
+**  link:ESMTP_DSN.html[Delivery Status Notification (RFC3461-3464)]
+**  link:ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over
     Transport Layer Security (RFC3207)]
-**  link:doc/ESMTP_AUTH.html[SMTP Service Extension for Authentication
+**  link:ESMTP_AUTH.html[SMTP Service Extension for Authentication
     (RFC 4954)]
 
-*  link:doc/SPF.html[Sender Policy Framework version 1 (RFC 7208)]
+*  link:SPF.html[Sender Policy Framework version 1 (RFC 7208)]
 
 
 The documentation created using
@@ -198,7 +198,7 @@ $ go install github.com/shuLhan/ciigo/cmd/ciigo
 and then run
 
 ----
-$ ciigo -template=html.tmpl serve .
+$ ciigo -template=html.tmpl serve doc/
 ----
 
 to serve documentation on HTTP server at http://127.0.0.1:8080 and watch
@@ -208,7 +208,7 @@ files.
 To generate HTML files for all asciidoc and markdown files, run
 
 ----
-$ ciigo -template=html.tmpl convert .
+$ ciigo -template=html.tmpl convert doc/
 ----
 
 
