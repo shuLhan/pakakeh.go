@@ -12,6 +12,9 @@ import (
 // ClientHandler define a callback type for client to handle packet from
 // server (either broadcast or from response of request) in the form of frame.
 //
+// Returning a non-nil error will cause the underlying connection to be
+// closed.
+//
 type ClientHandler func(cl *Client, frame *Frame) (err error)
 
 // HandlerAuthFn define server callback type to handle authentication request.
