@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"runtime"
 	"testing"
+
+	libreflect "github.com/shuLhan/share/lib/reflect"
 )
 
 func printStackTrace(t testing.TB, trace []byte) {
@@ -39,10 +41,24 @@ func printStackTrace(t testing.TB, trace []byte) {
 // Assert will compare two interfaces: `exp` and `got` whether its same with
 // `equal` value.
 //
+// If `exp` implement the extended `reflect.Equaler`, then it will use the
+// method `IsEqual()` with `got` as parameter.
+//
 // If comparison result is not same with `equal`, it will print the result and
 // expectation and then terminate the test routine.
 //
 func Assert(t *testing.T, name string, exp, got interface{}, equal bool) {
+	if exp == nil && got == nil && equal {
+		return
+	}
+	if libreflect.IsNil(exp) && libreflect.IsNil(got) && equal {
+		return
+	}
+	eq, ok := exp.(libreflect.Equaler)
+	if ok && eq.IsEqual(got) == equal {
+		return
+	}
+
 	if reflect.DeepEqual(exp, got) == equal {
 		return
 	}
