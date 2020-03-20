@@ -67,6 +67,7 @@ func TestKeyPoolPut(t *testing.T) {
 }
 
 func TestKeyPoolGet(t *testing.T) {
+	t.Skip("TODO: use local DNS")
 	cases := []struct {
 		dname  string
 		exp    string
