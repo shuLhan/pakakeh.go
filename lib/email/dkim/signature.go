@@ -604,7 +604,7 @@ func (sig *Signature) validateTime() (err error) {
 	exp := time.Unix(int64(sig.ExpiredAt), 0)
 	now := time.Now().Add(time.Hour * -1).Unix()
 	if uint64(now) > sig.ExpiredAt {
-		return fmt.Errorf("dkim: signature is expired at '%s'", exp)
+		return fmt.Errorf("dkim: signature is expired at '%s'", exp.UTC())
 	}
 
 	return nil
