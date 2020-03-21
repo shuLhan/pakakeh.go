@@ -4,10 +4,6 @@
 
 package hunspell
 
-import (
-	"fmt"
-)
-
 //
 // Spell contains list of options, root words, expanded words, and affixes.
 //
@@ -82,19 +78,4 @@ func (spell *Spell) Spell(word string) (root string, ok bool) {
 	}
 
 	return "", false
-}
-
-//
-// load affix and dictionary from string.
-//
-func (spell *Spell) load(affContent, dictContent string) (err error) {
-	err = spell.opts.load(affContent)
-	if err != nil {
-		return fmt.Errorf("Spell.load: %w", err)
-	}
-	err = spell.dict.load(dictContent, &spell.opts)
-	if err != nil {
-		return fmt.Errorf("Spell.load: %w", err)
-	}
-	return nil
 }
