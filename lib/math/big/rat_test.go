@@ -159,11 +159,14 @@ func TestRat_Int64(t *testing.T) {
 	}, {
 		r:   NewRat("0.6"),
 		exp: 0,
+	}, {
+		r:   NewRat("4011144900.02438879").Mul(100000000),
+		exp: 401114490002438879,
 	}}
 
 	for _, c := range cases {
 		got := c.r.Int64()
-		test.Assert(t, "Int64", c.exp, got, true)
+		test.Assert(t, fmt.Sprintf("Int64 of %s", c.r), c.exp, got, true)
 	}
 }
 

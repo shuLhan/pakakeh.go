@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"strconv"
 	"strings"
 )
 
@@ -152,8 +153,8 @@ func (r *Rat) Add(g interface{}) *Rat {
 // Int64 return the integer resulting from truncating r towards zero.
 //
 func (r *Rat) Int64() int64 {
-	f64, _ := r.Rat.Float64()
-	return int64(f64)
+	i64, _ := strconv.ParseInt(r.String(), 10, 64)
+	return i64
 }
 
 //
