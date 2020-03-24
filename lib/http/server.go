@@ -365,31 +365,35 @@ func (srv *Server) handleFS(
 		res.Header().Set(ContentEncoding, node.ContentEncoding)
 	}
 
+	var (
+		body []byte
+		size int64
+		err  error
+	)
+
+	if len(node.V) > 0 {
+		body = node.V
+		size = node.Size()
+	} else {
+		body, err = ioutil.ReadFile(node.SysPath)
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		size = int64(len(body))
+	}
+
+	res.Header().Set(ContentLength, strconv.FormatInt(size, 10))
+
 	if method == RequestMethodHead {
-		res.Header().Set("Content-Length", strconv.FormatInt(node.Size(), 10))
 		res.WriteHeader(http.StatusOK)
 		return
 	}
 
-	var (
-		v []byte
-		e error
-	)
-
-	if len(node.V) > 0 {
-		v = node.V
-	} else {
-		v, e = ioutil.ReadFile(node.SysPath)
-		if e != nil {
-			res.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-	}
-
 	res.WriteHeader(http.StatusOK)
-	_, e = res.Write(v)
-	if e != nil {
-		log.Println("handleFS: ", e.Error())
+	_, err = res.Write(body)
+	if err != nil {
+		log.Println("handleFS: ", err.Error())
 	}
 }
 
