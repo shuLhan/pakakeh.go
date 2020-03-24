@@ -164,10 +164,10 @@ func (p *Parser) Load(content, delims string) {
 // delimiter will be 0.
 //
 func (p *Parser) Token() (string, rune) {
+	p.d = 0
 	p.token = p.token[:0]
 
 	if p.x >= len(p.v) {
-		p.d = 0
 		return "", 0
 	}
 
@@ -183,9 +183,8 @@ func (p *Parser) Token() (string, rune) {
 		p.token = append(p.token, r)
 	}
 
-	p.d = 0
 	p.x = len(p.v)
-	return string(p.token), p.d
+	return string(p.token), 0
 }
 
 //
