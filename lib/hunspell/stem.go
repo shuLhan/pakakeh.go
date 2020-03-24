@@ -6,7 +6,9 @@ package hunspell
 
 import (
 	"fmt"
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/shuLhan/share/lib/parser"
 )
@@ -15,11 +17,11 @@ import (
 // stem contains the word and its attributes.
 //
 type stem struct {
-	root        *stem
-	value       string
-	flags       string
-	morphemes   map[string][]string
-	isForbidden bool
+	value        string
+	rawFlags     string
+	rawMorphemes []string
+	morphemes    map[string][]string
+	isForbidden  bool
 }
 
 func newStem(line string) (s *stem, err error) {
@@ -47,89 +49,76 @@ func (s *stem) addMorpheme(id, token string) {
 	s.morphemes[id] = list
 }
 
+//
+// parse the single line of word with optional flags and zero or more
+// morphemes attributes.
+//
+//	STEM := WORD [ " " WORD ] [ "/" FLAGS ] [ *MORPHEME ]
+//
 func (s *stem) parse(line string) (err error) {
 	var (
-		id, token string
-		sep       rune
-		p         = parser.New(line, " \t/:")
+		token  string
+		sep    rune
+		nwords int
+		p      = parser.New(line, " \t")
 	)
 
-	// It's worth to add not only words, but word pairs to the dictionary
-	// to get correct suggestions for common misspellings with missing
-	// space.
-	nword := 0
+	// Parse one or two words with optional flags, and possibly one
+	// morpheme.
 	for {
-		token, sep = p.TokenEscaped('\\')
-		if sep == ':' {
+		token, sep = p.Token()
+		if len(token) == 0 {
+			return nil
+		}
+		ok, err := isValidMorpheme(token)
+		if err != nil {
+			return err
+		}
+		if ok {
+			s.rawMorphemes = append(s.rawMorphemes, token)
+			p.SkipHorizontalSpaces()
 			break
 		}
+
+		token, s.rawFlags, err = parseWordFlags(token)
+		if err != nil {
+			return err
+		}
+
 		if len(s.value) > 0 {
 			s.value += " "
 		}
 		s.value += token
-		nword++
-		if nword > 2 {
+		nwords++
+		if nwords > 2 {
 			return fmt.Errorf("only one or two words allowed: %q", line)
 		}
-		if sep == 0 {
-			return nil
-		}
-		if sep == '/' {
+
+		p.SkipHorizontalSpaces()
+
+		if len(s.rawFlags) > 0 {
 			break
 		}
-		_ = p.SkipHorizontalSpaces()
-	}
-
-	switch sep {
-	case ' ', '\t':
-		sep = p.SkipHorizontalSpaces()
 		if sep == 0 {
+			// Its words without a flags.
 			return nil
 		}
 	}
-
-	// Each word may optionally be followed by a slash ("/")  and  one
-	// or more flags, which represents the word attributes, for example
-	// affixes.
-	if sep == '/' {
-		s.flags, sep = p.Token()
-		if sep == 0 {
-			return nil
-		}
-
-		sep = p.SkipHorizontalSpaces()
-		if sep == 0 {
-			return nil
-		}
-	}
-
-	p.RemoveDelimiters("/")
-
-	// Parse morphemes...
+	// Parse the rest of morphemes.
 	for {
-		if sep == ':' {
-			id = token
-		} else {
-			id, sep = p.Token()
-			if sep != ':' {
-				return fmt.Errorf("invalid character in morpheme: %q", sep)
-			}
-			if len(id) == 0 {
-				return fmt.Errorf("empty morpheme id at line %q", line)
-			}
-		}
-
 		token, sep = p.Token()
 		if len(token) == 0 {
-			return fmt.Errorf("empty morphemes at line %q", line)
-		}
-
-		s.addMorpheme(id, token)
-
-		sep = p.SkipHorizontalSpaces()
-		if sep == 0 {
 			break
 		}
+		ok, err := isValidMorpheme(token)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return errInvalidMorpheme(token)
+		}
+		s.rawMorphemes = append(s.rawMorphemes, token)
+		p.SkipHorizontalSpaces()
 	}
 
 	return nil
@@ -144,14 +133,25 @@ func (s *stem) unpack(opts *affixOptions) (derivatives []string, err error) {
 		s.value = s.value[1:]
 	}
 
+	derivatives, err = s.unpackFlags(opts)
+	if err != nil {
+		return derivatives, err
+	}
+
+	s.unpackMorphemes(opts)
+
+	return derivatives, nil
+}
+
+func (s *stem) unpackFlags(opts *affixOptions) (derivatives []string, err error) {
 	if len(opts.afAliases) > 1 {
-		afIdx, err := strconv.Atoi(s.flags)
+		afIdx, err := strconv.Atoi(s.rawFlags)
 		if err == nil {
-			s.flags = opts.afAliases[afIdx]
+			s.rawFlags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(opts.flag, s.flags)
+	flags, err := unpackFlags(opts.flag, s.rawFlags)
 	if err != nil {
 		return nil, err
 	}
@@ -159,13 +159,13 @@ func (s *stem) unpack(opts *affixOptions) (derivatives []string, err error) {
 		return nil, nil
 	}
 
-	for x, flag := range flags {
+	for _, flag := range flags {
 		pfx, ok := opts.prefixes[flag]
 		if ok {
 			words := pfx.apply(s.value)
 			derivatives = append(derivatives, words...)
 			if pfx.isCrossProduct {
-				words = s.applySuffixes(opts, flags[x+1:], words)
+				words = s.applySuffixes(opts, flags, words)
 				derivatives = append(derivatives, words...)
 			}
 			continue
@@ -180,6 +180,33 @@ func (s *stem) unpack(opts *affixOptions) (derivatives []string, err error) {
 	}
 
 	return derivatives, nil
+}
+
+//
+// unpackMorphemes convert any raw morphemes or an alias into map of
+// key-values.
+// At this point, each of the morphemes should be valid, unless its unknown
+// and it will logged to stderr.
+//
+func (s *stem) unpackMorphemes(opts *affixOptions) {
+	for _, m := range s.rawMorphemes {
+		idx := strings.Index(m, ":")
+
+		if idx == -1 {
+			if len(opts.amAliases) > 0 {
+				// Convert the AM alias number to actual
+				// morpheme.
+				amIdx, err := strconv.Atoi(m)
+				if err != nil {
+					log.Printf("unknown morpheme %q", m)
+					continue
+				}
+				m = opts.amAliases[amIdx]
+				idx = strings.Index(m, ":")
+			}
+		}
+		s.addMorpheme(m[:idx], m[idx+1:])
+	}
 }
 
 //
@@ -203,4 +230,63 @@ func (s *stem) applySuffixes(opts *affixOptions, flags, words []string) (
 		}
 	}
 	return derivatives
+}
+
+//
+// isValidMorpheme will return true if `in` contains ":" or a number (as an
+// alias); otherwise it will return false.
+//
+func isValidMorpheme(in string) (bool, error) {
+	idx := strings.Index(in, ":")
+	switch idx {
+	case -1:
+		_, err := strconv.Atoi(in)
+		if err == nil {
+			return true, nil
+		}
+		return false, nil
+	case 0:
+		return false, errInvalidMorpheme(in)
+	}
+
+	return true, nil
+}
+
+func parseWordFlags(in string) (word, flags string, err error) {
+	var (
+		end int = -1
+		esc bool
+		v   = make([]rune, 0, len(in))
+	)
+	for x, c := range in {
+		if esc {
+			if c != '/' {
+				return "", "", fmt.Errorf("invalid escape %q", in)
+			}
+			esc = false
+			v = append(v, c)
+			continue
+		}
+		if c == '\\' {
+			esc = true
+			continue
+		}
+		if c == '/' {
+			end = x
+			break
+		}
+		v = append(v, c)
+	}
+	if esc {
+		return "", "", fmt.Errorf("invalid escape %q", in)
+	}
+	if end == 0 {
+		return "", "", fmt.Errorf("invalid word format %q", in)
+	}
+	if end == -1 {
+		// No flags found.
+		return string(v), "", nil
+	}
+	flags = in[end+1:]
+	return string(v), flags, nil
 }

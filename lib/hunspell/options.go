@@ -611,6 +611,7 @@ func (opts *affixOptions) parseAM(arg string) (err error) {
 		}
 
 		opts.amAliases = make([]string, 0, n)
+		opts.amAliases = append(opts.amAliases, "")
 	} else {
 		opts.amAliases = append(opts.amAliases, arg)
 	}

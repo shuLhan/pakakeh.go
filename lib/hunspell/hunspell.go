@@ -144,6 +144,10 @@ const (
 	defaultMinimumCompound = 3
 )
 
+func errInvalidMorpheme(in string) error {
+	return fmt.Errorf("invalid morpheme %q", in)
+}
+
 //
 // MergeDictionaries merge two or more dictionaries into single file.
 // The outFile define the output of merged dictionaries.
