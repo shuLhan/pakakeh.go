@@ -49,7 +49,14 @@ func TestPrefix_apply(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got := afx.apply(c.root)
+		root := newStem(nil, c.root, nil)
+
+		stems := afx.apply(root)
+
+		got := make([]string, 0, len(stems))
+		for _, stem := range stems {
+			got = append(got, stem.Word)
+		}
 
 		test.Assert(t, "Prefix.apply", c.exp, got, true)
 	}
@@ -94,7 +101,14 @@ func TestSuffix_apply(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got := afx.apply(c.root)
+		root := newStem(nil, c.root, nil)
+
+		stems := afx.apply(root)
+
+		got := make([]string, 0, len(stems))
+		for _, stem := range stems {
+			got = append(got, stem.Word)
+		}
 
 		test.Assert(t, "Suffix.apply", c.exp, got, true)
 	}

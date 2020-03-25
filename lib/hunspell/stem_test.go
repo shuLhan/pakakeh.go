@@ -10,41 +10,41 @@ func TestParseStem(t *testing.T) {
 	cases := []struct {
 		desc     string
 		line     string
-		exp      *stem
+		exp      *Stem
 		expError string
 	}{{
 		desc: "With empty line",
 	}, {
 		desc: "With single word",
 		line: `a`,
-		exp: &stem{
-			value: "a",
+		exp: &Stem{
+			Word: "a",
 		},
 	}, {
 		desc: "With single word and trailing space",
 		line: `a `,
-		exp: &stem{
-			value: "a",
+		exp: &Stem{
+			Word: "a",
 		},
 	}, {
 		desc: "With single word and flags",
 		line: `a/bc`,
-		exp: &stem{
-			value:    "a",
+		exp: &Stem{
+			Word:     "a",
 			rawFlags: "bc",
 		},
 	}, {
 		desc: "With single word and morpheme",
 		line: `a ph:x`,
-		exp: &stem{
-			value:        "a",
+		exp: &Stem{
+			Word:         "a",
 			rawMorphemes: []string{"ph:x"},
 		},
 	}, {
 		desc: "With single word, flags, and morphemes",
 		line: `a/bc ph:x st:y`,
-		exp: &stem{
-			value:    "a",
+		exp: &Stem{
+			Word:     "a",
 			rawFlags: "bc",
 			rawMorphemes: []string{
 				"ph:x",
@@ -54,21 +54,21 @@ func TestParseStem(t *testing.T) {
 	}, {
 		desc: "With escaped slash",
 		line: `a\/b`,
-		exp: &stem{
-			value: "a/b",
+		exp: &Stem{
+			Word: "a/b",
 		},
 	}, {
 		desc: "With escaped slash and flags",
 		line: `a\//bc`,
-		exp: &stem{
-			value:    "a/",
+		exp: &Stem{
+			Word:     "a/",
 			rawFlags: "bc",
 		},
 	}, {
 		desc: "With escaped slash and morphemes",
 		line: `a\/ ph:x st:y`,
-		exp: &stem{
-			value: "a/",
+		exp: &Stem{
+			Word: "a/",
 			rawMorphemes: []string{
 				"ph:x",
 				"st:y",
@@ -77,8 +77,8 @@ func TestParseStem(t *testing.T) {
 	}, {
 		desc: "With escaped slash, flags, and morphemes",
 		line: `a\//bc ph:x st:y`,
-		exp: &stem{
-			value:    "a/",
+		exp: &Stem{
+			Word:     "a/",
 			rawFlags: "bc",
 			rawMorphemes: []string{
 				"ph:x",
@@ -88,21 +88,21 @@ func TestParseStem(t *testing.T) {
 	}, {
 		desc: "With word pair",
 		line: "a lot",
-		exp: &stem{
-			value: "a lot",
+		exp: &Stem{
+			Word: "a lot",
 		},
 	}, {
 		desc: "With word pair and flags",
 		line: "a lot/bc",
-		exp: &stem{
-			value:    "a lot",
+		exp: &Stem{
+			Word:     "a lot",
 			rawFlags: "bc",
 		},
 	}, {
 		desc: "With word pair and morphemes",
 		line: `a lot ph:x st:y`,
-		exp: &stem{
-			value: "a lot",
+		exp: &Stem{
+			Word: "a lot",
 			rawMorphemes: []string{
 				"ph:x",
 				"st:y",
@@ -111,8 +111,8 @@ func TestParseStem(t *testing.T) {
 	}, {
 		desc: "With word pair, flags, and morphemes",
 		line: `a lot/bc ph:x st:y`,
-		exp: &stem{
-			value:    "a lot",
+		exp: &Stem{
+			Word:     "a lot",
 			rawFlags: "bc",
 			rawMorphemes: []string{
 				"ph:x",
@@ -189,27 +189,27 @@ func TestStem_unpack(t *testing.T) {
 
 	cases := []struct {
 		desc           string
-		in             *stem
+		in             *Stem
 		expError       string
-		expStem        *stem
+		expStem        *Stem
 		expDerivatives []string
 	}{{
 		desc: "Simple prefix",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "A",
 			rawMorphemes: []string{
 				"p:q",
 			},
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "A",
 			rawMorphemes: []string{
 				"p:q",
 			},
-			morphemes: map[string][]string{
-				"p": []string{"q"},
+			Morphemes: Morphemes{
+				"p": "q",
 			},
 		},
 		expDerivatives: []string{
@@ -217,21 +217,21 @@ func TestStem_unpack(t *testing.T) {
 		},
 	}, {
 		desc: "Simple suffix",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "B",
 			rawMorphemes: []string{
 				"p:q",
 			},
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "B",
 			rawMorphemes: []string{
 				"p:q",
 			},
-			morphemes: map[string][]string{
-				"p": []string{"q"},
+			Morphemes: Morphemes{
+				"p": "q",
 			},
 		},
 		expDerivatives: []string{
@@ -239,21 +239,21 @@ func TestStem_unpack(t *testing.T) {
 		},
 	}, {
 		desc: "Simple suffix with alias",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "2",
 			rawMorphemes: []string{
 				"p:q",
 			},
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "B",
 			rawMorphemes: []string{
 				"p:q",
 			},
-			morphemes: map[string][]string{
-				"p": []string{"q"},
+			Morphemes: Morphemes{
+				"p": "q",
 			},
 		},
 		expDerivatives: []string{
@@ -262,21 +262,21 @@ func TestStem_unpack(t *testing.T) {
 	}, {
 
 		desc: "Prefix with alias",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "1",
 			rawMorphemes: []string{
 				"p:q",
 			},
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "A",
 			rawMorphemes: []string{
 				"p:q",
 			},
-			morphemes: map[string][]string{
-				"p": []string{"q"},
+			Morphemes: Morphemes{
+				"p": "q",
 			},
 		},
 		expDerivatives: []string{
@@ -284,21 +284,21 @@ func TestStem_unpack(t *testing.T) {
 		},
 	}, {
 		desc: "Prefix and morpheme with alias",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "1",
 			rawMorphemes: []string{
 				"1",
 			},
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "A",
 			rawMorphemes: []string{
 				"1",
 			},
-			morphemes: map[string][]string{
-				"p": []string{"q"},
+			Morphemes: Morphemes{
+				"p": "q",
 			},
 		},
 		expDerivatives: []string{
@@ -306,12 +306,12 @@ func TestStem_unpack(t *testing.T) {
 		},
 	}, {
 		desc: "Prefix and suffix",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "AB",
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "AB",
 		},
 		expDerivatives: []string{
@@ -321,12 +321,12 @@ func TestStem_unpack(t *testing.T) {
 		},
 	}, {
 		desc: "Suffix and prefix",
-		in: &stem{
-			value:    "a",
+		in: &Stem{
+			Word:     "a",
 			rawFlags: "BA",
 		},
-		expStem: &stem{
-			value:    "a",
+		expStem: &Stem{
+			Word:     "a",
 			rawFlags: "BA",
 		},
 		expDerivatives: []string{
@@ -342,7 +342,12 @@ func TestStem_unpack(t *testing.T) {
 			test.Assert(t, "unpack error", c.expError, err.Error(), true)
 		}
 
-		test.Assert(t, c.desc+" derivatives", c.expDerivatives, gotDerivatives, true)
+		got := make([]string, 0, len(gotDerivatives))
+		for _, der := range gotDerivatives {
+			got = append(got, der.Word)
+		}
+
+		test.Assert(t, c.desc+" derivatives", c.expDerivatives, got, true)
 		test.Assert(t, c.desc+" after", c.expStem, c.in, true)
 	}
 }
