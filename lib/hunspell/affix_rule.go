@@ -11,6 +11,32 @@ import (
 	"strings"
 )
 
+//
+// affixRule represent each prefix or suffix rule.
+//
+// Syntax for affix rule,
+//
+//	AFFIX_RULE := STRIPPING AFFIX ( FLAGS ) CONDITION MORPHEMES
+//
+//	STRIPPING  := "0" / 1*UTF8_VCHAR
+//
+//	AFFIX      := 1*UTF8_VCHAR
+//
+//	FLAGS      := "/" ( 1*AF_ALIAS / AFFIX_NAME )
+//	AF_ALIAS   := 1*DIGIT
+//
+//	CONDITION  := "." / COND_RE
+//	COND_RE    := "[" ( "^" ) 1*UTF8_VCHAR "]"
+//
+//	MORPHEMES  := 1*AM_ALIAS / *MORPHEME
+//	AM_ALIAS   := 1*DIGIT
+//
+// For example, the affix rule for prefix line "PFX A 0 x . 1" is "0 x . 1".
+// The "0" means no stripping, "x" is the prefix to be added to the word, "."
+// means zero condition, and "1" is an alias to the first morpheme defined in
+// "AM".
+//
+//
 type affixRule struct {
 	// stripping characters from beginning (at  prefix  rules)  or  end
 	// (at  suffix rules) of the word.
@@ -19,9 +45,12 @@ type affixRule struct {
 
 	// affix contains the root affix.
 	// Zero affix is indicated by empty string.
-	affix   string
-	flags   string
-	affixes []*affix
+	affix string
+
+	// An affix rule can contains another affix rules, chaining one or
+	// more affix together.
+	rawFlags string
+	affixes  []*affix
 
 	//
 	// condition is a simplified, regular expression-like pattern, which
@@ -67,7 +96,7 @@ func newAffixRule(opts *affixOptions, isPrefix bool,
 
 		// Expand the flags into affixes.
 		if len(affixflag) > 1 {
-			rule.flags = affixflag[1]
+			rule.rawFlags = affixflag[1]
 
 			err = rule.unpackFlags(opts, affixes)
 			if err != nil {
@@ -93,15 +122,17 @@ func newAffixRule(opts *affixOptions, isPrefix bool,
 //
 // unpackFlags apply each of flag rule to the "root" string.
 //
-func (rule *affixRule) unpackFlags(opts *affixOptions, affixes map[string]*affix) (err error) {
+func (rule *affixRule) unpackFlags(
+	opts *affixOptions, affixes map[string]*affix,
+) (err error) {
 	if len(opts.afAliases) > 1 {
-		afIdx, err := strconv.Atoi(rule.flags)
+		afIdx, err := strconv.Atoi(rule.rawFlags)
 		if err == nil {
-			rule.flags = opts.afAliases[afIdx]
+			rule.rawFlags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(opts.flag, rule.flags)
+	flags, err := unpackFlags(opts.flag, rule.rawFlags)
 	if err != nil {
 		return err
 	}
