@@ -6,6 +6,7 @@ package hunspell
 
 import (
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -42,33 +43,54 @@ func isValidMorpheme(in string) (bool, error) {
 // and it will logged to stderr.
 //
 func newMorphemes(opts *affixOptions, raws []string) Morphemes {
+	rawMorphs := make([]string, 0, len(raws))
 	morphs := make(Morphemes, len(raws))
+
+	// Normalize the raws strings.
 	for _, raw := range raws {
 		for _, m := range strings.Fields(raw) {
 			idx := strings.Index(m, ":")
-
-			if idx == -1 {
-				if len(opts.amAliases) > 0 {
-					// Convert the AM alias number to actual
-					// morpheme.
-					amIdx, err := strconv.Atoi(m)
-					if err != nil {
-						log.Printf("unknown morpheme %q", m)
-						continue
-					}
-					m = opts.amAliases[amIdx]
-					idx = strings.Index(m, ":")
-					if idx <= 0 {
-						continue
-					}
+			switch idx {
+			case -1:
+				if len(opts.amAliases) == 0 {
+					continue
 				}
-			} else if idx == 0 {
+
+				// Convert the AM alias number to actual
+				// morpheme.
+				amIdx, err := strconv.Atoi(m)
+				if err != nil {
+					log.Printf("unknown morpheme %q", m)
+					continue
+				}
+				m = opts.amAliases[amIdx]
+				rawMorphs = append(rawMorphs, strings.Fields(m)...)
+			case 0:
 				continue
+			default:
+				rawMorphs = append(rawMorphs, m)
 			}
-			morphs.set(m[:idx], m[idx+1:])
 		}
 	}
+
+	for _, raw := range rawMorphs {
+		idx := strings.Index(raw, ":")
+		morphs.set(raw[:idx], raw[idx+1:])
+	}
+
 	return morphs
+}
+
+//
+// String return list of morphological fields ordered by key.
+//
+func (morphs Morphemes) String() string {
+	fields := make([]string, 0, len(morphs))
+	for k, v := range morphs {
+		fields = append(fields, k+":"+v)
+	}
+	sort.Strings(fields)
+	return strings.Join(fields, " ")
 }
 
 func (morphs Morphemes) set(id, attr string) {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/shuLhan/share/lib/hunspell"
 	"github.com/shuLhan/share/lib/parser"
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestHunspell(t *testing.T) {
@@ -23,6 +24,7 @@ func TestHunspell(t *testing.T) {
 
 	for _, file := range testFiles {
 		t.Logf("test file: %s", file)
+
 		affFile := filepath.Join(file + ".aff")
 		dicFile := filepath.Join(file + ".dic")
 		goodFile := filepath.Join(file + ".good")
@@ -43,7 +45,6 @@ func TestHunspell(t *testing.T) {
 			if gotStem == nil {
 				t.Fatalf("%q not found in dictionary %q", exp, file)
 			}
-			t.Logf("got stem(%s): %+v", exp, gotStem)
 		}
 
 		expMorphs, err := parseMorphologiesFile(morphFile)
@@ -54,8 +55,17 @@ func TestHunspell(t *testing.T) {
 			t.Fatalf("%s: %s", morphFile, err)
 		}
 
-		for _, word := range exps {
-			_ = expMorphs[word]
+		for _, morph := range expMorphs {
+			gotAnalyze := spell.Analyze(morph.word)
+
+			test.Assert(t, "Analyze("+morph.word+")",
+				morph.analyze.String(), gotAnalyze.String(),
+				true)
+
+			gotStem := spell.Stem(morph.word)
+
+			test.Assert(t, "Stem("+morph.word+")",
+				morph.stem, gotStem.Word, true)
 		}
 	}
 }

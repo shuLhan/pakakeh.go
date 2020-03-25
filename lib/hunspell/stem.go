@@ -7,6 +7,7 @@ package hunspell
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/shuLhan/share/lib/parser"
 )
@@ -63,6 +64,24 @@ func parseStem(line string) (stem *Stem, err error) {
 }
 
 //
+// Analyze return the morphological fields of the stem and its parent stem.
+//
+func (stem *Stem) Analyze() Morphemes {
+	morphs := stem.Morphemes.clone()
+	root := stem
+	parent := stem.Parent
+	for parent != nil {
+		root = parent
+		for k, v := range parent.Morphemes {
+			morphs[k] = v
+		}
+		parent = parent.Parent
+	}
+	morphs.set(morphKeyST, root.Word)
+	return morphs
+}
+
+//
 // parse the single line of word with optional flags and zero or more
 // morphemes attributes.
 //
@@ -88,7 +107,8 @@ func (stem *Stem) parse(line string) (err error) {
 			return err
 		}
 		if ok {
-			stem.rawMorphemes = append(stem.rawMorphemes, token)
+			stem.rawMorphemes = append(stem.rawMorphemes,
+				strings.Fields(token)...)
 			p.SkipHorizontalSpaces()
 			break
 		}

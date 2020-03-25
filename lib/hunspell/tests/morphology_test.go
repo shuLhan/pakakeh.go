@@ -7,32 +7,33 @@ package tests
 import (
 	"testing"
 
+	"github.com/shuLhan/share/lib/hunspell"
 	"github.com/shuLhan/share/lib/test"
 )
 
 func TestMorphology_parseAnalyze(t *testing.T) {
 	cases := []struct {
 		line     string
-		exp      map[string]string
+		exp      hunspell.Morphemes
 		expError string
 	}{{
 		line: "analyze(x)=a:b",
-		exp: map[string]string{
+		exp: hunspell.Morphemes{
 			"a": "b",
 		},
 	}, {
 		line: "	analyze(x)	=	a:b	",
-		exp: map[string]string{
+		exp: hunspell.Morphemes{
 			"a": "b",
 		},
 	}, {
 		line: "analyze(x) = a:",
-		exp: map[string]string{
+		exp: hunspell.Morphemes{
 			"a": "",
 		},
 	}, {
 		line: "analyze(x) = :b",
-		exp: map[string]string{
+		exp: hunspell.Morphemes{
 			"": "b",
 		},
 	}}

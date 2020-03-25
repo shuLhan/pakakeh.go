@@ -7,6 +7,7 @@ package tests
 import (
 	"fmt"
 
+	"github.com/shuLhan/share/lib/hunspell"
 	"github.com/shuLhan/share/lib/parser"
 )
 
@@ -18,7 +19,7 @@ const (
 
 type morphology struct {
 	word    string
-	analyze map[string]string
+	analyze hunspell.Morphemes
 	stem    string
 }
 
@@ -74,7 +75,7 @@ func (morph *morphology) parseAnalyze(line string) (err error) {
 		return fmt.Errorf("parseAnalyze: %w", err)
 	}
 
-	morph.analyze = make(map[string]string)
+	morph.analyze = make(hunspell.Morphemes)
 	var (
 		token string
 		sep   rune
@@ -96,7 +97,7 @@ func (morph *morphology) parseAnalyze(line string) (err error) {
 func (morph *morphology) parseStem(line string) (err error) {
 	p, err := morph.initParser(line, stateStem)
 	if err != nil {
-		return fmt.Errorf("parseAnalyze: %w", err)
+		return fmt.Errorf("parseStem: %w", err)
 	}
 
 	morph.stem, _ = p.Token()

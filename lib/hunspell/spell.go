@@ -62,6 +62,18 @@ func (spell *Spell) AddDictionary(path string) (err error) {
 }
 
 //
+// Analyze return the morphological fields of the word and its parent.
+// It will return nil if word is unknown.
+//
+func (spell *Spell) Analyze(word string) Morphemes {
+	stem := spell.dict.stems[word]
+	if stem == nil {
+		return nil
+	}
+	return stem.Analyze()
+}
+
+//
 // Spell return the stem of "word" if its recognized by Spell;
 // otherwise it will return nil.
 //
