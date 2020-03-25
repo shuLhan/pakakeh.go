@@ -9,6 +9,16 @@ import "strings"
 //
 // affix represent the prefix or suffix and its rules.
 //
+// Syntax,
+//
+//	AFFIX          := "PFX" / "SFX" WSP AFFIX_NAME WSP CROSS_PRODUCT WSP NRULES
+//
+//	AFFIX_NAME     := 1*UTF8_VCHAR
+//
+//	CROSS_PRODUCT  := "N" / "Y"
+//
+//	NRULES         := 1*DIGIT
+//
 type affix struct {
 	isPrefix bool
 
@@ -52,32 +62,35 @@ func (afx *affix) addRule(opts *affixOptions,
 }
 
 //
-// apply the root string with list of affixes according to its rule.
+// apply the affixes to the root stem, return the list of stem.
 //
-func (afx *affix) apply(root string) (ss []string) {
-	var newroot string
+func (afx *affix) apply(root *Stem) (ss []*Stem) {
+	var word string
 
 	for _, rule := range afx.rules {
-		if rule.condition != nil && !rule.condition.MatchString(root) {
+		if rule.condition != nil && !rule.condition.MatchString(root.Word) {
 			continue
 		}
 
 		if afx.isPrefix {
-			newroot = strings.TrimPrefix(root, rule.stripping)
-			newroot = rule.affix + newroot
+			word = strings.TrimPrefix(root.Word, rule.stripping)
+			word = rule.affix + word
 		} else {
-			newroot = strings.TrimSuffix(root, rule.stripping)
-			newroot += rule.affix
+			word = strings.TrimSuffix(root.Word, rule.stripping)
+			word = word + rule.affix
 		}
+
+		stem := newStem(root, word, rule.morphemes)
+
 		if len(rule.affixes) == 0 {
-			ss = append(ss, newroot)
+			ss = append(ss, stem)
 		} else {
 			for _, subafx := range rule.affixes {
-				sublist := subafx.apply(newroot)
+				sublist := subafx.apply(stem)
 
 				ss = append(ss, sublist...)
 			}
-			ss = append(ss, newroot)
+			ss = append(ss, stem)
 		}
 	}
 

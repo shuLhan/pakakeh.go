@@ -57,7 +57,7 @@ func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 	}
 
 	for x := 1; x < len(lines); x++ {
-		stem, err := newStem(lines[x])
+		stem, err := parseStem(lines[x])
 		if err != nil {
 			return fmt.Errorf("line %d: %s", x, err.Error())
 		}
@@ -78,7 +78,7 @@ func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 		dict.stems[stem.Word] = stem
 
 		for _, w := range derivatives {
-			dict.derivatives[w] = stem
+			dict.derivatives[w.Word] = w
 		}
 	}
 

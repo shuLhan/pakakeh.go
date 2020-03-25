@@ -23,10 +23,46 @@ type Stem struct {
 	rawFlags     string
 	rawMorphemes []string
 
-	IsForbidden bool
+	IsForbidden  bool
+	IsDerivative bool // It will true if stem is derivative word.
 }
 
-func newStem(line string) (stem *Stem, err error) {
+//
+// newStem create and initialize new stem using the root Stem, word, and
+// optional list of morpheme.
+//
+func newStem(root *Stem, word string, morphemes []string) (stem *Stem) {
+	stem = &Stem{
+		Word: word,
+		Morphemes: make(map[string][]string,
+			len(root.Morphemes)+len(morphemes)),
+	}
+
+	if root != nil {
+		for k, v := range root.Morphemes {
+			vv := make([]string, len(v))
+			copy(vv, v)
+			stem.Morphemes[k] = vv
+		}
+		stem.IsDerivative = true
+	}
+
+	if len(morphemes) > 0 {
+		for _, m := range morphemes {
+			idx := strings.Index(m, ":")
+			if idx <= 0 {
+				continue
+			}
+			k := m[:idx]
+			v := m[idx+1:]
+			stem.addMorpheme(k, v)
+		}
+	}
+
+	return stem
+}
+
+func parseStem(line string) (stem *Stem, err error) {
 	if len(line) == 0 {
 		return nil, nil
 	}
@@ -129,23 +165,25 @@ func (stem *Stem) parse(line string) (err error) {
 //
 // unpack parse the stem and flags.
 //
-func (stem *Stem) unpack(opts *affixOptions) (derivatives []string, err error) {
+func (stem *Stem) unpack(opts *affixOptions) (derivatives []*Stem, err error) {
 	if stem.Word[0] == '*' {
 		stem.IsForbidden = true
 		stem.Word = stem.Word[1:]
 	}
+
+	stem.unpackMorphemes(opts)
 
 	derivatives, err = stem.unpackFlags(opts)
 	if err != nil {
 		return derivatives, err
 	}
 
-	stem.unpackMorphemes(opts)
-
 	return derivatives, nil
 }
 
-func (stem *Stem) unpackFlags(opts *affixOptions) (derivatives []string, err error) {
+func (stem *Stem) unpackFlags(opts *affixOptions) (
+	derivatives []*Stem, err error,
+) {
 	if len(opts.afAliases) > 1 {
 		afIdx, err := strconv.Atoi(stem.rawFlags)
 		if err == nil {
@@ -164,18 +202,18 @@ func (stem *Stem) unpackFlags(opts *affixOptions) (derivatives []string, err err
 	for _, flag := range flags {
 		pfx, ok := opts.prefixes[flag]
 		if ok {
-			words := pfx.apply(stem.Word)
-			derivatives = append(derivatives, words...)
+			stems := pfx.apply(stem)
+			derivatives = append(derivatives, stems...)
 			if pfx.isCrossProduct {
-				words = stem.applySuffixes(opts, flags, words)
-				derivatives = append(derivatives, words...)
+				stems = stem.applySuffixes(opts, flags, stems)
+				derivatives = append(derivatives, stems...)
 			}
 			continue
 		}
 		sfx, ok := opts.suffixes[flag]
 		if ok {
-			words := sfx.apply(stem.Word)
-			derivatives = append(derivatives, words...)
+			stems := sfx.apply(stem)
+			derivatives = append(derivatives, stems...)
 			continue
 		}
 		return nil, fmt.Errorf("unknown affix flag %q", flag)
@@ -213,12 +251,14 @@ func (stem *Stem) unpackMorphemes(opts *affixOptions) {
 
 //
 // applySuffixes apply any cross-product "suffixes" in "flags" for each word
-// in "words".
+// in "stems".
 //
-func (stem *Stem) applySuffixes(opts *affixOptions, flags, words []string) (
-	derivatives []string,
+func (stem *Stem) applySuffixes(
+	opts *affixOptions, flags []string, stems []*Stem,
+) (
+	derivatives []*Stem,
 ) {
-	for _, word := range words {
+	for _, stem := range stems {
 		for _, flag := range flags {
 			sfx, ok := opts.suffixes[flag]
 			if !ok {
@@ -227,7 +267,7 @@ func (stem *Stem) applySuffixes(opts *affixOptions, flags, words []string) (
 			if !sfx.isCrossProduct {
 				continue
 			}
-			ss := sfx.apply(word)
+			ss := sfx.apply(stem)
 			derivatives = append(derivatives, ss...)
 		}
 	}

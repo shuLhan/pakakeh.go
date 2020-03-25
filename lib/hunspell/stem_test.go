@@ -6,7 +6,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestNewStem(t *testing.T) {
+func TestParseStem(t *testing.T) {
 	cases := []struct {
 		desc     string
 		line     string
@@ -144,7 +144,7 @@ func TestNewStem(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := newStem(c.line)
+		got, err := parseStem(c.line)
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
