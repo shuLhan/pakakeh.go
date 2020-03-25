@@ -231,7 +231,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			if len(tokens) == 1 {
 				return fmt.Errorf("line %d: AM: missing argument", x)
 			}
-			err = opts.parseAM(tokens[1])
+			err = opts.parseAM(tokens[1:])
 			if err != nil {
 				return fmt.Errorf("line %d: %s", x, err.Error())
 			}
@@ -603,17 +603,17 @@ func (opts *affixOptions) parseAF(arg string) (err error) {
 	return nil
 }
 
-func (opts *affixOptions) parseAM(arg string) (err error) {
+func (opts *affixOptions) parseAM(args []string) (err error) {
 	if cap(opts.amAliases) == 0 {
-		n, err := strconv.Atoi(arg)
+		n, err := strconv.Atoi(args[0])
 		if err != nil {
 			return err
 		}
 
-		opts.amAliases = make([]string, 0, n)
+		opts.amAliases = make([]string, 0, n+1)
 		opts.amAliases = append(opts.amAliases, "")
 	} else {
-		opts.amAliases = append(opts.amAliases, arg)
+		opts.amAliases = append(opts.amAliases, strings.Join(args, " "))
 	}
 	return nil
 }
