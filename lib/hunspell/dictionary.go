@@ -16,10 +16,6 @@ import (
 type dictionary struct {
 	// stems contains mapping between root words and its attributes.
 	stems map[string]*Stem
-
-	// derivatives contains the mapping of combination of derivative
-	// word (root word plus prefix and/or suffix) and its root word.
-	derivatives map[string]*Stem
 }
 
 func (dict *dictionary) open(file string, opts *affixOptions) (err error) {
@@ -78,7 +74,7 @@ func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 		dict.stems[stem.Word] = stem
 
 		for _, w := range derivatives {
-			dict.derivatives[w.Word] = w
+			dict.stems[w.Word] = w
 		}
 	}
 

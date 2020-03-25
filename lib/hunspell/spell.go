@@ -25,8 +25,7 @@ func New() (spell *Spell) {
 			suffixes:    make(map[string]*affix),
 		},
 		dict: dictionary{
-			stems:       make(map[string]*Stem),
-			derivatives: make(map[string]*Stem),
+			stems: make(map[string]*Stem),
 		},
 	}
 	return spell
@@ -67,15 +66,5 @@ func (spell *Spell) AddDictionary(path string) (err error) {
 // otherwise it will return nil.
 //
 func (spell *Spell) Spell(word string) (stem *Stem) {
-	stem = spell.dict.stems[word]
-	if stem != nil {
-		return stem
-	}
-
-	stem = spell.dict.derivatives[word]
-	if stem != nil {
-		return stem
-	}
-
-	return nil
+	return spell.dict.stems[word]
 }
