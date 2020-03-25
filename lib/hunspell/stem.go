@@ -138,6 +138,26 @@ func (stem *Stem) parse(line string) (err error) {
 }
 
 //
+// Stem reduce inflected (or sometimes derived) words to their word stem,
+// base, or root form.
+//
+func (stem *Stem) Stem() *Stem {
+	if stem.Parent == nil {
+		return stem
+	}
+	parent := stem
+	for parent.Parent != nil {
+		_, ok := parent.Morphemes[morphKeyIS]
+		if ok {
+			parent = parent.Parent
+			continue
+		}
+		break
+	}
+	return parent
+}
+
+//
 // unpack parse the stem and flags.
 //
 func (stem *Stem) unpack(opts *affixOptions) (derivatives []*Stem, err error) {

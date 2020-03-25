@@ -97,6 +97,22 @@ const (
 	optCheckSharps   = "CHECKSHARPS"
 )
 
+// List of morphological and other IDs.
+const (
+	morphKeyPH = "ph"
+	morphKeyST = "st"
+	morphKeyAL = "al"
+	morphKeyPO = "po"
+	morphKeyDS = "ds"
+	morphKeyIS = "is"
+	morphKeyTS = "ts"
+	morphKeySP = "sp"
+	morphKeyPA = "pa"
+	morphKeyDP = "dp"
+	morphKeyIP = "ip"
+	morphKeyTP = "tp"
+)
+
 // List of valid SET values.
 const (
 	EncodingUTF8           = "UTF-8" // Default

@@ -68,3 +68,15 @@ func (spell *Spell) AddDictionary(path string) (err error) {
 func (spell *Spell) Spell(word string) (stem *Stem) {
 	return spell.dict.stems[word]
 }
+
+//
+// Stem reduce inflected (or sometimes derived) words to their word stem,
+// base, or root form.
+//
+func (spell *Spell) Stem(word string) *Stem {
+	stem := spell.dict.stems[word]
+	if stem == nil {
+		return nil
+	}
+	return stem.Stem()
+}
