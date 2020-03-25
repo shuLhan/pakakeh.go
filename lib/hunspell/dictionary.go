@@ -15,11 +15,11 @@ import (
 
 type dictionary struct {
 	// stems contains mapping between root words and its attributes.
-	stems map[string]*stem
+	stems map[string]*Stem
 
 	// derivatives contains the mapping of combination of derivative
 	// word (root word plus prefix and/or suffix) and its root word.
-	derivatives map[string]*stem
+	derivatives map[string]*Stem
 }
 
 func (dict *dictionary) open(file string, opts *affixOptions) (err error) {
@@ -57,28 +57,28 @@ func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 	}
 
 	for x := 1; x < len(lines); x++ {
-		s, err := newStem(lines[x])
+		stem, err := newStem(lines[x])
 		if err != nil {
 			return fmt.Errorf("line %d: %s", x, err.Error())
 		}
-		if s == nil {
+		if stem == nil {
 			continue
 		}
 
-		_, ok := dict.stems[s.value]
+		_, ok := dict.stems[stem.Word]
 		if ok {
-			log.Printf("duplicate stem %q", s.value)
+			log.Printf("duplicate stem %q", stem.Word)
 		}
 
-		derivatives, err := s.unpack(opts)
+		derivatives, err := stem.unpack(opts)
 		if err != nil {
 			return fmt.Errorf("line %d: %s", x, err.Error())
 		}
 
-		dict.stems[s.value] = s
+		dict.stems[stem.Word] = stem
 
 		for _, w := range derivatives {
-			dict.derivatives[w] = s
+			dict.derivatives[w] = stem
 		}
 	}
 

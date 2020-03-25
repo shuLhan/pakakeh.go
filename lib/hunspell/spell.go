@@ -25,8 +25,8 @@ func New() (spell *Spell) {
 			suffixes:    make(map[string]*affix),
 		},
 		dict: dictionary{
-			stems:       make(map[string]*stem),
-			derivatives: make(map[string]*stem),
+			stems:       make(map[string]*Stem),
+			derivatives: make(map[string]*Stem),
 		},
 	}
 	return spell
@@ -63,19 +63,19 @@ func (spell *Spell) AddDictionary(path string) (err error) {
 }
 
 //
-// Spell return the root word of "s" if its recognized by spell checked;
-// otherwise it will return empty string.
+// Spell return the stem of "word" if its recognized by Spell;
+// otherwise it will return nil.
 //
-func (spell *Spell) Spell(word string) (root string, ok bool) {
-	s, ok := spell.dict.stems[word]
-	if ok {
-		return s.value, true
+func (spell *Spell) Spell(word string) (stem *Stem) {
+	stem = spell.dict.stems[word]
+	if stem != nil {
+		return stem
 	}
 
-	s, ok = spell.dict.derivatives[word]
-	if ok {
-		return s.value, true
+	stem = spell.dict.derivatives[word]
+	if stem != nil {
+		return stem
 	}
 
-	return "", false
+	return nil
 }

@@ -14,39 +14,41 @@ import (
 )
 
 //
-// stem contains the word and its attributes.
+// Stem contains the word and its attributes.
 //
-type stem struct {
-	value        string
+type Stem struct {
+	Word      string
+	Morphemes map[string][]string
+
 	rawFlags     string
 	rawMorphemes []string
-	morphemes    map[string][]string
-	isForbidden  bool
+
+	IsForbidden bool
 }
 
-func newStem(line string) (s *stem, err error) {
+func newStem(line string) (stem *Stem, err error) {
 	if len(line) == 0 {
 		return nil, nil
 	}
 
-	s = &stem{}
+	stem = &Stem{}
 
-	err = s.parse(line)
+	err = stem.parse(line)
 	if err != nil {
 		return nil, err
 	}
 
-	return s, nil
+	return stem, nil
 }
 
-func (s *stem) addMorpheme(id, token string) {
-	if s.morphemes == nil {
-		s.morphemes = make(map[string][]string)
+func (stem *Stem) addMorpheme(id, token string) {
+	if stem.Morphemes == nil {
+		stem.Morphemes = make(map[string][]string)
 	}
 
-	list := s.morphemes[id]
+	list := stem.Morphemes[id]
 	list = append(list, token)
-	s.morphemes[id] = list
+	stem.Morphemes[id] = list
 }
 
 //
@@ -55,7 +57,7 @@ func (s *stem) addMorpheme(id, token string) {
 //
 //	STEM := WORD [ " " WORD ] [ "/" FLAGS ] [ *MORPHEME ]
 //
-func (s *stem) parse(line string) (err error) {
+func (stem *Stem) parse(line string) (err error) {
 	var (
 		token  string
 		sep    rune
@@ -75,20 +77,20 @@ func (s *stem) parse(line string) (err error) {
 			return err
 		}
 		if ok {
-			s.rawMorphemes = append(s.rawMorphemes, token)
+			stem.rawMorphemes = append(stem.rawMorphemes, token)
 			p.SkipHorizontalSpaces()
 			break
 		}
 
-		token, s.rawFlags, err = parseWordFlags(token)
+		token, stem.rawFlags, err = parseWordFlags(token)
 		if err != nil {
 			return err
 		}
 
-		if len(s.value) > 0 {
-			s.value += " "
+		if len(stem.Word) > 0 {
+			stem.Word += " "
 		}
-		s.value += token
+		stem.Word += token
 		nwords++
 		if nwords > 2 {
 			return fmt.Errorf("only one or two words allowed: %q", line)
@@ -96,7 +98,7 @@ func (s *stem) parse(line string) (err error) {
 
 		p.SkipHorizontalSpaces()
 
-		if len(s.rawFlags) > 0 {
+		if len(stem.rawFlags) > 0 {
 			break
 		}
 		if sep == 0 {
@@ -117,7 +119,7 @@ func (s *stem) parse(line string) (err error) {
 		if !ok {
 			return errInvalidMorpheme(token)
 		}
-		s.rawMorphemes = append(s.rawMorphemes, token)
+		stem.rawMorphemes = append(stem.rawMorphemes, token)
 		p.SkipHorizontalSpaces()
 	}
 
@@ -127,31 +129,31 @@ func (s *stem) parse(line string) (err error) {
 //
 // unpack parse the stem and flags.
 //
-func (s *stem) unpack(opts *affixOptions) (derivatives []string, err error) {
-	if s.value[0] == '*' {
-		s.isForbidden = true
-		s.value = s.value[1:]
+func (stem *Stem) unpack(opts *affixOptions) (derivatives []string, err error) {
+	if stem.Word[0] == '*' {
+		stem.IsForbidden = true
+		stem.Word = stem.Word[1:]
 	}
 
-	derivatives, err = s.unpackFlags(opts)
+	derivatives, err = stem.unpackFlags(opts)
 	if err != nil {
 		return derivatives, err
 	}
 
-	s.unpackMorphemes(opts)
+	stem.unpackMorphemes(opts)
 
 	return derivatives, nil
 }
 
-func (s *stem) unpackFlags(opts *affixOptions) (derivatives []string, err error) {
+func (stem *Stem) unpackFlags(opts *affixOptions) (derivatives []string, err error) {
 	if len(opts.afAliases) > 1 {
-		afIdx, err := strconv.Atoi(s.rawFlags)
+		afIdx, err := strconv.Atoi(stem.rawFlags)
 		if err == nil {
-			s.rawFlags = opts.afAliases[afIdx]
+			stem.rawFlags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(opts.flag, s.rawFlags)
+	flags, err := unpackFlags(opts.flag, stem.rawFlags)
 	if err != nil {
 		return nil, err
 	}
@@ -162,17 +164,17 @@ func (s *stem) unpackFlags(opts *affixOptions) (derivatives []string, err error)
 	for _, flag := range flags {
 		pfx, ok := opts.prefixes[flag]
 		if ok {
-			words := pfx.apply(s.value)
+			words := pfx.apply(stem.Word)
 			derivatives = append(derivatives, words...)
 			if pfx.isCrossProduct {
-				words = s.applySuffixes(opts, flags, words)
+				words = stem.applySuffixes(opts, flags, words)
 				derivatives = append(derivatives, words...)
 			}
 			continue
 		}
 		sfx, ok := opts.suffixes[flag]
 		if ok {
-			words := sfx.apply(s.value)
+			words := sfx.apply(stem.Word)
 			derivatives = append(derivatives, words...)
 			continue
 		}
@@ -188,8 +190,8 @@ func (s *stem) unpackFlags(opts *affixOptions) (derivatives []string, err error)
 // At this point, each of the morphemes should be valid, unless its unknown
 // and it will logged to stderr.
 //
-func (s *stem) unpackMorphemes(opts *affixOptions) {
-	for _, m := range s.rawMorphemes {
+func (stem *Stem) unpackMorphemes(opts *affixOptions) {
+	for _, m := range stem.rawMorphemes {
 		idx := strings.Index(m, ":")
 
 		if idx == -1 {
@@ -205,7 +207,7 @@ func (s *stem) unpackMorphemes(opts *affixOptions) {
 				idx = strings.Index(m, ":")
 			}
 		}
-		s.addMorpheme(m[:idx], m[idx+1:])
+		stem.addMorpheme(m[:idx], m[idx+1:])
 	}
 }
 
@@ -213,12 +215,12 @@ func (s *stem) unpackMorphemes(opts *affixOptions) {
 // applySuffixes apply any cross-product "suffixes" in "flags" for each word
 // in "words".
 //
-func (s *stem) applySuffixes(opts *affixOptions, flags, words []string) (
+func (stem *Stem) applySuffixes(opts *affixOptions, flags, words []string) (
 	derivatives []string,
 ) {
 	for _, word := range words {
-		for _, s := range flags {
-			sfx, ok := opts.suffixes[s]
+		for _, flag := range flags {
+			sfx, ok := opts.suffixes[flag]
 			if !ok {
 				continue
 			}
