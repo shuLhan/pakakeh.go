@@ -689,7 +689,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	ascii.ToLower(&tok)
 	rr.SOA.RName = m.generateDomainName(tok)
 
-	var v int
+	var v int64
 	isMultiline := false
 	terms := []byte{'\n', ';'}
 
@@ -705,7 +705,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		terms = append(terms, ')')
 		m.flag = parseSOAStart
 	} else {
-		v, err = strconv.Atoi(string(tok))
+		v, err = strconv.ParseInt(string(tok), 10, 64)
 		if err != nil {
 			return err
 		}
@@ -739,7 +739,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 			_ = m.reader.SkipSpaces()
 		}
 
-		v, err = strconv.Atoi(string(tok))
+		v, err = strconv.ParseInt(string(tok), 10, 64)
 		if err != nil {
 			return err
 		}
@@ -866,7 +866,7 @@ func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
-	pref, err := strconv.Atoi(string(tok))
+	pref, err := strconv.ParseInt(string(tok), 10, 64)
 	if err != nil {
 		return fmt.Errorf("! %s:%d Invalid MX Preference: %s",
 			m.file, m.lineno, err)

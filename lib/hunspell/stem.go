@@ -139,7 +139,7 @@ func (stem *Stem) parse(line string) (err error) {
 	}
 	// Parse the rest of morphemes.
 	for {
-		token, sep = p.Token()
+		token, _ = p.Token()
 		if len(token) == 0 {
 			break
 		}

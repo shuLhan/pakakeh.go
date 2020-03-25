@@ -19,4 +19,5 @@ package big
 // One should change this value before using the new extended Float or Rat in
 // the program.
 //
+//nolint: gochecknoglobals
 var DefaultDigitPrecision = 8

@@ -88,7 +88,7 @@ func (morph *morphology) parseAnalyze(line string) (err error) {
 		if sep != ':' {
 			return fmt.Errorf("parseAnalyze: expecting ':', got %q", sep)
 		}
-		morph.analyze[token], sep = p.Token()
+		morph.analyze[token], _ = p.Token()
 		p.SkipHorizontalSpaces()
 	}
 	return nil

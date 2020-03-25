@@ -79,7 +79,7 @@ func (afx *affix) apply(root *Stem) (ss []*Stem) {
 			word = rule.affix + word
 		} else {
 			word = strings.TrimSuffix(root.Word, rule.stripping)
-			word = word + rule.affix
+			word += rule.affix
 		}
 
 		stem := newStem(root, word, rule.morphemes)

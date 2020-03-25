@@ -19,6 +19,7 @@ import (
 // One should change this value before using the new extended Float in the
 // program.
 //
+//nolint: gochecknoglobals
 var DefaultBitPrecision uint = 128
 
 //
@@ -28,6 +29,7 @@ var DefaultBitPrecision uint = 128
 // One should change this value before using the new extended Float in the
 // program.
 //
+//nolint: gochecknoglobals
 var DefaultRoundingMode = big.ToNearestAway
 
 //
@@ -137,7 +139,7 @@ func QuoFloat(f, g interface{}) *Float {
 }
 
 //
-// SubFloat return the result of substraction `f-g` as new Float.
+// SubFloat return the result of subtraction `f-g` as new Float.
 //
 func SubFloat(f, g *Float) *Float {
 	h := f.Clone()

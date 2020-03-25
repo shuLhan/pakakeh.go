@@ -8,10 +8,6 @@ import "testing"
 
 type F func()
 
-type I interface {
-	J() bool
-}
-
 type T struct{}
 
 func (t *T) J() bool {

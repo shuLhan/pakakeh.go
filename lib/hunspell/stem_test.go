@@ -169,7 +169,7 @@ func TestStem_unpack(t *testing.T) {
 			"p:q r:s",
 		},
 		prefixes: map[string]*affix{
-			"A": &affix{
+			"A": {
 				isPrefix:       true,
 				isCrossProduct: true,
 				rules: []*affixRule{{
@@ -178,7 +178,7 @@ func TestStem_unpack(t *testing.T) {
 			},
 		},
 		suffixes: map[string]*affix{
-			"B": &affix{
+			"B": {
 				isCrossProduct: true,
 				rules: []*affixRule{{
 					affix: "y",

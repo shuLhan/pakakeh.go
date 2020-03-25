@@ -97,7 +97,10 @@ const (
 	optCheckSharps   = "CHECKSHARPS"
 )
 
+//
 // List of morphological and other IDs.
+//
+//nolint: varcheck,deadcode
 const (
 	morphKeyPH = "ph"
 	morphKeyST = "st"

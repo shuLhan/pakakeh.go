@@ -81,8 +81,6 @@ func xmlData(dec xml.TokenReader) (data string, err error) {
 }
 
 func xmlParseScalarValue(dec *xml.Decoder) (v Value, err error) {
-	var i int
-
 	// Get the element type.
 	el, _, err := xmlNext(dec)
 	if err != nil {
@@ -127,9 +125,10 @@ func xmlParseScalarValue(dec *xml.Decoder) (v Value, err error) {
 		v.In, err = strconv.ParseFloat(data, 10)
 
 	case typeNameInteger, typeNameInteger4:
+		var i64 int64
 		v.Kind = Integer
-		i, err = strconv.Atoi(data)
-		v.In = int32(i)
+		i64, err = strconv.ParseInt(data, 10, 64)
+		v.In = int32(i64)
 
 	case typeNameStruct:
 		v, err = xmlParseStruct(dec)

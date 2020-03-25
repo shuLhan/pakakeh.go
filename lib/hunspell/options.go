@@ -17,6 +17,7 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
+//nolint: maligned
 type affixOptions struct {
 	//
 	// Affix file general options.
@@ -90,18 +91,19 @@ type affixOptions struct {
 	// The parameter of TRY is case sensitive.
 	try string
 
-	noSuggest          []string          // NOSUGGEST option.
-	maxCompundSuggests int               // MAXCPDSUGS option.
-	maxNGramSuggests   int               // MAXNGRAMSUGS option.
-	maxDiff            int               // MAXDIFF option.
-	isOnlyMaxDiff      bool              // ONLYMAXDIFF option.
-	isNoSplitSugs      bool              // NOSPLITSUGS option.
-	isSugsWithDots     bool              // SUGSWITHDOTS option.
-	reps               []replacement     // REP option.
-	charsMaps          []charsmap        // MAP option.
-	phone              map[string]string // PHONE option.
-	warn               string            // WARN option.
-	isForbidWarn       bool              // FORBIDWARN option.
+	noSuggest          []string      // NOSUGGEST option.
+	maxCompundSuggests int           // MAXCPDSUGS option.
+	maxNGramSuggests   int           // MAXNGRAMSUGS option.
+	maxDiff            int           // MAXDIFF option.
+	isOnlyMaxDiff      bool          // ONLYMAXDIFF option.
+	isNoSplitSugs      bool          // NOSPLITSUGS option.
+	isSugsWithDots     bool          // SUGSWITHDOTS option.
+	reps               []replacement // REP option.
+	charsMaps          []charsmap    // MAP option.
+	warn               string        // WARN option.
+	isForbidWarn       bool          // FORBIDWARN option.
+
+	//phone              map[string]string // PHONE option.
 
 	//
 	// Options for compounding.
@@ -145,8 +147,8 @@ type affixOptions struct {
 	forbiddenWord string       // FORBIDDENWORD option.
 	isFullStrip   bool         // FULLSTRIP option.
 	keepCase      string       // KEEPCASE option.
-	iconv         []convertion // ICONV option.
-	oconv         []convertion // OCONV option.
+	iconv         []conversion // ICONV option.
+	oconv         []conversion // OCONV option.
 	lemmaPresent  string       // LEMMA_PRESENT option.
 	needAffix     string       // NEEDAFFIX option.
 	pseudoRoot    string       // PSEUDOROOT option.
@@ -177,6 +179,7 @@ func (opts *affixOptions) open(file string) (err error) {
 //
 // load affix options from string.
 //
+//nolint: gocyclo
 func (opts *affixOptions) load(content string) (err error) {
 	p := parser.New(content, "")
 
@@ -908,14 +911,14 @@ func (opts *affixOptions) parseIconv(args []string) (err error) {
 				args[0], err)
 		}
 
-		opts.iconv = make([]convertion, 0, n)
+		opts.iconv = make([]conversion, 0, n)
 		return nil
 	}
 	if len(args) != 2 {
 		return fmt.Errorf("ICONV: invalid arguments %q", args)
 	}
 
-	c := convertion{
+	c := conversion{
 		pattern:  args[0],
 		pattern2: args[1],
 	}
@@ -933,14 +936,14 @@ func (opts *affixOptions) parseOconv(args []string) (err error) {
 				args[0], err)
 		}
 
-		opts.oconv = make([]convertion, 0, n)
+		opts.oconv = make([]conversion, 0, n)
 		return nil
 	}
 	if len(args) != 2 {
 		return fmt.Errorf("ICONV: invalid arguments %q", args)
 	}
 
-	c := convertion{
+	c := conversion{
 		pattern:  args[0],
 		pattern2: args[1],
 	}

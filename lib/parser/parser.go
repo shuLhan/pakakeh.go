@@ -233,7 +233,6 @@ func (p *Parser) TokenEscaped(esc rune) (string, rune) {
 	p.d = 0
 	p.x = len(p.v)
 	return string(p.token), p.d
-
 }
 
 //
@@ -261,7 +260,7 @@ func (p *Parser) ReadEnclosed(open, closed rune) (string, rune) {
 
 	p.d = 0
 	p.x = len(p.v)
-	return string(p.v), 0
+	return p.v, 0
 }
 
 //

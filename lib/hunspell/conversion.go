@@ -4,7 +4,7 @@
 
 package hunspell
 
-type convertion struct {
+type conversion struct {
 	pattern  string
 	pattern2 string
 }

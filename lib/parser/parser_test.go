@@ -244,8 +244,8 @@ func TestParser_SkipHorizontalSpaces(t *testing.T) {
 	cases := []struct {
 		desc     string
 		content  string
-		expRune  rune
 		expToken string
+		expRune  rune
 		expDelim rune
 	}{{
 		desc: "With empty content",

@@ -449,16 +449,16 @@ func (serv *Server) handleText(conn int, payload []byte) {
 	*res = handler(ctx, req)
 
 out:
-	res.ID = req.ID
+	if req != nil {
+		res.ID = req.ID
+		_reqPool.Put(req)
+	}
 
 	err = serv.sendResponse(conn, res)
 	if err != nil {
 		serv.ClientRemove(conn)
 	}
 
-	if req != nil {
-		_reqPool.Put(req)
-	}
 	_resPool.Put(res)
 }
 

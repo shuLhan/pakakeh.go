@@ -13,6 +13,7 @@ import (
 	"strings"
 )
 
+//nolint: gochecknoglobals
 var ratZero = NewRat(0)
 
 //
@@ -116,7 +117,7 @@ func QuoRat(f ...interface{}) *Rat {
 }
 
 //
-// SubRat return the result of substraction `f-g-...` as new Rat.
+// SubRat return the result of subtraction `f-g-...` as new Rat.
 //
 func SubRat(f ...interface{}) *Rat {
 	if len(f) == 0 {
@@ -163,10 +164,7 @@ func (r *Rat) Int64() int64 {
 func (r *Rat) IsEqual(g interface{}) bool {
 	y := toRat(g, nil)
 	if y == nil {
-		if r == nil {
-			return true
-		}
-		return false
+		return r == nil
 	}
 	if r == nil {
 		return false
@@ -382,7 +380,7 @@ func toRat(v interface{}, in *Rat) (out *Rat) {
 	case int32:
 		out.SetInt64(int64(v))
 	case int64:
-		out.SetInt64(int64(v))
+		out.SetInt64(v)
 	case float32:
 		out.SetFloat64(float64(v))
 	case float64:
