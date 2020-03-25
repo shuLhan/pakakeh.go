@@ -34,7 +34,8 @@ func parseMorphologiesFile(morphFile string) (morphs map[string]morphology, err 
 
 	morph := &morphology{}
 
-	for x, line := range lines {
+	for x := 0; x < len(lines); {
+		line := lines[x]
 		switch state {
 		case stateWord:
 			if line[0] != '>' {
@@ -43,6 +44,7 @@ func parseMorphologiesFile(morphFile string) (morphs map[string]morphology, err 
 			}
 			morph.word = line[2:]
 			state = stateAnalyze
+			x++
 		case stateAnalyze:
 			err = morph.parseAnalyze(line)
 			if err != nil {
@@ -50,20 +52,19 @@ func parseMorphologiesFile(morphFile string) (morphs map[string]morphology, err 
 					morphFile, x, err)
 			}
 			state = stateStem
+			x++
 		case stateStem:
 			err = morph.parseStem(line)
 			if err != nil {
-				return nil, fmt.Errorf("%s line %d: %w",
-					morphFile, x, err)
+				state = stateWord
+				continue
 			}
 			state = stateWord
 
 			morphs[morph.word] = *morph
 			morph = &morphology{}
+			x++
 		}
-	}
-	if state != stateWord {
-		return nil, fmt.Errorf("%s: expecting %s", morphFile, state)
 	}
 
 	return morphs, nil
@@ -84,9 +85,6 @@ func (morph *morphology) parseAnalyze(line string) (err error) {
 		token, sep = p.Token()
 		if sep == 0 {
 			break
-		}
-		if sep != ':' {
-			return fmt.Errorf("parseAnalyze: expecting ':', got %q", sep)
 		}
 		morph.analyze[token], _ = p.Token()
 		p.SkipHorizontalSpaces()

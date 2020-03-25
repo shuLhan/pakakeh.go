@@ -20,6 +20,7 @@ func TestHunspell(t *testing.T) {
 		"affixes",
 		"alias",
 		"alias2",
+		"alias3",
 	}
 
 	for _, file := range testFiles {

@@ -64,7 +64,9 @@ func newMorphemes(opts *affixOptions, raws []string) Morphemes {
 					continue
 				}
 				m = opts.amAliases[amIdx]
-				rawMorphs = append(rawMorphs, strings.Fields(m)...)
+				if len(m) > 0 {
+					rawMorphs = append(rawMorphs, strings.Fields(m)...)
+				}
 			case 0:
 				continue
 			default:
@@ -74,8 +76,7 @@ func newMorphemes(opts *affixOptions, raws []string) Morphemes {
 	}
 
 	for _, raw := range rawMorphs {
-		idx := strings.Index(raw, ":")
-		morphs.set(raw[:idx], raw[idx+1:])
+		morphs.add(raw)
 	}
 
 	return morphs
@@ -91,6 +92,18 @@ func (morphs Morphemes) String() string {
 	}
 	sort.Strings(fields)
 	return strings.Join(fields, " ")
+}
+
+func (morphs Morphemes) add(raw string) {
+	idx := strings.Index(raw, ":")
+	switch idx {
+	case -1:
+		morphs[raw] = ""
+	case 0:
+		morphs[""] = raw[1:]
+	default:
+		morphs.set(raw[:idx], raw[idx+1:])
+	}
 }
 
 func (morphs Morphemes) set(id, attr string) {
