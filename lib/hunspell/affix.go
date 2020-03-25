@@ -4,7 +4,9 @@
 
 package hunspell
 
-import "strings"
+import (
+	"strings"
+)
 
 //
 // affix represent the prefix or suffix and its rules.

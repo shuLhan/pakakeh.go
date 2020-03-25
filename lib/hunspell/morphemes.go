@@ -74,3 +74,11 @@ func newMorphemes(opts *affixOptions, raws []string) Morphemes {
 func (morphs Morphemes) set(id, attr string) {
 	morphs[id] = attr
 }
+
+func (morphs Morphemes) clone() Morphemes {
+	clone := make(Morphemes, len(morphs))
+	for k, v := range morphs {
+		clone[k] = v
+	}
+	return clone
+}

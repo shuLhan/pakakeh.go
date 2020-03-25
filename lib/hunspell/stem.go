@@ -17,36 +17,27 @@ import (
 type Stem struct {
 	Word      string
 	Morphemes Morphemes
+	Parent    *Stem
 
 	rawFlags     string
 	rawMorphemes []string
 
-	IsForbidden  bool
-	IsDerivative bool // It will true if stem is derivative word.
+	IsForbidden bool
 }
 
 //
-// newStem create and initialize new stem using the root Stem, word, and
+// newStem create and initialize new stem using the parent Stem, word, and
 // optional list of morpheme.
 //
-func newStem(root *Stem, word string, morphs Morphemes) (stem *Stem) {
+func newStem(parent *Stem, word string, morphs Morphemes) (stem *Stem) {
 	stem = &Stem{
 		Word:      word,
-		Morphemes: make(Morphemes, len(root.Morphemes)+len(morphs)),
+		Morphemes: morphs.clone(),
+		Parent:    parent,
 	}
 
-	if root != nil {
-		for k, v := range root.Morphemes {
-			stem.Morphemes.set(k, v)
-		}
-		stem.IsDerivative = true
-		stem.Morphemes.set("st", root.Word)
-	} else {
-		stem.Morphemes.set("st", word)
-	}
-
-	if len(morphs) > 0 {
-		for k, v := range morphs {
+	if parent != nil {
+		for k, v := range parent.Morphemes {
 			stem.Morphemes.set(k, v)
 		}
 	}
@@ -156,7 +147,6 @@ func (stem *Stem) unpack(opts *affixOptions) (derivatives []*Stem, err error) {
 	}
 
 	stem.Morphemes = newMorphemes(opts, stem.rawMorphemes)
-	stem.Morphemes.set("st", stem.Word)
 
 	derivatives, err = stem.unpackFlags(opts)
 	if err != nil {
