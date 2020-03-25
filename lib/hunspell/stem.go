@@ -6,9 +6,7 @@ package hunspell
 
 import (
 	"fmt"
-	"log"
 	"strconv"
-	"strings"
 
 	"github.com/shuLhan/share/lib/parser"
 )
@@ -18,7 +16,7 @@ import (
 //
 type Stem struct {
 	Word      string
-	Morphemes map[string][]string
+	Morphemes Morphemes
 
 	rawFlags     string
 	rawMorphemes []string
@@ -31,31 +29,25 @@ type Stem struct {
 // newStem create and initialize new stem using the root Stem, word, and
 // optional list of morpheme.
 //
-func newStem(root *Stem, word string, morphemes []string) (stem *Stem) {
+func newStem(root *Stem, word string, morphs Morphemes) (stem *Stem) {
 	stem = &Stem{
-		Word: word,
-		Morphemes: make(map[string][]string,
-			len(root.Morphemes)+len(morphemes)),
+		Word:      word,
+		Morphemes: make(Morphemes, len(root.Morphemes)+len(morphs)),
 	}
 
 	if root != nil {
 		for k, v := range root.Morphemes {
-			vv := make([]string, len(v))
-			copy(vv, v)
-			stem.Morphemes[k] = vv
+			stem.Morphemes.set(k, v)
 		}
 		stem.IsDerivative = true
+		stem.Morphemes.set("st", root.Word)
+	} else {
+		stem.Morphemes.set("st", word)
 	}
 
-	if len(morphemes) > 0 {
-		for _, m := range morphemes {
-			idx := strings.Index(m, ":")
-			if idx <= 0 {
-				continue
-			}
-			k := m[:idx]
-			v := m[idx+1:]
-			stem.addMorpheme(k, v)
+	if len(morphs) > 0 {
+		for k, v := range morphs {
+			stem.Morphemes.set(k, v)
 		}
 	}
 
@@ -67,7 +59,9 @@ func parseStem(line string) (stem *Stem, err error) {
 		return nil, nil
 	}
 
-	stem = &Stem{}
+	stem = &Stem{
+		Morphemes: make(Morphemes),
+	}
 
 	err = stem.parse(line)
 	if err != nil {
@@ -75,16 +69,6 @@ func parseStem(line string) (stem *Stem, err error) {
 	}
 
 	return stem, nil
-}
-
-func (stem *Stem) addMorpheme(id, token string) {
-	if stem.Morphemes == nil {
-		stem.Morphemes = make(map[string][]string)
-	}
-
-	list := stem.Morphemes[id]
-	list = append(list, token)
-	stem.Morphemes[id] = list
 }
 
 //
@@ -171,7 +155,8 @@ func (stem *Stem) unpack(opts *affixOptions) (derivatives []*Stem, err error) {
 		stem.Word = stem.Word[1:]
 	}
 
-	stem.unpackMorphemes(opts)
+	stem.Morphemes = newMorphemes(opts, stem.rawMorphemes)
+	stem.Morphemes.set("st", stem.Word)
 
 	derivatives, err = stem.unpackFlags(opts)
 	if err != nil {
@@ -223,33 +208,6 @@ func (stem *Stem) unpackFlags(opts *affixOptions) (
 }
 
 //
-// unpackMorphemes convert any raw morphemes or an alias into map of
-// key-values.
-// At this point, each of the morphemes should be valid, unless its unknown
-// and it will logged to stderr.
-//
-func (stem *Stem) unpackMorphemes(opts *affixOptions) {
-	for _, m := range stem.rawMorphemes {
-		idx := strings.Index(m, ":")
-
-		if idx == -1 {
-			if len(opts.amAliases) > 0 {
-				// Convert the AM alias number to actual
-				// morpheme.
-				amIdx, err := strconv.Atoi(m)
-				if err != nil {
-					log.Printf("unknown morpheme %q", m)
-					continue
-				}
-				m = opts.amAliases[amIdx]
-				idx = strings.Index(m, ":")
-			}
-		}
-		stem.addMorpheme(m[:idx], m[idx+1:])
-	}
-}
-
-//
 // applySuffixes apply any cross-product "suffixes" in "flags" for each word
 // in "stems".
 //
@@ -258,7 +216,7 @@ func (stem *Stem) applySuffixes(
 ) (
 	derivatives []*Stem,
 ) {
-	for _, stem := range stems {
+	for _, substem := range stems {
 		for _, flag := range flags {
 			sfx, ok := opts.suffixes[flag]
 			if !ok {
@@ -267,31 +225,11 @@ func (stem *Stem) applySuffixes(
 			if !sfx.isCrossProduct {
 				continue
 			}
-			ss := sfx.apply(stem)
+			ss := sfx.apply(substem)
 			derivatives = append(derivatives, ss...)
 		}
 	}
 	return derivatives
-}
-
-//
-// isValidMorpheme will return true if `in` contains ":" or a number (as an
-// alias); otherwise it will return false.
-//
-func isValidMorpheme(in string) (bool, error) {
-	idx := strings.Index(in, ":")
-	switch idx {
-	case -1:
-		_, err := strconv.Atoi(in)
-		if err == nil {
-			return true, nil
-		}
-		return false, nil
-	case 0:
-		return false, errInvalidMorpheme(in)
-	}
-
-	return true, nil
 }
 
 func parseWordFlags(in string) (word, flags string, err error) {

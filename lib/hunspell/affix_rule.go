@@ -68,7 +68,7 @@ type affixRule struct {
 
 	// morphemes contains optional morphological fields separated by
 	// spaces or tabulators.
-	morphemes []string
+	morphemes Morphemes
 }
 
 func newAffixRule(opts *affixOptions, isPrefix bool,
@@ -79,7 +79,7 @@ func newAffixRule(opts *affixOptions, isPrefix bool,
 	affixes := opts.suffixes
 
 	rule = &affixRule{
-		morphemes: morphemes,
+		morphemes: newMorphemes(opts, morphemes),
 	}
 
 	if isPrefix {
