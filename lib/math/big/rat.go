@@ -154,7 +154,8 @@ func (r *Rat) Add(g interface{}) *Rat {
 // Int64 return the integer resulting from truncating r towards zero.
 //
 func (r *Rat) Int64() int64 {
-	i64, _ := strconv.ParseInt(r.String(), 10, 64)
+	s := strings.Split(r.String(), ".")[0]
+	i64, _ := strconv.ParseInt(s, 10, 64)
 	return i64
 }
 

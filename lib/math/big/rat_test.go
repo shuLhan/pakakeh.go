@@ -162,6 +162,9 @@ func TestRat_Int64(t *testing.T) {
 	}, {
 		r:   NewRat("4011144900.02438879").Mul(100000000),
 		exp: 401114490002438879,
+	}, {
+		r:   QuoRat("128_900", "0.000_0322"),
+		exp: 4003105590,
 	}}
 
 	for _, c := range cases {
