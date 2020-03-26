@@ -21,6 +21,7 @@ func TestHunspell(t *testing.T) {
 		"alias",
 		"alias2",
 		"alias3",
+		"allcaps",
 	}
 
 	for _, file := range testFiles {

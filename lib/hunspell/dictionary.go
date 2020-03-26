@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/shuLhan/share/lib/parser"
 )
@@ -72,9 +73,11 @@ func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 		}
 
 		dict.stems[stem.Word] = stem
+		dict.stems[strings.ToUpper(stem.Word)] = stem
 
 		for _, w := range derivatives {
 			dict.stems[w.Word] = w
+			dict.stems[strings.ToUpper(w.Word)] = w
 		}
 	}
 
