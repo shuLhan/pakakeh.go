@@ -86,6 +86,9 @@ func TestMergeSpaces(t *testing.T) {
 		text: "   a\n\nb c   d\n\n",
 		exp:  " a\n\nb c d\n\n",
 	}, {
+		text: " \t a \t ",
+		exp:  " a ",
+	}, {
 		text:     "   a\n\nb c   d\n\n",
 		withline: true,
 		exp:      " a\nb c d\n",

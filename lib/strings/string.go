@@ -84,8 +84,10 @@ func CleanWikiMarkup(text string) string {
 }
 
 //
-// MergeSpaces replace two or more spaces with single space. If withline
-// is true it also replace two or more new lines with single new-line.
+// MergeSpaces replace two or more horizontal spaces (' ', '\t', '\v', '\f',
+// '\r') with single space.
+// If withline is true it also replace two or more new lines with single
+// new-line.
 //
 func MergeSpaces(text string, withline bool) string {
 	var (
@@ -96,12 +98,13 @@ func MergeSpaces(text string, withline bool) string {
 	out := make([]rune, 0, len(text))
 
 	for _, v := range text {
-		if v == ' ' {
+		switch v {
+		case ' ', '\t', '\v', '\f', '\r':
 			if isspace {
 				continue
 			}
 			isspace = true
-		} else if isspace {
+		default:
 			isspace = false
 		}
 		if withline {
