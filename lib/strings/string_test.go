@@ -117,6 +117,22 @@ func TestReverse(t *testing.T) {
 	}
 }
 
+func TestSingleSpace(t *testing.T) {
+	cases := []struct {
+		in  string
+		exp string
+	}{{
+		in: "",
+	}, {
+		in:  " \t\v\r\n\r\n\fa \t\v\r\n\r\n\f",
+		exp: " a ",
+	}}
+	for _, c := range cases {
+		got := SingleSpace(c.in)
+		test.Assert(t, c.in, c.exp, got, true)
+	}
+}
+
 func TestSplit(t *testing.T) {
 	cases := []struct {
 		text string

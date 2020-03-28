@@ -138,6 +138,32 @@ func Reverse(input string) string {
 }
 
 //
+// SingleSpace convert all sequences of white spaces into single space ' '.
+//
+func SingleSpace(in string) string {
+	var isspace bool
+	out := make([]rune, 0, len(in))
+	for _, r := range in {
+		if unicode.IsSpace(r) {
+			if isspace {
+				continue
+			}
+			isspace = true
+			continue
+		}
+		if isspace {
+			out = append(out, ' ')
+			isspace = false
+		}
+		out = append(out, r)
+	}
+	if isspace {
+		out = append(out, ' ')
+	}
+	return string(out)
+}
+
+//
 // Split given a text, return all words in text.
 //
 // A word is any sequence of character which have length equal or greater than
