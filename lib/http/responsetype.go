@@ -10,7 +10,7 @@ type ResponseType int
 // List of valid response type.
 const (
 	ResponseTypeNone   ResponseType = 0
-	ResponseTypeBinary              = 1 << iota
+	ResponseTypeBinary ResponseType = 1 << iota
 	ResponseTypeHTML
 	ResponseTypeJSON
 	ResponseTypePlain

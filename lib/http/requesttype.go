@@ -10,7 +10,7 @@ type RequestType int
 // List of valid request type.
 const (
 	RequestTypeNone  RequestType = 0
-	RequestTypeQuery             = 1 << iota
+	RequestTypeQuery RequestType = 1 << iota
 	RequestTypeForm
 	RequestTypeMultipartForm
 	RequestTypeJSON

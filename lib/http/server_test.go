@@ -27,6 +27,7 @@ func TestRegisterDelete(t *testing.T) {
 	}{{
 		desc: "With new endpoint",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete",
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
@@ -34,6 +35,7 @@ func TestRegisterDelete(t *testing.T) {
 	}, {
 		desc: "With duplicate endpoint",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete",
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
@@ -52,6 +54,7 @@ func TestRegisterDelete(t *testing.T) {
 	}, {
 		desc: "With response type none",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete/none",
 			ResponseType: ResponseTypeNone,
 			Call:         cbNone,
@@ -61,6 +64,7 @@ func TestRegisterDelete(t *testing.T) {
 	}, {
 		desc: "With response type binary",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete/bin",
 			ResponseType: ResponseTypeBinary,
 			Call:         cbPlain,
@@ -78,6 +82,7 @@ func TestRegisterDelete(t *testing.T) {
 	}, {
 		desc: "With response type JSON",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete/json",
 			ResponseType: ResponseTypeJSON,
 			Call:         cbJSON,
@@ -93,6 +98,7 @@ func TestRegisterDelete(t *testing.T) {
 	}, {
 		desc: "With ambigous path",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete/:id",
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
@@ -101,6 +107,7 @@ func TestRegisterDelete(t *testing.T) {
 	}, {
 		desc: "With key",
 		ep: &Endpoint{
+			Method:       RequestMethodDelete,
 			Path:         "/delete/:id/x",
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
@@ -120,7 +127,7 @@ func TestRegisterDelete(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		err := testServer.RegisterDelete(c.ep)
+		err := testServer.RegisterEndpoint(c.ep)
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
@@ -185,7 +192,7 @@ func TestRegisterEvaluator(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	err := testServer.RegisterDelete(epEvaluate)
+	err := testServer.registerDelete(epEvaluate)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +250,7 @@ func TestRegisterGet(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	err := testServer.RegisterGet(epGet)
+	err := testServer.registerGet(epGet)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -312,7 +319,7 @@ func TestRegisterHead(t *testing.T) {
 		Call:         cbNone,
 	}
 
-	err := testServer.RegisterGet(epAPI)
+	err := testServer.registerGet(epAPI)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -383,7 +390,7 @@ func TestRegisterPatch(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	err := testServer.RegisterPatch(ep)
+	err := testServer.registerPatch(ep)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -446,7 +453,7 @@ func TestRegisterPost(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	err := testServer.RegisterPost(ep)
+	err := testServer.registerPost(ep)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -518,7 +525,7 @@ func TestRegisterPut(t *testing.T) {
 		Call:        cbPlain,
 	}
 
-	err := testServer.RegisterPut(ep)
+	err := testServer.registerPut(ep)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -584,12 +591,12 @@ func TestServeHTTPOptions(t *testing.T) {
 		Call:         cbPlain,
 	}
 
-	err := testServer.RegisterDelete(epDelete)
+	err := testServer.registerDelete(epDelete)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = testServer.RegisterPatch(epPatch)
+	err = testServer.registerPatch(epPatch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -665,7 +672,7 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeNone,
 		Call:         cbError,
 	}
-	err := testServer.RegisterPost(epErrNoBody)
+	err := testServer.registerPost(epErrNoBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -676,7 +683,7 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeBinary,
 		Call:         cbError,
 	}
-	err = testServer.RegisterPost(epErrBinary)
+	err = testServer.registerPost(epErrBinary)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -687,7 +694,7 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeJSON,
 		Call:         cbError,
 	}
-	err = testServer.RegisterPost(epErrJSON)
+	err = testServer.registerPost(epErrJSON)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -698,7 +705,7 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbError,
 	}
-	err = testServer.RegisterPost(epErrPlain)
+	err = testServer.registerPost(epErrPlain)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -709,7 +716,7 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbNoCode,
 	}
-	err = testServer.RegisterPost(epErrNoCode)
+	err = testServer.registerPost(epErrNoCode)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -720,7 +727,7 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypePlain,
 		Call:         cbCustomErr,
 	}
-	err = testServer.RegisterPost(epErrCustom)
+	err = testServer.registerPost(epErrCustom)
 	if err != nil {
 		t.Fatal(err)
 	}

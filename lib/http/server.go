@@ -5,6 +5,7 @@
 package http
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -102,15 +103,53 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 }
 
 //
-// RegisterDelete register HTTP method DELETE with specific endpoint to handle
-// it.
+// RegisterEndpoint register the Endpoint based on Method.
+// If Method field is not set, it will default to GET.
+// The Endpoint.Call field MUST be set, or it will return an error.
 //
-func (srv *Server) RegisterDelete(ep *Endpoint) (err error) {
-	if ep == nil || ep.Call == nil {
+// Endpoint with method HEAD and OPTIONS does not have any effect because it
+// already handled automatically by server.
+//
+// Endpoint with method CONNECT and TRACE will return an error because its not
+// supported yet.
+//
+func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
+	if ep == nil {
 		return nil
 	}
+	if ep.Call == nil {
+		return fmt.Errorf("http.RegisterEndpoint: empty Call field")
+	}
 
-	ep.Method = RequestMethodDelete
+	switch ep.Method {
+	case RequestMethodConnect:
+		return fmt.Errorf("http.RegisterEndpoint: can't handle CONNECT method yet")
+	case RequestMethodDelete:
+		err = srv.registerDelete(ep)
+	case RequestMethodHead:
+		return nil
+	case RequestMethodOptions:
+		return nil
+	case RequestMethodPatch:
+		err = srv.registerPatch(ep)
+	case RequestMethodPost:
+		err = srv.registerPost(ep)
+	case RequestMethodPut:
+		err = srv.registerPut(ep)
+	case RequestMethodTrace:
+		return fmt.Errorf("http.RegisterEndpoint: can't handle TRACE method yet")
+	default:
+		ep.Method = RequestMethodGet
+		err = srv.registerGet(ep)
+	}
+	return err
+}
+
+//
+// registerDelete register HTTP method DELETE with specific endpoint to handle
+// it.
+//
+func (srv *Server) registerDelete(ep *Endpoint) (err error) {
 	ep.RequestType = RequestTypeQuery
 
 	// Check if the same route already registered.
@@ -140,14 +179,9 @@ func (srv *Server) RegisterEvaluator(eval Evaluator) {
 }
 
 //
-// RegisterGet register HTTP method GET with callback to handle it.
+// registerGet register HTTP method GET with callback to handle it.
 //
-func (srv *Server) RegisterGet(ep *Endpoint) (err error) {
-	if ep == nil || ep.Call == nil {
-		return nil
-	}
-
-	ep.Method = RequestMethodGet
+func (srv *Server) registerGet(ep *Endpoint) (err error) {
 	ep.RequestType = RequestTypeQuery
 
 	// Check if the same route already registered.
@@ -169,15 +203,9 @@ func (srv *Server) RegisterGet(ep *Endpoint) (err error) {
 }
 
 //
-// RegisterPatch register HTTP method PATCH with callback to handle it.
+// registerPatch register HTTP method PATCH with callback to handle it.
 //
-func (srv *Server) RegisterPatch(ep *Endpoint) (err error) {
-	if ep == nil || ep.Call == nil {
-		return nil
-	}
-
-	ep.Method = RequestMethodPatch
-
+func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePatches {
 		_, ok := rute.parse(ep.Path)
@@ -197,15 +225,9 @@ func (srv *Server) RegisterPatch(ep *Endpoint) (err error) {
 }
 
 //
-// RegisterPost register HTTP method POST with callback to handle it.
+// registerPost register HTTP method POST with callback to handle it.
 //
-func (srv *Server) RegisterPost(ep *Endpoint) (err error) {
-	if ep == nil || ep.Call == nil {
-		return nil
-	}
-
-	ep.Method = RequestMethodPost
-
+func (srv *Server) registerPost(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePosts {
 		_, ok := rute.parse(ep.Path)
@@ -225,14 +247,9 @@ func (srv *Server) RegisterPost(ep *Endpoint) (err error) {
 }
 
 //
-// RegisterPut register HTTP method PUT with callback to handle it.
+// registerPut register HTTP method PUT with callback to handle it.
 //
-func (srv *Server) RegisterPut(ep *Endpoint) (err error) {
-	if ep == nil || ep.Call == nil {
-		return nil
-	}
-
-	ep.Method = RequestMethodPut
+func (srv *Server) registerPut(ep *Endpoint) (err error) {
 	ep.ResponseType = ResponseTypeNone
 
 	// Check if the same route already registered.
