@@ -146,6 +146,30 @@ func TestNewRat(t *testing.T) {
 	}
 }
 
+func TestRat_Add(t *testing.T) {
+	cases := []struct {
+		got *Rat
+		in  interface{}
+		exp *Rat
+	}{{
+		got: NewRat(1),
+		in:  nil,
+		exp: NewRat(1),
+	}, {
+		got: NewRat(1),
+		in:  1,
+		exp: NewRat(2),
+	}}
+
+	for _, c := range cases {
+		t.Logf("Add %T(%v)", c.in, c.in)
+
+		c.got.Add(c.in)
+
+		test.Assert(t, "Add", c.exp, c.got, true)
+	}
+}
+
 func TestRat_Int64(t *testing.T) {
 	cases := []struct {
 		r   *Rat
@@ -165,6 +189,9 @@ func TestRat_Int64(t *testing.T) {
 	}, {
 		r:   QuoRat("128_900", "0.000_0322"),
 		exp: 4003105590,
+	}, {
+		r:   QuoRat(128900, 3220).Mul(100000000),
+		exp: 4003105590,
 	}}
 
 	for _, c := range cases {
@@ -180,6 +207,10 @@ func TestRat_IsEqual(t *testing.T) {
 		g   interface{}
 		exp bool
 	}{{
+		g: "a",
+	}, {
+		g: 1.1,
+	}, {
 		g:   byte(1),
 		exp: true,
 	}, {
@@ -423,30 +454,33 @@ func TestRat_Mul(t *testing.T) {
 	)
 
 	cases := []struct {
+		got *Rat
 		in  interface{}
-		g   string
 		exp *Rat
 	}{{
-		in:  defValue,
-		g:   "0",
+		got: NewRat(defValue),
+		in:  "a",
 		exp: NewRat(0),
 	}, {
+		got: NewRat(defValue),
+		in:  "0",
+		exp: NewRat(0),
+	}, {
+		got: NewRat(defValue),
 		in:  defValue,
-		g:   defValue,
 		exp: NewRat("215714826181834884090.46087867"),
 	}, {
+		got: NewRat("1.06916608"),
 		in:  "1.06916608",
-		g:   "1.06916608",
 		exp: NewRat("1.14311611"),
 	}}
 
 	for _, c := range cases {
-		got := MustRat(c.in)
-		g := MustRat(c.g)
-		got.Mul(g)
+		t.Logf("Mul %T(%v)", c.in, c.in)
 
-		t.Logf("cmp: %s %s", c.exp.FloatString(10), got.FloatString(10))
-		test.Assert(t, "Mul", c.exp, got, true)
+		c.got.Mul(c.in)
+
+		test.Assert(t, "Mul", c.exp, c.got, true)
 	}
 }
 
@@ -459,6 +493,8 @@ func TestRat_Quo(t *testing.T) {
 		g   interface{}
 		exp *Rat
 	}{{
+		g: "a",
+	}, {
 		g:   defValue,
 		exp: NewRat(1),
 	}, {
@@ -467,9 +503,8 @@ func TestRat_Quo(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got := MustRat(defValue)
-		g := MustRat(c.g)
-		got.Quo(g)
+		r := NewRat(defValue)
+		got := r.Quo(c.g)
 
 		test.Assert(t, "Quo", c.exp, got, true)
 	}
@@ -511,6 +546,9 @@ func TestRat_String_fromString(t *testing.T) {
 		in  string
 		exp string
 	}{{
+		in:  "12345",
+		exp: "12345",
+	}, {
 		in:  "0.00000000",
 		exp: "0",
 	}, {
@@ -593,6 +631,30 @@ func TestRat_String_fromFloat64(t *testing.T) {
 	}
 }
 
+func TestRat_Sub(t *testing.T) {
+	cases := []struct {
+		got *Rat
+		in  interface{}
+		exp *Rat
+	}{{
+		got: NewRat(1),
+		in:  nil,
+		exp: NewRat(1),
+	}, {
+		got: NewRat(1),
+		in:  1,
+		exp: NewRat(0),
+	}}
+
+	for _, c := range cases {
+		t.Logf("Sub %T(%v)", c.in, c.in)
+
+		c.got.Sub(c.in)
+
+		test.Assert(t, "Sub", c.exp, c.got, true)
+	}
+}
+
 func TestRat_UnmarshalJSON(t *testing.T) {
 	type T struct {
 		V *Rat `json:"V"`
@@ -604,12 +666,18 @@ func TestRat_UnmarshalJSON(t *testing.T) {
 		expError string
 	}{{
 		in:       []byte(`{"V":"ab"}`),
-		expError: "Rat.UnmarshalJSON: cannot convert []uint8([34 97 98 34]) to Rat",
+		expError: "Rat.UnmarshalJSON: cannot convert []uint8([97 98]) to Rat",
 	}, {
 		in: []byte(`{}`),
 	}, {
+		in:       []byte(`{"V":}`),
+		expError: `invalid character '}' looking for beginning of value`,
+	}, {
 		in:  []byte(`{"V":0}`),
 		exp: NewRat(0),
+	}, {
+		in:  []byte(`{"V":"1"}`),
+		exp: NewRat(1),
 	}, {
 		in:  []byte(`{"V":0.00000001}`),
 		exp: MustRat("0.00000001"),

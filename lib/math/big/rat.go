@@ -288,9 +288,6 @@ func (r *Rat) Quo(g interface{}) *Rat {
 // Scan implement the database's sql.Scan interface.
 //
 func (r *Rat) Scan(src interface{}) error {
-	if r == nil {
-		r = &Rat{}
-	}
 	got := toRat(src, r)
 	if got == nil {
 		return fmt.Errorf("Rat.Scan: unknown type %T", src)
@@ -309,12 +306,10 @@ func (r *Rat) String() string {
 	b := []byte(r.FloatString(DefaultDigitPrecision))
 
 	pointIdx := bytes.Index(b, []byte{'.'})
-	if pointIdx < 0 {
-		return string(b)
+	if pointIdx > 0 {
+		b = bytes.TrimRight(b, "0")
+		b = bytes.TrimRight(b, ".")
 	}
-
-	b = bytes.TrimRight(b, "0")
-	b = bytes.TrimRight(b, ".")
 
 	return string(b)
 }
@@ -336,12 +331,7 @@ func (r *Rat) Sub(g interface{}) *Rat {
 // UnmarshalJSON convert the JSON byte value into Rat.
 //
 func (r *Rat) UnmarshalJSON(in []byte) (err error) {
-	if len(in) == 0 {
-		return nil
-	}
-	if r == nil {
-		r = NewRat(0)
-	}
+	in = bytes.Trim(in, `"`)
 	_, ok := r.Rat.SetString(string(in))
 	if !ok {
 		return fmt.Errorf("Rat.UnmarshalJSON:"+
@@ -399,6 +389,8 @@ func toRat(v interface{}, in *Rat) (out *Rat) {
 	}
 	if in != nil {
 		in.Set(&out.Rat)
+	} else {
+		in = out
 	}
 	return out
 }
