@@ -100,7 +100,7 @@ func (ep *Endpoint) call(
 		return
 	}
 
-	if debug.Value > 0 {
+	if debug.Value >= 2 {
 		log.Printf("> request body: %s\n", reqBody)
 	}
 	for k, v := range vals {
