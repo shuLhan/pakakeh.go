@@ -28,6 +28,8 @@ const (
 // Server define HTTP server.
 //
 type Server struct {
+	*http.Server
+
 	// Memfs contains the content of file systems to be served in memory.
 	// It will be initialized only if ServerOptions's Root is not empty or
 	// if the current directory contains generated Go file from
@@ -35,7 +37,6 @@ type Server struct {
 	Memfs *memfs.MemFS
 
 	evals        []Evaluator
-	conn         *http.Server
 	routeDeletes []*route
 	routeGets    []*route
 	routePatches []*route
@@ -55,23 +56,23 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	}
 
 	if opts.Conn == nil {
-		srv.conn = &http.Server{
+		srv.Server = &http.Server{
 			ReadTimeout:    defRWTimeout,
 			WriteTimeout:   defRWTimeout,
 			MaxHeaderBytes: 1 << 20,
 		}
 	} else {
-		srv.conn = opts.Conn
+		srv.Server = opts.Conn
 	}
 
-	srv.conn.Addr = opts.Address
-	srv.conn.Handler = srv
+	srv.Addr = opts.Address
+	srv.Handler = srv
 
-	if srv.conn.ReadTimeout == 0 {
-		srv.conn.ReadTimeout = defRWTimeout
+	if srv.ReadTimeout == 0 {
+		srv.ReadTimeout = defRWTimeout
 	}
-	if srv.conn.WriteTimeout == 0 {
-		srv.conn.WriteTimeout = defRWTimeout
+	if srv.WriteTimeout == 0 {
+		srv.WriteTimeout = defRWTimeout
 	}
 
 	memfs.Development = opts.Development
@@ -310,10 +311,10 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 // Start the HTTP server.
 //
 func (srv *Server) Start() (err error) {
-	if srv.conn.TLSConfig == nil {
-		err = srv.conn.ListenAndServe()
+	if srv.TLSConfig == nil {
+		err = srv.ListenAndServe()
 	} else {
-		err = srv.conn.ListenAndServeTLS("", "")
+		err = srv.ListenAndServeTLS("", "")
 	}
 	return err
 }
