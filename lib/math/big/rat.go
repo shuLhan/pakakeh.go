@@ -17,7 +17,7 @@ import (
 var ratZero = NewRat(0)
 
 //
-// Rat extend the standard big.Rat.
+// Rat extend the standard big.Rat using rounding mode ToZero.
 //
 type Rat struct {
 	big.Rat
@@ -297,21 +297,32 @@ func (r *Rat) Scan(src interface{}) error {
 
 //
 // String format the Rat value into string with maximum mantissa is set by
-// digit precision option.
+// digit precision option with rounding mode set to zero.
 //
 // Unlike standard String method, this method will trim trailing zero digit or
 // decimal point at the end of mantissa.
 //
 func (r *Rat) String() string {
-	b := []byte(r.FloatString(DefaultDigitPrecision))
+	b := []byte(r.FloatString(DefaultDigitPrecision + 1))
 
-	pointIdx := bytes.Index(b, []byte{'.'})
-	if pointIdx > 0 {
-		b = bytes.TrimRight(b, "0")
-		b = bytes.TrimRight(b, ".")
+	nums := bytes.Split(b, []byte{'.'})
+	out := string(nums[0])
+	if len(nums) == 2 {
+		nums[1] = bytes.TrimRight(nums[1], "0")
+		nums[1] = bytes.TrimRight(nums[1], ".")
+
+		if len(nums[1]) > DefaultDigitPrecision {
+			nums[1] = nums[1][:DefaultDigitPrecision]
+			nums[1] = bytes.TrimRight(nums[1], "0")
+			nums[1] = bytes.TrimRight(nums[1], ".")
+		}
+
+		if len(nums[1]) > 0 {
+			out += "." + string(nums[1])
+		}
 	}
 
-	return string(b)
+	return out
 }
 
 //
