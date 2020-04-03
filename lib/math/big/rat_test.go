@@ -64,26 +64,36 @@ func TestMulRat(t *testing.T) {
 func TestQuoRat(t *testing.T) {
 	cases := []struct {
 		ins []interface{}
-		exp *Rat
+		exp string
 	}{{
 		ins: nil,
 	}, {
 		ins: []interface{}{"a"},
 	}, {
 		ins: []interface{}{0, 1},
-		exp: NewRat(0),
+		exp: "0",
 	}, {
 		ins: []interface{}{
 			NewRat(6),
 			"a",
 			NewRat("0.3"),
 		},
-		exp: NewRat("20"),
+		exp: "20",
+	}, {
+		ins: []interface{}{
+			4651,
+			272,
+		},
+		exp: "17.0992647",
 	}}
 
 	for _, c := range cases {
 		got := QuoRat(c.ins...)
-		test.Assert(t, "QuoRat", c.exp, got, true)
+		if got == nil {
+			test.Assert(t, "QuoRat", c.exp, "", true)
+			continue
+		}
+		test.Assert(t, "QuoRat", c.exp, got.String(), true)
 	}
 }
 
@@ -443,7 +453,7 @@ func TestRat_MarshalJSON(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		test.Assert(t, fmt.Sprintf("MarshalJSON: %s", c.in),
+		test.Assert(t, fmt.Sprintf("MarshalJSON(%s)", c.in),
 			[]byte(c.exp), got, true)
 	}
 }
