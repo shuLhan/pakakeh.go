@@ -5,11 +5,63 @@
 This library is released each month, usually at the first week of month.
 
 
-==  share v0.14.0 (2020-04-xx)
+==  share v0.14.0 (2020-04-03)
 
-==  Breaking changes
+===  Breaking changes
+
+*  http: simplify server Endpoint registrations
+
+   Previously, each endpoint with method DELETE, GET, PATCH, POST, and PUT
+   require calling different call for registration.  This change simplify
+   it to one call only, "RegisterEndpoint", and the registration process
+   will be handled automatically based on value on field Method.
 
 *  mining/math: move the package from "lib/mining/" to "lib/" directory
+
+===  New features
+
+*  debug: add a wrapper for starting and stopping CPU profile
+
+*  math/big: new package that extends the capabilities of "math/big"
+
+   The "big" package add custom global precision, rounding mode, and number
+   of digit precision after decimal point for all instance of Float that
+   use the package.
+
+*  reflect: new package that extends the standard reflect
+
+   This package add new interface "Equaler", it is an interface that
+   have single method "IsEqual()".
+
+   Also, we have new function "IsNil(interface{})" that will return true
+   if the value in interface{} is nil.
+
+*  strings: add function SingleSpace
+
+   The SingleSpace function convert all sequences of white spaces into
+   single space ' '.
+
+===  Enhancements
+
+*  http: embed the standard http package instead of separate field
+
+*  hunspell: return the stem instead of root word on Spell() method
+
+*  hunspell: add Stem() method to Spell and Stem
+
+   The Stem() method reduce inflected (or sometimes derived) words to
+   their word stem, base, or root form.
+
+*  hunspell: add Analyze() method to Spell and Stem
+
+   The Analyze() method will return list of morphological fields of the
+   word.
+
+*  strings: check for other white spaces on MergeSpaces
+
+===  Bug fixes
+
+*  http: fix the content-length header not set if file is not cached
 
 
 ==  share v0.13.0 (2020-03-11)
