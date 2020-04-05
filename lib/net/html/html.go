@@ -10,24 +10,8 @@
 // to iterate tree, there is no check for empty node, and no function to
 // get attribute by name without looping it manually.
 //
-// This package extends the package by adding methods to get node's attribute
-// by name, get the first non-empty child, and get the next non-empty sibling
+// This package extends the parent package by adding methods to get node's
+// attribute by name, get the first non-empty child, get the next
+// non-empty sibling, and method to iterate the tree.
 //
 package html
-
-import (
-	"io"
-
-	"golang.org/x/net/html"
-)
-
-//
-// Parse returns the parse tree for the HTML from the given Reader.
-//
-func Parse(r io.Reader) (*Node, error) {
-	node, err := html.Parse(r)
-	if err != nil {
-		return nil, err
-	}
-	return NewNode(node), nil
-}
