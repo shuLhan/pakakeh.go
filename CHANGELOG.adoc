@@ -4,6 +4,19 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.16.0 (2020-05-xx)
+
+===  New features
+
+* net/html: new package to simplify the golang.org/x/net/html 
+
+  The x/net/html package currently only provide bare raw functionalities
+  to iterate tree, there is no check for empty node, and no function to
+  get attribute by name without looping it manually.
+
+  This package extends the package by adding methods to get node's attribute
+  by name, get the first non-empty child, and get the next non-empty sibling.
+
 
 ==  share v0.14.0 (2020-04-03)
 
