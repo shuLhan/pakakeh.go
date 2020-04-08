@@ -303,6 +303,10 @@ func (r *Rat) Scan(src interface{}) error {
 // decimal point at the end of mantissa.
 //
 func (r *Rat) String() string {
+	if r == nil {
+		return "0"
+	}
+
 	b := []byte(r.FloatString(DefaultDigitPrecision + 1))
 
 	nums := bytes.Split(b, []byte{'.'})
