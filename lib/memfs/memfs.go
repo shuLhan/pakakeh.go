@@ -96,14 +96,14 @@ func New(includes, excludes []string, withContent bool) (mfs *MemFS, err error) 
 	for _, inc := range includes {
 		re, err := regexp.Compile(inc)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("memfs.New: %w", err)
 		}
 		mfs.incRE = append(mfs.incRE, re)
 	}
 	for _, exc := range excludes {
 		re, err := regexp.Compile(exc)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("memfs.New: %w", err)
 		}
 		mfs.excRE = append(mfs.excRE, re)
 	}
@@ -180,7 +180,7 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 	case EncodingGzip:
 		encoder = gzip.NewWriter(&buf)
 	default:
-		return fmt.Errorf("ContentEncode: invalid encoding " + encoding)
+		return fmt.Errorf("memfs.ContentEncode: invalid encoding " + encoding)
 	}
 
 	for _, node := range mfs.pn.v {
@@ -190,12 +190,12 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 
 		_, err = encoder.Write(node.V)
 		if err != nil {
-			return fmt.Errorf("ContentEncode: " + err.Error())
+			return fmt.Errorf("memfs.ContentEncode: " + err.Error())
 		}
 
 		err = encoder.Close()
 		if err != nil {
-			return fmt.Errorf("ContentEncode: " + err.Error())
+			return fmt.Errorf("memfs.ContentEncode: " + err.Error())
 		}
 
 		node.V = make([]byte, buf.Len())
@@ -226,7 +226,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 			node, err = mfs.refresh(path)
 			if err != nil {
 				log.Println("lib/memfs: Get: " + err.Error())
-				return nil, os.ErrNotExist
+				return nil, fmt.Errorf("memfs.Get: %w", os.ErrNotExist)
 			}
 			return node, nil
 		}
@@ -236,7 +236,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	if Development {
 		err = node.update(nil, mfs.withContent)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("memfs.Get: %w", err)
 		}
 	}
 
@@ -308,18 +308,18 @@ func (mfs *MemFS) Mount(dir string) error {
 
 	f, err := os.Open(dir)
 	if err != nil {
-		return err
+		return fmt.Errorf("memfs.Mount: %w", err)
 	}
 
 	err = mfs.createRoot(dir, f)
 	if err != nil {
-		return err
+		return fmt.Errorf("memfs.Mount: %w", err)
 	}
 
 	err = mfs.scanDir(mfs.root, f)
 	_ = f.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("memfs.Mount: %w", err)
 	}
 
 	if mfs.withContent {
@@ -424,12 +424,12 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		symPath := filepath.Join(parent.SysPath, fi.Name())
 		absPath, err := filepath.EvalSymlinks(symPath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("memfs.AddChild: %w", err)
 		}
 
 		fi, err = os.Lstat(absPath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("memfs.AddChild: %w", err)
 		}
 	}
 
