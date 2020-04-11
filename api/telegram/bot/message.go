@@ -183,9 +183,11 @@ func (msg *Message) parseCommandArgs() bool {
 		return false
 	}
 
-	msg.Command = msg.Text[cmdEntity.Offset+1 : cmdEntity.Length]
-	start := cmdEntity.Offset + cmdEntity.Length
-	msg.CommandArgs = strings.TrimSpace(msg.Text[start:])
+	start := cmdEntity.Offset
+	end := start + cmdEntity.Length
+
+	msg.Command = strings.TrimPrefix(msg.Text[start:end], "/")
+	msg.CommandArgs = strings.TrimSpace(msg.Text[end:])
 
 	return true
 }
