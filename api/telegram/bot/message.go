@@ -187,6 +187,7 @@ func (msg *Message) parseCommandArgs() bool {
 	end := start + cmdEntity.Length
 
 	msg.Command = strings.TrimPrefix(msg.Text[start:end], "/")
+	msg.Command = strings.Split(msg.Command, "@")[0]
 	msg.CommandArgs = strings.TrimSpace(msg.Text[end:])
 
 	return true

@@ -36,12 +36,23 @@ func TestMessage_parseCommandArgs(t *testing.T) {
 		},
 		expCommand: "definisi",
 		expArgs:    "analisis",
+	}, {
+		msg: Message{
+			Text: "/definisi@KamuskuBot analisis",
+			Entities: []MessageEntity{{
+				Type:   EntityTypeBotCommand,
+				Offset: 0,
+				Length: 20,
+			}},
+		},
+		expCommand: "definisi",
+		expArgs:    "analisis",
 	}}
 
 	for _, c := range cases {
 		c.msg.parseCommandArgs()
 
 		test.Assert(t, "Command", c.expCommand, c.msg.Command, true)
-		test.Assert(t, "Command", c.expArgs, c.msg.CommandArgs, true)
+		test.Assert(t, "CommandArgs", c.expArgs, c.msg.CommandArgs, true)
 	}
 }
