@@ -10,8 +10,8 @@ COVER_HTML:=cover.html
 CPU_PROF:=cpu.prof
 MEM_PROF:=mem.prof
 
-.PHONY: all install lint
-.PHONY: test test.prof coverbrowse
+.PHONY: all install lint genhtml clean distclean
+.PHONY: test test.prof bench.lib.websocket coverbrowse
 
 all: install
 
