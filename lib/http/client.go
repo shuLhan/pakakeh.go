@@ -15,6 +15,13 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/shuLhan/share"
+)
+
+const (
+	defUserAgent = "libhttp/" + share.Version +
+		" (github.com/shuLhan/share/lib/http; m.shulhan@gmail.com)"
 )
 
 //
@@ -23,7 +30,8 @@ import (
 //
 type Client struct {
 	*http.Client
-	serverURL string
+	serverURL  string
+	defHeaders http.Header
 }
 
 //
@@ -31,10 +39,13 @@ type Client struct {
 // minimize repetition.
 // The serverURL is any path that is static and will never changes during
 // request to server.
+// The headers parameter define default headers that will be set in any
+// request to server.
 //
-func NewClient(serverURL string) (client *Client) {
+func NewClient(serverURL string, headers http.Header) (client *Client) {
 	client = &Client{
-		serverURL: serverURL,
+		serverURL:  serverURL,
+		defHeaders: headers,
 		Client: &http.Client{
 			Transport: &http.Transport{
 				Proxy: http.ProxyFromEnvironment,
@@ -52,6 +63,8 @@ func NewClient(serverURL string) (client *Client) {
 		},
 	}
 
+	client.setUserAgent()
+
 	return client
 }
 
@@ -67,9 +80,17 @@ func (client *Client) Get(path string, params url.Values) (
 		path += "?" + params.Encode()
 	}
 
-	httpRes, err := client.Client.Get(client.serverURL + path)
+	url := client.serverURL + path
+	httpReq, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("http: Get: %w", err)
+		return nil, fmt.Errorf("Get: %w", err)
+	}
+
+	client.setHeaders(httpReq)
+
+	httpRes, err := client.Client.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("Get: %w", err)
 	}
 
 	resBody, err = ioutil.ReadAll(httpRes.Body)
@@ -79,7 +100,7 @@ func (client *Client) Get(path string, params url.Values) (
 
 	err = httpRes.Body.Close()
 	if err != nil {
-		return nil, fmt.Errorf("http: Get: %w", err)
+		return nil, fmt.Errorf("Get: %w", err)
 	}
 
 	return resBody, nil
@@ -92,10 +113,18 @@ func (client *Client) Get(path string, params url.Values) (
 func (client *Client) PostForm(path string, params url.Values) (
 	resBody []byte, err error,
 ) {
+	url := client.serverURL + path
 	body := strings.NewReader(params.Encode())
 
-	url := client.serverURL + path
-	httpRes, err := client.Client.Post(url, ContentTypeForm, body)
+	httpReq, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		return nil, fmt.Errorf("Post: %w", err)
+	}
+
+	client.setHeaders(httpReq)
+	httpReq.Header.Set(ContentType, ContentTypeForm)
+
+	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("Post: %w", err)
 	}
@@ -122,13 +151,22 @@ func (client *Client) PostFormData(path string, params map[string][]byte) (
 ) {
 	url := client.serverURL + path
 
-	contentType, body, err := generateFormData(params)
+	contentType, strBody, err := generateFormData(params)
 	if err != nil {
 		return nil, fmt.Errorf("http: PostFormData: %w", err)
 	}
 
-	httpRes, err := client.Client.Post(url, contentType,
-		strings.NewReader(body))
+	body := strings.NewReader(strBody)
+
+	httpReq, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		return nil, fmt.Errorf("Post: %w", err)
+	}
+
+	client.setHeaders(httpReq)
+	httpReq.Header.Set(ContentType, contentType)
+
+	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("http: PostFormData: %w", err)
 	}
@@ -159,9 +197,17 @@ func (client *Client) PostJSON(path string, params interface{}) (
 	}
 
 	url := client.serverURL + path
+	body := bytes.NewReader(paramsJSON)
 
-	httpRes, err := client.Client.Post(url, ContentTypeJSON,
-		bytes.NewReader(paramsJSON))
+	httpReq, err := http.NewRequest(http.MethodPost, url, body)
+	if err != nil {
+		return nil, fmt.Errorf("PostJSON: %w", err)
+	}
+
+	client.setHeaders(httpReq)
+	httpReq.Header.Set(ContentType, ContentTypeJSON)
+
+	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("PostJSON: %w", err)
 	}
@@ -177,6 +223,32 @@ func (client *Client) PostJSON(path string, params interface{}) (
 	}
 
 	return resBody, nil
+}
+
+//
+// setHeaders set the request headers to default headers.
+// If the header's key contains more than one value, the last one will be
+// used.
+//
+func (client *Client) setHeaders(req *http.Request) {
+	for k, vv := range client.defHeaders {
+		for _, v := range vv {
+			if len(v) > 0 {
+				req.Header.Set(k, v[0])
+			}
+		}
+	}
+}
+
+//
+// setUserAgent set the User-Agent header only if its not defined by user.
+//
+func (client *Client) setUserAgent() {
+	v := client.defHeaders.Get(UserAgent)
+	if len(v) > 0 {
+		return
+	}
+	client.defHeaders.Set(UserAgent, defUserAgent)
 }
 
 func generateFormData(params map[string][]byte) (
