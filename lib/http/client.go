@@ -6,9 +6,16 @@ package http
 
 import (
 	"bytes"
+	"compress/bzip2"
+	"compress/flate"
+	"compress/gzip"
+	"compress/lzw"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net"
 	"net/http"
@@ -25,11 +32,15 @@ const (
 )
 
 //
-// Client is a wrapper for standard http.Client with simplified
-// functionalities.
+// Client is a wrapper for standard http.Client with simplified usabilities,
+// including setting default headers, uncompressing response body.
 //
 type Client struct {
 	*http.Client
+
+	flateReader io.ReadCloser
+	gzipReader  *gzip.Reader
+
 	serverURL  string
 	defHeaders http.Header
 }
@@ -71,7 +82,7 @@ func NewClient(serverURL string, headers http.Header) (client *Client) {
 //
 // Get send the GET request to server using path and params as query
 // parameters.
-// On success, it will return the response body.
+// On success, it will return the uncompressed response body.
 //
 func (client *Client) Get(path string, params url.Values) (
 	resBody []byte, err error,
@@ -103,7 +114,7 @@ func (client *Client) Get(path string, params url.Values) (
 		return nil, fmt.Errorf("Get: %w", err)
 	}
 
-	return resBody, nil
+	return client.uncompress(httpRes, resBody)
 }
 
 //
@@ -139,7 +150,7 @@ func (client *Client) PostForm(path string, params url.Values) (
 		return nil, fmt.Errorf("Post: %w", err)
 	}
 
-	return resBody, nil
+	return client.uncompress(httpRes, resBody)
 }
 
 //
@@ -181,7 +192,7 @@ func (client *Client) PostFormData(path string, params map[string][]byte) (
 		return nil, fmt.Errorf("http: PostFormData: %w", err)
 	}
 
-	return resBody, nil
+	return client.uncompress(httpRes, resBody)
 }
 
 //
@@ -222,7 +233,7 @@ func (client *Client) PostJSON(path string, params interface{}) (
 		return nil, fmt.Errorf("PostJSON: %w", err)
 	}
 
-	return resBody, nil
+	return client.uncompress(httpRes, resBody)
 }
 
 //
@@ -231,11 +242,9 @@ func (client *Client) PostJSON(path string, params interface{}) (
 // used.
 //
 func (client *Client) setHeaders(req *http.Request) {
-	for k, vv := range client.defHeaders {
-		for _, v := range vv {
-			if len(v) > 0 {
-				req.Header.Set(k, v[0])
-			}
+	for k, v := range client.defHeaders {
+		if len(v) > 0 {
+			req.Header.Set(k, v[len(v)-1])
 		}
 	}
 }
@@ -249,6 +258,95 @@ func (client *Client) setUserAgent() {
 		return
 	}
 	client.defHeaders.Set(UserAgent, defUserAgent)
+}
+
+//
+// uncompress the response body only if the response.Uncompressed is false or
+// user's is not explicitly disable compression and the Content-Type is
+// "text/*" or JSON.
+//
+func (client *Client) uncompress(res *http.Response, body []byte) (
+	out []byte, err error,
+) {
+	trans := client.Client.Transport.(*http.Transport)
+	if res.Uncompressed || trans.DisableCompression {
+		return body, nil
+	}
+
+	contentType := res.Header.Get(ContentType)
+	switch {
+	case strings.HasPrefix(contentType, "text/"):
+	case strings.HasPrefix(contentType, ContentTypeJSON):
+	default:
+		return body, nil
+	}
+
+	var (
+		n   int
+		dec io.ReadCloser
+		in  io.Reader = bytes.NewReader(body)
+		buf []byte    = make([]byte, 1024)
+	)
+
+	switch res.Header.Get(ContentEncoding) {
+	case ContentEncodingBzip2:
+		dec = ioutil.NopCloser(bzip2.NewReader(in))
+
+	case ContentEncodingCompress:
+		dec = lzw.NewReader(in, lzw.MSB, 8)
+
+	case ContentEncodingDeflate:
+		if client.flateReader == nil {
+			client.flateReader = flate.NewReader(in)
+		} else {
+			err = client.flateReader.(flate.Resetter).Reset(in, nil)
+			if err != nil {
+				return body, err
+			}
+		}
+		dec = client.flateReader
+
+	case ContentEncodingGzip:
+		if client.gzipReader == nil {
+			client.gzipReader, err = gzip.NewReader(in)
+		} else {
+			err = client.gzipReader.Reset(in)
+		}
+		if err != nil {
+			return body, err
+		}
+		dec = client.gzipReader
+
+	default:
+		// Unknown encoding detected, return as is ...
+		return body, nil
+	}
+
+	for {
+		n, err = dec.Read(buf)
+		if err != nil && !errors.Is(err, io.EOF) {
+			break
+		}
+		if errors.Is(err, io.EOF) {
+			out = append(out, buf[:n]...)
+			err = nil
+			break
+		}
+		if n == 0 {
+			break
+		}
+		out = append(out, buf[:n]...)
+	}
+
+	errc := dec.Close()
+	if errc != nil {
+		log.Printf("http.Client: uncompress: %s", errc.Error())
+		if err == nil {
+			err = errc
+		}
+	}
+
+	return out, err
 }
 
 func generateFormData(params map[string][]byte) (

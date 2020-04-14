@@ -142,8 +142,15 @@ import (
 
 // List of known HTTP header keys and values.
 const (
-	ContentEncoding   = "Content-Encoding"
-	ContentLength     = "Content-Length"
+	AcceptEncoding          = "Accept-Encoding"
+	ContentEncoding         = "Content-Encoding"
+	ContentEncodingBzip2    = "bzip2"
+	ContentEncodingCompress = "compress" // Using LZW.
+	ContentEncodingGzip     = "gzip"
+	ContentEncodingDeflate  = "deflate" // Using zlib.
+
+	ContentLength = "Content-Length"
+
 	ContentType       = "Content-Type"
 	ContentTypeBinary = "application/octet-stream"
 	ContentTypeForm   = "application/x-www-form-urlencoded"
@@ -151,7 +158,9 @@ const (
 	ContentTypeJSON   = "application/json"
 	ContentTypePlain  = "text/plain; charset=utf-8"
 	ContentTypeXML    = "text/xml; charset=utf-8"
-	HeaderLocation    = "Location"
+
+	HeaderLocation = "Location"
+	UserAgent      = "User-Agent"
 )
 
 var (
