@@ -38,7 +38,7 @@ func ExampleMergeSpaces() {
 }
 
 func ExampleSplit() {
-	line := `a b c [A] B C`
+	line := `a b   c [A] B C`
 	fmt.Printf("%s\n", Split(line, false, false))
 	fmt.Printf("%s\n", Split(line, true, false))
 	fmt.Printf("%s\n", Split(line, false, true))
