@@ -85,6 +85,18 @@ func TestQuoRat(t *testing.T) {
 			272,
 		},
 		exp: "17.0992647",
+	}, {
+		ins: []interface{}{
+			int64(1815507979407),
+			NewRat(100000000),
+		},
+		exp: "18155.07979407",
+	}, {
+		ins: []interface{}{
+			"25494300",
+			"25394000000",
+		},
+		exp: "100394",
 	}}
 
 	for _, c := range cases {
@@ -202,6 +214,9 @@ func TestRat_Int64(t *testing.T) {
 	}, {
 		r:   QuoRat(128900, 3220).Mul(100000000),
 		exp: 4003105590,
+	}, {
+		r:   QuoRat(25494300, QuoRat(25394000000, 100000000)),
+		exp: 100394,
 	}}
 
 	for _, c := range cases {
