@@ -1,0 +1,11 @@
+Include config.local
+
+# comment
+Host example.local
+	Hostname 127.0.0.1
+	User test
+	IdentityFile ~/.ssh/test
+
+	# comment
+Host *.example.local
+	Include sub/config

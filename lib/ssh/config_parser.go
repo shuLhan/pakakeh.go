@@ -1,0 +1,231 @@
+// Copyright 2020, Shulhan <m.shulhan@gmail.com>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package ssh
+
+import (
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/shuLhan/share/lib/debug"
+)
+
+//
+// configParser parser for the SSH config file that merge all "Include" files
+// and convert them all into lines of string.
+//
+type configParser struct {
+	workDir string
+	homeDir string
+	files   map[string]struct{}
+}
+
+func newConfigParser() (parser *configParser, err error) {
+	parser = &configParser{
+		files: make(map[string]struct{}),
+	}
+
+	parser.workDir, err = os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	parser.homeDir, err = os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	return parser, nil
+}
+
+//
+// load the config file(s) using glob(7) pattern and convert them into lines.
+//
+func (parser *configParser) load(dir, pattern string) (lines []string, err error) {
+	if debug.Value >= 1 {
+		fmt.Printf("load %q at %q ...\n", pattern, dir)
+	}
+
+	switch pattern[0] {
+	case '~':
+		// File is absolute path to user's home directory.
+		pattern = filepath.Join(parser.homeDir, pattern[1:])
+
+	case '/':
+		// File is absolute path, do nothing.
+
+	case '.':
+		// File is relative to current working directory.
+		pattern = filepath.Join(parser.workDir, pattern)
+
+	default:
+		if len(dir) != 0 {
+			// File is relative to previous directory.
+			pattern = filepath.Join(dir, pattern)
+		} else {
+			// File is relative to user's .ssh directory.
+			pattern = filepath.Join(parser.homeDir, ".ssh", pattern)
+		}
+	}
+
+	matches, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", pattern, err)
+	}
+
+	// File did not exist.
+	if len(matches) == 0 {
+		return nil, nil
+	}
+
+	rawLines := make([]string, 0)
+	for _, file := range matches {
+		_, ok := parser.files[file]
+		if ok {
+			// File already loaded previously.
+			continue
+		}
+
+		newLines, err := readLines(file)
+		if err != nil {
+			return nil, err
+		}
+
+		rawLines = append(rawLines, newLines...)
+		parser.files[file] = struct{}{}
+	}
+
+	lines = make([]string, 0, len(rawLines))
+
+	dir = filepath.Dir(pattern)
+
+	// Check and parse the Include directive in each lines.
+	for x := 0; x < len(rawLines); x++ {
+		if !isIncludeDirective(rawLines[x]) {
+			lines = append(lines, rawLines[x])
+			continue
+		}
+
+		patterns := parseInclude(rawLines[x])
+
+		for _, pattern := range patterns {
+			includeContents, err := parser.load(dir, pattern)
+			if err != nil {
+				return nil, err
+			}
+			if len(includeContents) == 0 {
+				continue
+			}
+			lines = append(lines, includeContents...)
+		}
+	}
+
+	return lines, nil
+}
+
+//
+// isIncludeDirective will return true if line started with "include", in case
+// insensitive.
+//
+func isIncludeDirective(line string) bool {
+	keyLen := len(keyInclude)
+	if len(line) <= keyLen {
+		return false
+	}
+	if strings.ToLower(line[:keyLen]) == keyInclude {
+		if line[keyLen] == ' ' || line[keyLen] == '=' {
+			return true
+		}
+	}
+	return false
+}
+
+func parseInclude(line string) (patterns []string) {
+	var (
+		useQuote bool
+		x        int = len(keyInclude)
+		start    int
+		end      int
+	)
+
+	for ; x < len(line); x++ {
+		if line[x] != ' ' {
+			break
+		}
+	}
+	if line[x] == '=' {
+		x++
+	}
+	start = x
+
+	for x < len(line) {
+		if line[x] == '"' {
+			useQuote = true
+			x++
+			start = x
+		}
+
+		for ; x < len(line); x++ {
+			if line[x] == ' ' {
+				if useQuote {
+					continue
+				}
+				end = x
+				break
+			}
+			if line[x] == '"' {
+				if useQuote {
+					useQuote = false
+					end = x
+					x++
+					break
+				}
+			}
+		}
+		if end == 0 {
+			end = len(line)
+		}
+		if end > start {
+			patterns = append(patterns, line[start:end])
+		}
+		end = 0
+
+		for ; x < len(line); x++ {
+			if line[x] != ' ' {
+				break
+			}
+		}
+		start = x
+	}
+
+	return patterns
+}
+
+//
+// readLines convert the contents of file into lines as slice of string.
+// Any empty lines or line start with comment '#' will be removed.
+//
+func readLines(file string) (lines []string, err error) {
+	contents, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	rawLines := bytes.Split(contents, []byte{'\n'})
+	for x := 0; x < len(rawLines); x++ {
+		rawLines[x] = bytes.TrimSpace(rawLines[x])
+		if len(rawLines[x]) == 0 {
+			continue
+		}
+		if rawLines[x][0] == '#' {
+			continue
+		}
+		lines = append(lines, string(rawLines[x]))
+	}
+
+	return lines, nil
+}

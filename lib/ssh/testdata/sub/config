@@ -1,0 +1,3 @@
+	Hostname 127.0.0.2
+	User wildcard
+	IdentityFile ~/.ssh/wildcard
