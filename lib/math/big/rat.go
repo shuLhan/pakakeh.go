@@ -347,6 +347,7 @@ func (r *Rat) Sub(g interface{}) *Rat {
 //
 func (r *Rat) UnmarshalJSON(in []byte) (err error) {
 	in = bytes.Trim(in, `"`)
+	r.SetInt64(0)
 	_, ok := r.Rat.SetString(string(in))
 	if !ok {
 		return fmt.Errorf("Rat.UnmarshalJSON:"+

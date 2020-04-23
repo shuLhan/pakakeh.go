@@ -125,16 +125,6 @@ func isEqual(v1, v2 reflect.Value) bool {
 		if v2.IsNil() {
 			return false
 		}
-		m1 := v1.MethodByName("IsEqual")
-		if m1.IsValid() {
-			res := m1.Call([]reflect.Value{
-				v2,
-			})
-			if len(res) == 1 &&
-				res[0].Kind() == reflect.Bool {
-				return res[0].Bool()
-			}
-		}
 		if v1.Pointer() == v2.Pointer() {
 			return true
 		}

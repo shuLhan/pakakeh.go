@@ -96,7 +96,7 @@ func TestQuoRat(t *testing.T) {
 			"25494300",
 			"25394000000",
 		},
-		exp: "100394",
+		exp: "0.00100395",
 	}}
 
 	for _, c := range cases {
@@ -258,6 +258,36 @@ func TestRat_IsEqual(t *testing.T) {
 	for _, c := range cases {
 		got := f.IsEqual(c.g)
 		test.Assert(t, "IsEqual", c.exp, got, true)
+	}
+}
+
+type A struct {
+	r *Rat
+}
+
+func TestRat_IsEqual_unexported(t *testing.T) {
+	exp := &A{
+		r: NewRat(10),
+	}
+
+	cases := []struct {
+		got      *A
+		expEqual bool
+	}{{
+		got: &A{
+			r: NewRat(10),
+		},
+		expEqual: true,
+	}, {
+		got: &A{
+			r: NewRat(11),
+		},
+		expEqual: false,
+	}}
+
+	for x, c := range cases {
+		test.Assert(t, fmt.Sprintf("unexported field %d", x),
+			exp, c.got, c.expEqual)
 	}
 }
 
@@ -548,10 +578,10 @@ func TestRat_Scan(t *testing.T) {
 		exp: NewRat("0.0001"),
 	}, {
 		in:  float64(0.0001),
-		exp: NewRat("0.0001"),
+		exp: NewRat(0.0001),
 	}, {
 		in:  (1.0 / 10000.0),
-		exp: NewRat("0.0001"),
+		exp: NewRat(1.0 / 10000.0),
 	}}
 
 	for _, c := range cases {
