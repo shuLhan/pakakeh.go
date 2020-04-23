@@ -117,7 +117,7 @@ func New(opts Options) (bot *Bot, err error) {
 	serverURL := defURL + opts.Token + "/"
 	bot = &Bot{
 		opts:   opts,
-		client: http.NewClient(serverURL),
+		client: http.NewClient(serverURL, nil),
 	}
 
 	fmt.Printf("Bot options: %+v\n", opts)
