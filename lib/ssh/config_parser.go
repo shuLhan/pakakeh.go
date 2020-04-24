@@ -6,6 +6,7 @@ package ssh
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -94,8 +95,9 @@ func (parser *configParser) load(dir, pattern string) (lines []string, err error
 		if err != nil {
 			return nil, err
 		}
-
-		rawLines = append(rawLines, newLines...)
+		if len(newLines) > 0 {
+			rawLines = append(rawLines, newLines...)
+		}
 		parser.files[file] = struct{}{}
 	}
 
@@ -212,6 +214,9 @@ func parseInclude(line string) (patterns []string) {
 func readLines(file string) (lines []string, err error) {
 	contents, err := ioutil.ReadFile(file)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
