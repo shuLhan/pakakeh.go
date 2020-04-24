@@ -7,6 +7,8 @@ package ssh
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/crypto/ssh"
 )
 
 const (
@@ -76,13 +78,11 @@ func newConfigSection() *ConfigSection {
 		AddKeysToAgent: valueNo,
 		AddressFamily:  valueAny,
 		CASignatureAlgorithms: []string{
-			SignAlg_ECDSA_SHA2_NISTP256,
-			SignAlg_ECDSA_SHA2_NISTP384,
-			SignAlg_ECDSA_SHA2_NISTP521,
-			SignAlg_RSA_SHA2_256,
-			SignAlg_RSA_SHA2_512,
-			SignAlg_SSH_ED22519,
-			SignAlg_SSH_RSA,
+			ssh.KeyAlgoECDSA256,
+			ssh.KeyAlgoECDSA384,
+			ssh.KeyAlgoECDSA521,
+			ssh.KeyAlgoED25519,
+			ssh.KeyAlgoRSA,
 		},
 		ConnectionAttempts: defConnectionAttempts,
 		IdentityFile: []string{
