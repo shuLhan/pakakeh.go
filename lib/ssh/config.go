@@ -266,6 +266,21 @@ func (cfg *Config) Get(s string) (section *ConfigSection) {
 	return nil
 }
 
+//
+// Prepend other Config's sections to this Config.
+// The other's sections will be at the top of the list.
+//
+// This function can be useful if we want to load another SSH config file
+// without using Include directive.
+//
+func (cfg *Config) Prepend(other *Config) {
+	newSections := make([]*ConfigSection, 0,
+		len(cfg.sections)+len(other.sections))
+	newSections = append(newSections, other.sections...)
+	newSections = append(newSections, cfg.sections...)
+	cfg.sections = newSections
+}
+
 func parseBool(key, val string) (out bool, err error) {
 	switch val {
 	case valueNo:
