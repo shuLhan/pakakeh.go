@@ -56,7 +56,7 @@ func TestNewSectionHost(t *testing.T) {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
 		}
-		got.postConfig(testParser)
+		got.postConfig(testParser.homeDir)
 		test.Assert(t, "newHost", c.exp(*testDefaultSection), got, true)
 	}
 }

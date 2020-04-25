@@ -30,7 +30,7 @@ func TestConfigSection_postConfig(t *testing.T) {
 	}}
 	for _, c := range cases {
 		got := c.section(*testDefaultSection)
-		got.postConfig(testParser)
+		got.postConfig(testParser.homeDir)
 		test.Assert(t, "postConfig", c.exp(*testDefaultSection), got, true)
 	}
 }

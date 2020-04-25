@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	testDefaultSection.postConfig(testParser)
+	testDefaultSection.postConfig(testParser.homeDir)
 
 	os.Exit(m.Run())
 }

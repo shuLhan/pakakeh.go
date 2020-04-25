@@ -5,7 +5,10 @@
 package ssh
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,7 +37,8 @@ const (
 // List of default values.
 const (
 	defConnectionAttempts = 1
-	defPort22             = 22
+	defPort               = 22
+	defStringPort         = "22"
 	defXAuthLocation      = "/usr/X11R6/bin/xauth"
 )
 
@@ -74,6 +78,24 @@ type ConfigSection struct {
 	UseCompression                    bool
 	UseVisualHostKey                  bool
 
+	stringPort string
+
+	// List of SSH private keys.
+	signers []ssh.Signer
+
+	// User's home directory.
+	homeDir string
+
+	// workingDir contains the directory where the SSH client started.
+	// This value is required when client want to copy file from/to
+	// remote.
+	// This field is optional, default to current working directory from
+	// os.Getwd() or user's home directory.
+	workingDir string
+
+	// The first IdentityFile that exist and valid.
+	privateKeyFile string
+
 	// Patterns for Host section.
 	patterns []*configPattern
 
@@ -97,20 +119,48 @@ func newConfigSection() *ConfigSection {
 			ssh.KeyAlgoRSA,
 		},
 		ConnectionAttempts: defConnectionAttempts,
-		Environments: map[string]string{
-			envTerm: os.Getenv(envTerm),
-		},
+		Environments:       map[string]string{},
 		IdentityFile: []string{
 			"~/.ssh/id_dsa",
 			"~/.ssh/id_ecdsa",
 			"~/.ssh/id_ed25519",
 			"~/.ssh/id_rsa",
 		},
-		Port:                              defPort22,
+		Port:                              defPort,
 		XAuthLocation:                     defXAuthLocation,
 		useDefaultIdentityFile:            true,
 		IsChallengeResponseAuthentication: true,
 		IsCheckHostIP:                     true,
+		stringPort:                        defStringPort,
+	}
+}
+
+//
+// generateSigners convert the IdentityFile to ssh.Signer for authentication
+// using PublicKey.
+//
+func (section *ConfigSection) generateSigners() {
+	section.signers = make([]ssh.Signer, 0, len(section.IdentityFile))
+
+	for _, pkey := range section.IdentityFile {
+		pkeyRaw, err := ioutil.ReadFile(pkey)
+		if err != nil {
+			if !errors.Is(err, os.ErrNotExist) {
+				log.Printf("generateSigners: " + err.Error())
+			}
+			continue
+		}
+
+		signer, err := ssh.ParsePrivateKey(pkeyRaw)
+		if err != nil {
+			log.Printf("generateSigners: ParsePrivateKey: " + err.Error())
+			continue
+		}
+
+		if len(section.privateKeyFile) == 0 {
+			section.privateKeyFile = pkey
+		}
+		section.signers = append(section.signers, signer)
 	}
 }
 
@@ -138,13 +188,32 @@ func (section *ConfigSection) isMatch(s string) bool {
 //
 // postConfig check, parse, and expand all of the fields values.
 //
-func (section *ConfigSection) postConfig(parser *configParser) {
+func (section *ConfigSection) postConfig(homeDir string) {
+	var err error
+
+	if len(homeDir) == 0 {
+		section.homeDir, err = os.UserHomeDir()
+		if err != nil {
+			log.Println("ConfigSection.postConfig: " + err.Error())
+		}
+	} else {
+		section.homeDir = homeDir
+	}
+
+	section.workingDir, err = os.Getwd()
+	if err != nil {
+		log.Println("ssh: cannot get working directory, default to user's home")
+		section.workingDir = section.homeDir
+	}
+
 	for x, identFile := range section.IdentityFile {
 		if identFile[0] == '~' {
 			section.IdentityFile[x] = strings.Replace(identFile,
-				"~", parser.homeDir, 1)
+				"~", homeDir, 1)
 		}
 	}
+
+	section.generateSigners()
 }
 
 func (section *ConfigSection) setAddKeysToAgent(val string) (err error) {

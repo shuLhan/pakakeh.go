@@ -36,8 +36,9 @@ func TestConfig_Get(t *testing.T) {
 		exp: func(def ConfigSection) *ConfigSection {
 			def.Hostname = "127.0.0.1"
 			def.User = "test"
+			def.privateKeyFile = filepath.Join(homeDir, "/.ssh/id_rsa")
 			def.IdentityFile = []string{
-				filepath.Join(homeDir, "/.ssh/test"),
+				def.privateKeyFile,
 			}
 			def.useDefaultIdentityFile = false
 			return &def
@@ -47,8 +48,9 @@ func TestConfig_Get(t *testing.T) {
 		exp: func(def ConfigSection) *ConfigSection {
 			def.Hostname = "127.0.0.2"
 			def.User = "wildcard"
+			def.privateKeyFile = filepath.Join(homeDir, "/.ssh/id_rsa")
 			def.IdentityFile = []string{
-				filepath.Join(homeDir, "/.ssh/wildcard"),
+				def.privateKeyFile,
 			}
 			def.useDefaultIdentityFile = false
 			return &def
@@ -62,8 +64,14 @@ func TestConfig_Get(t *testing.T) {
 		if got != nil {
 			got.patterns = nil
 			got.criterias = nil
+			got.postConfig(homeDir)
 		}
-		test.Assert(t, "Get "+c.s, c.exp(*testDefaultSection), got, true)
+
+		exp := c.exp(*testDefaultSection)
+		if exp != nil {
+			exp.postConfig(homeDir)
+		}
+		test.Assert(t, "Get "+c.s, exp, got, true)
 	}
 }
 

@@ -26,7 +26,7 @@ func TestNewSectionMatch(t *testing.T) {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
 		}
-		got.postConfig(testParser)
+		got.postConfig(testParser.homeDir)
 		test.Assert(t, "newSectionMatch", c.exp, got, true)
 	}
 }
@@ -82,7 +82,7 @@ func TestParseCriteriaAll(t *testing.T) {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
 		}
-		got.postConfig(testParser)
+		got.postConfig(testParser.homeDir)
 		test.Assert(t, "parseCriteriaAll",
 			c.exp(*testDefaultSection), got, true)
 	}
@@ -114,7 +114,7 @@ func TestParseCriteriaExec(t *testing.T) {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
 		}
-		got.postConfig(testParser)
+		got.postConfig(testParser.homeDir)
 		test.Assert(t, "parseCriteriaExec",
 			c.exp(*testDefaultSection), got, true)
 	}
@@ -164,7 +164,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
 		}
-		got.postConfig(testParser)
+		got.postConfig(testParser.homeDir)
 		test.Assert(t, "parseCriteriaWithArg",
 			c.exp(*testDefaultSection), got, true)
 	}

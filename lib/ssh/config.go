@@ -168,14 +168,14 @@ func NewConfig(file string) (cfg *Config, err error) {
 		switch key {
 		case keyHost:
 			if section != nil {
-				section.postConfig(parser)
+				section.postConfig(parser.homeDir)
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
 			section, err = newSectionHost(value)
 		case keyMatch:
 			if section != nil {
-				section.postConfig(parser)
+				section.postConfig(parser.homeDir)
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
@@ -237,6 +237,7 @@ func NewConfig(file string) (cfg *Config, err error) {
 		case keyHostname:
 			section.Hostname = value
 		case keyPort:
+			section.stringPort = value
 			section.Port, err = strconv.Atoi(value)
 		case keySendEnv:
 			section.setSendEnv(cfg.envs, value)
@@ -254,7 +255,7 @@ func NewConfig(file string) (cfg *Config, err error) {
 		}
 	}
 	if section != nil {
-		section.postConfig(parser)
+		section.postConfig(parser.homeDir)
 		cfg.sections = append(cfg.sections, section)
 		section = nil
 	}

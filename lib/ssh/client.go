@@ -6,7 +6,6 @@ package ssh
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -18,39 +17,24 @@ import (
 // Client for SSH connection.
 //
 type Client struct {
-	cfg  *ClientConfig
+	cfg  *ConfigSection
 	conn *ssh.Client
 }
 
 //
 // NewClient create a new SSH connection using predefined configuration.
 //
-func NewClient(cfg *ClientConfig) (cl *Client, err error) {
+func NewClient(cfg *ConfigSection) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
 	}
 
-	err = cfg.initialize()
-	if err != nil {
-		return
-	}
-
-	pkeyRaw, err := ioutil.ReadFile(cfg.PrivateKeyFile)
-	if err != nil {
-		err = fmt.Errorf("ssh: error when reading private key file %q: %s",
-			cfg.PrivateKeyFile, err)
-		return nil, err
-	}
-
-	sshSigner, err := ssh.ParsePrivateKey(pkeyRaw)
-	if err != nil {
-		return nil, fmt.Errorf("ssh: ParsePrivateKey: " + err.Error())
-	}
+	cfg.postConfig("")
 
 	sshConfig := &ssh.ClientConfig{
-		User: cfg.RemoteUser,
+		User: cfg.User,
 		Auth: []ssh.AuthMethod{
-			ssh.PublicKeys(sshSigner),
+			ssh.PublicKeys(cfg.signers...),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), //nolint:gosec
 	}
@@ -59,7 +43,9 @@ func NewClient(cfg *ClientConfig) (cl *Client, err error) {
 		cfg: cfg,
 	}
 
-	cl.conn, err = ssh.Dial("tcp", cfg.remoteAddr, sshConfig)
+	remoteAddr := fmt.Sprintf("%s:%d", cfg.Hostname, cfg.Port)
+
+	cl.conn, err = ssh.Dial("tcp", remoteAddr, sshConfig)
 	if err != nil {
 		err = fmt.Errorf("ssh: Dial: " + err.Error())
 		return nil, err
@@ -83,7 +69,7 @@ func (cl *Client) Execute(cmd string) (err error) {
 	for k, v := range cl.cfg.Environments {
 		err = sess.Setenv(k, v)
 		if err != nil {
-			return fmt.Errorf("ssh: client.Execute:" + err.Error())
+			log.Printf("Execute: Setenv %q=%q:%s\n", k, v, err.Error())
 		}
 	}
 
@@ -101,7 +87,7 @@ func (cl *Client) Execute(cmd string) (err error) {
 // Get copy file from remote into local storage.
 //
 // The local file should be use the absolute path, or relative to the file in
-// ClientConfig.WorkingDir.
+// ConfigSection's workingDir.
 //
 func (cl *Client) Get(remote, local string) (err error) {
 	if len(remote) == 0 {
@@ -113,14 +99,13 @@ func (cl *Client) Get(remote, local string) (err error) {
 		return nil
 	}
 
-	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.RemoteUser, cl.cfg.RemoteHost,
-		remote)
+	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
 	//nolint: gosec
-	cmd := exec.Command("scp", "-r", "-i", cl.cfg.PrivateKeyFile,
-		"-P", cl.cfg.remotePort, remote, local)
+	cmd := exec.Command("scp", "-r", "-i", cl.cfg.privateKeyFile,
+		"-P", cl.cfg.stringPort, remote, local)
 
-	cmd.Dir = cl.cfg.WorkingDir
+	cmd.Dir = cl.cfg.workingDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -136,7 +121,7 @@ func (cl *Client) Get(remote, local string) (err error) {
 // Put copy a file from local storage to remote using scp command.
 //
 // The local file should be use the absolute path, or relative to the file in
-// ClientConfig.WorkingDir.
+// ConfigSection's workingDir.
 //
 func (cl *Client) Put(local, remote string) (err error) {
 	if len(local) == 0 {
@@ -148,14 +133,13 @@ func (cl *Client) Put(local, remote string) (err error) {
 		return nil
 	}
 
-	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.RemoteUser, cl.cfg.RemoteHost,
-		remote)
+	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
 	//nolint: gosec
-	cmd := exec.Command("scp", "-r", "-i", cl.cfg.PrivateKeyFile,
-		"-P", cl.cfg.remotePort, local, remote)
+	cmd := exec.Command("scp", "-r", "-i", cl.cfg.privateKeyFile,
+		"-P", cl.cfg.stringPort, local, remote)
 
-	cmd.Dir = cl.cfg.WorkingDir
+	cmd.Dir = cl.cfg.workingDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -168,5 +152,5 @@ func (cl *Client) Put(local, remote string) (err error) {
 }
 
 func (cl *Client) String() string {
-	return cl.cfg.RemoteUser + "@" + cl.cfg.remoteAddr
+	return cl.cfg.User + "@" + cl.cfg.Hostname + ":" + cl.cfg.stringPort
 }
