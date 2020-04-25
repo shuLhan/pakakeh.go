@@ -7,6 +7,7 @@ package ssh
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -37,12 +38,13 @@ const (
 	keyIdentityFile                    = "identityfile"
 	keyHostname                        = "hostname"
 	keyPort                            = "port"
+	keySendEnv                         = "sendenv"
 	keyUser                            = "user"
 	keyVisualHostKey                   = "visualhostkey"
 	keyXAuthLocation                   = "xauthlocation"
 )
 
-//TODO: list of keys that is skipped due to time issues.
+//TODO: list of keys that are not implemented.
 //nolint:varcheck,deadcode
 const (
 	keyCiphers                          = "ciphers"
@@ -95,7 +97,6 @@ const (
 	keyRemoteForward                    = "remoteforward"
 	keyRequestTTY                       = "requesttty"
 	keyRevokeHostKeys                   = "revokehostkeys"
-	keySendEnv                          = "sendenv"
 	keyServerAliveCountMax              = "serveralivecountmax"
 	keyServerAliveInterval              = "serveraliveinterval"
 	keySetEnv                           = "setenv"
@@ -122,6 +123,7 @@ var (
 //
 type Config struct {
 	sections []*ConfigSection
+	envs     map[string]string
 }
 
 //
@@ -141,6 +143,8 @@ func NewConfig(file string) (cfg *Config, err error) {
 	cfg = &Config{
 		sections: make([]*ConfigSection, 0),
 	}
+
+	cfg.loadEnvironments()
 
 	parser, err := newConfigParser()
 	if err != nil {
@@ -234,6 +238,8 @@ func NewConfig(file string) (cfg *Config, err error) {
 			section.Hostname = value
 		case keyPort:
 			section.Port, err = strconv.Atoi(value)
+		case keySendEnv:
+			section.setSendEnv(cfg.envs, value)
 		case keyUser:
 			section.User = value
 		case keyVisualHostKey:
@@ -279,6 +285,20 @@ func (cfg *Config) Prepend(other *Config) {
 	newSections = append(newSections, other.sections...)
 	newSections = append(newSections, cfg.sections...)
 	cfg.sections = newSections
+}
+
+//
+// loadEnvironments get all environments variables and store it in the map for
+// future use by SendEnv.
+//
+func (cfg *Config) loadEnvironments() {
+	envs := os.Environ()
+	for _, env := range envs {
+		kv := strings.SplitN(env, "=", 2)
+		if len(kv) == 0 {
+			cfg.envs[kv[0]] = kv[1]
+		}
+	}
 }
 
 func parseBool(key, val string) (out bool, err error) {

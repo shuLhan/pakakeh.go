@@ -6,6 +6,8 @@ package ssh
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/crypto/ssh"
@@ -25,6 +27,10 @@ const (
 	valueInet6 = "inet6"
 )
 
+const (
+	envTerm = "TERM"
+)
+
 // List of default values.
 const (
 	defConnectionAttempts = 1
@@ -37,18 +43,24 @@ const (
 // in configuration.
 //
 type ConfigSection struct {
-	AddKeysToAgent                    string
-	AddressFamily                     string
-	BindAddress                       string
-	BindInterface                     string
-	CanonicalDomains                  []string
-	CanonicalizeHostname              string
-	CanonicalizeMaxDots               int
-	CanonicalizePermittedCNAMEs       *PermittedCNAMEs
-	CASignatureAlgorithms             []string
-	CertificateFile                   []string
-	ConnectionAttempts                int
-	ConnectTimeout                    int
+	AddKeysToAgent              string
+	AddressFamily               string
+	BindAddress                 string
+	BindInterface               string
+	CanonicalDomains            []string
+	CanonicalizeHostname        string
+	CanonicalizeMaxDots         int
+	CanonicalizePermittedCNAMEs *PermittedCNAMEs
+	CASignatureAlgorithms       []string
+	CertificateFile             []string
+	ConnectionAttempts          int
+	ConnectTimeout              int
+
+	// Environments contains system environment variables that will be
+	// passed to Execute().
+	// The key and value is derived from "SendEnv" and "SetEnv".
+	Environments map[string]string
+
 	Hostname                          string
 	IdentityFile                      []string
 	Port                              int
@@ -85,6 +97,9 @@ func newConfigSection() *ConfigSection {
 			ssh.KeyAlgoRSA,
 		},
 		ConnectionAttempts: defConnectionAttempts,
+		Environments: map[string]string{
+			envTerm: os.Getenv(envTerm),
+		},
 		IdentityFile: []string{
 			"~/.ssh/id_dsa",
 			"~/.ssh/id_ecdsa",
@@ -202,4 +217,13 @@ func (section *ConfigSection) setCanonicalizePermittedCNAMEs(val string) (err er
 
 func (section *ConfigSection) setCASignatureAlgorithms(val string) {
 	section.CASignatureAlgorithms = strings.Split(val, ",")
+}
+
+func (section *ConfigSection) setSendEnv(envs map[string]string, pattern string) {
+	for k, v := range envs {
+		ok, _ := filepath.Match(pattern, k)
+		if ok {
+			section.Environments[k] = v
+		}
+	}
 }
