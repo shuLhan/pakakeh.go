@@ -22,23 +22,24 @@ const (
 	keyBatchMode                       = "batchmode"
 	keyBindAddress                     = "bindaddress"
 	keyBindInterface                   = "bindinterface"
+	keyCASignatureAlgorithms           = "casignaturealgorithms"
 	keyCanonicalDomains                = "canonicaldomains"
 	keyCanonicalizeFallbackLocal       = "canonicalizefallbacklocal"
 	keyCanonicalizeHostname            = "canonicalizehostname"
 	keyCanonicalizeMaxDots             = "canonicalizemaxdots"
 	keyCanonicalizePermittedCNAMEs     = "canonicalizepermittedcnames"
-	keyCASignatureAlgorithms           = "casignaturealgorithms"
 	keyCertificateFile                 = "certificatefile"
 	keyChallengeResponseAuthentication = "challengeresponseauthentication"
 	keyCheckHostIP                     = "checkhostip"
 	keyClearAllForwardings             = "clearallforwardings"
 	keyCompression                     = "compression"
-	keyConnectionAttempts              = "connectionattempts"
 	keyConnectTimeout                  = "connecttimeout"
-	keyIdentityFile                    = "identityfile"
+	keyConnectionAttempts              = "connectionattempts"
 	keyHostname                        = "hostname"
+	keyIdentityFile                    = "identityfile"
 	keyPort                            = "port"
 	keySendEnv                         = "sendenv"
+	keySetEnv                          = "setenv"
 	keyUser                            = "user"
 	keyVisualHostKey                   = "visualhostkey"
 	keyXAuthLocation                   = "xauthlocation"
@@ -99,7 +100,6 @@ const (
 	keyRevokeHostKeys                   = "revokehostkeys"
 	keyServerAliveCountMax              = "serveralivecountmax"
 	keyServerAliveInterval              = "serveraliveinterval"
-	keySetEnv                           = "setenv"
 	keyStreamLocalBindMask              = "streamlocalbindmask"
 	keyStreamLocalBindUnlink            = "streamlocalbindunlink"
 	keyStrictHostKeyChecking            = "stricthostkeychecking"
@@ -240,6 +240,8 @@ func NewConfig(file string) (cfg *Config, err error) {
 			section.Port, err = strconv.Atoi(value)
 		case keySendEnv:
 			section.setSendEnv(cfg.envs, value)
+		case keySetEnv:
+			section.setEnv(value)
 		case keyUser:
 			section.User = value
 		case keyVisualHostKey:

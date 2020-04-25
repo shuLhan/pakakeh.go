@@ -219,6 +219,16 @@ func (section *ConfigSection) setCASignatureAlgorithms(val string) {
 	section.CASignatureAlgorithms = strings.Split(val, ",")
 }
 
+//
+// setEnv set the Environments with key and value of format "KEY=VALUE".
+//
+func (section *ConfigSection) setEnv(env string) {
+	kv := strings.SplitN(env, "=", 2)
+	if len(kv) == 2 {
+		section.Environments[kv[0]] = kv[1]
+	}
+}
+
 func (section *ConfigSection) setSendEnv(envs map[string]string, pattern string) {
 	for k, v := range envs {
 		ok, _ := filepath.Match(pattern, k)

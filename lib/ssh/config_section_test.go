@@ -35,6 +35,29 @@ func TestConfigSection_postConfig(t *testing.T) {
 	}
 }
 
+func TestConfigSection_setEnv(t *testing.T) {
+	cfg := &ConfigSection{
+		Environments: make(map[string]string),
+	}
+	cases := []struct {
+		value string
+		exp   map[string]string
+	}{{
+		value: "a",
+	}, {
+		value: "a=b",
+		exp: map[string]string{
+			"a": "b",
+		},
+	}}
+
+	for _, c := range cases {
+		cfg.setEnv(c.value)
+
+		test.Assert(t, "setEnv: "+c.value, c.exp, cfg.Environments, true)
+	}
+}
+
 func TestConfigSection_setSendEnv(t *testing.T) {
 	envs := map[string]string{
 		"key_1": "1",
