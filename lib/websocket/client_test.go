@@ -56,7 +56,7 @@ func TestConnect(t *testing.T) {
 			continue
 		}
 
-		client.SendClose(StatusNormal, nil)
+		client.sendClose(StatusNormal, nil)
 	}
 }
 
@@ -138,7 +138,7 @@ func TestClientPing(t *testing.T) {
 				got.payload = got.payload[2:]
 			}
 
-			cl.SendClose(got.closeCode, got.payload)
+			cl.sendClose(got.closeCode, got.payload)
 			cl.Quit()
 			wg.Done()
 			return nil
@@ -268,7 +268,7 @@ func TestClientText(t *testing.T) {
 		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
 			test.Assert(t, "close", exp, got, true)
-			cl.SendClose(got.closeCode, got.payload)
+			cl.sendClose(got.closeCode, got.payload)
 			cl.Quit()
 			wg.Done()
 			return nil
@@ -399,7 +399,7 @@ func TestClientFragmentation(t *testing.T) {
 		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
 			test.Assert(t, "close", exp, got, true)
-			cl.SendClose(got.closeCode, got.payload)
+			cl.sendClose(got.closeCode, got.payload)
 			cl.Quit()
 			wg.Done()
 			return nil
@@ -628,7 +628,7 @@ func TestClientSendPing(t *testing.T) {
 	}
 }
 
-func TestClientSendClose(t *testing.T) {
+func TestClient_sendClose(t *testing.T) {
 	if _testServer == nil {
 		runTestServer()
 	}
@@ -642,7 +642,7 @@ func TestClientSendClose(t *testing.T) {
 
 	err := testClient.Connect()
 	if err != nil {
-		t.Fatal("TestClientSendClose: Connect: " + err.Error())
+		t.Fatal("TestClient_sendClose: Connect: " + err.Error())
 	}
 
 	testClient.handleClose = func(cl *Client, got *Frame) error {
@@ -661,9 +661,9 @@ func TestClientSendClose(t *testing.T) {
 	}
 
 	wg.Add(1)
-	err = testClient.SendClose(StatusNormal, []byte("normal"))
+	err = testClient.sendClose(StatusNormal, []byte("normal"))
 	if err != nil {
-		t.Fatal("TestClientSendClose: " + err.Error())
+		t.Fatal("TestClient_sendClose: " + err.Error())
 	}
 
 	wg.Wait()

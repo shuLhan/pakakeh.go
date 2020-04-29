@@ -151,6 +151,49 @@ type Client struct {
 	allowRsv1 bool
 	allowRsv2 bool
 	allowRsv3 bool
+
+	// gracefulClose is a channel to gracefully close connection by
+	// client.
+	gracefulClose chan bool
+}
+
+//
+// Close gracefully close the client connection.
+//
+func (cl *Client) Close() (err error) {
+	packet := NewFrameClose(true, StatusNormal, nil)
+
+	cl.gracefulClose = make(chan bool, 1)
+
+	err = cl.send(packet)
+	if err != nil {
+		return fmt.Errorf("websocket: Close: %w", err)
+	}
+
+	// Wait for server to response with CLOSE.
+	timer := time.NewTimer(defaultTimeout)
+loop:
+	for {
+		select {
+		case <-timer.C:
+			// We did not receive server CLOSE frame in timely
+			// manner.
+			break loop
+		case <-cl.gracefulClose:
+			timer.Stop()
+			break loop
+		}
+	}
+
+	cl.Lock()
+	err = cl.conn.Close()
+	if err != nil {
+		err = fmt.Errorf("websocket: Close: %w", err)
+	}
+	cl.conn = nil
+	cl.Unlock()
+
+	return err
 }
 
 //
@@ -528,7 +571,12 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		cl.handleBadRequest()
 		return true
 	case OpcodeClose:
-		cl.handleClose(cl, frame)
+		// Check if we are requesting the close.
+		if cl.gracefulClose != nil {
+			cl.gracefulClose <- true
+		} else {
+			cl.handleClose(cl, frame)
+		}
 		return true
 	case OpcodePing:
 		_ = cl.handlePing(cl, frame)
@@ -622,11 +670,9 @@ func (cl *Client) SendBin(payload []byte) error {
 }
 
 //
-// SendClose send the control CLOSE frame to server.
-// If waitResponse is true, client will wait for CLOSE response from server
-// before closing the connection.
+// sendClose send the control CLOSE frame to server.
 //
-func (cl *Client) SendClose(status CloseCode, payload []byte) (err error) {
+func (cl *Client) sendClose(status CloseCode, payload []byte) (err error) {
 	packet := NewFrameClose(true, status, payload)
 	return cl.send(packet)
 }
