@@ -26,7 +26,8 @@ const (
 
 //nolint:gochecknoglobals
 var (
-	defaultTimeout = 10 * time.Second
+	defaultTimeout      = 10 * time.Second
+	defaultPingInterval = 10 * time.Second
 
 	_bbPool = sync.Pool{
 		New: func() interface{} {

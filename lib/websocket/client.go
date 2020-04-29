@@ -7,6 +7,7 @@ package websocket
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -145,6 +146,10 @@ type Client struct {
 	// "sec-websocket-version") will be deleted before handshake.
 	Headers http.Header
 
+	// The interval where PING control frame will be send to server.
+	// The minimum and default value is 10 seconds.
+	PingInterval time.Duration
+
 	remoteURL  *url.URL
 	remoteAddr string
 
@@ -233,6 +238,11 @@ func (cl *Client) Connect() (err error) {
 		}
 	}
 
+	if cl.PingInterval < defaultPingInterval {
+		cl.PingInterval = defaultPingInterval
+	}
+
+	go cl.pinger()
 	go cl.serve()
 
 	return nil
@@ -850,4 +860,22 @@ func (cl *Client) send(packet []byte) (err error) {
 	}
 
 	return nil
+}
+
+//
+// pinger send the PING control frame every 10 seconds.
+//
+func (cl *Client) pinger() {
+	var err error
+
+	t := time.NewTicker(cl.PingInterval)
+	for range t.C {
+		err = cl.SendPing(nil)
+		if err != nil {
+			if errors.Is(err, ErrConnClosed) {
+				return
+			}
+			log.Println("websocket: pinger: " + err.Error())
+		}
+	}
 }
