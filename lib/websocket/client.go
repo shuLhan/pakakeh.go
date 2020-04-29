@@ -166,6 +166,13 @@ type Client struct {
 // Close gracefully close the client connection.
 //
 func (cl *Client) Close() (err error) {
+	cl.Lock()
+	defer cl.Unlock()
+
+	if cl.conn == nil {
+		return
+	}
+
 	packet := NewFrameClose(true, StatusNormal, nil)
 
 	cl.gracefulClose = make(chan bool, 1)
@@ -190,13 +197,11 @@ loop:
 		}
 	}
 
-	cl.Lock()
 	err = cl.conn.Close()
 	if err != nil {
 		err = fmt.Errorf("websocket: Close: %w", err)
 	}
 	cl.conn = nil
-	cl.Unlock()
 
 	return err
 }
