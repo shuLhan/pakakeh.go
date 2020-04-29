@@ -205,6 +205,9 @@ func (r *Rat) IsGreaterOrEqual(g interface{}) bool {
 // IsGreaterThanZero will return true if `r > 0`.
 //
 func (r *Rat) IsGreaterThanZero() bool {
+	if r == nil {
+		return false
+	}
 	return r.Cmp(&ratZero.Rat) > 0
 }
 
