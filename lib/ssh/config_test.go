@@ -36,9 +36,9 @@ func TestConfig_Get(t *testing.T) {
 		exp: func(def ConfigSection) *ConfigSection {
 			def.Hostname = "127.0.0.1"
 			def.User = "test"
-			def.privateKeyFile = filepath.Join(homeDir, "/.ssh/id_rsa")
+			def.privateKeyFile = ""
 			def.IdentityFile = []string{
-				def.privateKeyFile,
+				filepath.Join(def.homeDir, ".ssh", "notexist"),
 			}
 			def.useDefaultIdentityFile = false
 			return &def
@@ -48,9 +48,9 @@ func TestConfig_Get(t *testing.T) {
 		exp: func(def ConfigSection) *ConfigSection {
 			def.Hostname = "127.0.0.2"
 			def.User = "wildcard"
-			def.privateKeyFile = filepath.Join(homeDir, "/.ssh/id_rsa")
+			def.privateKeyFile = ""
 			def.IdentityFile = []string{
-				def.privateKeyFile,
+				filepath.Join(def.homeDir, ".ssh", "notexist"),
 			}
 			def.useDefaultIdentityFile = false
 			return &def

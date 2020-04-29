@@ -70,7 +70,7 @@ func TestReadLines(t *testing.T) {
 			`Host example.local`,
 			`Hostname 127.0.0.1`,
 			`User test`,
-			`IdentityFile ~/.ssh/id_rsa`,
+			`IdentityFile ~/.ssh/notexist`,
 			`Host *.example.local`,
 			`Include sub/config`,
 		},
@@ -106,11 +106,11 @@ func TestConfigParser_load(t *testing.T) {
 			`Host example.local`,
 			`Hostname 127.0.0.1`,
 			`User test`,
-			`IdentityFile ~/.ssh/id_rsa`,
+			`IdentityFile ~/.ssh/notexist`,
 			`Host *.example.local`,
 			`Hostname 127.0.0.2`,
 			`User wildcard`,
-			`IdentityFile ~/.ssh/id_rsa`,
+			`IdentityFile ~/.ssh/notexist`,
 		},
 	}}
 

@@ -4,7 +4,7 @@ Include config.local
 Host example.local
 	Hostname 127.0.0.1
 	User test
-	IdentityFile ~/.ssh/id_rsa
+	IdentityFile ~/.ssh/notexist
 
 	# comment
 Host *.example.local
