@@ -368,19 +368,26 @@ func toRat(v interface{}, in *Rat) (out *Rat) {
 
 	switch v := v.(type) {
 	case []byte:
-		v = bytes.ReplaceAll(v, []byte{'_'}, nil)
-		_, ok := out.Rat.SetString(string(v))
-		if !ok {
-			return nil
+		if len(v) == 0 {
+			out.SetInt64(0)
+		} else {
+			v = bytes.ReplaceAll(v, []byte{'_'}, nil)
+			_, ok := out.Rat.SetString(string(v))
+			if !ok {
+				return nil
+			}
 		}
-
 	case string:
-		// Replace the underscore character, so we can write the
-		// number as "0.000_000_1".
-		v = strings.ReplaceAll(v, "_", "")
-		_, ok := out.Rat.SetString(v)
-		if !ok {
-			return nil
+		if len(v) == 0 {
+			out.SetInt64(0)
+		} else {
+			// Replace the underscore character, so we can write the
+			// number as "0.000_000_1".
+			v = strings.ReplaceAll(v, "_", "")
+			_, ok := out.Rat.SetString(v)
+			if !ok {
+				return nil
+			}
 		}
 
 	case byte:

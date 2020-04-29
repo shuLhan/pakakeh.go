@@ -140,6 +140,12 @@ func TestNewRat(t *testing.T) {
 		v   interface{}
 		exp *Rat
 	}{{
+		v:   []byte{},
+		exp: NewRat(0),
+	}, {
+		v:   "",
+		exp: NewRat(0),
+	}, {
 		v: []byte("a"),
 	}, {
 		v:   []byte("14687233442.06916608"),
