@@ -128,3 +128,36 @@ func TestConfigParser_load(t *testing.T) {
 		test.Assert(t, "load "+c.pattern, c.exp, got, true)
 	}
 }
+
+func TestParseArgs(t *testing.T) {
+	cases := []struct {
+		raw string
+		exp []string
+	}{{
+		raw: ``,
+		exp: nil,
+	}, {
+		raw: `aa`,
+		exp: []string{"aa"},
+	}, {
+		raw: `"aa"`,
+		exp: []string{"aa"},
+	}, {
+		raw: `"a"  b  c`,
+		exp: []string{"a", "b", "c"},
+	}, {
+		raw: `a "b c"`,
+		exp: []string{"a", "b c"},
+	}, {
+		raw: `a "b c"  d   `,
+		exp: []string{"a", "b c", "d"},
+	}, {
+		raw: `a "b c`,
+		exp: []string{"a", "b c"},
+	}}
+
+	for _, c := range cases {
+		got := parseArgs(c.raw, ' ')
+		test.Assert(t, "parseArgs "+c.raw, c.exp, got, true)
+	}
+}

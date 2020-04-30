@@ -234,3 +234,57 @@ func readLines(file string) (lines []string, err error) {
 
 	return lines, nil
 }
+
+//
+// parseArgs split single line arguments into list of string, separated by
+// `sep` (default to space), grouped by double quote.
+//
+// For example, given raw argument `a "b c" d` it would return "a", "b c", and
+// "d".
+//
+func parseArgs(raw string, sep byte) (args []string) {
+	raw = strings.TrimSpace(raw)
+	if len(raw) == 0 {
+		return nil
+	}
+	if sep == 0 {
+		sep = ' '
+	}
+	var (
+		x        int
+		begin    int
+		useQuote bool
+	)
+	args = make([]string, 0)
+	for ; x < len(raw); x++ {
+		c := raw[x]
+		if useQuote {
+			if c != '"' {
+				continue
+			}
+			args = append(args, raw[begin:x])
+			begin = len(raw)
+			useQuote = false
+			continue
+		}
+		if c == sep {
+			if begin < x {
+				args = append(args, raw[begin:x])
+				begin = len(raw)
+			}
+			continue
+		}
+		if c == '"' {
+			useQuote = true
+			begin = x + 1
+		} else {
+			if begin == len(raw) {
+				begin = x
+			}
+		}
+	}
+	if begin < x {
+		args = append(args, raw[begin:x])
+	}
+	return args
+}

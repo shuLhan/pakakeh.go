@@ -88,7 +88,7 @@ func TestParseCriteriaAll(t *testing.T) {
 	}
 }
 
-func TestParseCriteriaExec(t *testing.T) {
+func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	cases := []struct {
 		raw      string
 		exp      func(def ConfigSection) *ConfigSection
@@ -104,8 +104,15 @@ func TestParseCriteriaExec(t *testing.T) {
 			return &exp
 		},
 	}, {
-		raw:      `exec "echo true`,
-		expError: `"exec": expecting '"' got '\x00'`,
+		raw: `exec "echo true`,
+		exp: func(exp ConfigSection) *ConfigSection {
+			exp.criterias = []*matchCriteria{{
+				name: criteriaExec,
+				arg:  `echo true`,
+			}}
+			exp.useCriterias = true
+			return &exp
+		},
 	}}
 
 	for _, c := range cases {
@@ -115,6 +122,7 @@ func TestParseCriteriaExec(t *testing.T) {
 			continue
 		}
 		got.postConfig(testParser.homeDir)
+		t.Logf("got: %+v", got)
 		test.Assert(t, "parseCriteriaExec",
 			c.exp(*testDefaultSection), got, true)
 	}
@@ -154,8 +162,20 @@ func TestParseCriteriaWithArg(t *testing.T) {
 			return &exp
 		},
 	}, {
-		raw:      `user "a*,b*`,
-		expError: `"user": expecting '"' got '\x00'`,
+		raw: `user "a*,b*`,
+		exp: func(exp ConfigSection) *ConfigSection {
+			exp.criterias = []*matchCriteria{{
+				name: criteriaUser,
+				arg:  `a*,b*`,
+				patterns: []*configPattern{{
+					pattern: "a*",
+				}, {
+					pattern: "b*",
+				}},
+			}}
+			exp.useCriterias = true
+			return &exp
+		},
 	}}
 
 	for _, c := range cases {

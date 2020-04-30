@@ -8,8 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/shuLhan/share/lib/parser"
 )
 
 var (
@@ -37,20 +35,20 @@ func newSectionMatch(rawPattern string) (match *ConfigSection, err error) {
 	match.criterias = make([]*matchCriteria, 0)
 	match.useCriterias = true
 
-	p := parser.New(rawPattern, ` "`)
+	args := parseArgs(rawPattern, ' ')
 
-	for {
-		var (
-			err      error
-			isNegate bool
-		)
+	var (
+		arg      string
+		isNegate bool
+	)
 
-		token, _ := p.Token()
-		if len(token) == 0 {
-			break
+	for x := 0; x < len(args); x++ {
+		token := strings.ToLower(args[x])
+		if x+1 < len(args) {
+			arg = args[x+1]
+		} else {
+			arg = ""
 		}
-
-		token = strings.ToLower(token)
 
 		if token[0] == '!' {
 			isNegate = true
@@ -59,14 +57,15 @@ func newSectionMatch(rawPattern string) (match *ConfigSection, err error) {
 
 		switch token {
 		case criteriaAll:
-			criteria, err = parseCriteriaAll(p, prevCriteria)
+			criteria, err = parseCriteriaAll(prevCriteria, arg)
 
 		case criteriaCanonical, criteriaFinal:
 			criteria, err = newMatchCriteria(token, "")
 
 		case criteriaExec, criteriaHost, criteriaLocalUser, criteriaOriginalHost,
 			criteriaUser:
-			criteria, err = parseCriteriaWithArg(p, token)
+			criteria, err = newMatchCriteria(token, arg)
+			x++
 		default:
 			return nil, fmt.Errorf("unknown criteria %q", token)
 		}
@@ -84,7 +83,7 @@ func newSectionMatch(rawPattern string) (match *ConfigSection, err error) {
 	return match, nil
 }
 
-func parseCriteriaAll(p *parser.Parser, prevCriteria *matchCriteria) (
+func parseCriteriaAll(prevCriteria *matchCriteria, arg string) (
 	criteria *matchCriteria, err error,
 ) {
 	// The "all" criteria must appear alone or immediately
@@ -95,27 +94,9 @@ func parseCriteriaAll(p *parser.Parser, prevCriteria *matchCriteria) (
 			return nil, errCriteriaAll
 		}
 	}
-	token, sep := p.Token()
-	if len(token) > 0 || sep != 0 {
+	if len(arg) > 0 {
 		return nil, errCriteriaAll
 	}
 
 	return newMatchCriteria(criteriaAll, "")
-}
-
-func parseCriteriaWithArg(p *parser.Parser, name string) (
-	criteria *matchCriteria, err error,
-) {
-	arg, sep := p.Token()
-	if sep == '"' {
-		p.RemoveDelimiters(` `)
-		arg, sep = p.Token()
-		if sep != '"' {
-			return nil, fmt.Errorf(`%q: expecting '"' got %q`,
-				name, sep)
-		}
-		p.AddDelimiters(`"`)
-	}
-
-	return newMatchCriteria(name, arg)
 }
