@@ -3,7 +3,6 @@
 :email: <ms@kilabit.info>
 :toc:
 :sectnums:
-:stylesheet: style.css
 :url-rfc5863: https://tools.ietf.org/html/rfc5863
 
 This document provide note and summary of RFC 5863, DKIM Development,

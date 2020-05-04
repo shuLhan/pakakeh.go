@@ -3,7 +3,6 @@
 :email: <ms@kilabit.info>
 :toc:
 :sectnums:
-:stylesheet: style.css
 :url-rfc4422: https://tools.ietf.org/html/rfc4422
 
 This document provide note and summary of RFC 4422, Simple Authentication and

@@ -4,7 +4,6 @@
 :toc:
 :toclevels: 4
 :sectnums:
-:stylesheet: style.css
 :url-rfc3207: https://tools.ietf.org/html/rfc3207
 
 This documentation provide summary and notes on implementation of SMTP

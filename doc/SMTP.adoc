@@ -4,7 +4,6 @@
 :toc:
 :toclevels: 4
 :sectnums:
-:stylesheet: style.css
 :url-rfc5321: https://tools.ietf.org/html/rfc5321
 
 This documentation provide summary and notes on implementation of SMTP

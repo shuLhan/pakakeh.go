@@ -3,7 +3,6 @@
 :email: <ms@kilabit.info>
 :toc:
 :sectnums:
-:stylesheet: style.css
 :url-rfc4686: https://tools.ietf.org/html/rfc4686
 
 This document provide note and summary of RFC 4686, Analysis of Threats

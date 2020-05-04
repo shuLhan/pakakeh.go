@@ -241,7 +241,7 @@ $ go install github.com/shuLhan/ciigo/cmd/ciigo
 and then run
 
 ----
-$ ciigo -template=html.tmpl serve doc/
+$ ciigo serve doc/
 ----
 
 to serve documentation on HTTP server at http://127.0.0.1:8080 and watch
@@ -251,7 +251,7 @@ files.
 To generate HTML files for all asciidoc and markdown files, run
 
 ----
-$ ciigo -template=html.tmpl convert doc/
+$ ciigo convert doc/
 ----
 
 
