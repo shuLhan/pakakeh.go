@@ -6,19 +6,220 @@
 		<meta name="theme-color" content="#375EAB" />
 
 		<title>import &#34;github/shuLhan/share&#34;</title>
-		<link rel="stylesheet" href="doc/style.css" />
+
+		<style>
+		
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+	background-color: #fff;
+	line-height: 1.3;
+	text-align: center;
+	color: #222;
+}
+pre,
+code {
+	font-family: Menlo, monospace;
+	font-size: 0.875rem;
+}
+pre {
+	line-height: 1.4;
+	overflow-x: auto;
+	background: #efefef;
+	padding: 0.625rem;
+	border-radius: 0.3125rem;
+}
+a {
+	color: #007d9c;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+p,
+li {
+	max-width: 50rem;
+	word-wrap: break-word;
+}
+li p {
+	margin: 2px;
+}
+p,
+pre,
+ul,
+ol {
+	margin: 1.25rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	margin: 1.25rem 0 1.25rem;
+	padding: 0;
+	color: #007d9c;
+	font-weight: bold;
+}
+h1 {
+	font-size: 1.75rem;
+	line-height: 1;
+}
+h1 .text-muted {
+	color: #777;
+}
+h2 {
+	clear: right;
+	font-size: 1.25rem;
+	background: #e0ebf5;
+	padding: 0.5rem;
+	line-height: 1.25;
+	font-weight: normal;
+	overflow: auto;
+	overflow-wrap: break-word;
+}
+h2 a {
+	font-weight: bold;
+}
+h3 {
+	font-size: 1.25rem;
+	line-height: 1.25;
+	overflow: auto;
+	overflow-wrap: break-word;
+}
+h3,
+h4 {
+	margin: 1.25rem 0.3125rem;
+}
+h4 {
+	font-size: 1rem;
+}
+
+h2 > span,
+h3 > span {
+	float: right;
+	margin: 0 25px 0 0;
+	font-weight: normal;
+	color: #5279c7;
+}
+
+dl {
+	margin: 1.25rem;
+}
+dd {
+	margin: 0 0 0 1.25rem;
+}
+dl,
+dd {
+	font-size: 0.875rem;
+}
+
+/**
+ * Custom classes for pages
+ */
+
+.topbar {
+	background: #e0ebf5;
+	height: 4rem;
+	overflow: hidden;
+}
+
+.topbar .top-heading,
+.topbar .menu {
+	padding: 1.313rem 0;
+	font-size: 1.25rem;
+	font-weight: normal;
+}
+.topbar .top-heading {
+	float: left;
+}
+.topbar .top-heading a {
+	color: #222;
+	text-decoration: none;
+}
+
+.top-heading .header-logo {
+	height: 2rem;
+	width: 5.125rem;
+}
+
+.topbar .menu {
+	float: right;
+}
+.topbar .menu a {
+	margin: 0.625rem 0.125rem;
+	padding: 0.625rem;
+	color: white;
+	background: #007d9c;
+	border: 0.0625rem solid #007d9c;
+	border-radius: 5px;
+}
+.topbar .menu form {
+	display: inline-block;
+}
+
+.page {
+	width: 100%;
+}
+
+.page > .container,
+.topbar > .container,
+.footer > .container {
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0 1.25rem;
+	max-width: 59.38rem;
+}
+
+.page > .container {
+	text-align: left;
+}
+
+.container .meta {
+	font-style: italic;
+	margin: 1.25rem;
+}
+
+.footer {
+	text-align: center;
+	color: #666;
+	font-size: 0.875rem;
+	margin: 2.5rem 0;
+}
+
+/** Custom classes for asciidoc */
+#toctitle {
+	display: none;
+}
+#toc li {
+	list-style: none;
+}
+#toc ul .sectlevel1 {
+	padding: 0px;
+	margin: 4px;
+}
+#toc ul .sectlevel2 {
+	margin: 4px;
+}
+
+@media screen and (max-width: 992px) {
+	#toc {
+		all: unset;
+	}
+}
+
+		</style>
 	</head>
 	<body>
 		<div class="topbar">
 			<div class="container">
 				<div class="top-heading">
-					<a href="/">github.com/shuLhan/share</a>
+					<a href="/">ciigo</a>
 				</div>
 				<div class="menu">
-					<a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>
-				</div>
-				<div class="menu">
-					<a href="/CHANGELOG.html">Changelog</a>
+					<form class="item" action="/_internal/search">
+						<input type="text" name="q" placeholder="Search" />
+					</form>
 				</div>
 			</div>
 		</div>
@@ -26,9 +227,15 @@
 		<div class="page">
 			<div class="container">
 				<h1>import &#34;github/shuLhan/share&#34;</h1>
+				<div class="meta">
+					Shulhan
+					<br />
+					
+				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#_public_apis">Public APIs</a></li>
 <li><a href="#_command_line_interface">Command Line Interface</a></li>
 <li><a href="#_libraries">Libraries</a></li>
 <li><a href="#_changelog">Changelog</a></li>
@@ -39,11 +246,25 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="image"><img src="https://godoc.org/github.com/shuLhan/share?status.svg" alt="GoDoc"></span>
+<p><span class="image"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square" alt="GoDoc"></span>
 <span class="image"><img src="https://goreportcard.com/badge/github.com/shuLhan/share" alt="Go Report Card"></span></p>
 </div>
 <div class="paragraph">
-<p>A collection of libraries and tools written in Go.</p>
+<p>A collection of public APIs and libraries for working with Go, and tools
+written in Go.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_public_apis">Public APIs</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/api/telegram/bot"><strong>Telegram bot</strong></a>: Package bot implement
+   the Telegram Bot API <a href="https://core.telegram.org/bots/api." class="bare">https://core.telegram.org/bots/api.</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -53,11 +274,11 @@
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/cmd/gofmtcomment"><strong>gofmtcomment</strong></a>: Program to convert
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/cmd/gofmtcomment"><strong>gofmtcomment</strong></a>: Program to convert
    multilines &#34;/**/&#34; comment into single line &#34;//&#34; format.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/cmd/smtpcli"><strong>smtpcli</strong></a>: Command smtpcli provide a command
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/cmd/smtpcli"><strong>smtpcli</strong></a>: Command smtpcli provide a command
    line interface to SMTP client protocol.</p>
 </li>
 </ul>
@@ -70,178 +291,234 @@
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/ascii"><strong>ascii</strong></a>: A library for working with ASCII
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/ascii"><strong>ascii</strong></a>: A library for working with ASCII
    characters.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/bytes"><strong>bytes</strong></a>: A library for working with slice of
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/bytes"><strong>bytes</strong></a>: A library for working with slice of
    bytes.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/contact"><strong>contact</strong></a>: A library to import contact from
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/contact"><strong>contact</strong></a>: A library to import contact from
    Google, Microsoft, or Yahoo</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/crypto"><strong>crypto</strong></a>: Package crypto provide a wrapper
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/crypto"><strong>crypto</strong></a>: Package crypto provide a wrapper
    for standard crypto package.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/dns"><strong>dns</strong></a>: A library for working with Domain Name
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/debug"><strong>debug</strong></a>: Package debug provide global
+   debug variable, initialized through environment variable &#34;DEBUG&#34; or
+   directly.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/dns"><strong>dns</strong></a>: A library for working with Domain Name
    System (DNS) protocol.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/dsv"><strong>dsv</strong></a>: A library for working with delimited
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/dsv"><strong>dsv</strong></a>: A library for working with delimited
    separated value (DSV).</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/email"><strong>email</strong></a>: A library for working with Internet
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/email"><strong>email</strong></a>: A library for working with Internet
    Message Format as defined by RFC 5322.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/email/dkim"><strong>dkim</strong></a>:  A library to parse and create
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/email/dkim"><strong>dkim</strong></a>:  A library to parse and create
     DKIM-Signature header field value, as defined in RFC 6376.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/email/maildir"><strong>maildir</strong></a>: A library to manage email
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/email/maildir"><strong>maildir</strong></a>: A library to manage email
     using maildir format.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/errors"><strong>errors</strong></a>: Package errors provide an error
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/errors"><strong>errors</strong></a>: Package errors provide an error
    type with code.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/floats"><strong>floats</strong></a>: A library for working with slice of
-   floats.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/floats64"><strong>floats64</strong></a>: A library for working with slice
+   of float64.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/git"><strong>git</strong></a>: A wrapper for git command line interface.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/git"><strong>git</strong></a>: A wrapper for git command line interface.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/http"><strong>http</strong></a>: Custom HTTP server with memory file
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/http"><strong>http</strong></a>: Custom HTTP server with memory file
    system and simplified routing handler.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/ini"><strong>ini</strong></a>: A library for reading and writing INI
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/hunspell"><strong>hunspell</strong></a>: Package hunspell is a library to
+   parse the Hunspell file format.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/ini"><strong>ini</strong></a>: A library for reading and writing INI
    configuration as defined by Git configuration file syntax.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/ints"><strong>ints</strong></a>: A library for working with slice of
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/ints"><strong>ints</strong></a>: A library for working with slice of
    integer.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/ints"><strong>ints64</strong></a>: A library for working with slice of
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/ints"><strong>ints64</strong></a>: A library for working with slice of
    64 bit integer.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/io"><strong>io</strong></a>: A library for reading and watching file,
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/io"><strong>io</strong></a>: A library for reading and watching file,
    and reading from standard input.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/memfs"><strong>memfs</strong></a>: A library for mapping file system
-   into memory.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/json"><strong>json</strong></a>: Package json extends the capabilities of
+   standard json package.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining"><strong>mining</strong></a>: A library for data mining.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/math"><strong>math</strong></a>: Package math provide generic functions
+   working with math.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/cart"><strong>classifier/cart</strong></a>:
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/math/big"><strong>big</strong></a>: Package big extends the capabilities
+    of standard &#34;math/big&#34; package by adding custom global precision to Float
+    and Rat; and global rounding mode, and bits precision to Float.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/memfs"><strong>memfs</strong></a>: Package memfs provide a library for
+   mapping file system into memory and to generate a go file.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining"><strong>mining</strong></a>: A library for data mining.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/classifier/cart"><strong>classifier/cart</strong></a>:
     Implementation of the Classification and Regression Tree by
     Breiman, et al.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/crf"><strong>classififer/crf</strong></a>:
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/classifier/crf"><strong>classififer/crf</strong></a>:
     Implementation of the Cascaded Random Forest (CRF) algorithm, proposed by
     Baumann, Florian, et al.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/classifier/rf"><strong>classifier/rf</strong></a>:
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/classifier/rf"><strong>classifier/rf</strong></a>:
     Implementation of ensemble of classifiers using random forest algorithm by
     Breiman and Cutler.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/gain/gini"><strong>gain/gini</strong></a>: A library to
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/gain/gini"><strong>gain/gini</strong></a>: A library to
     calculate Gini gain.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/knn"><strong>knn</strong></a>: Implementation of the K
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/knn"><strong>knn</strong></a>: Implementation of the K
     Nearest Neighbor (KNN) using Euclidian to compute the distance between
     samples.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/math"><strong>math</strong></a>: A library for working with
-    mathematic.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/resampling/lnsmote"><strong>resampling/lnsmote</strong></a>:
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/resampling/lnsmote"><strong>resampling/lnsmote</strong></a>:
     Implementation of the Local-Neighborhood algorithm from the paper of
     Maciejewski, Tomasz, and Jerzy Stefanowski.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/resampling/smote"><strong>resampling/smote</strong></a>:
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/resampling/smote"><strong>resampling/smote</strong></a>:
     Implementation of the Synthetic Minority Oversampling TEchnique (SMOTE).</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/mining/tree/binary"><strong>tree/binary</strong></a>: Implementation of
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/mining/tree/binary"><strong>tree/binary</strong></a>: Implementation of
     binary tree.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/net"><strong>net</strong></a>: Constants and library for networking.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/numbers"><strong>numbers</strong></a>: A library for working with
-   integer, float, slice of integer, and slice of floats.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/runes"><strong>runes</strong></a>: A library for working with slice of
-   rune.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/sanitize"><strong>sanitize</strong></a>: A library to sanitize markup
-   document into plain text.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/smtp"><strong>smtp</strong></a>: A library for building SMTP server or
-   client.
-   This package is working in progress.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/strings"><strong>strings</strong></a>: A library for working with slice
-   of string.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/tabula"><strong>tabula</strong></a>: A library for working with rows,
-   columns, or matrix (table), or in another terms working with data set.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/test"><strong>test</strong></a>: A library for helping with testing.</p>
-</li>
-<li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/text"><strong>text</strong></a>: A library for working with text.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/net"><strong>net</strong></a>: Constants and library for networking.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/text/diff"><strong>text/diff</strong></a>: Text comparison.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/net/html"><strong>html</strong></a>: Package html extends the
+    golang.org/x/net/html by providing simplified methods to Node.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/time"><strong>time</strong></a>: A library for working with time.</p>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/numbers"><strong>numbers</strong></a>: A library for working with
+   integer, float, slice of integer, and slice of floats.</p>
 </li>
 <li>
-<p><a href="https://godoc.org/github.com/shuLhan/share/lib/websocket"><strong>websocket</strong></a>: Websocket library for server
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/parser"><strong>parser</strong></a>: Package parser provide a common text
+   parser, using delimiters.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/reflect"><strong>reflect</strong></a>: Package reflect extends the
+   standard reflect package.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/runes"><strong>runes</strong></a>: A library for working with slice of
+   rune.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/sanitize"><strong>sanitize</strong></a>: A library to sanitize markup
+   document into plain text.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/smtp"><strong>smtp</strong></a>: A library for building SMTP server or
+   client.
+   This package is working in progress.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/spf"><strong>spf</strong></a>: Package spf implement Sender Policy
+   Framework (SPF) per RFC 7208.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/sql"><strong>sql</strong></a>: Package sql is an extension to standard
+   library &#34;database/sql.DB&#34; that provide common functionality across DBMS.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/ssh"><strong>ssh</strong></a>: Package ssh provide a wrapper for
+   golang.org/x/crypto/ssh and a parser for SSH client configuration
+   specification ssh_config(5).</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/strings"><strong>strings</strong></a>: A library for working with slice
+   of string.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/tabula"><strong>tabula</strong></a>: A library for working with rows,
+   columns, or matrix (table), or in another terms working with data set.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/test"><strong>test</strong></a>: A library for helping with testing.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/text"><strong>text</strong></a>: A library for working with text.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/text/diff"><strong>text/diff</strong></a>: Package diff implement text
+    comparison.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/time"><strong>time</strong></a>: A library for working with time.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/websocket"><strong>websocket</strong></a>: Websocket library for server
    and client.  The websocket is tested with autobahn testsuite with 100%
    success rate.
    See <a href="https://github.com/shuLhan/share/tree/master/lib/websocket/AUTOBAHN.adoc">the status
 reports</a>.</p>
+</li>
+<li>
+<p><a href="https://pkg.go.dev/github.com/shuLhan/share/lib/xmlrpc"><strong>xmlrpc</strong></a>: Package xmlrpc provide an
+   implementation of XML-RPC specification, <a href="http://xmlrpc.com/spec.md." class="bare">http://xmlrpc.com/spec.md.</a></p>
 </li>
 </ul>
 </div>
@@ -259,7 +536,7 @@ reports</a>.</p>
 <h2 id="_documentations">Documentations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Beside <a href="https://godoc.org/github.com/shuLhan/share">GoDoc</a>, that provides documentation for API in packages,
+<p>Beside <a href="https://pkg.go.dev/github.com/shuLhan/share">GoDoc</a>, that provides documentation for API in packages,
 there are also additional documentations that we can&#39;t include inside source
 code due to their scope and limitation of godoc formatting itself.</p>
 </div>
@@ -362,7 +639,7 @@ First, install <code>ciigo</code> command line interface,</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ ciigo -template=html.tmpl serve doc/</pre>
+<pre>$ ciigo serve doc/</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -375,7 +652,7 @@ files.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ ciigo -template=html.tmpl convert doc/</pre>
+<pre>$ ciigo convert doc/</pre>
 </div>
 </div>
 </div>
@@ -398,10 +675,11 @@ files.</p>
 		
 
 		<div class="footer">
-			Copyright 2019, Shulhan &lt;ms@kilabit.info&gt;. All rights reserved.
-			<br />
-			Use of this source code is governed by a BSD-style license that can be
-			found in the <a href="/LICENSE">LICENSE</a> file.
+			Powered by <a
+				href="https://github.com/shuLhan/ciigo"
+			>
+				ciigo
+			</a>
 		</div>
 	</body>
 </html>

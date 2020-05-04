@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package share contains common tools and library for working with Go
-// language.
+// Package share contains public APIs and libraries for working with Go
+// language, and tools written in Go.
 //
 package share
 

@@ -2,15 +2,21 @@
 :author: Shulhan
 :email: <ms@kilabit.info>
 :toc:
-:stylesheet: doc/style.css
 :url-gocard: https://goreportcard.com/report/github.com/shuLhan/share
-:url-godoc: https://godoc.org/github.com/shuLhan/share
+:url-godoc: https://pkg.go.dev/github.com/shuLhan/share
 :url-github-master: https://github.com/shuLhan/share/tree/master
 
-image:https://godoc.org/github.com/shuLhan/share?status.svg[GoDoc, link={url-godoc}]
+image:https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square[GoDoc, link={url-godoc}]
 image:https://goreportcard.com/badge/github.com/shuLhan/share[Go Report Card, link={url-gocard}]
 
-A collection of libraries and tools written in Go.
+A collection of public APIs and libraries for working with Go, and tools
+written in Go.
+
+==  Public APIs
+
+*  link:{url-godoc}/api/telegram/bot[*Telegram bot*]: Package bot implement
+   the Telegram Bot API https://core.telegram.org/bots/api.
+
 
 ==  Command Line Interface
 
@@ -35,6 +41,10 @@ A collection of libraries and tools written in Go.
 *  link:{url-godoc}/lib/crypto[*crypto*]: Package crypto provide a wrapper
    for standard crypto package.
 
+*  link:{url-godoc}/lib/debug[*debug*]: Package debug provide global
+   debug variable, initialized through environment variable "DEBUG" or
+   directly.
+
 *  link:{url-godoc}/lib/dns[*dns*]: A library for working with Domain Name
    System (DNS) protocol.
 
@@ -53,13 +63,16 @@ A collection of libraries and tools written in Go.
 *  link:{url-godoc}/lib/errors[*errors*]: Package errors provide an error
    type with code.
 
-*  link:{url-godoc}/lib/floats[*floats*]: A library for working with slice of
-   floats.
+*  link:{url-godoc}/lib/floats64[*floats64*]: A library for working with slice
+   of float64.
 
 *  link:{url-godoc}/lib/git[*git*]: A wrapper for git command line interface.
 
 *  link:{url-godoc}/lib/http[*http*]: Custom HTTP server with memory file
    system and simplified routing handler.
+
+*  link:{url-godoc}/lib/hunspell[*hunspell*]: Package hunspell is a library to
+   parse the Hunspell file format.
 
 *  link:{url-godoc}/lib/ini[*ini*]: A library for reading and writing INI
    configuration as defined by Git configuration file syntax.
@@ -73,8 +86,18 @@ A collection of libraries and tools written in Go.
 *  link:{url-godoc}/lib/io[*io*]: A library for reading and watching file,
    and reading from standard input.
 
-*  link:{url-godoc}/lib/memfs[*memfs*]: A library for mapping file system
-   into memory.
+*  link:{url-godoc}/lib/json[*json*]: Package json extends the capabilities of
+   standard json package.
+
+*  link:{url-godoc}/lib/math[*math*]: Package math provide generic functions
+   working with math.
+
+**  link:{url-godoc}/lib/math/big[*big*]: Package big extends the capabilities
+    of standard "math/big" package by adding custom global precision to Float
+    and Rat; and global rounding mode, and bits precision to Float.
+
+*  link:{url-godoc}/lib/memfs[*memfs*]: Package memfs provide a library for
+   mapping file system into memory and to generate a go file.
 
 *  link:{url-godoc}/lib/mining[*mining*]: A library for data mining.
 
@@ -97,9 +120,6 @@ A collection of libraries and tools written in Go.
     Nearest Neighbor (KNN) using Euclidian to compute the distance between
     samples.
 
-**  link:{url-godoc}/lib/mining/math[*math*]: A library for working with
-    mathematic.
-
 **  link:{url-godoc}/lib/mining/resampling/lnsmote[*resampling/lnsmote*]:
     Implementation of the Local-Neighborhood algorithm from the paper of
     Maciejewski, Tomasz, and Jerzy Stefanowski.
@@ -112,8 +132,17 @@ A collection of libraries and tools written in Go.
 
 *  link:{url-godoc}/lib/net[*net*]: Constants and library for networking.
 
+**  link:{url-godoc}/lib/net/html[*html*]: Package html extends the
+    golang.org/x/net/html by providing simplified methods to Node.
+
 *  link:{url-godoc}/lib/numbers[*numbers*]: A library for working with
    integer, float, slice of integer, and slice of floats.
+
+*  link:{url-godoc}/lib/parser[*parser*]: Package parser provide a common text
+   parser, using delimiters.
+
+*  link:{url-godoc}/lib/reflect[*reflect*]: Package reflect extends the
+   standard reflect package.
 
 *  link:{url-godoc}/lib/runes[*runes*]: A library for working with slice of
    rune.
@@ -125,6 +154,16 @@ A collection of libraries and tools written in Go.
    client.
    This package is working in progress.
 
+*  link:{url-godoc}/lib/spf[*spf*]: Package spf implement Sender Policy
+   Framework (SPF) per RFC 7208.
+
+*  link:{url-godoc}/lib/sql[*sql*]: Package sql is an extension to standard
+   library "database/sql.DB" that provide common functionality across DBMS.
+
+*  link:{url-godoc}/lib/ssh[*ssh*]: Package ssh provide a wrapper for
+   golang.org/x/crypto/ssh and a parser for SSH client configuration
+   specification ssh_config(5).
+
 *  link:{url-godoc}/lib/strings[*strings*]: A library for working with slice
    of string.
 
@@ -135,7 +174,8 @@ A collection of libraries and tools written in Go.
 
 *  link:{url-godoc}/lib/text[*text*]: A library for working with text.
 
-**  link:{url-godoc}/lib/text/diff[*text/diff*]: Text comparison.
+**  link:{url-godoc}/lib/text/diff[*text/diff*]: Package diff implement text
+    comparison.
 
 *  link:{url-godoc}/lib/time[*time*]: A library for working with time.
 
@@ -144,6 +184,9 @@ A collection of libraries and tools written in Go.
    success rate.
    See link:{url-github-master}/lib/websocket/AUTOBAHN.adoc[the status
 reports].
+
+*  link:{url-godoc}/lib/xmlrpc[*xmlrpc*]: Package xmlrpc provide an
+   implementation of XML-RPC specification, http://xmlrpc.com/spec.md.
 
 
 ==  Changelog
