@@ -3,14 +3,18 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.15.0 (2020-05-xx)
+==  share v0.15.0 (2020-05-04)
+
+===  Breaking changes
+
+*  big: check for zero length slice of byte or string on toRat
+*  ssh: replace the ClientConfig with ConfigSection
 
 ===  New features
 
+* ssh: implement SSH client configuration parser -- ssh_config(5)
 * api/telegram/bot: Go package for Telegram API Bot
-
 * http: implement a simplified HTTP client
-
 * net/html: new package to simplify the golang.org/x/net/html 
 
   The x/net/html package currently only provide bare raw functionalities
@@ -21,6 +25,18 @@ This library is released each month, usually at the first week of month.
   This package extends the package by adding methods to get node's attribute
   by name, get the first non-empty child, get the next non-empty sibling, and
   to iterate each node in the tree from top to bottom.
+
+===  Enhancements
+
+*  big: return "0" instead of "<nil>" on Rat.String()
+*  big: return false if Rat is nil on IsGreaterThanZero
+*  http: add parameter to set default client's headers
+*  websocket: add method to gracefully Close the client connection
+*  websocket: add routine that send PING control frame on Connect
+
+===  Bug fixes
+
+*  reflect: remove checking for method IsEqual on type reflect.Ptr
 
 
 ==  share v0.14.0 (2020-04-03)
