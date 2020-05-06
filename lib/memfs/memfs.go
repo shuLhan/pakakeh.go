@@ -377,6 +377,10 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 		return err
 	}
 
+	sort.SliceStable(fis, func(x, y int) bool {
+		return fis[x].Name() < fis[y].Name()
+	})
+
 	for _, fi := range fis {
 		leaf, err := mfs.AddChild(parent, fi)
 		if err != nil {
