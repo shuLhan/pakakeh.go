@@ -38,6 +38,7 @@ func TestAddFile(t *testing.T) {
 			ContentType: "text/plain; charset=utf-8",
 			size:        22,
 			V:           []byte("Test direct add file.\n"),
+			GenFuncName: "generate_testdata_direct_add_file",
 		},
 	}, {
 		desc: "With directories exist",
@@ -49,6 +50,7 @@ func TestAddFile(t *testing.T) {
 			ContentType: "text/plain; charset=utf-8",
 			size:        24,
 			V:           []byte("Test direct add file 2.\n"),
+			GenFuncName: "generate_testdata_direct_add_file2",
 		},
 	}}
 

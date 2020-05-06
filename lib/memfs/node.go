@@ -17,6 +17,9 @@ import (
 	"path"
 	"path/filepath"
 	"time"
+
+	"github.com/shuLhan/share/lib/ascii"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 var (
@@ -45,6 +48,7 @@ type Node struct {
 	plainv          []byte      // Content of file in plain text.
 	lowerv          []byte      // Content of file in lower cases.
 	off             int64       // The cursor position when doing Read or Seek.
+	GenFuncName     string      // The function name for generated Go code.
 }
 
 //
@@ -70,16 +74,22 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 		absPath = fi.Name()
 	}
 
+	funcName := make([]byte, len(absPath))
+	copy(funcName, []byte(absPath))
+	genFuncName := "generate_" + string(libbytes.InReplace(funcName,
+		[]byte(ascii.LettersNumber), '_'))
+
 	node = &Node{
-		SysPath: sysPath,
-		Path:    absPath,
-		name:    fi.Name(),
-		modTime: fi.ModTime(),
-		mode:    fi.Mode(),
-		size:    fi.Size(),
-		V:       nil,
-		Parent:  parent,
-		Childs:  make([]*Node, 0),
+		SysPath:     sysPath,
+		Path:        absPath,
+		name:        fi.Name(),
+		modTime:     fi.ModTime(),
+		mode:        fi.Mode(),
+		size:        fi.Size(),
+		V:           nil,
+		Parent:      parent,
+		Childs:      make([]*Node, 0),
+		GenFuncName: genFuncName,
 	}
 
 	if node.mode.IsDir() || !withContent {
@@ -98,6 +108,13 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 	}
 
 	return node, nil
+}
+
+//
+// AddChild add the other node as child of this node.
+//
+func (leaf *Node) AddChild(child *Node) {
+	leaf.Childs = append(leaf.Childs, child)
 }
 
 //

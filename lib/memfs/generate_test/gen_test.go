@@ -16,10 +16,17 @@ func generate_() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("/")
 	node.SetSize(0)
+	node.AddChild(_getNode("/direct", generate__direct))
+	node.AddChild(_getNode("/exclude", generate__exclude))
+	node.AddChild(_getNode("/include", generate__include))
+	node.AddChild(_getNode("/index.css", generate__index_css))
+	node.AddChild(_getNode("/index.html", generate__index_html))
+	node.AddChild(_getNode("/index.js", generate__index_js))
+	node.AddChild(_getNode("/plain", generate__plain))
 	return node
 }
 
-func generate_direct() *memfs.Node {
+func generate__direct() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/direct",
 		Path:            "/direct",
@@ -29,10 +36,11 @@ func generate_direct() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("direct")
 	node.SetSize(0)
+	node.AddChild(_getNode("/direct/add", generate__direct_add))
 	return node
 }
 
-func generate_direct_add() *memfs.Node {
+func generate__direct_add() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/direct/add",
 		Path:            "/direct/add",
@@ -42,10 +50,12 @@ func generate_direct_add() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("add")
 	node.SetSize(0)
+	node.AddChild(_getNode("/direct/add/file", generate__direct_add_file))
+	node.AddChild(_getNode("/direct/add/file2", generate__direct_add_file2))
 	return node
 }
 
-func generate_direct_add_file() *memfs.Node {
+func generate__direct_add_file() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/direct/add/file",
 		Path:            "/direct/add/file",
@@ -59,7 +69,7 @@ func generate_direct_add_file() *memfs.Node {
 	return node
 }
 
-func generate_direct_add_file2() *memfs.Node {
+func generate__direct_add_file2() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/direct/add/file2",
 		Path:            "/direct/add/file2",
@@ -73,7 +83,7 @@ func generate_direct_add_file2() *memfs.Node {
 	return node
 }
 
-func generate_exclude() *memfs.Node {
+func generate__exclude() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/exclude",
 		Path:            "/exclude",
@@ -83,10 +93,13 @@ func generate_exclude() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("exclude")
 	node.SetSize(0)
+	node.AddChild(_getNode("/exclude/index.css", generate__exclude_index_css))
+	node.AddChild(_getNode("/exclude/index.html", generate__exclude_index_html))
+	node.AddChild(_getNode("/exclude/index.js", generate__exclude_index_js))
 	return node
 }
 
-func generate_exclude_index_css() *memfs.Node {
+func generate__exclude_index_css() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/exclude/index.css",
 		Path:            "/exclude/index.css",
@@ -100,7 +113,7 @@ func generate_exclude_index_css() *memfs.Node {
 	return node
 }
 
-func generate_exclude_index_html() *memfs.Node {
+func generate__exclude_index_html() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/exclude/index.html",
 		Path:            "/exclude/index.html",
@@ -114,7 +127,7 @@ func generate_exclude_index_html() *memfs.Node {
 	return node
 }
 
-func generate_exclude_index_js() *memfs.Node {
+func generate__exclude_index_js() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/exclude/index.js",
 		Path:            "/exclude/index.js",
@@ -128,7 +141,7 @@ func generate_exclude_index_js() *memfs.Node {
 	return node
 }
 
-func generate_include() *memfs.Node {
+func generate__include() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/include",
 		Path:            "/include",
@@ -138,10 +151,13 @@ func generate_include() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("include")
 	node.SetSize(0)
+	node.AddChild(_getNode("/include/index.css", generate__include_index_css))
+	node.AddChild(_getNode("/include/index.html", generate__include_index_html))
+	node.AddChild(_getNode("/include/index.js", generate__include_index_js))
 	return node
 }
 
-func generate_include_index_css() *memfs.Node {
+func generate__include_index_css() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/include/index.css",
 		Path:            "/include/index.css",
@@ -155,7 +171,7 @@ func generate_include_index_css() *memfs.Node {
 	return node
 }
 
-func generate_include_index_html() *memfs.Node {
+func generate__include_index_html() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/include/index.html",
 		Path:            "/include/index.html",
@@ -169,7 +185,7 @@ func generate_include_index_html() *memfs.Node {
 	return node
 }
 
-func generate_include_index_js() *memfs.Node {
+func generate__include_index_js() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/include/index.js",
 		Path:            "/include/index.js",
@@ -183,7 +199,7 @@ func generate_include_index_js() *memfs.Node {
 	return node
 }
 
-func generate_index_css() *memfs.Node {
+func generate__index_css() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/index.css",
 		Path:            "/index.css",
@@ -197,7 +213,7 @@ func generate_index_css() *memfs.Node {
 	return node
 }
 
-func generate_index_html() *memfs.Node {
+func generate__index_html() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/index.html",
 		Path:            "/index.html",
@@ -211,7 +227,7 @@ func generate_index_html() *memfs.Node {
 	return node
 }
 
-func generate_index_js() *memfs.Node {
+func generate__index_js() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/index.js",
 		Path:            "/index.js",
@@ -225,7 +241,7 @@ func generate_index_js() *memfs.Node {
 	return node
 }
 
-func generate_plain() *memfs.Node {
+func generate__plain() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/plain",
 		Path:            "/plain",
@@ -239,23 +255,52 @@ func generate_plain() *memfs.Node {
 	return node
 }
 
+//
+// _getNode is internal function to minimize duplicate node created on
+// Node.AddChild() and on GeneratedPathNode.Set().
+//
+func _getNode(path string, fn func() *memfs.Node) *memfs.Node {
+	node := memfs.GeneratedPathNode.Get(path)
+	if node != nil {
+		return node
+	}
+	return fn()
+}
+
 func init() {
 	memfs.GeneratedPathNode = memfs.NewPathNode()
-	memfs.GeneratedPathNode.Set("/", generate_())
-	memfs.GeneratedPathNode.Set("/direct", generate_direct())
-	memfs.GeneratedPathNode.Set("/direct/add", generate_direct_add())
-	memfs.GeneratedPathNode.Set("/direct/add/file", generate_direct_add_file())
-	memfs.GeneratedPathNode.Set("/direct/add/file2", generate_direct_add_file2())
-	memfs.GeneratedPathNode.Set("/exclude", generate_exclude())
-	memfs.GeneratedPathNode.Set("/exclude/index.css", generate_exclude_index_css())
-	memfs.GeneratedPathNode.Set("/exclude/index.html", generate_exclude_index_html())
-	memfs.GeneratedPathNode.Set("/exclude/index.js", generate_exclude_index_js())
-	memfs.GeneratedPathNode.Set("/include", generate_include())
-	memfs.GeneratedPathNode.Set("/include/index.css", generate_include_index_css())
-	memfs.GeneratedPathNode.Set("/include/index.html", generate_include_index_html())
-	memfs.GeneratedPathNode.Set("/include/index.js", generate_include_index_js())
-	memfs.GeneratedPathNode.Set("/index.css", generate_index_css())
-	memfs.GeneratedPathNode.Set("/index.html", generate_index_html())
-	memfs.GeneratedPathNode.Set("/index.js", generate_index_js())
-	memfs.GeneratedPathNode.Set("/plain", generate_plain())
+	memfs.GeneratedPathNode.Set("/",
+		_getNode("/", generate_))
+	memfs.GeneratedPathNode.Set("/direct",
+		_getNode("/direct", generate__direct))
+	memfs.GeneratedPathNode.Set("/direct/add",
+		_getNode("/direct/add", generate__direct_add))
+	memfs.GeneratedPathNode.Set("/direct/add/file",
+		_getNode("/direct/add/file", generate__direct_add_file))
+	memfs.GeneratedPathNode.Set("/direct/add/file2",
+		_getNode("/direct/add/file2", generate__direct_add_file2))
+	memfs.GeneratedPathNode.Set("/exclude",
+		_getNode("/exclude", generate__exclude))
+	memfs.GeneratedPathNode.Set("/exclude/index.css",
+		_getNode("/exclude/index.css", generate__exclude_index_css))
+	memfs.GeneratedPathNode.Set("/exclude/index.html",
+		_getNode("/exclude/index.html", generate__exclude_index_html))
+	memfs.GeneratedPathNode.Set("/exclude/index.js",
+		_getNode("/exclude/index.js", generate__exclude_index_js))
+	memfs.GeneratedPathNode.Set("/include",
+		_getNode("/include", generate__include))
+	memfs.GeneratedPathNode.Set("/include/index.css",
+		_getNode("/include/index.css", generate__include_index_css))
+	memfs.GeneratedPathNode.Set("/include/index.html",
+		_getNode("/include/index.html", generate__include_index_html))
+	memfs.GeneratedPathNode.Set("/include/index.js",
+		_getNode("/include/index.js", generate__include_index_js))
+	memfs.GeneratedPathNode.Set("/index.css",
+		_getNode("/index.css", generate__index_css))
+	memfs.GeneratedPathNode.Set("/index.html",
+		_getNode("/index.html", generate__index_html))
+	memfs.GeneratedPathNode.Set("/index.js",
+		_getNode("/index.js", generate__index_js))
+	memfs.GeneratedPathNode.Set("/plain",
+		_getNode("/plain", generate__plain))
 }

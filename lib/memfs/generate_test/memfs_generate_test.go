@@ -7,6 +7,7 @@ package test
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -70,8 +71,81 @@ func TestGeneratePathNode(t *testing.T) {
 			continue
 		}
 
-		got.SysPath = strings.Replace(got.SysPath, "xxx/", wd, -1)
-
+		childs := got.Childs
+		got.Childs = nil
 		test.Assert(t, "Node", c.exp, got, true)
+		got.Childs = childs
+	}
+}
+
+func TestNode_Readdir(t *testing.T) {
+	mfs, err := memfs.New("", nil, nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		path string
+		exp  []string
+	}{{
+		path: "/",
+		exp: []string{
+			"direct",
+			"exclude",
+			"include",
+			"index.css",
+			"index.html",
+			"index.js",
+			"plain",
+		},
+	}, {
+		path: "/direct",
+		exp: []string{
+			"add",
+		},
+	}, {
+		path: "/direct/add",
+		exp: []string{
+			"file",
+			"file2",
+		},
+	}, {
+		path: "/exclude",
+		exp: []string{
+			"index.css",
+			"index.html",
+			"index.js",
+		},
+	}, {
+		path: "/include",
+		exp: []string{
+			"index.css",
+			"index.html",
+			"index.js",
+		},
+	}}
+
+	for _, c := range cases {
+		t.Logf(c.path)
+
+		file, err := mfs.Open(c.path)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fis, err := file.Readdir(0)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got := make([]string, 0, len(fis))
+
+		for _, fi := range fis {
+			got = append(got, fi.Name())
+		}
+
+		sort.Strings(got)
+
+		test.Assert(t, "Node.Readdir", c.exp, got, true)
 	}
 }

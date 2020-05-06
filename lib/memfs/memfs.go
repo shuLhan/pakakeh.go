@@ -356,14 +356,15 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 	}
 
 	mfs.root = &Node{
-		SysPath: dir,
-		Path:    "/",
-		name:    "/",
-		modTime: fi.ModTime(),
-		mode:    fi.Mode(),
-		size:    0,
-		V:       nil,
-		Parent:  nil,
+		SysPath:     dir,
+		Path:        "/",
+		name:        "/",
+		modTime:     fi.ModTime(),
+		mode:        fi.Mode(),
+		size:        0,
+		V:           nil,
+		Parent:      nil,
+		GenFuncName: "generate_",
 	}
 
 	mfs.pn.v[mfs.root.Path] = mfs.root

@@ -7,9 +7,6 @@ package memfs
 import (
 	"fmt"
 	"text/template"
-
-	"github.com/shuLhan/share/lib/ascii"
-	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 const (
@@ -52,7 +49,7 @@ import (
 )
 {{end}}
 {{define "GENERATE_NODE"}}
-func generate{{ funcname .Path}}() *memfs.Node {
+func {{ .GenFuncName}}() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "{{.SysPath}}",
 		Path:            "{{.Path}}",
@@ -65,33 +62,35 @@ func generate{{ funcname .Path}}() *memfs.Node {
 	node.SetMode({{printf "%d" .Mode}})
 	node.SetName("{{.Name}}")
 	node.SetSize({{.Size}})
+	{{- range $x, $child := .Childs}}
+	node.AddChild(_getNode("{{.Path}}", {{$child.GenFuncName}}))
+	{{- end}}
 	return node
 }
 {{end}}
 {{define "PATH_FUNCS"}}
+//
+// _getNode is internal function to minimize duplicate node created on
+// Node.AddChild() and on GeneratedPathNode.Set().
+//
+func _getNode(path string, fn func() *memfs.Node) *memfs.Node {
+	node := memfs.GeneratedPathNode.Get(path)
+	if node != nil {
+		return node
+	}
+	return fn()
+}
+
 func init() {
 	memfs.GeneratedPathNode = memfs.NewPathNode()
 {{- range $path, $node := .}}
-	memfs.GeneratedPathNode.Set("{{$path}}", generate{{funcname $node.Path}}())
+	memfs.GeneratedPathNode.Set("{{$path}}",
+		_getNode("{{$path}}", {{$node.GenFuncName}}))
 {{- end}}
 }
 {{end}}
 `
-	tmplFuncs := template.FuncMap{
-		"funcname": func(path string) string {
-			return string(
-				libbytes.InReplace([]byte(path),
-					[]byte(ascii.LettersNumber), '_'))
-		},
-		"maxline": func(x int) bool {
-			if x != 0 && x%16 == 0 {
-				return true
-			}
-			return false
-		},
-	}
-
-	tmpl, err = template.New("memfs").Funcs(tmplFuncs).Parse(textTemplate)
+	tmpl, err = template.New("memfs").Parse(textTemplate)
 	if err != nil {
 		return nil, fmt.Errorf("generateTemplate: %w", err)
 	}
