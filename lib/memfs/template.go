@@ -52,16 +52,14 @@ import (
 )
 {{end}}
 {{define "GENERATE_NODE"}}
-func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
+func generate{{ funcname .Path}}() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "{{.SysPath}}",
 		Path:            "{{.Path}}",
 		ContentType:     "{{.ContentType}}",
 		ContentEncoding: "{{.ContentEncoding}}",
 {{- if .V }}
-		V: []byte{
-			{{range $x, $c := .V}}{{ if maxline $x }}{{ printf "\n\t\t\t" }}{{else if $x}} {{end}}{{ printf "%d," $c }}{{end}}
-		},
+		V:               []byte("{{range $x, $c := .V}}{{ printf "\\x%x" $c }}{{end}}"),
 {{- end }}
 	}
 	node.SetMode({{printf "%d" .Mode}})
@@ -74,14 +72,16 @@ func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
 func init() {
 	memfs.GeneratedPathNode = memfs.NewPathNode()
 {{- range $path, $node := .}}
-	memfs.GeneratedPathNode.Set("{{$path}}", generate{{funcname $node.Path | printf "%s" }}())
+	memfs.GeneratedPathNode.Set("{{$path}}", generate{{funcname $node.Path}}())
 {{- end}}
 }
 {{end}}
 `
 	tmplFuncs := template.FuncMap{
-		"funcname": func(path string) []byte {
-			return libbytes.InReplace([]byte(path), []byte(ascii.LettersNumber), '_')
+		"funcname": func(path string) string {
+			return string(
+				libbytes.InReplace([]byte(path),
+					[]byte(ascii.LettersNumber), '_'))
 		},
 		"maxline": func(x int) bool {
 			if x != 0 && x%16 == 0 {
