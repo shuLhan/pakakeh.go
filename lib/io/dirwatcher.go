@@ -70,12 +70,7 @@ func (dw *DirWatcher) Start() (err error) {
 		return fmt.Errorf("lib/io: NewDirWatcher: %q is not a directory", dw.Path)
 	}
 
-	dw.fs, err = memfs.New(dw.Includes, dw.Excludes, false)
-	if err != nil {
-		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
-	}
-
-	err = dw.fs.Mount(dw.Path)
+	dw.fs, err = memfs.New(dw.Path, dw.Includes, dw.Excludes, false)
 	if err != nil {
 		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
 	}
@@ -239,7 +234,9 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 // recursively.
 //
 func (dw *DirWatcher) onRootCreated() {
-	err := dw.fs.Mount(dw.Path)
+	var err error
+
+	dw.fs, err = memfs.New(dw.Path, dw.Includes, dw.Excludes, false)
 	if err != nil {
 		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
 		return
@@ -277,7 +274,7 @@ func (dw *DirWatcher) onRootDeleted() {
 		State: FileStateDeleted,
 	}
 
-	dw.fs.Unmount()
+	dw.fs = nil
 	dw.root = nil
 	dw.dirs = nil
 
@@ -317,12 +314,12 @@ func (dw *DirWatcher) start() {
 				log.Println("lib/io: DirWatcher: " + err.Error())
 				continue
 			}
-			if dw.fs.IsMounted() {
+			if dw.fs != nil {
 				dw.onRootDeleted()
 			}
 			continue
 		}
-		if !dw.fs.IsMounted() {
+		if dw.fs == nil {
 			dw.onRootCreated()
 			continue
 		}

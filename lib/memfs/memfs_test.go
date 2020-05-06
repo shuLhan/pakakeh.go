@@ -1,6 +1,7 @@
 package memfs
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -51,12 +52,7 @@ func TestAddFile(t *testing.T) {
 		},
 	}}
 
-	mfs, err := New(nil, nil, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = mfs.Mount("testdata")
+	mfs, err := New("testdata", nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,12 +152,8 @@ func TestGet(t *testing.T) {
 		expContentType: "application/octet-stream",
 	}}
 
-	mfs, err := New(nil, nil, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = mfs.Mount(filepath.Join(_testWD, "/testdata"))
+	dir := filepath.Join(_testWD, "/testdata")
+	mfs, err := New(dir, nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +176,9 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestMount(t *testing.T) {
+func TestMemFS_mount(t *testing.T) {
+	afile := filepath.Join(_testWD, "testdata/index.html")
+
 	cases := []struct {
 		desc       string
 		incs       []string
@@ -198,8 +192,8 @@ func TestMount(t *testing.T) {
 		expMapKeys: make([]string, 0),
 	}, {
 		desc:   "With file",
-		dir:    filepath.Join(_testWD, "testdata/index.html"),
-		expErr: "memfs.Mount: mount must be a directory",
+		dir:    afile,
+		expErr: fmt.Sprintf("memfs.New: mount: %q must be a directory", afile),
 	}, {
 		desc: "With directory",
 		excs: []string{
@@ -265,12 +259,7 @@ func TestMount(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New(c.incs, c.excs, true)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		err = mfs.Mount(c.dir)
+		mfs, err := New(c.dir, c.incs, c.excs, true)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
@@ -393,7 +382,7 @@ func TestFilter(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New(c.inc, c.exc, true)
+		mfs, err := New("", c.inc, c.exc, true)
 		if err != nil {
 			t.Fatal(err)
 		}

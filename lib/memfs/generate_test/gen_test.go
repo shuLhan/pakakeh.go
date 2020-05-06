@@ -8,20 +8,20 @@ import (
 
 func generate_() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata",
+		SysPath:         "testdata",
 		Path:            "/",
 		ContentType:     "",
 		ContentEncoding: "",
 	}
 	node.SetMode(2147484141)
 	node.SetName("/")
-	node.SetSize(4096)
+	node.SetSize(0)
 	return node
 }
 
 func generate_direct() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/direct",
+		SysPath:         "testdata/direct",
 		Path:            "/direct",
 		ContentType:     "",
 		ContentEncoding: "",
@@ -34,7 +34,7 @@ func generate_direct() *memfs.Node {
 
 func generate_direct_add() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/direct/add",
+		SysPath:         "testdata/direct/add",
 		Path:            "/direct/add",
 		ContentType:     "",
 		ContentEncoding: "",
@@ -47,14 +47,11 @@ func generate_direct_add() *memfs.Node {
 
 func generate_direct_add_file() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/direct/add/file",
+		SysPath:         "testdata/direct/add/file",
 		Path:            "/direct/add/file",
 		ContentType:     "text/plain; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			84, 101, 115, 116, 32, 100, 105, 114, 101, 99, 116, 32, 97, 100, 100, 32,
-			102, 105, 108, 101, 46, 10,
-		},
+		V:               []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("file")
@@ -64,14 +61,11 @@ func generate_direct_add_file() *memfs.Node {
 
 func generate_direct_add_file2() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/direct/add/file2",
+		SysPath:         "testdata/direct/add/file2",
 		Path:            "/direct/add/file2",
 		ContentType:     "text/plain; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			84, 101, 115, 116, 32, 100, 105, 114, 101, 99, 116, 32, 97, 100, 100, 32,
-			102, 105, 108, 101, 32, 50, 46, 10,
-		},
+		V:               []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x20\x32\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("file2")
@@ -81,7 +75,7 @@ func generate_direct_add_file2() *memfs.Node {
 
 func generate_exclude() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/exclude",
+		SysPath:         "testdata/exclude",
 		Path:            "/exclude",
 		ContentType:     "",
 		ContentEncoding: "",
@@ -94,13 +88,11 @@ func generate_exclude() *memfs.Node {
 
 func generate_exclude_index_css() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/exclude/index.css",
+		SysPath:         "testdata/exclude/index.css",
 		Path:            "/exclude/index.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			98, 111, 100, 121, 32, 123, 10, 125, 10,
-		},
+		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.css")
@@ -110,13 +102,11 @@ func generate_exclude_index_css() *memfs.Node {
 
 func generate_exclude_index_html() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/exclude/index.html",
+		SysPath:         "testdata/exclude/index.html",
 		Path:            "/exclude/index.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			60, 104, 116, 109, 108, 62, 60, 47, 104, 116, 109, 108, 62, 10,
-		},
+		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.html")
@@ -126,13 +116,11 @@ func generate_exclude_index_html() *memfs.Node {
 
 func generate_exclude_index_js() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/exclude/index.js",
+		SysPath:         "testdata/exclude/index.js",
 		Path:            "/exclude/index.js",
 		ContentType:     "application/javascript",
 		ContentEncoding: "",
-		V: []byte{
-			102, 117, 110, 99, 116, 105, 111, 110, 32, 88, 40, 41, 32, 123, 125, 10,
-		},
+		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.js")
@@ -142,7 +130,7 @@ func generate_exclude_index_js() *memfs.Node {
 
 func generate_include() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/include",
+		SysPath:         "testdata/include",
 		Path:            "/include",
 		ContentType:     "",
 		ContentEncoding: "",
@@ -155,13 +143,11 @@ func generate_include() *memfs.Node {
 
 func generate_include_index_css() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/include/index.css",
+		SysPath:         "testdata/include/index.css",
 		Path:            "/include/index.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			98, 111, 100, 121, 32, 123, 10, 125, 10,
-		},
+		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.css")
@@ -171,13 +157,11 @@ func generate_include_index_css() *memfs.Node {
 
 func generate_include_index_html() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/include/index.html",
+		SysPath:         "testdata/include/index.html",
 		Path:            "/include/index.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			60, 104, 116, 109, 108, 62, 60, 47, 104, 116, 109, 108, 62, 10,
-		},
+		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.html")
@@ -187,13 +171,11 @@ func generate_include_index_html() *memfs.Node {
 
 func generate_include_index_js() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/include/index.js",
+		SysPath:         "testdata/include/index.js",
 		Path:            "/include/index.js",
 		ContentType:     "application/javascript",
 		ContentEncoding: "",
-		V: []byte{
-			102, 117, 110, 99, 116, 105, 111, 110, 32, 88, 40, 41, 32, 123, 125, 10,
-		},
+		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.js")
@@ -203,13 +185,11 @@ func generate_include_index_js() *memfs.Node {
 
 func generate_index_css() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/index.css",
+		SysPath:         "testdata/index.css",
 		Path:            "/index.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			98, 111, 100, 121, 32, 123, 10, 125, 10,
-		},
+		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.css")
@@ -219,13 +199,11 @@ func generate_index_css() *memfs.Node {
 
 func generate_index_html() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/index.html",
+		SysPath:         "testdata/index.html",
 		Path:            "/index.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			60, 104, 116, 109, 108, 62, 60, 47, 104, 116, 109, 108, 62, 10,
-		},
+		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.html")
@@ -235,13 +213,11 @@ func generate_index_html() *memfs.Node {
 
 func generate_index_js() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/index.js",
+		SysPath:         "testdata/index.js",
 		Path:            "/index.js",
 		ContentType:     "application/javascript",
 		ContentEncoding: "",
-		V: []byte{
-			102, 117, 110, 99, 116, 105, 111, 110, 32, 88, 40, 41, 32, 123, 125, 10,
-		},
+		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("index.js")
@@ -251,14 +227,11 @@ func generate_index_js() *memfs.Node {
 
 func generate_plain() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "xxx/testdata/plain",
+		SysPath:         "testdata/plain",
 		Path:            "/plain",
 		ContentType:     "text/plain; charset=utf-8",
 		ContentEncoding: "",
-		V: []byte{
-			84, 104, 105, 115, 32, 105, 115, 32, 97, 32, 112, 108, 97, 105, 110, 32,
-			116, 101, 120, 116, 46, 10,
-		},
+		V:               []byte("\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x70\x6C\x61\x69\x6E\x20\x74\x65\x78\x74\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetName("plain")

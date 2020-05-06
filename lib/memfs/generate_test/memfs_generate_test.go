@@ -23,15 +23,15 @@ func TestGeneratePathNode(t *testing.T) {
 	wd = strings.TrimSuffix(wd, "generate_test")
 
 	expRoot := &memfs.Node{
-		SysPath: filepath.Join(wd, "testdata"),
+		SysPath: "testdata",
 		Path:    "/",
 	}
 	expRoot.SetMode(2147484141)
 	expRoot.SetName("/")
-	expRoot.SetSize(4096)
+	expRoot.SetSize(0)
 
 	expExcludeIndexHTML := &memfs.Node{
-		SysPath:     filepath.Join(wd, "testdata", "exclude", "index.html"),
+		SysPath:     filepath.Join("testdata", "exclude", "index.html"),
 		Path:        "/exclude/index.html",
 		ContentType: "text/html; charset=utf-8",
 		V:           []byte("<html></html>\n"),
@@ -56,7 +56,7 @@ func TestGeneratePathNode(t *testing.T) {
 		exp:  expExcludeIndexHTML,
 	}}
 
-	mfs, err := memfs.New(nil, nil, true)
+	mfs, err := memfs.New("", nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}

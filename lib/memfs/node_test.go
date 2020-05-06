@@ -64,12 +64,7 @@ func TestNode_Read(t *testing.T) {
 }
 
 func TestNode_Readdir(t *testing.T) {
-	mfs, err := New(nil, nil, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = mfs.Mount("testdata")
+	mfs, err := New("testdata", nil, nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}

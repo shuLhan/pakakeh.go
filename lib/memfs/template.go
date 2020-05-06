@@ -59,7 +59,7 @@ func generate{{ funcname .Path}}() *memfs.Node {
 		ContentType:     "{{.ContentType}}",
 		ContentEncoding: "{{.ContentEncoding}}",
 {{- if .V }}
-		V:               []byte("{{range $x, $c := .V}}{{ printf "\\x%x" $c }}{{end}}"),
+		V:               []byte("{{range $x, $c := .V}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}
 	}
 	node.SetMode({{printf "%d" .Mode}})

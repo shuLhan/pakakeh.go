@@ -78,12 +78,8 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	memfs.Development = opts.Development
 
 	if len(opts.Root) > 0 {
-		srv.Memfs, err = memfs.New(opts.Includes, opts.Excludes, true)
-		if err != nil {
-			return nil, err
-		}
-
-		err = srv.Memfs.Mount(opts.Root)
+		srv.Memfs, err = memfs.New(opts.Root, opts.Includes,
+			opts.Excludes, true)
 		if err != nil {
 			return nil, err
 		}

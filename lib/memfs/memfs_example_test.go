@@ -14,12 +14,7 @@ func ExampleNew() {
 		`.*/exclude`,
 	}
 
-	mfs, err := New(incs, excs, true)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = mfs.Mount("./testdata")
+	mfs, err := New("./testdata", incs, excs, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,12 +30,7 @@ func ExampleNew() {
 }
 
 func ExampleMemFS_Search() {
-	mfs, err := New(nil, nil, true)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = mfs.Mount("./testdata")
+	mfs, err := New("./testdata", nil, nil, true)
 	if err != nil {
 		log.Fatal(err)
 	}

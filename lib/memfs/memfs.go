@@ -7,7 +7,6 @@ package memfs
 import (
 	"bytes"
 	"compress/gzip"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -60,8 +59,8 @@ type MemFS struct {
 }
 
 //
-// New create and initialize new memory file system using list of regular
-// expresssion for including or excluding files.
+// New create and initialize new memory file system from directory dir using
+// list of regular expresssion for including or excluding files.
 //
 // The includes and excludes pattern applied to path of file in file system,
 // not to the path in memory.
@@ -74,7 +73,9 @@ type MemFS struct {
 // excludes does not have any effect, since the content of path and nodes will
 // be overwritten by GeneratedPathNode.
 //
-func New(includes, excludes []string, withContent bool) (mfs *MemFS, err error) {
+func New(dir string, includes, excludes []string, withContent bool) (
+	mfs *MemFS, err error,
+) {
 	if GeneratedPathNode != nil {
 		if !Development {
 			mfs = &MemFS{
@@ -106,6 +107,11 @@ func New(includes, excludes []string, withContent bool) (mfs *MemFS, err error) 
 			return nil, fmt.Errorf("memfs.New: %w", err)
 		}
 		mfs.excRE = append(mfs.excRE, re)
+	}
+
+	err = mfs.mount(dir)
+	if err != nil {
+		return nil, fmt.Errorf("memfs.New: %w", err)
 	}
 
 	return mfs, nil
@@ -274,22 +280,14 @@ func (mfs *MemFS) ListNames() (paths []string) {
 }
 
 //
-// IsMounted will return true if a directory in file system has been mounted
-// to memory; otherwise it will return false.
-//
-func (mfs *MemFS) IsMounted() bool {
-	return mfs.root != nil
-}
-
-//
-// Mount the directory recursively into the memory as root directory.
+// mount the directory recursively into the memory as root directory.
 // For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
 // access file "a" we call Get("/a"), not Get("/tmp/a").
 //
-// Mount does not have any effect if current directory contains ".go"
+// mount does not have any effect if current directory contains ".go"
 // file generated from GoGenerate().
 //
-func (mfs *MemFS) Mount(dir string) error {
+func (mfs *MemFS) mount(dir string) error {
 	if len(dir) == 0 {
 		return nil
 	}
@@ -308,18 +306,18 @@ func (mfs *MemFS) Mount(dir string) error {
 
 	f, err := os.Open(dir)
 	if err != nil {
-		return fmt.Errorf("memfs.Mount: %w", err)
+		return fmt.Errorf("mount: %w", err)
 	}
 
 	err = mfs.createRoot(dir, f)
 	if err != nil {
-		return fmt.Errorf("memfs.Mount: %w", err)
+		return fmt.Errorf("mount: %w", err)
 	}
 
 	err = mfs.scanDir(mfs.root, f)
 	_ = f.Close()
 	if err != nil {
-		return fmt.Errorf("memfs.Mount: %w", err)
+		return fmt.Errorf("mount: %w", err)
 	}
 
 	if mfs.withContent {
@@ -327,14 +325,6 @@ func (mfs *MemFS) Mount(dir string) error {
 	}
 
 	return nil
-}
-
-//
-// Unmount the root directory from memory.
-//
-func (mfs *MemFS) Unmount() {
-	mfs.root = nil
-	mfs.pn = nil
 }
 
 //
@@ -362,7 +352,7 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 	}
 
 	if !fi.IsDir() {
-		return errors.New("mount must be a directory")
+		return fmt.Errorf("%q must be a directory", dir)
 	}
 
 	mfs.root = &Node{
@@ -371,7 +361,7 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 		name:    "/",
 		modTime: fi.ModTime(),
 		mode:    fi.Mode(),
-		size:    fi.Size(),
+		size:    0,
 		V:       nil,
 		Parent:  nil,
 	}
