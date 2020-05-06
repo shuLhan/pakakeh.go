@@ -12,11 +12,17 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
+const (
+	templateNameHeader       = "HEADER"
+	templateNameGenerateNode = "GENERATE_NODE"
+	templateNamePathFuncs    = "PATH_FUNCS"
+)
+
 //
 // generateTemplate generate the .go source template.
 //
 // The .go source template contains three sections: HEADER, GENERATE_NODE,
-// and PATHFUNCS.
+// and PATH_FUNCS.
 //
 // The HEADER section accept single parameter: the package name, as a string.
 //
@@ -32,7 +38,7 @@ import (
 // Then Node itself then registered in memfs global variable
 // "GeneratedPathNode".
 //
-// The PATHFUNCS section generate the init() function that map each
+// The PATH_FUNCS section generate the init() function that map each
 // Node's Path with the function generated from GENERATE_NODE.
 //
 func generateTemplate() (tmpl *template.Template, err error) {
@@ -64,7 +70,7 @@ func generate{{ funcname .Path | printf "%s"}}() *memfs.Node {
 	return node
 }
 {{end}}
-{{define "PATHFUNCS"}}
+{{define "PATH_FUNCS"}}
 func init() {
 	memfs.GeneratedPathNode = memfs.NewPathNode()
 {{- range $path, $node := .}}
@@ -87,7 +93,7 @@ func init() {
 
 	tmpl, err = template.New("memfs").Funcs(tmplFuncs).Parse(textTemplate)
 	if err != nil {
-		return nil, fmt.Errorf("memfs: GoGenerate: " + err.Error())
+		return nil, fmt.Errorf("generateTemplate: %w", err)
 	}
 
 	return tmpl, nil

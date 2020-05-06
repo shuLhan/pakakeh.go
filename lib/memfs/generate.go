@@ -49,7 +49,7 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 
 	names := mfs.ListNames()
 
-	err = tmpl.ExecuteTemplate(f, "HEADER", pkgName)
+	err = tmpl.ExecuteTemplate(f, templateNameHeader, pkgName)
 	if err != nil {
 		goto fail
 	}
@@ -61,13 +61,13 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 		}
 
 		node := mfs.pn.v[names[x]]
-		err = tmpl.ExecuteTemplate(f, "GENERATE_NODE", node)
+		err = tmpl.ExecuteTemplate(f, templateNameGenerateNode, node)
 		if err != nil {
 			goto fail
 		}
 	}
 
-	err = tmpl.ExecuteTemplate(f, "PATHFUNCS", mfs.pn.v)
+	err = tmpl.ExecuteTemplate(f, templateNamePathFuncs, mfs.pn.v)
 	if err != nil {
 		goto fail
 	}
