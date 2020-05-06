@@ -55,6 +55,8 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 	}
 
 	for x := 0; x < len(names); x++ {
+		// Ignore and delete the file from map if its the output
+		// itself.
 		if strings.HasSuffix(names[x], out) {
 			delete(mfs.pn.v, names[x])
 			continue
@@ -72,7 +74,10 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 		goto fail
 	}
 
-	_ = f.Sync()
+	err = f.Sync()
+	if err != nil {
+		goto fail
+	}
 
 	err = f.Close()
 	if err != nil {
