@@ -8,20 +8,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shuLhan/share/lib/strings"
 	"github.com/shuLhan/share/lib/test"
 )
 
 func TestParseDuration(t *testing.T) {
 	cases := []struct {
 		in     string
-		expErr string
+		expErr []string
 		exp    time.Duration
 	}{{
-		in:     "w",
-		expErr: ErrDurationMissingValue.Error(),
+		in: "w",
+		expErr: []string{
+			ErrDurationMissingValue.Error(),
+		},
 	}, {
-		in:     "1aw",
-		expErr: `strconv.ParseFloat: parsing "1a": invalid syntax`,
+		in: "1aw",
+		expErr: []string{
+			`strconv.ParseFloat: parsing "1a": invalid syntax`,
+		},
 	}, {
 		in:  "1w",
 		exp: time.Duration(1) * Week,
@@ -41,8 +46,11 @@ func TestParseDuration(t *testing.T) {
 		in:  "1d0.5h",
 		exp: time.Duration(24)*time.Hour + (time.Minute * time.Duration(30)),
 	}, {
-		in:     "100  w",
-		expErr: `time: unknown unit   in duration 100 `,
+		in: "100  w",
+		expErr: []string{
+			`time: unknown unit   in duration 100 `,     // go <= 1.14
+			`time: unknown unit " " in duration "100 "`, // go > 1.14
+		},
 	}, {
 		in: "100",
 	}}
@@ -52,8 +60,10 @@ func TestParseDuration(t *testing.T) {
 
 		got, err := ParseDuration(c.in)
 		if err != nil {
+			if strings.IsContain(c.expErr, err.Error()) {
+				continue
+			}
 			test.Assert(t, "error", c.expErr, err.Error(), true)
-			continue
 		}
 
 		test.Assert(t, "duration", c.exp, got, true)
