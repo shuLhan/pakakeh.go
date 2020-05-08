@@ -3,6 +3,20 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.16.0 (2020-06-xx)
+
+===  Breaking changes
+
+*  dns: disable serving DoH and DoT if port is not set (0)
+
+Previously, if HTTPPort or TLSPort is not set (0) we set it to default
+value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
+want to serve DNS over UDP only.
+
+This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
+is not set, or 0.
+
+
 ==  share v0.15.0 (2020-05-04)
 
 ===  Breaking changes

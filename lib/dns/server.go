@@ -330,8 +330,12 @@ func (srv *Server) ListenAndServe() (err error) {
 	srv.startAllForwarders()
 
 	go srv.processRequest()
-	go srv.serveDoT()
-	go srv.serveDoH()
+	if srv.opts.TLSPort > 0 {
+		go srv.serveDoT()
+	}
+	if srv.opts.HTTPPort > 0 {
+		go srv.serveDoH()
+	}
 	go srv.serveTCP()
 	go srv.serveUDP()
 

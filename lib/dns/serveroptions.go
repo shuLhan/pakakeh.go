@@ -28,10 +28,12 @@ type ServerOptions struct {
 	// This field is optional, default to 120 seconds.
 	HTTPIdleTimeout time.Duration `ini:"dns:server:http.idle_timeout"`
 
-	// HTTPPort port for listening DNS over HTTP, default to 443.
+	// HTTPPort port for listening DNS over HTTP (DoH), default to 0.
+	// If its zero, the server will not serve DNS over HTTP.
 	HTTPPort uint16 `ini:"dns:server:http.port"`
 
-	// TLSPort port for listening DNS over TLS, default to 853.
+	// TLSPort port for listening DNS over TLS, default to 0.
+	// If its zero, the server will not serve DNS over TLS.
 	TLSPort uint16 `ini:"dns:server:tls.port"`
 
 	//
@@ -143,12 +145,6 @@ func (opts *ServerOptions) init() (err error) {
 		return fmt.Errorf("dns: invalid IP address '%s'", opts.ListenAddress)
 	}
 
-	if opts.HTTPPort == 0 {
-		opts.HTTPPort = DefaultHTTPPort
-	}
-	if opts.TLSPort == 0 {
-		opts.TLSPort = DefaultTLSPort
-	}
 	if opts.HTTPIdleTimeout <= 0 {
 		opts.HTTPIdleTimeout = defaultHTTPIdleTimeout
 	}
