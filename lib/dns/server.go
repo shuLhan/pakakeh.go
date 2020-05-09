@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -395,8 +396,10 @@ func (srv *Server) serveDoH() {
 		log.Println("dns.Server: listening for DNS over HTTP at", addr)
 		err = srv.doh.ListenAndServe()
 	}
-	if err != io.EOF {
-		err = fmt.Errorf("dns: error on DoH: " + err.Error())
+	if errors.Is(err, io.EOF) {
+		err = nil
+	} else {
+		err = fmt.Errorf("dns: error on DoH: %w", err)
 	}
 
 	srv.errListener <- err
@@ -426,8 +429,10 @@ func (srv *Server) serveDoT() {
 		for {
 			conn, err := srv.dot.Accept()
 			if err != nil {
-				if err != io.EOF {
-					err = fmt.Errorf("dns: error on accepting DoT connection: " + err.Error())
+				if errors.Is(err, io.EOF) {
+					err = nil
+				} else {
+					err = fmt.Errorf("dns: error on accepting DoT connection: %w", err)
 				}
 				srv.errListener <- err
 				break
@@ -452,8 +457,10 @@ func (srv *Server) serveTCP() {
 	for {
 		conn, err := srv.tcp.AcceptTCP()
 		if err != nil {
-			if err != io.EOF {
-				err = fmt.Errorf("dns: error on accepting TCP connection: " + err.Error())
+			if errors.Is(err, io.EOF) {
+				err = nil
+			} else {
+				err = fmt.Errorf("dns: error on accepting TCP connection: %w", err)
 			}
 			srv.errListener <- err
 			return
@@ -480,8 +487,10 @@ func (srv *Server) serveUDP() {
 
 		n, raddr, err := srv.udp.ReadFromUDP(packet)
 		if err != nil {
-			if err != io.EOF {
-				err = fmt.Errorf("dns: error when reading from UDP: " + err.Error())
+			if n == 0 || errors.Is(err, io.EOF) {
+				err = nil
+			} else {
+				err = fmt.Errorf("dns: error when reading from UDP: %w", err)
 			}
 			srv.errListener <- err
 			return
