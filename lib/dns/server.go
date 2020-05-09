@@ -361,12 +361,12 @@ func (srv *Server) Stop() {
 			log.Println("dns: error when closing DoT: " + err.Error())
 		}
 	}
-	err = srv.doh.Close()
-	if err != nil {
-		log.Println("dns: error when closing DoH: " + err.Error())
+	if srv.doh != nil {
+		err = srv.doh.Close()
+		if err != nil {
+			log.Println("dns: error when closing DoH: " + err.Error())
+		}
 	}
-
-	close(srv.requestq)
 }
 
 //
