@@ -340,10 +340,7 @@ func (srv *Server) ListenAndServe() (err error) {
 	go srv.serveTCP()
 	go srv.serveUDP()
 
-	err = <-srv.errListener
-	srv.Stop()
-
-	return err
+	return <-srv.errListener
 }
 
 //
