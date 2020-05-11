@@ -28,6 +28,11 @@ const (
 		"Connection: Upgrade\r\n" +
 		"Sec-Websocket-Key: %s\r\n" +
 		"Sec-Websocket-Version: 13\r\n"
+
+	schemeWSS   = "wss"
+	schemeHTTPS = "https"
+	defTLSPort  = "443"
+	defPort     = "80"
 )
 
 var (
@@ -295,10 +300,10 @@ func (cl *Client) init() (err error) {
 }
 
 //
-// parseURI parse WebSocket connection URI from "endpoint" and get the remote
+// parseURI parse WebSocket connection URI from Endpoint and get the remote
 // URL (for checking up scheme) and remote address.
-// By default, if no port is given, it will set to 80 for URL with any scheme
-// or 443 for "wss" scheme.
+// By default, if no port is given, it will be set to 80 or 443 for "wss" or
+// "https" scheme.
 //
 // On success it will set the remote address that can be used on open().
 // On fail it will return an error.
@@ -310,24 +315,24 @@ func (cl *Client) parseURI() (err error) {
 		return err
 	}
 
+	serverAddress := cl.remoteURL.Hostname()
 	serverPort := cl.remoteURL.Port()
 
-	if len(serverPort) != 0 {
-		cl.remoteAddr = cl.remoteURL.Host
-		return nil
-	}
-
 	switch cl.remoteURL.Scheme {
-	case "wss":
-		serverPort = "443"
+	case schemeWSS, schemeHTTPS:
+		if len(serverPort) == 0 {
+			serverPort = defTLSPort
+		}
 		if cl.TLSConfig == nil {
 			cl.TLSConfig = &tls.Config{}
 		}
 	default:
-		serverPort = "80"
+		if len(serverPort) == 0 {
+			serverPort = defPort
+		}
 	}
 
-	cl.remoteAddr = cl.remoteURL.Hostname() + ":" + serverPort
+	cl.remoteAddr = serverAddress + ":" + serverPort
 
 	return nil
 }

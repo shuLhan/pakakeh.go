@@ -5,6 +5,7 @@
 package websocket
 
 import (
+	"crypto/tls"
 	"net/http"
 	"sync"
 	"testing"
@@ -57,6 +58,56 @@ func TestConnect(t *testing.T) {
 		}
 
 		client.sendClose(StatusNormal, nil)
+	}
+}
+
+func TestClient_parseURI(t *testing.T) {
+	cl := &Client{}
+
+	cases := []struct {
+		endpoint         string
+		expRemoteAddress string
+		expTLSConfig     *tls.Config
+		expError         string
+	}{{
+		endpoint:         "ws://127.0.0.1:8080",
+		expRemoteAddress: "127.0.0.1:8080",
+	}, {
+		endpoint:         "wss://127.0.0.1",
+		expRemoteAddress: "127.0.0.1:443",
+		expTLSConfig:     new(tls.Config),
+	}, {
+		endpoint:         "wss://127.0.0.1:8000",
+		expRemoteAddress: "127.0.0.1:8000",
+		expTLSConfig:     new(tls.Config),
+	}, {
+		endpoint:         "http://127.0.0.1",
+		expRemoteAddress: "127.0.0.1:80",
+	}, {
+		endpoint:         "https://127.0.0.1",
+		expRemoteAddress: "127.0.0.1:443",
+		expTLSConfig:     new(tls.Config),
+	}, {
+		endpoint:         "https://127.0.0.1:8443",
+		expRemoteAddress: "127.0.0.1:8443",
+		expTLSConfig:     new(tls.Config),
+	}}
+
+	for _, c := range cases {
+		t.Log("parseURI", c.endpoint)
+
+		cl.remoteAddr = ""
+		cl.TLSConfig = nil
+		cl.Endpoint = c.endpoint
+
+		err := cl.parseURI()
+		if err != nil {
+			test.Assert(t, "error", c.expError, err.Error(), true)
+			continue
+		}
+
+		test.Assert(t, "remote address", c.expRemoteAddress, cl.remoteAddr, true)
+		test.Assert(t, "TLS config", c.expTLSConfig, cl.TLSConfig, true)
 	}
 }
 

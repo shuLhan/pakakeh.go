@@ -16,6 +16,10 @@ want to serve DNS over UDP only.
 This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
 is not set, or 0.
 
+===  Enhancements
+
+*  websocket: allow "https" scheme on Client's Endpoint
+
 
 ==  share v0.15.0 (2020-05-04)
 
