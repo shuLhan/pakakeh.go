@@ -373,7 +373,7 @@ func (srv *Server) handleFS(
 		return
 	}
 
-	res.Header().Set(ContentType, node.ContentType)
+	res.Header().Set(HeaderContentType, node.ContentType)
 
 	if len(node.ContentEncoding) > 0 {
 		res.Header().Set(ContentEncoding, node.ContentEncoding)
@@ -397,7 +397,7 @@ func (srv *Server) handleFS(
 		size = int64(len(body))
 	}
 
-	res.Header().Set(ContentLength, strconv.FormatInt(size, 10))
+	res.Header().Set(HeaderContentLength, strconv.FormatInt(size, 10))
 
 	if method == RequestMethodHead {
 		res.WriteHeader(http.StatusOK)
@@ -449,11 +449,11 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusNoContent)
 		return
 	case ResponseTypeBinary:
-		res.Header().Set(ContentType, ContentTypeBinary)
+		res.Header().Set(HeaderContentType, ContentTypeBinary)
 	case ResponseTypeJSON:
-		res.Header().Set(ContentType, ContentTypeJSON)
+		res.Header().Set(HeaderContentType, ContentTypeJSON)
 	case ResponseTypePlain:
-		res.Header().Set(ContentType, ContentTypePlain)
+		res.Header().Set(HeaderContentType, ContentTypePlain)
 	}
 
 	res.WriteHeader(http.StatusOK)
@@ -531,7 +531,8 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 
 	sort.Strings(allows)
 
-	res.Header().Set("Allow", strings.Join(allows, ", "))
+	res.Header().Set(HeaderAllow, strings.Join(allows, ", "))
+
 	res.WriteHeader(http.StatusOK)
 }
 

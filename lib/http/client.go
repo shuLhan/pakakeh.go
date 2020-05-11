@@ -133,7 +133,7 @@ func (client *Client) PostForm(path string, params url.Values) (
 	}
 
 	client.setHeaders(httpReq)
-	httpReq.Header.Set(ContentType, ContentTypeForm)
+	httpReq.Header.Set(HeaderContentType, ContentTypeForm)
 
 	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
@@ -175,7 +175,7 @@ func (client *Client) PostFormData(path string, params map[string][]byte) (
 	}
 
 	client.setHeaders(httpReq)
-	httpReq.Header.Set(ContentType, contentType)
+	httpReq.Header.Set(HeaderContentType, contentType)
 
 	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
@@ -216,7 +216,7 @@ func (client *Client) PostJSON(path string, params interface{}) (
 	}
 
 	client.setHeaders(httpReq)
-	httpReq.Header.Set(ContentType, ContentTypeJSON)
+	httpReq.Header.Set(HeaderContentType, ContentTypeJSON)
 
 	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
@@ -253,11 +253,11 @@ func (client *Client) setHeaders(req *http.Request) {
 // setUserAgent set the User-Agent header only if its not defined by user.
 //
 func (client *Client) setUserAgent() {
-	v := client.defHeaders.Get(UserAgent)
+	v := client.defHeaders.Get(HeaderUserAgent)
 	if len(v) > 0 {
 		return
 	}
-	client.defHeaders.Set(UserAgent, defUserAgent)
+	client.defHeaders.Set(HeaderUserAgent, defUserAgent)
 }
 
 //
@@ -273,7 +273,7 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 		return body, nil
 	}
 
-	contentType := res.Header.Get(ContentType)
+	contentType := res.Header.Get(HeaderContentType)
 	switch {
 	case strings.HasPrefix(contentType, "text/"):
 	case strings.HasPrefix(contentType, ContentTypeJSON):

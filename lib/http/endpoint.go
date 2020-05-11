@@ -139,11 +139,11 @@ func (ep *Endpoint) call(
 		res.WriteHeader(http.StatusNoContent)
 		return
 	case ResponseTypeBinary:
-		res.Header().Set(ContentType, ContentTypeBinary)
+		res.Header().Set(HeaderContentType, ContentTypeBinary)
 	case ResponseTypeJSON:
-		res.Header().Set(ContentType, ContentTypeJSON)
+		res.Header().Set(HeaderContentType, ContentTypeJSON)
 	case ResponseTypePlain:
-		res.Header().Set(ContentType, ContentTypePlain)
+		res.Header().Set(HeaderContentType, ContentTypePlain)
 	}
 
 	_, e = res.Write(rspb)
@@ -161,7 +161,7 @@ func (ep *Endpoint) error(res http.ResponseWriter, e error) {
 	}
 
 	res.WriteHeader(se.Code)
-	res.Header().Set(ContentType, ContentTypeJSON)
+	res.Header().Set(HeaderContentType, ContentTypeJSON)
 
 	rsp, err := json.Marshal(se)
 	if err != nil {

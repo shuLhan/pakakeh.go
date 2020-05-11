@@ -165,7 +165,7 @@ func TestRegisterDelete(t *testing.T) {
 
 		test.Assert(t, "Body", c.expBody, string(body), true)
 
-		gotContentType := res.Header.Get(ContentType)
+		gotContentType := res.Header.Get(HeaderContentType)
 
 		test.Assert(t, "Content-Type", c.expContentType, gotContentType, true)
 	}
@@ -376,9 +376,9 @@ func TestRegisterHead(t *testing.T) {
 			true)
 		test.Assert(t, "Body", c.expBody, string(body), true)
 		test.Assert(t, "Header.ContentType", c.expContentType,
-			res.Header[ContentType], true)
+			res.Header[HeaderContentType], true)
 		test.Assert(t, "Header.ContentLength", c.expContentLength,
-			res.Header[ContentLength], true)
+			res.Header[HeaderContentLength], true)
 	}
 }
 
@@ -495,7 +495,7 @@ k=vv`,
 			t.Fatal(e)
 		}
 
-		req.Header.Set(ContentType, ContentTypeForm)
+		req.Header.Set(HeaderContentType, ContentTypeForm)
 
 		res, e := client.Do(req)
 		if e != nil {

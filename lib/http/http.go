@@ -149,9 +149,6 @@ const (
 	ContentEncodingGzip     = "gzip"
 	ContentEncodingDeflate  = "deflate" // Using zlib.
 
-	ContentLength = "Content-Length"
-
-	ContentType       = "Content-Type"
 	ContentTypeBinary = "application/octet-stream"
 	ContentTypeForm   = "application/x-www-form-urlencoded"
 	ContentTypeHTML   = "text/html; charset=utf-8"
@@ -159,8 +156,12 @@ const (
 	ContentTypePlain  = "text/plain; charset=utf-8"
 	ContentTypeXML    = "text/xml; charset=utf-8"
 
-	HeaderLocation = "Location"
-	UserAgent      = "User-Agent"
+	HeaderAllow         = "Allow"
+	HeaderContentLength = "Content-Length"
+	HeaderContentType   = "Content-Type"
+	HeaderLocation      = "Location"
+	HeaderOrigin        = "Origin"
+	HeaderUserAgent     = "User-Agent"
 )
 
 var (
