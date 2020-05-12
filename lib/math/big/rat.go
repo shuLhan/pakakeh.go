@@ -138,6 +138,14 @@ func SubRat(f ...interface{}) *Rat {
 }
 
 //
+// Abs sets r to |r| (the absolute value of r) and return it.
+//
+func (r *Rat) Abs() *Rat {
+	r.Rat.Abs(&r.Rat)
+	return r
+}
+
+//
 // Add sets r to `r+g` and return the r as the result.
 //
 func (r *Rat) Add(g interface{}) *Rat {

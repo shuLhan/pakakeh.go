@@ -174,6 +174,26 @@ func TestNewRat(t *testing.T) {
 	}
 }
 
+func TestRat_Abs(t *testing.T) {
+	cases := []struct {
+		r   *Rat
+		exp string
+	}{{
+		r:   NewRat("-1"),
+		exp: "1",
+	}, {
+		r:   NewRat("0.0000"),
+		exp: "0",
+	}, {
+		r:   NewRat("1"),
+		exp: "1",
+	}}
+
+	for _, c := range cases {
+		test.Assert(t, "Abs()", c.exp, c.r.Abs().String(), true)
+	}
+}
+
 func TestRat_Add(t *testing.T) {
 	cases := []struct {
 		got *Rat
