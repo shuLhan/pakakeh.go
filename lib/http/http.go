@@ -156,12 +156,20 @@ const (
 	ContentTypePlain  = "text/plain; charset=utf-8"
 	ContentTypeXML    = "text/xml; charset=utf-8"
 
-	HeaderAllow         = "Allow"
-	HeaderContentLength = "Content-Length"
-	HeaderContentType   = "Content-Type"
-	HeaderLocation      = "Location"
-	HeaderOrigin        = "Origin"
-	HeaderUserAgent     = "User-Agent"
+	HeaderACAllowOrigin      = "Access-Control-Allow-Origin"
+	HeaderACAllowMethod      = "Access-Control-Allow-Method"
+	HeaderACAllowCredentials = "Access-Control-Allow-Credentials"
+	HeaderACAllowHeaders     = "Access-Control-Allow-Headers"
+	HeaderACExposeHeaders    = "Access-Control-Expose-Headers"
+	HeaderACMaxAge           = "Access-Control-Max-Age"
+	HeaderACRequestMethod    = "Access-Control-Request-Method"
+	HeaderACRequestHeaders   = "Access-Control-Request-Headers"
+	HeaderAllow              = "Allow"
+	HeaderContentLength      = "Content-Length"
+	HeaderContentType        = "Content-Type"
+	HeaderLocation           = "Location"
+	HeaderOrigin             = "Origin"
+	HeaderUserAgent          = "User-Agent"
 )
 
 var (

@@ -22,6 +22,7 @@ import (
 
 const (
 	defRWTimeout = 30 * time.Second
+	corsWildcard = "*"
 )
 
 //
@@ -29,6 +30,8 @@ const (
 //
 type Server struct {
 	*http.Server
+
+	opts *ServerOptions
 
 	// Memfs contains the content of file systems to be served in memory.
 	// It will be initialized only if ServerOptions's Root is not empty or
@@ -49,22 +52,13 @@ type Server struct {
 // with custom connection.
 //
 func NewServer(opts *ServerOptions) (srv *Server, err error) {
-	srv = &Server{}
+	opts.init()
 
-	if len(opts.Address) == 0 {
-		opts.Address = ":80"
+	srv = &Server{
+		opts: opts,
 	}
 
-	if opts.Conn == nil {
-		srv.Server = &http.Server{
-			ReadTimeout:    defRWTimeout,
-			WriteTimeout:   defRWTimeout,
-			MaxHeaderBytes: 1 << 20,
-		}
-	} else {
-		srv.Server = opts.Conn
-	}
-
+	srv.Server = opts.Conn
 	srv.Addr = opts.Address
 	srv.Handler = srv
 
@@ -350,6 +344,98 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 }
 
 //
+// handleCORS handle the CORS request.
+//
+// Reference: https://www.html5rocks.com/static/images/cors_server_flowchart.png
+//
+func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
+	var found bool
+	preflightOrigin := req.Header.Get(HeaderOrigin)
+
+	for _, origin := range srv.opts.CORSAllowOrigins {
+		if origin == corsWildcard {
+			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
+			found = true
+			break
+		}
+		if origin == preflightOrigin {
+			fmt.Println("preflightOrigin:", preflightOrigin)
+			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
+			found = true
+			break
+		}
+	}
+	if !found {
+		return
+	}
+
+	preflightMethod := req.Header.Get(HeaderACRequestMethod)
+	if len(preflightMethod) == 0 {
+		if len(srv.opts.exposeHeaders) > 0 {
+			res.Header().Set(
+				HeaderACExposeHeaders,
+				srv.opts.exposeHeaders,
+			)
+		}
+		return
+	}
+
+	switch preflightMethod {
+	case http.MethodGet, http.MethodPost, http.MethodPut,
+		http.MethodPatch, http.MethodDelete:
+		res.Header().Set(HeaderACAllowMethod, preflightMethod)
+	default:
+		return
+	}
+
+	srv.handleCORSRequestHeaders(res, req)
+
+	if len(srv.opts.corsMaxAge) > 0 {
+		res.Header().Set(HeaderACMaxAge, srv.opts.corsMaxAge)
+	}
+	if srv.opts.CORSAllowCredentials {
+		res.Header().Set(HeaderACAllowCredentials, "true")
+	}
+}
+
+func (srv *Server) handleCORSRequestHeaders(
+	res http.ResponseWriter, req *http.Request,
+) {
+	preflightHeaders := req.Header.Get(HeaderACRequestHeaders)
+	if len(preflightHeaders) == 0 {
+		return
+	}
+
+	reqHeaders := strings.Split(preflightHeaders, ",")
+	for x := 0; x < len(reqHeaders); x++ {
+		reqHeaders[x] = strings.ToLower(strings.TrimSpace(reqHeaders[x]))
+	}
+
+	fmt.Printf("preflightHeaders: %s\n", reqHeaders)
+
+	allowHeaders := make([]string, 0, len(reqHeaders))
+
+	for _, reqHeader := range reqHeaders {
+		for _, allowHeader := range srv.opts.CORSAllowHeaders {
+			if allowHeader == corsWildcard {
+				allowHeaders = append(allowHeaders, reqHeader)
+				break
+			}
+			if reqHeader == allowHeader {
+				allowHeaders = append(allowHeaders, reqHeader)
+				break
+			}
+		}
+	}
+	if len(allowHeaders) == 0 {
+		return
+	}
+
+	fmt.Printf("allowHeaders: %s\n", allowHeaders)
+	res.Header().Set(HeaderACAllowHeaders, strings.Join(allowHeaders, ","))
+}
+
+//
 // handleDelete handle the DELETE request by searching the registered route
 // and calling the endpoint.
 //
@@ -513,6 +599,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	// The OPTIONS method request to non existen path.
 	if len(methods) == 0 {
 		res.WriteHeader(http.StatusNotFound)
 		return
@@ -532,6 +619,8 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	sort.Strings(allows)
 
 	res.Header().Set(HeaderAllow, strings.Join(allows, ", "))
+
+	srv.handleCORS(res, req)
 
 	res.WriteHeader(http.StatusOK)
 }

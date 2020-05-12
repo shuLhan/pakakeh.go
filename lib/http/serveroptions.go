@@ -6,6 +6,8 @@ package http
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 //
@@ -35,7 +37,74 @@ type ServerOptions struct {
 	// This field is optional.
 	Excludes []string
 
+	// CORSAllowCredentials indicates whether or not the actual request
+	// can be made using credentials.
+	CORSAllowCredentials bool
+
+	// CORSAllowOrigins contains global list of cross-site Origin that are
+	// allowed during preflight requests by the OPTIONS method.
+	// The list is case-sensitive.
+	// To allow all Origin, one must add "*" string to the list.
+	CORSAllowOrigins    []string
+	corsAllowOriginsAll bool // flag to indicate wildcards on list.
+
+	// CORSAllowHeaders contains global list of allowed headers during
+	// preflight requests by the OPTIONS method.
+	// The list is case-insensitive.
+	// To allow all headers, one must add "*" string to the list.
+	CORSAllowHeaders    []string
+	corsAllowHeadersAll bool // flag to indicate wildcards on list.
+
+	// CORSExposeHeaders contains list of allowed headers.
+	// This list will be send when browser request OPTIONS without
+	// request-method.
+	CORSExposeHeaders []string
+
+	// CORSMaxAge gives the value in seconds for how long the response to
+	// the preflight request can be cached for without sending another
+	// preflight request.
+	CORSMaxAge int
+	corsMaxAge string
+
 	// Development if its true, the Root file system is served by reading
 	// the content directly instead of using memory file system.
 	Development bool
+
+	exposeHeaders string
+}
+
+func (opts *ServerOptions) init() {
+	if len(opts.Address) == 0 {
+		opts.Address = ":80"
+	}
+
+	if opts.Conn == nil {
+		opts.Conn = &http.Server{
+			ReadTimeout:    defRWTimeout,
+			WriteTimeout:   defRWTimeout,
+			MaxHeaderBytes: 1 << 20,
+		}
+	}
+
+	for x := 0; x < len(opts.CORSAllowOrigins); x++ {
+		if opts.CORSAllowOrigins[x] == corsWildcard {
+			opts.corsAllowOriginsAll = true
+			break
+		}
+	}
+
+	for x := 0; x < len(opts.CORSAllowHeaders); x++ {
+		if opts.CORSAllowHeaders[x] == corsWildcard {
+			opts.corsAllowHeadersAll = true
+		} else {
+			opts.CORSAllowHeaders[x] = strings.ToLower(opts.CORSAllowHeaders[x])
+		}
+	}
+
+	if len(opts.CORSExposeHeaders) > 0 {
+		opts.exposeHeaders = strings.Join(opts.CORSExposeHeaders, ",")
+	}
+	if opts.CORSMaxAge > 0 {
+		opts.corsMaxAge = strconv.Itoa(opts.CORSMaxAge)
+	}
 }
