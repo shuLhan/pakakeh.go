@@ -43,13 +43,14 @@ coverbrowse: $(COVER_HTML)
 	xdg-open $<
 
 lint:
-	golangci-lint run --enable-all \
+	-golangci-lint run --enable-all \
 		--disable=dupl \
 		--disable=funlen \
 		--disable=godox \
 		--disable=gomnd \
 		--disable=wsl \
 		--disable=gocognit \
+		--disable=testpackage \
 		./...
 
 genhtml:
