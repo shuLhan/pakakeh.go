@@ -7,6 +7,7 @@ package email
 import (
 	"bytes"
 	"errors"
+	"mime/quotedprintable"
 	"strings"
 
 	libio "github.com/shuLhan/share/lib/io"
@@ -18,6 +19,42 @@ import (
 type MIME struct {
 	Header  *Header
 	Content []byte
+}
+
+//
+// newMIME append new body with specific content type and charset.
+// The content must be in raw format and it will be encoded using
+// quoted-printable encoding.
+//
+func newMIME(contentType, content []byte) (mime *MIME, err error) {
+	mime = &MIME{
+		Header: &Header{},
+	}
+	err = mime.Header.Set(FieldTypeContentType, contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	err = mime.Header.Set(FieldTypeMIMEVersion, []byte(mimeVersion1))
+	if err != nil {
+		return nil, err
+	}
+
+	err = mime.Header.Set(FieldTypeContentTransferEncoding,
+		[]byte(encodingQuotedPrintable))
+	if err != nil {
+		return nil, err
+	}
+
+	var buf bytes.Buffer
+	content = append(content, []byte("\r\n")...)
+	w := quotedprintable.NewWriter(&buf)
+	w.Write(content)
+	w.Close()
+
+	mime.Content = buf.Bytes()
+
+	return mime, nil
 }
 
 //

@@ -22,6 +22,7 @@ is not set, or 0.
 
 ===  Enhancements
 
+*  email: add function to create multipart text and HTML message
 *  websocket: allow "https" scheme on Client's Endpoint
 
 

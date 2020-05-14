@@ -8,9 +8,39 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/email/dkim"
 	"github.com/shuLhan/share/lib/test"
 )
+
+func TestNewMultipart(t *testing.T) {
+	if debug.Value == 0 {
+		// This test involve random generated string on boundary, so
+		// it should be run manually.
+		t.Skip()
+	}
+
+	cases := []struct {
+		from, to, subject []byte
+		bodyText          []byte
+		bodyHTML          []byte
+	}{{
+		from:     []byte("a@b.c"),
+		to:       []byte("d@e.f"),
+		subject:  []byte("test"),
+		bodyText: []byte("This is plain text"),
+		bodyHTML: []byte("<b>This is body in HTML</b>"),
+	}}
+
+	for _, c := range cases {
+		got, err := NewMultipart(c.from, c.to, c.subject, c.bodyText, c.bodyHTML)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Logf("NewMultipart:\n%s", got.Pack())
+	}
+}
 
 func TestMessageParseMessage(t *testing.T) {
 	cases := []struct {

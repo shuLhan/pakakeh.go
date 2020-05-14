@@ -95,6 +95,13 @@ func skipPreamble(raw, boundary []byte) []byte {
 }
 
 //
+// Add new MIME part to the body.
+//
+func (body *Body) Add(mime *MIME) {
+	body.Parts = append(body.Parts, mime)
+}
+
+//
 // String return text representation of Body.
 //
 func (body *Body) String() string {

@@ -39,7 +39,7 @@ type Field struct {
 	// "Content-Type" or nil if still packed.
 	ContentType *ContentType
 
-	// true if field.Unpack has been called, false when field.setValue is
+	// true if field.unpack has been called, false when field.setValue is
 	// called again.
 	unpacked bool
 }
@@ -252,9 +252,9 @@ func (field *Field) Simple() (out []byte) {
 }
 
 //
-// Unpack the field Value based on field Name.
+// unpack the field Value based on field Name.
 //
-func (field *Field) Unpack() (err error) {
+func (field *Field) unpack() (err error) {
 	switch field.Type {
 	case FieldTypeDate:
 		err = field.unpackDate()

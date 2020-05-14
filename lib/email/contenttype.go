@@ -138,6 +138,23 @@ func (ct *ContentType) GetParamValue(name []byte) []byte {
 }
 
 //
+// SetBoundary set the parameter boundary in content-type header's value.
+//
+func (ct *ContentType) SetBoundary(boundary []byte) {
+	for x := 0; x < len(ct.Params); x++ {
+		if bytes.Equal(ct.Params[x].Key, ParamNameBoundary) {
+			ct.Params[x].Value = boundary
+			return
+		}
+	}
+	paramBoundary := Param{
+		Key:   ParamNameBoundary,
+		Value: boundary,
+	}
+	ct.Params = append(ct.Params, paramBoundary)
+}
+
+//
 // String return text representation of this instance.
 //
 func (ct *ContentType) String() string {

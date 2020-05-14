@@ -244,7 +244,7 @@ func TestUnpackDate(t *testing.T) {
 
 		field.setValue(c.value)
 
-		err := field.Unpack()
+		err := field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
@@ -279,7 +279,7 @@ func TestUnpackMailbox(t *testing.T) {
 			continue
 		}
 
-		err = field.Unpack()
+		err = field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
@@ -311,7 +311,7 @@ func TestUnpackMailboxList(t *testing.T) {
 			continue
 		}
 
-		err = field.Unpack()
+		err = field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
@@ -343,7 +343,7 @@ func TestUnpackContentType(t *testing.T) {
 			continue
 		}
 
-		err = field.Unpack()
+		err = field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
@@ -352,7 +352,7 @@ func TestUnpackContentType(t *testing.T) {
 		test.Assert(t, "Content-Type", c.exp, field.ContentType.String(), true)
 		test.Assert(t, "field.unpacked", true, field.unpacked, true)
 
-		err = field.Unpack()
+		err = field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue

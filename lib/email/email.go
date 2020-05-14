@@ -5,6 +5,14 @@
 package email
 
 const (
+	contentTypeMultipartAlternative = "multipart/alternative"
+	contentTypeTextPlain            = `text/plain; charset="utf-8"`
+	contentTypeTextHTML             = `text/html; charset="utf-8"`
+	encodingQuotedPrintable         = "quoted-printable"
+	mimeVersion1                    = "1.0"
+)
+
+const (
 	cr byte = '\r'
 	lf byte = '\n'
 )

@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 //
@@ -18,7 +20,7 @@ type Header struct {
 	// fields is ordered from top to bottom, the first field in message
 	// header is equal to the first element in slice.
 	//
-	// We are not using map here it to prevent the header being reordeded
+	// We are not using map here it to prevent the header being reordered
 	// when packing the message back into raw format.
 	//
 	fields []*Field
@@ -92,7 +94,7 @@ func (hdr *Header) ContentType() *ContentType {
 			continue
 		}
 		if f.ContentType == nil {
-			err := f.Unpack()
+			err := f.unpack()
 			if err != nil {
 				log.Println("ContentType: ", err)
 				return nil
@@ -165,13 +167,35 @@ func (hdr *Header) Relaxed() []byte {
 
 	for _, f := range hdr.fields {
 		if len(f.Name) > 0 && len(f.Value) > 0 {
-			bb.Write(f.Name)
-			bb.WriteByte(':')
-			bb.Write(f.Value)
+			bb.Write(f.Relaxed())
 		}
 	}
 
 	return bb.Bytes()
+}
+
+//
+// Set the header's value based on specific type.
+// If no field type found, the new field will be added to the list.
+//
+func (hdr *Header) Set(ft FieldType, value []byte) (err error) {
+	var field *Field
+
+	for _, f := range hdr.fields {
+		if f.Type == ft {
+			field = f
+			break
+		}
+	}
+	if field == nil {
+		field = &Field{
+			Type: ft,
+		}
+		hdr.fields = append(hdr.fields, field)
+	}
+	field.setName(fieldNames[ft])
+	field.setValue(value)
+	return field.unpack()
 }
 
 //
@@ -202,4 +226,25 @@ func (hdr *Header) popByName(name []byte) (f *Field) {
 		}
 	}
 	return f
+}
+
+//
+// SetMultipart make the header a multipart bodies with boundary.
+//
+func (hdr *Header) SetMultipart() (err error) {
+	err = hdr.Set(FieldTypeMIMEVersion, []byte(mimeVersion1))
+	if err != nil {
+		return fmt.Errorf("email.SetMultipart: %w", err)
+	}
+
+	hdr.Set(FieldTypeContentType, []byte(contentTypeMultipartAlternative))
+	if err != nil {
+		return fmt.Errorf("email.SetMultipart: %w", err)
+	}
+
+	boundary := ascii.Random([]byte(ascii.Hexaletters), 32)
+	contentType := hdr.ContentType()
+	contentType.SetBoundary(boundary)
+
+	return nil
 }

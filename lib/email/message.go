@@ -26,6 +26,55 @@ type Message struct {
 }
 
 //
+// NewMultipart create multipart email message with text and HTML bodies.
+//
+func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
+	msg *Message, err error,
+) {
+	msg = &Message{
+		Header: &Header{},
+		Body:   &Body{},
+	}
+
+	err = msg.Header.Set(FieldTypeFrom, from)
+	if err != nil {
+		return nil, fmt.Errorf("email.NewMultipart: %w", err)
+	}
+
+	err = msg.Header.Set(FieldTypeTo, to)
+	if err != nil {
+		return nil, fmt.Errorf("email.NewMultipart: %w", err)
+	}
+
+	err = msg.Header.Set(FieldTypeSubject, subject)
+	if err != nil {
+		return nil, fmt.Errorf("email.NewMultipart: %w", err)
+	}
+
+	err = msg.Header.SetMultipart()
+	if err != nil {
+		return nil, fmt.Errorf("email.NewMultipart: %w", err)
+	}
+
+	if len(bodyText) > 0 {
+		mimeText, err := newMIME([]byte(contentTypeTextPlain), bodyText)
+		if err != nil {
+			return nil, fmt.Errorf("email.NewMultipart: %w", err)
+		}
+		msg.Body.Add(mimeText)
+	}
+	if len(bodyHTML) > 0 {
+		mimeHTML, err := newMIME([]byte(contentTypeTextHTML), bodyHTML)
+		if err != nil {
+			return nil, fmt.Errorf("email.NewMultipart: %w", err)
+		}
+		msg.Body.Add(mimeHTML)
+	}
+
+	return msg, nil
+}
+
+//
 // ParseFile parse message from file.
 //
 func ParseFile(inFile string) (msg *Message, rest []byte, err error) {
@@ -232,7 +281,7 @@ func (msg *Message) String() string {
 }
 
 //
-// CanonBody return the canonincal representation of Message.
+// CanonBody return the canonical representation of Message.
 //
 func (msg *Message) CanonBody() (body []byte) {
 	if msg.DKIMSignature.CanonBody == nil || *msg.DKIMSignature.CanonBody == dkim.CanonSimple {
@@ -291,6 +340,44 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 	}
 
 	return bb.Bytes()
+}
+
+//
+// Pack the message for sending.
+//
+func (msg *Message) Pack() (out []byte) {
+	var buf bytes.Buffer
+
+	boundary := msg.Header.Boundary()
+
+	for _, f := range msg.Header.fields {
+		if f.Type == FieldTypeContentType {
+			fmt.Fprintf(&buf, "%s: %s\r\n", f.Name,
+				f.ContentType.String())
+		} else {
+			fmt.Fprintf(&buf, "%s: %s", f.Name, f.Value)
+		}
+	}
+	buf.WriteString("\r\n")
+	for _, mime := range msg.Body.Parts {
+		if len(boundary) > 0 {
+			fmt.Fprintf(&buf, "--%s\r\n", boundary)
+		}
+		for _, f := range mime.Header.fields {
+			if f.Type == FieldTypeContentType {
+				fmt.Fprintf(&buf, "%s: %s\r\n", f.Name,
+					f.ContentType.String())
+			} else {
+				fmt.Fprintf(&buf, "%s: %s", f.Name, f.Value)
+			}
+		}
+		buf.WriteString("\r\n")
+		buf.Write(mime.Content)
+	}
+	if len(boundary) > 0 {
+		fmt.Fprintf(&buf, "--%s--\r\n", boundary)
+	}
+	return buf.Bytes()
 }
 
 //
