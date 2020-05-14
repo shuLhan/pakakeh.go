@@ -56,6 +56,21 @@ func (mbox *Mailbox) String() string {
 }
 
 //
+// ParseMailbox parse the raw address and return a single mailbox, the first
+// mailbox in the list.
+//
+func ParseMailbox(raw []byte) (mbox *Mailbox, err error) {
+	mboxes, err := ParseMailboxes(raw)
+	if err != nil {
+		return nil, err
+	}
+	if len(mboxes) > 0 {
+		return mboxes[0], nil
+	}
+	return nil, errors.New("empty mailbox")
+}
+
+//
 // ParseMailboxes parse raw address into single or multiple mailboxes.
 // Raw address can be a group of address, list of mailbox, or single mailbox.
 //
