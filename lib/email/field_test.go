@@ -261,7 +261,7 @@ func TestUnpackMailbox(t *testing.T) {
 		exp    string
 	}{{
 		in:     []byte("Sender: local\r\n"),
-		expErr: "ParseAddress: empty or invalid address",
+		expErr: "ParseMailboxes: empty or invalid address",
 	}, {
 		in:     []byte("Sender: test@one, test@two\r\n"),
 		expErr: "multiple address in sender: 'test@one, test@two\r\n'",

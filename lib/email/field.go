@@ -431,7 +431,7 @@ func computeOffSeconds(off int64) int {
 // unpackMailboxList unpack list of mailbox from field Value.
 //
 func (field *Field) unpackMailboxList() (err error) {
-	field.mboxes, err = ParseAddress(field.Value)
+	field.mboxes, err = ParseMailboxes(field.Value)
 	if err == nil {
 		field.unpacked = true
 	}
@@ -444,7 +444,7 @@ func (field *Field) unpackMailboxList() (err error) {
 // addresses.
 //
 func (field *Field) unpackMailbox() (err error) {
-	mboxes, err := ParseAddress(field.Value)
+	mboxes, err := ParseMailboxes(field.Value)
 	if err != nil {
 		return err
 	}
