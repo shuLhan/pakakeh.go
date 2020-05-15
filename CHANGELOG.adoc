@@ -18,6 +18,8 @@ is not set, or 0.
 
 *  email: rename ParseAddress function to ParseMailboxes
 
+*  http: add parameter "insecure" when creating new client
+
 ===  New features
 
 *  http: support CORS with white list of origin and headers

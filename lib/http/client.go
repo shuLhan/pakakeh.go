@@ -10,6 +10,7 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"compress/lzw"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -52,8 +53,13 @@ type Client struct {
 // request to server.
 // The headers parameter define default headers that will be set in any
 // request to server.
+// The insecure parameter allow to connect to remote server with unknown
+// certificate authority.
 //
-func NewClient(serverURL string, headers http.Header) (client *Client) {
+func NewClient(serverURL string, headers http.Header, insecure bool) (client *Client) {
+	if headers == nil {
+		headers = make(http.Header)
+	}
 	client = &Client{
 		serverURL:  serverURL,
 		defHeaders: headers,
@@ -65,9 +71,12 @@ func NewClient(serverURL string, headers http.Header) (client *Client) {
 					KeepAlive: 30 * time.Second,
 					DualStack: true,
 				}).DialContext,
-				ForceAttemptHTTP2:     true,
-				MaxIdleConns:          100,
-				IdleConnTimeout:       90 * time.Second,
+				ForceAttemptHTTP2: true,
+				MaxIdleConns:      100,
+				IdleConnTimeout:   90 * time.Second,
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: insecure,
+				},
 				TLSHandshakeTimeout:   10 * time.Second,
 				ExpectContinueTimeout: 1 * time.Second,
 			},
