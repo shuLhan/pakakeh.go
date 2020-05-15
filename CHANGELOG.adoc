@@ -24,6 +24,7 @@ is not set, or 0.
 
 ===  Enhancements
 
+*  email: add methods to unmarshal/marshal Mailbox from/to JSON
 *  email: add function to parse single mailbox
 *  email: add function to create multipart text and HTML message
 *  websocket: allow "https" scheme on Client's Endpoint

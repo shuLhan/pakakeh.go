@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	libio "github.com/shuLhan/share/lib/io"
+	libjson "github.com/shuLhan/share/lib/json"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -313,4 +314,28 @@ func skipComment(r *libio.Reader) (c byte, err error) {
 	}
 out:
 	return c, nil
+}
+
+func (mbox *Mailbox) UnmarshalJSON(b []byte) (err error) {
+	// Replace \u003c and \u003e escaped characters back to '<' and '>'.
+	b, err = libjson.Unescape(b, false)
+	if err != nil {
+		return err
+	}
+	if b[0] == '"' {
+		b = b[1:]
+	}
+	if b[len(b)-1] == '"' {
+		b = b[:len(b)-1]
+	}
+	got, err := ParseMailbox(b)
+	if err != nil {
+		return err
+	}
+	*mbox = *got
+	return nil
+}
+
+func (mbox *Mailbox) MarshalJSON() (b []byte, err error) {
+	return []byte(`"` + mbox.String() + `"`), nil
 }

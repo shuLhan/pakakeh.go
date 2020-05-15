@@ -5,6 +5,7 @@
 package email
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -274,4 +275,60 @@ func TestSkipComment(t *testing.T) {
 
 		test.Assert(t, "rest", c.exp, got, true)
 	}
+}
+
+type ADT struct {
+	Address *Mailbox `json:"address"`
+}
+
+func TestMailbox_UnmarshalJSON(t *testing.T) {
+	jsonRaw := `{"address":"Name <local@domain>"}`
+
+	got := &ADT{}
+	err := json.Unmarshal([]byte(jsonRaw), got)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exp := &ADT{
+		Address: &Mailbox{
+			Name:    []byte("Name"),
+			Local:   []byte("local"),
+			Domain:  []byte("domain"),
+			Address: "local@domain",
+			isAngle: true,
+		},
+	}
+
+	test.Assert(t, "UnmarshalJSON", exp, got, true)
+}
+
+func TestMailbox_MarshalJSON(t *testing.T) {
+	adt := &ADT{
+		Address: &Mailbox{
+			Name:    []byte("Name"),
+			Local:   []byte("local"),
+			Domain:  []byte("domain"),
+			Address: "local@domain",
+			isAngle: true,
+		},
+	}
+
+	got, err := json.Marshal(adt)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exp := `{"address":"Name \u003clocal@domain\u003e"}`
+
+	test.Assert(t, "MarshalJSON", exp, string(got), true)
+
+	un := &ADT{}
+
+	err = json.Unmarshal(got, un)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "UnmarshalJSON", adt, un, true)
 }
