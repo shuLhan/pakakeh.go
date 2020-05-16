@@ -274,9 +274,11 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		srv.handleDelete(res, req)
 
 	case http.MethodGet:
+		srv.handleCORS(res, req)
 		srv.handleGet(res, req)
 
 	case http.MethodHead:
+		srv.handleCORS(res, req)
 		srv.handleHead(res, req)
 
 	case http.MethodOptions:
@@ -286,6 +288,7 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		srv.handlePatch(res, req)
 
 	case http.MethodPost:
+		srv.handleCORS(res, req)
 		srv.handlePost(res, req)
 
 	case http.MethodPut:
@@ -351,6 +354,9 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 	var found bool
 	preflightOrigin := req.Header.Get(HeaderOrigin)
+	if len(preflightOrigin) == 0 {
+		return
+	}
 
 	for _, origin := range srv.opts.CORSAllowOrigins {
 		if origin == corsWildcard {
@@ -359,7 +365,6 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 			break
 		}
 		if origin == preflightOrigin {
-			fmt.Println("preflightOrigin:", preflightOrigin)
 			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
 			found = true
 			break
