@@ -19,6 +19,11 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
+const (
+	fieldTagName      = "ini"
+	fieldTagSeparator = ":"
+)
+
 //
 // Ini contains the parsed file.
 //
@@ -29,7 +34,7 @@ type Ini struct {
 //
 // Open and parse INI formatted file.
 //
-// On fail it will return incomplete instance of Ini with error.
+// On fail it will return incomplete instance of Ini with an error.
 //
 func Open(filename string) (in *Ini, err error) {
 	reader := newReader()
@@ -113,7 +118,7 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 		ftype := field.Type
 		kind := ftype.Kind()
 
-		tag := field.Tag.Get("ini")
+		tag := field.Tag.Get(fieldTagName)
 		if len(tag) == 0 && kind != reflect.Struct {
 			continue
 		}
@@ -125,7 +130,7 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 
 		var sec, sub, key, value string
 
-		tags := strings.Split(tag, ":")
+		tags := strings.Split(tag, fieldTagSeparator)
 
 		switch len(tags) {
 		case 0:
@@ -205,6 +210,14 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 		return err
 	}
 
+	return ini.Unmarshal(v)
+}
+
+//
+// Unmarshal store the value from configuration, based on `ini` tag, into a
+// struct pointed by interface `v`.
+//
+func (in *Ini) Unmarshal(v interface{}) (err error) {
 	rtipe := reflect.TypeOf(v)
 	rvalue := reflect.ValueOf(v)
 	kind := rtipe.Kind()
@@ -220,13 +233,13 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
 	}
 
-	unmarshalStruct(ini, rtipe, rvalue)
+	in.unmarshalToStruct(rtipe, rvalue)
 
 	return nil
 }
 
 //nolint: gocyclo
-func unmarshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
+func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 	numField := rtipe.NumField()
 	if numField == 0 {
 		return
@@ -254,7 +267,7 @@ func unmarshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 
 		var sec, sub, key string
 
-		tags := strings.Split(tag, ":")
+		tags := strings.Split(tag, fieldTagSeparator)
 
 		switch len(tags) {
 		case 0:
@@ -370,7 +383,7 @@ func unmarshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 				continue
 			}
 
-			unmarshalStruct(ini, reflect.TypeOf(vi), fvalue.Addr().Elem())
+			ini.unmarshalToStruct(reflect.TypeOf(vi), fvalue.Addr().Elem())
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:
@@ -771,7 +784,6 @@ func (in *Ini) addSection(sec *Section) {
 // If section name is not empty, only the keys will be listed in the map.
 //
 func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
-	sep := ":"
 	out = make(map[string][]string)
 
 	for x := 0; x < len(in.secs); x++ {
@@ -799,8 +811,8 @@ func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 			if len(sectionName) > 0 && len(subName) > 0 {
 				key += v.key
 			} else {
-				key += sec.nameLower + sep
-				key += sec.sub + sep
+				key += sec.nameLower + fieldTagSeparator
+				key += sec.sub + fieldTagSeparator
 				key += v.key
 			}
 
