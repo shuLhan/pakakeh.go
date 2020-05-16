@@ -134,6 +134,7 @@ func (sec *Section) add(key, value string) bool {
 
 	keyLower := strings.ToLower(key)
 
+	idx := -1
 	for x := 0; x < len(sec.vars); x++ {
 		if !isLineModeVar(sec.vars[x].mode) {
 			continue
@@ -144,6 +145,7 @@ func (sec *Section) add(key, value string) bool {
 		if sec.vars[x].value == value {
 			return false
 		}
+		idx = x
 	}
 
 	v := &variable{
@@ -154,6 +156,11 @@ func (sec *Section) add(key, value string) bool {
 	}
 
 	sec.vars = append(sec.vars, v)
+	if idx >= 0 {
+		idx++
+		copy(sec.vars[idx+1:], sec.vars[idx:])
+		sec.vars[idx] = v
+	}
 
 	return true
 }

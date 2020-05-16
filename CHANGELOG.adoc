@@ -36,6 +36,7 @@ This cause inconsistency between empty string and boolean true.
 *  email: add methods to unmarshal/marshal Mailbox from/to JSON
 *  email: add function to parse single mailbox
 *  email: add function to create multipart text and HTML message
+*  ini: make the add method append the variable after existing same key
 *  websocket: allow "https" scheme on Client's Endpoint
 
 

@@ -126,7 +126,7 @@ func TestSectionSet(t *testing.T) {
 	}
 }
 
-func TestSectionAdd(t *testing.T) {
+func TestSection_add(t *testing.T) {
 	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
@@ -138,8 +138,8 @@ func TestSectionAdd(t *testing.T) {
 			value:    "v1",
 		}, {
 			mode:     lineModeValue,
-			key:      "k",
-			keyLower: "k",
+			key:      "k2",
+			keyLower: "k2",
 			value:    "v2",
 		}},
 	}
@@ -162,8 +162,8 @@ func TestSectionAdd(t *testing.T) {
 				value:    "v1",
 			}, {
 				mode:     lineModeValue,
-				key:      "k",
-				keyLower: "k",
+				key:      "k2",
+				keyLower: "k2",
 				value:    "v2",
 			}},
 		},
@@ -183,11 +183,11 @@ func TestSectionAdd(t *testing.T) {
 				mode:     lineModeValue,
 				key:      "k",
 				keyLower: "k",
-				value:    "v2",
 			}, {
 				mode:     lineModeValue,
-				key:      "k",
-				keyLower: "k",
+				key:      "k2",
+				keyLower: "k2",
+				value:    "v2",
 			}},
 		},
 	}, {
@@ -207,11 +207,11 @@ func TestSectionAdd(t *testing.T) {
 				mode:     lineModeValue,
 				key:      "k",
 				keyLower: "k",
-				value:    "v2",
 			}, {
 				mode:     lineModeValue,
-				key:      "k",
-				keyLower: "k",
+				key:      "k2",
+				keyLower: "k2",
+				value:    "v2",
 			}},
 		},
 	}}
@@ -404,7 +404,7 @@ func TestSectionUnsetAll(t *testing.T) {
 	}
 }
 
-func TestSectionReplaceAll(t *testing.T) {
+func TestSection_replaceAll(t *testing.T) {
 	sec := &Section{
 		mode:      lineModeSection,
 		name:      "section",
