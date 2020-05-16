@@ -30,10 +30,6 @@ const (
 	valueInet6 = "inet6"
 )
 
-const (
-	envTerm = "TERM"
-)
-
 // List of default values.
 const (
 	defConnectionAttempts = 1
@@ -258,22 +254,14 @@ func (section *ConfigSection) setCanonicalizePermittedCNAMEs(val string) (err er
 	listSource := strings.Split(sourceTarget[0], ",")
 	sources := make([]*configPattern, 0, len(listSource))
 	for _, domain := range listSource {
-		src, err := newConfigPattern(domain)
-		if err != nil {
-			return fmt.Errorf("%s: invalid syntax %s",
-				keyCanonicalizePermittedCNAMEs, domain)
-		}
+		src := newConfigPattern(domain)
 		sources = append(sources, src)
 	}
 
 	listTarget := strings.Split(sourceTarget[1], ",")
 	targets := make([]*configPattern, 0, len(listTarget))
 	for _, domain := range listTarget {
-		target, err := newConfigPattern(domain)
-		if err != nil {
-			return fmt.Errorf("%s: invalid syntax %s",
-				keyCanonicalizePermittedCNAMEs, domain)
-		}
+		target := newConfigPattern(domain)
 		targets = append(targets, target)
 	}
 

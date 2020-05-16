@@ -129,6 +129,7 @@ type Config struct {
 //
 // NewConfig load SSH configuration from file.
 //
+//nolint: gocyclo
 func NewConfig(file string) (cfg *Config, err error) {
 	if len(file) == 0 {
 		return nil, nil
@@ -172,7 +173,7 @@ func NewConfig(file string) (cfg *Config, err error) {
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
-			section, err = newSectionHost(value)
+			section = newSectionHost(value)
 		case keyMatch:
 			if section != nil {
 				section.postConfig(parser.homeDir)

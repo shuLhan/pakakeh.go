@@ -18,7 +18,7 @@ func TestIsIncludeDirective(t *testing.T) {
 	}{{
 		line: "",
 	}, {
-		line: "includ",
+		line: "includ", //nolint: misspell
 	}, {
 		line: "INCLUDE",
 	}, {

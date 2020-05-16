@@ -14,7 +14,6 @@ func TestNewSectionHost(t *testing.T) {
 	cases := []struct {
 		rawPattern string
 		exp        func(def ConfigSection) *ConfigSection
-		expError   string
 	}{{
 		rawPattern: "",
 		exp: func(exp ConfigSection) *ConfigSection {
@@ -51,11 +50,7 @@ func TestNewSectionHost(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got, err := newSectionHost(c.rawPattern)
-		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
-			continue
-		}
+		got := newSectionHost(c.rawPattern)
 		got.postConfig(testParser.homeDir)
 		test.Assert(t, "newHost", c.exp(*testDefaultSection), got, true)
 	}

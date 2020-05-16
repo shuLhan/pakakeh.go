@@ -11,14 +11,14 @@ type configPattern struct {
 	isNegate bool
 }
 
-func newConfigPattern(s string) (pat *configPattern, err error) {
+func newConfigPattern(s string) (pat *configPattern) {
 	pat = new(configPattern)
 	if s[0] == '!' {
 		pat.isNegate = true
 		s = s[1:]
 	}
 	pat.pattern = s
-	return pat, nil
+	return pat
 }
 
 //

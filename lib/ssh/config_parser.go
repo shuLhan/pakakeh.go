@@ -277,10 +277,8 @@ func parseArgs(raw string, sep byte) (args []string) {
 		if c == '"' {
 			useQuote = true
 			begin = x + 1
-		} else {
-			if begin == len(raw) {
-				begin = x
-			}
+		} else if begin == len(raw) {
+			begin = x
 		}
 	}
 	if begin < x {

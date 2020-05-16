@@ -40,10 +40,7 @@ func newMatchCriteria(name, arg string) (criteria *matchCriteria, err error) {
 	criteria.patterns = make([]*configPattern, 0, len(listPattern))
 
 	for _, raw := range listPattern {
-		pattern, err := newConfigPattern(raw)
-		if err != nil {
-			return nil, err
-		}
+		pattern := newConfigPattern(raw)
 		criteria.patterns = append(criteria.patterns, pattern)
 	}
 

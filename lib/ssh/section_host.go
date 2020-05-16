@@ -6,18 +6,15 @@ package ssh
 
 import "strings"
 
-func newSectionHost(rawPattern string) (host *ConfigSection, err error) {
+func newSectionHost(rawPattern string) (host *ConfigSection) {
 	patterns := strings.Fields(rawPattern)
 
 	host = newConfigSection()
 	host.patterns = make([]*configPattern, 0, len(patterns))
 
 	for _, pattern := range patterns {
-		pat, err := newConfigPattern(pattern)
-		if err != nil {
-			return nil, err
-		}
+		pat := newConfigPattern(pattern)
 		host.patterns = append(host.patterns, pat)
 	}
-	return host, nil
+	return host
 }
