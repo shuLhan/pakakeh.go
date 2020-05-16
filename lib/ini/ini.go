@@ -751,9 +751,27 @@ func (in *Ini) Unset(secName, subName, key string) bool {
 		return false
 	}
 
-	sec.unset(key)
+	return sec.unset(key)
+}
 
-	return true
+//
+// UnsetAll remove all variables in section and/or subsection that match
+// with the key.
+// If key found it will return true, otherwise it will return false.
+//
+func (in *Ini) UnsetAll(secName, subName, key string) {
+	if len(secName) == 0 || len(key) == 0 {
+		return
+	}
+
+	secName = strings.ToLower(secName)
+
+	sec := in.getSection(secName, subName)
+	if sec == nil {
+		return
+	}
+
+	sec.unsetAll(key)
 }
 
 //

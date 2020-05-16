@@ -28,6 +28,8 @@ This cause inconsistency between empty string and boolean true.
 ===  New features
 
 *  http: support CORS with white list of origin and headers
+*  ini: add method UnsetAll to remove all variables in section and/or
+   subsection that match with the key
 
 ===  Enhancements
 
