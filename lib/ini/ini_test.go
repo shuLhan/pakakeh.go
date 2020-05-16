@@ -183,10 +183,9 @@ func TestGet(t *testing.T) {
 		sub:  "devel",
 		key:  "user",
 	}, {
-		desc:   `With empty value`,
-		sec:    "http",
-		key:    "sslVerify",
-		expVal: "true",
+		desc: `With empty value`,
+		sec:  "http",
+		key:  "sslVerify",
 	}}
 
 	for _, c := range cases {
@@ -294,7 +293,7 @@ func TestGetInputIni(t *testing.T) {
 			"cookiefile",
 		},
 		expVals: []string{
-			"true",
+			"",
 			"/home/ms/.gitcookies",
 		},
 	}, {
@@ -423,11 +422,11 @@ func TestGetInputIni(t *testing.T) {
 			"valid4",
 		},
 		expVals: []string{
-			"true",
-			"true",
-			"true",
-			"true",
-			"true",
+			"",
+			"",
+			"",
+			"",
+			"",
 		},
 	}}
 
@@ -544,7 +543,7 @@ func TestGetVarMultiEmpty(t *testing.T) {
 		},
 		expVals: []string{
 			"",
-			"true",
+			"",
 		},
 	}}
 
@@ -589,7 +588,7 @@ func TestGetVarMultiSection(t *testing.T) {
 		},
 		expVals: []string{
 			"!git --no-pager log --graph [section]",
-			"true",
+			"",
 		},
 	}, {
 		sec: "section",
@@ -600,7 +599,7 @@ func TestGetVarMultiSection(t *testing.T) {
 			false,
 		},
 		expVals: []string{
-			"true",
+			"",
 		},
 	}}
 

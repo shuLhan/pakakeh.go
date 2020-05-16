@@ -420,7 +420,7 @@ func (reader *reader) parseVariable() (err error) {
 		case reader.r == tokEqual:
 			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = lineModeSingle
+			reader._var.mode = lineModeValue
 			reader._var.key = reader.buf.String()
 
 			return reader.parseVarValue()
@@ -437,16 +437,15 @@ func (reader *reader) parseVariable() (err error) {
 		case reader.r == tokHash, reader.r == tokSemiColon:
 			_ = reader.br.UnreadRune()
 
-			reader._var.mode = lineModeSingle
+			reader._var.mode = lineModeValue
 			reader._var.key = reader.buf.String()
-			reader._var.value = varValueTrue
 
 			return reader.parseComment()
 
 		case unicode.IsSpace(reader.r):
 			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = lineModeSingle
+			reader._var.mode = lineModeValue
 			reader._var.key = reader.buf.String()
 
 			return reader.parsePossibleValue()
@@ -456,10 +455,9 @@ func (reader *reader) parseVariable() (err error) {
 		}
 	}
 
-	reader._var.mode = lineModeSingle
+	reader._var.mode = lineModeValue
 	reader._var.format = reader.bufFormat.String()
 	reader._var.key = reader.buf.String()
-	reader._var.value = varValueTrue
 
 	return nil
 }
@@ -485,7 +483,6 @@ func (reader *reader) parsePossibleValue() (err error) {
 
 		case tokHash, tokSemiColon:
 			_ = reader.br.UnreadByte()
-			reader._var.value = varValueTrue
 			return reader.parseComment()
 		case tokEqual:
 			reader.bufFormat.WriteByte(reader.b)
@@ -495,9 +492,8 @@ func (reader *reader) parsePossibleValue() (err error) {
 		}
 	}
 
-	reader._var.mode = lineModeSingle
+	reader._var.mode = lineModeValue
 	reader._var.format = reader.bufFormat.String()
-	reader._var.value = varValueTrue
 
 	return nil
 }
@@ -527,9 +523,13 @@ consume_spaces:
 		case tokHash, tokSemiColon:
 			_ = reader.br.UnreadByte()
 			reader._var.value = ""
+			reader.bufFormat.WriteString("%s")
 			return reader.parseComment()
 
 		case tokNewLine:
+			if len(reader._var.key) > 0 {
+				reader.bufFormat.WriteString("%s")
+			}
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
 			reader._var.value = ""

@@ -20,6 +20,11 @@ is not set, or 0.
 
 *  http: add parameter "insecure" when creating new client
 
+*  ini: fix inconsistencies between empty string and boolean true
+
+In Git specification, an empty variable is equal to boolean true.
+This cause inconsistency between empty string and boolean true.
+
 ===  New features
 
 *  http: support CORS with white list of origin and headers

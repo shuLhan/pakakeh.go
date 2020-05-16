@@ -654,10 +654,6 @@ func (in *Ini) Add(secName, subName, key, value string) bool {
 		return sec.add(key, value)
 	}
 
-	if len(value) == 0 {
-		value = varValueTrue
-	}
-
 	sec = newSection(secName, subName)
 	v := &variable{
 		mode:     lineModeValue,

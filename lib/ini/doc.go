@@ -13,9 +13,12 @@
 //
 // *  Template friendly, through Val(), Vals(), and Subs().
 //
-// Unsupported Features
+// Unsupported features
 //
 // Git `include` and `includeIf` directives.
+//
+// In Git specification, an empty variable is equal to boolean true.  This
+// cause inconsistency between empty string and boolean true.
 //
 // Syntax
 //
@@ -75,15 +78,9 @@
 //
 // S.4.3.  Variable name must start with an alphabetic character.
 //
-// S.4.4.  Variable name without value is a short-hand to set the value to the
-// boolean "true" value, e.g.
-//
-//	[section]
-//		thisistrue # equal to thisistrue=true
-//
 // ## Value
 //
-// S.5.0.  Value can be empty or not set, see S.4.4.
+// S.5.0.  Value can be empty or not set, see E.4.1.
 //
 // S.5.1.  Internal whitespaces within the value are retained verbatim.
 //
@@ -115,6 +112,12 @@
 // ## Variable
 //
 // E.4.0.  Allow dot ('.') and underscore ('_') characters on variable name.
+//
+// E.4.1.  Variable name without value is a short-hand to set the value to the
+// empty string value, e.g.
+//
+//	[section]
+//		thisisempty # equal to thisisempty=
 //
 // References
 //

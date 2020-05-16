@@ -65,21 +65,6 @@ func TestVariableString(t *testing.T) {
 		},
 		exp: "; comment\n",
 	}, {
-		desc: "With mode single",
-		v: &variable{
-			mode: lineModeSingle,
-			key:  "name",
-		},
-		exp: "name = true\n",
-	}, {
-		desc: "With mode single and comment",
-		v: &variable{
-			mode:   lineModeSingle | lineModeComment,
-			key:    "name",
-			others: "; comment",
-		},
-		exp: "name = true ; comment\n",
-	}, {
 		desc: "With mode value",
 		v: &variable{
 			mode:  lineModeValue,

@@ -121,7 +121,6 @@ func (sec *Section) Vals(key string) []string {
 // add append variable with `key` and `value` to current section.
 //
 // If key is empty, no variable will be appended.
-// If value is empty, it will be set to true.
 // If key and value already exist, no variable will be appended.
 // Use set() or replaceAll() to set existing value without duplication.
 //
@@ -131,9 +130,6 @@ func (sec *Section) Vals(key string) []string {
 func (sec *Section) add(key, value string) bool {
 	if len(key) == 0 {
 		return false
-	}
-	if len(value) == 0 {
-		value = varValueTrue
 	}
 
 	keyLower := strings.ToLower(key)
@@ -194,12 +190,8 @@ func (sec *Section) addVariable(v *variable) {
 		return
 	}
 
-	if v.mode&lineModeSingle == lineModeSingle ||
-		v.mode&lineModeValue == lineModeValue ||
+	if v.mode&lineModeValue == lineModeValue ||
 		v.mode&lineModeMulti == lineModeMulti {
-		if len(v.value) == 0 {
-			v.value = varValueTrue
-		}
 		v.keyLower = strings.ToLower(v.key)
 	}
 
@@ -311,9 +303,6 @@ func (sec *Section) set(key, value string) bool {
 	}
 
 	keyLower := strings.ToLower(key)
-	if len(value) == 0 {
-		value = varValueTrue
-	}
 
 	_, v := sec.getVariable(keyLower)
 	if v == nil {

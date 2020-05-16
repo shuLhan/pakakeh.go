@@ -9,10 +9,6 @@ import (
 	"fmt"
 )
 
-const (
-	varValueTrue = "true"
-)
-
 //
 // variable define the smallest building block in INI format. It represent
 // empty lines, comment, section, section with subsection, and variable.
@@ -58,43 +54,54 @@ func (v *variable) String() string {
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s\n", v.others)
-		}
-	case lineModeSingle:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = true\n", v.key)
-		}
-	case lineModeSingle | lineModeComment:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = true %s\n", v.key, v.others)
+			buf.WriteString(v.others)
+			buf.WriteByte('\n')
 		}
 	case lineModeValue:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, val)
+			buf.WriteString(v.key + " =")
+			if len(val) > 0 {
+				buf.WriteString(" " + val)
+			}
+			buf.WriteByte('\n')
 		}
 	case lineModeValue | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, val, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, val, v.others)
+			buf.WriteString(v.key + " =")
+			if len(val) > 0 {
+				buf.WriteString(" " + val)
+			}
+			if len(v.others) > 0 {
+				buf.WriteString(" " + v.others)
+			}
+			buf.WriteByte('\n')
 		}
 	case lineModeMulti:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s\n", v.key, val)
+			buf.WriteString(v.key + " =")
+			if len(val) > 0 {
+				buf.WriteString(" " + val)
+			}
+			buf.WriteByte('\n')
 		}
 	case lineModeMulti | lineModeComment:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, val, v.others)
 		} else {
-			_, _ = fmt.Fprintf(&buf, "%s = %s %s\n", v.key, val, v.others)
+			buf.WriteString(v.key + " =")
+			if len(val) > 0 {
+				buf.WriteString(" " + val)
+			}
+			if len(v.others) > 0 {
+				buf.WriteString(" " + v.others)
+			}
+			buf.WriteByte('\n')
 		}
 	}
 

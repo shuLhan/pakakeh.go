@@ -91,7 +91,6 @@ func TestSectionSet(t *testing.T) {
 				mode:     lineModeValue,
 				key:      "k",
 				keyLower: "k",
-				value:    "true",
 			}},
 		},
 	}, {
@@ -189,7 +188,6 @@ func TestSectionAdd(t *testing.T) {
 				mode:     lineModeValue,
 				key:      "k",
 				keyLower: "k",
-				value:    "true",
 			}},
 		},
 	}, {
@@ -214,7 +212,6 @@ func TestSectionAdd(t *testing.T) {
 				mode:     lineModeValue,
 				key:      "k",
 				keyLower: "k",
-				value:    "true",
 			}},
 		},
 	}}

@@ -50,7 +50,7 @@ func ExampleIni_Add() {
 
 	// Output:
 	// [s1]
-	// k1 = true
+	// k1 =
 	// k1 = v1
 	// k1 = v2
 	//
@@ -150,12 +150,12 @@ key=value3
 
 	// Unordered output:
 	// section::key = [value1 value2]
-	// section::key2 = [true false]
+	// section::key2 = [ false]
 	// section:sub:key = [value1 value2 value3]
-	// section:sub:key2 = [true]
+	// section:sub:key2 = []
 	//
 	// key = [value1 value2 value3]
-	// key2 = [true]
+	// key2 = []
 }
 
 type T struct {
@@ -416,13 +416,13 @@ key=value1
 
 	sec := ini.Section("section", "")
 	for _, v := range sec.vars {
-		fmt.Println(v.key, "=", v.value)
+		fmt.Printf("%s=%s\n", v.key, v.value)
 	}
 	// Output:
-	// key = value1
-	// key2 = true
-	// key = value2
-	// key2 = false
+	// key=value1
+	// key2=
+	// key=value2
+	// key2=false
 }
 
 func ExampleIni_Set() {
