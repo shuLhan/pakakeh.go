@@ -32,8 +32,8 @@ func newSectionMatch(rawPattern string) (match *ConfigSection, err error) {
 	)
 
 	match = newConfigSection()
-	match.criterias = make([]*matchCriteria, 0)
-	match.useCriterias = true
+	match.criteria = make([]*matchCriteria, 0)
+	match.useCriteria = true
 
 	args := parseArgs(rawPattern, ' ')
 
@@ -75,7 +75,7 @@ func newSectionMatch(rawPattern string) (match *ConfigSection, err error) {
 
 		criteria.isNegate = isNegate
 
-		match.criterias = append(match.criterias, criteria)
+		match.criteria = append(match.criteria, criteria)
 		prevCriteria = criteria
 		criteria = nil
 	}

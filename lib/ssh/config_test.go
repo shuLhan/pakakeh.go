@@ -60,10 +60,10 @@ func TestConfig_Get(t *testing.T) {
 	for _, c := range cases {
 		got := cfg.Get(c.s)
 
-		// Clear the patterns and criterias for comparison.
+		// Clear the patterns and criteria for comparison.
 		if got != nil {
 			got.patterns = nil
-			got.criterias = nil
+			got.criteria = nil
 			got.postConfig(homeDir)
 		}
 

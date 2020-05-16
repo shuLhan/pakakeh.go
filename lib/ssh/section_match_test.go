@@ -39,33 +39,33 @@ func TestParseCriteriaAll(t *testing.T) {
 	}{{
 		raw: "all ",
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaAll,
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}, {
 
 		raw: "canonical all",
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaCanonical,
 			}, {
 				name: criteriaAll,
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}, {
 		raw: "final all",
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaFinal,
 			}, {
 				name: criteriaAll,
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}, {
@@ -96,21 +96,21 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	}{{
 		raw: `exec "echo true"`,
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaExec,
 				arg:  `echo true`,
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}, {
 		raw: `exec "echo true`,
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaExec,
 				arg:  `echo true`,
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}}
@@ -136,20 +136,20 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	}{{
 		raw: `user name*`,
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `name*`,
 				patterns: []*configPattern{{
 					pattern: "name*",
 				}},
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}, {
 		raw: `user "a*,b*"`,
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `a*,b*`,
 				patterns: []*configPattern{{
@@ -158,13 +158,13 @@ func TestParseCriteriaWithArg(t *testing.T) {
 					pattern: "b*",
 				}},
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}, {
 		raw: `user "a*,b*`,
 		exp: func(exp ConfigSection) *ConfigSection {
-			exp.criterias = []*matchCriteria{{
+			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `a*,b*`,
 				patterns: []*configPattern{{
@@ -173,7 +173,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 					pattern: "b*",
 				}},
 			}}
-			exp.useCriterias = true
+			exp.useCriteria = true
 			return &exp
 		},
 	}}

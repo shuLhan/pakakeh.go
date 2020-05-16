@@ -99,9 +99,9 @@ type ConfigSection struct {
 	// Patterns for Host section.
 	patterns []*configPattern
 
-	// Criterias for Match section.
-	criterias    []*matchCriteria
-	useCriterias bool
+	// Criteria for Match section.
+	criteria    []*matchCriteria
+	useCriteria bool
 
 	useDefaultIdentityFile bool // Flag for the IdentityFile.
 }
@@ -169,8 +169,8 @@ func (section *ConfigSection) generateSigners() {
 // section.
 //
 func (section *ConfigSection) isMatch(s string) bool {
-	if section.useCriterias {
-		for _, criteria := range section.criterias {
+	if section.useCriteria {
+		for _, criteria := range section.criteria {
 			if criteria.isMatch(s) {
 				return true
 			}
