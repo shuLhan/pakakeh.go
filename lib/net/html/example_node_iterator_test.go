@@ -52,7 +52,7 @@ func ExampleParse() {
 	//html
 }
 
-func ExampleNodeIterator_Set() {
+func ExampleNodeIterator_SetNext() {
 	rawHTML := `
 <ul>
 	<li>

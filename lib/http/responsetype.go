@@ -4,7 +4,7 @@
 
 package http
 
-// ResponseType define type for HTTP response
+// ResponseType define type for HTTP response.
 type ResponseType int
 
 // List of valid response type.

@@ -91,12 +91,12 @@ func Marshal(v interface{}) (b []byte, err error) {
 		return nil, fmt.Errorf("marshal: expecting struct, got %v", kind)
 	}
 
-	ini := &Ini{}
+	in := &Ini{}
 
-	marshalStruct(ini, rtipe, rvalue)
+	marshalStruct(in, rtipe, rvalue)
 
 	buf := bytes.NewBuffer(nil)
-	err = ini.Write(buf)
+	err = in.Write(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 }
 
 //nolint: gocyclo
-func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
+func (in *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 	numField := rtipe.NumField()
 	if numField == 0 {
 		return
@@ -255,7 +255,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 			continue
 		}
 
-		tag := field.Tag.Get("ini")
+		tag := field.Tag.Get(fieldTagName)
 		if len(tag) == 0 && kind != reflect.Struct {
 			continue
 		}
@@ -290,18 +290,18 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 
 		switch kind {
 		case reflect.Bool:
-			valString, _ := ini.Get(sec, sub, key, "")
+			valString, _ := in.Get(sec, sub, key, "")
 			if IsValueBoolTrue(valString) {
 				fvalue.SetBool(true)
 			}
 
 		case reflect.String:
-			valString, _ := ini.Get(sec, sub, key, "")
+			valString, _ := in.Get(sec, sub, key, "")
 			fvalue.SetString(valString)
 
 		case reflect.Int, reflect.Int8, reflect.Int16,
 			reflect.Int32, reflect.Int64:
-			valString, _ := ini.Get(sec, sub, key, "")
+			valString, _ := in.Get(sec, sub, key, "")
 
 			_, ok := fvalue.Interface().(time.Duration)
 			if ok {
@@ -321,7 +321,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 
 		case reflect.Uint, reflect.Uint8, reflect.Uint16,
 			reflect.Uint32, reflect.Uint64:
-			valString, _ := ini.Get(sec, sub, key, "")
+			valString, _ := in.Get(sec, sub, key, "")
 
 			u64, err := strconv.ParseUint(valString, 10, 64)
 			if err != nil {
@@ -330,7 +330,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 			fvalue.SetUint(u64)
 
 		case reflect.Float32, reflect.Float64:
-			valString, _ := ini.Get(sec, sub, key, "")
+			valString, _ := in.Get(sec, sub, key, "")
 
 			f64, err := strconv.ParseFloat(valString, 64)
 			if err != nil {
@@ -339,11 +339,11 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 			fvalue.SetFloat(f64)
 
 		case reflect.Array:
-			vals := ini.Gets(sec, sub, key)
+			vals := in.Gets(sec, sub, key)
 			fvalue.Set(unmarshalSlice(ftype.Elem(), fvalue, vals))
 
 		case reflect.Slice:
-			vals := ini.Gets(sec, sub, key)
+			vals := in.Gets(sec, sub, key)
 			fvalue.Set(unmarshalSlice(ftype.Elem(), fvalue, vals))
 
 		case reflect.Map:
@@ -351,7 +351,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 				continue
 			}
 
-			vals := ini.AsMap(sec, sub)
+			vals := in.AsMap(sec, sub)
 			amap := reflect.MakeMap(ftype)
 			fvalue.Set(unmarshalMap(ftype.Elem(), amap, vals))
 
@@ -361,7 +361,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 				kind = ftype.Kind()
 			}
 
-			valString, _ := ini.Get(sec, sub, key, "")
+			valString, _ := in.Get(sec, sub, key, "")
 
 			ptrval := reflect.New(ftype)
 			unmarshalPtr(ftype, ptrval.Elem(), valString)
@@ -372,7 +372,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 
 			_, ok := vi.(time.Time)
 			if ok {
-				valString, _ := ini.Get(sec, sub, key, "")
+				valString, _ := in.Get(sec, sub, key, "")
 
 				t, err := time.Parse(layout, valString)
 				if err != nil {
@@ -383,7 +383,7 @@ func (ini *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 				continue
 			}
 
-			ini.unmarshalToStruct(reflect.TypeOf(vi), fvalue.Addr().Elem())
+			in.unmarshalToStruct(reflect.TypeOf(vi), fvalue.Addr().Elem())
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:

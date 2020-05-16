@@ -19,9 +19,7 @@ import (
 )
 
 const (
-	sqlExtension  = ".sql"
-	sqlComment    = "--"
-	sqlTerminator = ';'
+	sqlExtension = ".sql"
 )
 
 //

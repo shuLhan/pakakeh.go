@@ -51,6 +51,8 @@ lint:
 		--disable=wsl \
 		--disable=gocognit \
 		--disable=testpackage \
+		--disable=nestif \
+		--disable=goerr113 \
 		./...
 
 genhtml:

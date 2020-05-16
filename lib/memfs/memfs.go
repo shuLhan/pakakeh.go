@@ -143,12 +143,12 @@ func (mfs *MemFS) AddFile(path string) (*Node, error) {
 
 		fi, err := os.Stat(path)
 		if err != nil {
-			return nil, fmt.Errorf("memfs.AddFile: " + err.Error())
+			return nil, fmt.Errorf("memfs.AddFile: %w", err)
 		}
 
 		node, err = NewNode(parent, fi, mfs.withContent)
 		if err != nil {
-			return nil, fmt.Errorf("memfs.AddFile: " + err.Error())
+			return nil, fmt.Errorf("memfs.AddFile: %w", err)
 		}
 
 		if parent == nil {
@@ -196,12 +196,12 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 
 		_, err = encoder.Write(node.V)
 		if err != nil {
-			return fmt.Errorf("memfs.ContentEncode: " + err.Error())
+			return fmt.Errorf("memfs.ContentEncode: %w", err)
 		}
 
 		err = encoder.Close()
 		if err != nil {
-			return fmt.Errorf("memfs.ContentEncode: " + err.Error())
+			return fmt.Errorf("memfs.ContentEncode: %w", err)
 		}
 
 		node.V = make([]byte, buf.Len())

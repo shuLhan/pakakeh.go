@@ -9,7 +9,7 @@ package bot
 //
 type WebhookInfo struct {
 	// Webhook URL, may be empty if webhook is not set up.
-	Url string `json:"url"`
+	URL string `json:"url"`
 
 	// Number of updates awaiting delivery
 	PendingUpdateCount int `json:"pending_update_count"`

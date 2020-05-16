@@ -60,7 +60,7 @@ func lookupDNSTXT(dname string) (key *Key, err error) {
 		dns.QueryClassIN, []byte(dname))
 	if err != nil {
 		dnsClientPool.Put(dnsClient)
-		return nil, fmt.Errorf("dkim: LookupKey: " + err.Error())
+		return nil, fmt.Errorf("dkim: LookupKey: %w", err)
 	}
 	if dnsMsg.Header.RCode != dns.RCodeOK {
 		dnsClientPool.Put(dnsClient)

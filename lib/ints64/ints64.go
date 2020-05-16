@@ -326,7 +326,7 @@ func inplaceMerge(d []int64, idx []int, x, y, r int, asc bool) {
 	}
 }
 
-// (4.3.4) LET Y := the minimum value between x and r on `d`
+// (4.3.4) LET Y := the minimum value between x and r on `d`.
 func minY(d []int64, x, y *int, r int, asc bool) {
 	for *x < r {
 		if asc {

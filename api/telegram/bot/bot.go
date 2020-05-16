@@ -79,7 +79,6 @@ const (
 const (
 	methodDeleteWebhook  = "deleteWebhook"
 	methodGetMe          = "getMe"
-	methodGetMyComands   = "getMyCommands"
 	methodGetWebhookInfo = "getWebhookInfo"
 	methodSendMessage    = "sendMessage"
 	methodSetMyCommands  = "setMyCommands"
@@ -117,7 +116,7 @@ func New(opts Options) (bot *Bot, err error) {
 	serverURL := defURL + opts.Token + "/"
 	bot = &Bot{
 		opts:   opts,
-		client: http.NewClient(serverURL, nil),
+		client: http.NewClient(serverURL, nil, false),
 	}
 
 	fmt.Printf("Bot options: %+v\n", opts)

@@ -294,7 +294,7 @@ func (sig *Signature) Sign(pk *rsa.PrivateKey, hashHeader []byte) (err error) {
 	rng := rand.Reader
 	b, err := rsa.SignPKCS1v15(rng, pk, cryptoHash, hashHeader)
 	if err != nil {
-		err = fmt.Errorf("email/dkim: failed to sign message: %s", err.Error())
+		err = fmt.Errorf("email/dkim: failed to sign message: %w", err)
 		return err
 	}
 
@@ -391,7 +391,7 @@ func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
 	sigValue := make([]byte, base64.StdEncoding.DecodedLen(len(sig.Value)))
 	n, err := base64.StdEncoding.Decode(sigValue, sig.Value)
 	if err != nil {
-		return fmt.Errorf("email/dkim: failed to decode signature: %s", err.Error())
+		return fmt.Errorf("email/dkim: failed to decode signature: %w", err)
 	}
 	sigValue = sigValue[:n]
 
@@ -402,7 +402,7 @@ func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
 
 	err = rsa.VerifyPKCS1v15(key.RSA, cryptoHash, headerHash, sigValue)
 	if err != nil {
-		err = fmt.Errorf("email/dkim: verification failed: %s", err.Error())
+		err = fmt.Errorf("email/dkim: verification failed: %w", err)
 	}
 
 	return err

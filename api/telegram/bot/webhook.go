@@ -11,7 +11,7 @@ import "crypto/tls"
 //
 type Webhook struct {
 	// HTTPS url to send updates to.
-	// This option will be overriden by environment variable
+	// This option will be overridden by environment variable
 	// TELEGRAM_WEBHOOK_URL.
 	URL string
 

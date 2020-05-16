@@ -49,7 +49,10 @@ func newMIME(contentType, content []byte) (mime *MIME, err error) {
 	var buf bytes.Buffer
 	content = append(content, []byte("\r\n")...)
 	w := quotedprintable.NewWriter(&buf)
-	w.Write(content)
+	_, err = w.Write(content)
+	if err != nil {
+		return nil, err
+	}
 	w.Close()
 
 	mime.Content = buf.Bytes()

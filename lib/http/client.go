@@ -75,7 +75,7 @@ func NewClient(serverURL string, headers http.Header, insecure bool) (client *Cl
 				MaxIdleConns:      100,
 				IdleConnTimeout:   90 * time.Second,
 				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: insecure,
+					InsecureSkipVerify: insecure, //nolint: gosec
 				},
 				TLSHandshakeTimeout:   10 * time.Second,
 				ExpectContinueTimeout: 1 * time.Second,
@@ -138,7 +138,7 @@ func (client *Client) PostForm(path string, params url.Values) (
 
 	httpReq, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
-		return nil, fmt.Errorf("Post: %w", err)
+		return nil, fmt.Errorf("client.PostForm: %w", err)
 	}
 
 	client.setHeaders(httpReq)
@@ -146,17 +146,17 @@ func (client *Client) PostForm(path string, params url.Values) (
 
 	httpRes, err := client.Client.Do(httpReq)
 	if err != nil {
-		return nil, fmt.Errorf("Post: %w", err)
+		return nil, fmt.Errorf("client.PostForm: %w", err)
 	}
 
 	resBody, err = ioutil.ReadAll(httpRes.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Post: %w", err)
+		return nil, fmt.Errorf("client.PostForm: %w", err)
 	}
 
 	err = httpRes.Body.Close()
 	if err != nil {
-		return nil, fmt.Errorf("Post: %w", err)
+		return nil, fmt.Errorf("client.PostForm: %w", err)
 	}
 
 	return client.uncompress(httpRes, resBody)
@@ -180,7 +180,7 @@ func (client *Client) PostFormData(path string, params map[string][]byte) (
 
 	httpReq, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
-		return nil, fmt.Errorf("Post: %w", err)
+		return nil, fmt.Errorf("http: PostFormData: %w", err)
 	}
 
 	client.setHeaders(httpReq)

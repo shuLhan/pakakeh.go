@@ -31,5 +31,5 @@ type SuccessfulPayment struct {
 	TelegramPaymentChargeID string `json:"telegram_payment_charge_id"`
 
 	// Provider payment identifier.
-	ProviderPaymentChargeID string `json:"telegram_payment_charge_id"`
+	ProviderPaymentChargeID string `json:"provider_payment_charge_id"`
 }

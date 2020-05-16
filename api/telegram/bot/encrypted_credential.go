@@ -5,7 +5,9 @@
 package bot
 
 //
-// EncryptedCredentials
+// EncryptedCredentials contains data required for decrypting and
+// authenticating EncryptedPassportElement.
+//
 type EncryptedCredentials struct {
 	// Base64-encoded encrypted JSON-serialized data with unique user's
 	// payload, data hashes and secrets required for

@@ -237,7 +237,7 @@ func (hdr *Header) SetMultipart() (err error) {
 		return fmt.Errorf("email.SetMultipart: %w", err)
 	}
 
-	hdr.Set(FieldTypeContentType, []byte(contentTypeMultipartAlternative))
+	err = hdr.Set(FieldTypeContentType, []byte(contentTypeMultipartAlternative))
 	if err != nil {
 		return fmt.Errorf("email.SetMultipart: %w", err)
 	}

@@ -81,7 +81,7 @@ const (
 	optSFX = "SFX"
 )
 
-// List of affix file other options/
+// List of affix file other options.
 const (
 	optCircumfix     = "CIRCUMFIX"
 	optForbiddenWord = "FORBIDDENWORD"

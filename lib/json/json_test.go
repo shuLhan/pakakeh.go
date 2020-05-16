@@ -89,7 +89,7 @@ func TestUnescapeString(t *testing.T) {
 		exp: `	this\ is
 		//\"☺"`,
 	}, {
-		in: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F\u263A `, //nolint: stylecheck
+		in: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F\u263A `,
 		exp: `☺ `}, { //nolint: stylecheck
 		in:     `\uerror`,
 		expErr: `strconv.ParseUint: parsing "erro": invalid syntax`,

@@ -10,7 +10,7 @@ package bot
 type PassportData struct {
 	// Array with information about documents and other Telegram Passport
 	// elements that was shared with the bot.
-	data []EncryptedPassportElement
+	data []EncryptedPassportElement //nolint: structcheck,unused
 
 	// Encrypted credentials required to decrypt the data.
 	Credentials EncryptedCredentials

@@ -35,7 +35,7 @@ type UpdateHandler func(update Update)
 //
 type Options struct {
 	// Required.  Your Bot authentication token.
-	// This option will be overriden by environment variable
+	// This option will be overridden by environment variable
 	// TELEGRAM_TOKEN.
 	Token string
 

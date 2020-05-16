@@ -185,12 +185,12 @@ func (key *Key) set(t *tag) (err error) {
 	case tagDNSPublicKey:
 		pkey, err := base64.RawStdEncoding.DecodeString(string(t.value))
 		if err != nil {
-			err = fmt.Errorf("dkim: error decode public key: " + err.Error())
+			err = fmt.Errorf("dkim: error decode public key: %w", err)
 			return err
 		}
 		pk, err := x509.ParsePKIXPublicKey(pkey)
 		if err != nil {
-			err = fmt.Errorf("dkim: error parsing public key: " + err.Error())
+			err = fmt.Errorf("dkim: error parsing public key: %w", err)
 			return err
 		}
 

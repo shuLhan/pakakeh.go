@@ -4,7 +4,7 @@
 
 package bot
 
-// List of message entity types
+// List of message entity types.
 const (
 	EntityTypeMention       = "mention"       // @username
 	EntityTypeHashtag       = "hashtag"       // #hashtag

@@ -5,10 +5,8 @@
 package test
 
 import (
-	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"testing"
 
 	"github.com/shuLhan/share/lib/memfs"
@@ -16,13 +14,6 @@ import (
 )
 
 func TestGeneratePathNode(t *testing.T) {
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	wd = strings.TrimSuffix(wd, "generate_test")
-
 	expRoot := &memfs.Node{
 		SysPath: "testdata",
 		Path:    "/",

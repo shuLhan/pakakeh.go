@@ -37,28 +37,23 @@ type ServerOptions struct {
 	// This field is optional.
 	Excludes []string
 
-	// CORSAllowCredentials indicates whether or not the actual request
-	// can be made using credentials.
-	CORSAllowCredentials bool
-
 	// CORSAllowOrigins contains global list of cross-site Origin that are
 	// allowed during preflight requests by the OPTIONS method.
 	// The list is case-sensitive.
 	// To allow all Origin, one must add "*" string to the list.
-	CORSAllowOrigins    []string
-	corsAllowOriginsAll bool // flag to indicate wildcards on list.
+	CORSAllowOrigins []string
 
 	// CORSAllowHeaders contains global list of allowed headers during
 	// preflight requests by the OPTIONS method.
 	// The list is case-insensitive.
 	// To allow all headers, one must add "*" string to the list.
-	CORSAllowHeaders    []string
-	corsAllowHeadersAll bool // flag to indicate wildcards on list.
+	CORSAllowHeaders []string
 
 	// CORSExposeHeaders contains list of allowed headers.
 	// This list will be send when browser request OPTIONS without
 	// request-method.
 	CORSExposeHeaders []string
+	exposeHeaders     string
 
 	// CORSMaxAge gives the value in seconds for how long the response to
 	// the preflight request can be cached for without sending another
@@ -66,11 +61,16 @@ type ServerOptions struct {
 	CORSMaxAge int
 	corsMaxAge string
 
+	// CORSAllowCredentials indicates whether or not the actual request
+	// can be made using credentials.
+	CORSAllowCredentials bool
+
 	// Development if its true, the Root file system is served by reading
 	// the content directly instead of using memory file system.
 	Development bool
 
-	exposeHeaders string
+	corsAllowHeadersAll bool // flag to indicate wildcards on list.
+	corsAllowOriginsAll bool // flag to indicate wildcards on list.
 }
 
 func (opts *ServerOptions) init() {

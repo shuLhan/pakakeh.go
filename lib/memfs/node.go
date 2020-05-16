@@ -360,8 +360,8 @@ func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
 	if newInfo == nil {
 		newInfo, err = os.Stat(leaf.SysPath)
 		if err != nil {
-			return fmt.Errorf("lib/memfs: Node.update %q: %s",
-				leaf.Path, err.Error())
+			return fmt.Errorf("lib/memfs: Node.update %q: %w",
+				leaf.Path, err)
 		}
 	}
 

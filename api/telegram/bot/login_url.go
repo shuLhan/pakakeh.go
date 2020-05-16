@@ -5,13 +5,13 @@
 package bot
 
 //
-// LoginUrl represents a parameter of the inline keyboard button used to
+// LoginURL represents a parameter of the inline keyboard button used to
 // automatically authorize a user.
 // Serves as a great replacement for the Telegram Login Widget when the user
 // is coming from Telegram.
 // All the user needs to do is tap/click a button and confirm that they want
 // to log in.
-type LoginUrl struct {
+type LoginURL struct {
 	// An HTTP URL to be opened with user authorization data added to the
 	// query string when the button is pressed. If the user refuses to
 	// provide authorization data, the original URL without information
@@ -21,7 +21,7 @@ type LoginUrl struct {
 	// NOTE: You must always check the hash of the received data to verify
 	// the authentication and the integrity of the data as described in
 	// Checking authorization.
-	Url string `json:"url"`
+	URL string `json:"url"`
 
 	// Optional. New text of the button in forwarded messages.
 	ForwardText string `json:"forward_text"`

@@ -37,13 +37,13 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 
 	f, err := os.Create(out)
 	if err != nil {
-		return fmt.Errorf("memfs: GoGenerate: " + err.Error())
+		return fmt.Errorf("memfs: GoGenerate: %w", err)
 	}
 
 	if len(contentEncoding) > 0 {
 		err = mfs.ContentEncode(contentEncoding)
 		if err != nil {
-			return fmt.Errorf("GoGenerate: " + err.Error())
+			return fmt.Errorf("GoGenerate: %w", err)
 		}
 	}
 
@@ -81,11 +81,11 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 
 	err = f.Close()
 	if err != nil {
-		return fmt.Errorf("memfs: GoGenerate: " + err.Error())
+		return fmt.Errorf("memfs: GoGenerate: %w", err)
 	}
 
 	return nil
 fail:
 	_ = f.Close()
-	return fmt.Errorf("memfs: GoGenerate: " + err.Error())
+	return fmt.Errorf("memfs: GoGenerate: %w", err)
 }

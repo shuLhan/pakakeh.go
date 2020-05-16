@@ -17,7 +17,7 @@ type InlineKeyboardButton struct {
 
 	// Optional. An HTTP URL used to automatically authorize the user. Can
 	// be used as a replacement for the Telegram Login Widget.
-	LoginUrl *LoginUrl `json:"login_url"`
+	LoginURL *LoginURL `json:"login_url"`
 
 	// Optional. Data to be sent in a callback query to the bot when
 	// button is pressed, 1-64 bytes.

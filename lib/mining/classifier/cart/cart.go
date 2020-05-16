@@ -257,7 +257,7 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 }
 
 // SelectRandomFeature if NRandomFeature is greater than zero, select and
-// compute gain in n random features instead of in all features
+// compute gain in n random features instead of in all features.
 func (runtime *Runtime) SelectRandomFeature(claset tabula.ClasetInterface) {
 	if runtime.NRandomFeature <= 0 {
 		// all features selected

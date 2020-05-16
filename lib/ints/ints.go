@@ -393,7 +393,7 @@ func inplaceMultiswap(d []int, idx []int, x, y, ylast int) int {
 	return y
 }
 
-// (4.3.4) LET Y := the minimum value between x and r on `d`
+// (4.3.4) LET Y := the minimum value between x and r on `d`.
 func minY(d []int, x, y *int, r int, asc bool) {
 	for *x < r {
 		if asc {
