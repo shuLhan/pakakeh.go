@@ -363,6 +363,11 @@ func (bot *Bot) startWebhook() (err error) {
 		bot.err <- bot.webhook.Start()
 	}()
 
+	err = bot.DeleteWebhook()
+	if err != nil {
+		log.Println("startWebhook:", err.Error())
+	}
+
 	err = bot.setWebhook()
 	if err != nil {
 		return fmt.Errorf("startWebhook: %w", err)
