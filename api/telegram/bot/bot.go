@@ -79,6 +79,7 @@ const (
 const (
 	methodDeleteWebhook  = "deleteWebhook"
 	methodGetMe          = "getMe"
+	methodGetMyCommands  = "getMyCommands"
 	methodGetWebhookInfo = "getWebhookInfo"
 	methodSendMessage    = "sendMessage"
 	methodSetMyCommands  = "setMyCommands"
@@ -178,7 +179,7 @@ func (bot *Bot) GetMe() (user *User, err error) {
 // GetMyCommands get the current list of the bot's commands.
 //
 func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
-	resBody, err := bot.client.Get(methodGetWebhookInfo, nil)
+	resBody, err := bot.client.Get(methodGetMyCommands, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GetMyCommands: %w", err)
 	}
