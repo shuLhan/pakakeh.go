@@ -200,7 +200,13 @@ func (srv *Server) LoadHostsDir(dir string) {
 			continue
 		}
 
-		hostsFile := filepath.Join(dir, fis[x].Name())
+		// Ignore file that start with "." .
+		name := fis[x].Name()
+		if name[0] == '.' {
+			continue
+		}
+
+		hostsFile := filepath.Join(dir, name)
 
 		srv.LoadHostsFile(hostsFile)
 	}
@@ -259,7 +265,13 @@ func (srv *Server) LoadMasterDir(dir string) {
 			continue
 		}
 
-		masterFile := filepath.Join(dir, fis[x].Name())
+		// Ignore file that start with "." .
+		name := fis[x].Name()
+		if name[0] == '.' {
+			continue
+		}
+
+		masterFile := filepath.Join(dir, name)
 
 		srv.LoadMasterFile(masterFile)
 	}
