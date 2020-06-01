@@ -1,7 +1,11 @@
 package dns
 
 import (
+	"fmt"
+	"log"
 	"net"
+	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -17,6 +21,15 @@ const (
 )
 
 //
+// HostsFile represent content of single hosts file.
+//
+type HostsFile struct {
+	Path     string
+	Name     string
+	Messages []*Message
+}
+
+//
 // GetSystemHosts return path to system hosts file.
 //
 func GetSystemHosts() string {
@@ -27,22 +40,84 @@ func GetSystemHosts() string {
 }
 
 //
-// HostsLoad parse the content of hosts file as packed DNS message.
+// LoadHostsDir load all of hosts formatted files inside a directory.
+// On success, it will return map of filename and the content of hosts file as
+// list of Message.
+// On fail, it will return partial loadeded hosts files and an error.
+//
+func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
+	if len(dir) == 0 {
+		return nil, nil
+	}
+
+	d, err := os.Open(dir)
+	if err != nil {
+		return nil, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
+	}
+
+	fis, err := d.Readdir(0)
+	if err != nil {
+		log.Println("dns: LoadHostsDir: ", err)
+		errClose := d.Close()
+		if errClose != nil {
+			log.Println("dns: LoadHostsDir: ", errClose)
+		}
+		return nil, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
+	}
+
+	hostsFiles = make(map[string]*HostsFile)
+
+	for x := 0; x < len(fis); x++ {
+		if fis[x].IsDir() {
+			continue
+		}
+
+		// Ignore file that start with "." .
+		name := fis[x].Name()
+		if name[0] == '.' {
+			continue
+		}
+
+		hostsFilePath := filepath.Join(dir, name)
+
+		hostsFile, err := ParseHostsFile(hostsFilePath)
+		if err != nil {
+			return hostsFiles, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
+		}
+
+		hostsFiles[name] = hostsFile
+	}
+
+	err = d.Close()
+	if err != nil {
+		return hostsFiles, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
+	}
+
+	return hostsFiles, nil
+}
+
+//
+// ParseHostsFile parse the content of hosts file as packed DNS message.
 // If path is empty, it will load from the system hosts file.
 //
-func HostsLoad(path string) (msgs []*Message, err error) {
+func ParseHostsFile(path string) (hostsFile *HostsFile, err error) {
 	if len(path) == 0 {
 		path = GetSystemHosts()
 	}
 
 	reader, err := libio.NewReader(path)
 	if err != nil {
-		return
+		return nil, fmt.Errorf("ParseHostsFile %q: %w", path, err)
 	}
 
-	msgs = parse(reader)
+	hostsFile = &HostsFile{
+		Path: path,
+		Name: filepath.Base(path),
+	}
 
-	return
+	hostsFile.Messages = parse(reader)
+
+	return hostsFile, nil
 }
 
 func newMessage(addr, hname []byte) *Message {
@@ -115,6 +190,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 		seps  = []byte{'\t', '\v', ' '}
 		terms = []byte{'\n', '\f', '#'}
 	)
+
 	for {
 		c := reader.SkipSpaces()
 		if c == 0 {

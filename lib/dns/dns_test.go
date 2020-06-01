@@ -43,7 +43,12 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	_testServer.LoadMasterFile("testdata/kilabit.info")
+	masterFile, err := ParseMasterFile("testdata/kilabit.info", "", 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_testServer.PopulateCaches(masterFile.Messages)
 
 	go func() {
 		err = _testServer.ListenAndServe()

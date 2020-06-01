@@ -15,8 +15,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -77,6 +75,8 @@ const (
 // message ID, and question.
 //
 type Server struct {
+	HostsFiles map[string]*HostsFile
+
 	opts        *ServerOptions
 	errListener chan error
 	caches      *caches
@@ -171,152 +171,26 @@ func isResponseValid(req *request, res *Message) bool {
 }
 
 //
-// LoadHostsDir populate caches with DNS record from hosts formatted files in
-// directory "dir".
+// PopulateCaches add list of message to caches.
 //
-func (srv *Server) LoadHostsDir(dir string) {
-	if len(dir) == 0 {
-		return
-	}
-
-	d, err := os.Open(dir)
-	if err != nil {
-		log.Println("dns: LoadHostsDir: ", err)
-		return
-	}
-
-	fis, err := d.Readdir(0)
-	if err != nil {
-		log.Println("dns: LoadHostsDir: ", err)
-		err = d.Close()
-		if err != nil {
-			log.Println("dns: LoadHostsDir: ", err)
-		}
-		return
-	}
-
-	for x := 0; x < len(fis); x++ {
-		if fis[x].IsDir() {
-			continue
-		}
-
-		// Ignore file that start with "." .
-		name := fis[x].Name()
-		if name[0] == '.' {
-			continue
-		}
-
-		hostsFile := filepath.Join(dir, name)
-
-		srv.LoadHostsFile(hostsFile)
-	}
-
-	err = d.Close()
-	if err != nil {
-		log.Println("dns: LoadHostsDir: ", err)
-	}
-}
-
-//
-// LoadHostsFile populate caches with DNS record from hosts formatted file.
-//
-func (srv *Server) LoadHostsFile(path string) {
-	if len(path) == 0 {
-		fmt.Println("dns: loading system hosts file")
-	} else {
-		fmt.Printf("dns: loading hosts file '%s'\n", path)
-	}
-
-	msgs, err := HostsLoad(path)
-	if err != nil {
-		log.Println("dns: LoadHostsFile: " + err.Error())
-	}
-
-	srv.populateCaches(msgs)
-}
-
-//
-// LoadMasterDir populate caches with DNS record from master (zone) formatted
-// files in directory "dir".
-//
-func (srv *Server) LoadMasterDir(dir string) {
-	if len(dir) == 0 {
-		return
-	}
-
-	d, err := os.Open(dir)
-	if err != nil {
-		log.Println("dns: LoadMasterDir: ", err)
-		return
-	}
-
-	fis, err := d.Readdir(0)
-	if err != nil {
-		log.Println("dns: LoadMasterDir: ", err)
-		err = d.Close()
-		if err != nil {
-			log.Println("dns: LoadMasterDir: ", err)
-		}
-		return
-	}
-
-	for x := 0; x < len(fis); x++ {
-		if fis[x].IsDir() {
-			continue
-		}
-
-		// Ignore file that start with "." .
-		name := fis[x].Name()
-		if name[0] == '.' {
-			continue
-		}
-
-		masterFile := filepath.Join(dir, name)
-
-		srv.LoadMasterFile(masterFile)
-	}
-
-	err = d.Close()
-	if err != nil {
-		log.Println("dns: LoadMasterDir: error closing directory:", err)
-	}
-}
-
-//
-// LoadMasterFile populate caches with DNS record from master (zone) formatted
-// file.
-//
-func (srv *Server) LoadMasterFile(path string) {
-	fmt.Printf("dns: loading master file '%s'\n", path)
-
-	msgs, err := MasterLoad(path, "", 0)
-	if err != nil {
-		log.Println("dns: LoadMasterFile: " + err.Error())
-	}
-
-	srv.populateCaches(msgs)
-}
-
-//
-// populateCaches add list of message to caches.
-//
-func (srv *Server) populateCaches(msgs []*Message) {
+func (srv *Server) PopulateCaches(msgs []*Message) {
 	var (
 		n        int
 		inserted bool
 		isLocal  = true
 	)
 
-	for x := 0; x < len(msgs); x++ {
-		an := newAnswer(msgs[x], isLocal)
+	for _, msg := range msgs {
+		an := newAnswer(msg, isLocal)
 		inserted = srv.caches.upsert(an)
 		if inserted {
 			n++
 		}
-		msgs[x] = nil
 	}
 
-	fmt.Printf("dns: %d out of %d records cached\n", n, len(msgs))
+	if debug.Value >= 1 {
+		fmt.Printf("dns: %d out of %d records cached\n", n, len(msgs))
+	}
 }
 
 //

@@ -50,7 +50,12 @@ func ExampleServer() {
 	}
 
 	// Load records to be served from master file.
-	server.LoadMasterFile("testdata/kilabit.info")
+	masterFile, err := dns.ParseMasterFile("testdata/kilabit.info", "", 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server.PopulateCaches(masterFile.Messages)
 
 	go func() {
 		err = server.ListenAndServe()

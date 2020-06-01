@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -51,6 +53,15 @@ const (
 	parseSRVTarget
 )
 
+//
+// MasterFile represent content of single master file.
+//
+type MasterFile struct {
+	Path     string
+	Name     string
+	Messages []*Message
+}
+
 type master struct {
 	file   string
 	lineno int
@@ -65,11 +76,70 @@ type master struct {
 }
 
 //
-// MasterLoad parse master file and return it as list of Message.
+// LoadMasterDir load DNS record from master (zone) formatted files in
+// directory "dir".
+// On success, it will return map of file name and MasterFile content as list
+// of Message.
+// On fail, it will return possible partially parse master files and an error.
+//
+func LoadMasterDir(dir string) (masterFiles map[string]*MasterFile, err error) {
+	if len(dir) == 0 {
+		return nil, nil
+	}
+
+	d, err := os.Open(dir)
+	if err != nil {
+		return nil, fmt.Errorf("LoadMasterDir: %w", err)
+	}
+
+	fis, err := d.Readdir(0)
+	if err != nil {
+		err = d.Close()
+		if err != nil {
+			return nil, fmt.Errorf("LoadMasterDir: %w", err)
+		}
+		return nil, fmt.Errorf("LoadMasterDir: %w", err)
+	}
+
+	masterFiles = make(map[string]*MasterFile)
+
+	for x := 0; x < len(fis); x++ {
+		if fis[x].IsDir() {
+			continue
+		}
+
+		// Ignore file that start with "." .
+		name := fis[x].Name()
+		if name[0] == '.' {
+			continue
+		}
+
+		masterFilePath := filepath.Join(dir, name)
+
+		masterFile, err := ParseMasterFile(masterFilePath, "", 0)
+		if err != nil {
+			return masterFiles, fmt.Errorf("LoadMasterDir %q: %w", dir, err)
+		}
+
+		masterFiles[name] = masterFile
+	}
+
+	err = d.Close()
+	if err != nil {
+		return masterFiles, fmt.Errorf(" LoadMasterDir %q: %w", dir, err)
+	}
+
+	return masterFiles, nil
+}
+
+//
+// ParseMasterFile parse master file and return it as list of Message.
 // The base path of file will be assumed as origin.
 //
-func MasterLoad(file, origin string, ttl uint32) ([]*Message, error) {
-	var err error
+func ParseMasterFile(file, origin string, ttl uint32) (masterFile *MasterFile, err error) {
+	masterFile = &MasterFile{
+		Path: file,
+	}
 
 	m := newMaster()
 	m.file = file
@@ -85,15 +155,18 @@ func MasterLoad(file, origin string, ttl uint32) ([]*Message, error) {
 
 	m.reader, err = libio.NewReader(file)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
 	}
 
 	err = m.parse()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
 	}
 
-	return m.msgs, nil
+	masterFile.Name = m.origin
+	masterFile.Messages = m.msgs
+
+	return masterFile, nil
 }
 
 func newMaster() *master {
@@ -334,12 +407,12 @@ func (m *master) parseDirectiveInclude() (err error) {
 		}
 	}
 
-	msgs, err := MasterLoad(incfile, dname, m.ttl)
+	masterFile, err := ParseMasterFile(incfile, dname, m.ttl)
 	if err != nil {
 		return err
 	}
 
-	m.msgs = append(m.msgs, msgs...)
+	m.msgs = append(m.msgs, masterFile.Messages...)
 
 	return nil
 }
