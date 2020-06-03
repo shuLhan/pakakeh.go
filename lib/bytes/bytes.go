@@ -388,6 +388,29 @@ func Indexes(s []byte, token []byte) (idxs []int) {
 }
 
 //
+// MergeSpaces convert sequences of white spaces into single space ' '.
+//
+func MergeSpaces(in []byte) (out []byte) {
+	var isSpace bool
+	for _, c := range in {
+		if c == ' ' || c == '\t' || c == '\v' || c == '\f' || c == '\n' || c == '\r' {
+			isSpace = true
+			continue
+		}
+		if isSpace {
+			out = append(out, ' ')
+			isSpace = false
+		}
+		out = append(out, c)
+	}
+	if isSpace {
+		out = append(out, ' ')
+	}
+
+	return out
+}
+
+//
 // SkipAfterToken skip all bytes until matched token is found and return the
 // index after the token and boolean true.
 //

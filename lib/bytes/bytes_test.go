@@ -242,6 +242,22 @@ func TestReadHexByte(t *testing.T) {
 	}
 }
 
+func TestMergeSpaces(t *testing.T) {
+	cases := []struct {
+		in  string
+		exp string
+	}{{
+		in: "",
+	}, {
+		in:  " \t\v\r\n\r\n\fa \t\v\r\n\r\n\f",
+		exp: " a ",
+	}}
+	for _, c := range cases {
+		got := MergeSpaces([]byte(c.in))
+		test.Assert(t, c.in, c.exp, string(got), true)
+	}
+}
+
 func TestSkipAfterToken(t *testing.T) {
 	line := []byte(`abc \def ghi`)
 
