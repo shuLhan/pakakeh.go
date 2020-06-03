@@ -3,7 +3,7 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.16.0 (2020-06-xx)
+==  share v0.16.0 (2020-06-05)
 
 ===  Breaking changes
 
@@ -30,6 +30,7 @@ This cause inconsistency between empty string and boolean true.
 *  http: support CORS with white list of origin and headers
 *  ini: add method UnsetAll to remove all variables in section and/or
    subsection that match with the key
+*  os/exec: new package to simplify the standard "os/exec"
 
 ===  Enhancements
 
