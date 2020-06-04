@@ -138,6 +138,9 @@ written in Go.
 *  link:{url-godoc}/lib/numbers[*numbers*]: A library for working with
    integer, float, slice of integer, and slice of floats.
 
+*  link:{url-godoc}/lib/os/exec[*os/exec*]: Package exec wrap the standar package
+"os/exec" to simplify calling Run with stdout and stderr.
+
 *  link:{url-godoc}/lib/parser[*parser*]: Package parser provide a common text
    parser, using delimiters.
 

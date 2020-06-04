@@ -7,14 +7,20 @@ This library is released each month, usually at the first week of month.
 
 ===  Breaking changes
 
+*  dns: refactoring loading hosts and master files
+
+   Instead of as methods in Server, we detach the LoadHostDir and
+   LostMasterDir into functions that return list of filename and their
+   content.
+
 *  dns: disable serving DoH and DoT if port is not set (0)
 
-Previously, if HTTPPort or TLSPort is not set (0) we set it to default
-value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
-want to serve DNS over UDP only.
+   Previously, if HTTPPort or TLSPort is not set (0) we set it to default
+   value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
+   want to serve DNS over UDP only.
 
-This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
-is not set, or 0.
+   This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
+   is not set, or 0.
 
 *  email: rename ParseAddress function to ParseMailboxes
 
@@ -22,22 +28,84 @@ is not set, or 0.
 
 *  ini: fix inconsistencies between empty string and boolean true
 
-In Git specification, an empty variable is equal to boolean true.
-This cause inconsistency between empty string and boolean true.
+   In Git specification, an empty variable is equal to boolean true.
+   This cause inconsistency between empty string and boolean true.
+
+*  memfs: simplify the API, add directory parameter to New
+
+   This changes add parameter directory to be mounted in New(), so user
+   did not need to call Mount manually
+
+   This cause the Mount method and its sibling, Unmount and IsMounted
+   become unneeded, so we remove them.
+
+===  Bug fixes
+
+*  api/telegram/bot: fix  request parameter on GetMyCommands
 
 ===  New features
 
-*  http: support CORS with white list of origin and headers
-*  ini: add method UnsetAll to remove all variables in section and/or
-   subsection that match with the key
-*  os/exec: new package to simplify the standard "os/exec"
+*  bytes: add function MergeSpaces
 
-===  Enhancements
+   The function MergeSpaces will convert sequences of white space into
+   single space ' '.
 
 *  email: add methods to unmarshal/marshal Mailbox from/to JSON
 *  email: add function to parse single mailbox
 *  email: add function to create multipart text and HTML message
+
+*  http: support CORS with white list of origin and headers
+
+*  ini: add method UnsetAll to remove all variables in section and/or
+   subsection that match with the key
+*  ini: add method to Unmarshal ini values to struct
+
+*  os/exec: new package to simplify the standard "os/exec"
+
+   New extension to standard package is function ParseCommandArgs() that
+   receive input as string and return itas command and list of arguments.
+   Unlike strings.Fields() which only separated the field by space,
+   ParseCommandArgs can detect possible single, double, or back quotes.
+
+   Another extension is Run() function that accept the string command
+   to be executed and their standard output and error.
+
+*  sql: add method to migrate database schema
+
+   The Migrate method migrate the database using list of SQL files inside
+   a directory.
+   Each SQL file in directory will be executed in alphabetical order based on
+   the last state.
+   
+   The state of migration will be saved in table "_migration" with the SQL
+   file name that has been executed and the timestamp.
+
+===  Enhancements
+
+*  api/telegram/bot: delete webhook upon setting new webhook
+
+*  dns: do not load hidden hosts and master file
+
+   Previously, the LoadHostDir and LoadMasterDir load all files inside
+   the directory without checking if its hidden (starting with dot) or not.
+   
+   This changes make the hidden file not loaded so one can disable it
+   temporarily by prefixing it with dot.
+
 *  ini: make the add method append the variable after existing same key
+
+*  memfs: make the Node Readdir works when calling from generated Go code
+
+   Previously, the Go generated code from call to GoGenerate() set only
+   mapping of path to node.  Calling Readdir() using http.File using
+
+     root, err := mfs.Open("/")
+     fis, err := root.Readdir(0)
+
+   will return nil on fis.
+
+   This changes add all child nodes to generated node.
+
 *  websocket: allow "https" scheme on Client's Endpoint
 
 
@@ -53,7 +121,7 @@ This cause inconsistency between empty string and boolean true.
 * ssh: implement SSH client configuration parser -- ssh_config(5)
 * api/telegram/bot: Go package for Telegram API Bot
 * http: implement a simplified HTTP client
-* net/html: new package to simplify the golang.org/x/net/html 
+* net/html: new package to simplify the golang.org/x/net/html
 
   The x/net/html package currently only provide bare raw functionalities
   to iterate tree, there is no check for empty node, no function to
