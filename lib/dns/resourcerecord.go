@@ -148,7 +148,7 @@ func (rr *ResourceRecord) String() string {
 func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err error) {
 	x = startIdx
 
-	err = rr.unpackDomainName(&rr.Name, packet, x)
+	rr.Name, err = rr.unpackDomainName(packet, x)
 	if err != nil {
 		return x, err
 	}
@@ -181,46 +181,47 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	return x, err
 }
 
-func (rr *ResourceRecord) unpackDomainName(out *[]byte, packet []byte, x uint) error {
-	if x >= uint(len(packet)) {
-		return ErrLabelSizeLimit
-	}
-	count := packet[x]
-	if count == 0 {
-		return nil
-	}
-	if (packet[x] & maskPointer) == maskPointer {
-		offset := uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
+func (rr *ResourceRecord) unpackDomainName(packet []byte, start uint) (
+	out []byte, err error,
+) {
+	x := int(start)
+	for x < len(packet) {
+		count := packet[x]
+		if count == 0 {
+			break
+		}
+		if (packet[x] & maskPointer) == maskPointer {
+			offset := uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
 
-		if rr.off == 0 {
-			rr.off = x + 1
+			if rr.off == 0 {
+				rr.off = uint(x + 1)
+			}
+			x = int(offset)
+			continue
+		}
+		if count > maxLabelSize {
+			return nil, ErrLabelSizeLimit
+		}
+		if len(out) > 0 {
+			out = append(out, '.')
 		}
 
-		err := rr.unpackDomainName(out, packet, uint(offset))
-		return err
-	}
-	if count > maxLabelSize {
-		return ErrLabelSizeLimit
-	}
-	if len(*out) > 0 {
-		*out = append(*out, '.')
-	}
-
-	x++
-	for y := byte(0); y < count; y++ {
-		if packet[x] >= 'A' && packet[x] <= 'Z' {
-			packet[x] += 32
-		}
-		*out = append(*out, packet[x])
 		x++
+		for y := byte(0); y < count; y++ {
+			if x >= len(packet) {
+				break
+			}
+			if packet[x] >= 'A' && packet[x] <= 'Z' {
+				packet[x] += 32
+			}
+			out = append(out, packet[x])
+			x++
+		}
 	}
-
-	err := rr.unpackDomainName(out, packet, x)
-
-	return err
+	return out, nil
 }
 
-func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
+func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) {
 	switch rr.Type {
 	case QueryTypeA:
 		rr.Text = new(RDataText)
@@ -241,7 +242,8 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	//
 	case QueryTypeNS:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
+		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		return err
 
 	// MD is obsolete.  See the definition of MX and [RFC-974] for details of
 	// the new scheme.  The recommended policy for dealing with MD RRs found in
@@ -261,7 +263,8 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 	// details.
 	case QueryTypeCNAME:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
+		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		return err
 
 	case QueryTypeSOA:
 		rr.SOA = new(RDataSOA)
@@ -269,15 +272,18 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 
 	case QueryTypeMB:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
+		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		return err
 
 	case QueryTypeMG:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
+		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		return err
 
 	case QueryTypeMR:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
+		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		return err
 
 	// NULL records cause no additional section processing.
 	// NULLs are used as placeholders in some experimental extensions of
@@ -295,7 +301,8 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) error {
 
 	case QueryTypePTR:
 		rr.Text = new(RDataText)
-		return rr.unpackDomainName(&rr.Text.Value, packet, startIdx)
+		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		return err
 
 	case QueryTypeHINFO:
 		rr.HInfo = new(RDataHINFO)
@@ -360,11 +367,11 @@ func (rr *ResourceRecord) unpackAAAA() error {
 	return nil
 }
 
-func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
+func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) (err error) {
 	x := startIdx
 	rr.off = 0
 
-	err := rr.unpackDomainName(&rr.MInfo.RMailBox, packet, x)
+	rr.MInfo.RMailBox, err = rr.unpackDomainName(packet, x)
 	if err != nil {
 		return err
 	}
@@ -375,7 +382,7 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
 		x += uint(len(rr.MInfo.RMailBox) + 2)
 	}
 
-	err = rr.unpackDomainName(&rr.MInfo.EmailBox, packet, x)
+	rr.MInfo.EmailBox, err = rr.unpackDomainName(packet, x)
 	if err != nil {
 		return err
 	}
@@ -383,11 +390,11 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) error {
 	return nil
 }
 
-func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) error {
+func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) (err error) {
 	rr.MX.Preference = libbytes.ReadInt16(packet, startIdx)
 
 	rr.off = 0
-	err := rr.unpackDomainName(&rr.MX.Exchange, packet, startIdx+2)
+	rr.MX.Exchange, err = rr.unpackDomainName(packet, startIdx+2)
 
 	return err
 }
@@ -419,7 +426,7 @@ func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
 	rr.SRV.Port = libbytes.ReadUint16(packet, x)
 	x += 2
 
-	err = rr.unpackDomainName(&rr.SRV.Target, packet, x)
+	rr.SRV.Target, err = rr.unpackDomainName(packet, x)
 
 	return
 }
@@ -450,11 +457,11 @@ func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
 	return nil
 }
 
-func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
+func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) (err error) {
 	x := startIdx
 	rr.off = 0
 
-	err := rr.unpackDomainName(&rr.SOA.MName, packet, x)
+	rr.SOA.MName, err = rr.unpackDomainName(packet, x)
 	if err != nil {
 		return err
 	}
@@ -465,7 +472,7 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) error {
 		x += uint(len(rr.SOA.MName) + 2)
 	}
 
-	err = rr.unpackDomainName(&rr.SOA.RName, packet, x)
+	rr.SOA.RName, err = rr.unpackDomainName(packet, x)
 	if err != nil {
 		return err
 	}

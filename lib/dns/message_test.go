@@ -1107,7 +1107,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -1210,7 +1209,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -1270,7 +1268,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  make([]byte, 0),
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -1495,7 +1492,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
@@ -1620,7 +1616,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
@@ -1679,7 +1674,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
@@ -1888,7 +1882,6 @@ func TestMessageUnpack(t *testing.T) {
 				},
 			}},
 			Additional: []ResourceRecord{{
-				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 512,
 				TTL:   0,
