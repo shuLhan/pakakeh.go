@@ -50,7 +50,7 @@ type ResourceRecord struct {
 	rdata []byte
 
 	// Text represent A, NS, CNAME, MB, MG, NULL, PTR, and TXT.
-	Text  *RDataText
+	Text  []byte
 	SOA   *RDataSOA
 	WKS   *RDataWKS
 	HInfo *RDataHINFO
@@ -69,7 +69,6 @@ type ResourceRecord struct {
 func NewResourceRecord() *ResourceRecord {
 	return &ResourceRecord{
 		Name:  make([]byte, 0),
-		Text:  &RDataText{},
 		rdata: make([]byte, 0),
 	}
 }
@@ -89,29 +88,29 @@ func NewResourceRecord() *ResourceRecord {
 func (rr *ResourceRecord) RData() interface{} {
 	switch rr.Type {
 	case QueryTypeA:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeNS:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeMD:
 		return nil
 	case QueryTypeMF:
 		return nil
 	case QueryTypeCNAME:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeSOA:
 		return rr.SOA
 	case QueryTypeMB:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeMG:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeMR:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeNULL:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeWKS:
 		return rr.WKS
 	case QueryTypePTR:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeHINFO:
 		return rr.HInfo
 	case QueryTypeMINFO:
@@ -119,9 +118,9 @@ func (rr *ResourceRecord) RData() interface{} {
 	case QueryTypeMX:
 		return rr.MX
 	case QueryTypeTXT:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeAAAA:
-		return rr.Text.Value
+		return rr.Text
 	case QueryTypeSRV:
 		return rr.SRV
 	case QueryTypeOPT:
@@ -224,7 +223,6 @@ func (rr *ResourceRecord) unpackDomainName(packet []byte, start uint) (
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) {
 	switch rr.Type {
 	case QueryTypeA:
-		rr.Text = new(RDataText)
 		return rr.unpackA()
 
 	//
@@ -241,8 +239,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	// class protocols.
 	//
 	case QueryTypeNS:
-		rr.Text = new(RDataText)
-		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		rr.Text, err = rr.unpackDomainName(packet, startIdx)
 		return err
 
 	// MD is obsolete.  See the definition of MX and [RFC-974] for details of
@@ -262,8 +259,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	// cases.  See the description of name server logic in [RFC-1034] for
 	// details.
 	case QueryTypeCNAME:
-		rr.Text = new(RDataText)
-		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		rr.Text, err = rr.unpackDomainName(packet, startIdx)
 		return err
 
 	case QueryTypeSOA:
@@ -271,27 +267,23 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 		return rr.unpackSOA(packet, startIdx)
 
 	case QueryTypeMB:
-		rr.Text = new(RDataText)
-		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		rr.Text, err = rr.unpackDomainName(packet, startIdx)
 		return err
 
 	case QueryTypeMG:
-		rr.Text = new(RDataText)
-		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		rr.Text, err = rr.unpackDomainName(packet, startIdx)
 		return err
 
 	case QueryTypeMR:
-		rr.Text = new(RDataText)
-		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		rr.Text, err = rr.unpackDomainName(packet, startIdx)
 		return err
 
 	// NULL records cause no additional section processing.
 	// NULLs are used as placeholders in some experimental extensions of
 	// the DNS.
 	case QueryTypeNULL:
-		rr.Text = new(RDataText)
 		endIdx := startIdx + uint(rr.rdlen)
-		rr.Text.Value = append(rr.Text.Value, packet[startIdx:startIdx+endIdx]...)
+		rr.Text = packet[startIdx : startIdx+endIdx]
 		return nil
 
 	case QueryTypeWKS:
@@ -300,8 +292,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 		return rr.WKS.unpack(packet[startIdx:endIdx])
 
 	case QueryTypePTR:
-		rr.Text = new(RDataText)
-		rr.Text.Value, err = rr.unpackDomainName(packet, startIdx)
+		rr.Text, err = rr.unpackDomainName(packet, startIdx)
 		return err
 
 	case QueryTypeHINFO:
@@ -318,16 +309,14 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 		return rr.unpackMX(packet, startIdx)
 
 	case QueryTypeTXT:
-		rr.Text = new(RDataText)
 		endIdx := startIdx + uint(rr.rdlen)
 
 		// The first byte of TXT is length.
-		rr.Text.Value = append(rr.Text.Value, packet[startIdx+1:endIdx]...)
+		rr.Text = packet[startIdx+1 : endIdx]
 
 		return nil
 
 	case QueryTypeAAAA:
-		rr.Text = new(RDataText)
 		return rr.unpackAAAA()
 
 	case QueryTypeSRV:
@@ -351,7 +340,7 @@ func (rr *ResourceRecord) unpackA() error {
 	}
 
 	ip := net.IP(rr.rdata)
-	rr.Text.Value = append(rr.Text.Value, []byte(ip.String())...)
+	rr.Text = []byte(ip.String())
 
 	return nil
 }
@@ -362,7 +351,7 @@ func (rr *ResourceRecord) unpackAAAA() error {
 	}
 
 	ip := net.IP(rr.rdata)
-	rr.Text.Value = append(rr.Text.Value, []byte(ip.String())...)
+	rr.Text = []byte(ip.String())
 
 	return nil
 }

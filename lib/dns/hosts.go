@@ -157,9 +157,7 @@ func newMessage(addr, hname []byte) *Message {
 			Type:  qtype,
 			Class: QueryClassIN,
 			TTL:   defaultTTL,
-			Text: &RDataText{
-				Value: addr,
-			},
+			Text:  addr,
 		}},
 	}
 

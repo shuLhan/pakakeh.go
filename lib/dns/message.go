@@ -296,9 +296,9 @@ func (msg *Message) packA(rr *ResourceRecord) {
 	libbytes.AppendUint16(&msg.Packet, rdataIPv4Size)
 	msg.off += 2
 
-	ip := net.ParseIP(string(rr.Text.Value))
+	ip := net.ParseIP(string(rr.Text))
 	if ip == nil {
-		msg.Packet = append(msg.Packet, rr.Text.Value[:rdataIPv4Size]...)
+		msg.Packet = append(msg.Packet, rr.Text[:rdataIPv4Size]...)
 	} else {
 		ipv4 := ip.To4()
 		if ipv4 == nil {
@@ -317,7 +317,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	off := uint(msg.off)
 	msg.off += 2
 
-	n := msg.packDomainName(rr.Text.Value, true)
+	n := msg.packDomainName(rr.Text, true)
 	libbytes.WriteUint16(&msg.Packet, off, uint16(n))
 }
 
@@ -393,12 +393,12 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 }
 
 func (msg *Message) packTXT(rr *ResourceRecord) {
-	n := uint16(len(rr.Text.Value))
+	n := uint16(len(rr.Text))
 	libbytes.AppendUint16(&msg.Packet, n+1)
 	msg.off += 2
 
 	msg.Packet = append(msg.Packet, byte(n))
-	msg.Packet = append(msg.Packet, rr.Text.Value...)
+	msg.Packet = append(msg.Packet, rr.Text...)
 	msg.off += n
 }
 
@@ -425,9 +425,9 @@ func (msg *Message) packAAAA(rr *ResourceRecord) {
 	libbytes.AppendUint16(&msg.Packet, rdataIPv6Size)
 	msg.off += 2
 
-	ip := net.ParseIP(string(rr.Text.Value))
+	ip := net.ParseIP(string(rr.Text))
 	if ip == nil {
-		msg.Packet = append(msg.Packet, rr.Text.Value[:rdataIPv6Size]...)
+		msg.Packet = append(msg.Packet, rr.Text[:rdataIPv6Size]...)
 	} else {
 		msg.Packet = append(msg.Packet, ip...)
 	}
@@ -725,7 +725,6 @@ func (msg *Message) Unpack() (err error) {
 	for ; x < msg.Header.ANCount; x++ {
 		rr := ResourceRecord{
 			Name:  make([]byte, 0),
-			Text:  &RDataText{},
 			rdata: make([]byte, 0),
 		}
 
@@ -744,7 +743,6 @@ func (msg *Message) Unpack() (err error) {
 	for x = 0; x < msg.Header.NSCount; x++ {
 		rr := ResourceRecord{
 			Name:  make([]byte, 0),
-			Text:  &RDataText{},
 			rdata: make([]byte, 0),
 		}
 
@@ -762,7 +760,6 @@ func (msg *Message) Unpack() (err error) {
 	for x = 0; x < msg.Header.ARCount; x++ {
 		rr := ResourceRecord{
 			Name:  make([]byte, 0),
-			Text:  &RDataText{},
 			rdata: make([]byte, 0),
 		}
 

@@ -30,9 +30,7 @@ func TestNewAnswer(t *testing.T) {
 			Class: QueryClassIN,
 			TTL:   3600,
 			rdlen: 4,
-			Text: &RDataText{
-				Value: []byte("127.0.0.1"),
-			},
+			Text:  []byte("127.0.0.1"),
 		}},
 	}
 
@@ -138,9 +136,7 @@ func TestAnswerGet(t *testing.T) {
 			Class: QueryClassIN,
 			TTL:   3600,
 			rdlen: 4,
-			Text: &RDataText{
-				Value: []byte("127.0.0.1"),
-			},
+			Text:  []byte("127.0.0.1"),
 		}},
 		Authority:  []ResourceRecord{},
 		Additional: []ResourceRecord{},

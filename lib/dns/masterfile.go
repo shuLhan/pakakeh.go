@@ -699,15 +699,10 @@ func (m *master) parseRRType(rr *ResourceRecord, stok string) bool {
 func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
 	case QueryTypeA, QueryTypeAAAA:
-		rr.Text = &RDataText{
-			Value: tok,
-		}
+		rr.Text = tok
 
 	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG, QueryTypeMR, QueryTypePTR:
-		dname := m.generateDomainName(tok)
-		rr.Text = &RDataText{
-			Value: dname,
-		}
+		rr.Text = m.generateDomainName(tok)
 
 	case QueryTypeSOA:
 		err = m.parseSOA(rr, tok)
@@ -989,9 +984,7 @@ func (m *master) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	}
 	v = v[1 : len(v)-1]
 
-	rr.Text = &RDataText{
-		Value: v,
-	}
+	rr.Text = v
 
 	return nil
 }

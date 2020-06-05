@@ -205,25 +205,19 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("a.isi.edu"),
-				},
+				Text:  []byte("a.isi.edu"),
 			}, {
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("venera.isi.edu"),
-				},
+				Text:  []byte("venera.isi.edu"),
 			}, {
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("vaxa.isi.edu"),
-				},
+				Text:  []byte("vaxa.isi.edu"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -271,9 +265,7 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("26.3.0.103"),
-				},
+				Text:  []byte("26.3.0.103"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -291,17 +283,13 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("10.1.0.52"),
-				},
+				Text:  []byte("10.1.0.52"),
 			}, {
 				Name:  []byte("venera.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("128.9.0.32"),
-				},
+				Text:  []byte("128.9.0.32"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -319,17 +307,13 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("10.2.0.27"),
-				},
+				Text:  []byte("10.2.0.27"),
 			}, {
 				Name:  []byte("vaxa.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("128.9.0.33"),
-				},
+				Text:  []byte("128.9.0.33"),
 			}},
 		}},
 	}}
@@ -452,17 +436,13 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("ns23.pair.com"),
-				},
+				Text:  []byte("ns23.pair.com"),
 			}, {
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("ns0.ns0.com"),
-				},
+				Text:  []byte("ns0.ns0.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -480,9 +460,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("127.0.0.1"),
-				},
+				Text:  []byte("127.0.0.1"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -500,9 +478,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("209.68.14.80"),
-				},
+				Text:  []byte("209.68.14.80"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -541,9 +517,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("pcguide.com"),
-				},
+				Text:  []byte("pcguide.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -561,9 +535,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("pcguide.com"),
-				},
+				Text:  []byte("pcguide.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -581,9 +553,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("pcguide.com"),
-				},
+				Text:  []byte("pcguide.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -601,9 +571,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("relay.pair.com"),
-				},
+				Text:  []byte("relay.pair.com"),
 			}},
 		}},
 	}}
@@ -688,9 +656,7 @@ angularjs.doc       A  127.0.0.1
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("127.0.0.1"),
-				},
+				Text:  []byte("127.0.0.1"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -708,9 +674,7 @@ angularjs.doc       A  127.0.0.1
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("127.0.0.1"),
-				},
+				Text:  []byte("127.0.0.1"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -728,9 +692,7 @@ angularjs.doc       A  127.0.0.1
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte("127.0.0.1"),
-				},
+				Text:  []byte("127.0.0.1"),
 			}},
 		}},
 	}}
@@ -803,9 +765,7 @@ func TestMasterParseTXT(t *testing.T) {
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text: &RDataText{
-					Value: []byte(`This is a test`),
-				},
+				Text:  []byte(`This is a test`),
 			}},
 		}},
 	}}
