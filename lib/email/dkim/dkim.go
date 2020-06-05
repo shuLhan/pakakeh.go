@@ -14,7 +14,6 @@ import (
 // If its not empty, the public key lookup using DNS/TXT will use this values;
 // otherwise it will try to use the system name servers.
 //
-//nolint:gochecknoglobals
 var DefaultNameServers []string
 
 //
@@ -24,7 +23,6 @@ var DefaultNameServers []string
 // instead of LookupKey to minimize network traffic and process to decode and
 // parse public key.
 //
-//nolint:gochecknoglobals
 var (
 	DefaultKeyPool = &KeyPool{
 		pool: make(map[string]*Key),

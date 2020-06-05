@@ -15,7 +15,6 @@ import (
 	"github.com/shuLhan/share/lib/email/dkim"
 )
 
-//nolint:gochecknoglobals
 var (
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey

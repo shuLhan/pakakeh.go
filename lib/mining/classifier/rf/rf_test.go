@@ -18,7 +18,6 @@ import (
 //
 // Global options to run for each test.
 //
-//nolint:gochecknoglobals
 var (
 	// SampleDsvFile is the file that contain samples config.
 	SampleDsvFile string

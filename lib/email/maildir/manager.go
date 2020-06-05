@@ -193,7 +193,7 @@ func (mg *Manager) Incoming(email []byte) (err error) {
 		return err
 	}
 
-	err = ioutil.WriteFile(tmpFile, email, 0660) //nolint: gosec
+	err = ioutil.WriteFile(tmpFile, email, 0660)
 	if err != nil {
 		err = fmt.Errorf("email/maildir: Incoming: %s", err.Error())
 		return err

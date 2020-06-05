@@ -92,7 +92,6 @@ func (mail *MailTx) isPostponed() bool {
 //
 // seal the mail envelope by inserting trace information into message content.
 //
-//nolint:gosec
 func (mail *MailTx) seal(clientDomain, clientAddress, localAddress string) {
 	line := fmt.Sprintf("FROM %s (%s)\r\n\tBY %s WITH SMTP ID %s;\r\n\t%s",
 		clientDomain, clientAddress, localAddress, mail.ID,

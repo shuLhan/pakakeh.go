@@ -14,7 +14,6 @@ import (
 	libmemfs "github.com/shuLhan/share/lib/memfs"
 )
 
-//nolint:gochecknoglobals
 var (
 	testServer *Server
 	client     = &http.Client{}

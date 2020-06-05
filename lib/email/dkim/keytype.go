@@ -24,7 +24,6 @@ const (
 // keyTypeNames contains mapping between key type and their text
 // representation.
 //
-//nolint:gochecknoglobals
 var keyTypeNames = map[KeyType][]byte{
 	KeyTypeRSA: []byte("rsa"),
 }

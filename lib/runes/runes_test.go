@@ -40,7 +40,6 @@ func TestDiff(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestEncloseRemove(t *testing.T) {
 	line := []rune(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 

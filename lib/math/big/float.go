@@ -19,7 +19,6 @@ import (
 // One should change this value before using the new extended Float in the
 // program.
 //
-//nolint: gochecknoglobals
 var DefaultBitPrecision uint = 128
 
 //
@@ -29,7 +28,6 @@ var DefaultBitPrecision uint = 128
 // One should change this value before using the new extended Float in the
 // program.
 //
-//nolint: gochecknoglobals
 var DefaultRoundingMode = big.ToNearestAway
 
 //

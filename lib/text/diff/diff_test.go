@@ -230,7 +230,7 @@ func TestDiffFilesLevelWords(t *testing.T) {
 	// golint:
 	compareChunks(t, diffs.Changes[0].Adds, diffs.Changes[0].Dels,
 		[]string{","},
-		[]string{"alse "}, //nolint:misspell
+		[]string{"alse "},
 	)
 
 	oldrev = "testdata/Psusennes_II.old"
@@ -375,7 +375,6 @@ func TestBytesRatio(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestDiffFilesLevelWords3(t *testing.T) {
 	oldrev := "testdata/the_singles_collection.old"
 	newrev := "testdata/the_singles_collection.new"

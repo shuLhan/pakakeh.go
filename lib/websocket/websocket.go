@@ -5,7 +5,7 @@
 package websocket
 
 import (
-	"bytes" //nolint:gosec
+	"bytes"
 	"math/rand"
 	"sync"
 	"time"
@@ -24,7 +24,6 @@ const (
 	frameIsMasked   = 0x80
 )
 
-//nolint:gochecknoglobals
 var (
 	defaultTimeout      = 10 * time.Second
 	defaultPingInterval = 10 * time.Second
@@ -36,7 +35,6 @@ var (
 	}
 )
 
-//nolint:gochecknoinits
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }

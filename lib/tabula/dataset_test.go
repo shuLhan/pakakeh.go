@@ -11,7 +11,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:gochecknoglobals
 var (
 	datasetRows = [][]string{
 		{"0", "1", "A"},

@@ -106,7 +106,6 @@ func doReadWrite(t *testing.T, dsvReader *Reader, dsvWriter *Writer,
 	}
 }
 
-//nolint:gochecknoglobals
 var (
 	datasetRows = [][]string{
 		{"0", "1", "A"},

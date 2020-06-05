@@ -142,7 +142,7 @@ func (cmd *Command) reset() {
 //
 // unpack parse a command type, argument, and their parameters.
 //
-func (cmd *Command) unpack(b []byte) (err error) { //nolint:gocyclo,gocognit
+func (cmd *Command) unpack(b []byte) (err error) {
 	// Minimum command length is 4 + CRLF.
 	if len(b) < 6 {
 		return errCmdUnknown

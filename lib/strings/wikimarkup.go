@@ -13,7 +13,6 @@ type wikiMarkup struct {
 //
 // listWikiMarkup contains list of common markup in Wikimedia software.
 //
-//nolint:gochecknoglobals
 var listWikiMarkup = []wikiMarkup{{
 	begin: "[[Category:",
 	end:   "]]",

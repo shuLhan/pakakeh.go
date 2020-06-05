@@ -61,7 +61,6 @@ const (
 	_hdrValWSVersion         = "13"
 )
 
-//nolint:gochecknoglobals
 var (
 	_handshakePool = sync.Pool{
 		New: func() interface{} {
@@ -319,7 +318,6 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 //
 // The minimum length of request without HTTP line is: 144 - 16 = 128 bytes.
 //
-//nolint:gocyclo
 func (h *Handshake) parse(req []byte) (err error) {
 	if len(req) < 144 {
 		return ErrRequestLength

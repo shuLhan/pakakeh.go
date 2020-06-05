@@ -9,7 +9,6 @@ import (
 	"sync"
 )
 
-//nolint:gochecknoglobals
 var (
 	_resPool = sync.Pool{
 		New: func() interface{} {

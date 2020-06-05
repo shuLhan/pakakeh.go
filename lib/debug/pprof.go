@@ -12,7 +12,6 @@ import (
 	"runtime/pprof"
 )
 
-//nolint:gochecknoglobals
 var prof *profile
 
 type profile struct {

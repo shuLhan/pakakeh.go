@@ -48,7 +48,7 @@ import (
 //
 // [1] RFC 1035 - 4.1. Format
 //
-type Message struct { //nolint: maligned
+type Message struct {
 	Header     SectionHeader
 	Question   SectionQuestion
 	Answer     []ResourceRecord

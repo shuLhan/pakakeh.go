@@ -14,7 +14,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:gochecknoglobals
 var (
 	dataFloat64 = [][]float64{
 		{0.243474, 0.505146, 0.472892, 1.34802, -0.844252, 1},

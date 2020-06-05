@@ -276,7 +276,6 @@ func TestSignatureHash(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestSignatureSign(t *testing.T) {
 	if privateKey == nil {
 		initKeys(t)
@@ -492,7 +491,6 @@ func TestSignatureValidate(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestSignatureVerify(t *testing.T) {
 	if publicKey == nil {
 		initKeys(t)

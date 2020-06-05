@@ -29,7 +29,7 @@ func TestEscapeString(t *testing.T) {
 		//\"☺"`,
 		exp: `\tthis\\ is\n\t\t\/\/\\\"☺\"`,
 	}, {
-		in: ` `, exp: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F `, //nolint: stylecheck
+		in: ` `, exp: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F `,
 	}}
 
 	var got string
@@ -90,7 +90,7 @@ func TestUnescapeString(t *testing.T) {
 		//\"☺"`,
 	}, {
 		in: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F\u263A `,
-		exp: `☺ `}, { //nolint: stylecheck
+		exp: `☺ `}, {
 		in:     `\uerror`,
 		expErr: `strconv.ParseUint: parsing "erro": invalid syntax`,
 	}, {

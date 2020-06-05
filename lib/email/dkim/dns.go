@@ -11,7 +11,6 @@ import (
 	"github.com/shuLhan/share/lib/dns"
 )
 
-//nolint:gochecknoglobals
 var dnsClientPool *dns.UDPClientPool
 
 func newDNSClientPool() (err error) {

@@ -12,7 +12,6 @@ import (
 	"os"
 )
 
-//nolint:gochecknoglobals
 var (
 	_stderr *os.File
 	_stdin  *os.File

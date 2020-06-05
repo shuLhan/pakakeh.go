@@ -12,7 +12,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint: gochecknoglobals
 var (
 	testDefaultSection = newConfigSection()
 	testParser         *configParser

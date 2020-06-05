@@ -7,7 +7,6 @@ package email
 //
 // List of known parameter name in header field's value.
 //
-//nolint:gochecknoglobals
 var (
 	// Parameter for Text Media Type, RFC 2046 section 4.1.
 	ParamNameCharset = []byte("charset")

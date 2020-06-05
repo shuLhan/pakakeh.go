@@ -17,7 +17,6 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
-//nolint: maligned
 type affixOptions struct {
 	//
 	// Affix file general options.
@@ -179,7 +178,6 @@ func (opts *affixOptions) open(file string) (err error) {
 //
 // load affix options from string.
 //
-//nolint: gocyclo
 func (opts *affixOptions) load(content string) (err error) {
 	p := parser.New(content, "")
 

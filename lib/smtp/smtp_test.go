@@ -25,7 +25,6 @@ const (
 	testFilePrivateKey  = "testdata/" + testDomain + ".key.pem"
 )
 
-//nolint:gochecknoglobals
 var (
 	testClient        *Client
 	testServer        *Server

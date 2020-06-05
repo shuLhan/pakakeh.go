@@ -64,7 +64,6 @@ const (
 //
 // Mapping between tag key in numeric and their human readable form.
 //
-//nolint:gochecknoglobals
 var tagKeys = map[tagKey][]byte{
 	tagVersion:        []byte("v"),
 	tagAlg:            []byte("a"),

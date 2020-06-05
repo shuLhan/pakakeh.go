@@ -13,7 +13,6 @@ import (
 	"strings"
 )
 
-//nolint: gochecknoglobals
 var ratZero = NewRat(0)
 
 //

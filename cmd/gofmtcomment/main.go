@@ -19,7 +19,6 @@ const (
 	gapb = byte(' ')
 )
 
-//nolint:gochecknoglobals
 var (
 	twoGaps   = []byte{gapb, gapb}
 	threeGaps = []byte{gapb, gapb, gapb}

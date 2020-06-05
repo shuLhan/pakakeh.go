@@ -149,7 +149,6 @@ func TestMessageDKIMVerify(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestMessageDKIMSign(t *testing.T) {
 	if privateKey == nil || publicKey == nil {
 		initKeys(t)

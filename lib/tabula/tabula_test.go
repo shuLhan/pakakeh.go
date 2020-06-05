@@ -4,7 +4,6 @@
 
 package tabula
 
-//nolint:gochecknoglobals
 var (
 	testColTypes = []int{
 		TInteger,

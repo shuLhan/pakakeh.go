@@ -136,7 +136,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 			Certificates: []tls.Certificate{
 				cert,
 			},
-			InsecureSkipVerify: opts.TLSAllowInsecure, //nolint:gosec
+			InsecureSkipVerify: opts.TLSAllowInsecure,
 		}
 	}
 
@@ -1021,7 +1021,6 @@ func (srv *Server) runUDPForwarder(isPrimary bool, tag, nameserver string,
 	}
 }
 
-//nolint: interfacer
 func (srv *Server) stopForwarder(isPrimary bool, fw Client) {
 	if fw != nil {
 		fw.Close()

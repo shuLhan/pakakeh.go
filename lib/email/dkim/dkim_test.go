@@ -13,7 +13,6 @@ import (
 	"time"
 )
 
-//nolint:gochecknoglobals
 var (
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey

@@ -40,7 +40,6 @@ func IsEqual(x, y interface{}) bool {
 	return isEqual(v1, v2)
 }
 
-//nolint: gocyclo
 func isEqual(v1, v2 reflect.Value) bool {
 	if !v1.IsValid() || !v2.IsValid() {
 		return v1.IsValid() == v2.IsValid()

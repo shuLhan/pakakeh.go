@@ -43,20 +43,10 @@ coverbrowse: $(COVER_HTML)
 	xdg-open $<
 
 lint:
-	-golangci-lint run --enable-all \
-		--disable=dupl \
-		--disable=funlen \
-		--disable=godox \
-		--disable=gomnd \
-		--disable=wsl \
-		--disable=gocognit \
-		--disable=testpackage \
-		--disable=nestif \
-		--disable=goerr113 \
-		./...
+	-golangci-lint run ./...
 
 genhtml:
-	ciigo -template=html.tmpl convert _doc/
+	ciigo convert _doc/
 
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)

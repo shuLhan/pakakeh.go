@@ -14,7 +14,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:gochecknoglobals
 var jsonSample = []string{
 	`{}`,
 	`{
@@ -89,7 +88,6 @@ var jsonSample = []string{
 	}`,
 }
 
-//nolint:gochecknoglobals
 var readers = []*Reader{
 	{},
 	{

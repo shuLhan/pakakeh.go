@@ -11,7 +11,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:dupl
 func TestNewFrameBin(t *testing.T) {
 	cases := []struct {
 		desc     string
@@ -94,7 +93,6 @@ func TestNewFrameClose(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestNewFramePing(t *testing.T) {
 	cases := []struct {
 		desc    string
@@ -134,7 +132,6 @@ func TestNewFramePing(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestNewFramePong(t *testing.T) {
 	cases := []struct {
 		desc    string
@@ -174,7 +171,6 @@ func TestNewFramePong(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestNewFrameText(t *testing.T) {
 	cases := []struct {
 		desc     string

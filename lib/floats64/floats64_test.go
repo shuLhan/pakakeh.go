@@ -12,7 +12,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:gochecknoglobals
 var (
 	d = [][]float64{
 		{},
@@ -252,7 +251,6 @@ func TestSortByIndex(t *testing.T) {
 	}
 }
 
-//nolint:gochecknoglobals,dupl
 var inSorts = [][]float64{
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0},
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0},
@@ -273,7 +271,6 @@ var inSorts = [][]float64{
 		6.2},
 }
 
-//nolint:gochecknoglobals,dupl
 var expSorts = [][]float64{
 	{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
 	{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0},
@@ -294,7 +291,6 @@ var expSorts = [][]float64{
 		7.9},
 }
 
-//nolint:gochecknoglobals,dupl
 var expSortsDesc = [][]float64{
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0},
 	{9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0},

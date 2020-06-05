@@ -100,7 +100,7 @@ const (
 //
 // List of morphological and other IDs.
 //
-//nolint: varcheck,deadcode
+//nolint: deadcode,varcheck
 const (
 	morphKeyPH = "ph"
 	morphKeyST = "st"

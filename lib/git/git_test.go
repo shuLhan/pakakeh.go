@@ -13,7 +13,6 @@ import (
 	"github.com/shuLhan/share/lib/test/mock"
 )
 
-//nolint:gochecknoglobals
 var (
 	_testRepoDir   string
 	_testRemoteURL string

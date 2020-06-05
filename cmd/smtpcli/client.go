@@ -14,7 +14,6 @@ import (
 	"github.com/shuLhan/share/lib/smtp"
 )
 
-//nolint:gochecknoglobals
 var (
 	stdin  = os.Stdin
 	stdout = os.Stdout

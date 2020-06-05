@@ -28,7 +28,6 @@ type upgradeCase struct {
 	req   *http.Request
 }
 
-//nolint:gochecknoglobals
 var upgradeCases = []upgradeCase{
 	{
 		label: "base",
@@ -254,7 +253,7 @@ func withoutHeader(header string, req *http.Request) *http.Request {
 func initNonce(dst []byte) {
 	// NOTE: bts does not escapes.
 	bts := make([]byte, nonceKeySize)
-	if _, err := rand.Read(bts); err != nil { //nolint:gas
+	if _, err := rand.Read(bts); err != nil {
 		panic(fmt.Sprintf("rand read error: %s", err))
 	}
 	base64.StdEncoding.Encode(dst, bts)

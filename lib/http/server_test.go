@@ -171,7 +171,6 @@ func TestRegisterDelete(t *testing.T) {
 	}
 }
 
-//nolint:gochecknoglobals
 var testEvaluator = func(req *http.Request, reqBody []byte) error {
 	k := req.Form.Get("k")
 
@@ -631,7 +630,7 @@ func TestServeHTTPOptions(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		res, err := client.Do(req) //nolint:bodyclose
+		res, err := client.Do(req)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -227,7 +227,6 @@ func findLine(line text.Line, text text.Lines, startat int) (
 //
 // Files compare two files.
 //
-//nolint:gocyclo
 func Files(oldf, newf string, difflevel int) (diffs Data, e error) {
 	oldlines, e := ReadLines(oldf)
 	if e != nil {

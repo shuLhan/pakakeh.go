@@ -420,7 +420,7 @@ func TestMessagePack(t *testing.T) {
 		},
 	}, {
 		desc: "Response with MX RDATA",
-		exp: []byte{ //nolint:dupl
+		exp: []byte{
 			0x9e, 0xef, 0x81, 0x80,
 			0x00, 0x01, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01,
 			// Question
@@ -543,7 +543,7 @@ func TestMessagePack(t *testing.T) {
 		},
 	}, {
 		desc: "Response with TXT RDATA",
-		exp: []byte{ //nolint:dupl
+		exp: []byte{
 			0x3f, 0x7d, 0x81, 0x80, 0x00, 0x01, 0x00, 0x03,
 			0x00, 0x00, 0x00, 0x01, 0x06, 0x67, 0x6f, 0x6f,
 			0x67, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d, 0x00,
@@ -664,7 +664,7 @@ func TestMessagePack(t *testing.T) {
 		},
 	}, {
 		desc: "Response with SRV RDATA",
-		exp: []byte{ //nolint:dupl
+		exp: []byte{
 			0x2c, 0xb4,
 			0x81, 0x80,
 			0x00, 0x01, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01,
@@ -905,7 +905,6 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestMessageSetQuery(t *testing.T) {
 	msgQuery := &Message{
 		Header: SectionHeader{
@@ -949,7 +948,6 @@ func TestMessageSetQuery(t *testing.T) {
 	}
 }
 
-//nolint:dupl
 func TestMessageSetRecursionDesired(t *testing.T) {
 	msgQuery := &Message{
 		Header: SectionHeader{
@@ -1318,7 +1316,7 @@ func TestMessageUnpack(t *testing.T) {
 		},
 	}, {
 		desc: "RR with MX",
-		packet: []byte{ //nolint:dupl
+		packet: []byte{
 			0x9e, 0xef, 0x81, 0x80,
 			0x00, 0x01, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01,
 			// Question
@@ -1473,7 +1471,7 @@ func TestMessageUnpack(t *testing.T) {
 		},
 	}, {
 		desc: "RR with TXT",
-		packet: []byte{ //nolint:dupl
+		packet: []byte{
 			0x3f, 0x7d, 0x81, 0x80,
 			0x00, 0x01, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01,
 			// Question
@@ -1648,7 +1646,7 @@ func TestMessageUnpack(t *testing.T) {
 		},
 	}, {
 		desc: "RR with SRV",
-		packet: []byte{ //nolint:dupl
+		packet: []byte{
 			0x2c, 0xb4,
 			0x81, 0x80,
 			0x00, 0x01, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01,
@@ -1875,7 +1873,7 @@ func TestMessageUnpack(t *testing.T) {
 		test.Assert(t, "Authority Length", len(c.exp.Authority), len(msg.Authority), true)
 		test.Assert(t, "Additional Length", len(c.exp.Additional), len(msg.Additional), true)
 
-		for x := 0; x < len(c.exp.Answer); x++ { //nolint:dupl
+		for x := 0; x < len(c.exp.Answer); x++ {
 			test.Assert(t, "Answer.Name", c.exp.Answer[x].Name, msg.Answer[x].Name, true)
 			test.Assert(t, "Answer.Type", c.exp.Answer[x].Type, msg.Answer[x].Type, true)
 			test.Assert(t, "Answer.Class", c.exp.Answer[x].Class, msg.Answer[x].Class, true)
@@ -1884,7 +1882,7 @@ func TestMessageUnpack(t *testing.T) {
 			test.Assert(t, "Answer.rdata", c.exp.Answer[x].rdata, msg.Answer[x].rdata, true)
 			test.Assert(t, "Answer.RData()", c.exp.Answer[x].RData(), msg.Answer[x].RData(), true)
 		}
-		for x := 0; x < len(c.exp.Authority); x++ { //nolint:dupl
+		for x := 0; x < len(c.exp.Authority); x++ {
 			test.Assert(t, "Authority.Name", c.exp.Authority[x].Name, msg.Authority[x].Name, true)
 			test.Assert(t, "Authority.Type", c.exp.Authority[x].Type, msg.Authority[x].Type, true)
 			test.Assert(t, "Authority.Class", c.exp.Authority[x].Class, msg.Authority[x].Class, true)
@@ -1893,7 +1891,7 @@ func TestMessageUnpack(t *testing.T) {
 			test.Assert(t, "Authority.rdata", c.exp.Authority[x].rdata, msg.Authority[x].rdata, true)
 			test.Assert(t, "Authority.RData()", c.exp.Authority[x].RData(), msg.Authority[x].RData(), true)
 		}
-		for x := 0; x < len(c.exp.Additional); x++ { //nolint:dupl
+		for x := 0; x < len(c.exp.Additional); x++ {
 			test.Assert(t, "Additional.Name", c.exp.Additional[x].Name, msg.Additional[x].Name, true)
 			test.Assert(t, "Additional.Type", c.exp.Additional[x].Type, msg.Additional[x].Type, true)
 			test.Assert(t, "Additional.Class", c.exp.Additional[x].Class, msg.Additional[x].Class, true)

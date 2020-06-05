@@ -13,14 +13,13 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:gochecknoglobals
 var (
 	_testRootRoute = newRootRoute()
 	_testDefMethod string
 )
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {
-	return func(ctx context.Context, req *Request) (res Response) { //nolint:unparam
+	return func(ctx context.Context, req *Request) (res Response) {
 		test.Assert(t, "routeHandler", target, req.Target, true)
 		return
 	}

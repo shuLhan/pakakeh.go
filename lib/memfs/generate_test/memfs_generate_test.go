@@ -29,7 +29,7 @@ func TestGeneratePathNode(t *testing.T) {
 		V:           []byte("<html></html>\n"),
 	}
 
-	expExcludeIndexHTML.SetMode(420) //nolint: staticcheck
+	expExcludeIndexHTML.SetMode(0644)
 	expExcludeIndexHTML.SetName("index.html")
 	expExcludeIndexHTML.SetSize(14)
 

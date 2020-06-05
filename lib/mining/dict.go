@@ -8,7 +8,6 @@ package mining
 // VulgarWords contain list of vulgar and offensive words in informal and
 // slangs.
 //
-//nolint:misspell,gochecknoglobals
 var VulgarWords = []string{
 	"$#!+", "$1ut", "$h1t", "$hit", "$lut", "'f*ck'", "'ho", "'hobag",
 	"@ss", "@sshole", "a$$", "a$$h0!e", "a$$h01e", "a$$h0le", "a$$hole",
@@ -135,7 +134,6 @@ var VulgarWords = []string{
 // PronounWords contains list of first and second person pronouns including
 // slangs.
 //
-//nolint:gochecknoglobals
 var PronounWords = []string{
 	"i", "me", "mine", "my", "myself", "our", "ours", "ourself",
 	"ourselves", "selves", "thee", "thine", "thou", "thy", "thyself",
@@ -147,7 +145,6 @@ var PronounWords = []string{
 //
 // BiasedWords contain list of colloquial words with high bias.
 //
-//nolint:gochecknoglobals
 var BiasedWords = []string{
 	"cutting-edge", "single-handedly", "well-established", "well-known",
 	"world-class", "absolute", "acclaimed", "amazing", "astonishing",
@@ -171,7 +168,6 @@ var BiasedWords = []string{
 //
 // SexWords contain list of non-vulgar sex-related words.
 //
-//nolint:gochecknoglobals
 var SexWords = []string{
 	"anal", "breast", "breasts", "buttocks", "dildo", "dildos", "erect",
 	"nipple", "nipples", "penis", "sex", "sodomized", "sodomy", "vagina",
@@ -181,7 +177,6 @@ var SexWords = []string{
 //
 // BadWords contain list of colloquial words or bad writing words.
 //
-//nolint:gochecknoglobals
 var BadWords = []string{
 	"666", "da", "dont", "dosent", "whatever", "guy", "hi", "nazi", "sup",
 	"guise", "loser", "thats", "ugly", "wanna", "whats", "wont", "gotta",

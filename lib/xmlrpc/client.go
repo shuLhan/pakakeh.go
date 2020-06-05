@@ -69,7 +69,7 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 
 		config := &tls.Config{
 			ServerName:         host,
-			InsecureSkipVerify: insecure, //nolint: gosec
+			InsecureSkipVerify: insecure,
 		}
 
 		client.conn, err = tls.Dial("tcp", host, config)
@@ -98,7 +98,7 @@ func (cl *Client) Close() (err error) {
 //
 // Send the RPC method with parameters to the server.
 //
-func (cl *Client) Send(req Request) (resp Response, err error) { //nolint: interfacer
+func (cl *Client) Send(req Request) (resp Response, err error) {
 	var buf bytes.Buffer
 
 	xmlbin, _ := req.MarshalText()

@@ -4,7 +4,6 @@
 
 package dsv
 
-//nolint:gochecknoglobals
 var expectation = []string{
 	"&[1 A-B AB 1 0.1]",
 	"&[2 A-B-C BCD 2 0.02]",
@@ -18,7 +17,6 @@ var expectation = []string{
 	"&[14 string with\" quote string with]] escape 14 14]",
 }
 
-//nolint:gochecknoglobals
 var expSkip = []string{
 	"&[A-B AB 1 0.1]",
 	"&[A-B-C BCD 2 0.02]",
@@ -32,7 +30,6 @@ var expSkip = []string{
 	"&[string with\" quote string with]] escape 14 14]",
 }
 
-//nolint:lll,gochecknoglobals
 var expSkipColumns = []string{
 	"[{name 0 0 [] [A-B]} {value 0 0 [] [AB]} {integer 1 0 [] [1]} {real 2 0 [] [0.1]}]",
 	"[{name 0 0 [] [A-B-C]} {value 0 0 [] [BCD]} {integer 1 0 [] [2]} {real 2 0 [] [0.02]}]",
@@ -46,7 +43,6 @@ var expSkipColumns = []string{
 	"[{name 0 0 [] [string with\" quote]} {value 0 0 [] [string with]] escape]} {integer 1 0 [] [14]} {real 2 0 [] [14]}]",
 }
 
-//nolint:lll,gochecknoglobals
 var expSkipColumnsAll = []string{
 	"{name 0 0 [] [A-B A-B-C A;B-C,D A;B-C,D  ok test test string with string with\" quote]}",
 	"{value 0 0 [] [AB BCD A;B C,D A;B C D  missing right-quote];8;0.00000008\n9;\"ok\"-[[ok integer real string with string with]] escape]}",
@@ -54,7 +50,6 @@ var expSkipColumnsAll = []string{
 	"{real 2 0 [] [0.1 0.02 0.003 0.0004 0.000006 0.000000009 0.101 0.123456789 13 14]}",
 }
 
-//nolint:lll,gochecknoglobals
 var expSkipColumnsAllRev = []string{
 	"{name 0 0 [] [string with\" quote string with test test ok  A;B-C,D A;B-C,D A-B-C A-B]}",
 	"{value 0 0 [] [string with]] escape string with real integer missing right-quote];8;0.00000008\n9;\"ok\"-[[ok  A;B C D A;B C,D BCD AB]}",

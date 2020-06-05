@@ -36,7 +36,7 @@ func NewClient(cfg *ConfigSection) (cl *Client, err error) {
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(cfg.signers...),
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), //nolint:gosec
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	cl = &Client{
@@ -101,7 +101,6 @@ func (cl *Client) Get(remote, local string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
-	//nolint: gosec
 	cmd := exec.Command("scp", "-r", "-i", cl.cfg.privateKeyFile,
 		"-P", cl.cfg.stringPort, remote, local)
 
@@ -135,7 +134,6 @@ func (cl *Client) Put(local, remote string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
-	//nolint: gosec
 	cmd := exec.Command("scp", "-r", "-i", cl.cfg.privateKeyFile,
 		"-P", cl.cfg.stringPort, local, remote)
 

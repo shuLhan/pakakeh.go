@@ -30,7 +30,6 @@ const (
 	EncodingGzip = "gzip"
 )
 
-//nolint:gochecknoglobals
 var (
 	// MaxFileSize define maximum file size that can be stored on memory.
 	// The default value is 5 MB.

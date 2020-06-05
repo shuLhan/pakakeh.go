@@ -10,7 +10,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//nolint:lll
 func TestCleanURI(t *testing.T) {
 	cases := []struct {
 		text string

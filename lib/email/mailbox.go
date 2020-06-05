@@ -97,7 +97,6 @@ func ParseMailbox(raw []byte) (mbox *Mailbox, err error) {
 //
 //	"(" text [comment] ")"
 //
-//nolint:gocyclo
 func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 	raw = bytes.TrimSpace(raw)
 	if len(raw) == 0 {

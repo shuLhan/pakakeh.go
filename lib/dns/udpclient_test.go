@@ -16,7 +16,7 @@ func TestUDPClientLookup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cases := []struct { //nolint:dupl
+	cases := []struct {
 		desc           string
 		allowRecursion bool
 		qtype          uint16

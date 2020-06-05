@@ -56,7 +56,6 @@ const (
 //
 // fieldNames contains mapping between field type and their lowercase name.
 //
-//nolint:gochecknoglobals
 var fieldNames = map[FieldType][]byte{
 	FieldTypeDate: []byte("date"),
 

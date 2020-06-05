@@ -17,7 +17,6 @@ const (
 	envLocaldomain = "LOCALDOMAIN"
 )
 
-//nolint:gochecknoglobals
 var (
 	newLineTerms = []byte{'\n'}
 

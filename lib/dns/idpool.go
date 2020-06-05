@@ -8,7 +8,6 @@ import (
 	"sync/atomic"
 )
 
-//nolint:gochecknoglobals
 var idPool uint32
 
 //

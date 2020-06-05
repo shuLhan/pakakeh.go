@@ -75,7 +75,7 @@ func NewClient(serverURL string, headers http.Header, insecure bool) (client *Cl
 				MaxIdleConns:      100,
 				IdleConnTimeout:   90 * time.Second,
 				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: insecure, //nolint: gosec
+					InsecureSkipVerify: insecure,
 				},
 				TLSHandshakeTimeout:   10 * time.Second,
 				ExpectContinueTimeout: 1 * time.Second,

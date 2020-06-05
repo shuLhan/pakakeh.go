@@ -320,7 +320,7 @@ VAXA    A       10.2.0.27
 
 	m := newMaster()
 
-	for _, c := range cases { //nolint:dupl
+	for _, c := range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
@@ -333,7 +333,6 @@ VAXA    A       10.2.0.27
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
-		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
@@ -578,7 +577,7 @@ relay IN CNAME relay.pair.com.
 
 	m := newMaster()
 
-	for _, c := range cases { //nolint:dupl
+	for _, c := range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
@@ -591,7 +590,6 @@ relay IN CNAME relay.pair.com.
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
-		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
@@ -699,7 +697,7 @@ angularjs.doc       A  127.0.0.1
 
 	m := newMaster()
 
-	for _, c := range cases { //nolint:dupl
+	for _, c := range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
@@ -712,7 +710,6 @@ angularjs.doc       A  127.0.0.1
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
-		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)
@@ -783,7 +780,6 @@ func TestMasterParseTXT(t *testing.T) {
 
 		libtest.Assert(t, "messages length:", len(c.exp), len(m.msgs), true)
 
-		//nolint:dupl
 		for x, msg := range m.msgs {
 			libtest.Assert(t, "Message.Header", c.exp[x].Header, msg.Header, true)
 			libtest.Assert(t, "Message.Question", c.exp[x].Question, msg.Question, true)

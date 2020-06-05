@@ -238,7 +238,6 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 	return nil
 }
 
-//nolint: gocyclo
 func (in *Ini) unmarshalToStruct(rtipe reflect.Type, rvalue reflect.Value) {
 	numField := rtipe.NumField()
 	if numField == 0 {

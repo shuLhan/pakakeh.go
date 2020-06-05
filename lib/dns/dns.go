@@ -62,7 +62,6 @@ var (
 	ErrIPv6Length     = errors.New("invalid length of AAAA RDATA format")
 )
 
-//nolint:gochecknoglobals
 var (
 	// clientTimeout define read and write timeout on client request.
 	clientTimeout = 6 * time.Second
@@ -81,7 +80,6 @@ const (
 //
 // connTypeNames contains a mapping between connection type and its name.
 //
-//nolint:gochecknoglobals
 var connTypeNames = map[connType]string{
 	connTypeUDP: "UDP",
 	connTypeTCP: "TCP",
@@ -131,7 +129,6 @@ const (
 // QueryTypes contains a mapping between string representation of DNS query
 // type with their decimal value.
 //
-//nolint:gochecknoglobals
 var QueryTypes = map[string]uint16{
 	"A":     QueryTypeA,
 	"NS":    QueryTypeNS,
@@ -156,7 +153,6 @@ var QueryTypes = map[string]uint16{
 // QueryTypeNames contains mapping between query type and and their string
 // representation.
 //
-//nolint:gochecknoglobals
 var QueryTypeNames = map[uint16]string{
 	QueryTypeA:     "A",
 	QueryTypeNS:    "NS",
@@ -191,7 +187,6 @@ const (
 // QueryClasses contains a mapping between string representation of DNS query
 // class with their decimal value.
 //
-//nolint:gochecknoglobals
 var QueryClasses = map[string]uint16{
 	"IN": QueryClassIN,
 	"CH": QueryClassCH,
@@ -233,7 +228,6 @@ const (
 // rcodeNames contains mapping of response code with their human readable
 // names.
 //
-//nolint:gochecknoglobals
 var rcodeNames = map[ResponseCode]string{
 	RCodeOK:             "OK",
 	RCodeErrFormat:      "ERR_FORMAT",

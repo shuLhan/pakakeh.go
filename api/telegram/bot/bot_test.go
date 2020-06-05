@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	testBot *Bot //nolint: gochecknoglobals
+	testBot *Bot
 )
 
 func TestMain(m *testing.M) {

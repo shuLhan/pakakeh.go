@@ -46,7 +46,7 @@ const (
 )
 
 //TODO: list of keys that are not implemented.
-//nolint:varcheck,deadcode
+//nolint: deadcode,varcheck
 const (
 	keyCiphers                          = "ciphers"
 	keyControlMaster                    = "controlmaster"
@@ -129,7 +129,6 @@ type Config struct {
 //
 // NewConfig load SSH configuration from file.
 //
-//nolint: gocyclo
 func NewConfig(file string) (cfg *Config, err error) {
 	if len(file) == 0 {
 		return nil, nil

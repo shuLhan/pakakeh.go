@@ -238,7 +238,6 @@ func TestGetDefault(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestGetInputIni(t *testing.T) {
 	inputIni, err := Open(testdataInputIni)
 	if err != nil {

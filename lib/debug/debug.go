@@ -11,7 +11,6 @@ import (
 	"strconv"
 )
 
-//nolint:gochecknoglobals
 var (
 	// Value contains DEBUG value from environment.
 	Value = 0
@@ -20,7 +19,6 @@ var (
 //
 // init initialize debug from system environment.
 //
-//nolint:gochecknoinits
 func init() {
 	v := os.Getenv("DEBUG")
 	if len(v) > 0 {

@@ -33,7 +33,6 @@ func (table *Table) Insert(tx *sql.Tx) (ids []int64, err error) {
 			continue
 		}
 
-		//nolint: gosec
 		q := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
 			table.Name, strings.Join(names, ","),
 			strings.Join(holders, ","))

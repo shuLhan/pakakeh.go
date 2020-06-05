@@ -19,7 +19,6 @@ const (
 	testTLSPort          = 8053
 )
 
-//nolint:gochecknoglobals
 var (
 	_testServer *Server
 )

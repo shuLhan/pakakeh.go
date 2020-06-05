@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-//nolint:gochecknoglobals
 var (
 	ShortDayNames = []string{
 		"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",

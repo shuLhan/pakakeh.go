@@ -61,7 +61,6 @@ func TestCountAlnumDistribution(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestCountCharSequence(t *testing.T) {
 	cases := []struct {
 		text      string
@@ -196,7 +195,6 @@ func TestCountUpperLower(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestMaxCharSequence(t *testing.T) {
 	cases := []struct {
 		text  string

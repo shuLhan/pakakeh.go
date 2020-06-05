@@ -13,7 +13,6 @@ import (
 	"github.com/shuLhan/share/lib/text"
 )
 
-//nolint:gochecknoglobals
 var (
 	// DefDelimiter define default delimiter for new line.
 	DefDelimiter = byte('\n')

@@ -20,7 +20,6 @@ const (
 // queryOptionNames contains a mapping between query option and their text
 // representation.
 //
-//nolint:gochecknoglobals
 var queryOptionNames = map[QueryOption][]byte{
 	QueryOptionTXT: []byte("txt"),
 }

@@ -4,7 +4,6 @@
 
 package email
 
-//nolint:gochecknoglobals
 var specialChars = map[byte]struct{}{
 	'(': {}, ')': {},
 	'<': {}, '>': {},
