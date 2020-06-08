@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/shuLhan/share"
+	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
 const (
@@ -98,36 +99,13 @@ func NewClient(serverURL string, headers http.Header, insecure bool) (client *Cl
 // On success, it will return the uncompressed response body.
 //
 func (client *Client) Get(path string, params url.Values) (
-	resBody []byte, err error,
+	httpRes *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
 		path += "?" + params.Encode()
 	}
 
-	url := client.serverURL + path
-	httpReq, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("Get: %w", err)
-	}
-
-	client.setHeaders(httpReq)
-
-	httpRes, err := client.Client.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("Get: %w", err)
-	}
-
-	resBody, err = ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		return nil, fmt.Errorf("http: Get: %w", err)
-	}
-
-	err = httpRes.Body.Close()
-	if err != nil {
-		return nil, fmt.Errorf("Get: %w", err)
-	}
-
-	return client.uncompress(httpRes, resBody)
+	return client.doRequest(http.MethodGet, path, "", nil)
 }
 
 //
@@ -135,35 +113,11 @@ func (client *Client) Get(path string, params url.Values) (
 // "application/x-www-form-urlencoded".
 //
 func (client *Client) PostForm(path string, params url.Values) (
-	resBody []byte, err error,
+	httpRes *http.Response, resBody []byte, err error,
 ) {
-	url := client.serverURL + path
 	body := strings.NewReader(params.Encode())
 
-	httpReq, err := http.NewRequest(http.MethodPost, url, body)
-	if err != nil {
-		return nil, fmt.Errorf("client.PostForm: %w", err)
-	}
-
-	client.setHeaders(httpReq)
-	httpReq.Header.Set(HeaderContentType, ContentTypeForm)
-
-	httpRes, err := client.Client.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("client.PostForm: %w", err)
-	}
-
-	resBody, err = ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		return nil, fmt.Errorf("client.PostForm: %w", err)
-	}
-
-	err = httpRes.Body.Close()
-	if err != nil {
-		return nil, fmt.Errorf("client.PostForm: %w", err)
-	}
-
-	return client.uncompress(httpRes, resBody)
+	return client.doRequest(http.MethodPost, path, ContentTypeForm, body)
 }
 
 //
@@ -171,41 +125,16 @@ func (client *Client) PostForm(path string, params url.Values) (
 // using "multipart/form-data".
 //
 func (client *Client) PostFormData(path string, params map[string][]byte) (
-	resBody []byte, err error,
+	httpRes *http.Response, resBody []byte, err error,
 ) {
-	url := client.serverURL + path
-
 	contentType, strBody, err := generateFormData(params)
 	if err != nil {
-		return nil, fmt.Errorf("http: PostFormData: %w", err)
+		return nil, nil, fmt.Errorf("http: PostFormData: %w", err)
 	}
 
 	body := strings.NewReader(strBody)
 
-	httpReq, err := http.NewRequest(http.MethodPost, url, body)
-	if err != nil {
-		return nil, fmt.Errorf("http: PostFormData: %w", err)
-	}
-
-	client.setHeaders(httpReq)
-	httpReq.Header.Set(HeaderContentType, contentType)
-
-	httpRes, err := client.Client.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("http: PostFormData: %w", err)
-	}
-
-	resBody, err = ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		return nil, fmt.Errorf("http: PostFormData: %w", err)
-	}
-
-	err = httpRes.Body.Close()
-	if err != nil {
-		return nil, fmt.Errorf("http: PostFormData: %w", err)
-	}
-
-	return client.uncompress(httpRes, resBody)
+	return client.doRequest(http.MethodPost, path, contentType, body)
 }
 
 //
@@ -213,40 +142,79 @@ func (client *Client) PostFormData(path string, params map[string][]byte) (
 // and params encoded automatically to JSON.
 //
 func (client *Client) PostJSON(path string, params interface{}) (
-	resBody []byte, err error,
+	httpRes *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)
 	if err != nil {
-		return nil, fmt.Errorf("PostJSON: %w", err)
+		return nil, nil, fmt.Errorf("PostJSON: %w", err)
 	}
 
-	url := client.serverURL + path
 	body := bytes.NewReader(paramsJSON)
 
-	httpReq, err := http.NewRequest(http.MethodPost, url, body)
+	return client.doRequest(http.MethodPost, path, ContentTypeJSON, body)
+}
+
+//
+// PutJSON send the PUT request with content type set to "application/json"
+// and params encoded automatically to JSON.
+//
+func (client *Client) PutJSON(path string, params interface{}) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	paramsJSON, err := json.Marshal(params)
 	if err != nil {
-		return nil, fmt.Errorf("PostJSON: %w", err)
+		return nil, nil, fmt.Errorf("PutJSON: %w", err)
+	}
+
+	body := bytes.NewReader(paramsJSON)
+
+	return client.doRequest(http.MethodPut, path, ContentTypeJSON, body)
+}
+
+func (client *Client) doRequest(
+	httpMethod, path, contentType string,
+	body io.Reader,
+) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	fullURL := client.serverURL + path
+
+	httpReq, err := http.NewRequest(httpMethod, fullURL, body)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	client.setHeaders(httpReq)
-	httpReq.Header.Set(HeaderContentType, ContentTypeJSON)
+	if len(contentType) > 0 {
+		httpReq.Header.Set(HeaderContentType, contentType)
+	}
 
-	httpRes, err := client.Client.Do(httpReq)
+	httpRes, err = client.Client.Do(httpReq)
 	if err != nil {
-		return nil, fmt.Errorf("PostJSON: %w", err)
+		return nil, nil, err
 	}
 
 	resBody, err = ioutil.ReadAll(httpRes.Body)
 	if err != nil {
-		return nil, fmt.Errorf("PostJSON: %w", err)
+		return nil, nil, err
 	}
 
 	err = httpRes.Body.Close()
 	if err != nil {
-		return nil, fmt.Errorf("PostJSON: %w", err)
+		return httpRes, resBody, err
 	}
 
-	return client.uncompress(httpRes, resBody)
+	if httpRes.StatusCode >= 400 {
+		e := &liberrors.E{
+			Code:    httpRes.StatusCode,
+			Message: httpRes.Status,
+		}
+		return httpRes, resBody, e
+	}
+
+	resBody, err = client.uncompress(httpRes, resBody)
+
+	return httpRes, resBody, err
 }
 
 //
