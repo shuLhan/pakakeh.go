@@ -322,7 +322,9 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	node, e = srv.Memfs.Get(reqPath)
 	if e != nil {
 		if e != os.ErrNotExist {
-			log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
+			if debug.Value >= 3 {
+				log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
+			}
 			return nil
 		}
 
