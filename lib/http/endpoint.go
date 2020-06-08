@@ -148,9 +148,15 @@ func (ep *Endpoint) call(
 		res.Header().Set(HeaderContentType, ContentTypePlain)
 	}
 
-	_, e = res.Write(rspb)
-	if e != nil {
-		log.Printf("endpoint.call: %s %s %s\n", req.Method, req.URL.Path, e)
+	var nwrite int
+	for nwrite < len(rspb) {
+		n, err := res.Write(rspb[nwrite:])
+		if err != nil {
+			log.Printf("endpoint.call: %s %s %s\n", req.Method,
+				req.URL.Path, e)
+			break
+		}
+		nwrite += n
 	}
 }
 
