@@ -127,11 +127,9 @@ func (ep *Endpoint) call(
 
 	rspb, e := ep.Call(res, req, reqBody)
 	if e != nil {
-		if debug.Value >= 3 {
-			log.Printf("endpoint.call: %d %s %s %s\n",
-				http.StatusInternalServerError,
-				req.Method, req.URL.Path, e)
-		}
+		log.Printf("endpoint.call: %d %s %s %s\n",
+			http.StatusInternalServerError,
+			req.Method, req.URL.Path, e)
 		ep.error(res, e)
 		return
 	}
