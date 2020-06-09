@@ -38,10 +38,10 @@ const (
 type Server struct {
 	Clients *ClientManager
 
-	pingTicker *time.Ticker
-	port       int
-	sock       int
-	chUpgrade  chan int
+	port      int
+	sock      int
+	chUpgrade chan int
+	running   chan struct{}
 
 	poll libnet.Poll
 
@@ -91,6 +91,7 @@ func NewServer(port int) (serv *Server) {
 		port:    port,
 		Clients: newClientManager(),
 		routes:  newRootRoute(),
+		running: make(chan struct{}),
 	}
 
 	serv.HandleBin = serv.handleBin
@@ -685,22 +686,26 @@ func (serv *Server) reader() {
 // every N seconds.
 //
 func (serv *Server) pinger() {
-	serv.pingTicker = time.NewTicker(16 * time.Second)
+	pingTicker := time.NewTicker(16 * time.Second)
 	framePing := NewFramePing(false, nil)
 
-	for range serv.pingTicker.C {
-		all := serv.Clients.All()
+	for {
+		select {
+		case <-pingTicker.C:
+			all := serv.Clients.All()
 
-		for _, conn := range all {
-			err := Send(conn, framePing)
-			if err != nil {
-				// Error on sending PING will be assumed as
-				// bad connection.
-				serv.ClientRemove(conn)
+			for _, conn := range all {
+				err := Send(conn, framePing)
+				if err != nil {
+					// Error on sending PING will be assumed as
+					// bad connection.
+					serv.ClientRemove(conn)
+				}
 			}
+		case <-serv.running:
+			return
 		}
 	}
-	// The ticker only closed by Stop.
 }
 
 //
@@ -727,6 +732,10 @@ func (serv *Server) Start() (err error) {
 	for {
 		conn, _, err = unix.Accept(serv.sock)
 		if err != nil {
+			if err.Error() == "software caused connection abort" {
+				// Stop has been called
+				return nil
+			}
 			log.Println("websocket: unix.Accept: " + err.Error())
 			return
 		}
@@ -744,7 +753,7 @@ func (serv *Server) Stop() {
 		log.Println("websocket: Stop: unix.Close: " + err.Error())
 	}
 
-	serv.pingTicker.Stop()
+	serv.running <- struct{}{}
 
 	serv.poll.Close()
 
