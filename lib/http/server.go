@@ -5,6 +5,8 @@
 package http
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -309,7 +311,24 @@ func (srv *Server) Start() (err error) {
 	} else {
 		err = srv.ListenAndServeTLS("", "")
 	}
+	if errors.Is(err, http.ErrServerClosed) {
+		err = nil
+	}
 	return err
+}
+
+//
+// Stop the server using Shutdown method. The wait is set default and minimum
+// to five seconds.
+//
+func (srv *Server) Stop(wait time.Duration) (err error) {
+	var defWait = 5 * time.Second
+	if wait <= defWait {
+		wait = defWait
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	return srv.Shutdown(ctx)
 }
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {

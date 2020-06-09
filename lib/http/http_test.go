@@ -69,5 +69,12 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	os.Exit(m.Run())
+	status := m.Run()
+
+	err = testServer.Stop(0)
+	if err != nil {
+		log.Println("testServer.Stop: ", err)
+	}
+
+	os.Exit(status)
 }
