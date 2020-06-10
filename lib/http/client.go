@@ -94,6 +94,21 @@ func NewClient(serverURL string, headers http.Header, insecure bool) (client *Cl
 }
 
 //
+// Delete send the DELETE request to server using path and params as query
+// parameters.
+// On success, it will return the uncompressed response body.
+//
+func (client *Client) Delete(headers http.Header, path string, params url.Values) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	if params != nil {
+		path += "?" + params.Encode()
+	}
+
+	return client.doRequest(http.MethodDelete, headers, path, "", nil)
+}
+
+//
 // Get send the GET request to server using path and params as query
 // parameters.
 // On success, it will return the uncompressed response body.
