@@ -1,4 +1,4 @@
-// Copyright 2020, Shulhan <m.shulhan@gmail.com>. All rights reserved.
+// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -30,7 +30,7 @@ import (
 
 const (
 	defUserAgent = "libhttp/" + share.Version +
-		" (github.com/shuLhan/share/lib/http; m.shulhan@gmail.com)"
+		" (github.com/shuLhan/share/lib/http; ms@kilabit.info)"
 )
 
 //

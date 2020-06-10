@@ -1,4 +1,4 @@
-// Copyright 2020, Shulhan <m.shulhan@gmail.com>. All rights reserved.
+// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -48,7 +48,7 @@ func TestCopy(t *testing.T) {
 		desc: "With input and output",
 		in:   "testdata/input.txt",
 		out:  "testdata/output.txt",
-		exp: `Copyright (c) 2018 M. Shulhan (m.shulhan@gmail.com). All rights reserved.
+		exp: `Copyright (c) 2018 M. Shulhan (ms@kilabit.info). All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
