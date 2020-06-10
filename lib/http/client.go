@@ -98,33 +98,37 @@ func NewClient(serverURL string, headers http.Header, insecure bool) (client *Cl
 // parameters.
 // On success, it will return the uncompressed response body.
 //
-func (client *Client) Get(path string, params url.Values) (
+func (client *Client) Get(headers http.Header, path string, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
 		path += "?" + params.Encode()
 	}
 
-	return client.doRequest(http.MethodGet, path, "", nil)
+	return client.doRequest(http.MethodGet, headers, path, "", nil)
 }
 
 //
 // PostForm send the POST request to path using
 // "application/x-www-form-urlencoded".
 //
-func (client *Client) PostForm(path string, params url.Values) (
+func (client *Client) PostForm(headers http.Header, path string, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	body := strings.NewReader(params.Encode())
 
-	return client.doRequest(http.MethodPost, path, ContentTypeForm, body)
+	return client.doRequest(http.MethodPost, headers, path, ContentTypeForm, body)
 }
 
 //
 // PostFormData send the POST request to path with all parameters is send
 // using "multipart/form-data".
 //
-func (client *Client) PostFormData(path string, params map[string][]byte) (
+func (client *Client) PostFormData(
+	path string,
+	headers http.Header,
+	params map[string][]byte,
+) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	contentType, strBody, err := generateFormData(params)
@@ -134,14 +138,14 @@ func (client *Client) PostFormData(path string, params map[string][]byte) (
 
 	body := strings.NewReader(strBody)
 
-	return client.doRequest(http.MethodPost, path, contentType, body)
+	return client.doRequest(http.MethodPost, headers, path, contentType, body)
 }
 
 //
 // PostJSON send the POST request with content type set to "application/json"
 // and params encoded automatically to JSON.
 //
-func (client *Client) PostJSON(path string, params interface{}) (
+func (client *Client) PostJSON(headers http.Header, path string, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)
@@ -151,14 +155,14 @@ func (client *Client) PostJSON(path string, params interface{}) (
 
 	body := bytes.NewReader(paramsJSON)
 
-	return client.doRequest(http.MethodPost, path, ContentTypeJSON, body)
+	return client.doRequest(http.MethodPost, headers, path, ContentTypeJSON, body)
 }
 
 //
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
 //
-func (client *Client) PutJSON(path string, params interface{}) (
+func (client *Client) PutJSON(headers http.Header, path string, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)
@@ -168,11 +172,13 @@ func (client *Client) PutJSON(path string, params interface{}) (
 
 	body := bytes.NewReader(paramsJSON)
 
-	return client.doRequest(http.MethodPut, path, ContentTypeJSON, body)
+	return client.doRequest(http.MethodPut, headers, path, ContentTypeJSON, body)
 }
 
 func (client *Client) doRequest(
-	httpMethod, path, contentType string,
+	httpMethod string,
+	headers http.Header,
+	path, contentType string,
 	body io.Reader,
 ) (
 	httpRes *http.Response, resBody []byte, err error,
@@ -184,7 +190,9 @@ func (client *Client) doRequest(
 		return nil, nil, err
 	}
 
-	client.setHeaders(httpReq)
+	client.setHeaders(httpReq, client.defHeaders)
+	client.setHeaders(httpReq, headers)
+
 	if len(contentType) > 0 {
 		httpReq.Header.Set(HeaderContentType, contentType)
 	}
@@ -196,7 +204,7 @@ func (client *Client) doRequest(
 
 	resBody, err = ioutil.ReadAll(httpRes.Body)
 	if err != nil {
-		return nil, nil, err
+		return httpRes, nil, err
 	}
 
 	err = httpRes.Body.Close()
@@ -218,14 +226,16 @@ func (client *Client) doRequest(
 }
 
 //
-// setHeaders set the request headers to default headers.
-// If the header's key contains more than one value, the last one will be
-// used.
+// setHeaders set the request headers.
 //
-func (client *Client) setHeaders(req *http.Request) {
-	for k, v := range client.defHeaders {
-		if len(v) > 0 {
-			req.Header.Set(k, v[len(v)-1])
+func (client *Client) setHeaders(req *http.Request, headers http.Header) {
+	for k, v := range headers {
+		for x, hv := range v {
+			if x == 0 {
+				req.Header.Set(k, hv)
+			} else {
+				req.Header.Add(k, hv)
+			}
 		}
 	}
 }
