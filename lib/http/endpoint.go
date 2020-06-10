@@ -7,6 +7,7 @@ package http
 import (
 	"bytes"
 	"encoding/json"
+	stderrors "errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -158,25 +159,27 @@ func (ep *Endpoint) call(
 	}
 }
 
-func (ep *Endpoint) error(res http.ResponseWriter, e error) {
-	se, ok := e.(*errors.E)
-	if !ok {
-		se = errors.Internal(e)
-	} else if se.Code == 0 {
-		se.Code = http.StatusInternalServerError
+func (ep *Endpoint) error(res http.ResponseWriter, err error) {
+	errInternal := &errors.E{}
+	if stderrors.As(err, &errInternal) {
+		if errInternal.Code <= 0 || errInternal.Code >= 512 {
+			errInternal.Code = http.StatusInternalServerError
+		}
+	} else {
+		errInternal = errors.Internal(err)
 	}
 
-	res.WriteHeader(se.Code)
+	res.WriteHeader(errInternal.Code)
 	res.Header().Set(HeaderContentType, ContentTypeJSON)
 
-	rsp, err := json.Marshal(se)
+	rsp, err := json.Marshal(errInternal)
 	if err != nil {
-		log.Println("endpoint.error: ", e)
+		log.Println("endpoint.error: ", err)
 		return
 	}
 
-	_, e = res.Write(rsp)
-	if e != nil {
-		log.Println("endpoint.error: ", e)
+	_, err = res.Write(rsp)
+	if err != nil {
+		log.Println("endpoint.error: ", err)
 	}
 }
