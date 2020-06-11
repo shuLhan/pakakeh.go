@@ -113,7 +113,7 @@ func (ep *Endpoint) call(
 	for _, eval := range evaluators {
 		e = eval(req, reqBody)
 		if e != nil {
-			ep.error(res, e)
+			ep.error(res, req, e)
 			return
 		}
 	}
@@ -121,17 +121,14 @@ func (ep *Endpoint) call(
 	if ep.Eval != nil {
 		e = ep.Eval(req, reqBody)
 		if e != nil {
-			ep.error(res, e)
+			ep.error(res, req, e)
 			return
 		}
 	}
 
 	rspb, e := ep.Call(res, req, reqBody)
 	if e != nil {
-		log.Printf("endpoint.call: %d %s %s %s\n",
-			http.StatusInternalServerError,
-			req.Method, req.URL.Path, e)
-		ep.error(res, e)
+		ep.error(res, req, e)
 		return
 	}
 
@@ -159,13 +156,17 @@ func (ep *Endpoint) call(
 	}
 }
 
-func (ep *Endpoint) error(res http.ResponseWriter, err error) {
+func (ep *Endpoint) error(res http.ResponseWriter, req *http.Request, err error) {
 	errInternal := &errors.E{}
 	if stderrors.As(err, &errInternal) {
 		if errInternal.Code <= 0 || errInternal.Code >= 512 {
 			errInternal.Code = http.StatusInternalServerError
 		}
 	} else {
+		log.Printf("endpoint.call: %d %s %s %s\n",
+			http.StatusInternalServerError,
+			req.Method, req.URL.Path, err)
+
 		errInternal = errors.Internal(err)
 	}
 
