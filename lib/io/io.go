@@ -27,7 +27,7 @@ func Copy(out, in string) (err error) {
 		return fmt.Errorf("Copy: failed to open input file: %s", err)
 	}
 
-	fout, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE, 0600)
+	fout, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("Copy: failed to open output file: %s", err)
 	}
