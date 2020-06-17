@@ -140,8 +140,8 @@ func (client *Client) PostForm(headers http.Header, path string, params url.Valu
 // using "multipart/form-data".
 //
 func (client *Client) PostFormData(
-	path string,
 	headers http.Header,
+	path string,
 	params map[string][]byte,
 ) (
 	httpRes *http.Response, resBody []byte, err error,
