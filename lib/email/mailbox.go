@@ -100,7 +100,7 @@ func ParseMailbox(raw []byte) (mbox *Mailbox, err error) {
 func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 	raw = bytes.TrimSpace(raw)
 	if len(raw) == 0 {
-		return nil, errors.New("ParseMailboxes: empty address")
+		return nil, fmt.Errorf("ParseMailboxes %q: empty address", raw)
 	}
 
 	r := &libio.Reader{}
@@ -123,7 +123,7 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 		case '(':
 			_, err = skipComment(r)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("ParseMailboxes %q: %w", raw, err)
 			}
 			if len(tok) > 0 {
 				value = append(value, tok...)
@@ -131,7 +131,7 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 
 		case ':':
 			if state != stateBegin {
-				return nil, errors.New("ParseMailboxes: invalid character: ':'")
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: ':'", raw)
 			}
 			isGroup = true
 			value = nil
@@ -140,7 +140,7 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 
 		case '<':
 			if state >= stateLocalPart {
-				return nil, errors.New("ParseMailboxes: invalid character: '<'")
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: '<'", raw)
 			}
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
@@ -155,18 +155,18 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 
 		case '@':
 			if state >= stateDomain {
-				return nil, errors.New("ParseMailboxes: invalid character: '@'")
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: '@'", raw)
 			}
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
 			if len(value) == 0 {
-				return nil, errors.New("ParseMailboxes: empty local")
+				return nil, fmt.Errorf("ParseMailboxes %q: empty local", raw)
 			}
 			if mbox == nil {
 				mbox = &Mailbox{}
 			}
 			if !IsValidLocal(value) {
-				return nil, fmt.Errorf("ParseMailboxes: invalid local: '%s'", value)
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid local: '%s'", raw, value)
 			}
 			mbox.Local = value
 			value = nil
@@ -174,13 +174,13 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 
 		case '>':
 			if state > stateDomain || !mbox.isAngle {
-				return nil, errors.New("ParseMailboxes: invalid character: '>'")
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: '>'", raw)
 			}
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
 			if state == stateDomain {
 				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes: invalid domain: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
 				}
 			}
 			mbox.Domain = value
@@ -192,17 +192,17 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 
 		case ';':
 			if state < stateDomain || !isGroup {
-				return nil, errors.New("ParseMailboxes: invalid character: ';'")
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: ';'", raw)
 			}
 			if mbox != nil && mbox.isAngle {
-				return nil, errors.New("ParseMailboxes: missing '>'")
+				return nil, fmt.Errorf("ParseMailboxes %q: missing '>'", raw)
 			}
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
 			switch state {
 			case stateDomain:
 				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes: invalid domain: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
 				}
 				mbox.Domain = value
 				mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)
@@ -210,7 +210,7 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 				mbox = nil
 			case stateEnd:
 				if len(value) > 0 {
-					return nil, fmt.Errorf("ParseMailboxes: invalid token: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: invalid token: '%s'", raw, value)
 				}
 			}
 			isGroup = false
@@ -218,17 +218,17 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 			state = stateGroupEnd
 		case ',':
 			if state < stateDomain {
-				return nil, errors.New("ParseMailboxes: invalid character: ','")
+				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: ','", raw)
 			}
 			if mbox != nil && mbox.isAngle {
-				return nil, errors.New("ParseMailboxes: missing '>'")
+				return nil, fmt.Errorf("ParseMailboxes %q: missing '>'", raw)
 			}
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
 			switch state {
 			case stateDomain:
 				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes: invalid domain: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
 				}
 				mbox.Domain = value
 				mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)
@@ -236,33 +236,33 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 				mbox = nil
 			case stateEnd:
 				if len(value) > 0 {
-					return nil, fmt.Errorf("ParseMailboxes: invalid token: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: invalid token: '%s'", raw, value)
 				}
 			}
 			value = nil
 			state = stateBegin
 		case 0:
 			if state < stateDomain {
-				return nil, errors.New("ParseMailboxes: empty or invalid address")
+				return nil, fmt.Errorf("ParseMailboxes %q: empty or invalid address", raw)
 			}
 			if state != stateEnd && mbox != nil && mbox.isAngle {
-				return nil, errors.New("ParseMailboxes: missing '>'")
+				return nil, fmt.Errorf("ParseMailboxes %q: missing '>'", raw)
 			}
 			if isGroup {
-				return nil, errors.New("ParseMailboxes: missing ';'")
+				return nil, fmt.Errorf("ParseMailboxes %q: missing ';'", raw)
 			}
 
 			value = append(value, tok...)
 			value = bytes.TrimSpace(value)
 			if state == stateGroupEnd {
 				if len(value) > 0 {
-					return nil, fmt.Errorf("ParseMailboxes: trailing text: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: trailing text: '%s'", raw, value)
 				}
 			}
 
 			if state == stateDomain {
 				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes: invalid domain: '%s'", value)
+					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
 				}
 				mbox.Domain = value
 				mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)

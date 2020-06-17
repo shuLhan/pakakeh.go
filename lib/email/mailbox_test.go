@@ -55,35 +55,35 @@ func TestParseMailboxes(t *testing.T) {
 		exp    string
 	}{{
 		desc:   "With empty input",
-		expErr: "ParseMailboxes: empty address",
+		expErr: "ParseMailboxes %q: empty address",
 	}, {
 		desc:   "With comment only",
 		in:     "(comment)",
-		expErr: "ParseMailboxes: empty or invalid address",
+		expErr: "ParseMailboxes %q: empty or invalid address",
 	}, {
 		desc:   "With no domain",
 		in:     "(comment)local(comment)",
-		expErr: "ParseMailboxes: empty or invalid address",
+		expErr: "ParseMailboxes %q: empty or invalid address",
 	}, {
 		desc:   "With no opening comment",
 		in:     "comment)local@domain",
-		expErr: "ParseMailboxes: invalid local: 'comment)local'",
+		expErr: "ParseMailboxes %q: invalid local: 'comment)local'",
 	}, {
 		desc:   "With no closing comment",
 		in:     "(commentlocal@domain",
-		expErr: "missing comment close parentheses",
+		expErr: "ParseMailboxes %q: missing comment close parentheses",
 	}, {
 		desc:   "With no opening bracket",
 		in:     "(comment)local(comment)@domain>",
-		expErr: "ParseMailboxes: invalid character: '>'",
+		expErr: "ParseMailboxes %q: invalid character: '>'",
 	}, {
 		desc:   "With no closing bracket",
 		in:     "<(comment)local(comment)@domain",
-		expErr: "ParseMailboxes: missing '>'",
+		expErr: "ParseMailboxes %q: missing '>'",
 	}, {
 		desc:   "With ':' inside mailbox",
 		in:     "<local:part@domain>",
-		expErr: "ParseMailboxes: invalid character: ':'",
+		expErr: "ParseMailboxes %q: invalid character: ':'",
 	}, {
 		desc: "With '<' inside local part",
 		in:   "local<part@domain>",
@@ -91,11 +91,11 @@ func TestParseMailboxes(t *testing.T) {
 	}, {
 		desc:   "With multiple '<'",
 		in:     "Name <local<part@domain>",
-		expErr: "ParseMailboxes: invalid character: '<'",
+		expErr: "ParseMailboxes %q: invalid character: '<'",
 	}, {
 		desc:   "With multiple '@'",
 		in:     "Name <local@part@domain>",
-		expErr: "ParseMailboxes: invalid character: '@'",
+		expErr: "ParseMailboxes %q: invalid character: '@'",
 	}, {
 		desc: "With no domain",
 		in:   "Name <local>",
@@ -103,15 +103,15 @@ func TestParseMailboxes(t *testing.T) {
 	}, {
 		desc:   "With empty local",
 		in:     "Name <@domain>",
-		expErr: "ParseMailboxes: empty local",
+		expErr: "ParseMailboxes %q: empty local",
 	}, {
 		desc:   "With empty domain",
 		in:     "Name <local@>, test@domain",
-		expErr: "ParseMailboxes: invalid domain: ''",
+		expErr: "ParseMailboxes %q: invalid domain: ''",
 	}, {
 		desc:   "With invalid domain",
 		in:     "Name <local@dom[ain>, test@domain",
-		expErr: "ParseMailboxes: invalid domain: 'dom[ain'",
+		expErr: "ParseMailboxes %q: invalid domain: 'dom[ain'",
 	}, {
 		desc: "With no bracket, single address",
 		in:   "local@domain",
@@ -135,7 +135,7 @@ func TestParseMailboxes(t *testing.T) {
 	}, {
 		desc:   "With ';' on multiple mailboxes",
 		in:     "One <one@example> ; (comment)",
-		expErr: "ParseMailboxes: invalid character: ';'",
+		expErr: "ParseMailboxes %q: invalid character: ';'",
 	}, {
 		desc: "With group list, single address",
 		in:   "Group name: <(c)local(c)@(c)domain(c)>;(c)",
@@ -143,11 +143,11 @@ func TestParseMailboxes(t *testing.T) {
 	}, {
 		desc:   "With group, missing '>'",
 		in:     "Group name:One <one@example ; (comment)",
-		expErr: "ParseMailboxes: missing '>'",
+		expErr: "ParseMailboxes %q: missing '>'",
 	}, {
 		desc:   "With group, missing ';'",
 		in:     "Group name:One <one@example>",
-		expErr: "ParseMailboxes: missing ';'",
+		expErr: "ParseMailboxes %q: missing ';'",
 	}, {
 		desc: "With group, without bracket",
 		in:   "Group name: one@example ; (comment)",
@@ -155,15 +155,15 @@ func TestParseMailboxes(t *testing.T) {
 	}, {
 		desc:   "With group, without bracket, invalid domain",
 		in:     "Group name: one@exa[mple ; (comment)",
-		expErr: "ParseMailboxes: invalid domain: 'exa[mple'",
+		expErr: "ParseMailboxes %q: invalid domain: 'exa[mple'",
 	}, {
 		desc:   "With group, trailing text before ';'",
 		in:     "Group name: <one@example> trail ; (comment)",
-		expErr: "ParseMailboxes: invalid token: 'trail'",
+		expErr: "ParseMailboxes %q: invalid token: 'trail'",
 	}, {
 		desc:   "With group, trailing text",
 		in:     "Group name: <(c)local(c)@(c)domain(c)>; trail(c)",
-		expErr: "ParseMailboxes: trailing text: 'trail'",
+		expErr: "ParseMailboxes %q: trailing text: 'trail'",
 	}, {
 		desc: "With group, multiple addresses",
 		in:   "(c)Group name(c): <(c)local(c)@(c)domain(c)>, Test One <test@one>;(c)",
@@ -171,23 +171,23 @@ func TestParseMailboxes(t *testing.T) {
 	}, {
 		desc:   "With list, invalid ','",
 		in:     "on,e@example , two@example",
-		expErr: "ParseMailboxes: invalid character: ','",
+		expErr: "ParseMailboxes %q: invalid character: ','",
 	}, {
 		desc:   "With list, missing '>'",
 		in:     "<one@example , <two@example>",
-		expErr: "ParseMailboxes: missing '>'",
+		expErr: "ParseMailboxes %q: missing '>'",
 	}, {
 		desc:   "With list, invalid domain",
 		in:     "one@ex[ample , <two@example>",
-		expErr: "ParseMailboxes: invalid domain: 'ex[ample'",
+		expErr: "ParseMailboxes %q: invalid domain: 'ex[ample'",
 	}, {
 		desc:   "With list, invalid domain",
 		in:     "one@example, two@exa[mple",
-		expErr: "ParseMailboxes: invalid domain: 'exa[mple'",
+		expErr: "ParseMailboxes %q: invalid domain: 'exa[mple'",
 	}, {
 		desc:   "With list, trailing text after '>'",
 		in:     "<one@example> trail, <two@example>",
-		expErr: "ParseMailboxes: invalid token: 'trail'",
+		expErr: "ParseMailboxes %q: invalid token: 'trail'",
 	}, {
 		desc: "RFC 5322 example",
 		in: "A Group(Some people)\r\n" +
@@ -210,7 +210,8 @@ func TestParseMailboxes(t *testing.T) {
 
 		mboxes, err := ParseMailboxes([]byte(c.in))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			exp := fmt.Sprintf(c.expErr, c.in)
+			test.Assert(t, "error", exp, err.Error(), true)
 			continue
 		}
 
