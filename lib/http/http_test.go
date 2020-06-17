@@ -63,7 +63,7 @@ func TestMain(m *testing.M) {
 	}
 
 	go func() {
-		err = testServer.Start()
+		err := testServer.Start()
 		if err != nil {
 			log.Fatal(err)
 		}
