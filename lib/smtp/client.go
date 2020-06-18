@@ -264,7 +264,12 @@ func (cl *Client) Quit() (res *Response, err error) {
 		res, err = cl.recv()
 	}
 
-	_ = cl.conn.Close()
+	errClose := cl.conn.Close()
+	if errClose != nil {
+		if err == nil {
+			err = errClose
+		}
+	}
 
 	return res, err
 }
