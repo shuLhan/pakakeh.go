@@ -10,6 +10,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/url"
 	"os"
@@ -428,6 +429,9 @@ func (cl *Client) recv() (res *Response, err error) {
 			_, _ = cl.buf.Write(cl.data[:n])
 		}
 		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
 			return nil, err
 		}
 		if n == cap(cl.data) {
