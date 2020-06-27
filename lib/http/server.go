@@ -336,23 +336,23 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 		return nil
 	}
 
-	var e error
+	var err error
 
-	node, e = srv.Memfs.Get(reqPath)
-	if e != nil {
-		if e != os.ErrNotExist {
+	node, err = srv.Memfs.Get(reqPath)
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
 			if debug.Value >= 3 {
-				log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
+				log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
 			}
 			return nil
 		}
 
 		reqPath = path.Join(reqPath, "index.html")
 
-		node, e = srv.Memfs.Get(reqPath)
-		if e != nil {
+		node, err = srv.Memfs.Get(reqPath)
+		if err != nil {
 			if debug.Value >= 3 {
-				log.Printf("http: getFSNode %q: %s", reqPath, e.Error())
+				log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
 			}
 			return nil
 		}
@@ -360,8 +360,8 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 	if node.IsDir() {
 		indexHTML := path.Join(reqPath, "index.html")
-		node, e = srv.Memfs.Get(indexHTML)
-		if e != nil {
+		node, err = srv.Memfs.Get(indexHTML)
+		if err != nil {
 			return nil
 		}
 	}
