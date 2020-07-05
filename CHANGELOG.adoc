@@ -3,6 +3,39 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.17.0 (2020-07-05)
+
+===  Breaking changes
+
+*  dns: replace RDataText with plain []byte
+
+*  http: add parameter headers to client methods
+
+*  http: return the http.Response as the first parameter
+
+===  Bug fixes
+
+*  http: initialize TLSClientConfig only if insecure is true
+
+*  io: truncate file on Copy
+
+*  websocket: fix race on pingTicker when stopping server
+
+===  Enhancements
+
+*  http: check for possible index.html file on getFSNode
+
+*  http: add method Delete
+
+*  http: add method Stop for HTTP server
+
+*  http: check the number of bytes written on ResponseWriter.Write
+
+*  http: log error if path not exist if debug value is set to 3 or greater
+
+*  smtp: check for EOF when receiving data from server
+
+
 ==  share v0.16.0 (2020-06-05)
 
 ===  Breaking changes
