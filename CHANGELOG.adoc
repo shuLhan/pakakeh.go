@@ -3,6 +3,17 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.18.0 (2020-08-xx)
+
+===  Breaking changes
+
+* big: add global flag MarshalJSONAsString
+
+MarshalJSONAsString define the default return behaviour of MarshalJSON().
+If its true (the default) the returned JSON format will encapsulated in
+double quote, as string instead of as numeric.
+
+
 ==  share v0.17.0 (2020-07-05)
 
 ===  Breaking changes

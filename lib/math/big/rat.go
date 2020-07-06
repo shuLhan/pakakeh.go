@@ -259,10 +259,15 @@ func (r *Rat) IsZero() bool {
 // String method.
 //
 func (r *Rat) MarshalJSON() ([]byte, error) {
+	var s string
 	if r == nil {
-		return []byte("0"), nil
+		s = "0"
+	} else {
+		s = r.String()
 	}
-	s := r.String()
+	if MarshalJSONAsString {
+		s = `"` + s + `"`
+	}
 	return []byte(s), nil
 }
 

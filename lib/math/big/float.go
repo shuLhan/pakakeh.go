@@ -242,6 +242,9 @@ func (f *Float) IsZero() bool {
 //
 func (f *Float) MarshalJSON() ([]byte, error) {
 	s := f.String()
+	if MarshalJSONAsString {
+		s = `"` + s + `"`
+	}
 	return []byte(s), nil
 }
 
