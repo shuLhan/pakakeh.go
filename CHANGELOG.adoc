@@ -13,6 +13,11 @@ MarshalJSONAsString define the default return behaviour of MarshalJSON().
 If its true (the default) the returned JSON format will encapsulated in
 double quote, as string instead of as numeric.
 
+* http: do not return error based on response code
+
+The error in doRequest should be about connection error, everything
+else should be handled by user.
+
 
 ==  share v0.17.0 (2020-07-05)
 

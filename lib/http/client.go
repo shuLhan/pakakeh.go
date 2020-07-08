@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/shuLhan/share"
-	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
 const (
@@ -225,14 +224,6 @@ func (client *Client) doRequest(
 	err = httpRes.Body.Close()
 	if err != nil {
 		return httpRes, resBody, err
-	}
-
-	if httpRes.StatusCode >= 400 {
-		e := &liberrors.E{
-			Code:    httpRes.StatusCode,
-			Message: httpRes.Status,
-		}
-		return httpRes, resBody, e
 	}
 
 	resBody, err = client.uncompress(httpRes, resBody)
