@@ -159,6 +159,26 @@ func (p *Parser) Load(content, delims string) {
 }
 
 //
+// Line read and return a single line.
+// On success it will return a string without '\n' and new line character.
+// In case of EOF it will return the last line and 0.
+//
+func (p *Parser) Line() (string, rune) {
+	p.d = 0
+	p.token = p.token[:0]
+
+	for x, r := range p.v[p.x:] {
+		if r == '\n' {
+			p.d = r
+			p.x += x + 1
+			return string(p.token), p.d
+		}
+		p.token = append(p.token, r)
+	}
+	return string(p.token), 0
+}
+
+//
 // Token read the next token from content until one of the delimiter found.
 // if no delimiter found, its mean all of content has been read, the returned
 // delimiter will be 0.
