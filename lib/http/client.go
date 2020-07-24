@@ -173,6 +173,17 @@ func (client *Client) PostJSON(headers http.Header, path string, params interfac
 }
 
 //
+// Put send the HTTP PUT request with specific content type and body to
+// specific path at the server.
+//
+func (client *Client) Put(headers http.Header, path, contentType string, body []byte) (
+	*http.Response, []byte, error,
+) {
+	bodyReader := bytes.NewReader(body)
+	return client.doRequest(http.MethodPut, headers, path, contentType, bodyReader)
+}
+
+//
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
 //
