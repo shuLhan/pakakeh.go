@@ -65,7 +65,7 @@ const (
 //	! : no answer found on cache and the query is not recursive, or
 //	    response contains error code
 //	^ : request is forwarded to parent name server
-//      * : request is dropped from queue
+//	* : request is dropped from queue
 //	~ : answer exist on cache but its expired
 //	- : answer is pruned from caches
 //	+ : new answer is added to caches
@@ -191,6 +191,20 @@ func (srv *Server) PopulateCaches(msgs []*Message) {
 	if debug.Value >= 1 {
 		fmt.Printf("dns: %d out of %d records cached\n", n, len(msgs))
 	}
+}
+
+//
+// RemoveCachesByNames remove the caches by domain names.
+//
+func (srv *Server) RemoveCachesByNames(names []string) {
+	srv.caches.Lock()
+	for x := 0; x < len(names); x++ {
+		if debug.Value >= 1 {
+			fmt.Println("dns: - ", names[x])
+		}
+		delete(srv.caches.v, names[x])
+	}
+	srv.caches.Unlock()
 }
 
 //
