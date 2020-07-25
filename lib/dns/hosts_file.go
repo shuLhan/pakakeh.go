@@ -3,14 +3,11 @@ package dns
 import (
 	"fmt"
 	"log"
-	"net"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
-	libnet "github.com/shuLhan/share/lib/net"
 )
 
 // List of known hosts file by OS.
@@ -120,55 +117,6 @@ func ParseHostsFile(path string) (hostsFile *HostsFile, err error) {
 	return hostsFile, nil
 }
 
-func newMessage(addr, hname []byte) *Message {
-	if !libnet.IsHostnameValid(hname, false) {
-		return nil
-	}
-	ip := net.ParseIP(string(addr))
-	if ip == nil {
-		return nil
-	}
-
-	qtype := QueryTypeA
-	for x := 0; x < len(addr); x++ {
-		if addr[x] == ':' {
-			qtype = QueryTypeAAAA
-			break
-		}
-	}
-
-	ascii.ToLower(&hname)
-	rrName := make([]byte, len(hname))
-	copy(rrName, hname)
-
-	msg := &Message{
-		Header: SectionHeader{
-			IsAA:    true,
-			QDCount: 1,
-			ANCount: 1,
-		},
-		Question: SectionQuestion{
-			Name:  hname,
-			Type:  qtype,
-			Class: QueryClassIN,
-		},
-		Answer: []ResourceRecord{{
-			Name:  rrName,
-			Type:  qtype,
-			Class: QueryClassIN,
-			TTL:   defaultTTL,
-			Text:  addr,
-		}},
-	}
-
-	_, err := msg.Pack()
-	if err != nil {
-		return nil
-	}
-
-	return msg
-}
-
 //
 // Fields of the entry are separated by any number of blanks and/or tab
 // characters.
@@ -221,7 +169,7 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 			}
 			hname, isTerm, c := reader.ReadUntil(seps, terms)
 			if len(hname) > 0 {
-				msg := newMessage(addr, hname)
+				msg := NewMessageAddress(hname, [][]byte{addr})
 				if msg != nil {
 					msgs = append(msgs, msg)
 				}

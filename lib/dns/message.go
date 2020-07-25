@@ -14,6 +14,7 @@ import (
 	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -83,6 +84,99 @@ func NewMessage() *Message {
 		},
 		dnameOff: make(map[string]uint16),
 	}
+}
+
+//
+// NewMessageAddress create new DNS message for hostname that contains one or
+// more A or AAAA addresses.
+// The addresses must be all IPv4 or IPv6, the first address define the query
+// type.
+// If hname is not valid hostname or one of the address is not valid IP
+// address it will return nil.
+//
+func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
+	if !libnet.IsHostnameValid(hname, false) {
+		return nil
+	}
+	if len(addresses) == 0 {
+		return nil
+	}
+
+	addr := addresses[0]
+	qtype := getQueryTypeFromAddress(addr)
+	if qtype == 0 {
+		return nil
+	}
+
+	ascii.ToLower(&hname)
+
+	rr := ResourceRecord{
+		Name:  libbytes.Copy(hname),
+		Type:  qtype,
+		Class: QueryClassIN,
+		TTL:   defaultTTL,
+		Text:  libbytes.Copy(addr),
+	}
+
+	msg = &Message{
+		Header: SectionHeader{
+			IsAA:    true,
+			QDCount: 1,
+			ANCount: 1,
+		},
+		Question: SectionQuestion{
+			Name:  hname,
+			Type:  qtype,
+			Class: QueryClassIN,
+		},
+		Answer: []ResourceRecord{rr},
+	}
+
+	for _, addr := range addresses[1:] {
+		qtype = getQueryTypeFromAddress(addr)
+		if qtype == 0 {
+			continue
+		}
+		if qtype != msg.Question.Type {
+			continue
+		}
+		msg.Answer = append(msg.Answer, ResourceRecord{
+			Name:  libbytes.Copy(hname),
+			Type:  qtype,
+			Class: QueryClassIN,
+			TTL:   defaultTTL,
+			Text:  libbytes.Copy(addr),
+		})
+		msg.Header.ANCount++
+	}
+
+	_, err := msg.Pack()
+	if err != nil {
+		return nil
+	}
+
+	return msg
+}
+
+//
+// getQueryTypeFromAddress return QueryTypeA or QueryTypeAAAA if addr is valid
+// IPv4 or IPv6 address, otherwise it will return 0.
+//
+func getQueryTypeFromAddress(addr []byte) (qtype uint16) {
+	ip := net.ParseIP(string(addr))
+	if ip == nil {
+		return 0
+	}
+
+	qtype = QueryTypeA
+	for x := 0; x < len(addr); x++ {
+		if addr[x] == ':' {
+			qtype = QueryTypeAAAA
+			break
+		}
+	}
+
+	return qtype
 }
 
 //
