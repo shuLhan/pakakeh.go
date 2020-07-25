@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/errors"
@@ -103,6 +104,9 @@ func (ep *Endpoint) call(
 
 	if debug.Value >= 2 {
 		log.Printf("> request body: %s\n", reqBody)
+	}
+	if len(vals) > 0 && req.Form == nil {
+		req.Form = make(url.Values, len(vals))
 	}
 	for k, v := range vals {
 		if len(k) > 0 && len(v) > 0 {
