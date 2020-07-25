@@ -243,8 +243,6 @@ func (srv *Server) registerPost(ep *Endpoint) (err error) {
 // registerPut register HTTP method PUT with callback to handle it.
 //
 func (srv *Server) registerPut(ep *Endpoint) (err error) {
-	ep.ResponseType = ResponseTypeNone
-
 	// Check if the same route already registered.
 	for _, rute := range srv.routePuts {
 		_, ok := rute.parse(ep.Path)
