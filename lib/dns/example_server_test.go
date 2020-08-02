@@ -23,13 +23,13 @@ func clientLookup(nameserver string) {
 
 	fmt.Printf("Receiving DNS message: %s\n", msg)
 	for x, answer := range msg.Answer {
-		fmt.Printf("Answer %d: %s\n", x, answer.RData())
+		fmt.Printf("Answer %d: %s\n", x, answer.Value)
 	}
 	for x, auth := range msg.Authority {
-		fmt.Printf("Authority %d: %s\n", x, auth.RData())
+		fmt.Printf("Authority %d: %s\n", x, auth.Value)
 	}
 	for x, add := range msg.Additional {
-		fmt.Printf("Additional %d: %s\n", x, add.RData())
+		fmt.Printf("Additional %d: %s\n", x, add.Value)
 	}
 }
 

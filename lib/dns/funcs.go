@@ -80,7 +80,7 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 		return "", nil
 	}
 
-	banswer, ok := rranswers[0].RData().([]byte)
+	banswer, ok := rranswers[0].Value.([]byte)
 	if !ok {
 		return "", fmt.Errorf("invalid PTR record data")
 	}

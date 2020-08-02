@@ -46,7 +46,7 @@ func TestUDPClientLookup(t *testing.T) {
 				Class: QueryClassIN,
 				TTL:   3600,
 				rdlen: 4,
-				Text:  []byte("127.0.0.1"),
+				Value: []byte("127.0.0.1"),
 			}},
 			Authority:  []ResourceRecord{},
 			Additional: []ResourceRecord{},
@@ -73,7 +73,7 @@ func TestUDPClientLookup(t *testing.T) {
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				SOA: &RDataSOA{
+				Value: &RDataSOA{
 					MName:   []byte("kilabit.info"),
 					RName:   []byte("admin.kilabit.info"),
 					Serial:  20180832,
@@ -108,7 +108,7 @@ func TestUDPClientLookup(t *testing.T) {
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("This is a test server"),
+				Value: []byte("This is a test server"),
 			}},
 			Authority:  []ResourceRecord{},
 			Additional: []ResourceRecord{},

@@ -207,13 +207,13 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   0x00000168,
-				Text:  []byte("103.200.4.162"),
+				Value: []byte("103.200.4.162"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 			dnameOff: make(map[string]uint16),
 		},
@@ -296,25 +296,25 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
-				Text:  []byte("ns2.dewaweb.com"),
+				Value: []byte("ns2.dewaweb.com"),
 			}, {
 				Name:  []byte("kilabit.INFO"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
-				Text:  []byte("NS3.DEWAWEB.COM"),
+				Value: []byte("NS3.DEWAWEB.COM"),
 			}, {
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   0x01336e,
-				Text:  []byte("ns1.dewaweb.com"),
+				Value: []byte("ns1.dewaweb.com"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -362,13 +362,13 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   0x0168,
-				Text:  []byte("kilabit.info"),
+				Value: []byte("kilabit.info"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -406,7 +406,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   10511,
-				SOA: &RDataSOA{
+				Value: &RDataSOA{
 					MName:   []byte("ns1.dewaweb.com"),
 					RName:   []byte("MONITOR.dewahost.com"),
 					Serial:  2017082501,
@@ -493,7 +493,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x28,
 					Exchange:   []byte("alt3.aspmx.l.google.com"),
 				},
@@ -502,7 +502,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x0a,
 					Exchange:   []byte("aspmx.l.google.com"),
 				},
@@ -511,7 +511,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x14,
 					Exchange:   []byte("alt1.aspmx.l.google.com"),
 				},
@@ -520,7 +520,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x1e,
 					Exchange:   []byte("alt2.aspmx.l.google.com"),
 				},
@@ -529,7 +529,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   0x000000fc,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x32,
 					Exchange:   []byte("alt4.aspmx.l.GOOGLE.COM"),
 				},
@@ -538,7 +538,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -591,25 +591,25 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   300,
-				Text:  []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
+				Value: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
 			}, {
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   300,
-				Text:  []byte("v=spf1 include:_spf.google.com ~all"),
+				Value: []byte("v=spf1 include:_spf.google.com ~all"),
 			}, {
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   300,
-				Text:  []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
+				Value: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 			dnameOff: make(map[string]uint16),
 		},
@@ -652,14 +652,14 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeAAAA,
 				TTL:   0x53,
 				Class: QueryClassIN,
-				Text:  []byte("2404:6800:4003:c00::8b"),
+				Value: []byte("2404:6800:4003:c00::8b"),
 			}},
 			Additional: []ResourceRecord{{
 				Name:  []byte{},
 				Type:  QueryTypeOPT,
 				Class: 1280,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -751,7 +751,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -765,7 +765,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -779,7 +779,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -793,7 +793,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -807,7 +807,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeSRV,
 				Class: QueryClassIN,
 				TTL:   0x231,
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -822,7 +822,7 @@ func TestMessagePack(t *testing.T) {
 				Type:  QueryTypeOPT,
 				Class: 512,
 				TTL:   0,
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}}
@@ -832,6 +832,7 @@ func TestMessagePack(t *testing.T) {
 
 		got, _ := c.msg.Pack()
 
+		t.Logf("Message: %+v\n", c.msg)
 		test.Assert(t, c.desc, c.exp, got, true)
 	}
 }
@@ -1082,14 +1083,14 @@ func TestMessageUnpack(t *testing.T) {
 				TTL:   0x00000168,
 				rdlen: 4,
 				rdata: []byte{0x67, 0xc8, 0x04, 0xa2},
-				Text:  []byte("103.200.4.162"),
+				Value: []byte("103.200.4.162"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
 				rdata: []byte{},
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -1158,7 +1159,7 @@ func TestMessageUnpack(t *testing.T) {
 				rdata: []byte{
 					0x03, 0x6e, 0x73, 0x32, 0x07, 0x64, 0x65, 0x77, 0x61, 0x77, 0x65, 0x62, 0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
-				Text: []byte("ns2.dewaweb.com"),
+				Value: []byte("ns2.dewaweb.com"),
 			}, {
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
@@ -1168,7 +1169,7 @@ func TestMessageUnpack(t *testing.T) {
 				rdata: []byte{
 					0x03, 0x6e, 0x73, 0x33, 0xc0, 0x2e,
 				},
-				Text: []byte("ns3.dewaweb.com"),
+				Value: []byte("ns3.dewaweb.com"),
 			}, {
 				Name:  []byte("kilabit.info"),
 				Type:  QueryTypeNS,
@@ -1178,14 +1179,14 @@ func TestMessageUnpack(t *testing.T) {
 				rdata: []byte{
 					0x03, 0x6e, 0x73, 0x31, 0xc0, 0x2e,
 				},
-				Text: []byte("ns1.dewaweb.com"),
+				Value: []byte("ns1.dewaweb.com"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
 				rdata: []byte{},
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -1235,14 +1236,14 @@ func TestMessageUnpack(t *testing.T) {
 				TTL:   0x0168,
 				rdlen: 2,
 				rdata: []byte{0xc0, 0x11},
-				Text:  []byte("kilabit.info"),
+				Value: []byte("kilabit.info"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
 				Class: 0x0500,
 				TTL:   0,
 				rdata: make([]byte, 0),
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -1302,7 +1303,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x00, 0x00, 0x0e, 0x10, 0x00, 0x00, 0x1c, 0x20,
 					0x00, 0x12, 0x75, 0x00, 0x00, 0x01, 0x51, 0x80,
 				},
-				SOA: &RDataSOA{
+				Value: &RDataSOA{
 					MName:   []byte("ns1.dewaweb.com"),
 					RName:   []byte("monitor.dewahost.com"),
 					Serial:  2017082501,
@@ -1397,7 +1398,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x01, 0x6c,
 					0xc0, 0x0c,
 				},
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x28,
 					Exchange:   []byte("alt3.aspmx.l.google.com"),
 				},
@@ -1411,7 +1412,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x00, 0x0a,
 					0xc0, 0x2f,
 				},
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x0a,
 					Exchange:   []byte("aspmx.l.google.com"),
 				},
@@ -1426,7 +1427,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x04, 0x61, 0x6c, 0x74, 0x31,
 					0xc0, 0x2f,
 				},
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x14,
 					Exchange:   []byte("alt1.aspmx.l.google.com"),
 				},
@@ -1441,7 +1442,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x04, 0x61, 0x6c, 0x74, 0x32,
 					0xc0, 0x2f,
 				},
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x1e,
 					Exchange:   []byte("alt2.aspmx.l.google.com"),
 				},
@@ -1456,7 +1457,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x04, 0x61, 0x6c, 0x74, 0x34,
 					0xc0, 0x2f,
 				},
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 0x32,
 					Exchange:   []byte("alt4.aspmx.l.google.com"),
 				},
@@ -1466,7 +1467,7 @@ func TestMessageUnpack(t *testing.T) {
 				Class: 0x0500,
 				TTL:   0,
 				rdata: []byte{},
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -1548,7 +1549,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x77, 0x35, 0x33, 0x36, 0x74, 0x6c, 0x64, 0x73,
 					0x34, 0x68, 0x39, 0x35,
 				},
-				Text: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
+				Value: []byte("facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"),
 			}, {
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
@@ -1562,7 +1563,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x67, 0x6c, 0x65, 0x2e, 0x63, 0x6f, 0x6d, 0x20,
 					0x7e, 0x61, 0x6c, 0x6c,
 				},
-				Text: []byte("v=spf1 include:_spf.google.com ~all"),
+				Value: []byte("v=spf1 include:_spf.google.com ~all"),
 			}, {
 				Name:  []byte("google.com"),
 				Type:  QueryTypeTXT,
@@ -1577,7 +1578,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x62, 0x2d, 0x61, 0x61, 0x37, 0x62, 0x61, 0x38,
 					0x61, 0x33, 0x62, 0x64, 0x30, 0x65,
 				},
-				Text: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
+				Value: []byte("docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
@@ -1585,7 +1586,7 @@ func TestMessageUnpack(t *testing.T) {
 				TTL:   0,
 				rdlen: 0,
 				rdata: []byte{},
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 			dnameOff: make(map[string]uint16),
 		},
@@ -1633,7 +1634,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x24, 0x04, 0x68, 0x00, 0x40, 0x03, 0x0c, 0x00,
 					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8b,
 				},
-				Text: []byte("2404:6800:4003:c00::8b"),
+				Value: []byte("2404:6800:4003:c00::8b"),
 			}},
 			Additional: []ResourceRecord{{
 				Type:  QueryTypeOPT,
@@ -1641,7 +1642,7 @@ func TestMessageUnpack(t *testing.T) {
 				TTL:   0,
 				rdlen: 0,
 				rdata: []byte{},
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}, {
@@ -1741,7 +1742,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 					0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -1764,7 +1765,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 					0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -1787,7 +1788,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 					0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -1810,7 +1811,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 					0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -1833,7 +1834,7 @@ func TestMessageUnpack(t *testing.T) {
 					0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 					0x03, 0x63, 0x6f, 0x6d, 0x00,
 				},
-				SRV: &RDataSRV{
+				Value: &RDataSRV{
 					Service:  []byte("_xmpp-server"),
 					Proto:    []byte("_tcp"),
 					Name:     []byte("google.com"),
@@ -1849,7 +1850,7 @@ func TestMessageUnpack(t *testing.T) {
 				TTL:   0,
 				rdlen: 0,
 				rdata: []byte{},
-				OPT:   &RDataOPT{},
+				Value: &RDataOPT{},
 			}},
 		},
 	}}
@@ -1880,7 +1881,7 @@ func TestMessageUnpack(t *testing.T) {
 			test.Assert(t, "Answer.TTL", c.exp.Answer[x].TTL, msg.Answer[x].TTL, true)
 			test.Assert(t, "Answer.rdlen", c.exp.Answer[x].rdlen, msg.Answer[x].rdlen, true)
 			test.Assert(t, "Answer.rdata", c.exp.Answer[x].rdata, msg.Answer[x].rdata, true)
-			test.Assert(t, "Answer.RData()", c.exp.Answer[x].RData(), msg.Answer[x].RData(), true)
+			test.Assert(t, "Answer.Value", c.exp.Answer[x].Value, msg.Answer[x].Value, true)
 		}
 		for x := 0; x < len(c.exp.Authority); x++ {
 			test.Assert(t, "Authority.Name", c.exp.Authority[x].Name, msg.Authority[x].Name, true)
@@ -1889,7 +1890,7 @@ func TestMessageUnpack(t *testing.T) {
 			test.Assert(t, "Authority.TTL", c.exp.Authority[x].TTL, msg.Authority[x].TTL, true)
 			test.Assert(t, "Authority.rdlen", c.exp.Authority[x].rdlen, msg.Authority[x].rdlen, true)
 			test.Assert(t, "Authority.rdata", c.exp.Authority[x].rdata, msg.Authority[x].rdata, true)
-			test.Assert(t, "Authority.RData()", c.exp.Authority[x].RData(), msg.Authority[x].RData(), true)
+			test.Assert(t, "Authority.Value", c.exp.Authority[x].Value, msg.Authority[x].Value, true)
 		}
 		for x := 0; x < len(c.exp.Additional); x++ {
 			test.Assert(t, "Additional.Name", c.exp.Additional[x].Name, msg.Additional[x].Name, true)
@@ -1898,7 +1899,7 @@ func TestMessageUnpack(t *testing.T) {
 			test.Assert(t, "Additional.TTL", c.exp.Additional[x].TTL, msg.Additional[x].TTL, true)
 			test.Assert(t, "Additional.rdlen", c.exp.Additional[x].rdlen, msg.Additional[x].rdlen, true)
 			test.Assert(t, "Additional.rdata", c.exp.Additional[x].rdata, msg.Additional[x].rdata, true)
-			test.Assert(t, "Additional.RData()", c.exp.Additional[x].RData(), msg.Additional[x].RData(), true)
+			test.Assert(t, "Additional.Value", c.exp.Additional[x].Value, msg.Additional[x].Value, true)
 		}
 	}
 }

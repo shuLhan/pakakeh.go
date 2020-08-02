@@ -179,7 +179,7 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				SOA: &RDataSOA{
+				Value: &RDataSOA{
 					MName:   []byte("venera.isi.edu"),
 					RName:   []byte("action\\.domains.isi.edu"),
 					Serial:  20,
@@ -205,19 +205,19 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("a.isi.edu"),
+				Value: []byte("a.isi.edu"),
 			}, {
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("venera.isi.edu"),
+				Value: []byte("venera.isi.edu"),
 			}, {
 				Name:  []byte("isi.edu"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("vaxa.isi.edu"),
+				Value: []byte("vaxa.isi.edu"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -235,7 +235,7 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   3600,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 10,
 					Exchange:   []byte("venera.isi.edu"),
 				},
@@ -244,7 +244,7 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   3600,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 20,
 					Exchange:   []byte("vaxa.isi.edu"),
 				},
@@ -265,7 +265,7 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("26.3.0.103"),
+				Value: []byte("26.3.0.103"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -283,13 +283,13 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("10.1.0.52"),
+				Value: []byte("10.1.0.52"),
 			}, {
 				Name:  []byte("venera.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("128.9.0.32"),
+				Value: []byte("128.9.0.32"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -307,13 +307,13 @@ VAXA    A       10.2.0.27
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("10.2.0.27"),
+				Value: []byte("10.2.0.27"),
 			}, {
 				Name:  []byte("vaxa.isi.edu"),
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("128.9.0.33"),
+				Value: []byte("128.9.0.33"),
 			}},
 		}},
 	}}
@@ -342,21 +342,21 @@ VAXA    A       10.2.0.27
 				libtest.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type, true)
 				libtest.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class, true)
 				libtest.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL, true)
-				libtest.Assert(t, "Answer.RData()", c.exp[x].Answer[y].RData(), answer.RData(), true)
+				libtest.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value, true)
 			}
 			for y, auth := range msg.Authority {
 				libtest.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name, true)
 				libtest.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type, true)
 				libtest.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class, true)
 				libtest.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL, true)
-				libtest.Assert(t, "Authority.RData()", c.exp[x].Authority[y].RData(), auth.RData(), true)
+				libtest.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value, true)
 			}
 			for y, add := range msg.Additional {
 				libtest.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name, true)
 				libtest.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type, true)
 				libtest.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class, true)
 				libtest.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL, true)
-				libtest.Assert(t, "Additional.RData()", c.exp[x].Additional[y].RData(), add.RData(), true)
+				libtest.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value, true)
 			}
 		}
 	}
@@ -409,7 +409,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				SOA: &RDataSOA{
+				Value: &RDataSOA{
 					MName:   []byte("ns23.pair.com"),
 					RName:   []byte("root.pair.com"),
 					Serial:  2001072300,
@@ -435,13 +435,13 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("ns23.pair.com"),
+				Value: []byte("ns23.pair.com"),
 			}, {
 				Name:  []byte("pcguide.com"),
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("ns0.ns0.com"),
+				Value: []byte("ns0.ns0.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -459,7 +459,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("127.0.0.1"),
+				Value: []byte("127.0.0.1"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -477,7 +477,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("209.68.14.80"),
+				Value: []byte("209.68.14.80"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -495,7 +495,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   3600,
-				MX: &RDataMX{
+				Value: &RDataMX{
 					Preference: 50,
 					Exchange:   []byte("qs939.pair.com"),
 				},
@@ -516,7 +516,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("pcguide.com"),
+				Value: []byte("pcguide.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -534,7 +534,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("pcguide.com"),
+				Value: []byte("pcguide.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -552,7 +552,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("pcguide.com"),
+				Value: []byte("pcguide.com"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -570,7 +570,7 @@ relay IN CNAME relay.pair.com.
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("relay.pair.com"),
+				Value: []byte("relay.pair.com"),
 			}},
 		}},
 	}}
@@ -599,21 +599,21 @@ relay IN CNAME relay.pair.com.
 				libtest.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type, true)
 				libtest.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class, true)
 				libtest.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL, true)
-				libtest.Assert(t, "Answer.RData()", c.exp[x].Answer[y].RData(), answer.RData(), true)
+				libtest.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value, true)
 			}
 			for y, auth := range msg.Authority {
 				libtest.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name, true)
 				libtest.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type, true)
 				libtest.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class, true)
 				libtest.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL, true)
-				libtest.Assert(t, "Authority.RData()", c.exp[x].Authority[y].RData(), auth.RData(), true)
+				libtest.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value, true)
 			}
 			for y, add := range msg.Additional {
 				libtest.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name, true)
 				libtest.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type, true)
 				libtest.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class, true)
 				libtest.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL, true)
-				libtest.Assert(t, "Additional.RData()", c.exp[x].Additional[y].RData(), add.RData(), true)
+				libtest.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value, true)
 			}
 		}
 	}
@@ -654,7 +654,7 @@ angularjs.doc       A  127.0.0.1
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("127.0.0.1"),
+				Value: []byte("127.0.0.1"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -672,7 +672,7 @@ angularjs.doc       A  127.0.0.1
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("127.0.0.1"),
+				Value: []byte("127.0.0.1"),
 			}},
 		}, {
 			Header: SectionHeader{
@@ -690,7 +690,7 @@ angularjs.doc       A  127.0.0.1
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte("127.0.0.1"),
+				Value: []byte("127.0.0.1"),
 			}},
 		}},
 	}}
@@ -719,21 +719,21 @@ angularjs.doc       A  127.0.0.1
 				libtest.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type, true)
 				libtest.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class, true)
 				libtest.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL, true)
-				libtest.Assert(t, "Answer.RData()", c.exp[x].Answer[y].RData(), answer.RData(), true)
+				libtest.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value, true)
 			}
 			for y, auth := range msg.Authority {
 				libtest.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name, true)
 				libtest.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type, true)
 				libtest.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class, true)
 				libtest.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL, true)
-				libtest.Assert(t, "Authority.RData()", c.exp[x].Authority[y].RData(), auth.RData(), true)
+				libtest.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value, true)
 			}
 			for y, add := range msg.Additional {
 				libtest.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name, true)
 				libtest.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type, true)
 				libtest.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class, true)
 				libtest.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL, true)
-				libtest.Assert(t, "Additional.RData()", c.exp[x].Additional[y].RData(), add.RData(), true)
+				libtest.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value, true)
 			}
 		}
 	}
@@ -762,7 +762,7 @@ func TestMasterParseTXT(t *testing.T) {
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Text:  []byte(`This is a test`),
+				Value: []byte(`This is a test`),
 			}},
 		}},
 	}}
@@ -789,21 +789,21 @@ func TestMasterParseTXT(t *testing.T) {
 				libtest.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type, true)
 				libtest.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class, true)
 				libtest.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL, true)
-				libtest.Assert(t, "Answer.RData()", c.exp[x].Answer[y].RData(), answer.RData(), true)
+				libtest.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value, true)
 			}
 			for y, auth := range msg.Authority {
 				libtest.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name, true)
 				libtest.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type, true)
 				libtest.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class, true)
 				libtest.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL, true)
-				libtest.Assert(t, "Authority.RData()", c.exp[x].Authority[y].RData(), auth.RData(), true)
+				libtest.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value, true)
 			}
 			for y, add := range msg.Additional {
 				libtest.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name, true)
 				libtest.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type, true)
 				libtest.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class, true)
 				libtest.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL, true)
-				libtest.Assert(t, "Additional.RData()", c.exp[x].Additional[y].RData(), add.RData(), true)
+				libtest.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value, true)
 			}
 		}
 	}

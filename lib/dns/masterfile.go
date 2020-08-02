@@ -699,10 +699,10 @@ func (m *master) parseRRType(rr *ResourceRecord, stok string) bool {
 func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
 	case QueryTypeA, QueryTypeAAAA:
-		rr.Text = tok
+		rr.Value = tok
 
 	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG, QueryTypeMR, QueryTypePTR:
-		rr.Text = m.generateDomainName(tok)
+		rr.Value = m.generateDomainName(tok)
 
 	case QueryTypeSOA:
 		err = m.parseSOA(rr, tok)
@@ -738,9 +738,10 @@ func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	ascii.ToLower(&tok)
 
-	rr.SOA = &RDataSOA{
+	rrSOA := &RDataSOA{
 		MName: m.generateDomainName(tok),
 	}
+	rr.Value = rrSOA
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
@@ -755,7 +756,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	}
 
 	ascii.ToLower(&tok)
-	rr.SOA.RName = m.generateDomainName(tok)
+	rrSOA.RName = m.generateDomainName(tok)
 
 	var v int64
 	isMultiline := false
@@ -777,7 +778,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		if err != nil {
 			return err
 		}
-		rr.SOA.Serial = uint32(v)
+		rrSOA.Serial = uint32(v)
 		m.flag |= parseSOASerial
 	}
 
@@ -814,23 +815,23 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 
 		switch m.flag {
 		case parseSOAStart:
-			rr.SOA.Serial = uint32(v)
+			rrSOA.Serial = uint32(v)
 			m.flag |= parseSOASerial
 
 		case parseSOASerial:
-			rr.SOA.Refresh = int32(v)
+			rrSOA.Refresh = int32(v)
 			m.flag |= parseSOARefresh
 
 		case parseSOASerial | parseSOARefresh:
-			rr.SOA.Retry = int32(v)
+			rrSOA.Retry = int32(v)
 			m.flag |= parseSOARetry
 
 		case parseSOASerial | parseSOARefresh | parseSOARetry:
-			rr.SOA.Expire = int32(v)
+			rrSOA.Expire = int32(v)
 			m.flag |= parseSOAExpire
 
 		case parseSOASerial | parseSOARefresh | parseSOARetry | parseSOAExpire:
-			rr.SOA.Minimum = uint32(v)
+			rrSOA.Minimum = uint32(v)
 			m.flag |= parseSOAMinimum
 			goto out
 
@@ -871,16 +872,17 @@ out:
 	}
 
 	if m.ttl == 0 {
-		m.ttl = rr.SOA.Minimum
+		m.ttl = rrSOA.Minimum
 	}
 
 	return nil
 }
 
 func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
-	rr.HInfo = &RDataHINFO{
+	rrHInfo := &RDataHINFO{
 		CPU: tok,
 	}
+	rr.Value = rrHInfo
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
@@ -895,7 +897,7 @@ func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 		return
 	}
 
-	rr.HInfo.OS = tok
+	rrHInfo.OS = tok
 
 	if !isTerm {
 		m.reader.SkipLine()
@@ -906,9 +908,10 @@ func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
-	rr.MInfo = &RDataMINFO{
+	rrMInfo := &RDataMINFO{
 		RMailBox: tok,
 	}
+	rr.Value = rrMInfo
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
@@ -923,7 +926,7 @@ func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 		return
 	}
 
-	rr.MInfo.EmailBox = tok
+	rrMInfo.EmailBox = tok
 
 	if !isTerm {
 		m.reader.SkipLine()
@@ -940,9 +943,10 @@ func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 			m.file, m.lineno, err)
 	}
 
-	rr.MX = &RDataMX{
+	rrMX := &RDataMX{
 		Preference: int16(pref),
 	}
+	rr.Value = rrMX
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
@@ -955,7 +959,7 @@ func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 		return fmt.Errorf("! %s:%d Missing MX Exchange value", m.file, m.lineno)
 	}
 
-	rr.MX.Exchange = m.generateDomainName(tok)
+	rrMX.Exchange = m.generateDomainName(tok)
 
 	if !isTerm {
 		m.reader.SkipLine()
@@ -984,7 +988,7 @@ func (m *master) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	}
 	v = v[1 : len(v)-1]
 
-	rr.Text = v
+	rr.Value = v
 
 	return nil
 }
@@ -992,9 +996,10 @@ func (m *master) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	var v int
 
-	rr.SRV = &RDataSRV{
+	rrSRV := &RDataSRV{
 		Service: tok,
 	}
+	rr.Value = rrSRV
 
 	m.flag = parseSRVService
 
@@ -1011,11 +1016,11 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 
 		switch m.flag {
 		case parseSRVService:
-			rr.SRV.Proto = tok
+			rrSRV.Proto = tok
 			m.flag |= parseSRVProto
 
 		case parseSRVService | parseSRVProto:
-			rr.SRV.Name = tok
+			rrSRV.Name = tok
 			m.flag |= parseSRVName
 
 		case parseSRVService | parseSRVProto | parseSRVName:
@@ -1023,7 +1028,7 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 			if err != nil {
 				return err
 			}
-			rr.SRV.Priority = uint16(v)
+			rrSRV.Priority = uint16(v)
 			m.flag |= parseSRVPriority
 
 		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority:
@@ -1031,7 +1036,7 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 			if err != nil {
 				return err
 			}
-			rr.SRV.Weight = uint16(v)
+			rrSRV.Weight = uint16(v)
 			m.flag |= parseSRVWeight
 
 		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority | parseSRVWeight:
@@ -1039,11 +1044,11 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 			if err != nil {
 				return err
 			}
-			rr.SRV.Port = uint16(v)
+			rrSRV.Port = uint16(v)
 			m.flag |= parseSRVPort
 
 		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority | parseSRVWeight | parseSRVPort:
-			rr.SRV.Target = tok
+			rrSRV.Target = tok
 			m.flag |= parseSRVTarget
 			goto out
 
@@ -1156,7 +1161,7 @@ func (m *master) pack() {
 			fmt.Printf("  Question: %s\n", msg.Question.String())
 			for x := 0; x < len(msg.Answer); x++ {
 				fmt.Printf("  Answer: %s\n", msg.Answer[x].String())
-				fmt.Printf("  RData: %s\n", msg.Answer[x].RData())
+				fmt.Printf("  RData: %s\n", msg.Answer[x].Value)
 			}
 		}
 	}
