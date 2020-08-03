@@ -76,6 +76,28 @@ func TestCountTokens(t *testing.T) {
 	}
 }
 
+func TestDelete(t *testing.T) {
+	value := "b"
+	exp := []string{"a", "c"}
+
+	cases := []struct {
+		in []string
+	}{{
+		in: []string{"b", "a", "c"},
+	}, {
+		in: []string{"a", "b", "c"},
+	}, {
+		in: []string{"a", "c", "b"},
+	}}
+
+	for _, c := range cases {
+		var ok bool
+		c.in, ok = Delete(c.in, value)
+		test.Assert(t, "Delete OK?", true, ok, true)
+		test.Assert(t, "Delete", exp, c.in, true)
+	}
+}
+
 func TestFrequencyOfTokens(t *testing.T) {
 	cases := []struct {
 		words, tokens []string

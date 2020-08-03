@@ -109,6 +109,31 @@ func CountTokens(words []string, tokens []string, sensitive bool) []int {
 }
 
 //
+// Delete the first item that match with value while still preserving the
+// order.
+// It will return true if there is an item being deleted on slice, otherwise
+// it will return false.
+//
+func Delete(in []string, value string) (out []string, ok bool) {
+	x := 0
+	for ; x < len(in); x++ {
+		if in[x] == value {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return in, false
+	}
+
+	copy(in[x:], in[x+1:])
+	in[len(in)-1] = ""
+	out = in[:len(in)-1]
+
+	return out, true
+}
+
+//
 // FrequencyOfToken return frequency of token in words using
 //
 //	count-of-token / total-words
