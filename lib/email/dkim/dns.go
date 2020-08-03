@@ -81,7 +81,7 @@ func lookupDNSTXT(dname string) (key *Key, err error) {
 		return nil, fmt.Errorf("dkim: LookupKey: multiple TXT records on '%s'", dname)
 	}
 
-	txt := answers[0].RData().([]byte)
+	txt := answers[0].Value.([]byte)
 
 	return ParseTXT(txt, answers[0].TTL)
 }

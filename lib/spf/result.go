@@ -103,7 +103,7 @@ func (result *Result) lookup() {
 	var found int
 
 	for x := 0; x < len(txts); x++ {
-		rdata, ok := txts[x].RData().([]byte)
+		rdata, ok := txts[x].Value.([]byte)
 		if !ok {
 			continue
 		}
