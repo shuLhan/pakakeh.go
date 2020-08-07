@@ -1113,7 +1113,7 @@ func (m *masterParser) generateDomainName(dname []byte) (out []byte) {
 // It will return true if new message created for RR, otherwise it will return
 // false.
 //
-func (m *masterParser) push(rr *ResourceRecord) bool {
+func (m *masterParser) push(rr *ResourceRecord) {
 	m.lastRR = rr
 	for x := 0; x < len(m.out.Messages); x++ {
 		if !bytes.Equal(m.out.Messages[x].Question.Name, rr.Name) {
@@ -1126,7 +1126,7 @@ func (m *masterParser) push(rr *ResourceRecord) bool {
 			continue
 		}
 		m.out.Messages[x].Answer = append(m.out.Messages[x].Answer, *rr)
-		return false
+		return
 	}
 
 	msg := &Message{
@@ -1141,10 +1141,8 @@ func (m *masterParser) push(rr *ResourceRecord) bool {
 		},
 		Answer: []ResourceRecord{*rr},
 	}
-
 	m.out.Messages = append(m.out.Messages, msg)
-
-	return true
+	return
 }
 
 func (m *masterParser) setMinimumTTL() {
