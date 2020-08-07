@@ -60,15 +60,15 @@ type MasterFile struct {
 	Path     string
 	Name     string
 	Messages []*Message
+	Records  []*ResourceRecord
 }
 
-type master struct {
-	file   string
+type masterParser struct {
+	out    *MasterFile
 	lineno int
 	seps   []byte
 	terms  []byte
 	reader *libio.Reader
-	msgs   []*Message
 	lastRR *ResourceRecord
 	origin string
 	ttl    uint32
@@ -134,15 +134,13 @@ func LoadMasterDir(dir string) (masterFiles map[string]*MasterFile, err error) {
 
 //
 // ParseMasterFile parse master file and return it as list of Message.
-// The base path of file will be assumed as origin.
+// The file name will be assumed as origin if parameter origin or $ORIGIN is
+// not set.
 //
-func ParseMasterFile(file, origin string, ttl uint32) (masterFile *MasterFile, err error) {
-	masterFile = &MasterFile{
-		Path: file,
-	}
+func ParseMasterFile(file, origin string, ttl uint32) (*MasterFile, error) {
+	var err error
 
-	m := newMaster()
-	m.file = file
+	m := newMasterParser(file)
 	m.ttl = ttl
 
 	if len(origin) > 0 {
@@ -163,14 +161,18 @@ func ParseMasterFile(file, origin string, ttl uint32) (masterFile *MasterFile, e
 		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
 	}
 
-	masterFile.Name = m.origin
-	masterFile.Messages = m.msgs
+	m.out.Name = m.origin
 
-	return masterFile, nil
+	mf := m.out
+	m.out = nil
+	return mf, nil
 }
 
-func newMaster() *master {
-	return &master{
+func newMasterParser(file string) *masterParser {
+	return &masterParser{
+		out: &MasterFile{
+			Path: file,
+		},
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
 		terms:  []byte{';', '\n'},
@@ -178,10 +180,12 @@ func newMaster() *master {
 }
 
 //
-// Init parse master file from string.
+// Init parse masterParser file from string.
 //
-func (m *master) Init(data, origin string, ttl uint32) {
-	m.file = "(data)"
+func (m *masterParser) Init(data, origin string, ttl uint32) {
+	m.out = &MasterFile{
+		Path: "(data)",
+	}
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
 	m.ttl = ttl
@@ -264,7 +268,7 @@ func (m *master) Init(data, origin string, ttl uint32) {
 // ;               Semicolon is used to start a comment; the remainder of
 //                 the line is ignored.
 //
-func (m *master) parse() (err error) {
+func (m *masterParser) parse() (err error) {
 	var rr *ResourceRecord
 
 	for {
@@ -280,7 +284,8 @@ func (m *master) parse() (err error) {
 
 		tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 		if isTerm {
-			err = fmt.Errorf("! %s:%d invalid line %q", m.file, m.lineno, m.reader.Rest())
+			err = fmt.Errorf("! %s:%d invalid line %q",
+				m.out.Path, m.lineno, m.reader.Rest())
 			return
 		}
 
@@ -324,15 +329,17 @@ func (m *master) parse() (err error) {
 //
 //    $ORIGIN <domain-name> [<comment>]
 //
-func (m *master) parseDirectiveOrigin() (err error) {
+func (m *masterParser) parseDirectiveOrigin() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		return fmt.Errorf("! %s:%d Empty $origin directive", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Empty $origin directive",
+			m.out.Path, m.lineno)
 	}
 
 	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
-		return fmt.Errorf("! %s:%d Empty $origin directive", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Empty $origin directive",
+			m.out.Path, m.lineno)
 	}
 
 	ascii.ToLower(&tok)
@@ -353,7 +360,7 @@ func (m *master) parseDirectiveOrigin() (err error) {
 			m.lineno++
 		} else {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
-				m.file, m.lineno, c, tok)
+				m.out.Path, m.lineno, c, tok)
 		}
 	}
 
@@ -363,15 +370,17 @@ func (m *master) parseDirectiveOrigin() (err error) {
 //
 //    $INCLUDE <file-name> [<domain-name>] [<comment>]
 //
-func (m *master) parseDirectiveInclude() (err error) {
+func (m *masterParser) parseDirectiveInclude() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		return fmt.Errorf("! %s:%d Empty $include directive", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Empty $include directive",
+			m.out.Path, m.lineno)
 	}
 
 	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
-		return fmt.Errorf("! %s:%d Empty $include directive", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Empty $include directive",
+			m.out.Path, m.lineno)
 	}
 
 	var incfile, dname string
@@ -394,7 +403,7 @@ func (m *master) parseDirectiveInclude() (err error) {
 		}
 		if c != ';' {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
-				m.file, m.lineno, c, tok)
+				m.out.Path, m.lineno, c, tok)
 		}
 
 		m.reader.SkipLine()
@@ -412,12 +421,12 @@ func (m *master) parseDirectiveInclude() (err error) {
 		return err
 	}
 
-	m.msgs = append(m.msgs, masterFile.Messages...)
+	m.out.Messages = append(m.out.Messages, masterFile.Messages...)
 
 	return nil
 }
 
-func (m *master) parseDirectiveTTL() (err error) {
+func (m *masterParser) parseDirectiveTTL() (err error) {
 	var (
 		c      byte
 		isTerm bool
@@ -426,12 +435,14 @@ func (m *master) parseDirectiveTTL() (err error) {
 
 	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		return fmt.Errorf("! %s:%d Empty $ttl directive", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Empty $ttl directive",
+			m.out.Path, m.lineno)
 	}
 
 	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
-		return fmt.Errorf("! %s:%d Empty $ttl directive", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Empty $ttl directive",
+			m.out.Path, m.lineno)
 	}
 
 	ascii.ToLower(&tok)
@@ -455,7 +466,7 @@ func (m *master) parseDirectiveTTL() (err error) {
 			m.lineno++
 		} else {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
-				m.file, m.lineno, c, tok)
+				m.out.Path, m.lineno, c, tok)
 		}
 	}
 
@@ -507,7 +518,7 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 // order is different from the order used in examples and the order used in
 // the actual RRs; the given order allows easier parsing and defaulting.)
 //
-func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord, err error) {
+func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord, err error) {
 	var (
 		isTerm bool
 	)
@@ -542,7 +553,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 			ok := m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-					m.file, m.lineno, stok)
+					m.out.Path, m.lineno, stok)
 				return nil, err
 			}
 		}
@@ -552,14 +563,14 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 		_, c := m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
 			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-				m.file, m.lineno, stok)
+				m.out.Path, m.lineno, stok)
 			return nil, err
 		}
 
 		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
 			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-				m.file, m.lineno, stok)
+				m.out.Path, m.lineno, stok)
 			return nil, err
 		}
 
@@ -581,7 +592,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 			ok := m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-					m.file, m.lineno, stok)
+					m.out.Path, m.lineno, stok)
 				return nil, err
 			}
 
@@ -589,7 +600,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 			ok := m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-					m.file, m.lineno, stok)
+					m.out.Path, m.lineno, stok)
 				return nil, err
 			}
 
@@ -610,7 +621,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 			}
 
 			err = fmt.Errorf("! %s:%d Unknown type '%s'",
-				m.file, m.lineno, stok)
+				m.out.Path, m.lineno, stok)
 			return nil, err
 
 		case parseRRTTL | parseRRClass:
@@ -621,7 +632,7 @@ func (m *master) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord
 			}
 
 			err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-				m.file, m.lineno, stok)
+				m.out.Path, m.lineno, stok)
 			return nil, err
 
 		case parseRRType,
@@ -650,7 +661,7 @@ out:
 // parseRRClassOrType check if token either class or type.
 // It will return true if one of them is set, otherwise it will return false.
 //
-func (m *master) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
+func (m *masterParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 	isClass := m.parseRRClass(rr, stok)
 	if isClass {
 		m.flag |= parseRRClass
@@ -671,7 +682,7 @@ func (m *master) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 // It will set the rr.Class and return true if stok is one of known class;
 // otherwise it will return false.
 //
-func (m *master) parseRRClass(rr *ResourceRecord, stok string) bool {
+func (m *masterParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 	for k, v := range QueryClasses {
 		if stok == k {
 			rr.Class = v
@@ -686,7 +697,7 @@ func (m *master) parseRRClass(rr *ResourceRecord, stok string) bool {
 // It will set rr.Type and return true if token found, otherwise it will
 // return false.
 //
-func (m *master) parseRRType(rr *ResourceRecord, stok string) bool {
+func (m *masterParser) parseRRType(rr *ResourceRecord, stok string) bool {
 	for k, v := range QueryTypes {
 		if stok == k {
 			rr.Type = v
@@ -696,7 +707,7 @@ func (m *master) parseRRType(rr *ResourceRecord, stok string) bool {
 	return false
 }
 
-func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
+func (m *masterParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
 	case QueryTypeA, QueryTypeAAAA:
 		rr.Value = tok
@@ -709,7 +720,8 @@ func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 
 	// NULL RRs are not allowed in master files.
 	case QueryTypeNULL:
-		err = fmt.Errorf("! %s:%d NULL type is not allowed", m.file, m.lineno)
+		err = fmt.Errorf("! %s:%d NULL type is not allowed",
+			m.out.Path, m.lineno)
 
 	// In master files, both ports and protocols are expressed using
 	// mnemonics or decimal numbers.
@@ -735,7 +747,7 @@ func (m *master) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	return err
 }
 
-func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
+func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	ascii.ToLower(&tok)
 
 	rrSOA := &RDataSOA{
@@ -745,14 +757,15 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		return fmt.Errorf("! %s:%d Invalid RDATA", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Invalid RDATA",
+			m.out.Path, m.lineno)
 	}
 
 	// Get RNAME
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 || isTerm {
 		return fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-			m.file, m.lineno, string(tok))
+			m.out.Path, m.lineno, string(tok))
 	}
 
 	ascii.ToLower(&tok)
@@ -766,7 +779,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-			m.file, m.lineno, string(tok))
+			m.out.Path, m.lineno, string(tok))
 	}
 
 	if len(tok) == 1 && tok[0] == '(' {
@@ -800,7 +813,7 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		tok, isTerm, c = m.reader.ReadUntil(m.seps, terms)
 		if len(tok) == 0 {
 			return fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-				m.file, m.lineno, string(tok))
+				m.out.Path, m.lineno, string(tok))
 		}
 		if c == ';' {
 			m.reader.SkipLine()
@@ -837,11 +850,12 @@ func (m *master) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 
 		default:
 			return fmt.Errorf("! %s:%d Invalid RR statement %d '%s'",
-				m.file, m.lineno, m.flag, string(tok))
+				m.out.Path, m.lineno, m.flag, string(tok))
 		}
 	}
 	if m.flag != parseSOAEnd {
-		return fmt.Errorf("! %s:%d Incomplete RR statement", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Incomplete RR statement",
+			m.out.Path, m.lineno)
 	}
 out:
 	if isMultiline {
@@ -861,7 +875,7 @@ out:
 
 		if c != ')' {
 			return fmt.Errorf("! %s:%d Missing closing parentheses",
-				m.file, m.lineno)
+				m.out.Path, m.lineno)
 		}
 
 		_, _, c = m.reader.ReadUntil(m.seps, m.terms)
@@ -878,7 +892,7 @@ out:
 	return nil
 }
 
-func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
+func (m *masterParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rrHInfo := &RDataHINFO{
 		CPU: tok,
 	}
@@ -886,14 +900,16 @@ func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		err = fmt.Errorf("! %s:%d Missing HInfo OS value", m.file, m.lineno)
+		err = fmt.Errorf("! %s:%d Missing HInfo OS value",
+			m.out.Path, m.lineno)
 		return
 	}
 
 	// Get OS
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
-		err = fmt.Errorf("! %s:%d Missing HInfo OS value", m.file, m.lineno)
+		err = fmt.Errorf("! %s:%d Missing HInfo OS value",
+			m.out.Path, m.lineno)
 		return
 	}
 
@@ -907,7 +923,7 @@ func (m *master) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	return
 }
 
-func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
+func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rrMInfo := &RDataMINFO{
 		RMailBox: tok,
 	}
@@ -915,14 +931,16 @@ func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		err = fmt.Errorf("! %s:%d Missing MInfo EmailBox value", m.file, m.lineno)
+		err = fmt.Errorf("! %s:%d Missing MInfo EmailBox value",
+			m.out.Path, m.lineno)
 		return
 	}
 
 	// Get EmailBox value
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
-		err = fmt.Errorf("! %s:%d Missing MInfo EmailBox value", m.file, m.lineno)
+		err = fmt.Errorf("! %s:%d Missing MInfo EmailBox value",
+			m.out.Path, m.lineno)
 		return
 	}
 
@@ -936,11 +954,11 @@ func (m *master) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	return
 }
 
-func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
+func (m *masterParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	pref, err := strconv.ParseInt(string(tok), 10, 64)
 	if err != nil {
 		return fmt.Errorf("! %s:%d Invalid MX Preference: %s",
-			m.file, m.lineno, err)
+			m.out.Path, m.lineno, err)
 	}
 
 	rrMX := &RDataMX{
@@ -950,13 +968,15 @@ func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
-		return fmt.Errorf("! %s:%d Missing MX Exchange value", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Missing MX Exchange value",
+			m.out.Path, m.lineno)
 	}
 
 	// Get EmailBox value
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
-		return fmt.Errorf("! %s:%d Missing MX Exchange value", m.file, m.lineno)
+		return fmt.Errorf("! %s:%d Missing MX Exchange value",
+			m.out.Path, m.lineno)
 	}
 
 	rrMX.Exchange = m.generateDomainName(tok)
@@ -976,7 +996,7 @@ func (m *master) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 //
 // The rdata MUST contains double quote at the beginning and end of text.
 //
-func (m *master) parseTXT(rr *ResourceRecord, v []byte) (err error) {
+func (m *masterParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	tok, _, _ := m.reader.ReadUntil(nil, []byte{'\n'})
 	v = append(v, tok...)
 	v = bytes.TrimSpace(v)
@@ -993,7 +1013,7 @@ func (m *master) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	return nil
 }
 
-func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
+func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	var v int
 
 	rrSRV := &RDataSRV{
@@ -1006,12 +1026,14 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	for {
 		_, c := m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
-			return fmt.Errorf("! %s:%d Incomplete SRV RDATA", m.file, m.lineno)
+			return fmt.Errorf("! %s:%d Incomplete SRV RDATA",
+				m.out.Path, m.lineno)
 		}
 
 		tok, _, _ = m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
-			return fmt.Errorf("! %s:%d Incomplete SRV RDATA", m.file, m.lineno)
+			return fmt.Errorf("! %s:%d Incomplete SRV RDATA",
+				m.out.Path, m.lineno)
 		}
 
 		switch m.flag {
@@ -1053,7 +1075,8 @@ func (m *master) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 			goto out
 
 		default:
-			return fmt.Errorf("! %s:%d Invalid SRV RData", m.file, m.lineno)
+			return fmt.Errorf("! %s:%d Invalid SRV RData",
+				m.out.Path, m.lineno)
 		}
 	}
 out:
@@ -1066,7 +1089,7 @@ out:
 	return nil
 }
 
-func (m *master) generateDomainName(dname []byte) (out []byte) {
+func (m *masterParser) generateDomainName(dname []byte) (out []byte) {
 	ascii.ToLower(&dname)
 	switch {
 	case dname[0] == '@':
@@ -1090,19 +1113,19 @@ func (m *master) generateDomainName(dname []byte) (out []byte) {
 // It will return true if new message created for RR, otherwise it will return
 // false.
 //
-func (m *master) push(rr *ResourceRecord) bool {
+func (m *masterParser) push(rr *ResourceRecord) bool {
 	m.lastRR = rr
-	for x := 0; x < len(m.msgs); x++ {
-		if !bytes.Equal(m.msgs[x].Question.Name, rr.Name) {
+	for x := 0; x < len(m.out.Messages); x++ {
+		if !bytes.Equal(m.out.Messages[x].Question.Name, rr.Name) {
 			continue
 		}
-		if m.msgs[x].Question.Type != rr.Type {
+		if m.out.Messages[x].Question.Type != rr.Type {
 			continue
 		}
-		if m.msgs[x].Question.Class != rr.Class {
+		if m.out.Messages[x].Question.Class != rr.Class {
 			continue
 		}
-		m.msgs[x].Answer = append(m.msgs[x].Answer, *rr)
+		m.out.Messages[x].Answer = append(m.out.Messages[x].Answer, *rr)
 		return false
 	}
 
@@ -1119,13 +1142,13 @@ func (m *master) push(rr *ResourceRecord) bool {
 		Answer: []ResourceRecord{*rr},
 	}
 
-	m.msgs = append(m.msgs, msg)
+	m.out.Messages = append(m.out.Messages, msg)
 
 	return true
 }
 
-func (m *master) setMinimumTTL() {
-	for _, msg := range m.msgs {
+func (m *masterParser) setMinimumTTL() {
+	for _, msg := range m.out.Messages {
 		for x := 0; x < len(msg.Answer); x++ {
 			if msg.Answer[x].TTL < m.ttl {
 				msg.Answer[x].TTL = m.ttl
@@ -1144,8 +1167,8 @@ func (m *master) setMinimumTTL() {
 	}
 }
 
-func (m *master) pack() {
-	for _, msg := range m.msgs {
+func (m *masterParser) pack() {
+	for _, msg := range m.out.Messages {
 		msg.Header.ANCount = uint16(len(msg.Answer))
 		msg.Header.NSCount = uint16(len(msg.Authority))
 		msg.Header.ARCount = uint16(len(msg.Additional))
