@@ -23,6 +23,7 @@ var (
 	_testUID          = uint64(100)
 	_testPort         = 9001
 	_testServer       *Server
+	_testAddr         string
 	_testWSAddr       string
 	_testHdrValWSKey  = "dGhlIHNhbXBsZSBub25jZQ=="
 	_testMaskKey      = []byte{'7', 'ú', '!', '='}
@@ -98,7 +99,8 @@ func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 func runTestServer() {
 	var err error
 
-	_testWSAddr = "ws://127.0.0.1:" + strconv.Itoa(_testPort) + "/"
+	_testAddr = "127.0.0.1:" + strconv.Itoa(_testPort)
+	_testWSAddr = "ws://" + _testAddr + "/"
 	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
 
 	_testServer = NewServer(_testPort)

@@ -254,3 +254,13 @@ func TestServerHandshake(t *testing.T) {
 		}
 	}
 }
+
+func TestServer_Health(t *testing.T) {
+	res, err := http.Get("http://" + _testAddr + "/health")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "/health response code", http.StatusNoContent,
+		res.StatusCode, true)
+}

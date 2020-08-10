@@ -26,10 +26,16 @@ import (
 const (
 	_maxQueue = 128
 
+	_pathHealth = "/health"
+
 	_resUpgradeOK = "HTTP/1.1 101 Switching Protocols\r\n" +
 		"Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" +
 		"Sec-Websocket-Accept: "
+)
+
+var (
+	_resHealthOK []byte = []byte("HTTP/1.1 204\r\n\r\n")
 )
 
 //
@@ -84,7 +90,8 @@ type Server struct {
 }
 
 //
-// NewServer will create new web-socket server that listen on port number.
+// NewServer will create new web-socket server that listen on specific port
+// number.
 //
 func NewServer(port int) (serv *Server) {
 	serv = &Server{
@@ -175,21 +182,19 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 // On success it will return the context from authentication and the WebSocket
 // key.
 //
-func (serv *Server) handleUpgrade(httpRequest []byte) (
+func (serv *Server) handleUpgrade(hs *Handshake) (
 	ctx context.Context, key []byte, err error,
 ) {
-	handshake := _handshakePool.Get().(*Handshake)
-
-	err = handshake.parse(httpRequest)
+	err = hs.parse()
 	if err == nil {
-		key = libbytes.Copy(handshake.Key)
+		key = libbytes.Copy(hs.Key)
 		if serv.HandleAuth != nil {
-			ctx, err = serv.HandleAuth(handshake)
+			ctx, err = serv.HandleAuth(hs)
 		}
 	}
 
-	handshake.reset(nil)
-	_handshakePool.Put(handshake)
+	hs.reset(nil)
+	_handshakePool.Put(hs)
 
 	return ctx, key, err
 }
@@ -250,7 +255,23 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		ctx, key, err := serv.handleUpgrade(packet)
+		hs, err := newHandshake(packet)
+		if err != nil {
+			serv.handleError(conn, http.StatusBadRequest, err.Error())
+			continue
+		}
+
+		if hs.URI == _pathHealth {
+			err = Send(conn, _resHealthOK)
+			if err != nil {
+				log.Println("websocket /health: Send: ",
+					err.Error())
+			}
+			unix.Close(conn)
+			continue
+		}
+
+		ctx, key, err := serv.handleUpgrade(hs)
 		if err != nil {
 			serv.handleError(conn, http.StatusBadRequest, err.Error())
 			continue

@@ -217,7 +217,8 @@ func BenchmarkUpgrader(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				for pb.Next() {
 					c := conn[atomic.AddInt64(i, 1)-1]
-					_, _, _ = u.handleUpgrade(c)
+					hs, _ := newHandshake(c)
+					_, _, _ = u.handleUpgrade(hs)
 				}
 			})
 		})

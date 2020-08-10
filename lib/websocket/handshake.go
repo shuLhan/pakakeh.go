@@ -78,12 +78,25 @@ type Handshake struct {
 	headerFlags int
 	raw         []byte
 
-	URI        []byte
+	URI        string
 	Host       []byte
 	Key        []byte
 	Extensions []byte
 	Protocol   []byte
 	Header     http.Header
+}
+
+func newHandshake(req []byte) (h *Handshake, err error) {
+	h = _handshakePool.Get().(*Handshake)
+
+	h.reset(req)
+
+	err = h.parseHTTPLine()
+	if err != nil {
+		return nil, err
+	}
+
+	return h, nil
 }
 
 //
@@ -95,7 +108,7 @@ func (h *Handshake) reset(req []byte) {
 	h.headerFlags = 0
 	h.raw = req
 
-	h.URI = nil
+	h.URI = ""
 	h.Extensions = nil
 	h.Protocol = nil
 	h.Header = nil
@@ -147,7 +160,7 @@ func (h *Handshake) parseHTTPLine() (err error) {
 		return
 	}
 
-	h.URI = chunk
+	h.URI = string(chunk)
 
 	chunk = h.getBytesChunk('/', false)
 	if !bytes.Equal(chunk, []byte("HTTP")) {
@@ -318,16 +331,9 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 //
 // The minimum length of request without HTTP line is: 144 - 16 = 128 bytes.
 //
-func (h *Handshake) parse(req []byte) (err error) {
-	if len(req) < 144 {
+func (h *Handshake) parse() (err error) {
+	if len(h.raw) < 144 {
 		return ErrRequestLength
-	}
-
-	h.reset(req)
-
-	err = h.parseHTTPLine()
-	if err != nil {
-		return err
 	}
 
 	if len(h.raw)-h.start < 128 {
