@@ -3,6 +3,20 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.19.0 (2020-09-xx)
+
+===  Breaking changes
+
+*  dns: dns: split between MasterFile and masterParser
+
+   While at it add field Records that contains unpacked ResourceRecord as
+   mapping between domain and ResourceRecord.
+
+   This is useful for client that need to edit the RR in MasterFile.
+
+   This changes also unexport the Messages field, to access it use the method
+   Messages.
+
 ==  share v0.18.0 (2020-08-06)
 
 ===  Breaking changes

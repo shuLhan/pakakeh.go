@@ -332,9 +332,9 @@ VAXA    A       10.2.0.27
 		}
 
 		test.Assert(t, "messages length:",
-			len(c.exp), len(m.out.Messages), true)
+			len(c.exp), len(m.out.messages), true)
 
-		for x, msg := range m.out.Messages {
+		for x, msg := range m.out.messages {
 			test.Assert(t, "Message.Header",
 				c.exp[x].Header, msg.Header, true)
 			test.Assert(t, "Message.Question",
@@ -621,9 +621,9 @@ relay IN CNAME relay.pair.com.
 		}
 
 		test.Assert(t, "messages length:", len(c.exp),
-			len(m.out.Messages), true)
+			len(m.out.messages), true)
 
-		for x, msg := range m.out.Messages {
+		for x, msg := range m.out.messages {
 			test.Assert(t, "Message.Header",
 				c.exp[x].Header, msg.Header, true)
 			test.Assert(t, "Message.Question",
@@ -774,9 +774,9 @@ angularjs.doc       A  127.0.0.1
 		}
 
 		test.Assert(t, "messages length:", len(c.exp),
-			len(m.out.Messages), true)
+			len(m.out.messages), true)
 
-		for x, msg := range m.out.Messages {
+		for x, msg := range m.out.messages {
 			test.Assert(t, "Message.Header", c.exp[x].Header,
 				msg.Header, true)
 			test.Assert(t, "Message.Question",
@@ -877,9 +877,9 @@ func TestMasterParseTXT(t *testing.T) {
 		}
 
 		test.Assert(t, "messages length:", len(c.exp),
-			len(m.out.Messages), true)
+			len(m.out.messages), true)
 
-		for x, msg := range m.out.Messages {
+		for x, msg := range m.out.messages {
 			test.Assert(t, "Message.Header", c.exp[x].Header,
 				msg.Header, true)
 			test.Assert(t, "Message.Question", c.exp[x].Question,

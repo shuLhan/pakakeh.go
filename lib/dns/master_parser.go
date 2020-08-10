@@ -8,9 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"os"
-	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -53,16 +50,6 @@ const (
 	parseSRVTarget
 )
 
-//
-// MasterFile represent content of single master file.
-//
-type MasterFile struct {
-	Path     string
-	Name     string
-	Messages []*Message
-	Records  []*ResourceRecord
-}
-
 type masterParser struct {
 	out    *MasterFile
 	lineno int
@@ -75,104 +62,9 @@ type masterParser struct {
 	flag   int
 }
 
-//
-// LoadMasterDir load DNS record from master (zone) formatted files in
-// directory "dir".
-// On success, it will return map of file name and MasterFile content as list
-// of Message.
-// On fail, it will return possible partially parse master files and an error.
-//
-func LoadMasterDir(dir string) (masterFiles map[string]*MasterFile, err error) {
-	if len(dir) == 0 {
-		return nil, nil
-	}
-
-	d, err := os.Open(dir)
-	if err != nil {
-		return nil, fmt.Errorf("LoadMasterDir: %w", err)
-	}
-
-	fis, err := d.Readdir(0)
-	if err != nil {
-		err = d.Close()
-		if err != nil {
-			return nil, fmt.Errorf("LoadMasterDir: %w", err)
-		}
-		return nil, fmt.Errorf("LoadMasterDir: %w", err)
-	}
-
-	masterFiles = make(map[string]*MasterFile)
-
-	for x := 0; x < len(fis); x++ {
-		if fis[x].IsDir() {
-			continue
-		}
-
-		// Ignore file that start with "." .
-		name := fis[x].Name()
-		if name[0] == '.' {
-			continue
-		}
-
-		masterFilePath := filepath.Join(dir, name)
-
-		masterFile, err := ParseMasterFile(masterFilePath, "", 0)
-		if err != nil {
-			return masterFiles, fmt.Errorf("LoadMasterDir %q: %w", dir, err)
-		}
-
-		masterFiles[name] = masterFile
-	}
-
-	err = d.Close()
-	if err != nil {
-		return masterFiles, fmt.Errorf(" LoadMasterDir %q: %w", dir, err)
-	}
-
-	return masterFiles, nil
-}
-
-//
-// ParseMasterFile parse master file and return it as list of Message.
-// The file name will be assumed as origin if parameter origin or $ORIGIN is
-// not set.
-//
-func ParseMasterFile(file, origin string, ttl uint32) (*MasterFile, error) {
-	var err error
-
-	m := newMasterParser(file)
-	m.ttl = ttl
-
-	if len(origin) > 0 {
-		m.origin = origin
-	} else {
-		m.origin = path.Base(file)
-	}
-
-	m.origin = strings.ToLower(m.origin)
-
-	m.reader, err = libio.NewReader(file)
-	if err != nil {
-		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
-	}
-
-	err = m.parse()
-	if err != nil {
-		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
-	}
-
-	m.out.Name = m.origin
-
-	mf := m.out
-	m.out = nil
-	return mf, nil
-}
-
 func newMasterParser(file string) *masterParser {
 	return &masterParser{
-		out: &MasterFile{
-			Path: file,
-		},
+		out:    newMasterFile(file, ""),
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
 		terms:  []byte{';', '\n'},
@@ -183,9 +75,7 @@ func newMasterParser(file string) *masterParser {
 // Init parse masterParser file from string.
 //
 func (m *masterParser) Init(data, origin string, ttl uint32) {
-	m.out = &MasterFile{
-		Path: "(data)",
-	}
+	m.out = newMasterFile("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
 	m.ttl = ttl
@@ -421,7 +311,7 @@ func (m *masterParser) parseDirectiveInclude() (err error) {
 		return err
 	}
 
-	m.out.Messages = append(m.out.Messages, masterFile.Messages...)
+	m.out.messages = append(m.out.messages, masterFile.messages...)
 
 	return nil
 }
@@ -1114,18 +1004,20 @@ func (m *masterParser) generateDomainName(dname []byte) (out []byte) {
 // false.
 //
 func (m *masterParser) push(rr *ResourceRecord) {
+	m.out.Records.add(rr)
+
 	m.lastRR = rr
-	for x := 0; x < len(m.out.Messages); x++ {
-		if !bytes.Equal(m.out.Messages[x].Question.Name, rr.Name) {
+	for x := 0; x < len(m.out.messages); x++ {
+		if !bytes.Equal(m.out.messages[x].Question.Name, rr.Name) {
 			continue
 		}
-		if m.out.Messages[x].Question.Type != rr.Type {
+		if m.out.messages[x].Question.Type != rr.Type {
 			continue
 		}
-		if m.out.Messages[x].Question.Class != rr.Class {
+		if m.out.messages[x].Question.Class != rr.Class {
 			continue
 		}
-		m.out.Messages[x].Answer = append(m.out.Messages[x].Answer, *rr)
+		m.out.messages[x].Answer = append(m.out.messages[x].Answer, *rr)
 		return
 	}
 
@@ -1141,12 +1033,12 @@ func (m *masterParser) push(rr *ResourceRecord) {
 		},
 		Answer: []ResourceRecord{*rr},
 	}
-	m.out.Messages = append(m.out.Messages, msg)
+	m.out.messages = append(m.out.messages, msg)
 	return
 }
 
 func (m *masterParser) setMinimumTTL() {
-	for _, msg := range m.out.Messages {
+	for _, msg := range m.out.messages {
 		for x := 0; x < len(msg.Answer); x++ {
 			if msg.Answer[x].TTL < m.ttl {
 				msg.Answer[x].TTL = m.ttl
@@ -1166,7 +1058,7 @@ func (m *masterParser) setMinimumTTL() {
 }
 
 func (m *masterParser) pack() {
-	for _, msg := range m.out.Messages {
+	for _, msg := range m.out.messages {
 		msg.Header.ANCount = uint16(len(msg.Answer))
 		msg.Header.NSCount = uint16(len(msg.Authority))
 		msg.Header.ARCount = uint16(len(msg.Additional))

@@ -55,7 +55,7 @@ func ExampleServer() {
 		log.Fatal(err)
 	}
 
-	server.PopulateCaches(masterFile.Messages)
+	server.PopulateCaches(masterFile.Messages())
 
 	go func() {
 		err = server.ListenAndServe()
