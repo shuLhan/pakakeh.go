@@ -25,15 +25,13 @@ func main() {
 
 	opts := &websocket.ServerOptions{
 		Address: ":9001",
+		// Register the authentication handler.
+		HandleAuth:         handleAuth,
+		HandleClientAdd:    handleClientAdd,
+		HandleClientRemove: handleClientRemove,
 	}
 
 	server = websocket.NewServer(opts)
-
-	// Register the authentication handler.
-	server.HandleAuth = handleAuth
-
-	server.HandleClientAdd = handleClientAdd
-	server.HandleClientRemove = handleClientRemove
 
 	// Register the message handler
 	err := server.RegisterTextHandler(http.MethodPost, "/message", handlePostMessage)

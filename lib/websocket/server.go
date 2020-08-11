@@ -41,8 +41,7 @@ const (
 )
 
 //
-// Server for websocket.
-//
+// Server for websocket.  //
 type Server struct {
 	Clients *ClientManager
 
@@ -54,37 +53,6 @@ type Server struct {
 	poll libnet.Poll
 
 	routes *rootRoute
-
-	// HandleAuth callback that will be called when receiving
-	// client handshake.
-	HandleAuth HandlerAuthFn
-
-	// HandleClientAdd callback that will called after client handshake
-	// and, if HandleAuth is defined, after client is authenticated.
-	HandleClientAdd HandlerClientFn
-
-	// HandleClientRemove callback that will be called before client
-	// connection being removed and closed by server.
-	HandleClientRemove HandlerClientFn
-
-	// HandleRsvControl callback that will be called when server received
-	// reserved control frame (opcode 0xB-F) from client.
-	// Default handle is nil.
-	HandleRsvControl HandlerFrameFn
-
-	// HandleText callback that will be called after receiving data
-	// frame(s) text from client.
-	// Default handle parse the payload into Request and pass it to
-	// registered routes.
-	HandleText HandlerPayloadFn
-
-	// HandleBin callback that will be called after receiving data
-	// frame(s) binary from client.
-	HandleBin HandlerPayloadFn
-
-	// HandleStatus function that will be called when server receive
-	// request for status as defined in ServerOptions.StatusPath.
-	HandleStatus HandlerStatusFn
 
 	// handlePong callback that will be called after receiving control
 	// PONG frame from client. Default is nil, used only for testing.
@@ -100,6 +68,10 @@ type Server struct {
 // number.
 //
 func NewServer(opts *ServerOptions) (serv *Server) {
+	if opts == nil {
+		opts = &ServerOptions{}
+	}
+
 	serv = &Server{
 		opts:    opts,
 		Clients: newClientManager(),
@@ -109,11 +81,12 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 
 	opts.init()
 
-	serv.HandleBin = serv.handleBin
-	serv.HandleClientAdd = nil
-	serv.HandleClientRemove = nil
-	serv.HandleRsvControl = nil
-	serv.HandleText = serv.handleText
+	if opts.HandleBin == nil {
+		opts.HandleBin = serv.handleBin
+	}
+	if opts.HandleText == nil {
+		opts.HandleText = serv.handleText
+	}
 
 	return serv
 }
@@ -206,8 +179,8 @@ func (serv *Server) handleUpgrade(hs *Handshake) (
 	err = hs.parse()
 	if err == nil {
 		key = libbytes.Copy(hs.Key)
-		if serv.HandleAuth != nil {
-			ctx, err = serv.HandleAuth(hs)
+		if serv.opts.HandleAuth != nil {
+			ctx, err = serv.opts.HandleAuth(hs)
 		}
 	}
 
@@ -229,8 +202,8 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 	if ctx != nil {
 		serv.Clients.add(ctx, conn)
 
-		if serv.HandleClientAdd != nil {
-			go serv.HandleClientAdd(ctx, conn)
+		if serv.opts.HandleClientAdd != nil {
+			go serv.opts.HandleClientAdd(ctx, conn)
 		}
 	}
 
@@ -243,8 +216,8 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 func (serv *Server) ClientRemove(conn int) {
 	ctx := serv.Clients.Context(conn)
 
-	if ctx != nil && serv.HandleClientRemove != nil {
-		serv.HandleClientRemove(ctx, conn)
+	if ctx != nil && serv.opts.HandleClientRemove != nil {
+		serv.opts.HandleClientRemove(ctx, conn)
 	}
 
 	serv.Clients.remove(conn)
@@ -393,9 +366,9 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 			serv.handleInvalidData(conn)
 			return true
 		}
-		go serv.HandleText(conn, frame.payload)
+		go serv.opts.HandleText(conn, frame.payload)
 	} else {
-		go serv.HandleBin(conn, frame.payload)
+		go serv.opts.HandleBin(conn, frame.payload)
 	}
 
 	return false
@@ -429,8 +402,8 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 			go serv.handlePong(conn, frame)
 		}
 	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
-		if serv.HandleRsvControl != nil {
-			serv.HandleRsvControl(conn, frame)
+		if serv.opts.HandleRsvControl != nil {
+			serv.opts.HandleRsvControl(conn, frame)
 		} else {
 			serv.handleClose(conn, frame)
 			isClosing = true
@@ -514,11 +487,11 @@ func (serv *Server) handleStatus(conn int) {
 		data        []byte
 	)
 
-	if serv.HandleStatus == nil {
+	if serv.opts.HandleStatus == nil {
 		contentType = "text/plain"
 		data = []byte("OK")
 	} else {
-		contentType, data = serv.HandleStatus()
+		contentType, data = serv.opts.HandleStatus()
 	}
 
 	res := fmt.Sprintf(_resStatusOK, contentType, len(data), data)

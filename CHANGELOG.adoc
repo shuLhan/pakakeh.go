@@ -7,6 +7,8 @@ This library is released each month, usually at the first week of month.
 
 ===  Breaking changes
 
+*  websocket: move the server handler to ServerOptions
+
 *  dns: dns: split between MasterFile and masterParser
 
    While at it add field Records that contains unpacked ResourceRecord as

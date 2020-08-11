@@ -58,15 +58,14 @@
 //	func main() {
 //		opts := &ServerOptions{
 //			Address: ":9001",
+//			HandleAuth: handleAuth,
+//			HandleText: handleText,
 //		}
 //		srv, err := websocket.NewServer(opts)
 //		if err != nil {
 //			log.Println("websocket: " + err.Error())
 //			os.Exit(2)
 //		}
-//
-//		srv.HandleAuth = handleAuth
-//		srv.HandleText = handleText
 //
 //		srv.Start()
 //	}

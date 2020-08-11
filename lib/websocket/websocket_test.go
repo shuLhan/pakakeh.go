@@ -98,13 +98,12 @@ func runTestServer() {
 	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
 
 	opts := &ServerOptions{
-		Address: _testAddr,
+		Address:    _testAddr,
+		HandleAuth: testHandleAuth,
+		HandleBin:  testHandleBin,
+		HandleText: testHandleText,
 	}
 	_testServer = NewServer(opts)
-
-	_testServer.HandleAuth = testHandleAuth
-	_testServer.HandleBin = testHandleBin
-	_testServer.HandleText = testHandleText
 
 	go func() {
 		err = _testServer.Start()

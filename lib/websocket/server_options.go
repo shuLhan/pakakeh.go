@@ -28,6 +28,37 @@ type ServerOptions struct {
 	// Default to ConnectPath +"/status" if its empty.
 	// The StatusPath is handled by HandleStatus callback in the server.
 	StatusPath string
+
+	// HandleAuth callback that will be called when receiving
+	// client handshake.
+	HandleAuth HandlerAuthFn
+
+	// HandleClientAdd callback that will called after client handshake
+	// and, if HandleAuth is defined, after client is authenticated.
+	HandleClientAdd HandlerClientFn
+
+	// HandleClientRemove callback that will be called before client
+	// connection being removed and closed by server.
+	HandleClientRemove HandlerClientFn
+
+	// HandleRsvControl callback that will be called when server received
+	// reserved control frame (opcode 0xB-F) from client.
+	// Default handle is nil.
+	HandleRsvControl HandlerFrameFn
+
+	// HandleText callback that will be called after receiving data
+	// frame(s) text from client.
+	// Default handle parse the payload into Request and pass it to
+	// registered routes.
+	HandleText HandlerPayloadFn
+
+	// HandleBin callback that will be called after receiving data
+	// frame(s) binary from client.
+	HandleBin HandlerPayloadFn
+
+	// HandleStatus function that will be called when server receive
+	// request for status as defined in ServerOptions.StatusPath.
+	HandleStatus HandlerStatusFn
 }
 
 func (opts *ServerOptions) init() {
