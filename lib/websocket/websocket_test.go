@@ -95,7 +95,8 @@ func runTestServer() {
 
 	_testAddr = "127.0.0.1:" + strconv.Itoa(_testPort)
 	_testWSAddr = "ws://" + _testAddr + "/"
-	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
+	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" +
+		_testExternalJWT
 
 	opts := &ServerOptions{
 		Address:    _testAddr,

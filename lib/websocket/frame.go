@@ -379,24 +379,30 @@ func (f *Frame) unpack(packet []byte) []byte {
 				if len(f.chopped) < 10 {
 					exp := 10 - len(f.chopped)
 					if len(packet) < exp {
-						f.chopped = append(f.chopped, packet...)
+						f.chopped = append(f.chopped,
+							packet...)
 						return nil
 					}
 					// chopped: 81 FF 0 0 0 1 0 0 = 10 - 8) = 2
 					// exp: 0 0
-					f.chopped = append(f.chopped, packet[:exp]...)
-					f.len = binary.BigEndian.Uint64(f.chopped[2:10])
+					f.chopped = append(f.chopped,
+						packet[:exp]...)
+					f.len = binary.BigEndian.Uint64(
+						f.chopped[2:10])
 					packet = packet[exp:]
 				}
 			case frameMediumPayload:
 				if len(f.chopped) < 4 {
 					exp := 4 - len(f.chopped)
 					if len(packet) < exp {
-						f.chopped = append(f.chopped, packet...)
+						f.chopped = append(f.chopped,
+							packet...)
 						return nil
 					}
-					f.chopped = append(f.chopped, packet[:exp]...)
-					f.len = uint64(binary.BigEndian.Uint16(f.chopped[2:4]))
+					f.chopped = append(f.chopped,
+						packet[:exp]...)
+					f.len = uint64(binary.BigEndian.Uint16(
+						f.chopped[2:4]))
 					packet = packet[exp:]
 				}
 			}
@@ -454,7 +460,8 @@ func (f *Frame) unpack(packet []byte) []byte {
 			case 1:
 				f.closeCode = StatusBadRequest
 			default:
-				f.closeCode = CloseCode(binary.BigEndian.Uint16(f.payload[:2]))
+				f.closeCode = CloseCode(binary.BigEndian.Uint16(
+					f.payload[:2]))
 			}
 		}
 		f.isComplete = true

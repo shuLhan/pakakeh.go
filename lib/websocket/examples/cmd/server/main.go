@@ -34,7 +34,8 @@ func main() {
 	server = websocket.NewServer(opts)
 
 	// Register the message handler
-	err := server.RegisterTextHandler(http.MethodPost, "/message", handlePostMessage)
+	err := server.RegisterTextHandler(http.MethodPost, "/message",
+		handlePostMessage)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,7 +121,9 @@ func handleClientRemove(ctx context.Context, conn int) {
 //
 // handlePostMessage handle message that is send to server by client.
 //
-func handlePostMessage(ctx context.Context, req *websocket.Request) (res websocket.Response) {
+func handlePostMessage(ctx context.Context, req *websocket.Request) (
+	res websocket.Response,
+) {
 	uid := ctx.Value(websocket.CtxKeyUID).(int64)
 	user := examples.Users[uid]
 

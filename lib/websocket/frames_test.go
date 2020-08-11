@@ -33,7 +33,8 @@ func TestFrameUnpack(t *testing.T) {
 		desc: "A single-frame masked text message",
 		in: []byte{
 			0x81, 0x85,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
+			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
+			_testMaskKey[3],
 			0x7f, 0x9f, 0x4d, 0x51, 0x58,
 		},
 		exp: &Frame{
@@ -82,7 +83,8 @@ func TestFrameUnpack(t *testing.T) {
 		desc: `Pong without payload`,
 		in: []byte{
 			0x8A, 0x80,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
+			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
+			_testMaskKey[3],
 		},
 		exp: &Frame{
 			fin:        frameIsFinished,
@@ -95,7 +97,8 @@ func TestFrameUnpack(t *testing.T) {
 		desc: `Pong with payload`,
 		in: []byte{
 			0x8a, 0x85,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
+			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
+			_testMaskKey[3],
 			0x7f, 0x9f, 0x4d, 0x51, 0x58,
 		},
 		exp: &Frame{
@@ -109,7 +112,8 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `256 bytes binary message in a single unmasked frame`,
-		in:   libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00}, _dummyPayload256),
+		in: libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00},
+			_dummyPayload256),
 		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeBin,
@@ -122,7 +126,8 @@ func TestFrameUnpack(t *testing.T) {
 		desc: `256 bytes binary message in a single masked frame`,
 		in: libbytes.Concat([]byte{
 			0x82, 0xFE, 0x01, 0x00,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
+			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
+			_testMaskKey[3],
 		}, _dummyPayload256Masked),
 		exp: &Frame{
 			fin:        frameIsFinished,
@@ -152,7 +157,8 @@ func TestFrameUnpack(t *testing.T) {
 		in: libbytes.Concat([]byte{
 			0x82, 0xFF,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2], _testMaskKey[3],
+			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
+			_testMaskKey[3],
 		}, _dummyPayload65536Masked),
 		exp: &Frame{
 			fin:        frameIsFinished,

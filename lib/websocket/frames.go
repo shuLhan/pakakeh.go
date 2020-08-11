@@ -68,7 +68,8 @@ func (frames *Frames) fin(last *Frame) (frame *Frame) {
 		}
 
 		// Ignore control PING or PONG frame.
-		if frames.v[x].opcode == OpcodePing || frames.v[x].opcode == OpcodePong {
+		if frames.v[x].opcode == OpcodePing ||
+			frames.v[x].opcode == OpcodePong {
 			continue
 		}
 
@@ -129,7 +130,8 @@ func (frames *Frames) payload() (payload []byte) {
 		}
 
 		// Ignore control PING or PONG frame.
-		if frames.v[x].opcode == OpcodePing || frames.v[x].opcode == OpcodePong {
+		if frames.v[x].opcode == OpcodePing ||
+			frames.v[x].opcode == OpcodePong {
 			continue
 		}
 

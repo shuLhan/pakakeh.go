@@ -348,7 +348,8 @@ func (cl *Client) open() (err error) {
 	}
 
 	if debug.Value >= 3 {
-		fmt.Printf("websocket: Client.open: remoteAddr: %s\n", cl.remoteAddr)
+		fmt.Printf("websocket: Client.open: remoteAddr: %s\n",
+			cl.remoteAddr)
 	}
 
 	if cl.TLSConfig != nil {
@@ -409,7 +410,9 @@ func (cl *Client) handshake() (rest []byte, err error) {
 	return rest, nil
 }
 
-func (cl *Client) doHandshake(keyAccept string, req []byte) (rest []byte, err error) {
+func (cl *Client) doHandshake(keyAccept string, req []byte) (
+	rest []byte, err error,
+) {
 	err = cl.send(req)
 	if err != nil {
 		return nil, err
@@ -587,7 +590,8 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		if isInvalid {
 			isClosing = true
 		}
-	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
+	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6,
+		OpcodeDataRsv7:
 		cl.handleBadRequest()
 		return true
 	case OpcodeClose:
@@ -604,7 +608,8 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		if cl.handlePong != nil {
 			_ = cl.handlePong(cl, frame)
 		}
-	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
+	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD,
+		OpcodeControlRsvE, OpcodeControlRsvF:
 		if cl.HandleRsvControl != nil {
 			_ = cl.HandleRsvControl(cl, frame)
 		} else {
@@ -616,13 +621,16 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 	return isClosing
 }
 
-func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, err error) {
+func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
+	rest []byte, err error,
+) {
 	if debug.Value >= 3 {
 		max := 512
 		if len(resp) < 512 {
 			max = len(resp)
 		}
-		fmt.Printf("websocket: Client.handleHandshake:\n%s\n--\n", resp[:max])
+		fmt.Printf("websocket: Client.handleHandshake:\n%s\n--\n",
+			resp[:max])
 	}
 
 	var httpRes *http.Response
@@ -840,7 +848,8 @@ func (cl *Client) recv() (packet []byte, err error) {
 		if max > 16 {
 			max = 16
 		}
-		fmt.Printf("websocket: Client.recv: packet: len:%d % x\n", len(packet), packet[:max])
+		fmt.Printf("websocket: Client.recv: packet: len:%d % x\n",
+			len(packet), packet[:max])
 	}
 
 	return packet, err

@@ -144,7 +144,9 @@ func (serv *Server) createSockServer() (err error) {
 // RegisterTextHandler register specific function to be called by server when
 // request opcode is text, and method and target matched with Request.
 //
-func (serv *Server) RegisterTextHandler(method, target string, handler RouteHandler) (err error) {
+func (serv *Server) RegisterTextHandler(
+	method, target string, handler RouteHandler,
+) (err error) {
 	if len(method) == 0 || len(target) == 0 || handler == nil {
 		return
 	}
@@ -257,7 +259,8 @@ func (serv *Server) upgrader() {
 			continue
 		}
 		if hs.URL.Path != serv.opts.ConnectPath {
-			serv.handleError(conn, http.StatusNotFound, "unknown path")
+			serv.handleError(conn, http.StatusNotFound,
+				"unknown path")
 			continue
 		}
 
@@ -273,7 +276,8 @@ func (serv *Server) upgrader() {
 
 		err = Send(conn, []byte(httpRes))
 		if err != nil {
-			log.Println("websocket: server.upgrader: Send: " + err.Error())
+			log.Println("websocket: server.upgrader: Send: ",
+				err.Error())
 			unix.Close(conn)
 			continue
 		}
@@ -284,7 +288,8 @@ func (serv *Server) upgrader() {
 
 		err = serv.clientAdd(ctx, conn)
 		if err != nil {
-			log.Println("websocket: server.upgrader: clientAdd: " + err.Error())
+			log.Println("websocket: server.upgrader: clientAdd: ",
+				err.Error())
 			unix.Close(conn)
 		}
 	}
@@ -321,7 +326,8 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
-			req.fin, req.opcode, req.masked, req.len, len(req.payload))
+			req.fin, req.opcode, req.masked, req.len,
+			len(req.payload))
 	}
 
 	if frames == nil {
@@ -389,7 +395,8 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 		if isInvalid {
 			isClosing = true
 		}
-	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6, OpcodeDataRsv7:
+	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6,
+		OpcodeDataRsv7:
 		serv.handleBadRequest(conn)
 		isClosing = true
 	case OpcodeClose:
@@ -401,7 +408,8 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 		if serv.handlePong != nil {
 			go serv.handlePong(conn, frame)
 		}
-	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD, OpcodeControlRsvE, OpcodeControlRsvF:
+	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD,
+		OpcodeControlRsvE, OpcodeControlRsvF:
 		if serv.opts.HandleRsvControl != nil {
 			serv.opts.HandleRsvControl(conn, frame)
 		} else {
@@ -616,7 +624,8 @@ func (serv *Server) handleInvalidData(conn int) {
 //
 func (serv *Server) handlePing(conn int, req *Frame) {
 	if debug.Value >= 3 {
-		fmt.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n", conn, req)
+		fmt.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n",
+			conn, req)
 	}
 
 	req.opcode = OpcodePong
@@ -666,7 +675,8 @@ func (serv *Server) reader() {
 				if max > 16 {
 					max = 16
 				}
-				fmt.Printf("websocket: Server.reader: packet {len:%d value:% x ...}\n", len(packet), packet[:max])
+				fmt.Printf("websocket: Server.reader: packet {len:%d value:% x ...}\n",
+					len(packet), packet[:max])
 			}
 
 			// Handle chopped, unfinished packet or payload.
@@ -731,8 +741,8 @@ func (serv *Server) pinger() {
 			for _, conn := range all {
 				err := Send(conn, framePing)
 				if err != nil {
-					// Error on sending PING will be assumed as
-					// bad connection.
+					// Error on sending PING will be
+					// assumed as bad connection.
 					serv.ClientRemove(conn)
 				}
 			}
