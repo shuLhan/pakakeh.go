@@ -29,6 +29,13 @@ type HandlerClientFn func(ctx context.Context, conn int)
 type HandlerPayloadFn func(conn int, payload []byte)
 
 //
+// HandlerStatusFn define server callback type to handle status request.
+// It must return the content type of data, for example "text/plain", and the
+// status data to be send to client.
+//
+type HandlerStatusFn func() (contentType string, data []byte)
+
+//
 // HandlerFrameFn define a server callback type to handle client request with
 // single frame.
 //

@@ -17,6 +17,17 @@ This library is released each month, usually at the first week of month.
    This changes also unexport the Messages field, to access it use the method
    Messages.
 
+===  New features
+
+*  websocket: add server options to change the connect and status paths
+
+   Previously, there is only one option for server, the port where it will
+   listen.
+
+   This changes add option to change the connect path (default to "/"
+   previously) and new path and handler for retrieving server status.
+
+
 ==  share v0.18.0 (2020-08-06)
 
 ===  Breaking changes

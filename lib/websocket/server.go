@@ -32,10 +32,12 @@ const (
 		"Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" +
 		"Sec-Websocket-Accept: "
-)
 
-var (
-	_resHealthOK []byte = []byte("HTTP/1.1 204\r\n\r\n")
+	_resStatusOK = "HTTP/1.1 200 OK\r\n" +
+		"Content-Type: %s\r\n" +
+		"Content-Length: %d\r\n" +
+		"\r\n" +
+		"%s"
 )
 
 //
@@ -44,7 +46,7 @@ var (
 type Server struct {
 	Clients *ClientManager
 
-	port      int
+	opts      *ServerOptions
 	sock      int
 	chUpgrade chan int
 	running   chan struct{}
@@ -80,6 +82,10 @@ type Server struct {
 	// frame(s) binary from client.
 	HandleBin HandlerPayloadFn
 
+	// HandleStatus function that will be called when server receive
+	// request for status as defined in ServerOptions.StatusPath.
+	HandleStatus HandlerStatusFn
+
 	// handlePong callback that will be called after receiving control
 	// PONG frame from client. Default is nil, used only for testing.
 	handlePong HandlerFrameFn
@@ -93,13 +99,15 @@ type Server struct {
 // NewServer will create new web-socket server that listen on specific port
 // number.
 //
-func NewServer(port int) (serv *Server) {
+func NewServer(opts *ServerOptions) (serv *Server) {
 	serv = &Server{
-		port:    port,
+		opts:    opts,
 		Clients: newClientManager(),
 		routes:  newRootRoute(),
 		running: make(chan struct{}),
 	}
+
+	opts.init()
 
 	serv.HandleBin = serv.handleBin
 	serv.HandleClientAdd = nil
@@ -136,8 +144,18 @@ func (serv *Server) createSockServer() (err error) {
 		return
 	}
 
-	addr := unix.SockaddrInet4{Port: serv.port}
-	copy(addr.Addr[:], net.ParseIP("0.0.0.0").To4())
+	host, strPort, err := net.SplitHostPort(serv.opts.Address)
+	if err != nil {
+		return
+	}
+
+	port, err := strconv.Atoi(strPort)
+	if err != nil {
+		return
+	}
+
+	addr := unix.SockaddrInet4{Port: port}
+	copy(addr.Addr[:], net.ParseIP(host).To4())
 
 	err = unix.Bind(serv.sock, &addr)
 	if err != nil {
@@ -261,13 +279,12 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		if hs.URI == _pathHealth {
-			err = Send(conn, _resHealthOK)
-			if err != nil {
-				log.Println("websocket /health: Send: ",
-					err.Error())
-			}
-			unix.Close(conn)
+		if hs.URL.Path == serv.opts.StatusPath {
+			serv.handleStatus(conn)
+			continue
+		}
+		if hs.URL.Path != serv.opts.ConnectPath {
+			serv.handleError(conn, http.StatusNotFound, "unknown path")
 			continue
 		}
 
@@ -489,6 +506,29 @@ out:
 // overwritten by implementer.
 //
 func (serv *Server) handleBin(conn int, payload []byte) {
+}
+
+func (serv *Server) handleStatus(conn int) {
+	var (
+		contentType string
+		data        []byte
+	)
+
+	if serv.HandleStatus == nil {
+		contentType = "text/plain"
+		data = []byte("OK")
+	} else {
+		contentType, data = serv.HandleStatus()
+	}
+
+	res := fmt.Sprintf(_resStatusOK, contentType, len(data), data)
+
+	err := Send(conn, []byte(res))
+	if err != nil {
+		log.Println("websocket /health: Send: ", err.Error())
+	}
+
+	unix.Close(conn)
 }
 
 //

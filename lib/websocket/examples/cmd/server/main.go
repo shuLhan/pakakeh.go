@@ -23,7 +23,11 @@ var server *websocket.Server
 func main() {
 	log.SetFlags(0)
 
-	server = websocket.NewServer(9001)
+	opts := &websocket.ServerOptions{
+		Address: ":9001",
+	}
+
+	server = websocket.NewServer(opts)
 
 	// Register the authentication handler.
 	server.HandleAuth = handleAuth

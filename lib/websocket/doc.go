@@ -56,7 +56,10 @@
 //	}
 //
 //	func main() {
-//		srv, err := websocket.NewServer(9001)
+//		opts := &ServerOptions{
+//			Address: ":9001",
+//		}
+//		srv, err := websocket.NewServer(opts)
 //		if err != nil {
 //			log.Println("websocket: " + err.Error())
 //			os.Exit(2)

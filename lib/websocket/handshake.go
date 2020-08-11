@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"net/http"
+	"net/url"
 	"sync"
 )
 
@@ -78,7 +79,7 @@ type Handshake struct {
 	headerFlags int
 	raw         []byte
 
-	URI        string
+	URL        *url.URL
 	Host       []byte
 	Key        []byte
 	Extensions []byte
@@ -108,7 +109,7 @@ func (h *Handshake) reset(req []byte) {
 	h.headerFlags = 0
 	h.raw = req
 
-	h.URI = ""
+	h.URL = nil
 	h.Extensions = nil
 	h.Protocol = nil
 	h.Header = nil
@@ -160,7 +161,11 @@ func (h *Handshake) parseHTTPLine() (err error) {
 		return
 	}
 
-	h.URI = string(chunk)
+	h.URL, err = url.ParseRequestURI(string(chunk))
+	if err != nil {
+		err = ErrBadRequest
+		return
+	}
 
 	chunk = h.getBytesChunk('/', false)
 	if !bytes.Equal(chunk, []byte("HTTP")) {

@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"strconv"
 	"testing"
@@ -77,12 +76,7 @@ func testHandleBin(conn int, payload []byte) {
 // testHandleAuth with token in query parameter
 //
 func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
-	URL, err := url.ParseRequestURI(string(req.URI))
-	if err != nil {
-		return nil, err
-	}
-
-	q := URL.Query()
+	q := req.URL.Query()
 
 	extJWT := q.Get(_qKeyTicket)
 	if len(extJWT) == 0 {
@@ -103,7 +97,10 @@ func runTestServer() {
 	_testWSAddr = "ws://" + _testAddr + "/"
 	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" + _testExternalJWT
 
-	_testServer = NewServer(_testPort)
+	opts := &ServerOptions{
+		Address: _testAddr,
+	}
+	_testServer = NewServer(opts)
 
 	_testServer.HandleAuth = testHandleAuth
 	_testServer.HandleBin = testHandleBin

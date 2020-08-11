@@ -58,6 +58,6 @@ func TestHandshakeParseHTTPLine(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "URI", c.expURI, h.URI, true)
+		test.Assert(t, "URI", c.expURI, h.URL.String(), true)
 	}
 }
