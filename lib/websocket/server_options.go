@@ -5,7 +5,6 @@
 package websocket
 
 import (
-	"log"
 	"path"
 )
 
@@ -71,6 +70,4 @@ func (opts *ServerOptions) init() {
 	if len(opts.StatusPath) == 0 {
 		opts.StatusPath = path.Join(opts.ConnectPath, defServerStatusPath)
 	}
-
-	log.Printf("opts: %+v\n", opts)
 }
