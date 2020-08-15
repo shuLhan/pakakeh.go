@@ -48,12 +48,12 @@ func TestNewAnswers(t *testing.T) {
 func TestAnswersGet(t *testing.T) {
 	msg := &Message{
 		Question: SectionQuestion{
-			Name:  []byte("test"),
+			Name:  "test",
 			Type:  1,
 			Class: 1,
 		},
 		Answer: []ResourceRecord{{
-			Name:  []byte("test"),
+			Name:  "test",
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 		}},
@@ -99,12 +99,12 @@ func TestAnswersGet(t *testing.T) {
 func TestAnswersRemove(t *testing.T) {
 	msg := &Message{
 		Question: SectionQuestion{
-			Name:  []byte("test"),
+			Name:  "test",
 			Type:  1,
 			Class: 1,
 		},
 		Answer: []ResourceRecord{{
-			Name:  []byte("test"),
+			Name:  "test",
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 		}},

@@ -20,17 +20,17 @@ func TestNewAnswer(t *testing.T) {
 			ID: 1,
 		},
 		Question: SectionQuestion{
-			Name:  []byte("test"),
+			Name:  "test",
 			Type:  1,
 			Class: 1,
 		},
 		Answer: []ResourceRecord{{
-			Name:  []byte("test"),
+			Name:  "test",
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 			TTL:   3600,
 			rdlen: 4,
-			Value: []byte("127.0.0.1"),
+			Value: "127.0.0.1",
 		}},
 	}
 
@@ -126,17 +126,17 @@ func TestAnswerGet(t *testing.T) {
 			ANCount: 1,
 		},
 		Question: SectionQuestion{
-			Name:  []byte("kilabit.info"),
+			Name:  "kilabit.info",
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 		},
 		Answer: []ResourceRecord{{
-			Name:  []byte("kilabit.info"),
+			Name:  "kilabit.info",
 			Type:  QueryTypeA,
 			Class: QueryClassIN,
 			TTL:   3600,
 			rdlen: 4,
-			Value: []byte("127.0.0.1"),
+			Value: "127.0.0.1",
 		}},
 		Authority:  []ResourceRecord{},
 		Additional: []ResourceRecord{},

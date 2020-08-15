@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"bytes"
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
@@ -151,7 +150,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 // It will return true if both matched, otherwise it will return false.
 //
 func isResponseValid(req *request, res *Message) bool {
-	if !bytes.Equal(req.message.Question.Name, res.Question.Name) {
+	if req.message.Question.Name != res.Question.Name {
 		log.Printf("dns: unmatched response name, got %s want %s",
 			req.message.Question.Name, res.Question.Name)
 		return false

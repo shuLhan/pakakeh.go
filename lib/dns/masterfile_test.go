@@ -170,18 +170,18 @@ VAXA    A       10.2.0.27
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
-					MName:   []byte("venera.isi.edu"),
-					RName:   []byte("action\\.domains.isi.edu"),
+					MName:   "venera.isi.edu",
+					RName:   "action\\.domains.isi.edu",
 					Serial:  20,
 					Refresh: 7200,
 					Retry:   600,
@@ -196,28 +196,28 @@ VAXA    A       10.2.0.27
 				ANCount: 3,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("a.isi.edu"),
+				Value: "a.isi.edu",
 			}, {
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("venera.isi.edu"),
+				Value: "venera.isi.edu",
 			}, {
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("vaxa.isi.edu"),
+				Value: "vaxa.isi.edu",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -226,27 +226,27 @@ VAXA    A       10.2.0.27
 				ANCount: 2,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 10,
-					Exchange:   []byte("venera.isi.edu"),
+					Exchange:   "venera.isi.edu",
 				},
 			}, {
-				Name:  []byte("isi.edu"),
+				Name:  "isi.edu",
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 20,
-					Exchange:   []byte("vaxa.isi.edu"),
+					Exchange:   "vaxa.isi.edu",
 				},
 			}},
 		}, {
@@ -256,16 +256,16 @@ VAXA    A       10.2.0.27
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("a.isi.edu"),
+				Name:  "a.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("a.isi.edu"),
+				Name:  "a.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("26.3.0.103"),
+				Value: "26.3.0.103",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -274,22 +274,22 @@ VAXA    A       10.2.0.27
 				ANCount: 2,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("venera.isi.edu"),
+				Name:  "venera.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("venera.isi.edu"),
+				Name:  "venera.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("10.1.0.52"),
+				Value: "10.1.0.52",
 			}, {
-				Name:  []byte("venera.isi.edu"),
+				Name:  "venera.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("128.9.0.32"),
+				Value: "128.9.0.32",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -298,22 +298,22 @@ VAXA    A       10.2.0.27
 				ANCount: 2,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("vaxa.isi.edu"),
+				Name:  "vaxa.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("vaxa.isi.edu"),
+				Name:  "vaxa.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("10.2.0.27"),
+				Value: "10.2.0.27",
 			}, {
-				Name:  []byte("vaxa.isi.edu"),
+				Name:  "vaxa.isi.edu",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("128.9.0.33"),
+				Value: "128.9.0.33",
 			}},
 		}},
 	}}
@@ -432,18 +432,18 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeSOA,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
-					MName:   []byte("ns23.pair.com"),
-					RName:   []byte("root.pair.com"),
+					MName:   "ns23.pair.com",
+					RName:   "root.pair.com",
 					Serial:  2001072300,
 					Refresh: 3600,
 					Retry:   300,
@@ -458,22 +458,22 @@ relay IN CNAME relay.pair.com.
 				ANCount: 2,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("ns23.pair.com"),
+				Value: "ns23.pair.com",
 			}, {
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeNS,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("ns0.ns0.com"),
+				Value: "ns0.ns0.com",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -482,16 +482,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("localhost.pcguide.com"),
+				Name:  "localhost.pcguide.com",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("localhost.pcguide.com"),
+				Name:  "localhost.pcguide.com",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("127.0.0.1"),
+				Value: "127.0.0.1",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -500,16 +500,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("209.68.14.80"),
+				Value: "209.68.14.80",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -518,18 +518,18 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("pcguide.com"),
+				Name:  "pcguide.com",
 				Type:  QueryTypeMX,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 50,
-					Exchange:   []byte("qs939.pair.com"),
+					Exchange:   "qs939.pair.com",
 				},
 			}},
 		}, {
@@ -539,16 +539,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("www.pcguide.com"),
+				Name:  "www.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("www.pcguide.com"),
+				Name:  "www.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("pcguide.com"),
+				Value: "pcguide.com",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -557,16 +557,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("ftp.pcguide.com"),
+				Name:  "ftp.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("ftp.pcguide.com"),
+				Name:  "ftp.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("pcguide.com"),
+				Value: "pcguide.com",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -575,16 +575,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("mail.pcguide.com"),
+				Name:  "mail.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("mail.pcguide.com"),
+				Name:  "mail.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("pcguide.com"),
+				Value: "pcguide.com",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -593,16 +593,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("relay.pcguide.com"),
+				Name:  "relay.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("relay.pcguide.com"),
+				Name:  "relay.pcguide.com",
 				Type:  QueryTypeCNAME,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("relay.pair.com"),
+				Value: "relay.pair.com",
 			}},
 		}},
 	}}
@@ -710,16 +710,16 @@ angularjs.doc       A  127.0.0.1
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("dev.kilabit.info"),
+				Name:  "dev.kilabit.info",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("dev.kilabit.info"),
+				Name:  "dev.kilabit.info",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("127.0.0.1"),
+				Value: "127.0.0.1",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -728,16 +728,16 @@ angularjs.doc       A  127.0.0.1
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("dev.kilabit.com"),
+				Name:  "dev.kilabit.com",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("dev.kilabit.com"),
+				Name:  "dev.kilabit.com",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("127.0.0.1"),
+				Value: "127.0.0.1",
 			}},
 		}, {
 			Header: SectionHeader{
@@ -746,16 +746,16 @@ angularjs.doc       A  127.0.0.1
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("angularjs.doc.localdomain"),
+				Name:  "angularjs.doc.localdomain",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("angularjs.doc.localdomain"),
+				Name:  "angularjs.doc.localdomain",
 				Type:  QueryTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte("127.0.0.1"),
+				Value: "127.0.0.1",
 			}},
 		}},
 	}}
@@ -851,16 +851,16 @@ func TestMasterParseTXT(t *testing.T) {
 				ANCount: 1,
 			},
 			Question: SectionQuestion{
-				Name:  []byte("kilabit.local"),
+				Name:  "kilabit.local",
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  []byte("kilabit.local"),
+				Name:  "kilabit.local",
 				Type:  QueryTypeTXT,
 				Class: QueryClassIN,
 				TTL:   3600,
-				Value: []byte(`This is a test`),
+				Value: "This is a test",
 			}},
 		}},
 	}}

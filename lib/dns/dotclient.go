@@ -65,7 +65,9 @@ func (cl *DoTClient) Close() error {
 //
 // Lookup specific type, class, and name in synchronous mode.
 //
-func (cl *DoTClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []byte) (
+func (cl *DoTClient) Lookup(
+	allowRecursion bool, qtype, qclass uint16, qname string,
+) (
 	res *Message, err error,
 ) {
 	if len(qname) == 0 {
@@ -85,7 +87,7 @@ func (cl *DoTClient) Lookup(allowRecursion bool, qtype, qclass uint16, qname []b
 	msg.Header.QDCount = 1
 	msg.Question.Type = qtype
 	msg.Question.Class = qclass
-	msg.Question.Name = append(msg.Question.Name, qname...)
+	msg.Question.Name = qname
 
 	_, _ = msg.Pack()
 

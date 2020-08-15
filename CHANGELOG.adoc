@@ -9,6 +9,14 @@ This library is released each month, usually at the first week of month.
 
 *  websocket: move the server handler to ServerOptions
 
+*  dns: refactoring the ResourceRecord values from []byte to string
+
+   There are two reasons for this changes.  First, to allow JSON encoded
+   of ResourceRecord.Value without encoded to base64.
+
+   Second, to minimize unreleased packet due to the backing storage is
+   still used when assigned to Value (or any []byte field in RDataXXX).
+
 *  dns: dns: split between MasterFile and masterParser
 
    While at it add field Records that contains unpacked ResourceRecord as

@@ -428,7 +428,7 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *Resource
 			rr.Class = QueryClassIN
 		}
 	} else {
-		rr.Name = append(rr.Name, prevRR.Name...)
+		rr.Name = prevRR.Name
 		rr.TTL = prevRR.TTL
 		rr.Class = prevRR.Class
 
@@ -600,7 +600,7 @@ func (m *masterParser) parseRRType(rr *ResourceRecord, stok string) bool {
 func (m *masterParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
 	case QueryTypeA, QueryTypeAAAA:
-		rr.Value = tok
+		rr.Value = string(tok)
 
 	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG, QueryTypeMR, QueryTypePTR:
 		rr.Value = m.generateDomainName(tok)
@@ -815,7 +815,7 @@ func (m *masterParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 
 func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rrMInfo := &RDataMINFO{
-		RMailBox: tok,
+		RMailBox: string(tok),
 	}
 	rr.Value = rrMInfo
 
@@ -834,7 +834,7 @@ func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 		return
 	}
 
-	rrMInfo.EmailBox = tok
+	rrMInfo.EmailBox = string(tok)
 
 	if !isTerm {
 		m.reader.SkipLine()
@@ -898,7 +898,7 @@ func (m *masterParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	}
 	v = v[1 : len(v)-1]
 
-	rr.Value = v
+	rr.Value = string(v)
 
 	return nil
 }
@@ -907,7 +907,7 @@ func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	var v int
 
 	rrSRV := &RDataSRV{
-		Service: tok,
+		Service: string(tok),
 	}
 	rr.Value = rrSRV
 
@@ -928,11 +928,11 @@ func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 
 		switch m.flag {
 		case parseSRVService:
-			rrSRV.Proto = tok
+			rrSRV.Proto = string(tok)
 			m.flag |= parseSRVProto
 
 		case parseSRVService | parseSRVProto:
-			rrSRV.Name = tok
+			rrSRV.Name = string(tok)
 			m.flag |= parseSRVName
 
 		case parseSRVService | parseSRVProto | parseSRVName:
@@ -960,7 +960,7 @@ func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 			m.flag |= parseSRVPort
 
 		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority | parseSRVWeight | parseSRVPort:
-			rrSRV.Target = tok
+			rrSRV.Target = string(tok)
 			m.flag |= parseSRVTarget
 			goto out
 
@@ -979,20 +979,17 @@ out:
 	return nil
 }
 
-func (m *masterParser) generateDomainName(dname []byte) (out []byte) {
+func (m *masterParser) generateDomainName(dname []byte) (out string) {
 	ascii.ToLower(&dname)
 	switch {
 	case dname[0] == '@':
-		out = []byte(m.origin)
+		out = m.origin
 	case dname[len(dname)-1] == '.':
-		out = dname
+		out = string(dname)
 	default:
-		out = append(out, dname...)
-		out = append(out, '.')
-		out = append(out, m.origin...)
+		out = string(dname) + "." + m.origin
 	}
-	out = bytes.TrimRight(out, ".")
-	return out
+	return strings.TrimRight(out, ".")
 }
 
 //
@@ -1008,7 +1005,7 @@ func (m *masterParser) push(rr *ResourceRecord) {
 
 	m.lastRR = rr
 	for x := 0; x < len(m.out.messages); x++ {
-		if !bytes.Equal(m.out.messages[x].Question.Name, rr.Name) {
+		if m.out.messages[x].Question.Name != rr.Name {
 			continue
 		}
 		if m.out.messages[x].Question.Type != rr.Type {
@@ -1034,7 +1031,6 @@ func (m *masterParser) push(rr *ResourceRecord) {
 		Answer: []ResourceRecord{*rr},
 	}
 	m.out.messages = append(m.out.messages, msg)
-	return
 }
 
 func (m *masterParser) setMinimumTTL() {

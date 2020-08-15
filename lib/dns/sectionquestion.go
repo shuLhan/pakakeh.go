@@ -6,6 +6,7 @@ package dns
 
 import (
 	"fmt"
+	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
@@ -21,7 +22,7 @@ type SectionQuestion struct {
 	// domain name terminates with the zero length octet for the null
 	// label of the root.  Note that this field may be an odd number of
 	// octets; no padding is used.
-	Name []byte
+	Name string
 
 	// A two octet code which specifies the type of the query.  The values
 	// for this field include all codes valid for a TYPE field, together
@@ -68,12 +69,13 @@ func (question *SectionQuestion) unpack(packet []byte) (err error) {
 		return nil
 	}
 
+	var sb strings.Builder
 	count := packet[0]
 	x := 1
 
 	for {
 		if count == 0 {
-			question.Name = append(question.Name, '.')
+			sb.WriteByte('.')
 			count = packet[x]
 			x++
 			if x >= len(packet) {
@@ -85,7 +87,7 @@ func (question *SectionQuestion) unpack(packet []byte) (err error) {
 			if packet[x] >= 'A' && packet[x] <= 'Z' {
 				packet[x] += 32
 			}
-			question.Name = append(question.Name, packet[x])
+			sb.WriteByte(packet[x])
 			x++
 			if x >= len(packet) {
 				return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
@@ -99,13 +101,14 @@ func (question *SectionQuestion) unpack(packet []byte) (err error) {
 		if x >= len(packet) {
 			return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
 		}
-		question.Name = append(question.Name, '.')
+		sb.WriteByte('.')
 	}
 
 	if x+4 > len(packet) {
 		return fmt.Errorf("SectionQuestion.unpack: invalid question %q", packet)
 	}
 
+	question.Name = sb.String()
 	question.Type = libbytes.ReadUint16(packet, uint(x))
 	x += 2
 	question.Class = libbytes.ReadUint16(packet, uint(x))

@@ -6,7 +6,6 @@ package dns
 
 import (
 	"fmt"
-	"strings"
 )
 
 //
@@ -19,24 +18,20 @@ type RDataMINFO struct {
 	// many existing mailing lists use a mailbox X-request for the RMAILBX
 	// field of mailing list X, e.g., Msgroup-request for Msgroup.  This
 	// field provides a more general mechanism.
-	RMailBox []byte
+	RMailBox string
 
 	// A <domain-name> which specifies a mailbox which is to receive error
 	// messages related to the mailing list or mailbox specified by the
 	// owner of the MINFO RR (similar to the ERRORS-TO: field which has
 	// been proposed).  If this domain name names the root, errors should
 	// be returned to the sender of the message.
-	EmailBox []byte
+	EmailBox string
 }
 
 //
 // String return readable representation of MINFO record.
 //
 func (minfo *RDataMINFO) String() string {
-	var b strings.Builder
-
-	fmt.Fprintf(&b, "{RMailBox:%s EmailBox:%s}", minfo.RMailBox,
+	return fmt.Sprintf("{RMailBox:%s EmailBox:%s}", minfo.RMailBox,
 		minfo.EmailBox)
-
-	return b.String()
 }

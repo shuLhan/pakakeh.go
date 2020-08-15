@@ -6,7 +6,6 @@ package dns
 
 import (
 	"fmt"
-	"strings"
 
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -24,7 +23,7 @@ type RDataSRV struct {
 	// universal name.  If Assigned Numbers names the service
 	// indicated, that name is the only name which is legal for SRV
 	// lookups.  The Service is case insensitive.
-	Service []byte
+	Service string
 
 	// The symbolic name of the desired protocol, with an underscore
 	// (_) prepended to prevent collisions with DNS labels that occur
@@ -32,12 +31,12 @@ type RDataSRV struct {
 	// for this field, though any name defined by Assigned Numbers or
 	// locally may be used (as for Service).  The Proto is case
 	// insensitive.
-	Proto []byte
+	Proto string
 
 	// The domain this RR refers to.  The SRV RR is unique in that the
 	// name one searches for is not this name; the example near the end
 	// shows this clearly.
-	Name []byte
+	Name string
 
 	// The priority of this target host.  A client MUST attempt to
 	// contact the target host with the lowest-numbered priority it can
@@ -96,27 +95,23 @@ type RDataSRV struct {
 	//
 	// A Target of "." means that the service is decidedly not
 	// available at this domain.
-	Target []byte
+	Target string
 }
 
 //
 // String return readable representation of SRV record.
 //
 func (srv *RDataSRV) String() string {
-	var b strings.Builder
-
-	fmt.Fprintf(&b, "{Service:%s Proto:%s Name:%s Priority:%d Weight:%d Port:%d Target:%s}",
+	return fmt.Sprintf("{Service:%s Proto:%s Name:%s Priority:%d Weight:%d Port:%d Target:%s}",
 		srv.Service, srv.Proto, srv.Name, srv.Priority, srv.Weight,
 		srv.Port, srv.Target)
-
-	return b.String()
 }
 
 //
 // initAndValidate initialize and validate the SRV fields.
 //
 func (srv *RDataSRV) initAndValidate() error {
-	if !libnet.IsHostnameValid(srv.Target, true) {
+	if !libnet.IsHostnameValid([]byte(srv.Target), true) {
 		return fmt.Errorf("invalid SRV target %q", srv.Target)
 	}
 	return nil

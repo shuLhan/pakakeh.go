@@ -28,11 +28,11 @@ import (
 type RDataSOA struct {
 	// The <domain-name> of the name server that was the original or
 	// primary source of data for this zone.
-	MName []byte
+	MName string
 
 	// A <domain-name> which specifies the mailbox of the person
 	// responsible for this zone.
-	RName []byte
+	RName string
 
 	// The unsigned 32 bit version number of the original copy of the
 	// zone.  Zone transfers preserve this value.  This value wraps and

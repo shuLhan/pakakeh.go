@@ -13,7 +13,7 @@ import (
 //
 type Client interface {
 	Close() error
-	Lookup(allowRecursion bool, qtype, qclass uint16, qname []byte) (*Message, error)
+	Lookup(allowRecursion bool, qtype, qclass uint16, qname string) (*Message, error)
 	Query(req *Message) (*Message, error)
 	RemoteAddr() string
 	SetRemoteAddr(addr string) error

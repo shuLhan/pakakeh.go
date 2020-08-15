@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	libnet "github.com/shuLhan/share/lib/net"
@@ -23,7 +24,7 @@ import (
 //
 type ResourceRecord struct {
 	// A domain name to which this resource record pertains.
-	Name []byte
+	Name string
 
 	// Two octets containing one of the RR type codes.  This field
 	// specifies the meaning of the data in the RDATA field.
@@ -87,7 +88,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 
 	switch rr.Type {
 	case QueryTypeA:
-		v, ok := rr.Value.([]byte)
+		v, ok := rr.Value.(string)
 		if !ok {
 			return errRRValue(rr.Type, "")
 		}
@@ -104,13 +105,13 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG,
 		QueryTypeMR, QueryTypeNULL, QueryTypePTR:
 
-		v, ok := rr.Value.([]byte)
+		v, ok := rr.Value.(string)
 		if !ok {
 			return errRRValue(rr.Type, "")
 		}
 
-		if !libnet.IsHostnameValid(v, true) {
-			return errRRValue(rr.Type, string(v))
+		if !libnet.IsHostnameValid([]byte(v), true) {
+			return errRRValue(rr.Type, v)
 		}
 
 	case QueryTypeSOA:
@@ -118,10 +119,10 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 		if !ok {
 			return errRRValue(rr.Type, "")
 		}
-		if !libnet.IsHostnameValid(soa.MName, true) {
+		if !libnet.IsHostnameValid([]byte(soa.MName), true) {
 			return errRRValue(rr.Type, string(soa.MName))
 		}
-		if !libnet.IsHostnameValid(soa.RName, true) {
+		if !libnet.IsHostnameValid([]byte(soa.RName), true) {
 			return errRRValue(rr.Type, string(soa.RName))
 		}
 	case QueryTypeWKS:
@@ -150,7 +151,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 			return err
 		}
 	case QueryTypeTXT:
-		txt, ok := rr.Value.([]byte)
+		txt, ok := rr.Value.(string)
 		if !ok {
 			return errRRValue(rr.Type, "")
 		}
@@ -167,7 +168,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 			return err
 		}
 	case QueryTypeAAAA:
-		v, ok := rr.Value.([]byte)
+		v, ok := rr.Value.(string)
 		if !ok {
 			return errRRValue(rr.Type, "")
 		}
@@ -235,8 +236,10 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 }
 
 func (rr *ResourceRecord) unpackDomainName(packet []byte, start uint) (
-	out []byte, err error,
+	string, error,
 ) {
+	var out strings.Builder
+
 	x := int(start)
 	for x < len(packet) {
 		count := packet[x]
@@ -253,10 +256,10 @@ func (rr *ResourceRecord) unpackDomainName(packet []byte, start uint) (
 			continue
 		}
 		if count > maxLabelSize {
-			return nil, ErrLabelSizeLimit
+			return "", ErrLabelSizeLimit
 		}
-		if len(out) > 0 {
-			out = append(out, '.')
+		if out.Len() > 0 {
+			out.WriteByte('.')
 		}
 
 		x++
@@ -267,11 +270,11 @@ func (rr *ResourceRecord) unpackDomainName(packet []byte, start uint) (
 			if packet[x] >= 'A' && packet[x] <= 'Z' {
 				packet[x] += 32
 			}
-			out = append(out, packet[x])
+			out.WriteByte(packet[x])
 			x++
 		}
 	}
-	return out, nil
+	return out.String(), nil
 }
 
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) {
@@ -336,7 +339,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	// the DNS.
 	case QueryTypeNULL:
 		endIdx := startIdx + uint(rr.rdlen)
-		rr.Value = packet[startIdx : startIdx+endIdx]
+		rr.Value = string(packet[startIdx : startIdx+endIdx])
 		return nil
 
 	case QueryTypeWKS:
@@ -365,7 +368,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 		endIdx := startIdx + uint(rr.rdlen)
 
 		// The first byte of TXT is length.
-		rr.Value = packet[startIdx+1 : endIdx]
+		rr.Value = string(packet[startIdx+1 : endIdx])
 
 		return nil
 
@@ -391,7 +394,7 @@ func (rr *ResourceRecord) unpackA() error {
 	}
 
 	ip := net.IP(rr.rdata)
-	rr.Value = []byte(ip.String())
+	rr.Value = ip.String()
 
 	return nil
 }
@@ -402,7 +405,7 @@ func (rr *ResourceRecord) unpackAAAA() error {
 	}
 
 	ip := net.IP(rr.rdata)
-	rr.Value = []byte(ip.String())
+	rr.Value = ip.String()
 
 	return nil
 }
@@ -450,22 +453,24 @@ func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
 	rr.Value = rrSRV
 
 	// Unpack service, proto, and name from RR.Name
+	start := 0
 	y := 0
 	for ; y < len(rr.Name); y++ {
 		if rr.Name[y] == '.' {
+			rrSRV.Service = string(rr.Name[start:y])
 			break
 		}
-		rrSRV.Service = append(rrSRV.Service, rr.Name[y])
 	}
-	for y++; y < len(rr.Name); y++ {
+	y++
+	start = y
+	for ; y < len(rr.Name); y++ {
 		if rr.Name[y] == '.' {
+			rrSRV.Proto = rr.Name[start:y]
 			break
 		}
-		rrSRV.Proto = append(rrSRV.Proto, rr.Name[y])
 	}
-	for y++; y < len(rr.Name); y++ {
-		rrSRV.Name = append(rrSRV.Name, rr.Name[y])
-	}
+	y++
+	rrSRV.Name = rr.Name[y:]
 
 	// Unpack RDATA
 	rrSRV.Priority = libbytes.ReadUint16(packet, x)

@@ -70,7 +70,8 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 		revIP = append(revIP, []byte(".ip6.arpa")...)
 	}
 
-	msg, err := client.Lookup(true, QueryTypePTR, QueryClassIN, revIP)
+	msg, err := client.Lookup(true, QueryTypePTR, QueryClassIN,
+		string(revIP))
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +81,7 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 		return "", nil
 	}
 
-	banswer, ok := rranswers[0].Value.([]byte)
+	banswer, ok := rranswers[0].Value.(string)
 	if !ok {
 		return "", fmt.Errorf("invalid PTR record data")
 	}

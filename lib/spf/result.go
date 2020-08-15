@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"strings"
 
 	libdns "github.com/shuLhan/share/lib/dns"
 	libnet "github.com/shuLhan/share/lib/net"
@@ -74,7 +75,7 @@ func (result *Result) lookup() {
 	)
 
 	dnsMsg, err = dnsClient.Lookup(true, libdns.QueryTypeTXT,
-		libdns.QueryClassIN, result.Domain)
+		libdns.QueryClassIN, string(result.Domain))
 	if err != nil {
 		result.Code = ResultCodeTempError
 		result.Err = err.Error()
@@ -103,15 +104,15 @@ func (result *Result) lookup() {
 	var found int
 
 	for x := 0; x < len(txts); x++ {
-		rdata, ok := txts[x].Value.([]byte)
+		rdata, ok := txts[x].Value.(string)
 		if !ok {
 			continue
 		}
 
-		if bytes.HasPrefix(rdata, []byte("v=spf1")) {
+		if strings.HasPrefix(rdata, "v=spf1") {
 			found++
 			if found == 1 {
-				result.terms = rdata
+				result.terms = []byte(rdata)
 			}
 		}
 	}

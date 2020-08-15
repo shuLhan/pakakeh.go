@@ -43,12 +43,13 @@ func TestNewUDPClientPool(t *testing.T) {
 		}
 
 		var wg sync.WaitGroup
-		qname := []byte("kilabit.info")
+		qname := "kilabit.info"
 		for x := 0; x < 10; x++ {
 			wg.Add(1)
 			go func() {
 				cl := ucp.Get()
-				_, err := cl.Lookup(false, QueryTypeA, QueryClassIN, qname)
+				_, err := cl.Lookup(false, QueryTypeA,
+					QueryClassIN, qname)
 				if err != nil {
 					t.Log("Lookup error: ", err.Error())
 				}
