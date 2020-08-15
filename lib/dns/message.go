@@ -159,6 +159,30 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 }
 
 //
+// NewMessageFromRR create new message with one RR as an answer.
+//
+func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
+	msg = &Message{
+		Header: SectionHeader{
+			IsAA:    true,
+			QDCount: 1,
+			ANCount: 1,
+		},
+		Question: SectionQuestion{
+			Name:  libbytes.Copy(rr.Name),
+			Type:  rr.Type,
+			Class: rr.Class,
+		},
+		Answer: []ResourceRecord{*rr},
+	}
+	_, err = msg.Pack()
+	if err != nil {
+		return nil, err
+	}
+	return msg, nil
+}
+
+//
 // getQueryTypeFromAddress return QueryTypeA or QueryTypeAAAA if addr is valid
 // IPv4 or IPv6 address, otherwise it will return 0.
 //
@@ -177,6 +201,27 @@ func getQueryTypeFromAddress(addr []byte) (qtype uint16) {
 	}
 
 	return qtype
+}
+
+//
+// AddRR to the Answer field and re-pack it again.
+//
+func (msg *Message) AddRR(rr *ResourceRecord) (err error) {
+	switch rr.Type {
+	case QueryTypeSOA, QueryTypePTR:
+		if len(msg.Answer) > 0 {
+			msg.Answer[0] = *rr
+		} else {
+			msg.Answer = append(msg.Answer, *rr)
+		}
+	default:
+		msg.Answer = append(msg.Answer, *rr)
+		msg.Header.ANCount++
+	}
+
+	_, err = msg.Pack()
+
+	return err
 }
 
 //

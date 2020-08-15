@@ -187,6 +187,52 @@ func (c *caches) upsert(nu *answer) (inserted bool) {
 }
 
 //
+// upsertByRR update or insert new answer by RR.
+//
+// First, it will check if the answer already exist in cache.
+// If it not exist, the new message and answer will created and inserted to
+// cached.
+// If its exist, it will add or replace the existing RR in the message
+// (dependes on RR type).
+//
+func (c *caches) upsertByRR(rr *ResourceRecord) (err error) {
+	err = rr.initAndValidate()
+	if err != nil {
+		return err
+	}
+
+	c.Lock()
+	defer c.Unlock()
+
+	dname := string(rr.Name)
+	ans := c.v[dname]
+	if ans == nil {
+		msg, err := NewMessageFromRR(rr)
+		if err != nil {
+			return err
+		}
+		an := newAnswer(msg, true)
+		c.v[dname] = newAnswers(an)
+		return nil
+	}
+
+	an, _ := ans.get(rr.Type, rr.Class)
+	if an == nil {
+		// The domain name is already exist, but without the RR type.
+		msg, err := NewMessageFromRR(rr)
+		if err != nil {
+			return err
+		}
+
+		an = newAnswer(msg, true)
+		ans.v = append(ans.v, an)
+		return nil
+	}
+
+	return an.msg.AddRR(rr)
+}
+
+//
 // startWorker start the worker pruning process.
 //
 // The worker prune process will run based on prune delay and it will remove

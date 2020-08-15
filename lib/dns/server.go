@@ -270,6 +270,13 @@ func (srv *Server) Stop() {
 }
 
 //
+// UpsertCacheByRR update or insert new RR into cache.
+//
+func (srv *Server) UpsertCacheByRR(rr *ResourceRecord) error {
+	return srv.caches.upsertByRR(rr)
+}
+
+//
 // serveDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
 //
