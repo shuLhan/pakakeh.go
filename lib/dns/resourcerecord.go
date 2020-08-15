@@ -12,6 +12,7 @@ import (
 	"net"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -66,6 +67,132 @@ func (rr *ResourceRecord) String() string {
 		rr.Name, rr.Type, rr.Class, rr.TTL, rr.rdlen)
 
 	return buf.String()
+}
+
+//
+// initAndValidate initialize and validate the resource record data.
+// It will return an error if one of the required fields is empty or if its
+// type is not match with its value.
+//
+func (rr *ResourceRecord) initAndValidate() (err error) {
+	if len(rr.Name) == 0 {
+		return errors.New("empty RR name")
+	}
+	if rr.Class == 0 {
+		rr.Class = QueryClassIN
+	}
+	if rr.TTL == 0 {
+		rr.TTL = defaultTTL
+	}
+
+	switch rr.Type {
+	case QueryTypeA:
+		v, ok := rr.Value.([]byte)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+		s := string(v)
+		ip := net.ParseIP(s)
+		if ip == nil {
+			return errRRValue(rr.Type, s)
+		}
+		ipv4 := ip.To4()
+		if ipv4 == nil {
+			return errRRValue(rr.Type, s)
+		}
+
+	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG,
+		QueryTypeMR, QueryTypeNULL, QueryTypePTR:
+
+		v, ok := rr.Value.([]byte)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+
+		if !libnet.IsHostnameValid(v, true) {
+			return errRRValue(rr.Type, string(v))
+		}
+
+	case QueryTypeSOA:
+		soa, ok := rr.Value.(*RDataSOA)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+		if !libnet.IsHostnameValid(soa.MName, true) {
+			return errRRValue(rr.Type, string(soa.MName))
+		}
+		if !libnet.IsHostnameValid(soa.RName, true) {
+			return errRRValue(rr.Type, string(soa.RName))
+		}
+	case QueryTypeWKS:
+		_, ok := rr.Value.(*RDataWKS)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+
+	case QueryTypeHINFO:
+		_, ok := rr.Value.(*RDataHINFO)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+	case QueryTypeMINFO:
+		_, ok := rr.Value.(*RDataMINFO)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+	case QueryTypeMX:
+		mx, ok := rr.Value.(*RDataMX)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+		err = mx.initAndValidate()
+		if err != nil {
+			return err
+		}
+	case QueryTypeTXT:
+		txt, ok := rr.Value.([]byte)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+		if len(txt) == 0 {
+			return errors.New("empty RR TXT value")
+		}
+	case QueryTypeSRV:
+		srv, ok := rr.Value.(*RDataSRV)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+		err = srv.initAndValidate()
+		if err != nil {
+			return err
+		}
+	case QueryTypeAAAA:
+		v, ok := rr.Value.([]byte)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+		s := string(v)
+		ip := net.ParseIP(s)
+		if ip == nil {
+			return errRRValue(rr.Type, s)
+		}
+		ipv6 := ip.To16()
+		if ipv6 == nil {
+			return errRRValue(rr.Type, s)
+		}
+	case QueryTypeOPT:
+		_, ok := rr.Value.(*RDataOPT)
+		if !ok {
+			return errRRValue(rr.Type, "")
+		}
+	default:
+		return fmt.Errorf("unknown RR type %d", rr.Type)
+	}
+	return nil
+}
+
+func errRRValue(t uint16, v string) error {
+	return fmt.Errorf("invalid or empty query type %d value: %q", t, v)
 }
 
 //

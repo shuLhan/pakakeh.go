@@ -7,6 +7,8 @@ package dns
 import (
 	"fmt"
 	"strings"
+
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 //
@@ -108,4 +110,14 @@ func (srv *RDataSRV) String() string {
 		srv.Port, srv.Target)
 
 	return b.String()
+}
+
+//
+// initAndValidate initialize and validate the SRV fields.
+//
+func (srv *RDataSRV) initAndValidate() error {
+	if !libnet.IsHostnameValid(srv.Target, true) {
+		return fmt.Errorf("invalid SRV target %q", srv.Target)
+	}
+	return nil
 }

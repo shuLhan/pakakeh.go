@@ -7,6 +7,12 @@ package dns
 import (
 	"fmt"
 	"strings"
+
+	libnet "github.com/shuLhan/share/lib/net"
+)
+
+const (
+	defMXPreference int16 = 10
 )
 
 // RDataMX MX records cause type A additional section processing for the host
@@ -32,4 +38,18 @@ func (mx *RDataMX) String() string {
 		mx.Exchange)
 
 	return b.String()
+}
+
+//
+// initAndValidate initialize and validate the MX fields.
+//
+func (mx *RDataMX) initAndValidate() error {
+	if mx.Preference <= 0 {
+		mx.Preference = defMXPreference
+	}
+	if !libnet.IsHostnameValid(mx.Exchange, true) {
+		return fmt.Errorf("invalid or empty MX Exchange %q",
+			string(mx.Exchange))
+	}
+	return nil
 }
