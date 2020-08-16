@@ -11,8 +11,7 @@ package dns
 type masterRecords map[string][]*ResourceRecord
 
 func (mr masterRecords) add(rr *ResourceRecord) {
-	dname := string(rr.Name)
-	listRR := mr[dname]
+	listRR := mr[rr.Name]
 
 	for x, rr2 := range listRR {
 		if rr.Type != rr2.Type {
@@ -22,7 +21,7 @@ func (mr masterRecords) add(rr *ResourceRecord) {
 			continue
 		}
 
-		// Replace the RR if its type is ROA because only one SOA
+		// Replace the RR if its type is SOA because only one SOA
 		// should exist per domain name.
 		if rr.Type == QueryTypeSOA {
 			listRR[x] = rr
@@ -31,5 +30,5 @@ func (mr masterRecords) add(rr *ResourceRecord) {
 		break
 	}
 	listRR = append(listRR, rr)
-	mr[dname] = listRR
+	mr[rr.Name] = listRR
 }
