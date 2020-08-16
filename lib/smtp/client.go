@@ -431,7 +431,10 @@ func (cl *Client) recv() (res *Response, err error) {
 	for {
 		n, err := cl.conn.Read(cl.data)
 		if n > 0 {
-			_, _ = cl.buf.Write(cl.data[:n])
+			_, err = cl.buf.Write(cl.data[:n])
+			if err != nil {
+				break
+			}
 		}
 		if err != nil {
 			if errors.Is(err, io.EOF) {
