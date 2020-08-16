@@ -20,7 +20,7 @@ import (
 // MasterFile represent content of single master file.
 //
 type MasterFile struct {
-	Path     string
+	path     string
 	Name     string
 	Records  masterRecords
 	messages []*Message
@@ -28,7 +28,7 @@ type MasterFile struct {
 
 func newMasterFile(file, name string) *MasterFile {
 	return &MasterFile{
-		Path:    file,
+		path:    file,
 		Name:    name,
 		Records: make(masterRecords),
 	}
@@ -171,10 +171,10 @@ func (mf *MasterFile) Messages() []*Message {
 }
 
 //
-// Save the content of master records to file defined by Path.
+// Save the content of master records to file defined by path.
 //
 func (mf *MasterFile) Save() (err error) {
-	out, err := os.OpenFile(mf.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+	out, err := os.OpenFile(mf.path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
 		0600)
 	if err != nil {
 		return err

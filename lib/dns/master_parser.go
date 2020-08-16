@@ -175,7 +175,7 @@ func (m *masterParser) parse() (err error) {
 		tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 		if isTerm {
 			err = fmt.Errorf("! %s:%d invalid line %q",
-				m.out.Path, m.lineno, m.reader.Rest())
+				m.out.path, m.lineno, m.reader.Rest())
 			return
 		}
 
@@ -226,13 +226,13 @@ func (m *masterParser) parseDirectiveOrigin() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("! %s:%d Empty $origin directive",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("! %s:%d Empty $origin directive",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	m.origin = strings.TrimSuffix(strings.ToLower(string(tok)), ".")
@@ -252,7 +252,7 @@ func (m *masterParser) parseDirectiveOrigin() (err error) {
 			m.lineno++
 		} else {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
-				m.out.Path, m.lineno, c, tok)
+				m.out.path, m.lineno, c, tok)
 		}
 	}
 
@@ -266,13 +266,13 @@ func (m *masterParser) parseDirectiveInclude() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("! %s:%d Empty $include directive",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("! %s:%d Empty $include directive",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	var incfile, dname string
@@ -295,7 +295,7 @@ func (m *masterParser) parseDirectiveInclude() (err error) {
 		}
 		if c != ';' {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
-				m.out.Path, m.lineno, c, tok)
+				m.out.path, m.lineno, c, tok)
 		}
 
 		m.reader.SkipLine()
@@ -328,13 +328,13 @@ func (m *masterParser) parseDirectiveTTL() (err error) {
 	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("! %s:%d Empty $ttl directive",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("! %s:%d Empty $ttl directive",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	ascii.ToLower(&tok)
@@ -358,7 +358,7 @@ func (m *masterParser) parseDirectiveTTL() (err error) {
 			m.lineno++
 		} else {
 			return fmt.Errorf("! %s:%d Invalid character '%c' after '%s'",
-				m.out.Path, m.lineno, c, tok)
+				m.out.path, m.lineno, c, tok)
 		}
 	}
 
@@ -447,7 +447,7 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			ok := m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-					m.out.Path, m.lineno, stok)
+					m.out.path, m.lineno, stok)
 				return nil, err
 			}
 		}
@@ -457,14 +457,14 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 		_, c := m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
 			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-				m.out.Path, m.lineno, stok)
+				m.out.path, m.lineno, stok)
 			return nil, err
 		}
 
 		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
 			err = fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-				m.out.Path, m.lineno, stok)
+				m.out.path, m.lineno, stok)
 			return nil, err
 		}
 
@@ -486,7 +486,7 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			ok := m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-					m.out.Path, m.lineno, stok)
+					m.out.path, m.lineno, stok)
 				return nil, err
 			}
 
@@ -494,7 +494,7 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			ok := m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-					m.out.Path, m.lineno, stok)
+					m.out.path, m.lineno, stok)
 				return nil, err
 			}
 
@@ -515,7 +515,7 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			}
 
 			err = fmt.Errorf("! %s:%d Unknown type '%s'",
-				m.out.Path, m.lineno, stok)
+				m.out.path, m.lineno, stok)
 			return nil, err
 
 		case parseRRTTL | parseRRClass:
@@ -526,7 +526,7 @@ func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			}
 
 			err = fmt.Errorf("! %s:%d Unknown class or type '%s'",
-				m.out.Path, m.lineno, stok)
+				m.out.path, m.lineno, stok)
 			return nil, err
 
 		case parseRRType,
@@ -615,7 +615,7 @@ func (m *masterParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	// NULL RRs are not allowed in master files.
 	case QueryTypeNULL:
 		err = fmt.Errorf("! %s:%d NULL type is not allowed",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 
 	// In master files, both ports and protocols are expressed using
 	// mnemonics or decimal numbers.
@@ -652,14 +652,14 @@ func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("! %s:%d Invalid RDATA",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	// Get RNAME
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 || isTerm {
 		return fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-			m.out.Path, m.lineno, string(tok))
+			m.out.path, m.lineno, string(tok))
 	}
 
 	ascii.ToLower(&tok)
@@ -673,7 +673,7 @@ func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-			m.out.Path, m.lineno, string(tok))
+			m.out.path, m.lineno, string(tok))
 	}
 
 	if len(tok) == 1 && tok[0] == '(' {
@@ -707,7 +707,7 @@ func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		tok, isTerm, c = m.reader.ReadUntil(m.seps, terms)
 		if len(tok) == 0 {
 			return fmt.Errorf("! %s:%d Invalid RR statement '%s'",
-				m.out.Path, m.lineno, string(tok))
+				m.out.path, m.lineno, string(tok))
 		}
 		if c == ';' {
 			m.reader.SkipLine()
@@ -744,12 +744,12 @@ func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 
 		default:
 			return fmt.Errorf("! %s:%d Invalid RR statement %d '%s'",
-				m.out.Path, m.lineno, m.flag, string(tok))
+				m.out.path, m.lineno, m.flag, string(tok))
 		}
 	}
 	if m.flag != parseSOAEnd {
 		return fmt.Errorf("! %s:%d Incomplete RR statement",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 out:
 	if isMultiline {
@@ -769,7 +769,7 @@ out:
 
 		if c != ')' {
 			return fmt.Errorf("! %s:%d Missing closing parentheses",
-				m.out.Path, m.lineno)
+				m.out.path, m.lineno)
 		}
 
 		_, _, c = m.reader.ReadUntil(m.seps, m.terms)
@@ -795,7 +795,7 @@ func (m *masterParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		err = fmt.Errorf("! %s:%d Missing HInfo OS value",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 		return
 	}
 
@@ -803,7 +803,7 @@ func (m *masterParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		err = fmt.Errorf("! %s:%d Missing HInfo OS value",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 		return
 	}
 
@@ -826,7 +826,7 @@ func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		err = fmt.Errorf("! %s:%d Missing MInfo EmailBox value",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 		return
 	}
 
@@ -834,7 +834,7 @@ func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		err = fmt.Errorf("! %s:%d Missing MInfo EmailBox value",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 		return
 	}
 
@@ -852,7 +852,7 @@ func (m *masterParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	pref, err := strconv.ParseInt(string(tok), 10, 64)
 	if err != nil {
 		return fmt.Errorf("! %s:%d Invalid MX Preference: %s",
-			m.out.Path, m.lineno, err)
+			m.out.path, m.lineno, err)
 	}
 
 	rrMX := &RDataMX{
@@ -863,14 +863,14 @@ func (m *masterParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("! %s:%d Missing MX Exchange value",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	// Get EmailBox value
 	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("! %s:%d Missing MX Exchange value",
-			m.out.Path, m.lineno)
+			m.out.path, m.lineno)
 	}
 
 	rrMX.Exchange = m.generateDomainName(tok)
@@ -921,13 +921,13 @@ func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 		_, c := m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
 			return fmt.Errorf("! %s:%d Incomplete SRV RDATA",
-				m.out.Path, m.lineno)
+				m.out.path, m.lineno)
 		}
 
 		tok, _, _ = m.reader.ReadUntil(m.seps, m.terms)
 		if len(tok) == 0 {
 			return fmt.Errorf("! %s:%d Incomplete SRV RDATA",
-				m.out.Path, m.lineno)
+				m.out.path, m.lineno)
 		}
 
 		switch m.flag {
@@ -970,7 +970,7 @@ func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 
 		default:
 			return fmt.Errorf("! %s:%d Invalid SRV RData",
-				m.out.Path, m.lineno)
+				m.out.path, m.lineno)
 		}
 	}
 out:
