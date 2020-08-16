@@ -26,8 +26,6 @@ import (
 const (
 	_maxQueue = 128
 
-	_pathHealth = "/health"
-
 	_resUpgradeOK = "HTTP/1.1 101 Switching Protocols\r\n" +
 		"Upgrade: websocket\r\n" +
 		"Connection: Upgrade\r\n" +
