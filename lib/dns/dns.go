@@ -193,6 +193,16 @@ var QueryClasses = map[string]uint16{
 	"HS": QueryClassHS,
 }
 
+//
+// QueryClassName contains a mapping between the query class and its string
+// representation.
+//
+var QueryClassName = map[uint16]string{
+	QueryClassIN: "IN",
+	QueryClassCH: "CH",
+	QueryClassHS: "HS",
+}
+
 // ResponseCode define response code in message header.
 type ResponseCode byte
 

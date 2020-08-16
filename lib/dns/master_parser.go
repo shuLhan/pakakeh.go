@@ -202,7 +202,10 @@ func (m *masterParser) parse() (err error) {
 			return
 		}
 		if rr != nil {
-			m.push(rr)
+			err = m.push(rr)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -232,8 +235,7 @@ func (m *masterParser) parseDirectiveOrigin() (err error) {
 			m.out.Path, m.lineno)
 	}
 
-	ascii.ToLower(&tok)
-	m.origin = string(tok)
+	m.origin = strings.TrimSuffix(strings.ToLower(string(tok)), ".")
 
 	if isTerm {
 		if c == ';' {
@@ -408,7 +410,9 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 // order is different from the order used in examples and the order used in
 // the actual RRs; the given order allows easier parsing and defaulting.)
 //
-func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord, err error) {
+func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
+	rr *ResourceRecord, err error,
+) {
 	var (
 		isTerm bool
 	)
@@ -985,11 +989,11 @@ func (m *masterParser) generateDomainName(dname []byte) (out string) {
 	case dname[0] == '@':
 		out = m.origin
 	case dname[len(dname)-1] == '.':
-		out = string(dname)
+		out = string(dname[:len(dname)-1])
 	default:
 		out = string(dname) + "." + m.origin
 	}
-	return strings.TrimRight(out, ".")
+	return out
 }
 
 //
@@ -997,12 +1001,9 @@ func (m *masterParser) generateDomainName(dname []byte) (out string) {
 // and class already exist; otherwise it will create new message with question
 // based on RR.
 //
-// It will return true if new message created for RR, otherwise it will return
-// false.
-//
-func (m *masterParser) push(rr *ResourceRecord) {
+func (m *masterParser) push(rr *ResourceRecord) error {
 	m.lastRR = rr
-	m.out.AddRR(rr)
+	return m.out.AddRR(rr)
 }
 
 func (m *masterParser) setMinimumTTL() {

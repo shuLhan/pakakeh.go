@@ -138,7 +138,7 @@ func TestMasterInitRFC1035(t *testing.T) {
 		exp    []*Message
 	}{{
 		desc:   "RFC1035 section 5.3",
-		origin: "ISI.EDU.",
+		origin: "ISI.EDU",
 		ttl:    3600,
 		in: `
 @   IN  SOA     VENERA      Action\.domains (

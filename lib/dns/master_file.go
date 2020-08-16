@@ -5,10 +5,12 @@
 package dns
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	libio "github.com/shuLhan/share/lib/io"
@@ -172,12 +174,154 @@ func (mf *MasterFile) Messages() []*Message {
 // Save the content of master records to file defined by Path.
 //
 func (mf *MasterFile) Save() (err error) {
-	out, err := os.OpenFile(mf.Path,
-		O_RDWR|O_CREATE|O_TRUNC,
+	out, err := os.OpenFile(mf.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
 		0600)
 	if err != nil {
 		return err
 	}
 
+	var names []string
+
+	fmt.Fprintf(out, "$ORIGIN %s.\n", mf.Name)
+
+	// Save the origin records first.
+	listRR := mf.Records[mf.Name]
+	if len(listRR) > 0 {
+		err = mf.saveListRR(out, "@", listRR)
+		if err != nil {
+			goto out
+		}
+	}
+
+	// Save the records ordered by name.
+	names = make([]string, 0, len(mf.Records))
+	for dname := range mf.Records {
+		if dname == mf.Name {
+			continue
+		}
+		names = append(names, dname)
+	}
+	sort.Strings(names)
+
+	for _, dname := range names {
+		listRR := mf.Records[dname]
+		dname = strings.TrimSuffix(dname, "."+mf.Name)
+		err = mf.saveListRR(out, dname, listRR)
+		if err != nil {
+			break
+		}
+	}
+out:
+	errc := out.Close()
+	if errc != nil {
+		if err == nil {
+			err = errc
+		}
+	}
+	return err
+}
+
+func (mf *MasterFile) saveListRR(
+	out *os.File, dname string, listRR []*ResourceRecord,
+) (err error) {
+	for x, rr := range listRR {
+		if x > 0 {
+			dname = "\t"
+		}
+		switch rr.Type {
+		case QueryTypeA, QueryTypeNULL, QueryTypeTXT,
+			QueryTypeAAAA:
+			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				QueryTypeNames[rr.Type], rr.Value.(string))
+
+		case QueryTypeNS, QueryTypeCNAME, QueryTypeMB,
+			QueryTypeMG, QueryTypeMR, QueryTypePTR:
+			v, ok := rr.Value.(string)
+			if !ok {
+				err = errors.New("invalid record value for " +
+					QueryTypeNames[rr.Type])
+				break
+			}
+			if strings.HasSuffix(v, mf.Name) {
+				v = strings.TrimSuffix(v, mf.Name)
+			} else {
+				v += "."
+			}
+			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				QueryTypeNames[rr.Type], v)
+
+		case QueryTypeSOA:
+			soa, ok := rr.Value.(*RDataSOA)
+			if !ok {
+				err = errors.New("invalid record value for SOA")
+				break
+			}
+			_, err = fmt.Fprintf(out,
+				"@ SOA %s %s %d %d %d %d %d\n",
+				soa.MName, soa.RName, soa.Serial, soa.Refresh,
+				soa.Retry, soa.Expire, soa.Minimum)
+
+		case QueryTypeWKS:
+			wks, ok := rr.Value.(*RDataWKS)
+			if !ok {
+				err = errors.New("invalid record value for WKS")
+				break
+			}
+			_, err = fmt.Fprintf(out,
+				"%s %d %s WKS %s %d %s\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				wks.Address, wks.Protocol, wks.BitMap)
+
+		case QueryTypeHINFO:
+			hinfo, ok := rr.Value.(*RDataHINFO)
+			if !ok {
+				err = errors.New("invalid record value for HINFO")
+				break
+			}
+			_, err = fmt.Fprintf(out,
+				"%s %d %s HINFO %s %s\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				hinfo.CPU, hinfo.OS)
+
+		case QueryTypeMINFO:
+			minfo, ok := rr.Value.(*RDataMINFO)
+			if !ok {
+				err = errors.New("invalid record value for MINFO")
+				break
+			}
+			_, err = fmt.Fprintf(out,
+				"%s %d %s MINFO %s %s\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				minfo.RMailBox, minfo.EmailBox)
+
+		case QueryTypeMX:
+			mx, ok := rr.Value.(*RDataMX)
+			if !ok {
+				err = errors.New("invalid record value for MX")
+				break
+			}
+			_, err = fmt.Fprintf(out,
+				"%s %d %s MX %d %s.\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				mx.Preference, mx.Exchange)
+
+		case QueryTypeSRV:
+			srv, ok := rr.Value.(*RDataSRV)
+			if !ok {
+				err = errors.New("invalid record value for SRV")
+				break
+			}
+			_, err = fmt.Fprintf(out,
+				"%s %d %s SRV %d %d %d %s.\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				srv.Priority, srv.Weight,
+				srv.Port, srv.Target)
+		}
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
