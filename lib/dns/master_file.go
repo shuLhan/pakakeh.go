@@ -126,8 +126,58 @@ func ParseMasterFile(file, origin string, ttl uint32) (*MasterFile, error) {
 }
 
 //
+// AddRR add new ResourceRecord to MasterFile.
+//
+func (mf *MasterFile) AddRR(rr *ResourceRecord) (err error) {
+	mf.Records.add(rr)
+
+	for _, msg := range mf.messages {
+		if msg.Question.Name != rr.Name {
+			continue
+		}
+		if msg.Question.Type != rr.Type {
+			continue
+		}
+		if msg.Question.Class != rr.Class {
+			continue
+		}
+		return msg.AddRR(rr)
+	}
+
+	msg := &Message{
+		Header: SectionHeader{
+			IsAA:    true,
+			QDCount: 1,
+			ANCount: 1,
+		},
+		Question: SectionQuestion{
+			Name:  rr.Name,
+			Type:  rr.Type,
+			Class: rr.Class,
+		},
+		Answer: []ResourceRecord{*rr},
+	}
+	mf.messages = append(mf.messages, msg)
+	return nil
+}
+
+//
 // Messages return all pre-generated DNS messages.
 //
 func (mf *MasterFile) Messages() []*Message {
 	return mf.messages
+}
+
+//
+// Save the content of master records to file defined by Path.
+//
+func (mf *MasterFile) Save() (err error) {
+	out, err := os.OpenFile(mf.Path,
+		O_RDWR|O_CREATE|O_TRUNC,
+		0600)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

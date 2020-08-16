@@ -1001,36 +1001,8 @@ func (m *masterParser) generateDomainName(dname []byte) (out string) {
 // false.
 //
 func (m *masterParser) push(rr *ResourceRecord) {
-	m.out.Records.add(rr)
-
 	m.lastRR = rr
-	for x := 0; x < len(m.out.messages); x++ {
-		if m.out.messages[x].Question.Name != rr.Name {
-			continue
-		}
-		if m.out.messages[x].Question.Type != rr.Type {
-			continue
-		}
-		if m.out.messages[x].Question.Class != rr.Class {
-			continue
-		}
-		m.out.messages[x].Answer = append(m.out.messages[x].Answer, *rr)
-		return
-	}
-
-	msg := &Message{
-		Header: SectionHeader{
-			IsAA:    true,
-			QDCount: 1,
-		},
-		Question: SectionQuestion{
-			Name:  rr.Name,
-			Type:  rr.Type,
-			Class: rr.Class,
-		},
-		Answer: []ResourceRecord{*rr},
-	}
-	m.out.messages = append(m.out.messages, msg)
+	m.out.AddRR(rr)
 }
 
 func (m *masterParser) setMinimumTTL() {
