@@ -167,6 +167,13 @@ func (mf *MasterFile) AddRR(rr *ResourceRecord) (err error) {
 }
 
 //
+// Delete the master file from storage.
+//
+func (mf *MasterFile) Delete() (err error) {
+	return os.Remove(mf.path)
+}
+
+//
 // Messages return all pre-generated DNS messages.
 //
 func (mf *MasterFile) Messages() []*Message {
