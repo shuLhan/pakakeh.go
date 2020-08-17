@@ -212,7 +212,7 @@ func (c *caches) upsert(nu *answer) (inserted bool) {
 }
 
 //
-// upsertByRR update or insert new answer by RR.
+// upsertRR update or insert new answer by RR.
 //
 // First, it will check if the answer already exist in cache.
 // If it not exist, the new message and answer will created and inserted to
@@ -220,7 +220,7 @@ func (c *caches) upsert(nu *answer) (inserted bool) {
 // If its exist, it will add or replace the existing RR in the message
 // (dependes on RR type).
 //
-func (c *caches) upsertByRR(rr *ResourceRecord) (err error) {
+func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	err = rr.initAndValidate()
 	if err != nil {
 		return err

@@ -193,6 +193,13 @@ func (srv *Server) PopulateCaches(msgs []*Message) {
 }
 
 //
+// PopulateCachesByRR update or insert new ResourceRecord into caches.
+//
+func (srv *Server) PopulateCachesByRR(rr *ResourceRecord) error {
+	return srv.caches.upsertRR(rr)
+}
+
+//
 // RemoveCachesByNames remove the caches by domain names.
 //
 func (srv *Server) RemoveCachesByNames(names []string) {
@@ -274,13 +281,6 @@ func (srv *Server) Stop() {
 			log.Println("dns: error when closing DoH: " + err.Error())
 		}
 	}
-}
-
-//
-// UpsertCacheByRR update or insert new RR into cache.
-//
-func (srv *Server) UpsertCacheByRR(rr *ResourceRecord) error {
-	return srv.caches.upsertByRR(rr)
 }
 
 //
