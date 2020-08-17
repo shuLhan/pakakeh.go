@@ -51,7 +51,7 @@ func ExampleServer() {
 	}
 
 	// Load records to be served from master file.
-	masterFile, err := dns.ParseMasterFile("testdata/kilabit.info", "", 0)
+	masterFile, err := dns.ParseZoneFile("testdata/kilabit.info", "", 0)
 	if err != nil {
 		log.Fatal(err)
 	}

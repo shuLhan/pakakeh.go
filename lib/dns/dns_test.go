@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	masterFile, err := ParseMasterFile("testdata/kilabit.info", "", 0)
+	masterFile, err := ParseZoneFile("testdata/kilabit.info", "", 0)
 	if err != nil {
 		log.Fatal(err)
 	}

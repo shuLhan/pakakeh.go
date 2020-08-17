@@ -51,7 +51,7 @@ const (
 )
 
 type masterParser struct {
-	out    *MasterFile
+	out    *ZoneFile
 	lineno int
 	seps   []byte
 	terms  []byte
@@ -64,7 +64,7 @@ type masterParser struct {
 
 func newMasterParser(file string) *masterParser {
 	return &masterParser{
-		out:    NewMasterFile(file, ""),
+		out:    NewZoneFile(file, ""),
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
 		terms:  []byte{';', '\n'},
@@ -75,7 +75,7 @@ func newMasterParser(file string) *masterParser {
 // Init parse masterParser file from string.
 //
 func (m *masterParser) Init(data, origin string, ttl uint32) {
-	m.out = NewMasterFile("(data)", "")
+	m.out = NewZoneFile("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
 	m.ttl = ttl
@@ -308,7 +308,7 @@ func (m *masterParser) parseDirectiveInclude() (err error) {
 		}
 	}
 
-	masterFile, err := ParseMasterFile(incfile, dname, m.ttl)
+	masterFile, err := ParseZoneFile(incfile, dname, m.ttl)
 	if err != nil {
 		return err
 	}

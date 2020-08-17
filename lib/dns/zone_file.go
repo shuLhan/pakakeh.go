@@ -17,34 +17,34 @@ import (
 )
 
 //
-// MasterFile represent content of single master file.
+// ZoneFile represent content of single zone file.
 //
-type MasterFile struct {
+type ZoneFile struct {
 	path     string
 	Name     string
-	Records  masterRecords
+	Records  zoneRecords
 	messages []*Message
 }
 
 //
-// NewMasterFile create and initialize new master file.
+// NewZoneFile create and initialize new zone file.
 //
-func NewMasterFile(file, name string) *MasterFile {
-	return &MasterFile{
+func NewZoneFile(file, name string) *ZoneFile {
+	return &ZoneFile{
 		path:    file,
 		Name:    name,
-		Records: make(masterRecords),
+		Records: make(zoneRecords),
 	}
 }
 
 //
 // LoadMasterDir load DNS record from master (zone) formatted files in
 // directory "dir".
-// On success, it will return map of file name and MasterFile content as list
+// On success, it will return map of file name and ZoneFile content as list
 // of Message.
-// On fail, it will return possible partially parse master files and an error.
+// On fail, it will return possible partially parse master file and an error.
 //
-func LoadMasterDir(dir string) (masterFiles map[string]*MasterFile, err error) {
+func LoadMasterDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 	if len(dir) == 0 {
 		return nil, nil
 	}
@@ -63,7 +63,7 @@ func LoadMasterDir(dir string) (masterFiles map[string]*MasterFile, err error) {
 		return nil, fmt.Errorf("LoadMasterDir: %w", err)
 	}
 
-	masterFiles = make(map[string]*MasterFile)
+	zoneFiles = make(map[string]*ZoneFile)
 
 	for x := 0; x < len(fis); x++ {
 		if fis[x].IsDir() {
@@ -76,30 +76,30 @@ func LoadMasterDir(dir string) (masterFiles map[string]*MasterFile, err error) {
 			continue
 		}
 
-		masterFilePath := filepath.Join(dir, name)
+		zoneFilePath := filepath.Join(dir, name)
 
-		masterFile, err := ParseMasterFile(masterFilePath, "", 0)
+		zoneFile, err := ParseZoneFile(zoneFilePath, "", 0)
 		if err != nil {
-			return masterFiles, fmt.Errorf("LoadMasterDir %q: %w", dir, err)
+			return zoneFiles, fmt.Errorf("LoadMasterDir %q: %w", dir, err)
 		}
 
-		masterFiles[name] = masterFile
+		zoneFiles[name] = zoneFile
 	}
 
 	err = d.Close()
 	if err != nil {
-		return masterFiles, fmt.Errorf(" LoadMasterDir %q: %w", dir, err)
+		return zoneFiles, fmt.Errorf(" LoadMasterDir %q: %w", dir, err)
 	}
 
-	return masterFiles, nil
+	return zoneFiles, nil
 }
 
 //
-// ParseMasterFile parse master file and return it as list of Message.
+// ParseZoneFile parse zone file and return it as list of Message.
 // The file name will be assumed as origin if parameter origin or $ORIGIN is
 // not set.
 //
-func ParseMasterFile(file, origin string, ttl uint32) (*MasterFile, error) {
+func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 	var err error
 
 	m := newMasterParser(file)
@@ -115,12 +115,12 @@ func ParseMasterFile(file, origin string, ttl uint32) (*MasterFile, error) {
 
 	m.reader, err = libio.NewReader(file)
 	if err != nil {
-		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
+		return nil, fmt.Errorf("ParseZoneFile %q: %w", file, err)
 	}
 
 	err = m.parse()
 	if err != nil {
-		return nil, fmt.Errorf("ParseMasterFile %q: %w", file, err)
+		return nil, fmt.Errorf("ParseZoneFile %q: %w", file, err)
 	}
 
 	m.out.Name = m.origin
@@ -131,9 +131,9 @@ func ParseMasterFile(file, origin string, ttl uint32) (*MasterFile, error) {
 }
 
 //
-// AddRR add new ResourceRecord to MasterFile.
+// AddRR add new ResourceRecord to ZoneFile.
 //
-func (mf *MasterFile) AddRR(rr *ResourceRecord) (err error) {
+func (mf *ZoneFile) AddRR(rr *ResourceRecord) (err error) {
 	mf.Records.add(rr)
 
 	for _, msg := range mf.messages {
@@ -167,23 +167,23 @@ func (mf *MasterFile) AddRR(rr *ResourceRecord) (err error) {
 }
 
 //
-// Delete the master file from storage.
+// Delete the zone file from storage.
 //
-func (mf *MasterFile) Delete() (err error) {
+func (mf *ZoneFile) Delete() (err error) {
 	return os.Remove(mf.path)
 }
 
 //
 // Messages return all pre-generated DNS messages.
 //
-func (mf *MasterFile) Messages() []*Message {
+func (mf *ZoneFile) Messages() []*Message {
 	return mf.messages
 }
 
 //
-// Remove a ResourceRecord from master file.
+// Remove a ResourceRecord from zone file.
 //
-func (mf *MasterFile) Remove(rr *ResourceRecord) (err error) {
+func (mf *ZoneFile) Remove(rr *ResourceRecord) (err error) {
 	isExist := mf.Records.remove(rr)
 	if isExist {
 		err = mf.Save()
@@ -192,9 +192,9 @@ func (mf *MasterFile) Remove(rr *ResourceRecord) (err error) {
 }
 
 //
-// Save the content of master records to file defined by path.
+// Save the content of zone records to file defined by path.
 //
-func (mf *MasterFile) Save() (err error) {
+func (mf *ZoneFile) Save() (err error) {
 	out, err := os.OpenFile(mf.path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
 		0600)
 	if err != nil {
@@ -242,7 +242,7 @@ out:
 	return err
 }
 
-func (mf *MasterFile) saveListRR(
+func (mf *ZoneFile) saveListRR(
 	out *os.File, dname string, listRR []*ResourceRecord,
 ) (err error) {
 	for x, rr := range listRR {

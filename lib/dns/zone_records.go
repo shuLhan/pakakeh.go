@@ -7,12 +7,12 @@ package dns
 import "github.com/shuLhan/share/lib/reflect"
 
 //
-// masterRecords contains mapping between domain name and its resource
+// zoneRecords contains mapping between domain name and its resource
 // records.
 //
-type masterRecords map[string][]*ResourceRecord
+type zoneRecords map[string][]*ResourceRecord
 
-func (mr masterRecords) add(rr *ResourceRecord) {
+func (mr zoneRecords) add(rr *ResourceRecord) {
 	listRR := mr[rr.Name]
 
 	for x, rr2 := range listRR {
@@ -40,7 +40,7 @@ func (mr masterRecords) add(rr *ResourceRecord) {
 // It will return true if the RR exist and removed, otherwise it will return
 // false.
 //
-func (mr masterRecords) remove(rr *ResourceRecord) bool {
+func (mr zoneRecords) remove(rr *ResourceRecord) bool {
 	listRR := mr[rr.Name]
 	for x, rr2 := range listRR {
 		if rr.Type != rr2.Type {
