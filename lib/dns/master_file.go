@@ -26,7 +26,10 @@ type MasterFile struct {
 	messages []*Message
 }
 
-func newMasterFile(file, name string) *MasterFile {
+//
+// NewMasterFile create and initialize new master file.
+//
+func NewMasterFile(file, name string) *MasterFile {
 	return &MasterFile{
 		path:    file,
 		Name:    name,

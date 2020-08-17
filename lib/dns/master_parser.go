@@ -64,7 +64,7 @@ type masterParser struct {
 
 func newMasterParser(file string) *masterParser {
 	return &masterParser{
-		out:    newMasterFile(file, ""),
+		out:    NewMasterFile(file, ""),
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
 		terms:  []byte{';', '\n'},
@@ -75,7 +75,7 @@ func newMasterParser(file string) *masterParser {
 // Init parse masterParser file from string.
 //
 func (m *masterParser) Init(data, origin string, ttl uint32) {
-	m.out = newMasterFile("(data)", "")
+	m.out = NewMasterFile("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
 	m.ttl = ttl
