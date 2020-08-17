@@ -10,7 +10,8 @@ import (
 )
 
 //
-// RDataSOA represent SOA RDATA format in resource record.
+// RDataSOA marks the Start Of a zone of Authority RDATA format in resource
+// record.
 //
 // All times are in units of seconds.
 //
