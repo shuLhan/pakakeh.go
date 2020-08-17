@@ -207,6 +207,14 @@ func (srv *Server) RemoveCachesByNames(names []string) {
 }
 
 //
+// RemoveCachesByRR remove the answer from caches by ResourceRecord name,
+// type, class, and value.
+//
+func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) error {
+	return srv.caches.removeLocalRR(rr)
+}
+
+//
 // RestartForwarders stop and start new forwarders with new nameserver address
 // and protocol.
 // Empty nameservers means server will run without forwarding request.

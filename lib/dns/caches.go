@@ -151,6 +151,31 @@ func (c *caches) remove(an *answer) {
 }
 
 //
+// removeLocalRR remove the local ResourceRecord from caches by its name,
+// type, class, and value.
+//
+func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
+	c.Lock()
+	defer c.Unlock()
+
+	ans, ok := c.v[rr.Name]
+	if !ok {
+		return nil
+	}
+	for _, an := range ans.v {
+		if an.qtype != rr.Type {
+			continue
+		}
+		if an.qclass != rr.Class {
+			continue
+		}
+		err = an.msg.RemoveAnswer(rr)
+		break
+	}
+	return err
+}
+
+//
 // upsert update or insert answer to caches.  If the answer is inserted to
 // caches it will return true, otherwise when its updated it will return
 // false.

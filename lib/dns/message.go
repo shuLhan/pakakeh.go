@@ -15,6 +15,7 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
+	"github.com/shuLhan/share/lib/reflect"
 )
 
 //
@@ -724,6 +725,24 @@ func (msg *Message) Pack() ([]byte, error) {
 	msg.dnameOff = nil
 
 	return msg.Packet, nil
+}
+
+//
+// RemoveAnswer remove the RR from list of answer.
+//
+func (msg *Message) RemoveAnswer(rr *ResourceRecord) (err error) {
+	for x, an := range msg.Answer {
+		fmt.Printf("RemoveAnswer: %s == %s?\n", an.Value, rr.Value)
+		if !reflect.IsEqual(an.Value, rr.Value) {
+			continue
+		}
+		copy(msg.Answer[x:], msg.Answer[x+1:])
+		msg.Answer = msg.Answer[:len(msg.Answer)-1]
+		msg.Header.ANCount--
+		_, err = msg.Pack()
+		break
+	}
+	return err
 }
 
 //

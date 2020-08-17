@@ -171,6 +171,17 @@ func (mf *MasterFile) Messages() []*Message {
 }
 
 //
+// Remove a ResourceRecord from master file.
+//
+func (mf *MasterFile) Remove(rr *ResourceRecord) (err error) {
+	isExist := mf.Records.remove(rr)
+	if isExist {
+		err = mf.Save()
+	}
+	return err
+}
+
+//
 // Save the content of master records to file defined by path.
 //
 func (mf *MasterFile) Save() (err error) {

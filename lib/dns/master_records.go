@@ -4,6 +4,8 @@
 
 package dns
 
+import "github.com/shuLhan/share/lib/reflect"
+
 //
 // masterRecords contains mapping between domain name and its resource
 // records.
@@ -31,4 +33,29 @@ func (mr masterRecords) add(rr *ResourceRecord) {
 	}
 	listRR = append(listRR, rr)
 	mr[rr.Name] = listRR
+}
+
+//
+// remove a ResourceRecord from list of RR by its Name.
+// It will return true if the RR exist and removed, otherwise it will return
+// false.
+//
+func (mr masterRecords) remove(rr *ResourceRecord) bool {
+	listRR := mr[rr.Name]
+	for x, rr2 := range listRR {
+		if rr.Type != rr2.Type {
+			continue
+		}
+		if rr.Class != rr2.Class {
+			continue
+		}
+		if !reflect.IsEqual(rr.Value, rr2.Value) {
+			continue
+		}
+		copy(listRR[x:], listRR[x+1:])
+		listRR[len(listRR)-1] = nil
+		mr[rr.Name] = listRR[:len(listRR)-1]
+		return true
+	}
+	return false
 }
