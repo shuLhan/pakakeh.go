@@ -254,7 +254,7 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 		return nil
 	}
 
-	return an.msg.AddRR(rr)
+	return an.msg.AddAnswer(rr)
 }
 
 //

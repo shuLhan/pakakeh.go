@@ -205,9 +205,9 @@ func getQueryTypeFromAddress(addr []byte) (qtype uint16) {
 }
 
 //
-// AddRR to the Answer field and re-pack it again.
+// AddAnswer to the Answer field and re-pack it again.
 //
-func (msg *Message) AddRR(rr *ResourceRecord) (err error) {
+func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 	switch rr.Type {
 	case QueryTypeSOA, QueryTypePTR:
 		if len(msg.Answer) > 0 {

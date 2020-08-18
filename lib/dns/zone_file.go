@@ -18,10 +18,12 @@ import (
 
 //
 // ZoneFile represent content of single zone file.
+// A zone file contains at least one SOA record.
 //
 type ZoneFile struct {
 	path     string
 	Name     string
+	SOA      *ResourceRecord
 	Records  zoneRecords
 	messages []*Message
 }
@@ -123,20 +125,24 @@ func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 		return nil, fmt.Errorf("ParseZoneFile %q: %w", file, err)
 	}
 
-	m.out.Name = m.origin
+	m.zone.Name = m.origin
 
-	mf := m.out
-	m.out = nil
-	return mf, nil
+	zone := m.zone
+	m.zone = nil
+	return zone, nil
 }
 
 //
-// AddRR add new ResourceRecord to ZoneFile.
+// Add add new ResourceRecord to ZoneFile.
 //
-func (mf *ZoneFile) AddRR(rr *ResourceRecord) (err error) {
-	mf.Records.add(rr)
+func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
+	if rr.Type == QueryTypeSOA {
+		zone.SOA = rr
+	} else {
+		zone.Records.add(rr)
+	}
 
-	for _, msg := range mf.messages {
+	for _, msg := range zone.messages {
 		if msg.Question.Name != rr.Name {
 			continue
 		}
@@ -146,7 +152,7 @@ func (mf *ZoneFile) AddRR(rr *ResourceRecord) (err error) {
 		if msg.Question.Class != rr.Class {
 			continue
 		}
-		return msg.AddRR(rr)
+		return msg.AddAnswer(rr)
 	}
 
 	msg := &Message{
@@ -162,31 +168,34 @@ func (mf *ZoneFile) AddRR(rr *ResourceRecord) (err error) {
 		},
 		Answer: []ResourceRecord{*rr},
 	}
-	mf.messages = append(mf.messages, msg)
+	zone.messages = append(zone.messages, msg)
 	return nil
 }
 
 //
 // Delete the zone file from storage.
 //
-func (mf *ZoneFile) Delete() (err error) {
-	return os.Remove(mf.path)
+func (zone *ZoneFile) Delete() (err error) {
+	return os.Remove(zone.path)
 }
 
 //
 // Messages return all pre-generated DNS messages.
 //
-func (mf *ZoneFile) Messages() []*Message {
-	return mf.messages
+func (zone *ZoneFile) Messages() []*Message {
+	return zone.messages
 }
 
 //
 // Remove a ResourceRecord from zone file.
 //
-func (mf *ZoneFile) Remove(rr *ResourceRecord) (err error) {
-	isExist := mf.Records.remove(rr)
-	if isExist {
-		err = mf.Save()
+func (zone *ZoneFile) Remove(rr *ResourceRecord) (err error) {
+	if rr.Type == QueryTypeSOA {
+		zone.SOA = nil
+	} else {
+		if zone.Records.remove(rr) {
+			err = zone.Save()
+		}
 	}
 	return err
 }
@@ -194,30 +203,48 @@ func (mf *ZoneFile) Remove(rr *ResourceRecord) (err error) {
 //
 // Save the content of zone records to file defined by path.
 //
-func (mf *ZoneFile) Save() (err error) {
-	out, err := os.OpenFile(mf.path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+func (zone *ZoneFile) Save() (err error) {
+	out, err := os.OpenFile(zone.path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
 		0600)
 	if err != nil {
 		return err
 	}
 
-	var names []string
+	var (
+		names  []string
+		listRR []*ResourceRecord
+	)
 
-	fmt.Fprintf(out, "$ORIGIN %s.\n", mf.Name)
+	fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
+
+	if zone.SOA != nil {
+		soa, ok := zone.SOA.Value.(*RDataSOA)
+		if !ok {
+			err = errors.New("invalid record value for SOA")
+			goto out
+		}
+		_, err = fmt.Fprintf(out,
+			"@ SOA %s %s %d %d %d %d %d\n",
+			soa.MName, soa.RName, soa.Serial, soa.Refresh,
+			soa.Retry, soa.Expire, soa.Minimum)
+		if err != nil {
+			goto out
+		}
+	}
 
 	// Save the origin records first.
-	listRR := mf.Records[mf.Name]
+	listRR = zone.Records[zone.Name]
 	if len(listRR) > 0 {
-		err = mf.saveListRR(out, "@", listRR)
+		err = zone.saveListRR(out, "@", listRR)
 		if err != nil {
 			goto out
 		}
 	}
 
 	// Save the records ordered by name.
-	names = make([]string, 0, len(mf.Records))
-	for dname := range mf.Records {
-		if dname == mf.Name {
+	names = make([]string, 0, len(zone.Records))
+	for dname := range zone.Records {
+		if dname == zone.Name {
 			continue
 		}
 		names = append(names, dname)
@@ -225,9 +252,9 @@ func (mf *ZoneFile) Save() (err error) {
 	sort.Strings(names)
 
 	for _, dname := range names {
-		listRR := mf.Records[dname]
-		dname = strings.TrimSuffix(dname, "."+mf.Name)
-		err = mf.saveListRR(out, dname, listRR)
+		listRR := zone.Records[dname]
+		dname = strings.TrimSuffix(dname, "."+zone.Name)
+		err = zone.saveListRR(out, dname, listRR)
 		if err != nil {
 			break
 		}
@@ -242,7 +269,7 @@ out:
 	return err
 }
 
-func (mf *ZoneFile) saveListRR(
+func (zone *ZoneFile) saveListRR(
 	out *os.File, dname string, listRR []*ResourceRecord,
 ) (err error) {
 	for x, rr := range listRR {
@@ -264,25 +291,14 @@ func (mf *ZoneFile) saveListRR(
 					QueryTypeNames[rr.Type])
 				break
 			}
-			if strings.HasSuffix(v, mf.Name) {
-				v = strings.TrimSuffix(v, mf.Name)
+			if strings.HasSuffix(v, zone.Name) {
+				v = strings.TrimSuffix(v, zone.Name)
 			} else {
 				v += "."
 			}
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, QueryClassName[rr.Class],
 				QueryTypeNames[rr.Type], v)
-
-		case QueryTypeSOA:
-			soa, ok := rr.Value.(*RDataSOA)
-			if !ok {
-				err = errors.New("invalid record value for SOA")
-				break
-			}
-			_, err = fmt.Fprintf(out,
-				"@ SOA %s %s %d %d %d %d %d\n",
-				soa.MName, soa.RName, soa.Serial, soa.Refresh,
-				soa.Retry, soa.Expire, soa.Minimum)
 
 		case QueryTypeWKS:
 			wks, ok := rr.Value.(*RDataWKS)
