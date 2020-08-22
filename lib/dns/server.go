@@ -258,9 +258,11 @@ func (srv *Server) ListenAndServe() (err error) {
 }
 
 //
-// Stop the server, close all listeners.
+// Stop the forwarders and close all listeners.
 //
 func (srv *Server) Stop() {
+	srv.stopAllForwarders()
+
 	err := srv.udp.Close()
 	if err != nil {
 		log.Println("dns: error when closing UDP: " + err.Error())
