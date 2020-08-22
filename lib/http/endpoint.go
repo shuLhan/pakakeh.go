@@ -174,8 +174,8 @@ func (ep *Endpoint) error(res http.ResponseWriter, req *http.Request, err error)
 		errInternal = errors.Internal(err)
 	}
 
-	res.WriteHeader(errInternal.Code)
 	res.Header().Set(HeaderContentType, ContentTypeJSON)
+	res.WriteHeader(errInternal.Code)
 
 	rsp, err := json.Marshal(errInternal)
 	if err != nil {
