@@ -360,22 +360,19 @@ func (sec *Section) unsetAll(key string) {
 		return
 	}
 
-	var (
-		vars []*variable
-		ok   bool
-	)
+	vars := make([]*variable, 0, len(sec.vars))
 	key = strings.ToLower(key)
 
 	for x := 0; x < len(sec.vars); x++ {
-		if sec.vars[x].keyLower == key {
-			ok = true
-			sec.vars[x] = nil
-			continue
+		if sec.vars[x].keyLower != key {
+			// Ignore the last empty line.
+			if x == len(sec.vars)-1 &&
+				sec.vars[x].mode == lineModeEmpty {
+				continue
+			}
+			vars = append(vars, sec.vars[x])
 		}
-		vars = append(vars, sec.vars[x])
 	}
 
-	if ok {
-		sec.vars = vars
-	}
+	sec.vars = vars
 }
