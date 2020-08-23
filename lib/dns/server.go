@@ -195,8 +195,14 @@ func (srv *Server) PopulateCaches(msgs []*Message) {
 //
 // PopulateCachesByRR update or insert new ResourceRecord into caches.
 //
-func (srv *Server) PopulateCachesByRR(rr *ResourceRecord) error {
-	return srv.caches.upsertRR(rr)
+func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord) (err error) {
+	for _, rr := range listRR {
+		err = srv.caches.upsertRR(rr)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 //

@@ -12,7 +12,7 @@ func TestParseHostsFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "Length", 10, len(hostsFile.Messages), true)
+	test.Assert(t, "Length", 10, len(hostsFile.Records), true)
 }
 
 func TestHostsLoad2(t *testing.T) {

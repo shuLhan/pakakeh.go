@@ -21,9 +21,27 @@ const (
 // HostsFile represent content of single hosts file.
 //
 type HostsFile struct {
-	Path     string
-	Name     string
-	Messages []*Message
+	path    string
+	Name    string
+	Records []*ResourceRecord `json:"-"`
+	out     *os.File
+}
+
+//
+// NewHostsFile create and store the host records in file defined by "path".
+//
+func NewHostsFile(path string, records []*ResourceRecord) (
+	hfile *HostsFile, err error,
+) {
+	hfile = &HostsFile{
+		path:    path,
+		Name:    filepath.Base(path),
+		Records: records,
+	}
+
+	err = hfile.Save()
+
+	return hfile, err
 }
 
 //
@@ -77,12 +95,12 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 
 		hostsFilePath := filepath.Join(dir, name)
 
-		hostsFile, err := ParseHostsFile(hostsFilePath)
+		hfile, err := ParseHostsFile(hostsFilePath)
 		if err != nil {
 			return hostsFiles, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
 		}
 
-		hostsFiles[name] = hostsFile
+		hostsFiles[name] = hfile
 	}
 
 	err = d.Close()
@@ -97,7 +115,7 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 // ParseHostsFile parse the content of hosts file as packed DNS message.
 // If path is empty, it will load from the system hosts file.
 //
-func ParseHostsFile(path string) (hostsFile *HostsFile, err error) {
+func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 	if len(path) == 0 {
 		path = GetSystemHosts()
 	}
@@ -107,14 +125,13 @@ func ParseHostsFile(path string) (hostsFile *HostsFile, err error) {
 		return nil, fmt.Errorf("ParseHostsFile %q: %w", path, err)
 	}
 
-	hostsFile = &HostsFile{
-		Path: path,
-		Name: filepath.Base(path),
+	hfile = &HostsFile{
+		path:    path,
+		Name:    filepath.Base(path),
+		Records: parse(reader),
 	}
 
-	hostsFile.Messages = parse(reader)
-
-	return hostsFile, nil
+	return hfile, nil
 }
 
 //
@@ -131,7 +148,7 @@ func ParseHostsFile(path string) (hostsFile *HostsFile, err error) {
 //
 // [1] man 5 hosts
 //
-func parse(reader *libio.Reader) (msgs []*Message) {
+func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 	var (
 		seps  = []byte{'\t', '\v', ' '}
 		terms = []byte{'\n', '\f', '#'}
@@ -169,10 +186,14 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 			}
 			hname, isTerm, c := reader.ReadUntil(seps, terms)
 			if len(hname) > 0 {
-				msg := NewMessageAddress(hname, [][]byte{addr})
-				if msg != nil {
-					msgs = append(msgs, msg)
+				rr := &ResourceRecord{
+					Name:  string(hname),
+					Type:  QueryTypeA,
+					Class: QueryClassIN,
+					TTL:   defaultTTL,
+					Value: string(addr),
 				}
+				listRR = append(listRR, rr)
 			}
 			if isTerm {
 				if c == 0 {
@@ -186,5 +207,65 @@ func parse(reader *libio.Reader) (msgs []*Message) {
 		}
 	}
 
-	return msgs
+	return listRR
+}
+
+//
+// Delete the hosts file from the storage.
+//
+func (hfile *HostsFile) Delete() (err error) {
+	return os.RemoveAll(hfile.path)
+}
+
+//
+// Names return all hosts domain names.
+//
+func (hfile *HostsFile) Names() (names []string) {
+	names = make([]string, 0, len(hfile.Records))
+
+	for _, rr := range hfile.Records {
+		names = append(names, rr.Name)
+	}
+
+	return names
+}
+
+//
+// Save the hosts records into the file defined by field "path".
+//
+func (hfile *HostsFile) Save() (err error) {
+	if hfile.out == nil {
+		hfile.out, err = os.OpenFile(
+			hfile.path,
+			os.O_CREATE|os.O_TRUNC|os.O_RDWR,
+			0600,
+		)
+	} else {
+		err = hfile.out.Truncate(0)
+	}
+	if err != nil {
+		return err
+	}
+
+	for _, rr := range hfile.Records {
+		if len(rr.Name) == 0 || rr.Value == nil {
+			continue
+		}
+		ipAddress, ok := rr.Value.(string)
+		if !ok {
+			continue
+		}
+		_, err = fmt.Fprintf(hfile.out, "%s %s\n", ipAddress, rr.Name)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = hfile.out.Close()
+	hfile.out = nil
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
