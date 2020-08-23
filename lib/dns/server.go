@@ -196,11 +196,16 @@ func (srv *Server) PopulateCaches(msgs []*Message) {
 // PopulateCachesByRR update or insert new ResourceRecord into caches.
 //
 func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord) (err error) {
+	n := 0
 	for _, rr := range listRR {
 		err = srv.caches.upsertRR(rr)
 		if err != nil {
 			return err
 		}
+		n++
+	}
+	if debug.Value >= 1 {
+		fmt.Printf("dns: %d out of %d records cached\n", n, len(listRR))
 	}
 	return nil
 }
