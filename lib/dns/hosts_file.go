@@ -186,9 +186,13 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 			}
 			hname, isTerm, c := reader.ReadUntil(seps, terms)
 			if len(hname) > 0 {
+				qtype := getQueryTypeFromAddress(addr)
+				if qtype == 0 {
+					continue
+				}
 				rr := &ResourceRecord{
 					Name:  string(hname),
-					Type:  QueryTypeA,
+					Type:  qtype,
 					Class: QueryClassIN,
 					TTL:   defaultTTL,
 					Value: string(addr),
