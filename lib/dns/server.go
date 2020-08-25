@@ -172,7 +172,7 @@ func isResponseValid(req *request, res *Message) bool {
 //
 // PopulateCaches add list of message to caches.
 //
-func (srv *Server) PopulateCaches(msgs []*Message) {
+func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 	var (
 		n        int
 		inserted bool
@@ -188,14 +188,17 @@ func (srv *Server) PopulateCaches(msgs []*Message) {
 	}
 
 	if debug.Value >= 1 {
-		fmt.Printf("dns: %d out of %d records cached\n", n, len(msgs))
+		fmt.Printf("dns: %d out of %d records cached from %q\n", n,
+			len(msgs), from)
 	}
 }
 
 //
 // PopulateCachesByRR update or insert new ResourceRecord into caches.
 //
-func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord) (err error) {
+func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
+	err error,
+) {
 	n := 0
 	for _, rr := range listRR {
 		err = srv.caches.upsertRR(rr)
@@ -205,7 +208,8 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord) (err error) {
 		n++
 	}
 	if debug.Value >= 1 {
-		fmt.Printf("dns: %d out of %d records cached\n", n, len(listRR))
+		fmt.Printf("dns: %d out of %d records cached from %q\n", n,
+			len(listRR), from)
 	}
 	return nil
 }
