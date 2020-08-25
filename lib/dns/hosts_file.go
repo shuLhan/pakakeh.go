@@ -21,7 +21,7 @@ const (
 // HostsFile represent content of single hosts file.
 //
 type HostsFile struct {
-	path    string
+	Path    string `json:"-"`
 	Name    string
 	Records []*ResourceRecord `json:"-"`
 	out     *os.File
@@ -34,7 +34,7 @@ func NewHostsFile(path string, records []*ResourceRecord) (
 	hfile *HostsFile, err error,
 ) {
 	hfile = &HostsFile{
-		path:    path,
+		Path:    path,
 		Name:    filepath.Base(path),
 		Records: records,
 	}
@@ -126,7 +126,7 @@ func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 	}
 
 	hfile = &HostsFile{
-		path:    path,
+		Path:    path,
 		Name:    filepath.Base(path),
 		Records: parse(reader),
 	}
@@ -218,7 +218,7 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 // Delete the hosts file from the storage.
 //
 func (hfile *HostsFile) Delete() (err error) {
-	return os.RemoveAll(hfile.path)
+	return os.RemoveAll(hfile.Path)
 }
 
 //
@@ -235,12 +235,12 @@ func (hfile *HostsFile) Names() (names []string) {
 }
 
 //
-// Save the hosts records into the file defined by field "path".
+// Save the hosts records into the file defined by field "Path".
 //
 func (hfile *HostsFile) Save() (err error) {
 	if hfile.out == nil {
 		hfile.out, err = os.OpenFile(
-			hfile.path,
+			hfile.Path,
 			os.O_CREATE|os.O_TRUNC|os.O_RDWR,
 			0600,
 		)

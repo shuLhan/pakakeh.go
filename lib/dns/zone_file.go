@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -21,7 +20,7 @@ import (
 // A zone file contains at least one SOA record.
 //
 type ZoneFile struct {
-	path     string
+	Path     string `json:"-"`
 	Name     string
 	SOA      *ResourceRecord
 	Records  zoneRecords
@@ -33,7 +32,7 @@ type ZoneFile struct {
 //
 func NewZoneFile(file, name string) *ZoneFile {
 	return &ZoneFile{
-		path:    file,
+		Path:    file,
 		Name:    name,
 		Records: make(zoneRecords),
 	}
@@ -110,7 +109,7 @@ func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 	if len(origin) > 0 {
 		m.origin = origin
 	} else {
-		m.origin = path.Base(file)
+		m.origin = filepath.Base(file)
 	}
 
 	m.origin = strings.ToLower(m.origin)
@@ -176,7 +175,7 @@ func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
 // Delete the zone file from storage.
 //
 func (zone *ZoneFile) Delete() (err error) {
-	return os.Remove(zone.path)
+	return os.Remove(zone.Path)
 }
 
 //
@@ -204,7 +203,7 @@ func (zone *ZoneFile) Remove(rr *ResourceRecord) (err error) {
 // Save the content of zone records to file defined by path.
 //
 func (zone *ZoneFile) Save() (err error) {
-	out, err := os.OpenFile(zone.path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+	out, err := os.OpenFile(zone.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
 		0600)
 	if err != nil {
 		return err
