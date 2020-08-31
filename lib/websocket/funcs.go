@@ -8,7 +8,6 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/binary"
-	"log"
 	"math/rand"
 
 	"golang.org/x/sys/unix"
@@ -62,8 +61,6 @@ func Send(fd int, packet []byte) (err error) {
 		if err != nil {
 			errno, ok := err.(unix.Errno)
 			if ok {
-				log.Printf("websocket: Send: errno: %d %d\n",
-					errno, unix.EAGAIN)
 				if errno == unix.EAGAIN {
 					continue
 				}
