@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -191,7 +192,7 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 					continue
 				}
 				rr := &ResourceRecord{
-					Name:  string(hname),
+					Name:  string(bytes.ToLower(hname)),
 					Type:  qtype,
 					Class: QueryClassIN,
 					TTL:   defaultTTL,
