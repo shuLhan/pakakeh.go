@@ -291,7 +291,7 @@ func (zone *ZoneFile) saveListRR(
 				break
 			}
 			if strings.HasSuffix(v, zone.Name) {
-				v = strings.TrimSuffix(v, zone.Name)
+				v = strings.TrimSuffix(v, "."+zone.Name)
 			} else {
 				v += "."
 			}
@@ -306,7 +306,11 @@ func (zone *ZoneFile) saveListRR(
 					QueryTypeNames[rr.Type])
 				break
 			}
-			v += "."
+			if strings.HasSuffix(v, zone.Name) {
+				v = strings.TrimSuffix(v, "."+zone.Name)
+			} else {
+				v += "."
+			}
 			_, err = fmt.Fprintf(out, "%s. %d IN PTR %s\n",
 				rr.Name, rr.TTL, v)
 
