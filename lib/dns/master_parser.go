@@ -686,7 +686,7 @@ func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 			return err
 		}
 		rrSOA.Serial = uint32(v)
-		m.flag |= parseSOASerial
+		m.flag = parseSOASerial
 	}
 
 	for {
