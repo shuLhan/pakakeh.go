@@ -19,11 +19,11 @@ func TestMasterParseDirectiveOrigin(t *testing.T) {
 	}{{
 		desc:   "Without value",
 		in:     `$origin`,
-		expErr: "! (data):1 Empty $origin directive",
+		expErr: "line 1: empty $origin directive",
 	}, {
 		desc:   "Without value and with comment",
 		in:     `$origin ; comment`,
-		expErr: "! (data):1 Empty $origin directive",
+		expErr: "line 1: empty $origin directive",
 	}, {
 		desc: "With value",
 		in:   `$origin x`,
@@ -59,11 +59,11 @@ func TestMasterParseDirectiveInclude(t *testing.T) {
 	}{{
 		desc:   "Without value",
 		in:     `$include`,
-		expErr: "! (data):1 Empty $include directive",
+		expErr: "line 1: empty $include directive",
 	}, {
 		desc:   "Without value and with comment",
 		in:     `$include ; comment`,
-		expErr: "! (data):1 Empty $include directive",
+		expErr: "line 1: empty $include directive",
 	}, {
 		desc: "With value",
 		in:   `$include testdata/sub.domain`,
@@ -96,11 +96,11 @@ func TestMasterParseDirectiveTTL(t *testing.T) {
 	}{{
 		desc:   "Without value",
 		in:     `$ttl`,
-		expErr: "! (data):1 Empty $ttl directive",
+		expErr: "line 1: empty $TTL directive",
 	}, {
 		desc:   "Without value and with comment",
 		in:     `$ttl ; comment`,
-		expErr: "! (data):1 Empty $ttl directive",
+		expErr: "line 1: empty $TTL directive",
 	}, {
 		desc: "With value",
 		in:   `$ttl 1`,
