@@ -283,7 +283,7 @@ func (zone *ZoneFile) saveListRR(
 				QueryTypeNames[rr.Type], rr.Value.(string))
 
 		case QueryTypeNS, QueryTypeCNAME, QueryTypeMB,
-			QueryTypeMG, QueryTypeMR, QueryTypePTR:
+			QueryTypeMG, QueryTypeMR:
 			v, ok := rr.Value.(string)
 			if !ok {
 				err = errors.New("invalid record value for " +
@@ -298,6 +298,17 @@ func (zone *ZoneFile) saveListRR(
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, QueryClassName[rr.Class],
 				QueryTypeNames[rr.Type], v)
+
+		case QueryTypePTR:
+			v, ok := rr.Value.(string)
+			if !ok {
+				err = errors.New("invalid record value for " +
+					QueryTypeNames[rr.Type])
+				break
+			}
+			v += "."
+			_, err = fmt.Fprintf(out, "%s. %d IN PTR %s\n",
+				rr.Name, rr.TTL, v)
 
 		case QueryTypeWKS:
 			wks, ok := rr.Value.(*RDataWKS)
