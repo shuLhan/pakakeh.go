@@ -223,7 +223,7 @@ func (zone *ZoneFile) Save() (err error) {
 			goto out
 		}
 		_, err = fmt.Fprintf(out,
-			"@ SOA %s %s %d %d %d %d %d\n",
+			"@ SOA %s. %s. %d %d %d %d %d\n",
 			soa.MName, soa.RName, soa.Serial, soa.Refresh,
 			soa.Retry, soa.Expire, soa.Minimum)
 		if err != nil {
