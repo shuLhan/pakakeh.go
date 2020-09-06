@@ -17,6 +17,7 @@ package dns
 
 import (
 	"errors"
+	"net"
 	"time"
 )
 
@@ -245,4 +246,25 @@ var rcodeNames = map[ResponseCode]string{
 	RCodeErrName:        "ERR_NAME",
 	RCodeNotImplemented: "ERR_NOT_IMPLEMENTED",
 	RCodeRefused:        "ERR_REFUSED",
+}
+
+//
+// GetQueryTypeFromAddress return QueryTypeA or QueryTypeAAAA if addr is valid
+// IPv4 or IPv6 address, otherwise it will return 0.
+//
+func GetQueryTypeFromAddress(addr []byte) (qtype uint16) {
+	ip := net.ParseIP(string(addr))
+	if ip == nil {
+		return 0
+	}
+
+	qtype = QueryTypeA
+	for x := 0; x < len(addr); x++ {
+		if addr[x] == ':' {
+			qtype = QueryTypeAAAA
+			break
+		}
+	}
+
+	return qtype
 }

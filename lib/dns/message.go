@@ -104,7 +104,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	}
 
 	addr := addresses[0]
-	qtype := getQueryTypeFromAddress(addr)
+	qtype := GetQueryTypeFromAddress(addr)
 	if qtype == 0 {
 		return nil
 	}
@@ -134,7 +134,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	}
 
 	for _, addr := range addresses[1:] {
-		qtype = getQueryTypeFromAddress(addr)
+		qtype = GetQueryTypeFromAddress(addr)
 		if qtype == 0 {
 			continue
 		}
@@ -181,27 +181,6 @@ func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 		return nil, err
 	}
 	return msg, nil
-}
-
-//
-// getQueryTypeFromAddress return QueryTypeA or QueryTypeAAAA if addr is valid
-// IPv4 or IPv6 address, otherwise it will return 0.
-//
-func getQueryTypeFromAddress(addr []byte) (qtype uint16) {
-	ip := net.ParseIP(string(addr))
-	if ip == nil {
-		return 0
-	}
-
-	qtype = QueryTypeA
-	for x := 0; x < len(addr); x++ {
-		if addr[x] == ':' {
-			qtype = QueryTypeAAAA
-			break
-		}
-	}
-
-	return qtype
 }
 
 //
