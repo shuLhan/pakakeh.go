@@ -14,6 +14,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -167,6 +168,14 @@ func isResponseValid(req *request, res *Message) bool {
 	}
 
 	return true
+}
+
+//
+// SearchCaches search caches by query (domain) name that match with the
+// regular expresion.
+//
+func (srv *Server) SearchCaches(re *regexp.Regexp) []*Message {
+	return srv.caches.search(re)
 }
 
 //

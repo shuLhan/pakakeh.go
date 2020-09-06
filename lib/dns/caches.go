@@ -7,6 +7,7 @@ package dns
 import (
 	"container/list"
 	"fmt"
+	"regexp"
 	"sync"
 	"time"
 
@@ -173,6 +174,21 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 		break
 	}
 	return err
+}
+
+//
+// search for non-local DNS answer that match with regular expression.
+//
+func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
+	c.Lock()
+	for e := c.lru.Front(); e != nil; e = e.Next() {
+		answer := e.Value.(*answer)
+		if re.MatchString(answer.qname) {
+			listMsg = append(listMsg, answer.msg)
+		}
+	}
+	c.Unlock()
+	return listMsg
 }
 
 //
