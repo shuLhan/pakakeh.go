@@ -176,7 +176,7 @@ func TestAnswerGet(t *testing.T) {
 		if c.isLocal {
 			test.Assert(t, "receivedAt", int64(0), an.receivedAt, true)
 			test.Assert(t, "accessedAt", int64(0), an.accessedAt, true)
-			test.Assert(t, "packet", c.msg.Packet, gotPacket, true)
+			test.Assert(t, "packet", c.msg.packet, gotPacket, true)
 			continue
 		}
 
@@ -185,7 +185,7 @@ func TestAnswerGet(t *testing.T) {
 		got := &Message{
 			Header:   SectionHeader{},
 			Question: SectionQuestion{},
-			Packet:   gotPacket,
+			packet:   gotPacket,
 		}
 		err := got.Unpack()
 		if err != nil {

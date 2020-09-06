@@ -73,8 +73,8 @@ func (an *answer) clear() {
 func (an *answer) get() (packet []byte) {
 	an.updateTTL()
 
-	packet = make([]byte, len(an.msg.Packet))
-	copy(packet, an.msg.Packet)
+	packet = make([]byte, len(an.msg.packet))
+	copy(packet, an.msg.packet)
 	return
 }
 

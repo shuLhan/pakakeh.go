@@ -130,6 +130,6 @@ func TestTCPClientLookup(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Packet", c.exp.Packet, got.Packet, true)
+		test.Assert(t, "packet", c.exp.packet, got.packet, true)
 	}
 }

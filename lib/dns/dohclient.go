@@ -135,7 +135,7 @@ func (cl *DoHClient) Lookup(
 //
 func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 	cl.req.Method = http.MethodPost
-	cl.req.Body = ioutil.NopCloser(bytes.NewReader(msg.Packet))
+	cl.req.Body = ioutil.NopCloser(bytes.NewReader(msg.packet))
 	cl.req.URL.RawQuery = ""
 
 	httpRes, err := cl.conn.Do(cl.req)
@@ -147,7 +147,7 @@ func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 
 	res := NewMessage()
 
-	res.Packet, err = ioutil.ReadAll(httpRes.Body)
+	res.packet, err = ioutil.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 // unpacked message.
 //
 func (cl *DoHClient) Get(msg *Message) (*Message, error) {
-	q := base64.RawURLEncoding.EncodeToString(msg.Packet)
+	q := base64.RawURLEncoding.EncodeToString(msg.packet)
 
 	cl.query.Set("dns", q)
 	cl.req.Method = http.MethodGet
@@ -177,17 +177,17 @@ func (cl *DoHClient) Get(msg *Message) (*Message, error) {
 
 	res := NewMessage()
 
-	res.Packet, err = ioutil.ReadAll(httpRes.Body)
+	res.packet, err = ioutil.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err
 	}
 	if httpRes.StatusCode != 200 {
-		err = fmt.Errorf("%s", string(res.Packet))
+		err = fmt.Errorf("%s", string(res.packet))
 		return nil, err
 	}
 
-	if len(res.Packet) > 20 {
+	if len(res.packet) > 20 {
 		err = res.Unpack()
 		if err != nil {
 			return nil, err

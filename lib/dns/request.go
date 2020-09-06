@@ -50,7 +50,7 @@ func (req *request) error(rcode ResponseCode) {
 	req.message.SetQuery(false)
 	req.message.SetResponseCode(rcode)
 
-	_, err := req.writer.Write(req.message.Packet)
+	_, err := req.writer.Write(req.message.packet)
 	if err != nil {
 		log.Println("dns: request.error:", err.Error())
 	}

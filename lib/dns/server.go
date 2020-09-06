@@ -445,7 +445,7 @@ func (srv *Server) serveUDP() {
 			return
 		}
 
-		req.message.Packet = libbytes.Copy(packet[:n])
+		req.message.packet = libbytes.Copy(packet[:n])
 
 		req.kind = connTypeUDP
 		req.writer = &UDPClient{
@@ -531,7 +531,7 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	}
 
 	req.writer = cl
-	req.message.Packet = append(req.message.Packet[:0], raw...)
+	req.message.packet = append(req.message.packet[:0], raw...)
 
 	err := req.message.UnpackHeaderQuestion()
 	if err != nil {
@@ -581,7 +581,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 				connTypeNames[kind], err.Error())
 			break
 		}
-		if n == 0 || len(req.message.Packet) == 0 {
+		if n == 0 || len(req.message.packet) == 0 {
 			break
 		}
 
@@ -701,7 +701,7 @@ func (srv *Server) processRequest() {
 				res.Header.ID, res.Question.String())
 		}
 
-		_, err := req.writer.Write(res.Packet)
+		_, err := req.writer.Write(res.packet)
 		if err != nil {
 			log.Println("dns: processRequest: ", err.Error())
 		}
@@ -714,7 +714,7 @@ func (srv *Server) processResponse(req *request, res *Message) {
 		return
 	}
 
-	_, err := req.writer.Write(res.Packet)
+	_, err := req.writer.Write(res.packet)
 	if err != nil {
 		log.Println("dns: processResponse: ", err.Error())
 		return

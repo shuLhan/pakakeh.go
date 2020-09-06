@@ -118,7 +118,7 @@ func (cl *UDPClient) Lookup(
 func (cl *UDPClient) Query(msg *Message) (*Message, error) {
 	cl.Lock()
 
-	_, err := cl.Write(msg.Packet)
+	_, err := cl.Write(msg.packet)
 	if err != nil {
 		cl.Unlock()
 		return nil, err
@@ -158,10 +158,10 @@ func (cl *UDPClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	msg.Packet = libbytes.Copy(packet[:n])
+	msg.packet = libbytes.Copy(packet[:n])
 
 	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> UDPClient: recv:", msg.Packet, 8)
+		libbytes.PrintHex(">>> UDPClient: recv:", msg.packet, 8)
 	}
 
 	return

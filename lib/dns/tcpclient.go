@@ -124,7 +124,7 @@ func (cl *TCPClient) Lookup(
 // The addr parameter is unused.
 //
 func (cl *TCPClient) Query(msg *Message) (*Message, error) {
-	_, err := cl.Write(msg.Packet)
+	_, err := cl.Write(msg.packet)
 	if err != nil {
 		return nil, err
 	}
@@ -212,10 +212,10 @@ func (cl *TCPClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	msg.Packet = libbytes.Copy(packet[2:n])
+	msg.packet = libbytes.Copy(packet[2:n])
 
 	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> TCPClient: recv: ", msg.Packet, 8)
+		libbytes.PrintHex(">>> TCPClient: recv: ", msg.packet, 8)
 	}
 
 	return

@@ -68,11 +68,11 @@ func TestMessagePackDomainName(t *testing.T) {
 
 	for _, c := range cases {
 		msg.Reset()
-		msg.Packet = msg.Packet[:0]
+		msg.packet = msg.packet[:0]
 
 		msg.packDomainName(c.in, false)
 
-		test.Assert(t, "packDomainName", c.exp, msg.Packet, true)
+		test.Assert(t, "packDomainName", c.exp, msg.packet, true)
 	}
 }
 
@@ -147,7 +147,7 @@ func TestMessagePackQuestion(t *testing.T) {
 
 		c.msg.packQuestion()
 
-		test.Assert(t, "packet", c.exp, c.msg.Packet, true)
+		test.Assert(t, "packet", c.exp, c.msg.packet, true)
 	}
 }
 
@@ -844,7 +844,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 			IsRD:    true,
 		},
 		Question: SectionQuestion{},
-		Packet:   make([]byte, maxUDPPacketSize),
+		packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 
@@ -861,7 +861,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 			IsRA: true,
 		},
 		Question: SectionQuestion{},
-		Packet:   make([]byte, maxUDPPacketSize),
+		packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 
@@ -900,7 +900,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 
 		c.msg.SetAuthorativeAnswer(c.isAA)
 
-		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
 	}
 }
 
@@ -913,7 +913,7 @@ func TestMessageSetQuery(t *testing.T) {
 			IsRD:    true,
 		},
 		Question: SectionQuestion{},
-		Packet:   make([]byte, maxUDPPacketSize),
+		packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 
@@ -943,7 +943,7 @@ func TestMessageSetQuery(t *testing.T) {
 
 		c.msg.SetQuery(c.isQuery)
 
-		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
 	}
 }
 
@@ -956,7 +956,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 			IsRD:    true,
 		},
 		Question: SectionQuestion{},
-		Packet:   make([]byte, maxUDPPacketSize),
+		packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 
@@ -986,7 +986,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 
 		c.msg.SetRecursionDesired(c.isRD)
 
-		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
 	}
 }
 
@@ -999,7 +999,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 			IsRD:    true,
 		},
 		Question: SectionQuestion{},
-		Packet:   make([]byte, maxUDPPacketSize),
+		packet:   make([]byte, maxUDPPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
 
@@ -1030,7 +1030,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 
 		c.msg.SetResponseCode(c.code)
 
-		test.Assert(t, "Message.Packet header", c.exp, c.msg.Packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
 	}
 }
 
@@ -1852,7 +1852,7 @@ func TestMessageUnpack(t *testing.T) {
 		t.Log(c.desc)
 
 		msg.Reset()
-		msg.Packet = c.packet
+		msg.packet = c.packet
 
 		err := msg.Unpack()
 		if err != nil {
