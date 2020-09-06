@@ -129,7 +129,14 @@ func (c *caches) prune() (n int) {
 
 		next := e.Next()
 		_ = c.lru.Remove(e)
-		c.remove(an)
+		answers, found := c.v[an.qname]
+		if found {
+			answers.remove(an.qtype, an.qclass)
+			if len(answers.v) == 0 {
+				delete(c.v, an.qname)
+			}
+		}
+		an.clear()
 		n++
 
 		e = next
@@ -141,14 +148,32 @@ func (c *caches) prune() (n int) {
 }
 
 //
-// remove an answer from caches.
+// remove an answer from caches by query name.
 //
-func (c *caches) remove(an *answer) {
-	answers, found := c.v[an.qname]
-	if found {
-		answers.remove(an.qtype, an.qclass)
+func (c *caches) remove(qname string) (ok bool) {
+	c.Lock()
+	for e := c.lru.Front(); e != nil; e = e.Next() {
+		answer := e.Value.(*answer)
+		if answer.qname != qname {
+			continue
+		}
+
+		c.lru.Remove(e)
+		delete(c.v, qname)
+		answer.clear()
+		ok = true
+		break
 	}
-	an.clear()
+	if !ok {
+		_, ok = c.v[qname]
+		if ok {
+			// If the qname is not found in non-local caches, it
+			// may exist as local answer.
+			delete(c.v, qname)
+		}
+	}
+	c.Unlock()
+	return ok
 }
 
 //

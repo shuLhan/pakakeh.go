@@ -227,14 +227,12 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
 // RemoveCachesByNames remove the caches by domain names.
 //
 func (srv *Server) RemoveCachesByNames(names []string) {
-	srv.caches.Lock()
 	for x := 0; x < len(names); x++ {
+		_ = srv.caches.remove(names[x])
 		if debug.Value >= 1 {
 			fmt.Println("dns: - ", names[x])
 		}
-		delete(srv.caches.v, names[x])
 	}
-	srv.caches.Unlock()
 }
 
 //
