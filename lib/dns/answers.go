@@ -5,7 +5,8 @@
 package dns
 
 //
-// answers maintain list of answer.
+// answers contains list of answer with the same query name but different
+// query types.
 //
 type answers struct {
 	v []*answer
