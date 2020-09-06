@@ -216,6 +216,38 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 }
 
 //
+// AppendAndSaveRecord append new record and save it to hosts file.
+//
+func (hfile *HostsFile) AppendAndSaveRecord(rr *ResourceRecord) (err error) {
+	f, err := os.OpenFile(
+		hfile.Path,
+		os.O_RDWR|os.O_CREATE|os.O_APPEND,
+		0600,
+	)
+	if err != nil {
+		return err
+	}
+
+	ipAddress, ok := rr.Value.(string)
+	if ok {
+		_, err = fmt.Fprintf(f, "%s %s\n", ipAddress, rr.Name)
+	}
+
+	errClose := f.Close()
+	if errClose != nil {
+		if err == nil {
+			err = errClose
+		}
+	}
+
+	if err == nil {
+		hfile.Records = append(hfile.Records, rr)
+	}
+
+	return err
+}
+
+//
 // Delete the hosts file from the storage.
 //
 func (hfile *HostsFile) Delete() (err error) {
@@ -233,6 +265,23 @@ func (hfile *HostsFile) Names() (names []string) {
 	}
 
 	return names
+}
+
+//
+// RemoveRecord remove single record from hosts file by domain name.
+// It will return true if record found and removed.
+//
+func (hfile *HostsFile) RemoveRecord(dname string) bool {
+	for x := 0; x < len(hfile.Records); x++ {
+		if hfile.Records[x].Name != dname {
+			continue
+		}
+		copy(hfile.Records[x:], hfile.Records[x+1:])
+		hfile.Records[len(hfile.Records)-1] = nil
+		hfile.Records = hfile.Records[:len(hfile.Records)-1]
+		return true
+	}
+	return false
 }
 
 //
