@@ -244,6 +244,20 @@ func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) error {
 }
 
 //
+// RemoveLocalCachesByNames remove local caches by domain names.
+//
+func (srv *Server) RemoveLocalCachesByNames(names []string) {
+	srv.caches.Lock()
+	for x := 0; x < len(names); x++ {
+		delete(srv.caches.v, names[x])
+		if debug.Value >= 1 {
+			fmt.Println("dns: - ", names[x])
+		}
+	}
+	srv.caches.Unlock()
+}
+
+//
 // RestartForwarders stop and start new forwarders with new nameserver address
 // and protocol.
 // Empty nameservers means server will run without forwarding request.
