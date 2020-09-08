@@ -3,11 +3,15 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.19.0 (2020-09-xx)
+==  share v0.19.0 (2020-09-08)
 
 ===  Breaking changes
 
-*  websocket: move the server handler to ServerOptions
+*  dns: unexport the Messsage's Packet field
+
+*  dns: change the HostsFile Messages to list of ResourceRecord
+
+*  dns: unexport the master file path field
 
 *  dns: refactoring the ResourceRecord values from []byte to string
 
@@ -27,7 +31,25 @@ This library is released each month, usually at the first week of month.
    This changes also unexport the Messages field, to access it use the method
    Messages.
 
+*  websocket: move the server handler to ServerOptions
+
 ===  New features
+
+*  dns: add method to remove local caches by names on Server
+
+*  dns: add method to search caches
+
+*  dns: add method Delete to MasterFile
+
+*  dns: add method to remove RR from cache and master file
+
+*  dns: add method to save the master records to file
+
+*  dns: implement method to add new RR to master file
+
+*  dns: add method to update/insert resource record to caches
+
+*  dns: add method to initialize and validate ResourceRecord
 
 *  websocket: add server options to change the connect and status paths
 
@@ -36,6 +58,16 @@ This library is released each month, usually at the first week of month.
 
    This changes add option to change the connect path (default to "/"
    previously) and new path and handler for retrieving server status.
+
+===  Bug fixes
+
+*  dns: fix parsing SOA resource record data from master file
+
+*  dns: stop all forwarders on Stop()
+
+*  http: write the HTTP status code after setting content-type on error
+
+*  ini: ignore the last empty line on unsetAll
 
 
 ==  share v0.18.0 (2020-08-06)
