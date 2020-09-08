@@ -144,6 +144,9 @@ written in Go.
 *  link:{url-godoc}/lib/parser[*parser*]: Package parser provide a common text
    parser, using delimiters.
 
+*  link:{url-godoc}/lib/paseto[*paseto*]: A simple, ready to use,
+   implementation of Platform-Agnostic SEcurity TOkens (PASETO).
+
 *  link:{url-godoc}/lib/reflect[*reflect*]: Package reflect extends the
    standard reflect package.
 
