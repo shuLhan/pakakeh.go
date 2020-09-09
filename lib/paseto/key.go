@@ -7,18 +7,19 @@ package paseto
 import "crypto/ed25519"
 
 type Key struct {
-	id      string
-	private ed25519.PrivateKey
-	public  ed25519.PublicKey
-}
+	// ID is a unique key ID.
+	ID string
 
-//
-// NewKey create new Key from hex encoded strings.
-//
-func NewKey(id string, private ed25519.PrivateKey, public ed25519.PublicKey) Key {
-	return Key{
-		id:      id,
-		private: private,
-		public:  public,
-	}
+	// PrivateKey for signing public token.
+	Private ed25519.PrivateKey
+
+	// PublicKey for verifying public token.
+	Public ed25519.PublicKey
+
+	// AllowedSubjects contains list of subject that are allowed in the
+	// token's claim "sub" to be signed by this public key.
+	// This field is used by receiver to check the claim "sub" and compare
+	// it with this list.
+	// Empty list means allowing all subjects.
+	AllowedSubjects map[string]struct{}
 }

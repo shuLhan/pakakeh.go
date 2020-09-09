@@ -5,7 +5,6 @@
 package paseto
 
 import (
-	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -13,42 +12,72 @@ import (
 	"time"
 )
 
+//
+// DefaultTTL define the time-to-live of each token, by setting ExpiredAt to
+// current time + DefaultTTL.
+// If you want longer token, increase this value before using Pack().
+//
 var DefaultTTL = 60 * time.Second
 
 //
 // PublicMode implement the PASETO public mode to signing and verifying data
 // using private key and one or more shared public keys.
+// The PublicMode contains list of peer public keys for verifying the incoming
+// token.
 //
 type PublicMode struct {
 	our   Key
-	peers map[string]ed25519.PublicKey
+	peers *keys
 }
 
 //
 // NewPublicMode create new PublicMode with our private key for signing
-// outgoing token and list of peer public keys for verifying the incoming
-// token.
+// outgoing token.
 //
-func NewPublicMode(our Key, peers map[string]ed25519.PublicKey) (auth *PublicMode) {
+func NewPublicMode(our Key) (auth *PublicMode) {
 	auth = &PublicMode{
 		our:   our,
-		peers: peers,
+		peers: newKeys(),
 	}
-
 	return auth
+}
+
+//
+// AddPeer add a key to list of known peers for verifying incoming token.
+// The Key.Public
+//
+func (auth *PublicMode) AddPeer(k Key) (err error) {
+	if len(k.ID) == 0 {
+		return fmt.Errorf("empty key ID")
+	}
+	if len(k.Public) == 0 {
+		return fmt.Errorf("empty public key")
+	}
+	auth.peers.upsert(k)
+	return nil
+}
+
+//
+// RemovePeer remove peer's key from list.
+//
+func (auth *PublicMode) RemovePeer(id string) {
+	auth.peers.delete(id)
 }
 
 //
 // Pack the data into token.
 //
-func (auth *PublicMode) Pack(data []byte, addFooter map[string]interface{}) (
+func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[string]interface{}) (
 	token string, err error,
 ) {
 	now := time.Now()
 	expiredAt := now.Add(DefaultTTL)
 	jsonToken := JSONToken{
-		Issuer:    auth.our.id,
+		Issuer:    auth.our.ID,
+		Subject:   subject,
+		Audience:  audience,
 		IssuedAt:  &now,
+		NotBefore: &now,
 		ExpiredAt: &expiredAt,
 		Data:      base64.StdEncoding.EncodeToString(data),
 	}
@@ -59,22 +88,22 @@ func (auth *PublicMode) Pack(data []byte, addFooter map[string]interface{}) (
 	}
 
 	jsonFooter := JSONFooter{
-		KID:  auth.our.id,
-		Data: addFooter,
+		KID:  auth.our.ID,
+		Data: footer,
 	}
 
-	footer, err := json.Marshal(&jsonFooter)
+	rawfooter, err := json.Marshal(&jsonFooter)
 	if err != nil {
 		return "", err
 	}
 
-	return Sign(auth.our.private, msg, footer)
+	return Sign(auth.our.Private, msg, rawfooter)
 }
 
 //
 // Unpack the token to get the JSONToken and the data.
 //
-func (auth *PublicMode) Unpack(token string) (data []byte, addFooter map[string]interface{}, err error) {
+func (auth *PublicMode) Unpack(token string) (data []byte, footer map[string]interface{}, err error) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) != 4 {
 		return nil, nil, fmt.Errorf("invalid token format")
@@ -86,17 +115,17 @@ func (auth *PublicMode) Unpack(token string) (data []byte, addFooter map[string]
 		return nil, nil, fmt.Errorf("expecting public mode, got " + pieces[1])
 	}
 
-	footer, err := base64.RawURLEncoding.DecodeString(pieces[3])
+	rawfooter, err := base64.RawURLEncoding.DecodeString(pieces[3])
 	if err != nil {
 		return nil, nil, err
 	}
 
 	jsonFooter := &JSONFooter{}
-	err = json.Unmarshal(footer, jsonFooter)
+	err = json.Unmarshal(rawfooter, jsonFooter)
 	if err != nil {
 		return nil, nil, err
 	}
-	peerKey, ok := auth.peers[jsonFooter.KID]
+	peerKey, ok := auth.peers.get(jsonFooter.KID)
 	if !ok {
 		return nil, nil, fmt.Errorf("unknown peer key ID %s", jsonFooter.KID)
 	}
@@ -106,7 +135,7 @@ func (auth *PublicMode) Unpack(token string) (data []byte, addFooter map[string]
 		return nil, nil, err
 	}
 
-	msg, err := Verify(peerKey, msgSig, footer)
+	msg, err := Verify(peerKey.Public, msgSig, rawfooter)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -117,7 +146,7 @@ func (auth *PublicMode) Unpack(token string) (data []byte, addFooter map[string]
 		return nil, nil, err
 	}
 
-	err = jtoken.Validate()
+	err = jtoken.Validate(auth.our.ID, peerKey)
 	if err != nil {
 		return nil, nil, err
 	}

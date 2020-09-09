@@ -6,5 +6,5 @@ package paseto
 
 type JSONFooter struct {
 	KID  string                 `json:"kid"`
-	Data map[string]interface{} `json:"data"`
+	Data map[string]interface{} `json:"data,omitempty"`
 }

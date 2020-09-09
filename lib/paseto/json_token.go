@@ -25,18 +25,50 @@ type JSONToken struct {
 }
 
 //
-// Validate the ExpiredAt and NotBefore time fields.
+// Validate the JSON token fields,
 //
-func (jtoken *JSONToken) Validate() (err error) {
+//	* The Issuer must equaal to peer.ID
+//	* The Audience must equal to received ID,
+//	* If peer.AllowedSubjects is not empty, the Subject value must be in
+//	one of them,
+//	* The current time must be after IssuedAt field,
+//	* The current time must after NotBefore "nbf" field,
+//	* The current time must before ExpiredAt field.
+//
+// If one of the above condition is not passed, it will return an error.
+//
+func (jtoken *JSONToken) Validate(audience string, peer Key) (err error) {
 	now := time.Now()
-	if jtoken.ExpiredAt != nil {
-		if now.After(*jtoken.ExpiredAt) {
-			return fmt.Errorf("token is expired")
+	if jtoken.Issuer != peer.ID {
+		return fmt.Errorf("expecting issuer %q, got %q", peer.ID,
+			jtoken.Issuer)
+	}
+	if len(peer.AllowedSubjects) != 0 {
+		_, isAllowed := peer.AllowedSubjects[jtoken.Subject]
+		if !isAllowed {
+			return fmt.Errorf("token subject %q is not allowed for key %q",
+				jtoken.Subject, peer.ID)
+		}
+	}
+	if len(audience) != 0 {
+		if jtoken.Audience != audience {
+			return fmt.Errorf("expecting audience %q, got %q",
+				audience, jtoken.Audience)
+		}
+	}
+	if jtoken.IssuedAt != nil {
+		if now.Equal(*jtoken.IssuedAt) || now.Before(*jtoken.IssuedAt) {
+			return fmt.Errorf("token issued at before current time")
 		}
 	}
 	if jtoken.NotBefore != nil {
-		if now.Before(*jtoken.NotBefore) {
+		if now.Equal(*jtoken.NotBefore) || now.Before(*jtoken.NotBefore) {
 			return fmt.Errorf("token is too early")
+		}
+	}
+	if jtoken.ExpiredAt != nil {
+		if now.Equal(*jtoken.ExpiredAt) || now.After(*jtoken.ExpiredAt) {
+			return fmt.Errorf("token is expired")
 		}
 	}
 	return nil

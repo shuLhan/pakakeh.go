@@ -3,9 +3,9 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package paseto provide a simple, ready to use, implementation of
-// Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in draft of RFC
-// 01 [1].
+// Package paseto provide a simple, ready to use, opinionated implementation
+// of Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in draft of
+// RFC 01 [1].
 //
 // Limitation
 //
@@ -21,30 +21,71 @@
 // The public mode focus on signing and verifing data, everything else is
 // handled and filled automatically.
 //
-// For example, when generating token for signing, the user data is stored
-// using key "data" inside the JSON token, encoded using base64.
-// The Issuer will be set to the Key's ID, the expiration date is set to
-// current time plus TTL.
-// The footer will always generated using JSONFooter with KID (Key-ID) set to
-// the Key's ID.
-// Additional footer data can be added on the Data field.
+// Steps for sender when generating new token, the Pack() method,
 //
-// When verifying token, the key ID is read from footer and verified using one
-// of the public key registered previously.
+//	* Prepare the JSON token claims, set
+//	** Issuer "iss" to PublicMode.our.ID
+//	** Subject "sub" to subject value from parameter
+//	** Audience "aud" to audience value from parameter
+//	** IssuedAt to current time
+//	** NotBefore to current time
+//	** ExpiredAt to current time + 60 seconds
+//	** Data field to base64 encoded of data value from parameter
+//	* Prepare the JSON footer, set
+//	** Key ID "kid" to PublicMode.our.ID
+//
+// The user's claims data is stored using key "data" inside the JSON token,
+// encoded using base64 (with padding).
+// Additional footer data can be added on the Data field.
 //
 // Overall, the following JSONToken and JSONFooter is generated for each
 // token,
 //
 //	JSONToken:{
 //		"iss": <Key.ID>,
+//		"sub": <Subject parameter>,
+//		"aud": <Audience parameter>
 //		"exp": <time.Now() + TTL>,
 //		"iat": <time.Now()>,
+//		"nbf": <time.Now()>,
 //		"data": <base64.StdEncoding.EncodeToString(userData)>,
 //	}
 //	JSONFooter:{
 //		"kid": <Key.ID>,
 //		"data": {}
 //	}
+//
+// On the receiver side, they will have list of registered peers Key (include
+// ID, public Key, and list of allowed subject).
+//
+//	PublicMode:{
+//		peers: map[Key.ID]Key{
+//			Public: <ed25519.PublicKey>,
+//			AllowedSubjects: map[string]struct{}{
+//				"/api/x": struct{}{},
+//				"/api/y:read": struct{}{},
+//				"/api/z:write": struct{}{},
+//				...
+//			},
+//		},
+//	}
+//
+// Step for receiver to process the token, the Unpack() method,
+//
+//	* Decode the token footer
+//	* Get the registered public key based on "kid" value in token footer
+//	** If no peers key exist matched with "kid" value, reject the token
+//	* Verify the token using the peer public key
+//	** If verification failed, reject the token
+//	* Validate the token
+//	** The Issuer must equal to peer ID
+//	** The Audience must equal to receiver ID
+//	** If the peer AllowedSubjects is not empty, the Subject must be in
+//	one of them
+//	** The current time must be after IssuedAt
+//	** The current time must be after NotBefore
+//	** The current time must be before ExpiredAt
+//	** If one of the above condition is not passed, it will return an error.
 //
 // References
 //
