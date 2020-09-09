@@ -8,8 +8,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
+)
+
+const (
+	headerAuthorization  = "Authorization"
+	paramNameAccessToken = "access_token"
+	keyBearer            = "bearer"
 )
 
 //
@@ -40,6 +47,40 @@ func NewPublicMode(our Key) (auth *PublicMode) {
 		peers: newKeys(),
 	}
 	return auth
+}
+
+//
+// UnpackHTTPRequest unpack token from HTTP request header "Authorization" or
+// from query parameter "access_token".
+//
+func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
+	data []byte, footer map[string]interface{}, err error,
+) {
+	if req == nil {
+		return nil, nil, fmt.Errorf("empty HTTP request")
+	}
+
+	var token string
+
+	headerAuth := req.Header.Get(headerAuthorization)
+	if len(headerAuth) == 0 {
+		token = req.Form.Get(paramNameAccessToken)
+		if len(token) == 0 {
+			return nil, nil, fmt.Errorf("missing access token")
+		}
+	} else {
+		vals := strings.Fields(headerAuth)
+		if len(vals) != 2 {
+			return nil, nil, fmt.Errorf("invalid Authorization: %s", headerAuth)
+		}
+		if strings.ToLower(vals[0]) != keyBearer {
+			return nil, nil, fmt.Errorf("invalid Authorization: expecting %q, got %q",
+				keyBearer, vals[0])
+		}
+		token = vals[1]
+	}
+
+	return auth.Unpack(token)
 }
 
 //
