@@ -165,11 +165,13 @@ const (
 	HeaderACRequestMethod    = "Access-Control-Request-Method"
 	HeaderACRequestHeaders   = "Access-Control-Request-Headers"
 	HeaderAllow              = "Allow"
+	HeaderAuthorization      = "Authorization"
 	HeaderContentLength      = "Content-Length"
 	HeaderContentType        = "Content-Type"
 	HeaderLocation           = "Location"
 	HeaderOrigin             = "Origin"
 	HeaderUserAgent          = "User-Agent"
+	HeaderAuthKeyBearer      = "Bearer"
 )
 
 var (
