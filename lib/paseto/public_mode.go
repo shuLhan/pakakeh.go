@@ -41,12 +41,18 @@ type PublicMode struct {
 // NewPublicMode create new PublicMode with our private key for signing
 // outgoing token.
 //
-func NewPublicMode(our Key) (auth *PublicMode) {
+func NewPublicMode(our Key) (auth *PublicMode, err error) {
+	if len(our.ID) == 0 {
+		return nil, fmt.Errorf("empty key ID")
+	}
+	if len(our.Private) == 0 {
+		return nil, fmt.Errorf("empty private key")
+	}
 	auth = &PublicMode{
 		our:   our,
 		peers: newKeys(),
 	}
-	return auth
+	return auth, nil
 }
 
 //
@@ -96,6 +102,13 @@ func (auth *PublicMode) AddPeer(k Key) (err error) {
 	}
 	auth.peers.upsert(k)
 	return nil
+}
+
+//
+// GetPeerKey get the peer's key based on key ID.
+//
+func (auth *PublicMode) GetPeerKey(id string) (k Key, ok bool) {
+	return auth.peers.get(id)
 }
 
 //

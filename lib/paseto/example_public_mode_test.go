@@ -37,7 +37,10 @@ func ExamplePublicMode() {
 	// In the sender part, we register the sender key and the public key
 	// of receiver in the list of peers.
 	//
-	sender := NewPublicMode(senderKey)
+	sender, err := NewPublicMode(senderKey)
+	if err != nil {
+		log.Fatal(err)
+	}
 	sender.AddPeer(receiverKey)
 
 	footer := map[string]interface{}{
@@ -59,7 +62,10 @@ func ExamplePublicMode() {
 	// In the receiver part, we register the receiver key and the public key
 	// of sender in the list of peers.
 	//
-	receiver := NewPublicMode(receiverKey)
+	receiver, err := NewPublicMode(receiverKey)
+	if err != nil {
+		log.Fatal(err)
+	}
 	receiver.AddPeer(senderKey)
 
 	// receiver receive the token from sender and unpack it ...
