@@ -124,7 +124,7 @@ func (auth *PublicMode) RemovePeer(id string) {
 func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[string]interface{}) (
 	token string, err error,
 ) {
-	now := time.Now()
+	now := time.Now().Round(time.Second)
 	expiredAt := now.Add(DefaultTTL)
 	jsonToken := JSONToken{
 		Issuer:    auth.our.ID,
