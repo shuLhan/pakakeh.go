@@ -359,14 +359,14 @@ func (srv *Server) serveDoT() {
 		err error
 	)
 
-	if srv.tlsConfig == nil {
-		return
-	}
-
 	dotAddr := srv.opts.getDoTAddress()
 
 	for {
-		srv.dot, err = tls.Listen("tcp", dotAddr.String(), srv.tlsConfig)
+		if srv.opts.DoHBehindProxy || srv.tlsConfig == nil {
+			srv.dot, err = net.ListenTCP("tcp", dotAddr)
+		} else {
+			srv.dot, err = tls.Listen("tcp", dotAddr.String(), srv.tlsConfig)
+		}
 		if err != nil {
 			log.Println("dns: Server.serveDoT: " + err.Error())
 			time.Sleep(3 * time.Second)
