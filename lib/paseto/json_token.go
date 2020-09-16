@@ -38,7 +38,7 @@ type JSONToken struct {
 // If one of the above condition is not passed, it will return an error.
 //
 func (jtoken *JSONToken) Validate(audience string, peer Key) (err error) {
-	now := time.Now()
+	now := time.Now().Round(time.Second)
 	if jtoken.Issuer != peer.ID {
 		return fmt.Errorf("expecting issuer %q, got %q", peer.ID,
 			jtoken.Issuer)
@@ -57,18 +57,19 @@ func (jtoken *JSONToken) Validate(audience string, peer Key) (err error) {
 		}
 	}
 	if jtoken.IssuedAt != nil {
-		if now.Equal(*jtoken.IssuedAt) || now.Before(*jtoken.IssuedAt) {
-			return fmt.Errorf("token issued at before current time")
+		if now.Before(*jtoken.IssuedAt) {
+			return fmt.Errorf("token issued at %s before current time %s",
+				jtoken.IssuedAt, now)
 		}
 	}
 	if jtoken.NotBefore != nil {
-		if now.Equal(*jtoken.NotBefore) || now.Before(*jtoken.NotBefore) {
-			return fmt.Errorf("token is too early")
+		if now.Before(*jtoken.NotBefore) {
+			return fmt.Errorf("token must not used before %s", jtoken.NotBefore)
 		}
 	}
 	if jtoken.ExpiredAt != nil {
-		if now.Equal(*jtoken.ExpiredAt) || now.After(*jtoken.ExpiredAt) {
-			return fmt.Errorf("token is expired")
+		if now.After(*jtoken.ExpiredAt) {
+			return fmt.Errorf("token is expired %s", jtoken.ExpiredAt)
 		}
 	}
 	return nil
