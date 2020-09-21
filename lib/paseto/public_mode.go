@@ -60,10 +60,10 @@ func NewPublicMode(our Key) (auth *PublicMode, err error) {
 // from query parameter "access_token".
 //
 func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
-	data []byte, footer map[string]interface{}, err error,
+	publicToken *PublicToken, err error,
 ) {
 	if req == nil {
-		return nil, nil, fmt.Errorf("empty HTTP request")
+		return nil, fmt.Errorf("empty HTTP request")
 	}
 
 	var token string
@@ -72,15 +72,15 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 	if len(headerAuth) == 0 {
 		token = req.Form.Get(paramNameAccessToken)
 		if len(token) == 0 {
-			return nil, nil, fmt.Errorf("missing access token")
+			return nil, fmt.Errorf("missing access token")
 		}
 	} else {
 		vals := strings.Fields(headerAuth)
 		if len(vals) != 2 {
-			return nil, nil, fmt.Errorf("invalid Authorization: %s", headerAuth)
+			return nil, fmt.Errorf("invalid Authorization: %s", headerAuth)
 		}
 		if strings.ToLower(vals[0]) != keyBearer {
-			return nil, nil, fmt.Errorf("invalid Authorization: expecting %q, got %q",
+			return nil, fmt.Errorf("invalid Authorization: expecting %q, got %q",
 				keyBearer, vals[0])
 		}
 		token = vals[1]
@@ -157,58 +157,59 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 //
 // Unpack the token to get the JSONToken and the data.
 //
-func (auth *PublicMode) Unpack(token string) (data []byte, footer map[string]interface{}, err error) {
+func (auth *PublicMode) Unpack(token string) (publicToken *PublicToken, err error) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) != 4 {
-		return nil, nil, fmt.Errorf("invalid token format")
+		return nil, fmt.Errorf("invalid token format")
 	}
 	if pieces[0] != "v2" {
-		return nil, nil, fmt.Errorf("unsupported protocol version " + pieces[0])
+		return nil, fmt.Errorf("unsupported protocol version " + pieces[0])
 	}
 	if pieces[1] != "public" {
-		return nil, nil, fmt.Errorf("expecting public mode, got " + pieces[1])
+		return nil, fmt.Errorf("expecting public mode, got " + pieces[1])
 	}
+
+	publicToken = &PublicToken{}
 
 	rawfooter, err := base64.RawURLEncoding.DecodeString(pieces[3])
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	jsonFooter := &JSONFooter{}
-	err = json.Unmarshal(rawfooter, jsonFooter)
+	err = json.Unmarshal(rawfooter, &publicToken.Footer)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	peerKey, ok := auth.peers.get(jsonFooter.KID)
+	peerKey, ok := auth.peers.get(publicToken.Footer.KID)
 	if !ok {
-		return nil, nil, fmt.Errorf("unknown peer key ID %s", jsonFooter.KID)
+		return nil, fmt.Errorf("unknown peer key ID %s",
+			publicToken.Footer.KID)
 	}
 
 	msgSig, err := base64.RawURLEncoding.DecodeString(pieces[2])
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	msg, err := Verify(peerKey.Public, msgSig, rawfooter)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	jtoken := &JSONToken{}
-	err = json.Unmarshal(msg, jtoken)
+	err = json.Unmarshal(msg, &publicToken.Token)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	err = jtoken.Validate(auth.our.ID, peerKey)
+	err = publicToken.Token.Validate(auth.our.ID, peerKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	data, err = base64.StdEncoding.DecodeString(jtoken.Data)
+	publicToken.Data, err = base64.StdEncoding.DecodeString(publicToken.Token.Data)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return data, jsonFooter.Data, nil
+	return publicToken, nil
 }

@@ -69,22 +69,22 @@ func ExamplePublicMode() {
 	receiver.AddPeer(senderKey)
 
 	// receiver receive the token from sender and unpack it ...
-	gotData, gotFooter, err := receiver.Unpack(token)
+	got, err := receiver.Unpack(token)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Received data: %s\n", gotData)
-	fmt.Printf("Received footer: %+v\n", gotFooter)
+	fmt.Printf("Received data: %s\n", got.Data)
+	fmt.Printf("Received footer: %+v\n", got.Footer)
 
 	// receiver receive invalid token from sender and unpack it ...
-	gotData, gotFooter, err = receiver.Unpack(invalidToken)
+	got, err = receiver.Unpack(invalidToken)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// Output:
 	// Received data: hello receiver
-	// Received footer: map[FOOTER:HERE]
+	// Received footer: {KID:sender Data:map[FOOTER:HERE]}
 	// token subject "unknown-subject" is not allowed for key "sender"
 }
