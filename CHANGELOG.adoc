@@ -3,12 +3,27 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.20.0 (2020-10-xx)
+==  share v0.20.0 (2020-10-05)
 
 ===  New features
 
 *  lib/paseto: a simple, ready to use, implementation of Platform-Agnostic
    SEcurity TOkens
+
+   This implementation only support PASETO Protocol v2.
+    
+   This library focus on how to sign and verify data, everything else is
+   handled and filled automatically.
+
+===  Enhancements
+
+* dns: serve DoT without SSL if server is behind proxy or tlsConfig is null
+  Previously we only check for tlsConfig, if its null the DoT server
+  will not running.
+  There is a use case where the SSL terminated by proxy and the connection
+  is forwarded to DNS server, so this changes accommodated it.
+
+* http: increase the debug level from 2 to 3
 
 
 ==  share v0.19.0 (2020-09-08)
