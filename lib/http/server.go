@@ -265,7 +265,7 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 // ServeHTTP handle mapping of client request to registered endpoints.
 //
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("> ServeHTTP: %s %+v\n", req.Method, req.URL)
 	}
 

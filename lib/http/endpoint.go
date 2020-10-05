@@ -102,7 +102,7 @@ func (ep *Endpoint) call(
 		return
 	}
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		log.Printf("> request body: %s\n", reqBody)
 	}
 	if len(vals) > 0 && req.Form == nil {
