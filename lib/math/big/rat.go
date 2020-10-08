@@ -300,6 +300,33 @@ func (r *Rat) Quo(g interface{}) *Rat {
 }
 
 //
+// RoundToNearestAway round r to n digit precision using nearest away mode,
+// where mantissa is accumulated by the last digit after precision.
+// For example, using 2 digit precision, 0.555 would become 0.56.
+//
+func (r *Rat) RoundToNearestAway(prec int) *Rat {
+	r.SetString(r.FloatString(prec))
+	return r
+}
+
+//
+// RoundToZero round r to n digit precision using to zero mode.
+// For example, using 2 digit precision, 0.555 would become 0.55.
+//
+func (r *Rat) RoundToZero(prec int) *Rat {
+	b := []byte(r.FloatString(prec + 1))
+	nums := bytes.Split(b, []byte{'.'})
+	b = b[:0]
+	b = append(b, nums[0]...)
+	if len(nums) == 2 && prec > 0 {
+		b = append(b, '.')
+		b = append(b, nums[1][:prec]...)
+	}
+	r.SetString(string(b))
+	return r
+}
+
+//
 // Scan implement the database's sql.Scan interface.
 //
 func (r *Rat) Scan(src interface{}) error {

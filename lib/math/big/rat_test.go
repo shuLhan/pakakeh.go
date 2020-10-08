@@ -591,6 +591,80 @@ func TestRat_Quo(t *testing.T) {
 	}
 }
 
+func TestRat_RoundToNearestAway(t *testing.T) {
+	cases := []struct {
+		r    *Rat
+		prec int
+		exp  string
+	}{{
+		r:    NewRat("0.5455"),
+		prec: 2,
+		exp:  "0.55",
+	}, {
+		r:    NewRat("0.5555"),
+		prec: 2,
+		exp:  "0.56",
+	}, {
+		r:    NewRat("0.5566"),
+		prec: 2,
+		exp:  "0.56",
+	}, {
+		r:    NewRat("0.5566"),
+		prec: 0,
+		exp:  "1",
+	}, {
+		r:    NewRat("0.5"),
+		prec: 0,
+		exp:  "1",
+	}, {
+		r:    NewRat("-0.5"),
+		prec: 0,
+		exp:  "-1",
+	}}
+
+	for _, c := range cases {
+		got := c.r.RoundToNearestAway(c.prec).String()
+		test.Assert(t, "RoundToNearestAway", c.exp, got, true)
+	}
+}
+
+func TestRat_RoundToZero(t *testing.T) {
+	cases := []struct {
+		r    *Rat
+		prec int
+		exp  string
+	}{{
+		r:    NewRat("0.5455"),
+		prec: 2,
+		exp:  "0.54",
+	}, {
+		r:    NewRat("0.5555"),
+		prec: 2,
+		exp:  "0.55",
+	}, {
+		r:    NewRat("0.5566"),
+		prec: 2,
+		exp:  "0.55",
+	}, {
+		r:    NewRat("0.5566"),
+		prec: 0,
+		exp:  "0",
+	}, {
+		r:    NewRat("0.5"),
+		prec: 0,
+		exp:  "0",
+	}, {
+		r:    NewRat("-0.5"),
+		prec: 0,
+		exp:  "-0",
+	}}
+
+	for _, c := range cases {
+		got := c.r.RoundToZero(c.prec).String()
+		test.Assert(t, "RoundToZero", c.exp, got, true)
+	}
+}
+
 func TestRat_Scan(t *testing.T) {
 	cases := []struct {
 		in       interface{}
