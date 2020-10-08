@@ -229,8 +229,6 @@ dd {
 				<h1>Delivery Status Notification (DSN)</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -339,11 +337,11 @@ presence of valid parameters.</p>
 </div>
 <div class="paragraph">
 <p>If the value is invalid or more than one ENVID or RET in MAIL command,
-the server MUST issue the reply-code &#34;501 syntax error in parameter&#34;.</p>
+the server MUST issue the reply-code "501 syntax error in parameter".</p>
 </div>
 <div class="paragraph">
-<p>A DSN MUST NOT be returned to the sender if SMTP MAIL command was NULL (&#34;&lt;&gt;&#34;),
-even if the sender&#39;s address is available from other sources (e.g., the
+<p>A DSN MUST NOT be returned to the sender if SMTP MAIL command was NULL ("&lt;&gt;"),
+even if the sender&#8217;s address is available from other sources (e.g., the
 message header).
 Instead, it SHOULD inform the local postmaster of delivery failures.</p>
 </div>
@@ -362,11 +360,11 @@ relayed using address from RCPT command.</p>
 <h3 id="_relaying_to_non_conforming_smtp_server">Relaying to non-conforming SMTP server</h3>
 <div class="paragraph">
 <p>If NOTIFY paramater contains SUCCESS and SMTP server return a success
-(2xx) to RCPT command, client MUST issue a &#34;relayed&#34; DSN for that recipient.</p>
+(2xx) to RCPT command, client MUST issue a "relayed" DSN for that recipient.</p>
 </div>
 <div class="paragraph">
-<p>If NOTIFY parameter contains &#34;FAILURE&#34; and SMTP server return a permanent
-failure (5xx) to RCPT command, client MUST issue a &#34;failed&#34; DSN for that
+<p>If NOTIFY parameter contains "FAILURE" and SMTP server return a permanent
+failure (5xx) to RCPT command, client MUST issue a "failed" DSN for that
 recipient.</p>
 </div>
 <div class="paragraph">
@@ -376,7 +374,7 @@ recipient.
 Client MAY inform the local postmaster of the delivery failure.</p>
 </div>
 <div class="paragraph">
-<p>If NOTIFY parameter contains NEVER, client MAY use &#34;&lt;&gt;&#34; on
+<p>If NOTIFY parameter contains NEVER, client MAY use "&lt;&gt;" on
 separate MAIL command.</p>
 </div>
 <div class="paragraph">
@@ -384,14 +382,14 @@ separate MAIL command.</p>
 DSN for that recipient.</p>
 </div>
 <div class="paragraph">
-<p>If no NOTIFY parameter, and server return 5xx, client MUST issue a &#34;failed&#34;
+<p>If no NOTIFY parameter, and server return 5xx, client MUST issue a "failed"
 DSN for that recipient.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_local_delivery">Local Delivery</h3>
 <div class="paragraph">
-<p>If NOTIFY contains SUCCESS, MTA MUST issue &#34;delivered&#34; DSN for that
+<p>If NOTIFY contains SUCCESS, MTA MUST issue "delivered" DSN for that
 recipient.</p>
 </div>
 <div class="paragraph">
@@ -402,18 +400,18 @@ for that recipient.</p>
 <div class="sect2">
 <h3 id="_delays_in_delivery">Delays in delivery</h3>
 <div class="paragraph">
-<p>If NOTIFY contains DELAY or no NOTIFY parameter, MTA MAY issue &#34;delayed&#34; DSN
+<p>If NOTIFY contains DELAY or no NOTIFY parameter, MTA MAY issue "delayed" DSN
 for that recipient.</p>
 </div>
 <div class="paragraph">
 <p>If NOTIFY parameter is issued without DELAY keyword, MTA MUST NOT issue
-&#34;delayed&#34; DSN for that recipient.</p>
+"delayed" DSN for that recipient.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_failure_on_delivery">Failure on delivery</h3>
 <div class="paragraph">
-<p>If NOTIFY parameter contains FAILURE or no NOTIFY parameter, a &#34;failed&#34;
+<p>If NOTIFY parameter contains FAILURE or no NOTIFY parameter, a "failed"
 DSN MUST be issued.</p>
 </div>
 <div class="paragraph">
@@ -424,8 +422,8 @@ it MAY inform the local postmaster via mechanism that does not using DSN.</p>
 <div class="sect2">
 <h3 id="_mailing_list">Mailing List</h3>
 <div class="paragraph">
-<p>If NOTIFY parameter contains SUCCESS, and the message is placed on list&#39;s
-mailbox or accepted by list&#39;s server, a &#34;delivered&#34; DSN must be issued.</p>
+<p>If NOTIFY parameter contains SUCCESS, and the message is placed on list&#8217;s
+mailbox or accepted by list&#8217;s server, a "delivered" DSN must be issued.</p>
 </div>
 <div class="paragraph">
 <p>When redistributed to members of mailing list,</p>
@@ -456,7 +454,7 @@ original message.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><code>FULL</code> requests that the entire message be returned in any &#34;failed&#34; DSN issued
+<p><code>FULL</code> requests that the entire message be returned in any "failed" DSN issued
 for this recipient.</p>
 </div>
 <div class="paragraph">
@@ -507,15 +505,15 @@ the US-ASCII.</p>
 <p>The NEVER keyword MUST appear by itself.</p>
 </div>
 <div class="paragraph">
-<p>&#34;NEVER&#34; requests that a DSN not be returned to the sender under any
+<p>"NEVER" requests that a DSN not be returned to the sender under any
 conditions.</p>
 </div>
 <div class="paragraph">
-<p>&#34;SUCCESS&#34; or &#34;FAILURE&#34; value indicated that a DSN be issued on successful
+<p>"SUCCESS" or "FAILURE" value indicated that a DSN be issued on successful
 delivery or delivery failure, respectively.</p>
 </div>
 <div class="paragraph">
-<p>&#34;DELAY&#34; indicates the sender&#39;s willingness to receive &#34;delayed&#34; DSNs.</p>
+<p>"DELAY" indicates the sender&#8217;s willingness to receive "delayed" DSNs.</p>
 </div>
 <div class="paragraph">
 <p>It MAY be up to 28 characters.</p>
@@ -533,7 +531,7 @@ delivery or delivery failure, respectively.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>ORCPT parameter is used to specify an &#34;original&#34; recipient address that
+<p>ORCPT parameter is used to specify an "original" recipient address that
 corresponds to the actual recipient.</p>
 </div>
 <div class="paragraph">
@@ -555,7 +553,7 @@ the message.</p>
 <div class="sect2">
 <h3 id="_format_of_delivery_notifications">Format of delivery notifications</h3>
 <div class="paragraph">
-<p>MAIL command argument MUST be a null (&#34;&lt;&gt;&#34;).</p>
+<p>MAIL command argument MUST be a null ("&lt;&gt;").</p>
 </div>
 <div class="paragraph">
 <p>RCPT command argument is copied from the original message MAIL command.</p>
@@ -566,8 +564,8 @@ The NOTIFY parameter MAY be used, with value MUST be NEVER.
 The ENVID and/or ORCPT parameter MAY be used.</p>
 </div>
 <div class="paragraph">
-<p>The MIME message is &#34;multipart/report&#34; with &#34;report-type&#34; is
-&#34;delivery-status&#34;.</p>
+<p>The MIME message is "multipart/report" with "report-type" is
+"delivery-status".</p>
 </div>
 </div>
 </div>
@@ -576,12 +574,12 @@ The ENVID and/or ORCPT parameter MAY be used.</p>
 <h2 id="_multipart_report_content_type_rfc_3462">Multipart-Report Content Type (RFC 3462)</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section provide summary and notes on implementation of &#34;multipart/report&#34;
+<p>This section provide summary and notes on implementation of "multipart/report"
 MIME type on SMTP protocol as defined in <a href="https://tools.ietf.org/html/rfc3462">RFC 3462</a>.</p>
 </div>
 <div class="paragraph">
 <p>The Multipart/Report Multipurpose Internet Mail Extensions (MIME) content-type
-is a general &#34;family&#34; or &#34;container&#34; type for electronic mail reports of any
+is a general "family" or "container" type for electronic mail reports of any
 kind.</p>
 </div>
 <div class="paragraph">
@@ -612,7 +610,7 @@ the reported message handling event.  The purpose of this body part is
 to provide a machine-readable description of the conditions that
 caused the report to be generated, along with details not present in
 the first body part that may be useful to human experts.  An initial
-body part, &#34;message/delivery-status&#34; is defined in RFC 3464 (see below).</p>
+body part, "message/delivery-status" is defined in RFC 3464 (see below).</p>
 </li>
 <li>
 <p>(Optional) A body part containing the returned message or a portion
@@ -641,15 +639,13 @@ from the message which caused the report.</p>
 <h2 id="status-codes">Enhanced Mail System Status Codes (RFC 3463)</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Syntax,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>status-code = class "." subject "." detail
+<p>Syntax,
+&#8230;&#8203;.
+status-code = class "." subject "." detail
 class = "2"/"4"/"5"
 subject = 1*3digit
-detail = 1*3digit</pre>
-</div>
+detail = 1*3digit
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
 <p>White-space characters and comments are NOT allowed within a status-code.</p>
@@ -682,7 +678,7 @@ zero digits.</p>
 <p>X.0.XXX   Other or Undefined Status</p>
 </li>
 <li>
-<p>X.1.XXX Addressing Status.  Problem on sender&#39;s recipient address.</p>
+<p>X.1.XXX Addressing Status.  Problem on sender&#8217;s recipient address.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -707,10 +703,10 @@ zero digits.</p>
 <p>X.1.6     Mailbox has moved</p>
 </li>
 <li>
-<p>X.1.7     Bad sender&#39;s mailbox address syntax</p>
+<p>X.1.7     Bad sender&#8217;s mailbox address syntax</p>
 </li>
 <li>
-<p>X.1.8     Bad sender&#39;s system address</p>
+<p>X.1.8     Bad sender&#8217;s system address</p>
 </li>
 </ul>
 </div>
@@ -884,7 +880,7 @@ zero digits.</p>
 protocol as defined in <a href="https://tools.ietf.org/html/rfc3464">RFC 3464</a>.</p>
 </div>
 <div class="paragraph">
-<p>A DSN is a &#34;multipart/report&#34; MIME message with three components,</p>
+<p>A DSN is a "multipart/report" MIME message with three components,</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -921,13 +917,13 @@ Subject: Returned mail: Cannot send message for 5 days
 </div>
 </div>
 <div class="paragraph">
-<p>The &#34;From&#34; field of message header of DSN SHOULD contain the address of human
+<p>The "From" field of message header of DSN SHOULD contain the address of human
 who responsible at Reporting-MTA and SHOULD be chosen so that DSN will not
 generate mail loops.</p>
 </div>
 <div class="paragraph">
-<p>The &#34;To&#34; field of message header and &#34;RCPT TO:&#34; parameter is return-path from
-&#34;MAIL FROM:&#34; command.</p>
+<p>The "To" field of message header and "RCPT TO:" parameter is return-path from
+"MAIL FROM:" command.</p>
 </div>
 </div>
 <div class="sect2">
@@ -951,12 +947,12 @@ CRLF
 recipient-fields.</p>
 </div>
 <div class="paragraph">
-<p>Any header that start with &#34;X-&#34; are extension fields; such names are reserved
+<p>Any header that start with "X-" are extension fields; such names are reserved
 for experimental use.</p>
 </div>
 <div class="paragraph">
 <p>Each sender-specified recipient address SHOULD result in at most one
-&#34;delivered&#34; or &#34;failed&#34; DSN for that recipient</p>
+"delivered" or "failed" DSN for that recipient</p>
 </div>
 <div class="sect3">
 <h4 id="_format_for_message_fields">Format for message-fields</h4>
@@ -970,20 +966,20 @@ for experimental use.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The &#34;Original-Envelope-ID&#34; MUST be supplied if original message MAIL command
-contains ENVID, except when a DSN is issued by the sender&#39;s MTA itself (Sender
+<p>The "Original-Envelope-ID" MUST be supplied if original message MAIL command
+contains ENVID, except when a DSN is issued by the sender&#8217;s MTA itself (Sender
 MTA = Reporting MTA)</p>
 </div>
 <div class="paragraph">
-<p>If no ENVID parameter, the &#34;Original-Envelope-ID&#34; field MUST NOT be supplied.</p>
+<p>If no ENVID parameter, the "Original-Envelope-ID" field MUST NOT be supplied.</p>
 </div>
 <div class="paragraph">
-<p>The &#34;envelope-id&#34; is CASE-SENSITIVE.
+<p>The "envelope-id" is CASE-SENSITIVE.
 The DSN MUST preserve the original case and spelling of the envelope-id.</p>
 </div>
 <div class="paragraph">
-<p>MTA-type MUST be &#34;dns&#34; if MTA is connected to internet, otherwise it SHOULD be
-&#34;x-local-hostname&#34;.</p>
+<p>MTA-type MUST be "dns" if MTA is connected to internet, otherwise it SHOULD be
+"x-local-hostname".</p>
 </div>
 <div class="paragraph">
 <p>MTA-name are case sensitive.
@@ -1021,10 +1017,10 @@ the Reporting MTA.</p>
 <div class="sect4">
 <h5 id="_original_recipient_and_final_recipient">Original-Recipient and Final-Recipient</h5>
 <div class="paragraph">
-<p>address-type field is &#34;rfc822&#34;.</p>
+<p>address-type field is "rfc822".</p>
 </div>
 <div class="paragraph">
-<p>address-type field is &#34;unknown&#34; if the Reporting MTA cannot determine the type
+<p>address-type field is "unknown" if the Reporting MTA cannot determine the type
 of the original recipient address from the message envelope.</p>
 </div>
 <div class="paragraph">
@@ -1052,36 +1048,36 @@ otherwise this field MUST NOT appear.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#34;failed&#34; indicates that the message could not be delivered to the recipient.</p>
+<p>"failed" indicates that the message could not be delivered to the recipient.</p>
 </li>
 <li>
-<p>&#34;delayed&#34; indicates that the Reporting MTA has so far been unable
+<p>"delayed" indicates that the Reporting MTA has so far been unable
 to deliver or relay the message, but it will continue to attempt to do so.</p>
 </li>
 <li>
-<p>&#34;delivered&#34; indicates that the message was successfully delivered to
+<p>"delivered" indicates that the message was successfully delivered to
 the recipient address specified by the sender.
 It does not indicate that the message has been read.
 This is a terminal state and no further DSN for this recipient should be
 expected.</p>
 </li>
 <li>
-<p>&#34;relayed&#34; indicates that the message has been relayed or gateway-ed
+<p>"relayed" indicates that the message has been relayed or gateway-ed
 into an environment that does not accept responsibility for generating DSNs
 upon successful delivery.
 This action-value SHOULD NOT be used unless the sender has requested
 notification of successful delivery for this recipient.</p>
 </li>
 <li>
-<p>&#34;expanded&#34; indicates that the message has been successfully delivered to the
+<p>"expanded" indicates that the message has been successfully delivered to the
 recipient address as specified by the sender, and forwarded by the
 Reporting-MTA beyond that destination to multiple additional recipient
 addresses.
-An action-value of &#34;expanded&#34; differs from &#34;delivered&#34; in that &#34;expanded&#34; is
+An action-value of "expanded" differs from "delivered" in that "expanded" is
 not a terminal state.
-Further &#34;failed&#34; and/or &#34;delayed&#34; notifications may be provided.
+Further "failed" and/or "delayed" notifications may be provided.
 This value SHOULD NOT be used with a DSN issued on delivery of a message to a
-&#34;mailing list&#34;.</p>
+"mailing list".</p>
 </li>
 </ul>
 </div>
@@ -1093,7 +1089,7 @@ This value SHOULD NOT be used with a DSN issued on delivery of a message to a
 leading zero digits.</p>
 </div>
 <div class="paragraph">
-<p>See section <a href="#status-codes">Enhanced Mail System Status Codes (RFC 3463)</a> for its value.</p>
+<p>See section <a href="#status-codes">Enhanced Mail System Status Codes (RFC 3463) </a> for its value.</p>
 </div>
 </div>
 <div class="sect4">
@@ -1108,7 +1104,7 @@ via SMTP, the Remote-MTA field MUST be supplied for each of those recipients.</p
 <div class="paragraph">
 <p>For DSNs resulting from attempts to relay a message to one or more recipients
 via SMTP, the Diagnostic-Code MUST be supplied for each of those recipients,
-with diagnostic-type is set to &#34;smtp&#34;.</p>
+with diagnostic-type is set to "smtp".</p>
 </div>
 </div>
 <div class="sect4">
@@ -1126,14 +1122,14 @@ attempt are not available.</p>
 <div class="sect4">
 <h5 id="_final_log_id">Final-Log-ID</h5>
 <div class="paragraph">
-<p>This can be useful as an index to the final-mta&#39;s log entry for that delivery
+<p>This can be useful as an index to the final-mta&#8217;s log entry for that delivery
 attempt.</p>
 </div>
 </div>
 <div class="sect4">
 <h5 id="_will_retry_until">Will-Retry-Until</h5>
 <div class="paragraph">
-<p>This header is for &#34;delayed&#34; status, which inform the final MTA the data and
+<p>This header is for "delayed" status, which inform the final MTA the data and
 time when the message will be abandoned if delivery is keep failing.</p>
 </div>
 </div>
@@ -1148,6 +1144,7 @@ depends on the value of RET parameter on RCPT command.</p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

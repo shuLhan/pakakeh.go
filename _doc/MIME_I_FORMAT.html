@@ -229,8 +229,6 @@ dd {
 				<h1>MIME Part One: Format of Internet Message Bodies</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -292,7 +290,7 @@ entity-headers       := [ content CRLF ]
 <div class="ulist">
 <ul>
 <li>
-<p>Valid value is &#34;1.0&#34;.</p>
+<p>Valid value is "1.0".</p>
 </li>
 <li>
 <p>Comment strings that are present MUST be ignored.</p>
@@ -415,29 +413,29 @@ mechanism := "7bit" / "8bit" / "binary" /
 <div class="ulist">
 <ul>
 <li>
-<p>Default value is &#34;7bit&#34;</p>
+<p>Default value is "7bit"</p>
 </li>
 <li>
 <p>This value is case insensitive</p>
 </li>
 <li>
-<p>Values &#34;7bit&#34;, &#34;8bit&#34;, and &#34;binary&#34; all mean that the identity (i.e. NO)
+<p>Values "7bit", "8bit", and "binary" all mean that the identity (i.e. NO)
    encoding transformation has been performed.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#34;7bit&#34; data refers to octets with decimal values greater than 127
+<p>"7bit" data refers to octets with decimal values greater than 127
     are not allowed and neither are NULs (octet with decimal value 0).
     CR (decimal value 13) and LF (decimal value 10) octets only occur as
     part of CRLF line separation sequences.</p>
 </li>
 <li>
-<p>&#34;8bit&#34; data allow octets with decimal values greater than 127.
+<p>"8bit" data allow octets with decimal values greater than 127.
     CR and LF octets only occur as part of CRLF line separation sequences and
     no NULs are allowed.</p>
 </li>
 <li>
-<p>&#34;Binary data&#34; refers to data where any sequence of octets whatsoever
+<p>"Binary data" refers to data where any sequence of octets whatsoever
     is allowed.</p>
 </li>
 </ul>
@@ -445,30 +443,30 @@ mechanism := "7bit" / "8bit" / "binary" /
 </li>
 <li>
 <p>The proper Content-Transfer-Encoding label MUST always be used.
-   Labelling unencoded data containing 8bit characters as &#34;7bit&#34; is not
+   Labelling unencoded data containing 8bit characters as "7bit" is not
    allowed, nor is labelling unencoded non-line-oriented data as anything
-   other than &#34;binary&#34; allowed.</p>
+   other than "binary" allowed.</p>
 </li>
 <li>
 <p>Mail transport for unencoded 8bit data is defined in RFC 6152.</p>
 </li>
 <li>
-<p>Private values, MUST use an x-token, e.g. &#34;Content-Type-Encoding: x-new&#34;.</p>
+<p>Private values, MUST use an x-token, e.g. "Content-Type-Encoding: x-new".</p>
 </li>
 <li>
 <p>If the header field appears as part of a message header, it applies to the
    entire body of that message.
-   If the header field appears as part of an entity&#39;s headers, it applies only
+   If the header field appears as part of an entity&#8217;s headers, it applies only
    to the body of that entity.</p>
 </li>
 <li>
-<p>It is EXPRESSLY FORBIDDEN to use any encodings other than &#34;7bit&#34;, &#34;8bit&#34;,
-   or &#34;binary&#34; with any composite media type.
-   Composite media types are &#34;multipart&#34; and &#34;message&#34;.</p>
+<p>It is EXPRESSLY FORBIDDEN to use any encodings other than "7bit", "8bit",
+   or "binary" with any composite media type.
+   Composite media types are "multipart" and "message".</p>
 </li>
 <li>
 <p>Any entity with an unrecognized Content-Transfer-Encoding MUST be
-   treated as &#34;application/octet-stream&#34;, regardless of what the Content-Type
+   treated as "application/octet-stream", regardless of what the Content-Type
    header field actually says.</p>
 </li>
 <li>
@@ -531,7 +529,7 @@ rules:</p>
 <li>
 <p>(General 8bit representation) Any octet, except a CRLF line break of the
    canonical (standard) form of the data being encoded, may be represented by
-   an &#34;=&#34; followed by a two digit hexadecimal representation of the octet&#39;s
+   an "=" followed by a two digit hexadecimal representation of the octet&#8217;s
    value.
    Uppercase letters MUST be used.
    A way to get reasonably reliable transport through EBCDIC gateways is to
@@ -562,7 +560,7 @@ rules:</p>
       followed on that line by a printable character.</p>
 </li>
 <li>
-<p>An &#34;=&#34; at the end of an encoded line, indicating a soft line break
+<p>An "=" at the end of an encoded line, indicating a soft line break
       (see rule #5) may follow one or more TAB (HT) or SPACE characters.</p>
 </li>
 <li>
@@ -575,15 +573,15 @@ rules:</p>
 <li>
 <p>(Line Breaks) A line break in a text body, represented as a CRLF sequence
    in the text canonical form, MUST be represented by a (RFC 822) line break.
-   A CR or LF in binary data should be encoded as &#34;=0D&#34; and &#34;=0A&#34;.</p>
+   A CR or LF in binary data should be encoded as "=0D" and "=0A".</p>
 </li>
 <li>
 <p>(Soft Line Breaks) The Quoted-Printable encoding REQUIRES that encoded
    lines be no more than 76 characters long.
    If longer lines are to be encoded with the Quoted-Printable encoding,
-   &#34;soft&#34; line breaks MUST be used.
+   "soft" line breaks MUST be used.
    An equal sign as the last character on a encoded line indicates such a
-   non-significant (&#34;soft&#34;) line break in the encoded text.</p>
+   non-significant ("soft") line break in the encoded text.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -592,7 +590,7 @@ rules:</p>
 </li>
 <li>
 <p>A good strategy is to choose a boundary that includes a character sequence
-   such as &#34;=_&#34; which can never appear in a quoted-printable body.</p>
+   such as "=_" which can never appear in a quoted-printable body.</p>
 </li>
 </ul>
 </div>
@@ -608,21 +606,21 @@ Such cases are,</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>An &#34;=&#34; followed by two hexadecimal digits, one or both of which are
-   lowercase letters in &#34;abcdef&#34;, is formally illegal.
+<p>An "=" followed by two hexadecimal digits, one or both of which are
+   lowercase letters in "abcdef", is formally illegal.
    A robust implementation might choose to recognize them as the corresponding
    uppercase letters.</p>
 </li>
 <li>
-<p>An &#34;=&#34; followed by a character that is neither a hexadecimal digit
-   (including &#34;abcdef&#34;) nor the CR character of a CRLF pair is illegal.
+<p>An "=" followed by a character that is neither a hexadecimal digit
+   (including "abcdef") nor the CR character of a CRLF pair is illegal.
    A reasonable approach by a robust implementation might be to include the
-   &#34;=&#34; character and the following character in the decoded data without any
+   "=" character and the following character in the decoded data without any
    transformation and, if possible, indicate to the user that proper decoding
    was not possible at this point in the data.</p>
 </li>
 <li>
-<p>An &#34;=&#34; cannot be the ultimate or penultimate character in an encoded
+<p>An "=" cannot be the ultimate or penultimate character in an encoded
    object.</p>
 </li>
 <li>
@@ -645,7 +643,7 @@ Such cases are,</p>
 <div class="paragraph">
 <p>A 65-character subset of US-ASCII is used, enabling 6 bits to be represented
 per printable character.
-(The extra 65th character, &#34;=&#34;, is used to signify a special processing
+(The extra 65th character, "=", is used to signify a special processing
  function.)</p>
 </div>
 <div class="literalblock">
@@ -698,16 +696,16 @@ per printable character.
 <li>
 <p>The final quantum of encoding input is an integral multiple of 24 bits;
     here, the final unit of encoded output will be an integral multiple of 4
-    characters with no &#34;=&#34; padding</p>
+    characters with no "=" padding</p>
 </li>
 <li>
 <p>The final quantum of encoding input is exactly 8 bits; here, the final
-    unit of encoded output will be two characters followed by two &#34;=&#34;
+    unit of encoded output will be two characters followed by two "="
     padding characters</p>
 </li>
 <li>
 <p>The final quantum of encoding input is exactly 16 bits; here, the final
-    unit of encoded output will be three characters followed by one &#34;=&#34;
+    unit of encoded output will be three characters followed by one "="
     padding character.</p>
 </li>
 </ol>
@@ -752,7 +750,7 @@ per printable character.
 <p>The Content-ID field allow one body to make reference to another.</p>
 </li>
 <li>
-<p>Its syntactically identical to the &#34;Message-ID&#34; header field</p>
+<p>Its syntactically identical to the "Message-ID" header field</p>
 </li>
 <li>
 <p>Content-ID values MUST be generated to be world-unique.</p>
@@ -764,7 +762,7 @@ per printable character.
 </li>
 <li>
 <p>Its use is MANDATORY in implementations which generate data of the optional
-   MIME media type &#34;message/external-body&#34;.</p>
+   MIME media type "message/external-body".</p>
 </li>
 <li>
 <p>The Content-ID value has special semantics in the case of the
@@ -791,6 +789,7 @@ per printable character.
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

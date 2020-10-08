@@ -229,8 +229,6 @@ dd {
 				<h1>Simple Mail Transfer Protocol (SMTP)</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -404,22 +402,18 @@ Argument       = Atom</pre>
 <p>There are two mode of response: single line and multi line.</p>
 </div>
 <div class="paragraph">
-<p>Format for single line response,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Reply-code SP text CRLF</pre>
-</div>
+<p>Format for single line response,
+&#8230;&#8203;.
+Reply-code SP text CRLF
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
-<p>Format for multi line response,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>  Reply-code "-" text CRLF
+<p>Format for multi line response,
+&#8230;&#8203;.
+  Reply-code "-" text CRLF
 *(Reply-code "-" text CRLF)
-  Reply-code SP text CRLF</pre>
-</div>
+  Reply-code SP text CRLF
+&#8230;&#8203;.</p>
 </div>
 </div>
 <div class="sect2">
@@ -444,7 +438,7 @@ At-domain      = "@" Domain</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The use of source routes (The &#34;A-d-l&#34;) is deprecated (RFC 5321, Appendix F.2),
+<p>The use of source routes (The "A-d-l") is deprecated (RFC 5321, Appendix F.2),
 while servers MUST be prepared to receive and handle them.
 Clients SHOULD NOT transmit them and this section is included in the current
 specification only to provide context.</p>
@@ -500,48 +494,70 @@ String         = Atom / Quoted-string</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Additional format defined in RFC 5322, section 3.2.3,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+<p>Additional format defined in RFC 5322, section 3.2.3,
+&#8230;&#8203;.
+   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
                        "!" / "#" /        ;  characters not including
                        "$" / "%" /        ;  specials.  Used for atoms.
-                       "&" / "'" /
+                       "&amp;" / "'" /
                        "*" / "+" /
                        "-" / "/" /
                        "=" / "?" /
                        "^" / "_" /
                        "`" / "{" /
                        "|" / "}" /
-                       "~"
-
-   atom            =   [CFWS] 1*atext [CFWS]
-
-   dot-atom-text   =   1*atext *("." 1*atext)
-
-   dot-atom        =   [CFWS] dot-atom-text [CFWS]
-
-   specials        =   "(" / ")" /        ; Special characters that do
-                       "<" / ">" /        ;  not appear in atext
-                       "[" / "]" /
-                       ":" / ";" /
-                       "@" / "\" /
-                       "," / "." /
-                       DQUOTE
-
-   qtext           =   %d33 /             ; Printable US-ASCII
-                       %d35-91 /          ;  characters not including
-                       %d93-126 /         ;  "\" or the quote character
-                       obs-qtext
-
-   qcontent        =   qtext / quoted-pair
-
-   quoted-string   =   [CFWS]
-                       DQUOTE *([FWS] qcontent) [FWS] DQUOTE
-                       [CFWS]
-
-   quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp</pre>
+                       "~"</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>atom            =   [CFWS] 1*atext [CFWS]</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dot-atom-text   =   1*atext *("." 1*atext)</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dot-atom        =   [CFWS] dot-atom-text [CFWS]</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>specials        =   "(" / ")" /        ; Special characters that do
+                    "<" / ">" /        ;  not appear in atext
+                    "[" / "]" /
+                    ":" / ";" /
+                    "@" / "\" /
+                    "," / "." /
+                    DQUOTE</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>qtext           =   %d33 /             ; Printable US-ASCII
+                    %d35-91 /          ;  characters not including
+                    %d93-126 /         ;  "\" or the quote character
+                    obs-qtext</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>qcontent        =   qtext / quoted-pair</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>quoted-string   =   [CFWS]
+                    DQUOTE *([FWS] qcontent) [FWS] DQUOTE
+                    [CFWS]</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>   quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp
+....</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -556,12 +572,12 @@ possible.</p>
 <div class="paragraph">
 <p>Systems MUST NOT define mailboxes in such a way as to require the use in SMTP
 of non-ASCII characters (octets with the high order bit set to one) or ASCII
-&#34;control characters&#34; (decimal value 0-31 and 127).
+"control characters" (decimal value 0-31 and 127).
 These characters MUST NOT be used in MAIL or RCPT commands or other commands
 that require mailbox names.</p>
 </div>
 <div class="paragraph">
-<p>Note that the backslash, &#34;\&#34;, is a quote character, which is used to indicate
+<p>Note that the backslash, "\", is a quote character, which is used to indicate
 that the next character is to be used literally (instead of its normal
 interpretation).</p>
 </div>
@@ -618,7 +634,7 @@ by appropriate SMTP extensions).</p>
 <div class="paragraph">
 <p>A server that reply with 554 MUST still wait for the client to send a QUIT
 (see Section 4.1.1.10) before closing the connection and SHOULD respond to any
-intervening commands with &#34;503 bad sequence of commands&#34;.</p>
+intervening commands with "503 bad sequence of commands".</p>
 </div>
 </div>
 </div>
@@ -655,8 +671,8 @@ data and the end of transaction,</p>
 <p>Server MUST support HELO.</p>
 </div>
 <div class="paragraph">
-<p>Client SHOULD start a session by EHLO.  If server return &#34;command not
-recognized&#34;, client SHOULD fall-back to HELO.</p>
+<p>Client SHOULD start a session by EHLO.  If server return "command not
+recognized", client SHOULD fall-back to HELO.</p>
 </div>
 <div class="paragraph">
 <p>Client MUST issue EHLO/HELO before starting a mail transaction.</p>
@@ -883,7 +899,7 @@ mailbox syntax incorrect)</p>
 </li>
 <li>
 <p>554  Transaction failed (Or, in the case of a connection-opening
-response, &#34;No SMTP service here&#34;)</p>
+response, "No SMTP service here")</p>
 </li>
 </ul>
 </div>
@@ -936,7 +952,7 @@ not found, no access, or command rejected for policy reasons)</p>
 </li>
 <li>
 <p>554  Transaction failed (Or, in the case of a connection-opening
-response, &#34;No SMTP service here&#34;)</p>
+response, "No SMTP service here")</p>
 </li>
 </ul>
 </div>
@@ -1199,8 +1215,8 @@ QUIT command, and it SHOULD wait until it receives the reply.</p>
 <p><a href="ESMTP_DSN.html">Delivery Status Notification (RFC3461-3464)</a></p>
 </li>
 <li>
-<p><a href="ESMTP_TLS.html">SMTP Service Extension for Secure SMTP over Transport
-Layer Security (RFC3207)</a></p>
+<p>link:ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over Transport
+Layer Security (RFC3207)]</p>
 </li>
 <li>
 <p><a href="ESMTP_AUTH.html">SMTP Service Extension for Authentication (RFC4954)</a></p>
@@ -1226,6 +1242,7 @@ Layer Security (RFC3207)</a></p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

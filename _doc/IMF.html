@@ -229,8 +229,6 @@ dd {
 				<h1>Internet Message Format (IMF)</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -322,8 +320,8 @@ text            =   %d1-9 /            ; Characters excluding CR
    syntactic and semantic evaluation.</p>
 </li>
 <li>
-<p>&#34;field-body&#34; MUST NOT include CR and LF except when used in &#34;folding&#34; and
-   &#34;unfolding&#34;.</p>
+<p>"field-body" MUST NOT include CR and LF except when used in "folding" and
+   "unfolding".</p>
 </li>
 </ul>
 </div>
@@ -350,12 +348,10 @@ quoted-pair     =   "\" (VCHAR / WSP) / obs-qp</pre>
 </div>
 <div class="paragraph">
 <p><em>Folding</em> is a function to split a line into multiline with CRLF and WSP. For
-example, the following line,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>"Subject: This is a test" CRLF</pre>
-</div>
+example, the following line,
+&#8230;&#8203;.
+"Subject: This is a test" CRLF
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
 <p>can be folded into,</p>
@@ -377,10 +373,10 @@ input.</p>
    indeterminately long.</p>
 </li>
 <li>
-<p>Any CRLF that appears in FWS is semantically &#34;invisible&#34;.</p>
+<p>Any CRLF that appears in FWS is semantically "invisible".</p>
 </li>
 <li>
-<p>The &#34;\&#34; in any quoted-pair is semantically &#34;invisible&#34;.</p>
+<p>The "\" in any quoted-pair is semantically "invisible".</p>
 </li>
 <li>
 <p>Folding is permitted within the comment.</p>
@@ -498,11 +494,11 @@ zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone</pre>
 <p>The date and time-of-day SHOULD express local time.</p>
 </li>
 <li>
-<p>The form &#34;&#43;0000&#34; on zone SHOULD be used to indicate a time zone at
+<p>The form "+0000" on zone SHOULD be used to indicate a time zone at
    Universal Time.</p>
 </li>
 <li>
-<p>The form &#34;-0000&#34; on zone indicate that the time was generated on a system
+<p>The form "-0000" on zone indicate that the time was generated on a system
    that may be in a local time zone other than Universal Time and that the
    date-time contains no information about the local time zone.</p>
 </li>
@@ -532,43 +528,55 @@ zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone</pre>
 <p>An address may either be an individual mailbox, or a group of mailboxes.</p>
 </div>
 <div class="paragraph">
-<p>Format,</p>
+<p>Format,
+&#8230;&#8203;.
+address-list    =   (address *("," address)) / obs-addr-list</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>address-list    =   (address *("," address)) / obs-addr-list
-
-address         =   mailbox / group
-
-group           =   display-name ":" [group-list] ";" [CFWS]
-
-group-list      =   mailbox-list / CFWS / obs-group-list
-
-mailbox-list    =   (mailbox *("," mailbox)) / obs-mbox-list
-
-address         =   mailbox / group
-
-mailbox         =   name-addr / addr-spec
-
-name-addr       =   [display-name] angle-addr
-
-angle-addr      =   [CFWS] "<" addr-spec ">" [CFWS] /
-                    obs-angle-addr
-
-display-name    =   phrase
-
-addr-spec       =   local-part "@" domain
-
-local-part      =   dot-atom / quoted-string / obs-local-part
-
-domain          =   dot-atom / domain-literal / obs-domain
-
-domain-literal  =   [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
-
-dtext           =   %d33-90 /          ; Printable US-ASCII
+<div class="paragraph">
+<p>address         =   mailbox / group</p>
+</div>
+<div class="paragraph">
+<p>group           =   display-name ":" [group-list] ";" [CFWS]</p>
+</div>
+<div class="paragraph">
+<p>group-list      =   mailbox-list / CFWS / obs-group-list</p>
+</div>
+<div class="paragraph">
+<p>mailbox-list    =   (mailbox *("," mailbox)) / obs-mbox-list</p>
+</div>
+<div class="paragraph">
+<p>address         =   mailbox / group</p>
+</div>
+<div class="paragraph">
+<p>mailbox         =   name-addr / addr-spec</p>
+</div>
+<div class="paragraph">
+<p>name-addr       =   [display-name] angle-addr</p>
+</div>
+<div class="paragraph">
+<p>angle-addr      =   [CFWS] "&lt;" addr-spec "&gt;" [CFWS] /
+                    obs-angle-addr</p>
+</div>
+<div class="paragraph">
+<p>display-name    =   phrase</p>
+</div>
+<div class="paragraph">
+<p>addr-spec       =   local-part "@" domain</p>
+</div>
+<div class="paragraph">
+<p>local-part      =   dot-atom / quoted-string / obs-local-part</p>
+</div>
+<div class="paragraph">
+<p>domain          =   dot-atom / domain-literal / obs-domain</p>
+</div>
+<div class="paragraph">
+<p>domain-literal  =   [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]</p>
+</div>
+<div class="paragraph">
+<p>dtext           =   %d33-90 /          ; Printable US-ASCII
                     %d94-126 /         ;  characters not including
-                    obs-dtext          ;  "[", "]", or "\"</pre>
-</div>
+                    obs-dtext          ;  "[", "]", or "\"
+&#8230;&#8203;.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -579,7 +587,7 @@ dtext           =   %d33-90 /          ; Printable US-ASCII
 <p>quoted-string form SHOULD NOT be used;</p>
 </li>
 <li>
-<p>Comments and folding white space SHOULD NOT be used around the &#34;@&#34; in the
+<p>Comments and folding white space SHOULD NOT be used around the "@" in the
    addr-spec.</p>
 </li>
 </ul>
@@ -591,11 +599,9 @@ dtext           =   %d33-90 /          ; Printable US-ASCII
 <h2 id="_header">Header</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Format,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>fields          =   *(trace
+<p>Format,
+&#8230;&#8203;.
+fields          =   *(trace
                       *optional-field /
                       *(resent-date /
                        resent-from /
@@ -617,8 +623,8 @@ dtext           =   %d33-90 /          ; Printable US-ASCII
                     subject /
                     comments /
                     keywords /
-                    optional-field)</pre>
-</div>
+                    optional-field)
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
 <p>|===
@@ -660,8 +666,8 @@ dtext           =   %d33-90 /          ; Printable US-ASCII
    reordered, and SHOULD be kept in blocks prepended to the message.</p>
 </li>
 <li>
-<p>The only required header fields are the &#34;Date&#34; field and the originator
-   address field(s) (which is &#34;From&#34;, &#34;Sender&#34;, and &#34;Reply-To&#34;).</p>
+<p>The only required header fields are the "Date" field and the originator
+   address field(s) (which is "From", "Sender", and "Reply-To").</p>
 </li>
 </ul>
 </div>
@@ -691,26 +697,26 @@ reply-to        =   "Reply-To:" address-list CRLF</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>If the &#34;From:&#34;  field contains more than one mailbox, then the sender field
+<p>If the "From:"  field contains more than one mailbox, then the sender field
    MUST appear in the message.</p>
 </li>
 <li>
 <p>If the originator of the message can be indicated by a single mailbox and
-   the author and transmitter are identical, the &#34;Sender:&#34; field SHOULD NOT be
+   the author and transmitter are identical, the "Sender:" field SHOULD NOT be
    used.
    Otherwise, both fields SHOULD appear.</p>
 </li>
 <li>
-<p>When the &#34;Reply-To:&#34; field is present, it indicates the address(es) to
+<p>When the "Reply-To:" field is present, it indicates the address(es) to
    which the author of the message suggests that replies be sent.</p>
 </li>
 <li>
-<p>In the absence of the &#34;Reply-To:&#34; field, replies SHOULD by default be sent
-   to the mailbox(es) specified in the &#34;From:&#34; field unless otherwise
+<p>In the absence of the "Reply-To:" field, replies SHOULD by default be sent
+   to the mailbox(es) specified in the "From:" field unless otherwise
    specified by the person composing the reply.</p>
 </li>
 <li>
-<p>In all cases, the &#34;From:&#34; field SHOULD NOT contain any mailbox that does
+<p>In all cases, the "From:" field SHOULD NOT contain any mailbox that does
    not belong to the author(s) of the message.</p>
 </li>
 </ul>
@@ -728,80 +734,84 @@ bcc =   "Bcc:" [address-list / CFWS] CRLF</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The &#34;To:&#34; field contains the address(es) of the primary recipient(s) of the
+<p>The "To:" field contains the address(es) of the primary recipient(s) of the
 message.</p>
 </div>
 <div class="paragraph">
-<p>The &#34;Cc:&#34; field (where the &#34;Cc&#34; means &#34;Carbon Copy&#34; in the sense of making a
+<p>The "Cc:" field (where the "Cc" means "Carbon Copy" in the sense of making a
 copy on a typewriter using carbon paper) contains the addresses of others who
 are to receive the message, though the content of the message may not be
 directed at them.</p>
 </div>
 <div class="paragraph">
-<p>The &#34;Bcc:&#34; field (where the &#34;Bcc&#34; means &#34;Blind Carbon Copy&#34;) contains
+<p>The "Bcc:" field (where the "Bcc" means "Blind Carbon Copy") contains
 addresses of recipients of the message whose addresses are not to be
 revealed to other recipients of the message.</p>
 </div>
 <div class="paragraph">
-<p>There are three ways in which the &#34;Bcc:&#34; field is used,</p>
+<p>There are three ways in which the "Bcc:" field is used,</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>The &#34;Bcc:&#34; line is removed even though all of the recipients (including
-   those specified in the &#34;Bcc:&#34; field) are sent a copy of the message.</p>
+<p>The "Bcc:" line is removed even though all of the recipients (including
+   those specified in the "Bcc:" field) are sent a copy of the message.</p>
 </li>
 <li>
-<p>Recipients specified in the &#34;To:&#34; and &#34;Cc:&#34; lines each are sent
-   a copy of the message with the &#34;Bcc:&#34; line removed as above, but the
-   recipients on the &#34;Bcc:&#34; line get a separate copy of the message
-   containing a &#34;Bcc:&#34; line.  (When there are multiple recipient
-   addresses in the &#34;Bcc:&#34; field, some implementations actually send a
-   separate copy of the message to each recipient with a &#34;Bcc:&#34;
+<p>Recipients specified in the "To:" and "Cc:" lines each are sent
+   a copy of the message with the "Bcc:" line removed as above, but the
+   recipients on the "Bcc:" line get a separate copy of the message
+   containing a "Bcc:" line.  (When there are multiple recipient
+   addresses in the "Bcc:" field, some implementations actually send a
+   separate copy of the message to each recipient with a "Bcc:"
    containing only the address of that particular recipient.)</p>
 </li>
 <li>
-<p>Since a &#34;Bcc:&#34; field may contain no addresses, a &#34;Bcc:&#34; field can be
+<p>Since a "Bcc:" field may contain no addresses, a "Bcc:" field can be
    sent without any addresses indicating to the recipients that blind
    copies were sent to someone.</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>Which method to use with &#34;Bcc:&#34; fields is implementation dependent, but refer
-to the &#34;Security Considerations&#34; section of this document for a discussion of
+<p>Which method to use with "Bcc:" fields is implementation dependent, but refer
+to the "Security Considerations" section of this document for a discussion of
 each.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_identification_field">Identification Field</h3>
 <div class="paragraph">
-<p>Format,</p>
+<p>Format,
+&#8230;&#8203;.
+message-id      =   "Message-ID:" msg-id CRLF</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>message-id      =   "Message-ID:" msg-id CRLF
-
-in-reply-to     =   "In-Reply-To:" 1*msg-id CRLF
-
-references      =   "References:" 1*msg-id CRLF
-
-msg-id          =   [CFWS] "<" id-left "@" id-right ">" [CFWS]
-
-id-left         =   dot-atom-text / obs-id-left
-
-id-right        =   dot-atom-text / no-fold-literal / obs-id-right
-
-no-fold-literal =   "[" *dtext "]"</pre>
+<div class="paragraph">
+<p>in-reply-to     =   "In-Reply-To:" 1*msg-id CRLF</p>
 </div>
+<div class="paragraph">
+<p>references      =   "References:" 1*msg-id CRLF</p>
+</div>
+<div class="paragraph">
+<p>msg-id          =   [CFWS] "&lt;" id-left "@" id-right "&gt;" [CFWS]</p>
+</div>
+<div class="paragraph">
+<p>id-left         =   dot-atom-text / obs-id-left</p>
+</div>
+<div class="paragraph">
+<p>id-right        =   dot-atom-text / no-fold-literal / obs-id-right</p>
+</div>
+<div class="paragraph">
+<p>no-fold-literal =   "[" *dtext "]"
+&#8230;&#8203;.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Every message SHOULD have a &#34;Message-ID:&#34; field.</p>
+<p>Every message SHOULD have a "Message-ID:" field.</p>
 </li>
 <li>
-<p>Reply messages SHOULD have &#34;In-Reply-To:&#34; and &#34;References:&#34; fields.</p>
+<p>Reply messages SHOULD have "In-Reply-To:" and "References:" fields.</p>
 </li>
 </ul>
 </div>
@@ -814,14 +824,14 @@ humans.</p>
 RECOMMENDED.</p>
 </div>
 <div class="paragraph">
-<p>The &#34;In-Reply-To:&#34; and &#34;References:&#34; fields are used when creating a
+<p>The "In-Reply-To:" and "References:" fields are used when creating a
 reply to a message.
-&#34;In-Reply-To:&#34; field may be used to identify the message (or messages) to
-which the new message is a reply (one or more parent), while the &#34;References:&#34;
-field may be used to identify a &#34;thread&#34; of conversation.</p>
+"In-Reply-To:" field may be used to identify the message (or messages) to
+which the new message is a reply (one or more parent), while the "References:"
+field may be used to identify a "thread" of conversation.</p>
 </div>
 <div class="paragraph">
-<p>Trying to form a &#34;References:&#34; field for a reply that has multiple parents is
+<p>Trying to form a "References:" field for a reply that has multiple parents is
 discouraged.</p>
 </div>
 <div class="paragraph">
@@ -845,10 +855,10 @@ keywords        =   "Keywords:" phrase *("," phrase) CRLF</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>When used in a reply, the &#34;Subject&#34; body MAY start with the string &#34;Re: &#34; (an
-abbreviation of the Latin &#34;in re&#34;, meaning &#34;in the matter of&#34;)
-followed by the contents of the &#34;Subject:&#34; field body of the original message.
-If this is done, only one instance of the literal string &#34;Re: &#34; ought to be
+<p>When used in a reply, the "Subject" body MAY start with the string "Re: " (an
+abbreviation of the Latin "in re", meaning "in the matter of")
+followed by the contents of the "Subject:" field body of the original message.
+If this is done, only one instance of the literal string "Re: " ought to be
 used since use of other strings or more than one instance can lead to
 undesirable consequences.</p>
 </div>
@@ -897,18 +907,18 @@ resent-msg-id   =   "Resent-Message-ID:" msg-id CRLF</pre>
 <p>No other fields in the message are changed when resent fields are added.</p>
 </li>
 <li>
-<p>When resent fields are used, the &#34;Resent-From:&#34; and &#34;Resent-Date:&#34;
+<p>When resent fields are used, the "Resent-From:" and "Resent-Date:"
    fields MUST be sent.</p>
 </li>
 <li>
-<p>The &#34;Resent-Message-ID:&#34; field SHOULD be sent.</p>
+<p>The "Resent-Message-ID:" field SHOULD be sent.</p>
 </li>
 <li>
-<p>&#34;Resent-Sender:&#34; SHOULD NOT be used if &#34;Resent-Sender:&#34; would be identical
-   to &#34;Resent-From:&#34;.</p>
+<p>"Resent-Sender:" SHOULD NOT be used if "Resent-Sender:" would be identical
+   to "Resent-From:".</p>
 </li>
 <li>
-<p>The &#34;Resent-Message-ID:&#34; field provides a unique identifier for the resent
+<p>The "Resent-Message-ID:" field provides a unique identifier for the resent
    message.</p>
 </li>
 </ul>
@@ -996,7 +1006,7 @@ PST is semantically equivalent to -0800</pre>
 </div>
 <div class="paragraph">
 <p>However, because of the error in [RFC0822], any time zones SHOULD all be
-considered equivalent to &#34;-0000&#34; unless there is out-of-band information
+considered equivalent to "-0000" unless there is out-of-band information
 confirming their meaning.</p>
 </div>
 </div>
@@ -1009,9 +1019,9 @@ confirming their meaning.</p>
 <ol class="arabic">
 <li>
 <p>mailbox addresses were allowed to have a route portion before the
-   addr-spec when enclosed in &#34;&lt;&#34; and &#34;&gt;&#34;.
+   addr-spec when enclosed in "&lt;" and "&gt;".
    The route is simply a comma-separated list of domain names, each preceded
-   by &#34;@&#34;, and the list terminated by a colon.</p>
+   by "@", and the list terminated by a colon.</p>
 </li>
 <li>
 <p>CFWS were allowed between the period-separated elements of local-part and
@@ -1020,7 +1030,7 @@ confirming their meaning.</p>
    just atom.</p>
 </li>
 <li>
-<p>mailbox-list and address-list were allowed to have &#34;null&#34; members.
+<p>mailbox-list and address-list were allowed to have "null" members.
    That is, there could be two or more commas in such a list with nothing in
    between them, or commas at the beginning or end of the list.</p>
 </li>
@@ -1042,7 +1052,7 @@ confirming their meaning.</p>
 <p>Fields may occur in any order.</p>
 </li>
 <li>
-<p>Any amount of white space is allowed before the &#34;:&#34; at the end of the
+<p>Any amount of white space is allowed before the ":" at the end of the
    field name.</p>
 </li>
 </ul>
@@ -1050,6 +1060,7 @@ confirming their meaning.</p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

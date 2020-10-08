@@ -229,8 +229,6 @@ dd {
 				<h1>Simple Authentication and Security Layer (SASL)</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -412,7 +410,7 @@ security layer, the original security layer remains in effect.</p>
 MUST supply the following information:</p>
 </div>
 <div class="paragraph">
-<p>1) A service name, to be selected from registry of &#34;service&#34; elements for
+<p>1) A service name, to be selected from registry of "service" elements for
 the Generic Security Service Application Program Interface (GSSAPI) host-based
 service name form.</p>
 </div>
@@ -506,7 +504,7 @@ identity string and an empty authorization identity.</p>
 <div class="paragraph">
 <p>Mechanisms that are capable of transferring an authorization identity string
 MUST be capable of transferring arbitrary non-empty sequences of Unicode
-characters, excluding those that contain the NUL (U&#43;0000) character.
+characters, excluding those that contain the NUL (U+0000) character.
 The specification MUST detail how any Unicode code points special to the
 mechanism that might appear in the authorization identity string are escaped
 to avoid ambiguity during decoding of the authorization identity string.</p>
@@ -549,7 +547,7 @@ the authorization identity string be canonical.</p>
 exchange, the receiver SHOULD handle gracefully any protected data buffer
 larger than the defined/negotiated maximal size.
 In particular, it MUST NOT blindly allocate the amount of memory specified in
-the buffer size field, as this might cause the &#34;out of memory&#34; condition.
+the buffer size field, as this might cause the "out of memory" condition.
 If the receiver detects a large block, it SHOULD close the connection.</p>
 </div>
 <div class="sect3">
@@ -619,10 +617,11 @@ services.</p>
 <div class="paragraph">
 <p>The SASL mechanism registry is maintained by IANA.
 The registry is currently available at
-&lt;http://www.iana.org/assignments/sasl-mechanisms&gt;.</p>
+&lt;<a href="http://www.iana.org/assignments/sasl-mechanisms/{>}/." class="bare">http://www.iana.org/assignments/sasl-mechanisms/{>}/.</a></p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

@@ -229,8 +229,6 @@ dd {
 				<h1>DomainKeys Identified Mail (DKIM) Signatures</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -283,7 +281,7 @@ dd {
 <li><a href="#_security_considerations">Security Considerations</a>
 <ul class="sectlevel2">
 <li><a href="#_ascii_art_attacks">ASCII Art Attacks</a></li>
-<li><a href="#_misuse_of_body_length_limits_l_tag">Misuse of Body Length Limits (&#34;l=&#34; Tag)</a></li>
+<li><a href="#_misuse_of_body_length_limits_l_tag">Misuse of Body Length Limits ("l=" Tag)</a></li>
 <li><a href="#_misappropriated_private_key">Misappropriated Private Key</a></li>
 <li><a href="#_key_server_denial_of_service_attacks">Key Server Denial-of-Service Attacks</a></li>
 <li><a href="#_attacks_against_the_dns">Attacks against the DNS</a></li>
@@ -362,7 +360,7 @@ claimed Signer directly rather than from a third party.</p>
 <h3 id="_data_integrity">Data Integrity</h3>
 <div class="paragraph">
 <p>Verifying the signature asserts that the hashed content has not changed since
-it was signed and asserts nothing else about &#34;protecting&#34; the end-to-end
+it was signed and asserts nothing else about "protecting" the end-to-end
 integrity of the message.</p>
 </div>
 <div class="paragraph">
@@ -409,7 +407,7 @@ behalf of SDID.</p>
 </dd>
 <dt class="hdlist1">Identity Assessor</dt>
 <dd>
-<p>An element in the mail system that consumes DKIM&#39;s payload, which is the
+<p>An element in the mail system that consumes DKIM&#8217;s payload, which is the
 responsible Signing Domain Identifier (SDID).
 The Identity Assessor is dedicated to the assessment of the delivered
 identifier.</p>
@@ -500,52 +498,53 @@ Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig</pre>
 <p><strong>field-name</strong></p>
 </div>
 <div class="paragraph">
-<p>Name of header field,</p>
+<p>Name of header field,
+&#8230;&#8203;.
+   field-name      =   1*ftext</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>   field-name      =   1*ftext
-
-   ftext           =   %d33-57 /          ; Printable US-ASCII
+<pre>   ftext           =   %d33-57 /          ; Printable US-ASCII
                        %d59-126           ;  characters not including
-                                          ;  ":".</pre>
+                                          ;  ":".
+....</pre>
 </div>
 </div>
 <div class="paragraph">
 <p><strong>dot-atom-text</strong></p>
 </div>
 <div class="paragraph">
-<p>In the local-part of an email address,</p>
+<p>In the local-part of an email address,
+&#8230;&#8203;.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>
-dot-atom-text   =   1*atext *("." 1*atext)</pre>
-</div>
+<div class="paragraph">
+<p>dot-atom-text   =   1*atext *("." 1*atext)
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
 <p><strong>qp-section</strong></p>
 </div>
 <div class="paragraph">
-<p>A single line of quoted-printable-encoded text,</p>
+<p>A single line of quoted-printable-encoded text,
+&#8230;&#8203;.
+qp-section  = [*(ptext / SPACE / TAB) ptext]</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>qp-section  = [*(ptext / SPACE / TAB) ptext]
-
-ptext       = hex-octet / safe-char
-
-hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
-            ; Octet MUST be used for characters > 127, =,
+<div class="paragraph">
+<p>ptext       = hex-octet / safe-char</p>
+</div>
+<div class="paragraph">
+<p>hex-octet   = "=" 2(DIGIT / "A" / "B" / "C" / "D" / "E" / "F")
+            ; Octet MUST be used for characters &gt; 127, =,
             ; SPACEs or TABs at the ends of lines, and is
             ; recommended for any character not listed in
-            ; RFC 2049 as "mail-safe".
-
-safe-char   = ; any octet with decimal value of 33 through
+            ; RFC 2049 as "mail-safe".</p>
+</div>
+<div class="paragraph">
+<p>safe-char   = ; any octet with decimal value of 33 through
               ; 60 inclusive, and 62 through 126.
               ; Characters not listed as "mail-safe" in
-              ; RFC 2049 are also not recommended.</pre>
-</div>
+              ; RFC 2049 are also not recommended.
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
 <p><strong>DKIM-Quoted-Printable</strong></p>
@@ -577,7 +576,7 @@ several important ways:</p>
    represented as physical line breaks; that is not the case here.</p>
 </li>
 <li>
-<p>The &#34;soft line break&#34; syntax (&#34;=&#34; as the last non-whitespace character on
+<p>The "soft line break" syntax ("=" as the last non-whitespace character on
    the line) does not apply.</p>
 </li>
 <li>
@@ -604,7 +603,7 @@ to either Signers or Verifiers.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The key namespace is subdivided using &#34;selectors&#34;, to support multiple
+<p>The key namespace is subdivided using "selectors", to support multiple
 concurrent public keys per signing domain.</p>
 </div>
 <div class="paragraph">
@@ -623,7 +622,7 @@ For example:</p>
    without the need to connect with a particular MSA.</p>
 </li>
 <li>
-<p>&#34;Affinity&#34; domains (e.g., college alumni associations) that provide
+<p>"Affinity" domains (e.g., college alumni associations) that provide
    forwarding of incoming mail, but that do not operate a mail submission
    agent for outgoing mail.</p>
 </li>
@@ -631,8 +630,8 @@ For example:</p>
 </div>
 <div class="paragraph">
 <p>Reusing a selector with a new key (for example, changing the key associated
-with a user&#39;s name) makes it impossible to tell the difference between a
-message that didn&#39;t verify because the key is no longer valid and a message
+with a user&#8217;s name) makes it impossible to tell the difference between a
+message that didn&#8217;t verify because the key is no longer valid and a message
 that is actually forged.
 For this reason, Signers are ill-advised to reuse selectors for new keys.
 A better strategy is to assign new keys to new selectors.</p>
@@ -641,7 +640,7 @@ A better strategy is to assign new keys to new selectors.</p>
 <div class="sect2">
 <h3 id="_tagvalue_lists">Tag=Value Lists</h3>
 <div class="paragraph">
-<p>DKIM uses a simple &#34;tag=value&#34; syntax in several contexts, including in
+<p>DKIM uses a simple "tag=value" syntax in several contexts, including in
 messages and domain signature records.</p>
 </div>
 <div class="literalblock">
@@ -660,14 +659,14 @@ ALNUMPUNC =  ALPHA / DIGIT / "_"</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Values are a series of strings containing either plain text, &#34;base64&#34; text,
-   &#34;qp-section&#34;, or &#34;dkim-quoted-printable&#34;.</p>
+<p>Values are a series of strings containing either plain text, "base64" text,
+   "qp-section", or "dkim-quoted-printable".</p>
 </li>
 <li>
 <p>The name of the tag will determine the encoding of each value.</p>
 </li>
 <li>
-<p>Unencoded semicolon (&#34;;&#34;) characters MUST NOT occur in the tag value, since
+<p>Unencoded semicolon (";") characters MUST NOT occur in the tag value, since
    that separates tag-specs.</p>
 </li>
 <li>
@@ -721,11 +720,11 @@ rsa-sha256.</p>
 </li>
 <li>
 <p>The rsa-sha1 computes a message hash using SHA-1 and then the hash is then
-   signed using the RSA algorithm and the Signer&#39;s private key.</p>
+   signed using the RSA algorithm and the Signer&#8217;s private key.</p>
 </li>
 <li>
 <p>The rsa-sha256 computes a message hash using SHA-256 and then the hash is
-   signed using the RSA algorithm and the Signer&#39;s private key.</p>
+   signed using the RSA algorithm and the Signer&#8217;s private key.</p>
 </li>
 <li>
 <p>Signers MUST use RSA keys of at least 1024 bits for long-lived keys.</p>
@@ -768,7 +767,7 @@ rsa-sha256.</p>
 <h3 id="_canonicalization">Canonicalization</h3>
 <div class="paragraph">
 <p>Canonicalization is a process for converting data that has more than one
-possible representation into a &#34;standard&#34;, &#34;normal&#34;, or canonical form.</p>
+possible representation into a "standard", "normal", or canonical form.</p>
 </div>
 <div class="paragraph">
 <p>Canonicalization is only used to prepare the email for signing or verifying;
@@ -776,22 +775,22 @@ it does not affect the transmitted email in any way.</p>
 </div>
 <div class="paragraph">
 <p>Two canonicalization algorithms are defined for each of the header and the
-body, a &#34;simple&#34; and &#34;relaxed&#34; algorithms.</p>
+body, a "simple" and "relaxed" algorithms.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>A &#34;simple&#34; algorithm tolerates almost no modification.</p>
+<p>A "simple" algorithm tolerates almost no modification.</p>
 </li>
 <li>
-<p>A &#34;relaxed&#34; algorithm tolerates common modifications such as whitespace
+<p>A "relaxed" algorithm tolerates common modifications such as whitespace
    replacement and header field line rewrapping.</p>
 </li>
 <li>
 <p>A Signer MAY specify either algorithm for header or body.</p>
 </li>
 <li>
-<p>If no canonicalization algorithm is specified by the Signer, the &#34;simple&#34;
+<p>If no canonicalization algorithm is specified by the Signer, the "simple"
    algorithm defaults for both header and body.</p>
 </li>
 <li>
@@ -811,7 +810,7 @@ body, a &#34;simple&#34; and &#34;relaxed&#34; algorithms.</p>
 </ul>
 </div>
 <div class="sect3">
-<h4 id="_the_simple_canonicalization_algorithm">The &#34;simple&#34; Canonicalization Algorithm</h4>
+<h4 id="_the_simple_canonicalization_algorithm">The "simple" Canonicalization Algorithm</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -825,7 +824,7 @@ body, a &#34;simple&#34; and &#34;relaxed&#34; algorithms.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The &#34;simple&#34; body canonicalization algorithm,</p>
+<p>The "simple" body canonicalization algorithm,</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -840,9 +839,9 @@ body, a &#34;simple&#34; and &#34;relaxed&#34; algorithms.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_the_relaxed_canonicalization_algorithm">The &#34;relaxed&#34; Canonicalization Algorithm</h4>
+<h4 id="_the_relaxed_canonicalization_algorithm">The "relaxed" Canonicalization Algorithm</h4>
 <div class="paragraph">
-<p>The &#34;relaxed&#34; header canonicalization algorithm MUST apply the following steps
+<p>The "relaxed" header canonicalization algorithm MUST apply the following steps
 in order:</p>
 </div>
 <div class="ulist">
@@ -873,7 +872,7 @@ in order:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The &#34;relaxed&#34; body canonicalization algorithm MUST apply the following steps
+<p>The "relaxed" body canonicalization algorithm MUST apply the following steps
 (a) and (b) in order:</p>
 </div>
 <div class="olist loweralpha">
@@ -908,44 +907,38 @@ in order:</p>
 <div class="sect3">
 <h4 id="_example">Example</h4>
 <div class="paragraph">
-<p>A message reading:</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>A: <SP> X <CRLF>
-B <SP> : <SP> Y <HTAB><CRLF>
-<HTAB> Z <SP><SP><CRLF>
-<CRLF>
-<SP> C <SP><CRLF>
-D <SP><HTAB><SP> E <CRLF>
-<CRLF>
-<CRLF></pre>
-</div>
+<p>A message reading:
+&#8230;&#8203;.
+A: &lt;SP&gt; X &lt;CRLF&gt;
+B &lt;SP&gt; : &lt;SP&gt; Y &lt;HTAB&gt;&lt;CRLF&gt;
+&lt;HTAB&gt; Z &lt;SP&gt;&lt;SP&gt;&lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;SP&gt; C &lt;SP&gt;&lt;CRLF&gt;
+D &lt;SP&gt;&lt;HTAB&gt;&lt;SP&gt; E &lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;CRLF&gt;
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
-<p>Output for &#34;simple&#34; canonicalization,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>A: <SP> X <CRLF>
-B <SP> : <SP> Y <HTAB><CRLF>
-<HTAB> Z <SP><SP><CRLF>
-<CRLF>
-<SP> C <SP><CRLF>
-D <SP><HTAB><SP> E <CRLF></pre>
-</div>
+<p>Output for "simple" canonicalization,
+&#8230;&#8203;.
+A: &lt;SP&gt; X &lt;CRLF&gt;
+B &lt;SP&gt; : &lt;SP&gt; Y &lt;HTAB&gt;&lt;CRLF&gt;
+&lt;HTAB&gt; Z &lt;SP&gt;&lt;SP&gt;&lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;SP&gt; C &lt;SP&gt;&lt;CRLF&gt;
+D &lt;SP&gt;&lt;HTAB&gt;&lt;SP&gt; E &lt;CRLF&gt;
+&#8230;&#8203;.</p>
 </div>
 <div class="paragraph">
-<p>Output for relaxed canonicalization,</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>a:X <CRLF>
-b:Y <SP> Z <CRLF>
-<CRLF>
-<SP> C <CRLF>
-D <SP> E <CRLF></pre>
-</div>
+<p>Output for relaxed canonicalization,
+&#8230;&#8203;.
+a:X &lt;CRLF&gt;
+b:Y &lt;SP&gt; Z &lt;CRLF&gt;
+&lt;CRLF&gt;
+&lt;SP&gt; C &lt;CRLF&gt;
+D &lt;SP&gt; E &lt;CRLF&gt;
+&#8230;&#8203;.</p>
 </div>
 </div>
 </div>
@@ -970,7 +963,7 @@ D <SP> E <CRLF></pre>
 <p>The DKIM-Signature header field being created or verified is always
    included in the signature calculation, after the rest of the header fields
    being signed;
-   however, when calculating or verifying the signature, the value of the &#34;b=&#34;
+   however, when calculating or verifying the signature, the value of the "b="
    tag (signature value) of that DKIM-Signature header field MUST be treated
    as though it were an empty string.</p>
 </li>
@@ -1001,7 +994,7 @@ status are shown below.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>It MUST have the value &#34;1&#34; for implementations compliant with this version
+<p>It MUST have the value "1" for implementations compliant with this version
   of DKIM.</p>
 </li>
 </ul>
@@ -1058,7 +1051,7 @@ sig-bh-tag-data = base64string</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The hash of the canonicalized body part of the message as limited by the &#34;l=&#34;
+<p>The hash of the canonicalized body part of the message as limited by the "l="
 tag.</p>
 </div>
 <div class="ulist">
@@ -1074,7 +1067,7 @@ tag.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>c=</strong> (plain-text; OPTIONAL, default is &#34;simple/simple&#34;)</p>
+<p><strong>c=</strong> (plain-text; OPTIONAL, default is "simple/simple")</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1090,14 +1083,14 @@ x-sig-c-tag-alg = hyphenated-word
 <div class="ulist">
 <ul>
 <li>
-<p>It consists of two names separated by a &#34;slash&#34; (%d47) character,
+<p>It consists of two names separated by a "slash" (%d47) character,
    corresponding to the header and body canonicalization algorithms,
    respectively.</p>
 </li>
 <li>
 <p>If only one algorithm is named, that algorithm is used for the header and
-   &#34;simple&#34; is used for the body.
-   For example, &#34;c=relaxed&#34; is treated the same as &#34;c=relaxed/simple&#34;.</p>
+   "simple" is used for the body.
+   For example, "c=relaxed" is treated the same as "c=relaxed/simple".</p>
 </li>
 </ul>
 </div>
@@ -1152,7 +1145,7 @@ algorithm.</p>
 <li>
 <p>The field MAY contain names of header fields that do not exist when signed;
    nonexistent header fields do not contribute to the signature computation.
-   By &#34;signing&#34; header fields that do not actually exist, a Signer can allow a
+   By "signing" header fields that do not actually exist, a Signer can allow a
    Verifier to detect insertion of those header fields after signing and
    also prevents adding fields with no values.</p>
 </li>
@@ -1176,7 +1169,7 @@ algorithm.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>i=</strong> (dkim-quoted-printable; OPTIONAL; default is &#34;@&#34; &#43; &#34;d=&#34; value)</p>
+<p><strong>i=</strong> (dkim-quoted-printable; OPTIONAL; default is "@" + "d=" value)</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1197,18 +1190,18 @@ algorithm.</p>
 </li>
 <li>
 <p>The domain-name MUST be the same as, or a subdomain of, the value of the
-   &#34;d=&#34; tag.</p>
+   "d=" tag.</p>
 </li>
 <li>
 <p>The domain-name need not be registered in the DNS -- so it might not
    resolve in a query</p>
 </li>
 <li>
-<p>If no &#34;i=&#34; tag, the Verifier MUST behave as though the value of that tag
-   were &#34;@d&#34;, where &#34;d&#34; is the value from the &#34;d=&#34; tag.</p>
+<p>If no "i=" tag, the Verifier MUST behave as though the value of that tag
+   were "@d", where "d" is the value from the "d=" tag.</p>
 </li>
 <li>
-<p>The Signer MAY choose to use the same namespace for its AUIDs as its users&#39;
+<p>The Signer MAY choose to use the same namespace for its AUIDs as its users'
    email addresses or MAY choose other means of representing its users.</p>
 </li>
 </ul>
@@ -1233,7 +1226,7 @@ preceding the body.</p>
    canonicalized message body.</p>
 </li>
 <li>
-<p>The value of the &#34;l=&#34; tag is constrained to 76 decimal digits.</p>
+<p>The value of the "l=" tag is constrained to 76 decimal digits.</p>
 </li>
 <li>
 <p>Implementers MAY need to limit the actual value expressed to a value
@@ -1254,7 +1247,7 @@ preceding the body.</p>
 </li>
 <li>
 <p>Signers wishing to ensure that no modification of any sort can occur
-   should specify the &#34;simple&#34; canonicalization algorithm for both header and
+   should specify the "simple" canonicalization algorithm for both header and
    body and omit the body length count.</p>
 </li>
 </ul>
@@ -1276,7 +1269,7 @@ qoption     = qp-hdr-value</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Each query method is of the form &#34;type[/options]&#34;, where the syntax and
+<p>Each query method is of the form "type[/options]", where the syntax and
    semantics of the options depend on the type and specified options.</p>
 </li>
 <li>
@@ -1291,19 +1284,19 @@ qoption     = qp-hdr-value</pre>
 <p>Unrecognized query mechanisms MUST be ignored.</p>
 </li>
 <li>
-<p>Default is &#34;dns/txt&#34;, which defines the DNS TXT resource record (RR) lookup
+<p>Default is "dns/txt", which defines the DNS TXT resource record (RR) lookup
    algorithm,</p>
 <div class="ulist">
 <ul>
 <li>
-<p>The only option defined for the &#34;dns&#34; query type is &#34;txt&#34;, which MUST be
+<p>The only option defined for the "dns" query type is "txt", which MUST be
     included.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Verifiers and Signers MUST support &#34;dns/txt&#34;.</p>
+<p>Verifiers and Signers MUST support "dns/txt".</p>
 </li>
 </ul>
 </div>
@@ -1316,7 +1309,7 @@ qoption     = qp-hdr-value</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The selector subdividing the namespace for the &#34;d=&#34; tag.</p>
+<p>The selector subdividing the namespace for the "d=" tag.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1382,12 +1375,12 @@ qoption     = qp-hdr-value</pre>
 <p>Default is no expiration</p>
 </li>
 <li>
-<p>The format is the same as in the &#34;t=&#34; tag, represented as an absolute date,
+<p>The format is the same as in the "t=" tag, represented as an absolute date,
    not as a time delta from the signing timestamp.</p>
 </li>
 <li>
 <p>The value is expressed as an unsigned integer in decimal ASCII, with the
-   same constraints on the value in the &#34;t=&#34; tag.</p>
+   same constraints on the value in the "t=" tag.</p>
 </li>
 <li>
 <p>Signatures MAY be considered invalid if the verification time at the
@@ -1399,16 +1392,16 @@ qoption     = qp-hdr-value</pre>
    reliably available; otherwise, the current time should be used.</p>
 </li>
 <li>
-<p>The value of the &#34;x=&#34; tag MUST be greater than the value of the &#34;t=&#34; tag if
+<p>The value of the "x=" tag MUST be greater than the value of the "t=" tag if
    both are present.</p>
 </li>
 <li>
-<p>The &#34;x=&#34; tag is not intended as an anti-replay defense.</p>
+<p>The "x=" tag is not intended as an anti-replay defense.</p>
 </li>
 <li>
-<p>Due to clock drift, the receiver&#39;s notion of when to consider the signature
+<p>Due to clock drift, the receiver&#8217;s notion of when to consider the signature
    expired may not exactly match what the sender is expecting.
-   Receivers MAY add a &#39;fudge factor&#39; to allow for such possible drift.</p>
+   Receivers MAY add a 'fudge factor' to allow for such possible drift.</p>
 </li>
 </ul>
 </div>
@@ -1439,11 +1432,11 @@ sig-z-tag-copy = hdr-name [FWS] ":" qp-hdr-value</pre>
    signing.</p>
 </li>
 <li>
-<p>This field need not contain the same header fields listed in the &#34;h=&#34; tag.</p>
+<p>This field need not contain the same header fields listed in the "h=" tag.</p>
 </li>
 <li>
-<p>The header field text itself MUST encode the vertical bar (&#34;|&#34;, %x7C)
-   character (i.e., vertical bars in the &#34;z=&#34; text are meta-characters, and
+<p>The header field text itself MUST encode the vertical bar ("|", %x7C)
+   character (i.e., vertical bars in the "z=" text are meta-characters, and
    any actual vertical bar characters in a copied header field MUST be
    encoded).</p>
 </li>
@@ -1476,9 +1469,9 @@ sig-z-tag-copy = hdr-name [FWS] ":" qp-hdr-value</pre>
 <div class="sect2">
 <h3 id="_key_management_and_representation">Key Management and Representation</h3>
 <div class="paragraph">
-<p>Parameters to the key lookup algorithm are the type of the lookup (the &#34;q=&#34;
-tag), the domain of the Signer (the &#34;d=&#34; tag of the DKIM-Signature header
-field), and the selector (the &#34;s=&#34; tag).</p>
+<p>Parameters to the key lookup algorithm are the type of the lookup (the "q="
+tag), the domain of the Signer (the "d=" tag of the DKIM-Signature header
+field), and the selector (the "s=" tag).</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1493,7 +1486,7 @@ Other tags MAY be present and MUST be ignored by any implementation that does
 not understand them.</p>
 </div>
 <div class="paragraph">
-<p><strong>v=</strong> (plain-text; RECOMMENDED, default is &#34;DKIM1&#34;)</p>
+<p><strong>v=</strong> (plain-text; RECOMMENDED, default is "DKIM1")</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1506,17 +1499,17 @@ not understand them.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>If specified, this tag MUST be set to &#34;DKIM1&#34; (without the quotes).</p>
+<p>If specified, this tag MUST be set to "DKIM1" (without the quotes).</p>
 </li>
 <li>
 <p>This tag MUST be the first tag in the record.</p>
 </li>
 <li>
-<p>Records beginning with a &#34;v=&#34; tag with any other value MUST be discarded.</p>
+<p>Records beginning with a "v=" tag with any other value MUST be discarded.</p>
 </li>
 <li>
-<p>Verifiers MUST do a string comparison on this value; for example, &#34;DKIM1&#34;
-is not the same as &#34;DKIM1.0&#34;</p>
+<p>Verifiers MUST do a string comparison on this value; for example, "DKIM1"
+is not the same as "DKIM1.0"</p>
 </li>
 </ul>
 </div>
@@ -1546,7 +1539,7 @@ x-key-h-tag-alg = hyphenated-word   ; for future extension</pre>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>k=</strong> (plain-text; OPTIONAL, default is &#34;rsa&#34;).</p>
+<p><strong>k=</strong> (plain-text; OPTIONAL, default is "rsa").</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1561,13 +1554,13 @@ x-key-k-tag-type = hyphenated-word   ; for future extension</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Signers and Verifiers MUST support the &#34;rsa&#34; key type.</p>
+<p>Signers and Verifiers MUST support the "rsa" key type.</p>
 </li>
 <li>
-<p>The &#34;rsa&#34; key type indicates that an ASN.1 DER-encoded [ITU-X660-1997]
+<p>The "rsa" key type indicates that an ASN.1 DER-encoded [ITU-X660-1997]
    RSAPublicKey (see [RFC3447], Sections 3.1 and A.1.1) is being used in the
-   &#34;p=&#34; tag.
-   (Note: the &#34;p=&#34; tag further encodes the value using the base64 algorithm.)</p>
+   "p=" tag.
+   (Note: the "p=" tag further encodes the value using the base64 algorithm.)</p>
 </li>
 <li>
 <p>Unrecognized key types MUST be ignored.</p>
@@ -1617,7 +1610,7 @@ x-key-k-tag-type = hyphenated-word   ; for future extension</pre>
 </li>
 <li>
 <p>The syntax and semantics of this tag value before being encoded in base64
-   are defined by the &#34;k=&#34; tag.</p>
+   are defined by the "k=" tag.</p>
 </li>
 <li>
 <p>If a private key has been compromised or otherwise disabled, a Signer might
@@ -1639,7 +1632,7 @@ x-key-k-tag-type = hyphenated-word   ; for future extension</pre>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>s=</strong> (plain-text; OPTIONAL; default is &#34;*&#34;).</p>
+<p><strong>s=</strong> (plain-text; OPTIONAL; default is "*").</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1666,10 +1659,10 @@ x-key-s-tag-type = hyphenated-word   ; for future extension</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>&#34;*&#34;  matches all service types</p>
+<p>"*"  matches all service types</p>
 </li>
 <li>
-<p>&#34;email&#34;   electronic mail (not necessarily limited to SMTP)</p>
+<p>"email"   electronic mail (not necessarily limited to SMTP)</p>
 </li>
 </ul>
 </div>
@@ -1710,10 +1703,10 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
     Verifiers MAY wish to track testing mode results to assist the Signer.</p>
 </li>
 <li>
-<p><strong>s</strong>:  Any DKIM-Signature header fields using the &#34;i=&#34; tag MUST have
-    the same domain value on the right-hand side of the &#34;@&#34; in the &#34;i=&#34; tag
-    and the value of the &#34;d=&#34; tag.
-    That is, the &#34;i=&#34; domain MUST NOT be a subdomain of &#34;d=&#34;.
+<p><strong>s</strong>:  Any DKIM-Signature header fields using the "i=" tag MUST have
+    the same domain value on the right-hand side of the "@" in the "i=" tag
+    and the value of the "d=" tag.
+    That is, the "i=" domain MUST NOT be a subdomain of "d=".
     Use of this flag is RECOMMENDED unless subdomaining is required.</p>
 </li>
 </ul>
@@ -1730,14 +1723,14 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
 <p>All implementations MUST support this binding.</p>
 </li>
 <li>
-<p>All DKIM keys are stored in a subdomain named &#34;_domainkey&#34;.
-   Given a DKIM-Signature field with a &#34;d=&#34; tag of &#34;example.com&#34; and an &#34;s=&#34;
-   tag of &#34;foo.bar&#34;, the DNS query will be for
-   &#34;foo.bar._domainkey.example.com&#34;.</p>
+<p>All DKIM keys are stored in a subdomain named "_domainkey".
+   Given a DKIM-Signature field with a "d=" tag of "example.com" and an "s="
+   tag of "foo.bar", the DNS query will be for
+   "foo.bar._domainkey.example.com".</p>
 </li>
 <li>
-<p>The query type &#34;q=&#34; in lookup function specify DNS Resource Record.
-   The only option defined in this base specification is &#34;txt&#34;, indicating the
+<p>The query type "q=" in lookup function specify DNS Resource Record.
+   The only option defined in this base specification is "txt", indicating the
    use of a TXT RR.</p>
 </li>
 <li>
@@ -1778,19 +1771,19 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>The body canonicalized using algorithm specified in the &#34;c=&#34; tag</p>
+<p>The body canonicalized using algorithm specified in the "c=" tag</p>
 </li>
 <li>
-<p>The body then truncated to the length specified in the &#34;l=&#34; tag</p>
+<p>The body then truncated to the length specified in the "l=" tag</p>
 </li>
 <li>
 <p>That hash value is then converted to base64 form</p>
 </li>
 <li>
-<p>For Signer, the hash value then inserted into &#34;bh=&#34; tag</p>
+<p>For Signer, the hash value then inserted into "bh=" tag</p>
 </li>
 <li>
-<p>For Verifier, the hash value then compared with value of &#34;bh=&#34; tag</p>
+<p>For Verifier, the hash value then compared with value of "bh=" tag</p>
 </li>
 </ol>
 </div>
@@ -1801,12 +1794,12 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>The header fields specified by the &#34;h=&#34; tag, in the order specified in
+<p>The header fields specified by the "h=" tag, in the order specified in
     that tag.</p>
 </li>
 <li>
 <p>The header fields then canonicalized using the header canonicalization
-    algorithm specified in the &#34;c=&#34; tag.</p>
+    algorithm specified in the "c=" tag.</p>
 </li>
 <li>
 <p>Each header field MUST be terminated with a single CRLF.</p>
@@ -1814,10 +1807,10 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
 <li>
 <p>All tags and their values in the DKIM-Signature header field are included
     in the cryptographic hash with the sole exception of the value portion of
-    the &#34;b=&#34; (signature) tag, which MUST be treated as the null string.</p>
+    the "b=" (signature) tag, which MUST be treated as the null string.</p>
 </li>
 <li>
-<p>The DKIM-Signature header field MUST NOT be included in its own &#34;h=&#34; tag,
+<p>The DKIM-Signature header field MUST NOT be included in its own "h=" tag,
     although other DKIM-Signature header fields MAY be signed</p>
 </li>
 <li>
@@ -1842,7 +1835,7 @@ x-key-t-tag-flag = hyphenated-word   ; for future extension</pre>
 </li>
 <li>
 <p>The hash MUST be computed before transport-level encodings such as SMTP
-   &#34;dot-stuffing&#34; (the modification of lines beginning with a &#34;.&#34; to avoid
+   "dot-stuffing" (the modification of lines beginning with a "." to avoid
    confusion with the SMTP end-of-message marker.</p>
 </li>
 <li>
@@ -1875,16 +1868,16 @@ signature    =  sig-alg (d-domain, selector, data-hash)</pre>
 <dl>
 <dt class="hdlist1">hash-alg</dt>
 <dd>
-<p>is the hashing algorithm specified in the &#34;a&#34; parameter.</p>
+<p>is the hashing algorithm specified in the "a" parameter.</p>
 </dd>
 <dt class="hdlist1">canon-body</dt>
 <dd>
 <p>is a canonicalized representation of the body, produced
-using the body algorithm specified in the &#34;c&#34; parameter.</p>
+using the body algorithm specified in the "c" parameter.</p>
 </dd>
 <dt class="hdlist1">l-param</dt>
 <dd>
-<p>is the length-of-body value of the &#34;l&#34; parameter.</p>
+<p>is the length-of-body value of the "l" parameter.</p>
 </dd>
 <dt class="hdlist1">data-hash</dt>
 <dd>
@@ -1893,7 +1886,7 @@ the header including the DKIM-Signature header, and the body hash.</p>
 </dd>
 <dt class="hdlist1">h-headers</dt>
 <dd>
-<p>is the list of headers to be signed, as specified in the &#34;h=&#34;
+<p>is the list of headers to be signed, as specified in the "h="
 parameter.</p>
 </dd>
 <dt class="hdlist1">D-SIG</dt>
@@ -1907,15 +1900,15 @@ signature value portion of the parameter, that is, an empty parameter value.</p>
 </dd>
 <dt class="hdlist1">sig-alg</dt>
 <dd>
-<p>is the signature algorithm specified by the &#34;a&#34; parameter.</p>
+<p>is the signature algorithm specified by the "a" parameter.</p>
 </dd>
 <dt class="hdlist1">d-domain</dt>
 <dd>
-<p>is the domain name specified in the &#34;d&#34; parameter.</p>
+<p>is the domain name specified in the "d" parameter.</p>
 </dd>
 <dt class="hdlist1">selector</dt>
 <dd>
-<p>is the selector value specified in the &#34;s&#34; parameter.</p>
+<p>is the selector value specified in the "s" parameter.</p>
 </dd>
 </dl>
 </div>
@@ -1969,20 +1962,20 @@ that consume those results.</p>
 <div class="paragraph">
 <p>By default, private keys corresponding to a domain can be used to sign
 messages for any subdomain.
-For example, a key record for the domain &#34;example.com&#34; can be used to verify
-messages where the AUID (&#34;i=&#34; tag of the signature) is &#34;sub.example.com&#34;, or
-even &#34;sub1.sub2.example.com&#34;.</p>
+For example, a key record for the domain "example.com" can be used to verify
+messages where the AUID ("i=" tag of the signature) is "sub.example.com", or
+even "sub1.sub2.example.com".</p>
 </div>
 <div class="paragraph">
 <p>In order to limit the capability of such keys when this is not intended, the
-&#34;s&#34; flag MAY be set in the &#34;t=&#34; tag of the key record, to constrain the
+"s" flag MAY be set in the "t=" tag of the key record, to constrain the
 validity of the domain of the AUID.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>If the referenced key record contains the &#34;s&#34; flag as part of the &#34;t=&#34; tag,
-   the domain of the AUID (&#34;i=&#34; flag) MUST be the same as that of the SDID
+<p>If the referenced key record contains the "s" flag as part of the "t=" tag,
+   the domain of the AUID ("i=" flag) MUST be the same as that of the SDID
    (d=) domain.</p>
 </li>
 <li>
@@ -1998,7 +1991,7 @@ validity of the domain of the AUID.</p>
 <ul>
 <li>
 <p>DKIM MAY optionally provide a single responsible Agent or User Identifier
-   (AUID) through &#34;i=&#34; tag.</p>
+   (AUID) through "i=" tag.</p>
 </li>
 <li>
 <p>Upon successfully verifying the signature, a receive-side DKIM Verifier
@@ -2014,9 +2007,9 @@ validity of the domain of the AUID.</p>
 <div class="sect3">
 <h4 id="_example_scenarios">Example Scenarios</h4>
 <div class="paragraph">
-<p>A Signer might sign a message including all header fields and no &#34;l=&#34; tag
+<p>A Signer might sign a message including all header fields and no "l=" tag
 (to satisfy strict Verifiers) and a second time with a limited set of
-header fields and an &#34;l=&#34; tag.
+header fields and an "l=" tag.
 Verifiers could then choose which signature they prefer.</p>
 </div>
 <div class="paragraph">
@@ -2035,7 +2028,7 @@ For example, a recipient might have an address at members.example.org, a site
 that has anti-abuse protection that is somewhat less effective than the
 recipient would prefer.
 Such a recipient might have specific authors whose messages would be trusted
-absolutely, but messages from unknown authors that had passed the forwarder&#39;s
+absolutely, but messages from unknown authors that had passed the forwarder&#8217;s
 scrutiny would have only medium trust.</p>
 </div>
 </div>
@@ -2182,7 +2175,7 @@ validation interval before being removed from the key server.</p>
     be likely to affect the processing of the message at the receiver.</p>
 </li>
 <li>
-<p>Sign only &#34;well-known&#34; headers.</p>
+<p>Sign only "well-known" headers.</p>
 </li>
 </ul>
 </div>
@@ -2196,7 +2189,7 @@ validation interval before being removed from the key server.</p>
 </li>
 <li>
 <p>The DKIM-Signature header field is always implicitly signed and MUST NOT be
-   included in the &#34;h=&#34; tag except to indicate that other preexisting
+   included in the "h=" tag except to indicate that other preexisting
    signatures are also signed.</p>
 </li>
 <li>
@@ -2211,9 +2204,9 @@ validation interval before being removed from the key server.</p>
    that header field in a message at the time of signing in order to prevent
    any further additions.
    For example, if there is a single Comments header field at the time of
-   signing, listing Comments twice in the &#34;h=&#34; tag is sufficient to prevent
+   signing, listing Comments twice in the "h=" tag is sufficient to prevent
    any number of Comments header fields from being appended; it is not
-   necessary (but is legal) to list Comments three or more times in the &#34;h=&#34;
+   necessary (but is legal) to list Comments three or more times in the "h="
    tag.</p>
 </li>
 </ul>
@@ -2230,7 +2223,7 @@ error-prone.</p>
 </div>
 <div class="paragraph">
 <p>All end-user visible header fields should be signed to avoid possible
-&#34;indirect spamming&#34;.
+"indirect spamming".
 For example, if the Subject header field is not signed, a spammer can resend a
 previously signed mail, replacing the legitimate subject with a one-line spam.</p>
 </div>
@@ -2268,7 +2261,7 @@ related to the body are:</p>
    List-Owner, List-Archive</p>
 </li>
 <li>
-<p>If the &#34;l=&#34; signature tag is in use, the Content-Type field is also a
+<p>If the "l=" signature tag is in use, the Content-Type field is also a
    candidate for being included as it could be replaced in a way that causes
    completely different content to be rendered to the receiving user.</p>
 </li>
@@ -2314,12 +2307,12 @@ messages they process and their aversion to risk.</p>
 </li>
 <li>
 <p>Signers wishing to sign multiple instances of such a header field MUST
-   include the header field name multiple times in the &#34;h=&#34; tag of the
+   include the header field name multiple times in the "h=" tag of the
    DKIM-Signature header field and MUST sign such header fields in order
    from the bottom of the header field block to the top.</p>
 </li>
 <li>
-<p>The Signer MAY include more instances of a header field name in &#34;h=&#34; than
+<p>The Signer MAY include more instances of a header field name in "h=" than
    there are actual corresponding header fields so that the signature will not
    verify if additional header fields of that name are added.</p>
 </li>
@@ -2378,7 +2371,7 @@ and MUST make such modifications before re-signing the message.</p>
    DKIM-Signature fields in the header block.</p>
 </li>
 <li>
-<p>It may be placed before any existing &#34;Received&#34; header fields.</p>
+<p>It may be placed before any existing "Received" header fields.</p>
 </li>
 </ul>
 </div>
@@ -2422,11 +2415,11 @@ and MUST make such modifications before re-signing the message.</p>
    denial-of-service attacks.</p>
 </li>
 <li>
-<p>If the status is &#34;PERMFAIL&#34;, the signature failed and should not be
+<p>If the status is "PERMFAIL", the signature failed and should not be
    reconsidered.</p>
 </li>
 <li>
-<p>If the status is &#34;TEMPFAIL&#34;, the signature could not be verified at
+<p>If the status is "TEMPFAIL", the signature could not be verified at
    this time but may be tried again later.</p>
 </li>
 <li>
@@ -2449,27 +2442,27 @@ and MUST make such modifications before re-signing the message.</p>
 </li>
 <li>
 <p>Verifiers MUST return PERMFAIL (incompatible version) when presented a
-   DKIM-Signature header field with a &#34;v=&#34; tag that is inconsistent with this
+   DKIM-Signature header field with a "v=" tag that is inconsistent with this
    specification.</p>
 </li>
 <li>
-<p>If any tag listed as &#34;required&#34; in Section 3.5 is omitted from the
+<p>If any tag listed as "required" in Section 3.5 is omitted from the
    DKIM-Signature header field, the Verifier MUST ignore the DKIM-Signature
    header field and return PERMFAIL (signature missing required tag).</p>
 </li>
 <li>
-<p>If &#34;d=&#34; tag is not same or parent domain of &#34;i=&#34; tag, the DKIM-Signature
+<p>If "d=" tag is not same or parent domain of "i=" tag, the DKIM-Signature
    header field MUST be ignored, and the Verifier should return PERMFAIL
    (domain mismatch).</p>
 </li>
 <li>
-<p>If the &#34;h=&#34; tag does not include the From header field, the Verifier
+<p>If the "h=" tag does not include the From header field, the Verifier
    MUST ignore the DKIM-Signature header field and return PERMFAIL (From
    field not signed).</p>
 </li>
 <li>
 <p>Verifiers MAY ignore the DKIM-Signature header field and return
-   PERMFAIL (signature expired) if it contains an &#34;x=&#34; tag and the
+   PERMFAIL (signature expired) if it contains an "x=" tag and the
    signature has expired.</p>
 </li>
 </ul>
@@ -2492,8 +2485,8 @@ the same as performing them in the order indicated,</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>The Verifier retrieves the public key using the algorithm in the &#34;q=&#34; tag,
-   the domain from the &#34;d=&#34; tag, and the selector from the &#34;s=&#34; tag.</p>
+<p>The Verifier retrieves the public key using the algorithm in the "q=" tag,
+   the domain from the "d=" tag, and the selector from the "s=" tag.</p>
 </li>
 <li>
 <p>If the query for the public key fails to respond, the Verifier MAY seek a
@@ -2514,19 +2507,19 @@ the same as performing them in the order indicated,</p>
    PERMFAIL (key syntax error).</p>
 </li>
 <li>
-<p>If the &#34;h=&#34; tag exists in the public-key record and the hash algorithm
-   implied by the &#34;a=&#34; tag in the DKIM-Signature header field is not included
-   in the contents of the &#34;h=&#34; tag, the Verifier MUST ignore the key record
+<p>If the "h=" tag exists in the public-key record and the hash algorithm
+   implied by the "a=" tag in the DKIM-Signature header field is not included
+   in the contents of the "h=" tag, the Verifier MUST ignore the key record
    and return PERMFAIL (inappropriate hash algorithm).</p>
 </li>
 <li>
-<p>If the public-key data (the &#34;p=&#34; tag) is empty, then this key has been
+<p>If the public-key data (the "p=" tag) is empty, then this key has been
    revoked and the Verifier MUST treat this as a failed signature check and
    return PERMFAIL (key revoked).</p>
 </li>
 <li>
 <p>If the public-key data is not suitable for use with the algorithm and key
-   types defined by the &#34;a=&#34; and &#34;k=&#34; tags in the DKIM-Signature header field,
+   types defined by the "a=" and "k=" tags in the DKIM-Signature header field,
    the Verifier MUST immediately return PERMFAIL (inappropriate key algorithm).</p>
 </li>
 </ol>
@@ -2537,19 +2530,19 @@ the same as performing them in the order indicated,</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Based on the algorithm defined in the &#34;c=&#34; tag, the body length specified
-   in the &#34;l=&#34; tag, and the header field names in the &#34;h=&#34; tag, prepare a
+<p>Based on the algorithm defined in the "c=" tag, the body length specified
+   in the "l=" tag, and the header field names in the "h=" tag, prepare a
    canonicalized version of the message.
    Note that this canonicalized version does not actually replace the original
    content.</p>
 </li>
 <li>
-<p>Based on the algorithm indicated in the &#34;a=&#34; tag, compute the message
+<p>Based on the algorithm indicated in the "a=" tag, compute the message
    hashes from the canonical copy.</p>
 </li>
 <li>
 <p>Verify that the hash of the canonicalized message body computed in the
-   previous step matches the hash value conveyed in the &#34;bh=&#34; tag.</p>
+   previous step matches the hash value conveyed in the "bh=" tag.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
@@ -2565,9 +2558,9 @@ the same as performing them in the order indicated,</p>
    were invalid (e.g., by returning PERMFAIL (unsigned content)).</p>
 </li>
 <li>
-<p>Using the signature conveyed in the &#34;b=&#34; tag, verify the signature against
+<p>Using the signature conveyed in the "b=" tag, verify the signature against
    the header hash using the mechanism appropriate for the public-key
-   algorithm described in the &#34;a=&#34; tag.</p>
+   algorithm described in the "a=" tag.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
@@ -2590,7 +2583,7 @@ the same as performing them in the order indicated,</p>
 <ul>
 <li>
 <p>Implementations might choose to add an email header
-   &#34;Authentication-Results&#34; (RFC5451) field to the message before passing it
+   "Authentication-Results" (RFC5451) field to the message before passing it
    on.</p>
 </li>
 <li>
@@ -2617,17 +2610,17 @@ opportunity to an Identity Assessor that unauthenticated email does not.</p>
 <div class="sect2">
 <h3 id="_ascii_art_attacks">ASCII Art Attacks</h3>
 <div class="paragraph">
-<p>The &#34;relaxed&#34; body canonicalization algorithm may enable certain types of
-extremely crude &#34;ASCII Art&#34; attacks where a message may be conveyed by
+<p>The "relaxed" body canonicalization algorithm may enable certain types of
+extremely crude "ASCII Art" attacks where a message may be conveyed by
 adjusting the spacing between words.
-If this is a concern, the &#34;simple&#34; body canonicalization algorithm should be
+If this is a concern, the "simple" body canonicalization algorithm should be
 used instead.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_misuse_of_body_length_limits_l_tag">Misuse of Body Length Limits (&#34;l=&#34; Tag)</h3>
+<h3 id="_misuse_of_body_length_limits_l_tag">Misuse of Body Length Limits ("l=" Tag)</h3>
 <div class="paragraph">
-<p>Use of the &#34;l=&#34; tag might allow display of fraudulent content without
+<p>Use of the "l=" tag might allow display of fraudulent content without
 appropriate warning to end users.</p>
 </div>
 <div class="paragraph">
@@ -2664,9 +2657,9 @@ message itself, such an attack would be difficult to mount.</p>
 <h3 id="_attacks_against_the_dns">Attacks against the DNS</h3>
 <div class="paragraph">
 <p>A DKIM Verifier, while verifying a DKIM-Signature header field, could be
-prompted to retrieve a key record of an attacker&#39;s choosing.
+prompted to retrieve a key record of an attacker&#8217;s choosing.
 This threat can be minimized by ensuring that name servers, including
-recursive name servers, used by the Verifier enforce strict checking of &#34;glue&#34;
+recursive name servers, used by the Verifier enforce strict checking of "glue"
 and other additional information in DNS responses and are therefore not
 vulnerable to this attack.</p>
 </div>
@@ -2714,7 +2707,7 @@ of its contents.</p>
 <p>An attacker could determine when a particular signature was verified by using
 a per-message selector and then monitoring their DNS traffic for the key
 lookup.
-This would act as the equivalent of a &#34;web bug&#34; for verification time rather
+This would act as the equivalent of a "web bug" for verification time rather
 than the time the message was read.</p>
 </div>
 </div>
@@ -2743,6 +2736,7 @@ reference selectors with public keys having unreasonable exponents.</p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

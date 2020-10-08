@@ -229,8 +229,6 @@ dd {
 				<h1>Analysis of Threats Motivating DomainKeys Identified Mail (DKIM)</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -276,7 +274,7 @@ Motivating DomainKeys Identified Mail (DKIM).</p>
 <p>The DKIM protocol defines a mechanism by which email messages can be
 cryptographically signed by Message Submission Agent (MSA) based on domain
 name.
-Recipients then can verify the signature by querying the signer&#39;s domain
+Recipients then can verify the signature by querying the signer&#8217;s domain
 directly to retrieve the appropriate public key, and thereby confirm that the
 message was attested to by a party in possession of the private key for the
 signing domain.</p>
@@ -432,7 +430,7 @@ of DNS-based keys or signing practices.</p>
 </li>
 <li>
 <p>Access to significant computing resources, for example, through the
-conscription of worm-infected &#34;zombie&#34; computers.
+conscription of worm-infected "zombie" computers.
 This could allow the bad actor to perform various types of brute-force
 attacks.</p>
 </li>
@@ -519,7 +517,7 @@ that is, in practice, fairly reliable.</p>
 <div class="sect3">
 <h4 id="_reflection_attacks">Reflection Attacks</h4>
 <div class="paragraph">
-<p>It is common and useful practice for a message&#39;s return path not to correspond
+<p>It is common and useful practice for a message&#8217;s return path not to correspond
 to the origin address.
 For these reasons, DKIM is not effective against reflection attacks.</p>
 </div>
@@ -537,107 +535,107 @@ For these reasons, DKIM is not effective against reflection attacks.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Attack Name</th>
-<th class="tableblock halign-left valign-top">Impact</th>
-<th class="tableblock halign-left valign-top">Likelihood</th>
+<th class="tableblock halign-left valign-middle">Impact</th>
+<th class="tableblock halign-left valign-middle">Likelihood</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Theft of private key for domain</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Theft of delegated private key</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Private key recovery via side channel attack</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Chosen message replay</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium/High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium/High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Signed message replay</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Denial-of-service attack against verifier</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Denial-of-service attack against key service</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Canonicalization abuse</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Body length limit abuse</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Use of revoked key</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Compromise of key server</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Falsification of key service replies</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Publication of malformed key records and/or signatures</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cryptographic weaknesses in signature generation</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Display name abuse</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compromised system within originator&#39;s network</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compromised system within originator&#8217;s network</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Verification probe attack</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Key publication by higher-level domain</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
 </tr>
 </tbody>
 </table>
@@ -650,47 +648,47 @@ practices:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Attack Name</th>
-<th class="tableblock halign-left valign-top">Impact</th>
-<th class="tableblock halign-left valign-top">Likelihood</th>
+<th class="tableblock halign-left valign-middle">Impact</th>
+<th class="tableblock halign-left valign-middle">Likelihood</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Look-alike domain names</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internationalized domain name abuse</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Denial-of-service attack against signing practices</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Use of multiple From addresses</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Abuse of third-party signatures</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Falsification of Sender Signing Practices replies</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 </tbody>
 </table>
@@ -699,22 +697,22 @@ practices:</p>
 <h3 id="_other_attacks">Other Attacks</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Attack Name</th>
-<th class="tableblock halign-left valign-top">Impact</th>
-<th class="tableblock halign-left valign-top">Likelihood</th>
+<th class="tableblock halign-left valign-middle">Impact</th>
+<th class="tableblock halign-left valign-middle">Likelihood</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Packet amplification attacks via DNS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">N/A</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
 </tr>
 </tbody>
 </table>
@@ -753,6 +751,7 @@ expected cryptographic developments several years in the future.</p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

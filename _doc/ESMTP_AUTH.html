@@ -229,8 +229,6 @@ dd {
 				<h1>SMTP Service Extension for Authentication</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -270,13 +268,13 @@ Authentication.</p>
 <h2 id="_ehlo_extension">EHLO Extension</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The EHLO keyword associated with this extension is &#34;AUTH&#34;.</p>
+<p>The EHLO keyword associated with this extension is "AUTH".</p>
 </div>
 <div class="paragraph">
-<p>This extension provide one command &#34;AUTH&#34;.</p>
+<p>This extension provide one command "AUTH".</p>
 </div>
 <div class="paragraph">
-<p>This extension add one optional parameter to MAIL FROM command: &#34;AUTH&#34;</p>
+<p>This extension add one optional parameter to MAIL FROM command: "AUTH"</p>
 </div>
 <div class="paragraph">
 <p>This extension extends the maximum line length of the MAIL FROM command to 500
@@ -316,7 +314,7 @@ initial-response = base64</pre>
 on mechanism.</p>
 </div>
 <div class="paragraph">
-<p>Initial-response &#34;=&#34; is response with zero length, to indicate that the
+<p>Initial-response "=" is response with zero length, to indicate that the
 response is present.</p>
 </div>
 <div class="paragraph">
@@ -334,7 +332,7 @@ non-directly with initial-response in the second response.</p>
 <div class="sect2">
 <h3 id="_direct_handshake">Direct Handshake</h3>
 <div class="paragraph">
-<p>In this mode, the $INITIAL_RESPONSE contains non empty text other than &#34;=&#34;.
+<p>In this mode, the $INITIAL_RESPONSE contains non empty text other than "=".
 This mode SHOULD be used when length of command line less than maximum (512
 octets), to minimize round-trip to server.</p>
 </div>
@@ -478,7 +476,7 @@ presenting a password dialog box).</p>
 <div class="sect2">
 <h3 id="_canceling_auth">Canceling AUTH</h3>
 <div class="paragraph">
-<p>Client can cancel authentication, for example when client can&#39;t decode base64
+<p>Client can cancel authentication, for example when client can&#8217;t decode base64
 from server, by sending,</p>
 </div>
 <div class="literalblock">
@@ -518,7 +516,7 @@ the authenticated identity that resulted from the AUTH command.</p>
 <div class="paragraph">
 <p>If the AUTH parameter is not supplied and the client has authenticated, and
 the server believes the message is an original submission,
-the server MAY generate a &lt;mailbox&gt; from the user&#39;s authenticated identity for
+the server MAY generate a &lt;mailbox&gt; from the user&#8217;s authenticated identity for
 use in an AUTH parameter when relaying the message to any server which
 supports the AUTH extension.
 The generated &lt;mailbox&gt; is implementation specific, but it MUST conform to the
@@ -550,8 +548,8 @@ address when relaying the message to list subscribers.</p>
 <h2 id="_additional_requirements_on_servers">Additional Requirements on Servers</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Upon successful authentication, a server SHOULD use the &#34;ESMTPA&#34; or the
-&#34;ESMTPSA&#34; [SMTP-TT] (when appropriate) keyword in the &#34;with&#34; clause of the
+<p>Upon successful authentication, a server SHOULD use the "ESMTPA" or the
+"ESMTPSA" [SMTP-TT] (when appropriate) keyword in the "with" clause of the
 Received header field.</p>
 </div>
 </div>
@@ -584,6 +582,7 @@ PLAIN mechanism.</p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

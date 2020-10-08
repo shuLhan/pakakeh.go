@@ -229,8 +229,6 @@ dd {
 				<h1>DomainKeys Identified Mail (DKIM) Service Overview</h1>
 				<div class="meta">
 					Shulhan
-					<br />
-					
 				</div>
 				<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -281,7 +279,7 @@ using the Domain Name System (DNS) as its key server technology.</p>
 Identifier refer to the identity of a responsible person or organization.
 The same identity can have multiple identifiers.
 This identifier is called the Signing Domain IDentifier (SDID) and is
-contained in the DKIM-Signature header fields &#34;d=&#34; tag.
+contained in the DKIM-Signature header fields "d=" tag.
 The owner of the SDID is declaring that they accept responsibility for the
 message and can thus be held accountable for it.</p>
 </div>
@@ -292,7 +290,7 @@ message and can thus be held accountable for it.</p>
 <ul>
 <li>
 <p>Does not authenticate or verify the contents of the message header or body,
-such as the author &#34;From&#34; field, beyond certifying data integrity between the
+such as the author "From" field, beyond certifying data integrity between the
 time of signing and the time of verifying.</p>
 </li>
 <li>
@@ -351,7 +349,7 @@ unchanged.</p>
 <h3 id="_establishing_message_validity">Establishing Message Validity</h3>
 <div class="paragraph">
 <p>An interesting side effect of the cryptographic method used by DKIM is that it
-is possible to be certain that a signed message (or, if &#34;l=&#34; is used, the
+is possible to be certain that a signed message (or, if "l=" is used, the
 signed portion of a message) has not been modified between the time of signing
 and the time of verifying.
 If it has been changed in any way, then the message will not be verified
@@ -375,7 +373,7 @@ reducing privacy concerns.</p>
 <div class="paragraph">
 <p><strong>Implementation Locality</strong>.
 Any party, anywhere along the transit path, can implement DKIM signing.
-Its use is not confined to particular systems, such as the author&#39;s MUA or the
+Its use is not confined to particular systems, such as the author&#8217;s MUA or the
 inbound boundary MTA, and there can be more than one signature per message.</p>
 </div>
 <div class="paragraph">
@@ -409,15 +407,15 @@ Recipient that does not support DKIM still can read the message.</p>
 </div>
 <div class="paragraph">
 <p><strong>Treat Verification Failure the Same as No Signature Present</strong>.
-If verification of the message&#39;s signature failed, the message will revert to
-normal handling, through the receiver&#39;s existing filtering mechanisms.</p>
+If verification of the message&#8217;s signature failed, the message will revert to
+normal handling, through the receiver&#8217;s existing filtering mechanisms.</p>
 </div>
 <div class="paragraph">
 <p><strong>Permit Incremental Adoption for Incremental Benefit</strong>.
 DKIM allows pairwise sets of email providers and spam filtering companies to
 distinguish mail that is associated with a known organization, versus mail
 that might deceptively purport to have the affiliation.
-This in turn allows the development of &#34;whitelist&#34; schemes whereby
+This in turn allows the development of "whitelist" schemes whereby
 authenticated mail from a known source with good reputation is allowed to
 bypass some anti-abuse filters.</p>
 </div>
@@ -429,7 +427,7 @@ infrastructure that is needed across the open Internet.</p>
 </div>
 <div class="paragraph">
 <p><strong>Permit a Wide Range of Deployment Choices</strong>.
-DKIM can be deployed at a variety of places within an organization&#39;s
+DKIM can be deployed at a variety of places within an organization&#8217;s
 email service.
 This affords flexibility in terms of who administers its use, as well as what
 traffic carries a DKIM signature.</p>
@@ -446,7 +444,7 @@ traffic carries a DKIM signature.</p>
 <p>With the DKIM signature mechanism, a signer chooses an SDID, performs digital
 signing on the message, and adds the signature information using a DKIM header
 field.
-A verifier obtains the domain name and the &#34;selector&#34; from the DKIM header
+A verifier obtains the domain name and the "selector" from the DKIM header
 field, obtains the public key associated with the name, and verifies the
 signature.</p>
 </div>
@@ -459,7 +457,7 @@ The signer computes a hash of the selected header fields and another hash of
 the body.
 The signer then uses a private key to cryptographically encode this
 information, along with other signing parameters.
-Signature information is placed into &#34;DKIM-Signature:&#34;, a new [RFC5322]
+Signature information is placed into "DKIM-Signature:", a new [RFC5322]
 message header field.</p>
 </div>
 </div>
@@ -469,15 +467,15 @@ message header field.</p>
 <p>A single SDID can have multiple signing keys and/or multiple potential
 signers.
 To support this, DKIM identifies a particular signature as using a combination
-of the SDID and an added field, called the &#34;selector&#34;, specified in a separate
-&#34;DKIM-Signature:&#34; header field parameter.</p>
+of the SDID and an added field, called the "selector", specified in a separate
+"DKIM-Signature:" header field parameter.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_verification">Verification</h3>
 <div class="paragraph">
 <p>Message recipients can verify the signature by querying the DNS for the
-signer&#39;s domain directly, to retrieve the appropriate public key, and thereby
+signer&#8217;s domain directly, to retrieve the appropriate public key, and thereby
 confirm that the message was signed by a party in possession of the private
 key for the SDID.</p>
 </div>
@@ -567,14 +565,14 @@ was required.
 Verifying the signature uses public information from the Key Store.
 If the signature passes, reputation information is used to assess the signer
 and that information is passed to the message filtering system.
-If the signature fails or there is no signature using the author&#39;s domain,
+If the signature fails or there is no signature using the author&#8217;s domain,
 information about signing practices related to the author can be retrieved
 remotely and/or locally, and that information is passed to the message
 filtering system.</p>
 </div>
 <div class="paragraph">
 <p>Messages lacking a valid author signature can prompt a query for any
-published &#34;signing practices&#34; information, as an aid in determining whether
+published "signing practices" information, as an aid in determining whether
 the author information has been used without authorization.</p>
 </div>
 <div class="paragraph">
@@ -609,7 +607,7 @@ keys.</p>
 </div>
 <div class="paragraph">
 <p>If a message contains a valid signature, then the verifier can evaluate the
-associated domain name&#39;s reputation, in order to determine appropriate
+associated domain name&#8217;s reputation, in order to determine appropriate
 delivery or display options for that message.</p>
 </div>
 <div class="paragraph">
@@ -634,6 +632,7 @@ to the evaluating site and is strictly a matter of local policy.</p>
 </div>
 </div>
 </div>
+
 			</div>
 			
 		</div>

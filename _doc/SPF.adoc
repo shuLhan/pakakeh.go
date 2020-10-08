@@ -1,6 +1,5 @@
 =  Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
-:author: Shulhan
-:email: <ms@kilabit.info>
+Shulhan <ms@kilabit.info>
 :toc:
 :sectnums:
 :sectanchors:
@@ -548,18 +547,20 @@ result be "fail".
 Whether this mechanism matches, does not match, or returns an exception
 depends on the result of the recursive evaluation of `check_host()`:
 
-[cols="2*"]
-|===
-| A recursive check_host() result of: | Causes the "include" mechanism to:
+----
 
-| pass        | match
-| fail        | not match
-| softfail    | not match
-| neutral     | not match
-| temperror   | return temperror
-| permerror   | return permerror
-| none        | return permerror
-|===
++-------------------------------------+------------------------------------+
+| A recursive check_host() result of: | Causes the "include" mechanism to: |
++-------------------------------------+------------------------------------+
+| pass                                | match                              |
+| fail                                | not match                          |
+| softfail                            | not match                          |
+| neutral                             | not match                          |
+| temperror                           | return temperror                   |
+| permerror                           | return permerror                   |
+| none                                | return permerror                   |
++-------------------------------------+------------------------------------+
+----
 
 
 The "include" mechanism is intended for crossing administrative boundaries.
@@ -1084,42 +1085,34 @@ The IPv4 SMTP client IP is 192.0.2.3.
 The IPv6 SMTP client IP is 2001:db8::cb01.
 The PTR domain name of the client IP is mx.example.org.
 
-|===
-| macro   | expansion
+Example of macro expansion,
 
-| %{s}    | strong-bad@email.example.com
-| %{o}    | email.example.com
-| %{d}    | email.example.com
-| %{d4}   | email.example.com
-| %{d3}   | email.example.com
-| %{d2}   | example.com
-| %{d1}   | com
-| %{dr}   | com.example.email
-| %{d2r}  | example.email
-| %{l}    | strong-bad
-| %{l-}   | strong.bad
-| %{lr}   | strong-bad
-| %{lr-}  | bad.strong
-| %{l1r-} | strong
+* `%{s}`: strong-bad@email.example.com
+* `%{o}`: email.example.com
+* `%{d}`: email.example.com
+* `%{d4}`: email.example.com
+* `%{d3}`: email.example.com
+* `%{d2}`: example.com
+* `%{d1}`: com
+* `%{dr}`: com.example.email
+* `%{d2r}`: example.email
+* `%{l}`: strong-bad
+* `%{l-}`: strong.bad
+* `%{lr}`: strong-bad
+* `%{lr-}`: bad.strong
+* `%{l1r-}`: strong
 
-| %{ir}.%{v}._spf.%{d2}
-| 3.2.0.192.in-addr._spf.example.com
+* `%{ir}.%{v}._spf.%{d2}: `3.2.0.192.in-addr._spf.example.com`
 
-| %{lr-}.lp._spf.%{d2}
-| bad.strong.lp._spf.example.com
+* `%{lr-}.lp._spf.%{d2}`: `bad.strong.lp._spf.example.com`
 
-| %{lr-}.lp.%{ir}.%{v}._spf.%{d2}
-| bad.strong.lp.3.2.0.192.in-addr._spf.example.com
+* `%{lr-}.lp.%{ir}.%{v}._spf.%{d2}`: bad.strong.lp.3.2.0.192.in-addr._spf.example.com
 
-| %{ir}.%{v}.%{l1r-}.lp._spf.%{d2}
-| 3.2.0.192.in-addr.strong.lp._spf.example.com
+* `%{ir}.%{v}.%{l1r-}.lp._spf.%{d2}`: 3.2.0.192.in-addr.strong.lp._spf.example.com
 
-| %{d2}.trusted-domains.example.net
-| example.com.trusted-domains.example.net
+* `%{d2}.trusted-domains.example.net`: example.com.trusted-domains.example.net
 
-| %{ir}.%{v}._spf.%{d2}
-| 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6._spf.example.com
-|===
+* `%{ir}.%{v}._spf.%{d2}`: `1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6._spf.example.com`
 
 
 ==  Result Handling
