@@ -353,7 +353,7 @@ func le64(n byte) (out []byte, err error) {
 		if err != nil {
 			return out, err
 		}
-		n = n >> 8
+		n = n >> 8 //nolint: govet
 	}
 	return buf.Bytes(), nil
 }

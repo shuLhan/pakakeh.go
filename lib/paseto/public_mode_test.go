@@ -31,7 +31,11 @@ func TestPublicMode_UnpackHTTPRequest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	auth.AddPeer(ourKey)
+
+	err = auth.AddPeer(ourKey)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	data := []byte("This is a signed message")
 

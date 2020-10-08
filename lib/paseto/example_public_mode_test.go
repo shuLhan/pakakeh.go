@@ -41,7 +41,11 @@ func ExamplePublicMode() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sender.AddPeer(receiverKey)
+
+	err = sender.AddPeer(receiverKey)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	footer := map[string]interface{}{
 		"FOOTER": "HERE",
@@ -66,7 +70,11 @@ func ExamplePublicMode() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	receiver.AddPeer(senderKey)
+
+	err = receiver.AddPeer(senderKey)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// receiver receive the token from sender and unpack it ...
 	got, err := receiver.Unpack(token)

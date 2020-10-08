@@ -9,10 +9,6 @@ import (
 	"time"
 )
 
-const (
-	dateTimeLayout = "2006-01-02T15:04:05-07:00"
-)
-
 type JSONToken struct {
 	Issuer    string     `json:"iss,omitempty"`
 	Subject   string     `json:"sub,omitempty"`
