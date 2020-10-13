@@ -92,6 +92,32 @@ func TestParser_Lines(t *testing.T) {
 	}
 }
 
+func TestParser_Stop(t *testing.T) {
+	p := New("\t test \ntest", "")
+
+	cases := []struct {
+		exp string
+	}{{
+		exp: " test \ntest",
+	}, {
+		exp: "test \ntest",
+	}, {
+		exp: "\ntest",
+	}, {
+		exp: "test",
+	}, {
+		exp: "",
+	}}
+
+	var got string
+	for _, c := range cases {
+		_, _ = p.Token()
+		got, _ = p.Stop()
+		test.Assert(t, "Stop", c.exp, got, true)
+		p.Load(got, "")
+	}
+}
+
 func TestParser_Token(t *testing.T) {
 	p := New("\t test \ntest", "")
 

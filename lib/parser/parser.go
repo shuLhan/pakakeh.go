@@ -179,6 +179,17 @@ func (p *Parser) Line() (string, rune) {
 }
 
 //
+// Stop the parser, return the remaining unparsed content and its last
+// position, and then call Close to reset the internal state back to zero.
+//
+func (p *Parser) Stop() (remain string, pos int) {
+	pos = p.x
+	remain = p.v[pos:]
+	p.Close()
+	return remain, pos
+}
+
+//
 // Token read the next token from content until one of the delimiter found.
 // if no delimiter found, its mean all of content has been read, the returned
 // delimiter will be 0.
