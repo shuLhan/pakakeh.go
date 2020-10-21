@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+const (
+	_validateTimeDrift = 5 * time.Second
+)
+
 type JSONToken struct {
 	Issuer    string     `json:"iss,omitempty"`
 	Subject   string     `json:"sub,omitempty"`
@@ -53,13 +57,21 @@ func (jtoken *JSONToken) Validate(audience string, peer Key) (err error) {
 		}
 	}
 	if jtoken.IssuedAt != nil {
-		if now.Before(*jtoken.IssuedAt) {
+		diff := now.Sub(*jtoken.IssuedAt)
+		if diff < 0 {
+			diff *= -1
+		}
+		if diff > _validateTimeDrift {
 			return fmt.Errorf("token issued at %s before current time %s",
 				jtoken.IssuedAt, now)
 		}
 	}
 	if jtoken.NotBefore != nil {
-		if now.Before(*jtoken.NotBefore) {
+		diff := now.Sub(*jtoken.NotBefore)
+		if diff < 0 {
+			diff *= -1
+		}
+		if diff > _validateTimeDrift {
 			return fmt.Errorf("token must not used before %s", jtoken.NotBefore)
 		}
 	}
