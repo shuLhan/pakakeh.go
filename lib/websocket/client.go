@@ -106,6 +106,8 @@ type Client struct {
 	//
 	// TLSConfig define custom TLS configuration when connecting to secure
 	// WebSocket server.
+	// The scheme of Endpoint must be "https" or "wss", or it will be
+	// resetting back to nil.
 	//
 	TLSConfig *tls.Config
 
@@ -330,6 +332,10 @@ func (cl *Client) parseURI() (err error) {
 		if len(serverPort) == 0 {
 			serverPort = defPort
 		}
+		// Remove TLSConfig if scheme is not https or wss to prevent
+		// error "Connect: tls: first record does not look like a TLS
+		// handshake".
+		cl.TLSConfig = nil
 	}
 
 	cl.remoteAddr = serverAddress + ":" + serverPort

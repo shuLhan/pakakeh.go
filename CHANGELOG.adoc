@@ -3,6 +3,16 @@
 
 This library is released each month, usually at the first week of month.
 
+==  share v0.20.1 (2020-11-xx)
+
+===  Bug fixes
+
+* websocket: set TLSConfig to nil if Endpoint scheme is not https or wss
+If user set TLSConfig but the Endpoint is not start with "https" or "wss",
+client open() method may return an error "Connect: tls: first record does
+not look like a TLS handshake".
+
+
 ==  share v0.20.0 (2020-10-05)
 
 ===  New features
