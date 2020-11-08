@@ -228,41 +228,50 @@ dd {
 			<div class="container">
 				<h1>Internet Message Format (IMF)</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:25:32 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>Internet Message Format (IMF)</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_syntax">Syntax</a>
+<li><a href="#_syntax">1. Syntax</a>
 <ul class="sectlevel2">
-<li><a href="#_folding_white_space_and_comments">Folding White Space and Comments</a></li>
-<li><a href="#_atom">Atom</a></li>
-<li><a href="#_quoted_strings">Quoted Strings</a></li>
-<li><a href="#_date_and_time_specification">Date and Time Specification</a></li>
-<li><a href="#_address_specification">Address Specification</a></li>
+<li><a href="#_folding_white_space_and_comments">1.1. Folding White Space and Comments</a></li>
+<li><a href="#_atom">1.2. Atom</a></li>
+<li><a href="#_quoted_strings">1.3. Quoted Strings</a></li>
+<li><a href="#_date_and_time_specification">1.4. Date and Time Specification</a></li>
+<li><a href="#_address_specification">1.5. Address Specification</a></li>
 </ul>
 </li>
-<li><a href="#_header">Header</a>
+<li><a href="#_header">2. Header</a>
 <ul class="sectlevel2">
-<li><a href="#_date_field">Date Field</a></li>
-<li><a href="#_originator_fields">Originator Fields</a></li>
-<li><a href="#_destination_fields">Destination Fields</a></li>
-<li><a href="#_identification_field">Identification Field</a></li>
-<li><a href="#_informational_fields">Informational Fields</a></li>
-<li><a href="#_resent_fields">Resent Fields</a></li>
-<li><a href="#_trace_fields">Trace Fields</a></li>
-<li><a href="#_optional_fields">Optional Fields</a></li>
+<li><a href="#_date_field">2.1. Date Field</a></li>
+<li><a href="#_originator_fields">2.2. Originator Fields</a></li>
+<li><a href="#_destination_fields">2.3. Destination Fields</a></li>
+<li><a href="#_identification_field">2.4. Identification Field</a></li>
+<li><a href="#_informational_fields">2.5. Informational Fields</a></li>
+<li><a href="#_resent_fields">2.6. Resent Fields</a></li>
+<li><a href="#_trace_fields">2.7. Trace Fields</a></li>
+<li><a href="#_optional_fields">2.8. Optional Fields</a></li>
 </ul>
 </li>
-<li><a href="#_obsolete_specification">Obsolete Specification</a>
+<li><a href="#_obsolete_specification">3. Obsolete Specification</a>
 <ul class="sectlevel2">
-<li><a href="#_obsolete_date_and_time">Obsolete Date and Time</a></li>
-<li><a href="#_obsolete_addressing">Obsolete Addressing</a></li>
-<li><a href="#_obsolete_header_fields">Obsolete Header Fields</a></li>
+<li><a href="#_obsolete_date_and_time">3.1. Obsolete Date and Time</a></li>
+<li><a href="#_obsolete_addressing">3.2. Obsolete Addressing</a></li>
+<li><a href="#_obsolete_header_fields">3.3. Obsolete Header Fields</a></li>
 </ul>
 </li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -272,7 +281,7 @@ Message Format as defined in <a href="https://tools.ietf.org/html/rfc5322">RFC 5
 </div>
 </div>
 <div class="sect1">
-<h2 id="_syntax">Syntax</h2>
+<h2 id="_syntax">1. Syntax</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -313,20 +322,20 @@ text            =   %d1-9 /            ; Characters excluding CR
 </li>
 <li>
 <p>CR and LF MUST only occur together as CRLF; they MUST NOT appear
-   independently in the body.</p>
+independently in the body.</p>
 </li>
 <li>
 <p>Each header field SHOULD be treated in its unfolded form for further
-   syntactic and semantic evaluation.</p>
+syntactic and semantic evaluation.</p>
 </li>
 <li>
 <p>"field-body" MUST NOT include CR and LF except when used in "folding" and
-   "unfolding".</p>
+"unfolding".</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_folding_white_space_and_comments">Folding White Space and Comments</h3>
+<h3 id="_folding_white_space_and_comments">1.1. Folding White Space and Comments</h3>
 <div class="literalblock">
 <div class="content">
 <pre>CFWS            =   (1*([FWS] comment) [FWS]) / FWS
@@ -348,10 +357,12 @@ quoted-pair     =   "\" (VCHAR / WSP) / obs-qp</pre>
 </div>
 <div class="paragraph">
 <p><em>Folding</em> is a function to split a line into multiline with CRLF and WSP. For
-example, the following line,
-&#8230;&#8203;.
-"Subject: This is a test" CRLF
-&#8230;&#8203;.</p>
+example, the following line,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>"Subject: This is a test" CRLF</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>can be folded into,</p>
@@ -370,20 +381,20 @@ input.</p>
 <ul>
 <li>
 <p>An unfolded header field has no length restriction and therefore may be
-   indeterminately long.</p>
+indeterminately long.</p>
 </li>
 <li>
 <p>Any CRLF that appears in FWS is semantically "invisible".</p>
 </li>
 <li>
-<p>The "\" in any quoted-pair is semantically "invisible".</p>
+<p>The "" in any quoted-pair is semantically "invisible".</p>
 </li>
 <li>
 <p>Folding is permitted within the comment.</p>
 </li>
 <li>
 <p>The parentheses and backslash characters may appear in a comment, so long
-   as they appear as a quoted-pair.</p>
+as they appear as a quoted-pair.</p>
 </li>
 <li>
 <p>Comment is not including the enclosing paretheses.</p>
@@ -392,7 +403,7 @@ input.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_atom">Atom</h3>
+<h3 id="_atom">1.2. Atom</h3>
 <div class="literalblock">
 <div class="content">
 <pre>phrase          =   1*word / obs-phrase
@@ -408,7 +419,7 @@ dot-atom-text   =   1*atext *("." 1*atext)
 atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
                     "!" / "#" /        ;  characters not including
                     "$" / "%" /        ;  specials.  Used for atoms.
-                    "&" / "'" /
+                    "&amp;" / "'" /
                     "*" / "+" /
                     "-" / "/" /
                     "=" / "?" /
@@ -418,7 +429,7 @@ atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
                     "~"
 
 specials        =   "(" / ")" /        ; Special characters that do
-                    "<" / ">" /        ;  not appear in atext
+                    "&lt;" / "&gt;" /        ;  not appear in atext
                     "[" / "]" /
                     ":" / ";" /
                     "@" / "\" /
@@ -430,13 +441,13 @@ specials        =   "(" / ")" /        ; Special characters that do
 <ul>
 <li>
 <p>The optional comments and FWS surrounding the rest of the characters are
-   not part of the atom.</p>
+not part of the atom.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quoted_strings">Quoted Strings</h3>
+<h3 id="_quoted_strings">1.3. Quoted Strings</h3>
 <div class="literalblock">
 <div class="content">
 <pre>quoted-string   =   [CFWS]
@@ -453,7 +464,7 @@ qtext           =   %d33 /             ; Printable US-ASCII
 </div>
 </div>
 <div class="sect2">
-<h3 id="_date_and_time_specification">Date and Time Specification</h3>
+<h3 id="_date_and_time_specification">1.4. Date and Time Specification</h3>
 <div class="paragraph">
 <p>Syntax,</p>
 </div>
@@ -495,12 +506,12 @@ zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone</pre>
 </li>
 <li>
 <p>The form "+0000" on zone SHOULD be used to indicate a time zone at
-   Universal Time.</p>
+Universal Time.</p>
 </li>
 <li>
 <p>The form "-0000" on zone indicate that the time was generated on a system
-   that may be in a local time zone other than Universal Time and that the
-   date-time contains no information about the local time zone.</p>
+that may be in a local time zone other than Universal Time and that the
+date-time contains no information about the local time zone.</p>
 </li>
 <li>
 <p>A date-time specification MUST be semantically valid.</p>
@@ -510,11 +521,11 @@ zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone</pre>
 </li>
 <li>
 <p>The numeric day-of-month MUST be between 1 and the number of days allowed
-   for the specified month (in the specified year).</p>
+for the specified month (in the specified year).</p>
 </li>
 <li>
 <p>The time-of-day MUST be in the range 00:00:00 through 23:59:60 (the number
-   of seconds allowing for a leap second.</p>
+of seconds allowing for a leap second.</p>
 </li>
 <li>
 <p>The last two digits of the zone MUST be within the range 00 through 59.</p>
@@ -523,60 +534,48 @@ zone            =   (FWS ( "+" / "-" ) 4DIGIT) / obs-zone</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_address_specification">Address Specification</h3>
+<h3 id="_address_specification">1.5. Address Specification</h3>
 <div class="paragraph">
 <p>An address may either be an individual mailbox, or a group of mailboxes.</p>
 </div>
 <div class="paragraph">
-<p>Format,
-&#8230;&#8203;.
-address-list    =   (address *("," address)) / obs-addr-list</p>
+<p>Format,</p>
 </div>
-<div class="paragraph">
-<p>address         =   mailbox / group</p>
-</div>
-<div class="paragraph">
-<p>group           =   display-name ":" [group-list] ";" [CFWS]</p>
-</div>
-<div class="paragraph">
-<p>group-list      =   mailbox-list / CFWS / obs-group-list</p>
-</div>
-<div class="paragraph">
-<p>mailbox-list    =   (mailbox *("," mailbox)) / obs-mbox-list</p>
-</div>
-<div class="paragraph">
-<p>address         =   mailbox / group</p>
-</div>
-<div class="paragraph">
-<p>mailbox         =   name-addr / addr-spec</p>
-</div>
-<div class="paragraph">
-<p>name-addr       =   [display-name] angle-addr</p>
-</div>
-<div class="paragraph">
-<p>angle-addr      =   [CFWS] "&lt;" addr-spec "&gt;" [CFWS] /
-                    obs-angle-addr</p>
-</div>
-<div class="paragraph">
-<p>display-name    =   phrase</p>
-</div>
-<div class="paragraph">
-<p>addr-spec       =   local-part "@" domain</p>
-</div>
-<div class="paragraph">
-<p>local-part      =   dot-atom / quoted-string / obs-local-part</p>
-</div>
-<div class="paragraph">
-<p>domain          =   dot-atom / domain-literal / obs-domain</p>
-</div>
-<div class="paragraph">
-<p>domain-literal  =   [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]</p>
-</div>
-<div class="paragraph">
-<p>dtext           =   %d33-90 /          ; Printable US-ASCII
+<div class="literalblock">
+<div class="content">
+<pre>address-list    =   (address *("," address)) / obs-addr-list
+
+address         =   mailbox / group
+
+group           =   display-name ":" [group-list] ";" [CFWS]
+
+group-list      =   mailbox-list / CFWS / obs-group-list
+
+mailbox-list    =   (mailbox *("," mailbox)) / obs-mbox-list
+
+address         =   mailbox / group
+
+mailbox         =   name-addr / addr-spec
+
+name-addr       =   [display-name] angle-addr
+
+angle-addr      =   [CFWS] "&lt;" addr-spec "&gt;" [CFWS] /
+                    obs-angle-addr
+
+display-name    =   phrase
+
+addr-spec       =   local-part "@" domain
+
+local-part      =   dot-atom / quoted-string / obs-local-part
+
+domain          =   dot-atom / domain-literal / obs-domain
+
+domain-literal  =   [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+
+dtext           =   %d33-90 /          ; Printable US-ASCII
                     %d94-126 /         ;  characters not including
-                    obs-dtext          ;  "[", "]", or "\"
-&#8230;&#8203;.</p>
+                    obs-dtext          ;  "[", "]", or "\"</pre>
+</div>
 </div>
 <div class="ulist">
 <ul>
@@ -588,7 +587,7 @@ address-list    =   (address *("," address)) / obs-addr-list</p>
 </li>
 <li>
 <p>Comments and folding white space SHOULD NOT be used around the "@" in the
-   addr-spec.</p>
+addr-spec.</p>
 </li>
 </ul>
 </div>
@@ -596,12 +595,14 @@ address-list    =   (address *("," address)) / obs-addr-list</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_header">Header</h2>
+<h2 id="_header">2. Header</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Format,
-&#8230;&#8203;.
-fields          =   *(trace
+<p>Format,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>fields          =   *(trace
                       *optional-field /
                       *(resent-date /
                        resent-from /
@@ -623,11 +624,12 @@ fields          =   *(trace
                     subject /
                     comments /
                     keywords /
-                    optional-field)
-&#8230;&#8203;.</p>
+                    optional-field)</pre>
+</div>
 </div>
 <div class="paragraph">
-<p>|===
+<p>[cols=".&lt;2,.^1,.&lt;1,.&lt;6",options="header"]
+|===
 | Field          | Min number      | Max number | Notes</p>
 </div>
 <div class="paragraph">
@@ -659,20 +661,20 @@ fields          =   *(trace
 <ul>
 <li>
 <p>Header fields SHOULD NOT be reordered when a message is transported or
-   transformed.</p>
+transformed.</p>
 </li>
 <li>
 <p>The trace header fields and resent header fields MUST NOT be
-   reordered, and SHOULD be kept in blocks prepended to the message.</p>
+reordered, and SHOULD be kept in blocks prepended to the message.</p>
 </li>
 <li>
 <p>The only required header fields are the "Date" field and the originator
-   address field(s) (which is "From", "Sender", and "Reply-To").</p>
+address field(s) (which is "From", "Sender", and "Reply-To").</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_date_field">Date Field</h3>
+<h3 id="_date_field">2.1. Date Field</h3>
 <div class="paragraph">
 <p>The date and time at which the creator of the message indicated that the
 message was completed, not the time the message transferred.</p>
@@ -684,7 +686,7 @@ message was completed, not the time the message transferred.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_originator_fields">Originator Fields</h3>
+<h3 id="_originator_fields">2.2. Originator Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>from            =   "From:" mailbox-list CRLF
@@ -698,32 +700,32 @@ reply-to        =   "Reply-To:" address-list CRLF</pre>
 <ul>
 <li>
 <p>If the "From:"  field contains more than one mailbox, then the sender field
-   MUST appear in the message.</p>
+MUST appear in the message.</p>
 </li>
 <li>
 <p>If the originator of the message can be indicated by a single mailbox and
-   the author and transmitter are identical, the "Sender:" field SHOULD NOT be
-   used.
-   Otherwise, both fields SHOULD appear.</p>
+the author and transmitter are identical, the "Sender:" field SHOULD NOT be
+used.
+Otherwise, both fields SHOULD appear.</p>
 </li>
 <li>
 <p>When the "Reply-To:" field is present, it indicates the address(es) to
-   which the author of the message suggests that replies be sent.</p>
+which the author of the message suggests that replies be sent.</p>
 </li>
 <li>
 <p>In the absence of the "Reply-To:" field, replies SHOULD by default be sent
-   to the mailbox(es) specified in the "From:" field unless otherwise
-   specified by the person composing the reply.</p>
+to the mailbox(es) specified in the "From:" field unless otherwise
+specified by the person composing the reply.</p>
 </li>
 <li>
 <p>In all cases, the "From:" field SHOULD NOT contain any mailbox that does
-   not belong to the author(s) of the message.</p>
+not belong to the author(s) of the message.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_destination_fields">Destination Fields</h3>
+<h3 id="_destination_fields">2.3. Destination Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>to  =   "To:" address-list CRLF
@@ -755,21 +757,21 @@ revealed to other recipients of the message.</p>
 <ol class="arabic">
 <li>
 <p>The "Bcc:" line is removed even though all of the recipients (including
-   those specified in the "Bcc:" field) are sent a copy of the message.</p>
+those specified in the "Bcc:" field) are sent a copy of the message.</p>
 </li>
 <li>
 <p>Recipients specified in the "To:" and "Cc:" lines each are sent
-   a copy of the message with the "Bcc:" line removed as above, but the
-   recipients on the "Bcc:" line get a separate copy of the message
-   containing a "Bcc:" line.  (When there are multiple recipient
-   addresses in the "Bcc:" field, some implementations actually send a
-   separate copy of the message to each recipient with a "Bcc:"
-   containing only the address of that particular recipient.)</p>
+a copy of the message with the "Bcc:" line removed as above, but the
+recipients on the "Bcc:" line get a separate copy of the message
+containing a "Bcc:" line.  (When there are multiple recipient
+addresses in the "Bcc:" field, some implementations actually send a
+separate copy of the message to each recipient with a "Bcc:"
+containing only the address of that particular recipient.)</p>
 </li>
 <li>
 <p>Since a "Bcc:" field may contain no addresses, a "Bcc:" field can be
-   sent without any addresses indicating to the recipients that blind
-   copies were sent to someone.</p>
+sent without any addresses indicating to the recipients that blind
+copies were sent to someone.</p>
 </li>
 </ol>
 </div>
@@ -780,30 +782,26 @@ each.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_identification_field">Identification Field</h3>
+<h3 id="_identification_field">2.4. Identification Field</h3>
 <div class="paragraph">
-<p>Format,
-&#8230;&#8203;.
-message-id      =   "Message-ID:" msg-id CRLF</p>
+<p>Format,</p>
 </div>
-<div class="paragraph">
-<p>in-reply-to     =   "In-Reply-To:" 1*msg-id CRLF</p>
+<div class="literalblock">
+<div class="content">
+<pre>message-id      =   "Message-ID:" msg-id CRLF
+
+in-reply-to     =   "In-Reply-To:" 1*msg-id CRLF
+
+references      =   "References:" 1*msg-id CRLF
+
+msg-id          =   [CFWS] "&lt;" id-left "@" id-right "&gt;" [CFWS]
+
+id-left         =   dot-atom-text / obs-id-left
+
+id-right        =   dot-atom-text / no-fold-literal / obs-id-right
+
+no-fold-literal =   "[" *dtext "]"</pre>
 </div>
-<div class="paragraph">
-<p>references      =   "References:" 1*msg-id CRLF</p>
-</div>
-<div class="paragraph">
-<p>msg-id          =   [CFWS] "&lt;" id-left "@" id-right "&gt;" [CFWS]</p>
-</div>
-<div class="paragraph">
-<p>id-left         =   dot-atom-text / obs-id-left</p>
-</div>
-<div class="paragraph">
-<p>id-right        =   dot-atom-text / no-fold-literal / obs-id-right</p>
-</div>
-<div class="paragraph">
-<p>no-fold-literal =   "[" *dtext "]"
-&#8230;&#8203;.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -844,7 +842,7 @@ msg-id is what is contained between the two angle bracket characters.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_informational_fields">Informational Fields</h3>
+<h3 id="_informational_fields">2.5. Informational Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>subject         =   "Subject:" unstructured CRLF
@@ -864,7 +862,7 @@ undesirable consequences.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_resent_fields">Resent Fields</h3>
+<h3 id="_resent_fields">2.6. Resent Fields</h3>
 <div class="paragraph">
 <p>Each of the resent fields corresponds to a particular field elsewhere in the
 syntax.</p>
@@ -890,49 +888,49 @@ resent-msg-id   =   "Resent-Message-ID:" msg-id CRLF</pre>
 <ul>
 <li>
 <p>Resent fields SHOULD be added to any message that is reintroduced by
-   a user into the transport system.</p>
+a user into the transport system.</p>
 </li>
 <li>
 <p>A separate set of resent fields SHOULD be added each time this is done.</p>
 </li>
 <li>
 <p>All of the resent fields corresponding to a particular resending of the
-   message SHOULD be grouped together.</p>
+message SHOULD be grouped together.</p>
 </li>
 <li>
 <p>Each new set of resent fields is prepended to the message; that is, the
-   most recent set of resent fields appears earlier in the message.</p>
+most recent set of resent fields appears earlier in the message.</p>
 </li>
 <li>
 <p>No other fields in the message are changed when resent fields are added.</p>
 </li>
 <li>
 <p>When resent fields are used, the "Resent-From:" and "Resent-Date:"
-   fields MUST be sent.</p>
+fields MUST be sent.</p>
 </li>
 <li>
 <p>The "Resent-Message-ID:" field SHOULD be sent.</p>
 </li>
 <li>
 <p>"Resent-Sender:" SHOULD NOT be used if "Resent-Sender:" would be identical
-   to "Resent-From:".</p>
+to "Resent-From:".</p>
 </li>
 <li>
 <p>The "Resent-Message-ID:" field provides a unique identifier for the resent
-   message.</p>
+message.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_trace_fields">Trace Fields</h3>
+<h3 id="_trace_fields">2.7. Trace Fields</h3>
 <div class="literalblock">
 <div class="content">
 <pre>trace           =   [return] 1*received
 
 return          =   "Return-Path:" path CRLF
 
-path            =   angle-addr / ([CFWS] "<" [CFWS] ">" [CFWS])
+path            =   angle-addr / ([CFWS] "&lt;" [CFWS] "&gt;" [CFWS])
 
 received        =   "Received:" *received-token ";" date-time CRLF
 
@@ -941,7 +939,7 @@ received-token  =   word / angle-addr / addr-spec / domain</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_optional_fields">Optional Fields</h3>
+<h3 id="_optional_fields">2.8. Optional Fields</h3>
 <div class="paragraph">
 <p>The field names of any optional field MUST NOT be identical to any field name
 specified elsewhere in this document.</p>
@@ -955,10 +953,10 @@ specified elsewhere in this document.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_obsolete_specification">Obsolete Specification</h2>
+<h2 id="_obsolete_specification">3. Obsolete Specification</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_obsolete_date_and_time">Obsolete Date and Time</h3>
+<h3 id="_obsolete_date_and_time">3.1. Obsolete Date and Time</h3>
 <div class="paragraph">
 <p>The syntax for the obsolete date format allows</p>
 </div>
@@ -980,12 +978,12 @@ interpreted as follows:</p>
 <ol class="arabic">
 <li>
 <p>If a two digit year is encountered whose value is between 00 and 49, the
-  year is interpreted by adding 2000, ending up with a value between 2000 and
-  2049.</p>
+year is interpreted by adding 2000, ending up with a value between 2000 and
+2049.</p>
 </li>
 <li>
 <p>If a two digit year is encountered with a value between 50 and 99, or any
-  three digit year is encountered, the year is interpreted by adding 1900.</p>
+three digit year is encountered, the year is interpreted by adding 1900.</p>
 </li>
 </ol>
 </div>
@@ -1011,7 +1009,7 @@ confirming their meaning.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_obsolete_addressing">Obsolete Addressing</h3>
+<h3 id="_obsolete_addressing">3.2. Obsolete Addressing</h3>
 <div class="paragraph">
 <p>There are four primary differences in addressing.</p>
 </div>
@@ -1019,30 +1017,30 @@ confirming their meaning.</p>
 <ol class="arabic">
 <li>
 <p>mailbox addresses were allowed to have a route portion before the
-   addr-spec when enclosed in "&lt;" and "&gt;".
-   The route is simply a comma-separated list of domain names, each preceded
-   by "@", and the list terminated by a colon.</p>
+addr-spec when enclosed in "&lt;" and "&gt;".
+The route is simply a comma-separated list of domain names, each preceded
+by "@", and the list terminated by a colon.</p>
 </li>
 <li>
 <p>CFWS were allowed between the period-separated elements of local-part and
-   domain (i.e., dot-atom was not used).
-   In addition, local-part is allowed to contain quoted-string in addition to
-   just atom.</p>
+domain (i.e., dot-atom was not used).
+In addition, local-part is allowed to contain quoted-string in addition to
+just atom.</p>
 </li>
 <li>
 <p>mailbox-list and address-list were allowed to have "null" members.
-   That is, there could be two or more commas in such a list with nothing in
-   between them, or commas at the beginning or end of the list.</p>
+That is, there could be two or more commas in such a list with nothing in
+between them, or commas at the beginning or end of the list.</p>
 </li>
 <li>
 <p>US-ASCII control characters and quoted-pairs were allowed in domain
-   literals and are added here.</p>
+literals and are added here.</p>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_obsolete_header_fields">Obsolete Header Fields</h3>
+<h3 id="_obsolete_header_fields">3.3. Obsolete Header Fields</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1053,14 +1051,14 @@ confirming their meaning.</p>
 </li>
 <li>
 <p>Any amount of white space is allowed before the ":" at the end of the
-   field name.</p>
+field name.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>

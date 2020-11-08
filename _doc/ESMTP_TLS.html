@@ -228,31 +228,40 @@ dd {
 			<div class="container">
 				<h1>SMTP Service Extension for Secure SMTP over Transport Layer Security</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:25:32 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>SMTP Service Extension for Secure SMTP over Transport Layer Security</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_service_extension">Service Extension</a></li>
-<li><a href="#_starttls_command">STARTTLS command</a>
+<li><a href="#_service_extension">1. Service Extension</a></li>
+<li><a href="#_starttls_command">2. STARTTLS command</a>
 <ul class="sectlevel2">
-<li><a href="#_request">Request</a>
+<li><a href="#_request">2.1. Request</a>
 <ul class="sectlevel3">
-<li><a href="#_success_response">Success Response</a></li>
-<li><a href="#_error_response">Error Response</a></li>
+<li><a href="#_success_response">2.1.1. Success Response</a></li>
+<li><a href="#_error_response">2.1.2. Error Response</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_post_tls_handshake">Post TLS Handshake</a>
+<li><a href="#_post_tls_handshake">3. Post TLS Handshake</a>
 <ul class="sectlevel2">
-<li><a href="#_client">Client</a></li>
-<li><a href="#_server">Server</a></li>
+<li><a href="#_client">3.1. Client</a></li>
+<li><a href="#_server">3.2. Server</a></li>
 </ul>
 </li>
-<li><a href="#_security_considerations">Security Considerations</a></li>
+<li><a href="#_security_considerations">4. Security Considerations</a></li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -263,7 +272,7 @@ defined in <a href="https://tools.ietf.org/html/rfc3207">RFC3207</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_service_extension">Service Extension</h2>
+<h2 id="_service_extension">1. Service Extension</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The EHLO keyword value associated with the extension is "STARTTLS" with no
@@ -279,17 +288,17 @@ STARTTLS extension in order to deliver mail locally.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_starttls_command">STARTTLS command</h2>
+<h2 id="_starttls_command">2. STARTTLS command</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_request">Request</h3>
+<h3 id="_request">2.1. Request</h3>
 <div class="literalblock">
 <div class="content">
 <pre>"STARTTLS" CRLF</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response">Success Response</h4>
+<h4 id="_success_response">2.1.1. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"220" SP *text CRLF</pre>
@@ -304,7 +313,7 @@ abort the connection.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response">Error Response</h4>
+<h4 id="_error_response">2.1.2. Error Response</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -339,10 +348,10 @@ If the client and server are using the ENHANCEDSTATUSCODES ESMTP extension
 </div>
 </div>
 <div class="sect1">
-<h2 id="_post_tls_handshake">Post TLS Handshake</h2>
+<h2 id="_post_tls_handshake">3. Post TLS Handshake</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_client">Client</h3>
+<h3 id="_client">3.1. Client</h3>
 <div class="paragraph">
 <p>The client MUST discard any knowledge obtained from the server, such as the
 list of SMTP service extensions, which was not obtained from the TLS
@@ -361,7 +370,7 @@ active.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_server">Server</h3>
+<h3 id="_server">3.2. Server</h3>
 <div class="paragraph">
 <p>The server MUST discard any knowledge obtained from the client, such as the
 argument to the EHLO command, which was not obtained from the TLS negotiation
@@ -375,7 +384,7 @@ received after a TLS handshake has completed.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_security_considerations">Security Considerations</h2>
+<h2 id="_security_considerations">4. Security Considerations</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If the SMTP client decides that the level of authentication or privacy is not
@@ -397,7 +406,7 @@ client (other than a QUIT command) with,</p>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>

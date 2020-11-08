@@ -228,37 +228,46 @@ dd {
 			<div class="container">
 				<h1>Analysis of Threats Motivating DomainKeys Identified Mail (DKIM)</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:57:35 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>Analysis of Threats Motivating DomainKeys Identified Mail (DKIM)</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a>
+<li><a href="#_introduction">1. Introduction</a>
 <ul class="sectlevel2">
-<li><a href="#_terminology_and_model">Terminology and Model</a></li>
+<li><a href="#_terminology_and_model">1.1. Terminology and Model</a></li>
 </ul>
 </li>
-<li><a href="#_the_bad_actors">The Bad Actors</a>
+<li><a href="#_the_bad_actors">2. The Bad Actors</a>
 <ul class="sectlevel2">
-<li><a href="#_location">Location</a></li>
+<li><a href="#_location">2.1. Location</a></li>
 </ul>
 </li>
-<li><a href="#_representative_bad_acts">Representative Bad Acts</a>
+<li><a href="#_representative_bad_acts">3. Representative Bad Acts</a>
 <ul class="sectlevel2">
-<li><a href="#_use_of_arbitrary_identities">Use of Arbitrary Identities</a></li>
-<li><a href="#_use_of_specific_identities">Use of Specific Identities</a></li>
+<li><a href="#_use_of_arbitrary_identities">3.1. Use of Arbitrary Identities</a></li>
+<li><a href="#_use_of_specific_identities">3.2. Use of Specific Identities</a></li>
 </ul>
 </li>
-<li><a href="#_attacks_on_message_signing">Attacks on Message Signing</a>
+<li><a href="#_attacks_on_message_signing">4. Attacks on Message Signing</a>
 <ul class="sectlevel2">
-<li><a href="#_attacks_against_message_signatures">Attacks against Message Signatures</a></li>
-<li><a href="#_attacks_against_message_signing_practices">Attacks against Message Signing Practices</a></li>
-<li><a href="#_other_attacks">Other Attacks</a></li>
+<li><a href="#_attacks_against_message_signatures">4.1. Attacks against Message Signatures</a></li>
+<li><a href="#_attacks_against_message_signing_practices">4.2. Attacks against Message Signing Practices</a></li>
+<li><a href="#_other_attacks">4.3. Other Attacks</a></li>
 </ul>
 </li>
-<li><a href="#_derived_requirements">Derived Requirements</a></li>
+<li><a href="#_derived_requirements">5. Derived Requirements</a></li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -268,7 +277,7 @@ Motivating DomainKeys Identified Mail (DKIM).</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">Introduction</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The DKIM protocol defines a mechanism by which email messages can be
@@ -280,7 +289,7 @@ message was attested to by a party in possession of the private key for the
 signing domain.</p>
 </div>
 <div class="sect2">
-<h3 id="_terminology_and_model">Terminology and Model</h3>
+<h3 id="_terminology_and_model">1.1. Terminology and Model</h3>
 <div class="paragraph">
 <p>An administrative unit (AU) is the portion of the path of an email message
 that is under common administration.</p>
@@ -306,14 +315,14 @@ that is under common administration.</p>
      +-----------+    |     SIGNATURE VERIFICATION      |
      |           |    |  (Relaying or Delivering AU)    |
      |    KEY    |    |                                 |
-     |   QUERY   +--->|  Verify (Message, Domain, Key)  |
+     |   QUERY   +---&gt;|  Verify (Message, Domain, Key)  |
      |           |    |                                 |
      +-----------+    +----------------+----------------+
                                        |  - Verified Domain
      +-----------+                     V  - [Report]
      |  SENDER   |    +----------------+----------------+
      |  SIGNING  |    |                                 |
-     | PRACTICES +--->|        SIGNER EVALUATION        |
+     | PRACTICES +---&gt;|        SIGNER EVALUATION        |
      |   QUERY   |    |                                 |
      +-----------+    +---------------------------------+</pre>
 </div>
@@ -368,7 +377,7 @@ a few users</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_bad_actors">The Bad Actors</h2>
+<h2 id="_the_bad_actors">2. The Bad Actors</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The bad actors are expected to have access to the following:</p>
@@ -440,7 +449,7 @@ attacks.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_location">Location</h3>
+<h3 id="_location">2.1. Location</h3>
 <div class="paragraph">
 <p>The bad actors can reside inside the AU or outside the AU.</p>
 </div>
@@ -459,7 +468,7 @@ MSA.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_representative_bad_acts">Representative Bad Acts</h2>
+<h2 id="_representative_bad_acts">3. Representative Bad Acts</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>One of the most fundamental bad acts being attempted is the delivery
@@ -467,7 +476,7 @@ of messages that are not intended to have been sent by the alleged
 originating domain.</p>
 </div>
 <div class="sect2">
-<h3 id="_use_of_arbitrary_identities">Use of Arbitrary Identities</h3>
+<h3 id="_use_of_arbitrary_identities">3.1. Use of Arbitrary Identities</h3>
 <div class="paragraph">
 <p>DKIM is not effective against the use of addresses controlled by bad actors.</p>
 </div>
@@ -478,7 +487,7 @@ addresses and/or the likelihood that signed messages are desirable.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_use_of_specific_identities">Use of Specific Identities</h3>
+<h3 id="_use_of_specific_identities">3.2. Use of Specific Identities</h3>
 <div class="paragraph">
 <p>DKIM is not effective against the domains controlled by bad actors.</p>
 </div>
@@ -489,7 +498,7 @@ The primary means for establishing this is the use of Sender Signing
 Practices (SSP).</p>
 </div>
 <div class="sect3">
-<h4 id="_exploitation_of_social_relationships">Exploitation of Social Relationships</h4>
+<h4 id="_exploitation_of_social_relationships">3.2.1. Exploitation of Social Relationships</h4>
 <div class="paragraph">
 <p>DKIM could be effective in mitigating these acts by limiting the scope of
 origin addresses for which a valid signature can be obtained when sending the
@@ -497,7 +506,7 @@ messages from other locations.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_identity_related_fraud">Identity-Related Fraud</h4>
+<h4 id="_identity_related_fraud">3.2.2. Identity-Related Fraud</h4>
 <div class="paragraph">
 <p>DKIM is effective in defending against the fraudulent use of origin addresses
 on signed messages.
@@ -508,14 +517,14 @@ messages.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_reputation_attacks">Reputation Attacks</h4>
+<h4 id="_reputation_attacks">3.2.3. Reputation Attacks</h4>
 <div class="paragraph">
 <p>It is for this reason that reputation systems must be based on an identity
 that is, in practice, fairly reliable.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_reflection_attacks">Reflection Attacks</h4>
+<h4 id="_reflection_attacks">3.2.4. Reflection Attacks</h4>
 <div class="paragraph">
 <p>It is common and useful practice for a message&#8217;s return path not to correspond
 to the origin address.
@@ -526,201 +535,86 @@ For these reasons, DKIM is not effective against reflection attacks.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_attacks_on_message_signing">Attacks on Message Signing</h2>
+<h2 id="_attacks_on_message_signing">4. Attacks on Message Signing</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_attacks_against_message_signatures">Attacks against Message Signatures</h3>
+<h3 id="_attacks_against_message_signatures">4.1. Attacks against Message Signatures</h3>
 <div class="paragraph">
 <p>The following is a summary of postulated attacks against DKIM signatures:</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 80%;">
-<col style="width: 10%;">
-<col style="width: 10%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Attack Name</th>
-<th class="tableblock halign-left valign-middle">Impact</th>
-<th class="tableblock halign-left valign-middle">Likelihood</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Theft of private key for domain</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Theft of delegated private key</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private key recovery via side channel attack</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Chosen message replay</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium/High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Signed message replay</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Denial-of-service attack against verifier</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Denial-of-service attack against key service</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Canonicalization abuse</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Body length limit abuse</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Use of revoked key</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compromise of key server</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Falsification of key service replies</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Publication of malformed key records and/or signatures</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cryptographic weaknesses in signature generation</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Display name abuse</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compromised system within originator&#8217;s network</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Verification probe attack</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Key publication by higher-level domain</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>[cols=".&lt;8,.<sup>1,.</sup>1"]</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>|===
+| Attack Name                                            | Impact | Likelihood
+
+| Theft of private key for domain                        | High   | Low
+| Theft of delegated private key                         | Medium | Medium
+| Private key recovery via side channel attack           | High   | Low
+| Chosen message replay                                  | Low    | Medium/High
+| Signed message replay                                  | Low    | High
+| Denial-of-service attack against verifier              | High   | Medium
+| Denial-of-service attack against key service           | High   | Medium
+| Canonicalization abuse                                 | Low    | Medium
+| Body length limit abuse                                | Medium | Medium
+| Use of revoked key                                     | Medium | Low
+| Compromise of key server                               | High   | Low
+| Falsification of key service replies                   | Medium | Medium
+| Publication of malformed key records and/or signatures | High   | Low
+| Cryptographic weaknesses in signature generation       | High   | Low
+| Display name abuse                                     | Medium | High
+| Compromised system within originator's network         | High   | Medium
+| Verification probe attack                              | Medium | Medium
+| Key publication by higher-level domain                 | High   | Low
+|===</pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_attacks_against_message_signing_practices">Attacks against Message Signing Practices</h3>
+<h3 id="_attacks_against_message_signing_practices">4.2. Attacks against Message Signing Practices</h3>
 <div class="paragraph">
 <p>The following is a summary of postulated attacks against signing
 practices:</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 80%;">
-<col style="width: 10%;">
-<col style="width: 10%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Attack Name</th>
-<th class="tableblock halign-left valign-middle">Impact</th>
-<th class="tableblock halign-left valign-middle">Likelihood</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Look-alike domain names</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internationalized domain name abuse</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Denial-of-service attack against signing practices</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Use of multiple From addresses</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Low</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Abuse of third-party signatures</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">High</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Falsification of Sender Signing Practices replies</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>[cols=".&lt;8,.<sup>1,.</sup>1"]</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>|===
+| Attack Name                                          | Impact | Likelihood
+
+| Look-alike domain names                              | High   | High
+| Internationalized domain name abuse                  | High   | High
+| Denial-of-service attack against signing practices   | Medium | Medium
+| Use of multiple From addresses                       | Low    | Medium
+| Abuse of third-party signatures                      | Medium | High
+| Falsification of Sender Signing Practices replies    | Medium | Medium
+|===</pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_other_attacks">Other Attacks</h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 80%;">
-<col style="width: 10%;">
-<col style="width: 10%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Attack Name</th>
-<th class="tableblock halign-left valign-middle">Impact</th>
-<th class="tableblock halign-left valign-middle">Likelihood</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Packet amplification attacks via DNS</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">N/A</p></td>
-<td class="tableblock halign-left valign-middle"><p class="tableblock">Medium</p></td>
-</tr>
-</tbody>
-</table>
+<h3 id="_other_attacks">4.3. Other Attacks</h3>
+<div class="paragraph">
+<p>[cols=".&lt;8,.<sup>1,.</sup>1"]</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>|===
+| Attack Name                          | Impact | Likelihood
+
+| Packet amplification attacks via DNS |   N/A  |   Medium
+|===</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_derived_requirements">Derived Requirements</h2>
+<h2 id="_derived_requirements">5. Derived Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>These requirements include:</p>
@@ -751,7 +645,7 @@ expected cryptographic developments several years in the future.</p>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>

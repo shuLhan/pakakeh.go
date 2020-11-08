@@ -228,31 +228,40 @@ dd {
 			<div class="container">
 				<h1>Simple Authentication and Security Layer (SASL)</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:25:32 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>Simple Authentication and Security Layer (SASL)</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_identity_concepts">Identity Concepts</a></li>
-<li><a href="#_the_authentication_exchange">The Authentication Exchange</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_identity_concepts">2. Identity Concepts</a></li>
+<li><a href="#_the_authentication_exchange">3. The Authentication Exchange</a>
 <ul class="sectlevel2">
-<li><a href="#_mechanism_naming">Mechanism Naming</a></li>
-<li><a href="#_security_layers">Security Layers</a></li>
+<li><a href="#_mechanism_naming">3.1. Mechanism Naming</a></li>
+<li><a href="#_security_layers">3.2. Security Layers</a></li>
 </ul>
 </li>
-<li><a href="#_protocol_requirements">Protocol Requirements</a></li>
-<li><a href="#_mechanism_specifications">Mechanism Specifications</a></li>
-<li><a href="#_security_considerations">Security Considerations</a>
+<li><a href="#_protocol_requirements">4. Protocol Requirements</a></li>
+<li><a href="#_mechanism_specifications">5. Mechanism Specifications</a></li>
+<li><a href="#_security_considerations">6. Security Considerations</a>
 <ul class="sectlevel2">
-<li><a href="#_active_attacks">Active Attacks</a></li>
-<li><a href="#_passive_attacks">Passive Attacks</a></li>
-<li><a href="#_re_keying">Re-keying</a></li>
+<li><a href="#_active_attacks">6.1. Active Attacks</a></li>
+<li><a href="#_passive_attacks">6.2. Passive Attacks</a></li>
+<li><a href="#_re_keying">6.3. Re-keying</a></li>
 </ul>
 </li>
-<li><a href="#_mechanism_registry">Mechanism Registry</a></li>
+<li><a href="#_mechanism_registry">7. Mechanism Registry</a></li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -262,7 +271,7 @@ Security Layer (SASL).</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">Introduction</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>SASL is conceptually a framework that provides an abstraction layer between
@@ -282,7 +291,7 @@ protocols and mechanisms as illustrated in the following diagram.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_identity_concepts">Identity Concepts</h2>
+<h2 id="_identity_concepts">2. Identity Concepts</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Authentication identity is an identity that is used on credential form that
@@ -304,7 +313,7 @@ and authorization identity to be transferred by mechanism.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_authentication_exchange">The Authentication Exchange</h2>
+<h2 id="_the_authentication_exchange">3. The Authentication Exchange</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following illustration provides a high-level overview of an
@@ -312,15 +321,15 @@ authentication exchange.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>	C: Request available mechanism on server
-	S: List of available mechanism
-	<Client select the best and suitable mechanism>
-	C: Request authentication exchange
-	<Mechanism name + [ additional data ]>
-	S: Initial challenge
-	C: Initial response
-	<additional challenge/response messages>
-	S: Outcome of authentication exchange</pre>
+<pre>C: Request available mechanism on server
+S: List of available mechanism
+&lt;Client select the best and suitable mechanism&gt;
+C: Request authentication exchange
+&lt;Mechanism name + [ additional data ]&gt;
+S: Initial challenge
+C: Initial response
+&lt;additional challenge/response messages&gt;
+S: Outcome of authentication exchange</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -328,8 +337,8 @@ authentication exchange.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>	C: Request authentication exchange + Initial response
-	S: Outcome of authentication exchange</pre>
+<pre>C: Request authentication exchange + Initial response
+S: Outcome of authentication exchange</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -353,7 +362,7 @@ credential, timeout, internal server error).</p>
 <p>Client or server may abort the authentication exchange any time.</p>
 </div>
 <div class="sect2">
-<h3 id="_mechanism_naming">Mechanism Naming</h3>
+<h3 id="_mechanism_naming">3.1. Mechanism Naming</h3>
 <div class="literalblock">
 <div class="content">
 <pre>sasl-mech    = 1*20mech-char
@@ -369,7 +378,7 @@ UNDERSCORE   = %x5F ; underscore (_)</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_security_layers">Security Layers</h3>
+<h3 id="_security_layers">3.2. Security Layers</h3>
 <div class="paragraph">
 <p>If use of a security layer is negotiated in the authentication protocol
 exchange, the layer is installed by the server after indicating the outcome of
@@ -403,7 +412,7 @@ security layer, the original security layer remains in effect.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_protocol_requirements">Protocol Requirements</h2>
+<h2 id="_protocol_requirements">4. Protocol Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In order for a protocol to offer SASL services, its specification
@@ -467,7 +476,7 @@ authorization state.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mechanism_specifications">Mechanism Specifications</h2>
+<h2 id="_mechanism_specifications">5. Mechanism Specifications</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>SASL mechanism specifications MUST supply the following information:</p>
@@ -538,10 +547,10 @@ the authorization identity string be canonical.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_security_considerations">Security Considerations</h2>
+<h2 id="_security_considerations">6. Security Considerations</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_active_attacks">Active Attacks</h3>
+<h3 id="_active_attacks">6.1. Active Attacks</h3>
 <div class="paragraph">
 <p>When use of a security layer is negotiated by the authentication protocol
 exchange, the receiver SHOULD handle gracefully any protected data buffer
@@ -551,14 +560,14 @@ the buffer size field, as this might cause the "out of memory" condition.
 If the receiver detects a large block, it SHOULD close the connection.</p>
 </div>
 <div class="sect3">
-<h4 id="_hijack_attacks">Hijack Attacks</h4>
+<h4 id="_hijack_attacks">6.1.1. Hijack Attacks</h4>
 <div class="paragraph">
 <p>Implementations SHOULD close the connection security layer report protocol
 data lack of data integrity.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_downgrade_attacks">Downgrade Attacks</h4>
+<h4 id="_downgrade_attacks">6.1.2. Downgrade Attacks</h4>
 <div class="paragraph">
 <p>Implementations SHOULD NOT advertise mechanisms and/or features that cannot
 meet their minimum security requirements.
@@ -576,14 +585,14 @@ transport connection.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_replay_attacks">Replay Attacks</h4>
+<h4 id="_replay_attacks">6.1.3. Replay Attacks</h4>
 <div class="paragraph">
 <p>Some mechanisms may be subject to replay attacks unless protected by
 external data security services (e.g., TLS).</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_truncation_attacks">Truncation Attacks</h4>
+<h4 id="_truncation_attacks">6.1.4. Truncation Attacks</h4>
 <div class="paragraph">
 <p>A protocol can defend against these attacks by ensuring that each information
 exchange has a clear final result and that each protocol session has a
@@ -592,7 +601,7 @@ graceful closure mechanism, and that these are integrity protected.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_passive_attacks">Passive Attacks</h3>
+<h3 id="_passive_attacks">6.2. Passive Attacks</h3>
 <div class="paragraph">
 <p>Many mechanisms are subject to various passive attacks, including simple
 eavesdropping of unprotected credential information as well as online and
@@ -600,7 +609,7 @@ off-line dictionary attacks of protected credential information.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_re_keying">Re-keying</h3>
+<h3 id="_re_keying">6.3. Re-keying</h3>
 <div class="paragraph">
 <p>Re-keying (key renegotiation process) is a way of addressing the weakening of
 cryptographic keys.
@@ -612,16 +621,16 @@ services.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mechanism_registry">Mechanism Registry</h2>
+<h2 id="_mechanism_registry">7. Mechanism Registry</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The SASL mechanism registry is maintained by IANA.
 The registry is currently available at
-&lt;<a href="http://www.iana.org/assignments/sasl-mechanisms/{>}/." class="bare">http://www.iana.org/assignments/sasl-mechanisms/{>}/.</a></p>
+&lt;<a href="http://www.iana.org/assignments/sasl-mechanisms&gt;" class="bare">http://www.iana.org/assignments/sasl-mechanisms&gt;</a>.</p>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>

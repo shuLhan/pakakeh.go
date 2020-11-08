@@ -228,16 +228,25 @@ dd {
 			<div class="container">
 				<h1>MIME Part Five: Conformance Criteria and Examples</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:25:32 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>MIME Part Five: Conformance Criteria and Examples</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_mime_conformance">MIME Conformance</a></li>
-<li><a href="#_guidelines_for_sending_email_data">Guidelines for Sending Email Data</a></li>
-<li><a href="#_canonical_encoding_model">Canonical Encoding Model</a></li>
+<li><a href="#_mime_conformance">1. MIME Conformance</a></li>
+<li><a href="#_guidelines_for_sending_email_data">2. Guidelines for Sending Email Data</a></li>
+<li><a href="#_canonical_encoding_model">3. Canonical Encoding Model</a></li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -247,7 +256,7 @@ Extensions (MIME) Part Five: Conformance Criteria and Examples</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mime_conformance">MIME Conformance</h2>
+<h2 id="_mime_conformance">1. MIME Conformance</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The concept of "MIME-conformance" is to define a certain level of
@@ -264,14 +273,14 @@ that differs from US-ASCII text.</p>
 </li>
 <li>
 <p>Enable to decode using quoted-printable or base64.
-   Sending non-7bit data without encoding MUST use content-transfer-encoding
-   8bit or binary, as appropriate.
-   If the underlying transport does not support 8bit or binary, sender must
-   encode and label data using quoted-printable or base64.</p>
+Sending non-7bit data without encoding MUST use content-transfer-encoding
+8bit or binary, as appropriate.
+If the underlying transport does not support 8bit or binary, sender must
+encode and label data using quoted-printable or base64.</p>
 </li>
 <li>
 <p>Treat unrecognized Content-Transfer-Encoding as Content-Type of
-   "application/octet-stream", regardless their actual type.</p>
+"application/octet-stream", regardless their actual type.</p>
 </li>
 <li>
 <p>Avoid showing users raw data when a Content-Type field other than text.</p>
@@ -292,11 +301,11 @@ that differs from US-ASCII text.</p>
 </li>
 <li>
 <p>Recognize other charset, at least being able to inform the user about
-     charset the message uses</p>
+charset the message uses</p>
 </li>
 <li>
 <p>For unrecognized subtypes in a known charset, offer to show the user the
-     "raw" version of data after conversion from canonical to local form</p>
+"raw" version of data after conversion from canonical to local form</p>
 </li>
 <li>
 <p>Treat material in an unknown charset as "application/octet-stream"</p>
@@ -320,7 +329,7 @@ that differs from US-ASCII text.</p>
 <ol class="lowerroman" type="i">
 <li>
 <p>Offer the ability to remove encodings and put the resulting information
-     in a user file</p>
+in a user file</p>
 </li>
 </ol>
 </div>
@@ -334,11 +343,11 @@ that differs from US-ASCII text.</p>
 </li>
 <li>
 <p>Recognize the "alternative" subtype, and avoid showing the user redundant
-     parts.</p>
+parts.</p>
 </li>
 <li>
 <p>Recognize the "digest" subtype, specifically using "message/rfc822"
-     rather than "text/plain" as the default media type for body parts</p>
+rather than "text/plain" as the default media type for body parts</p>
 </li>
 <li>
 <p>Treat unrecognized subtypes as "mixed"</p>
@@ -370,7 +379,7 @@ that differs from US-ASCII text.</p>
 </li>
 <li>
 <p>Ensure that any string that begins with "=?" and ends with "?=" in field
-   body to be valid encoded-word.</p>
+body to be valid encoded-word.</p>
 </li>
 <li>
 <p>Able to distinguish encoded-words from "text", "ctext", or "word"s</p>
@@ -380,7 +389,7 @@ that differs from US-ASCII text.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_guidelines_for_sending_email_data">Guidelines for Sending Email Data</h2>
+<h2 id="_guidelines_for_sending_email_data">2. Guidelines for Sending Email Data</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The list is NOT recommended practices for MTAs.</p>
@@ -388,7 +397,7 @@ that differs from US-ASCII text.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_canonical_encoding_model">Canonical Encoding Model</h2>
+<h2 id="_canonical_encoding_model">3. Canonical Encoding Model</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Conversion steps from local to canonical form,</p>
@@ -397,26 +406,26 @@ that differs from US-ASCII text.</p>
 <ol class="arabic">
 <li>
 <p>Creation of local form
-   The body to be transmitted is created in the system&#8217;s native format.</p>
+The body to be transmitted is created in the system&#8217;s native format.</p>
 </li>
 <li>
 <p>Conversion to canonical form.
-   The entire body, including "out-of-band" information such as record lengths
-   and possibly file attribute information, is converted to a universal
-   canonical form.
-   For example, in case of "text/plain", the text MUST be converted to a
-   supported charset and lines MUST be delimited with CRLF.</p>
+The entire body, including "out-of-band" information such as record lengths
+and possibly file attribute information, is converted to a universal
+canonical form.
+For example, in case of "text/plain", the text MUST be converted to a
+supported charset and lines MUST be delimited with CRLF.</p>
 </li>
 <li>
 <p>Apply transfer encoding.
-   It may be appropriate to base the choice of base64 or quoted-printable on
-   character frequency counts.</p>
+It may be appropriate to base the choice of base64 or quoted-printable on
+character frequency counts.</p>
 </li>
 <li>
 <p>Insertion into entity.
-   The encoded body then inserted into MIME entity with appropriate headers.
-   The entity is then inserted into the body of higher-level entity (message
-   or multipart).</p>
+The encoded body then inserted into MIME entity with appropriate headers.
+The entity is then inserted into the body of higher-level entity (message
+or multipart).</p>
 </li>
 </ol>
 </div>
@@ -429,8 +438,8 @@ these steps.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>	Content-type: text/foo; charset=bar
-	Content-Transfer-Encoding: base64</pre>
+<pre>Content-type: text/foo; charset=bar
+Content-Transfer-Encoding: base64</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -440,7 +449,7 @@ mail-safe form.</p>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>

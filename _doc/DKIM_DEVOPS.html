@@ -228,79 +228,88 @@ dd {
 			<div class="container">
 				<h1>DomainKeys Identified Mail (DKIM) Development, Deployment, and Operations</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:25:32 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>DomainKeys Identified Mail (DKIM) Development, Deployment, and Operations</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_using_dkim_as_part_of_trust_assessment">Using DKIM as Part of Trust Assessment</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_using_dkim_as_part_of_trust_assessment">2. Using DKIM as Part of Trust Assessment</a>
 <ul class="sectlevel2">
-<li><a href="#_a_systems_view_of_email_trust_assessment">A Systems View of Email Trust Assessment</a></li>
-<li><a href="#_choosing_a_dkim_tag_for_the_assessment_identifier">Choosing a DKIM Tag for the Assessment Identifier</a></li>
-<li><a href="#_choosing_the_signing_domain_name">Choosing the Signing Domain Name</a></li>
-<li><a href="#_recipient_based_assessments">Recipient-Based Assessments</a></li>
-<li><a href="#_filtering">Filtering</a></li>
+<li><a href="#_a_systems_view_of_email_trust_assessment">2.1. A Systems View of Email Trust Assessment</a></li>
+<li><a href="#_choosing_a_dkim_tag_for_the_assessment_identifier">2.2. Choosing a DKIM Tag for the Assessment Identifier</a></li>
+<li><a href="#_choosing_the_signing_domain_name">2.3. Choosing the Signing Domain Name</a></li>
+<li><a href="#_recipient_based_assessments">2.4. Recipient-Based Assessments</a></li>
+<li><a href="#_filtering">2.5. Filtering</a></li>
 </ul>
 </li>
-<li><a href="#_dkim_key_generation_storage_and_management">DKIM Key Generation, Storage, and Management</a>
+<li><a href="#_dkim_key_generation_storage_and_management">3. DKIM Key Generation, Storage, and Management</a>
 <ul class="sectlevel2">
-<li><a href="#_private_key_management_deployment_and_ongoing_operations">Private Key Management: Deployment and Ongoing Operations</a></li>
-<li><a href="#_storing_public_keys_dns_server_software_considerations">Storing Public Keys: DNS Server Software Considerations</a></li>
-<li><a href="#_assignment_of_selectors">Assignment of Selectors</a></li>
-<li><a href="#_per_user_signing_key_management_issues">Per-User Signing Key Management Issues</a></li>
-<li><a href="#_third_party_signer_key_management_and_selector_administration">Third-Party Signer Key Management and Selector Administration</a></li>
-<li><a href="#_key_pair_selector_life_cycle_management">Key Pair / Selector Life Cycle Management</a></li>
+<li><a href="#_private_key_management_deployment_and_ongoing_operations">3.1. Private Key Management: Deployment and Ongoing Operations</a></li>
+<li><a href="#_storing_public_keys_dns_server_software_considerations">3.2. Storing Public Keys: DNS Server Software Considerations</a></li>
+<li><a href="#_assignment_of_selectors">3.3. Assignment of Selectors</a></li>
+<li><a href="#_per_user_signing_key_management_issues">3.4. Per-User Signing Key Management Issues</a></li>
+<li><a href="#_third_party_signer_key_management_and_selector_administration">3.5. Third-Party Signer Key Management and Selector Administration</a></li>
+<li><a href="#_key_pair_selector_life_cycle_management">3.6. Key Pair / Selector Life Cycle Management</a></li>
 </ul>
 </li>
-<li><a href="#_signing">Signing</a>
+<li><a href="#_signing">4. Signing</a>
 <ul class="sectlevel2">
-<li><a href="#_dns_record">DNS Record</a></li>
-<li><a href="#_signing_module">Signing Module</a></li>
-<li><a href="#_signing_policies_and_practices">Signing Policies and Practices</a></li>
+<li><a href="#_dns_record">4.1. DNS Record</a></li>
+<li><a href="#_signing_module">4.2. Signing Module</a></li>
+<li><a href="#_signing_policies_and_practices">4.3. Signing Policies and Practices</a></li>
 </ul>
 </li>
-<li><a href="#_verifying">Verifying</a>
+<li><a href="#_verifying">5. Verifying</a>
 <ul class="sectlevel2">
-<li><a href="#_intended_scope_of_use">Intended Scope of Use</a></li>
-<li><a href="#_signature_scope">Signature Scope</a></li>
-<li><a href="#_design_scope_of_use">Design Scope of Use</a></li>
-<li><a href="#_inbound_mail_filtering">Inbound Mail Filtering</a></li>
-<li><a href="#_messages_sent_through_mailing_lists_and_other_intermediaries">Messages Sent through Mailing Lists and Other Intermediaries</a></li>
-<li><a href="#_generation_transmission_and_use_of_results_headers">Generation, Transmission, and Use of Results Headers</a></li>
+<li><a href="#_intended_scope_of_use">5.1. Intended Scope of Use</a></li>
+<li><a href="#_signature_scope">5.2. Signature Scope</a></li>
+<li><a href="#_design_scope_of_use">5.3. Design Scope of Use</a></li>
+<li><a href="#_inbound_mail_filtering">5.4. Inbound Mail Filtering</a></li>
+<li><a href="#_messages_sent_through_mailing_lists_and_other_intermediaries">5.5. Messages Sent through Mailing Lists and Other Intermediaries</a></li>
+<li><a href="#_generation_transmission_and_use_of_results_headers">5.6. Generation, Transmission, and Use of Results Headers</a></li>
 </ul>
 </li>
-<li><a href="#_taxonomy_of_signatures">Taxonomy of Signatures</a>
+<li><a href="#_taxonomy_of_signatures">6. Taxonomy of Signatures</a>
 <ul class="sectlevel2">
-<li><a href="#_single_domain_signature">Single Domain Signature</a></li>
-<li><a href="#_parent_domain_signature">Parent Domain Signature</a></li>
-<li><a href="#_third_party_signature">Third Party Signature</a></li>
-<li><a href="#_using_trusted_third_party_ttp_senders">Using Trusted Third Party (TTP) Senders</a></li>
-<li><a href="#_multiple_signatures">Multiple Signatures</a></li>
+<li><a href="#_single_domain_signature">6.1. Single Domain Signature</a></li>
+<li><a href="#_parent_domain_signature">6.2. Parent Domain Signature</a></li>
+<li><a href="#_third_party_signature">6.3. Third Party Signature</a></li>
+<li><a href="#_using_trusted_third_party_ttp_senders">6.4. Using Trusted Third Party (TTP) Senders</a></li>
+<li><a href="#_multiple_signatures">6.5. Multiple Signatures</a></li>
 </ul>
 </li>
-<li><a href="#_example_usage_scenarios">Example Usage Scenarios</a>
+<li><a href="#_example_usage_scenarios">7. Example Usage Scenarios</a>
 <ul class="sectlevel2">
-<li><a href="#_author_s_organization_simple">Author’s Organization - Simple</a></li>
-<li><a href="#_author_s_organization_differentiated_types_of_mail">Author’s Organization - Differentiated Types of Mail</a></li>
-<li><a href="#_author_domain_signing_practices_adsp">Author Domain Signing Practices (ADSP)</a></li>
-<li><a href="#_delegated_signing">Delegated Signing</a></li>
-<li><a href="#_independent_third_party_service_providers">Independent Third-Party Service Providers</a></li>
-<li><a href="#_mail_streams_based_on_behavioral_assessment">Mail Streams Based on Behavioral Assessment</a></li>
-<li><a href="#_agent_or_mediator_signatures">Agent or Mediator Signatures</a></li>
+<li><a href="#_author_8217_s_organization_simple">7.1. Author&#8217;s Organization - Simple</a></li>
+<li><a href="#_author_8217_s_organization_differentiated_types_of_mail">7.2. Author&#8217;s Organization - Differentiated Types of Mail</a></li>
+<li><a href="#_author_domain_signing_practices_adsp">7.3. Author Domain Signing Practices (ADSP)</a></li>
+<li><a href="#_delegated_signing">7.4. Delegated Signing</a></li>
+<li><a href="#_independent_third_party_service_providers">7.5. Independent Third-Party Service Providers</a></li>
+<li><a href="#_mail_streams_based_on_behavioral_assessment">7.6. Mail Streams Based on Behavioral Assessment</a></li>
+<li><a href="#_agent_or_mediator_signatures">7.7. Agent or Mediator Signatures</a></li>
 </ul>
 </li>
-<li><a href="#_usage_considerations">Usage Considerations</a>
+<li><a href="#_usage_considerations">8. Usage Considerations</a>
 <ul class="sectlevel2">
-<li><a href="#_a_non_standard_submission_and_delivery_scenarios">A Non-Standard Submission and Delivery Scenarios</a></li>
-<li><a href="#_protection_of_internal_mail">Protection of Internal Mail</a></li>
-<li><a href="#_signature_granularity">Signature Granularity</a></li>
-<li><a href="#_email_infrastructure_agents">Email Infrastructure Agents</a></li>
-<li><a href="#_mail_user_agent">Mail User Agent</a></li>
+<li><a href="#_a_non_standard_submission_and_delivery_scenarios">8.1. A Non-Standard Submission and Delivery Scenarios</a></li>
+<li><a href="#_protection_of_internal_mail">8.2. Protection of Internal Mail</a></li>
+<li><a href="#_signature_granularity">8.3. Signature Granularity</a></li>
+<li><a href="#_email_infrastructure_agents">8.4. Email Infrastructure Agents</a></li>
+<li><a href="#_mail_user_agent">8.5. Mail User Agent</a></li>
 </ul>
 </li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -310,7 +319,7 @@ Deployment, and Operations.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">Introduction</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This document provides practical tips for those who are developing DKIM
@@ -320,15 +329,15 @@ DKIM verification, and DNS servers.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_using_dkim_as_part_of_trust_assessment">Using DKIM as Part of Trust Assessment</h2>
+<h2 id="_using_dkim_as_part_of_trust_assessment">2. Using DKIM as Part of Trust Assessment</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_a_systems_view_of_email_trust_assessment">A Systems View of Email Trust Assessment</h3>
+<h3 id="_a_systems_view_of_email_trust_assessment">2.1. A Systems View of Email Trust Assessment</h3>
 <div class="paragraph">
 <p>DKIM only claim about message content is that the content cited in the
 "DKIM-Signature:" field&#8217;s "h=" tag has been delivered without modification.
-That is, it asserts message content integrity -- between signing and verifying
--- not message content validity.</p>
+That is, it asserts message content integrity &#8212; between signing and verifying
+&#8212; not message content validity.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -338,21 +347,21 @@ That is, it asserts message content integrity -- between signing and verifying
             |                                          ^
             |                                          |
             |                                   +------+------+
-            |                                -->|  Handling   |<--
-            |                                -->|   Filter    |<--
+            |                                --&gt;|  Handling   |&lt;--
+            |                                --&gt;|   Filter    |&lt;--
             |                                   +-------------+
             |                                          ^
             V                  Responsible             |
      +-------------+           Identifier       +------+------+
-     | Responsible |. .       . . . . . . . . .>|  Identity   |
+     | Responsible |. .       . . . . . . . . .&gt;|  Identity   |
      |  Identity   |  .       .                 |  Assessor   |
      +------+------+  .       .                 +-------------+
             |         V       .                       ^ ^
             V         .       .                       | |
    +------------------.-------.--------------------+  | |
-   | +------+------+  . . . > .   +-------------+  |  | |  +-----------+
+   | +------+------+  . . . &gt; .   +-------------+  |  | |  +-----------+
    | | Identifier  |              | Identifier  +--|--+ +--+ Assessment|
-   | |   Signer    +------------->| Validator   |  |       | Databases |
+   | |   Signer    +-------------&gt;| Validator   |  |       | Databases |
    | +-------------+              +-------------+  |       +-----------+
    |                 DKIM Service                  |
    +-----------------------------------------------+
@@ -362,7 +371,7 @@ That is, it asserts message content integrity -- between signing and verifying
 </div>
 </div>
 <div class="sect2">
-<h3 id="_choosing_a_dkim_tag_for_the_assessment_identifier">Choosing a DKIM Tag for the Assessment Identifier</h3>
+<h3 id="_choosing_a_dkim_tag_for_the_assessment_identifier">2.2. Choosing a DKIM Tag for the Assessment Identifier</h3>
 <div class="paragraph">
 <p>DKIM has three values that specify identification information and it is easy
 to confuse their use, although only one defines the formal input and output of
@@ -464,14 +473,14 @@ represent any semantics, known only to the signer.</p>
 </div>
 <div class="paragraph">
 <p>Hence, "i=" serves well as a token that is usable like a Web cookie, for
-return to the signing Administrative Management Domain (ADMD) -- such as for
+return to the signing Administrative Management Domain (ADMD) &#8212; such as for
 auditing and debugging.
 Of course in some scenarios the "i=" string might provide a useful adjunct
 value for additional (heuristic) processing by the Handling Filter.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_choosing_the_signing_domain_name">Choosing the Signing Domain Name</h3>
+<h3 id="_choosing_the_signing_domain_name">2.3. Choosing the Signing Domain Name</h3>
 <div class="paragraph">
 <p>For an entity creating DKIM signatures, it is likely that different portions
 of its mail will warrant different levels of trust.</p>
@@ -496,7 +505,7 @@ over time, so the scheme needs to be flexible.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_recipient_based_assessments">Recipient-Based Assessments</h3>
+<h3 id="_recipient_based_assessments">2.4. Recipient-Based Assessments</h3>
 <div class="paragraph">
 <p>With DKIM, the Assessor can know that two messages with the same SDID are, in
 fact, signed by the same person or organization.
@@ -511,11 +520,11 @@ for the identifier(s).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filtering">Filtering</h3>
+<h3 id="_filtering">2.5. Filtering</h3>
 <div class="paragraph">
-<div class="doctitle">Trust versus Risk Handling Tradeoffs Example</div>
+<div class="title">Trust versus Risk Handling Tradeoffs Example</div>
 <p>|===
-.2^.^| Stream Risk 3^| Organizational Trust
+.2+<sup>.</sup>| Stream Risk 3+^| Organizational Trust
 ^| Low ^| Medium ^| High</p>
 </div>
 <div class="paragraph">
@@ -628,10 +637,10 @@ resolve the matter.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dkim_key_generation_storage_and_management">DKIM Key Generation, Storage, and Management</h2>
+<h2 id="_dkim_key_generation_storage_and_management">3. DKIM Key Generation, Storage, and Management</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_private_key_management_deployment_and_ongoing_operations">Private Key Management: Deployment and Ongoing Operations</h3>
+<h3 id="_private_key_management_deployment_and_ongoing_operations">3.1. Private Key Management: Deployment and Ongoing Operations</h3>
 <div class="paragraph">
 <p>Best practices on key managements,</p>
 </div>
@@ -696,7 +705,7 @@ to use a different key to enable accountability and auditing.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_storing_public_keys_dns_server_software_considerations">Storing Public Keys: DNS Server Software Considerations</h3>
+<h3 id="_storing_public_keys_dns_server_software_considerations">3.2. Storing Public Keys: DNS Server Software Considerations</h3>
 <div class="paragraph">
 <p>Ideally, DNS Security (DNSSEC) [RFC4034] needs to be employed in a
 configuration that provides protection against record insertion attacks and
@@ -704,14 +713,14 @@ zone enumeration.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_assignment_of_selectors">Assignment of Selectors</h3>
+<h3 id="_assignment_of_selectors">3.3. Assignment of Selectors</h3>
 <div class="paragraph">
 <p>It is intended that assessments of DKIM identities be based on the domain
 name, and not include the selector.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_per_user_signing_key_management_issues">Per-User Signing Key Management Issues</h3>
+<h3 id="_per_user_signing_key_management_issues">3.4. Per-User Signing Key Management Issues</h3>
 <div class="paragraph">
 <p>If per-user signing keys are assigned for internal purposes, the following
 issues need to be considered before using such signatures as an alternative to
@@ -737,7 +746,7 @@ administrator running an edge MTA.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_third_party_signer_key_management_and_selector_administration">Third-Party Signer Key Management and Selector Administration</h3>
+<h3 id="_third_party_signer_key_management_and_selector_administration">3.5. Third-Party Signer Key Management and Selector Administration</h3>
 <div class="paragraph">
 <p>Best practices when signer is handled by other provider,</p>
 </div>
@@ -757,7 +766,7 @@ component to the third-party signer.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_key_pair_selector_life_cycle_management">Key Pair / Selector Life Cycle Management</h3>
+<h3 id="_key_pair_selector_life_cycle_management">3.6. Key Pair / Selector Life Cycle Management</h3>
 <div class="paragraph">
 <p>Example of key deployment process,</p>
 </div>
@@ -854,7 +863,7 @@ key.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_signing">Signing</h2>
+<h2 id="_signing">4. Signing</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Signing a message require two services,</p>
@@ -871,7 +880,7 @@ key.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_dns_record">DNS Record</h3>
+<h3 id="_dns_record">4.1. DNS Record</h3>
 <div class="paragraph">
 <p>Initial DKIM DNS information is contained within TXT RRs.</p>
 </div>
@@ -885,7 +894,7 @@ contain a DKIM-related RR that provides the public key information</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_signing_module">Signing Module</h3>
+<h3 id="_signing_module">4.2. Signing Module</h3>
 <div class="paragraph">
 <p>The module doing signing can be placed anywhere within an organization&#8217;s
 trusted Administrative Management Domain (ADMD); obvious choices include
@@ -900,7 +909,7 @@ into software.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_signing_policies_and_practices">Signing Policies and Practices</h3>
+<h3 id="_signing_policies_and_practices">4.3. Signing Policies and Practices</h3>
 <div class="paragraph">
 <p>Every organization (ADMD) will have its own policies and practices for
 deciding when to sign messages (message stream) and with what domain name,
@@ -910,10 +919,10 @@ selector, and key.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_verifying">Verifying</h2>
+<h2 id="_verifying">5. Verifying</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_intended_scope_of_use">Intended Scope of Use</h3>
+<h3 id="_intended_scope_of_use">5.1. Intended Scope of Use</h3>
 <div class="paragraph">
 <p>DKIM requires that a message with a signature that is found to be invalid is
 to be treated as if the message had not been signed at all.</p>
@@ -929,14 +938,14 @@ signature blocks to gain the preferential treatment.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_signature_scope">Signature Scope</h3>
+<h3 id="_signature_scope">5.2. Signature Scope</h3>
 <div class="paragraph">
 <p>Verifiers need to consider only the part of the message that is inside the
 scope of the message as being authenticated by the signature.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_design_scope_of_use">Design Scope of Use</h3>
+<h3 id="_design_scope_of_use">5.3. Design Scope of Use</h3>
 <div class="paragraph">
 <p>Valid DKIM signature does not represent proof positive that a valid claim of
 responsibility was made for it by the indicated party, that the message is
@@ -964,7 +973,7 @@ for the zone from which the key record was retrieved.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_inbound_mail_filtering">Inbound Mail Filtering</h3>
+<h3 id="_inbound_mail_filtering">5.4. Inbound Mail Filtering</h3>
 <div class="paragraph">
 <p>Messages that carry a valid DKIM signature from a trusted source can be
 whitelisted, avoiding the need to perform computation and hence
@@ -978,7 +987,7 @@ header data entirely.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_messages_sent_through_mailing_lists_and_other_intermediaries">Messages Sent through Mailing Lists and Other Intermediaries</h3>
+<h3 id="_messages_sent_through_mailing_lists_and_other_intermediaries">5.5. Messages Sent through Mailing Lists and Other Intermediaries</h3>
 <div class="paragraph">
 <p>The intermediary that change the message content are strongly encouraged to
 deploy DKIM signing so that a verifiable claim of responsibility remains
@@ -986,7 +995,7 @@ available to parties attempting to verify the modified message.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_generation_transmission_and_use_of_results_headers">Generation, Transmission, and Use of Results Headers</h3>
+<h3 id="_generation_transmission_and_use_of_results_headers">5.6. Generation, Transmission, and Use of Results Headers</h3>
 <div class="paragraph">
 <p>Consider the cases where:</p>
 </div>
@@ -1013,10 +1022,10 @@ prevent insertion of a message that carries a bogus results header.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_taxonomy_of_signatures">Taxonomy of Signatures</h2>
+<h2 id="_taxonomy_of_signatures">6. Taxonomy of Signatures</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_single_domain_signature">Single Domain Signature</h3>
+<h3 id="_single_domain_signature">6.1. Single Domain Signature</h3>
 <div class="paragraph">
 <p>The simplest case is when an organization use their own domain in the SDID of
 the signatures.
@@ -1025,7 +1034,7 @@ name.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_parent_domain_signature">Parent Domain Signature</h3>
+<h3 id="_parent_domain_signature">6.2. Parent Domain Signature</h3>
 <div class="paragraph">
 <p>An organization with multiple active subdomains may apply the same (single)
 signature domain to mail from all subdomains.</p>
@@ -1039,7 +1048,7 @@ For example, marketing email would be signed with
 </div>
 </div>
 <div class="sect2">
-<h3 id="_third_party_signature">Third Party Signature</h3>
+<h3 id="_third_party_signature">6.3. Third Party Signature</h3>
 <div class="paragraph">
 <p>A signature whose domain does not match the domain of the RFC5322.From address
 is sometimes referred to as a third-party signature.</p>
@@ -1067,7 +1076,7 @@ vouched for by that third party.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_using_trusted_third_party_ttp_senders">Using Trusted Third Party (TTP) Senders</h3>
+<h3 id="_using_trusted_third_party_ttp_senders">6.4. Using Trusted Third Party (TTP) Senders</h3>
 <div class="paragraph">
 <p>A different model arises when an organization uses a trusted third-party
 sender for certain key business functions, but still wants that email to
@@ -1080,7 +1089,7 @@ public key in the controlling organization&#8217;s DNS domain, thus enabling the
 third party to sign mail using the signature of the controlling organization.</p>
 </div>
 <div class="sect3">
-<h4 id="_dns_delegation">DNS Delegation</h4>
+<h4 id="_dns_delegation">6.4.1. DNS Delegation</h4>
 <div class="paragraph">
 <p>In this case, Company A would create a subdomain benefits.companya.example,
 and delegate the DNS management of that subdomain to the benefits company
@@ -1091,7 +1100,7 @@ delegation record.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_multiple_signatures">Multiple Signatures</h3>
+<h3 id="_multiple_signatures">6.5. Multiple Signatures</h3>
 <div class="paragraph">
 <p>One important caveat to the use of multiple signatures is that there is
 currently no clear consensus among receivers on how they plan to handle them.
@@ -1161,13 +1170,13 @@ author or originator signature.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_example_usage_scenarios">Example Usage Scenarios</h2>
+<h2 id="_example_usage_scenarios">7. Example Usage Scenarios</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section provides some examples of usage scenarios for DKIM deployments.</p>
 </div>
 <div class="sect2">
-<h3 id="_author_s_organization_simple">Author&#8217;s Organization - Simple</h3>
+<h3 id="_author_8217_s_organization_simple">7.1. Author&#8217;s Organization - Simple</h3>
 <div class="paragraph">
 <p>In this scenario, Company A need only generate a single signing key and
 publish it under their top-level domain (companya.example); the signing module
@@ -1175,16 +1184,16 @@ would then tailor the AUID value as needed at signing time.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_author_s_organization_differentiated_types_of_mail">Author&#8217;s Organization - Differentiated Types of Mail</h3>
+<h3 id="_author_8217_s_organization_differentiated_types_of_mail">7.2. Author&#8217;s Organization - Differentiated Types of Mail</h3>
 <div class="paragraph">
 <p>An organization may distinguish email from several department, where each
 department may have their own subdomain with its unique signing keys.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_author_domain_signing_practices_adsp">Author Domain Signing Practices (ADSP)</h3>
+<h3 id="_author_domain_signing_practices_adsp">7.3. Author Domain Signing Practices (ADSP)</h3>
 <div class="sect3">
-<h4 id="_introduction_2">Introduction</h4>
+<h4 id="_introduction_1">7.3.1. Introduction</h4>
 <div class="paragraph">
 <p>A domain might decide to sign all of their outgoing mail.
 In such a configuration, the absence of a signature would be more significant
@@ -1199,7 +1208,7 @@ risk of phishing attacks against the likelihood of undelivered mail.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_a_few_definitions">A Few Definitions</h4>
+<h4 id="_a_few_definitions">7.3.2. A Few Definitions</h4>
 <div class="paragraph">
 <p>An address in the RFC5322.From header field of a message is defined as an
 "Author Address", and an "Author Domain" is defined as anything to the right
@@ -1217,7 +1226,7 @@ failures.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_some_adsp_examples">Some ADSP Examples</h4>
+<h4 id="_some_adsp_examples">7.3.3. Some ADSP Examples</h4>
 <div class="paragraph">
 <p>An organization (Company A) can specify its signing practices by
 publishing an ADSP record with "dkim=all" or "dkim=discardable".
@@ -1243,7 +1252,7 @@ stronger than "unknown".</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_delegated_signing">Delegated Signing</h3>
+<h3 id="_delegated_signing">7.4. Delegated Signing</h3>
 <div class="paragraph">
 <p>A company might outsource its department&#8217;s mail service to other provider.
 For example, Company A with marketing department, marketing.company-a.example,
@@ -1256,7 +1265,7 @@ In other words, the provider X would generate keys.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_independent_third_party_service_providers">Independent Third-Party Service Providers</h3>
+<h3 id="_independent_third_party_service_providers">7.5. Independent Third-Party Service Providers</h3>
 <div class="paragraph">
 <p>An Email Service Provider (ESP A) might want to share its own mailing
 reputation with its clients, and might sign all outgoing mail from its clients
@@ -1281,7 +1290,7 @@ client, e.g., a signature on behalf of client A would have
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mail_streams_based_on_behavioral_assessment">Mail Streams Based on Behavioral Assessment</h3>
+<h3 id="_mail_streams_based_on_behavioral_assessment">7.6. Mail Streams Based on Behavioral Assessment</h3>
 <div class="paragraph">
 <p>An ISP (ISP A) might want to assign signatures to outbound mail from its users
 according to each user&#8217;s past sending behavior (reputation).
@@ -1296,7 +1305,7 @@ and use these subdomains in the "d=" value of the signature.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_agent_or_mediator_signatures">Agent or Mediator Signatures</h3>
+<h3 id="_agent_or_mediator_signatures">7.7. Agent or Mediator Signatures</h3>
 <div class="paragraph">
 <p>Some examples of agents might be a mailing list manager, or the "forward
 article to a friend" service that many online publications offer.
@@ -1310,10 +1319,10 @@ signature.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_usage_considerations">Usage Considerations</h2>
+<h2 id="_usage_considerations">8. Usage Considerations</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_a_non_standard_submission_and_delivery_scenarios">A Non-Standard Submission and Delivery Scenarios</h3>
+<h3 id="_a_non_standard_submission_and_delivery_scenarios">8.1. A Non-Standard Submission and Delivery Scenarios</h3>
 <div class="paragraph">
 <p>The robustness of DKIM&#8217;s verification mechanism is based on the fact
 that only authorized signing modules have access to the designated
@@ -1338,7 +1347,7 @@ The email will have signature from "isp-1.example" instead.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_protection_of_internal_mail">Protection of Internal Mail</h3>
+<h3 id="_protection_of_internal_mail">8.2. Protection of Internal Mail</h3>
 <div class="paragraph">
 <p>If the organization signs all of its mail, then its boundary MTAs can look for
 mail purporting to be from the organization that does not contain a verifiable
@@ -1353,7 +1362,7 @@ Signing Practices.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_signature_granularity">Signature Granularity</h3>
+<h3 id="_signature_granularity">8.3. Signature Granularity</h3>
 <div class="paragraph">
 <p>It is possible to administer subdomains or otherwise adjust signatures in a
 way that supports per-user identification.
@@ -1390,7 +1399,7 @@ keys.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_email_infrastructure_agents">Email Infrastructure Agents</h3>
+<h3 id="_email_infrastructure_agents">8.4. Email Infrastructure Agents</h3>
 <div class="paragraph">
 <p><strong>Outbound</strong></p>
 </div>
@@ -1455,7 +1464,7 @@ Authentication-Results header field).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mail_user_agent">Mail User Agent</h3>
+<h3 id="_mail_user_agent">8.5. Mail User Agent</h3>
 <div class="paragraph">
 <p><strong>Outbound</strong></p>
 </div>
@@ -1489,7 +1498,7 @@ However, it can be used as input into a reputation system.</p>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>

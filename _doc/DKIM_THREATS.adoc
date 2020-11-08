@@ -189,8 +189,9 @@ For these reasons, DKIM is not effective against reflection attacks.
 The following is a summary of postulated attacks against DKIM signatures:
 
 [cols=".<8,.^1,.^1"]
+----
 |===
-| Attack Name | Impact | Likelihood
+| Attack Name                                            | Impact | Likelihood
 
 | Theft of private key for domain                        | High   | Low
 | Theft of delegated private key                         | Medium | Medium
@@ -211,7 +212,7 @@ The following is a summary of postulated attacks against DKIM signatures:
 | Verification probe attack                              | Medium | Medium
 | Key publication by higher-level domain                 | High   | Low
 |===
-
+----
 
 === Attacks against Message Signing Practices
 
@@ -219,6 +220,7 @@ The following is a summary of postulated attacks against signing
 practices:
 
 [cols=".<8,.^1,.^1"]
+----
 |===
 | Attack Name                                          | Impact | Likelihood
 
@@ -229,16 +231,19 @@ practices:
 | Abuse of third-party signatures                      | Medium | High
 | Falsification of Sender Signing Practices replies    | Medium | Medium
 |===
+----
 
 
 === Other Attacks
 
 [cols=".<8,.^1,.^1"]
+----
 |===
 | Attack Name                          | Impact | Likelihood
 
 | Packet amplification attacks via DNS |   N/A  |   Medium
 |===
+----
 
 == Derived Requirements
 

@@ -228,118 +228,127 @@ dd {
 			<div class="container">
 				<h1>Simple Mail Transfer Protocol (SMTP)</h1>
 				<div class="meta">
-					Shulhan
+					Shulhan<br />
+						2020-11-08 18:25:32 &#43;0700
 				</div>
-				<div id="toc" class="toc">
+				
+<div id="header">
+<h1>Simple Mail Transfer Protocol (SMTP)</h1>
+<div class="details">
+</div>
+<div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_syntax">Syntax</a>
+<li><a href="#_syntax">1. Syntax</a>
 <ul class="sectlevel2">
-<li><a href="#_format_of_request">Format of Request</a>
+<li><a href="#_format_of_request">1.1. Format of Request</a>
 <ul class="sectlevel3">
-<li><a href="#_format_of_parameters">Format of Parameters</a></li>
+<li><a href="#_format_of_parameters">1.1.1. Format of Parameters</a></li>
 </ul>
 </li>
-<li><a href="#_format_of_response">Format of Response</a></li>
-<li><a href="#_format_of_path">Format of Path</a></li>
-<li><a href="#_format_of_domain">Format of Domain</a></li>
-<li><a href="#_format_of_mailbox">Format of Mailbox</a></li>
+<li><a href="#_format_of_response">1.2. Format of Response</a></li>
+<li><a href="#_format_of_path">1.3. Format of Path</a></li>
+<li><a href="#_format_of_domain">1.4. Format of Domain</a></li>
+<li><a href="#_format_of_mailbox">1.5. Format of Mailbox</a></li>
 </ul>
 </li>
-<li><a href="#_session_initiation">Session Initiation</a>
+<li><a href="#_session_initiation">2. Session Initiation</a>
 <ul class="sectlevel2">
-<li><a href="#_request">Request</a></li>
-<li><a href="#_success_response">Success Response</a></li>
-<li><a href="#_error_response">Error Response</a></li>
+<li><a href="#_request">2.1. Request</a></li>
+<li><a href="#_success_response">2.2. Success Response</a></li>
+<li><a href="#_error_response">2.3. Error Response</a></li>
 </ul>
 </li>
-<li><a href="#_mail_transaction">Mail Transaction</a>
+<li><a href="#_mail_transaction">3. Mail Transaction</a>
 <ul class="sectlevel2">
-<li><a href="#_helo_ehlo">HELO/EHLO</a>
+<li><a href="#_helo_ehlo">3.1. HELO/EHLO</a>
 <ul class="sectlevel3">
-<li><a href="#_request_2">Request</a></li>
-<li><a href="#_success_response_2">Success response</a></li>
-<li><a href="#_error_responses">Error responses</a></li>
+<li><a href="#_request_1">3.1.1. Request</a></li>
+<li><a href="#_success_response_1">3.1.2. Success response</a></li>
+<li><a href="#_error_responses">3.1.3. Error responses</a></li>
 </ul>
 </li>
-<li><a href="#_mail">MAIL</a>
+<li><a href="#_mail">3.2. MAIL</a>
 <ul class="sectlevel3">
-<li><a href="#_request_3">Request</a></li>
-<li><a href="#_success_response_3">Success response</a></li>
-<li><a href="#_error_response_2">Error response</a></li>
+<li><a href="#_request_2">3.2.1. Request</a></li>
+<li><a href="#_success_response_2">3.2.2. Success response</a></li>
+<li><a href="#_error_response_1">3.2.3. Error response</a></li>
 </ul>
 </li>
-<li><a href="#_rcpt">RCPT</a>
+<li><a href="#_rcpt">3.3. RCPT</a>
 <ul class="sectlevel3">
-<li><a href="#_request_4">Request</a></li>
-<li><a href="#_success_response_4">Success Response</a></li>
-<li><a href="#_error_response_3">Error Response</a></li>
+<li><a href="#_request_3">3.3.1. Request</a></li>
+<li><a href="#_success_response_3">3.3.2. Success Response</a></li>
+<li><a href="#_error_response_2">3.3.3. Error Response</a></li>
 </ul>
 </li>
-<li><a href="#_data">DATA</a>
+<li><a href="#_data">3.4. DATA</a>
 <ul class="sectlevel3">
-<li><a href="#_request_5">Request</a></li>
-<li><a href="#_success_response_5">Success Response</a></li>
-<li><a href="#_error_responses_2">Error Responses</a></li>
+<li><a href="#_request_4">3.4.1. Request</a></li>
+<li><a href="#_success_response_4">3.4.2. Success Response</a></li>
+<li><a href="#_error_responses_1">3.4.3. Error Responses</a></li>
 </ul>
 </li>
-<li><a href="#_message_data">Message Data</a>
+<li><a href="#_message_data">3.5. Message Data</a>
 <ul class="sectlevel3">
-<li><a href="#_request_6">Request</a></li>
-<li><a href="#_success_response_6">Success Response</a></li>
-<li><a href="#_error_responses_3">Error Responses</a></li>
+<li><a href="#_request_5">3.5.1. Request</a></li>
+<li><a href="#_success_response_5">3.5.2. Success Response</a></li>
+<li><a href="#_error_responses_2">3.5.3. Error Responses</a></li>
 </ul>
 </li>
-<li><a href="#_rset">RSET</a>
+<li><a href="#_rset">3.6. RSET</a>
 <ul class="sectlevel3">
-<li><a href="#_request_7">Request</a></li>
-<li><a href="#_success_response_7">Success Response</a></li>
-<li><a href="#_error_responses_4">Error responses,</a></li>
+<li><a href="#_request_6">3.6.1. Request</a></li>
+<li><a href="#_success_response_6">3.6.2. Success Response</a></li>
+<li><a href="#_error_responses_3">3.6.3. Error responses,</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_others_commands">Others Commands</a>
+<li><a href="#_others_commands">4. Others Commands</a>
 <ul class="sectlevel2">
-<li><a href="#_vrfy">VRFY</a>
+<li><a href="#_vrfy">4.1. VRFY</a>
 <ul class="sectlevel3">
-<li><a href="#_request_8">Request</a></li>
-<li><a href="#_success_response_8">Success Response</a></li>
-<li><a href="#_error_responses_5">Error Responses</a></li>
+<li><a href="#_request_7">4.1.1. Request</a></li>
+<li><a href="#_success_response_7">4.1.2. Success Response</a></li>
+<li><a href="#_error_responses_4">4.1.3. Error Responses</a></li>
 </ul>
 </li>
-<li><a href="#_expn">EXPN</a>
+<li><a href="#_expn">4.2. EXPN</a>
 <ul class="sectlevel3">
-<li><a href="#_request_9">Request</a></li>
-<li><a href="#_success_response_9">Success Response</a></li>
-<li><a href="#_error_responses_6">Error Responses</a></li>
+<li><a href="#_request_8">4.2.1. Request</a></li>
+<li><a href="#_success_response_8">4.2.2. Success Response</a></li>
+<li><a href="#_error_responses_5">4.2.3. Error Responses</a></li>
 </ul>
 </li>
-<li><a href="#_help">HELP</a>
+<li><a href="#_help">4.3. HELP</a>
 <ul class="sectlevel3">
-<li><a href="#_request_10">Request</a></li>
-<li><a href="#_success_responses">Success Responses</a></li>
-<li><a href="#_error_responses_7">Error Responses</a></li>
+<li><a href="#_request_9">4.3.1. Request</a></li>
+<li><a href="#_success_responses">4.3.2. Success Responses</a></li>
+<li><a href="#_error_responses_6">4.3.3. Error Responses</a></li>
 </ul>
 </li>
-<li><a href="#_noop">NOOP</a>
+<li><a href="#_noop">4.4. NOOP</a>
 <ul class="sectlevel3">
-<li><a href="#_request_11">Request</a></li>
-<li><a href="#_success_response_10">Success Response</a></li>
+<li><a href="#_request_10">4.4.1. Request</a></li>
+<li><a href="#_success_response_9">4.4.2. Success Response</a></li>
 </ul>
 </li>
-<li><a href="#_quit">QUIT</a>
+<li><a href="#_quit">4.5. QUIT</a>
 <ul class="sectlevel3">
-<li><a href="#_request_12">Request</a></li>
-<li><a href="#_success_response_11">Success Response</a></li>
+<li><a href="#_request_11">4.5.1. Request</a></li>
+<li><a href="#_success_response_10">4.5.2. Success Response</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_extensions">Extensions</a></li>
-<li><a href="#_glossary">Glossary</a></li>
+<li><a href="#_extensions">5. Extensions</a></li>
+<li><a href="#_glossary">6. Glossary</a></li>
 </ul>
+
 </div>
+</div>
+<div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
@@ -349,10 +358,10 @@ as defined in <a href="https://tools.ietf.org/html/rfc5321">RFC 5321</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_syntax">Syntax</h2>
+<h2 id="_syntax">1. Syntax</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_format_of_request">Format of Request</h3>
+<h3 id="_format_of_request">1.1. Format of Request</h3>
 <div class="literalblock">
 <div class="content">
 <pre>Command [ SP argument [ SP parameters ]] CRLF</pre>
@@ -366,7 +375,7 @@ as defined in <a href="https://tools.ietf.org/html/rfc5321">RFC 5321</a>.</p>
 convention.</p>
 </div>
 <div class="sect3">
-<h4 id="_format_of_parameters">Format of Parameters</h4>
+<h4 id="_format_of_parameters">1.1.1. Format of Parameters</h4>
 <div class="paragraph">
 <p>The parameters is only available for MAIL and RCPT commands.</p>
 </div>
@@ -394,7 +403,7 @@ Argument       = Atom</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_format_of_response">Format of Response</h3>
+<h3 id="_format_of_response">1.2. Format of Response</h3>
 <div class="paragraph">
 <p>Every request MUST generate one reply (section 4.2).</p>
 </div>
@@ -402,22 +411,26 @@ Argument       = Atom</pre>
 <p>There are two mode of response: single line and multi line.</p>
 </div>
 <div class="paragraph">
-<p>Format for single line response,
-&#8230;&#8203;.
-Reply-code SP text CRLF
-&#8230;&#8203;.</p>
+<p>Format for single line response,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Reply-code SP text CRLF</pre>
+</div>
 </div>
 <div class="paragraph">
-<p>Format for multi line response,
-&#8230;&#8203;.
-  Reply-code "-" text CRLF
+<p>Format for multi line response,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>  Reply-code "-" text CRLF
 *(Reply-code "-" text CRLF)
-  Reply-code SP text CRLF
-&#8230;&#8203;.</p>
+  Reply-code SP text CRLF</pre>
+</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_format_of_path">Format of Path</h3>
+<h3 id="_format_of_path">1.3. Format of Path</h3>
 <div class="paragraph">
 <p>There are two type of path: Reverse-path and Forward-path.
 Reverse-path is used as an argument on MAIL command, while Forward-path is
@@ -425,9 +438,9 @@ used as an argument on RCPT command.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>Reverse-path   = Path / "<>"
+<pre>Reverse-path   = Path / "&lt;&gt;"
 Forward-path   = Path
-Path           = "<" [ A-d-l ":" ] Mailbox ">"
+Path           = "&lt;" [ A-d-l ":" ] Mailbox "&gt;"
 
 A-d-l          = At-domain *( "," At-domain )
                ; Note that this form, the so-called "source
@@ -445,7 +458,7 @@ specification only to provide context.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_format_of_domain">Format of Domain</h3>
+<h3 id="_format_of_domain">1.4. Format of Domain</h3>
 <div class="literalblock">
 <div class="content">
 <pre>Domain         = sub-domain *("." sub-domain)
@@ -459,7 +472,7 @@ Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_format_of_mailbox">Format of Mailbox</h3>
+<h3 id="_format_of_mailbox">1.5. Format of Mailbox</h3>
 <div class="literalblock">
 <div class="content">
 <pre>Mailbox        = Local-part "@" ( Domain / address-literal )
@@ -494,9 +507,11 @@ String         = Atom / Quoted-string</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Additional format defined in RFC 5322, section 3.2.3,
-&#8230;&#8203;.
-   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
+<p>Additional format defined in RFC 5322, section 3.2.3,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>   atext           =   ALPHA / DIGIT /    ; Printable US-ASCII
                        "!" / "#" /        ;  characters not including
                        "$" / "%" /        ;  specials.  Used for atoms.
                        "&amp;" / "'" /
@@ -506,58 +521,34 @@ String         = Atom / Quoted-string</pre>
                        "^" / "_" /
                        "`" / "{" /
                        "|" / "}" /
-                       "~"</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>atom            =   [CFWS] 1*atext [CFWS]</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>dot-atom-text   =   1*atext *("." 1*atext)</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>dot-atom        =   [CFWS] dot-atom-text [CFWS]</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>specials        =   "(" / ")" /        ; Special characters that do
-                    "<" / ">" /        ;  not appear in atext
-                    "[" / "]" /
-                    ":" / ";" /
-                    "@" / "\" /
-                    "," / "." /
-                    DQUOTE</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>qtext           =   %d33 /             ; Printable US-ASCII
-                    %d35-91 /          ;  characters not including
-                    %d93-126 /         ;  "\" or the quote character
-                    obs-qtext</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>qcontent        =   qtext / quoted-pair</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>quoted-string   =   [CFWS]
-                    DQUOTE *([FWS] qcontent) [FWS] DQUOTE
-                    [CFWS]</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>   quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp
-....</pre>
+                       "~"
+
+   atom            =   [CFWS] 1*atext [CFWS]
+
+   dot-atom-text   =   1*atext *("." 1*atext)
+
+   dot-atom        =   [CFWS] dot-atom-text [CFWS]
+
+   specials        =   "(" / ")" /        ; Special characters that do
+                       "&lt;" / "&gt;" /        ;  not appear in atext
+                       "[" / "]" /
+                       ":" / ";" /
+                       "@" / "\" /
+                       "," / "." /
+                       DQUOTE
+
+   qtext           =   %d33 /             ; Printable US-ASCII
+                       %d35-91 /          ;  characters not including
+                       %d93-126 /         ;  "\" or the quote character
+                       obs-qtext
+
+   qcontent        =   qtext / quoted-pair
+
+   quoted-string   =   [CFWS]
+                       DQUOTE *([FWS] qcontent) [FWS] DQUOTE
+                       [CFWS]
+
+   quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -577,7 +568,7 @@ These characters MUST NOT be used in MAIL or RCPT commands or other commands
 that require mailbox names.</p>
 </div>
 <div class="paragraph">
-<p>Note that the backslash, "\", is a quote character, which is used to indicate
+<p>Note that the backslash, "", is a quote character, which is used to indicate
 that the next character is to be used literally (instead of its normal
 interpretation).</p>
 </div>
@@ -596,16 +587,16 @@ by appropriate SMTP extensions).</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_session_initiation">Session Initiation</h2>
+<h2 id="_session_initiation">2. Session Initiation</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_request">Request</h3>
+<h3 id="_request">2.1. Request</h3>
 <div class="paragraph">
 <p>Client open a TCP connection to SMTP server on port 25 or 587 (with STARTTLS).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_success_response">Success Response</h3>
+<h3 id="_success_response">2.2. Success Response</h3>
 <div class="paragraph">
 <p>On success, server reply with 220,</p>
 </div>
@@ -616,7 +607,7 @@ by appropriate SMTP extensions).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_error_response">Error Response</h3>
+<h3 id="_error_response">2.3. Error Response</h3>
 <div class="paragraph">
 <p>On failure, server will reply with 554,</p>
 </div>
@@ -640,7 +631,7 @@ intervening commands with "503 bad sequence of commands".</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mail_transaction">Mail Transaction</h2>
+<h2 id="_mail_transaction">3. Mail Transaction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Mail transaction constructed by four commands, in sequence order, with message
@@ -666,7 +657,7 @@ data and the end of transaction,</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_helo_ehlo">HELO/EHLO</h3>
+<h3 id="_helo_ehlo">3.1. HELO/EHLO</h3>
 <div class="paragraph">
 <p>Server MUST support HELO.</p>
 </div>
@@ -678,7 +669,7 @@ recognized", client SHOULD fall-back to HELO.</p>
 <p>Client MUST issue EHLO/HELO before starting a mail transaction.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_2">Request</h4>
+<h4 id="_request_1">3.1.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"HELO" SP Domain CRLF
@@ -691,7 +682,7 @@ recognized", client SHOULD fall-back to HELO.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_2">Success response</h4>
+<h4 id="_success_response_1">3.1.2. Success response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>( "250" SP Domain [ SP ehlo-greet ] CRLF )
@@ -702,7 +693,7 @@ recognized", client SHOULD fall-back to HELO.</p>
 ehlo-greet     = string of any characters other than CR or LF
 ehlo-line      = ehlo-keyword *( SP ehlo-param )
 ehlo-keyword   = (ALPHA / DIGIT) *(ALPHA / DIGIT / "-")
-ehlo-param     = any CHAR excluding <SP> and all control characters
+ehlo-param     = any CHAR excluding &lt;SP&gt; and all control characters
                  (US-ASCII 0-31 and 127 inclusive)</pre>
 </div>
 </div>
@@ -717,7 +708,7 @@ ehlo-param     = any CHAR excluding <SP> and all control characters
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses">Error responses</h4>
+<h4 id="_error_responses">3.1.3. Error responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -734,9 +725,9 @@ ehlo-param     = any CHAR excluding <SP> and all control characters
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mail">MAIL</h3>
+<h3 id="_mail">3.2. MAIL</h3>
 <div class="sect3">
-<h4 id="_request_3">Request</h4>
+<h4 id="_request_2">3.2.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"MAIL FROM:" Reverse-path [SP Mail-parameters] CRLF</pre>
@@ -754,7 +745,7 @@ extension.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_3">Success response</h4>
+<h4 id="_success_response_2">3.2.2. Success response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>250 [ SP text ] CRLF</pre>
@@ -762,7 +753,7 @@ extension.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response_2">Error response</h4>
+<h4 id="_error_response_1">3.2.3. Error response</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -796,13 +787,13 @@ mailbox syntax incorrect)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_rcpt">RCPT</h3>
+<h3 id="_rcpt">3.3. RCPT</h3>
 <div class="sect3">
-<h4 id="_request_4">Request</h4>
+<h4 id="_request_3">3.3.1. Request</h4>
 <div class="literalblock">
 <div class="content">
-<pre>"RCPT TO:" ( "<Postmaster@" Domain ">"
-	/ "<Postmaster>"
+<pre>"RCPT TO:" ( "&lt;Postmaster@" Domain "&gt;"
+	/ "&lt;Postmaster&gt;"
 	/ Forward-path ) [SP Rcpt-parameters] CRLF</pre>
 </div>
 </div>
@@ -824,7 +815,7 @@ service extension offered by the server in its EHLO response.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_4">Success Response</h4>
+<h4 id="_success_response_3">3.3.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>250 [ SP text ] CRLF</pre>
@@ -832,7 +823,7 @@ service extension offered by the server in its EHLO response.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_response_3">Error Response</h4>
+<h4 id="_error_response_2">3.3.3. Error Response</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -853,7 +844,7 @@ mailbox busy or temporarily blocked for policy reasons)</p>
 </li>
 <li>
 <p>550  Requested action not taken: mailbox unavailable (e.g., mailbox
-  not found, no access, or command rejected for policy reasons)</p>
+not found, no access, or command rejected for policy reasons)</p>
 </li>
 <li>
 <p>551  User not local; please try &lt;forward-path&gt; (See Section 3.4)</p>
@@ -873,9 +864,9 @@ mailbox syntax incorrect)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_data">DATA</h3>
+<h3 id="_data">3.4. DATA</h3>
 <div class="sect3">
-<h4 id="_request_5">Request</h4>
+<h4 id="_request_4">3.4.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"DATA" CRLF</pre>
@@ -883,7 +874,7 @@ mailbox syntax incorrect)</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_5">Success Response</h4>
+<h4 id="_success_response_4">3.4.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"354" [ SP String ] CRLF</pre>
@@ -891,7 +882,7 @@ mailbox syntax incorrect)</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses_2">Error Responses</h4>
+<h4 id="_error_responses_1">3.4.3. Error Responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -906,12 +897,12 @@ response, "No SMTP service here")</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_message_data">Message Data</h3>
+<h3 id="_message_data">3.5. Message Data</h3>
 <div class="paragraph">
 <p>Message data MUST NOT be send unless 354 reply code is received.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_6">Request</h4>
+<h4 id="_request_5">3.5.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>(*text)
@@ -922,7 +913,7 @@ CRLF</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_6">Success Response</h4>
+<h4 id="_success_response_5">3.5.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>250 [ SP text ] CRLF</pre>
@@ -930,7 +921,7 @@ CRLF</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses_3">Error Responses</h4>
+<h4 id="_error_responses_2">3.5.3. Error Responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -959,7 +950,7 @@ response, "No SMTP service here")</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_rset">RSET</h3>
+<h3 id="_rset">3.6. RSET</h3>
 <div class="paragraph">
 <p>This command clear the current buffer on MAIL, RCPT, and DATA, but not the
 EHLO/HELO buffer.</p>
@@ -969,7 +960,7 @@ EHLO/HELO buffer.</p>
 RSET.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_7">Request</h4>
+<h4 id="_request_6">3.6.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"RSET" CRLF</pre>
@@ -977,7 +968,7 @@ RSET.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_7">Success Response</h4>
+<h4 id="_success_response_6">3.6.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"250 OK" CRLF</pre>
@@ -985,7 +976,7 @@ RSET.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses_4">Error responses,</h4>
+<h4 id="_error_responses_3">3.6.3. Error responses,</h4>
 <div class="paragraph">
 <p>Not available.</p>
 </div>
@@ -994,18 +985,18 @@ RSET.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_others_commands">Others Commands</h2>
+<h2 id="_others_commands">4. Others Commands</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following commands does not affect mail transaction.</p>
 </div>
 <div class="sect2">
-<h3 id="_vrfy">VRFY</h3>
+<h3 id="_vrfy">4.1. VRFY</h3>
 <div class="paragraph">
 <p>This command is used to verify the existency of user in remote server.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_8">Request</h4>
+<h4 id="_request_7">4.1.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"VRFY" SP String CRLF</pre>
@@ -1016,10 +1007,10 @@ RSET.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_8">Success Response</h4>
+<h4 id="_success_response_7">4.1.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
-<pre>250 User name <local-part@domain>
+<pre>250 User name &lt;local-part@domain&gt;
 / 250 local-part@domain</pre>
 </div>
 </div>
@@ -1031,13 +1022,13 @@ list of ambigous name,</p>
 <div class="content">
 <pre>  "553" SP "User ambiguous" CRLF
 /    "553-" Description CRLF
-  1*("553-" [ user-name ] "<" local-part@domain ">"
-     "553 " [ user-name ] "<"  local-part@domain ">"</pre>
+  1*("553-" [ user-name ] "&lt;" local-part@domain "&gt;"
+     "553 " [ user-name ] "&lt;"  local-part@domain "&gt;"</pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses_5">Error Responses</h4>
+<h4 id="_error_responses_4">4.1.3. Error Responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1058,12 +1049,12 @@ not found, no access, or command rejected for policy reasons)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_expn">EXPN</h3>
+<h3 id="_expn">4.2. EXPN</h3>
 <div class="paragraph">
 <p>Command to identify mailing-list, if success, it will return list of members.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_9">Request</h4>
+<h4 id="_request_8">4.2.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"EXPN" SP String CRLF</pre>
@@ -1071,17 +1062,17 @@ not found, no access, or command rejected for policy reasons)</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_9">Success Response</h4>
+<h4 id="_success_response_8">4.2.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>   "250-" mailing-list name
-1*("250-" [ member-name ] "<" member-address ">"
-   "250 " [ member-name ] "<" member-address ">"</pre>
+1*("250-" [ member-name ] "&lt;" member-address "&gt;"
+   "250 " [ member-name ] "&lt;" member-address "&gt;"</pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses_6">Error Responses</h4>
+<h4 id="_error_responses_5">4.2.3. Error Responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1102,7 +1093,7 @@ as command line too long)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_help">HELP</h3>
+<h3 id="_help">4.3. HELP</h3>
 <div class="paragraph">
 <p>Command to query information about server command.a</p>
 </div>
@@ -1111,7 +1102,7 @@ as command line too long)</p>
 arguments.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_10">Request</h4>
+<h4 id="_request_9">4.3.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"HELP" [ SP String ] CRLF</pre>
@@ -1119,7 +1110,7 @@ arguments.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_responses">Success Responses</h4>
+<h4 id="_success_responses">4.3.2. Success Responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1134,7 +1125,7 @@ only to the human user)</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_error_responses_7">Error Responses</h4>
+<h4 id="_error_responses_6">4.3.3. Error Responses</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1148,9 +1139,9 @@ only to the human user)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_noop">NOOP</h3>
+<h3 id="_noop">4.4. NOOP</h3>
 <div class="sect3">
-<h4 id="_request_11">Request</h4>
+<h4 id="_request_10">4.4.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"NOOP" [ SP String ] CRLF</pre>
@@ -1161,7 +1152,7 @@ only to the human user)</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_10">Success Response</h4>
+<h4 id="_success_response_9">4.4.2. Success Response</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1172,7 +1163,7 @@ only to the human user)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_quit">QUIT</h3>
+<h3 id="_quit">4.5. QUIT</h3>
 <div class="paragraph">
 <p>Command to issue closing the session.</p>
 </div>
@@ -1188,7 +1179,7 @@ QUIT command, and it SHOULD wait until it receives the reply.</p>
 <p>Any current uncompleted mail transaction will be aborted.</p>
 </div>
 <div class="sect3">
-<h4 id="_request_12">Request</h4>
+<h4 id="_request_11">4.5.1. Request</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"QUIT" CRLF</pre>
@@ -1196,7 +1187,7 @@ QUIT command, and it SHOULD wait until it receives the reply.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_success_response_11">Success Response</h4>
+<h4 id="_success_response_10">4.5.2. Success Response</h4>
 <div class="literalblock">
 <div class="content">
 <pre>"221" [ SP String ] CRLF</pre>
@@ -1207,7 +1198,7 @@ QUIT command, and it SHOULD wait until it receives the reply.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_extensions">Extensions</h2>
+<h2 id="_extensions">5. Extensions</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -1215,8 +1206,8 @@ QUIT command, and it SHOULD wait until it receives the reply.</p>
 <p><a href="ESMTP_DSN.html">Delivery Status Notification (RFC3461-3464)</a></p>
 </li>
 <li>
-<p>link:ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over Transport
-Layer Security (RFC3207)]</p>
+<p><a href="ESMTP_TLS.html">SMTP Service Extension for Secure SMTP over Transport
+Layer Security (RFC3207)</a></p>
 </li>
 <li>
 <p><a href="ESMTP_AUTH.html">SMTP Service Extension for Authentication (RFC4954)</a></p>
@@ -1226,7 +1217,7 @@ Layer Security (RFC3207)]</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_glossary">Glossary</h2>
+<h2 id="_glossary">6. Glossary</h2>
 <div class="sectionbody">
 <div class="dlist">
 <dl>
@@ -1242,7 +1233,7 @@ Layer Security (RFC3207)]</p>
 </div>
 </div>
 </div>
-
+</div>
 			</div>
 			
 		</div>
