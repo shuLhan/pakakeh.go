@@ -3,14 +3,36 @@
 
 This library is released each month, usually at the first week of month.
 
-==  share v0.20.1 (2020-11-xx)
+==  share v0.20.1 (2020-11-08)
 
 ===  Bug fixes
 
 * websocket: set TLSConfig to nil if Endpoint scheme is not https or wss
-If user set TLSConfig but the Endpoint is not start with "https" or "wss",
-client open() method may return an error "Connect: tls: first record does
-not look like a TLS handshake".
+  If user set TLSConfig but the Endpoint is not start with "https" or "wss",
+  client open() method may return an error "Connect: tls: first record does
+  not look like a TLS handshake".
+
+* paseto: add 5 seconds time drift when validating JSONToken
+
+===  Enhancements
+
+* big: add method RoundToNearestAway and RoundToZero
+
+  RoundToNearestAway round r to n digit precision using nearest away mode,
+  where mantissa is accumulated by the last digit after precision.
+  For example, using 2 digit precision, 0.555 would become 0.56.
+
+  RoundToZero round r to n digit precision using to zero mode.
+  For example, using 2 digit precision, 0.555 would become 0.55.
+
+* parser: add Stop method
+
+  The Stop method return the remaining unparsed content and its last
+  position, and then call Close to reset the internal state back to zero.
+
+===  Chores
+
+* paseto: fix linter warnings
 
 
 ==  share v0.20.0 (2020-10-05)
@@ -21,7 +43,7 @@ not look like a TLS handshake".
    SEcurity TOkens
 
    This implementation only support PASETO Protocol v2.
-    
+
    This library focus on how to sign and verify data, everything else is
    handled and filled automatically.
 
