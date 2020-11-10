@@ -826,7 +826,7 @@ func TestRat_UnmarshalJSON(t *testing.T) {
 		in: []byte(`{}`),
 	}, {
 		in:       []byte(`{"V":}`),
-		expError: `invalid character '}' looking for beginning of value`,
+		expError: `json: invalid character '}' looking for beginning of value`,
 	}, {
 		in:  []byte(`{"V":0}`),
 		exp: NewRat(0),
