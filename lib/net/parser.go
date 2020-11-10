@@ -11,25 +11,24 @@ import (
 )
 
 //
-// ParseIPPort parse address into IP and port.
+// ParseIPPort parse address into hostname/address, IP and port.
 // If address is not an IP address, it will return the address as hostname
 // (without port number if its exist) and nil on ip.
 // In case of port is empty or invalid, it will set to defPort.
 //
-func ParseIPPort(address string, defPort uint16) (hostname string, ip net.IP, port uint16) {
-	var iport int
-
-	shost, sport, err := net.SplitHostPort(address)
+func ParseIPPort(address string, defPort uint16) (host string, ip net.IP, port uint16) {
+	var (
+		sport string
+		err   error
+	)
+	host, sport, err = net.SplitHostPort(address)
 	if err != nil {
-		shost = address
+		host = address
 	}
 
-	ip = net.ParseIP(shost)
-	if ip == nil {
-		hostname = shost
-	}
+	ip = net.ParseIP(host)
 	if len(sport) > 0 {
-		iport, err = strconv.Atoi(sport)
+		iport, err := strconv.Atoi(sport)
 		if err != nil {
 			iport = int(defPort)
 		} else if iport < 0 || iport > maxPort {
@@ -40,7 +39,7 @@ func ParseIPPort(address string, defPort uint16) (hostname string, ip net.IP, po
 		port = defPort
 	}
 
-	return hostname, ip, port
+	return host, ip, port
 }
 
 //
