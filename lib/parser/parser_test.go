@@ -34,6 +34,50 @@ func TestParser_AddDelimiters(t *testing.T) {
 	}
 }
 
+type expLine struct {
+	line string
+	c    rune
+}
+
+func TestParser_Line(t *testing.T) {
+	p := New("", "\n")
+
+	cases := []struct {
+		content string
+		exp     []expLine
+	}{{
+		content: ``,
+		exp:     []expLine{{}},
+	}, {
+		content: `a
+`,
+		exp: []expLine{
+			{"a", '\n'},
+			{"", 0},
+		},
+	}, {
+		content: `a
+
+b`,
+		exp: []expLine{
+			{"a", '\n'},
+			{"", '\n'},
+			{"b", 0},
+			{"", 0},
+		},
+	}}
+
+	for _, c := range cases {
+		p.Load(c.content, "\n")
+
+		for x := 0; x < len(c.exp); x++ {
+			gotLine, gotC := p.Line()
+			test.Assert(t, "", c.exp[x].line, gotLine, true)
+			test.Assert(t, "", c.exp[x].c, gotC, true)
+		}
+	}
+}
+
 func TestParser_Lines(t *testing.T) {
 	cases := []struct {
 		desc    string

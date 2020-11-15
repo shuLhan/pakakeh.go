@@ -175,6 +175,7 @@ func (p *Parser) Line() (string, rune) {
 		}
 		p.token = append(p.token, r)
 	}
+	p.x = len(p.v)
 	return string(p.token), 0
 }
 
