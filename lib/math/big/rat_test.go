@@ -297,23 +297,15 @@ func TestRat_IsEqual_unexported(t *testing.T) {
 	}
 
 	cases := []struct {
-		got      *A
-		expEqual bool
+		got *A
 	}{{
 		got: &A{
 			r: NewRat(10),
 		},
-		expEqual: true,
-	}, {
-		got: &A{
-			r: NewRat(11),
-		},
-		expEqual: false,
 	}}
 
 	for x, c := range cases {
-		test.Assert(t, fmt.Sprintf("unexported field %d", x),
-			exp, c.got, c.expEqual)
+		test.Assert(t, fmt.Sprintf("unexported field %d", x), exp, c.got, false)
 	}
 }
 

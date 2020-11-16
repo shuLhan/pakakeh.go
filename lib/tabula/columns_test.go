@@ -7,7 +7,7 @@ package tabula
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"github.com/shuLhan/share/lib/reflect"
 )
 
 func TestRandomPickColumns(t *testing.T) {
@@ -23,25 +23,10 @@ func TestRandomPickColumns(t *testing.T) {
 
 	dataset.TransposeToColumns()
 
-	// random pick with duplicate
-	ncols := 6
-	dup := true
-	excludeIdx := []int{3}
-
-	for i := 0; i < 5; i++ {
-		picked, unpicked, _, _ :=
-			dataset.Columns.RandomPick(ncols, dup, excludeIdx)
-
-		// check if unpicked item exist in picked items.
-		for _, un := range unpicked {
-			for _, pick := range picked {
-				test.Assert(t, "", un, pick, false)
-			}
-		}
-	}
-
 	// random pick without duplicate
-	dup = false
+	dup := false
+	ncols := 6
+	excludeIdx := []int{3}
 	for i := 0; i < 5; i++ {
 		picked, unpicked, _, _ :=
 			dataset.Columns.RandomPick(ncols, dup, excludeIdx)
@@ -49,7 +34,10 @@ func TestRandomPickColumns(t *testing.T) {
 		// check if unpicked item exist in picked items.
 		for _, un := range unpicked {
 			for _, pick := range picked {
-				test.Assert(t, "", un, pick, false)
+				err := reflect.DoEqual(un, pick)
+				if err == nil {
+					t.Fatalf("unpicked column exist in picked: %v", un)
+				}
 			}
 		}
 	}

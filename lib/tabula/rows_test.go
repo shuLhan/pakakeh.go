@@ -134,9 +134,6 @@ func TestRandomPick(t *testing.T) {
 		picked, unpicked, pickedIdx, unpickedIdx := rows.RandomPick(3,
 			false)
 
-		// check if picked rows is duplicate
-		test.Assert(t, "", picked[0], picked[1], false)
-
 		// check if unpicked item exist in picked items.
 		isin, _ := picked.Contains(unpicked)
 

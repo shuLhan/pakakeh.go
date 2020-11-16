@@ -174,8 +174,6 @@ func TestSwap(t *testing.T) {
 
 	Swap(in, 0, len(in)-1)
 
-	test.Assert(t, "", exp, in, false)
-
 	tmp := exp[0]
 	exp[0] = exp[len(exp)-1]
 	exp[len(exp)-1] = tmp
