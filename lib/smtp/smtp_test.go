@@ -73,7 +73,7 @@ func testRunServer() {
 		testFilePrivateKey,
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("testServer.LoadCertificate: " + err.Error())
 	}
 
 	go func() {
@@ -93,7 +93,7 @@ func TestMain(m *testing.M) {
 
 	testClient, err = NewClient("", testSMTPSAddress, true)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("NewClient: " + err.Error())
 	}
 
 	s := m.Run()

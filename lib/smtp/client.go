@@ -80,7 +80,8 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 	}
 
 	cl = &Client{
-		raddr: &net.TCPAddr{},
+		raddr:    &net.TCPAddr{},
+		insecure: insecure,
 	}
 
 	scheme = strings.ToLower(rurl.Scheme)
@@ -107,9 +108,6 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 			err = fmt.Errorf("smtp: NewClient: '%s' does not have MX record or IP address", cl.serverName)
 			return nil, err
 		}
-	}
-	if len(cl.serverName) == 0 {
-		cl.insecure = true
 	}
 
 	cl.data = make([]byte, 4096)
