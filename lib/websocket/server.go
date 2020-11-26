@@ -74,7 +74,7 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 		opts:    opts,
 		Clients: newClientManager(),
 		routes:  newRootRoute(),
-		running: make(chan struct{}),
+		running: make(chan struct{}, 1),
 	}
 
 	opts.init()
