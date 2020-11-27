@@ -6,15 +6,12 @@ package http
 
 import (
 	"bytes"
-	"encoding/json"
-	stderrors "errors"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 
 	"github.com/shuLhan/share/lib/debug"
-	"github.com/shuLhan/share/lib/errors"
 )
 
 //
@@ -41,6 +38,10 @@ type Endpoint struct {
 
 	// Call is the main process of route.
 	Call Callback
+
+	// ErrorHandler define the function that will handle the error
+	// returned from Call.
+	ErrorHandler CallbackErrorHandler
 }
 
 //
@@ -117,7 +118,7 @@ func (ep *Endpoint) call(
 	for _, eval := range evaluators {
 		e = eval(req, reqBody)
 		if e != nil {
-			ep.error(res, req, e)
+			ep.ErrorHandler(res, req, e)
 			return
 		}
 	}
@@ -125,14 +126,14 @@ func (ep *Endpoint) call(
 	if ep.Eval != nil {
 		e = ep.Eval(req, reqBody)
 		if e != nil {
-			ep.error(res, req, e)
+			ep.ErrorHandler(res, req, e)
 			return
 		}
 	}
 
 	rspb, e := ep.Call(res, req, reqBody)
 	if e != nil {
-		ep.error(res, req, e)
+		ep.ErrorHandler(res, req, e)
 		return
 	}
 
@@ -157,34 +158,5 @@ func (ep *Endpoint) call(
 			break
 		}
 		nwrite += n
-	}
-}
-
-func (ep *Endpoint) error(res http.ResponseWriter, req *http.Request, err error) {
-	errInternal := &errors.E{}
-	if stderrors.As(err, &errInternal) {
-		if errInternal.Code <= 0 || errInternal.Code >= 512 {
-			errInternal.Code = http.StatusInternalServerError
-		}
-	} else {
-		log.Printf("endpoint.call: %d %s %s %s\n",
-			http.StatusInternalServerError,
-			req.Method, req.URL.Path, err)
-
-		errInternal = errors.Internal(err)
-	}
-
-	res.Header().Set(HeaderContentType, ContentTypeJSON)
-	res.WriteHeader(errInternal.Code)
-
-	rsp, err := json.Marshal(errInternal)
-	if err != nil {
-		log.Println("endpoint.error: ", err)
-		return
-	}
-
-	_, err = res.Write(rsp)
-	if err != nil {
-		log.Println("endpoint.error: ", err)
 	}
 }

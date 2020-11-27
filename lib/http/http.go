@@ -124,6 +124,14 @@
 //
 //	map[name:[book Hitchiker]]
 //
+// Callback error handling
+//
+// Each Endpoint can have their own error handler. If its nil, it will default
+// to DefaultErrorHandler, which return the error as JSON with the following
+// format,
+//
+//	{"code":<HTTP_STATUS_CODE>,"message":<err.Error()>}
+//
 // Known Bugs and Limitations
 //
 // * The server does not handle CONNECT method

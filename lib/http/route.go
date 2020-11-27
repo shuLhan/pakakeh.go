@@ -28,6 +28,9 @@ func newRoute(ep *Endpoint) (rute *route, err error) {
 	rute = &route{
 		endpoint: ep,
 	}
+	if ep.ErrorHandler == nil {
+		ep.ErrorHandler = DefaultErrorHandler
+	}
 
 	paths := strings.Split(strings.ToLower(strings.Trim(ep.Path, "/")), "/")
 
