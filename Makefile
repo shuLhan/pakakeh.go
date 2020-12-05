@@ -46,10 +46,10 @@ lint:
 	-golangci-lint run ./...
 
 docs:
-	ciigo convert _doc/
+	go run ./internal/cmd/docs
 
 docs-serve:
-	DEBUG=1 ciigo serve _doc/
+	go run ./internal/cmd/docs-serve
 
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)

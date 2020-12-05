@@ -226,15 +226,12 @@ dd {
 
 		<div class="page">
 			<div class="container">
-				<h1>DomainKeys Identified Mail (DKIM) Development, Deployment, and Operations</h1>
-				<div class="meta">
-					Shulhan<br />
-						2020-11-08 18:25:32 &#43;0700
-				</div>
 				
 <div id="header">
 <h1>DomainKeys Identified Mail (DKIM) Development, Deployment, and Operations</h1>
 <div class="details">
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email"><a href="mailto:<ms@kilabit.info>"><ms@kilabit.info></a></span><br>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -521,31 +518,47 @@ for the identifier(s).</p>
 </div>
 <div class="sect2">
 <h3 id="_filtering">2.5. Filtering</h3>
-<div class="paragraph">
-<div class="title">Trust versus Risk Handling Tradeoffs Example</div>
-<p>|===
-.2+<sup>.</sup>| Stream Risk 3+^| Organizational Trust
-^| Low ^| Medium ^| High</p>
-</div>
-<div class="paragraph">
-<p>| Low
-| BENIGN: Moderate filter
-| DILIGENT: Mild filter
-| PRISTINE: Accept</p>
-</div>
-<div class="paragraph">
-<p>| Medium
-| UNKNOWN: Strong filter
-| TYPICAL: Targeted filter
-| PROTECTED: Accept and Contact</p>
-</div>
-<div class="paragraph">
-<p>| High
-| MALICIOUS: Block and Counter
-| NEGLIGENT: Block
-| COMPROMISED: Block and Contact
-|===</p>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Trust versus Risk Handling Tradeoffs Example</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stream Risk 3+^</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Organizational Trust</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low ^</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium ^</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Low</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BENIGN: Moderate filter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DILIGENT: Mild filter</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PRISTINE: Accept</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UNKNOWN: Strong filter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TYPICAL: Targeted filter</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROTECTED: Accept and Contact</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MALICIOUS: Block and Counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NEGLIGENT: Block</p></td>
+</tr>
+</tbody>
+</table>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Stream Risk</dt>
@@ -1499,6 +1512,11 @@ However, it can be used as input into a reputation system.</p>
 </div>
 </div>
 </div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2020-11-08 18:25:32 +0700
+</div>
+</div>
 			</div>
 			
 		</div>
@@ -1506,7 +1524,7 @@ However, it can be used as input into a reputation system.</p>
 
 		<div class="footer">
 			Powered by <a
-				href="https://github.com/shuLhan/ciigo"
+				href="https://git.sr.ht/shulhan/ciigo"
 			>
 				ciigo
 			</a>

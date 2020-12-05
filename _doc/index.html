@@ -260,6 +260,10 @@ pkg.go.dev.
 <div class="ulist">
 <ul>
 <li>
+<p><a href="CHANGELOG.html">CHANGELOG</a>
+</p>
+</li>
+<li>
 <p><a href="IMF.html">Internet Message Format (RFC 5322)</a>
 </p>
 <div class="ulist">
@@ -342,36 +346,21 @@ pkg.go.dev.
 <a href="https://github.com/shuLhan/ciigo"><code>ciigo</code></a>.</p>
 </div>
 <div class="paragraph">
-<p>First, install <code>ciigo</code> command line interface,</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ go install git.sr.ht/~shulhan/ciigo/cmd/ciigo</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>and then run</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ ciigo serve _doc/
-## or
-$ make docs-serve</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>to serve documentation on HTTP server at <a href="http://127.0.0.1:8080" class="bare">http://127.0.0.1:8080</a> and watch
+<p>To serve documentation on HTTP server at <a href="http://127.0.0.1:8080" class="bare">http://127.0.0.1:8080</a> and watch
 changes on documentation files (".adoc") and regenerate the HTML
-files.</p>
+files, run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ make docs-serve</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>To generate HTML files for all asciidoc files, run</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ ciigo convert _doc/
-## or
-$ make docs</pre>
+<pre>$ make docs</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -382,7 +371,7 @@ $ make docs</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-12-06 03:18:59 +0700
+Last updated 2020-12-06 03:41:53 +0700
 </div>
 </div>
 			</div>

@@ -226,15 +226,12 @@ dd {
 
 		<div class="page">
 			<div class="container">
-				<h1>Internet Message Format (IMF)</h1>
-				<div class="meta">
-					Shulhan<br />
-						2020-11-08 18:25:32 &#43;0700
-				</div>
 				
 <div id="header">
 <h1>Internet Message Format (IMF)</h1>
 <div class="details">
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email"><a href="mailto:<ms@kilabit.info>"><ms@kilabit.info></a></span><br>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -627,36 +624,156 @@ addr-spec.</p>
                     optional-field)</pre>
 </div>
 </div>
-<div class="paragraph">
-<p>[cols=".&lt;2,.^1,.&lt;1,.&lt;6",options="header"]
-|===
-| Field          | Min number      | Max number | Notes</p>
-</div>
-<div class="paragraph">
-<p>| trace          | 0  | unlimited  | Block prepended - see 3.6.7
-| resent-date    | 0* | unlimited* | One per block, required if other resent fields are present - see 3.6.6
-| resent-from    | 0  | unlimited* | One per block - see 3.6.6
-| resent-sender  | 0* | unlimited* | One per block, MUST occur with multi-address resent-from - see 3.6.6
-| resent-to      | 0  | unlimited* | One per block - see 3.6.6
-| resent-cc      | 0  | unlimited* | One per block - see 3.6.6
-| resent-bcc     | 0  | unlimited* | One per block - see 3.6.6
-| resent-msg-id  | 0  | unlimited* | One per block - see 3.6.6
-| orig-date      | 1  | 1          |
-| from           | 1  | 1          | See sender and 3.6.2
-| sender         | 0* | 1          | MUST occur withmulti-address from - see 3.6.2
-| reply-to       | 0  | 1          |
-| to             | 0  | 1          |
-| cc             | 0  | 1          |
-| bcc            | 0  | 1          |
-| message-id     | 0* | 1          | SHOULD be present - see 3.6.4
-| in-reply-to    | 0* | 1          | SHOULD occur in some replies - see 3.6.4
-| references     | 0* | 1          | SHOULD occur in some replies - see 3.6.4
-| subject        | 0  | 1          |
-| comments       | 0  | unlimited  |
-| keywords       | 0  | unlimited  |
-| optional-field | 0  | unlimited  |
-|===</p>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Min number</th>
+<th class="tableblock halign-left valign-top">Max number</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">trace</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Block prepended - see 3.6.7</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-date</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block, required if other resent fields are present - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-from</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-sender</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block, MUST occur with multi-address resent-from - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-to</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-cc</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-bcc</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resent-msg-id</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One per block - see 3.6.6</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">orig-date</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">from</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">See sender and 3.6.2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sender</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MUST occur withmulti-address from - see 3.6.2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">reply-to</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">to</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cc</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bcc</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">message-id</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SHOULD be present - see 3.6.4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">in-reply-to</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SHOULD occur in some replies - see 3.6.4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">references</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SHOULD occur in some replies - see 3.6.4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">subject</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">comments</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">keywords</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">optional-field</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">unlimited</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"></p></td>
+</tr>
+</tbody>
+</table>
 <div class="ulist">
 <ul>
 <li>
@@ -1059,6 +1176,11 @@ field name.</p>
 </div>
 </div>
 </div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2020-11-08 18:25:32 +0700
+</div>
+</div>
 			</div>
 			
 		</div>
@@ -1066,7 +1188,7 @@ field name.</p>
 
 		<div class="footer">
 			Powered by <a
-				href="https://github.com/shuLhan/ciigo"
+				href="https://git.sr.ht/shulhan/ciigo"
 			>
 				ciigo
 			</a>

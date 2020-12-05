@@ -10,6 +10,8 @@ their scope and limitation of Go doc formatting itself.
 NOTE: The links below is used to be viewed locally, not through Github or
 pkg.go.dev.
 
+* link:CHANGELOG.html[CHANGELOG]
+
 * link:IMF.html[Internet Message Format (RFC 5322)]
 ** link:MIME_I_FORMAT.html[MIME Part One: Format of Internet Message Bodies (RFC 2045)]
 ** link:MIME_II_MEDIA_TYPES.html[MIME Part Two: Media Types (RFC 2046)]
@@ -33,29 +35,17 @@ pkg.go.dev.
 The documentation is created and generated using
 https://github.com/shuLhan/ciigo[`ciigo`].
 
-First, install `ciigo` command line interface,
+To serve documentation on HTTP server at http://127.0.0.1:8080 and watch
+changes on documentation files (".adoc") and regenerate the HTML
+files, run
 
 ----
-$ go install git.sr.ht/~shulhan/ciigo/cmd/ciigo
-----
-
-and then run
-
-----
-$ ciigo serve _doc/
-## or
 $ make docs-serve
 ----
-
-to serve documentation on HTTP server at http://127.0.0.1:8080 and watch
-changes on documentation files (".adoc") and regenerate the HTML
-files.
 
 To generate HTML files for all asciidoc files, run
 
 ----
-$ ciigo convert _doc/
-## or
 $ make docs
 ----
 

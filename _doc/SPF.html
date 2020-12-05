@@ -226,16 +226,12 @@ dd {
 
 		<div class="page">
 			<div class="container">
-				<h1>Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1</h1>
-				<div class="meta">
-					Shulhan &lt;ms@kilabit.info&gt;<br />
-						2020-11-08 18:25:32 &#43;0700
-				</div>
 				
 <div id="header">
 <h1>Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1</h1>
 <div class="details">
-<span id="author" class="author">Shulhan <ms@kilabit.info></span><br>
+<span id="author" class="author">Shulhan</span><br>
+<span id="email" class="email"><a href="mailto:ms@kilabit.info">ms@kilabit.info</a></span><br>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -350,7 +346,7 @@ The content of this document are merged with errata that are reported before
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">1. Introduction</h2>
+<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This document defines a protocol by which ADministrative Management Domains
@@ -365,10 +361,10 @@ during a mail transaction.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_operational_overview">2. Operational Overview</h2>
+<h2 id="_operational_overview"><a class="anchor" href="#_operational_overview"></a>2. Operational Overview</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_publishing_authorization">2.1. Publishing Authorization</h3>
+<h3 id="_publishing_authorization"><a class="anchor" href="#_publishing_authorization"></a>2.1. Publishing Authorization</h3>
 <div class="paragraph">
 <p>An SPF-compliant domain publishes valid SPF records to authorize the use of
 the relevant domain names in the "HELO" and "MAIL FROM" identities by the MTAs
@@ -389,7 +385,7 @@ email can reasonably expect to have been checked.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_checking_authorization">2.2. Checking Authorization</h3>
+<h3 id="_checking_authorization"><a class="anchor" href="#_checking_authorization"></a>2.2. Checking Authorization</h3>
 <div class="paragraph">
 <p>A mail receiver can perform a set of SPF checks for each mail message it
 receives.
@@ -425,7 +421,7 @@ These archaic features have been maliciously used to bypass security systems.</p
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_helo_identity">2.3. The "HELO" Identity</h3>
+<h3 id="_the_helo_identity"><a class="anchor" href="#_the_helo_identity"></a>2.3. The "HELO" Identity</h3>
 <div class="paragraph">
 <p>It is RECOMMENDED that SPF verifiers not only check the "MAIL FROM" identity
 but also separately check the "HELO" identity by applying the check_host()
@@ -445,7 +441,7 @@ multi-label domain name.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_mail_from_identity">2.4. The "MAIL FROM" Identity</h3>
+<h3 id="_the_mail_from_identity"><a class="anchor" href="#_the_mail_from_identity"></a>2.4. The "MAIL FROM" Identity</h3>
 <div class="paragraph">
 <p>SPF verifiers MUST check the "MAIL FROM" identity if a "HELO" check either has
 not been performed or has not reached a definitive policy result by applying
@@ -458,7 +454,7 @@ be the mailbox composed of the local-part "postmaster" and the "HELO" identity
 </div>
 </div>
 <div class="sect2">
-<h3 id="_location_of_checks">2.5. Location of Checks</h3>
+<h3 id="_location_of_checks"><a class="anchor" href="#_location_of_checks"></a>2.5. Location of Checks</h3>
 <div class="paragraph">
 <p>The authorization check is performed during the SMTP transaction at the time
 of the MAIL command, and uses the MAIL FROM value and the client IP address.
@@ -479,7 +475,7 @@ policy has since changed.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_results_of_evaluation">2.6. Results of Evaluation</h3>
+<h3 id="_results_of_evaluation"><a class="anchor" href="#_results_of_evaluation"></a>2.6. Results of Evaluation</h3>
 <div class="paragraph">
 <p>Moved to &lt;&lt;#_results,section 4.2&gt;&gt;.</p>
 </div>
@@ -487,7 +483,7 @@ policy has since changed.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_spf_records">3. SPF Records</h2>
+<h2 id="_spf_records"><a class="anchor" href="#_spf_records"></a>3. SPF Records</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The SPF record is expressed as a single string of text found in the RDATA of a
@@ -495,7 +491,7 @@ single DNS TXT resource record; multiple SPF records are not permitted for the
 same owner name.</p>
 </div>
 <div class="sect2">
-<h3 id="_dns_resource_record">3.1. DNS Resource Record</h3>
+<h3 id="_dns_resource_record"><a class="anchor" href="#_dns_resource_record"></a>3.1. DNS Resource Record</h3>
 <div class="paragraph">
 <p>SPF records MUST be published as a DNS TXT (type 16) Resource Record (RR)
 only.
@@ -503,14 +499,14 @@ The character content of the record is encoded as [US-ASCII].</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_multiple_dns_records">3.2. Multiple DNS Records</h3>
+<h3 id="_multiple_dns_records"><a class="anchor" href="#_multiple_dns_records"></a>3.2. Multiple DNS Records</h3>
 <div class="paragraph">
 <p>A domain name MUST NOT have multiple records that would cause an authorization
 check to select more than one record.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_multiple_strings_in_a_single_dns_record">3.3. Multiple Strings in a Single DNS Record</h3>
+<h3 id="_multiple_strings_in_a_single_dns_record"><a class="anchor" href="#_multiple_strings_in_a_single_dns_record"></a>3.3. Multiple Strings in a Single DNS Record</h3>
 <div class="paragraph">
 <p>If a published record contains multiple character-strings, then the record
 MUST be treated as if those strings are concatenated together without adding
@@ -532,7 +528,7 @@ For example:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_record_size">3.4. Record Size</h3>
+<h3 id="_record_size"><a class="anchor" href="#_record_size"></a>3.4. Record Size</h3>
 <div class="paragraph">
 <p>If the size of the DNS message, the combined length of the DNS name and the
 text of all the records of a given type is under 450 octets, then DNS answers
@@ -550,7 +546,7 @@ evaluated to fit in a single 512-octet UDP packet.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_wildcard_records">3.5. Wildcard Records</h3>
+<h3 id="_wildcard_records"><a class="anchor" href="#_wildcard_records"></a>3.5. Wildcard Records</h3>
 <div class="paragraph">
 <p>Use of wildcard records for publishing is discouraged, and care has to be
 taken if they are used.</p>
@@ -564,7 +560,7 @@ in order to cover all domains in use in outgoing mail.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_check_host_function">4. The check_host() Function</h2>
+<h2 id="_the_check_host_function"><a class="anchor" href="#_the_check_host_function"></a>4. The check_host() Function</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <code>check_host()</code> function fetches SPF records, parses them, and
@@ -574,7 +570,7 @@ Receiving ADMDs that perform this check MUST correctly evaluate the
 <code>check_host()</code> function as described here.</p>
 </div>
 <div class="sect2">
-<h3 id="_arguments">4.1. Arguments</h3>
+<h3 id="_arguments"><a class="anchor" href="#_arguments"></a>4.1. Arguments</h3>
 <div class="paragraph">
 <p>The <code>check_host()</code> function takes these arguments:</p>
 </div>
@@ -596,7 +592,7 @@ identity.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_results">4.2. Results</h3>
+<h3 id="_results"><a class="anchor" href="#_results"></a>4.2. Results</h3>
 <div class="paragraph">
 <p>This section enumerates and briefly defines the possible outputs of
 <code>check_host()</code> function.</p>
@@ -612,7 +608,7 @@ identity.</p>
 that could be used as the one to be authorized, or</p>
 </li>
 <li>
-<p>no SPF records were retrieved from the DNS. </p>
+<p>no SPF records were retrieved from the DNS.</p>
 </li>
 </ul>
 </div>
@@ -650,7 +646,7 @@ intervention to be resolved.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_initial_processing">4.3. Initial Processing</h3>
+<h3 id="_initial_processing"><a class="anchor" href="#_initial_processing"></a>4.3. Initial Processing</h3>
 <div class="paragraph">
 <p>If the &lt;domain&gt; is malformed (e.g., label longer than 63 characters,
 zero-length label not at the end, etc.) or is not a multi-label domain name,
@@ -663,7 +659,7 @@ local-part.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_record_lookup">4.4. Record Lookup</h3>
+<h3 id="_record_lookup"><a class="anchor" href="#_record_lookup"></a>4.4. Record Lookup</h3>
 <div class="paragraph">
 <p>A DNS query needs to be made for the &lt;domain&gt; name, querying for type TXT
 only.</p>
@@ -675,7 +671,7 @@ terminates immediately with the result "temperror".</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_selecting_records">4.5. Selecting Records</h3>
+<h3 id="_selecting_records"><a class="anchor" href="#_selecting_records"></a>4.5. Selecting Records</h3>
 <div class="paragraph">
 <p>Records begin with a version section:</p>
 </div>
@@ -693,7 +689,7 @@ produces the "permerror" result.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_record_evaluation">4.6. Record Evaluation</h3>
+<h3 id="_record_evaluation"><a class="anchor" href="#_record_evaluation"></a>4.6. Record Evaluation</h3>
 <div class="paragraph">
 <p>The <code>check_host()</code> function parses and interprets the SPF record to find a
 result for the current test.
@@ -702,7 +698,7 @@ immediately with the result "permerror", without further interpretation or
 evaluation.</p>
 </div>
 <div class="sect3">
-<h4 id="_term_evaluation">4.6.1. Term Evaluation</h4>
+<h4 id="_term_evaluation"><a class="anchor" href="#_term_evaluation"></a>4.6.1. Term Evaluation</h4>
 <div class="paragraph">
 <p>There are two types of terms: mechanisms and modifiers.</p>
 </div>
@@ -736,7 +732,7 @@ and before any ":" or "/" characters that might be part of the macro-string.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_mechanisms">4.6.2. Mechanisms</h4>
+<h4 id="_mechanisms"><a class="anchor" href="#_mechanisms"></a>4.6.2. Mechanisms</h4>
 <div class="paragraph">
 <p>Each mechanism is considered in turn from left to right.
 If there are no more mechanisms, the result is the default result.</p>
@@ -773,7 +769,7 @@ returned.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_modifiers">4.6.3. Modifiers</h4>
+<h4 id="_modifiers"><a class="anchor" href="#_modifiers"></a>4.6.3. Modifiers</h4>
 <div class="paragraph">
 <p>Modifiers are not mechanisms.
 They do not return match or not-match.
@@ -784,7 +780,7 @@ evaluated.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_dns_lookup_limits">4.6.4. DNS Lookup Limits</h4>
+<h4 id="_dns_lookup_limits"><a class="anchor" href="#_dns_lookup_limits"></a>4.6.4. DNS Lookup Limits</h4>
 <div class="paragraph">
 <p>The following terms cause DNS queries: the "include", "a", "mx", "ptr", and
 "exists" mechanisms, and the "redirect" modifier.</p>
@@ -838,7 +834,7 @@ Exceeding the limit produces a "permerror" result.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_default_result">4.7. Default Result</h3>
+<h3 id="_default_result"><a class="anchor" href="#_default_result"></a>4.7. Default Result</h3>
 <div class="paragraph">
 <p>If none of the mechanisms match and there is no "redirect" modifier, then the
 check_host() returns a result of "neutral", just as if "?all" were specified
@@ -868,7 +864,7 @@ For example:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_domain_specification">4.8. Domain Specification</h3>
+<h3 id="_domain_specification"><a class="anchor" href="#_domain_specification"></a>4.8. Domain Specification</h3>
 <div class="paragraph">
 <p>The &lt;domain-spec&gt; string is subject to macro expansion (see Section 7).
 The resulting string is the common presentation form of a fully qualified DNS
@@ -895,7 +891,7 @@ ignore such names, while others return a "permerror" exception.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mechanism_definitions">5. Mechanism Definitions</h2>
+<h2 id="_mechanism_definitions"><a class="anchor" href="#_mechanism_definitions"></a>5. Mechanism Definitions</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section defines two types of mechanisms: basic language framework
@@ -958,7 +954,7 @@ continues as if the server returned no error (RCODE 0) and zero answer
 records.</p>
 </div>
 <div class="sect2">
-<h3 id="_all">5.1. "all"</h3>
+<h3 id="_all"><a class="anchor" href="#_all"></a>5.1. "all"</h3>
 <div class="listingblock">
 <div class="content">
 <pre>all = "all"</pre>
@@ -984,7 +980,7 @@ the record, regardless of the relative ordering of the terms.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_include">5.2. "include"</h3>
+<h3 id="_include"><a class="anchor" href="#_include"></a>5.2. "include"</h3>
 <div class="listingblock">
 <div class="content">
 <pre>include = "include"  ":" domain-spec</pre>
@@ -1080,7 +1076,7 @@ number of domains from a single record.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_a">5.3. "a"</h3>
+<h3 id="_a"><a class="anchor" href="#_a"></a>5.3. "a"</h3>
 <div class="listingblock">
 <div class="content">
 <pre>a = "a" [ ":" domain-spec ] [ dual-cidr-length ]</pre>
@@ -1098,7 +1094,7 @@ If any address matches, the mechanism matches.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mx">5.4. "mx"</h3>
+<h3 id="_mx"><a class="anchor" href="#_mx"></a>5.4. "mx"</h3>
 <div class="paragraph">
 <p>This mechanism matches if &lt;ip&gt; is one of the MX hosts for a domain
 name.</p>
@@ -1143,7 +1139,7 @@ record for the same name.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mechanism_ptr">5.5. "ptr" (do not use)</h3>
+<h3 id="_mechanism_ptr"><a class="anchor" href="#_mechanism_ptr"></a>5.5. "ptr" (do not use)</h3>
 <div class="paragraph">
 <p>This mechanism tests whether the DNS reverse-mapping for &lt;ip&gt; exists and
 correctly points to a domain name within a particular domain.
@@ -1234,7 +1230,7 @@ check_host() implementations MUST support it.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_ip4_and_ip6">5.6. "ip4" and "ip6"</h3>
+<h3 id="_ip4_and_ip6"><a class="anchor" href="#_ip4_and_ip6"></a>5.6. "ip4" and "ip6"</h3>
 <div class="paragraph">
 <p>These mechanisms test whether &lt;ip&gt; is contained within a given IP network.</p>
 </div>
@@ -1282,7 +1278,7 @@ That is, use 192.0.2.0/24 instead of 192.0.2.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_exist">5.7. "exist"</h3>
+<h3 id="_exist"><a class="anchor" href="#_exist"></a>5.7. "exist"</h3>
 <div class="paragraph">
 <p>This mechanism is used to construct an arbitrary domain name that is used for
 a DNS A record query.
@@ -1321,7 +1317,7 @@ IP address.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_modifier_definitions">6. Modifier Definitions</h2>
+<h2 id="_modifier_definitions"><a class="anchor" href="#_modifier_definitions"></a>6. Modifier Definitions</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Modifiers are name/value pairs that provide additional information.</p>
@@ -1352,7 +1348,7 @@ handle records with modifiers that are defined in other specifications.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_redirect_redirected_query">6.1. redirect: Redirected Query</h3>
+<h3 id="_redirect_redirected_query"><a class="anchor" href="#_redirect_redirected_query"></a>6.1. redirect: Redirected Query</h3>
 <div class="paragraph">
 <p>The "redirect" modifier is intended for consolidating both authorizations and
 policy into a common set to be shared within a single ADMD.</p>
@@ -1433,7 +1429,7 @@ An "include" directive will generally be more appropriate.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_exp_explanation">6.2. exp: Explanation</h3>
+<h3 id="_exp_explanation"><a class="anchor" href="#_exp_explanation"></a>6.2. exp: Explanation</h3>
 <div class="literalblock">
 <div class="content">
 <pre>explanation      = "exp" "=" domain-spec</pre>
@@ -1538,10 +1534,10 @@ instructions</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_macros">7. Macros</h2>
+<h2 id="_macros"><a class="anchor" href="#_macros"></a>7. Macros</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_formal_specification">7.1. Formal Specification</h3>
+<h3 id="_formal_specification"><a class="anchor" href="#_formal_specification"></a>7.1. Formal Specification</h3>
 <div class="literalblock">
 <div class="content">
 <pre>domain-spec      = macro-string domain-end
@@ -1589,7 +1585,7 @@ delimiter        = "." / "-" / "+" / "," / "/" / "_" / "="</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_macro_definitions">7.2. Macro Definitions</h3>
+<h3 id="_macro_definitions"><a class="anchor" href="#_macro_definitions"></a>7.2. Macro Definitions</h3>
 <div class="paragraph">
 <p>The following macro letters are expanded in term arguments:</p>
 </div>
@@ -1617,7 +1613,7 @@ t = current timestamp</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_macro_processing_details">7.3. Macro Processing Details</h3>
+<h3 id="_macro_processing_details"><a class="anchor" href="#_macro_processing_details"></a>7.3. Macro Processing Details</h3>
 <div class="paragraph">
 <p>A '%' character not followed by a '{', '%', '-', or '_' character is a syntax
 error.
@@ -1823,7 +1819,7 @@ Live (TTL) has not expired.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_expansion_examples">7.4. Expansion Examples</h3>
+<h3 id="_expansion_examples"><a class="anchor" href="#_expansion_examples"></a>7.4. Expansion Examples</h3>
 <div class="paragraph">
 <p>The &lt;sender&gt; is strong-bad@email.example.com.
 The IPv4 SMTP client IP is 192.0.2.3.
@@ -1878,10 +1874,12 @@ The PTR domain name of the client IP is mx.example.org.</p>
 <p><code>%{l1r-}</code>: strong</p>
 </li>
 <li>
-<p><code>%{ir}.%{v}._spf.%{d2}: `3.2.0.192.in-addr._spf.example.com</code></p>
+<p><code>%{ir}.%{v}._spf.%{d2}: `3.2.0.192.in-addr._spf.example.com</code>
+</p>
 </li>
 <li>
-<p><code>%{lr-}.lp._spf.%{d2}</code>: <code>bad.strong.lp._spf.example.com</code></p>
+<p><code>%{lr-}.lp._spf.%{d2}</code>: <code>bad.strong.lp._spf.example.com</code>
+</p>
 </li>
 <li>
 <p><code>%{lr-}.lp.%{ir}.%{v}._spf.%{d2}</code>: bad.strong.lp.3.2.0.192.in-addr._spf.example.com</p>
@@ -1893,7 +1891,8 @@ The PTR domain name of the client IP is mx.example.org.</p>
 <p><code>%{d2}.trusted-domains.example.net</code>: example.com.trusted-domains.example.net</p>
 </li>
 <li>
-<p><code>%{ir}.%{v}._spf.%{d2}</code>: <code>1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6._spf.example.com</code></p>
+<p><code>%{ir}.%{v}._spf.%{d2}</code>: <code>1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6._spf.example.com</code>
+</p>
 </li>
 </ul>
 </div>
@@ -1901,7 +1900,7 @@ The PTR domain name of the client IP is mx.example.org.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_result_handling">8. Result Handling</h2>
+<h2 id="_result_handling"><a class="anchor" href="#_result_handling"></a>8. Result Handling</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There are essentially two classes of handling choices:</p>
@@ -1918,7 +1917,7 @@ The PTR domain name of the client IP is mx.example.org.</p>
  discussed in more detail in Section 9.</p>
 </div>
 <div class="sect2">
-<h3 id="_none">8.1. None</h3>
+<h3 id="_none"><a class="anchor" href="#_none"></a>8.1. None</h3>
 <div class="paragraph">
 <p>The SPF verifier has no information at all about the authorization or
 lack thereof of the client to use the checked identity or identities.
@@ -1927,7 +1926,7 @@ reach any conclusion.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_neutral">8.2. Neutral</h3>
+<h3 id="_neutral"><a class="anchor" href="#_neutral"></a>8.2. Neutral</h3>
 <div class="paragraph">
 <p>A policy for the identity was discovered, there is no definite
 assertion (positive or negative) about the client.</p>
@@ -1940,7 +1939,7 @@ from testing the use of SPF records (see Section 10.1).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_pass">8.3. Pass</h3>
+<h3 id="_pass"><a class="anchor" href="#_pass"></a>8.3. Pass</h3>
 <div class="paragraph">
 <p>The client is authorized to inject mail with the given identity.
 The domain can now, in the sense of reputation, be considered
@@ -1951,7 +1950,7 @@ This is further discussed in Appendix G.1.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fail">8.4. Fail</h3>
+<h3 id="_fail"><a class="anchor" href="#_fail"></a>8.4. Fail</h3>
 <div class="paragraph">
 <p>The client is not authorized to use the domain in the given identity.
 Disposition of SPF fail messages is a matter of local policy.
@@ -1995,7 +1994,7 @@ authorized by the ADMD.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_softfail">8.5. Softfail</h3>
+<h3 id="_softfail"><a class="anchor" href="#_softfail"></a>8.5. Softfail</h3>
 <div class="paragraph">
 <p>A "softfail" result ought to be treated as somewhere between "fail"
 and "neutral"/"none".
@@ -2022,7 +2021,7 @@ policy.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_temperror">8.6. Temperror</h3>
+<h3 id="_temperror"><a class="anchor" href="#_temperror"></a>8.6. Temperror</h3>
 <div class="paragraph">
 <p>The SPF verifier encountered a transient (generally DNS) error while
 performing the check.</p>
@@ -2047,7 +2046,7 @@ See Appendix G.4 for considerations on developing local policy.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_permerror">8.7. Permerror</h3>
+<h3 id="_permerror"><a class="anchor" href="#_permerror"></a>8.7. Permerror</h3>
 <div class="paragraph">
 <p>The domain&#8217;s published records could not be correctly interpreted.</p>
 </div>
@@ -2082,7 +2081,7 @@ see Section 4.8.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_recording_the_result">9. Recording the Result</h2>
+<h2 id="_recording_the_result"><a class="anchor" href="#_recording_the_result"></a>9. Recording the Result</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>It is RECOMMENDED that SMTP receivers record the result of SPF
@@ -2139,7 +2138,7 @@ are conveying the same details, or unexpected results can occur.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_the_received_spf_header_field">9.1. The Received-SPF Header Field</h3>
+<h3 id="_the_received_spf_header_field"><a class="anchor" href="#_the_received_spf_header_field"></a>9.1. The Received-SPF Header Field</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2281,7 +2280,7 @@ Received-SPF: pass (mybox.example.org: domain of
 </div>
 </div>
 <div class="sect2">
-<h3 id="_spf_results_in_the_authentication_results_header_field">9.2. SPF Results in the Authentication-Results Header Field</h3>
+<h3 id="_spf_results_in_the_authentication_results_header_field"><a class="anchor" href="#_spf_results_in_the_authentication_results_header_field"></a>9.2. SPF Results in the Authentication-Results Header Field</h3>
 <div class="paragraph">
 <p>The Authentication-Results header field is designed to communicate
 lists of tests a border MTA did and their results.
@@ -2319,14 +2318,14 @@ look like (for a "MAIL FROM" check in this example):</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_effects_on_infrastructure">10. Effects on Infrastructure</h2>
+<h2 id="_effects_on_infrastructure"><a class="anchor" href="#_effects_on_infrastructure"></a>10. Effects on Infrastructure</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section provides operational advice and instruction only.
 It is non-normative.</p>
 </div>
 <div class="sect2">
-<h3 id="_sending_domains">10.1. Sending Domains</h3>
+<h3 id="_sending_domains"><a class="anchor" href="#_sending_domains"></a>10.1. Sending Domains</h3>
 <div class="paragraph">
 <p>Originating ADMDs that wish to be compliant with this specification
 will need to determine the list of relays ([RFC5598], Section 2.2.2)
@@ -2337,7 +2336,7 @@ technical exercise, but involves policy decisions with both technical
 and administrative considerations.</p>
 </div>
 <div class="sect3">
-<h4 id="_dns_resource_considerations">10.1.1. DNS Resource Considerations</h4>
+<h4 id="_dns_resource_considerations"><a class="anchor" href="#_dns_resource_considerations"></a>10.1.1. DNS Resource Considerations</h4>
 <div class="paragraph">
 <p>For example, consider a domain set up as follows:</p>
 </div>
@@ -2391,7 +2390,7 @@ IN A    192.0.2.129</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_administrator_8217_s_considerations">10.1.2. Administrator&#8217;s Considerations</h4>
+<h4 id="_administrator_8217_s_considerations"><a class="anchor" href="#_administrator_8217_s_considerations"></a>10.1.2. Administrator&#8217;s Considerations</h4>
 <div class="paragraph">
 <p>There might be administrative considerations: using "a" over "ip4" or
 "ip6" allows hosts to be renumbered easily at the cost of a DNS query
@@ -2437,7 +2436,7 @@ architecture is essential to effective deployment.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_bounces">10.1.3. Bounces</h4>
+<h4 id="_bounces"><a class="anchor" href="#_bounces"></a>10.1.3. Bounces</h4>
 <div class="paragraph">
 <p>In this case, the only entity available for performing an SPF check is
 the "HELO" identity defined in Section 1.1.4.
@@ -2452,7 +2451,7 @@ deployment.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_receivers">10.2. Receivers</h3>
+<h3 id="_receivers"><a class="anchor" href="#_receivers"></a>10.2. Receivers</h3>
 <div class="paragraph">
 <p>There is no comprehensive normative requirement for specific handling
 of a message based on SPF results.
@@ -2471,7 +2470,7 @@ establishing local handling policy.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mediator">10.3. Mediator</h3>
+<h3 id="_mediator"><a class="anchor" href="#_mediator"></a>10.3. Mediator</h3>
 <div class="paragraph">
 <p>A mediator takes 'delivery&#8217; of a message and posts a 'submission&#8217; of a
 new message.
@@ -2501,10 +2500,10 @@ used.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_security_considerations">11. Security Considerations</h2>
+<h2 id="_security_considerations"><a class="anchor" href="#_security_considerations"></a>11. Security Considerations</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_processing_limits">11.1. Processing Limits</h3>
+<h3 id="_processing_limits"><a class="anchor" href="#_processing_limits"></a>11.1. Processing Limits</h3>
 <div class="paragraph">
 <p>The processing limits outlined in Section 4.6.4 are designed to
 prevent attacks such as the following:</p>
@@ -2582,7 +2581,7 @@ Therefore, the processing limits need to be quite low.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_spf_authorized_email_may_contain_other_false_identities">11.2. SPF-Authorized Email May Contain Other False Identities</h3>
+<h3 id="_spf_authorized_email_may_contain_other_false_identities"><a class="anchor" href="#_spf_authorized_email_may_contain_other_false_identities"></a>11.2. SPF-Authorized Email May Contain Other False Identities</h3>
 <div class="paragraph">
 <p>The "MAIL FROM" and "HELO" identity authorizations do not provide
 assurance about the authorization/authenticity of other identities
@@ -2598,7 +2597,7 @@ false sense of security.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_spoofed_dns_and_ip_data">11.3. Spoofed DNS and IP Data</h3>
+<h3 id="_spoofed_dns_and_ip_data"><a class="anchor" href="#_spoofed_dns_and_ip_data"></a>11.3. Spoofed DNS and IP Data</h3>
 <div class="paragraph">
 <p>There are two aspects of this protocol that malicious parties could
 exploit to undermine the validity of the check_host() function:</p>
@@ -2624,7 +2623,7 @@ being true is nil.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_cross_user_forgery">11.4. Cross-User Forgery</h3>
+<h3 id="_cross_user_forgery"><a class="anchor" href="#_cross_user_forgery"></a>11.4. Cross-User Forgery</h3>
 <div class="paragraph">
 <p>By definition, SPF policies just map domain names to sets of
 authorized MTAs, not whole email addresses to sets of authorized
@@ -2645,7 +2644,7 @@ cryptography, such as Pretty Good Privacy (PGP) ([RFC4880]) or S/MIME
 </div>
 </div>
 <div class="sect2">
-<h3 id="_untrusted_information_sources">11.5. Untrusted Information Sources</h3>
+<h3 id="_untrusted_information_sources"><a class="anchor" href="#_untrusted_information_sources"></a>11.5. Untrusted Information Sources</h3>
 <div class="paragraph">
 <p>An SPF-compliant receiver gathers information from the SMTP commands
 it receives and from the published DNS records of the sending domain
@@ -2659,7 +2658,7 @@ the authority of the receiver, and thus are not guaranteed to be
 accurate or legitimate.</p>
 </div>
 <div class="sect3">
-<h4 id="_recorded_results">11.5.1. Recorded Results</h4>
+<h4 id="_recorded_results"><a class="anchor" href="#_recorded_results"></a>11.5.1. Recorded Results</h4>
 <div class="paragraph">
 <p>This information, passed to the receiver in the Received-SPF: or
 Authentication-Results: trace fields, can be returned to the client
@@ -2670,7 +2669,7 @@ characters and excessively long lines.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_external_explanations">11.5.2. External Explanations</h4>
+<h4 id="_external_explanations"><a class="anchor" href="#_external_explanations"></a>11.5.2. External Explanations</h4>
 <div class="paragraph">
 <p>When the authorization check fails, an explanation string could be
 included in the reject response.
@@ -2697,7 +2696,7 @@ direct the bounce back to the original sender.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_macro_expansion">11.5.3. Macro Expansion</h4>
+<h4 id="_macro_expansion"><a class="anchor" href="#_macro_expansion"></a>11.5.3. Macro Expansion</h4>
 <div class="paragraph">
 <p>Macros (Section 7) allow senders to inject arbitrary text (any
 non-null [US-ASCII] character) into receiver DNS queries.
@@ -2706,7 +2705,7 @@ It is necessary to be prepared for hostile or unexpected content.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_privacy_exposure">11.6. Privacy Exposure</h3>
+<h3 id="_privacy_exposure"><a class="anchor" href="#_privacy_exposure"></a>11.6. Privacy Exposure</h3>
 <div class="paragraph">
 <p>Checking SPF records causes DNS queries to be sent to the domain
 owner.
@@ -2719,7 +2718,7 @@ and the person sending the email.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_delivering_mail_producing_a_fail_result">11.7. Delivering Mail Producing a "Fail" Result</h3>
+<h3 id="_delivering_mail_producing_a_fail_result"><a class="anchor" href="#_delivering_mail_producing_a_fail_result"></a>11.7. Delivering Mail Producing a "Fail" Result</h3>
 <div class="paragraph">
 <p>Operators that choose to deliver mail for which SPF produces a "fail"
 result need to understand that they are admitting content that is
@@ -2742,6 +2741,11 @@ Those notions are out of scope for this specification.</p>
 </div>
 </div>
 </div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2020-11-08 18:25:32 +0700
+</div>
+</div>
 			</div>
 			
 		</div>
@@ -2749,7 +2753,7 @@ Those notions are out of scope for this specification.</p>
 
 		<div class="footer">
 			Powered by <a
-				href="https://github.com/shuLhan/ciigo"
+				href="https://git.sr.ht/shulhan/ciigo"
 			>
 				ciigo
 			</a>
