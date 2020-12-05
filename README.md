@@ -6,6 +6,7 @@ Shulhan <ms@kilabit.info>
 A collection of tools, public APIs, and libraries written and for working with
 Go programming language.
 
+This library is released every month, usually at the first week of month.
 
 ## Public APIs
 
@@ -198,6 +199,9 @@ Go programming language.
 
 * [**time**](https://pkg.go.dev/github.com/shuLhan/share/lib/time): A library
   for working with time.
+
+* [**totp**](https://pkg.go.dev/github.com/shuLhan/share/lib/totp): Package
+  totp implement Time-Based One-Time Password Algorithm based on RFC 6238.
 
 * [**websocket**](https://pkg.go.dev/github.com/shuLhan/share/lib/websocket):
   The WebSocket library for server and client. This websocket library has

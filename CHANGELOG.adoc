@@ -1,7 +1,69 @@
 =  CHANGELOG
 :toc:
 
-This library is released each month, usually at the first week of month.
+This library is released every month, usually at the first week of month.
+
+==  share v0.21.0 (2020-12-06)
+
+===  Breaking changes
+
+* test: refactoring Assert with better error message
++
+The new Assert function use the reflect.DoEqual that return an error
+which describe which field have unmatched value.
+
+===  New features
+
+* http: allow Endpoint to register custom error handler
++
+The new field ErrorHandler on Endpoint allow the implementor to define
+their own function to handler error from Endpoint.Call.
++
+If the ErrorHandler is nil it will default to DefaultErrorHandler.
+
+* totp: new package that implement TOTP protocol
++
+Package totp implement Time-Based One-Time Password Algorithm based on
+RFC 6238.
+
+===  Bug fixes
+
+* parser: fix Line method that always return non-empty line
++
+In case of content end without new line, for example "a\nb", the Line()
+method always return "b, 0" on the last line.
+
+* smtp: update the expired test certificate
+
+* websocket: create buffered channel for running queue.
++
+This is to fix Stop() method waiting for running channel to be consumed.
+
+===  Enhancements
+
+* big: update the latest expected error message with Go tip
+
+* http: add an example on how to write custom HTTP status code
++
+The example show how to use http.ResponseWriter.WriteHeader to write
+custom HTTP status code instead of relying on errors.E.
+
+* net: always return the host name or IP on ParseIPPort.
++
+Previously, if the address is an IP address the returned value is empty,
+for example "127.0.0.1" will return empty host but with non-nil IP and
+port.
++
+This changes always return the host either as host name (the same as
+paremeter) or valid IP address.
+
+===  Chores
+
+* all: replace the tasks to serve and generate docs using ciigo as library
++
+This way, one does not need to install ciigo binary, only require Go
+tools.
+
 
 ==  share v0.20.1 (2020-11-08)
 
