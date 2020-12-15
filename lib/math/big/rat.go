@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math"
 	"math/big"
 	"strconv"
 	"strings"
@@ -296,6 +297,74 @@ func (r *Rat) Quo(g interface{}) *Rat {
 	}
 	r.Rat.Quo(&r.Rat, &y.Rat)
 	r.SetString(r.String())
+	return r
+}
+
+//
+// RoundingUpToZero round the value up to one digit precision to the last
+// zero.
+// This rounding mode is not common, please see the example for input
+// and output of this method.
+//
+// If the r value is positive and have zero digit after comma and last digit,
+// the last digit will be rounded up until the last zero.
+//
+// If the r value is negative, the precision will be truncated.
+//
+func (r *Rat) RoundingUpToZero() *Rat {
+	num := r.Num().Int64()
+	if num < 0 {
+		num *= -1
+	}
+	denom := r.Denom().Int64()
+	if denom < 0 {
+		denom *= -1
+	}
+	if denom == 1 {
+		return r
+	}
+
+	// 0.002 = 1/500
+	prec := QuoRat(num%denom, denom)
+
+	// 0.998 = 499/500
+	x := QuoRat(denom-(num%denom), denom)
+
+	if x.IsLess(prec) {
+		if r.Sign() < 0 {
+			r.Add(prec)
+		} else {
+			r.Add(x)
+		}
+		return r
+	}
+
+	// 2 = log10(500)
+	logDenom := int(math.Log10(float64(denom)))
+	denom10 := int64(math.Pow10(logDenom))
+	if denom == denom10 {
+		logDenom -= 1
+		denom10 = int64(math.Pow10(logDenom))
+	}
+	num10 := denom10 - 1
+	// 0.990 = ((10^2)-1)/(10^2)
+	y := QuoRat(num10, denom10)
+
+	// 0.008 = 0.998 - 0.99
+	add := SubRat(x, y)
+	for add.IsLessThanZero() {
+		num10 = num10 / 10
+		denom10 = denom10 / 10
+		y = QuoRat(num10, denom10)
+		add = SubRat(x, y)
+	}
+
+	if r.Sign() < 0 {
+		r.Add(prec)
+	} else {
+		r.Add(add)
+	}
+
 	return r
 }
 
