@@ -102,6 +102,13 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 // SQL file name that has been executed and the timestamp.
 //
 func (cl *Client) Migrate(fs http.FileSystem) (err error) {
+	if fs == nil {
+		if len(cl.MigrationDir) == 0 {
+			return nil
+		}
+		fs = http.Dir(cl.MigrationDir)
+	}
+
 	root, err := fs.Open("/")
 	if err != nil {
 		return fmt.Errorf("Migrate: %w", err)
