@@ -27,17 +27,22 @@ const (
 //
 type Client struct {
 	*sql.DB
-	DriverName string
+	ClientOptions
 	TableNames []string // List of tables in database.
 }
 
 //
-// New wrap a database client to provide additional methods.
+// NewClient create and initialize new database client.
 //
-func New(driverName string, db *sql.DB) (cl *Client, err error) {
+func NewClient(opts ClientOptions) (cl *Client, err error) {
+	db, err := sql.Open(opts.DriverName, opts.DSN)
+	if err != nil {
+		return nil, fmt.Errorf("sql.NewClient: %w", err)
+	}
+
 	cl = &Client{
-		DB:         db,
-		DriverName: driverName,
+		DB:            db,
+		ClientOptions: opts,
 	}
 
 	return cl, nil
