@@ -20,11 +20,13 @@ import (
 	"mime/multipart"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/shuLhan/share"
+	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -220,6 +222,14 @@ func (client *Client) doRequest(
 
 	if len(contentType) > 0 {
 		httpReq.Header.Set(HeaderContentType, contentType)
+	}
+
+	if debug.Value >= 2 {
+		dump, err := httputil.DumpRequestOut(httpReq, true)
+		if err != nil {
+			log.Printf("doRequest: " + err.Error())
+		}
+		fmt.Printf("%s", dump)
 	}
 
 	httpRes, err = client.Client.Do(httpReq)
