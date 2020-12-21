@@ -142,14 +142,16 @@ func (section *ConfigSection) generateSigners() {
 		pkeyRaw, err := ioutil.ReadFile(pkey)
 		if err != nil {
 			if !errors.Is(err, os.ErrNotExist) {
-				log.Printf("generateSigners: " + err.Error())
+				log.Printf("generateSigners %s: %s", pkey,
+					err.Error())
 			}
 			continue
 		}
 
 		signer, err := ssh.ParsePrivateKey(pkeyRaw)
 		if err != nil {
-			log.Printf("generateSigners: ParsePrivateKey: " + err.Error())
+			log.Printf("generateSigners %s: ParsePrivateKey: %s",
+				pkey, err.Error())
 			continue
 		}
 
