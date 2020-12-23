@@ -23,6 +23,8 @@ This library is released every month, usually at the first week of month.
 * [**smtpcli**](https://pkg.go.dev/github.com/shuLhan/share/cmd/smtpcli):
   Command line interface to SMTP client protocol.
 
+* [**totp**](https://pkg.go.dev/github.com/shuLhan/share/cmd/totp):
+  Program to generate Time-based One-time Password using secret key.
 
 ## Libraries
 
