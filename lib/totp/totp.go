@@ -64,6 +64,24 @@ func (p *Protocol) Generate(secret []byte) (otp string, err error) {
 }
 
 //
+// GenerateN generate n number of passwords from (current time - N*timeStep)
+// until the curent time.
+//
+func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error) {
+	mac := hmac.New(p.fnHash, secret)
+	ts := time.Now().Unix()
+	for x := 0; x < n; x++ {
+		t := ts - int64(x*p.timeStep)
+		otp, err := p.generateWithTimestamp(mac, t)
+		if err != nil {
+			return nil, fmt.Errorf("GenerateN: %w", err)
+		}
+		listOTP = append(listOTP, otp)
+	}
+	return listOTP, nil
+}
+
+//
 // Verify the token based on the prover secret key.
 // It will return true if the token matched, otherwise it will return false.
 //
@@ -107,7 +125,7 @@ func (p *Protocol) generateWithTimestamp(mac hash.Hash, time int64) (
 ) {
 	steps := int64((float64(time) / float64(p.timeStep)))
 
-	msg := fmt.Sprintf("%016x", steps)
+	msg := fmt.Sprintf("%016X", steps)
 	msgb, err := hex.DecodeString(msg)
 	if err != nil {
 		return "", err

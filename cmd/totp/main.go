@@ -7,6 +7,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base32"
 	"flag"
 	"fmt"
 	"hash"
@@ -22,8 +23,8 @@ func main() {
 	flag.Usage = usage
 
 	paramDigits := flag.Int("digits", 6, "number of digits to generated")
-	paramHash := flag.String("hash", "sha1", "hash names, valid values is sha1, sha256, sha512")
-	paramTimestep := flag.Int("timestep", 30, "time step in seconds")
+	paramHash := flag.String("alg", "sha1", "hash name, valid values is sha1, sha256, sha512")
+	paramTimestep := flag.Int("period", 30, "time step in seconds")
 	paramHelp := flag.Bool("help", false, "show command usage")
 	flag.Parse()
 
@@ -45,19 +46,25 @@ func main() {
 	}
 
 	totproto := totp.New(hashFn, *paramDigits, *paramTimestep)
-	secret := []byte(os.Args[1])
-	p0, err := totproto.Generate(secret)
+	secret, err := base32.StdEncoding.DecodeString(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%s\n", p0)
+	listOTP, err := totproto.GenerateN(secret, 3)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, otp := range listOTP {
+		fmt.Printf("%s\n", otp)
+	}
 }
 
 func usage() {
 	log.Printf(`%s is command line interface to generate time-based one-time password.
 Usage:
-	%s [OPTIONS] <SECRET_KEY>
+	%s [OPTIONS] <BASE32-SECRET>
 
 Available OPTIONS:
 `, os.Args[0], os.Args[0])
