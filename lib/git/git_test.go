@@ -7,6 +7,7 @@ package git
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -311,12 +312,12 @@ func TestRemoteChange(t *testing.T) {
 		expStdout                string
 	}{{
 		desc:      "With empty oldName",
-		expErr:    "RemoteChange: exit status 128",
+		expErr:    "RemoteChange: exit status",
 		expStderr: "fatal: No such remote: ''\n",
 	}, {
 		desc:      "With empty newName",
 		oldName:   "origin",
-		expErr:    "RemoteChange: exit status 128",
+		expErr:    "RemoteChange: exit status",
 		expStderr: "fatal: '' is not a valid remote name\n",
 	}}
 
@@ -326,7 +327,10 @@ func TestRemoteChange(t *testing.T) {
 
 		err := RemoteChange(_testRepoDir, c.oldName, c.newName, c.newURL)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			if strings.Contains(err.Error(), c.expErr) {
+				continue
+			}
+			t.Fatalf("expecting error like %q, got %q", c.expErr, err.Error())
 		}
 
 		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
