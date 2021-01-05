@@ -29,11 +29,11 @@ func ExampleEndpoint_errorHandler() {
 			codeMsg := strings.Split(err.Error(), ":")
 			if len(codeMsg) != 2 {
 				res.WriteHeader(http.StatusInternalServerError)
-				res.Write([]byte(err.Error()))
+				_, _ = res.Write([]byte(err.Error()))
 			} else {
 				code, _ := strconv.Atoi(codeMsg[0])
 				res.WriteHeader(code)
-				res.Write([]byte(codeMsg[1]))
+				_, _ = res.Write([]byte(codeMsg[1]))
 			}
 		},
 	}
@@ -42,7 +42,9 @@ func ExampleEndpoint_errorHandler() {
 	go func() {
 		_ = server.Start()
 	}()
-	defer server.Stop(1 * time.Second)
+	defer func() {
+		_ = server.Stop(1 * time.Second)
+	}()
 	time.Sleep(1 * time.Second)
 
 	client := NewClient("http://"+serverOpts.Address, nil, false)

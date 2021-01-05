@@ -32,7 +32,9 @@ func ExampleServer_customHTTPStatusCode() {
 		}
 	}()
 
-	defer testServer.Stop(5 * time.Second)
+	defer func() {
+		_ = testServer.Stop(5 * time.Second)
+	}()
 
 	epCustom := &Endpoint{
 		Path:         "/error/custom",
