@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -813,12 +814,12 @@ func TestRat_UnmarshalJSON(t *testing.T) {
 		expError string
 	}{{
 		in:       []byte(`{"V":"ab"}`),
-		expError: "Rat.UnmarshalJSON: cannot convert []uint8([97 98]) to Rat",
+		expError: "cannot convert []uint8([97 98]) to Rat",
 	}, {
 		in: []byte(`{}`),
 	}, {
 		in:       []byte(`{"V":}`),
-		expError: `json: invalid character '}' looking for beginning of value`,
+		expError: `invalid character '}' looking for beginning of value`,
 	}, {
 		in:  []byte(`{"V":0}`),
 		exp: NewRat(0),
@@ -836,9 +837,10 @@ func TestRat_UnmarshalJSON(t *testing.T) {
 		got := &T{}
 		err := json.Unmarshal(c.in, &got)
 		if err != nil {
-			test.Assert(t, fmt.Sprintf("error %s", c.in),
-				c.expError, err.Error(), true)
-			continue
+			if strings.Contains(err.Error(), c.expError) {
+				continue
+			}
+			t.Fatalf("expecting error like %q, got %q", c.expError, err.Error())
 		}
 
 		test.Assert(t, "", c.exp, got.V, true)
