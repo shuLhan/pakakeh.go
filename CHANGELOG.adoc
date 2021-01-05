@@ -3,6 +3,34 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.22.0 (2021-01-06)
+
+===  Breaking changes
+
+* contact: remove unused package proofn
+
+* sql: change the new client function parameter into struct of options.
+
+===  New features
+
+* cmd: add new CLI "totp"
++
+The totp is a program to generate Time-based One-time Password from
+secret key.
+
+* totp: add method to generate n number of passwords
+
+===  Enhancements
+
+* http: print client request if debug value is equal or greater than 2.
++
+If user set DEBUG environment variable or debug.Value to 2 or greater,
+the http Client will print the request (header and body) to the
+standard output.
+
+* ssh: print the private key file that has an error when generating signers
+
+
 ==  share v0.21.0 (2020-12-06)
 
 ===  Breaking changes
