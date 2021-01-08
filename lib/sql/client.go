@@ -16,6 +16,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/shuLhan/share/lib/reflect"
 )
 
 const (
@@ -102,7 +104,7 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 // SQL file name that has been executed and the timestamp.
 //
 func (cl *Client) Migrate(fs http.FileSystem) (err error) {
-	if fs == nil {
+	if reflect.IsNil(fs) {
 		if len(cl.MigrationDir) == 0 {
 			return nil
 		}
