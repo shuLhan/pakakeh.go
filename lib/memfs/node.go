@@ -320,9 +320,8 @@ func (leaf *Node) addChild(
 }
 
 func (leaf *Node) generateFuncName() {
-	funcName := libbytes.Copy([]byte(leaf.SysPath))
-	funcName = libbytes.InReplace(funcName, []byte(ascii.LettersNumber), '_')
-	leaf.GenFuncName = "generate_" + string(funcName)
+	syspath := string(libbytes.InReplace([]byte(leaf.SysPath), []byte(ascii.LettersNumber), '_'))
+	leaf.GenFuncName = "generate_" + syspath
 }
 
 //
