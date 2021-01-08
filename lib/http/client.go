@@ -125,6 +125,20 @@ func (client *Client) Get(headers http.Header, path string, params url.Values) (
 }
 
 //
+// Post send the POST request to path without setting "Content-Type".
+// If the params is not nil, it will send as query parameters in the path.
+//
+func (client *Client) Post(headers http.Header, path string, params url.Values) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	if params != nil {
+		path += "?" + params.Encode()
+	}
+
+	return client.doRequest(http.MethodPost, headers, path, "", nil)
+}
+
+//
 // PostForm send the POST request to path using
 // "application/x-www-form-urlencoded".
 //
