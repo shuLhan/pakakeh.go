@@ -70,7 +70,12 @@ func (dw *DirWatcher) Start() (err error) {
 		return fmt.Errorf("lib/io: NewDirWatcher: %q is not a directory", dw.Path)
 	}
 
-	dw.fs, err = memfs.New(dw.Path, dw.Includes, dw.Excludes, false)
+	memfsOpts := &memfs.Options{
+		Root:     dw.Path,
+		Includes: dw.Includes,
+		Excludes: dw.Excludes,
+	}
+	dw.fs, err = memfs.New(memfsOpts)
 	if err != nil {
 		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
 	}
@@ -236,7 +241,12 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 func (dw *DirWatcher) onRootCreated() {
 	var err error
 
-	dw.fs, err = memfs.New(dw.Path, dw.Includes, dw.Excludes, false)
+	memfsOpts := &memfs.Options{
+		Root:     dw.Path,
+		Includes: dw.Includes,
+		Excludes: dw.Excludes,
+	}
+	dw.fs, err = memfs.New(memfsOpts)
 	if err != nil {
 		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
 		return

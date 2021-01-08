@@ -30,56 +30,36 @@ const (
 	EncodingGzip = "gzip"
 )
 
-var (
-	// MaxFileSize define maximum file size that can be stored on memory.
-	// The default value is 5 MB.
-	MaxFileSize int64 = 1024 * 1024 * 5
-
-	// Development define a flag to bypass file in memory.  If its
-	// true, any call to Get will result in direct read to file system.
-	Development bool
-
-	// GeneratedPathNode contains the mapping of path and node.  Its will
-	// be used and initialized by ".go" file generated from GoGenerate().
-	GeneratedPathNode *PathNode
-)
-
 //
 // MemFS contains directory tree of file system in memory.
 //
 type MemFS struct {
 	http.FileSystem
 
-	incRE       []*regexp.Regexp
-	excRE       []*regexp.Regexp
-	root        *Node
-	pn          *PathNode
-	withContent bool
+	opts  *Options
+	incRE []*regexp.Regexp
+	excRE []*regexp.Regexp
+	root  *Node
+	pn    *PathNode
 }
 
 //
-// New create and initialize new memory file system from directory dir using
-// list of regular expresssion for including or excluding files.
+// New create and initialize new memory file system from directory Root using
+// list of regular expresssion for Including or Excluding files; or from
+// GeneratedPathNode.
 //
-// The includes and excludes pattern applied to path of file in file system,
-// not to the path in memory.
-//
-// The "withContent" parameter tell the MemFS to read the content of file and
-// detect its content type.  If this paramater is false, the content of file
-// will not be mapped to memory, the MemFS will behave as directory tree.
-//
-// On directory that contains output from GoGenerate(), the includes and
-// excludes does not have any effect, since the content of path and nodes will
-// be overwritten by GeneratedPathNode.
-//
-func New(dir string, includes, excludes []string, withContent bool) (
-	mfs *MemFS, err error,
-) {
-	if GeneratedPathNode != nil {
-		if !Development {
+func New(opts *Options) (mfs *MemFS, err error) {
+	if opts == nil {
+		opts = &Options{}
+	}
+	opts.init()
+
+	if opts.GeneratedPathNode != nil {
+		if !opts.Development {
 			mfs = &MemFS{
-				pn:   GeneratedPathNode,
-				root: GeneratedPathNode.Get("/"),
+				pn:   opts.GeneratedPathNode,
+				root: opts.GeneratedPathNode.Get("/"),
+				opts: opts,
 			}
 			return mfs, nil
 		}
@@ -90,17 +70,17 @@ func New(dir string, includes, excludes []string, withContent bool) (
 			v: make(map[string]*Node),
 			f: nil,
 		},
-		withContent: withContent,
+		opts: opts,
 	}
 
-	for _, inc := range includes {
+	for _, inc := range opts.Includes {
 		re, err := regexp.Compile(inc)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.New: %w", err)
 		}
 		mfs.incRE = append(mfs.incRE, re)
 	}
-	for _, exc := range excludes {
+	for _, exc := range opts.Excludes {
 		re, err := regexp.Compile(exc)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.New: %w", err)
@@ -108,7 +88,7 @@ func New(dir string, includes, excludes []string, withContent bool) (
 		mfs.excRE = append(mfs.excRE, re)
 	}
 
-	err = mfs.mount(dir)
+	err = mfs.mount(opts.Root)
 	if err != nil {
 		return nil, fmt.Errorf("memfs.New: %w", err)
 	}
@@ -145,7 +125,7 @@ func (mfs *MemFS) AddFile(path string) (*Node, error) {
 			return nil, fmt.Errorf("memfs.AddFile: %w", err)
 		}
 
-		node, err = NewNode(parent, fi, mfs.withContent)
+		node, err = NewNode(parent, fi, mfs.opts.MaxFileSize, mfs.opts.WithContent)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.AddFile: %w", err)
 		}
@@ -227,7 +207,7 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	node = mfs.pn.Get(path)
 	if node == nil {
-		if Development {
+		if mfs.opts.Development {
 			node, err = mfs.refresh(path)
 			if err != nil {
 				log.Println("lib/memfs: Get: " + err.Error())
@@ -238,8 +218,8 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 		return nil, os.ErrNotExist
 	}
 
-	if Development {
-		err = node.update(nil, mfs.withContent)
+	if mfs.opts.Development {
+		err = node.update(nil, mfs.opts.MaxFileSize, mfs.opts.WithContent)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.Get: %w", err)
 		}
@@ -290,8 +270,8 @@ func (mfs *MemFS) mount(dir string) error {
 	if len(dir) == 0 {
 		return nil
 	}
-	if GeneratedPathNode != nil {
-		if !Development {
+	if mfs.opts.GeneratedPathNode != nil {
+		if !mfs.opts.Development {
 			return nil
 		}
 	}
@@ -319,7 +299,7 @@ func (mfs *MemFS) mount(dir string) error {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	if mfs.withContent {
+	if mfs.opts.WithContent {
 		mfs.pruneEmptyDirs()
 	}
 
@@ -338,7 +318,7 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 		return
 	}
 
-	err := node.update(newInfo, mfs.withContent)
+	err := node.update(newInfo, mfs.opts.MaxFileSize, mfs.opts.WithContent)
 	if err != nil {
 		log.Println("lib/memfs: Update: " + err.Error())
 	}
@@ -355,16 +335,16 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 	}
 
 	mfs.root = &Node{
-		SysPath:     dir,
-		Path:        "/",
-		name:        "/",
-		modTime:     fi.ModTime(),
-		mode:        fi.Mode(),
-		size:        0,
-		V:           nil,
-		Parent:      nil,
-		GenFuncName: "generate_",
+		SysPath: dir,
+		Path:    "/",
+		name:    "/",
+		modTime: fi.ModTime(),
+		mode:    fi.Mode(),
+		size:    0,
+		V:       nil,
+		Parent:  nil,
 	}
+	mfs.root.generateFuncName()
 
 	mfs.pn.v[mfs.root.Path] = mfs.root
 
@@ -431,7 +411,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		return nil, nil
 	}
 
-	child, err = parent.addChild(sysPath, fi, mfs.withContent)
+	child, err = parent.addChild(sysPath, fi, mfs.opts.MaxFileSize, mfs.opts.WithContent)
 	if err != nil {
 		log.Printf("AddChild %s: %s", fi.Name(), err.Error())
 		return nil, nil

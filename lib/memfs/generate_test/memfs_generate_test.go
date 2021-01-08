@@ -13,6 +13,8 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
+var memfsPathNode *memfs.PathNode
+
 func TestGeneratePathNode(t *testing.T) {
 	expRoot := &memfs.Node{
 		SysPath: "testdata",
@@ -48,7 +50,10 @@ func TestGeneratePathNode(t *testing.T) {
 		exp:  expExcludeIndexHTML,
 	}}
 
-	mfs, err := memfs.New("", nil, nil, true)
+	opts := &memfs.Options{
+		GeneratedPathNode: memfsPathNode,
+	}
+	mfs, err := memfs.New(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +75,10 @@ func TestGeneratePathNode(t *testing.T) {
 }
 
 func TestNode_Readdir(t *testing.T) {
-	mfs, err := memfs.New("", nil, nil, true)
+	opts := &memfs.Options{
+		GeneratedPathNode: memfsPathNode,
+	}
+	mfs, err := memfs.New(opts)
 	if err != nil {
 		t.Fatal(err)
 	}

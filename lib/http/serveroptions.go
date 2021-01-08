@@ -37,6 +37,8 @@ type ServerOptions struct {
 	// This field is optional.
 	Excludes []string
 
+	MaxFileSize int64
+
 	// CORSAllowOrigins contains global list of cross-site Origin that are
 	// allowed during preflight requests by the OPTIONS method.
 	// The list is case-sensitive.

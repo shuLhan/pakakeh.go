@@ -53,7 +53,11 @@ func TestAddFile(t *testing.T) {
 		},
 	}}
 
-	mfs, err := New("testdata", nil, nil, true)
+	opts := &Options{
+		Root:        "testdata",
+		WithContent: true,
+	}
+	mfs, err := New(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,8 +99,6 @@ func TestAddFile(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	// Limit file size to allow testing Get from disk on file "index.js".
-	MaxFileSize = 15
 
 	cases := []struct {
 		path           string
@@ -154,7 +156,15 @@ func TestGet(t *testing.T) {
 	}}
 
 	dir := filepath.Join(_testWD, "/testdata")
-	mfs, err := New(dir, nil, nil, true)
+
+	opts := &Options{
+		Root: dir,
+		// Limit file size to allow testing Get from disk on file "index.js".
+		MaxFileSize: 15,
+		WithContent: true,
+	}
+
+	mfs, err := New(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -168,7 +178,7 @@ func TestGet(t *testing.T) {
 			continue
 		}
 
-		if got.size <= MaxFileSize {
+		if got.size <= opts.MaxFileSize {
 			test.Assert(t, "node.V", c.expV, got.V, true)
 		}
 
@@ -182,9 +192,7 @@ func TestMemFS_mount(t *testing.T) {
 
 	cases := []struct {
 		desc       string
-		incs       []string
-		excs       []string
-		dir        string
+		opts       Options
 		expErr     string
 		expMapKeys []string
 	}{{
@@ -192,16 +200,22 @@ func TestMemFS_mount(t *testing.T) {
 		expErr:     "open : no such file or directory",
 		expMapKeys: make([]string, 0),
 	}, {
-		desc:   "With file",
-		dir:    afile,
+		desc: "With file",
+		opts: Options{
+			Root:        afile,
+			WithContent: true,
+		},
 		expErr: fmt.Sprintf("memfs.New: mount: %q must be a directory", afile),
 	}, {
 		desc: "With directory",
-		excs: []string{
-			"memfs_generate.go$",
-			"direct$",
+		opts: Options{
+			Root: filepath.Join(_testWD, "testdata"),
+			Excludes: []string{
+				"memfs_generate.go$",
+				"direct$",
+			},
+			WithContent: true,
 		},
-		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
 			"/",
 			"/exclude",
@@ -219,12 +233,15 @@ func TestMemFS_mount(t *testing.T) {
 		},
 	}, {
 		desc: "With excludes",
-		excs: []string{
-			`.*\.js$`,
-			"memfs_generate.go$",
-			"direct$",
+		opts: Options{
+			Root: filepath.Join(_testWD, "testdata"),
+			Excludes: []string{
+				`.*\.js$`,
+				"memfs_generate.go$",
+				"direct$",
+			},
+			WithContent: true,
 		},
-		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
 			"/",
 			"/exclude",
@@ -239,14 +256,17 @@ func TestMemFS_mount(t *testing.T) {
 		},
 	}, {
 		desc: "With includes",
-		incs: []string{
-			`.*\.js$`,
+		opts: Options{
+			Root: filepath.Join(_testWD, "testdata"),
+			Includes: []string{
+				`.*\.js$`,
+			},
+			Excludes: []string{
+				"memfs_generate.go$",
+				"direct$",
+			},
+			WithContent: true,
 		},
-		excs: []string{
-			"memfs_generate.go$",
-			"direct$",
-		},
-		dir: filepath.Join(_testWD, "testdata"),
 		expMapKeys: []string{
 			"/",
 			"/exclude",
@@ -260,7 +280,7 @@ func TestMemFS_mount(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New(c.dir, c.incs, c.excs, true)
+		mfs, err := New(&c.opts)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error(), true)
 			continue
@@ -383,7 +403,12 @@ func TestFilter(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New("", c.inc, c.exc, true)
+		opts := &Options{
+			Includes:    c.inc,
+			Excludes:    c.exc,
+			WithContent: true,
+		}
+		mfs, err := New(opts)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -49,21 +49,22 @@ import (
 )
 {{end}}
 {{define "GENERATE_NODE"}}
-func {{ .GenFuncName}}() *memfs.Node {
+	{{- $varname := .VarName}}
+func {{ .Node.GenFuncName}}() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "{{.SysPath}}",
-		Path:            "{{.Path}}",
-		ContentType:     "{{.ContentType}}",
-		ContentEncoding: "{{.ContentEncoding}}",
-{{- if .V }}
-		V:               []byte("{{range $x, $c := .V}}{{ printf "\\x%02X" $c }}{{end}}"),
+		SysPath:         "{{.Node.SysPath}}",
+		Path:            "{{.Node.Path}}",
+		ContentType:     "{{.Node.ContentType}}",
+		ContentEncoding: "{{.Node.ContentEncoding}}",
+{{- if .Node.V }}
+		V:               []byte("{{range $x, $c := .Node.V}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}
 	}
-	node.SetMode({{printf "%d" .Mode}})
-	node.SetName("{{.Name}}")
-	node.SetSize({{.Size}})
-	{{- range $x, $child := .Childs}}
-	node.AddChild(_getNode("{{.Path}}", {{$child.GenFuncName}}))
+	node.SetMode({{printf "%d" .Node.Mode}})
+	node.SetName("{{.Node.Name}}")
+	node.SetSize({{.Node.Size}})
+	{{- range $x, $child := .Node.Childs}}
+	node.AddChild(_getNode({{$varname}}, "{{.Path}}", {{$child.GenFuncName}}))
 	{{- end}}
 	return node
 }
@@ -71,10 +72,10 @@ func {{ .GenFuncName}}() *memfs.Node {
 {{define "PATH_FUNCS"}}
 //
 // _getNode is internal function to minimize duplicate node created on
-// Node.AddChild() and on GeneratedPathNode.Set().
+// Node.AddChild() and on generatedPathNode.Set().
 //
-func _getNode(path string, fn func() *memfs.Node) *memfs.Node {
-	node := memfs.GeneratedPathNode.Get(path)
+func _getNode(pn *memfs.PathNode, path string, fn func() *memfs.Node) *memfs.Node {
+	node := pn.Get(path)
 	if node != nil {
 		return node
 	}
@@ -82,10 +83,11 @@ func _getNode(path string, fn func() *memfs.Node) *memfs.Node {
 }
 
 func init() {
-	memfs.GeneratedPathNode = memfs.NewPathNode()
-{{- range $path, $node := .}}
-	memfs.GeneratedPathNode.Set("{{$path}}",
-		_getNode("{{$path}}", {{$node.GenFuncName}}))
+	{{- $varname := .VarName}}
+	{{$varname}} = memfs.NewPathNode()
+{{- range $path, $node := .Nodes}}
+	{{$varname}}.Set("{{$path}}",
+		_getNode({{$varname}}, "{{$path}}", {{$node.GenFuncName}}))
 {{- end}}
 }
 {{end}}

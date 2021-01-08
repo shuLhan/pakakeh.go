@@ -56,7 +56,7 @@ type Node struct {
 // If withContent is true, the file content and its type will be saved in
 // node as V and ContentType.
 //
-func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err error) {
+func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64, withContent bool) (node *Node, err error) {
 	if fi == nil {
 		return nil, nil
 	}
@@ -74,30 +74,25 @@ func NewNode(parent *Node, fi os.FileInfo, withContent bool) (node *Node, err er
 		absPath = fi.Name()
 	}
 
-	funcName := make([]byte, len(absPath))
-	copy(funcName, []byte(absPath))
-	genFuncName := "generate_" + string(libbytes.InReplace(funcName,
-		[]byte(ascii.LettersNumber), '_'))
-
 	node = &Node{
-		SysPath:     sysPath,
-		Path:        absPath,
-		name:        fi.Name(),
-		modTime:     fi.ModTime(),
-		mode:        fi.Mode(),
-		size:        fi.Size(),
-		V:           nil,
-		Parent:      parent,
-		Childs:      make([]*Node, 0),
-		GenFuncName: genFuncName,
+		SysPath: sysPath,
+		Path:    absPath,
+		name:    fi.Name(),
+		modTime: fi.ModTime(),
+		mode:    fi.Mode(),
+		size:    fi.Size(),
+		V:       nil,
+		Parent:  parent,
+		Childs:  make([]*Node, 0),
 	}
+	node.generateFuncName()
 
 	if node.mode.IsDir() || !withContent {
 		node.size = 0
 		return node, nil
 	}
 
-	err = node.updateContent()
+	err = node.updateContent(maxFileSize)
 	if err != nil {
 		return nil, err
 	}
@@ -309,8 +304,10 @@ func (leaf *Node) Sys() interface{} {
 //
 // addChild add new node as sub-directory or file of this node.
 //
-func (leaf *Node) addChild(sysPath string, fi os.FileInfo, withContent bool) (child *Node, err error) {
-	child, err = NewNode(leaf, fi, withContent)
+func (leaf *Node) addChild(
+	sysPath string, fi os.FileInfo, maxFileSize int64, withContent bool,
+) (child *Node, err error) {
+	child, err = NewNode(leaf, fi, maxFileSize, withContent)
 	if err != nil {
 		return nil, err
 	}
@@ -320,6 +317,12 @@ func (leaf *Node) addChild(sysPath string, fi os.FileInfo, withContent bool) (ch
 	leaf.Childs = append(leaf.Childs, child)
 
 	return child, nil
+}
+
+func (leaf *Node) generateFuncName() {
+	funcName := libbytes.Copy([]byte(leaf.SysPath))
+	funcName = libbytes.InReplace(funcName, []byte(ascii.LettersNumber), '_')
+	leaf.GenFuncName = "generate_" + string(funcName)
 }
 
 //
@@ -356,7 +359,7 @@ func (leaf *Node) removeChild(child *Node) *Node {
 // mode or change on content (size and modtime).
 // Change on mode will not affect the content of node.
 //
-func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
+func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64, withContent bool) (err error) {
 	if newInfo == nil {
 		newInfo, err = os.Stat(leaf.SysPath)
 		if err != nil {
@@ -377,14 +380,14 @@ func (leaf *Node) update(newInfo os.FileInfo, withContent bool) (err error) {
 		return nil
 	}
 
-	return leaf.updateContent()
+	return leaf.updateContent(maxFileSize)
 }
 
 //
 // updateContent read the content of file.
 //
-func (leaf *Node) updateContent() (err error) {
-	if leaf.size > MaxFileSize {
+func (leaf *Node) updateContent(maxFileSize int64) (err error) {
+	if leaf.size > maxFileSize {
 		return nil
 	}
 

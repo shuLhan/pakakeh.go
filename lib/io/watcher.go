@@ -58,7 +58,7 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 		return nil, fmt.Errorf("lib/io: NewWatcher: path is directory")
 	}
 
-	node, err := memfs.NewNode(nil, fi, false)
+	node, err := memfs.NewNode(nil, fi, 0, false)
 	if err != nil {
 		log.Printf("lib/io: NewWatcher %s: %s", fi.Name(), err.Error())
 		return nil, nil

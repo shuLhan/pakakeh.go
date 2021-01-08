@@ -71,11 +71,15 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 		srv.WriteTimeout = defRWTimeout
 	}
 
-	memfs.Development = opts.Development
-
 	if len(opts.Root) > 0 {
-		srv.Memfs, err = memfs.New(opts.Root, opts.Includes,
-			opts.Excludes, true)
+		memfsOpts := &memfs.Options{
+			Root:        opts.Root,
+			Includes:    opts.Includes,
+			Excludes:    opts.Excludes,
+			MaxFileSize: opts.MaxFileSize,
+			WithContent: true,
+		}
+		srv.Memfs, err = memfs.New(memfsOpts)
 		if err != nil {
 			return nil, err
 		}

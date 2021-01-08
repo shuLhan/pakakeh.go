@@ -7,12 +7,16 @@ package memfs
 import "testing"
 
 func TestGenerate(t *testing.T) {
-	mfs, err := New("testdata", nil, nil, true)
+	opts := &Options{
+		Root:        "testdata",
+		WithContent: true,
+	}
+	mfs, err := New(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = mfs.GoGenerate("test", "./generate_test/gen_test.go", "")
+	err = mfs.GoGenerate("test", "", "./generate_test/gen_test.go", "")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -6,15 +6,18 @@ import (
 )
 
 func ExampleNew() {
-	incs := []string{
-		`.*/include`,
-		`.*\.(css|html|js)$`,
+	opts := &Options{
+		Root: "./testdata",
+		Includes: []string{
+			`.*/include`,
+			`.*\.(css|html|js)$`,
+		},
+		Excludes: []string{
+			`.*/exclude`,
+		},
+		WithContent: true,
 	}
-	excs := []string{
-		`.*/exclude`,
-	}
-
-	mfs, err := New("./testdata", incs, excs, true)
+	mfs, err := New(opts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +33,11 @@ func ExampleNew() {
 }
 
 func ExampleMemFS_Search() {
-	mfs, err := New("./testdata", nil, nil, true)
+	opts := &Options{
+		Root:        "./testdata",
+		WithContent: true,
+	}
+	mfs, err := New(opts)
 	if err != nil {
 		log.Fatal(err)
 	}

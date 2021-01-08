@@ -10,8 +10,6 @@ import (
 	"net/http"
 	"os"
 	"testing"
-
-	libmemfs "github.com/shuLhan/share/lib/memfs"
 )
 
 var (
@@ -50,12 +48,10 @@ func TestMain(m *testing.M) {
 	var err error
 
 	opts := &ServerOptions{
-		Address: "127.0.0.1:8080",
-		Root:    "./testdata",
+		Address:     "127.0.0.1:8080",
+		Root:        "./testdata",
+		MaxFileSize: 30,
 	}
-
-	// Testing handleFS with large size.
-	libmemfs.MaxFileSize = 30
 
 	testServer, err = NewServer(opts)
 	if err != nil {

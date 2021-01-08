@@ -10,9 +10,24 @@ import (
 	"strings"
 )
 
+const (
+	defGeneratedVarName = "memfsPathNode"
+)
+
+type generateData struct {
+	VarName string
+	Node    *Node
+	Nodes   map[string]*Node
+}
+
 //
 // GoGenerate write the tree nodes as Go generated source file.
+//
 // If pkgName is not defined it will be default to "main".
+//
+// varName is the global variable name that will return the memfs root
+// PathNode, which can be used to initilize New() function.
+//
 // If out is not defined it will be default "memfs_generate.go" and saved in
 // current directory.
 //
@@ -22,12 +37,19 @@ import (
 // For example, if contentEncoding is "gzip" it will compress the content of
 // file using gzip and set "ContentEncoding" to "gzip".
 //
-func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
+func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err error) {
 	if len(pkgName) == 0 {
 		pkgName = "main"
 	}
+	if len(varName) == 0 {
+		varName = defGeneratedVarName
+	}
 	if len(out) == 0 {
 		out = "memfs_generate.go"
+	}
+	genData := &generateData{
+		VarName: varName,
+		Nodes:   mfs.pn.v,
 	}
 
 	tmpl, err := generateTemplate()
@@ -62,14 +84,15 @@ func (mfs *MemFS) GoGenerate(pkgName, out, contentEncoding string) (err error) {
 			continue
 		}
 
-		node := mfs.pn.v[names[x]]
-		err = tmpl.ExecuteTemplate(f, templateNameGenerateNode, node)
+		genData.Node = mfs.pn.v[names[x]]
+
+		err = tmpl.ExecuteTemplate(f, templateNameGenerateNode, genData)
 		if err != nil {
 			goto fail
 		}
 	}
 
-	err = tmpl.ExecuteTemplate(f, templateNamePathFuncs, mfs.pn.v)
+	err = tmpl.ExecuteTemplate(f, templateNamePathFuncs, genData)
 	if err != nil {
 		goto fail
 	}
