@@ -18,38 +18,42 @@ var (
 func TestAddFile(t *testing.T) {
 	cases := []struct {
 		desc     string
-		path     string
+		intPath  string
+		extPath  string
 		exp      *Node
 		expError string
 	}{{
-		desc: "With empty path",
+		desc: "With empty internal path",
 	}, {
-		desc:     "With path is not exist",
-		path:     "is/not/exist",
-		expError: "memfs.AddFile: stat is: no such file or directory",
+		desc:     "With external path is not exist",
+		intPath:  "internal/file",
+		extPath:  "is/not/exist",
+		expError: "memfs.AddFile: stat is/not/exist: no such file or directory",
 	}, {
-		desc: "With file exist",
-		path: "testdata/direct/add/file",
+		desc:    "With file exist",
+		intPath: "internal/file",
+		extPath: "testdata/direct/add/file",
 		exp: &Node{
 			SysPath:     "testdata/direct/add/file",
-			Path:        "testdata/direct/add/file",
+			Path:        "internal/file",
 			name:        "file",
 			ContentType: "text/plain; charset=utf-8",
 			size:        22,
 			V:           []byte("Test direct add file.\n"),
-			GenFuncName: "generate_testdata_direct_add_file",
+			GenFuncName: "generate_internal_file",
 		},
 	}, {
-		desc: "With directories exist",
-		path: "testdata/direct/add/file2",
+		desc:    "With directories exist",
+		intPath: "internal/file2",
+		extPath: "testdata/direct/add/file2",
 		exp: &Node{
 			SysPath:     "testdata/direct/add/file2",
-			Path:        "testdata/direct/add/file2",
+			Path:        "internal/file2",
 			name:        "file2",
 			ContentType: "text/plain; charset=utf-8",
 			size:        24,
 			V:           []byte("Test direct add file 2.\n"),
-			GenFuncName: "generate_testdata_direct_add_file2",
+			GenFuncName: "generate_internal_file2",
 		},
 	}}
 
@@ -64,7 +68,7 @@ func TestAddFile(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := mfs.AddFile(c.path)
+		got, err := mfs.AddFile(c.intPath, c.extPath)
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
@@ -79,21 +83,23 @@ func TestAddFile(t *testing.T) {
 
 		test.Assert(t, "AddFile", c.exp, got, true)
 
-		if c.exp != nil {
-			got, err := mfs.Get(c.path)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if got != nil {
-				got.modTime = time.Time{}
-				got.mode = 0
-				got.Parent = nil
-				got.Childs = nil
-			}
-
-			test.Assert(t, "Get", c.exp, got, true)
+		if c.exp == nil {
+			continue
 		}
+
+		got, err = mfs.Get(c.intPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if got != nil {
+			got.modTime = time.Time{}
+			got.mode = 0
+			got.Parent = nil
+			got.Childs = nil
+		}
+
+		test.Assert(t, "Get", c.exp, got, true)
 	}
 }
 

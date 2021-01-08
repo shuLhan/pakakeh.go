@@ -85,7 +85,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 		Parent:  parent,
 		Childs:  make([]*Node, 0),
 	}
-	node.generateFuncName()
+	node.generateFuncName(sysPath)
 
 	if node.mode.IsDir() || maxFileSize <= 0 {
 		node.size = 0
@@ -319,8 +319,8 @@ func (leaf *Node) addChild(
 	return child, nil
 }
 
-func (leaf *Node) generateFuncName() {
-	syspath := string(libbytes.InReplace([]byte(leaf.SysPath), []byte(ascii.LettersNumber), '_'))
+func (leaf *Node) generateFuncName(in string) {
+	syspath := string(libbytes.InReplace([]byte(in), []byte(ascii.LettersNumber), '_'))
 	leaf.GenFuncName = "generate_" + syspath
 }
 

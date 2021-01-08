@@ -97,20 +97,27 @@ func New(opts *Options) (mfs *MemFS, err error) {
 }
 
 //
-// AddFile add the file directly as child of root.
-// The directory and subdirectories in the path will be keep as separated
-// nodes,
+// AddFile add the external file directly as internal file.
+// If the internal file is already exist it will be replaced.
+// Any directories in the internal path will be generated automatically if its
+// not exist.
 //
-func (mfs *MemFS) AddFile(path string) (*Node, error) {
-	if len(path) == 0 {
+func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
+	if len(internalPath) == 0 {
 		return nil, nil
+	}
+	fi, err := os.Stat(externalPath)
+	if err != nil {
+		return nil, fmt.Errorf("memfs.AddFile: %w", err)
 	}
 
 	var parent *Node
 
-	path = filepath.ToSlash(filepath.Clean(path))
-	paths := strings.Split(path, "/")
-	path = ""
+	internalPath = filepath.ToSlash(filepath.Clean(internalPath))
+	paths := strings.Split(internalPath, "/")
+	base := paths[len(paths)-1]
+	paths = paths[:len(paths)-1]
+	path := ""
 
 	for _, p := range paths {
 		path = filepath.Join(path, p)
@@ -120,15 +127,14 @@ func (mfs *MemFS) AddFile(path string) (*Node, error) {
 			continue
 		}
 
-		fi, err := os.Stat(path)
-		if err != nil {
-			return nil, fmt.Errorf("memfs.AddFile: %w", err)
+		node = &Node{
+			SysPath: path,
+			Path:    path,
+			name:    p,
+			mode:    os.ModeDir,
+			Parent:  parent,
 		}
-
-		node, err = NewNode(parent, fi, mfs.opts.MaxFileSize)
-		if err != nil {
-			return nil, fmt.Errorf("memfs.AddFile: %w", err)
-		}
+		node.generateFuncName(path)
 
 		if parent == nil {
 			mfs.root.Childs = append(mfs.root.Childs, node)
@@ -141,7 +147,37 @@ func (mfs *MemFS) AddFile(path string) (*Node, error) {
 		parent = node
 	}
 
-	return parent, nil
+	path = filepath.Join(path, base)
+	node := &Node{
+		SysPath: externalPath,
+		Path:    path,
+		name:    base,
+		modTime: fi.ModTime(),
+		mode:    fi.Mode(),
+		size:    fi.Size(),
+		Parent:  parent,
+	}
+	node.generateFuncName(path)
+
+	if mfs.opts.MaxFileSize <= 0 {
+		node.size = 0
+		return node, nil
+	}
+
+	err = node.updateContent(mfs.opts.MaxFileSize)
+	if err != nil {
+		return nil, err
+	}
+
+	err = node.updateContentType()
+	if err != nil {
+		return nil, err
+	}
+
+	parent.Childs = append(parent.Childs, node)
+	mfs.pn.v[node.Path] = node
+
+	return node, nil
 }
 
 //
@@ -344,7 +380,7 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 		V:       nil,
 		Parent:  nil,
 	}
-	mfs.root.generateFuncName()
+	mfs.root.generateFuncName(dir)
 
 	mfs.pn.v[mfs.root.Path] = mfs.root
 
