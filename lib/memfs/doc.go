@@ -23,17 +23,15 @@
 //	excs := []string{
 //		`.*/exclude`,
 //	}
-//	mfs, err := memfs.New(incs, excs)
+//	withContent := true
+//	mfs, err := memfs.New("./mystaticsite", incs, excs, withContent)
 //
-// and then we mount the directory that we want into memory using "Mount()",
-//
-//	err := mfs.Mount("./testdata")
-//
-// Later, if we want to get the file from memory, call "Get()" and access the
-// content with "node.V".  Remember that if file size is larger that maximum,
+// Later, if we want to get the file from memory, call Get() which will return
+// the node object with content can be accessed from field "V".
+// Remember that if file size is larger that maximum,
 // the content will need to be read manually,
 //
-//	node, err := mfs.Get()
+//	node, err := mfs.Get("/")
 //	if err != nil {
 //		// Handle file not exist
 //	}
@@ -51,7 +49,8 @@
 // Go Generate
 //
 // memfs also support generating the files into Go generated source file.
-// After we Mount the directory, we can call,
+// After we create memfs instance, we call GoGenerate() to dump all directory
+// and files as Go source code,
 //
 //	mfs.GoGenerate("mypackage", "output/path/file.go", memfs.EncodingGzip)
 //
