@@ -15,7 +15,6 @@ func ExampleNew() {
 		Excludes: []string{
 			`.*/exclude`,
 		},
-		WithContent: true,
 	}
 	mfs, err := New(opts)
 	if err != nil {
@@ -34,8 +33,7 @@ func ExampleNew() {
 
 func ExampleMemFS_Search() {
 	opts := &Options{
-		Root:        "./testdata",
-		WithContent: true,
+		Root: "./testdata",
 	}
 	mfs, err := New(opts)
 	if err != nil {

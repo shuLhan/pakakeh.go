@@ -25,13 +25,9 @@ type Options struct {
 
 	// MaxFileSize define maximum file size that can be stored on memory.
 	// The default value is 5 MB.
+	// If its value is negative, the content of file will not be mapped to
+	// memory, the MemFS will behave as directory tree.
 	MaxFileSize int64
-
-	// WithContent parameter tell the MemFS to read the content of file
-	// and detect its content type.
-	// If false, the content of file will not be mapped to memory, the
-	// MemFS will behave as directory tree.
-	WithContent bool
 
 	// Development define a flag to bypass file in memory.
 	// If its true, any call to Get will result in direct read to file

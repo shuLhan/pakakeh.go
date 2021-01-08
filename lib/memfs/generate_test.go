@@ -8,8 +8,7 @@ import "testing"
 
 func TestGenerate(t *testing.T) {
 	opts := &Options{
-		Root:        "testdata",
-		WithContent: true,
+		Root: "testdata",
 	}
 	mfs, err := New(opts)
 	if err != nil {

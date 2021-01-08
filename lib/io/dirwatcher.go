@@ -71,9 +71,10 @@ func (dw *DirWatcher) Start() (err error) {
 	}
 
 	memfsOpts := &memfs.Options{
-		Root:     dw.Path,
-		Includes: dw.Includes,
-		Excludes: dw.Excludes,
+		Root:        dw.Path,
+		Includes:    dw.Includes,
+		Excludes:    dw.Excludes,
+		MaxFileSize: -1,
 	}
 	dw.fs, err = memfs.New(memfsOpts)
 	if err != nil {
@@ -242,9 +243,10 @@ func (dw *DirWatcher) onRootCreated() {
 	var err error
 
 	memfsOpts := &memfs.Options{
-		Root:     dw.Path,
-		Includes: dw.Includes,
-		Excludes: dw.Excludes,
+		Root:        dw.Path,
+		Includes:    dw.Includes,
+		Excludes:    dw.Excludes,
+		MaxFileSize: -1,
 	}
 	dw.fs, err = memfs.New(memfsOpts)
 	if err != nil {

@@ -65,8 +65,7 @@ func TestNode_Read(t *testing.T) {
 
 func TestNode_Readdir(t *testing.T) {
 	opts := &Options{
-		Root:        "testdata",
-		WithContent: true,
+		Root: "testdata",
 	}
 	mfs, err := New(opts)
 	if err != nil {

@@ -53,10 +53,10 @@ type Node struct {
 
 //
 // NewNode create a new node based on file information "fi".
-// If withContent is true, the file content and its type will be saved in
-// node as V and ContentType.
+// If maxFileSize is greater than zero, the file content and its type will be
+// saved in node as V and ContentType.
 //
-func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64, withContent bool) (node *Node, err error) {
+func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err error) {
 	if fi == nil {
 		return nil, nil
 	}
@@ -87,7 +87,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64, withContent bool) 
 	}
 	node.generateFuncName()
 
-	if node.mode.IsDir() || !withContent {
+	if node.mode.IsDir() || maxFileSize <= 0 {
 		node.size = 0
 		return node, nil
 	}
@@ -305,9 +305,9 @@ func (leaf *Node) Sys() interface{} {
 // addChild add new node as sub-directory or file of this node.
 //
 func (leaf *Node) addChild(
-	sysPath string, fi os.FileInfo, maxFileSize int64, withContent bool,
+	sysPath string, fi os.FileInfo, maxFileSize int64,
 ) (child *Node, err error) {
-	child, err = NewNode(leaf, fi, maxFileSize, withContent)
+	child, err = NewNode(leaf, fi, maxFileSize)
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +359,7 @@ func (leaf *Node) removeChild(child *Node) *Node {
 // mode or change on content (size and modtime).
 // Change on mode will not affect the content of node.
 //
-func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64, withContent bool) (err error) {
+func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	if newInfo == nil {
 		newInfo, err = os.Stat(leaf.SysPath)
 		if err != nil {
@@ -376,7 +376,7 @@ func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64, withContent boo
 	leaf.modTime = newInfo.ModTime()
 	leaf.size = newInfo.Size()
 
-	if !withContent || newInfo.IsDir() {
+	if newInfo.IsDir() || maxFileSize <= 0 {
 		return nil
 	}
 

@@ -125,7 +125,7 @@ func (mfs *MemFS) AddFile(path string) (*Node, error) {
 			return nil, fmt.Errorf("memfs.AddFile: %w", err)
 		}
 
-		node, err = NewNode(parent, fi, mfs.opts.MaxFileSize, mfs.opts.WithContent)
+		node, err = NewNode(parent, fi, mfs.opts.MaxFileSize)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.AddFile: %w", err)
 		}
@@ -219,7 +219,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	if mfs.opts.Development {
-		err = node.update(nil, mfs.opts.MaxFileSize, mfs.opts.WithContent)
+		err = node.update(nil, mfs.opts.MaxFileSize)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.Get: %w", err)
 		}
@@ -299,7 +299,7 @@ func (mfs *MemFS) mount(dir string) error {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	if mfs.opts.WithContent {
+	if mfs.opts.MaxFileSize > 0 {
 		mfs.pruneEmptyDirs()
 	}
 
@@ -318,7 +318,7 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 		return
 	}
 
-	err := node.update(newInfo, mfs.opts.MaxFileSize, mfs.opts.WithContent)
+	err := node.update(newInfo, mfs.opts.MaxFileSize)
 	if err != nil {
 		log.Println("lib/memfs: Update: " + err.Error())
 	}
@@ -411,7 +411,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		return nil, nil
 	}
 
-	child, err = parent.addChild(sysPath, fi, mfs.opts.MaxFileSize, mfs.opts.WithContent)
+	child, err = parent.addChild(sysPath, fi, mfs.opts.MaxFileSize)
 	if err != nil {
 		log.Printf("AddChild %s: %s", fi.Name(), err.Error())
 		return nil, nil

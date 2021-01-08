@@ -54,8 +54,7 @@ func TestAddFile(t *testing.T) {
 	}}
 
 	opts := &Options{
-		Root:        "testdata",
-		WithContent: true,
+		Root: "testdata",
 	}
 	mfs, err := New(opts)
 	if err != nil {
@@ -161,7 +160,6 @@ func TestGet(t *testing.T) {
 		Root: dir,
 		// Limit file size to allow testing Get from disk on file "index.js".
 		MaxFileSize: 15,
-		WithContent: true,
 	}
 
 	mfs, err := New(opts)
@@ -202,8 +200,7 @@ func TestMemFS_mount(t *testing.T) {
 	}, {
 		desc: "With file",
 		opts: Options{
-			Root:        afile,
-			WithContent: true,
+			Root: afile,
 		},
 		expErr: fmt.Sprintf("memfs.New: mount: %q must be a directory", afile),
 	}, {
@@ -214,7 +211,6 @@ func TestMemFS_mount(t *testing.T) {
 				"memfs_generate.go$",
 				"direct$",
 			},
-			WithContent: true,
 		},
 		expMapKeys: []string{
 			"/",
@@ -240,7 +236,6 @@ func TestMemFS_mount(t *testing.T) {
 				"memfs_generate.go$",
 				"direct$",
 			},
-			WithContent: true,
 		},
 		expMapKeys: []string{
 			"/",
@@ -265,7 +260,6 @@ func TestMemFS_mount(t *testing.T) {
 				"memfs_generate.go$",
 				"direct$",
 			},
-			WithContent: true,
 		},
 		expMapKeys: []string{
 			"/",
@@ -404,9 +398,8 @@ func TestFilter(t *testing.T) {
 		t.Log(c.desc)
 
 		opts := &Options{
-			Includes:    c.inc,
-			Excludes:    c.exc,
-			WithContent: true,
+			Includes: c.inc,
+			Excludes: c.exc,
 		}
 		mfs, err := New(opts)
 		if err != nil {

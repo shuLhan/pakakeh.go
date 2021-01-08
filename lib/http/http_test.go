@@ -53,7 +53,6 @@ func TestMain(m *testing.M) {
 		Options: memfs.Options{
 			Root:        "./testdata",
 			MaxFileSize: 30,
-			WithContent: true,
 		},
 		Address: "127.0.0.1:8080",
 	}
