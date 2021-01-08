@@ -14,6 +14,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/shuLhan/share/lib/memfs"
 )
 
 func TestDirWatcher(t *testing.T) {
@@ -65,15 +67,17 @@ func TestDirWatcher(t *testing.T) {
 	var x int32
 
 	dw := &DirWatcher{
-		Path:  dir,
+		Options: memfs.Options{
+			Root: dir,
+			Includes: []string{
+				`assets/.*`,
+				`.*\.adoc$`,
+			},
+			Excludes: []string{
+				`.*\.html$`,
+			},
+		},
 		Delay: 150 * time.Millisecond,
-		Includes: []string{
-			`assets/.*`,
-			`.*\.adoc$`,
-		},
-		Excludes: []string{
-			`.*\.html$`,
-		},
 		Callback: func(ns *NodeState) {
 			localx := atomic.LoadInt32(&x)
 			if exps[localx].path != ns.Node.Path {

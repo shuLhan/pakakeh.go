@@ -18,16 +18,17 @@ import (
 // DirWatcher is a naive implementation of directory change notification.
 //
 type DirWatcher struct {
-	// Path to directory that we want to watch.
-	Path string
-
+	// This struct embed memfs.Options to map the directory to be watched
+	// into memory.
+	//
+	// The Root field define the directory that we want to watch.
+	//
 	// Includes contains list of regex to filter file names that we want
 	// to be notified.
-	Includes []string
-
+	//
 	// Excludes contains list of regex to filter file names that we did
 	// not want to be notified.
-	Excludes []string
+	memfs.Options
 
 	// Delay define a duration when the new changes will be fetched from
 	// system.
@@ -62,21 +63,17 @@ func (dw *DirWatcher) Start() (err error) {
 		return fmt.Errorf("lib/io: NewDirWatcher: callback is not defined")
 	}
 
-	fi, err := os.Stat(dw.Path)
+	fi, err := os.Stat(dw.Root)
 	if err != nil {
 		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
 	}
 	if !fi.IsDir() {
-		return fmt.Errorf("lib/io: NewDirWatcher: %q is not a directory", dw.Path)
+		return fmt.Errorf("lib/io: NewDirWatcher: %q is not a directory", dw.Root)
 	}
 
-	memfsOpts := &memfs.Options{
-		Root:        dw.Path,
-		Includes:    dw.Includes,
-		Excludes:    dw.Excludes,
-		MaxFileSize: -1,
-	}
-	dw.fs, err = memfs.New(memfsOpts)
+	dw.Options.MaxFileSize = -1
+
+	dw.fs, err = memfs.New(&dw.Options)
 	if err != nil {
 		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
 	}
@@ -242,13 +239,7 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 func (dw *DirWatcher) onRootCreated() {
 	var err error
 
-	memfsOpts := &memfs.Options{
-		Root:        dw.Path,
-		Includes:    dw.Includes,
-		Excludes:    dw.Excludes,
-		MaxFileSize: -1,
-	}
-	dw.fs, err = memfs.New(memfsOpts)
+	dw.fs, err = memfs.New(&dw.Options)
 	if err != nil {
 		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
 		return
@@ -320,7 +311,7 @@ func (dw *DirWatcher) start() {
 	dw.ticker = time.NewTicker(dw.Delay)
 
 	for range dw.ticker.C {
-		newDirInfo, err := os.Stat(dw.Path)
+		newDirInfo, err := os.Stat(dw.Root)
 		if err != nil {
 			if !os.IsNotExist(err) {
 				log.Println("lib/io: DirWatcher: " + err.Error())
