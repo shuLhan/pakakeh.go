@@ -8,16 +8,32 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/shuLhan/share/lib/memfs"
 )
 
 //
 // ServerOptions define an options to initialize HTTP server.
 //
 type ServerOptions struct {
+	// The server options embed memfs.Options to allow serving directory
+	// from the memory.
+	//
 	// Root contains path to file system to be served.
 	// This field is optional, if its empty the server will not serve the
 	// local file system, only registered handler.
-	Root string
+	//
+	// Includes contains list of regex to include files to be served from
+	// Root.
+	// This field is optional.
+	//
+	// Excludes contains list of regex to exclude files to be served from
+	// Root.
+	// This field is optional.
+	//
+	// Development if its true, the Root file system is served by reading
+	// the content directly instead of using memory file system.
+	memfs.Options
 
 	// Address define listen address, using ip:port format.
 	// This field is optional, default to ":80".
@@ -26,18 +42,6 @@ type ServerOptions struct {
 	// Conn contains custom HTTP server connection.
 	// This fields is optional.
 	Conn *http.Server
-
-	// Includes contains list of regex to include files to be served from
-	// Root.
-	// This field is optional.
-	Includes []string
-
-	// Excludes contains list of regex to exclude files to be served from
-	// Root.
-	// This field is optional.
-	Excludes []string
-
-	MaxFileSize int64
 
 	// CORSAllowOrigins contains global list of cross-site Origin that are
 	// allowed during preflight requests by the OPTIONS method.
@@ -66,10 +70,6 @@ type ServerOptions struct {
 	// CORSAllowCredentials indicates whether or not the actual request
 	// can be made using credentials.
 	CORSAllowCredentials bool
-
-	// Development if its true, the Root file system is served by reading
-	// the content directly instead of using memory file system.
-	Development bool
 
 	corsAllowHeadersAll bool // flag to indicate wildcards on list.
 	corsAllowOriginsAll bool // flag to indicate wildcards on list.

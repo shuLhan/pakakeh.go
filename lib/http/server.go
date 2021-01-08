@@ -72,14 +72,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	}
 
 	if len(opts.Root) > 0 {
-		memfsOpts := &memfs.Options{
-			Root:        opts.Root,
-			Includes:    opts.Includes,
-			Excludes:    opts.Excludes,
-			MaxFileSize: opts.MaxFileSize,
-			WithContent: true,
-		}
-		srv.Memfs, err = memfs.New(memfsOpts)
+		srv.Memfs, err = memfs.New(&opts.Options)
 		if err != nil {
 			return nil, err
 		}
