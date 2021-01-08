@@ -64,18 +64,19 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 	node.SetName("{{.Node.Name}}")
 	node.SetSize({{.Node.Size}})
 	{{- range $x, $child := .Node.Childs}}
-	node.AddChild(_getNode({{$varname}}, "{{.Path}}", {{$child.GenFuncName}}))
+	node.AddChild(_{{$varname}}_getNode({{$varname}}, "{{.Path}}", {{$child.GenFuncName}}))
 	{{- end}}
 	return node
 }
 {{end}}
 {{define "PATH_FUNCS"}}
+	{{- $varname := .VarName }}
 //
 // _getNode is internal function to minimize duplicate node created on
 // Node.AddChild() and on generatedPathNode.Set().
 //
-func _getNode(pn *memfs.PathNode, path string, fn func() *memfs.Node) *memfs.Node {
-	node := pn.Get(path)
+func _{{$varname}}_getNode(root *memfs.PathNode, path string, fn func() *memfs.Node) (node *memfs.Node) {
+	node = root.Get(path)
 	if node != nil {
 		return node
 	}
@@ -83,11 +84,10 @@ func _getNode(pn *memfs.PathNode, path string, fn func() *memfs.Node) *memfs.Nod
 }
 
 func init() {
-	{{- $varname := .VarName}}
 	{{$varname}} = memfs.NewPathNode()
 {{- range $path, $node := .Nodes}}
 	{{$varname}}.Set("{{$path}}",
-		_getNode({{$varname}}, "{{$path}}", {{$node.GenFuncName}}))
+		_{{$varname}}_getNode({{$varname}}, "{{$path}}", {{$node.GenFuncName}}))
 {{- end}}
 }
 {{end}}
