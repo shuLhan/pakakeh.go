@@ -7,5 +7,5 @@ import (
 
 func main() {
 	debug.Value = 1
-	ciigo.Serve("_doc", ":8080", "")
+	ciigo.Serve(nil, "_doc", ":8080", "")
 }
