@@ -50,10 +50,18 @@
 // This cause more memory to be consumed on server side but we minimize path
 // lookup, and cache-miss on OS level.
 //
-// Serving file system is handled by memory file system using map of path to
-// file node.
+// Serving file system is handled by package memfs, which can be set on
+// ServerOptions.
+// For example, to serve all content in directory "www", we can set the
+// ServerOptions to,
 //
-//	map[/index.html] = Node{Type: ..., Size: ..., ContentType: ...}
+//	opts := &http.ServerOptions{
+//		Options: memfs.Options{
+//			Root: "www",
+//		},
+//		Address: ":8080",
+//	}
+//	httpServer, err := NewServer(opts)
 //
 // There is a limit on size of file to be mapped on memory.
 // See the package "lib/memfs" for more information.
