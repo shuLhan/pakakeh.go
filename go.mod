@@ -1,6 +1,6 @@
 module github.com/shuLhan/share
 
-go 1.13
+go 1.14
 
 require (
 	git.sr.ht/~shulhan/ciigo v0.3.1-0.20210109200358-c23bd42ef521
