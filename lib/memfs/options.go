@@ -9,17 +9,8 @@ type Options struct {
 	// to memory.
 	Root string
 
-	// GeneratedPathNode define the root directory.
-	// If GeneratedPathNode is not nil, the Dir, Includes, and Excludes
-	// options will not have any effects.
-	GeneratedPathNode *PathNode
-
 	// The includes and excludes pattern applied to path of file in file
-	// system, not to the path in memory.
-	//
-	// If GeneratedPathNode is not nil, the includes and excludes does not
-	// have any effect, since the content of path and nodes will be
-	// overwritten by it.
+	// system.
 	Includes []string
 	Excludes []string
 

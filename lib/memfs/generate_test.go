@@ -9,6 +9,9 @@ import "testing"
 func TestGenerate(t *testing.T) {
 	opts := &Options{
 		Root: "testdata",
+		Excludes: []string{
+			`^\..*`,
+		},
 	}
 	mfs, err := New(opts)
 	if err != nil {

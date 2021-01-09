@@ -16,13 +16,13 @@ func generate_testdata() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("/")
 	node.SetSize(0)
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/direct", generate_testdata_direct))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/exclude", generate_testdata_exclude))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/include", generate_testdata_include))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/index.css", generate_testdata_index_css))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/index.html", generate_testdata_index_html))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/index.js", generate_testdata_index_js))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/plain", generate_testdata_plain))
+	node.AddChild(_memFS_getNode(memFS, "/direct", generate_testdata_direct))
+	node.AddChild(_memFS_getNode(memFS, "/exclude", generate_testdata_exclude))
+	node.AddChild(_memFS_getNode(memFS, "/include", generate_testdata_include))
+	node.AddChild(_memFS_getNode(memFS, "/index.css", generate_testdata_index_css))
+	node.AddChild(_memFS_getNode(memFS, "/index.html", generate_testdata_index_html))
+	node.AddChild(_memFS_getNode(memFS, "/index.js", generate_testdata_index_js))
+	node.AddChild(_memFS_getNode(memFS, "/plain", generate_testdata_plain))
 	return node
 }
 
@@ -36,7 +36,7 @@ func generate_testdata_direct() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("direct")
 	node.SetSize(0)
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/direct/add", generate_testdata_direct_add))
+	node.AddChild(_memFS_getNode(memFS, "/direct/add", generate_testdata_direct_add))
 	return node
 }
 
@@ -50,8 +50,8 @@ func generate_testdata_direct_add() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("add")
 	node.SetSize(0)
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/direct/add/file", generate_testdata_direct_add_file))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/direct/add/file2", generate_testdata_direct_add_file2))
+	node.AddChild(_memFS_getNode(memFS, "/direct/add/file", generate_testdata_direct_add_file))
+	node.AddChild(_memFS_getNode(memFS, "/direct/add/file2", generate_testdata_direct_add_file2))
 	return node
 }
 
@@ -93,9 +93,9 @@ func generate_testdata_exclude() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("exclude")
 	node.SetSize(0)
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/exclude/index.css", generate_testdata_exclude_index_css))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/exclude/index.html", generate_testdata_exclude_index_html))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/exclude/index.js", generate_testdata_exclude_index_js))
+	node.AddChild(_memFS_getNode(memFS, "/exclude/index.css", generate_testdata_exclude_index_css))
+	node.AddChild(_memFS_getNode(memFS, "/exclude/index.html", generate_testdata_exclude_index_html))
+	node.AddChild(_memFS_getNode(memFS, "/exclude/index.js", generate_testdata_exclude_index_js))
 	return node
 }
 
@@ -151,9 +151,9 @@ func generate_testdata_include() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("include")
 	node.SetSize(0)
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/include/index.css", generate_testdata_include_index_css))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/include/index.html", generate_testdata_include_index_html))
-	node.AddChild(_memfsPathNode_getNode(memfsPathNode, "/include/index.js", generate_testdata_include_index_js))
+	node.AddChild(_memFS_getNode(memFS, "/include/index.css", generate_testdata_include_index_css))
+	node.AddChild(_memFS_getNode(memFS, "/include/index.html", generate_testdata_include_index_html))
+	node.AddChild(_memFS_getNode(memFS, "/include/index.js", generate_testdata_include_index_js))
 	return node
 }
 
@@ -259,8 +259,8 @@ func generate_testdata_plain() *memfs.Node {
 // _getNode is internal function to minimize duplicate node created on
 // Node.AddChild() and on generatedPathNode.Set().
 //
-func _memfsPathNode_getNode(root *memfs.PathNode, path string, fn func() *memfs.Node) (node *memfs.Node) {
-	node = root.Get(path)
+func _memFS_getNode(mfs *memfs.MemFS, path string, fn func() *memfs.Node) (node *memfs.Node) {
+	node = mfs.PathNodes.Get(path)
 	if node != nil {
 		return node
 	}
@@ -268,39 +268,52 @@ func _memfsPathNode_getNode(root *memfs.PathNode, path string, fn func() *memfs.
 }
 
 func init() {
-	memfsPathNode = memfs.NewPathNode()
-	memfsPathNode.Set("/",
-		_memfsPathNode_getNode(memfsPathNode, "/", generate_testdata))
-	memfsPathNode.Set("/direct",
-		_memfsPathNode_getNode(memfsPathNode, "/direct", generate_testdata_direct))
-	memfsPathNode.Set("/direct/add",
-		_memfsPathNode_getNode(memfsPathNode, "/direct/add", generate_testdata_direct_add))
-	memfsPathNode.Set("/direct/add/file",
-		_memfsPathNode_getNode(memfsPathNode, "/direct/add/file", generate_testdata_direct_add_file))
-	memfsPathNode.Set("/direct/add/file2",
-		_memfsPathNode_getNode(memfsPathNode, "/direct/add/file2", generate_testdata_direct_add_file2))
-	memfsPathNode.Set("/exclude",
-		_memfsPathNode_getNode(memfsPathNode, "/exclude", generate_testdata_exclude))
-	memfsPathNode.Set("/exclude/index.css",
-		_memfsPathNode_getNode(memfsPathNode, "/exclude/index.css", generate_testdata_exclude_index_css))
-	memfsPathNode.Set("/exclude/index.html",
-		_memfsPathNode_getNode(memfsPathNode, "/exclude/index.html", generate_testdata_exclude_index_html))
-	memfsPathNode.Set("/exclude/index.js",
-		_memfsPathNode_getNode(memfsPathNode, "/exclude/index.js", generate_testdata_exclude_index_js))
-	memfsPathNode.Set("/include",
-		_memfsPathNode_getNode(memfsPathNode, "/include", generate_testdata_include))
-	memfsPathNode.Set("/include/index.css",
-		_memfsPathNode_getNode(memfsPathNode, "/include/index.css", generate_testdata_include_index_css))
-	memfsPathNode.Set("/include/index.html",
-		_memfsPathNode_getNode(memfsPathNode, "/include/index.html", generate_testdata_include_index_html))
-	memfsPathNode.Set("/include/index.js",
-		_memfsPathNode_getNode(memfsPathNode, "/include/index.js", generate_testdata_include_index_js))
-	memfsPathNode.Set("/index.css",
-		_memfsPathNode_getNode(memfsPathNode, "/index.css", generate_testdata_index_css))
-	memfsPathNode.Set("/index.html",
-		_memfsPathNode_getNode(memfsPathNode, "/index.html", generate_testdata_index_html))
-	memfsPathNode.Set("/index.js",
-		_memfsPathNode_getNode(memfsPathNode, "/index.js", generate_testdata_index_js))
-	memfsPathNode.Set("/plain",
-		_memfsPathNode_getNode(memfsPathNode, "/plain", generate_testdata_plain))
+	memFS = &memfs.MemFS{
+		PathNodes: memfs.NewPathNode(),
+		Opts: &memfs.Options{
+			Root: "testdata",
+			MaxFileSize: 5242880,
+			Includes: []string{
+			},
+			Excludes: []string{
+				`^\..*`,
+			},
+		},
+	}
+	memFS.PathNodes.Set("/",
+		_memFS_getNode(memFS, "/", generate_testdata))
+	memFS.PathNodes.Set("/direct",
+		_memFS_getNode(memFS, "/direct", generate_testdata_direct))
+	memFS.PathNodes.Set("/direct/add",
+		_memFS_getNode(memFS, "/direct/add", generate_testdata_direct_add))
+	memFS.PathNodes.Set("/direct/add/file",
+		_memFS_getNode(memFS, "/direct/add/file", generate_testdata_direct_add_file))
+	memFS.PathNodes.Set("/direct/add/file2",
+		_memFS_getNode(memFS, "/direct/add/file2", generate_testdata_direct_add_file2))
+	memFS.PathNodes.Set("/exclude",
+		_memFS_getNode(memFS, "/exclude", generate_testdata_exclude))
+	memFS.PathNodes.Set("/exclude/index.css",
+		_memFS_getNode(memFS, "/exclude/index.css", generate_testdata_exclude_index_css))
+	memFS.PathNodes.Set("/exclude/index.html",
+		_memFS_getNode(memFS, "/exclude/index.html", generate_testdata_exclude_index_html))
+	memFS.PathNodes.Set("/exclude/index.js",
+		_memFS_getNode(memFS, "/exclude/index.js", generate_testdata_exclude_index_js))
+	memFS.PathNodes.Set("/include",
+		_memFS_getNode(memFS, "/include", generate_testdata_include))
+	memFS.PathNodes.Set("/include/index.css",
+		_memFS_getNode(memFS, "/include/index.css", generate_testdata_include_index_css))
+	memFS.PathNodes.Set("/include/index.html",
+		_memFS_getNode(memFS, "/include/index.html", generate_testdata_include_index_html))
+	memFS.PathNodes.Set("/include/index.js",
+		_memFS_getNode(memFS, "/include/index.js", generate_testdata_include_index_js))
+	memFS.PathNodes.Set("/index.css",
+		_memFS_getNode(memFS, "/index.css", generate_testdata_index_css))
+	memFS.PathNodes.Set("/index.html",
+		_memFS_getNode(memFS, "/index.html", generate_testdata_index_html))
+	memFS.PathNodes.Set("/index.js",
+		_memFS_getNode(memFS, "/index.js", generate_testdata_index_js))
+	memFS.PathNodes.Set("/plain",
+		_memFS_getNode(memFS, "/plain", generate_testdata_plain))
+
+	memFS.Root = memFS.PathNodes.Get("/")
 }

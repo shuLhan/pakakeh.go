@@ -75,8 +75,8 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 // _getNode is internal function to minimize duplicate node created on
 // Node.AddChild() and on generatedPathNode.Set().
 //
-func _{{$varname}}_getNode(root *memfs.PathNode, path string, fn func() *memfs.Node) (node *memfs.Node) {
-	node = root.Get(path)
+func _{{$varname}}_getNode(mfs *memfs.MemFS, path string, fn func() *memfs.Node) (node *memfs.Node) {
+	node = mfs.PathNodes.Get(path)
 	if node != nil {
 		return node
 	}
@@ -84,11 +84,30 @@ func _{{$varname}}_getNode(root *memfs.PathNode, path string, fn func() *memfs.N
 }
 
 func init() {
-	{{$varname}} = memfs.NewPathNode()
+	{{$varname}} = &memfs.MemFS{
+		PathNodes: memfs.NewPathNode(),
+		Opts: &memfs.Options{
+			Root: "{{.Opts.Root}}",
+			MaxFileSize: {{.Opts.MaxFileSize}},
+			Includes: []string{
+			{{- range $v := .Opts.Includes}}
+				` + "`{{$v}}`" + `,
+			{{- end}}
+			},
+			Excludes: []string{
+			{{- range $v := .Opts.Excludes}}
+				` + "`{{$v}}`" + `,
+			{{- end}}
+			},
+		},
+	}
+
 {{- range $path, $node := .Nodes}}
-	{{$varname}}.Set("{{$path}}",
+	{{$varname}}.PathNodes.Set("{{$path}}",
 		_{{$varname}}_getNode({{$varname}}, "{{$path}}", {{$node.GenFuncName}}))
 {{- end}}
+
+	{{$varname}}.Root = {{$varname}}.PathNodes.Get("/")
 }
 {{end}}
 `

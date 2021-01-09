@@ -13,7 +13,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var memfsPathNode *memfs.PathNode
+var memFS *memfs.MemFS
 
 func TestGeneratePathNode(t *testing.T) {
 	expRoot := &memfs.Node{
@@ -50,18 +50,10 @@ func TestGeneratePathNode(t *testing.T) {
 		exp:  expExcludeIndexHTML,
 	}}
 
-	opts := &memfs.Options{
-		GeneratedPathNode: memfsPathNode,
-	}
-	mfs, err := memfs.New(opts)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	for _, c := range cases {
 		t.Log(c.path)
 
-		got, err := mfs.Get(c.path)
+		got, err := memFS.Get(c.path)
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error(), true)
 			continue
@@ -75,14 +67,6 @@ func TestGeneratePathNode(t *testing.T) {
 }
 
 func TestNode_Readdir(t *testing.T) {
-	opts := &memfs.Options{
-		GeneratedPathNode: memfsPathNode,
-	}
-	mfs, err := memfs.New(opts)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	cases := []struct {
 		path string
 		exp  []string
@@ -127,7 +111,7 @@ func TestNode_Readdir(t *testing.T) {
 	for _, c := range cases {
 		t.Logf(c.path)
 
-		file, err := mfs.Open(c.path)
+		file, err := memFS.Open(c.path)
 		if err != nil {
 			t.Fatal(err)
 		}

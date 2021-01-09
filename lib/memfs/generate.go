@@ -11,10 +11,13 @@ import (
 )
 
 const (
-	defGeneratedVarName = "memfsPathNode"
+	DefaultGenPackageName = "main"
+	DefaultGenVarName     = "memFS"
+	DefaultGenGoFileName  = "memfs_generate.go"
 )
 
 type generateData struct {
+	Opts    *Options
 	VarName string
 	Node    *Node
 	Nodes   map[string]*Node
@@ -25,31 +28,33 @@ type generateData struct {
 //
 // If pkgName is not defined it will be default to "main".
 //
-// varName is the global variable name that will return the memfs root
-// PathNode, which can be used to initilize New() function.
+// varName is the global variable name with type *memfs.MemFS which will be
+// initialize by generated Go source code on init().
+// The varName default to "memFS" if its empty.
 //
-// If out is not defined it will be default "memfs_generate.go" and saved in
-// current directory.
+// If out is not defined it will be default to "memfs_generate.go" and saved
+// in current directory from where its called.
 //
 // If contentEncoding is not empty, it will encode the content of node and set
 // the node ContentEncoding.
 // List of available encoding is "gzip".
 // For example, if contentEncoding is "gzip" it will compress the content of
-// file using gzip and set "ContentEncoding" to "gzip".
+// file using gzip and set Node.ContentEncoding to "gzip".
 //
 func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err error) {
 	if len(pkgName) == 0 {
-		pkgName = "main"
+		pkgName = DefaultGenPackageName
 	}
 	if len(varName) == 0 {
-		varName = defGeneratedVarName
+		varName = DefaultGenVarName
 	}
 	if len(out) == 0 {
-		out = "memfs_generate.go"
+		out = DefaultGenGoFileName
 	}
 	genData := &generateData{
+		Opts:    mfs.Opts,
 		VarName: varName,
-		Nodes:   mfs.pn.v,
+		Nodes:   mfs.PathNodes.v,
 	}
 
 	tmpl, err := generateTemplate()
@@ -80,11 +85,11 @@ func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err
 		// Ignore and delete the file from map if its the output
 		// itself.
 		if strings.HasSuffix(names[x], out) {
-			delete(mfs.pn.v, names[x])
+			delete(mfs.PathNodes.v, names[x])
 			continue
 		}
 
-		genData.Node = mfs.pn.v[names[x]]
+		genData.Node = mfs.PathNodes.v[names[x]]
 
 		err = tmpl.ExecuteTemplate(f, templateNameGenerateNode, genData)
 		if err != nil {

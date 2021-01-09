@@ -35,6 +35,10 @@ type ServerOptions struct {
 	// the content directly instead of using memory file system.
 	memfs.Options
 
+	// Memfs contains the content of file systems to be served in memory.
+	// It will be initialized only if Root is not empty and if its nil.
+	Memfs *memfs.MemFS
+
 	// Address define listen address, using ip:port format.
 	// This field is optional, default to ":80".
 	Address string

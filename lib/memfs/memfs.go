@@ -36,17 +36,16 @@ const (
 type MemFS struct {
 	http.FileSystem
 
-	opts  *Options
-	incRE []*regexp.Regexp
-	excRE []*regexp.Regexp
-	root  *Node
-	pn    *PathNode
+	PathNodes *PathNode
+	Root      *Node
+	Opts      *Options
+	incRE     []*regexp.Regexp
+	excRE     []*regexp.Regexp
 }
 
 //
 // New create and initialize new memory file system from directory Root using
-// list of regular expresssion for Including or Excluding files; or from
-// GeneratedPathNode.
+// list of regular expresssion for Including or Excluding files.
 //
 func New(opts *Options) (mfs *MemFS, err error) {
 	if opts == nil {
@@ -54,23 +53,12 @@ func New(opts *Options) (mfs *MemFS, err error) {
 	}
 	opts.init()
 
-	if opts.GeneratedPathNode != nil {
-		if !opts.Development {
-			mfs = &MemFS{
-				pn:   opts.GeneratedPathNode,
-				root: opts.GeneratedPathNode.Get("/"),
-				opts: opts,
-			}
-			return mfs, nil
-		}
-	}
-
 	mfs = &MemFS{
-		pn: &PathNode{
+		PathNodes: &PathNode{
 			v: make(map[string]*Node),
 			f: nil,
 		},
-		opts: opts,
+		Opts: opts,
 	}
 
 	for _, inc := range opts.Includes {
@@ -88,7 +76,7 @@ func New(opts *Options) (mfs *MemFS, err error) {
 		mfs.excRE = append(mfs.excRE, re)
 	}
 
-	err = mfs.mount(opts.Root)
+	err = mfs.mount()
 	if err != nil {
 		return nil, fmt.Errorf("memfs.New: %w", err)
 	}
@@ -137,12 +125,12 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 		node.generateFuncName(path)
 
 		if parent == nil {
-			mfs.root.Childs = append(mfs.root.Childs, node)
+			mfs.Root.Childs = append(mfs.Root.Childs, node)
 		} else {
 			parent.Childs = append(parent.Childs, node)
 		}
 
-		mfs.pn.v[node.Path] = node
+		mfs.PathNodes.v[node.Path] = node
 
 		parent = node
 	}
@@ -159,12 +147,12 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 	}
 	node.generateFuncName(path)
 
-	if mfs.opts.MaxFileSize <= 0 {
+	if mfs.Opts.MaxFileSize <= 0 {
 		node.size = 0
 		return node, nil
 	}
 
-	err = node.updateContent(mfs.opts.MaxFileSize)
+	err = node.updateContent(mfs.Opts.MaxFileSize)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +163,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 	}
 
 	parent.Childs = append(parent.Childs, node)
-	mfs.pn.v[node.Path] = node
+	mfs.PathNodes.v[node.Path] = node
 
 	return node, nil
 }
@@ -204,7 +192,7 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 		return fmt.Errorf("memfs.ContentEncode: invalid encoding " + encoding)
 	}
 
-	for _, node := range mfs.pn.v {
+	for _, node := range mfs.PathNodes.v {
 		if node.mode.IsDir() || len(node.V) == 0 {
 			continue
 		}
@@ -241,9 +229,9 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 // will return os.ErrNotExist.
 //
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
-	node = mfs.pn.Get(path)
+	node = mfs.PathNodes.Get(path)
 	if node == nil {
-		if mfs.opts.Development {
+		if mfs.Opts.Development {
 			node, err = mfs.refresh(path)
 			if err != nil {
 				log.Println("lib/memfs: Get: " + err.Error())
@@ -254,8 +242,8 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 		return nil, os.ErrNotExist
 	}
 
-	if mfs.opts.Development {
-		err = node.update(nil, mfs.opts.MaxFileSize)
+	if mfs.Opts.Development {
+		err = node.update(nil, mfs.Opts.MaxFileSize)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.Get: %w", err)
 		}
@@ -276,14 +264,14 @@ func (mfs *MemFS) Open(path string) (http.File, error) {
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
-	paths = make([]string, 0, len(mfs.pn.f)+len(mfs.pn.v))
+	paths = make([]string, 0, len(mfs.PathNodes.f)+len(mfs.PathNodes.v))
 
-	for k := range mfs.pn.f {
+	for k := range mfs.PathNodes.f {
 		paths = append(paths, k)
 	}
 
-	for k := range mfs.pn.v {
-		_, ok := mfs.pn.f[k]
+	for k := range mfs.PathNodes.v {
+		_, ok := mfs.PathNodes.f[k]
 		if !ok {
 			paths = append(paths, k)
 		}
@@ -302,40 +290,35 @@ func (mfs *MemFS) ListNames() (paths []string) {
 // mount does not have any effect if current directory contains ".go"
 // file generated from GoGenerate().
 //
-func (mfs *MemFS) mount(dir string) error {
-	if len(dir) == 0 {
+func (mfs *MemFS) mount() error {
+	if len(mfs.Opts.Root) == 0 {
 		return nil
 	}
-	if mfs.opts.GeneratedPathNode != nil {
-		if !mfs.opts.Development {
-			return nil
-		}
-	}
 
-	if mfs.pn == nil {
-		mfs.pn = &PathNode{
+	if mfs.PathNodes == nil {
+		mfs.PathNodes = &PathNode{
 			v: make(map[string]*Node),
 			f: nil,
 		}
 	}
 
-	f, err := os.Open(dir)
+	f, err := os.Open(mfs.Opts.Root)
 	if err != nil {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	err = mfs.createRoot(dir, f)
+	err = mfs.createRoot(f)
 	if err != nil {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	err = mfs.scanDir(mfs.root, f)
+	err = mfs.scanDir(mfs.Root, f)
 	_ = f.Close()
 	if err != nil {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	if mfs.opts.MaxFileSize > 0 {
+	if mfs.Opts.MaxFileSize > 0 {
 		mfs.pruneEmptyDirs()
 	}
 
@@ -347,31 +330,31 @@ func (mfs *MemFS) mount(dir string) error {
 // information.
 // This method only check if the node name is equal with file name, but it's
 // not checking whether the node is part of memfs (node is parent or have the
-// same root node).
+// same Root node).
 //
 func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 	if node == nil || newInfo == nil {
 		return
 	}
 
-	err := node.update(newInfo, mfs.opts.MaxFileSize)
+	err := node.update(newInfo, mfs.Opts.MaxFileSize)
 	if err != nil {
 		log.Println("lib/memfs: Update: " + err.Error())
 	}
 }
 
-func (mfs *MemFS) createRoot(dir string, f *os.File) error {
+func (mfs *MemFS) createRoot(f *os.File) error {
 	fi, err := f.Stat()
 	if err != nil {
 		return err
 	}
 
 	if !fi.IsDir() {
-		return fmt.Errorf("%q must be a directory", dir)
+		return fmt.Errorf("%q must be a directory", mfs.Opts.Root)
 	}
 
-	mfs.root = &Node{
-		SysPath: dir,
+	mfs.Root = &Node{
+		SysPath: mfs.Opts.Root,
 		Path:    "/",
 		name:    "/",
 		modTime: fi.ModTime(),
@@ -380,9 +363,9 @@ func (mfs *MemFS) createRoot(dir string, f *os.File) error {
 		V:       nil,
 		Parent:  nil,
 	}
-	mfs.root.generateFuncName(dir)
+	mfs.Root.generateFuncName(mfs.Opts.Root)
 
-	mfs.pn.v[mfs.root.Path] = mfs.root
+	mfs.PathNodes.v[mfs.Root.Path] = mfs.Root
 
 	return nil
 }
@@ -447,13 +430,13 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		return nil, nil
 	}
 
-	child, err = parent.addChild(sysPath, fi, mfs.opts.MaxFileSize)
+	child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
 	if err != nil {
 		log.Printf("AddChild %s: %s", fi.Name(), err.Error())
 		return nil, nil
 	}
 
-	mfs.pn.v[child.Path] = child
+	mfs.PathNodes.v[child.Path] = child
 
 	return child, nil
 }
@@ -465,7 +448,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
 	removed = parent.removeChild(child)
 	if removed != nil {
-		delete(mfs.pn.v, removed.Path)
+		delete(mfs.PathNodes.v, removed.Path)
 	}
 	return
 }
@@ -499,7 +482,7 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 // pruneEmptyDirs remove node that is directory and does not have childs.
 //
 func (mfs *MemFS) pruneEmptyDirs() {
-	for k, node := range mfs.pn.v {
+	for k, node := range mfs.PathNodes.v {
 		if !node.mode.IsDir() {
 			continue
 		}
@@ -511,7 +494,7 @@ func (mfs *MemFS) pruneEmptyDirs() {
 		}
 
 		node.Parent.removeChild(node)
-		delete(mfs.pn.v, k)
+		delete(mfs.PathNodes.v, k)
 	}
 }
 
@@ -519,7 +502,7 @@ func (mfs *MemFS) pruneEmptyDirs() {
 // refresh the tree by rescanning from the root.
 //
 func (mfs *MemFS) refresh(url string) (node *Node, err error) {
-	syspath := filepath.Join(mfs.root.SysPath, url)
+	syspath := filepath.Join(mfs.Root.SysPath, url)
 
 	_, err = os.Stat(syspath)
 	if err != nil {
@@ -527,12 +510,12 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	}
 
 	// Path exist on file system, try to refresh directory.
-	f, err := os.Open(mfs.root.SysPath)
+	f, err := os.Open(mfs.Root.SysPath)
 	if err != nil {
 		return nil, err
 	}
 
-	err = mfs.scanDir(mfs.root, f)
+	err = mfs.scanDir(mfs.Root, f)
 	if err != nil {
 		return nil, err
 	}
@@ -542,7 +525,7 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 		return nil, err
 	}
 
-	node = mfs.pn.Get(url)
+	node = mfs.PathNodes.Get(url)
 	if node == nil {
 		return nil, os.ErrNotExist
 	}
@@ -566,7 +549,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		tokens[x] = bytes.ToLower(tokens[x])
 	}
 
-	for _, node := range mfs.pn.v {
+	for _, node := range mfs.PathNodes.v {
 		if node.mode.IsDir() {
 			continue
 		}

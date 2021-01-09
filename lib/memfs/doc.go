@@ -61,14 +61,14 @@
 //
 //	package mypackage
 //
-//	var myFS *memfs.PathNode
+//	var myFS *memfs.MemFS
 //
 // Second, write the content of memfs instance as Go source code file,
 //
 //	mfs.GoGenerate("mypackage", "myFS", "mypackage/file.go", memfs.EncodingGzip)
 //
 // The Go generated file will be defined with package named "mypackage" using
-// global variable "rootFS" as container stored in
+// global variable "myFS" as container stored in
 // file "mypackage/file.go" with each content encoded (compressed) using
 // gzip.
 //

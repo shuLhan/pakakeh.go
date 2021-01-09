@@ -36,9 +36,8 @@ type Server struct {
 	opts *ServerOptions
 
 	// Memfs contains the content of file systems to be served in memory.
-	// It will be initialized only if ServerOptions's Root is not empty or
-	// if the current directory contains generated Go file from
-	// memfs.GoGenerate.
+	// It will be initialized only if ServerOptions.Memfs is nil and Root
+	// is not empty.
 	Memfs *memfs.MemFS
 
 	evals        []Evaluator
@@ -62,6 +61,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 
 	srv.Server = opts.Conn
 	srv.Addr = opts.Address
+	srv.Memfs = opts.Memfs
 	srv.Handler = srv
 
 	if srv.ReadTimeout == 0 {
@@ -71,7 +71,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 		srv.WriteTimeout = defRWTimeout
 	}
 
-	if len(opts.Root) > 0 {
+	if opts.Memfs == nil && len(opts.Root) > 0 {
 		srv.Memfs, err = memfs.New(&opts.Options)
 		if err != nil {
 			return nil, err
