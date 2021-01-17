@@ -1,4 +1,4 @@
-name: Go1.13
+name: Go1.14
 on: [push]
 jobs:
 
@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.13
+    - name: Set up Go 1.14
       uses: actions/setup-go@v1
       with:
-        go-version: 1.13.10
+        go-version: 1.14.13
       id: go
 
     - name: Check out code into the Go module directory
