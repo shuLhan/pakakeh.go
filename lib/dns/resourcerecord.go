@@ -90,16 +90,16 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	case QueryTypeA:
 		v, ok := rr.Value.(string)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR A: expecting Value as string got %T", rr.Value)
 		}
 		s := string(v)
 		ip := net.ParseIP(s)
 		if ip == nil {
-			return errRRValue(rr.Type, s)
+			return fmt.Errorf("RR A: invalid or empty IP address %q", s)
 		}
 		ipv4 := ip.To4()
 		if ipv4 == nil {
-			return errRRValue(rr.Type, s)
+			return fmt.Errorf("RR A: invalid or empty IPv4 address %q", s)
 		}
 
 	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG,
@@ -107,44 +107,46 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 
 		v, ok := rr.Value.(string)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR %s: expecting Value as string got %T",
+				QueryTypeNames[rr.Type], rr.Value)
 		}
 
 		if !libnet.IsHostnameValid([]byte(v), true) {
-			return errRRValue(rr.Type, v)
+			return fmt.Errorf("RR %s: invalid or empty value: %q",
+				QueryTypeNames[rr.Type], v)
 		}
 
 	case QueryTypeSOA:
 		soa, ok := rr.Value.(*RDataSOA)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR SOA: expecting RDataSOA got %T", rr.Value)
 		}
 		if !libnet.IsHostnameValid([]byte(soa.MName), true) {
-			return errRRValue(rr.Type, string(soa.MName))
+			return fmt.Errorf("RR SOA: invalid or empty MName: %q", soa.MName)
 		}
 		if !libnet.IsHostnameValid([]byte(soa.RName), true) {
-			return errRRValue(rr.Type, string(soa.RName))
+			return fmt.Errorf("RR SOA: invalid or empty RName: %q", soa.RName)
 		}
 	case QueryTypeWKS:
 		_, ok := rr.Value.(*RDataWKS)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR WKS: expecting WKS got %T", rr.Value)
 		}
 
 	case QueryTypeHINFO:
 		_, ok := rr.Value.(*RDataHINFO)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR HINFO: expecting HINFO got %T", rr.Value)
 		}
 	case QueryTypeMINFO:
 		_, ok := rr.Value.(*RDataMINFO)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR MINFO: expecting MINFO got %T", rr.Value)
 		}
 	case QueryTypeMX:
 		mx, ok := rr.Value.(*RDataMX)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR MX: expecting MX got %T", rr.Value)
 		}
 		err = mx.initAndValidate()
 		if err != nil {
@@ -153,7 +155,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	case QueryTypeTXT:
 		txt, ok := rr.Value.(string)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR TXT: expecting string got %T", rr.Value)
 		}
 		if len(txt) == 0 {
 			return errors.New("empty RR TXT value")
@@ -161,7 +163,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	case QueryTypeSRV:
 		srv, ok := rr.Value.(*RDataSRV)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR SRV: expecting SRV got %T", rr.Value)
 		}
 		err = srv.initAndValidate()
 		if err != nil {
@@ -170,30 +172,26 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	case QueryTypeAAAA:
 		v, ok := rr.Value.(string)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR AAAA: expecting AAAA got %T", rr.Value)
 		}
 		s := string(v)
 		ip := net.ParseIP(s)
 		if ip == nil {
-			return errRRValue(rr.Type, s)
+			return fmt.Errorf("RR AAAA: invalid or empty IPv6 address: %q", s)
 		}
 		ipv6 := ip.To16()
 		if ipv6 == nil {
-			return errRRValue(rr.Type, s)
+			return fmt.Errorf("RR AAAA: invalid or empty IPv6 address: %q", s)
 		}
 	case QueryTypeOPT:
 		_, ok := rr.Value.(*RDataOPT)
 		if !ok {
-			return errRRValue(rr.Type, "")
+			return fmt.Errorf("RR OPT: expecting OPT got %T", rr.Value)
 		}
 	default:
 		return fmt.Errorf("unknown RR type %d", rr.Type)
 	}
 	return nil
-}
-
-func errRRValue(t uint16, v string) error {
-	return fmt.Errorf("invalid or empty query type %d value: %q", t, v)
 }
 
 //
