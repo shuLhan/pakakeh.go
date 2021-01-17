@@ -22,7 +22,7 @@ import (
 type ZoneFile struct {
 	Path     string `json:"-"`
 	Name     string
-	SOA      *ResourceRecord
+	SOA      ResourceRecord
 	Records  zoneRecords
 	messages []*Message
 }
@@ -32,8 +32,14 @@ type ZoneFile struct {
 //
 func NewZoneFile(file, name string) *ZoneFile {
 	return &ZoneFile{
-		Path:    file,
-		Name:    name,
+		Path: file,
+		Name: name,
+		SOA: ResourceRecord{
+			Type: QueryTypeSOA,
+			Value: &RDataSOA{
+				MName: name,
+			},
+		},
 		Records: make(zoneRecords),
 	}
 }
@@ -136,7 +142,7 @@ func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 //
 func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
 	if rr.Type == QueryTypeSOA {
-		zone.SOA = rr
+		zone.SOA = *rr
 	} else {
 		zone.Records.add(rr)
 	}
@@ -190,7 +196,10 @@ func (zone *ZoneFile) Messages() []*Message {
 //
 func (zone *ZoneFile) Remove(rr *ResourceRecord) (err error) {
 	if rr.Type == QueryTypeSOA {
-		zone.SOA = nil
+		zone.SOA = ResourceRecord{
+			Type:  QueryTypeSOA,
+			Value: &RDataSOA{},
+		}
 	} else {
 		if zone.Records.remove(rr) {
 			err = zone.Save()
@@ -216,12 +225,8 @@ func (zone *ZoneFile) Save() (err error) {
 
 	fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
 
-	if zone.SOA != nil {
-		soa, ok := zone.SOA.Value.(*RDataSOA)
-		if !ok {
-			err = errors.New("invalid record value for SOA")
-			goto out
-		}
+	soa, ok := zone.SOA.Value.(*RDataSOA)
+	if ok && len(soa.MName) > 0 {
 		_, err = fmt.Fprintf(out,
 			"@ SOA %s. %s. %d %d %d %d %d\n",
 			soa.MName, soa.RName, soa.Serial, soa.Refresh,
