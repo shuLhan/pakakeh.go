@@ -42,12 +42,12 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	masterFile, err := ParseZoneFile("testdata/kilabit.info", "", 0)
+	zoneFile, err := ParseZoneFile("testdata/kilabit.info", "", 0)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_testServer.PopulateCaches(masterFile.messages, masterFile.Path)
+	_testServer.PopulateCaches(zoneFile.messages, zoneFile.Path)
 
 	go func() {
 		err = _testServer.ListenAndServe()

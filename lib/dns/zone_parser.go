@@ -50,7 +50,7 @@ const (
 	parseSRVTarget
 )
 
-type masterParser struct {
+type zoneParser struct {
 	zone   *ZoneFile
 	lineno int
 	seps   []byte
@@ -62,8 +62,8 @@ type masterParser struct {
 	flag   int
 }
 
-func newMasterParser(file string) *masterParser {
-	return &masterParser{
+func newZoneParser(file string) *zoneParser {
+	return &zoneParser{
 		zone:   NewZoneFile(file, ""),
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
@@ -72,9 +72,9 @@ func newMasterParser(file string) *masterParser {
 }
 
 //
-// Init parse masterParser file from string.
+// Init parse zoneParser file from string.
 //
-func (m *masterParser) Init(data, origin string, ttl uint32) {
+func (m *zoneParser) Init(data, origin string, ttl uint32) {
 	m.zone = NewZoneFile("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
@@ -91,7 +91,7 @@ func (m *masterParser) Init(data, origin string, ttl uint32) {
 // a list of items across a line boundary, and text literals can contain
 // CRLF within the text.  Any combination of tabs and spaces act as a
 // delimiter between the separate items that make up an entry.  The end of
-// any line in the master file can end with a comment.  The comment starts
+// any line in the zone file can end with a comment.  The comment starts
 // with a ";" (semicolon).
 //
 // The following entries are defined:
@@ -121,14 +121,14 @@ func (m *masterParser) Init(data, origin string, ttl uint32) {
 // blank, then the RR is assumed to be owned by the last stated owner.  If
 // an RR entry begins with a <domain-name>, then the owner name is reset.
 //
-// <domain-name>s make up a large share of the data in the master file.
+// <domain-name>s make up a large share of the data in the zone file.
 // The labels in the domain name are expressed as character strings and
 // separated by dots.  Quoting conventions allow arbitrary characters to be
 // stored in domain names.  Domain names that end in a dot are called
 // absolute, and are taken as complete.  Domain names which do not end in a
 // dot are called relative; the actual domain name is the concatenation of
 // the relative part with an origin specified in a $ORIGIN, $INCLUDE, or as
-// an argument to the master file loading routine.  A relative name is an
+// an argument to the zone file loading routine.  A relative name is an
 // error when no origin is available.
 //
 // <character-string> is expressed in one or two ways: as a contiguous set
@@ -158,7 +158,7 @@ func (m *masterParser) Init(data, origin string, ttl uint32) {
 // ;               Semicolon is used to start a comment; the remainder of
 //                 the line is ignored.
 //
-func (m *masterParser) parse() (err error) {
+func (m *zoneParser) parse() (err error) {
 	var rr *ResourceRecord
 
 	for {
@@ -221,7 +221,7 @@ func (m *masterParser) parse() (err error) {
 //
 //    $ORIGIN <domain-name> [<comment>]
 //
-func (m *masterParser) parseDirectiveOrigin() (err error) {
+func (m *zoneParser) parseDirectiveOrigin() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: empty $origin directive", m.lineno)
@@ -259,7 +259,7 @@ func (m *masterParser) parseDirectiveOrigin() (err error) {
 //
 //    $INCLUDE <file-name> [<domain-name>] [<comment>]
 //
-func (m *masterParser) parseDirectiveInclude() (err error) {
+func (m *zoneParser) parseDirectiveInclude() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: empty $include directive", m.lineno)
@@ -303,17 +303,17 @@ func (m *masterParser) parseDirectiveInclude() (err error) {
 		}
 	}
 
-	masterFile, err := ParseZoneFile(incfile, dname, m.ttl)
+	zoneFile, err := ParseZoneFile(incfile, dname, m.ttl)
 	if err != nil {
 		return err
 	}
 
-	m.zone.messages = append(m.zone.messages, masterFile.messages...)
+	m.zone.messages = append(m.zone.messages, zoneFile.messages...)
 
 	return nil
 }
 
-func (m *masterParser) parseDirectiveTTL() (err error) {
+func (m *zoneParser) parseDirectiveTTL() (err error) {
 	var (
 		c      byte
 		isTerm bool
@@ -403,7 +403,7 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 // order is different from the order used in examples and the order used in
 // the actual RRs; the given order allows easier parsing and defaulting.)
 //
-func (m *masterParser) parseRR(prevRR *ResourceRecord, tok []byte) (
+func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 	rr *ResourceRecord, err error,
 ) {
 	var (
@@ -544,7 +544,7 @@ out:
 // parseRRClassOrType check if token either class or type.
 // It will return true if one of them is set, otherwise it will return false.
 //
-func (m *masterParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
+func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 	isClass := m.parseRRClass(rr, stok)
 	if isClass {
 		m.flag |= parseRRClass
@@ -565,7 +565,7 @@ func (m *masterParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool 
 // It will set the rr.Class and return true if stok is one of known class;
 // otherwise it will return false.
 //
-func (m *masterParser) parseRRClass(rr *ResourceRecord, stok string) bool {
+func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 	for k, v := range QueryClasses {
 		if stok == k {
 			rr.Class = v
@@ -580,7 +580,7 @@ func (m *masterParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 // It will set rr.Type and return true if token found, otherwise it will
 // return false.
 //
-func (m *masterParser) parseRRType(rr *ResourceRecord, stok string) bool {
+func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
 	for k, v := range QueryTypes {
 		if stok == k {
 			rr.Type = v
@@ -590,7 +590,7 @@ func (m *masterParser) parseRRType(rr *ResourceRecord, stok string) bool {
 	return false
 }
 
-func (m *masterParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
 	case QueryTypeA, QueryTypeAAAA:
 		rr.Value = string(tok)
@@ -601,11 +601,11 @@ func (m *masterParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	case QueryTypeSOA:
 		err = m.parseSOA(rr, tok)
 
-	// NULL RRs are not allowed in master files.
+	// NULL RRs are not allowed in zone files.
 	case QueryTypeNULL:
 		err = fmt.Errorf("line %d: NULL type is not allowed", m.lineno)
 
-	// In master files, both ports and protocols are expressed using
+	// In zone files, both ports and protocols are expressed using
 	// mnemonics or decimal numbers.
 	case QueryTypeWKS:
 		// TODO(ms)
@@ -629,7 +629,7 @@ func (m *masterParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	return err
 }
 
-func (m *masterParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	ascii.ToLower(&tok)
 
 	rrSOA := &RDataSOA{
@@ -769,7 +769,7 @@ out:
 	return nil
 }
 
-func (m *masterParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rrHInfo := &RDataHINFO{
 		CPU: tok,
 	}
@@ -796,7 +796,7 @@ func (m *masterParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	return nil
 }
 
-func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	rrMInfo := &RDataMINFO{
 		RMailBox: string(tok),
 	}
@@ -823,7 +823,7 @@ func (m *masterParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	return nil
 }
 
-func (m *masterParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	pref, err := strconv.ParseInt(string(tok), 10, 64)
 	if err != nil {
 		return fmt.Errorf("line %d: invalid MX Preference: %w", m.lineno, err)
@@ -862,7 +862,7 @@ func (m *masterParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 //
 // The rdata MUST contains double quote at the beginning and end of text.
 //
-func (m *masterParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
+func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	tok, _, _ := m.reader.ReadUntil(nil, []byte{'\n'})
 	v = append(v, tok...)
 	v = bytes.TrimSpace(v)
@@ -879,7 +879,7 @@ func (m *masterParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	return nil
 }
 
-func (m *masterParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	var v int
 
 	rrSRV := &RDataSRV{
@@ -955,7 +955,7 @@ out:
 	return nil
 }
 
-func (m *masterParser) generateDomainName(dname []byte) (out string) {
+func (m *zoneParser) generateDomainName(dname []byte) (out string) {
 	ascii.ToLower(&dname)
 	switch {
 	case dname[0] == '@':
@@ -973,12 +973,12 @@ func (m *masterParser) generateDomainName(dname []byte) (out string) {
 // and class already exist; otherwise it will create new message with question
 // based on RR.
 //
-func (m *masterParser) push(rr *ResourceRecord) error {
+func (m *zoneParser) push(rr *ResourceRecord) error {
 	m.lastRR = rr
 	return m.zone.Add(rr)
 }
 
-func (m *masterParser) setMinimumTTL() {
+func (m *zoneParser) setMinimumTTL() {
 	for _, msg := range m.zone.messages {
 		for x := 0; x < len(msg.Answer); x++ {
 			if msg.Answer[x].TTL < m.ttl {
@@ -998,7 +998,7 @@ func (m *masterParser) setMinimumTTL() {
 	}
 }
 
-func (m *masterParser) pack() {
+func (m *zoneParser) pack() {
 	for _, msg := range m.zone.messages {
 		msg.Header.ANCount = uint16(len(msg.Answer))
 		msg.Header.NSCount = uint16(len(msg.Authority))

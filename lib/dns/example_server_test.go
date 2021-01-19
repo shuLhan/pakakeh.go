@@ -50,13 +50,13 @@ func ExampleServer() {
 		log.Fatal(err)
 	}
 
-	// Load records to be served from master file.
-	masterFile, err := dns.ParseZoneFile("testdata/kilabit.info", "", 0)
+	// Load records to be served from zone file.
+	zoneFile, err := dns.ParseZoneFile("testdata/kilabit.info", "", 0)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	server.PopulateCaches(masterFile.Messages(), masterFile.Path)
+	server.PopulateCaches(zoneFile.Messages(), zoneFile.Path)
 
 	go func() {
 		err = server.ListenAndServe()

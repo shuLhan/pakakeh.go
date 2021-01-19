@@ -22,7 +22,7 @@ import (
 // and the MINIMUM field in the appropriate SOA.  Thus MINIMUM is a lower
 // bound on the TTL field for all RRs in a zone.  Note that this use of
 // MINIMUM should occur when the RRs are copied into the response and not
-// when the zone is loaded from a master file or via a zone transfer.  The
+// when the zone is loaded from a zone file or via a zone transfer.  The
 // reason for this provison is to allow future dynamic update facilities to
 // change the SOA RR with known semantics.
 //

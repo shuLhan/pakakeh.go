@@ -38,8 +38,7 @@ const (
 // Caches
 //
 // There are two type of answer: local and non-local.
-// Local answer is a DNS record that is loaded from hosts file or master
-// zone file.
+// Local answer is a DNS record that is loaded from hosts or zone file.
 // Non-local answer is a DNS record that is received from parent name
 // servers.
 //

@@ -10,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestMasterParseDirectiveOrigin(t *testing.T) {
+func TestZoneParseDirectiveOrigin(t *testing.T) {
 	cases := []struct {
 		desc   string
 		in     string
@@ -34,7 +34,7 @@ func TestMasterParseDirectiveOrigin(t *testing.T) {
 		exp:  "x",
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -51,7 +51,7 @@ func TestMasterParseDirectiveOrigin(t *testing.T) {
 	}
 }
 
-func TestMasterParseDirectiveInclude(t *testing.T) {
+func TestZoneParseDirectiveInclude(t *testing.T) {
 	cases := []struct {
 		desc   string
 		in     string
@@ -72,7 +72,7 @@ func TestMasterParseDirectiveInclude(t *testing.T) {
 		in:   `$origin testdata/sub.domain ;comment`,
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -87,7 +87,7 @@ func TestMasterParseDirectiveInclude(t *testing.T) {
 	}
 }
 
-func TestMasterParseDirectiveTTL(t *testing.T) {
+func TestZoneParseDirectiveTTL(t *testing.T) {
 	cases := []struct {
 		desc   string
 		in     string
@@ -111,7 +111,7 @@ func TestMasterParseDirectiveTTL(t *testing.T) {
 		exp:  1,
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -128,7 +128,7 @@ func TestMasterParseDirectiveTTL(t *testing.T) {
 	}
 }
 
-func TestMasterInitRFC1035(t *testing.T) {
+func TestZoneInitRFC1035(t *testing.T) {
 	cases := []struct {
 		desc   string
 		origin string
@@ -318,7 +318,7 @@ VAXA    A       10.2.0.27
 		}},
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -394,7 +394,7 @@ VAXA    A       10.2.0.27
 	}
 }
 
-func TestMasterInit2(t *testing.T) {
+func TestZoneInit2(t *testing.T) {
 	cases := []struct {
 		desc   string
 		origin string
@@ -403,7 +403,7 @@ func TestMasterInit2(t *testing.T) {
 		expErr error
 		exp    []*Message
 	}{{
-		desc: "From http://www.tcpipguide.com/free/t_DNSMasterFileFormat-4.htm",
+		desc: "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
 		in: `
 $ORIGIN pcguide.com.
 @ IN SOA ns23.pair.com. root.pair.com. (
@@ -607,7 +607,7 @@ relay IN CNAME relay.pair.com.
 		}},
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -684,7 +684,7 @@ relay IN CNAME relay.pair.com.
 	}
 }
 
-func TestMasterInit3(t *testing.T) {
+func TestZoneInit3(t *testing.T) {
 	cases := []struct {
 		desc   string
 		origin string
@@ -693,7 +693,7 @@ func TestMasterInit3(t *testing.T) {
 		expErr error
 		exp    []*Message
 	}{{
-		desc:   "From http://www.tcpipguide.com/free/t_DNSMasterFileFormat-4.htm",
+		desc:   "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
 		origin: "localdomain",
 		in: `
 ; Applications.
@@ -760,7 +760,7 @@ angularjs.doc       A  127.0.0.1
 		}},
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -837,7 +837,7 @@ angularjs.doc       A  127.0.0.1
 	}
 }
 
-func TestMasterParseTXT(t *testing.T) {
+func TestZoneParseTXT(t *testing.T) {
 	cases := []struct {
 		in       string
 		exp      []*Message
@@ -865,7 +865,7 @@ func TestMasterParseTXT(t *testing.T) {
 		}},
 	}}
 
-	m := newMasterParser("")
+	m := newZoneParser("")
 
 	for _, c := range cases {
 		m.Init(c.in, "kilabit.local", 3600)

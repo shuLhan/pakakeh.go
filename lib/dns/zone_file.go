@@ -45,29 +45,29 @@ func NewZoneFile(file, name string) *ZoneFile {
 }
 
 //
-// LoadMasterDir load DNS record from master (zone) formatted files in
+// LoadZoneDir load DNS record from zone formatted files in
 // directory "dir".
 // On success, it will return map of file name and ZoneFile content as list
 // of Message.
-// On fail, it will return possible partially parse master file and an error.
+// On fail, it will return possible partially parse zone file and an error.
 //
-func LoadMasterDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
+func LoadZoneDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 	if len(dir) == 0 {
 		return nil, nil
 	}
 
 	d, err := os.Open(dir)
 	if err != nil {
-		return nil, fmt.Errorf("LoadMasterDir: %w", err)
+		return nil, fmt.Errorf("LoadZoneDir: %w", err)
 	}
 
 	fis, err := d.Readdir(0)
 	if err != nil {
 		err = d.Close()
 		if err != nil {
-			return nil, fmt.Errorf("LoadMasterDir: %w", err)
+			return nil, fmt.Errorf("LoadZoneDir: %w", err)
 		}
-		return nil, fmt.Errorf("LoadMasterDir: %w", err)
+		return nil, fmt.Errorf("LoadZoneDir: %w", err)
 	}
 
 	zoneFiles = make(map[string]*ZoneFile)
@@ -87,7 +87,7 @@ func LoadMasterDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 
 		zoneFile, err := ParseZoneFile(zoneFilePath, "", 0)
 		if err != nil {
-			return zoneFiles, fmt.Errorf("LoadMasterDir %q: %w", dir, err)
+			return zoneFiles, fmt.Errorf("LoadZoneDir %q: %w", dir, err)
 		}
 
 		zoneFiles[name] = zoneFile
@@ -95,7 +95,7 @@ func LoadMasterDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 
 	err = d.Close()
 	if err != nil {
-		return zoneFiles, fmt.Errorf(" LoadMasterDir %q: %w", dir, err)
+		return zoneFiles, fmt.Errorf(" LoadZoneDir %q: %w", dir, err)
 	}
 
 	return zoneFiles, nil
@@ -109,7 +109,7 @@ func LoadMasterDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 	var err error
 
-	m := newMasterParser(file)
+	m := newZoneParser(file)
 	m.ttl = ttl
 
 	if len(origin) > 0 {
