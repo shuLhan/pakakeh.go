@@ -3,6 +3,94 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.23.0 (2021-02-xx)
+
+This release bring major refactoring to package memfs to allow embedding two
+or more directories in single package.
+
+The minimum Go version is increased to 1.14.
+
+===  Breaking changes
+
+*  memfs: refactoring, allow multiple instances of memfs in single package
+
+   Previously, the generated Go code from memfs can be used only once
+   on the package that use it.  For example, if we have two instances of
+   memfs.MemFS and both of them call GoGenerate(), when we load them back
+   again only the last one will be active and set the global variable
+   memfs.GeneratedPathNode.
+
+   This changes refactoring on how we use memfs by storing the
+   generated path node into variable that is defined by user and pass
+   them to New Options.
+
+*  memfs: remove field WithContent
+
+   The field WithContent is not necessary if we set MaxFileSize to negative
+   value.
+
+*  http: embed the memfs.Options into ServerOptions
+
+   This is to minimize duplicate on fields names and give clear distinction
+   between options for Server and options for serving files on memory using
+   memfs.
+
+*  io: embed the memfs.Options into DirWatcher
+
+   This is to minimize duplicate configuration between DirWatcher and
+   memfs, and to allow clear distinction between which options that
+   affect the directory tree and options for DirWatcher.
+
+*  memfs: allow AddFile to set internal path
+    
+   Previously, AddFile set the internal path equal to path of file to be
+   included.  This may cause conflict if the file is already included
+   due to the same sys path but different internal path.
+    
+   This commit add parameter internalPath to set custom internal path in
+   the memfs map.
+
+*  memfs: refactoring Go generate code to use memfs.MemFS instance
+    
+   Instead of using memfs.PathNode, which is confusing for new user
+   (what is PathNode?), we actually can use memfs.MemFS instance.
+    
+   This effect on how we use memfs in http package.
+
+*  dns: change the SOA field in ZoneFile to non-pointer
+    
+   The reason we use pointer for SOA record is so we can save them only
+   if its not nil.  A nil SOA record cause the generated JSON become "null"
+   and this is make the consumer of ZoneFile do more work, checking for the
+   null and initialize it when required.
+    
+   This changes, make the SOA record to non-nil and we save the record only
+   if the MName field is not empty.
+
+*  dns: replace master word with zone
+
+   This is for consistency for type and variable names.
+
+===  Enhancements
+
+*  http: add method Post on client
+
+   The Post method send the POST request to path without setting
+   "Content-Type".
+
+*  dns: change the error messages on ResourceRecord initAndInitialize
+
+   This change make the error message more readable and understandable by
+   consumer
+
+===  Bug fixes
+
+*  sql: check nil on Migrate parameter "fs" using reflect.IsNil
+
+   If we pass nil pointer of type to fs, the if condition will not true
+   and this cause panic because fs is not nil.
+
+
 ==  share v0.22.0 (2021-01-06)
 
 ===  Breaking changes
@@ -13,84 +101,84 @@ This library is released every month, usually at the first week of month.
 
 ===  New features
 
-* cmd: add new CLI "totp"
-+
-The totp is a program to generate Time-based One-time Password from
-secret key.
+*  cmd: add new CLI "totp"
 
-* totp: add method to generate n number of passwords
+   The totp is a program to generate Time-based One-time Password from
+   secret key.
+
+*  totp: add method to generate n number of passwords
 
 ===  Enhancements
 
-* http: print client request if debug value is equal or greater than 2.
-+
-If user set DEBUG environment variable or debug.Value to 2 or greater,
-the http Client will print the request (header and body) to the
-standard output.
+*  http: print client request if debug value is equal or greater than 2.
 
-* ssh: print the private key file that has an error when generating signers
+   If user set DEBUG environment variable or debug.Value to 2 or greater,
+   the http Client will print the request (header and body) to the
+   standard output.
+
+*  ssh: print the private key file that has an error when generating signers
 
 
 ==  share v0.21.0 (2020-12-06)
 
 ===  Breaking changes
 
-* test: refactoring Assert with better error message
-+
-The new Assert function use the reflect.DoEqual that return an error
-which describe which field have unmatched value.
+*  test: refactoring Assert with better error message
+
+   The new Assert function use the reflect.DoEqual that return an error
+   which describe which field have unmatched value.
 
 ===  New features
 
-* http: allow Endpoint to register custom error handler
-+
-The new field ErrorHandler on Endpoint allow the implementor to define
-their own function to handler error from Endpoint.Call.
-+
-If the ErrorHandler is nil it will default to DefaultErrorHandler.
+*  http: allow Endpoint to register custom error handler
 
-* totp: new package that implement TOTP protocol
-+
-Package totp implement Time-Based One-Time Password Algorithm based on
-RFC 6238.
+   The new field ErrorHandler on Endpoint allow the implementor to define
+   their own function to handler error from Endpoint.Call.
+
+   If the ErrorHandler is nil it will default to DefaultErrorHandler.
+
+*  totp: new package that implement TOTP protocol
+
+   Package totp implement Time-Based One-Time Password Algorithm based on
+   RFC 6238.
 
 ===  Bug fixes
 
-* parser: fix Line method that always return non-empty line
-+
-In case of content end without new line, for example "a\nb", the Line()
-method always return "b, 0" on the last line.
+*  parser: fix Line method that always return non-empty line
 
-* smtp: update the expired test certificate
+   In case of content end without new line, for example "a\nb", the Line()
+   method always return "b, 0" on the last line.
 
-* websocket: create buffered channel for running queue.
-+
-This is to fix Stop() method waiting for running channel to be consumed.
+*  smtp: update the expired test certificate
+
+*  websocket: create buffered channel for running queue.
+
+   This is to fix Stop() method waiting for running channel to be consumed.
 
 ===  Enhancements
 
-* big: update the latest expected error message with Go tip
+*  big: update the latest expected error message with Go tip
 
-* http: add an example on how to write custom HTTP status code
-+
-The example show how to use http.ResponseWriter.WriteHeader to write
-custom HTTP status code instead of relying on errors.E.
+*  http: add an example on how to write custom HTTP status code
 
-* net: always return the host name or IP on ParseIPPort.
-+
-Previously, if the address is an IP address the returned value is empty,
-for example "127.0.0.1" will return empty host but with non-nil IP and
-port.
-+
-This changes always return the host either as host name (the same as
-paremeter) or valid IP address.
+   The example show how to use http.ResponseWriter.WriteHeader to write
+   custom HTTP status code instead of relying on errors.E.
+
+*  net: always return the host name or IP on ParseIPPort.
+
+   Previously, if the address is an IP address the returned value is empty,
+   for example "127.0.0.1" will return empty host but with non-nil IP and
+   port.
+
+   This changes always return the host either as host name (the same as
+   paremeter) or valid IP address.
 
 ===  Chores
 
-* all: replace the tasks to serve and generate docs using ciigo as library
-+
-This way, one does not need to install ciigo binary, only require Go
-tools.
+*  all: replace the tasks to serve and generate docs using ciigo as library
+
+   This way, one does not need to install ciigo binary, only require Go
+   tools.
 
 
 ==  share v0.20.1 (2020-11-08)
