@@ -37,7 +37,7 @@ func TestNewAnswer(t *testing.T) {
 	cases := []struct {
 		desc      string
 		msg       *Message
-		exp       *answer
+		exp       *Answer
 		expMsg    *Message
 		expQName  string
 		expQType  uint16
@@ -47,10 +47,10 @@ func TestNewAnswer(t *testing.T) {
 		desc:    "With local message",
 		msg:     msg1,
 		isLocal: true,
-		exp: &answer{
-			qname:  "test",
-			qtype:  1,
-			qclass: 1,
+		exp: &Answer{
+			QName:  "test",
+			QType:  1,
+			QClass: 1,
 			msg:    msg1,
 		},
 		expQName:  "test",
@@ -60,10 +60,10 @@ func TestNewAnswer(t *testing.T) {
 	}, {
 		desc: "With non local message",
 		msg:  msg1,
-		exp: &answer{
-			qname:  "test",
-			qtype:  1,
-			qclass: 1,
+		exp: &Answer{
+			QName:  "test",
+			QType:  1,
+			QClass: 1,
 			msg:    msg1,
 		},
 		expQName:  "test",
@@ -83,16 +83,16 @@ func TestNewAnswer(t *testing.T) {
 		}
 
 		if c.isLocal {
-			test.Assert(t, "newAnswer.receivedAt", int64(0), got.receivedAt, true)
-			test.Assert(t, "newAnswer.accessedAt", int64(0), got.accessedAt, true)
+			test.Assert(t, "newAnswer.ReceivedAt", int64(0), got.ReceivedAt, true)
+			test.Assert(t, "newAnswer.AccessedAt", int64(0), got.AccessedAt, true)
 		} else {
-			test.Assert(t, "newAnswer.receivedAt", true, got.receivedAt >= at, true)
-			test.Assert(t, "newAnswer.accessedAt", true, got.accessedAt >= at, true)
+			test.Assert(t, "newAnswer.ReceivedAt", true, got.ReceivedAt >= at, true)
+			test.Assert(t, "newAnswer.AccessedAt", true, got.AccessedAt >= at, true)
 		}
 
-		test.Assert(t, "newAnswer.qname", c.expQName, got.qname, true)
-		test.Assert(t, "newAnswer.qtype", c.expQType, got.qtype, true)
-		test.Assert(t, "newAnswer.qclass", c.expQClass, got.qclass, true)
+		test.Assert(t, "newAnswer.QName", c.expQName, got.QName, true)
+		test.Assert(t, "newAnswer.QType", c.expQType, got.QType, true)
+		test.Assert(t, "newAnswer.QClass", c.expQClass, got.QClass, true)
 		test.Assert(t, "newAnswer.msg", c.expMsg, got.msg, true)
 	}
 }
@@ -103,7 +103,7 @@ func TestAnswerClear(t *testing.T) {
 		Value: 1,
 	}
 
-	an := &answer{
+	an := &Answer{
 		msg: msg,
 		el:  el,
 	}
@@ -168,20 +168,20 @@ func TestAnswerGet(t *testing.T) {
 		an := newAnswer(c.msg, c.isLocal)
 
 		if !c.isLocal {
-			an.receivedAt -= 5
+			an.ReceivedAt -= 5
 		}
 
 		gotPacket := an.get()
 
 		if c.isLocal {
-			test.Assert(t, "receivedAt", int64(0), an.receivedAt, true)
-			test.Assert(t, "accessedAt", int64(0), an.accessedAt, true)
+			test.Assert(t, "ReceivedAt", int64(0), an.ReceivedAt, true)
+			test.Assert(t, "AccessedAt", int64(0), an.AccessedAt, true)
 			test.Assert(t, "packet", c.msg.packet, gotPacket, true)
 			continue
 		}
 
-		test.Assert(t, "receivedAt", an.receivedAt >= at-5, true, true)
-		test.Assert(t, "accessedAt", an.accessedAt >= at, true, true)
+		test.Assert(t, "ReceivedAt", an.ReceivedAt >= at-5, true, true)
+		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true, true)
 		got := &Message{
 			Header:   SectionHeader{},
 			Question: SectionQuestion{},
@@ -212,16 +212,16 @@ func TestAnswerUpdate(t *testing.T) {
 
 	cases := []struct {
 		desc          string
-		an            *answer
-		nu            *answer
+		an            *Answer
+		nu            *Answer
 		expReceivedAt int64
 		expAccessedAt int64
 		expMsg        *Message
 	}{{
 		desc: "With nil parameter",
-		an: &answer{
-			receivedAt: 1,
-			accessedAt: 1,
+		an: &Answer{
+			ReceivedAt: 1,
+			AccessedAt: 1,
 			msg:        msg1,
 		},
 		expReceivedAt: 1,
@@ -229,14 +229,14 @@ func TestAnswerUpdate(t *testing.T) {
 		expMsg:        msg1,
 	}, {
 		desc: "With local answer",
-		an: &answer{
-			receivedAt: 0,
-			accessedAt: 0,
+		an: &Answer{
+			ReceivedAt: 0,
+			AccessedAt: 0,
 			msg:        msg1,
 		},
-		nu: &answer{
-			receivedAt: at,
-			accessedAt: at,
+		nu: &Answer{
+			ReceivedAt: at,
+			AccessedAt: at,
 			msg:        msg2,
 		},
 		expReceivedAt: 0,
@@ -244,14 +244,14 @@ func TestAnswerUpdate(t *testing.T) {
 		expMsg:        nil,
 	}, {
 		desc: "With non local answer",
-		an: &answer{
-			receivedAt: 1,
-			accessedAt: 1,
+		an: &Answer{
+			ReceivedAt: 1,
+			AccessedAt: 1,
 			msg:        msg1,
 		},
-		nu: &answer{
-			receivedAt: at,
-			accessedAt: at,
+		nu: &Answer{
+			ReceivedAt: at,
+			AccessedAt: at,
 			msg:        msg2,
 		},
 		expReceivedAt: at,
@@ -264,8 +264,8 @@ func TestAnswerUpdate(t *testing.T) {
 
 		c.an.update(c.nu)
 
-		test.Assert(t, "receivedAt", c.expReceivedAt, c.an.receivedAt, true)
-		test.Assert(t, "accessedAt", c.expAccessedAt, c.an.accessedAt, true)
+		test.Assert(t, "ReceivedAt", c.expReceivedAt, c.an.ReceivedAt, true)
+		test.Assert(t, "AccessedAt", c.expAccessedAt, c.an.AccessedAt, true)
 		if c.nu != nil {
 			test.Assert(t, "c.nu.msg", c.expMsg, c.nu.msg, true)
 		}

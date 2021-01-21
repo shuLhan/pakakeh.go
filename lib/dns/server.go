@@ -170,6 +170,14 @@ func isResponseValid(req *request, res *Message) bool {
 }
 
 //
+// CachesLRU return list of non-local caches ordered by the least recently
+// used.
+//
+func (srv *Server) CachesLRU() []*Answer {
+	return srv.caches.list()
+}
+
+//
 // SearchCaches search caches by query (domain) name that match with the
 // regular expresion.
 //

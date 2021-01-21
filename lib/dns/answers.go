@@ -9,15 +9,15 @@ package dns
 // query types.
 //
 type answers struct {
-	v []*answer
+	v []*Answer
 }
 
 //
 // newAnswers create and initialize list of answer with one element.
 //
-func newAnswers(an *answer) (ans *answers) {
+func newAnswers(an *Answer) (ans *answers) {
 	ans = &answers{
-		v: make([]*answer, 0, 1),
+		v: make([]*Answer, 0, 1),
 	}
 	if an != nil && an.msg != nil {
 		ans.v = append(ans.v, an)
@@ -30,12 +30,12 @@ func newAnswers(an *answer) (ans *answers) {
 // If found, it will return its element and index in slice; otherwise it will
 // return nil on answer.
 //
-func (ans *answers) get(qtype, qclass uint16) (an *answer, x int) {
+func (ans *answers) get(qtype, qclass uint16) (an *Answer, x int) {
 	for x = 0; x < len(ans.v); x++ {
-		if ans.v[x].qtype != qtype {
+		if ans.v[x].QType != qtype {
 			continue
 		}
-		if ans.v[x].qclass != qclass {
+		if ans.v[x].QClass != qclass {
 			continue
 		}
 
@@ -62,11 +62,11 @@ func (ans *answers) remove(qtype, qclass uint16) {
 // If new answer is updated, it will return the old answer.
 // If new answer is inserted, it will return nil instead.
 //
-func (ans *answers) upsert(nu *answer) (an *answer) {
+func (ans *answers) upsert(nu *Answer) (an *Answer) {
 	if nu == nil || nu.msg == nil {
 		return
 	}
-	an, _ = ans.get(nu.qtype, nu.qclass)
+	an, _ = ans.get(nu.QType, nu.QClass)
 	if an != nil {
 		an.update(nu)
 	} else {

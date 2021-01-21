@@ -74,7 +74,7 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 // If answer exist on cache, their accessed time will be updated to current
 // time and moved to back of LRU to prevent being pruned later.
 //
-func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *answer) {
+func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *Answer) {
 	c.Lock()
 
 	var found bool
@@ -85,9 +85,9 @@ func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *answ
 		if an != nil {
 			// Move the answer to the back of LRU if its not
 			// local and update its accessed time.
-			if an.receivedAt > 0 {
+			if an.ReceivedAt > 0 {
 				c.lru.MoveToBack(an.el)
-				an.accessedAt = time.Now().Unix()
+				an.AccessedAt = time.Now().Unix()
 			}
 		}
 	}
@@ -99,10 +99,10 @@ func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *answ
 //
 // list return all answers in LRU.
 //
-func (c *caches) list() (list []*answer) {
+func (c *caches) list() (list []*Answer) {
 	c.Lock()
 	for e := c.lru.Front(); e != nil; e = e.Next() {
-		list = append(list, e.Value.(*answer))
+		list = append(list, e.Value.(*Answer))
 	}
 	c.Unlock()
 	return
@@ -118,8 +118,8 @@ func (c *caches) prune() (n int) {
 
 	e := c.lru.Front()
 	for e != nil {
-		an := e.Value.(*answer)
-		if an.accessedAt > exp {
+		an := e.Value.(*Answer)
+		if an.AccessedAt > exp {
 			break
 		}
 
@@ -129,11 +129,11 @@ func (c *caches) prune() (n int) {
 
 		next := e.Next()
 		_ = c.lru.Remove(e)
-		answers, found := c.v[an.qname]
+		answers, found := c.v[an.QName]
 		if found {
-			answers.remove(an.qtype, an.qclass)
+			answers.remove(an.QType, an.QClass)
 			if len(answers.v) == 0 {
-				delete(c.v, an.qname)
+				delete(c.v, an.QName)
 			}
 		}
 		an.clear()
@@ -153,8 +153,8 @@ func (c *caches) prune() (n int) {
 func (c *caches) remove(qname string) (ok bool) {
 	c.Lock()
 	for e := c.lru.Front(); e != nil; e = e.Next() {
-		answer := e.Value.(*answer)
-		if answer.qname != qname {
+		answer := e.Value.(*Answer)
+		if answer.QName != qname {
 			continue
 		}
 
@@ -189,10 +189,10 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 		return nil
 	}
 	for _, an := range ans.v {
-		if an.qtype != rr.Type {
+		if an.QType != rr.Type {
 			continue
 		}
-		if an.qclass != rr.Class {
+		if an.QClass != rr.Class {
 			continue
 		}
 		err = an.msg.RemoveAnswer(rr)
@@ -207,8 +207,8 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
 	c.Lock()
 	for e := c.lru.Front(); e != nil; e = e.Next() {
-		answer := e.Value.(*answer)
-		if re.MatchString(answer.qname) {
+		answer := e.Value.(*Answer)
+		if re.MatchString(answer.QName) {
 			listMsg = append(listMsg, answer.msg)
 		}
 	}
@@ -221,25 +221,25 @@ func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
 // caches it will return true, otherwise when its updated it will return
 // false.
 //
-func (c *caches) upsert(nu *answer) (inserted bool) {
+func (c *caches) upsert(nu *Answer) (inserted bool) {
 	if nu == nil || nu.msg == nil {
 		return
 	}
 
 	c.Lock()
 
-	answers, found := c.v[nu.qname]
+	answers, found := c.v[nu.QName]
 	if !found {
 		inserted = true
-		c.v[nu.qname] = newAnswers(nu)
-		if nu.receivedAt > 0 {
+		c.v[nu.QName] = newAnswers(nu)
+		if nu.ReceivedAt > 0 {
 			nu.el = c.lru.PushBack(nu)
 		}
 	} else {
 		an := answers.upsert(nu)
 		if an == nil {
 			inserted = true
-			if nu.receivedAt > 0 {
+			if nu.ReceivedAt > 0 {
 				// Push the new answer to LRU if new answer is
 				// not local and its inserted to list.
 				nu.el = c.lru.PushBack(nu)

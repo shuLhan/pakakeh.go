@@ -13,24 +13,24 @@ import (
 func TestNewAnswers(t *testing.T) {
 	cases := []struct {
 		desc   string
-		an     *answer
+		an     *Answer
 		expLen int
-		expV   []*answer
+		expV   []*Answer
 	}{{
 		desc: "With nil parameter",
-		expV: make([]*answer, 0, 1),
+		expV: make([]*Answer, 0, 1),
 	}, {
 		desc:   "With nil message",
-		an:     &answer{},
+		an:     &Answer{},
 		expLen: 0,
-		expV:   []*answer{},
+		expV:   []*Answer{},
 	}, {
 		desc: "With valid answer",
-		an: &answer{
+		an: &Answer{
 			msg: &Message{},
 		},
 		expLen: 1,
-		expV: []*answer{{
+		expV: []*Answer{{
 			msg: &Message{},
 		}},
 	}}
@@ -63,25 +63,25 @@ func TestAnswersGet(t *testing.T) {
 
 	cases := []struct {
 		desc     string
-		qtype    uint16
-		qclass   uint16
-		exp      *answer
+		QType    uint16
+		QClass   uint16
+		exp      *Answer
 		expIndex int
 	}{{
 		desc:     "With query type and class not found",
 		expIndex: 1,
 	}, {
 		desc:     "With query type not found",
-		qclass:   1,
+		QClass:   1,
 		expIndex: 1,
 	}, {
 		desc:     "With query class not found",
-		qtype:    1,
+		QType:    1,
 		expIndex: 1,
 	}, {
 		desc:     "With valid query type and class",
-		qtype:    1,
-		qclass:   1,
+		QType:    1,
+		QClass:   1,
 		exp:      an,
 		expIndex: 0,
 	}}
@@ -89,7 +89,7 @@ func TestAnswersGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, x := ans.get(c.qtype, c.qclass)
+		got, x := ans.get(c.QType, c.QClass)
 
 		test.Assert(t, "answers.get", c.exp, got, true)
 		test.Assert(t, "answers.get index", c.expIndex, x, true)
@@ -115,7 +115,7 @@ func TestAnswersRemove(t *testing.T) {
 
 	cases := []struct {
 		desc          string
-		qtype, qclass uint16
+		QType, QClass uint16
 		exp           *answers
 		expLen        int
 	}{{
@@ -124,20 +124,20 @@ func TestAnswersRemove(t *testing.T) {
 		expLen: 1,
 	}, {
 		desc:   "With query type not found",
-		qclass: 1,
+		QClass: 1,
 		exp:    ans,
 		expLen: 1,
 	}, {
 		desc:   "With query class not found",
-		qtype:  1,
+		QType:  1,
 		exp:    ans,
 		expLen: 1,
 	}, {
 		desc:   "With valid query type and class",
-		qtype:  1,
-		qclass: 1,
+		QType:  1,
+		QClass: 1,
 		exp: &answers{
-			v: make([]*answer, 0, 1),
+			v: make([]*Answer, 0, 1),
 		},
 		expLen: 0,
 	}}
@@ -145,7 +145,7 @@ func TestAnswersRemove(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ans.remove(c.qtype, c.qclass)
+		ans.remove(c.QType, c.QClass)
 
 		test.Assert(t, "len(answers.v)", c.expLen, len(ans.v), true)
 		test.Assert(t, "cap(answers.v)", 1, cap(ans.v), true)
@@ -154,28 +154,28 @@ func TestAnswersRemove(t *testing.T) {
 }
 
 func TestAnswersUpdate(t *testing.T) {
-	an1 := &answer{
-		qtype:  1,
-		qclass: 1,
+	an1 := &Answer{
+		QType:  1,
+		QClass: 1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
 			},
 		},
 	}
-	an2 := &answer{
-		qtype:  2,
-		qclass: 1,
+	an2 := &Answer{
+		QType:  2,
+		QClass: 1,
 		msg:    &Message{},
 	}
-	an3 := &answer{
-		qtype:  1,
-		qclass: 2,
+	an3 := &Answer{
+		QType:  1,
+		QClass: 2,
 		msg:    &Message{},
 	}
-	an4 := &answer{
-		qtype:  1,
-		qclass: 1,
+	an4 := &Answer{
+		QType:  1,
+		QClass: 1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
@@ -187,7 +187,7 @@ func TestAnswersUpdate(t *testing.T) {
 
 	cases := []struct {
 		desc string
-		nu   *answer
+		nu   *Answer
 		exp  *answers
 	}{{
 		desc: "With nil parameter",
@@ -196,7 +196,7 @@ func TestAnswersUpdate(t *testing.T) {
 		desc: "With query type not found",
 		nu:   an2,
 		exp: &answers{
-			v: []*answer{
+			v: []*Answer{
 				an1,
 				an2,
 			},
@@ -205,7 +205,7 @@ func TestAnswersUpdate(t *testing.T) {
 		desc: "With query class not found",
 		nu:   an3,
 		exp: &answers{
-			v: []*answer{
+			v: []*Answer{
 				an1,
 				an2,
 				an3,
@@ -215,10 +215,10 @@ func TestAnswersUpdate(t *testing.T) {
 		desc: "With query found",
 		nu:   an4,
 		exp: &answers{
-			v: []*answer{
+			v: []*Answer{
 				{
-					qtype:  1,
-					qclass: 1,
+					QType:  1,
+					QClass: 1,
 					msg:    an4.msg,
 				},
 				an2,

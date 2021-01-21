@@ -43,33 +43,33 @@ func TestNewCaches(t *testing.T) {
 }
 
 func TestCachesGet(t *testing.T) {
-	an1 := &answer{
-		receivedAt: 1,
-		qname:      "test",
-		qtype:      1,
-		qclass:     1,
+	an1 := &Answer{
+		ReceivedAt: 1,
+		QName:      "test",
+		QType:      1,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
 			},
 		},
 	}
-	an2 := &answer{
-		receivedAt: 2,
-		qname:      "test",
-		qtype:      2,
-		qclass:     1,
+	an2 := &Answer{
+		ReceivedAt: 2,
+		QName:      "test",
+		QType:      2,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
 			},
 		},
 	}
-	an3 := &answer{
-		receivedAt: 3,
-		qname:      "test",
-		qtype:      3,
-		qclass:     1,
+	an3 := &Answer{
+		ReceivedAt: 3,
+		QName:      "test",
+		QType:      3,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 3,
@@ -85,23 +85,23 @@ func TestCachesGet(t *testing.T) {
 
 	cases := []struct {
 		desc    string
-		qname   string
-		qtype   uint16
-		qclass  uint16
-		exp     *answer
-		expList []*answer
+		QName   string
+		QType   uint16
+		QClass  uint16
+		exp     *Answer
+		expList []*Answer
 	}{{
 		desc: "With query not found",
-		expList: []*answer{
+		expList: []*Answer{
 			an1, an2, an3,
 		},
 	}, {
 		desc:   "With query found",
-		qname:  "test",
-		qtype:  1,
-		qclass: 1,
+		QName:  "test",
+		QType:  1,
+		QClass: 1,
 		exp:    an1,
-		expList: []*answer{
+		expList: []*Answer{
 			an2, an3, an1,
 		},
 	}}
@@ -109,7 +109,7 @@ func TestCachesGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_, got := ca.get(c.qname, c.qtype, c.qclass)
+		_, got := ca.get(c.QName, c.QType, c.QClass)
 		gotList := ca.list()
 
 		test.Assert(t, "caches.get", c.exp, got, true)
@@ -120,36 +120,36 @@ func TestCachesGet(t *testing.T) {
 func TestCachesPrune(t *testing.T) {
 	at := time.Now().Unix()
 
-	an1 := &answer{
-		receivedAt: 1,
-		accessedAt: 1,
-		qname:      "test",
-		qtype:      1,
-		qclass:     1,
+	an1 := &Answer{
+		ReceivedAt: 1,
+		AccessedAt: 1,
+		QName:      "test",
+		QType:      1,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
 			},
 		},
 	}
-	an2 := &answer{
-		receivedAt: 2,
-		accessedAt: 2,
-		qname:      "test",
-		qtype:      2,
-		qclass:     1,
+	an2 := &Answer{
+		ReceivedAt: 2,
+		AccessedAt: 2,
+		QName:      "test",
+		QType:      2,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
 			},
 		},
 	}
-	an3 := &answer{
-		receivedAt: at,
-		accessedAt: at,
-		qname:      "test",
-		qtype:      3,
-		qclass:     1,
+	an3 := &Answer{
+		ReceivedAt: at,
+		AccessedAt: at,
+		QName:      "test",
+		QType:      3,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 3,
@@ -167,10 +167,10 @@ func TestCachesPrune(t *testing.T) {
 
 	cases := []struct {
 		desc    string
-		expList []*answer
+		expList []*Answer
 	}{{
 		desc: "With several caches got pruned",
-		expList: []*answer{
+		expList: []*Answer{
 			an3,
 		},
 	}}
@@ -189,48 +189,48 @@ func TestCachesPrune(t *testing.T) {
 func TestCachesUpsert(t *testing.T) {
 	ca := newCaches(0, 0)
 
-	an1 := &answer{
-		receivedAt: 1,
-		accessedAt: 1,
-		qname:      "test",
-		qtype:      1,
-		qclass:     1,
+	an1 := &Answer{
+		ReceivedAt: 1,
+		AccessedAt: 1,
+		QName:      "test",
+		QType:      1,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
 			},
 		},
 	}
-	an1Update := &answer{
-		receivedAt: 3,
-		accessedAt: 3,
-		qname:      "test",
-		qtype:      1,
-		qclass:     1,
+	an1Update := &Answer{
+		ReceivedAt: 3,
+		AccessedAt: 3,
+		QName:      "test",
+		QType:      1,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 3,
 			},
 		},
 	}
-	an2 := &answer{
-		receivedAt: 2,
-		accessedAt: 2,
-		qname:      "test",
-		qtype:      2,
-		qclass:     1,
+	an2 := &Answer{
+		ReceivedAt: 2,
+		AccessedAt: 2,
+		QName:      "test",
+		QType:      2,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
 			},
 		},
 	}
-	an2Update := &answer{
-		receivedAt: 4,
-		accessedAt: 4,
-		qname:      "test",
-		qtype:      2,
-		qclass:     1,
+	an2Update := &Answer{
+		ReceivedAt: 4,
+		AccessedAt: 4,
+		QName:      "test",
+		QType:      2,
+		QClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 4,
@@ -240,31 +240,31 @@ func TestCachesUpsert(t *testing.T) {
 
 	cases := []struct {
 		desc    string
-		nu      *answer
+		nu      *Answer
 		expLen  int
-		expList []*answer
+		expList []*Answer
 	}{{
 		desc: "With empty answer",
 	}, {
 		desc:    "With new answer",
 		nu:      an1,
 		expLen:  1,
-		expList: []*answer{an1},
+		expList: []*Answer{an1},
 	}, {
 		desc:    "With new answer, different type",
 		nu:      an2,
 		expLen:  2,
-		expList: []*answer{an1, an2},
+		expList: []*Answer{an1, an2},
 	}, {
 		desc:    "With update on answer",
 		nu:      an1Update,
 		expLen:  2,
-		expList: []*answer{an1, an2},
+		expList: []*Answer{an1, an2},
 	}, {
 		desc:    "With update on answer (2)",
 		nu:      an2Update,
 		expLen:  2,
-		expList: []*answer{an1, an2},
+		expList: []*Answer{an1, an2},
 	}}
 
 	for _, c := range cases {

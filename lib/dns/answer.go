@@ -10,23 +10,23 @@ import (
 )
 
 //
-// answer maintain the record of DNS response for cache.
+// Answer maintain the record of DNS response for cache.
 //
-type answer struct {
-	// receivedAt contains time when message is received.  If answer is
+type Answer struct {
+	// ReceivedAt contains time when message is received.  If answer is
 	// from local cache (host or zone file), its value is 0.
-	receivedAt int64
+	ReceivedAt int64
 
-	// accessedAt contains time when message last accessed.  This field
+	// AccessedAt contains time when message last accessed.  This field
 	// is used to prune old answer from caches.
-	accessedAt int64
+	AccessedAt int64
 
-	// qname contains DNS question name, a copy of msg.Question.Name.
-	qname string
+	// QName contains DNS question name, a copy of msg.Question.Name.
+	QName string
 	// qtype contains DNS question type, a copy of msg.Question.Type.
-	qtype uint16
+	QType uint16
 	// qclass contains DNS question class, a copy of msg.Question.Class.
-	qclass uint16
+	QClass uint16
 
 	// msg contains the unpacked DNS message.
 	msg *Message
@@ -40,26 +40,26 @@ type answer struct {
 // If is not local (isLocal=false), the received and accessed time will be set
 // to current timestamp.
 //
-func newAnswer(msg *Message, isLocal bool) (an *answer) {
-	an = &answer{
-		qname:  string(msg.Question.Name),
-		qtype:  msg.Question.Type,
-		qclass: msg.Question.Class,
+func newAnswer(msg *Message, isLocal bool) (an *Answer) {
+	an = &Answer{
+		QName:  string(msg.Question.Name),
+		QType:  msg.Question.Type,
+		QClass: msg.Question.Class,
 		msg:    msg,
 	}
 	if isLocal {
 		return
 	}
 	at := time.Now().Unix()
-	an.receivedAt = at
-	an.accessedAt = at
+	an.ReceivedAt = at
+	an.AccessedAt = at
 	return
 }
 
 //
 // clear the answer fields.
 //
-func (an *answer) clear() {
+func (an *Answer) clear() {
 	an.msg = nil
 	an.el = nil
 }
@@ -70,7 +70,7 @@ func (an *answer) clear() {
 // to current time and each resource record's TTL in message is subtracted
 // based on received time.
 //
-func (an *answer) get() (packet []byte) {
+func (an *Answer) get() (packet []byte) {
 	an.updateTTL()
 
 	packet = make([]byte, len(an.msg.packet))
@@ -81,14 +81,14 @@ func (an *answer) get() (packet []byte) {
 //
 // update the answer with new message.
 //
-func (an *answer) update(nu *answer) {
+func (an *Answer) update(nu *Answer) {
 	if nu == nil || nu.msg == nil {
 		return
 	}
 
-	if an.receivedAt > 0 {
-		an.receivedAt = nu.receivedAt
-		an.accessedAt = nu.accessedAt
+	if an.ReceivedAt > 0 {
+		an.ReceivedAt = nu.ReceivedAt
+		an.AccessedAt = nu.AccessedAt
 	}
 
 	an.msg = nu.msg
@@ -98,12 +98,12 @@ func (an *answer) update(nu *answer) {
 //
 // updateTTL decrease the answer TTLs based on time when message received.
 //
-func (an *answer) updateTTL() {
-	if an.receivedAt == 0 {
+func (an *Answer) updateTTL() {
+	if an.ReceivedAt == 0 {
 		return
 	}
 
-	an.accessedAt = time.Now().Unix()
-	ttl := uint32(an.accessedAt - an.receivedAt)
+	an.AccessedAt = time.Now().Unix()
+	ttl := uint32(an.AccessedAt - an.ReceivedAt)
 	an.msg.SubTTL(ttl)
 }
