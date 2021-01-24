@@ -281,9 +281,13 @@ func (zone *ZoneFile) saveListRR(
 			dname = "\t"
 		}
 		switch rr.Type {
-		case QueryTypeA, QueryTypeNULL, QueryTypeTXT,
-			QueryTypeAAAA:
+		case QueryTypeA, QueryTypeNULL, QueryTypeAAAA:
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
+				dname, rr.TTL, QueryClassName[rr.Class],
+				QueryTypeNames[rr.Type], rr.Value.(string))
+
+		case QueryTypeTXT:
+			_, err = fmt.Fprintf(out, "%s %d %s %s %q\n",
 				dname, rr.TTL, QueryClassName[rr.Class],
 				QueryTypeNames[rr.Type], rr.Value.(string))
 
