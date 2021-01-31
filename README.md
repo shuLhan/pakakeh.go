@@ -34,6 +34,9 @@ This library is released every month, usually at the first week of month.
 * [**bytes**](https://pkg.go.dev/github.com/shuLhan/share/lib/bytes): A
   library for working with slice of bytes.
 
+* [**clise**](https://pkg.go.dev/github.com/shuLhan/share/lib/clise): Package
+  clise implements circular slice.
+
 * [**contact**](https://pkg.go.dev/github.com/shuLhan/share/lib/contact): A
   library to import contact from Google, Microsoft, or Yahoo.
 
