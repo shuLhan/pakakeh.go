@@ -78,12 +78,13 @@
 //	...
 //
 //	epAPILogin := &libhttp.Endpoint{
+//		Method: libhttp.RequestMethodPost,
 //		Path: "/api/login",
 //		RequestType: libhttp.RequestTypeQuery,
 //		ResponseType: libhttp.ResponseTypeJSON,
 //		Call: handleLogin,
 //	}
-//	server.RegisterPost(epAPILogin)
+//	server.RegisterEndpoint(epAPILogin)
 //
 //	...
 //
@@ -107,18 +108,19 @@
 // For example, after registering the following Endpoint,
 //
 //	epBinding := &libhttp.Endpoint{
+//		Method: libhttp.RequestMethodGet,
 //		Path: "/category/:name",
 //		RequestType: libhttp.RequestTypeQuery,
 //		ResponseType: libhttp.ResponseTypeJSON,
 //		Call: handleCategory,
 //	}
-//	server.RegisterGet(epBinding)
+//	server.RegisterEndpoint(epBinding)
 //
 // when the server receiving GET request using path "/category/book?limit=10",
 // it will put the "book" and "10" into http.Request's Form with key is "name"
 // and "limit"
 //
-//	fmt.Printf("request.Form:", req.Form)
+//	fmt.Println("request.Form:", req.Form)
 //	// request.Form: map[name:[book] limit:[10]]
 //
 // The key binding must be unique between path and query.  If query has the
