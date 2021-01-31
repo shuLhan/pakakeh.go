@@ -317,7 +317,7 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 		n   int
 		dec io.ReadCloser
 		in  io.Reader = bytes.NewReader(body)
-		buf []byte    = make([]byte, 1024)
+		buf           = make([]byte, 1024)
 	)
 
 	switch res.Header.Get(ContentEncoding) {
