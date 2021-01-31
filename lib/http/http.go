@@ -142,6 +142,36 @@
 //
 //	{"code":<HTTP_STATUS_CODE>,"message":<err.Error()>}
 //
+// Summary
+//
+// The pseudocode below illustrate how Endpoint, Callback, and
+// CallbackErrorHandler works when the Server receive HTTP request,
+//
+//	func (server *Server) (w http.ResponseWriter, req *http.Request) {
+//		for _, endpoint := range server.endpoints {
+//			if endpoint.Method.String() != req.Method {
+//				continue
+//			}
+//
+//			reqBody, _ := ioutil.ReadAll(req.Body)
+//
+//			// Check request type, and call ParseForm or
+//			// ParseMultipartForm if required.
+//
+//			resBody, err := endpoint.Call(w, req, reqBody)
+//			if err != nil {
+//				endpoint.ErrorHandler(w, req, err)
+//				return
+//			}
+//			// Set content-type based on endpoint.ResponseType,
+//			// and write the response body,
+//			w.Write(resBody)
+//			return
+//		}
+//		// If request is HTTP GET, check if Path exist as static
+//		// contents in Memfs.
+//	}
+//
 // Known Bugs and Limitations
 //
 // * The server does not handle CONNECT method
