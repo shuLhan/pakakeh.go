@@ -88,6 +88,11 @@ The minimum Go version is increased to 1.14.
    The Inverse function reverse the order of slice of rune without
    allocating another slice.
 
+*  big: add method Humanize
+
+   The Humanize method return the r as string with custom thousand and
+   decimal separator.
+
 ===  Enhancements
 
 *  dns: change the error messages on ResourceRecord initAndInitialize

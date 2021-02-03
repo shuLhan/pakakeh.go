@@ -11,6 +11,8 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
+
+	"github.com/shuLhan/share/lib/runes"
 )
 
 var ratZero = NewRat(0)
@@ -155,6 +157,33 @@ func (r *Rat) Add(g interface{}) *Rat {
 	}
 	r.Rat.Add(&r.Rat, &y.Rat)
 	return r
+}
+
+//
+// Humanize format the r into string with custom thousand and decimal
+// separator.
+//
+func (r *Rat) Humanize(thousandSep, decimalSep string) string {
+	var (
+		raw     = r.String()
+		parts   = strings.SplitN(raw, ".", 2)
+		intPart = []rune(parts[0])
+		out     = make([]rune, 0, len(intPart)+(len(intPart)/3))
+		i       = 0
+	)
+	for x := len(intPart) - 1; x >= 0; x-- {
+		if i%3 == 0 && len(out) > 0 {
+			out = append(out, []rune(thousandSep)...)
+		}
+		out = append(out, intPart[x])
+		i++
+	}
+	out = runes.Inverse(out)
+	if len(parts) == 2 {
+		out = append(out, []rune(decimalSep)...)
+		out = append(out, []rune(parts[1])...)
+	}
+	return string(out)
 }
 
 //
