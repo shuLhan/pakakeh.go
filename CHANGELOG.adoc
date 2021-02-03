@@ -80,6 +80,9 @@ The minimum Go version is increased to 1.14.
 
 *  time: add function UnixMicro that return UNIX time in micro seconds
 
+*  api/slack: simple API for sending message to Slack using only
+   standard packages.
+
 ===  Enhancements
 
 *  dns: change the error messages on ResourceRecord initAndInitialize
