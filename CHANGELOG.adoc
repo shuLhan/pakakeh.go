@@ -83,6 +83,11 @@ The minimum Go version is increased to 1.14.
 *  api/slack: simple API for sending message to Slack using only
    standard packages.
 
+*  runes: add function to inverse the slice of rune
+    
+   The Inverse function reverse the order of slice of rune without
+   allocating another slice.
+
 ===  Enhancements
 
 *  dns: change the error messages on ResourceRecord initAndInitialize

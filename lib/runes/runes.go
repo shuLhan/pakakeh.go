@@ -111,6 +111,25 @@ func FindSpace(line []rune, startAt int) (idx int) {
 }
 
 //
+// Inverse the input slice of rune with inplace reversion (without allocating
+// another slice).
+//
+func Inverse(in []rune) []rune {
+	var (
+		left, right rune
+		y           = len(in) - 1
+	)
+	for x := 0; x < y; x++ {
+		left = in[x]
+		right = in[y]
+		in[x] = right
+		in[y] = left
+		y--
+	}
+	return in
+}
+
+//
 // TokenFind will search token in text starting from index `startAt` and
 // return the position where the match start.
 //

@@ -46,6 +46,22 @@ func ExampleFindSpace() {
 	// 6
 }
 
+func ExampleInverse() {
+	fmt.Printf("%s\n", string(Inverse([]rune(``))))
+	fmt.Printf("%s\n", string(Inverse([]rune(`a`))))
+	fmt.Printf("%s\n", string(Inverse([]rune(`ab`))))
+	fmt.Printf("%s\n", string(Inverse([]rune(`abc`))))
+	fmt.Printf("%s\n", string(Inverse([]rune(`abcd`))))
+	fmt.Printf("%s\n", string(Inverse([]rune(`abcde`))))
+	// Output:
+	//
+	// a
+	// ba
+	// cba
+	// dcba
+	// edcba
+}
+
 func ExampleTokenFind() {
 	line := []rune("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
 	token := []rune("right")
