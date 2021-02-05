@@ -93,6 +93,12 @@ The minimum Go version is increased to 1.14.
    The Humanize method return the r as string with custom thousand and
    decimal separator.
 
+*  big: add method to round fraction to nearest non-zero value
+
+   The RoundNearestFraction does not require precision parameter, like in
+   other rounds function, but it figure it out based on the last non-zero
+   value from fraction.
+
 ===  Enhancements
 
 *  dns: change the error messages on ResourceRecord initAndInitialize

@@ -32,6 +32,32 @@ func ExampleRat_Humanize() {
 	//100.000,234
 }
 
+func ExampleRat_RoundNearestFraction() {
+	fmt.Printf("0.000000001: %s\n", NewRat("0").RoundNearestFraction()) // Affected by DefaultDigitPrecision (8)
+	fmt.Printf("0.00545: %s\n", NewRat("0.00545").RoundNearestFraction())
+	fmt.Printf("0.00555: %s\n", NewRat("0.00555").RoundNearestFraction())
+	fmt.Printf("0.0545: %s\n", NewRat("0.0545").RoundNearestFraction())
+	fmt.Printf("0.0555: %s\n", NewRat("0.0555").RoundNearestFraction())
+	fmt.Printf("0.545: %s\n", NewRat("0.545").RoundNearestFraction())
+	fmt.Printf("0.555: %s\n", NewRat("0.555").RoundNearestFraction())
+	fmt.Printf("0.5: %s\n", NewRat("0.5").RoundNearestFraction())
+	fmt.Printf("-0.5: %s\n", NewRat("-0.5").RoundNearestFraction())
+	fmt.Printf("-0.555: %s\n", NewRat("-0.555").RoundNearestFraction())
+	fmt.Printf("-0.545: %s\n", NewRat("-0.545").RoundNearestFraction())
+	//Output:
+	//0.000000001: 0
+	//0.00545: 0.005
+	//0.00555: 0.006
+	//0.0545: 0.05
+	//0.0555: 0.06
+	//0.545: 0.5
+	//0.555: 0.6
+	//0.5: 0.5
+	//-0.5: -0.5
+	//-0.555: -0.6
+	//-0.545: -0.5
+}
+
 func ExampleRat_RoundToNearestAway() {
 	fmt.Printf("0.5455: %s\n", NewRat("0.5455").RoundToNearestAway(2))
 	fmt.Printf("0.5555: %s\n", NewRat("0.5555").RoundToNearestAway(2))

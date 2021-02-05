@@ -329,6 +329,29 @@ func (r *Rat) Quo(g interface{}) *Rat {
 }
 
 //
+// RoundNearestFraction round the fraction to the nearest non-zero value.
+//
+// The RoundNearestFraction does not require precision parameter, like in
+// other rounds function, but it figure it out based on the last non-zero
+// value from fraction.
+//
+// See example for more information.
+//
+func (r *Rat) RoundNearestFraction() *Rat {
+	b := []byte(r.String())
+	nums := bytes.Split(b, []byte{'.'})
+	x := 0
+	if len(nums) == 2 {
+		for ; x < len(nums[1]); x++ {
+			if nums[1][x] != '0' {
+				break
+			}
+		}
+	}
+	return r.RoundToNearestAway(x + 1)
+}
+
+//
 // RoundToNearestAway round r to n digit precision using nearest away mode,
 // where mantissa is accumulated by the last digit after precision.
 // For example, using 2 digit precision, 0.555 would become 0.56.
