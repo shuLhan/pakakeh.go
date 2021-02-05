@@ -3,7 +3,7 @@
 
 This library is released every month, usually at the first week of month.
 
-==  share v0.23.0 (2021-02-xx)
+==  share v0.23.0 (2021-02-05)
 
 This release bring major refactoring to package memfs to allow embedding two
 or more directories in single package.
@@ -42,28 +42,28 @@ The minimum Go version is increased to 1.14.
    affect the directory tree and options for DirWatcher.
 
 *  memfs: allow AddFile to set internal path
-    
+
    Previously, AddFile set the internal path equal to path of file to be
    included.  This may cause conflict if the file is already included
    due to the same sys path but different internal path.
-    
+
    This commit add parameter internalPath to set custom internal path in
    the memfs map.
 
 *  memfs: refactoring Go generate code to use memfs.MemFS instance
-    
+
    Instead of using memfs.PathNode, which is confusing for new user
    (what is PathNode?), we actually can use memfs.MemFS instance.
-    
+
    This effect on how we use memfs in http package.
 
 *  dns: change the SOA field in ZoneFile to non-pointer
-    
+
    The reason we use pointer for SOA record is so we can save them only
    if its not nil.  A nil SOA record cause the generated JSON become "null"
    and this is make the consumer of ZoneFile do more work, checking for the
    null and initialize it when required.
-    
+
    This changes, make the SOA record to non-nil and we save the record only
    if the MName field is not empty.
 
@@ -78,13 +78,32 @@ The minimum Go version is increased to 1.14.
    The Post method send the POST request to path without setting
    "Content-Type".
 
+*  lib/clise: new package that implement circular slice
+
+   A circular slice is a slice that have fixed size.
+   An append to slice that has reached its length will overwrite and start
+   again from index 0.
+
+   For example, a clise with size 5,
+
+     c := clise.New(5)
+     c.Push(1, 2, 3, 4, 5)
+     fmt.Printf("%v\n", c.Slice()) // [1 2 3 4 5]
+
+   If we push another item, it will overwrite the first index,
+
+     c.Push(6)
+     fmt.Printf("%v\n", c.Slice()) // [6 2 3 4 5]
+
+   See the examples for usage of the package.
+
 *  time: add function UnixMicro that return UNIX time in micro seconds
 
 *  api/slack: simple API for sending message to Slack using only
    standard packages.
 
 *  runes: add function to inverse the slice of rune
-    
+
    The Inverse function reverse the order of slice of rune without
    allocating another slice.
 
@@ -106,6 +125,14 @@ The minimum Go version is increased to 1.14.
    This change make the error message more readable and understandable by
    consumer
 
+*  dns: add method to get list of non-local caches in the Server
+
+   The CachesLRU method return the list of non-local caches ordered by
+   the least recently used.
+
+   This changes affect the answer type which must be exported, including
+   most of its fields, so consumer can access it.
+
 ===  Bug fixes
 
 *  sql: check nil on Migrate parameter "fs" using reflect.IsNil
@@ -113,6 +140,15 @@ The minimum Go version is increased to 1.14.
    If we pass nil pointer of type to fs, the if condition will not true
    and this cause panic because fs is not nil.
 
+*  http: fix the package documentation
+
+   The RegisterXxx methods on Server has been replaced with single method,
+   RegisterEndpoint.
+
+*  dns: fix saving the TXT record file on zone file
+
+   The TXT record value must be wrapped with quote when stored on zone
+   file.
 
 ==  share v0.22.0 (2021-01-06)
 
