@@ -157,6 +157,7 @@ The minimum Go version is increased to 1.14.
    The TXT record value must be wrapped with quote when stored on zone
    file.
 
+
 ==  share v0.22.0 (2021-01-06)
 
 ===  Breaking changes
