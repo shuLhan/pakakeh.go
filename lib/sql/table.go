@@ -28,7 +28,7 @@ type Table struct {
 //
 func (table *Table) Insert(tx *sql.Tx) (ids []int64, err error) {
 	for _, row := range table.Rows {
-		names, holders, values := row.ExtractSQLFields()
+		names, holders, values := row.ExtractSQLFields(DefaultPlaceHolder)
 		if len(names) == 0 {
 			continue
 		}

@@ -71,6 +71,13 @@ The minimum Go version is increased to 1.14.
 
    This is for consistency for type and variable names.
 
+*  sql: sort returned names on ExtractSQLFields sorted in ascending
+
+   This is to make sure that any test that use the package always
+   predictable.
+
+   While at it, add paramter to change placeholder on ExtractSQLFields.
+
 ===  New features
 
 *  http: add method Post on client

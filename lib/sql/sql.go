@@ -11,4 +11,6 @@ package sql
 const (
 	DriverNameMysql    = "mysql"
 	DriverNamePostgres = "postgres"
+
+	DefaultPlaceHolder = "?"
 )
