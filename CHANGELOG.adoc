@@ -3,6 +3,19 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.24.0 (2021-03-xx)
+
+===  Breaking changes
+
+*  http: add prefix Header to constants AcceptEncoding and ContentEncoding
+
+   Since both of those constants are used only for HTTP header, it could
+   be more clear if we prefix it with "Header".
+
+   Also, rename "HeaderAuthKeyBearer" to "HeaderBearer" and sort the list
+   of header constants.
+
+
 ==  share v0.23.0 (2021-02-05)
 
 This release bring major refactoring to package memfs to allow embedding two

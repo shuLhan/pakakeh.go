@@ -320,7 +320,7 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 		buf           = make([]byte, 1024)
 	)
 
-	switch res.Header.Get(ContentEncoding) {
+	switch res.Header.Get(HeaderContentEncoding) {
 	case ContentEncodingBzip2:
 		dec = ioutil.NopCloser(bzip2.NewReader(in))
 

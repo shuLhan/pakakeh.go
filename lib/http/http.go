@@ -190,8 +190,6 @@ import (
 
 // List of known HTTP header keys and values.
 const (
-	AcceptEncoding          = "Accept-Encoding"
-	ContentEncoding         = "Content-Encoding"
 	ContentEncodingBzip2    = "bzip2"
 	ContentEncodingCompress = "compress" // Using LZW.
 	ContentEncodingGzip     = "gzip"
@@ -204,22 +202,24 @@ const (
 	ContentTypePlain  = "text/plain; charset=utf-8"
 	ContentTypeXML    = "text/xml; charset=utf-8"
 
-	HeaderACAllowOrigin      = "Access-Control-Allow-Origin"
-	HeaderACAllowMethod      = "Access-Control-Allow-Method"
 	HeaderACAllowCredentials = "Access-Control-Allow-Credentials"
 	HeaderACAllowHeaders     = "Access-Control-Allow-Headers"
+	HeaderACAllowMethod      = "Access-Control-Allow-Method"
+	HeaderACAllowOrigin      = "Access-Control-Allow-Origin"
 	HeaderACExposeHeaders    = "Access-Control-Expose-Headers"
 	HeaderACMaxAge           = "Access-Control-Max-Age"
-	HeaderACRequestMethod    = "Access-Control-Request-Method"
 	HeaderACRequestHeaders   = "Access-Control-Request-Headers"
+	HeaderACRequestMethod    = "Access-Control-Request-Method"
+	HeaderAcceptEncoding     = "Accept-Encoding"
 	HeaderAllow              = "Allow"
+	HeaderBearer             = "Bearer"
 	HeaderAuthorization      = "Authorization"
+	HeaderContentEncoding    = "Content-Encoding"
 	HeaderContentLength      = "Content-Length"
 	HeaderContentType        = "Content-Type"
 	HeaderLocation           = "Location"
 	HeaderOrigin             = "Origin"
 	HeaderUserAgent          = "User-Agent"
-	HeaderAuthKeyBearer      = "Bearer"
 )
 
 var (

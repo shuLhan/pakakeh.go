@@ -485,7 +485,7 @@ func (srv *Server) handleFS(
 	res.Header().Set(HeaderContentType, node.ContentType)
 
 	if len(node.ContentEncoding) > 0 {
-		res.Header().Set(ContentEncoding, node.ContentEncoding)
+		res.Header().Set(HeaderContentEncoding, node.ContentEncoding)
 	}
 
 	var (
