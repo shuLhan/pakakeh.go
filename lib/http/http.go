@@ -186,6 +186,10 @@ package http
 
 import (
 	"errors"
+	"net/http"
+	"strings"
+
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 // List of known HTTP header keys and values.
@@ -220,6 +224,8 @@ const (
 	HeaderLocation           = "Location"
 	HeaderOrigin             = "Origin"
 	HeaderUserAgent          = "User-Agent"
+	HeaderXForwardedFor      = "X-Forwarded-For" // https://en.wikipedia.org/wiki/X-Forwarded-For
+	HeaderXRealIp            = "X-Real-Ip"
 )
 
 var (
@@ -242,3 +248,40 @@ var (
 	//
 	ErrEndpointKeyEmpty = errors.New("empty route's key")
 )
+
+//
+// IPAddressOfRequest get the client IP address from HTTP request header
+// "X-Real-IP" or "X-Forwarded-For" or from Request.RemoteAddr, which ever
+// non-empty first.
+//
+func IPAddressOfRequest(req *http.Request) (addr string) {
+	addr = req.Header.Get(HeaderXRealIp)
+	if len(addr) == 0 {
+		addr, _ = ParseXForwardedFor(req.Header.Get(HeaderXForwardedFor))
+		if len(addr) == 0 {
+			addr = req.RemoteAddr
+		}
+	}
+	addr, _, _ = libnet.ParseIPPort(addr, 0)
+	return addr
+}
+
+//
+// ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from the
+// following format "client, proxy1, proxy2" into client address and list of
+// proxy addressess.
+//
+func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
+	if len(val) == 0 {
+		return "", nil
+	}
+	addrs := strings.Split(val, ",")
+	for x, addr := range addrs {
+		if x == 0 {
+			clientAddr = strings.TrimSpace(addr)
+		} else {
+			proxyAddrs = append(proxyAddrs, strings.TrimSpace(addr))
+		}
+	}
+	return clientAddr, proxyAddrs
+}
