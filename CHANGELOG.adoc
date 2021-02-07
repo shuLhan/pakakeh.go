@@ -15,6 +15,15 @@ This library is released every month, usually at the first week of month.
    Also, rename "HeaderAuthKeyBearer" to "HeaderBearer" and sort the list
    of header constants.
 
+*  sql: change the parameter ExtractSQLFields to driver name
+
+   Previously, we use the string as parameter to set the returned place
+   holders.
+
+   This commit changes the parameter to the driver name so if the value
+   is "postgres" the place holders will be returned as counter, for example
+   "$1", "$2", and so on.
+
 ===  New features
 
 *  http: add methods IPAddressOfRequest and ParseXForwardedFor

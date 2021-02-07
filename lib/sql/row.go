@@ -4,7 +4,10 @@
 
 package sql
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 //
 // Row represent a column-name and value in a tuple.
@@ -15,17 +18,20 @@ import "sort"
 type Row map[string]interface{}
 
 //
-// ExtractSQLFields extract the column's name, column place holder (default is
-// "?"), and column values; as slices.
+// ExtractSQLFields extract the column's name, column place holder, and column
+// values as slices.
+//
+// The driverName define the returned place holders.
+// If the driverName is "postgres" then the list of holders will be returned
+// as counter, for example "$1", "$2" and so on.
+// If the driverName is "mysql" or empty or unknown the the list of holders
+// will be returned as list of "?".
 //
 // The returned names will be sorted in ascending order.
 //
-func (row Row) ExtractSQLFields(placeHolder string) (names, holders []string, values []interface{}) {
+func (row Row) ExtractSQLFields(driverName string) (names, holders []string, values []interface{}) {
 	if len(row) == 0 {
 		return nil, nil, nil
-	}
-	if len(placeHolder) == 0 {
-		placeHolder = DefaultPlaceHolder
 	}
 
 	names = make([]string, 0, len(row))
@@ -37,8 +43,12 @@ func (row Row) ExtractSQLFields(placeHolder string) (names, holders []string, va
 	}
 	sort.Strings(names)
 
-	for _, k := range names {
-		holders = append(holders, placeHolder)
+	for x, k := range names {
+		if driverName == DriverNamePostgres {
+			holders = append(holders, fmt.Sprintf("$%d", x+1))
+		} else {
+			holders = append(holders, DefaultPlaceHolder)
+		}
 		values = append(values, row[k])
 	}
 
