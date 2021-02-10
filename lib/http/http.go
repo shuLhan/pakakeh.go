@@ -251,15 +251,15 @@ var (
 
 //
 // IPAddressOfRequest get the client IP address from HTTP request header
-// "X-Real-IP" or "X-Forwarded-For" or from Request.RemoteAddr, which ever
-// non-empty first.
+// "X-Real-IP" or "X-Forwarded-For", which ever non-empty first.
+// If no headers present, use the default address.
 //
-func IPAddressOfRequest(req *http.Request) (addr string) {
-	addr = req.Header.Get(HeaderXRealIp)
+func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
+	addr = headers.Get(HeaderXRealIp)
 	if len(addr) == 0 {
-		addr, _ = ParseXForwardedFor(req.Header.Get(HeaderXForwardedFor))
+		addr, _ = ParseXForwardedFor(headers.Get(HeaderXForwardedFor))
 		if len(addr) == 0 {
-			addr = req.RemoteAddr
+			addr = defAddr
 		}
 	}
 	addr, _, _ = libnet.ParseIPPort(addr, 0)

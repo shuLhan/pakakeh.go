@@ -6,32 +6,25 @@ import (
 )
 
 func ExampleIPAddressOfRequest() {
-	reqWithXRealIP := &http.Request{
-		Header: http.Header{
-			"X-Real-Ip": []string{"127.0.0.1"},
-		},
-		RemoteAddr: "192.168.100.1",
-	}
-	fmt.Println("Request with X-Real-IP:", IPAddressOfRequest(reqWithXRealIP))
+	defAddress := "192.168.100.1"
 
-	reqWithXForwardedFor := &http.Request{
-		Header: http.Header{
-			"X-Forwarded-For": []string{"127.0.0.2, 192.168.100.1"},
-		},
-		RemoteAddr: "192.168.100.1",
+	headers := http.Header{
+		"X-Real-Ip": []string{"127.0.0.1"},
 	}
-	fmt.Println("Request with X-Forwarded-For:", IPAddressOfRequest(reqWithXForwardedFor))
+	fmt.Println("Request with X-Real-IP:", IPAddressOfRequest(headers, defAddress))
 
-	reqWithRemoteAddr := &http.Request{
-		Header:     http.Header{},
-		RemoteAddr: "127.0.0.3",
+	headers = http.Header{
+		"X-Forwarded-For": []string{"127.0.0.2, 192.168.100.1"},
 	}
-	fmt.Println("Request without X-* headers:", IPAddressOfRequest(reqWithRemoteAddr))
+	fmt.Println("Request with X-Forwarded-For:", IPAddressOfRequest(headers, defAddress))
+
+	headers = http.Header{}
+	fmt.Println("Request without X-* headers:", IPAddressOfRequest(headers, defAddress))
 
 	// Output:
 	// Request with X-Real-IP: 127.0.0.1
 	// Request with X-Forwarded-For: 127.0.0.2
-	// Request without X-* headers: 127.0.0.3
+	// Request without X-* headers: 192.168.100.1
 }
 
 func ExampleParseXForwardedFor() {
