@@ -12,9 +12,6 @@ This library is released every month, usually at the first week of month.
    Since both of those constants are used only for HTTP header, it could
    be more clear if we prefix it with "Header".
 
-   Also, rename "HeaderAuthKeyBearer" to "HeaderBearer" and sort the list
-   of header constants.
-
 *  sql: change the parameter ExtractSQLFields to driver name
 
    Previously, we use the string as parameter to set the returned place
