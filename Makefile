@@ -37,7 +37,7 @@ $(COVER_HTML): $(COVER_OUT)
 $(COVER_OUT): $(SRC) $(SRC_TEST)
 	export GORACE=history_size=7 && \
 		export CGO_ENABLED=1 && \
-		go test -race -count=1 -coverprofile=$@ ./...
+		go test -race -count=1 -p=1 -coverprofile=$@ ./...
 
 coverbrowse: $(COVER_HTML)
 	xdg-open $<
