@@ -33,6 +33,14 @@ This library is released every month, usually at the first week of month.
    the following format "client, proxy1, proxy2" into client address and
    list of proxy addressess.
 
+*  api/slack: create new client for webhook
+
+   Unlike PostWebhook API which is close and open one connection at the
+   time, the WebhookClient is keep open.
+
+   Use the WebhookClient for long running program that post message every
+   minutes or seconds.
+
 
 ==  share v0.23.0 (2021-02-05)
 
