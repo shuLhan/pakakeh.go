@@ -41,6 +41,34 @@ This library is released every month, usually at the first week of month.
    Use the WebhookClient for long running program that post message every
    minutes or seconds.
 
+*  mlog: implement MultiLogger
+
+   MultiLogger represent a single log writer that write to multiple outputs.
+   MultiLogger can have zero or more writers for standard output (normal log)
+   and zero or more writers for standard error.
+
+   The MultiLogger is buffered to minimize waiting time when writing to
+   multiple writers that have different latencies.
+   For example, if we have one writer to os.Stdout, one writer to file, and
+   one writer to network; the writer to network may take more time to finish
+   than to os.Stdout and file, which may slowing down the program if we want
+   to wait for all writes to finish.
+
+   For this reason, do not forget to call Flush when your program exit.
+
+   The default MultiLogger use time.RFC3339 as the default time layout, empty
+   prefix, os.Stdout for the output writer, and os.Stderr for the error
+   writer.
+
+   Format of written log,
+
+     [time] [prefix] <message>
+
+   The time and prefix only printed if its not empty, and the single space is
+   added for convenience.
+   Unlike standard log package, this package does not add new line to the end
+   of message if its not exist.
+
 
 ==  share v0.23.0 (2021-02-05)
 
