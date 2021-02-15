@@ -69,6 +69,18 @@ This library is released every month, usually at the first week of month.
    Unlike standard log package, this package does not add new line to the end
    of message if its not exist.
 
+*  http: export the HandleFS method
+
+   The HandleFS handle the request as resource in the memory file system.
+   This method only works if the Server.Memfs is not nil.
+
+   If the request Path exists in file system, it will return 200 OK with the
+   header Content-Type set accordingly to the detected file type and the
+   response body set to the content of file.
+   If the request Method is HEAD, only the header will be sent back to client.
+
+   If the request Path is not exist it will return 404 Not Found.
+
 
 ==  share v0.23.0 (2021-02-05)
 

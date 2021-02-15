@@ -473,9 +473,18 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusNotFound)
 }
 
-func (srv *Server) handleFS(
-	res http.ResponseWriter, req *http.Request, method RequestMethod,
-) {
+//
+// HandleFS handle the request as resource in the memory file system.
+// This method only works if the Server.Memfs is not nil.
+//
+// If the request Path exists in file system, it will return 200 OK with the
+// header Content-Type set accordingly to the detected file type and the
+// response body set to the content of file.
+// If the request Method is HEAD, only the header will be sent back to client.
+//
+// If the request Path is not exist it will return 404 Not Found.
+//
+func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	node := srv.getFSNode(req.URL.Path)
 	if node == nil {
 		res.WriteHeader(http.StatusNotFound)
@@ -508,7 +517,7 @@ func (srv *Server) handleFS(
 
 	res.Header().Set(HeaderContentLength, strconv.FormatInt(size, 10))
 
-	if method == RequestMethodHead {
+	if req.Method == http.MethodHead {
 		res.WriteHeader(http.StatusOK)
 		return
 	}
@@ -516,7 +525,7 @@ func (srv *Server) handleFS(
 	res.WriteHeader(http.StatusOK)
 	_, err = res.Write(body)
 	if err != nil {
-		log.Println("handleFS: ", err.Error())
+		log.Println("HandleFS: ", err.Error())
 	}
 }
 
@@ -533,7 +542,7 @@ func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	srv.handleFS(res, req, RequestMethodGet)
+	srv.HandleFS(res, req)
 }
 
 func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
@@ -549,7 +558,7 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 	if !ok {
-		srv.handleFS(res, req, RequestMethodHead)
+		srv.HandleFS(res, req)
 		return
 	}
 
