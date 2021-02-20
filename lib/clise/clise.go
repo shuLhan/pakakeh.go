@@ -42,6 +42,28 @@ func New(size int) (c *Clise) {
 }
 
 //
+// Pop remove the last Push()-ed item and return it to caller.
+// It will return nil if no more item inside it.
+//
+func (c *Clise) Pop() (item interface{}) {
+	if c.over {
+		if c.last == 0 {
+			c.last = c.size - 1
+		} else {
+			c.last--
+		}
+	} else {
+		if c.last == 0 {
+			return nil
+		}
+		c.last--
+	}
+	item = c.v[c.last]
+	c.v[c.last] = nil
+	return item
+}
+
+//
 // Push the item into the slice.
 //
 func (c *Clise) Push(src ...interface{}) {

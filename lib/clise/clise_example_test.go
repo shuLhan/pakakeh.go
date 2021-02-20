@@ -2,6 +2,22 @@ package clise
 
 import "fmt"
 
+func ExampleClise_Pop() {
+	c := New(5)
+	c.Push(1, 2, 3, 4, 5, 6)
+	item := c.Pop()
+	for item != nil {
+		fmt.Printf("%v\n", item)
+		item = c.Pop()
+	}
+	// Output:
+	// 6
+	// 5
+	// 4
+	// 3
+	// 2
+}
+
 func ExampleClise_RecentSlice() {
 	c := New(5)
 	c.Push(1, 2, 3)
