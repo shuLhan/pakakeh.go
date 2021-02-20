@@ -19,7 +19,10 @@
 //
 package clise
 
+import "sync"
+
 type Clise struct {
+	sync.Mutex
 	v    []interface{}
 	size int
 	last int
@@ -46,6 +49,7 @@ func New(size int) (c *Clise) {
 // It will return nil if no more item inside it.
 //
 func (c *Clise) Pop() (item interface{}) {
+	c.Lock()
 	if c.over {
 		if c.last == 0 {
 			c.last = c.size - 1
@@ -54,12 +58,14 @@ func (c *Clise) Pop() (item interface{}) {
 		}
 	} else {
 		if c.last == 0 {
+			c.Unlock()
 			return nil
 		}
 		c.last--
 	}
 	item = c.v[c.last]
 	c.v[c.last] = nil
+	c.Unlock()
 	return item
 }
 
@@ -67,6 +73,7 @@ func (c *Clise) Pop() (item interface{}) {
 // Push the item into the slice.
 //
 func (c *Clise) Push(src ...interface{}) {
+	c.Lock()
 	for x := 0; x < len(src); x++ {
 		c.v[c.last] = src[x]
 		c.last++
@@ -75,14 +82,17 @@ func (c *Clise) Push(src ...interface{}) {
 			c.over = true
 		}
 	}
+	c.Unlock()
 }
 
 //
 // RecentSlice return the slice from index zero until the recent item.
 //
 func (c *Clise) RecentSlice() (dst []interface{}) {
+	c.Lock()
 	dst = make([]interface{}, c.last)
 	copy(dst, c.v[:c.last])
+	c.Unlock()
 	return dst
 }
 
@@ -90,8 +100,10 @@ func (c *Clise) RecentSlice() (dst []interface{}) {
 // Reset the slice, start from zero.
 //
 func (c *Clise) Reset() {
+	c.Lock()
 	c.last = 0
 	c.over = false
+	c.Unlock()
 }
 
 //
@@ -110,9 +122,11 @@ func (c *Clise) Slice() (dst []interface{}) {
 		dst = make([]interface{}, c.last)
 		end = c.last
 	}
+	c.Lock()
 	copy(dst, c.v[start:end])
 	if c.over {
 		copy(dst[end-start:], c.v[0:start])
 	}
+	c.Unlock()
 	return dst
 }
