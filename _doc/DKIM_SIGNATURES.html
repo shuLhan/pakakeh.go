@@ -404,7 +404,8 @@ The domain name is the same as that used for the SDID or is a subdomain of it.</
 </dd>
 <dt class="hdlist1">Signers</dt>
 <dd>
-<p>Signers is an elements in the mail system that sign messages onbehalf of SDID.</p>
+<p>Signers is an elements in the mail system that sign messages on
+behalf of SDID.</p>
 </dd>
 <dt class="hdlist1">Verifiers</dt>
 <dd>
@@ -420,13 +421,13 @@ identifier.</p>
 <dt class="hdlist1">Whitespace</dt>
 <dd>
 <p>There are three forms of whitespace:
-&#8230;.
+&#8230;&#8203;.
 SP                       = ; Space
 HTAB                     = ; Horizontal tab
 WSP                      =   SP / HTAB         ; whitespace
 LWSP (linear whitespace) =  *(WSP / CRLF WSP)  ; linear whitespace
 FWS (folding whitespace) =   [*WSP CRLF] 1*WSP ; folding whitespace
-&#8230;.</p>
+&#8230;&#8203;.</p>
 </dd>
 </dl>
 </div>
@@ -1197,7 +1198,7 @@ able to establish a verified individual identity.</p>
 "d=" tag.</p>
 </li>
 <li>
-<p>The domain-name need not be registered in the DNS &#8212; so it might not
+<p>The domain-name need not be registered in the DNS&#8201;&#8212;&#8201;so it might not
 resolve in a query</p>
 </li>
 <li>
@@ -1876,7 +1877,8 @@ signature    =  sig-alg (d-domain, selector, data-hash)</pre>
 </dd>
 <dt class="hdlist1">canon-body</dt>
 <dd>
-<p>is a canonicalized representation of the body, producedusing the body algorithm specified in the "c" parameter.</p>
+<p>is a canonicalized representation of the body, produced
+using the body algorithm specified in the "c" parameter.</p>
 </dd>
 <dt class="hdlist1">l-param</dt>
 <dd>
@@ -1884,15 +1886,18 @@ signature    =  sig-alg (d-domain, selector, data-hash)</pre>
 </dd>
 <dt class="hdlist1">data-hash</dt>
 <dd>
-<p>is the output from using the hash-alg algorithm, to hashthe header including the DKIM-Signature header, and the body hash.</p>
+<p>is the output from using the hash-alg algorithm, to hash
+the header including the DKIM-Signature header, and the body hash.</p>
 </dd>
 <dt class="hdlist1">h-headers</dt>
 <dd>
-<p>is the list of headers to be signed, as specified in the "h="parameter.</p>
+<p>is the list of headers to be signed, as specified in the "h="
+parameter.</p>
 </dd>
 <dt class="hdlist1">D-SIG</dt>
 <dd>
-<p>is the canonicalized DKIM-Signature field itself without thesignature value portion of the parameter, that is, an empty parameter value.</p>
+<p>is the canonicalized DKIM-Signature field itself without the
+signature value portion of the parameter, that is, an empty parameter value.</p>
 </dd>
 <dt class="hdlist1">signature</dt>
 <dd>
@@ -2749,7 +2754,7 @@ Last updated 2020-11-08 18:25:32 +0700
 
 		<div class="footer">
 			Powered by <a
-				href="https://git.sr.ht/shulhan/ciigo"
+				href="https://git.sr.ht/~shulhan/ciigo"
 			>
 				ciigo
 			</a>

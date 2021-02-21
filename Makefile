@@ -10,6 +10,8 @@ COVER_HTML:=cover.html
 CPU_PROF:=cpu.prof
 MEM_PROF:=mem.prof
 
+CIIGO := ${GOBIN}/ciigo
+
 .PHONY: all install lint docs docs-serve clean distclean
 .PHONY: test test.prof bench.lib.websocket coverbrowse
 
@@ -45,11 +47,14 @@ coverbrowse: $(COVER_HTML)
 lint:
 	-golangci-lint run ./...
 
-docs:
-	go run ./internal/cmd/docs
+$(CIIGO):
+	go install git.sr.ht/~shulhan/ciigo/cmd/ciigo
 
-docs-serve:
-	go run ./internal/cmd/docs-serve
+docs: $(CIIGO)
+	ciigo convert _doc
+
+docs-serve: $(CIIGO)
+	ciigo -address 127.0.0.1:21019 serve _doc
 
 clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)

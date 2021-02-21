@@ -791,8 +791,8 @@ SPF evaluation, to avoid unreasonable load on the DNS.
 If this limit is exceeded, the implementation MUST return "permerror".</p>
 </div>
 <div class="paragraph">
-<p>The other terms &#8212; the "all", "ip4", and "ip6" mechanisms, and the "exp"
-modifier &#8212; do not cause DNS queries at the time of SPF evaluation (the
+<p>The other terms&#8201;&#8212;&#8201;the "all", "ip4", and "ip6" mechanisms, and the "exp"
+modifier&#8201;&#8212;&#8201;do not cause DNS queries at the time of SPF evaluation (the
 "exp" modifier only causes a lookup at a later time), and their use is not
 subject to this limit.</p>
 </div>
@@ -801,7 +801,7 @@ subject to this limit.</p>
 queried is included in the overall limit of 10 mechanisms/modifiers that
 cause DNS lookups as described above.
 In addition to that limit, the evaluation of each "MX" record MUST NOT result
-in querying more than 10 address records &#8212; either "A" or "AAAA" resource
+in querying more than 10 address records&#8201;&#8212;&#8201;either "A" or "AAAA" resource
 records.
 If this limit is exceeded, the "mx" mechanism MUST produce a "permerror"
 result.</p>
@@ -811,7 +811,7 @@ result.</p>
 resource records queried is included in the overall limit of 10
 mechanisms/modifiers that cause DNS lookups as described above.
 In addition to that limit, the evaluation of each "PTR" record MUST NOT result
-in querying more than 10 address records &#8212; either "A" or "AAAA" resource
+in querying more than 10 address records&#8201;&#8212;&#8201;either "A" or "AAAA" resource
 records.
 If this limit is exceeded, all records other than the first 10 MUST be
 ignored.</p>
@@ -1302,9 +1302,9 @@ connection type is IPv6).</p>
 <li>
 <p>Domains can use this mechanism to specify arbitrarily complex queries.
 For example, suppose example.com publishes the record:
-&#8230;.
+&#8230;&#8203;.
 v=spf1 exists:%{ir}.%{l1r+-}._spf.%{d} -all
-&#8230;.</p>
+&#8230;&#8203;.</p>
 </li>
 </ul>
 </div>
@@ -1509,7 +1509,7 @@ explain._spf.example.com:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>&#8212; a simple, constant message</p>
+<p>&#8212;&#8201;a simple, constant message</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1517,7 +1517,7 @@ explain._spf.example.com:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>&#8212; a message with a little more information, including the IP address that
+<p>&#8212;&#8201;a message with a little more information, including the IP address that
 failed the check</p>
 </div>
 <div class="literalblock">
@@ -1526,7 +1526,7 @@ failed the check</p>
 </div>
 </div>
 <div class="paragraph">
-<p>&#8212; a complicated example that constructs a URL with the arguments to
+<p>&#8212;&#8201;a complicated example that constructs a URL with the arguments to
 check_host() so that a web page can be generated with detailed, custom
 instructions</p>
 </div>
@@ -2204,13 +2204,13 @@ CRLF             = &lt;standard end-of-line token as per [RFC5322]&gt;</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>The header field SHOULD include a "(&#8230;)" style comment after the
+<p>The header field SHOULD include a "(&#8230;&#8203;)" style comment after the
 result, conveying supporting information for the result, such as
 &lt;ip&gt;, &lt;sender&gt;, and &lt;domain&gt;.</p>
 </li>
 <li>
 <p>SPF verifiers SHOULD give enough information so that the SPF
-results can be verified &#8212; that is, at least "client-ip", "helo",
+results can be verified&#8201;&#8212;&#8201;that is, at least "client-ip", "helo",
 and, if the "MAIL FROM" identity was checked, "envelope-from".</p>
 </li>
 </ul>
@@ -2753,7 +2753,7 @@ Last updated 2020-11-08 18:25:32 +0700
 
 		<div class="footer">
 			Powered by <a
-				href="https://git.sr.ht/shulhan/ciigo"
+				href="https://git.sr.ht/~shulhan/ciigo"
 			>
 				ciigo
 			</a>

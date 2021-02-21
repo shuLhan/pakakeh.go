@@ -1,4 +1,4 @@
-# Documentation
+# shuLhan/share internal documentation
 Shulhan <ms@kilabit.info>
 
 Beside
@@ -33,9 +33,9 @@ pkg.go.dev.
 * link:SPF.html[Sender Policy Framework version 1 (RFC 7208)]
 
 The documentation is created and generated using
-https://github.com/shuLhan/ciigo[`ciigo`].
+https://git.sr.ht/~shulhan/ciigo[`ciigo`].
 
-To serve documentation on HTTP server at http://127.0.0.1:8080 and watch
+To serve documentation on HTTP server at http://127.0.0.1:21019 and watch
 changes on documentation files (".adoc") and regenerate the HTML
 files, run
 
