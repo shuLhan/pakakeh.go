@@ -158,27 +158,25 @@ key=value3
 	// key2 = []
 }
 
-type T struct {
-	String      string            `ini:"section::string"`
-	Int         int               `ini:"section::int"`
-	Bool        bool              `ini:"section::bool"`
-	Duration    time.Duration     `ini:"section::duration"`
-	Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
-	SliceString []string          `ini:"section:slice:string"`
-	SliceInt    []int             `ini:"section:slice:int"`
-	SliceUint   []uint            `ini:"section:slice:uint"`
-	SliceBool   []bool            `ini:"section:slice:bool"`
-	MapString   map[string]string `ini:"section:mapstring"`
-	MapInt      map[string]int    `ini:"section:mapint"`
-	PtrString   *string           `ini:"section:pointer"`
-	PtrInt      *int              `ini:"section:pointer"`
-}
-
 func ExampleMarshal() {
 	ptrString := "b"
 	ptrInt := int(2)
 
-	t := &T{
+	t := struct {
+		String      string            `ini:"section::string"`
+		Int         int               `ini:"section::int"`
+		Bool        bool              `ini:"section::bool"`
+		Duration    time.Duration     `ini:"section::duration"`
+		Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
+		SliceString []string          `ini:"section:slice:string"`
+		SliceInt    []int             `ini:"section:slice:int"`
+		SliceUint   []uint            `ini:"section:slice:uint"`
+		SliceBool   []bool            `ini:"section:slice:bool"`
+		MapString   map[string]string `ini:"section:mapstring"`
+		MapInt      map[string]int    `ini:"section:mapint"`
+		PtrString   *string           `ini:"section:pointer"`
+		PtrInt      *int              `ini:"section:pointer"`
+	}{
 		String:      "a",
 		Int:         1,
 		Bool:        true,
@@ -198,7 +196,7 @@ func ExampleMarshal() {
 		PtrInt:    &ptrInt,
 	}
 
-	iniText, err := Marshal(t)
+	iniText, err := Marshal(&t)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -262,9 +260,23 @@ k = 6
 ptrstring = b
 ptrint = 2
 `
-	t := &T{}
+	t := struct {
+		String      string            `ini:"section::string"`
+		Int         int               `ini:"section::int"`
+		Bool        bool              `ini:"section::bool"`
+		Duration    time.Duration     `ini:"section::duration"`
+		Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
+		SliceString []string          `ini:"section:slice:string"`
+		SliceInt    []int             `ini:"section:slice:int"`
+		SliceUint   []uint            `ini:"section:slice:uint"`
+		SliceBool   []bool            `ini:"section:slice:bool"`
+		MapString   map[string]string `ini:"section:mapstring"`
+		MapInt      map[string]int    `ini:"section:mapint"`
+		PtrString   *string           `ini:"section:pointer"`
+		PtrInt      *int              `ini:"section:pointer"`
+	}{}
 
-	err := Unmarshal([]byte(iniText), t)
+	err := Unmarshal([]byte(iniText), &t)
 	if err != nil {
 		log.Fatal(err)
 	}
