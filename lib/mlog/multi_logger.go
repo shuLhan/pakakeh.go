@@ -80,6 +80,8 @@ func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog *
 // Errf write the formatted string and its optional values to all error
 // writers.
 //
+// The format string does not end with new line, it will be added.
+//
 func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
 	if len(mlog.errs) == 0 {
 		return
@@ -173,6 +175,11 @@ func (mlog *MultiLogger) processErrorQueue() {
 	for {
 		select {
 		case b := <-mlog.qerr:
+			if len(b) == 0 {
+				b = append(b, '\n')
+			} else if b[len(b)-1] != '\n' {
+				b = append(b, '\n')
+			}
 			for _, w := range mlog.errs {
 				_, err = w.Write(b)
 				if err != nil {
@@ -182,6 +189,11 @@ func (mlog *MultiLogger) processErrorQueue() {
 		case <-mlog.qerrFlush:
 			for x := 0; x < len(mlog.qerr); x++ {
 				b := <-mlog.qerr
+				if len(b) == 0 {
+					b = append(b, '\n')
+				} else if b[len(b)-1] != '\n' {
+					b = append(b, '\n')
+				}
 				for _, w := range mlog.errs {
 					_, err = w.Write(b)
 					if err != nil {
