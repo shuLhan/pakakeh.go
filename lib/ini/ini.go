@@ -60,7 +60,7 @@ func Parse(text []byte) (in *Ini, err error) {
 //
 // Marshal encode the struct of v into stream of ini formatted string.
 //
-// To encode a struct, an exported fields must have tagged with "ini" key;
+// To encode a struct, each exported fields must have tagged with "ini" key;
 // untagged field will not be exported.
 //
 // Each exported field in the struct must have at least one tag: a section
@@ -93,7 +93,7 @@ func Marshal(v interface{}) (b []byte, err error) {
 
 	in := &Ini{}
 
-	marshalStruct(in, rtipe, rvalue)
+	in.marshalStruct(rtipe, rvalue, "", "")
 
 	buf := bytes.NewBuffer(nil)
 	err = in.Write(buf)
@@ -106,7 +106,10 @@ func Marshal(v interface{}) (b []byte, err error) {
 	return b, nil
 }
 
-func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
+func (in *Ini) marshalStruct(
+	rtipe reflect.Type, rvalue reflect.Value,
+	parentSec, parentSub string,
+) {
 	numField := rtipe.NumField()
 	if numField == 0 {
 		return
@@ -149,6 +152,13 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 			sub = tags[1]
 			key = tags[2]
 		}
+		if len(parentSec) > 0 {
+			sec = parentSec
+		}
+		if len(parentSub) > 0 {
+			sub = parentSub
+		}
+
 		key = strings.ToLower(key)
 
 		for kind == reflect.Ptr {
@@ -159,12 +169,23 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 
 		switch kind {
 		case reflect.String:
-			ini.Set(sec, sub, key, fvalue.String())
+			in.Set(sec, sub, key, fvalue.String())
 
 		case reflect.Array, reflect.Slice:
-			for x := 0; x < fvalue.Len(); x++ {
-				value = fmt.Sprintf("%v", fvalue.Index(x))
-				ini.Add(sec, sub, key, value)
+			for xx := 0; xx < fvalue.Len(); xx++ {
+				item := fvalue.Index(xx)
+				switch item.Kind() {
+				case reflect.Struct:
+					vi := item.Interface()
+					structIni := &Ini{}
+					structIni.marshalStruct(
+						reflect.TypeOf(vi),
+						reflect.ValueOf(vi), sec, sub)
+					in.secs = append(in.secs, structIni.secs...)
+				default:
+					value = fmt.Sprintf("%v", item)
+					in.Add(sec, sub, key, value)
+				}
 			}
 
 		case reflect.Map:
@@ -174,7 +195,7 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 				mv := iter.Value()
 				key = strings.ToLower(fmt.Sprintf("%v", mk))
 				value = fmt.Sprintf("%v", mv)
-				ini.Set(sec, sub, key, value)
+				in.Set(sec, sub, key, value)
 			}
 
 		case reflect.Struct:
@@ -182,10 +203,10 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 			t, ok := vi.(time.Time)
 			if ok {
 				value = t.Format(layout)
-				ini.Set(sec, sub, key, value)
+				in.Set(sec, sub, key, value)
 				continue
 			}
-			marshalStruct(ini, reflect.TypeOf(vi), reflect.ValueOf(vi))
+			in.marshalStruct(reflect.TypeOf(vi), reflect.ValueOf(vi), "", "")
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:
@@ -193,15 +214,15 @@ func marshalStruct(ini *Ini, rtipe reflect.Type, rvalue reflect.Value) {
 
 		default:
 			value = fmt.Sprintf("%v", fvalue)
-			ini.Set(sec, sub, key, value)
+			in.Set(sec, sub, key, value)
 		}
 	}
 }
 
 //
-// Unmarshal parse the INI stream as slice of byte and store its value into
+// Unmarshal parse the INI stream from slice of byte and store its value into
 // struct of `v`.
-// All the property and specification of field's tag follow the Marshal
+// All the properties and specifications of field's tag follow the Marshal
 // function.
 //
 func Unmarshal(b []byte, v interface{}) (err error) {

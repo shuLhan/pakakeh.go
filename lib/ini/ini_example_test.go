@@ -162,6 +162,11 @@ func ExampleMarshal() {
 	ptrString := "b"
 	ptrInt := int(2)
 
+	type U struct {
+		String string `ini:"::string"`
+		Int    int    `ini:"::int"`
+	}
+
 	t := struct {
 		String      string            `ini:"section::string"`
 		Int         int               `ini:"section::int"`
@@ -172,6 +177,7 @@ func ExampleMarshal() {
 		SliceInt    []int             `ini:"section:slice:int"`
 		SliceUint   []uint            `ini:"section:slice:uint"`
 		SliceBool   []bool            `ini:"section:slice:bool"`
+		SliceStruct []U               `ini:"slice:OfStruct"`
 		MapString   map[string]string `ini:"section:mapstring"`
 		MapInt      map[string]int    `ini:"section:mapint"`
 		PtrString   *string           `ini:"section:pointer"`
@@ -186,6 +192,13 @@ func ExampleMarshal() {
 		SliceInt:    []int{2, 3},
 		SliceUint:   []uint{4, 5},
 		SliceBool:   []bool{true, false},
+		SliceStruct: []U{{
+			String: "U.string 1",
+			Int:    1,
+		}, {
+			String: "U.string 2",
+			Int:    2,
+		}},
 		MapString: map[string]string{
 			"k": "v",
 		},
@@ -219,6 +232,14 @@ func ExampleMarshal() {
 	// uint = 5
 	// bool = true
 	// bool = false
+	//
+	// [slice "OfStruct"]
+	// string = U.string 1
+	// int = 1
+	//
+	// [slice "OfStruct"]
+	// string = U.string 2
+	// int = 2
 	//
 	// [section "mapstring"]
 	// k = v
