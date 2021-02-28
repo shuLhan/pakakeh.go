@@ -180,10 +180,10 @@ func ExampleMarshal() {
 		SliceUint   []uint            `ini:"section:slice:uint"`
 		SliceBool   []bool            `ini:"section:slice:bool"`
 		SliceStruct []U               `ini:"slice:OfStruct"`
-		MapString   map[string]string `ini:"section:mapstring"`
-		MapInt      map[string]int    `ini:"section:mapint"`
-		PtrString   *string           `ini:"section:pointer"`
-		PtrInt      *int              `ini:"section:pointer"`
+		MapString   map[string]string `ini:"map:string"`
+		MapInt      map[string]int    `ini:"map:int"`
+		PtrString   *string           `ini:"section:pointer:string"`
+		PtrInt      *int              `ini:"section:pointer:int"`
 		PtrTime     *time.Time        `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
 		PtrStruct   *U                `ini:"pointer:struct"`
 	}{
@@ -258,15 +258,15 @@ func ExampleMarshal() {
 	// string = U.string 2
 	// int = 2
 	//
-	// [section "mapstring"]
+	// [map "string"]
 	// k = v
 	//
-	// [section "mapint"]
+	// [map "int"]
 	// keyint = 6
 	//
 	// [section "pointer"]
-	// ptrstring = b
-	// ptrint = 2
+	// string = b
+	// int = 2
 	// time = 2021-02-28 18:44:01
 	//
 	// [pointer "struct"]
@@ -301,15 +301,15 @@ int = 1
 string = U.string 2
 int = 2
 
-[section "mapstring"]
+[map "string"]
 k = v
 
-[section "mapint"]
+[map "int"]
 k = 6
 
 [section "pointer"]
-ptrstring = b
-ptrint = 2
+string = b
+int = 2
 `
 
 	type U struct {
@@ -328,10 +328,10 @@ ptrint = 2
 		SliceUint   []uint            `ini:"section:slice:uint"`
 		SliceBool   []bool            `ini:"section:slice:bool"`
 		SliceStruct []U               `ini:"slice:OfStruct"`
-		MapString   map[string]string `ini:"section:mapstring"`
-		MapInt      map[string]int    `ini:"section:mapint"`
-		PtrString   *string           `ini:"section:pointer:ptrstring"`
-		PtrInt      *int              `ini:"section:pointer:ptrint"`
+		MapString   map[string]string `ini:"map:string"`
+		MapInt      map[string]int    `ini:"map:int"`
+		PtrString   *string           `ini:"section:pointer:string"`
+		PtrInt      *int              `ini:"section:pointer:int"`
 	}{}
 
 	err := Unmarshal([]byte(iniText), &t)

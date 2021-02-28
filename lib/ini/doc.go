@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package ini implement reading and writing INI configuration as defined by
+// Package ini implement reading and writing INI text format as defined by
 // Git configuration file syntax.
 //
 // Features
@@ -15,109 +15,176 @@
 //
 // Unsupported features
 //
-// Git `include` and `includeIf` directives.
+// Git "include" and "includeIf" directives.
 //
 // In Git specification, an empty variable is equal to boolean true.  This
 // cause inconsistency between empty string and boolean true.
 //
 // Syntax
 //
-// S.1.0.  The `#` and `;` characters begin comments to the end of line.
+// The '#' and ';' characters begin comments to the end of line.
 //
-// S.1.1.  Blank lines are ignored.
+// Blank lines are ignored.
 //
-// ## Section
+// Section
 //
-// S.2.0.  A section begins with the name of the section in square brackets.
+// A section begins with the name of the section in square brackets.
 //
-// S.2.1.  A section continues until the next section begins.
+// A section continues until the next section begins.
 //
-// S.2.2.  Section name are case-insensitive.
+// Section name are case-insensitive.
 //
-// S.2.3.  Variable name must start with an alphabetic character, no
+// Variable name must start with an alphabetic character, no
 // whitespace before name or after '['.
 //
-// S.2.4.  Section name only allow alphanumeric characters, `-` and `.`.
+// Section name only allow alphanumeric characters, `-` and `.`.
 //
-// S.2.5.  Section can be further divided into subsections.
+// Section can be further divided into subsections.
 //
-// S.2.6.  Section headers cannot span multiple lines.
+// Section headers cannot span multiple lines.
 //
-// S.2.7.  You can have `[section]` if you have `[section "subsection"]`, but
+// You can have `[section]` if you have `[section "subsection"]`, but
 // you don’t need to.
 //
-// S.2.8.  All the other lines (and the remainder of the line after the
+// All the other lines (and the remainder of the line after the
 // section header) are recognized as setting variables, in the form
 // `name = value`.
 //
-// ## SubSection
+// Subsection
 //
-// S.3.0.  To begin a subsection put its name in double quotes, separated by
+// To begin a subsection put its name in double quotes, separated by
 // space from the section name, in the section header, for example
 //
 //	[section "subsection"]
 //
-// S.3.1.  Subsection name are case sensitive and can contain any characters
+// Subsection name are case sensitive and can contain any characters
 // except newline and the null byte.
 //
-// S.3.2.  Subsection name can include doublequote `"` and backslash by
+// Subsection name can include doublequote `"` and backslash by
 // escaping them as `\"` and `\\`, respectively.
 //
-// S.3.3.  Other backslashes preceding other characters are dropped when
+// Other backslashes preceding other characters are dropped when
 // reading subsection name; for example, `\t` is read as `t` and `\0` is read
 // as `0`.
 //
-// ## Variable
+// Variable
 //
-// S.4.0.  Variable must belong to some section, which means that there
+// Variable name must start with an alphabetic character.
+//
+// Variable must belong to some section, which means that there
 // must be a section header before the first setting of a variable.
 //
-// S.4.1.  Variable name are case-insensitive.
+// Variable name are case-insensitive.
 //
-// S.4.2.  Variable name allow only alphanumeric characters and `-`.
+// Variable name allow only alphanumeric characters and `-`.
+// This ini library add extension to allow dot ('.') and underscore ('_')
+// characters on variable name.
 //
-// S.4.3.  Variable name must start with an alphabetic character.
+// Value
 //
-// ## Value
+// Value can be empty or not set.
+// (EXT) Variable name without value is a short-hand to set the value to the
+// empty string value, for example
 //
-// S.5.0.  Value can be empty or not set, see E.4.1.
+//	[section]
+//		thisisempty # equal to thisisempty=
 //
-// S.5.1.  Internal whitespaces within the value are retained verbatim.
 //
-// S.5.2.  Value can be continued to the next line by ending it with a `\`;
-// the backquote and the end-of-line are stripped.
-//
-// S.5.3.  Leading and trailing.whitespaces on value without double quote will
+// Internal whitespaces within the value are retained verbatim.
+// Leading and trailing whitespaces on value without double quote will
 // be discarded.
 //
-// S.5.4.  Value can contain inline comment, e.g.
+// 	key = multiple strings     # equal to "multiple strings"
+// 	key = " multiple strings " # equal to " multiple strings "
+//
+// Value can be continued to the next line by ending it with a backslash '\'
+// character, the backquote and the end-of-line are stripped.
+//
+//	key = multiple \           # equal to "multiple string"
+//	strings
+//
+// Value can contain inline comment, for example
 //
 //	key = value # this is inline comment
 //
-// S.5.5.  Comment characters, '#' and ';', inside double quoted value will be
+// Comment characters, '#' and ';', inside double quoted value will be
 // read as content of value, not as comment,
 //
 //	key = "value # with hash"
 //
-// S.5.6.  Inside value enclosed double quotes, the following escape sequences
+// Inside value enclosed double quotes, the following escape sequences
 // are recognized: `\"` for doublequote, `\\` for backslash, `\n` for newline
 // character (NL), `\t` for horizontal tabulation (HT, TAB) and `\b` for
 // backspace (BS).
 //
-// S.5.7.  Other char escape sequences (including octal escape sequences) are
+// Other char escape sequences (including octal escape sequences) are
 // invalid.
 //
-// Extensions
+// Marshaling
 //
-// ## Variable
+// The container to be passed when marshaling must be struct type.
+// Each exported field in the struct with "ini" tags will be marshaled based
+// on the section, subsection, and key in the tag.
 //
-// E.4.0.  Allow dot ('.') and underscore ('_') characters on variable name.
+// If the field type is slice of primitive, for example "[]int", it will be
+// marshaled into multiple key with the same name.
 //
-// E.4.1.  Variable name without value is a short-hand to set the value to the
-// empty string value, e.g.
+// If the field type is struct, it will marshaled as new section and/or
+// subsection based on tag on the struct field
 //
-//	[section]
-//		thisisempty # equal to thisisempty=
+// If the field type is slice of struct, it will marshaled as multiple
+// section-subsection with the same tags.
+//
+// Map type is supported as long as the key is string, otherwise it will be
+// ignored.
+// The map key will be marshaled as key.
+//
+// Other standard type that supported is time.Time, which will be rendered
+// with the time format defined in "layout" tag.
+//
+// Example,
+//
+//	type U struct {
+//		Int `ini:"::int"`
+//	}
+//
+//	type T struct {
+//		String      string         `ini:"single::string"
+//		Time        time.Time      `ini:"single::time" layout:"2006-01-02"`
+//		SliceString []string       `ini:"slice::string"
+//		Struct      U              `ini:"single:struct"
+//		SliceStruct []U            `ini:"slice:struct"
+//		Map         map[string]int `ini:"map::"
+//	}
+//
+// will be marshaled into
+//
+//	[single]
+//	string = <value of T.String>
+//	time = <value of T.Time with layout "YYYY-MM-DD">
+//
+//	[slice]
+//	string = <value of T.SliceStruct[0]>
+//	...
+//	string = <value of T.SliceStruct[n]>
+//
+//	[single "struct"]
+//	int = <value of T.U.Int>
+//
+//	[slice "struct"]
+//	int = <value of T.SliceStruct[0].Int
+//
+//	[slice "struct"]
+//	int = <value of T.SliceStruct[n].Int
+//
+//	[map]
+//	<T.Map.Key[0]> = <T.Map.Value[0]>
+//	...
+//	<T.Map.Key[n]> = <T.Map.Value[n]>
+//
+// Unmarshaling
+//
+// The syntax and rules for unmarshaling is equal to the marshaling.
 //
 // References
 //
