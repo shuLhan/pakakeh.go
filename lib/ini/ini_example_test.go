@@ -271,6 +271,14 @@ bool = false
 uint = 4
 uint = 5
 
+[slice "OfStruct"]
+string = U.string 1
+int = 1
+
+[slice "OfStruct"]
+string = U.string 2
+int = 2
+
 [section "mapstring"]
 k = v
 
@@ -281,6 +289,12 @@ k = 6
 ptrstring = b
 ptrint = 2
 `
+
+	type U struct {
+		String string `ini:"::string"`
+		Int    int    `ini:"::int"`
+	}
+
 	t := struct {
 		String      string            `ini:"section::string"`
 		Int         int               `ini:"section::int"`
@@ -291,10 +305,11 @@ ptrint = 2
 		SliceInt    []int             `ini:"section:slice:int"`
 		SliceUint   []uint            `ini:"section:slice:uint"`
 		SliceBool   []bool            `ini:"section:slice:bool"`
+		SliceStruct []U               `ini:"slice:OfStruct"`
 		MapString   map[string]string `ini:"section:mapstring"`
 		MapInt      map[string]int    `ini:"section:mapint"`
-		PtrString   *string           `ini:"section:pointer"`
-		PtrInt      *int              `ini:"section:pointer"`
+		PtrString   *string           `ini:"section:pointer:ptrstring"`
+		PtrInt      *int              `ini:"section:pointer:ptrint"`
 	}{}
 
 	err := Unmarshal([]byte(iniText), &t)
@@ -311,6 +326,7 @@ ptrint = 2
 	fmt.Printf("SliceInt: %v\n", t.SliceInt)
 	fmt.Printf("SliceUint: %v\n", t.SliceUint)
 	fmt.Printf("SliceBool: %v\n", t.SliceBool)
+	fmt.Printf("SliceStruct: %v\n", t.SliceStruct)
 	fmt.Printf("MapString: %v\n", t.MapString)
 	fmt.Printf("MapInt: %v\n", t.MapInt)
 	fmt.Printf("PtrString: %v\n", *t.PtrString)
@@ -325,6 +341,7 @@ ptrint = 2
 	// SliceInt: [2 3]
 	// SliceUint: [4 5]
 	// SliceBool: [true false]
+	// SliceStruct: [{U.string 1 1} {U.string 2 2}]
 	// MapString: map[k:v]
 	// MapInt: map[k:6]
 	// PtrString: b
