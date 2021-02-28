@@ -196,6 +196,23 @@ func (in *Ini) marshalStruct(
 				in.Set(sec, sub, key, value)
 			}
 
+		case reflect.Ptr:
+			for ftype.Kind() == reflect.Ptr {
+				ftype = ftype.Elem()
+				fvalue = fvalue.Elem()
+			}
+			switch ftype.Kind() {
+			case reflect.Struct:
+				vi := fvalue.Interface()
+				t, ok := vi.(time.Time)
+				if ok {
+					value = t.Format(layout)
+					in.Set(sec, sub, key, value)
+					continue
+				}
+				in.marshalStruct(reflect.TypeOf(vi), reflect.ValueOf(vi), sec, sub)
+			}
+
 		case reflect.Struct:
 			vi := fvalue.Interface()
 			t, ok := vi.(time.Time)
@@ -204,7 +221,7 @@ func (in *Ini) marshalStruct(
 				in.Set(sec, sub, key, value)
 				continue
 			}
-			in.marshalStruct(reflect.TypeOf(vi), reflect.ValueOf(vi), "", "")
+			in.marshalStruct(reflect.TypeOf(vi), reflect.ValueOf(vi), sec, sub)
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:

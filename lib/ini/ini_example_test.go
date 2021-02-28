@@ -161,6 +161,7 @@ key=value3
 func ExampleMarshal() {
 	ptrString := "b"
 	ptrInt := int(2)
+	ptrTime := time.Date(2021, 2, 28, 18, 44, 1, 0, time.UTC)
 
 	type U struct {
 		String string `ini:"::string"`
@@ -173,6 +174,7 @@ func ExampleMarshal() {
 		Bool        bool              `ini:"section::bool"`
 		Duration    time.Duration     `ini:"section::duration"`
 		Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
+		Struct      U                 `ini:"section:struct"`
 		SliceString []string          `ini:"section:slice:string"`
 		SliceInt    []int             `ini:"section:slice:int"`
 		SliceUint   []uint            `ini:"section:slice:uint"`
@@ -182,12 +184,18 @@ func ExampleMarshal() {
 		MapInt      map[string]int    `ini:"section:mapint"`
 		PtrString   *string           `ini:"section:pointer"`
 		PtrInt      *int              `ini:"section:pointer"`
+		PtrTime     *time.Time        `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
+		PtrStruct   *U                `ini:"pointer:struct"`
 	}{
-		String:      "a",
-		Int:         1,
-		Bool:        true,
-		Duration:    time.Minute,
-		Time:        time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC),
+		String:   "a",
+		Int:      1,
+		Bool:     true,
+		Duration: time.Minute,
+		Time:     time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC),
+		Struct: U{
+			String: "b",
+			Int:    2,
+		},
 		SliceString: []string{"c", "d"},
 		SliceInt:    []int{2, 3},
 		SliceUint:   []uint{4, 5},
@@ -207,6 +215,11 @@ func ExampleMarshal() {
 		},
 		PtrString: &ptrString,
 		PtrInt:    &ptrInt,
+		PtrTime:   &ptrTime,
+		PtrStruct: &U{
+			String: "PtrStruct.String",
+			Int:    3,
+		},
 	}
 
 	iniText, err := Marshal(&t)
@@ -222,6 +235,10 @@ func ExampleMarshal() {
 	// bool = true
 	// duration = 1m0s
 	// time = 2006-01-02 15:04:05
+	//
+	// [section "struct"]
+	// string = b
+	// int = 2
 	//
 	// [section "slice"]
 	// string = c
@@ -250,6 +267,11 @@ func ExampleMarshal() {
 	// [section "pointer"]
 	// ptrstring = b
 	// ptrint = 2
+	// time = 2021-02-28 18:44:01
+	//
+	// [pointer "struct"]
+	// string = PtrStruct.String
+	// int = 3
 }
 
 func ExampleUnmarshal() {
