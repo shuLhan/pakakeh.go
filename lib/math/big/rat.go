@@ -6,6 +6,7 @@ package big
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"fmt"
 	"log"
 	"math/big"
@@ -448,6 +449,20 @@ func (r *Rat) UnmarshalJSON(in []byte) (err error) {
 			" cannot convert %T(%v) to Rat", in, in)
 	}
 	return nil
+}
+
+//
+// Value return the []byte value for database/sql, as defined in
+// sql/driver.Valuer.
+//
+func (r *Rat) Value() (driver.Value, error) {
+	var s string
+	if r == nil {
+		s = "0"
+	} else {
+		s = r.String()
+	}
+	return []byte(s), nil
 }
 
 //
