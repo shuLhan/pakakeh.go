@@ -4,7 +4,10 @@
 
 package reflect
 
-import "testing"
+import (
+	"net/http"
+	"testing"
+)
 
 type F func()
 
@@ -21,6 +24,7 @@ func TestIsNil(t *testing.T) {
 		aMap      map[int]int
 		aPtr      *T
 		aSlice    []int
+		fs        http.FileSystem
 	)
 
 	cases := []struct {
@@ -42,6 +46,9 @@ func TestIsNil(t *testing.T) {
 		exp: true,
 	}, {
 		v:   aSlice,
+		exp: true,
+	}, {
+		v:   fs,
 		exp: true,
 	}}
 

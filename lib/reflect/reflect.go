@@ -24,7 +24,7 @@ func IsNil(v interface{}) bool {
 		reflect.Ptr, reflect.Slice:
 		return val.IsNil()
 	}
-	return false
+	return v == nil
 }
 
 //
