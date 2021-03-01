@@ -437,7 +437,7 @@ func TestGetInputIni(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c)
 
-		if debug.Value >= 2 {
+		if debug.Value >= 3 {
 			t.Logf("Section header: [%s %s]", c.sec, c.sub)
 			t.Logf(">>> keys: %s", c.keys)
 			t.Logf(">>> expVals: %s", c.expVals)

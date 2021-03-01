@@ -127,7 +127,7 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 			break
 		}
 
-		if debug.Value >= 1 {
+		if debug.Value >= 3 {
 			fmt.Print(reader._var)
 		}
 
@@ -169,7 +169,7 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 	}
 
 	if reader._var.mode != lineModeEmpty {
-		if debug.Value >= 1 {
+		if debug.Value >= 3 {
 			fmt.Println(reader._var)
 		}
 
