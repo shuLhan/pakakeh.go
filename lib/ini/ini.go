@@ -172,6 +172,9 @@ func (in *Ini) marshalStruct(
 		case reflect.Array, reflect.Slice:
 			for xx := 0; xx < fvalue.Len(); xx++ {
 				item := fvalue.Index(xx)
+				for item.Kind() == reflect.Ptr {
+					item = item.Elem()
+				}
 				switch item.Kind() {
 				case reflect.Struct:
 					vi := item.Interface()
