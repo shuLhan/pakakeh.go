@@ -34,10 +34,13 @@ package mlog
 
 import (
 	"os"
-	"time"
 )
 
-var defaultMLog = NewMultiLogger(time.RFC3339, "",
+const (
+	defTimeFormat = "2006-01-02 15:04:05 MST"
+)
+
+var defaultMLog = NewMultiLogger(defTimeFormat, "",
 	[]NamedWriter{
 		NewNamedWriter("stdout", os.Stdout),
 	},
