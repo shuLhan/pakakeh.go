@@ -3,7 +3,7 @@ package http
 import liberrors "github.com/shuLhan/share/lib/errors"
 
 //
-// GenericResponse is one of the common HTTP response container that can be
+// EndpointResponse is one of the common HTTP response container that can be
 // used by Server implementor.
 // Its embed the lib/errors.E type to work seamlessly with Endpoint.Call
 // handler for checking the returned error.
@@ -17,7 +17,7 @@ import liberrors "github.com/shuLhan/share/lib/errors"
 //
 // See the example below on how to use it with Endpoint.Call handler.
 //
-type GenericResponse struct {
+type EndpointResponse struct {
 	liberrors.E
 	Data   interface{} `json:"data,omitempty"`
 	Offset int64       `json:"offset,omitempty"`
@@ -28,6 +28,6 @@ type GenericResponse struct {
 //
 // Unwrap return the error as instance of *liberror.E.
 //
-func (gr *GenericResponse) Unwrap() (err error) {
-	return &gr.E
+func (epr *EndpointResponse) Unwrap() (err error) {
+	return &epr.E
 }

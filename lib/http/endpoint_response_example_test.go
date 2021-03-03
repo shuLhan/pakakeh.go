@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func ExampleGenericResponse() {
+func ExampleEndpointResponse() {
 	type myData struct {
 		ID string
 	}
@@ -22,16 +22,16 @@ func ExampleGenericResponse() {
 	}
 
 	// Lest say we have an endpoint that echoing back the request
-	// parameter "id" back to client inside the GenericResponse.Data using
+	// parameter "id" back to client inside the EndpointResponse.Data using
 	// myData as JSON format.
 	// If the parameter "id" is missing or empty it will return an HTTP
-	// status code with message as defined in GenericResponse.
+	// status code with message as defined in EndpointResponse.
 	err = server.RegisterEndpoint(&Endpoint{
 		Method:       RequestMethodGet,
 		RequestType:  RequestTypeQuery,
 		ResponseType: ResponseTypeJSON,
 		Call: func(_ http.ResponseWriter, httpreq *http.Request, _ []byte) ([]byte, error) {
-			res := &GenericResponse{}
+			res := &EndpointResponse{}
 			id := httpreq.Form.Get("id")
 			if len(id) == 0 {
 				res.Code = http.StatusBadRequest
@@ -39,7 +39,7 @@ func ExampleGenericResponse() {
 				return nil, res
 			}
 			if id == "0" {
-				// If the GenericResponse.Code is 0, it will
+				// If the EndpointResponse.Code is 0, it will
 				// default to http.StatusInternalServerError
 				res.Message = "id value 0 cause internal server error"
 				return nil, res
