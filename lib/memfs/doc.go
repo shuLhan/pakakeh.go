@@ -19,7 +19,6 @@
 //		Excludes: []string{
 //			`.*/exclude`,
 //		},
-//		WithContent: true,
 //	}
 //	mfs, err := memfs.New(opts)
 //
@@ -50,9 +49,9 @@
 //
 // Thats it!
 //
-// Go Generate
+// Go embed
 //
-// memfs also support generating the files into Go generated source file.
+// memfs also support embedding the files into Go generated source file.
 // After we create memfs instance, we call GoGenerate() to dump all directory
 // and files as Go source code.
 //
