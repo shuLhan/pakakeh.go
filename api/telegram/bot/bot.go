@@ -421,14 +421,10 @@ func (bot *Bot) createServer() (err error) {
 //
 // handleWebhook handle Updates from Webhook.
 //
-func (bot *Bot) handleWebhook(
-	res stdhttp.ResponseWriter, req *stdhttp.Request, reqBody []byte,
-) (
-	resBody []byte, err error,
-) {
+func (bot *Bot) handleWebhook(epr *http.EndpointRequest) (resBody []byte, err error) {
 	update := Update{}
 
-	err = json.Unmarshal(reqBody, &update)
+	err = json.Unmarshal(epr.RequestBody, &update)
 	if err != nil {
 		return nil, errors.Internal(err)
 	}

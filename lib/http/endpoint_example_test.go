@@ -20,20 +20,20 @@ func ExampleEndpoint_errorHandler() {
 		Path:         "/",
 		RequestType:  RequestTypeQuery,
 		ResponseType: ResponseTypePlain,
-		Call: func(res http.ResponseWriter, req *http.Request, reqBody []byte) ([]byte, error) {
-			return nil, fmt.Errorf(req.Form.Get("error"))
+		Call: func(epr *EndpointRequest) ([]byte, error) {
+			return nil, fmt.Errorf(epr.HttpRequest.Form.Get("error"))
 		},
-		ErrorHandler: func(res http.ResponseWriter, req *http.Request, err error) {
-			res.Header().Set(HeaderContentType, ContentTypePlain)
+		ErrorHandler: func(epr *EndpointRequest) {
+			epr.HttpWriter.Header().Set(HeaderContentType, ContentTypePlain)
 
-			codeMsg := strings.Split(err.Error(), ":")
+			codeMsg := strings.Split(epr.Error.Error(), ":")
 			if len(codeMsg) != 2 {
-				res.WriteHeader(http.StatusInternalServerError)
-				_, _ = res.Write([]byte(err.Error()))
+				epr.HttpWriter.WriteHeader(http.StatusInternalServerError)
+				_, _ = epr.HttpWriter.Write([]byte(epr.Error.Error()))
 			} else {
 				code, _ := strconv.Atoi(codeMsg[0])
-				res.WriteHeader(code)
-				_, _ = res.Write([]byte(codeMsg[1]))
+				epr.HttpWriter.WriteHeader(code)
+				_, _ = epr.HttpWriter.Write([]byte(codeMsg[1]))
 			}
 		},
 	}

@@ -18,30 +18,24 @@ var (
 	testServer *Server
 	client     = &http.Client{}
 
-	cbNone = func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
-		[]byte, error,
-	) {
+	cbNone = func(epr *EndpointRequest) ([]byte, error) {
 		return nil, nil
 	}
 
-	cbPlain = func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
-		s := fmt.Sprintf("%s\n", req.Form)
-		s += fmt.Sprintf("%s\n", req.PostForm)
-		s += fmt.Sprintf("%v\n", req.MultipartForm)
-		s += fmt.Sprintf("%s", reqBody)
+	cbPlain = func(epr *EndpointRequest) (resBody []byte, e error) {
+		s := fmt.Sprintf("%s\n", epr.HttpRequest.Form)
+		s += fmt.Sprintf("%s\n", epr.HttpRequest.PostForm)
+		s += fmt.Sprintf("%v\n", epr.HttpRequest.MultipartForm)
+		s += fmt.Sprintf("%s", epr.RequestBody)
 		return []byte(s), nil
 	}
 
-	cbJSON = func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
-		resBody []byte, e error,
-	) {
+	cbJSON = func(epr *EndpointRequest) (resBody []byte, e error) {
 		s := fmt.Sprintf(`{
 "form": "%s",
 "multipartForm": "%v",
 "body": %q
-}`, req.Form, req.MultipartForm, reqBody)
+}`, epr.HttpRequest.Form, epr.HttpRequest.MultipartForm, epr.RequestBody)
 		return []byte(s), nil
 	}
 )

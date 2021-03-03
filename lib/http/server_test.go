@@ -644,7 +644,7 @@ func TestServeHTTPOptions(t *testing.T) {
 }
 
 func TestStatusError(t *testing.T) {
-	cbError := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+	cbError := func(epr *EndpointRequest) (
 		[]byte, error,
 	) {
 		return nil, &errors.E{
@@ -653,13 +653,13 @@ func TestStatusError(t *testing.T) {
 		}
 	}
 
-	cbNoCode := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+	cbNoCode := func(epr *EndpointRequest) (
 		[]byte, error,
 	) {
 		return nil, errors.Internal(nil)
 	}
 
-	cbCustomErr := func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+	cbCustomErr := func(epr *EndpointRequest) (
 		[]byte, error,
 	) {
 		return nil, fmt.Errorf("Custom error")

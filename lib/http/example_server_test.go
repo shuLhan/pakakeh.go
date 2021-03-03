@@ -40,10 +40,10 @@ func ExampleServer_customHTTPStatusCode() {
 		Path:         "/error/custom",
 		RequestType:  RequestTypeJSON,
 		ResponseType: ResponseTypeJSON,
-		Call: func(res http.ResponseWriter, req *http.Request, reqBody []byte) (
+		Call: func(epr *EndpointRequest) (
 			resbody []byte, err error,
 		) {
-			res.WriteHeader(exp.Status)
+			epr.HttpWriter.WriteHeader(exp.Status)
 			return json.Marshal(exp)
 		},
 	}

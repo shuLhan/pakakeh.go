@@ -30,9 +30,9 @@ func ExampleEndpointResponse() {
 		Method:       RequestMethodGet,
 		RequestType:  RequestTypeQuery,
 		ResponseType: ResponseTypeJSON,
-		Call: func(_ http.ResponseWriter, httpreq *http.Request, _ []byte) ([]byte, error) {
+		Call: func(epr *EndpointRequest) ([]byte, error) {
 			res := &EndpointResponse{}
-			id := httpreq.Form.Get("id")
+			id := epr.HttpRequest.Form.Get("id")
 			if len(id) == 0 {
 				res.Code = http.StatusBadRequest
 				res.Message = "empty parameter id"

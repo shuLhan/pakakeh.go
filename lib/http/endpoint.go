@@ -78,7 +78,17 @@ func (ep *Endpoint) call(
 	evaluators []Evaluator,
 	vals map[string]string,
 ) {
-	reqBody, e := ioutil.ReadAll(req.Body)
+	var (
+		epr = &EndpointRequest{
+			Endpoint:    ep,
+			HttpWriter:  res,
+			HttpRequest: req,
+		}
+		responseBody []byte
+		e            error
+	)
+
+	epr.RequestBody, e = ioutil.ReadAll(req.Body)
 	if e != nil {
 		log.Printf("endpoint.call: " + e.Error())
 		res.WriteHeader(http.StatusBadRequest)
@@ -86,7 +96,7 @@ func (ep *Endpoint) call(
 	}
 
 	req.Body.Close()
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(epr.RequestBody))
 
 	switch ep.RequestType {
 	case RequestTypeForm, RequestTypeQuery, RequestTypeJSON:
@@ -104,7 +114,7 @@ func (ep *Endpoint) call(
 	}
 
 	if debug.Value >= 3 {
-		log.Printf("> request body: %s\n", reqBody)
+		log.Printf("> request body: %s\n", epr.RequestBody)
 	}
 	if len(vals) > 0 && req.Form == nil {
 		req.Form = make(url.Values, len(vals))
@@ -116,24 +126,24 @@ func (ep *Endpoint) call(
 	}
 
 	for _, eval := range evaluators {
-		e = eval(req, reqBody)
-		if e != nil {
-			ep.ErrorHandler(res, req, e)
+		epr.Error = eval(req, epr.RequestBody)
+		if epr.Error != nil {
+			ep.ErrorHandler(epr)
 			return
 		}
 	}
 
 	if ep.Eval != nil {
-		e = ep.Eval(req, reqBody)
-		if e != nil {
-			ep.ErrorHandler(res, req, e)
+		epr.Error = ep.Eval(req, epr.RequestBody)
+		if epr.Error != nil {
+			ep.ErrorHandler(epr)
 			return
 		}
 	}
 
-	rspb, e := ep.Call(res, req, reqBody)
-	if e != nil {
-		ep.ErrorHandler(res, req, e)
+	responseBody, epr.Error = ep.Call(epr)
+	if epr.Error != nil {
+		ep.ErrorHandler(epr)
 		return
 	}
 
@@ -150,8 +160,8 @@ func (ep *Endpoint) call(
 	}
 
 	var nwrite int
-	for nwrite < len(rspb) {
-		n, err := res.Write(rspb[nwrite:])
+	for nwrite < len(responseBody) {
+		n, err := res.Write(responseBody[nwrite:])
 		if err != nil {
 			log.Printf("endpoint.call: %s %s %s\n", req.Method,
 				req.URL.Path, e)
