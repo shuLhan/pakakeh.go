@@ -47,36 +47,8 @@ type ServerOptions struct {
 	// This fields is optional.
 	Conn *http.Server
 
-	// CORSAllowOrigins contains global list of cross-site Origin that are
-	// allowed during preflight requests by the OPTIONS method.
-	// The list is case-sensitive.
-	// To allow all Origin, one must add "*" string to the list.
-	CORSAllowOrigins []string
-
-	// CORSAllowHeaders contains global list of allowed headers during
-	// preflight requests by the OPTIONS method.
-	// The list is case-insensitive.
-	// To allow all headers, one must add "*" string to the list.
-	CORSAllowHeaders []string
-
-	// CORSExposeHeaders contains list of allowed headers.
-	// This list will be send when browser request OPTIONS without
-	// request-method.
-	CORSExposeHeaders []string
-	exposeHeaders     string
-
-	// CORSMaxAge gives the value in seconds for how long the response to
-	// the preflight request can be cached for without sending another
-	// preflight request.
-	CORSMaxAge int
-	corsMaxAge string
-
-	// CORSAllowCredentials indicates whether or not the actual request
-	// can be made using credentials.
-	CORSAllowCredentials bool
-
-	corsAllowHeadersAll bool // flag to indicate wildcards on list.
-	corsAllowOriginsAll bool // flag to indicate wildcards on list.
+	// The options for Cross-Origin Resource Sharing.
+	CORS CORSOptions
 }
 
 func (opts *ServerOptions) init() {
@@ -92,25 +64,25 @@ func (opts *ServerOptions) init() {
 		}
 	}
 
-	for x := 0; x < len(opts.CORSAllowOrigins); x++ {
-		if opts.CORSAllowOrigins[x] == corsWildcard {
-			opts.corsAllowOriginsAll = true
+	for x := 0; x < len(opts.CORS.AllowOrigins); x++ {
+		if opts.CORS.AllowOrigins[x] == corsWildcard {
+			opts.CORS.allowOriginsAll = true
 			break
 		}
 	}
 
-	for x := 0; x < len(opts.CORSAllowHeaders); x++ {
-		if opts.CORSAllowHeaders[x] == corsWildcard {
-			opts.corsAllowHeadersAll = true
+	for x := 0; x < len(opts.CORS.AllowHeaders); x++ {
+		if opts.CORS.AllowHeaders[x] == corsWildcard {
+			opts.CORS.allowHeadersAll = true
 		} else {
-			opts.CORSAllowHeaders[x] = strings.ToLower(opts.CORSAllowHeaders[x])
+			opts.CORS.AllowHeaders[x] = strings.ToLower(opts.CORS.AllowHeaders[x])
 		}
 	}
 
-	if len(opts.CORSExposeHeaders) > 0 {
-		opts.exposeHeaders = strings.Join(opts.CORSExposeHeaders, ",")
+	if len(opts.CORS.ExposeHeaders) > 0 {
+		opts.CORS.exposeHeaders = strings.Join(opts.CORS.ExposeHeaders, ",")
 	}
-	if opts.CORSMaxAge > 0 {
-		opts.corsMaxAge = strconv.Itoa(opts.CORSMaxAge)
+	if opts.CORS.MaxAge > 0 {
+		opts.CORS.maxAge = strconv.Itoa(opts.CORS.MaxAge)
 	}
 }

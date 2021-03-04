@@ -376,7 +376,7 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for _, origin := range srv.opts.CORSAllowOrigins {
+	for _, origin := range srv.opts.CORS.AllowOrigins {
 		if origin == corsWildcard {
 			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
 			found = true
@@ -394,10 +394,10 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 
 	preflightMethod := req.Header.Get(HeaderACRequestMethod)
 	if len(preflightMethod) == 0 {
-		if len(srv.opts.exposeHeaders) > 0 {
+		if len(srv.opts.CORS.exposeHeaders) > 0 {
 			res.Header().Set(
 				HeaderACExposeHeaders,
-				srv.opts.exposeHeaders,
+				srv.opts.CORS.exposeHeaders,
 			)
 		}
 		return
@@ -413,10 +413,10 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 
 	srv.handleCORSRequestHeaders(res, req)
 
-	if len(srv.opts.corsMaxAge) > 0 {
-		res.Header().Set(HeaderACMaxAge, srv.opts.corsMaxAge)
+	if len(srv.opts.CORS.maxAge) > 0 {
+		res.Header().Set(HeaderACMaxAge, srv.opts.CORS.maxAge)
 	}
-	if srv.opts.CORSAllowCredentials {
+	if srv.opts.CORS.AllowCredentials {
 		res.Header().Set(HeaderACAllowCredentials, "true")
 	}
 }
@@ -434,12 +434,10 @@ func (srv *Server) handleCORSRequestHeaders(
 		reqHeaders[x] = strings.ToLower(strings.TrimSpace(reqHeaders[x]))
 	}
 
-	fmt.Printf("preflightHeaders: %s\n", reqHeaders)
-
 	allowHeaders := make([]string, 0, len(reqHeaders))
 
 	for _, reqHeader := range reqHeaders {
-		for _, allowHeader := range srv.opts.CORSAllowHeaders {
+		for _, allowHeader := range srv.opts.CORS.AllowHeaders {
 			if allowHeader == corsWildcard {
 				allowHeaders = append(allowHeaders, reqHeader)
 				break
@@ -454,7 +452,6 @@ func (srv *Server) handleCORSRequestHeaders(
 		return
 	}
 
-	fmt.Printf("allowHeaders: %s\n", allowHeaders)
 	res.Header().Set(HeaderACAllowHeaders, strings.Join(allowHeaders, ","))
 }
 
