@@ -88,15 +88,13 @@
 //
 //	...
 //
-// Upon receiving request to "/api/login", the library will call
-// "req.ParseForm()", read the content of body and pass them to
+// Upon receiving request to "POST /api/login", the library will call
+// "HttpRequest.ParseForm()", read the content of body and pass them to
 // "handleLogin",
 //
-//	func handleLogin(res http.ResponseWriter, req *http.Request, reqBody []byte) (
-//		resBody []byte, err error,
-//	) {
-//		// Process login input from req.Form, req.PostForm, and/or
-//		// reqBody.
+//	func handleLogin(epr *EndpointRequest) (resBody []byte, err error) {
+//		// Process login input from epr.HttpRequest.Form,
+//		// epr.HttpRequest.PostForm, and/or epr.RequestBody.
 //		// Return response body and error.
 //	}
 //
@@ -153,14 +151,20 @@
 //				continue
 //			}
 //
-//			reqBody, _ := ioutil.ReadAll(req.Body)
+//			epr := &EndpointRequest{
+//				Endpoint: endpoint,
+//				HttpWriter: w,
+//				HttpRequest: req,
+//			}
+//			epr.RequestBody, _ = ioutil.ReadAll(req.Body)
 //
 //			// Check request type, and call ParseForm or
 //			// ParseMultipartForm if required.
 //
-//			resBody, err := endpoint.Call(w, req, reqBody)
+//			var resBody []byte
+//			resBody, epr.Error = endpoint.Call(epr)
 //			if err != nil {
-//				endpoint.ErrorHandler(w, req, err)
+//				endpoint.ErrorHandler(epr)
 //				return
 //			}
 //			// Set content-type based on endpoint.ResponseType,
