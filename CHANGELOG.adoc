@@ -3,7 +3,7 @@
 
 This library is released every month, usually at the first week of month.
 
-==  share v0.24.0 (2021-03-xx)
+==  share v0.24.0 (2021-03-06)
 
 ===  Breaking changes
 
@@ -20,6 +20,29 @@ This library is released every month, usually at the first week of month.
    This commit changes the parameter to the driver name so if the value
    is "postgres" the place holders will be returned as counter, for example
    "$1", "$2", and so on.
+
+*  http: rename "GenericResponse" to "EndpointResponse"
+
+   Well, the hard thing in software is naming a thing.  Using the term
+   Generic is too generic, so we change it to make it closer with Endpoint.
+
+*  http: refactoring parameters on Callback and CallbackErrorHandler
+
+   Previously, the parameters to Callback has three types:
+   the http.ResponseWriter, *http.Request, and []byte for response body.
+   Not only the type names are long, there is no information on the
+   registered Endpoint on the receiver of Callback.
+
+   This changes wrap the three parameters into single type EndpointRequest
+   with addition field Endpoint, which contains the registered Endpoint.
+
+   On the CallbackErrorHandler we also have three parameters, but instead
+   of request body we have an error.
+
+   This changes store the error for CallbackErrorHandler inside
+   EndpointRequest.Error field.
+
+*  http: move the CORS options to separate struct
 
 ===  New features
 
@@ -80,6 +103,55 @@ This library is released every month, usually at the first week of month.
    If the request Method is HEAD, only the header will be sent back to client.
 
    If the request Path is not exist it will return 404 Not Found.
+
+*  clise: add method Pop
+
+   The Pop method remove the last Push()-ed item and return it to caller.
+   It will return nil if no more item inside it.
+
+*  ini: add support for marshaling slice of struct
+
+   Given a struct with exported field is slice of struct and tagged with
+   section and sub-section, the exported field will be marshalled as,
+
+     [section "sub"]
+     field = value
+
+*  ini: add support for marshaling pointer to struct and to time.Time
+
+   Given the following field struct with tag,
+
+      V *T `ini:"sec:sub"
+
+   If the V is not nil, it will marshal it into,
+
+      [sec "sub"]
+      <field name or tag> = <field value>
+
+*  ini: add support for un-marshaling to struct and slice of struct
+
+*  big: add method that implement sql/driver.Valuer for type Rat
+
+   The Rat.Value() return the value as []byte.
+
+=== Enhancements
+
+*  clise: make all methods safe for concurrent use
+
+*  http: add fields for paging on GenericResponse
+
+   If the response is paging, contains more than one item in data, one
+   can set the current status of paging in field Offset, Limit, and Count.
+
+   The Offset field contains the start of paging.
+   The Limit field contains the maximum number of records per page.
+   The Count field contains the total number of records.
+
+=== Bug fixes
+
+*  reflect: check using equal statement on IsNil
+
+   Beside using IsNil(), return the last check using "v == nil".
 
 
 ==  share v0.23.0 (2021-02-05)
