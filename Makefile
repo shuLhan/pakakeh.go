@@ -60,6 +60,8 @@ clean:
 	rm -f $(COVER_OUT) $(COVER_HTML)
 	rm -f ./**/${CPU_PROF}
 	rm -f ./**/${MEM_PROF}
+	rm -f ./**/$(COVER_OUT)
+	rm -f ./**/$(COVER_HTML)
 
 distclean:
 	go clean -i ./...
