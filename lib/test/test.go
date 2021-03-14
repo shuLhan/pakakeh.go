@@ -37,56 +37,35 @@ func printStackTrace(t testing.TB, trace []byte) {
 }
 
 //
-// Assert will compare two interfaces: `exp` and `got` for equality.
-// If both are not equal, the test will throw panic parameter describe the
-// position (type and value) where both are not matched.
+// Assert compare two interfaces: `exp` and `got` for equality.
+// If both parameters are not equal, the function will call Fatalf that
+// describe the position (type and value) where value are not matched.
 //
 // If `exp` implement the extended `reflect.Equaler`, then it will use the
 // method `IsEqual()` with `got` as parameter.
 //
-// If debug parameter is true it will print the stack trace of testing.T
-// instance.
+// WARNING: this method does not support recursive pointer, for example a node
+// that point to parent and parent that point back to node again.
 //
-// WARNING: this method does not support recursive pointer, for example node
-// that point to parent and parent that point back to node.
-//
-func Assert(t *testing.T, name string, exp, got interface{}, debug bool) {
+func Assert(t *testing.T, name string, exp, got interface{}) {
 	err := reflect.DoEqual(exp, got)
 	if err == nil {
 		return
 	}
 
-	if debug {
-		trace := make([]byte, 1024)
-		runtime.Stack(trace, false)
-		printStackTrace(t, trace)
-	}
+	trace := make([]byte, 1024)
+	runtime.Stack(trace, false)
+	printStackTrace(t, trace)
 
 	t.Fatalf("!!! %s: %s", name, err)
 }
 
 //
-// AssertBench will compare two interfaces: `exp` and `got` whether its same
-// with `equal` value.
+// AssertBench will compare two interfaces: `exp` and `got` for equality.
+// If both parameters are not equal, the function will call Fatalf that
+// describe the position (type and value) where value are not matched.
 //
-// If comparison result is not same with `equal`, it will print the result and
-// expectation and then terminate the test routine.
-//
-func AssertBench(b *testing.B, name string, exp, got interface{}, equal bool) {
-	if reflect.IsEqual(exp, got) == equal {
-		return
-	}
-
-	trace := make([]byte, 1024)
-	runtime.Stack(trace, false)
-
-	printStackTrace(b, trace)
-
-	b.Fatalf(">>> Got %s:\n\t'%+v';\n"+
-		"     want:\n\t'%+v'\n", name, got, exp)
-}
-
-func AssertBench2(b *testing.B, name string, exp, got interface{}) {
+func AssertBench(b *testing.B, name string, exp, got interface{}) {
 	err := reflect.DoEqual(exp, got)
 	if err == nil {
 		return

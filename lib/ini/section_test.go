@@ -46,7 +46,7 @@ func TestNewSection(t *testing.T) {
 
 		got := newSection(c.name, c.sub)
 
-		test.Assert(t, "section", c.expSec, got, true)
+		test.Assert(t, "section", c.expSec, got)
 	}
 }
 
@@ -121,8 +121,8 @@ func TestSectionSet(t *testing.T) {
 
 		ok := sec.set(c.k, c.v)
 
-		test.Assert(t, "ok", c.expOK, ok, true)
-		test.Assert(t, "section", c.expSec, sec, true)
+		test.Assert(t, "ok", c.expOK, ok)
+		test.Assert(t, "section", c.expSec, sec)
 	}
 }
 
@@ -221,7 +221,7 @@ func TestSection_add(t *testing.T) {
 
 		sec.add(c.k, c.v)
 
-		test.Assert(t, "section", c.expSec, sec, true)
+		test.Assert(t, "section", c.expSec, sec)
 	}
 }
 
@@ -313,8 +313,8 @@ func TestSectionUnset(t *testing.T) {
 
 		ok := sec.unset(c.k)
 
-		test.Assert(t, "ok", c.expOK, ok, true)
-		test.Assert(t, "section", c.expSec, sec, true)
+		test.Assert(t, "ok", c.expOK, ok)
+		test.Assert(t, "section", c.expSec, sec)
 	}
 }
 
@@ -400,7 +400,7 @@ func TestSectionUnsetAll(t *testing.T) {
 
 		sec.unsetAll(c.k)
 
-		test.Assert(t, "section", c.expSec, sec, true)
+		test.Assert(t, "section", c.expSec, sec)
 	}
 }
 
@@ -511,7 +511,7 @@ func TestSection_replaceAll(t *testing.T) {
 
 		sec.replaceAll(c.k, c.v)
 
-		test.Assert(t, "section", c.expSec, sec, true)
+		test.Assert(t, "section", c.expSec, sec)
 	}
 }
 
@@ -557,8 +557,8 @@ func TestSectionGet(t *testing.T) {
 
 		got, ok := sec.get(c.k, c.def)
 
-		test.Assert(t, "ok", c.expOK, ok, true)
-		test.Assert(t, "value", c.expVal, got, true)
+		test.Assert(t, "ok", c.expOK, ok)
+		test.Assert(t, "value", c.expVal, got)
 	}
 }
 
@@ -609,7 +609,7 @@ func TestSectionGets(t *testing.T) {
 
 		got, ok := sec.gets(c.key, c.defs)
 
-		test.Assert(t, "Gets value", c.exps, got, true)
-		test.Assert(t, "Gets ok", c.expOK, ok, true)
+		test.Assert(t, "Gets value", c.exps, got)
+		test.Assert(t, "Gets ok", c.expOK, ok)
 	}
 }

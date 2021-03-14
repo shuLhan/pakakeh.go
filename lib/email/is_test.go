@@ -36,7 +36,7 @@ func TestIsValidLocal(t *testing.T) {
 
 		got := IsValidLocal(c.in)
 
-		test.Assert(t, "IsValidLocal", c.exp, got, true)
+		test.Assert(t, "IsValidLocal", c.exp, got)
 	}
 
 	for k := range specialChars {
@@ -48,6 +48,6 @@ func TestIsValidLocal(t *testing.T) {
 
 		got := IsValidLocal(local)
 
-		test.Assert(t, "IsValidLocal", false, got, true)
+		test.Assert(t, "IsValidLocal", false, got)
 	}
 }

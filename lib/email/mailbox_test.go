@@ -40,10 +40,10 @@ func TestParseMailbox(t *testing.T) {
 	for _, c := range cases {
 		got, err := ParseMailbox([]byte(c.in))
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
-		test.Assert(t, "ParseMailbox", c.exp, got, true)
+		test.Assert(t, "ParseMailbox", c.exp, got)
 	}
 }
 
@@ -211,12 +211,12 @@ func TestParseMailboxes(t *testing.T) {
 		mboxes, err := ParseMailboxes([]byte(c.in))
 		if err != nil {
 			exp := fmt.Sprintf(c.expErr, c.in)
-			test.Assert(t, "error", exp, err.Error(), true)
+			test.Assert(t, "error", exp, err.Error())
 			continue
 		}
 
 		got := fmt.Sprintf("%+v", mboxes)
-		test.Assert(t, "Mailboxes", c.exp, got, true)
+		test.Assert(t, "Mailboxes", c.exp, got)
 	}
 }
 
@@ -268,13 +268,13 @@ func TestSkipComment(t *testing.T) {
 		r.SkipN(1)
 		_, err := skipComment(r)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		got := string(r.Rest())
 
-		test.Assert(t, "rest", c.exp, got, true)
+		test.Assert(t, "rest", c.exp, got)
 	}
 }
 
@@ -301,7 +301,7 @@ func TestMailbox_UnmarshalJSON(t *testing.T) {
 		},
 	}
 
-	test.Assert(t, "UnmarshalJSON", exp, got, true)
+	test.Assert(t, "UnmarshalJSON", exp, got)
 }
 
 func TestMailbox_MarshalJSON(t *testing.T) {
@@ -322,7 +322,7 @@ func TestMailbox_MarshalJSON(t *testing.T) {
 
 	exp := `{"address":"Name \u003clocal@domain\u003e"}`
 
-	test.Assert(t, "MarshalJSON", exp, string(got), true)
+	test.Assert(t, "MarshalJSON", exp, string(got))
 
 	un := &ADT{}
 
@@ -331,5 +331,5 @@ func TestMailbox_MarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "UnmarshalJSON", adt, un, true)
+	test.Assert(t, "UnmarshalJSON", adt, un)
 }

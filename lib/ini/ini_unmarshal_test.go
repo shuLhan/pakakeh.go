@@ -119,7 +119,7 @@ time = 2021-02-28 00:12:05
 		PtrTime:     &ptrTime,
 	}
 
-	test.Assert(t, "Unmarshal", exp, got, true)
+	test.Assert(t, "Unmarshal", exp, got)
 }
 
 func TestIni_Unmarshal_sliceOfStruct(t *testing.T) {
@@ -149,7 +149,7 @@ int = 2
 		}},
 	}
 
-	test.Assert(t, "Unmarshal slice of struct", exp, got, true)
+	test.Assert(t, "Unmarshal slice of struct", exp, got)
 }
 
 func TestIni_Unmarshal_sliceOfPrimitive(t *testing.T) {
@@ -191,7 +191,7 @@ time = 2021-02-28 03:56:02
 		},
 	}
 
-	test.Assert(t, "Unmarshal slice of primitive", exp, got, true)
+	test.Assert(t, "Unmarshal slice of primitive", exp, got)
 }
 
 func TestIni_Unmarshal_sliceOfPointer(t *testing.T) {
@@ -250,5 +250,5 @@ time = 2021-02-28 03:56:02
 		SlicePtrTime:     []*time.Time{&time0, &time1},
 	}
 
-	test.Assert(t, "Unmarshal slice of pointer", exp, got, true)
+	test.Assert(t, "Unmarshal slice of pointer", exp, got)
 }

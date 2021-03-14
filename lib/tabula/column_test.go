@@ -31,7 +31,7 @@ func TestToFloatSlice(t *testing.T) {
 	got := col.ToFloatSlice()
 	expFloat := []float64{9.987654321, 8.8, 7.7, 6.6, 5.5, 4.4, 3.3}
 
-	test.Assert(t, "", expFloat, got, true)
+	test.Assert(t, "", expFloat, got)
 }
 
 func TestToStringSlice(t *testing.T) {
@@ -50,7 +50,7 @@ func TestToStringSlice(t *testing.T) {
 
 	got := col.ToStringSlice()
 
-	test.Assert(t, "", data, got, true)
+	test.Assert(t, "", data, got)
 }
 
 func TestDeleteRecordAt(t *testing.T) {
@@ -65,5 +65,5 @@ func TestDeleteRecordAt(t *testing.T) {
 	col.DeleteRecordAt(del)
 	got := col.ToFloatSlice()
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

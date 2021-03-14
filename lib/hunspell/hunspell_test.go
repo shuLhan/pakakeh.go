@@ -55,7 +55,7 @@ work/B
 		}
 
 		if n == 0 {
-			test.Assert(t, c.desc, c.expN, n, true)
+			test.Assert(t, c.desc, c.expN, n)
 			continue
 		}
 
@@ -64,6 +64,6 @@ work/B
 			t.Fatalf("%s: %s", c.desc, err)
 		}
 
-		test.Assert(t, c.desc, c.exp, string(got), true)
+		test.Assert(t, c.desc, c.exp, string(got))
 	}
 }

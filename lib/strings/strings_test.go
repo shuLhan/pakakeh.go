@@ -46,7 +46,7 @@ func TestCountMissRate(t *testing.T) {
 
 	for _, c := range cases {
 		got, _, _ := CountMissRate(c.src, c.target)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -72,7 +72,7 @@ func TestCountTokens(t *testing.T) {
 	for _, c := range cases {
 		got := CountTokens(c.words, c.tokens, c.sensitive)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -93,8 +93,8 @@ func TestDelete(t *testing.T) {
 	for _, c := range cases {
 		var ok bool
 		c.in, ok = Delete(c.in, value)
-		test.Assert(t, "Delete OK?", true, ok, true)
-		test.Assert(t, "Delete", exp, c.in, true)
+		test.Assert(t, "Delete OK?", true, ok)
+		test.Assert(t, "Delete", exp, c.in)
 	}
 }
 
@@ -113,7 +113,7 @@ func TestFrequencyOfTokens(t *testing.T) {
 
 	for _, c := range cases {
 		got := FrequencyOfTokens(c.words, c.tokens, c.sensitive)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -121,10 +121,10 @@ func TestIsContain(t *testing.T) {
 	ss := []string{"a", "b", "c", "d"}
 
 	got := IsContain(ss, "a")
-	test.Assert(t, "", true, got, true)
+	test.Assert(t, "", true, got)
 
 	got = IsContain(ss, "e")
-	test.Assert(t, "", false, got, true)
+	test.Assert(t, "", false, got)
 }
 
 func TestIsEqual(t *testing.T) {
@@ -151,7 +151,7 @@ func TestIsEqual(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		test.Assert(t, "", c.exp, IsEqual(c.a, c.b), true)
+		test.Assert(t, "", c.exp, IsEqual(c.a, c.b))
 	}
 }
 
@@ -176,8 +176,8 @@ func TestLongest(t *testing.T) {
 	for _, c := range cases {
 		got, idx := Longest(c.words)
 
-		test.Assert(t, "word", c.exp, got, true)
-		test.Assert(t, "idx", c.expIdx, idx, true)
+		test.Assert(t, "word", c.exp, got)
+		test.Assert(t, "idx", c.expIdx, idx)
 	}
 }
 
@@ -205,7 +205,7 @@ func TestMostFrequentTokens(t *testing.T) {
 
 	for _, c := range cases {
 		got := MostFrequentTokens(c.words, c.tokens, c.sensitive)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -216,7 +216,7 @@ func TestSortByIndex(t *testing.T) {
 
 	SortByIndex(&dat, ids)
 
-	test.Assert(t, "", exp, dat, true)
+	test.Assert(t, "", exp, dat)
 }
 
 func TestSwap(t *testing.T) {
@@ -248,7 +248,7 @@ func TestSwap(t *testing.T) {
 	}}
 	for _, c := range cases {
 		Swap(ss, c.x, c.y)
-		test.Assert(t, "", c.exp, ss, true)
+		test.Assert(t, "", c.exp, ss)
 	}
 }
 
@@ -268,7 +268,7 @@ func TestTotalFrequencyOfTokens(t *testing.T) {
 	for _, c := range cases {
 		got := TotalFrequencyOfTokens(c.words, c.tokens, c.sensitive)
 
-		test.Assert(t, "", c.exp, numbers.Float64Round(got, 3), true)
+		test.Assert(t, "", c.exp, numbers.Float64Round(got, 3))
 	}
 }
 
@@ -291,7 +291,7 @@ func TestUniq(t *testing.T) {
 
 	for _, c := range cases {
 		got := Uniq(c.words, c.sensitive)
-		test.Assert(t, "unique", c.expReturn, got, true)
-		test.Assert(t, "words", c.expWords, c.words, true)
+		test.Assert(t, "unique", c.expReturn, got)
+		test.Assert(t, "words", c.expWords, c.words)
 	}
 }

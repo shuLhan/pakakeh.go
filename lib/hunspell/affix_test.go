@@ -58,7 +58,7 @@ func TestPrefix_apply(t *testing.T) {
 			got = append(got, stem.Word)
 		}
 
-		test.Assert(t, "Prefix.apply", c.exp, got, true)
+		test.Assert(t, "Prefix.apply", c.exp, got)
 	}
 }
 
@@ -110,6 +110,6 @@ func TestSuffix_apply(t *testing.T) {
 			got = append(got, stem.Word)
 		}
 
-		test.Assert(t, "Suffix.apply", c.exp, got, true)
+		test.Assert(t, "Suffix.apply", c.exp, got)
 	}
 }

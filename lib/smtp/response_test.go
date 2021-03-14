@@ -81,10 +81,10 @@ func TestNewResponse(t *testing.T) {
 
 		got, err := NewResponse([]byte(c.in))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Response", c.exp, got, true)
+		test.Assert(t, "Response", c.exp, got)
 	}
 }

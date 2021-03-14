@@ -21,7 +21,7 @@ func TestPushBack(t *testing.T) {
 	exp := strings.Join(rowsExpect, "")
 	got := fmt.Sprint(rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestPopFront(t *testing.T) {
@@ -37,7 +37,7 @@ func TestPopFront(t *testing.T) {
 		exp := rowsExpect[i]
 		got := fmt.Sprint(row)
 
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 
 		if i < l {
 			exp = strings.Join(rowsExpect[i+1:], "")
@@ -46,7 +46,7 @@ func TestPopFront(t *testing.T) {
 		}
 		got = fmt.Sprint(rows)
 
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 	}
 
 	// empty rows
@@ -55,7 +55,7 @@ func TestPopFront(t *testing.T) {
 	exp := "<nil>"
 	got := fmt.Sprint(row)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestPopFrontRow(t *testing.T) {
@@ -71,7 +71,7 @@ func TestPopFrontRow(t *testing.T) {
 		exp := rowsExpect[i]
 		got := fmt.Sprint(newRows)
 
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 
 		if i < l {
 			exp = strings.Join(rowsExpect[i+1:], "")
@@ -80,7 +80,7 @@ func TestPopFrontRow(t *testing.T) {
 		}
 		got = fmt.Sprint(rows)
 
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 	}
 
 	// empty rows
@@ -89,7 +89,7 @@ func TestPopFrontRow(t *testing.T) {
 	exp := ""
 	got := fmt.Sprint(row)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestGroupByValue(t *testing.T) {
@@ -102,7 +102,7 @@ func TestGroupByValue(t *testing.T) {
 
 	got := fmt.Sprint(mapRows)
 
-	test.Assert(t, "", groupByExpect, got, true)
+	test.Assert(t, "", groupByExpect, got)
 }
 
 func TestRandomPick(t *testing.T) {
@@ -171,8 +171,8 @@ func TestRowsDel(t *testing.T) {
 	exp := strings.Join(rowsExpect[1:], "")
 	got := fmt.Sprint(rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	got = fmt.Sprint(row)
-	test.Assert(t, "", rowsExpect[0], got, true)
+	test.Assert(t, "", rowsExpect[0], got)
 }

@@ -108,17 +108,17 @@ func TestParseSectionHeader(t *testing.T) {
 
 		err := reader.parseSectionHeader()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			if err != io.EOF {
 				continue
 			}
 		}
 
-		test.Assert(t, "mode", c.expMode, reader._var.mode, true)
-		test.Assert(t, "format", c.expFormat, reader._var.format, true)
-		test.Assert(t, "section", c.expSecName, reader._var.secName, true)
-		test.Assert(t, "subsection", c.expSubName, reader._var.subName, true)
-		test.Assert(t, "comment", c.expComment, reader._var.others, true)
+		test.Assert(t, "mode", c.expMode, reader._var.mode)
+		test.Assert(t, "format", c.expFormat, reader._var.format)
+		test.Assert(t, "section", c.expSecName, reader._var.secName)
+		test.Assert(t, "subsection", c.expSubName, reader._var.subName)
+		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
 
@@ -163,16 +163,16 @@ func TestParseSubsection(t *testing.T) {
 
 		err := reader.parseSubsection()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			if err != io.EOF {
 				continue
 			}
 		}
 
-		test.Assert(t, "mode", c.expMode, reader._var.mode, true)
-		test.Assert(t, "format", c.expFormat, reader._var.format, true)
-		test.Assert(t, "subsection", c.expSub, reader._var.subName, true)
-		test.Assert(t, "comment", c.expComment, reader._var.others, true)
+		test.Assert(t, "mode", c.expMode, reader._var.mode)
+		test.Assert(t, "format", c.expFormat, reader._var.format)
+		test.Assert(t, "subsection", c.expSub, reader._var.subName)
+		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
 
@@ -330,17 +330,17 @@ func TestParseVariable(t *testing.T) {
 
 		err := reader.parseVariable()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			if err != io.EOF {
 				continue
 			}
 		}
 
-		test.Assert(t, "mode", c.expMode, reader._var.mode, true)
-		test.Assert(t, "format", c.expFormat, reader._var.format, true)
-		test.Assert(t, "key", c.expKey, reader._var.key, true)
-		test.Assert(t, "value", c.expValue, reader._var.value, true)
-		test.Assert(t, "comment", c.expComment, reader._var.others, true)
+		test.Assert(t, "mode", c.expMode, reader._var.mode)
+		test.Assert(t, "format", c.expFormat, reader._var.format)
+		test.Assert(t, "key", c.expKey, reader._var.key)
+		test.Assert(t, "value", c.expValue, reader._var.value)
+		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
 
@@ -482,14 +482,14 @@ func TestParseVarValue(t *testing.T) {
 
 		err := reader.parseVarValue()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			if err != io.EOF {
 				continue
 			}
 		}
 
-		test.Assert(t, "format", c.expFormat, reader._var.format, true)
-		test.Assert(t, "value", c.expValue, reader._var.value, true)
-		test.Assert(t, "comment", c.expComment, reader._var.others, true)
+		test.Assert(t, "format", c.expFormat, reader._var.format)
+		test.Assert(t, "value", c.expValue, reader._var.value)
+		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }

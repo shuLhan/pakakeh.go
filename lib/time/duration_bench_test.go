@@ -24,6 +24,6 @@ func BenchmarkParseDuration(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		test.AssertBench(b, "duration", exp, got, true)
+		test.AssertBench(b, "duration", exp, got)
 	}
 }

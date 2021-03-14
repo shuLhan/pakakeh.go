@@ -54,7 +54,7 @@ func TestPartition(t *testing.T) {
 
 		got := Partition(c.ss, c.k)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -71,7 +71,7 @@ func TestSinglePartition(t *testing.T) {
 
 	for _, c := range cases {
 		got := SinglePartition(c.ss)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -112,7 +112,7 @@ func TestTable_IsEqual(t *testing.T) {
 
 	for _, c := range cases {
 		got := table.IsEqual(c.tcmp)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -148,6 +148,6 @@ func TestTable_JoinCombination(t *testing.T) {
 
 	for _, c := range cases {
 		got := c.table.JoinCombination(c.s)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

@@ -30,6 +30,6 @@ func TestResponseType_String(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		test.Assert(t, "ResponseType.String", c.exp, c.restype.String(), true)
+		test.Assert(t, "ResponseType.String", c.exp, c.restype.String())
 	}
 }

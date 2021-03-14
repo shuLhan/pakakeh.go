@@ -31,7 +31,7 @@ func TestIsIncludeDirective(t *testing.T) {
 
 	for _, c := range cases {
 		got := isIncludeDirective(c.line)
-		test.Assert(t, "isIncludeDirective: "+c.line, c.exp, got, true)
+		test.Assert(t, "isIncludeDirective: "+c.line, c.exp, got)
 	}
 }
 
@@ -55,7 +55,7 @@ func TestParseInclude(t *testing.T) {
 
 	for _, c := range cases {
 		got := parseInclude(c.line)
-		test.Assert(t, "parseInclude: "+c.line, c.exp, got, true)
+		test.Assert(t, "parseInclude: "+c.line, c.exp, got)
 	}
 }
 
@@ -82,7 +82,7 @@ func TestReadLines(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "readLines", c.exp, got, true)
+		test.Assert(t, "readLines", c.exp, got)
 	}
 }
 
@@ -122,10 +122,10 @@ func TestConfigParser_load(t *testing.T) {
 
 		got, err := parser.load(c.dir, c.pattern)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
-		test.Assert(t, "load "+c.pattern, c.exp, got, true)
+		test.Assert(t, "load "+c.pattern, c.exp, got)
 	}
 }
 
@@ -158,6 +158,6 @@ func TestParseArgs(t *testing.T) {
 
 	for _, c := range cases {
 		got := parseArgs(c.raw, ' ')
-		test.Assert(t, "parseArgs "+c.raw, c.exp, got, true)
+		test.Assert(t, "parseArgs "+c.raw, c.exp, got)
 	}
 }

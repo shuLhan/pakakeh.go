@@ -150,11 +150,11 @@ func TestParseStem(t *testing.T) {
 
 		got, err := parseStem(c.line)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, "stem", c.exp, got, true)
+		test.Assert(t, "stem", c.exp, got)
 	}
 }
 
@@ -343,7 +343,7 @@ func TestStem_unpack(t *testing.T) {
 	for _, c := range cases {
 		gotDerivatives, err := c.in.unpack(opts)
 		if err != nil {
-			test.Assert(t, "unpack error", c.expError, err.Error(), true)
+			test.Assert(t, "unpack error", c.expError, err.Error())
 		}
 
 		got := make([]string, 0, len(gotDerivatives))
@@ -351,7 +351,7 @@ func TestStem_unpack(t *testing.T) {
 			got = append(got, der.Word)
 		}
 
-		test.Assert(t, c.desc+" derivatives", c.expDerivatives, got, true)
-		test.Assert(t, c.desc+" after", c.expStem, c.in, true)
+		test.Assert(t, c.desc+" derivatives", c.expDerivatives, got)
+		test.Assert(t, c.desc+" after", c.expStem, c.in)
 	}
 }

@@ -20,7 +20,7 @@ var (
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {
 	return func(ctx context.Context, req *Request) (res Response) {
-		test.Assert(t, "routeHandler", target, req.Target, true)
+		test.Assert(t, "routeHandler", target, req.Target)
 		return
 	}
 }
@@ -153,12 +153,12 @@ func testRootRouteAdd(t *testing.T) {
 
 		err := _testRootRoute.add(c.method, c.target, c.handler)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err, true)
+			test.Assert(t, "err", c.expErr, err)
 		}
 
 		got := _testRootRoute.getParent(c.method)
 
-		test.Assert(t, "route", fmt.Sprintf("%+v", c.exp), fmt.Sprintf("%+v", got), true)
+		test.Assert(t, "route", fmt.Sprintf("%+v", c.exp), fmt.Sprintf("%+v", got))
 	}
 }
 
@@ -232,7 +232,7 @@ func testRootRouteGet(t *testing.T) {
 
 		gotParams, gotHandler := _testRootRoute.get(c.method, c.target)
 
-		test.Assert(t, "params", c.expParams, gotParams, true)
+		test.Assert(t, "params", c.expParams, gotParams)
 
 		if gotHandler != nil {
 			gotHandler(context.Background(), &Request{Target: c.expTarget})

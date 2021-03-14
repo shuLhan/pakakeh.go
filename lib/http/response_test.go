@@ -107,12 +107,12 @@ func TestParseResponseHeader(t *testing.T) {
 
 		got, rest, err := ParseResponseHeader(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "http.Response", c.expResp, got, true)
-		test.Assert(t, "rest", c.expRest, rest, true)
+		test.Assert(t, "http.Response", c.expResp, got)
+		test.Assert(t, "rest", c.expRest, rest)
 	}
 }
 
@@ -176,11 +176,11 @@ func TestParseHeaders(t *testing.T) {
 
 		header, rest, err := parseHeaders(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "header", c.exp, header, true)
-		test.Assert(t, "rest", c.expRest, rest, true)
+		test.Assert(t, "header", c.exp, header)
+		test.Assert(t, "rest", c.expRest, rest)
 	}
 }

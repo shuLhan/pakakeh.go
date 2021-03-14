@@ -63,9 +63,9 @@ func TestParseDuration(t *testing.T) {
 			if strings.IsContain(c.expErr, err.Error()) {
 				continue
 			}
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "duration", c.exp, got, true)
+		test.Assert(t, "duration", c.exp, got)
 	}
 }

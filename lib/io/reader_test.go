@@ -63,7 +63,7 @@ func TestReaderScanInt64(t *testing.T) {
 
 		got, gotc := r.ScanInt64()
 
-		test.Assert(t, "n", c.exp, got, true)
-		test.Assert(t, "c", c.expc, gotc, true)
+		test.Assert(t, "n", c.exp, got)
+		test.Assert(t, "c", c.expc, gotc)
 	}
 }

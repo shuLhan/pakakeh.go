@@ -14,7 +14,7 @@ func TestEscape(t *testing.T) {
 	in := []byte("\"\\/\b\f\n\r\t")
 	exp := []byte(`\"\\\/\b\f\n\r\t`)
 	got := Escape(in)
-	test.Assert(t, "Escape", exp, got, true)
+	test.Assert(t, "Escape", exp, got)
 }
 
 func TestEscapeString(t *testing.T) {
@@ -39,7 +39,7 @@ func TestEscapeString(t *testing.T) {
 
 		got = EscapeString(c.in)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -62,7 +62,7 @@ func TestToMapStringFloat64(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "ToMapStringFloat64", exp, got, true)
+	test.Assert(t, "ToMapStringFloat64", exp, got)
 }
 
 func TestUnescape(t *testing.T) {
@@ -72,7 +72,7 @@ func TestUnescape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	test.Assert(t, "Unescape", exp, got, true)
+	test.Assert(t, "Unescape", exp, got)
 }
 
 func TestUnescapeString(t *testing.T) {
@@ -112,10 +112,10 @@ func TestUnescapeString(t *testing.T) {
 
 		got, err = UnescapeString(c.in, c.strict)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "value", c.exp, got, true)
+		test.Assert(t, "value", c.exp, got)
 	}
 }

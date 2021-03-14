@@ -196,19 +196,19 @@ func TestSignatureParse(t *testing.T) {
 
 		sig, err := Parse([]byte(c.in))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if sig == nil {
 			continue
 		}
 
-		test.Assert(t, "Signature.Relaxed", c.expRelaxed, string(sig.Relaxed()), true)
-		test.Assert(t, "Signature.Simple", c.expSimple, string(sig.Simple()), true)
+		test.Assert(t, "Signature.Relaxed", c.expRelaxed, string(sig.Relaxed()))
+		test.Assert(t, "Signature.Simple", c.expSimple, string(sig.Simple()))
 
 		err = sig.Validate()
 		if err != nil {
-			test.Assert(t, "Validate error", c.expValidateErr, err.Error(), true)
+			test.Assert(t, "Validate error", c.expValidateErr, err.Error())
 		}
 	}
 }
@@ -233,7 +233,7 @@ func TestNewSignature(t *testing.T) {
 
 		got := NewSignature([]byte(c.sdid), []byte(c.selector))
 
-		test.Assert(t, "Signature", c.exp, string(got.Relaxed()), true)
+		test.Assert(t, "Signature", c.exp, string(got.Relaxed()))
 	}
 }
 
@@ -272,7 +272,7 @@ func TestSignatureHash(t *testing.T) {
 
 		_, got64 := sig.Hash([]byte(c.in))
 
-		test.Assert(t, "Hash", c.exp, string(got64), true)
+		test.Assert(t, "Hash", c.exp, string(got64))
 	}
 }
 
@@ -346,11 +346,11 @@ func TestSignatureSign(t *testing.T) {
 
 		err := sig.Sign(c.pk, hashed)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Signature", c.exp, string(sig.Value), true)
+		test.Assert(t, "Signature", c.exp, string(sig.Value))
 	}
 }
 
@@ -481,13 +481,13 @@ func TestSignatureValidate(t *testing.T) {
 
 		err := c.sig.Validate()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		got := c.sig.Simple()
 
-		test.Assert(t, "Signature", c.exp, string(got), true)
+		test.Assert(t, "Signature", c.exp, string(got))
 	}
 }
 
@@ -564,7 +564,7 @@ func TestSignatureVerify(t *testing.T) {
 
 		err := sig.Verify(c.key, bhash)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 		}
 	}
 }
@@ -587,12 +587,12 @@ func TestSignatureSet(t *testing.T) {
 		sig := &Signature{}
 		err := sig.set(c.t)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		got := sig.Simple()
 
-		test.Assert(t, "Signature", c.expSimple, string(got), true)
+		test.Assert(t, "Signature", c.expSimple, string(got))
 	}
 }

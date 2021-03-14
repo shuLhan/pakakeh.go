@@ -47,11 +47,9 @@ func TestEhlo(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Ehlo", c.exp, got, true)
-		test.Assert(t, "ServerInfo.Domain", c.expServerInfo.Domain,
-			testClient.ServerInfo.Domain, true)
-		test.Assert(t, "ServerInfo.Info", c.expServerInfo.Info,
-			testClient.ServerInfo.Info, true)
+		test.Assert(t, "Ehlo", c.exp, got)
+		test.Assert(t, "ServerInfo.Domain", c.expServerInfo.Domain, testClient.ServerInfo.Domain)
+		test.Assert(t, "ServerInfo.Info", c.expServerInfo.Info, testClient.ServerInfo.Info)
 	}
 }
 
@@ -102,11 +100,11 @@ func TestAuth(t *testing.T) {
 
 		got, err := testClient.Authenticate(c.mech, c.username, c.password)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Response", c.exp, got, true)
+		test.Assert(t, "Response", c.exp, got)
 	}
 }
 
@@ -125,7 +123,7 @@ func TestAuth2(t *testing.T) {
 	exp := &Response{
 		Code: StatusAuthReady,
 	}
-	test.Assert(t, "Response", exp, res, true)
+	test.Assert(t, "Response", exp, res)
 
 	cred := []byte("\x00" + testAccountFirst.Short() + "\x00" + testPassword)
 	cmd = base64.StdEncoding.EncodeToString(cred)
@@ -139,7 +137,7 @@ func TestAuth2(t *testing.T) {
 		Code:    StatusAuthenticated,
 		Message: "2.7.0 Authentication successful",
 	}
-	test.Assert(t, "Response", exp, res, true)
+	test.Assert(t, "Response", exp, res)
 }
 
 func TestExpand(t *testing.T) {
@@ -164,7 +162,7 @@ func TestExpand(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Expand", c.exp, got, true)
+		test.Assert(t, "Expand", c.exp, got)
 	}
 }
 
@@ -189,7 +187,7 @@ func TestHelp(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Help", c.exp, got, true)
+		test.Assert(t, "Help", c.exp, got)
 	}
 }
 
@@ -229,7 +227,7 @@ func TestSendCommand(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "SendCommand", c.exp, got, true)
+		test.Assert(t, "SendCommand", c.exp, got)
 	}
 }
 
@@ -270,11 +268,11 @@ func TestMailTx(t *testing.T) {
 
 		got, err := testClient.MailTx(c.mail)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Response", c.exp, got, true)
+		test.Assert(t, "Response", c.exp, got)
 	}
 }
 
@@ -307,7 +305,7 @@ func TestVerify(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Verify", c.exp, got, true)
+		test.Assert(t, "Verify", c.exp, got)
 	}
 }
 
@@ -322,5 +320,5 @@ func TestQuit(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "Quit", exp, got, true)
+	test.Assert(t, "Quit", exp, got)
 }

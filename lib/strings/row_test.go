@@ -33,7 +33,7 @@ func TestRowIsEqual(t *testing.T) {
 
 	for _, c := range cases {
 		got := c.a.IsEqual(c.b)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -61,6 +61,6 @@ func TestRowJoin(t *testing.T) {
 
 	for _, c := range cases {
 		got := c.row.Join(c.lsep, c.ssep)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

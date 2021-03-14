@@ -38,7 +38,7 @@ func TestMessageIsExpired(t *testing.T) {
 
 		got := c.msg.IsExpired()
 
-		test.Assert(t, "IsExpired", c.exp, got, true)
+		test.Assert(t, "IsExpired", c.exp, got)
 	}
 }
 
@@ -72,7 +72,7 @@ func TestMessagePackDomainName(t *testing.T) {
 
 		msg.packDomainName(c.in, false)
 
-		test.Assert(t, "packDomainName", c.exp, msg.packet, true)
+		test.Assert(t, "packDomainName", c.exp, msg.packet)
 	}
 }
 
@@ -147,7 +147,7 @@ func TestMessagePackQuestion(t *testing.T) {
 
 		c.msg.packQuestion()
 
-		test.Assert(t, "packet", c.exp, c.msg.packet, true)
+		test.Assert(t, "packet", c.exp, c.msg.packet)
 	}
 }
 
@@ -831,7 +831,7 @@ func TestMessagePack(t *testing.T) {
 		got, _ := c.msg.Pack()
 
 		t.Logf("Message: %+v\n", c.msg)
-		test.Assert(t, c.desc, c.exp, got, true)
+		test.Assert(t, c.desc, c.exp, got)
 	}
 }
 
@@ -900,7 +900,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 
 		c.msg.SetAuthorativeAnswer(c.isAA)
 
-		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4])
 	}
 }
 
@@ -943,7 +943,7 @@ func TestMessageSetQuery(t *testing.T) {
 
 		c.msg.SetQuery(c.isQuery)
 
-		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4])
 	}
 }
 
@@ -986,7 +986,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 
 		c.msg.SetRecursionDesired(c.isRD)
 
-		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4])
 	}
 }
 
@@ -1030,7 +1030,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 
 		c.msg.SetResponseCode(c.code)
 
-		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4], true)
+		test.Assert(t, "Message.packet header", c.exp, c.msg.packet[:4])
 	}
 }
 
@@ -1859,38 +1859,38 @@ func TestMessageUnpack(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Header", c.exp.Header, msg.Header, true)
-		test.Assert(t, "Question", c.exp.Question, msg.Question, true)
-		test.Assert(t, "Answer Length", len(c.exp.Answer), len(msg.Answer), true)
-		test.Assert(t, "Authority Length", len(c.exp.Authority), len(msg.Authority), true)
-		test.Assert(t, "Additional Length", len(c.exp.Additional), len(msg.Additional), true)
+		test.Assert(t, "Header", c.exp.Header, msg.Header)
+		test.Assert(t, "Question", c.exp.Question, msg.Question)
+		test.Assert(t, "Answer Length", len(c.exp.Answer), len(msg.Answer))
+		test.Assert(t, "Authority Length", len(c.exp.Authority), len(msg.Authority))
+		test.Assert(t, "Additional Length", len(c.exp.Additional), len(msg.Additional))
 
 		for x := 0; x < len(c.exp.Answer); x++ {
-			test.Assert(t, "Answer.Name", c.exp.Answer[x].Name, msg.Answer[x].Name, true)
-			test.Assert(t, "Answer.Type", c.exp.Answer[x].Type, msg.Answer[x].Type, true)
-			test.Assert(t, "Answer.Class", c.exp.Answer[x].Class, msg.Answer[x].Class, true)
-			test.Assert(t, "Answer.TTL", c.exp.Answer[x].TTL, msg.Answer[x].TTL, true)
-			test.Assert(t, "Answer.rdlen", c.exp.Answer[x].rdlen, msg.Answer[x].rdlen, true)
-			test.Assert(t, "Answer.rdata", c.exp.Answer[x].rdata, msg.Answer[x].rdata, true)
-			test.Assert(t, "Answer.Value", c.exp.Answer[x].Value, msg.Answer[x].Value, true)
+			test.Assert(t, "Answer.Name", c.exp.Answer[x].Name, msg.Answer[x].Name)
+			test.Assert(t, "Answer.Type", c.exp.Answer[x].Type, msg.Answer[x].Type)
+			test.Assert(t, "Answer.Class", c.exp.Answer[x].Class, msg.Answer[x].Class)
+			test.Assert(t, "Answer.TTL", c.exp.Answer[x].TTL, msg.Answer[x].TTL)
+			test.Assert(t, "Answer.rdlen", c.exp.Answer[x].rdlen, msg.Answer[x].rdlen)
+			test.Assert(t, "Answer.rdata", c.exp.Answer[x].rdata, msg.Answer[x].rdata)
+			test.Assert(t, "Answer.Value", c.exp.Answer[x].Value, msg.Answer[x].Value)
 		}
 		for x := 0; x < len(c.exp.Authority); x++ {
-			test.Assert(t, "Authority.Name", c.exp.Authority[x].Name, msg.Authority[x].Name, true)
-			test.Assert(t, "Authority.Type", c.exp.Authority[x].Type, msg.Authority[x].Type, true)
-			test.Assert(t, "Authority.Class", c.exp.Authority[x].Class, msg.Authority[x].Class, true)
-			test.Assert(t, "Authority.TTL", c.exp.Authority[x].TTL, msg.Authority[x].TTL, true)
-			test.Assert(t, "Authority.rdlen", c.exp.Authority[x].rdlen, msg.Authority[x].rdlen, true)
-			test.Assert(t, "Authority.rdata", c.exp.Authority[x].rdata, msg.Authority[x].rdata, true)
-			test.Assert(t, "Authority.Value", c.exp.Authority[x].Value, msg.Authority[x].Value, true)
+			test.Assert(t, "Authority.Name", c.exp.Authority[x].Name, msg.Authority[x].Name)
+			test.Assert(t, "Authority.Type", c.exp.Authority[x].Type, msg.Authority[x].Type)
+			test.Assert(t, "Authority.Class", c.exp.Authority[x].Class, msg.Authority[x].Class)
+			test.Assert(t, "Authority.TTL", c.exp.Authority[x].TTL, msg.Authority[x].TTL)
+			test.Assert(t, "Authority.rdlen", c.exp.Authority[x].rdlen, msg.Authority[x].rdlen)
+			test.Assert(t, "Authority.rdata", c.exp.Authority[x].rdata, msg.Authority[x].rdata)
+			test.Assert(t, "Authority.Value", c.exp.Authority[x].Value, msg.Authority[x].Value)
 		}
 		for x := 0; x < len(c.exp.Additional); x++ {
-			test.Assert(t, "Additional.Name", c.exp.Additional[x].Name, msg.Additional[x].Name, true)
-			test.Assert(t, "Additional.Type", c.exp.Additional[x].Type, msg.Additional[x].Type, true)
-			test.Assert(t, "Additional.Class", c.exp.Additional[x].Class, msg.Additional[x].Class, true)
-			test.Assert(t, "Additional.TTL", c.exp.Additional[x].TTL, msg.Additional[x].TTL, true)
-			test.Assert(t, "Additional.rdlen", c.exp.Additional[x].rdlen, msg.Additional[x].rdlen, true)
-			test.Assert(t, "Additional.rdata", c.exp.Additional[x].rdata, msg.Additional[x].rdata, true)
-			test.Assert(t, "Additional.Value", c.exp.Additional[x].Value, msg.Additional[x].Value, true)
+			test.Assert(t, "Additional.Name", c.exp.Additional[x].Name, msg.Additional[x].Name)
+			test.Assert(t, "Additional.Type", c.exp.Additional[x].Type, msg.Additional[x].Type)
+			test.Assert(t, "Additional.Class", c.exp.Additional[x].Class, msg.Additional[x].Class)
+			test.Assert(t, "Additional.TTL", c.exp.Additional[x].TTL, msg.Additional[x].TTL)
+			test.Assert(t, "Additional.rdlen", c.exp.Additional[x].rdlen, msg.Additional[x].rdlen)
+			test.Assert(t, "Additional.rdata", c.exp.Additional[x].rdata, msg.Additional[x].rdata)
+			test.Assert(t, "Additional.Value", c.exp.Additional[x].Value, msg.Additional[x].Value)
 		}
 	}
 }

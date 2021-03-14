@@ -32,7 +32,7 @@ func TestStore(t *testing.T) {
 
 		err := testFS.MailSave(c.mail)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			continue
 		}
 
@@ -44,7 +44,7 @@ func TestStore(t *testing.T) {
 			}
 		}
 
-		test.Assert(t, "mail", c.mail, got, true)
+		test.Assert(t, "mail", c.mail, got)
 	}
 }
 

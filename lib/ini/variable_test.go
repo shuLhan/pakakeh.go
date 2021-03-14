@@ -28,7 +28,7 @@ func TestVariableEscape(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 		got := escape(c.in)
-		test.Assert(t, "escape", c.exp, got, true)
+		test.Assert(t, "escape", c.exp, got)
 	}
 }
 
@@ -105,6 +105,6 @@ func TestVariableString(t *testing.T) {
 
 		got := c.v.String()
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

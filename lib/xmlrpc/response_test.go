@@ -98,6 +98,6 @@ func TestResponse(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Response", c.exp, got, true)
+		test.Assert(t, "Response", c.exp, got)
 	}
 }

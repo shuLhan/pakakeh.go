@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	for _, c := range cases {
 		err := Copy(c.out, c.in)
 		if err != nil {
-			test.Assert(t, c.desc, c.expErr, err.Error(), true)
+			test.Assert(t, c.desc, c.expErr, err.Error())
 			continue
 		}
 
@@ -90,6 +90,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, c.exp, string(got), true)
+		test.Assert(t, c.desc, c.exp, string(got))
 	}
 }

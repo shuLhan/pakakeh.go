@@ -16,7 +16,7 @@ func TestToFloat64(t *testing.T) {
 
 	got := ToFloat64(in)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestToInt64(t *testing.T) {
@@ -25,7 +25,7 @@ func TestToInt64(t *testing.T) {
 
 	got := ToInt64(in)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestToStrings(t *testing.T) {
@@ -39,5 +39,5 @@ func TestToStrings(t *testing.T) {
 
 	got := ToStrings(is)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

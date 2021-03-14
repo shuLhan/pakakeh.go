@@ -37,6 +37,6 @@ func TestRequestMethod_String(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		test.Assert(t, "RequestMethod.String", c.exp, c.m.String(), true)
+		test.Assert(t, "RequestMethod.String", c.exp, c.m.String())
 	}
 }

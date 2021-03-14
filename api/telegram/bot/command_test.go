@@ -67,6 +67,6 @@ func TestCommand_validate(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		test.Assert(t, c.desc, c.exp, c.cmd.validate(), true)
+		test.Assert(t, c.desc, c.exp, c.cmd.validate())
 	}
 }

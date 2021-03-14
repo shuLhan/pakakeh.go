@@ -10,22 +10,20 @@ import (
 
 func TestAssert(t *testing.T) {
 	cases := []struct {
-		desc     string
-		in       interface{}
-		exp      interface{}
-		expEqual bool
+		desc string
+		in   interface{}
+		exp  interface{}
 	}{
 		{
-			desc:     "With nil",
-			in:       nil,
-			exp:      nil,
-			expEqual: true,
+			desc: "With nil",
+			in:   nil,
+			exp:  nil,
 		},
 	}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		Assert(t, "interface{}", c.exp, c.in, c.expEqual)
+		Assert(t, "interface{}", c.exp, c.in)
 	}
 }

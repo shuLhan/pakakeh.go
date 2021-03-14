@@ -14,7 +14,7 @@ func TestIntCreateSeq(t *testing.T) {
 	exp := []int{-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5}
 	got := IntCreateSeq(-5, 5)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestIntPickRandPositive(t *testing.T) {
@@ -25,9 +25,9 @@ func TestIntPickRandPositive(t *testing.T) {
 	// Pick random without duplicate.
 	got := IntPickRandPositive(7, false, pickedIds, nil)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Pick random with exclude indices.
 	got = IntPickRandPositive(9, false, pickedIds, exsIds)
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

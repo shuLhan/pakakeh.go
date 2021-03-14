@@ -56,6 +56,6 @@ func TestNewAffixRule_prefix(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "newAffixRule", c.exp, got, true)
+		test.Assert(t, "newAffixRule", c.exp, got)
 	}
 }

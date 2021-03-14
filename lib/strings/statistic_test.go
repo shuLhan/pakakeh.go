@@ -29,7 +29,7 @@ func TestCountAlnum(t *testing.T) {
 
 	for _, c := range cases {
 		got := CountAlnum(c.text)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -56,8 +56,8 @@ func TestCountAlnumDistribution(t *testing.T) {
 
 	for _, c := range cases {
 		gotChars, gotCounts := CountAlnumDistribution(c.text)
-		test.Assert(t, "chars", c.expChars, gotChars, true)
-		test.Assert(t, "counts", c.expCounts, gotCounts, true)
+		test.Assert(t, "chars", c.expChars, gotChars)
+		test.Assert(t, "counts", c.expCounts, gotCounts)
 	}
 }
 
@@ -97,8 +97,8 @@ func TestCountCharSequence(t *testing.T) {
 	for _, c := range cases {
 		gotChars, gotCounts := CountCharSequence(c.text)
 
-		test.Assert(t, "", c.expChars, gotChars, true)
-		test.Assert(t, "", c.expCounts, gotCounts, true)
+		test.Assert(t, "", c.expChars, gotChars)
+		test.Assert(t, "", c.expCounts, gotCounts)
 	}
 }
 
@@ -116,7 +116,7 @@ func TestCountDigit(t *testing.T) {
 	for _, c := range cases {
 		got := CountDigit(c.text)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -152,7 +152,7 @@ func TestCountNonAlnum(t *testing.T) {
 
 	for _, c := range cases {
 		got := CountNonAlnum(c.text, c.withspace)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -172,7 +172,7 @@ func TestCountUniqChar(t *testing.T) {
 
 	for _, c := range cases {
 		got := CountUniqChar(c.text)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -190,8 +190,8 @@ func TestCountUpperLower(t *testing.T) {
 	for _, c := range cases {
 		gotup, gotlo := CountUpperLower(c.text)
 
-		test.Assert(t, "", c.expUpper, gotup, true)
-		test.Assert(t, "", c.expLower, gotlo, true)
+		test.Assert(t, "", c.expUpper, gotup)
+		test.Assert(t, "", c.expLower, gotlo)
 	}
 }
 
@@ -219,8 +219,8 @@ func TestMaxCharSequence(t *testing.T) {
 	for _, c := range cases {
 		gotv, gotc := MaxCharSequence(c.text)
 
-		test.Assert(t, "", c.char, gotv, true)
-		test.Assert(t, "", c.count, gotc, true)
+		test.Assert(t, "", c.char, gotv)
+		test.Assert(t, "", c.count, gotc)
 	}
 }
 
@@ -240,7 +240,7 @@ func TestRatioAlnum(t *testing.T) {
 
 	for _, c := range cases {
 		got := RatioAlnum(c.text)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -260,7 +260,7 @@ func TestRatioDigit(t *testing.T) {
 
 	for _, c := range cases {
 		got := RatioDigit(c.text)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -289,7 +289,7 @@ func TestRatioNonAlnum(t *testing.T) {
 
 	for _, c := range cases {
 		got := RatioNonAlnum(c.text, c.withspace)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -306,7 +306,7 @@ func TestRatioUpper(t *testing.T) {
 
 	for _, c := range cases {
 		got := RatioUpper(c.text)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -328,7 +328,7 @@ func TestRatioUpperLower(t *testing.T) {
 
 	for _, c := range cases {
 		got := RatioUpperLower(c.text)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -365,7 +365,7 @@ func TestTextSumCountTokens(t *testing.T) {
 
 	for _, c := range cases {
 		got := TextSumCountTokens(c.text, c.tokens, c.sensitive)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -390,6 +390,6 @@ func TestTextFrequencyOfTokens(t *testing.T) {
 
 	for _, c := range cases {
 		got := TextFrequencyOfTokens(c.text, c.tokens, c.sensitive)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

@@ -63,8 +63,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestQueryType(t *testing.T) {
-	test.Assert(t, "QueryTypeA", QueryTypeA, uint16(1), true)
-	test.Assert(t, "QueryTypeTXT", QueryTypeTXT, uint16(16), true)
-	test.Assert(t, "QueryTypeAXFR", QueryTypeAXFR, uint16(252), true)
-	test.Assert(t, "QueryTypeALL", QueryTypeALL, uint16(255), true)
+	test.Assert(t, "QueryTypeA", QueryTypeA, uint16(1))
+	test.Assert(t, "QueryTypeTXT", QueryTypeTXT, uint16(16))
+	test.Assert(t, "QueryTypeAXFR", QueryTypeAXFR, uint16(252))
+	test.Assert(t, "QueryTypeALL", QueryTypeALL, uint16(255))
 }

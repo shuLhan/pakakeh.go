@@ -23,7 +23,7 @@ func TestFloat_Clone(t *testing.T) {
 
 	got := f.Clone()
 
-	test.Assert(t, "Clone", f.String(), got.String(), true)
+	test.Assert(t, "Clone", f.String(), got.String())
 }
 
 func TestFloat_IsEqual(t *testing.T) {
@@ -57,7 +57,7 @@ func TestFloat_IsEqual(t *testing.T) {
 
 	for _, c := range cases {
 		got := f.IsEqual(c.g)
-		test.Assert(t, "IsEqual", c.exp, got, true)
+		test.Assert(t, "IsEqual", c.exp, got)
 	}
 }
 
@@ -91,7 +91,7 @@ func TestFloat_Mul(t *testing.T) {
 		f.Mul(g)
 		got := f.String()
 
-		test.Assert(t, "Mul", c.exp, got, true)
+		test.Assert(t, "Mul", c.exp, got)
 	}
 }
 
@@ -120,7 +120,7 @@ func TestFloat_MulFloat64(t *testing.T) {
 		f.Mul(c.g)
 		got := f.String()
 
-		test.Assert(t, "MulFloat64", c.exp, got, true)
+		test.Assert(t, "MulFloat64", c.exp, got)
 	}
 }
 
@@ -158,7 +158,7 @@ func TestFloat_Quo(t *testing.T) {
 
 		got := f.String()
 
-		test.Assert(t, "Quo", c.exp, got, true)
+		test.Assert(t, "Quo", c.exp, got)
 	}
 }
 
@@ -196,7 +196,7 @@ func TestFloat_QuoFloat64(t *testing.T) {
 
 		got := f.String()
 
-		test.Assert(t, "Quo", c.exp, got, true)
+		test.Assert(t, "Quo", c.exp, got)
 	}
 }
 
@@ -246,7 +246,7 @@ func TestFloat_String_fromString(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		test.Assert(t, c.in, c.exp, bf.String(), true)
+		test.Assert(t, c.in, c.exp, bf.String())
 	}
 }
 
@@ -290,7 +290,7 @@ func TestFloat_String_fromFloat(t *testing.T) {
 
 	for _, c := range cases {
 		bf.SetFloat64(c.in)
-		test.Assert(t, c.exp, c.exp, bf.String(), true)
+		test.Assert(t, c.exp, c.exp, bf.String())
 	}
 }
 
@@ -321,6 +321,6 @@ func TestFloat_UnmarshalJSON(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "", c.exp, got.V, true)
+		test.Assert(t, "", c.exp, got.V)
 	}
 }

@@ -210,7 +210,7 @@ func doRead(t *testing.T, dsvReader *Reader, exp []string) {
 				GetDataset().(tabula.DatasetInterface).
 				GetDataAsRows())
 
-			test.Assert(t, "", exp[i], r, true)
+			test.Assert(t, "", exp[i], r)
 
 			i++
 		} else if e == io.EOF {
@@ -332,7 +332,7 @@ func TestReaderToColumns(t *testing.T) {
 
 			r := fmt.Sprint(ds.GetData())
 
-			test.Assert(t, "", expectation[i], r, true)
+			test.Assert(t, "", expectation[i], r)
 
 			i++
 		} else if e == io.EOF {
@@ -382,7 +382,7 @@ func TestTransposeToColumns(t *testing.T) {
 
 	got := fmt.Sprint(*columns)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	e = reader.Close()
 	if e != nil {
@@ -419,7 +419,7 @@ func TestSortColumnsByIndex(t *testing.T) {
 	exp := strings.Join(expReverse, "")
 	got := fmt.Sprint(ds.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	exp = "[" + strings.Join(expSkipColumnsAllRev, " ") + "]"
 
@@ -427,7 +427,7 @@ func TestSortColumnsByIndex(t *testing.T) {
 
 	got = fmt.Sprint(*columns)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	e = reader.Close()
 	if e != nil {
@@ -464,7 +464,7 @@ func TestSplitRowsByValue(t *testing.T) {
 
 	got := fmt.Sprint(splitL.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// test right split
 	exp = ""
@@ -474,7 +474,7 @@ func TestSplitRowsByValue(t *testing.T) {
 
 	got = fmt.Sprint(splitR.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	e = reader.Close()
 	if e != nil {

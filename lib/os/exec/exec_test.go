@@ -46,7 +46,7 @@ func TestParseCommandArg(t *testing.T) {
 	for _, c := range cases {
 		t.Logf(c.in)
 		gotCmd, gotArgs := ParseCommandArgs(c.in)
-		test.Assert(t, "cmd", c.expCmd, gotCmd, true)
-		test.Assert(t, "args", c.expArgs, gotArgs, true)
+		test.Assert(t, "cmd", c.expCmd, gotCmd)
+		test.Assert(t, "args", c.expArgs, gotArgs)
 	}
 }

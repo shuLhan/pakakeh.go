@@ -52,7 +52,7 @@ func TestMessage_parseCommandArgs(t *testing.T) {
 	for _, c := range cases {
 		c.msg.parseCommandArgs()
 
-		test.Assert(t, "Command", c.expCommand, c.msg.Command, true)
-		test.Assert(t, "CommandArgs", c.expArgs, c.msg.CommandArgs, true)
+		test.Assert(t, "Command", c.expCommand, c.msg.Command)
+		test.Assert(t, "CommandArgs", c.expArgs, c.msg.CommandArgs)
 	}
 }

@@ -63,7 +63,7 @@ func checkDataset(t *testing.T, r *Reader, exp string) {
 		fmt.Println("data type unknown")
 	}
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 //

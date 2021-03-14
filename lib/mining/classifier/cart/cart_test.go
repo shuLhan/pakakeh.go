@@ -32,7 +32,7 @@ func TestCART(t *testing.T) {
 	// copy target to be compared later.
 	targetv := ds.GetClassAsStrings()
 
-	test.Assert(t, "", NRows, ds.GetNRow(), true)
+	test.Assert(t, "", NRows, ds.GetNRow())
 
 	// Build CART tree.
 	CART, e := New(&ds, SplitMethodGini, 0)
@@ -58,5 +58,5 @@ func TestCART(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	test.Assert(t, "", targetv, testset.GetClassAsStrings(), true)
+	test.Assert(t, "", targetv, testset.GetClassAsStrings())
 }

@@ -21,14 +21,14 @@ func TestReaderWithClaset(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	test.Assert(t, "", 3, claset.GetClassIndex(), true)
+	test.Assert(t, "", 3, claset.GetClassIndex())
 
 	claset.SetMajorityClass("regular")
 	claset.SetMinorityClass("vandalism")
 
 	clone := claset.Clone().(tabula.ClasetInterface)
 
-	test.Assert(t, "", 3, clone.GetClassIndex(), true)
-	test.Assert(t, "", "regular", clone.MajorityClass(), true)
-	test.Assert(t, "", "vandalism", clone.MinorityClass(), true)
+	test.Assert(t, "", 3, clone.GetClassIndex())
+	test.Assert(t, "", "regular", clone.MajorityClass())
+	test.Assert(t, "", "vandalism", clone.MinorityClass())
 }

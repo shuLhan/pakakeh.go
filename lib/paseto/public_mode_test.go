@@ -91,10 +91,10 @@ func TestPublicMode_UnpackHTTPRequest(t *testing.T) {
 	for _, c := range cases {
 		got, err := auth.UnpackHTTPRequest(c.req)
 		if err != nil {
-			test.Assert(t, c.desc, c.expError, err.Error(), true)
+			test.Assert(t, c.desc, c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, c.desc, c.expData, got.Data, true)
+		test.Assert(t, c.desc, c.expData, got.Data)
 	}
 }

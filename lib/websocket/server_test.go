@@ -250,7 +250,7 @@ func TestServerHandshake(t *testing.T) {
 
 		_, err = cl.doHandshake("", bb.Bytes())
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 		}
 	}
 }
@@ -261,6 +261,5 @@ func TestServer_Health(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "/status response code", http.StatusOK,
-		res.StatusCode, true)
+	test.Assert(t, "/status response code", http.StatusOK, res.StatusCode)
 }

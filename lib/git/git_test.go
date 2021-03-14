@@ -38,11 +38,11 @@ func TestClone(t *testing.T) {
 
 		err := Clone(_testRemoteURL, c.dest)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, mock.Output())
 	}
 }
 
@@ -78,11 +78,11 @@ Use '--' to separate paths from revisions, like this:
 
 		err := CheckoutRevision(_testRepoDir, c.remote, c.branch, c.revision)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, mock.Output())
 	}
 }
 
@@ -108,12 +108,12 @@ func TestGetRemoteURL(t *testing.T) {
 
 		got, err := GetRemoteURL(_testRepoDir, c.remoteName)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "url", c.exp, got, true)
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
+		test.Assert(t, "url", c.exp, got)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, mock.Output())
 	}
 }
 
@@ -144,11 +144,11 @@ func TestGetTag(t *testing.T) {
 
 		got, err := GetTag(_testRepoDir, c.revision)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, got, true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, got)
 	}
 }
 
@@ -175,11 +175,11 @@ func TestLatestCommit(t *testing.T) {
 
 		got, err := LatestCommit(_testRepoDir, c.ref)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, got, true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, got)
 	}
 }
 
@@ -200,11 +200,11 @@ func TestLatestTag(t *testing.T) {
 
 		got, err := LatestTag(_testRepoDir)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, got, true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, got)
 	}
 }
 
@@ -226,12 +226,12 @@ func TestLatestVersion(t *testing.T) {
 
 		got, err := LatestVersion(_testRepoDir)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "version", c.exp, got, true)
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
+		test.Assert(t, "version", c.exp, got)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, mock.Output())
 	}
 }
 
@@ -251,11 +251,11 @@ func TestListTag(t *testing.T) {
 
 		got, err := ListTags(_testRepoDir)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "tags", c.exp, got, true)
+		test.Assert(t, "tags", c.exp, got)
 	}
 }
 
@@ -295,11 +295,11 @@ ec65455 Add feature A.
 
 		err := LogRevisions(_testRepoDir, c.prevRevision, c.nextRevision)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, mock.Output())
 	}
 }
 
@@ -333,8 +333,8 @@ func TestRemoteChange(t *testing.T) {
 			t.Fatalf("expecting error like %q, got %q", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error(), true)
-		test.Assert(t, "stdout", c.expStdout, mock.Output(), true)
+		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stdout", c.expStdout, mock.Output())
 	}
 }
 

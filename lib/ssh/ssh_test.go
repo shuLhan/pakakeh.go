@@ -47,6 +47,6 @@ func TestPatternToRegex(t *testing.T) {
 
 	for _, c := range cases {
 		got := patternToRegex(c.in)
-		test.Assert(t, "patternToRegex", c.exp, got, true)
+		test.Assert(t, "patternToRegex", c.exp, got)
 	}
 }

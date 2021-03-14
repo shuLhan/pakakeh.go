@@ -95,15 +95,15 @@ func TestMessageParseMessage(t *testing.T) {
 
 		msg, rest, err := ParseMessage(in)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if msg == nil {
 			continue
 		}
 
-		test.Assert(t, "rest", c.expRest, string(rest), true)
-		test.Assert(t, "Message", c.exp, msg.String(), true)
+		test.Assert(t, "rest", c.expRest, string(rest))
+		test.Assert(t, "Message", c.exp, msg.String())
 	}
 }
 
@@ -141,11 +141,11 @@ func TestMessageDKIMVerify(t *testing.T) {
 
 		gotStatus, err := msg.DKIMVerify()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "dkim.Status", c.expStatus, gotStatus, true)
+		test.Assert(t, "dkim.Status", c.expStatus, gotStatus)
 	}
 }
 
@@ -193,16 +193,14 @@ func TestMessageDKIMSign(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "BodyHash", c.expBodyHash,
-			string(msg.DKIMSignature.BodyHash), true)
-		test.Assert(t, "Signature", c.expSignature,
-			string(msg.DKIMSignature.Value), true)
+		test.Assert(t, "BodyHash", c.expBodyHash, string(msg.DKIMSignature.BodyHash))
+		test.Assert(t, "Signature", c.expSignature, string(msg.DKIMSignature.Value))
 
 		gotStatus, err := msg.DKIMVerify()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "dkim.Status", c.expStatus, gotStatus, true)
+		test.Assert(t, "dkim.Status", c.expStatus, gotStatus)
 	}
 }

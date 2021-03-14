@@ -53,7 +53,7 @@ func TestIsHostnameValid(t *testing.T) {
 
 		got := IsHostnameValid(c.in, c.isFQDN)
 
-		test.Assert(t, "IsHostnameValid", c.exp, got, true)
+		test.Assert(t, "IsHostnameValid", c.exp, got)
 	}
 }
 
@@ -75,7 +75,7 @@ func TestIsIPv4(t *testing.T) {
 	for _, c := range cases {
 		ip := net.ParseIP(c.ip)
 		got := IsIPv4(ip)
-		test.Assert(t, "IsIPv4: "+c.ip, c.exp, got, true)
+		test.Assert(t, "IsIPv4: "+c.ip, c.exp, got)
 	}
 }
 
@@ -97,6 +97,6 @@ func TestIsIPv6(t *testing.T) {
 	for _, c := range cases {
 		ip := net.ParseIP(c.ip)
 		got := IsIPv6(ip)
-		test.Assert(t, "IsIPv4", c.exp, got, true)
+		test.Assert(t, "IsIPv4", c.exp, got)
 	}
 }

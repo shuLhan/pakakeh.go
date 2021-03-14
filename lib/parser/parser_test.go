@@ -30,7 +30,7 @@ func TestParser_AddDelimiters(t *testing.T) {
 
 	for _, c := range cases {
 		p.AddDelimiters(c.delims)
-		test.Assert(t, "p.delims", c.exp, p.delims, true)
+		test.Assert(t, "p.delims", c.exp, p.delims)
 	}
 }
 
@@ -72,8 +72,8 @@ b`,
 
 		for x := 0; x < len(c.exp); x++ {
 			gotLine, gotC := p.Line()
-			test.Assert(t, "", c.exp[x].line, gotLine, true)
-			test.Assert(t, "", c.exp[x].c, gotC, true)
+			test.Assert(t, "", c.exp[x].line, gotLine)
+			test.Assert(t, "", c.exp[x].c, gotC)
 		}
 	}
 }
@@ -132,7 +132,7 @@ func TestParser_Lines(t *testing.T) {
 
 		got := p.Lines()
 
-		test.Assert(t, "Lines()", c.exp, got, true)
+		test.Assert(t, "Lines()", c.exp, got)
 	}
 }
 
@@ -157,7 +157,7 @@ func TestParser_Stop(t *testing.T) {
 	for _, c := range cases {
 		_, _ = p.Token()
 		got, _ = p.Stop()
-		test.Assert(t, "Stop", c.exp, got, true)
+		test.Assert(t, "Stop", c.exp, got)
 		p.Load(got, "")
 	}
 }
@@ -184,8 +184,8 @@ func TestParser_Token(t *testing.T) {
 	for _, c := range cases {
 		gotToken, gotDelim := p.Token()
 
-		test.Assert(t, "token", c.expToken, gotToken, true)
-		test.Assert(t, "delim", c.expDelim, gotDelim, true)
+		test.Assert(t, "token", c.expToken, gotToken)
+		test.Assert(t, "delim", c.expDelim, gotDelim)
 	}
 }
 
@@ -211,8 +211,8 @@ func TestParser_TokenEscaped(t *testing.T) {
 	for _, c := range cases {
 		gotToken, gotDelim := p.TokenEscaped('\\')
 
-		test.Assert(t, "token", c.expToken, gotToken, true)
-		test.Assert(t, "delim", c.expDelim, gotDelim, true)
+		test.Assert(t, "token", c.expToken, gotToken)
+		test.Assert(t, "delim", c.expDelim, gotDelim)
 	}
 }
 
@@ -250,8 +250,8 @@ func TestParser_SkipLine(t *testing.T) {
 
 		gotToken, gotDelim := p.Token()
 
-		test.Assert(t, "token", c.expToken, gotToken, true)
-		test.Assert(t, "delim", c.expDelim, gotDelim, true)
+		test.Assert(t, "token", c.expToken, gotToken)
+		test.Assert(t, "delim", c.expDelim, gotDelim)
 	}
 }
 
@@ -276,11 +276,11 @@ func TestParser_Open(t *testing.T) {
 
 		p, err := Open(c.file, "")
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, "content", c.expContent, p.v, true)
+		test.Assert(t, "content", c.expContent, p.v)
 	}
 }
 
@@ -306,7 +306,7 @@ func TestParser_RemoveDelimiters(t *testing.T) {
 
 	for _, c := range cases {
 		p.RemoveDelimiters(c.delims)
-		test.Assert(t, "p.delims", c.exp, p.delims, true)
+		test.Assert(t, "p.delims", c.exp, p.delims)
 	}
 }
 
@@ -347,11 +347,11 @@ func TestParser_SkipHorizontalSpaces(t *testing.T) {
 
 		got := p.SkipHorizontalSpaces()
 
-		test.Assert(t, "rune", c.expRune, got, true)
+		test.Assert(t, "rune", c.expRune, got)
 
 		gotToken, gotDelim := p.Token()
 
-		test.Assert(t, "token", c.expToken, gotToken, true)
-		test.Assert(t, "delim", c.expDelim, gotDelim, true)
+		test.Assert(t, "token", c.expToken, gotToken)
+		test.Assert(t, "delim", c.expDelim, gotDelim)
 	}
 }

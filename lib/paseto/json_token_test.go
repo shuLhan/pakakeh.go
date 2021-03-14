@@ -45,6 +45,6 @@ func TestJSONToken_Validate(t *testing.T) {
 			gotErr = err.Error()
 		}
 
-		test.Assert(t, c.desc, c.expErr, gotErr, true)
+		test.Assert(t, c.desc, c.expErr, gotErr)
 	}
 }

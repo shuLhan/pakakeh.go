@@ -27,7 +27,7 @@ func TestGetSystemNameServers(t *testing.T) {
 
 		got := GetSystemNameServers(c.path)
 
-		test.Assert(t, "NameServers", c.exp, got, true)
+		test.Assert(t, "NameServers", c.exp, got)
 	}
 }
 
@@ -52,8 +52,8 @@ func TestReverseIP(t *testing.T) {
 
 		gotIP, gotIsIPv4 := reverseIP(ip)
 
-		test.Assert(t, "reverseIP", c.exp, gotIP, true)
-		test.Assert(t, "isIPv4", c.expIsIPv4, gotIsIPv4, true)
+		test.Assert(t, "reverseIP", c.exp, gotIP)
+		test.Assert(t, "isIPv4", c.expIsIPv4, gotIsIPv4)
 	}
 }
 
@@ -88,10 +88,10 @@ func TestLookupPTR(t *testing.T) {
 
 		got, err := LookupPTR(cl, c.ip)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "LookupPTR", c.exp, got, true)
+		test.Assert(t, "LookupPTR", c.exp, got)
 	}
 }

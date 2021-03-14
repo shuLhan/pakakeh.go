@@ -21,10 +21,10 @@ func TestComputeNumeric(t *testing.T) {
 
 	cm.ComputeNumeric(vs, actuals, predics)
 
-	test.Assert(t, "", exp[0], cm.TP(), true)
-	test.Assert(t, "", exp[1], cm.FN(), true)
-	test.Assert(t, "", exp[2], cm.TN(), true)
-	test.Assert(t, "", exp[3], cm.FP(), true)
+	test.Assert(t, "", exp[0], cm.TP())
+	test.Assert(t, "", exp[1], cm.FN())
+	test.Assert(t, "", exp[2], cm.TN())
+	test.Assert(t, "", exp[3], cm.FP())
 
 	fmt.Println(cm)
 }
@@ -39,10 +39,10 @@ func TestComputeStrings(t *testing.T) {
 
 	cm.ComputeStrings(vs, actuals, predics)
 
-	test.Assert(t, "", exp[0], cm.TP(), true)
-	test.Assert(t, "", exp[1], cm.FN(), true)
-	test.Assert(t, "", exp[2], cm.TN(), true)
-	test.Assert(t, "", exp[3], cm.FP(), true)
+	test.Assert(t, "", exp[0], cm.TP())
+	test.Assert(t, "", exp[1], cm.FN())
+	test.Assert(t, "", exp[2], cm.TN())
+	test.Assert(t, "", exp[3], cm.FP())
 
 	fmt.Println(cm)
 }
@@ -62,8 +62,8 @@ func TestGroupIndexPredictions(t *testing.T) {
 
 	cm.GroupIndexPredictions(testIds, actuals, predics)
 
-	test.Assert(t, "", exp[0], cm.TPIndices(), true)
-	test.Assert(t, "", exp[1], cm.FNIndices(), true)
-	test.Assert(t, "", exp[2], cm.FPIndices(), true)
-	test.Assert(t, "", exp[3], cm.TNIndices(), true)
+	test.Assert(t, "", exp[0], cm.TPIndices())
+	test.Assert(t, "", exp[1], cm.FNIndices())
+	test.Assert(t, "", exp[2], cm.FPIndices())
+	test.Assert(t, "", exp[3], cm.TNIndices())
 }

@@ -18,13 +18,13 @@ func TestRequestReset(t *testing.T) {
 
 	req.reset()
 
-	test.Assert(t, "Request.ID", uint64(0), req.ID, true)
-	test.Assert(t, "Request.Method", "", req.Method, true)
-	test.Assert(t, "Request.Target", "", req.Target, true)
-	test.Assert(t, "Request.Body", "", req.Body, true)
-	test.Assert(t, "Request.Path", "", req.Path, true)
-	test.Assert(t, "Request.Params", targetParam{}, req.Params, true)
-	test.Assert(t, "Request.Query", url.Values{}, req.Query, true)
+	test.Assert(t, "Request.ID", uint64(0), req.ID)
+	test.Assert(t, "Request.Method", "", req.Method)
+	test.Assert(t, "Request.Target", "", req.Target)
+	test.Assert(t, "Request.Body", "", req.Body)
+	test.Assert(t, "Request.Path", "", req.Path)
+	test.Assert(t, "Request.Params", targetParam{}, req.Params)
+	test.Assert(t, "Request.Query", url.Values{}, req.Query)
 }
 
 func testHandleGet(ctx context.Context, req *Request) (res Response) {
@@ -93,11 +93,11 @@ func TestRequestUnpack(t *testing.T) {
 
 		_, err := c.req.unpack(rootRoutes)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Params", c.expParams, c.req.Params, true)
-		test.Assert(t, "Query", c.expQuery, c.req.Query, true)
+		test.Assert(t, "Params", c.expParams, c.req.Params)
+		test.Assert(t, "Query", c.expQuery, c.req.Query)
 	}
 }

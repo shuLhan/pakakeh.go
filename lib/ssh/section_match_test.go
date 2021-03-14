@@ -23,11 +23,11 @@ func TestNewSectionMatch(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 		got.postConfig(testParser.homeDir)
-		test.Assert(t, "newSectionMatch", c.exp, got, true)
+		test.Assert(t, "newSectionMatch", c.exp, got)
 	}
 }
 
@@ -79,12 +79,12 @@ func TestParseCriteriaAll(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 		got.postConfig(testParser.homeDir)
 		test.Assert(t, "parseCriteriaAll",
-			c.exp(*testDefaultSection), got, true)
+			c.exp(*testDefaultSection), got)
 	}
 }
 
@@ -118,13 +118,13 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 		got.postConfig(testParser.homeDir)
 		t.Logf("got: %+v", got)
 		test.Assert(t, "parseCriteriaExec",
-			c.exp(*testDefaultSection), got, true)
+			c.exp(*testDefaultSection), got)
 	}
 }
 
@@ -181,11 +181,10 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 		got.postConfig(testParser.homeDir)
-		test.Assert(t, "parseCriteriaWithArg",
-			c.exp(*testDefaultSection), got, true)
+		test.Assert(t, "parseCriteriaWithArg", c.exp(*testDefaultSection), got)
 	}
 }

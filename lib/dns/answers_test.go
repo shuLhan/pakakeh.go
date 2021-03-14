@@ -40,8 +40,8 @@ func TestNewAnswers(t *testing.T) {
 
 		got := newAnswers(c.an)
 
-		test.Assert(t, "len(answers.v)", len(got.v), c.expLen, true)
-		test.Assert(t, "answers.v", got.v, c.expV, true)
+		test.Assert(t, "len(answers.v)", len(got.v), c.expLen)
+		test.Assert(t, "answers.v", got.v, c.expV)
 	}
 }
 
@@ -91,8 +91,8 @@ func TestAnswersGet(t *testing.T) {
 
 		got, x := ans.get(c.QType, c.QClass)
 
-		test.Assert(t, "answers.get", c.exp, got, true)
-		test.Assert(t, "answers.get index", c.expIndex, x, true)
+		test.Assert(t, "answers.get", c.exp, got)
+		test.Assert(t, "answers.get index", c.expIndex, x)
 	}
 }
 
@@ -147,9 +147,9 @@ func TestAnswersRemove(t *testing.T) {
 
 		ans.remove(c.QType, c.QClass)
 
-		test.Assert(t, "len(answers.v)", c.expLen, len(ans.v), true)
-		test.Assert(t, "cap(answers.v)", 1, cap(ans.v), true)
-		test.Assert(t, "answers", c.exp, ans, true)
+		test.Assert(t, "len(answers.v)", c.expLen, len(ans.v))
+		test.Assert(t, "cap(answers.v)", 1, cap(ans.v))
+		test.Assert(t, "answers", c.exp, ans)
 	}
 }
 
@@ -232,6 +232,6 @@ func TestAnswersUpdate(t *testing.T) {
 
 		ans.upsert(c.nu)
 
-		test.Assert(t, "answers.upsert", c.exp, ans, true)
+		test.Assert(t, "answers.upsert", c.exp, ans)
 	}
 }

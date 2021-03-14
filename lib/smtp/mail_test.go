@@ -37,6 +37,6 @@ func TestIsTerminated(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		test.Assert(t, "isTerminated", c.exp, c.mail.isTerminated(), true)
+		test.Assert(t, "isTerminated", c.exp, c.mail.isTerminated())
 	}
 }

@@ -52,6 +52,6 @@ func TestNewSectionHost(t *testing.T) {
 	for _, c := range cases {
 		got := newSectionHost(c.rawPattern)
 		got.postConfig(testParser.homeDir)
-		test.Assert(t, "newHost", c.exp(*testDefaultSection), got, true)
+		test.Assert(t, "newHost", c.exp(*testDefaultSection), got)
 	}
 }

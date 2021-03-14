@@ -54,11 +54,11 @@ func TestParseContentType(t *testing.T) {
 
 		got, err := ParseContentType(c.in)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "ContentType", c.exp, got.String(), true)
+		test.Assert(t, "ContentType", c.exp, got.String())
 	}
 }
 
@@ -84,6 +84,6 @@ func TestGetParamValue(t *testing.T) {
 
 		got := ct.GetParamValue(c.in)
 
-		test.Assert(t, "GetParamValue", c.exp, got, true)
+		test.Assert(t, "GetParamValue", c.exp, got)
 	}
 }

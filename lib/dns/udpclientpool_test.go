@@ -38,7 +38,7 @@ func TestNewUDPClientPool(t *testing.T) {
 
 		ucp, err := NewUDPClientPool(c.ns)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 

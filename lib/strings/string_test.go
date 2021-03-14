@@ -24,7 +24,7 @@ func TestCleanURI(t *testing.T) {
 	for _, c := range cases {
 		got := CleanURI(c.text)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -72,7 +72,7 @@ func TestCleanWikiMarkup(t *testing.T) {
 	for _, c := range cases {
 		got := CleanWikiMarkup(c.text)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -96,7 +96,7 @@ func TestMergeSpaces(t *testing.T) {
 	for _, c := range cases {
 		got := MergeSpaces(c.text, c.withline)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -112,7 +112,7 @@ func TestReverse(t *testing.T) {
 	for _, c := range cases {
 		got := Reverse(c.input)
 
-		test.Assert(t, "Reverse", c.exp, got, true)
+		test.Assert(t, "Reverse", c.exp, got)
 	}
 }
 
@@ -128,7 +128,7 @@ func TestSingleSpace(t *testing.T) {
 	}}
 	for _, c := range cases {
 		got := SingleSpace(c.in)
-		test.Assert(t, c.in, c.exp, got, true)
+		test.Assert(t, c.in, c.exp, got)
 	}
 }
 
@@ -160,7 +160,7 @@ func TestSplit(t *testing.T) {
 
 	for _, c := range cases {
 		got := Split(c.text, true, true)
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -182,6 +182,6 @@ func TestTrimNonAlnum(t *testing.T) {
 	for _, c := range cases {
 		got := TrimNonAlnum(c.text)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

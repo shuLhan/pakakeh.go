@@ -177,7 +177,7 @@ func TestFrameUnpack(t *testing.T) {
 		gots := Unpack(c.in)
 
 		if gots != nil && len(gots.v) > 0 {
-			test.Assert(t, "", c.exp, gots.v[0], true)
+			test.Assert(t, "", c.exp, gots.v[0])
 		}
 	}
 }
@@ -209,9 +209,8 @@ func TestFramesAppend(t *testing.T) {
 
 		frames.Append(c.f)
 
-		test.Assert(t, "Frames.Len", c.expLen, len(frames.v), true)
-		test.Assert(t, "Frames.payload", c.expPayload,
-			string(frames.payload()), true)
+		test.Assert(t, "Frames.Len", c.expLen, len(frames.v))
+		test.Assert(t, "Frames.payload", c.expPayload, string(frames.payload()))
 	}
 }
 
@@ -247,7 +246,7 @@ func TestFramesIsClosed(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 		got := c.frames.isClosed()
-		test.Assert(t, "Frames.isClosed", c.exp, got, true)
+		test.Assert(t, "Frames.isClosed", c.exp, got)
 	}
 }
 
@@ -329,6 +328,6 @@ func TestFramesPayload(t *testing.T) {
 
 		got := c.fs.payload()
 
-		test.Assert(t, "Frames.payload", c.exp, string(got), true)
+		test.Assert(t, "Frames.payload", c.exp, string(got))
 	}
 }

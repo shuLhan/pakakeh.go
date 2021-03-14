@@ -48,6 +48,6 @@ func TestIsValueBoolTrue(t *testing.T) {
 
 		got := IsValueBoolTrue(c.v)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

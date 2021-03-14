@@ -46,11 +46,11 @@ func TestMorphology_parseAnalyze(t *testing.T) {
 
 		err := got.parseAnalyze(c.line)
 		if err != nil {
-			test.Assert(t, c.line, c.expError, err.Error(), true)
+			test.Assert(t, c.line, c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, c.line, c.exp, got.analyze, true)
+		test.Assert(t, c.line, c.exp, got.analyze)
 	}
 }
 
@@ -74,9 +74,9 @@ func TestMorphology_parseStem(t *testing.T) {
 	for _, c := range cases {
 		err := got.parseStem(c.line)
 		if err != nil {
-			test.Assert(t, c.line+" error", c.expError, err.Error(), true)
+			test.Assert(t, c.line+" error", c.expError, err.Error())
 			continue
 		}
-		test.Assert(t, c.line, c.exp, got.stem, true)
+		test.Assert(t, c.line, c.exp, got.stem)
 	}
 }

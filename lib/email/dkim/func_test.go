@@ -41,7 +41,7 @@ func TestDecodeQP(t *testing.T) {
 
 		got := DecodeQP(c.in)
 
-		test.Assert(t, "DecodeQP", c.exp, got, true)
+		test.Assert(t, "DecodeQP", c.exp, got)
 	}
 }
 
@@ -117,6 +117,6 @@ func TestCanonicalize(t *testing.T) {
 
 		got := Canonicalize([]byte(c.in))
 
-		test.Assert(t, "Canonicalize", c.exp, string(got), true)
+		test.Assert(t, "Canonicalize", c.exp, string(got))
 	}
 }

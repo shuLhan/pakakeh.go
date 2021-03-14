@@ -11,32 +11,32 @@ func TestConcat(t *testing.T) {
 	var exp []byte
 	t.Log("With one parameter")
 	got := Concat([]byte{})
-	test.Assert(t, "Concat", exp, got, true)
+	test.Assert(t, "Concat", exp, got)
 
 	t.Log("With first parameter is empty")
 	got = Concat([]byte{}, []byte("B"))
 	exp = []byte("B")
-	test.Assert(t, "Concat", exp, got, true)
+	test.Assert(t, "Concat", exp, got)
 
 	t.Log("With two parameters")
 	got = Concat([]byte("A"), []byte("B"))
 	exp = []byte("AB")
-	test.Assert(t, "Concat", exp, got, true)
+	test.Assert(t, "Concat", exp, got)
 
 	t.Log("With three parameters")
 	got = Concat([]byte("A"), []byte("B"), []byte("C"))
 	exp = []byte("ABC")
-	test.Assert(t, "Concat", exp, got, true)
+	test.Assert(t, "Concat", exp, got)
 
 	t.Log("With one parameter is string")
 	got = Concat([]byte("A"), "B", []byte("C"))
 	exp = []byte("ABC")
-	test.Assert(t, "Concat", exp, got, true)
+	test.Assert(t, "Concat", exp, got)
 
 	t.Log("With some parameter is not []byte or string")
 	got = Concat([]byte("A"), 1, []int{2}, []byte{}, []byte("C"))
 	exp = []byte("AC")
-	test.Assert(t, "Concat", exp, got, true)
+	test.Assert(t, "Concat", exp, got)
 }
 
 func TestCutUntilToken(t *testing.T) {
@@ -79,9 +79,9 @@ func TestCutUntilToken(t *testing.T) {
 
 		got, idx, found := CutUntilToken(line, c.token, c.startAt, c.checkEsc)
 
-		test.Assert(t, "cut", c.exp, string(got), true)
-		test.Assert(t, "idx", c.expIdx, idx, true)
-		test.Assert(t, "found", c.expFound, found, true)
+		test.Assert(t, "cut", c.exp, string(got))
+		test.Assert(t, "idx", c.expIdx, idx)
+		test.Assert(t, "found", c.expFound, found)
 	}
 }
 
@@ -118,7 +118,7 @@ func TestEncloseRemove(t *testing.T) {
 	for _, c := range cases {
 		got, _ := EncloseRemove(c.line, c.leftcap, c.rightcap)
 
-		test.Assert(t, "", c.exp, string(got), true)
+		test.Assert(t, "", c.exp, string(got))
 	}
 }
 
@@ -158,8 +158,8 @@ func TestEncloseToken(t *testing.T) {
 	for _, c := range cases {
 		got, changed := EncloseToken(line, c.token, c.leftcap, c.rightcap)
 
-		test.Assert(t, "newline", c.exp, string(got), true)
-		test.Assert(t, "changed", c.changed, changed, true)
+		test.Assert(t, "newline", c.exp, string(got))
+		test.Assert(t, "changed", c.changed, changed)
 	}
 }
 
@@ -192,7 +192,7 @@ func TestIsTokenAt(t *testing.T) {
 
 	for _, c := range cases {
 		got := IsTokenAt(line, c.token, c.p)
-		test.Assert(t, "IsTokenAt", c.exp, got, true)
+		test.Assert(t, "IsTokenAt", c.exp, got)
 	}
 }
 
@@ -237,8 +237,8 @@ func TestReadHexByte(t *testing.T) {
 
 		got, ok := ReadHexByte(c.in, 0)
 
-		test.Assert(t, "b", c.exp, got, true)
-		test.Assert(t, "ok", c.expOK, ok, true)
+		test.Assert(t, "b", c.exp, got)
+		test.Assert(t, "ok", c.expOK, ok)
 	}
 }
 
@@ -254,7 +254,7 @@ func TestMergeSpaces(t *testing.T) {
 	}}
 	for _, c := range cases {
 		got := MergeSpaces([]byte(c.in))
-		test.Assert(t, c.in, c.exp, string(got), true)
+		test.Assert(t, c.in, c.exp, string(got))
 	}
 }
 
@@ -291,8 +291,8 @@ func TestSkipAfterToken(t *testing.T) {
 	for x, c := range cases {
 		t.Logf("#%d\n", x)
 		got, found := SkipAfterToken(line, c.token, c.startAt, c.checkEsc)
-		test.Assert(t, "Index", c.exp, got, true)
-		test.Assert(t, "Found", c.expFound, found, true)
+		test.Assert(t, "Index", c.exp, got)
+		test.Assert(t, "Found", c.expFound, found)
 	}
 }
 
@@ -311,7 +311,7 @@ func testTokenFind(t *testing.T, line, token []byte, startat int, exp []int) {
 		startat = foundat + tokenlen
 	}
 
-	test.Assert(t, "TokenFind", exp, got, true)
+	test.Assert(t, "TokenFind", exp, got)
 }
 
 func TestTokenFind(t *testing.T) {
@@ -345,7 +345,7 @@ func TestInReplace(t *testing.T) {
 	for _, c := range cases {
 		got := InReplace([]byte(c.in), []byte(ascii.LettersNumber), '_')
 
-		test.Assert(t, "InReplace", c.exp, string(got), true)
+		test.Assert(t, "InReplace", c.exp, string(got))
 	}
 }
 
@@ -373,6 +373,6 @@ func TestIndexes(t *testing.T) {
 
 		got := Indexes(c.s, c.token)
 
-		test.Assert(t, "Indexes", c.exp, got, true)
+		test.Assert(t, "Indexes", c.exp, got)
 	}
 }

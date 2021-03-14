@@ -123,20 +123,20 @@ func TestParseField(t *testing.T) {
 
 		got, rest, err := ParseField(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if got == nil {
-			test.Assert(t, "Field", c.exp, got, true)
+			test.Assert(t, "Field", c.exp, got)
 			continue
 		}
 
-		test.Assert(t, "Field.oriName", c.exp.oriName, got.oriName, true)
-		test.Assert(t, "Field.oriValue", c.exp.oriValue, got.oriValue, true)
-		test.Assert(t, "Field.Name", c.exp.Name, got.Name, true)
-		test.Assert(t, "Field.Value", c.exp.Value, got.Value, true)
+		test.Assert(t, "Field.oriName", c.exp.oriName, got.oriName)
+		test.Assert(t, "Field.oriValue", c.exp.oriValue, got.oriValue)
+		test.Assert(t, "Field.Name", c.exp.Name, got.Name)
+		test.Assert(t, "Field.Value", c.exp.Value, got.Value)
 
-		test.Assert(t, "rest", c.expRest, rest, true)
+		test.Assert(t, "rest", c.expRest, rest)
 	}
 }
 
@@ -246,11 +246,11 @@ func TestUnpackDate(t *testing.T) {
 
 		err := field.unpack()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "date", c.exp.String(), field.date.String(), true)
+		test.Assert(t, "date", c.exp.String(), field.date.String())
 	}
 }
 
@@ -275,17 +275,17 @@ func TestUnpackMailbox(t *testing.T) {
 
 		field, _, err := ParseField(c.in)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		err = field.unpack()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Sender:", []byte(c.exp), field.Relaxed(), true)
+		test.Assert(t, "Sender:", []byte(c.exp), field.Relaxed())
 	}
 }
 
@@ -307,17 +307,17 @@ func TestUnpackMailboxList(t *testing.T) {
 
 		field, _, err := ParseField(c.in)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		err = field.unpack()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "From:", []byte(c.exp), field.Relaxed(), true)
+		test.Assert(t, "From:", []byte(c.exp), field.Relaxed())
 	}
 }
 
@@ -339,26 +339,26 @@ func TestUnpackContentType(t *testing.T) {
 
 		field, _, err := ParseField(c.in)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		err = field.unpack()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Content-Type", c.exp, field.ContentType.String(), true)
-		test.Assert(t, "field.unpacked", true, field.unpacked, true)
+		test.Assert(t, "Content-Type", c.exp, field.ContentType.String())
+		test.Assert(t, "field.unpacked", true, field.unpacked)
 
 		err = field.unpack()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "Content-Type", c.exp, field.ContentType.String(), true)
-		test.Assert(t, "field.unpacked", true, field.unpacked, true)
+		test.Assert(t, "Content-Type", c.exp, field.ContentType.String())
+		test.Assert(t, "field.unpacked", true, field.unpacked)
 	}
 }

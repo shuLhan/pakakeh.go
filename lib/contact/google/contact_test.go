@@ -96,13 +96,13 @@ func TestDecode(t *testing.T) {
 
 	gotContact := parseContact(t)
 
-	test.Assert(t, "Name", exp.Name, gotContact.Name, true)
-	test.Assert(t, "Birthday", exp.Birthday, gotContact.Birthday, true)
-	test.Assert(t, "Addresses", exp.Addresses, gotContact.Addresses, true)
-	test.Assert(t, "Anniversary", exp.Anniversary, gotContact.Anniversary, true)
-	test.Assert(t, "Emails", exp.Emails, gotContact.Emails, true)
-	test.Assert(t, "Phones", exp.Phones, gotContact.Phones, true)
-	test.Assert(t, "Links", exp.Links, gotContact.Links, true)
-	test.Assert(t, "Company", exp.Company, gotContact.Company, true)
-	test.Assert(t, "JobTitle", exp.JobTitle, gotContact.JobTitle, true)
+	test.Assert(t, "Name", exp.Name, gotContact.Name)
+	test.Assert(t, "Birthday", exp.Birthday, gotContact.Birthday)
+	test.Assert(t, "Addresses", exp.Addresses, gotContact.Addresses)
+	test.Assert(t, "Anniversary", exp.Anniversary, gotContact.Anniversary)
+	test.Assert(t, "Emails", exp.Emails, gotContact.Emails)
+	test.Assert(t, "Phones", exp.Phones, gotContact.Phones)
+	test.Assert(t, "Links", exp.Links, gotContact.Links)
+	test.Assert(t, "Company", exp.Company, gotContact.Company)
+	test.Assert(t, "JobTitle", exp.JobTitle, gotContact.JobTitle)
 }

@@ -298,12 +298,12 @@ func TestUnpack(t *testing.T) {
 		cmd.reset()
 		err := cmd.unpack([]byte(c.b))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			continue
 		}
 
-		test.Assert(t, "Command.Kind", c.expCmd.Kind, cmd.Kind, true)
-		test.Assert(t, "Command.Arg", c.expCmd.Arg, cmd.Arg, true)
-		test.Assert(t, "Command.Params", c.expCmd.Params, cmd.Params, true)
+		test.Assert(t, "Command.Kind", c.expCmd.Kind, cmd.Kind)
+		test.Assert(t, "Command.Arg", c.expCmd.Arg, cmd.Arg)
+		test.Assert(t, "Command.Params", c.expCmd.Params, cmd.Params)
 	}
 }

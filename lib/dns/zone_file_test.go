@@ -43,11 +43,11 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "origin", c.exp, m.origin, true)
+		test.Assert(t, "origin", c.exp, m.origin)
 	}
 }
 
@@ -81,7 +81,7 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 	}
@@ -120,11 +120,11 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "ttl", c.exp, m.ttl, true)
+		test.Assert(t, "ttl", c.exp, m.ttl)
 	}
 }
 
@@ -327,68 +327,37 @@ VAXA    A       10.2.0.27
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
 		test.Assert(t, "messages length:",
-			len(c.exp), len(m.zone.messages), true)
+			len(c.exp), len(m.zone.messages))
 
 		for x, msg := range m.zone.messages {
-			test.Assert(t, "Message.Header",
-				c.exp[x].Header, msg.Header, true)
-			test.Assert(t, "Message.Question",
-				c.exp[x].Question, msg.Question, true)
+			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
+			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name",
-					c.exp[x].Answer[y].Name,
-					answer.Name, true)
-				test.Assert(t, "Answer.Type",
-					c.exp[x].Answer[y].Type,
-					answer.Type, true)
-				test.Assert(t, "Answer.Class",
-					c.exp[x].Answer[y].Class,
-					answer.Class, true)
-				test.Assert(t, "Answer.TTL",
-					c.exp[x].Answer[y].TTL,
-					answer.TTL, true)
-				test.Assert(t, "Answer.Value",
-					c.exp[x].Answer[y].Value,
-					answer.Value, true)
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
 			}
 			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name",
-					c.exp[x].Authority[y].Name,
-					auth.Name, true)
-				test.Assert(t, "Authority.Type",
-					c.exp[x].Authority[y].Type,
-					auth.Type, true)
-				test.Assert(t, "Authority.Class",
-					c.exp[x].Authority[y].Class,
-					auth.Class, true)
-				test.Assert(t, "Authority.TTL",
-					c.exp[x].Authority[y].TTL,
-					auth.TTL, true)
-				test.Assert(t, "Authority.Value",
-					c.exp[x].Authority[y].Value, auth.Value, true)
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
 			}
 			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name",
-					c.exp[x].Additional[y].Name,
-					add.Name, true)
-				test.Assert(t, "Additional.Type",
-					c.exp[x].Additional[y].Type,
-					add.Type, true)
-				test.Assert(t, "Additional.Class",
-					c.exp[x].Additional[y].Class,
-					add.Class, true)
-				test.Assert(t, "Additional.TTL",
-					c.exp[x].Additional[y].TTL,
-					add.TTL, true)
-				test.Assert(t, "Additional.Value",
-					c.exp[x].Additional[y].Value,
-					add.Value, true)
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
 			}
 		}
 	}
@@ -616,69 +585,37 @@ relay IN CNAME relay.pair.com.
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
 		test.Assert(t, "messages length:", len(c.exp),
-			len(m.zone.messages), true)
+			len(m.zone.messages))
 
 		for x, msg := range m.zone.messages {
-			test.Assert(t, "Message.Header",
-				c.exp[x].Header, msg.Header, true)
-			test.Assert(t, "Message.Question",
-				c.exp[x].Question, msg.Question, true)
+			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
+			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name",
-					c.exp[x].Answer[y].Name, answer.Name,
-					true)
-				test.Assert(t, "Answer.Type",
-					c.exp[x].Answer[y].Type, answer.Type,
-					true)
-				test.Assert(t, "Answer.Class",
-					c.exp[x].Answer[y].Class,
-					answer.Class, true)
-				test.Assert(t, "Answer.TTL",
-					c.exp[x].Answer[y].TTL,
-					answer.TTL, true)
-				test.Assert(t, "Answer.Value",
-					c.exp[x].Answer[y].Value,
-					answer.Value, true)
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
 			}
 			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name",
-					c.exp[x].Authority[y].Name,
-					auth.Name, true)
-				test.Assert(t, "Authority.Type",
-					c.exp[x].Authority[y].Type,
-					auth.Type, true)
-				test.Assert(t, "Authority.Class",
-					c.exp[x].Authority[y].Class,
-					auth.Class, true)
-				test.Assert(t, "Authority.TTL",
-					c.exp[x].Authority[y].TTL,
-					auth.TTL, true)
-				test.Assert(t, "Authority.Value",
-					c.exp[x].Authority[y].Value,
-					auth.Value, true)
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
 			}
 			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name",
-					c.exp[x].Additional[y].Name,
-					add.Name, true)
-				test.Assert(t, "Additional.Type",
-					c.exp[x].Additional[y].Type,
-					add.Type, true)
-				test.Assert(t, "Additional.Class",
-					c.exp[x].Additional[y].Class,
-					add.Class, true)
-				test.Assert(t, "Additional.TTL",
-					c.exp[x].Additional[y].TTL,
-					add.TTL, true)
-				test.Assert(t, "Additional.Value",
-					c.exp[x].Additional[y].Value,
-					add.Value, true)
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
 			}
 		}
 	}
@@ -769,69 +706,37 @@ angularjs.doc       A  127.0.0.1
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error(), true)
+			test.Assert(t, "err", c.expErr, err.Error())
 			continue
 		}
 
 		test.Assert(t, "messages length:", len(c.exp),
-			len(m.zone.messages), true)
+			len(m.zone.messages))
 
 		for x, msg := range m.zone.messages {
-			test.Assert(t, "Message.Header", c.exp[x].Header,
-				msg.Header, true)
-			test.Assert(t, "Message.Question",
-				c.exp[x].Question, msg.Question, true)
+			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
+			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name",
-					c.exp[x].Answer[y].Name, answer.Name,
-					true)
-				test.Assert(t, "Answer.Type",
-					c.exp[x].Answer[y].Type, answer.Type,
-					true)
-				test.Assert(t, "Answer.Class",
-					c.exp[x].Answer[y].Class,
-					answer.Class, true)
-				test.Assert(t, "Answer.TTL",
-					c.exp[x].Answer[y].TTL, answer.TTL,
-					true)
-				test.Assert(t, "Answer.Value",
-					c.exp[x].Answer[y].Value,
-					answer.Value, true)
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
 			}
 			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name",
-					c.exp[x].Authority[y].Name,
-					auth.Name, true)
-				test.Assert(t, "Authority.Type",
-					c.exp[x].Authority[y].Type,
-					auth.Type, true)
-				test.Assert(t, "Authority.Class",
-					c.exp[x].Authority[y].Class,
-					auth.Class, true)
-				test.Assert(t, "Authority.TTL",
-					c.exp[x].Authority[y].TTL, auth.TTL,
-					true)
-				test.Assert(t, "Authority.Value",
-					c.exp[x].Authority[y].Value,
-					auth.Value, true)
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
 			}
 			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name",
-					c.exp[x].Additional[y].Name,
-					add.Name, true)
-				test.Assert(t, "Additional.Type",
-					c.exp[x].Additional[y].Type,
-					add.Type, true)
-				test.Assert(t, "Additional.Class",
-					c.exp[x].Additional[y].Class,
-					add.Class, true)
-				test.Assert(t, "Additional.TTL",
-					c.exp[x].Additional[y].TTL, add.TTL,
-					true)
-				test.Assert(t, "Additional.Value",
-					c.exp[x].Additional[y].Value,
-					add.Value, true)
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
 			}
 		}
 	}
@@ -872,69 +777,36 @@ func TestZoneParseTXT(t *testing.T) {
 
 		err := m.parse()
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, "messages length:", len(c.exp),
-			len(m.zone.messages), true)
+		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
 
 		for x, msg := range m.zone.messages {
-			test.Assert(t, "Message.Header", c.exp[x].Header,
-				msg.Header, true)
-			test.Assert(t, "Message.Question", c.exp[x].Question,
-				msg.Question, true)
+			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
+			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name",
-					c.exp[x].Answer[y].Name, answer.Name,
-					true)
-				test.Assert(t, "Answer.Type",
-					c.exp[x].Answer[y].Type, answer.Type,
-					true)
-				test.Assert(t, "Answer.Class",
-					c.exp[x].Answer[y].Class,
-					answer.Class, true)
-				test.Assert(t, "Answer.TTL",
-					c.exp[x].Answer[y].TTL, answer.TTL,
-					true)
-				test.Assert(t, "Answer.Value",
-					c.exp[x].Answer[y].Value,
-					answer.Value, true)
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
 			}
 			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name",
-					c.exp[x].Authority[y].Name, auth.Name,
-					true)
-				test.Assert(t, "Authority.Type",
-					c.exp[x].Authority[y].Type, auth.Type,
-					true)
-				test.Assert(t, "Authority.Class",
-					c.exp[x].Authority[y].Class,
-					auth.Class, true)
-				test.Assert(t, "Authority.TTL",
-					c.exp[x].Authority[y].TTL, auth.TTL,
-					true)
-				test.Assert(t, "Authority.Value",
-					c.exp[x].Authority[y].Value,
-					auth.Value, true)
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
 			}
 			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name",
-					c.exp[x].Additional[y].Name,
-					add.Name, true)
-				test.Assert(t, "Additional.Type",
-					c.exp[x].Additional[y].Type,
-					add.Type, true)
-				test.Assert(t, "Additional.Class",
-					c.exp[x].Additional[y].Class,
-					add.Class, true)
-				test.Assert(t, "Additional.TTL",
-					c.exp[x].Additional[y].TTL,
-					add.TTL, true)
-				test.Assert(t, "Additional.Value",
-					c.exp[x].Additional[y].Value,
-					add.Value, true)
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
 			}
 		}
 	}

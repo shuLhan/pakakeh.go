@@ -76,11 +76,11 @@ func TestServerOptionsInit(t *testing.T) {
 
 		err := c.so.init()
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, "ServerOptions", c.exp, c.so, true)
+		test.Assert(t, "ServerOptions", c.exp, c.so)
 	}
 }
 
@@ -147,8 +147,8 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 
 		so.parseNameServers()
 
-		test.Assert(t, "primaryUDP", c.expUDPServers, so.primaryUDP, true)
-		test.Assert(t, "primaryTCP", c.expTCPServers, so.primaryTCP, true)
-		test.Assert(t, "primaryDoh", c.expDoHServers, so.primaryDoh, true)
+		test.Assert(t, "primaryUDP", c.expUDPServers, so.primaryUDP)
+		test.Assert(t, "primaryTCP", c.expTCPServers, so.primaryTCP)
+		test.Assert(t, "primaryDoh", c.expDoHServers, so.primaryDoh)
 	}
 }

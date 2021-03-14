@@ -54,10 +54,10 @@ func TestHandshakeParseHTTPLine(t *testing.T) {
 
 		err := h.parseHTTPLine()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err, true)
+			test.Assert(t, "err", c.expErr, err)
 			continue
 		}
 
-		test.Assert(t, "URI", c.expURI, h.URL.String(), true)
+		test.Assert(t, "URI", c.expURI, h.URL.String())
 	}
 }

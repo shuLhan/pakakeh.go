@@ -24,7 +24,7 @@ func TestFloat64Round(t *testing.T) {
 	for x := range data {
 		for y, exp := range exps[x] {
 			got := Float64Round(data[x], y)
-			test.Assert(t, "", exp, got, true)
+			test.Assert(t, "", exp, got)
 		}
 	}
 }

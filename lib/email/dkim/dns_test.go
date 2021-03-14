@@ -45,8 +45,7 @@ func TestNewDNSClientPool(t *testing.T) {
 			if strings.Contains(err.Error(), c.expErrLookup) {
 				continue
 			}
-			test.Assert(t, "error lookup", c.expErrLookup,
-				err.Error(), true)
+			test.Assert(t, "error lookup", c.expErrLookup, err.Error())
 		}
 	}
 

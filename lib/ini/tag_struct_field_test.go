@@ -66,7 +66,7 @@ func TestUnpackStruct(t *testing.T) {
 		"slice:OfStruct",
 	}
 
-	test.Assert(t, "unpackStruct", exp, got.keys(), true)
+	test.Assert(t, "unpackStruct", exp, got.keys())
 }
 
 func TestUnpackStruct_embedded(t *testing.T) {
@@ -99,5 +99,5 @@ func TestUnpackStruct_embedded(t *testing.T) {
 		"b::z",
 		"c::xx",
 	}
-	test.Assert(t, "unpackStruct embedded", exp, got.keys(), true)
+	test.Assert(t, "unpackStruct embedded", exp, got.keys())
 }

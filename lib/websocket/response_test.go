@@ -15,8 +15,8 @@ func TestResponseReset(t *testing.T) {
 
 	res.reset()
 
-	test.Assert(t, "Response.ID", uint64(0), res.ID, true)
-	test.Assert(t, "Response.Code", int32(0), res.Code, true)
-	test.Assert(t, "Response.Message", "", res.Message, true)
-	test.Assert(t, "Response.Body", "", res.Body, true)
+	test.Assert(t, "Response.ID", uint64(0), res.ID)
+	test.Assert(t, "Response.Code", int32(0), res.Code)
+	test.Assert(t, "Response.Message", "", res.Message)
+	test.Assert(t, "Response.Body", "", res.Body)
 }

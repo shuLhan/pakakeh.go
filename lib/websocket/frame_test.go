@@ -44,10 +44,10 @@ func TestNewFrameBin(t *testing.T) {
 		frames := Unpack(packet)
 		frame := frames.v[0]
 
-		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin, true)
-		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode, true)
-		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked, true)
-		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
+		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
+		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked)
+		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload)
 	}
 }
 
@@ -87,12 +87,11 @@ func TestNewFrameClose(t *testing.T) {
 		frames := Unpack(packet)
 		frame := frames.v[0]
 
-		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin, true)
-		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode, true)
-		test.Assert(t, "Frame.closeCode", c.exp.closeCode,
-			frame.closeCode, true)
-		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked, true)
-		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
+		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
+		test.Assert(t, "Frame.closeCode", c.exp.closeCode, frame.closeCode)
+		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked)
+		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload)
 	}
 }
 
@@ -128,10 +127,10 @@ func TestNewFramePing(t *testing.T) {
 		frames := Unpack(packet)
 		frame := frames.v[0]
 
-		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin, true)
-		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode, true)
-		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked, true)
-		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
+		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
+		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked)
+		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload)
 	}
 }
 
@@ -167,10 +166,10 @@ func TestNewFramePong(t *testing.T) {
 		frames := Unpack(packet)
 		frame := frames.v[0]
 
-		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin, true)
-		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode, true)
-		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked, true)
-		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
+		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
+		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked)
+		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload)
 	}
 }
 
@@ -207,10 +206,10 @@ func TestNewFrameText(t *testing.T) {
 		frames := Unpack(packet)
 		frame := frames.v[0]
 
-		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin, true)
-		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode, true)
-		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked, true)
-		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload, true)
+		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
+		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
+		test.Assert(t, "Frame.masked", c.exp.masked, frame.masked)
+		test.Assert(t, "Frame.payload", c.exp.payload, frame.payload)
 	}
 }
 
@@ -345,6 +344,6 @@ func TestFramePack(t *testing.T) {
 
 		got := c.f.pack()
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

@@ -14,12 +14,12 @@ import (
 func TestKeyPoolClear(t *testing.T) {
 	DefaultKeyPool.Put("example.com", &Key{ExpiredAt: 1})
 	got := DefaultKeyPool.String()
-	test.Assert(t, "DefaultKeyPool.Clear", "[{example.com 1}]", got, true)
+	test.Assert(t, "DefaultKeyPool.Clear", "[{example.com 1}]", got)
 
 	DefaultKeyPool.Clear()
 
 	got = DefaultKeyPool.String()
-	test.Assert(t, "DefaultKeyPool.Clear", "[]", got, true)
+	test.Assert(t, "DefaultKeyPool.Clear", "[]", got)
 }
 
 func TestKeyPoolPut(t *testing.T) {
@@ -62,7 +62,7 @@ func TestKeyPoolPut(t *testing.T) {
 		DefaultKeyPool.Put(c.dname, c.key)
 		got := DefaultKeyPool.String()
 
-		test.Assert(t, "DefaultKeyPool", c.exp, got, true)
+		test.Assert(t, "DefaultKeyPool", c.exp, got)
 	}
 }
 
@@ -97,7 +97,7 @@ func TestKeyPoolGet(t *testing.T) {
 			if strings.Contains(serr, "timeout") {
 				continue
 			}
-			test.Assert(t, "error", c.expErr, serr, true)
+			test.Assert(t, "error", c.expErr, serr)
 			continue
 		}
 		if key == nil {
@@ -105,6 +105,6 @@ func TestKeyPoolGet(t *testing.T) {
 		}
 
 		got := key.Pack()
-		test.Assert(t, "DefaultKeyPool.Get", c.exp, got, true)
+		test.Assert(t, "DefaultKeyPool.Get", c.exp, got)
 	}
 }

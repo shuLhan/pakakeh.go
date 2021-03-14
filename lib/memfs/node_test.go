@@ -57,9 +57,9 @@ func TestNode_Read(t *testing.T) {
 
 		n, err := node.Read(c.p)
 
-		test.Assert(t, "p", c.exp, c.p, true)
-		test.Assert(t, "n", c.expN, n, true)
-		test.Assert(t, "error", c.expError, err, true)
+		test.Assert(t, "p", c.exp, c.p)
+		test.Assert(t, "n", c.expN, n)
+		test.Assert(t, "error", c.expError, err)
 	}
 }
 
@@ -92,7 +92,7 @@ func TestNode_Readdir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "Readdir(0)", expFileNames, gotFileNames(fis), true)
+	test.Assert(t, "Readdir(0)", expFileNames, gotFileNames(fis))
 
 	// Test reading two nodes at a time.
 
@@ -105,7 +105,7 @@ func TestNode_Readdir(t *testing.T) {
 		allFis = append(allFis, fis...)
 	}
 
-	test.Assert(t, "Readdir(2)", expFileNames, gotFileNames(allFis), true)
+	test.Assert(t, "Readdir(2)", expFileNames, gotFileNames(allFis))
 }
 
 func gotFileNames(fis []os.FileInfo) (names []string) {
@@ -159,7 +159,7 @@ func TestNode_Seek(t *testing.T) {
 
 		got, err := node.Seek(c.offset, c.whence)
 
-		test.Assert(t, "Seek", c.exp, got, true)
-		test.Assert(t, "Seek error", c.expError, err, true)
+		test.Assert(t, "Seek", c.exp, got)
+		test.Assert(t, "Seek error", c.expError, err)
 	}
 }

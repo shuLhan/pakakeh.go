@@ -31,5 +31,5 @@ func TestRecord(t *testing.T) {
 
 	exp := fmt.Sprint(expec)
 	got := fmt.Sprint(row)
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

@@ -121,11 +121,11 @@ func TestMacroExpandIPv4(t *testing.T) {
 
 		got, err := macroExpand(ref, c.mode, []byte(c.data))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "macroExpand", c.exp, string(got), true)
+		test.Assert(t, "macroExpand", c.exp, string(got))
 	}
 }
 
@@ -148,10 +148,10 @@ func TestMacroExpandIPv6(t *testing.T) {
 
 		got, err := macroExpand(ref, c.mode, []byte(c.data))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, string(got), true)
+			test.Assert(t, "error", c.expErr, string(got))
 			continue
 		}
 
-		test.Assert(t, "macroExpand", c.exp, string(got), true)
+		test.Assert(t, "macroExpand", c.exp, string(got))
 	}
 }

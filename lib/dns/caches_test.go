@@ -35,10 +35,8 @@ func TestNewCaches(t *testing.T) {
 
 		got := newCaches(c.pruneDelay, c.pruneThreshold)
 
-		test.Assert(t, "caches.pruneDelay", c.expDelay,
-			got.pruneDelay, true)
-		test.Assert(t, "caches.pruneThreshold", c.expThreshold,
-			got.pruneThreshold, true)
+		test.Assert(t, "caches.pruneDelay", c.expDelay, got.pruneDelay)
+		test.Assert(t, "caches.pruneThreshold", c.expThreshold, got.pruneThreshold)
 	}
 }
 
@@ -112,8 +110,8 @@ func TestCachesGet(t *testing.T) {
 		_, got := ca.get(c.QName, c.QType, c.QClass)
 		gotList := ca.list()
 
-		test.Assert(t, "caches.get", c.exp, got, true)
-		test.Assert(t, "caches.list", c.expList, gotList, true)
+		test.Assert(t, "caches.get", c.exp, got)
+		test.Assert(t, "caches.list", c.expList, gotList)
 	}
 }
 
@@ -182,7 +180,7 @@ func TestCachesPrune(t *testing.T) {
 
 		gotList := ca.list()
 
-		test.Assert(t, "caches.list", c.expList, gotList, true)
+		test.Assert(t, "caches.list", c.expList, gotList)
 	}
 }
 
@@ -274,10 +272,10 @@ func TestCachesUpsert(t *testing.T) {
 
 		gotList := ca.list()
 
-		test.Assert(t, "len(caches.list)", c.expLen, len(gotList), true)
+		test.Assert(t, "len(caches.list)", c.expLen, len(gotList))
 
 		for x := 0; x < len(gotList); x++ {
-			test.Assert(t, "caches.list", c.expList[x], gotList[x], true)
+			test.Assert(t, "caches.list", c.expList[x], gotList[x])
 		}
 	}
 }

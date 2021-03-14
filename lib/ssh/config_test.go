@@ -71,7 +71,7 @@ func TestConfig_Get(t *testing.T) {
 		if exp != nil {
 			exp.postConfig(homeDir)
 		}
-		test.Assert(t, "Get "+c.s, exp, got, true)
+		test.Assert(t, "Get "+c.s, exp, got)
 	}
 }
 
@@ -109,10 +109,10 @@ func TestParseKeyValue(t *testing.T) {
 	for _, c := range cases {
 		key, value, err := parseKeyValue(c.line)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
-		test.Assert(t, "key:", c.expKey, key, true)
-		test.Assert(t, "value:", c.expValue, value, true)
+		test.Assert(t, "key:", c.expKey, key)
+		test.Assert(t, "value:", c.expValue, value)
 	}
 }

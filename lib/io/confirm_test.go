@@ -67,7 +67,7 @@ func TestConfirmYesNo(t *testing.T) {
 
 		got := ConfirmYesNo(in, "confirm", c.defIsYes)
 
-		test.Assert(t, "answer", c.exp, got, true)
+		test.Assert(t, "answer", c.exp, got)
 
 		mock.ResetStdin(true)
 	}

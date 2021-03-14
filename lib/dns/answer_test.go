@@ -78,22 +78,22 @@ func TestNewAnswer(t *testing.T) {
 		got := newAnswer(c.msg, c.isLocal)
 
 		if got == nil {
-			test.Assert(t, "newAnswer", got, c.exp, true)
+			test.Assert(t, "newAnswer", got, c.exp)
 			continue
 		}
 
 		if c.isLocal {
-			test.Assert(t, "newAnswer.ReceivedAt", int64(0), got.ReceivedAt, true)
-			test.Assert(t, "newAnswer.AccessedAt", int64(0), got.AccessedAt, true)
+			test.Assert(t, "newAnswer.ReceivedAt", int64(0), got.ReceivedAt)
+			test.Assert(t, "newAnswer.AccessedAt", int64(0), got.AccessedAt)
 		} else {
-			test.Assert(t, "newAnswer.ReceivedAt", true, got.ReceivedAt >= at, true)
-			test.Assert(t, "newAnswer.AccessedAt", true, got.AccessedAt >= at, true)
+			test.Assert(t, "newAnswer.ReceivedAt", true, got.ReceivedAt >= at)
+			test.Assert(t, "newAnswer.AccessedAt", true, got.AccessedAt >= at)
 		}
 
-		test.Assert(t, "newAnswer.QName", c.expQName, got.QName, true)
-		test.Assert(t, "newAnswer.QType", c.expQType, got.QType, true)
-		test.Assert(t, "newAnswer.QClass", c.expQClass, got.QClass, true)
-		test.Assert(t, "newAnswer.msg", c.expMsg, got.msg, true)
+		test.Assert(t, "newAnswer.QName", c.expQName, got.QName)
+		test.Assert(t, "newAnswer.QType", c.expQType, got.QType)
+		test.Assert(t, "newAnswer.QClass", c.expQClass, got.QClass)
+		test.Assert(t, "newAnswer.msg", c.expMsg, got.msg)
 	}
 }
 
@@ -113,8 +113,8 @@ func TestAnswerClear(t *testing.T) {
 	var expMsg *Message
 	var expEl *list.Element
 
-	test.Assert(t, "answer.msg", expMsg, an.msg, true)
-	test.Assert(t, "answer.el", expEl, an.el, true)
+	test.Assert(t, "answer.msg", expMsg, an.msg)
+	test.Assert(t, "answer.el", expEl, an.el)
 }
 
 func TestAnswerGet(t *testing.T) {
@@ -174,14 +174,14 @@ func TestAnswerGet(t *testing.T) {
 		gotPacket := an.get()
 
 		if c.isLocal {
-			test.Assert(t, "ReceivedAt", int64(0), an.ReceivedAt, true)
-			test.Assert(t, "AccessedAt", int64(0), an.AccessedAt, true)
-			test.Assert(t, "packet", c.msg.packet, gotPacket, true)
+			test.Assert(t, "ReceivedAt", int64(0), an.ReceivedAt)
+			test.Assert(t, "AccessedAt", int64(0), an.AccessedAt)
+			test.Assert(t, "packet", c.msg.packet, gotPacket)
 			continue
 		}
 
-		test.Assert(t, "ReceivedAt", an.ReceivedAt >= at-5, true, true)
-		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true, true)
+		test.Assert(t, "ReceivedAt", an.ReceivedAt >= at-5, true)
+		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true)
 		got := &Message{
 			Header:   SectionHeader{},
 			Question: SectionQuestion{},
@@ -191,9 +191,9 @@ func TestAnswerGet(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		test.Assert(t, "Message.Header", c.msg.Header, got.Header, true)
-		test.Assert(t, "Message.Question", c.msg.Question, got.Question, true)
-		test.Assert(t, "Answer.TTL", c.msg.Answer[0].TTL, got.Answer[0].TTL, true)
+		test.Assert(t, "Message.Header", c.msg.Header, got.Header)
+		test.Assert(t, "Message.Question", c.msg.Question, got.Question)
+		test.Assert(t, "Answer.TTL", c.msg.Answer[0].TTL, got.Answer[0].TTL)
 	}
 }
 
@@ -264,10 +264,10 @@ func TestAnswerUpdate(t *testing.T) {
 
 		c.an.update(c.nu)
 
-		test.Assert(t, "ReceivedAt", c.expReceivedAt, c.an.ReceivedAt, true)
-		test.Assert(t, "AccessedAt", c.expAccessedAt, c.an.AccessedAt, true)
+		test.Assert(t, "ReceivedAt", c.expReceivedAt, c.an.ReceivedAt)
+		test.Assert(t, "AccessedAt", c.expAccessedAt, c.an.AccessedAt)
 		if c.nu != nil {
-			test.Assert(t, "c.nu.msg", c.expMsg, c.nu.msg, true)
+			test.Assert(t, "c.nu.msg", c.expMsg, c.nu.msg)
 		}
 	}
 }

@@ -55,13 +55,13 @@ func TestGeneratePathNode(t *testing.T) {
 
 		got, err := memFS.Get(c.path)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
 		childs := got.Childs
 		got.Childs = nil
-		test.Assert(t, "Node", c.exp, got, true)
+		test.Assert(t, "Node", c.exp, got)
 		got.Childs = childs
 	}
 }
@@ -129,6 +129,6 @@ func TestNode_Readdir(t *testing.T) {
 
 		sort.Strings(got)
 
-		test.Assert(t, "Node.Readdir", c.exp, got, true)
+		test.Assert(t, "Node.Readdir", c.exp, got)
 	}
 }

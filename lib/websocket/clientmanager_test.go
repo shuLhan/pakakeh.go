@@ -58,8 +58,8 @@ func TestClientManagerAdd(t *testing.T) {
 		gotConns := fmt.Sprintf("%v", clients.conns)
 		gotCtxLen := len(clients.ctx)
 
-		test.Assert(t, "ClientManager.conns", c.expConns, gotConns, true)
-		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen, true)
+		test.Assert(t, "ClientManager.conns", c.expConns, gotConns)
+		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen)
 	}
 }
 
@@ -103,7 +103,7 @@ func TestClientManagerRemove(t *testing.T) {
 		gotConns := fmt.Sprintf("%v", clients.conns)
 		gotCtxLen := len(clients.ctx)
 
-		test.Assert(t, "conns", c.expConns, gotConns, true)
-		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen, true)
+		test.Assert(t, "conns", c.expConns, gotConns)
+		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen)
 	}
 }

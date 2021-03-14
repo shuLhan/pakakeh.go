@@ -168,10 +168,10 @@ func TestParsePath(t *testing.T) {
 
 		got, err := ParsePath([]byte(c.path))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "mailbox", c.exp, string(got), true)
+		test.Assert(t, "mailbox", c.exp, string(got))
 	}
 }

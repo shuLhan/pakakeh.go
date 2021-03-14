@@ -56,7 +56,7 @@ func TestProtocol_generateWithTimestamp_sha1(t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		test.Assert(t, "generateWithTimestamp", c.exp, got, false)
+		test.Assert(t, "generateWithTimestamp", c.exp, got)
 	}
 }
 
@@ -102,7 +102,7 @@ func TestProtocol_generateWithTimestamp_sha256(t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		test.Assert(t, "generateWithTimestamp", c.exp, got, false)
+		test.Assert(t, "generateWithTimestamp", c.exp, got)
 	}
 }
 
@@ -150,7 +150,7 @@ func TestProtocol_generateWithTimestamp_sha512(t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		test.Assert(t, "generateWithTimestamp sha512", c.exp, got, false)
+		test.Assert(t, "generateWithTimestamp sha512", c.exp, got)
 	}
 }
 
@@ -193,6 +193,6 @@ func TestProtocol_verifyWithTimestamp(t *testing.T) {
 
 	for _, c := range cases {
 		got := p.verifyWithTimestamp(mac, c.token, c.steps, c.ts)
-		test.Assert(t, c.desc, c.exp, got, false)
+		test.Assert(t, c.desc, c.exp, got)
 	}
 }

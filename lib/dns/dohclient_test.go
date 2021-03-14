@@ -151,7 +151,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Packet", c.exp.packet, got.packet, true)
+		test.Assert(t, "Packet", c.exp.packet, got.packet)
 	}
 }
 
@@ -308,7 +308,7 @@ func TestDoHClient_Post(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Packet", c.exp.packet, got.packet, true)
+		test.Assert(t, "Packet", c.exp.packet, got.packet)
 	}
 }
 
@@ -357,7 +357,7 @@ func TestDoHClient_Get(t *testing.T) {
 
 		got, err := cl.Get(msg)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
@@ -366,6 +366,6 @@ func TestDoHClient_Get(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Packet", c.exp.packet, got.packet, true)
+		test.Assert(t, "Packet", c.exp.packet, got.packet)
 	}
 }

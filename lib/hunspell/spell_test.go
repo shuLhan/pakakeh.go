@@ -46,6 +46,6 @@ func TestSpell_parseMap(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Map", c.exp, spell.opts.charsMaps, true)
+		test.Assert(t, "Map", c.exp, spell.opts.charsMaps)
 	}
 }

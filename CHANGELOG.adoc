@@ -3,6 +3,20 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.25.0 (2021-04-xx)
+
+===  Breaking changes
+
+*  all: refactoring the test.Assert and test.AssertBench signature
+
+   Previously, the test.Assert and test.AssertBench functions has the
+   boolean parameter to print the stack trace of test in case its not equal.
+
+   Since this parameter is not mandatory and its usually always set to
+   "true", we remove them from function signature to simplify the call
+   to Assert and AssertBench.
+
+
 ==  share v0.24.0 (2021-03-06)
 
 ===  Breaking changes

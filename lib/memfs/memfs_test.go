@@ -70,7 +70,7 @@ func TestAddFile(t *testing.T) {
 
 		got, err := mfs.AddFile(c.intPath, c.extPath)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
@@ -81,7 +81,7 @@ func TestAddFile(t *testing.T) {
 			got.Childs = nil
 		}
 
-		test.Assert(t, "AddFile", c.exp, got, true)
+		test.Assert(t, "AddFile", c.exp, got)
 
 		if c.exp == nil {
 			continue
@@ -99,7 +99,7 @@ func TestAddFile(t *testing.T) {
 			got.Childs = nil
 		}
 
-		test.Assert(t, "Get", c.exp, got, true)
+		test.Assert(t, "Get", c.exp, got)
 	}
 }
 
@@ -178,16 +178,16 @@ func TestGet(t *testing.T) {
 
 		got, err := mfs.Get(c.path)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err, true)
+			test.Assert(t, "error", c.expErr, err)
 			continue
 		}
 
 		if got.size <= opts.MaxFileSize {
-			test.Assert(t, "node.V", c.expV, got.V, true)
+			test.Assert(t, "node.V", c.expV, got.V)
 		}
 
 		test.Assert(t, "node.ContentType", c.expContentType,
-			got.ContentType, true)
+			got.ContentType)
 	}
 }
 
@@ -282,12 +282,12 @@ func TestMemFS_mount(t *testing.T) {
 
 		mfs, err := New(&c.opts)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		gotListNames := mfs.ListNames()
-		test.Assert(t, "names", c.expMapKeys, gotListNames, true)
+		test.Assert(t, "names", c.expMapKeys, gotListNames)
 	}
 }
 
@@ -420,7 +420,7 @@ func TestFilter(t *testing.T) {
 
 			got := mfs.isIncluded(sysPath, fi.Mode())
 
-			test.Assert(t, sysPath, c.exp[x], got, true)
+			test.Assert(t, sysPath, c.exp[x], got)
 		}
 	}
 }

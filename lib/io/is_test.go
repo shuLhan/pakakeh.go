@@ -40,7 +40,7 @@ func TestIsDirEmpty(t *testing.T) {
 
 		got := IsDirEmpty(c.path)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }
 
@@ -76,6 +76,6 @@ func TestIsFileExist(t *testing.T) {
 
 		got := IsFileExist(c.parent, c.relpath)
 
-		test.Assert(t, "", c.exp, got, true)
+		test.Assert(t, "", c.exp, got)
 	}
 }

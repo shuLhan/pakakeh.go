@@ -60,13 +60,13 @@ func TestOutQueue(t *testing.T) {
 
 		err = mg.OutQueue(c.email)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		ls := lsDir(mg.dirOut)
 
-		test.Assert(t, "n List", c.expNList, len(ls), true)
+		test.Assert(t, "n List", c.expNList, len(ls))
 	}
 }
 
@@ -78,7 +78,7 @@ func TestDeleteOutQueue(t *testing.T) {
 
 	listOut := lsDir(mg.dirOut)
 
-	test.Assert(t, "n List", 1, len(listOut), true)
+	test.Assert(t, "n List", 1, len(listOut))
 
 	cases := []struct {
 		desc     string
@@ -100,13 +100,13 @@ func TestDeleteOutQueue(t *testing.T) {
 
 		err := mg.DeleteOutQueue(c.fname)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		ls := lsDir(mg.dirOut)
 
-		test.Assert(t, "n List", c.expNList, len(ls), true)
+		test.Assert(t, "n List", c.expNList, len(ls))
 	}
 }
 
@@ -140,14 +140,14 @@ func TestIncoming(t *testing.T) {
 
 		err := mg.Incoming(c.email)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		lsTmp := lsDir(mg.dirTmp)
 		lsNew := lsDir(mg.dirNew)
 
-		test.Assert(t, "n list tmp", c.expNTmp, len(lsTmp), true)
-		test.Assert(t, "n list new", c.expNNew, len(lsNew), true)
+		test.Assert(t, "n list tmp", c.expNTmp, len(lsTmp))
+		test.Assert(t, "n list new", c.expNNew, len(lsNew))
 	}
 }

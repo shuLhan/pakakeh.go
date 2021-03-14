@@ -30,13 +30,13 @@ func TestNewTag(t *testing.T) {
 
 		got, err := newTag([]byte(c.key))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if got == nil {
 			continue
 		}
 
-		test.Assert(t, "tag", c.exp, got, true)
+		test.Assert(t, "tag", c.exp, got)
 	}
 }

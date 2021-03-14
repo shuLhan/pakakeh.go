@@ -51,7 +51,7 @@ func TestHeaderBoundary(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Boundary", c.exp, header.Boundary(), true)
+		test.Assert(t, "Boundary", c.exp, header.Boundary())
 	}
 }
 
@@ -115,17 +115,17 @@ func TestParseHeader(t *testing.T) {
 
 		header, rest, err := ParseHeader(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if header == nil {
 			continue
 		}
 
-		test.Assert(t, "Header.Relaxed", []byte(c.exp), header.Relaxed(), true)
-		test.Assert(t, "rest", c.expRest, rest, true)
+		test.Assert(t, "Header.Relaxed", []byte(c.exp), header.Relaxed())
+		test.Assert(t, "rest", c.expRest, rest)
 
-		test.Assert(t, "Header.Relaxed", []byte(c.expRelaxed), header.Relaxed(), true)
-		test.Assert(t, "Header.Simple", []byte(c.expSimple), header.Simple(), true)
+		test.Assert(t, "Header.Relaxed", []byte(c.expRelaxed), header.Relaxed())
+		test.Assert(t, "Header.Simple", []byte(c.expSimple), header.Simple())
 	}
 }

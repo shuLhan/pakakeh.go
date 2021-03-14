@@ -34,7 +34,7 @@ func TestPae(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "pae", c.exp, got, true)
+		test.Assert(t, "pae", c.exp, got)
 	}
 }
 
@@ -115,7 +115,7 @@ func TestEncrypt(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, c.exp, got, true)
+		test.Assert(t, c.desc, c.exp, got)
 	}
 }
 
@@ -180,8 +180,8 @@ func TestDecrypt(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, c.exp, got, true)
-		test.Assert(t, c.desc, c.expFooter, gotFooter, true)
+		test.Assert(t, c.desc, c.exp, got)
+		test.Assert(t, c.desc, c.expFooter, gotFooter)
 	}
 }
 
@@ -227,7 +227,7 @@ func TestSign(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, c.exp, got, true)
+		test.Assert(t, c.desc, c.exp, got)
 	}
 }
 
@@ -282,6 +282,6 @@ func TestVerify(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, c.exp, string(got), true)
+		test.Assert(t, c.desc, c.exp, string(got))
 	}
 }

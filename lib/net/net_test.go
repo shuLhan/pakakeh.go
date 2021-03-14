@@ -66,7 +66,7 @@ func TestIsTypeUDP(t *testing.T) {
 
 		got := IsTypeUDP(netType)
 
-		test.Assert(t, "IsTypeUDP", c.exp, got, true)
+		test.Assert(t, "IsTypeUDP", c.exp, got)
 	}
 }
 
@@ -125,7 +125,7 @@ func TestIsTypeTCP(t *testing.T) {
 
 		got := IsTypeTCP(netType)
 
-		test.Assert(t, "IsTypeTCP", c.exp, got, true)
+		test.Assert(t, "IsTypeTCP", c.exp, got)
 	}
 }
 
@@ -187,7 +187,7 @@ func TestIsTypeTransport(t *testing.T) {
 
 		got := IsTypeTransport(netType)
 
-		test.Assert(t, "IsTypeTransport", c.exp, got, true)
+		test.Assert(t, "IsTypeTransport", c.exp, got)
 	}
 }
 
@@ -205,6 +205,6 @@ func TestToDotIPv6(t *testing.T) {
 
 	for _, c := range cases {
 		got := ToDotIPv6(c.ip)
-		test.Assert(t, "ToDotIPv6", c.exp, got, true)
+		test.Assert(t, "ToDotIPv6", c.exp, got)
 	}
 }

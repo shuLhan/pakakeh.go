@@ -74,6 +74,6 @@ func TestRequest(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Pack", c.exp, string(got), true)
+		test.Assert(t, "Pack", c.exp, string(got))
 	}
 }

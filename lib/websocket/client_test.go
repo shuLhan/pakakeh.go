@@ -53,7 +53,7 @@ func TestConnect(t *testing.T) {
 
 		err := client.Connect()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
@@ -102,12 +102,12 @@ func TestClient_parseURI(t *testing.T) {
 
 		err := cl.parseURI()
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, "remote address", c.expRemoteAddress, cl.remoteAddr, true)
-		test.Assert(t, "TLS config", c.expTLSConfig, cl.TLSConfig, true)
+		test.Assert(t, "remote address", c.expRemoteAddress, cl.remoteAddr)
+		test.Assert(t, "TLS config", c.expTLSConfig, cl.TLSConfig)
 	}
 }
 
@@ -183,7 +183,7 @@ func TestClientPing(t *testing.T) {
 
 		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
-			test.Assert(t, "close", exp, got, true)
+			test.Assert(t, "close", exp, got)
 
 			if len(got.payload) >= 2 {
 				got.payload = got.payload[2:]
@@ -197,7 +197,7 @@ func TestClientPing(t *testing.T) {
 
 		testClient.handlePong = func(cl *Client, got *Frame) (err error) {
 			exp := c.exp
-			test.Assert(t, "handlePong", exp, got, true)
+			test.Assert(t, "handlePong", exp, got)
 			wg.Done()
 			return nil
 		}
@@ -318,7 +318,7 @@ func TestClientText(t *testing.T) {
 
 		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
-			test.Assert(t, "close", exp, got, true)
+			test.Assert(t, "close", exp, got)
 			cl.sendClose(got.closeCode, got.payload)
 			cl.Quit()
 			wg.Done()
@@ -327,7 +327,7 @@ func TestClientText(t *testing.T) {
 
 		testClient.HandleText = func(cl *Client, got *Frame) error {
 			exp := c.exp
-			test.Assert(t, "text", exp, got, true)
+			test.Assert(t, "text", exp, got)
 			wg.Done()
 			return nil
 		}
@@ -449,7 +449,7 @@ func TestClientFragmentation(t *testing.T) {
 
 		testClient.handleClose = func(cl *Client, got *Frame) error {
 			exp := c.expClose
-			test.Assert(t, "close", exp, got, true)
+			test.Assert(t, "close", exp, got)
 			cl.sendClose(got.closeCode, got.payload)
 			cl.Quit()
 			wg.Done()
@@ -458,7 +458,7 @@ func TestClientFragmentation(t *testing.T) {
 
 		testClient.HandleText = func(cl *Client, got *Frame) error {
 			exp := c.exp
-			test.Assert(t, "text", exp, got, true)
+			test.Assert(t, "text", exp, got)
 			wg.Done()
 			return nil
 		}
@@ -524,7 +524,7 @@ func TestClientFragmentation2(t *testing.T) {
 			payload:    []byte("PING"),
 			isComplete: true,
 		}
-		test.Assert(t, "handlePong", exp, got, true)
+		test.Assert(t, "handlePong", exp, got)
 		wg.Done()
 		return nil
 	}
@@ -537,7 +537,7 @@ func TestClientFragmentation2(t *testing.T) {
 			payload:    []byte("Hello, Shulhan"),
 			isComplete: true,
 		}
-		test.Assert(t, "handlePong", exp, got, true)
+		test.Assert(t, "handlePong", exp, got)
 		wg.Done()
 		return nil
 	}
@@ -602,7 +602,7 @@ func TestClientSendBin(t *testing.T) {
 
 		testClient.HandleBin = func(cl *Client, got *Frame) error {
 			exp := c.exp
-			test.Assert(t, "HandleBin", exp, got, true)
+			test.Assert(t, "HandleBin", exp, got)
 			wg.Done()
 			return nil
 		}
@@ -664,7 +664,7 @@ func TestClientSendPing(t *testing.T) {
 
 		testClient.handlePong = func(cl *Client, got *Frame) error {
 			exp := c.exp
-			test.Assert(t, "handlePong", exp, got, true)
+			test.Assert(t, "handlePong", exp, got)
 			wg.Done()
 			return nil
 		}
@@ -705,7 +705,7 @@ func TestClient_sendClose(t *testing.T) {
 			payload:    []byte{0x03, 0xE8, 'n', 'o', 'r', 'm', 'a', 'l'},
 			isComplete: true,
 		}
-		test.Assert(t, "handleClose", exp, got, true)
+		test.Assert(t, "handleClose", exp, got)
 		cl.Quit()
 		wg.Done()
 		return nil
@@ -721,5 +721,5 @@ func TestClient_sendClose(t *testing.T) {
 
 	err = testClient.SendPing(nil)
 
-	test.Assert(t, "error", ErrConnClosed, err, true)
+	test.Assert(t, "error", ErrConnClosed, err)
 }

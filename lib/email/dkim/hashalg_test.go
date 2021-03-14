@@ -32,6 +32,6 @@ func TestUnpackHashAlg(t *testing.T) {
 		algs := unpackHashAlgs([]byte(c.in))
 		got := packHashAlgs(algs)
 
-		test.Assert(t, "unpackHashAlgs", c.exp, string(got), true)
+		test.Assert(t, "unpackHashAlgs", c.exp, string(got))
 	}
 }

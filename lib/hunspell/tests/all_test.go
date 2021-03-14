@@ -60,14 +60,11 @@ func TestHunspell(t *testing.T) {
 		for _, morph := range expMorphs {
 			gotAnalyze := spell.Analyze(morph.word)
 
-			test.Assert(t, "Analyze("+morph.word+")",
-				morph.analyze.String(), gotAnalyze.String(),
-				true)
+			test.Assert(t, "Analyze("+morph.word+")", morph.analyze.String(), gotAnalyze.String())
 
 			gotStem := spell.Stem(morph.word)
 
-			test.Assert(t, "Stem("+morph.word+")",
-				morph.stem, gotStem.Word, true)
+			test.Assert(t, "Stem("+morph.word+")", morph.stem, gotStem.Word)
 		}
 	}
 }

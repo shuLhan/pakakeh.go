@@ -54,9 +54,9 @@ func TestComputeEuclidianDistance(t *testing.T) {
 		got += fmt.Sprint(*row)
 	}
 
-	test.Assert(t, "", exp[1], got, true)
+	test.Assert(t, "", exp[1], got)
 
 	distances := kneighbors.Distances()
 	got = fmt.Sprint(*distances)
-	test.Assert(t, "", expDistances, got, true)
+	test.Assert(t, "", expDistances, got)
 }

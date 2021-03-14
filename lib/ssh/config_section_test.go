@@ -31,7 +31,7 @@ func TestConfigSection_postConfig(t *testing.T) {
 	for _, c := range cases {
 		got := c.section(*testDefaultSection)
 		got.postConfig(testParser.homeDir)
-		test.Assert(t, "postConfig", c.exp(*testDefaultSection), got, true)
+		test.Assert(t, "postConfig", c.exp(*testDefaultSection), got)
 	}
 }
 
@@ -54,7 +54,7 @@ func TestConfigSection_setEnv(t *testing.T) {
 	for _, c := range cases {
 		cfg.setEnv(c.value)
 
-		test.Assert(t, "setEnv: "+c.value, c.exp, cfg.Environments, true)
+		test.Assert(t, "setEnv: "+c.value, c.exp, cfg.Environments)
 	}
 }
 
@@ -88,7 +88,6 @@ func TestConfigSection_setSendEnv(t *testing.T) {
 	for _, c := range cases {
 		cfg.setSendEnv(envs, c.pattern)
 
-		test.Assert(t, "setSendEnv: "+c.pattern,
-			c.exp, cfg.Environments, true)
+		test.Assert(t, "setSendEnv: "+c.pattern, c.exp, cfg.Environments)
 	}
 }

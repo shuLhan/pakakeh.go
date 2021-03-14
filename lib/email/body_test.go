@@ -90,15 +90,15 @@ func TestParseBody(t *testing.T) {
 
 		body, rest, err := ParseBody([]byte(c.in), []byte(c.boundary))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if body == nil {
 			continue
 		}
 
-		test.Assert(t, "rest", c.expRest, string(rest), true)
-		test.Assert(t, "body", c.exp, body.String(), true)
+		test.Assert(t, "rest", c.expRest, string(rest))
+		test.Assert(t, "body", c.exp, body.String())
 	}
 }
 
@@ -145,7 +145,7 @@ func TestBodyRelaxed(t *testing.T) {
 		body.raw = []byte(c.in)
 		got := body.Relaxed()
 
-		test.Assert(t, "Relaxed", c.exp, string(got), true)
+		test.Assert(t, "Relaxed", c.exp, string(got))
 	}
 }
 
@@ -184,6 +184,6 @@ func TestBodySimple(t *testing.T) {
 		body.raw = []byte(c.in)
 		got := body.Simple()
 
-		test.Assert(t, "Simple", []byte(c.exp), got, true)
+		test.Assert(t, "Simple", []byte(c.exp), got)
 	}
 }

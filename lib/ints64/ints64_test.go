@@ -35,61 +35,61 @@ var (
 func TestMaxEmpty(t *testing.T) {
 	gotv, goti, gotok := Max(d[0])
 
-	test.Assert(t, "", int64(0), gotv, true)
-	test.Assert(t, "", 0, goti, true)
-	test.Assert(t, "", false, gotok, true)
+	test.Assert(t, "", int64(0), gotv)
+	test.Assert(t, "", 0, goti)
+	test.Assert(t, "", false, gotok)
 }
 
 func TestMax(t *testing.T) {
 	gotv, goti, gotok := Max(d[1])
 
-	test.Assert(t, "", int64(9), gotv, true)
-	test.Assert(t, "", 4, goti, true)
-	test.Assert(t, "", true, gotok, true)
+	test.Assert(t, "", int64(9), gotv)
+	test.Assert(t, "", 4, goti)
+	test.Assert(t, "", true, gotok)
 }
 
 func TestMinEmpty(t *testing.T) {
 	gotv, goti, gotok := Min(d[0])
 
-	test.Assert(t, "", int64(0), gotv, true)
-	test.Assert(t, "", 0, goti, true)
-	test.Assert(t, "", false, gotok, true)
+	test.Assert(t, "", int64(0), gotv)
+	test.Assert(t, "", 0, goti)
+	test.Assert(t, "", false, gotok)
 }
 
 func TestMin(t *testing.T) {
 	gotv, goti, gotok := Min(d[1])
 
-	test.Assert(t, "", int64(0), gotv, true)
-	test.Assert(t, "", 5, goti, true)
-	test.Assert(t, "", true, gotok, true)
+	test.Assert(t, "", int64(0), gotv)
+	test.Assert(t, "", 5, goti)
+	test.Assert(t, "", true, gotok)
 }
 
 func TestSum(t *testing.T) {
 	got := Sum(d[1])
 
-	test.Assert(t, "", int64(45), got, true)
+	test.Assert(t, "", int64(45), got)
 }
 
 func TestCount(t *testing.T) {
 	got := Count(d[0], 0)
 
-	test.Assert(t, "", 0, got, true)
+	test.Assert(t, "", 0, got)
 
 	got = Count(d[1], 1)
 
-	test.Assert(t, "", 1, got, true)
+	test.Assert(t, "", 1, got)
 
 	got = Count(d[2], 1)
 
-	test.Assert(t, "", 4, got, true)
+	test.Assert(t, "", 4, got)
 
 	got = Count(d[3], 0)
 
-	test.Assert(t, "", 0, got, true)
+	test.Assert(t, "", 0, got)
 
 	got = Count(d[3], 3)
 
-	test.Assert(t, "", 1, got, true)
+	test.Assert(t, "", 1, got)
 }
 
 func TestCountsEmpty(t *testing.T) {
@@ -98,7 +98,7 @@ func TestCountsEmpty(t *testing.T) {
 
 	got := Counts(d[0], classes)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestCountsEmptyClasses(t *testing.T) {
@@ -107,7 +107,7 @@ func TestCountsEmptyClasses(t *testing.T) {
 
 	got := Counts(d[1], classes)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestCounts(t *testing.T) {
@@ -116,7 +116,7 @@ func TestCounts(t *testing.T) {
 
 	got := Counts(d[3], classes)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func Test64MaxCountOf(t *testing.T) {
@@ -124,13 +124,13 @@ func Test64MaxCountOf(t *testing.T) {
 	exp := int64(0)
 	got, _ := MaxCountOf(d[2], classes)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Swap the class values.
 	classes = []int64{1, 0}
 	got, _ = MaxCountOf(d[2], classes)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestSwapEmpty(t *testing.T) {
@@ -138,7 +138,7 @@ func TestSwapEmpty(t *testing.T) {
 
 	Swap(d[0], 1, 6)
 
-	test.Assert(t, "", exp, d[0], true)
+	test.Assert(t, "", exp, d[0])
 }
 
 func TestSwapEqual(t *testing.T) {
@@ -150,7 +150,7 @@ func TestSwapEqual(t *testing.T) {
 
 	Swap(in, 1, 1)
 
-	test.Assert(t, "", exp, in, true)
+	test.Assert(t, "", exp, in)
 }
 
 func TestSwapOutOfRange(t *testing.T) {
@@ -162,7 +162,7 @@ func TestSwapOutOfRange(t *testing.T) {
 
 	Swap(in, 1, 100)
 
-	test.Assert(t, "", exp, in, true)
+	test.Assert(t, "", exp, in)
 }
 
 func TestSwap(t *testing.T) {
@@ -178,7 +178,7 @@ func TestSwap(t *testing.T) {
 	exp[0] = exp[len(exp)-1]
 	exp[len(exp)-1] = tmp
 
-	test.Assert(t, "", exp, in, true)
+	test.Assert(t, "", exp, in)
 }
 
 func TestIsExist(t *testing.T) {
@@ -189,16 +189,16 @@ func TestIsExist(t *testing.T) {
 		for _, v := range d {
 			s = IsExist(d, v)
 
-			test.Assert(t, "", true, s, true)
+			test.Assert(t, "", true, s)
 		}
 	}
 
 	// False positive.
 	for _, d := range d {
 		s = IsExist(d, -1)
-		test.Assert(t, "", false, s, true)
+		test.Assert(t, "", false, s)
 		s = IsExist(d, 10)
-		test.Assert(t, "", false, s, true)
+		test.Assert(t, "", false, s)
 	}
 }
 
@@ -215,7 +215,7 @@ func TestInsertionSortWithIndices(t *testing.T) {
 
 		InsertionSortWithIndices(data, ids, 0, len(ids), true)
 
-		test.Assert(t, "", dSorted[x], data, true)
+		test.Assert(t, "", dSorted[x], data)
 	}
 }
 
@@ -232,7 +232,7 @@ func TestInsertionSortWithIndicesDesc(t *testing.T) {
 
 		InsertionSortWithIndices(data, ids, 0, len(ids), false)
 
-		test.Assert(t, "", dSortedDesc[x], data, true)
+		test.Assert(t, "", dSortedDesc[x], data)
 	}
 }
 
@@ -251,7 +251,7 @@ func TestSortByIndex(t *testing.T) {
 
 		SortByIndex(&data, ids[x])
 
-		test.Assert(t, "", dSorted[x], data, true)
+		test.Assert(t, "", dSorted[x], data)
 	}
 }
 
@@ -324,7 +324,7 @@ func TestIndirectSort(t *testing.T) {
 		res = fmt.Sprint(ints64InSorts[i])
 		exp = fmt.Sprint(ints64ExpSorts[i])
 
-		test.Assert(t, "", exp, res, true)
+		test.Assert(t, "", exp, res)
 	}
 }
 
@@ -337,7 +337,7 @@ func TestIndirectSortDesc(t *testing.T) {
 		res = fmt.Sprint(ints64InSorts[i])
 		exp = fmt.Sprint(ints64ExpSortsDesc[i])
 
-		test.Assert(t, "", exp, res, true)
+		test.Assert(t, "", exp, res)
 	}
 }
 
@@ -345,14 +345,14 @@ func TestIndirectSort_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 	got := IndirectSort(ints64InSorts[5], true)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestIndirectSortDesc_Stability(t *testing.T) {
 	exp := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 	got := IndirectSort(ints64InSorts[5], false)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestInplaceMergesort(t *testing.T) {
@@ -361,7 +361,7 @@ func TestInplaceMergesort(t *testing.T) {
 
 	InplaceMergesort(ints64InSorts[6], idx, 0, size, true)
 
-	test.Assert(t, "", ints64ExpSorts[6], ints64InSorts[6], true)
+	test.Assert(t, "", ints64ExpSorts[6], ints64InSorts[6])
 }
 
 func TestIndirectSort_SortByIndex(t *testing.T) {
@@ -373,12 +373,12 @@ func TestIndirectSort_SortByIndex(t *testing.T) {
 
 	sortedIds := IndirectSort(in1, true)
 
-	test.Assert(t, "", expIds, sortedIds, true)
+	test.Assert(t, "", expIds, sortedIds)
 
 	// Reverse the sort.
 	SortByIndex(&in2, sortedIds)
 
 	got := fmt.Sprint(in2)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

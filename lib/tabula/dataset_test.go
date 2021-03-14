@@ -117,13 +117,13 @@ func TestSplitRowsByNumeric(t *testing.T) {
 	rows := splitL.GetDataAsRows()
 	got := fmt.Sprint(rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	expIdx = []int{5, 6, 7, 8, 9}
 	exp = DatasetStringJoinByIndex(t, datasetRows, expIdx)
 	got = fmt.Sprint(splitR.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Split by float
 	splitL, splitR, e = SplitRowsByNumeric(dataset, 1, 1.8)
@@ -135,13 +135,13 @@ func TestSplitRowsByNumeric(t *testing.T) {
 	exp = DatasetStringJoinByIndex(t, datasetRows, expIdx)
 	got = fmt.Sprint(splitL.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	expIdx = []int{8, 9}
 	exp = DatasetStringJoinByIndex(t, datasetRows, expIdx)
 	got = fmt.Sprint(splitR.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestSplitRowsByCategorical(t *testing.T) {
@@ -158,13 +158,13 @@ func TestSplitRowsByCategorical(t *testing.T) {
 	exp := DatasetStringJoinByIndex(t, datasetRows, expIdx)
 	got := fmt.Sprint(splitL.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	expIdx = []int{1, 3, 4, 6, 8, 9}
 	exp = DatasetStringJoinByIndex(t, datasetRows, expIdx)
 	got = fmt.Sprint(splitR.GetDataAsRows())
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestModeColumnsPushColumn(t *testing.T) {
@@ -185,12 +185,12 @@ func TestModeColumnsPushColumn(t *testing.T) {
 		got += fmt.Sprint(dataset.Columns[x].Records)
 	}
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Check rows
 	exp = ""
 	got = fmt.Sprint(dataset.Rows)
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestModeRowsPushColumn(t *testing.T) {
@@ -202,13 +202,13 @@ func TestModeRowsPushColumn(t *testing.T) {
 	exp := DatasetRowsJoin(t)
 	got := fmt.Sprint(dataset.Rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Check columns
 	exp = "[{int 1 0 [] []} {real 2 0 [] []} {string 0 0 [] []}]"
 	got = fmt.Sprint(dataset.Columns)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestModeMatrixPushColumn(t *testing.T) {
@@ -229,13 +229,13 @@ func TestModeMatrixPushColumn(t *testing.T) {
 		got += fmt.Sprint(dataset.Columns[x].Records)
 	}
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Check rows
 	exp = DatasetRowsJoin(t)
 	got = fmt.Sprint(dataset.Rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestModeRowsPushRows(t *testing.T) {
@@ -249,7 +249,7 @@ func TestModeRowsPushRows(t *testing.T) {
 	exp := DatasetRowsJoin(t)
 	got := fmt.Sprint(dataset.Rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestModeColumnsPushRows(t *testing.T) {
@@ -264,7 +264,7 @@ func TestModeColumnsPushRows(t *testing.T) {
 	exp := ""
 	got := fmt.Sprint(dataset.Rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// check columns
 	exp = DatasetColumnsJoin(t)
@@ -273,7 +273,7 @@ func TestModeColumnsPushRows(t *testing.T) {
 		got += fmt.Sprint(dataset.Columns[x].Records)
 	}
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestModeMatrixPushRows(t *testing.T) {
@@ -287,7 +287,7 @@ func TestModeMatrixPushRows(t *testing.T) {
 	exp := DatasetRowsJoin(t)
 	got := fmt.Sprint(dataset.Rows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// check columns
 	exp = DatasetColumnsJoin(t)
@@ -296,7 +296,7 @@ func TestModeMatrixPushRows(t *testing.T) {
 		got += fmt.Sprint(dataset.Columns[x].Records)
 	}
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestSelectRowsWhere(t *testing.T) {
@@ -312,7 +312,7 @@ func TestSelectRowsWhere(t *testing.T) {
 	exp := dataset.GetRow(9)
 	got := selected.GetRow(0)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
 
 func TestDeleteRow(t *testing.T) {
@@ -330,13 +330,13 @@ func TestDeleteRow(t *testing.T) {
 	dataset.DeleteRow(delIdx)
 	got := dataset.Len()
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 
 	// Check columns len.
 	for _, col := range dataset.Columns {
 		got = col.Len()
 
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 	}
 
 	// Check rows data.
@@ -349,7 +349,7 @@ func TestDeleteRow(t *testing.T) {
 		got := fmt.Sprint(dataset.GetRow(ridx))
 		ridx++
 
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 	}
 
 	// Check columns data.
@@ -362,6 +362,6 @@ func TestDeleteRow(t *testing.T) {
 
 		exp := fmt.Sprint(coldel)
 		got := fmt.Sprint(dataset.Columns[x].Records)
-		test.Assert(t, "", exp, got, true)
+		test.Assert(t, "", exp, got)
 	}
 }

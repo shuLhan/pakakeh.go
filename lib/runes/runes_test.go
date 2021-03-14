@@ -36,7 +36,7 @@ func TestDiff(t *testing.T) {
 	for _, c := range cases {
 		got := Diff(c.l, c.r)
 
-		test.Assert(t, "", string(c.exp), string(got), true)
+		test.Assert(t, "", string(c.exp), string(got))
 	}
 }
 
@@ -73,6 +73,6 @@ func TestEncloseRemove(t *testing.T) {
 	for _, c := range cases {
 		got, _ := EncloseRemove(c.line, c.leftcap, c.rightcap)
 
-		test.Assert(t, "", c.exp, string(got), true)
+		test.Assert(t, "", c.exp, string(got))
 	}
 }

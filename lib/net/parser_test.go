@@ -70,8 +70,8 @@ func TestParseIPPort(t *testing.T) {
 
 		hostname, ip, port := ParseIPPort(c.address, 1)
 
-		test.Assert(t, "hostname", c.expHostname, hostname, true)
-		test.Assert(t, "ip", c.expIP, ip, true)
-		test.Assert(t, "port", c.expPort, port, true)
+		test.Assert(t, "hostname", c.expHostname, hostname)
+		test.Assert(t, "ip", c.expIP, ip)
+		test.Assert(t, "port", c.expPort, port)
 	}
 }

@@ -22,7 +22,7 @@ func TestKeyLookupKey(t *testing.T) {
 		expErr: "dkim: LookupKey: empty domain name",
 	}, {
 		domainName: "ug7nbtf4gccmlpwj322ax3p6ow6yfsug._domainkey.amazonses.com",
-		exp:        "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKkjP6XucgQ06cVZ89Ue/sQDu4v1/AJVd6mMK4bS2YmXk5PzWw4KWtWNUZlg77hegAChx1pG85lUbJ+x4awp28VXqRi3/jZoC6W+3ELysDvVohZPMRMadc+KVtyTiTH4BL38/8ZV9zkj4ZIaaYyiLAiYX+c3+lZQEF3rKDptRcpwIDAQAB",
+		exp:        "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCT2DfRYLx3jUqqznIMCy08Zq2OahJC9i//ps0eF9AW3lPogTOI1cs5OntMVKJJ/THdkEZ2E0rLoYAcP2FaRs9ytw4VT6zgx+nYUAoh3O5wn1yVp9Z9VnUpglsiNerYxahiyR5C/0HJu4PfT8GZuJ6cOEToyBxOVrXcAfJ6Igu1jwIDAQAB",
 	}, {
 		domainName: "20150623._domainkey.wikimedia-or-id.20150623.gappssmtp.com",
 		exp:        "v=DKIM1; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2UMfREvlgajdSp3jv1tJ9nLpi/mRYnGyKC3inEQ9a7zqUjLq/yXukgpXs9AEHlvBvioxlgAVCPQQsuc1xp9+KXQGgJ8jTsn5OtKm8u+YBCt6OfvpeCpvt0l9JXMMHBNYV4c0XiPE5RHX2ltI0Av20CfEy+vMecpFtVDg4rMngjLws/ro6qT63S20A4zyVs/V19WW5F2Lulgv+l+EJzz9XummIJHOlU5n5ChcWU3Rw5RVGTtNjTZnFUaNXly3fW0ahKcG5Qc3e0Rhztp57JJQTl3OmHiMR5cHsCnrl1VnBi3kaOoQBYsSuBm+KRhMIw/X9wkLY67VLdkrwlX3xxsp6wIDAQAB; k=rsa",
@@ -37,14 +37,14 @@ func TestKeyLookupKey(t *testing.T) {
 			if strings.Contains(serr, "timeout") {
 				continue
 			}
-			test.Assert(t, "error", c.expErr, serr, true)
+			test.Assert(t, "error", c.expErr, serr)
 			continue
 		}
 		if got == nil {
 			continue
 		}
 
-		test.Assert(t, "Key", c.exp, got.Pack(), true)
+		test.Assert(t, "Key", c.exp, got.Pack())
 	}
 }
 
@@ -83,14 +83,14 @@ func TestKeyParseTXT(t *testing.T) {
 
 		got, err := ParseTXT([]byte(c.txt), c.ttl)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if got == nil {
 			continue
 		}
 
-		test.Assert(t, "ParseTXT", c.exp, got.Pack(), true)
+		test.Assert(t, "ParseTXT", c.exp, got.Pack())
 	}
 }
 
@@ -107,9 +107,6 @@ func TestKeyLookupDNSTXT(t *testing.T) {
 	}, {
 		dname:  "www.amazon.com",
 		expErr: "dkim: LookupKey: no TXT record on 'www.amazon.com'",
-	}, {
-		dname:  "www.google.com",
-		expErr: "dkim: LookupKey: empty answer on 'www.google.com'",
 	}}
 
 	for _, c := range cases {
@@ -121,14 +118,14 @@ func TestKeyLookupDNSTXT(t *testing.T) {
 			if strings.Contains(serr, "timeout") {
 				continue
 			}
-			test.Assert(t, "error", c.expErr, serr, true)
+			test.Assert(t, "error", c.expErr, serr)
 			continue
 		}
 		if got == nil {
 			continue
 		}
 
-		test.Assert(t, "ParseTXT", c.exp, got.Pack(), true)
+		test.Assert(t, "ParseTXT", c.exp, got.Pack())
 	}
 }
 
@@ -157,7 +154,7 @@ func TestKeyPack(t *testing.T) {
 	for _, c := range cases {
 		got := c.key.Pack()
 
-		test.Assert(t, "Key.Pack", c.exp, got, true)
+		test.Assert(t, "Key.Pack", c.exp, got)
 	}
 }
 
@@ -214,12 +211,12 @@ func TestKeySet(t *testing.T) {
 		key := &Key{}
 		err := key.set(c.in)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		got := key.Pack()
 
-		test.Assert(t, "Key.set", c.exp, got, true)
+		test.Assert(t, "Key.set", c.exp, got)
 	}
 }

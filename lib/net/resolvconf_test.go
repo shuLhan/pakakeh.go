@@ -42,10 +42,10 @@ func TestNewResolvConf(t *testing.T) {
 
 		rc, err := NewResolvConf(c.path)
 		if err != nil {
-			test.Assert(t, "expError", c.expErr, err.Error(), true)
+			test.Assert(t, "expError", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "exp", c.exp, rc, true)
+		test.Assert(t, "exp", c.exp, rc)
 	}
 }
 
@@ -192,6 +192,6 @@ options ndots:33
 			}
 		}
 
-		test.Assert(t, "ResolvConf", c.exp, rc, true)
+		test.Assert(t, "ResolvConf", c.exp, rc)
 	}
 }

@@ -106,11 +106,11 @@ func TestNewRoute(t *testing.T) {
 
 		got, err := newRoute(c.ep)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
-		test.Assert(t, "newRoute", c.exp, got, true)
+		test.Assert(t, "newRoute", c.exp, got)
 	}
 }
 
@@ -242,8 +242,8 @@ func TestRoute_parse(t *testing.T) {
 		for _, tp := range c.paths {
 			gotVals, gotOK := rute.parse(tp.path)
 
-			test.Assert(t, "vals", tp.expVals, gotVals, true)
-			test.Assert(t, "ok", tp.expOK, gotOK, true)
+			test.Assert(t, "vals", tp.expVals, gotVals)
+			test.Assert(t, "ok", tp.expOK, gotOK)
 		}
 	}
 }

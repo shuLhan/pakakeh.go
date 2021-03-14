@@ -32,7 +32,7 @@ func TestAddRat(t *testing.T) {
 
 	for _, c := range cases {
 		got := AddRat(c.ins...)
-		test.Assert(t, "AddRat", c.exp, got, true)
+		test.Assert(t, "AddRat", c.exp, got)
 	}
 }
 
@@ -58,7 +58,7 @@ func TestMulRat(t *testing.T) {
 
 	for _, c := range cases {
 		got := MulRat(c.ins...)
-		test.Assert(t, "MulRat", c.exp, got, true)
+		test.Assert(t, "MulRat", c.exp, got)
 	}
 }
 
@@ -103,10 +103,10 @@ func TestQuoRat(t *testing.T) {
 	for _, c := range cases {
 		got := QuoRat(c.ins...)
 		if got == nil {
-			test.Assert(t, "QuoRat", c.exp, "", true)
+			test.Assert(t, "QuoRat", c.exp, "")
 			continue
 		}
-		test.Assert(t, "QuoRat", c.exp, got.String(), true)
+		test.Assert(t, "QuoRat", c.exp, got.String())
 	}
 }
 
@@ -132,7 +132,7 @@ func TestSubRat(t *testing.T) {
 
 	for _, c := range cases {
 		got := SubRat(c.ins...)
-		test.Assert(t, "SubRat", c.exp, got, true)
+		test.Assert(t, "SubRat", c.exp, got)
 	}
 }
 
@@ -171,7 +171,7 @@ func TestNewRat(t *testing.T) {
 	for _, c := range cases {
 		got := NewRat(c.v)
 		test.Assert(t, fmt.Sprintf("NewRat: %T(%v)", c.v, c.v),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -191,7 +191,7 @@ func TestRat_Abs(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		test.Assert(t, "Abs()", c.exp, c.r.Abs().String(), true)
+		test.Assert(t, "Abs()", c.exp, c.r.Abs().String())
 	}
 }
 
@@ -215,7 +215,7 @@ func TestRat_Add(t *testing.T) {
 
 		c.got.Add(c.in)
 
-		test.Assert(t, "Add", c.exp, c.got, true)
+		test.Assert(t, "Add", c.exp, c.got)
 	}
 }
 
@@ -248,7 +248,7 @@ func TestRat_Int64(t *testing.T) {
 
 	for _, c := range cases {
 		got := c.r.Int64()
-		test.Assert(t, fmt.Sprintf("Int64 of %s", c.r), c.exp, got, true)
+		test.Assert(t, fmt.Sprintf("Int64 of %s", c.r), c.exp, got)
 	}
 }
 
@@ -284,7 +284,7 @@ func TestRat_IsEqual(t *testing.T) {
 
 	for _, c := range cases {
 		got := f.IsEqual(c.g)
-		test.Assert(t, "IsEqual", c.exp, got, true)
+		test.Assert(t, "IsEqual", c.exp, got)
 	}
 }
 
@@ -306,7 +306,7 @@ func TestRat_IsEqual_unexported(t *testing.T) {
 	}}
 
 	for x, c := range cases {
-		test.Assert(t, fmt.Sprintf("unexported field %d", x), exp, c.got, false)
+		test.Assert(t, fmt.Sprintf("unexported field %d", x), exp, c.got)
 	}
 }
 
@@ -327,7 +327,7 @@ func TestRat_IsGreater(t *testing.T) {
 	for _, c := range cases {
 		got := r.IsGreater(c.in)
 		test.Assert(t, fmt.Sprintf("IsGreater %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -351,7 +351,7 @@ func TestRat_IsGreaterOrEqual(t *testing.T) {
 	for _, c := range cases {
 		got := r.IsGreaterOrEqual(c.in)
 		test.Assert(t, fmt.Sprintf("IsGreaterOrEqual %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -373,7 +373,7 @@ func TestRat_IsGreaterThanZero(t *testing.T) {
 	for _, c := range cases {
 		got := NewRat(c.in).IsGreaterThanZero()
 		test.Assert(t, fmt.Sprintf("IsGreaterThanZero %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -396,7 +396,7 @@ func TestRat_IsLess(t *testing.T) {
 	for _, c := range cases {
 		got := r.IsLess(c.in)
 		test.Assert(t, fmt.Sprintf("IsLess %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -420,7 +420,7 @@ func TestRat_IsLessOrEqual(t *testing.T) {
 	for _, c := range cases {
 		got := r.IsLessOrEqual(c.in)
 		test.Assert(t, fmt.Sprintf("IsLessOrEqual %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -441,7 +441,7 @@ func TestRat_IsLessThanZero(t *testing.T) {
 	for _, c := range cases {
 		got := NewRat(c.in).IsLessThanZero()
 		test.Assert(t, fmt.Sprintf("IsLessThanZero %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -463,7 +463,7 @@ func TestRat_IsZero(t *testing.T) {
 	for _, c := range cases {
 		got := NewRat(c.in).IsZero()
 		test.Assert(t, fmt.Sprintf("IsZero %s", c.in),
-			c.exp, got, true)
+			c.exp, got)
 	}
 }
 
@@ -518,7 +518,7 @@ func TestRat_MarshalJSON(t *testing.T) {
 			t.Fatal(err)
 		}
 		test.Assert(t, fmt.Sprintf("MarshalJSON(%s)", c.in),
-			c.exp, string(got), true)
+			c.exp, string(got))
 	}
 }
 
@@ -554,7 +554,7 @@ func TestRat_Mul(t *testing.T) {
 
 		c.got.Mul(c.in)
 
-		test.Assert(t, "Mul", c.exp, c.got, true)
+		test.Assert(t, "Mul", c.exp, c.got)
 	}
 }
 
@@ -580,7 +580,7 @@ func TestRat_Quo(t *testing.T) {
 		r := NewRat(defValue)
 		got := r.Quo(c.g)
 
-		test.Assert(t, "Quo", c.exp, got, true)
+		test.Assert(t, "Quo", c.exp, got)
 	}
 }
 
@@ -617,7 +617,7 @@ func TestRat_RoundToZero(t *testing.T) {
 
 	for _, c := range cases {
 		got := c.r.RoundToZero(c.prec).String()
-		test.Assert(t, "RoundToZero", c.exp, got, true)
+		test.Assert(t, "RoundToZero", c.exp, got)
 	}
 }
 
@@ -644,11 +644,11 @@ func TestRat_Scan(t *testing.T) {
 		r := NewRat(0)
 		err := r.Scan(c.in)
 		if err != nil {
-			test.Assert(t, "Scan error", c.expError, err.Error(), true)
+			test.Assert(t, "Scan error", c.expError, err.Error())
 			continue
 		}
 		test.Assert(t, fmt.Sprintf("Scan(%T(%v))", c.in, c.in),
-			c.exp, r, true)
+			c.exp, r)
 	}
 }
 
@@ -696,7 +696,7 @@ func TestRat_String_fromString(t *testing.T) {
 
 	for _, c := range cases {
 		got := MustRat(c.in)
-		test.Assert(t, c.in, c.exp, got.String(), true)
+		test.Assert(t, c.in, c.exp, got.String())
 	}
 }
 
@@ -738,7 +738,7 @@ func TestRat_String_fromFloat64(t *testing.T) {
 
 	for _, c := range cases {
 		got := NewRat(c.in)
-		test.Assert(t, c.exp, c.exp, got.String(), true)
+		test.Assert(t, c.exp, c.exp, got.String())
 	}
 }
 
@@ -762,7 +762,7 @@ func TestRat_Sub(t *testing.T) {
 
 		c.got.Sub(c.in)
 
-		test.Assert(t, "Sub", c.exp, c.got, true)
+		test.Assert(t, "Sub", c.exp, c.got)
 	}
 }
 
@@ -806,6 +806,6 @@ func TestRat_UnmarshalJSON(t *testing.T) {
 			t.Fatalf("expecting error like %q, got %q", c.expError, err.Error())
 		}
 
-		test.Assert(t, "", c.exp, got.V, true)
+		test.Assert(t, "", c.exp, got.V)
 	}
 }

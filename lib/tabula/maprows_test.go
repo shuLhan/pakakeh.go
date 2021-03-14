@@ -26,7 +26,7 @@ func TestAddRow(t *testing.T) {
 
 	got := fmt.Sprint(mapRows)
 
-	test.Assert(t, "", groupByExpect, got, true)
+	test.Assert(t, "", groupByExpect, got)
 }
 
 func TestGetMinority(t *testing.T) {
@@ -50,5 +50,5 @@ func TestGetMinority(t *testing.T) {
 	exp := rowsExpect[3]
 	got := fmt.Sprint(minRows)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

@@ -129,7 +129,7 @@ func TestRegisterDelete(t *testing.T) {
 
 		err := testServer.RegisterEndpoint(c.ep)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error(), true)
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
@@ -157,17 +157,17 @@ func TestRegisterDelete(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+
 		if c.expStatusCode != http.StatusOK {
 			continue
 		}
 
-		test.Assert(t, "Body", c.expBody, string(body), true)
+		test.Assert(t, "Body", c.expBody, string(body))
 
 		gotContentType := res.Header.Get(HeaderContentType)
 
-		test.Assert(t, "Content-Type", c.expContentType, gotContentType, true)
+		test.Assert(t, "Content-Type", c.expContentType, gotContentType)
 	}
 }
 
@@ -235,8 +235,7 @@ func TestRegisterEvaluator(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
 	}
 }
 
@@ -304,8 +303,8 @@ func TestRegisterGet(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode, true)
-		test.Assert(t, "Body", c.expBody, string(body), true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Body", c.expBody, string(body))
 	}
 }
 
@@ -371,13 +370,10 @@ func TestRegisterHead(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
-		test.Assert(t, "Body", c.expBody, string(body), true)
-		test.Assert(t, "Header.ContentType", c.expContentType,
-			res.Header[HeaderContentType], true)
-		test.Assert(t, "Header.ContentLength", c.expContentLength,
-			res.Header[HeaderContentLength], true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Body", c.expBody, string(body))
+		test.Assert(t, "Header.ContentType", c.expContentType, res.Header[HeaderContentType])
+		test.Assert(t, "Header.ContentLength", c.expContentLength, res.Header[HeaderContentLength])
 	}
 }
 
@@ -438,9 +434,8 @@ func TestRegisterPatch(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
-		test.Assert(t, "Body", c.expBody, string(body), true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Body", c.expBody, string(body))
 	}
 }
 
@@ -511,9 +506,8 @@ k=vv`,
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
-		test.Assert(t, "Body", c.expBody, string(body), true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Body", c.expBody, string(body))
 	}
 }
 
@@ -571,9 +565,8 @@ func TestRegisterPut(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
-		test.Assert(t, "Body", c.expBody, string(body), true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Body", c.expBody, string(body))
 	}
 }
 
@@ -637,9 +630,8 @@ func TestServeHTTPOptions(t *testing.T) {
 
 		gotAllow := res.Header.Get("Allow")
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
-		test.Assert(t, "Allow", c.expAllow, gotAllow, true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Allow", c.expAllow, gotAllow)
 	}
 }
 
@@ -791,8 +783,7 @@ func TestStatusError(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode,
-			true)
-		test.Assert(t, "Body", c.expBody, string(body), true)
+		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
+		test.Assert(t, "Body", c.expBody, string(body))
 	}
 }

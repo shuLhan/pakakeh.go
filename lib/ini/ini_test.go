@@ -56,7 +56,7 @@ func TestOpen(t *testing.T) {
 
 		_, err := Open(c.inFile)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 	}
@@ -90,13 +90,13 @@ func TestSave(t *testing.T) {
 
 		cfg, err := Open(c.inFile)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		err = cfg.Save(c.outFile)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 		}
 	}
 }
@@ -132,7 +132,7 @@ func TestAddSection(t *testing.T) {
 
 		in.addSection(c.sec)
 
-		test.Assert(t, "ini", c.expIni, in, true)
+		test.Assert(t, "ini", c.expIni, in)
 	}
 }
 
@@ -193,11 +193,11 @@ func TestGet(t *testing.T) {
 
 		got, ok = inputIni.Get(c.sec, c.sub, c.key, "")
 		if !ok {
-			test.Assert(t, "ok", c.expOk, ok, true)
+			test.Assert(t, "ok", c.expOk, ok)
 			continue
 		}
 
-		test.Assert(t, "value", c.expVal, got, true)
+		test.Assert(t, "value", c.expVal, got)
 	}
 }
 
@@ -234,7 +234,7 @@ func TestGetDefault(t *testing.T) {
 
 		got, _ := cfg.Get(c.sec, c.sub, c.key, c.def)
 
-		test.Assert(t, "string", c.exp, got, true)
+		test.Assert(t, "string", c.exp, got)
 	}
 }
 
@@ -449,11 +449,11 @@ func TestGetInputIni(t *testing.T) {
 			got, ok = inputIni.Get(c.sec, c.sub, k, "")
 			if !ok {
 				t.Logf("Get: %s > %s > %s", c.sec, c.sub, k)
-				test.Assert(t, "ok", true, ok, true)
+				test.Assert(t, "ok", true, ok)
 				t.FailNow()
 			}
 
-			test.Assert(t, "value", c.expVals[x], got, true)
+			test.Assert(t, "value", c.expVals[x], got)
 		}
 	}
 }
@@ -500,11 +500,11 @@ func TestGetSectionDup(t *testing.T) {
 
 			got, ok := cfg.Get(c.sec, c.sub, k, "")
 			if !ok {
-				test.Assert(t, "ok", c.expOK[x], ok, true)
+				test.Assert(t, "ok", c.expOK[x], ok)
 				continue
 			}
 
-			test.Assert(t, k, c.expVals[x], got, true)
+			test.Assert(t, k, c.expVals[x], got)
 		}
 	}
 }
@@ -559,11 +559,11 @@ func TestGetVarMultiEmpty(t *testing.T) {
 
 			got, ok := cfg.Get(c.sec, c.sub, k, "")
 			if !ok {
-				test.Assert(t, "ok", c.expOK[x], ok, true)
+				test.Assert(t, "ok", c.expOK[x], ok)
 				continue
 			}
 
-			test.Assert(t, k, c.expVals[x], got, true)
+			test.Assert(t, k, c.expVals[x], got)
 		}
 	}
 }
@@ -615,11 +615,11 @@ func TestGetVarMultiSection(t *testing.T) {
 
 			got, ok := cfg.Get(c.sec, c.sub, k, "")
 			if !ok {
-				test.Assert(t, "ok", c.expOK[x], ok, true)
+				test.Assert(t, "ok", c.expOK[x], ok)
 				continue
 			}
 
-			test.Assert(t, k, c.expVals[x], got, true)
+			test.Assert(t, k, c.expVals[x], got)
 		}
 	}
 }
@@ -651,7 +651,7 @@ xx = 4
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "TestMarshal_embedded", exp, string(got), true)
+	test.Assert(t, "TestMarshal_embedded", exp, string(got))
 }
 
 func TestUnmarshal_embedded(t *testing.T) {
@@ -680,5 +680,5 @@ xx = 4
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "TestUnmarshal_embedded", exp, got, true)
+	test.Assert(t, "TestUnmarshal_embedded", exp, got)
 }

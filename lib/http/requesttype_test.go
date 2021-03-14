@@ -23,6 +23,6 @@ func TestRequestType_String(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		test.Assert(t, "RequestMethod.String", c.exp, c.rt.String(), true)
+		test.Assert(t, "RequestMethod.String", c.exp, c.rt.String())
 	}
 }

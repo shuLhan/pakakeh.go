@@ -93,14 +93,14 @@ func TestParseBodyPart(t *testing.T) {
 
 		got, rest, err := ParseBodyPart([]byte(c.in), []byte(c.boundary))
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error(), true)
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 		if got == nil {
 			continue
 		}
 
-		test.Assert(t, "Rest", c.expRest, string(rest), true)
-		test.Assert(t, "MIME", c.exp, got.String(), true)
+		test.Assert(t, "Rest", c.expRest, string(rest))
+		test.Assert(t, "MIME", c.exp, got.String())
 	}
 }

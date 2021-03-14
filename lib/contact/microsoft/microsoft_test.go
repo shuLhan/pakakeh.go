@@ -76,9 +76,9 @@ func TestImportFromJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "Len", 1, len(contacts), true)
+	test.Assert(t, "Len", 1, len(contacts))
 
 	got := contacts[0]
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }

@@ -23,9 +23,9 @@ func TestClone(t *testing.T) {
 	rowClone := row.Clone()
 	rowClone2 := row.Clone()
 
-	test.Assert(t, "", &row, rowClone, true)
+	test.Assert(t, "", &row, rowClone)
 
 	// changing the clone value should not change the original copy.
 	(*rowClone2)[0].SetFloat(0)
-	test.Assert(t, "", &row, rowClone, true)
+	test.Assert(t, "", &row, rowClone)
 }

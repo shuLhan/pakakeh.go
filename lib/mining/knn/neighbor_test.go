@@ -65,15 +65,15 @@ func TestContain(t *testing.T) {
 
 	isin, idx := neighbors.Contain(randSample)
 
-	test.Assert(t, "", true, isin, true)
-	test.Assert(t, "", pickIdx, idx, true)
+	test.Assert(t, "", true, isin)
+	test.Assert(t, "", pickIdx, idx)
 
 	// change one of record value to check for false.
 	(*randSample)[0].SetFloat(0)
 
 	isin, _ = neighbors.Contain(randSample)
 
-	test.Assert(t, "", false, isin, true)
+	test.Assert(t, "", false, isin)
 }
 
 func TestSort(t *testing.T) {
@@ -82,5 +82,5 @@ func TestSort(t *testing.T) {
 
 	sort.Sort(&neighbors)
 
-	test.Assert(t, "", exp.Rows(), neighbors.Rows(), true)
+	test.Assert(t, "", exp.Rows(), neighbors.Rows())
 }

@@ -25,5 +25,5 @@ func TestSortByIndex(t *testing.T) {
 	got := fmt.Sprint(sorted)
 	exp := fmt.Sprint(&expect)
 
-	test.Assert(t, "", exp, got, true)
+	test.Assert(t, "", exp, got)
 }
