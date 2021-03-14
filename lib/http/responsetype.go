@@ -9,10 +9,31 @@ type ResponseType int
 
 // List of valid response type.
 const (
-	ResponseTypeNone   ResponseType = 0
-	ResponseTypeBinary ResponseType = 1 << iota
+	ResponseTypeNone ResponseType = iota
+	ResponseTypeBinary
 	ResponseTypeHTML
 	ResponseTypeJSON
 	ResponseTypePlain
 	ResponseTypeXML
 )
+
+//
+// String return the string representation of ResponseType as in
+// "Content-Type" header.
+// For ResponseTypeNone it will return an empty string "".
+//
+func (restype ResponseType) String() string {
+	switch restype {
+	case ResponseTypeBinary:
+		return ContentTypeBinary
+	case ResponseTypeHTML:
+		return ContentTypeHTML
+	case ResponseTypeJSON:
+		return ContentTypeJSON
+	case ResponseTypePlain:
+		return ContentTypePlain
+	case ResponseTypeXML:
+		return ContentTypeXML
+	}
+	return ""
+}
