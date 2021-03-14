@@ -36,6 +36,11 @@ This library is released every month, usually at the first week of month.
 
      (path, headers, params)
 
+*  http: remove parameter contentType on Client method Put
+
+   Since one can set the Content-Type in parameter headers, this parameter is
+   become redundant.
+
 
 ==  share v0.24.0 (2021-03-06)
 

@@ -192,11 +192,11 @@ func (client *Client) PostJSON(path string, headers http.Header, params interfac
 // Put send the HTTP PUT request with specific content type and body to
 // specific path at the server.
 //
-func (client *Client) Put(path, contentType string, headers http.Header, body []byte) (
+func (client *Client) Put(path string, headers http.Header, body []byte) (
 	*http.Response, []byte, error,
 ) {
 	bodyReader := bytes.NewReader(body)
-	return client.doRequest(http.MethodPut, headers, path, contentType, bodyReader)
+	return client.doRequest(http.MethodPut, headers, path, "", bodyReader)
 }
 
 //
