@@ -16,6 +16,26 @@ This library is released every month, usually at the first week of month.
    "true", we remove them from function signature to simplify the call
    to Assert and AssertBench.
 
+*  all: refactoring http.Client methods signature
+
+   Previously, parameters to method Delete, Get, Post, PostForm, PostFormData,
+   PostJSON, Put, and PutJSON are in the following order:
+
+     (headers, path, params)
+
+   This is sometimes confusing. To make it better and works with format
+   of HTTP request header,
+
+     METHOD PATH
+     HEADERS
+
+     PARAMS
+
+   we move the path to the first parameter and headers as the second
+   parameter, so the call to client methods would be
+
+     (path, headers, params)
+
 
 ==  share v0.24.0 (2021-03-06)
 

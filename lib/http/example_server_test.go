@@ -58,7 +58,7 @@ func ExampleServer_customHTTPStatusCode() {
 
 	client := NewClient("http://127.0.0.1:8123", nil, false)
 
-	httpRes, resBody, err := client.PostJSON(nil, epCustom.Path, nil)
+	httpRes, resBody, err := client.PostJSON(epCustom.Path, nil, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

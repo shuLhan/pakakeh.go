@@ -99,7 +99,7 @@ func NewClient(serverURL string, headers http.Header, insecure bool) (client *Cl
 // parameters.
 // On success, it will return the uncompressed response body.
 //
-func (client *Client) Delete(headers http.Header, path string, params url.Values) (
+func (client *Client) Delete(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
@@ -114,7 +114,7 @@ func (client *Client) Delete(headers http.Header, path string, params url.Values
 // parameters.
 // On success, it will return the uncompressed response body.
 //
-func (client *Client) Get(headers http.Header, path string, params url.Values) (
+func (client *Client) Get(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
@@ -128,7 +128,7 @@ func (client *Client) Get(headers http.Header, path string, params url.Values) (
 // Post send the POST request to path without setting "Content-Type".
 // If the params is not nil, it will send as query parameters in the path.
 //
-func (client *Client) Post(headers http.Header, path string, params url.Values) (
+func (client *Client) Post(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
@@ -142,7 +142,7 @@ func (client *Client) Post(headers http.Header, path string, params url.Values) 
 // PostForm send the POST request to path using
 // "application/x-www-form-urlencoded".
 //
-func (client *Client) PostForm(headers http.Header, path string, params url.Values) (
+func (client *Client) PostForm(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	body := strings.NewReader(params.Encode())
@@ -155,8 +155,8 @@ func (client *Client) PostForm(headers http.Header, path string, params url.Valu
 // using "multipart/form-data".
 //
 func (client *Client) PostFormData(
-	headers http.Header,
 	path string,
+	headers http.Header,
 	params map[string][]byte,
 ) (
 	httpRes *http.Response, resBody []byte, err error,
@@ -175,7 +175,7 @@ func (client *Client) PostFormData(
 // PostJSON send the POST request with content type set to "application/json"
 // and params encoded automatically to JSON.
 //
-func (client *Client) PostJSON(headers http.Header, path string, params interface{}) (
+func (client *Client) PostJSON(path string, headers http.Header, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)
@@ -192,7 +192,7 @@ func (client *Client) PostJSON(headers http.Header, path string, params interfac
 // Put send the HTTP PUT request with specific content type and body to
 // specific path at the server.
 //
-func (client *Client) Put(headers http.Header, path, contentType string, body []byte) (
+func (client *Client) Put(path, contentType string, headers http.Header, body []byte) (
 	*http.Response, []byte, error,
 ) {
 	bodyReader := bytes.NewReader(body)
@@ -203,7 +203,7 @@ func (client *Client) Put(headers http.Header, path, contentType string, body []
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
 //
-func (client *Client) PutJSON(headers http.Header, path string, params interface{}) (
+func (client *Client) PutJSON(path string, headers http.Header, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)

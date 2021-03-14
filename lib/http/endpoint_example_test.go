@@ -51,11 +51,11 @@ func ExampleEndpoint_errorHandler() {
 
 	params := url.Values{}
 	params.Set("error", "400:error with status code")
-	httpres, resbody, _ := client.Get(nil, "/", params)
+	httpres, resbody, _ := client.Get("/", nil, params)
 	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
 
 	params.Set("error", "error without status code")
-	httpres, resbody, _ = client.Get(nil, "/", params)
+	httpres, resbody, _ = client.Get("/", nil, params)
 	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
 
 	// Output:

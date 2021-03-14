@@ -138,7 +138,7 @@ func New(opts Options) (bot *Bot, err error) {
 // getUpdates. Returns True on success. Requires no parameters.
 //
 func (bot *Bot) DeleteWebhook() (err error) {
-	_, resBody, err := bot.client.PostForm(nil, methodDeleteWebhook, nil)
+	_, resBody, err := bot.client.PostForm(methodDeleteWebhook, nil, nil)
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
 	}
@@ -158,7 +158,7 @@ func (bot *Bot) DeleteWebhook() (err error) {
 // Returns basic information about the bot in form of a User object.
 //
 func (bot *Bot) GetMe() (user *User, err error) {
-	_, resBody, err := bot.client.Get(nil, methodGetMe, nil)
+	_, resBody, err := bot.client.Get(methodGetMe, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GetMe: %w", err)
 	}
@@ -179,7 +179,7 @@ func (bot *Bot) GetMe() (user *User, err error) {
 // GetMyCommands get the current list of the bot's commands.
 //
 func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
-	_, resBody, err := bot.client.Get(nil, methodGetMyCommands, nil)
+	_, resBody, err := bot.client.Get(methodGetMyCommands, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GetMyCommands: %w", err)
 	}
@@ -201,7 +201,7 @@ func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 // If the bot is using getUpdates, will return an object with the url field
 // empty.
 func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
-	_, resBody, err := bot.client.Get(nil, methodGetWebhookInfo, nil)
+	_, resBody, err := bot.client.Get(methodGetWebhookInfo, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GetWebhookInfo: %w", err)
 	}
@@ -231,7 +231,7 @@ func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 		ParseMode: parseMode,
 	}
 
-	_, resBody, err := bot.client.PostJSON(nil, methodSendMessage, req)
+	_, resBody, err := bot.client.PostJSON(methodSendMessage, nil, req)
 	if err != nil {
 		return nil, fmt.Errorf("SendMessage: %w", err)
 	}
@@ -267,8 +267,7 @@ func (bot *Bot) SetMyCommands(cmds []Command) (err error) {
 
 	bot.commands.Commands = cmds
 
-	_, resBody, err := bot.client.PostJSON(nil, methodSetMyCommands,
-		&bot.commands)
+	_, resBody, err := bot.client.PostJSON(methodSetMyCommands, nil, &bot.commands)
 	if err != nil {
 		return fmt.Errorf("SetMyCommands: %w", err)
 	}
@@ -332,7 +331,7 @@ func (bot *Bot) setWebhook() (err error) {
 		params[paramNameAllowedUpdates] = allowedUpdates
 	}
 
-	_, resBody, err := bot.client.PostFormData(nil, methodSetWebhook, params)
+	_, resBody, err := bot.client.PostFormData(methodSetWebhook, nil, params)
 	if err != nil {
 		return fmt.Errorf("setWebhook: %w", err)
 	}

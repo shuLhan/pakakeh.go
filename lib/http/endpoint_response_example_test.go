@@ -67,7 +67,7 @@ func ExampleEndpointResponse() {
 	params := url.Values{}
 
 	// Test call endpoint without "id" parameter.
-	_, resBody, err := cl.Get(nil, "/", params)
+	_, resBody, err := cl.Get("/", nil, params)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func ExampleEndpointResponse() {
 	// Test call endpoint with "id" parameter set to "0", it should return
 	// HTTP status 500 with custom message.
 	params.Set("id", "0")
-	_, resBody, err = cl.Get(nil, "/", params)
+	_, resBody, err = cl.Get("/", nil, params)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func ExampleEndpointResponse() {
 
 	// Test with "id" parameter is set.
 	params.Set("id", "1000")
-	_, resBody, err = cl.Get(nil, "/", params)
+	_, resBody, err = cl.Get("/", nil, params)
 	if err != nil {
 		log.Fatal(err)
 	}
