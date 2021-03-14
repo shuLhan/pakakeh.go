@@ -13,8 +13,8 @@ type RequestMethod int
 
 // List of known HTTP methods.
 const (
-	RequestMethodGet     RequestMethod = 0
-	RequestMethodConnect RequestMethod = 1 << iota
+	RequestMethodGet RequestMethod = iota
+	RequestMethodConnect
 	RequestMethodDelete
 	RequestMethodHead
 	RequestMethodOptions
