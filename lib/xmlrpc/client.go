@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/shuLhan/share/lib/debug"
 	libhttp "github.com/shuLhan/share/lib/http"
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -106,7 +107,12 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 	fmt.Fprintf(&buf, requestHeader, cl.url.Path, cl.url.Host,
 		len(xml.Header)+len(xmlbin), xml.Header, xmlbin)
 
-	_, err = cl.conn.Write(buf.Bytes())
+	reqbody := buf.Bytes()
+	if debug.Value >= 3 {
+		fmt.Printf("<<< Send: request body:\n%s\n", reqbody)
+	}
+
+	_, err = cl.conn.Write(reqbody)
 	if err != nil {
 		return resp, err
 	}
@@ -114,6 +120,10 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 	xmlbin, err = ioutil.ReadAll(cl.conn)
 	if err != nil {
 		return resp, err
+	}
+
+	if debug.Value >= 3 {
+		fmt.Printf(">>> Send: response:\n%s\n", xmlbin)
 	}
 
 	httpRes, resBody, err := libhttp.ParseResponseHeader(xmlbin)
