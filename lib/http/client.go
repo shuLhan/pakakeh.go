@@ -238,12 +238,12 @@ func (client *Client) doRequest(
 		httpReq.Header.Set(HeaderContentType, contentType)
 	}
 
-	if debug.Value >= 2 {
+	if debug.Value >= 3 {
 		dump, err := httputil.DumpRequestOut(httpReq, true)
 		if err != nil {
 			log.Printf("doRequest: " + err.Error())
 		}
-		fmt.Printf("%s", dump)
+		fmt.Printf("%s\n", dump)
 	}
 
 	httpRes, err = client.Client.Do(httpReq)
