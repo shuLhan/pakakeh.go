@@ -41,6 +41,39 @@ This library is released every month, usually at the first week of month.
    Since one can set the Content-Type in parameter headers, this parameter is
    become redundant.
 
+===  New features
+
+* http: add method to generate standard HTTP request on Client
+
+  The GenerateHttpRequest method generate http.Request instance from
+  method, path, requestType, headers, and params.
+
+  For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
+  value should be nil or url.Values.
+  If its url.Values, then the params will be encoded as query parameters.
+
+  For HTTP method is PATCH, POST, or PUT; the params will converted based on
+  requestType rules below,
+
+    * If requestType is RequestTypeQuery and params is url.Values it will be
+      added as query parameters in the path.
+
+    * If requestType is RequestTypeForm and params is url.Values it will be
+      added as URL encoded in the body.
+
+    * If requestType is RequestTypeMultipartForm and params type is
+      map[string][]byte, then it will be converted as multipart form in the
+      body.
+
+    * If requestType is RequestTypeJSON and params is not nil, the params will
+      be encoded as JSON in body.
+
+===  Enhancements
+
+* xmlrpc: add debug statements to print request and response
+
+  The debug level is set minimum to 3. If its set it will print the
+  request and response to standard output.
 
 ==  share v0.24.0 (2021-03-06)
 

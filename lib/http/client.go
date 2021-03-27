@@ -110,6 +110,168 @@ func (client *Client) Delete(path string, headers http.Header, params url.Values
 }
 
 //
+// Do overwrite the standard http Client.Do to allow debugging request and
+// response, and to read and return the response body immediately.
+//
+func (client *Client) Do(httpRequest *http.Request) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	logp := "Do"
+
+	if debug.Value >= 3 {
+		dump, err := httputil.DumpRequestOut(httpRequest, true)
+		if err != nil {
+			log.Printf("%s: %s\n", logp, err)
+		} else {
+			fmt.Printf("%s\n", dump)
+		}
+	}
+
+	httpRes, err = client.Client.Do(httpRequest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	if debug.Value >= 3 {
+		dump, err := httputil.DumpResponse(httpRes, true)
+		if err != nil {
+			log.Printf("%s: %s", logp, err)
+		} else {
+			fmt.Printf("%s\n", dump)
+		}
+	}
+
+	rawBody, err := ioutil.ReadAll(httpRes.Body)
+	if err != nil {
+		return nil, nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	err = httpRes.Body.Close()
+	if err != nil {
+		return httpRes, resBody, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	resBody, err = client.uncompress(httpRes, rawBody)
+	if err != nil {
+		return httpRes, resBody, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	// Recreate the body to prevent error on caller.
+	httpRes.Body = io.NopCloser(bytes.NewReader(rawBody))
+
+	return httpRes, resBody, nil
+}
+
+//
+// GenerateHttpRequest generate http.Request from method, path, requestType,
+// headers, and params.
+//
+// For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
+// value should be nil or url.Values.
+// If its url.Values, then the params will be encoded as query parameters.
+//
+// For HTTP method is PATCH, POST, or PUT; the params will converted based on
+// requestType rules below,
+//
+// * If requestType is RequestTypeQuery and params is url.Values it will be
+// added as query parameters in the path.
+//
+// * If requestType is RequestTypeForm and params is url.Values it will be
+// added as URL encoded in the body.
+//
+// * If requestType is RequestTypeMultipartForm and params type is
+// map[string][]byte, then it will be converted as multipart form in the
+// body.
+//
+// * If requestType is RequestTypeJSON and params is not nil, the params will
+// be encoded as JSON in body.
+//
+func (client *Client) GenerateHttpRequest(
+	method RequestMethod,
+	path string,
+	requestType RequestType,
+	headers http.Header,
+	params interface{},
+) (httpRequest *http.Request, err error) {
+	var (
+		logp              = "GenerateHttpRequest"
+		paramsAsUrlValues url.Values
+		isParamsUrlValues bool
+		paramsAsJSON      []byte
+		contentType       = requestType.String()
+		strBody           string
+		body              io.Reader
+	)
+
+	paramsAsUrlValues, isParamsUrlValues = params.(url.Values)
+
+	switch method {
+	case RequestMethodGet,
+		RequestMethodConnect,
+		RequestMethodDelete,
+		RequestMethodHead,
+		RequestMethodOptions,
+		RequestMethodTrace:
+
+		if isParamsUrlValues {
+			path += "?" + paramsAsUrlValues.Encode()
+		}
+
+	case RequestMethodPatch,
+		RequestMethodPost,
+		RequestMethodPut:
+		switch requestType {
+		case RequestTypeQuery:
+			if isParamsUrlValues {
+				path += "?" + paramsAsUrlValues.Encode()
+			}
+
+		case RequestTypeForm:
+			if isParamsUrlValues {
+				strBody = paramsAsUrlValues.Encode()
+				body = strings.NewReader(strBody)
+			}
+
+		case RequestTypeMultipartForm:
+			paramsAsMultipart, ok := params.(map[string][]byte)
+			if ok {
+				contentType, strBody, err = generateFormData(paramsAsMultipart)
+				if err != nil {
+					return nil, fmt.Errorf("%s: %w", logp, err)
+				}
+
+				body = strings.NewReader(strBody)
+			}
+
+		case RequestTypeJSON:
+			if params != nil {
+				paramsAsJSON, err = json.Marshal(params)
+				if err != nil {
+					return nil, fmt.Errorf("%s: %w", logp, err)
+				}
+				body = bytes.NewReader(paramsAsJSON)
+			}
+		}
+	}
+
+	fullURL := client.serverURL + path
+
+	httpRequest, err = http.NewRequest(method.String(), fullURL, body)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	client.setHeaders(httpRequest, client.defHeaders)
+	client.setHeaders(httpRequest, headers)
+
+	if len(contentType) > 0 {
+		httpRequest.Header.Set(HeaderContentType, contentType)
+	}
+
+	return httpRequest, nil
+}
+
+//
 // Get send the GET request to server using path and params as query
 // parameters.
 // On success, it will return the uncompressed response body.
@@ -238,32 +400,7 @@ func (client *Client) doRequest(
 		httpReq.Header.Set(HeaderContentType, contentType)
 	}
 
-	if debug.Value >= 3 {
-		dump, err := httputil.DumpRequestOut(httpReq, true)
-		if err != nil {
-			log.Printf("doRequest: " + err.Error())
-		}
-		fmt.Printf("%s\n", dump)
-	}
-
-	httpRes, err = client.Client.Do(httpReq)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	resBody, err = ioutil.ReadAll(httpRes.Body)
-	if err != nil {
-		return httpRes, nil, err
-	}
-
-	err = httpRes.Body.Close()
-	if err != nil {
-		return httpRes, resBody, err
-	}
-
-	resBody, err = client.uncompress(httpRes, resBody)
-
-	return httpRes, resBody, err
+	return client.Do(httpReq)
 }
 
 //
