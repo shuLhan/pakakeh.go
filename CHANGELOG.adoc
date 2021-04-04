@@ -68,12 +68,23 @@ This library is released every month, usually at the first week of month.
     * If requestType is RequestTypeJSON and params is not nil, the params will
       be encoded as JSON in body.
 
+* ssh: ask for passphrase if private key is encrypted on generateSigners
+
+  In case the private key defined in IdentityFile is encrypted, prompt
+  for the passphrase on the screen and read it from stdin using
+  terminal.ReadPassword().
+
+  This changes also remove call to generateSigners on postConfig(),
+  instead invoke it from NewClient() to minimize multiple calls to
+  generateSigners().
+
 ===  Enhancements
 
 * xmlrpc: add debug statements to print request and response
 
   The debug level is set minimum to 3. If its set it will print the
   request and response to standard output.
+
 
 ==  share v0.24.0 (2021-03-06)
 

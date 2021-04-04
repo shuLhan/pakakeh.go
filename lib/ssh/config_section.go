@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/term"
 )
 
 const (
@@ -135,24 +136,36 @@ func newConfigSection() *ConfigSection {
 // generateSigners convert the IdentityFile to ssh.Signer for authentication
 // using PublicKey.
 //
-func (section *ConfigSection) generateSigners() {
+func (section *ConfigSection) generateSigners() (err error) {
+	var (
+		logp    = "generateSigners"
+		pkey    string
+		pkeyRaw []byte
+		signer  ssh.Signer
+	)
+
 	section.signers = make([]ssh.Signer, 0, len(section.IdentityFile))
 
-	for _, pkey := range section.IdentityFile {
-		pkeyRaw, err := ioutil.ReadFile(pkey)
+	for _, pkey = range section.IdentityFile {
+		pkeyRaw, err = ioutil.ReadFile(pkey)
 		if err != nil {
-			if !errors.Is(err, os.ErrNotExist) {
-				log.Printf("generateSigners %s: %s", pkey,
-					err.Error())
+			if errors.Is(err, os.ErrNotExist) {
+				continue
 			}
-			continue
+			return fmt.Errorf("%s: %w", logp, err)
 		}
 
-		signer, err := ssh.ParsePrivateKey(pkeyRaw)
+		signer, err = ssh.ParsePrivateKey(pkeyRaw)
 		if err != nil {
-			log.Printf("generateSigners %s: ParsePrivateKey: %s",
-				pkey, err.Error())
-			continue
+			_, isMissingPass := err.(*ssh.PassphraseMissingError)
+			if !isMissingPass {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
+
+			signer, err = section.generateSignerWithPassphrase(pkey, pkeyRaw)
+			if err != nil {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
 		}
 
 		if len(section.privateKeyFile) == 0 {
@@ -160,6 +173,7 @@ func (section *ConfigSection) generateSigners() {
 		}
 		section.signers = append(section.signers, signer)
 	}
+	return nil
 }
 
 //
@@ -210,8 +224,26 @@ func (section *ConfigSection) postConfig(homeDir string) {
 				"~", homeDir, 1)
 		}
 	}
+}
 
-	section.generateSigners()
+func (section *ConfigSection) generateSignerWithPassphrase(
+	pkey string, pkeyRaw []byte,
+) (signer ssh.Signer, err error) {
+	var pass []byte
+
+	fmt.Printf("Enter passphrase for %s:", pkey)
+
+	pass, err = term.ReadPassword(0)
+	if err != nil {
+		return nil, err
+	}
+
+	signer, err = ssh.ParsePrivateKeyWithPassphrase(pkeyRaw, pass)
+	if err != nil {
+		return nil, err
+	}
+
+	return signer, nil
 }
 
 func (section *ConfigSection) setAddKeysToAgent(val string) (err error) {

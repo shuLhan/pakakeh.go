@@ -31,6 +31,11 @@ func NewClient(cfg *ConfigSection) (cl *Client, err error) {
 
 	cfg.postConfig("")
 
+	err = cfg.generateSigners()
+	if err != nil {
+		return nil, err
+	}
+
 	sshConfig := &ssh.ClientConfig{
 		User: cfg.User,
 		Auth: []ssh.AuthMethod{
