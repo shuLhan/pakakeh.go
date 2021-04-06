@@ -3,6 +3,18 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.25.1 (2021-04-06)
+
+Set the minimum Go version to 1.16
+
+Commit 4cdd6b01c1 "http: add method to generate standard HTTP request
+on Client" use the io.NopCloser thats only available in Go 1.16.  Either
+we move backward by replacing it with ioutil.NopCloser or we move forward
+by setting the minimum Go version to 1.16.
+
+We choose to move forward.
+
+
 ==  share v0.25.0 (2021-04-06)
 
 ===  Breaking changes
