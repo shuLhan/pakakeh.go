@@ -605,7 +605,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		if cl.gracefulClose != nil {
 			cl.gracefulClose <- true
 		} else {
-			cl.handleClose(cl, frame)
+			_ = cl.handleClose(cl, frame)
 		}
 		return true
 	case OpcodePing:
@@ -619,7 +619,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		if cl.HandleRsvControl != nil {
 			_ = cl.HandleRsvControl(cl, frame)
 		} else {
-			cl.handleClose(cl, frame)
+			_ = cl.handleClose(cl, frame)
 			isClosing = true
 		}
 	}
