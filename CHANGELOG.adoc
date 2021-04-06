@@ -78,6 +78,21 @@ This library is released every month, usually at the first week of month.
   instead invoke it from NewClient() to minimize multiple calls to
   generateSigners().
 
+* ssh: use the SSH agent to authenticate on NewClient
+
+  Previously, the client use the IdentityFile on ConfigSection to
+  Authenticate with the remote SSH server.  In case the IdentityFile is
+  Encrypted with passphrase, each time NewClient is invoked it will ask
+  For passphrase.
+  
+  To minimize inputing the passphrase, we check if current use run the
+  SSH agent through SSH_AUTH_SOCK environment variable and use the agent
+  To generate signers.
+  
+  This method need manual key added by user to SSH agent before calling
+  NewClient to make it works.
+
+
 ===  Enhancements
 
 * xmlrpc: add debug statements to print request and response

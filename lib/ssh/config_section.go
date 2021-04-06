@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 	"golang.org/x/term"
 )
 
@@ -136,18 +137,19 @@ func newConfigSection() *ConfigSection {
 // generateSigners convert the IdentityFile to ssh.Signer for authentication
 // using PublicKey.
 //
-func (section *ConfigSection) generateSigners() (err error) {
+func (section *ConfigSection) generateSigners(agentc agent.ExtendedAgent) (err error) {
 	var (
-		logp    = "generateSigners"
-		pkey    string
-		pkeyRaw []byte
-		signer  ssh.Signer
+		logp     = "generateSigners"
+		pkeyFile string
+		pkeyPem  []byte
+		pkey     interface{}
+		signer   ssh.Signer
 	)
 
 	section.signers = make([]ssh.Signer, 0, len(section.IdentityFile))
 
-	for _, pkey = range section.IdentityFile {
-		pkeyRaw, err = ioutil.ReadFile(pkey)
+	for _, pkeyFile = range section.IdentityFile {
+		pkeyPem, err = ioutil.ReadFile(pkeyFile)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				continue
@@ -155,21 +157,45 @@ func (section *ConfigSection) generateSigners() (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 
-		signer, err = ssh.ParsePrivateKey(pkeyRaw)
+		pkey, err = ssh.ParseRawPrivateKey(pkeyPem)
 		if err != nil {
 			_, isMissingPass := err.(*ssh.PassphraseMissingError)
 			if !isMissingPass {
 				return fmt.Errorf("%s: %w", logp, err)
 			}
 
-			signer, err = section.generateSignerWithPassphrase(pkey, pkeyRaw)
+			fmt.Printf("Enter passphrase for %s:", pkeyFile)
+
+			pass, err := term.ReadPassword(0)
+			if err != nil {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
+
+			pkey, err = ssh.ParseRawPrivateKeyWithPassphrase(pkeyPem, pass)
+			if err != nil {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
+		}
+
+		signer, err = ssh.NewSignerFromKey(pkey)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+
+		if agentc != nil {
+			fmt.Printf("adding key %q to agent\n", pkeyFile)
+
+			key := agent.AddedKey{
+				PrivateKey: pkey,
+			}
+			err = agentc.Add(key)
 			if err != nil {
 				return fmt.Errorf("%s: %w", logp, err)
 			}
 		}
 
 		if len(section.privateKeyFile) == 0 {
-			section.privateKeyFile = pkey
+			section.privateKeyFile = pkeyFile
 		}
 		section.signers = append(section.signers, signer)
 	}
@@ -224,26 +250,6 @@ func (section *ConfigSection) postConfig(homeDir string) {
 				"~", homeDir, 1)
 		}
 	}
-}
-
-func (section *ConfigSection) generateSignerWithPassphrase(
-	pkey string, pkeyRaw []byte,
-) (signer ssh.Signer, err error) {
-	var pass []byte
-
-	fmt.Printf("Enter passphrase for %s:", pkey)
-
-	pass, err = term.ReadPassword(0)
-	if err != nil {
-		return nil, err
-	}
-
-	signer, err = ssh.ParsePrivateKeyWithPassphrase(pkeyRaw, pass)
-	if err != nil {
-		return nil, err
-	}
-
-	return signer, nil
 }
 
 func (section *ConfigSection) setAddKeysToAgent(val string) (err error) {

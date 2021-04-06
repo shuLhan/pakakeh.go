@@ -7,10 +7,12 @@ package ssh
 import (
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 //
@@ -29,26 +31,50 @@ func NewClient(cfg *ConfigSection) (cl *Client, err error) {
 		return nil, nil
 	}
 
+	var (
+		logp             = "NewClient"
+		sshAgentSockPath string
+		sshAgentSock     net.Conn
+		sshConfig        *ssh.ClientConfig
+		remoteAddr       string
+		agentClient      agent.ExtendedAgent
+	)
+
 	cfg.postConfig("")
 
-	err = cfg.generateSigners()
-	if err != nil {
-		return nil, err
+	sshConfig = &ssh.ClientConfig{
+		User:            cfg.User,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	sshConfig := &ssh.ClientConfig{
-		User: cfg.User,
-		Auth: []ssh.AuthMethod{
+	sshAgentSockPath = os.Getenv("SSH_AUTH_SOCK")
+	if len(sshAgentSockPath) > 0 {
+		sshAgentSock, err = net.Dial("unix", sshAgentSockPath)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+
+		agentClient = agent.NewClient(sshAgentSock)
+
+		sshConfig.Auth = []ssh.AuthMethod{
+			ssh.PublicKeysCallback(agentClient.Signers),
+		}
+	} else {
+		err = cfg.generateSigners(nil)
+		if err != nil {
+			return nil, err
+		}
+
+		sshConfig.Auth = []ssh.AuthMethod{
 			ssh.PublicKeys(cfg.signers...),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
 	}
 
 	cl = &Client{
 		cfg: cfg,
 	}
 
-	remoteAddr := fmt.Sprintf("%s:%d", cfg.Hostname, cfg.Port)
+	remoteAddr = fmt.Sprintf("%s:%d", cfg.Hostname, cfg.Port)
 
 	cl.conn, err = ssh.Dial("tcp", remoteAddr, sshConfig)
 	if err != nil {
