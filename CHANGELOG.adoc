@@ -3,7 +3,7 @@
 
 This library is released every month, usually at the first week of month.
 
-==  share v0.25.0 (2021-04-xx)
+==  share v0.25.0 (2021-04-06)
 
 ===  Breaking changes
 
@@ -91,7 +91,6 @@ This library is released every month, usually at the first week of month.
   
   This method need manual key added by user to SSH agent before calling
   NewClient to make it works.
-
 
 ===  Enhancements
 
