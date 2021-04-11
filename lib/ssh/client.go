@@ -132,8 +132,15 @@ func (cl *Client) Get(remote, local string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
-	cmd := exec.Command("scp", "-r", "-i", cl.cfg.privateKeyFile,
-		"-P", cl.cfg.stringPort, remote, local)
+	args := []string{"-r", "-P", cl.cfg.stringPort}
+	if len(cl.cfg.privateKeyFile) > 0 {
+		args = append(args, "-i")
+		args = append(args, cl.cfg.privateKeyFile)
+	}
+	args = append(args, remote)
+	args = append(args, local)
+
+	cmd := exec.Command("scp", args...)
 
 	cmd.Dir = cl.cfg.workingDir
 	cmd.Stdout = os.Stdout
@@ -165,8 +172,15 @@ func (cl *Client) Put(local, remote string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
-	cmd := exec.Command("scp", "-r", "-i", cl.cfg.privateKeyFile,
-		"-P", cl.cfg.stringPort, local, remote)
+	args := []string{"-r", "-P", cl.cfg.stringPort}
+	if len(cl.cfg.privateKeyFile) > 0 {
+		args = append(args, "-i")
+		args = append(args, cl.cfg.privateKeyFile)
+	}
+	args = append(args, local)
+	args = append(args, remote)
+
+	cmd := exec.Command("scp", args...)
 
 	cmd.Dir = cl.cfg.workingDir
 	cmd.Stdout = os.Stdout
