@@ -166,6 +166,12 @@ func TestNewRat(t *testing.T) {
 	}, {
 		v:   *(big.NewRat(14687233442, 100_000_000)),
 		exp: NewRat("146.87233442"),
+	}, {
+		v:   uint64(18446744073709551615),
+		exp: NewRat("18446744073709551615"),
+	}, {
+		v:   big.NewInt(100_000_000),
+		exp: NewRat("100_000_000"),
 	}}
 
 	for _, c := range cases {

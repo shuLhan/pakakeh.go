@@ -504,6 +504,8 @@ func toRat(v interface{}, in *Rat) (out *Rat) {
 		out.SetInt64(int64(v))
 	case int64:
 		out.SetInt64(v)
+	case uint64:
+		out.SetUint64(v)
 	case float32:
 		out.SetFloat64(float64(v))
 	case float64:
@@ -516,6 +518,8 @@ func toRat(v interface{}, in *Rat) (out *Rat) {
 		out.Rat = v
 	case *big.Rat:
 		out.Rat = *v
+	case *big.Int:
+		out.SetInt(v)
 	default:
 		return nil
 	}
