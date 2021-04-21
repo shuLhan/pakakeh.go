@@ -7,6 +7,7 @@ package dns
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -40,8 +41,27 @@ func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err err
 
 	nameserver = fmt.Sprintf("%s:%d", remoteIP, port)
 
+	setTCPKeepAlive := func(clientHello *tls.ClientHelloInfo) (*tls.Config, error) {
+		tcpConn, ok := clientHello.Conn.(*net.TCPConn)
+		if !ok {
+			return nil, nil
+		}
+
+		err := tcpConn.SetKeepAlive(true)
+		if err != nil {
+			return nil, err
+		}
+
+		err = tcpConn.SetKeepAlivePeriod(defaultKeepAlivePeriod)
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+
 	tlsConfig := tls.Config{
 		InsecureSkipVerify: allowInsecure,
+		GetConfigForClient: setTCPKeepAlive,
 	}
 
 	cl.conn, err = tls.Dial("tcp", nameserver, &tlsConfig)

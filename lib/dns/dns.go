@@ -33,6 +33,8 @@ const (
 	// DefaultHTTPPort define default port for DNS over HTTPS.
 	DefaultHTTPPort        uint16        = 443
 	defaultHTTPIdleTimeout time.Duration = 120 * time.Second
+
+	defaultKeepAlivePeriod = 5 * time.Second
 )
 
 const (

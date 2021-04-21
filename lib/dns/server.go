@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
@@ -362,23 +363,26 @@ func (srv *Server) serveDoH() {
 }
 
 func (srv *Server) serveDoT() {
-	var (
-		err error
-	)
-
+	logp := "serveDoT"
 	dotAddr := srv.opts.getDoTAddress()
 
 	for {
-		if srv.opts.DoHBehindProxy || srv.tlsConfig == nil {
-			srv.dot, err = net.ListenTCP("tcp", dotAddr)
-		} else {
-			srv.dot, err = tls.Listen("tcp", dotAddr.String(), srv.tlsConfig)
+		lc := net.ListenConfig{
+			KeepAlive: defaultKeepAlivePeriod,
 		}
+
+		netListener, err := lc.Listen(context.Background(), "tcp", dotAddr.String())
 		if err != nil {
 			log.Println("dns: Server.serveDoT: " + err.Error())
 			time.Sleep(3 * time.Second)
 			continue
 		}
+
+		if !srv.opts.DoHBehindProxy && srv.tlsConfig != nil {
+			netListener = tls.NewListener(netListener, srv.tlsConfig)
+		}
+
+		srv.dot = netListener
 
 		log.Println("dns.Server: listening for DNS over TLS at", dotAddr.String())
 
@@ -392,6 +396,20 @@ func (srv *Server) serveDoT() {
 				}
 				srv.errListener <- err
 				break
+			}
+
+			tcpConn, ok := conn.(*net.TCPConn)
+			if ok {
+				err = tcpConn.SetKeepAlive(true)
+				if err != nil {
+					log.Printf("%s: %s", logp, err)
+					continue
+				}
+				err = tcpConn.SetKeepAlivePeriod(defaultKeepAlivePeriod)
+				if err != nil {
+					log.Printf("%s: %s", logp, err)
+					continue
+				}
 			}
 
 			cl := &TCPClient{
@@ -420,6 +438,18 @@ func (srv *Server) serveTCP() {
 			}
 			srv.errListener <- err
 			return
+		}
+
+		err = conn.SetKeepAlive(true)
+		if err != nil {
+			err = fmt.Errorf("serveTCP: SetKeepAlive: %w", err)
+			srv.errListener <- err
+		}
+
+		err = conn.SetKeepAlivePeriod(defaultKeepAlivePeriod)
+		if err != nil {
+			err = fmt.Errorf("serveTCP: SetKeepAlivePeriod: %w", err)
+			srv.errListener <- err
 		}
 
 		cl := &TCPClient{
