@@ -26,9 +26,8 @@ type DoTClient struct {
 // server.  Default port is 853, if not set.
 func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err error) {
 	var (
-		tlsConfig tls.Config
-		remoteIP  net.IP
-		port      uint16
+		remoteIP net.IP
+		port     uint16
 	)
 
 	_, remoteIP, port = libnet.ParseIPPort(nameserver, DefaultTLSPort)
@@ -42,7 +41,28 @@ func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err err
 
 	nameserver = fmt.Sprintf("%s:%d", remoteIP, port)
 
-	tlsConfig.InsecureSkipVerify = allowInsecure
+	setTCPKeepAlive := func(clientHello *tls.ClientHelloInfo) (*tls.Config, error) {
+		tcpConn, ok := clientHello.Conn.(*net.TCPConn)
+		if !ok {
+			return nil, nil
+		}
+
+		err := tcpConn.SetKeepAlive(true)
+		if err != nil {
+			return nil, err
+		}
+
+		err = tcpConn.SetKeepAlivePeriod(defaultKeepAlivePeriod)
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+
+	var tlsConfig = tls.Config{
+		InsecureSkipVerify: allowInsecure,
+		GetConfigForClient: setTCPKeepAlive,
+	}
 
 	cl.conn, err = tls.Dial("tcp", nameserver, &tlsConfig)
 	if err != nil {

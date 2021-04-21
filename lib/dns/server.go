@@ -263,28 +263,39 @@ func (srv *Server) serveDoH() {
 
 func (srv *Server) serveDoT() {
 	var (
+		logp    = "serveDoT"
 		dotAddr = srv.opts.getDoTAddress()
 
-		cl   *TCPClient
-		conn net.Conn
-		err  error
+		err error
 	)
 
 	for {
-		if srv.opts.DoHBehindProxy || srv.tlsConfig == nil {
-			srv.dot, err = net.ListenTCP("tcp", dotAddr)
-		} else {
-			srv.dot, err = tls.Listen("tcp", dotAddr.String(), srv.tlsConfig)
-		}
+		var (
+			lc = net.ListenConfig{
+				KeepAlive: defaultKeepAlivePeriod,
+			}
+
+			netListener net.Listener
+		)
+
+		netListener, err = lc.Listen(context.Background(), "tcp", dotAddr.String())
 		if err != nil {
 			log.Println("dns: Server.serveDoT: " + err.Error())
 			time.Sleep(3 * time.Second)
 			continue
 		}
 
+		if !srv.opts.DoHBehindProxy && srv.tlsConfig != nil {
+			netListener = tls.NewListener(netListener, srv.tlsConfig)
+		}
+
+		srv.dot = netListener
+
 		log.Println("dns.Server: listening for DNS over TLS at", dotAddr.String())
 
 		for {
+			var conn net.Conn
+
 			conn, err = srv.dot.Accept()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
@@ -296,7 +307,26 @@ func (srv *Server) serveDoT() {
 				break
 			}
 
-			cl = &TCPClient{
+			var (
+				tcpConn *net.TCPConn
+				ok      bool
+			)
+
+			tcpConn, ok = conn.(*net.TCPConn)
+			if ok {
+				err = tcpConn.SetKeepAlive(true)
+				if err != nil {
+					log.Printf("%s: %s", logp, err)
+					continue
+				}
+				err = tcpConn.SetKeepAlivePeriod(defaultKeepAlivePeriod)
+				if err != nil {
+					log.Printf("%s: %s", logp, err)
+					continue
+				}
+			}
+
+			var cl = &TCPClient{
 				writeTimeout: clientTimeout,
 				conn:         conn,
 			}
@@ -309,8 +339,7 @@ func (srv *Server) serveDoT() {
 // serveTCP serve DNS request from TCP connection.
 func (srv *Server) serveTCP() {
 	var (
-		cl   *TCPClient
-		conn net.Conn
+		conn *net.TCPConn
 		err  error
 	)
 
@@ -328,7 +357,19 @@ func (srv *Server) serveTCP() {
 			return
 		}
 
-		cl = &TCPClient{
+		err = conn.SetKeepAlive(true)
+		if err != nil {
+			err = fmt.Errorf("serveTCP: SetKeepAlive: %w", err)
+			srv.errListener <- err
+		}
+
+		err = conn.SetKeepAlivePeriod(defaultKeepAlivePeriod)
+		if err != nil {
+			err = fmt.Errorf("serveTCP: SetKeepAlivePeriod: %w", err)
+			srv.errListener <- err
+		}
+
+		var cl = &TCPClient{
 			writeTimeout: clientTimeout,
 			conn:         conn,
 		}
