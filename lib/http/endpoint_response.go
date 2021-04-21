@@ -22,15 +22,18 @@ type EndpointResponse struct {
 	Limit int64 `json:"limit,omitempty"`
 
 	// The Offset field contains the start index of paging.
-	// If Page values is from request then the offset will be set to page
-	// times limit.
+	// If Page values is from request then the offset can be set to
+	// Page times Limit.
 	Offset int64 `json:"offset,omitempty"`
 
 	// The Page field contains the requested or current page of response.
 	Page int64 `json:"page,omitempty"`
 
-	// Count field contains the total number of records.
+	// Count field contains the total number of records in Data.
 	Count int64 `json:"count,omitempty"`
+
+	// Total field contains the total number of all records.
+	Total int64 `json:"total,omitempty"`
 }
 
 //
