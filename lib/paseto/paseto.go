@@ -99,6 +99,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"strings"
@@ -313,7 +314,7 @@ func Verify(pk ed25519.PublicKey, sm, f []byte) (msg []byte, err error) {
 func pae(pieces [][]byte) (b []byte, err error) {
 	var buf bytes.Buffer
 
-	b, err = le64(byte(len(pieces)))
+	err = binary.Write(&buf, binary.LittleEndian, uint64(len(pieces)))
 	if err != nil {
 		return nil, err
 	}
@@ -324,7 +325,7 @@ func pae(pieces [][]byte) (b []byte, err error) {
 	}
 
 	for x := 0; x < len(pieces); x++ {
-		b, err = le64(byte(len(pieces[x])))
+		err = binary.Write(&buf, binary.LittleEndian, uint64(len(pieces[x])))
 		if err != nil {
 			return nil, err
 		}
@@ -338,22 +339,6 @@ func pae(pieces [][]byte) (b []byte, err error) {
 		if err != nil {
 			return nil, err
 		}
-	}
-	return buf.Bytes(), nil
-}
-
-func le64(n byte) (out []byte, err error) {
-	var buf bytes.Buffer
-
-	for x := 0; x < 8; x++ {
-		if x == 7 {
-			n &= 127
-		}
-		err = buf.WriteByte(n & 255)
-		if err != nil {
-			return out, err
-		}
-		n = n >> 8 //nolint: govet
 	}
 	return buf.Bytes(), nil
 }
