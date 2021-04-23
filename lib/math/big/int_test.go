@@ -61,3 +61,21 @@ func TestNewInt(t *testing.T) {
 		test.Assert(t, "NewInt", c.exp, got.String())
 	}
 }
+
+func TestInt_IsZero(t *testing.T) {
+	cases := []struct {
+		in  *Int
+		exp bool
+	}{{
+		in:  NewInt(0),
+		exp: true,
+	}, {
+		in: NewInt(1),
+	}, {
+		in: NewInt(-1),
+	}}
+
+	for _, c := range cases {
+		test.Assert(t, "Int.IsZero", c.in.IsZero(), c.exp)
+	}
+}

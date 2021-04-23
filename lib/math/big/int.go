@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+var intZero = NewInt(0)
+
 //
 // Int extends the standard big.Int package.
 //
@@ -31,6 +33,13 @@ func NewInt(v interface{}) (i *Int) {
 		return nil
 	}
 	return i
+}
+
+//
+// IsZero will return true if `i == 0`.
+//
+func (i *Int) IsZero() bool {
+	return i.Cmp(&intZero.Int) == 0
 }
 
 //
