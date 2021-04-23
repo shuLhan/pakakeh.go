@@ -7,6 +7,7 @@ package big
 import (
 	"bytes"
 	"database/sql/driver"
+	"fmt"
 	"math/big"
 	"strings"
 )
@@ -30,6 +31,39 @@ func NewInt(v interface{}) (i *Int) {
 		return nil
 	}
 	return i
+}
+
+//
+// MarshalJSON implement the json.Marshaler interface and return the output of
+// String method.
+//
+// If the global variable MarshalJSONAsString is true, the Int value will
+// be encoded as string.
+//
+func (r *Int) MarshalJSON() ([]byte, error) {
+	var s string
+	if r == nil {
+		s = "0"
+	} else {
+		s = r.String()
+	}
+	if MarshalJSONAsString {
+		s = `"` + s + `"`
+	}
+	return []byte(s), nil
+}
+
+//
+// UnmarshalJSON convert the JSON byte value into Int.
+//
+func (r *Int) UnmarshalJSON(in []byte) (err error) {
+	in = bytes.Trim(in, `"`)
+	r.SetInt64(0)
+	_, ok := r.Int.SetString(string(in), 10)
+	if !ok {
+		return fmt.Errorf("Int.UnmarshalJSON: cannot convert %T(%v) to Int", in, in)
+	}
+	return nil
 }
 
 //
