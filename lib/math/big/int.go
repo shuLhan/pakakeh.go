@@ -40,12 +40,12 @@ func NewInt(v interface{}) (i *Int) {
 // If the global variable MarshalJSONAsString is true, the Int value will
 // be encoded as string.
 //
-func (r *Int) MarshalJSON() ([]byte, error) {
+func (i *Int) MarshalJSON() ([]byte, error) {
 	var s string
-	if r == nil {
+	if i == nil {
 		s = "0"
 	} else {
-		s = r.String()
+		s = i.String()
 	}
 	if MarshalJSONAsString {
 		s = `"` + s + `"`
@@ -56,10 +56,10 @@ func (r *Int) MarshalJSON() ([]byte, error) {
 //
 // UnmarshalJSON convert the JSON byte value into Int.
 //
-func (r *Int) UnmarshalJSON(in []byte) (err error) {
+func (i *Int) UnmarshalJSON(in []byte) (err error) {
 	in = bytes.Trim(in, `"`)
-	r.SetInt64(0)
-	_, ok := r.Int.SetString(string(in), 10)
+	i.SetInt64(0)
+	_, ok := i.Int.SetString(string(in), 10)
 	if !ok {
 		return fmt.Errorf("Int.UnmarshalJSON: cannot convert %T(%v) to Int", in, in)
 	}
