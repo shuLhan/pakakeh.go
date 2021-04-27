@@ -205,6 +205,7 @@ func (cl *Client) migrateCreateTable() (err error) {
 		CREATE TABLE _migration (
 			filename    VARCHAR(1024)
 		,	applied_at  TIMESTAMP DEFAULT NOW()
+		,	PRIMARY KEY(filename)
 		);
 	`
 	_, err = cl.DB.Exec(q)
