@@ -127,7 +127,7 @@ func TestGet(t *testing.T) {
 		expContentType: "text/html; charset=utf-8",
 	}, {
 		path:           "/exclude/index.js",
-		expContentType: "application/javascript",
+		expContentType: "text/javascript; charset=utf-8",
 	}, {
 		path: "/include",
 	}, {
@@ -143,7 +143,7 @@ func TestGet(t *testing.T) {
 		expContentType: "text/html; charset=utf-8",
 	}, {
 		path:           "/include/index.js",
-		expContentType: "application/javascript",
+		expContentType: "text/javascript; charset=utf-8",
 	}, {
 		path:           "/index.css",
 		expV:           []byte("body {\n}\n"),
@@ -154,7 +154,7 @@ func TestGet(t *testing.T) {
 		expContentType: "text/html; charset=utf-8",
 	}, {
 		path:           "/index.js",
-		expContentType: "application/javascript",
+		expContentType: "text/javascript; charset=utf-8",
 	}, {
 		path:           "/plain",
 		expContentType: "application/octet-stream",
@@ -186,8 +186,7 @@ func TestGet(t *testing.T) {
 			test.Assert(t, "node.V", c.expV, got.V)
 		}
 
-		test.Assert(t, "node.ContentType", c.expContentType,
-			got.ContentType)
+		test.Assert(t, "node.ContentType", c.expContentType, got.ContentType)
 	}
 }
 

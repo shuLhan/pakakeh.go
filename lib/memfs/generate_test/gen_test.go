@@ -131,7 +131,7 @@ func generate_testdata_exclude_index_js() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/exclude/index.js",
 		Path:            "/exclude/index.js",
-		ContentType:     "application/javascript",
+		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
 		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
@@ -189,7 +189,7 @@ func generate_testdata_include_index_js() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/include/index.js",
 		Path:            "/include/index.js",
-		ContentType:     "application/javascript",
+		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
 		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
@@ -231,7 +231,7 @@ func generate_testdata_index_js() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "testdata/index.js",
 		Path:            "/index.js",
-		ContentType:     "application/javascript",
+		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
 		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
