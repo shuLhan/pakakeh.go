@@ -36,6 +36,41 @@ func NewInt(v interface{}) (i *Int) {
 }
 
 //
+// Add set the i value to i + v and return the i as the result.
+//
+func (i *Int) Add(v interface{}) *Int {
+	vv := toInt(v, nil)
+	if vv == nil {
+		// Its equal to `i+0`
+		return i
+	}
+	i.Int.Add(&i.Int, &vv.Int)
+	return i
+}
+
+//
+// IsGreater will return true if i > v.
+//
+func (i *Int) IsGreater(v interface{}) bool {
+	vv := toInt(v, nil)
+	if vv == nil {
+		return false
+	}
+	return i.Cmp(&vv.Int) > 0
+}
+
+//
+// IsLess will return true if i < v.
+//
+func (i *Int) IsLess(v interface{}) bool {
+	vv := toInt(v, nil)
+	if vv == nil {
+		return false
+	}
+	return i.Cmp(&vv.Int) < 0
+}
+
+//
 // IsZero will return true if `i == 0`.
 //
 func (i *Int) IsZero() bool {
@@ -60,6 +95,17 @@ func (i *Int) MarshalJSON() ([]byte, error) {
 		s = `"` + s + `"`
 	}
 	return []byte(s), nil
+}
+
+//
+// Scan implement the database's sql.Scan interface.
+//
+func (i *Int) Scan(src interface{}) error {
+	got := toInt(src, i)
+	if got == nil {
+		return fmt.Errorf("Int.Scan: unknown type %T", src)
+	}
+	return nil
 }
 
 //
