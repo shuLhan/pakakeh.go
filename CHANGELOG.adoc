@@ -3,6 +3,73 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.26.0 (2021-05-03)
+
+=== New features
+
+* math/big: add method Add, IsLess, IsGreater, and Scan on Int
+
+  The Add method simplify addition of one value to current Int.
+
+  The IsLess and IsGreater method simplify comparing Int with any value.
+
+  The Scan method allow the Int to be used on sql Scan().
+
+* math/big: add method IsZero on Int
+
+  The IsZero method will return true if the current i value is zero.
+
+* big: extends the standard big.Int
+
+  The standard big.Int does not implement sql/driver.Valuer interface,
+  which make it not usable when querying or doing update/insert with
+  database.
+
+  This commit extend the big.Int and simplify creating new Int from any
+  values using NewInt().
+
+  Also, make it support marshal/unmarshal JSON
+
+=== Enhancements
+
+* sql: make the column filename on table _migration as primary key
+
+  This will allow deleting the record by filename instead of requiring
+  all columns.
+
+* http: add the Total field to EndpointResponse
+
+  The Total field contains the total number of all records, while the
+  Count fields only contains the total number of records in Data.
+
+* http: add field Page to EndpointResponse
+
+  The page field contains the requested page on current response.
+  If page is from request then the offset will be set to page times limit.
+
+  While at it, move the field comment to its declaration.
+
+* big: allow creating new Rat from uint64 and *big.Int
+
+* ssh: check for empty private key file on Get and Put
+
+  If the private key file is empty, skip it for being added as parameter
+  of scp command.  This is to prevent warning message on user side.
+
+=== Chores
+
+* memfs: update the test ContentType for JavaScript files
+
+  The latest Go set the content type for JavaScript file as
+  "text/javascript; charset=utf-8", not "application/javascript".
+
+* paseto: replace le64() function with binary.Write()
+
+  The le64() return the string representation of uint64 in little endian,
+  which is basically binary.Write with parameter output buffer,
+  LittleEndian, and input value.
+
+
 ==  share v0.25.1 (2021-04-06)
 
 Set the minimum Go version to 1.16
@@ -96,11 +163,11 @@ We choose to move forward.
   Authenticate with the remote SSH server.  In case the IdentityFile is
   Encrypted with passphrase, each time NewClient is invoked it will ask
   For passphrase.
-  
+
   To minimize inputing the passphrase, we check if current use run the
   SSH agent through SSH_AUTH_SOCK environment variable and use the agent
   To generate signers.
-  
+
   This method need manual key added by user to SSH agent before calling
   NewClient to make it works.
 

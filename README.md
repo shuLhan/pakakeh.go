@@ -100,9 +100,9 @@ This library is released every month, usually at the first week of month.
   math provide generic functions working with math.
 
  * [**big**](https://pkg.go.dev/github.com/shuLhan/share/lib/math/big):
-  Package big extends the capabilities of standard "math/big" package by
-  adding custom global precision to Float and Rat, global rounding mode, and
-  custom bits precision to Float.
+   Package big extends the capabilities of standard "math/big" package by
+   adding custom global precision to Float, Int, and Rat, global rounding
+   mode, and custom bits precision to Float.
 
 * [**memfs**](https://pkg.go.dev/github.com/shuLhan/share/lib/memfs): A
   library for mapping file system into memory and to generate an embedded Go
