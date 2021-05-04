@@ -80,7 +80,7 @@ func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog *
 // Errf write the formatted string and its optional values to all error
 // writers.
 //
-// The format string does not end with new line, it will be added.
+// If the format string does not end with new line, it will be added.
 //
 func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
 	if len(mlog.errs) == 0 {

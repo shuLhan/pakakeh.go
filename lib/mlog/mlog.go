@@ -27,8 +27,6 @@
 //
 // The time and prefix only printed if its not empty, and the single space is
 // added for convenience.
-// Unlike standard log package, this package does not add new line to the end
-// of message if its not exist.
 //
 package mlog
 
