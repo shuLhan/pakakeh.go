@@ -77,6 +77,24 @@ func Outf(format string, v ...interface{}) {
 }
 
 //
+// PrintStack writes to error writers the stack trace returned by
+// debug.Stack.
+//
+// This function can be useful when debugging panic using recover in the main
+// program by logging the stack trace.
+// For example,
+//
+//	err := recover()
+//	if err != nil {
+//		mlog.PrintStack()
+//		os.Exit(1)
+//	}
+//
+func PrintStack() {
+	defaultMLog.PrintStack()
+}
+
+//
 // RegisterErrorWriter register the named writer to one of error writers.
 //
 func RegisterErrorWriter(errw NamedWriter) {

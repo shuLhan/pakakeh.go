@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -116,6 +117,25 @@ func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 		return
 	}
 	mlog.writeTo(mlog.qout, format, v...)
+}
+
+//
+// PrintStack writes to error writers the stack trace returned by
+// debug.Stack.
+//
+// This function can be useful when debugging panic using recover in the main
+// program by logging the stack trace.
+// For example,
+//
+//	err := recover()
+//	if err != nil {
+//		mlog.PrintStack()
+//		os.Exit(1)
+//	}
+//
+func (mlog *MultiLogger) PrintStack() {
+	mlog.Errf("%s\n", debug.Stack())
+	mlog.Flush()
 }
 
 //
