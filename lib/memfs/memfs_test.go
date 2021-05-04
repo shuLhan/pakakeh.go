@@ -108,7 +108,7 @@ func TestGet(t *testing.T) {
 	cases := []struct {
 		path           string
 		expV           []byte
-		expContentType string
+		expContentType []string
 		expErr         error
 	}{{
 		path: "/",
@@ -120,14 +120,17 @@ func TestGet(t *testing.T) {
 	}, {
 		path:           "/exclude/index.css",
 		expV:           []byte("body {\n}\n"),
-		expContentType: "text/css; charset=utf-8",
+		expContentType: []string{"text/css; charset=utf-8"},
 	}, {
 		path:           "/exclude/index.html",
 		expV:           []byte("<html></html>\n"),
-		expContentType: "text/html; charset=utf-8",
+		expContentType: []string{"text/html; charset=utf-8"},
 	}, {
-		path:           "/exclude/index.js",
-		expContentType: "text/javascript; charset=utf-8",
+		path: "/exclude/index.js",
+		expContentType: []string{
+			"text/javascript; charset=utf-8",
+			"application/javascript",
+		},
 	}, {
 		path: "/include",
 	}, {
@@ -136,28 +139,34 @@ func TestGet(t *testing.T) {
 	}, {
 		path:           "/include/index.css",
 		expV:           []byte("body {\n}\n"),
-		expContentType: "text/css; charset=utf-8",
+		expContentType: []string{"text/css; charset=utf-8"},
 	}, {
 		path:           "/include/index.html",
 		expV:           []byte("<html></html>\n"),
-		expContentType: "text/html; charset=utf-8",
+		expContentType: []string{"text/html; charset=utf-8"},
 	}, {
-		path:           "/include/index.js",
-		expContentType: "text/javascript; charset=utf-8",
+		path: "/include/index.js",
+		expContentType: []string{
+			"text/javascript; charset=utf-8",
+			"application/javascript",
+		},
 	}, {
 		path:           "/index.css",
 		expV:           []byte("body {\n}\n"),
-		expContentType: "text/css; charset=utf-8",
+		expContentType: []string{"text/css; charset=utf-8"},
 	}, {
 		path:           "/index.html",
 		expV:           []byte("<html></html>\n"),
-		expContentType: "text/html; charset=utf-8",
+		expContentType: []string{"text/html; charset=utf-8"},
 	}, {
-		path:           "/index.js",
-		expContentType: "text/javascript; charset=utf-8",
+		path: "/index.js",
+		expContentType: []string{
+			"text/javascript; charset=utf-8",
+			"application/javascript",
+		},
 	}, {
 		path:           "/plain",
-		expContentType: "application/octet-stream",
+		expContentType: []string{"application/octet-stream"},
 	}}
 
 	dir := filepath.Join(_testWD, "/testdata")
@@ -186,7 +195,21 @@ func TestGet(t *testing.T) {
 			test.Assert(t, "node.V", c.expV, got.V)
 		}
 
-		test.Assert(t, "node.ContentType", c.expContentType, got.ContentType)
+		if len(got.ContentType) == 0 && len(c.expContentType) == 0 {
+			continue
+		}
+
+		found := false
+		for _, expCT := range c.expContentType {
+			if expCT == got.ContentType {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("expecting one of the Content-Type %v, got %s",
+				c.expContentType, got.ContentType)
+		}
 	}
 }
 
