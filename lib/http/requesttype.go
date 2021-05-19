@@ -14,6 +14,7 @@ const (
 	RequestTypeForm
 	RequestTypeMultipartForm
 	RequestTypeJSON
+	RequestTypeXML
 )
 
 //
@@ -29,6 +30,8 @@ func (rt RequestType) String() string {
 		return ContentTypeMultipartForm
 	case RequestTypeJSON:
 		return ContentTypeJSON
+	case RequestTypeXML:
+		return ContentTypeXML
 	}
 	return ""
 }
