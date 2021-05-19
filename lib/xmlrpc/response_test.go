@@ -5,12 +5,60 @@
 package xmlrpc
 
 import (
+	"encoding/xml"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestResponse(t *testing.T) {
+func TestResponse_MarshalText(t *testing.T) {
+	cases := []struct {
+		desc string
+		resp *Response
+		exp  string
+	}{{
+		desc: "With param",
+		resp: &Response{
+			Param: &Value{
+				Kind: Boolean,
+				In:   true,
+			},
+		},
+		exp: xml.Header + `<methodResponse><params><param><value><boolean>true</boolean></value></param></params></methodResponse>`,
+	}, {
+		desc: "With fault",
+		resp: &Response{
+			FaultCode:    404,
+			FaultMessage: "Not found",
+			IsFault:      true,
+		},
+		exp: xml.Header + `<methodResponse>` +
+			`<fault><value><struct>` +
+			`<member>` +
+			`<name>faultCode</name>` +
+			`<value><int>404</int></value>` +
+			`</member>` +
+			`<member>` +
+			`<name>faultString</name>` +
+			`<value><string>Not found</string></value>` +
+			`</member>` +
+			`</struct></value></fault>` +
+			`</methodResponse>`,
+	}}
+
+	for _, c := range cases {
+		t.Logf(c.desc)
+
+		got, err := c.resp.MarshalText()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, "MarshalText", c.exp, string(got))
+	}
+}
+
+func TestResponse_UnmarshalText(t *testing.T) {
 	cases := []struct {
 		desc string
 		text string
@@ -91,6 +139,8 @@ func TestResponse(t *testing.T) {
 	}}
 
 	for _, c := range cases {
+		t.Logf(c.desc)
+
 		var got Response
 
 		err := got.UnmarshalText([]byte(c.text))

@@ -17,6 +17,32 @@ type Response struct {
 	IsFault      bool
 }
 
+//
+// MarshalText encode the Response instance into XML text.
+//
+func (resp *Response) MarshalText() (out []byte, err error) {
+	var buf bytes.Buffer
+
+	buf.WriteString(xml.Header)
+	buf.WriteString("<methodResponse>")
+
+	if !resp.IsFault {
+		fmt.Fprintf(&buf, "<params><param>%s</param></params>",
+			resp.Param)
+	} else {
+		buf.WriteString("<fault><value><struct>")
+		fmt.Fprintf(&buf, "<member><name>faultCode</name><value><int>%d</int></value></member>",
+			resp.FaultCode)
+		fmt.Fprintf(&buf, "<member><name>faultString</name><value><string>%s</string></value></member>",
+			resp.FaultMessage)
+		buf.WriteString("</struct></value></fault>")
+	}
+
+	buf.WriteString("</methodResponse>")
+
+	return buf.Bytes(), nil
+}
+
 func (resp *Response) UnmarshalText(text []byte) (err error) {
 	var (
 		logp = "xmlrpc: Response"
