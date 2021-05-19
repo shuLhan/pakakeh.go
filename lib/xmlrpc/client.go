@@ -136,7 +136,7 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 		}
 	}
 	if !resp.IsFault {
-		if httpRes.StatusCode != 200 {
+		if httpRes.StatusCode >= 400 {
 			resp.IsFault = true
 		}
 	}
