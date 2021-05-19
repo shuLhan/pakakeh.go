@@ -11,67 +11,67 @@ import (
 )
 
 type Response struct {
-	Param        Value
+	Param        *Value
 	FaultMessage string
 	FaultCode    int32
 	IsFault      bool
 }
 
 func (resp *Response) UnmarshalText(text []byte) (err error) {
-	dec := xml.NewDecoder(bytes.NewReader(text))
+	var (
+		logp = "xmlrpc: Response"
+		dec  = xml.NewDecoder(bytes.NewReader(text))
+	)
 
 	err = xmlBegin(dec)
 	if err != nil {
-		return fmt.Errorf("UnmarshalText: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	el, _, err := xmlNext(dec)
+	err = xmlMustStart(dec, elNameMethodResponse)
 	if err != nil {
-		return fmt.Errorf("UnmarshalText: %w", err)
-	}
-	if el.Name.Local != elNameMethodResponse {
-		return fmt.Errorf("UnmarshalText: expecting '<%s>' got %v",
-			elNameMethodResponse, el.Name.Local)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	el, _, err = xmlNext(dec)
+	token, err := dec.Token()
 	if err != nil {
-		return fmt.Errorf("UnmarshalText: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	switch el.Name.Local {
-	case elNameFault:
-		err = resp.unmarshalFault(dec)
-		if err != nil {
-			return fmt.Errorf("UnmarshalText: %w", err)
-		}
+	found := false
+	for !found {
+		switch tok := token.(type) {
+		case xml.StartElement:
+			switch tok.Name.Local {
+			case elNameFault:
+				err = resp.unmarshalFault(dec)
+				if err != nil {
+					return fmt.Errorf("%s: %w", logp, err)
+				}
+				found = true
 
-	case elNameParams:
-		el, _, err = xmlNext(dec)
-		if err != nil {
-			return fmt.Errorf("UnmarshalText: %w", err)
-		}
-		if el.Name.Local != elNameParam {
-			return fmt.Errorf("UnmarshalText: expecting '<%s>' got %v",
-				elNameParam, el)
-		}
+			case elNameParams:
+				resp.Param, err = xmlParseParam(dec, elNameParams)
+				if err != nil {
+					return fmt.Errorf("%s: %w", logp, err)
+				}
+				found = true
 
-		el, _, err = xmlNext(dec)
-		if err != nil {
-			return fmt.Errorf("UnmarshalText: %w", err)
-		}
-		if el.Name.Local != elNameValue {
-			return fmt.Errorf("UnmarshalText: expecting '<%s>' got %v",
-				elNameValue, el)
-		}
+			default:
+				return fmt.Errorf("%s: expecting <params> or <fault> got <%s>",
+					logp, tok.Name.Local)
+			}
 
-		resp.Param, err = xmlParseScalarValue(dec)
-		if err != nil {
-			return fmt.Errorf("UnmarshalText: %w", err)
+		case xml.Comment, xml.CharData:
+			token, err = dec.Token()
+			if err != nil {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
+
+		default:
+			return fmt.Errorf("%s: expecting <params> or <fault>, got token %T %+v",
+				logp, token, tok)
 		}
-	default:
-		return fmt.Errorf("UnmarshalText: expecting '<params>' or '<fault>' got %v",
-			el.Name.Local)
 	}
 
 	return nil
@@ -83,25 +83,7 @@ func (resp *Response) UnmarshalText(text []byte) (err error) {
 func (resp *Response) unmarshalFault(dec *xml.Decoder) (err error) {
 	resp.IsFault = true
 
-	el, _, err := xmlNext(dec)
-	if err != nil {
-		return fmt.Errorf("unmarshalFault: %w", err)
-	}
-	if el.Name.Local != elNameValue {
-		return fmt.Errorf("expecting '<%s>' got %v", elNameValue,
-			el.Name.Local)
-	}
-
-	el, _, err = xmlNext(dec)
-	if err != nil {
-		return fmt.Errorf("unmarshalFault: %w", err)
-	}
-	if el.Name.Local != typeNameStruct {
-		return fmt.Errorf("unmarshalFault: expecting '<%s>' got %v",
-			typeNameStruct, el.Name.Local)
-	}
-
-	v, err := xmlParseStruct(dec)
+	v, err := xmlParseValue(dec, elNameFault)
 	if err != nil {
 		return fmt.Errorf("unmarshalFault: %w", err)
 	}

@@ -6,12 +6,17 @@ package xmlrpc
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
 )
 
+//
+// Request represent the XML-RPC request, including method name and optional
+// parameters.
+//
 type Request struct {
 	MethodName string
-	Params     []Value
+	Params     []*Value
 }
 
 //
@@ -20,7 +25,7 @@ type Request struct {
 func NewRequest(methodName string, params []interface{}) (req Request, err error) {
 	req = Request{
 		MethodName: methodName,
-		Params:     make([]Value, 0, len(params)),
+		Params:     make([]*Value, 0, len(params)),
 	}
 
 	for _, p := range params {
@@ -29,7 +34,7 @@ func NewRequest(methodName string, params []interface{}) (req Request, err error
 			return req, fmt.Errorf("NewRequest: cannot convert parameter %v", p)
 		}
 
-		req.Params = append(req.Params, *v)
+		req.Params = append(req.Params, v)
 	}
 
 	return req, nil
@@ -57,4 +62,44 @@ func (req Request) MarshalText() (out []byte, err error) {
 	buf.WriteString("</methodCall>")
 
 	return buf.Bytes(), nil
+}
+
+//
+// UnmarshalText parse the XML request.
+//
+func (req *Request) UnmarshalText(text []byte) (err error) {
+	var (
+		logp      = "xmlrpc: Request"
+		dec       = xml.NewDecoder(bytes.NewReader(text))
+		hasParams bool
+	)
+
+	err = xmlBegin(dec)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	err = xmlMustStart(dec, elNameMethodCall)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	req.MethodName, err = xmlMustCData(dec, elNameMethodName)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	req.Params, hasParams, err = xmlParseParams(dec, elNameMethodCall)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	if hasParams {
+		err = xmlMustEnd(dec, elNameMethodCall)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+	}
+
+	return nil
 }

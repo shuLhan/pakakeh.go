@@ -36,17 +36,20 @@ const (
 )
 
 const (
-	elNameData           = "data"
-	elNameFault          = "fault"
-	elNameMember         = "member"
-	elNameMethodResponse = "methodresponse"
-	elNameName           = "name"
-	elNameParam          = "param"
-	elNameParams         = "params"
-	elNameValue          = "value"
+	elNameMethodCall     = "methodCall"
+	elNameMethodName     = "methodName"
+	elNameMethodResponse = "methodResponse"
 
-	memberNameFaultCode   = "faultcode"
-	memberNameFaultString = "faultstring"
+	elNameData   = "data"
+	elNameFault  = "fault"
+	elNameMember = "member"
+	elNameName   = "name"
+	elNameParam  = "param"
+	elNameParams = "params"
+	elNameValue  = "value"
+
+	memberNameFaultCode   = "faultCode"
+	memberNameFaultString = "faultString"
 
 	typeNameArray    = "array"
 	typeNameBase64   = "base64"

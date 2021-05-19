@@ -13,10 +13,13 @@ import (
 //
 type Member struct {
 	Name  string
-	Value Value
+	Value *Value
 }
 
 func (m Member) String() string {
-	return fmt.Sprintf("<member><name>%s</name>%s</member>", m.Name,
-		m.Value.String())
+	var val string
+	if m.Value != nil {
+		val = m.Value.String()
+	}
+	return fmt.Sprintf("<member><name>%s</name>%s</member>", m.Name, val)
 }

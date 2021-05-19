@@ -18,15 +18,15 @@ func TestResponse(t *testing.T) {
 	}{{
 		desc: "Normal response with string",
 		text: `<?xml version="1.0"?>
-<methodResponse>
-	<params>
-		<param>
-			<value><string>West Sumatra</string></value>
-		</param>
-	</params>
-</methodResponse>`,
+			<methodResponse>
+				<params>
+					<param>
+						<value><string>West Sumatra</string></value>
+					</param>
+				</params>
+			</methodResponse>`,
 		exp: Response{
-			Param: Value{
+			Param: &Value{
 				Kind: String,
 				In:   "West Sumatra",
 			},
@@ -34,22 +34,22 @@ func TestResponse(t *testing.T) {
 	}, {
 		desc: "Faulty response",
 		text: `<?xml version="1.0"?>
-<methodResponse>
-	<fault>
-		<value>
-			<struct>
-				<member>
-					<name>faultCode</name>
-					<value><int>4</int></value>
-				</member>
-				<member>
-					<name>faultString</name>
-					<value><string>Too many parameters.</string></value>
-				</member>
-			</struct>
-		</value>
-	</fault>
-</methodResponse>`,
+			<methodResponse>
+				<fault>
+					<value>
+						<struct>
+							<member>
+								<name>faultCode</name>
+								<value><int>4</int></value>
+							</member>
+							<member>
+								<name>faultString</name>
+								<value><string>Too many parameters.</string></value>
+							</member>
+						</struct>
+					</value>
+				</fault>
+			</methodResponse>`,
 		exp: Response{
 			FaultCode:    4,
 			FaultMessage: "Too many parameters.",
@@ -58,25 +58,25 @@ func TestResponse(t *testing.T) {
 	}, {
 		desc: "Response with array",
 		text: `<?xml version="1.0"?>
-<methodResponse>
-	<params>
-		<param>
-		<value>
-			<array>
-			<data>
-				<value><string>North Sumatra</string></value>
-				<value><string>West Sumatra</string></value>
-				<value><string>South Sumatra</string></value>
-			</data>
-			</array>
-		</value>
-		</param>
-	</params>
-</methodResponse>`,
+			<methodResponse>
+				<params>
+					<param>
+					<value>
+						<array>
+						<data>
+							<value><string>North Sumatra</string></value>
+							<value><string>West Sumatra</string></value>
+							<value><string>South Sumatra</string></value>
+						</data>
+						</array>
+					</value>
+					</param>
+				</params>
+			</methodResponse>`,
 		exp: Response{
-			Param: Value{
+			Param: &Value{
 				Kind: Array,
-				Values: []Value{{
+				ArrayValues: []*Value{{
 					Kind: String,
 					In:   "North Sumatra",
 				}, {

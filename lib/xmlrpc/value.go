@@ -18,9 +18,9 @@ type Value struct {
 	// In contains scalar value for Base64, Boolean, Double, Integer,
 	// String, and DateTime.
 	// It would be nil for Kind of Array and Struct.
-	In      interface{}
-	Members []Member // List of struct's member.
-	Values  []Value  // List of array's items.
+	In            interface{}
+	StructMembers []*Member // List of struct's member.
+	ArrayValues   []*Value  // List of array's items.
 }
 
 //
@@ -74,7 +74,7 @@ func NewValue(in interface{}) (out *Value) {
 	case reflect.Struct:
 		out.Kind = Struct
 		for x := 0; x < reft.NumField(); x++ {
-			m := Member{}
+			m := &Member{}
 
 			field := reft.Field(x)
 			tag := field.Tag.Get(tagXML)
@@ -86,8 +86,8 @@ func NewValue(in interface{}) (out *Value) {
 
 			v := NewValue(refv.Field(x).Interface())
 			if v != nil {
-				m.Value = *v
-				out.Members = append(out.Members, m)
+				m.Value = v
+				out.StructMembers = append(out.StructMembers, m)
 			}
 		}
 
@@ -96,7 +96,7 @@ func NewValue(in interface{}) (out *Value) {
 		for x := 0; x < refv.Len(); x++ {
 			v := NewValue(refv.Index(x).Interface())
 			if v != nil {
-				out.Values = append(out.Values, *v)
+				out.ArrayValues = append(out.ArrayValues, v)
 			}
 		}
 
@@ -114,7 +114,7 @@ func NewValue(in interface{}) (out *Value) {
 // GetFieldAsFloat get struct's field value by name as float64.
 //
 func (v Value) GetFieldAsFloat(key string) float64 {
-	for _, m := range v.Members {
+	for _, m := range v.StructMembers {
 		if m.Name == key {
 			s, _ := m.Value.In.(float64)
 			return s
@@ -128,7 +128,7 @@ func (v Value) GetFieldAsFloat(key string) float64 {
 // GetFieldAsInteger get struct's field value by name as int32.
 //
 func (v Value) GetFieldAsInteger(key string) int32 {
-	for _, m := range v.Members {
+	for _, m := range v.StructMembers {
 		if m.Name == key {
 			s, _ := m.Value.In.(int32)
 			return s
@@ -142,7 +142,7 @@ func (v Value) GetFieldAsInteger(key string) int32 {
 // GetFieldAsString get struct's field value by name as string.
 //
 func (v Value) GetFieldAsString(key string) string {
-	for _, m := range v.Members {
+	for _, m := range v.StructMembers {
 		if m.Name == key {
 			s, _ := m.Value.In.(string)
 			return s
@@ -173,13 +173,13 @@ func (v Value) String() string {
 		fmt.Fprintf(&buf, "<base64>%s</base64>", v.In.(string))
 	case Struct:
 		buf.WriteString("<struct>")
-		for _, member := range v.Members {
+		for _, member := range v.StructMembers {
 			buf.WriteString(member.String())
 		}
 		buf.WriteString("</struct>")
 	case Array:
 		buf.WriteString("<array><data>")
-		for _, val := range v.Values {
+		for _, val := range v.ArrayValues {
 			fmt.Fprintf(&buf, "%s", val.String())
 		}
 		buf.WriteString("</data></array>")
