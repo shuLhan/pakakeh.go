@@ -46,6 +46,7 @@ func NewRequest(methodName string, params []interface{}) (req Request, err error
 func (req Request) MarshalText() (out []byte, err error) {
 	var buf bytes.Buffer
 
+	buf.WriteString(xml.Header)
 	buf.WriteString("<methodCall>")
 	buf.WriteString("<methodName>" + req.MethodName + "</methodName>")
 	if len(req.Params) > 0 {

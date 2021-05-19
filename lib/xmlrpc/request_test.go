@@ -5,6 +5,7 @@
 package xmlrpc
 
 import (
+	"encoding/xml"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -25,7 +26,7 @@ func TestRequest_MarshalText(t *testing.T) {
 		params: []interface{}{
 			"param-string",
 		},
-		exp: "<methodCall><methodName>method.name</methodName>" +
+		exp: xml.Header + "<methodCall><methodName>method.name</methodName>" +
 			"<params>" +
 			"<param>" +
 			"<value><string>param-string</string></value>" +
@@ -40,7 +41,7 @@ func TestRequest_MarshalText(t *testing.T) {
 				Y: true,
 			},
 		},
-		exp: "<methodCall><methodName>test.struct</methodName>" +
+		exp: xml.Header + "<methodCall><methodName>test.struct</methodName>" +
 			"<params><param><value><struct>" +
 			"<member>" +
 			"<name>X</name><value><int>1</int></value>" +
@@ -55,7 +56,7 @@ func TestRequest_MarshalText(t *testing.T) {
 		params: []interface{}{
 			[]string{"a", "b"},
 		},
-		exp: "<methodCall><methodName>test.array</methodName>" +
+		exp: xml.Header + "<methodCall><methodName>test.array</methodName>" +
 			"<params><param><value><array><data>" +
 			"<value><string>a</string></value>" +
 			"<value><string>b</string></value>" +

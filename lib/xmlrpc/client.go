@@ -7,7 +7,6 @@ package xmlrpc
 import (
 	"bytes"
 	"crypto/tls"
-	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -26,7 +25,6 @@ const (
 		"Content-Type: text/xml\r\n" +
 		"Content-Length: %d\r\n" +
 		"\r\n" +
-		"%s" +
 		"%s"
 
 	defaultTimeout = 60 * time.Second
@@ -105,7 +103,7 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 	xmlbin, _ := req.MarshalText()
 
 	fmt.Fprintf(&buf, requestHeader, cl.url.Path, cl.url.Host,
-		len(xml.Header)+len(xmlbin), xml.Header, xmlbin)
+		len(xmlbin), xmlbin)
 
 	reqbody := buf.Bytes()
 	if debug.Value >= 3 {
