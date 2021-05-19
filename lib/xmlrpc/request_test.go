@@ -142,19 +142,16 @@ func TestRequest_UnmarshalText(t *testing.T) {
 			MethodName: "test.struct",
 			Params: []*Value{{
 				Kind: Struct,
-				StructMembers: []*Member{{
-					Name: "X",
-					Value: &Value{
+				StructMembers: map[string]*Value{
+					"X": &Value{
 						Kind: Integer,
 						In:   int32(1),
 					},
-				}, {
-					Name: "Y",
-					Value: &Value{
+					"Y": &Value{
 						Kind: Boolean,
 						In:   true,
 					},
-				}},
+				},
 			}},
 		},
 	}, {

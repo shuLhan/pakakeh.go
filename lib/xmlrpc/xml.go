@@ -426,49 +426,50 @@ func xmlParseArray(dec *xml.Decoder) (arr *Value, err error) {
 }
 
 func xmlParseStruct(dec *xml.Decoder) (v *Value, err error) {
-	v = &Value{}
+	v = &Value{
+		StructMembers: make(map[string]*Value),
+	}
 	v.Kind = Struct
 
 	for {
-		member, err := xmlParseStructMember(dec)
+		mkey, mval, err := xmlParseStructMember(dec)
 		if err != nil {
 			return nil, err
 		}
-		if member == nil {
+		if mval == nil {
 			break
 		}
-		v.StructMembers = append(v.StructMembers, member)
+		v.StructMembers[mkey] = mval
 	}
 
 	return v, nil
 }
 
-func xmlParseStructMember(dec *xml.Decoder) (m *Member, err error) {
+func xmlParseStructMember(dec *xml.Decoder) (key string, val *Value, err error) {
 	isOpen, err := xmlStart(dec, elNameMember, typeNameStruct)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	if !isOpen {
-		return nil, nil
+		return "", nil, nil
 	}
 
 	cdata, err := xmlMustCData(dec, elNameName)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	m = &Member{}
-	m.Name = strings.TrimSpace(cdata)
+	key = strings.TrimSpace(cdata)
 
-	m.Value, err = xmlParseValue(dec, elNameMember)
+	val, err = xmlParseValue(dec, elNameMember)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	err = xmlMustEnd(dec, elNameMember)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	return m, nil
+	return key, val, nil
 }
