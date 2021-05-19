@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"sort"
 )
 
 //
@@ -180,9 +181,17 @@ func (v *Value) String() string {
 		fmt.Fprintf(&buf, "<base64>%s</base64>", v.In.(string))
 	case Struct:
 		buf.WriteString("<struct>")
-		for key, value := range v.StructMembers {
+		keys := make([]string, 0, len(v.StructMembers))
+		for key := range v.StructMembers {
+			if len(key) == 0 {
+				continue
+			}
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
 			fmt.Fprintf(&buf, `<member><name>%s</name>%s</member>`,
-				key, value)
+				key, v.StructMembers[key])
 		}
 		buf.WriteString("</struct>")
 	case Array:
