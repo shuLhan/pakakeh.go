@@ -28,7 +28,7 @@ const (
 	String        // represent Go string type.
 	Boolean       // represent Go bool type.
 	Integer       // represent Go int8, int16, int32, uint8, and uint16 types.
-	Double        // represent Go int64, uint8, uint16, uint32, uint64, float32, and float64 types.
+	Double        // represent Go uint32, uint64, float32, and float64 types.
 	DateTime      // represent Go time.Time type.
 	Base64        // represent Go string type.
 	Struct        // represent Go struct type.

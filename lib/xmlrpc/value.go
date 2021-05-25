@@ -63,8 +63,11 @@ func NewValue(in interface{}) (out *Value) {
 		out.Kind = Double
 		out.In = float64(refv.Int())
 
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32,
-		reflect.Uint64, reflect.Uintptr:
+	case reflect.Uint8, reflect.Uint16:
+		out.Kind = Integer
+		out.In = int32(refv.Uint())
+
+	case reflect.Uint, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		out.Kind = Double
 		out.In = float64(refv.Uint())
 
