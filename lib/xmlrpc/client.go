@@ -124,7 +124,7 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 		fmt.Printf(">>> Send: response:\n%s\n", xmlbin)
 	}
 
-	httpRes, resBody, err := libhttp.ParseResponseHeader(xmlbin)
+	_, resBody, err := libhttp.ParseResponseHeader(xmlbin)
 	if err != nil {
 		return resp, fmt.Errorf("Send: %w", err)
 	}
@@ -133,11 +133,6 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 		err = resp.UnmarshalText(resBody)
 		if err != nil {
 			return resp, err
-		}
-	}
-	if !resp.IsFault {
-		if httpRes.StatusCode >= 400 {
-			resp.IsFault = true
 		}
 	}
 

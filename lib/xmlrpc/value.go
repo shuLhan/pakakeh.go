@@ -131,9 +131,9 @@ func (v *Value) GetFieldAsFloat(key string) float64 {
 }
 
 //
-// GetFieldAsInteger get struct's field value by name as int32.
+// GetFieldAsInteger get struct's field value by name as int.
 //
-func (v *Value) GetFieldAsInteger(key string) int32 {
+func (v *Value) GetFieldAsInteger(key string) int {
 	if v == nil || v.StructMembers == nil {
 		return 0
 	}
@@ -142,7 +142,7 @@ func (v *Value) GetFieldAsInteger(key string) int32 {
 		return 0
 	}
 	i32, _ := mv.In.(int32)
-	return i32
+	return int(i32)
 }
 
 //

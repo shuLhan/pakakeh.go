@@ -8,13 +8,13 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+
+	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
 type Response struct {
-	Param        *Value
-	FaultMessage string
-	FaultCode    int32
-	IsFault      bool
+	liberrors.E
+	Param *Value
 }
 
 //
@@ -26,15 +26,15 @@ func (resp *Response) MarshalText() (out []byte, err error) {
 	buf.WriteString(xml.Header)
 	buf.WriteString("<methodResponse>")
 
-	if !resp.IsFault {
+	if resp.Code <= 200 {
 		fmt.Fprintf(&buf, "<params><param>%s</param></params>",
 			resp.Param)
 	} else {
 		buf.WriteString("<fault><value><struct>")
 		fmt.Fprintf(&buf, "<member><name>faultCode</name><value><int>%d</int></value></member>",
-			resp.FaultCode)
+			resp.Code)
 		fmt.Fprintf(&buf, "<member><name>faultString</name><value><string>%s</string></value></member>",
-			resp.FaultMessage)
+			resp.Message)
 		buf.WriteString("</struct></value></fault>")
 	}
 
@@ -104,18 +104,23 @@ func (resp *Response) UnmarshalText(text []byte) (err error) {
 }
 
 //
+// Unwrap return the error as instance of *liberror.E.
+//
+func (resp *Response) Unwrap() (err error) {
+	return &resp.E
+}
+
+//
 // unmarshalFault parse the XML fault error code and message.
 //
 func (resp *Response) unmarshalFault(dec *xml.Decoder) (err error) {
-	resp.IsFault = true
-
 	v, err := xmlParseValue(dec, elNameFault)
 	if err != nil {
 		return fmt.Errorf("unmarshalFault: %w", err)
 	}
 
-	resp.FaultCode = v.GetFieldAsInteger(memberNameFaultCode)
-	resp.FaultMessage = v.GetFieldAsString(memberNameFaultString)
+	resp.Code = v.GetFieldAsInteger(memberNameFaultCode)
+	resp.Message = v.GetFieldAsString(memberNameFaultString)
 
 	return nil
 }

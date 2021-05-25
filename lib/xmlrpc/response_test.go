@@ -8,6 +8,7 @@ import (
 	"encoding/xml"
 	"testing"
 
+	liberrors "github.com/shuLhan/share/lib/errors"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -28,9 +29,10 @@ func TestResponse_MarshalText(t *testing.T) {
 	}, {
 		desc: "With fault",
 		resp: &Response{
-			FaultCode:    404,
-			FaultMessage: "Not found",
-			IsFault:      true,
+			E: liberrors.E{
+				Code:    404,
+				Message: "Not found",
+			},
 		},
 		exp: xml.Header + `<methodResponse>` +
 			`<fault><value><struct>` +
@@ -99,9 +101,10 @@ func TestResponse_UnmarshalText(t *testing.T) {
 				</fault>
 			</methodResponse>`,
 		exp: Response{
-			FaultCode:    4,
-			FaultMessage: "Too many parameters.",
-			IsFault:      true,
+			E: liberrors.E{
+				Code:    4,
+				Message: "Too many parameters.",
+			},
 		},
 	}, {
 		desc: "Response with array",
