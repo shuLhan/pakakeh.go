@@ -3,15 +3,18 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package memfs provide a library for mapping file system into memory and to
-// generate a go file.
+// Package memfs provide a library for mapping file system into memory and/or
+// to embed it inside go source file.
 //
 // Usage
 //
-// The first step is to create new instance of memfs using "New()".
+// The first step is to create new instance of memfs using `New()`.
+// The following example embed all files inside directory named "include" or
+// any files with extension ".css", ".html", and ".js";
+// but exclude any files inside directory named "exclude".
 //
 //	opts := &Options{
-//		Dir: "./mydir",
+//		Root: "./mydir",
 //		Includes: []string{
 //			`.*/include`,
 //			`.*\.(css|html|js)$`,
@@ -51,7 +54,8 @@
 //
 // Go embed
 //
-// memfs also support embedding the files into Go generated source file.
+// The memfs package also support embedding the files into Go generated source
+// file.
 // After we create memfs instance, we call GoGenerate() to dump all directory
 // and files as Go source code.
 //
