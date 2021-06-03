@@ -478,3 +478,77 @@ func TestMain(m *testing.M) {
 
 	os.Exit(m.Run())
 }
+
+func TestMerge(t *testing.T) {
+	optsDirect := &Options{
+		Root: "testdata/direct",
+	}
+	mfsDirect, err := New(optsDirect)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	optsInclude := &Options{
+		Root: "testdata/include",
+	}
+	mfsInclude, err := New(optsInclude)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc   string
+		params []*MemFS
+		exp    *MemFS
+	}{{
+		desc:   "with the same instance",
+		params: []*MemFS{mfsDirect, mfsDirect},
+		exp: &MemFS{
+			PathNodes: &PathNode{
+				v: map[string]*Node{
+					"/": &Node{
+						SysPath: "..",
+						Path:    "/",
+						Childs: []*Node{
+							mfsDirect.MustGet("/add"),
+						},
+					},
+					"/add":       mfsDirect.MustGet("/add"),
+					"/add/file":  mfsDirect.MustGet("/add/file"),
+					"/add/file2": mfsDirect.MustGet("/add/file2"),
+				},
+			},
+		},
+	}, {
+		desc:   "with different instances",
+		params: []*MemFS{mfsDirect, mfsInclude},
+		exp: &MemFS{
+			PathNodes: &PathNode{
+				v: map[string]*Node{
+					"/": &Node{
+						SysPath: "..",
+						Path:    "/",
+						Childs: []*Node{
+							mfsDirect.MustGet("/add"),
+							mfsInclude.MustGet("/index.css"),
+							mfsInclude.MustGet("/index.html"),
+							mfsInclude.MustGet("/index.js"),
+						},
+					},
+					"/add":        mfsDirect.MustGet("/add"),
+					"/add/file":   mfsDirect.MustGet("/add/file"),
+					"/add/file2":  mfsDirect.MustGet("/add/file2"),
+					"/index.css":  mfsInclude.MustGet("/index.css"),
+					"/index.html": mfsInclude.MustGet("/index.html"),
+					"/index.js":   mfsInclude.MustGet("/index.js"),
+				},
+			},
+		},
+	}}
+
+	for _, c := range cases {
+		got := Merge(c.params...)
+
+		test.Assert(t, c.desc, c.exp.PathNodes.v, got.PathNodes.v)
+	}
+}

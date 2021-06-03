@@ -44,6 +44,46 @@ type MemFS struct {
 }
 
 //
+// Merge one or more instances of MemFS into single hierarchy.
+//
+// If there are two instance of Node that have the same path, the last
+// instance will be ignored.
+//
+func Merge(params ...*MemFS) (merged *MemFS) {
+	merged = &MemFS{
+		PathNodes: &PathNode{
+			v: make(map[string]*Node),
+		},
+		Root: &Node{
+			SysPath: "..",
+			Path:    "/",
+		},
+	}
+
+	merged.PathNodes.v["/"] = merged.Root
+
+	for _, mfs := range params {
+		for _, child := range mfs.Root.Childs {
+			_, exist := merged.PathNodes.v[child.Path]
+			if exist {
+				continue
+			}
+			merged.Root.AddChild(child)
+		}
+		for path, node := range mfs.PathNodes.v {
+			if path == "/" {
+				continue
+			}
+			_, exist := merged.PathNodes.v[path]
+			if !exist {
+				merged.PathNodes.v[path] = node
+			}
+		}
+	}
+	return merged
+}
+
+//
 // New create and initialize new memory file system from directory Root using
 // list of regular expresssion for Including or Excluding files.
 //
@@ -250,6 +290,15 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	return node, nil
+}
+
+//
+// MustGet return the Node representation of file in memory by its path if its
+// exist or nil the path is not exist.
+//
+func (mfs *MemFS) MustGet(path string) (node *Node) {
+	node, _ = mfs.Get(path)
+	return node
 }
 
 //
