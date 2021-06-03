@@ -110,6 +110,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 //
 func (leaf *Node) AddChild(child *Node) {
 	leaf.Childs = append(leaf.Childs, child)
+	child.Parent = leaf
 }
 
 //
