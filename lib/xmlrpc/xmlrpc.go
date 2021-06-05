@@ -9,7 +9,6 @@
 package xmlrpc
 
 const (
-	boolTrue          = "true"
 	schemeIsHTTPS     = "https"
 	tagXML            = "xml"
 	timeLayoutISO8601 = "20060102T15:04:05"

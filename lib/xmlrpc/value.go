@@ -125,11 +125,14 @@ func (v *Value) GetFieldAsFloat(key string) float64 {
 	if v == nil || v.StructMembers == nil {
 		return 0
 	}
-	mv, _ := v.StructMembers[key]
+	mv := v.StructMembers[key]
 	if mv == nil {
 		return 0
 	}
-	f64, _ := mv.In.(float64)
+	f64, ok := mv.In.(float64)
+	if !ok {
+		return 0
+	}
 	return f64
 }
 
@@ -140,11 +143,14 @@ func (v *Value) GetFieldAsInteger(key string) int {
 	if v == nil || v.StructMembers == nil {
 		return 0
 	}
-	mv, _ := v.StructMembers[key]
+	mv := v.StructMembers[key]
 	if mv == nil {
 		return 0
 	}
-	i32, _ := mv.In.(int32)
+	i32, ok := mv.In.(int32)
+	if !ok {
+		return 0
+	}
 	return int(i32)
 }
 
@@ -155,11 +161,14 @@ func (v *Value) GetFieldAsString(key string) string {
 	if v == nil || v.StructMembers == nil {
 		return ""
 	}
-	mv, _ := v.StructMembers[key]
+	mv := v.StructMembers[key]
 	if mv == nil {
 		return ""
 	}
-	s, _ := mv.In.(string)
+	s, ok := mv.In.(string)
+	if !ok {
+		return ""
+	}
 	return s
 }
 
