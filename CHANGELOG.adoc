@@ -3,6 +3,94 @@
 
 This library is released every month, usually at the first week of month.
 
+== share v0.27.0 (2021-06-05)
+
+This release bring better functionalities, usability, and fixes for `xmlrpc`
+package.
+
+=== Breaking changes
+
+* xmlrpc: change the Response to embed the errors.E
+
+  The errors.E contains code and message that also implement wrapping and
+  unwrapping error, so we can use the Response as error just like in
+  http.EndpointResponse.
+
+* xmlrpc: write the XML header when marshaling request not on client
+
+  Previously, the XML header is added when sending the request using
+  client.
+
+  This commit changes it to write the header when marshaling the Request
+  instance.
+
+* xmlrpc: replace Value field for struct with map of string and value
+
+  Previously, for param with type "struct" is represented by slice of
+  Member{Name,Value}.
+
+  This commit changes the Value field for "struct" to a map of string and
+  value for easily access the struct's member, without looping.
+
+* xmlrpc: refactoring the parser for decoding XML-RPC request
+
+  This changes,
+
+  * method to parse XML-RPC request,
+  * change the Member field Value type to pointer to Value,
+  * change the Request field Params type to slice of pointer of Value,
+  * change the Response field Param type to pointer to Value,
+  * rename the Value fields from Members to StructMembers and Values to
+    ArrayValues
+
+=== New features
+
+* memfs: add function to Merge one or more instance of MemFS
+
+  The Merge function merge one or more instance of MemFS into single MemFS
+  instance.
+
+  If there are two instance of Node that have the same path, the last
+  instance will be ignored.
+
+* xmlrpc: add method to marshal Response
+
+* mlog: add function and method PrintStack
+
+  The PrintStack function or method will writes to error writers the stack
+  trace returned by debug.Stack.
+
+=== Enhancements
+
+* http: add request type for XML
+
+  Setting Endpoint's RequestType to RequestTypeXML will check the content
+  type of HTTP request to match with "text/xml".
+
+=== Bug fixes
+
+* memfs: set the field Parent on Node AddChild
+
+* xmlrpc: convert the uint8 and uint16 as type Integer, and Uint as Double
+
+  Previously, uint8 and uint16 will be converted as Double, but those
+  types are in range of four bytes so it can still be handled by int32.
+
+* xmlrpc: set client response IsFault when StatusCode >= 400
+
+  Previously, we set IsFault to true if the HTTP response code not equal to
+  200 only, which is not always correct.
+
+  This commit changes it to check any status code that is greater or equal
+  to 400.
+
+* memfs: fix test by checking multiple content-types
+
+  On Arch Linux with Go tip, the content-type for JavaScript file is
+  "text/javascript".  While on Ubuntu with Go 1.16 the content-type for
+  JavaScript file is "application/javascript".
+
+
 ==  share v0.26.0 (2021-05-03)
 
 === New features
