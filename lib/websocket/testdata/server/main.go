@@ -42,10 +42,15 @@ func handleText(conn int, payload []byte) {
 }
 
 func main() {
-	srv := websocket.NewServer(9001)
+	opts := &websocket.ServerOptions{
+		Address:    "127.0.0.1:9001",
+		HandleBin:  handleBin,
+		HandleText: handleText,
+	}
+	srv := websocket.NewServer(opts)
 
-	srv.HandleBin = handleBin
-	srv.HandleText = handleText
-
-	srv.Start()
+	err := srv.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
