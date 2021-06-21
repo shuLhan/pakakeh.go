@@ -3,6 +3,18 @@
 
 This library is released every month, usually at the first week of month.
 
+== share v0.28.0 (2021-07-xx)
+
+=== Enhancements
+
+* websocket: store all the handshake headers to Handshake.Header
+
+  Previously only non-required headers are stored in the Handshake Header
+  field, while the required header value stored on their respective fields.
+
+  This commit store all request header key and values into the Header field.
+
+
 == share v0.27.0 (2021-06-05)
 
 This release bring better functionalities, usability, and fixes for `xmlrpc`
