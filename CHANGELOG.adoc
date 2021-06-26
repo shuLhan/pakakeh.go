@@ -7,6 +7,15 @@ This library is released every month, usually at the first week of month.
 
 === Enhancements
 
+* http: export the Options field on the Server
+
+  Previously, the Options field is not exported to prevent user from
+  changing it once it set throught NewServer() function.
+
+  This changes export the Options field to allow user of Server access its
+  values.  We can create a method on server to return read-only options,
+  but that will over complicated the Server API.
+
 * websocket: store all the handshake headers to Handshake.Header
 
   Previously only non-required headers are stored in the Handshake Header

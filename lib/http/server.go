@@ -33,7 +33,12 @@ const (
 type Server struct {
 	*http.Server
 
-	opts *ServerOptions
+	// Options for server, set by calling NewServer.
+	// This field is exported only for reference, for example logging in
+	// the Options when server started.
+	// Modifying the value of Options after server has been started may
+	// cause undefined effects.
+	Options *ServerOptions
 
 	// Memfs contains the content of file systems to be served in memory.
 	// It will be initialized only if ServerOptions.Memfs is nil and Root
@@ -56,11 +61,11 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	opts.init()
 
 	srv = &Server{
-		opts: opts,
+		Options: opts,
 	}
 
 	srv.Server = opts.Conn
-	srv.Addr = opts.Address
+	srv.Server.Addr = opts.Address
 	srv.Memfs = opts.Memfs
 	srv.Handler = srv
 
@@ -376,7 +381,7 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for _, origin := range srv.opts.CORS.AllowOrigins {
+	for _, origin := range srv.Options.CORS.AllowOrigins {
 		if origin == corsWildcard {
 			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
 			found = true
@@ -394,10 +399,10 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 
 	preflightMethod := req.Header.Get(HeaderACRequestMethod)
 	if len(preflightMethod) == 0 {
-		if len(srv.opts.CORS.exposeHeaders) > 0 {
+		if len(srv.Options.CORS.exposeHeaders) > 0 {
 			res.Header().Set(
 				HeaderACExposeHeaders,
-				srv.opts.CORS.exposeHeaders,
+				srv.Options.CORS.exposeHeaders,
 			)
 		}
 		return
@@ -413,10 +418,10 @@ func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 
 	srv.handleCORSRequestHeaders(res, req)
 
-	if len(srv.opts.CORS.maxAge) > 0 {
-		res.Header().Set(HeaderACMaxAge, srv.opts.CORS.maxAge)
+	if len(srv.Options.CORS.maxAge) > 0 {
+		res.Header().Set(HeaderACMaxAge, srv.Options.CORS.maxAge)
 	}
-	if srv.opts.CORS.AllowCredentials {
+	if srv.Options.CORS.AllowCredentials {
 		res.Header().Set(HeaderACAllowCredentials, "true")
 	}
 }
@@ -437,7 +442,7 @@ func (srv *Server) handleCORSRequestHeaders(
 	allowHeaders := make([]string, 0, len(reqHeaders))
 
 	for _, reqHeader := range reqHeaders {
-		for _, allowHeader := range srv.opts.CORS.AllowHeaders {
+		for _, allowHeader := range srv.Options.CORS.AllowHeaders {
 			if allowHeader == corsWildcard {
 				allowHeaders = append(allowHeaders, reqHeader)
 				break
