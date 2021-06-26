@@ -39,11 +39,18 @@ const (
 )
 
 //
-// Server for websocket.  //
+// Server for websocket.
+//
 type Server struct {
 	Clients *ClientManager
 
-	opts      *ServerOptions
+	// Options for server, set by calling NewServer.
+	// This field is exported only for reference, for example logging in
+	// the Options when server started.
+	// Modifying the value of Options after server has been started may
+	// cause undefined effects.
+	Options *ServerOptions
+
 	sock      int
 	chUpgrade chan int
 	running   chan struct{}
@@ -71,7 +78,7 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 	}
 
 	serv = &Server{
-		opts:    opts,
+		Options: opts,
 		Clients: newClientManager(),
 		routes:  newRootRoute(),
 		running: make(chan struct{}, 1),
@@ -115,7 +122,7 @@ func (serv *Server) createSockServer() (err error) {
 		return
 	}
 
-	host, strPort, err := net.SplitHostPort(serv.opts.Address)
+	host, strPort, err := net.SplitHostPort(serv.Options.Address)
 	if err != nil {
 		return
 	}
@@ -179,8 +186,8 @@ func (serv *Server) handleUpgrade(hs *Handshake) (
 	err = hs.parse()
 	if err == nil {
 		key = libbytes.Copy(hs.Key)
-		if serv.opts.HandleAuth != nil {
-			ctx, err = serv.opts.HandleAuth(hs)
+		if serv.Options.HandleAuth != nil {
+			ctx, err = serv.Options.HandleAuth(hs)
 		}
 	}
 
@@ -202,8 +209,8 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 	if ctx != nil {
 		serv.Clients.add(ctx, conn)
 
-		if serv.opts.HandleClientAdd != nil {
-			go serv.opts.HandleClientAdd(ctx, conn)
+		if serv.Options.HandleClientAdd != nil {
+			go serv.Options.HandleClientAdd(ctx, conn)
 		}
 	}
 
@@ -216,8 +223,8 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 func (serv *Server) ClientRemove(conn int) {
 	ctx := serv.Clients.Context(conn)
 
-	if ctx != nil && serv.opts.HandleClientRemove != nil {
-		serv.opts.HandleClientRemove(ctx, conn)
+	if ctx != nil && serv.Options.HandleClientRemove != nil {
+		serv.Options.HandleClientRemove(ctx, conn)
 	}
 
 	serv.Clients.remove(conn)
@@ -252,11 +259,11 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		if hs.URL.Path == serv.opts.StatusPath {
+		if hs.URL.Path == serv.Options.StatusPath {
 			serv.handleStatus(conn)
 			continue
 		}
-		if hs.URL.Path != serv.opts.ConnectPath {
+		if hs.URL.Path != serv.Options.ConnectPath {
 			serv.handleError(conn, http.StatusNotFound,
 				"unknown path")
 			continue
@@ -370,9 +377,9 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 			serv.handleInvalidData(conn)
 			return true
 		}
-		go serv.opts.HandleText(conn, frame.payload)
+		go serv.Options.HandleText(conn, frame.payload)
 	} else {
-		go serv.opts.HandleBin(conn, frame.payload)
+		go serv.Options.HandleBin(conn, frame.payload)
 	}
 
 	return false
@@ -408,8 +415,8 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 		}
 	case OpcodeControlRsvB, OpcodeControlRsvC, OpcodeControlRsvD,
 		OpcodeControlRsvE, OpcodeControlRsvF:
-		if serv.opts.HandleRsvControl != nil {
-			serv.opts.HandleRsvControl(conn, frame)
+		if serv.Options.HandleRsvControl != nil {
+			serv.Options.HandleRsvControl(conn, frame)
 		} else {
 			serv.handleClose(conn, frame)
 			isClosing = true
@@ -484,8 +491,7 @@ out:
 // handleBin message from client.  This is the dummy handler, that can be
 // overwritten by implementer.
 //
-func (serv *Server) handleBin(conn int, payload []byte) {
-}
+func (serv *Server) handleBin(conn int, payload []byte) {}
 
 func (serv *Server) handleStatus(conn int) {
 	var (
@@ -493,11 +499,11 @@ func (serv *Server) handleStatus(conn int) {
 		data        []byte
 	)
 
-	if serv.opts.HandleStatus == nil {
+	if serv.Options.HandleStatus == nil {
 		contentType = "text/plain"
 		data = []byte("OK")
 	} else {
-		contentType, data = serv.opts.HandleStatus()
+		contentType, data = serv.Options.HandleStatus()
 	}
 
 	res := fmt.Sprintf(_resStatusOK, contentType, len(data), data)
