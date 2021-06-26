@@ -26,7 +26,7 @@ var (
 		s := fmt.Sprintf("%s\n", epr.HttpRequest.Form)
 		s += fmt.Sprintf("%s\n", epr.HttpRequest.PostForm)
 		s += fmt.Sprintf("%v\n", epr.HttpRequest.MultipartForm)
-		s += fmt.Sprintf("%s", epr.RequestBody)
+		s += string(epr.RequestBody)
 		return []byte(s), nil
 	}
 
