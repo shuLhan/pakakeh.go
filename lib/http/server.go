@@ -40,11 +40,6 @@ type Server struct {
 	// cause undefined effects.
 	Options *ServerOptions
 
-	// Memfs contains the content of file systems to be served in memory.
-	// It will be initialized only if ServerOptions.Memfs is nil and Root
-	// is not empty.
-	Memfs *memfs.MemFS
-
 	evals        []Evaluator
 	routeDeletes []*route
 	routeGets    []*route
@@ -66,7 +61,6 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 
 	srv.Server = opts.Conn
 	srv.Server.Addr = opts.Address
-	srv.Memfs = opts.Memfs
 	srv.Handler = srv
 
 	if srv.ReadTimeout == 0 {
@@ -77,7 +71,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	}
 
 	if opts.Development || (opts.Memfs == nil && len(opts.Root) > 0) {
-		srv.Memfs, err = memfs.New(&opts.Options)
+		opts.Memfs, err = memfs.New(&opts.Options)
 		if err != nil {
 			return nil, err
 		}
@@ -332,13 +326,13 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 }
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
-	if srv.Memfs == nil {
+	if srv.Options.Memfs == nil {
 		return nil
 	}
 
 	var err error
 
-	node, err = srv.Memfs.Get(reqPath)
+	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			if debug.Value >= 3 {
@@ -349,7 +343,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 		reqPath = path.Join(reqPath, "index.html")
 
-		node, err = srv.Memfs.Get(reqPath)
+		node, err = srv.Options.Memfs.Get(reqPath)
 		if err != nil {
 			if debug.Value >= 3 {
 				log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
@@ -360,7 +354,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 
 	if node.IsDir() {
 		indexHTML := path.Join(reqPath, "index.html")
-		node, err = srv.Memfs.Get(indexHTML)
+		node, err = srv.Options.Memfs.Get(indexHTML)
 		if err != nil {
 			return nil
 		}
@@ -477,7 +471,7 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 
 //
 // HandleFS handle the request as resource in the memory file system.
-// This method only works if the Server.Memfs is not nil.
+// This method only works if the Server.Options.Memfs is not nil.
 //
 // If the request Path exists in file system, it will return 200 OK with the
 // header Content-Type set accordingly to the detected file type and the
