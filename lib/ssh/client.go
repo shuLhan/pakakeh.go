@@ -21,8 +21,9 @@ import (
 // Client for SSH connection.
 //
 type Client struct {
-	cfg  *config.Section
-	conn *ssh.Client
+	*ssh.Client
+
+	cfg *config.Section
 }
 
 //
@@ -70,7 +71,7 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 
 	remoteAddr := fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port)
 
-	cl.conn, err = ssh.Dial("tcp", remoteAddr, sshConfig)
+	cl.Client, err = ssh.Dial("tcp", remoteAddr, sshConfig)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -82,7 +83,7 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 // Execute a command on remote server.
 //
 func (cl *Client) Execute(cmd string) (err error) {
-	sess, err := cl.conn.NewSession()
+	sess, err := cl.NewSession()
 	if err != nil {
 		return fmt.Errorf("ssh: NewSession: " + err.Error())
 	}
