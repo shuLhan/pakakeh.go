@@ -2,41 +2,77 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import (
+	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
-
-	"github.com/shuLhan/share/lib/test"
 )
 
-func TestConfig_Get(t *testing.T) {
-	homeDir, err := os.UserHomeDir()
+var (
+	testDefaultSection = newSection()
+	testParser         *parser
+)
+
+func TestMain(m *testing.M) {
+	var err error
+
+	testParser, err = newParser()
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
 
-	cfg, err := NewConfig("./testdata/config")
+	testDefaultSection.init(testParser.workDir, testParser.homeDir)
+
+	os.Exit(m.Run())
+}
+
+func TestPatternToRegex(t *testing.T) {
+	cases := []struct {
+		in  string
+		exp string
+	}{{
+		in:  "*",
+		exp: ".*",
+	}, {
+		in:  "?",
+		exp: ".?",
+	}, {
+		in:  "192.*",
+		exp: `192\..*`,
+	}}
+
+	for _, c := range cases {
+		got := patternToRegex(c.in)
+		if c.exp != got {
+			t.Fatalf("patternToRegex: expecting %s, got %s", c.exp, got)
+		}
+	}
+}
+
+func TestConfig_Get(t *testing.T) {
+	cfg, err := Load("./testdata/config")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	cases := []struct {
 		s   string
-		exp func(def ConfigSection) *ConfigSection
+		exp func(def Section) *Section
 	}{{
 		s: "",
-		exp: func(def ConfigSection) *ConfigSection {
+		exp: func(def Section) *Section {
 			return nil
 		},
 	}, {
 		s: "example.local",
-		exp: func(def ConfigSection) *ConfigSection {
+		exp: func(def Section) *Section {
 			def.Hostname = "127.0.0.1"
 			def.User = "test"
-			def.privateKeyFile = ""
+			def.PrivateKeyFile = ""
 			def.IdentityFile = []string{
 				filepath.Join(def.homeDir, ".ssh", "notexist"),
 			}
@@ -45,10 +81,10 @@ func TestConfig_Get(t *testing.T) {
 		},
 	}, {
 		s: "my.example.local",
-		exp: func(def ConfigSection) *ConfigSection {
+		exp: func(def Section) *Section {
 			def.Hostname = "127.0.0.2"
 			def.User = "wildcard"
-			def.privateKeyFile = ""
+			def.PrivateKeyFile = ""
 			def.IdentityFile = []string{
 				filepath.Join(def.homeDir, ".ssh", "notexist"),
 			}
@@ -64,14 +100,18 @@ func TestConfig_Get(t *testing.T) {
 		if got != nil {
 			got.patterns = nil
 			got.criteria = nil
-			got.postConfig(homeDir)
+			got.init(testParser.workDir, testParser.homeDir)
 		}
 
 		exp := c.exp(*testDefaultSection)
 		if exp != nil {
-			exp.postConfig(homeDir)
+			exp.init(testParser.workDir, testParser.homeDir)
+		} else if got == nil {
+			continue
 		}
-		test.Assert(t, "Get "+c.s, exp, got)
+		if !reflect.DeepEqual(*exp, *got) {
+			t.Fatalf("Config.Get: expecting %v, got %v", exp, got)
+		}
 	}
 }
 
@@ -109,10 +149,20 @@ func TestParseKeyValue(t *testing.T) {
 	for _, c := range cases {
 		key, value, err := parseKeyValue(c.line)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if c.expError != err.Error() {
+				t.Fatalf("parseKeyValue: expecting error %s, got %s",
+					c.expError, err)
+			}
 			continue
 		}
-		test.Assert(t, "key:", c.expKey, key)
-		test.Assert(t, "value:", c.expValue, value)
+
+		if c.expKey != key {
+			t.Fatalf("parseKeyValue: expecting key %s, got %s",
+				c.expKey, key)
+		}
+		if c.expValue != value {
+			t.Fatalf("parseKeyValue: expecting value %s, got %s",
+				c.expValue, value)
+		}
 	}
 }

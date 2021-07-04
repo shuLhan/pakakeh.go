@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,16 +34,15 @@ const (
 // List of default values.
 const (
 	defConnectionAttempts = 1
-	defPort               = 22
-	defStringPort         = "22"
+	defPort               = "22"
 	defXAuthLocation      = "/usr/X11R6/bin/xauth"
 )
 
 //
-// ConfigSection is the type that represent SSH client Host and Match section
-// in configuration.
+// Section is the type that represent SSH client Host and Match section in
+// configuration.
 //
-type ConfigSection struct {
+type Section struct {
 	AddKeysToAgent              string
 	AddressFamily               string
 	BindAddress                 string
@@ -65,7 +63,7 @@ type ConfigSection struct {
 
 	Hostname                          string
 	IdentityFile                      []string
-	Port                              int
+	Port                              string
 	User                              string
 	XAuthLocation                     string
 	IsBatchMode                       bool
@@ -76,26 +74,24 @@ type ConfigSection struct {
 	UseCompression                    bool
 	UseVisualHostKey                  bool
 
-	stringPort string
-
 	// List of SSH private keys.
-	signers []ssh.Signer
+	Signers []ssh.Signer
 
 	// User's home directory.
 	homeDir string
 
-	// workingDir contains the directory where the SSH client started.
+	// WorkingDir contains the directory where the SSH client started.
 	// This value is required when client want to copy file from/to
 	// remote.
 	// This field is optional, default to current working directory from
 	// os.Getwd() or user's home directory.
-	workingDir string
+	WorkingDir string
 
 	// The first IdentityFile that exist and valid.
-	privateKeyFile string
+	PrivateKeyFile string
 
 	// Patterns for Host section.
-	patterns []*configPattern
+	patterns []*pattern
 
 	// Criteria for Match section.
 	criteria    []*matchCriteria
@@ -104,9 +100,9 @@ type ConfigSection struct {
 	useDefaultIdentityFile bool // Flag for the IdentityFile.
 }
 
-// newConfigSection create new Host or Match with default values.
-func newConfigSection() *ConfigSection {
-	return &ConfigSection{
+// newSection create new Host or Match with default values.
+func newSection() *Section {
+	return &Section{
 		AddKeysToAgent: valueNo,
 		AddressFamily:  valueAny,
 		CASignatureAlgorithms: []string{
@@ -129,24 +125,36 @@ func newConfigSection() *ConfigSection {
 		useDefaultIdentityFile:            true,
 		IsChallengeResponseAuthentication: true,
 		IsCheckHostIP:                     true,
-		stringPort:                        defStringPort,
 	}
 }
 
+func newSectionHost(rawPattern string) (host *Section) {
+	patterns := strings.Fields(rawPattern)
+
+	host = newSection()
+	host.patterns = make([]*pattern, 0, len(patterns))
+
+	for _, pattern := range patterns {
+		pat := newPattern(pattern)
+		host.patterns = append(host.patterns, pat)
+	}
+	return host
+}
+
 //
-// generateSigners convert the IdentityFile to ssh.Signer for authentication
+// GenerateSigners convert the IdentityFile to ssh.Signer for authentication
 // using PublicKey.
 //
-func (section *ConfigSection) generateSigners(agentc agent.ExtendedAgent) (err error) {
+func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) {
 	var (
-		logp     = "generateSigners"
+		logp     = "GenerateSigners"
 		pkeyFile string
 		pkeyPem  []byte
 		pkey     interface{}
 		signer   ssh.Signer
 	)
 
-	section.signers = make([]ssh.Signer, 0, len(section.IdentityFile))
+	section.Signers = make([]ssh.Signer, 0, len(section.IdentityFile))
 
 	for _, pkeyFile = range section.IdentityFile {
 		pkeyPem, err = ioutil.ReadFile(pkeyFile)
@@ -194,10 +202,10 @@ func (section *ConfigSection) generateSigners(agentc agent.ExtendedAgent) (err e
 			}
 		}
 
-		if len(section.privateKeyFile) == 0 {
-			section.privateKeyFile = pkeyFile
+		if len(section.PrivateKeyFile) == 0 {
+			section.PrivateKeyFile = pkeyFile
 		}
-		section.signers = append(section.signers, signer)
+		section.Signers = append(section.Signers, signer)
 	}
 	return nil
 }
@@ -206,7 +214,7 @@ func (section *ConfigSection) generateSigners(agentc agent.ExtendedAgent) (err e
 // isMatch will return true if the string "s" match with one of Host or Match
 // section.
 //
-func (section *ConfigSection) isMatch(s string) bool {
+func (section *Section) isMatch(s string) bool {
 	if section.useCriteria {
 		for _, criteria := range section.criteria {
 			if criteria.isMatch(s) {
@@ -224,35 +232,20 @@ func (section *ConfigSection) isMatch(s string) bool {
 }
 
 //
-// postConfig check, parse, and expand all of the fields values.
+// init check, parse, and expand all of the fields values.
 //
-func (section *ConfigSection) postConfig(homeDir string) {
-	var err error
-
-	if len(homeDir) == 0 {
-		section.homeDir, err = os.UserHomeDir()
-		if err != nil {
-			log.Println("ConfigSection.postConfig: " + err.Error())
-		}
-	} else {
-		section.homeDir = homeDir
-	}
-
-	section.workingDir, err = os.Getwd()
-	if err != nil {
-		log.Println("ssh: cannot get working directory, default to user's home")
-		section.workingDir = section.homeDir
-	}
+func (section *Section) init(workDir, homeDir string) {
+	section.homeDir = homeDir
+	section.WorkingDir = workDir
 
 	for x, identFile := range section.IdentityFile {
 		if identFile[0] == '~' {
-			section.IdentityFile[x] = strings.Replace(identFile,
-				"~", homeDir, 1)
+			section.IdentityFile[x] = strings.Replace(identFile, "~", section.homeDir, 1)
 		}
 	}
 }
 
-func (section *ConfigSection) setAddKeysToAgent(val string) (err error) {
+func (section *Section) setAddKeysToAgent(val string) (err error) {
 	switch val {
 	case valueAsk, valueConfirm, valueNo, valueYes:
 		section.AddKeysToAgent = val
@@ -263,7 +256,7 @@ func (section *ConfigSection) setAddKeysToAgent(val string) (err error) {
 	return nil
 }
 
-func (section *ConfigSection) setAddressFamily(val string) (err error) {
+func (section *Section) setAddressFamily(val string) (err error) {
 	switch val {
 	case valueAny, valueInet, valueInet6:
 		section.AddressFamily = val
@@ -274,7 +267,7 @@ func (section *ConfigSection) setAddressFamily(val string) (err error) {
 	return nil
 }
 
-func (section *ConfigSection) setCanonicalizeHostname(val string) (err error) {
+func (section *Section) setCanonicalizeHostname(val string) (err error) {
 	switch val {
 	case valueNo, valueAlways, valueYes:
 		section.CanonicalizeHostname = val
@@ -284,7 +277,7 @@ func (section *ConfigSection) setCanonicalizeHostname(val string) (err error) {
 	return nil
 }
 
-func (section *ConfigSection) setCanonicalizePermittedCNAMEs(val string) (err error) {
+func (section *Section) setCanonicalizePermittedCNAMEs(val string) (err error) {
 	sourceTarget := strings.Split(val, ":")
 	if len(sourceTarget) != 2 {
 		return fmt.Errorf("%s: invalid rule",
@@ -292,16 +285,16 @@ func (section *ConfigSection) setCanonicalizePermittedCNAMEs(val string) (err er
 	}
 
 	listSource := strings.Split(sourceTarget[0], ",")
-	sources := make([]*configPattern, 0, len(listSource))
+	sources := make([]*pattern, 0, len(listSource))
 	for _, domain := range listSource {
-		src := newConfigPattern(domain)
+		src := newPattern(domain)
 		sources = append(sources, src)
 	}
 
 	listTarget := strings.Split(sourceTarget[1], ",")
-	targets := make([]*configPattern, 0, len(listTarget))
+	targets := make([]*pattern, 0, len(listTarget))
 	for _, domain := range listTarget {
-		target := newConfigPattern(domain)
+		target := newPattern(domain)
 		targets = append(targets, target)
 	}
 
@@ -312,21 +305,21 @@ func (section *ConfigSection) setCanonicalizePermittedCNAMEs(val string) (err er
 	return nil
 }
 
-func (section *ConfigSection) setCASignatureAlgorithms(val string) {
+func (section *Section) setCASignatureAlgorithms(val string) {
 	section.CASignatureAlgorithms = strings.Split(val, ",")
 }
 
 //
 // setEnv set the Environments with key and value of format "KEY=VALUE".
 //
-func (section *ConfigSection) setEnv(env string) {
+func (section *Section) setEnv(env string) {
 	kv := strings.SplitN(env, "=", 2)
 	if len(kv) == 2 {
 		section.Environments[kv[0]] = kv[1]
 	}
 }
 
-func (section *ConfigSection) setSendEnv(envs map[string]string, pattern string) {
+func (section *Section) setSendEnv(envs map[string]string, pattern string) {
 	for k, v := range envs {
 		ok, _ := filepath.Match(pattern, k)
 		if ok {

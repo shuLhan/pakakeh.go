@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import (
 	"os"
+	"reflect"
 	"testing"
-
-	"github.com/shuLhan/share/lib/test"
 )
 
 func TestIsIncludeDirective(t *testing.T) {
@@ -31,7 +30,10 @@ func TestIsIncludeDirective(t *testing.T) {
 
 	for _, c := range cases {
 		got := isIncludeDirective(c.line)
-		test.Assert(t, "isIncludeDirective: "+c.line, c.exp, got)
+		if c.exp != got {
+			t.Fatalf("isIncludeDirective: %s: expecting %v, got %v",
+				c.line, c.exp, got)
+		}
 	}
 }
 
@@ -55,7 +57,9 @@ func TestParseInclude(t *testing.T) {
 
 	for _, c := range cases {
 		got := parseInclude(c.line)
-		test.Assert(t, "parseInclude: "+c.line, c.exp, got)
+		if !reflect.DeepEqual(c.exp, got) {
+			t.Fatalf("parseInclude: expecting %v, got %v", c.exp, got)
+		}
 	}
 }
 
@@ -82,7 +86,9 @@ func TestReadLines(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "readLines", c.exp, got)
+		if !reflect.DeepEqual(c.exp, got) {
+			t.Fatalf("readLines: expecting %v, got %v", c.exp, got)
+		}
 	}
 }
 
@@ -115,17 +121,21 @@ func TestConfigParser_load(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		parser, err := newConfigParser()
+		p, err := newParser()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		got, err := parser.load(c.dir, c.pattern)
+		got, err := p.load(c.dir, c.pattern)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if c.expError != err.Error() {
+				t.Fatalf("parser.load: expecting error %v, got %v", c.expError, err)
+			}
 			continue
 		}
-		test.Assert(t, "load "+c.pattern, c.exp, got)
+		if !reflect.DeepEqual(c.exp, got) {
+			t.Fatalf("parser.load: expecting %v, got %v", c.exp, got)
+		}
 	}
 }
 
@@ -158,6 +168,9 @@ func TestParseArgs(t *testing.T) {
 
 	for _, c := range cases {
 		got := parseArgs(c.raw, ' ')
-		test.Assert(t, "parseArgs "+c.raw, c.exp, got)
+
+		if !reflect.DeepEqual(c.exp, got) {
+			t.Fatalf("parseArgs: expecting %v, got %v", c.exp, got)
+		}
 	}
 }

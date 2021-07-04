@@ -2,22 +2,23 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import "path/filepath"
 
-type configPattern struct {
-	pattern  string
+type pattern struct {
+	value    string
 	isNegate bool
 }
 
-func newConfigPattern(s string) (pat *configPattern) {
-	pat = new(configPattern)
+func newPattern(s string) (pat *pattern) {
+	pat = &pattern{}
 	if s[0] == '!' {
 		pat.isNegate = true
-		s = s[1:]
+		pat.value = s[1:]
+	} else {
+		pat.value = s
 	}
-	pat.pattern = s
 	return pat
 }
 
@@ -25,8 +26,8 @@ func newConfigPattern(s string) (pat *configPattern) {
 // isMatch will return true if input string match with regex and isNegate is
 // false; otherwise it will return false.
 //
-func (pat *configPattern) isMatch(s string) bool {
-	ok, err := filepath.Match(pat.pattern, s)
+func (pat *pattern) isMatch(s string) bool {
+	ok, err := filepath.Match(pat.value, s)
 	if err != nil {
 		return false
 	}

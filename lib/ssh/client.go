@@ -13,60 +13,54 @@ import (
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
+
+	"github.com/shuLhan/share/lib/ssh/config"
 )
 
 //
 // Client for SSH connection.
 //
 type Client struct {
-	cfg  *ConfigSection
+	cfg  *config.Section
 	conn *ssh.Client
 }
 
 //
-// NewClient create a new SSH connection using predefined configuration.
+// NewClient create a new SSH connection using predefined
+// configuration.
 //
-func NewClient(cfg *ConfigSection) (cl *Client, err error) {
+func NewClient(cfg *config.Section) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
 	}
 
-	var (
-		logp             = "NewClient"
-		sshAgentSockPath string
-		sshAgentSock     net.Conn
-		sshConfig        *ssh.ClientConfig
-		remoteAddr       string
-		agentClient      agent.ExtendedAgent
-	)
+	logp := "NewClient"
 
-	cfg.postConfig("")
-
-	sshConfig = &ssh.ClientConfig{
+	sshConfig := &ssh.ClientConfig{
 		User:            cfg.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	sshAgentSockPath = os.Getenv("SSH_AUTH_SOCK")
+	sshAgentSockPath := os.Getenv("SSH_AUTH_SOCK")
 	if len(sshAgentSockPath) > 0 {
-		sshAgentSock, err = net.Dial("unix", sshAgentSockPath)
+		sshAgentSock, err := net.Dial("unix", sshAgentSockPath)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
-		agentClient = agent.NewClient(sshAgentSock)
+		agentClient := agent.NewClient(sshAgentSock)
 
 		sshConfig.Auth = []ssh.AuthMethod{
 			ssh.PublicKeysCallback(agentClient.Signers),
 		}
 	} else {
-		err = cfg.generateSigners(nil)
+		err = cfg.GenerateSigners(nil)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
 		sshConfig.Auth = []ssh.AuthMethod{
-			ssh.PublicKeys(cfg.signers...),
+			ssh.PublicKeys(cfg.Signers...),
 		}
 	}
 
@@ -74,12 +68,11 @@ func NewClient(cfg *ConfigSection) (cl *Client, err error) {
 		cfg: cfg,
 	}
 
-	remoteAddr = fmt.Sprintf("%s:%d", cfg.Hostname, cfg.Port)
+	remoteAddr := fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port)
 
 	cl.conn, err = ssh.Dial("tcp", remoteAddr, sshConfig)
 	if err != nil {
-		err = fmt.Errorf("ssh: Dial: " + err.Error())
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return cl, nil
@@ -118,7 +111,7 @@ func (cl *Client) Execute(cmd string) (err error) {
 // Get copy file from remote into local storage.
 //
 // The local file should be use the absolute path, or relative to the file in
-// ConfigSection's workingDir.
+// config.Section.WorkingDir.
 //
 func (cl *Client) Get(remote, local string) (err error) {
 	if len(remote) == 0 {
@@ -132,17 +125,17 @@ func (cl *Client) Get(remote, local string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
-	args := []string{"-r", "-P", cl.cfg.stringPort}
-	if len(cl.cfg.privateKeyFile) > 0 {
+	args := []string{"-r", "-P", cl.cfg.Port}
+	if len(cl.cfg.PrivateKeyFile) > 0 {
 		args = append(args, "-i")
-		args = append(args, cl.cfg.privateKeyFile)
+		args = append(args, cl.cfg.PrivateKeyFile)
 	}
 	args = append(args, remote)
 	args = append(args, local)
 
 	cmd := exec.Command("scp", args...)
 
-	cmd.Dir = cl.cfg.workingDir
+	cmd.Dir = cl.cfg.WorkingDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -158,7 +151,7 @@ func (cl *Client) Get(remote, local string) (err error) {
 // Put copy a file from local storage to remote using scp command.
 //
 // The local file should be use the absolute path, or relative to the file in
-// ConfigSection's workingDir.
+// config.Section's WorkingDir.
 //
 func (cl *Client) Put(local, remote string) (err error) {
 	if len(local) == 0 {
@@ -172,17 +165,17 @@ func (cl *Client) Put(local, remote string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
 
-	args := []string{"-r", "-P", cl.cfg.stringPort}
-	if len(cl.cfg.privateKeyFile) > 0 {
+	args := []string{"-r", "-P", cl.cfg.Port}
+	if len(cl.cfg.PrivateKeyFile) > 0 {
 		args = append(args, "-i")
-		args = append(args, cl.cfg.privateKeyFile)
+		args = append(args, cl.cfg.PrivateKeyFile)
 	}
 	args = append(args, local)
 	args = append(args, remote)
 
 	cmd := exec.Command("scp", args...)
 
-	cmd.Dir = cl.cfg.workingDir
+	cmd.Dir = cl.cfg.WorkingDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -195,5 +188,5 @@ func (cl *Client) Put(local, remote string) (err error) {
 }
 
 func (cl *Client) String() string {
-	return cl.cfg.User + "@" + cl.cfg.Hostname + ":" + cl.cfg.stringPort
+	return cl.cfg.User + "@" + cl.cfg.Hostname + ":" + cl.cfg.Port
 }

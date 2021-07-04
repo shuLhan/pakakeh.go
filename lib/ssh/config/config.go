@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+//
+// Package config provide the ssh_config(5) parser and getter.
+//
+package config
 
 import (
 	"errors"
@@ -45,7 +48,8 @@ const (
 	keyXAuthLocation                   = "xauthlocation"
 )
 
-//TODO: list of keys that are not implemented.
+// TODO: list of keys that are not implemented yet due to hard or
+// unknown how to test it.
 //nolint: deadcode,varcheck
 const (
 	keyCiphers                          = "ciphers"
@@ -122,60 +126,59 @@ var (
 // configuration file.
 //
 type Config struct {
-	sections []*ConfigSection
+	sections []*Section
 	envs     map[string]string
 }
 
 //
-// NewConfig load SSH configuration from file.
+// Load SSH configuration from file.
 //
-func NewConfig(file string) (cfg *Config, err error) {
+func Load(file string) (cfg *Config, err error) {
 	if len(file) == 0 {
 		return nil, nil
 	}
 
 	var (
-		section *ConfigSection
-		key     string
-		value   string
+		logp    = "Load"
+		section *Section
 	)
 
 	cfg = &Config{
-		sections: make([]*ConfigSection, 0),
+		sections: make([]*Section, 0),
 	}
 
 	cfg.loadEnvironments()
 
-	parser, err := newConfigParser()
+	p, err := newParser()
 	if err != nil {
-		return nil, fmt.Errorf("NewConfig %s: %w", file, err)
+		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
 	}
 
-	lines, err := parser.load("", file)
+	lines, err := p.load("", file)
 	if err != nil {
-		return nil, fmt.Errorf("NewConfig %s: %w", file, err)
+		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
 	}
 
 	for x, line := range lines {
 		if line[0] == '#' {
 			continue
 		}
-		key, value, err = parseKeyValue(line)
+		key, value, err := parseKeyValue(line)
 		if err != nil {
-			return nil, fmt.Errorf("%s line %d: %w", file, x, err)
+			return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x, err)
 		}
 
 		switch key {
 		case keyHost:
 			if section != nil {
-				section.postConfig(parser.homeDir)
+				section.init(p.workDir, p.homeDir)
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
 			section = newSectionHost(value)
 		case keyMatch:
 			if section != nil {
-				section.postConfig(parser.homeDir)
+				section.init(p.workDir, p.homeDir)
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
@@ -237,8 +240,7 @@ func NewConfig(file string) (cfg *Config, err error) {
 		case keyHostname:
 			section.Hostname = value
 		case keyPort:
-			section.stringPort = value
-			section.Port, err = strconv.Atoi(value)
+			section.Port = value
 		case keySendEnv:
 			section.setSendEnv(cfg.envs, value)
 		case keySetEnv:
@@ -251,11 +253,11 @@ func NewConfig(file string) (cfg *Config, err error) {
 			section.XAuthLocation = value
 		}
 		if err != nil {
-			return nil, fmt.Errorf("%s line %d: %w", file, x+1, err)
+			return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x+1, err)
 		}
 	}
 	if section != nil {
-		section.postConfig(parser.homeDir)
+		section.init(p.workDir, p.homeDir)
 		cfg.sections = append(cfg.sections, section)
 		section = nil
 	}
@@ -266,7 +268,7 @@ func NewConfig(file string) (cfg *Config, err error) {
 //
 // Get the Host or Match configuration that match with the pattern "s".
 //
-func (cfg *Config) Get(s string) (section *ConfigSection) {
+func (cfg *Config) Get(s string) (section *Section) {
 	for _, section := range cfg.sections {
 		if section.isMatch(s) {
 			return section
@@ -283,7 +285,7 @@ func (cfg *Config) Get(s string) (section *ConfigSection) {
 // without using Include directive.
 //
 func (cfg *Config) Prepend(other *Config) {
-	newSections := make([]*ConfigSection, 0,
+	newSections := make([]*Section, 0,
 		len(cfg.sections)+len(other.sections))
 	newSections = append(newSections, other.sections...)
 	newSections = append(newSections, cfg.sections...)
@@ -352,4 +354,21 @@ func parseKeyValue(line string) (key, value string, err error) {
 	key = strings.ToLower(key)
 	value = strings.Trim(value, `"`)
 	return key, value, nil
+}
+
+//
+// patternToRegex convert the Host and Match pattern string into regex.
+//
+func patternToRegex(in string) (out string) {
+	sr := make([]rune, 0, len(in))
+	for _, r := range in {
+		switch r {
+		case '*', '?':
+			sr = append(sr, '.')
+		case '.':
+			sr = append(sr, '\\')
+		}
+		sr = append(sr, r)
+	}
+	return string(sr)
 }

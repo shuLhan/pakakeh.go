@@ -2,18 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import (
+	"reflect"
 	"testing"
-
-	"github.com/shuLhan/share/lib/test"
 )
 
 func TestNewSectionMatch(t *testing.T) {
 	cases := []struct {
 		raw      string
-		exp      *ConfigSection
+		exp      *Section
 		expError string
 	}{{
 		raw:      "test",
@@ -23,22 +22,28 @@ func TestNewSectionMatch(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if c.expError != err.Error() {
+				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
+					c.expError, err.Error())
+			}
 			continue
 		}
-		got.postConfig(testParser.homeDir)
-		test.Assert(t, "newSectionMatch", c.exp, got)
+		got.init(testParser.workDir, testParser.homeDir)
+
+		if !reflect.DeepEqual(*c.exp, *got) {
+			t.Fatalf("newSectionMatch: expecting %v, got %v", c.exp, got)
+		}
 	}
 }
 
 func TestParseCriteriaAll(t *testing.T) {
 	cases := []struct {
 		raw      string
-		exp      func(def ConfigSection) *ConfigSection
+		exp      func(def Section) *Section
 		expError string
 	}{{
 		raw: "all ",
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaAll,
 			}}
@@ -48,7 +53,7 @@ func TestParseCriteriaAll(t *testing.T) {
 	}, {
 
 		raw: "canonical all",
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaCanonical,
 			}, {
@@ -59,7 +64,7 @@ func TestParseCriteriaAll(t *testing.T) {
 		},
 	}, {
 		raw: "final all",
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaFinal,
 			}, {
@@ -79,23 +84,29 @@ func TestParseCriteriaAll(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if c.expError != err.Error() {
+				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
+					c.expError, err.Error())
+			}
 			continue
 		}
-		got.postConfig(testParser.homeDir)
-		test.Assert(t, "parseCriteriaAll",
-			c.exp(*testDefaultSection), got)
+		got.init(testParser.workDir, testParser.homeDir)
+
+		exp := c.exp(*testDefaultSection)
+		if !reflect.DeepEqual(*exp, *got) {
+			t.Fatalf("parseCriteriaAll: expecting %v, got %v", exp, got)
+		}
 	}
 }
 
 func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	cases := []struct {
 		raw      string
-		exp      func(def ConfigSection) *ConfigSection
+		exp      func(def Section) *Section
 		expError string
 	}{{
 		raw: `exec "echo true"`,
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaExec,
 				arg:  `echo true`,
@@ -105,7 +116,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 		},
 	}, {
 		raw: `exec "echo true`,
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaExec,
 				arg:  `echo true`,
@@ -118,29 +129,34 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if c.expError != err.Error() {
+				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
+					c.expError, err.Error())
+			}
 			continue
 		}
-		got.postConfig(testParser.homeDir)
-		t.Logf("got: %+v", got)
-		test.Assert(t, "parseCriteriaExec",
-			c.exp(*testDefaultSection), got)
+		got.init(testParser.workDir, testParser.homeDir)
+
+		exp := c.exp(*testDefaultSection)
+		if !reflect.DeepEqual(*exp, *got) {
+			t.Fatalf("parseCriteriaExec: expecting %v, got %v", exp, got)
+		}
 	}
 }
 
 func TestParseCriteriaWithArg(t *testing.T) {
 	cases := []struct {
 		raw      string
-		exp      func(exp ConfigSection) *ConfigSection
+		exp      func(exp Section) *Section
 		expError string
 	}{{
 		raw: `user name*`,
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `name*`,
-				patterns: []*configPattern{{
-					pattern: "name*",
+				patterns: []*pattern{{
+					value: "name*",
 				}},
 			}}
 			exp.useCriteria = true
@@ -148,14 +164,14 @@ func TestParseCriteriaWithArg(t *testing.T) {
 		},
 	}, {
 		raw: `user "a*,b*"`,
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `a*,b*`,
-				patterns: []*configPattern{{
-					pattern: "a*",
+				patterns: []*pattern{{
+					value: "a*",
 				}, {
-					pattern: "b*",
+					value: "b*",
 				}},
 			}}
 			exp.useCriteria = true
@@ -163,14 +179,14 @@ func TestParseCriteriaWithArg(t *testing.T) {
 		},
 	}, {
 		raw: `user "a*,b*`,
-		exp: func(exp ConfigSection) *ConfigSection {
+		exp: func(exp Section) *Section {
 			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `a*,b*`,
-				patterns: []*configPattern{{
-					pattern: "a*",
+				patterns: []*pattern{{
+					value: "a*",
 				}, {
-					pattern: "b*",
+					value: "b*",
 				}},
 			}}
 			exp.useCriteria = true
@@ -181,10 +197,17 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	for _, c := range cases {
 		got, err := newSectionMatch(c.raw)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if c.expError != err.Error() {
+				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
+					c.expError, err.Error())
+			}
 			continue
 		}
-		got.postConfig(testParser.homeDir)
-		test.Assert(t, "parseCriteriaWithArg", c.exp(*testDefaultSection), got)
+		got.init(testParser.workDir, testParser.homeDir)
+
+		exp := c.exp(*testDefaultSection)
+		if !reflect.DeepEqual(*exp, *got) {
+			t.Fatalf("parseCriteriaWithArg: expecting %v, got %v", exp, got)
+		}
 	}
 }

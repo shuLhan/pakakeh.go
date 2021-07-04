@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import (
 	"bytes"
@@ -12,56 +12,50 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/shuLhan/share/lib/debug"
 )
 
 //
-// configParser parser for the SSH config file that merge all "Include" files
-// and convert them all into lines of string.
+// parser for the SSH config file that merge all "Include" files and convert
+// them all into lines of string.
 //
-type configParser struct {
+type parser struct {
 	workDir string
 	homeDir string
 	files   map[string]struct{}
 }
 
-func newConfigParser() (parser *configParser, err error) {
-	parser = &configParser{
+func newParser() (p *parser, err error) {
+	p = &parser{
 		files: make(map[string]struct{}),
 	}
 
-	parser.workDir, err = os.Getwd()
+	p.workDir, err = os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	parser.homeDir, err = os.UserHomeDir()
+	p.homeDir, err = os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
 
-	return parser, nil
+	return p, nil
 }
 
 //
 // load the config file(s) using glob(7) pattern and convert them into lines.
 //
-func (parser *configParser) load(dir, pattern string) (lines []string, err error) {
-	if debug.Value >= 1 {
-		fmt.Printf("load %q at %q ...\n", pattern, dir)
-	}
-
+func (p *parser) load(dir, pattern string) (lines []string, err error) {
 	switch pattern[0] {
 	case '~':
 		// File is absolute path to user's home directory.
-		pattern = filepath.Join(parser.homeDir, pattern[1:])
+		pattern = filepath.Join(p.homeDir, pattern[1:])
 
 	case '/':
 		// File is absolute path, do nothing.
 
 	case '.':
 		// File is relative to current working directory.
-		pattern = filepath.Join(parser.workDir, pattern)
+		pattern = filepath.Join(p.workDir, pattern)
 
 	default:
 		if len(dir) != 0 {
@@ -69,7 +63,7 @@ func (parser *configParser) load(dir, pattern string) (lines []string, err error
 			pattern = filepath.Join(dir, pattern)
 		} else {
 			// File is relative to user's .ssh directory.
-			pattern = filepath.Join(parser.homeDir, ".ssh", pattern)
+			pattern = filepath.Join(p.homeDir, ".ssh", pattern)
 		}
 	}
 
@@ -85,7 +79,7 @@ func (parser *configParser) load(dir, pattern string) (lines []string, err error
 
 	rawLines := make([]string, 0)
 	for _, file := range matches {
-		_, ok := parser.files[file]
+		_, ok := p.files[file]
 		if ok {
 			// File already loaded previously.
 			continue
@@ -98,7 +92,7 @@ func (parser *configParser) load(dir, pattern string) (lines []string, err error
 		if len(newLines) > 0 {
 			rawLines = append(rawLines, newLines...)
 		}
-		parser.files[file] = struct{}{}
+		p.files[file] = struct{}{}
 	}
 
 	lines = make([]string, 0, len(rawLines))
@@ -115,7 +109,7 @@ func (parser *configParser) load(dir, pattern string) (lines []string, err error
 		patterns := parseInclude(rawLines[x])
 
 		for _, pattern := range patterns {
-			includeContents, err := parser.load(dir, pattern)
+			includeContents, err := p.load(dir, pattern)
 			if err != nil {
 				return nil, err
 			}

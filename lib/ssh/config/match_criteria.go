@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import "strings"
 
@@ -20,7 +20,7 @@ const (
 type matchCriteria struct {
 	name     string
 	arg      string
-	patterns []*configPattern
+	patterns []*pattern
 	isNegate bool
 }
 
@@ -37,11 +37,11 @@ func newMatchCriteria(name, arg string) (criteria *matchCriteria, err error) {
 	}
 
 	listPattern := strings.Split(arg, ",")
-	criteria.patterns = make([]*configPattern, 0, len(listPattern))
+	criteria.patterns = make([]*pattern, 0, len(listPattern))
 
 	for _, raw := range listPattern {
-		pattern := newConfigPattern(raw)
-		criteria.patterns = append(criteria.patterns, pattern)
+		pat := newPattern(raw)
+		criteria.patterns = append(criteria.patterns, pat)
 	}
 
 	return criteria, nil
@@ -61,8 +61,8 @@ func (mcriteria *matchCriteria) isMatch(s string) bool {
 	case criteriaFinal:
 		//TODO
 	case criteriaHost, criteriaLocalUser, criteriaOriginalHost, criteriaUser:
-		for _, pattern := range mcriteria.patterns {
-			if pattern.isMatch(s) {
+		for _, pat := range mcriteria.patterns {
+			if pat.isMatch(s) {
 				return !mcriteria.isNegate
 			}
 		}

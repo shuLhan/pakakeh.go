@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ssh
+package config
 
 import (
 	"errors"
@@ -25,13 +25,13 @@ var (
 // All criteria but "all", "canonical", and "final" require an argument.
 // Criteria may be negated by prepending an exclamation mark (`!').
 //
-func newSectionMatch(rawPattern string) (match *ConfigSection, err error) {
+func newSectionMatch(rawPattern string) (match *Section, err error) {
 	var (
 		prevCriteria *matchCriteria
 		criteria     *matchCriteria
 	)
 
-	match = newConfigSection()
+	match = newSection()
 	match.criteria = make([]*matchCriteria, 0)
 	match.useCriteria = true
 
