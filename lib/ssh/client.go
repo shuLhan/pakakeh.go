@@ -109,19 +109,19 @@ func (cl *Client) Execute(cmd string) (err error) {
 }
 
 //
-// Get copy file from remote into local storage.
+// ScpGet copy file from remote into local storage using scp.
 //
 // The local file should be use the absolute path, or relative to the file in
 // config.Section.WorkingDir.
 //
-func (cl *Client) Get(remote, local string) (err error) {
+func (cl *Client) ScpGet(remote, local string) (err error) {
+	logp := "ScpGet"
+
 	if len(remote) == 0 {
-		log.Println("ssh: Get: empty remote file")
-		return nil
+		return fmt.Errorf("%s: empty remote file", logp)
 	}
 	if len(local) == 0 {
-		log.Println("ssh: Get: empty local file")
-		return nil
+		return fmt.Errorf("%s: empty local file", logp)
 	}
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
@@ -142,26 +142,26 @@ func (cl *Client) Get(remote, local string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("ssh: Get %q: %s", cmd.Args, err.Error())
+		return fmt.Errorf("%s: %q: %s", logp, cmd.Args, err.Error())
 	}
 
 	return nil
 }
 
 //
-// Put copy a file from local storage to remote using scp command.
+// ScpPut copy a file from local storage to remote using scp command.
 //
 // The local file should be use the absolute path, or relative to the file in
 // config.Section's WorkingDir.
 //
-func (cl *Client) Put(local, remote string) (err error) {
+func (cl *Client) ScpPut(local, remote string) (err error) {
+	logp := "ScpPut"
+
 	if len(local) == 0 {
-		log.Println("ssh: Put: empty local file")
-		return nil
+		return fmt.Errorf("%s: empty local file", logp)
 	}
 	if len(remote) == 0 {
-		log.Println("ssh: Put: empty remote file")
-		return nil
+		return fmt.Errorf("%s: empty remote file", logp)
 	}
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
@@ -182,7 +182,7 @@ func (cl *Client) Put(local, remote string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("ssh: Put: %q: %s", cmd.Args, err.Error())
+		return fmt.Errorf("%s: %q: %s", logp, cmd.Args, err.Error())
 	}
 
 	return nil
