@@ -26,10 +26,10 @@ type Client struct {
 }
 
 //
-// NewClient create a new SSH connection using predefined
+// NewClientFromConfig create a new SSH connection using predefined
 // configuration.
 //
-func NewClient(cfg *config.Section) (cl *Client, err error) {
+func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
 	}
