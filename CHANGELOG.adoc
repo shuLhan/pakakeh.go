@@ -3,14 +3,42 @@
 
 This library is released every month, usually at the first week of month.
 
-== share v0.28.0 (2021-07-xx)
+== share v0.28.0 (2021-07-06)
+
+=== Breaking changes
+
+* lib/ssh: rename method Get to ScpGet and Put to ScpPut
+
+  This changes is to make clear that the methods to copy the files, either
+  from local or from remote, is using the "scp" through exec package,
+  not using the native SSH file transfer protocol.
+
+  While at it, use consistent log prefix for error message.
+
+* ssh: rename the NewClient function to NewClientFromConfig
+
+  This is to differentiate it with x/crypto ssh package that have the same
+  function name.
+
+* ssh: move the config parser to subpackage "config"
+
+  There are two reasons for moving to sub-package.  First, the code for
+  parsing the ssh_config(5) take almost 99% of the lines in the ssh package.
+  Second, in case we want to submit the code to upstream,
+  golang.org/x/crypto, we need the package to be independent, less external
+  dependencies as possible.
+
+* http: remove the Memfs field from Server
+
+  Now that Options field has been exported, we did not need to have
+  duplicate Memfs, so this field is removed in favor of Options.Memfs.
 
 === Enhancements
 
 * websocket: export the Options field on the Server
 
   Previously, the Options field is not exported to prevent user from
-  changing it once it set throught NewServer() function.
+  changing it once it set through NewServer() function.
 
   This changes export the Options field to allow user of Server access its
   values.  We can create a method on server to return read-only options,
@@ -19,7 +47,7 @@ This library is released every month, usually at the first week of month.
 * http: export the Options field on the Server
 
   Previously, the Options field is not exported to prevent user from
-  changing it once it set throught NewServer() function.
+  changing it once it set through NewServer() function.
 
   This changes export the Options field to allow user of Server access its
   values.  We can create a method on server to return read-only options,
