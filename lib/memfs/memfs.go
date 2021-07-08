@@ -57,7 +57,9 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 		Root: &Node{
 			SysPath: "..",
 			Path:    "/",
+			mode:    2147484141,
 		},
+		Opts: &Options{},
 	}
 
 	merged.PathNodes.v["/"] = merged.Root
