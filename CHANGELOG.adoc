@@ -3,6 +3,21 @@
 
 This library is released every month, usually at the first week of month.
 
+== share v0.28.1 (2021-08-xx)
+
+=== Enhancements
+
+* lib/http: check request path as HTML file on getFSNode
+
+  Previously, if the request path is not exist we check if request
+  contains index.html and if still not exist we return nil.
+
+  This commit add another check by appending ".html" to the request path.
+
+  So, for example, if path "/x" not exist in memfs, we check if
+  "/x/index.html". If its still not exist, we check "/x.html".
+
+
 == share v0.28.0 (2021-07-06)
 
 === Breaking changes

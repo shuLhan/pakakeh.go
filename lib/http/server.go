@@ -341,12 +341,17 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 			return nil
 		}
 
-		reqPath = path.Join(reqPath, "index.html")
+		asDir := path.Join(reqPath, "index.html")
 
-		node, err = srv.Options.Memfs.Get(reqPath)
+		node, err = srv.Options.Memfs.Get(asDir)
 		if err != nil {
-			if debug.Value >= 3 {
-				log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
+			asHtml := reqPath + ".html"
+			node, err = srv.Options.Memfs.Get(asHtml)
+			if err != nil {
+				if debug.Value >= 3 {
+					log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
+				}
+				return nil
 			}
 			return nil
 		}
