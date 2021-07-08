@@ -512,6 +512,7 @@ func TestMerge(t *testing.T) {
 						Childs: []*Node{
 							mfsDirect.MustGet("/add"),
 						},
+						mode: 2147484141,
 					},
 					"/add":       mfsDirect.MustGet("/add"),
 					"/add/file":  mfsDirect.MustGet("/add/file"),
@@ -534,6 +535,7 @@ func TestMerge(t *testing.T) {
 							mfsInclude.MustGet("/index.html"),
 							mfsInclude.MustGet("/index.js"),
 						},
+						mode: 2147484141,
 					},
 					"/add":        mfsDirect.MustGet("/add"),
 					"/add/file":   mfsDirect.MustGet("/add/file"),
