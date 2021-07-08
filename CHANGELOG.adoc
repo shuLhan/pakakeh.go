@@ -3,7 +3,14 @@
 
 This library is released every month, usually at the first week of month.
 
-== share v0.28.1 (2021-08-xx)
+== share v0.29.0 (2021-08-xx)
+
+=== New feature
+
+ssh/sftp: new package that implement SSH File Transport Protocol v3
+
+The sftp package extend the golang.org/x/crypto/ssh package by
+implementing "sftp" subsystem using the ssh.Client connection.
 
 === Enhancements
 

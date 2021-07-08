@@ -186,6 +186,9 @@ This library is released every month, usually at the first week of month.
   provide a wrapper for golang.org/x/crypto/ssh and a parser for SSH client
   configuration specification ssh_config(5).
 
+* [**sftp**](https://pkg.go.dev/github.com/shuLhan/share/lib/ssh/sftp):
+  Package sftp implement native SSH File Transport Protocol v3.
+
 * [**strings**](https://pkg.go.dev/github.com/shuLhan/share/lib/strings): A
   library for working with slice of string.
 

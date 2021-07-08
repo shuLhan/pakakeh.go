@@ -41,6 +41,7 @@
 /lib/mining/resampling/smote/synthetic.csv
 /lib/mining/resampling/smote/testdata/phoneme.csv
 /lib/mining/testdata/phoneme/phoneme.csv
+/lib/ssh/sftp/testdata/*.get
 /lib/websocket/examples/cmd/client/client
 /lib/websocket/examples/cmd/server/server
 /lib/websocket/testdata/.Python
