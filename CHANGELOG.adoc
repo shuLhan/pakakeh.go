@@ -7,6 +7,11 @@ This library is released every month, usually at the first week of month.
 
 === Enhancements
 
+* lib/totp: lib/totp: increase the maximum steps back on Verify from 2 to 20
+
+  The value 20 means the Verify will check maximum 20 TOTP tokens or 10
+  minutes to the past.
+
 * lib/http: check request path as HTML file on getFSNode
 
   Previously, if the request path is not exist we check if request

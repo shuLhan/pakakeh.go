@@ -20,6 +20,11 @@ const (
 	// OTP.
 	DefCodeDigits = 6
 	DefTimeStep   = 30
+
+	// DefStepsBack maximum value for stepsBack parameter on Verify.
+	// The value 20 means the Verify() method will check maximum 20 TOTP
+	// tokens or 10 minutes to the past.
+	DefStepsBack = 20
 )
 
 var _digitsPower = []int{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000}
@@ -92,13 +97,13 @@ func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error)
 //
 //	(current_timestamp - (2*30)) ... current_timestamp
 //
-// For security reason, the maximum stepsBack is limited to 4.
+// For security reason, the maximum stepsBack is limited to DefStepsBack.
 //
 func (p *Protocol) Verify(secret []byte, token string, stepsBack int) bool {
 	mac := hmac.New(p.fnHash, secret)
 	now := time.Now().Unix()
-	if stepsBack <= 0 || stepsBack > 4 {
-		stepsBack = 1
+	if stepsBack <= 0 || stepsBack > DefStepsBack {
+		stepsBack = DefStepsBack
 	}
 	return p.verifyWithTimestamp(mac, token, stepsBack, now)
 }
