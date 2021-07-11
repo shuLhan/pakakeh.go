@@ -70,7 +70,7 @@ func TestClient_Get(t *testing.T) {
 		t.Skipf("%s not set", envNameTestManual)
 	}
 
-	err := testClient.Get("/tmp/id_ed25519.pub", "testdata/id_ed25519.pub.get")
+	err := testClient.Get("/etc/hosts", "testdata/etc-hosts.get")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,7 +136,8 @@ func TestClient_Readdir(t *testing.T) {
 
 	t.Logf("List of files inside the %s:\n", path)
 	for x, node := range nodes {
-		t.Logf("%02d: %+v\n", x, node.LongName)
+		fi, _ := node.Info()
+		t.Logf("%02d: %s %+v\n", x, fi.Mode().String(), node.Name())
 	}
 }
 
@@ -151,7 +152,7 @@ func TestClient_Realpath(t *testing.T) {
 	}
 
 	exp := "/etc/hosts"
-	test.Assert(t, "Realpath", exp, node.FileName)
+	test.Assert(t, "Realpath", exp, node.Name())
 }
 
 func TestClient_Rename(t *testing.T) {
@@ -188,6 +189,8 @@ func TestClient_Rename(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	expAttrs.name = newPath
 
 	test.Assert(t, "Rename", expAttrs, gotAttrs)
 }
@@ -277,5 +280,5 @@ func TestClient_Symlink(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "Readlink", targetPath, node.FileName)
+	test.Assert(t, "Readlink", targetPath, node.Name())
 }

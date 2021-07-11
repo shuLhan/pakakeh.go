@@ -65,7 +65,7 @@ type packet struct {
 	data []byte
 
 	// FxpName
-	nodes []*Node
+	nodes []*dirEntry
 
 	// FxpAttrs
 	fa *FileAttrs
@@ -131,19 +131,19 @@ func unpackPacket(payload []byte) (pac *packet, err error) {
 		n := binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
 		for x := uint32(0); x < n; x++ {
-			node := &Node{}
+			node := &dirEntry{}
 
 			v = binary.BigEndian.Uint32(payload)
 			payload = payload[4:]
-			node.FileName = string(payload[:v])
+			node.fileName = string(payload[:v])
 			payload = payload[v:]
 
 			v = binary.BigEndian.Uint32(payload)
 			payload = payload[4:]
-			node.LongName = string(payload[:v])
+			node.longName = string(payload[:v])
 			payload = payload[v:]
 
-			node.Attrs, length = unpackFileAttrs(payload)
+			node.attrs, length = unpackFileAttrs(payload)
 			payload = payload[length:]
 
 			pac.nodes = append(pac.nodes, node)

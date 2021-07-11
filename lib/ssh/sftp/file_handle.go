@@ -5,5 +5,6 @@
 package sftp
 
 type FileHandle struct {
-	v []byte
+	remotePath string // The remote path.
+	v          []byte // The handle value returned from open().
 }

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"sync"
 	"time"
@@ -157,8 +158,10 @@ func (cl *Client) Fstat(fh *FileHandle) (fa *FileAttrs, err error) {
 	if res.kind != packetKindFxpAttrs {
 		return nil, ErrUnexpectedResponse(packetKindFxpAttrs, res.kind)
 	}
-
-	return res.fa, nil
+	fa = res.fa
+	fa.name = fh.remotePath
+	res.fa = nil
+	return fa, nil
 }
 
 //
@@ -232,8 +235,10 @@ func (cl *Client) Lstat(remoteFile string) (fa *FileAttrs, err error) {
 	if res.kind != packetKindFxpAttrs {
 		return nil, ErrUnexpectedResponse(packetKindFxpAttrs, res.kind)
 	}
-
-	return res.fa, nil
+	fa = res.fa
+	fa.name = remoteFile
+	res.fa = nil
+	return fa, nil
 }
 
 //
@@ -289,6 +294,7 @@ func (cl *Client) Opendir(path string) (fh *FileHandle, err error) {
 		return nil, ErrUnexpectedResponse(packetKindFxpHandle, res.kind)
 	}
 	fh = res.fh
+	fh.remotePath = path
 	res.fh = nil
 	return fh, nil
 }
@@ -375,14 +381,15 @@ func (cl *Client) Read(fh *FileHandle, offset uint64) (data []byte, err error) {
 	if res.kind != packetKindFxpData {
 		return nil, ErrUnexpectedResponse(packetKindFxpData, res.kind)
 	}
-
-	return res.data, nil
+	data = res.data
+	res.data = nil
+	return data, nil
 }
 
 //
 // Readdir list files and/or directories inside the handle.
 //
-func (cl *Client) Readdir(fh *FileHandle) (nodes []*Node, err error) {
+func (cl *Client) Readdir(fh *FileHandle) (nodes []fs.DirEntry, err error) {
 	var (
 		logp    = "Readdir"
 		req     = cl.generatePacket()
@@ -400,7 +407,9 @@ func (cl *Client) Readdir(fh *FileHandle) (nodes []*Node, err error) {
 	if res.kind != packetKindFxpName {
 		return nil, ErrUnexpectedResponse(packetKindFxpName, res.kind)
 	}
-	nodes = res.nodes
+	for _, node := range res.nodes {
+		nodes = append(nodes, node)
+	}
 	res.nodes = nil
 	return nodes, nil
 }
@@ -408,7 +417,7 @@ func (cl *Client) Readdir(fh *FileHandle) (nodes []*Node, err error) {
 //
 // Readlink read the target of a symbolic link.
 //
-func (cl *Client) Readlink(linkPath string) (node *Node, err error) {
+func (cl *Client) Readlink(linkPath string) (node fs.DirEntry, err error) {
 	var (
 		logp    = "Readlink"
 		req     = cl.generatePacket()
@@ -422,8 +431,9 @@ func (cl *Client) Readlink(linkPath string) (node *Node, err error) {
 	if res.kind != packetKindFxpName {
 		return nil, ErrUnexpectedResponse(packetKindFxpName, res.kind)
 	}
-
-	return res.nodes[0], nil
+	node = res.nodes[0]
+	res.nodes = nil
+	return node, nil
 }
 
 //
@@ -431,7 +441,7 @@ func (cl *Client) Readlink(linkPath string) (node *Node, err error) {
 // This is useful for converting path names containing ".." components or
 // relative pathnames without a leading slash into absolute paths.
 //
-func (cl *Client) Realpath(path string) (node *Node, err error) {
+func (cl *Client) Realpath(path string) (node fs.DirEntry, err error) {
 	var (
 		logp    = "Realpath"
 		req     = cl.generatePacket()
@@ -445,8 +455,9 @@ func (cl *Client) Realpath(path string) (node *Node, err error) {
 	if res.kind != packetKindFxpName {
 		return nil, ErrUnexpectedResponse(packetKindFxpName, res.kind)
 	}
-
-	return res.nodes[0], nil
+	node = res.nodes[0]
+	res.nodes = nil
+	return node, nil
 }
 
 //
@@ -572,8 +583,10 @@ func (cl *Client) Stat(remoteFile string) (fa *FileAttrs, err error) {
 	if res.kind != packetKindFxpAttrs {
 		return nil, ErrUnexpectedResponse(packetKindFxpAttrs, res.kind)
 	}
-
-	return res.fa, nil
+	fa = res.fa
+	fa.name = remoteFile
+	res.fa = nil
+	return fa, nil
 }
 
 //
@@ -654,7 +667,7 @@ func (cl *Client) init() (err error) {
 	return nil
 }
 
-func (cl *Client) open(remoteFile string, pflags uint32, fa *FileAttrs) (h *FileHandle, err error) {
+func (cl *Client) open(remoteFile string, pflags uint32, fa *FileAttrs) (fh *FileHandle, err error) {
 	var (
 		logp = "open"
 		req  = cl.generatePacket()
@@ -674,8 +687,10 @@ func (cl *Client) open(remoteFile string, pflags uint32, fa *FileAttrs) (h *File
 		err = fmt.Errorf("%s: %d %d %s", logp, res.kind, res.code, res.message)
 		return nil, err
 	}
-
-	return res.fh, nil
+	fh = res.fh
+	fh.remotePath = remoteFile
+	res.fh = nil
+	return fh, nil
 }
 
 func (cl *Client) read() (res []byte, err error) {
