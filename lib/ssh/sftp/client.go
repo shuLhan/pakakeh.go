@@ -36,6 +36,10 @@ type Client struct {
 //
 // NewClient create and initialize new client for SSH file transfer protocol.
 //
+// On failure, it will return ErrSubsystem if the server does not support
+// "sftp" subsystem, ErrVersion if the client does not support the
+// server version, and other errors.
+//
 func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 	logp := "New"
 	cl = &Client{}
@@ -60,6 +64,9 @@ func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 
 	err = cl.sess.RequestSubsystem(subsystemNameSftp)
 	if err != nil {
+		if err.Error() == "ssh: subsystem request failed" {
+			return nil, ErrSubsystem
+		}
 		return nil, fmt.Errorf("%s: RequestSubsystem: %w", logp, err)
 	}
 
@@ -90,12 +97,11 @@ func (cl *Client) Close(fh *FileHandle) (err error) {
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
-
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %d %s", logp, res.kind, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 
 	return nil
@@ -131,10 +137,10 @@ func (cl *Client) Fsetstat(fh *FileHandle, fa *FileAttrs) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 	return nil
 }
@@ -153,10 +159,10 @@ func (cl *Client) Fstat(fh *FileHandle) (fa *FileAttrs, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind == packetKindFxpStatus {
-		return nil, fmt.Errorf("%s: %d %d %s", logp, res.kind, res.code, res.message)
+		return nil, handleStatusCode(res.code, res.message)
 	}
 	if res.kind != packetKindFxpAttrs {
-		return nil, ErrUnexpectedResponse(packetKindFxpAttrs, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpAttrs, res.kind)
 	}
 	fa = res.fa
 	fa.name = fh.remotePath
@@ -230,10 +236,10 @@ func (cl *Client) Lstat(remoteFile string) (fa *FileAttrs, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind == packetKindFxpStatus {
-		return nil, fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+		return nil, handleStatusCode(res.code, res.message)
 	}
 	if res.kind != packetKindFxpAttrs {
-		return nil, ErrUnexpectedResponse(packetKindFxpAttrs, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpAttrs, res.kind)
 	}
 	fa = res.fa
 	fa.name = remoteFile
@@ -258,10 +264,10 @@ func (cl *Client) Mkdir(path string, fa *FileAttrs) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 	return nil
 }
@@ -288,10 +294,10 @@ func (cl *Client) Opendir(path string) (fh *FileHandle, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind == packetKindFxpStatus {
-		return nil, fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+		return nil, handleStatusCode(res.code, res.message)
 	}
 	if res.kind != packetKindFxpHandle {
-		return nil, ErrUnexpectedResponse(packetKindFxpHandle, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpHandle, res.kind)
 	}
 	fh = res.fh
 	fh.remotePath = path
@@ -373,13 +379,10 @@ func (cl *Client) Read(fh *FileHandle, offset uint64) (data []byte, err error) {
 	}
 
 	if res.kind == packetKindFxpStatus {
-		if res.code == ssh_FX_EOF {
-			return nil, io.EOF
-		}
-		return nil, fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+		return nil, handleStatusCode(res.code, res.message)
 	}
 	if res.kind != packetKindFxpData {
-		return nil, ErrUnexpectedResponse(packetKindFxpData, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpData, res.kind)
 	}
 	data = res.data
 	res.data = nil
@@ -400,12 +403,11 @@ func (cl *Client) Readdir(fh *FileHandle) (nodes []fs.DirEntry, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
-
 	if res.kind == packetKindFxpStatus {
-		return nil, fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+		return nil, handleStatusCode(res.code, res.message)
 	}
 	if res.kind != packetKindFxpName {
-		return nil, ErrUnexpectedResponse(packetKindFxpName, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpName, res.kind)
 	}
 	for _, node := range res.nodes {
 		nodes = append(nodes, node)
@@ -428,8 +430,11 @@ func (cl *Client) Readlink(linkPath string) (node fs.DirEntry, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
+	if res.kind == packetKindFxpStatus {
+		return nil, handleStatusCode(res.code, res.message)
+	}
 	if res.kind != packetKindFxpName {
-		return nil, ErrUnexpectedResponse(packetKindFxpName, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpName, res.kind)
 	}
 	node = res.nodes[0]
 	res.nodes = nil
@@ -452,8 +457,11 @@ func (cl *Client) Realpath(path string) (node fs.DirEntry, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
+	if res.kind == packetKindFxpStatus {
+		return nil, handleStatusCode(res.code, res.message)
+	}
 	if res.kind != packetKindFxpName {
-		return nil, ErrUnexpectedResponse(packetKindFxpName, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpName, res.kind)
 	}
 	node = res.nodes[0]
 	res.nodes = nil
@@ -475,10 +483,10 @@ func (cl *Client) Remove(remoteFile string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 
 	return nil
@@ -499,10 +507,10 @@ func (cl *Client) Rename(oldPath, newPath string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 
 	return nil
@@ -523,10 +531,10 @@ func (cl *Client) Rmdir(path string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 
 	return nil
@@ -554,10 +562,10 @@ func (cl *Client) Setstat(remoteFile string, fa *FileAttrs) (err error) {
 	}
 
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 
 	return nil
@@ -578,10 +586,10 @@ func (cl *Client) Stat(remoteFile string) (fa *FileAttrs, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind == packetKindFxpStatus {
-		return nil, fmt.Errorf("%s: %d %d %s", logp, res.kind, res.code, res.message)
+		return nil, handleStatusCode(res.code, res.message)
 	}
 	if res.kind != packetKindFxpAttrs {
-		return nil, ErrUnexpectedResponse(packetKindFxpAttrs, res.kind)
+		return nil, errUnexpectedResponse(packetKindFxpAttrs, res.kind)
 	}
 	fa = res.fa
 	fa.name = remoteFile
@@ -609,10 +617,10 @@ func (cl *Client) Symlink(targetPath, linkPath string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %s", logp, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 	return nil
 }
@@ -632,10 +640,10 @@ func (cl *Client) Write(fh *FileHandle, offset uint64, data []byte) (err error) 
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.kind != packetKindFxpStatus {
-		return ErrUnexpectedResponse(packetKindFxpStatus, res.kind)
+		return errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
-	if res.code != ssh_FX_OK {
-		return fmt.Errorf("%s: %d %d %s", logp, res.kind, res.code, res.message)
+	if res.code != statusCodeOK {
+		return handleStatusCode(res.code, res.message)
 	}
 	return nil
 }
@@ -663,6 +671,11 @@ func (cl *Client) init() (err error) {
 
 	cl.version = res.version
 	cl.exts = res.exts
+	res.exts = nil
+
+	if cl.version != defFxpVersion {
+		return errVersion(cl.version)
+	}
 
 	return nil
 }
@@ -682,10 +695,11 @@ func (cl *Client) open(remoteFile string, pflags uint32, fa *FileAttrs) (fh *Fil
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
-
+	if res.kind == packetKindFxpStatus {
+		return nil, handleStatusCode(res.code, res.message)
+	}
 	if res.kind != packetKindFxpHandle {
-		err = fmt.Errorf("%s: %d %d %s", logp, res.kind, res.code, res.message)
-		return nil, err
+		return nil, errUnexpectedResponse(packetKindFxpStatus, res.kind)
 	}
 	fh = res.fh
 	fh.remotePath = remoteFile

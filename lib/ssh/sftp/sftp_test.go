@@ -1,6 +1,7 @@
 package sftp
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/shuLhan/share/lib/ssh"
 	"github.com/shuLhan/share/lib/ssh/config"
+	"github.com/shuLhan/share/lib/test"
 )
 
 const (
@@ -54,4 +56,10 @@ func TestMain(m *testing.M) {
 	fmt.Printf("Server extensions: %v\n", testClient.exts)
 
 	os.Exit(m.Run())
+}
+
+func TestErrFailure(t *testing.T) {
+	err := errFailure("test")
+	got := errors.Is(err, ErrFailure)
+	test.Assert(t, "ErrFailure", true, got)
 }
