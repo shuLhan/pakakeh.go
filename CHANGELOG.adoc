@@ -7,6 +7,14 @@ This library is released every month, usually at the first week of month.
 
 === Enhancements
 
+* lib/bytes: print the ASCII character on the right side on PrintHex
+
+  Previously, PrintHex only print the hex value of all bytes with
+  specified length.
+
+  This changes also print any printables ASCII characters (char 33 through
+  126) in the right side column to view readable contents.
+
 * lib/totp: lib/totp: increase the maximum steps back on Verify from 2 to 20
 
   The value 20 means the Verify will check maximum 20 TOTP tokens or 10

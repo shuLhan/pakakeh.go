@@ -263,14 +263,43 @@ func IsTokenAt(line, token []byte, p int) bool {
 // length.
 //
 func PrintHex(title string, data []byte, col int) {
+	var (
+		start, x int
+	)
 	fmt.Print(title)
-	for x := 0; x < len(data); x++ {
+	for x = 0; x < len(data); x++ {
 		if x%col == 0 {
+			if x > 0 {
+				fmt.Print(" ||")
+			}
+			for y := start; y < x; y++ {
+				if data[y] >= 33 && data[y] <= 126 {
+					fmt.Printf(" %c", data[y])
+				} else {
+					fmt.Print(" .")
+				}
+			}
 			fmt.Printf("\n%4d -", x)
+			start = x
 		}
 
 		fmt.Printf(" %02X", data[x])
 	}
+	rest := 16 - (x % col)
+	if rest > 0 {
+		for y := 0; y < rest; y++ {
+			fmt.Print("   ")
+		}
+		fmt.Print(" ||")
+	}
+	for y := start; y < x; y++ {
+		if data[y] >= 33 && data[y] <= 126 {
+			fmt.Printf(" %c", data[y])
+		} else {
+			fmt.Print(" .")
+		}
+	}
+
 	fmt.Println()
 }
 
