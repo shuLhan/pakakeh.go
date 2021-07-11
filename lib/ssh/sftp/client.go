@@ -114,8 +114,8 @@ func (cl *Client) Close(fh *FileHandle) (err error) {
 // On success, it will return the remote FileHandle ready for write only.
 //
 func (cl *Client) Create(remoteFile string, fa *FileAttrs) (*FileHandle, error) {
-	pflags := ssh_FXF_WRITE | ssh_FXF_CREAT | ssh_FXF_TRUNC
-	return cl.open(remoteFile, pflags, fa)
+	pflags := OpenFlagWrite | OpenFlagCreate | OpenFlagTruncate
+	return cl.OpenFile(remoteFile, pflags, fa)
 }
 
 //
@@ -276,8 +276,38 @@ func (cl *Client) Mkdir(path string, fa *FileAttrs) (err error) {
 // Open the remote file for read only.
 //
 func (cl *Client) Open(remoteFile string) (fh *FileHandle, err error) {
-	pflags := ssh_FXF_READ
-	return cl.open(remoteFile, pflags, nil)
+	return cl.OpenFile(remoteFile, OpenFlagRead, nil)
+}
+
+//
+// OpenFile open remote file with custom open flag (OpenFlagRead,
+// OpenFlagWrite, and so on) and with specific file attributes.
+//
+func (cl *Client) OpenFile(remoteFile string, flags uint32, fa *FileAttrs) (fh *FileHandle, err error) {
+	var (
+		logp = "open"
+		req  = cl.generatePacket()
+	)
+	if fa == nil {
+		fa = newFileAttrs()
+	}
+
+	payload := req.fxpOpen(remoteFile, flags, fa)
+
+	res, err := cl.send(payload)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+	if res.kind == packetKindFxpStatus {
+		return nil, handleStatusCode(res.code, res.message)
+	}
+	if res.kind != packetKindFxpHandle {
+		return nil, errUnexpectedResponse(packetKindFxpStatus, res.kind)
+	}
+	fh = res.fh
+	fh.remotePath = remoteFile
+	res.fh = nil
+	return fh, nil
 }
 
 //
@@ -678,33 +708,6 @@ func (cl *Client) init() (err error) {
 	}
 
 	return nil
-}
-
-func (cl *Client) open(remoteFile string, pflags uint32, fa *FileAttrs) (fh *FileHandle, err error) {
-	var (
-		logp = "open"
-		req  = cl.generatePacket()
-	)
-	if fa == nil {
-		fa = newFileAttrs()
-	}
-
-	payload := req.fxpOpen(remoteFile, pflags, fa)
-
-	res, err := cl.send(payload)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-	if res.kind == packetKindFxpStatus {
-		return nil, handleStatusCode(res.code, res.message)
-	}
-	if res.kind != packetKindFxpHandle {
-		return nil, errUnexpectedResponse(packetKindFxpStatus, res.kind)
-	}
-	fh = res.fh
-	fh.remotePath = remoteFile
-	res.fh = nil
-	return fh, nil
 }
 
 func (cl *Client) read() (res []byte, err error) {

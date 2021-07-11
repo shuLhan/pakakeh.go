@@ -33,14 +33,29 @@ const (
 	maxPacketRead     uint32 = 32000
 )
 
-// List of values for FXP_OPEN pflags.
+// List of valid values for OpenFile flag.
 const (
-	ssh_FXF_READ   uint32 = 0x00000001
-	ssh_FXF_WRITE  uint32 = 0x00000002
-	ssh_FXF_APPEND uint32 = 0x00000004
-	ssh_FXF_CREAT  uint32 = 0x00000008
-	ssh_FXF_TRUNC  uint32 = 0x00000010
-	ssh_FXF_EXCL   uint32 = 0x00000020
+	// OpenFlagRead open remote file for read only.
+	OpenFlagRead uint32 = 0x00000001
+
+	// OpenFlagWrite open remote file for write only.
+	OpenFlagWrite uint32 = 0x00000002
+
+	// OpenFlagAppend any write to remote file handle opened with this
+	// file will be appended at the end of the file.
+	OpenFlagAppend uint32 = 0x00000004
+
+	// OpenFlagCreate create new file on the server if it does not exist.
+	OpenFlagCreate uint32 = 0x00000008
+
+	// OpenFlagTruncate truncated the remote file.
+	// OpenFlagCreate MUST also be specified.
+	OpenFlagTruncate uint32 = 0x00000010
+
+	// OpenFlagExcl passing this flag along OpenFlagCreate will fail the
+	// remote file already exists.
+	// OpenFlagCreate MUST also be specified.
+	OpenFlagExcl uint32 = 0x00000020
 )
 
 // List of values for FXP_STATUS code.
