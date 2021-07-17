@@ -15,7 +15,139 @@ var (
 	_testWD string
 )
 
-func TestAddFile(t *testing.T) {
+func TestMain(m *testing.M) {
+	var err error
+	_testWD, err = os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = os.MkdirAll(filepath.Join(_testWD, "testdata/exclude/dir"), 0700)
+	if err != nil {
+		perr, ok := err.(*os.PathError)
+		if !ok {
+			log.Fatal("!ok:", err)
+		}
+		if perr.Err != os.ErrExist {
+			log.Fatalf("perr: %+v %+v\n", perr.Err, os.ErrExist)
+		}
+	}
+
+	err = os.MkdirAll(filepath.Join(_testWD, "testdata/include/dir"), 0700)
+	if err != nil {
+		perr, ok := err.(*os.PathError)
+		if !ok {
+			log.Fatal(err)
+		}
+		if perr.Err != os.ErrExist {
+			log.Fatal(err)
+		}
+	}
+
+	os.Exit(m.Run())
+}
+
+func TestNew(t *testing.T) {
+	afile := filepath.Join(_testWD, "testdata/index.html")
+
+	cases := []struct {
+		desc       string
+		opts       Options
+		expErr     string
+		expMapKeys []string
+	}{{
+		desc:       "With empty dir",
+		expErr:     "open : no such file or directory",
+		expMapKeys: make([]string, 0),
+	}, {
+		desc: "With file",
+		opts: Options{
+			Root: afile,
+		},
+		expErr: fmt.Sprintf("memfs.New: mount: %q must be a directory", afile),
+	}, {
+		desc: "With directory",
+		opts: Options{
+			Root: filepath.Join(_testWD, "testdata"),
+			Excludes: []string{
+				"memfs_generate.go$",
+				"direct$",
+			},
+		},
+		expMapKeys: []string{
+			"/",
+			"/exclude",
+			"/exclude/index.css",
+			"/exclude/index.html",
+			"/exclude/index.js",
+			"/include",
+			"/include/index.css",
+			"/include/index.html",
+			"/include/index.js",
+			"/index.css",
+			"/index.html",
+			"/index.js",
+			"/plain",
+		},
+	}, {
+		desc: "With excludes",
+		opts: Options{
+			Root: filepath.Join(_testWD, "testdata"),
+			Excludes: []string{
+				`.*\.js$`,
+				"memfs_generate.go$",
+				"direct$",
+			},
+		},
+		expMapKeys: []string{
+			"/",
+			"/exclude",
+			"/exclude/index.css",
+			"/exclude/index.html",
+			"/include",
+			"/include/index.css",
+			"/include/index.html",
+			"/index.css",
+			"/index.html",
+			"/plain",
+		},
+	}, {
+		desc: "With includes",
+		opts: Options{
+			Root: filepath.Join(_testWD, "testdata"),
+			Includes: []string{
+				`.*\.js$`,
+			},
+			Excludes: []string{
+				"memfs_generate.go$",
+				"direct$",
+			},
+		},
+		expMapKeys: []string{
+			"/",
+			"/exclude",
+			"/exclude/index.js",
+			"/include",
+			"/include/index.js",
+			"/index.js",
+		},
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		mfs, err := New(&c.opts)
+		if err != nil {
+			test.Assert(t, "error", c.expErr, err.Error())
+			continue
+		}
+
+		gotListNames := mfs.ListNames()
+		test.Assert(t, "names", c.expMapKeys, gotListNames)
+	}
+}
+
+func TestMemFS_AddFile(t *testing.T) {
 	cases := []struct {
 		desc     string
 		intPath  string
@@ -103,8 +235,7 @@ func TestAddFile(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
-
+func TestMemFS_Get(t *testing.T) {
 	cases := []struct {
 		path           string
 		expV           []byte
@@ -213,107 +344,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestMemFS_mount(t *testing.T) {
-	afile := filepath.Join(_testWD, "testdata/index.html")
-
-	cases := []struct {
-		desc       string
-		opts       Options
-		expErr     string
-		expMapKeys []string
-	}{{
-		desc:       "With empty dir",
-		expErr:     "open : no such file or directory",
-		expMapKeys: make([]string, 0),
-	}, {
-		desc: "With file",
-		opts: Options{
-			Root: afile,
-		},
-		expErr: fmt.Sprintf("memfs.New: mount: %q must be a directory", afile),
-	}, {
-		desc: "With directory",
-		opts: Options{
-			Root: filepath.Join(_testWD, "testdata"),
-			Excludes: []string{
-				"memfs_generate.go$",
-				"direct$",
-			},
-		},
-		expMapKeys: []string{
-			"/",
-			"/exclude",
-			"/exclude/index.css",
-			"/exclude/index.html",
-			"/exclude/index.js",
-			"/include",
-			"/include/index.css",
-			"/include/index.html",
-			"/include/index.js",
-			"/index.css",
-			"/index.html",
-			"/index.js",
-			"/plain",
-		},
-	}, {
-		desc: "With excludes",
-		opts: Options{
-			Root: filepath.Join(_testWD, "testdata"),
-			Excludes: []string{
-				`.*\.js$`,
-				"memfs_generate.go$",
-				"direct$",
-			},
-		},
-		expMapKeys: []string{
-			"/",
-			"/exclude",
-			"/exclude/index.css",
-			"/exclude/index.html",
-			"/include",
-			"/include/index.css",
-			"/include/index.html",
-			"/index.css",
-			"/index.html",
-			"/plain",
-		},
-	}, {
-		desc: "With includes",
-		opts: Options{
-			Root: filepath.Join(_testWD, "testdata"),
-			Includes: []string{
-				`.*\.js$`,
-			},
-			Excludes: []string{
-				"memfs_generate.go$",
-				"direct$",
-			},
-		},
-		expMapKeys: []string{
-			"/",
-			"/exclude",
-			"/exclude/index.js",
-			"/include",
-			"/include/index.js",
-			"/index.js",
-		},
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		mfs, err := New(&c.opts)
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
-			continue
-		}
-
-		gotListNames := mfs.ListNames()
-		test.Assert(t, "names", c.expMapKeys, gotListNames)
-	}
-}
-
-func TestFilter(t *testing.T) {
+func TestMemFS_isIncluded(t *testing.T) {
 	cases := []struct {
 		desc    string
 		inc     []string
@@ -445,38 +476,6 @@ func TestFilter(t *testing.T) {
 			test.Assert(t, sysPath, c.exp[x], got)
 		}
 	}
-}
-
-func TestMain(m *testing.M) {
-	var err error
-	_testWD, err = os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = os.MkdirAll(filepath.Join(_testWD, "testdata/exclude/dir"), 0700)
-	if err != nil {
-		perr, ok := err.(*os.PathError)
-		if !ok {
-			log.Fatal("!ok:", err)
-		}
-		if perr.Err != os.ErrExist {
-			log.Fatalf("perr: %+v %+v\n", perr.Err, os.ErrExist)
-		}
-	}
-
-	err = os.MkdirAll(filepath.Join(_testWD, "testdata/include/dir"), 0700)
-	if err != nil {
-		perr, ok := err.(*os.PathError)
-		if !ok {
-			log.Fatal(err)
-		}
-		if perr.Err != os.ErrExist {
-			log.Fatal(err)
-		}
-	}
-
-	os.Exit(m.Run())
 }
 
 func TestMerge(t *testing.T) {
