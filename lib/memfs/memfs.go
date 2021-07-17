@@ -127,6 +127,40 @@ func New(opts *Options) (mfs *MemFS, err error) {
 }
 
 //
+// AddChild add new child to parent node.
+//
+func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
+	sysPath := filepath.Join(parent.SysPath, fi.Name())
+
+	if fi.Mode()&os.ModeSymlink != 0 {
+		symPath := filepath.Join(parent.SysPath, fi.Name())
+		absPath, err := filepath.EvalSymlinks(symPath)
+		if err != nil {
+			return nil, fmt.Errorf("memfs.AddChild: %w", err)
+		}
+
+		fi, err = os.Lstat(absPath)
+		if err != nil {
+			return nil, fmt.Errorf("memfs.AddChild: %w", err)
+		}
+	}
+
+	if !mfs.isIncluded(sysPath, fi.Mode()) {
+		return nil, nil
+	}
+
+	child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
+	if err != nil {
+		log.Printf("AddChild %s: %s", fi.Name(), err.Error())
+		return nil, nil
+	}
+
+	mfs.PathNodes.v[child.Path] = child
+
+	return child, nil
+}
+
+//
 // AddFile add the external file directly as internal file.
 // If the internal file is already exist it will be replaced.
 // Any directories in the internal path will be generated automatically if its
@@ -295,23 +329,6 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 }
 
 //
-// MustGet return the Node representation of file in memory by its path if its
-// exist or nil the path is not exist.
-//
-func (mfs *MemFS) MustGet(path string) (node *Node) {
-	node, _ = mfs.Get(path)
-	return node
-}
-
-//
-// Open the named file for reading.
-// This is an alias to Get() method, to make it implement http.FileSystem.
-//
-func (mfs *MemFS) Open(path string) (http.File, error) {
-	return mfs.Get(path)
-}
-
-//
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
@@ -334,162 +351,20 @@ func (mfs *MemFS) ListNames() (paths []string) {
 }
 
 //
-// mount the directory recursively into the memory as root directory.
-// For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
-// access file "a" we call Get("/a"), not Get("/tmp/a").
+// MustGet return the Node representation of file in memory by its path if its
+// exist or nil the path is not exist.
 //
-// mount does not have any effect if current directory contains ".go"
-// file generated from GoGenerate().
-//
-func (mfs *MemFS) mount() error {
-	if len(mfs.Opts.Root) == 0 {
-		return nil
-	}
-
-	if mfs.PathNodes == nil {
-		mfs.PathNodes = &PathNode{
-			v: make(map[string]*Node),
-			f: nil,
-		}
-	}
-
-	f, err := os.Open(mfs.Opts.Root)
-	if err != nil {
-		return fmt.Errorf("mount: %w", err)
-	}
-
-	err = mfs.createRoot(f)
-	if err != nil {
-		return fmt.Errorf("mount: %w", err)
-	}
-
-	err = mfs.scanDir(mfs.Root, f)
-	_ = f.Close()
-	if err != nil {
-		return fmt.Errorf("mount: %w", err)
-	}
-
-	if mfs.Opts.MaxFileSize > 0 {
-		mfs.pruneEmptyDirs()
-	}
-
-	return nil
+func (mfs *MemFS) MustGet(path string) (node *Node) {
+	node, _ = mfs.Get(path)
+	return node
 }
 
 //
-// Update the node content and information in memory based on new file
-// information.
-// This method only check if the node name is equal with file name, but it's
-// not checking whether the node is part of memfs (node is parent or have the
-// same Root node).
+// Open the named file for reading.
+// This is an alias to Get() method, to make it implement http.FileSystem.
 //
-func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
-	if node == nil || newInfo == nil {
-		return
-	}
-
-	err := node.update(newInfo, mfs.Opts.MaxFileSize)
-	if err != nil {
-		log.Println("lib/memfs: Update: " + err.Error())
-	}
-}
-
-func (mfs *MemFS) createRoot(f *os.File) error {
-	fi, err := f.Stat()
-	if err != nil {
-		return err
-	}
-
-	if !fi.IsDir() {
-		return fmt.Errorf("%q must be a directory", mfs.Opts.Root)
-	}
-
-	mfs.Root = &Node{
-		SysPath: mfs.Opts.Root,
-		Path:    "/",
-		name:    "/",
-		modTime: fi.ModTime(),
-		mode:    fi.Mode(),
-		size:    0,
-		V:       nil,
-		Parent:  nil,
-	}
-	mfs.Root.generateFuncName(mfs.Opts.Root)
-
-	mfs.PathNodes.v[mfs.Root.Path] = mfs.Root
-
-	return nil
-}
-
-func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
-	fis, err := f.Readdir(0)
-	if err != nil {
-		return err
-	}
-
-	sort.SliceStable(fis, func(x, y int) bool {
-		return fis[x].Name() < fis[y].Name()
-	})
-
-	for _, fi := range fis {
-		leaf, err := mfs.AddChild(parent, fi)
-		if err != nil {
-			return err
-		}
-		if leaf == nil {
-			continue
-		}
-		if !leaf.mode.IsDir() {
-			continue
-		}
-
-		fdir, err := os.Open(leaf.SysPath)
-		if err != nil {
-			return err
-		}
-
-		err = mfs.scanDir(leaf, fdir)
-		_ = fdir.Close()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-//
-// AddChild add new child to parent node.
-//
-func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
-	sysPath := filepath.Join(parent.SysPath, fi.Name())
-
-	if fi.Mode()&os.ModeSymlink != 0 {
-		symPath := filepath.Join(parent.SysPath, fi.Name())
-		absPath, err := filepath.EvalSymlinks(symPath)
-		if err != nil {
-			return nil, fmt.Errorf("memfs.AddChild: %w", err)
-		}
-
-		fi, err = os.Lstat(absPath)
-		if err != nil {
-			return nil, fmt.Errorf("memfs.AddChild: %w", err)
-		}
-	}
-
-	if !mfs.isIncluded(sysPath, fi.Mode()) {
-		return nil, nil
-	}
-
-	child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
-	if err != nil {
-		log.Printf("AddChild %s: %s", fi.Name(), err.Error())
-		return nil, nil
-	}
-
-	mfs.PathNodes.v[child.Path] = child
-
-	return child, nil
+func (mfs *MemFS) Open(path string) (http.File, error) {
+	return mfs.Get(path)
 }
 
 //
@@ -502,86 +377,6 @@ func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
 		delete(mfs.PathNodes.v, removed.Path)
 	}
 	return
-}
-
-//
-// isIncluded will return true if the child node pass the included filter or
-// excluded filter; otherwise it will return false.
-//
-func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
-	if len(mfs.incRE) == 0 && len(mfs.excRE) == 0 {
-		return true
-	}
-	for _, re := range mfs.excRE {
-		if re.MatchString(sysPath) {
-			return false
-		}
-	}
-	if len(mfs.incRE) > 0 {
-		for _, re := range mfs.incRE {
-			if re.MatchString(sysPath) {
-				return true
-			}
-		}
-		return mode.IsDir()
-	}
-
-	return true
-}
-
-//
-// pruneEmptyDirs remove node that is directory and does not have childs.
-//
-func (mfs *MemFS) pruneEmptyDirs() {
-	for k, node := range mfs.PathNodes.v {
-		if !node.mode.IsDir() {
-			continue
-		}
-		if len(node.Childs) != 0 {
-			continue
-		}
-		if node.Parent == nil {
-			continue
-		}
-
-		node.Parent.removeChild(node)
-		delete(mfs.PathNodes.v, k)
-	}
-}
-
-//
-// refresh the tree by rescanning from the root.
-//
-func (mfs *MemFS) refresh(url string) (node *Node, err error) {
-	syspath := filepath.Join(mfs.Root.SysPath, url)
-
-	_, err = os.Stat(syspath)
-	if err != nil {
-		return nil, err
-	}
-
-	// Path exist on file system, try to refresh directory.
-	f, err := os.Open(mfs.Root.SysPath)
-	if err != nil {
-		return nil, err
-	}
-
-	err = mfs.scanDir(mfs.Root, f)
-	if err != nil {
-		return nil, err
-	}
-
-	err = f.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	node = mfs.PathNodes.Get(url)
-	if node == nil {
-		return nil, os.ErrNotExist
-	}
-
-	return node, nil
 }
 
 //
@@ -646,4 +441,209 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 	}
 
 	return results
+}
+
+//
+// Update the node content and information in memory based on new file
+// information.
+// This method only check if the node name is equal with file name, but it's
+// not checking whether the node is part of memfs (node is parent or have the
+// same Root node).
+//
+func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
+	if node == nil || newInfo == nil {
+		return
+	}
+
+	err := node.update(newInfo, mfs.Opts.MaxFileSize)
+	if err != nil {
+		log.Println("lib/memfs: Update: " + err.Error())
+	}
+}
+
+func (mfs *MemFS) createRoot(f *os.File) error {
+	fi, err := f.Stat()
+	if err != nil {
+		return err
+	}
+
+	if !fi.IsDir() {
+		return fmt.Errorf("%q must be a directory", mfs.Opts.Root)
+	}
+
+	mfs.Root = &Node{
+		SysPath: mfs.Opts.Root,
+		Path:    "/",
+		name:    "/",
+		modTime: fi.ModTime(),
+		mode:    fi.Mode(),
+		size:    0,
+		V:       nil,
+		Parent:  nil,
+	}
+	mfs.Root.generateFuncName(mfs.Opts.Root)
+
+	mfs.PathNodes.v[mfs.Root.Path] = mfs.Root
+
+	return nil
+}
+
+//
+// isIncluded will return true if the child node pass the included filter or
+// excluded filter; otherwise it will return false.
+//
+func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
+	if len(mfs.incRE) == 0 && len(mfs.excRE) == 0 {
+		return true
+	}
+	for _, re := range mfs.excRE {
+		if re.MatchString(sysPath) {
+			return false
+		}
+	}
+	if len(mfs.incRE) > 0 {
+		for _, re := range mfs.incRE {
+			if re.MatchString(sysPath) {
+				return true
+			}
+		}
+		return mode.IsDir()
+	}
+
+	return true
+}
+
+//
+// mount the directory recursively into the memory as root directory.
+// For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
+// access file "a" we call Get("/a"), not Get("/tmp/a").
+//
+// mount does not have any effect if current directory contains ".go"
+// file generated from GoGenerate().
+//
+func (mfs *MemFS) mount() error {
+	if len(mfs.Opts.Root) == 0 {
+		return nil
+	}
+
+	if mfs.PathNodes == nil {
+		mfs.PathNodes = &PathNode{
+			v: make(map[string]*Node),
+			f: nil,
+		}
+	}
+
+	f, err := os.Open(mfs.Opts.Root)
+	if err != nil {
+		return fmt.Errorf("mount: %w", err)
+	}
+
+	err = mfs.createRoot(f)
+	if err != nil {
+		return fmt.Errorf("mount: %w", err)
+	}
+
+	err = mfs.scanDir(mfs.Root, f)
+	_ = f.Close()
+	if err != nil {
+		return fmt.Errorf("mount: %w", err)
+	}
+
+	if mfs.Opts.MaxFileSize > 0 {
+		mfs.pruneEmptyDirs()
+	}
+
+	return nil
+}
+
+func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
+	fis, err := f.Readdir(0)
+	if err != nil {
+		return err
+	}
+
+	sort.SliceStable(fis, func(x, y int) bool {
+		return fis[x].Name() < fis[y].Name()
+	})
+
+	for _, fi := range fis {
+		leaf, err := mfs.AddChild(parent, fi)
+		if err != nil {
+			return err
+		}
+		if leaf == nil {
+			continue
+		}
+		if !leaf.mode.IsDir() {
+			continue
+		}
+
+		fdir, err := os.Open(leaf.SysPath)
+		if err != nil {
+			return err
+		}
+
+		err = mfs.scanDir(leaf, fdir)
+		_ = fdir.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+//
+// pruneEmptyDirs remove node that is directory and does not have childs.
+//
+func (mfs *MemFS) pruneEmptyDirs() {
+	for k, node := range mfs.PathNodes.v {
+		if !node.mode.IsDir() {
+			continue
+		}
+		if len(node.Childs) != 0 {
+			continue
+		}
+		if node.Parent == nil {
+			continue
+		}
+
+		node.Parent.removeChild(node)
+		delete(mfs.PathNodes.v, k)
+	}
+}
+
+//
+// refresh the tree by rescanning from the root.
+//
+func (mfs *MemFS) refresh(url string) (node *Node, err error) {
+	syspath := filepath.Join(mfs.Root.SysPath, url)
+
+	_, err = os.Stat(syspath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Path exist on file system, try to refresh directory.
+	f, err := os.Open(mfs.Root.SysPath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = mfs.scanDir(mfs.Root, f)
+	if err != nil {
+		return nil, err
+	}
+
+	err = f.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	node = mfs.PathNodes.Get(url)
+	if node == nil {
+		return nil, os.ErrNotExist
+	}
+
+	return node, nil
 }
