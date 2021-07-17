@@ -4,6 +4,12 @@
 
 package memfs
 
+import (
+	"bytes"
+	"fmt"
+	"sort"
+)
+
 //
 // PathNode contains a mapping between path and Node.
 //
@@ -37,6 +43,35 @@ func (pn *PathNode) Get(path string) *Node {
 		}
 	}
 	return nil
+}
+
+func (pn *PathNode) MarshalJSON() ([]byte, error) {
+	// Merge the path with function to node into v.
+	for k, fn := range pn.f {
+		pn.v[k] = fn()
+	}
+
+	buf := bytes.Buffer{}
+
+	// Sort the paths.
+	keys := make([]string, 0, len(pn.v))
+	for path := range pn.v {
+		keys = append(keys, path)
+	}
+	sort.Strings(keys)
+
+	_ = buf.WriteByte('{')
+	for x, key := range keys {
+		if x > 0 {
+			_ = buf.WriteByte(',')
+		}
+		fmt.Fprintf(&buf, "%q:", key)
+		node := pn.v[key]
+		node.packAsJson(&buf)
+	}
+	_ = buf.WriteByte('}')
+
+	return buf.Bytes(), nil
 }
 
 //

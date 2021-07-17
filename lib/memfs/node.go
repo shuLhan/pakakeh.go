@@ -162,6 +162,15 @@ func (leaf *Node) IsDir() bool {
 	return leaf.mode.IsDir()
 }
 
+//
+// MarshalJSON encode the node into JSON format.
+//
+func (leaf *Node) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	leaf.packAsJson(&buf)
+	return buf.Bytes(), nil
+}
+
 func (leaf *Node) ModTime() time.Time {
 	return leaf.modTime
 }
@@ -323,6 +332,29 @@ func (leaf *Node) addChild(
 func (leaf *Node) generateFuncName(in string) {
 	syspath := string(libbytes.InReplace([]byte(in), []byte(ascii.LettersNumber), '_'))
 	leaf.GenFuncName = "generate_" + syspath
+}
+
+func (leaf *Node) packAsJson(buf *bytes.Buffer) {
+	_ = buf.WriteByte('{')
+
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "path", leaf.Path)
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "name", leaf.name)
+	_, _ = fmt.Fprintf(buf, `%q:%d,`, "mod_time_epoch", leaf.modTime.Unix())
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mod_time_rfc3339", leaf.modTime.UTC())
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mode_string", leaf.mode)
+	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", leaf.size)
+	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", leaf.IsDir())
+
+	_, _ = fmt.Fprintf(buf, `%q:[`, "childs")
+	for x, child := range leaf.Childs {
+		if x > 0 {
+			_ = buf.WriteByte(',')
+		}
+		child.packAsJson(buf)
+	}
+	_ = buf.WriteByte(']')
+
+	_ = buf.WriteByte('}')
 }
 
 //

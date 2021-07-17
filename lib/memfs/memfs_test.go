@@ -1,6 +1,7 @@
 package memfs
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -342,6 +343,121 @@ func TestMemFS_Get(t *testing.T) {
 				c.expContentType, got.ContentType)
 		}
 	}
+}
+
+func TestMemFS_MarshalJSON(t *testing.T) {
+	logp := "MarshalJSON"
+
+	opts := &Options{
+		Root: "testdata/direct/",
+	}
+	mfs, err := New(opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := json.MarshalIndent(mfs, "", "\t")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exp := `{
+	"/": {
+		"path": "/",
+		"name": "/",
+		"mod_time_epoch": 1569586540,
+		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mode_string": "drwxr-xr-x",
+		"size": 0,
+		"is_dir": true,
+		"childs": [
+			{
+				"path": "/add",
+				"name": "add",
+				"mod_time_epoch": 1569586540,
+				"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+				"mode_string": "drwxr-xr-x",
+				"size": 0,
+				"is_dir": true,
+				"childs": [
+					{
+						"path": "/add/file",
+						"name": "file",
+						"mod_time_epoch": 1569586540,
+						"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+						"mode_string": "-rw-r--r--",
+						"size": 22,
+						"is_dir": false,
+						"childs": []
+					},
+					{
+						"path": "/add/file2",
+						"name": "file2",
+						"mod_time_epoch": 1569586540,
+						"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+						"mode_string": "-rw-r--r--",
+						"size": 24,
+						"is_dir": false,
+						"childs": []
+					}
+				]
+			}
+		]
+	},
+	"/add": {
+		"path": "/add",
+		"name": "add",
+		"mod_time_epoch": 1569586540,
+		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mode_string": "drwxr-xr-x",
+		"size": 0,
+		"is_dir": true,
+		"childs": [
+			{
+				"path": "/add/file",
+				"name": "file",
+				"mod_time_epoch": 1569586540,
+				"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+				"mode_string": "-rw-r--r--",
+				"size": 22,
+				"is_dir": false,
+				"childs": []
+			},
+			{
+				"path": "/add/file2",
+				"name": "file2",
+				"mod_time_epoch": 1569586540,
+				"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+				"mode_string": "-rw-r--r--",
+				"size": 24,
+				"is_dir": false,
+				"childs": []
+			}
+		]
+	},
+	"/add/file": {
+		"path": "/add/file",
+		"name": "file",
+		"mod_time_epoch": 1569586540,
+		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mode_string": "-rw-r--r--",
+		"size": 22,
+		"is_dir": false,
+		"childs": []
+	},
+	"/add/file2": {
+		"path": "/add/file2",
+		"name": "file2",
+		"mod_time_epoch": 1569586540,
+		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mode_string": "-rw-r--r--",
+		"size": 24,
+		"is_dir": false,
+		"childs": []
+	}
+}`
+
+	test.Assert(t, logp, exp, string(got))
 }
 
 func TestMemFS_isIncluded(t *testing.T) {

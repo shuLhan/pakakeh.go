@@ -351,6 +351,16 @@ func (mfs *MemFS) ListNames() (paths []string) {
 }
 
 //
+// MarshalJSON encode the MemFS object into JSON format.
+//
+// The field that being encoded is the PathNode field, where the key sorted in
+// ascending order.
+//
+func (mfs *MemFS) MarshalJSON() ([]byte, error) {
+	return mfs.PathNodes.MarshalJSON()
+}
+
+//
 // MustGet return the Node representation of file in memory by its path if its
 // exist or nil the path is not exist.
 //
