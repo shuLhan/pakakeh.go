@@ -382,6 +382,17 @@ func (leaf *Node) removeChild(child *Node) *Node {
 }
 
 //
+// resetAllModTime set the modTime of node and its child to the t.
+// This method is only intended for testing.
+//
+func (leaf *Node) resetAllModTime(t time.Time) {
+	leaf.modTime = t
+	for _, c := range leaf.Childs {
+		c.resetAllModTime(t)
+	}
+}
+
+//
 // update the node content and information based on new file information.
 //
 // If the newInfo is nil, it will read the file information based on node's

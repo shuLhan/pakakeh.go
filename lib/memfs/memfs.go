@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	libints "github.com/shuLhan/share/lib/ints"
@@ -656,4 +657,12 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	}
 
 	return node, nil
+}
+
+//
+// resetAllModTime set the modTime on Root and its childs to the t.
+// This method is only intended for testing.
+//
+func (mfs *MemFS) resetAllModTime(t time.Time) {
+	mfs.Root.resetAllModTime(t)
 }
