@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/test"
+	"github.com/shuLhan/share/lib/text/diff"
 )
 
 var (
@@ -347,6 +348,7 @@ func TestMemFS_Get(t *testing.T) {
 
 func TestMemFS_MarshalJSON(t *testing.T) {
 	logp := "MarshalJSON"
+	modTime := time.Date(2021, 7, 30, 20, 04, 00, 0, time.UTC)
 
 	opts := &Options{
 		Root: "testdata/direct/",
@@ -355,6 +357,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	mfs.resetAllModTime(modTime)
 
 	got, err := json.MarshalIndent(mfs, "", "\t")
 	if err != nil {
@@ -365,8 +369,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	"/": {
 		"path": "/",
 		"name": "/",
-		"mod_time_epoch": 1569586540,
-		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mod_time_epoch": 1627675440,
+		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 		"mode_string": "drwxr-xr-x",
 		"size": 0,
 		"is_dir": true,
@@ -374,8 +378,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 			{
 				"path": "/add",
 				"name": "add",
-				"mod_time_epoch": 1569586540,
-				"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+				"mod_time_epoch": 1627675440,
+				"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 				"mode_string": "drwxr-xr-x",
 				"size": 0,
 				"is_dir": true,
@@ -383,8 +387,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 					{
 						"path": "/add/file",
 						"name": "file",
-						"mod_time_epoch": 1569586540,
-						"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+						"mod_time_epoch": 1627675440,
+						"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 						"mode_string": "-rw-r--r--",
 						"size": 22,
 						"is_dir": false,
@@ -393,8 +397,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 					{
 						"path": "/add/file2",
 						"name": "file2",
-						"mod_time_epoch": 1569586540,
-						"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+						"mod_time_epoch": 1627675440,
+						"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 						"mode_string": "-rw-r--r--",
 						"size": 24,
 						"is_dir": false,
@@ -407,8 +411,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	"/add": {
 		"path": "/add",
 		"name": "add",
-		"mod_time_epoch": 1569586540,
-		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mod_time_epoch": 1627675440,
+		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 		"mode_string": "drwxr-xr-x",
 		"size": 0,
 		"is_dir": true,
@@ -416,8 +420,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 			{
 				"path": "/add/file",
 				"name": "file",
-				"mod_time_epoch": 1569586540,
-				"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+				"mod_time_epoch": 1627675440,
+				"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 				"mode_string": "-rw-r--r--",
 				"size": 22,
 				"is_dir": false,
@@ -426,8 +430,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 			{
 				"path": "/add/file2",
 				"name": "file2",
-				"mod_time_epoch": 1569586540,
-				"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+				"mod_time_epoch": 1627675440,
+				"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 				"mode_string": "-rw-r--r--",
 				"size": 24,
 				"is_dir": false,
@@ -438,8 +442,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	"/add/file": {
 		"path": "/add/file",
 		"name": "file",
-		"mod_time_epoch": 1569586540,
-		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mod_time_epoch": 1627675440,
+		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 		"mode_string": "-rw-r--r--",
 		"size": 22,
 		"is_dir": false,
@@ -448,8 +452,8 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	"/add/file2": {
 		"path": "/add/file2",
 		"name": "file2",
-		"mod_time_epoch": 1569586540,
-		"mod_time_rfc3339": "2019-09-27 12:15:40 +0000 UTC",
+		"mod_time_epoch": 1627675440,
+		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
 		"mode_string": "-rw-r--r--",
 		"size": 24,
 		"is_dir": false,
@@ -457,7 +461,16 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	}
 }`
 
-	test.Assert(t, logp, exp, string(got))
+	diffs := diff.Text([]byte(exp), got, diff.LevelLines)
+	if len(diffs.Adds) != 0 {
+		t.Fatalf("%s: adds: %v", logp, diffs.Adds)
+	}
+	if len(diffs.Dels) != 0 {
+		t.Fatalf("%s: dels: %#v", logp, diffs.Dels)
+	}
+	if len(diffs.Changes) != 0 {
+		t.Fatalf("%s: changes: %s", logp, diffs.Changes)
+	}
 }
 
 func TestMemFS_isIncluded(t *testing.T) {
