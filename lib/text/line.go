@@ -4,10 +4,16 @@
 
 package text
 
+import "fmt"
+
 //
 // Line represent line number and slice of bytes as string.
 //
 type Line struct {
 	N int
 	V []byte
+}
+
+func (l Line) String() string {
+	return fmt.Sprintf("{N:%d,V:%s}", l.N, l.V)
 }

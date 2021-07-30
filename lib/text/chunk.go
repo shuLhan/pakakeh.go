@@ -4,6 +4,8 @@
 
 package text
 
+import "fmt"
+
 //
 // Chunk represent subset of line, contain starting position and slice of
 // bytes in line.
@@ -27,4 +29,8 @@ func JoinChunks(chunks []Chunk, sep string) string {
 		out += string(chunks[x].V)
 	}
 	return out
+}
+
+func (c Chunk) String() string {
+	return fmt.Sprintf("{StartAt:%d,V:%s}", c.StartAt, c.V)
 }
