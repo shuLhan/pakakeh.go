@@ -58,8 +58,12 @@ func (e *E) Error() string {
 }
 
 //
-// Unwrap return the internal error.
+// Unwrap return the internal error only if its not nil; otherwise it will
+// return the e itself.
 //
 func (e *E) Unwrap() error {
-	return e.err
+	if e.err != nil {
+		return e.err
+	}
+	return e
 }
