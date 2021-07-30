@@ -32,9 +32,9 @@ func NewLineChange(old, new text.Line) *LineChange {
 //
 func (change LineChange) String() string {
 	return fmt.Sprintf("LineChange: {\n"+
-		" Old  : %v\n"+
-		" New  : %v\n"+
-		" Adds : %v\n"+
-		" Dels : %v\n"+
+		" Old  : %s\n"+
+		" New  : %s\n"+
+		" Adds : %s\n"+
+		" Dels : %s\n"+
 		"}\n", change.Old, change.New, change.Adds, change.Dels)
 }

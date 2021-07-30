@@ -288,15 +288,15 @@ func compareChunks(t *testing.T, adds, dels text.Chunks,
 	}
 }
 
-func testDiffLines(t *testing.T, old, new text.Line,
+func testDiffBytes(t *testing.T, old, new text.Line,
 	expAdds, expDels []string,
 ) {
-	adds, dels := Lines(old.V, new.V, 0, 0)
+	adds, dels := Bytes(old.V, new.V, 0, 0)
 
 	compareChunks(t, adds, dels, expAdds, expDels)
 }
 
-func TestDiffLines(t *testing.T) {
+func TestBytes(t *testing.T) {
 	old := text.Line{N: 0, V: []byte("lorem ipsum dolmet")}
 	new := text.Line{N: 0, V: []byte("lorem all ipsum")}
 
@@ -307,22 +307,22 @@ func TestDiffLines(t *testing.T) {
 		[]string{" dolmet"},
 	}
 
-	testDiffLines(t, old, new, expAdds[0], expDels[0])
+	testDiffBytes(t, old, new, expAdds[0], expDels[0])
 
 	old = text.Line{N: 0, V: []byte("lorem ipsum dolmet")}
 	new = text.Line{N: 0, V: []byte("lorem ipsum")}
 
-	testDiffLines(t, old, new, []string{}, expDels[0])
+	testDiffBytes(t, old, new, []string{}, expDels[0])
 
 	old = text.Line{N: 0, V: []byte("lorem ipsum")}
 	new = text.Line{N: 0, V: []byte("lorem ipsum dolmet")}
 
-	testDiffLines(t, old, new, expDels[0], []string{})
+	testDiffBytes(t, old, new, expDels[0], []string{})
 
 	old = text.Line{N: 0, V: []byte("{{Pharaoh Infobox |")}
 	new = text.Line{N: 0, V: []byte("{{Infobox pharaoh")}
 
-	testDiffLines(t, old, new, []string{"pharaoh"},
+	testDiffBytes(t, old, new, []string{"pharaoh"},
 		[]string{"Pharaoh ", "|"})
 }
 

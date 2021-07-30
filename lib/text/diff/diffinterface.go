@@ -6,7 +6,6 @@ package diff
 
 import (
 	"bufio"
-	"bytes"
 	"io"
 	"os"
 
@@ -64,10 +63,10 @@ func ReadLines(f string) (lines text.Lines, e error) {
 }
 
 //
-// Bytes compare two slice of bytes and return true if equal or false
+// IsEqual compare two slice of bytes and return true if equal or false
 // otherwise.
 //
-func Bytes(oldb, newb []byte) (equal bool) {
+func IsEqual(oldb, newb []byte) (equal bool) {
 	oldblen := len(oldb)
 	newblen := len(newb)
 
@@ -214,9 +213,7 @@ func findLine(line text.Line, text text.Lines, startat int) (
 	textlen := len(text)
 
 	for n = startat; n < textlen; n++ {
-		isEqual := Bytes(line.V, text[n].V)
-
-		if isEqual {
+		if IsEqual(line.V, text[n].V) {
 			return true, n
 		}
 	}
@@ -227,176 +224,21 @@ func findLine(line text.Line, text text.Lines, startat int) (
 //
 // Files compare two files.
 //
-func Files(oldf, newf string, difflevel int) (diffs Data, e error) {
+func Files(oldf, newf string, level int) (diffs Data, e error) {
 	oldlines, e := ReadLines(oldf)
 	if e != nil {
 		return
 	}
-
 	newlines, e := ReadLines(newf)
 	if e != nil {
 		return
 	}
-
-	oldlen := len(oldlines)
-	newlen := len(newlines)
-	x := 0
-	y := 0
-
-	for x < oldlen {
-		if y == newlen {
-			// New text has been full examined. Leave out the old
-			// text that means deletion at the end of text.
-			diffs.PushDel(oldlines[x])
-			oldlines[x].V = nil
-			x++
-			continue
-		}
-
-		// Compare old line with new line.
-		isEqual := Bytes(oldlines[x].V, newlines[y].V)
-
-		if isEqual {
-			oldlines[x].V = nil
-			newlines[y].V = nil
-			x++
-			y++
-			continue
-		}
-
-		// Check for whitespace changes
-		oldlinetrim := bytes.TrimSpace(oldlines[x].V)
-		newlinetrim := bytes.TrimSpace(newlines[y].V)
-		oldtrimlen := len(oldlinetrim)
-		newtrimlen := len(newlinetrim)
-
-		// Both are empty, probably one of them is changing
-		if oldtrimlen <= 0 && newtrimlen <= 0 {
-			diffs.PushChange(oldlines[x], newlines[y])
-			oldlines[x].V = nil
-			newlines[y].V = nil
-			x++
-			y++
-			continue
-		}
-
-		// Old is empty or contain only whitespaces.
-		if oldtrimlen <= 0 {
-			diffs.PushDel(oldlines[x])
-			oldlines[x].V = nil
-			x++
-			continue
-		}
-
-		// New is empty or contain only whitespaces.
-		if newtrimlen <= 0 {
-			diffs.PushAdd(newlines[y])
-			newlines[y].V = nil
-			y++
-			continue
-		}
-
-		ratio, _, _ := BytesRatio(oldlines[x].V, newlines[y].V,
-			DefMatchLen)
-
-		if ratio > DefMatchRatio {
-			// Ratio of similar bytes is higher than minimum
-			// expectation. So, it must be changes
-			diffs.PushChange(oldlines[x], newlines[y])
-			oldlines[x].V = nil
-			newlines[y].V = nil
-			x++
-			y++
-			continue
-		}
-
-		// x is not equal with y, search down...
-		foundx, xaty := findLine(oldlines[x], newlines, y+1)
-
-		// Cross check the y with the rest of x...
-		foundy, yatx := findLine(newlines[y], oldlines, x+1)
-
-		// Both line is missing, its mean changes on current line
-		if !foundx && !foundy {
-			diffs.PushChange(oldlines[x], newlines[y])
-			oldlines[x].V = nil
-			newlines[y].V = nil
-			x++
-			y++
-			continue
-		}
-
-		// x still missing, means deletion in old text.
-		if !foundx && foundy {
-			for ; x < yatx && x < oldlen; x++ {
-				diffs.PushDel(oldlines[x])
-				oldlines[x].V = nil
-			}
-			continue
-		}
-
-		// we found x but y is missing, its mean addition in new text.
-		if foundx && !foundy {
-			for ; y < xaty && y < newlen; y++ {
-				diffs.PushAdd(newlines[y])
-				newlines[y].V = nil
-			}
-			continue
-		}
-
-		if foundx && foundy {
-			// We found x and y. Check which one is the
-			// addition or deletion based on line range.
-			addlen := xaty - y
-			dellen := yatx - x
-
-			switch {
-			case addlen < dellen:
-				for ; y < xaty && y < newlen; y++ {
-					diffs.PushAdd(newlines[y])
-					newlines[y].V = nil
-				}
-
-			case addlen == dellen:
-				// Both changes occur between lines
-				for x < yatx && y < xaty {
-					diffs.PushChange(oldlines[x],
-						newlines[y])
-					oldlines[x].V = nil
-					newlines[y].V = nil
-					x++
-					y++
-				}
-			default:
-				for ; x < yatx && x < oldlen; x++ {
-					diffs.PushDel(oldlines[x])
-					oldlines[x].V = nil
-				}
-			}
-			continue
-		}
-	}
-
-	// Check if there is a left over from new text.
-	for ; y < newlen; y++ {
-		diffs.PushAdd(newlines[y])
-		newlines[y].V = nil
-	}
-
-	if difflevel == LevelWords {
-		// Process each changes to find modified chunkes.
-		for x, change := range diffs.Changes {
-			adds, dels := Lines(change.Old.V, change.New.V, 0, 0)
-			diffs.Changes[x].Adds = adds
-			diffs.Changes[x].Dels = dels
-		}
-	}
-
-	return diffs, e
+	diffs = Lines(oldlines, newlines, level)
+	return diffs, nil
 }
 
 //
-// Lines given two similar lines, find and return the differences (additions and
+// Bytes given two similar lines, find and return the differences (additions and
 // deletion) between them.
 //
 // Case 1: addition on new or deletion on old.
@@ -429,7 +271,7 @@ func Files(oldf, newf string, difflevel int) (diffs Data, e error) {
 //	old: 0001000
 //	new: 0002000
 //
-func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
+func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	oldlen := len(old)
 	newlen := len(new)
 
@@ -563,7 +405,7 @@ func Lines(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 		oldleft = old[x+yatx : xend+1]
 	}
 
-	addsleft, delsleft := Lines(oldleft, newleft, atx+x, aty+y)
+	addsleft, delsleft := Bytes(oldleft, newleft, atx+x, aty+y)
 
 	if len(addsleft) > 0 {
 		adds = append(adds, addsleft...)
