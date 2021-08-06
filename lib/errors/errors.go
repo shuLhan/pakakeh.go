@@ -7,6 +7,7 @@ package errors
 
 import (
 	"net/http"
+	"reflect"
 )
 
 //
@@ -55,6 +56,19 @@ func InvalidInput(field string) *E {
 //
 func (e *E) Error() string {
 	return e.Message
+}
+
+//
+// As set the target to e only if only target is **E.
+//
+func (e *E) As(target interface{}) bool {
+	_, ok := target.(**E)
+	if ok {
+		val := reflect.ValueOf(target)
+		val.Elem().Set(reflect.ValueOf(e))
+		return ok
+	}
+	return false
 }
 
 //
