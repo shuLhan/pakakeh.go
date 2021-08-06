@@ -3,39 +3,75 @@
 
 This library is released every month, usually at the first week of month.
 
-== share v0.29.0 (2021-08-xx)
+==  share v0.29.0 (2021-08-06)
 
-=== New feature
+===  New feature
 
 ssh/sftp: new package that implement SSH File Transport Protocol v3
 
 The sftp package extend the golang.org/x/crypto/ssh package by
 implementing "sftp" subsystem using the ssh.Client connection.
 
-=== Enhancements
+===  Breaking changes
 
-* lib/bytes: print the ASCII character on the right side on PrintHex
+*  text/diff: add functions to compare raw bytes as text and text.Lines
 
-  Previously, PrintHex only print the hex value of all bytes with
-  specified length.
+   This changes refactoring some functions, notably,
 
-  This changes also print any printables ASCII characters (char 33 through
-  126) in the right side column to view readable contents.
+   * Rename Bytes function to IsEqual
+   * Rename Lines function to Bytes
+   * Add function Text that compare two text (raw bytes)
+   * Add function Lines that compare two instances of text.Lines
 
-* lib/totp: lib/totp: increase the maximum steps back on Verify from 2 to 20
+===  Enhancements
 
-  The value 20 means the Verify will check maximum 20 TOTP tokens or 10
-  minutes to the past.
+*  lib/mlog: add function and method Panicf
 
-* lib/http: check request path as HTML file on getFSNode
+   The Panicf method is equal to Errf followed by panic.  This signature
+   follow the log.Panicf convention.
 
-  Previously, if the request path is not exist we check if request
-  contains index.html and if still not exist we return nil.
+*  lib/text: implement function to parse raw bytes into Lines
 
-  This commit add another check by appending ".html" to the request path.
+*  lib/text: implement Stringer on Chunk and Line types
 
-  So, for example, if path "/x" not exist in memfs, we check if
-  "/x/index.html". If its still not exist, we check "/x.html".
+*  lib/memfs: implement json.Marshaler on MemFS and Node
+
+   Previously, without MarshalJSON, encoding the MemFS or Node object will
+   result in incomplete information, for example, missing name, modification
+   time, and size.
+
+   This commit implement the json.Marshaler in MemFS which encode the
+   PathNode sorted by keys in ascending order.
+
+*  lib/bytes: print the ASCII character on the right side on PrintHex
+
+   Previously, PrintHex only print the hex value of all bytes with
+   specified length.
+
+   This changes also print any printables ASCII characters (char 33 through
+   126) in the right side column to view readable contents.
+
+*  lib/totp: lib/totp: increase the maximum steps back on Verify from 2 to 20
+
+   The value 20 means the Verify will check maximum 20 TOTP tokens or 10
+   minutes to the past.
+
+*  lib/http: check request path as HTML file on getFSNode
+
+   Previously, if the request path is not exist we check if request
+   contains index.html and if still not exist we return nil.
+
+   This commit add another check by appending ".html" to the request path.
+
+   So, for example, if path "/x" not exist in memfs, we check if
+   "/x/index.html". If its still not exist, we check "/x.html".
+
+===  Bug fix
+
+*  lib/errors: return the internal error only if its not nil on Unwrap
+
+   If the internal error is nil, the Unwrap method will return the instance
+   of e itself.
 
 
 == share v0.28.0 (2021-07-06)
