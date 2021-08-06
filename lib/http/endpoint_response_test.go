@@ -32,7 +32,16 @@ func TestEndpointResponse_errors_As(t *testing.T) {
 		Error: err,
 	}
 
-	errInternal := &liberrors.E{}
-	got := errors.As(epr.Error, &errInternal)
+	var (
+		errIn  *liberrors.E
+		errIn2 = &liberrors.E{}
+	)
+
+	got := errors.As(epr.Error, &errIn)
 	test.Assert(t, "EndpointRequest: errors.As", true, got)
+	test.Assert(t, "errors.As with unintialized E:", errIn, &myres.E)
+
+	got = errors.As(epr.Error, &errIn2)
+	test.Assert(t, "EndpointRequest: errors.As", true, got)
+	test.Assert(t, "errors.As with initialized E:", errIn2, &myres.E)
 }
