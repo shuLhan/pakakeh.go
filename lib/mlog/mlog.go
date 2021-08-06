@@ -77,6 +77,13 @@ func Outf(format string, v ...interface{}) {
 }
 
 //
+// Panicf is equal to Errf followed by panic.
+//
+func Panicf(format string, v ...interface{}) {
+	defaultMLog.Panicf(format, v...)
+}
+
+//
 // PrintStack writes to error writers the stack trace returned by
 // debug.Stack.
 //

@@ -120,6 +120,16 @@ func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 }
 
 //
+// Panicf is equal to Errf and followed by panic.
+//
+func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
+	mlog.Errf(format, v...)
+	mlog.Flush()
+	msg := fmt.Sprintf(format, v...)
+	panic(msg)
+}
+
+//
 // PrintStack writes to error writers the stack trace returned by
 // debug.Stack.
 //
