@@ -353,7 +353,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 				}
 				return nil
 			}
-			return nil
+			return node
 		}
 	}
 
