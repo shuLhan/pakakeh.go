@@ -39,10 +39,12 @@ const (
 	packetKindFxpName
 	packetKindFxpAttrs
 )
-const (
-	packetKindFxpExtended = 200 + iota
-	packetKindFxpExtendedReply
-)
+
+// TODO(ms): handle extended reply.
+// const (
+// packetKindFxpExtended = 200 + iota
+// packetKindFxpExtendedReply
+// )
 
 type packet struct {
 	length    uint32
@@ -122,7 +124,6 @@ func unpackPacket(payload []byte) (pac *packet, err error) {
 		v = binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
 		pac.data = payload[:v]
-		payload = payload[v:]
 
 	case packetKindFxpName:
 		var (
