@@ -41,6 +41,18 @@ func TestParseCommandArg(t *testing.T) {
 		in:      "a `b'c`",
 		expCmd:  `a`,
 		expArgs: []string{`b'c`},
+	}, {
+		in: `a\ b c\ d`,
+		expCmd: "a b",
+		expArgs: []string{"c d"},
+	}, {
+		in: `a\\ b c\\ d`,
+		expCmd: `a\`,
+		expArgs: []string{"b", `c\`, "d"},
+	}, {
+		in: `a\\\ b c\\\ d`,
+		expCmd: `a\ b`,
+		expArgs: []string{`c\ d`},
 	}}
 
 	for _, c := range cases {

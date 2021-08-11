@@ -17,10 +17,12 @@ import (
 
 //
 // ParseCommandArgs parse the input string into command and arguments.
-// This function detect possible single, double, or back quote on arguments.
+// This function detect single, double, or back quote on arguments; and
+// escaped spaces using backslash.
 //
 func ParseCommandArgs(in string) (cmd string, args []string) {
 	var (
+		prev    rune
 		quote   rune
 		cmdArgs []string
 	)
@@ -40,21 +42,38 @@ func ParseCommandArgs(in string) (cmd string, args []string) {
 			} else {
 				sb.WriteRune(r)
 			}
+			prev = r
 			continue
 		}
 		if r == '\'' || r == '"' || r == '`' {
 			quote = r
+			prev = r
+			continue
+		}
+		if r == '\\' {
+			if prev == '\\' {
+				sb.WriteRune(r)
+				prev = 0
+			} else {
+				prev = r
+			}
 			continue
 		}
 		if r == ' ' || r == '\t' {
-			arg := sb.String()
-			if len(arg) > 0 {
-				cmdArgs = append(cmdArgs, sb.String())
+			if prev == '\\' {
+				sb.WriteRune(r)
+			} else {
+				arg := sb.String()
+				if len(arg) > 0 {
+					cmdArgs = append(cmdArgs, sb.String())
+				}
+				sb.Reset()
 			}
-			sb.Reset()
+			prev = r
 			continue
 		}
 		sb.WriteRune(r)
+		prev = r
 	}
 
 	arg := sb.String()
