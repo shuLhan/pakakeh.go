@@ -10,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestParseCommandArg(t *testing.T) {
+func TestParseCommandArgs(t *testing.T) {
 	cases := []struct {
 		in      string
 		expCmd  string
@@ -24,34 +24,34 @@ func TestParseCommandArg(t *testing.T) {
 	}, {
 		in:      `a "b c"`,
 		expCmd:  `a`,
-		expArgs: []string{`b c`},
+		expArgs: []string{`"b c"`},
 	}, {
 		in:      `a "b'c"`,
 		expCmd:  `a`,
-		expArgs: []string{`b'c`},
+		expArgs: []string{`"b'c"`},
 	}, {
 		in:      `'a "b'c"`,
-		expCmd:  `a "b`,
+		expCmd:  `'a "b'`,
 		expArgs: []string{`c`},
 	}, {
 		in:      "a `b c`",
 		expCmd:  `a`,
-		expArgs: []string{`b c`},
+		expArgs: []string{"`b c`"},
 	}, {
 		in:      "a `b'c`",
 		expCmd:  `a`,
-		expArgs: []string{`b'c`},
+		expArgs: []string{"`b'c`"},
 	}, {
-		in: `a\ b c\ d`,
-		expCmd: "a b",
+		in:      `a\ b c\ d`,
+		expCmd:  "a b",
 		expArgs: []string{"c d"},
 	}, {
-		in: `a\\ b c\\ d`,
-		expCmd: `a\`,
+		in:      `a\\ b c\\ d`,
+		expCmd:  `a\`,
 		expArgs: []string{"b", `c\`, "d"},
 	}, {
-		in: `a\\\ b c\\\ d`,
-		expCmd: `a\ b`,
+		in:      `a\\\ b c\\\ d`,
+		expCmd:  `a\ b`,
 		expArgs: []string{`c\ d`},
 	}}
 
