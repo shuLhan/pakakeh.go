@@ -67,7 +67,7 @@ func (pn *PathNode) MarshalJSON() ([]byte, error) {
 		}
 		fmt.Fprintf(&buf, "%q:", key)
 		node := pn.v[key]
-		node.packAsJson(&buf)
+		node.packAsJson(&buf, false)
 	}
 	_ = buf.WriteByte('}')
 

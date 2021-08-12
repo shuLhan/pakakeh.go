@@ -167,7 +167,7 @@ func (leaf *Node) IsDir() bool {
 //
 func (leaf *Node) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	leaf.packAsJson(&buf)
+	leaf.packAsJson(&buf, true)
 	return buf.Bytes(), nil
 }
 
@@ -334,7 +334,7 @@ func (leaf *Node) generateFuncName(in string) {
 	leaf.GenFuncName = "generate_" + syspath
 }
 
-func (leaf *Node) packAsJson(buf *bytes.Buffer) {
+func (leaf *Node) packAsJson(buf *bytes.Buffer, withContent bool) {
 	_ = buf.WriteByte('{')
 
 	_, _ = fmt.Fprintf(buf, `%q:%q,`, "path", leaf.Path)
@@ -344,13 +344,16 @@ func (leaf *Node) packAsJson(buf *bytes.Buffer) {
 	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mode_string", leaf.mode)
 	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", leaf.size)
 	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", leaf.IsDir())
+	if withContent {
+		_, _ = fmt.Fprintf(buf, `%q:%q,`, "content", leaf.V)
+	}
 
 	_, _ = fmt.Fprintf(buf, `%q:[`, "childs")
 	for x, child := range leaf.Childs {
 		if x > 0 {
 			_ = buf.WriteByte(',')
 		}
-		child.packAsJson(buf)
+		child.packAsJson(buf, withContent)
 	}
 	_ = buf.WriteByte(']')
 
