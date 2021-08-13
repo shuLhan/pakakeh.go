@@ -69,6 +69,7 @@ type Client struct {
 //
 func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err error) {
 	var (
+		logp   = "NewClient"
 		rurl   *url.URL
 		port   uint16
 		scheme string
@@ -76,7 +77,7 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 
 	rurl, err = url.Parse(remoteURL)
 	if err != nil {
-		return nil, fmt.Errorf("smtp: NewClient: " + err.Error())
+		return nil, fmt.Errorf("smtp: %s: %w", logp, err)
 	}
 
 	cl = &Client{
@@ -95,7 +96,7 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 		port = 587
 		cl.isStartTLS = true
 	default:
-		return nil, fmt.Errorf("smtp: NewClient: invalid scheme '%s'", scheme)
+		return nil, fmt.Errorf("smtp: %s: invalid scheme %q", logp, scheme)
 	}
 
 	cl.serverName, cl.raddr.IP, port = libnet.ParseIPPort(rurl.Host, port)
@@ -105,7 +106,7 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 			return nil, err
 		}
 		if cl.raddr.IP == nil {
-			err = fmt.Errorf("smtp: NewClient: '%s' does not have MX record or IP address", cl.serverName)
+			err = fmt.Errorf("smtp: %s: '%s' does not have MX record or IP address", logp, cl.serverName)
 			return nil, err
 		}
 	}
@@ -114,16 +115,16 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 	cl.raddr.Port = int(port)
 
 	if debug.Value >= 3 {
-		fmt.Printf("smtp: NewClient remote address '%v'\n", cl.raddr)
+		fmt.Printf("smtp: %s: remote address '%v'\n", logp, cl.raddr)
 	}
 
 	_, err = cl.connect(localName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if debug.Value >= 3 {
-		fmt.Printf("smtp: ServerInfo: %+v\n", cl.ServerInfo)
+		fmt.Printf("smtp: %s: ServerInfo: %+v\n", logp, cl.ServerInfo)
 	}
 
 	return cl, nil
@@ -157,6 +158,8 @@ func (cl *Client) Authenticate(mech Mechanism, username, password string) (
 // command immediately after connect.
 //
 func (cl *Client) connect(localName string) (res *Response, err error) {
+	logp := "connect"
+
 	cl.conn, err = net.DialTCP("tcp", nil, cl.raddr)
 	if err != nil {
 		return nil, err
@@ -177,15 +180,15 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 
 	res, err = cl.recv()
 	if err != nil {
-		return res, err
+		return res, fmt.Errorf("%s: %w", logp, err)
 	}
 	if res.Code != StatusReady {
-		return res, fmt.Errorf("server return %d, want 220", res.Code)
+		return res, fmt.Errorf("%s: server return %d, want 220", logp, res.Code)
 	}
 
 	res, err = cl.ehlo(localName)
 	if err != nil {
-		return res, err
+		return res, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if cl.isStartTLS {
