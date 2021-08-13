@@ -436,6 +436,9 @@ func (cl *Client) recv() (res *Response, err error) {
 		}
 		if err != nil {
 			if errors.Is(err, io.EOF) {
+				if cl.buf.Len() == 0 {
+					return nil, err
+				}
 				break
 			}
 			return nil, err
@@ -453,6 +456,9 @@ func (cl *Client) recv() (res *Response, err error) {
 	res, err = NewResponse(cl.buf.Bytes())
 	if err != nil {
 		return nil, err
+	}
+	if res == nil {
+		return nil, io.EOF
 	}
 
 	return res, nil
