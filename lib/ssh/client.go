@@ -6,6 +6,7 @@ package ssh
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -23,7 +24,9 @@ import (
 type Client struct {
 	*ssh.Client
 
-	cfg *config.Section
+	cfg    *config.Section
+	stdout io.Writer
+	stderr io.Writer
 }
 
 //
@@ -66,7 +69,9 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	}
 
 	cl = &Client{
-		cfg: cfg,
+		cfg:    cfg,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
 	}
 
 	remoteAddr := fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port)
@@ -88,8 +93,8 @@ func (cl *Client) Execute(cmd string) (err error) {
 		return fmt.Errorf("ssh: NewSession: " + err.Error())
 	}
 
-	sess.Stdout = os.Stdout
-	sess.Stderr = os.Stderr
+	sess.Stdout = cl.stdout
+	sess.Stderr = cl.stderr
 
 	for k, v := range cl.cfg.Environments {
 		err = sess.Setenv(k, v)
@@ -137,8 +142,8 @@ func (cl *Client) ScpGet(remote, local string) (err error) {
 	cmd := exec.Command("scp", args...)
 
 	cmd.Dir = cl.cfg.WorkingDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = cl.stdout
+	cmd.Stderr = cl.stderr
 
 	err = cmd.Run()
 	if err != nil {
@@ -177,8 +182,8 @@ func (cl *Client) ScpPut(local, remote string) (err error) {
 	cmd := exec.Command("scp", args...)
 
 	cmd.Dir = cl.cfg.WorkingDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = cl.stdout
+	cmd.Stderr = cl.stderr
 
 	err = cmd.Run()
 	if err != nil {
@@ -186,6 +191,19 @@ func (cl *Client) ScpPut(local, remote string) (err error) {
 	}
 
 	return nil
+}
+
+//
+// SetSessionOutputError set the standard output and error for future remote
+// execution.
+//
+func (cl *Client) SetSessionOutputError(stdout, stderr io.Writer) {
+	if stdout != nil {
+		cl.stdout = stdout
+	}
+	if stderr != nil {
+		cl.stderr = stderr
+	}
 }
 
 func (cl *Client) String() string {
