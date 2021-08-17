@@ -104,6 +104,8 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 // SQL file name that has been executed and the timestamp.
 //
 func (cl *Client) Migrate(fs http.FileSystem) (err error) {
+	logp := "Migrate"
+
 	if reflect.IsNil(fs) {
 		if len(cl.MigrationDir) == 0 {
 			return nil
@@ -113,12 +115,12 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 
 	root, err := fs.Open("/")
 	if err != nil {
-		return fmt.Errorf("Migrate: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	fis, err := root.Readdir(0)
 	if err != nil {
-		return fmt.Errorf("Migrate: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	sort.SliceStable(fis, func(x, y int) bool {
@@ -127,20 +129,27 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 
 	lastFile, err := cl.migrateInit()
 	if err != nil {
-		return fmt.Errorf("Migrate: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	var x int
+	var (
+		x              int
+		lastFileExists bool
+	)
 	if len(lastFile) > 0 {
 		for ; x < len(fis); x++ {
 			if fis[x].Name() == lastFile {
+				lastFileExists = true
 				break
 			}
 		}
-		if x == len(fis) {
-			x = 0
-		} else {
-			x++
+		x++
+		// If the last file not found, there will be no SQL script to
+		// be executed.  Since we cannot return it as an error, we
+		// only log it here.  In the future, we may return it.
+		if !lastFileExists {
+			log.Printf("%s: the last file %s not found on the list",
+				logp, lastFile)
 		}
 	}
 	for ; x < len(fis); x++ {
@@ -148,7 +157,7 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 
 		sqlRaw, err := loadSQL(fs, fis[x], name)
 		if err != nil {
-			return fmt.Errorf("Migrate %q: %w", name, err)
+			return fmt.Errorf("%s: %q: %w", logp, name, err)
 		}
 		if len(sqlRaw) == 0 {
 			continue
@@ -156,7 +165,7 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 
 		err = cl.migrateApply(name, sqlRaw)
 		if err != nil {
-			return fmt.Errorf("Migrate %q: %w", name, err)
+			return fmt.Errorf("%s: %q: %w", logp, name, err)
 		}
 	}
 	return nil
