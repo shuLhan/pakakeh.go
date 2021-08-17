@@ -63,8 +63,9 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 			insecure = true
 		}
 		if port == 0 {
-			host += ":443"
+			port = 443
 		}
+		host = fmt.Sprintf("%s:%d", host, port)
 
 		config := &tls.Config{
 			ServerName:         host,
@@ -74,8 +75,9 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 		client.conn, err = tls.Dial("tcp", host, config)
 	} else {
 		if port == 0 {
-			host += ":80"
+			port = 80
 		}
+		host = fmt.Sprintf("%s:%d", host, port)
 
 		client.conn, err = net.Dial("tcp", host)
 	}
