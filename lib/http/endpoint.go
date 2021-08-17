@@ -157,6 +157,8 @@ func (ep *Endpoint) call(
 		res.Header().Set(HeaderContentType, ContentTypeJSON)
 	case ResponseTypePlain:
 		res.Header().Set(HeaderContentType, ContentTypePlain)
+	case ResponseTypeXML:
+		res.Header().Set(HeaderContentType, ContentTypeXML)
 	}
 
 	var nwrite int

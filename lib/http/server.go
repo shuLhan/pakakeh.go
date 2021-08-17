@@ -573,6 +573,8 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 		res.Header().Set(HeaderContentType, ContentTypeJSON)
 	case ResponseTypePlain:
 		res.Header().Set(HeaderContentType, ContentTypePlain)
+	case ResponseTypeXML:
+		res.Header().Set(HeaderContentType, ContentTypeXML)
 	}
 
 	res.WriteHeader(http.StatusOK)
