@@ -9,7 +9,6 @@
 package exec
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -35,8 +34,7 @@ func ParseCommandArgs(in string) (cmd string, args []string) {
 			if r == quote {
 				arg := sb.String()
 				if len(arg) > 0 {
-					arg = fmt.Sprintf("%c%s%c", quote, arg, quote)
-					cmdArgs = append(cmdArgs, arg)
+					cmdArgs = append(cmdArgs, sb.String())
 				}
 
 				sb.Reset()
