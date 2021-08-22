@@ -176,6 +176,39 @@ func (leaf *Node) Decode() ([]byte, error) {
 	return leaf.plainv, nil
 }
 
+//
+// Encode compress and set the content of Node.
+//
+func (leaf *Node) Encode(content []byte) (err error) {
+	logp := "Node.Encode"
+
+	leaf.plainv = content
+	leaf.lowerv = bytes.ToLower(content)
+
+	switch leaf.ContentEncoding {
+	case EncodingGzip:
+		var buf bytes.Buffer
+		gz := gzip.NewWriter(&buf)
+
+		_, err = gz.Write(content)
+		if err != nil {
+			_ = gz.Close()
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+
+		err = gz.Close()
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+
+		leaf.V = libbytes.Copy(buf.Bytes())
+
+	default:
+		leaf.V = content
+	}
+	return nil
+}
+
 func (leaf *Node) IsDir() bool {
 	return leaf.mode.IsDir()
 }
@@ -254,6 +287,36 @@ func (leaf *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 	leaf.off = int64(count)
 
 	return fis, nil
+}
+
+//
+// Save the content to file system and update the content of Node.
+//
+func (leaf *Node) Save(content []byte) (err error) {
+	var (
+		logp = "Node.Save"
+		f    *os.File
+	)
+	f, err = os.OpenFile(leaf.SysPath, os.O_WRONLY|os.O_TRUNC, leaf.mode.Perm())
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+	_, err = f.Write(content)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+	err = leaf.Encode(content)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	leaf.modTime = time.Now()
+	leaf.size = int64(len(content))
+	return nil
 }
 
 //

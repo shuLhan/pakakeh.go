@@ -74,6 +74,7 @@ func TestNew(t *testing.T) {
 			Excludes: []string{
 				"memfs_generate.go$",
 				"direct$",
+				"node_save$",
 			},
 		},
 		expMapKeys: []string{
@@ -99,6 +100,7 @@ func TestNew(t *testing.T) {
 				`.*\.js$`,
 				"memfs_generate.go$",
 				"direct$",
+				"node_save$",
 			},
 		},
 		expMapKeys: []string{
@@ -123,6 +125,7 @@ func TestNew(t *testing.T) {
 			Excludes: []string{
 				"memfs_generate.go$",
 				"direct$",
+				"node_save$",
 			},
 		},
 		expMapKeys: []string{

@@ -11,6 +11,7 @@ func TestGenerate(t *testing.T) {
 		Root: "testdata",
 		Excludes: []string{
 			`^\..*`,
+			".*/node_save$",
 		},
 	}
 	mfs, err := New(opts)

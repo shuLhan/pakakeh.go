@@ -277,6 +277,7 @@ func init() {
 			},
 			Excludes: []string{
 				`^\..*`,
+				`.*/node_save$`,
 			},
 		},
 	}

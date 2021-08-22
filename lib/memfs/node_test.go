@@ -84,6 +84,7 @@ func TestNode_Readdir(t *testing.T) {
 		"index.css",
 		"index.html",
 		"index.js",
+		"node_save",
 		"plain",
 	}
 
@@ -114,6 +115,56 @@ func gotFileNames(fis []os.FileInfo) (names []string) {
 	}
 	sort.Strings(names)
 	return
+}
+
+func TestNode_Save(t *testing.T) {
+	node := &Node{
+		SysPath: "testdata/node_save",
+		mode:    0600,
+	}
+
+	err := os.WriteFile(node.SysPath, []byte{}, node.mode.Perm())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc            string
+		content         []byte
+		contentEncoding string
+		expContent      []byte
+	}{{
+		desc:       "Without content encoding",
+		content:    []byte("ABC"),
+		expContent: []byte("ABC"),
+	}, {
+		desc:            "With content encoding is gzip",
+		contentEncoding: EncodingGzip,
+		content:         []byte("ABC"),
+		expContent: []byte{
+			0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0xff, 0x72, 0x74, 0x72, 0x06, 0x04, 0x00,
+			0x00, 0xff, 0xff, 0x48, 0x03, 0x83, 0xa3, 0x03,
+			0x00, 0x00, 0x00,
+		},
+	}}
+
+	for _, c := range cases {
+		node.ContentEncoding = c.contentEncoding
+
+		err = node.Save(c.content)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := os.ReadFile(node.SysPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.desc+": file content", c.content, got)
+		test.Assert(t, c.desc+": node content", c.expContent, node.V)
+	}
 }
 
 func TestNode_Seek(t *testing.T) {
