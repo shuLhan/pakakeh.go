@@ -198,11 +198,9 @@ func TestMemFS_AddFile(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		t.Log(c.desc)
-
 		got, err := mfs.AddFile(c.intPath, c.extPath)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			test.Assert(t, c.desc+": error", c.expError, err.Error())
 			continue
 		}
 
@@ -213,7 +211,7 @@ func TestMemFS_AddFile(t *testing.T) {
 			got.Childs = nil
 		}
 
-		test.Assert(t, "AddFile", c.exp, got)
+		test.Assert(t, c.desc+": AddFile", c.exp, got)
 
 		if c.exp == nil {
 			continue
@@ -231,7 +229,7 @@ func TestMemFS_AddFile(t *testing.T) {
 			got.Childs = nil
 		}
 
-		test.Assert(t, "Get", c.exp, got)
+		test.Assert(t, c.desc+": Get", c.exp, got)
 	}
 }
 

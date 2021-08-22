@@ -454,9 +454,16 @@ func (leaf *Node) updateContent(maxFileSize int64) (err error) {
 	if leaf.size > maxFileSize {
 		return nil
 	}
+	if leaf.size == 0 {
+		leaf.V = nil
+		return nil
+	}
 
 	leaf.V, err = ioutil.ReadFile(leaf.SysPath)
 	if err != nil {
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
 		return err
 	}
 
@@ -473,11 +480,22 @@ func (leaf *Node) updateContentType() error {
 		leaf.ContentType = http.DetectContentType(leaf.V)
 		return nil
 	}
+	if leaf.size == 0 {
+		// The actual file size is zero, we set the content type to
+		// default.
+		leaf.ContentType = defContentType
+		return nil
+	}
 
 	data := make([]byte, 512)
 
 	f, err := os.Open(leaf.SysPath)
 	if err != nil {
+		if errors.Is(err, io.EOF) {
+			// File is empty.
+			leaf.ContentType = defContentType
+			return nil
+		}
 		return err
 	}
 

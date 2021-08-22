@@ -29,6 +29,8 @@ import (
 //
 const (
 	EncodingGzip = "gzip"
+
+	defContentType = "application/octet-stream"
 )
 
 //
