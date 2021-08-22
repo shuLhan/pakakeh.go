@@ -84,7 +84,6 @@ func TestNode_Readdir(t *testing.T) {
 		"index.css",
 		"index.html",
 		"index.js",
-		"node_save",
 		"plain",
 	}
 
@@ -127,6 +126,10 @@ func TestNode_Save(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Cleanup(func() {
+		_ = os.Remove(node.SysPath)
+	})
 
 	cases := []struct {
 		desc            string
