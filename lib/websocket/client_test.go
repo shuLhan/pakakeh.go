@@ -348,23 +348,14 @@ func TestClientFragmentation(t *testing.T) {
 	}
 
 	var (
-		testClient = &Client{
-			Endpoint: _testEndpointAuth,
-		}
 		wg sync.WaitGroup
 	)
 
-	err := testClient.Connect()
-	if err != nil {
-		t.Fatal("TestClientFragmentation: " + err.Error())
-	}
-
 	cases := []struct {
-		desc      string
-		reconnect bool
-		frames    []Frame
-		exp       *Frame
-		expClose  *Frame
+		desc     string
+		frames   []Frame
+		exp      *Frame
+		expClose *Frame
 	}{{
 		desc: "Two text frames, unmasked",
 		frames: []Frame{{
@@ -385,8 +376,7 @@ func TestClientFragmentation(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "Three text frames, unmasked",
-		reconnect: true,
+		desc: "Three text frames, unmasked",
 		frames: []Frame{{
 			fin:     0,
 			opcode:  OpcodeText,
@@ -409,8 +399,7 @@ func TestClientFragmentation(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "Three text frames, masked",
-		reconnect: true,
+		desc: "Three text frames, masked",
 		frames: []Frame{{
 			fin:     0,
 			opcode:  OpcodeText,
@@ -437,31 +426,32 @@ func TestClientFragmentation(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		c := c
-		t.Log(c.desc)
+		testClient := &Client{
+			Endpoint: _testEndpointAuth,
+		}
 
-		if c.reconnect {
-			err := testClient.Connect()
-			if err != nil {
-				t.Fatal(err)
+		err := testClient.Connect()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		testClient.handleClose = func(desc string, exp *Frame) ClientHandler {
+			return func(cl *Client, got *Frame) (err error) {
+				test.Assert(t, desc+": close", exp, got)
+				cl.sendClose(got.closeCode, got.payload)
+				cl.Quit()
+				wg.Done()
+				return nil
 			}
-		}
+		}(c.desc, c.expClose)
 
-		testClient.handleClose = func(cl *Client, got *Frame) error {
-			exp := c.expClose
-			test.Assert(t, "close", exp, got)
-			cl.sendClose(got.closeCode, got.payload)
-			cl.Quit()
-			wg.Done()
-			return nil
-		}
-
-		testClient.HandleText = func(cl *Client, got *Frame) error {
-			exp := c.exp
-			test.Assert(t, "text", exp, got)
-			wg.Done()
-			return nil
-		}
+		testClient.HandleText = func(desc string, exp *Frame) ClientHandler {
+			return func(cl *Client, got *Frame) error {
+				test.Assert(t, desc+": text", exp, got)
+				wg.Done()
+				return nil
+			}
+		}(c.desc, c.exp)
 
 		wg.Add(1)
 		for x := 0; x < len(c.frames); x++ {
@@ -472,7 +462,6 @@ func TestClientFragmentation(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-
 		wg.Wait()
 	}
 }
