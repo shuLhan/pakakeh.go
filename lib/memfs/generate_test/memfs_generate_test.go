@@ -25,14 +25,14 @@ func TestGeneratePathNode(t *testing.T) {
 	expRoot.SetSize(0)
 
 	expExcludeIndexHTML := &memfs.Node{
-		SysPath:     filepath.Join("testdata", "exclude", "index.html"),
-		Path:        "/exclude/index.html",
+		SysPath:     filepath.Join("testdata", "exclude", "index-link.html"),
+		Path:        "/exclude/index-link.html",
 		ContentType: "text/html; charset=utf-8",
 		V:           []byte("<html></html>\n"),
 	}
 
 	expExcludeIndexHTML.SetMode(0644)
-	expExcludeIndexHTML.SetName("index.html")
+	expExcludeIndexHTML.SetName("index-link.html")
 	expExcludeIndexHTML.SetSize(14)
 
 	cases := []struct {
@@ -46,22 +46,20 @@ func TestGeneratePathNode(t *testing.T) {
 		path: "/",
 		exp:  expRoot,
 	}, {
-		path: "/exclude/index.html",
+		path: "/exclude/index-link.html",
 		exp:  expExcludeIndexHTML,
 	}}
 
 	for _, c := range cases {
-		t.Log(c.path)
-
 		got, err := memFS.Get(c.path)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			test.Assert(t, c.path+": error", c.expError, err.Error())
 			continue
 		}
 
 		childs := got.Childs
 		got.Childs = nil
-		test.Assert(t, "Node", c.exp, got)
+		test.Assert(t, c.path+": Node", c.exp, got)
 		got.Childs = childs
 	}
 }
@@ -95,9 +93,9 @@ func TestNode_Readdir(t *testing.T) {
 	}, {
 		path: "/exclude",
 		exp: []string{
-			"index.css",
-			"index.html",
-			"index.js",
+			"index-link.css",
+			"index-link.html",
+			"index-link.js",
 		},
 	}, {
 		path: "/include",

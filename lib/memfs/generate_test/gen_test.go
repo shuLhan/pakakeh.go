@@ -93,50 +93,50 @@ func generate_testdata_exclude() *memfs.Node {
 	node.SetMode(2147484141)
 	node.SetName("exclude")
 	node.SetSize(0)
-	node.AddChild(_memFS_getNode(memFS, "/exclude/index.css", generate_testdata_exclude_index_css))
-	node.AddChild(_memFS_getNode(memFS, "/exclude/index.html", generate_testdata_exclude_index_html))
-	node.AddChild(_memFS_getNode(memFS, "/exclude/index.js", generate_testdata_exclude_index_js))
+	node.AddChild(_memFS_getNode(memFS, "/exclude/index-link.css", generate_testdata_exclude_index_link_css))
+	node.AddChild(_memFS_getNode(memFS, "/exclude/index-link.html", generate_testdata_exclude_index_link_html))
+	node.AddChild(_memFS_getNode(memFS, "/exclude/index-link.js", generate_testdata_exclude_index_link_js))
 	return node
 }
 
-func generate_testdata_exclude_index_css() *memfs.Node {
+func generate_testdata_exclude_index_link_css() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "testdata/exclude/index.css",
-		Path:            "/exclude/index.css",
+		SysPath:         "testdata/exclude/index-link.css",
+		Path:            "/exclude/index-link.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
 		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
-	node.SetName("index.css")
+	node.SetName("index-link.css")
 	node.SetSize(9)
 	return node
 }
 
-func generate_testdata_exclude_index_html() *memfs.Node {
+func generate_testdata_exclude_index_link_html() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "testdata/exclude/index.html",
-		Path:            "/exclude/index.html",
+		SysPath:         "testdata/exclude/index-link.html",
+		Path:            "/exclude/index-link.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
 		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
-	node.SetName("index.html")
+	node.SetName("index-link.html")
 	node.SetSize(14)
 	return node
 }
 
-func generate_testdata_exclude_index_js() *memfs.Node {
+func generate_testdata_exclude_index_link_js() *memfs.Node {
 	node := &memfs.Node{
-		SysPath:         "testdata/exclude/index.js",
-		Path:            "/exclude/index.js",
+		SysPath:         "testdata/exclude/index-link.js",
+		Path:            "/exclude/index-link.js",
 		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
 		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
-	node.SetName("index.js")
+	node.SetName("index-link.js")
 	node.SetSize(16)
 	return node
 }
@@ -292,12 +292,12 @@ func init() {
 		_memFS_getNode(memFS, "/direct/add/file2", generate_testdata_direct_add_file2))
 	memFS.PathNodes.Set("/exclude",
 		_memFS_getNode(memFS, "/exclude", generate_testdata_exclude))
-	memFS.PathNodes.Set("/exclude/index.css",
-		_memFS_getNode(memFS, "/exclude/index.css", generate_testdata_exclude_index_css))
-	memFS.PathNodes.Set("/exclude/index.html",
-		_memFS_getNode(memFS, "/exclude/index.html", generate_testdata_exclude_index_html))
-	memFS.PathNodes.Set("/exclude/index.js",
-		_memFS_getNode(memFS, "/exclude/index.js", generate_testdata_exclude_index_js))
+	memFS.PathNodes.Set("/exclude/index-link.css",
+		_memFS_getNode(memFS, "/exclude/index-link.css", generate_testdata_exclude_index_link_css))
+	memFS.PathNodes.Set("/exclude/index-link.html",
+		_memFS_getNode(memFS, "/exclude/index-link.html", generate_testdata_exclude_index_link_html))
+	memFS.PathNodes.Set("/exclude/index-link.js",
+		_memFS_getNode(memFS, "/exclude/index-link.js", generate_testdata_exclude_index_link_js))
 	memFS.PathNodes.Set("/include",
 		_memFS_getNode(memFS, "/include", generate_testdata_include))
 	memFS.PathNodes.Set("/include/index.css",

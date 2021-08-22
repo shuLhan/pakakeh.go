@@ -79,9 +79,9 @@ func TestNew(t *testing.T) {
 		expMapKeys: []string{
 			"/",
 			"/exclude",
-			"/exclude/index.css",
-			"/exclude/index.html",
-			"/exclude/index.js",
+			"/exclude/index-link.css",
+			"/exclude/index-link.html",
+			"/exclude/index-link.js",
 			"/include",
 			"/include/index.css",
 			"/include/index.html",
@@ -104,8 +104,8 @@ func TestNew(t *testing.T) {
 		expMapKeys: []string{
 			"/",
 			"/exclude",
-			"/exclude/index.css",
-			"/exclude/index.html",
+			"/exclude/index-link.css",
+			"/exclude/index-link.html",
 			"/include",
 			"/include/index.css",
 			"/include/index.html",
@@ -128,7 +128,7 @@ func TestNew(t *testing.T) {
 		expMapKeys: []string{
 			"/",
 			"/exclude",
-			"/exclude/index.js",
+			"/exclude/index-link.js",
 			"/include",
 			"/include/index.js",
 			"/index.js",
@@ -136,16 +136,14 @@ func TestNew(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Log(c.desc)
-
 		mfs, err := New(&c.opts)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
+			test.Assert(t, c.desc+": error", c.expErr, err.Error())
 			continue
 		}
 
 		gotListNames := mfs.ListNames()
-		test.Assert(t, "names", c.expMapKeys, gotListNames)
+		test.Assert(t, c.desc+": names", c.expMapKeys, gotListNames)
 	}
 }
 
@@ -251,15 +249,16 @@ func TestMemFS_Get(t *testing.T) {
 		path:   "/exclude/dir",
 		expErr: os.ErrNotExist,
 	}, {
-		path:           "/exclude/index.css",
+		path:           "/exclude/index-link.css",
 		expV:           []byte("body {\n}\n"),
 		expContentType: []string{"text/css; charset=utf-8"},
 	}, {
-		path:           "/exclude/index.html",
+		path:           "/exclude/index-link.html",
 		expV:           []byte("<html></html>\n"),
 		expContentType: []string{"text/html; charset=utf-8"},
 	}, {
-		path: "/exclude/index.js",
+		path: "/exclude/index-link.js",
+		expV: []byte("function X() {}\n"),
 		expContentType: []string{
 			"text/javascript; charset=utf-8",
 			"application/javascript",
@@ -279,6 +278,7 @@ func TestMemFS_Get(t *testing.T) {
 		expContentType: []string{"text/html; charset=utf-8"},
 	}, {
 		path: "/include/index.js",
+		expV: []byte("function X() {}\n"),
 		expContentType: []string{
 			"text/javascript; charset=utf-8",
 			"application/javascript",
@@ -316,16 +316,14 @@ func TestMemFS_Get(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		t.Logf("Get %s", c.path)
-
 		got, err := mfs.Get(c.path)
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err)
+			test.Assert(t, c.path+": error", c.expErr, err)
 			continue
 		}
 
 		if got.size <= opts.MaxFileSize {
-			test.Assert(t, "node.V", c.expV, got.V)
+			test.Assert(t, c.path+": node.V", c.expV, got.V)
 		}
 
 		if len(got.ContentType) == 0 && len(c.expContentType) == 0 {
@@ -553,9 +551,9 @@ func TestMemFS_isIncluded(t *testing.T) {
 
 			filepath.Join(_testWD, "/testdata/exclude"),
 			filepath.Join(_testWD, "/testdata/exclude/dir"),
-			filepath.Join(_testWD, "/testdata/exclude/index.css"),
-			filepath.Join(_testWD, "/testdata/exclude/index.html"),
-			filepath.Join(_testWD, "/testdata/exclude/index.js"),
+			filepath.Join(_testWD, "/testdata/exclude/index-link.css"),
+			filepath.Join(_testWD, "/testdata/exclude/index-link.html"),
+			filepath.Join(_testWD, "/testdata/exclude/index-link.js"),
 
 			filepath.Join(_testWD, "/testdata/include"),
 			filepath.Join(_testWD, "/testdata/include/dir"),
@@ -680,5 +678,15 @@ func TestMerge(t *testing.T) {
 		got := Merge(c.params...)
 
 		test.Assert(t, c.desc, c.exp.PathNodes.v, got.PathNodes.v)
+	}
+}
+
+func TestScanDir(t *testing.T) {
+	opts := Options{
+		Root: "testdata/",
+	}
+	_, err := New(&opts)
+	if err != nil {
+		t.Fatal(err)
 	}
 }

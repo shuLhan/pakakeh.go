@@ -62,6 +62,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 	}
 
 	var (
+		logp    = "NewNode"
 		sysPath string
 		absPath string
 	)
@@ -92,14 +93,31 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 		return node, nil
 	}
 
+	// If the file is symbolic link, update the node size and mode based
+	// on original.
+	if fi.Mode()&os.ModeSymlink != 0 {
+		absPath, err := filepath.EvalSymlinks(sysPath)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+
+		fi, err = os.Lstat(absPath)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+
+		node.mode = fi.Mode()
+		node.size = fi.Size()
+	}
+
 	err = node.updateContent(maxFileSize)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	err = node.updateContentType()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return node, nil

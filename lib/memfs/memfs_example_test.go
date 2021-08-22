@@ -50,7 +50,7 @@ func ExampleMemFS_Search() {
 	// Unordered output:
 	// Path: /include/index.css
 	// Snippets: ["body {\n}\n"]
-	// Path: /exclude/index.css
+	// Path: /exclude/index-link.css
 	// Snippets: ["body {\n}\n"]
 	// Path: /index.css
 	// Snippets: ["body {\n}\n"]

@@ -133,19 +133,6 @@ func New(opts *Options) (mfs *MemFS, err error) {
 func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
 	sysPath := filepath.Join(parent.SysPath, fi.Name())
 
-	if fi.Mode()&os.ModeSymlink != 0 {
-		symPath := filepath.Join(parent.SysPath, fi.Name())
-		absPath, err := filepath.EvalSymlinks(symPath)
-		if err != nil {
-			return nil, fmt.Errorf("memfs.AddChild: %w", err)
-		}
-
-		fi, err = os.Lstat(absPath)
-		if err != nil {
-			return nil, fmt.Errorf("memfs.AddChild: %w", err)
-		}
-	}
-
 	if !mfs.isIncluded(sysPath, fi.Mode()) {
 		return nil, nil
 	}
