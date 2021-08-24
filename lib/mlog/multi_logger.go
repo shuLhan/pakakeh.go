@@ -200,6 +200,15 @@ func (mlog *MultiLogger) UnregisterOutputWriter(name string) {
 	delete(mlog.outs, name)
 }
 
+//
+// Write write the b to all error writers.
+// It will always return the length of b without an error.
+//
+func (mlog *MultiLogger) Write(b []byte) (n int, err error) {
+	mlog.qerr <- libbytes.Copy(b)
+	return len(b), nil
+}
+
 func (mlog *MultiLogger) processErrorQueue() {
 	var err error
 	for {

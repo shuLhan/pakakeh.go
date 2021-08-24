@@ -31,6 +31,7 @@
 package mlog
 
 import (
+	"io"
 	"os"
 )
 
@@ -141,4 +142,13 @@ func UnregisterErrorWriter(name string) {
 //
 func UnregisterOutputWriter(name string) {
 	defaultMLog.UnregisterOutputWriter(name)
+}
+
+//
+// ErrorWriter return the internal default MultiLogger.
+// A call to Write() on returned io.Writer will forward it to all registered
+// error writers.
+//
+func ErrorWriter() io.Writer {
+	return defaultMLog
 }
