@@ -5,6 +5,8 @@
 package http
 
 import (
+	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -47,6 +49,13 @@ type ServerOptions struct {
 	// This fields is optional.
 	Conn *http.Server
 
+	// ErrorWriter define the writer where output from panic in handler
+	// will be written.  Basically this will create new log.Logger and set
+	// the default Server.ErrorLog.
+	// This field is optional, but if its set it will be used only if Conn
+	// is not set by caller.
+	ErrorWriter io.Writer
+
 	// The options for Cross-Origin Resource Sharing.
 	CORS CORSOptions
 }
@@ -61,6 +70,9 @@ func (opts *ServerOptions) init() {
 			ReadTimeout:    defRWTimeout,
 			WriteTimeout:   defRWTimeout,
 			MaxHeaderBytes: 1 << 20,
+		}
+		if opts.ErrorWriter != nil {
+			opts.Conn.ErrorLog = log.New(opts.ErrorWriter, "", 0)
 		}
 	}
 
