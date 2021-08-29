@@ -30,7 +30,7 @@ import (
 const (
 	EncodingGzip = "gzip"
 
-	defContentType = "application/octet-stream"
+	defContentType = "text/plain" // Default content type for empty file.
 )
 
 //
