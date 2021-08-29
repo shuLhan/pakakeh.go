@@ -365,99 +365,25 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	}
 
 	exp := `{
-	"/": {
-		"path": "/",
-		"name": "/",
-		"mod_time_epoch": 1627675440,
-		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-		"mode_string": "drwxr-xr-x",
-		"size": 0,
-		"is_dir": true,
-		"childs": [
-			{
-				"path": "/add",
-				"name": "add",
-				"mod_time_epoch": 1627675440,
-				"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-				"mode_string": "drwxr-xr-x",
-				"size": 0,
-				"is_dir": true,
-				"childs": [
-					{
-						"path": "/add/file",
-						"name": "file",
-						"mod_time_epoch": 1627675440,
-						"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-						"mode_string": "-rw-r--r--",
-						"size": 22,
-						"is_dir": false,
-						"childs": []
-					},
-					{
-						"path": "/add/file2",
-						"name": "file2",
-						"mod_time_epoch": 1627675440,
-						"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-						"mode_string": "-rw-r--r--",
-						"size": 24,
-						"is_dir": false,
-						"childs": []
-					}
-				]
-			}
-		]
-	},
-	"/add": {
-		"path": "/add",
-		"name": "add",
-		"mod_time_epoch": 1627675440,
-		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-		"mode_string": "drwxr-xr-x",
-		"size": 0,
-		"is_dir": true,
-		"childs": [
-			{
-				"path": "/add/file",
-				"name": "file",
-				"mod_time_epoch": 1627675440,
-				"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-				"mode_string": "-rw-r--r--",
-				"size": 22,
-				"is_dir": false,
-				"childs": []
-			},
-			{
-				"path": "/add/file2",
-				"name": "file2",
-				"mod_time_epoch": 1627675440,
-				"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-				"mode_string": "-rw-r--r--",
-				"size": 24,
-				"is_dir": false,
-				"childs": []
-			}
-		]
-	},
-	"/add/file": {
-		"path": "/add/file",
-		"name": "file",
-		"mod_time_epoch": 1627675440,
-		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-		"mode_string": "-rw-r--r--",
-		"size": 22,
-		"is_dir": false,
-		"childs": []
-	},
-	"/add/file2": {
-		"path": "/add/file2",
-		"name": "file2",
-		"mod_time_epoch": 1627675440,
-		"mod_time_rfc3339": "2021-07-30 20:04:00 +0000 UTC",
-		"mode_string": "-rw-r--r--",
-		"size": 24,
-		"is_dir": false,
-		"childs": []
-	}
+	"path": "/",
+	"name": "/",
+	"content_type": "",
+	"mod_time": 1627675440,
+	"mode_string": "drwxr-xr-x",
+	"size": 0,
+	"is_dir": true,
+	"childs": [
+		{
+			"path": "/add",
+			"name": "add",
+			"content_type": "",
+			"mod_time": 1627675440,
+			"mode_string": "drwxr-xr-x",
+			"size": 0,
+			"is_dir": true,
+			"childs": null
+		}
+	]
 }`
 
 	diffs := diff.Text([]byte(exp), got, diff.LevelLines)

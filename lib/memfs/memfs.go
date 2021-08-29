@@ -343,11 +343,12 @@ func (mfs *MemFS) ListNames() (paths []string) {
 //
 // MarshalJSON encode the MemFS object into JSON format.
 //
-// The field that being encoded is the PathNode field, where the key sorted in
-// ascending order.
+// The field that being encoded is the Root node.
 //
 func (mfs *MemFS) MarshalJSON() ([]byte, error) {
-	return mfs.PathNodes.MarshalJSON()
+	var buf bytes.Buffer
+	mfs.Root.packAsJson(&buf, 0)
+	return buf.Bytes(), nil
 }
 
 //

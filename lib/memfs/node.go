@@ -7,6 +7,7 @@ package memfs
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -215,10 +216,13 @@ func (leaf *Node) IsDir() bool {
 
 //
 // MarshalJSON encode the node into JSON format.
+// If the node is a file it will return the content of file;
+// otherwise it will return the node with list of childs, but not including
+// childs of childs.
 //
 func (leaf *Node) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	leaf.packAsJson(&buf, true)
+	leaf.packAsJson(&buf, 0)
 	return buf.Bytes(), nil
 }
 
@@ -415,29 +419,36 @@ func (leaf *Node) generateFuncName(in string) {
 	leaf.GenFuncName = "generate_" + syspath
 }
 
-func (leaf *Node) packAsJson(buf *bytes.Buffer, withContent bool) {
+func (leaf *Node) packAsJson(buf *bytes.Buffer, depth int) {
+	isDir := leaf.IsDir()
+
 	_ = buf.WriteByte('{')
 
 	_, _ = fmt.Fprintf(buf, `%q:%q,`, "path", leaf.Path)
 	_, _ = fmt.Fprintf(buf, `%q:%q,`, "name", leaf.name)
-	_, _ = fmt.Fprintf(buf, `%q:%d,`, "mod_time_epoch", leaf.modTime.Unix())
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mod_time_rfc3339", leaf.modTime.UTC())
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "content_type", leaf.ContentType)
+	_, _ = fmt.Fprintf(buf, `%q:%d,`, "mod_time", leaf.modTime.Unix())
 	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mode_string", leaf.mode)
 	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", leaf.size)
-	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", leaf.IsDir())
-	if withContent {
-		_, _ = fmt.Fprintf(buf, `%q:%q,`, "content", leaf.V)
+	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", isDir)
+	if !isDir && depth == 0 {
+		content := base64.StdEncoding.EncodeToString(leaf.V)
+		_, _ = fmt.Fprintf(buf, `%q:%q,`, "content", content)
 	}
 
-	_, _ = fmt.Fprintf(buf, `%q:[`, "childs")
-	for x, child := range leaf.Childs {
-		if x > 0 {
-			_ = buf.WriteByte(',')
+	_, _ = fmt.Fprintf(buf, `%q:`, "childs")
+	if depth == 0 {
+		_ = buf.WriteByte('[')
+		for x, child := range leaf.Childs {
+			if x > 0 {
+				_ = buf.WriteByte(',')
+			}
+			child.packAsJson(buf, depth+1)
 		}
-		child.packAsJson(buf, withContent)
+		_ = buf.WriteByte(']')
+	} else {
+		_, _ = buf.WriteString("null")
 	}
-	_ = buf.WriteByte(']')
-
 	_ = buf.WriteByte('}')
 }
 
