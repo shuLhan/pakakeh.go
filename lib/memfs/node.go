@@ -89,7 +89,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 	}
 	node.generateFuncName(sysPath)
 
-	if node.mode.IsDir() || maxFileSize <= 0 {
+	if node.mode.IsDir() {
 		node.size = 0
 		return node, nil
 	}
@@ -514,7 +514,7 @@ func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	leaf.modTime = newInfo.ModTime()
 	leaf.size = newInfo.Size()
 
-	if newInfo.IsDir() || maxFileSize <= 0 {
+	if newInfo.IsDir() {
 		return nil
 	}
 
@@ -525,6 +525,10 @@ func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 // updateContent read the content of file.
 //
 func (leaf *Node) updateContent(maxFileSize int64) (err error) {
+	if maxFileSize < 0 {
+		// Negative maxFileSize means content will not be read.
+		return nil
+	}
 	if leaf.size > maxFileSize {
 		return nil
 	}

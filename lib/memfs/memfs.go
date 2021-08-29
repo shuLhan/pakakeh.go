@@ -213,11 +213,6 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 	}
 	node.generateFuncName(path)
 
-	if mfs.Opts.MaxFileSize <= 0 {
-		node.size = 0
-		return node, nil
-	}
-
 	err = node.updateContent(mfs.Opts.MaxFileSize)
 	if err != nil {
 		return nil, err
