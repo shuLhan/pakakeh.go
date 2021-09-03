@@ -42,17 +42,33 @@ func TestParseCommandArg(t *testing.T) {
 		expCmd:  `a`,
 		expArgs: []string{`b'c`},
 	}, {
-		in: `a\ b c\ d`,
-		expCmd: "a b",
+		in:      `a\ b c\ d`,
+		expCmd:  "a b",
 		expArgs: []string{"c d"},
 	}, {
-		in: `a\\ b c\\ d`,
-		expCmd: `a\`,
+		in:      `a\\ b c\\ d`,
+		expCmd:  `a\`,
 		expArgs: []string{"b", `c\`, "d"},
 	}, {
-		in: `a\\\ b c\\\ d`,
-		expCmd: `a\ b`,
+		in:      `a\\\ b c\\\ d`,
+		expCmd:  `a\ b`,
 		expArgs: []string{`c\ d`},
+	}, {
+		in:      `sh -c "echo \"a\""`,
+		expCmd:  "sh",
+		expArgs: []string{`-c`, `echo "a"`},
+	}, {
+		in:      `sh -c "sh -c \"echo 'a\x'\""`,
+		expCmd:  "sh",
+		expArgs: []string{`-c`, `sh -c "echo 'a\x'"`},
+	}, {
+		in:      `sh -c "sh -c \"echo 'a'\'''\""`,
+		expCmd:  "sh",
+		expArgs: []string{`-c`, `sh -c "echo 'a'\'''"`},
+	}, {
+		in:      `sh -c "sh -c \"echo 'a\\\"'\""`,
+		expCmd:  "sh",
+		expArgs: []string{`-c`, `sh -c "echo 'a\"'"`},
 	}}
 
 	for _, c := range cases {

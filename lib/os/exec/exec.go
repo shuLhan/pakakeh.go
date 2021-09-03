@@ -32,17 +32,31 @@ func ParseCommandArgs(in string) (cmd string, args []string) {
 	for _, r := range in {
 		if quote > 0 {
 			if r == quote {
-				arg := sb.String()
-				if len(arg) > 0 {
-					cmdArgs = append(cmdArgs, sb.String())
+				if prev == '\\' {
+					sb.WriteRune(r)
+					prev = r
+				} else {
+					arg := sb.String()
+					if len(arg) > 0 {
+						cmdArgs = append(cmdArgs, sb.String())
+					}
+					sb.Reset()
+					quote = 0
 				}
-
-				sb.Reset()
-				quote = 0
+			} else if r == '\\' {
+				if prev == '\\' {
+					sb.WriteRune(r)
+					prev = 0
+				} else {
+					prev = r
+				}
 			} else {
+				if prev == '\\' {
+					sb.WriteRune('\\')
+				}
 				sb.WriteRune(r)
+				prev = r
 			}
-			prev = r
 			continue
 		}
 		if r == '\'' || r == '"' || r == '`' {
