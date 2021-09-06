@@ -3,6 +3,146 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.29.2 (2021-09-06)
+
+===  Bug fixes
+
+*  os/exec: fix escaped quote inside the same quote
+
+   Shell quote is a hell of complex.  For example, one can write
+   shell that execute command that contains quote of quote,
+
+     sh -c "psql -c 'CREATE ... IDENTIFIED BY PASSWORD '\''pass'\'''"
+
+   or to simplify,
+
+     sh -c "psql -c \"CREATE ... IDENTIFIED BY PASSWORD 'pass'\""
+
+*  lib/memfs: fix empty ContentType if MaxFileSize is negative
+
+   A negative MaxFileSize means the content of file will not be mapped to
+   memory, but the content type should be detected for other operation.
+
+*  lib/memfs: fix empty file not being added to tree
+
+   Previously, we did not check if the file size is 0 before reading the
+   content or updating the content type, which cause the read on file
+   return io.EOF and the file not added to caches.
+
+   This commit fix this issue by checking for zero file size and for
+   io.EOF when reading the file content.
+
+*  lib/memfs: fix symbolic link with different name
+
+   Previously, if file is symbolic link and has different name with their
+   original file, it will return an error when we tried to open the file
+
+      parentpath/filename: no such file or directory
+
+   because we use the original file name, not the symlinked file name.
+
+   This commit fix this issue by not replacing the original FileInfo for
+   symlink but by setting only the size and mode.
+
+*  lib/sql: do not run migration if the last file not exist on the list
+
+   Previously, if the last migrated file name not found on the migration
+   directory, we start executing migration start from the first file.
+
+   This changes the behaviour to not run any migration at all.
+   Since we cannot return it as an error, we only log it.  In the future
+   we may return it.
+
+*  lib/http: fix missing content type for XML Header
+
+   If the Endpoint set the RequestType to RequestTypeXML, the response
+   header should be set to ContentTypeXML.
+
+*  lib/xmlrpc: fix missing port on NewClient
+
+   Calling net.Dial or tls.Dial on host without port will cause the
+   following error,
+
+     NewClient: Dial: dial tcp: address 10.148.0.164: missing port in address
+
+   This changes fix this by always generate new host value using previous
+   host and port values.
+
+*  lib/smtp: return io.EOF if no data received from server
+
+   This is to prevent the recv return nil on *Response without an error,
+   which may cause panic on caller side.
+
+*  os/exec: check for escaped backslash when ParseCommandArgs
+
+   Given the following string "cmd /a\ b" to ParseCommandArgs now
+   return "cmd" and ["/a b"] not ["/a\", "b"], because the space after a
+   is escaped using backslash.
+
+===  Enhancements
+
+*  lib/memfs: set default content type for empty file to "text/plain"
+
+   An empty file should be able to be displayed as text file instead of
+   downloaded as binary.
+
+*  lib/memfs: change the MarshalJSON to always return an object
+
+   Previously, MarshalJSON on memfs will return an object of map
+   of all PathNodes and on Node it will return an object.
+
+   This changes make it the JSON response consistent. If its directory
+   it will return the node object with its childs, without "content".
+   If its file, it will return the node object with content.
+
+   While at it, use single "mod_time" with value is epoch and return
+   the node ContentType as "content_type".
+
+*  lib/mlog: implement io.Writer and add function ErrorWriter
+
+   The ErrorWriter will return the internal default MultiLogger.
+   A call to Write() on returned io.Writer will forward it to all registered
+   error writers.
+
+   A Write method on MultiLogger write the b to all error writers.
+   It will always return the length of b without an error.
+
+*  lib/memfs: add method Save and Encode
+
+   The Save method will write the new content to file system and update
+   the content of Node using Encode().
+
+*  lib/ssh: add method to set session output and error
+
+   Previously, all of the SSH output and error goes to os.Stdout and
+   os.Stderr.
+
+   This changes add method SetSessionOutputError to change the output and
+   error for future remote execution.
+
+===  Chores
+
+*  lib/reflect: make the IsNil tests to become an example
+
+   In this way we do test and provide an example at the same time.
+
+   While at it, add another test cases for boolean, initialized slice, map,
+   and errors.
+
+*  lib/websocket: try to fix flaky test on client
+
+   The following error thrown when running on Github Action using
+   Ubuntu-latest and Go 1.16.3,
+
+     client_test.go:472: write tcp 127.0.0.1:34460->127.0.0.1:9001:
+       write: connection reset by peer
+
+   This may be caused by using the same client connection on all test
+   cases.
+
+   We try to fix this by creating new client on each test cases.
+
+
 ==  share v0.29.1 (2021-08-06)
 
 Revert the "lib/errors: return the internal error only if its not nil on
