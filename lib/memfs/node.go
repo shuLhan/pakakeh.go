@@ -108,6 +108,10 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 		}
 
 		node.mode = fi.Mode()
+		if node.mode.IsDir() {
+			node.size = 0
+			return node, nil
+		}
 		node.size = fi.Size()
 	}
 
