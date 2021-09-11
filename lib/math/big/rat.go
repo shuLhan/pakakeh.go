@@ -189,6 +189,8 @@ func (r *Rat) Humanize(thousandSep, decimalSep string) string {
 
 //
 // Int64 return the integer resulting from truncating r towards zero.
+// It will return math.MaxInt64, if the value is larger than MaxInt64.
+// It will return math.MinInt64, if the value is lower than MinInt64.
 //
 func (r *Rat) Int64() int64 {
 	s := strings.Split(r.String(), ".")[0]

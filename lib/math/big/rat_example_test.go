@@ -32,6 +32,19 @@ func ExampleRat_Humanize() {
 	//100.000,234
 }
 
+func ExampleRat_Int64() {
+	fmt.Printf("MaxInt64: %d\n", NewRat("9223372036854775807").Int64())
+	fmt.Printf("MaxInt64+1: %d\n", NewRat("9223372036854775808").Int64())
+	fmt.Printf("MinInt64: %d\n", NewRat("-9223372036854775808").Int64())
+	fmt.Printf("MinInt64-1: %d\n", NewRat("-9223372036854775809").Int64())
+
+	//Output:
+	//MaxInt64: 9223372036854775807
+	//MaxInt64+1: 9223372036854775807
+	//MinInt64: -9223372036854775808
+	//MinInt64-1: -9223372036854775808
+}
+
 func ExampleRat_RoundNearestFraction() {
 	fmt.Printf("0.000000001: %s\n", NewRat("0").RoundNearestFraction()) // Affected by DefaultDigitPrecision (8)
 	fmt.Printf("0.00545: %s\n", NewRat("0.00545").RoundNearestFraction())
@@ -59,6 +72,8 @@ func ExampleRat_RoundNearestFraction() {
 }
 
 func ExampleRat_RoundToNearestAway() {
+	fmt.Printf("0.0054: %s\n", NewRat("0.0054").RoundToNearestAway(2))
+	fmt.Printf("0.0054: %s\n", NewRat("0.0054").RoundToNearestAway(1))
 	fmt.Printf("0.5455: %s\n", NewRat("0.5455").RoundToNearestAway(2))
 	fmt.Printf("0.5555: %s\n", NewRat("0.5555").RoundToNearestAway(2))
 	fmt.Printf("0.5566: %s\n", NewRat("0.5567").RoundToNearestAway(2))
@@ -66,6 +81,8 @@ func ExampleRat_RoundToNearestAway() {
 	fmt.Printf("0.5: %s\n", NewRat("0.5").RoundToNearestAway(0))
 	fmt.Printf("-0.5: %s\n", NewRat("-0.5").RoundToNearestAway(0))
 	//Output:
+	//0.0054: 0.01
+	//0.0054: 0
 	//0.5455: 0.55
 	//0.5555: 0.56
 	//0.5566: 0.56
