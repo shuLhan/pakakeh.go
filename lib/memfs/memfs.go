@@ -65,7 +65,7 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 		Opts: &Options{},
 	}
 
-	merged.PathNodes.v["/"] = merged.Root
+	merged.PathNodes.Set("/", merged.Root)
 
 	for _, mfs := range params {
 		for _, child := range mfs.Root.Childs {
@@ -75,13 +75,14 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 			}
 			merged.Root.AddChild(child)
 		}
-		for path, node := range mfs.PathNodes.v {
+		paths := mfs.PathNodes.Paths()
+		for _, path := range paths {
 			if path == "/" {
 				continue
 			}
 			_, exist := merged.PathNodes.v[path]
 			if !exist {
-				merged.PathNodes.v[path] = node
+				merged.PathNodes.v[path] = mfs.PathNodes.Get(path)
 			}
 		}
 	}
@@ -145,7 +146,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		return nil, nil
 	}
 
-	mfs.PathNodes.v[child.Path] = child
+	mfs.PathNodes.Set(child.Path, child)
 
 	return child, nil
 }
@@ -196,7 +197,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 			parent.Childs = append(parent.Childs, node)
 		}
 
-		mfs.PathNodes.v[node.Path] = node
+		mfs.PathNodes.Set(node.Path, node)
 
 		parent = node
 	}
@@ -224,7 +225,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 	}
 
 	parent.Childs = append(parent.Childs, node)
-	mfs.PathNodes.v[node.Path] = node
+	mfs.PathNodes.Set(node.Path, node)
 
 	return node, nil
 }
@@ -253,7 +254,8 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 		return fmt.Errorf("memfs.ContentEncode: invalid encoding " + encoding)
 	}
 
-	for _, node := range mfs.PathNodes.v {
+	nodes := mfs.PathNodes.Nodes()
+	for _, node := range nodes {
 		if node.mode.IsDir() || len(node.V) == 0 {
 			continue
 		}
@@ -323,7 +325,8 @@ func (mfs *MemFS) ListNames() (paths []string) {
 		paths = append(paths, k)
 	}
 
-	for k := range mfs.PathNodes.v {
+	vpaths := mfs.PathNodes.Paths()
+	for _, k := range vpaths {
 		_, ok := mfs.PathNodes.f[k]
 		if !ok {
 			paths = append(paths, k)
@@ -370,7 +373,7 @@ func (mfs *MemFS) Open(path string) (http.File, error) {
 func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
 	removed = parent.removeChild(child)
 	if removed != nil {
-		delete(mfs.PathNodes.v, removed.Path)
+		mfs.PathNodes.Delete(removed.Path)
 	}
 	return
 }
@@ -391,7 +394,8 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		tokens[x] = bytes.ToLower(tokens[x])
 	}
 
-	for _, node := range mfs.PathNodes.v {
+	nodes := mfs.PathNodes.Nodes()
+	for _, node := range nodes {
 		if node.mode.IsDir() {
 			continue
 		}
@@ -479,7 +483,7 @@ func (mfs *MemFS) createRoot(f *os.File) error {
 	}
 	mfs.Root.generateFuncName(mfs.Opts.Root)
 
-	mfs.PathNodes.v[mfs.Root.Path] = mfs.Root
+	mfs.PathNodes.Set(mfs.Root.Path, mfs.Root)
 
 	return nil
 }
