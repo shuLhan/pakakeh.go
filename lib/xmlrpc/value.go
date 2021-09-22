@@ -167,7 +167,7 @@ func (v *Value) GetFieldAsString(key string) string {
 	}
 	s, ok := mv.In.(string)
 	if !ok {
-		return ""
+		return fmt.Sprintf("%s", mv.In)
 	}
 	return s
 }
