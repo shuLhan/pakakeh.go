@@ -498,6 +498,13 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		res.Header().Set(HeaderContentEncoding, node.ContentEncoding)
 	}
 
+	responseETag := strconv.FormatInt(node.ModTime().Unix(), 10)
+	requestETag := req.Header.Get(HeaderIfNoneMatch)
+	if requestETag == responseETag {
+		res.WriteHeader(http.StatusNotModified)
+		return
+	}
+
 	var (
 		body []byte
 		size int64
@@ -517,6 +524,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	}
 
 	res.Header().Set(HeaderContentLength, strconv.FormatInt(size, 10))
+	res.Header().Set(HeaderETag, responseETag)
 
 	if req.Method == http.MethodHead {
 		res.WriteHeader(http.StatusOK)
