@@ -5,11 +5,29 @@
 package strings
 
 import (
+	"bytes"
 	"strings"
 	"unicode"
 
 	librunes "github.com/shuLhan/share/lib/runes"
 )
+
+//
+// Alnum remove non alpha-numeric character from text and return it.
+// If withSpace is true then white space is allowed, otherwise it would also
+// be removed from text.
+//
+func Alnum(text string, withSpace bool) string {
+	var buf bytes.Buffer
+	for _, r := range text {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			buf.WriteRune(r)
+		} else if withSpace && unicode.IsSpace(r) {
+			buf.WriteRune(r)
+		}
+	}
+	return buf.String()
+}
 
 //
 // CleanURI remove known links from text and return it.

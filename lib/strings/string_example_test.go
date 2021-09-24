@@ -8,6 +8,27 @@ import (
 	"fmt"
 )
 
+func ExampleAlnum() {
+	cases := []struct {
+		text      string
+		withSpace bool
+	}{
+		{"A, b.c", false},
+		{"A, b.c", true},
+		{"A1 b", false},
+		{"A1 b", true},
+	}
+
+	for _, c := range cases {
+		fmt.Printf("%s\n", Alnum(c.text, c.withSpace))
+	}
+	//Output:
+	//Abc
+	//A bc
+	//A1b
+	//A1 b
+}
+
 func ExampleCleanURI() {
 	text := `You can visit ftp://hostname or https://hostname/link%202 for more information`
 
