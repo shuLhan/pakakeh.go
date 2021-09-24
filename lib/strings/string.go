@@ -211,7 +211,7 @@ func Split(text string, cleanit bool, uniq bool) (words []string) {
 
 //
 // TrimNonAlnum remove non alpha-numeric character at the beginning and
-// end for `text`.
+// end of `text`.
 //
 func TrimNonAlnum(text string) string {
 	r := []rune(text)

@@ -80,6 +80,7 @@ func ExampleTrimNonAlnum() {
 		"alpha0",
 		"1alpha",
 		"1alpha0",
+		"[a][b][c]",
 		"[][][]",
 	}
 
@@ -94,5 +95,6 @@ func ExampleTrimNonAlnum() {
 	// 'alpha0'
 	// '1alpha'
 	// '1alpha0'
+	// 'a][b][c'
 	// ''
 }
