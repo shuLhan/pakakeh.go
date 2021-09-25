@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -43,33 +44,40 @@ type Watcher struct {
 // duration (5 seconds).
 //
 func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err error) {
+	logp := "NewWatcher"
+
 	if len(path) == 0 {
-		return nil, fmt.Errorf("lib/io: NewWatcher: path is empty")
+		return nil, fmt.Errorf("%s: path is empty", logp)
 	}
 	if cb == nil {
-		return nil, fmt.Errorf("lib/io: NewWatcher: callback is not defined")
+		return nil, fmt.Errorf("%s: callback is not defined", logp)
 	}
 
 	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, fmt.Errorf("lib/io: NewWatcher: " + err.Error())
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	if fi.IsDir() {
-		return nil, fmt.Errorf("lib/io: NewWatcher: path is directory")
+		return nil, fmt.Errorf("%s: path is directory", logp)
 	}
 
-	node, err := memfs.NewNode(nil, fi, -1)
+	absPath, err := filepath.Abs(path)
 	if err != nil {
-		log.Printf("lib/io: NewWatcher %s: %s", fi.Name(), err.Error())
-		return nil, nil
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+	dummyParent := &memfs.Node{
+		SysPath: filepath.Dir(absPath),
+	}
+	dummyParent.Path = filepath.Base(dummyParent.SysPath)
+
+	node, err := memfs.NewNode(dummyParent, fi, -1)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if d < 100*time.Millisecond {
 		d = time.Second * 5
 	}
-
-	node.SysPath = path
-	node.Path = path
 
 	w = &Watcher{
 		path:   path,

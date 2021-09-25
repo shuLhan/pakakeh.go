@@ -54,6 +54,10 @@ type Node struct {
 
 //
 // NewNode create a new node based on file information "fi".
+//
+// The parent parameter is required to allow valid system path generated for
+// new node.
+//
 // If maxFileSize is greater than zero, the file content and its type will be
 // saved in node as V and ContentType.
 //
@@ -68,13 +72,8 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 		absPath string
 	)
 
-	if parent != nil {
-		sysPath = filepath.Join(parent.SysPath, fi.Name())
-		absPath = path.Join(parent.Path, fi.Name())
-	} else {
-		sysPath = fi.Name()
-		absPath = fi.Name()
-	}
+	sysPath = filepath.Join(parent.SysPath, fi.Name())
+	absPath = path.Join(parent.Path, fi.Name())
 
 	node = &Node{
 		SysPath: sysPath,
