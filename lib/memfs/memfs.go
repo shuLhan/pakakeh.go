@@ -507,7 +507,25 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 				return true
 			}
 		}
-		return mode.IsDir()
+		if mode&os.ModeSymlink == 0 {
+			return mode.IsDir()
+		}
+
+		// File is symlink, get the real FileInfo to check if its
+		// directory or not.
+		absPath, err := filepath.EvalSymlinks(sysPath)
+		if err != nil {
+			return false
+		}
+
+		fi, err := os.Lstat(absPath)
+		if err != nil {
+			return false
+		}
+		if fi.IsDir() {
+			return true
+		}
+		return false
 	}
 
 	return true
