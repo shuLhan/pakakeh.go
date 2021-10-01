@@ -306,7 +306,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	if mfs.Opts.Development {
-		err = node.update(nil, mfs.Opts.MaxFileSize)
+		err = node.Update(nil, mfs.Opts.MaxFileSize)
 		if err != nil {
 			return nil, fmt.Errorf("memfs.Get: %w", err)
 		}
@@ -451,13 +451,13 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 // same Root node).
 //
 func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
-	if node == nil || newInfo == nil {
+	if node == nil {
 		return
 	}
 
-	err := node.update(newInfo, mfs.Opts.MaxFileSize)
+	err := node.Update(newInfo, mfs.Opts.MaxFileSize)
 	if err != nil {
-		log.Println("lib/memfs: Update: " + err.Error())
+		log.Printf("MemFS.Update: %s", err)
 	}
 }
 

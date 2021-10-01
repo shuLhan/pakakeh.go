@@ -491,21 +491,24 @@ func (leaf *Node) resetAllModTime(t time.Time) {
 }
 
 //
-// update the node content and information based on new file information.
+// Update the node metadata or content based on new file information.
 //
-// If the newInfo is nil, it will read the file information based on node's
-// SysPath.
+// The newInfo parameter is optional, if its nil, it will read the file
+// information based on node's SysPath.
 //
-// There are two possible changes that will happened: its either change on
+// The maxFileSize parameter is also optional.
+// If its negative, the node content will not be updated.
+// If its zero, it will default to 5 MB.
+//
+// There are two possible changes that will happen: its either change on
 // mode or change on content (size and modtime).
 // Change on mode will not affect the content of node.
 //
-func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64) (err error) {
+func (leaf *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	if newInfo == nil {
 		newInfo, err = os.Stat(leaf.SysPath)
 		if err != nil {
-			return fmt.Errorf("lib/memfs: Node.update %q: %w",
-				leaf.Path, err)
+			return fmt.Errorf("Node.Update: %q: %w", leaf.Path, err)
 		}
 	}
 
@@ -521,7 +524,11 @@ func (leaf *Node) update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 		return nil
 	}
 
-	return leaf.updateContent(maxFileSize)
+	err = leaf.updateContent(maxFileSize)
+	if err != nil {
+		return fmt.Errorf("Node.Update: %q: %w", leaf.Path, err)
+	}
+	return nil
 }
 
 //
@@ -531,6 +538,8 @@ func (leaf *Node) updateContent(maxFileSize int64) (err error) {
 	if maxFileSize < 0 {
 		// Negative maxFileSize means content will not be read.
 		return nil
+	} else if maxFileSize == 0 {
+		maxFileSize = defaultMaxFileSize
 	}
 	if leaf.size > maxFileSize {
 		return nil
