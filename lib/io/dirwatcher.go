@@ -297,7 +297,7 @@ func (dw *DirWatcher) onModified(node *memfs.Node, newDirInfo os.FileInfo) {
 
 	ns := &NodeState{
 		Node:  node,
-		State: FileStateModified,
+		State: FileStateUpdateMode,
 	}
 
 	dw.Callback(ns)

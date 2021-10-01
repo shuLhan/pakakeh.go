@@ -93,58 +93,52 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 }
 
 func (w *Watcher) start() {
+	logp := "Watcher"
 	if debug.Value >= 2 {
-		fmt.Printf("lib/io: Watcher watching %q\n", w.path)
+		fmt.Printf("%s: %s: watching for changes\n", logp, w.path)
 	}
 	for range w.ticker.C {
+		ns := &NodeState{
+			Node: w.node,
+		}
+
 		newInfo, err := os.Stat(w.path)
 		if err != nil {
 			if !os.IsNotExist(err) {
-				log.Println("lib/io: Watcher: " + err.Error())
+				log.Printf("%s: %s", logp, err.Error())
 				continue
 			}
 
 			if debug.Value >= 2 {
-				fmt.Printf("lib/io: Watcher: deleted %q\n", w.node.SysPath)
+				fmt.Printf("%s: %s: deleted\n", logp, w.node.SysPath)
 			}
 
-			ns := &NodeState{
-				Node:  w.node,
-				State: FileStateDeleted,
-			}
+			ns.State = FileStateDeleted
 			w.cb(ns)
 			w.node = nil
 			return
 		}
+
 		if w.node.Mode() != newInfo.Mode() {
 			if debug.Value >= 2 {
-				fmt.Printf("lib/io: Watcher: mode modified %q\n", w.node.SysPath)
+				fmt.Printf("%s: %s: mode modified\n", logp, w.node.SysPath)
 			}
-
+			ns.State = FileStateUpdateMode
 			w.node.SetMode(newInfo.Mode())
-			ns := &NodeState{
-				Node:  w.node,
-				State: FileStateModified,
-			}
 			w.cb(ns)
 			continue
 		}
 		if w.node.ModTime().Equal(newInfo.ModTime()) {
 			continue
 		}
-
 		if debug.Value >= 2 {
-			fmt.Printf("lib/io: Watcher: content modified %q\n", w.node.SysPath)
+			fmt.Printf("%s: %s: content modified\n", logp, w.node.SysPath)
 		}
 
 		w.node.SetModTime(newInfo.ModTime())
 		w.node.SetSize(newInfo.Size())
 
-		ns := &NodeState{
-			Node:  w.node,
-			State: FileStateModified,
-		}
-
+		ns.State = FileStateUpdateContent
 		w.cb(ns)
 	}
 }

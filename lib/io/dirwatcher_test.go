@@ -39,7 +39,7 @@ func TestDirWatcher(t *testing.T) {
 		state: FileStateCreated,
 		path:  "/",
 	}, {
-		state: FileStateModified,
+		state: FileStateUpdateMode,
 		path:  "/",
 	}, {
 		state: FileStateCreated,

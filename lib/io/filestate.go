@@ -5,14 +5,13 @@
 package io
 
 // FileState define the state of file.
-// There are three state of file: created, modified, or deleted.
+// There are four states of file: created, updated on mode, updated on content
+// or deleted.
 type FileState byte
 
 const (
-	// FileStateCreated indicate that the file has been created.
-	FileStateCreated FileState = iota
-	// FileStateModified indicate that the file has been modified.
-	FileStateModified
-	// FileStateDeleted indicate that the file has been deleted.
-	FileStateDeleted
+	FileStateCreated       FileState = iota // New file is created.
+	FileStateUpdateContent                  // The content of file is modified.
+	FileStateUpdateMode                     // The mode of file is modified.
+	FileStateDeleted                        // The file has been deleted.
 )

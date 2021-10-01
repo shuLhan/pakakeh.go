@@ -28,10 +28,10 @@ func TestWatcher(t *testing.T) {
 		mode  os.FileMode
 		size  int64
 	}{{
-		state: FileStateModified,
+		state: FileStateUpdateMode,
 		mode:  0700,
 	}, {
-		state: FileStateModified,
+		state: FileStateUpdateContent,
 		mode:  0700,
 		size:  13,
 	}, {
