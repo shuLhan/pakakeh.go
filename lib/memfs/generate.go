@@ -42,6 +42,8 @@ type generateData struct {
 // file using gzip and set Node.ContentEncoding to "gzip".
 //
 func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err error) {
+	logp := "MemFS.GoGenerate"
+
 	if len(pkgName) == 0 {
 		pkgName = DefaultGenPackageName
 	}
@@ -59,18 +61,18 @@ func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err
 
 	tmpl, err := generateTemplate()
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	f, err := os.Create(out)
 	if err != nil {
-		return fmt.Errorf("memfs: GoGenerate: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if len(contentEncoding) > 0 {
 		err = mfs.ContentEncode(contentEncoding)
 		if err != nil {
-			return fmt.Errorf("GoGenerate: %w", err)
+			return fmt.Errorf("%s: %w", logp, err)
 		}
 	}
 
@@ -107,13 +109,16 @@ func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err
 		goto fail
 	}
 
-	err = f.Close()
-	if err != nil {
-		return fmt.Errorf("memfs: GoGenerate: %w", err)
-	}
-
-	return nil
 fail:
-	_ = f.Close()
-	return fmt.Errorf("memfs: GoGenerate: %w", err)
+	errClose := f.Close()
+	if errClose != nil {
+		if err != nil {
+			return fmt.Errorf("%s: %s: %w", logp, errClose, err)
+		}
+		return fmt.Errorf("%s: %w", logp, errClose)
+	}
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+	return nil
 }
