@@ -61,12 +61,8 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 		return nil, fmt.Errorf("%s: path is directory", logp)
 	}
 
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
 	dummyParent := &memfs.Node{
-		SysPath: filepath.Dir(absPath),
+		SysPath: filepath.Dir(path),
 	}
 	dummyParent.Path = filepath.Base(dummyParent.SysPath)
 
