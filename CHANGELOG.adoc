@@ -3,6 +3,153 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.30.0 (2021-10-04)
+
+=== Breaking changes
+
+*  lib/io: separate FileState for updated mode and content
+
+   Previously, when content of file being watched is modified, it will
+   trigger the callback with State set to FileStateModified.  When the
+   mode of file is modified, it will also trigger the callback with
+   the same state.
+
+   This changes separated those state into two kind: FileStateUpdateMode
+   for update on file mode, and FileStateUpdateContent for update on
+   file content.
+
+=== New features
+
+*  lib/memfs: export the Node Update method
+
+   The Update method update the node metadata or content based on new
+   file information.
+   It accept two parameters: the new file information, newInfo, and
+   maximum file size, maxFileSize.
+
+   The newInfo parameter is optional, if its nil, it will read the file
+   information based on node's SysPath.
+
+   The maxFileSize parameter is also optional.
+   If its negative, the node content will not be updated.
+   If its zero, it will default to 5 MB.
+
+   There are two possible changes that will happen: its either change on
+   mode or change on content (size and modtime).
+   Change on mode will not affect the content of node.
+
+*  lib/strings: add function Alnum
+
+   The Alnum remove non alpha-numeric character from text and return it.
+   Its accept the string to be cleanup and boolean parameter withSpace.
+   If withSpace is true then white space is allowed, otherwise it would
+   also be removed from text.
+
+=== Bug fixes
+
+*  lib/memfs: fix symlink to directory not included on mount
+
+   During mounting and scanning a directory, if the node is symlink to a
+   directory, the isIncluded will return false because the node is not
+   a file nor directory.
+
+   The fix is to check if node mode is symlink first and then get the
+   the real stat.
+
+*  lib/io: fix NewWatcher when called DirWatcher
+
+   When NewWatcher called from DirWatcher's Start(), it will called NewNode
+   with nil parent parameter.  If the parent parameter is nil on NewNode
+   the SysPath of new node will be set to the FileInfo.Name() instead of
+   full or relative path based on current working directory.
+
+   Any operation using new node SysPath will failed because the path
+   does not exist or reachable from current directory.
+
+   For example, let say we have the following directory tree,
+
+     testdata
+      |
+      +--- A
+      |
+      +--- B
+
+   We then set DirWatcher Root to "testdata" from current directory.
+   The DirWatcher Start then iterate over all child of "testdata" directory,
+   and call NewWatcher("testdata/A", ...). On the NewWatcher, it will
+   call NewNode(nil, FileInfo, -1).  Now since the parent is nil,
+   the Node.SysPath will be set to FileInfo.Name() or base name of the file,
+   which is "A".
+
+   Later, when node content need to be read, ioutil.ReadFile("A") will
+   fail because the path to "A" does not exist on current directory.
+
+   This fix require to force the parameter "parent" on NewNode to be
+   required.
+
+*  lib/memfs: fix possible data race on PathNode
+
+   During Memfs Get(), if the node returned by PathNodes.Get() is null,
+   the memfs instance will try to refresh the directory tree. In case
+   the requested path exist, the memfs will write to PathNodes through
+   AddChild()
+
+   At the same time, there maybe a request to access another path, which
+   cause both read and write occured.
+
+*  lib/memfs: fix NewNode if node is symlink to directory
+
+   Previously, if a symlink point to directory the memfs NewNode function
+   will return an error,
+
+     AddChild wui: NewNode: read x/y: is a directory
+
+   which cause the files inside y cannot be scanned (404).
+
+   This commit fix this issue by checking if the original node mode is a
+   directory and return immediately.
+
+=== Enhancements
+
+*  lib/memfs: check error on File Close on GoGenerate
+
+   Previously, we ignore the error for call to Close when there is an
+   error in previous operation.
+
+   This changes check the error returned from Close and add it to the
+   returned error message.
+
+   While at it, use consisten prefix for all returned error:
+   "MemFS.GoGenerate".
+
+*  lib/http: support server caching file system using ETag
+
+   If the Server handle file system using MemFS, server will set the
+   ETag [1] header using the file epoch as value.
+
+   On the next request, server will compare the request header
+   If-None-Match with the requested file epoch. If its equal server will
+   return the response as 304 StatusNotModified.
+
+   [1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+
+*  lib/xmlrpc: convert the value using Sprintf on GetFieldAsString
+
+   Previously, the GetFieldAsString will return empty string if the
+   Value type is not string.
+
+   In this commit, we force the value to be string by converted it using
+   fmt.Sprintf.
+
+*  math/big: add some examples of Rat.Int64() and RoundToNearestAway
+
+=== Chores
+
+*  github: update the Go version to v1.17.1
+
+*  lib/strings: update comment and example of TrimAlnum
+
+
 ==  share v0.29.2 (2021-09-06)
 
 ===  Bug fixes
