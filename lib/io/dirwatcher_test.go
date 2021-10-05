@@ -26,7 +26,9 @@ func TestDirWatcher(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		_ = os.RemoveAll(dir)
+	})
 	fmt.Printf(">>> Watching directory %q for changes ...\n", dir)
 
 	exps := []struct {
