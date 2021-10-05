@@ -6,10 +6,8 @@ package xmlrpc
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
-	"io/ioutil"
-	"net"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -19,22 +17,14 @@ import (
 )
 
 const (
-	requestHeader = "POST %s HTTP/1.1\r\n" +
-		"User-agent: lib/xmlrpc (go)\r\n" +
-		"Host: %s\r\n" +
-		"Content-Type: text/xml\r\n" +
-		"Content-Length: %d\r\n" +
-		"\r\n" +
-		"%s"
-
-	defaultTimeout = 60 * time.Second
+	defaultTimeout = 10 * time.Second
 )
 
 //
 // Client for XML-RPC.
 //
 type Client struct {
-	conn    net.Conn
+	conn    *libhttp.Client
 	timeout time.Duration
 	url     *url.URL
 }
@@ -65,21 +55,18 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 		if port == 0 {
 			port = 443
 		}
-		host = fmt.Sprintf("%s:%d", host, port)
 
-		config := &tls.Config{
-			ServerName:         host,
-			InsecureSkipVerify: insecure,
-		}
+		serverUrl := fmt.Sprintf("https://%s:%d", host, port)
 
-		client.conn, err = tls.Dial("tcp", host, config)
+		client.conn = libhttp.NewClient(serverUrl, nil, insecure)
 	} else {
 		if port == 0 {
 			port = 80
 		}
-		host = fmt.Sprintf("%s:%d", host, port)
 
-		client.conn, err = net.Dial("tcp", host)
+		serverUrl := fmt.Sprintf("http://%s:%d", host, port)
+
+		client.conn = libhttp.NewClient(serverUrl, nil, false)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("NewClient: Dial: %w", err)
@@ -91,44 +78,40 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 //
 // Close the client connection.
 //
-func (cl *Client) Close() (err error) {
+func (cl *Client) Close() {
 	cl.url = nil
-	return cl.conn.Close()
+	cl.conn = nil
 }
 
 //
 // Send the RPC method with parameters to the server.
 //
 func (cl *Client) Send(req Request) (resp Response, err error) {
-	var buf bytes.Buffer
+	var (
+		logp = "Client.Send"
+	)
 
 	xmlbin, _ := req.MarshalText()
-
-	fmt.Fprintf(&buf, requestHeader, cl.url.Path, cl.url.Host,
-		len(xmlbin), xmlbin)
-
-	reqbody := buf.Bytes()
-	if debug.Value >= 3 {
-		fmt.Printf("<<< Send: request body:\n%s\n", reqbody)
-	}
-
-	_, err = cl.conn.Write(reqbody)
-	if err != nil {
-		return resp, err
-	}
-
-	xmlbin, err = ioutil.ReadAll(cl.conn)
-	if err != nil {
-		return resp, err
-	}
+	reqBody := bytes.NewReader(xmlbin)
 
 	if debug.Value >= 3 {
-		fmt.Printf(">>> Send: response:\n%s\n", xmlbin)
+		fmt.Printf("<<< Send: request body:\n%s\n", xmlbin)
 	}
 
-	_, resBody, err := libhttp.ParseResponseHeader(xmlbin)
+	httpRequest, err := http.NewRequest("POST", cl.url.String(), reqBody)
 	if err != nil {
-		return resp, fmt.Errorf("Send: %w", err)
+		return resp, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	httpRequest.Header.Set(libhttp.HeaderContentType, libhttp.ContentTypeXML)
+
+	_, resBody, err := cl.conn.Do(httpRequest)
+	if err != nil {
+		return resp, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	if debug.Value >= 3 {
+		fmt.Printf(">>> Send: response:\n%s\n", resBody)
 	}
 
 	if len(resBody) > 0 {
