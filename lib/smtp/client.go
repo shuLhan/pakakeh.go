@@ -350,6 +350,21 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 }
 
 //
+// Noop send the NOOP command to server with optional message.
+//
+// On success, it will return response with Code 250, StatusOK.
+//
+func (cl *Client) Noop(msg string) (res *Response, err error) {
+	var cmd string
+	if len(msg) > 0 {
+		cmd = fmt.Sprintf("NOOP %s\r\n", msg)
+	} else {
+		cmd = "NOOP\r\n"
+	}
+	return cl.SendCommand([]byte(cmd))
+}
+
+//
 // Reset send the RSET command to server.
 // This command clear the current buffer on MAIL, RCPT, and DATA, but not the
 // EHLO/HELO buffer.
@@ -358,12 +373,7 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 //
 func (cl *Client) Reset() (res *Response, err error) {
 	cmd := []byte("RSET\r\n")
-	_, err = cl.SendCommand(cmd)
-	if err != nil {
-		return nil, err
-	}
-
-	return cl.recv()
+	return cl.SendCommand(cmd)
 }
 
 //
