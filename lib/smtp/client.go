@@ -350,6 +350,23 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 }
 
 //
+// Reset send the RSET command to server.
+// This command clear the current buffer on MAIL, RCPT, and DATA, but not the
+// EHLO/HELO buffer.
+//
+// On success, it will return response with Code 250, StatusOK.
+//
+func (cl *Client) Reset() (res *Response, err error) {
+	cmd := []byte("RSET\r\n")
+	_, err = cl.SendCommand(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return cl.recv()
+}
+
+//
 // SendCommand send any custom command to server.
 //
 func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
