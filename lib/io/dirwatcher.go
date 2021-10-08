@@ -52,40 +52,37 @@ type DirWatcher struct {
 }
 
 //
-// Start create a new watcher that detect changes in directory and its
-// content.
+// Start watching changes in directory and its content.
 //
 func (dw *DirWatcher) Start() (err error) {
+	logp := "DirWatcher.Start"
+
 	if dw.Delay < 100*time.Millisecond {
 		dw.Delay = time.Second * 5
 	}
 	if dw.Callback == nil {
-		return fmt.Errorf("lib/io: NewDirWatcher: callback is not defined")
+		return fmt.Errorf("%s: callback is not defined", logp)
 	}
 
 	fi, err := os.Stat(dw.Root)
 	if err != nil {
-		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 	if !fi.IsDir() {
-		return fmt.Errorf("lib/io: NewDirWatcher: %q is not a directory", dw.Root)
+		return fmt.Errorf("%s: %q is not a directory", logp, dw.Root)
 	}
 
 	dw.Options.MaxFileSize = -1
 
 	dw.fs, err = memfs.New(&dw.Options)
 	if err != nil {
-		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	dw.root, err = dw.fs.Get("/")
-	if err != nil {
-		return fmt.Errorf("lib/io: NewDirWatcher: " + err.Error())
-	}
+	dw.root = dw.fs.Root
 
 	dw.dirs = make(map[string]*memfs.Node)
 	dw.mapSubdirs(dw.root)
-
 	go dw.start()
 
 	return nil
@@ -97,21 +94,28 @@ func (dw *DirWatcher) Stop() {
 }
 
 //
-// mapSubdirs find any sub directories on node's childrens and add it
-// to map of node.
+// mapSubdirs iterate each child node and check if its a directory or regular
+// file.
+// If its a directory add it to map of node and recursively iterate
+// the childs.
+// If its a regular file, start a NewWatcher.
 //
 func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
+	var (
+		logp = "DirWatcher.mapSubdirs"
+		err  error
+	)
+
 	for _, child := range node.Childs {
-		if !child.IsDir() {
-			_, err := NewWatcher(child.SysPath, dw.Delay, dw.Callback)
-			if err != nil {
-				log.Println(err)
-			}
+		if child.IsDir() {
+			dw.dirs[child.Path] = child
+			dw.mapSubdirs(child)
 			continue
 		}
-
-		dw.dirs[child.Path] = child
-		dw.mapSubdirs(child)
+		_, err = newWatcher(node, node.FileInfo, dw.Delay, dw.Callback)
+		if err != nil {
+			log.Printf("%s: %q: %s", logp, child.SysPath, err)
+		}
 	}
 }
 
@@ -137,48 +141,48 @@ func (dw *DirWatcher) unmapSubdirs(node *memfs.Node) {
 // old content to detect deletion and addition of files.
 //
 func (dw *DirWatcher) onContentChange(node *memfs.Node) {
+	logp := "DirWatcher.onContentChange"
+
 	if debug.Value >= 2 {
-		fmt.Printf("lib/io: DirWatcher.onContentChange: %+v\n", node)
+		fmt.Printf("%s: %+v\n", logp, node)
 	}
 
 	f, err := os.Open(node.SysPath)
 	if err != nil {
-		log.Println("lib/io: DirWatcher.onContentChange: " + err.Error())
+		log.Printf("%s: %s", logp, err)
 		return
 	}
 
 	fis, err := f.Readdir(0)
 	if err != nil {
-		log.Println("lib/io: DirWatcher.onContentChange: " + err.Error())
+		log.Printf("%s: %s", logp, err)
 		return
 	}
 
 	err = f.Close()
 	if err != nil {
-		log.Println("lib/io: DirWatcher.onContentChange: " + err.Error())
+		log.Printf("%s: %s", logp, err)
 	}
 
 	// Find deleted files in directory.
-	for x := 0; x < len(node.Childs); x++ {
+	for _, child := range node.Childs {
 		found := false
 		for _, newInfo := range fis {
-			if node.Childs[x].Name() == newInfo.Name() {
+			if child.Name() == newInfo.Name() {
 				found = true
 				break
 			}
 		}
-		if !found {
-			if debug.Value >= 2 {
-				fmt.Printf("lib/io: DirWatcher.onContentChange: deleted %+v\n", node.Childs[x])
-			}
-
-			if node.Childs[x].IsDir() {
-				dw.unmapSubdirs(node.Childs[x])
-			}
-
-			dw.fs.RemoveChild(node, node.Childs[x])
+		if found {
 			continue
 		}
+		if debug.Value >= 2 {
+			fmt.Printf("%s: %q deleted\n", logp, child.Path)
+		}
+		if child.IsDir() {
+			dw.unmapSubdirs(child)
+		}
+		dw.fs.RemoveChild(node, child)
 	}
 
 	// Find new files in directory.
@@ -196,16 +200,16 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 
 		newChild, err := dw.fs.AddChild(node, newInfo)
 		if err != nil {
-			log.Printf("lib/io: DirWatcher.onContentChange: " + err.Error())
+			log.Printf("%s: %s", logp, err)
 			continue
 		}
 		if newChild == nil {
-			log.Printf("lib/io: DirWatcher.onContentChange: exclude %q\n", newInfo.Name())
+			// a node is excluded.
 			continue
 		}
 
 		if debug.Value >= 2 {
-			fmt.Printf("lib/io: DirWatcher.onContentChange: new child %+v\n", newChild)
+			fmt.Printf("%s: new child %s\n", logp, newChild.Path)
 		}
 
 		ns := &NodeState{
@@ -223,9 +227,9 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 		}
 
 		// Start watching the file for modification.
-		_, err = NewWatcher(newChild.SysPath, dw.Delay, dw.Callback)
+		_, err = newWatcher(node, newInfo, dw.Delay, dw.Callback)
 		if err != nil {
-			log.Println("io: NewWatcher: " + err.Error())
+			log.Printf("%s: %s", logp, err)
 		}
 	}
 }
@@ -237,17 +241,20 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 // recursively.
 //
 func (dw *DirWatcher) onRootCreated() {
-	var err error
+	var (
+		logp = "DirWatcher.onRootCreated"
+		err  error
+	)
 
 	dw.fs, err = memfs.New(&dw.Options)
 	if err != nil {
-		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
+		log.Printf("%s: %s", logp, err)
 		return
 	}
 
 	dw.root, err = dw.fs.Get("/")
 	if err != nil {
-		log.Println("lib/io: DirWatcher.onRootCreated: " + err.Error())
+		log.Printf("%s: %s", logp, err)
 		return
 	}
 
@@ -260,7 +267,7 @@ func (dw *DirWatcher) onRootCreated() {
 	}
 
 	if debug.Value >= 2 {
-		fmt.Printf("lib/io: DirWatcher.onRootCreated: %+v\n", dw.root)
+		fmt.Printf("%s: %s", logp, dw.root.Path)
 	}
 
 	dw.Callback(ns)
@@ -282,7 +289,7 @@ func (dw *DirWatcher) onRootDeleted() {
 	dw.dirs = nil
 
 	if debug.Value >= 2 {
-		fmt.Println("lib/io: DirWatcher: root directory deleted")
+		fmt.Println("DirWatcher.onRootDeleted: root directory deleted")
 	}
 
 	dw.Callback(ns)
@@ -303,18 +310,20 @@ func (dw *DirWatcher) onModified(node *memfs.Node, newDirInfo os.FileInfo) {
 	dw.Callback(ns)
 
 	if debug.Value >= 2 {
-		fmt.Printf("lib/io: DirWatcher.onModified: %+v\n", node)
+		fmt.Printf("DirWatcher.onModified: %s\n", node.Path)
 	}
 }
 
 func (dw *DirWatcher) start() {
+	logp := "DirWatcher"
+
 	dw.ticker = time.NewTicker(dw.Delay)
 
 	for range dw.ticker.C {
 		newDirInfo, err := os.Stat(dw.Root)
 		if err != nil {
 			if !os.IsNotExist(err) {
-				log.Println("lib/io: DirWatcher: " + err.Error())
+				log.Printf("%s: %s", logp, err)
 				continue
 			}
 			if dw.fs != nil {
@@ -342,15 +351,17 @@ func (dw *DirWatcher) start() {
 }
 
 func (dw *DirWatcher) processSubdirs() {
+	logp := "DirWatcher.processSubdirs"
+
 	for _, node := range dw.dirs {
 		if debug.Value >= 3 {
-			fmt.Printf("lib/io: DirWatcher: processSubdirs: %q\n", node.SysPath)
+			fmt.Printf("%s: %q\n", logp, node.SysPath)
 		}
 
 		newDirInfo, err := os.Stat(node.SysPath)
 		if err != nil {
 			if !os.IsNotExist(err) {
-				log.Println("lib/io: DirWatcher: " + err.Error())
+				log.Printf("%s: %q: %s", logp, node.SysPath, err)
 				continue
 			}
 			dw.unmapSubdirs(node)

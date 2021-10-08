@@ -48,7 +48,7 @@ func TestDirWatcher(t *testing.T) {
 		path:  "/new.adoc",
 	}, {
 		state: FileStateDeleted,
-		path:  filepath.Join(filepath.Base(dir), "/new.adoc"),
+		path:  "/new.adoc",
 	}, {
 		state: FileStateCreated,
 		path:  "/sub",
@@ -57,13 +57,13 @@ func TestDirWatcher(t *testing.T) {
 		path:  "/sub/new.adoc",
 	}, {
 		state: FileStateDeleted,
-		path:  "sub/new.adoc",
+		path:  "/sub/new.adoc",
 	}, {
 		state: FileStateCreated,
 		path:  "/assets/new",
 	}, {
 		state: FileStateDeleted,
-		path:  "assets/new",
+		path:  "/assets/new",
 	}}
 
 	var x int32
