@@ -61,6 +61,7 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 {{- end }}
 	}
 	node.SetMode({{printf "%d" .Node.Mode}})
+	node.SetModTimeUnix({{.Node.ModTime.Unix}}, {{.Node.ModTime.Nanosecond}})
 	node.SetName("{{.Node.Name}}")
 	node.SetSize({{.Node.Size}})
 	{{- range $x, $child := .Node.Childs}}

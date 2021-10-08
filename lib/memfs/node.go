@@ -356,6 +356,14 @@ func (leaf *Node) SetModTime(modTime time.Time) {
 }
 
 //
+// SetModTimeUnix set the file modification time using seconds and nanoseconds
+// since January 1, 1970 UTC.
+//
+func (leaf *Node) SetModTimeUnix(seconds, nanoSeconds int64) {
+	leaf.modTime = time.Unix(seconds, nanoSeconds)
+}
+
+//
 // SetMode set the mode of file.
 //
 func (leaf *Node) SetMode(mode os.FileMode) {

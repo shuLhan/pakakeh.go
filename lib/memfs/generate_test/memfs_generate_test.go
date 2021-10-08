@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/test"
@@ -16,6 +17,8 @@ import (
 var memFS *memfs.MemFS
 
 func TestGeneratePathNode(t *testing.T) {
+	zeroTime := time.Time{}
+
 	expRoot := &memfs.Node{
 		SysPath: "testdata",
 		Path:    "/",
@@ -59,6 +62,7 @@ func TestGeneratePathNode(t *testing.T) {
 
 		childs := got.Childs
 		got.Childs = nil
+		got.SetModTime(zeroTime)
 		test.Assert(t, c.path+": Node", c.exp, got)
 		got.Childs = childs
 	}
