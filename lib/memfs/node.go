@@ -49,7 +49,7 @@ type Node struct {
 	plainv          []byte      // Content of file in plain text.
 	lowerv          []byte      // Content of file in lower cases.
 	off             int64       // The cursor position when doing Read or Seek.
-	GenFuncName     string      // The function name for generated Go code.
+	GenFuncName     string      // The function name for embedded Go code.
 }
 
 //
@@ -69,22 +69,20 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 	var (
 		logp    = "NewNode"
 		sysPath string
-		absPath string
+		relPath string
 	)
 
 	sysPath = filepath.Join(parent.SysPath, fi.Name())
-	absPath = path.Join(parent.Path, fi.Name())
+	relPath = path.Join(parent.Path, fi.Name())
 
 	node = &Node{
 		SysPath: sysPath,
-		Path:    absPath,
+		Path:    relPath,
 		name:    fi.Name(),
 		modTime: fi.ModTime(),
 		mode:    fi.Mode(),
 		size:    fi.Size(),
-		V:       nil,
 		Parent:  parent,
-		Childs:  make([]*Node, 0),
 	}
 	node.generateFuncName(sysPath)
 
@@ -96,12 +94,12 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 	// If the file is symbolic link, update the node size and mode based
 	// on original.
 	if fi.Mode()&os.ModeSymlink != 0 {
-		absPath, err := filepath.EvalSymlinks(sysPath)
+		sysPath, err = filepath.EvalSymlinks(sysPath)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
-		fi, err = os.Lstat(absPath)
+		fi, err = os.Lstat(sysPath)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
