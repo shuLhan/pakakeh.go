@@ -15,3 +15,18 @@ const (
 	FileStateUpdateMode                     // The mode of file is modified.
 	FileStateDeleted                        // The file has been deleted.
 )
+
+// String return the string representation of FileState.
+func (fs FileState) String() (s string) {
+	switch fs {
+	case FileStateCreated:
+		s = "FileStateCreated"
+	case FileStateUpdateContent:
+		s = "FileStateUpdateContent"
+	case FileStateUpdateMode:
+		s = "FileStateUpdateMode"
+	case FileStateDeleted:
+		s = "FileStateDeleted"
+	}
+	return s
+}
