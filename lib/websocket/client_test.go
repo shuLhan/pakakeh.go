@@ -7,6 +7,7 @@ package websocket
 import (
 	"crypto/tls"
 	"net/http"
+	"strings"
 	"sync"
 	"testing"
 
@@ -459,7 +460,14 @@ func TestClientFragmentation(t *testing.T) {
 
 			err := testClient.send(req)
 			if err != nil {
-				t.Fatal(err)
+				// If the client send unmasked frame, the
+				// server may close the connection before we
+				// can test send the second frame.
+				brokenPipe := strings.Contains(err.Error(), "write: broken pipe")
+				if !brokenPipe {
+					t.Fatalf("expecting broken pipe, got %s", err)
+				}
+				break
 			}
 		}
 		wg.Wait()
