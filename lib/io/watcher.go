@@ -19,9 +19,6 @@ import (
 // Watcher is a naive implementation of file event change notification.
 //
 type Watcher struct {
-	// path to file that we want to watch.
-	path string
-
 	// Delay define a duration when the new changes will be fetched from
 	// system.
 	// This field is optional, minimum is 100 millisecond and default is
@@ -64,9 +61,20 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 	dummyParent := &memfs.Node{
 		SysPath: filepath.Dir(path),
 	}
-	dummyParent.Path = filepath.Base(dummyParent.SysPath)
+	dummyParent.Path = dummyParent.SysPath
 
-	node, err := memfs.NewNode(dummyParent, fi, -1)
+	return newWatcher(dummyParent, fi, d, cb)
+}
+
+// newWatcher create and initialize new Watcher like NewWatcher but using
+// parent node.
+func newWatcher(parent *memfs.Node, fi os.FileInfo, d time.Duration, cb WatchCallback) (
+	w *Watcher, err error,
+) {
+	logp := "newWatcher"
+
+	// Create new node based on FileInfo without caching the content.
+	node, err := memfs.NewNode(parent, fi, -1)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -76,7 +84,6 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 	}
 
 	w = &Watcher{
-		path:   path,
 		delay:  d,
 		cb:     cb,
 		ticker: time.NewTicker(d),
@@ -88,27 +95,27 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 	return w, nil
 }
 
+// start fetching new file information every tick.
+// This method run as goroutine and will finish when the file is deleted.
 func (w *Watcher) start() {
 	logp := "Watcher"
 	if debug.Value >= 2 {
-		fmt.Printf("%s: %s: watching for changes\n", logp, w.path)
+		fmt.Printf("%s: %s: watching for changes\n", logp, w.node.SysPath)
 	}
 	for range w.ticker.C {
 		ns := &NodeState{
 			Node: w.node,
 		}
 
-		newInfo, err := os.Stat(w.path)
+		newInfo, err := os.Stat(w.node.SysPath)
 		if err != nil {
-			if !os.IsNotExist(err) {
-				log.Printf("%s: %s", logp, err.Error())
-				continue
-			}
-
 			if debug.Value >= 2 {
 				fmt.Printf("%s: %s: deleted\n", logp, w.node.SysPath)
 			}
-
+			if !os.IsNotExist(err) {
+				log.Printf("%s: %s: %s", logp, w.node.SysPath, err)
+				continue
+			}
 			ns.State = FileStateDeleted
 			w.cb(ns)
 			w.node = nil
@@ -117,7 +124,7 @@ func (w *Watcher) start() {
 
 		if w.node.Mode() != newInfo.Mode() {
 			if debug.Value >= 2 {
-				fmt.Printf("%s: %s: mode modified\n", logp, w.node.SysPath)
+				fmt.Printf("%s: %s: mode updated\n", logp, w.node.SysPath)
 			}
 			ns.State = FileStateUpdateMode
 			w.node.SetMode(newInfo.Mode())
@@ -128,7 +135,7 @@ func (w *Watcher) start() {
 			continue
 		}
 		if debug.Value >= 2 {
-			fmt.Printf("%s: %s: content modified\n", logp, w.node.SysPath)
+			fmt.Printf("%s: %s: content updated\n", logp, w.node.SysPath)
 		}
 
 		w.node.SetModTime(newInfo.ModTime())

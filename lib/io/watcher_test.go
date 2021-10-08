@@ -14,14 +14,15 @@ import (
 )
 
 func TestWatcher(t *testing.T) {
-	var wg sync.WaitGroup
+	var (
+		wg      sync.WaitGroup
+		content = "Write changes"
+	)
 
 	f, err := ioutil.TempFile("", "watcher")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	t.Logf("= Watching: %s\n", f.Name())
 
 	exps := []struct {
 		state FileState
@@ -33,23 +34,23 @@ func TestWatcher(t *testing.T) {
 	}, {
 		state: FileStateUpdateContent,
 		mode:  0700,
-		size:  13,
+		size:  int64(len(content)),
 	}, {
 		state: FileStateDeleted,
 		mode:  0700,
-		size:  13,
+		size:  int64(len(content)),
 	}}
 
 	x := 0
 	_, err = NewWatcher(f.Name(), 150*time.Millisecond, func(ns *NodeState) {
 		if exps[x].state != ns.State {
-			log.Fatalf("Got state %d, want %d\n", ns.State, exps[x].state)
+			log.Fatalf("Got state %s, want %s", ns.State, exps[x].state)
 		}
 		if exps[x].mode != ns.Node.Mode() {
-			log.Fatalf("Got mode %d, want %d\n", ns.Node.Mode(), exps[x].mode)
+			log.Fatalf("Got mode %d, want %d", ns.Node.Mode(), exps[x].mode)
 		}
 		if exps[x].size != ns.Node.Size() {
-			log.Fatalf("Got size %d, want %d\n", ns.Node.Size(), exps[x].size)
+			log.Fatalf("Got size %d, want %d", ns.Node.Size(), exps[x].size)
 		}
 		x++
 		wg.Done()
@@ -67,7 +68,7 @@ func TestWatcher(t *testing.T) {
 	wg.Wait()
 
 	wg.Add(1)
-	_, err = f.WriteString("Write changes")
+	_, err = f.WriteString(content)
 	if err != nil {
 		t.Fatal(err)
 	}
