@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	DefaultGenPackageName = "main"
-	DefaultGenVarName     = "memFS"
-	DefaultGenGoFileName  = "memfs_generate.go"
+	DefaultEmbedPackageName = "main"              // Default package name for GoEmbed().
+	DefaultEmbedVarName     = "memFS"             // Default variable name for GoEmbed().
+	DefaultEmbedGoFileName  = "memfs_generate.go" // Default file output for GoEmbed().
 )
 
 type generateData struct {
@@ -24,7 +24,7 @@ type generateData struct {
 }
 
 //
-// GoGenerate write the tree nodes as Go generated source file.
+// GoEmbed write the tree nodes as Go generated source file.
 //
 // If pkgName is not defined it will be default to "main".
 //
@@ -41,17 +41,17 @@ type generateData struct {
 // For example, if contentEncoding is "gzip" it will compress the content of
 // file using gzip and set Node.ContentEncoding to "gzip".
 //
-func (mfs *MemFS) GoGenerate(pkgName, varName, out, contentEncoding string) (err error) {
-	logp := "MemFS.GoGenerate"
+func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err error) {
+	logp := "MemFS.GoEmbed"
 
 	if len(pkgName) == 0 {
-		pkgName = DefaultGenPackageName
+		pkgName = DefaultEmbedPackageName
 	}
 	if len(varName) == 0 {
-		varName = DefaultGenVarName
+		varName = DefaultEmbedVarName
 	}
 	if len(out) == 0 {
-		out = DefaultGenGoFileName
+		out = DefaultEmbedGoFileName
 	}
 	genData := &generateData{
 		Opts:    mfs.Opts,

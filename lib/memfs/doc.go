@@ -56,7 +56,7 @@
 //
 // The memfs package also support embedding the files into Go generated source
 // file.
-// After we create memfs instance, we call GoGenerate() to dump all directory
+// After we create memfs instance, we call GoEmbed() to dump all directory
 // and files as Go source code.
 //
 // First, define global variable as container for all files later in the same
@@ -68,7 +68,7 @@
 //
 // Second, write the content of memfs instance as Go source code file,
 //
-//	mfs.GoGenerate("mypackage", "myFS", "mypackage/file.go", memfs.EncodingGzip)
+//	mfs.GoEmbed("mypackage", "myFS", "mypackage/file.go", memfs.EncodingGzip)
 //
 // The Go generated file will be defined with package named "mypackage" using
 // global variable "myFS" as container stored in

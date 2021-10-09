@@ -537,7 +537,7 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 // access file "a" we call Get("/a"), not Get("/tmp/a").
 //
 // mount does not have any effect if current directory contains ".go"
-// file generated from GoGenerate().
+// file generated from GoEmbed().
 //
 func (mfs *MemFS) mount() error {
 	if len(mfs.Opts.Root) == 0 {
