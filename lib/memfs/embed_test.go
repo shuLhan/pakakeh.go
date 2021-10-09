@@ -19,7 +19,7 @@ func TestMemFS_GoEmbed(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = mfs.GoEmbed("embed", "", "./embed_test/memfs_embed.go", "")
+	err = mfs.GoEmbed("embed", "", "./embed_test/embed_test.go", "")
 	if err != nil {
 		t.Fatal(err)
 	}
