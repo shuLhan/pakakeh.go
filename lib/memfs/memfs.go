@@ -557,13 +557,9 @@ func (mfs *MemFS) mount() (err error) {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	err = mfs.scanDir(mfs.Root)
+	_, err = mfs.scanDir(mfs.Root)
 	if err != nil {
 		return fmt.Errorf("mount: %w", err)
-	}
-
-	if mfs.Opts.MaxFileSize > 0 {
-		mfs.pruneEmptyDirs()
 	}
 
 	return nil
@@ -571,25 +567,33 @@ func (mfs *MemFS) mount() (err error) {
 
 // scanDir scan the directory node for files and add them to memory file
 // system.
-func (mfs *MemFS) scanDir(node *Node) (err error) {
-	logp := fmt.Sprintf("scanDir %s", node.SysPath)
+// It returns number of childs added to the node or an error.
+func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
+	var (
+		logp    = "scanDir"
+		child   *Node
+		nchilds int
+		f       *os.File
+		fi      os.FileInfo
+		fis     []os.FileInfo
+	)
 
-	f, err := os.Open(node.SysPath)
+	f, err = os.Open(node.SysPath)
 	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
+		return 0, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	fis, err := f.Readdir(0)
+	fis, err = f.Readdir(0)
 	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
+		return 0, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	sort.SliceStable(fis, func(x, y int) bool {
 		return fis[x].Name() < fis[y].Name()
 	})
 
-	for _, fi := range fis {
-		child, err := mfs.AddChild(node, fi)
+	for _, fi = range fis {
+		child, err = mfs.AddChild(node, fi)
 		if err != nil {
 			err = fmt.Errorf("%s: %w", logp, err)
 			goto out
@@ -597,14 +601,20 @@ func (mfs *MemFS) scanDir(node *Node) (err error) {
 		if child == nil {
 			continue
 		}
+		n++
 		if !child.mode.IsDir() {
 			continue
 		}
 
-		err = mfs.scanDir(child)
+		nchilds, err = mfs.scanDir(child)
 		if err != nil {
 			err = fmt.Errorf("%s: %w", logp, err)
 			goto out
+		}
+		if nchilds == 0 {
+			// No childs added, remove it from node.
+			mfs.RemoveChild(node, child)
+			n--
 		}
 	}
 out:
@@ -617,45 +627,7 @@ out:
 		}
 	}
 
-	return err
-}
-
-//
-// pruneEmptyDirs remove node that is directory and does not have childs.
-//
-func (mfs *MemFS) pruneEmptyDirs() {
-	// Sort the paths in descending order first to make empty parent
-	// removed clearly.
-	// Use case:
-	//
-	//	x
-	//	x/y
-	//
-	// If x/y is empty, and x processed first, the x will
-	// not be removed.
-	paths := make([]string, 0, len(mfs.PathNodes.v))
-	for k := range mfs.PathNodes.v {
-		paths = append(paths, k)
-	}
-	sort.SliceStable(paths, func(x, y int) bool {
-		return paths[x] > paths[y]
-	})
-
-	for _, path := range paths {
-		node := mfs.PathNodes.v[path]
-		if !node.mode.IsDir() {
-			continue
-		}
-		if len(node.Childs) != 0 {
-			continue
-		}
-		if node.Parent == nil {
-			continue
-		}
-
-		node.Parent.removeChild(node)
-		delete(mfs.PathNodes.v, path)
-	}
+	return n, err
 }
 
 //
@@ -669,7 +641,7 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 		return nil, err
 	}
 
-	err = mfs.scanDir(mfs.Root)
+	_, err = mfs.scanDir(mfs.Root)
 	if err != nil {
 		return nil, err
 	}
