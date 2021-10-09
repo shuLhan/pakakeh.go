@@ -48,7 +48,7 @@ func ExampleNew() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Content of /index.html: %s", node.V)
+	fmt.Printf("Content of /index.html: %s", node.Content)
 
 	fmt.Printf("List of embedded files: %+v\n", mfs.ListNames())
 

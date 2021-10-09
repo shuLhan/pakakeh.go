@@ -56,8 +56,8 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 		Path:            "{{.Node.Path}}",
 		ContentType:     "{{.Node.ContentType}}",
 		ContentEncoding: "{{.Node.ContentEncoding}}",
-{{- if .Node.V }}
-		V:               []byte("{{range $x, $c := .Node.V}}{{ printf "\\x%02X" $c }}{{end}}"),
+{{- if .Node.Content }}
+		Content:         []byte("{{range $x, $c := .Node.Content}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}
 	}
 	node.SetMode({{printf "%d" .Node.Mode}})

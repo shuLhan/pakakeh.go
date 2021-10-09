@@ -511,8 +511,8 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		err  error
 	)
 
-	if len(node.V) > 0 {
-		body = node.V
+	if len(node.Content) > 0 {
+		body = node.Content
 		size = node.Size()
 	} else {
 		body, err = ioutil.ReadFile(node.SysPath)

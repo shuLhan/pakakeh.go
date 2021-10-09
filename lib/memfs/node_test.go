@@ -15,8 +15,8 @@ import (
 
 func TestNode_Read(t *testing.T) {
 	node := &Node{
-		size: 3,
-		V:    []byte("123"),
+		size:    3,
+		Content: []byte("123"),
 	}
 
 	p := make([]byte, 1)
@@ -166,14 +166,14 @@ func TestNode_Save(t *testing.T) {
 		}
 
 		test.Assert(t, c.desc+": file content", c.content, got)
-		test.Assert(t, c.desc+": node content", c.expContent, node.V)
+		test.Assert(t, c.desc+": node content", c.expContent, node.Content)
 	}
 }
 
 func TestNode_Seek(t *testing.T) {
 	node := &Node{
-		size: 3,
-		V:    []byte("123"),
+		size:    3,
+		Content: []byte("123"),
 	}
 
 	cases := []struct {

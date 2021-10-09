@@ -256,11 +256,11 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 
 	nodes := mfs.PathNodes.Nodes()
 	for _, node := range nodes {
-		if node.mode.IsDir() || len(node.V) == 0 {
+		if node.mode.IsDir() || len(node.Content) == 0 {
 			continue
 		}
 
-		_, err = encoder.Write(node.V)
+		_, err = encoder.Write(node.Content)
 		if err != nil {
 			return fmt.Errorf("memfs.ContentEncode: %w", err)
 		}
@@ -270,11 +270,11 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 			return fmt.Errorf("memfs.ContentEncode: %w", err)
 		}
 
-		node.V = make([]byte, buf.Len())
-		copy(node.V, buf.Bytes())
+		node.Content = make([]byte, buf.Len())
+		copy(node.Content, buf.Bytes())
 
 		node.ContentEncoding = encoding
-		node.size = int64(len(node.V))
+		node.size = int64(len(node.Content))
 
 		buf.Reset()
 

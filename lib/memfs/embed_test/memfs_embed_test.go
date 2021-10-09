@@ -31,7 +31,7 @@ func TestGeneratePathNode(t *testing.T) {
 		SysPath:     filepath.Join("testdata", "exclude", "index-link.html"),
 		Path:        "/exclude/index-link.html",
 		ContentType: "text/html; charset=utf-8",
-		V:           []byte("<html></html>\n"),
+		Content:     []byte("<html></html>\n"),
 	}
 
 	expExcludeIndexHTML.SetMode(0644)

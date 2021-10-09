@@ -14,7 +14,7 @@ func generate_testdata() *memfs.Node {
 		ContentEncoding: "",
 	}
 	node.SetMode(2147484141)
-	node.SetModTimeUnix(1633721789, 884140769)
+	node.SetModTimeUnix(1633772772, 881353676)
 	node.SetName("/")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/direct", generate_testdata_direct))
@@ -64,7 +64,7 @@ func generate_testdata_direct_add_file() *memfs.Node {
 		Path:            "/direct/add/file",
 		ContentType:     "text/plain; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x2E\x0A"),
+		Content:         []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1569586540, 0)
@@ -79,7 +79,7 @@ func generate_testdata_direct_add_file2() *memfs.Node {
 		Path:            "/direct/add/file2",
 		ContentType:     "text/plain; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x20\x32\x2E\x0A"),
+		Content:         []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x20\x32\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1569586540, 0)
@@ -111,7 +111,7 @@ func generate_testdata_exclude_index_link_css() *memfs.Node {
 		Path:            "/exclude/index-link.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
+		Content:         []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -126,7 +126,7 @@ func generate_testdata_exclude_index_link_html() *memfs.Node {
 		Path:            "/exclude/index-link.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
+		Content:         []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1588592345, 0)
@@ -141,7 +141,7 @@ func generate_testdata_exclude_index_link_js() *memfs.Node {
 		Path:            "/exclude/index-link.js",
 		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
+		Content:         []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -173,7 +173,7 @@ func generate_testdata_include_index_css() *memfs.Node {
 		Path:            "/include/index.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
+		Content:         []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -188,7 +188,7 @@ func generate_testdata_include_index_html() *memfs.Node {
 		Path:            "/include/index.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
+		Content:         []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1588592346, 0)
@@ -203,7 +203,7 @@ func generate_testdata_include_index_js() *memfs.Node {
 		Path:            "/include/index.js",
 		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
+		Content:         []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -218,7 +218,7 @@ func generate_testdata_index_css() *memfs.Node {
 		Path:            "/index.css",
 		ContentType:     "text/css; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
+		Content:         []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -233,7 +233,7 @@ func generate_testdata_index_html() *memfs.Node {
 		Path:            "/index.html",
 		ContentType:     "text/html; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
+		Content:         []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1588592347, 0)
@@ -248,7 +248,7 @@ func generate_testdata_index_js() *memfs.Node {
 		Path:            "/index.js",
 		ContentType:     "text/javascript; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
+		Content:         []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -263,7 +263,7 @@ func generate_testdata_plain() *memfs.Node {
 		Path:            "/plain",
 		ContentType:     "text/plain; charset=utf-8",
 		ContentEncoding: "",
-		V:               []byte("\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x70\x6C\x61\x69\x6E\x20\x74\x65\x78\x74\x2E\x0A"),
+		Content:         []byte("\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x70\x6C\x61\x69\x6E\x20\x74\x65\x78\x74\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -288,9 +288,10 @@ func init() {
 	memFS = &memfs.MemFS{
 		PathNodes: memfs.NewPathNode(),
 		Opts: &memfs.Options{
-			Root:        "testdata",
+			Root: "testdata",
 			MaxFileSize: 5242880,
-			Includes:    []string{},
+			Includes: []string{
+			},
 			Excludes: []string{
 				`^\..*`,
 				`.*/node_save$`,

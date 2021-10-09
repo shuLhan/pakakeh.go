@@ -174,7 +174,7 @@ func TestMemFS_AddFile(t *testing.T) {
 			name:        "file",
 			ContentType: "text/plain; charset=utf-8",
 			size:        22,
-			V:           []byte("Test direct add file.\n"),
+			Content:     []byte("Test direct add file.\n"),
 			GenFuncName: "generate_internal_file",
 		},
 	}, {
@@ -187,7 +187,7 @@ func TestMemFS_AddFile(t *testing.T) {
 			name:        "file2",
 			ContentType: "text/plain; charset=utf-8",
 			size:        24,
-			V:           []byte("Test direct add file 2.\n"),
+			Content:     []byte("Test direct add file 2.\n"),
 			GenFuncName: "generate_internal_file2",
 		},
 	}}
@@ -324,7 +324,7 @@ func TestMemFS_Get(t *testing.T) {
 		}
 
 		if got.size <= opts.MaxFileSize {
-			test.Assert(t, c.path+": node.V", c.expV, got.V)
+			test.Assert(t, c.path+": node.Content", c.expV, got.Content)
 		}
 
 		if len(got.ContentType) == 0 && len(c.expContentType) == 0 {

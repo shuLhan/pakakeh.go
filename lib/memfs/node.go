@@ -35,21 +35,22 @@ type Node struct {
 	os.FileInfo
 	http.File
 
-	SysPath         string      // The original file path in system.
-	Path            string      // Absolute file path in memory.
-	name            string      // File name.
-	ContentType     string      // File type per MIME, for example "application/json".
-	ContentEncoding string      // File type encoding, for example "gzip".
-	modTime         time.Time   // ModTime contains file modification time.
-	mode            os.FileMode // File mode.
-	size            int64       // Size of file.
-	V               []byte      // Content of file.
-	Parent          *Node       // Pointer to parent directory.
-	Childs          []*Node     // List of files in directory.
-	plainv          []byte      // Content of file in plain text.
-	lowerv          []byte      // Content of file in lower cases.
-	off             int64       // The cursor position when doing Read or Seek.
-	GenFuncName     string      // The function name for embedded Go code.
+	SysPath         string  // The original file path in system.
+	Path            string  // Absolute file path in memory.
+	Content         []byte  // Content of file.
+	ContentType     string  // File type per MIME, for example "application/json".
+	ContentEncoding string  // File type encoding, for example "gzip".
+	Parent          *Node   // Pointer to parent directory.
+	Childs          []*Node // List of files in directory.
+	GenFuncName     string  // The function name for embedded Go code.
+
+	name    string      // File name.
+	modTime time.Time   // ModTime contains file modification time.
+	mode    os.FileMode // File mode.
+	size    int64       // Size of file.
+	plainv  []byte      // Content of file in plain text.
+	lowerv  []byte      // Content of file in lower cases.
+	off     int64       // The cursor position when doing Read or Seek.
 }
 
 //
@@ -59,7 +60,7 @@ type Node struct {
 // new node.
 //
 // If maxFileSize is greater than zero, the file content and its type will be
-// saved in node as V and ContentType.
+// saved in node as Content and ContentType.
 //
 func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err error) {
 	if fi == nil {
@@ -147,14 +148,14 @@ func (leaf *Node) Close() error {
 //
 func (leaf *Node) Decode() ([]byte, error) {
 	if len(leaf.ContentEncoding) == 0 {
-		leaf.plainv = leaf.V
+		leaf.plainv = leaf.Content
 		return leaf.plainv, nil
 	}
 
 	leaf.plainv = leaf.plainv[:0]
 
 	if leaf.ContentEncoding == EncodingGzip {
-		r, err := gzip.NewReader(bytes.NewReader(leaf.V))
+		r, err := gzip.NewReader(bytes.NewReader(leaf.Content))
 		if err != nil {
 			return nil, err
 		}
@@ -203,10 +204,10 @@ func (leaf *Node) Encode(content []byte) (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 
-		leaf.V = libbytes.Copy(buf.Bytes())
+		leaf.Content = libbytes.Copy(buf.Bytes())
 
 	default:
-		leaf.V = content
+		leaf.Content = content
 	}
 	return nil
 }
@@ -251,7 +252,7 @@ func (leaf *Node) Read(p []byte) (n int, err error) {
 	if leaf.off >= leaf.size {
 		return 0, io.EOF
 	}
-	n = copy(p, leaf.V[leaf.off:])
+	n = copy(p, leaf.Content[leaf.off:])
 	leaf.off += int64(n)
 	return n, nil
 }
@@ -441,7 +442,7 @@ func (leaf *Node) packAsJson(buf *bytes.Buffer, depth int) {
 	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", leaf.size)
 	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", isDir)
 	if !isDir && depth == 0 {
-		content := base64.StdEncoding.EncodeToString(leaf.V)
+		content := base64.StdEncoding.EncodeToString(leaf.Content)
 		_, _ = fmt.Fprintf(buf, `%q:%q,`, "content", content)
 	}
 
@@ -551,11 +552,11 @@ func (leaf *Node) updateContent(maxFileSize int64) (err error) {
 		return nil
 	}
 	if leaf.size == 0 {
-		leaf.V = nil
+		leaf.Content = nil
 		return nil
 	}
 
-	leaf.V, err = ioutil.ReadFile(leaf.SysPath)
+	leaf.Content, err = ioutil.ReadFile(leaf.SysPath)
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			return nil
@@ -572,8 +573,8 @@ func (leaf *Node) updateContentType() error {
 		return nil
 	}
 
-	if len(leaf.V) > 0 {
-		leaf.ContentType = http.DetectContentType(leaf.V)
+	if len(leaf.Content) > 0 {
+		leaf.ContentType = http.DetectContentType(leaf.Content)
 		return nil
 	}
 	if leaf.size == 0 {
