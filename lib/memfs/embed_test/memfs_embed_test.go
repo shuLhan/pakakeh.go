@@ -54,16 +54,18 @@ func TestGeneratePathNode(t *testing.T) {
 	}}
 
 	for _, c := range cases {
+		t.Log(c.path)
+
 		got, err := memFS.Get(c.path)
 		if err != nil {
-			test.Assert(t, c.path+": error", c.expError, err.Error())
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 
 		childs := got.Childs
 		got.Childs = nil
 		got.SetModTime(zeroTime)
-		test.Assert(t, c.path+": Node", c.exp, got)
+		test.Assert(t, "Node", c.exp, got)
 		got.Childs = childs
 	}
 }

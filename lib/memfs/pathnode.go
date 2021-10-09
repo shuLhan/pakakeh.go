@@ -17,7 +17,6 @@ import (
 type PathNode struct {
 	mu sync.Mutex
 	v  map[string]*Node
-	f  map[string]func() *Node
 }
 
 //
@@ -26,7 +25,6 @@ type PathNode struct {
 func NewPathNode() *PathNode {
 	return &PathNode{
 		v: make(map[string]*Node),
-		f: make(map[string]func() *Node),
 	}
 }
 
@@ -42,52 +40,38 @@ func (pn *PathNode) Delete(path string) {
 //
 // Get the node by path, or nil if path is not exist.
 //
-func (pn *PathNode) Get(path string) *Node {
+func (pn *PathNode) Get(path string) (node *Node) {
 	pn.mu.Lock()
 	defer pn.mu.Unlock()
-
-	node, ok := pn.v[path]
-	if ok {
-		return node
+	if pn.v == nil {
+		return nil
 	}
-	if pn.f != nil {
-		f, ok := pn.f[path]
-		if ok {
-			node = f()
-			return node
-		}
-	}
-	return nil
+	return pn.v[path]
 }
 
 func (pn *PathNode) MarshalJSON() ([]byte, error) {
+	var (
+		buf   bytes.Buffer
+		paths = pn.Paths()
+		x     int
+		path  string
+		node  *Node
+	)
+
 	pn.mu.Lock()
-	defer pn.mu.Unlock()
-
-	// Merge the path with function to node into v.
-	for k, fn := range pn.f {
-		pn.v[k] = fn()
-	}
-
-	buf := bytes.Buffer{}
-
-	// Sort the paths.
-	keys := make([]string, 0, len(pn.v))
-	for path := range pn.v {
-		keys = append(keys, path)
-	}
-	sort.Strings(keys)
-
 	_ = buf.WriteByte('{')
-	for x, key := range keys {
+	for x, path = range paths {
 		if x > 0 {
 			_ = buf.WriteByte(',')
 		}
-		fmt.Fprintf(&buf, "%q:", key)
-		node := pn.v[key]
-		node.packAsJson(&buf, 0)
+		fmt.Fprintf(&buf, "%q:", path)
+		node = pn.v[path]
+		if node != nil {
+			node.packAsJson(&buf, 0)
+		}
 	}
 	_ = buf.WriteByte('}')
+	pn.mu.Unlock()
 
 	return buf.Bytes(), nil
 }
@@ -96,8 +80,12 @@ func (pn *PathNode) MarshalJSON() ([]byte, error) {
 // Nodes return all the nodes.
 //
 func (pn *PathNode) Nodes() (nodes []*Node) {
+	var (
+		node *Node
+	)
+
 	pn.mu.Lock()
-	for _, node := range pn.v {
+	for _, node = range pn.v {
 		nodes = append(nodes, node)
 	}
 	pn.mu.Unlock()
@@ -105,13 +93,15 @@ func (pn *PathNode) Nodes() (nodes []*Node) {
 }
 
 //
-// Paths return all the nodes keys as list of path.
+// Paths return all the nodes paths sorted in ascending order.
 //
 func (pn *PathNode) Paths() (paths []string) {
+	var path string
 	pn.mu.Lock()
-	for key := range pn.v {
-		paths = append(paths, key)
+	for path = range pn.v {
+		paths = append(paths, path)
 	}
+	sort.Strings(paths)
 	pn.mu.Unlock()
 	return paths
 }

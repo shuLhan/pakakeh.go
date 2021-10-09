@@ -58,9 +58,8 @@ func TestNew(t *testing.T) {
 		expErr     string
 		expMapKeys []string
 	}{{
-		desc:       "With empty dir",
-		expErr:     "open : no such file or directory",
-		expMapKeys: make([]string, 0),
+		desc:   "With empty dir",
+		expErr: "open : no such file or directory",
 	}, {
 		desc: "With file",
 		opts: Options{

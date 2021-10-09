@@ -17,10 +17,10 @@ const (
 )
 
 type generateData struct {
-	Opts    *Options
-	VarName string
-	Node    *Node
-	Nodes   map[string]*Node
+	Opts     *Options
+	VarName  string
+	Node     *Node
+	PathNode *PathNode
 }
 
 //
@@ -54,9 +54,9 @@ func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err er
 		out = DefaultEmbedGoFileName
 	}
 	genData := &generateData{
-		Opts:    mfs.Opts,
-		VarName: varName,
-		Nodes:   mfs.PathNodes.v,
+		Opts:     mfs.Opts,
+		VarName:  varName,
+		PathNode: mfs.PathNodes,
 	}
 
 	tmpl, err := generateTemplate()
@@ -87,11 +87,11 @@ func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err er
 		// Ignore and delete the file from map if its the output
 		// itself.
 		if strings.HasSuffix(names[x], out) {
-			delete(mfs.PathNodes.v, names[x])
+			mfs.PathNodes.Delete(names[x])
 			continue
 		}
 
-		genData.Node = mfs.PathNodes.v[names[x]]
+		genData.Node = mfs.PathNodes.Get(names[x])
 
 		err = tmpl.ExecuteTemplate(f, templateNameGenerateNode, genData)
 		if err != nil {

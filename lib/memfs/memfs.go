@@ -54,9 +54,7 @@ type MemFS struct {
 //
 func Merge(params ...*MemFS) (merged *MemFS) {
 	merged = &MemFS{
-		PathNodes: &PathNode{
-			v: make(map[string]*Node),
-		},
+		PathNodes: NewPathNode(),
 		Root: &Node{
 			SysPath: "..",
 			Path:    "/",
@@ -69,8 +67,8 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 
 	for _, mfs := range params {
 		for _, child := range mfs.Root.Childs {
-			_, exist := merged.PathNodes.v[child.Path]
-			if exist {
+			gotNode := merged.PathNodes.Get(child.Path)
+			if gotNode != nil {
 				continue
 			}
 			merged.Root.AddChild(child)
@@ -80,9 +78,9 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 			if path == "/" {
 				continue
 			}
-			_, exist := merged.PathNodes.v[path]
-			if !exist {
-				merged.PathNodes.v[path] = mfs.PathNodes.Get(path)
+			gotNode := merged.PathNodes.Get(path)
+			if gotNode == nil {
+				merged.PathNodes.Set(path, mfs.PathNodes.Get(path))
 			}
 		}
 	}
@@ -102,11 +100,8 @@ func New(opts *Options) (mfs *MemFS, err error) {
 	opts.init()
 
 	mfs = &MemFS{
-		PathNodes: &PathNode{
-			v: make(map[string]*Node),
-			f: nil,
-		},
-		Opts: opts,
+		PathNodes: NewPathNode(),
+		Opts:      opts,
 	}
 
 	for _, inc := range opts.Includes {
@@ -326,22 +321,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 // ListNames list all files in memory sorted by name.
 //
 func (mfs *MemFS) ListNames() (paths []string) {
-	paths = make([]string, 0, len(mfs.PathNodes.f)+len(mfs.PathNodes.v))
-
-	for k := range mfs.PathNodes.f {
-		paths = append(paths, k)
-	}
-
-	vpaths := mfs.PathNodes.Paths()
-	for _, k := range vpaths {
-		_, ok := mfs.PathNodes.f[k]
-		if !ok {
-			paths = append(paths, k)
-		}
-	}
-
-	sort.Strings(paths)
-
+	paths = mfs.PathNodes.Paths()
 	return paths
 }
 
@@ -560,10 +540,7 @@ func (mfs *MemFS) mount() (err error) {
 	logp := "mount"
 
 	if mfs.PathNodes == nil {
-		mfs.PathNodes = &PathNode{
-			v: make(map[string]*Node),
-			f: nil,
-		}
+		mfs.PathNodes = NewPathNode()
 	}
 
 	err = mfs.createRoot()

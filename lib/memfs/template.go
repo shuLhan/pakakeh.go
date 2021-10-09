@@ -103,9 +103,10 @@ func init() {
 		},
 	}
 
-{{- range $path, $node := .Nodes}}
+{{- range $x, $path := .PathNode.Paths }}
+	{{- $node := $.PathNode.Get $path }}
 	{{$varname}}.PathNodes.Set("{{$path}}",
-		_{{$varname}}_getNode({{$varname}}, "{{$path}}", {{$node.GenFuncName}}))
+		_{{$varname}}_getNode({{$varname}}, "{{$path}}", {{ $node.GenFuncName }}))
 {{- end}}
 
 	{{$varname}}.Root = {{$varname}}.PathNodes.Get("/")
