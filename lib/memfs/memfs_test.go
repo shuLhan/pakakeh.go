@@ -66,7 +66,7 @@ func TestNew(t *testing.T) {
 		opts: Options{
 			Root: afile,
 		},
-		expErr: fmt.Sprintf("memfs.New: mount: %q must be a directory", afile),
+		expErr: fmt.Sprintf("memfs.New: mount: createRoot %s: must be a directory", afile),
 	}, {
 		desc: "With directory",
 		opts: Options{

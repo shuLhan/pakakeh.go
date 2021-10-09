@@ -461,14 +461,16 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 	}
 }
 
-func (mfs *MemFS) createRoot(f *os.File) error {
-	fi, err := f.Stat()
+func (mfs *MemFS) createRoot() error {
+	logp := fmt.Sprintf("createRoot %s", mfs.Opts.Root)
+
+	fi, err := os.Stat(mfs.Opts.Root)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if !fi.IsDir() {
-		return fmt.Errorf("%q must be a directory", mfs.Opts.Root)
+		return fmt.Errorf("%s: must be a directory", logp)
 	}
 
 	mfs.Root = &Node{
@@ -477,9 +479,6 @@ func (mfs *MemFS) createRoot(f *os.File) error {
 		name:    "/",
 		modTime: fi.ModTime(),
 		mode:    fi.Mode(),
-		size:    0,
-		V:       nil,
-		Parent:  nil,
 	}
 	mfs.Root.generateFuncName(mfs.Opts.Root)
 
@@ -539,7 +538,7 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 // mount does not have any effect if current directory contains ".go"
 // file generated from GoEmbed().
 //
-func (mfs *MemFS) mount() error {
+func (mfs *MemFS) mount() (err error) {
 	if len(mfs.Opts.Root) == 0 {
 		return nil
 	}
@@ -551,18 +550,12 @@ func (mfs *MemFS) mount() error {
 		}
 	}
 
-	f, err := os.Open(mfs.Opts.Root)
+	err = mfs.createRoot()
 	if err != nil {
 		return fmt.Errorf("mount: %w", err)
 	}
 
-	err = mfs.createRoot(f)
-	if err != nil {
-		return fmt.Errorf("mount: %w", err)
-	}
-
-	err = mfs.scanDir(mfs.Root, f)
-	_ = f.Close()
+	err = mfs.scanDir(mfs.Root)
 	if err != nil {
 		return fmt.Errorf("mount: %w", err)
 	}
@@ -574,10 +567,19 @@ func (mfs *MemFS) mount() error {
 	return nil
 }
 
-func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
+// scanDir scan the directory node for files and add them to memory file
+// system.
+func (mfs *MemFS) scanDir(node *Node) (err error) {
+	logp := fmt.Sprintf("scanDir %s", node.SysPath)
+
+	f, err := os.Open(node.SysPath)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
 	fis, err := f.Readdir(0)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	sort.SliceStable(fis, func(x, y int) bool {
@@ -585,30 +587,35 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 	})
 
 	for _, fi := range fis {
-		leaf, err := mfs.AddChild(parent, fi)
+		child, err := mfs.AddChild(node, fi)
 		if err != nil {
-			return err
+			err = fmt.Errorf("%s: %w", logp, err)
+			goto out
 		}
-		if leaf == nil {
+		if child == nil {
 			continue
 		}
-		if !leaf.mode.IsDir() {
+		if !child.mode.IsDir() {
 			continue
 		}
 
-		fdir, err := os.Open(leaf.SysPath)
+		err = mfs.scanDir(child)
 		if err != nil {
-			return err
+			err = fmt.Errorf("%s: %w", logp, err)
+			goto out
 		}
-
-		err = mfs.scanDir(leaf, fdir)
-		_ = fdir.Close()
-		if err != nil {
-			return err
+	}
+out:
+	errClose := f.Close()
+	if errClose != nil {
+		if err == nil {
+			err = fmt.Errorf("%s: %w", logp, errClose)
+		} else {
+			log.Printf("%s: %s", logp, errClose)
 		}
 	}
 
-	return nil
+	return err
 }
 
 //
@@ -660,18 +667,7 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 		return nil, err
 	}
 
-	// Path exist on file system, try to refresh directory.
-	f, err := os.Open(mfs.Root.SysPath)
-	if err != nil {
-		return nil, err
-	}
-
-	err = mfs.scanDir(mfs.Root, f)
-	if err != nil {
-		return nil, err
-	}
-
-	err = f.Close()
+	err = mfs.scanDir(mfs.Root)
 	if err != nil {
 		return nil, err
 	}
