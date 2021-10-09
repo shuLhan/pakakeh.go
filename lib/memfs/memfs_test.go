@@ -66,7 +66,7 @@ func TestNew(t *testing.T) {
 		opts: Options{
 			Root: afile,
 		},
-		expErr: fmt.Sprintf("memfs.New: mount: createRoot %s: must be a directory", afile),
+		expErr: fmt.Sprintf("New: mount: createRoot: %s must be a directory", afile),
 	}, {
 		desc: "With directory",
 		opts: Options{
@@ -139,14 +139,16 @@ func TestNew(t *testing.T) {
 	}}
 
 	for _, c := range cases {
+		t.Log(c.desc)
+
 		mfs, err := New(&c.opts)
 		if err != nil {
-			test.Assert(t, c.desc+": error", c.expErr, err.Error())
+			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
 		gotListNames := mfs.ListNames()
-		test.Assert(t, c.desc+": names", c.expMapKeys, gotListNames)
+		test.Assert(t, "ListNames", c.expMapKeys, gotListNames)
 	}
 }
 
@@ -163,7 +165,7 @@ func TestMemFS_AddFile(t *testing.T) {
 		desc:     "With external path is not exist",
 		intPath:  "internal/file",
 		extPath:  "is/not/exist",
-		expError: "memfs.AddFile: stat is/not/exist: no such file or directory",
+		expError: "AddFile: stat is/not/exist: no such file or directory",
 	}, {
 		desc:    "With file exist",
 		intPath: "internal/file",
@@ -201,9 +203,11 @@ func TestMemFS_AddFile(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		t.Log(c.desc)
+
 		got, err := mfs.AddFile(c.intPath, c.extPath)
 		if err != nil {
-			test.Assert(t, c.desc+": error", c.expError, err.Error())
+			test.Assert(t, "error", c.expError, err.Error())
 			continue
 		}
 

@@ -94,6 +94,8 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 // list of regular expresssion for Including or Excluding files.
 //
 func New(opts *Options) (mfs *MemFS, err error) {
+	logp := "New"
+
 	if opts == nil {
 		opts = &Options{}
 	}
@@ -110,21 +112,21 @@ func New(opts *Options) (mfs *MemFS, err error) {
 	for _, inc := range opts.Includes {
 		re, err := regexp.Compile(inc)
 		if err != nil {
-			return nil, fmt.Errorf("memfs.New: %w", err)
+			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 		mfs.incRE = append(mfs.incRE, re)
 	}
 	for _, exc := range opts.Excludes {
 		re, err := regexp.Compile(exc)
 		if err != nil {
-			return nil, fmt.Errorf("memfs.New: %w", err)
+			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 		mfs.excRE = append(mfs.excRE, re)
 	}
 
 	err = mfs.mount()
 	if err != nil {
-		return nil, fmt.Errorf("memfs.New: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return mfs, nil
@@ -157,13 +159,16 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 // Any directories in the internal path will be generated automatically if its
 // not exist.
 //
-func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
+func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err error) {
 	if len(internalPath) == 0 {
 		return nil, nil
 	}
+
+	logp := "AddFile"
+
 	fi, err := os.Stat(externalPath)
 	if err != nil {
-		return nil, fmt.Errorf("memfs.AddFile: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	var parent *Node
@@ -203,7 +208,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 	}
 
 	path = filepath.Join(path, base)
-	node := &Node{
+	node = &Node{
 		SysPath: externalPath,
 		Path:    path,
 		name:    base,
@@ -216,12 +221,12 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 
 	err = node.updateContent(mfs.Opts.MaxFileSize)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	err = node.updateContentType()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	parent.Childs = append(parent.Childs, node)
@@ -241,6 +246,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (*Node, error) {
 //
 func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 	var (
+		logp    = "ContentEncode"
 		buf     bytes.Buffer
 		encoder io.WriteCloser
 	)
@@ -251,7 +257,7 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 	case EncodingGzip:
 		encoder = gzip.NewWriter(&buf)
 	default:
-		return fmt.Errorf("memfs.ContentEncode: invalid encoding " + encoding)
+		return fmt.Errorf("%s: invalid encoding %q", logp, encoding)
 	}
 
 	nodes := mfs.PathNodes.Nodes()
@@ -262,12 +268,12 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 
 		_, err = encoder.Write(node.Content)
 		if err != nil {
-			return fmt.Errorf("memfs.ContentEncode: %w", err)
+			return fmt.Errorf("%s: %w", logp, err)
 		}
 
 		err = encoder.Close()
 		if err != nil {
-			return fmt.Errorf("memfs.ContentEncode: %w", err)
+			return fmt.Errorf("%s: %w", logp, err)
 		}
 
 		node.Content = make([]byte, buf.Len())
@@ -292,13 +298,14 @@ func (mfs *MemFS) ContentEncode(encoding string) (err error) {
 // will return os.ErrNotExist.
 //
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
+	logp := "Get"
+
 	node = mfs.PathNodes.Get(path)
 	if node == nil {
 		if mfs.Opts.Development {
 			node, err = mfs.refresh(path)
 			if err != nil {
-				log.Println("lib/memfs: Get: " + err.Error())
-				return nil, fmt.Errorf("memfs.Get: %w", os.ErrNotExist)
+				return nil, fmt.Errorf("%s: %s: %w", logp, path, err)
 			}
 			return node, nil
 		}
@@ -308,7 +315,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	if mfs.Opts.Development {
 		err = node.Update(nil, mfs.Opts.MaxFileSize)
 		if err != nil {
-			return nil, fmt.Errorf("memfs.Get: %w", err)
+			return nil, fmt.Errorf("%s: %s: %w", logp, path, err)
 		}
 	}
 
@@ -389,6 +396,11 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		snippetLen = 60
 	}
 
+	var (
+		logp = "Search"
+		err  error
+	)
+
 	tokens := libstrings.ToBytes(words)
 	for x := 0; x < len(tokens); x++ {
 		tokens[x] = bytes.ToLower(tokens[x])
@@ -405,9 +417,9 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		}
 
 		if len(node.lowerv) == 0 {
-			_, err := node.Decode()
+			_, err = node.Decode()
 			if err != nil {
-				log.Printf("memfs.Search: " + err.Error())
+				log.Printf("%s: %s", logp, err)
 				continue
 			}
 
@@ -457,20 +469,20 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 
 	err := node.Update(newInfo, mfs.Opts.MaxFileSize)
 	if err != nil {
-		log.Printf("MemFS.Update: %s", err)
+		log.Printf("Update: %s: %s", node.SysPath, err)
 	}
 }
 
 func (mfs *MemFS) createRoot() error {
-	logp := fmt.Sprintf("createRoot %s", mfs.Opts.Root)
+	logp := "createRoot"
 
 	fi, err := os.Stat(mfs.Opts.Root)
 	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
+		return fmt.Errorf("%s: %s: %w", logp, mfs.Opts.Root, err)
 	}
 
 	if !fi.IsDir() {
-		return fmt.Errorf("%s: must be a directory", logp)
+		return fmt.Errorf("%s: %s must be a directory", logp, mfs.Opts.Root)
 	}
 
 	mfs.Root = &Node{
@@ -545,6 +557,8 @@ func (mfs *MemFS) mount() (err error) {
 		return nil
 	}
 
+	logp := "mount"
+
 	if mfs.PathNodes == nil {
 		mfs.PathNodes = &PathNode{
 			v: make(map[string]*Node),
@@ -554,12 +568,12 @@ func (mfs *MemFS) mount() (err error) {
 
 	err = mfs.createRoot()
 	if err != nil {
-		return fmt.Errorf("mount: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	_, err = mfs.scanDir(mfs.Root)
 	if err != nil {
-		return fmt.Errorf("mount: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return nil
@@ -580,12 +594,12 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 
 	f, err = os.Open(node.SysPath)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", logp, err)
+		return 0, fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 	}
 
 	fis, err = f.Readdir(0)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", logp, err)
+		return 0, fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 	}
 
 	sort.SliceStable(fis, func(x, y int) bool {
@@ -595,7 +609,7 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 	for _, fi = range fis {
 		child, err = mfs.AddChild(node, fi)
 		if err != nil {
-			err = fmt.Errorf("%s: %w", logp, err)
+			err = fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 			goto out
 		}
 		if child == nil {
@@ -608,7 +622,7 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 
 		nchilds, err = mfs.scanDir(child)
 		if err != nil {
-			err = fmt.Errorf("%s: %w", logp, err)
+			err = fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 			goto out
 		}
 		if nchilds == 0 {
@@ -621,9 +635,9 @@ out:
 	errClose := f.Close()
 	if errClose != nil {
 		if err == nil {
-			err = fmt.Errorf("%s: %w", logp, errClose)
+			err = fmt.Errorf("%s: %s: %w", logp, node.SysPath, errClose)
 		} else {
-			log.Printf("%s: %s", logp, errClose)
+			log.Printf("%s: %s: %s", logp, node.SysPath, errClose)
 		}
 	}
 
@@ -634,16 +648,17 @@ out:
 // refresh the tree by rescanning from the root.
 //
 func (mfs *MemFS) refresh(url string) (node *Node, err error) {
+	logp := "refresh"
 	syspath := filepath.Join(mfs.Root.SysPath, url)
 
 	_, err = os.Stat(syspath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %s: %w", logp, url, err)
 	}
 
 	_, err = mfs.scanDir(mfs.Root)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %s: %w", logp, url, err)
 	}
 
 	node = mfs.PathNodes.Get(url)

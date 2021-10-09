@@ -27,7 +27,7 @@ func TestNode_Read(t *testing.T) {
 		p        []byte
 		exp      []byte
 		expN     int
-		expError error
+		expError string
 	}{{
 		desc: "With empty p",
 	}, {
@@ -50,7 +50,7 @@ func TestNode_Read(t *testing.T) {
 		p:        p,
 		exp:      []byte(`3`),
 		expN:     0,
-		expError: io.EOF,
+		expError: "Read: EOF",
 	}}
 
 	for _, c := range cases {
@@ -60,7 +60,10 @@ func TestNode_Read(t *testing.T) {
 
 		test.Assert(t, "p", c.exp, c.p)
 		test.Assert(t, "n", c.expN, n)
-		test.Assert(t, "error", c.expError, err)
+
+		if err != nil {
+			test.Assert(t, "error", c.expError, err.Error())
+		}
 	}
 }
 

@@ -42,7 +42,7 @@ type generateData struct {
 // file using gzip and set Node.ContentEncoding to "gzip".
 //
 func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err error) {
-	logp := "MemFS.GoEmbed"
+	logp := "GoEmbed"
 
 	if len(pkgName) == 0 {
 		pkgName = DefaultEmbedPackageName

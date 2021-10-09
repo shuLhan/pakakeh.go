@@ -152,12 +152,13 @@ func (node *Node) Decode() ([]byte, error) {
 		return node.plainv, nil
 	}
 
+	logp := "Decode"
 	node.plainv = node.plainv[:0]
 
 	if node.ContentEncoding == EncodingGzip {
 		r, err := gzip.NewReader(bytes.NewReader(node.Content))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
 		buf := make([]byte, 1024)
@@ -170,7 +171,7 @@ func (node *Node) Decode() ([]byte, error) {
 				if err == io.EOF {
 					break
 				}
-				return nil, err
+				return nil, fmt.Errorf("%s: %w", logp, err)
 			}
 			buf = buf[0:]
 		}
@@ -183,7 +184,7 @@ func (node *Node) Decode() ([]byte, error) {
 // Encode compress and set the content of Node.
 //
 func (node *Node) Encode(content []byte) (err error) {
-	logp := "Node.Encode"
+	logp := "Encode"
 
 	node.plainv = content
 	node.lowerv = bytes.ToLower(content)
@@ -250,7 +251,7 @@ func (node *Node) Read(p []byte) (n int, err error) {
 		return 0, nil
 	}
 	if node.off >= node.size {
-		return 0, io.EOF
+		return 0, fmt.Errorf("Read: %w", io.EOF)
 	}
 	n = copy(p, node.Content[node.off:])
 	node.off += int64(n)
@@ -300,7 +301,7 @@ func (node *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 //
 func (node *Node) Save(content []byte) (err error) {
 	var (
-		logp = "Node.Save"
+		logp = "Save"
 		f    *os.File
 	)
 	f, err = os.OpenFile(node.SysPath, os.O_WRONLY|os.O_TRUNC, node.mode.Perm())
@@ -414,7 +415,7 @@ func (node *Node) addChild(
 ) (child *Node, err error) {
 	child, err = NewNode(node, fi, maxFileSize)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("addChild: %w", err)
 	}
 
 	child.SysPath = sysPath
@@ -434,19 +435,19 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
 
 	_ = buf.WriteByte('{')
 
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "path", node.Path)
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "name", node.name)
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "content_type", node.ContentType)
-	_, _ = fmt.Fprintf(buf, `%q:%d,`, "mod_time", node.modTime.Unix())
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mode_string", node.mode)
-	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", node.size)
-	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", isDir)
+	_, _ = fmt.Fprintf(buf, `"path":%q,`, node.Path)
+	_, _ = fmt.Fprintf(buf, `"name":%q,`, node.name)
+	_, _ = fmt.Fprintf(buf, `"content_type":%q,`, node.ContentType)
+	_, _ = fmt.Fprintf(buf, `"mod_time":%d,`, node.modTime.Unix())
+	_, _ = fmt.Fprintf(buf, `"mode_string":%q,`, node.mode)
+	_, _ = fmt.Fprintf(buf, `"size":%d,`, node.size)
+	_, _ = fmt.Fprintf(buf, `"is_dir":%t,`, isDir)
 	if !isDir && depth == 0 {
 		content := base64.StdEncoding.EncodeToString(node.Content)
-		_, _ = fmt.Fprintf(buf, `%q:%q,`, "content", content)
+		_, _ = fmt.Fprintf(buf, `"content":%q,`, content)
 	}
 
-	_, _ = fmt.Fprintf(buf, `%q:`, "childs")
+	_, _ = fmt.Fprintf(buf, `"childs":`)
 	if depth == 0 {
 		_ = buf.WriteByte('[')
 		for x, child := range node.Childs {
@@ -512,10 +513,12 @@ func (node *Node) resetAllModTime(t time.Time) {
 // Change on mode will not affect the content of node.
 //
 func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
+	logp := "Update"
+
 	if newInfo == nil {
 		newInfo, err = os.Stat(node.SysPath)
 		if err != nil {
-			return fmt.Errorf("Node.Update: %q: %w", node.Path, err)
+			return fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 		}
 	}
 
@@ -533,7 +536,7 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 
 	err = node.updateContent(maxFileSize)
 	if err != nil {
-		return fmt.Errorf("Node.Update: %q: %w", node.Path, err)
+		return fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 	}
 	return nil
 }
@@ -561,7 +564,7 @@ func (node *Node) updateContent(maxFileSize int64) (err error) {
 		if errors.Is(err, io.EOF) {
 			return nil
 		}
-		return err
+		return fmt.Errorf("updateContent: %w", err)
 	}
 
 	return nil
@@ -584,6 +587,7 @@ func (node *Node) updateContentType() error {
 		return nil
 	}
 
+	logp := "updateContentType"
 	data := make([]byte, 512)
 
 	f, err := os.Open(node.SysPath)
@@ -593,7 +597,7 @@ func (node *Node) updateContentType() error {
 			node.ContentType = defContentType
 			return nil
 		}
-		return err
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	_, err = f.Read(data)
@@ -602,11 +606,12 @@ func (node *Node) updateContentType() error {
 		if errc != nil {
 			panic(errc)
 		}
-		return err
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	err = f.Close()
 	if err != nil {
+		err = fmt.Errorf("%s: %w", logp, err)
 		panic(err)
 	}
 
