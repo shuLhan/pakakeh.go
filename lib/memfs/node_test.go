@@ -7,6 +7,7 @@ package memfs
 import (
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"testing"
 
@@ -117,18 +118,25 @@ func gotFileNames(fis []os.FileInfo) (names []string) {
 }
 
 func TestNode_Save(t *testing.T) {
+	logp := "TestNode_Save"
+
+	tempDir, err := os.MkdirTemp("", logp)
+	if err != nil {
+		t.Fatalf("%s: %s", logp, err)
+	}
+
 	node := &Node{
-		SysPath: "testdata/node_save",
+		SysPath: filepath.Join(tempDir, "node_save"),
 		mode:    0600,
 	}
 
-	err := os.WriteFile(node.SysPath, []byte{}, node.mode.Perm())
+	err = os.WriteFile(node.SysPath, []byte{}, node.mode.Perm())
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Cleanup(func() {
-		_ = os.Remove(node.SysPath)
+		_ = os.RemoveAll(tempDir)
 	})
 
 	cases := []struct {
