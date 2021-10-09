@@ -129,16 +129,16 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 //
 // AddChild add the other node as child of this node.
 //
-func (leaf *Node) AddChild(child *Node) {
-	leaf.Childs = append(leaf.Childs, child)
-	child.Parent = leaf
+func (node *Node) AddChild(child *Node) {
+	node.Childs = append(node.Childs, child)
+	child.Parent = node
 }
 
 //
 // Close reset the offset position back to zero.
 //
-func (leaf *Node) Close() error {
-	leaf.off = 0
+func (node *Node) Close() error {
+	node.off = 0
 	return nil
 }
 
@@ -146,16 +146,16 @@ func (leaf *Node) Close() error {
 // Decode the contents of node (for example, uncompress with gzip) and return
 // it.
 //
-func (leaf *Node) Decode() ([]byte, error) {
-	if len(leaf.ContentEncoding) == 0 {
-		leaf.plainv = leaf.Content
-		return leaf.plainv, nil
+func (node *Node) Decode() ([]byte, error) {
+	if len(node.ContentEncoding) == 0 {
+		node.plainv = node.Content
+		return node.plainv, nil
 	}
 
-	leaf.plainv = leaf.plainv[:0]
+	node.plainv = node.plainv[:0]
 
-	if leaf.ContentEncoding == EncodingGzip {
-		r, err := gzip.NewReader(bytes.NewReader(leaf.Content))
+	if node.ContentEncoding == EncodingGzip {
+		r, err := gzip.NewReader(bytes.NewReader(node.Content))
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +164,7 @@ func (leaf *Node) Decode() ([]byte, error) {
 		for {
 			n, err := r.Read(buf)
 			if n > 0 {
-				leaf.plainv = append(leaf.plainv, buf[:n]...)
+				node.plainv = append(node.plainv, buf[:n]...)
 			}
 			if err != nil {
 				if err == io.EOF {
@@ -176,19 +176,19 @@ func (leaf *Node) Decode() ([]byte, error) {
 		}
 	}
 
-	return leaf.plainv, nil
+	return node.plainv, nil
 }
 
 //
 // Encode compress and set the content of Node.
 //
-func (leaf *Node) Encode(content []byte) (err error) {
+func (node *Node) Encode(content []byte) (err error) {
 	logp := "Node.Encode"
 
-	leaf.plainv = content
-	leaf.lowerv = bytes.ToLower(content)
+	node.plainv = content
+	node.lowerv = bytes.ToLower(content)
 
-	switch leaf.ContentEncoding {
+	switch node.ContentEncoding {
 	case EncodingGzip:
 		var buf bytes.Buffer
 		gz := gzip.NewWriter(&buf)
@@ -204,16 +204,16 @@ func (leaf *Node) Encode(content []byte) (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 
-		leaf.Content = libbytes.Copy(buf.Bytes())
+		node.Content = libbytes.Copy(buf.Bytes())
 
 	default:
-		leaf.Content = content
+		node.Content = content
 	}
 	return nil
 }
 
-func (leaf *Node) IsDir() bool {
-	return leaf.mode.IsDir()
+func (node *Node) IsDir() bool {
+	return node.mode.IsDir()
 }
 
 //
@@ -222,38 +222,38 @@ func (leaf *Node) IsDir() bool {
 // otherwise it will return the node with list of childs, but not including
 // childs of childs.
 //
-func (leaf *Node) MarshalJSON() ([]byte, error) {
+func (node *Node) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	leaf.packAsJson(&buf, 0)
+	node.packAsJson(&buf, 0)
 	return buf.Bytes(), nil
 }
 
-func (leaf *Node) ModTime() time.Time {
-	return leaf.modTime
+func (node *Node) ModTime() time.Time {
+	return node.modTime
 }
 
-func (leaf *Node) Mode() os.FileMode {
-	return leaf.mode
+func (node *Node) Mode() os.FileMode {
+	return node.mode
 }
 
-func (leaf *Node) Name() string {
-	return leaf.name
+func (node *Node) Name() string {
+	return node.name
 }
 
 //
 // Read the content of node into p.
 //
-func (leaf *Node) Read(p []byte) (n int, err error) {
+func (node *Node) Read(p []byte) (n int, err error) {
 	// Implementations of Read are discouraged from returning a zero byte
 	// count with a nil error, except when len(p) == 0.
 	if len(p) == 0 {
 		return 0, nil
 	}
-	if leaf.off >= leaf.size {
+	if node.off >= node.size {
 		return 0, io.EOF
 	}
-	n = copy(p, leaf.Content[leaf.off:])
-	leaf.off += int64(n)
+	n = copy(p, node.Content[node.off:])
+	node.off += int64(n)
 	return n, nil
 }
 
@@ -263,34 +263,34 @@ func (leaf *Node) Read(p []byte) (n int, err error) {
 // in directory order.
 // Subsequent calls on the same file will yield further FileInfos.
 //
-func (leaf *Node) Readdir(count int) (fis []os.FileInfo, err error) {
-	if !leaf.IsDir() {
+func (node *Node) Readdir(count int) (fis []os.FileInfo, err error) {
+	if !node.IsDir() {
 		return nil, nil
 	}
-	if count <= 0 || count >= len(leaf.Childs) {
-		fis = make([]os.FileInfo, len(leaf.Childs))
-		for x := 0; x < len(leaf.Childs); x++ {
-			fis[x] = leaf.Childs[x]
+	if count <= 0 || count >= len(node.Childs) {
+		fis = make([]os.FileInfo, len(node.Childs))
+		for x := 0; x < len(node.Childs); x++ {
+			fis[x] = node.Childs[x]
 		}
-		leaf.off = 0
+		node.off = 0
 		return fis, nil
 	}
-	if leaf.off >= int64(len(leaf.Childs)) {
+	if node.off >= int64(len(node.Childs)) {
 		return nil, nil
 	}
 
-	count += int(leaf.off)
-	if count >= len(leaf.Childs) {
-		count = len(leaf.Childs)
+	count += int(node.off)
+	if count >= len(node.Childs) {
+		count = len(node.Childs)
 	}
 
-	fis = make([]os.FileInfo, 0, count-int(leaf.off))
+	fis = make([]os.FileInfo, 0, count-int(node.off))
 
-	for _, child := range leaf.Childs[leaf.off:count] {
+	for _, child := range node.Childs[node.off:count] {
 		fis = append(fis, child)
 	}
 
-	leaf.off = int64(count)
+	node.off = int64(count)
 
 	return fis, nil
 }
@@ -298,12 +298,12 @@ func (leaf *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 //
 // Save the content to file system and update the content of Node.
 //
-func (leaf *Node) Save(content []byte) (err error) {
+func (node *Node) Save(content []byte) (err error) {
 	var (
 		logp = "Node.Save"
 		f    *os.File
 	)
-	f, err = os.OpenFile(leaf.SysPath, os.O_WRONLY|os.O_TRUNC, leaf.mode.Perm())
+	f, err = os.OpenFile(node.SysPath, os.O_WRONLY|os.O_TRUNC, node.mode.Perm())
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -315,13 +315,13 @@ func (leaf *Node) Save(content []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
-	err = leaf.Encode(content)
+	err = node.Encode(content)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	leaf.modTime = time.Now()
-	leaf.size = int64(len(content))
+	node.modTime = time.Now()
+	node.size = int64(len(content))
 	return nil
 }
 
@@ -332,124 +332,124 @@ func (leaf *Node) Save(content []byte) (err error) {
 // end. Seek returns the new offset relative to the start of the file and an
 // error, if any.
 //
-func (leaf *Node) Seek(offset int64, whence int) (int64, error) {
+func (node *Node) Seek(offset int64, whence int) (int64, error) {
 	switch whence {
 	case io.SeekStart:
 	case io.SeekCurrent:
-		offset += leaf.off
+		offset += node.off
 	case io.SeekEnd:
-		offset += leaf.size
+		offset += node.size
 	default:
 		return 0, errWhence
 	}
 	if offset < 0 {
 		return 0, errOffset
 	}
-	leaf.off = offset
-	return leaf.off, nil
+	node.off = offset
+	return node.off, nil
 }
 
 //
 // SetModTime set the file modification time.
 //
-func (leaf *Node) SetModTime(modTime time.Time) {
-	leaf.modTime = modTime
+func (node *Node) SetModTime(modTime time.Time) {
+	node.modTime = modTime
 }
 
 //
 // SetModTimeUnix set the file modification time using seconds and nanoseconds
 // since January 1, 1970 UTC.
 //
-func (leaf *Node) SetModTimeUnix(seconds, nanoSeconds int64) {
-	leaf.modTime = time.Unix(seconds, nanoSeconds)
+func (node *Node) SetModTimeUnix(seconds, nanoSeconds int64) {
+	node.modTime = time.Unix(seconds, nanoSeconds)
 }
 
 //
 // SetMode set the mode of file.
 //
-func (leaf *Node) SetMode(mode os.FileMode) {
-	leaf.mode = mode
+func (node *Node) SetMode(mode os.FileMode) {
+	node.mode = mode
 }
 
 //
 // SetName set the name of file.
 //
-func (leaf *Node) SetName(name string) {
-	leaf.name = name
+func (node *Node) SetName(name string) {
+	node.name = name
 }
 
 //
 // SetSize set the file size.
 //
-func (leaf *Node) SetSize(size int64) {
-	leaf.size = size
+func (node *Node) SetSize(size int64) {
+	node.size = size
 }
 
 //
 // Size return the file size information.
 //
-func (leaf *Node) Size() int64 {
-	return leaf.size
+func (node *Node) Size() int64 {
+	return node.size
 }
 
 //
 // Stat return the file information.
 //
-func (leaf *Node) Stat() (os.FileInfo, error) {
-	return leaf, nil
+func (node *Node) Stat() (os.FileInfo, error) {
+	return node, nil
 }
 
 //
 // Sys return the underlying data source (can return nil).
 //
-func (leaf *Node) Sys() interface{} {
-	return leaf
+func (node *Node) Sys() interface{} {
+	return node
 }
 
 //
 // addChild add new node as sub-directory or file of this node.
 //
-func (leaf *Node) addChild(
+func (node *Node) addChild(
 	sysPath string, fi os.FileInfo, maxFileSize int64,
 ) (child *Node, err error) {
-	child, err = NewNode(leaf, fi, maxFileSize)
+	child, err = NewNode(node, fi, maxFileSize)
 	if err != nil {
 		return nil, err
 	}
 
 	child.SysPath = sysPath
 
-	leaf.Childs = append(leaf.Childs, child)
+	node.Childs = append(node.Childs, child)
 
 	return child, nil
 }
 
-func (leaf *Node) generateFuncName(in string) {
+func (node *Node) generateFuncName(in string) {
 	syspath := string(libbytes.InReplace([]byte(in), []byte(ascii.LettersNumber), '_'))
-	leaf.GenFuncName = "generate_" + syspath
+	node.GenFuncName = "generate_" + syspath
 }
 
-func (leaf *Node) packAsJson(buf *bytes.Buffer, depth int) {
-	isDir := leaf.IsDir()
+func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
+	isDir := node.IsDir()
 
 	_ = buf.WriteByte('{')
 
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "path", leaf.Path)
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "name", leaf.name)
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "content_type", leaf.ContentType)
-	_, _ = fmt.Fprintf(buf, `%q:%d,`, "mod_time", leaf.modTime.Unix())
-	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mode_string", leaf.mode)
-	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", leaf.size)
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "path", node.Path)
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "name", node.name)
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "content_type", node.ContentType)
+	_, _ = fmt.Fprintf(buf, `%q:%d,`, "mod_time", node.modTime.Unix())
+	_, _ = fmt.Fprintf(buf, `%q:%q,`, "mode_string", node.mode)
+	_, _ = fmt.Fprintf(buf, `%q:%d,`, "size", node.size)
 	_, _ = fmt.Fprintf(buf, `%q:%t,`, "is_dir", isDir)
 	if !isDir && depth == 0 {
-		content := base64.StdEncoding.EncodeToString(leaf.Content)
+		content := base64.StdEncoding.EncodeToString(node.Content)
 		_, _ = fmt.Fprintf(buf, `%q:%q,`, "content", content)
 	}
 
 	_, _ = fmt.Fprintf(buf, `%q:`, "childs")
 	if depth == 0 {
 		_ = buf.WriteByte('[')
-		for x, child := range leaf.Childs {
+		for x, child := range node.Childs {
 			if x > 0 {
 				_ = buf.WriteByte(',')
 			}
@@ -466,16 +466,16 @@ func (leaf *Node) packAsJson(buf *bytes.Buffer, depth int) {
 // removeChild remove a children node from list.  If child is not exist, it
 // will return nil.
 //
-func (leaf *Node) removeChild(child *Node) *Node {
-	for x := 0; x < len(leaf.Childs); x++ {
-		if leaf.Childs[x] != child {
+func (node *Node) removeChild(child *Node) *Node {
+	for x := 0; x < len(node.Childs); x++ {
+		if node.Childs[x] != child {
 			continue
 		}
 
-		copy(leaf.Childs[x:], leaf.Childs[x+1:])
-		n := len(leaf.Childs)
-		leaf.Childs[n-1] = nil
-		leaf.Childs = leaf.Childs[:n-1]
+		copy(node.Childs[x:], node.Childs[x+1:])
+		n := len(node.Childs)
+		node.Childs[n-1] = nil
+		node.Childs = node.Childs[:n-1]
 
 		child.Parent = nil
 		child.Childs = nil
@@ -490,9 +490,9 @@ func (leaf *Node) removeChild(child *Node) *Node {
 // resetAllModTime set the modTime of node and its child to the t.
 // This method is only intended for testing.
 //
-func (leaf *Node) resetAllModTime(t time.Time) {
-	leaf.modTime = t
-	for _, c := range leaf.Childs {
+func (node *Node) resetAllModTime(t time.Time) {
+	node.modTime = t
+	for _, c := range node.Childs {
 		c.resetAllModTime(t)
 	}
 }
@@ -511,29 +511,29 @@ func (leaf *Node) resetAllModTime(t time.Time) {
 // mode or change on content (size and modtime).
 // Change on mode will not affect the content of node.
 //
-func (leaf *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
+func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	if newInfo == nil {
-		newInfo, err = os.Stat(leaf.SysPath)
+		newInfo, err = os.Stat(node.SysPath)
 		if err != nil {
-			return fmt.Errorf("Node.Update: %q: %w", leaf.Path, err)
+			return fmt.Errorf("Node.Update: %q: %w", node.Path, err)
 		}
 	}
 
-	if leaf.mode != newInfo.Mode() {
-		leaf.mode = newInfo.Mode()
+	if node.mode != newInfo.Mode() {
+		node.mode = newInfo.Mode()
 		return nil
 	}
 
-	leaf.modTime = newInfo.ModTime()
-	leaf.size = newInfo.Size()
+	node.modTime = newInfo.ModTime()
+	node.size = newInfo.Size()
 
 	if newInfo.IsDir() {
 		return nil
 	}
 
-	err = leaf.updateContent(maxFileSize)
+	err = node.updateContent(maxFileSize)
 	if err != nil {
-		return fmt.Errorf("Node.Update: %q: %w", leaf.Path, err)
+		return fmt.Errorf("Node.Update: %q: %w", node.Path, err)
 	}
 	return nil
 }
@@ -541,22 +541,22 @@ func (leaf *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 //
 // updateContent read the content of file.
 //
-func (leaf *Node) updateContent(maxFileSize int64) (err error) {
+func (node *Node) updateContent(maxFileSize int64) (err error) {
 	if maxFileSize < 0 {
 		// Negative maxFileSize means content will not be read.
 		return nil
 	} else if maxFileSize == 0 {
 		maxFileSize = defaultMaxFileSize
 	}
-	if leaf.size > maxFileSize {
+	if node.size > maxFileSize {
 		return nil
 	}
-	if leaf.size == 0 {
-		leaf.Content = nil
+	if node.size == 0 {
+		node.Content = nil
 		return nil
 	}
 
-	leaf.Content, err = ioutil.ReadFile(leaf.SysPath)
+	node.Content, err = ioutil.ReadFile(node.SysPath)
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			return nil
@@ -567,30 +567,30 @@ func (leaf *Node) updateContent(maxFileSize int64) (err error) {
 	return nil
 }
 
-func (leaf *Node) updateContentType() error {
-	leaf.ContentType = mime.TypeByExtension(path.Ext(leaf.name))
-	if len(leaf.ContentType) > 0 {
+func (node *Node) updateContentType() error {
+	node.ContentType = mime.TypeByExtension(path.Ext(node.name))
+	if len(node.ContentType) > 0 {
 		return nil
 	}
 
-	if len(leaf.Content) > 0 {
-		leaf.ContentType = http.DetectContentType(leaf.Content)
+	if len(node.Content) > 0 {
+		node.ContentType = http.DetectContentType(node.Content)
 		return nil
 	}
-	if leaf.size == 0 {
+	if node.size == 0 {
 		// The actual file size is zero, we set the content type to
 		// default.
-		leaf.ContentType = defContentType
+		node.ContentType = defContentType
 		return nil
 	}
 
 	data := make([]byte, 512)
 
-	f, err := os.Open(leaf.SysPath)
+	f, err := os.Open(node.SysPath)
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			// File is empty.
-			leaf.ContentType = defContentType
+			node.ContentType = defContentType
 			return nil
 		}
 		return err
@@ -610,7 +610,7 @@ func (leaf *Node) updateContentType() error {
 		panic(err)
 	}
 
-	leaf.ContentType = http.DetectContentType(data)
+	node.ContentType = http.DetectContentType(data)
 
 	return nil
 }
