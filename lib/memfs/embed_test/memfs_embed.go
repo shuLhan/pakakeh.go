@@ -273,8 +273,8 @@ func generate_testdata_plain() *memfs.Node {
 }
 
 //
-// _getNode is internal function to minimize duplicate node created on
-// Node.AddChild() and on generatedPathNode.Set().
+// _memFS_getNode is internal function to minimize duplicate node
+// created on Node.AddChild() and on generatedPathNode.Set().
 //
 func _memFS_getNode(mfs *memfs.MemFS, path string, fn func() *memfs.Node) (node *memfs.Node) {
 	node = mfs.PathNodes.Get(path)
