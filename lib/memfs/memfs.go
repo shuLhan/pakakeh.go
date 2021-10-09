@@ -615,7 +615,25 @@ func (mfs *MemFS) scanDir(parent *Node, f *os.File) error {
 // pruneEmptyDirs remove node that is directory and does not have childs.
 //
 func (mfs *MemFS) pruneEmptyDirs() {
-	for k, node := range mfs.PathNodes.v {
+	// Sort the paths in descending order first to make empty parent
+	// removed clearly.
+	// Use case:
+	//
+	//	x
+	//	x/y
+	//
+	// If x/y is empty, and x processed first, the x will
+	// not be removed.
+	paths := make([]string, 0, len(mfs.PathNodes.v))
+	for k := range mfs.PathNodes.v {
+		paths = append(paths, k)
+	}
+	sort.SliceStable(paths, func(x, y int) bool {
+		return paths[x] > paths[y]
+	})
+
+	for _, path := range paths {
+		node := mfs.PathNodes.v[path]
 		if !node.mode.IsDir() {
 			continue
 		}
@@ -627,7 +645,7 @@ func (mfs *MemFS) pruneEmptyDirs() {
 		}
 
 		node.Parent.removeChild(node)
-		delete(mfs.PathNodes.v, k)
+		delete(mfs.PathNodes.v, path)
 	}
 }
 
