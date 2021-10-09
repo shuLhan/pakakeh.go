@@ -112,7 +112,7 @@ func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
 			dw.mapSubdirs(child)
 			continue
 		}
-		_, err = newWatcher(node, node.FileInfo, dw.Delay, dw.Callback)
+		_, err = newWatcher(node, child, dw.Delay, dw.Callback)
 		if err != nil {
 			log.Printf("%s: %q: %s", logp, child.SysPath, err)
 		}
