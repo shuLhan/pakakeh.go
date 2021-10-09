@@ -41,6 +41,9 @@ func TestDirWatcher(t *testing.T) {
 		state: FileStateCreated,
 		path:  "/",
 	}, {
+		state: FileStateCreated,
+		path:  "/assets",
+	}, {
 		state: FileStateUpdateMode,
 		path:  "/",
 	}, {
@@ -108,9 +111,11 @@ func TestDirWatcher(t *testing.T) {
 	wg.Wait()
 
 	// Create the watched directory back with sub directory
+	// This will trigger two FileStateCreated events, one for "/" and one
+	// for "/assets".
 	dirAssets := filepath.Join(dir, "assets")
 	t.Logf("Re-create root directory %q ...\n", dirAssets)
-	wg.Add(1)
+	wg.Add(2)
 	err = os.MkdirAll(dirAssets, 0770)
 	if err != nil {
 		t.Fatal(err)

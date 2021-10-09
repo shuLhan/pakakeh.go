@@ -333,6 +333,7 @@ func (dw *DirWatcher) start() {
 		}
 		if dw.fs == nil {
 			dw.onRootCreated()
+			dw.onContentChange(dw.root)
 			continue
 		}
 		if dw.root.Mode() != newDirInfo.Mode() {
