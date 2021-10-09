@@ -500,34 +500,36 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 			return false
 		}
 	}
-	if len(mfs.incRE) > 0 {
-		for _, re := range mfs.incRE {
-			if re.MatchString(sysPath) {
-				return true
-			}
-		}
-		if mode&os.ModeSymlink == 0 {
-			return mode.IsDir()
-		}
+	if len(mfs.incRE) == 0 {
+		// No filter defined, default to always included.
+		return true
+	}
 
-		// File is symlink, get the real FileInfo to check if its
-		// directory or not.
-		absPath, err := filepath.EvalSymlinks(sysPath)
-		if err != nil {
-			return false
-		}
-
-		fi, err := os.Lstat(absPath)
-		if err != nil {
-			return false
-		}
-		if fi.IsDir() {
+	for _, re := range mfs.incRE {
+		if re.MatchString(sysPath) {
 			return true
 		}
+	}
+	if mode&os.ModeSymlink == 0 {
+		// If file is NOT a symlink andits a directory, include it.
+		return mode.IsDir()
+	}
+
+	// File is symlink, get the real FileInfo to check if its
+	// directory or not.
+	absPath, err := filepath.EvalSymlinks(sysPath)
+	if err != nil {
 		return false
 	}
 
-	return true
+	fi, err := os.Lstat(absPath)
+	if err != nil {
+		return false
+	}
+	if fi.IsDir() {
+		return true
+	}
+	return false
 }
 
 //
