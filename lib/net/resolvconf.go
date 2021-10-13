@@ -165,7 +165,7 @@ func (rc *ResolvConf) parse(reader *libio.Reader) {
 			continue
 		}
 
-		ascii.ToLower(&tok)
+		tok = ascii.ToLower(tok)
 		v := string(tok)
 		switch v {
 		case "domain":

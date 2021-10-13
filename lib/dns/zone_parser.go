@@ -178,7 +178,7 @@ func (m *zoneParser) parse() (err error) {
 				m.lineno, m.reader.Rest())
 		}
 
-		ascii.ToUpper(&tok)
+		tok = ascii.ToUpper(tok)
 		stok := string(tok)
 
 		switch stok {
@@ -272,7 +272,7 @@ func (m *zoneParser) parseDirectiveInclude() (err error) {
 
 	var incfile, dname string
 
-	ascii.ToLower(&tok)
+	tok = ascii.ToLower(tok)
 	incfile = string(tok)
 
 	// check if include followed by domain name.
@@ -330,7 +330,7 @@ func (m *zoneParser) parseDirectiveTTL() (err error) {
 		return fmt.Errorf("line %d: empty $ttl directive", m.lineno)
 	}
 
-	ascii.ToLower(&tok)
+	tok = ascii.ToLower(tok)
 	stok := string(tok)
 
 	m.ttl, err = parseTTL(tok, stok)
@@ -462,7 +462,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 		}
 
 		orgtok := libbytes.Copy(tok)
-		ascii.ToUpper(&tok)
+		tok = ascii.ToUpper(tok)
 		stok = string(tok)
 
 		switch m.flag {
@@ -630,7 +630,7 @@ func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
-	ascii.ToLower(&tok)
+	tok = ascii.ToLower(tok)
 
 	rrSOA := &RDataSOA{
 		MName: m.generateDomainName(tok),
@@ -648,7 +648,7 @@ func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		return fmt.Errorf("line %d: Invalid SOA RNAME '%s'", m.lineno, tok)
 	}
 
-	ascii.ToLower(&tok)
+	tok = ascii.ToLower(tok)
 	rrSOA.RName = m.generateDomainName(tok)
 
 	var v int64
@@ -956,7 +956,7 @@ out:
 }
 
 func (m *zoneParser) generateDomainName(dname []byte) (out string) {
-	ascii.ToLower(&dname)
+	dname = ascii.ToLower(dname)
 	switch {
 	case dname[0] == '@':
 		out = m.origin

@@ -126,20 +126,14 @@ func ExampleRandom() {
 
 func ExampleToLower() {
 	in := []byte("@ABCDEFGhijklmnoPQRSTUVWxyz{12345678")
-
-	ToLower(&in)
-
-	fmt.Println(string(in))
+	fmt.Printf("%s\n", ToLower(in))
 	// Output:
 	// @abcdefghijklmnopqrstuvwxyz{12345678
 }
 
 func ExampleToUpper() {
 	in := []byte("@ABCDEFGhijklmnoPQRSTUVWxyz{12345678")
-
-	ToUpper(&in)
-
-	fmt.Println(string(in))
+	fmt.Printf("%s\n", ToUpper(in))
 	// Output:
 	// @ABCDEFGHIJKLMNOPQRSTUVWXYZ{12345678
 }

@@ -110,25 +110,29 @@ func Random(source []byte, n int) []byte {
 }
 
 //
-// ToLower convert slice of ASCII characters to lower cases, in places.
+// ToLower convert slice of ASCII characters to lower cases, in places, which
+// means it will return the same slice instead of creating new one.
 //
-func ToLower(data *[]byte) {
-	for x := 0; x < len(*data); x++ {
-		if (*data)[x] < 'A' || (*data)[x] > 'Z' {
+func ToLower(data []byte) []byte {
+	for x := 0; x < len(data); x++ {
+		if data[x] < 'A' || data[x] > 'Z' {
 			continue
 		}
-		(*data)[x] += 32
+		data[x] += 32
 	}
+	return data
 }
 
 //
-// ToUpper convert slice of ASCII characters to upper cases, in places.
+// ToUpper convert slice of ASCII characters to upper cases, in places, which
+// means it will return the same slice instead of creating new one.
 //
-func ToUpper(data *[]byte) {
-	for x := 0; x < len(*data); x++ {
-		if (*data)[x] < 'a' || (*data)[x] > 'z' {
+func ToUpper(data []byte) []byte {
+	for x := 0; x < len(data); x++ {
+		if data[x] < 'a' || data[x] > 'z' {
 			continue
 		}
-		(*data)[x] -= 32
+		data[x] -= 32
 	}
+	return data
 }

@@ -109,7 +109,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 		return nil
 	}
 
-	ascii.ToLower(&hname)
+	hname = ascii.ToLower(hname)
 
 	rr := ResourceRecord{
 		Name:  string(hname),
@@ -237,7 +237,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 		d  int
 	)
 
-	ascii.ToLower(&dname)
+	dname = ascii.ToLower(dname)
 	msg.dname = string(dname)
 
 	if doCompress {
