@@ -79,7 +79,7 @@ func IsDigits(data []byte) bool {
 // return false.
 //
 func IsHex(b byte) bool {
-	if (b >= '1' && b <= '9') || (b >= 'a' && b <= 'f') || (b >= 'A' && b <= 'F') {
+	if (b >= '0' && b <= '9') || (b >= 'a' && b <= 'f') || (b >= 'A' && b <= 'F') {
 		return true
 	}
 	return false
