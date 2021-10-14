@@ -183,7 +183,7 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 	lenmsg := len(msg)
 	packet := make([]byte, 0, 2+lenmsg)
 
-	libbytes.AppendUint16(&packet, uint16(lenmsg))
+	packet = libbytes.AppendUint16(packet, uint16(lenmsg))
 	packet = append(packet, msg...)
 
 	n, err = cl.conn.Write(packet)

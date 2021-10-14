@@ -13,39 +13,43 @@ import (
 )
 
 //
-// AppendInt16 into slice of byte.
+// AppendInt16 append an int16 value into slice of byte.
 //
-func AppendInt16(data *[]byte, v int16) {
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
+func AppendInt16(data []byte, v int16) []byte {
+	data = append(data, byte(v>>8))
+	data = append(data, byte(v))
+	return data
 }
 
 //
-// AppendInt32 into slice of byte.
+// AppendInt32 append an int32 value into slice of byte.
 //
-func AppendInt32(data *[]byte, v int32) {
-	*data = append(*data, byte(v>>24))
-	*data = append(*data, byte(v>>16))
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
+func AppendInt32(data []byte, v int32) []byte {
+	data = append(data, byte(v>>24))
+	data = append(data, byte(v>>16))
+	data = append(data, byte(v>>8))
+	data = append(data, byte(v))
+	return data
 }
 
 //
-// AppendUint16 into slice of byte.
+// AppendUint16 append an uint16 value into slice of byte.
 //
-func AppendUint16(data *[]byte, v uint16) {
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
+func AppendUint16(data []byte, v uint16) []byte {
+	data = append(data, byte(v>>8))
+	data = append(data, byte(v))
+	return data
 }
 
 //
-// AppendUint32 into slice of byte.
+// AppendUint32 append an uint32 value into slice of byte.
 //
-func AppendUint32(data *[]byte, v uint32) {
-	*data = append(*data, byte(v>>24))
-	*data = append(*data, byte(v>>16))
-	*data = append(*data, byte(v>>8))
-	*data = append(*data, byte(v))
+func AppendUint32(data []byte, v uint32) []byte {
+	data = append(data, byte(v>>24))
+	data = append(data, byte(v>>16))
+	data = append(data, byte(v>>8))
+	data = append(data, byte(v))
+	return data
 }
 
 //

@@ -332,8 +332,8 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 
 func (msg *Message) packQuestion() {
 	msg.packDomainName([]byte(msg.Question.Name), false)
-	libbytes.AppendUint16(&msg.packet, msg.Question.Type)
-	libbytes.AppendUint16(&msg.packet, msg.Question.Class)
+	msg.packet = libbytes.AppendUint16(msg.packet, msg.Question.Type)
+	msg.packet = libbytes.AppendUint16(msg.packet, msg.Question.Class)
 	msg.off += 4
 }
 
@@ -350,8 +350,8 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		msg.packDomainName([]byte(rr.Name), true)
 	}
 
-	libbytes.AppendUint16(&msg.packet, rr.Type)
-	libbytes.AppendUint16(&msg.packet, rr.Class)
+	msg.packet = libbytes.AppendUint16(msg.packet, rr.Type)
+	msg.packet = libbytes.AppendUint16(msg.packet, rr.Class)
 	msg.off += 4
 
 	if rr.Type == QueryTypeOPT {
@@ -367,7 +367,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 	}
 
 	rr.offTTL = uint(msg.off)
-	libbytes.AppendUint32(&msg.packet, rr.TTL)
+	msg.packet = libbytes.AppendUint32(msg.packet, rr.TTL)
 	msg.off += 4
 
 	msg.packRData(rr)
@@ -417,7 +417,7 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 }
 
 func (msg *Message) packA(rr *ResourceRecord) {
-	libbytes.AppendUint16(&msg.packet, rdataIPv4Size)
+	msg.packet = libbytes.AppendUint16(msg.packet, rdataIPv4Size)
 	msg.off += 2
 
 	rrText, _ := rr.Value.(string)
@@ -439,7 +439,7 @@ func (msg *Message) packA(rr *ResourceRecord) {
 
 func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	// Reserve two octets for rdlength
-	libbytes.AppendUint16(&msg.packet, 0)
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 	off := uint(msg.off)
 	msg.off += 2
 
@@ -451,7 +451,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 
 func (msg *Message) packSOA(rr *ResourceRecord) {
 	// Reserve two octets for rdlength.
-	libbytes.AppendUint16(&msg.packet, 0)
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 	off := uint(msg.off)
 	msg.off += 2
 
@@ -460,11 +460,11 @@ func (msg *Message) packSOA(rr *ResourceRecord) {
 	n := msg.packDomainName([]byte(rrSOA.MName), true)
 	n += msg.packDomainName([]byte(rrSOA.RName), true)
 
-	libbytes.AppendUint32(&msg.packet, rrSOA.Serial)
-	libbytes.AppendInt32(&msg.packet, rrSOA.Refresh)
-	libbytes.AppendInt32(&msg.packet, rrSOA.Retry)
-	libbytes.AppendInt32(&msg.packet, rrSOA.Expire)
-	libbytes.AppendUint32(&msg.packet, rrSOA.Minimum)
+	msg.packet = libbytes.AppendUint32(msg.packet, rrSOA.Serial)
+	msg.packet = libbytes.AppendInt32(msg.packet, rrSOA.Refresh)
+	msg.packet = libbytes.AppendInt32(msg.packet, rrSOA.Retry)
+	msg.packet = libbytes.AppendInt32(msg.packet, rrSOA.Expire)
+	msg.packet = libbytes.AppendUint32(msg.packet, rrSOA.Minimum)
 
 	// Write rdlength.
 	libbytes.WriteUint16(&msg.packet, off, uint16(n+20))
@@ -476,7 +476,7 @@ func (msg *Message) packWKS(rr *ResourceRecord) {
 
 	// Write rdlength.
 	n := uint16(5 + len(rrWKS.BitMap))
-	libbytes.AppendUint16(&msg.packet, n)
+	msg.packet = libbytes.AppendUint16(msg.packet, n)
 	msg.off += 2
 
 	msg.packet = append(msg.packet, rrWKS.Address[:4]...)
@@ -491,7 +491,7 @@ func (msg *Message) packHINFO(rr *ResourceRecord) {
 	// Write rdlength.
 	n := len(rrHInfo.CPU)
 	n += len(rrHInfo.OS)
-	libbytes.AppendUint16(&msg.packet, uint16(n))
+	msg.packet = libbytes.AppendUint16(msg.packet, uint16(n))
 	msg.off += 2
 	msg.packet = append(msg.packet, rrHInfo.CPU...)
 	msg.packet = append(msg.packet, rrHInfo.OS...)
@@ -503,7 +503,7 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength.
 	off := uint(msg.off)
-	libbytes.AppendUint16(&msg.packet, 0)
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 	msg.off += 2
 
 	n := msg.packDomainName([]byte(rrMInfo.RMailBox), true)
@@ -518,10 +518,10 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength.
 	off := uint(msg.off)
-	libbytes.AppendUint16(&msg.packet, 0)
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 	msg.off += 2
 
-	libbytes.AppendInt16(&msg.packet, rrMX.Preference)
+	msg.packet = libbytes.AppendInt16(msg.packet, rrMX.Preference)
 	msg.off += 2
 
 	n := msg.packDomainName([]byte(rrMX.Exchange), true)
@@ -534,7 +534,7 @@ func (msg *Message) packTXT(rr *ResourceRecord) {
 	rrText, _ := rr.Value.(string)
 
 	n := uint16(len(rrText))
-	libbytes.AppendUint16(&msg.packet, n+1)
+	msg.packet = libbytes.AppendUint16(msg.packet, n+1)
 	msg.off += 2
 
 	msg.packet = append(msg.packet, byte(n))
@@ -547,14 +547,14 @@ func (msg *Message) packSRV(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength
 	off := uint(msg.off)
-	libbytes.AppendUint16(&msg.packet, 0)
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 	msg.off += 2
 
-	libbytes.AppendUint16(&msg.packet, rrSRV.Priority)
+	msg.packet = libbytes.AppendUint16(msg.packet, rrSRV.Priority)
 	msg.off += 2
-	libbytes.AppendUint16(&msg.packet, rrSRV.Weight)
+	msg.packet = libbytes.AppendUint16(msg.packet, rrSRV.Weight)
 	msg.off += 2
-	libbytes.AppendUint16(&msg.packet, rrSRV.Port)
+	msg.packet = libbytes.AppendUint16(msg.packet, rrSRV.Port)
 	msg.off += 2
 
 	n := msg.packDomainName([]byte(rrSRV.Target), false) + 6
@@ -566,7 +566,7 @@ func (msg *Message) packSRV(rr *ResourceRecord) {
 func (msg *Message) packAAAA(rr *ResourceRecord) {
 	rrText, _ := rr.Value.(string)
 
-	libbytes.AppendUint16(&msg.packet, rdataIPv6Size)
+	msg.packet = libbytes.AppendUint16(msg.packet, rdataIPv6Size)
 	msg.off += 2
 
 	ip := net.ParseIP(rrText)
@@ -585,7 +585,7 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength.
 	off := uint(msg.off)
-	libbytes.AppendUint16(&msg.packet, 0)
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 	msg.off += 2
 
 	if rrOPT.Length == 0 {
@@ -593,14 +593,14 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 	}
 
 	// Pack OPT rdata
-	libbytes.AppendUint16(&msg.packet, rrOPT.Code)
+	msg.packet = libbytes.AppendUint16(msg.packet, rrOPT.Code)
 
 	// Values of less than 512 bytes MUST be treated as equal to 512
 	// bytes (RFC6891 P11).
 	if rrOPT.Length < 512 {
-		libbytes.AppendUint16(&msg.packet, 512)
+		msg.packet = libbytes.AppendUint16(msg.packet, 512)
 	} else {
-		libbytes.AppendUint16(&msg.packet, rrOPT.Length)
+		msg.packet = libbytes.AppendUint16(msg.packet, rrOPT.Length)
 	}
 
 	msg.packet = append(msg.packet, rrOPT.Data[:rrOPT.Length]...)

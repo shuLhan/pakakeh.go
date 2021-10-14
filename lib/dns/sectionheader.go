@@ -156,10 +156,10 @@ func (hdr *SectionHeader) pack() []byte {
 	packet[2] = b0
 	packet[3] = b1
 
-	libbytes.AppendUint16(&packet, hdr.QDCount)
-	libbytes.AppendUint16(&packet, hdr.ANCount)
-	libbytes.AppendUint16(&packet, hdr.NSCount)
-	libbytes.AppendUint16(&packet, hdr.ARCount)
+	packet = libbytes.AppendUint16(packet, hdr.QDCount)
+	packet = libbytes.AppendUint16(packet, hdr.ANCount)
+	packet = libbytes.AppendUint16(packet, hdr.NSCount)
+	packet = libbytes.AppendUint16(packet, hdr.ARCount)
 
 	return packet
 }

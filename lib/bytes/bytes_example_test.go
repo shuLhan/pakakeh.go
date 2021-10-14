@@ -6,7 +6,72 @@ package bytes
 
 import (
 	"fmt"
+	"math"
 )
+
+func ExampleAppendInt16() {
+	for _, v := range []int16{math.MinInt16, 0xab, 0xabc, math.MaxInt16} {
+		out := AppendInt16([]byte{}, v)
+		fmt.Printf("%6d => %#04x => %#02v\n", v, v, out)
+	}
+	// Output:
+	// -32768 => -0x8000 => []byte{0x80, 0x00}
+	//    171 => 0x00ab => []byte{0x00, 0xab}
+	//   2748 => 0x0abc => []byte{0x0a, 0xbc}
+	//  32767 => 0x7fff => []byte{0x7f, 0xff}
+}
+
+func ExampleAppendInt32() {
+	for _, v := range []int32{math.MinInt32, 0xab, 0xabc, math.MaxInt32} {
+		out := AppendInt32([]byte{}, v)
+		fmt.Printf("%11d => %#x => %#v\n", v, v, out)
+	}
+	// Output:
+	// -2147483648 => -0x80000000 => []byte{0x80, 0x0, 0x0, 0x0}
+	//         171 => 0xab => []byte{0x0, 0x0, 0x0, 0xab}
+	//        2748 => 0xabc => []byte{0x0, 0x0, 0xa, 0xbc}
+	//  2147483647 => 0x7fffffff => []byte{0x7f, 0xff, 0xff, 0xff}
+}
+
+func ExampleAppendUint16() {
+	inputs := []uint16{0, 0xab, 0xabc, math.MaxInt16, math.MaxUint16}
+	for _, v := range inputs {
+		out := AppendUint16([]byte{}, v)
+		fmt.Printf("%5d => %#04x => %#02v\n", v, v, out)
+	}
+
+	v := inputs[4] + 1 // MaxUint16 + 1
+	out := AppendUint16([]byte{}, v)
+	fmt.Printf("%5d => %#04x => %#02v\n", v, v, out)
+
+	// Output:
+	// 0 => 0x0000 => []byte{0x00, 0x00}
+	//   171 => 0x00ab => []byte{0x00, 0xab}
+	//  2748 => 0x0abc => []byte{0x0a, 0xbc}
+	// 32767 => 0x7fff => []byte{0x7f, 0xff}
+	// 65535 => 0xffff => []byte{0xff, 0xff}
+	//     0 => 0x0000 => []byte{0x00, 0x00}
+}
+
+func ExampleAppendUint32() {
+	inputs := []uint32{0, 0xab, 0xabc, math.MaxInt32, math.MaxUint32}
+	for _, v := range inputs {
+		out := AppendUint32([]byte{}, v)
+		fmt.Printf("%11d => %#x => %#v\n", v, v, out)
+	}
+
+	v := inputs[4] + 2 // MaxUint32 + 2
+	out := AppendUint32([]byte{}, v)
+	fmt.Printf("%11d => %#x => %#v\n", v, v, out)
+
+	// Output:
+	// 0 => 0x0 => []byte{0x0, 0x0, 0x0, 0x0}
+	//         171 => 0xab => []byte{0x0, 0x0, 0x0, 0xab}
+	//        2748 => 0xabc => []byte{0x0, 0x0, 0xa, 0xbc}
+	//  2147483647 => 0x7fffffff => []byte{0x7f, 0xff, 0xff, 0xff}
+	//  4294967295 => 0xffffffff => []byte{0xff, 0xff, 0xff, 0xff}
+	//           1 => 0x1 => []byte{0x0, 0x0, 0x0, 0x1}
+}
 
 func ExampleCutUntilToken() {
 	line := []byte(`abc \def ghi`)
