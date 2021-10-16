@@ -446,7 +446,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	rrText, _ := rr.Value.(string)
 
 	n := msg.packDomainName([]byte(rrText), true)
-	libbytes.WriteUint16(&msg.packet, off, uint16(n))
+	libbytes.WriteUint16(msg.packet, off, uint16(n))
 }
 
 func (msg *Message) packSOA(rr *ResourceRecord) {
@@ -467,7 +467,7 @@ func (msg *Message) packSOA(rr *ResourceRecord) {
 	msg.packet = libbytes.AppendUint32(msg.packet, rrSOA.Minimum)
 
 	// Write rdlength.
-	libbytes.WriteUint16(&msg.packet, off, uint16(n+20))
+	libbytes.WriteUint16(msg.packet, off, uint16(n+20))
 	msg.off += uint16(n + 20)
 }
 
@@ -510,7 +510,7 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 	n += msg.packDomainName([]byte(rrMInfo.EmailBox), true)
 
 	// Write rdlength.
-	libbytes.WriteUint16(&msg.packet, off, uint16(n))
+	libbytes.WriteUint16(msg.packet, off, uint16(n))
 }
 
 func (msg *Message) packMX(rr *ResourceRecord) {
@@ -527,7 +527,7 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 	n := msg.packDomainName([]byte(rrMX.Exchange), true)
 
 	// Write rdlength.
-	libbytes.WriteUint16(&msg.packet, off, uint16(n+2))
+	libbytes.WriteUint16(msg.packet, off, uint16(n+2))
 }
 
 func (msg *Message) packTXT(rr *ResourceRecord) {
@@ -560,7 +560,7 @@ func (msg *Message) packSRV(rr *ResourceRecord) {
 	n := msg.packDomainName([]byte(rrSRV.Target), false) + 6
 
 	// Write rdlength.
-	libbytes.WriteUint16(&msg.packet, off, uint16(n))
+	libbytes.WriteUint16(msg.packet, off, uint16(n))
 }
 
 func (msg *Message) packAAAA(rr *ResourceRecord) {
@@ -607,7 +607,7 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 
 	// Write rdlength.
 	n := 4 + rrOPT.Length
-	libbytes.WriteUint16(&msg.packet, off, n)
+	libbytes.WriteUint16(msg.packet, off, n)
 	msg.off += n
 }
 
@@ -745,7 +745,7 @@ func (msg *Message) SetAuthorativeAnswer(isAA bool) {
 func (msg *Message) SetID(id uint16) {
 	msg.Header.ID = id
 	if len(msg.packet) > 2 {
-		libbytes.WriteUint16(&msg.packet, 0, id)
+		libbytes.WriteUint16(msg.packet, 0, id)
 	}
 }
 
@@ -809,7 +809,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Answer[x].TTL -= n
 		}
-		libbytes.WriteUint32(&msg.packet, msg.Answer[x].offTTL,
+		libbytes.WriteUint32(msg.packet, msg.Answer[x].offTTL,
 			msg.Answer[x].TTL)
 	}
 	for x := 0; x < len(msg.Authority); x++ {
@@ -818,7 +818,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Authority[x].TTL -= n
 		}
-		libbytes.WriteUint32(&msg.packet, msg.Authority[x].offTTL,
+		libbytes.WriteUint32(msg.packet, msg.Authority[x].offTTL,
 			msg.Authority[x].TTL)
 	}
 	for x := 0; x < len(msg.Additional); x++ {
@@ -830,7 +830,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Additional[x].TTL -= n
 		}
-		libbytes.WriteUint32(&msg.packet, msg.Additional[x].offTTL,
+		libbytes.WriteUint32(msg.packet, msg.Additional[x].offTTL,
 			msg.Additional[x].TTL)
 	}
 }

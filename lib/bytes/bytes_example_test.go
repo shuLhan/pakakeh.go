@@ -7,6 +7,8 @@ package bytes
 import (
 	"fmt"
 	"math"
+
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 func ExampleAppendInt16() {
@@ -73,74 +75,164 @@ func ExampleAppendUint32() {
 	//           1 => 0x1 => []byte{0x0, 0x0, 0x0, 0x1}
 }
 
-func ExampleCutUntilToken() {
-	line := []byte(`abc \def ghi`)
+func ExampleConcat() {
+	fmt.Printf("%s\n", Concat())
+	fmt.Printf("%s\n", Concat([]byte{}))
+	fmt.Printf("%s\n", Concat([]byte{}, []byte("B")))
+	fmt.Printf("%s\n", Concat("with []int:", []int{1, 2}))
+	fmt.Printf("%s\n", Concat([]byte("bytes"), " and ", []byte("string")))
+	fmt.Printf("%s\n", Concat([]byte("A"), 1, []int{2}, []byte{}, []byte("C")))
+	// Output:
+	//
+	//
+	// B
+	// with []int:
+	// bytes and string
+	// AC
+}
 
-	cut, p, found := CutUntilToken(line, []byte("def"), 0, false)
-	fmt.Printf("'%s' %d %t\n", cut, p, found)
+func ExampleCopy() {
+	// Copying empty slice.
+	org := []byte{}
+	cp := Copy(org)
+	fmt.Printf("%d %q\n", len(cp), cp)
 
-	cut, p, found = CutUntilToken(line, []byte("def"), 0, true)
-	fmt.Printf("'%s' %d %t\n", cut, p, found)
-
-	cut, p, found = CutUntilToken(line, []byte("ef"), 0, true)
-	fmt.Printf("'%s' %d %t\n", cut, p, found)
-
-	cut, p, found = CutUntilToken(line, []byte("hi"), 0, true)
-	fmt.Printf("'%s' %d %t\n", cut, p, found)
+	org = []byte("slice of life")
+	tmp := org
+	cp = Copy(org)
+	fmt.Printf("%d %q\n", len(cp), cp)
+	fmt.Printf("Original address == tmp address: %v\n", &org[0] == &tmp[0])
+	fmt.Printf("Original address == copy address: %v\n", &org[0] == &cp[0])
 
 	// Output:
-	// 'abc \' 8 true
-	// 'abc def ghi' 12 false
-	// 'abc \d' 8 true
-	// 'abc \def g' 12 true
+	// 0 ""
+	// 13 "slice of life"
+	// Original address == tmp address: true
+	// Original address == copy address: false
+}
+
+func ExampleCutUntilToken() {
+	text := []byte(`\\abc \def \deg`)
+
+	cut, pos, found := CutUntilToken(text, nil, 0, false)
+	fmt.Printf("'%s' %d %t\n", cut, pos, found)
+
+	cut, pos, found = CutUntilToken(text, []byte("def"), 0, false)
+	fmt.Printf("'%s' %d %t\n", cut, pos, found)
+
+	cut, pos, found = CutUntilToken(text, []byte("def"), 0, true)
+	fmt.Printf("'%s' %d %t\n", cut, pos, found)
+
+	cut, pos, found = CutUntilToken(text, []byte("ef"), -1, true)
+	fmt.Printf("'%s' %d %t\n", cut, pos, found)
+
+	cut, pos, found = CutUntilToken(text, []byte("hi"), 0, true)
+	fmt.Printf("'%s' %d %t\n", cut, pos, found)
+
+	// Output:
+	// '\\abc \def \deg' -1 false
+	// '\\abc \' 10 true
+	// '\abc def \deg' 15 false
+	// '\abc \d' 10 true
+	// '\abc \def \deg' 15 false
 }
 
 func ExampleEncloseRemove() {
-	line := []byte(`[[ ABC ]] DEF`)
-	leftcap := []byte(`[[`)
-	rightcap := []byte(`]]`)
+	text := []byte(`[[ A ]]-[[ B ]] C`)
 
-	got, changed := EncloseRemove(line, leftcap, rightcap)
+	got, isCut := EncloseRemove(text, []byte("[["), []byte("]]"))
+	fmt.Printf("'%s' %t\n", got, isCut)
 
-	fmt.Printf("'%s' %t\n", got, changed)
-	// Output: ' DEF' true
+	got, isCut = EncloseRemove(text, []byte("[["), []byte("}}"))
+	fmt.Printf("'%s' %t\n", got, isCut)
+
+	text = []byte(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
+
+	got, isCut = EncloseRemove(text, []byte("<"), []byte(">"))
+	fmt.Printf("'%s' %t\n", got, isCut)
+
+	got, isCut = EncloseRemove(text, []byte(`"`), []byte(`"`))
+	fmt.Printf("'%s' %t\n", got, isCut)
+
+	got, isCut = EncloseRemove(text, []byte(`/`), []byte(`/`))
+	fmt.Printf("'%s' %t\n", got, isCut)
+
+	text = []byte(`/* TEST */`)
+
+	got, isCut = EncloseRemove(text, []byte(`/*`), []byte(`*/`))
+	fmt.Printf("'%s' %t\n", got, isCut)
+
+	// Output:
+	// '- C' true
+	// '[[ A ]]-[[ B ]] C' false
+	// '// Copyright 2016-2018 "Shulhan ". All rights reserved.' true
+	// '// Copyright 2016-2018 . All rights reserved.' true
+	// ' Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.' true
+	// '' true
 }
 
 func ExampleEncloseToken() {
-	line := []byte(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
-	token := []byte(`"`)
-	leftcap := []byte(`\`)
-	rightcap := []byte(`_`)
+	text := []byte(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 
-	got, changed := EncloseToken(line, token, leftcap, rightcap)
+	got, isChanged := EncloseToken(text, []byte(`"`), []byte(`\`), []byte(`_`))
+	fmt.Printf("%t '%s'\n", isChanged, got)
 
-	fmt.Printf("'%s' %t\n", got, changed)
+	got, isChanged = EncloseToken(text, []byte(`_`), []byte(`-`), []byte(`-`))
+	fmt.Printf("%t '%s'\n", isChanged, got)
+
+	got, isChanged = EncloseToken(text, []byte(`/`), []byte(`\`), nil)
+	fmt.Printf("%t '%s'\n", isChanged, got)
+
+	got, isChanged = EncloseToken(text, []byte(`<`), []byte(`<`), []byte(` `))
+	fmt.Printf("%t '%s'\n", isChanged, got)
+
 	// Output:
-	// '// Copyright 2016-2018 \"_Shulhan <ms@kilabit.info>\"_. All rights reserved.' true
+	// true '// Copyright 2016-2018 \"_Shulhan <ms@kilabit.info>\"_. All rights reserved.'
+	// false '// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.'
+	// true '\/\/ Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.'
+	// true '// Copyright 2016-2018 "Shulhan << ms@kilabit.info>". All rights reserved.'
+}
+
+func ExampleInReplace() {
+	text := InReplace([]byte{}, []byte(ascii.LettersNumber), '_')
+	fmt.Printf("%q\n", text)
+
+	text = InReplace([]byte("/a/b/c"), []byte(ascii.LettersNumber), '_')
+	fmt.Printf("%q\n", text)
+
+	_ = InReplace(text, []byte(ascii.LettersNumber), '/')
+	fmt.Printf("%q\n", text)
+
+	// Output:
+	// ""
+	// "_a_b_c"
+	// "/a/b/c"
 }
 
 func ExampleIndexes() {
-	s := []byte("moo moomoo")
-	token := []byte("moo")
-
-	idxs := Indexes(s, token)
-	fmt.Println(idxs)
+	fmt.Println(Indexes([]byte(""), []byte("moo")))
+	fmt.Println(Indexes([]byte("moo moomoo"), []byte{}))
+	fmt.Println(Indexes([]byte("moo moomoo"), []byte("moo")))
 	// Output:
+	// []
+	// []
 	// [0 4 7]
 }
 
 func ExampleIsTokenAt() {
-	line := []byte("Hello, world")
-	token := []byte("world")
-	token2 := []byte("worlds")
+	text := []byte("Hello, world")
+	tokenWorld := []byte("world")
+	tokenWorlds := []byte("worlds")
 	tokenEmpty := []byte{}
 
-	fmt.Printf("%t\n", IsTokenAt(line, tokenEmpty, 6))
-	fmt.Printf("%t\n", IsTokenAt(line, token, 6))
-	fmt.Printf("%t\n", IsTokenAt(line, token, 7))
-	fmt.Printf("%t\n", IsTokenAt(line, token, 8))
-	fmt.Printf("%t\n", IsTokenAt(line, token2, 8))
+	fmt.Printf("%t\n", IsTokenAt(text, tokenEmpty, 6))
+	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, -1))
+	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, 6))
+	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, 7))
+	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, 8))
+	fmt.Printf("%t\n", IsTokenAt(text, tokenWorlds, 8))
 	// Output:
+	// false
 	// false
 	// false
 	// true
@@ -148,24 +240,99 @@ func ExampleIsTokenAt() {
 	// false
 }
 
+func ExampleMergeSpaces() {
+	fmt.Printf("%s\n", MergeSpaces([]byte("")))
+	fmt.Printf("%s\n", MergeSpaces([]byte(" \t\v\r\n\r\n\fa \t\v\r\n\r\n\f")))
+	// Output:
+	//
+	//  a
+}
+
+func ExamplePrintHex() {
+	title := "PrintHex"
+	data := []byte("Hello, world !")
+	PrintHex(title, data, 5)
+	// Output:
+	// PrintHex
+	//    0 - 48 65 6C 6C 6F || H e l l o
+	//    5 - 2C 20 77 6F 72 || , . w o r
+	//   10 - 6C 64 20 21    || l d . !
+}
+
+func ExampleReadHexByte() {
+	fmt.Println(ReadHexByte([]byte{}, 0))
+	fmt.Println(ReadHexByte([]byte("x0"), 0))
+	fmt.Println(ReadHexByte([]byte("00"), 0))
+	fmt.Println(ReadHexByte([]byte("01"), 0))
+	fmt.Println(ReadHexByte([]byte("10"), 0))
+	fmt.Println(ReadHexByte([]byte("1A"), 0))
+	fmt.Println(ReadHexByte([]byte("1a"), 0))
+	fmt.Println(ReadHexByte([]byte("1a"), -1))
+	// Output:
+	// 0 false
+	// 0 false
+	// 0 true
+	// 1 true
+	// 16 true
+	// 26 true
+	// 26 true
+	// 0 false
+}
+
+func ExampleReadInt16() {
+	fmt.Println(ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 3)) // x is out of range.
+	fmt.Println(ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x0102
+	fmt.Println(ReadInt16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
+	// Output:
+	// 0
+	// 258
+	// -4092
+}
+
+func ExampleReadInt32() {
+	fmt.Println(ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
+	fmt.Println(ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
+	fmt.Println(ReadInt32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
+	// Output:
+	// 0
+	// 16909060
+	// -251526396
+}
+
+func ExampleReadUint16() {
+	fmt.Println(ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 3)) // x is out of range.
+	fmt.Println(ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 0)) // 0x0102
+	fmt.Println(ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
+	// Output:
+	// 0
+	// 258
+	// 61444
+}
+
+func ExampleReadUint32() {
+	fmt.Println(ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
+	fmt.Println(ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
+	fmt.Println(ReadUint32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
+	// Output:
+	// 0
+	// 16909060
+	// 4043440900
+}
+
 func ExampleSkipAfterToken() {
-	line := []byte(`abc \def ghi`)
+	text := []byte(`abc \def ghi`)
 
-	p, found := SkipAfterToken(line, []byte("def"), 0, false)
-	fmt.Printf("%d %t\n", p, found)
-
-	p, found = SkipAfterToken(line, []byte("def"), 0, true)
-	fmt.Printf("%d %t\n", p, found)
-
-	p, found = SkipAfterToken(line, []byte("ef"), 0, true)
-	fmt.Printf("%d %t\n", p, found)
-
-	p, found = SkipAfterToken(line, []byte("hi"), 0, true)
-	fmt.Printf("%d %t\n", p, found)
-
+	fmt.Println(SkipAfterToken(text, []byte("def"), -1, false))
+	fmt.Println(SkipAfterToken(text, []byte("def"), 0, true))
+	fmt.Println(SkipAfterToken(text, []byte("deg"), 0, false))
+	fmt.Println(SkipAfterToken(text, []byte("deg"), 0, true))
+	fmt.Println(SkipAfterToken(text, []byte("ef"), 0, true))
+	fmt.Println(SkipAfterToken(text, []byte("hi"), 0, true))
 	// Output:
 	// 8 true
-	// 12 false
+	// -1 false
+	// -1 false
+	// -1 false
 	// 8 true
 	// 12 true
 }
@@ -185,21 +352,73 @@ func ExampleSnippetByIndexes() {
 }
 
 func ExampleTokenFind() {
-	line := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
-	token := []byte("right")
+	text := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
 
-	at := TokenFind(line, token, 0)
-
-	fmt.Printf("%d\n", at)
-	// Output: 7
+	fmt.Println(TokenFind(text, []byte{}, 0))
+	fmt.Println(TokenFind(text, []byte("right"), -1))
+	fmt.Println(TokenFind(text, []byte("."), 0))
+	fmt.Println(TokenFind(text, []byte("."), 42))
+	fmt.Println(TokenFind(text, []byte("."), 48))
+	fmt.Println(TokenFind(text, []byte("d."), 0))
+	// Output:
+	// -1
+	// 7
+	// 38
+	// 44
+	// 65
+	// 64
 }
 
 func ExampleWordIndexes() {
-	s := []byte("moo moomoo moo")
-	token := []byte("moo")
+	text := []byte("moo moomoo moo")
 
-	idxs := WordIndexes(s, token)
-	fmt.Println(idxs)
+	fmt.Println(WordIndexes(text, []byte("mo")))
+	fmt.Println(WordIndexes(text, []byte("moo")))
+	fmt.Println(WordIndexes(text, []byte("mooo")))
 	// Output:
+	// []
 	// [0 11]
+	// []
+}
+
+func ExampleWriteUint16() {
+	data := []byte("Hello, world!")
+
+	var v uint16
+
+	v = 'h' << 8
+	v |= 'E'
+
+	WriteUint16(data, uint(len(data)-1), v) // Index out of range
+	fmt.Println(string(data))
+
+	WriteUint16(data, 0, v)
+	fmt.Println(string(data))
+	// Output:
+	// Hello, world!
+	// hEllo, world!
+}
+
+func ExampleWriteUint32() {
+	data := []byte("Hello, world!")
+
+	var v uint32
+
+	v = 'h' << 24
+	v |= 'E' << 16
+	v |= 'L' << 8
+	v |= 'L'
+
+	WriteUint32(data, uint(len(data)-1), v) // Index out of range
+	fmt.Println(string(data))
+
+	WriteUint32(data, 0, v)
+	fmt.Println(string(data))
+
+	WriteUint32(data, 7, v)
+	fmt.Println(string(data))
+	// Output:
+	// Hello, world!
+	// hELLo, world!
+	// hELLo, hELLd!
 }
