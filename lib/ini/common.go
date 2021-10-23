@@ -16,6 +16,9 @@ import (
 // If "v" is valid it will return true.
 //
 func IsValidVarName(v string) bool {
+	if len(v) == 0 {
+		return false
+	}
 	for x, r := range v {
 		if x == 0 && !unicode.IsLetter(r) {
 			return false
