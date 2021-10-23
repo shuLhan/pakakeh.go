@@ -149,12 +149,13 @@
 //	}
 //
 //	type T struct {
-//		String      string         `ini:"single::string"
-//		Time        time.Time      `ini:"single::time" layout:"2006-01-02"`
-//		SliceString []string       `ini:"slice::string"
-//		Struct      U              `ini:"single:struct"
-//		SliceStruct []U            `ini:"slice:struct"
-//		Map         map[string]int `ini:"map::"
+//		String      string            `ini:"single::string"
+//		Time        time.Time         `ini:"single::time" layout:"2006-01-02"`
+//		SliceString []string          `ini:"slice::string"
+//		Struct      U                 `ini:"single:struct"
+//		SliceStruct []U               `ini:"slice:struct"
+//		Map         map[string]int    `ini:"amap:"
+//		MapSub      map[string]string `ini:"amap:sub"
 //	}
 //
 // will be marshaled into
@@ -177,10 +178,15 @@
 //	[slice "struct"]
 //	int = <value of T.SliceStruct[n].Int
 //
-//	[map]
+//	[amap]
 //	<T.Map.Key[0]> = <T.Map.Value[0]>
 //	...
 //	<T.Map.Key[n]> = <T.Map.Value[n]>
+//
+//	[amap "sub"]
+//	<T.MapSub.Key[0]> = <T.MapSub.Value[0]>
+//	...
+//	<T.MapSub.Key[n]> = <T.MapSub.Value[n]>
 //
 // Unmarshaling
 //
