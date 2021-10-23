@@ -6,7 +6,28 @@ package ini
 
 import (
 	"strings"
+	"unicode"
 )
+
+//
+// IsValidVarName check if "v" is valid variable name, where the
+// first character must be a letter and the rest should contains only letter,
+// digit, period, hyphen, or underscore.
+// If "v" is valid it will return true.
+//
+func IsValidVarName(v string) bool {
+	for x, r := range v {
+		if x == 0 && !unicode.IsLetter(r) {
+			return false
+		}
+		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
+			r == tokHyphen || r == tokDot || r == tokUnderscore {
+			continue
+		}
+		return false
+	}
+	return true
+}
 
 //
 // IsValueBoolTrue will return true if variable contains boolean value for
