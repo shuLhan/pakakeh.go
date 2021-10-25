@@ -4,13 +4,9 @@
 package main
 
 import (
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/base32"
 	"flag"
 	"fmt"
-	"hash"
 	"log"
 	"os"
 
@@ -35,17 +31,17 @@ func main() {
 		flag.Usage()
 	}
 
-	var hashFn func() hash.Hash
+	var cryptoHash totp.CryptoHash
 	switch *paramHash {
 	case "sha256":
-		hashFn = sha256.New
+		cryptoHash = totp.CryptoHashSHA256
 	case "sha512":
-		hashFn = sha512.New
+		cryptoHash = totp.CryptoHashSHA512
 	default:
-		hashFn = sha1.New
+		cryptoHash = totp.CryptoHashSHA1
 	}
 
-	totproto := totp.New(hashFn, *paramDigits, *paramTimestep)
+	totproto := totp.New(cryptoHash, *paramDigits, *paramTimestep)
 	secret, err := base32.StdEncoding.DecodeString(os.Args[1])
 	if err != nil {
 		log.Fatal(err)

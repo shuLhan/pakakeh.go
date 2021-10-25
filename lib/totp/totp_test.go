@@ -24,7 +24,7 @@ func TestProtocol_generateWithTimestamp_sha1(t *testing.T) {
 	}
 
 	mac := hmac.New(sha1.New, secretb)
-	p := New(sha1.New, 8, DefTimeStep)
+	p := New(CryptoHashSHA1, 8, DefTimeStep)
 
 	cases := []struct {
 		time int64
@@ -70,7 +70,7 @@ func TestProtocol_generateWithTimestamp_sha256(t *testing.T) {
 	}
 
 	mac := hmac.New(sha256.New, secretb)
-	p := New(sha256.New, 8, DefTimeStep)
+	p := New(CryptoHashSHA256, 8, DefTimeStep)
 
 	cases := []struct {
 		time int64
@@ -140,7 +140,7 @@ func TestProtocol_generateWithTimestamp_sha512(t *testing.T) {
 		exp:  "47863826",
 	}}
 
-	p := New(sha512.New, 8, DefTimeStep)
+	p := New(CryptoHashSHA512, 8, DefTimeStep)
 	mac := hmac.New(sha512.New, secretb)
 
 	for _, c := range cases {
@@ -163,7 +163,7 @@ func TestProtocol_verifyWithTimestamp(t *testing.T) {
 	}
 
 	mac := hmac.New(sha1.New, secretb)
-	p := New(sha1.New, 8, DefTimeStep)
+	p := New(CryptoHashSHA1, 8, DefTimeStep)
 
 	cases := []struct {
 		desc  string

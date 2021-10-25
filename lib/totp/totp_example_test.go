@@ -5,7 +5,6 @@
 package totp
 
 import (
-	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -19,7 +18,7 @@ func ExampleProtocol_Verify() {
 		log.Fatal(err)
 	}
 
-	p := New(sha1.New, DefCodeDigits, DefTimeStep)
+	p := New(CryptoHashSHA1, DefCodeDigits, DefTimeStep)
 	otp, _ := p.Generate(secret)
 
 	if p.Verify(secret, otp, 1) {

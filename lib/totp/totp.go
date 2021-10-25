@@ -7,7 +7,11 @@
 package totp
 
 import (
+	"crypto"
 	"crypto/hmac"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"hash"
@@ -15,7 +19,21 @@ import (
 	"time"
 )
 
+type CryptoHash crypto.Hash
+
+// List of available hash function that can be used in TOTP.
+//
+// See RFC 6238 Section 1.2.
 const (
+	CryptoHashSHA1   CryptoHash = CryptoHash(crypto.SHA1) // Default hash algorithm.
+	CryptoHashSHA256            = CryptoHash(crypto.SHA256)
+	CryptoHashSHA512            = CryptoHash(crypto.SHA512)
+)
+
+// Default value for hash, digits, time-step, and maximum step backs.
+const (
+	DefHash = CryptoHashSHA1
+
 	// DefCodeDigits default digits generated when verifying or generating
 	// OTP.
 	DefCodeDigits = 6
@@ -40,11 +58,27 @@ type Protocol struct {
 }
 
 //
-// New create TOTP protocol for prover or verifier using "fnHash" as the hmac-sha
-// hash function, "codeDigits" as the number of digits to be generated
-// and/or verified, and "timeStep" as the time divisor.
+// New create TOTP protocol for prover or verifier using "cryptoHash" as the
+// hmac-sha hash function, "codeDigits" as the number of digits to be
+// generated and/or verified, and "timeStep" as the time divisor.
 //
-func New(fnHash func() hash.Hash, codeDigits, timeStep int) Protocol {
+// There are only three hash functions that can be used: SHA1, SHA256, and
+// SHA512.
+// Passing hash value other than that, will revert the value default to SHA1.
+//
+// The maximum value for codeDigits parameter is 8.
+//
+func New(cryptoHash CryptoHash, codeDigits, timeStep int) Protocol {
+	var fnHash func() hash.Hash
+
+	switch cryptoHash {
+	case CryptoHashSHA256:
+		fnHash = sha256.New
+	case CryptoHashSHA512:
+		fnHash = sha512.New
+	default:
+		fnHash = sha1.New
+	}
 	if codeDigits <= 0 || codeDigits > 8 {
 		codeDigits = DefCodeDigits
 	}
