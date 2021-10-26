@@ -15,7 +15,7 @@ func TestMemFS_GoEmbed(t *testing.T) {
 		},
 		Embed: EmbedOptions{
 			PackageName: "embed",
-			GoFileName:  "./embed_test/embed_test.go",
+			GoFileName:  "./internal/test/embed/embed_test.go",
 		},
 	}
 	mfs, err := New(opts)
