@@ -33,7 +33,7 @@
 //	opts.MaxFileSize = 1024 * 1024 * 10
 //
 // Later, if we want to get the file from memory, call Get() which will return
-// the node object with content can be accessed from field "V".
+// the node object with content can be accessed from field "Content".
 // Remember that if file size is larger that maximum,
 // the content will need to be read manually,
 //
@@ -44,13 +44,11 @@
 //	if node.mode.IsDir() {
 //		// Handle directory.
 //	}
-//	if node.V == nil {
+//	if node.Content == nil {
 //		// Handle large file.
 //		node.V, err = ioutil.ReadFile(child.SysPath)
 //	}
 //	// Do something with content of file system.
-//
-// Thats it!
 //
 // Go embed
 //
@@ -66,13 +64,32 @@
 //
 //	var myFS *memfs.MemFS
 //
-// Second, write the content of memfs instance as Go source code file,
+// Second, create new instance of MemFS with Options.Embed is set, and write
+// the content of memfs instance as Go source code file,
 //
-//	mfs.GoEmbed("mypackage", "myFS", "mypackage/file.go", memfs.EncodingGzip)
+//	opts := &Options{
+//		Root: "./mydir",
+//		Includes: []string{
+//			`.*/include`,
+//			`.*\.(css|html|js)$`,
+//		},
+//		Excludes: []string{
+//			`.*/exclude`,
+//		},
+//		Embed: EmbedOptions{
+//			PackageName:     "mypackage",
+//			VarName:         "myFS",
+//			GoFileName:      "mypackage/embed.go",
+//			ContentEncoding: memfs.EncodingGzip,
+//		},
+//	}
+//	mfs, _ := memfs.New(opts)
+//	mfs.GoEmbed()
 //
 // The Go generated file will be defined with package named "mypackage" using
-// global variable "myFS" as container stored in
-// file "mypackage/file.go" with each content encoded (compressed) using
-// gzip.
+// global variable "myFS" as container stored in file "mypackage/file.go"
+// with each content encoded (compressed) using gzip.
+//
+// Thats it!
 //
 package memfs

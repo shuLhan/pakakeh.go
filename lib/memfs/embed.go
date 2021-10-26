@@ -18,7 +18,6 @@ const (
 
 type generateData struct {
 	Opts     *Options
-	VarName  string
 	Node     *Node
 	PathNode *PathNode
 }
@@ -26,36 +25,20 @@ type generateData struct {
 //
 // GoEmbed write the tree nodes as Go generated source file.
 //
-// If pkgName is not defined it will be default to "main".
-//
-// varName is the global variable name with type *memfs.MemFS which will be
-// initialize by generated Go source code on init().
-// The varName default to "memFS" if its empty.
-//
-// If out is not defined it will be default to "memfs_generate.go" and saved
-// in current directory from where its called.
-//
-// If contentEncoding is not empty, it will encode the content of node and set
-// the node ContentEncoding.
-// List of available encoding is "gzip".
-// For example, if contentEncoding is "gzip" it will compress the content of
-// file using gzip and set Node.ContentEncoding to "gzip".
-//
-func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err error) {
+func (mfs *MemFS) GoEmbed() (err error) {
 	logp := "GoEmbed"
 
-	if len(pkgName) == 0 {
-		pkgName = DefaultEmbedPackageName
+	if len(mfs.Opts.Embed.PackageName) == 0 {
+		mfs.Opts.Embed.PackageName = DefaultEmbedPackageName
 	}
-	if len(varName) == 0 {
-		varName = DefaultEmbedVarName
+	if len(mfs.Opts.Embed.VarName) == 0 {
+		mfs.Opts.Embed.VarName = DefaultEmbedVarName
 	}
-	if len(out) == 0 {
-		out = DefaultEmbedGoFileName
+	if len(mfs.Opts.Embed.GoFileName) == 0 {
+		mfs.Opts.Embed.GoFileName = DefaultEmbedGoFileName
 	}
 	genData := &generateData{
 		Opts:     mfs.Opts,
-		VarName:  varName,
 		PathNode: mfs.PathNodes,
 	}
 
@@ -64,13 +47,13 @@ func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err er
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	f, err := os.Create(out)
+	f, err := os.Create(mfs.Opts.Embed.GoFileName)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	if len(contentEncoding) > 0 {
-		err = mfs.ContentEncode(contentEncoding)
+	if len(mfs.Opts.Embed.ContentEncoding) > 0 {
+		err = mfs.ContentEncode(mfs.Opts.Embed.ContentEncoding)
 		if err != nil {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
@@ -78,7 +61,7 @@ func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err er
 
 	names := mfs.ListNames()
 
-	err = tmpl.ExecuteTemplate(f, templateNameHeader, pkgName)
+	err = tmpl.ExecuteTemplate(f, templateNameHeader, mfs.Opts.Embed.PackageName)
 	if err != nil {
 		goto fail
 	}
@@ -86,7 +69,7 @@ func (mfs *MemFS) GoEmbed(pkgName, varName, out, contentEncoding string) (err er
 	for x := 0; x < len(names); x++ {
 		// Ignore and delete the file from map if its the output
 		// itself.
-		if strings.HasSuffix(names[x], out) {
+		if strings.HasSuffix(names[x], mfs.Opts.Embed.GoFileName) {
 			mfs.PathNodes.Delete(names[x])
 			continue
 		}

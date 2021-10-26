@@ -13,13 +13,41 @@ func TestMemFS_GoEmbed(t *testing.T) {
 			`^\..*`,
 			".*/node_save$",
 		},
+		Embed: EmbedOptions{
+			PackageName: "embed",
+			GoFileName:  "./embed_test/embed_test.go",
+		},
 	}
 	mfs, err := New(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = mfs.GoEmbed("embed", "", "./embed_test/embed_test.go", "")
+	err = mfs.GoEmbed()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMemFS_GoEmbed_DisableModTime(t *testing.T) {
+	opts := &Options{
+		Root: "testdata",
+		Excludes: []string{
+			`^\..*`,
+			".*/node_save$",
+		},
+		Embed: EmbedOptions{
+			PackageName:    "embed",
+			GoFileName:     "./internal/test/embed_disable_modtime/embed_test.go",
+			WithoutModTime: true,
+		},
+	}
+	mfs, err := New(opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mfs.GoEmbed()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -130,6 +130,9 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 // AddChild add the other node as child of this node.
 //
 func (node *Node) AddChild(child *Node) {
+	if child.modTime.IsZero() {
+		child.modTime = time.Now()
+	}
 	node.Childs = append(node.Childs, child)
 	child.Parent = node
 }

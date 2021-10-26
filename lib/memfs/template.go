@@ -49,7 +49,7 @@ import (
 )
 {{end}}
 {{define "GENERATE_NODE"}}
-	{{- $varname := .VarName}}
+	{{- $varname := .Opts.Embed.VarName}}
 func {{ .Node.GenFuncName}}() *memfs.Node {
 	node := &memfs.Node{
 		SysPath:         "{{.Node.SysPath}}",
@@ -61,7 +61,9 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 {{- end }}
 	}
 	node.SetMode({{printf "%d" .Node.Mode}})
+{{- if not .Opts.Embed.WithoutModTime }}
 	node.SetModTimeUnix({{.Node.ModTime.Unix}}, {{.Node.ModTime.Nanosecond}})
+{{- end }}
 	node.SetName("{{.Node.Name}}")
 	node.SetSize({{.Node.Size}})
 	{{- range $x, $child := .Node.Childs}}
@@ -71,7 +73,7 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 }
 {{end}}
 {{define "PATH_FUNCS"}}
-	{{- $varname := .VarName }}
+	{{- $varname := .Opts.Embed.VarName }}
 //
 // _{{ $varname}}_getNode is internal function to minimize duplicate node
 // created on Node.AddChild() and on generatedPathNode.Set().
