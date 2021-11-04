@@ -10,5 +10,5 @@ package share
 
 const (
 	// Version of this module.
-	Version = "0.29.2"
+	Version = "0.31.0"
 )

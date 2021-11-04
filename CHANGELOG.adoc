@@ -3,6 +3,188 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.31.0 (2021-11-04)
+
+===  Breaking changes
+
+*  lib/memfs: move the embedded parameter to Options
+
+   Since the GoEmbed can be called only when MemFS instance is initiated,
+   it would be better if parameters for GoEmbed also initialized in the
+   struct Options.
+   In this way any additional parameters needed to add to GoEmbed does not
+   changes the method signature in the future.
+
+   This commit add new type EmbedOptions that contains the parameters
+   for GoEmbed.
+
+   In this new type, we add new field EmbedWithoutModTime.
+   if its true, the modification time for all files and directories are not
+   stored inside generated code, instead all files will use the current
+   time when the program is running.
+
+*  lib/totp: make the New to accept only hash with SHA1, SHA256, or SHA512
+
+   Previously, the first parameter to New is a function that return
+   hash.Hash.  This signature can be misleading, because md5.New also
+   can return hash.Hash but not usable in TOTP.
+
+   This changes update the New function signature to accept defined
+   type that can be set to SHA1, SHA256, or SHA512.
+
+*  lib/bytes: refactoring and cleaning up the bytes package
+
+   The bytes package, and many other packages in this module, is written
+   when I still learning and using the Go language for master thesis.
+   Some of the code, like function signature, does not follow the
+   Go idiom, at least not how the Go source code looks like.
+
+   A breaking changes,
+
+   * WriteUint16 and WriteUint32 accept slice only without pointer.
+     There is no need to pass slice as pointer to function if we want
+     to modify the content, as long as the backing storage is not
+     changed.
+
+   Bug fixes,
+
+   * PrintHex: fix print layout on the last line
+   * ReadHexByte: fix possible index out of range
+   * SkipAfterToken return -1 and false if no token found, as promised
+     in the comment, instead of the length of text.
+
+   We move all unit test to example so we have test and example in the
+   documentation at the same time.
+
+   This changes make all test coverage 100%.
+
+*  lib/bytes: refactoring AppendXxx functions
+
+   Previously, we pass pointer to slice on AppendInt16, AppendInt32,
+   AppendUint16, and AppendUint32 functions.  This model of function
+   signature is not a Go idiom.  It is written when I am still new to
+   Go.
+
+*  lib/ascii: change signature of ToLower and ToUpper
+
+   Using pointer to slice on method or function is not a Go idiom.
+   It is created when I still new to Go.
+
+*  lib/memfs: refactoring Node field V into Content
+
+   The reason why the field named V is because it's short.  It's come
+   from my C/C++ experience that got carried away when writing this
+   package.
+
+   Now, after having more time writing Go, I prefer clarity over
+   cleverity(?).
+
+*  lib/memfs: set the node modification time in embedded file
+
+   This changes set all node modification time in embedded files to
+   the node modTime using Unix() and Nanosecond() values.
+
+   Since the time will always changes we need to remove the test to
+   generate file gen_test.go to prevent the file being modified and
+   re-adding the same file every time we run local tests.
+
+===  New features
+
+*  lib/ini: add function IsValidVarName
+
+   The IsValidVarName check if "v" is valid variable name, where the
+   first character must be a letter and the rest should contains only
+   letter, digit, period, hyphen, or underscore.
+   If "v" is valid it will return true.
+
+*  lib/memfs: set the node modification time in embedded file
+
+   This changes set all node modification time in embedded files to
+   the node modTime using Unix() and Nanosecond() values.
+
+   Since the time will always changes we need to remove the test to
+   generate file gen_test.go to prevent the file being modified and
+   re-adding the same file every time we run local tests.
+
+*  lib/io: add method String to FileState type
+
+   The String method return the string representation of FileState.
+   Usually used only for debugging.
+
+*  lib/smtp: implement method Noop on Client
+
+   Noop send the NOOP command to server with optional message.
+
+   On success, it will return response with Code 250, StatusOK.
+
+   While at it fix double call to recv on Reset() method.
+
+*  lib/smtp: implement method Reset on Client
+
+   The Reset() method send the STMP RSET command to the server.
+
+   This command clear the current buffer on MAIL, RCPT, and DATA, but not the
+   EHLO/HELO buffer.
+
+   On success, it will return response with Code 250, StatusOK.
+
+===  Bug fixes
+
+*  lib/ascii: fix IsHex return false on 0
+
+*  lib/memfs: fix parent empty directory not removed
+
+   Use case:
+
+    x
+    x/y
+
+   If x/y is empty, and x processed first, the x will
+   not be removed.
+
+   This commit fix this, by sorting the paths in descending order first
+   to make empty parent removed clearly.  In above case the order
+   or check become,
+
+    x/y
+    x
+
+   While at it, update an example of New to give preview of input and
+   what the expected output for certain operations.
+
+*  lib/xmlrpc: rewrite the Client connection using lib/http
+
+   Using socket connection require reading the HTTP response header before
+   we can process the response body.
+
+   Instead of rewrite the parser, use the lib/http to send and receive
+   the request/response.
+
+*  lib/io: do not use absolute path on dummy Watcher parent SysPath
+
+   Converting that parameter path to absolute path may cause unpredictable
+   result on module that use it.
+
+===  Chores
+
+*  lib/ini: add example of marshal/unmarshaling of section with sub
+
+   This changes also fix the example of field tag on marshaling the
+   map.
+
+*  lib/io: add method String to FileState type
+
+   The String method return the string representation of FileState.
+   Usually used only for debugging.
+
+*  lib/memfs: remove unnecessary initialization on NewNode
+
+   The zero value for V ([]byte) is already nil and Node.Childs
+   ([]*Node) does not need to be initialized with make if size is 0.
+
+*  lib/io: use t.Cleanup instead of defer on test
+
+
 ==  share v0.30.0 (2021-10-04)
 
 === Breaking changes
