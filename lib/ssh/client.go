@@ -45,7 +45,7 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	sshAgentSockPath := os.Getenv("SSH_AUTH_SOCK")
+	sshAgentSockPath := cfg.GetIdentityAgent()
 	if len(sshAgentSockPath) > 0 {
 		sshAgentSock, err := net.Dial("unix", sshAgentSockPath)
 		if err != nil {
