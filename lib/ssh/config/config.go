@@ -16,6 +16,10 @@ import (
 )
 
 const (
+	envSshAuthSock = "SSH_AUTH_SOCK"
+)
+
+const (
 	keyHost  = "host"
 	keyMatch = "match"
 
@@ -39,6 +43,7 @@ const (
 	keyConnectTimeout                  = "connecttimeout"
 	keyConnectionAttempts              = "connectionattempts"
 	keyHostname                        = "hostname"
+	keyIdentityAgent                   = "identityagent"
 	keyIdentityFile                    = "identityfile"
 	keyPort                            = "port"
 	keySendEnv                         = "sendenv"
@@ -75,7 +80,6 @@ const (
 	keyHostKeyAlgorithms                = "hostkeyalgorithms"
 	keyHostKeyAlias                     = "hostkeyalias"
 	keyIdentitiesOnly                   = "identitiesonly"
-	keyIdentityAgent                    = "identityagent"
 	keyIgnoreUnknown                    = "ignoreunknown"
 	keyInclude                          = "include"
 	keyIPQoS                            = "ipqos"
@@ -228,6 +232,8 @@ func Load(file string) (cfg *Config, err error) {
 		case keyConnectTimeout:
 			section.ConnectTimeout, err = strconv.Atoi(value)
 
+		case keyIdentityAgent:
+			section.setIdentityAgent(value)
 		case keyIdentityFile:
 			if section.useDefaultIdentityFile {
 				section.IdentityFile = []string{value}

@@ -62,6 +62,7 @@ type Section struct {
 	Environments map[string]string
 
 	Hostname                          string
+	identityAgent                     string
 	IdentityFile                      []string
 	Port                              string
 	User                              string
@@ -211,6 +212,22 @@ func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) 
 }
 
 //
+// GetIdentityAgent get the identity agent either from section config variable
+// IdentityAgent or from environment variable SSH_AUTH_SOCK.
+// It will return empty string if IdentityAgent set to "none" or SSH_AUTH_SOCK
+// is empty.
+//
+func (section *Section) GetIdentityAgent() string {
+	if section.identityAgent == "none" {
+		return ""
+	}
+	if len(section.identityAgent) > 0 {
+		return section.identityAgent
+	}
+	return os.Getenv(envSshAuthSock)
+}
+
+//
 // isMatch will return true if the string "s" match with one of Host or Match
 // section.
 //
@@ -317,6 +334,30 @@ func (section *Section) setEnv(env string) {
 	if len(kv) == 2 {
 		section.Environments[kv[0]] = kv[1]
 	}
+}
+
+//
+// setIdentityAgent set the UNIX-domain socket used to communicate with
+// the authentication agent.
+// There are four possible value: SSH_AUTH_SOCK, <$STRING>, <PATH>, or
+// "none".
+// If SSH_AUTH_SOCK, the socket path is read from the environment variable
+// SSH_AUTH_SOCK.
+// If value start with "$", then the socket path is set based on value of that
+// environment variable.
+// Other string beside "none" will be considered as path to socket.
+//
+func (section *Section) setIdentityAgent(val string) {
+	if val == envSshAuthSock {
+		section.identityAgent = os.Getenv(envSshAuthSock)
+		return
+	}
+	if val[0] == '$' {
+		// Read the socket from environment variable defined by value.
+		section.identityAgent = os.Getenv(val[1:])
+		return
+	}
+	section.identityAgent = val
 }
 
 func (section *Section) setSendEnv(envs map[string]string, pattern string) {
