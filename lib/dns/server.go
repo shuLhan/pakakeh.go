@@ -97,7 +97,7 @@ type Server struct {
 }
 
 //
-// NewServer create and initialize server using the options and a .handler.
+// NewServer create and initialize DNS server.
 //
 func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	err = opts.init()
@@ -170,11 +170,38 @@ func isResponseValid(req *request, res *Message) bool {
 }
 
 //
+// CachesLoad load the gob encoded answers from r.
+//
+func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
+	logp := "CachesLoad"
+
+	answers, err = srv.caches.read(r)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+	for _, answer := range answers {
+		_ = srv.caches.upsert(answer)
+	}
+	return answers, nil
+}
+
+//
 // CachesLRU return list of non-local caches ordered by the least recently
 // used.
 //
 func (srv *Server) CachesLRU() []*Answer {
 	return srv.caches.list()
+}
+
+//
+// CachesSave write the non-local answers into w, encoded with gob.
+//
+func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
+	n, err = srv.caches.write(w)
+	if err != nil {
+		return 0, fmt.Errorf("CachesSave: %w", err)
+	}
+	return n, nil
 }
 
 //

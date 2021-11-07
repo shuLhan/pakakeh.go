@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"bytes"
 	"testing"
 	"time"
 
@@ -278,4 +279,46 @@ func TestCachesUpsert(t *testing.T) {
 			test.Assert(t, "caches.list", c.expList[x], gotList[x])
 		}
 	}
+}
+
+func TestCaches_write(t *testing.T) {
+	var (
+		caches = newCaches(0, 0)
+		msg    = NewMessageAddress([]byte("test.local"), [][]byte{
+			[]byte("127.0.0.1"),
+		})
+		answer     = newAnswer(msg, false)
+		expAnswers []*Answer
+	)
+
+	ok := caches.upsert(answer)
+	if !ok {
+		t.Fatal("answer not inserted to cache")
+	}
+
+	answers := caches.list()
+	for _, an := range answers {
+		msg := NewMessage()
+		msg.packet = an.msg.packet
+		err := msg.Unpack()
+		if err != nil {
+			t.Fatal(err)
+		}
+		answer = newAnswer(msg, false)
+		expAnswers = append(expAnswers, answer)
+	}
+
+	var buf bytes.Buffer
+
+	_, err := caches.write(&buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotAnswers, err := caches.read(&buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "caches.write", expAnswers, gotAnswers)
 }

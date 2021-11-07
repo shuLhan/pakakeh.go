@@ -6,12 +6,19 @@ package dns
 
 import (
 	"container/list"
+	"encoding/gob"
+	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"sync"
 	"time"
 
 	"github.com/shuLhan/share/lib/debug"
+)
+
+const (
+	cachesFileFormatV1 = 1
 )
 
 //
@@ -36,6 +43,23 @@ type caches struct {
 	// pruned from caches.
 	// Default to -1 hour.
 	pruneThreshold time.Duration
+}
+
+// cachesFileHeader define the file header when storing caches on storage.
+type cachesFileHeader struct {
+	Version int
+}
+
+// cachesFileV1 contains the format of DNS message to be stored on file.
+type cachesFileV1 struct {
+	// Packet contains the raw DNS message.
+	Packet []byte
+
+	// ReceivedAt contains time when message is received.
+	ReceivedAt int64
+
+	// AccessedAt contains time when message last accessed.
+	AccessedAt int64
 }
 
 //
@@ -145,6 +169,49 @@ func (c *caches) prune() (n int) {
 	c.Unlock()
 
 	return n
+}
+
+//
+// read caches stored on storage r.
+//
+func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
+	var (
+		logp   = "caches.read"
+		header = &cachesFileHeader{}
+		dec    = gob.NewDecoder(r)
+	)
+
+	dec.Decode(header)
+
+	if header.Version != cachesFileFormatV1 {
+		return nil, fmt.Errorf("%s: unknown version %d", logp, header.Version)
+	}
+
+	for {
+		item := &cachesFileV1{}
+		err = dec.Decode(item)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+
+		msg := NewMessage()
+		msg.packet = item.Packet
+		err = msg.Unpack()
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+
+		answer := newAnswer(msg, false)
+		answer.ReceivedAt = item.ReceivedAt
+		answer.AccessedAt = item.AccessedAt
+
+		answers = append(answers, answer)
+	}
+
+	return answers, nil
 }
 
 //
@@ -312,4 +379,39 @@ func (c *caches) startWorker() {
 		n := c.prune()
 		fmt.Printf("dns: pruning %d records from cache\n", n)
 	}
+}
+
+//
+// write all non-local answers to w.
+// On success, it returns the number of answers written to w.
+//
+func (c *caches) write(w io.Writer) (n int, err error) {
+	var (
+		logp    = "caches.write"
+		answers = c.list()
+		header  = &cachesFileHeader{
+			Version: cachesFileFormatV1,
+		}
+		enc = gob.NewEncoder(w)
+	)
+
+	err = enc.Encode(header)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	for _, answer := range answers {
+		item := &cachesFileV1{
+			ReceivedAt: answer.ReceivedAt,
+			AccessedAt: answer.AccessedAt,
+			Packet:     answer.msg.packet,
+		}
+		err = enc.Encode(item)
+		if err != nil {
+			return 0, fmt.Errorf("%s: %w", logp, err)
+		}
+		n++
+	}
+
+	return n, nil
 }
