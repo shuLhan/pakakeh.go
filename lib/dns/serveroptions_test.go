@@ -145,7 +145,7 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 
 		so.NameServers = c.nameServers
 
-		so.parseNameServers()
+		so.initNameServers()
 
 		test.Assert(t, "primaryUDP", c.expUDPServers, so.primaryUDP)
 		test.Assert(t, "primaryTCP", c.expTCPServers, so.primaryTCP)

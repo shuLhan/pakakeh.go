@@ -302,7 +302,7 @@ func (srv *Server) RestartForwarders(nameServers, fallbackNS []string) {
 	srv.opts.NameServers = nameServers
 	srv.opts.FallbackNS = fallbackNS
 
-	srv.opts.parseNameServers()
+	srv.opts.initNameServers()
 
 	srv.stopAllForwarders()
 	srv.startAllForwarders()

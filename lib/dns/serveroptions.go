@@ -158,7 +158,7 @@ func (opts *ServerOptions) init() (err error) {
 		return nil
 	}
 
-	opts.parseNameServers()
+	opts.initNameServers()
 
 	if len(opts.primaryUDP) == 0 && len(opts.primaryTCP) == 0 && len(opts.primaryDoh) == 0 && len(opts.primaryDot) == 0 {
 		return fmt.Errorf("dns: no valid name servers")
@@ -207,9 +207,7 @@ func (opts *ServerOptions) hasFallback() bool {
 // If the name server format contains no scheme, it will be assumed to be
 // "udp".
 //
-func parseNameServers(nameServers []string) (
-	udpAddrs, tcpAddrs []net.Addr, dohAddrs, dotAddrs []string,
-) {
+func (opts *ServerOptions) parseNameServers(nameServers []string, isPrimary bool) {
 	for _, ns := range nameServers {
 		dnsURL, err := url.Parse(ns)
 		if err != nil {
@@ -218,15 +216,6 @@ func parseNameServers(nameServers []string) (
 		}
 
 		switch dnsURL.Scheme {
-		case "udp":
-			udpAddr, err := libnet.ParseUDPAddr(dnsURL.Host, DefaultPort)
-			if err != nil {
-				log.Printf("dns: invalid UDP IP address %q", dnsURL.Host)
-				continue
-			}
-
-			udpAddrs = append(udpAddrs, udpAddr)
-
 		case "tcp":
 			tcpAddr, err := libnet.ParseTCPAddr(dnsURL.Host, DefaultPort)
 			if err != nil {
@@ -234,14 +223,26 @@ func parseNameServers(nameServers []string) (
 				continue
 			}
 
-			tcpAddrs = append(tcpAddrs, tcpAddr)
+			if isPrimary {
+				opts.primaryTCP = append(opts.primaryTCP, tcpAddr)
+			} else {
+				opts.fallbackTCP = append(opts.fallbackTCP, tcpAddr)
+			}
 
 		case "https":
 			ip := net.ParseIP(dnsURL.Hostname())
-			if ip != nil {
-				dotAddrs = append(dotAddrs, dnsURL.Host)
+			if ip == nil {
+				if isPrimary {
+					opts.primaryDoh = append(opts.primaryDoh, ns)
+				} else {
+					opts.fallbackDoh = append(opts.fallbackDoh, ns)
+				}
 			} else {
-				dohAddrs = append(dohAddrs, ns)
+				if isPrimary {
+					opts.primaryDot = append(opts.primaryDot, dnsURL.Host)
+				} else {
+					opts.fallbackDot = append(opts.fallbackDot, dnsURL.Host)
+				}
 			}
 
 		default:
@@ -255,14 +256,25 @@ func parseNameServers(nameServers []string) (
 				continue
 			}
 
-			udpAddrs = append(udpAddrs, udpAddr)
+			if isPrimary {
+				opts.primaryUDP = append(opts.primaryUDP, udpAddr)
+			} else {
+				opts.fallbackUDP = append(opts.fallbackUDP, udpAddr)
+			}
 		}
 	}
-
-	return udpAddrs, tcpAddrs, dohAddrs, dotAddrs
 }
 
-func (opts *ServerOptions) parseNameServers() {
-	opts.primaryUDP, opts.primaryTCP, opts.primaryDoh, opts.primaryDot = parseNameServers(opts.NameServers)
-	opts.fallbackUDP, opts.fallbackTCP, opts.fallbackDoh, opts.fallbackDot = parseNameServers(opts.FallbackNS)
+func (opts *ServerOptions) initNameServers() {
+	opts.primaryUDP = nil
+	opts.primaryTCP = nil
+	opts.primaryDoh = nil
+	opts.primaryDot = nil
+	opts.parseNameServers(opts.NameServers, true)
+
+	opts.fallbackUDP = nil
+	opts.fallbackTCP = nil
+	opts.fallbackDoh = nil
+	opts.fallbackDot = nil
+	opts.parseNameServers(opts.FallbackNS, false)
 }
