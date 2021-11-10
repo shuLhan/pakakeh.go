@@ -766,6 +766,10 @@ func (srv *Server) processResponse(req *request, res *Message) {
 			res.Header.ID, res.Question.String())
 		return
 	}
+	if res.Header.IsTC {
+		log.Printf("dns: ! %s TRUNCATED %s", connTypeNames[req.kind], res.Question.String())
+		return
+	}
 
 	an := newAnswer(res, false)
 	inserted := srv.caches.upsert(an)
