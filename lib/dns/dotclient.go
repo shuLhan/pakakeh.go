@@ -139,7 +139,7 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	packet := make([]byte, maxUDPPacketSize)
+	packet := make([]byte, maxTcpPacketSize)
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {
@@ -149,7 +149,7 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	msg.packet = libbytes.Copy(packet[2:n])
+	msg.packet = packet[2:n]
 
 	if debug.Value >= 3 {
 		libbytes.PrintHex(">>> DoTClient: recv: ", msg.packet, 8)

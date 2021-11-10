@@ -6,6 +6,7 @@ package dns
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"time"
 
@@ -123,15 +124,13 @@ func (cl *TCPClient) Lookup(
 // Query send DNS query to name server.
 // The addr parameter is unused.
 //
-func (cl *TCPClient) Query(msg *Message) (*Message, error) {
-	_, err := cl.Write(msg.packet)
+func (cl *TCPClient) Query(msg *Message) (res *Message, err error) {
+	_, err = cl.Write(msg.packet)
 	if err != nil {
 		return nil, err
 	}
 
-	res := NewMessage()
-
-	_, err = cl.recv(res)
+	res, err = cl.recv()
 	if err != nil {
 		return nil, err
 	}
@@ -192,31 +191,33 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 }
 
 //
-// recv will read DNS message from active connection in client into `msg`.
+// recv receive DNS message.
 //
-func (cl *TCPClient) recv(msg *Message) (n int, err error) {
+func (cl *TCPClient) recv() (res *Message, err error) {
 	if cl.readTimeout > 0 {
 		err = cl.conn.SetReadDeadline(time.Now().Add(cl.readTimeout))
 		if err != nil {
-			return
+			return nil, err
 		}
 	}
 
-	packet := make([]byte, maxUDPPacketSize)
+	packet := make([]byte, maxTcpPacketSize)
 
-	n, err = cl.conn.Read(packet)
+	n, err := cl.conn.Read(packet)
 	if err != nil {
-		return
+		return nil, err
 	}
 	if n == 0 {
-		return
+		return nil, io.EOF
 	}
 
-	msg.packet = libbytes.Copy(packet[2:n])
+	res = &Message{
+		packet: packet[2:n],
+	}
 
 	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> TCPClient: recv: ", msg.packet, 8)
+		libbytes.PrintHex(">>> TCPClient.recv: ", res.packet, 8)
 	}
 
-	return
+	return res, nil
 }

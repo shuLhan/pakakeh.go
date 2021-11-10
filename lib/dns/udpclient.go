@@ -115,56 +115,42 @@ func (cl *UDPClient) Lookup(
 //
 // Query send DNS query to name server "ns" and return the unpacked response.
 //
-func (cl *UDPClient) Query(msg *Message) (*Message, error) {
+func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
+	logp := "Query"
 	cl.Lock()
+	defer cl.Unlock()
 
-	_, err := cl.Write(msg.packet)
+	_, err = cl.Write(req.packet)
 	if err != nil {
-		cl.Unlock()
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	res := NewMessage()
-
-	_, err = cl.recv(res)
+	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
-		cl.Unlock()
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	cl.Unlock()
+	packet := make([]byte, maxUdpPacketSize)
+
+	n, _, err := cl.conn.ReadFromUDP(packet)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	res = &Message{
+		packet: packet[:n],
+	}
+
+	if debug.Value >= 3 {
+		libbytes.PrintHex(">>> UDPClient.recv:", res.packet, 8)
+	}
 
 	err = res.Unpack()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return res, nil
-}
-
-//
-// recv will read DNS message from active connection in client into `msg`.
-//
-func (cl *UDPClient) recv(msg *Message) (n int, err error) {
-	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
-	if err != nil {
-		return
-	}
-
-	packet := make([]byte, maxUDPPacketSize)
-
-	n, _, err = cl.conn.ReadFromUDP(packet)
-	if err != nil {
-		return
-	}
-
-	msg.packet = libbytes.Copy(packet[:n])
-
-	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> UDPClient: recv:", msg.packet, 8)
-	}
-
-	return
 }
 
 //

@@ -462,13 +462,17 @@ func (srv *Server) serveTCP() {
 // serveUDP serve DNS request from UDP connection.
 //
 func (srv *Server) serveUDP() {
+	var (
+		n      int
+		packet = make([]byte, maxUdpPacketSize)
+		raddr  *net.UDPAddr
+		req    *request
+		err    error
+	)
+
 	log.Println("dns.Server: listening for DNS over UDP at", srv.udp.LocalAddr())
-
-	packet := make([]byte, maxUDPPacketSize)
 	for {
-		req := newRequest()
-
-		n, raddr, err := srv.udp.ReadFromUDP(packet)
+		n, raddr, err = srv.udp.ReadFromUDP(packet)
 		if err != nil {
 			if n == 0 || errors.Is(err, io.EOF) {
 				err = nil
@@ -479,6 +483,7 @@ func (srv *Server) serveUDP() {
 			return
 		}
 
+		req = newRequest()
 		req.message.packet = libbytes.Copy(packet[:n])
 
 		req.kind = connTypeUDP
@@ -606,16 +611,17 @@ func (srv *Server) incForwarder() {
 }
 
 func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
+	var (
+		req *request
+		err error
+	)
 	for {
-		req := newRequest()
+		req = newRequest()
 
-		n, err := cl.recv(req.message)
+		req.message, err = cl.recv()
 		if err != nil {
 			log.Printf("serveTCPClient: %s: %s",
 				connTypeNames[kind], err.Error())
-			break
-		}
-		if n == 0 || len(req.message.packet) == 0 {
 			break
 		}
 
@@ -632,7 +638,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 		srv.requestq <- req
 	}
 
-	err := cl.conn.Close()
+	err = cl.conn.Close()
 	if err != nil {
 		log.Printf("serveTCPClient: conn.Close: %s: %s",
 			connTypeNames[kind], err.Error())

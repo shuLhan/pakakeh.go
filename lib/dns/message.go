@@ -619,7 +619,7 @@ func (msg *Message) Reset() {
 	msg.Question.Reset()
 
 	msg.ResetRR()
-	msg.packet = append(msg.packet[:0], make([]byte, maxUDPPacketSize)...)
+	msg.packet = nil
 
 	msg.dname = ""
 	msg.off = 0

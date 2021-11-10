@@ -41,7 +41,8 @@ const (
 	maskOPTDO   uint32 = 0x00008000
 
 	maxLabelSize     = 63
-	maxUDPPacketSize = 4096
+	maxUdpPacketSize = 512
+	maxTcpPacketSize = 4096
 	rdataIPv4Size    = 4
 	rdataIPv6Size    = 16
 	// sectionHeaderSize define the size of section header in DNS message.
