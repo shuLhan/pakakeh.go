@@ -62,14 +62,6 @@ type ServerOptions struct {
 	//
 	NameServers []string `ini:"dns:server:parent"`
 
-	//
-	// FallbackNS contains list of parent name servers that will be
-	// queried if the primary NameServers return an error.
-	//
-	// This field use the same format as NameServers.
-	//
-	FallbackNS []string
-
 	// TLSCertFile contains path to certificate for serving DNS over TLS
 	// and HTTPS.
 	// This field is optional, if its empty, server will listening on
@@ -124,11 +116,6 @@ type ServerOptions struct {
 	// primaryDot contains list of parent name server addresses using DoT
 	// protocol.
 	primaryDot []string
-
-	fallbackUDP []net.Addr
-	fallbackTCP []net.Addr
-	fallbackDoh []string
-	fallbackDot []string
 }
 
 //
@@ -195,11 +182,6 @@ func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
 	}
 }
 
-func (opts *ServerOptions) hasFallback() bool {
-	return len(opts.fallbackUDP) > 0 || len(opts.fallbackTCP) > 0 ||
-		len(opts.fallbackDot) > 0 || len(opts.fallbackDoh) > 0
-}
-
 //
 // parseNameServers parse each name server in NameServers list based on scheme
 // and store the result either in udpAddrs, tcpAddrs, dohAddrs, or dotAddrs.
@@ -207,7 +189,7 @@ func (opts *ServerOptions) hasFallback() bool {
 // If the name server format contains no scheme, it will be assumed to be
 // "udp".
 //
-func (opts *ServerOptions) parseNameServers(nameServers []string, isPrimary bool) {
+func (opts *ServerOptions) parseNameServers(nameServers []string) {
 	for _, ns := range nameServers {
 		dnsURL, err := url.Parse(ns)
 		if err != nil {
@@ -223,26 +205,14 @@ func (opts *ServerOptions) parseNameServers(nameServers []string, isPrimary bool
 				continue
 			}
 
-			if isPrimary {
-				opts.primaryTCP = append(opts.primaryTCP, tcpAddr)
-			} else {
-				opts.fallbackTCP = append(opts.fallbackTCP, tcpAddr)
-			}
+			opts.primaryTCP = append(opts.primaryTCP, tcpAddr)
 
 		case "https":
 			ip := net.ParseIP(dnsURL.Hostname())
 			if ip == nil {
-				if isPrimary {
-					opts.primaryDoh = append(opts.primaryDoh, ns)
-				} else {
-					opts.fallbackDoh = append(opts.fallbackDoh, ns)
-				}
+				opts.primaryDoh = append(opts.primaryDoh, ns)
 			} else {
-				if isPrimary {
-					opts.primaryDot = append(opts.primaryDot, dnsURL.Host)
-				} else {
-					opts.fallbackDot = append(opts.fallbackDot, dnsURL.Host)
-				}
+				opts.primaryDot = append(opts.primaryDot, dnsURL.Host)
 			}
 
 		default:
@@ -256,11 +226,7 @@ func (opts *ServerOptions) parseNameServers(nameServers []string, isPrimary bool
 				continue
 			}
 
-			if isPrimary {
-				opts.primaryUDP = append(opts.primaryUDP, udpAddr)
-			} else {
-				opts.fallbackUDP = append(opts.fallbackUDP, udpAddr)
-			}
+			opts.primaryUDP = append(opts.primaryUDP, udpAddr)
 		}
 	}
 }
@@ -270,11 +236,5 @@ func (opts *ServerOptions) initNameServers() {
 	opts.primaryTCP = nil
 	opts.primaryDoh = nil
 	opts.primaryDot = nil
-	opts.parseNameServers(opts.NameServers, true)
-
-	opts.fallbackUDP = nil
-	opts.fallbackTCP = nil
-	opts.fallbackDoh = nil
-	opts.fallbackDot = nil
-	opts.parseNameServers(opts.FallbackNS, false)
+	opts.parseNameServers(opts.NameServers)
 }
