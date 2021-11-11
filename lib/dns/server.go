@@ -114,21 +114,19 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	udpAddr := opts.getUDPAddress()
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
 	if err != nil {
-		return nil, fmt.Errorf("dns: error listening on UDP '%v': %s",
-			udpAddr, err.Error())
+		return nil, fmt.Errorf("dns: error listening on UDP '%v': %s", udpAddr, err)
 	}
 
 	tcpAddr := opts.getTCPAddress()
 	srv.tcp, err = net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
-		return nil, fmt.Errorf("dns: error listening on TCP '%v': %s",
-			tcpAddr, err.Error())
+		return nil, fmt.Errorf("dns: error listening on TCP '%v': %s", tcpAddr, err)
 	}
 
 	if len(opts.TLSCertFile) > 0 && len(opts.TLSPrivateKey) > 0 {
 		cert, err := tls.LoadX509KeyPair(opts.TLSCertFile, opts.TLSPrivateKey)
 		if err != nil {
-			return nil, fmt.Errorf("dns: error loading certificate: " + err.Error())
+			return nil, fmt.Errorf("dns: error loading certificate: %w", err)
 		}
 
 		srv.tlsConfig = &tls.Config{
@@ -231,8 +229,7 @@ func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 	}
 
 	if debug.Value >= 1 {
-		fmt.Printf("dns: %d out of %d records cached from %q\n", n,
-			len(msgs), from)
+		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(msgs), from)
 	}
 }
 
@@ -251,8 +248,7 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
 		n++
 	}
 	if debug.Value >= 1 {
-		fmt.Printf("dns: %d out of %d records cached from %q\n", n,
-			len(listRR), from)
+		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
 	}
 	return nil
 }
@@ -620,8 +616,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 
 		req.message, err = cl.recv()
 		if err != nil {
-			log.Printf("serveTCPClient: %s: %s",
-				connTypeNames[kind], err.Error())
+			log.Printf("serveTCPClient: %s: %s", connTypeNames[kind], err)
 			break
 		}
 
@@ -640,8 +635,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 
 	err = cl.conn.Close()
 	if err != nil {
-		log.Printf("serveTCPClient: conn.Close: %s: %s",
-			connTypeNames[kind], err.Error())
+		log.Printf("serveTCPClient: conn.Close: %s: %s", connTypeNames[kind], err)
 	}
 }
 
@@ -736,9 +730,7 @@ func (srv *Server) processRequest() {
 		res := an.msg
 
 		if debug.Value >= 1 {
-			fmt.Printf("dns: < %s %d:%s\n",
-				connTypeNames[req.kind],
-				res.Header.ID, res.Question.String())
+			fmt.Printf("dns: < %s %d:%s\n", connTypeNames[req.kind], res.Header.ID, res.Question.String())
 		}
 
 		_, err := req.writer.Write(res.packet)
@@ -857,8 +849,7 @@ func (srv *Server) runDohForwarder(isPrimary bool, tag, nameserver string,
 	for {
 		forwarder, err := NewDoHClient(nameserver, false)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s",
-				tag, err.Error())
+			log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 
 			select {
 			case <-stopper:
@@ -895,7 +886,7 @@ func (srv *Server) runDohForwarder(isPrimary bool, tag, nameserver string,
 
 				res, err := forwarder.Query(req.message)
 				if err != nil {
-					log.Printf("dns: %s forward failed: %s", tag, err.Error())
+					log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 					if fallbackq != nil {
 						fallbackq <- req
 					}
@@ -930,8 +921,7 @@ func (srv *Server) runTLSForwarder(isPrimary bool, tag, nameserver string,
 	for {
 		forwarder, err := NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s",
-				tag, err.Error())
+			log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 
 			select {
 			case <-stopper:
@@ -968,7 +958,7 @@ func (srv *Server) runTLSForwarder(isPrimary bool, tag, nameserver string,
 
 				res, err := forwarder.Query(req.message)
 				if err != nil {
-					log.Printf("dns: %s forward failed: %s", tag, err.Error())
+					log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 					if fallbackq != nil {
 						fallbackq <- req
 					}
@@ -1026,7 +1016,7 @@ func (srv *Server) runTCPForwarder(isPrimary bool, tag, nameserver string,
 
 			cl, err := NewTCPClient(nameserver)
 			if err != nil {
-				log.Printf("dns: failed to create forwarder %s: %s", tag, err.Error())
+				log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 				err = nil
 				continue
 			}
@@ -1034,7 +1024,7 @@ func (srv *Server) runTCPForwarder(isPrimary bool, tag, nameserver string,
 			res, err := cl.Query(req.message)
 			cl.Close()
 			if err != nil {
-				log.Printf("dns: %s forward failed: %s", tag, err.Error())
+				log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 				if fallbackq != nil {
 					fallbackq <- req
 				}
@@ -1069,8 +1059,7 @@ func (srv *Server) runUDPForwarder(isPrimary bool, tag, nameserver string,
 	for {
 		forwarder, err := NewUDPClient(nameserver)
 		if err != nil {
-			log.Printf("dns: failed to create forwarder %s: %s",
-				tag, err.Error())
+			log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 
 			select {
 			case <-stopper:
@@ -1108,7 +1097,7 @@ func (srv *Server) runUDPForwarder(isPrimary bool, tag, nameserver string,
 
 				res, err := forwarder.Query(req.message)
 				if err != nil {
-					log.Printf("dns: %s forward failed: %s", tag, err.Error())
+					log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 					if fallbackq != nil {
 						fallbackq <- req
 					}
