@@ -68,6 +68,12 @@ func TestServerOptionsInit(t *testing.T) {
 					Port: 53,
 				},
 			},
+			primaryTCP: []net.Addr{
+				&net.TCPAddr{
+					IP:   net.ParseIP("127.0.0.1"),
+					Port: 53,
+				},
+			},
 		},
 	}}
 
@@ -120,6 +126,10 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 			IP:   ip,
 			Port: 53,
 		}},
+		expTCPServers: []net.Addr{&net.TCPAddr{
+			IP:   ip,
+			Port: 53,
+		}},
 	}, {
 		desc: "With valid name servers",
 		nameServers: []string{
@@ -131,10 +141,16 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 			IP:   ip,
 			Port: 53,
 		}},
-		expTCPServers: []net.Addr{&net.TCPAddr{
-			IP:   ip,
-			Port: 5353,
-		}},
+		expTCPServers: []net.Addr{
+			&net.TCPAddr{
+				IP:   ip,
+				Port: 53,
+			},
+			&net.TCPAddr{
+				IP:   ip,
+				Port: 5353,
+			},
+		},
 		expDoHServers: []string{
 			"https://localhost/dns-query",
 		},

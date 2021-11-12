@@ -46,7 +46,7 @@ type ServerOptions struct {
 	// The name server use the URI format,
 	//
 	//	nameserver  = [ scheme "://" ] ( ip-address / domain-name ) [:port]
-	//	scheme      = ( "udp" / "tcp" / "https" )
+	//	scheme      = ( "udp" / "https" )
 	//	ip-address  = ( ip4 / ip6 )
 	//	domain-name = ; fully qualified domain name
 	//
@@ -56,7 +56,6 @@ type ServerOptions struct {
 	// Example,
 	//
 	//	udp://35.240.172.103
-	//	tcp://35.240.172.103:5353
 	//	https://35.240.172.103:853 (DNS over TLS)
 	//	https://kilabit.info/dns-query (DNS over HTTPS)
 	//
@@ -147,7 +146,7 @@ func (opts *ServerOptions) init() (err error) {
 
 	opts.initNameServers()
 
-	if len(opts.primaryUDP) == 0 && len(opts.primaryTCP) == 0 && len(opts.primaryDoh) == 0 && len(opts.primaryDot) == 0 {
+	if len(opts.primaryUDP) == 0 && len(opts.primaryDoh) == 0 && len(opts.primaryDot) == 0 {
 		return fmt.Errorf("dns: no valid name servers")
 	}
 
@@ -201,10 +200,9 @@ func (opts *ServerOptions) parseNameServers(nameServers []string) {
 		case "tcp":
 			tcpAddr, err := libnet.ParseTCPAddr(dnsURL.Host, DefaultPort)
 			if err != nil {
-				log.Printf("dns: invalid TCP IP address %q", dnsURL.Host)
+				log.Printf("dns: invalid IP address %q", dnsURL.Host)
 				continue
 			}
-
 			opts.primaryTCP = append(opts.primaryTCP, tcpAddr)
 
 		case "https":
@@ -222,11 +220,17 @@ func (opts *ServerOptions) parseNameServers(nameServers []string) {
 
 			udpAddr, err := libnet.ParseUDPAddr(ns, DefaultPort)
 			if err != nil {
-				log.Printf("dns: invalid UDP IP address %q", ns)
+				log.Printf("dns: invalid IP address %q", ns)
 				continue
 			}
-
 			opts.primaryUDP = append(opts.primaryUDP, udpAddr)
+
+			tcpAddr, err := libnet.ParseTCPAddr(ns, DefaultPort)
+			if err != nil {
+				log.Printf("dns: invalid IP address %q", ns)
+				continue
+			}
+			opts.primaryTCP = append(opts.primaryTCP, tcpAddr)
 		}
 	}
 }
