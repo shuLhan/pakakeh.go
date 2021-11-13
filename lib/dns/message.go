@@ -366,7 +366,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		}
 	}
 
-	rr.offTTL = uint(msg.off)
+	rr.idxTTL = uint(msg.off)
 	msg.packet = libbytes.AppendUint32(msg.packet, rr.TTL)
 	msg.off += 4
 
@@ -809,7 +809,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Answer[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, msg.Answer[x].offTTL,
+		libbytes.WriteUint32(msg.packet, msg.Answer[x].idxTTL,
 			msg.Answer[x].TTL)
 	}
 	for x := 0; x < len(msg.Authority); x++ {
@@ -818,7 +818,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Authority[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, msg.Authority[x].offTTL,
+		libbytes.WriteUint32(msg.packet, msg.Authority[x].idxTTL,
 			msg.Authority[x].TTL)
 	}
 	for x := 0; x < len(msg.Additional); x++ {
@@ -830,7 +830,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Additional[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, msg.Additional[x].offTTL,
+		libbytes.WriteUint32(msg.packet, msg.Additional[x].idxTTL,
 			msg.Additional[x].TTL)
 	}
 }
@@ -938,14 +938,14 @@ func (msg *Message) Unpack() (err error) {
 // message.
 //
 func (msg *Message) UnpackHeaderQuestion() (err error) {
+	if len(msg.packet) <= sectionHeaderSize {
+		return fmt.Errorf("UnpackHeaderQuestion: missing question")
+	}
+
 	msg.Header.unpack(msg.packet)
 
 	if debug.Value >= 3 {
 		log.Printf("msg.Header: %+v\n", msg.Header)
-	}
-
-	if len(msg.packet) <= sectionHeaderSize {
-		return fmt.Errorf("Message.UnpackHeaderQuestion: missing question")
 	}
 
 	err = msg.Question.unpack(msg.packet[sectionHeaderSize:])
