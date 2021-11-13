@@ -6,7 +6,6 @@ package dns
 
 import (
 	"fmt"
-	"strings"
 
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -29,18 +28,6 @@ type RDataMX struct {
 }
 
 //
-// String return readable representation of MX record.
-//
-func (mx *RDataMX) String() string {
-	var b strings.Builder
-
-	fmt.Fprintf(&b, "{Preference:%d Exchange:%s}", mx.Preference,
-		mx.Exchange)
-
-	return b.String()
-}
-
-//
 // initAndValidate initialize and validate the MX fields.
 //
 func (mx *RDataMX) initAndValidate() error {
@@ -48,8 +35,7 @@ func (mx *RDataMX) initAndValidate() error {
 		mx.Preference = defMXPreference
 	}
 	if !libnet.IsHostnameValid([]byte(mx.Exchange), true) {
-		return fmt.Errorf("invalid or empty MX Exchange %q",
-			string(mx.Exchange))
+		return fmt.Errorf("invalid or empty MX Exchange %q", mx.Exchange)
 	}
 	return nil
 }

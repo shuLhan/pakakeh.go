@@ -337,15 +337,14 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	c.Lock()
 	defer c.Unlock()
 
-	dname := string(rr.Name)
-	ans := c.v[dname]
+	ans := c.v[rr.Name]
 	if ans == nil {
 		msg, err := NewMessageFromRR(rr)
 		if err != nil {
 			return err
 		}
 		an := newAnswer(msg, true)
-		c.v[dname] = newAnswers(an)
+		c.v[rr.Name] = newAnswers(an)
 		return nil
 	}
 

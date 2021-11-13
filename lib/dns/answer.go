@@ -42,7 +42,7 @@ type Answer struct {
 //
 func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	an = &Answer{
-		QName:  string(msg.Question.Name),
+		QName:  msg.Question.Name,
 		QType:  msg.Question.Type,
 		QClass: msg.Question.Class,
 		msg:    msg,

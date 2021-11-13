@@ -679,7 +679,7 @@ func (srv *Server) processRequest() {
 				req.message.Question.String())
 		}
 
-		ans, an := srv.caches.get(string(req.message.Question.Name),
+		ans, an := srv.caches.get(req.message.Question.Name,
 			req.message.Question.Type,
 			req.message.Question.Class)
 
