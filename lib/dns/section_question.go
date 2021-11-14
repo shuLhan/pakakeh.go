@@ -32,7 +32,7 @@ type SectionQuestion struct {
 
 	// A two octet code that specifies the class of the query.  For
 	// example, the QCLASS field is IN for the Internet.
-	Class uint16
+	Class RecordClass
 }
 
 //
@@ -41,13 +41,13 @@ type SectionQuestion struct {
 func (question *SectionQuestion) Reset() {
 	question.Name = question.Name[:0]
 	question.Type = RecordTypeA
-	question.Class = QueryClassIN
+	question.Class = RecordClassIN
 }
 
 //
 // size return the section question size, length of name + 2 (1 octet for
 // beginning size plus 1 octet for end of label) + 2 octets of
-// rtype + 2 octets of qclass
+// rtype + 2 octets of rclass
 //
 func (question *SectionQuestion) size() int {
 	return len(question.Name) + 6
@@ -111,7 +111,7 @@ func (question *SectionQuestion) unpack(packet []byte) (err error) {
 	question.Name = sb.String()
 	question.Type = RecordType(libbytes.ReadUint16(packet, uint(x)))
 	x += 2
-	question.Class = libbytes.ReadUint16(packet, uint(x))
+	question.Class = RecordClass(libbytes.ReadUint16(packet, uint(x)))
 
 	return nil
 }

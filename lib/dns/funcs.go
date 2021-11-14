@@ -70,7 +70,7 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 		revIP = append(revIP, []byte(".ip6.arpa")...)
 	}
 
-	msg, err := client.Lookup(true, RecordTypePTR, QueryClassIN, string(revIP))
+	msg, err := client.Lookup(true, RecordTypePTR, RecordClassIN, string(revIP))
 	if err != nil {
 		return "", err
 	}

@@ -22,13 +22,13 @@ func TestDoHClient_Lookup(t *testing.T) {
 		desc           string
 		allowRecursion bool
 		rtype          RecordType
-		qclass         uint16
+		rclass         RecordClass
 		qname          string
 		exp            *Message
 	}{{
-		desc:   "QType:A QClass:IN QName:kilabit.info",
+		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -40,12 +40,12 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				rdlen: 4,
 				Value: "127.0.0.1",
@@ -54,9 +54,9 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:SOA QClass:IN QName:kilabit.info",
+		desc:   "QType:SOA RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeSOA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -68,12 +68,12 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
 					MName:   "kilabit.info",
@@ -89,9 +89,9 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:TXT QClass:IN QName:kilabit.info",
+		desc:   "QType:TXT RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeTXT,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -103,12 +103,12 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "This is a test server",
 			}},
@@ -116,9 +116,9 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:AAAA QClass:IN QName:kilabit.info",
+		desc:   "QType:AAAA RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeAAAA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -130,7 +130,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeAAAA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer:     []ResourceRecord{},
 			Authority:  []ResourceRecord{},
@@ -141,7 +141,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.allowRecursion, c.rtype, c.qclass, c.qname)
+		got, err := cl.Lookup(c.allowRecursion, c.rtype, c.rclass, c.qname)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -167,13 +167,13 @@ func TestDoHClient_Post(t *testing.T) {
 		desc           string
 		allowRecursion bool
 		rtype          RecordType
-		qclass         uint16
+		rclass         RecordClass
 		qname          string
 		exp            *Message
 	}{{
-		desc:   "QType:A QClass:IN QName:kilabit.info",
+		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -185,12 +185,12 @@ func TestDoHClient_Post(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				rdlen: 4,
 				Value: "127.0.0.1",
@@ -199,9 +199,9 @@ func TestDoHClient_Post(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:SOA QClass:IN QName:kilabit.info",
+		desc:   "QType:SOA RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeSOA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -213,12 +213,12 @@ func TestDoHClient_Post(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
 					MName:   "kilabit.info",
@@ -234,9 +234,9 @@ func TestDoHClient_Post(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:TXT QClass:IN QName:kilabit.info",
+		desc:   "QType:TXT RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeTXT,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -248,12 +248,12 @@ func TestDoHClient_Post(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "This is a test server",
 			}},
@@ -261,9 +261,9 @@ func TestDoHClient_Post(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:AAAA QClass:IN QName:kilabit.info",
+		desc:   "QType:AAAA RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeAAAA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
 			Header: SectionHeader{
@@ -275,7 +275,7 @@ func TestDoHClient_Post(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeAAAA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer:     []ResourceRecord{},
 			Authority:  []ResourceRecord{},
@@ -290,7 +290,7 @@ func TestDoHClient_Post(t *testing.T) {
 
 		msg.Header.IsRD = c.allowRecursion
 		msg.Question.Type = c.rtype
-		msg.Question.Class = c.qclass
+		msg.Question.Class = c.rclass
 		msg.Question.Name = c.qname
 
 		_, err := msg.Pack()
@@ -323,20 +323,20 @@ func TestDoHClient_Get(t *testing.T) {
 	cases := []struct {
 		desc   string
 		rtype  RecordType
-		qclass uint16
+		rclass RecordClass
 		qname  string
 		exp    *Message
 		expErr string
 	}{{
-		desc:   "QType:A QClass:IN QName:kilabit.info",
+		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		expErr: "404 page not found\n",
 	}, {
-		desc:   "QType:A QClass:IN QName:kilabit.info",
+		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
-		qclass: QueryClassIN,
+		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		expErr: "404 page not found\n",
 	}}
@@ -347,7 +347,7 @@ func TestDoHClient_Get(t *testing.T) {
 		msg := NewMessage()
 
 		msg.Question.Type = c.rtype
-		msg.Question.Class = c.qclass
+		msg.Question.Class = c.rclass
 		msg.Question.Name = c.qname
 
 		_, err := msg.Pack()

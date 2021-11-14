@@ -25,8 +25,8 @@ type Answer struct {
 	QName string
 	// RType contains record type, a copy of msg.Question.Type.
 	RType RecordType
-	// qclass contains DNS question class, a copy of msg.Question.Class.
-	QClass uint16
+	// RClass contains record class, a copy of msg.Question.Class.
+	RClass RecordClass
 
 	// msg contains the unpacked DNS message.
 	msg *Message
@@ -44,7 +44,7 @@ func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	an = &Answer{
 		QName:  msg.Question.Name,
 		RType:  msg.Question.Type,
-		QClass: msg.Question.Class,
+		RClass: msg.Question.Class,
 		msg:    msg,
 	}
 	if isLocal {

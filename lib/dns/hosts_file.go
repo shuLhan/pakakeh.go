@@ -194,7 +194,7 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 				rr := &ResourceRecord{
 					Name:  string(bytes.ToLower(hname)),
 					Type:  rtype,
-					Class: QueryClassIN,
+					Class: RecordClassIN,
 					TTL:   defaultTTL,
 					Value: string(addr),
 				}

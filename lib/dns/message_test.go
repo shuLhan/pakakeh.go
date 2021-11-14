@@ -86,7 +86,7 @@ func TestMessagePackQuestion(t *testing.T) {
 		msg: &Message{
 			Question: SectionQuestion{
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			dnameOff: make(map[string]uint16),
 		},
@@ -99,7 +99,7 @@ func TestMessagePackQuestion(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilaBit",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			dnameOff: make(map[string]uint16),
 		},
@@ -113,7 +113,7 @@ func TestMessagePackQuestion(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			dnameOff: make(map[string]uint16),
 		},
@@ -129,7 +129,7 @@ func TestMessagePackQuestion(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "MAIL.KILABIT.INFO",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			dnameOff: make(map[string]uint16),
 		},
@@ -167,7 +167,7 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.INFO",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			dnameOff: make(map[string]uint16),
 		},
@@ -200,12 +200,12 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "KILABIT.INFO",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x00000168,
 				Value: "103.200.4.162",
 			}},
@@ -289,24 +289,24 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x01336e,
 				Value: "ns2.dewaweb.com",
 			}, {
 				Name:  "kilabit.INFO",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x01336e,
 				Value: "NS3.DEWAWEB.COM",
 			}, {
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x01336e,
 				Value: "ns1.dewaweb.com",
 			}},
@@ -355,12 +355,12 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "mail.kilabit.info",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "mail.kilabit.info",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x0168,
 				Value: "kilabit.info",
 			}},
@@ -399,12 +399,12 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   10511,
 				Value: &RDataSOA{
 					MName:   "ns1.dewaweb.com",
@@ -486,12 +486,12 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				Value: &RDataMX{
 					Preference: 0x28,
@@ -500,7 +500,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				Value: &RDataMX{
 					Preference: 0x0a,
@@ -509,7 +509,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				Value: &RDataMX{
 					Preference: 0x14,
@@ -518,7 +518,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				Value: &RDataMX{
 					Preference: 0x1e,
@@ -527,7 +527,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				Value: &RDataMX{
 					Preference: 0x32,
@@ -584,24 +584,24 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   300,
 				Value: "facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95",
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   300,
 				Value: "v=spf1 include:_spf.google.com ~all",
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   300,
 				Value: "docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e",
 			}},
@@ -645,13 +645,13 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeAAAA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "google.com",
 				Type:  RecordTypeAAAA,
 				TTL:   0x53,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				Value: "2404:6800:4003:c00::8b",
 			}},
 			Additional: []ResourceRecord{{
@@ -743,12 +743,12 @@ func TestMessagePack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				Value: &RDataSRV{
 					Service:  "_xmpp-server",
@@ -762,7 +762,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				Value: &RDataSRV{
 					Service:  "_xmpp-server",
@@ -776,7 +776,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				Value: &RDataSRV{
 					Service:  "_xmpp-server",
@@ -790,7 +790,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				Value: &RDataSRV{
 					Service:  "_xmpp-server",
@@ -804,7 +804,7 @@ func TestMessagePack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				Value: &RDataSRV{
 					Service:  "_xmpp-server",
@@ -1072,12 +1072,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x00000168,
 				rdlen: 4,
 				rdata: []byte{0x67, 0xc8, 0x04, 0xa2},
@@ -1145,12 +1145,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x01336e,
 				rdlen: 0x11,
 				rdata: []byte{
@@ -1160,7 +1160,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x01336e,
 				rdlen: 6,
 				rdata: []byte{
@@ -1170,7 +1170,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x01336e,
 				rdlen: 6,
 				rdata: []byte{
@@ -1223,12 +1223,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "mail.kilabit.info",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "mail.kilabit.info",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x0168,
 				rdlen: 2,
 				rdata: []byte{0xc0, 0x11},
@@ -1281,12 +1281,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   10511,
 				rdlen: 56,
 				rdata: []byte{
@@ -1378,12 +1378,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				rdlen: 0x11,
 				rdata: []byte{
@@ -1400,7 +1400,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				rdlen: 0x04,
 				rdata: []byte{
@@ -1414,7 +1414,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				rdlen: 0x09,
 				rdata: []byte{
@@ -1429,7 +1429,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				rdlen: 0x09,
 				rdata: []byte{
@@ -1444,7 +1444,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x000000fc,
 				rdlen: 0x09,
 				rdata: []byte{
@@ -1525,12 +1525,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   300,
 				rdlen: 60,
 				rdata: []byte{
@@ -1547,7 +1547,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   300,
 				rdlen: 36,
 				rdata: []byte{
@@ -1561,7 +1561,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   300,
 				rdlen: 46,
 				rdata: []byte{
@@ -1615,12 +1615,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeAAAA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "google.com",
 				Type:  RecordTypeAAAA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x53,
 				rdlen: 16,
 				rdata: []byte{
@@ -1719,12 +1719,12 @@ func TestMessageUnpack(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				rdlen: 0x20,
 				rdata: []byte{
@@ -1746,7 +1746,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				rdlen: 0x25,
 				rdata: []byte{
@@ -1769,7 +1769,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				rdlen: 0x25,
 				rdata: []byte{
@@ -1792,7 +1792,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				rdlen: 0x25,
 				rdata: []byte{
@@ -1815,7 +1815,7 @@ func TestMessageUnpack(t *testing.T) {
 			}, {
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   0x231,
 				rdlen: 0x25,
 				rdata: []byte{

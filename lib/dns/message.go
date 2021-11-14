@@ -81,7 +81,7 @@ func NewMessage() *Message {
 		},
 		Question: SectionQuestion{
 			Type:  RecordTypeA,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 		},
 		dnameOff: make(map[string]uint16),
 	}
@@ -114,7 +114,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	rr := ResourceRecord{
 		Name:  string(hname),
 		Type:  rtype,
-		Class: QueryClassIN,
+		Class: RecordClassIN,
 		TTL:   defaultTTL,
 		Value: string(addr),
 	}
@@ -128,7 +128,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 		Question: SectionQuestion{
 			Name:  string(hname),
 			Type:  rtype,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 		},
 		Answer: []ResourceRecord{rr},
 	}
@@ -144,7 +144,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 		msg.Answer = append(msg.Answer, ResourceRecord{
 			Name:  string(hname),
 			Type:  rtype,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 			TTL:   defaultTTL,
 			Value: string(addr),
 		})
@@ -333,7 +333,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 func (msg *Message) packQuestion() {
 	msg.packDomainName([]byte(msg.Question.Name), false)
 	msg.packet = libbytes.AppendUint16(msg.packet, uint16(msg.Question.Type))
-	msg.packet = libbytes.AppendUint16(msg.packet, msg.Question.Class)
+	msg.packet = libbytes.AppendUint16(msg.packet, uint16(msg.Question.Class))
 	msg.off += 4
 }
 
@@ -351,7 +351,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 	}
 
 	msg.packet = libbytes.AppendUint16(msg.packet, uint16(rr.Type))
-	msg.packet = libbytes.AppendUint16(msg.packet, rr.Class)
+	msg.packet = libbytes.AppendUint16(msg.packet, uint16(rr.Class))
 	msg.off += 4
 
 	if rr.Type == RecordTypeOPT {

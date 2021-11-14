@@ -172,12 +172,12 @@ VAXA    A       10.2.0.27
 			Question: SectionQuestion{
 				Name:  "isi.edu",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "isi.edu",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
 					MName:   "venera.isi.edu",
@@ -198,24 +198,24 @@ VAXA    A       10.2.0.27
 			Question: SectionQuestion{
 				Name:  "isi.edu",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "isi.edu",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "a.isi.edu",
 			}, {
 				Name:  "isi.edu",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "venera.isi.edu",
 			}, {
 				Name:  "isi.edu",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "vaxa.isi.edu",
 			}},
@@ -228,12 +228,12 @@ VAXA    A       10.2.0.27
 			Question: SectionQuestion{
 				Name:  "isi.edu",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "isi.edu",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 10,
@@ -242,7 +242,7 @@ VAXA    A       10.2.0.27
 			}, {
 				Name:  "isi.edu",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 20,
@@ -258,12 +258,12 @@ VAXA    A       10.2.0.27
 			Question: SectionQuestion{
 				Name:  "a.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "a.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "26.3.0.103",
 			}},
@@ -276,18 +276,18 @@ VAXA    A       10.2.0.27
 			Question: SectionQuestion{
 				Name:  "venera.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "venera.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "10.1.0.52",
 			}, {
 				Name:  "venera.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "128.9.0.32",
 			}},
@@ -300,18 +300,18 @@ VAXA    A       10.2.0.27
 			Question: SectionQuestion{
 				Name:  "vaxa.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "vaxa.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "10.2.0.27",
 			}, {
 				Name:  "vaxa.isi.edu",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "128.9.0.33",
 			}},
@@ -403,12 +403,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "pcguide.com",
 				Type:  RecordTypeSOA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
 					MName:   "ns23.pair.com",
@@ -429,18 +429,18 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "pcguide.com",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "ns23.pair.com",
 			}, {
 				Name:  "pcguide.com",
 				Type:  RecordTypeNS,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "ns0.ns0.com",
 			}},
@@ -453,12 +453,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "localhost.pcguide.com",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "localhost.pcguide.com",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "127.0.0.1",
 			}},
@@ -471,12 +471,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "pcguide.com",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "209.68.14.80",
 			}},
@@ -489,12 +489,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "pcguide.com",
 				Type:  RecordTypeMX,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 50,
@@ -510,12 +510,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "www.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "www.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "pcguide.com",
 			}},
@@ -528,12 +528,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "ftp.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "ftp.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "pcguide.com",
 			}},
@@ -546,12 +546,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "mail.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "mail.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "pcguide.com",
 			}},
@@ -564,12 +564,12 @@ relay IN CNAME relay.pair.com.
 			Question: SectionQuestion{
 				Name:  "relay.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "relay.pcguide.com",
 				Type:  RecordTypeCNAME,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "relay.pair.com",
 			}},
@@ -649,12 +649,12 @@ angularjs.doc       A  127.0.0.1
 			Question: SectionQuestion{
 				Name:  "dev.kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "dev.kilabit.info",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "127.0.0.1",
 			}},
@@ -667,12 +667,12 @@ angularjs.doc       A  127.0.0.1
 			Question: SectionQuestion{
 				Name:  "dev.kilabit.com",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "dev.kilabit.com",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "127.0.0.1",
 			}},
@@ -685,12 +685,12 @@ angularjs.doc       A  127.0.0.1
 			Question: SectionQuestion{
 				Name:  "angularjs.doc.localdomain",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "angularjs.doc.localdomain",
 				Type:  RecordTypeA,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "127.0.0.1",
 			}},
@@ -758,12 +758,12 @@ func TestZoneParseTXT(t *testing.T) {
 			Question: SectionQuestion{
 				Name:  "kilabit.local",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.local",
 				Type:  RecordTypeTXT,
-				Class: QueryClassIN,
+				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "This is a test",
 			}},

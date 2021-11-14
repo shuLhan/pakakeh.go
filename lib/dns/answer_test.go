@@ -27,7 +27,7 @@ func TestNewAnswer(t *testing.T) {
 		Answer: []ResourceRecord{{
 			Name:  "test",
 			Type:  RecordTypeA,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 			TTL:   3600,
 			rdlen: 4,
 			Value: "127.0.0.1",
@@ -41,7 +41,7 @@ func TestNewAnswer(t *testing.T) {
 		expMsg    *Message
 		expQName  string
 		expRType  RecordType
-		expQClass uint16
+		expRClass RecordClass
 		isLocal   bool
 	}{{
 		desc:    "With local message",
@@ -50,12 +50,12 @@ func TestNewAnswer(t *testing.T) {
 		exp: &Answer{
 			QName:  "test",
 			RType:  1,
-			QClass: 1,
+			RClass: 1,
 			msg:    msg1,
 		},
 		expQName:  "test",
 		expRType:  1,
-		expQClass: 1,
+		expRClass: 1,
 		expMsg:    msg1,
 	}, {
 		desc: "With non local message",
@@ -63,12 +63,12 @@ func TestNewAnswer(t *testing.T) {
 		exp: &Answer{
 			QName:  "test",
 			RType:  1,
-			QClass: 1,
+			RClass: 1,
 			msg:    msg1,
 		},
 		expQName:  "test",
 		expRType:  1,
-		expQClass: 1,
+		expRClass: 1,
 		expMsg:    msg1,
 	}}
 
@@ -92,7 +92,7 @@ func TestNewAnswer(t *testing.T) {
 
 		test.Assert(t, "newAnswer.QName", c.expQName, got.QName)
 		test.Assert(t, "newAnswer.RType", c.expRType, got.RType)
-		test.Assert(t, "newAnswer.QClass", c.expQClass, got.QClass)
+		test.Assert(t, "newAnswer.RClass", c.expRClass, got.RClass)
 		test.Assert(t, "newAnswer.msg", c.expMsg, got.msg)
 	}
 }
@@ -128,12 +128,12 @@ func TestAnswerGet(t *testing.T) {
 		Question: SectionQuestion{
 			Name:  "kilabit.info",
 			Type:  RecordTypeA,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 		},
 		Answer: []ResourceRecord{{
 			Name:  "kilabit.info",
 			Type:  RecordTypeA,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 			TTL:   3600,
 			rdlen: 4,
 			Value: "127.0.0.1",

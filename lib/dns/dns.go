@@ -98,36 +98,6 @@ const (
 	OpCodeStatus               // a server status request (STATUS)
 )
 
-// List of code known DNS query class.
-const (
-	QueryClassZERO uint16 = iota // Empty query class.
-	QueryClassIN                 // The Internet
-	QueryClassCS                 // The CSNET class (Obsolete - used only for examples in some obsolete RFCs)
-	QueryClassCH                 // The CHAOS class
-	QueryClassHS                 // Hesiod [Dyer 87]
-	QueryClassANY  uint16 = 255  // Any class
-)
-
-//
-// QueryClasses contains a mapping between string representation of DNS query
-// class with their decimal value.
-//
-var QueryClasses = map[string]uint16{
-	"IN": QueryClassIN,
-	"CH": QueryClassCH,
-	"HS": QueryClassHS,
-}
-
-//
-// QueryClassName contains a mapping between the query class and its string
-// representation.
-//
-var QueryClassName = map[uint16]string{
-	QueryClassIN: "IN",
-	QueryClassCH: "CH",
-	QueryClassHS: "HS",
-}
-
 // ResponseCode define response code in message header.
 type ResponseCode byte
 

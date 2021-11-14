@@ -46,7 +46,7 @@ func TestCachesGet(t *testing.T) {
 		ReceivedAt: 1,
 		QName:      "test",
 		RType:      1,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
@@ -57,7 +57,7 @@ func TestCachesGet(t *testing.T) {
 		ReceivedAt: 2,
 		QName:      "test",
 		RType:      2,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
@@ -68,7 +68,7 @@ func TestCachesGet(t *testing.T) {
 		ReceivedAt: 3,
 		QName:      "test",
 		RType:      3,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 3,
@@ -86,7 +86,7 @@ func TestCachesGet(t *testing.T) {
 		desc    string
 		QName   string
 		RType   RecordType
-		QClass  uint16
+		RClass  RecordClass
 		exp     *Answer
 		expList []*Answer
 	}{{
@@ -98,7 +98,7 @@ func TestCachesGet(t *testing.T) {
 		desc:   "With query found",
 		QName:  "test",
 		RType:  1,
-		QClass: 1,
+		RClass: 1,
 		exp:    an1,
 		expList: []*Answer{
 			an2, an3, an1,
@@ -108,7 +108,7 @@ func TestCachesGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		_, got := ca.get(c.QName, c.RType, c.QClass)
+		_, got := ca.get(c.QName, c.RType, c.RClass)
 		gotList := ca.list()
 
 		test.Assert(t, "caches.get", c.exp, got)
@@ -124,7 +124,7 @@ func TestCachesPrune(t *testing.T) {
 		AccessedAt: 1,
 		QName:      "test",
 		RType:      1,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
@@ -136,7 +136,7 @@ func TestCachesPrune(t *testing.T) {
 		AccessedAt: 2,
 		QName:      "test",
 		RType:      2,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
@@ -148,7 +148,7 @@ func TestCachesPrune(t *testing.T) {
 		AccessedAt: at,
 		QName:      "test",
 		RType:      3,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 3,
@@ -193,7 +193,7 @@ func TestCachesUpsert(t *testing.T) {
 		AccessedAt: 1,
 		QName:      "test",
 		RType:      1,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 1,
@@ -205,7 +205,7 @@ func TestCachesUpsert(t *testing.T) {
 		AccessedAt: 3,
 		QName:      "test",
 		RType:      1,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 3,
@@ -217,7 +217,7 @@ func TestCachesUpsert(t *testing.T) {
 		AccessedAt: 2,
 		QName:      "test",
 		RType:      2,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 2,
@@ -229,7 +229,7 @@ func TestCachesUpsert(t *testing.T) {
 		AccessedAt: 4,
 		QName:      "test",
 		RType:      2,
-		QClass:     1,
+		RClass:     1,
 		msg: &Message{
 			Header: SectionHeader{
 				ID: 4,

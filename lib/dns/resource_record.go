@@ -30,7 +30,7 @@ type ResourceRecord struct {
 	Type RecordType
 
 	// Two octets which specify the class of the data in the RDATA field.
-	Class uint16
+	Class RecordClass
 
 	// A 32 bit unsigned integer that specifies the time interval (in
 	// seconds) that the resource record may be cached before it should be
@@ -78,7 +78,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 		return fmt.Errorf("%s: empty Name", logp)
 	}
 	if rr.Class == 0 {
-		rr.Class = QueryClassIN
+		rr.Class = RecordClassIN
 	}
 	if rr.TTL == 0 {
 		rr.TTL = defaultTTL
@@ -214,7 +214,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 
 	rr.Type = RecordType(libbytes.ReadUint16(packet, x))
 	x += 2
-	rr.Class = libbytes.ReadUint16(packet, x)
+	rr.Class = RecordClass(libbytes.ReadUint16(packet, x))
 	x += 2
 	rr.idxTTL = x
 	rr.TTL = libbytes.ReadUint32(packet, x)

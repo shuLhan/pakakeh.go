@@ -16,29 +16,29 @@ func testGenerateZoneRecords() (zoneRR zoneRecords, listRR []*ResourceRecord) {
 	listRR = []*ResourceRecord{{
 		Name:  "test",
 		Type:  RecordTypeA,
-		Class: QueryClassIN,
+		Class: RecordClassIN,
 		Value: "127.0.0.1",
 		TTL:   1,
 	}, {
 		Name:  "test",
 		Type:  RecordTypeSOA,
-		Class: QueryClassIN,
+		Class: RecordClassIN,
 		Value: &RDataSOA{},
 		TTL:   2,
 	}, {
 		Name:  "test",
 		Type:  RecordTypeMX,
-		Class: QueryClassIN,
+		Class: RecordClassIN,
 		TTL:   3,
 	}, {
 		Name:  "test",
 		Type:  RecordTypeSOA,
-		Class: QueryClassIN,
+		Class: RecordClassIN,
 		TTL:   4,
 	}, {
 		Name:  "test",
 		Type:  RecordTypeA,
-		Class: QueryClassCH,
+		Class: RecordClassCH,
 		TTL:   5,
 	}}
 
@@ -76,7 +76,7 @@ func TestZoneRecords_remove(t *testing.T) {
 		rr: &ResourceRecord{
 			Name:  "test",
 			Type:  RecordTypeA,
-			Class: QueryClassIN,
+			Class: RecordClassIN,
 			Value: "127.0.0.2",
 		},
 		expZoneRR:    gotZoneRR,
@@ -86,7 +86,7 @@ func TestZoneRecords_remove(t *testing.T) {
 		rr: &ResourceRecord{
 			Name:  "test",
 			Type:  RecordTypeA,
-			Class: QueryClassCH,
+			Class: RecordClassCH,
 			Value: "127.0.0.1",
 		},
 		expZoneRR:    gotZoneRR,

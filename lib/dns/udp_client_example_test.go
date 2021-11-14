@@ -23,7 +23,7 @@ func ExampleUDPClient() {
 		Question: dns.SectionQuestion{
 			Name:  "kilabit.info",
 			Type:  dns.RecordTypeA,
-			Class: dns.QueryClassIN,
+			Class: dns.RecordClassIN,
 		},
 	}
 
@@ -58,7 +58,7 @@ func ExampleUDPClient_Lookup() {
 		return
 	}
 
-	msg, err := cl.Lookup(false, dns.RecordTypeA, dns.QueryClassIN,
+	msg, err := cl.Lookup(false, dns.RecordTypeA, dns.RecordClassIN,
 		"kilabit.info")
 	if err != nil {
 		log.Println(err)

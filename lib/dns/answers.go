@@ -30,12 +30,12 @@ func newAnswers(an *Answer) (ans *answers) {
 // If found, it will return its element and index in slice; otherwise it will
 // return nil on answer.
 //
-func (ans *answers) get(rtype RecordType, qclass uint16) (an *Answer, x int) {
+func (ans *answers) get(rtype RecordType, rclass RecordClass) (an *Answer, x int) {
 	for x = 0; x < len(ans.v); x++ {
 		if ans.v[x].RType != rtype {
 			continue
 		}
-		if ans.v[x].QClass != qclass {
+		if ans.v[x].RClass != rclass {
 			continue
 		}
 
@@ -48,8 +48,8 @@ func (ans *answers) get(rtype RecordType, qclass uint16) (an *Answer, x int) {
 //
 // remove the answer from list.
 //
-func (ans *answers) remove(rtype RecordType, qclass uint16) {
-	an, x := ans.get(rtype, qclass)
+func (ans *answers) remove(rtype RecordType, rclass RecordClass) {
+	an, x := ans.get(rtype, rclass)
 	if an != nil {
 		ans.v[x] = ans.v[len(ans.v)-1]
 		ans.v[len(ans.v)-1] = nil
@@ -66,7 +66,7 @@ func (ans *answers) upsert(nu *Answer) (an *Answer) {
 	if nu == nil || nu.msg == nil {
 		return
 	}
-	an, _ = ans.get(nu.RType, nu.QClass)
+	an, _ = ans.get(nu.RType, nu.RClass)
 	if an != nil {
 		an.update(nu)
 	} else {

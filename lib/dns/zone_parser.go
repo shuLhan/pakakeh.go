@@ -422,7 +422,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 		if m.lastRR != nil {
 			rr.Class = m.lastRR.Class
 		} else {
-			rr.Class = QueryClassIN
+			rr.Class = RecordClassIN
 		}
 	} else {
 		rr.Name = prevRR.Name
@@ -566,7 +566,7 @@ func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 // otherwise it will return false.
 //
 func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
-	for k, v := range QueryClasses {
+	for k, v := range RecordClasses {
 		if stok == k {
 			rr.Class = v
 			return true

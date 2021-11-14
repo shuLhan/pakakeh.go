@@ -95,7 +95,7 @@ func (cl *DoHClient) Close() error {
 // synchronous mode.
 //
 func (cl *DoHClient) Lookup(
-	allowRecursion bool, rtype RecordType, qclass uint16, qname string,
+	allowRecursion bool, rtype RecordType, rclass RecordClass, qname string,
 ) (
 	*Message, error,
 ) {
@@ -105,15 +105,15 @@ func (cl *DoHClient) Lookup(
 	if rtype == 0 {
 		rtype = RecordTypeA
 	}
-	if qclass == 0 {
-		qclass = QueryClassIN
+	if rclass == 0 {
+		rclass = RecordClassIN
 	}
 
 	msg := NewMessage()
 
 	msg.Header.IsRD = allowRecursion
 	msg.Question.Type = rtype
-	msg.Question.Class = qclass
+	msg.Question.Class = rclass
 	msg.Question.Name = qname
 
 	_, err := msg.Pack()

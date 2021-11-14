@@ -643,7 +643,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 
 func (srv *Server) isImplemented(msg *Message) bool {
 	switch msg.Question.Class {
-	case QueryClassCS, QueryClassCH, QueryClassHS:
+	case RecordClassCH, RecordClassHS:
 		log.Printf("dns: class %d is not implemented", msg.Question.Class)
 		return false
 	}

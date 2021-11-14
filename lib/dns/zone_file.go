@@ -283,12 +283,12 @@ func (zone *ZoneFile) saveListRR(
 		switch rr.Type {
 		case RecordTypeA, RecordTypeNULL, RecordTypeAAAA:
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				RecordTypeNames[rr.Type], rr.Value.(string))
 
 		case RecordTypeTXT:
 			_, err = fmt.Fprintf(out, "%s %d %s %s %q\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				RecordTypeNames[rr.Type], rr.Value.(string))
 
 		case RecordTypeNS, RecordTypeCNAME, RecordTypeMB,
@@ -305,7 +305,7 @@ func (zone *ZoneFile) saveListRR(
 				v += "."
 			}
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				RecordTypeNames[rr.Type], v)
 
 		case RecordTypePTR:
@@ -331,7 +331,7 @@ func (zone *ZoneFile) saveListRR(
 			}
 			_, err = fmt.Fprintf(out,
 				"%s %d %s WKS %s %d %s\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				wks.Address, wks.Protocol, wks.BitMap)
 
 		case RecordTypeHINFO:
@@ -342,7 +342,7 @@ func (zone *ZoneFile) saveListRR(
 			}
 			_, err = fmt.Fprintf(out,
 				"%s %d %s HINFO %s %s\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				hinfo.CPU, hinfo.OS)
 
 		case RecordTypeMINFO:
@@ -353,7 +353,7 @@ func (zone *ZoneFile) saveListRR(
 			}
 			_, err = fmt.Fprintf(out,
 				"%s %d %s MINFO %s %s\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				minfo.RMailBox, minfo.EmailBox)
 
 		case RecordTypeMX:
@@ -364,7 +364,7 @@ func (zone *ZoneFile) saveListRR(
 			}
 			_, err = fmt.Fprintf(out,
 				"%s %d %s MX %d %s.\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				mx.Preference, mx.Exchange)
 
 		case RecordTypeSRV:
@@ -375,7 +375,7 @@ func (zone *ZoneFile) saveListRR(
 			}
 			_, err = fmt.Fprintf(out,
 				"%s %d %s SRV %d %d %d %s.\n",
-				dname, rr.TTL, QueryClassName[rr.Class],
+				dname, rr.TTL, RecordClassName[rr.Class],
 				srv.Priority, srv.Weight,
 				srv.Port, srv.Target)
 		}
