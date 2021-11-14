@@ -18,13 +18,6 @@ import (
 // ChanResponded must be non nil and initialized.
 //
 type request struct {
-	// Kind define the connection type that this request is belong to,
-	// e.g. UDP, TCP, or DoH.
-	kind connType
-
-	// Message define the DNS query.
-	message *Message
-
 	// writer represent client connection on server that receive the query
 	// and responsible to write the answer back.
 	// On UDP connection, writer is an instance of UDPClient with
@@ -32,6 +25,13 @@ type request struct {
 	// On TCP connection, writer is a TCP connection from accept.
 	// On Doh connection, writer is http ResponseWriter.
 	writer io.Writer
+
+	// Message define the DNS query.
+	message *Message
+
+	// Kind define the connection type that this request is belong to,
+	// e.g. UDP, TCP, or DoH.
+	kind connType
 }
 
 //

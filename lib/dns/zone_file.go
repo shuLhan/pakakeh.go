@@ -20,11 +20,11 @@ import (
 // A zone file contains at least one SOA record.
 //
 type ZoneFile struct {
+	Records  zoneRecords
 	Path     string `json:"-"`
 	Name     string
-	SOA      ResourceRecord
-	Records  zoneRecords
 	messages []*Message
+	SOA      ResourceRecord
 }
 
 //

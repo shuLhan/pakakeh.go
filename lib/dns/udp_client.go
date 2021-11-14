@@ -22,10 +22,9 @@ import (
 // should create one client per routine.
 //
 type UDPClient struct {
+	addr    *net.UDPAddr // addr contains address of remote connection.
+	conn    *net.UDPConn
 	timeout time.Duration
-	// addr contains address of remote connection.
-	addr *net.UDPAddr
-	conn *net.UDPConn
 	sync.Mutex
 }
 

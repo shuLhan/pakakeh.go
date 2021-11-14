@@ -74,26 +74,21 @@ const (
 // message ID, and question.
 //
 type Server struct {
-	HostsFiles map[string]*HostsFile
-
+	HostsFiles  map[string]*HostsFile
 	opts        *ServerOptions
-	errListener chan error
 	caches      *caches
-
-	tlsConfig *tls.Config
-
-	udp *net.UDPConn
-	tcp *net.TCPListener
-	dot net.Listener
-	doh *http.Server
-
-	requestq chan *request
-	primaryq chan *request
-	tcpq     chan *request
-
-	fwLocker   sync.Mutex
-	fwStoppers []chan bool
-	fwn        int // Number of forwarders currently running.
+	tlsConfig   *tls.Config
+	udp         *net.UDPConn
+	tcp         *net.TCPListener
+	doh         *http.Server
+	dot         net.Listener
+	requestq    chan *request
+	primaryq    chan *request
+	tcpq        chan *request
+	errListener chan error
+	fwStoppers  []chan bool
+	fwn         int
+	fwLocker    sync.Mutex
 }
 
 //

@@ -12,8 +12,8 @@ import (
 
 type testMessageHeader struct {
 	desc   string
-	hdr    MessageHeader
 	packet []byte
+	hdr    MessageHeader
 }
 
 func testMessageHeaderCases() []testMessageHeader {

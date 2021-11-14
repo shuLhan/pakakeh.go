@@ -19,12 +19,12 @@ func TestDoHClient_Lookup(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp            *Message
 		desc           string
-		allowRecursion bool
+		qname          string
 		rtype          RecordType
 		rclass         RecordClass
-		qname          string
-		exp            *Message
+		allowRecursion bool
 	}{{
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
@@ -164,12 +164,12 @@ func TestDoHClient_Post(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp            *Message
 		desc           string
-		allowRecursion bool
+		qname          string
 		rtype          RecordType
 		rclass         RecordClass
-		qname          string
-		exp            *Message
+		allowRecursion bool
 	}{{
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
@@ -321,12 +321,12 @@ func TestDoHClient_Get(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp    *Message
 		desc   string
+		qname  string
+		expErr string
 		rtype  RecordType
 		rclass RecordClass
-		qname  string
-		exp    *Message
-		expErr string
 	}{{
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,

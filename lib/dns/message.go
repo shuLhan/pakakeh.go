@@ -51,22 +51,18 @@ import (
 // [1] RFC 1035 - 4.1. Format
 //
 type Message struct {
-	Header     MessageHeader
-	Question   MessageQuestion
+	dnameOff map[string]uint16
+	dname    string
+
 	Answer     []ResourceRecord
 	Authority  []ResourceRecord
 	Additional []ResourceRecord
+	packet     []byte
 
-	// The raw message as result of packing or original packet from
-	// unpacking.
-	packet []byte
+	Question MessageQuestion
+	Header   MessageHeader
 
-	// offset of curret packet when packing, equal to len(packet).
 	off uint16
-
-	// Mapping between name and their offset for message compression.
-	dnameOff map[string]uint16
-	dname    string
 }
 
 //
@@ -366,7 +362,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		}
 	}
 
-	rr.idxTTL = uint(msg.off)
+	rr.idxTTL = uint16(msg.off)
 	msg.packet = libbytes.AppendUint32(msg.packet, rr.TTL)
 	msg.off += 4
 
@@ -809,8 +805,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Answer[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, msg.Answer[x].idxTTL,
-			msg.Answer[x].TTL)
+		libbytes.WriteUint32(msg.packet, uint(msg.Answer[x].idxTTL), msg.Answer[x].TTL)
 	}
 	for x := 0; x < len(msg.Authority); x++ {
 		if msg.Authority[x].TTL < n {
@@ -818,8 +813,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Authority[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, msg.Authority[x].idxTTL,
-			msg.Authority[x].TTL)
+		libbytes.WriteUint32(msg.packet, uint(msg.Authority[x].idxTTL), msg.Authority[x].TTL)
 	}
 	for x := 0; x < len(msg.Additional); x++ {
 		if msg.Additional[x].Type == RecordTypeOPT {
@@ -830,8 +824,7 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Additional[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, msg.Additional[x].idxTTL,
-			msg.Additional[x].TTL)
+		libbytes.WriteUint32(msg.packet, uint(msg.Additional[x].idxTTL), msg.Additional[x].TTL)
 	}
 }
 

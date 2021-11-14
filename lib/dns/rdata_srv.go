@@ -38,6 +38,17 @@ type RDataSRV struct {
 	// shows this clearly.
 	Name string
 
+	// The domain name of the target host.  There MUST be one or more
+	// address records for this name, the name MUST NOT be an alias (in
+	// the sense of RFC 1034 or RFC 2181).  Implementors are urged, but
+	// not required, to return the address record(s) in the Additional
+	// Data section.  Unless and until permitted by future standards
+	// action, name compression is not to be used for this field.
+	//
+	// A Target of "." means that the service is decidedly not
+	// available at this domain.
+	Target string
+
 	// The priority of this target host.  A client MUST attempt to
 	// contact the target host with the lowest-numbered priority it can
 	// reach; target hosts with the same priority SHOULD be tried in an
@@ -85,17 +96,6 @@ type RDataSRV struct {
 	// 65535.  This is a 16 bit unsigned integer in network byte order.
 	// This is often as specified in Assigned Numbers but need not be.
 	Port uint16
-
-	// The domain name of the target host.  There MUST be one or more
-	// address records for this name, the name MUST NOT be an alias (in
-	// the sense of RFC 1034 or RFC 2181).  Implementors are urged, but
-	// not required, to return the address record(s) in the Additional
-	// Data section.  Unless and until permitted by future standards
-	// action, name compression is not to be used for this field.
-	//
-	// A Target of "." means that the service is decidedly not
-	// available at this domain.
-	Target string
 }
 
 //

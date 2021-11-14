@@ -129,14 +129,16 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 }
 
 func TestZoneInitRFC1035(t *testing.T) {
-	cases := []struct {
+	type caseZoneInit struct {
+		expErr error
 		desc   string
 		origin string
-		ttl    uint32
 		in     string
-		expErr error
 		exp    []*Message
-	}{{
+		ttl    uint32
+	}
+
+	cases := []caseZoneInit{{
 		desc:   "RFC1035 section 5.3",
 		origin: "ISI.EDU",
 		ttl:    3600,
@@ -365,12 +367,12 @@ VAXA    A       10.2.0.27
 
 func TestZoneInit2(t *testing.T) {
 	cases := []struct {
+		expErr error
 		desc   string
 		origin string
-		ttl    uint32
 		in     string
-		expErr error
 		exp    []*Message
+		ttl    uint32
 	}{{
 		desc: "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
 		in: `
@@ -623,12 +625,12 @@ relay IN CNAME relay.pair.com.
 
 func TestZoneInit3(t *testing.T) {
 	cases := []struct {
+		expErr error
 		desc   string
 		origin string
-		ttl    uint32
 		in     string
-		expErr error
 		exp    []*Message
+		ttl    uint32
 	}{{
 		desc:   "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
 		origin: "localdomain",
@@ -745,8 +747,8 @@ angularjs.doc       A  127.0.0.1
 func TestZoneParseTXT(t *testing.T) {
 	cases := []struct {
 		in       string
-		exp      []*Message
 		expError string
+		exp      []*Message
 	}{{
 		in: `@ IN TXT "This is a test"`,
 		exp: []*Message{{

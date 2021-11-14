@@ -19,10 +19,10 @@ import (
 // TCPClient for DNS with TCP connection and list of remote addresses.
 //
 type TCPClient struct {
+	conn         net.Conn
+	addr         *net.TCPAddr
 	readTimeout  time.Duration
 	writeTimeout time.Duration
-	addr         *net.TCPAddr
-	conn         net.Conn
 }
 
 //

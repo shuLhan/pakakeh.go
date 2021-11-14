@@ -13,8 +13,8 @@ import (
 func TestMessageQuestion_String(t *testing.T) {
 	cases := []struct {
 		desc string
-		mq   MessageQuestion
 		exp  string
+		mq   MessageQuestion
 	}{{
 		desc: "With unknown type",
 		mq: MessageQuestion{
@@ -39,9 +39,9 @@ func TestMessageQuestion_String(t *testing.T) {
 func TestMessageQuestion_unpack(t *testing.T) {
 	cases := []struct {
 		desc   string
+		expErr string
 		mq     MessageQuestion
 		packet []byte
-		expErr string
 	}{{
 		desc: "With empty packet",
 		mq:   MessageQuestion{},

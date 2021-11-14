@@ -11,12 +11,14 @@ import (
 )
 
 func TestNewAnswers(t *testing.T) {
-	cases := []struct {
-		desc   string
+	type caseNewAnswer struct {
 		an     *Answer
-		expLen int
+		desc   string
 		expV   []*Answer
-	}{{
+		expLen int
+	}
+
+	cases := []caseNewAnswer{{
 		desc: "With nil parameter",
 		expV: make([]*Answer, 0, 1),
 	}, {
@@ -62,11 +64,11 @@ func TestAnswersGet(t *testing.T) {
 	ans := newAnswers(an)
 
 	cases := []struct {
+		exp      *Answer
 		desc     string
+		expIndex int
 		RType    RecordType
 		RClass   RecordClass
-		exp      *Answer
-		expIndex int
 	}{{
 		desc:     "With query type and class not found",
 		expIndex: 1,
@@ -114,11 +116,11 @@ func TestAnswersRemove(t *testing.T) {
 	ans := newAnswers(an)
 
 	cases := []struct {
+		exp    *answers
 		desc   string
+		expLen int
 		RType  RecordType
 		RClass RecordClass
-		exp    *answers
-		expLen int
 	}{{
 		desc:   "With query type and class not found",
 		exp:    ans,
@@ -187,9 +189,9 @@ func TestAnswersUpdate(t *testing.T) {
 	ans := newAnswers(an1)
 
 	cases := []struct {
-		desc string
 		nu   *Answer
 		exp  *answers
+		desc string
 	}{{
 		desc: "With nil parameter",
 		exp:  ans,

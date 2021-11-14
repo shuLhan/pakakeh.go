@@ -13,6 +13,15 @@ import (
 // Answer maintain the record of DNS response for cache.
 //
 type Answer struct {
+	// el contains pointer to the cache in LRU.
+	el *list.Element
+
+	// msg contains the unpacked DNS message.
+	msg *Message
+
+	// QName contains DNS question name, a copy of msg.Question.Name.
+	QName string
+
 	// ReceivedAt contains time when message is received.  If answer is
 	// from local cache (host or zone file), its value is 0.
 	ReceivedAt int64
@@ -21,18 +30,10 @@ type Answer struct {
 	// is used to prune old answer from caches.
 	AccessedAt int64
 
-	// QName contains DNS question name, a copy of msg.Question.Name.
-	QName string
 	// RType contains record type, a copy of msg.Question.Type.
 	RType RecordType
 	// RClass contains record class, a copy of msg.Question.Class.
 	RClass RecordClass
-
-	// msg contains the unpacked DNS message.
-	msg *Message
-
-	// el contains pointer to the cache in LRU.
-	el *list.Element
 }
 
 //

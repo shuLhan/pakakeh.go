@@ -83,12 +83,12 @@ func TestCachesGet(t *testing.T) {
 	ca.upsert(an3)
 
 	cases := []struct {
+		exp     *Answer
 		desc    string
 		QName   string
+		expList []*Answer
 		RType   RecordType
 		RClass  RecordClass
-		exp     *Answer
-		expList []*Answer
 	}{{
 		desc: "With query not found",
 		expList: []*Answer{
@@ -238,10 +238,10 @@ func TestCachesUpsert(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc    string
 		nu      *Answer
-		expLen  int
+		desc    string
 		expList []*Answer
+		expLen  int
 	}{{
 		desc: "With empty answer",
 	}, {

@@ -16,6 +16,16 @@ import (
 // (TTL) field, contains ExtRCode, Version
 //
 type RDataOPT struct {
+	// Varies per OPTION-CODE.  MUST be treated as a bit field.
+	Data []byte
+
+	// Assigned by the Expert Review process as defined by the DNSEXT
+	// working group and the IESG.
+	Code uint16
+
+	// Size (in octets) of OPTION-DATA.
+	Length uint16
+
 	// Forms the upper 8 bits of extended 12-bit RCODE (together with the
 	// 4 bits defined in [RFC1035].  Note that EXTENDED-RCODE value 0
 	// indicates that an unextended RCODE is in use (values 0 through 15).
@@ -32,16 +42,6 @@ type RDataOPT struct {
 
 	// DNSSEC OK bit as defined by [RFC3225].
 	DO bool
-
-	// Assigned by the Expert Review process as defined by the DNSEXT
-	// working group and the IESG.
-	Code uint16
-
-	// Size (in octets) of OPTION-DATA.
-	Length uint16
-
-	// Varies per OPTION-CODE.  MUST be treated as a bit field.
-	Data []byte
 }
 
 //

@@ -149,11 +149,13 @@ func TestAnswerGet(t *testing.T) {
 
 	at := time.Now().Unix()
 
-	cases := []struct {
-		desc    string
+	type caseAnswerGet struct {
 		msg     *Message
+		desc    string
 		isLocal bool
-	}{{
+	}
+
+	cases := []caseAnswerGet{{
 		desc:    "With local answer",
 		msg:     res,
 		isLocal: true,
@@ -210,14 +212,16 @@ func TestAnswerUpdate(t *testing.T) {
 		},
 	}
 
-	cases := []struct {
-		desc          string
+	type caseAnswerUpdate struct {
 		an            *Answer
 		nu            *Answer
+		expMsg        *Message
+		desc          string
 		expReceivedAt int64
 		expAccessedAt int64
-		expMsg        *Message
-	}{{
+	}
+
+	cases := []caseAnswerUpdate{{
 		desc: "With nil parameter",
 		an: &Answer{
 			ReceivedAt: 1,

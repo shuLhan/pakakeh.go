@@ -22,38 +22,27 @@ import (
 // resource record has the following format:
 //
 type ResourceRecord struct {
+	// Value hold the generic, unpacked rdata based on Type.
+	Value interface{}
+
 	// A domain name to which this resource record pertains.
 	Name string
 
-	// Two octets containing one of the RR type codes.  This field
-	// specifies the meaning of the data in the RDATA field.
+	rdata  []byte // The raw data.
+	idxTTL uint16 // Position of TTL field inside packet.
+	rdlen  uint16 // The length of rdata field.
+
+	// This field specifies the meaning of the data in the rdata field.
 	Type RecordType
 
-	// Two octets which specify the class of the data in the RDATA field.
+	// The class of the data in the rdata field.
 	Class RecordClass
 
-	// A 32 bit unsigned integer that specifies the time interval (in
-	// seconds) that the resource record may be cached before it should be
-	// discarded.  Zero values are interpreted to mean that the RR can
-	// only be used for the transaction in progress, and should not be
-	// cached.
+	// A time interval (in seconds) that the resource record may be cached
+	// before it should be discarded.
+	// Zero values are interpreted to mean that the RR can only be used
+	// for the transaction in progress, and should not be cached.
 	TTL uint32
-
-	// Value hold the generic value based on Type.
-	Value interface{}
-
-	// An unsigned 16 bit integer that specifies the length in octets of
-	// the RDATA field.
-	rdlen uint16
-
-	// A variable length string of octets that describes the resource.
-	// The format of this information varies according to the TYPE and
-	// CLASS of the resource record.  For example, if the TYPE is A
-	// and the CLASS is IN, the RDATA field is a 4 octet ARPA Internet
-	// address.
-	rdata []byte
-
-	idxTTL uint // mark the index position of TTL field inside packet.
 }
 
 //
@@ -216,7 +205,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	x += 2
 	rr.Class = RecordClass(libbytes.ReadUint16(packet, x))
 	x += 2
-	rr.idxTTL = x
+	rr.idxTTL = uint16(x)
 	rr.TTL = libbytes.ReadUint32(packet, x)
 	x += 4
 	rr.rdlen = libbytes.ReadUint16(packet, x)

@@ -14,8 +14,8 @@ import (
 func TestNewUDPClientPool(t *testing.T) {
 	cases := []struct {
 		desc   string
-		ns     []string
 		expErr string
+		ns     []string
 	}{{
 		desc:   "With empty name servers",
 		expErr: "udp: UDPClientPool: no name servers defined",

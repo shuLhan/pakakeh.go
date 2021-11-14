@@ -52,14 +52,14 @@ const (
 
 type zoneParser struct {
 	zone   *ZoneFile
-	lineno int
-	seps   []byte
-	terms  []byte
 	reader *libio.Reader
 	lastRR *ResourceRecord
 	origin string
-	ttl    uint32
+	seps   []byte
+	terms  []byte
+	lineno int
 	flag   int
+	ttl    uint32
 }
 
 func newZoneParser(file string) *zoneParser {

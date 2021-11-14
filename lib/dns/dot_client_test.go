@@ -17,12 +17,12 @@ func TestDoTClient_Lookup(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp            *Message
 		desc           string
-		allowRecursion bool
+		qname          string
 		rtype          RecordType
 		rclass         RecordClass
-		qname          string
-		exp            *Message
+		allowRecursion bool
 	}{{
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,

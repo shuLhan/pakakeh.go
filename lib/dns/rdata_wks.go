@@ -29,8 +29,8 @@ import (
 //
 type RDataWKS struct {
 	Address  []byte
-	Protocol byte
 	BitMap   []byte
+	Protocol byte
 }
 
 //

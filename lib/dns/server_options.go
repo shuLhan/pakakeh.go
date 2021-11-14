@@ -18,22 +18,25 @@ import (
 // ServerOptions describes options for running a DNS server.
 //
 type ServerOptions struct {
+	primaryUDP []net.Addr // List of parent name server addresses using UDP.
+	primaryTCP []net.Addr // List of parent name server addresses using TCP
+	primaryDoh []string   // List of parent name server addresses using DoH.
+	primaryDot []string   // List of parent name server addresses using DoT.
+
+	ip net.IP
+
 	// ListenAddress ip address and port number to serve query.
 	// This field is optional, default to "0.0.0.0:53".
 	ListenAddress string `ini:"dns:server:listen"`
 
-	// HTTPIdleTimeout number of seconds before considering the client of
-	// HTTP connection to be closed.
-	// This field is optional, default to 120 seconds.
-	HTTPIdleTimeout time.Duration `ini:"dns:server:http.idle_timeout"`
+	// TLSCertFile contains path to certificate for serving DNS over TLS
+	// and HTTPS.
+	// This field is optional, if its empty, server will listening on
+	// unsecure HTTP connection only.
+	TLSCertFile string `ini:"dns:server:tls.certificate"`
 
-	// HTTPPort port for listening DNS over HTTP (DoH), default to 0.
-	// If its zero, the server will not serve DNS over HTTP.
-	HTTPPort uint16 `ini:"dns:server:http.port"`
-
-	// TLSPort port for listening DNS over TLS, default to 0.
-	// If its zero, the server will not serve DNS over TLS.
-	TLSPort uint16 `ini:"dns:server:tls.port"`
+	// TLSPrivateKey contains path to certificate private key file.
+	TLSPrivateKey string `ini:"dns:server:tls.private_key"`
 
 	//
 	// NameServers contains list of parent name servers.
@@ -61,25 +64,10 @@ type ServerOptions struct {
 	//
 	NameServers []string `ini:"dns:server:parent"`
 
-	// TLSCertFile contains path to certificate for serving DNS over TLS
-	// and HTTPS.
-	// This field is optional, if its empty, server will listening on
-	// unsecure HTTP connection only.
-	TLSCertFile string `ini:"dns:server:tls.certificate"`
-
-	// TLSPrivateKey contains path to certificate private key file.
-	TLSPrivateKey string `ini:"dns:server:tls.private_key"`
-
-	// TLSAllowInsecure option to allow to serve DoH with self-signed
-	// certificate.
-	// This field is optional.
-	TLSAllowInsecure bool `ini:"dns:server:tls.allow_insecure"`
-
-	// DoHBehindProxy allow serving DNS over insecure HTTP, even if
-	// certificate file is defined.
-	// This option allow serving DNS request forwarded by another proxy
-	// server.
-	DoHBehindProxy bool `ini:"dns:server:doh.behind_proxy"`
+	// HTTPIdleTimeout number of seconds before considering the client of
+	// HTTP connection to be closed.
+	// This field is optional, default to 120 seconds.
+	HTTPIdleTimeout time.Duration `ini:"dns:server:http.idle_timeout"`
 
 	// PruneDelay define a delay where caches will be pruned.
 	// This field is optional, minimum value is 1 minute, and default
@@ -97,24 +85,26 @@ type ServerOptions struct {
 	// accessed in the last 1 minute will be removed from cache.
 	PruneThreshold time.Duration `ini:"dns:server:cache.prune_threshold"`
 
-	ip   net.IP
+	// HTTPPort port for listening DNS over HTTP (DoH), default to 0.
+	// If its zero, the server will not serve DNS over HTTP.
+	HTTPPort uint16 `ini:"dns:server:http.port"`
+
+	// TLSPort port for listening DNS over TLS, default to 0.
+	// If its zero, the server will not serve DNS over TLS.
+	TLSPort uint16 `ini:"dns:server:tls.port"`
+
 	port uint16
 
-	// primaryUDP contains list of parent name server addresses using UDP
-	// protocol.
-	primaryUDP []net.Addr
+	// TLSAllowInsecure option to allow to serve DoH with self-signed
+	// certificate.
+	// This field is optional.
+	TLSAllowInsecure bool `ini:"dns:server:tls.allow_insecure"`
 
-	// primaryTCP contains list of parent name server addresses using TCP
-	// protocol.
-	primaryTCP []net.Addr
-
-	// primaryDoh contains list of parent name server addresses using DoH
-	// protocol.
-	primaryDoh []string
-
-	// primaryDot contains list of parent name server addresses using DoT
-	// protocol.
-	primaryDot []string
+	// DoHBehindProxy allow serving DNS over insecure HTTP, even if
+	// certificate file is defined.
+	// This option allow serving DNS request forwarded by another proxy
+	// server.
+	DoHBehindProxy bool `ini:"dns:server:doh.behind_proxy"`
 }
 
 //

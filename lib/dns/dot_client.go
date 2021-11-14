@@ -18,8 +18,8 @@ import (
 // DoTClient client for DNS over TLS.
 //
 type DoTClient struct {
-	timeout time.Duration
 	conn    *tls.Conn
+	timeout time.Duration
 }
 
 //

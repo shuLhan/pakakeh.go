@@ -22,10 +22,10 @@ const (
 // HostsFile represent content of single hosts file.
 //
 type HostsFile struct {
+	out     *os.File
 	Path    string `json:"-"`
 	Name    string
 	Records []*ResourceRecord `json:"-"`
-	out     *os.File
 }
 
 //

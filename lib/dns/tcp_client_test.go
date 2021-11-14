@@ -17,12 +17,12 @@ func TestTCPClientLookup(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp            *Message
 		desc           string
-		allowRecursion bool
+		qname          string
 		rtype          RecordType
 		rclass         RecordClass
-		qname          string
-		exp            *Message
+		allowRecursion bool
 	}{{
 		desc:   "RType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,

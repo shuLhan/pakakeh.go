@@ -64,9 +64,9 @@ func TestLookupPTR(t *testing.T) {
 	}
 
 	cases := []struct {
-		ip     net.IP
 		exp    string
 		expErr string
+		ip     net.IP
 	}{{
 		ip:     nil,
 		expErr: "empty IP address",

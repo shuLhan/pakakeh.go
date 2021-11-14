@@ -25,8 +25,6 @@ const (
 // caches of DNS answers.
 //
 type caches struct {
-	sync.Mutex
-
 	// v contains mapping of DNS question name (a domain name) with their
 	// list of answer.
 	v map[string]*answers
@@ -43,6 +41,8 @@ type caches struct {
 	// pruned from caches.
 	// Default to -1 hour.
 	pruneThreshold time.Duration
+
+	sync.Mutex
 }
 
 // cachesFileHeader define the file header when storing caches on storage.
@@ -86,7 +86,7 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 
 	go ca.startWorker()
 
-	return
+	return ca
 }
 
 //

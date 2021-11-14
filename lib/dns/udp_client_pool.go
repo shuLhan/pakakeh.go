@@ -23,10 +23,10 @@ import (
 // Recv on the same routine before putting the client back to pool.
 //
 type UDPClientPool struct {
-	sync.Mutex
 	pool *sync.Pool
 	ns   []string
 	seq  int // sequence for the next name server.
+	sync.Mutex
 }
 
 //

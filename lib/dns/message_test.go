@@ -12,8 +12,8 @@ import (
 
 func TestMessageIsExpired(t *testing.T) {
 	cases := []struct {
-		desc string
 		msg  *Message
+		desc string
 		exp  bool
 	}{{
 		desc: "Message is not expired",
@@ -871,10 +871,10 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc string
 		msg  *Message
-		isAA bool
+		desc string
 		exp  []byte
+		isAA bool
 	}{{
 		desc: "With query and isAA is false",
 		msg:  msgQuery,
@@ -923,10 +923,10 @@ func TestMessageSetQuery(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc    string
 		msg     *Message
-		isQuery bool
+		desc    string
 		exp     []byte
+		isQuery bool
 	}{{
 		desc: "With isQuery is false",
 		msg:  msgQuery,
@@ -966,10 +966,10 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc string
 		msg  *Message
-		isRD bool
+		desc string
 		exp  []byte
+		isRD bool
 	}{{
 		desc: "With isRD is false",
 		msg:  msgQuery,
@@ -1009,10 +1009,10 @@ func TestMessageSetResponseCode(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc string
 		msg  *Message
-		code ResponseCode
+		desc string
 		exp  []byte
+		code ResponseCode
 	}{{
 		desc: "With code is error format",
 		msg:  msgQuery,
@@ -1036,9 +1036,9 @@ func TestMessageSetResponseCode(t *testing.T) {
 
 func TestMessageUnpack(t *testing.T) {
 	cases := []struct {
+		exp    *Message
 		desc   string
 		packet []byte
-		exp    *Message
 	}{{
 		desc: "RR with A",
 		packet: []byte{
