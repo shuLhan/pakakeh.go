@@ -29,7 +29,7 @@ func TestTCPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      5,
 				IsAA:    true,
 				QDCount: 1,
@@ -57,7 +57,7 @@ func TestTCPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      6,
 				IsAA:    true,
 				QDCount: 1,
@@ -92,7 +92,7 @@ func TestTCPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      7,
 				IsAA:    true,
 				QDCount: 1,

@@ -164,7 +164,7 @@ VAXA    A       10.2.0.27
 
 `,
 		exp: []*Message{{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -190,7 +190,7 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 3,
@@ -220,7 +220,7 @@ VAXA    A       10.2.0.27
 				Value: "vaxa.isi.edu",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
@@ -250,7 +250,7 @@ VAXA    A       10.2.0.27
 				},
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -268,7 +268,7 @@ VAXA    A       10.2.0.27
 				Value: "26.3.0.103",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
@@ -292,7 +292,7 @@ VAXA    A       10.2.0.27
 				Value: "128.9.0.32",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
@@ -395,7 +395,7 @@ mail IN CNAME @
 relay IN CNAME relay.pair.com.
 `,
 		exp: []*Message{{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -421,7 +421,7 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 2,
@@ -445,7 +445,7 @@ relay IN CNAME relay.pair.com.
 				Value: "ns0.ns0.com",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -463,7 +463,7 @@ relay IN CNAME relay.pair.com.
 				Value: "127.0.0.1",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -481,7 +481,7 @@ relay IN CNAME relay.pair.com.
 				Value: "209.68.14.80",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -502,7 +502,7 @@ relay IN CNAME relay.pair.com.
 				},
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -520,7 +520,7 @@ relay IN CNAME relay.pair.com.
 				Value: "pcguide.com",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -538,7 +538,7 @@ relay IN CNAME relay.pair.com.
 				Value: "pcguide.com",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -556,7 +556,7 @@ relay IN CNAME relay.pair.com.
 				Value: "pcguide.com",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -641,7 +641,7 @@ dev.kilabit.com.   A  127.0.0.1
 angularjs.doc       A  127.0.0.1
 `,
 		exp: []*Message{{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -659,7 +659,7 @@ angularjs.doc       A  127.0.0.1
 				Value: "127.0.0.1",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -677,7 +677,7 @@ angularjs.doc       A  127.0.0.1
 				Value: "127.0.0.1",
 			}},
 		}, {
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,
@@ -750,7 +750,7 @@ func TestZoneParseTXT(t *testing.T) {
 	}{{
 		in: `@ IN TXT "This is a test"`,
 		exp: []*Message{{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				IsAA:    true,
 				QDCount: 1,
 				ANCount: 1,

@@ -159,7 +159,7 @@ func TestAnswersUpdate(t *testing.T) {
 		RType:  1,
 		RClass: 1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 1,
 			},
 		},
@@ -178,7 +178,7 @@ func TestAnswersUpdate(t *testing.T) {
 		RType:  1,
 		RClass: 1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 2,
 			},
 		},

@@ -51,7 +51,7 @@ import (
 // [1] RFC 1035 - 4.1. Format
 //
 type Message struct {
-	Header     SectionHeader
+	Header     MessageHeader
 	Question   SectionQuestion
 	Answer     []ResourceRecord
 	Authority  []ResourceRecord
@@ -74,7 +74,7 @@ type Message struct {
 //
 func NewMessage() *Message {
 	return &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			IsQuery: true,
 			IsRD:    true,
 			QDCount: 1,
@@ -120,7 +120,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	}
 
 	msg = &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			IsAA:    true,
 			QDCount: 1,
 			ANCount: 1,
@@ -164,7 +164,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 //
 func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 	msg = &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			IsAA:    true,
 			QDCount: 1,
 			ANCount: 1,

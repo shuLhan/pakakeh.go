@@ -159,7 +159,7 @@ func TestMessagePack(t *testing.T) {
 	}{{
 		desc: "Simple query",
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      1,
 				IsQuery: true,
 				QDCount: 1,
@@ -187,7 +187,7 @@ func TestMessagePack(t *testing.T) {
 	}, {
 		desc: "Response with A RDATA",
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x8cdb,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -275,7 +275,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0xd4a6,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -342,7 +342,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x8a38,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -389,7 +389,7 @@ func TestMessagePack(t *testing.T) {
 			0x51, 0x80,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      2,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -473,7 +473,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x9eef,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -573,7 +573,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x29, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      16253,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -634,7 +634,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x2c90,
 				IsRD:    true,
 				IsRA:    true,
@@ -732,7 +732,7 @@ func TestMessagePack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x2cb4,
 				IsRD:    true,
 				IsRA:    true,
@@ -837,7 +837,7 @@ func TestMessagePack(t *testing.T) {
 
 func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	msgQuery := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
@@ -854,7 +854,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 	}
 
 	msgResponse := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID:   1,
 			IsAA: true,
 			IsRD: true,
@@ -906,7 +906,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 
 func TestMessageSetQuery(t *testing.T) {
 	msgQuery := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
@@ -949,7 +949,7 @@ func TestMessageSetQuery(t *testing.T) {
 
 func TestMessageSetRecursionDesired(t *testing.T) {
 	msgQuery := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
@@ -992,7 +992,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 
 func TestMessageSetResponseCode(t *testing.T) {
 	msgQuery := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID:      1,
 			IsQuery: true,
 			IsAA:    true,
@@ -1059,7 +1059,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x8cdb,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1131,7 +1131,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0xd4a6,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1210,7 +1210,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x8a38,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1269,7 +1269,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x01, 0x51, 0x80,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      2,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1365,7 +1365,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x9eef,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1512,7 +1512,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      16253,
 				IsQuery: false,
 				Op:      OpCodeQuery,
@@ -1604,7 +1604,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x2c90,
 				IsRD:    true,
 				IsRA:    true,
@@ -1708,7 +1708,7 @@ func TestMessageUnpack(t *testing.T) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		},
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0x2cb4,
 				IsRD:    true,
 				IsRA:    true,

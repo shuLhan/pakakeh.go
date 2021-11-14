@@ -93,9 +93,9 @@ type OpCode byte
 
 // List of valid operation code.
 const (
-	OpCodeQuery  OpCode = iota // a standard query (QUERY)
-	OpCodeIQuery               // an inverse query (IQUERY), obsolete by RFC3425
-	OpCodeStatus               // a server status request (STATUS)
+	OpCodeQuery  OpCode = iota // A standard query (QUERY)
+	OpCodeIQuery               // An inverse query (IQUERY), obsolete by RFC3425
+	OpCodeStatus               // A server status request (STATUS)
 )
 
 // ResponseCode define response code in message header.

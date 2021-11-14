@@ -31,7 +31,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
@@ -59,7 +59,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
@@ -94,7 +94,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
@@ -121,7 +121,7 @@ func TestDoHClient_Lookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    false,
 				RCode:   RCodeErrServer,
@@ -176,7 +176,7 @@ func TestDoHClient_Post(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
@@ -204,7 +204,7 @@ func TestDoHClient_Post(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
@@ -239,7 +239,7 @@ func TestDoHClient_Post(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    true,
 				QDCount: 1,
@@ -266,7 +266,7 @@ func TestDoHClient_Post(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      0,
 				IsAA:    false,
 				RCode:   RCodeErrServer,

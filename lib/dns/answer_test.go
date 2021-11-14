@@ -16,7 +16,7 @@ func TestNewAnswer(t *testing.T) {
 	at := time.Now().Unix()
 
 	msg1 := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID: 1,
 		},
 		Question: SectionQuestion{
@@ -120,7 +120,7 @@ func TestAnswerClear(t *testing.T) {
 func TestAnswerGet(t *testing.T) {
 	// kilabit.info A
 	res := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID:      1,
 			QDCount: 1,
 			ANCount: 1,
@@ -183,7 +183,7 @@ func TestAnswerGet(t *testing.T) {
 		test.Assert(t, "ReceivedAt", an.ReceivedAt >= at-5, true)
 		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true)
 		got := &Message{
-			Header:   SectionHeader{},
+			Header:   MessageHeader{},
 			Question: SectionQuestion{},
 			packet:   gotPacket,
 		}
@@ -200,12 +200,12 @@ func TestAnswerGet(t *testing.T) {
 func TestAnswerUpdate(t *testing.T) {
 	at := time.Now().Unix() - 5
 	msg1 := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID: 1,
 		},
 	}
 	msg2 := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			ID: 1,
 		},
 	}

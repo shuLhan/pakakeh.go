@@ -1,3 +1,5 @@
+**/testdata/bench
+**/testdata/pprof
 *.bak
 *.bench
 *.cprof

@@ -48,7 +48,7 @@ func TestCachesGet(t *testing.T) {
 		RType:      1,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 1,
 			},
 		},
@@ -59,7 +59,7 @@ func TestCachesGet(t *testing.T) {
 		RType:      2,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 2,
 			},
 		},
@@ -70,7 +70,7 @@ func TestCachesGet(t *testing.T) {
 		RType:      3,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 3,
 			},
 		},
@@ -126,7 +126,7 @@ func TestCachesPrune(t *testing.T) {
 		RType:      1,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 1,
 			},
 		},
@@ -138,7 +138,7 @@ func TestCachesPrune(t *testing.T) {
 		RType:      2,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 2,
 			},
 		},
@@ -150,7 +150,7 @@ func TestCachesPrune(t *testing.T) {
 		RType:      3,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 3,
 			},
 		},
@@ -195,7 +195,7 @@ func TestCachesUpsert(t *testing.T) {
 		RType:      1,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 1,
 			},
 		},
@@ -207,7 +207,7 @@ func TestCachesUpsert(t *testing.T) {
 		RType:      1,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 3,
 			},
 		},
@@ -219,7 +219,7 @@ func TestCachesUpsert(t *testing.T) {
 		RType:      2,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 2,
 			},
 		},
@@ -231,7 +231,7 @@ func TestCachesUpsert(t *testing.T) {
 		RType:      2,
 		RClass:     1,
 		msg: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID: 4,
 			},
 		},

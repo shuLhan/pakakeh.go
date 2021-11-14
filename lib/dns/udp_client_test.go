@@ -29,7 +29,7 @@ func TestUDPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      8,
 				IsAA:    true,
 				QDCount: 1,
@@ -57,7 +57,7 @@ func TestUDPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      9,
 				IsAA:    true,
 				QDCount: 1,
@@ -92,7 +92,7 @@ func TestUDPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      10,
 				IsAA:    true,
 				QDCount: 1,
@@ -119,7 +119,7 @@ func TestUDPClientLookup(t *testing.T) {
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
-			Header: SectionHeader{
+			Header: MessageHeader{
 				ID:      11,
 				IsAA:    false,
 				RCode:   RCodeErrServer,

@@ -10,22 +10,25 @@ import (
 
 const (
 	headerIsQuery    byte = 0x00
-	headerIsResponse byte = 0x80
-	headerIsAA       byte = 0x04
-	headerIsTC       byte = 0x02
-	headerIsRD       byte = 0x01
-	headerIsRA       byte = 0x80
+	headerIsResponse byte = 0x80 // 1000.0000
+	headerMaskOpCode byte = 0x78 // 0111.1000
+	headerIsAA       byte = 0x04 // 0000.0100
+	headerIsTC       byte = 0x02 // 0000.0010
+	headerIsRD       byte = 0x01 // 0000.0001
+	headerIsRA       byte = 0x80 //          1000.0000
+	headerMaskRCode  byte = 0x0F //          0000.1111
 )
 
 //
-// SectionHeader The header section is always present.  The header includes
-// fields that specify which of the remaining sections are present, and also
-// specify whether the message is a query or a response, a standard query or
-// some other opcode, etc. [1]
+// MessageHeader the header includes fields that specify which of the
+// remaining sections are present, and also specify whether the message is a
+// query or a response, a standard query or some other opcode, etc. [1]
+//
+// The header section is always present.
 //
 // [1] RFC 1035 P-25 - 4.1. Format
 //
-type SectionHeader struct {
+type MessageHeader struct {
 	//
 	// A 16 bit identifier assigned by the program that generates
 	// any kind of query.  This identifier is copied the corresponding
@@ -82,27 +85,25 @@ type SectionHeader struct {
 	//
 	RCode ResponseCode
 
-	// An unsigned 16 bit integer specifying the number of entries in the
-	// question section.
+	// The number of entries in the question section.
 	QDCount uint16
 
-	// An unsigned 16 bit integer specifying the number of resource
-	// records in the answer section.
+	// The number of resource records in the answer section.
 	ANCount uint16
 
-	// An unsigned 16 bit integer specifying the number of name server
-	// resource records in the authority records section.
+	// The number of name server resource records in the authority records
+	// section.
 	NSCount uint16
 
-	// An unsigned 16 bit integer specifying the number of resource
-	// records in the additional records section.
+	// The number of resource records in the additional records section.
 	ARCount uint16
 }
 
 //
-// Reset the header to default (query) values.
+// Reset the header to default (query) values, which mean the IsQuery is true,
+// the Op code is 0, with recursion enabled, and query count set tot 1.
 //
-func (hdr *SectionHeader) Reset() {
+func (hdr *MessageHeader) Reset() {
 	hdr.ID = 0
 	hdr.IsQuery = true
 	hdr.Op = OpCodeQuery
@@ -111,7 +112,7 @@ func (hdr *SectionHeader) Reset() {
 	hdr.IsRD = true
 	hdr.IsRA = false
 	hdr.RCode = RCodeOK
-	hdr.QDCount = 0
+	hdr.QDCount = 1
 	hdr.ANCount = 0
 	hdr.NSCount = 0
 	hdr.ARCount = 0
@@ -120,10 +121,11 @@ func (hdr *SectionHeader) Reset() {
 //
 // pack the section header into slice of bytes.
 //
-func (hdr *SectionHeader) pack() []byte {
-	var b0, b1 byte
-
-	packet := make([]byte, 4)
+func (hdr *MessageHeader) pack() []byte {
+	var (
+		b0, b1 byte
+		packet [12]byte
+	)
 
 	packet[0] = byte(hdr.ID >> 8)
 	packet[1] = byte(hdr.ID)
@@ -134,7 +136,7 @@ func (hdr *SectionHeader) pack() []byte {
 		b0 = headerIsResponse
 	}
 
-	b0 |= (0x78 & byte(hdr.Op<<2))
+	b0 |= (headerMaskOpCode & byte(hdr.Op<<3))
 
 	if hdr.IsRD {
 		b0 |= headerIsRD
@@ -150,48 +152,33 @@ func (hdr *SectionHeader) pack() []byte {
 		if hdr.IsRA {
 			b1 |= headerIsRA
 		}
-		b1 |= (0x0F & byte(hdr.RCode))
+		b1 |= (headerMaskRCode & byte(hdr.RCode))
 	}
 
 	packet[2] = b0
 	packet[3] = b1
 
-	packet = libbytes.AppendUint16(packet, hdr.QDCount)
-	packet = libbytes.AppendUint16(packet, hdr.ANCount)
-	packet = libbytes.AppendUint16(packet, hdr.NSCount)
-	packet = libbytes.AppendUint16(packet, hdr.ARCount)
+	libbytes.WriteUint16(packet[:], 4, hdr.QDCount)
+	libbytes.WriteUint16(packet[:], 6, hdr.ANCount)
+	libbytes.WriteUint16(packet[:], 8, hdr.NSCount)
+	libbytes.WriteUint16(packet[:], 10, hdr.ARCount)
 
-	return packet
+	return packet[:]
 }
 
 //
 // unpack the DNS header section.
 //
-func (hdr *SectionHeader) unpack(packet []byte) {
+func (hdr *MessageHeader) unpack(packet []byte) {
 	hdr.ID = libbytes.ReadUint16(packet, 0)
 
-	if packet[2]&headerIsResponse == headerIsResponse {
-		hdr.IsQuery = false
-	}
-	hdr.Op = OpCode((packet[2] & 0x78) >> 2)
-
-	if packet[2]&headerIsAA == headerIsAA {
-		hdr.IsAA = true
-	}
-	if packet[2]&headerIsTC == headerIsTC {
-		hdr.IsTC = true
-	}
-	if packet[2]&headerIsRD == headerIsRD {
-		hdr.IsRD = true
-	} else {
-		hdr.IsRD = false
-	}
-
-	if packet[3]&headerIsRA == headerIsRA {
-		hdr.IsRA = true
-	}
-
-	hdr.RCode = ResponseCode(0x0F & packet[3])
+	hdr.IsQuery = packet[2]&headerIsResponse != headerIsResponse
+	hdr.Op = OpCode((packet[2] & headerMaskOpCode) >> 3)
+	hdr.IsAA = packet[2]&headerIsAA == headerIsAA
+	hdr.IsTC = packet[2]&headerIsTC == headerIsTC
+	hdr.IsRD = packet[2]&headerIsRD == headerIsRD
+	hdr.IsRA = packet[3]&headerIsRA == headerIsRA
+	hdr.RCode = ResponseCode(headerMaskRCode & packet[3])
 
 	hdr.QDCount = libbytes.ReadUint16(packet, 4)
 	hdr.ANCount = libbytes.ReadUint16(packet, 6)

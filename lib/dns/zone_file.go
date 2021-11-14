@@ -161,7 +161,7 @@ func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
 	}
 
 	msg := &Message{
-		Header: SectionHeader{
+		Header: MessageHeader{
 			IsAA:    true,
 			QDCount: 1,
 			ANCount: 1,
