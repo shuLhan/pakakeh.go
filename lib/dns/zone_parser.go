@@ -51,7 +51,7 @@ const (
 )
 
 type zoneParser struct {
-	zone   *ZoneFile
+	zone   *Zone
 	reader *libio.Reader
 	lastRR *ResourceRecord
 	origin string
@@ -64,7 +64,7 @@ type zoneParser struct {
 
 func newZoneParser(file string) *zoneParser {
 	return &zoneParser{
-		zone:   NewZoneFile(file, ""),
+		zone:   NewZone(file, ""),
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
 		terms:  []byte{';', '\n'},
@@ -75,7 +75,7 @@ func newZoneParser(file string) *zoneParser {
 // Init parse zoneParser file from string.
 //
 func (m *zoneParser) Init(data, origin string, ttl uint32) {
-	m.zone = NewZoneFile("(data)", "")
+	m.zone = NewZone("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
 	m.ttl = ttl

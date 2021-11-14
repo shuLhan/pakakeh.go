@@ -16,10 +16,10 @@ import (
 )
 
 //
-// ZoneFile represent content of single zone file.
-// A zone file contains at least one SOA record.
+// Zone represent a group of domain names shared a single root domain.
+// A Zone contains at least one SOA record.
 //
-type ZoneFile struct {
+type Zone struct {
 	Records  zoneRecords
 	Path     string `json:"-"`
 	Name     string
@@ -28,10 +28,10 @@ type ZoneFile struct {
 }
 
 //
-// NewZoneFile create and initialize new zone file.
+// NewZone create and initialize new zone.
 //
-func NewZoneFile(file, name string) *ZoneFile {
-	return &ZoneFile{
+func NewZone(file, name string) *Zone {
+	return &Zone{
 		Path: file,
 		Name: name,
 		SOA: ResourceRecord{
@@ -47,11 +47,11 @@ func NewZoneFile(file, name string) *ZoneFile {
 //
 // LoadZoneDir load DNS record from zone formatted files in
 // directory "dir".
-// On success, it will return map of file name and ZoneFile content as list
+// On success, it will return map of file name and Zone content as list
 // of Message.
 // On fail, it will return possible partially parse zone file and an error.
 //
-func LoadZoneDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
+func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 	if len(dir) == 0 {
 		return nil, nil
 	}
@@ -70,7 +70,7 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 		return nil, fmt.Errorf("LoadZoneDir: %w", err)
 	}
 
-	zoneFiles = make(map[string]*ZoneFile)
+	zoneFiles = make(map[string]*Zone)
 
 	for x := 0; x < len(fis); x++ {
 		if fis[x].IsDir() {
@@ -102,11 +102,11 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*ZoneFile, err error) {
 }
 
 //
-// ParseZoneFile parse zone file and return it as list of Message.
+// ParseZoneFile parse zone file.
 // The file name will be assumed as origin if parameter origin or $ORIGIN is
 // not set.
 //
-func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
+func ParseZoneFile(file, origin string, ttl uint32) (*Zone, error) {
 	var err error
 
 	m := newZoneParser(file)
@@ -122,12 +122,12 @@ func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 
 	m.reader, err = libio.NewReader(file)
 	if err != nil {
-		return nil, fmt.Errorf("ParseZoneFile %q: %w", file, err)
+		return nil, fmt.Errorf("ParseZone %q: %w", file, err)
 	}
 
 	err = m.parse()
 	if err != nil {
-		return nil, fmt.Errorf("ParseZoneFile %q: %w", file, err)
+		return nil, fmt.Errorf("ParseZone %q: %w", file, err)
 	}
 
 	m.zone.Name = m.origin
@@ -138,9 +138,9 @@ func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 }
 
 //
-// Add add new ResourceRecord to ZoneFile.
+// Add add new ResourceRecord to Zone.
 //
-func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
+func (zone *Zone) Add(rr *ResourceRecord) (err error) {
 	if rr.Type == RecordTypeSOA {
 		zone.SOA = *rr
 	} else {
@@ -180,21 +180,21 @@ func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
 //
 // Delete the zone file from storage.
 //
-func (zone *ZoneFile) Delete() (err error) {
+func (zone *Zone) Delete() (err error) {
 	return os.Remove(zone.Path)
 }
 
 //
 // Messages return all pre-generated DNS messages.
 //
-func (zone *ZoneFile) Messages() []*Message {
+func (zone *Zone) Messages() []*Message {
 	return zone.messages
 }
 
 //
 // Remove a ResourceRecord from zone file.
 //
-func (zone *ZoneFile) Remove(rr *ResourceRecord) (err error) {
+func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 	if rr.Type == RecordTypeSOA {
 		zone.SOA = ResourceRecord{
 			Type:  RecordTypeSOA,
@@ -209,9 +209,9 @@ func (zone *ZoneFile) Remove(rr *ResourceRecord) (err error) {
 }
 
 //
-// Save the content of zone records to file defined by path.
+// Save the content of zone records to file defined by Path.
 //
-func (zone *ZoneFile) Save() (err error) {
+func (zone *Zone) Save() (err error) {
 	out, err := os.OpenFile(zone.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
 		0600)
 	if err != nil {
@@ -273,9 +273,7 @@ out:
 	return err
 }
 
-func (zone *ZoneFile) saveListRR(
-	out *os.File, dname string, listRR []*ResourceRecord,
-) (err error) {
+func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecord) (err error) {
 	for x, rr := range listRR {
 		if x > 0 {
 			dname = "\t"
