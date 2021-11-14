@@ -87,15 +87,15 @@ func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {
 // This function is safe to be used concurrently.
 //
 func (cl *TCPClient) Lookup(
-	allowRecursion bool, qtype, qclass uint16, qname string,
+	allowRecursion bool, rtype RecordType, qclass uint16, qname string,
 ) (
 	*Message, error,
 ) {
 	if cl.addr == nil || cl.conn == nil {
 		return nil, nil
 	}
-	if qtype == 0 {
-		qtype = QueryTypeA
+	if rtype == 0 {
+		rtype = RecordTypeA
 	}
 	if qclass == 0 {
 		qclass = QueryClassIN
@@ -106,7 +106,7 @@ func (cl *TCPClient) Lookup(
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
 	msg.Header.QDCount = 1
-	msg.Question.Type = qtype
+	msg.Question.Type = rtype
 	msg.Question.Class = qclass
 	msg.Question.Name = qname
 

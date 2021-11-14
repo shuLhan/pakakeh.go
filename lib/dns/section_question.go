@@ -28,7 +28,7 @@ type SectionQuestion struct {
 	// for this field include all codes valid for a TYPE field, together
 	// with some more general codes which can match more than one type of
 	// RR.
-	Type uint16
+	Type RecordType
 
 	// A two octet code that specifies the class of the query.  For
 	// example, the QCLASS field is IN for the Internet.
@@ -40,14 +40,14 @@ type SectionQuestion struct {
 //
 func (question *SectionQuestion) Reset() {
 	question.Name = question.Name[:0]
-	question.Type = QueryTypeA
+	question.Type = RecordTypeA
 	question.Class = QueryClassIN
 }
 
 //
 // size return the section question size, length of name + 2 (1 octet for
 // beginning size plus 1 octet for end of label) + 2 octets of
-// qtype + 2 octets of qclass
+// rtype + 2 octets of qclass
 //
 func (question *SectionQuestion) size() int {
 	return len(question.Name) + 6
@@ -58,7 +58,7 @@ func (question *SectionQuestion) size() int {
 //
 func (question *SectionQuestion) String() string {
 	return fmt.Sprintf("&{Name:%s Type:%s}", question.Name,
-		QueryTypeNames[question.Type])
+		RecordTypeNames[question.Type])
 }
 
 //
@@ -109,7 +109,7 @@ func (question *SectionQuestion) unpack(packet []byte) (err error) {
 	}
 
 	question.Name = sb.String()
-	question.Type = libbytes.ReadUint16(packet, uint(x))
+	question.Type = RecordType(libbytes.ReadUint16(packet, uint(x)))
 	x += 2
 	question.Class = libbytes.ReadUint16(packet, uint(x))
 

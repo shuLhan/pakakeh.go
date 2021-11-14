@@ -23,8 +23,8 @@ type Answer struct {
 
 	// QName contains DNS question name, a copy of msg.Question.Name.
 	QName string
-	// qtype contains DNS question type, a copy of msg.Question.Type.
-	QType uint16
+	// RType contains record type, a copy of msg.Question.Type.
+	RType RecordType
 	// qclass contains DNS question class, a copy of msg.Question.Class.
 	QClass uint16
 
@@ -43,7 +43,7 @@ type Answer struct {
 func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	an = &Answer{
 		QName:  msg.Question.Name,
-		QType:  msg.Question.Type,
+		RType:  msg.Question.Type,
 		QClass: msg.Question.Class,
 		msg:    msg,
 	}

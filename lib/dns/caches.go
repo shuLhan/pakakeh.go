@@ -98,14 +98,14 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 // If answer exist on cache, their accessed time will be updated to current
 // time and moved to back of LRU to prevent being pruned later.
 //
-func (c *caches) get(qname string, qtype, qclass uint16) (ans *answers, an *Answer) {
+func (c *caches) get(qname string, rtype RecordType, qclass uint16) (ans *answers, an *Answer) {
 	c.Lock()
 
 	var found bool
 
 	ans, found = c.v[qname]
 	if found {
-		an, _ = ans.get(qtype, qclass)
+		an, _ = ans.get(rtype, qclass)
 		if an != nil {
 			// Move the answer to the back of LRU if its not
 			// local and update its accessed time.
@@ -155,7 +155,7 @@ func (c *caches) prune() (n int) {
 		_ = c.lru.Remove(e)
 		answers, found := c.v[an.QName]
 		if found {
-			answers.remove(an.QType, an.QClass)
+			answers.remove(an.RType, an.QClass)
 			if len(answers.v) == 0 {
 				delete(c.v, an.QName)
 			}
@@ -256,7 +256,7 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 		return nil
 	}
 	for _, an := range ans.v {
-		if an.QType != rr.Type {
+		if an.RType != rr.Type {
 			continue
 		}
 		if an.QClass != rr.Class {

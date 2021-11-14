@@ -66,15 +66,15 @@ func (cl *DoTClient) Close() error {
 // Lookup specific type, class, and name in synchronous mode.
 //
 func (cl *DoTClient) Lookup(
-	allowRecursion bool, qtype, qclass uint16, qname string,
+	allowRecursion bool, rtype RecordType, qclass uint16, qname string,
 ) (
 	res *Message, err error,
 ) {
 	if len(qname) == 0 {
 		return nil, nil
 	}
-	if qtype == 0 {
-		qtype = QueryTypeA
+	if rtype == 0 {
+		rtype = RecordTypeA
 	}
 	if qclass == 0 {
 		qclass = QueryClassIN
@@ -85,7 +85,7 @@ func (cl *DoTClient) Lookup(
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
 	msg.Header.QDCount = 1
-	msg.Question.Type = qtype
+	msg.Question.Type = rtype
 	msg.Question.Class = qclass
 	msg.Question.Name = qname
 

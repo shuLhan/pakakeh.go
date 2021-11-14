@@ -648,12 +648,12 @@ func (srv *Server) isImplemented(msg *Message) bool {
 		return false
 	}
 
-	if msg.Question.Type >= QueryTypeA && msg.Question.Type <= QueryTypeTXT {
+	if msg.Question.Type >= RecordTypeA && msg.Question.Type <= RecordTypeTXT {
 		return true
 	}
 	switch msg.Question.Type {
-	case QueryTypeAAAA, QueryTypeSRV, QueryTypeOPT, QueryTypeAXFR,
-		QueryTypeMAILB, QueryTypeMAILA:
+	case RecordTypeAAAA, RecordTypeSRV, RecordTypeOPT, RecordTypeAXFR,
+		RecordTypeMAILB, RecordTypeMAILA:
 		return true
 	}
 

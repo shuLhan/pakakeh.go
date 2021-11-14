@@ -80,7 +80,7 @@ func NewMessage() *Message {
 			QDCount: 1,
 		},
 		Question: SectionQuestion{
-			Type:  QueryTypeA,
+			Type:  RecordTypeA,
 			Class: QueryClassIN,
 		},
 		dnameOff: make(map[string]uint16),
@@ -104,8 +104,8 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	}
 
 	addr := addresses[0]
-	qtype := GetQueryTypeFromAddress(addr)
-	if qtype == 0 {
+	rtype := RecordTypeFromAddress(addr)
+	if rtype == 0 {
 		return nil
 	}
 
@@ -113,7 +113,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 
 	rr := ResourceRecord{
 		Name:  string(hname),
-		Type:  qtype,
+		Type:  rtype,
 		Class: QueryClassIN,
 		TTL:   defaultTTL,
 		Value: string(addr),
@@ -127,23 +127,23 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 		},
 		Question: SectionQuestion{
 			Name:  string(hname),
-			Type:  qtype,
+			Type:  rtype,
 			Class: QueryClassIN,
 		},
 		Answer: []ResourceRecord{rr},
 	}
 
 	for _, addr := range addresses[1:] {
-		qtype = GetQueryTypeFromAddress(addr)
-		if qtype == 0 {
+		rtype = RecordTypeFromAddress(addr)
+		if rtype == 0 {
 			continue
 		}
-		if qtype != msg.Question.Type {
+		if rtype != msg.Question.Type {
 			continue
 		}
 		msg.Answer = append(msg.Answer, ResourceRecord{
 			Name:  string(hname),
-			Type:  qtype,
+			Type:  rtype,
 			Class: QueryClassIN,
 			TTL:   defaultTTL,
 			Value: string(addr),
@@ -188,7 +188,7 @@ func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 //
 func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 	switch rr.Type {
-	case QueryTypeSOA, QueryTypePTR:
+	case RecordTypeSOA, RecordTypePTR:
 		if len(msg.Answer) > 0 {
 			msg.Answer[0] = *rr
 		} else {
@@ -208,7 +208,7 @@ func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 // FilterAnswers return resource record in Answer that match only with
 // specific query type.
 //
-func (msg *Message) FilterAnswers(t uint16) (answers []ResourceRecord) {
+func (msg *Message) FilterAnswers(t RecordType) (answers []ResourceRecord) {
 	for _, rr := range msg.Answer {
 		if rr.Type == t {
 			answers = append(answers, rr)
@@ -332,7 +332,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 
 func (msg *Message) packQuestion() {
 	msg.packDomainName([]byte(msg.Question.Name), false)
-	msg.packet = libbytes.AppendUint16(msg.packet, msg.Question.Type)
+	msg.packet = libbytes.AppendUint16(msg.packet, uint16(msg.Question.Type))
 	msg.packet = libbytes.AppendUint16(msg.packet, msg.Question.Class)
 	msg.off += 4
 }
@@ -342,7 +342,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		rrOPT *RDataOPT
 	)
 
-	if rr.Type == QueryTypeOPT {
+	if rr.Type == RecordTypeOPT {
 		// MUST be 0 (root domain).
 		msg.packet = append(msg.packet, 0)
 		rrOPT, _ = rr.Value.(*RDataOPT)
@@ -350,11 +350,11 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		msg.packDomainName([]byte(rr.Name), true)
 	}
 
-	msg.packet = libbytes.AppendUint16(msg.packet, rr.Type)
+	msg.packet = libbytes.AppendUint16(msg.packet, uint16(rr.Type))
 	msg.packet = libbytes.AppendUint16(msg.packet, rr.Class)
 	msg.off += 4
 
-	if rr.Type == QueryTypeOPT {
+	if rr.Type == RecordTypeOPT {
 		rr.TTL = 0
 
 		// Pack extended code and version to TTL
@@ -375,43 +375,43 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 
 func (msg *Message) packRData(rr *ResourceRecord) {
 	switch rr.Type {
-	case QueryTypeA:
+	case RecordTypeA:
 		msg.packA(rr)
-	case QueryTypeNS:
+	case RecordTypeNS:
 		msg.packTextAsDomain(rr)
-	case QueryTypeMD:
+	case RecordTypeMD:
 		// obsolete
-	case QueryTypeMF:
+	case RecordTypeMF:
 		// obsolete
-	case QueryTypeCNAME:
+	case RecordTypeCNAME:
 		msg.packTextAsDomain(rr)
-	case QueryTypeSOA:
+	case RecordTypeSOA:
 		msg.packSOA(rr)
-	case QueryTypeMB:
+	case RecordTypeMB:
 		msg.packTextAsDomain(rr)
-	case QueryTypeMG:
+	case RecordTypeMG:
 		msg.packTextAsDomain(rr)
-	case QueryTypeMR:
+	case RecordTypeMR:
 		msg.packTextAsDomain(rr)
-	case QueryTypeNULL:
+	case RecordTypeNULL:
 		msg.packTextAsDomain(rr)
-	case QueryTypeWKS:
+	case RecordTypeWKS:
 		msg.packWKS(rr)
-	case QueryTypePTR:
+	case RecordTypePTR:
 		msg.packTextAsDomain(rr)
-	case QueryTypeHINFO:
+	case RecordTypeHINFO:
 		msg.packHINFO(rr)
-	case QueryTypeMINFO:
+	case RecordTypeMINFO:
 		msg.packMINFO(rr)
-	case QueryTypeMX:
+	case RecordTypeMX:
 		msg.packMX(rr)
-	case QueryTypeTXT:
+	case RecordTypeTXT:
 		msg.packTXT(rr)
-	case QueryTypeSRV:
+	case RecordTypeSRV:
 		msg.packSRV(rr)
-	case QueryTypeAAAA:
+	case RecordTypeAAAA:
 		msg.packAAAA(rr)
-	case QueryTypeOPT:
+	case RecordTypeOPT:
 		msg.packOPT(rr)
 	}
 }
@@ -822,7 +822,7 @@ func (msg *Message) SubTTL(n uint32) {
 			msg.Authority[x].TTL)
 	}
 	for x := 0; x < len(msg.Additional); x++ {
-		if msg.Additional[x].Type == QueryTypeOPT {
+		if msg.Additional[x].Type == RecordTypeOPT {
 			continue
 		}
 		if msg.Additional[x].TTL < n {

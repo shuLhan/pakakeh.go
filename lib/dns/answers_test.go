@@ -54,7 +54,7 @@ func TestAnswersGet(t *testing.T) {
 		},
 		Answer: []ResourceRecord{{
 			Name:  "test",
-			Type:  QueryTypeA,
+			Type:  RecordTypeA,
 			Class: QueryClassIN,
 		}},
 	}
@@ -63,7 +63,7 @@ func TestAnswersGet(t *testing.T) {
 
 	cases := []struct {
 		desc     string
-		QType    uint16
+		RType    RecordType
 		QClass   uint16
 		exp      *Answer
 		expIndex int
@@ -76,11 +76,11 @@ func TestAnswersGet(t *testing.T) {
 		expIndex: 1,
 	}, {
 		desc:     "With query class not found",
-		QType:    1,
+		RType:    1,
 		expIndex: 1,
 	}, {
 		desc:     "With valid query type and class",
-		QType:    1,
+		RType:    1,
 		QClass:   1,
 		exp:      an,
 		expIndex: 0,
@@ -89,7 +89,7 @@ func TestAnswersGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, x := ans.get(c.QType, c.QClass)
+		got, x := ans.get(c.RType, c.QClass)
 
 		test.Assert(t, "answers.get", c.exp, got)
 		test.Assert(t, "answers.get index", c.expIndex, x)
@@ -105,7 +105,7 @@ func TestAnswersRemove(t *testing.T) {
 		},
 		Answer: []ResourceRecord{{
 			Name:  "test",
-			Type:  QueryTypeA,
+			Type:  RecordTypeA,
 			Class: QueryClassIN,
 		}},
 	}
@@ -114,10 +114,11 @@ func TestAnswersRemove(t *testing.T) {
 	ans := newAnswers(an)
 
 	cases := []struct {
-		desc          string
-		QType, QClass uint16
-		exp           *answers
-		expLen        int
+		desc   string
+		RType  RecordType
+		QClass uint16
+		exp    *answers
+		expLen int
 	}{{
 		desc:   "With query type and class not found",
 		exp:    ans,
@@ -129,12 +130,12 @@ func TestAnswersRemove(t *testing.T) {
 		expLen: 1,
 	}, {
 		desc:   "With query class not found",
-		QType:  1,
+		RType:  1,
 		exp:    ans,
 		expLen: 1,
 	}, {
 		desc:   "With valid query type and class",
-		QType:  1,
+		RType:  1,
 		QClass: 1,
 		exp: &answers{
 			v: make([]*Answer, 0, 1),
@@ -145,7 +146,7 @@ func TestAnswersRemove(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ans.remove(c.QType, c.QClass)
+		ans.remove(c.RType, c.QClass)
 
 		test.Assert(t, "len(answers.v)", c.expLen, len(ans.v))
 		test.Assert(t, "cap(answers.v)", 1, cap(ans.v))
@@ -155,7 +156,7 @@ func TestAnswersRemove(t *testing.T) {
 
 func TestAnswersUpdate(t *testing.T) {
 	an1 := &Answer{
-		QType:  1,
+		RType:  1,
 		QClass: 1,
 		msg: &Message{
 			Header: SectionHeader{
@@ -164,17 +165,17 @@ func TestAnswersUpdate(t *testing.T) {
 		},
 	}
 	an2 := &Answer{
-		QType:  2,
+		RType:  2,
 		QClass: 1,
 		msg:    &Message{},
 	}
 	an3 := &Answer{
-		QType:  1,
+		RType:  1,
 		QClass: 2,
 		msg:    &Message{},
 	}
 	an4 := &Answer{
-		QType:  1,
+		RType:  1,
 		QClass: 1,
 		msg: &Message{
 			Header: SectionHeader{
@@ -217,7 +218,7 @@ func TestAnswersUpdate(t *testing.T) {
 		exp: &answers{
 			v: []*Answer{
 				{
-					QType:  1,
+					RType:  1,
 					QClass: 1,
 					msg:    an4.msg,
 				},

@@ -20,9 +20,9 @@ func (zr zoneRecords) add(rr *ResourceRecord) {
 
 	// Replace the RR if its type is SOA because only one SOA
 	// should exist per domain name.
-	if rr.Type == QueryTypeSOA {
+	if rr.Type == RecordTypeSOA {
 		for x, in := range listRR {
-			if in.Type != QueryTypeSOA {
+			if in.Type != RecordTypeSOA {
 				continue
 			}
 			listRR[x] = rr

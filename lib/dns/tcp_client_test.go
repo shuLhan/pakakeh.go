@@ -19,13 +19,13 @@ func TestTCPClientLookup(t *testing.T) {
 	cases := []struct {
 		desc           string
 		allowRecursion bool
-		qtype          uint16
+		rtype          RecordType
 		qclass         uint16
 		qname          string
 		exp            *Message
 	}{{
-		desc:   "QType:A QClass:IN QName:kilabit.info",
-		qtype:  QueryTypeA,
+		desc:   "RType:A QClass:IN QName:kilabit.info",
+		rtype:  RecordTypeA,
 		qclass: QueryClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
@@ -37,12 +37,12 @@ func TestTCPClientLookup(t *testing.T) {
 			},
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
-				Type:  QueryTypeA,
+				Type:  RecordTypeA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
-				Type:  QueryTypeA,
+				Type:  RecordTypeA,
 				Class: QueryClassIN,
 				TTL:   3600,
 				rdlen: 4,
@@ -52,8 +52,8 @@ func TestTCPClientLookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:SOA QClass:IN QName:kilabit.info",
-		qtype:  QueryTypeSOA,
+		desc:   "RType:SOA QClass:IN QName:kilabit.info",
+		rtype:  RecordTypeSOA,
 		qclass: QueryClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
@@ -65,12 +65,12 @@ func TestTCPClientLookup(t *testing.T) {
 			},
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
-				Type:  QueryTypeSOA,
+				Type:  RecordTypeSOA,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
-				Type:  QueryTypeSOA,
+				Type:  RecordTypeSOA,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
@@ -87,8 +87,8 @@ func TestTCPClientLookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:TXT QClass:IN QName:kilabit.info",
-		qtype:  QueryTypeTXT,
+		desc:   "RType:TXT QClass:IN QName:kilabit.info",
+		rtype:  RecordTypeTXT,
 		qclass: QueryClassIN,
 		qname:  "kilabit.info",
 		exp: &Message{
@@ -100,12 +100,12 @@ func TestTCPClientLookup(t *testing.T) {
 			},
 			Question: SectionQuestion{
 				Name:  "kilabit.info",
-				Type:  QueryTypeTXT,
+				Type:  RecordTypeTXT,
 				Class: QueryClassIN,
 			},
 			Answer: []ResourceRecord{{
 				Name:  "kilabit.info",
-				Type:  QueryTypeTXT,
+				Type:  RecordTypeTXT,
 				Class: QueryClassIN,
 				TTL:   3600,
 				Value: "This is a test server",
@@ -118,7 +118,7 @@ func TestTCPClientLookup(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.allowRecursion, c.qtype, c.qclass, c.qname)
+		got, err := cl.Lookup(c.allowRecursion, c.rtype, c.qclass, c.qname)
 		if err != nil {
 			t.Fatal(err)
 		}

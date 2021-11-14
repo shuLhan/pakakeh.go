@@ -17,7 +17,6 @@ package dns
 
 import (
 	"errors"
-	"net"
 	"time"
 )
 
@@ -99,82 +98,6 @@ const (
 	OpCodeStatus               // a server status request (STATUS)
 )
 
-// List of code for known DNS query types.
-const (
-	QueryTypeZERO  uint16 = iota // Empty query type.
-	QueryTypeA                   //  1 - A host address
-	QueryTypeNS                  //  2 - An authoritative name server
-	QueryTypeMD                  //  3 - A mail destination (Obsolete - use MX)
-	QueryTypeMF                  //  4 - A mail forwarder (Obsolete - use MX)
-	QueryTypeCNAME               //  5 - The canonical name for an alias
-	QueryTypeSOA                 //  6 - Marks the start of a zone of authority
-	QueryTypeMB                  //  7 - A mailbox domain name (EXPERIMENTAL)
-	QueryTypeMG                  //  8 - A mail group member (EXPERIMENTAL)
-	QueryTypeMR                  //  9 - A mail rename domain name (EXPERIMENTAL)
-	QueryTypeNULL                // 10 - A null RR (EXPERIMENTAL)
-	QueryTypeWKS                 // 11 - A well known service description
-	QueryTypePTR                 // 12 - A domain name pointer
-	QueryTypeHINFO               // 13 - Host information
-	QueryTypeMINFO               // 14 - Mailbox or mail list information
-	QueryTypeMX                  // 15 - Mail exchange
-	QueryTypeTXT                 // 16 - Text strings
-	QueryTypeAAAA  uint16 = 28   // IPv6 address
-	QueryTypeSRV   uint16 = 33   // A SRV RR for locating service.
-	QueryTypeOPT   uint16 = 41   // An OPT pseudo-RR (sometimes called a meta-RR)
-	QueryTypeAXFR  uint16 = 252  // A request for a transfer of an entire zone
-	QueryTypeMAILB uint16 = 253  // A request for mailbox-related records (MB, MG or MR)
-	QueryTypeMAILA uint16 = 254  // A request for mail agent RRs (Obsolete - see MX)
-	QueryTypeALL   uint16 = 255  // A request for all records
-)
-
-//
-// QueryTypes contains a mapping between string representation of DNS query
-// type with their decimal value.
-//
-var QueryTypes = map[string]uint16{
-	"A":     QueryTypeA,
-	"NS":    QueryTypeNS,
-	"CNAME": QueryTypeCNAME,
-	"SOA":   QueryTypeSOA,
-	"MB":    QueryTypeMB,
-	"MG":    QueryTypeMG,
-	"MR":    QueryTypeMR,
-	"NULL":  QueryTypeNULL,
-	"WKS":   QueryTypeWKS,
-	"PTR":   QueryTypePTR,
-	"HINFO": QueryTypeHINFO,
-	"MINFO": QueryTypeMINFO,
-	"MX":    QueryTypeMX,
-	"TXT":   QueryTypeTXT,
-	"AAAA":  QueryTypeAAAA,
-	"SRV":   QueryTypeSRV,
-	"OPT":   QueryTypeOPT,
-}
-
-//
-// QueryTypeNames contains mapping between query type and and their string
-// representation.
-//
-var QueryTypeNames = map[uint16]string{
-	QueryTypeA:     "A",
-	QueryTypeNS:    "NS",
-	QueryTypeCNAME: "CNAME",
-	QueryTypeSOA:   "SOA",
-	QueryTypeMB:    "MB",
-	QueryTypeMG:    "MG",
-	QueryTypeMR:    "MR",
-	QueryTypeNULL:  "NULL",
-	QueryTypeWKS:   "WKS",
-	QueryTypePTR:   "PTR",
-	QueryTypeHINFO: "HINFO",
-	QueryTypeMINFO: "MINFO",
-	QueryTypeMX:    "MX",
-	QueryTypeTXT:   "TXT",
-	QueryTypeAAAA:  "AAAA",
-	QueryTypeSRV:   "SRV",
-	QueryTypeOPT:   "OPT",
-}
-
 // List of code known DNS query class.
 const (
 	QueryClassZERO uint16 = iota // Empty query class.
@@ -247,25 +170,4 @@ var rcodeNames = map[ResponseCode]string{
 	RCodeErrName:        "ERR_NAME",
 	RCodeNotImplemented: "ERR_NOT_IMPLEMENTED",
 	RCodeRefused:        "ERR_REFUSED",
-}
-
-//
-// GetQueryTypeFromAddress return QueryTypeA or QueryTypeAAAA if addr is valid
-// IPv4 or IPv6 address, otherwise it will return 0.
-//
-func GetQueryTypeFromAddress(addr []byte) (qtype uint16) {
-	ip := net.ParseIP(string(addr))
-	if ip == nil {
-		return 0
-	}
-
-	qtype = QueryTypeA
-	for x := 0; x < len(addr); x++ {
-		if addr[x] == ':' {
-			qtype = QueryTypeAAAA
-			break
-		}
-	}
-
-	return qtype
 }

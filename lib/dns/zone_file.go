@@ -35,7 +35,7 @@ func NewZoneFile(file, name string) *ZoneFile {
 		Path: file,
 		Name: name,
 		SOA: ResourceRecord{
-			Type: QueryTypeSOA,
+			Type: RecordTypeSOA,
 			Value: &RDataSOA{
 				MName: name,
 			},
@@ -141,7 +141,7 @@ func ParseZoneFile(file, origin string, ttl uint32) (*ZoneFile, error) {
 // Add add new ResourceRecord to ZoneFile.
 //
 func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
-	if rr.Type == QueryTypeSOA {
+	if rr.Type == RecordTypeSOA {
 		zone.SOA = *rr
 	} else {
 		zone.Records.add(rr)
@@ -195,9 +195,9 @@ func (zone *ZoneFile) Messages() []*Message {
 // Remove a ResourceRecord from zone file.
 //
 func (zone *ZoneFile) Remove(rr *ResourceRecord) (err error) {
-	if rr.Type == QueryTypeSOA {
+	if rr.Type == RecordTypeSOA {
 		zone.SOA = ResourceRecord{
-			Type:  QueryTypeSOA,
+			Type:  RecordTypeSOA,
 			Value: &RDataSOA{},
 		}
 	} else {
@@ -281,22 +281,22 @@ func (zone *ZoneFile) saveListRR(
 			dname = "\t"
 		}
 		switch rr.Type {
-		case QueryTypeA, QueryTypeNULL, QueryTypeAAAA:
+		case RecordTypeA, RecordTypeNULL, RecordTypeAAAA:
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, QueryClassName[rr.Class],
-				QueryTypeNames[rr.Type], rr.Value.(string))
+				RecordTypeNames[rr.Type], rr.Value.(string))
 
-		case QueryTypeTXT:
+		case RecordTypeTXT:
 			_, err = fmt.Fprintf(out, "%s %d %s %s %q\n",
 				dname, rr.TTL, QueryClassName[rr.Class],
-				QueryTypeNames[rr.Type], rr.Value.(string))
+				RecordTypeNames[rr.Type], rr.Value.(string))
 
-		case QueryTypeNS, QueryTypeCNAME, QueryTypeMB,
-			QueryTypeMG, QueryTypeMR:
+		case RecordTypeNS, RecordTypeCNAME, RecordTypeMB,
+			RecordTypeMG, RecordTypeMR:
 			v, ok := rr.Value.(string)
 			if !ok {
 				err = errors.New("invalid record value for " +
-					QueryTypeNames[rr.Type])
+					RecordTypeNames[rr.Type])
 				break
 			}
 			if strings.HasSuffix(v, zone.Name) {
@@ -306,13 +306,13 @@ func (zone *ZoneFile) saveListRR(
 			}
 			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, QueryClassName[rr.Class],
-				QueryTypeNames[rr.Type], v)
+				RecordTypeNames[rr.Type], v)
 
-		case QueryTypePTR:
+		case RecordTypePTR:
 			v, ok := rr.Value.(string)
 			if !ok {
 				err = errors.New("invalid record value for " +
-					QueryTypeNames[rr.Type])
+					RecordTypeNames[rr.Type])
 				break
 			}
 			if strings.HasSuffix(v, zone.Name) {
@@ -323,7 +323,7 @@ func (zone *ZoneFile) saveListRR(
 			_, err = fmt.Fprintf(out, "%s. %d IN PTR %s\n",
 				rr.Name, rr.TTL, v)
 
-		case QueryTypeWKS:
+		case RecordTypeWKS:
 			wks, ok := rr.Value.(*RDataWKS)
 			if !ok {
 				err = errors.New("invalid record value for WKS")
@@ -334,7 +334,7 @@ func (zone *ZoneFile) saveListRR(
 				dname, rr.TTL, QueryClassName[rr.Class],
 				wks.Address, wks.Protocol, wks.BitMap)
 
-		case QueryTypeHINFO:
+		case RecordTypeHINFO:
 			hinfo, ok := rr.Value.(*RDataHINFO)
 			if !ok {
 				err = errors.New("invalid record value for HINFO")
@@ -345,7 +345,7 @@ func (zone *ZoneFile) saveListRR(
 				dname, rr.TTL, QueryClassName[rr.Class],
 				hinfo.CPU, hinfo.OS)
 
-		case QueryTypeMINFO:
+		case RecordTypeMINFO:
 			minfo, ok := rr.Value.(*RDataMINFO)
 			if !ok {
 				err = errors.New("invalid record value for MINFO")
@@ -356,7 +356,7 @@ func (zone *ZoneFile) saveListRR(
 				dname, rr.TTL, QueryClassName[rr.Class],
 				minfo.RMailBox, minfo.EmailBox)
 
-		case QueryTypeMX:
+		case RecordTypeMX:
 			mx, ok := rr.Value.(*RDataMX)
 			if !ok {
 				err = errors.New("invalid record value for MX")
@@ -367,7 +367,7 @@ func (zone *ZoneFile) saveListRR(
 				dname, rr.TTL, QueryClassName[rr.Class],
 				mx.Preference, mx.Exchange)
 
-		case QueryTypeSRV:
+		case RecordTypeSRV:
 			srv, ok := rr.Value.(*RDataSRV)
 			if !ok {
 				err = errors.New("invalid record value for SRV")

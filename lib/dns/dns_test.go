@@ -9,8 +9,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
-	"github.com/shuLhan/share/lib/test"
 )
 
 const (
@@ -60,11 +58,4 @@ func TestMain(m *testing.M) {
 	time.Sleep(500 * time.Millisecond)
 
 	os.Exit(m.Run())
-}
-
-func TestQueryType(t *testing.T) {
-	test.Assert(t, "QueryTypeA", QueryTypeA, uint16(1))
-	test.Assert(t, "QueryTypeTXT", QueryTypeTXT, uint16(16))
-	test.Assert(t, "QueryTypeAXFR", QueryTypeAXFR, uint16(252))
-	test.Assert(t, "QueryTypeALL", QueryTypeALL, uint16(255))
 }

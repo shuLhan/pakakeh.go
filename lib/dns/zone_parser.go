@@ -523,7 +523,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			parseRRClass | parseRRType,
 			parseRRTTL | parseRRClass | parseRRType:
 
-			if rr.Type == QueryTypeTXT {
+			if rr.Type == RecordTypeTXT {
 				if !isTerm {
 					orgtok = append(orgtok, c)
 				}
@@ -581,7 +581,7 @@ func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 // return false.
 //
 func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
-	for k, v := range QueryTypes {
+	for k, v := range RecordTypes {
 		if stok == k {
 			rr.Type = v
 			return true
@@ -592,37 +592,37 @@ func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
 
 func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	switch rr.Type {
-	case QueryTypeA, QueryTypeAAAA:
+	case RecordTypeA, RecordTypeAAAA:
 		rr.Value = string(tok)
 
-	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG, QueryTypeMR, QueryTypePTR:
+	case RecordTypeNS, RecordTypeCNAME, RecordTypeMB, RecordTypeMG, RecordTypeMR, RecordTypePTR:
 		rr.Value = m.generateDomainName(tok)
 
-	case QueryTypeSOA:
+	case RecordTypeSOA:
 		err = m.parseSOA(rr, tok)
 
 	// NULL RRs are not allowed in zone files.
-	case QueryTypeNULL:
+	case RecordTypeNULL:
 		err = fmt.Errorf("line %d: NULL type is not allowed", m.lineno)
 
 	// In zone files, both ports and protocols are expressed using
 	// mnemonics or decimal numbers.
-	case QueryTypeWKS:
+	case RecordTypeWKS:
 		// TODO(ms)
 
-	case QueryTypeHINFO:
+	case RecordTypeHINFO:
 		err = m.parseHInfo(rr, tok)
 
-	case QueryTypeMINFO:
+	case RecordTypeMINFO:
 		err = m.parseMInfo(rr, tok)
 
-	case QueryTypeMX:
+	case RecordTypeMX:
 		err = m.parseMX(rr, tok)
 
-	case QueryTypeTXT:
+	case RecordTypeTXT:
 		err = m.parseTXT(rr, tok)
 
-	case QueryTypeSRV:
+	case RecordTypeSRV:
 		err = m.parseSRV(rr, tok)
 	}
 

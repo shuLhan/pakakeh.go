@@ -27,7 +27,7 @@ type ResourceRecord struct {
 
 	// Two octets containing one of the RR type codes.  This field
 	// specifies the meaning of the data in the RDATA field.
-	Type uint16
+	Type RecordType
 
 	// Two octets which specify the class of the data in the RDATA field.
 	Class uint16
@@ -84,107 +84,107 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 		rr.TTL = defaultTTL
 	}
 
-	qtype, ok := QueryTypeNames[rr.Type]
+	rtype, ok := RecordTypeNames[rr.Type]
 	if !ok {
 		return fmt.Errorf("%s: unknown type %d", logp, rr.Type)
 	}
 	switch rr.Type {
-	case QueryTypeA:
+	case RecordTypeA:
 		v, ok := rr.Value.(string)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 		ip := net.ParseIP(v)
 		if ip == nil {
-			return fmt.Errorf("%s: invalid or empty %s: %q", logp, qtype, v)
+			return fmt.Errorf("%s: invalid or empty %s: %q", logp, rtype, v)
 		}
 		ipv4 := ip.To4()
 		if ipv4 == nil {
-			return fmt.Errorf("%s: invalid or empty %s: %q", logp, qtype, v)
+			return fmt.Errorf("%s: invalid or empty %s: %q", logp, rtype, v)
 		}
 
-	case QueryTypeNS, QueryTypeCNAME, QueryTypeMB, QueryTypeMG,
-		QueryTypeMR, QueryTypeNULL, QueryTypePTR:
+	case RecordTypeNS, RecordTypeCNAME, RecordTypeMB, RecordTypeMG,
+		RecordTypeMR, RecordTypeNULL, RecordTypePTR:
 
 		v, ok := rr.Value.(string)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 
 		if !libnet.IsHostnameValid([]byte(v), true) {
-			return fmt.Errorf("%s: invalid or empty %s: %q", logp, qtype, v)
+			return fmt.Errorf("%s: invalid or empty %s: %q", logp, rtype, v)
 		}
 
-	case QueryTypeSOA:
+	case RecordTypeSOA:
 		soa, ok := rr.Value.(*RDataSOA)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 		if !libnet.IsHostnameValid([]byte(soa.MName), true) {
-			return fmt.Errorf("%s: invalid or empty %s MName: %q", logp, qtype, soa.MName)
+			return fmt.Errorf("%s: invalid or empty %s MName: %q", logp, rtype, soa.MName)
 		}
 		if !libnet.IsHostnameValid([]byte(soa.RName), true) {
-			return fmt.Errorf("%s: invalid or empty %s RName: %q", logp, qtype, soa.RName)
+			return fmt.Errorf("%s: invalid or empty %s RName: %q", logp, rtype, soa.RName)
 		}
-	case QueryTypeWKS:
+	case RecordTypeWKS:
 		_, ok := rr.Value.(*RDataWKS)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 
-	case QueryTypeHINFO:
+	case RecordTypeHINFO:
 		_, ok := rr.Value.(*RDataHINFO)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
-	case QueryTypeMINFO:
+	case RecordTypeMINFO:
 		_, ok := rr.Value.(*RDataMINFO)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
-	case QueryTypeMX:
+	case RecordTypeMX:
 		mx, ok := rr.Value.(*RDataMX)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 		err = mx.initAndValidate()
 		if err != nil {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
-	case QueryTypeTXT:
+	case RecordTypeTXT:
 		txt, ok := rr.Value.(string)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 		if len(txt) == 0 {
-			return fmt.Errorf("%s: empty %s value", logp, qtype)
+			return fmt.Errorf("%s: empty %s value", logp, rtype)
 		}
-	case QueryTypeSRV:
+	case RecordTypeSRV:
 		srv, ok := rr.Value.(*RDataSRV)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 		err = srv.initAndValidate()
 		if err != nil {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
-	case QueryTypeAAAA:
+	case RecordTypeAAAA:
 		v, ok := rr.Value.(string)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 		ip := net.ParseIP(v)
 		if ip == nil {
-			return fmt.Errorf("%s: invalid or empty %s value: %q", logp, qtype, v)
+			return fmt.Errorf("%s: invalid or empty %s value: %q", logp, rtype, v)
 		}
 		ipv6 := ip.To16()
 		if ipv6 == nil {
-			return fmt.Errorf("%s: invalid or empty %s value: %q", logp, qtype, v)
+			return fmt.Errorf("%s: invalid or empty %s value: %q", logp, rtype, v)
 		}
-	case QueryTypeOPT:
+	case RecordTypeOPT:
 		_, ok := rr.Value.(*RDataOPT)
 		if !ok {
-			return fmt.Errorf("%s: expecting %s got %T", logp, qtype, rr.Value)
+			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 	}
 	return nil
@@ -212,7 +212,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 		}
 	}
 
-	rr.Type = libbytes.ReadUint16(packet, x)
+	rr.Type = RecordType(libbytes.ReadUint16(packet, x))
 	x += 2
 	rr.Class = libbytes.ReadUint16(packet, x)
 	x += 2
@@ -279,7 +279,7 @@ func unpackDomainName(packet []byte, start uint) (name string, end uint, err err
 
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) {
 	switch rr.Type {
-	case QueryTypeA:
+	case RecordTypeA:
 		return rr.unpackA()
 
 	//
@@ -295,7 +295,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	// or Hesiod (HS) class information are normally queried using IN
 	// class protocols.
 	//
-	case QueryTypeNS:
+	case RecordTypeNS:
 		rr.Value, _, err = unpackDomainName(packet, startIdx)
 		return err
 
@@ -303,68 +303,68 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	// the new scheme.  The recommended policy for dealing with MD RRs found in
 	// a zone file is to reject them, or to convert them to MX RRs with a
 	// preference of 0.
-	case QueryTypeMD:
+	case RecordTypeMD:
 
 	// MF is obsolete.  See the definition of MX and [RFC-974] for details
 	// ofw the new scheme.  The recommended policy for dealing with MD RRs
 	// found in a zone file is to reject them, or to convert them to MX
 	// RRs with a preference of 10.
-	case QueryTypeMF:
+	case RecordTypeMF:
 
 	// CNAME RRs cause no additional section processing, but name servers
 	// may choose to restart the query at the canonical name in certain
 	// cases.  See the description of name server logic in [RFC-1034] for
 	// details.
-	case QueryTypeCNAME:
+	case RecordTypeCNAME:
 		rr.Value, _, err = unpackDomainName(packet, startIdx)
 		return err
 
-	case QueryTypeSOA:
+	case RecordTypeSOA:
 		return rr.unpackSOA(packet, startIdx)
 
-	case QueryTypeMB:
+	case RecordTypeMB:
 		rr.Value, _, err = unpackDomainName(packet, startIdx)
 		return err
 
-	case QueryTypeMG:
+	case RecordTypeMG:
 		rr.Value, _, err = unpackDomainName(packet, startIdx)
 		return err
 
-	case QueryTypeMR:
+	case RecordTypeMR:
 		rr.Value, _, err = unpackDomainName(packet, startIdx)
 		return err
 
 	// NULL records cause no additional section processing.
 	// NULLs are used as placeholders in some experimental extensions of
 	// the DNS.
-	case QueryTypeNULL:
+	case RecordTypeNULL:
 		endIdx := startIdx + uint(rr.rdlen)
 		rr.Value = string(packet[startIdx : startIdx+endIdx])
 		return nil
 
-	case QueryTypeWKS:
+	case RecordTypeWKS:
 		rrWKS := new(RDataWKS)
 		rr.Value = rrWKS
 		endIdx := startIdx + uint(rr.rdlen)
 		return rrWKS.unpack(packet[startIdx:endIdx])
 
-	case QueryTypePTR:
+	case RecordTypePTR:
 		rr.Value, _, err = unpackDomainName(packet, startIdx)
 		return err
 
-	case QueryTypeHINFO:
+	case RecordTypeHINFO:
 		rrHInfo := new(RDataHINFO)
 		rr.Value = rrHInfo
 		endIdx := startIdx + uint(rr.rdlen)
 		return rrHInfo.unpack(packet[startIdx:endIdx])
 
-	case QueryTypeMINFO:
+	case RecordTypeMINFO:
 		return rr.unpackMInfo(packet, startIdx)
 
-	case QueryTypeMX:
+	case RecordTypeMX:
 		return rr.unpackMX(packet, startIdx)
 
-	case QueryTypeTXT:
+	case RecordTypeTXT:
 		endIdx := startIdx + uint(rr.rdlen)
 
 		// The first byte of TXT is length.
@@ -372,13 +372,13 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 
 		return nil
 
-	case QueryTypeAAAA:
+	case RecordTypeAAAA:
 		return rr.unpackAAAA()
 
-	case QueryTypeSRV:
+	case RecordTypeSRV:
 		return rr.unpackSRV(packet, startIdx)
 
-	case QueryTypeOPT:
+	case RecordTypeOPT:
 		return rr.unpackOPT(packet, startIdx)
 
 	default:
