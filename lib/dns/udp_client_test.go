@@ -35,7 +35,7 @@ func TestUDPClientLookup(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -63,7 +63,7 @@ func TestUDPClientLookup(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
@@ -98,7 +98,7 @@ func TestUDPClientLookup(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,
@@ -125,7 +125,7 @@ func TestUDPClientLookup(t *testing.T) {
 				RCode:   RCodeErrServer,
 				QDCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeAAAA,
 				Class: RecordClassIN,

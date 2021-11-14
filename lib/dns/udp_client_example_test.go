@@ -20,7 +20,7 @@ func ExampleUDPClient() {
 
 	req := &dns.Message{
 		Header: dns.MessageHeader{},
-		Question: dns.SectionQuestion{
+		Question: dns.MessageQuestion{
 			Name:  "kilabit.info",
 			Type:  dns.RecordTypeA,
 			Class: dns.RecordClassIN,
