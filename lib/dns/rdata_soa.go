@@ -5,67 +5,76 @@
 package dns
 
 import (
-	"fmt"
 	"strings"
+	"time"
+)
+
+const (
+	defaultRName      string = "root"
+	defaultRefresh    int32  = 1 * 24 * 60 * 60 // 1 Day.
+	defaultRetry      int32  = 1 * 60 * 60      // 1 Hour.
+	defaultMinimumTTL uint32 = 1 * 60 * 60      // 1 Hour.
 )
 
 //
-// RDataSOA marks the Start Of a zone of Authority RDATA format in resource
-// record.
+// RDataSOA contains the authority of zone.
 //
 // All times are in units of seconds.
 //
-// Most of these fields are pertinent only for name server maintenance
-// operations.  However, MINIMUM is used in all query operations that
-// retrieve RRs from a zone.  Whenever a RR is sent in a response to a
-// query, the TTL field is set to the maximum of the TTL field from the RR
-// and the MINIMUM field in the appropriate SOA.  Thus MINIMUM is a lower
-// bound on the TTL field for all RRs in a zone.  Note that this use of
-// MINIMUM should occur when the RRs are copied into the response and not
-// when the zone is loaded from a zone file or via a zone transfer.  The
-// reason for this provison is to allow future dynamic update facilities to
-// change the SOA RR with known semantics.
-//
 type RDataSOA struct {
-	// The <domain-name> of the name server that was the original or
-	// primary source of data for this zone.
+	// The primary name server for the zone.
 	MName string
 
-	// A <domain-name> which specifies the mailbox of the person
-	// responsible for this zone.
+	// The mailbox of the person responsible for the name server.
+	// For example, "root@localhost", but with '@' is replaced with dot
+	// '.', its become "root.localhost".
+	// If its empty, default to "root".
 	RName string
 
-	// The unsigned 32 bit version number of the original copy of the
-	// zone.  Zone transfers preserve this value.  This value wraps and
-	// should be compared using sequence space arithmetic.
+	// The version number of the original copy of the zone.
+	// If its empty, default to current epoch.
 	Serial uint32
 
-	// A 32 bit time interval before the zone should be refreshed.
+	// A time interval before the zone should be refreshed.
+	// If its empty, default to 1 days.
 	Refresh int32
 
-	// A 32 bit time interval that should elapse before a failed refresh
-	// should be retried.
+	// A time interval that should elapse before a failed refresh should
+	// be retried.
+	// If its empty, default to 1 hour.
 	Retry int32
 
-	// A 32 bit time value that specifies the upper limit on the time
-	// interval that can elapse before the zone is no longer
-	// authoritative.
+	// A time value that specifies the upper limit on the time interval
+	// that can elapse before the zone is no longer authoritative.
 	Expire int32
 
-	// The unsigned 32 bit minimum TTL field that should be exported with
-	// any RR from this zone.
+	// The minimum TTL field that should be exported with any RR from this
+	// zone.
+	// If its empty, default to 1 hour.
 	Minimum uint32
 }
 
-//
-// String return readable representation of SOA record.
-//
-func (soa *RDataSOA) String() string {
-	var b strings.Builder
-
-	fmt.Fprintf(&b, "{MName:%s RName:%s Serial:%d Refresh:%d Retry:%d Expire:%d Minimum:%d}",
-		soa.MName, soa.RName, soa.Serial, soa.Refresh, soa.Retry,
-		soa.Expire, soa.Minimum)
-
-	return b.String()
+// init initialize the SOA record by setting fields to its default value if
+// its empty.
+func (soa *RDataSOA) init() {
+	if len(soa.MName) > 0 {
+		soa.MName = strings.ToLower(soa.MName)
+	}
+	if len(soa.RName) > 0 {
+		soa.RName = strings.ToLower(soa.RName)
+	} else {
+		soa.RName = defaultRName
+	}
+	if soa.Serial == 0 {
+		soa.Serial = uint32(time.Now().Unix())
+	}
+	if soa.Refresh == 0 {
+		soa.Refresh = defaultRefresh
+	}
+	if soa.Retry == 0 {
+		soa.Retry = defaultRetry
+	}
+	if soa.Minimum == 0 {
+		soa.Minimum = defaultMinimumTTL
+	}
 }
