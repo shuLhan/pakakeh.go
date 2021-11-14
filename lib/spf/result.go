@@ -74,8 +74,7 @@ func (result *Result) lookup() {
 		txts   []libdns.ResourceRecord
 	)
 
-	dnsMsg, err = dnsClient.Lookup(true, libdns.QueryTypeTXT,
-		libdns.QueryClassIN, string(result.Domain))
+	dnsMsg, err = dnsClient.Lookup(true, libdns.RecordTypeTXT, libdns.RecordClassIN, string(result.Domain))
 	if err != nil {
 		result.Code = ResultCodeTempError
 		result.Err = err.Error()
@@ -94,7 +93,7 @@ func (result *Result) lookup() {
 		return
 	}
 
-	txts = dnsMsg.FilterAnswers(libdns.QueryTypeTXT)
+	txts = dnsMsg.FilterAnswers(libdns.RecordTypeTXT)
 	if len(txts) == 0 {
 		result.Code = ResultCodeNone
 		result.Err = "no SPF record found"
