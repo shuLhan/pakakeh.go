@@ -166,7 +166,7 @@ func (zone *ZoneFile) Add(rr *ResourceRecord) (err error) {
 			QDCount: 1,
 			ANCount: 1,
 		},
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  rr.Name,
 			Type:  rr.Type,
 			Class: rr.Class,

@@ -52,13 +52,13 @@ import (
 //
 type Message struct {
 	Header     MessageHeader
-	Question   SectionQuestion
+	Question   MessageQuestion
 	Answer     []ResourceRecord
 	Authority  []ResourceRecord
 	Additional []ResourceRecord
 
-	// Slice that hold the result of packing the message or original
-	// message from unpacking.
+	// The raw message as result of packing or original packet from
+	// unpacking.
 	packet []byte
 
 	// offset of curret packet when packing, equal to len(packet).
@@ -79,7 +79,7 @@ func NewMessage() *Message {
 			IsRD:    true,
 			QDCount: 1,
 		},
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Type:  RecordTypeA,
 			Class: RecordClassIN,
 		},
@@ -125,7 +125,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 			QDCount: 1,
 			ANCount: 1,
 		},
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  string(hname),
 			Type:  rtype,
 			Class: RecordClassIN,
@@ -169,7 +169,7 @@ func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 			QDCount: 1,
 			ANCount: 1,
 		},
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  rr.Name,
 			Type:  rr.Type,
 			Class: rr.Class,

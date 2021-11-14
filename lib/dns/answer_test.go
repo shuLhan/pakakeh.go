@@ -19,7 +19,7 @@ func TestNewAnswer(t *testing.T) {
 		Header: MessageHeader{
 			ID: 1,
 		},
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  "test",
 			Type:  1,
 			Class: 1,
@@ -125,7 +125,7 @@ func TestAnswerGet(t *testing.T) {
 			QDCount: 1,
 			ANCount: 1,
 		},
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  "kilabit.info",
 			Type:  RecordTypeA,
 			Class: RecordClassIN,
@@ -184,7 +184,7 @@ func TestAnswerGet(t *testing.T) {
 		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true)
 		got := &Message{
 			Header:   MessageHeader{},
-			Question: SectionQuestion{},
+			Question: MessageQuestion{},
 			packet:   gotPacket,
 		}
 		err := got.Unpack()

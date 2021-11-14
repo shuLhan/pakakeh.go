@@ -169,7 +169,7 @@ VAXA    A       10.2.0.27
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "isi.edu",
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
@@ -195,7 +195,7 @@ VAXA    A       10.2.0.27
 				QDCount: 1,
 				ANCount: 3,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "isi.edu",
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
@@ -225,7 +225,7 @@ VAXA    A       10.2.0.27
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "isi.edu",
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
@@ -255,7 +255,7 @@ VAXA    A       10.2.0.27
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "a.isi.edu",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -273,7 +273,7 @@ VAXA    A       10.2.0.27
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "venera.isi.edu",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -297,7 +297,7 @@ VAXA    A       10.2.0.27
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "vaxa.isi.edu",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -400,7 +400,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
@@ -426,7 +426,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 2,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
@@ -450,7 +450,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "localhost.pcguide.com",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -468,7 +468,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -486,7 +486,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "pcguide.com",
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
@@ -507,7 +507,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "www.pcguide.com",
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
@@ -525,7 +525,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "ftp.pcguide.com",
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
@@ -543,7 +543,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "mail.pcguide.com",
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
@@ -561,7 +561,7 @@ relay IN CNAME relay.pair.com.
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "relay.pcguide.com",
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
@@ -646,7 +646,7 @@ angularjs.doc       A  127.0.0.1
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "dev.kilabit.info",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -664,7 +664,7 @@ angularjs.doc       A  127.0.0.1
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "dev.kilabit.com",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -682,7 +682,7 @@ angularjs.doc       A  127.0.0.1
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "angularjs.doc.localdomain",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -755,7 +755,7 @@ func TestZoneParseTXT(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.local",
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,

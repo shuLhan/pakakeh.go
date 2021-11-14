@@ -35,7 +35,7 @@ func TestDoTClient_Lookup(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -63,7 +63,7 @@ func TestDoTClient_Lookup(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
@@ -98,7 +98,7 @@ func TestDoTClient_Lookup(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,

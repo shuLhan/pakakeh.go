@@ -84,7 +84,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}{{
 		desc: "Empty name",
 		msg: &Message{
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
@@ -96,7 +96,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}, {
 		desc: "Single domain name",
 		msg: &Message{
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilaBit",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -110,7 +110,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}, {
 		desc: "Two domain names",
 		msg: &Message{
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -126,7 +126,7 @@ func TestMessagePackQuestion(t *testing.T) {
 	}, {
 		desc: "Three domain names",
 		msg: &Message{
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "MAIL.KILABIT.INFO",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -164,7 +164,7 @@ func TestMessagePack(t *testing.T) {
 				IsQuery: true,
 				QDCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.INFO",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -197,7 +197,7 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -286,7 +286,7 @@ func TestMessagePack(t *testing.T) {
 				NSCount: 0,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
@@ -352,7 +352,7 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "mail.kilabit.info",
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
@@ -396,7 +396,7 @@ func TestMessagePack(t *testing.T) {
 				IsRA:    true,
 				QDCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
@@ -483,7 +483,7 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
@@ -581,7 +581,7 @@ func TestMessagePack(t *testing.T) {
 				IsRA:    true,
 				QDCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,
@@ -642,7 +642,7 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeAAAA,
 				Class: RecordClassIN,
@@ -740,7 +740,7 @@ func TestMessagePack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
 				Class: RecordClassIN,
@@ -843,7 +843,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: SectionQuestion{},
+		Question: MessageQuestion{},
 		packet:   make([]byte, maxUdpPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -860,7 +860,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 			IsRD: true,
 			IsRA: true,
 		},
-		Question: SectionQuestion{},
+		Question: MessageQuestion{},
 		packet:   make([]byte, maxUdpPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -912,7 +912,7 @@ func TestMessageSetQuery(t *testing.T) {
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: SectionQuestion{},
+		Question: MessageQuestion{},
 		packet:   make([]byte, maxUdpPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -955,7 +955,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: SectionQuestion{},
+		Question: MessageQuestion{},
 		packet:   make([]byte, maxUdpPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -998,7 +998,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 			IsAA:    true,
 			IsRD:    true,
 		},
-		Question: SectionQuestion{},
+		Question: MessageQuestion{},
 		packet:   make([]byte, maxUdpPacketSize),
 		dnameOff: make(map[string]uint16),
 	}
@@ -1069,7 +1069,7 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
@@ -1142,7 +1142,7 @@ func TestMessageUnpack(t *testing.T) {
 				NSCount: 0,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
@@ -1220,7 +1220,7 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "mail.kilabit.info",
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
@@ -1278,7 +1278,7 @@ func TestMessageUnpack(t *testing.T) {
 				QDCount: 1,
 				ANCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "kilabit.info",
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
@@ -1375,7 +1375,7 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
@@ -1522,7 +1522,7 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 3,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,
@@ -1612,7 +1612,7 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 1,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "google.com",
 				Type:  RecordTypeAAAA,
 				Class: RecordClassIN,
@@ -1716,7 +1716,7 @@ func TestMessageUnpack(t *testing.T) {
 				ANCount: 5,
 				ARCount: 1,
 			},
-			Question: SectionQuestion{
+			Question: MessageQuestion{
 				Name:  "_xmpp-server._tcp.google.com",
 				Type:  RecordTypeSRV,
 				Class: RecordClassIN,

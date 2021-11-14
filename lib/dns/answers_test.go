@@ -47,7 +47,7 @@ func TestNewAnswers(t *testing.T) {
 
 func TestAnswersGet(t *testing.T) {
 	msg := &Message{
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  "test",
 			Type:  1,
 			Class: 1,
@@ -98,7 +98,7 @@ func TestAnswersGet(t *testing.T) {
 
 func TestAnswersRemove(t *testing.T) {
 	msg := &Message{
-		Question: SectionQuestion{
+		Question: MessageQuestion{
 			Name:  "test",
 			Type:  1,
 			Class: 1,
