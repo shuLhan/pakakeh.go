@@ -965,7 +965,6 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 			cl, err := NewTCPClient(nameserver)
 			if err != nil {
 				log.Printf("dns: failed to create forwarder %s: %s", tag, err)
-				err = nil
 				continue
 			}
 
