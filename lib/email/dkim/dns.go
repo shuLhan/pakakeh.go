@@ -55,7 +55,11 @@ func lookupDNSTXT(dname string) (key *Key, err error) {
 
 	dnsClient := dnsClientPool.Get()
 
-	dnsMsg, err := dnsClient.Lookup(true, dns.RecordTypeTXT, dns.RecordClassIN, dname)
+	q := dns.MessageQuestion{
+		Name: dname,
+		Type: dns.RecordTypeTXT,
+	}
+	dnsMsg, err := dnsClient.Lookup(q, true)
 	if err != nil {
 		dnsClientPool.Put(dnsClient)
 		return nil, fmt.Errorf("dkim: LookupKey: %w", err)

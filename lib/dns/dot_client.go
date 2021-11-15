@@ -63,21 +63,21 @@ func (cl *DoTClient) Close() error {
 }
 
 //
-// Lookup specific type, class, and name in synchronous mode.
+// Lookup DNS records based on MessageQuestion Name and Type, in synchronous
+// mode.
+// The MessageQuestion Class default to IN.
 //
-func (cl *DoTClient) Lookup(
-	allowRecursion bool, rtype RecordType, rclass RecordClass, qname string,
-) (
-	res *Message, err error,
-) {
-	if len(qname) == 0 {
-		return nil, nil
+// It will return an error if the Name is empty.
+//
+func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
+	if len(q.Name) == 0 {
+		return nil, fmt.Errorf("Lookup: empty question name")
 	}
-	if rtype == 0 {
-		rtype = RecordTypeA
+	if q.Type == 0 {
+		q.Type = RecordTypeA
 	}
-	if rclass == 0 {
-		rclass = RecordClassIN
+	if q.Class == 0 {
+		q.Class = RecordClassIN
 	}
 
 	msg := NewMessage()
@@ -85,15 +85,16 @@ func (cl *DoTClient) Lookup(
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
 	msg.Header.QDCount = 1
-	msg.Question.Type = rtype
-	msg.Question.Class = rclass
-	msg.Question.Name = qname
+	msg.Question = q
 
-	_, _ = msg.Pack()
+	_, err = msg.Pack()
+	if err != nil {
+		return nil, fmt.Errorf("Lookup: %w", err)
+	}
 
 	res, err = cl.Query(msg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
 	return res, nil

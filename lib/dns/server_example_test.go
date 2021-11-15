@@ -15,7 +15,10 @@ func clientLookup(nameserver string) {
 		return
 	}
 
-	msg, err := cl.Lookup(false, dns.RecordTypeA, dns.RecordClassIN, "kilabit.info")
+	q := dns.MessageQuestion{
+		Name: "kilabit.info",
+	}
+	msg, err := cl.Lookup(q, false)
 	if err != nil {
 		log.Println(err)
 		return

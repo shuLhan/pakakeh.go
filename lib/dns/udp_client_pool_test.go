@@ -48,7 +48,10 @@ func TestNewUDPClientPool(t *testing.T) {
 			wg.Add(1)
 			go func() {
 				cl := ucp.Get()
-				_, err := cl.Lookup(false, RecordTypeA, RecordClassIN, qname)
+				q := MessageQuestion{
+					Name: qname,
+				}
+				_, err := cl.Lookup(q, false)
 				if err != nil {
 					t.Log("Lookup error: ", err.Error())
 				}

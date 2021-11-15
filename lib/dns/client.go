@@ -13,7 +13,7 @@ import (
 //
 type Client interface {
 	Close() error
-	Lookup(allowRecursion bool, rtype RecordType, rclass RecordClass, qname string) (*Message, error)
+	Lookup(q MessageQuestion, allowRecursion bool) (*Message, error)
 	Query(req *Message) (*Message, error)
 	RemoteAddr() string
 	SetRemoteAddr(addr string) error

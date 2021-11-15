@@ -91,39 +91,43 @@ func (cl *DoHClient) Close() error {
 }
 
 //
-// Lookup will query the DoH server with specific type, class, and name in
-// synchronous mode.
+// Lookup DNS records based on MessageQuestion Name and Type, in synchronous
+// mode.
+// The MessageQuestion Class default to IN.
 //
-func (cl *DoHClient) Lookup(
-	allowRecursion bool, rtype RecordType, rclass RecordClass, qname string,
-) (
-	*Message, error,
-) {
-	if len(qname) == 0 {
-		return nil, nil
+// It will return an error if the Name is empty.
+//
+func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
+	if len(q.Name) == 0 {
+		return nil, fmt.Errorf("Lookup: empty question name")
 	}
-	if rtype == 0 {
-		rtype = RecordTypeA
+	if q.Type == 0 {
+		q.Type = RecordTypeA
 	}
-	if rclass == 0 {
-		rclass = RecordClassIN
+	if q.Class == 0 {
+		q.Class = RecordClassIN
 	}
 
 	msg := NewMessage()
 
+	// No ID.
+	// HTTP correlates the request and response, thus eliminating
+	// the need for the ID in a media type such as
+	// "application/dns-message".
+	// The use of a varying DNS ID can cause semantically equivalent DNS
+	// queries to be cached separately.
+	// -- RFC8484 4.1
 	msg.Header.IsRD = allowRecursion
-	msg.Question.Type = rtype
-	msg.Question.Class = rclass
-	msg.Question.Name = qname
+	msg.Question = q
 
-	_, err := msg.Pack()
+	_, err = msg.Pack()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
-	res, err := cl.Get(msg)
+	res, err = cl.Get(msg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
 	return res, err

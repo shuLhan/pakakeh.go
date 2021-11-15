@@ -10,7 +10,7 @@ import (
 	"net"
 	"strings"
 
-	libdns "github.com/shuLhan/share/lib/dns"
+	"github.com/shuLhan/share/lib/dns"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -69,12 +69,15 @@ func (result *Result) Error() string {
 //
 func (result *Result) lookup() {
 	var (
-		dnsMsg *libdns.Message
+		dnsMsg *dns.Message
 		err    error
-		txts   []libdns.ResourceRecord
+		txts   []dns.ResourceRecord
+		q      = dns.MessageQuestion{
+			Name: string(result.Domain),
+			Type: dns.RecordTypeTXT,
+		}
 	)
-
-	dnsMsg, err = dnsClient.Lookup(true, libdns.RecordTypeTXT, libdns.RecordClassIN, string(result.Domain))
+	dnsMsg, err = dnsClient.Lookup(q, true)
 	if err != nil {
 		result.Code = ResultCodeTempError
 		result.Err = err.Error()
@@ -82,8 +85,8 @@ func (result *Result) lookup() {
 	}
 
 	switch dnsMsg.Header.RCode {
-	case libdns.RCodeOK:
-	case libdns.RCodeErrName:
+	case dns.RCodeOK:
+	case dns.RCodeErrName:
 		result.Code = ResultCodeNone
 		result.Err = "domain name does not exist"
 		return
@@ -93,7 +96,7 @@ func (result *Result) lookup() {
 		return
 	}
 
-	txts = dnsMsg.FilterAnswers(libdns.RecordTypeTXT)
+	txts = dnsMsg.FilterAnswers(dns.RecordTypeTXT)
 	if len(txts) == 0 {
 		result.Code = ResultCodeNone
 		result.Err = "no SPF record found"

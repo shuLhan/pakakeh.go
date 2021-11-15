@@ -19,15 +19,13 @@ func TestUDPClientLookup(t *testing.T) {
 	cases := []struct {
 		exp            *Message
 		desc           string
-		qname          string
-		rtype          RecordType
-		rclass         RecordClass
+		qst            MessageQuestion
 		allowRecursion bool
 	}{{
-		desc:   "QType:A RClass:IN QName:kilabit.info",
-		rtype:  RecordTypeA,
-		rclass: RecordClassIN,
-		qname:  "kilabit.info",
+		desc: "QType:A RClass:IN QName:kilabit.info",
+		qst: MessageQuestion{
+			Name: "kilabit.info",
+		},
 		exp: &Message{
 			Header: MessageHeader{
 				ID:      8,
@@ -52,10 +50,11 @@ func TestUDPClientLookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:SOA RClass:IN QName:kilabit.info",
-		rtype:  RecordTypeSOA,
-		rclass: RecordClassIN,
-		qname:  "kilabit.info",
+		desc: "QType:SOA RClass:IN QName:kilabit.info",
+		qst: MessageQuestion{
+			Name: "kilabit.info",
+			Type: RecordTypeSOA,
+		},
 		exp: &Message{
 			Header: MessageHeader{
 				ID:      9,
@@ -87,10 +86,11 @@ func TestUDPClientLookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:TXT RClass:IN QName:kilabit.info",
-		rtype:  RecordTypeTXT,
-		rclass: RecordClassIN,
-		qname:  "kilabit.info",
+		desc: "QType:TXT RClass:IN QName:kilabit.info",
+		qst: MessageQuestion{
+			Name: "kilabit.info",
+			Type: RecordTypeTXT,
+		},
 		exp: &Message{
 			Header: MessageHeader{
 				ID:      10,
@@ -114,10 +114,11 @@ func TestUDPClientLookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:   "QType:AAAA RClass:IN QName:kilabit.info",
-		rtype:  RecordTypeAAAA,
-		rclass: RecordClassIN,
-		qname:  "kilabit.info",
+		desc: "QType:AAAA RClass:IN QName:kilabit.info",
+		qst: MessageQuestion{
+			Name: "kilabit.info",
+			Type: RecordTypeAAAA,
+		},
 		exp: &Message{
 			Header: MessageHeader{
 				ID:      11,
@@ -135,23 +136,25 @@ func TestUDPClientLookup(t *testing.T) {
 			Additional: []ResourceRecord{},
 		},
 	}, {
-		desc:           "IsRD:true QType:AAAA RClass:IN QName:kilabit.info",
+		desc: "IsRD:true QType:AAAA RClass:IN QName:kilabit.info",
+		qst: MessageQuestion{
+			Name: "kilabit.info",
+			Type: RecordTypeAAAA,
+		},
 		allowRecursion: true,
-		rtype:          RecordTypeAAAA,
-		rclass:         RecordClassIN,
-		qname:          "kilabit.info",
 	}, {
-		desc:           "IsRD:true QType:A RClass:IN QName:random",
+		desc: "IsRD:true QType:A RClass:IN QName:random",
+		qst: MessageQuestion{
+			Name: "random",
+			Type: RecordTypeA,
+		},
 		allowRecursion: true,
-		rtype:          RecordTypeA,
-		rclass:         RecordClassIN,
-		qname:          "random",
 	}}
 
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.allowRecursion, c.rtype, c.rclass, c.qname)
+		got, err := cl.Lookup(c.qst, c.allowRecursion)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -75,21 +75,25 @@ func (cl *UDPClient) Close() error {
 }
 
 //
-// Lookup will query one of the name server with specific type, class, and
-// name in synchronous mode.
+// Lookup DNS records based on MessageQuestion Name and Type, in synchronous
+// mode.
+// The MessageQuestion Class default to IN.
 //
-// Name could be a host name for standard query or IP address for inverse
-// query.
+// It will return an error if the client does not set the name server address,
+// or no connection, or Name is empty.
 //
-// This function is safe to be used concurrently.
-//
-func (cl *UDPClient) Lookup(
-	allowRecursion bool, rtype RecordType, rclass RecordClass, qname string,
-) (
-	*Message, error,
-) {
+func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
 	if cl.addr == nil || cl.conn == nil {
-		return nil, nil
+		return nil, fmt.Errorf("Lookup: no name server or active connection")
+	}
+	if len(q.Name) == 0 {
+		return nil, fmt.Errorf("Lookup: empty question name")
+	}
+	if q.Type == 0 {
+		q.Type = RecordTypeA
+	}
+	if q.Class == 0 {
+		q.Class = RecordClassIN
 	}
 
 	msg := NewMessage()
@@ -97,15 +101,16 @@ func (cl *UDPClient) Lookup(
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
 	msg.Header.QDCount = 1
-	msg.Question.Type = rtype
-	msg.Question.Class = rclass
-	msg.Question.Name = qname
+	msg.Question = q
 
-	_, _ = msg.Pack()
-
-	res, err := cl.Query(msg)
+	_, err = msg.Pack()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Lookup: %w", err)
+	}
+
+	res, err = cl.Query(msg)
+	if err != nil {
+		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
 	return res, nil
