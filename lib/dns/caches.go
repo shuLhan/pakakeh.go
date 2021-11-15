@@ -181,7 +181,10 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 		dec    = gob.NewDecoder(r)
 	)
 
-	dec.Decode(header)
+	err = dec.Decode(header)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
 
 	if header.Version != cachesFileFormatV1 {
 		return nil, fmt.Errorf("%s: unknown version %d", logp, header.Version)
