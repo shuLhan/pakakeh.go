@@ -79,7 +79,7 @@ func TestQuoRat(t *testing.T) {
 			"a",
 			NewRat("0.3"),
 		},
-		exp: "20",
+		exp: "",
 	}, {
 		ins: []interface{}{
 			4651,
@@ -98,6 +98,9 @@ func TestQuoRat(t *testing.T) {
 			"25394000000",
 		},
 		exp: "0.00100395",
+	}, {
+		ins: []interface{}{2, 0, 2},
+		exp: "",
 	}}
 
 	for _, c := range cases {

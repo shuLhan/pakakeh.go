@@ -99,6 +99,8 @@ func MustRat(v interface{}) (r *Rat) {
 
 //
 // QuoRat return the quotient of `f/g/...` as new Rat.
+// If the second or rest of parameters can not be converted to Rat or zero it
+// will return nil instead of panic.
 //
 func QuoRat(f ...interface{}) *Rat {
 	if len(f) == 0 {
@@ -109,9 +111,9 @@ func QuoRat(f ...interface{}) *Rat {
 		return nil
 	}
 	for x := 1; x < len(f); x++ {
-		rx := toRat(f[x], nil)
-		if rx == nil {
-			continue
+		rx := toRat(f[x])
+		if rx == nil || rx.IsZero() {
+			return nil
 		}
 		total.Quo(rx)
 	}
@@ -319,15 +321,15 @@ func (r *Rat) Mul(g interface{}) *Rat {
 
 //
 // Quo sets r to quotient of `r/g` and return the result as r.
-// If g is not convertible to Rat it will return nil.
+// If g is not convertible to Rat or zero it will return nil.
 //
 func (r *Rat) Quo(g interface{}) *Rat {
-	y := toRat(g, nil)
-	if y == nil {
+	y := toRat(g)
+	if y == nil || y.IsZero() {
 		return nil
 	}
 	r.Rat.Quo(&r.Rat, &y.Rat)
-	r.SetString(r.String())
+	r.Rat.SetString(r.String())
 	return r
 }
 
