@@ -101,8 +101,8 @@ func TestFloat_MulFloat64(t *testing.T) {
 	)
 
 	cases := []struct {
-		g   float64
 		exp string
+		g   float64
 	}{{
 		g:   0,
 		exp: "0",
@@ -252,8 +252,8 @@ func TestFloat_String_fromString(t *testing.T) {
 
 func TestFloat_String_fromFloat(t *testing.T) {
 	cases := []struct {
-		in  float64
 		exp string
+		in  float64
 	}{{
 		in:  0.00000000,
 		exp: "0",
@@ -300,8 +300,8 @@ func TestFloat_UnmarshalJSON(t *testing.T) {
 	}
 
 	cases := []struct {
-		in  []byte
 		exp *Float
+		in  []byte
 	}{{
 		in: []byte(`{}`),
 	}, {
