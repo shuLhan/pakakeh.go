@@ -59,12 +59,8 @@ func AddFloat(f, g interface{}) *Float {
 // NewFloat create and initialize new Float with default bit precision,
 // and rounding mode.
 //
-func NewFloat(v float64) *Float {
-	f := &Float{}
-	f.SetPrec(DefaultBitPrecision)
-	f.SetMode(DefaultRoundingMode)
-	f.SetFloat64(v)
-	return f
+func NewFloat(v interface{}) *Float {
+	return toFloat(v)
 }
 
 //
@@ -332,35 +328,79 @@ func (f *Float) UnmarshalJSON(in []byte) (err error) {
 }
 
 //
-// toFloat convert any type to Float or nil if type is unknown.
+// toFloat convert v type to Float or nil if v type is unknown.
 //
-func toFloat(v interface{}) *Float {
-	switch v := v.(type) {
-	case string:
-		vf, err := ParseFloat(v)
-		if err != nil {
-			log.Println("toFloat: ", err.Error())
-			return nil
+func toFloat(g interface{}) (out *Float) {
+	out = &Float{}
+	out.SetPrec(DefaultBitPrecision).SetMode(DefaultRoundingMode)
+
+	switch v := g.(type) {
+	case []byte:
+		if len(v) == 0 {
+			out.SetInt64(0)
+		} else {
+			_, ok := out.Float.SetString(string(v))
+			if !ok {
+				return nil
+			}
 		}
-		return vf
+
+	case string:
+		if len(v) == 0 {
+			out.SetInt64(0)
+		} else {
+			_, ok := out.Float.SetString(v)
+			if !ok {
+				return nil
+			}
+		}
 
 	case byte:
-		return NewFloat(float64(v))
+		out.SetInt64(int64(v))
 	case int:
-		return NewFloat(float64(v))
+		out.SetInt64(int64(v))
 	case int32:
-		return NewFloat(float64(v))
+		out.SetInt64(int64(v))
 	case int64:
-		return NewFloat(float64(v))
+		out.SetInt64(v)
+	case uint:
+		out.SetUint64(uint64(v))
+	case uint16:
+		out.SetUint64(uint64(v))
+	case uint32:
+		out.SetUint64(uint64(v))
+	case uint64:
+		out.SetUint64(v)
 	case float32:
-		return NewFloat(float64(v))
+		out.SetFloat64(float64(v))
 	case float64:
-		return NewFloat(v)
+		out.SetFloat64(v)
 	case Float:
-		return &v
+		out.Float.Set(&v.Float)
 	case *Float:
-		return v
+		if v == nil {
+			out.SetInt64(0)
+		} else {
+			out.Float.Set(&v.Float)
+		}
+	case big.Int:
+		out.Float.SetInt(&v)
+	case *big.Int:
+		if v == nil {
+			out.Float.SetInt64(0)
+		} else {
+			out.Float.SetInt(v)
+		}
+	case big.Rat:
+		out.Float.SetRat(&v)
+	case *big.Rat:
+		if v == nil {
+			out.Float.SetInt64(0)
+		} else {
+			out.Float.SetRat(v)
+		}
+	default:
+		return nil
 	}
-
-	return nil
+	return out
 }
