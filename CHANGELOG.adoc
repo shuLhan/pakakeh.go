@@ -3,6 +3,194 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.32.0 (2021-12-03)
+
+This release bring major changes and enhancements to package dns and math/big.
+
+===  Breaking changes
+
+*  math/big: refactoring AddFloat to accept variadic interface{}
+
+   Previously, the AddFloat function only accept two interface parameters.
+
+   This changes make the AddFloat to accept many interface parameters.
+
+*  math/big: refactor NewFloat to accept interface{} instead of float64 only
+
+   The following types is added and can be initialized to Float: []byte,
+   uint, uint16, uint32, uint64, big.Int, *big.Int, big.Rat, and *big.Rat.
+
+*  math/big: refactoring the Rat
+
+   The promise of this package is to provide the Rat type with RoundToZero
+   and without panic.
+
+   In order to do that we remove the MustRat() function and check for nil
+   on pointer receiver before doing operation, and check for zero value
+   when doing quotation.
+
+   Another breaking changes are,
+
+   * Humanize() with nil pointer receiver will return string "0"
+   * Any IsXxx() methods with nil pointer receiver will return false
+   * MarshalJSON() will nil pointer receiver will return "null" instead of
+     "0" now
+
+*  lib/dns: refactoring, change signature of client Lookup
+
+   Previously, Lookup() method on Client pass the question name, type, and
+   class as parameters.
+
+   This changes make those parameters into MessageQuestion.
+
+*  lib/dns: refactoring ZoneFile into Zone
+
+   Reason: A Zone is not always represented by file, it just that in this
+   package, it is.
+
+   This changes rename the type ZoneFile into Zone.
+
+*  lib/dns: refactoring message question
+
+   Previously the type for message question section SectionQuestion.
+
+   This changes, rename the type to MessageQuestion.
+
+*  lib/dns: refactoring the section header
+
+   This changes rename the SectionHeader into MessageHeader.
+
+   The pack() method is optimized with the following results,
+
+   benchmark                         old ns/op     new ns/op     delta
+   BenchmarkMessageHeader_pack-8     66.2          21.7          -67.31%
+
+   benchmark                         old allocs     new allocs     delta
+   BenchmarkMessageHeader_pack-8     3              1              -66.67%
+
+   benchmark                         old bytes     new bytes     delta
+   BenchmarkMessageHeader_pack-8     32            16            -50.00%
+
+   The unpack() method is simplified by minimizing the if-condition.
+
+   This changes also fix the pack and unpack OpCode for value other then 0,
+   due to wrong shift value, 2 instead of 3.
+
+*  lib/dns: refactoring, introduce new type RecordClass
+
+   Previously, the record class is represented by uint16 using prefix
+   QueryClassXxx.
+
+   This changes make the record class to be an independent type, to make
+   code more strict (prevent passing invalid value), and readable.
+
+*  lib/dns: refactoring, create type RecordType to represent type of RR
+
+   Previously, we use uint16 to represent type for ResourceRecord Type or
+   Question type.
+
+   To make the code more strict, where parameter or return value, must be
+   expected as record type, we add new type to represent the RR type:
+   RecordType.
+
+   This changes also rename any variable name of QType or qtype to RType
+   or rtype because QType is misleading. The type defined the
+   ResourceRecord to be queried not only question.
+
+*  lib/dns: remove the fallback name servers (NS) from server options
+
+   The original idea of fallback NS is to send the query to the one define
+   to original resolv.conf, instead of using the one defined by user in
+   ServerOptions NameServers, when an error occured.
+
+   But, most of error usually caused by network (disconnected, time out),
+   so re-sending query to fallback NS does not have any effect if the network
+   it self is not working.
+
+   This changes remove the unnecessary and complex fallback NS from
+   server.
+
+===  New features
+
+*  lib/dns: add support to save and load caches to/from storage
+
+   The CachesSave method write the non-local answers into an io.Writer,
+   encoded with gob.
+
+   The CachesLoad method load the gob encoded answers from an io.Reader.
+
+*  lib/ssh: use agent defined by config or from environment variable
+
+   Previously, we only check the environment variable SSH_AUTH_SOCK
+   to decide whether the client identity will fetched from agent or
+   from private key file.
+
+   This changes use the GetIdentityAgent from config Section to derive the
+   path to unix socket.  It will return an empty string if the IdentityAgent
+   is set to "none" in the Section or when SSH_AUTH_SOCK is not exist or
+   empty.
+
+*  ssh/config: add support for section variable IdentityAgent
+
+   There are four possible value for IdentityAgent: SSH_AUTH_SOCK,
+   <$STRING>, <PATH>, or "none".
+   If SSH_AUTH_SOCK, the socket path is read from the environment variable
+   SSH_AUTH_SOCK.
+   If value start with "$", then the socket path is set based on value of
+   that environment variable.
+   Other string beside "none" will be considered as path to socket.
+
+===  Bug fixes
+
+*  math/big: return nil on Quo and QuoRat instead of panic
+
+   Previously, if the first parameter of Quo or the second/next parameters
+   of QuoRat is not convertable to Rat or zero, the method/function will
+   panic.
+
+   This changes make it less intrusive, instead of panic we check for
+   zero value and return nil immediately.
+
+*  lib/dns: do not cache truncated answer
+
+   Previously only answer with non-zero response code is ignored.
+
+   This changes ignore also answer where response header is truncated.
+
+===  Enhancements
+
+*  lib/dns: realign all struct fields
+
+   Turns out the struct that we frequently used, answer and resource_record,
+   is not optimized.
+
+     answer.go:15:13: struct with 56 pointer bytes could be 24 = 32 bytes
+	 ...
+     resource_record.go:24:21: struct with 56 pointer bytes could be 40 = 16
+
+   This changes reorder all structs field to save space in memory.
+
+*  lib/dns: make the TCP forwarders as complementary of UDP
+
+   The TCP forwarders only active when client send the DNS request as TCP.
+   When the server receive that request it should also forward the request
+   as TCP not as UDP to prevent the truncated response.
+
+   Another use case for TCP is when the response is truncated, the client
+   will send the query back through TCP connection.  The server should
+   forward this request using TCP instead of UDP.
+
+*  lib/dns: use different packet between UDP and TCP messages
+
+   Previously, all packet size for reading and sending the message is
+   fixed to 4096, even on UDP.
+
+   This changes set the UDP packet size maximum to 512 bytes and others to
+   4096 bytes.
+
+   While at it, minimize copying packet if its not reusable inside a method.
+
+
 ==  share v0.31.0 (2021-11-04)
 
 ===  Breaking changes
