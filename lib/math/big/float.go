@@ -40,19 +40,25 @@ type Float struct {
 }
 
 //
-// AddFloat return the rounded sum `f+g` and return f.
+// AddFloat return the rounded sum `f[0]+f[1]+...`.
+// It will return nil if the first parameter is not convertable to Float.
 //
-func AddFloat(f, g interface{}) *Float {
-	ff := toFloat(f)
-	gf := toFloat(g)
-	if ff == nil {
+func AddFloat(f ...interface{}) *Float {
+	if len(f) == 0 {
 		return nil
 	}
-	if gf == nil {
+	total := toFloat(f[0])
+	if total == nil {
 		return nil
 	}
-	h := gf.Clone()
-	return h.Add(gf)
+	for x := 1; x < len(f); x++ {
+		rx := toFloat(f[x])
+		if rx == nil {
+			continue
+		}
+		total.Add(rx)
+	}
+	return total
 }
 
 //
