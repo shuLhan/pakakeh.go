@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -271,6 +272,8 @@ func (cl *Client) migrateFinished(tx *sql.Tx, file string) (err error) {
 func loadSQL(fs http.FileSystem, fi os.FileInfo, filename string) (
 	sqlRaw []byte, err error,
 ) {
+	logp := "loadSQL"
+
 	if strings.ToLower(filepath.Ext(filename)) != sqlExtension {
 		return nil, nil
 	}
@@ -283,12 +286,14 @@ func loadSQL(fs http.FileSystem, fi os.FileInfo, filename string) (
 
 	file, err := fs.Open(fileSQL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	sqlRaw, err = ioutil.ReadAll(file)
 	if err != nil {
-		return nil, err
+		if !errors.Is(err, io.EOF) {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
 	}
 
 	return sqlRaw, nil
