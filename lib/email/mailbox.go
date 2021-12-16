@@ -57,18 +57,20 @@ func (mbox *Mailbox) String() string {
 }
 
 //
-// ParseMailbox parse the raw address and return a single mailbox, the first
-// mailbox in the list.
+// ParseMailbox parse the raw address(es) and return the first mailbox in the
+// list.
+// If the raw parameter is empty or no mailbox present or mailbox format is
+// invalid, it will return nil.
 //
-func ParseMailbox(raw []byte) (mbox *Mailbox, err error) {
+func ParseMailbox(raw []byte) (mbox *Mailbox) {
 	mboxes, err := ParseMailboxes(raw)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	if len(mboxes) > 0 {
-		return mboxes[0], nil
+		return mboxes[0]
 	}
-	return nil, errors.New("empty mailbox")
+	return nil
 }
 
 //
@@ -327,9 +329,9 @@ func (mbox *Mailbox) UnmarshalJSON(b []byte) (err error) {
 	if b[len(b)-1] == '"' {
 		b = b[:len(b)-1]
 	}
-	got, err := ParseMailbox(b)
-	if err != nil {
-		return err
+	got := ParseMailbox(b)
+	if got == nil {
+		return nil
 	}
 	*mbox = *got
 	return nil
