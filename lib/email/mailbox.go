@@ -28,10 +28,10 @@ const (
 // Mailbox represent an invidual mailbox.
 //
 type Mailbox struct {
+	Address string // address contains the combination of "local@domain"
 	Name    []byte
 	Local   []byte
 	Domain  []byte
-	Address string // address contains the combination of "local@domain"
 	isAngle bool
 }
 
