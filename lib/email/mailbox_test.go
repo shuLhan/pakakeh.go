@@ -13,40 +13,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestParseMailbox(t *testing.T) {
-	cases := []struct {
-		in       string
-		exp      *Mailbox
-		expError string
-	}{{
-		in: "Name <local@domain>",
-		exp: &Mailbox{
-			Name:    []byte("Name"),
-			Local:   []byte("local"),
-			Domain:  []byte("domain"),
-			Address: "local@domain",
-			isAngle: true,
-		},
-	}, {
-		in: "Name <local>",
-		exp: &Mailbox{
-			Name:    []byte("Name"),
-			Domain:  []byte("local"),
-			Address: "@local",
-			isAngle: true,
-		},
-	}}
-
-	for _, c := range cases {
-		got, err := ParseMailbox([]byte(c.in))
-		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
-			continue
-		}
-		test.Assert(t, "ParseMailbox", c.exp, got)
-	}
-}
-
 func TestParseMailboxes(t *testing.T) {
 	cases := []struct {
 		desc   string
