@@ -6,7 +6,6 @@ package memfs
 
 import (
 	"bytes"
-	"compress/gzip"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -35,14 +34,13 @@ type Node struct {
 	os.FileInfo
 	http.File
 
-	SysPath         string  // The original file path in system.
-	Path            string  // Absolute file path in memory.
-	Content         []byte  // Content of file.
-	ContentType     string  // File type per MIME, for example "application/json".
-	ContentEncoding string  // File type encoding, for example "gzip".
-	Parent          *Node   // Pointer to parent directory.
-	Childs          []*Node // List of files in directory.
-	GenFuncName     string  // The function name for embedded Go code.
+	SysPath     string  // The original file path in system.
+	Path        string  // Absolute file path in memory.
+	Content     []byte  // Content of file.
+	ContentType string  // File type per MIME, for example "application/json".
+	Parent      *Node   // Pointer to parent directory.
+	Childs      []*Node // List of files in directory.
+	GenFuncName string  // The function name for embedded Go code.
 
 	name    string      // File name.
 	modTime time.Time   // ModTime contains file modification time.
@@ -142,77 +140,6 @@ func (node *Node) AddChild(child *Node) {
 //
 func (node *Node) Close() error {
 	node.off = 0
-	return nil
-}
-
-//
-// Decode the contents of node (for example, uncompress with gzip) and return
-// it.
-//
-func (node *Node) Decode() ([]byte, error) {
-	if len(node.ContentEncoding) == 0 {
-		node.plainv = node.Content
-		return node.plainv, nil
-	}
-
-	logp := "Decode"
-	node.plainv = node.plainv[:0]
-
-	if node.ContentEncoding == EncodingGzip {
-		r, err := gzip.NewReader(bytes.NewReader(node.Content))
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-
-		buf := make([]byte, 1024)
-		for {
-			n, err := r.Read(buf)
-			if n > 0 {
-				node.plainv = append(node.plainv, buf[:n]...)
-			}
-			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				return nil, fmt.Errorf("%s: %w", logp, err)
-			}
-			buf = buf[0:]
-		}
-	}
-
-	return node.plainv, nil
-}
-
-//
-// Encode compress and set the content of Node.
-//
-func (node *Node) Encode(content []byte) (err error) {
-	logp := "Encode"
-
-	node.plainv = content
-	node.lowerv = bytes.ToLower(content)
-
-	switch node.ContentEncoding {
-	case EncodingGzip:
-		var buf bytes.Buffer
-		gz := gzip.NewWriter(&buf)
-
-		_, err = gz.Write(content)
-		if err != nil {
-			_ = gz.Close()
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-
-		err = gz.Close()
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-
-		node.Content = libbytes.Copy(buf.Bytes())
-
-	default:
-		node.Content = content
-	}
 	return nil
 }
 
@@ -319,11 +246,8 @@ func (node *Node) Save(content []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
-	err = node.Encode(content)
-	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
-	}
 
+	node.Content = content
 	node.modTime = time.Now()
 	node.size = int64(len(content))
 	return nil

@@ -80,7 +80,6 @@
 //			PackageName:     "mypackage",
 //			VarName:         "myFS",
 //			GoFileName:      "mypackage/embed.go",
-//			ContentEncoding: memfs.EncodingGzip,
 //		},
 //	}
 //	mfs, _ := memfs.New(opts)

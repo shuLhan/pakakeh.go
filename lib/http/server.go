@@ -494,10 +494,6 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set(HeaderContentType, node.ContentType)
 
-	if len(node.ContentEncoding) > 0 {
-		res.Header().Set(HeaderContentEncoding, node.ContentEncoding)
-	}
-
 	responseETag := strconv.FormatInt(node.ModTime().Unix(), 10)
 	requestETag := req.Header.Get(HeaderIfNoneMatch)
 	if requestETag == responseETag {

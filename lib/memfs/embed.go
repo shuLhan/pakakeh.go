@@ -52,13 +52,6 @@ func (mfs *MemFS) GoEmbed() (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	if len(mfs.Opts.Embed.ContentEncoding) > 0 {
-		err = mfs.ContentEncode(mfs.Opts.Embed.ContentEncoding)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-	}
-
 	names := mfs.ListNames()
 
 	err = tmpl.ExecuteTemplate(f, templateNameHeader, mfs.Opts.Embed.PackageName)

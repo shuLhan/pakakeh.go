@@ -21,15 +21,6 @@ type EmbedOptions struct {
 	// in current directory from where its called.
 	GoFileName string
 
-	// ContentEncoding if this value is not empty, it will encode the
-	// content of node and set the node ContentEncoding.
-	//
-	// List of available encoding is "gzip".
-	//
-	// For example, if the value is "gzip" it will compress the content of
-	// file using gzip and set Node.ContentEncoding to "gzip".
-	ContentEncoding string
-
 	// WithoutModTime if its true, the modification time for all
 	// files and directories are not stored inside generated code, instead
 	// all files will use the current time when the program is running.

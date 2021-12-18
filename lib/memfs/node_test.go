@@ -148,24 +148,12 @@ func TestNode_Save(t *testing.T) {
 		contentEncoding string
 		expContent      []byte
 	}{{
-		desc:       "Without content encoding",
+		desc:       "With non empty content",
 		content:    []byte("ABC"),
 		expContent: []byte("ABC"),
-	}, {
-		desc:            "With content encoding is gzip",
-		contentEncoding: EncodingGzip,
-		content:         []byte("ABC"),
-		expContent: []byte{
-			0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0xff, 0x72, 0x74, 0x72, 0x06, 0x04, 0x00,
-			0x00, 0xff, 0xff, 0x48, 0x03, 0x83, 0xa3, 0x03,
-			0x00, 0x00, 0x00,
-		},
 	}}
 
 	for _, c := range cases {
-		node.ContentEncoding = c.contentEncoding
-
 		err = node.Save(c.content)
 		if err != nil {
 			t.Fatal(err)

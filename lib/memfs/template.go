@@ -55,7 +55,6 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 		SysPath:         "{{.Node.SysPath}}",
 		Path:            "{{.Node.Path}}",
 		ContentType:     "{{.Node.ContentType}}",
-		ContentEncoding: "{{.Node.ContentEncoding}}",
 {{- if .Node.Content }}
 		Content:         []byte("{{range $x, $c := .Node.Content}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}

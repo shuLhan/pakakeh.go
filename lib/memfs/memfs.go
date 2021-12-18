@@ -6,9 +6,7 @@ package memfs
 
 import (
 	"bytes"
-	"compress/gzip"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -24,12 +22,7 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
-//
-// List of valid content encoding for ContentEncode().
-//
 const (
-	EncodingGzip = "gzip"
-
 	defContentType = "text/plain" // Default content type for empty file.
 )
 
@@ -231,64 +224,6 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 }
 
 //
-// ContentEncode encode each node's content into specific encoding, in other
-// words this method can be used to compress the content of file in memory
-// or before being served or written.
-//
-// Only file with size greater than 0 will be encoded.
-//
-// List of known encoding is "gzip".
-//
-func (mfs *MemFS) ContentEncode(encoding string) (err error) {
-	var (
-		logp    = "ContentEncode"
-		buf     bytes.Buffer
-		encoder io.WriteCloser
-	)
-
-	encoding = strings.ToLower(encoding)
-
-	switch encoding {
-	case EncodingGzip:
-		encoder = gzip.NewWriter(&buf)
-	default:
-		return fmt.Errorf("%s: invalid encoding %q", logp, encoding)
-	}
-
-	nodes := mfs.PathNodes.Nodes()
-	for _, node := range nodes {
-		if node.mode.IsDir() || len(node.Content) == 0 {
-			continue
-		}
-
-		_, err = encoder.Write(node.Content)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-
-		err = encoder.Close()
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-
-		node.Content = make([]byte, buf.Len())
-		copy(node.Content, buf.Bytes())
-
-		node.ContentEncoding = encoding
-		node.size = int64(len(node.Content))
-
-		buf.Reset()
-
-		if encoding == EncodingGzip {
-			gziper := encoder.(*gzip.Writer)
-			gziper.Reset(&buf)
-		}
-	}
-
-	return nil
-}
-
-//
 // Get the node representation of file in memory.  If path is not exist it
 // will return os.ErrNotExist.
 //
@@ -376,11 +311,6 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		snippetLen = 60
 	}
 
-	var (
-		logp = "Search"
-		err  error
-	)
-
 	tokens := libstrings.ToBytes(words)
 	for x := 0; x < len(tokens); x++ {
 		tokens[x] = bytes.ToLower(tokens[x])
@@ -397,11 +327,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 		}
 
 		if len(node.lowerv) == 0 {
-			_, err = node.Decode()
-			if err != nil {
-				log.Printf("%s: %s", logp, err)
-				continue
-			}
+			node.plainv = node.Content
 
 			if strings.HasPrefix(node.ContentType, "text/html") {
 				node.plainv = sanitize.HTML(node.plainv)
