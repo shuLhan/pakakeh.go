@@ -54,9 +54,9 @@ func TestNew(t *testing.T) {
 
 	cases := []struct {
 		desc       string
-		opts       Options
 		expErr     string
 		expMapKeys []string
+		opts       Options
 	}{{
 		desc:   "With empty dir",
 		expErr: "open : no such file or directory",
@@ -241,10 +241,10 @@ func TestMemFS_AddFile(t *testing.T) {
 
 func TestMemFS_Get(t *testing.T) {
 	cases := []struct {
+		expErr         error
 		path           string
 		expV           []byte
 		expContentType []string
-		expErr         error
 	}{{
 		path: "/",
 	}, {
@@ -553,9 +553,9 @@ func TestMerge(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp    *MemFS
 		desc   string
 		params []*MemFS
-		exp    *MemFS
 	}{{
 		desc:   "with the same instance",
 		params: []*MemFS{mfsDirect, mfsDirect},

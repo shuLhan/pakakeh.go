@@ -9,6 +9,9 @@ const (
 )
 
 type Options struct {
+	// EmbedOptions for GoEmbed.
+	Embed EmbedOptions
+
 	// Root contains path to directory where its contents will be mapped
 	// to memory.
 	Root string
@@ -23,9 +26,6 @@ type Options struct {
 	// If its value is negative, the content of file will not be mapped to
 	// memory, the MemFS will behave as directory tree.
 	MaxFileSize int64
-
-	// EmbedOptions for GoEmbed.
-	Embed EmbedOptions
 
 	// Development define a flag to bypass file in memory.
 	// If its true, any call to Get will result in direct read to file

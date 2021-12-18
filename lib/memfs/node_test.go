@@ -24,10 +24,10 @@ func TestNode_Read(t *testing.T) {
 
 	cases := []struct {
 		desc     string
+		expError string
 		p        []byte
 		exp      []byte
 		expN     int
-		expError string
 	}{{
 		desc: "With empty p",
 	}, {
@@ -176,11 +176,11 @@ func TestNode_Seek(t *testing.T) {
 	}
 
 	cases := []struct {
+		expError error
 		desc     string
 		offset   int64
 		whence   int
 		exp      int64
-		expError error
 	}{{
 		desc:     "With invalid whence",
 		offset:   5,

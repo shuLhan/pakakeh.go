@@ -15,8 +15,8 @@ import (
 // PathNode contains a mapping between path and Node.
 //
 type PathNode struct {
-	mu sync.Mutex
 	v  map[string]*Node
+	mu sync.Mutex
 }
 
 //

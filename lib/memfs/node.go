@@ -31,24 +31,29 @@ var (
 // Node represent a single file.
 //
 type Node struct {
+	modTime time.Time // ModTime contains file modification time.
+
 	os.FileInfo
 	http.File
 
-	SysPath     string  // The original file path in system.
-	Path        string  // Absolute file path in memory.
-	Content     []byte  // Content of file.
-	ContentType string  // File type per MIME, for example "application/json".
-	Parent      *Node   // Pointer to parent directory.
-	Childs      []*Node // List of files in directory.
-	GenFuncName string  // The function name for embedded Go code.
+	Parent *Node // Pointer to parent directory.
 
-	name    string      // File name.
-	modTime time.Time   // ModTime contains file modification time.
-	mode    os.FileMode // File mode.
-	size    int64       // Size of file.
-	plainv  []byte      // Content of file in plain text.
-	lowerv  []byte      // Content of file in lower cases.
-	off     int64       // The cursor position when doing Read or Seek.
+	SysPath     string // The original file path in system.
+	Path        string // Absolute file path in memory.
+	name        string // File name.
+	ContentType string // File type per MIME, for example "application/json".
+	GenFuncName string // The function name for embedded Go code.
+
+	Childs []*Node // List of files in directory.
+
+	Content []byte // Content of file.
+	plainv  []byte // Content of file in plain text.
+	lowerv  []byte // Content of file in lower cases.
+
+	size int64 // Size of file.
+	off  int64 // The cursor position when doing Read or Seek.
+
+	mode os.FileMode // File mode.
 }
 
 //
