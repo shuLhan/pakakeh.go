@@ -221,7 +221,7 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 // ClientRemove remove client connection from server.
 //
 func (serv *Server) ClientRemove(conn int) {
-	ctx := serv.Clients.Context(conn)
+	ctx, _ := serv.Clients.Context(conn)
 
 	if ctx != nil && serv.Options.HandleClientRemove != nil {
 		serv.Options.HandleClientRemove(ctx, conn)
@@ -439,7 +439,7 @@ func (serv *Server) handleText(conn int, payload []byte) {
 	res := _resPool.Get().(*Response)
 	res.reset()
 
-	ctx, ok := serv.Clients.ctx[conn]
+	ctx, ok := serv.Clients.Context(conn)
 	if !ok {
 		err = errors.New("client context not found")
 		res.Code = http.StatusInternalServerError
