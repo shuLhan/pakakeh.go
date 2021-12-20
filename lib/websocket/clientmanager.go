@@ -108,11 +108,11 @@ func (cls *ClientManager) Conns(uid uint64) (conns []int) {
 //
 // Context return the client context.
 //
-func (cls *ClientManager) Context(conn int) (ctx context.Context) {
+func (cls *ClientManager) Context(conn int) (ctx context.Context, ok bool) {
 	cls.Lock()
-	ctx = cls.ctx[conn]
+	ctx, ok = cls.ctx[conn]
 	cls.Unlock()
-	return
+	return ctx, ok
 }
 
 //
