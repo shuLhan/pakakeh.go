@@ -55,6 +55,7 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 		SysPath:         "{{.Node.SysPath}}",
 		Path:            "{{.Node.Path}}",
 		ContentType:     "{{.Node.ContentType}}",
+		GenFuncName:     "{{.Node.GenFuncName}}",
 {{- if .Node.Content }}
 		Content:         []byte("{{range $x, $c := .Node.Content}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}
@@ -100,6 +101,12 @@ func init() {
 			{{- range $v := .Opts.Excludes}}
 				` + "`{{$v}}`" + `,
 			{{- end}}
+			},
+			Embed: memfs.EmbedOptions{
+				PackageName:    "{{.Opts.Embed.PackageName}}",
+				VarName:        "{{.Opts.Embed.VarName}}",
+				GoFileName:     "{{.Opts.Embed.GoFileName}}",
+				WithoutModTime: {{.Opts.Embed.WithoutModTime}},
 			},
 		},
 	}
