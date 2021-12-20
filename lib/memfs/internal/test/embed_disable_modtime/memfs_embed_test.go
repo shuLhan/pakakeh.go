@@ -20,8 +20,9 @@ func TestGeneratePathNode(t *testing.T) {
 	zeroTime := time.Time{}
 
 	expRoot := &memfs.Node{
-		SysPath: "testdata",
-		Path:    "/",
+		SysPath:     "testdata",
+		Path:        "/",
+		GenFuncName: "generate_testdata",
 	}
 	expRoot.SetMode(2147484141)
 	expRoot.SetName("/")
@@ -32,6 +33,7 @@ func TestGeneratePathNode(t *testing.T) {
 		Path:        "/exclude/index-link.html",
 		ContentType: "text/html; charset=utf-8",
 		Content:     []byte("<html></html>\n"),
+		GenFuncName: "generate_testdata_exclude_index_link_html",
 	}
 
 	expExcludeIndexHTML.SetMode(0644)
