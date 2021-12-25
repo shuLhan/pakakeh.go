@@ -87,32 +87,11 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 func New(opts *Options) (mfs *MemFS, err error) {
 	logp := "New"
 
-	if opts == nil {
-		opts = &Options{}
-	}
-	opts.init()
-
 	mfs = &MemFS{
-		PathNodes: NewPathNode(),
-		Opts:      opts,
+		Opts: opts,
 	}
 
-	for _, inc := range opts.Includes {
-		re, err := regexp.Compile(inc)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-		mfs.incRE = append(mfs.incRE, re)
-	}
-	for _, exc := range opts.Excludes {
-		re, err := regexp.Compile(exc)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-		mfs.excRE = append(mfs.excRE, re)
-	}
-
-	err = mfs.mount()
+	err = mfs.Init()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -250,6 +229,50 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	return node, nil
+}
+
+//
+// Init initialize the MemFS instance.
+// This method provided to initialize MemFS if its Options is set directly,
+// not through New() function.
+//
+func (mfs *MemFS) Init() (err error) {
+	var (
+		logp = "Init"
+		v    string
+		re   *regexp.Regexp
+	)
+
+	if mfs.Opts == nil {
+		mfs.Opts = &Options{}
+	}
+	mfs.Opts.init()
+
+	if mfs.PathNodes == nil {
+		mfs.PathNodes = NewPathNode()
+	}
+
+	for _, v = range mfs.Opts.Includes {
+		re, err = regexp.Compile(v)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+		mfs.incRE = append(mfs.incRE, re)
+	}
+	for _, v = range mfs.Opts.Excludes {
+		re, err = regexp.Compile(v)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+		mfs.excRE = append(mfs.excRE, re)
+	}
+
+	err = mfs.mount()
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	return nil
 }
 
 //
