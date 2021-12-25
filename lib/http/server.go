@@ -69,11 +69,10 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	if srv.WriteTimeout == 0 {
 		srv.WriteTimeout = defRWTimeout
 	}
-
-	if opts.Development || (opts.Memfs == nil && len(opts.Root) > 0) {
-		opts.Memfs, err = memfs.New(&opts.Options)
+	if srv.Options.Memfs != nil {
+		err = srv.Options.Memfs.Init()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("NewServer: %w", err)
 		}
 	}
 

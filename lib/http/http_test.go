@@ -44,9 +44,12 @@ func TestMain(m *testing.M) {
 	var err error
 
 	opts := &ServerOptions{
-		Options: memfs.Options{
-			Root:        "./testdata",
-			MaxFileSize: 30,
+		Memfs: &memfs.MemFS{
+			Opts: &memfs.Options{
+				Root:        "./testdata",
+				MaxFileSize: 30,
+				Development: true,
+			},
 		},
 		Address: "127.0.0.1:8080",
 	}

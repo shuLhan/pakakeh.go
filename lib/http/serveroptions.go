@@ -18,27 +18,12 @@ import (
 // ServerOptions define an options to initialize HTTP server.
 //
 type ServerOptions struct {
-	// The server options embed memfs.Options to allow serving directory
-	// from the memory.
-	//
-	// Root contains path to file system to be served.
-	// This field is optional, if its empty the server will not serve the
-	// local file system, only registered handler.
-	//
-	// Includes contains list of regex to include files to be served from
-	// Root.
-	// This field is optional.
-	//
-	// Excludes contains list of regex to exclude files to be served from
-	// Root.
-	// This field is optional.
-	//
-	// Development if its true, the Root file system is served by reading
-	// the content directly instead of using memory file system.
-	memfs.Options
-
 	// Memfs contains the content of file systems to be served in memory.
-	// It will be initialized only if Root is not empty and if its nil.
+	// The MemFS instance to be served should be already embedded in Go
+	// file, generated using memfs.MemFS.GoEmbed().
+	// Otherwise, it will try to read from file system directly.
+	//
+	// See https://pkg.go.dev/github.com/shuLhan/share/lib/memfs#hdr-Go_embed
 	Memfs *memfs.MemFS
 
 	// Address define listen address, using ip:port format.
