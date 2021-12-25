@@ -19,18 +19,18 @@ import (
 // Watcher is a naive implementation of file event change notification.
 //
 type Watcher struct {
-	// Delay define a duration when the new changes will be fetched from
-	// system.
-	// This field is optional, minimum is 100 millisecond and default is
-	// 5 seconds.
-	delay time.Duration
+	node   *memfs.Node
+	ticker *time.Ticker
 
 	// cb define a function that will be called when file modified or
 	// deleted.
 	cb WatchCallback
 
-	ticker *time.Ticker
-	node   *memfs.Node
+	// Delay define a duration when the new changes will be fetched from
+	// system.
+	// This field is optional, minimum is 100 millisecond and default is
+	// 5 seconds.
+	delay time.Duration
 }
 
 //

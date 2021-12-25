@@ -24,8 +24,8 @@ import (
 //	  r.X
 //
 type Reader struct {
-	X int    // X contains the current index of readed buffer.
 	V []byte // V contains the buffer.
+	X int    // X contains the current index of readed buffer.
 }
 
 //

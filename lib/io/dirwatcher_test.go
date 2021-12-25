@@ -32,8 +32,8 @@ func TestDirWatcher(t *testing.T) {
 	fmt.Printf(">>> Watching directory %q for changes ...\n", dir)
 
 	exps := []struct {
-		state FileState
 		path  string
+		state FileState
 	}{{
 		state: FileStateDeleted,
 		path:  "/",

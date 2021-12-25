@@ -18,6 +18,20 @@ import (
 // DirWatcher is a naive implementation of directory change notification.
 //
 type DirWatcher struct {
+	root   *memfs.Node
+	fs     *memfs.MemFS
+	ticker *time.Ticker
+
+	// Callback define a function that will be called when change detected
+	// on directory.
+	Callback WatchCallback
+
+	// dirs contains list of directory and their sub-directories that is
+	// being watched for changes.
+	// The map key is relative path to directory and its value is a node
+	// information.
+	dirs map[string]*memfs.Node
+
 	// This struct embed memfs.Options to map the directory to be watched
 	// into memory.
 	//
@@ -35,20 +49,6 @@ type DirWatcher struct {
 	// This field is optional, minimum is 100 milli second and default is
 	// 5 seconds.
 	Delay time.Duration
-
-	// Callback define a function that will be called when change detected
-	// on directory.
-	Callback WatchCallback
-
-	// dirs contains list of directory and their sub-directories that is
-	// being watched for changes.
-	// The map key is relative path to directory and its value is a node
-	// information.
-	dirs map[string]*memfs.Node
-
-	root   *memfs.Node
-	fs     *memfs.MemFS
-	ticker *time.Ticker
 }
 
 //
