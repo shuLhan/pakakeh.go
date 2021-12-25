@@ -300,13 +300,24 @@ func loadSQL(fs http.FileSystem, fi os.FileInfo, filename string) (
 }
 
 //
-// TruncateTable truncate all data on table `tableName`.
+// TruncateTable truncate all data on table `tableName` with cascade option.
+// On PostgreSQL, any identity columns (for example, serial) will be reset
+// back to its initial value.
 //
 func (cl *Client) TruncateTable(tableName string) (err error) {
-	q := `TRUNCATE TABLE ` + tableName
+	q := fmt.Sprintf(`TRUNCATE TABLE %s %s CASCADE;`, tableName,
+		cl.truncateWithRestartIdentity())
+
 	_, err = cl.DB.Exec(q)
 	if err != nil {
 		return fmt.Errorf("TruncateTable %q: %s", tableName, err)
 	}
 	return nil
+}
+
+func (cl *Client) truncateWithRestartIdentity() string {
+	if cl.DriverName == DriverNamePostgres {
+		return " RESTART IDENTITY "
+	}
+	return ""
 }
