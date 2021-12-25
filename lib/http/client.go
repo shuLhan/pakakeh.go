@@ -39,13 +39,13 @@ const (
 // including setting default headers, uncompressing response body.
 //
 type Client struct {
-	*http.Client
-
 	flateReader io.ReadCloser
 	gzipReader  *gzip.Reader
 
-	serverURL  string
 	defHeaders http.Header
+	*http.Client
+
+	serverURL string
 }
 
 //

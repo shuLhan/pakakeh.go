@@ -16,9 +16,9 @@ import "net/http"
 // The Error field is used by CallbackErrorHandler.
 //
 type EndpointRequest struct {
-	Endpoint    *Endpoint
 	HttpWriter  http.ResponseWriter
+	Error       error
+	Endpoint    *Endpoint
 	HttpRequest *http.Request
 	RequestBody []byte
-	Error       error
 }

@@ -12,14 +12,14 @@ import (
 
 func TestRequestType_String(t *testing.T) {
 	cases := []struct {
-		rt  RequestType
 		exp string
+		rt  RequestType
 	}{
-		{0, ""},
-		{1, ""},
-		{2, ContentTypeForm},
-		{3, ContentTypeMultipartForm},
-		{4, ContentTypeJSON},
+		{rt: 0, exp: ""},
+		{rt: 1, exp: ""},
+		{rt: 2, exp: ContentTypeForm},
+		{rt: 3, exp: ContentTypeMultipartForm},
+		{rt: 4, exp: ContentTypeJSON},
 	}
 
 	for _, c := range cases {

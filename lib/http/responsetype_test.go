@@ -12,21 +12,21 @@ import (
 
 func TestResponseType_String(t *testing.T) {
 	cases := []struct {
-		restype ResponseType
 		exp     string
+		restype ResponseType
 	}{
-		{0, ""},
-		{1, ContentTypeBinary},
-		{2, ContentTypeHTML},
-		{3, ContentTypeJSON},
-		{4, ContentTypePlain},
-		{5, ContentTypeXML},
-		{ResponseTypeNone, ""},
-		{ResponseTypeBinary, ContentTypeBinary},
-		{ResponseTypeHTML, ContentTypeHTML},
-		{ResponseTypeJSON, ContentTypeJSON},
-		{ResponseTypePlain, ContentTypePlain},
-		{ResponseTypeXML, ContentTypeXML},
+		{restype: 0, exp: ""},
+		{restype: 1, exp: ContentTypeBinary},
+		{restype: 2, exp: ContentTypeHTML},
+		{restype: 3, exp: ContentTypeJSON},
+		{restype: 4, exp: ContentTypePlain},
+		{restype: 5, exp: ContentTypeXML},
+		{restype: ResponseTypeNone, exp: ""},
+		{restype: ResponseTypeBinary, exp: ContentTypeBinary},
+		{restype: ResponseTypeHTML, exp: ContentTypeHTML},
+		{restype: ResponseTypeJSON, exp: ContentTypeJSON},
+		{restype: ResponseTypePlain, exp: ContentTypePlain},
+		{restype: ResponseTypeXML, exp: ContentTypeXML},
 	}
 
 	for _, c := range cases {

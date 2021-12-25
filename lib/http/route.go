@@ -12,10 +12,10 @@ import (
 // route represent the route to endpoint.
 //
 type route struct {
+	endpoint *Endpoint // endpoint of route.
 	path     string    // path contains Endpoint's path that has been cleaned up.
 	nodes    []*node   // nodes contains sub-path.
 	nkey     int       // nkey contains the number of keys in nodes.
-	endpoint *Endpoint // endpoint of route.
 }
 
 //

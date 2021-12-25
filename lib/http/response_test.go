@@ -13,11 +13,11 @@ import (
 
 func TestParseResponseHeader(t *testing.T) {
 	cases := []struct {
+		expResp *http.Response
+		expErr  string
 		desc    string
 		raw     []byte
-		expResp *http.Response
 		expRest []byte
-		expErr  string
 	}{{
 		desc: "With empty input",
 	}, {

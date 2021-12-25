@@ -9,6 +9,9 @@ package http
 // access its resources.
 //
 type CORSOptions struct {
+	exposeHeaders string
+	maxAge        string
+
 	// AllowOrigins contains global list of cross-site Origin that are
 	// allowed during preflight requests by the OPTIONS method.
 	// The list is case-sensitive.
@@ -25,13 +28,11 @@ type CORSOptions struct {
 	// This list will be send when browser request OPTIONS without
 	// request-method.
 	ExposeHeaders []string
-	exposeHeaders string
 
 	// MaxAge gives the value in seconds for how long the response to
 	// the preflight request can be cached for without sending another
 	// preflight request.
 	MaxAge int
-	maxAge string
 
 	// AllowCredentials indicates whether or not the actual request
 	// can be made using credentials.

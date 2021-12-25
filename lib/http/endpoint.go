@@ -20,8 +20,16 @@ import (
 // evaluators from server.
 //
 type Endpoint struct {
-	// Method contains HTTP method, default to GET.
-	Method RequestMethod
+	// ErrorHandler define the function that will handle the error
+	// returned from Call.
+	ErrorHandler CallbackErrorHandler
+
+	// Eval define evaluator for route that will be called after global
+	// evaluators and before callback.
+	Eval Evaluator
+
+	// Call is the main process of route.
+	Call Callback
 
 	// Path contains route to be served, default to "/" if its empty.
 	Path string
@@ -32,16 +40,8 @@ type Endpoint struct {
 	// ResponseType contains type of request, default to ResponseTypeNone.
 	ResponseType ResponseType
 
-	// Eval define evaluator for route that will be called after global
-	// evaluators and before callback.
-	Eval Evaluator
-
-	// Call is the main process of route.
-	Call Callback
-
-	// ErrorHandler define the function that will handle the error
-	// returned from Call.
-	ErrorHandler CallbackErrorHandler
+	// Method contains HTTP method, default to GET.
+	Method RequestMethod
 }
 
 //

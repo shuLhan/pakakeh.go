@@ -120,9 +120,9 @@ func TestNewRoute(t *testing.T) {
 
 func TestRoute_parse(t *testing.T) {
 	type testPath struct {
+		expVals map[string]string
 		path    string
 		expOK   bool
-		expVals map[string]string
 	}
 
 	cases := []struct {

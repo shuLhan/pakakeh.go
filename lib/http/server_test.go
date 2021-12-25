@@ -17,13 +17,13 @@ import (
 
 func TestRegisterDelete(t *testing.T) {
 	cases := []struct {
+		ep             *Endpoint
 		desc           string
 		reqURL         string
-		ep             *Endpoint
-		expStatusCode  int
 		expContentType string
 		expBody        string
 		expError       string
+		expStatusCode  int
 	}{{
 		desc: "With new endpoint",
 		ep: &Endpoint{
@@ -256,8 +256,8 @@ func TestRegisterGet(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
-		expStatusCode int
 		expBody       string
+		expStatusCode int
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
@@ -325,10 +325,10 @@ func TestRegisterHead(t *testing.T) {
 	cases := []struct {
 		desc             string
 		reqURL           string
-		expStatusCode    int
 		expBody          string
 		expContentType   []string
 		expContentLength []string
+		expStatusCode    int
 	}{{
 		desc:             "With root path",
 		reqURL:           "http://127.0.0.1:8080/",
@@ -393,8 +393,8 @@ func TestRegisterPatch(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
-		expStatusCode int
 		expBody       string
+		expStatusCode int
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
@@ -456,8 +456,8 @@ func TestRegisterPost(t *testing.T) {
 		desc          string
 		reqURL        string
 		reqBody       string
-		expStatusCode int
 		expBody       string
+		expStatusCode int
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
@@ -526,8 +526,8 @@ func TestRegisterPut(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
-		expStatusCode int
 		expBody       string
+		expStatusCode int
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
@@ -596,8 +596,8 @@ func TestServeHTTPOptions(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
-		expStatusCode int
 		expAllow      string
+		expStatusCode int
 	}{{
 		desc:          "With root path",
 		reqURL:        "http://127.0.0.1:8080/",
@@ -726,8 +726,8 @@ func TestStatusError(t *testing.T) {
 	cases := []struct {
 		desc          string
 		reqURL        string
-		expStatusCode int
 		expBody       string
+		expStatusCode int
 	}{{
 		desc:          "With registered error no body",
 		reqURL:        "http://127.0.0.1:8080/error/no-body?k=v",
