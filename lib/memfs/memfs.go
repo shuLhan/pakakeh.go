@@ -485,6 +485,10 @@ func (mfs *MemFS) mount() (err error) {
 	if len(mfs.Opts.Root) == 0 {
 		return nil
 	}
+	if mfs.Root != nil {
+		// The directory has been initialized by embedded.
+		return nil
+	}
 
 	logp := "mount"
 
