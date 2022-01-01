@@ -42,49 +42,39 @@ type Client struct {
 	flateReader io.ReadCloser
 	gzipReader  *gzip.Reader
 
-	defHeaders http.Header
-	*http.Client
+	opts *ClientOptions
 
-	serverURL string
+	*http.Client
 }
 
 //
-// NewClient create and initialize new Client connection using serverURL to
-// minimize repetition.
-// The serverURL is any path that is static and will never changes during
-// request to server.
-// The headers parameter define default headers that will be set in any
-// request to server.
-// The insecure parameter allow to connect to remote server with unknown
-// certificate authority.
+// NewClient create and initialize new Client.
 //
-func NewClient(serverURL string, headers http.Header, insecure bool) (client *Client) {
-	if headers == nil {
-		headers = make(http.Header)
-	}
+// The client will have KeepAlive timeout set to 30 seconds, with 1 maximum
+// idle connection, and 90 seconds IdleConnTimeout.
+//
+func NewClient(opts *ClientOptions) (client *Client) {
+	opts.init()
 
 	httpTransport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout:   30 * time.Second,
+			Timeout:   opts.Timeout,
 			KeepAlive: 30 * time.Second,
-			DualStack: true,
 		}).DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
+		MaxIdleConns:          1,
 		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
+		TLSHandshakeTimeout:   opts.Timeout,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 
 	client = &Client{
-		serverURL:  serverURL,
-		defHeaders: headers,
-		Client:     &http.Client{},
+		opts:   opts,
+		Client: &http.Client{},
 	}
-	if insecure {
+	if opts.AllowInsecure {
 		httpTransport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: insecure,
+			InsecureSkipVerify: opts.AllowInsecure,
 		}
 	}
 	client.Client.Transport = httpTransport
@@ -254,14 +244,14 @@ func (client *Client) GenerateHttpRequest(
 		}
 	}
 
-	fullURL := client.serverURL + path
+	fullURL := client.opts.ServerUrl + path
 
 	httpRequest, err = http.NewRequest(method.String(), fullURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	client.setHeaders(httpRequest, client.defHeaders)
+	client.setHeaders(httpRequest, client.opts.Headers)
 	client.setHeaders(httpRequest, headers)
 
 	if len(contentType) > 0 {
@@ -386,14 +376,14 @@ func (client *Client) doRequest(
 ) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
-	fullURL := client.serverURL + path
+	fullURL := client.opts.ServerUrl + path
 
 	httpReq, err := http.NewRequest(httpMethod, fullURL, body)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	client.setHeaders(httpReq, client.defHeaders)
+	client.setHeaders(httpReq, client.opts.Headers)
 	client.setHeaders(httpReq, headers)
 
 	if len(contentType) > 0 {
@@ -422,11 +412,11 @@ func (client *Client) setHeaders(req *http.Request, headers http.Header) {
 // setUserAgent set the User-Agent header only if its not defined by user.
 //
 func (client *Client) setUserAgent() {
-	v := client.defHeaders.Get(HeaderUserAgent)
+	v := client.opts.Headers.Get(HeaderUserAgent)
 	if len(v) > 0 {
 		return
 	}
-	client.defHeaders.Set(HeaderUserAgent, defUserAgent)
+	client.opts.Headers.Set(HeaderUserAgent, defUserAgent)
 }
 
 //

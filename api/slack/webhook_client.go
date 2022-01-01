@@ -35,9 +35,11 @@ func NewWebhookClient(webhookURL, user, channel string) (wcl *WebhookClient, err
 		return nil, fmt.Errorf("NewWebhookClient: %w", err)
 	}
 
-	host := fmt.Sprintf("%s://%s", wurl.Scheme, wurl.Host)
+	clientOpts := &libhttp.ClientOptions{
+		ServerUrl: fmt.Sprintf("%s://%s", wurl.Scheme, wurl.Host),
+	}
 	wcl = &WebhookClient{
-		Client:      libhttp.NewClient(host, nil, false),
+		Client:      libhttp.NewClient(clientOpts),
 		webhookPath: wurl.Path,
 		user:        user,
 		channel:     channel,

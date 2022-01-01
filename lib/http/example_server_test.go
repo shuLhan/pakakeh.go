@@ -60,7 +60,10 @@ func ExampleServer_customHTTPStatusCode() {
 	// Wait for the server fully started.
 	time.Sleep(1 * time.Second)
 
-	client := NewClient("http://127.0.0.1:8123", nil, false)
+	clientOpts := &ClientOptions{
+		ServerUrl: "http://127.0.0.1:8123",
+	}
+	client := NewClient(clientOpts)
 
 	httpRes, resBody, err := client.PostJSON(epCustom.Path, nil, nil)
 	if err != nil {

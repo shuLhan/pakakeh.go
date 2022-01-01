@@ -51,7 +51,10 @@ func ExampleEndpoint_errorHandler() {
 	}()
 	time.Sleep(1 * time.Second)
 
-	client := NewClient("http://"+serverOpts.Address, nil, false)
+	clientOpts := &ClientOptions{
+		ServerUrl: "http://" + serverOpts.Address,
+	}
+	client := NewClient(clientOpts)
 
 	params := url.Values{}
 	params.Set("error", "400:error with status code")

@@ -67,7 +67,10 @@ func ExampleEndpointResponse() {
 	}()
 	time.Sleep(500)
 
-	cl := NewClient("http://127.0.0.1:7016", nil, true)
+	clientOpts := &ClientOptions{
+		ServerUrl: "http://127.0.0.1:7016",
+	}
+	cl := NewClient(clientOpts)
 	params := url.Values{}
 
 	// Test call endpoint without "id" parameter.

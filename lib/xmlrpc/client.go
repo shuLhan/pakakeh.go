@@ -46,31 +46,26 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 		url:     url,
 		timeout: timeout,
 	}
+	clientOpts := &libhttp.ClientOptions{
+		Timeout: timeout,
+	}
 
 	if url.Scheme == schemeIsHTTPS {
-		var insecure bool
 		if ip != nil {
-			insecure = true
+			clientOpts.AllowInsecure = true
 		}
 		if port == 0 {
 			port = 443
 		}
-
-		serverUrl := fmt.Sprintf("https://%s:%d", host, port)
-
-		client.conn = libhttp.NewClient(serverUrl, nil, insecure)
+		clientOpts.ServerUrl = fmt.Sprintf("https://%s:%d", host, port)
 	} else {
 		if port == 0 {
 			port = 80
 		}
-
-		serverUrl := fmt.Sprintf("http://%s:%d", host, port)
-
-		client.conn = libhttp.NewClient(serverUrl, nil, false)
+		clientOpts.ServerUrl = fmt.Sprintf("http://%s:%d", host, port)
 	}
-	if err != nil {
-		return nil, fmt.Errorf("NewClient: Dial: %w", err)
-	}
+
+	client.conn = libhttp.NewClient(clientOpts)
 
 	return client, nil
 }
