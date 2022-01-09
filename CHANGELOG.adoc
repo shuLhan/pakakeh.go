@@ -3,6 +3,188 @@
 
 This library is released every month, usually at the first week of month.
 
+==  share v0.33.0 (2022-01-09)
+
+Happy New Year!
+
+Three years has passed since the first release of this multi-libraries (or Go
+module), and we have released at least 33 new features with several bugs here
+and there.
+
+For anyone who use this module, I hope it help you, as the module name
+intended "share", and sorry if its too many breaking changes.
+
+Live long and prosper!
+See you again next year.
+
+===  New features
+
+*  cmd/gofilemode: new command to decode the Go file mode
++
+The Go has their own file mode that works across all operating system.
+The file mode is represented by uint64, the command line will convert it
+to fs.FileMode and print each possible flag on it including the
+permission.
+
+*  lib/sql: make the TruncateTable run with cascade and restart identity
++
+--
+On table that contains foreign key, truncate without cascade may cause
+the method fail.
+
+Also, since TruncateTable is, and should be only, used on testing, any
+identity columns, for example serial, should be reset back to its initial
+value. On PostgreSQL this means the truncate table is with
+"RESTART IDENTITY".
+--
+
+*  cmd/epoch: command line to print and parse Unix timestamp
++
+--
+Program epoch print the current time (Unix seconds, milliseconds,
+nanoseconds, local time, and UTC time) or the time based on the epoch on
+first parameter.
+Usage,
+
+	epoch <unix-seconds|unix-milliseconds|unix-nanoseconds>
+
+Without a parameter, it will print the current time.
+With single parameter, it will print the time based on that epoch.
+--
+
+===  Breaking changes
+
+*  lib/http: refactoring NewClient to accept single struct
++
+--
+Previously, the NewClient function accept three parameters: serverURL,
+http.Header, and insecure.  If we want to add another parameter,
+for example timeout it will cause changes on the function signature.
+
+To prevent this changes in the future, we change it now. The NewClient
+now accept single struct.
+
+While at it, we add option to set Timeout.
+
+The Timeout affect the http Transport Timeout and TLSHandshakeTimeout.
+The field is optional, if not set it will set to 10 seconds.
+--
+
+*  lib/http: remove field memfs.Options in ServerOptions
++
+This options is duplicate with Memfs.Opts.
+
+*  lib/websocket: add "ok" return value on ClientManager Context
++
+The ok return value will be true if the context exist or false otherwise.
+
+*  lib/memfs: remove field ContentEncoding from EmbedOptions and Node
++
+--
+The original idea for option ContentEncoding in EmbedOptions and Node
+is to save spaces, compressing the content on disk on embedding and
+doing transport, when the MemFS instance is used to serve the (embedded)
+contents of file system.
+
+This option turns out break the HTTP content negotiation [1] of
+accept-encoding header, if the HTTP server does not handle it properly,
+which default Go HTTP server does not.
+
+In order to prevent this issue in the future, for anyone who use the
+memfs for serving static HTTP contents, we remove the options and store
+the embedded content as is and let the HTTP server handle how the
+compression by itself.
+--
+
+*  lib/email: refacforing ParseMailbox
++
+This commit changes the signature of ParseMailbox by returning no error.
+
+[1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation
+
+===  Bug fixes
+
+*  lib/memfs: skip mount if the Root node has been initialized
+
+*  lib/websocket: fix race conditition on handleText
++
+Instead of accessing the ctx field directly, call the Context() method
+to prevent data race.
+
+*  lib/sql: check for EOF on loadSQL
++
+--
+There is probably a regression in Go that cause ioutil.ReadAll return
+io.EOF, while it should not, because the documentation said that
+
+	A successful call returns err == nil, not err == EOF.
+
+But in this, using http.FileSystem, the ioutil.ReadAll now return EOF
+and we need to check it to make the migration can run without an error.
+--
+
+===  Enhancements
+
+*  lib/io: realign all structs
++
+--
+The struct realign, save the occupied of struct size in the memory,
+
+* DirWatcher: from 184 to 144 bytes (-40 bytes)
+* Reader: from 16 to 8 bytes (-8 bytes)
+* Watcher: from 32 to 24 bytes (-8 bytes)
+--
+
+*  lib/http: realign all structs
++
+--
+Changes,
+* Client: from 56 to 48 bytes (-8 bytes)
+* CORSOptions: from 104 to 88 bytes (-16 bytes)
+* Endpoint: from 64 to 32 bytes (-32 bytes)
+* EndpointRequest: from 72 to 56 bytes (-16 bytes)
+* route: from 56 to 32 bytes (-24 bytes)
+
+Other changes is struct on unit tests.
+--
+
+*  lib/memfs: add method Init
++
+The Init provided to initialize MemFS instance if its Options is set
+directly, not through New() function.
+
+*  lib/memfs: embed the Embed options and GenFuncName
++
+This is to make the instance of memfs initialize from init is reusable.
+
+*  lib/memfs: realign struct Node, Options, PathNode, and on unit tests
++
+--
+The realign save storage spaces on struct,
+
+* Node: from 240 to 224 bytes (-16 bytes)
+* Options: from 112 to 104 bytes (-8 bytes)
+* PathNode: from 16 to 8 bytes (-8 bytes)
+--
+
+*  lib/email: realign the struct Mailbox
++
+This changes the storage size from 80 to 72 bytes (-8 bytes).
+
+===  Chores
+
+*  github/workflows: remove step to get dependencies
++
+The Go module should handle the dependencies automatically.
+
+*  github/workflows: set go version to 1.17.6
+
+*  lib/email: convert the unit test for ParseMailbox to examples
++
+Since the ParseMailbox is public we can provide an examples and test
+at the same times.
+
+
 ==  share v0.32.0 (2021-12-03)
 
 This release bring major changes and enhancements to package dns and math/big.
