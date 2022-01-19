@@ -101,10 +101,13 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 // Each SQL file in directory will be executed in alphabetical order based on
 // the last state.
 //
-// The state of migration will be saved in table "_migration" including the
-// SQL file name that has been executed and the timestamp.
+// The table parameter contains the name of table where the state of migration
+// will be saved.
+// If its empty default to "_migration".
+// The state including the SQL file name that has been executed and the
+// timestamp.
 //
-func (cl *Client) Migrate(fs http.FileSystem) (err error) {
+func (cl *Client) Migrate(tableMigration string, fs http.FileSystem) (err error) {
 	logp := "Migrate"
 
 	if reflect.IsNil(fs) {
@@ -128,7 +131,11 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 		return fis[x].Name() < fis[y].Name()
 	})
 
-	lastFile, err := cl.migrateInit()
+	if len(tableMigration) == 0 {
+		tableMigration = "_migration"
+	}
+
+	lastFile, err := cl.migrateInit(tableMigration)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -164,7 +171,7 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 			continue
 		}
 
-		err = cl.migrateApply(name, sqlRaw)
+		err = cl.migrateApply(tableMigration, name, sqlRaw)
 		if err != nil {
 			return fmt.Errorf("%s: %q: %w", logp, name, err)
 		}
@@ -176,15 +183,15 @@ func (cl *Client) Migrate(fs http.FileSystem) (err error) {
 // migrateInit get the last file in table migration or if its not exist create
 // the migration table.
 //
-func (cl *Client) migrateInit() (lastFile string, err error) {
-	lastFile, err = cl.migrateLastFile()
+func (cl *Client) migrateInit(tableMigration string) (lastFile string, err error) {
+	lastFile, err = cl.migrateLastFile(tableMigration)
 	if err == nil {
 		return lastFile, nil
 	}
 
-	err = cl.migrateCreateTable()
+	err = cl.migrateCreateTable(tableMigration)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("migrateInit: %w", err)
 	}
 
 	return "", nil
@@ -194,25 +201,28 @@ func (cl *Client) migrateInit() (lastFile string, err error) {
 // migrateLastFile return the last finished migration or empty string if table
 // migration does not exist.
 //
-func (cl *Client) migrateLastFile() (file string, err error) {
+func (cl *Client) migrateLastFile(tableMigration string) (file string, err error) {
 	q := `
 		SELECT filename
-		FROM _migration
+		FROM ` + tableMigration + `
 		ORDER BY filename DESC
 		LIMIT 1
 	`
 
 	err = cl.DB.QueryRow(q).Scan(&file)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return "", err
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", nil
+		}
+		return "", fmt.Errorf("migrateLastFile: %w", err)
 	}
 
 	return file, nil
 }
 
-func (cl *Client) migrateCreateTable() (err error) {
+func (cl *Client) migrateCreateTable(tableMigration string) (err error) {
 	q := `
-		CREATE TABLE _migration (
+		CREATE TABLE ` + tableMigration + ` (
 			filename    VARCHAR(1024)
 		,	applied_at  TIMESTAMP DEFAULT NOW()
 		,	PRIMARY KEY(filename)
@@ -225,45 +235,53 @@ func (cl *Client) migrateCreateTable() (err error) {
 	return nil
 }
 
-func (cl *Client) migrateApply(filename string, sqlRaw []byte) (err error) {
-	tx, err := cl.DB.Begin()
+func (cl *Client) migrateApply(tableMigration, filename string, sqlRaw []byte) (err error) {
+	var (
+		logp = "migrateApply"
+		tx   *sql.Tx
+	)
+
+	tx, err = cl.DB.Begin()
 	if err != nil {
 		return err
 	}
 
 	_, err = tx.Exec(string(sqlRaw))
 	if err == nil {
-		err = cl.migrateFinished(tx, filename)
+		err = cl.migrateFinished(tx, tableMigration, filename)
 	}
 	if err != nil {
 		err2 := tx.Rollback()
 		if err2 != nil {
-			log.Printf("migrateApply %s: %s", filename, err2)
+			log.Printf("%s: %s: %s", logp, filename, err2)
 		}
-		return fmt.Errorf("migrateApply: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("migrateApply: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return nil
 }
 
-func (cl *Client) migrateFinished(tx *sql.Tx, file string) (err error) {
-	var q string
+func (cl *Client) migrateFinished(tx *sql.Tx, tableMigration, file string) (err error) {
+	var (
+		logp = "migrateFinished"
+		q    string
+	)
 
 	switch cl.DriverName {
 	case DriverNamePostgres:
-		q = `INSERT INTO _migration (filename) VALUES ($1)`
+		q = `INSERT INTO ` + tableMigration + ` (filename) VALUES ($1)`
 	case DriverNameMysql:
-		q = `INSERT INTO _migration (filename) VALUES (?)`
+		q = `INSERT INTO ` + tableMigration + ` (filename) VALUES (?)`
 	}
 
 	_, err = tx.Exec(q, file)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %s: %w", logp, file, err)
 	}
 
 	return nil
