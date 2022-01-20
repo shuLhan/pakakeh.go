@@ -149,16 +149,25 @@ func (serv *Server) createSockServer() (err error) {
 // RegisterTextHandler register specific function to be called by server when
 // request opcode is text, and method and target matched with Request.
 //
-func (serv *Server) RegisterTextHandler(
-	method, target string, handler RouteHandler,
-) (err error) {
-	if len(method) == 0 || len(target) == 0 || handler == nil {
-		return
+func (serv *Server) RegisterTextHandler(method, target string, handler RouteHandler) (err error) {
+	logp := "RegisterTextHandler"
+
+	if len(method) == 0 {
+		return fmt.Errorf("%s: empty method", logp)
+	}
+	if len(target) == 0 {
+		return fmt.Errorf("%s: empty target", logp)
+	}
+	if handler == nil {
+		return fmt.Errorf("%s: empty handler", logp)
 	}
 
 	err = serv.routes.add(method, target, handler)
+	if err != nil {
+		return fmt.Errorf("%s: %s %s: %w", logp, method, target, err)
+	}
 
-	return
+	return nil
 }
 
 func (serv *Server) handleError(conn int, code int, msg string) {
