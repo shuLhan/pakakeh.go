@@ -153,6 +153,61 @@ func (client *Client) Do(httpRequest *http.Request) (
 }
 
 //
+// Download a resource from remote server and write it into
+// DownloadRequest.Output.
+//
+// If the DownloadRequest.Output is nil, it will return an error
+// ErrClientDownloadNoOutput.
+// If server return HTTP code beside 200, it will return non-nil
+// http.Response with an error.
+//
+func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err error) {
+	var (
+		logp     = "Download"
+		httpReq  *http.Request
+		tee      io.Reader
+		errClose error
+	)
+
+	if req.Output == nil {
+		return nil, fmt.Errorf("%s: %w", logp, ErrClientDownloadNoOutput)
+	}
+
+	httpReq, err = req.toHttpRequest(client)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", logp, err)
+	}
+
+	httpRes, err = client.Client.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	if httpRes.StatusCode != http.StatusOK {
+		err = fmt.Errorf("%s: %s", logp, httpRes.Status)
+		goto out
+	}
+
+	tee = io.TeeReader(httpRes.Body, req.Output)
+
+	_, err = io.ReadAll(tee)
+	if err != nil {
+		err = fmt.Errorf("%s: %w", logp, err)
+	}
+out:
+	errClose = httpRes.Body.Close()
+	if errClose != nil {
+		if err == nil {
+			err = fmt.Errorf("%s: %w", logp, errClose)
+		} else {
+			err = fmt.Errorf("%w: %s", err, errClose)
+		}
+	}
+
+	return httpRes, err
+}
+
+//
 // GenerateHttpRequest generate http.Request from method, path, requestType,
 // headers, and params.
 //

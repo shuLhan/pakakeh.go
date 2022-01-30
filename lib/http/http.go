@@ -238,6 +238,8 @@ const (
 )
 
 var (
+	ErrClientDownloadNoOutput = errors.New("invalid or empty client download output")
+
 	//
 	// ErrEndpointAmbiguous define an error when registering path that
 	// already exist.  For example, after registering "/:x", registering

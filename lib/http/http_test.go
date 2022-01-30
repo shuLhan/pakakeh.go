@@ -66,6 +66,8 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
+	registerEndpoints()
+
 	go func() {
 		err := testServer.Start()
 		if err != nil {
@@ -81,4 +83,42 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(status)
+}
+
+var (
+	testDownloadBody []byte
+)
+
+func registerEndpoints() {
+	var err error
+
+	testDownloadBody, err = os.ReadFile("client.go")
+	if err != nil {
+		log.Fatalf("TestMain: %s", err)
+	}
+
+	// Endpoint to test the client Download().
+	err = testServer.RegisterEndpoint(&Endpoint{
+		Path:         "/download",
+		ResponseType: ResponseTypePlain,
+		Call: func(epr *EndpointRequest) ([]byte, error) {
+			return testDownloadBody, nil
+		},
+	})
+	if err != nil {
+		log.Fatalf("TestMain: %s", err)
+	}
+
+	// Endpoint to test the client Download() with HTTP 302 redirect.
+	err = testServer.RegisterEndpoint(&Endpoint{
+		Path:         "/redirect/download",
+		ResponseType: ResponseTypePlain,
+		Call: func(epr *EndpointRequest) ([]byte, error) {
+			http.Redirect(epr.HttpWriter, epr.HttpRequest, "/download", http.StatusFound)
+			return nil, nil
+		},
+	})
+	if err != nil {
+		log.Fatalf("TestMain: %s", err)
+	}
 }
