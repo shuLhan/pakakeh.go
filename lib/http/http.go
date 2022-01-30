@@ -294,3 +294,18 @@ func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
 	}
 	return clientAddr, proxyAddrs
 }
+
+//
+// setHeaders set the request headers.
+//
+func setHeaders(req *http.Request, headers http.Header) {
+	for k, v := range headers {
+		for x, hv := range v {
+			if x == 0 {
+				req.Header.Set(k, hv)
+			} else {
+				req.Header.Add(k, hv)
+			}
+		}
+	}
+}

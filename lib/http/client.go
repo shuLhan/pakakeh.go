@@ -251,8 +251,8 @@ func (client *Client) GenerateHttpRequest(
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	client.setHeaders(httpRequest, client.opts.Headers)
-	client.setHeaders(httpRequest, headers)
+	setHeaders(httpRequest, client.opts.Headers)
+	setHeaders(httpRequest, headers)
 
 	if len(contentType) > 0 {
 		httpRequest.Header.Set(HeaderContentType, contentType)
@@ -383,29 +383,14 @@ func (client *Client) doRequest(
 		return nil, nil, err
 	}
 
-	client.setHeaders(httpReq, client.opts.Headers)
-	client.setHeaders(httpReq, headers)
+	setHeaders(httpReq, client.opts.Headers)
+	setHeaders(httpReq, headers)
 
 	if len(contentType) > 0 {
 		httpReq.Header.Set(HeaderContentType, contentType)
 	}
 
 	return client.Do(httpReq)
-}
-
-//
-// setHeaders set the request headers.
-//
-func (client *Client) setHeaders(req *http.Request, headers http.Header) {
-	for k, v := range headers {
-		for x, hv := range v {
-			if x == 0 {
-				req.Header.Set(k, hv)
-			} else {
-				req.Header.Add(k, hv)
-			}
-		}
-	}
 }
 
 //
