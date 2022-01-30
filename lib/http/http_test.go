@@ -15,8 +15,10 @@ import (
 )
 
 var (
-	testServer *Server
-	client     = &http.Client{}
+	testServer    *Server
+	testServerUrl string
+
+	client = &http.Client{}
 
 	cbNone = func(epr *EndpointRequest) ([]byte, error) {
 		return nil, nil
@@ -41,7 +43,10 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	var err error
+	var (
+		serverAddress = "127.0.0.1:14832"
+		err           error
+	)
 
 	opts := &ServerOptions{
 		Memfs: &memfs.MemFS{
@@ -51,8 +56,10 @@ func TestMain(m *testing.M) {
 				Development: true,
 			},
 		},
-		Address: "127.0.0.1:8080",
+		Address: serverAddress,
 	}
+
+	testServerUrl = fmt.Sprintf("http://" + serverAddress)
 
 	testServer, err = NewServer(opts)
 	if err != nil {

@@ -43,11 +43,11 @@ func TestRegisterDelete(t *testing.T) {
 		expError: ErrEndpointAmbiguous.Error(),
 	}, {
 		desc:          "With unknown path",
-		reqURL:        "http://127.0.0.1:8080/",
+		reqURL:        testServerUrl,
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:           "With known path and subtree root",
-		reqURL:         "http://127.0.0.1:8080/delete/",
+		reqURL:         testServerUrl + "/delete/",
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[]\nmap[]\n<nil>\n",
@@ -59,7 +59,7 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypeNone,
 			Call:         cbNone,
 		},
-		reqURL:        "http://127.0.0.1:8080/delete/none?k=v",
+		reqURL:        testServerUrl + "/delete/none?k=v",
 		expStatusCode: http.StatusNoContent,
 	}, {
 		desc: "With response type binary",
@@ -69,13 +69,13 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypeBinary,
 			Call:         cbPlain,
 		},
-		reqURL:         "http://127.0.0.1:8080/delete/bin?k=v",
+		reqURL:         testServerUrl + "/delete/bin?k=v",
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypeBinary,
 		expBody:        "map[k:[v]]\nmap[]\n<nil>\n",
 	}, {
 		desc:           "With response type plain",
-		reqURL:         "http://127.0.0.1:8080/delete?k=v",
+		reqURL:         testServerUrl + "/delete?k=v",
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[k:[v]]\nmap[]\n<nil>\n",
@@ -87,7 +87,7 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypeJSON,
 			Call:         cbJSON,
 		},
-		reqURL:         "http://127.0.0.1:8080/delete/json?k=v",
+		reqURL:         testServerUrl + "/delete/json?k=v",
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypeJSON,
 		expBody: `{
@@ -112,13 +112,13 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
 		},
-		reqURL:         "http://127.0.0.1:8080/delete/1/x?k=v",
+		reqURL:         testServerUrl + "/delete/1/x?k=v",
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[id:[1] k:[v]]\nmap[]\n<nil>\n",
 	}, {
 		desc:           "With duplicate key in query",
-		reqURL:         "http://127.0.0.1:8080/delete/1/x?id=v",
+		reqURL:         testServerUrl + "/delete/1/x?id=v",
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[id:[1]]\nmap[]\n<nil>\n",
@@ -204,11 +204,11 @@ func TestRegisterEvaluator(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With invalid evaluate",
-		reqURL:        "http://127.0.0.1:8080/evaluate",
+		reqURL:        testServerUrl + "/evaluate",
 		expStatusCode: http.StatusBadRequest,
 	}, {
 		desc:          "With valid evaluate",
-		reqURL:        "http://127.0.0.1:8080/evaluate?k=v",
+		reqURL:        testServerUrl + "/evaluate?k=v",
 		expStatusCode: http.StatusOK,
 	}}
 
@@ -260,22 +260,22 @@ func TestRegisterGet(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        "http://127.0.0.1:8080/",
+		reqURL:        testServerUrl,
 		expStatusCode: http.StatusOK,
 		expBody:       "<html><body>Hello, world!</body></html>\n",
 	}, {
 		desc:          "With known path",
-		reqURL:        "http://127.0.0.1:8080/index.js",
+		reqURL:        testServerUrl + "/index.js",
 		expStatusCode: http.StatusOK,
 		expBody:       "var a = \"Hello, world!\"\n",
 	}, {
 		desc:          "With known path and subtree root",
-		reqURL:        "http://127.0.0.1:8080/get/",
+		reqURL:        testServerUrl + "/get/",
 		expStatusCode: http.StatusOK,
 		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With known path",
-		reqURL:        "http://127.0.0.1:8080/get?k=v",
+		reqURL:        testServerUrl + "/get?k=v",
 		expStatusCode: http.StatusOK,
 		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}}
@@ -331,18 +331,18 @@ func TestRegisterHead(t *testing.T) {
 		expStatusCode    int
 	}{{
 		desc:             "With root path",
-		reqURL:           "http://127.0.0.1:8080/",
+		reqURL:           testServerUrl + "/",
 		expStatusCode:    http.StatusOK,
 		expContentType:   []string{"text/html; charset=utf-8"},
 		expContentLength: []string{"40"},
 	}, {
 		desc:           "With registered GET and subtree root",
-		reqURL:         "http://127.0.0.1:8080/api/",
+		reqURL:         testServerUrl + "/api/",
 		expStatusCode:  http.StatusOK,
 		expContentType: []string{ContentTypeJSON},
 	}, {
 		desc:           "With registered GET",
-		reqURL:         "http://127.0.0.1:8080/api?k=v",
+		reqURL:         testServerUrl + "/api?k=v",
 		expStatusCode:  http.StatusOK,
 		expContentType: []string{ContentTypeJSON},
 	}}
@@ -397,16 +397,16 @@ func TestRegisterPatch(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        "http://127.0.0.1:8080/",
+		reqURL:        testServerUrl + "/",
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:          "With registered PATCH and subtree root",
-		reqURL:        "http://127.0.0.1:8080/patch/",
+		reqURL:        testServerUrl + "/patch/",
 		expStatusCode: http.StatusOK,
 		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With registered PATCH and query",
-		reqURL:        "http://127.0.0.1:8080/patch?k=v",
+		reqURL:        testServerUrl + "/patch?k=v",
 		expStatusCode: http.StatusOK,
 		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}}
@@ -460,16 +460,16 @@ func TestRegisterPost(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        "http://127.0.0.1:8080/",
+		reqURL:        testServerUrl + "/",
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:          "With registered POST and subtree root",
-		reqURL:        "http://127.0.0.1:8080/post/",
+		reqURL:        testServerUrl + "/post/",
 		expStatusCode: http.StatusOK,
 		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With registered POST and query",
-		reqURL:        "http://127.0.0.1:8080/post?k=v",
+		reqURL:        testServerUrl + "/post?k=v",
 		reqBody:       "k=vv",
 		expStatusCode: http.StatusOK,
 		expBody: `map[k:[vv v]]
@@ -530,15 +530,15 @@ func TestRegisterPut(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        "http://127.0.0.1:8080/",
+		reqURL:        testServerUrl + "/",
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:          "With registered PUT and subtree root",
-		reqURL:        "http://127.0.0.1:8080/put/",
+		reqURL:        testServerUrl + "/put/",
 		expStatusCode: http.StatusNoContent,
 	}, {
 		desc:          "With registered PUT and query",
-		reqURL:        "http://127.0.0.1:8080/put?k=v",
+		reqURL:        testServerUrl + "/put?k=v",
 		expStatusCode: http.StatusNoContent,
 	}}
 
@@ -600,17 +600,17 @@ func TestServeHTTPOptions(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        "http://127.0.0.1:8080/",
+		reqURL:        testServerUrl + "/",
 		expStatusCode: http.StatusOK,
 		expAllow:      "GET, HEAD, OPTIONS",
 	}, {
 		desc:          "With registered PATCH and subtree root",
-		reqURL:        "http://127.0.0.1:8080/options/",
+		reqURL:        testServerUrl + "/options/",
 		expStatusCode: http.StatusOK,
 		expAllow:      "DELETE, OPTIONS, PATCH",
 	}, {
 		desc:          "With registered PATCH and query",
-		reqURL:        "http://127.0.0.1:8080/options?k=v",
+		reqURL:        testServerUrl + "/options?k=v",
 		expStatusCode: http.StatusOK,
 		expAllow:      "DELETE, OPTIONS, PATCH",
 	}}
@@ -730,32 +730,32 @@ func TestStatusError(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With registered error no body",
-		reqURL:        "http://127.0.0.1:8080/error/no-body?k=v",
+		reqURL:        testServerUrl + "/error/no-body?k=v",
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error binary",
-		reqURL:        "http://127.0.0.1:8080/error/binary?k=v",
+		reqURL:        testServerUrl + "/error/binary?k=v",
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        "http://127.0.0.1:8080/error/plain?k=v",
+		reqURL:        testServerUrl + "/error/plain?k=v",
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        "http://127.0.0.1:8080/error/json?k=v",
+		reqURL:        testServerUrl + "/error/json?k=v",
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"code":411,"message":"Length required"}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        "http://127.0.0.1:8080/error/no-code?k=v",
+		reqURL:        testServerUrl + "/error/no-code?k=v",
 		expStatusCode: http.StatusInternalServerError,
 		expBody:       `{"code":500,"message":"internal server error","name":"ERR_INTERNAL"}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        "http://127.0.0.1:8080/error/custom?k=v",
+		reqURL:        testServerUrl + "/error/custom?k=v",
 		expStatusCode: http.StatusInternalServerError,
 		expBody:       `{"code":500,"message":"internal server error","name":"ERR_INTERNAL"}`,
 	}}
