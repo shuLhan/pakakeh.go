@@ -1,7 +1,77 @@
 =  CHANGELOG
+Shulhan <ms@kilabit.info>
 :toc:
 
 This library is released every month, usually at the first week of month.
+
+
+==  share v0.34.0 (2022-02-05)
+
+===  Breaking changes
+
+*  lib/sql: make the table migration customizable
++
+--
+In the method Migrate() we add parameter "tableMigration" which define
+the name of table where the state of migration will be saved.
+
+If its empty default to "_migration".
+--
+
+===  New features
+
+*  lib/os: implement function to Extract compressed and/or archived file
++
+--
+The Extract function uncompress and/or unarchive file from fileInput
+into directory defined by dirOutput.
+This is the high level API that combine standard archive/zip, archive/tar,
+compress/bzip2, and/or compress/gzip.
+
+The compression and archive format is detected automatically based on
+the following fileInput extension:
+
+* .bz2: decompress using compress/bzip2.
+* .gz: decompress using compress/gzip.
+* .tar: unarchive using archive/tar.
+* .zip: unarchive using archive/zip.
+* .tar.bz2: decompress using compress/bzip2 and unarchive using
+  archive/tar.
+* .tar.gz: decompress using compress/gzip and unarchive using
+  archive/tar.
+
+The output directory, dirOutput, where the decompressed and/or unarchived
+file stored. will be created if not exist.
+If its empty, it will set to current directory.
+
+On success, the compressed and/or archived file will be removed from the
+file system.
+--
+
+*  lib/http: implement method Download() on Client
++
+The Download method get a resource from remote server and write it into
+DownloadRequest.Output (a io.Writer).
+
+===  Enhancements
+
+*  lib/websocket: return error if parameter is empty on RegisterTextHandler
++
+Previously, the RegisterTextHandler method return nil if method, target,
+or handler parameter is not set.
+This may cause confusion and hard to debug handler when no connection receive
+but the RegisterTextHandler does not have any error.
+
+===  Chores
+
+*  lib/http: change the test port for testing HTTP server
++
+Previously, the test port for HTTP server is set to 8080 and may conflict
+with any service that running on the local (due to common use of 8080).
++
+This changes it to 14832 and we make the full server address stored
+as global variable so any tests can references it.
+
 
 ==  share v0.33.0 (2022-01-09)
 
