@@ -262,365 +262,415 @@ This release bring major changes and enhancements to package dns and math/big.
 ===  Breaking changes
 
 *  math/big: refactoring AddFloat to accept variadic interface{}
++
+--
+Previously, the AddFloat function only accept two interface parameters.
 
-   Previously, the AddFloat function only accept two interface parameters.
-
-   This changes make the AddFloat to accept many interface parameters.
+This changes make the AddFloat to accept many interface parameters.
+--
 
 *  math/big: refactor NewFloat to accept interface{} instead of float64 only
-
-   The following types is added and can be initialized to Float: []byte,
-   uint, uint16, uint32, uint64, big.Int, *big.Int, big.Rat, and *big.Rat.
++
+The following types is added and can be initialized to Float: []byte,
+uint, uint16, uint32, uint64, big.Int, *big.Int, big.Rat, and *big.Rat.
 
 *  math/big: refactoring the Rat
++
+--
+The promise of this package is to provide the Rat type with RoundToZero
+and without panic.
 
-   The promise of this package is to provide the Rat type with RoundToZero
-   and without panic.
+In order to do that we remove the MustRat() function and check for nil
+on pointer receiver before doing operation, and check for zero value
+when doing quotation.
 
-   In order to do that we remove the MustRat() function and check for nil
-   on pointer receiver before doing operation, and check for zero value
-   when doing quotation.
+Another breaking changes are,
 
-   Another breaking changes are,
-
-   * Humanize() with nil pointer receiver will return string "0"
-   * Any IsXxx() methods with nil pointer receiver will return false
-   * MarshalJSON() will nil pointer receiver will return "null" instead of
-     "0" now
+* Humanize() with nil pointer receiver will return string "0"
+* Any IsXxx() methods with nil pointer receiver will return false
+* MarshalJSON() will nil pointer receiver will return "null" instead of
+  "0" now
+--
 
 *  lib/dns: refactoring, change signature of client Lookup
++
+--
+Previously, Lookup() method on Client pass the question name, type, and
+class as parameters.
 
-   Previously, Lookup() method on Client pass the question name, type, and
-   class as parameters.
-
-   This changes make those parameters into MessageQuestion.
+This changes make those parameters into MessageQuestion.
+--
 
 *  lib/dns: refactoring ZoneFile into Zone
++
+--
+Reason: A Zone is not always represented by file, it just that in this
+package, it is.
 
-   Reason: A Zone is not always represented by file, it just that in this
-   package, it is.
-
-   This changes rename the type ZoneFile into Zone.
+This changes rename the type ZoneFile into Zone.
+--
 
 *  lib/dns: refactoring message question
++
+--
+Previously the type for message question section SectionQuestion.
 
-   Previously the type for message question section SectionQuestion.
-
-   This changes, rename the type to MessageQuestion.
+This changes, rename the type to MessageQuestion.
+--
 
 *  lib/dns: refactoring the section header
++
+--
+This changes rename the SectionHeader into MessageHeader.
 
-   This changes rename the SectionHeader into MessageHeader.
+The pack() method is optimized with the following results,
 
-   The pack() method is optimized with the following results,
+benchmark                         old ns/op     new ns/op     delta
+BenchmarkMessageHeader_pack-8     66.2          21.7          -67.31%
 
-   benchmark                         old ns/op     new ns/op     delta
-   BenchmarkMessageHeader_pack-8     66.2          21.7          -67.31%
+benchmark                         old allocs     new allocs     delta
+BenchmarkMessageHeader_pack-8     3              1              -66.67%
 
-   benchmark                         old allocs     new allocs     delta
-   BenchmarkMessageHeader_pack-8     3              1              -66.67%
+benchmark                         old bytes     new bytes     delta
+BenchmarkMessageHeader_pack-8     32            16            -50.00%
 
-   benchmark                         old bytes     new bytes     delta
-   BenchmarkMessageHeader_pack-8     32            16            -50.00%
+The unpack() method is simplified by minimizing the if-condition.
 
-   The unpack() method is simplified by minimizing the if-condition.
-
-   This changes also fix the pack and unpack OpCode for value other then 0,
-   due to wrong shift value, 2 instead of 3.
+This changes also fix the pack and unpack OpCode for value other then 0,
+due to wrong shift value, 2 instead of 3.
+--
 
 *  lib/dns: refactoring, introduce new type RecordClass
++
+--
+Previously, the record class is represented by uint16 using prefix
+QueryClassXxx.
 
-   Previously, the record class is represented by uint16 using prefix
-   QueryClassXxx.
-
-   This changes make the record class to be an independent type, to make
-   code more strict (prevent passing invalid value), and readable.
+This changes make the record class to be an independent type, to make
+code more strict (prevent passing invalid value), and readable.
+--
 
 *  lib/dns: refactoring, create type RecordType to represent type of RR
++
+--
+Previously, we use uint16 to represent type for ResourceRecord Type or
+Question type.
 
-   Previously, we use uint16 to represent type for ResourceRecord Type or
-   Question type.
+To make the code more strict, where parameter or return value, must be
+expected as record type, we add new type to represent the RR type:
+RecordType.
 
-   To make the code more strict, where parameter or return value, must be
-   expected as record type, we add new type to represent the RR type:
-   RecordType.
-
-   This changes also rename any variable name of QType or qtype to RType
-   or rtype because QType is misleading. The type defined the
-   ResourceRecord to be queried not only question.
+This changes also rename any variable name of QType or qtype to RType
+or rtype because QType is misleading. The type defined the
+ResourceRecord to be queried not only question.
+--
 
 *  lib/dns: remove the fallback name servers (NS) from server options
++
+--
+The original idea of fallback NS is to send the query to the one define
+to original resolv.conf, instead of using the one defined by user in
+ServerOptions NameServers, when an error occured.
 
-   The original idea of fallback NS is to send the query to the one define
-   to original resolv.conf, instead of using the one defined by user in
-   ServerOptions NameServers, when an error occured.
+But, most of error usually caused by network (disconnected, time out),
+so re-sending query to fallback NS does not have any effect if the network
+it self is not working.
 
-   But, most of error usually caused by network (disconnected, time out),
-   so re-sending query to fallback NS does not have any effect if the network
-   it self is not working.
-
-   This changes remove the unnecessary and complex fallback NS from
-   server.
+This changes remove the unnecessary and complex fallback NS from
+server.
+--
 
 ===  New features
 
 *  lib/dns: add support to save and load caches to/from storage
++
+--
+The CachesSave method write the non-local answers into an io.Writer,
+encoded with gob.
 
-   The CachesSave method write the non-local answers into an io.Writer,
-   encoded with gob.
-
-   The CachesLoad method load the gob encoded answers from an io.Reader.
+The CachesLoad method load the gob encoded answers from an io.Reader.
+--
 
 *  lib/ssh: use agent defined by config or from environment variable
++
+--
+Previously, we only check the environment variable SSH_AUTH_SOCK
+to decide whether the client identity will fetched from agent or
+from private key file.
 
-   Previously, we only check the environment variable SSH_AUTH_SOCK
-   to decide whether the client identity will fetched from agent or
-   from private key file.
-
-   This changes use the GetIdentityAgent from config Section to derive the
-   path to unix socket.  It will return an empty string if the IdentityAgent
-   is set to "none" in the Section or when SSH_AUTH_SOCK is not exist or
-   empty.
+This changes use the GetIdentityAgent from config Section to derive the
+path to unix socket.  It will return an empty string if the IdentityAgent
+is set to "none" in the Section or when SSH_AUTH_SOCK is not exist or
+empty.
+--
 
 *  ssh/config: add support for section variable IdentityAgent
-
-   There are four possible value for IdentityAgent: SSH_AUTH_SOCK,
-   <$STRING>, <PATH>, or "none".
-   If SSH_AUTH_SOCK, the socket path is read from the environment variable
-   SSH_AUTH_SOCK.
-   If value start with "$", then the socket path is set based on value of
-   that environment variable.
-   Other string beside "none" will be considered as path to socket.
++
+There are four possible value for IdentityAgent: SSH_AUTH_SOCK,
+<$STRING>, <PATH>, or "none".
+If SSH_AUTH_SOCK, the socket path is read from the environment variable
+SSH_AUTH_SOCK.
+If value start with "$", then the socket path is set based on value of
+that environment variable.
+Other string beside "none" will be considered as path to socket.
 
 ===  Bug fixes
 
 *  math/big: return nil on Quo and QuoRat instead of panic
++
+Previously, if the first parameter of Quo or the second/next parameters
+of QuoRat is not convertable to Rat or zero, the method/function will
+panic.
 
-   Previously, if the first parameter of Quo or the second/next parameters
-   of QuoRat is not convertable to Rat or zero, the method/function will
-   panic.
-
-   This changes make it less intrusive, instead of panic we check for
-   zero value and return nil immediately.
+This changes make it less intrusive, instead of panic we check for
+zero value and return nil immediately.
+--
 
 *  lib/dns: do not cache truncated answer
++
+--
+Previously only answer with non-zero response code is ignored.
 
-   Previously only answer with non-zero response code is ignored.
-
-   This changes ignore also answer where response header is truncated.
+This changes ignore also answer where response header is truncated.
+--
 
 ===  Enhancements
 
 *  lib/dns: realign all struct fields
-
-   Turns out the struct that we frequently used, answer and resource_record,
-   is not optimized.
++
+--
+Turns out the struct that we frequently used, answer and resource_record,
+is not optimized.
 
      answer.go:15:13: struct with 56 pointer bytes could be 24 = 32 bytes
-	 ...
+     ...
      resource_record.go:24:21: struct with 56 pointer bytes could be 40 = 16
 
-   This changes reorder all structs field to save space in memory.
+This changes reorder all structs field to save space in memory.
+--
 
 *  lib/dns: make the TCP forwarders as complementary of UDP
++
+--
+The TCP forwarders only active when client send the DNS request as TCP.
+When the server receive that request it should also forward the request
+as TCP not as UDP to prevent the truncated response.
 
-   The TCP forwarders only active when client send the DNS request as TCP.
-   When the server receive that request it should also forward the request
-   as TCP not as UDP to prevent the truncated response.
-
-   Another use case for TCP is when the response is truncated, the client
-   will send the query back through TCP connection.  The server should
-   forward this request using TCP instead of UDP.
+Another use case for TCP is when the response is truncated, the client
+will send the query back through TCP connection.  The server should
+forward this request using TCP instead of UDP.
+--
 
 *  lib/dns: use different packet between UDP and TCP messages
++
+--
+Previously, all packet size for reading and sending the message is
+fixed to 4096, even on UDP.
 
-   Previously, all packet size for reading and sending the message is
-   fixed to 4096, even on UDP.
+This changes set the UDP packet size maximum to 512 bytes and others to
+4096 bytes.
 
-   This changes set the UDP packet size maximum to 512 bytes and others to
-   4096 bytes.
-
-   While at it, minimize copying packet if its not reusable inside a method.
-
+While at it, minimize copying packet if its not reusable inside a method.
+--
 
 ==  share v0.31.0 (2021-11-04)
 
 ===  Breaking changes
 
 *  lib/memfs: move the embedded parameter to Options
++
+--
+Since the GoEmbed can be called only when MemFS instance is initiated,
+it would be better if parameters for GoEmbed also initialized in the
+struct Options.
+In this way any additional parameters needed to add to GoEmbed does not
+changes the method signature in the future.
 
-   Since the GoEmbed can be called only when MemFS instance is initiated,
-   it would be better if parameters for GoEmbed also initialized in the
-   struct Options.
-   In this way any additional parameters needed to add to GoEmbed does not
-   changes the method signature in the future.
+This commit add new type EmbedOptions that contains the parameters
+for GoEmbed.
 
-   This commit add new type EmbedOptions that contains the parameters
-   for GoEmbed.
-
-   In this new type, we add new field EmbedWithoutModTime.
-   if its true, the modification time for all files and directories are not
-   stored inside generated code, instead all files will use the current
-   time when the program is running.
+In this new type, we add new field EmbedWithoutModTime.
+if its true, the modification time for all files and directories are not
+stored inside generated code, instead all files will use the current
+time when the program is running.
+--
 
 *  lib/totp: make the New to accept only hash with SHA1, SHA256, or SHA512
++
+--
+Previously, the first parameter to New is a function that return
+hash.Hash.  This signature can be misleading, because md5.New also
+can return hash.Hash but not usable in TOTP.
 
-   Previously, the first parameter to New is a function that return
-   hash.Hash.  This signature can be misleading, because md5.New also
-   can return hash.Hash but not usable in TOTP.
-
-   This changes update the New function signature to accept defined
-   type that can be set to SHA1, SHA256, or SHA512.
+This changes update the New function signature to accept defined
+type that can be set to SHA1, SHA256, or SHA512.
+--
 
 *  lib/bytes: refactoring and cleaning up the bytes package
++
+--
+The bytes package, and many other packages in this module, is written
+when I still learning and using the Go language for master thesis.
+Some of the code, like function signature, does not follow the
+Go idiom, at least not how the Go source code looks like.
 
-   The bytes package, and many other packages in this module, is written
-   when I still learning and using the Go language for master thesis.
-   Some of the code, like function signature, does not follow the
-   Go idiom, at least not how the Go source code looks like.
+A breaking changes,
 
-   A breaking changes,
+* WriteUint16 and WriteUint32 accept slice only without pointer.
+  There is no need to pass slice as pointer to function if we want
+  to modify the content, as long as the backing storage is not
+  changed.
 
-   * WriteUint16 and WriteUint32 accept slice only without pointer.
-     There is no need to pass slice as pointer to function if we want
-     to modify the content, as long as the backing storage is not
-     changed.
+Bug fixes,
 
-   Bug fixes,
+* PrintHex: fix print layout on the last line
+* ReadHexByte: fix possible index out of range
+* SkipAfterToken return -1 and false if no token found, as promised
+  in the comment, instead of the length of text.
 
-   * PrintHex: fix print layout on the last line
-   * ReadHexByte: fix possible index out of range
-   * SkipAfterToken return -1 and false if no token found, as promised
-     in the comment, instead of the length of text.
+We move all unit test to example so we have test and example in the
+documentation at the same time.
 
-   We move all unit test to example so we have test and example in the
-   documentation at the same time.
-
-   This changes make all test coverage 100%.
+This changes make all test coverage 100%.
+--
 
 *  lib/bytes: refactoring AppendXxx functions
-
-   Previously, we pass pointer to slice on AppendInt16, AppendInt32,
-   AppendUint16, and AppendUint32 functions.  This model of function
-   signature is not a Go idiom.  It is written when I am still new to
-   Go.
++
+Previously, we pass pointer to slice on AppendInt16, AppendInt32,
+AppendUint16, and AppendUint32 functions.  This model of function
+signature is not a Go idiom.  It is written when I am still new to
+Go.
 
 *  lib/ascii: change signature of ToLower and ToUpper
-
-   Using pointer to slice on method or function is not a Go idiom.
-   It is created when I still new to Go.
++
+Using pointer to slice on method or function is not a Go idiom.
+It is created when I still new to Go.
 
 *  lib/memfs: refactoring Node field V into Content
++
+--
+The reason why the field named V is because it's short.  It's come
+from my C/C++ experience that got carried away when writing this
+package.
 
-   The reason why the field named V is because it's short.  It's come
-   from my C/C++ experience that got carried away when writing this
-   package.
-
-   Now, after having more time writing Go, I prefer clarity over
-   cleverity(?).
+Now, after having more time writing Go, I prefer clarity over
+cleverity(?).
+--
 
 *  lib/memfs: set the node modification time in embedded file
++
+--
+This changes set all node modification time in embedded files to
+the node modTime using Unix() and Nanosecond() values.
 
-   This changes set all node modification time in embedded files to
-   the node modTime using Unix() and Nanosecond() values.
-
-   Since the time will always changes we need to remove the test to
-   generate file gen_test.go to prevent the file being modified and
-   re-adding the same file every time we run local tests.
+Since the time will always changes we need to remove the test to
+generate file gen_test.go to prevent the file being modified and
+re-adding the same file every time we run local tests.
+--
 
 ===  New features
 
 *  lib/ini: add function IsValidVarName
-
-   The IsValidVarName check if "v" is valid variable name, where the
-   first character must be a letter and the rest should contains only
-   letter, digit, period, hyphen, or underscore.
-   If "v" is valid it will return true.
++
+The IsValidVarName check if "v" is valid variable name, where the
+first character must be a letter and the rest should contains only
+letter, digit, period, hyphen, or underscore.
+If "v" is valid it will return true.
 
 *  lib/memfs: set the node modification time in embedded file
++
+--
+This changes set all node modification time in embedded files to
+the node modTime using Unix() and Nanosecond() values.
 
-   This changes set all node modification time in embedded files to
-   the node modTime using Unix() and Nanosecond() values.
-
-   Since the time will always changes we need to remove the test to
-   generate file gen_test.go to prevent the file being modified and
-   re-adding the same file every time we run local tests.
+Since the time will always changes we need to remove the test to
+generate file gen_test.go to prevent the file being modified and
+re-adding the same file every time we run local tests.
+--
 
 *  lib/io: add method String to FileState type
-
-   The String method return the string representation of FileState.
-   Usually used only for debugging.
++
+The String method return the string representation of FileState.
+Usually used only for debugging.
 
 *  lib/smtp: implement method Noop on Client
++
+--
+Noop send the NOOP command to server with optional message.
 
-   Noop send the NOOP command to server with optional message.
+On success, it will return response with Code 250, StatusOK.
 
-   On success, it will return response with Code 250, StatusOK.
-
-   While at it fix double call to recv on Reset() method.
+While at it fix double call to recv on Reset() method.
+--
 
 *  lib/smtp: implement method Reset on Client
++
+--
+The Reset() method send the STMP RSET command to the server.
 
-   The Reset() method send the STMP RSET command to the server.
+This command clear the current buffer on MAIL, RCPT, and DATA, but not the
+EHLO/HELO buffer.
 
-   This command clear the current buffer on MAIL, RCPT, and DATA, but not the
-   EHLO/HELO buffer.
-
-   On success, it will return response with Code 250, StatusOK.
+On success, it will return response with Code 250, StatusOK.
+--
 
 ===  Bug fixes
 
 *  lib/ascii: fix IsHex return false on 0
 
 *  lib/memfs: fix parent empty directory not removed
-
-   Use case:
++
+--
+Use case:
 
     x
     x/y
 
-   If x/y is empty, and x processed first, the x will
-   not be removed.
+If x/y is empty, and x processed first, the x will
+not be removed.
 
-   This commit fix this, by sorting the paths in descending order first
-   to make empty parent removed clearly.  In above case the order
-   or check become,
+This commit fix this, by sorting the paths in descending order first
+to make empty parent removed clearly.  In above case the order
+or check become,
 
     x/y
     x
 
-   While at it, update an example of New to give preview of input and
-   what the expected output for certain operations.
+While at it, update an example of New to give preview of input and
+what the expected output for certain operations.
+--
 
 *  lib/xmlrpc: rewrite the Client connection using lib/http
++
+--
+Using socket connection require reading the HTTP response header before
+we can process the response body.
 
-   Using socket connection require reading the HTTP response header before
-   we can process the response body.
-
-   Instead of rewrite the parser, use the lib/http to send and receive
-   the request/response.
+Instead of rewrite the parser, use the lib/http to send and receive
+the request/response.
+--
 
 *  lib/io: do not use absolute path on dummy Watcher parent SysPath
-
-   Converting that parameter path to absolute path may cause unpredictable
-   result on module that use it.
++
+Converting that parameter path to absolute path may cause unpredictable
+result on module that use it.
 
 ===  Chores
 
 *  lib/ini: add example of marshal/unmarshaling of section with sub
-
-   This changes also fix the example of field tag on marshaling the
-   map.
++
+This changes also fix the example of field tag on marshaling the
+map.
 
 *  lib/io: add method String to FileState type
-
-   The String method return the string representation of FileState.
-   Usually used only for debugging.
++
+The String method return the string representation of FileState.
+Usually used only for debugging.
 
 *  lib/memfs: remove unnecessary initialization on NewNode
-
-   The zero value for V ([]byte) is already nil and Node.Childs
-   ([]*Node) does not need to be initialized with make if size is 0.
++
+The zero value for V ([]byte) is already nil and Node.Childs
+([]*Node) does not need to be initialized with make if size is 0.
 
 *  lib/io: use t.Cleanup instead of defer on test
 
@@ -630,138 +680,158 @@ This release bring major changes and enhancements to package dns and math/big.
 === Breaking changes
 
 *  lib/io: separate FileState for updated mode and content
++
+--
+Previously, when content of file being watched is modified, it will
+trigger the callback with State set to FileStateModified.  When the
+mode of file is modified, it will also trigger the callback with
+the same state.
 
-   Previously, when content of file being watched is modified, it will
-   trigger the callback with State set to FileStateModified.  When the
-   mode of file is modified, it will also trigger the callback with
-   the same state.
-
-   This changes separated those state into two kind: FileStateUpdateMode
-   for update on file mode, and FileStateUpdateContent for update on
-   file content.
+This changes separated those state into two kind: FileStateUpdateMode
+for update on file mode, and FileStateUpdateContent for update on
+file content.
+--
 
 === New features
 
 *  lib/memfs: export the Node Update method
++
+--
+The Update method update the node metadata or content based on new
+file information.
+It accept two parameters: the new file information, newInfo, and
+maximum file size, maxFileSize.
 
-   The Update method update the node metadata or content based on new
-   file information.
-   It accept two parameters: the new file information, newInfo, and
-   maximum file size, maxFileSize.
+The newInfo parameter is optional, if its nil, it will read the file
+information based on node's SysPath.
 
-   The newInfo parameter is optional, if its nil, it will read the file
-   information based on node's SysPath.
+The maxFileSize parameter is also optional.
+If its negative, the node content will not be updated.
+If its zero, it will default to 5 MB.
 
-   The maxFileSize parameter is also optional.
-   If its negative, the node content will not be updated.
-   If its zero, it will default to 5 MB.
-
-   There are two possible changes that will happen: its either change on
-   mode or change on content (size and modtime).
-   Change on mode will not affect the content of node.
+There are two possible changes that will happen: its either change on
+mode or change on content (size and modtime).
+Change on mode will not affect the content of node.
+--
 
 *  lib/strings: add function Alnum
-
-   The Alnum remove non alpha-numeric character from text and return it.
-   Its accept the string to be cleanup and boolean parameter withSpace.
-   If withSpace is true then white space is allowed, otherwise it would
-   also be removed from text.
++
+--
+The Alnum remove non alpha-numeric character from text and return it.
+Its accept the string to be cleanup and boolean parameter withSpace.
+If withSpace is true then white space is allowed, otherwise it would
+also be removed from text.
+--
 
 === Bug fixes
 
 *  lib/memfs: fix symlink to directory not included on mount
++
+--
+During mounting and scanning a directory, if the node is symlink to a
+directory, the isIncluded will return false because the node is not
+a file nor directory.
 
-   During mounting and scanning a directory, if the node is symlink to a
-   directory, the isIncluded will return false because the node is not
-   a file nor directory.
-
-   The fix is to check if node mode is symlink first and then get the
-   the real stat.
+The fix is to check if node mode is symlink first and then get the
+the real stat.
+--
 
 *  lib/io: fix NewWatcher when called DirWatcher
++
+--
+When NewWatcher called from DirWatcher's Start(), it will called NewNode
+with nil parent parameter.  If the parent parameter is nil on NewNode
+the SysPath of new node will be set to the FileInfo.Name() instead of
+full or relative path based on current working directory.
 
-   When NewWatcher called from DirWatcher's Start(), it will called NewNode
-   with nil parent parameter.  If the parent parameter is nil on NewNode
-   the SysPath of new node will be set to the FileInfo.Name() instead of
-   full or relative path based on current working directory.
+Any operation using new node SysPath will failed because the path
+does not exist or reachable from current directory.
 
-   Any operation using new node SysPath will failed because the path
-   does not exist or reachable from current directory.
+For example, let say we have the following directory tree,
 
-   For example, let say we have the following directory tree,
+  testdata
+   |
+   +--- A
+   |
+   +--- B
 
-     testdata
-      |
-      +--- A
-      |
-      +--- B
+We then set DirWatcher Root to "testdata" from current directory.
+The DirWatcher Start then iterate over all child of "testdata" directory,
+and call NewWatcher("testdata/A", ...). On the NewWatcher, it will
+call NewNode(nil, FileInfo, -1).  Now since the parent is nil,
+the Node.SysPath will be set to FileInfo.Name() or base name of the file,
+which is "A".
 
-   We then set DirWatcher Root to "testdata" from current directory.
-   The DirWatcher Start then iterate over all child of "testdata" directory,
-   and call NewWatcher("testdata/A", ...). On the NewWatcher, it will
-   call NewNode(nil, FileInfo, -1).  Now since the parent is nil,
-   the Node.SysPath will be set to FileInfo.Name() or base name of the file,
-   which is "A".
+Later, when node content need to be read, ioutil.ReadFile("A") will
+fail because the path to "A" does not exist on current directory.
 
-   Later, when node content need to be read, ioutil.ReadFile("A") will
-   fail because the path to "A" does not exist on current directory.
-
-   This fix require to force the parameter "parent" on NewNode to be
-   required.
+This fix require to force the parameter "parent" on NewNode to be
+required.
+--
 
 *  lib/memfs: fix possible data race on PathNode
++
+--
+During Memfs Get(), if the node returned by PathNodes.Get() is null,
+the memfs instance will try to refresh the directory tree. In case
+the requested path exist, the memfs will write to PathNodes through
+AddChild()
 
-   During Memfs Get(), if the node returned by PathNodes.Get() is null,
-   the memfs instance will try to refresh the directory tree. In case
-   the requested path exist, the memfs will write to PathNodes through
-   AddChild()
-
-   At the same time, there maybe a request to access another path, which
-   cause both read and write occured.
+At the same time, there maybe a request to access another path, which
+cause both read and write occured.
+--
 
 *  lib/memfs: fix NewNode if node is symlink to directory
++
+--
+Previously, if a symlink point to directory the memfs NewNode function
+will return an error,
 
-   Previously, if a symlink point to directory the memfs NewNode function
-   will return an error,
+  AddChild wui: NewNode: read x/y: is a directory
 
-     AddChild wui: NewNode: read x/y: is a directory
+which cause the files inside y cannot be scanned (404).
 
-   which cause the files inside y cannot be scanned (404).
-
-   This commit fix this issue by checking if the original node mode is a
-   directory and return immediately.
+This commit fix this issue by checking if the original node mode is a
+directory and return immediately.
+--
 
 === Enhancements
 
 *  lib/memfs: check error on File Close on GoGenerate
++
+--
+Previously, we ignore the error for call to Close when there is an
+error in previous operation.
 
-   Previously, we ignore the error for call to Close when there is an
-   error in previous operation.
+This changes check the error returned from Close and add it to the
+returned error message.
 
-   This changes check the error returned from Close and add it to the
-   returned error message.
-
-   While at it, use consisten prefix for all returned error:
-   "MemFS.GoGenerate".
+While at it, use consisten prefix for all returned error:
+"MemFS.GoGenerate".
+--
 
 *  lib/http: support server caching file system using ETag
++
+--
+If the Server handle file system using MemFS, server will set the
+ETag [1] header using the file epoch as value.
 
-   If the Server handle file system using MemFS, server will set the
-   ETag [1] header using the file epoch as value.
+On the next request, server will compare the request header
+If-None-Match with the requested file epoch. If its equal server will
+return the response as 304 StatusNotModified.
 
-   On the next request, server will compare the request header
-   If-None-Match with the requested file epoch. If its equal server will
-   return the response as 304 StatusNotModified.
-
-   [1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+[1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+--
 
 *  lib/xmlrpc: convert the value using Sprintf on GetFieldAsString
++
+--
+Previously, the GetFieldAsString will return empty string if the
+Value type is not string.
 
-   Previously, the GetFieldAsString will return empty string if the
-   Value type is not string.
-
-   In this commit, we force the value to be string by converted it using
-   fmt.Sprintf.
+In this commit, we force the value to be string by converted it using
+fmt.Sprintf.
+--
 
 *  math/big: add some examples of Rat.Int64() and RoundToNearestAway
 
@@ -777,140 +847,159 @@ This release bring major changes and enhancements to package dns and math/big.
 ===  Bug fixes
 
 *  os/exec: fix escaped quote inside the same quote
++
+--
+Shell quote is a hell of complex.  For example, one can write
+shell that execute command that contains quote of quote,
 
-   Shell quote is a hell of complex.  For example, one can write
-   shell that execute command that contains quote of quote,
+	sh -c "psql -c 'CREATE ... IDENTIFIED BY PASSWORD '\''pass'\'''"
 
-     sh -c "psql -c 'CREATE ... IDENTIFIED BY PASSWORD '\''pass'\'''"
+or to simplify,
 
-   or to simplify,
-
-     sh -c "psql -c \"CREATE ... IDENTIFIED BY PASSWORD 'pass'\""
+	sh -c "psql -c \"CREATE ... IDENTIFIED BY PASSWORD 'pass'\""
+--
 
 *  lib/memfs: fix empty ContentType if MaxFileSize is negative
-
-   A negative MaxFileSize means the content of file will not be mapped to
-   memory, but the content type should be detected for other operation.
++
+A negative MaxFileSize means the content of file will not be mapped to
+memory, but the content type should be detected for other operation.
 
 *  lib/memfs: fix empty file not being added to tree
++
+--
+Previously, we did not check if the file size is 0 before reading the
+content or updating the content type, which cause the read on file
+return io.EOF and the file not added to caches.
 
-   Previously, we did not check if the file size is 0 before reading the
-   content or updating the content type, which cause the read on file
-   return io.EOF and the file not added to caches.
-
-   This commit fix this issue by checking for zero file size and for
-   io.EOF when reading the file content.
+This commit fix this issue by checking for zero file size and for
+io.EOF when reading the file content.
+--
 
 *  lib/memfs: fix symbolic link with different name
++
+--
+Previously, if file is symbolic link and has different name with their
+original file, it will return an error when we tried to open the file
 
-   Previously, if file is symbolic link and has different name with their
-   original file, it will return an error when we tried to open the file
+   parentpath/filename: no such file or directory
 
-      parentpath/filename: no such file or directory
+because we use the original file name, not the symlinked file name.
 
-   because we use the original file name, not the symlinked file name.
-
-   This commit fix this issue by not replacing the original FileInfo for
-   symlink but by setting only the size and mode.
+This commit fix this issue by not replacing the original FileInfo for
+symlink but by setting only the size and mode.
+--
 
 *  lib/sql: do not run migration if the last file not exist on the list
++
+--
+Previously, if the last migrated file name not found on the migration
+directory, we start executing migration start from the first file.
 
-   Previously, if the last migrated file name not found on the migration
-   directory, we start executing migration start from the first file.
-
-   This changes the behaviour to not run any migration at all.
-   Since we cannot return it as an error, we only log it.  In the future
-   we may return it.
+This changes the behaviour to not run any migration at all.
+Since we cannot return it as an error, we only log it.  In the future
+we may return it.
+--
 
 *  lib/http: fix missing content type for XML Header
-
-   If the Endpoint set the RequestType to RequestTypeXML, the response
-   header should be set to ContentTypeXML.
++
+If the Endpoint set the RequestType to RequestTypeXML, the response
+header should be set to ContentTypeXML.
 
 *  lib/xmlrpc: fix missing port on NewClient
++
+--
+Calling net.Dial or tls.Dial on host without port will cause the
+following error,
 
-   Calling net.Dial or tls.Dial on host without port will cause the
-   following error,
+  NewClient: Dial: dial tcp: address 10.148.0.164: missing port in address
 
-     NewClient: Dial: dial tcp: address 10.148.0.164: missing port in address
-
-   This changes fix this by always generate new host value using previous
-   host and port values.
+This changes fix this by always generate new host value using previous
+host and port values.
+--
 
 *  lib/smtp: return io.EOF if no data received from server
-
-   This is to prevent the recv return nil on *Response without an error,
-   which may cause panic on caller side.
++
+This is to prevent the recv return nil on *Response without an error,
+which may cause panic on caller side.
 
 *  os/exec: check for escaped backslash when ParseCommandArgs
-
-   Given the following string "cmd /a\ b" to ParseCommandArgs now
-   return "cmd" and ["/a b"] not ["/a\", "b"], because the space after a
-   is escaped using backslash.
++
+Given the following string "cmd /a\ b" to ParseCommandArgs now
+return "cmd" and ["/a b"] not ["/a\", "b"], because the space after a
+is escaped using backslash.
 
 ===  Enhancements
 
 *  lib/memfs: set default content type for empty file to "text/plain"
-
-   An empty file should be able to be displayed as text file instead of
-   downloaded as binary.
++
+An empty file should be able to be displayed as text file instead of
+downloaded as binary.
 
 *  lib/memfs: change the MarshalJSON to always return an object
++
+--
+Previously, MarshalJSON on memfs will return an object of map
+of all PathNodes and on Node it will return an object.
 
-   Previously, MarshalJSON on memfs will return an object of map
-   of all PathNodes and on Node it will return an object.
+This changes make it the JSON response consistent. If its directory
+it will return the node object with its childs, without "content".
+If its file, it will return the node object with content.
 
-   This changes make it the JSON response consistent. If its directory
-   it will return the node object with its childs, without "content".
-   If its file, it will return the node object with content.
-
-   While at it, use single "mod_time" with value is epoch and return
-   the node ContentType as "content_type".
+While at it, use single "mod_time" with value is epoch and return
+the node ContentType as "content_type".
+--
 
 *  lib/mlog: implement io.Writer and add function ErrorWriter
++
+--
+The ErrorWriter will return the internal default MultiLogger.
+A call to Write() on returned io.Writer will forward it to all registered
+error writers.
 
-   The ErrorWriter will return the internal default MultiLogger.
-   A call to Write() on returned io.Writer will forward it to all registered
-   error writers.
-
-   A Write method on MultiLogger write the b to all error writers.
-   It will always return the length of b without an error.
+A Write method on MultiLogger write the b to all error writers.
+It will always return the length of b without an error.
+--
 
 *  lib/memfs: add method Save and Encode
-
-   The Save method will write the new content to file system and update
-   the content of Node using Encode().
++
+The Save method will write the new content to file system and update
+the content of Node using Encode().
 
 *  lib/ssh: add method to set session output and error
++
+--
+Previously, all of the SSH output and error goes to os.Stdout and
+os.Stderr.
 
-   Previously, all of the SSH output and error goes to os.Stdout and
-   os.Stderr.
-
-   This changes add method SetSessionOutputError to change the output and
-   error for future remote execution.
+This changes add method SetSessionOutputError to change the output and
+error for future remote execution.
+--
 
 ===  Chores
 
 *  lib/reflect: make the IsNil tests to become an example
++
+--
+In this way we do test and provide an example at the same time.
 
-   In this way we do test and provide an example at the same time.
-
-   While at it, add another test cases for boolean, initialized slice, map,
-   and errors.
+While at it, add another test cases for boolean, initialized slice, map,
+and errors.
+--
 
 *  lib/websocket: try to fix flaky test on client
++
+--
+The following error thrown when running on Github Action using
+Ubuntu-latest and Go 1.16.3,
 
-   The following error thrown when running on Github Action using
-   Ubuntu-latest and Go 1.16.3,
-
-     client_test.go:472: write tcp 127.0.0.1:34460->127.0.0.1:9001:
+	client_test.go:472: write tcp 127.0.0.1:34460->127.0.0.1:9001:
        write: connection reset by peer
 
-   This may be caused by using the same client connection on all test
-   cases.
+This may be caused by using the same client connection on all test
+cases.
 
-   We try to fix this by creating new client on each test cases.
-
+We try to fix this by creating new client on each test cases.
+--
 
 ==  share v0.29.1 (2021-08-06)
 
@@ -935,63 +1024,71 @@ implementing "sftp" subsystem using the ssh.Client connection.
 ===  Breaking changes
 
 *  text/diff: add functions to compare raw bytes as text and text.Lines
++
+--
+This changes refactoring some functions, notably,
 
-   This changes refactoring some functions, notably,
-
-   * Rename Bytes function to IsEqual
-   * Rename Lines function to Bytes
-   * Add function Text that compare two text (raw bytes)
-   * Add function Lines that compare two instances of text.Lines
+* Rename Bytes function to IsEqual
+* Rename Lines function to Bytes
+* Add function Text that compare two text (raw bytes)
+* Add function Lines that compare two instances of text.Lines
+--
 
 ===  Enhancements
 
 *  lib/mlog: add function and method Panicf
-
-   The Panicf method is equal to Errf followed by panic.  This signature
-   follow the log.Panicf convention.
++
+The Panicf method is equal to Errf followed by panic.  This signature
+follow the log.Panicf convention.
 
 *  lib/text: implement function to parse raw bytes into Lines
 
 *  lib/text: implement Stringer on Chunk and Line types
 
 *  lib/memfs: implement json.Marshaler on MemFS and Node
++
+--
+Previously, without MarshalJSON, encoding the MemFS or Node object will
+result in incomplete information, for example, missing name, modification
+time, and size.
 
-   Previously, without MarshalJSON, encoding the MemFS or Node object will
-   result in incomplete information, for example, missing name, modification
-   time, and size.
-
-   This commit implement the json.Marshaler in MemFS which encode the
-   PathNode sorted by keys in ascending order.
+This commit implement the json.Marshaler in MemFS which encode the
+PathNode sorted by keys in ascending order.
+--
 
 *  lib/bytes: print the ASCII character on the right side on PrintHex
++
+--
+Previously, PrintHex only print the hex value of all bytes with
+specified length.
 
-   Previously, PrintHex only print the hex value of all bytes with
-   specified length.
-
-   This changes also print any printables ASCII characters (char 33 through
-   126) in the right side column to view readable contents.
+This changes also print any printables ASCII characters (char 33 through
+126) in the right side column to view readable contents.
+--
 
 *  lib/totp: lib/totp: increase the maximum steps back on Verify from 2 to 20
-
-   The value 20 means the Verify will check maximum 20 TOTP tokens or 10
-   minutes to the past.
++
+The value 20 means the Verify will check maximum 20 TOTP tokens or 10
+minutes to the past.
 
 *  lib/http: check request path as HTML file on getFSNode
++
+--
+Previously, if the request path is not exist we check if request
+contains index.html and if still not exist we return nil.
 
-   Previously, if the request path is not exist we check if request
-   contains index.html and if still not exist we return nil.
+This commit add another check by appending ".html" to the request path.
 
-   This commit add another check by appending ".html" to the request path.
-
-   So, for example, if path "/x" not exist in memfs, we check if
-   "/x/index.html". If its still not exist, we check "/x.html".
+So, for example, if path "/x" not exist in memfs, we check if
+"/x/index.html". If its still not exist, we check "/x.html".
+--
 
 ===  Bug fix
 
 *  lib/errors: return the internal error only if its not nil on Unwrap
-
-   If the internal error is nil, the Unwrap method will return the instance
-   of e itself.
++
+If the internal error is nil, the Unwrap method will return the instance
+of e itself.
 
 
 == share v0.28.0 (2021-07-06)
@@ -999,58 +1096,65 @@ implementing "sftp" subsystem using the ssh.Client connection.
 === Breaking changes
 
 * lib/ssh: rename method Get to ScpGet and Put to ScpPut
++
+--
+This changes is to make clear that the methods to copy the files, either
+from local or from remote, is using the "scp" through exec package,
+not using the native SSH file transfer protocol.
 
-  This changes is to make clear that the methods to copy the files, either
-  from local or from remote, is using the "scp" through exec package,
-  not using the native SSH file transfer protocol.
-
-  While at it, use consistent log prefix for error message.
+While at it, use consistent log prefix for error message.
+--
 
 * ssh: rename the NewClient function to NewClientFromConfig
-
-  This is to differentiate it with x/crypto ssh package that have the same
-  function name.
++
+This is to differentiate it with x/crypto ssh package that have the same
+function name.
 
 * ssh: move the config parser to subpackage "config"
-
-  There are two reasons for moving to sub-package.  First, the code for
-  parsing the ssh_config(5) take almost 99% of the lines in the ssh package.
-  Second, in case we want to submit the code to upstream,
-  golang.org/x/crypto, we need the package to be independent, less external
-  dependencies as possible.
++
+There are two reasons for moving to sub-package.  First, the code for
+parsing the ssh_config(5) take almost 99% of the lines in the ssh package.
+Second, in case we want to submit the code to upstream,
+golang.org/x/crypto, we need the package to be independent, less external
+dependencies as possible.
 
 * http: remove the Memfs field from Server
-
-  Now that Options field has been exported, we did not need to have
-  duplicate Memfs, so this field is removed in favor of Options.Memfs.
++
+Now that Options field has been exported, we did not need to have
+duplicate Memfs, so this field is removed in favor of Options.Memfs.
 
 === Enhancements
 
 * websocket: export the Options field on the Server
++
+--
+Previously, the Options field is not exported to prevent user from
+changing it once it set through NewServer() function.
 
-  Previously, the Options field is not exported to prevent user from
-  changing it once it set through NewServer() function.
-
-  This changes export the Options field to allow user of Server access its
-  values.  We can create a method on server to return read-only options,
-  but that will over complicated the Server API.
+This changes export the Options field to allow user of Server access its
+values.  We can create a method on server to return read-only options,
+but that will over complicated the Server API.
+--
 
 * http: export the Options field on the Server
++
+--
+Previously, the Options field is not exported to prevent user from
+changing it once it set through NewServer() function.
 
-  Previously, the Options field is not exported to prevent user from
-  changing it once it set through NewServer() function.
-
-  This changes export the Options field to allow user of Server access its
-  values.  We can create a method on server to return read-only options,
-  but that will over complicated the Server API.
+This changes export the Options field to allow user of Server access its
+values.  We can create a method on server to return read-only options,
+but that will over complicated the Server API.
+--
 
 * websocket: store all the handshake headers to Handshake.Header
++
+--
+Previously only non-required headers are stored in the Handshake Header
+field, while the required header value stored on their respective fields.
 
-  Previously only non-required headers are stored in the Handshake Header
-  field, while the required header value stored on their respective fields.
-
-  This commit store all request header key and values into the Header field.
-
+This commit store all request header key and values into the Header field.
+--
 
 == share v0.27.0 (2021-06-05)
 
@@ -1060,84 +1164,92 @@ package.
 === Breaking changes
 
 * xmlrpc: change the Response to embed the errors.E
-
-  The errors.E contains code and message that also implement wrapping and
-  unwrapping error, so we can use the Response as error just like in
-  http.EndpointResponse.
++
+The errors.E contains code and message that also implement wrapping and
+unwrapping error, so we can use the Response as error just like in
+http.EndpointResponse.
 
 * xmlrpc: write the XML header when marshaling request not on client
++
+--
+Previously, the XML header is added when sending the request using
+client.
 
-  Previously, the XML header is added when sending the request using
-  client.
-
-  This commit changes it to write the header when marshaling the Request
-  instance.
+This commit changes it to write the header when marshaling the Request
+instance.
+--
 
 * xmlrpc: replace Value field for struct with map of string and value
++
+--
+Previously, for param with type "struct" is represented by slice of
+Member{Name,Value}.
 
-  Previously, for param with type "struct" is represented by slice of
-  Member{Name,Value}.
-
-  This commit changes the Value field for "struct" to a map of string and
-  value for easily access the struct's member, without looping.
+This commit changes the Value field for "struct" to a map of string and
+value for easily access the struct's member, without looping.
+--
 
 * xmlrpc: refactoring the parser for decoding XML-RPC request
++
+--
+This changes,
 
-  This changes,
-
-  * method to parse XML-RPC request,
-  * change the Member field Value type to pointer to Value,
-  * change the Request field Params type to slice of pointer of Value,
-  * change the Response field Param type to pointer to Value,
-  * rename the Value fields from Members to StructMembers and Values to
-    ArrayValues
+* method to parse XML-RPC request,
+* change the Member field Value type to pointer to Value,
+* change the Request field Params type to slice of pointer of Value,
+* change the Response field Param type to pointer to Value,
+* rename the Value fields from Members to StructMembers and Values to
+  ArrayValues
+--
 
 === New features
 
 * memfs: add function to Merge one or more instance of MemFS
++
+--
+The Merge function merge one or more instance of MemFS into single MemFS
+instance.
 
-  The Merge function merge one or more instance of MemFS into single MemFS
-  instance.
-
-  If there are two instance of Node that have the same path, the last
-  instance will be ignored.
+If there are two instance of Node that have the same path, the last
+instance will be ignored.
+--
 
 * xmlrpc: add method to marshal Response
 
 * mlog: add function and method PrintStack
-
-  The PrintStack function or method will writes to error writers the stack
-  trace returned by debug.Stack.
++
+The PrintStack function or method will writes to error writers the stack
+trace returned by debug.Stack.
 
 === Enhancements
 
 * http: add request type for XML
-
-  Setting Endpoint's RequestType to RequestTypeXML will check the content
-  type of HTTP request to match with "text/xml".
++
+Setting Endpoint's RequestType to RequestTypeXML will check the content
+type of HTTP request to match with "text/xml".
 
 === Bug fixes
 
 * memfs: set the field Parent on Node AddChild
 
 * xmlrpc: convert the uint8 and uint16 as type Integer, and Uint as Double
-
-  Previously, uint8 and uint16 will be converted as Double, but those
-  types are in range of four bytes so it can still be handled by int32.
++
+Previously, uint8 and uint16 will be converted as Double, but those
+types are in range of four bytes so it can still be handled by int32.
 
 * xmlrpc: set client response IsFault when StatusCode >= 400
-
-  Previously, we set IsFault to true if the HTTP response code not equal to
-  200 only, which is not always correct.
-
-  This commit changes it to check any status code that is greater or equal
-  to 400.
++
+Previously, we set IsFault to true if the HTTP response code not equal to
+200 only, which is not always correct.
++
+This commit changes it to check any status code that is greater or equal
+to 400.
 
 * memfs: fix test by checking multiple content-types
-
-  On Arch Linux with Go tip, the content-type for JavaScript file is
-  "text/javascript".  While on Ubuntu with Go 1.16 the content-type for
-  JavaScript file is "application/javascript".
++
+On Arch Linux with Go tip, the content-type for JavaScript file is
+"text/javascript".  While on Ubuntu with Go 1.16 the content-type for
+JavaScript file is "application/javascript".
 
 
 ==  share v0.26.0 (2021-05-03)
@@ -1145,66 +1257,66 @@ package.
 === New features
 
 * math/big: add method Add, IsLess, IsGreater, and Scan on Int
-
-  The Add method simplify addition of one value to current Int.
-
-  The IsLess and IsGreater method simplify comparing Int with any value.
-
-  The Scan method allow the Int to be used on sql Scan().
++
+The Add method simplify addition of one value to current Int.
++
+The IsLess and IsGreater method simplify comparing Int with any value.
++
+The Scan method allow the Int to be used on sql Scan().
 
 * math/big: add method IsZero on Int
-
-  The IsZero method will return true if the current i value is zero.
++
+The IsZero method will return true if the current i value is zero.
 
 * big: extends the standard big.Int
-
-  The standard big.Int does not implement sql/driver.Valuer interface,
-  which make it not usable when querying or doing update/insert with
-  database.
-
-  This commit extend the big.Int and simplify creating new Int from any
-  values using NewInt().
-
-  Also, make it support marshal/unmarshal JSON
++
+The standard big.Int does not implement sql/driver.Valuer interface,
+which make it not usable when querying or doing update/insert with
+database.
++
+This commit extend the big.Int and simplify creating new Int from any
+values using NewInt().
++
+Also, make it support marshal/unmarshal JSON
 
 === Enhancements
 
 * sql: make the column filename on table _migration as primary key
-
-  This will allow deleting the record by filename instead of requiring
-  all columns.
++
+This will allow deleting the record by filename instead of requiring
+all columns.
 
 * http: add the Total field to EndpointResponse
-
-  The Total field contains the total number of all records, while the
-  Count fields only contains the total number of records in Data.
++
+The Total field contains the total number of all records, while the
+Count fields only contains the total number of records in Data.
 
 * http: add field Page to EndpointResponse
-
-  The page field contains the requested page on current response.
-  If page is from request then the offset will be set to page times limit.
-
-  While at it, move the field comment to its declaration.
++
+The page field contains the requested page on current response.
+If page is from request then the offset will be set to page times limit.
++
+While at it, move the field comment to its declaration.
 
 * big: allow creating new Rat from uint64 and *big.Int
 
 * ssh: check for empty private key file on Get and Put
-
-  If the private key file is empty, skip it for being added as parameter
-  of scp command.  This is to prevent warning message on user side.
++
+If the private key file is empty, skip it for being added as parameter
+of scp command.  This is to prevent warning message on user side.
 
 === Chores
 
 * memfs: update the test ContentType for JavaScript files
-
-  The latest Go set the content type for JavaScript file as
-  "text/javascript; charset=utf-8", not "application/javascript".
++
+The latest Go set the content type for JavaScript file as
+"text/javascript; charset=utf-8", not "application/javascript".
 
 * paseto: replace le64() function with binary.Write()
-
-  The le64() return the string representation of uint64 in little endian,
-  which is basically binary.Write with parameter output buffer,
-  LittleEndian, and input value.
++
+The le64() return the string representation of uint64 in little endian,
+which is basically binary.Write with parameter output buffer,
+LittleEndian, and input value.
 
 
 ==  share v0.25.1 (2021-04-06)
@@ -1224,96 +1336,102 @@ We choose to move forward.
 ===  Breaking changes
 
 *  all: refactoring the test.Assert and test.AssertBench signature
-
-   Previously, the test.Assert and test.AssertBench functions has the
-   boolean parameter to print the stack trace of test in case its not equal.
-
-   Since this parameter is not mandatory and its usually always set to
-   "true", we remove them from function signature to simplify the call
-   to Assert and AssertBench.
++
+Previously, the test.Assert and test.AssertBench functions has the
+boolean parameter to print the stack trace of test in case its not equal.
++
+Since this parameter is not mandatory and its usually always set to
+"true", we remove them from function signature to simplify the call
+to Assert and AssertBench.
 
 *  all: refactoring http.Client methods signature
++
+--
+Previously, parameters to method Delete, Get, Post, PostForm, PostFormData,
+PostJSON, Put, and PutJSON are in the following order:
 
-   Previously, parameters to method Delete, Get, Post, PostForm, PostFormData,
-   PostJSON, Put, and PutJSON are in the following order:
+	(headers, path, params)
 
-     (headers, path, params)
+This is sometimes confusing. To make it better and works with format
+of HTTP request header,
 
-   This is sometimes confusing. To make it better and works with format
-   of HTTP request header,
+----
+METHOD PATH
+HEADERS
 
-     METHOD PATH
-     HEADERS
+PARAMS
+----
 
-     PARAMS
-
-   we move the path to the first parameter and headers as the second
-   parameter, so the call to client methods would be
+we move the path to the first parameter and headers as the second
+parameter, so the call to client methods would be
 
      (path, headers, params)
+--
 
 *  http: remove parameter contentType on Client method Put
-
-   Since one can set the Content-Type in parameter headers, this parameter is
-   become redundant.
++
+Since one can set the Content-Type in parameter headers, this parameter is
+become redundant.
 
 ===  New features
 
 * http: add method to generate standard HTTP request on Client
++
+--
+The GenerateHttpRequest method generate http.Request instance from
+method, path, requestType, headers, and params.
 
-  The GenerateHttpRequest method generate http.Request instance from
-  method, path, requestType, headers, and params.
+For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
+value should be nil or url.Values.
+If its url.Values, then the params will be encoded as query parameters.
 
-  For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
-  value should be nil or url.Values.
-  If its url.Values, then the params will be encoded as query parameters.
+For HTTP method is PATCH, POST, or PUT; the params will converted based on
+requestType rules below,
 
-  For HTTP method is PATCH, POST, or PUT; the params will converted based on
-  requestType rules below,
+* If requestType is RequestTypeQuery and params is url.Values it will be
+  added as query parameters in the path.
 
-    * If requestType is RequestTypeQuery and params is url.Values it will be
-      added as query parameters in the path.
+* If requestType is RequestTypeForm and params is url.Values it will be
+  added as URL encoded in the body.
 
-    * If requestType is RequestTypeForm and params is url.Values it will be
-      added as URL encoded in the body.
+* If requestType is RequestTypeMultipartForm and params type is
+  map[string][]byte, then it will be converted as multipart form in the
+  body.
 
-    * If requestType is RequestTypeMultipartForm and params type is
-      map[string][]byte, then it will be converted as multipart form in the
-      body.
-
-    * If requestType is RequestTypeJSON and params is not nil, the params will
-      be encoded as JSON in body.
+* If requestType is RequestTypeJSON and params is not nil, the params will
+  be encoded as JSON in body.
+--
 
 * ssh: ask for passphrase if private key is encrypted on generateSigners
-
-  In case the private key defined in IdentityFile is encrypted, prompt
-  for the passphrase on the screen and read it from stdin using
-  terminal.ReadPassword().
-
-  This changes also remove call to generateSigners on postConfig(),
-  instead invoke it from NewClient() to minimize multiple calls to
-  generateSigners().
++
+In case the private key defined in IdentityFile is encrypted, prompt
+for the passphrase on the screen and read it from stdin using
+terminal.ReadPassword().
++
+This changes also remove call to generateSigners on postConfig(),
+instead invoke it from NewClient() to minimize multiple calls to
+generateSigners().
 
 * ssh: use the SSH agent to authenticate on NewClient
-
-  Previously, the client use the IdentityFile on ConfigSection to
-  Authenticate with the remote SSH server.  In case the IdentityFile is
-  Encrypted with passphrase, each time NewClient is invoked it will ask
-  For passphrase.
-
-  To minimize inputing the passphrase, we check if current use run the
-  SSH agent through SSH_AUTH_SOCK environment variable and use the agent
-  To generate signers.
-
-  This method need manual key added by user to SSH agent before calling
-  NewClient to make it works.
++
+Previously, the client use the IdentityFile on ConfigSection to
+Authenticate with the remote SSH server.  In case the IdentityFile is
+Encrypted with passphrase, each time NewClient is invoked it will ask
+For passphrase.
++
+To minimize inputing the passphrase, we check if current use run the
+SSH agent through SSH_AUTH_SOCK environment variable and use the agent
+To generate signers.
++
+This method need manual key added by user to SSH agent before calling
+NewClient to make it works.
 
 ===  Enhancements
 
 * xmlrpc: add debug statements to print request and response
-
-  The debug level is set minimum to 3. If its set it will print the
-  request and response to standard output.
++
+The debug level is set minimum to 3. If its set it will print the
+request and response to standard output.
 
 
 ==  share v0.24.0 (2021-03-06)
@@ -1321,150 +1439,156 @@ We choose to move forward.
 ===  Breaking changes
 
 *  http: add prefix Header to constants AcceptEncoding and ContentEncoding
-
-   Since both of those constants are used only for HTTP header, it could
-   be more clear if we prefix it with "Header".
++
+Since both of those constants are used only for HTTP header, it could
+be more clear if we prefix it with "Header".
 
 *  sql: change the parameter ExtractSQLFields to driver name
-
-   Previously, we use the string as parameter to set the returned place
-   holders.
-
-   This commit changes the parameter to the driver name so if the value
-   is "postgres" the place holders will be returned as counter, for example
-   "$1", "$2", and so on.
++
+Previously, we use the string as parameter to set the returned place
+holders.
++
+This commit changes the parameter to the driver name so if the value
+is "postgres" the place holders will be returned as counter, for example
+"$1", "$2", and so on.
 
 *  http: rename "GenericResponse" to "EndpointResponse"
-
-   Well, the hard thing in software is naming a thing.  Using the term
-   Generic is too generic, so we change it to make it closer with Endpoint.
++
+Well, the hard thing in software is naming a thing.  Using the term
+Generic is too generic, so we change it to make it closer with Endpoint.
 
 *  http: refactoring parameters on Callback and CallbackErrorHandler
-
-   Previously, the parameters to Callback has three types:
-   the http.ResponseWriter, *http.Request, and []byte for response body.
-   Not only the type names are long, there is no information on the
-   registered Endpoint on the receiver of Callback.
-
-   This changes wrap the three parameters into single type EndpointRequest
-   with addition field Endpoint, which contains the registered Endpoint.
-
-   On the CallbackErrorHandler we also have three parameters, but instead
-   of request body we have an error.
-
-   This changes store the error for CallbackErrorHandler inside
-   EndpointRequest.Error field.
++
+Previously, the parameters to Callback has three types:
+the http.ResponseWriter, *http.Request, and []byte for response body.
+Not only the type names are long, there is no information on the
+registered Endpoint on the receiver of Callback.
++
+This changes wrap the three parameters into single type EndpointRequest
+with addition field Endpoint, which contains the registered Endpoint.
++
+On the CallbackErrorHandler we also have three parameters, but instead
+of request body we have an error.
++
+This changes store the error for CallbackErrorHandler inside
+EndpointRequest.Error field.
 
 *  http: move the CORS options to separate struct
 
 ===  New features
 
 *  http: add methods IPAddressOfRequest and ParseXForwardedFor
-
-   The IPAddressOfRequest get the client IP address from HTTP request header
-   "X-Real-IP" or "X-Forwarded-For" or from Request.RemoteAddr, which ever
-   non-empty first.
-
-   The ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from
-   the following format "client, proxy1, proxy2" into client address and
-   list of proxy addressess.
++
+The IPAddressOfRequest get the client IP address from HTTP request header
+"X-Real-IP" or "X-Forwarded-For" or from Request.RemoteAddr, which ever
+non-empty first.
++
+The ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from
+the following format "client, proxy1, proxy2" into client address and
+list of proxy addressess.
 
 *  api/slack: create new client for webhook
-
-   Unlike PostWebhook API which is close and open one connection at the
-   time, the WebhookClient is keep open.
-
-   Use the WebhookClient for long running program that post message every
-   minutes or seconds.
++
+Unlike PostWebhook API which is close and open one connection at the
+time, the WebhookClient is keep open.
++
+Use the WebhookClient for long running program that post message every
+minutes or seconds.
 
 *  mlog: implement MultiLogger
++
+--
+MultiLogger represent a single log writer that write to multiple outputs.
+MultiLogger can have zero or more writers for standard output (normal log)
+and zero or more writers for standard error.
 
-   MultiLogger represent a single log writer that write to multiple outputs.
-   MultiLogger can have zero or more writers for standard output (normal log)
-   and zero or more writers for standard error.
+The MultiLogger is buffered to minimize waiting time when writing to
+multiple writers that have different latencies.
+For example, if we have one writer to os.Stdout, one writer to file, and
+one writer to network; the writer to network may take more time to finish
+than to os.Stdout and file, which may slowing down the program if we want
+to wait for all writes to finish.
 
-   The MultiLogger is buffered to minimize waiting time when writing to
-   multiple writers that have different latencies.
-   For example, if we have one writer to os.Stdout, one writer to file, and
-   one writer to network; the writer to network may take more time to finish
-   than to os.Stdout and file, which may slowing down the program if we want
-   to wait for all writes to finish.
+For this reason, do not forget to call Flush when your program exit.
 
-   For this reason, do not forget to call Flush when your program exit.
+The default MultiLogger use time.RFC3339 as the default time layout, empty
+prefix, os.Stdout for the output writer, and os.Stderr for the error
+writer.
 
-   The default MultiLogger use time.RFC3339 as the default time layout, empty
-   prefix, os.Stdout for the output writer, and os.Stderr for the error
-   writer.
+Format of written log,
 
-   Format of written log,
+	[time] [prefix] <message>
 
-     [time] [prefix] <message>
-
-   The time and prefix only printed if its not empty, and the single space is
-   added for convenience.
-   Unlike standard log package, this package does not add new line to the end
-   of message if its not exist.
+The time and prefix only printed if its not empty, and the single space is
+added for convenience.
+Unlike standard log package, this package does not add new line to the end
+of message if its not exist.
+--
 
 *  http: export the HandleFS method
-
-   The HandleFS handle the request as resource in the memory file system.
-   This method only works if the Server.Memfs is not nil.
-
-   If the request Path exists in file system, it will return 200 OK with the
-   header Content-Type set accordingly to the detected file type and the
-   response body set to the content of file.
-   If the request Method is HEAD, only the header will be sent back to client.
-
-   If the request Path is not exist it will return 404 Not Found.
++
+The HandleFS handle the request as resource in the memory file system.
+This method only works if the Server.Memfs is not nil.
++
+If the request Path exists in file system, it will return 200 OK with the
+header Content-Type set accordingly to the detected file type and the
+response body set to the content of file.
+If the request Method is HEAD, only the header will be sent back to client.
++
+If the request Path is not exist it will return 404 Not Found.
 
 *  clise: add method Pop
-
-   The Pop method remove the last Push()-ed item and return it to caller.
-   It will return nil if no more item inside it.
++
+The Pop method remove the last Push()-ed item and return it to caller.
+It will return nil if no more item inside it.
 
 *  ini: add support for marshaling slice of struct
++
+--
+Given a struct with exported field is slice of struct and tagged with
+section and sub-section, the exported field will be marshalled as,
 
-   Given a struct with exported field is slice of struct and tagged with
-   section and sub-section, the exported field will be marshalled as,
-
-     [section "sub"]
-     field = value
+	[section "sub"]
+	field = value
+--
 
 *  ini: add support for marshaling pointer to struct and to time.Time
++
+--
+Given the following field struct with tag,
 
-   Given the following field struct with tag,
+	V *T `ini:"sec:sub"
 
-      V *T `ini:"sec:sub"
+If the V is not nil, it will marshal it into,
 
-   If the V is not nil, it will marshal it into,
-
-      [sec "sub"]
-      <field name or tag> = <field value>
+	[sec "sub"]
+	<field name or tag> = <field value>
+--
 
 *  ini: add support for un-marshaling to struct and slice of struct
 
 *  big: add method that implement sql/driver.Valuer for type Rat
-
-   The Rat.Value() return the value as []byte.
++
+The Rat.Value() return the value as []byte.
 
 === Enhancements
 
 *  clise: make all methods safe for concurrent use
 
 *  http: add fields for paging on GenericResponse
-
-   If the response is paging, contains more than one item in data, one
-   can set the current status of paging in field Offset, Limit, and Count.
-
-   The Offset field contains the start of paging.
-   The Limit field contains the maximum number of records per page.
-   The Count field contains the total number of records.
++
+If the response is paging, contains more than one item in data, one
+can set the current status of paging in field Offset, Limit, and Count.
++
+The Offset field contains the start of paging.
+The Limit field contains the maximum number of records per page.
+The Count field contains the total number of records.
 
 === Bug fixes
 
 *  reflect: check using equal statement on IsNil
-
-   Beside using IsNil(), return the last check using "v == nil".
++
+Beside using IsNil(), return the last check using "v == nil".
 
 
 ==  share v0.23.0 (2021-02-05)
@@ -1477,96 +1601,98 @@ The minimum Go version is increased to 1.14.
 ===  Breaking changes
 
 *  memfs: refactoring, allow multiple instances of memfs in single package
-
-   Previously, the generated Go code from memfs can be used only once
-   on the package that use it.  For example, if we have two instances of
-   memfs.MemFS and both of them call GoGenerate(), when we load them back
-   again only the last one will be active and set the global variable
-   memfs.GeneratedPathNode.
-
-   This changes refactoring on how we use memfs by storing the
-   generated path node into variable that is defined by user and pass
-   them to New Options.
++
+Previously, the generated Go code from memfs can be used only once
+on the package that use it.  For example, if we have two instances of
+memfs.MemFS and both of them call GoGenerate(), when we load them back
+again only the last one will be active and set the global variable
+memfs.GeneratedPathNode.
++
+This changes refactoring on how we use memfs by storing the
+generated path node into variable that is defined by user and pass
+them to New Options.
 
 *  memfs: remove field WithContent
-
-   The field WithContent is not necessary if we set MaxFileSize to negative
-   value.
++
+The field WithContent is not necessary if we set MaxFileSize to negative
+value.
 
 *  http: embed the memfs.Options into ServerOptions
-
-   This is to minimize duplicate on fields names and give clear distinction
-   between options for Server and options for serving files on memory using
-   memfs.
++
+This is to minimize duplicate on fields names and give clear distinction
+between options for Server and options for serving files on memory using
+memfs.
 
 *  io: embed the memfs.Options into DirWatcher
-
-   This is to minimize duplicate configuration between DirWatcher and
-   memfs, and to allow clear distinction between which options that
-   affect the directory tree and options for DirWatcher.
++
+This is to minimize duplicate configuration between DirWatcher and
+memfs, and to allow clear distinction between which options that
+affect the directory tree and options for DirWatcher.
 
 *  memfs: allow AddFile to set internal path
-
-   Previously, AddFile set the internal path equal to path of file to be
-   included.  This may cause conflict if the file is already included
-   due to the same sys path but different internal path.
-
-   This commit add parameter internalPath to set custom internal path in
-   the memfs map.
++
+Previously, AddFile set the internal path equal to path of file to be
+included.  This may cause conflict if the file is already included
+due to the same sys path but different internal path.
++
+This commit add parameter internalPath to set custom internal path in
+the memfs map.
 
 *  memfs: refactoring Go generate code to use memfs.MemFS instance
-
-   Instead of using memfs.PathNode, which is confusing for new user
-   (what is PathNode?), we actually can use memfs.MemFS instance.
-
-   This effect on how we use memfs in http package.
++
+Instead of using memfs.PathNode, which is confusing for new user
+(what is PathNode?), we actually can use memfs.MemFS instance.
++
+This effect on how we use memfs in http package.
 
 *  dns: change the SOA field in ZoneFile to non-pointer
-
-   The reason we use pointer for SOA record is so we can save them only
-   if its not nil.  A nil SOA record cause the generated JSON become "null"
-   and this is make the consumer of ZoneFile do more work, checking for the
-   null and initialize it when required.
-
-   This changes, make the SOA record to non-nil and we save the record only
-   if the MName field is not empty.
++
+The reason we use pointer for SOA record is so we can save them only
+if its not nil.  A nil SOA record cause the generated JSON become "null"
+and this is make the consumer of ZoneFile do more work, checking for the
+null and initialize it when required.
++
+This changes, make the SOA record to non-nil and we save the record only
+if the MName field is not empty.
 
 *  dns: replace master word with zone
-
-   This is for consistency for type and variable names.
++
+This is for consistency for type and variable names.
 
 *  sql: sort returned names on ExtractSQLFields sorted in ascending
-
-   This is to make sure that any test that use the package always
-   predictable.
-
-   While at it, add paramter to change placeholder on ExtractSQLFields.
++
+This is to make sure that any test that use the package always
+predictable.
++
+While at it, add paramter to change placeholder on ExtractSQLFields.
 
 ===  New features
 
 *  http: add method Post on client
-
-   The Post method send the POST request to path without setting
-   "Content-Type".
++
+The Post method send the POST request to path without setting
+"Content-Type".
 
 *  lib/clise: new package that implement circular slice
++
+--
+A circular slice is a slice that have fixed size.
+An append to slice that has reached its length will overwrite and start
+again from index 0.
 
-   A circular slice is a slice that have fixed size.
-   An append to slice that has reached its length will overwrite and start
-   again from index 0.
+For example, a clise with size 5,
 
-   For example, a clise with size 5,
+	c := clise.New(5)
+	c.Push(1, 2, 3, 4, 5)
+	fmt.Printf("%v\n", c.Slice()) // [1 2 3 4 5]
 
-     c := clise.New(5)
-     c.Push(1, 2, 3, 4, 5)
-     fmt.Printf("%v\n", c.Slice()) // [1 2 3 4 5]
+If we push another item, it will overwrite the first index,
 
-   If we push another item, it will overwrite the first index,
+	c.Push(6)
+	fmt.Printf("%v\n", c.Slice()) // [6 2 3 4 5]
 
-     c.Push(6)
-     fmt.Printf("%v\n", c.Slice()) // [6 2 3 4 5]
-
-   See the examples for usage of the package.
+See the examples for usage of the package.
+--
 
 *  time: add function UnixMicro that return UNIX time in micro seconds
 
@@ -1574,52 +1700,52 @@ The minimum Go version is increased to 1.14.
    standard packages.
 
 *  runes: add function to inverse the slice of rune
-
-   The Inverse function reverse the order of slice of rune without
-   allocating another slice.
++
+The Inverse function reverse the order of slice of rune without
+allocating another slice.
 
 *  big: add method Humanize
-
-   The Humanize method return the r as string with custom thousand and
-   decimal separator.
++
+The Humanize method return the r as string with custom thousand and
+decimal separator.
 
 *  big: add method to round fraction to nearest non-zero value
-
-   The RoundNearestFraction does not require precision parameter, like in
-   other rounds function, but it figure it out based on the last non-zero
-   value from fraction.
++
+The RoundNearestFraction does not require precision parameter, like in
+other rounds function, but it figure it out based on the last non-zero
+value from fraction.
 
 ===  Enhancements
 
 *  dns: change the error messages on ResourceRecord initAndInitialize
-
-   This change make the error message more readable and understandable by
-   consumer
++
+This change make the error message more readable and understandable by
+consumer
 
 *  dns: add method to get list of non-local caches in the Server
-
-   The CachesLRU method return the list of non-local caches ordered by
-   the least recently used.
-
-   This changes affect the answer type which must be exported, including
-   most of its fields, so consumer can access it.
++
+The CachesLRU method return the list of non-local caches ordered by
+the least recently used.
++
+This changes affect the answer type which must be exported, including
+most of its fields, so consumer can access it.
 
 ===  Bug fixes
 
 *  sql: check nil on Migrate parameter "fs" using reflect.IsNil
-
-   If we pass nil pointer of type to fs, the if condition will not true
-   and this cause panic because fs is not nil.
++
+If we pass nil pointer of type to fs, the if condition will not true
+and this cause panic because fs is not nil.
 
 *  http: fix the package documentation
-
-   The RegisterXxx methods on Server has been replaced with single method,
-   RegisterEndpoint.
++
+The RegisterXxx methods on Server has been replaced with single method,
+RegisterEndpoint.
 
 *  dns: fix saving the TXT record file on zone file
-
-   The TXT record value must be wrapped with quote when stored on zone
-   file.
++
+The TXT record value must be wrapped with quote when stored on zone
+file.
 
 
 ==  share v0.22.0 (2021-01-06)
@@ -1633,19 +1759,19 @@ The minimum Go version is increased to 1.14.
 ===  New features
 
 *  cmd: add new CLI "totp"
-
-   The totp is a program to generate Time-based One-time Password from
-   secret key.
++
+The totp is a program to generate Time-based One-time Password from
+secret key.
 
 *  totp: add method to generate n number of passwords
 
 ===  Enhancements
 
 *  http: print client request if debug value is equal or greater than 2.
-
-   If user set DEBUG environment variable or debug.Value to 2 or greater,
-   the http Client will print the request (header and body) to the
-   standard output.
++
+If user set DEBUG environment variable or debug.Value to 2 or greater,
+the http Client will print the request (header and body) to the
+standard output.
 
 *  ssh: print the private key file that has an error when generating signers
 
@@ -1655,89 +1781,90 @@ The minimum Go version is increased to 1.14.
 ===  Breaking changes
 
 *  test: refactoring Assert with better error message
-
-   The new Assert function use the reflect.DoEqual that return an error
-   which describe which field have unmatched value.
++
+The new Assert function use the reflect.DoEqual that return an error
+which describe which field have unmatched value.
 
 ===  New features
 
 *  http: allow Endpoint to register custom error handler
-
-   The new field ErrorHandler on Endpoint allow the implementor to define
-   their own function to handler error from Endpoint.Call.
-
-   If the ErrorHandler is nil it will default to DefaultErrorHandler.
++
+The new field ErrorHandler on Endpoint allow the implementor to define
+their own function to handler error from Endpoint.Call.
++
+If the ErrorHandler is nil it will default to DefaultErrorHandler.
 
 *  totp: new package that implement TOTP protocol
-
-   Package totp implement Time-Based One-Time Password Algorithm based on
-   RFC 6238.
++
+Package totp implement Time-Based One-Time Password Algorithm based on
+RFC 6238.
 
 ===  Bug fixes
 
 *  parser: fix Line method that always return non-empty line
-
-   In case of content end without new line, for example "a\nb", the Line()
-   method always return "b, 0" on the last line.
++
+In case of content end without new line, for example "a\nb", the Line()
+method always return "b, 0" on the last line.
 
 *  smtp: update the expired test certificate
 
 *  websocket: create buffered channel for running queue.
-
-   This is to fix Stop() method waiting for running channel to be consumed.
++
+This is to fix Stop() method waiting for running channel to be consumed.
 
 ===  Enhancements
 
 *  big: update the latest expected error message with Go tip
 
 *  http: add an example on how to write custom HTTP status code
-
-   The example show how to use http.ResponseWriter.WriteHeader to write
-   custom HTTP status code instead of relying on errors.E.
++
+The example show how to use http.ResponseWriter.WriteHeader to write
+custom HTTP status code instead of relying on errors.E.
 
 *  net: always return the host name or IP on ParseIPPort.
-
-   Previously, if the address is an IP address the returned value is empty,
-   for example "127.0.0.1" will return empty host but with non-nil IP and
-   port.
-
-   This changes always return the host either as host name (the same as
-   paremeter) or valid IP address.
++
+Previously, if the address is an IP address the returned value is empty,
+for example "127.0.0.1" will return empty host but with non-nil IP and
+port.
++
+This changes always return the host either as host name (the same as
+paremeter) or valid IP address.
 
 ===  Chores
 
 *  all: replace the tasks to serve and generate docs using ciigo as library
-
-   This way, one does not need to install ciigo binary, only require Go
-   tools.
++
+This way, one does not need to install ciigo binary, only require Go
+tools.
 
 
 ==  share v0.20.1 (2020-11-08)
 
 ===  Bug fixes
 
-* websocket: set TLSConfig to nil if Endpoint scheme is not https or wss
-  If user set TLSConfig but the Endpoint is not start with "https" or "wss",
-  client open() method may return an error "Connect: tls: first record does
-  not look like a TLS handshake".
+* websocket: set TLSConfig to nil if Endpoint scheme is not https or wss.
++
+If user set TLSConfig but the Endpoint is not start with "https" or "wss",
+client open() method may return an error "Connect: tls: first record does
+not look like a TLS handshake".
 
 * paseto: add 5 seconds time drift when validating JSONToken
 
 ===  Enhancements
 
 * big: add method RoundToNearestAway and RoundToZero
-
-  RoundToNearestAway round r to n digit precision using nearest away mode,
-  where mantissa is accumulated by the last digit after precision.
-  For example, using 2 digit precision, 0.555 would become 0.56.
-
-  RoundToZero round r to n digit precision using to zero mode.
-  For example, using 2 digit precision, 0.555 would become 0.55.
++
+RoundToNearestAway round r to n digit precision using nearest away mode,
+where mantissa is accumulated by the last digit after precision.
+For example, using 2 digit precision, 0.555 would become 0.56.
++
+RoundToZero round r to n digit precision using to zero mode.
+For example, using 2 digit precision, 0.555 would become 0.55.
 
 * parser: add Stop method
-
-  The Stop method return the remaining unparsed content and its last
-  position, and then call Close to reset the internal state back to zero.
++
+The Stop method return the remaining unparsed content and its last
+position, and then call Close to reset the internal state back to zero.
 
 ===  Chores
 
@@ -1750,19 +1877,20 @@ The minimum Go version is increased to 1.14.
 
 *  lib/paseto: a simple, ready to use, implementation of Platform-Agnostic
    SEcurity TOkens
-
-   This implementation only support PASETO Protocol v2.
-
-   This library focus on how to sign and verify data, everything else is
-   handled and filled automatically.
++
+This implementation only support PASETO Protocol v2.
++
+This library focus on how to sign and verify data, everything else is
+handled and filled automatically.
 
 ===  Enhancements
 
-* dns: serve DoT without SSL if server is behind proxy or tlsConfig is null
-  Previously we only check for tlsConfig, if its null the DoT server
-  will not running.
-  There is a use case where the SSL terminated by proxy and the connection
-  is forwarded to DNS server, so this changes accommodated it.
+* dns: serve DoT without SSL if server is behind proxy or tlsConfig is null.
++
+Previously we only check for tlsConfig, if its null the DoT server
+will not running.
+There is a use case where the SSL terminated by proxy and the connection
+is forwarded to DNS server, so this changes accommodated it.
 
 * http: increase the debug level from 2 to 3
 
@@ -1778,22 +1906,22 @@ The minimum Go version is increased to 1.14.
 *  dns: unexport the master file path field
 
 *  dns: refactoring the ResourceRecord values from []byte to string
-
-   There are two reasons for this changes.  First, to allow JSON encoded
-   of ResourceRecord.Value without encoded to base64.
-
-   Second, to minimize unreleased packet due to the backing storage is
-   still used when assigned to Value (or any []byte field in RDataXXX).
++
+There are two reasons for this changes.  First, to allow JSON encoded
+of ResourceRecord.Value without encoded to base64.
++
+Second, to minimize unreleased packet due to the backing storage is
+still used when assigned to Value (or any []byte field in RDataXXX).
 
 *  dns: dns: split between MasterFile and masterParser
-
-   While at it add field Records that contains unpacked ResourceRecord as
-   mapping between domain and ResourceRecord.
-
-   This is useful for client that need to edit the RR in MasterFile.
-
-   This changes also unexport the Messages field, to access it use the method
-   Messages.
++
+While at it add field Records that contains unpacked ResourceRecord as
+mapping between domain and ResourceRecord.
++
+This is useful for client that need to edit the RR in MasterFile.
++
+This changes also unexport the Messages field, to access it use the method
+Messages.
 
 *  websocket: move the server handler to ServerOptions
 
@@ -1816,12 +1944,12 @@ The minimum Go version is increased to 1.14.
 *  dns: add method to initialize and validate ResourceRecord
 
 *  websocket: add server options to change the connect and status paths
-
-   Previously, there is only one option for server, the port where it will
-   listen.
-
-   This changes add option to change the connect path (default to "/"
-   previously) and new path and handler for retrieving server status.
++
+Previously, there is only one option for server, the port where it will
+listen.
++
+This changes add option to change the connect path (default to "/"
+previously) and new path and handler for retrieving server status.
 
 ===  Bug fixes
 
@@ -1839,22 +1967,22 @@ The minimum Go version is increased to 1.14.
 ===  Breaking changes
 
 *  big: add global flag MarshalJSONAsString
-
-   MarshalJSONAsString define the default return behaviour of MarshalJSON().
-   If its true (the default) the returned JSON format will encapsulated in
-   double quote, as string instead of as numeric.
++
+MarshalJSONAsString define the default return behaviour of MarshalJSON().
+If its true (the default) the returned JSON format will encapsulated in
+double quote, as string instead of as numeric.
 
 *  dns: refactoring resource record fields
 
 *  http: do not return error based on response code
-
-   The error in doRequest should be about connection error, everything
-   else should be handled by user.
++
+The error in doRequest should be about connection error, everything
+else should be handled by user.
 
 *  http: allow setting response type when registering PUT
-
-   User of this library may want to return something and they will suprised
-   if the library always set the response type to None.
++
+User of this library may want to return something and they will suprised
+if the library always set the response type to None.
 
 ===  Bug fixes
 
@@ -1913,36 +2041,36 @@ The minimum Go version is increased to 1.14.
 ===  Breaking changes
 
 *  dns: refactoring loading hosts and master files
-
-   Instead of as methods in Server, we detach the LoadHostDir and
-   LostMasterDir into functions that return list of filename and their
-   content.
++
+Instead of as methods in Server, we detach the LoadHostDir and
+LostMasterDir into functions that return list of filename and their
+content.
 
 *  dns: disable serving DoH and DoT if port is not set (0)
-
-   Previously, if HTTPPort or TLSPort is not set (0) we set it to default
-   value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
-   want to serve DNS over UDP only.
-
-   This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
-   is not set, or 0.
++
+Previously, if HTTPPort or TLSPort is not set (0) we set it to default
+value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
+want to serve DNS over UDP only.
++
+This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
+is not set, or 0.
 
 *  email: rename ParseAddress function to ParseMailboxes
 
 *  http: add parameter "insecure" when creating new client
 
 *  ini: fix inconsistencies between empty string and boolean true
-
-   In Git specification, an empty variable is equal to boolean true.
-   This cause inconsistency between empty string and boolean true.
++
+In Git specification, an empty variable is equal to boolean true.
+This cause inconsistency between empty string and boolean true.
 
 *  memfs: simplify the API, add directory parameter to New
-
-   This changes add parameter directory to be mounted in New(), so user
-   did not need to call Mount manually
-
-   This cause the Mount method and its sibling, Unmount and IsMounted
-   become unneeded, so we remove them.
++
+This changes add parameter directory to be mounted in New(), so user
+did not need to call Mount manually
++
+This cause the Mount method and its sibling, Unmount and IsMounted
+become unneeded, so we remove them.
 
 ===  Bug fixes
 
@@ -1951,9 +2079,9 @@ The minimum Go version is increased to 1.14.
 ===  New features
 
 *  bytes: add function MergeSpaces
-
-   The function MergeSpaces will convert sequences of white space into
-   single space ' '.
++
+The function MergeSpaces will convert sequences of white space into
+single space ' '.
 
 *  email: add methods to unmarshal/marshal Mailbox from/to JSON
 *  email: add function to parse single mailbox
@@ -1963,53 +2091,56 @@ The minimum Go version is increased to 1.14.
 
 *  ini: add method UnsetAll to remove all variables in section and/or
    subsection that match with the key
+
 *  ini: add method to Unmarshal ini values to struct
 
 *  os/exec: new package to simplify the standard "os/exec"
-
-   New extension to standard package is function ParseCommandArgs() that
-   receive input as string and return itas command and list of arguments.
-   Unlike strings.Fields() which only separated the field by space,
-   ParseCommandArgs can detect possible single, double, or back quotes.
-
-   Another extension is Run() function that accept the string command
-   to be executed and their standard output and error.
++
+New extension to standard package is function ParseCommandArgs() that
+receive input as string and return itas command and list of arguments.
+Unlike strings.Fields() which only separated the field by space,
+ParseCommandArgs can detect possible single, double, or back quotes.
++
+Another extension is Run() function that accept the string command
+to be executed and their standard output and error.
 
 *  sql: add method to migrate database schema
-
-   The Migrate method migrate the database using list of SQL files inside
-   a directory.
-   Each SQL file in directory will be executed in alphabetical order based on
-   the last state.
-
-   The state of migration will be saved in table "_migration" with the SQL
-   file name that has been executed and the timestamp.
++
+The Migrate method migrate the database using list of SQL files inside
+a directory.
+Each SQL file in directory will be executed in alphabetical order based on
+the last state.
++
+The state of migration will be saved in table "_migration" with the SQL
+file name that has been executed and the timestamp.
 
 ===  Enhancements
 
 *  api/telegram/bot: delete webhook upon setting new webhook
 
 *  dns: do not load hidden hosts and master file
-
-   Previously, the LoadHostDir and LoadMasterDir load all files inside
-   the directory without checking if its hidden (starting with dot) or not.
-
-   This changes make the hidden file not loaded so one can disable it
-   temporarily by prefixing it with dot.
++
+Previously, the LoadHostDir and LoadMasterDir load all files inside
+the directory without checking if its hidden (starting with dot) or not.
++
+This changes make the hidden file not loaded so one can disable it
+temporarily by prefixing it with dot.
 
 *  ini: make the add method append the variable after existing same key
 
 *  memfs: make the Node Readdir works when calling from generated Go code
++
+--
+Previously, the Go generated code from call to GoGenerate() set only
+mapping of path to node.  Calling Readdir() using http.File using
 
-   Previously, the Go generated code from call to GoGenerate() set only
-   mapping of path to node.  Calling Readdir() using http.File using
+	root, err := mfs.Open("/")
+	fis, err := root.Readdir(0)
 
-     root, err := mfs.Open("/")
-     fis, err := root.Readdir(0)
+will return nil on fis.
 
-   will return nil on fis.
-
-   This changes add all child nodes to generated node.
+This changes add all child nodes to generated node.
+--
 
 *  websocket: allow "https" scheme on Client's Endpoint
 
@@ -2026,16 +2157,17 @@ The minimum Go version is increased to 1.14.
 * ssh: implement SSH client configuration parser -- ssh_config(5)
 * api/telegram/bot: Go package for Telegram API Bot
 * http: implement a simplified HTTP client
+
 * net/html: new package to simplify the golang.org/x/net/html
-
-  The x/net/html package currently only provide bare raw functionalities
-  to iterate tree, there is no check for empty node, no function to
-  get attribute by name, and no simple way to iterate tree without looping it
-  manually.
-
-  This package extends the package by adding methods to get node's attribute
-  by name, get the first non-empty child, get the next non-empty sibling, and
-  to iterate each node in the tree from top to bottom.
++
+The x/net/html package currently only provide bare raw functionalities
+to iterate tree, there is no check for empty node, no function to
+get attribute by name, and no simple way to iterate tree without looping it
+manually.
++
+This package extends the package by adding methods to get node's attribute
+by name, get the first non-empty child, get the next non-empty sibling, and
+to iterate each node in the tree from top to bottom.
 
 ===  Enhancements
 
@@ -2055,11 +2187,11 @@ The minimum Go version is increased to 1.14.
 ===  Breaking changes
 
 *  http: simplify server Endpoint registrations
-
-   Previously, each endpoint with method DELETE, GET, PATCH, POST, and PUT
-   require calling different call for registration.  This change simplify
-   it to one call only, "RegisterEndpoint", and the registration process
-   will be handled automatically based on value on field Method.
++
+Previously, each endpoint with method DELETE, GET, PATCH, POST, and PUT
+require calling different call for registration.  This change simplify
+it to one call only, "RegisterEndpoint", and the registration process
+will be handled automatically based on value on field Method.
 
 *  mining/math: move the package from "lib/mining/" to "lib/" directory
 
@@ -2068,23 +2200,23 @@ The minimum Go version is increased to 1.14.
 *  debug: add a wrapper for starting and stopping CPU profile
 
 *  math/big: new package that extends the capabilities of "math/big"
-
-   The "big" package add custom global precision, rounding mode, and number
-   of digit precision after decimal point for all instance of Float that
-   use the package.
++
+The "big" package add custom global precision, rounding mode, and number
+of digit precision after decimal point for all instance of Float that
+use the package.
 
 *  reflect: new package that extends the standard reflect
-
-   This package add new interface "Equaler", it is an interface that
-   have single method "IsEqual()".
-
-   Also, we have new function "IsNil(interface{})" that will return true
-   if the value in interface{} is nil.
++
+This package add new interface "Equaler", it is an interface that
+have single method "IsEqual()".
++
+Also, we have new function "IsNil(interface{})" that will return true
+if the value in interface{} is nil.
 
 *  strings: add function SingleSpace
-
-   The SingleSpace function convert all sequences of white spaces into
-   single space ' '.
++
+The SingleSpace function convert all sequences of white spaces into
+single space ' '.
 
 ===  Enhancements
 
@@ -2093,14 +2225,14 @@ The minimum Go version is increased to 1.14.
 *  hunspell: return the stem instead of root word on Spell() method
 
 *  hunspell: add Stem() method to Spell and Stem
-
-   The Stem() method reduce inflected (or sometimes derived) words to
-   their word stem, base, or root form.
++
+The Stem() method reduce inflected (or sometimes derived) words to
+their word stem, base, or root form.
 
 *  hunspell: add Analyze() method to Spell and Stem
-
-   The Analyze() method will return list of morphological fields of the
-   word.
++
+The Analyze() method will return list of morphological fields of the
+word.
 
 *  strings: check for other white spaces on MergeSpaces
 
@@ -2280,7 +2412,8 @@ http.Request.Form using Get method.
 ===  Breaking Changes
 
 *  ini: set variable with "=" without a value default to empty string
-
++
+--
 Previously, a variable end with "=" will have value set to "true".
 For example,
 
@@ -2293,6 +2426,7 @@ set the "var" value to string "true".
 
 This changes make the variable that end with "=" without any value
 to be an empty string, so "var" value is equal to "".
+--
 
 ===  Bug Fixes
 

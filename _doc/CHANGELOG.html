@@ -974,47 +974,42 @@ at the same times.</p>
 <ul>
 <li>
 <p>math/big: refactoring AddFloat to accept variadic interface{}</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the AddFloat function only accept two interface parameters.</pre>
+<div class="paragraph">
+<p>Previously, the AddFloat function only accept two interface parameters.</p>
 </div>
+<div class="paragraph">
+<p>This changes make the AddFloat to accept many interface parameters.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make the AddFloat to accept many interface parameters.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>math/big: refactor NewFloat to accept interface{} instead of float64 only</p>
-<div class="literalblock">
-<div class="content">
-<pre>The following types is added and can be initialized to Float: []byte,
-uint, uint16, uint32, uint64, big.Int, *big.Int, big.Rat, and *big.Rat.</pre>
-</div>
+<div class="paragraph">
+<p>The following types is added and can be initialized to Float: []byte,
+uint, uint16, uint32, uint64, big.Int, *big.Int, big.Rat, and *big.Rat.</p>
 </div>
 </li>
 <li>
 <p>math/big: refactoring the Rat</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The promise of this package is to provide the Rat type with RoundToZero
-and without panic.</pre>
+<div class="paragraph">
+<p>The promise of this package is to provide the Rat type with RoundToZero
+and without panic.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>In order to do that we remove the MustRat() function and check for nil
+<div class="paragraph">
+<p>In order to do that we remove the MustRat() function and check for nil
 on pointer receiver before doing operation, and check for zero value
-when doing quotation.</pre>
+when doing quotation.</p>
 </div>
+<div class="paragraph">
+<p>Another breaking changes are,</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>Another breaking changes are,</pre>
-</div>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>Humanize() with nil pointer receiver will return string "0"</p>
 </li>
@@ -1025,147 +1020,138 @@ when doing quotation.</pre>
 <p>MarshalJSON() will nil pointer receiver will return "null" instead of
 "0" now</p>
 </li>
+</ul>
+</div>
+</div>
+</div>
+</li>
 <li>
 <p>lib/dns: refactoring, change signature of client Lookup</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, Lookup() method on Client pass the question name, type, and
-class as parameters.</pre>
+<div class="paragraph">
+<p>Previously, Lookup() method on Client pass the question name, type, and
+class as parameters.</p>
 </div>
+<div class="paragraph">
+<p>This changes make those parameters into MessageQuestion.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make those parameters into MessageQuestion.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: refactoring ZoneFile into Zone</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Reason: A Zone is not always represented by file, it just that in this
-package, it is.</pre>
+<div class="paragraph">
+<p>Reason: A Zone is not always represented by file, it just that in this
+package, it is.</p>
 </div>
+<div class="paragraph">
+<p>This changes rename the type ZoneFile into Zone.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes rename the type ZoneFile into Zone.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: refactoring message question</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously the type for message question section SectionQuestion.</pre>
+<div class="paragraph">
+<p>Previously the type for message question section SectionQuestion.</p>
 </div>
+<div class="paragraph">
+<p>This changes, rename the type to MessageQuestion.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes, rename the type to MessageQuestion.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: refactoring the section header</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>This changes rename the SectionHeader into MessageHeader.</pre>
+<div class="paragraph">
+<p>This changes rename the SectionHeader into MessageHeader.</p>
 </div>
+<div class="paragraph">
+<p>The pack() method is optimized with the following results,</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>The pack() method is optimized with the following results,</pre>
+<div class="paragraph">
+<p>benchmark                         old ns/op     new ns/op     delta
+BenchmarkMessageHeader_pack-8     66.2          21.7          -67.31%</p>
 </div>
+<div class="paragraph">
+<p>benchmark                         old allocs     new allocs     delta
+BenchmarkMessageHeader_pack-8     3              1              -66.67%</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>benchmark                         old ns/op     new ns/op     delta
-BenchmarkMessageHeader_pack-8     66.2          21.7          -67.31%</pre>
+<div class="paragraph">
+<p>benchmark                         old bytes     new bytes     delta
+BenchmarkMessageHeader_pack-8     32            16            -50.00%</p>
 </div>
+<div class="paragraph">
+<p>The unpack() method is simplified by minimizing the if-condition.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>benchmark                         old allocs     new allocs     delta
-BenchmarkMessageHeader_pack-8     3              1              -66.67%</pre>
+<div class="paragraph">
+<p>This changes also fix the pack and unpack OpCode for value other then 0,
+due to wrong shift value, 2 instead of 3.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>benchmark                         old bytes     new bytes     delta
-BenchmarkMessageHeader_pack-8     32            16            -50.00%</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The unpack() method is simplified by minimizing the if-condition.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes also fix the pack and unpack OpCode for value other then 0,
-due to wrong shift value, 2 instead of 3.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: refactoring, introduce new type RecordClass</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the record class is represented by uint16 using prefix
-QueryClassXxx.</pre>
+<div class="paragraph">
+<p>Previously, the record class is represented by uint16 using prefix
+QueryClassXxx.</p>
 </div>
+<div class="paragraph">
+<p>This changes make the record class to be an independent type, to make
+code more strict (prevent passing invalid value), and readable.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make the record class to be an independent type, to make
-code more strict (prevent passing invalid value), and readable.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: refactoring, create type RecordType to represent type of RR</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, we use uint16 to represent type for ResourceRecord Type or
-Question type.</pre>
+<div class="paragraph">
+<p>Previously, we use uint16 to represent type for ResourceRecord Type or
+Question type.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>To make the code more strict, where parameter or return value, must be
+<div class="paragraph">
+<p>To make the code more strict, where parameter or return value, must be
 expected as record type, we add new type to represent the RR type:
-RecordType.</pre>
+RecordType.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes also rename any variable name of QType or qtype to RType
+<div class="paragraph">
+<p>This changes also rename any variable name of QType or qtype to RType
 or rtype because QType is misleading. The type defined the
-ResourceRecord to be queried not only question.</pre>
+ResourceRecord to be queried not only question.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: remove the fallback name servers (NS) from server options</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The original idea of fallback NS is to send the query to the one define
+<div class="paragraph">
+<p>The original idea of fallback NS is to send the query to the one define
 to original resolv.conf, instead of using the one defined by user in
-ServerOptions NameServers, when an error occured.</pre>
+ServerOptions NameServers, when an error occured.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>But, most of error usually caused by network (disconnected, time out),
+<div class="paragraph">
+<p>But, most of error usually caused by network (disconnected, time out),
 so re-sending query to fallback NS does not have any effect if the network
-it self is not working.</pre>
+it self is not working.</p>
 </div>
+<div class="paragraph">
+<p>This changes remove the unnecessary and complex fallback NS from
+server.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes remove the unnecessary and complex fallback NS from
-server.</pre>
 </div>
 </div>
 </li>
@@ -1178,48 +1164,46 @@ server.</pre>
 <ul>
 <li>
 <p>lib/dns: add support to save and load caches to/from storage</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The CachesSave method write the non-local answers into an io.Writer,
-encoded with gob.</pre>
+<div class="paragraph">
+<p>The CachesSave method write the non-local answers into an io.Writer,
+encoded with gob.</p>
 </div>
+<div class="paragraph">
+<p>The CachesLoad method load the gob encoded answers from an io.Reader.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>The CachesLoad method load the gob encoded answers from an io.Reader.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/ssh: use agent defined by config or from environment variable</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, we only check the environment variable SSH_AUTH_SOCK
+<div class="paragraph">
+<p>Previously, we only check the environment variable SSH_AUTH_SOCK
 to decide whether the client identity will fetched from agent or
-from private key file.</pre>
+from private key file.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes use the GetIdentityAgent from config Section to derive the
+<div class="paragraph">
+<p>This changes use the GetIdentityAgent from config Section to derive the
 path to unix socket.  It will return an empty string if the IdentityAgent
 is set to "none" in the Section or when SSH_AUTH_SOCK is not exist or
-empty.</pre>
+empty.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>ssh/config: add support for section variable IdentityAgent</p>
-<div class="literalblock">
-<div class="content">
-<pre>There are four possible value for IdentityAgent: SSH_AUTH_SOCK,
+<div class="paragraph">
+<p>There are four possible value for IdentityAgent: SSH_AUTH_SOCK,
 &lt;$STRING&gt;, &lt;PATH&gt;, or "none".
 If SSH_AUTH_SOCK, the socket path is read from the environment variable
 SSH_AUTH_SOCK.
 If value start with "$", then the socket path is set based on value of
 that environment variable.
-Other string beside "none" will be considered as path to socket.</pre>
-</div>
+Other string beside "none" will be considered as path to socket.</p>
 </div>
 </li>
 </ul>
@@ -1231,30 +1215,31 @@ Other string beside "none" will be considered as path to socket.</pre>
 <ul>
 <li>
 <p>math/big: return nil on Quo and QuoRat instead of panic</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, if the first parameter of Quo or the second/next parameters
+<div class="paragraph">
+<p>Previously, if the first parameter of Quo or the second/next parameters
 of QuoRat is not convertable to Rat or zero, the method/function will
-panic.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make it less intrusive, instead of panic we check for
-zero value and return nil immediately.</pre>
-</div>
+panic.</p>
 </div>
 </li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This changes make it less intrusive, instead of panic we check for
+zero value and return nil immediately.
+&#8212;</p>
+</div>
+<div class="ulist">
+<ul>
 <li>
 <p>lib/dns: do not cache truncated answer</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously only answer with non-zero response code is ignored.</pre>
+<div class="paragraph">
+<p>Previously only answer with non-zero response code is ignored.</p>
 </div>
+<div class="paragraph">
+<p>This changes ignore also answer where response header is truncated.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes ignore also answer where response header is truncated.</pre>
 </div>
 </div>
 </li>
@@ -1267,11 +1252,11 @@ zero value and return nil immediately.</pre>
 <ul>
 <li>
 <p>lib/dns: realign all struct fields</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Turns out the struct that we frequently used, answer and resource_record,
-is not optimized.</pre>
-</div>
+<div class="paragraph">
+<p>Turns out the struct that we frequently used, answer and resource_record,
+is not optimized.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1280,46 +1265,44 @@ is not optimized.</pre>
 resource_record.go:24:21: struct with 56 pointer bytes could be 40 = 16</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes reorder all structs field to save space in memory.</pre>
+<div class="paragraph">
+<p>This changes reorder all structs field to save space in memory.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: make the TCP forwarders as complementary of UDP</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The TCP forwarders only active when client send the DNS request as TCP.
+<div class="paragraph">
+<p>The TCP forwarders only active when client send the DNS request as TCP.
 When the server receive that request it should also forward the request
-as TCP not as UDP to prevent the truncated response.</pre>
+as TCP not as UDP to prevent the truncated response.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Another use case for TCP is when the response is truncated, the client
+<div class="paragraph">
+<p>Another use case for TCP is when the response is truncated, the client
 will send the query back through TCP connection.  The server should
-forward this request using TCP instead of UDP.</pre>
+forward this request using TCP instead of UDP.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/dns: use different packet between UDP and TCP messages</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, all packet size for reading and sending the message is
-fixed to 4096, even on UDP.</pre>
+<div class="paragraph">
+<p>Previously, all packet size for reading and sending the message is
+fixed to 4096, even on UDP.</p>
 </div>
+<div class="paragraph">
+<p>This changes set the UDP packet size maximum to 512 bytes and others to
+4096 bytes.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes set the UDP packet size maximum to 512 bytes and others to
-4096 bytes.</pre>
+<div class="paragraph">
+<p>While at it, minimize copying packet if its not reusable inside a method.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, minimize copying packet if its not reusable inside a method.</pre>
 </div>
 </div>
 </li>
@@ -1337,73 +1320,72 @@ fixed to 4096, even on UDP.</pre>
 <ul>
 <li>
 <p>lib/memfs: move the embedded parameter to Options</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Since the GoEmbed can be called only when MemFS instance is initiated,
+<div class="paragraph">
+<p>Since the GoEmbed can be called only when MemFS instance is initiated,
 it would be better if parameters for GoEmbed also initialized in the
 struct Options.
 In this way any additional parameters needed to add to GoEmbed does not
-changes the method signature in the future.</pre>
+changes the method signature in the future.</p>
 </div>
+<div class="paragraph">
+<p>This commit add new type EmbedOptions that contains the parameters
+for GoEmbed.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit add new type EmbedOptions that contains the parameters
-for GoEmbed.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>In this new type, we add new field EmbedWithoutModTime.
+<div class="paragraph">
+<p>In this new type, we add new field EmbedWithoutModTime.
 if its true, the modification time for all files and directories are not
 stored inside generated code, instead all files will use the current
-time when the program is running.</pre>
+time when the program is running.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/totp: make the New to accept only hash with SHA1, SHA256, or SHA512</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the first parameter to New is a function that return
+<div class="paragraph">
+<p>Previously, the first parameter to New is a function that return
 hash.Hash.  This signature can be misleading, because md5.New also
-can return hash.Hash but not usable in TOTP.</pre>
+can return hash.Hash but not usable in TOTP.</p>
 </div>
+<div class="paragraph">
+<p>This changes update the New function signature to accept defined
+type that can be set to SHA1, SHA256, or SHA512.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes update the New function signature to accept defined
-type that can be set to SHA1, SHA256, or SHA512.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/bytes: refactoring and cleaning up the bytes package</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The bytes package, and many other packages in this module, is written
+<div class="paragraph">
+<p>The bytes package, and many other packages in this module, is written
 when I still learning and using the Go language for master thesis.
 Some of the code, like function signature, does not follow the
-Go idiom, at least not how the Go source code looks like.</pre>
+Go idiom, at least not how the Go source code looks like.</p>
 </div>
+<div class="paragraph">
+<p>A breaking changes,</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>A breaking changes,</pre>
-</div>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>WriteUint16 and WriteUint32 accept slice only without pointer.
 There is no need to pass slice as pointer to function if we want
 to modify the content, as long as the backing storage is not
 changed.</p>
-<div class="literalblock">
-<div class="content">
-<pre>Bug fixes,</pre>
-</div>
-</div>
 </li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Bug fixes,</p>
+</div>
+<div class="ulist">
+<ul>
 <li>
 <p>PrintHex: fix print layout on the last line</p>
 </li>
@@ -1413,67 +1395,64 @@ changed.</p>
 <li>
 <p>SkipAfterToken return -1 and false if no token found, as promised
 in the comment, instead of the length of text.</p>
-<div class="literalblock">
-<div class="content">
-<pre>We move all unit test to example so we have test and example in the
-documentation at the same time.</pre>
+</li>
+</ul>
 </div>
+<div class="paragraph">
+<p>We move all unit test to example so we have test and example in the
+documentation at the same time.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make all test coverage 100%.</pre>
+<div class="paragraph">
+<p>This changes make all test coverage 100%.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/bytes: refactoring AppendXxx functions</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, we pass pointer to slice on AppendInt16, AppendInt32,
+<div class="paragraph">
+<p>Previously, we pass pointer to slice on AppendInt16, AppendInt32,
 AppendUint16, and AppendUint32 functions.  This model of function
 signature is not a Go idiom.  It is written when I am still new to
-Go.</pre>
-</div>
+Go.</p>
 </div>
 </li>
 <li>
 <p>lib/ascii: change signature of ToLower and ToUpper</p>
-<div class="literalblock">
-<div class="content">
-<pre>Using pointer to slice on method or function is not a Go idiom.
-It is created when I still new to Go.</pre>
-</div>
+<div class="paragraph">
+<p>Using pointer to slice on method or function is not a Go idiom.
+It is created when I still new to Go.</p>
 </div>
 </li>
 <li>
 <p>lib/memfs: refactoring Node field V into Content</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The reason why the field named V is because it's short.  It's come
+<div class="paragraph">
+<p>The reason why the field named V is because it&#8217;s short.  It&#8217;s come
 from my C/C++ experience that got carried away when writing this
-package.</pre>
+package.</p>
 </div>
+<div class="paragraph">
+<p>Now, after having more time writing Go, I prefer clarity over
+cleverity(?).</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>Now, after having more time writing Go, I prefer clarity over
-cleverity(?).</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/memfs: set the node modification time in embedded file</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>This changes set all node modification time in embedded files to
-the node modTime using Unix() and Nanosecond() values.</pre>
+<div class="paragraph">
+<p>This changes set all node modification time in embedded files to
+the node modTime using Unix() and Nanosecond() values.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Since the time will always changes we need to remove the test to
+<div class="paragraph">
+<p>Since the time will always changes we need to remove the test to
 generate file gen_test.go to prevent the file being modified and
-re-adding the same file every time we run local tests.</pre>
+re-adding the same file every time we run local tests.</p>
+</div>
 </div>
 </div>
 </li>
@@ -1486,74 +1465,66 @@ re-adding the same file every time we run local tests.</pre>
 <ul>
 <li>
 <p>lib/ini: add function IsValidVarName</p>
-<div class="literalblock">
-<div class="content">
-<pre>The IsValidVarName check if "v" is valid variable name, where the
+<div class="paragraph">
+<p>The IsValidVarName check if "v" is valid variable name, where the
 first character must be a letter and the rest should contains only
 letter, digit, period, hyphen, or underscore.
-If "v" is valid it will return true.</pre>
-</div>
+If "v" is valid it will return true.</p>
 </div>
 </li>
 <li>
 <p>lib/memfs: set the node modification time in embedded file</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>This changes set all node modification time in embedded files to
-the node modTime using Unix() and Nanosecond() values.</pre>
+<div class="paragraph">
+<p>This changes set all node modification time in embedded files to
+the node modTime using Unix() and Nanosecond() values.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Since the time will always changes we need to remove the test to
+<div class="paragraph">
+<p>Since the time will always changes we need to remove the test to
 generate file gen_test.go to prevent the file being modified and
-re-adding the same file every time we run local tests.</pre>
+re-adding the same file every time we run local tests.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/io: add method String to FileState type</p>
-<div class="literalblock">
-<div class="content">
-<pre>The String method return the string representation of FileState.
-Usually used only for debugging.</pre>
-</div>
+<div class="paragraph">
+<p>The String method return the string representation of FileState.
+Usually used only for debugging.</p>
 </div>
 </li>
 <li>
 <p>lib/smtp: implement method Noop on Client</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Noop send the NOOP command to server with optional message.</pre>
+<div class="paragraph">
+<p>Noop send the NOOP command to server with optional message.</p>
 </div>
+<div class="paragraph">
+<p>On success, it will return response with Code 250, StatusOK.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>On success, it will return response with Code 250, StatusOK.</pre>
+<div class="paragraph">
+<p>While at it fix double call to recv on Reset() method.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it fix double call to recv on Reset() method.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/smtp: implement method Reset on Client</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The Reset() method send the STMP RSET command to the server.</pre>
+<div class="paragraph">
+<p>The Reset() method send the STMP RSET command to the server.</p>
 </div>
+<div class="paragraph">
+<p>This command clear the current buffer on MAIL, RCPT, and DATA, but not the
+EHLO/HELO buffer.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This command clear the current buffer on MAIL, RCPT, and DATA, but not the
-EHLO/HELO buffer.</pre>
+<div class="paragraph">
+<p>On success, it will return response with Code 250, StatusOK.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>On success, it will return response with Code 250, StatusOK.</pre>
 </div>
 </div>
 </li>
@@ -1569,10 +1540,10 @@ EHLO/HELO buffer.</pre>
 </li>
 <li>
 <p>lib/memfs: fix parent empty directory not removed</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Use case:</pre>
-</div>
+<div class="paragraph">
+<p>Use case:</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1580,18 +1551,14 @@ EHLO/HELO buffer.</pre>
 x/y</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>If x/y is empty, and x processed first, the x will
-not be removed.</pre>
+<div class="paragraph">
+<p>If x/y is empty, and x processed first, the x will
+not be removed.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit fix this, by sorting the paths in descending order first
+<div class="paragraph">
+<p>This commit fix this, by sorting the paths in descending order first
 to make empty parent removed clearly.  In above case the order
-or check become,</pre>
-</div>
+or check become,</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1599,35 +1566,33 @@ or check become,</pre>
 x</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, update an example of New to give preview of input and
-what the expected output for certain operations.</pre>
+<div class="paragraph">
+<p>While at it, update an example of New to give preview of input and
+what the expected output for certain operations.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/xmlrpc: rewrite the Client connection using lib/http</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Using socket connection require reading the HTTP response header before
-we can process the response body.</pre>
+<div class="paragraph">
+<p>Using socket connection require reading the HTTP response header before
+we can process the response body.</p>
 </div>
+<div class="paragraph">
+<p>Instead of rewrite the parser, use the lib/http to send and receive
+the request/response.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>Instead of rewrite the parser, use the lib/http to send and receive
-the request/response.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/io: do not use absolute path on dummy Watcher parent SysPath</p>
-<div class="literalblock">
-<div class="content">
-<pre>Converting that parameter path to absolute path may cause unpredictable
-result on module that use it.</pre>
-</div>
+<div class="paragraph">
+<p>Converting that parameter path to absolute path may cause unpredictable
+result on module that use it.</p>
 </div>
 </li>
 </ul>
@@ -1639,29 +1604,23 @@ result on module that use it.</pre>
 <ul>
 <li>
 <p>lib/ini: add example of marshal/unmarshaling of section with sub</p>
-<div class="literalblock">
-<div class="content">
-<pre>This changes also fix the example of field tag on marshaling the
-map.</pre>
-</div>
+<div class="paragraph">
+<p>This changes also fix the example of field tag on marshaling the
+map.</p>
 </div>
 </li>
 <li>
 <p>lib/io: add method String to FileState type</p>
-<div class="literalblock">
-<div class="content">
-<pre>The String method return the string representation of FileState.
-Usually used only for debugging.</pre>
-</div>
+<div class="paragraph">
+<p>The String method return the string representation of FileState.
+Usually used only for debugging.</p>
 </div>
 </li>
 <li>
 <p>lib/memfs: remove unnecessary initialization on NewNode</p>
-<div class="literalblock">
-<div class="content">
-<pre>The zero value for V ([]byte) is already nil and Node.Childs
-([]*Node) does not need to be initialized with make if size is 0.</pre>
-</div>
+<div class="paragraph">
+<p>The zero value for V ([]byte) is already nil and Node.Childs
+([]*Node) does not need to be initialized with make if size is 0.</p>
 </div>
 </li>
 <li>
@@ -1681,19 +1640,19 @@ Usually used only for debugging.</pre>
 <ul>
 <li>
 <p>lib/io: separate FileState for updated mode and content</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, when content of file being watched is modified, it will
+<div class="paragraph">
+<p>Previously, when content of file being watched is modified, it will
 trigger the callback with State set to FileStateModified.  When the
 mode of file is modified, it will also trigger the callback with
-the same state.</pre>
+the same state.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes separated those state into two kind: FileStateUpdateMode
+<div class="paragraph">
+<p>This changes separated those state into two kind: FileStateUpdateMode
 for update on file mode, and FileStateUpdateContent for update on
-file content.</pre>
+file content.</p>
+</div>
 </div>
 </div>
 </li>
@@ -1706,43 +1665,41 @@ file content.</pre>
 <ul>
 <li>
 <p>lib/memfs: export the Node Update method</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The Update method update the node metadata or content based on new
+<div class="paragraph">
+<p>The Update method update the node metadata or content based on new
 file information.
 It accept two parameters: the new file information, newInfo, and
-maximum file size, maxFileSize.</pre>
+maximum file size, maxFileSize.</p>
 </div>
+<div class="paragraph">
+<p>The newInfo parameter is optional, if its nil, it will read the file
+information based on node&#8217;s SysPath.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>The newInfo parameter is optional, if its nil, it will read the file
-information based on node's SysPath.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The maxFileSize parameter is also optional.
+<div class="paragraph">
+<p>The maxFileSize parameter is also optional.
 If its negative, the node content will not be updated.
-If its zero, it will default to 5 MB.</pre>
+If its zero, it will default to 5 MB.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>There are two possible changes that will happen: its either change on
+<div class="paragraph">
+<p>There are two possible changes that will happen: its either change on
 mode or change on content (size and modtime).
-Change on mode will not affect the content of node.</pre>
+Change on mode will not affect the content of node.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/strings: add function Alnum</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The Alnum remove non alpha-numeric character from text and return it.
+<div class="paragraph">
+<p>The Alnum remove non alpha-numeric character from text and return it.
 Its accept the string to be cleanup and boolean parameter withSpace.
 If withSpace is true then white space is allowed, otherwise it would
-also be removed from text.</pre>
+also be removed from text.</p>
+</div>
 </div>
 </div>
 </li>
@@ -1755,40 +1712,36 @@ also be removed from text.</pre>
 <ul>
 <li>
 <p>lib/memfs: fix symlink to directory not included on mount</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>During mounting and scanning a directory, if the node is symlink to a
+<div class="paragraph">
+<p>During mounting and scanning a directory, if the node is symlink to a
 directory, the isIncluded will return false because the node is not
-a file nor directory.</pre>
+a file nor directory.</p>
 </div>
+<div class="paragraph">
+<p>The fix is to check if node mode is symlink first and then get the
+the real stat.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>The fix is to check if node mode is symlink first and then get the
-the real stat.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/io: fix NewWatcher when called DirWatcher</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>When NewWatcher called from DirWatcher's Start(), it will called NewNode
+<div class="paragraph">
+<p>When NewWatcher called from DirWatcher&#8217;s Start(), it will called NewNode
 with nil parent parameter.  If the parent parameter is nil on NewNode
 the SysPath of new node will be set to the FileInfo.Name() instead of
-full or relative path based on current working directory.</pre>
+full or relative path based on current working directory.</p>
 </div>
+<div class="paragraph">
+<p>Any operation using new node SysPath will failed because the path
+does not exist or reachable from current directory.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>Any operation using new node SysPath will failed because the path
-does not exist or reachable from current directory.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>For example, let say we have the following directory tree,</pre>
-</div>
+<div class="paragraph">
+<p>For example, let say we have the following directory tree,</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1799,68 +1752,62 @@ does not exist or reachable from current directory.</pre>
 +--- B</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>We then set DirWatcher Root to "testdata" from current directory.
+<div class="paragraph">
+<p>We then set DirWatcher Root to "testdata" from current directory.
 The DirWatcher Start then iterate over all child of "testdata" directory,
-and call NewWatcher("testdata/A", ...). On the NewWatcher, it will
+and call NewWatcher("testdata/A", &#8230;&#8203;). On the NewWatcher, it will
 call NewNode(nil, FileInfo, -1).  Now since the parent is nil,
 the Node.SysPath will be set to FileInfo.Name() or base name of the file,
-which is "A".</pre>
+which is "A".</p>
 </div>
+<div class="paragraph">
+<p>Later, when node content need to be read, ioutil.ReadFile("A") will
+fail because the path to "A" does not exist on current directory.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>Later, when node content need to be read, ioutil.ReadFile("A") will
-fail because the path to "A" does not exist on current directory.</pre>
+<div class="paragraph">
+<p>This fix require to force the parameter "parent" on NewNode to be
+required.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This fix require to force the parameter "parent" on NewNode to be
-required.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/memfs: fix possible data race on PathNode</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>During Memfs Get(), if the node returned by PathNodes.Get() is null,
+<div class="paragraph">
+<p>During Memfs Get(), if the node returned by PathNodes.Get() is null,
 the memfs instance will try to refresh the directory tree. In case
 the requested path exist, the memfs will write to PathNodes through
-AddChild()</pre>
+AddChild()</p>
 </div>
+<div class="paragraph">
+<p>At the same time, there maybe a request to access another path, which
+cause both read and write occured.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>At the same time, there maybe a request to access another path, which
-cause both read and write occured.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/memfs: fix NewNode if node is symlink to directory</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, if a symlink point to directory the memfs NewNode function
-will return an error,</pre>
-</div>
+<div class="paragraph">
+<p>Previously, if a symlink point to directory the memfs NewNode function
+will return an error,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>AddChild wui: NewNode: read x/y: is a directory</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>which cause the files inside y cannot be scanned (404).</pre>
+<div class="paragraph">
+<p>which cause the files inside y cannot be scanned (404).</p>
 </div>
+<div class="paragraph">
+<p>This commit fix this issue by checking if the original node mode is a
+directory and return immediately.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit fix this issue by checking if the original node mode is a
-directory and return immediately.</pre>
 </div>
 </div>
 </li>
@@ -1873,58 +1820,54 @@ directory and return immediately.</pre>
 <ul>
 <li>
 <p>lib/memfs: check error on File Close on GoGenerate</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, we ignore the error for call to Close when there is an
-error in previous operation.</pre>
+<div class="paragraph">
+<p>Previously, we ignore the error for call to Close when there is an
+error in previous operation.</p>
 </div>
+<div class="paragraph">
+<p>This changes check the error returned from Close and add it to the
+returned error message.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes check the error returned from Close and add it to the
-returned error message.</pre>
+<div class="paragraph">
+<p>While at it, use consisten prefix for all returned error:
+"MemFS.GoGenerate".</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, use consisten prefix for all returned error:
-"MemFS.GoGenerate".</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/http: support server caching file system using ETag</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>If the Server handle file system using MemFS, server will set the
-ETag [1] header using the file epoch as value.</pre>
+<div class="paragraph">
+<p>If the Server handle file system using MemFS, server will set the
+ETag [1] header using the file epoch as value.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>On the next request, server will compare the request header
+<div class="paragraph">
+<p>On the next request, server will compare the request header
 If-None-Match with the requested file epoch. If its equal server will
-return the response as 304 StatusNotModified.</pre>
+return the response as 304 StatusNotModified.</p>
 </div>
+<div class="paragraph">
+<p>[1] <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag" class="bare">https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag</a></p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>[1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/xmlrpc: convert the value using Sprintf on GetFieldAsString</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the GetFieldAsString will return empty string if the
-Value type is not string.</pre>
+<div class="paragraph">
+<p>Previously, the GetFieldAsString will return empty string if the
+Value type is not string.</p>
 </div>
+<div class="paragraph">
+<p>In this commit, we force the value to be string by converted it using
+fmt.Sprintf.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>In this commit, we force the value to be string by converted it using
-fmt.Sprintf.</pre>
 </div>
 </div>
 </li>
@@ -1958,140 +1901,130 @@ fmt.Sprintf.</pre>
 <ul>
 <li>
 <p>os/exec: fix escaped quote inside the same quote</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Shell quote is a hell of complex.  For example, one can write
-shell that execute command that contains quote of quote,</pre>
-</div>
+<div class="paragraph">
+<p>Shell quote is a hell of complex.  For example, one can write
+shell that execute command that contains quote of quote,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>sh -c "psql -c 'CREATE ... IDENTIFIED BY PASSWORD '\''pass'\'''"</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>or to simplify,</pre>
-</div>
+<div class="paragraph">
+<p>or to simplify,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>sh -c "psql -c \"CREATE ... IDENTIFIED BY PASSWORD 'pass'\""</pre>
 </div>
 </div>
+</div>
+</div>
 </li>
 <li>
 <p>lib/memfs: fix empty ContentType if MaxFileSize is negative</p>
-<div class="literalblock">
-<div class="content">
-<pre>A negative MaxFileSize means the content of file will not be mapped to
-memory, but the content type should be detected for other operation.</pre>
-</div>
+<div class="paragraph">
+<p>A negative MaxFileSize means the content of file will not be mapped to
+memory, but the content type should be detected for other operation.</p>
 </div>
 </li>
 <li>
 <p>lib/memfs: fix empty file not being added to tree</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, we did not check if the file size is 0 before reading the
+<div class="paragraph">
+<p>Previously, we did not check if the file size is 0 before reading the
 content or updating the content type, which cause the read on file
-return io.EOF and the file not added to caches.</pre>
+return io.EOF and the file not added to caches.</p>
 </div>
+<div class="paragraph">
+<p>This commit fix this issue by checking for zero file size and for
+io.EOF when reading the file content.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit fix this issue by checking for zero file size and for
-io.EOF when reading the file content.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/memfs: fix symbolic link with different name</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, if file is symbolic link and has different name with their
-original file, it will return an error when we tried to open the file</pre>
-</div>
+<div class="paragraph">
+<p>Previously, if file is symbolic link and has different name with their
+original file, it will return an error when we tried to open the file</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>parentpath/filename: no such file or directory</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>because we use the original file name, not the symlinked file name.</pre>
+<div class="paragraph">
+<p>because we use the original file name, not the symlinked file name.</p>
 </div>
+<div class="paragraph">
+<p>This commit fix this issue by not replacing the original FileInfo for
+symlink but by setting only the size and mode.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit fix this issue by not replacing the original FileInfo for
-symlink but by setting only the size and mode.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/sql: do not run migration if the last file not exist on the list</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, if the last migrated file name not found on the migration
-directory, we start executing migration start from the first file.</pre>
+<div class="paragraph">
+<p>Previously, if the last migrated file name not found on the migration
+directory, we start executing migration start from the first file.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes the behaviour to not run any migration at all.
+<div class="paragraph">
+<p>This changes the behaviour to not run any migration at all.
 Since we cannot return it as an error, we only log it.  In the future
-we may return it.</pre>
+we may return it.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/http: fix missing content type for XML Header</p>
-<div class="literalblock">
-<div class="content">
-<pre>If the Endpoint set the RequestType to RequestTypeXML, the response
-header should be set to ContentTypeXML.</pre>
-</div>
+<div class="paragraph">
+<p>If the Endpoint set the RequestType to RequestTypeXML, the response
+header should be set to ContentTypeXML.</p>
 </div>
 </li>
 <li>
 <p>lib/xmlrpc: fix missing port on NewClient</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Calling net.Dial or tls.Dial on host without port will cause the
-following error,</pre>
-</div>
+<div class="paragraph">
+<p>Calling net.Dial or tls.Dial on host without port will cause the
+following error,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>NewClient: Dial: dial tcp: address 10.148.0.164: missing port in address</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes fix this by always generate new host value using previous
-host and port values.</pre>
+<div class="paragraph">
+<p>This changes fix this by always generate new host value using previous
+host and port values.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>lib/smtp: return io.EOF if no data received from server</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is to prevent the recv return nil on *Response without an error,
-which may cause panic on caller side.</pre>
-</div>
+<div class="paragraph">
+<p>This is to prevent the recv return nil on *Response without an error,
+which may cause panic on caller side.</p>
 </div>
 </li>
 <li>
 <p>os/exec: check for escaped backslash when ParseCommandArgs</p>
-<div class="literalblock">
-<div class="content">
-<pre>Given the following string "cmd /a\ b" to ParseCommandArgs now
-return "cmd" and ["/a b"] not ["/a\", "b"], because the space after a
-is escaped using backslash.</pre>
-</div>
+<div class="paragraph">
+<p>Given the following string "cmd /a b" to ParseCommandArgs now
+return "cmd" and ["/a b"] not ["/a", "b"], because the space after a
+is escaped using backslash.</p>
 </div>
 </li>
 </ul>
@@ -2103,72 +2036,66 @@ is escaped using backslash.</pre>
 <ul>
 <li>
 <p>lib/memfs: set default content type for empty file to "text/plain"</p>
-<div class="literalblock">
-<div class="content">
-<pre>An empty file should be able to be displayed as text file instead of
-downloaded as binary.</pre>
-</div>
+<div class="paragraph">
+<p>An empty file should be able to be displayed as text file instead of
+downloaded as binary.</p>
 </div>
 </li>
 <li>
 <p>lib/memfs: change the MarshalJSON to always return an object</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, MarshalJSON on memfs will return an object of map
-of all PathNodes and on Node it will return an object.</pre>
+<div class="paragraph">
+<p>Previously, MarshalJSON on memfs will return an object of map
+of all PathNodes and on Node it will return an object.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make it the JSON response consistent. If its directory
+<div class="paragraph">
+<p>This changes make it the JSON response consistent. If its directory
 it will return the node object with its childs, without "content".
-If its file, it will return the node object with content.</pre>
+If its file, it will return the node object with content.</p>
 </div>
+<div class="paragraph">
+<p>While at it, use single "mod_time" with value is epoch and return
+the node ContentType as "content_type".</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, use single "mod_time" with value is epoch and return
-the node ContentType as "content_type".</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/mlog: implement io.Writer and add function ErrorWriter</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The ErrorWriter will return the internal default MultiLogger.
+<div class="paragraph">
+<p>The ErrorWriter will return the internal default MultiLogger.
 A call to Write() on returned io.Writer will forward it to all registered
-error writers.</pre>
+error writers.</p>
 </div>
+<div class="paragraph">
+<p>A Write method on MultiLogger write the b to all error writers.
+It will always return the length of b without an error.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>A Write method on MultiLogger write the b to all error writers.
-It will always return the length of b without an error.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/memfs: add method Save and Encode</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Save method will write the new content to file system and update
-the content of Node using Encode().</pre>
-</div>
+<div class="paragraph">
+<p>The Save method will write the new content to file system and update
+the content of Node using Encode().</p>
 </div>
 </li>
 <li>
 <p>lib/ssh: add method to set session output and error</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, all of the SSH output and error goes to os.Stdout and
-os.Stderr.</pre>
+<div class="paragraph">
+<p>Previously, all of the SSH output and error goes to os.Stdout and
+os.Stderr.</p>
 </div>
+<div class="paragraph">
+<p>This changes add method SetSessionOutputError to change the output and
+error for future remote execution.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes add method SetSessionOutputError to change the output and
-error for future remote execution.</pre>
 </div>
 </div>
 </li>
@@ -2181,25 +2108,25 @@ error for future remote execution.</pre>
 <ul>
 <li>
 <p>lib/reflect: make the IsNil tests to become an example</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>In this way we do test and provide an example at the same time.</pre>
+<div class="paragraph">
+<p>In this way we do test and provide an example at the same time.</p>
 </div>
+<div class="paragraph">
+<p>While at it, add another test cases for boolean, initialized slice, map,
+and errors.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, add another test cases for boolean, initialized slice, map,
-and errors.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/websocket: try to fix flaky test on client</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The following error thrown when running on Github Action using
-Ubuntu-latest and Go 1.16.3,</pre>
-</div>
+<div class="paragraph">
+<p>The following error thrown when running on Github Action using
+Ubuntu-latest and Go 1.16.3,</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -2207,15 +2134,13 @@ Ubuntu-latest and Go 1.16.3,</pre>
 write: connection reset by peer</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This may be caused by using the same client connection on all test
-cases.</pre>
+<div class="paragraph">
+<p>This may be caused by using the same client connection on all test
+cases.</p>
 </div>
+<div class="paragraph">
+<p>We try to fix this by creating new client on each test cases.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>We try to fix this by creating new client on each test cases.</pre>
 </div>
 </div>
 </li>
@@ -2259,12 +2184,13 @@ implementing "sftp" subsystem using the ssh.Client connection.</p>
 <ul>
 <li>
 <p>text/diff: add functions to compare raw bytes as text and text.Lines</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>This changes refactoring some functions, notably,</pre>
+<div class="paragraph">
+<p>This changes refactoring some functions, notably,</p>
 </div>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>Rename Bytes function to IsEqual</p>
 </li>
@@ -2280,17 +2206,20 @@ implementing "sftp" subsystem using the ssh.Client connection.</p>
 </ul>
 </div>
 </div>
+</div>
+</li>
+</ul>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_enhancements_5">Enhancements</h3>
 <div class="ulist">
 <ul>
 <li>
 <p>lib/mlog: add function and method Panicf</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Panicf method is equal to Errf followed by panic.  This signature
-follow the log.Panicf convention.</pre>
-</div>
+<div class="paragraph">
+<p>The Panicf method is equal to Errf followed by panic.  This signature
+follow the log.Panicf convention.</p>
 </div>
 </li>
 <li>
@@ -2301,61 +2230,57 @@ follow the log.Panicf convention.</pre>
 </li>
 <li>
 <p>lib/memfs: implement json.Marshaler on MemFS and Node</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, without MarshalJSON, encoding the MemFS or Node object will
+<div class="paragraph">
+<p>Previously, without MarshalJSON, encoding the MemFS or Node object will
 result in incomplete information, for example, missing name, modification
-time, and size.</pre>
+time, and size.</p>
 </div>
+<div class="paragraph">
+<p>This commit implement the json.Marshaler in MemFS which encode the
+PathNode sorted by keys in ascending order.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit implement the json.Marshaler in MemFS which encode the
-PathNode sorted by keys in ascending order.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/bytes: print the ASCII character on the right side on PrintHex</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, PrintHex only print the hex value of all bytes with
-specified length.</pre>
+<div class="paragraph">
+<p>Previously, PrintHex only print the hex value of all bytes with
+specified length.</p>
 </div>
+<div class="paragraph">
+<p>This changes also print any printables ASCII characters (char 33 through
+126) in the right side column to view readable contents.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes also print any printables ASCII characters (char 33 through
-126) in the right side column to view readable contents.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>lib/totp: lib/totp: increase the maximum steps back on Verify from 2 to 20</p>
-<div class="literalblock">
-<div class="content">
-<pre>The value 20 means the Verify will check maximum 20 TOTP tokens or 10
-minutes to the past.</pre>
-</div>
+<div class="paragraph">
+<p>The value 20 means the Verify will check maximum 20 TOTP tokens or 10
+minutes to the past.</p>
 </div>
 </li>
 <li>
 <p>lib/http: check request path as HTML file on getFSNode</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, if the request path is not exist we check if request
-contains index.html and if still not exist we return nil.</pre>
+<div class="paragraph">
+<p>Previously, if the request path is not exist we check if request
+contains index.html and if still not exist we return nil.</p>
 </div>
+<div class="paragraph">
+<p>This commit add another check by appending ".html" to the request path.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit add another check by appending ".html" to the request path.</pre>
+<div class="paragraph">
+<p>So, for example, if path "/x" not exist in memfs, we check if
+"/x/index.html". If its still not exist, we check "/x.html".</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>So, for example, if path "/x" not exist in memfs, we check if
-"/x/index.html". If its still not exist, we check "/x.html".</pre>
 </div>
 </div>
 </li>
@@ -2368,11 +2293,9 @@ contains index.html and if still not exist we return nil.</pre>
 <ul>
 <li>
 <p>lib/errors: return the internal error only if its not nil on Unwrap</p>
-<div class="literalblock">
-<div class="content">
-<pre>If the internal error is nil, the Unwrap method will return the instance
-of e itself.</pre>
-</div>
+<div class="paragraph">
+<p>If the internal error is nil, the Unwrap method will return the instance
+of e itself.</p>
 </div>
 </li>
 </ul>
@@ -2389,47 +2312,41 @@ of e itself.</pre>
 <ul>
 <li>
 <p>lib/ssh: rename method Get to ScpGet and Put to ScpPut</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>This changes is to make clear that the methods to copy the files, either
+<div class="paragraph">
+<p>This changes is to make clear that the methods to copy the files, either
 from local or from remote, is using the "scp" through exec package,
-not using the native SSH file transfer protocol.</pre>
+not using the native SSH file transfer protocol.</p>
 </div>
+<div class="paragraph">
+<p>While at it, use consistent log prefix for error message.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, use consistent log prefix for error message.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>ssh: rename the NewClient function to NewClientFromConfig</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is to differentiate it with x/crypto ssh package that have the same
-function name.</pre>
-</div>
+<div class="paragraph">
+<p>This is to differentiate it with x/crypto ssh package that have the same
+function name.</p>
 </div>
 </li>
 <li>
 <p>ssh: move the config parser to subpackage "config"</p>
-<div class="literalblock">
-<div class="content">
-<pre>There are two reasons for moving to sub-package.  First, the code for
+<div class="paragraph">
+<p>There are two reasons for moving to sub-package.  First, the code for
 parsing the ssh_config(5) take almost 99% of the lines in the ssh package.
 Second, in case we want to submit the code to upstream,
 golang.org/x/crypto, we need the package to be independent, less external
-dependencies as possible.</pre>
-</div>
+dependencies as possible.</p>
 </div>
 </li>
 <li>
 <p>http: remove the Memfs field from Server</p>
-<div class="literalblock">
-<div class="content">
-<pre>Now that Options field has been exported, we did not need to have
-duplicate Memfs, so this field is removed in favor of Options.Memfs.</pre>
-</div>
+<div class="paragraph">
+<p>Now that Options field has been exported, we did not need to have
+duplicate Memfs, so this field is removed in favor of Options.Memfs.</p>
 </div>
 </li>
 </ul>
@@ -2441,47 +2358,47 @@ duplicate Memfs, so this field is removed in favor of Options.Memfs.</pre>
 <ul>
 <li>
 <p>websocket: export the Options field on the Server</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the Options field is not exported to prevent user from
-changing it once it set through NewServer() function.</pre>
+<div class="paragraph">
+<p>Previously, the Options field is not exported to prevent user from
+changing it once it set through NewServer() function.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes export the Options field to allow user of Server access its
+<div class="paragraph">
+<p>This changes export the Options field to allow user of Server access its
 values.  We can create a method on server to return read-only options,
-but that will over complicated the Server API.</pre>
+but that will over complicated the Server API.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>http: export the Options field on the Server</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the Options field is not exported to prevent user from
-changing it once it set through NewServer() function.</pre>
+<div class="paragraph">
+<p>Previously, the Options field is not exported to prevent user from
+changing it once it set through NewServer() function.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes export the Options field to allow user of Server access its
+<div class="paragraph">
+<p>This changes export the Options field to allow user of Server access its
 values.  We can create a method on server to return read-only options,
-but that will over complicated the Server API.</pre>
+but that will over complicated the Server API.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>websocket: store all the handshake headers to Handshake.Header</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously only non-required headers are stored in the Handshake Header
-field, while the required header value stored on their respective fields.</pre>
+<div class="paragraph">
+<p>Previously only non-required headers are stored in the Handshake Header
+field, while the required header value stored on their respective fields.</p>
 </div>
+<div class="paragraph">
+<p>This commit store all request header key and values into the Header field.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit store all request header key and values into the Header field.</pre>
 </div>
 </div>
 </li>
@@ -2503,52 +2420,51 @@ package.</p>
 <ul>
 <li>
 <p>xmlrpc: change the Response to embed the errors.E</p>
-<div class="literalblock">
-<div class="content">
-<pre>The errors.E contains code and message that also implement wrapping and
+<div class="paragraph">
+<p>The errors.E contains code and message that also implement wrapping and
 unwrapping error, so we can use the Response as error just like in
-http.EndpointResponse.</pre>
-</div>
+http.EndpointResponse.</p>
 </div>
 </li>
 <li>
 <p>xmlrpc: write the XML header when marshaling request not on client</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the XML header is added when sending the request using
-client.</pre>
+<div class="paragraph">
+<p>Previously, the XML header is added when sending the request using
+client.</p>
 </div>
+<div class="paragraph">
+<p>This commit changes it to write the header when marshaling the Request
+instance.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit changes it to write the header when marshaling the Request
-instance.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>xmlrpc: replace Value field for struct with map of string and value</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, for param with type "struct" is represented by slice of
-Member{Name,Value}.</pre>
+<div class="paragraph">
+<p>Previously, for param with type "struct" is represented by slice of
+Member{Name,Value}.</p>
 </div>
+<div class="paragraph">
+<p>This commit changes the Value field for "struct" to a map of string and
+value for easily access the struct&#8217;s member, without looping.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit changes the Value field for "struct" to a map of string and
-value for easily access the struct's member, without looping.</pre>
 </div>
 </div>
 </li>
 <li>
 <p>xmlrpc: refactoring the parser for decoding XML-RPC request</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>This changes,</pre>
+<div class="paragraph">
+<p>This changes,</p>
 </div>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>method to parse XML-RPC request,</p>
 </li>
@@ -2568,22 +2484,27 @@ ArrayValues</p>
 </ul>
 </div>
 </div>
+</div>
+</li>
+</ul>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_new_features_5">New features</h3>
 <div class="ulist">
 <ul>
 <li>
 <p>memfs: add function to Merge one or more instance of MemFS</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The Merge function merge one or more instance of MemFS into single MemFS
-instance.</pre>
+<div class="paragraph">
+<p>The Merge function merge one or more instance of MemFS into single MemFS
+instance.</p>
 </div>
+<div class="paragraph">
+<p>If there are two instance of Node that have the same path, the last
+instance will be ignored.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>If there are two instance of Node that have the same path, the last
-instance will be ignored.</pre>
 </div>
 </div>
 </li>
@@ -2592,11 +2513,9 @@ instance will be ignored.</pre>
 </li>
 <li>
 <p>mlog: add function and method PrintStack</p>
-<div class="literalblock">
-<div class="content">
-<pre>The PrintStack function or method will writes to error writers the stack
-trace returned by debug.Stack.</pre>
-</div>
+<div class="paragraph">
+<p>The PrintStack function or method will writes to error writers the stack
+trace returned by debug.Stack.</p>
 </div>
 </li>
 </ul>
@@ -2608,11 +2527,9 @@ trace returned by debug.Stack.</pre>
 <ul>
 <li>
 <p>http: add request type for XML</p>
-<div class="literalblock">
-<div class="content">
-<pre>Setting Endpoint's RequestType to RequestTypeXML will check the content
-type of HTTP request to match with "text/xml".</pre>
-</div>
+<div class="paragraph">
+<p>Setting Endpoint&#8217;s RequestType to RequestTypeXML will check the content
+type of HTTP request to match with "text/xml".</p>
 </div>
 </li>
 </ul>
@@ -2627,36 +2544,28 @@ type of HTTP request to match with "text/xml".</pre>
 </li>
 <li>
 <p>xmlrpc: convert the uint8 and uint16 as type Integer, and Uint as Double</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, uint8 and uint16 will be converted as Double, but those
-types are in range of four bytes so it can still be handled by int32.</pre>
-</div>
+<div class="paragraph">
+<p>Previously, uint8 and uint16 will be converted as Double, but those
+types are in range of four bytes so it can still be handled by int32.</p>
 </div>
 </li>
 <li>
 <p>xmlrpc: set client response IsFault when StatusCode &gt;= 400</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, we set IsFault to true if the HTTP response code not equal to
-200 only, which is not always correct.</pre>
+<div class="paragraph">
+<p>Previously, we set IsFault to true if the HTTP response code not equal to
+200 only, which is not always correct.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit changes it to check any status code that is greater or equal
-to 400.</pre>
-</div>
+<div class="paragraph">
+<p>This commit changes it to check any status code that is greater or equal
+to 400.</p>
 </div>
 </li>
 <li>
 <p>memfs: fix test by checking multiple content-types</p>
-<div class="literalblock">
-<div class="content">
-<pre>On Arch Linux with Go tip, the content-type for JavaScript file is
+<div class="paragraph">
+<p>On Arch Linux with Go tip, the content-type for JavaScript file is
 "text/javascript".  While on Ubuntu with Go 1.16 the content-type for
-JavaScript file is "application/javascript".</pre>
-</div>
+JavaScript file is "application/javascript".</p>
 </div>
 </li>
 </ul>
@@ -2673,49 +2582,35 @@ JavaScript file is "application/javascript".</pre>
 <ul>
 <li>
 <p>math/big: add method Add, IsLess, IsGreater, and Scan on Int</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Add method simplify addition of one value to current Int.</pre>
+<div class="paragraph">
+<p>The Add method simplify addition of one value to current Int.</p>
 </div>
+<div class="paragraph">
+<p>The IsLess and IsGreater method simplify comparing Int with any value.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>The IsLess and IsGreater method simplify comparing Int with any value.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The Scan method allow the Int to be used on sql Scan().</pre>
-</div>
+<div class="paragraph">
+<p>The Scan method allow the Int to be used on sql Scan().</p>
 </div>
 </li>
 <li>
 <p>math/big: add method IsZero on Int</p>
-<div class="literalblock">
-<div class="content">
-<pre>The IsZero method will return true if the current i value is zero.</pre>
-</div>
+<div class="paragraph">
+<p>The IsZero method will return true if the current i value is zero.</p>
 </div>
 </li>
 <li>
 <p>big: extends the standard big.Int</p>
-<div class="literalblock">
-<div class="content">
-<pre>The standard big.Int does not implement sql/driver.Valuer interface,
+<div class="paragraph">
+<p>The standard big.Int does not implement sql/driver.Valuer interface,
 which make it not usable when querying or doing update/insert with
-database.</pre>
+database.</p>
 </div>
+<div class="paragraph">
+<p>This commit extend the big.Int and simplify creating new Int from any
+values using NewInt().</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit extend the big.Int and simplify creating new Int from any
-values using NewInt().</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Also, make it support marshal/unmarshal JSON</pre>
-</div>
+<div class="paragraph">
+<p>Also, make it support marshal/unmarshal JSON</p>
 </div>
 </li>
 </ul>
@@ -2727,34 +2622,26 @@ values using NewInt().</pre>
 <ul>
 <li>
 <p>sql: make the column filename on table _migration as primary key</p>
-<div class="literalblock">
-<div class="content">
-<pre>This will allow deleting the record by filename instead of requiring
-all columns.</pre>
-</div>
+<div class="paragraph">
+<p>This will allow deleting the record by filename instead of requiring
+all columns.</p>
 </div>
 </li>
 <li>
 <p>http: add the Total field to EndpointResponse</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Total field contains the total number of all records, while the
-Count fields only contains the total number of records in Data.</pre>
-</div>
+<div class="paragraph">
+<p>The Total field contains the total number of all records, while the
+Count fields only contains the total number of records in Data.</p>
 </div>
 </li>
 <li>
 <p>http: add field Page to EndpointResponse</p>
-<div class="literalblock">
-<div class="content">
-<pre>The page field contains the requested page on current response.
-If page is from request then the offset will be set to page times limit.</pre>
+<div class="paragraph">
+<p>The page field contains the requested page on current response.
+If page is from request then the offset will be set to page times limit.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, move the field comment to its declaration.</pre>
-</div>
+<div class="paragraph">
+<p>While at it, move the field comment to its declaration.</p>
 </div>
 </li>
 <li>
@@ -2762,11 +2649,9 @@ If page is from request then the offset will be set to page times limit.</pre>
 </li>
 <li>
 <p>ssh: check for empty private key file on Get and Put</p>
-<div class="literalblock">
-<div class="content">
-<pre>If the private key file is empty, skip it for being added as parameter
-of scp command.  This is to prevent warning message on user side.</pre>
-</div>
+<div class="paragraph">
+<p>If the private key file is empty, skip it for being added as parameter
+of scp command.  This is to prevent warning message on user side.</p>
 </div>
 </li>
 </ul>
@@ -2778,21 +2663,17 @@ of scp command.  This is to prevent warning message on user side.</pre>
 <ul>
 <li>
 <p>memfs: update the test ContentType for JavaScript files</p>
-<div class="literalblock">
-<div class="content">
-<pre>The latest Go set the content type for JavaScript file as
-"text/javascript; charset=utf-8", not "application/javascript".</pre>
-</div>
+<div class="paragraph">
+<p>The latest Go set the content type for JavaScript file as
+"text/javascript; charset=utf-8", not "application/javascript".</p>
 </div>
 </li>
 <li>
 <p>paseto: replace le64() function with binary.Write()</p>
-<div class="literalblock">
-<div class="content">
-<pre>The le64() return the string representation of uint64 in little endian,
+<div class="paragraph">
+<p>The le64() return the string representation of uint64 in little endian,
 which is basically binary.Write with parameter output buffer,
-LittleEndian, and input value.</pre>
-</div>
+LittleEndian, and input value.</p>
 </div>
 </li>
 </ul>
@@ -2826,69 +2707,58 @@ by setting the minimum Go version to 1.16.</p>
 <ul>
 <li>
 <p>all: refactoring the test.Assert and test.AssertBench signature</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, the test.Assert and test.AssertBench functions has the
-boolean parameter to print the stack trace of test in case its not equal.</pre>
+<div class="paragraph">
+<p>Previously, the test.Assert and test.AssertBench functions has the
+boolean parameter to print the stack trace of test in case its not equal.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Since this parameter is not mandatory and its usually always set to
+<div class="paragraph">
+<p>Since this parameter is not mandatory and its usually always set to
 "true", we remove them from function signature to simplify the call
-to Assert and AssertBench.</pre>
-</div>
+to Assert and AssertBench.</p>
 </div>
 </li>
 <li>
 <p>all: refactoring http.Client methods signature</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, parameters to method Delete, Get, Post, PostForm, PostFormData,
-PostJSON, Put, and PutJSON are in the following order:</pre>
-</div>
+<div class="paragraph">
+<p>Previously, parameters to method Delete, Get, Post, PostForm, PostFormData,
+PostJSON, Put, and PutJSON are in the following order:</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>(headers, path, params)</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This is sometimes confusing. To make it better and works with format
-of HTTP request header,</pre>
+<div class="paragraph">
+<p>This is sometimes confusing. To make it better and works with format
+of HTTP request header,</p>
 </div>
-</div>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
 <pre>METHOD PATH
-HEADERS</pre>
+HEADERS
+
+PARAMS</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>PARAMS</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>we move the path to the first parameter and headers as the second
-parameter, so the call to client methods would be</pre>
-</div>
+<div class="paragraph">
+<p>we move the path to the first parameter and headers as the second
+parameter, so the call to client methods would be</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>(path, headers, params)</pre>
 </div>
 </div>
+</div>
+</div>
 </li>
 <li>
 <p>http: remove parameter contentType on Client method Put</p>
-<div class="literalblock">
-<div class="content">
-<pre>Since one can set the Content-Type in parameter headers, this parameter is
-become redundant.</pre>
-</div>
+<div class="paragraph">
+<p>Since one can set the Content-Type in parameter headers, this parameter is
+become redundant.</p>
 </div>
 </li>
 </ul>
@@ -2900,26 +2770,23 @@ become redundant.</pre>
 <ul>
 <li>
 <p>http: add method to generate standard HTTP request on Client</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>The GenerateHttpRequest method generate http.Request instance from
-method, path, requestType, headers, and params.</pre>
+<div class="paragraph">
+<p>The GenerateHttpRequest method generate http.Request instance from
+method, path, requestType, headers, and params.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
+<div class="paragraph">
+<p>For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
 value should be nil or url.Values.
-If its url.Values, then the params will be encoded as query parameters.</pre>
+If its url.Values, then the params will be encoded as query parameters.</p>
 </div>
+<div class="paragraph">
+<p>For HTTP method is PATCH, POST, or PUT; the params will converted based on
+requestType rules below,</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>For HTTP method is PATCH, POST, or PUT; the params will converted based on
-requestType rules below,</pre>
-</div>
-</div>
-</li>
+<div class="ulist">
+<ul>
 <li>
 <p>If requestType is RequestTypeQuery and params is url.Values it will be
 added as query parameters in the path.</p>
@@ -2937,45 +2804,40 @@ body.</p>
 <p>If requestType is RequestTypeJSON and params is not nil, the params will
 be encoded as JSON in body.</p>
 </li>
-<li>
-<p>ssh: ask for passphrase if private key is encrypted on generateSigners</p>
-<div class="literalblock">
-<div class="content">
-<pre>In case the private key defined in IdentityFile is encrypted, prompt
-for the passphrase on the screen and read it from stdin using
-terminal.ReadPassword().</pre>
+</ul>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes also remove call to generateSigners on postConfig(),
-instead invoke it from NewClient() to minimize multiple calls to
-generateSigners().</pre>
 </div>
 </div>
 </li>
 <li>
+<p>ssh: ask for passphrase if private key is encrypted on generateSigners</p>
+<div class="paragraph">
+<p>In case the private key defined in IdentityFile is encrypted, prompt
+for the passphrase on the screen and read it from stdin using
+terminal.ReadPassword().</p>
+</div>
+<div class="paragraph">
+<p>This changes also remove call to generateSigners on postConfig(),
+instead invoke it from NewClient() to minimize multiple calls to
+generateSigners().</p>
+</div>
+</li>
+<li>
 <p>ssh: use the SSH agent to authenticate on NewClient</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, the client use the IdentityFile on ConfigSection to
+<div class="paragraph">
+<p>Previously, the client use the IdentityFile on ConfigSection to
 Authenticate with the remote SSH server.  In case the IdentityFile is
 Encrypted with passphrase, each time NewClient is invoked it will ask
-For passphrase.</pre>
+For passphrase.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>To minimize inputing the passphrase, we check if current use run the
+<div class="paragraph">
+<p>To minimize inputing the passphrase, we check if current use run the
 SSH agent through SSH_AUTH_SOCK environment variable and use the agent
-To generate signers.</pre>
+To generate signers.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This method need manual key added by user to SSH agent before calling
-NewClient to make it works.</pre>
-</div>
+<div class="paragraph">
+<p>This method need manual key added by user to SSH agent before calling
+NewClient to make it works.</p>
 </div>
 </li>
 </ul>
@@ -2987,11 +2849,9 @@ NewClient to make it works.</pre>
 <ul>
 <li>
 <p>xmlrpc: add debug statements to print request and response</p>
-<div class="literalblock">
-<div class="content">
-<pre>The debug level is set minimum to 3. If its set it will print the
-request and response to standard output.</pre>
-</div>
+<div class="paragraph">
+<p>The debug level is set minimum to 3. If its set it will print the
+request and response to standard output.</p>
 </div>
 </li>
 </ul>
@@ -3008,65 +2868,49 @@ request and response to standard output.</pre>
 <ul>
 <li>
 <p>http: add prefix Header to constants AcceptEncoding and ContentEncoding</p>
-<div class="literalblock">
-<div class="content">
-<pre>Since both of those constants are used only for HTTP header, it could
-be more clear if we prefix it with "Header".</pre>
-</div>
+<div class="paragraph">
+<p>Since both of those constants are used only for HTTP header, it could
+be more clear if we prefix it with "Header".</p>
 </div>
 </li>
 <li>
 <p>sql: change the parameter ExtractSQLFields to driver name</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, we use the string as parameter to set the returned place
-holders.</pre>
+<div class="paragraph">
+<p>Previously, we use the string as parameter to set the returned place
+holders.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit changes the parameter to the driver name so if the value
+<div class="paragraph">
+<p>This commit changes the parameter to the driver name so if the value
 is "postgres" the place holders will be returned as counter, for example
-"$1", "$2", and so on.</pre>
-</div>
+"$1", "$2", and so on.</p>
 </div>
 </li>
 <li>
 <p>http: rename "GenericResponse" to "EndpointResponse"</p>
-<div class="literalblock">
-<div class="content">
-<pre>Well, the hard thing in software is naming a thing.  Using the term
-Generic is too generic, so we change it to make it closer with Endpoint.</pre>
-</div>
+<div class="paragraph">
+<p>Well, the hard thing in software is naming a thing.  Using the term
+Generic is too generic, so we change it to make it closer with Endpoint.</p>
 </div>
 </li>
 <li>
 <p>http: refactoring parameters on Callback and CallbackErrorHandler</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, the parameters to Callback has three types:
+<div class="paragraph">
+<p>Previously, the parameters to Callback has three types:
 the http.ResponseWriter, *http.Request, and []byte for response body.
 Not only the type names are long, there is no information on the
-registered Endpoint on the receiver of Callback.</pre>
+registered Endpoint on the receiver of Callback.</p>
 </div>
+<div class="paragraph">
+<p>This changes wrap the three parameters into single type EndpointRequest
+with addition field Endpoint, which contains the registered Endpoint.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes wrap the three parameters into single type EndpointRequest
-with addition field Endpoint, which contains the registered Endpoint.</pre>
+<div class="paragraph">
+<p>On the CallbackErrorHandler we also have three parameters, but instead
+of request body we have an error.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>On the CallbackErrorHandler we also have three parameters, but instead
-of request body we have an error.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes store the error for CallbackErrorHandler inside
-EndpointRequest.Error field.</pre>
-</div>
+<div class="paragraph">
+<p>This changes store the error for CallbackErrorHandler inside
+EndpointRequest.Error field.</p>
 </div>
 </li>
 <li>
@@ -3081,124 +2925,100 @@ EndpointRequest.Error field.</pre>
 <ul>
 <li>
 <p>http: add methods IPAddressOfRequest and ParseXForwardedFor</p>
-<div class="literalblock">
-<div class="content">
-<pre>The IPAddressOfRequest get the client IP address from HTTP request header
+<div class="paragraph">
+<p>The IPAddressOfRequest get the client IP address from HTTP request header
 "X-Real-IP" or "X-Forwarded-For" or from Request.RemoteAddr, which ever
-non-empty first.</pre>
+non-empty first.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from
+<div class="paragraph">
+<p>The ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from
 the following format "client, proxy1, proxy2" into client address and
-list of proxy addressess.</pre>
-</div>
+list of proxy addressess.</p>
 </div>
 </li>
 <li>
 <p>api/slack: create new client for webhook</p>
-<div class="literalblock">
-<div class="content">
-<pre>Unlike PostWebhook API which is close and open one connection at the
-time, the WebhookClient is keep open.</pre>
+<div class="paragraph">
+<p>Unlike PostWebhook API which is close and open one connection at the
+time, the WebhookClient is keep open.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Use the WebhookClient for long running program that post message every
-minutes or seconds.</pre>
-</div>
+<div class="paragraph">
+<p>Use the WebhookClient for long running program that post message every
+minutes or seconds.</p>
 </div>
 </li>
 <li>
 <p>mlog: implement MultiLogger</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>MultiLogger represent a single log writer that write to multiple outputs.
+<div class="paragraph">
+<p>MultiLogger represent a single log writer that write to multiple outputs.
 MultiLogger can have zero or more writers for standard output (normal log)
-and zero or more writers for standard error.</pre>
+and zero or more writers for standard error.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The MultiLogger is buffered to minimize waiting time when writing to
+<div class="paragraph">
+<p>The MultiLogger is buffered to minimize waiting time when writing to
 multiple writers that have different latencies.
 For example, if we have one writer to os.Stdout, one writer to file, and
 one writer to network; the writer to network may take more time to finish
 than to os.Stdout and file, which may slowing down the program if we want
-to wait for all writes to finish.</pre>
+to wait for all writes to finish.</p>
 </div>
+<div class="paragraph">
+<p>For this reason, do not forget to call Flush when your program exit.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>For this reason, do not forget to call Flush when your program exit.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The default MultiLogger use time.RFC3339 as the default time layout, empty
+<div class="paragraph">
+<p>The default MultiLogger use time.RFC3339 as the default time layout, empty
 prefix, os.Stdout for the output writer, and os.Stderr for the error
-writer.</pre>
+writer.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Format of written log,</pre>
-</div>
+<div class="paragraph">
+<p>Format of written log,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>[time] [prefix] &lt;message&gt;</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>The time and prefix only printed if its not empty, and the single space is
+<div class="paragraph">
+<p>The time and prefix only printed if its not empty, and the single space is
 added for convenience.
 Unlike standard log package, this package does not add new line to the end
-of message if its not exist.</pre>
+of message if its not exist.</p>
+</div>
 </div>
 </div>
 </li>
 <li>
 <p>http: export the HandleFS method</p>
-<div class="literalblock">
-<div class="content">
-<pre>The HandleFS handle the request as resource in the memory file system.
-This method only works if the Server.Memfs is not nil.</pre>
+<div class="paragraph">
+<p>The HandleFS handle the request as resource in the memory file system.
+This method only works if the Server.Memfs is not nil.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>If the request Path exists in file system, it will return 200 OK with the
+<div class="paragraph">
+<p>If the request Path exists in file system, it will return 200 OK with the
 header Content-Type set accordingly to the detected file type and the
 response body set to the content of file.
-If the request Method is HEAD, only the header will be sent back to client.</pre>
+If the request Method is HEAD, only the header will be sent back to client.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>If the request Path is not exist it will return 404 Not Found.</pre>
-</div>
+<div class="paragraph">
+<p>If the request Path is not exist it will return 404 Not Found.</p>
 </div>
 </li>
 <li>
 <p>clise: add method Pop</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Pop method remove the last Push()-ed item and return it to caller.
-It will return nil if no more item inside it.</pre>
-</div>
+<div class="paragraph">
+<p>The Pop method remove the last Push()-ed item and return it to caller.
+It will return nil if no more item inside it.</p>
 </div>
 </li>
 <li>
 <p>ini: add support for marshaling slice of struct</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Given a struct with exported field is slice of struct and tagged with
-section and sub-section, the exported field will be marshalled as,</pre>
-</div>
+<div class="paragraph">
+<p>Given a struct with exported field is slice of struct and tagged with
+section and sub-section, the exported field will be marshalled as,</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -3206,28 +3026,30 @@ section and sub-section, the exported field will be marshalled as,</pre>
 field = value</pre>
 </div>
 </div>
+</div>
+</div>
 </li>
 <li>
 <p>ini: add support for marshaling pointer to struct and to time.Time</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Given the following field struct with tag,</pre>
-</div>
+<div class="paragraph">
+<p>Given the following field struct with tag,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>V *T `ini:"sec:sub"</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>If the V is not nil, it will marshal it into,</pre>
-</div>
+<div class="paragraph">
+<p>If the V is not nil, it will marshal it into,</p>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>[sec "sub"]
 &lt;field name or tag&gt; = &lt;field value&gt;</pre>
+</div>
+</div>
 </div>
 </div>
 </li>
@@ -3236,10 +3058,8 @@ field = value</pre>
 </li>
 <li>
 <p>big: add method that implement sql/driver.Valuer for type Rat</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Rat.Value() return the value as []byte.</pre>
-</div>
+<div class="paragraph">
+<p>The Rat.Value() return the value as []byte.</p>
 </div>
 </li>
 </ul>
@@ -3254,18 +3074,14 @@ field = value</pre>
 </li>
 <li>
 <p>http: add fields for paging on GenericResponse</p>
-<div class="literalblock">
-<div class="content">
-<pre>If the response is paging, contains more than one item in data, one
-can set the current status of paging in field Offset, Limit, and Count.</pre>
+<div class="paragraph">
+<p>If the response is paging, contains more than one item in data, one
+can set the current status of paging in field Offset, Limit, and Count.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The Offset field contains the start of paging.
+<div class="paragraph">
+<p>The Offset field contains the start of paging.
 The Limit field contains the maximum number of records per page.
-The Count field contains the total number of records.</pre>
-</div>
+The Count field contains the total number of records.</p>
 </div>
 </li>
 </ul>
@@ -3277,10 +3093,8 @@ The Count field contains the total number of records.</pre>
 <ul>
 <li>
 <p>reflect: check using equal statement on IsNil</p>
-<div class="literalblock">
-<div class="content">
-<pre>Beside using IsNil(), return the last check using "v == nil".</pre>
-</div>
+<div class="paragraph">
+<p>Beside using IsNil(), return the last check using "v == nil".</p>
 </div>
 </li>
 </ul>
@@ -3304,119 +3118,91 @@ or more directories in single package.</p>
 <ul>
 <li>
 <p>memfs: refactoring, allow multiple instances of memfs in single package</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, the generated Go code from memfs can be used only once
+<div class="paragraph">
+<p>Previously, the generated Go code from memfs can be used only once
 on the package that use it.  For example, if we have two instances of
 memfs.MemFS and both of them call GoGenerate(), when we load them back
 again only the last one will be active and set the global variable
-memfs.GeneratedPathNode.</pre>
+memfs.GeneratedPathNode.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes refactoring on how we use memfs by storing the
+<div class="paragraph">
+<p>This changes refactoring on how we use memfs by storing the
 generated path node into variable that is defined by user and pass
-them to New Options.</pre>
-</div>
+them to New Options.</p>
 </div>
 </li>
 <li>
 <p>memfs: remove field WithContent</p>
-<div class="literalblock">
-<div class="content">
-<pre>The field WithContent is not necessary if we set MaxFileSize to negative
-value.</pre>
-</div>
+<div class="paragraph">
+<p>The field WithContent is not necessary if we set MaxFileSize to negative
+value.</p>
 </div>
 </li>
 <li>
 <p>http: embed the memfs.Options into ServerOptions</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is to minimize duplicate on fields names and give clear distinction
+<div class="paragraph">
+<p>This is to minimize duplicate on fields names and give clear distinction
 between options for Server and options for serving files on memory using
-memfs.</pre>
-</div>
+memfs.</p>
 </div>
 </li>
 <li>
 <p>io: embed the memfs.Options into DirWatcher</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is to minimize duplicate configuration between DirWatcher and
+<div class="paragraph">
+<p>This is to minimize duplicate configuration between DirWatcher and
 memfs, and to allow clear distinction between which options that
-affect the directory tree and options for DirWatcher.</pre>
-</div>
+affect the directory tree and options for DirWatcher.</p>
 </div>
 </li>
 <li>
 <p>memfs: allow AddFile to set internal path</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, AddFile set the internal path equal to path of file to be
+<div class="paragraph">
+<p>Previously, AddFile set the internal path equal to path of file to be
 included.  This may cause conflict if the file is already included
-due to the same sys path but different internal path.</pre>
+due to the same sys path but different internal path.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This commit add parameter internalPath to set custom internal path in
-the memfs map.</pre>
-</div>
+<div class="paragraph">
+<p>This commit add parameter internalPath to set custom internal path in
+the memfs map.</p>
 </div>
 </li>
 <li>
 <p>memfs: refactoring Go generate code to use memfs.MemFS instance</p>
-<div class="literalblock">
-<div class="content">
-<pre>Instead of using memfs.PathNode, which is confusing for new user
-(what is PathNode?), we actually can use memfs.MemFS instance.</pre>
+<div class="paragraph">
+<p>Instead of using memfs.PathNode, which is confusing for new user
+(what is PathNode?), we actually can use memfs.MemFS instance.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This effect on how we use memfs in http package.</pre>
-</div>
+<div class="paragraph">
+<p>This effect on how we use memfs in http package.</p>
 </div>
 </li>
 <li>
 <p>dns: change the SOA field in ZoneFile to non-pointer</p>
-<div class="literalblock">
-<div class="content">
-<pre>The reason we use pointer for SOA record is so we can save them only
+<div class="paragraph">
+<p>The reason we use pointer for SOA record is so we can save them only
 if its not nil.  A nil SOA record cause the generated JSON become "null"
 and this is make the consumer of ZoneFile do more work, checking for the
-null and initialize it when required.</pre>
+null and initialize it when required.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes, make the SOA record to non-nil and we save the record only
-if the MName field is not empty.</pre>
-</div>
+<div class="paragraph">
+<p>This changes, make the SOA record to non-nil and we save the record only
+if the MName field is not empty.</p>
 </div>
 </li>
 <li>
 <p>dns: replace master word with zone</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is for consistency for type and variable names.</pre>
-</div>
+<div class="paragraph">
+<p>This is for consistency for type and variable names.</p>
 </div>
 </li>
 <li>
 <p>sql: sort returned names on ExtractSQLFields sorted in ascending</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is to make sure that any test that use the package always
-predictable.</pre>
+<div class="paragraph">
+<p>This is to make sure that any test that use the package always
+predictable.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>While at it, add paramter to change placeholder on ExtractSQLFields.</pre>
-</div>
+<div class="paragraph">
+<p>While at it, add paramter to change placeholder on ExtractSQLFields.</p>
 </div>
 </li>
 </ul>
@@ -3428,26 +3214,22 @@ predictable.</pre>
 <ul>
 <li>
 <p>http: add method Post on client</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Post method send the POST request to path without setting
-"Content-Type".</pre>
-</div>
+<div class="paragraph">
+<p>The Post method send the POST request to path without setting
+"Content-Type".</p>
 </div>
 </li>
 <li>
 <p>lib/clise: new package that implement circular slice</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>A circular slice is a slice that have fixed size.
+<div class="paragraph">
+<p>A circular slice is a slice that have fixed size.
 An append to slice that has reached its length will overwrite and start
-again from index 0.</pre>
+again from index 0.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>For example, a clise with size 5,</pre>
-</div>
+<div class="paragraph">
+<p>For example, a clise with size 5,</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -3456,10 +3238,8 @@ c.Push(1, 2, 3, 4, 5)
 fmt.Printf("%v\n", c.Slice()) // [1 2 3 4 5]</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>If we push another item, it will overwrite the first index,</pre>
-</div>
+<div class="paragraph">
+<p>If we push another item, it will overwrite the first index,</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -3467,9 +3247,9 @@ fmt.Printf("%v\n", c.Slice()) // [1 2 3 4 5]</pre>
 fmt.Printf("%v\n", c.Slice()) // [6 2 3 4 5]</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>See the examples for usage of the package.</pre>
+<div class="paragraph">
+<p>See the examples for usage of the package.</p>
+</div>
 </div>
 </div>
 </li>
@@ -3482,30 +3262,24 @@ standard packages.</p>
 </li>
 <li>
 <p>runes: add function to inverse the slice of rune</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Inverse function reverse the order of slice of rune without
-allocating another slice.</pre>
-</div>
+<div class="paragraph">
+<p>The Inverse function reverse the order of slice of rune without
+allocating another slice.</p>
 </div>
 </li>
 <li>
 <p>big: add method Humanize</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Humanize method return the r as string with custom thousand and
-decimal separator.</pre>
-</div>
+<div class="paragraph">
+<p>The Humanize method return the r as string with custom thousand and
+decimal separator.</p>
 </div>
 </li>
 <li>
 <p>big: add method to round fraction to nearest non-zero value</p>
-<div class="literalblock">
-<div class="content">
-<pre>The RoundNearestFraction does not require precision parameter, like in
+<div class="paragraph">
+<p>The RoundNearestFraction does not require precision parameter, like in
 other rounds function, but it figure it out based on the last non-zero
-value from fraction.</pre>
-</div>
+value from fraction.</p>
 </div>
 </li>
 </ul>
@@ -3517,26 +3291,20 @@ value from fraction.</pre>
 <ul>
 <li>
 <p>dns: change the error messages on ResourceRecord initAndInitialize</p>
-<div class="literalblock">
-<div class="content">
-<pre>This change make the error message more readable and understandable by
-consumer</pre>
-</div>
+<div class="paragraph">
+<p>This change make the error message more readable and understandable by
+consumer</p>
 </div>
 </li>
 <li>
 <p>dns: add method to get list of non-local caches in the Server</p>
-<div class="literalblock">
-<div class="content">
-<pre>The CachesLRU method return the list of non-local caches ordered by
-the least recently used.</pre>
+<div class="paragraph">
+<p>The CachesLRU method return the list of non-local caches ordered by
+the least recently used.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes affect the answer type which must be exported, including
-most of its fields, so consumer can access it.</pre>
-</div>
+<div class="paragraph">
+<p>This changes affect the answer type which must be exported, including
+most of its fields, so consumer can access it.</p>
 </div>
 </li>
 </ul>
@@ -3548,29 +3316,23 @@ most of its fields, so consumer can access it.</pre>
 <ul>
 <li>
 <p>sql: check nil on Migrate parameter "fs" using reflect.IsNil</p>
-<div class="literalblock">
-<div class="content">
-<pre>If we pass nil pointer of type to fs, the if condition will not true
-and this cause panic because fs is not nil.</pre>
-</div>
+<div class="paragraph">
+<p>If we pass nil pointer of type to fs, the if condition will not true
+and this cause panic because fs is not nil.</p>
 </div>
 </li>
 <li>
 <p>http: fix the package documentation</p>
-<div class="literalblock">
-<div class="content">
-<pre>The RegisterXxx methods on Server has been replaced with single method,
-RegisterEndpoint.</pre>
-</div>
+<div class="paragraph">
+<p>The RegisterXxx methods on Server has been replaced with single method,
+RegisterEndpoint.</p>
 </div>
 </li>
 <li>
 <p>dns: fix saving the TXT record file on zone file</p>
-<div class="literalblock">
-<div class="content">
-<pre>The TXT record value must be wrapped with quote when stored on zone
-file.</pre>
-</div>
+<div class="paragraph">
+<p>The TXT record value must be wrapped with quote when stored on zone
+file.</p>
 </div>
 </li>
 </ul>
@@ -3600,11 +3362,9 @@ file.</pre>
 <ul>
 <li>
 <p>cmd: add new CLI "totp"</p>
-<div class="literalblock">
-<div class="content">
-<pre>The totp is a program to generate Time-based One-time Password from
-secret key.</pre>
-</div>
+<div class="paragraph">
+<p>The totp is a program to generate Time-based One-time Password from
+secret key.</p>
 </div>
 </li>
 <li>
@@ -3619,12 +3379,10 @@ secret key.</pre>
 <ul>
 <li>
 <p>http: print client request if debug value is equal or greater than 2.</p>
-<div class="literalblock">
-<div class="content">
-<pre>If user set DEBUG environment variable or debug.Value to 2 or greater,
+<div class="paragraph">
+<p>If user set DEBUG environment variable or debug.Value to 2 or greater,
 the http Client will print the request (header and body) to the
-standard output.</pre>
-</div>
+standard output.</p>
 </div>
 </li>
 <li>
@@ -3644,11 +3402,9 @@ standard output.</pre>
 <ul>
 <li>
 <p>test: refactoring Assert with better error message</p>
-<div class="literalblock">
-<div class="content">
-<pre>The new Assert function use the reflect.DoEqual that return an error
-which describe which field have unmatched value.</pre>
-</div>
+<div class="paragraph">
+<p>The new Assert function use the reflect.DoEqual that return an error
+which describe which field have unmatched value.</p>
 </div>
 </li>
 </ul>
@@ -3660,25 +3416,19 @@ which describe which field have unmatched value.</pre>
 <ul>
 <li>
 <p>http: allow Endpoint to register custom error handler</p>
-<div class="literalblock">
-<div class="content">
-<pre>The new field ErrorHandler on Endpoint allow the implementor to define
-their own function to handler error from Endpoint.Call.</pre>
+<div class="paragraph">
+<p>The new field ErrorHandler on Endpoint allow the implementor to define
+their own function to handler error from Endpoint.Call.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>If the ErrorHandler is nil it will default to DefaultErrorHandler.</pre>
-</div>
+<div class="paragraph">
+<p>If the ErrorHandler is nil it will default to DefaultErrorHandler.</p>
 </div>
 </li>
 <li>
 <p>totp: new package that implement TOTP protocol</p>
-<div class="literalblock">
-<div class="content">
-<pre>Package totp implement Time-Based One-Time Password Algorithm based on
-RFC 6238.</pre>
-</div>
+<div class="paragraph">
+<p>Package totp implement Time-Based One-Time Password Algorithm based on
+RFC 6238.</p>
 </div>
 </li>
 </ul>
@@ -3690,11 +3440,9 @@ RFC 6238.</pre>
 <ul>
 <li>
 <p>parser: fix Line method that always return non-empty line</p>
-<div class="literalblock">
-<div class="content">
-<pre>In case of content end without new line, for example "a\nb", the Line()
-method always return "b, 0" on the last line.</pre>
-</div>
+<div class="paragraph">
+<p>In case of content end without new line, for example "anb", the Line()
+method always return "b, 0" on the last line.</p>
 </div>
 </li>
 <li>
@@ -3702,10 +3450,8 @@ method always return "b, 0" on the last line.</pre>
 </li>
 <li>
 <p>websocket: create buffered channel for running queue.</p>
-<div class="literalblock">
-<div class="content">
-<pre>This is to fix Stop() method waiting for running channel to be consumed.</pre>
-</div>
+<div class="paragraph">
+<p>This is to fix Stop() method waiting for running channel to be consumed.</p>
 </div>
 </li>
 </ul>
@@ -3720,27 +3466,21 @@ method always return "b, 0" on the last line.</pre>
 </li>
 <li>
 <p>http: add an example on how to write custom HTTP status code</p>
-<div class="literalblock">
-<div class="content">
-<pre>The example show how to use http.ResponseWriter.WriteHeader to write
-custom HTTP status code instead of relying on errors.E.</pre>
-</div>
+<div class="paragraph">
+<p>The example show how to use http.ResponseWriter.WriteHeader to write
+custom HTTP status code instead of relying on errors.E.</p>
 </div>
 </li>
 <li>
 <p>net: always return the host name or IP on ParseIPPort.</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, if the address is an IP address the returned value is empty,
+<div class="paragraph">
+<p>Previously, if the address is an IP address the returned value is empty,
 for example "127.0.0.1" will return empty host but with non-nil IP and
-port.</pre>
+port.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes always return the host either as host name (the same as
-paremeter) or valid IP address.</pre>
-</div>
+<div class="paragraph">
+<p>This changes always return the host either as host name (the same as
+paremeter) or valid IP address.</p>
 </div>
 </li>
 </ul>
@@ -3752,11 +3492,9 @@ paremeter) or valid IP address.</pre>
 <ul>
 <li>
 <p>all: replace the tasks to serve and generate docs using ciigo as library</p>
-<div class="literalblock">
-<div class="content">
-<pre>This way, one does not need to install ciigo binary, only require Go
-tools.</pre>
-</div>
+<div class="paragraph">
+<p>This way, one does not need to install ciigo binary, only require Go
+tools.</p>
 </div>
 </li>
 </ul>
@@ -3772,10 +3510,12 @@ tools.</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>websocket: set TLSConfig to nil if Endpoint scheme is not https or wss
-If user set TLSConfig but the Endpoint is not start with "https" or "wss",
+<p>websocket: set TLSConfig to nil if Endpoint scheme is not https or wss.</p>
+<div class="paragraph">
+<p>If user set TLSConfig but the Endpoint is not start with "https" or "wss",
 client open() method may return an error "Connect: tls: first record does
 not look like a TLS handshake".</p>
+</div>
 </li>
 <li>
 <p>paseto: add 5 seconds time drift when validating JSONToken</p>
@@ -3789,27 +3529,21 @@ not look like a TLS handshake".</p>
 <ul>
 <li>
 <p>big: add method RoundToNearestAway and RoundToZero</p>
-<div class="literalblock">
-<div class="content">
-<pre>RoundToNearestAway round r to n digit precision using nearest away mode,
+<div class="paragraph">
+<p>RoundToNearestAway round r to n digit precision using nearest away mode,
 where mantissa is accumulated by the last digit after precision.
-For example, using 2 digit precision, 0.555 would become 0.56.</pre>
+For example, using 2 digit precision, 0.555 would become 0.56.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>RoundToZero round r to n digit precision using to zero mode.
-For example, using 2 digit precision, 0.555 would become 0.55.</pre>
-</div>
+<div class="paragraph">
+<p>RoundToZero round r to n digit precision using to zero mode.
+For example, using 2 digit precision, 0.555 would become 0.55.</p>
 </div>
 </li>
 <li>
 <p>parser: add Stop method</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Stop method return the remaining unparsed content and its last
-position, and then call Close to reset the internal state back to zero.</pre>
-</div>
+<div class="paragraph">
+<p>The Stop method return the remaining unparsed content and its last
+position, and then call Close to reset the internal state back to zero.</p>
 </div>
 </li>
 </ul>
@@ -3837,16 +3571,12 @@ position, and then call Close to reset the internal state back to zero.</pre>
 <li>
 <p>lib/paseto: a simple, ready to use, implementation of Platform-Agnostic
 SEcurity TOkens</p>
-<div class="literalblock">
-<div class="content">
-<pre>This implementation only support PASETO Protocol v2.</pre>
+<div class="paragraph">
+<p>This implementation only support PASETO Protocol v2.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This library focus on how to sign and verify data, everything else is
-handled and filled automatically.</pre>
-</div>
+<div class="paragraph">
+<p>This library focus on how to sign and verify data, everything else is
+handled and filled automatically.</p>
 </div>
 </li>
 </ul>
@@ -3857,11 +3587,13 @@ handled and filled automatically.</pre>
 <div class="ulist">
 <ul>
 <li>
-<p>dns: serve DoT without SSL if server is behind proxy or tlsConfig is null
-Previously we only check for tlsConfig, if its null the DoT server
+<p>dns: serve DoT without SSL if server is behind proxy or tlsConfig is null.</p>
+<div class="paragraph">
+<p>Previously we only check for tlsConfig, if its null the DoT server
 will not running.
 There is a use case where the SSL terminated by proxy and the connection
 is forwarded to DNS server, so this changes accommodated it.</p>
+</div>
 </li>
 <li>
 <p>http: increase the debug level from 2 to 3</p>
@@ -3889,37 +3621,27 @@ is forwarded to DNS server, so this changes accommodated it.</p>
 </li>
 <li>
 <p>dns: refactoring the ResourceRecord values from []byte to string</p>
-<div class="literalblock">
-<div class="content">
-<pre>There are two reasons for this changes.  First, to allow JSON encoded
-of ResourceRecord.Value without encoded to base64.</pre>
+<div class="paragraph">
+<p>There are two reasons for this changes.  First, to allow JSON encoded
+of ResourceRecord.Value without encoded to base64.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Second, to minimize unreleased packet due to the backing storage is
-still used when assigned to Value (or any []byte field in RDataXXX).</pre>
-</div>
+<div class="paragraph">
+<p>Second, to minimize unreleased packet due to the backing storage is
+still used when assigned to Value (or any []byte field in RDataXXX).</p>
 </div>
 </li>
 <li>
 <p>dns: dns: split between MasterFile and masterParser</p>
-<div class="literalblock">
-<div class="content">
-<pre>While at it add field Records that contains unpacked ResourceRecord as
-mapping between domain and ResourceRecord.</pre>
+<div class="paragraph">
+<p>While at it add field Records that contains unpacked ResourceRecord as
+mapping between domain and ResourceRecord.</p>
 </div>
+<div class="paragraph">
+<p>This is useful for client that need to edit the RR in MasterFile.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This is useful for client that need to edit the RR in MasterFile.</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes also unexport the Messages field, to access it use the method
-Messages.</pre>
-</div>
+<div class="paragraph">
+<p>This changes also unexport the Messages field, to access it use the method
+Messages.</p>
 </div>
 </li>
 <li>
@@ -3958,17 +3680,13 @@ Messages.</pre>
 </li>
 <li>
 <p>websocket: add server options to change the connect and status paths</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, there is only one option for server, the port where it will
-listen.</pre>
+<div class="paragraph">
+<p>Previously, there is only one option for server, the port where it will
+listen.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes add option to change the connect path (default to "/"
-previously) and new path and handler for retrieving server status.</pre>
-</div>
+<div class="paragraph">
+<p>This changes add option to change the connect path (default to "/"
+previously) and new path and handler for retrieving server status.</p>
 </div>
 </li>
 </ul>
@@ -4004,12 +3722,10 @@ previously) and new path and handler for retrieving server status.</pre>
 <ul>
 <li>
 <p>big: add global flag MarshalJSONAsString</p>
-<div class="literalblock">
-<div class="content">
-<pre>MarshalJSONAsString define the default return behaviour of MarshalJSON().
+<div class="paragraph">
+<p>MarshalJSONAsString define the default return behaviour of MarshalJSON().
 If its true (the default) the returned JSON format will encapsulated in
-double quote, as string instead of as numeric.</pre>
-</div>
+double quote, as string instead of as numeric.</p>
 </div>
 </li>
 <li>
@@ -4017,20 +3733,16 @@ double quote, as string instead of as numeric.</pre>
 </li>
 <li>
 <p>http: do not return error based on response code</p>
-<div class="literalblock">
-<div class="content">
-<pre>The error in doRequest should be about connection error, everything
-else should be handled by user.</pre>
-</div>
+<div class="paragraph">
+<p>The error in doRequest should be about connection error, everything
+else should be handled by user.</p>
 </div>
 </li>
 <li>
 <p>http: allow setting response type when registering PUT</p>
-<div class="literalblock">
-<div class="content">
-<pre>User of this library may want to return something and they will suprised
-if the library always set the response type to None.</pre>
-</div>
+<div class="paragraph">
+<p>User of this library may want to return something and they will suprised
+if the library always set the response type to None.</p>
 </div>
 </li>
 </ul>
@@ -4144,28 +3856,22 @@ if the library always set the response type to None.</pre>
 <ul>
 <li>
 <p>dns: refactoring loading hosts and master files</p>
-<div class="literalblock">
-<div class="content">
-<pre>Instead of as methods in Server, we detach the LoadHostDir and
+<div class="paragraph">
+<p>Instead of as methods in Server, we detach the LoadHostDir and
 LostMasterDir into functions that return list of filename and their
-content.</pre>
-</div>
+content.</p>
 </div>
 </li>
 <li>
 <p>dns: disable serving DoH and DoT if port is not set (0)</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, if HTTPPort or TLSPort is not set (0) we set it to default
+<div class="paragraph">
+<p>Previously, if HTTPPort or TLSPort is not set (0) we set it to default
 value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
-want to serve DNS over UDP only.</pre>
+want to serve DNS over UDP only.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
-is not set, or 0.</pre>
-</div>
+<div class="paragraph">
+<p>This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
+is not set, or 0.</p>
 </div>
 </li>
 <li>
@@ -4176,26 +3882,20 @@ is not set, or 0.</pre>
 </li>
 <li>
 <p>ini: fix inconsistencies between empty string and boolean true</p>
-<div class="literalblock">
-<div class="content">
-<pre>In Git specification, an empty variable is equal to boolean true.
-This cause inconsistency between empty string and boolean true.</pre>
-</div>
+<div class="paragraph">
+<p>In Git specification, an empty variable is equal to boolean true.
+This cause inconsistency between empty string and boolean true.</p>
 </div>
 </li>
 <li>
 <p>memfs: simplify the API, add directory parameter to New</p>
-<div class="literalblock">
-<div class="content">
-<pre>This changes add parameter directory to be mounted in New(), so user
-did not need to call Mount manually</pre>
+<div class="paragraph">
+<p>This changes add parameter directory to be mounted in New(), so user
+did not need to call Mount manually</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This cause the Mount method and its sibling, Unmount and IsMounted
-become unneeded, so we remove them.</pre>
-</div>
+<div class="paragraph">
+<p>This cause the Mount method and its sibling, Unmount and IsMounted
+become unneeded, so we remove them.</p>
 </div>
 </li>
 </ul>
@@ -4217,11 +3917,9 @@ become unneeded, so we remove them.</pre>
 <ul>
 <li>
 <p>bytes: add function MergeSpaces</p>
-<div class="literalblock">
-<div class="content">
-<pre>The function MergeSpaces will convert sequences of white space into
-single space ' '.</pre>
-</div>
+<div class="paragraph">
+<p>The function MergeSpaces will convert sequences of white space into
+single space ' '.</p>
 </div>
 </li>
 <li>
@@ -4245,36 +3943,28 @@ subsection that match with the key</p>
 </li>
 <li>
 <p>os/exec: new package to simplify the standard "os/exec"</p>
-<div class="literalblock">
-<div class="content">
-<pre>New extension to standard package is function ParseCommandArgs() that
+<div class="paragraph">
+<p>New extension to standard package is function ParseCommandArgs() that
 receive input as string and return itas command and list of arguments.
 Unlike strings.Fields() which only separated the field by space,
-ParseCommandArgs can detect possible single, double, or back quotes.</pre>
+ParseCommandArgs can detect possible single, double, or back quotes.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Another extension is Run() function that accept the string command
-to be executed and their standard output and error.</pre>
-</div>
+<div class="paragraph">
+<p>Another extension is Run() function that accept the string command
+to be executed and their standard output and error.</p>
 </div>
 </li>
 <li>
 <p>sql: add method to migrate database schema</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Migrate method migrate the database using list of SQL files inside
+<div class="paragraph">
+<p>The Migrate method migrate the database using list of SQL files inside
 a directory.
 Each SQL file in directory will be executed in alphabetical order based on
-the last state.</pre>
+the last state.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>The state of migration will be saved in table "_migration" with the SQL
-file name that has been executed and the timestamp.</pre>
-</div>
+<div class="paragraph">
+<p>The state of migration will be saved in table "_migration" with the SQL
+file name that has been executed and the timestamp.</p>
 </div>
 </li>
 </ul>
@@ -4289,17 +3979,13 @@ file name that has been executed and the timestamp.</pre>
 </li>
 <li>
 <p>dns: do not load hidden hosts and master file</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, the LoadHostDir and LoadMasterDir load all files inside
-the directory without checking if its hidden (starting with dot) or not.</pre>
+<div class="paragraph">
+<p>Previously, the LoadHostDir and LoadMasterDir load all files inside
+the directory without checking if its hidden (starting with dot) or not.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes make the hidden file not loaded so one can disable it
-temporarily by prefixing it with dot.</pre>
-</div>
+<div class="paragraph">
+<p>This changes make the hidden file not loaded so one can disable it
+temporarily by prefixing it with dot.</p>
 </div>
 </li>
 <li>
@@ -4307,11 +3993,11 @@ temporarily by prefixing it with dot.</pre>
 </li>
 <li>
 <p>memfs: make the Node Readdir works when calling from generated Go code</p>
-<div class="literalblock">
+<div class="openblock">
 <div class="content">
-<pre>Previously, the Go generated code from call to GoGenerate() set only
-mapping of path to node.  Calling Readdir() using http.File using</pre>
-</div>
+<div class="paragraph">
+<p>Previously, the Go generated code from call to GoGenerate() set only
+mapping of path to node.  Calling Readdir() using http.File using</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -4319,14 +4005,12 @@ mapping of path to node.  Calling Readdir() using http.File using</pre>
 fis, err := root.Readdir(0)</pre>
 </div>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>will return nil on fis.</pre>
+<div class="paragraph">
+<p>will return nil on fis.</p>
 </div>
+<div class="paragraph">
+<p>This changes add all child nodes to generated node.</p>
 </div>
-<div class="literalblock">
-<div class="content">
-<pre>This changes add all child nodes to generated node.</pre>
 </div>
 </div>
 </li>
@@ -4369,20 +4053,16 @@ fis, err := root.Readdir(0)</pre>
 </li>
 <li>
 <p>net/html: new package to simplify the golang.org/x/net/html</p>
-<div class="literalblock">
-<div class="content">
-<pre>The x/net/html package currently only provide bare raw functionalities
+<div class="paragraph">
+<p>The x/net/html package currently only provide bare raw functionalities
 to iterate tree, there is no check for empty node, no function to
 get attribute by name, and no simple way to iterate tree without looping it
-manually.</pre>
+manually.</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>This package extends the package by adding methods to get node's attribute
+<div class="paragraph">
+<p>This package extends the package by adding methods to get node&#8217;s attribute
 by name, get the first non-empty child, get the next non-empty sibling, and
-to iterate each node in the tree from top to bottom.</pre>
-</div>
+to iterate each node in the tree from top to bottom.</p>
 </div>
 </li>
 </ul>
@@ -4431,13 +4111,11 @@ to iterate each node in the tree from top to bottom.</pre>
 <ul>
 <li>
 <p>http: simplify server Endpoint registrations</p>
-<div class="literalblock">
-<div class="content">
-<pre>Previously, each endpoint with method DELETE, GET, PATCH, POST, and PUT
+<div class="paragraph">
+<p>Previously, each endpoint with method DELETE, GET, PATCH, POST, and PUT
 require calling different call for registration.  This change simplify
 it to one call only, "RegisterEndpoint", and the registration process
-will be handled automatically based on value on field Method.</pre>
-</div>
+will be handled automatically based on value on field Method.</p>
 </div>
 </li>
 <li>
@@ -4455,36 +4133,28 @@ will be handled automatically based on value on field Method.</pre>
 </li>
 <li>
 <p>math/big: new package that extends the capabilities of "math/big"</p>
-<div class="literalblock">
-<div class="content">
-<pre>The "big" package add custom global precision, rounding mode, and number
+<div class="paragraph">
+<p>The "big" package add custom global precision, rounding mode, and number
 of digit precision after decimal point for all instance of Float that
-use the package.</pre>
-</div>
+use the package.</p>
 </div>
 </li>
 <li>
 <p>reflect: new package that extends the standard reflect</p>
-<div class="literalblock">
-<div class="content">
-<pre>This package add new interface "Equaler", it is an interface that
-have single method "IsEqual()".</pre>
+<div class="paragraph">
+<p>This package add new interface "Equaler", it is an interface that
+have single method "IsEqual()".</p>
 </div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>Also, we have new function "IsNil(interface{})" that will return true
-if the value in interface{} is nil.</pre>
-</div>
+<div class="paragraph">
+<p>Also, we have new function "IsNil(interface{})" that will return true
+if the value in interface{} is nil.</p>
 </div>
 </li>
 <li>
 <p>strings: add function SingleSpace</p>
-<div class="literalblock">
-<div class="content">
-<pre>The SingleSpace function convert all sequences of white spaces into
-single space ' '.</pre>
-</div>
+<div class="paragraph">
+<p>The SingleSpace function convert all sequences of white spaces into
+single space ' '.</p>
 </div>
 </li>
 </ul>
@@ -4502,20 +4172,16 @@ single space ' '.</pre>
 </li>
 <li>
 <p>hunspell: add Stem() method to Spell and Stem</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Stem() method reduce inflected (or sometimes derived) words to
-their word stem, base, or root form.</pre>
-</div>
+<div class="paragraph">
+<p>The Stem() method reduce inflected (or sometimes derived) words to
+their word stem, base, or root form.</p>
 </div>
 </li>
 <li>
 <p>hunspell: add Analyze() method to Spell and Stem</p>
-<div class="literalblock">
-<div class="content">
-<pre>The Analyze() method will return list of morphological fields of the
-word.</pre>
-</div>
+<div class="paragraph">
+<p>The Analyze() method will return list of morphological fields of the
+word.</p>
 </div>
 </li>
 <li>
@@ -4960,9 +4626,8 @@ http.Request.Form using Get method.</p>
 <ul>
 <li>
 <p>ini: set variable with "=" without a value default to empty string</p>
-</li>
-</ul>
-</div>
+<div class="openblock">
+<div class="content">
 <div class="paragraph">
 <p>Previously, a variable end with "=" will have value set to "true".
 For example,</p>
@@ -4979,6 +4644,11 @@ var =</pre>
 <div class="paragraph">
 <p>This changes make the variable that end with "=" without any value
 to be an empty string, so "var" value is equal to "".</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
@@ -5877,7 +5547,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-02-05 13:32:08 +0700
+Last updated 2022-02-05 14:01:47 +0700
 </div>
 </div>
 			</div>
