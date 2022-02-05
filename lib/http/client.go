@@ -165,7 +165,6 @@ func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err
 	var (
 		logp     = "Download"
 		httpReq  *http.Request
-		tee      io.Reader
 		errClose error
 	)
 
@@ -188,9 +187,7 @@ func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err
 		goto out
 	}
 
-	tee = io.TeeReader(httpRes.Body, req.Output)
-
-	_, err = io.ReadAll(tee)
+	_, err = io.Copy(req.Output, httpRes.Body)
 	if err != nil {
 		err = fmt.Errorf("%s: %w", logp, err)
 	}
