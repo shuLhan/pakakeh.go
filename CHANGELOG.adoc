@@ -5,6 +5,32 @@ Shulhan <ms@kilabit.info>
 This library is released every month, usually at the first week of month.
 
 
+==  share v0.35.0 (2022-0x-xx)
+
+=== New features
+
+*  cmd/xtrk: command line interface to uncompress and/or unarchive file
++
+--
+xtrk accept single file to uncompress and/or archived into a directory
+output dir".
+If directory output "dir" is not defined, it will be set to current
+directoy.
+
+The compression and archive format is detected automatically based on the
+following file input extension:
+
+* .bz2: decompress using bzip2.
+* .gz: decompress using gzip.
+* .tar: unarchive using tar.
+* .zip: unarchive using zip.
+* .tar.bz2: decompress using bzip2 and unarchive using tar.
+* .tar.gz: decompresss using gzip and unarchive using tar.
+
+The input file will be removed on success.
+--
+
+
 ==  share v0.34.0 (2022-02-05)
 
 ===  Breaking changes
