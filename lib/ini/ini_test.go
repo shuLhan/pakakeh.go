@@ -654,6 +654,48 @@ xx = 4
 	test.Assert(t, "TestMarshal_embedded", exp, string(got))
 }
 
+// Make sure that variables loaded into a map, will be stored in
+// alphabetically orders by keys on Marshal.
+func TestMarshal_map_stable(t *testing.T) {
+	type ADT struct {
+		Amap map[string]string `ini:"test:map"`
+	}
+
+	var (
+		logp = "TestMarshal_map_stable"
+		adt  ADT
+		text []byte
+		exp  []byte
+		got  []byte
+		err  error
+	)
+
+	text = []byte(`
+[test "map"]
+c = 3
+b = 2
+a = 1
+`)
+
+	exp = []byte(`[test "map"]
+a = 1
+b = 2
+c = 3
+`)
+
+	err = Unmarshal(text, &adt)
+	if err != nil {
+		t.Fatalf("%s: %s", logp, err)
+	}
+
+	got, err = Marshal(&adt)
+	if err != nil {
+		t.Fatalf("%s: %s", logp, err)
+	}
+
+	test.Assert(t, "Marshal map stable", string(exp), string(got))
+}
+
 func TestUnmarshal_embedded(t *testing.T) {
 	got := &C{}
 	content := []byte(`[a]

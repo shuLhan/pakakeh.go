@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -190,13 +191,20 @@ func (in *Ini) marshalStruct(
 			}
 
 		case reflect.Map:
+			amap := map[string]string{}
+			keys := make([]string, 0)
 			iter := fvalue.MapRange()
 			for iter.Next() {
 				mk := iter.Key()
 				mv := iter.Value()
 				key = strings.ToLower(fmt.Sprintf("%v", mk))
 				value = fmt.Sprintf("%v", mv)
-				in.Set(sec, sub, key, value)
+				amap[key] = value
+				keys = append(keys, key)
+			}
+			sort.Strings(keys)
+			for _, key = range keys {
+				in.Set(sec, sub, key, amap[key])
 			}
 
 		case reflect.Ptr:

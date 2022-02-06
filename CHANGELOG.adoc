@@ -30,6 +30,35 @@ following file input extension:
 The input file will be removed on success.
 --
 
+===  Enhancements
+
+*  lib/ini: make the Marshal on map field sorted by keys
++
+--
+Given the following struct,
+
+----
+type ADT struct {
+	Amap map[string]string `ini:"section:sub"`
+}
+----
+
+and ini text,
+
+----
+[test "map"]
+c = 3
+b = 2
+a = 1
+----
+
+Unmarshal-ing the text into ADT and then Marshal-ing it again will
+result in unpredictable keys order.
+
+This changes fix this issue by sorting the keys on ADT.Amap on
+Marshal-ing, to make the written output predictable.
+--
+
 
 ==  share v0.34.0 (2022-02-05)
 
