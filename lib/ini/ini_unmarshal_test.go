@@ -17,35 +17,39 @@ type Y struct {
 }
 
 type X struct {
-	Struct       Y  `ini:"section:struct"`
+	Time time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+
+	PtrBool     *bool          `ini:"section:pointer:bool"`
+	PtrDuration *time.Duration `ini:"section:pointer:duration"`
+	PtrInt      *int           `ini:"section:pointer:int"`
+	PtrString   *string        `ini:"section:pointer:string"`
+	PtrTime     *time.Time     `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
+
 	PtrStruct    *Y `ini:"section:ptr_struct"`
 	PtrStructNil *Y `ini:"section:ptr_struct_nil"`
 
-	String   string        `ini:"section::string"`
-	Int      int           `ini:"section::int"`
-	Bool     bool          `ini:"section::bool"`
-	Duration time.Duration `ini:"section::duration"`
-	Time     time.Time     `ini:"section::time" layout:"2006-01-02 15:04:05"`
+	Struct Y `ini:"section:struct"`
 
-	PtrString   *string        `ini:"section:pointer:string"`
-	PtrInt      *int           `ini:"section:pointer:int"`
-	PtrBool     *bool          `ini:"section:pointer:bool"`
-	PtrDuration *time.Duration `ini:"section:pointer:duration"`
-	PtrTime     *time.Time     `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
+	String string `ini:"section::string"`
 
-	SliceStruct   []Y             `ini:"slice:struct"`
-	SliceString   []string        `ini:"slice::string"`
-	SliceInt      []int           `ini:"slice::int"`
-	SliceBool     []bool          `ini:"slice::bool"`
-	SliceDuration []time.Duration `ini:"slice::duration"`
-	SliceTime     []time.Time     `ini:"slice::time" layout:"2006-01-02 15:04:05"`
+	SliceStruct []Y `ini:"slice:struct"`
 
-	SlicePtrStruct   []*Y             `ini:"slice:ptr_struct"`
-	SlicePtrString   []*string        `ini:"slice:ptr:string"`
-	SlicePtrInt      []*int           `ini:"slice:ptr:int"`
 	SlicePtrBool     []*bool          `ini:"slice:ptr:bool"`
 	SlicePtrDuration []*time.Duration `ini:"slice:ptr:duration"`
+	SlicePtrInt      []*int           `ini:"slice:ptr:int"`
+	SlicePtrString   []*string        `ini:"slice:ptr:string"`
+	SlicePtrStruct   []*Y             `ini:"slice:ptr_struct"`
 	SlicePtrTime     []*time.Time     `ini:"slice:ptr:time" layout:"2006-01-02 15:04:05"`
+
+	SliceBool     []bool          `ini:"slice::bool"`
+	SliceDuration []time.Duration `ini:"slice::duration"`
+	SliceInt      []int           `ini:"slice::int"`
+	SliceString   []string        `ini:"slice::string"`
+	SliceTime     []time.Time     `ini:"slice::time" layout:"2006-01-02 15:04:05"`
+
+	Duration time.Duration `ini:"section::duration"`
+	Int      int           `ini:"section::int"`
+	Bool     bool          `ini:"section::bool"`
 }
 
 func TestIni_Unmarshal(t *testing.T) {

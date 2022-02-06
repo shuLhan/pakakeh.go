@@ -168,34 +168,54 @@ func ExampleMarshal() {
 		Int    int    `ini:"::int"`
 	}
 
-	t := struct {
-		String      string            `ini:"section::string"`
-		Int         int               `ini:"section::int"`
-		Bool        bool              `ini:"section::bool"`
-		Duration    time.Duration     `ini:"section::duration"`
-		Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
-		Struct      U                 `ini:"section:struct"`
-		SliceString []string          `ini:"section:slice:string"`
-		SliceInt    []int             `ini:"section:slice:int"`
-		SliceUint   []uint            `ini:"section:slice:uint"`
-		SliceBool   []bool            `ini:"section:slice:bool"`
-		SliceStruct []U               `ini:"slice:OfStruct"`
-		MapString   map[string]string `ini:"map:string"`
-		MapInt      map[string]int    `ini:"map:int"`
-		PtrString   *string           `ini:"section:pointer:string"`
-		PtrInt      *int              `ini:"section:pointer:int"`
-		PtrTime     *time.Time        `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
-		PtrStruct   *U                `ini:"pointer:struct"`
-	}{
-		String:   "a",
-		Int:      1,
-		Bool:     true,
-		Duration: time.Minute,
-		Time:     time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC),
-		Struct: U{
-			String: "b",
-			Int:    2,
+	type ADT struct {
+		Time time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+
+		PtrString *string    `ini:"section:pointer:string"`
+		PtrInt    *int       `ini:"section:pointer:int"`
+		PtrTime   *time.Time `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
+		PtrStruct *U         `ini:"pointer:struct"`
+
+		MapString map[string]string `ini:"map:string"`
+		MapInt    map[string]int    `ini:"map:int"`
+
+		String string `ini:"section::string"`
+
+		SliceString []string `ini:"section:slice:string"`
+		SliceInt    []int    `ini:"section:slice:int"`
+		SliceUint   []uint   `ini:"section:slice:uint"`
+		SliceBool   []bool   `ini:"section:slice:bool"`
+		SliceStruct []U      `ini:"slice:OfStruct"`
+
+		Struct U `ini:"section:struct"`
+
+		Duration time.Duration `ini:"section::duration"`
+
+		Int int `ini:"section::int"`
+
+		Bool bool `ini:"section::bool"`
+	}
+
+	t := ADT{
+		Time: time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC),
+
+		PtrString: &ptrString,
+		PtrInt:    &ptrInt,
+		PtrTime:   &ptrTime,
+		PtrStruct: &U{
+			String: "PtrStruct.String",
+			Int:    3,
 		},
+
+		MapString: map[string]string{
+			"k": "v",
+		},
+		MapInt: map[string]int{
+			"keyInt": 6,
+		},
+
+		String: "a",
+
 		SliceString: []string{"c", "d"},
 		SliceInt:    []int{2, 3},
 		SliceUint:   []uint{4, 5},
@@ -207,19 +227,17 @@ func ExampleMarshal() {
 			String: "U.string 2",
 			Int:    2,
 		}},
-		MapString: map[string]string{
-			"k": "v",
+
+		Struct: U{
+			String: "b",
+			Int:    2,
 		},
-		MapInt: map[string]int{
-			"keyInt": 6,
-		},
-		PtrString: &ptrString,
-		PtrInt:    &ptrInt,
-		PtrTime:   &ptrTime,
-		PtrStruct: &U{
-			String: "PtrStruct.String",
-			Int:    3,
-		},
+
+		Duration: time.Minute,
+
+		Int: 1,
+
+		Bool: true,
 	}
 
 	iniText, err := Marshal(&t)
@@ -230,15 +248,26 @@ func ExampleMarshal() {
 	fmt.Printf("%s\n", iniText)
 	// Output:
 	// [section]
+	// time = 2006-01-02 15:04:05
 	// string = a
+	// duration = 1m0s
 	// int = 1
 	// bool = true
-	// duration = 1m0s
-	// time = 2006-01-02 15:04:05
 	//
-	// [section "struct"]
+	// [section "pointer"]
 	// string = b
 	// int = 2
+	// time = 2021-02-28 18:44:01
+	//
+	// [pointer "struct"]
+	// string = PtrStruct.String
+	// int = 3
+	//
+	// [map "string"]
+	// k = v
+	//
+	// [map "int"]
+	// keyint = 6
 	//
 	// [section "slice"]
 	// string = c
@@ -258,20 +287,9 @@ func ExampleMarshal() {
 	// string = U.string 2
 	// int = 2
 	//
-	// [map "string"]
-	// k = v
-	//
-	// [map "int"]
-	// keyint = 6
-	//
-	// [section "pointer"]
+	// [section "struct"]
 	// string = b
 	// int = 2
-	// time = 2021-02-28 18:44:01
-	//
-	// [pointer "struct"]
-	// string = PtrStruct.String
-	// int = 3
 }
 
 func ExampleUnmarshal() {
@@ -317,22 +335,35 @@ int = 2
 		Int    int    `ini:"::int"`
 	}
 
-	t := struct {
-		String      string            `ini:"section::string"`
-		Int         int               `ini:"section::int"`
-		Bool        bool              `ini:"section::bool"`
-		Duration    time.Duration     `ini:"section::duration"`
-		Time        time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
-		SliceString []string          `ini:"section:slice:string"`
-		SliceInt    []int             `ini:"section:slice:int"`
-		SliceUint   []uint            `ini:"section:slice:uint"`
-		SliceBool   []bool            `ini:"section:slice:bool"`
-		SliceStruct []U               `ini:"slice:OfStruct"`
-		MapString   map[string]string `ini:"map:string"`
-		MapInt      map[string]int    `ini:"map:int"`
-		PtrString   *string           `ini:"section:pointer:string"`
-		PtrInt      *int              `ini:"section:pointer:int"`
-	}{}
+	type ADT struct {
+		Time time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+
+		PtrString *string    `ini:"section:pointer:string"`
+		PtrInt    *int       `ini:"section:pointer:int"`
+		PtrTime   *time.Time `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
+		PtrStruct *U         `ini:"pointer:struct"`
+
+		MapString map[string]string `ini:"map:string"`
+		MapInt    map[string]int    `ini:"map:int"`
+
+		String string `ini:"section::string"`
+
+		SliceString []string `ini:"section:slice:string"`
+		SliceInt    []int    `ini:"section:slice:int"`
+		SliceUint   []uint   `ini:"section:slice:uint"`
+		SliceBool   []bool   `ini:"section:slice:bool"`
+		SliceStruct []U      `ini:"slice:OfStruct"`
+
+		Struct U `ini:"section:struct"`
+
+		Duration time.Duration `ini:"section::duration"`
+
+		Int int `ini:"section::int"`
+
+		Bool bool `ini:"section::bool"`
+	}
+
+	t := ADT{}
 
 	err := Unmarshal([]byte(iniText), &t)
 	if err != nil {

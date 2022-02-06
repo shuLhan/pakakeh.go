@@ -43,17 +43,20 @@ var (
 // reader define the INI file reader.
 //
 type reader struct {
-	br         *bytes.Reader
-	b          byte
-	r          rune
-	lineNum    int
-	filename   string
-	_var       *variable
-	sec        *Section
+	br   *bytes.Reader
+	_var *variable
+	sec  *Section
+
+	filename string
+
 	buf        bytes.Buffer
 	bufComment bytes.Buffer
 	bufFormat  bytes.Buffer
 	bufSpaces  bytes.Buffer
+
+	lineNum int
+	r       rune
+	b       byte
 }
 
 //

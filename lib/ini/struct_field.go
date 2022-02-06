@@ -11,14 +11,16 @@ import (
 )
 
 type structField struct {
+	ftype reflect.Type
+	fval  reflect.Value
+
 	sec    string
 	sub    string
 	key    string
 	layout string
 	fname  string
-	fkind  reflect.Kind
-	ftype  reflect.Type
-	fval   reflect.Value
+
+	fkind reflect.Kind
 }
 
 func (sfield *structField) set(val string) bool {

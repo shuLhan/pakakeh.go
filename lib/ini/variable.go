@@ -18,8 +18,6 @@ import (
 // want to compare variable, use the KeyLower value.
 //
 type variable struct {
-	mode     lineMode
-	lineNum  int
 	format   string
 	secName  string
 	subName  string
@@ -27,6 +25,10 @@ type variable struct {
 	keyLower string
 	value    string
 	others   string
+
+	mode    lineMode
+	lineNum int
+
 	isQuoted bool
 }
 

@@ -105,9 +105,9 @@ func TestAddSection(t *testing.T) {
 	in := &Ini{}
 
 	cases := []struct {
-		desc   string
 		sec    *Section
 		expIni *Ini
+		desc   string
 	}{{
 		desc:   "With nil section",
 		expIni: &Ini{},

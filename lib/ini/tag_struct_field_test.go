@@ -19,23 +19,30 @@ func TestUnpackStruct(t *testing.T) {
 	}
 
 	type T struct {
-		String       string            `ini:"section::string"`
-		Int          int               `ini:"section::int"`
-		Bool         bool              `ini:"section::bool"`
-		Duration     time.Duration     `ini:"section::duration"`
-		Time         time.Time         `ini:"section::time" layout:"2006-01-02 15:04:05"`
-		SliceString  []string          `ini:"section:slice:string"`
-		SliceInt     []int             `ini:"section:slice:int"`
-		SliceUint    []uint            `ini:"section:slice:uint"`
-		SliceBool    []bool            `ini:"section:slice:bool"`
-		SliceStruct  []U               `ini:"slice:OfStruct"`
-		MapString    map[string]string `ini:"section:mapstring"`
-		MapInt       map[string]int    `ini:"section:mapint"`
-		PtrString    *string           `ini:"section:pointer"`
-		PtrInt       *int              `ini:"section:pointer"`
-		Struct       U
+		Time time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+
 		PtrStruct    *U
 		PtrStructNil *U
+
+		PtrString *string `ini:"section:pointer"`
+		PtrInt    *int    `ini:"section:pointer"`
+
+		MapString map[string]string `ini:"section:mapstring"`
+		MapInt    map[string]int    `ini:"section:mapint"`
+
+		String string `ini:"section::string"`
+
+		SliceString []string `ini:"section:slice:string"`
+		SliceInt    []int    `ini:"section:slice:int"`
+		SliceUint   []uint   `ini:"section:slice:uint"`
+		SliceStruct []U      `ini:"slice:OfStruct"`
+		SliceBool   []bool   `ini:"section:slice:bool"`
+
+		Struct U
+
+		Duration time.Duration `ini:"section::duration"`
+		Int      int           `ini:"section::int"`
+		Bool     bool          `ini:"section::bool"`
 	}
 
 	var v interface{} = &T{

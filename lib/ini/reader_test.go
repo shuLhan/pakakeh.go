@@ -13,14 +13,15 @@ import (
 
 func TestParseSectionHeader(t *testing.T) {
 	cases := []struct {
-		desc       string
-		in         string
 		expErr     error
-		expMode    lineMode
 		expFormat  string
 		expSecName string
 		expSubName string
 		expComment string
+
+		desc    string
+		in      string
+		expMode lineMode
 	}{{
 		desc:   "With empty input",
 		expErr: errBadConfig,
@@ -124,13 +125,15 @@ func TestParseSectionHeader(t *testing.T) {
 
 func TestParseSubsection(t *testing.T) {
 	cases := []struct {
-		desc       string
-		in         string
 		expErr     error
-		expMode    lineMode
 		expFormat  string
 		expSub     string
 		expComment string
+
+		desc string
+		in   string
+
+		expMode lineMode
 	}{{
 		desc:   "With empty input",
 		expErr: errBadConfig,
@@ -178,14 +181,15 @@ func TestParseSubsection(t *testing.T) {
 
 func TestParseVariable(t *testing.T) {
 	cases := []struct {
-		desc       string
-		in         []byte
 		expErr     error
-		expMode    lineMode
 		expFormat  string
 		expComment string
 		expKey     string
 		expValue   string
+
+		desc    string
+		in      []byte
+		expMode lineMode
 	}{{
 		desc:   "Empty",
 		expErr: errVarNameInvalid,
@@ -346,12 +350,13 @@ func TestParseVariable(t *testing.T) {
 
 func TestParseVarValue(t *testing.T) {
 	cases := []struct {
-		desc       string
-		in         []byte
 		expErr     error
 		expFormat  string
 		expValue   string
 		expComment string
+
+		desc string
+		in   []byte
 	}{{
 		desc:     `Empty input`,
 		expErr:   io.EOF,

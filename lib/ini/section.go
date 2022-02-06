@@ -16,14 +16,16 @@ import (
 // Remember that section's name is case insensitive.
 //
 type Section struct {
-	mode      lineMode
-	lineNum   int
 	name      string
 	sub       string
 	format    string
 	nameLower string
 	others    string
-	vars      []*variable
+
+	vars []*variable
+
+	mode    lineMode
+	lineNum int
 }
 
 //

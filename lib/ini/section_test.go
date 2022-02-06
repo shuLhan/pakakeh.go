@@ -12,10 +12,11 @@ import (
 
 func TestNewSection(t *testing.T) {
 	cases := []struct {
-		desc   string
-		name   string
-		sub    string
 		expSec *Section
+
+		desc string
+		name string
+		sub  string
 	}{{
 		desc: "With empty name",
 	}, {
@@ -69,11 +70,13 @@ func TestSectionSet(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		k      string
-		v      string
-		expOK  bool
 		expSec *Section
+
+		desc string
+		k    string
+		v    string
+
+		expOK bool
 	}{{
 		desc:  "With empty value",
 		k:     "k",
@@ -145,10 +148,11 @@ func TestSection_add(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		k      string
-		v      string
 		expSec *Section
+
+		desc string
+		k    string
+		v    string
 	}{{
 		desc: "With empty key",
 		expSec: &Section{
@@ -244,10 +248,11 @@ func TestSectionUnset(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		k      string
-		expOK  bool
 		expSec *Section
+
+		desc  string
+		k     string
+		expOK bool
 	}{{
 		desc:  "With empty key",
 		expOK: false,
@@ -337,9 +342,10 @@ func TestSectionUnsetAll(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		k      string
 		expSec *Section
+
+		desc string
+		k    string
 	}{{
 		desc: "With empty key",
 		expSec: &Section{
@@ -417,10 +423,11 @@ func TestSection_replaceAll(t *testing.T) {
 	sec.add("key-3", "3333")
 
 	cases := []struct {
-		desc   string
-		k      string
-		v      string
 		expSec *Section
+
+		desc string
+		k    string
+		v    string
 	}{{
 		desc: "With empty key",
 		expSec: &Section{
@@ -537,8 +544,9 @@ func TestSectionGet(t *testing.T) {
 		desc   string
 		k      string
 		def    string
-		expOK  bool
 		expVal string
+
+		expOK bool
 	}{{
 		desc:   "With invalid key and default",
 		k:      "key-1",
