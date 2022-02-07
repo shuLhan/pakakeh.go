@@ -59,6 +59,18 @@ This changes fix this issue by sorting the keys on ADT.Amap on
 Marshal-ing, to make the written output predictable.
 --
 
+===  Bug fixes
+
+*  lib/dns: check for possible index out of range when unpacking RR
++
+There is a possibility that record data (rdata) length inside the
+packet is greater than length of packet itself.  Some of the reasons are
+corrupted packet from server or packet poisoning (attacking the DNS
+server by sending invalid packet).
++
+This changes fix this issue by checking the index and rdata length with
+the length of packet before consuming the rdata itself.
+
 
 ==  share v0.34.0 (2022-02-05)
 

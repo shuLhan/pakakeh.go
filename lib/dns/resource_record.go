@@ -183,13 +183,19 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 // unpack the resource record from packet start from index startIdx.
 //
 func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err error) {
-	var end uint
+	var (
+		logp      = "ResourceRecord.unpack"
+		lenPacket = uint(len(packet))
+
+		end       uint
+		lenXRdata uint
+	)
 
 	x = startIdx
 
 	rr.Name, end, err = unpackDomainName(packet, x)
 	if err != nil {
-		return x, fmt.Errorf("unpack: %w", err)
+		return x, fmt.Errorf("%s: %w", logp, err)
 	}
 	if end > 0 {
 		x = end
@@ -211,16 +217,22 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	rr.rdlen = libbytes.ReadUint16(packet, x)
 	x += 2
 
-	rr.rdata = append(rr.rdata, packet[x:x+uint(rr.rdlen)]...)
+	lenXRdata = x + uint(rr.rdlen)
+	if lenPacket < lenXRdata {
+		return x, fmt.Errorf("%s: %s %d: packet length %d smaller than index+rdata %d+%d (%d)",
+			logp, rr.Name, rr.Type, lenPacket, x, rr.rdlen, lenXRdata)
+	}
+
+	rr.rdata = append(rr.rdata, packet[x:lenXRdata]...)
 
 	err = rr.unpackRData(packet, x)
 	if err != nil {
-		return x, fmt.Errorf("unpack: %w", err)
+		return x, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	x += uint(rr.rdlen)
 
-	return x, err
+	return x, nil
 }
 
 func unpackDomainName(packet []byte, start uint) (name string, end uint, err error) {
