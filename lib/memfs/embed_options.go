@@ -6,6 +6,12 @@ package memfs
 
 // EmbedOptions define an options for GoEmbed.
 type EmbedOptions struct {
+	// CommentHeader define optional comment to be added to the header of
+	// generated file, for example copyright holder and/or license.
+	// The string value is not checked, whether it's a comment or not, it
+	// will rendered as is.
+	CommentHeader string
+
 	// The generated package name for GoEmbed().
 	// If its not defined it will be default to "main".
 	PackageName string

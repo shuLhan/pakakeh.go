@@ -54,7 +54,7 @@ func (mfs *MemFS) GoEmbed() (err error) {
 
 	names := mfs.ListNames()
 
-	err = tmpl.ExecuteTemplate(f, templateNameHeader, mfs.Opts.Embed.PackageName)
+	err = tmpl.ExecuteTemplate(f, templateNameHeader, mfs.Opts.Embed)
 	if err != nil {
 		goto fail
 	}

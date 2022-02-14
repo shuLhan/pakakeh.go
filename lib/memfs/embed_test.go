@@ -14,10 +14,14 @@ func TestMemFS_GoEmbed(t *testing.T) {
 			".*/node_save$",
 		},
 		Embed: EmbedOptions{
+			CommentHeader: `// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+`,
 			PackageName: "embed",
 			GoFileName:  "./internal/test/embed/embed_test.go",
 		},
 	}
+
 	mfs, err := New(opts)
 	if err != nil {
 		t.Fatal(err)
