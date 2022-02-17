@@ -25,16 +25,21 @@ import (
 // time format in UTC and optional prefix.
 //
 type MultiLogger struct {
-	bufPool    *sync.Pool
+	bufPool *sync.Pool
+
+	qerr chan []byte
+	qout chan []byte
+
+	qerrFlush chan bool
+	qflush    chan bool
+	qoutFlush chan bool
+
+	errs map[string]NamedWriter
+	outs map[string]NamedWriter
+
 	timeFormat string
-	prefix     []byte
-	outs       map[string]NamedWriter
-	errs       map[string]NamedWriter
-	qout       chan []byte
-	qerr       chan []byte
-	qflush     chan bool
-	qerrFlush  chan bool
-	qoutFlush  chan bool
+
+	prefix []byte
 }
 
 //
