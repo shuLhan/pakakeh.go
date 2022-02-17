@@ -63,7 +63,7 @@ func TestAuth(t *testing.T) {
 		password string
 		expErr   string
 
-		mech Mechanism
+		mech SaslMechanism
 	}{{
 		desc:     "With invalid mechanism",
 		username: testAccountFirst.Short(),
@@ -71,7 +71,7 @@ func TestAuth(t *testing.T) {
 		expErr:   "client.Authenticate: unknown mechanism",
 	}, {
 		desc:     "With invalid credential",
-		mech:     MechanismPLAIN,
+		mech:     SaslMechanismPlain,
 		username: testAccountFirst.Short(),
 		password: "invalid",
 		exp: &Response{
@@ -80,7 +80,7 @@ func TestAuth(t *testing.T) {
 		},
 	}, {
 		desc:     "With valid credential",
-		mech:     MechanismPLAIN,
+		mech:     SaslMechanismPlain,
 		username: testAccountFirst.Short(),
 		password: testPassword,
 		exp: &Response{
@@ -89,7 +89,7 @@ func TestAuth(t *testing.T) {
 		},
 	}, {
 		desc:     "With valid credential again",
-		mech:     MechanismPLAIN,
+		mech:     SaslMechanismPlain,
 		username: testAccountFirst.Short(),
 		password: testPassword,
 		exp: &Response{

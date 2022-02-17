@@ -135,13 +135,13 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 // Authenticate to server using one of SASL mechanism.
 // Currently, the only mechanism available is PLAIN.
 //
-func (cl *Client) Authenticate(mech Mechanism, username, password string) (
+func (cl *Client) Authenticate(mech SaslMechanism, username, password string) (
 	res *Response, err error,
 ) {
 	var cmd []byte
 
 	switch mech {
-	case MechanismPLAIN:
+	case SaslMechanismPlain:
 		b := []byte("\x00" + username + "\x00" + password)
 		initialResponse := base64.StdEncoding.EncodeToString(b)
 		cmd = []byte("AUTH PLAIN " + initialResponse + "\r\n")

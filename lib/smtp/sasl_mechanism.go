@@ -5,12 +5,12 @@
 package smtp
 
 //
-// Mechanism represent Simple Authentication and Security Layer (SASL)
+// SaslMechanism represent Simple Authentication and Security Layer (SASL)
 // mechanism (RFC 4422).
 //
-type Mechanism int
+type SaslMechanism int
 
 // List of available SASL mechanism.
 const (
-	MechanismPLAIN Mechanism = 1
+	SaslMechanismPlain SaslMechanism = 1
 )
