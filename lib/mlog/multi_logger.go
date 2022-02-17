@@ -45,8 +45,15 @@ type MultiLogger struct {
 //
 // NewMultiLogger create and initialize new MultiLogger.
 //
-func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog *MultiLogger) {
-	mlog = &MultiLogger{
+func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) *MultiLogger {
+	var (
+		mlog = createMultiLogger(timeFormat, prefix, outs, errs)
+	)
+	return &mlog
+}
+
+func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog MultiLogger) {
+	mlog = MultiLogger{
 		bufPool: &sync.Pool{
 			New: func() interface{} {
 				return new(bytes.Buffer)
@@ -54,8 +61,8 @@ func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog *
 		},
 		timeFormat: timeFormat,
 		prefix:     []byte(prefix),
-		outs:       make(map[string]NamedWriter),
-		errs:       make(map[string]NamedWriter),
+		outs:       make(map[string]NamedWriter, len(outs)),
+		errs:       make(map[string]NamedWriter, len(errs)),
 		qout:       make(chan []byte, 512),
 		qerr:       make(chan []byte, 512),
 		qerrFlush:  make(chan bool, 1),

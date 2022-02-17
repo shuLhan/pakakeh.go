@@ -39,7 +39,7 @@ const (
 	defTimeFormat = "2006-01-02 15:04:05 MST"
 )
 
-var defaultMLog = NewMultiLogger(defTimeFormat, "",
+var defaultMLog MultiLogger = createMultiLogger(defTimeFormat, "",
 	[]NamedWriter{
 		NewNamedWriter("stdout", os.Stdout),
 	},
@@ -150,5 +150,5 @@ func UnregisterOutputWriter(name string) {
 // error writers.
 //
 func ErrorWriter() io.Writer {
-	return defaultMLog
+	return &defaultMLog
 }
