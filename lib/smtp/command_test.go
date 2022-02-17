@@ -13,10 +13,10 @@ import (
 
 func TestUnpack(t *testing.T) {
 	cases := []struct {
+		expCmd *Command
+		expErr error
 		desc   string
 		b      string
-		expErr error
-		expCmd *Command
 	}{{
 		desc:   "With invalid length",
 		b:      "DAT\r\n",

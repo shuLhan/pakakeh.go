@@ -9,9 +9,10 @@ package smtp
 // DKIM feature.
 //
 type Domain struct {
-	Name     string
-	Accounts map[string]*Account
 	dkimOpts *DKIMOptions
+
+	Accounts map[string]*Account
+	Name     string
 }
 
 //

@@ -23,10 +23,10 @@ const (
 // retrieved in file system inside a directory.
 //
 type LocalStorage struct {
-	dir  string
-	buff bytes.Buffer
 	enc  *gob.Encoder
 	dec  *gob.Decoder
+	dir  string
+	buff bytes.Buffer
 }
 
 //

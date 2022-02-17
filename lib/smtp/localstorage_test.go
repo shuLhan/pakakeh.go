@@ -17,9 +17,9 @@ func TestStore(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
-		mail   *MailTx
 		expErr error
+		mail   *MailTx
+		desc   string
 	}{{
 		desc: "With nil",
 	}, {

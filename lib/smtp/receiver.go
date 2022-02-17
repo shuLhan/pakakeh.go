@@ -31,17 +31,19 @@ const (
 // receiver represent a connection that receive incoming email in server.
 //
 type receiver struct {
-	mode receiverMode
+	conn net.Conn
+	mail *MailTx
 
-	data          []byte
-	buff          bytes.Buffer
-	conn          net.Conn
 	clientDomain  string
 	clientAddress string
 	localAddress  string
 
-	state         CommandKind
-	mail          *MailTx
+	data []byte
+	buff bytes.Buffer
+
+	mode  receiverMode
+	state CommandKind
+
 	authenticated bool
 }
 

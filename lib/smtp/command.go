@@ -33,10 +33,10 @@ const (
 // parameters.
 //
 type Command struct {
-	Kind   CommandKind
+	Params map[string]string
 	Arg    string
 	Param  string
-	Params map[string]string
+	Kind   CommandKind
 }
 
 //

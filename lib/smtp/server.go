@@ -25,28 +25,8 @@ const (
 // Server defines parameters for running an SMTP server.
 //
 type Server struct {
-	// address to listen for incoming connections.
-	// This field is optional and exist only for the purpose of testing.
-	// If its empty, it will set default to ":25".
-	address string
-
-	// tlsAddress define an address when listening with security layer.
-	// This field is optional and exist only for the purpose of testing.
-	// If its empty, it will set default to ":465".
-	tlsAddress string
-
-	// TLSCert the server certificate for TLS or nil if no certificate.
-	// This field is optional, if its non nil, the server will also listen
-	// on address defined in TLSAddress.
-	TLSCert *tls.Certificate
-
 	// Env contains server environment.
 	Env *Environment
-
-	//
-	// Exts define list of custom extensions that the server will provide.
-	//
-	Exts []Extension
 
 	//
 	// Handler define an interface that will process the bouncing email,
@@ -72,6 +52,26 @@ type Server struct {
 
 	// relayQueue hold mail objects that need to be relayed to other MTA.
 	relayQueue chan *MailTx
+
+	// TLSCert the server certificate for TLS or nil if no certificate.
+	// This field is optional, if its non nil, the server will also listen
+	// on address defined in TLSAddress.
+	TLSCert *tls.Certificate
+
+	// address to listen for incoming connections.
+	// This field is optional and exist only for the purpose of testing.
+	// If its empty, it will set default to ":25".
+	address string
+
+	// tlsAddress define an address when listening with security layer.
+	// This field is optional and exist only for the purpose of testing.
+	// If its empty, it will set default to ":465".
+	tlsAddress string
+
+	//
+	// Exts define list of custom extensions that the server will provide.
+	//
+	Exts []Extension
 
 	wg      sync.WaitGroup
 	running bool

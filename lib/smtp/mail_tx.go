@@ -15,6 +15,12 @@ import (
 // MailTx define a mail transaction.
 //
 type MailTx struct {
+	Postpone time.Time
+
+	// Received contains the time when the message arrived on server.
+	// This field is ignored in Client.Send().
+	Received time.Time
+
 	// ID of message.
 	// This field is ignored in Client.Send().
 	ID string
@@ -31,12 +37,7 @@ type MailTx struct {
 	// This field is optional in Client.Send().
 	Data []byte
 
-	Postpone time.Time
-
-	// Received contains the time when the message arrived on server.
-	// This field is ignored in Client.Send().
-	Received time.Time
-	Retry    int
+	Retry int
 }
 
 //

@@ -13,10 +13,11 @@ import (
 
 func TestEhlo(t *testing.T) {
 	cases := []struct {
-		desc          string
-		arg           string
 		exp           *Response
 		expServerInfo *ServerInfo
+
+		desc string
+		arg  string
 	}{{
 		desc: "With no argument",
 		exp: &Response{
@@ -55,12 +56,14 @@ func TestEhlo(t *testing.T) {
 
 func TestAuth(t *testing.T) {
 	cases := []struct {
+		exp *Response
+
 		desc     string
-		mech     Mechanism
 		username string
 		password string
 		expErr   string
-		exp      *Response
+
+		mech Mechanism
 	}{{
 		desc:     "With invalid mechanism",
 		username: testAccountFirst.Short(),
@@ -142,9 +145,9 @@ func TestAuth2(t *testing.T) {
 
 func TestExpand(t *testing.T) {
 	cases := []struct {
+		exp   *Response
 		desc  string
 		mlist string
-		exp   *Response
 	}{{
 		desc:  "With mailing-list",
 		mlist: "mailing-list@test",
@@ -168,9 +171,9 @@ func TestExpand(t *testing.T) {
 
 func TestHelp(t *testing.T) {
 	cases := []struct {
+		exp  *Response
 		desc string
 		arg  string
-		exp  *Response
 	}{{
 		desc: "Without any argument",
 		exp: &Response{
@@ -193,9 +196,9 @@ func TestHelp(t *testing.T) {
 
 func TestSendCommand(t *testing.T) {
 	cases := []struct {
+		exp  *Response
 		desc string
 		cmd  []byte
-		exp  *Response
 	}{{
 		desc: "Send HELO",
 		cmd:  []byte("HELO 192.168.10.1\r\n"),
@@ -233,9 +236,10 @@ func TestSendCommand(t *testing.T) {
 
 func TestMailTx(t *testing.T) {
 	cases := []struct {
+		mail *MailTx
+		exp  *Response
+
 		desc   string
-		mail   *MailTx
-		exp    *Response
 		expErr string
 	}{{
 		desc: "With empty mail",
@@ -278,9 +282,10 @@ func TestMailTx(t *testing.T) {
 
 func TestVerify(t *testing.T) {
 	cases := []struct {
+		exp *Response
+
 		desc    string
 		mailbox string
-		exp     *Response
 	}{{
 		desc:    "With mailbox exist",
 		mailbox: testAccountFirst.Short(),

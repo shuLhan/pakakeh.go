@@ -28,12 +28,13 @@ type Client struct {
 	// EHLO command.
 	ServerInfo *ServerInfo
 
+	conn       net.Conn
+	raddr      *net.TCPAddr
+	serverName string
+
 	data []byte
 	buf  bytes.Buffer
 
-	serverName string
-	raddr      *net.TCPAddr
-	conn       net.Conn
 	insecure   bool
 	isTLS      bool
 	isStartTLS bool

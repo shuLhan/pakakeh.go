@@ -17,9 +17,9 @@ import (
 // Response represent a generic single or multilines response from server.
 //
 type Response struct {
-	Code    int
 	Message string
 	Body    []string
+	Code    int
 }
 
 //

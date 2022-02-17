@@ -13,9 +13,9 @@ import (
 // command.
 //
 type ServerInfo struct {
+	Exts   map[string][]string
 	Domain string
 	Info   string
-	Exts   map[string][]string
 }
 
 //
