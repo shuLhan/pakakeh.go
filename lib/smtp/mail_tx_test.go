@@ -10,7 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestIsTerminated(t *testing.T) {
+func TestMailTx_isTerminated(t *testing.T) {
 	cases := []struct {
 		desc string
 		mail MailTx
