@@ -51,6 +51,8 @@ var defaultMLog MultiLogger = createMultiLogger(defTimeFormat, "",
 // Errf write to all registered error writers.
 // The default registered error writer is os.Stderr.
 //
+// If the generated string does not end with new line, it will be added.
+//
 func Errf(format string, v ...interface{}) {
 	defaultMLog.Errf(format, v...)
 }
@@ -72,6 +74,8 @@ func Flush() {
 //
 // Outf write to all registered output writers.
 // The default registered output writer is os.Stdout.
+//
+// If the generated string does not end with new line, it will be added.
 //
 func Outf(format string, v ...interface{}) {
 	defaultMLog.Outf(format, v...)

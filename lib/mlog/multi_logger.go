@@ -93,7 +93,7 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 // Errf write the formatted string and its optional values to all error
 // writers.
 //
-// If the format string does not end with new line, it will be added.
+// If the generated string does not end with new line, it will be added.
 //
 func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
 	if len(mlog.errs) == 0 {
@@ -123,6 +123,8 @@ func (mlog *MultiLogger) Flush() {
 
 //
 // Outf write the formatted string and its values to all output writers.
+//
+// If the generated string does not end with new line, it will be added.
 //
 func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 	if len(mlog.outs) == 0 {
@@ -262,6 +264,11 @@ func (mlog *MultiLogger) processOutputQueue() {
 	for {
 		select {
 		case b := <-mlog.qout:
+			if len(b) == 0 {
+				b = append(b, '\n')
+			} else if b[len(b)-1] != '\n' {
+				b = append(b, '\n')
+			}
 			for _, w := range mlog.outs {
 				_, err = w.Write(b)
 				if err != nil {
