@@ -1,9 +1,7 @@
 = Simple Authentication and Security Layer (SASL)
-:author: Shulhan
-:email: <ms@kilabit.info>
+Shulhan <ms@kilabit.info>
 :toc:
 :sectnums:
-:url-rfc4422: https://tools.ietf.org/html/rfc4422
 
 This document provide note and summary of RFC 4422, Simple Authentication and
 Security Layer (SASL).
@@ -14,13 +12,13 @@ SASL is conceptually a framework that provides an abstraction layer between
 protocols and mechanisms as illustrated in the following diagram.
 
 ....
-                  SMTP    LDAP    XMPP   Other protocols ...
-                     \       |    |      /
-                      \      |    |     /
-                     SASL abstraction layer
-                      /      |    |     \
-                     /       |    |      \
-              EXTERNAL   GSSAPI  PLAIN   Other mechanisms ...
+    SMTP    LDAP    XMPP   Other protocols ...
+       \       |    |      /
+        \      |    |     /
+       SASL abstraction layer
+        /      |    |     \
+       /       |    |      \
+EXTERNAL   GSSAPI  PLAIN   Other mechanisms ...
 ....
 
 == Identity Concepts
@@ -118,46 +116,46 @@ security layer, the original security layer remains in effect.
 In order for a protocol to offer SASL services, its specification
 MUST supply the following information:
 
-1) A service name, to be selected from registry of "service" elements for
+. A service name, to be selected from registry of "service" elements for
 the Generic Security Service Application Program Interface (GSSAPI) host-based
 service name form.
 
-2) A function through which the client may discover the names of the SASL
+. A function through which the client may discover the names of the SASL
 mechanisms that the server makes available to the client.
 
-3) Definition of the messages necessary for authentication exchange,
+. Definition of the messages necessary for authentication exchange,
 including the following:
 
-3.a) A message to initiate the authentication exchange.
+.. A message to initiate the authentication exchange.
 The message MUST contain a field for mechanism name and SHOULD contain an
 optional field for carrying an initial response.
 The message MUST be able to distinguished between an empty initial response
 and no initial response.
 
-3.b) Messages to transfer server challenges and client responses.
+.. Messages to transfer server challenges and client responses.
 
-3.c) A message to indicate the outcome of the authentication.
+.. A message to indicate the outcome of the authentication.
 This message SHOULD contain an optional field for carrying additional data
 with a successful outcome.
 
-4) Prescribe the syntax and semantics of non-empty authorization identity
+. Prescribe the syntax and semantics of non-empty authorization identity
 strings exchange.
 The protocol specification MUST detail precisely how and where (client or
 server) non-empty authorization identity strings are prepared,
 including all normalizations, for comparison and other applicable
 functions to ensure proper function.
 
-5) Detail any facility the protocol provides that allows the client and/or
+. Detail any facility the protocol provides that allows the client and/or
 server to abort authentication exchange.
 
-6) Identify precisely where newly negotiated security layers start to take
+. Identify precisely where newly negotiated security layers start to take
 effect, in both directions.
 
-7) If the protocol supports other layered security services, such as Transport
+. If the protocol supports other layered security services, such as Transport
 Layer Security (TLS), the specification MUST prescribe the order in
 which security layers are applied to protocol data.
 
-8) Indicate whether the protocol supports multiple authentications.
+. Indicate whether the protocol supports multiple authentications.
 If so, the protocol MUST detail the effect a failed SASL authentication
 exchange will have upon a previously established authentication and
 authorization state.
@@ -167,29 +165,31 @@ authorization state.
 
 SASL mechanism specifications MUST supply the following information:
 
-1) The name of the mechanism.
+. The name of the mechanism.
 
-2) A definition of the server-challenges and client-responses of the
+. A definition of the server-challenges and client-responses of the
 authentication exchange, as well as the following:
-
-2.a) An indication of whether the mechanism is client-first.
++
+.. An indication of whether the mechanism is client-first.
 If a SASL mechanism is defined as client-first and the client does not send an
 initial response in the authentication request, then the first server
 challenge MUST be empty.
++
 If a SASL mechanism is defined as server-first, then the client MUST NOT send
 an initial client response in the authentication request.
-
-2.b) An indication of whether the server is expected to provide additional
++
+.. An indication of whether the server is expected to provide additional
 data when indicating a successful outcome.
-
++
 SASL mechanisms SHOULD be designed to minimize the number of challenges and
 responses necessary to complete the exchange.
 
-3) An indication of whether the mechanism is capable of transferring
+. An indication of whether the mechanism is capable of transferring
 authorization identity strings.
++
 The mechanism SHOULD NOT be capable of transferring both no authorization
 identity string and an empty authorization identity.
-
++
 Mechanisms that are capable of transferring an authorization identity string
 MUST be capable of transferring arbitrary non-empty sequences of Unicode
 characters, excluding those that contain the NUL (U+0000) character.
@@ -197,10 +197,10 @@ The specification MUST detail how any Unicode code points special to the
 mechanism that might appear in the authorization identity string are escaped
 to avoid ambiguity during decoding of the authorization identity string.
 
-4) The specification MUST detail whether the mechanism offers a security
+. The specification MUST detail whether the mechanism offers a security
 layer.
 
-5) If the underlying cryptographic technology used by a mechanism supports
+. If the underlying cryptographic technology used by a mechanism supports
 data integrity, then the mechanism specification MUST integrity protect the
 transmission of an authorization identity and the negotiation of the security
 layer.

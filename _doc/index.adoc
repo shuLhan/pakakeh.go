@@ -26,7 +26,7 @@ pkg.go.dev.
 ** link:DKIM_SIGNATURES.html[DKIM Signatures (RFC 6376)]
 
 * link:SMTP.html[Simple Mail Transfer Protocol (RFC 5321)]
-** link:ESMTP_DSN.html[Delivery Status Notification (RFC 3461, 3462, 3463, 3464)]
+** link:ESMTP_DSN.html["Delivery Status Notification (RFC 3461, 3462, 3463, 3464)"]
 ** link:ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over Transport Layer Security (RFC 3207)]
 ** link:ESMTP_AUTH.html[SMTP Service Extension for Authentication (RFC 4954)]
 

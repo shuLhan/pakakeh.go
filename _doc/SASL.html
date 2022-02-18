@@ -187,7 +187,7 @@ dd {
 	margin: 2.5rem 0;
 }
 
-/** Custom classes for asciidoc */
+/** Custom classes */
 #toctitle {
 	display: none;
 }
@@ -231,7 +231,7 @@ dd {
 <h1>Simple Authentication and Security Layer (SASL)</h1>
 <div class="details">
 <span id="author" class="author">Shulhan</span><br>
-<span id="email" class="email"><a href="mailto:<ms@kilabit.info>"><ms@kilabit.info></a></span><br>
+<span id="email" class="email"><a href="mailto:ms@kilabit.info">ms@kilabit.info</a></span><br>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -276,13 +276,13 @@ protocols and mechanisms as illustrated in the following diagram.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>                  SMTP    LDAP    XMPP   Other protocols ...
-                     \       |    |      /
-                      \      |    |     /
-                     SASL abstraction layer
-                      /      |    |     \
-                     /       |    |      \
-              EXTERNAL   GSSAPI  PLAIN   Other mechanisms ...</pre>
+<pre>    SMTP    LDAP    XMPP   Other protocols ...
+       \       |    |      /
+        \      |    |     /
+       SASL abstraction layer
+        /      |    |     \
+       /       |    |      \
+EXTERNAL   GSSAPI  PLAIN   Other mechanisms ...</pre>
 </div>
 </div>
 </div>
@@ -415,60 +415,68 @@ security layer, the original security layer remains in effect.</p>
 <p>In order for a protocol to offer SASL services, its specification
 MUST supply the following information:</p>
 </div>
-<div class="paragraph">
-<p>1) A service name, to be selected from registry of "service" elements for
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A service name, to be selected from registry of "service" elements for
 the Generic Security Service Application Program Interface (GSSAPI) host-based
 service name form.</p>
-</div>
-<div class="paragraph">
-<p>2) A function through which the client may discover the names of the SASL
+</li>
+<li>
+<p>A function through which the client may discover the names of the SASL
 mechanisms that the server makes available to the client.</p>
-</div>
-<div class="paragraph">
-<p>3) Definition of the messages necessary for authentication exchange,
+</li>
+<li>
+<p>Definition of the messages necessary for authentication exchange,
 including the following:</p>
-</div>
-<div class="paragraph">
-<p>3.a) A message to initiate the authentication exchange.
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>A message to initiate the authentication exchange.
 The message MUST contain a field for mechanism name and SHOULD contain an
 optional field for carrying an initial response.
 The message MUST be able to distinguished between an empty initial response
 and no initial response.</p>
-</div>
-<div class="paragraph">
-<p>3.b) Messages to transfer server challenges and client responses.</p>
-</div>
-<div class="paragraph">
-<p>3.c) A message to indicate the outcome of the authentication.
+</li>
+<li>
+<p>Messages to transfer server challenges and client responses.</p>
+</li>
+<li>
+<p>A message to indicate the outcome of the authentication.
 This message SHOULD contain an optional field for carrying additional data
 with a successful outcome.</p>
+</li>
+</ol>
 </div>
-<div class="paragraph">
-<p>4) Prescribe the syntax and semantics of non-empty authorization identity
+</li>
+<li>
+<p>Prescribe the syntax and semantics of non-empty authorization identity
 strings exchange.
 The protocol specification MUST detail precisely how and where (client or
 server) non-empty authorization identity strings are prepared,
 including all normalizations, for comparison and other applicable
 functions to ensure proper function.</p>
-</div>
-<div class="paragraph">
-<p>5) Detail any facility the protocol provides that allows the client and/or
+</li>
+<li>
+<p>Detail any facility the protocol provides that allows the client and/or
 server to abort authentication exchange.</p>
-</div>
-<div class="paragraph">
-<p>6) Identify precisely where newly negotiated security layers start to take
+</li>
+<li>
+<p>Identify precisely where newly negotiated security layers start to take
 effect, in both directions.</p>
-</div>
-<div class="paragraph">
-<p>7) If the protocol supports other layered security services, such as Transport
+</li>
+<li>
+<p>If the protocol supports other layered security services, such as Transport
 Layer Security (TLS), the specification MUST prescribe the order in
 which security layers are applied to protocol data.</p>
-</div>
-<div class="paragraph">
-<p>8) Indicate whether the protocol supports multiple authentications.
+</li>
+<li>
+<p>Indicate whether the protocol supports multiple authentications.
 If so, the protocol MUST detail the effect a failed SASL authentication
 exchange will have upon a previously established authentication and
 authorization state.</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
@@ -478,33 +486,42 @@ authorization state.</p>
 <div class="paragraph">
 <p>SASL mechanism specifications MUST supply the following information:</p>
 </div>
-<div class="paragraph">
-<p>1) The name of the mechanism.</p>
-</div>
-<div class="paragraph">
-<p>2) A definition of the server-challenges and client-responses of the
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The name of the mechanism.</p>
+</li>
+<li>
+<p>A definition of the server-challenges and client-responses of the
 authentication exchange, as well as the following:</p>
-</div>
-<div class="paragraph">
-<p>2.a) An indication of whether the mechanism is client-first.
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>An indication of whether the mechanism is client-first.
 If a SASL mechanism is defined as client-first and the client does not send an
 initial response in the authentication request, then the first server
-challenge MUST be empty.
-If a SASL mechanism is defined as server-first, then the client MUST NOT send
+challenge MUST be empty.</p>
+<div class="paragraph">
+<p>If a SASL mechanism is defined as server-first, then the client MUST NOT send
 an initial client response in the authentication request.</p>
 </div>
-<div class="paragraph">
-<p>2.b) An indication of whether the server is expected to provide additional
+</li>
+<li>
+<p>An indication of whether the server is expected to provide additional
 data when indicating a successful outcome.</p>
-</div>
 <div class="paragraph">
 <p>SASL mechanisms SHOULD be designed to minimize the number of challenges and
 responses necessary to complete the exchange.</p>
 </div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>An indication of whether the mechanism is capable of transferring
+authorization identity strings.</p>
 <div class="paragraph">
-<p>3) An indication of whether the mechanism is capable of transferring
-authorization identity strings.
-The mechanism SHOULD NOT be capable of transferring both no authorization
+<p>The mechanism SHOULD NOT be capable of transferring both no authorization
 identity string and an empty authorization identity.</p>
 </div>
 <div class="paragraph">
@@ -515,15 +532,18 @@ The specification MUST detail how any Unicode code points special to the
 mechanism that might appear in the authorization identity string are escaped
 to avoid ambiguity during decoding of the authorization identity string.</p>
 </div>
-<div class="paragraph">
-<p>4) The specification MUST detail whether the mechanism offers a security
+</li>
+<li>
+<p>The specification MUST detail whether the mechanism offers a security
 layer.</p>
-</div>
-<div class="paragraph">
-<p>5) If the underlying cryptographic technology used by a mechanism supports
+</li>
+<li>
+<p>If the underlying cryptographic technology used by a mechanism supports
 data integrity, then the mechanism specification MUST integrity protect the
 transmission of an authorization identity and the negotiation of the security
 layer.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>SASL mechanisms SHOULD be protocol neutral.</p>
@@ -630,7 +650,7 @@ The registry is currently available at
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-11-08 18:25:32 +0700
+Last updated 2022-02-18 12:46:16 +0700
 </div>
 </div>
 			</div>
