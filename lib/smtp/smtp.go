@@ -56,11 +56,13 @@ const (
 	// (that is, the command is repeated identically and the receiver
 	// does not put up a new implementation).
 	//
-	StatusShuttingDown           = 421
-	StatusMailboxUnavailable     = 450
-	StatusLocalError             = 451
-	StatusNoStorage              = 452
-	StatusParameterUnprocessable = 455
+	StatusShuttingDown             = 421
+	StatusPasswordTransitionNeeded = 432 // RFC 4954 section 4.7.12.
+	StatusMailboxUnavailable       = 450
+	StatusLocalError               = 451
+	StatusNoStorage                = 452
+	StatusTemporaryAuthFailure     = 454 // RFC 4954 section 4.7.0.
+	StatusParameterUnprocessable   = 455
 
 	//
 	// 5xx indicate permanent failure.
@@ -73,16 +75,17 @@ const (
 	// the future (e.g., after the spelling has been changed, or the user
 	// has altered the account status).
 	//
-	StatusCmdUnknown           = 500 // RFC 5321, section 4.2.4.
-	StatusCmdTooLong           = 500 // RFC 5321, section 4.3.2.
+	StatusCmdUnknown           = 500 // RFC 5321 section 4.2.4.
+	StatusCmdTooLong           = 500 // RFC 5321 section 4.3.2, RFC 4954 section 5.5.6.
 	StatusCmdSyntaxError       = 501
-	StatusCmdNotImplemented    = 502 // RFC 5321, section 4.2.4.
+	StatusCmdNotImplemented    = 502 // RFC 5321 section 4.2.4.
 	StatusCmdBadSequence       = 503
 	StatusParamUnimplemented   = 504
 	StatusNotAuthenticated     = 530
-	StatusInvalidCredential    = 535
+	StatusAuthMechanismTooWeak = 534 // RFC 4954 section 5.7.9.
+	StatusInvalidCredential    = 535 // RFC 4954 section 5.7.8.
 	StatusMailboxNotFound      = 550
-	StatusAddressChangeAborted = 551 // RFC 5321, section 3.4.
+	StatusAddressChangeAborted = 551 // RFC 5321 section 3.4.
 	StatusMailNoStorage        = 552
 	StatusMailboxIncorrect     = 553
 	StatusTransactionFailed    = 554
