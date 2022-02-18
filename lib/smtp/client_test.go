@@ -112,12 +112,23 @@ func TestAuth(t *testing.T) {
 }
 
 func TestAuth2(t *testing.T) {
-	cl, err := NewClient("", testSMTPSAddress, true)
+	var (
+		opts = ClientOptions{
+			ServerUrl: testSMTPSAddress,
+			Insecure:  true,
+		}
+
+		cl  *Client
+		err error
+		cmd string
+	)
+
+	cl, err = NewClient(opts)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cmd := "AUTH PLAIN\r\n"
+	cmd = "AUTH PLAIN\r\n"
 	res, err := cl.SendCommand([]byte(cmd))
 	if err != nil {
 		t.Fatal(err)

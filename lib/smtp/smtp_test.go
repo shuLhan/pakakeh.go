@@ -85,19 +85,26 @@ func testRunServer() {
 }
 
 func TestMain(m *testing.M) {
-	var err error
+	var (
+		opts = ClientOptions{
+			ServerUrl: testSMTPSAddress,
+			Insecure:  true,
+		}
+
+		err error
+		s   int
+	)
 
 	testRunServer()
 
 	time.Sleep(100 * time.Millisecond)
 
-	testClient, err = NewClient("", testSMTPSAddress, true)
+	testClient, err = NewClient(opts)
 	if err != nil {
-		log.Fatal("NewClient: " + err.Error())
+		log.Fatal(err.Error())
 	}
 
-	s := m.Run()
-
+	s = m.Run()
 	os.Exit(s)
 }
 

@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/shuLhan/share/lib/smtp"
 )
@@ -28,6 +29,12 @@ type client struct {
 }
 
 func newClient(remoteURL string) (cli *client, err error) {
+	var (
+		clientOpts = smtp.ClientOptions{
+			ServerUrl: remoteURL,
+		}
+	)
+
 	cli = &client{
 		remoteURL: remoteURL,
 		input:     make([]byte, 0, 128),
@@ -36,7 +43,7 @@ func newClient(remoteURL string) (cli *client, err error) {
 		return
 	}
 
-	cli.con, err = smtp.NewClient("", remoteURL, false)
+	cli.con, err = smtp.NewClient(clientOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +52,7 @@ func newClient(remoteURL string) (cli *client, err error) {
 }
 
 func (cli *client) handleInput() (isQuit bool) {
-	input := bytes.ToLower(bytes.TrimSpace(cli.input))
+	input := bytes.TrimSpace(cli.input)
 
 	var (
 		res *smtp.Response
@@ -53,7 +60,7 @@ func (cli *client) handleInput() (isQuit bool) {
 	)
 
 	ins := bytes.Split(input, []byte{' '})
-	cmd := string(ins[0])
+	cmd := strings.ToLower(string(ins[0]))
 	switch cmd {
 	case "":
 		res, err = cli.con.SendCommand(noop)

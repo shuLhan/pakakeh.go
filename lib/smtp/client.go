@@ -24,18 +24,19 @@ import (
 // Client for SMTP.
 //
 type Client struct {
+	opts ClientOptions
+
 	// ServerInfo contains the server information, from the response of
 	// EHLO command.
 	ServerInfo *ServerInfo
 
 	conn       net.Conn
-	raddr      *net.TCPAddr
+	raddr      net.TCPAddr
 	serverName string
 
 	data []byte
 	buf  bytes.Buffer
 
-	insecure   bool
 	isTLS      bool
 	isStartTLS bool
 }
@@ -43,51 +44,36 @@ type Client struct {
 //
 // NewClient create and initialize connection to remote SMTP server.
 //
-// The localName define the client domain address, used when issuing EHLO
-// command to server.  If its empty, it will set to current operating system's
-// hostname.
+// When connected, the client send implicit EHLO command issued to server
+// immediately.
+// If scheme is "smtp+starttls", the connection automatically upgraded to
+// TLS after EHLO command success.
 //
-// The remoteURL use the following format,
-//
-//	remoteURL = [ scheme "://" ](domain | IP-address [":" port])
-//	scheme    = "smtp" / "smtps" / "smtp+starttls"
-//
-// If scheme is "smtp" and no port is given, client will connect to remote
-// address at port 25.
-// If scheme is "smtps" and no port is given, client will connect to remote
-// address at port 465 (implicit TLS).
-// If scheme is "smtp+starttls" and no port is given, client will connect to
-// remote address at port 587.
-//
-// The "insecure" parameter, if set to true, will disable verifying
-// remote certificate when connecting with TLS or STARTTLS.
-//
-// On success, it will return connected client, with implicit EHLO command
-// issued to server immediately.  If scheme is "smtp+starttls", the connection
-// also automatically upgraded to TLS after EHLO command success.
+// If both AuthUser and AuthPass in the ClientOptions is not empty, the client
+// will try to authenticate to remote server.
 //
 // On fail, it will return nil client with an error.
 //
-func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err error) {
+func NewClient(opts ClientOptions) (cl *Client, err error) {
 	var (
-		logp   = "NewClient"
-		rurl   *url.URL
-		port   uint16
-		scheme string
+		logp = "NewClient"
+
+		res  *Response
+		rurl *url.URL
+		port uint16
 	)
 
-	rurl, err = url.Parse(remoteURL)
+	rurl, err = url.Parse(opts.ServerUrl)
 	if err != nil {
-		return nil, fmt.Errorf("smtp: %s: %w", logp, err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	cl = &Client{
-		raddr:    &net.TCPAddr{},
-		insecure: insecure,
+		opts: opts,
 	}
 
-	scheme = strings.ToLower(rurl.Scheme)
-	switch scheme {
+	rurl.Scheme = strings.ToLower(rurl.Scheme)
+	switch rurl.Scheme {
 	case "smtp":
 		port = 25
 	case "smtps":
@@ -97,18 +83,17 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 		port = 587
 		cl.isStartTLS = true
 	default:
-		return nil, fmt.Errorf("smtp: %s: invalid scheme %q", logp, scheme)
+		return nil, fmt.Errorf("%s: invalid server URL scheme", logp)
 	}
 
 	cl.serverName, cl.raddr.IP, port = libnet.ParseIPPort(rurl.Host, port)
 	if cl.raddr.IP == nil {
 		cl.raddr.IP, err = lookup(cl.serverName)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 		if cl.raddr.IP == nil {
-			err = fmt.Errorf("smtp: %s: '%s' does not have MX record or IP address", logp, cl.serverName)
-			return nil, err
+			return nil, fmt.Errorf("%s: %q does not have MX record or IP address", logp, cl.serverName)
 		}
 	}
 
@@ -116,16 +101,29 @@ func NewClient(localName, remoteURL string, insecure bool) (cl *Client, err erro
 	cl.raddr.Port = int(port)
 
 	if debug.Value >= 3 {
-		fmt.Printf("smtp: %s: remote address '%v'\n", logp, cl.raddr)
+		fmt.Printf("%s: remote address is %v\n", logp, cl.raddr)
 	}
 
-	_, err = cl.connect(localName)
+	_, err = cl.connect(opts.LocalName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if debug.Value >= 3 {
-		fmt.Printf("smtp: %s: ServerInfo: %+v\n", logp, cl.ServerInfo)
+		fmt.Printf("%s: ServerInfo: %+v\n", logp, cl.ServerInfo)
+	}
+
+	if len(opts.AuthUser) == 0 || len(opts.AuthPass) == 0 {
+		// Do not authenticate this connection, yet.
+		return cl, nil
+	}
+
+	res, err = cl.Authenticate(cl.opts.AuthMechanism, cl.opts.AuthUser, cl.opts.AuthPass)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+	if res.Code != StatusAuthenticated {
+		return nil, fmt.Errorf("%s: %d %s", logp, res.Code, res.Message)
 	}
 
 	return cl, nil
@@ -161,7 +159,7 @@ func (cl *Client) Authenticate(mech SaslMechanism, username, password string) (
 func (cl *Client) connect(localName string) (res *Response, err error) {
 	logp := "connect"
 
-	cl.conn, err = net.DialTCP("tcp", nil, cl.raddr)
+	cl.conn, err = net.DialTCP("tcp", nil, &cl.raddr)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +167,7 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 	if cl.isTLS {
 		tlsConfig := &tls.Config{
 			ServerName:         cl.serverName,
-			InsecureSkipVerify: cl.insecure,
+			InsecureSkipVerify: cl.opts.Insecure,
 		}
 
 		cl.conn = tls.Client(cl.conn, tlsConfig)
@@ -514,7 +512,7 @@ func (cl *Client) StartTLS() (res *Response, err error) {
 
 	tlsConfig := &tls.Config{
 		ServerName:         cl.serverName,
-		InsecureSkipVerify: cl.insecure,
+		InsecureSkipVerify: cl.opts.Insecure,
 	}
 
 	cl.conn = tls.Client(cl.conn, tlsConfig)
