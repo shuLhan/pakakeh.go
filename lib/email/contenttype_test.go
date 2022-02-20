@@ -12,9 +12,9 @@ import (
 
 func TestParseContentType(t *testing.T) {
 	cases := []struct {
-		in     []byte
 		expErr string
 		exp    string
+		in     []byte
 	}{{
 		exp: "text/plain; charset=us-ascii",
 	}, {

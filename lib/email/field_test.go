@@ -142,10 +142,10 @@ func TestParseField(t *testing.T) {
 
 func TestUnpackDate(t *testing.T) {
 	cases := []struct {
-		desc   string
-		value  []byte
 		exp    time.Time
 		expErr string
+		desc   string
+		value  []byte
 	}{{
 		desc:   "With empty value",
 		expErr: "unpackDate: empty date",
@@ -256,9 +256,9 @@ func TestUnpackDate(t *testing.T) {
 
 func TestUnpackMailbox(t *testing.T) {
 	cases := []struct {
-		in     []byte
 		expErr string
 		exp    string
+		in     []byte
 	}{{
 		in:     []byte("Sender: local\r\n"),
 		expErr: `ParseMailboxes "local": empty or invalid address`,
@@ -291,9 +291,9 @@ func TestUnpackMailbox(t *testing.T) {
 
 func TestUnpackMailboxList(t *testing.T) {
 	cases := []struct {
-		in     []byte
 		expErr string
 		exp    string
+		in     []byte
 	}{{
 		in:     []byte("From: \r\n"),
 		expErr: "email: empty field value at 'From: \r\n'",
@@ -323,9 +323,9 @@ func TestUnpackMailboxList(t *testing.T) {
 
 func TestUnpackContentType(t *testing.T) {
 	cases := []struct {
-		in     []byte
 		expErr string
 		exp    string
+		in     []byte
 	}{{
 		in:     []byte("Content-Type: text;\r\n"),
 		expErr: "ParseContentType: missing subtype",

@@ -20,8 +20,13 @@ import (
 // Field represent field name and value in header.
 //
 type Field struct {
-	// Type of field, the numeric representation of field name.
-	Type FieldType
+	// ContentType contains unpacked value of field with Name
+	// "Content-Type" or nil if still packed.
+	ContentType *ContentType
+
+	date   *time.Time
+	mboxes []*Mailbox
+
 	// Name contains "relaxed" canonicalization of field name.
 	Name []byte
 	// Value contains "relaxed" canonicalization of field value.
@@ -32,12 +37,8 @@ type Field struct {
 	// oriValue contains "simple" canonicalization of field value.
 	oriValue []byte
 
-	date   *time.Time
-	mboxes []*Mailbox
-
-	// ContentType contains unpacked value of field with Name
-	// "Content-Type" or nil if still packed.
-	ContentType *ContentType
+	// Type of field, the numeric representation of field name.
+	Type FieldType
 
 	// true if field.unpack has been called, false when field.setValue is
 	// called again.

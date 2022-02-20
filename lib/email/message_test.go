@@ -114,9 +114,9 @@ func TestMessageDKIMVerify(t *testing.T) {
 	t.Skip()
 
 	cases := []struct {
+		expStatus *dkim.Status
 		inFile    string
 		expErr    string
-		expStatus *dkim.Status
 	}{{
 		inFile: "testdata/message-dkimverify-00.txt",
 		expStatus: &dkim.Status{
@@ -157,11 +157,12 @@ func TestMessageDKIMSign(t *testing.T) {
 	canonSimple := dkim.CanonSimple
 
 	cases := []struct {
+		sig       *dkim.Signature
+		expStatus *dkim.Status
+
 		inFile       string
-		sig          *dkim.Signature
 		expBodyHash  string
 		expSignature string
-		expStatus    *dkim.Status
 	}{{
 		inFile: "testdata/message-dkimsign-00.txt",
 		sig: &dkim.Signature{
