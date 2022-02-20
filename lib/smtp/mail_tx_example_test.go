@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"regexp"
+	"time"
 
 	"github.com/shuLhan/share/lib/email"
 )
@@ -18,13 +20,20 @@ func ExampleNewMailTx() {
 	//
 	// [1] github.com/shuLhan/share/lib/email
 
+	// Overwrite the email.Epoch to make the example works.
+	email.Epoch = func() int64 {
+		return 1645600000
+	}
+
 	var (
 		txFrom      = "Postmaster <postmaster@mail.example.com>"
 		fromAddress = []byte("Noreply <noreply@example.com>")
+		toAddresses = []byte("John <john@example.com>, Jane <jane@example.com>")
 		subject     = []byte(`Example subject`)
 		bodyText    = []byte(`Email body as plain text`)
 		bodyHtml    = []byte(`Email body as <b>HTML</b>`)
-		toAddresses = []byte("John <john@example.com>, Jane <jane@example.com>")
+		timeNowUtc  = time.Unix(email.Epoch(), 0).UTC()
+		dateNowUtc  = timeNowUtc.Format(email.DateFormat)
 
 		recipients []string
 		mboxes     []*email.Mailbox
@@ -65,14 +74,21 @@ func ExampleNewMailTx() {
 	fmt.Printf("Tx Recipients: %s\n", mailtx.Recipients)
 
 	// In order to make the example Output works, we need to replace all
-	// CRLF with LF.
+	// CRLF with LF and "date:" with the system timezone.
 	data = bytes.ReplaceAll(mailtx.Data, []byte("\r\n"), []byte("\n"))
+
+	//fmt.Printf("timeNowUtc: %s\n", timeNowUtc)
+	//fmt.Printf("dateNowUtc: %s\n", dateNowUtc)
+
+	reDate := regexp.MustCompile(`^date: Wed(.*) \+....`)
+	data = reDate.ReplaceAll(data, []byte(`date: `+dateNowUtc))
 
 	fmt.Printf("Tx Data:\n%s", data)
 	//Output:
 	//Tx From: Postmaster <postmaster@mail.example.com>
 	//Tx Recipients: [john@example.com jane@example.com]
 	//Tx Data:
+	//date: Wed, 23 Feb 2022 07:06:40 +0000
 	//from: Noreply <noreply@example.com>
 	//to: John <john@example.com>, Jane <jane@example.com>
 	//subject: Example subject

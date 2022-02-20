@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/email/dkim"
@@ -31,9 +32,20 @@ type Message struct {
 func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 	msg *Message, err error,
 ) {
+	var (
+		logp      = "NewMultipart"
+		timeNow   = time.Unix(Epoch(), 0)
+		dateValue = timeNow.Format(DateFormat)
+	)
+
 	msg = &Message{
 		Header: &Header{},
 		Body:   &Body{},
+	}
+
+	err = msg.Header.Set(FieldTypeDate, []byte(dateValue))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	err = msg.Header.Set(FieldTypeFrom, from)
