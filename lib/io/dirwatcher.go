@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -93,6 +94,18 @@ func (dw *DirWatcher) Stop() {
 	dw.ticker.Stop()
 }
 
+// dirsKeys return all the key in field dirs sorted in ascending order.
+func (dw *DirWatcher) dirsKeys() (keys []string) {
+	var (
+		key string
+	)
+	for key = range dw.dirs {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 //
 // mapSubdirs iterate each child node and check if its a directory or regular
 // file.
@@ -120,18 +133,21 @@ func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
 }
 
 //
-// unmapSubdirs find any sub directories in node's childrens and remove it
-// from map of node.
+// unmapSubdirs find sub directories in node's childrens, recursively and
+// remove it from map of node.
 //
 func (dw *DirWatcher) unmapSubdirs(node *memfs.Node) {
 	for _, child := range node.Childs {
-		if !child.IsDir() {
-			continue
+		if child.IsDir() {
+			delete(dw.dirs, child.Path)
+			dw.unmapSubdirs(child)
 		}
-
-		delete(dw.dirs, child.Path)
-		dw.unmapSubdirs(child)
+		dw.fs.RemoveChild(node, child)
 	}
+	if node.IsDir() {
+		delete(dw.dirs, node.Path)
+	}
+	dw.fs.RemoveChild(node.Parent, node)
 }
 
 //
@@ -141,7 +157,9 @@ func (dw *DirWatcher) unmapSubdirs(node *memfs.Node) {
 // old content to detect deletion and addition of files.
 //
 func (dw *DirWatcher) onContentChange(node *memfs.Node) {
-	logp := "DirWatcher.onContentChange"
+	var (
+		logp = "onContentChange"
+	)
 
 	if debug.Value >= 2 {
 		fmt.Printf("%s: %+v\n", logp, node)
@@ -179,10 +197,7 @@ func (dw *DirWatcher) onContentChange(node *memfs.Node) {
 		if debug.Value >= 2 {
 			fmt.Printf("%s: %q deleted\n", logp, child.Path)
 		}
-		if child.IsDir() {
-			dw.unmapSubdirs(child)
-		}
-		dw.fs.RemoveChild(node, child)
+		dw.unmapSubdirs(child)
 	}
 
 	// Find new files in directory.
@@ -352,7 +367,7 @@ func (dw *DirWatcher) start() {
 }
 
 func (dw *DirWatcher) processSubdirs() {
-	logp := "DirWatcher.processSubdirs"
+	logp := "processSubdirs"
 
 	for _, node := range dw.dirs {
 		if debug.Value >= 3 {
@@ -361,11 +376,11 @@ func (dw *DirWatcher) processSubdirs() {
 
 		newDirInfo, err := os.Stat(node.SysPath)
 		if err != nil {
-			if !os.IsNotExist(err) {
+			if os.IsNotExist(err) {
+				dw.unmapSubdirs(node)
+			} else {
 				log.Printf("%s: %q: %s", logp, node.SysPath, err)
-				continue
 			}
-			dw.unmapSubdirs(node)
 			continue
 		}
 		if node.Mode() != newDirInfo.Mode() {

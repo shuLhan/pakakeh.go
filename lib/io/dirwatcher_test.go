@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/memfs"
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestDirWatcher(t *testing.T) {
@@ -200,4 +201,88 @@ func TestDirWatcher(t *testing.T) {
 
 	wg.Add(1)
 	dw.Stop()
+}
+
+//
+// Test renaming sub-directory being watched.
+//
+func TestDirWatcher_renameDirectory(t *testing.T) {
+	var (
+		logp = "TestDirWatcher_renameDirectory"
+		nsq  = make(chan *NodeState)
+
+		dw  DirWatcher
+		err error
+
+		rootDir    string
+		subDir     string
+		subDirFile string
+		newSubDir  string
+	)
+
+	//
+	// Create a directory with its content to be watched.
+	//
+	//	rootDir
+	//	|_ subDir
+	//	   |_ subDirFile
+	//
+
+	rootDir, err = os.MkdirTemp("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		err = os.RemoveAll(rootDir)
+		if err != nil {
+			t.Logf("%s: on cleanup: %s", logp, err)
+		}
+	})
+
+	subDir = filepath.Join(rootDir, "subdir")
+	err = os.Mkdir(subDir, 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	subDirFile = filepath.Join(subDir, "testfile")
+	err = os.WriteFile(subDirFile, []byte(`content of testfile`), 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dw = DirWatcher{
+		Callback: func(ns *NodeState) {
+			nsq <- ns
+		},
+		Options: memfs.Options{
+			Root: rootDir,
+		},
+		Delay: 200 * time.Millisecond,
+	}
+
+	err = dw.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Wait for all watcher started.
+	time.Sleep(400 * time.Millisecond)
+
+	newSubDir = filepath.Join(rootDir, "newsubdir")
+	err = os.Rename(subDir, newSubDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	<-nsq
+	<-nsq
+	<-nsq
+
+	var expDirs = []string{
+		"/newsubdir",
+	}
+
+	test.Assert(t, "dirs", expDirs, dw.dirsKeys())
 }
