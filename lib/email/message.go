@@ -20,10 +20,11 @@ import (
 // Message represent an unpacked internet message format.
 //
 type Message struct {
-	Header        *Header
-	Body          *Body
 	DKIMSignature *dkim.Signature
 	dkimStatus    *dkim.Status
+
+	Header Header
+	Body   Body
 }
 
 //
@@ -38,10 +39,7 @@ func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 		dateValue = timeNow.Format(DateFormat)
 	)
 
-	msg = &Message{
-		Header: &Header{},
-		Body:   &Body{},
-	}
+	msg = &Message{}
 
 	err = msg.Header.Set(FieldTypeDate, []byte(dateValue))
 	if err != nil {
@@ -106,18 +104,32 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 		return nil, nil, nil
 	}
 
+	var (
+		logp = "ParseMessage"
+
+		hdr      *Header
+		body     *Body
+		boundary []byte
+	)
+
 	msg = &Message{}
 
-	msg.Header, rest, err = ParseHeader(raw)
+	hdr, rest, err = ParseHeader(raw)
 	if err != nil {
-		return nil, rest, err
+		return nil, rest, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	boundary := msg.Header.Boundary()
+	boundary = hdr.Boundary()
 
-	msg.Body, rest, err = ParseBody(rest, boundary)
+	body, rest, err = ParseBody(rest, boundary)
+	if err != nil {
+		return nil, rest, fmt.Errorf("%s: %w", logp, err)
+	}
 
-	return msg, rest, err
+	msg.Header = *hdr
+	msg.Body = *body
+
+	return msg, rest, nil
 }
 
 //
@@ -280,14 +292,10 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 func (msg *Message) String() string {
 	var sb strings.Builder
 
-	if msg.Header != nil {
-		sb.Write(msg.Header.Relaxed())
-	}
+	sb.Write(msg.Header.Relaxed())
 	sb.WriteByte(cr)
 	sb.WriteByte(lf)
-	if msg.Body != nil {
-		sb.WriteString(msg.Body.String())
-	}
+	sb.WriteString(msg.Body.String())
 
 	return sb.String()
 }
