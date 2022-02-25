@@ -17,6 +17,8 @@ import (
 // MIME represent part of message body with their header and content.
 //
 type MIME struct {
+	contentType *ContentType
+
 	Header  *Header
 	Content []byte
 }
@@ -30,24 +32,26 @@ func newMIME(contentType, content []byte) (mime *MIME, err error) {
 	mime = &MIME{
 		Header: &Header{},
 	}
+
 	err = mime.Header.Set(FieldTypeContentType, contentType)
 	if err != nil {
 		return nil, err
 	}
+
+	mime.contentType = mime.Header.ContentType()
 
 	err = mime.Header.Set(FieldTypeMIMEVersion, []byte(mimeVersion1))
 	if err != nil {
 		return nil, err
 	}
 
-	err = mime.Header.Set(FieldTypeContentTransferEncoding,
-		[]byte(encodingQuotedPrintable))
+	err = mime.Header.Set(FieldTypeContentTransferEncoding, []byte(encodingQuotedPrintable))
 	if err != nil {
 		return nil, err
 	}
 
 	var buf bytes.Buffer
-	content = append(content, []byte("\r\n")...)
+	content = append(content, cr, lf)
 	w := quotedprintable.NewWriter(&buf)
 	_, err = w.Write(content)
 	if err != nil {
