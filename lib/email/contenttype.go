@@ -137,6 +137,17 @@ func (ct *ContentType) GetParamValue(name []byte) []byte {
 	return nil
 }
 
+// isEqual will return true if the ct's Top and Sub matched with other.
+func (ct *ContentType) isEqual(other *ContentType) bool {
+	if other == nil {
+		return false
+	}
+	if !bytes.Equal(ct.Top, other.Top) {
+		return false
+	}
+	return bytes.Equal(ct.Sub, other.Sub)
+}
+
 //
 // SetBoundary set the parameter boundary in content-type header's value.
 //

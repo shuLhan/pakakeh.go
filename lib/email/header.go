@@ -72,6 +72,30 @@ func ParseHeader(raw []byte) (hdr *Header, rest []byte, err error) {
 	return nil, rest, err
 }
 
+func (hdr *Header) addMailboxes(ft FieldType, mailboxes []byte) (err error) {
+	var (
+		f, field *Field
+	)
+
+	for _, f = range hdr.fields {
+		if f.Type == ft {
+			field = f
+			break
+		}
+	}
+	if field == nil {
+		field = &Field{
+			Type: ft,
+		}
+		hdr.fields = append(hdr.fields, field)
+		field.setName(fieldNames[ft])
+		field.setValue(mailboxes)
+		return field.unpack()
+	}
+
+	return field.addMailboxes(mailboxes)
+}
+
 //
 // Boundary return the message body boundary defined in Content-Type.
 // If no field Content-Type or no boundary it will return nil.
@@ -179,23 +203,30 @@ func (hdr *Header) Relaxed() []byte {
 // If no field type found, the new field will be added to the list.
 //
 func (hdr *Header) Set(ft FieldType, value []byte) (err error) {
-	var field *Field
-
-	for _, f := range hdr.fields {
-		if f.Type == ft {
-			field = f
-			break
-		}
-	}
-	if field == nil {
+	var (
 		field = &Field{
 			Type: ft,
 		}
-		hdr.fields = append(hdr.fields, field)
-	}
+
+		f *Field
+		x int
+	)
+
 	field.setName(fieldNames[ft])
 	field.setValue(value)
-	return field.unpack()
+	err = field.unpack()
+	if err != nil {
+		return fmt.Errorf("Set: %w", err)
+	}
+
+	for x, f = range hdr.fields {
+		if f.Type == ft {
+			hdr.fields[x] = field
+			return nil
+		}
+	}
+	hdr.fields = append(hdr.fields, field)
+	return nil
 }
 
 //

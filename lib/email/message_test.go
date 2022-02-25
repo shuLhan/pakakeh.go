@@ -107,6 +107,82 @@ func TestMessageParseMessage(t *testing.T) {
 	}
 }
 
+func TestMessage_AddCC(t *testing.T) {
+	var (
+		msg Message
+		err error
+	)
+
+	cases := []struct {
+		desc      string
+		mailboxes string
+		expMsg    string
+		expError  string
+	}{{
+		desc:      "One mailbox",
+		mailboxes: "one <a@b.c>",
+		expMsg:    "cc:one <a@b.c>\r\n\r\n",
+	}, {
+		desc:   "Empty mailbox",
+		expMsg: "cc:one <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Invalid mailbox",
+		mailboxes: "a",
+		expError:  `AddCC: ParseMailboxes "a": empty or invalid address`,
+		expMsg:    "cc:one <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Multiple mailboxes",
+		mailboxes: "two <a@b.c>,   three <a@b.c> ",
+		expMsg:    "cc:one <a@b.c>, two <a@b.c>, three <a@b.c>\r\n\r\n",
+	}}
+
+	for _, c := range cases {
+		err = msg.AddCC(c.mailboxes)
+		if err != nil {
+			test.Assert(t, c.desc, c.expError, err.Error())
+		}
+		test.Assert(t, c.desc, c.expMsg, msg.String())
+	}
+}
+
+func TestMessage_AddTo(t *testing.T) {
+	var (
+		msg Message
+		err error
+	)
+
+	cases := []struct {
+		desc      string
+		mailboxes string
+		expMsg    string
+		expError  string
+	}{{
+		desc:      "One mailbox",
+		mailboxes: "one <a@b.c>",
+		expMsg:    "to:one <a@b.c>\r\n\r\n",
+	}, {
+		desc:   "Empty mailbox",
+		expMsg: "to:one <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Invalid mailbox",
+		mailboxes: "a",
+		expError:  `AddTo: ParseMailboxes "a": empty or invalid address`,
+		expMsg:    "to:one <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Multiple mailboxes",
+		mailboxes: "two <a@b.c>,   three <a@b.c> ",
+		expMsg:    "to:one <a@b.c>, two <a@b.c>, three <a@b.c>\r\n\r\n",
+	}}
+
+	for _, c := range cases {
+		err = msg.AddTo(c.mailboxes)
+		if err != nil {
+			test.Assert(t, c.desc, c.expError, err.Error())
+		}
+		test.Assert(t, c.desc, c.expMsg, msg.String())
+	}
+}
+
 //
 // NOTE: this test require call to DNS to get the public key.
 //
@@ -203,5 +279,186 @@ func TestMessageDKIMSign(t *testing.T) {
 		}
 
 		test.Assert(t, "dkim.Status", c.expStatus, gotStatus)
+	}
+}
+
+func TestMessage_SetBodyText(t *testing.T) {
+	var (
+		msg Message
+		err error
+	)
+	cases := []struct {
+		desc    string
+		content []byte
+		expMsg  string
+	}{{
+		desc:    "With empty Body",
+		content: []byte("text body"),
+		expMsg: "\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-transfer-encoding: quoted-printable\r\n" +
+			"\r\n" +
+			"text body\r\n",
+	}, {
+		desc:    "With new text",
+		content: []byte("new text body"),
+		expMsg: "\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-transfer-encoding: quoted-printable\r\n" +
+			"\r\n" +
+			"new text body\r\n",
+	}}
+
+	for _, c := range cases {
+		err = msg.SetBodyText(c.content)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.desc, string(c.expMsg), string(msg.Pack()))
+	}
+}
+
+func TestMessage_SetCC(t *testing.T) {
+	var (
+		msg Message
+		err error
+	)
+
+	cases := []struct {
+		desc      string
+		mailboxes string
+		expMsg    string
+		expError  string
+	}{{
+		desc:      "One mailbox",
+		mailboxes: "test <a@b.c>",
+		expMsg:    "cc:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:   "Empty mailbox",
+		expMsg: "cc:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Invalid mailbox",
+		mailboxes: "a",
+		expError:  `SetCC: Set: ParseMailboxes "a": empty or invalid address`,
+		expMsg:    "cc:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Multiple mailboxes",
+		mailboxes: "new <a@b.c>, from <a@b.c>",
+		expMsg:    "cc:new <a@b.c>, from <a@b.c>\r\n\r\n",
+	}}
+
+	for _, c := range cases {
+		err = msg.SetCC(c.mailboxes)
+		if err != nil {
+			test.Assert(t, c.desc, c.expError, err.Error())
+		}
+		test.Assert(t, c.desc, c.expMsg, msg.String())
+	}
+}
+
+func TestMessage_SetFrom(t *testing.T) {
+	var (
+		msg Message
+		err error
+	)
+
+	cases := []struct {
+		desc     string
+		mailbox  string
+		expMsg   string
+		expError string
+	}{{
+		desc:    "Valid mailbox",
+		mailbox: "test <a@b.c>",
+		expMsg:  "from:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:   "Empty mailbox",
+		expMsg: "from:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:     "Invalid mailbox",
+		mailbox:  "a",
+		expError: `SetFrom: Set: ParseMailboxes "a": empty or invalid address`,
+		expMsg:   "from:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:    "New mailbox",
+		mailbox: "new <a@b.c>",
+		expMsg:  "from:new <a@b.c>\r\n\r\n",
+	}, {
+		desc:    "Multiple mailboxes",
+		mailbox: "two <a@b.c>, three <a@b.c>",
+		expMsg:  "from:two <a@b.c>, three <a@b.c>\r\n\r\n",
+	}}
+
+	for _, c := range cases {
+		err = msg.SetFrom(c.mailbox)
+		if err != nil {
+			test.Assert(t, c.desc, c.expError, err.Error())
+		}
+		test.Assert(t, c.desc, c.expMsg, msg.String())
+	}
+}
+
+func TestMessage_SetSubject(t *testing.T) {
+	var (
+		msg Message
+	)
+	cases := []struct {
+		subject string
+		expMsg  string
+	}{{
+		subject: "a subject",
+		expMsg:  "subject: a subject\r\n\r\n",
+	}, {
+		expMsg: "subject: a subject\r\n\r\n",
+	}, {
+		subject: "new subject",
+		expMsg:  "subject: new subject\r\n\r\n",
+	}}
+
+	for _, c := range cases {
+		msg.SetSubject(c.subject)
+
+		test.Assert(t, "SetSubject", c.expMsg, string(msg.Pack()))
+	}
+}
+
+func TestMessage_SetTo(t *testing.T) {
+	var (
+		msg Message
+		err error
+	)
+
+	cases := []struct {
+		desc      string
+		mailboxes string
+		expMsg    string
+		expError  string
+	}{{
+		desc:      "One mailbox",
+		mailboxes: "test <a@b.c>",
+		expMsg:    "to:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:   "Empty mailbox",
+		expMsg: "to:test <a@b.c>\r\n\r\n",
+	}, {
+		desc:      "Invalid mailbox",
+		mailboxes: "a",
+		expMsg:    "to:test <a@b.c>\r\n\r\n",
+		expError:  `SetTo: Set: ParseMailboxes "a": empty or invalid address`,
+	}, {
+		desc:      "Multiple mailboxes",
+		mailboxes: "new <a@b.c>, from <a@b.c>",
+		expMsg:    "to:new <a@b.c>, from <a@b.c>\r\n\r\n",
+	}}
+
+	for _, c := range cases {
+		err = msg.SetTo(c.mailboxes)
+		if err != nil {
+			test.Assert(t, c.desc, c.expError, err.Error())
+		}
+		test.Assert(t, c.desc, c.expMsg, msg.String())
 	}
 }

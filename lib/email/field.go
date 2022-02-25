@@ -165,6 +165,63 @@ invalid:
 }
 
 //
+// addMailboxes append zero or more mailboxes to current mboxes.
+//
+func (field *Field) addMailboxes(mailboxes []byte) (err error) {
+	var (
+		mboxes []*Mailbox
+	)
+
+	mailboxes = bytes.TrimSpace(mailboxes)
+
+	mboxes, err = ParseMailboxes(mailboxes)
+	if err != nil {
+		return err
+	}
+	field.mboxes = append(field.mboxes, mboxes...)
+
+	if len(field.Value) > 0 {
+		field.Value = bytes.TrimSpace(field.Value)
+		field.Value = append(field.Value, ',', ' ')
+	}
+	field.appendValue(mailboxes)
+
+	return nil
+}
+
+func (field *Field) appendValue(raw []byte) {
+	var (
+		x      int
+		spaces int
+	)
+
+	// Skip leading spaces.
+	for ; x < len(raw); x++ {
+		if !ascii.IsSpace(raw[x]) {
+			break
+		}
+	}
+
+	for ; x < len(raw); x++ {
+		if ascii.IsSpace(raw[x]) {
+			spaces++
+			continue
+		}
+		if spaces > 0 {
+			field.Value = append(field.Value, ' ')
+			spaces = 0
+		}
+		field.Value = append(field.Value, raw[x])
+	}
+	if len(field.Value) > 0 {
+		field.Value = append(field.Value, cr)
+		field.Value = append(field.Value, lf)
+	}
+	field.unpacked = false
+
+}
+
+//
 // setName set field Name by canonicalizing raw field name using "simple" and
 // "relaxed" algorithms.
 //.
@@ -201,32 +258,7 @@ func (field *Field) setName(raw []byte) {
 func (field *Field) setValue(raw []byte) {
 	field.oriValue = raw
 	field.Value = make([]byte, 0, len(raw))
-
-	x := 0
-	// Skip leading spaces.
-	for ; x < len(raw); x++ {
-		if !ascii.IsSpace(raw[x]) {
-			break
-		}
-	}
-
-	spaces := 0
-	for ; x < len(raw); x++ {
-		if ascii.IsSpace(raw[x]) {
-			spaces++
-			continue
-		}
-		if spaces > 0 {
-			field.Value = append(field.Value, ' ')
-			spaces = 0
-		}
-		field.Value = append(field.Value, raw[x])
-	}
-	if len(field.Value) > 0 {
-		field.Value = append(field.Value, cr)
-		field.Value = append(field.Value, lf)
-	}
-	field.unpacked = false
+	field.appendValue(raw)
 }
 
 //

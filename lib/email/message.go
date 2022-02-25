@@ -133,6 +133,36 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 }
 
 //
+// AddCC add one or more recipients to the message header CC.
+//
+func (msg *Message) AddCC(mailboxes string) (err error) {
+	err = msg.addMailboxes(FieldTypeCC, []byte(mailboxes))
+	if err != nil {
+		return fmt.Errorf("AddCC: %w", err)
+	}
+	return nil
+}
+
+//
+// AddTo add one or more recipients to the mesage header To.
+//
+func (msg *Message) AddTo(mailboxes string) (err error) {
+	err = msg.addMailboxes(FieldTypeTo, []byte(mailboxes))
+	if err != nil {
+		return fmt.Errorf("AddTo: %w", err)
+	}
+	return nil
+}
+
+func (msg *Message) addMailboxes(ft FieldType, mailboxes []byte) error {
+	mailboxes = bytes.TrimSpace(mailboxes)
+	if len(mailboxes) == 0 {
+		return nil
+	}
+	return msg.Header.addMailboxes(ft, mailboxes)
+}
+
+//
 // DKIMSign sign the message using the private key and signature.
 // The only required fields in signature is SDID and Selector, any other
 // required fields that are empty will be initialized with default values.
@@ -287,6 +317,96 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 }
 
 //
+// SetBodyHtml set or replace the message's body HTML content.
+//
+func (msg *Message) SetBodyHtml(content []byte) (err error) {
+	err = msg.setBody([]byte(contentTypeTextHTML), content)
+	if err != nil {
+		return fmt.Errorf("SetBodyHtml: %w", err)
+	}
+	return nil
+}
+
+//
+// SetBodyText set or replace the message body text content.
+//
+func (msg *Message) SetBodyText(content []byte) (err error) {
+	err = msg.setBody([]byte(contentTypeTextPlain), content)
+	if err != nil {
+		return fmt.Errorf("SetBodyText: %w", err)
+	}
+	return nil
+}
+
+func (msg *Message) setBody(contentType, content []byte) (err error) {
+	var (
+		mime *MIME
+	)
+	mime, err = newMIME(contentType, content)
+	if err != nil {
+		return err
+	}
+	msg.Body.Set(mime)
+	return nil
+}
+
+//
+// SetCC set or replace the message header CC with one or more mailboxes.
+// See AddCC to add another recipient to the CC header.
+//
+func (msg *Message) SetCC(mailboxes string) (err error) {
+	err = msg.setMailboxes(FieldTypeCC, []byte(mailboxes))
+	if err != nil {
+		return fmt.Errorf("SetCC: %w", err)
+	}
+	return nil
+}
+
+//
+// SetFrom set or replace the message header From with mailbox.
+// If the mailbox parameter is empty, nothing will changes.
+//
+func (msg *Message) SetFrom(mailbox string) (err error) {
+	err = msg.setMailboxes(FieldTypeFrom, []byte(mailbox))
+	if err != nil {
+		return fmt.Errorf("SetFrom: %w", err)
+	}
+	return nil
+}
+
+//
+// SetSubject set or replace the subject.
+// It will do nothing if the subject is empty.
+//
+func (msg *Message) SetSubject(subject string) {
+	subject = strings.TrimSpace(subject)
+	if len(subject) == 0 {
+		return
+	}
+	_ = msg.Header.Set(FieldTypeSubject, []byte(subject))
+}
+
+//
+// SetTo set or replace the message header To with one or more mailboxes.
+// See AddTo to add another recipient to the To header.
+//
+func (msg *Message) SetTo(mailboxes string) (err error) {
+	err = msg.setMailboxes(FieldTypeTo, []byte(mailboxes))
+	if err != nil {
+		return fmt.Errorf("SetTo: %w", err)
+	}
+	return nil
+}
+
+func (msg *Message) setMailboxes(ft FieldType, mailboxes []byte) error {
+	mailboxes = bytes.TrimSpace(mailboxes)
+	if len(mailboxes) == 0 {
+		return nil
+	}
+	return msg.Header.Set(ft, mailboxes)
+}
+
+//
 // String return the text representation of Message object.
 //
 func (msg *Message) String() string {
@@ -372,8 +492,7 @@ func (msg *Message) Pack() (out []byte) {
 
 	for _, f := range msg.Header.fields {
 		if f.Type == FieldTypeContentType {
-			fmt.Fprintf(&buf, "%s: %s\r\n", f.Name,
-				f.ContentType.String())
+			fmt.Fprintf(&buf, "%s: %s\r\n", f.Name, f.ContentType.String())
 		} else {
 			fmt.Fprintf(&buf, "%s: %s", f.Name, f.Value)
 		}

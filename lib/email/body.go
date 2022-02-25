@@ -102,6 +102,24 @@ func (body *Body) Add(mime *MIME) {
 }
 
 //
+// Set replace the MIME content-type with new one, if its exist; otherwise
+// append it.
+//
+func (body *Body) Set(mime *MIME) {
+	var (
+		part *MIME
+	)
+	for _, part = range body.Parts {
+		if part.contentType.isEqual(mime.contentType) {
+			part.Header = mime.Header
+			part.Content = mime.Content
+			return
+		}
+	}
+	body.Parts = append(body.Parts, mime)
+}
+
+//
 // String return text representation of Body.
 //
 func (body *Body) String() string {
