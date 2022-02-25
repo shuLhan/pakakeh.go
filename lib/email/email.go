@@ -20,6 +20,11 @@ const (
 	lf byte = '\n'
 )
 
+// dateInUtc if set to true, the Date header will be set to UTC instead of
+// local time.
+// This variable is used to make test work on all zones.
+var dateInUtc bool
+
 //
 // Epoch return the UNIX timestamp in seconds.
 //

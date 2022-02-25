@@ -6,39 +6,63 @@ package email
 
 import (
 	"io/ioutil"
+	"math/rand"
 	"testing"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/email/dkim"
 	"github.com/shuLhan/share/lib/test"
 )
 
 func TestNewMultipart(t *testing.T) {
-	if debug.Value == 0 {
-		// This test involve random generated string on boundary, so
-		// it should be run manually.
-		t.Skip()
+	dateInUtc = true
+	Epoch = func() int64 {
+		return 1645811431
 	}
+	rand.Seed(42)
 
 	cases := []struct {
-		from, to, subject []byte
-		bodyText          []byte
-		bodyHTML          []byte
+		expMsg string
+
+		from     []byte
+		to       []byte
+		subject  []byte
+		bodyText []byte
+		bodyHTML []byte
 	}{{
 		from:     []byte("a@b.c"),
 		to:       []byte("d@e.f"),
 		subject:  []byte("test"),
 		bodyText: []byte("This is plain text"),
 		bodyHTML: []byte("<b>This is body in HTML</b>"),
+		expMsg: "date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
+			"from: a@b.c\r\n" +
+			"to: d@e.f\r\n" +
+			"subject: test\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-type: multipart/alternative; boundary=1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
+			"\r\n" +
+			"--1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-transfer-encoding: quoted-printable\r\n" +
+			"\r\n" +
+			"This is plain text\r\n" +
+			"--1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
+			"content-type: text/html; charset=\"utf-8\"\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-transfer-encoding: quoted-printable\r\n" +
+			"\r\n" +
+			"<b>This is body in HTML</b>\r\n" +
+			"--1b4df158039f7cce49f0a64b0ea7b7dd--\r\n",
 	}}
 
 	for _, c := range cases {
-		got, err := NewMultipart(c.from, c.to, c.subject, c.bodyText, c.bodyHTML)
+		gotMsg, err := NewMultipart(c.from, c.to, c.subject, c.bodyText, c.bodyHTML)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		t.Logf("NewMultipart:\n%s", got.Pack())
+		test.Assert(t, "NewMultipart", c.expMsg, string(gotMsg.Pack()))
 	}
 }
 
@@ -187,7 +211,7 @@ func TestMessage_AddTo(t *testing.T) {
 // NOTE: this test require call to DNS to get the public key.
 //
 func TestMessageDKIMVerify(t *testing.T) {
-	t.Skip()
+	t.Skip("TODO: use local DNS")
 
 	cases := []struct {
 		expStatus *dkim.Status

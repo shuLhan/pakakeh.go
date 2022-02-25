@@ -39,6 +39,10 @@ func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 		dateValue = timeNow.Format(DateFormat)
 	)
 
+	if dateInUtc {
+		dateValue = timeNow.UTC().Format(DateFormat)
+	}
+
 	msg = &Message{}
 
 	err = msg.Header.Set(FieldTypeDate, []byte(dateValue))
