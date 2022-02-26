@@ -34,17 +34,17 @@ func newMIME(contentType, content []byte) (mime *MIME, err error) {
 		Header: &Header{},
 	}
 
+	err = mime.Header.Set(FieldTypeMIMEVersion, []byte(mimeVersion1))
+	if err != nil {
+		return nil, err
+	}
+
 	err = mime.Header.Set(FieldTypeContentType, contentType)
 	if err != nil {
 		return nil, err
 	}
 
 	mime.contentType = mime.Header.ContentType()
-
-	err = mime.Header.Set(FieldTypeMIMEVersion, []byte(mimeVersion1))
-	if err != nil {
-		return nil, err
-	}
 
 	err = mime.Header.Set(FieldTypeContentTransferEncoding, []byte(encodingQuotedPrintable))
 	if err != nil {

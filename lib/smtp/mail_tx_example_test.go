@@ -68,7 +68,8 @@ func ExampleNewMailTx() {
 	// The From in MailTx define the account that authorize or allowed
 	// sending the email on behalf of fromAddress domain, while the
 	// fromAddress define the address that viewed by recipients.
-	mailtx = NewMailTx(txFrom, recipients, msg.Pack())
+	data, _ = msg.Pack()
+	mailtx = NewMailTx(txFrom, recipients, data)
 
 	fmt.Printf("Tx From: %s\n", mailtx.From)
 	fmt.Printf("Tx Recipients: %s\n", mailtx.Recipients)
@@ -96,14 +97,14 @@ func ExampleNewMailTx() {
 	//content-type: multipart/alternative; boundary=1b4df158039f7cce49f0a64b0ea7b7dd
 	//
 	//--1b4df158039f7cce49f0a64b0ea7b7dd
-	//content-type: text/plain; charset="utf-8"
 	//mime-version: 1.0
+	//content-type: text/plain; charset="utf-8"
 	//content-transfer-encoding: quoted-printable
 	//
 	//Email body as plain text
 	//--1b4df158039f7cce49f0a64b0ea7b7dd
-	//content-type: text/html; charset="utf-8"
 	//mime-version: 1.0
+	//content-type: text/html; charset="utf-8"
 	//content-transfer-encoding: quoted-printable
 	//
 	//Email body as <b>HTML</b>

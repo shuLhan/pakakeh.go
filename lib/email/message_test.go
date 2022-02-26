@@ -48,14 +48,14 @@ func TestNewMultipart(t *testing.T) {
 			"content-type: multipart/alternative; boundary=1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
 			"\r\n" +
 			"--1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"This is plain text\r\n" +
 			"--1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
-			"content-type: text/html; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
+			"content-type: text/html; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"<b>This is body in HTML</b>\r\n" +
@@ -336,8 +336,8 @@ func TestMessage_packSingle(t *testing.T) {
 		desc:     "With body text",
 		bodyText: []byte(`this is a body text`),
 		exp: "" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"this is a body text\r\n",
@@ -345,8 +345,8 @@ func TestMessage_packSingle(t *testing.T) {
 		desc:     "With body HTML",
 		bodyHtml: []byte(`<p>this is an HTML body</p>`),
 		exp: "" +
-			"content-type: text/html; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
+			"content-type: text/html; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"<p>this is an HTML body</p>\r\n",
@@ -388,8 +388,8 @@ func TestMessage_SetBodyText(t *testing.T) {
 		desc:    "With empty Body",
 		content: []byte("text body"),
 		expMsg: "" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"text body\r\n",
@@ -397,8 +397,8 @@ func TestMessage_SetBodyText(t *testing.T) {
 		desc:    "With new text",
 		content: []byte("new text body"),
 		expMsg: "" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"new text body\r\n",

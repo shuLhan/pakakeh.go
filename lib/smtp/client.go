@@ -392,6 +392,13 @@ func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
 }
 
 //
+// SendEmail is the wrapper that simplify MailTx.
+//
+func (cl *Client) SendEmail(from string, to []string, subject, bodyText, bodyHtml []byte) (err error) {
+	return nil
+}
+
+//
 // Verify send the VRFY command to server to check if mailbox is exist.
 //
 func (cl *Client) Verify(mailbox string) (res *Response, err error) {
