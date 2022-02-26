@@ -7,6 +7,7 @@ package email
 import (
 	"bytes"
 	"errors"
+	"io"
 	"mime/quotedprintable"
 	"strings"
 
@@ -145,6 +146,13 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	return mime, rest, err
 }
 
+func (mime *MIME) isContentType(top, sub []byte) bool {
+	if bytes.Equal(mime.contentType.Top, top) {
+		return bytes.Equal(mime.contentType.Sub, sub)
+	}
+	return false
+}
+
 //
 // String return string representation of MIME object.
 //
@@ -159,4 +167,32 @@ func (mime *MIME) String() string {
 	sb.Write(mime.Content)
 
 	return sb.String()
+}
+
+//
+// WriteTo write the MIME header and content into Writer w.
+//
+func (mime *MIME) WriteTo(w io.Writer) (n int, err error) {
+	var (
+		m int
+	)
+	m, err = mime.Header.WriteTo(w)
+	if err != nil {
+		return n, err
+	}
+	n += m
+
+	m, err = w.Write([]byte("\r\n"))
+	if err != nil {
+		return n, err
+	}
+	n += m
+
+	m, err = w.Write(mime.Content)
+	if err != nil {
+		return n, err
+	}
+	n += m
+
+	return n, nil
 }

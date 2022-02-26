@@ -102,6 +102,22 @@ func (body *Body) Add(mime *MIME) {
 }
 
 //
+// getPart get the body part by top and sub content type.
+//
+func (body *Body) getPart(top, sub []byte) (mime *MIME) {
+	for _, mime = range body.Parts {
+		if !bytes.Equal(mime.contentType.Top, top) {
+			continue
+		}
+		if !bytes.Equal(mime.contentType.Sub, sub) {
+			continue
+		}
+		return mime
+	}
+	return nil
+}
+
+//
 // Set replace the MIME content-type with new one, if its exist; otherwise
 // append it.
 //

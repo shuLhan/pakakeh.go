@@ -7,6 +7,7 @@ package email
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -278,4 +279,28 @@ func (hdr *Header) SetMultipart() (err error) {
 	contentType.SetBoundary(boundary)
 
 	return nil
+}
+
+//
+// WriteTo the header into w.
+// The header does not end with an empty line to allow multiple Header
+// written multiple times.
+//
+func (hdr *Header) WriteTo(w io.Writer) (n int, err error) {
+	var (
+		f *Field
+		m int
+	)
+	for _, f = range hdr.fields {
+		if f.Type == FieldTypeContentType {
+			m, err = fmt.Fprintf(w, "%s: %s\r\n", f.Name, f.ContentType.String())
+		} else {
+			m, err = fmt.Fprintf(w, "%s: %s", f.Name, f.Value)
+		}
+		if err != nil {
+			return n, err
+		}
+		n += m
+	}
+	return n, nil
 }

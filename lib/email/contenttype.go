@@ -13,6 +13,12 @@ import (
 	libio "github.com/shuLhan/share/lib/io"
 )
 
+var (
+	topText  = []byte("text")
+	subPlain = []byte("plain")
+	subHtml  = []byte("html")
+)
+
 //
 // ContentType represent MIME header "Content-Type" field.
 //
@@ -166,7 +172,7 @@ func (ct *ContentType) SetBoundary(boundary []byte) {
 }
 
 //
-// String return text representation of this instance.
+// String return text representation of content type with its parameters.
 //
 func (ct *ContentType) String() string {
 	var sb strings.Builder

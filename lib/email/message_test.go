@@ -14,6 +14,12 @@ import (
 )
 
 func TestNewMultipart(t *testing.T) {
+	var (
+		gotMsg *Message
+		msgb   []byte
+		err    error
+	)
+
 	dateInUtc = true
 	Epoch = func() int64 {
 		return 1645811431
@@ -57,12 +63,17 @@ func TestNewMultipart(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		gotMsg, err := NewMultipart(c.from, c.to, c.subject, c.bodyText, c.bodyHTML)
+		gotMsg, err = NewMultipart(c.from, c.to, c.subject, c.bodyText, c.bodyHTML)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "NewMultipart", c.expMsg, string(gotMsg.Pack()))
+		msgb, err = gotMsg.Pack()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, "NewMultipart", c.expMsg, string(msgb))
 	}
 }
 
@@ -306,6 +317,64 @@ func TestMessageDKIMSign(t *testing.T) {
 	}
 }
 
+func TestMessage_packSingle(t *testing.T) {
+	type testCase struct {
+		desc     string
+		exp      string
+		bodyText []byte
+		bodyHtml []byte
+	}
+
+	var (
+		msg   Message
+		err   error
+		cases []testCase
+		got   []byte
+	)
+
+	cases = []testCase{{
+		desc:     "With body text",
+		bodyText: []byte(`this is a body text`),
+		exp: "" +
+			"content-type: text/plain; charset=\"utf-8\"\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-transfer-encoding: quoted-printable\r\n" +
+			"\r\n" +
+			"this is a body text\r\n",
+	}, {
+		desc:     "With body HTML",
+		bodyHtml: []byte(`<p>this is an HTML body</p>`),
+		exp: "" +
+			"content-type: text/html; charset=\"utf-8\"\r\n" +
+			"mime-version: 1.0\r\n" +
+			"content-transfer-encoding: quoted-printable\r\n" +
+			"\r\n" +
+			"<p>this is an HTML body</p>\r\n",
+	}}
+
+	for _, c := range cases {
+		msg.Body.Parts = nil
+
+		if len(c.bodyText) > 0 {
+			err = msg.SetBodyText(c.bodyText)
+			if err != nil {
+				t.Fatal(err)
+			}
+		} else {
+			err = msg.SetBodyHtml(c.bodyHtml)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		got, err = msg.Pack()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.desc, c.exp, string(got))
+	}
+}
+
 func TestMessage_SetBodyText(t *testing.T) {
 	var (
 		msg Message
@@ -313,12 +382,12 @@ func TestMessage_SetBodyText(t *testing.T) {
 	)
 	cases := []struct {
 		desc    string
-		content []byte
 		expMsg  string
+		content []byte
 	}{{
 		desc:    "With empty Body",
 		content: []byte("text body"),
-		expMsg: "\r\n" +
+		expMsg: "" +
 			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
@@ -327,7 +396,7 @@ func TestMessage_SetBodyText(t *testing.T) {
 	}, {
 		desc:    "With new text",
 		content: []byte("new text body"),
-		expMsg: "\r\n" +
+		expMsg: "" +
 			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
@@ -341,7 +410,12 @@ func TestMessage_SetBodyText(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, string(c.expMsg), string(msg.Pack()))
+		msgb, err := msg.Pack()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.desc, string(c.expMsg), string(msgb))
 	}
 }
 
@@ -434,18 +508,18 @@ func TestMessage_SetSubject(t *testing.T) {
 		expMsg  string
 	}{{
 		subject: "a subject",
-		expMsg:  "subject: a subject\r\n\r\n",
+		expMsg:  "subject:a subject\r\n\r\n",
 	}, {
-		expMsg: "subject: a subject\r\n\r\n",
+		expMsg: "subject:a subject\r\n\r\n",
 	}, {
 		subject: "new subject",
-		expMsg:  "subject: new subject\r\n\r\n",
+		expMsg:  "subject:new subject\r\n\r\n",
 	}}
 
 	for _, c := range cases {
 		msg.SetSubject(c.subject)
 
-		test.Assert(t, "SetSubject", c.expMsg, string(msg.Pack()))
+		test.Assert(t, "SetSubject", c.expMsg, msg.String())
 	}
 }
 

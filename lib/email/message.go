@@ -489,38 +489,121 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 //
 // Pack the message for sending.
 //
-func (msg *Message) Pack() (out []byte) {
-	var buf bytes.Buffer
+// The message content type is automatically set based on the Body parts.
+// If the Body only contain text part, the generated content-type will be set
+// to text/plain.
+// If the Body only contain HTML part, the generated content-type will be set
+// to text/html.
+// If both the text and HTML parts exist, the generated content-type will be
+// set to multipart/alternative.
+//
+func (msg *Message) Pack() (out []byte, err error) {
+	var (
+		logp = "Pack"
+	)
 
-	boundary := msg.Header.Boundary()
-
-	for _, f := range msg.Header.fields {
-		if f.Type == FieldTypeContentType {
-			fmt.Fprintf(&buf, "%s: %s\r\n", f.Name, f.ContentType.String())
-		} else {
-			fmt.Fprintf(&buf, "%s: %s", f.Name, f.Value)
-		}
+	if len(msg.Body.Parts) == 0 {
+		return nil, fmt.Errorf("%s: empty body", logp)
 	}
+
+	// TODO: check date, from, to, subject.
+
+	if len(msg.Body.Parts) > 1 {
+		out, err = msg.packMultipartAlternative()
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+		return out, nil
+	}
+
+	out, err = msg.packSingle()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	return out, nil
+}
+
+func (msg *Message) packMultipartAlternative() (out []byte, err error) {
+	var (
+		mime     *MIME
+		buf      bytes.Buffer
+		boundary []byte
+	)
+
+	boundary = msg.Header.Boundary()
+	if len(boundary) == 0 {
+		// Set the boundary has not been set, so generated one.
+		err = msg.Header.SetMultipart()
+		if err != nil {
+			return nil, err
+		}
+		boundary = msg.Header.Boundary()
+	}
+
+	_, err = msg.Header.WriteTo(&buf)
+	if err != nil {
+		return nil, err
+	}
+
 	buf.WriteString("\r\n")
-	for _, mime := range msg.Body.Parts {
-		if len(boundary) > 0 {
-			fmt.Fprintf(&buf, "--%s\r\n", boundary)
+
+	// Make sure the text part written first.
+	mime = msg.Body.getPart(topText, subPlain)
+	if mime != nil {
+		fmt.Fprintf(&buf, "--%s\r\n", boundary)
+		_, err = mime.WriteTo(&buf)
+		if err != nil {
+			return nil, err
 		}
-		for _, f := range mime.Header.fields {
-			if f.Type == FieldTypeContentType {
-				fmt.Fprintf(&buf, "%s: %s\r\n", f.Name,
-					f.ContentType.String())
-			} else {
-				fmt.Fprintf(&buf, "%s: %s", f.Name, f.Value)
-			}
+	}
+
+	mime = msg.Body.getPart(topText, subHtml)
+	if mime != nil {
+		fmt.Fprintf(&buf, "--%s\r\n", boundary)
+		_, err = mime.WriteTo(&buf)
+		if err != nil {
+			return nil, err
 		}
-		buf.WriteString("\r\n")
-		buf.Write(mime.Content)
 	}
-	if len(boundary) > 0 {
-		fmt.Fprintf(&buf, "--%s--\r\n", boundary)
+
+	// Write the rest of the parts, but skip the plain and HTML parts.
+	for _, mime = range msg.Body.Parts {
+		if mime.isContentType(topText, subPlain) {
+			continue
+		}
+		if mime.isContentType(topText, subHtml) {
+			continue
+		}
+
+		fmt.Fprintf(&buf, "--%s\r\n", boundary)
+		_, err = mime.WriteTo(&buf)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return buf.Bytes()
+	fmt.Fprintf(&buf, "--%s--\r\n", boundary)
+	return buf.Bytes(), nil
+}
+
+func (msg *Message) packSingle() (out []byte, err error) {
+	var (
+		mime = msg.Body.Parts[0]
+
+		buf bytes.Buffer
+	)
+
+	_, err = msg.Header.WriteTo(&buf)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = mime.WriteTo(&buf)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 //
