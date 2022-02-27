@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -19,6 +20,14 @@ var (
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
 )
+
+func TestMain(m *testing.M) {
+	Epoch = func() int64 {
+		return 1645811431
+	}
+
+	os.Exit(m.Run())
+}
 
 func initKeys(t *testing.T) {
 	rsaPrivateRaw, err := ioutil.ReadFile("dkim/testdata/rsa.private.pem")

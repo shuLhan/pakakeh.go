@@ -6,7 +6,7 @@ package email
 
 import (
 	"io/ioutil"
-	"math/rand"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/email/dkim"
@@ -15,16 +15,18 @@ import (
 
 func TestNewMultipart(t *testing.T) {
 	var (
-		gotMsg *Message
-		msgb   []byte
-		err    error
+		gotMsg   *Message
+		hostname string
+		msgb     []byte
+		err      error
 	)
 
 	dateInUtc = true
-	Epoch = func() int64 {
-		return 1645811431
+
+	hostname, err = os.Hostname()
+	if err != nil {
+		t.Fatal(err)
 	}
-	rand.Seed(42)
 
 	cases := []struct {
 		expMsg string
@@ -45,21 +47,22 @@ func TestNewMultipart(t *testing.T) {
 			"to: d@e.f\r\n" +
 			"subject: test\r\n" +
 			"mime-version: 1.0\r\n" +
-			"content-type: multipart/alternative; boundary=1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
+			"content-type: multipart/alternative; boundary=bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6\r\n" +
+			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
 			"\r\n" +
-			"--1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
+			"--bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"This is plain text\r\n" +
-			"--1b4df158039f7cce49f0a64b0ea7b7dd\r\n" +
+			"--bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-type: text/html; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
 			"\r\n" +
 			"<b>This is body in HTML</b>\r\n" +
-			"--1b4df158039f7cce49f0a64b0ea7b7dd--\r\n",
+			"--bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6--\r\n",
 	}}
 
 	for _, c := range cases {
@@ -326,16 +329,25 @@ func TestMessage_packSingle(t *testing.T) {
 	}
 
 	var (
-		msg   Message
-		err   error
-		cases []testCase
-		got   []byte
+		msg      Message
+		hostname string
+		err      error
+		cases    []testCase
+		got      []byte
 	)
+
+	dateInUtc = true
+	hostname, err = os.Hostname()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cases = []testCase{{
 		desc:     "With body text",
 		bodyText: []byte(`this is a body text`),
 		exp: "" +
+			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
+			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
@@ -345,6 +357,8 @@ func TestMessage_packSingle(t *testing.T) {
 		desc:     "With body HTML",
 		bodyHtml: []byte(`<p>this is an HTML body</p>`),
 		exp: "" +
+			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
+			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-type: text/html; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
@@ -377,9 +391,18 @@ func TestMessage_packSingle(t *testing.T) {
 
 func TestMessage_SetBodyText(t *testing.T) {
 	var (
-		msg Message
-		err error
+		msg      Message
+		hostname string
+		err      error
 	)
+
+	dateInUtc = true
+
+	hostname, err = os.Hostname()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	cases := []struct {
 		desc    string
 		expMsg  string
@@ -388,6 +411,8 @@ func TestMessage_SetBodyText(t *testing.T) {
 		desc:    "With empty Body",
 		content: []byte("text body"),
 		expMsg: "" +
+			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
+			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +
@@ -397,6 +422,8 @@ func TestMessage_SetBodyText(t *testing.T) {
 		desc:    "With new text",
 		content: []byte("new text body"),
 		expMsg: "" +
+			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
+			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
 			"mime-version: 1.0\r\n" +
 			"content-type: text/plain; charset=\"utf-8\"\r\n" +
 			"content-transfer-encoding: quoted-printable\r\n" +

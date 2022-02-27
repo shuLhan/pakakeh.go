@@ -9,6 +9,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -379,6 +380,18 @@ func (msg *Message) SetFrom(mailbox string) (err error) {
 }
 
 //
+// SetID set or replace the message-id header to id.
+// If the id is empty, nothing will changes.
+//
+func (msg *Message) SetID(id string) {
+	id = strings.TrimSpace(id)
+	if len(id) == 0 {
+		return
+	}
+	_ = msg.Header.Set(FieldTypeMessageID, []byte(id))
+}
+
+//
 // SetSubject set or replace the subject.
 // It will do nothing if the subject is empty.
 //
@@ -489,6 +502,12 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 //
 // Pack the message for sending.
 //
+// This method will set the Date header if its not exist, using the local
+// time;
+// and the message-id header if its not exist using the following format:
+//
+//	<epoch>.<random-8-chars>@<local-hostname>
+//
 // The message content type is automatically set based on the Body parts.
 // If the Body only contain text part, the generated content-type will be set
 // to text/plain.
@@ -498,17 +517,46 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 // set to multipart/alternative.
 //
 func (msg *Message) Pack() (out []byte, err error) {
+	// TODO: check from, to, subject.
+
 	var (
-		logp = "Pack"
+		logp    = "Pack"
+		timeNow = time.Unix(Epoch(), 0)
+
+		dateValue string
+		hostname  string
+		id        string
+		fields    []*Field
 	)
 
 	if len(msg.Body.Parts) == 0 {
 		return nil, fmt.Errorf("%s: empty body", logp)
 	}
 
-	// TODO: check date, from, to, subject.
+	fields = msg.Header.Filter(FieldTypeDate)
+	if len(fields) == 0 {
+		if dateInUtc {
+			dateValue = timeNow.UTC().Format(DateFormat)
+		} else {
+			dateValue = timeNow.Format(DateFormat)
+		}
+		err = msg.Header.Set(FieldTypeDate, []byte(dateValue))
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+	}
 
-	if len(msg.Body.Parts) > 1 {
+	fields = msg.Header.Filter(FieldTypeMessageID)
+	if len(fields) == 0 {
+		hostname, err = os.Hostname()
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+		id = fmt.Sprintf("%d.%s@%s", timeNow.Unix(), randomChars(8), hostname)
+		msg.SetID(id)
+	}
+
+	if len(msg.Body.Parts) >= 2 {
 		out, err = msg.packMultipartAlternative()
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)

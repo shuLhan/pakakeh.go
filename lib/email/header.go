@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-
-	"github.com/shuLhan/share/lib/ascii"
 )
 
 //
@@ -274,7 +272,7 @@ func (hdr *Header) SetMultipart() (err error) {
 		return fmt.Errorf("email.SetMultipart: %w", err)
 	}
 
-	boundary := ascii.Random([]byte(ascii.Hexaletters), 32)
+	boundary := randomChars(32)
 	contentType := hdr.ContentType()
 	contentType.SetBoundary(boundary)
 
@@ -294,6 +292,8 @@ func (hdr *Header) WriteTo(w io.Writer) (n int, err error) {
 	for _, f = range hdr.fields {
 		if f.Type == FieldTypeContentType {
 			m, err = fmt.Fprintf(w, "%s: %s\r\n", f.Name, f.ContentType.String())
+		} else if f.Type == FieldTypeMessageID {
+			m, err = fmt.Fprintf(w, "%s: <%s>\r\n", f.Name, f.oriValue)
 		} else {
 			m, err = fmt.Fprintf(w, "%s: %s", f.Name, f.Value)
 		}

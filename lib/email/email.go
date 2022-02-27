@@ -4,7 +4,12 @@
 
 package email
 
-import "time"
+import (
+	"math/rand"
+	"time"
+
+	"github.com/shuLhan/share/lib/ascii"
+)
 
 const (
 	contentTypeMultipartAlternative = "multipart/alternative"
@@ -20,19 +25,25 @@ const (
 	lf byte = '\n'
 )
 
+var boundSeps = []byte{'-', '-'}
+
 // dateInUtc if set to true, the Date header will be set to UTC instead of
 // local time.
-// This variable is used to make test work on all zones.
+// This variable is used to make testing works on all zones.
 var dateInUtc bool
 
 //
 // Epoch return the UNIX timestamp in seconds.
 //
-// This variable is exported to allow function that use date and/or time can
+// This variable is exported to allow function that use time and math/rand can
 // be tested with fixed, predictable value.
 //
 var Epoch = func() int64 {
 	return time.Now().Unix()
 }
 
-var boundSeps = []byte{'-', '-'}
+// randomChars generate n random characters.
+func randomChars(n int) []byte {
+	rand.Seed(Epoch())
+	return ascii.Random([]byte(ascii.LettersNumber), n)
+}
