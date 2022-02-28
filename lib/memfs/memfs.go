@@ -509,6 +509,13 @@ func (mfs *MemFS) mount() (err error) {
 	return nil
 }
 
+// remount reset the memfs to scanning the files again.
+func (mfs *MemFS) remount() (err error) {
+	mfs.Root = nil
+	mfs.PathNodes = nil
+	return mfs.mount()
+}
+
 // scanDir scan the directory node for files and add them to memory file
 // system.
 // It returns number of childs added to the node or an error.

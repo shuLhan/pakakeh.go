@@ -299,6 +299,9 @@ func init() {
 				`.*/node_save$`,
 			},
 			Embed: memfs.EmbedOptions{
+				CommentHeader:  `// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+`,
 				PackageName:    "embed",
 				VarName:        "memFS",
 				GoFileName:     "./internal/test/embed/embed_test.go",

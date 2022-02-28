@@ -37,6 +37,12 @@ func (mfs *MemFS) GoEmbed() (err error) {
 	if len(mfs.Opts.Embed.GoFileName) == 0 {
 		mfs.Opts.Embed.GoFileName = DefaultEmbedGoFileName
 	}
+
+	err = mfs.remount()
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
 	genData := &generateData{
 		Opts:     mfs.Opts,
 		PathNode: mfs.PathNodes,

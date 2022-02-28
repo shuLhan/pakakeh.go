@@ -280,6 +280,7 @@ func init() {
 				`.*/node_save$`,
 			},
 			Embed: memfs.EmbedOptions{
+				CommentHeader:  ``,
 				PackageName:    "embed",
 				VarName:        "memFS",
 				GoFileName:     "./internal/test/embed_disable_modtime/embed_test.go",
