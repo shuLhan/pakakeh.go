@@ -104,6 +104,7 @@ func init() {
 			{{- end}}
 			},
 			Embed: memfs.EmbedOptions{
+				CommentHeader:  ` + "`" + `{{.Opts.Embed.CommentHeader}}` + "`" + `,
 				PackageName:    "{{.Opts.Embed.PackageName}}",
 				VarName:        "{{.Opts.Embed.VarName}}",
 				GoFileName:     "{{.Opts.Embed.GoFileName}}",

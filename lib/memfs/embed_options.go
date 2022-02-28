@@ -10,6 +10,9 @@ type EmbedOptions struct {
 	// generated file, for example copyright holder and/or license.
 	// The string value is not checked, whether it's a comment or not, it
 	// will rendered as is.
+	//
+	// Due to templating, the value MUST be set using raw
+	// string literal syntax ``, NOT "".
 	CommentHeader string
 
 	// The generated package name for GoEmbed().
