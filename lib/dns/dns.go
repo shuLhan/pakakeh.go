@@ -40,7 +40,7 @@ const (
 	maskOPTDO   uint32 = 0x00008000
 
 	maxLabelSize     = 63
-	maxUdpPacketSize = 512
+	maxUdpPacketSize = 1232
 	maxTcpPacketSize = 4096
 	rdataIPv4Size    = 4
 	rdataIPv6Size    = 16
