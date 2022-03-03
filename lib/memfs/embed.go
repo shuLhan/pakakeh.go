@@ -24,6 +24,9 @@ type generateData struct {
 
 //
 // GoEmbed write the tree nodes as Go generated source file.
+// This method assume that the files inside the mfs instance is already
+// up-to-date.
+// If you are not sure, call Remount.
 //
 func (mfs *MemFS) GoEmbed() (err error) {
 	logp := "GoEmbed"

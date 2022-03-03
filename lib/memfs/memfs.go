@@ -509,8 +509,9 @@ func (mfs *MemFS) mount() (err error) {
 	return nil
 }
 
-// remount reset the memfs to scanning the files again.
-func (mfs *MemFS) remount() (err error) {
+// Remount reset the memfs instance to force rescanning the files again from
+// file system.
+func (mfs *MemFS) Remount() (err error) {
 	mfs.Root = nil
 	mfs.PathNodes = nil
 	return mfs.mount()
