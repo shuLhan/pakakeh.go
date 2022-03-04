@@ -1,21 +1,52 @@
 =  CHANGELOG
 Shulhan <ms@kilabit.info>
 :toc:
+:sectanchors:
+:sectlinks:
 
 This library is released every month, usually at the first week of month.
 
+[#v0.35.0]
+==  share v0.35.0 (2022-03-04)
 
-==  share v0.35.0 (2022-0x-xx)
+[#v0.35.0_breaking_changes]
+===  Breaking changes
 
+*  lib/email: change the Header and Body fields on Message to non-pointer.
++
+The idea is to minimize GC pressure on system with many messages,
+minimize checking for nil value, and make an empty Message ready to use
+without any initialization.
+
+*  lib/smtp: refactoring NewClient to use struct instead of parameters.
++
+Previously, to create new client one must pass three parameters to
+NewClient function: localName, remoteURL, and insecure.
+If we want to add another parameters in the future, it will cause the
+function signature changes.
++
+This changes simplify creating NewClient by passing single struct
+with new parameters: AuthUser, AuthPass, and AuthMechanism.
+If both AuthUser and AuthPass is not empty, the NewClient will
+authenticate the connection, minimize number of step on the caller.
+
+*  lib/smtp: rename Mechanism to SaslMechanism.
+
+[#v0.35.0_new_features]
 === New features
 
-*  cmd/xtrk: command line interface to uncompress and/or unarchive file
+*  cmd/sendemail: command line interface to send an email.
++
+The sendemail command is proof of concept on how to use lib/email and
+lib/smtp to write and send email through SMTP.
+
+*  cmd/xtrk: command line interface to uncompress and/or un-archive file.
 +
 --
 xtrk accept single file to uncompress and/or archived into a directory
 output dir".
 If directory output "dir" is not defined, it will be set to current
-directoy.
+directory.
 
 The compression and archive format is detected automatically based on the
 following file input extension:
@@ -30,7 +61,83 @@ following file input extension:
 The input file will be removed on success.
 --
 
+[#v0.35.0_enhancements]
 ===  Enhancements
+
+*  lib/dns: increase the default UDP packet size to 1232.
++
+The value is based on recommendation by https://dnsflagday.net/2020/
+to prevent IP fragmentation when supporting EDNS message.
+
+*  lib/memfs: export the Remount method.
++
+The Remount method reset the memfs instance to force rescanning
+the files again from file system.
+
+*  lib/email: set the Date and Message-ID on Message Pack.
++
+--
+Calling Pack now set the Date header if its not exist, using the local
+time;  and the message-id header if its not exist using the following
+format:
+
+	<epoch>.<random-8-chars>@<local-hostname>
+
+The random-8-chars is Seed-ed from Epoch(), so does the boundary.
+--
+
+*  lib/email: make Message Pack works with single text or HTML part.
++
+Previously, the Pack method generate multipart/alternative message only.
++
+Since the Message now can set the body text and HTML, without using
+NewMultipart, the Pack method need to be able to accommodate this.
+
+*  lib/email: add methods to modify Message.
++
+Previously, a Message can be created only using NewMultipart, which
+generate message with text and HTML.
++
+This changes add methods to compose a Message: AddCC, AddTo, SetBodyHtml,
+SetBodyText, SetCC, SetFrom, SetSubject, and SetTo.
+
+*  lib/email: set the header Date field on NewMultipart.
++
+The Date field value is set to current time on the system that
+generated the message.
++
+The date format is set to "Mon, 2 Jan 2006 15:04:05 -0700" according
+to RFC 5322 section 3.3.
+
+*  lib/smtp: add status codes from RFC 4954.
++
+--
+The following status codes are added,
+
+* 432: StatusPasswordTransitionNeeded, from section 4.7.12.
+* 454: StatusTemporaryAuthFailure, from section 4.7.0.
+* 534: StatusAuthMechanismTooWeak, from section 5.7.9.
+--
+
+*  lib/mlog: make the Outf method always add new line at the end.
++
+One of common mistakes when using logging library is to put the new line
+"\n" at the end of format string, which cause delayed output written
+to Stdout (the OS wait for "\n" as signal for printing).
++
+This changes check new line to every call of Outf method and add it if
+its not exist.
++
+If the caller need to call Outf multiple times before ending it with
+new line, they should handle it manually by storing into temporary
+buffer first and call Outf at the end.
+
+*  lib/memfs: add option CommentHeader to EmbedOptions.
++
+The CommentHeader option allow user to define custom header to the Go
+generated file.
+The string value is not checked, whether it's a comment or not, it
+will rendered as is.
 
 *  lib/ini: make the Marshal on map field sorted by keys
 +
@@ -59,9 +166,20 @@ This changes fix this issue by sorting the keys on ADT.Amap on
 Marshal-ing, to make the written output predictable.
 --
 
+[#v0.35.0_bug_fixes]
 ===  Bug fixes
 
-*  lib/dns: check for possible index out of range when unpacking RR
+*  lib/io: fix DirWatcher not removing old files on rename.
++
+Previously, if a sub-directory being watched by DirWatcher is renamed,
+the old directory does not get removed from field dirs.
++
+This commit fix this issue by deleting the sub directory on unmpSubdirs.
++
+While at it, guard any read/write to dirs field with mutex to prevent
+data race.
+
+*  lib/dns: check for possible index out of range when unpacking RR.
 +
 There is a possibility that record data (rdata) length inside the
 packet is greater than length of packet itself.  Some of the reasons are
@@ -70,6 +188,22 @@ server by sending invalid packet).
 +
 This changes fix this issue by checking the index and rdata length with
 the length of packet before consuming the rdata itself.
+
+[#v0.35.0_chores]
+===  Chores
+
+*  lib/smtp: provide an example of how to create MailTx from email package.
++
+If one read the current documentation on how to use the Client.SendTx,
+there is a missing link on how to create and populate MailTx.
++
+This changes provide the example using the email package to generate
+the MailTx Data.
+
+*  lib/mlog: change default mlog instance to non-pointer.
++
+Since the default mlog instance is a global variable, using non-pointer
+give advantages on minimize GC pressure.
 
 
 ==  share v0.34.0 (2022-02-05)
