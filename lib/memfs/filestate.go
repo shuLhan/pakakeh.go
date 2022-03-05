@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io
+package memfs
 
 // FileState define the state of file.
 // There are four states of file: created, updated on mode, updated on content

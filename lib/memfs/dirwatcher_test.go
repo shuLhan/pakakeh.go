@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io
+package memfs
 
 import (
 	"fmt"
@@ -15,7 +15,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -73,7 +72,7 @@ func TestDirWatcher(t *testing.T) {
 	var x int32
 
 	dw := &DirWatcher{
-		Options: memfs.Options{
+		Options: Options{
 			Root: dir,
 			Includes: []string{
 				`assets/.*`,
@@ -256,7 +255,7 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 		Callback: func(ns *NodeState) {
 			nsq <- ns
 		},
-		Options: memfs.Options{
+		Options: Options{
 			Root: rootDir,
 		},
 		Delay: 200 * time.Millisecond,

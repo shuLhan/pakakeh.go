@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io
+package memfs
 
 import (
 	"fmt"
@@ -12,15 +12,14 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/debug"
-	"github.com/shuLhan/share/lib/memfs"
 )
 
 //
 // DirWatcher is a naive implementation of directory change notification.
 //
 type DirWatcher struct {
-	root   *memfs.Node
-	fs     *memfs.MemFS
+	root   *Node
+	fs     *MemFS
 	ticker *time.Ticker
 
 	// Callback define a function that will be called when change detected
@@ -31,9 +30,9 @@ type DirWatcher struct {
 	// being watched for changes.
 	// The map key is relative path to directory and its value is a node
 	// information.
-	dirs map[string]*memfs.Node
+	dirs map[string]*Node
 
-	// This struct embed memfs.Options to map the directory to be watched
+	// This struct embed Options to map the directory to be watched
 	// into memory.
 	//
 	// The Root field define the directory that we want to watch.
@@ -43,7 +42,7 @@ type DirWatcher struct {
 	//
 	// Excludes contains list of regex to filter file names that we did
 	// not want to be notified.
-	memfs.Options
+	Options
 
 	// Delay define a duration when the new changes will be fetched from
 	// system.
@@ -75,14 +74,14 @@ func (dw *DirWatcher) Start() (err error) {
 
 	dw.Options.MaxFileSize = -1
 
-	dw.fs, err = memfs.New(&dw.Options)
+	dw.fs, err = New(&dw.Options)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	dw.root = dw.fs.Root
 
-	dw.dirs = make(map[string]*memfs.Node)
+	dw.dirs = make(map[string]*Node)
 	dw.mapSubdirs(dw.root)
 	go dw.start()
 
@@ -113,7 +112,7 @@ func (dw *DirWatcher) dirsKeys() (keys []string) {
 // the childs.
 // If its a regular file, start a NewWatcher.
 //
-func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
+func (dw *DirWatcher) mapSubdirs(node *Node) {
 	var (
 		logp = "DirWatcher.mapSubdirs"
 		err  error
@@ -136,7 +135,7 @@ func (dw *DirWatcher) mapSubdirs(node *memfs.Node) {
 // unmapSubdirs find sub directories in node's childrens, recursively and
 // remove it from map of node.
 //
-func (dw *DirWatcher) unmapSubdirs(node *memfs.Node) {
+func (dw *DirWatcher) unmapSubdirs(node *Node) {
 	for _, child := range node.Childs {
 		if child.IsDir() {
 			delete(dw.dirs, child.Path)
@@ -156,7 +155,7 @@ func (dw *DirWatcher) unmapSubdirs(node *memfs.Node) {
 // It will re-read the list of files in node directory and compare them with
 // old content to detect deletion and addition of files.
 //
-func (dw *DirWatcher) onContentChange(node *memfs.Node) {
+func (dw *DirWatcher) onContentChange(node *Node) {
 	var (
 		logp = "onContentChange"
 	)
@@ -261,7 +260,7 @@ func (dw *DirWatcher) onRootCreated() {
 		err  error
 	)
 
-	dw.fs, err = memfs.New(&dw.Options)
+	dw.fs, err = New(&dw.Options)
 	if err != nil {
 		log.Printf("%s: %s", logp, err)
 		return
@@ -273,7 +272,7 @@ func (dw *DirWatcher) onRootCreated() {
 		return
 	}
 
-	dw.dirs = make(map[string]*memfs.Node)
+	dw.dirs = make(map[string]*Node)
 	dw.mapSubdirs(dw.root)
 
 	ns := &NodeState{
@@ -314,7 +313,7 @@ func (dw *DirWatcher) onRootDeleted() {
 // onModified handle change when permission or attribute on node directory
 // changed.
 //
-func (dw *DirWatcher) onModified(node *memfs.Node, newDirInfo os.FileInfo) {
+func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 	dw.fs.Update(node, newDirInfo)
 
 	ns := &NodeState{

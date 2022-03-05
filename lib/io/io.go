@@ -3,8 +3,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// Package io provide a library for reading and watching file, and reading
-// from standard input.
+// Package io extends the standard io library.
 //
 package io
 

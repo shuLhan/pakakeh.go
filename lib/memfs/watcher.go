@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io
+package memfs
 
 import (
 	"fmt"
@@ -12,14 +12,13 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/debug"
-	"github.com/shuLhan/share/lib/memfs"
 )
 
 //
 // Watcher is a naive implementation of file event change notification.
 //
 type Watcher struct {
-	node   *memfs.Node
+	node   *Node
 	ticker *time.Ticker
 
 	// cb define a function that will be called when file modified or
@@ -58,7 +57,7 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 		return nil, fmt.Errorf("%s: path is directory", logp)
 	}
 
-	dummyParent := &memfs.Node{
+	dummyParent := &Node{
 		SysPath: filepath.Dir(path),
 	}
 	dummyParent.Path = dummyParent.SysPath
@@ -68,13 +67,13 @@ func NewWatcher(path string, d time.Duration, cb WatchCallback) (w *Watcher, err
 
 // newWatcher create and initialize new Watcher like NewWatcher but using
 // parent node.
-func newWatcher(parent *memfs.Node, fi os.FileInfo, d time.Duration, cb WatchCallback) (
+func newWatcher(parent *Node, fi os.FileInfo, d time.Duration, cb WatchCallback) (
 	w *Watcher, err error,
 ) {
 	logp := "newWatcher"
 
 	// Create new node based on FileInfo without caching the content.
-	node, err := memfs.NewNode(parent, fi, -1)
+	node, err := NewNode(parent, fi, -1)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

@@ -2,18 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io
-
-import (
-	"github.com/shuLhan/share/lib/memfs"
-)
+package memfs
 
 //
 // NodeState contains the information about the file and its state.
 //
 type NodeState struct {
 	// Node represent the file information.
-	Node *memfs.Node
+	Node *Node
 	// State of file, its either created, modified, or deleted.
 	State FileState
 }
