@@ -6,29 +6,36 @@ package memfs
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
-	"sync"
 	"testing"
 	"time"
+
+	"github.com/shuLhan/share/lib/test"
 )
+
+type caseWatcher struct {
+	state FileState
+	mode  os.FileMode
+	size  int64
+}
 
 func TestWatcher(t *testing.T) {
 	var (
-		wg      sync.WaitGroup
 		content = "Write changes"
+
+		f       *os.File
+		watcher *Watcher
+		gotNS   NodeState
+		err     error
+		x       int
 	)
 
-	f, err := ioutil.TempFile("", "watcher")
+	f, err = ioutil.TempFile("", "watcher")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	exps := []struct {
-		state FileState
-		mode  os.FileMode
-		size  int64
-	}{{
+	exps := []caseWatcher{{
 		state: FileStateUpdateMode,
 		mode:  0700,
 	}, {
@@ -41,48 +48,44 @@ func TestWatcher(t *testing.T) {
 		size:  int64(len(content)),
 	}}
 
-	x := 0
-	_, err = NewWatcher(f.Name(), 150*time.Millisecond, func(ns *NodeState) {
-		if exps[x].state != ns.State {
-			log.Fatalf("Got state %s, want %s", ns.State, exps[x].state)
-		}
-		if exps[x].mode != ns.Node.Mode() {
-			log.Fatalf("Got mode %d, want %d", ns.Node.Mode(), exps[x].mode)
-		}
-		if exps[x].size != ns.Node.Size() {
-			log.Fatalf("Got size %d, want %d", ns.Node.Size(), exps[x].size)
-		}
-		x++
-		wg.Done()
-	})
+	watcher, err = NewWatcher(f.Name(), 150*time.Millisecond)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Update file mode
-	wg.Add(1)
 	err = f.Chmod(0700)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-watcher.C
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	test.Assert(t, "file mode", exps[x].mode, gotNS.Node.Mode())
+	test.Assert(t, "file size", exps[x].size, gotNS.Node.Size())
+	x++
 
-	wg.Add(1)
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-watcher.C
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	test.Assert(t, "file mode", exps[x].mode, gotNS.Node.Mode())
+	test.Assert(t, "file size", exps[x].size, gotNS.Node.Size())
+	x++
 
 	err = f.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	wg.Add(1)
 	err = os.Remove(f.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-watcher.C
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	test.Assert(t, "file mode", exps[x].mode, gotNS.Node.Mode())
+	test.Assert(t, "file size", exps[x].size, gotNS.Node.Size())
+	x++
 }

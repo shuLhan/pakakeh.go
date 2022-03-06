@@ -9,7 +9,7 @@ package memfs
 //
 type NodeState struct {
 	// Node represent the file information.
-	Node *Node
+	Node Node
 	// State of file, its either created, modified, or deleted.
 	State FileState
 }

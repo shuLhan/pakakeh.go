@@ -6,6 +6,7 @@ package memfs
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"sort"
@@ -14,17 +15,20 @@ import (
 	"github.com/shuLhan/share/lib/debug"
 )
 
+const (
+	dirWatcherQueueSize = 64
+)
+
 //
 // DirWatcher is a naive implementation of directory change notification.
 //
 type DirWatcher struct {
+	C        <-chan NodeState // The channel on which the changes are delivered.
+	qchanges chan NodeState
+
 	root   *Node
 	fs     *MemFS
 	ticker *time.Ticker
-
-	// Callback define a function that will be called when change detected
-	// on directory.
-	Callback WatchCallback
 
 	// dirs contains list of directory and their sub-directories that is
 	// being watched for changes.
@@ -51,38 +55,57 @@ type DirWatcher struct {
 	Delay time.Duration
 }
 
-//
-// Start watching changes in directory and its content.
-//
-func (dw *DirWatcher) Start() (err error) {
-	logp := "DirWatcher.Start"
+func (dw *DirWatcher) init() (err error) {
+	var (
+		logp = "init"
+
+		fi fs.FileInfo
+	)
 
 	if dw.Delay < 100*time.Millisecond {
 		dw.Delay = time.Second * 5
 	}
-	if dw.Callback == nil {
-		return fmt.Errorf("%s: callback is not defined", logp)
-	}
 
-	fi, err := os.Stat(dw.Root)
-	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
-	}
-	if !fi.IsDir() {
-		return fmt.Errorf("%s: %q is not a directory", logp, dw.Root)
-	}
+	if dw.fs == nil {
+		fi, err = os.Stat(dw.Root)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+		if !fi.IsDir() {
+			return fmt.Errorf("%s: %q is not a directory", logp, dw.Root)
+		}
 
-	dw.Options.MaxFileSize = -1
+		dw.Options.MaxFileSize = -1
 
-	dw.fs, err = New(&dw.Options)
-	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
+		dw.fs, err = New(&dw.Options)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
 	}
-
 	dw.root = dw.fs.Root
+
+	dw.qchanges = make(chan NodeState, dirWatcherQueueSize)
+	dw.C = dw.qchanges
 
 	dw.dirs = make(map[string]*Node)
 	dw.mapSubdirs(dw.root)
+
+	return nil
+}
+
+//
+// Start watching changes in directory and its content.
+//
+func (dw *DirWatcher) Start() (err error) {
+	var (
+		logp = "Start"
+	)
+
+	err = dw.init()
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
 	go dw.start()
 
 	return nil
@@ -124,7 +147,7 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 			dw.mapSubdirs(child)
 			continue
 		}
-		_, err = newWatcher(node, child, dw.Delay, dw.Callback)
+		_, err = newWatcher(node, child, dw.Delay, dw.qchanges)
 		if err != nil {
 			log.Printf("%s: %q: %s", logp, child.SysPath, err)
 		}
@@ -226,12 +249,13 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 			fmt.Printf("%s: new child %s\n", logp, newChild.Path)
 		}
 
-		ns := &NodeState{
-			Node:  newChild,
+		ns := NodeState{
+			Node:  *newChild,
 			State: FileStateCreated,
 		}
-
-		dw.Callback(ns)
+		select {
+		case dw.qchanges <- ns:
+		}
 
 		if newChild.IsDir() {
 			dw.dirs[newChild.Path] = newChild
@@ -241,7 +265,7 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		}
 
 		// Start watching the file for modification.
-		_, err = newWatcher(node, newInfo, dw.Delay, dw.Callback)
+		_, err = newWatcher(node, newInfo, dw.Delay, dw.qchanges)
 		if err != nil {
 			log.Printf("%s: %s", logp, err)
 		}
@@ -275,16 +299,17 @@ func (dw *DirWatcher) onRootCreated() {
 	dw.dirs = make(map[string]*Node)
 	dw.mapSubdirs(dw.root)
 
-	ns := &NodeState{
-		Node:  dw.root,
-		State: FileStateCreated,
-	}
-
 	if debug.Value >= 2 {
 		fmt.Printf("%s: %s", logp, dw.root.Path)
 	}
 
-	dw.Callback(ns)
+	ns := NodeState{
+		Node:  *dw.root,
+		State: FileStateCreated,
+	}
+	select {
+	case dw.qchanges <- ns:
+	}
 }
 
 //
@@ -293,10 +318,12 @@ func (dw *DirWatcher) onRootCreated() {
 // memory.
 //
 func (dw *DirWatcher) onRootDeleted() {
-	ns := &NodeState{
-		Node:  dw.root,
-		State: FileStateDeleted,
-	}
+	var (
+		ns = NodeState{
+			Node:  *dw.root,
+			State: FileStateDeleted,
+		}
+	)
 
 	dw.fs = nil
 	dw.root = nil
@@ -305,8 +332,9 @@ func (dw *DirWatcher) onRootDeleted() {
 	if debug.Value >= 2 {
 		fmt.Println("DirWatcher.onRootDeleted: root directory deleted")
 	}
-
-	dw.Callback(ns)
+	select {
+	case dw.qchanges <- ns:
+	}
 }
 
 //
@@ -316,12 +344,15 @@ func (dw *DirWatcher) onRootDeleted() {
 func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 	dw.fs.Update(node, newDirInfo)
 
-	ns := &NodeState{
-		Node:  node,
-		State: FileStateUpdateMode,
+	var (
+		ns = NodeState{
+			Node:  *node,
+			State: FileStateUpdateMode,
+		}
+	)
+	select {
+	case dw.qchanges <- ns:
 	}
-
-	dw.Callback(ns)
 
 	if debug.Value >= 2 {
 		fmt.Printf("DirWatcher.onModified: %s\n", node.Path)

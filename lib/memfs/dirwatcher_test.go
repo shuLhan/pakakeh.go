@@ -7,11 +7,8 @@ package memfs
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
-	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -19,16 +16,18 @@ import (
 )
 
 func TestDirWatcher(t *testing.T) {
-	var wg sync.WaitGroup
+	var (
+		err   error
+		gotNS NodeState
+		dir   string
+		x     int
+	)
 
-	dir, err := ioutil.TempDir("", "libio")
+	dir = t.TempDir()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Cleanup(func() {
-		_ = os.RemoveAll(dir)
-	})
 	fmt.Printf(">>> Watching directory %q for changes ...\n", dir)
 
 	exps := []struct {
@@ -69,8 +68,6 @@ func TestDirWatcher(t *testing.T) {
 		path:  "/assets/new",
 	}}
 
-	var x int32
-
 	dw := &DirWatcher{
 		Options: Options{
 			Root: dir,
@@ -83,17 +80,6 @@ func TestDirWatcher(t *testing.T) {
 			},
 		},
 		Delay: 150 * time.Millisecond,
-		Callback: func(ns *NodeState) {
-			localx := atomic.LoadInt32(&x)
-			if exps[localx].path != ns.Node.Path {
-				log.Fatalf("TestDirWatcher got node path %q, want %q\n", ns.Node.Path, exps[x].path)
-			}
-			if exps[localx].state != ns.State {
-				log.Fatalf("TestDirWatcher got state %d, want %d\n", ns.State, exps[x].state)
-			}
-			atomic.AddInt32(&x, 1)
-			wg.Done()
-		},
 	}
 
 	err = dw.Start()
@@ -103,81 +89,101 @@ func TestDirWatcher(t *testing.T) {
 
 	// Delete the directory being watched.
 	t.Logf("Deleting root directory %q ...\n", dir)
-	wg.Add(1)
 	err = os.Remove(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Create the watched directory back with sub directory
 	// This will trigger two FileStateCreated events, one for "/" and one
 	// for "/assets".
 	dirAssets := filepath.Join(dir, "assets")
 	t.Logf("Re-create root directory %q ...\n", dirAssets)
-	wg.Add(2)
 	err = os.MkdirAll(dirAssets, 0770)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Modify the permission on root directory
-	wg.Add(1)
 	t.Logf("Modify root directory %q ...\n", dir)
 	err = os.Chmod(dir, 0700)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Add new file to watched directory.
 	newFile := filepath.Join(dir, "new.adoc")
 	t.Logf("Create new file on root directory: %q ...\n", newFile)
-	wg.Add(1)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Remove file.
 	t.Logf("Remove file on root directory: %q ...\n", newFile)
-	wg.Add(1)
 	err = os.Remove(newFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Create sub-directory.
 	subDir := filepath.Join(dir, "sub")
 	t.Logf("Create new sub-directory: %q ...\n", subDir)
-	wg.Add(1)
 	err = os.Mkdir(subDir, 0770)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Add new file in sub directory.
 	newFile = filepath.Join(subDir, "new.adoc")
 	t.Logf("Create new file in sub directory: %q ...\n", newFile)
-	wg.Add(1)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Remove file in sub directory.
 	t.Logf("Remove file in sub directory: %q ...\n", newFile)
-	wg.Add(1)
 	err = os.Remove(newFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
 	// Create exclude file, should not trigger event.
 	newFile = filepath.Join(subDir, "new.html")
@@ -191,14 +197,15 @@ func TestDirWatcher(t *testing.T) {
 	// should trigger event.
 	newFile = filepath.Join(dirAssets, "new")
 	t.Logf("Create new file on assets: %q ...\n", newFile)
-	wg.Add(1)
 	err = ioutil.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wg.Wait()
+	gotNS = <-dw.C
+	test.Assert(t, "path", exps[x].path, gotNS.Node.Path)
+	test.Assert(t, "state", exps[x].state, gotNS.State)
+	x++
 
-	wg.Add(1)
 	dw.Stop()
 }
 
@@ -207,9 +214,6 @@ func TestDirWatcher(t *testing.T) {
 //
 func TestDirWatcher_renameDirectory(t *testing.T) {
 	var (
-		logp = "TestDirWatcher_renameDirectory"
-		nsq  = make(chan *NodeState)
-
 		dw  DirWatcher
 		err error
 
@@ -227,17 +231,7 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 	//	   |_ subDirFile
 	//
 
-	rootDir, err = os.MkdirTemp("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Cleanup(func() {
-		err = os.RemoveAll(rootDir)
-		if err != nil {
-			t.Logf("%s: on cleanup: %s", logp, err)
-		}
-	})
+	rootDir = t.TempDir()
 
 	subDir = filepath.Join(rootDir, "subdir")
 	err = os.Mkdir(subDir, 0700)
@@ -252,9 +246,6 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 	}
 
 	dw = DirWatcher{
-		Callback: func(ns *NodeState) {
-			nsq <- ns
-		},
 		Options: Options{
 			Root: rootDir,
 		},
@@ -275,9 +266,9 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	<-nsq
-	<-nsq
-	<-nsq
+	<-dw.C
+	<-dw.C
+	<-dw.C
 
 	var expDirs = []string{
 		"/newsubdir",
