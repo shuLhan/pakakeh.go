@@ -35,8 +35,10 @@ type MemFS struct {
 	PathNodes *PathNode
 	Root      *Node
 	Opts      *Options
-	incRE     []*regexp.Regexp
-	excRE     []*regexp.Regexp
+	dw        *DirWatcher
+
+	incRE []*regexp.Regexp
+	excRE []*regexp.Regexp
 }
 
 //
@@ -316,9 +318,11 @@ func (mfs *MemFS) Open(path string) (http.File, error) {
 // If child is not part if node's childrens it will return nil.
 //
 func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
-	removed = parent.removeChild(child)
-	if removed != nil {
-		mfs.PathNodes.Delete(removed.Path)
+	if parent != nil {
+		removed = parent.removeChild(child)
+		if removed != nil {
+			mfs.PathNodes.Delete(removed.Path)
+		}
 	}
 	return
 }
@@ -400,6 +404,34 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 	if err != nil {
 		log.Printf("Update: %s: %s", node.SysPath, err)
 	}
+}
+
+//
+// Watch create and start the DirWatcher that monitor the memfs Root
+// directory.
+// The MemFS will update the tree and node content automatically if the file
+// get deleted or updated.
+// The returned channel nsq is ready to be consumed.
+//
+func (mfs *MemFS) Watch(d time.Duration) (dw *DirWatcher, err error) {
+	var (
+		logp = "Watch"
+	)
+
+	dw = &DirWatcher{
+		fs:      mfs,
+		Delay:   d,
+		Options: *mfs.Opts,
+	}
+
+	err = dw.Start()
+	if err != nil {
+		// There should be no error here, since we already check and
+		// filled the required fields for DirWatcher.
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	return dw, nil
 }
 
 func (mfs *MemFS) createRoot() error {

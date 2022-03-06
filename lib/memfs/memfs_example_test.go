@@ -2,7 +2,11 @@ package memfs
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
+	"time"
 )
 
 func ExampleNew() {
@@ -86,4 +90,71 @@ func ExampleMemFS_Search() {
 	// Snippets: ["body {\n}\n"]
 	// Path: /index.css
 	// Snippets: ["body {\n}\n"]
+}
+
+func ExampleMemFS_Watch() {
+	var (
+		mfs  *MemFS
+		dw   *DirWatcher
+		node *Node
+		opts Options
+		ns   NodeState
+		err  error
+	)
+
+	opts.Root, err = ioutil.TempDir("", "memfs_watch")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		_ = os.RemoveAll(opts.Root)
+	}()
+
+	mfs, err = New(&opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dw, err = mfs.Watch(200 * time.Millisecond)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Wait for the goroutine on Watch run.
+	time.Sleep(200 * time.Millisecond)
+
+	testFile := filepath.Join(opts.Root, "file")
+	err = os.WriteFile(testFile, []byte("dummy content"), 0700)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ns = <-dw.C
+	fmt.Printf("State: %s\n", ns.State)
+
+	node, err = mfs.Get("/file")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Node: %s: %q\n", node.Path, node.Content)
+
+	err = os.Remove(testFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ns = <-dw.C
+	fmt.Printf("State: %s\n", ns.State)
+
+	node, _ = mfs.Get("/file")
+	fmt.Printf("Node: %s: %v\n", ns.Node.Path, node)
+
+	dw.Stop()
+
+	//Output:
+	//State: FileStateCreated
+	//Node: /file: "dummy content"
+	//State: FileStateDeleted
+	//Node: /file: <nil>
 }
