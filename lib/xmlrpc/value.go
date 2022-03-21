@@ -137,6 +137,24 @@ func (v *Value) GetFieldAsFloat(key string) float64 {
 }
 
 //
+// GetFieldAsFloat get the struct's field value by its key as boolean.
+//
+func (v *Value) GetFieldAsBoolean(key string) bool {
+	if v == nil || v.StructMembers == nil {
+		return false
+	}
+	mv := v.StructMembers[key]
+	if mv == nil {
+		return false
+	}
+	abool, ok := mv.In.(bool)
+	if !ok {
+		return false
+	}
+	return abool
+}
+
+//
 // GetFieldAsInteger get struct's field value by name as int.
 //
 func (v *Value) GetFieldAsInteger(key string) int {
