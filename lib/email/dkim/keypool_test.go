@@ -83,9 +83,6 @@ func TestKeyPoolGet(t *testing.T) {
 	}, {
 		dname:  "amazon.com",
 		expErr: "dkim: LookupKey: multiple TXT records on 'amazon.com'",
-	}, {
-		dname: "ug7nbtf4gccmlpwj322ax3p6ow6yfsug._domainkey.amazonses.com",
-		exp:   "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKkjP6XucgQ06cVZ89Ue/sQDu4v1/AJVd6mMK4bS2YmXk5PzWw4KWtWNUZlg77hegAChx1pG85lUbJ+x4awp28VXqRi3/jZoC6W+3ELysDvVohZPMRMadc+KVtyTiTH4BL38/8ZV9zkj4ZIaaYyiLAiYX+c3+lZQEF3rKDptRcpwIDAQAB",
 	}}
 
 	for _, c := range cases {

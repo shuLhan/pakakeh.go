@@ -21,9 +21,6 @@ func TestKeyLookupKey(t *testing.T) {
 	}{{
 		expErr: "dkim: LookupKey: empty domain name",
 	}, {
-		domainName: "ug7nbtf4gccmlpwj322ax3p6ow6yfsug._domainkey.amazonses.com",
-		exp:        "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCT2DfRYLx3jUqqznIMCy08Zq2OahJC9i//ps0eF9AW3lPogTOI1cs5OntMVKJJ/THdkEZ2E0rLoYAcP2FaRs9ytw4VT6zgx+nYUAoh3O5wn1yVp9Z9VnUpglsiNerYxahiyR5C/0HJu4PfT8GZuJ6cOEToyBxOVrXcAfJ6Igu1jwIDAQAB",
-	}, {
 		domainName: "20150623._domainkey.wikimedia-or-id.20150623.gappssmtp.com",
 		exp:        "v=DKIM1; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2UMfREvlgajdSp3jv1tJ9nLpi/mRYnGyKC3inEQ9a7zqUjLq/yXukgpXs9AEHlvBvioxlgAVCPQQsuc1xp9+KXQGgJ8jTsn5OtKm8u+YBCt6OfvpeCpvt0l9JXMMHBNYV4c0XiPE5RHX2ltI0Av20CfEy+vMecpFtVDg4rMngjLws/ro6qT63S20A4zyVs/V19WW5F2Lulgv+l+EJzz9XummIJHOlU5n5ChcWU3Rw5RVGTtNjTZnFUaNXly3fW0ahKcG5Qc3e0Rhztp57JJQTl3OmHiMR5cHsCnrl1VnBi3kaOoQBYsSuBm+KRhMIw/X9wkLY67VLdkrwlX3xxsp6wIDAQAB; k=rsa",
 	}}
