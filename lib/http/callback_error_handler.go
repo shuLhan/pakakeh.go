@@ -7,10 +7,10 @@ package http
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	liberrors "github.com/shuLhan/share/lib/errors"
+	"github.com/shuLhan/share/lib/mlog"
 )
 
 //
@@ -35,15 +35,21 @@ type CallbackErrorHandler func(epr *EndpointRequest)
 //	{"code":<HTTP_STATUS_CODE>, "message":<err.Error()>}
 //
 func DefaultErrorHandler(epr *EndpointRequest) {
-	errInternal := &liberrors.E{}
+	var (
+		logp        = "DefaultErrorHandler"
+		errInternal = &liberrors.E{}
+
+		jsonb []byte
+		err   error
+	)
+
 	if errors.As(epr.Error, &errInternal) {
 		if errInternal.Code <= 0 || errInternal.Code >= 512 {
 			errInternal.Code = http.StatusInternalServerError
 		}
 	} else {
-		log.Printf("DefaultErrorHandler: %d %s %s %s\n",
-			http.StatusInternalServerError,
-			epr.HttpRequest.Method, epr.HttpRequest.URL.Path, epr.Error)
+		mlog.Errf("%s: %s %s: %s", logp, epr.HttpRequest.Method,
+			epr.HttpRequest.URL.Path, epr.Error)
 
 		errInternal = liberrors.Internal(epr.Error)
 	}
@@ -51,14 +57,14 @@ func DefaultErrorHandler(epr *EndpointRequest) {
 	epr.HttpWriter.Header().Set(HeaderContentType, ContentTypeJSON)
 	epr.HttpWriter.WriteHeader(errInternal.Code)
 
-	rsp, err := json.Marshal(errInternal)
+	jsonb, err = json.Marshal(errInternal)
 	if err != nil {
-		log.Println("DefaultErrorHandler: " + err.Error())
+		mlog.Errf("%s: json.Marshal: %s", logp, err)
 		return
 	}
 
-	_, err = epr.HttpWriter.Write(rsp)
+	_, err = epr.HttpWriter.Write(jsonb)
 	if err != nil {
-		log.Println("DefaultErrorHandler: " + err.Error())
+		mlog.Errf("%s: Write: %s", logp, err)
 	}
 }

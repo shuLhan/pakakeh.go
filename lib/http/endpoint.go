@@ -7,11 +7,11 @@ package http
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 
 	"github.com/shuLhan/share/lib/debug"
+	"github.com/shuLhan/share/lib/mlog"
 )
 
 //
@@ -79,7 +79,8 @@ func (ep *Endpoint) call(
 	vals map[string]string,
 ) {
 	var (
-		epr = &EndpointRequest{
+		logp = "Endpoint.call"
+		epr  = &EndpointRequest{
 			Endpoint:    ep,
 			HttpWriter:  res,
 			HttpRequest: req,
@@ -90,7 +91,7 @@ func (ep *Endpoint) call(
 
 	epr.RequestBody, e = ioutil.ReadAll(req.Body)
 	if e != nil {
-		log.Printf("endpoint.call: " + e.Error())
+		mlog.Errf("%s: ReadAll: %s", logp, e)
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -105,16 +106,14 @@ func (ep *Endpoint) call(
 	case RequestTypeMultipartForm:
 		e = req.ParseMultipartForm(0)
 	}
-
 	if e != nil {
-		log.Printf("endpoint.call: %d %s %s %s\n",
-			http.StatusBadRequest, req.Method, req.URL.Path, e)
+		mlog.Errf("%s: %s %s: request parse: %s", logp, req.Method, req.URL.Path, e)
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if debug.Value >= 3 {
-		log.Printf("> request body: %s\n", epr.RequestBody)
+		mlog.Outf("%s: %s %s: request body: %s", logp, req.Method, req.URL.Path, epr.RequestBody)
 	}
 	if len(vals) > 0 && req.Form == nil {
 		req.Form = make(url.Values, len(vals))
@@ -165,8 +164,7 @@ func (ep *Endpoint) call(
 	for nwrite < len(responseBody) {
 		n, err := res.Write(responseBody[nwrite:])
 		if err != nil {
-			log.Printf("endpoint.call: %s %s %s\n", req.Method,
-				req.URL.Path, e)
+			mlog.Errf("%s: %s %s: response write: %s", logp, req.Method, req.URL.Path, e)
 			break
 		}
 		nwrite += n

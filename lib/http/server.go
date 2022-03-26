@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -20,6 +19,7 @@ import (
 
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/memfs"
+	"github.com/shuLhan/share/lib/mlog"
 )
 
 const (
@@ -260,8 +260,12 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 // ServeHTTP handle mapping of client request to registered endpoints.
 //
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	var (
+		logp = "ServeHTTP"
+	)
+
 	if debug.Value >= 3 {
-		log.Printf("> ServeHTTP: %s %+v\n", req.Method, req.URL)
+		mlog.Outf("%s: %s %+v", logp, req.Method, req.URL)
 	}
 
 	switch req.Method {
@@ -325,17 +329,20 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 }
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
+	var (
+		logp = "getFSNode"
+		err  error
+	)
+
 	if srv.Options.Memfs == nil {
 		return nil
 	}
-
-	var err error
 
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			if debug.Value >= 3 {
-				log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
+				mlog.Outf("%s: %q: %s", logp, reqPath, err)
 			}
 			return nil
 		}
@@ -348,7 +355,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 			node, err = srv.Options.Memfs.Get(asHtml)
 			if err != nil {
 				if debug.Value >= 3 {
-					log.Printf("http: getFSNode %q: %s", reqPath, err.Error())
+					mlog.Outf("%s: %q: %s", logp, reqPath, err)
 				}
 				return nil
 			}
@@ -485,7 +492,18 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 // If the request Path is not exist it will return 404 Not Found.
 //
 func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
-	node := srv.getFSNode(req.URL.Path)
+	var (
+		logp = "HandleFS"
+
+		node         *memfs.Node
+		responseETag string
+		requestETag  string
+		body         []byte
+		size         int64
+		err          error
+	)
+
+	node = srv.getFSNode(req.URL.Path)
 	if node == nil {
 		res.WriteHeader(http.StatusNotFound)
 		return
@@ -493,18 +511,12 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set(HeaderContentType, node.ContentType)
 
-	responseETag := strconv.FormatInt(node.ModTime().Unix(), 10)
-	requestETag := req.Header.Get(HeaderIfNoneMatch)
+	responseETag = strconv.FormatInt(node.ModTime().Unix(), 10)
+	requestETag = req.Header.Get(HeaderIfNoneMatch)
 	if requestETag == responseETag {
 		res.WriteHeader(http.StatusNotModified)
 		return
 	}
-
-	var (
-		body []byte
-		size int64
-		err  error
-	)
 
 	if len(node.Content) > 0 {
 		body = node.Content
@@ -529,7 +541,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusOK)
 	_, err = res.Write(body)
 	if err != nil {
-		log.Println("HandleFS: ", err.Error())
+		mlog.Errf("%s: %s %s: %s", logp, req.Method, req.URL.Path, err)
 	}
 }
 
