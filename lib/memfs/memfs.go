@@ -393,6 +393,17 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 }
 
 //
+// StopWatch stop watching for update, from calling Watch.
+//
+func (mfs *MemFS) StopWatch() {
+	if mfs.dw == nil {
+		return
+	}
+	mfs.dw.Stop()
+	mfs.dw = nil
+}
+
+//
 // Update the node content and information in memory based on new file
 // information.
 // This method only check if the node name is equal with file name, but it's
@@ -420,27 +431,32 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 // directory.
 // The MemFS will update the tree and node content automatically if the file
 // get deleted or updated.
-// The returned channel nsq is ready to be consumed.
+// The returned DirWatcher is ready to use.
+// To stop watching for update call the StopWatch.
 //
 func (mfs *MemFS) Watch(d time.Duration) (dw *DirWatcher, err error) {
 	var (
 		logp = "Watch"
 	)
 
-	dw = &DirWatcher{
+	if mfs.dw != nil {
+		return mfs.dw, nil
+	}
+
+	mfs.dw = &DirWatcher{
 		fs:      mfs,
 		Delay:   d,
 		Options: *mfs.Opts,
 	}
 
-	err = dw.Start()
+	err = mfs.dw.Start()
 	if err != nil {
 		// There should be no error here, since we already check and
 		// filled the required fields for DirWatcher.
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	return dw, nil
+	return mfs.dw, nil
 }
 
 func (mfs *MemFS) createRoot() error {

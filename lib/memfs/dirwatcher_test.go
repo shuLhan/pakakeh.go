@@ -74,8 +74,7 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 	<-dw.C
 	<-dw.C
 
-	// Wait for all watcher finished.
-	time.Sleep(400 * time.Millisecond)
+	dw.Stop()
 
 	var expDirs = []string{
 		"/newsubdir",
