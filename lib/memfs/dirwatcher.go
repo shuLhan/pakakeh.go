@@ -23,8 +23,10 @@ const (
 // DirWatcher is a naive implementation of directory change notification.
 //
 type DirWatcher struct {
-	C        <-chan NodeState // The channel on which the changes are delivered.
-	qchanges chan NodeState
+	C            <-chan NodeState // The channel on which the changes are delivered to user.
+	qchanges     chan NodeState
+	qFileChanges chan NodeState
+	qrun         chan bool
 
 	root   *Node
 	fs     *MemFS
@@ -87,6 +89,9 @@ func (dw *DirWatcher) init() (err error) {
 	dw.qchanges = make(chan NodeState, dirWatcherQueueSize)
 	dw.C = dw.qchanges
 
+	dw.qFileChanges = make(chan NodeState, dirWatcherQueueSize)
+	dw.qrun = make(chan bool, 1)
+
 	dw.dirs = make(map[string]*Node)
 	dw.mapSubdirs(dw.root)
 
@@ -113,6 +118,7 @@ func (dw *DirWatcher) Start() (err error) {
 
 // Stop watching changes on directory.
 func (dw *DirWatcher) Stop() {
+	dw.qrun <- false
 	dw.ticker.Stop()
 }
 
@@ -147,7 +153,7 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 			dw.mapSubdirs(child)
 			continue
 		}
-		_, err = newWatcher(node, child, dw.Delay, dw.qchanges)
+		_, err = newWatcher(node, child, dw.Delay, dw.qFileChanges)
 		if err != nil {
 			log.Printf("%s: %q: %s", logp, child.SysPath, err)
 		}
@@ -265,7 +271,7 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		}
 
 		// Start watching the file for modification.
-		_, err = newWatcher(node, newInfo, dw.Delay, dw.qchanges)
+		_, err = newWatcher(node, newInfo, dw.Delay, dw.qFileChanges)
 		if err != nil {
 			log.Printf("%s: %s", logp, err)
 		}
@@ -300,7 +306,7 @@ func (dw *DirWatcher) onRootCreated() {
 	dw.mapSubdirs(dw.root)
 
 	if debug.Value >= 2 {
-		fmt.Printf("%s: %s", logp, dw.root.Path)
+		fmt.Printf("%s: %s\n", logp, dw.root.Path)
 	}
 
 	ns := NodeState{
@@ -360,39 +366,68 @@ func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 }
 
 func (dw *DirWatcher) start() {
-	logp := "DirWatcher"
+	var (
+		logp = "DirWatcher"
+		ever = true
+
+		node *Node
+		fi   os.FileInfo
+		ns   NodeState
+		err  error
+	)
 
 	dw.ticker = time.NewTicker(dw.Delay)
 
-	for range dw.ticker.C {
-		newDirInfo, err := os.Stat(dw.Root)
-		if err != nil {
-			if !os.IsNotExist(err) {
-				log.Printf("%s: %s", logp, err)
+	for ever {
+		select {
+		case <-dw.ticker.C:
+			fi, err = os.Stat(dw.Root)
+			if err != nil {
+				if !os.IsNotExist(err) {
+					log.Printf("%s: %s", logp, err)
+					continue
+				}
+				if dw.fs != nil {
+					dw.onRootDeleted()
+				}
 				continue
 			}
-			if dw.fs != nil {
-				dw.onRootDeleted()
+			if dw.fs == nil {
+				dw.onRootCreated()
+				dw.onContentChange(dw.root)
+				continue
 			}
-			continue
-		}
-		if dw.fs == nil {
-			dw.onRootCreated()
-			dw.onContentChange(dw.root)
-			continue
-		}
-		if dw.root.Mode() != newDirInfo.Mode() {
-			dw.onModified(dw.root, newDirInfo)
-			continue
-		}
-		if dw.root.ModTime().Equal(newDirInfo.ModTime()) {
-			dw.processSubdirs()
-			continue
-		}
+			if dw.root.Mode() != fi.Mode() {
+				dw.onModified(dw.root, fi)
+				continue
+			}
+			if dw.root.ModTime().Equal(fi.ModTime()) {
+				dw.processSubdirs()
+				continue
+			}
 
-		dw.fs.Update(dw.root, newDirInfo)
-		dw.onContentChange(dw.root)
-		dw.processSubdirs()
+			dw.fs.Update(dw.root, fi)
+			dw.onContentChange(dw.root)
+			dw.processSubdirs()
+
+		case ns = <-dw.qFileChanges:
+			node, err = dw.fs.Get(ns.Node.Path)
+			if err != nil {
+				log.Printf("%s: on file changes %s: %s", logp, ns.Node.Path, err)
+			} else {
+				ns.Node = *node
+				switch ns.State {
+				case FileStateDeleted:
+					dw.fs.RemoveChild(node.Parent, node)
+				default:
+					dw.fs.Update(node, nil)
+				}
+			}
+			dw.qchanges <- ns
+
+		case <-dw.qrun:
+			ever = false
+		}
 	}
 }
 
