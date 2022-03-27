@@ -211,6 +211,10 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	logp := "Get"
 
+	if mfs == nil || mfs.PathNodes == nil {
+		return nil, fmt.Errorf("%s %s: %w", logp, path, os.ErrNotExist)
+	}
+
 	node = mfs.PathNodes.Get(path)
 	if node == nil {
 		if mfs.Opts.Development {
