@@ -445,12 +445,14 @@ func (node *Node) resetAllModTime(t time.Time) {
 // Change on mode will not affect the content of node.
 //
 func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
-	logp := "Update"
+	var (
+		logp = "Node.Update"
+	)
 
 	if newInfo == nil {
 		newInfo, err = os.Stat(node.SysPath)
 		if err != nil {
-			return fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
+			return fmt.Errorf("%s %s: %w", logp, node.SysPath, err)
 		}
 	}
 
@@ -468,7 +470,7 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 
 	err = node.updateContent(maxFileSize)
 	if err != nil {
-		return fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
+		return fmt.Errorf("%s %s: %w", logp, node.SysPath, err)
 	}
 	return nil
 }

@@ -404,9 +404,14 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 		return
 	}
 
-	err := node.Update(newInfo, mfs.Opts.MaxFileSize)
+	var (
+		logp = "MemFS.Update"
+		err  error
+	)
+
+	err = node.Update(newInfo, mfs.Opts.MaxFileSize)
 	if err != nil {
-		log.Printf("Update: %s: %s", node.SysPath, err)
+		log.Printf("%s %s: %s", logp, node.SysPath, err)
 	}
 }
 
