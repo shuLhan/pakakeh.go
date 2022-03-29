@@ -9,7 +9,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/shuLhan/share/lib/memfs"
 )
@@ -56,7 +58,8 @@ func TestMain(m *testing.M) {
 				Development: true,
 			},
 		},
-		Address: serverAddress,
+		HandleFSAuth: handleFSAuth,
+		Address:      serverAddress,
 	}
 
 	testServerUrl = fmt.Sprintf("http://" + serverAddress)
@@ -75,6 +78,8 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
+	time.Sleep(400 * time.Millisecond) // Wait for server to be ready.
+
 	status := m.Run()
 
 	err = testServer.Stop(0)
@@ -88,6 +93,30 @@ func TestMain(m *testing.M) {
 var (
 	testDownloadBody []byte
 )
+
+// handleFSAuth authenticate the request to Memfs using cookie.
+// It will return true if request path is "/auth/" and cookie name "sid" exist
+// with value "authz".
+func handleFSAuth(req *http.Request) bool {
+	var (
+		lowerPath = strings.ToLower(req.URL.Path)
+
+		cookieSid *http.Cookie
+		err       error
+	)
+	log.Printf("handleFSAuth: %s", lowerPath)
+	if !strings.HasPrefix(lowerPath, "/auth/") {
+		return true
+	}
+	cookieSid, err = req.Cookie("sid")
+	if err != nil {
+		return false
+	}
+	if cookieSid.Value != "authz" {
+		return false
+	}
+	return true
+}
 
 func registerEndpoints() {
 	var err error

@@ -787,3 +787,76 @@ func TestStatusError(t *testing.T) {
 		test.Assert(t, "Body", c.expBody, string(body))
 	}
 }
+
+// TestServer_HandleFS_Auth test GET on memfs with authorization.
+func TestServer_HandleFS_Auth(t *testing.T) {
+	type testCase struct {
+		cookieSid     *http.Cookie
+		desc          string
+		reqPath       string
+		expStatusCode int
+	}
+
+	var (
+		c   testCase
+		req *http.Request
+		res *http.Response
+		err error
+	)
+
+	cases := []testCase{{
+		desc:          "With public path",
+		reqPath:       "/index.html",
+		expStatusCode: http.StatusOK,
+	}, {
+		desc:          "With /auth.txt",
+		reqPath:       "/auth.txt",
+		expStatusCode: http.StatusOK,
+	}, {
+		desc:          "With /auth path no cookie",
+		reqPath:       "/auth",
+		expStatusCode: http.StatusUnauthorized,
+	}, {
+		desc:    "With /auth path and cookie",
+		reqPath: "/auth",
+		cookieSid: &http.Cookie{
+			Name:  "sid",
+			Value: "authz",
+		},
+		expStatusCode: http.StatusOK,
+	}, {
+		desc:    "With invalid /auth path and cookie",
+		reqPath: "/auth/notexist",
+		cookieSid: &http.Cookie{
+			Name:  "sid",
+			Value: "authz",
+		},
+		expStatusCode: http.StatusNotFound,
+	}, {
+		desc:    "With /auth/sub path and cookie",
+		reqPath: "/auth/sub",
+		cookieSid: &http.Cookie{
+			Name:  "sid",
+			Value: "authz",
+		},
+		expStatusCode: http.StatusOK,
+	}}
+
+	for _, c = range cases {
+		req, err = http.NewRequest(http.MethodGet, testServerUrl+c.reqPath, nil)
+		if err != nil {
+			t.Fatalf("%s: %s", c.desc, err)
+		}
+
+		if c.cookieSid != nil {
+			req.AddCookie(c.cookieSid)
+		}
+
+		res, err = client.Do(req)
+		if err != nil {
+			t.Fatalf("%s: %s", c.desc, err)
+		}
+
+		test.Assert(t, c.desc, c.expStatusCode, res.StatusCode)
+	}
+}

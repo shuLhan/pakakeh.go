@@ -489,6 +489,9 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 // response body set to the content of file.
 // If the request Method is HEAD, only the header will be sent back to client.
 //
+// If the request Path exists and Server Options FSAuthHandler is set and
+// returning false, it will return 401 Unauthorized.
+//
 // If the request Path is not exist it will return 404 Not Found.
 //
 func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
@@ -501,12 +504,22 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		body         []byte
 		size         int64
 		err          error
+		isAuthorized bool
 	)
 
 	node = srv.getFSNode(req.URL.Path)
 	if node == nil {
 		res.WriteHeader(http.StatusNotFound)
 		return
+	}
+
+	if srv.Options.HandleFSAuth != nil {
+		req.URL.Path = node.Path
+		isAuthorized = srv.Options.HandleFSAuth(req)
+		if !isAuthorized {
+			res.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
 
 	res.Header().Set(HeaderContentType, node.ContentType)
