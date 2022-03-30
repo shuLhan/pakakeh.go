@@ -26,9 +26,12 @@ type ServerOptions struct {
 	// See https://pkg.go.dev/github.com/shuLhan/share/lib/memfs#hdr-Go_embed
 	Memfs *memfs.MemFS
 
-	// HandleFSAuth handle authorization to GET request on Memfs.
-	// If null it means all request is allowed.
-	HandleFSAuth FSAuthHandler
+	// HandleFS inspect each GET request to Memfs.
+	// Some usage of this handler is to check for authorization on
+	// specific path, handling redirect, and so on.
+	// If nil it means all request are allowed.
+	// See FSHandler for more information.
+	HandleFS FSHandler
 
 	// Address define listen address, using ip:port format.
 	// This field is optional, default to ":80".

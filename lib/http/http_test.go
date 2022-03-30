@@ -58,8 +58,8 @@ func TestMain(m *testing.M) {
 				Development: true,
 			},
 		},
-		HandleFSAuth: handleFSAuth,
-		Address:      serverAddress,
+		HandleFS: handleFS,
+		Address:  serverAddress,
 	}
 
 	testServerUrl = fmt.Sprintf("http://" + serverAddress)
@@ -94,26 +94,32 @@ var (
 	testDownloadBody []byte
 )
 
-// handleFSAuth authenticate the request to Memfs using cookie.
-// It will return true if request path is "/auth/" and cookie name "sid" exist
-// with value "authz".
-func handleFSAuth(req *http.Request) bool {
+//
+// handleFS authenticate the request to Memfs using cookie.
+//
+// If the node does not start with "/auth/" it will return true.
+//
+// If the node path is start with "/auth/" and cookie name "sid" exist
+// with value "authz" it will return true;
+// otherwise it will redirect to "/" and return false.
+//
+func handleFS(node *memfs.Node, res http.ResponseWriter, req *http.Request) bool {
 	var (
-		lowerPath = strings.ToLower(req.URL.Path)
+		lowerPath = strings.ToLower(node.Path)
 
 		cookieSid *http.Cookie
 		err       error
 	)
-	log.Printf("handleFSAuth: %s", lowerPath)
-	if !strings.HasPrefix(lowerPath, "/auth/") {
-		return true
-	}
-	cookieSid, err = req.Cookie("sid")
-	if err != nil {
-		return false
-	}
-	if cookieSid.Value != "authz" {
-		return false
+	if strings.HasPrefix(lowerPath, "/auth/") {
+		cookieSid, err = req.Cookie("sid")
+		if err != nil {
+			http.Redirect(res, req, "/", http.StatusSeeOther)
+			return false
+		}
+		if cookieSid.Value != "authz" {
+			http.Redirect(res, req, "/", http.StatusSeeOther)
+			return false
+		}
 	}
 	return true
 }

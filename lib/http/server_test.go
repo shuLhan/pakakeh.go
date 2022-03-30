@@ -788,12 +788,13 @@ func TestStatusError(t *testing.T) {
 	}
 }
 
-// TestServer_HandleFS_Auth test GET on memfs with authorization.
-func TestServer_HandleFS_Auth(t *testing.T) {
+// TestServer_Options_HandleFS test GET on memfs with authorization.
+func TestServer_Options_HandleFS(t *testing.T) {
 	type testCase struct {
 		cookieSid     *http.Cookie
 		desc          string
 		reqPath       string
+		expResBody    string
 		expStatusCode int
 	}
 
@@ -808,14 +809,17 @@ func TestServer_HandleFS_Auth(t *testing.T) {
 		desc:          "With public path",
 		reqPath:       "/index.html",
 		expStatusCode: http.StatusOK,
+		expResBody:    "<html><body>Hello, world!</body></html>\n",
 	}, {
 		desc:          "With /auth.txt",
 		reqPath:       "/auth.txt",
 		expStatusCode: http.StatusOK,
+		expResBody:    "Hello, auth.txt!\n",
 	}, {
-		desc:          "With /auth path no cookie",
+		desc:          "With /auth path no cookie, redirected to /",
 		reqPath:       "/auth",
-		expStatusCode: http.StatusUnauthorized,
+		expStatusCode: http.StatusOK,
+		expResBody:    "<html><body>Hello, world!</body></html>\n",
 	}, {
 		desc:    "With /auth path and cookie",
 		reqPath: "/auth",
@@ -824,6 +828,7 @@ func TestServer_HandleFS_Auth(t *testing.T) {
 			Value: "authz",
 		},
 		expStatusCode: http.StatusOK,
+		expResBody:    "<html><body>Hello, authorized world!</body></html>\n",
 	}, {
 		desc:    "With invalid /auth path and cookie",
 		reqPath: "/auth/notexist",
@@ -840,6 +845,7 @@ func TestServer_HandleFS_Auth(t *testing.T) {
 			Value: "authz",
 		},
 		expStatusCode: http.StatusOK,
+		expResBody:    "<html><body>Hello, /auth/sub!</body></html>\n",
 	}}
 
 	for _, c = range cases {
@@ -858,5 +864,12 @@ func TestServer_HandleFS_Auth(t *testing.T) {
 		}
 
 		test.Assert(t, c.desc, c.expStatusCode, res.StatusCode)
+
+		gotBody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatalf("%s: %s", c.desc, err)
+		}
+
+		test.Assert(t, "response body", c.expResBody, string(gotBody))
 	}
 }

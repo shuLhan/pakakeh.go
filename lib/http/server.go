@@ -484,13 +484,13 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 // HandleFS handle the request as resource in the memory file system.
 // This method only works if the Server.Options.Memfs is not nil.
 //
+// If the request Path exists and Server Options FSHandler is set and
+// returning false, it will return immediately.
+//
 // If the request Path exists in file system, it will return 200 OK with the
 // header Content-Type set accordingly to the detected file type and the
 // response body set to the content of file.
 // If the request Method is HEAD, only the header will be sent back to client.
-//
-// If the request Path exists and Server Options FSAuthHandler is set and
-// returning false, it will return 401 Unauthorized.
 //
 // If the request Path is not exist it will return 404 Not Found.
 //
@@ -504,7 +504,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		body         []byte
 		size         int64
 		err          error
-		isAuthorized bool
+		ok           bool
 	)
 
 	node = srv.getFSNode(req.URL.Path)
@@ -513,11 +513,9 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if srv.Options.HandleFSAuth != nil {
-		req.URL.Path = node.Path
-		isAuthorized = srv.Options.HandleFSAuth(req)
-		if !isAuthorized {
-			res.WriteHeader(http.StatusUnauthorized)
+	if srv.Options.HandleFS != nil {
+		ok = srv.Options.HandleFS(node, res, req)
+		if !ok {
 			return
 		}
 	}
