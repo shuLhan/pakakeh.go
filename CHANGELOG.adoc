@@ -6,6 +6,124 @@ Shulhan <ms@kilabit.info>
 
 This library is released every month, usually at the first week of month.
 
+[#v0.36.0]
+==  share v0.36.0 (2022-04-03)
+
+[#v0.36.0_breaking_changes]
+===  Breaking changes
+
+*  lib/memfs: update the file mode and/or content on DirWatcher
++
+Previously, the DirWatcher only forward the NodeState if the file being
+watched is deleted or modified.
++
+This changes the DirWatcher handle it internally.
+If the file is deleted it will be removed from internal MemFS instance.
+If the file is updated it will update the mode or content of that file
+in the MemFS.
+
+*  lib/memfs: changes the DirWatcher and Watcher to use channel
++
+Previously, we use a callback model to propagated changes.
+This model has its advantages and disadvantages.
++
+The advantages is there is no limit of queue when the changes need to
+be propagated to the caller.
+The disadvantages of that the watcher needs to wait for callback to
+finish before continue processing.
+One can run it under goroutine, but it may cause race if the caller does
+not handle update properly and it does not guarantee the goroutine
+process it in FIFO.
+We can see this on the unit test of NewWatcher, we needs to use
+sync.WaitGroup to properly check one changes before processing the order.
++
+This commit changes the DirWatcher and Watcher to use channel, like
+the one in time.Ticker.
+
+*  all: move the DirWatcher and Watcher types from io to memfs
++
+There are two reasons why we move them.
+First, DirWatcher and Watcher code internally depends on the memfs
+package, especially on Node type.
+Second, we want to add new Watch method to MemFS which depends on
+package io.
+If we do that, there will be circular imports.
+
+[v0.36.0_new_features]
+===  New features
+
+*  lib/http: implement handler to check each request to Server Memfs
++
+The FSHandler define the function to inspect each GET request to Server
+MemFS instance.
+The node parameter contains the requested file inside the memfs.
++
+If the handler return true, server will continue processing the node
+(writing the Node content type, body, and so on).
++
+If the handler return false, server stop processing the node and return
+immediately, which means the function should have already handle writing
+the header, status code, and/or body.
+
+*  lib/memfs: add method to stop the Watch
++
+The StopWatch method stop watching for update, from calling Watch.
+
+*  lib/xmlrpc: add method to get boolean field value on Value
++
+The GetFieldAsBoolean return the struct's field value by its key as
+bool type.
+
+*  lib/memfs: add method Watch to MemFS
++
+The Watch method create and start a DirWatcher that ready to be consumed.
++
+This is to simplify watching an existing MemFS instance because the
+internal fs inside the DirWatcher is not exported.
+
+[v0.36.0_enhancements]
+===  Enhancements
+
+*  lib/http: use package mlog for logging
++
+In case the consumer of lib/http package use mlog for logging, the
+log will be written to their predefined writers.
++
+In case they did not use mlog, the log will written to stdout and stderr.
+
+[v0.36.0_bug_fixes]
+===  Bug fixes
+
+*  lib/memfs: check for possible nil on Get
++
+In case the instance of memfs is set to nil (for example, the root
+directory being watched is deleted on DirWatcher), the Get method will
+cause panic after the next update on content of root directory.
+
+*  lib/xmlrpc: use %v to convert non-string type on GetFieldAsString
++
+Previously, if GetFieldAsString is called and the struct field type is
+not string, it will return "%s(<type>=<value>)" instead of the value
+in string.
++
+This commit fix this issue by using %v to convert non-string type.
+
+[v0.36.0_chores]
+===  Chores
+
+*  lib/memfs: differentiate prefix on MemFS's Update and Node's Update
+
+*  email/dkim: remove amazonses.com domain from test cases
++
+The domain now return invalid public key record, so we removed them
+to make the test passed for now.
+
+*  lib/memfs: move the test for NewWatcher and DirWatcher as example
++
+With this we do one thing (write testing) and output two things (testing
+the code and give an example for code).
+
+
 [#v0.35.0]
 ==  share v0.35.0 (2022-03-04)
 

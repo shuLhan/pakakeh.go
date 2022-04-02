@@ -244,6 +244,15 @@ dd {
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#v0.36.0">share v0.36.0 (2022-04-03)</a>
+<ul class="sectlevel2">
+<li><a href="#v0.36.0_breaking_changes">Breaking changes</a></li>
+<li><a href="#_new_features">New features</a></li>
+<li><a href="#_enhancements">Enhancements</a></li>
+<li><a href="#_bug_fixes">Bug fixes</a></li>
+<li><a href="#_chores">Chores</a></li>
+</ul>
+</li>
 <li><a href="#v0.35.0">share v0.35.0 (2022-03-04)</a>
 <ul class="sectlevel2">
 <li><a href="#v0.35.0_breaking_changes">Breaking changes</a></li>
@@ -551,6 +560,178 @@ dd {
 <div class="sectionbody">
 <div class="paragraph">
 <p>This library is released every month, usually at the first week of month.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0.36.0"><a class="anchor" href="#v0.36.0"></a><a class="link" href="#v0.36.0">share v0.36.0 (2022-04-03)</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="v0.36.0_breaking_changes"><a class="anchor" href="#v0.36.0_breaking_changes"></a><a class="link" href="#v0.36.0_breaking_changes">Breaking changes</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/memfs: update the file mode and/or content on DirWatcher</p>
+<div class="paragraph">
+<p>Previously, the DirWatcher only forward the NodeState if the file being
+watched is deleted or modified.</p>
+</div>
+<div class="paragraph">
+<p>This changes the DirWatcher handle it internally.
+If the file is deleted it will be removed from internal MemFS instance.
+If the file is updated it will update the mode or content of that file
+in the MemFS.</p>
+</div>
+</li>
+<li>
+<p>lib/memfs: changes the DirWatcher and Watcher to use channel</p>
+<div class="paragraph">
+<p>Previously, we use a callback model to propagated changes.
+This model has its advantages and disadvantages.</p>
+</div>
+<div class="paragraph">
+<p>The advantages is there is no limit of queue when the changes need to
+be propagated to the caller.
+The disadvantages of that the watcher needs to wait for callback to
+finish before continue processing.
+One can run it under goroutine, but it may cause race if the caller does
+not handle update properly and it does not guarantee the goroutine
+process it in FIFO.
+We can see this on the unit test of NewWatcher, we needs to use
+sync.WaitGroup to properly check one changes before processing the order.</p>
+</div>
+<div class="paragraph">
+<p>This commit changes the DirWatcher and Watcher to use channel, like
+the one in time.Ticker.</p>
+</div>
+</li>
+<li>
+<p>all: move the DirWatcher and Watcher types from io to memfs</p>
+<div class="paragraph">
+<p>There are two reasons why we move them.
+First, DirWatcher and Watcher code internally depends on the memfs
+package, especially on Node type.
+Second, we want to add new Watch method to MemFS which depends on
+package io.
+If we do that, there will be circular imports.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_new_features"><a class="anchor" href="#_new_features"></a><a class="link" href="#_new_features">New features</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/http: implement handler to check each request to Server Memfs</p>
+<div class="paragraph">
+<p>The FSHandler define the function to inspect each GET request to Server
+MemFS instance.
+The node parameter contains the requested file inside the memfs.</p>
+</div>
+<div class="paragraph">
+<p>If the handler return true, server will continue processing the node
+(writing the Node content type, body, and so on).</p>
+</div>
+<div class="paragraph">
+<p>If the handler return false, server stop processing the node and return
+immediately, which means the function should have already handle writing
+the header, status code, and/or body.</p>
+</div>
+</li>
+<li>
+<p>lib/memfs: add method to stop the Watch</p>
+<div class="paragraph">
+<p>The StopWatch method stop watching for update, from calling Watch.</p>
+</div>
+</li>
+<li>
+<p>lib/xmlrpc: add method to get boolean field value on Value</p>
+<div class="paragraph">
+<p>The GetFieldAsBoolean return the struct&#8217;s field value by its key as
+bool type.</p>
+</div>
+</li>
+<li>
+<p>lib/memfs: add method Watch to MemFS</p>
+<div class="paragraph">
+<p>The Watch method create and start a DirWatcher that ready to be consumed.</p>
+</div>
+<div class="paragraph">
+<p>This is to simplify watching an existing MemFS instance because the
+internal fs inside the DirWatcher is not exported.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_enhancements"><a class="anchor" href="#_enhancements"></a><a class="link" href="#_enhancements">Enhancements</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/http: use package mlog for logging</p>
+<div class="paragraph">
+<p>In case the consumer of lib/http package use mlog for logging, the
+log will be written to their predefined writers.</p>
+</div>
+<div class="paragraph">
+<p>In case they did not use mlog, the log will written to stdout and stderr.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bug_fixes"><a class="anchor" href="#_bug_fixes"></a><a class="link" href="#_bug_fixes">Bug fixes</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/memfs: check for possible nil on Get</p>
+<div class="paragraph">
+<p>In case the instance of memfs is set to nil (for example, the root
+directory being watched is deleted on DirWatcher), the Get method will
+cause panic after the next update on content of root directory.</p>
+</div>
+</li>
+<li>
+<p>lib/xmlrpc: use %v to convert non-string type on GetFieldAsString</p>
+<div class="paragraph">
+<p>Previously, if GetFieldAsString is called and the struct field type is
+not string, it will return "%s(&lt;type&gt;=&lt;value&gt;)" instead of the value
+in string.</p>
+</div>
+<div class="paragraph">
+<p>This commit fix this issue by using %v to convert non-string type.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_chores"><a class="anchor" href="#_chores"></a><a class="link" href="#_chores">Chores</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/memfs: differentiate prefix on MemFS&#8217;s Update and Node&#8217;s Update</p>
+</li>
+<li>
+<p>email/dkim: remove amazonses.com domain from test cases</p>
+<div class="paragraph">
+<p>The domain now return invalid public key record, so we removed them
+to make the test passed for now.</p>
+</div>
+</li>
+<li>
+<p>lib/memfs: move the test for NewWatcher and DirWatcher as example</p>
+<div class="paragraph">
+<p>With this we do one thing (write testing) and output two things (testing
+the code and give an example for code).</p>
+</div>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -5875,7 +6056,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-03-04 22:41:54 +0700
+Last updated 2022-04-02 23:22:36 +0700
 </div>
 </div>
 			</div>
