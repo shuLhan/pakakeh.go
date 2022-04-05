@@ -8,16 +8,20 @@ const (
 	defaultMaxFileSize = 1024 * 1024 * 5
 )
 
+// Options to create and initialize the MemFS.
 type Options struct {
-	// EmbedOptions for GoEmbed.
+	// Embed options for GoEmbed method.
 	Embed EmbedOptions
 
-	// Root contains path to directory where its contents will be mapped
-	// to memory.
+	// Root define the path to directory where its contents will be mapped
+	// to memory or to be embedded as Go source code using GoEmbed.
 	Root string
 
-	// The includes and excludes pattern applied to path of file in file
-	// system.
+	// The includes and excludes pattern applied relative to the system
+	// path.
+	// The Excludes patterns will be applied first before the Includes.
+	// If the path is not excluded and Includes is empty, it will be
+	// assumed as included.
 	Includes []string
 	Excludes []string
 
