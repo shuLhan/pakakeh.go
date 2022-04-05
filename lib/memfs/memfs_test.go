@@ -510,27 +510,40 @@ func TestMemFS_isIncluded(t *testing.T) {
 		},
 	}}
 
+	var (
+		opts    *Options
+		mfs     *MemFS
+		fi      os.FileInfo
+		sysPath string
+		err     error
+		x       int
+		got     bool
+	)
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		opts := &Options{
+		opts = &Options{
 			Includes: c.inc,
 			Excludes: c.exc,
 		}
-		mfs, err := New(opts)
+		mfs, err = New(opts)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		for x, sysPath := range c.sysPath {
-			fi, err := os.Stat(sysPath)
+		for x, sysPath = range c.sysPath {
+			fi, err = os.Stat(sysPath)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			got := mfs.isIncluded(sysPath, fi.Mode())
-
-			test.Assert(t, sysPath, c.exp[x], got)
+			got = mfs.isExcluded(sysPath, fi.Mode())
+			if got {
+				test.Assert(t, sysPath, !c.exp[x], got)
+			} else {
+				got = mfs.isIncluded(sysPath, fi.Mode())
+				test.Assert(t, sysPath, c.exp[x], got)
+			}
 		}
 	}
 }

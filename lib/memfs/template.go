@@ -68,7 +68,9 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 	node.SetName("{{.Node.Name}}")
 	node.SetSize({{.Node.Size}})
 	{{- range $x, $child := .Node.Childs}}
+		{{- if $child.GenFuncName}}
 	node.AddChild(_{{$varname}}_getNode({{$varname}}, "{{.Path}}", {{$child.GenFuncName}}))
+		{{- end}}
 	{{- end}}
 	return node
 }
@@ -115,8 +117,10 @@ func init() {
 
 {{- range $x, $path := .PathNode.Paths }}
 	{{- $node := $.PathNode.Get $path }}
+	{{- if $node.GenFuncName}}
 	{{$varname}}.PathNodes.Set("{{$path}}",
 		_{{$varname}}_getNode({{$varname}}, "{{$path}}", {{ $node.GenFuncName }}))
+	{{- end}}
 {{- end}}
 
 	{{$varname}}.Root = {{$varname}}.PathNodes.Get("/")

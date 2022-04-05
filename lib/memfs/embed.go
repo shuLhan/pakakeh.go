@@ -29,7 +29,13 @@ type generateData struct {
 // If you are not sure, call Remount.
 //
 func (mfs *MemFS) GoEmbed() (err error) {
-	logp := "GoEmbed"
+	var (
+		logp = "GoEmbed"
+
+		node    *Node
+		genData *generateData
+		name    string
+	)
 
 	if len(mfs.Opts.Embed.PackageName) == 0 {
 		mfs.Opts.Embed.PackageName = DefaultEmbedPackageName
@@ -41,7 +47,7 @@ func (mfs *MemFS) GoEmbed() (err error) {
 		mfs.Opts.Embed.GoFileName = DefaultEmbedGoFileName
 	}
 
-	genData := &generateData{
+	genData = &generateData{
 		Opts:     mfs.Opts,
 		PathNode: mfs.PathNodes,
 	}
@@ -63,15 +69,22 @@ func (mfs *MemFS) GoEmbed() (err error) {
 		goto fail
 	}
 
-	for x := 0; x < len(names); x++ {
+	for _, name = range names {
+		node = mfs.PathNodes.Get(name)
+
 		// Ignore and delete the file from map if its the output
 		// itself.
-		if strings.HasSuffix(names[x], mfs.Opts.Embed.GoFileName) {
-			mfs.PathNodes.Delete(names[x])
+		if strings.HasSuffix(name, mfs.Opts.Embed.GoFileName) {
+			mfs.PathNodes.Delete(name)
 			continue
 		}
 
-		genData.Node = mfs.PathNodes.Get(names[x])
+		if len(node.GenFuncName) == 0 {
+			// Node is watched only, not included.
+			continue
+		}
+
+		genData.Node = node
 
 		err = tmpl.ExecuteTemplate(f, templateNameGenerateNode, genData)
 		if err != nil {

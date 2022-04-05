@@ -37,8 +37,9 @@ type MemFS struct {
 	Opts      *Options
 	dw        *DirWatcher
 
-	incRE []*regexp.Regexp
-	excRE []*regexp.Regexp
+	watchRE []*regexp.Regexp
+	incRE   []*regexp.Regexp
+	excRE   []*regexp.Regexp
 }
 
 //
@@ -102,19 +103,42 @@ func New(opts *Options) (mfs *MemFS, err error) {
 }
 
 //
-// AddChild add new child to parent node.
+// AddChild add FileInfo fi as new child of parent node.
+//
+// It will return nil without an error if the system path of parent+fi.Name()
+// is excluded by one of Options.Excludes pattern.
 //
 func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
-	sysPath := filepath.Join(parent.SysPath, fi.Name())
+	var (
+		logp    = "AddChild"
+		sysPath = filepath.Join(parent.SysPath, fi.Name())
+		fiMode  = fi.Mode()
+	)
 
-	if !mfs.isIncluded(sysPath, fi.Mode()) {
+	if mfs.isExcluded(sysPath, fiMode) {
 		return nil, nil
+	}
+	if mfs.isWatched(sysPath, fiMode) {
+		child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
+		if err != nil {
+			return nil, fmt.Errorf("%s %s: %w", logp, sysPath, err)
+		}
+
+		mfs.PathNodes.Set(child.Path, child)
+	}
+	if !mfs.isIncluded(sysPath, fiMode) {
+		if child != nil {
+			// The path being watched, but not included.
+			// Set the generate function name to empty, to prevent
+			// GoEmbed embed the content of this node.
+			child.GenFuncName = ""
+		}
+		return child, nil
 	}
 
 	child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
 	if err != nil {
-		log.Printf("AddChild %s: %s", fi.Name(), err.Error())
-		return nil, nil
+		return nil, fmt.Errorf("%s %s: %w", logp, sysPath, err)
 	}
 
 	mfs.PathNodes.Set(child.Path, child)
@@ -426,39 +450,6 @@ func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 	}
 }
 
-//
-// Watch create and start the DirWatcher that monitor the memfs Root
-// directory.
-// The MemFS will update the tree and node content automatically if the file
-// get deleted or updated.
-// The returned DirWatcher is ready to use.
-// To stop watching for update call the StopWatch.
-//
-func (mfs *MemFS) Watch(d time.Duration) (dw *DirWatcher, err error) {
-	var (
-		logp = "Watch"
-	)
-
-	if mfs.dw != nil {
-		return mfs.dw, nil
-	}
-
-	mfs.dw = &DirWatcher{
-		fs:      mfs,
-		Delay:   d,
-		Options: *mfs.Opts,
-	}
-
-	err = mfs.dw.Start()
-	if err != nil {
-		// There should be no error here, since we already check and
-		// filled the required fields for DirWatcher.
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	return mfs.dw, nil
-}
-
 func (mfs *MemFS) createRoot() error {
 	logp := "createRoot"
 
@@ -486,46 +477,75 @@ func (mfs *MemFS) createRoot() error {
 }
 
 //
-// isIncluded will return true if the child node pass the included filter or
-// excluded filter; otherwise it will return false.
+// isExcluded will return true if the system path is excluded from being
+// watched or included.
 //
-func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
-	if len(mfs.incRE) == 0 && len(mfs.excRE) == 0 {
-		return true
-	}
-	for _, re := range mfs.excRE {
+func (mfs *MemFS) isExcluded(sysPath string, mode os.FileMode) bool {
+	var (
+		re *regexp.Regexp
+	)
+	for _, re = range mfs.excRE {
 		if re.MatchString(sysPath) {
-			return false
+			return true
 		}
 	}
+	return false
+}
+
+//
+// isIncluded will return true if the system path is filtered to be included,
+// pass the list of Includes regexp or no filter defined.
+//
+func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
+	var (
+		re      *regexp.Regexp
+		fi      os.FileInfo
+		absPath string
+		err     error
+	)
+
 	if len(mfs.incRE) == 0 {
 		// No filter defined, default to always included.
 		return true
 	}
-
-	for _, re := range mfs.incRE {
+	for _, re = range mfs.incRE {
 		if re.MatchString(sysPath) {
 			return true
 		}
 	}
 	if mode&os.ModeSymlink == 0 {
-		// If file is NOT a symlink andits a directory, include it.
+		// If file is NOT a symlink and its a directory, include it.
 		return mode.IsDir()
 	}
 
 	// File is symlink, get the real FileInfo to check if its
 	// directory or not.
-	absPath, err := filepath.EvalSymlinks(sysPath)
+	absPath, err = filepath.EvalSymlinks(sysPath)
 	if err != nil {
 		return false
 	}
 
-	fi, err := os.Lstat(absPath)
+	fi, err = os.Lstat(absPath)
 	if err != nil {
 		return false
 	}
 	if fi.IsDir() {
 		return true
+	}
+	return false
+}
+
+//
+// isWatched will return true if the system path is filtered to be watched.
+//
+func (mfs *MemFS) isWatched(sysPath string, mode os.FileMode) bool {
+	var (
+		re *regexp.Regexp
+	)
+	for _, re = range mfs.watchRE {
+		if re.MatchString(sysPath) {
+			return true
+		}
 	}
 	return false
 }
@@ -670,4 +690,57 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 //
 func (mfs *MemFS) resetAllModTime(t time.Time) {
 	mfs.Root.resetAllModTime(t)
+}
+
+//
+// Watch create and start the DirWatcher that monitor the memfs Root
+// directory based on the list of pattern on WatchOptions.Watches and
+// Options.Includes.
+//
+// The MemFS will remove or update the tree and node content automatically if
+// the file being watched get deleted or updated.
+//
+// The returned DirWatcher is ready to use.
+// To stop watching for update call the StopWatch.
+//
+func (mfs *MemFS) Watch(opts WatchOptions) (dw *DirWatcher, err error) {
+	var (
+		logp = "Watch"
+
+		re *regexp.Regexp
+		v  string
+	)
+
+	if mfs.dw != nil {
+		return mfs.dw, nil
+	}
+
+	mfs.watchRE = nil
+	for _, v = range opts.Watches {
+		re, err = regexp.Compile(v)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+		mfs.watchRE = append(mfs.watchRE, re)
+	}
+
+	mfs.dw = &DirWatcher{
+		fs:      mfs,
+		Delay:   opts.Delay,
+		Options: *mfs.Opts,
+	}
+
+	_, err = mfs.scanDir(mfs.Root)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	err = mfs.dw.Start()
+	if err != nil {
+		// There should be no error here, since we already check and
+		// filled the required fields for DirWatcher.
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	return mfs.dw, nil
 }

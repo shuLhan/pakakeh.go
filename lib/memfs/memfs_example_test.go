@@ -94,6 +94,10 @@ func ExampleMemFS_Search() {
 
 func ExampleMemFS_Watch() {
 	var (
+		watchOpts = WatchOptions{
+			Delay: 200 * time.Millisecond,
+		}
+
 		mfs  *MemFS
 		dw   *DirWatcher
 		node *Node
@@ -116,7 +120,7 @@ func ExampleMemFS_Watch() {
 		log.Fatal(err)
 	}
 
-	dw, err = mfs.Watch(200 * time.Millisecond)
+	dw, err = mfs.Watch(watchOpts)
 	if err != nil {
 		log.Fatal(err)
 	}
