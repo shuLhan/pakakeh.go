@@ -340,20 +340,37 @@ func (node *Node) Sys() interface{} {
 }
 
 //
-// addChild add new node as sub-directory or file of this node.
+// addChild add FileInfo fi as child of this node.
+// This method is idempotent, which means, calling addChild with the same
+// FileInfo will return the same Node.
 //
 func (node *Node) addChild(
 	sysPath string, fi os.FileInfo, maxFileSize int64,
 ) (child *Node, err error) {
+	var (
+		logp    = "Node.addChild"
+		relPath = path.Join(node.Path, fi.Name())
+		found   bool
+	)
+
+	for _, child = range node.Childs {
+		if child.Path == relPath {
+			found = true
+			break
+		}
+	}
+	if found {
+		return child, nil
+	}
+
 	child, err = NewNode(node, fi, maxFileSize)
 	if err != nil {
-		return nil, fmt.Errorf("addChild: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	child.SysPath = sysPath
 
 	node.Childs = append(node.Childs, child)
-
 	return child, nil
 }
 
