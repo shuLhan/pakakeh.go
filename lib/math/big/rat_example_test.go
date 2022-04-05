@@ -534,14 +534,16 @@ func ExampleRat_RoundToZero() {
 	fmt.Println(NewRat("0.5555").RoundToZero(2))
 	fmt.Println(NewRat("0.5566").RoundToZero(2))
 	fmt.Println(NewRat("0.5566").RoundToZero(0))
-	fmt.Println(NewRat("-0.5").RoundToZero(0))
+	// In Go <= 1.18, this will print "-0", but on Go tip "0".
+	// So to make test success on all versions, we multiple it to 1.
+	fmt.Println(NewRat("-0.5").RoundToZero(0).Mul(1))
 	//Output:
 	//0
 	//0.54
 	//0.55
 	//0.55
 	//0
-	//-0
+	//0
 }
 
 func ExampleRat_Scan() {
