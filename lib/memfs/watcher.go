@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	defWatchDelay    = 5 * time.Second
 	watcherQueueSize = 16
 )
 
@@ -92,7 +93,7 @@ func newWatcher(parent *Node, fi os.FileInfo, d time.Duration, qchanges chan Nod
 	}
 
 	if d < 100*time.Millisecond {
-		d = time.Second * 5
+		d = defWatchDelay
 	}
 
 	w = &Watcher{

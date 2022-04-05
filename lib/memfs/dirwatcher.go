@@ -65,7 +65,7 @@ func (dw *DirWatcher) init() (err error) {
 	)
 
 	if dw.Delay < 100*time.Millisecond {
-		dw.Delay = time.Second * 5
+		dw.Delay = defWatchDelay
 	}
 
 	if dw.fs == nil {
