@@ -156,7 +156,7 @@
 //				HttpWriter: w,
 //				HttpRequest: req,
 //			}
-//			epr.RequestBody, _ = ioutil.ReadAll(req.Body)
+//			epr.RequestBody, _ = io.ReadAll(req.Body)
 //
 //			// Check request type, and call ParseForm or
 //			// ParseMultipartForm if required.

@@ -9,7 +9,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -139,7 +139,7 @@ func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 //
 func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 	cl.req.Method = http.MethodPost
-	cl.req.Body = ioutil.NopCloser(bytes.NewReader(msg.packet))
+	cl.req.Body = io.NopCloser(bytes.NewReader(msg.packet))
 	cl.req.URL.RawQuery = ""
 
 	httpRes, err := cl.conn.Do(cl.req)
@@ -151,7 +151,7 @@ func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 
 	res := NewMessage()
 
-	res.packet, err = ioutil.ReadAll(httpRes.Body)
+	res.packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ func (cl *DoHClient) Get(msg *Message) (*Message, error) {
 
 	res := NewMessage()
 
-	res.packet, err = ioutil.ReadAll(httpRes.Body)
+	res.packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err

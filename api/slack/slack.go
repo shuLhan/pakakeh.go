@@ -12,7 +12,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -32,7 +32,7 @@ func PostWebhook(webhookUrl string, msg *Message) (err error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		resBody, err := ioutil.ReadAll(res.Body)
+		resBody, err := io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("PostWebhook: %w", err)
 		}

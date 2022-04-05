@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"unicode"
 
 	"github.com/shuLhan/share/lib/debug"
@@ -98,7 +98,7 @@ func (reader *reader) reset(src []byte) {
 // On failure, it return nil and error.
 //
 func (reader *reader) parseFile(filename string) (in *Ini, err error) {
-	src, err := ioutil.ReadFile(filename)
+	src, err := os.ReadFile(filename)
 	if err != nil {
 		return
 	}

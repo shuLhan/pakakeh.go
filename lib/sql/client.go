@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -307,7 +306,7 @@ func loadSQL(fs http.FileSystem, fi os.FileInfo, filename string) (
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	sqlRaw, err = ioutil.ReadAll(file)
+	sqlRaw, err = io.ReadAll(file)
 	if err != nil {
 		if !errors.Is(err, io.EOF) {
 			return nil, fmt.Errorf("%s: %w", logp, err)

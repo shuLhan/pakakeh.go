@@ -7,7 +7,7 @@ package http
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -147,7 +147,7 @@ func TestRegisterDelete(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -225,7 +225,7 @@ func TestRegisterEvaluator(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		_, e = ioutil.ReadAll(res.Body)
+		_, e = io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -293,7 +293,7 @@ func TestRegisterGet(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -360,7 +360,7 @@ func TestRegisterHead(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -424,7 +424,7 @@ func TestRegisterPatch(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -496,7 +496,7 @@ k=vv`,
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -555,7 +555,7 @@ func TestRegisterPut(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -773,7 +773,7 @@ func TestStatusError(t *testing.T) {
 			t.Fatal(e)
 		}
 
-		body, e := ioutil.ReadAll(res.Body)
+		body, e := io.ReadAll(res.Body)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -865,7 +865,7 @@ func TestServer_Options_HandleFS(t *testing.T) {
 
 		test.Assert(t, c.desc, c.expStatusCode, res.StatusCode)
 
-		gotBody, err := ioutil.ReadAll(res.Body)
+		gotBody, err := io.ReadAll(res.Body)
 		if err != nil {
 			t.Fatalf("%s: %s", c.desc, err)
 		}

@@ -8,7 +8,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -30,11 +29,11 @@ func TestMain(m *testing.M) {
 }
 
 func initKeys(t *testing.T) {
-	rsaPrivateRaw, err := ioutil.ReadFile("dkim/testdata/rsa.private.pem")
+	rsaPrivateRaw, err := os.ReadFile("dkim/testdata/rsa.private.pem")
 	if err != nil {
 		t.Fatal(err)
 	}
-	rsaPublicRaw, err := ioutil.ReadFile("dkim/testdata/rsa.public.pem")
+	rsaPublicRaw, err := os.ReadFile("dkim/testdata/rsa.public.pem")
 	if err != nil {
 		t.Fatal(err)
 	}

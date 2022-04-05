@@ -7,7 +7,6 @@ package smtp
 import (
 	"bytes"
 	"encoding/gob"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -93,7 +92,7 @@ func (fs *LocalStorage) MailLoad(id string) (mail *MailTx, err error) {
 
 	fpath := filepath.Join(fs.dir, id)
 
-	b, err := ioutil.ReadFile(fpath)
+	b, err := os.ReadFile(fpath)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +147,7 @@ func (fs *LocalStorage) MailSave(mail *MailTx) (err error) {
 
 	fpath := filepath.Join(fs.dir, mail.ID)
 
-	return ioutil.WriteFile(fpath, fs.buff.Bytes(), 0600)
+	return os.WriteFile(fpath, fs.buff.Bytes(), 0600)
 }
 
 func (fs *LocalStorage) loadRaw(b []byte) (mail *MailTx, err error) {

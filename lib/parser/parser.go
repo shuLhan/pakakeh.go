@@ -9,7 +9,7 @@ package parser
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	libascii "github.com/shuLhan/share/lib/ascii"
 )
@@ -56,7 +56,7 @@ func New(content, delims string) (p *Parser) {
 // If delimiters is empty, it would default to all whitespaces characters.
 //
 func Open(file, delims string) (p *Parser, err error) {
-	v, err := ioutil.ReadFile(file)
+	v, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}

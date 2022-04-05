@@ -5,7 +5,6 @@
 package io
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -85,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			continue
 		}
 
-		got, err := ioutil.ReadFile(c.out)
+		got, err := os.ReadFile(c.out)
 		if err != nil {
 			t.Fatal(err)
 		}

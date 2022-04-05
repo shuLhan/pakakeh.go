@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -206,7 +205,7 @@ func parseInclude(line string) (patterns []string) {
 // Any empty lines or line start with comment '#' will be removed.
 //
 func readLines(file string) (lines []string, err error) {
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, nil

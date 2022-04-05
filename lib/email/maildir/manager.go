@@ -15,7 +15,6 @@ package maildir
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -148,7 +147,7 @@ func (mg *Manager) OutQueue(email []byte) (err error) {
 		return err
 	}
 
-	err = ioutil.WriteFile(fname, email, 0400)
+	err = os.WriteFile(fname, email, 0400)
 	if err != nil {
 		err = fmt.Errorf("email/maildir: OutQueue: %s", err.Error())
 		return err
@@ -193,7 +192,7 @@ func (mg *Manager) Incoming(email []byte) (err error) {
 		return err
 	}
 
-	err = ioutil.WriteFile(tmpFile, email, 0660)
+	err = os.WriteFile(tmpFile, email, 0660)
 	if err != nil {
 		err = fmt.Errorf("email/maildir: Incoming: %s", err.Error())
 		return err

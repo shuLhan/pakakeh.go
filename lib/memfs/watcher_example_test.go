@@ -6,7 +6,6 @@ package memfs
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -23,7 +22,7 @@ func ExampleNewWatcher() {
 	)
 
 	// Create a file to be watched.
-	f, err = ioutil.TempFile("", "watcher")
+	f, err = os.CreateTemp("", "watcher")
 	if err != nil {
 		log.Fatal(err)
 	}

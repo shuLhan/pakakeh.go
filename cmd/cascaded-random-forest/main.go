@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -92,7 +91,7 @@ func un(startTime time.Time) {
 //
 func createCRF(o *options) (crforest *crf.Runtime, e error) {
 	// (1)
-	config, e := ioutil.ReadFile(o.trainCfg)
+	config, e := os.ReadFile(o.trainCfg)
 	if e != nil {
 		return nil, e
 	}

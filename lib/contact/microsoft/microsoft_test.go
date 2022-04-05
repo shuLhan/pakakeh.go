@@ -5,7 +5,7 @@
 package microsoft
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/contact"
@@ -66,7 +66,7 @@ func TestImportFromJSON(t *testing.T) {
 		JobTitle: "Tester",
 	}
 
-	jsonb, err := ioutil.ReadFile(sampleContacts)
+	jsonb, err := os.ReadFile(sampleContacts)
 	if err != nil {
 		t.Fatal(err)
 	}

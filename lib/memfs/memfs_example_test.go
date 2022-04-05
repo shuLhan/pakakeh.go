@@ -2,7 +2,6 @@ package memfs
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -106,7 +105,7 @@ func ExampleMemFS_Watch() {
 		err  error
 	)
 
-	opts.Root, err = ioutil.TempDir("", "memfs_watch")
+	opts.Root, err = os.MkdirTemp("", "memfs_watch")
 	if err != nil {
 		log.Fatal(err)
 	}

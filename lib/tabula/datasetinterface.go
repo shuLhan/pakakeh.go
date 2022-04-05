@@ -7,7 +7,7 @@ package tabula
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/shuLhan/share/lib/debug"
 )
@@ -69,7 +69,7 @@ type DatasetInterface interface {
 // field from there.
 //
 func ReadDatasetConfig(ds interface{}, fcfg string) (e error) {
-	cfg, e := ioutil.ReadFile(fcfg)
+	cfg, e := os.ReadFile(fcfg)
 
 	if nil != e {
 		return e

@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -542,7 +541,7 @@ func (srv *Server) handleDoHGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
-	raw, err := ioutil.ReadAll(r.Body)
+	raw, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

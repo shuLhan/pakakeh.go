@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -81,7 +80,7 @@ func un(s string, startTime time.Time) {
 func createLnsmote(fcfg string, opts *options) (lnsmoteRun *lnsmote.Runtime, e error) {
 	lnsmoteRun = &lnsmote.Runtime{}
 
-	config, e := ioutil.ReadFile(fcfg)
+	config, e := os.ReadFile(fcfg)
 	if e != nil {
 		return nil, e
 	}

@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"crypto/rsa"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -93,7 +92,7 @@ func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 // ParseFile parse message from file.
 //
 func ParseFile(inFile string) (msg *Message, rest []byte, err error) {
-	raw, err := ioutil.ReadFile(inFile)
+	raw, err := os.ReadFile(inFile)
 	if err != nil {
 		return nil, nil, fmt.Errorf("email: " + err.Error())
 	}

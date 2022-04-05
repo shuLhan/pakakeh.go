@@ -5,7 +5,7 @@
 package yahoo
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/contact"
@@ -17,7 +17,7 @@ const (
 )
 
 func parseSampleJSON(t *testing.T, input string) (contact *contact.Record) {
-	jsonb, err := ioutil.ReadFile(input)
+	jsonb, err := os.ReadFile(input)
 	if err != nil {
 		t.Fatal(err)
 	}

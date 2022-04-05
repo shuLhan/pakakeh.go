@@ -6,7 +6,6 @@ package memfs
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -20,7 +19,7 @@ func ExampleDirWatcher() {
 		err     error
 	)
 
-	rootDir, err = ioutil.TempDir("", "libmemfs")
+	rootDir, err = os.MkdirTemp("", "libmemfs")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +79,7 @@ func ExampleDirWatcher() {
 
 	newFile := filepath.Join(rootDir, "new.adoc")
 	fmt.Println("Create new file on root directory: /new.adoc")
-	err = ioutil.WriteFile(newFile, nil, 0600)
+	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -108,7 +107,7 @@ func ExampleDirWatcher() {
 	// Add new file in sub directory.
 	newFile = filepath.Join(subDir, "new.adoc")
 	fmt.Println("Create new file in sub directory: /subdir/new.adoc")
-	err = ioutil.WriteFile(newFile, nil, 0600)
+	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -126,7 +125,7 @@ func ExampleDirWatcher() {
 	// Creating file that is excluded should not trigger event.
 	newFile = filepath.Join(subDir, "new.html")
 	fmt.Println("Create excluded file in sub directory: /subdir/new.html")
-	err = ioutil.WriteFile(newFile, nil, 0600)
+	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -135,7 +134,7 @@ func ExampleDirWatcher() {
 	// event.
 	newFile = filepath.Join(dirAssets, "new")
 	fmt.Println("Create new file under assets: /assets/new")
-	err = ioutil.WriteFile(newFile, nil, 0600)
+	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}

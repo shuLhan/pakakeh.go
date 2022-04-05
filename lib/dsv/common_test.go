@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"runtime/debug"
 	"testing"
 
@@ -21,14 +21,14 @@ import (
 // when both are different.
 //
 func assertFile(t *testing.T, a, b string) {
-	out, e := ioutil.ReadFile(a)
+	out, e := os.ReadFile(a)
 
 	if e != nil {
 		debug.PrintStack()
 		t.Error(e)
 	}
 
-	exp, e := ioutil.ReadFile(b)
+	exp, e := os.ReadFile(b)
 
 	if e != nil {
 		debug.PrintStack()

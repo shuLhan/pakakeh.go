@@ -6,8 +6,8 @@ package hunspell
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -20,7 +20,7 @@ type dictionary struct {
 }
 
 func (dict *dictionary) open(file string, opts *affixOptions) (err error) {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("dictionary.open: %w", err)
 	}

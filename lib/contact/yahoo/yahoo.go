@@ -13,7 +13,7 @@ package yahoo
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/shuLhan/share/lib/contact"
@@ -61,7 +61,7 @@ func ImportWithOAuth(client *http.Client, guid string) (contacts []*contact.Reco
 		return
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return
 	}

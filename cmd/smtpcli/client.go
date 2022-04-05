@@ -7,7 +7,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -138,7 +137,7 @@ func (cli *client) handleInput() (isQuit bool) {
 }
 
 func (cli *client) readData(fin string) (err error) {
-	cli.mailTx.Data, err = ioutil.ReadFile(fin)
+	cli.mailTx.Data, err = os.ReadFile(fin)
 	if err != nil {
 		return err
 	}

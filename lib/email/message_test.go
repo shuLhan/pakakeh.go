@@ -5,7 +5,6 @@
 package email
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -126,7 +125,7 @@ func TestMessageParseMessage(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.in)
 
-		in, err := ioutil.ReadFile(c.in)
+		in, err := os.ReadFile(c.in)
 		if err != nil {
 			t.Fatal(err)
 		}

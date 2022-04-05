@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -54,7 +53,7 @@ func un(s string, startTime time.Time) {
 func createCart(fcfg string, opts *options) (*cart.Runtime, error) {
 	cartrt := &cart.Runtime{}
 
-	config, e := ioutil.ReadFile(fcfg)
+	config, e := os.ReadFile(fcfg)
 	if e != nil {
 		return nil, e
 	}

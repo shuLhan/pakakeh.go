@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
@@ -510,7 +509,7 @@ func (node *Node) updateContent(maxFileSize int64) (err error) {
 		return nil
 	}
 
-	node.Content, err = ioutil.ReadFile(node.SysPath)
+	node.Content, err = os.ReadFile(node.SysPath)
 	if err != nil {
 		if errors.Is(err, io.EOF) {
 			return nil

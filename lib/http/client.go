@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net"
@@ -131,7 +130,7 @@ func (client *Client) Do(httpRequest *http.Request) (
 		}
 	}
 
-	rawBody, err := ioutil.ReadAll(httpRes.Body)
+	rawBody, err := io.ReadAll(httpRes.Body)
 	if err != nil {
 		return nil, nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -486,7 +485,7 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 
 	switch res.Header.Get(HeaderContentEncoding) {
 	case ContentEncodingBzip2:
-		dec = ioutil.NopCloser(bzip2.NewReader(in))
+		dec = io.NopCloser(bzip2.NewReader(in))
 
 	case ContentEncodingCompress:
 		dec = lzw.NewReader(in, lzw.MSB, 8)

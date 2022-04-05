@@ -5,7 +5,7 @@
 package yahoo
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -16,7 +16,7 @@ const (
 )
 
 func TestImportFromJSON(t *testing.T) {
-	contactsb, err := ioutil.ReadFile(sampleContacts)
+	contactsb, err := os.ReadFile(sampleContacts)
 	if err != nil {
 		t.Fatal(err)
 	}

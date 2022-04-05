@@ -2,7 +2,7 @@ package dsv
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path"
 )
 
@@ -18,7 +18,7 @@ type ConfigInterface interface {
 // ConfigOpen configuration file and initialize the attributes.
 //
 func ConfigOpen(rw interface{}, fcfg string) error {
-	cfg, e := ioutil.ReadFile(fcfg)
+	cfg, e := os.ReadFile(fcfg)
 
 	if nil != e {
 		return e

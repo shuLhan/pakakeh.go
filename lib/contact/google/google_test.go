@@ -5,7 +5,7 @@
 package google
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -16,7 +16,7 @@ const (
 )
 
 func TestImportFromJSON(t *testing.T) {
-	jsonb, err := ioutil.ReadFile(sampleContacts)
+	jsonb, err := os.ReadFile(sampleContacts)
 	if err != nil {
 		t.Fatal(err)
 	}

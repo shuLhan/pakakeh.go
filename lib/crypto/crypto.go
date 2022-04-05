@@ -12,14 +12,14 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 //
 // LoadPrivateKey read and parse PEM formatted private key from file.
 //
 func LoadPrivateKey(file string) (pkey *rsa.PrivateKey, err error) {
-	rawPEM, err := ioutil.ReadFile(file)
+	rawPEM, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}

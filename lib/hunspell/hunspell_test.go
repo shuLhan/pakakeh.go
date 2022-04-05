@@ -5,7 +5,7 @@
 package hunspell
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -59,7 +59,7 @@ work/B
 			continue
 		}
 
-		got, err := ioutil.ReadFile(c.outFile)
+		got, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("%s: %s", c.desc, err)
 		}

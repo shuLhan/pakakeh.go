@@ -7,7 +7,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -158,7 +157,7 @@ func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) 
 	section.Signers = make([]ssh.Signer, 0, len(section.IdentityFile))
 
 	for _, pkeyFile = range section.IdentityFile {
-		pkeyPem, err = ioutil.ReadFile(pkeyFile)
+		pkeyPem, err = os.ReadFile(pkeyFile)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				continue

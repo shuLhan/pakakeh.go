@@ -13,7 +13,7 @@ package microsoft
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/shuLhan/share/lib/contact"
@@ -61,7 +61,7 @@ func ImportWithOAuth(client *http.Client) (contacts []*contact.Record, err error
 		return
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return
 	}

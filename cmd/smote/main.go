@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -79,7 +78,7 @@ func un(s string, startTime time.Time) {
 func createSmote(fcfg string, o *options) (smoteRun *smote.Runtime, e error) {
 	smoteRun = &smote.Runtime{}
 
-	config, e := ioutil.ReadFile(fcfg)
+	config, e := os.ReadFile(fcfg)
 	if e != nil {
 		return nil, e
 	}

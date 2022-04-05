@@ -6,7 +6,7 @@ package http
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -89,7 +89,7 @@ func (ep *Endpoint) call(
 		e            error
 	)
 
-	epr.RequestBody, e = ioutil.ReadAll(req.Body)
+	epr.RequestBody, e = io.ReadAll(req.Body)
 	if e != nil {
 		mlog.Errf("%s: ReadAll: %s", logp, e)
 		res.WriteHeader(http.StatusBadRequest)
@@ -97,7 +97,7 @@ func (ep *Endpoint) call(
 	}
 
 	req.Body.Close()
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(epr.RequestBody))
+	req.Body = io.NopCloser(bytes.NewBuffer(epr.RequestBody))
 
 	switch ep.RequestType {
 	case RequestTypeForm, RequestTypeQuery, RequestTypeJSON:

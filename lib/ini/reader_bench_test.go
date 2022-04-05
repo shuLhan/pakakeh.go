@@ -5,7 +5,7 @@
 package ini
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -24,7 +24,7 @@ import (
 //
 func BenchmarkParse(b *testing.B) {
 	reader := newReader()
-	src, err := ioutil.ReadFile(testdataInputIni)
+	src, err := os.ReadFile(testdataInputIni)
 	if err != nil {
 		b.Fatal(err)
 	}

@@ -6,8 +6,8 @@ package hunspell
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -162,7 +162,7 @@ type affixOptions struct {
 // its default values.
 //
 func (opts *affixOptions) open(file string) (err error) {
-	affcontent, err := ioutil.ReadFile(file)
+	affcontent, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("affixOptions.open: %w", err)
 	}

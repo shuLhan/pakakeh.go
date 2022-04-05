@@ -7,7 +7,6 @@ package mock
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -64,7 +63,7 @@ func Error() string {
 
 	ResetStderr(false)
 
-	bs, err := ioutil.ReadAll(_stderr)
+	bs, err := io.ReadAll(_stderr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,7 +81,7 @@ func Output() string {
 
 	ResetStdout(false)
 
-	bs, err := ioutil.ReadAll(_stdout)
+	bs, err := io.ReadAll(_stdout)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -96,7 +95,7 @@ func Output() string {
 func Stderr() *os.File {
 	var err error
 
-	_stderr, err = ioutil.TempFile("", "")
+	_stderr, err = os.CreateTemp("", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,7 +109,7 @@ func Stderr() *os.File {
 func Stdin() *os.File {
 	var err error
 
-	_stdin, err = ioutil.TempFile("", "")
+	_stdin, err = os.CreateTemp("", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -124,7 +123,7 @@ func Stdin() *os.File {
 func Stdout() *os.File {
 	var err error
 
-	_stdout, err = ioutil.TempFile("", "")
+	_stdout, err = os.CreateTemp("", "")
 	if err != nil {
 		log.Fatal(err)
 	}

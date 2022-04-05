@@ -5,7 +5,7 @@
 package io
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/shuLhan/share/lib/ascii"
 )
@@ -35,7 +35,7 @@ func NewReader(path string) (*Reader, error) {
 	var err error
 	r := new(Reader)
 
-	r.V, err = ioutil.ReadFile(path)
+	r.V, err = os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

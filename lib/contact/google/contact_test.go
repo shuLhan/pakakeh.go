@@ -6,7 +6,7 @@ package google
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/contact"
@@ -20,7 +20,7 @@ const (
 func parseContact(t *testing.T) (contact *contact.Record) {
 	googleContact := &Contact{}
 
-	jsonb, err := ioutil.ReadFile(sampleContact)
+	jsonb, err := os.ReadFile(sampleContact)
 	if err != nil {
 		t.Fatal(err)
 	}

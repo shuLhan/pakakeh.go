@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -533,7 +532,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		body = node.Content
 		size = node.Size()
 	} else {
-		body, err = ioutil.ReadFile(node.SysPath)
+		body, err = os.ReadFile(node.SysPath)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			return

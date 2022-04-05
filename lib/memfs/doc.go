@@ -46,7 +46,7 @@
 //	}
 //	if node.Content == nil {
 //		// Handle large file.
-//		node.V, err = ioutil.ReadFile(child.SysPath)
+//		node.V, err = os.ReadFile(child.SysPath)
 //	}
 //	// Do something with content of file system.
 //

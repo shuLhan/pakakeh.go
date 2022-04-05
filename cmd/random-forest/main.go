@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -88,7 +87,7 @@ func un(startTime time.Time) {
 //
 func createRandomForest(opts *options) (forest *rf.Runtime, e error) {
 	// (1)
-	config, e := ioutil.ReadFile(opts.trainCfg)
+	config, e := os.ReadFile(opts.trainCfg)
 	if e != nil {
 		return nil, e
 	}
