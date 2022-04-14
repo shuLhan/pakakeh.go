@@ -219,31 +219,33 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 
 //
 // remove an answer from caches by query name.
+// It will return nil if qname is not exist in the caches.
 //
-func (c *caches) remove(qname string) (ok bool) {
+func (c *caches) remove(qname string) (listAnswer []*Answer) {
+	var (
+		answer *Answer
+		el     *list.Element
+		next   *list.Element
+	)
+
 	c.Lock()
-	for e := c.lru.Front(); e != nil; e = e.Next() {
-		answer := e.Value.(*Answer)
+	defer c.Unlock()
+
+	el = c.lru.Front()
+	for el != nil {
+		next = el.Next()
+		answer = el.Value.(*Answer)
 		if answer.QName != qname {
+			el = next
 			continue
 		}
 
-		c.lru.Remove(e)
-		delete(c.v, qname)
+		c.lru.Remove(el)
 		answer.clear()
-		ok = true
-		break
+		listAnswer = append(listAnswer, answer)
+		el = next
 	}
-	if !ok {
-		_, ok = c.v[qname]
-		if ok {
-			// If the qname is not found in non-local caches, it
-			// may exist as local answer.
-			delete(c.v, qname)
-		}
-	}
-	c.Unlock()
-	return ok
+	return listAnswer
 }
 
 //
