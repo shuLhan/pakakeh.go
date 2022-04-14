@@ -177,7 +177,7 @@ func TestCachesPrune(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		ca.prune()
+		_ = ca.prune(3)
 
 		gotList := ca.list()
 

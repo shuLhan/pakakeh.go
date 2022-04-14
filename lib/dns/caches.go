@@ -133,42 +133,48 @@ func (c *caches) list() (list []*Answer) {
 }
 
 //
-// prune will remove old answers on caches based on accessed time.
+// prune will remove old answers from caches based on accessed time.
+// If the accessed time is greater than expired time (exp) it will be removed,
+// otherwise it will stay on caches.
 //
-func (c *caches) prune() (n int) {
+func (c *caches) prune(exp int64) (listAnswer []*Answer) {
+	var (
+		el, next *list.Element
+		answer   *Answer
+		answers  *answers
+		found    bool
+	)
+
 	c.Lock()
+	defer c.Unlock()
 
-	exp := time.Now().Add(c.pruneThreshold).Unix()
-
-	e := c.lru.Front()
-	for e != nil {
-		an := e.Value.(*Answer)
-		if an.AccessedAt > exp {
+	el = c.lru.Front()
+	for el != nil {
+		answer = el.Value.(*Answer)
+		if answer.AccessedAt > exp {
 			break
 		}
 
 		if debug.Value >= 1 {
-			fmt.Printf("dns: - 0:%s\n", an.msg.Question.String())
+			fmt.Printf("dns: - 0:%s\n", answer.msg.Question.String())
 		}
 
-		next := e.Next()
-		_ = c.lru.Remove(e)
-		answers, found := c.v[an.QName]
+		next = el.Next()
+		_ = c.lru.Remove(el)
+		answers, found = c.v[answer.QName]
 		if found {
-			answers.remove(an.RType, an.RClass)
+			answers.remove(answer.RType, answer.RClass)
 			if len(answers.v) == 0 {
-				delete(c.v, an.QName)
+				delete(c.v, answer.QName)
 			}
 		}
-		an.clear()
-		n++
+		answer.clear()
 
-		e = next
+		listAnswer = append(listAnswer, answer)
+
+		el = next
 	}
-
-	c.Unlock()
-
-	return n
+	return listAnswer
 }
 
 //
@@ -377,11 +383,17 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 // value.
 //
 func (c *caches) startWorker() {
-	ticker := time.NewTicker(c.pruneDelay)
+	var (
+		ticker = time.NewTicker(c.pruneDelay)
+
+		listAnswer []*Answer
+		exp        int64
+	)
 
 	for range ticker.C {
-		n := c.prune()
-		fmt.Printf("dns: pruning %d records from cache\n", n)
+		exp = time.Now().Add(c.pruneThreshold).Unix()
+		listAnswer = c.prune(exp)
+		fmt.Printf("dns: pruning %d records from cache\n", len(listAnswer))
 	}
 }
 

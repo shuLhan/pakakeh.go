@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"regexp"
@@ -246,6 +247,14 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
 		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
 	}
 	return nil
+}
+
+//
+// CachesClear remove all caches.
+//
+func (srv *Server) CachesClear() (listAnswer []*Answer) {
+	listAnswer = srv.caches.prune(math.MaxInt64)
+	return listAnswer
 }
 
 //
