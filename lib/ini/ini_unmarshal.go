@@ -11,92 +11,141 @@ import (
 	"time"
 )
 
-//
 // unmarshal set each section-subsection variables into the struct
 // fields.
-//
 func (in *Ini) unmarshal(tagField tagStructField, rtype reflect.Type, rval reflect.Value) {
-	for _, sec := range in.secs {
-		tag := fmt.Sprintf("%s:%s", sec.name, sec.sub)
-		sfield, ok := tagField[tag]
-		if ok {
-			switch sfield.fkind {
-			case reflect.Map:
-				// V map[S]T `ini:"section:sub"`
-				unmarshalToMap(sec, sfield.ftype, sfield.fval)
-
-			case reflect.Ptr:
-				for sfield.fkind == reflect.Ptr {
-					sfield.ftype = sfield.ftype.Elem()
-					sfield.fkind = sfield.ftype.Kind()
-				}
-
-				if sfield.fkind == reflect.Struct {
-					if sfield.fval.IsNil() {
-						ptrfval := reflect.New(sfield.ftype)
-						sfield.fval.Set(ptrfval)
-						sfield.fval = ptrfval.Elem()
-					} else {
-						sfield.fval = sfield.fval.Elem()
-					}
-					unmarshalToStruct(sec, sfield.ftype, sfield.fval)
-				}
-
-			case reflect.Slice:
-				sliceElem := sfield.ftype.Elem()
-				switch sliceElem.Kind() {
-				case reflect.Struct:
-					newStruct := reflect.New(sliceElem)
-					unmarshalToStruct(sec, sliceElem, newStruct.Elem())
-					newSlice := reflect.Append(sfield.fval, newStruct.Elem())
-					sfield.fval.Set(newSlice)
-
-				case reflect.Ptr:
-					// V []*T
-					for sliceElem.Kind() == reflect.Ptr {
-						sliceElem = sliceElem.Elem()
-					}
-
-					if sliceElem.Kind() == reflect.Struct {
-						ptrfval := reflect.New(sliceElem)
-						unmarshalToStruct(sec, sliceElem, ptrfval.Elem())
-						newSlice := reflect.Append(sfield.fval, ptrfval)
-						sfield.fval.Set(newSlice)
-					}
-				}
-
-			case reflect.Struct:
-				unmarshalToStruct(sec, sfield.ftype, sfield.fval)
-			}
-			continue
-		}
-
-		for _, v := range sec.vars {
-			tag = fmt.Sprintf("%s:%s:%s", sec.name, sec.sub, v.keyLower)
+	var (
+		sec    *Section
+		sfield *structField
+		v      *variable
+		tag    string
+		ok     bool
+	)
+	for _, sec = range in.secs {
+		// Search field that tagged with subsection first.
+		tag = fmt.Sprintf("%s:%s", sec.nameLower, sec.sub)
+		sfield, ok = tagField[tag]
+		if !ok {
+			// Search field that tagged with section name only.
+			tag = sec.nameLower
 			sfield, ok = tagField[tag]
 			if !ok {
+				// Unmarshal each variable in section-sub into
+				// field directly.
+				for _, v = range sec.vars {
+					tag = fmt.Sprintf("%s:%s:%s", sec.nameLower, sec.sub, v.keyLower)
+					sfield, ok = tagField[tag]
+					if !ok {
+						continue
+					}
+					sfield.set(v.value)
+				}
 				continue
 			}
-			sfield.set(v.value)
 		}
+		switch sfield.fkind {
+		case reflect.Map:
+			unmarshalToMap(sec, sfield.ftype, sfield.fval)
+
+		case reflect.Ptr:
+			for sfield.fkind == reflect.Ptr {
+				sfield.ftype = sfield.ftype.Elem()
+				sfield.fkind = sfield.ftype.Kind()
+			}
+
+			if sfield.fkind == reflect.Struct {
+				if sfield.fval.IsNil() {
+					ptrfval := reflect.New(sfield.ftype)
+					sfield.fval.Set(ptrfval)
+					sfield.fval = ptrfval.Elem()
+				} else {
+					sfield.fval = sfield.fval.Elem()
+				}
+				unmarshalToStruct(sec, sfield.ftype, sfield.fval)
+			}
+
+		case reflect.Slice:
+			sliceElem := sfield.ftype.Elem()
+			switch sliceElem.Kind() {
+			case reflect.Struct:
+				newStruct := reflect.New(sliceElem)
+				unmarshalToStruct(sec, sliceElem, newStruct.Elem())
+				newSlice := reflect.Append(sfield.fval, newStruct.Elem())
+				sfield.fval.Set(newSlice)
+
+			case reflect.Ptr:
+				// V []*T
+				for sliceElem.Kind() == reflect.Ptr {
+					sliceElem = sliceElem.Elem()
+				}
+
+				if sliceElem.Kind() == reflect.Struct {
+					ptrfval := reflect.New(sliceElem)
+					unmarshalToStruct(sec, sliceElem, ptrfval.Elem())
+					newSlice := reflect.Append(sfield.fval, ptrfval)
+					sfield.fval.Set(newSlice)
+				}
+			}
+
+		case reflect.Struct:
+			unmarshalToStruct(sec, sfield.ftype, sfield.fval)
+		}
+
 	}
 }
 
+// unmarshalToMap unmarshal the Section into a map.
+//
+// V map[S]T `ini:"section:sub"` for non-struct value or
+// V map[S]T `ini:"section"` for map of struct.
 func unmarshalToMap(sec *Section, rtype reflect.Type, rval reflect.Value) bool {
 	if rtype.Key().Kind() != reflect.String {
 		return false
 	}
 
-	amap := reflect.MakeMap(rtype)
-	mapType := rtype.Elem()
+	var (
+		elType = rtype.Elem()
+		elKind = elType.Kind()
 
-	for _, v := range sec.vars {
+		v        *variable
+		amap     reflect.Value
+		astruct  reflect.Value
+		mapValue reflect.Value
+		isPtr    bool
+		ok       bool
+	)
+
+	if rval.IsNil() {
+		amap = reflect.MakeMap(rtype)
+		rval.Set(amap)
+	} else {
+		amap = rval
+	}
+	for elKind == reflect.Ptr {
+		elType = elType.Elem()
+		elKind = elType.Kind()
+		isPtr = true
+	}
+	if elKind == reflect.Struct {
+		astruct = reflect.New(elType)
+
+		unmarshalToStruct(sec, elType, astruct.Elem())
+		if isPtr {
+			amap.SetMapIndex(reflect.ValueOf(sec.sub), astruct)
+		} else {
+			amap.SetMapIndex(reflect.ValueOf(sec.sub), astruct.Elem())
+		}
+		return true
+	}
+
+	for _, v = range sec.vars {
 		if len(v.keyLower) == 0 {
 			continue
 		}
-		rval, ok := unmarshalValue(mapType, v.value)
+
+		mapValue, ok = unmarshalValue(elType, v.value)
 		if ok {
-			amap.SetMapIndex(reflect.ValueOf(v.keyLower), rval)
+			amap.SetMapIndex(reflect.ValueOf(v.keyLower), mapValue)
 		}
 	}
 	rval.Set(amap)
@@ -104,7 +153,7 @@ func unmarshalToMap(sec *Section, rtype reflect.Type, rval reflect.Value) bool {
 }
 
 func unmarshalToStruct(sec *Section, rtype reflect.Type, rval reflect.Value) {
-	tagField := unpackStruct(rtype, rval)
+	tagField := unpackTagStructField(rtype, rval)
 	for _, v := range sec.vars {
 		sfield := tagField.getByKey(v.keyLower)
 		if sfield == nil {
@@ -114,10 +163,8 @@ func unmarshalToStruct(sec *Section, rtype reflect.Type, rval reflect.Value) {
 	}
 }
 
-//
 // unmarshalValue convert the value from string to primitive type based on its
 // kind.
-//
 func unmarshalValue(rtype reflect.Type, val string) (rval reflect.Value, ok bool) {
 	switch rtype.Kind() {
 	case reflect.Bool:

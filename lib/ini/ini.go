@@ -191,20 +191,39 @@ func (in *Ini) marshalStruct(
 			}
 
 		case reflect.Map:
-			amap := map[string]string{}
-			keys := make([]string, 0)
-			iter := fvalue.MapRange()
+			var (
+				amap = map[string]reflect.Value{}
+				keys = make([]string, 0)
+				iter = fvalue.MapRange()
+
+				mapKey    reflect.Value
+				mapValue  reflect.Value
+				valueType reflect.Type
+				key       string
+			)
+			// Collect all the map keys and sort it to make the
+			// output consistent.
 			for iter.Next() {
-				mk := iter.Key()
-				mv := iter.Value()
-				key = strings.ToLower(fmt.Sprintf("%v", mk))
-				value = fmt.Sprintf("%v", mv)
-				amap[key] = value
+				mapKey = iter.Key()
+				mapValue = iter.Value()
+				key = strings.ToLower(fmt.Sprintf("%v", mapKey))
 				keys = append(keys, key)
+				amap[key] = mapValue
 			}
 			sort.Strings(keys)
 			for _, key = range keys {
-				in.Set(sec, sub, key, amap[key])
+				mapValue = amap[key]
+				valueType = reflect.TypeOf(mapValue.Interface())
+				for valueType.Kind() == reflect.Ptr {
+					valueType = valueType.Elem()
+					mapValue = mapValue.Elem()
+				}
+				if valueType.Kind() == reflect.Struct {
+					in.marshalStruct(valueType, mapValue, sec, key)
+				} else {
+					value = fmt.Sprintf("%v", mapValue)
+					in.Set(sec, sub, key, value)
+				}
 			}
 
 		case reflect.Ptr:
@@ -280,7 +299,7 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
 	}
 
-	tagField := unpackStruct(rtipe, rvalue)
+	tagField := unpackTagStructField(rtipe, rvalue)
 	in.unmarshal(tagField, rtipe, rvalue)
 
 	return nil

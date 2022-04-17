@@ -176,9 +176,6 @@ func ExampleMarshal() {
 		PtrTime   *time.Time `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
 		PtrStruct *U         `ini:"pointer:struct"`
 
-		MapString map[string]string `ini:"map:string"`
-		MapInt    map[string]int    `ini:"map:int"`
-
 		String string `ini:"section::string"`
 
 		SliceString []string `ini:"section:slice:string"`
@@ -205,13 +202,6 @@ func ExampleMarshal() {
 		PtrStruct: &U{
 			String: "PtrStruct.String",
 			Int:    3,
-		},
-
-		MapString: map[string]string{
-			"k": "v",
-		},
-		MapInt: map[string]int{
-			"keyInt": 6,
 		},
 
 		String: "a",
@@ -263,12 +253,6 @@ func ExampleMarshal() {
 	// string = PtrStruct.String
 	// int = 3
 	//
-	// [map "string"]
-	// k = v
-	//
-	// [map "int"]
-	// keyint = 6
-	//
 	// [section "slice"]
 	// string = c
 	// string = d
@@ -290,6 +274,108 @@ func ExampleMarshal() {
 	// [section "struct"]
 	// string = b
 	// int = 2
+}
+
+func ExampleMarshal_map() {
+	type U struct {
+		String string `ini:"string"`
+		Int    int    `ini:"int"`
+	}
+	type ADT struct {
+		MapString    map[string]string  `ini:"map:subString"`
+		MapPtrString map[string]*string `ini:"map:subPtrString"`
+
+		MapInt    map[string]int  `ini:"map:subInt"`
+		MapPtrInt map[string]*int `ini:"map:subPtrInt"`
+
+		MapStruct    map[string]U  `ini:"mapStruct"`
+		MapPtrStruct map[string]*U `ini:"mapPtrStruct"`
+	}
+
+	var (
+		stringV  = "v"
+		stringV2 = "v2"
+		intV     = 6
+
+		t = ADT{
+			MapString: map[string]string{
+				"k":  "v",
+				"k2": "v2",
+			},
+			MapPtrString: map[string]*string{
+				"k":  &stringV,
+				"k2": &stringV2,
+			},
+
+			MapInt: map[string]int{
+				"keyInt": 6,
+			},
+			MapPtrInt: map[string]*int{
+				"keyInt": &intV,
+			},
+
+			MapStruct: map[string]U{
+				"struct-key-1": {
+					String: "struct-1-string",
+					Int:    1,
+				},
+				"struct-key-2": {
+					String: "struct-2-string",
+					Int:    2,
+				},
+			},
+			MapPtrStruct: map[string]*U{
+				"ptr-struct-key-1": {
+					String: "struct-1-string",
+					Int:    1,
+				},
+				"ptr-struct-key-2": {
+					String: "struct-2-string",
+					Int:    2,
+				},
+			},
+		}
+
+		iniText []byte
+		err     error
+	)
+
+	iniText, err = Marshal(&t)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(iniText))
+	//Output:
+	//[map "subString"]
+	//k = v
+	//k2 = v2
+	//
+	//[map "subPtrString"]
+	//k = v
+	//k2 = v2
+	//
+	//[map "subInt"]
+	//keyint = 6
+	//
+	//[map "subPtrInt"]
+	//keyint = 6
+	//
+	//[mapstruct "struct-key-1"]
+	//string = struct-1-string
+	//int = 1
+	//
+	//[mapstruct "struct-key-2"]
+	//string = struct-2-string
+	//int = 2
+	//
+	//[mapptrstruct "ptr-struct-key-1"]
+	//string = struct-1-string
+	//int = 1
+	//
+	//[mapptrstruct "ptr-struct-key-2"]
+	//string = struct-2-string
+	//int = 2
 }
 
 func ExampleUnmarshal() {
@@ -319,12 +405,6 @@ int = 1
 string = U.string 2
 int = 2
 
-[map "string"]
-k = v
-
-[map "int"]
-k = 6
-
 [section "pointer"]
 string = b
 int = 2
@@ -342,9 +422,6 @@ int = 2
 		PtrInt    *int       `ini:"section:pointer:int"`
 		PtrTime   *time.Time `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
 		PtrStruct *U         `ini:"pointer:struct"`
-
-		MapString map[string]string `ini:"map:string"`
-		MapInt    map[string]int    `ini:"map:int"`
 
 		String string `ini:"section::string"`
 
@@ -380,8 +457,6 @@ int = 2
 	fmt.Printf("SliceUint: %v\n", t.SliceUint)
 	fmt.Printf("SliceBool: %v\n", t.SliceBool)
 	fmt.Printf("SliceStruct: %v\n", t.SliceStruct)
-	fmt.Printf("MapString: %v\n", t.MapString)
-	fmt.Printf("MapInt: %v\n", t.MapInt)
 	fmt.Printf("PtrString: %v\n", *t.PtrString)
 	fmt.Printf("PtrInt: %v\n", *t.PtrInt)
 	// Output:
@@ -395,10 +470,69 @@ int = 2
 	// SliceUint: [4 5]
 	// SliceBool: [true false]
 	// SliceStruct: [{U.string 1 1} {U.string 2 2}]
-	// MapString: map[k:v]
-	// MapInt: map[k:6]
 	// PtrString: b
 	// PtrInt: 2
+}
+
+func ExampleUnmarshal_map() {
+	type U struct {
+		String string `ini:"string"`
+		Int    int    `ini:"int"`
+	}
+
+	type ADT struct {
+		MapString    map[string]string `ini:"map:string"`
+		MapInt       map[string]int    `ini:"map:int"`
+		MapStruct    map[string]U      `ini:"mapstruct"`
+		MapPtrStruct map[string]*U     `ini:"mapptrstruct"`
+	}
+
+	var (
+		iniText = `
+[map "string"]
+k = v
+k2 = v2
+
+[map "int"]
+k = 6
+k2 = 7
+
+[mapstruct "struct-key-1"]
+string = struct-1-string
+int = 1
+
+[mapstruct "struct-key-2"]
+string = struct-2-string
+int = 2
+
+[mapptrstruct "struct-key-1"]
+string = struct-1-string
+int = 1
+
+[mapptrstruct "struct-key-2"]
+string = struct-2-string
+int = 2
+`
+		t   = ADT{}
+		err error
+	)
+
+	err = Unmarshal([]byte(iniText), &t)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("MapString: %v\n", t.MapString)
+	fmt.Printf("MapInt: %v\n", t.MapInt)
+	fmt.Printf("MapStruct: %v\n", t.MapStruct)
+	fmt.Printf("MapPtrStruct: struct-key-1: %v\n", t.MapPtrStruct["struct-key-1"])
+	fmt.Printf("MapPtrStruct: struct-key-2: %v\n", t.MapPtrStruct["struct-key-2"])
+	//Output:
+	//MapString: map[k:v k2:v2]
+	//MapInt: map[k:6 k2:7]
+	//MapStruct: map[struct-key-1:{struct-1-string 1} struct-key-2:{struct-2-string 2}]
+	//MapPtrStruct: struct-key-1: &{struct-1-string 1}
+	//MapPtrStruct: struct-key-2: &{struct-2-string 2}
 }
 
 func ExampleIni_Prune() {

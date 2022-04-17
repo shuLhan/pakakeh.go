@@ -2,31 +2,30 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package ini implement reading and writing INI text format as defined by
 // Git configuration file syntax.
 //
-// Features
+// # Features
 //
 // *  Reading and writing on the same file should not change the content of
 // file (including comment).
 //
 // *  Template friendly, through Val(), Vals(), and Subs().
 //
-// Unsupported features
+// # Unsupported features
 //
 // Git "include" and "includeIf" directives.
 //
 // In Git specification, an empty variable is equal to boolean true.  This
 // cause inconsistency between empty string and boolean true.
 //
-// Syntax
+// # Syntax
 //
 // The '#' and ';' characters begin comments to the end of line.
 //
 // Blank lines are ignored.
 //
-// Section
+// # Section
 //
 // A section begins with the name of the section in square brackets.
 //
@@ -50,7 +49,7 @@
 // section header) are recognized as setting variables, in the form
 // `name = value`.
 //
-// Subsection
+// # Subsection
 //
 // To begin a subsection put its name in double quotes, separated by
 // space from the section name, in the section header, for example
@@ -67,7 +66,7 @@
 // reading subsection name; for example, `\t` is read as `t` and `\0` is read
 // as `0`.
 //
-// Variable
+// # Variable
 //
 // Variable name must start with an alphabetic character.
 //
@@ -80,7 +79,7 @@
 // This ini library add extension to allow dot ('.') and underscore ('_')
 // characters on variable name.
 //
-// Value
+// # Value
 //
 // Value can be empty or not set.
 // (EXT) Variable name without value is a short-hand to set the value to the
@@ -89,13 +88,12 @@
 //	[section]
 //		thisisempty # equal to thisisempty=
 //
-//
 // Internal whitespaces within the value are retained verbatim.
 // Leading and trailing whitespaces on value without double quote will
 // be discarded.
 //
-// 	key = multiple strings     # equal to "multiple strings"
-// 	key = " multiple strings " # equal to " multiple strings "
+//	key = multiple strings     # equal to "multiple strings"
+//	key = " multiple strings " # equal to " multiple strings "
 //
 // Value can be continued to the next line by ending it with a backslash '\'
 // character, the backquote and the end-of-line are stripped.
@@ -120,7 +118,7 @@
 // Other char escape sequences (including octal escape sequences) are
 // invalid.
 //
-// Marshaling
+// # Marshaling
 //
 // The container to be passed when marshaling must be struct type.
 // Each exported field in the struct with "ini" tags will be marshaled based
@@ -156,6 +154,7 @@
 //		SliceStruct []U               `ini:"slice:struct"
 //		Map         map[string]int    `ini:"amap:"
 //		MapSub      map[string]string `ini:"amap:sub"
+//		MapStruct   map[string]U      `ini:"mapstruct"`
 //	}
 //
 // will be marshaled into
@@ -188,12 +187,24 @@
 //	...
 //	<T.MapSub.Key[n]> = <T.MapSub.Value[n]>
 //
-// Unmarshaling
+//	## On map[string]struct, each key become a subsection.
+//	[mapstruct "<map.key[0]>"]
+//	<U.Field[0]> = <U.Value[0]>
+//	...
+//	<U.Field[n]> = <U.Value[n]>
+//
+//	...
+//
+//	[mapstruct "<map.key[n]>"]
+//	<U.Field[0]> = <U.Value[0]>
+//	...
+//	<U.Field[n]> = <U.Value[n]>
+//
+// # Unmarshaling
 //
 // The syntax and rules for unmarshaling is equal to the marshaling.
 //
-// References
+// # References
 //
 // https://git-scm.com/docs/git-config#_configuration_file
-//
 package ini

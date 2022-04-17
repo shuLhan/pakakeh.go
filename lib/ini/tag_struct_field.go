@@ -14,13 +14,11 @@ import (
 type tagStructField map[string]*structField
 
 //
-// unpackStruct read each tags in the struct field and store its section,
+// unpackTagStructField read each ini tag in the struct's field and store its section,
 // subsection, and/or key along with their reflect type and value into
 // structField.
 //
-// The returned type is map of field name and the field tag.
-//
-func unpackStruct(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
+func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
 	numField := rtype.NumField()
 	if numField == 0 {
 		return nil
@@ -42,7 +40,7 @@ func unpackStruct(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
 		if len(tag) == 0 {
 			switch fkind {
 			case reflect.Struct:
-				for k, v := range unpackStruct(ftype, fval) {
+				for k, v := range unpackTagStructField(ftype, fval) {
 					out[k] = v
 				}
 
@@ -54,7 +52,7 @@ func unpackStruct(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
 				fval = fval.Elem()
 				kind := ftype.Kind()
 				if kind == reflect.Struct {
-					for k, v := range unpackStruct(ftype, fval) {
+					for k, v := range unpackTagStructField(ftype, fval) {
 						out[k] = v
 					}
 				}

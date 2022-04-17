@@ -53,7 +53,7 @@ func TestUnpackStruct(t *testing.T) {
 	rval := reflect.ValueOf(v)
 	rtype = rtype.Elem()
 	rval = rval.Elem()
-	got := unpackStruct(rtype, rval)
+	got := unpackTagStructField(rtype, rval)
 
 	exp := []string{
 		"::int",
@@ -73,7 +73,7 @@ func TestUnpackStruct(t *testing.T) {
 		"slice:OfStruct",
 	}
 
-	test.Assert(t, "unpackStruct", exp, got.keys())
+	test.Assert(t, "unpackTagStructField", exp, got.keys())
 }
 
 func TestUnpackStruct_embedded(t *testing.T) {
@@ -98,7 +98,7 @@ func TestUnpackStruct_embedded(t *testing.T) {
 	rval := reflect.ValueOf(v)
 	rtype = rtype.Elem()
 	rval = rval.Elem()
-	got := unpackStruct(rtype, rval)
+	got := unpackTagStructField(rtype, rval)
 
 	exp := []string{
 		"a::x",
@@ -106,5 +106,5 @@ func TestUnpackStruct_embedded(t *testing.T) {
 		"b::z",
 		"c::xx",
 	}
-	test.Assert(t, "unpackStruct embedded", exp, got.keys())
+	test.Assert(t, "unpackTagStructField: embedded", exp, got.keys())
 }
