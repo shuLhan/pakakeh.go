@@ -23,18 +23,14 @@ const (
 	fieldTagSeparator = ":"
 )
 
-//
 // Ini contains the parsed file.
-//
 type Ini struct {
 	secs []*Section
 }
 
-//
 // Open and parse INI formatted file.
 //
 // On fail it will return incomplete instance of Ini with an error.
-//
 func Open(filename string) (in *Ini, err error) {
 	reader := newReader()
 
@@ -47,16 +43,13 @@ func Open(filename string) (in *Ini, err error) {
 	return
 }
 
-//
 // Parse INI format from text.
-//
 func Parse(text []byte) (in *Ini, err error) {
 	reader := newReader()
 
 	return reader.Parse(text)
 }
 
-//
 // Marshal encode the struct of v into stream of ini formatted string.
 //
 // To encode a struct, each exported fields must have tagged with "ini" key;
@@ -75,7 +68,6 @@ func Parse(text []byte) (in *Ini, err error) {
 //
 // One exception to above rule is map type.
 // A map's key will override the key defined in tag.
-//
 func Marshal(v interface{}) (b []byte, err error) {
 	rtipe := reflect.TypeOf(v)
 	rvalue := reflect.ValueOf(v)
@@ -109,30 +101,46 @@ func (in *Ini) marshalStruct(
 	rtipe reflect.Type, rvalue reflect.Value,
 	parentSec, parentSub string,
 ) {
-	numField := rtipe.NumField()
+	var numField int = rtipe.NumField()
 	if numField == 0 {
 		return
 	}
 
-	for x := 0; x < numField; x++ {
-		field := rtipe.Field(x)
-		fvalue := rvalue.Field(x)
-		ftype := field.Type
-		kind := ftype.Kind()
+	var (
+		field  reflect.StructField
+		ftype  reflect.Type
+		fvalue reflect.Value
+		kind   reflect.Kind
+		tag    string
+		layout string
+		tags   []string
+		x      int
+	)
+	for x = 0; x < numField; x++ {
+		field = rtipe.Field(x)
+		fvalue = rvalue.Field(x)
+		ftype = field.Type
+		kind = ftype.Kind()
 
-		tag := field.Tag.Get(fieldTagName)
+		// TODO: replace with IsExported() once go.mod version set to
+		// 1.17.
+		if field.PkgPath != "" {
+			continue
+		}
+
+		tag = field.Tag.Get(fieldTagName)
 		if len(tag) == 0 && kind != reflect.Struct {
 			continue
 		}
 
-		layout := field.Tag.Get("layout")
+		layout = field.Tag.Get("layout")
 		if len(layout) == 0 {
 			layout = time.RFC3339
 		}
 
 		var sec, sub, key, value string
 
-		tags := strings.Split(tag, fieldTagSeparator)
+		tags = strings.Split(tag, fieldTagSeparator)
 
 		switch len(tags) {
 		case 0:
@@ -264,12 +272,10 @@ func (in *Ini) marshalStruct(
 	}
 }
 
-//
 // Unmarshal parse the INI stream from slice of byte and store its value into
 // struct of `v`.
 // All the properties and specifications of field's tag follow the Marshal
 // function.
-//
 func Unmarshal(b []byte, v interface{}) (err error) {
 	ini, err := Parse(b)
 	if err != nil {
@@ -279,10 +285,8 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 	return ini.Unmarshal(v)
 }
 
-//
 // Unmarshal store the value from configuration, based on `ini` tag, into a
 // struct pointed by interface `v`.
-//
 func (in *Ini) Unmarshal(v interface{}) (err error) {
 	rtipe := reflect.TypeOf(v)
 	rvalue := reflect.ValueOf(v)
@@ -305,7 +309,6 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 	return nil
 }
 
-//
 // Add the new key and value to the last item in section and/or subsection.
 //
 // If section or subsection is not exist it will create a new one.
@@ -314,7 +317,6 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 //
 // It will return true if new variable is added, otherwise it will return
 // false.
-//
 func (in *Ini) Add(secName, subName, key, value string) bool {
 	if len(secName) == 0 || len(key) == 0 {
 		return false
@@ -340,13 +342,11 @@ func (in *Ini) Add(secName, subName, key, value string) bool {
 	return true
 }
 
-//
 // Section given section and/or subsection name, return the Section object
 // that match with it.
 // If section name is empty, it will return nil.
 // If ini contains duplicate section (or subsection) it will merge all
 // of its variables into one section.
-//
 func (in *Ini) Section(secName, subName string) (sec *Section) {
 	if len(secName) == 0 {
 		return nil
@@ -371,7 +371,6 @@ func (in *Ini) Section(secName, subName string) (sec *Section) {
 	return
 }
 
-//
 // Set the last variable's value in section-subsection that match with the
 // key.
 // If section or subsection is not found, the new section-subsection will be
@@ -380,7 +379,6 @@ func (in *Ini) Section(secName, subName string) (sec *Section) {
 //
 // It will return true if new key added or updated; otherwise it will return
 // false.
-//
 func (in *Ini) Set(secName, subName, key, value string) bool {
 	if len(secName) == 0 || len(key) == 0 {
 		return false
@@ -407,11 +405,9 @@ func (in *Ini) Set(secName, subName, key, value string) bool {
 	return sec.set(key, value)
 }
 
-//
 // Unset remove the last variable's in section and/or subsection that match
 // with the key.
 // If key found it will return true, otherwise it will return false.
-//
 func (in *Ini) Unset(secName, subName, key string) bool {
 	if len(secName) == 0 || len(key) == 0 {
 		return false
@@ -427,11 +423,9 @@ func (in *Ini) Unset(secName, subName, key string) bool {
 	return sec.unset(key)
 }
 
-//
 // UnsetAll remove all variables in section and/or subsection that match
 // with the key.
 // If key found it will return true, otherwise it will return false.
-//
 func (in *Ini) UnsetAll(secName, subName, key string) {
 	if len(secName) == 0 || len(key) == 0 {
 		return
@@ -447,9 +441,7 @@ func (in *Ini) UnsetAll(secName, subName, key string) {
 	sec.unsetAll(key)
 }
 
-//
 // addSection append the new section to the list.
-//
 func (in *Ini) addSection(sec *Section) {
 	if sec == nil {
 		return
@@ -463,13 +455,11 @@ func (in *Ini) addSection(sec *Section) {
 	in.secs = append(in.secs, sec)
 }
 
-//
 // AsMap return the INI contents as mapping of
 // (section-name ":" subsection-name ":" variable-name) as key
 // and the variable's values as slice of string.
 //
 // If section name is not empty, only the keys will be listed in the map.
-//
 func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 	out = make(map[string][]string)
 
@@ -515,12 +505,10 @@ func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 	return out
 }
 
-//
 // Get the last key on section and/or subsection.
 //
 // If key found it will return its value and true; otherwise it will return
 // default value in def and false.
-//
 func (in *Ini) Get(secName, subName, key, def string) (val string, ok bool) {
 	if len(in.secs) == 0 || len(secName) == 0 || len(key) == 0 {
 		return def, false
@@ -547,10 +535,8 @@ func (in *Ini) Get(secName, subName, key, def string) (val string, ok bool) {
 	return def, false
 }
 
-//
 // GetBool return key's value as boolean.  If no key found it will return
 // default value.
-//
 func (in *Ini) GetBool(secName, subName, key string, def bool) bool {
 	out, ok := in.Get(secName, subName, key, "false")
 	if !ok {
@@ -560,9 +546,7 @@ func (in *Ini) GetBool(secName, subName, key string, def bool) bool {
 	return IsValueBoolTrue(out)
 }
 
-//
 // Gets key's values as slice of string in the same section and subsection.
-//
 func (in *Ini) Gets(secName, subName, key string) (out []string) {
 	secName = strings.ToLower(secName)
 
@@ -586,18 +570,14 @@ func (in *Ini) Gets(secName, subName, key string) (out []string) {
 	return
 }
 
-//
 // GetsUniq key's values as slice of string in the same section and
 // subsection.
-//
 func (in *Ini) GetsUniq(secName, subName, key string, caseSensitive bool) (out []string) {
 	return libstrings.Uniq(in.Gets(secName, subName, key), caseSensitive)
 }
 
-//
 // Prune remove all empty lines, comments, and merge all section and
 // subsection with the same name into one group.
-//
 func (in *Ini) Prune() {
 	newSecs := make([]*Section, 0, len(in.secs))
 
@@ -632,9 +612,7 @@ func (in *Ini) Prune() {
 	in.secs = newSecs
 }
 
-//
 // mergeSection merge a section (and subsection) into slice.
-//
 func mergeSection(secs []*Section, newSec *Section) []*Section {
 	for x := 0; x < len(secs); x++ {
 		if secs[x].nameLower != newSec.nameLower {
@@ -655,19 +633,15 @@ func mergeSection(secs []*Section, newSec *Section) []*Section {
 	return secs
 }
 
-//
 // Rebase merge the other INI sections into this INI sections.
-//
 func (in *Ini) Rebase(other *Ini) {
 	for _, otherSec := range other.secs {
 		in.secs = mergeSection(in.secs, otherSec)
 	}
 }
 
-//
 // Save the current parsed Ini into file `filename`. It will overwrite the
 // destination file if it's exist.
-//
 func (in *Ini) Save(filename string) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -682,12 +656,10 @@ func (in *Ini) Save(filename string) (err error) {
 	return f.Close()
 }
 
-//
 // Subs return all non empty subsections (and its variable) that have the same
 // section name.
 //
 // This function is shortcut to be used in templating.
-//
 func (in *Ini) Subs(secName string) (subs []*Section) {
 	if len(secName) == 0 {
 		return
@@ -712,7 +684,6 @@ func (in *Ini) Subs(secName string) (subs []*Section) {
 	return subs
 }
 
-//
 // Val return the last variable value using a string as combination of
 // section, subsection, and key with ":" as separator.  If key not found, it
 // will return empty string.
@@ -723,7 +694,6 @@ func (in *Ini) Subs(secName string) (subs []*Section) {
 //	V("s:sub:k")
 //
 // This function is shortcut to be used in templating.
-//
 func (in *Ini) Val(keyPath string) (val string) {
 	keys := strings.Split(keyPath, ":")
 	if len(keys) != 3 {
@@ -735,7 +705,6 @@ func (in *Ini) Val(keyPath string) (val string) {
 	return
 }
 
-//
 // Vals return all values as slice of string.
 // The keyPath is combination of section, subsection, and key using colon ":"
 // as separator.
@@ -747,7 +716,6 @@ func (in *Ini) Val(keyPath string) (val string) {
 //	Vals("s:sub:k")
 //
 // This function is shortcut to be used in templating.
-//
 func (in *Ini) Vals(keyPath string) (vals []string) {
 	keys := strings.Split(keyPath, ":")
 	if len(keys) != 3 {
@@ -759,20 +727,16 @@ func (in *Ini) Vals(keyPath string) (vals []string) {
 	return
 }
 
-//
 // ValsUniq return all values as slice of string without any duplication.
-//
 func (in *Ini) ValsUniq(keyPath string, caseSensitive bool) (vals []string) {
 	return libstrings.Uniq(in.Vals(keyPath), caseSensitive)
 }
 
-//
 // Vars return all variables in section and/or subsection as map of string.
 // If there is a duplicate in key's name, only the last key value that will be
 // store on map value.
 //
 // This method is a shortcut that can be used in templating.
-//
 func (in *Ini) Vars(sectionPath string) (vars map[string]string) {
 	names := strings.Split(sectionPath, ":")
 	switch len(names) {
@@ -793,9 +757,7 @@ func (in *Ini) Vars(sectionPath string) (vars map[string]string) {
 	return
 }
 
-//
 // Write the current parsed Ini into writer `w`.
-//
 func (in *Ini) Write(w io.Writer) (err error) {
 	var (
 		endWithVar bool
@@ -825,11 +787,9 @@ func (in *Ini) Write(w io.Writer) (err error) {
 	return
 }
 
-//
 // getSection return the last section that have the same name and/or with
 // subsection's name.
 // Section's name MUST have in lowercase.
-//
 func (in *Ini) getSection(secName, subName string) *Section {
 	x := len(in.secs) - 1
 	for ; x >= 0; x-- {

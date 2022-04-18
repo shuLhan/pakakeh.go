@@ -290,6 +290,9 @@ func ExampleMarshal_map() {
 
 		MapStruct    map[string]U  `ini:"mapStruct"`
 		MapPtrStruct map[string]*U `ini:"mapPtrStruct"`
+
+		// This field should not marshaled.
+		unMapStruct map[string]U `ini:"unmapstruct"`
 	}
 
 	var (
@@ -334,6 +337,12 @@ func ExampleMarshal_map() {
 					Int:    2,
 				},
 			},
+			unMapStruct: map[string]U{
+				"struct-key-1": {
+					String: "struct-1-string",
+					Int:    1,
+				},
+			},
 		}
 
 		iniText []byte
@@ -376,6 +385,73 @@ func ExampleMarshal_map() {
 	//[mapptrstruct "ptr-struct-key-2"]
 	//string = struct-2-string
 	//int = 2
+}
+
+func ExampleMarshal_struct() {
+	type U struct {
+		String string `ini:"::string"`
+		Int    int    `ini:"::int"`
+	}
+	type ADT struct {
+		Time        time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+		PtrStruct   *U        `ini:"pointer:struct"`
+		SliceStruct []U       `ini:"slice:OfStruct"`
+		Struct      U         `ini:"section:struct"`
+		unexported  U         `ini:"unexported"` // This field should not be marshaled.
+	}
+	var (
+		t = ADT{
+			Time: time.Date(2006, 1, 2, 15, 4, 5, 0, time.UTC),
+			PtrStruct: &U{
+				String: "PtrStruct.String",
+				Int:    1,
+			},
+			SliceStruct: []U{{
+				String: "slice-struct-1",
+				Int:    2,
+			}, {
+				String: "slice-struct-2",
+				Int:    3,
+			}},
+			Struct: U{
+				String: "b",
+				Int:    4,
+			},
+			unexported: U{
+				String: "unexported",
+				Int:    5,
+			},
+		}
+
+		iniText []byte
+		err     error
+	)
+
+	iniText, err = Marshal(&t)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(iniText))
+	//Output:
+	//[section]
+	//time = 2006-01-02 15:04:05
+	//
+	//[pointer "struct"]
+	//string = PtrStruct.String
+	//int = 1
+	//
+	//[slice "OfStruct"]
+	//string = slice-struct-1
+	//int = 2
+	//
+	//[slice "OfStruct"]
+	//string = slice-struct-2
+	//int = 3
+	//
+	//[section "struct"]
+	//string = b
+	//int = 4
 }
 
 func ExampleUnmarshal() {
@@ -533,6 +609,67 @@ int = 2
 	//MapStruct: map[struct-key-1:{struct-1-string 1} struct-key-2:{struct-2-string 2}]
 	//MapPtrStruct: struct-key-1: &{struct-1-string 1}
 	//MapPtrStruct: struct-key-2: &{struct-2-string 2}
+}
+
+func ExampleUnmarshal_struct() {
+	type U struct {
+		String string `ini:"::string"`
+		Int    int    `ini:"::int"`
+	}
+
+	type ADT struct {
+		Time        time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+		PtrStruct   *U        `ini:"pointer:struct"`
+		SliceStruct []U       `ini:"slice:OfStruct"`
+		Struct      U         `ini:"section:struct"`
+		unexported  U         `ini:"unexported"`
+	}
+
+	var (
+		iniText = `
+[section]
+time = 2006-01-02 15:04:05
+
+[pointer "struct"]
+string = PtrStruct.String
+int = 1
+
+[slice "OfStruct"]
+string = slice-struct-1
+int = 2
+
+[slice "OfStruct"]
+string = slice-struct-2
+int = 3
+
+[section "struct"]
+string = struct
+int = 4
+
+[unexported]
+string = should not unmarshaled
+int = 5
+`
+		t   = ADT{}
+		err error
+	)
+
+	err = Unmarshal([]byte(iniText), &t)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Time: %v\n", t.Time)
+	fmt.Printf("PtrStruct: %v\n", t.PtrStruct)
+	fmt.Printf("SliceStruct: %v\n", t.SliceStruct)
+	fmt.Printf("Struct: %v\n", t.Struct)
+	fmt.Printf("unexported: %v\n", t.unexported)
+	//Output:
+	//Time: 2006-01-02 15:04:05 +0000 UTC
+	//PtrStruct: &{PtrStruct.String 1}
+	//SliceStruct: [{slice-struct-1 2} {slice-struct-2 3}]
+	//Struct: {struct 4}
+	//unexported: { 0}
 }
 
 func ExampleIni_Prune() {
