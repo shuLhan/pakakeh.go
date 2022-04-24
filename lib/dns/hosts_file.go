@@ -1,3 +1,7 @@
+// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package dns
 
 import (
@@ -7,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	libio "github.com/shuLhan/share/lib/io"
 )
@@ -18,9 +23,7 @@ const (
 	defaultTTL       = 604800 // 7 days
 )
 
-//
 // HostsFile represent content of single hosts file.
-//
 type HostsFile struct {
 	out     *os.File
 	Path    string `json:"-"`
@@ -28,9 +31,7 @@ type HostsFile struct {
 	Records []*ResourceRecord `json:"-"`
 }
 
-//
 // NewHostsFile create and store the host records in file defined by "path".
-//
 func NewHostsFile(path string, records []*ResourceRecord) (
 	hfile *HostsFile, err error,
 ) {
@@ -45,9 +46,7 @@ func NewHostsFile(path string, records []*ResourceRecord) (
 	return hfile, err
 }
 
-//
 // GetSystemHosts return path to system hosts file.
-//
 func GetSystemHosts() string {
 	if runtime.GOOS == "windows" {
 		return HostsFileWindows
@@ -55,12 +54,10 @@ func GetSystemHosts() string {
 	return HostsFilePOSIX
 }
 
-//
 // LoadHostsDir load all of hosts formatted files inside a directory.
 // On success, it will return map of filename and the content of hosts file as
 // list of Message.
 // On fail, it will return partial loadeded hosts files and an error.
-//
 func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 	if len(dir) == 0 {
 		return nil, nil
@@ -112,10 +109,8 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 	return hostsFiles, nil
 }
 
-//
 // ParseHostsFile parse the content of hosts file as packed DNS message.
 // If path is empty, it will load from the system hosts file.
-//
 func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 	if len(path) == 0 {
 		path = GetSystemHosts()
@@ -135,7 +130,6 @@ func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 	return hfile, nil
 }
 
-//
 // Fields of the entry are separated by any number of blanks and/or tab
 // characters.
 // Text from a "#" character until the end of the line is a comment, and is
@@ -148,7 +142,6 @@ func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 // shorter hostnames, or generic hostnames (for example, localhost). [1]
 //
 // [1] man 5 hosts
-//
 func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 	var (
 		seps  = []byte{'\t', '\v', ' '}
@@ -215,9 +208,7 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 	return listRR
 }
 
-//
 // AppendAndSaveRecord append new record and save it to hosts file.
-//
 func (hfile *HostsFile) AppendAndSaveRecord(rr *ResourceRecord) (err error) {
 	f, err := os.OpenFile(
 		hfile.Path,
@@ -247,16 +238,48 @@ func (hfile *HostsFile) AppendAndSaveRecord(rr *ResourceRecord) (err error) {
 	return err
 }
 
-//
 // Delete the hosts file from the storage.
-//
 func (hfile *HostsFile) Delete() (err error) {
 	return os.RemoveAll(hfile.Path)
 }
 
+// Get the first resource record that match with domain name and/or value.
+// The value parameter is optional, if its empty, then only the first record
+// that match with domain name that will be returned.
 //
+// If no record matched, it will return nil.
+func (hfile *HostsFile) Get(dname, value string) (rr *ResourceRecord) {
+	var (
+		rrValue string
+		ok      bool
+	)
+
+	dname = strings.ToLower(dname)
+
+	if len(value) != 0 {
+		value = strings.ToLower(value)
+	}
+
+	for _, rr = range hfile.Records {
+		if rr.Name != dname {
+			continue
+		}
+		if len(value) == 0 {
+			return rr
+		}
+		rrValue, ok = rr.Value.(string)
+		if !ok {
+			continue
+		}
+		if rrValue != value {
+			continue
+		}
+		return rr
+	}
+	return nil
+}
+
 // Names return all hosts domain names.
-//
 func (hfile *HostsFile) Names() (names []string) {
 	names = make([]string, 0, len(hfile.Records))
 
@@ -267,10 +290,8 @@ func (hfile *HostsFile) Names() (names []string) {
 	return names
 }
 
-//
 // RemoveRecord remove single record from hosts file by domain name.
 // It will return true if record found and removed.
-//
 func (hfile *HostsFile) RemoveRecord(dname string) bool {
 	for x := 0; x < len(hfile.Records); x++ {
 		if hfile.Records[x].Name != dname {
@@ -284,9 +305,7 @@ func (hfile *HostsFile) RemoveRecord(dname string) bool {
 	return false
 }
 
-//
 // Save the hosts records into the file defined by field "Path".
-//
 func (hfile *HostsFile) Save() (err error) {
 	if hfile.out == nil {
 		hfile.out, err = os.OpenFile(
