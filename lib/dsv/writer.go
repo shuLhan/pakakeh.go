@@ -24,10 +24,8 @@ const (
 	DefEscape = "\\"
 )
 
-//
 // Writer write records from reader or slice using format configuration in
 // metadata.
-//
 type Writer struct {
 	Config `json:"-"`
 	// Output file where the records will be written.
@@ -40,10 +38,8 @@ type Writer struct {
 	BufWriter *bufio.Writer
 }
 
-//
 // NewWriter create a writer object.
 // User must call Open after that to populate the output and metadata.
-//
 func NewWriter(config string) (writer *Writer, e error) {
 	writer = &Writer{
 		Output:         "",
@@ -64,30 +60,22 @@ func NewWriter(config string) (writer *Writer, e error) {
 	return
 }
 
-//
 // GetOutput return output filename.
-//
 func (writer *Writer) GetOutput() string {
 	return writer.Output
 }
 
-//
 // SetOutput will set the output file to path.
-//
 func (writer *Writer) SetOutput(path string) {
 	writer.Output = path
 }
 
-//
 // AddMetadata will add new output metadata to writer.
-//
 func (writer *Writer) AddMetadata(md Metadata) {
 	writer.OutputMetadata = append(writer.OutputMetadata, md)
 }
 
-//
 // open a generic method to open output file with specific flag.
-//
 func (writer *Writer) open(file string, flag int) (e error) {
 	if file == "" {
 		if writer.Output == "" {
@@ -107,17 +95,13 @@ func (writer *Writer) open(file string, flag int) (e error) {
 	return nil
 }
 
-//
 // OpenOutput file and buffered writer.
 // File will be truncated if its exist.
-//
 func (writer *Writer) OpenOutput(file string) (e error) {
 	return writer.open(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY)
 }
 
-//
 // ReopenOutput will open the output file back without truncating the content.
-//
 func (writer *Writer) ReopenOutput(file string) (e error) {
 	if e = writer.Close(); e != nil {
 		return
@@ -125,16 +109,12 @@ func (writer *Writer) ReopenOutput(file string) (e error) {
 	return writer.open(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY)
 }
 
-//
 // Flush output buffer to disk.
-//
 func (writer *Writer) Flush() error {
 	return writer.BufWriter.Flush()
 }
 
-//
 // Close all open descriptor.
-//
 func (writer *Writer) Close() (e error) {
 	if nil != writer.BufWriter {
 		e = writer.BufWriter.Flush()
@@ -148,9 +128,7 @@ func (writer *Writer) Close() (e error) {
 	return
 }
 
-//
 // WriteRow dump content of Row to file using format in metadata.
-//
 func (writer *Writer) WriteRow(row *tabula.Row, recordMd []MetadataInterface) (
 	e error,
 ) {
@@ -215,11 +193,9 @@ func (writer *Writer) WriteRow(row *tabula.Row, recordMd []MetadataInterface) (
 	return e
 }
 
-//
 // WriteRows will loop each row in the list of rows and write their content to
 // output file.
 // Return n for number of row written, and e if error happened.
-//
 func (writer *Writer) WriteRows(rows tabula.Rows, recordMd []MetadataInterface) (
 	n int,
 	e error,
@@ -235,10 +211,8 @@ func (writer *Writer) WriteRows(rows tabula.Rows, recordMd []MetadataInterface) 
 	return
 }
 
-//
 // WriteColumns will write content of columns to output file.
 // Return n for number of row written, and e if error happened.
-//
 func (writer *Writer) WriteColumns(columns tabula.Columns,
 	colMd []MetadataInterface,
 ) (
@@ -308,9 +282,7 @@ err:
 	return n, e
 }
 
-//
 // WriteRawRow will write row data using separator `sep` for each record.
-//
 func (writer *Writer) WriteRawRow(row *tabula.Row, sep, esc []byte) (e error) {
 	if sep == nil {
 		sep = []byte(DefSeparator)
@@ -343,11 +315,9 @@ func (writer *Writer) WriteRawRow(row *tabula.Row, sep, esc []byte) (e error) {
 	return e
 }
 
-//
 // WriteRawRows write rows data using separator `sep` for each record.
 // We use pointer in separator parameter, so we can use empty string as
 // separator.
-//
 func (writer *Writer) WriteRawRows(rows *tabula.Rows, sep *string) (
 	nrow int,
 	e error,
@@ -376,13 +346,11 @@ func (writer *Writer) WriteRawRows(rows *tabula.Rows, sep *string) (
 	return x, e
 }
 
-//
 // WriteRawColumns write raw columns using separator `sep` for each record to
 // file.
 //
 // We use pointer in separator parameter, so we can use empty string as
 // separator.
-//
 func (writer *Writer) WriteRawColumns(cols *tabula.Columns, sep *string) (
 	nrow int,
 	e error,
@@ -432,13 +400,11 @@ func (writer *Writer) WriteRawColumns(cols *tabula.Columns, sep *string) (
 	return x, e
 }
 
-//
 // WriteRawDataset will write content of dataset to file without metadata but
 // using separator `sep` for each record.
 //
 // We use pointer in separator parameter, so we can use empty string as
 // separator.
-//
 func (writer *Writer) WriteRawDataset(dataset tabula.DatasetInterface,
 	sep *string,
 ) (
@@ -470,10 +436,8 @@ func (writer *Writer) WriteRawDataset(dataset tabula.DatasetInterface,
 	return writer.WriteRawRows(rows, sep)
 }
 
-//
 // Write rows from Reader to file.
 // Return n for number of row written, or e if error happened.
-//
 func (writer *Writer) Write(reader ReaderInterface) (int, error) {
 	if nil == reader {
 		return 0, ErrNilReader
@@ -499,9 +463,7 @@ func (writer *Writer) Write(reader ReaderInterface) (int, error) {
 	return writer.WriteRows(*rows, reader.GetInputMetadata())
 }
 
-//
 // String yes, it will print it in JSON like format.
-//
 func (writer *Writer) String() string {
 	r, e := json.MarshalIndent(writer, "", "\t")
 

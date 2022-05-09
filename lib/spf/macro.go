@@ -59,12 +59,10 @@ func macroExpand(ref *Result, mode string, data []byte) (out []byte, err error) 
 	return m.out, nil
 }
 
-//
 // isDelimiter will return true if value of character c is one of delimiter
 // in,
 //
 //	delimiter = "." / "-" / "+" / "," / "/" / "_" / "="
-//
 func isDelimiter(c byte) bool {
 	if c == '.' || c == '-' || c == '+' || c == ',' || c == '/' || c == '_' || c == '=' {
 		return true
@@ -72,7 +70,6 @@ func isDelimiter(c byte) bool {
 	return false
 }
 
-//
 // isMacroLetter will return true if value of character c is one of the valid
 // letter for macro:
 //
@@ -80,7 +77,6 @@ func isDelimiter(c byte) bool {
 //	                   "c" / "r" / "t"
 //
 // Letter "c", "r", and "t" only valid if modifier is "exp".
-//
 func isMacroLetter(mode string, c byte) bool {
 	if c == macroSender || c == macroSenderLocal ||
 		c == macroSenderDomain || c == macroDomain || c == macroIP ||
@@ -270,10 +266,8 @@ func (m *macro) expandLetter() (value []byte) {
 	return value
 }
 
-//
 // reverseValues reverse the items in slices.  For example, "[a b]" would
 // become "[b a]".
-//
 func reverseValues(in [][]byte) (out [][]byte) {
 	out = make([][]byte, 0, len(in))
 	for x := len(in) - 1; x >= 0; x-- {
@@ -282,10 +276,8 @@ func reverseValues(in [][]byte) (out [][]byte) {
 	return
 }
 
-//
 // chopRight take n items from input slice.  If input length less than n,
 // return all of them.
-//
 func chopRight(in [][]byte, n int) (out [][]byte) {
 	if len(in) < n {
 		return in
@@ -299,11 +291,9 @@ func chopRight(in [][]byte, n int) (out [][]byte) {
 	return
 }
 
-//
 // toDotIP convert the IP address into dotted format.  For IPv4, it will
 // return the usual IP address, while for IPv6 it will split each hexa numbers
 // into dot.
-//
 func toDotIP(ip net.IP) []byte {
 	if libnet.IsIPv4(ip) {
 		return []byte(ip.String())

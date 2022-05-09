@@ -4,17 +4,13 @@
 
 package dns
 
-//
 // answers contains list of answer with the same query name but different
 // query types.
-//
 type answers struct {
 	v []*Answer
 }
 
-//
 // newAnswers create and initialize list of answer with one element.
-//
 func newAnswers(an *Answer) (ans *answers) {
 	ans = &answers{
 		v: make([]*Answer, 0, 1),
@@ -25,11 +21,9 @@ func newAnswers(an *Answer) (ans *answers) {
 	return
 }
 
-//
 // get an answer with specific query type and class in slice.
 // If found, it will return its element and index in slice; otherwise it will
 // return nil on answer.
-//
 func (ans *answers) get(rtype RecordType, rclass RecordClass) (an *Answer, x int) {
 	for x = 0; x < len(ans.v); x++ {
 		if ans.v[x].RType != rtype {
@@ -45,9 +39,7 @@ func (ans *answers) get(rtype RecordType, rclass RecordClass) (an *Answer, x int
 	return
 }
 
-//
 // remove the answer from list.
-//
 func (ans *answers) remove(rtype RecordType, rclass RecordClass) {
 	an, x := ans.get(rtype, rclass)
 	if an != nil {
@@ -57,11 +49,9 @@ func (ans *answers) remove(rtype RecordType, rclass RecordClass) {
 	}
 }
 
-//
 // upsert update or insert new answer to list.
 // If new answer is updated, it will return the old answer.
 // If new answer is inserted, it will return nil instead.
-//
 func (ans *answers) upsert(nu *Answer) (an *Answer) {
 	if nu == nil || nu.msg == nil {
 		return

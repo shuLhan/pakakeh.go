@@ -71,11 +71,9 @@ func init() {
 	}
 }
 
-//
 // CheckHost fetches SPF records, parses them, and evaluates them to determine
 // whether a particular host is or is not permitted to send mail with a given
 // identity.
-//
 func CheckHost(ip net.IP, domain, sender, hostname string) (result *Result) {
 	at := strings.Index(sender, "@")
 	if at == -1 {

@@ -17,9 +17,7 @@ type Response struct {
 	Param *Value
 }
 
-//
 // MarshalText encode the Response instance into XML text.
-//
 func (resp *Response) MarshalText() (out []byte, err error) {
 	var buf bytes.Buffer
 
@@ -103,16 +101,12 @@ func (resp *Response) UnmarshalText(text []byte) (err error) {
 	return nil
 }
 
-//
 // Unwrap return the error as instance of *liberror.E.
-//
 func (resp *Response) Unwrap() (err error) {
 	return &resp.E
 }
 
-//
 // unmarshalFault parse the XML fault error code and message.
-//
 func (resp *Response) unmarshalFault(dec *xml.Decoder) (err error) {
 	v, err := xmlParseValue(dec, elNameFault)
 	if err != nil {

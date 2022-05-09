@@ -12,9 +12,7 @@ const (
 	testdataSimpleRead = "testdata/config_simpleread.dsv"
 )
 
-//
 // doInit create read-write object.
-//
 func doInit(t *testing.T, fcfg string) (rw *ReadWriter, e error) {
 	// Initialize dsv
 	rw, e = New(fcfg, nil)
@@ -26,9 +24,7 @@ func doInit(t *testing.T, fcfg string) (rw *ReadWriter, e error) {
 	return
 }
 
-//
 // TestReadWriter test reading and writing DSV.
-//
 func TestReadWriter(t *testing.T) {
 	rw, _ := doInit(t, "testdata/config.dsv")
 
@@ -42,9 +38,7 @@ func TestReadWriter(t *testing.T) {
 	assertFile(t, rw.GetOutput(), "testdata/expected.dat")
 }
 
-//
 // TestReadWriter test reading and writing DSV.
-//
 func TestReadWriterAll(t *testing.T) {
 	rw, _ := doInit(t, "testdata/config.dsv")
 

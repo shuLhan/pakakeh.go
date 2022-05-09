@@ -27,9 +27,7 @@ type RDataMX struct {
 	Preference int16
 }
 
-//
 // initAndValidate initialize and validate the MX fields.
-//
 func (mx *RDataMX) initAndValidate() error {
 	if mx.Preference <= 0 {
 		mx.Preference = defMXPreference

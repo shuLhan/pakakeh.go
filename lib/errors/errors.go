@@ -10,7 +10,6 @@ import (
 	"reflect"
 )
 
-//
 // E define custom error that wrap underlying error with custom code, message,
 // and name.
 //
@@ -20,7 +19,6 @@ import (
 // The Name field is optional, intended to be consumed by program, for
 // example, to provide a key as translation of Message into user's locale
 // defined language.
-//
 type E struct {
 	Code    int    `json:"code,omitempty"`
 	Message string `json:"message,omitempty"`
@@ -28,9 +26,7 @@ type E struct {
 	err     error
 }
 
-//
 // Internal define an error caused by server.
-//
 func Internal(err error) *E {
 	return &E{
 		Code:    http.StatusInternalServerError,
@@ -40,9 +36,7 @@ func Internal(err error) *E {
 	}
 }
 
-//
 // InvalidInput generate an error for invalid input.
-//
 func InvalidInput(field string) *E {
 	return &E{
 		Code:    http.StatusBadRequest,
@@ -51,16 +45,12 @@ func InvalidInput(field string) *E {
 	}
 }
 
-//
 // Error implement the error interface.
-//
 func (e *E) Error() string {
 	return e.Message
 }
 
-//
 // As set the target to e only if only target is **E.
-//
 func (e *E) As(target interface{}) bool {
 	_, ok := target.(**E)
 	if ok {
@@ -71,9 +61,7 @@ func (e *E) As(target interface{}) bool {
 	return false
 }
 
-//
 // Unwrap return the internal error.
-//
 func (e *E) Unwrap() error {
 	return e.err
 }

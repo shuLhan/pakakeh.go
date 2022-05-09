@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Program client provide an example of chat client that connect to WebSocket
 // server.
 //
@@ -16,7 +15,6 @@
 //	$ go run . 3
 //
 // and start chatting with each others.
-//
 package main
 
 import (
@@ -39,9 +37,7 @@ type ChatClient struct {
 	conn *websocket.Client
 }
 
-//
 // NewChatClient create new WebSocket client using specific user's account.
-//
 func NewChatClient(user *examples.Account) (cc *ChatClient) {
 	cc = &ChatClient{
 		user: user,
@@ -69,9 +65,7 @@ func NewChatClient(user *examples.Account) (cc *ChatClient) {
 	return cc
 }
 
-//
 // Start the chat client.
-//
 func (cc *ChatClient) Start() {
 	req := &websocket.Request{
 		Method: http.MethodPost,
@@ -102,9 +96,7 @@ func (cc *ChatClient) Start() {
 	}
 }
 
-//
 // handleText process response from request or broadcast from server.
-//
 func (cc *ChatClient) handleText(cl *websocket.Client, frame *websocket.Frame) (err error) {
 	res := &websocket.Response{}
 

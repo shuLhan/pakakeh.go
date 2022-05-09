@@ -19,19 +19,17 @@ var (
 	}
 )
 
-//
 // Request define text payload format for client requesting resource on
 // server.
 //
 // Example of request format,
 //
-// 	{
-// 		"id": 1512459721269,
+//	{
+//		"id": 1512459721269,
 //		"method": "GET",
-// 		"target": "/v1/auth/login",
-// 		"body": "{ \"token\": \"xxx.yyy.zzz\" }"
-// 	}
-//
+//		"target": "/v1/auth/login",
+//		"body": "{ \"token\": \"xxx.yyy.zzz\" }"
+//	}
 type Request struct {
 	//
 	// Id is unique between request to differentiate multiple request
@@ -64,9 +62,7 @@ type Request struct {
 	Conn int
 }
 
-//
 // reset all Request field's value to zero.
-//
 func (req *Request) reset() {
 	req.ID = 0
 	req.Method = ""
@@ -77,9 +73,7 @@ func (req *Request) reset() {
 	req.Query = make(url.Values)
 }
 
-//
 // unpack the request, parse parameters and query from target.
-//
 func (req *Request) unpack(routes *rootRoute) (handler RouteHandler, err error) {
 	if len(req.Target) == 0 {
 		return

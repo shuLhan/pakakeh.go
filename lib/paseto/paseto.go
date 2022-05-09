@@ -2,37 +2,36 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package paseto provide a simple, ready to use, opinionated implementation
 // of Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in draft of
 // RFC 01 [1].
 //
-// Limitation
+// # Limitation
 //
 // This implementation only support PASETO Protocol v2.
 //
-// Local mode
+// # Local mode
 //
 // The local mode use crypto/rand package to generate random nonce and hashed
 // with blake2b.
 //
-// Public mode
+// # Public mode
 //
 // The public mode focus on signing and verifing data, everything else is
 // handled and filled automatically.
 //
 // Steps for sender when generating new token, the Pack() method,
 //
-//	* Prepare the JSON token claims, set
-//	** Issuer "iss" to PublicMode.our.ID
-//	** Subject "sub" to subject value from parameter
-//	** Audience "aud" to audience value from parameter
-//	** IssuedAt to current time
-//	** NotBefore to current time
-//	** ExpiredAt to current time + 60 seconds
-//	** Data field to base64 encoded of data value from parameter
-//	* Prepare the JSON footer, set
-//	** Key ID "kid" to PublicMode.our.ID
+//   - Prepare the JSON token claims, set
+//     ** Issuer "iss" to PublicMode.our.ID
+//     ** Subject "sub" to subject value from parameter
+//     ** Audience "aud" to audience value from parameter
+//     ** IssuedAt to current time
+//     ** NotBefore to current time
+//     ** ExpiredAt to current time + 60 seconds
+//     ** Data field to base64 encoded of data value from parameter
+//   - Prepare the JSON footer, set
+//     ** Key ID "kid" to PublicMode.our.ID
 //
 // The user's claims data is stored using key "data" inside the JSON token,
 // encoded using base64 (with padding).
@@ -72,25 +71,24 @@
 //
 // Step for receiver to process the token, the Unpack() method,
 //
-//	* Decode the token footer
-//	* Get the registered public key based on "kid" value in token footer
-//	** If no peers key exist matched with "kid" value, reject the token
-//	* Verify the token using the peer public key
-//	** If verification failed, reject the token
-//	* Validate the token
-//	** The Issuer must equal to peer ID
-//	** The Audience must equal to receiver ID
-//	** If the peer AllowedSubjects is not empty, the Subject must be in
-//	one of them
-//	** The current time must be after IssuedAt
-//	** The current time must be after NotBefore
-//	** The current time must be before ExpiredAt
-//	** If one of the above condition is not passed, it will return an error.
+//   - Decode the token footer
+//   - Get the registered public key based on "kid" value in token footer
+//     ** If no peers key exist matched with "kid" value, reject the token
+//   - Verify the token using the peer public key
+//     ** If verification failed, reject the token
+//   - Validate the token
+//     ** The Issuer must equal to peer ID
+//     ** The Audience must equal to receiver ID
+//     ** If the peer AllowedSubjects is not empty, the Subject must be in
+//     one of them
+//     ** The current time must be after IssuedAt
+//     ** The current time must be after NotBefore
+//     ** The current time must be before ExpiredAt
+//     ** If one of the above condition is not passed, it will return an error.
 //
-// References
+// # References
 //
 // [1] https://github.com/paragonie/paseto/blob/master/docs/RFC/draft-paragon-paseto-rfc-01.txt
-//
 package paseto
 
 import (
@@ -116,10 +114,8 @@ var (
 	headerModeLocal  = []byte("v2.local.")
 )
 
-//
 // Encrypt given the shared key, encrypt the plain message and generate the
 // "local" token with optional footer.
-//
 func Encrypt(aead cipher.AEAD, plain, footer []byte) (token string, err error) {
 	nonce := make([]byte, randNonceSize)
 	_, err = rand.Read(nonce)
@@ -186,10 +182,8 @@ func encrypt(aead cipher.AEAD, nonce, plain, footer []byte) (token string, err e
 	return buf.String(), nil
 }
 
-//
 // Decrypt given a shared key and encrypted token, decrypt the token to get
 // the message.
-//
 func Decrypt(aead cipher.AEAD, token string) (plain, footer []byte, err error) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) < 3 || len(pieces) > 4 {
@@ -234,11 +228,9 @@ func Decrypt(aead cipher.AEAD, token string) (plain, footer []byte, err error) {
 	return plain, footer, nil
 }
 
-//
 // Sign given an Ed25519 secret key "sk", a message "m", and optional footer
 // "f" (which defaults to empty string); sign the message "m" and generate the
 // public token.
-//
 func Sign(sk ed25519.PrivateKey, m, f []byte) (token string, err error) {
 	pieces := [][]byte{headerModePublic, m, f}
 
@@ -285,11 +277,9 @@ func Sign(sk ed25519.PrivateKey, m, f []byte) (token string, err error) {
 	return buf.String(), nil
 }
 
-//
 // Verify given a public key "pk", a signed message "sm" (that has been
 // decoded from base64), and optional footer "f" (also that has been decoded
 // from base64 string); verify that the signature is valid for the message.
-//
 func Verify(pk ed25519.PublicKey, sm, f []byte) (msg []byte, err error) {
 	if len(sm) <= 64 {
 		return nil, fmt.Errorf("invalid signed message length")

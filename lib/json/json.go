@@ -2,11 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package json provide a library for working with JSON.
 //
 // This is an extension to standard "encoding/json" package.
-//
 package json
 
 import (
@@ -31,7 +29,6 @@ const (
 	bTab         = '\t'
 )
 
-//
 // Escape the following character: `"` (quotation mark),
 // `\` (reverse solidus), `/` (solidus), `\b` (backspace), `\f` (formfeed),
 // `\n` (newline), `\r` (carriage return`), `\t` (horizontal tab), and control
@@ -40,7 +37,6 @@ const (
 // References:
 //
 // * https://tools.ietf.org/html/rfc7159#page-8
-//
 func Escape(in []byte) []byte {
 	var buf bytes.Buffer
 
@@ -86,16 +82,14 @@ func Escape(in []byte) []byte {
 	return buf.Bytes()
 }
 
-//
 // EscapeString escape the following character: `"` (quotation mark),
 // `\` (reverse solidus), `/` (solidus), `\b` (backspace), `\f` (formfeed),
 // `\n` (newline), `\r` (carriage return`), `\t` (horizontal tab), and control
 // character from 0 - 31.
 //
-// References
+// # References
 //
 // * https://tools.ietf.org/html/rfc7159#page-8
-//
 func EscapeString(in string) string {
 	if len(in) == 0 {
 		return in
@@ -107,13 +101,11 @@ func EscapeString(in string) string {
 	return string(outb)
 }
 
-//
 // ToMapStringFloat64 convert the map of string-interface{} into map of
 // string-float64.
 // This function convert the map's key to lower-cases and ignore zero value in
 // interface{}.
 // The interface{} value only accept basic numeric types and slice of byte.
-//
 func ToMapStringFloat64(in map[string]interface{}) (out map[string]float64, err error) {
 	out = make(map[string]float64, len(in))
 
@@ -164,14 +156,12 @@ func ToMapStringFloat64(in map[string]interface{}) (out map[string]float64, err 
 	return out, nil
 }
 
-//
 // Unescape JSON bytes, reversing what Escape function do.
 //
 // If strict is true, any unknown control character will be returned as error.
 // For example, in string "\x", "x" is not valid control character, and the
 // function will return empty string and error.
 // If strict is false, it will return "x".
-//
 func Unescape(in []byte, strict bool) ([]byte, error) {
 	var (
 		buf bytes.Buffer
@@ -255,14 +245,12 @@ func Unescape(in []byte, strict bool) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-//
 // UnescapeString unescape JSON string, reversing what EscapeString do.
 //
 // If strict is true, any unknown control character will be returned as error.
 // For example, in string "\x", "x" is not valid control character, and the
 // function will return empty string and error.
 // If strict is false, it will return "x".
-//
 func UnescapeString(in string, strict bool) (string, error) {
 	if len(in) == 0 {
 		return in, nil

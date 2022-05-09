@@ -22,10 +22,8 @@ func newPattern(s string) (pat *pattern) {
 	return pat
 }
 
-//
 // isMatch will return true if input string match with regex and isNegate is
 // false; otherwise it will return false.
-//
 func (pat *pattern) isMatch(s string) bool {
 	ok, err := filepath.Match(pat.value, s)
 	if err != nil {

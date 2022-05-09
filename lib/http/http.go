@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package http implement custom HTTP server with memory file system and
 // simplified routing handler.
 //
-// Problems
+// # Problems
 //
 // There are two problems that this library try to handle.
 // First, optimizing serving local file system; second, complexity of routing
@@ -43,7 +42,7 @@
 //
 // The step number 1, 2, 4 needs to be written for every handler of our API.
 //
-// Solutions
+// # Solutions
 //
 // The solution to the first problem is by mapping all content of files to be
 // served into memory.
@@ -98,7 +97,7 @@
 //		// Return response body and error.
 //	}
 //
-// Routing
+// # Routing
 //
 // The Endpoint allow binding the unique key into path using colon ":" as the
 // first character.
@@ -132,7 +131,7 @@
 //
 //	map[name:[book Hitchiker]]
 //
-// Callback error handling
+// # Callback error handling
 //
 // Each Endpoint can have their own error handler. If its nil, it will default
 // to DefaultErrorHandler, which return the error as JSON with the following
@@ -140,7 +139,7 @@
 //
 //	{"code":<HTTP_STATUS_CODE>,"message":<err.Error()>}
 //
-// Summary
+// # Summary
 //
 // The pseudocode below illustrate how Endpoint, Callback, and
 // CallbackErrorHandler works when the Server receive HTTP request,
@@ -176,7 +175,7 @@
 //		// contents in Memfs.
 //	}
 //
-// Known Bugs and Limitations
+// # Known Bugs and Limitations
 //
 // * The server does not handle CONNECT method
 //
@@ -185,7 +184,6 @@
 // * We can not register path with ambigous route.  For example, "/:x" and
 // "/y" are ambiguous because one is dynamic path using key binding "x" and
 // the last one is static path to "y".
-//
 package http
 
 import (
@@ -260,11 +258,9 @@ var (
 	ErrEndpointKeyEmpty = errors.New("empty route's key")
 )
 
-//
 // IPAddressOfRequest get the client IP address from HTTP request header
 // "X-Real-IP" or "X-Forwarded-For", which ever non-empty first.
 // If no headers present, use the default address.
-//
 func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
 	addr = headers.Get(HeaderXRealIp)
 	if len(addr) == 0 {
@@ -277,11 +273,9 @@ func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
 	return addr
 }
 
-//
 // ParseXForwardedFor parse the HTTP header "X-Forwarded-For" value from the
 // following format "client, proxy1, proxy2" into client address and list of
 // proxy addressess.
-//
 func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
 	if len(val) == 0 {
 		return "", nil
@@ -297,9 +291,7 @@ func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
 	return clientAddr, proxyAddrs
 }
 
-//
 // setHeaders set the request headers.
-//
 func setHeaders(req *http.Request, headers http.Header) {
 	for k, v := range headers {
 		for x, hv := range v {

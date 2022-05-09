@@ -10,7 +10,6 @@ import (
 	"github.com/shuLhan/share/lib/debug"
 )
 
-//
 // Table is for working with set of row.
 //
 // Each element in table is in the form of
@@ -19,12 +18,9 @@ import (
 //		[["a"],["b","c"],...], // Row
 //		[["x"],["y",z"],...]   // Row
 //	]
-//
 type Table []Row
 
-//
 // createIndent create n space indentation and return it.
-//
 func createIndent(n int) (s string) {
 	for i := 0; i < n; i++ {
 		s += " "
@@ -32,7 +28,6 @@ func createIndent(n int) (s string) {
 	return
 }
 
-//
 // Partition group the each element of slice "ss" into non-empty
 // record, in such a way that every element is included in one and only of the
 // record.
@@ -44,8 +39,7 @@ func createIndent(n int) (s string) {
 //
 // For more information see,
 //
-//	- https://en.wikipedia.org/wiki/Partition_of_a_set
-//
+//   - https://en.wikipedia.org/wiki/Partition_of_a_set
 func Partition(ss []string, k int) (table Table) {
 	n := len(ss)
 	seed := make([]string, n)
@@ -118,10 +112,8 @@ func Partition(ss []string, k int) (table Table) {
 	return table
 }
 
-//
 // SinglePartition create a table from a slice of string, where each element
 // in slice become a single record.
-//
 func SinglePartition(ss []string) Table {
 	table := make(Table, 0)
 	row := make(Row, len(ss))
@@ -135,11 +127,9 @@ func SinglePartition(ss []string) Table {
 	return table
 }
 
-//
 // IsEqual compare two table of string without regard to their order.
 //
 // Return true if both set is contains the same list, false otherwise.
-//
 func (table Table) IsEqual(other Table) bool {
 	if len(table) != len(other) {
 		return false
@@ -164,10 +154,8 @@ func (table Table) IsEqual(other Table) bool {
 	return true
 }
 
-//
 // JoinCombination for each row in table, generate new row and insert "s" into
 // different record in different new row.
-//
 func (table Table) JoinCombination(s string) (tout Table) {
 	for _, row := range table {
 		for y := 0; y < len(row); y++ {

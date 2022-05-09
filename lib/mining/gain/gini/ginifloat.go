@@ -11,7 +11,6 @@ import (
 	"github.com/shuLhan/share/lib/floats64"
 )
 
-//
 // ComputeContinuFloat Given an attribute A and the target attribute T which contain
 // N classes in C, compute the information gain of A.
 //
@@ -24,7 +23,6 @@ import (
 // (2) Create continu partition.
 // (3) Create temporary space for gini index and gini gain.
 // (4) Compute gini index for all target.
-//
 func (gini *Gini) ComputeContinuFloat(src, target, classes *[]float64) {
 	gini.IsContinu = true
 
@@ -51,13 +49,11 @@ func (gini *Gini) ComputeContinuFloat(src, target, classes *[]float64) {
 	gini.computeContinuGainFloat(src, target, classes)
 }
 
-//
 // computeFloat will compute Gini value for attribute "target".
 //
 // Gini value is computed using formula,
 //
 //	1 - sum (probability of each classes in target)
-//
 func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 	n := float64(len(*target))
 	if n == 0 {
@@ -81,7 +77,6 @@ func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 	return 1 - sump2
 }
 
-//
 // computeContinuGainFloat will compute gain for each partition.
 //
 // The Gini gain formula we used here is,
@@ -90,14 +85,13 @@ func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 //				+ (count(right)/S * Gini(right)))
 //
 // where,
-//	- left is sub-sample from S that is less than part value.
-//	- right is sub-sample from S that is greater than part value.
+//   - left is sub-sample from S that is less than part value.
+//   - right is sub-sample from S that is greater than part value.
 //
 // Algorithm,
 // (0) For each partition value,
 // (0.1) Find the split of samples between partition based on partition value.
 // (0.2) Count class in partition.
-//
 func (gini *Gini) computeContinuGainFloat(src, target, classes *[]float64) {
 	var gainLeft, gainRight float64
 	var tleft, tright []float64

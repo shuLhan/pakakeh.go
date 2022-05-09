@@ -2,13 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package microsoft implement Microsoft's Live contact API v1.0.
 //
-// Reference
+// # Reference
 //
 // - https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
-//
 package microsoft
 
 import (
@@ -24,10 +22,8 @@ const (
 	apiContactsURL = "https://graph.microsoft.com/v1.0/me/contacts"
 )
 
-//
 // ImportFromJSON will parse Microsoft Live's JSON contact response and return
 // list of contact on success.
-//
 func ImportFromJSON(jsonb []byte) (
 	contacts []*contact.Record,
 	err error,
@@ -47,9 +43,7 @@ func ImportFromJSON(jsonb []byte) (
 	return
 }
 
-//
 // ImportWithOAuth get Microsoft Live contacts using OAuth HTTP client.
-//
 func ImportWithOAuth(client *http.Client) (contacts []*contact.Record, err error) {
 	req, err := http.NewRequest(http.MethodGet, apiContactsURL, nil)
 	if err != nil {

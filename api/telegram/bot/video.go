@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // Video represents a video file.
-//
 type Video struct {
 	Document
 

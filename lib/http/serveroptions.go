@@ -14,9 +14,7 @@ import (
 	"github.com/shuLhan/share/lib/memfs"
 )
 
-//
 // ServerOptions define an options to initialize HTTP server.
-//
 type ServerOptions struct {
 	// Memfs contains the content of file systems to be served in memory.
 	// The MemFS instance to be served should be already embedded in Go

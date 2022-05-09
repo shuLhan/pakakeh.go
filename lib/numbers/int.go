@@ -9,12 +9,10 @@ import (
 	"time"
 )
 
-//
 // IntCreateSeq will create and return sequence of integer from `min` to
 // `max`.
 //
 // E.g. if min is 0 and max is 5 then it will return `[0 1 2 3 4 5]`.
-//
 func IntCreateSeq(min, max int) (seq []int) {
 	for ; min <= max; min++ {
 		seq = append(seq, min)
@@ -22,7 +20,6 @@ func IntCreateSeq(min, max int) (seq []int) {
 	return
 }
 
-//
 // IntPickRandPositive return random integer value from 0 to maximum value
 // `maxVal`.
 //
@@ -33,7 +30,6 @@ func IntCreateSeq(min, max int) (seq []int) {
 //
 // If excluding index `exsIds` is not empty, do not pick the integer value
 // listed in there.
-//
 func IntPickRandPositive(maxVal int, dup bool, pickedIds, exsIds []int) (
 	idx int,
 ) {

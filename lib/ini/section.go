@@ -10,11 +10,9 @@ import (
 	"strings"
 )
 
-//
 // Section represent section header in INI file format and their variables.
 //
 // Remember that section's name is case insensitive.
-//
 type Section struct {
 	name      string
 	sub       string
@@ -28,11 +26,9 @@ type Section struct {
 	lineNum int
 }
 
-//
 // newSection will create new section with `name` and optional subsection
 // `subName`.
 // If section `name` is empty, it will return nil.
-//
 func newSection(name, subName string) (sec *Section) {
 	if len(name) == 0 {
 		return
@@ -53,23 +49,17 @@ func newSection(name, subName string) (sec *Section) {
 	return
 }
 
-//
 // Name return the section's name.
-//
 func (sec *Section) Name() string {
 	return sec.name
 }
 
-//
 // SubName return subsection's name.
-//
 func (sec *Section) SubName() string {
 	return sec.sub
 }
 
-//
 // String return formatted INI section header.
-//
 func (sec *Section) String() string {
 	var buf bytes.Buffer
 
@@ -103,23 +93,18 @@ func (sec *Section) String() string {
 	return buf.String()
 }
 
-//
 // Val return the last defined variable key in section.
-//
 func (sec *Section) Val(key string) string {
 	val, _ := sec.get(key, "")
 	return val
 }
 
-//
 // Vals return all variables in section as slice of string.
-//
 func (sec *Section) Vals(key string) []string {
 	vals, _ := sec.gets(key, nil)
 	return vals
 }
 
-//
 // add append variable with `key` and `value` to current section.
 //
 // If key is empty, no variable will be appended.
@@ -128,7 +113,6 @@ func (sec *Section) Vals(key string) []string {
 //
 // It will return true if new variable is appended, otherwise it will return
 // false.
-//
 func (sec *Section) add(key, value string) bool {
 	if len(key) == 0 {
 		return false
@@ -167,12 +151,10 @@ func (sec *Section) add(key, value string) bool {
 	return true
 }
 
-//
 // addUniqValue add a new variable with uniq value to section.
 // If variable with the same key and value found, that variable will be moved
 // to end of list, to make the last declared variable still at the end of
 // list.
-//
 func (sec *Section) addUniqValue(key, value string) {
 	keyLower := strings.ToLower(key)
 	for x := 0; x < len(sec.vars); x++ {
@@ -207,10 +189,8 @@ func (sec *Section) addVariable(v *variable) {
 	sec.vars = append(sec.vars, v)
 }
 
-//
 // get will return the last variable value based on key.
 // If no key found it will return default value and false.
-//
 func (sec *Section) get(key, def string) (val string, ok bool) {
 	val = def
 	if len(sec.vars) == 0 || len(key) == 0 {
@@ -233,10 +213,8 @@ func (sec *Section) get(key, def string) (val string, ok bool) {
 	return
 }
 
-//
 // getVariable return the last variable that have the same key.
 // The key MUST have been converted to lowercase.
-//
 func (sec *Section) getVariable(key string) (idx int, v *variable) {
 	idx = len(sec.vars) - 1
 	for ; idx >= 0; idx-- {
@@ -252,11 +230,9 @@ func (sec *Section) getVariable(key string) (idx int, v *variable) {
 	return 0, nil
 }
 
-//
 // gets all variable values that have the same key under section from top to
 // bottom.
 // If no key found it will return default values and false.
-//
 func (sec *Section) gets(key string, defs []string) (vals []string, ok bool) {
 	if len(sec.vars) == 0 || len(key) == 0 {
 		return defs, false
@@ -274,10 +250,8 @@ func (sec *Section) gets(key string, defs []string) (vals []string, ok bool) {
 	return vals, true
 }
 
-//
 // merge other Section variables on this section, ignoring empty or comment
 // mode.
-//
 func (sec *Section) merge(other *Section) {
 	for x := 0; x < len(other.vars); x++ {
 		if !isLineModeVar(other.vars[x].mode) {
@@ -287,7 +261,6 @@ func (sec *Section) merge(other *Section) {
 	}
 }
 
-//
 // replaceAll change the value of variable reference with `key` into new
 // `value`. This is basically `unsetAll` and `Add`.
 //
@@ -295,17 +268,14 @@ func (sec *Section) merge(other *Section) {
 // added.
 // If section contains duplicate keys, all duplicate keys will be
 // removed, and replaced with one key only.
-//
 func (sec *Section) replaceAll(key, value string) {
 	sec.unsetAll(key)
 	sec.add(key, value)
 }
 
-//
 // set will replace variable with matching key with value.
 // The key MUST be not empty and has been converted to lowercase.
 // If value is empty, it will be set to true.
-//
 func (sec *Section) set(key, value string) bool {
 	if len(key) == 0 {
 		return false
@@ -329,12 +299,10 @@ func (sec *Section) set(key, value string) bool {
 	return true
 }
 
-//
 // unset remove the last variable with name `key` on current section.
 //
 // On success, where a variable removed or one variable is removed, it will
 // return true, otherwise it will be removed.
-//
 func (sec *Section) unset(key string) bool {
 	if len(key) == 0 {
 		return false
@@ -354,9 +322,7 @@ func (sec *Section) unset(key string) bool {
 	return true
 }
 
-//
 // unsetAll remove all variables with `key`.
-//
 func (sec *Section) unsetAll(key string) {
 	if len(key) == 0 {
 		return

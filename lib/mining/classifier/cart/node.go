@@ -9,9 +9,7 @@ import (
 	"reflect"
 )
 
-//
 // NodeValue of tree in CART.
-//
 type NodeValue struct {
 	// Class of leaf node.
 	Class string
@@ -29,9 +27,7 @@ type NodeValue struct {
 	SplitV interface{}
 }
 
-//
 // String will return the value of node for printable.
-//
 func (nodev *NodeValue) String() (s string) {
 	if nodev.IsLeaf {
 		s = fmt.Sprintf("Class: %s", nodev.Class)

@@ -38,9 +38,7 @@ const (
 		"%s"
 )
 
-//
 // Server for websocket.
-//
 type Server struct {
 	Clients *ClientManager
 
@@ -68,10 +66,8 @@ type Server struct {
 	allowRsv3 bool
 }
 
-//
 // NewServer will create new web-socket server that listen on specific port
 // number.
-//
 func NewServer(opts *ServerOptions) (serv *Server) {
 	if opts == nil {
 		opts = &ServerOptions{}
@@ -96,7 +92,6 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 	return serv
 }
 
-//
 // AllowReservedBits allow receiving frame with RSV1, RSV2, or RSV3 bit set.
 // Calling this function means server has negotiated the extension that use
 // the reserved bits through handshake with client using HandleAuth.
@@ -104,7 +99,6 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 // If a nonzero value is received in reserved bits and none of the negotiated
 // extensions defines the meaning of such a nonzero value, server will close
 // the connection (RFC 6455, section 5.2).
-//
 func (serv *Server) AllowReservedBits(one, two, three bool) {
 	serv.allowRsv1 = one
 	serv.allowRsv2 = two
@@ -145,10 +139,8 @@ func (serv *Server) createSockServer() (err error) {
 	return
 }
 
-//
 // RegisterTextHandler register specific function to be called by server when
 // request opcode is text, and method and target matched with Request.
-//
 func (serv *Server) RegisterTextHandler(method, target string, handler RouteHandler) (err error) {
 	logp := "RegisterTextHandler"
 
@@ -181,14 +173,12 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 	unix.Close(conn)
 }
 
-//
 // handleUpgrade parse and validate websocket HTTP handshake from client.
 // If HandleAuth is not nil, the HTTP handshake will be passed to that
 // function to allow custom authentication.
 //
 // On success it will return the context from authentication and the WebSocket
 // key.
-//
 func (serv *Server) handleUpgrade(hs *Handshake) (
 	ctx context.Context, key []byte, err error,
 ) {
@@ -206,9 +196,7 @@ func (serv *Server) handleUpgrade(hs *Handshake) (
 	return ctx, key, err
 }
 
-//
 // clientAdd add the new client connection to epoll and to list of clients.
-//
 func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 	err = serv.poll.RegisterRead(conn)
 	if err != nil {
@@ -226,9 +214,7 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 	return nil
 }
 
-//
 // ClientRemove remove client connection from server.
-//
 func (serv *Server) ClientRemove(conn int) {
 	ctx, _ := serv.Clients.Context(conn)
 
@@ -309,7 +295,6 @@ func (serv *Server) upgrader() {
 	}
 }
 
-//
 // handleFragment will handle continuation frame (fragmentation).
 //
 // (RFC 6455 Section 5.4 Page 34)
@@ -334,7 +319,6 @@ func (serv *Server) upgrader() {
 // and the third fragment would have an opcode of 0x0 and a FIN bit
 // that is set.
 // (RFC 6455 Section 5.4 Page 34)
-//
 func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	frames, ok := serv.Clients.getFrames(conn)
 
@@ -394,9 +378,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 	return false
 }
 
-//
 // handleFrame handle a single frame from client.
-//
 func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 	if !frame.isValid(true, serv.allowRsv1, serv.allowRsv2, serv.allowRsv3) {
 		serv.handleBadRequest(conn)
@@ -434,9 +416,7 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 	return isClosing
 }
 
-//
 // handleText message from client.
-//
 func (serv *Server) handleText(conn int, payload []byte) {
 	var (
 		handler RouteHandler
@@ -496,10 +476,8 @@ out:
 	_resPool.Put(res)
 }
 
-//
 // handleBin message from client.  This is the dummy handler, that can be
 // overwritten by implementer.
-//
 func (serv *Server) handleBin(conn int, payload []byte) {}
 
 func (serv *Server) handleStatus(conn int) {
@@ -525,9 +503,7 @@ func (serv *Server) handleStatus(conn int) {
 	unix.Close(conn)
 }
 
-//
 // handleClose request from client.
-//
 func (serv *Server) handleClose(conn int, req *Frame) {
 	switch {
 	case req.closeCode == 0:
@@ -587,9 +563,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	serv.ClientRemove(conn)
 }
 
-//
 // handleBadRequest by sending Close frame with status.
-//
 func (serv *Server) handleBadRequest(conn int) {
 	frameClose := NewFrameClose(false, StatusBadRequest, nil)
 
@@ -606,9 +580,7 @@ func (serv *Server) handleBadRequest(conn int) {
 	serv.ClientRemove(conn)
 }
 
-//
 // handleInvalidData by sending Close frame with status 1007.
-//
 func (serv *Server) handleInvalidData(conn int) {
 	frameClose := NewFrameClose(false, StatusInvalidData, nil)
 
@@ -625,16 +597,14 @@ func (serv *Server) handleInvalidData(conn int) {
 	serv.ClientRemove(conn)
 }
 
-//
 // handlePing from client by sending pong response.
 //
-//```RFC6455
+// “`RFC6455
 // (5.5.3.P3)
 // A Pong frame sent in response to a Ping frame must have identical
 // "Application data" as found in the message body of the Ping frame
 // being replied to.
-//```
-//
+// “`
 func (serv *Server) handlePing(conn int, req *Frame) {
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n",
@@ -654,7 +624,6 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	}
 }
 
-//
 // reader read request from client.
 //
 // To avoid confusing network intermediaries (such as intercepting proxies)
@@ -665,7 +634,6 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 // connection upon receiving a frame that is not masked.  In this case, a
 // server MAY send a Close frame with a status code of 1002 (protocol error)
 // as defined in Section 7.4.1. (RFC 6455, section 5.1, P27).
-//
 func (serv *Server) reader() {
 	for {
 		fds, err := serv.poll.WaitRead()
@@ -738,10 +706,8 @@ func (serv *Server) reader() {
 	}
 }
 
-//
 // pinger is a routine that send control PING frame to all client connections
 // every N seconds.
-//
 func (serv *Server) pinger() {
 	pingTicker := time.NewTicker(16 * time.Second)
 	framePing := NewFramePing(false, nil)
@@ -765,9 +731,7 @@ func (serv *Server) pinger() {
 	}
 }
 
-//
 // Start accepting incoming connection from clients.
-//
 func (serv *Server) Start() (err error) {
 	err = serv.createSockServer()
 	if err != nil {
@@ -801,9 +765,7 @@ func (serv *Server) Start() (err error) {
 	}
 }
 
-//
 // Stop the server.
-//
 func (serv *Server) Stop() {
 	err := unix.Close(serv.sock)
 	if err != nil {
@@ -817,9 +779,7 @@ func (serv *Server) Stop() {
 	close(serv.chUpgrade)
 }
 
-//
 // sendResponse to client.
-//
 func (serv *Server) sendResponse(conn int, res *Response) (err error) {
 	resb, err := json.Marshal(res)
 	if err != nil {

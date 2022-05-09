@@ -4,11 +4,9 @@
 
 package google
 
-//
 // Feed define content of Google contacts feed metadata.
 //
 // Some of the fields are disabled for speed.
-//
 type Feed struct {
 	//XMLNS           string     `json:"xmlns,omitempty"`
 	//XMLNSOpenSearch string     `json:"xmlns$openSearch,omitempty"`

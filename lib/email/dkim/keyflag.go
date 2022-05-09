@@ -8,14 +8,10 @@ import (
 	"bytes"
 )
 
-//
 // KeyFlag define a type of key flag in DKIM key record.
-//
 type KeyFlag byte
 
-//
 // List of valid key flags.
-//
 const (
 	// KeyFlagTesting or "y" in text, indicate that domain is for testing
 	// DKIM.
@@ -26,10 +22,8 @@ const (
 	KeyFlagStrict
 )
 
-//
 // keyFlagNames contains mapping between key flag and their text
 // representation.
-//
 var keyFlagNames = map[KeyFlag]byte{
 	KeyFlagTesting: 'y',
 	KeyFlagStrict:  's',

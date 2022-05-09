@@ -2,19 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package contact provide a library to import contact from Google, Microsoft,
 // and Yahoo.
-//
 package contact
 
 import (
 	"strings"
 )
 
-//
 // Record define a single contact entity with sane format.
-//
 type Record struct {
 	Name        Name
 	Birthday    *Date
@@ -28,11 +24,8 @@ type Record struct {
 	JobTitle    string
 }
 
-//
 // SetBirthday will set contact birthday from string format "YYYY-MM-DD" or
 // "YYYY-MM-DDTHH:MM:SSZ".
-//
-//
 func (contact *Record) SetBirthday(dateStr string) {
 	if dateStr == "" {
 		return
@@ -54,9 +47,7 @@ func (contact *Record) SetBirthday(dateStr string) {
 	}
 }
 
-//
 // SetAnniversary will set contact annivery from string format "YYYY-MM-DD".
-//
 func (contact *Record) SetAnniversary(dateStr string) {
 	if dateStr == "" {
 		return

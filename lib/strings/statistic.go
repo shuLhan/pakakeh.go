@@ -12,9 +12,7 @@ import (
 	"github.com/shuLhan/share/lib/runes"
 )
 
-//
 // CountAlnum return number of alpha-numeric character in text.
-//
 func CountAlnum(text string) (n int) {
 	if len(text) == 0 {
 		return
@@ -28,13 +26,11 @@ func CountAlnum(text string) (n int) {
 	return
 }
 
-//
 // CountAlnumDistribution count distribution of alpha-numeric characters in
 // text.
 //
 // Example, given a text "abbcccddddeeeee", it will return [a b c d e] and
 // [1 2 3 4 5].
-//
 func CountAlnumDistribution(text string) (chars []rune, counts []int) {
 	var found bool
 
@@ -58,10 +54,8 @@ func CountAlnumDistribution(text string) (chars []rune, counts []int) {
 	return
 }
 
-//
 // CountCharSequence given a string, count number of repeated character more
 // than one in sequence and return list of characters and their counts.
-//
 func CountCharSequence(text string) (chars []rune, counts []int) {
 	var lastv rune
 	count := 1
@@ -86,9 +80,7 @@ func CountCharSequence(text string) (chars []rune, counts []int) {
 	return
 }
 
-//
 // CountDigit return number of digit in text.
-//
 func CountDigit(text string) (n int) {
 	if len(text) == 0 {
 		return 0
@@ -102,11 +94,9 @@ func CountDigit(text string) (n int) {
 	return
 }
 
-//
 // CountNonAlnum return number of non alpha-numeric character in text.
 // If `withspace` is true, it will be counted as non-alpha-numeric, if it
 // false it will be ignored.
-//
 func CountNonAlnum(text string, withspace bool) (n int) {
 	if len(text) == 0 {
 		return
@@ -127,9 +117,7 @@ func CountNonAlnum(text string, withspace bool) (n int) {
 	return
 }
 
-//
 // CountUniqChar count number of character in text without duplication.
-//
 func CountUniqChar(text string) (n int) {
 	if len(text) == 0 {
 		return
@@ -148,9 +136,7 @@ func CountUniqChar(text string) (n int) {
 	return
 }
 
-//
 // CountUpperLower return number of uppercase and lowercase in text.
-//
 func CountUpperLower(text string) (upper, lower int) {
 	for _, v := range text {
 		if !unicode.IsLetter(v) {
@@ -165,9 +151,7 @@ func CountUpperLower(text string) (upper, lower int) {
 	return
 }
 
-//
 // MaxCharSequence return character which have maximum sequence in `text`.
-//
 func MaxCharSequence(text string) (rune, int) {
 	if len(text) == 0 {
 		return 0, 0
@@ -184,10 +168,8 @@ func MaxCharSequence(text string) (rune, int) {
 	return chars[idx], counts[idx]
 }
 
-//
 // RatioAlnum compute and return ratio of alpha-numeric within all character
 // in text.
-//
 func RatioAlnum(text string) float64 {
 	textlen := len(text)
 	if textlen == 0 {
@@ -199,9 +181,7 @@ func RatioAlnum(text string) float64 {
 	return float64(n) / float64(textlen)
 }
 
-//
 // RatioDigit compute and return digit ratio to all characters in text.
-//
 func RatioDigit(text string) float64 {
 	textlen := len(text)
 
@@ -218,10 +198,8 @@ func RatioDigit(text string) float64 {
 	return float64(n) / float64(textlen)
 }
 
-//
 // RatioUpper compute and return ratio of uppercase character to all character
 // in text.
-//
 func RatioUpper(text string) float64 {
 	if len(text) == 0 {
 		return 0
@@ -236,13 +214,11 @@ func RatioUpper(text string) float64 {
 	return float64(up) / float64(total)
 }
 
-//
 // RatioNonAlnum return ratio of non-alphanumeric character to all
 // character in text.
 //
 // If `withspace` is true then white-space character will be counted as
 // non-alpha numeric, otherwise it will be skipped.
-//
 func RatioNonAlnum(text string, withspace bool) float64 {
 	textlen := len(text)
 	if textlen == 0 {
@@ -254,10 +230,8 @@ func RatioNonAlnum(text string, withspace bool) float64 {
 	return float64(n) / float64(textlen)
 }
 
-//
 // RatioUpperLower compute and return ratio of uppercase with lowercase
 // character in text.
-//
 func RatioUpperLower(text string) float64 {
 	if len(text) == 0 {
 		return 0
@@ -272,10 +246,8 @@ func RatioUpperLower(text string) float64 {
 	return float64(up) / float64(lo)
 }
 
-//
 // TextSumCountTokens given a text, count how many tokens inside of it and
 // return sum of all counts.
-//
 func TextSumCountTokens(text string, tokens []string, sensitive bool) (
 	cnt int,
 ) {
@@ -297,10 +269,8 @@ func TextSumCountTokens(text string, tokens []string, sensitive bool) (
 	return
 }
 
-//
 // TextFrequencyOfTokens return frequencies of tokens by counting each
 // occurrence of token and divide it with total words in text.
-//
 func TextFrequencyOfTokens(text string, tokens []string, sensitive bool) (
 	freq float64,
 ) {

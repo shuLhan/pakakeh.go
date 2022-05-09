@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // WebhookInfo contains information about the current status of a webhook.
-//
 type WebhookInfo struct {
 	// Webhook URL, may be empty if webhook is not set up.
 	URL string `json:"url"`

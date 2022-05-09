@@ -14,9 +14,7 @@ import (
 	"time"
 )
 
-//
 // Key represent a DKIM key record.
-//
 type Key struct {
 	// REQUIRED fields.
 
@@ -62,10 +60,8 @@ type Key struct {
 	ExpiredAt int64
 }
 
-//
 // LookupKey DKIM (public) key using specific query method and DKIM domain
 // name (selector plus SDID).
-//
 func LookupKey(qmethod QueryMethod, dname string) (key *Key, err error) {
 	if len(dname) == 0 {
 		return nil, nil
@@ -76,9 +72,7 @@ func LookupKey(qmethod QueryMethod, dname string) (key *Key, err error) {
 	return key, err
 }
 
-//
 // ParseTXT parse DNS TXT resource record into Key.
-//
 func ParseTXT(txt []byte, ttl uint32) (key *Key, err error) {
 	if len(txt) == 0 {
 		return nil, nil
@@ -106,9 +100,7 @@ func ParseTXT(txt []byte, ttl uint32) (key *Key, err error) {
 	return key, nil
 }
 
-//
 // Pack the key to be used in DNS TXT record.
-//
 func (key *Key) Pack() string {
 	if key == nil {
 		return ""
@@ -169,10 +161,8 @@ func (key *Key) Pack() string {
 	return bb.String()
 }
 
-//
 // IsExpired will return true if key ExpiredAt time is less than current time;
 // otherwise it will return false.
-//
 func (key *Key) IsExpired() bool {
 	return key.ExpiredAt < time.Now().Unix()
 }

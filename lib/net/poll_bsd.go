@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build darwin || dragonfly || freebsd || netbsd || openbsd
 // +build darwin dragonfly freebsd netbsd openbsd
 
 package net
@@ -17,10 +18,8 @@ type kqueue struct {
 	read   int
 }
 
-//
 // NewPoll create and initialize new poll using epoll for Linux system or
 // kqueue for BSD or Darwin (macOS).
-//
 func NewPoll() (Poll, error) {
 	var err error
 

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package html extends the golang.org/x/net/html by providing simplified
 // methods to Node.
 //
@@ -13,5 +12,4 @@
 // This package extends the parent package by adding methods to get node's
 // attribute by name, get the first non-empty child, get the next
 // non-empty sibling, and method to iterate the tree.
-//
 package html

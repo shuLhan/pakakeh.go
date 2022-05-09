@@ -4,9 +4,7 @@
 
 package dkim
 
-//
 // Status represent the result of DKIM verification.
-//
 type Status struct {
 	Type  StatusType // Type of status.
 	SDID  []byte     // SDID in signature ("d=" tag).

@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package diff implement text comparison.
-//
 package diff
 
 import (
@@ -19,27 +17,21 @@ var (
 	DefDelimiter = byte('\n')
 )
 
-//
 // Data represent additions, deletions, and changes between two text.
-//
 type Data struct {
 	Adds    text.Lines
 	Dels    text.Lines
 	Changes LineChanges
 }
 
-//
 // Text search the difference between two texts.
-//
 func Text(before, after []byte, level int) (diffs Data) {
 	beforeLines := text.ParseLines(before)
 	afterLines := text.ParseLines(after)
 	return Lines(beforeLines, afterLines, level)
 }
 
-//
 // Lines search the difference between two Lines.
-//
 func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 	oldlen := len(oldlines)
 	newlen := len(newlines)
@@ -196,32 +188,24 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 	return diffs
 }
 
-//
 // PushAdd will add new line to diff set.
-//
 func (diffs *Data) PushAdd(new text.Line) {
 	diffs.Adds = append(diffs.Adds, new)
 }
 
-//
 // PushDel will add deletion line to diff set.
-//
 func (diffs *Data) PushDel(old text.Line) {
 	diffs.Dels = append(diffs.Dels, old)
 }
 
-//
 // PushChange set to diff data.
-//
 func (diffs *Data) PushChange(old, new text.Line) {
 	change := NewLineChange(old, new)
 
 	diffs.Changes = append(diffs.Changes, *change)
 }
 
-//
 // GetAllAdds return chunks of additions including in line changes.
-//
 func (diffs *Data) GetAllAdds() (chunks text.Chunks) {
 	for _, add := range diffs.Adds {
 		chunks = append(chunks, text.Chunk{StartAt: 0, V: add.V})
@@ -230,9 +214,7 @@ func (diffs *Data) GetAllAdds() (chunks text.Chunks) {
 	return
 }
 
-//
 // GetAllDels return chunks of deletions including in line changes.
-//
 func (diffs *Data) GetAllDels() (chunks text.Chunks) {
 	for _, del := range diffs.Dels {
 		chunks = append(chunks, text.Chunk{StartAt: 0, V: del.V})
@@ -241,9 +223,7 @@ func (diffs *Data) GetAllDels() (chunks text.Chunks) {
 	return
 }
 
-//
 // String return formatted data.
-//
 func (diffs Data) String() (s string) {
 	s += "Diffs:\n"
 

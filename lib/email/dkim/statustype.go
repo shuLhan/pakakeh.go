@@ -4,9 +4,7 @@
 
 package dkim
 
-//
 // StatusType define type of status.
-//
 type StatusType byte
 
 const (

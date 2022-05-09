@@ -10,10 +10,8 @@ import (
 	"github.com/shuLhan/share/lib/email/dkim"
 )
 
-//
 // DKIMOptions contains the DKIM signature fields and private key to sign the
 // incoming message.
-//
 type DKIMOptions struct {
 	Signature  *dkim.Signature
 	PrivateKey *rsa.PrivateKey

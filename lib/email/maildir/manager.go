@@ -2,15 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package maildir provide a library to manage email using maildir format.
 //
-// References
+// # References
 //
 // [1] http://www.qmail.org/qmail-manual-html/man5/maildir.html
 //
 // [2] https://cr.yp.to/proto/maildir.html
-//
 package maildir
 
 import (
@@ -23,9 +21,7 @@ import (
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
-//
 // Manager manage email in a directory.
-//
 type Manager struct {
 	dirCur   string
 	dirNew   string
@@ -36,10 +32,8 @@ type Manager struct {
 	counter  int
 }
 
-//
 // New create new maildir Manager in directory and initialize the hostname,
 // pid, and counter for generating unique name.
-//
 func New(dir string) (mg *Manager, err error) {
 	if len(dir) == 0 {
 		return nil, fmt.Errorf("email/maildir: New: empty base directory")
@@ -93,9 +87,7 @@ func (mg *Manager) initDirs(dir string) (err error) {
 	return nil
 }
 
-//
 // Delete email file in "cur".
-//
 func (mg *Manager) Delete(fname string) (err error) {
 	if len(fname) == 0 {
 		return fmt.Errorf("email/maildir: Delete: empty file name")
@@ -111,9 +103,7 @@ func (mg *Manager) Delete(fname string) (err error) {
 	return nil
 }
 
-//
 // DeleteOutQueue delete temporary file in send queue.
-//
 func (mg *Manager) DeleteOutQueue(fname string) (err error) {
 	if len(fname) == 0 {
 		return nil
@@ -129,14 +119,12 @@ func (mg *Manager) DeleteOutQueue(fname string) (err error) {
 	return nil
 }
 
-//
 // OutQueue save the email in temporary queue directory before sending it to
 // external MTA or processed.
 //
 // When mail is coming from MUA and received by server, the mail need
 // to be successfully stored into disk by server, before replying with
 // "250 OK" to client.
-//
 func (mg *Manager) OutQueue(email []byte) (err error) {
 	if len(email) == 0 {
 		return nil
@@ -158,9 +146,7 @@ func (mg *Manager) OutQueue(email []byte) (err error) {
 	return nil
 }
 
-//
 // Get will move email from "new" to "cur".
-//
 func (mg *Manager) Get(fname string) (err error) {
 	if len(fname) == 0 {
 		return nil
@@ -177,11 +163,9 @@ func (mg *Manager) Get(fname string) (err error) {
 	return nil
 }
 
-//
 // Incoming save incoming message, from external MTA, in directory
 // "${dir}/tmp/${unique}".  Upon success, hard link it to
 // "${dir}/new/${unique}" and delete the temporary file.
-//
 func (mg *Manager) Incoming(email []byte) (err error) {
 	if len(email) == 0 {
 		return nil
@@ -217,9 +201,7 @@ func (mg *Manager) Incoming(email []byte) (err error) {
 	return nil
 }
 
-//
 // RemoveAll remove all files inside a directory.
-//
 func (mg *Manager) RemoveAll(dir string) {
 	d, err := os.Open(dir)
 	if err != nil {
@@ -244,10 +226,8 @@ func (mg *Manager) RemoveAll(dir string) {
 	}
 }
 
-//
 // generateUniqueName try generate unique name until 5 attempts or return an
 // error.
-//
 func (mg *Manager) generateUniqueName(dir string) (fname, uniqueName string, err error) {
 	x := 0
 	for x < 5 {
@@ -268,12 +248,10 @@ func (mg *Manager) generateUniqueName(dir string) (fname, uniqueName string, err
 	return "", "", err
 }
 
-//
 // uniqueName generate a unique name using the following format,
 //
 //	UnixTimestamp "." "M"(microsecond) "P"(ProcessID) "Q"(Counter) "."
 //	hostname
-//
 func (mg *Manager) uniqueName() string {
 	now := time.Now()
 

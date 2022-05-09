@@ -27,9 +27,7 @@ const (
 	receiverModeClient
 )
 
-//
 // receiver represent a connection that receive incoming email in server.
-//
 type receiver struct {
 	conn net.Conn
 	mail *MailTx
@@ -61,9 +59,7 @@ func newReceiver(conn net.Conn, mode receiverMode) (recv *receiver) {
 	return recv
 }
 
-//
 // close the receiving line.
-//
 func (recv *receiver) close() {
 	err := recv.conn.Close()
 	if err != nil {
@@ -71,10 +67,8 @@ func (recv *receiver) close() {
 	}
 }
 
-//
 // isAuthenticated will return true if receiver mode is client and user has
 // authenticated to system.
-//
 func (recv *receiver) isAuthenticated() bool {
 	if recv.mode == receiverModeClient && recv.authenticated {
 		return true
@@ -82,9 +76,7 @@ func (recv *receiver) isAuthenticated() bool {
 	return false
 }
 
-//
 // readAuthData read AUTH initial response from client into Command Param.
-//
 func (recv *receiver) readAuthData(cmd *Command) (err error) {
 	recv.buff.Reset()
 
@@ -111,7 +103,6 @@ func (recv *receiver) readAuthData(cmd *Command) (err error) {
 	return nil
 }
 
-//
 // readCommand from client.
 //
 // Any error from command line (for example, unknown command, or syntax error)
@@ -119,7 +110,6 @@ func (recv *receiver) readAuthData(cmd *Command) (err error) {
 //
 // An error returned from this function, MUST be considered error on system
 // which should stop the receiver for further processing.
-//
 func (recv *receiver) readCommand() (cmd *Command, err error) {
 	recv.buff.Reset()
 
@@ -153,9 +143,7 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 	return cmd, nil
 }
 
-//
 // readDATA start mail input.
-//
 func (recv *receiver) readDATA() (err error) {
 	for {
 		recv.data = recv.data[0:]
@@ -207,12 +195,10 @@ func (recv *receiver) sendError(errRes error) (err error) {
 	return nil
 }
 
-//
 // sendReply send single or multiple lines reply to client.
 //
 // An error returned from this function, MUST be considered error on system
 // which should stop the receiver for further processing.
-//
 func (recv *receiver) sendReply(code int, msg string, body []string) (err error) {
 	recv.buff.Reset()
 	if len(body) == 0 {

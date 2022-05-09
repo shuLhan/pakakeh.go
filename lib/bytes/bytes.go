@@ -11,18 +11,14 @@ import (
 	"unicode"
 )
 
-//
 // AppendInt16 append an int16 value into slice of byte.
-//
 func AppendInt16(data []byte, v int16) []byte {
 	data = append(data, byte(v>>8))
 	data = append(data, byte(v))
 	return data
 }
 
-//
 // AppendInt32 append an int32 value into slice of byte.
-//
 func AppendInt32(data []byte, v int32) []byte {
 	data = append(data, byte(v>>24))
 	data = append(data, byte(v>>16))
@@ -31,18 +27,14 @@ func AppendInt32(data []byte, v int32) []byte {
 	return data
 }
 
-//
 // AppendUint16 append an uint16 value into slice of byte.
-//
 func AppendUint16(data []byte, v uint16) []byte {
 	data = append(data, byte(v>>8))
 	data = append(data, byte(v))
 	return data
 }
 
-//
 // AppendUint32 append an uint32 value into slice of byte.
-//
 func AppendUint32(data []byte, v uint32) []byte {
 	data = append(data, byte(v>>24))
 	data = append(data, byte(v>>16))
@@ -51,11 +43,9 @@ func AppendUint32(data []byte, v uint32) []byte {
 	return data
 }
 
-//
 // Concat merge one or more []byte or string in args into slice of
 // byte.
 // Any type that is not []byte or string in args will be ignored.
-//
 func Concat(args ...interface{}) (out []byte) {
 	for _, arg := range args {
 		switch v := arg.(type) {
@@ -68,9 +58,7 @@ func Concat(args ...interface{}) (out []byte) {
 	return out
 }
 
-//
 // Copy slice of bytes from parameter.
-//
 func Copy(src []byte) (dst []byte) {
 	if len(src) == 0 {
 		return
@@ -80,7 +68,6 @@ func Copy(src []byte) (dst []byte) {
 	return
 }
 
-//
 // CutUntilToken cut text until we found token.
 //
 // If token found, it will return all bytes before token, position of byte
@@ -90,7 +77,6 @@ func Copy(src []byte) (dst []byte) {
 //
 // If checkEsc is true, token that is prefixed with escaped character ('\')
 // will be skipped, the escape character will be removed.
-//
 func CutUntilToken(text, token []byte, startAt int, checkEsc bool) (cut []byte, pos int, found bool) {
 	var isEsc bool
 
@@ -156,14 +142,12 @@ func CutUntilToken(text, token []byte, startAt int, checkEsc bool) (cut []byte, 
 	return cut, pos, false
 }
 
-//
 // EncloseRemove given a text, find the leftToken and rightToken and cut
 // the content in between them and return it with status true.
 // Keep doing it until no more leftToken and rightToken found.
 //
 // If no leftToken or rightToken is found, it will return text as is and
 // false.
-//
 func EncloseRemove(text, leftToken, rightToken []byte) (cut []byte, found bool) {
 	lidx := TokenFind(text, leftToken, 0)
 	if lidx < 0 {
@@ -182,12 +166,10 @@ func EncloseRemove(text, leftToken, rightToken []byte) (cut []byte, found bool) 
 	return cut, true
 }
 
-//
 // EncloseToken find "token" in "text" and enclose it with bytes from
 // "leftcap" and "rightcap".
 // If at least one token found, it will return modified text with true status.
 // If no token is found, it will return the same text with false status.
-//
 func EncloseToken(text, token, leftcap, rightcap []byte) (
 	newtext []byte,
 	found bool,
@@ -217,12 +199,10 @@ func EncloseToken(text, token, leftcap, rightcap []byte) (
 	return newtext, found
 }
 
-//
 // InReplace replace any characters in "text" that is not in "allowed" with
 // character "c".
 // The replacement occur inside the "text" backing storage, which means the
 // passed "text" will changes and returned.
-//
 func InReplace(text, allowed []byte, c byte) []byte {
 	if len(text) == 0 {
 		return nil
@@ -244,10 +224,8 @@ func InReplace(text, allowed []byte, c byte) []byte {
 	return text
 }
 
-//
 // Indexes returns the index of the all instance of "token" in "text", or nil
 // if no "token" found.
-//
 func Indexes(text, token []byte) (idxs []int) {
 	if len(text) == 0 || len(token) == 0 {
 		return nil
@@ -267,11 +245,9 @@ func Indexes(text, token []byte) (idxs []int) {
 	return idxs
 }
 
-//
 // IsTokenAt return true if `text` at index `p` match with `token`,
 // otherwise it will return false.
 // Empty token always return false.
-//
 func IsTokenAt(text, token []byte, p int) bool {
 	textlen := len(text)
 	tokenlen := len(token)
@@ -295,9 +271,7 @@ func IsTokenAt(text, token []byte, p int) bool {
 	return true
 }
 
-//
 // MergeSpaces convert sequences of white spaces into single space ' '.
-//
 func MergeSpaces(in []byte) (out []byte) {
 	var isSpace bool
 	for _, c := range in {
@@ -318,10 +292,8 @@ func MergeSpaces(in []byte) (out []byte) {
 	return out
 }
 
-//
 // PrintHex will print each byte in slice as hexadecimal value into N column
 // length.
-//
 func PrintHex(title string, data []byte, col int) {
 	var (
 		start, x int
@@ -364,12 +336,10 @@ func PrintHex(title string, data []byte, col int) {
 	fmt.Println()
 }
 
-//
 // ReadHexByte read two hexadecimal characters from "data" start from index
 // "x" and convert them to byte.
 // It will return the byte and true if its read exactly two hexadecimal
 // characters, otherwise it will return 0 and false.
-//
 func ReadHexByte(data []byte, x int) (b byte, ok bool) {
 	if x < 0 {
 		return 0, false
@@ -396,10 +366,8 @@ func ReadHexByte(data []byte, x int) (b byte, ok bool) {
 	return b, true
 }
 
-//
 // ReadInt16 read int16 value from "data" start at index "x".
 // It will return 0 if "x" is out of range.
-//
 func ReadInt16(data []byte, x uint) (v int16) {
 	if x+1 >= uint(len(data)) {
 		return 0
@@ -409,10 +377,8 @@ func ReadInt16(data []byte, x uint) (v int16) {
 	return v
 }
 
-//
 // ReadInt32 read int32 value from "data" start at index "x".
 // It will return 0 if "x" is out of range.
-//
 func ReadInt32(data []byte, x uint) (v int32) {
 	if x+3 >= uint(len(data)) {
 		return 0
@@ -424,10 +390,8 @@ func ReadInt32(data []byte, x uint) (v int32) {
 	return v
 }
 
-//
 // ReadUint16 read uint16 value from "data" start at index "x".
 // If x is out of range, it will return 0.
-//
 func ReadUint16(data []byte, x uint) (v uint16) {
 	if x+1 >= uint(len(data)) {
 		return 0
@@ -437,10 +401,8 @@ func ReadUint16(data []byte, x uint) (v uint16) {
 	return v
 }
 
-//
 // ReadUint32 read uint32 value from "data" start at index "x".
 // If x is out of range, it will return 0.
-//
 func ReadUint32(data []byte, x uint) (v uint32) {
 	if x+3 >= uint(len(data)) {
 		return 0
@@ -452,7 +414,6 @@ func ReadUint32(data []byte, x uint) (v uint32) {
 	return v
 }
 
-//
 // SkipAfterToken skip all bytes until matched "token" is found and return the
 // index after the token and boolean true.
 //
@@ -460,7 +421,6 @@ func ReadUint32(data []byte, x uint) (v uint32) {
 // '\' will be considered as non-match token.
 //
 // If no token found it will return -1 and boolean false.
-//
 func SkipAfterToken(text, token []byte, startAt int, checkEsc bool) (int, bool) {
 	textlen := len(text)
 	escaped := false
@@ -510,11 +470,9 @@ func SkipAfterToken(text, token []byte, startAt int, checkEsc bool) (int, bool) 
 	return -1, false
 }
 
-//
 // SnippetByIndexes take snippet in between of each index with minimum
 // snippet length.  The sniplen is the length before and after index, not the
 // length of all snippet.
-//
 func SnippetByIndexes(s []byte, indexes []int, sniplen int) (snippets [][]byte) {
 	var start, end int
 	for _, idx := range indexes {
@@ -533,12 +491,10 @@ func SnippetByIndexes(s []byte, indexes []int, sniplen int) (snippets [][]byte) 
 	return snippets
 }
 
-//
 // TokenFind return the first index of matched token in text, start at custom
 // index.
 // If "startat" parameter is less than 0, then it will be set to 0.
 // If token is empty or no token found it will return -1.
-//
 func TokenFind(text, token []byte, startat int) (at int) {
 	textlen := len(text)
 	tokenlen := len(token)
@@ -575,10 +531,8 @@ func TokenFind(text, token []byte, startat int) (at int) {
 	return at
 }
 
-//
 // WordIndexes returns the index of the all instance of word in s as long as
 // word is separated by space or at the beginning or end of s.
-//
 func WordIndexes(s []byte, word []byte) (idxs []int) {
 	tmp := Indexes(s, word)
 	if len(tmp) == 0 {
@@ -606,10 +560,8 @@ func WordIndexes(s []byte, word []byte) (idxs []int) {
 	return idxs
 }
 
-//
 // WriteUint16 write uint16 value "v" into "data" start at position "x".
 // If x is out range, the data will not change.
-//
 func WriteUint16(data []byte, x uint, v uint16) {
 	if x+1 >= uint(len(data)) {
 		return
@@ -618,10 +570,8 @@ func WriteUint16(data []byte, x uint, v uint16) {
 	data[x+1] = byte(v)
 }
 
-//
 // WriteUint32 write uint32 value into "data" start at position "x".
 // If x is out range, the data will not change.
-//
 func WriteUint32(data []byte, x uint, v uint32) {
 	if x+3 >= uint(len(data)) {
 		return

@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package crypto provide a wrapper for standard crypto package.
-//
 package crypto
 
 import (
@@ -15,9 +13,7 @@ import (
 	"os"
 )
 
-//
 // LoadPrivateKey read and parse PEM formatted private key from file.
-//
 func LoadPrivateKey(file string) (pkey *rsa.PrivateKey, err error) {
 	rawPEM, err := os.ReadFile(file)
 	if err != nil {

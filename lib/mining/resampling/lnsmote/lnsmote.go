@@ -2,14 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package lnsmote implement the Local-Neighborhood algorithm from the paper,
 //
 // Maciejewski, Tomasz, and Jerzy Stefanowski. "Local neighbourhood
 // extension of SMOTE for mining imbalanced data." Computational
 // Intelligence and Data Mining (CIDM), 2011 IEEE Symposium on. IEEE,
 // 2011.
-//
 package lnsmote
 
 import (
@@ -23,9 +21,7 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-//
 // Runtime parameters for input and output.
-//
 type Runtime struct {
 	// Runtime of SMOTE, since this module extend the SMOTE method.
 	smote.Runtime
@@ -48,9 +44,7 @@ type Runtime struct {
 	OutliersFile string `json:"OutliersFile"`
 }
 
-//
 // New create and return new LnSmote object.
-//
 func New(percentOver, k, classIndex int, classMinor, outliers string) (
 	lnsmoteRun *Runtime,
 ) {
@@ -70,10 +64,8 @@ func New(percentOver, k, classIndex int, classMinor, outliers string) (
 	return
 }
 
-//
 // Init will initialize LNSmote runtime by checking input values and set it to
 // default if not set or invalid.
-//
 func (in *Runtime) Init(dataset tabula.DatasetInterface) {
 	in.Runtime.Init()
 
@@ -91,10 +83,8 @@ func (in *Runtime) Init(dataset tabula.DatasetInterface) {
 	}
 }
 
-//
 // Resampling will run resampling process on dataset and return the synthetic
 // samples.
-//
 func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 	e error,
 ) {
@@ -135,10 +125,8 @@ func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 	return e
 }
 
-//
 // createSynthetic will create synthetics row from original row `p` and their
 // `neighbors`.
-//
 func (in *Runtime) createSynthetic(p *tabula.Row, neighbors knn.Neighbors) (
 	synthetic *tabula.Row,
 ) {
@@ -178,10 +166,8 @@ func (in *Runtime) createSynthetic(p *tabula.Row, neighbors knn.Neighbors) (
 	return synthetic
 }
 
-//
 // canCreate return true if synthetic can be created between two sample `p` and
 // `n`. Otherwise it will return false.
-//
 func (in *Runtime) canCreate(p, n *tabula.Row) (bool, knn.Neighbors,
 	knn.Neighbors,
 ) {
@@ -196,9 +182,7 @@ func (in *Runtime) canCreate(p, n *tabula.Row) (bool, knn.Neighbors,
 	return slp.Len() != 0 || sln.Len() != 0, slp, sln
 }
 
-//
 // safeLevel return the minority neighbors in sample `p`.
-//
 func (in *Runtime) safeLevel(p *tabula.Row) knn.Neighbors {
 	neighbors := in.FindNeighbors(in.datasetRows, p)
 	minorNeighbors := neighbors.SelectWhere(in.ClassIndex, in.ClassMinor)
@@ -206,9 +190,7 @@ func (in *Runtime) safeLevel(p *tabula.Row) knn.Neighbors {
 	return minorNeighbors
 }
 
-//
 // safeLevel2 return the minority neighbors between sample `p` and `n`.
-//
 func (in *Runtime) safeLevel2(p, n *tabula.Row) knn.Neighbors {
 	neighbors := in.FindNeighbors(in.datasetRows, n)
 
@@ -241,10 +223,8 @@ func (in *Runtime) safeLevel2(p, n *tabula.Row) knn.Neighbors {
 	return minorNeighbors
 }
 
-//
 // randomGap return the neighbors gap between sample `p` and `n` using safe
 // level (number of minority neighbors) of p in `lenslp` and `n` in `lensln`.
-//
 func (in *Runtime) randomGap(lenslp, lensln int) (
 	delta float64,
 ) {

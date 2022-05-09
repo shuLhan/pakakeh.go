@@ -12,11 +12,9 @@ import (
 	librunes "github.com/shuLhan/share/lib/runes"
 )
 
-//
 // Alnum remove non alpha-numeric character from text and return it.
 // If withSpace is true then white space is allowed, otherwise it would also
 // be removed from text.
-//
 func Alnum(text string, withSpace bool) string {
 	var buf bytes.Buffer
 	for _, r := range text {
@@ -29,13 +27,11 @@ func Alnum(text string, withSpace bool) string {
 	return buf.String()
 }
 
-//
 // CleanURI remove known links from text and return it.
 // This function assume that space in URI is using '%20' not literal space,
 // as in ' '.
 //
 // List of known links: http, https, ftp, ftps, ssh, file, rsync, and ws.
-//
 func CleanURI(text string) string {
 	if len(text) == 0 {
 		return ""
@@ -76,7 +72,6 @@ func CleanURI(text string) string {
 	return string(ctext)
 }
 
-//
 // CleanWikiMarkup remove wiki markup from text.
 //
 //	List of known wiki markups,
@@ -90,7 +85,6 @@ func CleanURI(text string) string {
 //	- {{DEFAULTSORT: ... }}
 //	- {{Template: ... }}
 //	- <ref ... />
-//
 func CleanWikiMarkup(text string) string {
 	ctext := []rune(text)
 
@@ -101,12 +95,10 @@ func CleanWikiMarkup(text string) string {
 	return string(ctext)
 }
 
-//
 // MergeSpaces replace two or more horizontal spaces (' ', '\t', '\v', '\f',
 // '\r') with single space.
 // If withline is true it also replace two or more new lines with single
 // new-line.
-//
 func MergeSpaces(text string, withline bool) string {
 	var (
 		isspace   bool
@@ -140,9 +132,7 @@ func MergeSpaces(text string, withline bool) string {
 	return string(out)
 }
 
-//
 // Reverse the string.
-//
 func Reverse(input string) string {
 	r := []rune(input)
 	x := 0
@@ -155,9 +145,7 @@ func Reverse(input string) string {
 	return string(r)
 }
 
-//
 // SingleSpace convert all sequences of white spaces into single space ' '.
-//
 func SingleSpace(in string) string {
 	var isspace bool
 	out := make([]rune, 0, len(in))
@@ -181,7 +169,6 @@ func SingleSpace(in string) string {
 	return string(out)
 }
 
-//
 // Split given a text, return all words in text.
 //
 // A word is any sequence of character which have length equal or greater than
@@ -191,7 +178,6 @@ func SingleSpace(in string) string {
 // each words.
 //
 // If uniq is true remove duplicate words, in case insensitive manner.
-//
 func Split(text string, cleanit bool, uniq bool) (words []string) {
 	words = strings.Fields(text)
 
@@ -209,10 +195,8 @@ func Split(text string, cleanit bool, uniq bool) (words []string) {
 	return words
 }
 
-//
 // TrimNonAlnum remove non alpha-numeric character at the beginning and
 // end of `text`.
-//
 func TrimNonAlnum(text string) string {
 	r := []rune(text)
 	rlen := len(r)

@@ -21,9 +21,7 @@ const (
 	cachesFileFormatV1 = 1
 )
 
-//
 // caches of DNS answers.
-//
 type caches struct {
 	// v contains mapping of DNS question name (a domain name) with their
 	// list of answer.
@@ -62,13 +60,11 @@ type cachesFileV1 struct {
 	AccessedAt int64
 }
 
-//
 // newCaches create new in memory caches with specific prune delay and
 // threshold.
 // The prune delay MUST be greater than 1 minute or it will set to 1 hour.
 // The prune threshold MUST be greater than -1 minute or it will be set to -1
 // hour.
-//
 func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 	if pruneDelay.Minutes() < 1 {
 		pruneDelay = time.Hour
@@ -89,7 +85,6 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 	return ca
 }
 
-//
 // get an answer from cache based on domain-name, query type, and query class.
 //
 // If query name exist but the query type or class does not exist,
@@ -97,7 +92,6 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 //
 // If answer exist on cache, their accessed time will be updated to current
 // time and moved to back of LRU to prevent being pruned later.
-//
 func (c *caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *answers, an *Answer) {
 	c.Lock()
 
@@ -120,9 +114,7 @@ func (c *caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *a
 	return
 }
 
-//
 // list return all answers in LRU.
-//
 func (c *caches) list() (list []*Answer) {
 	c.Lock()
 	for e := c.lru.Front(); e != nil; e = e.Next() {
@@ -132,11 +124,9 @@ func (c *caches) list() (list []*Answer) {
 	return
 }
 
-//
 // prune will remove old answers from caches based on accessed time.
 // If the accessed time is greater than expired time (exp) it will be removed,
 // otherwise it will stay on caches.
-//
 func (c *caches) prune(exp int64) (listAnswer []*Answer) {
 	var (
 		el, next *list.Element
@@ -177,9 +167,7 @@ func (c *caches) prune(exp int64) (listAnswer []*Answer) {
 	return listAnswer
 }
 
-//
 // read caches stored on storage r.
-//
 func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 	var (
 		logp   = "caches.read"
@@ -223,10 +211,8 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 	return answers, nil
 }
 
-//
 // remove an answer from caches by query name.
 // It will return nil if qname is not exist in the caches.
-//
 func (c *caches) remove(qname string) (listAnswer []*Answer) {
 	var (
 		answer *Answer
@@ -254,10 +240,8 @@ func (c *caches) remove(qname string) (listAnswer []*Answer) {
 	return listAnswer
 }
 
-//
 // removeLocalRR remove the local ResourceRecord from caches by its name,
 // type, class, and value.
-//
 func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 	c.Lock()
 	defer c.Unlock()
@@ -279,9 +263,7 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 	return err
 }
 
-//
 // search for non-local DNS answer that match with regular expression.
-//
 func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
 	c.Lock()
 	for e := c.lru.Front(); e != nil; e = e.Next() {
@@ -294,11 +276,9 @@ func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
 	return listMsg
 }
 
-//
 // upsert update or insert answer to caches.  If the answer is inserted to
 // caches it will return true, otherwise when its updated it will return
 // false.
-//
 func (c *caches) upsert(nu *Answer) (inserted bool) {
 	if nu == nil || nu.msg == nil {
 		return
@@ -330,7 +310,6 @@ func (c *caches) upsert(nu *Answer) (inserted bool) {
 	return inserted
 }
 
-//
 // upsertRR update or insert new answer by RR.
 //
 // First, it will check if the answer already exist in cache.
@@ -338,7 +317,6 @@ func (c *caches) upsert(nu *Answer) (inserted bool) {
 // cached.
 // If its exist, it will add or replace the existing RR in the message
 // (dependes on RR type).
-//
 func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	err = rr.initAndValidate()
 	if err != nil {
@@ -375,13 +353,11 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	return an.msg.AddAnswer(rr)
 }
 
-//
 // startWorker start the worker pruning process.
 //
 // The worker prune process will run based on prune delay and it will remove
 // any cached answer that has not been accessed less than prune threshold
 // value.
-//
 func (c *caches) startWorker() {
 	var (
 		ticker = time.NewTicker(c.pruneDelay)
@@ -397,10 +373,8 @@ func (c *caches) startWorker() {
 	}
 }
 
-//
 // write all non-local answers to w.
 // On success, it returns the number of answers written to w.
-//
 func (c *caches) write(w io.Writer) (n int, err error) {
 	var (
 		logp    = "caches.write"

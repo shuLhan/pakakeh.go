@@ -4,22 +4,16 @@
 
 package tabula
 
-//
 // Records define slice of pointer to Record.
-//
 type Records []*Record
 
-//
 // Len will return the length of records.
-//
 func (recs *Records) Len() int {
 	return len(*recs)
 }
 
-//
 // SortByIndex will sort the records using slice of index `sortedIDx` and
 // return it.
-//
 func (recs *Records) SortByIndex(sortedIdx []int) *Records {
 	sorted := make(Records, len(*recs))
 
@@ -29,10 +23,8 @@ func (recs *Records) SortByIndex(sortedIdx []int) *Records {
 	return &sorted
 }
 
-//
 // CountWhere return number of record where its value is equal to `v` type and
 // value.
-//
 func (recs *Records) CountWhere(v interface{}) (c int) {
 	for _, r := range *recs {
 		if r.IsEqualToInterface(v) {
@@ -42,9 +34,7 @@ func (recs *Records) CountWhere(v interface{}) (c int) {
 	return
 }
 
-//
 // CountsWhere will return count of each value in slice `sv`.
-//
 func (recs *Records) CountsWhere(vs []interface{}) (counts []int) {
 	for _, v := range vs {
 		c := recs.CountWhere(v)

@@ -9,31 +9,23 @@ import (
 	"fmt"
 )
 
-//
 // Canon define type of canonicalization algorithm.
-//
 type Canon byte
 
-//
 // List of valid and known canonicalization algorithms.
-//
 const (
 	CanonSimple Canon = iota // "simple" (default)
 	CanonRelaxed
 )
 
-//
 // canonNames contains mapping between canonical type and their human
 // readabale names.
-//
 var canonNames = map[Canon][]byte{
 	CanonSimple:  []byte("simple"),
 	CanonRelaxed: []byte("relaxed"),
 }
 
-//
 // unpackCanons unpack Signature canonicalization algorithms.
-//
 func unpackCanons(v []byte) (canonHeader, canonBody *Canon, err error) {
 	var vHeader, vBody []byte
 
@@ -65,9 +57,7 @@ func unpackCanons(v []byte) (canonHeader, canonBody *Canon, err error) {
 	return canonHeader, canonBody, nil
 }
 
-//
 // parseCanonValue parse canonicalization name and return their numeric type.
-//
 func parseCanonValue(v []byte) (*Canon, error) {
 	if len(v) == 0 {
 		return nil, nil

@@ -19,7 +19,6 @@ const (
 	headerMaskRCode  byte = 0x0F //          0000.1111
 )
 
-//
 // MessageHeader the header includes fields that specify which of the
 // remaining sections are present, and also specify whether the message is a
 // query or a response, a standard query or some other opcode, etc. [1]
@@ -27,7 +26,6 @@ const (
 // The header section is always present.
 //
 // [1] RFC 1035 P-25 - 4.1. Format
-//
 type MessageHeader struct {
 	//
 	// A 16 bit identifier assigned by the program that generates
@@ -99,10 +97,8 @@ type MessageHeader struct {
 	ARCount uint16
 }
 
-//
 // Reset the header to default (query) values, which mean the IsQuery is true,
 // the Op code is 0, with recursion enabled, and query count set tot 1.
-//
 func (hdr *MessageHeader) Reset() {
 	hdr.ID = 0
 	hdr.IsQuery = true
@@ -118,9 +114,7 @@ func (hdr *MessageHeader) Reset() {
 	hdr.ARCount = 0
 }
 
-//
 // pack the section header into slice of bytes.
-//
 func (hdr *MessageHeader) pack() []byte {
 	var (
 		b0, b1 byte
@@ -166,9 +160,7 @@ func (hdr *MessageHeader) pack() []byte {
 	return packet[:]
 }
 
-//
 // unpack the DNS header section.
-//
 func (hdr *MessageHeader) unpack(packet []byte) {
 	hdr.ID = libbytes.ReadUint16(packet, 0)
 

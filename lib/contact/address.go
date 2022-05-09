@@ -4,9 +4,7 @@
 
 package contact
 
-//
 // Address define contact's address.
-//
 type Address struct {
 	Type        string `json:"type,omitempty"`
 	POBox       string `json:"pobox,omitempty"`

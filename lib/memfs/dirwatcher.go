@@ -19,9 +19,7 @@ const (
 	dirWatcherQueueSize = 64
 )
 
-//
 // DirWatcher is a naive implementation of directory change notification.
-//
 type DirWatcher struct {
 	C            <-chan NodeState // The channel on which the changes are delivered to user.
 	qchanges     chan NodeState
@@ -98,9 +96,7 @@ func (dw *DirWatcher) init() (err error) {
 	return nil
 }
 
-//
 // Start watching changes in directory and its content.
-//
 func (dw *DirWatcher) Start() (err error) {
 	var (
 		logp = "Start"
@@ -134,13 +130,11 @@ func (dw *DirWatcher) dirsKeys() (keys []string) {
 	return keys
 }
 
-//
 // mapSubdirs iterate each child node and check if its a directory or regular
 // file.
 // If its a directory add it to map of node and recursively iterate
 // the childs.
 // If its a regular file, start a NewWatcher.
-//
 func (dw *DirWatcher) mapSubdirs(node *Node) {
 	var (
 		logp = "DirWatcher.mapSubdirs"
@@ -160,10 +154,8 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 	}
 }
 
-//
 // unmapSubdirs find sub directories in node's childrens, recursively and
 // remove it from map of node.
-//
 func (dw *DirWatcher) unmapSubdirs(node *Node) {
 	for _, child := range node.Childs {
 		if child.IsDir() {
@@ -178,12 +170,10 @@ func (dw *DirWatcher) unmapSubdirs(node *Node) {
 	dw.fs.RemoveChild(node.Parent, node)
 }
 
-//
 // onContentChange handle changes on the content of directory.
 //
 // It will re-read the list of files in node directory and compare them with
 // old content to detect deletion and addition of files.
-//
 func (dw *DirWatcher) onContentChange(node *Node) {
 	var (
 		logp = "onContentChange"
@@ -278,12 +268,10 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 	}
 }
 
-//
 // onRootCreated handle changes when the root directory that we watch get
 // created again, after being deleted.
 // It will send created event, and re-mount the root directory back to memory,
 // recursively.
-//
 func (dw *DirWatcher) onRootCreated() {
 	var (
 		logp = "DirWatcher.onRootCreated"
@@ -318,11 +306,9 @@ func (dw *DirWatcher) onRootCreated() {
 	}
 }
 
-//
 // onRootDeleted handle change when the root directory that we watch get
 // deleted.  It will send deleted event and unmount the root directory from
 // memory.
-//
 func (dw *DirWatcher) onRootDeleted() {
 	var (
 		ns = NodeState{
@@ -343,10 +329,8 @@ func (dw *DirWatcher) onRootDeleted() {
 	}
 }
 
-//
 // onModified handle change when permission or attribute on node directory
 // changed.
-//
 func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 	dw.fs.Update(node, newDirInfo)
 

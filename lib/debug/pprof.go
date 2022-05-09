@@ -79,11 +79,9 @@ func (prof *profile) writeHeap() (err error) {
 	return nil
 }
 
-//
 // WriteHeapProfile write memory profile into "/tmp/{prefix}.pid.heap.pprof".
 // If keepAlive is true, the file will be keep opened until error happened, or
 // caller send keepAlive=false, or when program end.
-//
 func WriteHeapProfile(prefix string, keepAlive bool) {
 	prof = newProfile(prefix)
 

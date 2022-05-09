@@ -4,19 +4,16 @@
 
 package websocket
 
-//
 // Frames represent continuous (fragmented) frame.
 //
 // A fragmented message consists of a single frame with the FIN bit clear and
 // an opcode other than 0, followed by zero or more frames with the FIN bit
 // clear and the opcode set to 0, and terminated by a single frame with the
 // FIN bit set and an opcode of 0.
-//
 type Frames struct {
 	v []*Frame
 }
 
-//
 // Unpack websocket data protocol from raw bytes to one or more frames.
 //
 // When receiving packet from client, the underlying protocol or operating
@@ -27,7 +24,6 @@ type Frames struct {
 //
 // On success it will return one or more frames.
 // On fail it will return zero frame.
-//
 func Unpack(in []byte) (frames *Frames) {
 	if len(in) == 0 {
 		return
@@ -44,21 +40,17 @@ func Unpack(in []byte) (frames *Frames) {
 	return
 }
 
-//
 // Append a frame as part of continuous frame.
 // This function does not check if the appended frame is valid (i.e. zero
 // operation code on second or later frame).
-//
 func (frames *Frames) Append(f *Frame) {
 	if f != nil {
 		frames.v = append(frames.v, f)
 	}
 }
 
-//
 // fin merge all continuous frame with last frame and return it as single
 // frame.
-//
 func (frames *Frames) fin(last *Frame) (frame *Frame) {
 	frame = frames.v[0]
 
@@ -82,9 +74,7 @@ func (frames *Frames) fin(last *Frame) (frame *Frame) {
 	return frame
 }
 
-//
 // isClosed will return true if one of the frame is control CLOSE frame.
-//
 func (frames *Frames) isClosed() bool {
 	if len(frames.v) == 0 {
 		return false
@@ -97,9 +87,7 @@ func (frames *Frames) isClosed() bool {
 	return false
 }
 
-//
 // Opcode return the operation code of the first frame.
-//
 func (frames *Frames) Opcode() Opcode {
 	if len(frames.v) == 0 {
 		return OpcodeCont
@@ -107,7 +95,6 @@ func (frames *Frames) Opcode() Opcode {
 	return frames.v[0].opcode
 }
 
-//
 // payload return the concatenation of continuous data frame's payload.
 //
 // The first frame must be a data frame, either text or binary, otherwise it
@@ -115,7 +102,6 @@ func (frames *Frames) Opcode() Opcode {
 //
 // Any control CLOSE frame of frame with fin set will considered the last
 // frame.
-//
 func (frames *Frames) payload() (payload []byte) {
 	if len(frames.v) == 0 {
 		return

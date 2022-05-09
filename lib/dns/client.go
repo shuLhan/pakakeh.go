@@ -12,9 +12,7 @@ import (
 	"time"
 )
 
-//
 // Client is interface that implement sending and receiving DNS message.
-//
 type Client interface {
 	Close() error
 	Lookup(q MessageQuestion, allowRecursion bool) (*Message, error)
@@ -24,7 +22,6 @@ type Client interface {
 	SetTimeout(t time.Duration)
 }
 
-//
 // NewClient create new DNS client using the name server URL.
 // The name server URL is defined in the same format as
 // ServerOptions.NameServers.
@@ -33,11 +30,10 @@ type Client interface {
 //
 // For example,
 //
-//  - "udp://127.0.0.1:53" for UDP client.
-//  - "tcp://127.0.0.1:53" for TCP client.
-//  - "https://127.0.0.1:853" (HTTPS with IP address) for DoT.
-//  - "https://localhost/dns-query" (HTTPS with domain name) for DoH.
-//
+//   - "udp://127.0.0.1:53" for UDP client.
+//   - "tcp://127.0.0.1:53" for TCP client.
+//   - "https://127.0.0.1:853" (HTTPS with IP address) for DoT.
+//   - "https://localhost/dns-query" (HTTPS with domain name) for DoH.
 func NewClient(nsUrl string, isInsecure bool) (cl Client, err error) {
 	var (
 		logp = "NewClient"

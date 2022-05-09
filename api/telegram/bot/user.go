@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // User represents a Telegram user or bot.
-//
 type User struct {
 	// Unique identifier for this user or bot
 	ID int `json:"id"`

@@ -37,9 +37,7 @@ type Options struct {
 	Development bool
 }
 
-//
 // init initialize the options with default value.
-//
 func (opts *Options) init() {
 	if opts.MaxFileSize == 0 {
 		opts.MaxFileSize = defaultMaxFileSize

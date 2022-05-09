@@ -73,10 +73,8 @@ func un(s string, startTime time.Time) {
 		endTime.Sub(startTime))
 }
 
-//
 // createLnsmote will create and initialize SMOTE object from config file and
 // from command parameter.
-//
 func createLnsmote(fcfg string, opts *options) (lnsmoteRun *lnsmote.Runtime, e error) {
 	lnsmoteRun = &lnsmote.Runtime{}
 
@@ -105,9 +103,7 @@ func createLnsmote(fcfg string, opts *options) (lnsmoteRun *lnsmote.Runtime, e e
 	return
 }
 
-//
 // runLnsmote will select minority class from dataset and run oversampling.
-//
 func runLnsmote(lnsmoteRun *lnsmote.Runtime, dataset *tabula.Claset) (e error) {
 	e = lnsmoteRun.Resampling(dataset)
 	if e != nil {

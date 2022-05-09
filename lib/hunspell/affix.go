@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-//
 // affix represent the prefix or suffix and its rules.
 //
 // Syntax,
@@ -20,7 +19,6 @@ import (
 //	CROSS_PRODUCT  := "N" / "Y"
 //
 //	NRULES         := 1*DIGIT
-//
 type affix struct {
 	isPrefix bool
 
@@ -44,9 +42,7 @@ func newAffix(name string, isPrefix, isCrossProduct bool, nrules int) (afx *affi
 	return afx
 }
 
-//
 // addRule to affix.
-//
 func (afx *affix) addRule(opts *affixOptions,
 	stripping, affix, condition string, morphemes []string,
 ) (
@@ -63,9 +59,7 @@ func (afx *affix) addRule(opts *affixOptions,
 	return nil
 }
 
-//
 // apply the affixes to the root stem, return the list of stem.
-//
 func (afx *affix) apply(root *Stem) (ss []*Stem) {
 	var word string
 

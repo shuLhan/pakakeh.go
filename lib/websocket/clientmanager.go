@@ -11,7 +11,6 @@ import (
 	"github.com/shuLhan/share/lib/ints"
 )
 
-//
 // ClientManager manage list of active websocket connections on server.
 //
 // This library assume that each connection belong to a user in the server,
@@ -19,7 +18,6 @@ import (
 //
 // For a custom management of user use HandleClientAdd and HandleClientRemove
 // on Server.
-//
 type ClientManager struct {
 	sync.Mutex
 
@@ -44,9 +42,7 @@ type ClientManager struct {
 	frames map[int]*Frames
 }
 
-//
 // newClientManager create and initialize new user sockets.
-//
 func newClientManager() *ClientManager {
 	return &ClientManager{
 		conns:  make(map[uint64][]int),
@@ -56,9 +52,7 @@ func newClientManager() *ClientManager {
 	}
 }
 
-//
 // All return a copy of all client connections.
-//
 func (cls *ClientManager) All() (conns []int) {
 	cls.Lock()
 	if len(cls.all) > 0 {
@@ -69,10 +63,8 @@ func (cls *ClientManager) All() (conns []int) {
 	return
 }
 
-//
 // finFrames merge all continuous frames into single frame and clear the
 // stored frame and frames on behalf of connection.
-//
 func (cls *ClientManager) finFrames(conn int, last *Frame) (f *Frame) {
 	cls.Lock()
 
@@ -91,13 +83,11 @@ func (cls *ClientManager) finFrames(conn int, last *Frame) (f *Frame) {
 	return
 }
 
-//
 // Conns return list of connections by user ID.
 //
 // Each user may have more than one connection (e.g. from Android, iOS, or
 // web). By knowing which connections that user have, implementor of websocket
 // server can broadcast a message to all connections.
-//
 func (cls *ClientManager) Conns(uid uint64) (conns []int) {
 	cls.Lock()
 	conns = cls.conns[uid]
@@ -105,9 +95,7 @@ func (cls *ClientManager) Conns(uid uint64) (conns []int) {
 	return
 }
 
-//
 // Context return the client context.
-//
 func (cls *ClientManager) Context(conn int) (ctx context.Context, ok bool) {
 	cls.Lock()
 	ctx, ok = cls.ctx[conn]
@@ -115,9 +103,7 @@ func (cls *ClientManager) Context(conn int) (ctx context.Context, ok bool) {
 	return ctx, ok
 }
 
-//
 // getFrame return an active frame on a client connection.
-//
 func (cls *ClientManager) getFrame(conn int) (frame *Frame, ok bool) {
 	cls.Lock()
 	frame, ok = cls.frame[conn]
@@ -125,9 +111,7 @@ func (cls *ClientManager) getFrame(conn int) (frame *Frame, ok bool) {
 	return
 }
 
-//
 // getFrames return continuous frames on behalf of connection.
-//
 func (cls *ClientManager) getFrames(conn int) (frames *Frames, ok bool) {
 	cls.Lock()
 	frames, ok = cls.frames[conn]
@@ -135,10 +119,8 @@ func (cls *ClientManager) getFrames(conn int) (frames *Frames, ok bool) {
 	return
 }
 
-//
 // setFrame set the active, chopped frame on client connection.  If frame is
 // nil, it will delete the stored frame in connection.
-//
 func (cls *ClientManager) setFrame(conn int, frame *Frame) {
 	cls.Lock()
 	if frame == nil {
@@ -149,10 +131,8 @@ func (cls *ClientManager) setFrame(conn int, frame *Frame) {
 	cls.Unlock()
 }
 
-//
 // setFrames set continuous frames on client connection.  If frames is nil it
 // will clear the stored frames.
-//
 func (cls *ClientManager) setFrames(conn int, frames *Frames) {
 	cls.Lock()
 	if frames == nil {
@@ -163,9 +143,7 @@ func (cls *ClientManager) setFrames(conn int, frames *Frames) {
 	cls.Unlock()
 }
 
-//
 // add new socket connection to user ID in context.
-//
 func (cls *ClientManager) add(ctx context.Context, conn int) {
 	var uid uint64
 
@@ -197,9 +175,7 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 	cls.Unlock()
 }
 
-//
 // remove a connection from list of clients.
-//
 func (cls *ClientManager) remove(conn int) {
 	cls.Lock()
 

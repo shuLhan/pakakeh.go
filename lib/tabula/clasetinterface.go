@@ -4,13 +4,11 @@
 
 package tabula
 
-//
 // ClasetInterface is the interface for working with dataset containing class
 // or target attribute. It embed dataset interface.
 //
 // Yes, the name is Claset with single `s` not Classset with triple `s` to
 // minimize typo.
-//
 type ClasetInterface interface {
 	DatasetInterface
 

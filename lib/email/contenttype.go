@@ -19,18 +19,14 @@ var (
 	subHtml  = []byte("html")
 )
 
-//
 // ContentType represent MIME header "Content-Type" field.
-//
 type ContentType struct {
 	Top    []byte
 	Sub    []byte
 	Params []Param
 }
 
-//
 // ParseContentType parse content type from raw bytes.
-//
 func ParseContentType(raw []byte) (ct *ContentType, err error) {
 	raw = bytes.TrimSpace(raw)
 
@@ -130,9 +126,7 @@ func isValidToken(tok []byte, quoted bool) bool {
 	return true
 }
 
-//
 // GetParamValue return parameter value related to specific name.
-//
 func (ct *ContentType) GetParamValue(name []byte) []byte {
 	name = bytes.ToLower(name)
 	for _, p := range ct.Params {
@@ -154,9 +148,7 @@ func (ct *ContentType) isEqual(other *ContentType) bool {
 	return bytes.Equal(ct.Sub, other.Sub)
 }
 
-//
 // SetBoundary set the parameter boundary in content-type header's value.
-//
 func (ct *ContentType) SetBoundary(boundary []byte) {
 	for x := 0; x < len(ct.Params); x++ {
 		if bytes.Equal(ct.Params[x].Key, ParamNameBoundary) {
@@ -171,9 +163,7 @@ func (ct *ContentType) SetBoundary(boundary []byte) {
 	ct.Params = append(ct.Params, paramBoundary)
 }
 
-//
 // String return text representation of content type with its parameters.
-//
 func (ct *ContentType) String() string {
 	var sb strings.Builder
 

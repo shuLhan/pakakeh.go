@@ -2,14 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package rf implement ensemble of classifiers using random forest
 // algorithm by Breiman and Cutler.
 //
 // Breiman, Leo. "Random forests." Machine learning 45.1 (2001): 5-32.
 //
 // The implementation is based on various sources and using author experience.
-//
 package rf
 
 import (
@@ -51,9 +49,7 @@ var (
 	ErrNoInput = errors.New("rf: input samples is empty")
 )
 
-//
 // Runtime contains input and output configuration when generating random forest.
-//
 type Runtime struct {
 	// Runtime embed common fields for classifier.
 	classifier.Runtime
@@ -74,35 +70,26 @@ type Runtime struct {
 	bagIndices [][]int
 }
 
-//
 // Trees return all tree in forest.
-//
 func (forest *Runtime) Trees() []cart.Runtime {
 	return forest.trees
 }
 
-//
 // AddCartTree add tree to forest
-//
 func (forest *Runtime) AddCartTree(tree cart.Runtime) {
 	forest.trees = append(forest.trees, tree)
 }
 
-//
 // AddBagIndex add bagging index for book keeping.
-//
 func (forest *Runtime) AddBagIndex(bagIndex []int) {
 	forest.bagIndices = append(forest.bagIndices, bagIndex)
 }
 
-//
 // Initialize will check forest inputs and set it to default values if invalid.
 //
 // It will also calculate number of random samples for each tree using,
 //
 //	number-of-sample * percentage-of-bootstrap
-//
-//
 func (forest *Runtime) Initialize(samples tabula.ClasetInterface) error {
 	if forest.NTree <= 0 {
 		forest.NTree = DefNumTree
@@ -131,17 +118,17 @@ func (forest *Runtime) Initialize(samples tabula.ClasetInterface) error {
 	return forest.Runtime.Initialize()
 }
 
-//
 // Build the forest using samples dataset.
 //
 // Algorithm,
 //
 // (0) Recheck input value: number of tree, percentage bootstrap, etc; and
-//    Open statistic file output.
+//
+//	Open statistic file output.
+//
 // (1) For 0 to NTree,
 // (1.1) Create new tree, repeat until all trees has been build.
 // (2) Compute and write total statistic.
-//
 func (forest *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 	// check input samples
 	if samples == nil {
@@ -179,7 +166,6 @@ func (forest *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 	return forest.Finalize()
 }
 
-//
 // GrowTree build a new tree in forest, return OOB error value or error if tree
 // can not grow.
 //
@@ -191,7 +177,6 @@ func (forest *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 // (4) Save index of random samples for calculating error rate later.
 // (5) Run OOB on forest.
 // (6) Calculate OOB error rate and statistic values.
-//
 func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 	cm *classifier.CM, stat *classifier.Stat, e error,
 ) {
@@ -255,7 +240,6 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 	return cm, stat, e
 }
 
-//
 // ClassifySet given a samples predict their class by running each sample in
 // forest, and return their class prediction with confusion matrix.
 // `samples` is the sample that will be predicted, `sampleIds` is the index of
@@ -274,7 +258,6 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 // (3) Compute stat from confusion matrix.
 // (4) Write the stat to file only if sampleIds is empty, which mean its run
 // not from OOB set.
-//
 func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 	sampleIds []int,
 ) (
@@ -332,7 +315,6 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 	return predicts, cm, probs
 }
 
-//
 // Votes will return votes, or classes, in each tree based on sample.
 // If checkIdx is true then the `sampleIdx` will be checked in if it has been used
 // when training the tree, if its exist then the sample will be skipped.
@@ -340,7 +322,6 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 // (1) If row is used to build the tree then skip it,
 // (2) classify row in tree,
 // (3) save tree class value.
-//
 func (forest *Runtime) Votes(sample *tabula.Row, sampleIdx int) (
 	votes []string,
 ) {

@@ -38,10 +38,8 @@ const (
 	RecordTypeALL   RecordType = 255 // A request for all records
 )
 
-//
 // RecordTypes contains a mapping between string representation of DNS record
 // type with their numeric value, ordered by key alphabetically.
-//
 var RecordTypes = map[string]RecordType{
 	"A":     RecordTypeA,
 	"AAAA":  RecordTypeAAAA,
@@ -68,10 +66,8 @@ var RecordTypes = map[string]RecordType{
 	"WKS":   RecordTypeWKS,
 }
 
-//
 // RecordTypeNames contains mapping between record type and and their string
 // representation, ordered alphabetically.
-//
 var RecordTypeNames = map[RecordType]string{
 	RecordTypeA:     "A",
 	RecordTypeAAAA:  "AAAA",
@@ -98,10 +94,8 @@ var RecordTypeNames = map[RecordType]string{
 	RecordTypeWKS:   "WKS",
 }
 
-//
 // RecordTypeFromAddress return RecordTypeA or RecordTypeAAAA if addr is valid
 // IPv4 or IPv6 address, respectively, otherwise it will return 0.
-//
 func RecordTypeFromAddress(addr []byte) (rtype RecordType) {
 	ip := net.ParseIP(string(addr))
 	if ip != nil {

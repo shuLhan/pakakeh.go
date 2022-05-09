@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package parser provide a common text parser, using delimiters.
-//
 package parser
 
 import (
@@ -14,9 +12,7 @@ import (
 	libascii "github.com/shuLhan/share/lib/ascii"
 )
 
-//
 // Parser implement text parsing.
-//
 type Parser struct {
 	file   string
 	delims string
@@ -26,9 +22,7 @@ type Parser struct {
 	d      rune   // d is one of delims character that terminated parsing.
 }
 
-//
 // Lines parse the content of path and return non-empty lines.
-//
 func Lines(file string) ([]string, error) {
 	p, err := Open(file, "")
 	if err != nil {
@@ -37,9 +31,7 @@ func Lines(file string) ([]string, error) {
 	return p.Lines(), nil
 }
 
-//
 // New create and initialize parser from content and delimiters.
-//
 func New(content, delims string) (p *Parser) {
 	p = &Parser{
 		token: make([]rune, 0, 16),
@@ -50,11 +42,9 @@ func New(content, delims string) (p *Parser) {
 	return p
 }
 
-//
 // Open create and initialize the parser using predefined delimiters.
 // All the content of file will be loaded first.
 // If delimiters is empty, it would default to all whitespaces characters.
-//
 func Open(file, delims string) (p *Parser, err error) {
 	v, err := os.ReadFile(file)
 	if err != nil {
@@ -67,9 +57,7 @@ func Open(file, delims string) (p *Parser, err error) {
 	return p, nil
 }
 
-//
 // AddDelimiters append new delimiter to existing parser.
-//
 func (p *Parser) AddDelimiters(delims string) {
 	var found bool
 	for _, newd := range delims {
@@ -86,9 +74,7 @@ func (p *Parser) AddDelimiters(delims string) {
 	}
 }
 
-//
 // Close the parser by resetting all its internal state to zero value.
-//
 func (p *Parser) Close() {
 	p.file = ""
 	p.delims = ""
@@ -98,9 +84,7 @@ func (p *Parser) Close() {
 	p.d = 0
 }
 
-//
 // Lines return all non-empty lines from the content.
-//
 func (p *Parser) Lines() []string {
 	var start, end int
 
@@ -145,9 +129,7 @@ func (p *Parser) Lines() []string {
 	return lines
 }
 
-//
 // Load the new content and delimiters.
-//
 func (p *Parser) Load(content, delims string) {
 	p.Close()
 	p.v = content
@@ -158,11 +140,9 @@ func (p *Parser) Load(content, delims string) {
 	}
 }
 
-//
 // Line read and return a single line.
 // On success it will return a string without '\n' and new line character.
 // In case of EOF it will return the last line and 0.
-//
 func (p *Parser) Line() (string, rune) {
 	p.d = 0
 	p.token = p.token[:0]
@@ -179,10 +159,8 @@ func (p *Parser) Line() (string, rune) {
 	return string(p.token), 0
 }
 
-//
 // Stop the parser, return the remaining unparsed content and its last
 // position, and then call Close to reset the internal state back to zero.
-//
 func (p *Parser) Stop() (remain string, pos int) {
 	pos = p.x
 	remain = p.v[pos:]
@@ -190,11 +168,9 @@ func (p *Parser) Stop() (remain string, pos int) {
 	return remain, pos
 }
 
-//
 // Token read the next token from content until one of the delimiter found.
 // if no delimiter found, its mean all of content has been read, the returned
 // delimiter will be 0.
-//
 func (p *Parser) Token() (string, rune) {
 	p.d = 0
 	p.token = p.token[:0]
@@ -219,13 +195,11 @@ func (p *Parser) Token() (string, rune) {
 	return string(p.token), 0
 }
 
-//
 // TokenEscaped read the next token from content until one of the delimiter
 // found, unless its escaped with value of esc character.
 //
 // For example, if the content is "a b" and one of the delimiter is " ",
 // escaping it with "\" will return as "a b" not "a".
-//
 func (p *Parser) TokenEscaped(esc rune) (string, rune) {
 	var isEscaped bool
 
@@ -267,13 +241,11 @@ func (p *Parser) TokenEscaped(esc rune) (string, rune) {
 	return string(p.token), p.d
 }
 
-//
 // ReadEnclosed read the token inside opening and closing characters, ignoring
 // all delimiters that previously set.
 //
 // It will return the parsed token and closed character if closed character
 // found, otherwise it will token with 0.
-//
 func (p *Parser) ReadEnclosed(open, closed rune) (string, rune) {
 	for x, r := range p.v[p.x:] {
 		if x == 0 {
@@ -295,9 +267,7 @@ func (p *Parser) ReadEnclosed(open, closed rune) (string, rune) {
 	return p.v, 0
 }
 
-//
 // RemoveDelimiters from current parser.
-//
 func (p *Parser) RemoveDelimiters(dels string) {
 	var (
 		newdelims string
@@ -320,9 +290,7 @@ func (p *Parser) RemoveDelimiters(dels string) {
 	p.delims = newdelims
 }
 
-//
 // Skip parsing n characters or EOF if n is greater then length of content.
-//
 func (p *Parser) Skip(n int) {
 	if p.x+n >= len(p.v) {
 		p.x = len(p.v)
@@ -332,11 +300,9 @@ func (p *Parser) Skip(n int) {
 	}
 }
 
-//
 // SkipHorizontalSpaces skip all space (" "), tab ("\t"), carriage return
 // ("\r"), and form feed ("\f") characters; and return the first character
 // found, probably new line.
-//
 func (p *Parser) SkipHorizontalSpaces() rune {
 	for x, r := range p.v[p.x:] {
 		switch r {
@@ -354,10 +320,8 @@ func (p *Parser) SkipHorizontalSpaces() rune {
 	return 0
 }
 
-//
 // SkipLine skip all characters until new line.
 // It will return the first character after new line or 0 if EOF.
-//
 func (p *Parser) SkipLine() rune {
 	for x, r := range p.v[p.x:] {
 		if r == '\n' {

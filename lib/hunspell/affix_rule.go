@@ -11,7 +11,6 @@ import (
 	"strings"
 )
 
-//
 // affixRule represent each prefix or suffix rule.
 //
 // Syntax for affix rule,
@@ -35,8 +34,6 @@ import (
 // The "0" means no stripping, "x" is the prefix to be added to the word, "."
 // means zero condition, and "1" is an alias to the first morpheme defined in
 // "AM".
-//
-//
 type affixRule struct {
 	// stripping characters from beginning (at  prefix  rules)  or  end
 	// (at  suffix rules) of the word.
@@ -119,9 +116,7 @@ func newAffixRule(opts *affixOptions, isPrefix bool,
 	return rule, nil
 }
 
-//
 // unpackFlags apply each of flag rule to the "root" string.
-//
 func (rule *affixRule) unpackFlags(
 	opts *affixOptions, affixes map[string]*affix,
 ) (err error) {

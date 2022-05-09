@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // PollOption contains information about one answer option in a poll.
-//
 type PollOption struct {
 	// Option text, 1-100 characters.
 	Text string `json:"text"`

@@ -4,9 +4,7 @@
 
 package contact
 
-//
 // Name define contact's name.
-//
 type Name struct {
 	Given       string `json:"givenName"`
 	Middle      string `json:"middleName"`

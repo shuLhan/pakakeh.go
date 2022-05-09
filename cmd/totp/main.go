@@ -1,6 +1,4 @@
-//
 // Program totp generate Time-based One-time Password from secret key.
-//
 package main
 
 import (

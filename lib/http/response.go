@@ -13,10 +13,8 @@ import (
 	libio "github.com/shuLhan/share/lib/io"
 )
 
-//
 // ParseResponseHeader parse HTTP response header and return it as standard
 // HTTP Response with unreaded packet.
-//
 func ParseResponseHeader(raw []byte) (resp *http.Response, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, nil, nil

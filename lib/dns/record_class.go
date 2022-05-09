@@ -16,20 +16,16 @@ const (
 	RecordClassANY RecordClass = 255 // Any class
 )
 
-//
 // RecordClasses contains a mapping between string representation of record
 // class to their numeric value, ordered by key alphabetically.
-//
 var RecordClasses = map[string]RecordClass{
 	"CH": RecordClassCH,
 	"HS": RecordClassHS,
 	"IN": RecordClassIN,
 }
 
-//
 // RecordClassName contains a mapping between the record class value and its
 // string representation, ordered by key alphabetically.
-//
 var RecordClassName = map[RecordClass]string{
 	RecordClassCH: "CH",
 	RecordClassHS: "HS",

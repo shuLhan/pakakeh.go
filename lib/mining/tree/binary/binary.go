@@ -9,26 +9,20 @@ import (
 	"fmt"
 )
 
-//
 // Tree is a abstract data type for tree with only two branch: left and right.
-//
 type Tree struct {
 	// Root is pointer to root of tree.
 	Root *BTNode
 }
 
-//
 // NewTree will create new binary tree with empty root.
-//
 func NewTree() *Tree {
 	return &Tree{
 		Root: nil,
 	}
 }
 
-//
 // String will print all the branch and leaf in tree.
-//
 func (btree *Tree) String() (s string) {
 	var parent, node *BTNode
 

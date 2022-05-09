@@ -20,9 +20,7 @@ const (
 	watcherQueueSize = 16
 )
 
-//
 // Watcher is a naive implementation of file event change notification.
-//
 type Watcher struct {
 	C        <-chan NodeState // The channel on which the changes are delivered.
 	qchanges chan NodeState
@@ -37,7 +35,6 @@ type Watcher struct {
 	delay time.Duration
 }
 
-//
 // NewWatcher return a new file watcher that will inspect the file for changes
 // for `path` with period specified by duration `d` argument.
 //
@@ -46,7 +43,6 @@ type Watcher struct {
 //
 // The changes can be consumed from the channel C.
 // If the consumer is slower, channel is full, the changes will be dropped.
-//
 func NewWatcher(path string, d time.Duration) (w *Watcher, err error) {
 	var (
 		logp = "NewWatcher"
@@ -176,9 +172,7 @@ func (w *Watcher) start() {
 	}
 }
 
-//
 // Stop watching the file.
-//
 func (w *Watcher) Stop() {
 	w.ticker.Stop()
 }

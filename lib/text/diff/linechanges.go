@@ -8,14 +8,10 @@ import (
 	"github.com/shuLhan/share/lib/text"
 )
 
-//
 // LineChanges represents a set of change in text.
-//
 type LineChanges []LineChange
 
-//
 // GetAllDels return all deleted chunks.
-//
 func (changes *LineChanges) GetAllDels() (allDels text.Chunks) {
 	for _, change := range *changes {
 		allDels = append(allDels, change.Dels...)
@@ -23,9 +19,7 @@ func (changes *LineChanges) GetAllDels() (allDels text.Chunks) {
 	return
 }
 
-//
 // GetAllAdds return all addition chunks.
-//
 func (changes *LineChanges) GetAllAdds() (allAdds text.Chunks) {
 	for _, change := range *changes {
 		allAdds = append(allAdds, change.Adds...)

@@ -9,9 +9,7 @@ import (
 	"time"
 )
 
-//
 // Answer maintain the record of DNS response for cache.
-//
 type Answer struct {
 	// el contains pointer to the cache in LRU.
 	el *list.Element
@@ -36,11 +34,9 @@ type Answer struct {
 	RClass RecordClass
 }
 
-//
 // newAnswer create new answer from Message.
 // If is not local (isLocal=false), the received and accessed time will be set
 // to current timestamp.
-//
 func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	an = &Answer{
 		QName:  msg.Question.Name,
@@ -57,20 +53,16 @@ func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	return
 }
 
-//
 // clear the answer fields.
-//
 func (an *Answer) clear() {
 	an.msg = nil
 	an.el = nil
 }
 
-//
 // get the raw packet in the message.
 // Before the raw packet is returned, the answer accessed time will be updated
 // to current time and each resource record's TTL in message is subtracted
 // based on received time.
-//
 func (an *Answer) get() (packet []byte) {
 	an.updateTTL()
 
@@ -79,9 +71,7 @@ func (an *Answer) get() (packet []byte) {
 	return
 }
 
-//
 // update the answer with new message.
-//
 func (an *Answer) update(nu *Answer) {
 	if nu == nil || nu.msg == nil {
 		return
@@ -96,9 +86,7 @@ func (an *Answer) update(nu *Answer) {
 	nu.msg = nil
 }
 
-//
 // updateTTL decrease the answer TTLs based on time when message received.
-//
 func (an *Answer) updateTTL() {
 	if an.ReceivedAt == 0 {
 		return

@@ -30,9 +30,7 @@ const (
 	DefMatchRatio = 0.7
 )
 
-//
 // ReadLines return lines in the file `f`.
-//
 func ReadLines(f string) (lines text.Lines, e error) {
 	fd, e := os.Open(f)
 
@@ -62,10 +60,8 @@ func ReadLines(f string) (lines text.Lines, e error) {
 	return lines, e
 }
 
-//
 // IsEqual compare two slice of bytes and return true if equal or false
 // otherwise.
-//
 func IsEqual(oldb, newb []byte) (equal bool) {
 	oldblen := len(oldb)
 	newblen := len(newb)
@@ -92,13 +88,11 @@ func IsEqual(oldb, newb []byte) (equal bool) {
 	return oldblen == newblen
 }
 
-//
 // BytesRatio compare two slice of bytes and return ratio of matching bytes.
 // The ratio in in range of 0.0 to 1.0, where 1.0 if both are similar, and 0.0
 // if no matchs even found.
 // `minTokenLen` define the minimum length of token for searching in both of
 // slice.
-//
 func BytesRatio(old, new []byte, minTokenLen int) (
 	ratio float32, m int, maxlen int,
 ) {
@@ -201,11 +195,9 @@ func BytesRatio(old, new []byte, minTokenLen int) (
 	return ratio, m, maxlen
 }
 
-//
 // findLine return true if line is found in text beginning at line `startat`.
 // It also return line number of matching line.
 // If no match found, it will return false and `startat` value.
-//
 func findLine(line text.Line, text text.Lines, startat int) (
 	found bool,
 	n int,
@@ -221,9 +213,7 @@ func findLine(line text.Line, text text.Lines, startat int) (
 	return false, startat
 }
 
-//
 // Files compare two files.
-//
 func Files(oldf, newf string, level int) (diffs Data, e error) {
 	oldlines, e := ReadLines(oldf)
 	if e != nil {
@@ -237,7 +227,6 @@ func Files(oldf, newf string, level int) (diffs Data, e error) {
 	return diffs, nil
 }
 
-//
 // Bytes given two similar lines, find and return the differences (additions and
 // deletion) between them.
 //
@@ -270,7 +259,6 @@ func Files(oldf, newf string, level int) (diffs Data, e error) {
 //
 //	old: 0001000
 //	new: 0002000
-//
 func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	oldlen := len(old)
 	newlen := len(new)

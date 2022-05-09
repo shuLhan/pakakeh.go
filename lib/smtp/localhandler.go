@@ -6,16 +6,12 @@ package smtp
 
 import "strings"
 
-//
 // LocalHandler is an handler using local environment.
-//
 type LocalHandler struct {
 	env *Environment
 }
 
-//
 // NewLocalHandler create an handler using local environment.
-//
 func NewLocalHandler(env *Environment) Handler {
 	return &LocalHandler{
 		env: env,
@@ -81,19 +77,15 @@ func (lh *LocalHandler) ServeAuth(username, password string) (
 	return nil, ErrInvalidCredential
 }
 
-//
 // ServeBounce handle email transaction with unknown or invalid recipent.
-//
 func (lh *LocalHandler) ServeBounce(mail *MailTx) (res *Response, err error) {
 	// TODO: send delivery status notification to sender address.
 	return nil, nil
 }
 
-//
 // ServeExpand handle SMTP EXPN command.
 //
 // BUG: The group feature currently is not supported.
-//
 func (lh *LocalHandler) ServeExpand(mailingList string) (res *Response, err error) {
 	res = &Response{
 		Code:    StatusCmdNotImplemented,
@@ -102,17 +94,13 @@ func (lh *LocalHandler) ServeExpand(mailingList string) (res *Response, err erro
 	return res, nil
 }
 
-//
 // ServeMailTx handle processing the final delivery of incoming mail.
-//
 func (lh *LocalHandler) ServeMailTx(mail *MailTx) (res *Response, err error) {
 	return nil, nil
 }
 
-//
 // ServeVerify handle SMTP VRFY command.  The username must be in the format
 // of mailbox, "local@domain".
-//
 func (lh *LocalHandler) ServeVerify(username string) (res *Response, err error) {
 	username = strings.ToLower(username)
 	localDomain := strings.Split(username, "@")

@@ -8,9 +8,7 @@ import (
 	"fmt"
 )
 
-//
 // Command represents a bot command.
-//
 type Command struct {
 	// Text of the command, 1-32 characters. Can contain only lowercase
 	// English letters, digits and underscores.
@@ -25,9 +23,7 @@ type Command struct {
 	Handler UpdateHandler `json:"-"`
 }
 
-//
 // validate will return an error if command is not valid.
-//
 func (cmd *Command) validate() error {
 	if len(cmd.Command) == 0 || len(cmd.Command) > 32 {
 		return errCommandLength(cmd.Command)

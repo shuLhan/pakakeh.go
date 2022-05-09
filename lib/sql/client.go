@@ -24,18 +24,14 @@ const (
 	sqlExtension = ".sql"
 )
 
-//
 // Client provide a wrapper for generic database instance.
-//
 type Client struct {
 	*sql.DB
 	ClientOptions
 	TableNames []string // List of tables in database.
 }
 
-//
 // NewClient create and initialize new database client.
-//
 func NewClient(opts ClientOptions) (cl *Client, err error) {
 	db, err := sql.Open(opts.DriverName, opts.DSN)
 	if err != nil {
@@ -50,10 +46,8 @@ func NewClient(opts ClientOptions) (cl *Client, err error) {
 	return cl, nil
 }
 
-//
 // FetchTableNames return the table names in current database schema sorted
 // in ascending order.
-//
 func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 	var q, v string
 
@@ -95,7 +89,6 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 	return cl.TableNames, nil
 }
 
-//
 // Migrate the database using list of SQL files inside a directory.
 // Each SQL file in directory will be executed in alphabetical order based on
 // the last state.
@@ -105,7 +98,6 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 // If its empty default to "_migration".
 // The state including the SQL file name that has been executed and the
 // timestamp.
-//
 func (cl *Client) Migrate(tableMigration string, fs http.FileSystem) (err error) {
 	logp := "Migrate"
 
@@ -178,10 +170,8 @@ func (cl *Client) Migrate(tableMigration string, fs http.FileSystem) (err error)
 	return nil
 }
 
-//
 // migrateInit get the last file in table migration or if its not exist create
 // the migration table.
-//
 func (cl *Client) migrateInit(tableMigration string) (lastFile string, err error) {
 	lastFile, err = cl.migrateLastFile(tableMigration)
 	if err == nil {
@@ -196,10 +186,8 @@ func (cl *Client) migrateInit(tableMigration string) (lastFile string, err error
 	return "", nil
 }
 
-//
 // migrateLastFile return the last finished migration or empty string if table
 // migration does not exist.
-//
 func (cl *Client) migrateLastFile(tableMigration string) (file string, err error) {
 	q := `
 		SELECT filename
@@ -316,11 +304,9 @@ func loadSQL(fs http.FileSystem, fi os.FileInfo, filename string) (
 	return sqlRaw, nil
 }
 
-//
 // TruncateTable truncate all data on table `tableName` with cascade option.
 // On PostgreSQL, any identity columns (for example, serial) will be reset
 // back to its initial value.
-//
 func (cl *Client) TruncateTable(tableName string) (err error) {
 	q := fmt.Sprintf(`TRUNCATE TABLE %s %s CASCADE;`, tableName,
 		cl.truncateWithRestartIdentity())

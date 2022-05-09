@@ -32,12 +32,10 @@ var boundSeps = []byte{'-', '-'}
 // This variable is used to make testing works on all zones.
 var dateInUtc bool
 
-//
 // Epoch return the UNIX timestamp in seconds.
 //
 // This variable is exported to allow function that use time and math/rand can
 // be tested with fixed, predictable value.
-//
 var Epoch = func() int64 {
 	return time.Now().Unix()
 }

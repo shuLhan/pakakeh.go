@@ -11,35 +11,27 @@ import (
 	"sync"
 )
 
-//
 // PathNode contains a mapping between path and Node.
-//
 type PathNode struct {
 	v  map[string]*Node
 	mu sync.Mutex
 }
 
-//
 // NewPathNode create and initialize new PathNode.
-//
 func NewPathNode() *PathNode {
 	return &PathNode{
 		v: make(map[string]*Node),
 	}
 }
 
-//
 // Delete the the node by its path.
-//
 func (pn *PathNode) Delete(path string) {
 	pn.mu.Lock()
 	delete(pn.v, path)
 	pn.mu.Unlock()
 }
 
-//
 // Get the node by path, or nil if path is not exist.
-//
 func (pn *PathNode) Get(path string) (node *Node) {
 	pn.mu.Lock()
 	defer pn.mu.Unlock()
@@ -76,9 +68,7 @@ func (pn *PathNode) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-//
 // Nodes return all the nodes.
-//
 func (pn *PathNode) Nodes() (nodes []*Node) {
 	var (
 		node *Node
@@ -92,9 +82,7 @@ func (pn *PathNode) Nodes() (nodes []*Node) {
 	return nodes
 }
 
-//
 // Paths return all the nodes paths sorted in ascending order.
-//
 func (pn *PathNode) Paths() (paths []string) {
 	var path string
 	pn.mu.Lock()
@@ -106,9 +94,7 @@ func (pn *PathNode) Paths() (paths []string) {
 	return paths
 }
 
-//
 // Set mapping of path to Node.
-//
 func (pn *PathNode) Set(path string, node *Node) {
 	if len(path) == 0 || node == nil {
 		return

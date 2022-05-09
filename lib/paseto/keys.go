@@ -6,9 +6,7 @@ package paseto
 
 import "sync"
 
-//
 // keys contains and maintains list of public Keys and its configuration.
-//
 type keys struct {
 	sync.Mutex
 	v map[string]Key

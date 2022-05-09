@@ -8,11 +8,9 @@ import (
 	"github.com/shuLhan/share/lib/contact"
 )
 
-//
 // Contact define a single Google contact data.
 //
 // Some of the fields are disabled for speed.
-//
 type Contact struct {
 	//ID         GD
 	//ETag       string     `json:"gd$etag,omitempty"`
@@ -91,9 +89,7 @@ func (gc *Contact) decodeWebsites(to *contact.Record) {
 	}
 }
 
-//
 // Decode will convert Google's Contact to our Contact format.
-//
 func (gc *Contact) Decode() (to *contact.Record) {
 	to = &contact.Record{
 		Name: contact.Name{

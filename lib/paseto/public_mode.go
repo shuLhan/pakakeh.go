@@ -19,28 +19,22 @@ const (
 	keyBearer            = "bearer"
 )
 
-//
 // DefaultTTL define the time-to-live of each token, by setting ExpiredAt to
 // current time + DefaultTTL.
 // If you want longer token, increase this value before using Pack().
-//
 var DefaultTTL = 60 * time.Second
 
-//
 // PublicMode implement the PASETO public mode to signing and verifying data
 // using private key and one or more shared public keys.
 // The PublicMode contains list of peer public keys for verifying the incoming
 // token.
-//
 type PublicMode struct {
 	our   Key
 	peers *keys
 }
 
-//
 // NewPublicMode create new PublicMode with our private key for signing
 // outgoing token.
-//
 func NewPublicMode(our Key) (auth *PublicMode, err error) {
 	if len(our.ID) == 0 {
 		return nil, fmt.Errorf("empty key ID")
@@ -55,10 +49,8 @@ func NewPublicMode(our Key) (auth *PublicMode, err error) {
 	return auth, nil
 }
 
-//
 // UnpackHTTPRequest unpack token from HTTP request header "Authorization" or
 // from query parameter "access_token".
-//
 func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 	publicToken *PublicToken, err error,
 ) {
@@ -89,10 +81,8 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 	return auth.Unpack(token)
 }
 
-//
 // AddPeer add a key to list of known peers for verifying incoming token.
 // The Key.Public
-//
 func (auth *PublicMode) AddPeer(k Key) (err error) {
 	if len(k.ID) == 0 {
 		return fmt.Errorf("empty key ID")
@@ -104,23 +94,17 @@ func (auth *PublicMode) AddPeer(k Key) (err error) {
 	return nil
 }
 
-//
 // GetPeerKey get the peer's key based on key ID.
-//
 func (auth *PublicMode) GetPeerKey(id string) (k Key, ok bool) {
 	return auth.peers.get(id)
 }
 
-//
 // RemovePeer remove peer's key from list.
-//
 func (auth *PublicMode) RemovePeer(id string) {
 	auth.peers.delete(id)
 }
 
-//
 // Pack the data into token.
-//
 func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[string]interface{}) (
 	token string, err error,
 ) {
@@ -154,9 +138,7 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 	return Sign(auth.our.Private, msg, rawfooter)
 }
 
-//
 // Unpack the token to get the JSONToken and the data.
-//
 func (auth *PublicMode) Unpack(token string) (publicToken *PublicToken, err error) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) != 4 {

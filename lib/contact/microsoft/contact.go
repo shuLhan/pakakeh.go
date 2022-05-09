@@ -8,11 +8,9 @@ import (
 	"github.com/shuLhan/share/lib/contact"
 )
 
-//
 // Contact define Microsoft Live's contact format.
 //
 // Some of the fields are disabled for speed up.
-//
 type Contact struct {
 	//ETag string `json:"@odata.etag,omitempty"`
 	//Id   string `json:"id,omitempty"`
@@ -125,9 +123,7 @@ func (c *Contact) decodeNotes(to *contact.Record) {
 	}
 }
 
-//
 // Decode will convert Microsoft's Contact to our Contact format.
-//
 func (c *Contact) Decode() (to *contact.Record) {
 	to = &contact.Record{
 		Name: contact.Name{

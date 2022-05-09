@@ -2,14 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package websocket provide a library for creating WebSocket server or
 // client.
 //
 // The websocket server is implemented with epoll and kqueue, which means it's
 // only run on Linux, Darwin, or BSD.
 //
-// Pub-Sub Example
+// # Pub-Sub Example
 //
 // The following example show how create an authenticated WebSocket server
 // that echo the data frame TEXT back to client.
@@ -70,12 +69,11 @@
 //		srv.Start()
 //	}
 //
-// References
+// # References
 //
 // - https://tools.ietf.org/html/rfc6455
 //
 // - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
 //
 // - http://man7.org/linux/man-pages/man7/epoll.7.html
-//
 package websocket

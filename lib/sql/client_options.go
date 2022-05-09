@@ -4,10 +4,8 @@
 
 package sql
 
-//
 // ClientOptions contains options to connect to database server, including the
 // migration directory.
-//
 type ClientOptions struct {
 	DriverName   string
 	DSN          string

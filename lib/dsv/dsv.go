@@ -2,13 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package dsv is a library for working with delimited separated value (DSV).
 //
 // DSV is a free-style form of Comma Separated Value (CSV) format of text data,
 // where each row is separated by newline, and each column can be separated by
 // any string enclosed with left-quote and right-quote.
-//
 package dsv
 
 import (
@@ -53,17 +51,13 @@ var (
 	ErrNilReader = errors.New("dsv: Reader object is nil")
 )
 
-//
 // ReadWriter combine reader and writer.
-//
 type ReadWriter struct {
 	Reader
 	Writer
 }
 
-//
 // New create a new ReadWriter object.
-//
 func New(config string, dataset interface{}) (rw *ReadWriter, e error) {
 	rw = &ReadWriter{}
 
@@ -80,17 +74,13 @@ func New(config string, dataset interface{}) (rw *ReadWriter, e error) {
 	return
 }
 
-//
 // SetConfigPath of input and output file.
-//
 func (dsv *ReadWriter) SetConfigPath(dir string) {
 	dsv.Reader.SetConfigPath(dir)
 	dsv.Writer.SetConfigPath(dir)
 }
 
-//
 // Close reader and writer.
-//
 func (dsv *ReadWriter) Close() (e error) {
 	e = dsv.Writer.Close()
 	if e != nil {

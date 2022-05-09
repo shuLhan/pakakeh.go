@@ -20,18 +20,14 @@ const (
 	defaultTimeout = 10 * time.Second
 )
 
-//
 // Client for XML-RPC.
-//
 type Client struct {
 	conn    *libhttp.Client
 	timeout time.Duration
 	url     *url.URL
 }
 
-//
 // NewClient create and initialize new connection to RPC server.
-//
 func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) {
 	if url == nil {
 		return nil, nil
@@ -70,17 +66,13 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 	return client, nil
 }
 
-//
 // Close the client connection.
-//
 func (cl *Client) Close() {
 	cl.url = nil
 	cl.conn = nil
 }
 
-//
 // Send the RPC method with parameters to the server.
-//
 func (cl *Client) Send(req Request) (resp Response, err error) {
 	var (
 		logp = "Client.Send"

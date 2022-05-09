@@ -9,20 +9,16 @@ import (
 	"strings"
 )
 
-//
 // RDataHINFO HINFO records are used to acquire general information about a
 // host.  The main use is for protocols such as FTP that can use special
 // procedures when talking between machines or operating systems of the same
 // type.
-//
 type RDataHINFO struct {
 	CPU []byte
 	OS  []byte
 }
 
-//
 // unpack the HINFO RDATA from DNS message.
-//
 func (hinfo *RDataHINFO) unpack(packet []byte) error {
 	x := 0
 	for ; x < len(packet); x++ {
@@ -37,9 +33,7 @@ func (hinfo *RDataHINFO) unpack(packet []byte) error {
 	return nil
 }
 
-//
 // String return readable representation of HINFO record.
-//
 func (hinfo *RDataHINFO) String() string {
 	var b strings.Builder
 

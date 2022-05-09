@@ -18,24 +18,23 @@ import (
 	"github.com/shuLhan/share/lib/reflect"
 )
 
-//
 // Message represent a DNS message.
 //
 // All communications inside of the domain protocol are carried in a single
 // format called a message.  The top level format of message is divided
 // into 5 sections (some of which are empty in certain cases) shown below:
 //
-//     +---------------------+
-//     |        Header       |
-//     +---------------------+
-//     |       Question      | the question for the name server
-//     +---------------------+
-//     |        Answer       | RRs answering the question
-//     +---------------------+
-//     |      Authority      | RRs pointing toward an authority
-//     +---------------------+
-//     |      Additional     | RRs holding additional information
-//     +---------------------+
+//	+---------------------+
+//	|        Header       |
+//	+---------------------+
+//	|       Question      | the question for the name server
+//	+---------------------+
+//	|        Answer       | RRs answering the question
+//	+---------------------+
+//	|      Authority      | RRs pointing toward an authority
+//	+---------------------+
+//	|      Additional     | RRs holding additional information
+//	+---------------------+
 //
 // The names of the sections after the header are derived from their use in
 // standard queries.  The question section contains fields that describe a
@@ -49,7 +48,6 @@ import (
 // question. [1]
 //
 // [1] RFC 1035 - 4.1. Format
-//
 type Message struct {
 	dnameOff map[string]uint16
 	dname    string
@@ -65,9 +63,7 @@ type Message struct {
 	off uint16
 }
 
-//
 // NewMessage create, initialize, and return new message.
-//
 func NewMessage() *Message {
 	return &Message{
 		Header: MessageHeader{
@@ -83,14 +79,12 @@ func NewMessage() *Message {
 	}
 }
 
-//
 // NewMessageAddress create new DNS message for hostname that contains one or
 // more A or AAAA addresses.
 // The addresses must be all IPv4 or IPv6, the first address define the query
 // type.
 // If hname is not valid hostname or one of the address is not valid IP
 // address it will return nil.
-//
 func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	if !libnet.IsHostnameValid(hname, false) {
 		return nil
@@ -155,9 +149,7 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	return msg
 }
 
-//
 // NewMessageFromRR create new message with one RR as an answer.
-//
 func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 	msg = &Message{
 		Header: MessageHeader{
@@ -179,9 +171,7 @@ func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 	return msg, nil
 }
 
-//
 // AddAnswer to the Answer field and re-pack it again.
-//
 func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 	switch rr.Type {
 	case RecordTypeSOA, RecordTypePTR:
@@ -200,10 +190,8 @@ func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 	return err
 }
 
-//
 // FilterAnswers return resource record in Answer that match only with
 // specific query type.
-//
 func (msg *Message) FilterAnswers(t RecordType) (answers []ResourceRecord) {
 	for _, rr := range msg.Answer {
 		if rr.Type == t {
@@ -224,9 +212,7 @@ func (msg *Message) compress() bool {
 	return false
 }
 
-//
 // packDomainName convert string of domain-name into DNS domain-name format.
-//
 func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 	var (
 		ok bool
@@ -607,9 +593,7 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 	msg.off += n
 }
 
-//
 // Reset the message fields.
-//
 func (msg *Message) Reset() {
 	msg.Header.Reset()
 	msg.Question.Reset()
@@ -622,18 +606,15 @@ func (msg *Message) Reset() {
 	msg.dnameOff = make(map[string]uint16)
 }
 
-//
 // ResetRR free allocated resource records in message.  This function can be
 // used to release some memory after message has been packed, but the raw
 // packet may still be in use.
-//
 func (msg *Message) ResetRR() {
 	msg.Answer = nil
 	msg.Authority = nil
 	msg.Additional = nil
 }
 
-//
 // IsExpired will return true if at least one resource record in answers is
 // expired, where their TTL value is equal to 0.
 // As long as the answers RR exist and no TTL is 0, it will return false.
@@ -643,7 +624,6 @@ func (msg *Message) ResetRR() {
 //
 // There is no check to be done on additional RR, since its may contain EDNS
 // with zero TTL.
-//
 func (msg *Message) IsExpired() bool {
 	for x := 0; x < len(msg.Answer); x++ {
 		if msg.Answer[x].TTL == 0 {
@@ -663,10 +643,8 @@ func (msg *Message) IsExpired() bool {
 	return false
 }
 
-//
 // Pack convert message into datagram packet.  The result of packing
 // a message will be saved in Packet field and returned.
-//
 func (msg *Message) Pack() ([]byte, error) {
 	msg.dnameOff = make(map[string]uint16)
 	msg.packet = msg.packet[:0]
@@ -702,9 +680,7 @@ func (msg *Message) Pack() ([]byte, error) {
 	return msg.packet, nil
 }
 
-//
 // RemoveAnswer remove the RR from list of answer.
-//
 func (msg *Message) RemoveAnswer(rr *ResourceRecord) (err error) {
 	for x, an := range msg.Answer {
 		fmt.Printf("RemoveAnswer: %s == %s?\n", an.Value, rr.Value)
@@ -720,10 +696,8 @@ func (msg *Message) RemoveAnswer(rr *ResourceRecord) (err error) {
 	return err
 }
 
-//
 // SetAuthorativeAnswer set the header authoritative answer to true (1) or
 // false (0).
-//
 func (msg *Message) SetAuthorativeAnswer(isAA bool) {
 	msg.Header.IsAA = isAA
 	if len(msg.packet) > 2 {
@@ -735,9 +709,7 @@ func (msg *Message) SetAuthorativeAnswer(isAA bool) {
 	}
 }
 
-//
 // SetID in section header and in packet.
-//
 func (msg *Message) SetID(id uint16) {
 	msg.Header.ID = id
 	if len(msg.packet) > 2 {
@@ -745,11 +717,9 @@ func (msg *Message) SetID(id uint16) {
 	}
 }
 
-//
 // SetQuery set the message as query (0) or as response (1) in header and in
 // packet.
 // Setting the message as query will also turning off AA, TC, and RA flags.
-//
 func (msg *Message) SetQuery(isQuery bool) {
 	msg.Header.IsQuery = isQuery
 	if len(msg.packet) > 3 {
@@ -765,10 +735,8 @@ func (msg *Message) SetQuery(isQuery bool) {
 	}
 }
 
-//
 // SetRecursionDesired set the message to allow recursion (true=1) or
 // not (false=0) in header and packet.
-//
 func (msg *Message) SetRecursionDesired(isRD bool) {
 	msg.Header.IsRD = isRD
 	if len(msg.packet) > 2 {
@@ -780,9 +748,7 @@ func (msg *Message) SetRecursionDesired(isRD bool) {
 	}
 }
 
-//
 // SetResponseCode in message header and in packet.
-//
 func (msg *Message) SetResponseCode(code ResponseCode) {
 	msg.Header.RCode = code
 	if len(msg.packet) > 3 {
@@ -794,10 +760,8 @@ func (msg *Message) SetResponseCode(code ResponseCode) {
 	}
 }
 
-//
 // SubTTL subtract TTL in each resource records and in packet by n seconds.
 // If TTL is less than n, it will set to 0.
-//
 func (msg *Message) SubTTL(n uint32) {
 	for x := 0; x < len(msg.Answer); x++ {
 		if msg.Answer[x].TTL < n {
@@ -828,9 +792,7 @@ func (msg *Message) SubTTL(n uint32) {
 	}
 }
 
-//
 // String return the message representation as string.
-//
 func (msg *Message) String() string {
 	var b strings.Builder
 
@@ -866,9 +828,7 @@ func (msg *Message) String() string {
 	return b.String()
 }
 
-//
 // Unpack the packet to fill the message fields.
-//
 func (msg *Message) Unpack() (err error) {
 	err = msg.UnpackHeaderQuestion()
 	if err != nil {
@@ -925,11 +885,9 @@ func (msg *Message) Unpack() (err error) {
 	return nil
 }
 
-//
 // UnpackHeaderQuestion extract only DNS header and question from message
 // packet.  This method assume that message.packet already set to DNS raw
 // message.
-//
 func (msg *Message) UnpackHeaderQuestion() (err error) {
 	if len(msg.packet) <= sectionHeaderSize {
 		return fmt.Errorf("UnpackHeaderQuestion: missing question")

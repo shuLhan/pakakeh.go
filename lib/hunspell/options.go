@@ -156,11 +156,9 @@ type affixOptions struct {
 	isCheckSharps bool         // CHECKSHARPS option.
 }
 
-//
 // open open and parse the affix options from file.
 // This function will cause all of the affix options will be reset back to
 // its default values.
-//
 func (opts *affixOptions) open(file string) (err error) {
 	affcontent, err := os.ReadFile(file)
 	if err != nil {
@@ -175,9 +173,7 @@ func (opts *affixOptions) open(file string) (err error) {
 	return nil
 }
 
-//
 // load affix options from string.
-//
 func (opts *affixOptions) load(content string) (err error) {
 	p := parser.New(content, "")
 
@@ -550,9 +546,7 @@ func (opts *affixOptions) load(content string) (err error) {
 	return nil
 }
 
-//
 // parseSet option from affix file.
-//
 func (opts *affixOptions) parseSet(args []string) {
 	if len(args) == 0 {
 		return
@@ -575,9 +569,7 @@ func (opts *affixOptions) parseSet(args []string) {
 	}
 }
 
-//
 // parseFlag parse the FLAG option from affix .
-//
 func (opts *affixOptions) parseFlag(flag string) {
 	flag = strings.ToLower(flag)
 
@@ -783,7 +775,6 @@ func (opts *affixOptions) parseCheckCompoundPattern(args []string) (err error) {
 	return nil
 }
 
-//
 // parsePfx parse the prefix header and rules.
 //
 // The first line is the prefix header,
@@ -815,7 +806,6 @@ func (opts *affixOptions) parseCheckCompoundPattern(args []string) (err error) {
 // one of the character in braces is not the first character of stem.
 //
 // The morphological_fields are separated by spaces or tab.
-//
 func (opts *affixOptions) parsePfx(args []string) (err error) {
 	flag := args[0]
 
@@ -951,9 +941,7 @@ func (opts *affixOptions) parseOconv(args []string) (err error) {
 	return nil
 }
 
-//
 // isValidFlag check whether the flag value conform the FLAG type.
-//
 func (opts *affixOptions) isValidFlag(flag string) error {
 	switch opts.flag {
 	case FlagASCII:

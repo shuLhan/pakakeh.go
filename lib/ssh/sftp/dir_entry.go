@@ -6,10 +6,8 @@ package sftp
 
 import "os"
 
-//
 // dirEntry represent the internal data returned from Readdir, Readlink, or
 // Realpath.
-//
 type dirEntry struct {
 	fileName string
 	longName string

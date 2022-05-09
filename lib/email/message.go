@@ -16,9 +16,7 @@ import (
 	"github.com/shuLhan/share/lib/email/dkim"
 )
 
-//
 // Message represent an unpacked internet message format.
-//
 type Message struct {
 	DKIMSignature *dkim.Signature
 	dkimStatus    *dkim.Status
@@ -27,9 +25,7 @@ type Message struct {
 	Body   Body
 }
 
-//
 // NewMultipart create multipart email message with text and HTML bodies.
-//
 func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 	msg *Message, err error,
 ) {
@@ -88,9 +84,7 @@ func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 	return msg, nil
 }
 
-//
 // ParseFile parse message from file.
-//
 func ParseFile(inFile string) (msg *Message, rest []byte, err error) {
 	raw, err := os.ReadFile(inFile)
 	if err != nil {
@@ -100,9 +94,7 @@ func ParseFile(inFile string) (msg *Message, rest []byte, err error) {
 	return ParseMessage(raw)
 }
 
-//
 // ParseMessage parse the raw message header and body.
-//
 func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, nil, nil
@@ -136,9 +128,7 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 	return msg, rest, nil
 }
 
-//
 // AddCC add one or more recipients to the message header CC.
-//
 func (msg *Message) AddCC(mailboxes string) (err error) {
 	err = msg.addMailboxes(FieldTypeCC, []byte(mailboxes))
 	if err != nil {
@@ -147,9 +137,7 @@ func (msg *Message) AddCC(mailboxes string) (err error) {
 	return nil
 }
 
-//
 // AddTo add one or more recipients to the mesage header To.
-//
 func (msg *Message) AddTo(mailboxes string) (err error) {
 	err = msg.addMailboxes(FieldTypeTo, []byte(mailboxes))
 	if err != nil {
@@ -166,14 +154,12 @@ func (msg *Message) addMailboxes(ft FieldType, mailboxes []byte) error {
 	return msg.Header.addMailboxes(ft, mailboxes)
 }
 
-//
 // DKIMSign sign the message using the private key and signature.
 // The only required fields in signature is SDID and Selector, any other
 // required fields that are empty will be initialized with default values.
 //
 // Upon calling this function, any field values in header and body MUST be
 // already encoded.
-//
 func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error) {
 	if pk == nil {
 		return fmt.Errorf("email: empty private key for signing")
@@ -232,9 +218,7 @@ func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error
 	return nil
 }
 
-//
 // DKIMVerify verify the message signature using DKIM.
-//
 func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	// Do not run verify again if the message has no DKIM-Signature or
 	// already permanent failed.
@@ -320,9 +304,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	return msg.dkimStatus, nil
 }
 
-//
 // SetBodyHtml set or replace the message's body HTML content.
-//
 func (msg *Message) SetBodyHtml(content []byte) (err error) {
 	err = msg.setBody([]byte(contentTypeTextHTML), content)
 	if err != nil {
@@ -331,9 +313,7 @@ func (msg *Message) SetBodyHtml(content []byte) (err error) {
 	return nil
 }
 
-//
 // SetBodyText set or replace the message body text content.
-//
 func (msg *Message) SetBodyText(content []byte) (err error) {
 	err = msg.setBody([]byte(contentTypeTextPlain), content)
 	if err != nil {
@@ -354,10 +334,8 @@ func (msg *Message) setBody(contentType, content []byte) (err error) {
 	return nil
 }
 
-//
 // SetCC set or replace the message header CC with one or more mailboxes.
 // See AddCC to add another recipient to the CC header.
-//
 func (msg *Message) SetCC(mailboxes string) (err error) {
 	err = msg.setMailboxes(FieldTypeCC, []byte(mailboxes))
 	if err != nil {
@@ -366,10 +344,8 @@ func (msg *Message) SetCC(mailboxes string) (err error) {
 	return nil
 }
 
-//
 // SetFrom set or replace the message header From with mailbox.
 // If the mailbox parameter is empty, nothing will changes.
-//
 func (msg *Message) SetFrom(mailbox string) (err error) {
 	err = msg.setMailboxes(FieldTypeFrom, []byte(mailbox))
 	if err != nil {
@@ -378,10 +354,8 @@ func (msg *Message) SetFrom(mailbox string) (err error) {
 	return nil
 }
 
-//
 // SetID set or replace the message-id header to id.
 // If the id is empty, nothing will changes.
-//
 func (msg *Message) SetID(id string) {
 	id = strings.TrimSpace(id)
 	if len(id) == 0 {
@@ -390,10 +364,8 @@ func (msg *Message) SetID(id string) {
 	_ = msg.Header.Set(FieldTypeMessageID, []byte(id))
 }
 
-//
 // SetSubject set or replace the subject.
 // It will do nothing if the subject is empty.
-//
 func (msg *Message) SetSubject(subject string) {
 	subject = strings.TrimSpace(subject)
 	if len(subject) == 0 {
@@ -402,10 +374,8 @@ func (msg *Message) SetSubject(subject string) {
 	_ = msg.Header.Set(FieldTypeSubject, []byte(subject))
 }
 
-//
 // SetTo set or replace the message header To with one or more mailboxes.
 // See AddTo to add another recipient to the To header.
-//
 func (msg *Message) SetTo(mailboxes string) (err error) {
 	err = msg.setMailboxes(FieldTypeTo, []byte(mailboxes))
 	if err != nil {
@@ -422,9 +392,7 @@ func (msg *Message) setMailboxes(ft FieldType, mailboxes []byte) error {
 	return msg.Header.Set(ft, mailboxes)
 }
 
-//
 // String return the text representation of Message object.
-//
 func (msg *Message) String() string {
 	var sb strings.Builder
 
@@ -436,9 +404,7 @@ func (msg *Message) String() string {
 	return sb.String()
 }
 
-//
 // CanonBody return the canonical representation of Message.
-//
 func (msg *Message) CanonBody() (body []byte) {
 	if msg.DKIMSignature.CanonBody == nil || *msg.DKIMSignature.CanonBody == dkim.CanonSimple {
 		body = msg.Body.Simple()
@@ -459,10 +425,8 @@ func (msg *Message) CanonBody() (body []byte) {
 	return
 }
 
-//
 // CanonHeader generate the canonicalization of sub-header and DKIM-Signature
 // field.
-//
 func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 	var bb bytes.Buffer
 
@@ -498,7 +462,6 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 	return bb.Bytes()
 }
 
-//
 // Pack the message for sending.
 //
 // This method will set the Date header if its not exist, using the local
@@ -514,7 +477,6 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 // to text/html.
 // If both the text and HTML parts exist, the generated content-type will be
 // set to multipart/alternative.
-//
 func (msg *Message) Pack() (out []byte, err error) {
 	// TODO: check from, to, subject.
 
@@ -653,10 +615,8 @@ func (msg *Message) packSingle() (out []byte, err error) {
 	return buf.Bytes(), nil
 }
 
-//
 // setDKIMHeaders set the DKIM signature headers ("h=") value with current
 // list of headers name in message.
-//
 func (msg *Message) setDKIMHeaders(sig *dkim.Signature) {
 	if len(sig.Headers) > 0 {
 		return

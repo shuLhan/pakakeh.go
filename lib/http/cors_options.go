@@ -4,10 +4,8 @@
 
 package http
 
-//
 // CORSOptions define optional options for server to allow other servers to
 // access its resources.
-//
 type CORSOptions struct {
 	exposeHeaders string
 	maxAge        string

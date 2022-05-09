@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package cart implement the Classification and Regression Tree by Breiman, et al.
 // CART is binary decision tree.
 //
@@ -13,7 +12,6 @@
 //
 // Han, Jiawei, Micheline Kamber, and Jian Pei. Data mining: concepts and
 // techniques: concepts and techniques. Elsevier, 2011.
-//
 package cart
 
 import (
@@ -42,9 +40,7 @@ const (
 	ColFlagSkip = 2
 )
 
-//
 // Runtime data for building CART.
-//
 type Runtime struct {
 	// SplitMethod define the criteria to used for splitting.
 	SplitMethod string `json:"SplitMethod"`
@@ -58,9 +54,7 @@ type Runtime struct {
 	Tree binary.Tree
 }
 
-//
 // New create new Runtime object.
-//
 func New(claset tabula.ClasetInterface, splitMethod string, nRandomFeature int) (
 	*Runtime, error,
 ) {
@@ -78,9 +72,7 @@ func New(claset tabula.ClasetInterface, splitMethod string, nRandomFeature int) 
 	return runtime, nil
 }
 
-//
 // Build will create a tree using CART algorithm.
-//
 func (runtime *Runtime) Build(claset tabula.ClasetInterface) (e error) {
 	// Re-check input configuration.
 	switch runtime.SplitMethod {
@@ -96,12 +88,10 @@ func (runtime *Runtime) Build(claset tabula.ClasetInterface) (e error) {
 	return
 }
 
-//
 // splitTreeByGain calculate the gain in all dataset, and split into two node:
 // left and right.
 //
 // Return node with the split information.
-//
 func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 	node *binary.BTNode,
 	e error,
@@ -303,9 +293,7 @@ func (runtime *Runtime) SelectRandomFeature(claset tabula.ClasetInterface) {
 	}
 }
 
-//
 // computeGain calculate the gini index for each value in each attribute.
-//
 func (runtime *Runtime) computeGain(claset tabula.ClasetInterface) (
 	gains []gini.Gini,
 ) {
@@ -374,9 +362,7 @@ func (runtime *Runtime) computeGain(claset tabula.ClasetInterface) (
 	return gains
 }
 
-//
 // Classify return the prediction of one sample.
-//
 func (runtime *Runtime) Classify(data *tabula.Row) (class string) {
 	node := runtime.Tree.Root
 	nodev := node.Value.(NodeValue)
@@ -407,9 +393,7 @@ func (runtime *Runtime) Classify(data *tabula.Row) (class string) {
 	return nodev.Class
 }
 
-//
 // ClassifySet set the class attribute based on tree classification.
-//
 func (runtime *Runtime) ClassifySet(data tabula.ClasetInterface) (e error) {
 	nrow := data.GetNRow()
 	targetAttr := data.GetClassColumn()
@@ -423,9 +407,7 @@ func (runtime *Runtime) ClassifySet(data tabula.ClasetInterface) (e error) {
 	return
 }
 
-//
 // CountOOBError process out-of-bag data on tree and return error value.
-//
 func (runtime *Runtime) CountOOBError(oob tabula.Claset) (
 	errval float64,
 	e error,
@@ -466,9 +448,7 @@ func (runtime *Runtime) CountOOBError(oob tabula.Claset) (
 	return runtime.OOBErrVal, nil
 }
 
-//
 // String yes, it will print it JSON like format.
-//
 func (runtime *Runtime) String() (s string) {
 	s = fmt.Sprintf("NRandomFeature: %d\n"+
 		" SplitMethod   : %s\n"+

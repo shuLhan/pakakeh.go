@@ -54,7 +54,6 @@ type archiveTimes struct {
 	filePath string
 }
 
-//
 // Extract uncompress and/or unarchive file from fileInput into directory
 // defined by dirOutput.
 // This is the high level API that combine standard archive/zip, archive/tar,
@@ -63,14 +62,14 @@ type archiveTimes struct {
 // The compression and archive format is detected automatically based on the
 // following fileInput extension:
 //
-//	* .bz2: decompress using compress/bzip2.
-//	* .gz: decompress using compress/gzip.
-//	* .tar: unarchive using archive/tar.
-//	* .zip: unarchive using archive/zip.
-//	* .tar.bz2: decompress using compress/bzip2 and unarchive using
-//	archive/tar.
-//	* .tar.gz: decompresss using compress/gzip and unarchive using
-//	archive/tar.
+//   - .bz2: decompress using compress/bzip2.
+//   - .gz: decompress using compress/gzip.
+//   - .tar: unarchive using archive/tar.
+//   - .zip: unarchive using archive/zip.
+//   - .tar.bz2: decompress using compress/bzip2 and unarchive using
+//     archive/tar.
+//   - .tar.gz: decompresss using compress/gzip and unarchive using
+//     archive/tar.
 //
 // The output directory, dirOutput, where the decompressed and/or unarchived
 // file stored will be created if not exist.
@@ -78,7 +77,6 @@ type archiveTimes struct {
 //
 // On success, the compressed and/or archived file will be removed from the
 // file system.
-//
 func Extract(fileInput, dirOutput string) (err error) {
 	var (
 		logp     = "Extract"
@@ -206,11 +204,9 @@ func Extract(fileInput, dirOutput string) (err error) {
 	return nil
 }
 
-//
 // bunzip2 uncompress the file input fin using bzip2.
 // Since we did not know how large the output file and how much the caller
 // memory, we store the output into the temporary file.
-//
 func (xtrk *extractor) bunzip2(fin *os.File) (fout *os.File, err error) {
 	var (
 		logp      = "uncompressWithBzip"
@@ -297,10 +293,8 @@ func (xtrk *extractor) gunzip(fin *os.File) (fout *os.File, err error) {
 	return fout, nil
 }
 
-//
 // untar the tar archive from fin, store the result into directory
 // dirOutput.
-//
 func (xtrk *extractor) untar(fin io.Reader) (err error) {
 	var (
 		logp      = "untar"
@@ -367,10 +361,8 @@ func (xtrk *extractor) untar(fin io.Reader) (err error) {
 	return nil
 }
 
-//
 // unzip extract the zip archive from fin, store the result into directory
 // dirOutput.
-//
 func (xtrk *extractor) unzip(fin *os.File) (err error) {
 	var (
 		logp = "unzip"

@@ -17,7 +17,6 @@ var (
 	}
 )
 
-//
 // Response contains the data that server send to client as a reply from
 // Request or as broadcast from client subscription.
 //
@@ -27,24 +26,23 @@ var (
 //
 // Example of response format for replying request,
 //
-// 	{
-// 		id: 1512459721269,
-// 		code:  200,
-// 		message: "",
-// 		body: ""
-// 	}
+//	{
+//		id: 1512459721269,
+//		code:  200,
+//		message: "",
+//		body: ""
+//	}
 //
 // If response type is broadcast the ID and code MUST be 0, and the `message`
 // field will contain the name of subscription. For example, when recipient of
 // message read the message, server will publish a notification response as,
 //
-// 	{
-// 		id: 0,
-// 		code:  0,
-// 		message: "message.read",
-// 		body: "{ \"id\": ... }"
-// 	}
-//
+//	{
+//		id: 0,
+//		code:  0,
+//		message: "message.read",
+//		body: "{ \"id\": ... }"
+//	}
 type Response struct {
 	ID      uint64 `json:"id"`
 	Code    int32  `json:"code"`
@@ -52,10 +50,8 @@ type Response struct {
 	Body    string `json:"body"`
 }
 
-//
 // NewBroadcast create a new message for broadcast by server encoded as JSON
 // and wrapped in TEXT frame.
-//
 func NewBroadcast(message, body string) (packet []byte, err error) {
 	res := _resPool.Get().(*Response)
 	res.reset()
@@ -75,9 +71,7 @@ func NewBroadcast(message, body string) (packet []byte, err error) {
 	return packet, nil
 }
 
-//
 // reset all field's value to zero or empty.
-//
 func (res *Response) reset() {
 	res.ID = 0
 	res.Code = 0

@@ -4,9 +4,7 @@
 
 package slack
 
-//
 // Message define the standard message payload with JSON tags.
-//
 type Message struct {
 	Channel   string `json:"channel,omitempty"`
 	Username  string `json:"username,omitempty"`

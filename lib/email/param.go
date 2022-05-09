@@ -4,9 +4,7 @@
 
 package email
 
-//
 // List of known parameter name in header field's value.
-//
 var (
 	// Parameter for Text Media Type, RFC 2046 section 4.1.
 	ParamNameCharset = []byte("charset")
@@ -24,9 +22,7 @@ var (
 	ParamNameTotal  = []byte("total")
 )
 
-//
 // Param represent a key-value in slice of bytes.
-//
 type Param struct {
 	Key    []byte
 	Value  []byte

@@ -16,10 +16,8 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//
 // assertFile compare content of two file, print error message and exit
 // when both are different.
-//
 func assertFile(t *testing.T, a, b string) {
 	out, e := os.ReadFile(a)
 
@@ -66,9 +64,7 @@ func checkDataset(t *testing.T, r *Reader, exp string) {
 	test.Assert(t, "", exp, got)
 }
 
-//
 // doReadWrite test reading and writing the DSV data.
-//
 func doReadWrite(t *testing.T, dsvReader *Reader, dsvWriter *Writer,
 	expectation []string, check bool) {
 	i := 0

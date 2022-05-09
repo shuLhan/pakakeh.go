@@ -48,9 +48,7 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 	return
 }
 
-//
 // testHandleText from websocket by echo-ing back the payload.
-//
 func testHandleText(conn int, payload []byte) {
 	packet := NewFrameText(false, payload)
 
@@ -60,9 +58,7 @@ func testHandleText(conn int, payload []byte) {
 	}
 }
 
-//
 // testHandleBin from websocket by echo-ing back the payload.
-//
 func testHandleBin(conn int, payload []byte) {
 	packet := NewFrameBin(false, payload)
 
@@ -72,9 +68,7 @@ func testHandleBin(conn int, payload []byte) {
 	}
 }
 
-//
 // testHandleAuth with token in query parameter
-//
 func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 	q := req.URL.Query()
 

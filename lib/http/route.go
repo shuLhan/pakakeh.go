@@ -8,9 +8,7 @@ import (
 	"strings"
 )
 
-//
 // route represent the route to endpoint.
-//
 type route struct {
 	endpoint *Endpoint // endpoint of route.
 	path     string    // path contains Endpoint's path that has been cleaned up.
@@ -18,7 +16,6 @@ type route struct {
 	nkey     int       // nkey contains the number of keys in nodes.
 }
 
-//
 // newRoute parse the Endpoint's path, store the key(s) in path if available
 // in nodes.
 //
@@ -27,7 +24,6 @@ type route struct {
 // are keys.
 // If path is invalid, for example, "/:user/:" or "/:user/:user" (key with
 // duplicate names), it will return nil.
-//
 func newRoute(ep *Endpoint) (rute *route, err error) {
 	rute = &route{
 		endpoint: ep,
@@ -73,10 +69,8 @@ func newRoute(ep *Endpoint) (rute *route, err error) {
 	return rute, nil
 }
 
-//
 // isKeyExist will return true if the key already exist in nodes; otherwise it
 // will return false.
-//
 func (rute *route) isKeyExist(key string) bool {
 	for _, node := range rute.nodes {
 		if !node.isKey {
@@ -89,10 +83,8 @@ func (rute *route) isKeyExist(key string) bool {
 	return false
 }
 
-//
 // parse the path and return the key-value association and true if path is
 // matched with current route; otherwise it will return nil and false.
-//
 func (rute *route) parse(path string) (vals map[string]string, ok bool) {
 	if rute.nkey == 0 {
 		if path == rute.path {
@@ -118,10 +110,8 @@ func (rute *route) parse(path string) (vals map[string]string, ok bool) {
 	return vals, true
 }
 
-//
 // generatePath generate a clean path without any white spaces and single "/"
 // between sub-path.
-//
 func (rute *route) generatePath() (path string) {
 	for _, node := range rute.nodes {
 		path += "/"

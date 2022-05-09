@@ -37,10 +37,8 @@ const (
 	defXAuthLocation      = "/usr/X11R6/bin/xauth"
 )
 
-//
 // Section is the type that represent SSH client Host and Match section in
 // configuration.
-//
 type Section struct {
 	AddKeysToAgent              string
 	AddressFamily               string
@@ -141,10 +139,8 @@ func newSectionHost(rawPattern string) (host *Section) {
 	return host
 }
 
-//
 // GenerateSigners convert the IdentityFile to ssh.Signer for authentication
 // using PublicKey.
-//
 func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) {
 	var (
 		logp     = "GenerateSigners"
@@ -210,12 +206,10 @@ func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) 
 	return nil
 }
 
-//
 // GetIdentityAgent get the identity agent either from section config variable
 // IdentityAgent or from environment variable SSH_AUTH_SOCK.
 // It will return empty string if IdentityAgent set to "none" or SSH_AUTH_SOCK
 // is empty.
-//
 func (section *Section) GetIdentityAgent() string {
 	if section.identityAgent == "none" {
 		return ""
@@ -226,10 +220,8 @@ func (section *Section) GetIdentityAgent() string {
 	return os.Getenv(envSshAuthSock)
 }
 
-//
 // isMatch will return true if the string "s" match with one of Host or Match
 // section.
-//
 func (section *Section) isMatch(s string) bool {
 	if section.useCriteria {
 		for _, criteria := range section.criteria {
@@ -247,9 +239,7 @@ func (section *Section) isMatch(s string) bool {
 	return false
 }
 
-//
 // init check, parse, and expand all of the fields values.
-//
 func (section *Section) init(workDir, homeDir string) {
 	section.homeDir = homeDir
 	section.WorkingDir = workDir
@@ -325,9 +315,7 @@ func (section *Section) setCASignatureAlgorithms(val string) {
 	section.CASignatureAlgorithms = strings.Split(val, ",")
 }
 
-//
 // setEnv set the Environments with key and value of format "KEY=VALUE".
-//
 func (section *Section) setEnv(env string) {
 	kv := strings.SplitN(env, "=", 2)
 	if len(kv) == 2 {
@@ -335,7 +323,6 @@ func (section *Section) setEnv(env string) {
 	}
 }
 
-//
 // setIdentityAgent set the UNIX-domain socket used to communicate with
 // the authentication agent.
 // There are four possible value: SSH_AUTH_SOCK, <$STRING>, <PATH>, or
@@ -345,7 +332,6 @@ func (section *Section) setEnv(env string) {
 // If value start with "$", then the socket path is set based on value of that
 // environment variable.
 // Other string beside "none" will be considered as path to socket.
-//
 func (section *Section) setIdentityAgent(val string) {
 	if val == envSshAuthSock {
 		section.identityAgent = os.Getenv(envSshAuthSock)

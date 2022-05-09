@@ -9,9 +9,7 @@ import (
 	"sort"
 )
 
-//
 // Count number of class in data.
-//
 func Count(d []int, class int) (count int) {
 	if len(d) == 0 {
 		return
@@ -24,12 +22,10 @@ func Count(d []int, class int) (count int) {
 	return
 }
 
-//
 // Counts number of each class in slice.
 //
 // For example, if data is "[1,1,2]" and classes is "[1,2]", this function
 // will return "[2,1]".
-//
 func Counts(d, classes []int) (counts []int) {
 	if len(classes) == 0 {
 		return
@@ -41,9 +37,7 @@ func Counts(d, classes []int) (counts []int) {
 	return
 }
 
-//
 // IndirectSort sort the data and return the sorted index.
-//
 func IndirectSort(d []int, asc bool) (sortedIdx []int) {
 	sortedIdx = make([]int, len(d))
 	for i := 0; i < len(d); i++ {
@@ -55,7 +49,6 @@ func IndirectSort(d []int, asc bool) (sortedIdx []int) {
 	return
 }
 
-//
 // InplaceInsertionSort will sort the data and their index using
 // insertion-sort algorithm.
 //
@@ -64,7 +57,6 @@ func IndirectSort(d []int, asc bool) (sortedIdx []int) {
 // `ids` is indices of data,
 // `l` is starting index of slice to be sorted, and
 // `r` is end index of slice to be sorted.
-//
 func InplaceInsertionSort(d, ids []int, l, r int, asc bool) {
 	for x := l; x < r; x++ {
 		for y := x + 1; y < r; y++ {
@@ -83,10 +75,8 @@ func InplaceInsertionSort(d, ids []int, l, r int, asc bool) {
 	}
 }
 
-//
 // InplaceMergesort sort the slice "d" in-place, without memory allocation,
 // using mergesort algorithm.
-//
 func InplaceMergesort(d []int, idx []int, l, r int, asc bool) {
 	if l+7 >= r {
 		// If data length <= Threshold, then use insertion sort.
@@ -120,10 +110,8 @@ func InplaceMergesort(d []int, idx []int, l, r int, asc bool) {
 	inplaceMerge(d, idx, l, c, r, asc)
 }
 
-//
 // IsExist will return true if value `v` exist in slice of `d`,
 // otherwise it will return false.
-//
 func IsExist(d []int, v int) bool {
 	for x := 0; x < len(d); x++ {
 		if d[x] == v {
@@ -133,11 +121,9 @@ func IsExist(d []int, v int) bool {
 	return false
 }
 
-//
 // Max find the maximum value in slice and return its value and index.
 //
 // If slice is empty, it will return false in ok.
-//
 func Max(d []int) (v int, i int, ok bool) {
 	if len(d) == 0 {
 		return
@@ -153,7 +139,6 @@ func Max(d []int) (v int, i int, ok bool) {
 	return v, i, true
 }
 
-//
 // MaxCountOf count number of occurrence of each element of classes
 // in data and return the class with maximum count.
 //
@@ -166,7 +151,6 @@ func Max(d []int) (v int, i int, ok bool) {
 // function will count 5 as 3, 6 as 2, and 7 as 0.
 // Since frequency of 5 is greater than 6 and 7, then it will return `5` and
 // `true`.
-//
 func MaxCountOf(d, classes []int) (int, bool) {
 	if len(classes) == 0 {
 		return -1, false
@@ -182,11 +166,9 @@ func MaxCountOf(d, classes []int) (int, bool) {
 	return classes[i], true
 }
 
-//
 // MaxRange find the (last) maximum value in slice between index "l" and "r".
 //
 // WARNING: This function does not check index out of range.
-//
 func MaxRange(d []int, l, r int) (v, i int) {
 	v = d[l]
 	i = l
@@ -199,7 +181,6 @@ func MaxRange(d []int, l, r int) (v, i int) {
 	return
 }
 
-//
 // MergeByDistance merge two slice of integers by their distance between each
 // others.
 //
@@ -207,7 +188,6 @@ func MaxRange(d []int, l, r int) (v, i int) {
 // "{4, 11, 15}" and the distance is 3, the output of merged is
 // "{1, 5, 9, 15}".  The 4 and 11 are not included because 4 is in
 // range between 1 and (1+3), and 11 is in range between 9 and 9+3.
-//
 func MergeByDistance(a, b []int, distance int) (out []int) {
 	lenab := len(a) + len(b)
 	if lenab == 0 {
@@ -233,11 +213,9 @@ func MergeByDistance(a, b []int, distance int) (out []int) {
 	return out
 }
 
-//
 // Min find the minimum value in slice and return its value and index.
 //
 // If slice is empty, it will return false in ok.
-//
 func Min(d []int) (v int, i int, ok bool) {
 	if len(d) == 0 {
 		return
@@ -253,11 +231,9 @@ func Min(d []int) (v int, i int, ok bool) {
 	return v, i, true
 }
 
-//
 // MinRange find the (last) minimum value in slice between index "l" and "r".
 //
 // WARNING: This function does not check index out of range.
-//
 func MinRange(d []int, l, r int) (v, i int) {
 	v = d[l]
 	i = l
@@ -270,10 +246,8 @@ func MinRange(d []int, l, r int) (v, i int) {
 	return
 }
 
-//
 // Remove value "v" from slice if its exist and return new slice and true;
 // otherwise, if not found, return unmodified slice and false.
-//
 func Remove(d []int, v int) ([]int, bool) {
 	for x := 0; x < len(d); x++ {
 		if d[x] == v {
@@ -284,9 +258,7 @@ func Remove(d []int, v int) ([]int, bool) {
 	return d, false
 }
 
-//
 // SortByIndex will sort the slice `d` using sorted index `sortedIds`.
-//
 func SortByIndex(d *[]int, sortedIds []int) {
 	newd := make([]int, len(*d))
 
@@ -297,9 +269,7 @@ func SortByIndex(d *[]int, sortedIds []int) {
 	(*d) = newd
 }
 
-//
 // Sum all value in slice.
-//
 func Sum(d []int) (sum int) {
 	for x := 0; x < len(d); x++ {
 		sum += d[x]
@@ -307,9 +277,7 @@ func Sum(d []int) (sum int) {
 	return
 }
 
-//
 // Swap two indices value of slice.
-//
 func Swap(d []int, x, y int) {
 	if x == y || len(d) <= 1 || x > len(d) || y > len(d) {
 		return
@@ -319,9 +287,7 @@ func Swap(d []int, x, y int) {
 	d[y] = tmp
 }
 
-//
 // To64 convert slice of integer to 64 bit values.
-//
 func To64(ints []int) []int64 {
 	i64 := make([]int64, len(ints))
 	for x, v := range ints {
@@ -330,10 +296,8 @@ func To64(ints []int) []int64 {
 	return i64
 }
 
-//
 // Let `x` be the first index of left-side, `y` be the first index of
 // the right-side, and `r` as length of slice `d`
-//
 func inplaceMerge(d []int, idx []int, x, y, r int, asc bool) {
 	var ylast int
 

@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-//
 // RDataWKS The WKS record is used to describe the well known services
 // supported by a particular protocol on a particular internet address.  The
 // PROTOCOL field specifies an IP protocol number, and the bit map has one bit
@@ -26,16 +25,13 @@ import (
 // The purpose of WKS RRs is to provide availability information for
 // servers for TCP and UDP.  If a server supports both TCP and UDP, or has
 // multiple Internet addresses, then multiple WKS RRs are used.
-//
 type RDataWKS struct {
 	Address  []byte
 	BitMap   []byte
 	Protocol byte
 }
 
-//
 // unpack the WKS record from DNS RR in packet.
-//
 func (wks *RDataWKS) unpack(packet []byte) error {
 	wks.Address = append(wks.Address, packet[0:4]...)
 	wks.Protocol = packet[4]
@@ -43,9 +39,7 @@ func (wks *RDataWKS) unpack(packet []byte) error {
 	return nil
 }
 
-//
 // String return readable representation of WKS record.
-//
 func (wks *RDataWKS) String() string {
 	var b strings.Builder
 

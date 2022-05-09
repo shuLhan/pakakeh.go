@@ -12,9 +12,7 @@ import (
 	"github.com/shuLhan/share/lib/parser"
 )
 
-//
 // Stem contains the word and its attributes.
-//
 type Stem struct {
 	Word      string
 	Morphemes Morphemes
@@ -26,10 +24,8 @@ type Stem struct {
 	IsForbidden bool
 }
 
-//
 // newStem create and initialize new stem using the parent Stem, word, and
 // optional list of morpheme.
-//
 func newStem(parent *Stem, word string, morphs Morphemes) (stem *Stem) {
 	stem = &Stem{
 		Word:      word,
@@ -63,9 +59,7 @@ func parseStem(line string) (stem *Stem, err error) {
 	return stem, nil
 }
 
-//
 // Analyze return the morphological fields of the stem and its parent stem.
-//
 func (stem *Stem) Analyze() Morphemes {
 	morphs := stem.Morphemes.clone()
 	root := stem
@@ -81,12 +75,10 @@ func (stem *Stem) Analyze() Morphemes {
 	return morphs
 }
 
-//
 // parse the single line of word with optional flags and zero or more
 // morphemes attributes.
 //
 //	STEM := WORD [ " " WORD ] [ "/" FLAGS ] [ *MORPHEME ]
-//
 func (stem *Stem) parse(line string) (err error) {
 	var (
 		token  string
@@ -157,10 +149,8 @@ func (stem *Stem) parse(line string) (err error) {
 	return nil
 }
 
-//
 // Stem reduce inflected (or sometimes derived) words to their word stem,
 // base, or root form.
-//
 func (stem *Stem) Stem() *Stem {
 	if stem.Parent == nil {
 		return stem
@@ -177,9 +167,7 @@ func (stem *Stem) Stem() *Stem {
 	return parent
 }
 
-//
 // unpack parse the stem and flags.
-//
 func (stem *Stem) unpack(opts *affixOptions) (derivatives []*Stem, err error) {
 	if stem.Word[0] == '*' {
 		stem.IsForbidden = true
@@ -237,10 +225,8 @@ func (stem *Stem) unpackFlags(opts *affixOptions) (
 	return derivatives, nil
 }
 
-//
 // applySuffixes apply any cross-product "suffixes" in "flags" for each word
 // in "stems".
-//
 func (stem *Stem) applySuffixes(
 	opts *affixOptions, flags []string, stems []*Stem,
 ) (

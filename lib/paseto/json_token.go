@@ -24,19 +24,17 @@ type JSONToken struct {
 	Data      string     `json:"data"`
 }
 
-//
 // Validate the JSON token fields,
 //
-//	* The Issuer must equaal to peer.ID
-//	* The Audience must equal to received ID,
-//	* If peer.AllowedSubjects is not empty, the Subject value must be in
-//	one of them,
-//	* The current time must be after IssuedAt field,
-//	* The current time must after NotBefore "nbf" field,
-//	* The current time must before ExpiredAt field.
+//   - The Issuer must equal to peer.ID
+//   - The Audience must equal to received ID,
+//   - If peer.AllowedSubjects is not empty, the Subject value must be in
+//     one of them,
+//   - The current time must be after IssuedAt field,
+//   - The current time must after NotBefore "nbf" field,
+//   - The current time must before ExpiredAt field.
 //
 // If one of the above condition is not passed, it will return an error.
-//
 func (jtoken *JSONToken) Validate(audience string, peer Key) (err error) {
 	now := time.Now().Round(time.Second)
 	if jtoken.Issuer != peer.ID {

@@ -16,7 +16,6 @@ import (
 // After:
 //
 //	BenchmarkReaderReadUntil-4  5000000  239 ns/op  33.37 MB/s  32 B/op  1 allocs/op
-//
 func BenchmarkReaderReadUntil(b *testing.B) {
 	r := &Reader{}
 

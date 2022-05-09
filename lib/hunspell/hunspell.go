@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package hunspell is a library to parse the Hunspell file format.
-//
 package hunspell
 
 import (
@@ -18,9 +16,7 @@ import (
 	"github.com/shuLhan/share/lib/parser"
 )
 
-//
 // List of affix file general options.
-//
 const (
 	optSet             = "SET"
 	optFlag            = "FLAG"
@@ -97,10 +93,9 @@ const (
 	optCheckSharps   = "CHECKSHARPS"
 )
 
-//
 // List of morphological and other IDs.
 //
-//nolint: deadcode,varcheck
+// nolint: deadcode,varcheck
 const (
 	morphKeyPH = "ph"
 	morphKeyST = "st"
@@ -167,7 +162,6 @@ func errInvalidMorpheme(in string) error {
 	return fmt.Errorf("invalid morpheme %q", in)
 }
 
-//
 // MergeDictionaries merge two or more dictionaries into single file.
 // The outFile define the output of merged dictionaries.
 // If the outFile already exist it will be truncated, otherwise it will be
@@ -175,7 +169,6 @@ func errInvalidMorpheme(in string) error {
 // The inFiles contains list of input dictionary files.
 //
 // On success it will return number of words merged into output file.
-//
 func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
 	if len(inFiles) == 0 {
 		return 0, nil

@@ -12,9 +12,7 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
-//
 // Claset define a dataset with class attribute.
-//
 type Claset struct {
 	// Dataset embedded, for implementing the dataset interface.
 	Dataset
@@ -32,9 +30,7 @@ type Claset struct {
 	minor string
 }
 
-//
 // NewClaset create and return new Claset object.
-//
 func NewClaset(mode int, types []int, names []string) (claset *Claset) {
 	claset = &Claset{
 		ClassIndex: -1,
@@ -45,9 +41,7 @@ func NewClaset(mode int, types []int, names []string) (claset *Claset) {
 	return
 }
 
-//
 // Clone return a copy of current claset object.
-//
 func (claset *Claset) Clone() interface{} {
 	clone := Claset{
 		ClassIndex: claset.GetClassIndex(),
@@ -58,16 +52,12 @@ func (claset *Claset) Clone() interface{} {
 	return &clone
 }
 
-//
 // GetDataset return the dataset.
-//
 func (claset *Claset) GetDataset() DatasetInterface {
 	return &claset.Dataset
 }
 
-//
 // GetClassType return type of class in dataset.
-//
 func (claset *Claset) GetClassType() int {
 	if claset.Columns.Len() <= 0 {
 		return TString
@@ -75,9 +65,7 @@ func (claset *Claset) GetClassType() int {
 	return claset.Columns[claset.ClassIndex].Type
 }
 
-//
 // GetClassValueSpace return the class value space.
-//
 func (claset *Claset) GetClassValueSpace() []string {
 	if claset.Columns.Len() <= 0 {
 		return nil
@@ -85,9 +73,7 @@ func (claset *Claset) GetClassValueSpace() []string {
 	return claset.Columns[claset.ClassIndex].ValueSpace
 }
 
-//
 // GetClassColumn return dataset class values in column.
-//
 func (claset *Claset) GetClassColumn() *Column {
 	if claset.Mode == DatasetModeRows {
 		claset.TransposeToColumns()
@@ -98,9 +84,7 @@ func (claset *Claset) GetClassColumn() *Column {
 	return &claset.Columns[claset.ClassIndex]
 }
 
-//
 // GetClassRecords return class values as records.
-//
 func (claset *Claset) GetClassRecords() *Records {
 	if claset.Mode == DatasetModeRows {
 		claset.TransposeToColumns()
@@ -111,9 +95,7 @@ func (claset *Claset) GetClassRecords() *Records {
 	return &claset.Columns[claset.ClassIndex].Records
 }
 
-//
 // GetClassAsStrings return all class values as slice of string.
-//
 func (claset *Claset) GetClassAsStrings() []string {
 	if claset.Mode == DatasetModeRows {
 		claset.TransposeToColumns()
@@ -124,9 +106,7 @@ func (claset *Claset) GetClassAsStrings() []string {
 	return claset.Columns[claset.ClassIndex].ToStringSlice()
 }
 
-//
 // GetClassAsReals return class record value as slice of float64.
-//
 func (claset *Claset) GetClassAsReals() []float64 {
 	if claset.Mode == DatasetModeRows {
 		claset.TransposeToColumns()
@@ -137,9 +117,7 @@ func (claset *Claset) GetClassAsReals() []float64 {
 	return claset.Columns[claset.ClassIndex].ToFloatSlice()
 }
 
-//
 // GetClassAsInteger return class record value as slice of int64.
-//
 func (claset *Claset) GetClassAsInteger() []int64 {
 	if claset.Mode == DatasetModeRows {
 		claset.TransposeToColumns()
@@ -150,30 +128,22 @@ func (claset *Claset) GetClassAsInteger() []int64 {
 	return claset.Columns[claset.ClassIndex].ToIntegers()
 }
 
-//
 // GetClassIndex return index of class attribute in dataset.
-//
 func (claset *Claset) GetClassIndex() int {
 	return claset.ClassIndex
 }
 
-//
 // MajorityClass return the majority class of data.
-//
 func (claset *Claset) MajorityClass() string {
 	return claset.major
 }
 
-//
 // MinorityClass return the minority class in dataset.
-//
 func (claset *Claset) MinorityClass() string {
 	return claset.minor
 }
 
-//
 // Counts return the number of each class in value-space.
-//
 func (claset *Claset) Counts() []int {
 	if len(claset.counts) == 0 {
 		claset.CountValueSpaces()
@@ -181,37 +151,27 @@ func (claset *Claset) Counts() []int {
 	return claset.counts
 }
 
-//
 // SetDataset in class set.
-//
 func (claset *Claset) SetDataset(dataset DatasetInterface) {
 	claset.Dataset = *(dataset.(*Dataset))
 }
 
-//
 // SetClassIndex will set the class index to `v`.
-//
 func (claset *Claset) SetClassIndex(v int) {
 	claset.ClassIndex = v
 }
 
-//
 // SetMajorityClass will set the majority class to `v`.
-//
 func (claset *Claset) SetMajorityClass(v string) {
 	claset.major = v
 }
 
-//
 // SetMinorityClass will set the minority class to `v`.
-//
 func (claset *Claset) SetMinorityClass(v string) {
 	claset.minor = v
 }
 
-//
 // CountValueSpaces will count number of value space in current dataset.
-//
 func (claset *Claset) CountValueSpaces() {
 	classv := claset.GetClassAsStrings()
 	claset.vs = claset.GetClassValueSpace()
@@ -219,9 +179,7 @@ func (claset *Claset) CountValueSpaces() {
 	claset.counts = libstrings.CountTokens(classv, claset.vs, false)
 }
 
-//
 // RecountMajorMinor recount major and minor class in claset.
-//
 func (claset *Claset) RecountMajorMinor() {
 	claset.CountValueSpaces()
 
@@ -236,11 +194,9 @@ func (claset *Claset) RecountMajorMinor() {
 	}
 }
 
-//
 // IsInSingleClass check whether all target class contain only single value.
 // Return true and name of target if all rows is in the same class,
 // false and empty string otherwise.
-//
 func (claset *Claset) IsInSingleClass() (single bool, class string) {
 	classv := claset.GetClassAsStrings()
 
@@ -257,10 +213,8 @@ func (claset *Claset) IsInSingleClass() (single bool, class string) {
 	return
 }
 
-//
 // GetMinorityRows return rows where their class is minority in dataset, or nil
 // if dataset is empty.
-//
 func (claset *Claset) GetMinorityRows() *Rows {
 	if claset.Len() == 0 {
 		return nil
@@ -275,9 +229,7 @@ func (claset *Claset) GetMinorityRows() *Rows {
 	return &minRows
 }
 
-//
 // String, yes it will pretty print the meta-data in JSON format.
-//
 func (claset *Claset) String() (s string) {
 	if claset.vs == nil {
 		claset.RecountMajorMinor()

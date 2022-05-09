@@ -11,10 +11,8 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-//
 // Stat hold statistic value of classifier, including TP rate, FP rate, precision,
 // and recall.
-//
 type Stat struct {
 	// ID unique id for this statistic (e.g. number of tree).
 	ID int64
@@ -60,42 +58,32 @@ func (stat *Stat) SetAUC(v float64) {
 	stat.AUC = v
 }
 
-//
 // SetTPRate will set TP and TPRate using number of positive `p`.
-//
 func (stat *Stat) SetTPRate(tp, p int64) {
 	stat.TP = tp
 	stat.TPRate = float64(tp) / float64(p)
 }
 
-//
 // SetFPRate will set FP and FPRate using number of negative `n`.
-//
 func (stat *Stat) SetFPRate(fp, n int64) {
 	stat.FP = fp
 	stat.FPRate = float64(fp) / float64(n)
 }
 
-//
 // SetPrecisionFromRate will set Precision value using tprate and fprate.
 // `p` and `n` is the number of positive and negative class in samples.
-//
 func (stat *Stat) SetPrecisionFromRate(p, n int64) {
 	stat.Precision = (stat.TPRate * float64(p)) /
 		((stat.TPRate * float64(p)) + (stat.FPRate * float64(n)))
 }
 
-//
 // Recall return value of recall.
-//
 func (stat *Stat) Recall() float64 {
 	return stat.TPRate
 }
 
-//
 // Sum will add statistic from other stat object to current stat, not including
 // the start and end time.
-//
 func (stat *Stat) Sum(other *Stat) {
 	stat.OobError += other.OobError
 	stat.OobErrorMean += other.OobErrorMean
@@ -111,9 +99,7 @@ func (stat *Stat) Sum(other *Stat) {
 	stat.Accuracy += other.Accuracy
 }
 
-//
 // ToRow will convert the stat to tabula.row in the order of Stat field.
-//
 func (stat *Stat) ToRow() (row *tabula.Row) {
 	row = &tabula.Row{}
 
@@ -138,24 +124,18 @@ func (stat *Stat) ToRow() (row *tabula.Row) {
 	return
 }
 
-//
 // Start will start the timer.
-//
 func (stat *Stat) Start() {
 	stat.StartTime = time.Now().Unix()
 }
 
-//
 // End will stop the timer and compute the elapsed time.
-//
 func (stat *Stat) End() {
 	stat.EndTime = time.Now().Unix()
 	stat.ElapsedTime = stat.EndTime - stat.StartTime
 }
 
-//
 // Write will write the content of stat to `file`.
-//
 func (stat *Stat) Write(file string) (e error) {
 	if file == "" {
 		return

@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package xmlrpc provide an implementation of XML-RPC specification,
 // http://xmlrpc.com/spec.md.
-//
 package xmlrpc
 
 const (
@@ -14,12 +12,10 @@ const (
 	timeLayoutISO8601 = "20060102T15:04:05"
 )
 
-//
 // Kind define the known type in Value.
 //
 // This is looks like the reflect.Kind but limited only to specific types
 // defined in XML-RPC.
-//
 type Kind int
 
 const (

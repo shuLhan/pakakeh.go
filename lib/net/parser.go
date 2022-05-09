@@ -10,12 +10,10 @@ import (
 	"strconv"
 )
 
-//
 // ParseIPPort parse address into hostname/address, IP and port.
 // If address is not an IP address, it will return the address as hostname
 // (without port number if its exist) and nil on ip.
 // In case of port is empty or invalid, it will set to defPort.
-//
 func ParseIPPort(address string, defPort uint16) (host string, ip net.IP, port uint16) {
 	var (
 		sport string
@@ -42,11 +40,9 @@ func ParseIPPort(address string, defPort uint16) (host string, ip net.IP, port u
 	return host, ip, port
 }
 
-//
 // ParseUDPAddr parse IP address into standard library UDP address.
 // If address is not contains IP address, it will return nil with error.
 // In case of port is empty, it will set to default port value in defPort.
-//
 func ParseUDPAddr(address string, defPort uint16) (udp *net.UDPAddr, err error) {
 	_, ip, port := ParseIPPort(address, defPort)
 	if ip == nil {
@@ -61,11 +57,9 @@ func ParseUDPAddr(address string, defPort uint16) (udp *net.UDPAddr, err error) 
 	return
 }
 
-//
 // ParseTCPAddr parse IP address into standard library TCP address.
 // If address is not contains IP address, it will return nil with error.
 // In case of port is empty, it will set to default port value in defPort.
-//
 func ParseTCPAddr(address string, defPort uint16) (udp *net.TCPAddr, err error) {
 	_, ip, port := ParseIPPort(address, defPort)
 	if ip == nil {

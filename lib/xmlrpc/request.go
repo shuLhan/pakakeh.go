@@ -10,18 +10,14 @@ import (
 	"fmt"
 )
 
-//
 // Request represent the XML-RPC request, including method name and optional
 // parameters.
-//
 type Request struct {
 	MethodName string
 	Params     []*Value
 }
 
-//
 // NewRequest create and initialize new request.
-//
 func NewRequest(methodName string, params []interface{}) (req Request, err error) {
 	req = Request{
 		MethodName: methodName,
@@ -40,9 +36,7 @@ func NewRequest(methodName string, params []interface{}) (req Request, err error
 	return req, nil
 }
 
-//
 // MarshalText implement the encoding.TextMarshaler interface.
-//
 func (req Request) MarshalText() (out []byte, err error) {
 	var buf bytes.Buffer
 
@@ -65,9 +59,7 @@ func (req Request) MarshalText() (out []byte, err error) {
 	return buf.Bytes(), nil
 }
 
-//
 // UnmarshalText parse the XML request.
-//
 func (req *Request) UnmarshalText(text []byte) (err error) {
 	var (
 		logp      = "xmlrpc: Request"

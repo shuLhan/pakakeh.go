@@ -9,9 +9,7 @@ import (
 	"database/sql"
 )
 
-//
 // Session is an interface that represent both sql.DB and sql.Tx.
-//
 type Session interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)

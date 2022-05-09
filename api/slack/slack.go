@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package slack provide a simple API for sending message to Slack using only
 // standard packages.
-//
 package slack
 
 import (
@@ -16,9 +14,7 @@ import (
 	"net/http"
 )
 
-//
 // PostWebhook send a message using "Incoming Webhook".
-//
 func PostWebhook(webhookUrl string, msg *Message) (err error) {
 	payload, err := json.Marshal(&msg)
 	if err != nil {

@@ -42,11 +42,9 @@ var (
 	ErrUnsupportedWSVersion      = errors.New("unsupported Sec-WebSocket-Version")
 )
 
-//
-//	RFC6455 4.1 P20
-//	Please note that according to [RFC2616], all header field names in
-//	both HTTP requests and HTTP responses are case-insensitive.
-//
+// RFC6455 4.1 P20
+// Please note that according to [RFC2616], all header field names in
+// both HTTP requests and HTTP responses are case-insensitive.
 const (
 	_hdrKeyConnection        = "connection"
 	_hdrKeyHost              = "host"
@@ -70,9 +68,7 @@ var (
 	}
 )
 
-//
 // Handshake contains the websocket HTTP handshake request.
-//
 type Handshake struct {
 	start       int
 	end         int
@@ -100,9 +96,7 @@ func newHandshake(req []byte) (h *Handshake, err error) {
 	return h, nil
 }
 
-//
 // reset all handshake values to zero or empty.
-//
 func (h *Handshake) reset(req []byte) {
 	h.start = 0
 	h.end = 0
@@ -144,10 +138,8 @@ func (h *Handshake) getBytesChunk(sep byte, tolower bool) (chunk []byte) {
 	return
 }
 
-//
 // parseHTTPLine check if HTTP method is "GET", save the URI, and make sure
 // that HTTP version is 1.1.
-//
 func (h *Handshake) parseHTTPLine() (err error) {
 	chunk := h.getBytesChunk(' ', false)
 	if !bytes.Equal(chunk, []byte("GET")) {
@@ -182,9 +174,7 @@ func (h *Handshake) parseHTTPLine() (err error) {
 	return
 }
 
-//
 // parseHeader of HTTP request.
-//
 func (h *Handshake) parseHeader() (k, v []byte, err error) {
 	chunk := h.getBytesChunk(':', true)
 	if len(chunk) == 0 {
@@ -230,7 +220,6 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 	return bytes.Equal(hv[start:], sub)
 }
 
-//
 // parse HTTP handshake request from client.
 //
 //	RFC6455 4.1-P17-19
@@ -335,7 +324,6 @@ func (h *Handshake) headerValueContains(hv, sub []byte) bool {
 // headers and the length will be greater than 144 bytes.
 //
 // The minimum length of request without HTTP line is: 144 - 16 = 128 bytes.
-//
 func (h *Handshake) parse() (err error) {
 	if len(h.raw) < 144 {
 		return ErrRequestLength

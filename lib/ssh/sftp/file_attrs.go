@@ -34,9 +34,7 @@ const (
 	attr_EXTENDED    uint32 = 0x80000000
 )
 
-//
 // FileAttrs define the attributes for opening or creating file on the remote.
-//
 type FileAttrs struct {
 	name        string
 	flags       uint32
@@ -50,9 +48,7 @@ type FileAttrs struct {
 	fsMode      fs.FileMode
 }
 
-//
 // NewFileAttrs create and initialize FileAttrs from FileInfo.
-//
 func NewFileAttrs(fi fs.FileInfo) (fa *FileAttrs) {
 	fa = &FileAttrs{
 		name: fi.Name(),
@@ -164,45 +160,33 @@ func (fa *FileAttrs) pack(w io.Writer) {
 	}
 }
 
-//
 // AccessTime return the remote file access time.
-//
 func (fa *FileAttrs) AccessTime() uint32 {
 	return fa.atime
 }
 
-//
 // Extensions return the remote file attribute extensions as map of type and
 // data.
-//
 func (fa *FileAttrs) Extensions() map[string]string {
 	return map[string]string(fa.exts)
 }
 
-//
 // Gid return the group ID attribute of file.
-//
 func (fa *FileAttrs) Gid() uint32 {
 	return fa.gid
 }
 
-//
 // IsDir return true if the file is a directory.
-//
 func (fa *FileAttrs) IsDir() bool {
 	return fa.fsMode.IsDir()
 }
 
-//
 // ModTime return the remote file modified time.
-//
 func (fa *FileAttrs) ModTime() time.Time {
 	return time.Unix(int64(fa.mtime), 0)
 }
 
-//
 // Mode return the file mode bits as standard fs.FileMode type.
-//
 func (fa *FileAttrs) Mode() fs.FileMode {
 	return fa.fsMode
 }
@@ -211,24 +195,18 @@ func (fa *FileAttrs) Name() string {
 	return fa.name
 }
 
-//
 // Permissions return the remote file mode and permissions.
-//
 func (fa *FileAttrs) Permissions() uint32 {
 	return fa.permissions
 }
 
-//
 // SetAccessTime set the file attribute access time.
-//
 func (fa *FileAttrs) SetAccessTime(v uint32) {
 	fa.flags |= attr_ACMODTIME
 	fa.atime = v
 }
 
-//
 // SetExtension set the file attribute extension.
-//
 func (fa *FileAttrs) SetExtension(name, data string) {
 	if fa.exts == nil {
 		fa.exts = extensions{}
@@ -237,64 +215,48 @@ func (fa *FileAttrs) SetExtension(name, data string) {
 	fa.exts[name] = data
 }
 
-//
 // SetGid set the file attribute group ID.
-//
 func (fa *FileAttrs) SetGid(gid uint32) {
 	fa.flags |= attr_UIDGID
 	fa.gid = gid
 }
 
-//
 // SetModifiedTime set the file attribute modified time.
-//
 func (fa *FileAttrs) SetModifiedTime(v uint32) {
 	fa.flags |= attr_ACMODTIME
 	fa.mtime = v
 }
 
-//
 // SetPermissions set the remote file permission.
-//
 func (fa *FileAttrs) SetPermissions(v uint32) {
 	fa.flags |= attr_PERMISSIONS
 	fa.permissions = v
 	fa.updateFsmode()
 }
 
-//
 // SetSize set the remote file size.
-//
 func (fa *FileAttrs) SetSize(v uint64) {
 	fa.flags |= attr_SIZE
 	fa.size = v
 }
 
-//
 // SetUid set the file attribute user ID.
-//
 func (fa *FileAttrs) SetUid(uid uint32) {
 	fa.flags |= attr_UIDGID
 	fa.uid = uid
 }
 
-//
 // Size return the file size information.
-//
 func (fa *FileAttrs) Size() int64 {
 	return int64(fa.size)
 }
 
-//
 // Sys return the pointer to FileAttrs itself.
-//
 func (fa *FileAttrs) Sys() interface{} {
 	return fa
 }
 
-//
 // Uid return the user ID of file.
-//
 func (fa *FileAttrs) Uid() uint32 {
 	return fa.uid
 }

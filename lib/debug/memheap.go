@@ -8,9 +8,7 @@ import (
 	"runtime"
 )
 
-//
 // MemHeap store the difference between heap allocation.
-//
 type MemHeap struct {
 	// RelHeapAlloc difference between heap allocation, relative to the
 	// first time this object initialized.
@@ -32,9 +30,7 @@ type MemHeap struct {
 	lastHeapObjects  int64
 }
 
-//
 // NewMemHeap create and initialize MemStatsDiff for the first time.
-//
 func NewMemHeap() (memHeap *MemHeap) {
 	firstStat := runtime.MemStats{}
 	runtime.ReadMemStats(&firstStat)
@@ -47,10 +43,8 @@ func NewMemHeap() (memHeap *MemHeap) {
 	return
 }
 
-//
 // Collect and compute the difference on the current heap allocation (in
 // bytes) and heap objects.
-//
 func (msd *MemHeap) Collect() {
 	runtime.ReadMemStats(&msd.memStats)
 

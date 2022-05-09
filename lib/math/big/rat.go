@@ -17,18 +17,14 @@ import (
 
 var ratZero = NewRat(0)
 
-//
 // Rat extend the standard big.Rat using rounding mode ToZero and without
 // panic.
-//
 type Rat struct {
 	big.Rat
 }
 
-//
 // AddRat return the sum of `f[0]+f[1]+...`.
 // It will return nil if the first parameter is not convertable to Rat.
-//
 func AddRat(f ...interface{}) *Rat {
 	if len(f) == 0 {
 		return nil
@@ -47,21 +43,17 @@ func AddRat(f ...interface{}) *Rat {
 	return total
 }
 
-//
 // NewRat create and initialize new Rat value from v.
 // It will return nil if v is not convertable to Rat.
 //
 // Empty string or empty []byte still considered as valid, and it will return
 // it as zero.
-//
 func NewRat(v interface{}) (r *Rat) {
 	return toRat(v)
 }
 
-//
 // MulRat return the result of multiplication `f[0]*f[1]*...`.
 // It will return nil if the first parameter is not convertable to Rat.
-//
 func MulRat(f ...interface{}) *Rat {
 	if len(f) == 0 {
 		return nil
@@ -81,12 +73,10 @@ func MulRat(f ...interface{}) *Rat {
 	return total
 }
 
-//
 // QuoRat return the quotient of `f[0]/f[1]/...` as new Rat.
 // It will return nil if the first parameter is not convertable to Rat.
 // If the second or rest of parameters can not be converted to Rat or zero it
 // will return nil instead of panic.
-//
 func QuoRat(f ...interface{}) *Rat {
 	if len(f) == 0 {
 		return nil
@@ -105,10 +95,8 @@ func QuoRat(f ...interface{}) *Rat {
 	return total
 }
 
-//
 // SubRat return the result of subtraction `f[0]-f[1]-...` as new Rat.
 // It will return nil if the first parameter is not convertable to Rat.
-//
 func SubRat(f ...interface{}) *Rat {
 	if len(f) == 0 {
 		return nil
@@ -127,9 +115,7 @@ func SubRat(f ...interface{}) *Rat {
 	return total
 }
 
-//
 // Abs sets r to |r| (the absolute value of r) and return it.
-//
 func (r *Rat) Abs() *Rat {
 	if r == nil {
 		return nil
@@ -138,10 +124,8 @@ func (r *Rat) Abs() *Rat {
 	return r
 }
 
-//
 // Add sets r to `r+g` and return the r as the result.
 // If g is not convertable to Rat it will equal to r+0.
-//
 func (r *Rat) Add(g interface{}) *Rat {
 	if r == nil {
 		return nil
@@ -155,10 +139,8 @@ func (r *Rat) Add(g interface{}) *Rat {
 	return r
 }
 
-//
 // Humanize format the r into string with custom thousand and decimal
 // separator.
-//
 func (r *Rat) Humanize(thousandSep, decimalSep string) string {
 	if r == nil {
 		return "0"
@@ -185,11 +167,9 @@ func (r *Rat) Humanize(thousandSep, decimalSep string) string {
 	return string(out)
 }
 
-//
 // Int64 return the integer resulting from truncating r towards zero.
 // It will return math.MaxInt64, if the value is larger than MaxInt64.
 // It will return math.MinInt64, if the value is lower than MinInt64.
-//
 func (r *Rat) Int64() int64 {
 	if r == nil {
 		return 0
@@ -199,13 +179,11 @@ func (r *Rat) Int64() int64 {
 	return i64
 }
 
-//
 // IsEqual will return true if `r == g`, including when r and g are both nil.
 //
 // Unlike the standard Cmp(), if the first call to Cmp is not 0, it will try
 // to compare the string values of r and g, truncated by
 // DefaultDigitPrecision.
-//
 func (r *Rat) IsEqual(g interface{}) bool {
 	y := toRat(g)
 	if y == nil {
@@ -223,10 +201,8 @@ func (r *Rat) IsEqual(g interface{}) bool {
 	return false
 }
 
-//
 // IsGreater will return true if `r > g`.
 // If g is not convertable to Rat it will return false.
-//
 func (r *Rat) IsGreater(g interface{}) bool {
 	if r == nil {
 		return false
@@ -238,10 +214,8 @@ func (r *Rat) IsGreater(g interface{}) bool {
 	return r.Rat.Cmp(&y.Rat) > 0
 }
 
-//
 // IsGreaterOrEqual will return true if `r >= g`.
 // If g is not convertable to Rat it will return false.
-//
 func (r *Rat) IsGreaterOrEqual(g interface{}) bool {
 	if r == nil {
 		return false
@@ -253,9 +227,7 @@ func (r *Rat) IsGreaterOrEqual(g interface{}) bool {
 	return r.Rat.Cmp(&y.Rat) >= 0
 }
 
-//
 // IsGreaterThanZero will return true if `r > 0`.
-//
 func (r *Rat) IsGreaterThanZero() bool {
 	if r == nil {
 		return false
@@ -263,10 +235,8 @@ func (r *Rat) IsGreaterThanZero() bool {
 	return r.Rat.Cmp(&ratZero.Rat) > 0
 }
 
-//
 // IsLess will return true if `r < g`.
 // If r is nill or g is not convertable to Rat it will return false.
-//
 func (r *Rat) IsLess(g interface{}) bool {
 	if r == nil {
 		return false
@@ -278,10 +248,8 @@ func (r *Rat) IsLess(g interface{}) bool {
 	return r.Rat.Cmp(&y.Rat) < 0
 }
 
-//
 // IsLessOrEqual will return true if `r <= g`.
 // It r is nil or g is not convertable to Rat it will return false.
-//
 func (r *Rat) IsLessOrEqual(g interface{}) bool {
 	if r == nil {
 		return false
@@ -293,9 +261,7 @@ func (r *Rat) IsLessOrEqual(g interface{}) bool {
 	return r.Rat.Cmp(&y.Rat) <= 0
 }
 
-//
 // IsLessThanZero return true if `r < 0`.
-//
 func (r *Rat) IsLessThanZero() bool {
 	if r == nil {
 		return false
@@ -303,9 +269,7 @@ func (r *Rat) IsLessThanZero() bool {
 	return r.Rat.Cmp(&ratZero.Rat) < 0
 }
 
-//
 // IsZero will return true if `r == 0`.
-//
 func (r *Rat) IsZero() bool {
 	if r == nil {
 		return false
@@ -313,10 +277,8 @@ func (r *Rat) IsZero() bool {
 	return r.Rat.Cmp(&ratZero.Rat) == 0
 }
 
-//
 // MarshalJSON implement the json.Marshaler interface.
 // It will return the same result as String().
-//
 func (r *Rat) MarshalJSON() ([]byte, error) {
 	var s string
 	if r == nil {
@@ -334,10 +296,8 @@ func (r *Rat) MarshalJSON() ([]byte, error) {
 	return []byte(s), nil
 }
 
-//
 // Mul sets r to product of `r * g` and return the result as r.
 // If g is not convertible to Rat it will return nil.
-//
 func (r *Rat) Mul(g interface{}) *Rat {
 	y := toRat(g)
 	if y == nil {
@@ -348,10 +308,8 @@ func (r *Rat) Mul(g interface{}) *Rat {
 	return r
 }
 
-//
 // Quo sets r to quotient of `r/g` and return the result as r.
 // If r is nil or g is not convertible to Rat or zero it will return nil.
-//
 func (r *Rat) Quo(g interface{}) *Rat {
 	if r == nil {
 		return nil
@@ -365,7 +323,6 @@ func (r *Rat) Quo(g interface{}) *Rat {
 	return r
 }
 
-//
 // RoundNearestFraction round the fraction to the nearest non-zero value.
 //
 // The RoundNearestFraction does not require precision parameter, like in
@@ -373,7 +330,6 @@ func (r *Rat) Quo(g interface{}) *Rat {
 // value from fraction.
 //
 // See example for more information.
-//
 func (r *Rat) RoundNearestFraction() *Rat {
 	if r == nil {
 		return nil
@@ -391,11 +347,9 @@ func (r *Rat) RoundNearestFraction() *Rat {
 	return r.RoundToNearestAway(x + 1)
 }
 
-//
 // RoundToNearestAway round r to n digit precision using nearest away mode,
 // where mantissa is accumulated by the last digit after precision.
 // For example, using 2 digit precision, 0.555 would become 0.56.
-//
 func (r *Rat) RoundToNearestAway(prec int) *Rat {
 	if r == nil {
 		return nil
@@ -404,10 +358,8 @@ func (r *Rat) RoundToNearestAway(prec int) *Rat {
 	return r
 }
 
-//
 // RoundToZero round r to n digit precision using to zero mode.
 // For example, using 2 digit precision, 0.555 would become 0.55.
-//
 func (r *Rat) RoundToZero(prec int) *Rat {
 	if r == nil {
 		return nil
@@ -424,9 +376,7 @@ func (r *Rat) RoundToZero(prec int) *Rat {
 	return r
 }
 
-//
 // Scan implement the database's sql.Scan interface.
-//
 func (r *Rat) Scan(v interface{}) error {
 	got := toRat(v)
 	if got == nil {
@@ -436,13 +386,11 @@ func (r *Rat) Scan(v interface{}) error {
 	return nil
 }
 
-//
 // String format the Rat value into string with maximum mantissa is set by
 // digit precision option with rounding mode set to zero.
 //
 // Unlike standard String method, this method will trim trailing zero digit or
 // decimal point at the end of mantissa.
-//
 func (r *Rat) String() string {
 	if r == nil {
 		return "0"
@@ -470,10 +418,8 @@ func (r *Rat) String() string {
 	return out
 }
 
-//
 // Sub sets r to rounded difference `r-g` and return r.
 // If g is not convertable to Rat, it will return as r-0.
-//
 func (r *Rat) Sub(g interface{}) *Rat {
 	if r == nil {
 		return nil
@@ -487,9 +433,7 @@ func (r *Rat) Sub(g interface{}) *Rat {
 	return r
 }
 
-//
 // UnmarshalJSON convert the JSON byte value into Rat.
-//
 func (r *Rat) UnmarshalJSON(in []byte) (err error) {
 	in = bytes.Trim(in, `"`)
 	r.SetInt64(0)
@@ -500,11 +444,9 @@ func (r *Rat) UnmarshalJSON(in []byte) (err error) {
 	return nil
 }
 
-//
 // Value return the []byte value for database/sql, as defined in
 // sql/driver.Valuer.
 // It will return "0" if r is nil.
-//
 func (r *Rat) Value() (driver.Value, error) {
 	var s string
 	if r == nil {
@@ -515,9 +457,7 @@ func (r *Rat) Value() (driver.Value, error) {
 	return []byte(s), nil
 }
 
-//
 // toRat convert v type to Rat or nil if v type is unknown.
-//
 func toRat(g interface{}) (out *Rat) {
 	out = &Rat{}
 

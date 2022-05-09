@@ -15,9 +15,7 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-//
 // Global options to run for each test.
-//
 var (
 	// SampleDsvFile is the file that contain samples config.
 	SampleDsvFile string

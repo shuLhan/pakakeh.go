@@ -15,7 +15,6 @@ var (
 		` or immediately after "canonical" or "final`)
 )
 
-//
 // newSectionMatch create new Match section using one or more criteria or the
 // single token "all" which always matches.
 //
@@ -24,7 +23,6 @@ var (
 // Other criteria may be combined arbitrarily.
 // All criteria but "all", "canonical", and "final" require an argument.
 // Criteria may be negated by prepending an exclamation mark (`!').
-//
 func newSectionMatch(rawPattern string) (match *Section, err error) {
 	var (
 		prevCriteria *matchCriteria

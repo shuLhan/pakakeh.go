@@ -31,18 +31,14 @@ var (
 	Spaces = []byte{'\t', '\n', '\v', '\f', '\r', ' '}
 )
 
-//
 // IsAlnum will return true if byte is ASCII alphanumeric character, otherwise
 // it will return false.
-//
 func IsAlnum(b byte) bool {
 	return IsAlpha(b) || IsDigit(b)
 }
 
-//
 // IsAlpha will return true if byte is ASCII alphabet character, otherwise
 // it will return false.
-//
 func IsAlpha(b byte) bool {
 	if (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') {
 		return true
@@ -50,10 +46,8 @@ func IsAlpha(b byte) bool {
 	return false
 }
 
-//
 // IsDigit will return true if byte is ASCII digit, otherwise it will return
 // false.
-//
 func IsDigit(b byte) bool {
 	if b >= '0' && b <= '9' {
 		return true
@@ -61,10 +55,8 @@ func IsDigit(b byte) bool {
 	return false
 }
 
-//
 // IsDigits will return true if all bytes are ASCII digit, otherwise it will
 // return false.
-//
 func IsDigits(data []byte) bool {
 	for x := 0; x < len(data); x++ {
 		if !IsDigit(data[x]) {
@@ -74,10 +66,8 @@ func IsDigits(data []byte) bool {
 	return true
 }
 
-//
 // IsHex will return true if byte is hexadecimal number, otherwise it will
 // return false.
-//
 func IsHex(b byte) bool {
 	if (b >= '0' && b <= '9') || (b >= 'a' && b <= 'f') || (b >= 'A' && b <= 'F') {
 		return true
@@ -85,10 +75,8 @@ func IsHex(b byte) bool {
 	return false
 }
 
-//
 // IsSpace will return true if byte is ASCII white spaces character,
 // otherwise it will return false.
-//
 func IsSpace(b byte) bool {
 	if b == '\t' || b == '\n' || b == '\v' || b == '\f' || b == '\r' || b == ' ' {
 		return true
@@ -96,11 +84,9 @@ func IsSpace(b byte) bool {
 	return false
 }
 
-//
 // Random generate random sequence of value from source with fixed length.
 //
 // This function assume that random generator has been seeded.
-//
 func Random(source []byte, n int) []byte {
 	b := make([]byte, n)
 	for x := 0; x < n; x++ {
@@ -109,10 +95,8 @@ func Random(source []byte, n int) []byte {
 	return b
 }
 
-//
 // ToLower convert slice of ASCII characters to lower cases, in places, which
 // means it will return the same slice instead of creating new one.
-//
 func ToLower(data []byte) []byte {
 	for x := 0; x < len(data); x++ {
 		if data[x] < 'A' || data[x] > 'Z' {
@@ -123,10 +107,8 @@ func ToLower(data []byte) []byte {
 	return data
 }
 
-//
 // ToUpper convert slice of ASCII characters to upper cases, in places, which
 // means it will return the same slice instead of creating new one.
-//
 func ToUpper(data []byte) []byte {
 	for x := 0; x < len(data); x++ {
 		if data[x] < 'a' || data[x] > 'z' {

@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Program server provide an example of WebSocket server as group chat.
 // The client that connect to the server must be authenticated using key.
-//
 package main
 
 import (
@@ -45,10 +43,8 @@ func main() {
 	server.Start()
 }
 
-//
 // handleAuth authenticated the new connection by checking the Header "Key"
 // value.
-//
 func handleAuth(req *websocket.Handshake) (ctx context.Context, err error) {
 	key := req.Header.Get("Key")
 
@@ -63,9 +59,7 @@ func handleAuth(req *websocket.Handshake) (ctx context.Context, err error) {
 	return nil, fmt.Errorf("user's key not found")
 }
 
-//
 // handleClientAdd do something when new connection accepted by server.
-//
 func handleClientAdd(ctx context.Context, conn int) {
 	log.Printf("server: adding client %d ...", conn)
 
@@ -90,10 +84,8 @@ func handleClientAdd(ctx context.Context, conn int) {
 	}
 }
 
-//
 // handleClientRemove do something when connection removed by server, either
 // by client disconnected or manually removed by server itself.
-//
 func handleClientRemove(ctx context.Context, conn int) {
 	log.Printf("server: client %d has been disconnected ...", conn)
 
@@ -118,9 +110,7 @@ func handleClientRemove(ctx context.Context, conn int) {
 	}
 }
 
-//
 // handlePostMessage handle message that is send to server by client.
-//
 func handlePostMessage(ctx context.Context, req *websocket.Request) (
 	res websocket.Response,
 ) {

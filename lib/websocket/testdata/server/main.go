@@ -13,9 +13,7 @@ import (
 	"github.com/shuLhan/share/lib/websocket"
 )
 
-//
 // handleBin from websocket by echo-ing back the payload.
-//
 func handleBin(conn int, payload []byte) {
 	packet := websocket.NewFrameBin(false, payload)
 
@@ -25,9 +23,7 @@ func handleBin(conn int, payload []byte) {
 	}
 }
 
-//
 // handleText from websocket by echo-ing back the payload.
-//
 func handleText(conn int, payload []byte) {
 	packet := websocket.NewFrameText(false, payload)
 

@@ -13,11 +13,9 @@ import (
 
 type tagStructField map[string]*structField
 
-//
 // unpackTagStructField read each ini tag in the struct's field and store its section,
 // subsection, and/or key along with their reflect type and value into
 // structField.
-//
 func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
 	numField := rtype.NumField()
 	if numField == 0 {
@@ -102,9 +100,7 @@ func (tsf tagStructField) getByKey(key string) *structField {
 	return nil
 }
 
-//
 // keys return the map keys sorted in ascending order.
-//
 func (tsf tagStructField) keys() (out []string) {
 	out = make([]string, 0, len(tsf))
 	for k := range tsf {

@@ -9,12 +9,10 @@ import (
 	"unicode"
 )
 
-//
 // IsValidVarName check if "v" is valid variable name, where the
 // first character must be a letter and the rest should contains only letter,
 // digit, period, hyphen, or underscore.
 // If "v" is valid it will return true.
-//
 func IsValidVarName(v string) bool {
 	if len(v) == 0 {
 		return false
@@ -32,11 +30,9 @@ func IsValidVarName(v string) bool {
 	return true
 }
 
-//
 // IsValueBoolTrue will return true if variable contains boolean value for
 // true. The following conditions is boolean true for value: "" (empty
 // string), "true", "yes", "ya", "t", "1" (all of string is case insensitive).
-//
 func IsValueBoolTrue(v string) bool {
 	if len(v) == 0 {
 		return false

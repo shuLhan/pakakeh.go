@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // SuccessfulPayment contains basic information about a successful payment.
-//
 type SuccessfulPayment struct {
 	// Three-letter ISO 4217 currency code.
 	Currency string `json:"currency"`

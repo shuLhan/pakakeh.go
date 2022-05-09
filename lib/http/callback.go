@@ -4,7 +4,6 @@
 
 package http
 
-//
 // Callback define a type of function for handling registered handler.
 //
 // The function will have the query URL, request multipart form data,
@@ -18,5 +17,4 @@ package http
 // define the HTTP status code.
 // If error is not nil and not *errors.E, server will response with
 // internal-server-error status code.
-//
 type Callback func(req *EndpointRequest) (resBody []byte, err error)

@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package sanitize provide a function to sanitize markup document into plain
 // text.
-//
 package sanitize
 
 import (
@@ -14,9 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-//
 // HTML sanitize the content of HTML into plain text.
-//
 func HTML(in []byte) (plain []byte) {
 	if len(in) == 0 {
 		return plain

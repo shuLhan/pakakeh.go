@@ -7,9 +7,7 @@ package websocket
 // Opcode represent the websocket operation code.
 type Opcode byte
 
-//
 // List of valid operation code in frame.
-//
 const (
 	OpcodeCont        Opcode = 0x0
 	OpcodeText        Opcode = 0x1

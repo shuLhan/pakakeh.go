@@ -14,9 +14,7 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // ServerOptions describes options for running a DNS server.
-//
 type ServerOptions struct {
 	primaryUDP []net.Addr // List of parent name server addresses using UDP.
 	primaryTCP []net.Addr // List of parent name server addresses using TCP
@@ -107,9 +105,7 @@ type ServerOptions struct {
 	DoHBehindProxy bool `ini:"dns:server:doh.behind_proxy"`
 }
 
-//
 // init initialize the server options.
-//
 func (opts *ServerOptions) init() (err error) {
 	if len(opts.ListenAddress) == 0 {
 		opts.ListenAddress = "0.0.0.0:53"
@@ -171,13 +167,11 @@ func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
 	}
 }
 
-//
 // parseNameServers parse each name server in NameServers list based on scheme
 // and store the result either in udpAddrs, tcpAddrs, dohAddrs, or dotAddrs.
 //
 // If the name server format contains no scheme, it will be assumed to be
 // "udp".
-//
 func (opts *ServerOptions) parseNameServers(nameServers []string) {
 	for _, ns := range nameServers {
 		dnsURL, err := url.Parse(ns)

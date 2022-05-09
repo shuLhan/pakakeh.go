@@ -92,12 +92,10 @@ const (
 	StatusMailRcptParamUnknown = 555
 )
 
-//
 // ParsePath parse the Reverse-path or Forward-path as in argument of MAIL and
 // RCPT commands.
 // This function ignore the source route and only return the mailbox.
 // Empty mailbox without an error is equal to Null Reverse-Path "<>".
-//
 func ParsePath(path []byte) (mailbox []byte, err error) {
 	if len(path) == 0 {
 		return nil, errors.New("ParsePath: empty path")
@@ -131,10 +129,8 @@ func ParsePath(path []byte) (mailbox []byte, err error) {
 	return mailbox, nil
 }
 
-//
 // ParseMailbox parse the mailbox, remove comment or any escaped characters
 // insided quoted-string.
-//
 func ParseMailbox(data []byte) (mailbox []byte) {
 	if len(data) == 0 {
 		return nil
@@ -177,13 +173,11 @@ func ParseMailbox(data []byte) (mailbox []byte) {
 	return mailbox
 }
 
-//
 // parseLocalDomain parse local-part or domain-name of mailbox.
 // Rules,
 // * dot is not allowed at beginning or end.
 // * local part or domain can contains comment "(any)"
 // * dot must not appear consecutively
-//
 func parseLocalDomain(data []byte, allow []byte) (out []byte) {
 	if data[0] == '.' || data[len(data)-1] == '.' {
 		return nil
@@ -248,14 +242,12 @@ func skipComment(data []byte, x int) int {
 	return x
 }
 
-//
 // parseQuotedMailbox parse the mailbox in quoted format.
 //
 // The following ASCII characters are accepted: %d32-33 / %d35-91 / %d93-126.
 // Character code %d34 is '"'.
 // Quoted-pair character is character %d92 ("\" or backslash) followed by
 // %d32-126.
-//
 func parseQuotedMailbox(data []byte) (out []byte) {
 	out = append(out, '"')
 	for x := 0; x < len(data); x++ {

@@ -2,14 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package crf implement the cascaded random forest algorithm, proposed by
 // Baumann et.al in their paper:
 //
 // Baumann, Florian, et al. "Cascaded Random Forest for Fast Object
 // Detection." Image Analysis. Springer Berlin Heidelberg, 2013. 131-142.
-//
-//
 package crf
 
 import (
@@ -53,9 +50,7 @@ var (
 	ErrNoInput = errors.New("rf: input samples is empty")
 )
 
-//
 // Runtime define the cascaded random forest runtime input and output.
-//
 type Runtime struct {
 	// Runtime embed common fields for classifier.
 	classifier.Runtime
@@ -82,9 +77,7 @@ type Runtime struct {
 	tnset *tabula.Claset
 }
 
-//
 // New create and return new input for cascaded random-forest.
-//
 func New(nstage, ntree, percentboot, nfeature int,
 	tprate, tnrate float64,
 	samples tabula.ClasetInterface,
@@ -103,17 +96,13 @@ func New(nstage, ntree, percentboot, nfeature int,
 	return crf
 }
 
-//
 // AddForest will append new forest.
-//
 func (crf *Runtime) AddForest(forest *rf.Runtime) {
 	crf.forests = append(crf.forests, forest)
 }
 
-//
 // Initialize will check crf inputs and set it to default values if its
 // invalid.
-//
 func (crf *Runtime) Initialize(samples tabula.ClasetInterface) error {
 	if crf.NStage <= 0 {
 		crf.NStage = DefStage
@@ -146,9 +135,7 @@ func (crf *Runtime) Initialize(samples tabula.ClasetInterface) error {
 	return crf.Runtime.Initialize()
 }
 
-//
 // Build given a sample dataset, build the stage with randomforest.
-//
 func (crf *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 	if samples == nil {
 		return ErrNoInput
@@ -182,7 +169,6 @@ func (crf *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 	return crf.Finalize()
 }
 
-//
 // createForest will create and return a forest and run the training `samples`
 // on it.
 //
@@ -196,7 +182,6 @@ func (crf *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 // will be used again to test the model and after test and the sample with FP
 // will be moved to training samples again.
 // (5) Refill samples with false-positive.
-//
 func (crf *Runtime) createForest(samples tabula.ClasetInterface) (
 	forest *rf.Runtime, e error,
 ) {
@@ -263,9 +248,7 @@ func (crf *Runtime) createForest(samples tabula.ClasetInterface) (
 	return forest, nil
 }
 
-//
 // finalizeStage save forest and write the forest statistic to file.
-//
 func (crf *Runtime) finalizeStage(forest *rf.Runtime) (e error) {
 	stat := forest.StatTotal()
 	stat.ID = int64(len(crf.forests))
@@ -288,10 +271,8 @@ func (crf *Runtime) finalizeStage(forest *rf.Runtime) (e error) {
 	return nil
 }
 
-//
 // computeWeight will compute the weight of stage based on F-measure of the
 // last tree in forest.
-//
 func (crf *Runtime) computeWeight(stat *classifier.Stat) {
 	crf.weights = append(crf.weights, math.Exp(stat.FMeasure))
 }
@@ -334,10 +315,8 @@ func (crf *Runtime) deleteTrueNegative(samples tabula.ClasetInterface,
 	}
 }
 
-//
 // refillWithFP will copy the false-positive data in training set `tnset`
 // and append it to `samples`.
-//
 func (crf *Runtime) refillWithFP(samples, tnset tabula.ClasetInterface,
 	cm *classifier.CM,
 ) {
@@ -365,10 +344,8 @@ func (crf *Runtime) refillWithFP(samples, tnset tabula.ClasetInterface,
 	}
 }
 
-//
 // runTPSet will run true-positive set into trained stage, to get the
 // false-positive. The FP samples will be added to training set.
-//
 func (crf *Runtime) runTPSet(samples tabula.ClasetInterface) {
 	// Skip the first stage, because we just got tnset from them.
 	if len(crf.weights) <= 1 {
@@ -381,7 +358,6 @@ func (crf *Runtime) runTPSet(samples tabula.ClasetInterface) {
 	crf.refillWithFP(samples, crf.tnset, cm)
 }
 
-//
 // ClassifySetByWeight will classify each instance in samples by weight
 // with respect to its single performance.
 //
@@ -391,21 +367,20 @@ func (crf *Runtime) runTPSet(samples tabula.ClasetInterface) {
 // (1.1.1) collect votes for instance in current stage.
 // (1.1.2) Compute probabilities of each classes in votes.
 //
-//		prob_class = count_of_class / total_votes
+//	prob_class = count_of_class / total_votes
 //
 // (1.1.3) Compute total of probabilities times of stage weight.
 //
-//		stage_prob = prob_class * stage_weight
+//	stage_prob = prob_class * stage_weight
 //
 // (1.2) Divide each class stage probabilities with
 //
-//		stage_prob = stage_prob /
-//			(sum_of_all_weights * number_of_tree_in_forest)
+//	stage_prob = stage_prob /
+//		(sum_of_all_weights * number_of_tree_in_forest)
 //
 // (1.3) Select class label with highest probabilities.
 // (1.4) Save stage probabilities for positive class.
 // (2) Compute confusion matrix.
-//
 func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 	sampleIds []int,
 ) (

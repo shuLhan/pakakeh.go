@@ -27,15 +27,14 @@ const (
 	aliveInterval = 10 * time.Second
 )
 
-//
 // Server defines DNS server.
 //
-// Services
+// # Services
 //
 // The server will listening for DNS over TLS only if certificates file is
 // exist and valid.
 //
-// Caches
+// # Caches
 //
 // There are two type of answer: local and non-local.
 // Local answer is a DNS record that is loaded from hosts or zone file.
@@ -52,7 +51,7 @@ const (
 // it is used to prune least frequently accessed answers.
 // Local caches will never get pruned.
 //
-// Debugging
+// # Debugging
 //
 // If debug.Value is set to value greater than 1, server will print each
 // processed request, forward, and response.
@@ -72,7 +71,6 @@ const (
 //
 // Following the prefix is connection type, parent name server address,
 // message ID, and question.
-//
 type Server struct {
 	HostsFiles  map[string]*HostsFile
 	opts        *ServerOptions
@@ -91,9 +89,7 @@ type Server struct {
 	fwLocker    sync.Mutex
 }
 
-//
 // NewServer create and initialize DNS server.
-//
 func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	err = opts.init()
 	if err != nil {
@@ -139,10 +135,8 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	return srv, nil
 }
 
-//
 // isResponseValid check if request name, type, and class match with response.
 // It will return true if both matched, otherwise it will return false.
-//
 func isResponseValid(req *request, res *Message) bool {
 	if req.message.Question.Name != res.Question.Name {
 		log.Printf("dns: unmatched response name, got %s want %s",
@@ -163,9 +157,7 @@ func isResponseValid(req *request, res *Message) bool {
 	return true
 }
 
-//
 // CachesLoad load the gob encoded answers from r.
-//
 func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
 	logp := "CachesLoad"
 
@@ -179,17 +171,13 @@ func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
 	return answers, nil
 }
 
-//
 // CachesLRU return list of non-local caches ordered by the least recently
 // used.
-//
 func (srv *Server) CachesLRU() []*Answer {
 	return srv.caches.list()
 }
 
-//
 // CachesSave write the non-local answers into w, encoded with gob.
-//
 func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
 	n, err = srv.caches.write(w)
 	if err != nil {
@@ -198,17 +186,13 @@ func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
 	return n, nil
 }
 
-//
 // SearchCaches search caches by query (domain) name that match with the
 // regular expresion.
-//
 func (srv *Server) SearchCaches(re *regexp.Regexp) []*Message {
 	return srv.caches.search(re)
 }
 
-//
 // PopulateCaches add list of message to caches.
-//
 func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 	var (
 		n        int
@@ -229,9 +213,7 @@ func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 	}
 }
 
-//
 // PopulateCachesByRR update or insert new ResourceRecord into caches.
-//
 func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
 	err error,
 ) {
@@ -249,17 +231,13 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
 	return nil
 }
 
-//
 // CachesClear remove all caches.
-//
 func (srv *Server) CachesClear() (listAnswer []*Answer) {
 	listAnswer = srv.caches.prune(math.MaxInt64)
 	return listAnswer
 }
 
-//
 // RemoveCachesByNames remove the caches by domain names.
-//
 func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
 	var (
 		answers []*Answer
@@ -277,17 +255,13 @@ func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
 	return listAnswer
 }
 
-//
 // RemoveCachesByRR remove the answer from caches by ResourceRecord name,
 // type, class, and value.
-//
 func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) error {
 	return srv.caches.removeLocalRR(rr)
 }
 
-//
 // RemoveLocalCachesByNames remove local caches by domain names.
-//
 func (srv *Server) RemoveLocalCachesByNames(names []string) {
 	srv.caches.Lock()
 	for x := 0; x < len(names); x++ {
@@ -299,11 +273,9 @@ func (srv *Server) RemoveLocalCachesByNames(names []string) {
 	srv.caches.Unlock()
 }
 
-//
 // RestartForwarders stop and start new forwarders with new nameserver address
 // and protocol.
 // Empty nameservers means server will run without forwarding request.
-//
 func (srv *Server) RestartForwarders(nameServers []string) {
 	fmt.Printf("dns: RestartForwarders: %s\n", nameServers)
 
@@ -315,9 +287,7 @@ func (srv *Server) RestartForwarders(nameServers []string) {
 	srv.startAllForwarders()
 }
 
-//
 // ListenAndServe start listening and serve queries from clients.
-//
 func (srv *Server) ListenAndServe() (err error) {
 	srv.startAllForwarders()
 
@@ -334,9 +304,7 @@ func (srv *Server) ListenAndServe() (err error) {
 	return <-srv.errListener
 }
 
-//
 // Stop the forwarders and close all listeners.
-//
 func (srv *Server) Stop() {
 	srv.stopAllForwarders()
 
@@ -362,10 +330,8 @@ func (srv *Server) Stop() {
 	}
 }
 
-//
 // serveDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
-//
 func (srv *Server) serveDoH() {
 	var err error
 
@@ -438,9 +404,7 @@ func (srv *Server) serveDoT() {
 	}
 }
 
-//
 // serveTCP serve DNS request from TCP connection.
-//
 func (srv *Server) serveTCP() {
 	log.Println("dns.Server: listening for DNS over TCP at", srv.tcp.Addr())
 
@@ -465,9 +429,7 @@ func (srv *Server) serveTCP() {
 	}
 }
 
-//
 // serveUDP serve DNS request from UDP connection.
-//
 func (srv *Server) serveUDP() {
 	var (
 		n      int
@@ -591,10 +553,8 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	cl.waitResponse()
 }
 
-//
 // hasForwarders will return true if server run at least one forwarder,
 // otherwise it will return false.
-//
 func (srv *Server) hasForwarders() (ok bool) {
 	srv.fwLocker.Lock()
 	ok = (srv.fwn > 0)
@@ -673,9 +633,7 @@ func (srv *Server) isImplemented(msg *Message) bool {
 	return false
 }
 
-//
 // processRequest from client.
-//
 func (srv *Server) processRequest() {
 	for req := range srv.requestq {
 		if !srv.isImplemented(req.message) {
@@ -1002,10 +960,8 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 	}
 }
 
-//
 // runUDPForwarder create a UDP client that consume request from queue
 // and forward it to parent name server.
-//
 func (srv *Server) runUDPForwarder(tag, nameserver string) {
 	stopper := srv.newStopper()
 
@@ -1080,9 +1036,7 @@ func (srv *Server) stopForwarder(fw Client) {
 	srv.decForwarder()
 }
 
-//
 // stopAllForwarders stop all forwarder connections.
-//
 func (srv *Server) stopAllForwarders() {
 	for x := 0; x < len(srv.fwStoppers); x++ {
 		srv.fwStoppers[x] <- true

@@ -11,9 +11,7 @@ import (
 	"log"
 )
 
-//
 // Header represent list of fields in message.
-//
 type Header struct {
 	//
 	// fields is ordered from top to bottom, the first field in message
@@ -25,7 +23,6 @@ type Header struct {
 	fields []*Field
 }
 
-//
 // ParseHeader parse the raw header from top to bottom.
 //
 // Raw header that start with CRLF indicate an empty header.
@@ -37,7 +34,6 @@ type Header struct {
 //
 // On success it will return the rest of raw input (possible message's body)
 // without leading CRLF.
-//
 func ParseHeader(raw []byte) (hdr *Header, rest []byte, err error) {
 	var (
 		field *Field
@@ -95,10 +91,8 @@ func (hdr *Header) addMailboxes(ft FieldType, mailboxes []byte) (err error) {
 	return field.addMailboxes(mailboxes)
 }
 
-//
 // Boundary return the message body boundary defined in Content-Type.
 // If no field Content-Type or no boundary it will return nil.
-//
 func (hdr *Header) Boundary() []byte {
 	ct := hdr.ContentType()
 	if ct == nil {
@@ -107,10 +101,8 @@ func (hdr *Header) Boundary() []byte {
 	return ct.GetParamValue(ParamNameBoundary)
 }
 
-//
 // ContentType return the unpacked value of field "Content-Type", or nil if no
 // field Content-Type exist or there is an error when unpacking.
-//
 func (hdr *Header) ContentType() *ContentType {
 	for _, f := range hdr.fields {
 		if f.Type != FieldTypeContentType {
@@ -128,13 +120,11 @@ func (hdr *Header) ContentType() *ContentType {
 	return nil
 }
 
-//
 // DKIM return sub-header of the "n" DKIM-Signature, start from the top.
 // If no DKIM-Signature found it will return nil.
 //
 // For example, to get the second DKIM-Signature from the top, call it with
 // "n=2", but if no second DKIM-Signature it will return nil.
-//
 func (hdr *Header) DKIM(n int) (dkimHeader *Header) {
 	if n == 0 || len(hdr.fields) == 0 {
 		return nil
@@ -162,10 +152,8 @@ func (hdr *Header) DKIM(n int) (dkimHeader *Header) {
 	return dkimHeader
 }
 
-//
 // Filter specific field type.  If multiple fields type exist it will
 // return all of them.
-//
 func (hdr *Header) Filter(ft FieldType) (fields []*Field) {
 	for x := len(hdr.fields) - 1; x >= 0; x-- {
 		if hdr.fields[x].Type == ft {
@@ -175,16 +163,12 @@ func (hdr *Header) Filter(ft FieldType) (fields []*Field) {
 	return
 }
 
-//
 // PushTop put the field at the top of header.
-//
 func (hdr *Header) PushTop(f *Field) {
 	hdr.fields = append([]*Field{f}, hdr.fields...)
 }
 
-//
 // Relaxed canonicalize the header using "relaxed" algorithm and return it.
-//
 func (hdr *Header) Relaxed() []byte {
 	var bb bytes.Buffer
 
@@ -197,10 +181,8 @@ func (hdr *Header) Relaxed() []byte {
 	return bb.Bytes()
 }
 
-//
 // Set the header's value based on specific type.
 // If no field type found, the new field will be added to the list.
-//
 func (hdr *Header) Set(ft FieldType, value []byte) (err error) {
 	var (
 		field = &Field{
@@ -228,9 +210,7 @@ func (hdr *Header) Set(ft FieldType, value []byte) (err error) {
 	return nil
 }
 
-//
 // Simple canonicalize the header using "simple" algorithm.
-//
 func (hdr *Header) Simple() []byte {
 	var bb bytes.Buffer
 
@@ -245,9 +225,7 @@ func (hdr *Header) Simple() []byte {
 	return bb.Bytes()
 }
 
-//
 // popByName remove the field where the name match from header.
-//
 func (hdr *Header) popByName(name []byte) (f *Field) {
 	for x := len(hdr.fields) - 1; x >= 0; x-- {
 		if bytes.Equal(hdr.fields[x].Name, name) {
@@ -258,9 +236,7 @@ func (hdr *Header) popByName(name []byte) (f *Field) {
 	return f
 }
 
-//
 // SetMultipart make the header a multipart bodies with boundary.
-//
 func (hdr *Header) SetMultipart() (err error) {
 	err = hdr.Set(FieldTypeMIMEVersion, []byte(mimeVersion1))
 	if err != nil {
@@ -279,11 +255,9 @@ func (hdr *Header) SetMultipart() (err error) {
 	return nil
 }
 
-//
 // WriteTo the header into w.
 // The header does not end with an empty line to allow multiple Header
 // written multiple times.
-//
 func (hdr *Header) WriteTo(w io.Writer) (n int, err error) {
 	var (
 		f *Field

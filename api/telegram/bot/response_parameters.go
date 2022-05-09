@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // responseParameters contains information about why a request was
 // unsuccessful.
-//
 type responseParameters struct {
 	// Optional. The group has been migrated to a supergroup with the
 	// specified identifier. This number may be greater than 32 bits and

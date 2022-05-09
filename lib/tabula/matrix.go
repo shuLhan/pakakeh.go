@@ -4,9 +4,7 @@
 
 package tabula
 
-//
 // Matrix is a combination of columns and rows.
-//
 type Matrix struct {
 	Columns *Columns
 	Rows    *Rows

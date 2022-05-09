@@ -12,12 +12,10 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // GetSystemNameServers return list of system name servers by reading
 // resolv.conf formatted file in path.
 //
 // Default path is "/etc/resolv.conf".
-//
 func GetSystemNameServers(path string) []string {
 	if len(path) == 0 {
 		path = "/etc/resolv.conf"
@@ -29,11 +27,9 @@ func GetSystemNameServers(path string) []string {
 	return rc.NameServers
 }
 
-//
 // ParseNameServers parse list of nameserver into UDP addresses.
 // If one of nameserver is invalid it will stop parsing and return only valid
 // nameserver addresses with error.
-//
 func ParseNameServers(nameservers []string) ([]*net.UDPAddr, error) {
 	udpAddrs := make([]*net.UDPAddr, 0)
 
@@ -48,12 +44,10 @@ func ParseNameServers(nameservers []string) ([]*net.UDPAddr, error) {
 	return udpAddrs, nil
 }
 
-//
 // LookupPTR accept an IP address (either IPv4 or IPv6) and return a single
 // answer as domain name on success or an error on failed.
 // If IP address does not contains PTR record it will return an empty string
 // without error.
-//
 func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 	if ip == nil {
 		return "", fmt.Errorf("empty IP address")
@@ -94,9 +88,7 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 	return answer, nil
 }
 
-//
 // reverseIP reverse the IP address by dot.
-//
 func reverseIP(ip net.IP) (revIP []byte, isIPv4 bool) {
 	isIPv4 = libnet.IsIPv4(ip)
 	if isIPv4 {
@@ -110,12 +102,10 @@ func reverseIP(ip net.IP) (revIP []byte, isIPv4 bool) {
 	return nil, false
 }
 
-//
 // reverseByDot reverse the IP address by dot.
 // For example, IPv4 with address "127.0.0.1" it will return "1.0.0.127".
 // For IPv6 with address "2001:db8::cb01" it will return
 // "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.2".
-//
 func reverseByDot(ip []byte) (rev []byte) {
 	addrs := bytes.Split(ip, []byte{'.'})
 	for x := len(addrs) - 1; x >= 0; x-- {

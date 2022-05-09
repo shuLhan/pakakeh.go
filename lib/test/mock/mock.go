@@ -17,9 +17,7 @@ var (
 	_stdout *os.File
 )
 
-//
 // Close all mocked output and/or error.
-//
 func Close() {
 	if _stderr != nil {
 		err := _stderr.Close()
@@ -53,9 +51,7 @@ func Close() {
 	}
 }
 
-//
 // Error get stream of standard error as string.
-//
 func Error() string {
 	if _stderr == nil {
 		return ""
@@ -71,9 +67,7 @@ func Error() string {
 	return string(bs)
 }
 
-//
 // Output get stream of standard output.
-//
 func Output() string {
 	if _stdout == nil {
 		return ""
@@ -89,9 +83,7 @@ func Output() string {
 	return string(bs)
 }
 
-//
 // Stderr mock standard error to temporary file.
-//
 func Stderr() *os.File {
 	var err error
 
@@ -103,9 +95,7 @@ func Stderr() *os.File {
 	return _stderr
 }
 
-//
 // Stdin mock the standar input using temporary file.
-//
 func Stdin() *os.File {
 	var err error
 
@@ -117,9 +107,7 @@ func Stdin() *os.File {
 	return _stdin
 }
 
-//
 // Stdout mock standard output to temporary file.
-//
 func Stdout() *os.File {
 	var err error
 
@@ -131,18 +119,14 @@ func Stdout() *os.File {
 	return _stdout
 }
 
-//
 // Reset all mocked standard output and error.
-//
 func Reset(truncate bool) {
 	ResetStderr(truncate)
 	ResetStdout(truncate)
 }
 
-//
 // ResetStderr reset mocked standard error offset back to 0.
 // If truncated is true, it also reset the size to 0.
-//
 func ResetStderr(truncate bool) {
 	if _stderr == nil {
 		return
@@ -160,10 +144,8 @@ func ResetStderr(truncate bool) {
 	}
 }
 
-//
 // ResetStdin reset mocked standard input offset back to 0.
 // If truncated is true, it also reset the size to 0.
-//
 func ResetStdin(truncate bool) {
 	if _stdin == nil {
 		return
@@ -181,10 +163,8 @@ func ResetStdin(truncate bool) {
 	}
 }
 
-//
 // ResetStdout reset mocked standard output offset back to 0.
 // If truncated is true, it also reset the size to 0.
-//
 func ResetStdout(truncate bool) {
 	if _stdout == nil {
 		return

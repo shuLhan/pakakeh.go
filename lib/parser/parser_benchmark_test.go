@@ -9,7 +9,6 @@ import "testing"
 // Output:
 //
 // BenchmarkParser_Token-4          59117898                20.2 ns/op             0 B/op          0 allocs/op
-//
 func BenchmarkParser_Token(b *testing.B) {
 	content := "abc;def"
 	delims := " /;"

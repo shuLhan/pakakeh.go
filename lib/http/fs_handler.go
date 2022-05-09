@@ -10,7 +10,6 @@ import (
 	"github.com/shuLhan/share/lib/memfs"
 )
 
-//
 // FSHandler define the function to inspect each GET request to Server MemFS
 // instance.
 // The node parameter contains the requested file inside the memfs.
@@ -21,5 +20,4 @@ import (
 // If the handler return false, server stop processing the node and return
 // immediately, which means the function should have already handle writing
 // the header, status code, and/or body.
-//
 type FSHandler func(node *memfs.Node, res http.ResponseWriter, req *http.Request) bool

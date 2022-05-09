@@ -11,9 +11,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//
 // TestRecord simply check how the stringer work.
-//
 func TestRecord(t *testing.T) {
 	expec := []string{"test", "1", "2"}
 	expType := []int{TString, TInteger, TInteger}

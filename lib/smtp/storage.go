@@ -4,10 +4,8 @@
 
 package smtp
 
-//
 // Storage define an interface for storing and retrieving mail object into
 // permanent storage (for example, file system or database).
-//
 type Storage interface {
 	MailBounce(id string) error
 	MailDelete(id string) error

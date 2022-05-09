@@ -33,9 +33,7 @@ func (dict *dictionary) open(file string, opts *affixOptions) (err error) {
 	return nil
 }
 
-//
 // load dictionary from string.
-//
 func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 	p := parser.New(content, "")
 

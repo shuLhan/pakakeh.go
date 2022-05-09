@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // ChosenInlineResult represents a result of an inline query that was chosen
 // by the user and sent to their chat partner.
-//
 type ChosenInlineResult struct {
 	// The unique identifier for the result that was chosen.
 	ResultID string `json:"result_id"`

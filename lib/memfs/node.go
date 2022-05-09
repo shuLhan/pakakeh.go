@@ -26,9 +26,7 @@ var (
 	errWhence = errors.New("Seek: invalid whence")
 )
 
-//
 // Node represent a single file.
-//
 type Node struct {
 	modTime time.Time // ModTime contains file modification time.
 
@@ -55,7 +53,6 @@ type Node struct {
 	mode os.FileMode // File mode.
 }
 
-//
 // NewNode create a new node based on file information "fi".
 //
 // The parent parameter is required to allow valid system path generated for
@@ -63,7 +60,6 @@ type Node struct {
 //
 // If maxFileSize is greater than zero, the file content and its type will be
 // saved in node as Content and ContentType.
-//
 func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err error) {
 	if fi == nil {
 		return nil, nil
@@ -128,9 +124,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 	return node, nil
 }
 
-//
 // AddChild add the other node as child of this node.
-//
 func (node *Node) AddChild(child *Node) {
 	if child.modTime.IsZero() {
 		child.modTime = time.Now()
@@ -139,9 +133,7 @@ func (node *Node) AddChild(child *Node) {
 	child.Parent = node
 }
 
-//
 // Close reset the offset position back to zero.
-//
 func (node *Node) Close() error {
 	node.off = 0
 	return nil
@@ -151,12 +143,10 @@ func (node *Node) IsDir() bool {
 	return node.mode.IsDir()
 }
 
-//
 // MarshalJSON encode the node into JSON format.
 // If the node is a file it will return the content of file;
 // otherwise it will return the node with list of childs, but not including
 // childs of childs.
-//
 func (node *Node) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	node.packAsJson(&buf, 0)
@@ -175,9 +165,7 @@ func (node *Node) Name() string {
 	return node.name
 }
 
-//
 // Read the content of node into p.
-//
 func (node *Node) Read(p []byte) (n int, err error) {
 	// Implementations of Read are discouraged from returning a zero byte
 	// count with a nil error, except when len(p) == 0.
@@ -192,12 +180,10 @@ func (node *Node) Read(p []byte) (n int, err error) {
 	return n, nil
 }
 
-//
 // Readdir reads the contents of the directory associated with file and
 // returns a slice of up to n FileInfo values, as would be returned by Lstat,
 // in directory order.
 // Subsequent calls on the same file will yield further FileInfos.
-//
 func (node *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 	if !node.IsDir() {
 		return nil, nil
@@ -230,9 +216,7 @@ func (node *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 	return fis, nil
 }
 
-//
 // Save the content to file system and update the content of Node.
-//
 func (node *Node) Save(content []byte) (err error) {
 	var (
 		logp = "Save"
@@ -257,13 +241,11 @@ func (node *Node) Save(content []byte) (err error) {
 	return nil
 }
 
-//
 // Seek sets the offset for the next Read offset, interpreted according to
 // whence: SeekStart means relative to the start of the file, SeekCurrent
 // means relative to the current offset, and SeekEnd means relative to the
 // end. Seek returns the new offset relative to the start of the file and an
 // error, if any.
-//
 func (node *Node) Seek(offset int64, whence int) (int64, error) {
 	switch whence {
 	case io.SeekStart:
@@ -281,68 +263,50 @@ func (node *Node) Seek(offset int64, whence int) (int64, error) {
 	return node.off, nil
 }
 
-//
 // SetModTime set the file modification time.
-//
 func (node *Node) SetModTime(modTime time.Time) {
 	node.modTime = modTime
 }
 
-//
 // SetModTimeUnix set the file modification time using seconds and nanoseconds
 // since January 1, 1970 UTC.
-//
 func (node *Node) SetModTimeUnix(seconds, nanoSeconds int64) {
 	node.modTime = time.Unix(seconds, nanoSeconds)
 }
 
-//
 // SetMode set the mode of file.
-//
 func (node *Node) SetMode(mode os.FileMode) {
 	node.mode = mode
 }
 
-//
 // SetName set the name of file.
-//
 func (node *Node) SetName(name string) {
 	node.name = name
 }
 
-//
 // SetSize set the file size.
-//
 func (node *Node) SetSize(size int64) {
 	node.size = size
 }
 
-//
 // Size return the file size information.
-//
 func (node *Node) Size() int64 {
 	return node.size
 }
 
-//
 // Stat return the file information.
-//
 func (node *Node) Stat() (os.FileInfo, error) {
 	return node, nil
 }
 
-//
 // Sys return the underlying data source (can return nil).
-//
 func (node *Node) Sys() interface{} {
 	return node
 }
 
-//
 // addChild add FileInfo fi as child of this node.
 // This method is idempotent, which means, calling addChild with the same
 // FileInfo will return the same Node.
-//
 func (node *Node) addChild(
 	sysPath string, fi os.FileInfo, maxFileSize int64,
 ) (child *Node, err error) {
@@ -411,10 +375,8 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
 	_ = buf.WriteByte('}')
 }
 
-//
 // removeChild remove a children node from list.  If child is not exist, it
 // will return nil.
-//
 func (node *Node) removeChild(child *Node) *Node {
 	for x := 0; x < len(node.Childs); x++ {
 		if node.Childs[x] != child {
@@ -435,10 +397,8 @@ func (node *Node) removeChild(child *Node) *Node {
 	return nil
 }
 
-//
 // resetAllModTime set the modTime of node and its child to the t.
 // This method is only intended for testing.
-//
 func (node *Node) resetAllModTime(t time.Time) {
 	node.modTime = t
 	for _, c := range node.Childs {
@@ -446,7 +406,6 @@ func (node *Node) resetAllModTime(t time.Time) {
 	}
 }
 
-//
 // Update the node metadata or content based on new file information.
 //
 // The newInfo parameter is optional, if its nil, it will read the file
@@ -459,7 +418,6 @@ func (node *Node) resetAllModTime(t time.Time) {
 // There are two possible changes that will happen: its either change on
 // mode or change on content (size and modtime).
 // Change on mode will not affect the content of node.
-//
 func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	var (
 		logp = "Node.Update"
@@ -491,9 +449,7 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	return nil
 }
 
-//
 // updateContent read the content of file.
-//
 func (node *Node) updateContent(maxFileSize int64) (err error) {
 	if maxFileSize < 0 {
 		// Negative maxFileSize means content will not be read.

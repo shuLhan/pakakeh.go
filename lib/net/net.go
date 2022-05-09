@@ -40,10 +40,8 @@ const (
 	TypeUnixPacket
 )
 
-//
 // ConvertStandard library network value from string to Type.
 // It will return TypeInvalid (0) if network is unknown.
-//
 func ConvertStandard(network string) Type {
 	network = strings.ToLower(network)
 
@@ -76,10 +74,8 @@ func ConvertStandard(network string) Type {
 	return TypeInvalid
 }
 
-//
 // IsTypeTCP will return true if t is type of TCP(4,6); otherwise it will
 // return false.
-//
 func IsTypeTCP(t Type) bool {
 	if t == TypeTCP || t == TypeTCP4 || t == TypeTCP6 {
 		return true
@@ -87,10 +83,8 @@ func IsTypeTCP(t Type) bool {
 	return false
 }
 
-//
 // IsTypeUDP will return true if t is type of UDP(4,6); otherwise it will
 // return false.
-//
 func IsTypeUDP(t Type) bool {
 	if t == TypeUDP || t == TypeUDP4 || t == TypeUDP6 {
 		return true
@@ -98,21 +92,17 @@ func IsTypeUDP(t Type) bool {
 	return false
 }
 
-//
 // IsTypeTransport will return true if t is type of transport layer, i.e.
 // tcp(4,6) or udp(4,6); otherwise it will return false.
-//
 func IsTypeTransport(t Type) bool {
 	return IsTypeTCP(t) || IsTypeUDP(t)
 }
 
-//
 // ToDotIPv6 convert the IPv6 address format from "::1" format into
 // "0.0.0.0 ... 0.0.0.1".
 //
 // This function only useful for expanding SPF macro "i" or when generating
 // query for DNS PTR.
-//
 func ToDotIPv6(ip net.IP) (out []byte) {
 	addrs := strings.Split(ip.String(), ":")
 

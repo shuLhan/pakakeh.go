@@ -10,9 +10,7 @@ import (
 	"math/rand"
 )
 
-//
 // Frame represent a WebSocket data protocol.
-//
 type Frame struct {
 	// fin Indicates that this is the final fragment in a message.
 	// The first fragment MAY also be the final fragment.
@@ -103,21 +101,17 @@ type Frame struct {
 	isComplete bool
 }
 
-//
 // NewFrameBin create a single binary data frame with optional payload.
 // Client frame must be masked.
-//
 func NewFrameBin(isMasked bool, payload []byte) []byte {
 	return NewFrame(OpcodeBin, isMasked, payload)
 }
 
-//
 // NewFrameClose create control CLOSE frame.
 // The optional code represent the reason why the endpoint send the CLOSE
 // frame, for closure.
 // The optional payload represent the human readable reason, usually for
 // debugging.
-//
 func NewFrameClose(isMasked bool, code CloseCode, payload []byte) []byte {
 	if code == 0 {
 		code = StatusNormal
@@ -133,32 +127,24 @@ func NewFrameClose(isMasked bool, code CloseCode, payload []byte) []byte {
 	return newControlFrame(OpcodeClose, isMasked, packet)
 }
 
-//
 // NewFramePing create a masked PING control frame.
-//
 func NewFramePing(isMasked bool, payload []byte) (packet []byte) {
 	return newControlFrame(OpcodePing, isMasked, payload)
 }
 
-//
 // NewFramePong create a masked PONG control frame to be used by client.
-//
 func NewFramePong(isMasked bool, payload []byte) (packet []byte) {
 	return newControlFrame(OpcodePong, isMasked, payload)
 }
 
-//
 // NewFrameText create a single text data frame with optional payload.
 // Client frame must be masked.
-//
 func NewFrameText(isMasked bool, payload []byte) []byte {
 	return NewFrame(OpcodeText, isMasked, payload)
 }
 
-//
 // newControlFrame create new control frame with specific operation code and
 // optional payload.
-//
 func newControlFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	if len(payload) > frameSmallPayload {
 		// All control frames MUST have a payload length of 125 bytes
@@ -168,10 +154,8 @@ func newControlFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	return NewFrame(opcode, isMasked, payload)
 }
 
-//
 // NewFrame create a single finished frame with specific operation code and
 // optional payload.
-//
 func NewFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	f := &Frame{
 		fin:     frameIsFinished,
@@ -184,14 +168,11 @@ func NewFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 	return f.pack()
 }
 
-//
 // IsData return true if frame is either text or binary data frame.
-//
 func (f *Frame) IsData() bool {
 	return f.opcode == OpcodeText || f.opcode == OpcodeBin
 }
 
-//
 // isValid will return true if a frame is valid.
 // If isMasked is true, the frame masked MUST be set, otherwise it will return
 // false; and vice versa.
@@ -201,7 +182,6 @@ func (f *Frame) IsData() bool {
 // false; and so on.
 // If its control frame the fin field should be set and payload must be less
 // than 125.
-//
 func (f *Frame) isValid(isMasked, allowRsv1, allowRsv2, allowRsv3 bool) bool {
 	if isMasked {
 		if f.masked != frameIsMasked {
@@ -236,14 +216,11 @@ func (f *Frame) isValid(isMasked, allowRsv1, allowRsv2, allowRsv3 bool) bool {
 	return true
 }
 
-//
 // Opcode return the frame operation code.
-//
 func (f *Frame) Opcode() Opcode {
 	return f.opcode
 }
 
-//
 // pack WebSocket Frame into packet that can be written into socket.
 //
 // Frame payload len will be set based on length of payload.
@@ -252,7 +229,6 @@ func (f *Frame) Opcode() Opcode {
 //
 // A server MUST NOT mask any frames that it sends to the client.
 // (RFC 6455 5.1-P27).
-//
 func (f *Frame) pack() (out []byte) {
 	headerSize := uint64(2)
 	payloadSize := uint64(len(f.payload))
@@ -318,39 +294,35 @@ func (f *Frame) pack() (out []byte) {
 	return out
 }
 
-//
 // Payload return the frame payload.
-//
 func (f *Frame) Payload() []byte {
 	return f.payload
 }
 
-//
 // unpack the WebSocket data protocol from raw bytes into single frame.
 //
 // On success it will return the rest of unpacked frame.
 //
 // WebSocket data protocol,
 //
-//	   0                   1                   2                   3
-//	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-//	  +-+-+-+-+-------+-+-------------+-------------------------------+
-//	  |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
-//	  |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
-//	  |N|V|V|V|       |S|             |   (if payload len==126/127)   |
-//	  | |1|2|3|       |K|             |                               |
-//	  +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-//	  |     Extended payload length continued, if payload len == 127  |
-//	  + - - - - - - - - - - - - - - - +-------------------------------+
-//	  |                               |Masking-key, if MASK set to 1  |
-//	  +-------------------------------+-------------------------------+
-//	  | Masking-key (continued)       |          Payload Data         |
-//	  +-------------------------------- - - - - - - - - - - - - - - - +
-//	  :                     Payload Data continued ...                :
-//	  + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-//	  |                     Payload Data continued ...                |
-//	  +---------------------------------------------------------------+
-//
+//	 0                   1                   2                   3
+//	 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//	+-+-+-+-+-------+-+-------------+-------------------------------+
+//	|F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+//	|I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+//	|N|V|V|V|       |S|             |   (if payload len==126/127)   |
+//	| |1|2|3|       |K|             |                               |
+//	+-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+//	|     Extended payload length continued, if payload len == 127  |
+//	+ - - - - - - - - - - - - - - - +-------------------------------+
+//	|                               |Masking-key, if MASK set to 1  |
+//	+-------------------------------+-------------------------------+
+//	| Masking-key (continued)       |          Payload Data         |
+//	+-------------------------------- - - - - - - - - - - - - - - - +
+//	:                     Payload Data continued ...                :
+//	+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+//	|                     Payload Data continued ...                |
+//	+---------------------------------------------------------------+
 func (f *Frame) unpack(packet []byte) []byte {
 	var isHaveLen bool
 	for !isHaveLen {

@@ -12,11 +12,9 @@ import (
 	"github.com/shuLhan/share/lib/ascii"
 )
 
-//
 // IsBinary will return true if content of file is binary.
 // If file is not exist or there is an error when reading or closing the file,
 // it will return false.
-//
 func IsBinary(file string) bool {
 	var (
 		total     int
@@ -59,10 +57,8 @@ func IsBinary(file string) bool {
 	return ratio <= float64(0.75)
 }
 
-//
 // IsDirEmpty will return true if directory is not exist or empty; otherwise
 // it will return false.
-//
 func IsDirEmpty(dir string) (ok bool) {
 	d, err := os.Open(dir)
 	if err != nil {
@@ -82,10 +78,8 @@ func IsDirEmpty(dir string) (ok bool) {
 	return
 }
 
-//
 // IsFileExist will return true if relative path is exist on parent directory;
 // otherwise it will return false.
-//
 func IsFileExist(parent, relpath string) bool {
 	path := filepath.Join(parent, relpath)
 

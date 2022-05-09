@@ -14,7 +14,6 @@ import (
 // Before,
 //
 //	BenchmarkParseDuration-4  5000000  332 ns/op  32 B/op  4 allocs/op
-//
 func BenchmarkParseDuration(b *testing.B) {
 	exp := time.Duration(1.5 * float64(Week))
 

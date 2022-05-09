@@ -32,10 +32,8 @@ type rootRoute struct {
 	methodPut    *route
 }
 
-//
 // newRootRoute create and initialize each route's method with path "/" and
 // nil handler.
-//
 func newRootRoute() (root *rootRoute) {
 	root = &rootRoute{
 		methodDelete: &route{
@@ -84,7 +82,6 @@ func (root *rootRoute) getParent(method string) *route {
 	return nil
 }
 
-//
 // add new route handler by method and target.
 //
 // method is one of HTTP method that is allowed: DELETE, GET, PATCH, POST, or
@@ -100,7 +97,6 @@ func (root *rootRoute) getParent(method string) *route {
 //			isParam:true,
 //		}}
 //	}`
-//
 func (root *rootRoute) add(method, target string, handler RouteHandler) (err error) {
 	if target[0] != pathSep {
 		return ErrRouteInvTarget
@@ -159,9 +155,7 @@ out:
 	return err
 }
 
-//
 // get the route parameters values and their handler.
-//
 func (root *rootRoute) get(method, target string) (
 	params targetParam, handler RouteHandler,
 ) {

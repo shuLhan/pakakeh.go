@@ -11,20 +11,16 @@ import (
 	"runtime/pprof"
 )
 
-//
 // CPUProfile provide a wrapper to starting and stopping CPU profiler from
 // package "runtime/pprof".
-//
 type CPUProfile struct {
 	f *os.File
 }
 
-//
 // NewCPUProfile create and start the CPU profiler.
 // On success, it will return the running profiler; otherwise it will return
 // nil.
 // Do not forget to call Stop() when finished.
-//
 func NewCPUProfile(prefix string) (prof *CPUProfile) {
 	var err error
 
@@ -44,9 +40,7 @@ func NewCPUProfile(prefix string) (prof *CPUProfile) {
 	return prof
 }
 
-//
 // Stop the CPU profiler.
-//
 func (prof *CPUProfile) Stop() {
 	pprof.StopCPUProfile()
 

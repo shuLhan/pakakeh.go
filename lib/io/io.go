@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package io extends the standard io library.
-//
 package io
 
 import (
@@ -14,12 +12,10 @@ import (
 	"os"
 )
 
-//
 // Copy file from in to out.
 // If the output file is already exist, it will be truncated.
 // If the file is not exist, it will created with permission set to user's
 // read-write only.
-//
 func Copy(out, in string) (err error) {
 	fin, err := os.Open(in)
 	if err != nil {

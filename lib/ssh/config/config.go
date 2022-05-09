@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package config provide the ssh_config(5) parser and getter.
-//
 package config
 
 import (
@@ -55,7 +53,7 @@ const (
 
 // TODO: list of keys that are not implemented yet due to hard or
 // unknown how to test it.
-//nolint: deadcode,varcheck
+// nolint: deadcode,varcheck
 const (
 	keyCiphers                          = "ciphers"
 	keyControlMaster                    = "controlmaster"
@@ -125,18 +123,14 @@ var (
 	errMultipleEqual = errors.New("multiple '=' character")
 )
 
-//
 // Config contains mapping of host's patterns and its options from SSH
 // configuration file.
-//
 type Config struct {
 	sections []*Section
 	envs     map[string]string
 }
 
-//
 // Load SSH configuration from file.
-//
 func Load(file string) (cfg *Config, err error) {
 	if len(file) == 0 {
 		return nil, nil
@@ -271,9 +265,7 @@ func Load(file string) (cfg *Config, err error) {
 	return cfg, nil
 }
 
-//
 // Get the Host or Match configuration that match with the pattern "s".
-//
 func (cfg *Config) Get(s string) (section *Section) {
 	for _, section := range cfg.sections {
 		if section.isMatch(s) {
@@ -283,13 +275,11 @@ func (cfg *Config) Get(s string) (section *Section) {
 	return nil
 }
 
-//
 // Prepend other Config's sections to this Config.
 // The other's sections will be at the top of the list.
 //
 // This function can be useful if we want to load another SSH config file
 // without using Include directive.
-//
 func (cfg *Config) Prepend(other *Config) {
 	newSections := make([]*Section, 0,
 		len(cfg.sections)+len(other.sections))
@@ -298,10 +288,8 @@ func (cfg *Config) Prepend(other *Config) {
 	cfg.sections = newSections
 }
 
-//
 // loadEnvironments get all environments variables and store it in the map for
 // future use by SendEnv.
-//
 func (cfg *Config) loadEnvironments() {
 	envs := os.Environ()
 	for _, env := range envs {
@@ -322,7 +310,6 @@ func parseBool(key, val string) (out bool, err error) {
 	return false, fmt.Errorf("%s: invalid value %q", key, val)
 }
 
-//
 // parseKeyValue from single line.
 //
 // ssh_config(5):
@@ -330,7 +317,6 @@ func parseBool(key, val string) (out bool, err error) {
 //	Configuration options may be separated by whitespace or optional
 //	whitespace and exactly one `='; the latter format is useful to avoid
 //	the need to quote whitespace ...
-//
 func parseKeyValue(line string) (key, value string, err error) {
 	var (
 		hasSeparator bool
@@ -362,9 +348,7 @@ func parseKeyValue(line string) (key, value string, err error) {
 	return key, value, nil
 }
 
-//
 // patternToRegex convert the Host and Match pattern string into regex.
-//
 func patternToRegex(in string) (out string) {
 	sr := make([]rune, 0, len(in))
 	for _, r := range in {

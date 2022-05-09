@@ -24,11 +24,9 @@ var (
 	getHostname = os.Hostname
 )
 
-//
 // ResolvConf contains value of resolver configuration file.
 //
 // Reference: "man resolv.conf" in Linux.
-//
 type ResolvConf struct {
 	// Local domain name.
 	// Most queries for names within this domain can use short names
@@ -99,9 +97,7 @@ type ResolvConf struct {
 	OptMisc map[string]bool
 }
 
-//
 // NewResolvConf open resolv.conf file in path and return the parsed records.
-//
 func NewResolvConf(path string) (*ResolvConf, error) {
 	rc := &ResolvConf{
 		OptMisc: make(map[string]bool),
@@ -117,9 +113,7 @@ func NewResolvConf(path string) (*ResolvConf, error) {
 	return rc, nil
 }
 
-//
 // Init parse resolv.conf from string.
-//
 func (rc *ResolvConf) Init(src string) {
 	reader := new(libio.Reader)
 	reader.Init([]byte(src))
@@ -136,7 +130,6 @@ func (rc *ResolvConf) reset() {
 	rc.OptMisc = make(map[string]bool)
 }
 
-//
 // parse open and parse the resolv.conf file.
 //
 // Lines that contain a semicolon (;) or hash character (#) in the first
@@ -147,7 +140,6 @@ func (rc *ResolvConf) reset() {
 // by white space.
 //
 // See `man resolv.conf`
-//
 func (rc *ResolvConf) parse(reader *libio.Reader) {
 	for {
 		c := reader.SkipSpaces()
@@ -204,10 +196,8 @@ func (rc *ResolvConf) parseValue(reader *libio.Reader, out *string) {
 	}
 }
 
-//
 // (1) The domain and search keywords are mutually exclusive.  If more than
 // one instance of these keywords is present, the last instance wins.
-//
 func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
 	max := 6
 	maxLen := 255
@@ -335,11 +325,9 @@ func (rc *ResolvConf) sanitize() {
 	}
 }
 
-//
 // PopulateQuery given a domain name to be resolved, generate list of names
 // to be queried based on registered Domain and Search in the resolv.conf.
 // The dname itself will be on top of the list if its contains any dot.
-//
 func (rc *ResolvConf) PopulateQuery(dname string) (queries []string) {
 	var (
 		s     string

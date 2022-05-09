@@ -4,9 +4,7 @@
 
 package spf
 
-//
 // List of modifiers.
-//
 const (
 	modifierExp      = "exp"
 	modifierRedirect = "redirect"

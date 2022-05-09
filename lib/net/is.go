@@ -7,7 +7,6 @@ import (
 	"github.com/shuLhan/share/lib/ascii"
 )
 
-//
 // IsHostnameValid will return true if hostname is valid, otherwise it will
 // return false.
 // They must begin with alphanumeric character or "_" and end with an
@@ -19,7 +18,6 @@ import (
 // otherwise it will be invalid.
 //
 // See rfc952 and rfc1123.
-//
 func IsHostnameValid(hname []byte, isFQDN bool) bool {
 	n := len(hname)
 	if n == 0 {
@@ -48,10 +46,8 @@ func IsHostnameValid(hname []byte, isFQDN bool) bool {
 	return true
 }
 
-//
 // IsIPv4 will return true if string representation of IP contains three dots,
 // for example "127.0.0.1".
-//
 func IsIPv4(ip net.IP) bool {
 	if ip == nil {
 		return false
@@ -66,10 +62,8 @@ func IsIPv4(ip net.IP) bool {
 	return false
 }
 
-//
 // IsIPv6 will return true if string representation of IP contains two or more
 // colons ":", for example, "::1".
-//
 func IsIPv6(ip net.IP) bool {
 	if ip == nil {
 		return false

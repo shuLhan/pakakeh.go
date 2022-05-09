@@ -10,7 +10,6 @@ import (
 	"sync"
 )
 
-//
 // UDPClientPool contains a pool of UDP client connections.
 //
 // Any implementation that access UDPClient in multiple Go routines should
@@ -21,7 +20,6 @@ import (
 // WARNING: using pooling is only works if client only call Lookup or Query.
 // If implementation call Send() n client connection, make sure, it also call
 // Recv on the same routine before putting the client back to pool.
-//
 type UDPClientPool struct {
 	pool *sync.Pool
 	ns   []string
@@ -29,10 +27,8 @@ type UDPClientPool struct {
 	sync.Mutex
 }
 
-//
 // NewUDPClientPool create pool for UDP connection using list of name servers.
 // If no name servers is defined it will return nil.
-//
 func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 	if len(nameServers) == 0 {
 		err = errors.New("udp: UDPClientPool: no name servers defined")
@@ -60,9 +56,7 @@ func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 	return ucp, nil
 }
 
-//
 // newClient create a new udp client.
-//
 func (ucp *UDPClientPool) newClient() interface{} {
 	ucp.Lock()
 	ucp.seq %= len(ucp.ns)
@@ -75,19 +69,15 @@ func (ucp *UDPClientPool) newClient() interface{} {
 	return cl
 }
 
-//
 // Get return UDP client.
-//
 func (ucp *UDPClientPool) Get() *UDPClient {
 	return ucp.pool.Get().(*UDPClient)
 }
 
-//
 // Put the UDP client into pool.
 //
 // WARNING: any client connection that call Send(), MUST call Recv()
 // before putting client back to pool.  You have been warned.
-//
 func (ucp *UDPClientPool) Put(cl interface{}) {
 	if cl != nil {
 		ucp.pool.Put(cl)

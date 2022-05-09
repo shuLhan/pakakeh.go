@@ -13,14 +13,11 @@ import (
 	"github.com/shuLhan/share/lib/mlog"
 )
 
-//
 // CallbackErrorHandler define the function that can be used to handle an
 // error returned from Endpoint.Call.
 // By default, if Endpoint.Call is nil, it will use DefaultErrorHandler.
-//
 type CallbackErrorHandler func(epr *EndpointRequest)
 
-//
 // DefaultErrorHandler define the default function that will called to handle
 // the error returned from Callback function, if the Endpoint.ErrorHandler is
 // not defined.
@@ -33,7 +30,6 @@ type CallbackErrorHandler func(epr *EndpointRequest)
 // write the response body as JSON format,
 //
 //	{"code":<HTTP_STATUS_CODE>, "message":<err.Error()>}
-//
 func DefaultErrorHandler(epr *EndpointRequest) {
 	var (
 		logp        = "DefaultErrorHandler"

@@ -6,9 +6,7 @@ package bot
 
 import "strings"
 
-//
 // Message represents a message.
-//
 type Message struct {
 	MessageForward
 
@@ -167,9 +165,7 @@ type Message struct {
 	CommandArgs string // It will contains the Command arguments.
 }
 
-//
 // parseCommandArgs parse the Text to get the command and its arguments.
-//
 func (msg *Message) parseCommandArgs() bool {
 	var cmdEntity *MessageEntity
 

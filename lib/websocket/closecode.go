@@ -4,12 +4,9 @@
 
 package websocket
 
-//
 // CloseCode represent the server close status.
-//
 type CloseCode uint16
 
-//
 // List of close code in network byte order.  The name of status is
 // mimicking the "net/http" status code.
 //
@@ -20,7 +17,6 @@ type CloseCode uint16
 // payload.
 //
 // See RFC6455 7.4.1-P45 for more information.
-//
 const (
 	// StatusNormal (1000) indicates a normal closure, meaning that the
 	// purpose for which the connection was established has been

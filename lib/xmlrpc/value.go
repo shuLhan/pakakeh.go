@@ -11,9 +11,7 @@ import (
 	"sort"
 )
 
-//
 // Value represent dynamic value of XML-RPC type.
-//
 type Value struct {
 	Kind Kind
 	// In contains scalar value for Base64, Boolean, Double, Integer,
@@ -28,9 +26,7 @@ type Value struct {
 	ArrayValues []*Value
 }
 
-//
 // NewValue convert Go type data into XML-RPC value.
-//
 func NewValue(in interface{}) (out *Value) {
 	reft := reflect.TypeOf(in)
 	if reft == nil {
@@ -118,9 +114,7 @@ func NewValue(in interface{}) (out *Value) {
 	return out
 }
 
-//
 // GetFieldAsFloat get struct's field value by name as float64.
-//
 func (v *Value) GetFieldAsFloat(key string) float64 {
 	if v == nil || v.StructMembers == nil {
 		return 0
@@ -136,9 +130,7 @@ func (v *Value) GetFieldAsFloat(key string) float64 {
 	return f64
 }
 
-//
 // GetFieldAsFloat get the struct's field value by its key as boolean.
-//
 func (v *Value) GetFieldAsBoolean(key string) bool {
 	if v == nil || v.StructMembers == nil {
 		return false
@@ -154,9 +146,7 @@ func (v *Value) GetFieldAsBoolean(key string) bool {
 	return abool
 }
 
-//
 // GetFieldAsInteger get struct's field value by name as int.
-//
 func (v *Value) GetFieldAsInteger(key string) int {
 	if v == nil || v.StructMembers == nil {
 		return 0
@@ -172,9 +162,7 @@ func (v *Value) GetFieldAsInteger(key string) int {
 	return int(i32)
 }
 
-//
 // GetFieldAsString get struct's field value by name as string.
-//
 func (v *Value) GetFieldAsString(key string) string {
 	if v == nil || v.StructMembers == nil {
 		return ""

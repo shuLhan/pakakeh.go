@@ -111,9 +111,7 @@ var readers = []*Reader{
 	},
 }
 
-//
 // TestReaderNoInput will print error that the input is not defined.
-//
 func TestReaderNoInput(t *testing.T) {
 	dsvReader := &Reader{}
 
@@ -130,9 +128,7 @@ func TestReaderNoInput(t *testing.T) {
 	}
 }
 
-//
 // TestConfigParse test parsing metadata.
-//
 func TestConfigParse(t *testing.T) {
 	cases := []struct {
 		in  string
@@ -194,9 +190,7 @@ func TestReaderIsEqual(t *testing.T) {
 	}
 }
 
-//
 // doRead test reading the DSV data.
-//
 func doRead(t *testing.T, dsvReader *Reader, exp []string) {
 	i := 0
 	var n int
@@ -220,9 +214,7 @@ func doRead(t *testing.T, dsvReader *Reader, exp []string) {
 	}
 }
 
-//
 // TestReader test reading.
-//
 func TestReaderRead(t *testing.T) {
 	dsvReader := &Reader{}
 
@@ -245,9 +237,7 @@ func TestReaderRead(t *testing.T) {
 	}
 }
 
-//
 // TestReaderOpen real example from the start.
-//
 func TestReaderOpen(t *testing.T) {
 	dsvReader, e := NewReader("testdata/config.dsv", nil)
 	if nil != e {
@@ -342,9 +332,7 @@ func TestReaderToColumns(t *testing.T) {
 	}
 }
 
-//
 // TestReaderSkip will test the 'Skip' option in Metadata.
-//
 func TestReaderSkip(t *testing.T) {
 	dsvReader, e := NewReader("testdata/config_skip.dsv", nil)
 	if nil != e {
@@ -482,9 +470,7 @@ func TestSplitRowsByValue(t *testing.T) {
 	}
 }
 
-//
 // testWriteOutput will write merged reader and check with expected file output.
-//
 func testWriteOutput(t *testing.T, r *Reader, outfile, expfile string) {
 	writer, e := NewWriter("")
 	if e != nil {

@@ -11,15 +11,11 @@ import (
 	"strings"
 )
 
-//
 // Morphemes contains list of morphological attributes.
-//
 type Morphemes map[string]string
 
-//
 // isValidMorpheme will return true if `in` contains ":" or a number (as an
 // alias); otherwise it will return false.
-//
 func isValidMorpheme(in string) (bool, error) {
 	idx := strings.Index(in, ":")
 	switch idx {
@@ -36,12 +32,10 @@ func isValidMorpheme(in string) (bool, error) {
 	return true, nil
 }
 
-//
 // newMorphemes convert any raw morphemes or an alias into map of
 // key-values.
 // At this point, each of the morphemes should be valid, unless its unknown
 // and it will logged to stderr.
-//
 func newMorphemes(opts *affixOptions, raws []string) Morphemes {
 	rawMorphs := make([]string, 0, len(raws))
 	morphs := make(Morphemes, len(raws))
@@ -82,9 +76,7 @@ func newMorphemes(opts *affixOptions, raws []string) Morphemes {
 	return morphs
 }
 
-//
 // String return list of morphological fields ordered by key.
-//
 func (morphs Morphemes) String() string {
 	fields := make([]string, 0, len(morphs))
 	for k, v := range morphs {

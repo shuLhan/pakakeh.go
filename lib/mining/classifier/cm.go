@@ -11,9 +11,7 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-//
 // CM represent the matrix of classification.
-//
 type CM struct {
 	tabula.Dataset
 	// rowNames contain name in each row.
@@ -35,9 +33,7 @@ type CM struct {
 	fnIds []int
 }
 
-//
 // initByNumeric will initialize confusion matrix using numeric value space.
-//
 func (cm *CM) initByNumeric(vs []int64) {
 	colTypes := make([]int, 0, len(vs))
 	colNames := make([]string, 0, len(vs))
@@ -56,10 +52,8 @@ func (cm *CM) initByNumeric(vs []int64) {
 	cm.Dataset.Init(tabula.DatasetModeMatrix, colTypes, colNames)
 }
 
-//
 // ComputeStrings will calculate confusion matrix using targets and predictions
 // class values.
-//
 func (cm *CM) ComputeStrings(valueSpace, targets, predictions []string) {
 	cm.init(valueSpace)
 
@@ -79,10 +73,8 @@ func (cm *CM) ComputeStrings(valueSpace, targets, predictions []string) {
 	cm.computeClassError()
 }
 
-//
 // ComputeNumeric will calculate confusion matrix using targets and predictions
 // values.
-//
 func (cm *CM) ComputeNumeric(vs, actuals, predictions []int64) {
 	cm.initByNumeric(vs)
 
@@ -102,9 +94,7 @@ func (cm *CM) ComputeNumeric(vs, actuals, predictions []int64) {
 	cm.computeClassError()
 }
 
-//
 // create will initialize confusion matrix using value space.
-//
 func (cm *CM) init(valueSpace []string) {
 	colTypes := make([]int, 0, len(valueSpace))
 	colNames := make([]string, 0, len(valueSpace))
@@ -122,10 +112,8 @@ func (cm *CM) init(valueSpace []string) {
 	cm.Dataset.Init(tabula.DatasetModeMatrix, colTypes, colNames)
 }
 
-//
 // countTargetPrediction will count and return number of true positive or false
 // positive in predictions using targets values.
-//
 func (cm *CM) countTargetPrediction(target, predict string,
 	targets, predictions []string,
 ) (
@@ -149,10 +137,8 @@ func (cm *CM) countTargetPrediction(target, predict string,
 	return
 }
 
-//
 // countNumeric will count and return number of `pred` in predictions where
 // actuals value is `act`.
-//
 func (cm *CM) countNumeric(act, pred int64, actuals, predictions []int64) (
 	cnt int64,
 ) {
@@ -174,9 +160,7 @@ func (cm *CM) countNumeric(act, pred int64, actuals, predictions []int64) (
 	return cnt
 }
 
-//
 // computeClassError will compute the classification error in matrix.
-//
 func (cm *CM) computeClassError() {
 	var tp, fp int64
 
@@ -210,7 +194,6 @@ func (cm *CM) computeClassError() {
 	cm.PushColumnToRows(*col)
 }
 
-//
 // GroupIndexPredictions given index of samples, group the samples by their
 // class of prediction. For example,
 //
@@ -221,13 +204,12 @@ func (cm *CM) computeClassError() {
 // This function will group the index by true-positive, false-positive,
 // true-negative, and false-negative, which result in,
 //
-//	true-positive indices:  [0, 4]
-//	false-positive indices: [2, 5]
-//	true-negative indices:  [3]
-//      false-negative indices: [1]
+//		true-positive indices:  [0, 4]
+//		false-positive indices: [2, 5]
+//		true-negative indices:  [3]
+//	     false-negative indices: [1]
 //
 // This function assume that positive value as "1" and negative value as "0".
-//
 func (cm *CM) GroupIndexPredictions(sampleIds []int,
 	actuals, predictions []int64,
 ) {
@@ -264,10 +246,8 @@ func (cm *CM) GroupIndexPredictions(sampleIds []int,
 	}
 }
 
-//
 // GroupIndexPredictionsStrings is an alternative to GroupIndexPredictions
 // which work with string class.
-//
 func (cm *CM) GroupIndexPredictionsStrings(sampleIds []int,
 	actuals, predictions []string,
 ) {
@@ -308,35 +288,27 @@ func (cm *CM) GroupIndexPredictionsStrings(sampleIds []int,
 	}
 }
 
-//
 // GetColumnClassError return the last column which is the column that contain
 // the error of classification.
-//
 func (cm *CM) GetColumnClassError() *tabula.Column {
 	return cm.GetColumn(cm.GetNColumn() - 1)
 }
 
-//
 // GetTrueRate return true-positive rate in term of
 //
 //	true-positive / (true-positive + false-positive)
-//
 func (cm *CM) GetTrueRate() float64 {
 	return float64(cm.nTrue) / float64(cm.nTrue+cm.nFalse)
 }
 
-//
 // GetFalseRate return false-positive rate in term of,
 //
 //	false-positive / (false-positive + true negative)
-//
 func (cm *CM) GetFalseRate() float64 {
 	return float64(cm.nFalse) / float64(cm.nTrue+cm.nFalse)
 }
 
-//
 // TP return number of true-positive in confusion matrix.
-//
 func (cm *CM) TP() int {
 	row := cm.GetRow(0)
 	if row == nil {
@@ -347,9 +319,7 @@ func (cm *CM) TP() int {
 	return int(v)
 }
 
-//
 // FP return number of false-positive in confusion matrix.
-//
 func (cm *CM) FP() int {
 	row := cm.GetRow(0)
 	if row == nil {
@@ -360,9 +330,7 @@ func (cm *CM) FP() int {
 	return int(v)
 }
 
-//
 // FN return number of false-negative.
-//
 func (cm *CM) FN() int {
 	row := cm.GetRow(1)
 	if row == nil {
@@ -372,9 +340,7 @@ func (cm *CM) FN() int {
 	return int(v)
 }
 
-//
 // TN return number of true-negative.
-//
 func (cm *CM) TN() int {
 	row := cm.GetRow(1)
 	if row == nil {
@@ -384,37 +350,27 @@ func (cm *CM) TN() int {
 	return int(v)
 }
 
-//
 // TPIndices return indices of all true-positive samples.
-//
 func (cm *CM) TPIndices() []int {
 	return cm.tpIds
 }
 
-//
 // FNIndices return indices of all false-negative samples.
-//
 func (cm *CM) FNIndices() []int {
 	return cm.fnIds
 }
 
-//
 // FPIndices return indices of all false-positive samples.
-//
 func (cm *CM) FPIndices() []int {
 	return cm.fpIds
 }
 
-//
 // TNIndices return indices of all true-negative samples.
-//
 func (cm *CM) TNIndices() []int {
 	return cm.tnIds
 }
 
-//
 // String will return the output of confusion matrix in table like format.
-//
 func (cm *CM) String() (s string) {
 	s += "Confusion Matrix:\n"
 

@@ -13,9 +13,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//
 // Test renaming sub-directory being watched.
-//
 func TestDirWatcher_renameDirectory(t *testing.T) {
 	var (
 		dw  DirWatcher

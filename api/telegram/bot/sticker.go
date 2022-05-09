@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // Sticker represents a sticker.
-//
 type Sticker struct {
 	Document
 

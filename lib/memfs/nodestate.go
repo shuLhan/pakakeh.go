@@ -4,9 +4,7 @@
 
 package memfs
 
-//
 // NodeState contains the information about the file and its state.
-//
 type NodeState struct {
 	// Node represent the file information.
 	Node Node

@@ -13,9 +13,7 @@ import (
 
 type tagKey int
 
-//
 // List of known tag keys.
-//
 const (
 	tagUnknown tagKey = iota
 
@@ -48,10 +46,8 @@ const (
 	tagDNSNotes   // n=
 )
 
-//
 // Mapping between tag in DKIM-Signature and tag in DKIM domain record,
 // since both have the same text representation.
-//
 const (
 	// Recommended tags.
 	tagDNSVersion tagKey = tagVersion // v=
@@ -61,9 +57,7 @@ const (
 	tagDNSFlags    = tagCreatedAt // t=
 )
 
-//
 // Mapping between tag key in numeric and their human readable form.
-//
 var tagKeys = map[tagKey][]byte{
 	tagVersion:        []byte("v"),
 	tagAlg:            []byte("a"),
@@ -85,18 +79,14 @@ var tagKeys = map[tagKey][]byte{
 	tagDNSNotes:     []byte("n"),
 }
 
-//
 // tag represent tag's key and its value.
-//
 type tag struct {
 	key   tagKey
 	value []byte
 }
 
-//
 // newTag create new tag only if key is valid: start with ALPHA and contains
 // only ALPHA, DIGIT, or "_".
-//
 func newTag(key []byte) (t *tag, err error) {
 	if len(key) == 0 {
 		return nil, nil
@@ -124,9 +114,7 @@ func newTag(key []byte) (t *tag, err error) {
 	return t, nil
 }
 
-//
 // setValue set the tag value only if val is valid, otherwise return an error.
-//
 func (t *tag) setValue(val []byte) (err error) {
 	if len(val) == 0 {
 		return nil

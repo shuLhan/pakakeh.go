@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package resampling provide common interface, constants, and methods for
 // resampling modules.
-//
 package resampling
 
 import (
@@ -20,17 +18,13 @@ const (
 	DefaultPercentOver = 100
 )
 
-//
 // Interface define common methods used by resampling module.
-//
 type Interface interface {
 	GetSynthetics() tabula.DatasetInterface
 }
 
-//
 // WriteSynthetics will write synthetic samples in resampling module `ri` into
 // `file`.
-//
 func WriteSynthetics(ri Interface, file string) (e error) {
 	writer, e := dsv.NewWriter("")
 	if nil != e {

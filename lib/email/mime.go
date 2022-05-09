@@ -14,9 +14,7 @@ import (
 	libio "github.com/shuLhan/share/lib/io"
 )
 
-//
 // MIME represent part of message body with their header and content.
-//
 type MIME struct {
 	contentType *ContentType
 
@@ -24,11 +22,9 @@ type MIME struct {
 	Content []byte
 }
 
-//
 // newMIME append new body with specific content type and charset.
 // The content must be in raw format and it will be encoded using
 // quoted-printable encoding.
-//
 func newMIME(contentType, content []byte) (mime *MIME, err error) {
 	mime = &MIME{
 		Header: &Header{},
@@ -65,10 +61,8 @@ func newMIME(contentType, content []byte) (mime *MIME, err error) {
 	return mime, nil
 }
 
-//
 // ParseBodyPart parse one body part using boundary and return the rest of
 // body.
-//
 func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, raw, nil
@@ -153,9 +147,7 @@ func (mime *MIME) isContentType(top, sub []byte) bool {
 	return false
 }
 
-//
 // String return string representation of MIME object.
-//
 func (mime *MIME) String() string {
 	var sb strings.Builder
 
@@ -169,9 +161,7 @@ func (mime *MIME) String() string {
 	return sb.String()
 }
 
-//
 // WriteTo write the MIME header and content into Writer w.
-//
 func (mime *MIME) WriteTo(w io.Writer) (n int, err error) {
 	var (
 		m int

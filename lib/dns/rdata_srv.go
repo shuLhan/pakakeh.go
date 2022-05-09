@@ -10,9 +10,7 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // RDataSRV define a resource record for type SRV.
-//
 type RDataSRV struct {
 	// The symbolic name of the desired service, as defined in Assigned
 	// Numbers [STD 2] or locally.  An underscore (_) is prepended to
@@ -98,18 +96,14 @@ type RDataSRV struct {
 	Port uint16
 }
 
-//
 // String return readable representation of SRV record.
-//
 func (srv *RDataSRV) String() string {
 	return fmt.Sprintf("{Service:%s Proto:%s Name:%s Priority:%d Weight:%d Port:%d Target:%s}",
 		srv.Service, srv.Proto, srv.Name, srv.Priority, srv.Weight,
 		srv.Port, srv.Target)
 }
 
-//
 // initAndValidate initialize and validate the SRV fields.
-//
 func (srv *RDataSRV) initAndValidate() error {
 	if !libnet.IsHostnameValid([]byte(srv.Target), true) {
 		return fmt.Errorf("invalid SRV target %q", srv.Target)

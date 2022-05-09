@@ -21,10 +21,8 @@ const (
 	tag = "[classifier.runtime]"
 )
 
-//
 // Runtime define a generic type which provide common fields that can be
 // embedded by the real classifier (e.g. RandomForest).
-//
 type Runtime struct {
 	// RunOOB if its true the OOB will be computed, default is false.
 	RunOOB bool `json:"RunOOB"`
@@ -56,20 +54,16 @@ type Runtime struct {
 	perfs Stats
 }
 
-//
 // Initialize will start the runtime for processing by saving start time and
 // opening stats file.
-//
 func (rt *Runtime) Initialize() error {
 	rt.oobStatTotal.Start()
 
 	return rt.OpenOOBStatsFile()
 }
 
-//
 // Finalize finish the runtime, compute total statistic, write it to file, and
 // close the file.
-//
 func (rt *Runtime) Finalize() (e error) {
 	st := &rt.oobStatTotal
 
@@ -84,38 +78,28 @@ func (rt *Runtime) Finalize() (e error) {
 	return rt.CloseOOBStatsFile()
 }
 
-//
 // OOBStats return all statistic objects.
-//
 func (rt *Runtime) OOBStats() *Stats {
 	return &rt.oobStats
 }
 
-//
 // StatTotal return total statistic.
-//
 func (rt *Runtime) StatTotal() *Stat {
 	return &rt.oobStatTotal
 }
 
-//
 // AddOOBCM will append new confusion matrix.
-//
 func (rt *Runtime) AddOOBCM(cm *CM) {
 	rt.oobCms = append(rt.oobCms, *cm)
 }
 
-//
 // AddStat will append new classifier statistic data.
-//
 func (rt *Runtime) AddStat(stat *Stat) {
 	rt.oobStats = append(rt.oobStats, stat)
 }
 
-//
 // ComputeCM will compute confusion matrix of sample using value space, actual
 // and prediction values.
-//
 func (rt *Runtime) ComputeCM(sampleIds []int,
 	vs, actuals, predicts []string,
 ) (
@@ -133,9 +117,7 @@ func (rt *Runtime) ComputeCM(sampleIds []int,
 	return cm
 }
 
-//
 // ComputeStatFromCM will compute statistic using confusion matrix.
-//
 func (rt *Runtime) ComputeStatFromCM(stat *Stat, cm *CM) {
 	stat.OobError = cm.GetFalseRate()
 
@@ -195,9 +177,7 @@ func (rt *Runtime) ComputeStatFromCM(stat *Stat, cm *CM) {
 	}
 }
 
-//
 // ComputeStatTotal compute total statistic.
-//
 func (rt *Runtime) ComputeStatTotal(stat *Stat) {
 	if stat == nil {
 		return
@@ -260,9 +240,7 @@ func (rt *Runtime) ComputeStatTotal(stat *Stat) {
 	}
 }
 
-//
 // OpenOOBStatsFile will open statistic file for output.
-//
 func (rt *Runtime) OpenOOBStatsFile() error {
 	if rt.oobWriter != nil {
 		_ = rt.CloseOOBStatsFile()
@@ -271,9 +249,7 @@ func (rt *Runtime) OpenOOBStatsFile() error {
 	return rt.oobWriter.OpenOutput(rt.OOBStatsFile)
 }
 
-//
 // WriteOOBStat will write statistic of process to file.
-//
 func (rt *Runtime) WriteOOBStat(stat *Stat) error {
 	if rt.oobWriter == nil {
 		return nil
@@ -284,9 +260,7 @@ func (rt *Runtime) WriteOOBStat(stat *Stat) error {
 	return rt.oobWriter.WriteRawRow(stat.ToRow(), nil, nil)
 }
 
-//
 // CloseOOBStatsFile will close statistics file for writing.
-//
 func (rt *Runtime) CloseOOBStatsFile() (e error) {
 	if rt.oobWriter == nil {
 		return
@@ -298,9 +272,7 @@ func (rt *Runtime) CloseOOBStatsFile() (e error) {
 	return
 }
 
-//
 // PrintOobStat will print the out-of-bag statistic to standard output.
-//
 func (rt *Runtime) PrintOobStat(stat *Stat, cm *CM) {
 	fmt.Printf("%s OOB error rate: %.4f,"+
 		" total: %.4f, mean %.4f, true rate: %.4f\n", tag,
@@ -308,9 +280,7 @@ func (rt *Runtime) PrintOobStat(stat *Stat, cm *CM) {
 		stat.OobErrorMean, cm.GetTrueRate())
 }
 
-//
 // PrintStat will print statistic value to standard output.
-//
 func (rt *Runtime) PrintStat(stat *Stat) {
 	if stat == nil {
 		statslen := len(rt.oobStats)
@@ -326,9 +296,7 @@ func (rt *Runtime) PrintStat(stat *Stat) {
 		stat.TNRate, stat.Precision, stat.FMeasure, stat.Accuracy)
 }
 
-//
 // PrintStatTotal will print total statistic to standard output.
-//
 func (rt *Runtime) PrintStatTotal(st *Stat) {
 	if st == nil {
 		st = &rt.oobStatTotal
@@ -336,7 +304,6 @@ func (rt *Runtime) PrintStatTotal(st *Stat) {
 	rt.PrintStat(st)
 }
 
-//
 // Performance given an actuals class label and their probabilities, compute
 // the performance statistic of classifier.
 //
@@ -345,7 +312,6 @@ func (rt *Runtime) PrintStatTotal(st *Stat) {
 // (2) Sort the actuals and predicts using sorted index from probs
 // (3) Compute tpr, fpr, precision
 // (4) Write performance to file.
-//
 func (rt *Runtime) Performance(samples tabula.ClasetInterface,
 	predicts []string, probs []float64,
 ) (
@@ -372,12 +338,10 @@ func trapezoidArea(fp, fpprev, tp, tpprev int64) float64 {
 	return base * heightAvg
 }
 
-//
 // computePerfByProbs will compute classifier performance using probabilities
 // or score `probs`.
 //
 // This currently only work for two class problem.
-//
 func (rt *Runtime) computePerfByProbs(samples tabula.ClasetInterface,
 	actuals []string, probs []float64,
 ) {
@@ -435,9 +399,7 @@ func (rt *Runtime) computePerfByProbs(samples tabula.ClasetInterface,
 	}
 }
 
-//
 // WritePerformance will write performance data to file.
-//
 func (rt *Runtime) WritePerformance() error {
 	return rt.perfs.Write(rt.PerfFile)
 }

@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package test provide library for helping with testing.
-//
 package test
 
 import (
@@ -36,7 +34,6 @@ func printStackTrace(t testing.TB, trace []byte) {
 	t.Log("\n!!! ERR " + string(trace[start:end]))
 }
 
-//
 // Assert compare two interfaces: `exp` and `got` for equality.
 // If both parameters are not equal, the function will call Fatalf that
 // describe the position (type and value) where value are not matched.
@@ -46,7 +43,6 @@ func printStackTrace(t testing.TB, trace []byte) {
 //
 // WARNING: this method does not support recursive pointer, for example a node
 // that point to parent and parent that point back to node again.
-//
 func Assert(t *testing.T, name string, exp, got interface{}) {
 	err := reflect.DoEqual(exp, got)
 	if err == nil {
@@ -60,11 +56,9 @@ func Assert(t *testing.T, name string, exp, got interface{}) {
 	t.Fatalf("!!! %s: %s", name, err)
 }
 
-//
 // AssertBench will compare two interfaces: `exp` and `got` for equality.
 // If both parameters are not equal, the function will call Fatalf that
 // describe the position (type and value) where value are not matched.
-//
 func AssertBench(b *testing.B, name string, exp, got interface{}) {
 	err := reflect.DoEqual(exp, got)
 	if err == nil {

@@ -30,9 +30,7 @@ const (
 
 type UpdateHandler func(update Update)
 
-//
 // Options to create new Bot.
-//
 type Options struct {
 	// Required.  Your Bot authentication token.
 	// This option will be overridden by environment variable
@@ -48,10 +46,8 @@ type Options struct {
 	Webhook *Webhook
 }
 
-//
 // init check for required fields and initialize empty fields with default
 // value.
-//
 func (opts *Options) init() (err error) {
 	// Set the Telegram token and Webhook URL from environment, if its not
 	// empty.

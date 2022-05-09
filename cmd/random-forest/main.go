@@ -79,12 +79,10 @@ func un(startTime time.Time) {
 	fmt.Println(tag, "elapsed time", endTime.Sub(startTime))
 }
 
-//
 // createRandomForest will create random forest for training, with the
 // following steps,
 // (1) load training configuration.
 // (2) Overwrite configuration parameter if its set from command line.
-//
 func createRandomForest(opts *options) (forest *rf.Runtime, e error) {
 	// (1)
 	config, e := os.ReadFile(opts.trainCfg)
@@ -159,14 +157,12 @@ func test(forest *rf.Runtime, opts *options) {
 	}
 }
 
-//
 // (0) Parse and check command line parameters.
 // (1) If trainCfg parameter is set,
 // (1.1) train the model,
 // (1.2) TODO: load saved model.
 // (2) If testCfg parameter is set,
 // (2.1) Test the model using data from testCfg.
-//
 func main() {
 	var forest *rf.Runtime
 

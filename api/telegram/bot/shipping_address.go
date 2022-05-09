@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // ShippingAddress represents a shipping address.
-//
 type ShippingAddress struct {
 	// ISO 3166-1 alpha-2 country code.
 	CountryCode string `json:"country_code"`

@@ -4,9 +4,7 @@
 
 package hunspell
 
-//
 // breakopt contains the break role and token from option BREAK.
-//
 type breakopt struct {
 	delEnd   bool
 	delStart bool

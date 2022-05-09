@@ -4,11 +4,9 @@
 
 package bot
 
-//
 // Game represents a game.
 // Use BotFather to create and edit games, their short names will act as
 // unique identifiers.
-//
 type Game struct {
 	Title       string `json:"title"`       // Title of the game.
 	Description string `json:"description"` // Description of the game.

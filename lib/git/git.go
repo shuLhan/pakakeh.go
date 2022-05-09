@@ -27,7 +27,6 @@ var (
 	_stderr = os.Stderr
 )
 
-//
 // CheckoutRevision will set the HEAD to specific revision on specific branch.
 // Any untracked files and directories will be removed before checking out
 // existing branch or creating new branch.
@@ -38,7 +37,6 @@ var (
 // This function assume that repository is up-to-date with remote.
 // Client may call FetchAll() before, to prevent checking out revision that
 // may not exist.
-//
 func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 	if len(remoteName) == 0 {
 		remoteName = _defRemoteName
@@ -103,11 +101,9 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 	return err
 }
 
-//
 // Clone the repository into destination directory.
 //
 // If destination directory is not empty it will return an error.
-//
 func Clone(remoteURL, dest string) (err error) {
 	err = os.MkdirAll(dest, 0700)
 	if err != nil {
@@ -136,9 +132,7 @@ func Clone(remoteURL, dest string) (err error) {
 	return
 }
 
-//
 // FetchAll will fetch the latest commits and tags from remote.
-//
 func FetchAll(repoDir string) (err error) {
 	cmd := exec.Command("git", "fetch")
 	if debug.Value == 0 {
@@ -161,9 +155,7 @@ func FetchAll(repoDir string) (err error) {
 	return
 }
 
-//
 // FetchTags will fetch all tags from remote.
-//
 func FetchTags(repoDir string) error {
 	cmd := exec.Command("git", "fetch")
 	if debug.Value == 0 {
@@ -186,11 +178,9 @@ func FetchTags(repoDir string) error {
 	return err
 }
 
-//
 // GetRemoteURL return remote URL or error if repository is not git or url is
 // empty.
 // If remoteName is empty, it will be set to default ("origin").
-//
 func GetRemoteURL(repoDir, remoteName string) (url string, err error) {
 	if len(remoteName) == 0 {
 		remoteName = _defRemoteName
@@ -212,10 +202,8 @@ func GetRemoteURL(repoDir, remoteName string) (url string, err error) {
 	return
 }
 
-//
 // GetTag get the tag from revision.  If revision is empty it's default to
 // "HEAD".
-//
 func GetTag(repoDir, revision string) (tag string, err error) {
 	if len(revision) == 0 {
 		revision = "HEAD"
@@ -241,10 +229,8 @@ func GetTag(repoDir, revision string) (tag string, err error) {
 	return
 }
 
-//
 // LatestCommit get the latest commit hash in short format from "ref".
 // If ref is empty, its default to "origin/master".
-//
 func LatestCommit(repoDir, ref string) (commit string, err error) {
 	if len(ref) == 0 {
 		ref = _defRef
@@ -270,9 +256,7 @@ func LatestCommit(repoDir, ref string) (commit string, err error) {
 	return
 }
 
-//
 // LatestTag get latest tag.
-//
 func LatestTag(repoDir string) (tag string, err error) {
 	cmd := exec.Command("git")
 	cmd.Args = append(cmd.Args, "rev-list", "--tags", "--max-count=1")
@@ -312,10 +296,8 @@ func LatestTag(repoDir string) (tag string, err error) {
 	return tag, nil
 }
 
-//
 // LatestVersion will try to get latest tag from repository.
 // If it's fail get the latest commit hash.
-//
 func LatestVersion(repoDir string) (version string, err error) {
 	version, err = LatestTag(repoDir)
 	if err == nil && len(version) > 0 {
@@ -331,9 +313,7 @@ func LatestVersion(repoDir string) (version string, err error) {
 	return
 }
 
-//
 // ListTags get all tags from repository.
-//
 func ListTags(repoDir string) (tags []string, err error) {
 	err = FetchTags(repoDir)
 	if err != nil {
@@ -368,9 +348,7 @@ func ListTags(repoDir string) (tags []string, err error) {
 	return tags, nil
 }
 
-//
 // LogRevisions get commits between two revisions.
-//
 func LogRevisions(repoDir, prevRevision, nextRevision string) error {
 	cmd := exec.Command("git")
 	cmd.Args = append(cmd.Args, "--no-pager", "log", "--oneline",
@@ -391,10 +369,8 @@ func LogRevisions(repoDir, prevRevision, nextRevision string) error {
 	return err
 }
 
-//
 // RemoteChange change current repository remote name (e.g. "origin") to new
 // remote name and URL.
-//
 func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	if len(repoDir) == 0 {
 		return nil
@@ -434,9 +410,7 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	return err
 }
 
-//
 // RemoteBranches return list of remote branches.
-//
 func RemoteBranches(repoDir string) ([]string, error) {
 	if len(repoDir) == 0 {
 		return nil, nil

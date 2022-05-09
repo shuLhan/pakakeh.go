@@ -6,13 +6,12 @@
 //
 // This library implemented in reference to,
 //
-//	- RFC1034 DOMAIN NAMES - CONCEPTS AND FACILITIES
-//	- RFC1035 DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
-//	- RFC1886 DNS Extensions to support IP version 6.
-//	- RFC2782 A DNS RR for specifying the location of services (DNS SRV)
-//	- RFC6891 Extension Mechanisms for DNS (EDNS(0))
-//	- RFC8484 DNS Queries over HTTPS (DoH)
-//
+//   - RFC1034 DOMAIN NAMES - CONCEPTS AND FACILITIES
+//   - RFC1035 DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION
+//   - RFC1886 DNS Extensions to support IP version 6.
+//   - RFC2782 A DNS RR for specifying the location of services (DNS SRV)
+//   - RFC6891 Extension Mechanisms for DNS (EDNS(0))
+//   - RFC8484 DNS Queries over HTTPS (DoH)
 package dns
 
 import (
@@ -52,9 +51,7 @@ const (
 	dohHeaderValDNSMessage  = "application/dns-message"
 )
 
-//
 // List of error messages.
-//
 var (
 	ErrNewConnection  = errors.New("lookup: can't create new connection")
 	ErrLabelSizeLimit = errors.New("labels should be 63 octet or less")
@@ -78,9 +75,7 @@ const (
 	connTypeDoT
 )
 
-//
 // connTypeNames contains a mapping between connection type and its name.
-//
 var connTypeNames = map[connType]string{
 	connTypeUDP: "UDP",
 	connTypeTCP: "TCP",
@@ -129,10 +124,8 @@ const (
 	RCodeRefused
 )
 
-//
 // rcodeNames contains mapping of response code with their human readable
 // names.
-//
 var rcodeNames = map[ResponseCode]string{
 	RCodeOK:             "OK",
 	RCodeErrFormat:      "ERR_FORMAT",

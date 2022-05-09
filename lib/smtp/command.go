@@ -28,10 +28,8 @@ const (
 	CommandQUIT
 )
 
-//
 // Command represent a single SMTP command with its parsed argument and
 // parameters.
-//
 type Command struct {
 	Params map[string]string
 	Arg    string
@@ -39,23 +37,19 @@ type Command struct {
 	Kind   CommandKind
 }
 
-//
 // newCommand create or get new command from pool.
-//
 func newCommand() *Command {
 	return &Command{
 		Params: make(map[string]string),
 	}
 }
 
-//
 // parsePath parse the reverse-path in MAIL command or forward-path in RCPT
 // command, and their optional parameters.
 //
 // Syntax,
 //
 //	MAIL FROM:<[@domain[,...]:]local@domain> [ SP params ]
-//
 func (cmd *Command) parsePath(b []byte) error {
 	if len(b) == 0 {
 		return errCmdSyntaxError
@@ -87,12 +81,10 @@ func (cmd *Command) parsePath(b []byte) error {
 	return nil
 }
 
-//
 // parseParams parse parameters in MAIL or RCPT argument.  The parameters have
 // the following syntax,
 //
 //	key=value [ SP key=value ]
-//
 func (cmd *Command) parseParams(line []byte) {
 	var x int
 	var k, v []byte
@@ -131,17 +123,13 @@ func (cmd *Command) parseParams(line []byte) {
 	}
 }
 
-//
 // reset command fields to its zero value for re-use.
-//
 func (cmd *Command) reset() {
 	cmd.Arg = ""
 	cmd.Params = nil
 }
 
-//
 // unpack parse a command type, argument, and their parameters.
-//
 func (cmd *Command) unpack(b []byte) (err error) {
 	// Minimum command length is 4 + CRLF.
 	if len(b) < 6 {

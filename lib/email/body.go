@@ -11,9 +11,7 @@ import (
 	libio "github.com/shuLhan/share/lib/io"
 )
 
-//
 // Body represent single or multiple message body parts.
-//
 type Body struct {
 	// Parts contains one or more message body.
 	Parts []*MIME
@@ -21,9 +19,7 @@ type Body struct {
 	raw []byte
 }
 
-//
 // ParseBody parse the the raw message's body using boundary.
-//
 func ParseBody(raw, boundary []byte) (body *Body, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, nil, nil
@@ -94,16 +90,12 @@ func skipPreamble(raw, boundary []byte) []byte {
 	return r.Rest()
 }
 
-//
 // Add new MIME part to the body.
-//
 func (body *Body) Add(mime *MIME) {
 	body.Parts = append(body.Parts, mime)
 }
 
-//
 // getPart get the body part by top and sub content type.
-//
 func (body *Body) getPart(top, sub []byte) (mime *MIME) {
 	for _, mime = range body.Parts {
 		if !bytes.Equal(mime.contentType.Top, top) {
@@ -117,10 +109,8 @@ func (body *Body) getPart(top, sub []byte) (mime *MIME) {
 	return nil
 }
 
-//
 // Set replace the MIME content-type with new one, if its exist; otherwise
 // append it.
-//
 func (body *Body) Set(mime *MIME) {
 	var (
 		part *MIME
@@ -135,9 +125,7 @@ func (body *Body) Set(mime *MIME) {
 	body.Parts = append(body.Parts, mime)
 }
 
-//
 // String return text representation of Body.
-//
 func (body *Body) String() string {
 	var sb strings.Builder
 
@@ -148,7 +136,6 @@ func (body *Body) String() string {
 	return sb.String()
 }
 
-//
 // Relaxed canonicalize the original body with "relaxed" algorithm as defined
 // in RFC 6376 section 3.4.4.
 // It remove all trailing whitespaces, reduce sequence of whitespaces inside
@@ -157,7 +144,6 @@ func (body *Body) String() string {
 //
 // This function is expensive for message with large body, its better if we
 // call it once and store it somewhere.
-//
 func (body *Body) Relaxed() (out []byte) {
 	if len(body.raw) == 0 {
 		return
@@ -225,12 +211,10 @@ func (body *Body) Relaxed() (out []byte) {
 	return out
 }
 
-//
 // Simple canonicalize the original body with "simple" algorithm as defined in
 // RFC 6376 section 3.4.3.
 // Basically, it converts "*CRLF" at the end of body to a single CRLF.
 // If no message body or no trailing CRLF, a CRLF is added.
-//
 func (body *Body) Simple() (out []byte) {
 	if len(body.raw) == 0 {
 		return []byte{cr, lf}

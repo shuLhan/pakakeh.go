@@ -12,9 +12,7 @@ import (
 	"github.com/shuLhan/share/lib/debug"
 )
 
-//
 // DatasetInterface is the interface for working with DSV data.
-//
 type DatasetInterface interface {
 	Init(mode int, types []int, names []string)
 	Clone() interface{}
@@ -64,10 +62,8 @@ type DatasetInterface interface {
 	MergeRows(DatasetInterface)
 }
 
-//
 // ReadDatasetConfig open dataset configuration file and initialize dataset
 // field from there.
-//
 func ReadDatasetConfig(ds interface{}, fcfg string) (e error) {
 	cfg, e := os.ReadFile(fcfg)
 
@@ -78,9 +74,7 @@ func ReadDatasetConfig(ds interface{}, fcfg string) (e error) {
 	return json.Unmarshal(cfg, ds)
 }
 
-//
 // SortColumnsByIndex will sort all columns using sorted index.
-//
 func SortColumnsByIndex(di DatasetInterface, sortedIdx []int) {
 	if di.GetMode() == DatasetModeRows {
 		di.TransposeToColumns()
@@ -93,24 +87,22 @@ func SortColumnsByIndex(di DatasetInterface, sortedIdx []int) {
 	}
 }
 
-//
 // SplitRowsByNumeric will split the data using splitVal in column `colidx`.
 //
 // For example, given two continuous attribute,
 //
-// 	A: {1,2,3,4}
-// 	B: {5,6,7,8}
+//	A: {1,2,3,4}
+//	B: {5,6,7,8}
 //
 // if colidx is (1) B and splitVal is 7, the data will splitted into left set
 //
-// 	A': {1,2}
-// 	B': {5,6}
+//	A': {1,2}
+//	B': {5,6}
 //
 // and right set
 //
-// 	A'': {3,4}
-// 	B'': {7,8}
-//
+//	A'': {3,4}
+//	B'': {7,8}
 func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 	splitLess DatasetInterface,
 	splitGreater DatasetInterface,
@@ -166,26 +158,24 @@ func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 	return splitLess, splitGreater, nil
 }
 
-//
 // SplitRowsByCategorical will split the data using a set of split value in
 // column `colidx`.
 //
 // For example, given two attributes,
 //
-// 	X: [A,B,A,B,C,D,C,D]
-// 	Y: [1,2,3,4,5,6,7,8]
+//	X: [A,B,A,B,C,D,C,D]
+//	Y: [1,2,3,4,5,6,7,8]
 //
 // if colidx is (0) or A and split value is a set `[A,C]`, the data will
 // splitted into left set which contain all rows that have A or C,
 //
-// 	X': [A,A,C,C]
-// 	Y': [1,3,5,7]
+//	X': [A,A,C,C]
+//	Y': [1,3,5,7]
 //
 // and the right set, excluded set, will contain all rows which is not A or C,
 //
-// 	X'': [B,B,D,D]
-// 	Y'': [2,4,6,8]
-//
+//	X'': [B,B,D,D]
+//	Y'': [2,4,6,8]
 func SplitRowsByCategorical(di DatasetInterface, colidx int, splitVal []string) (
 	splitIn DatasetInterface,
 	splitEx DatasetInterface,
@@ -239,12 +229,10 @@ func SplitRowsByCategorical(di DatasetInterface, colidx int, splitVal []string) 
 	return splitIn, splitEx, nil
 }
 
-//
 // SplitRowsByValue generic function to split data by value. This function will
 // split data using value in column `colidx`. If value is numeric it will return
 // any rows that have column value less than `value` in `splitL`, and any column
 // value greater or equal to `value` in `splitR`.
-//
 func SplitRowsByValue(di DatasetInterface, colidx int, value interface{}) (
 	splitL DatasetInterface,
 	splitR DatasetInterface,
@@ -282,10 +270,8 @@ func SplitRowsByValue(di DatasetInterface, colidx int, value interface{}) (
 	return splitL, splitR, nil
 }
 
-//
 // SelectRowsWhere return all rows which column value in `colidx` is equal to
 // `colval`.
-//
 func SelectRowsWhere(dataset DatasetInterface, colidx int, colval string) DatasetInterface {
 	orgmode := dataset.GetMode()
 
@@ -308,7 +294,6 @@ func SelectRowsWhere(dataset DatasetInterface, colidx int, colval string) Datase
 	return selected
 }
 
-//
 // RandomPickRows return `n` item of row that has been selected randomly from
 // dataset.Rows. The ids of rows that has been picked is saved id `pickedIdx`.
 //
@@ -317,7 +302,6 @@ func SelectRowsWhere(dataset DatasetInterface, colidx int, colval string) Datase
 // with or without replacement in machine learning domain.
 //
 // If output mode is columns, it will be transposed to rows.
-//
 func RandomPickRows(dataset DatasetInterface, n int, duplicate bool) (
 	picked DatasetInterface,
 	unpicked DatasetInterface,
@@ -356,14 +340,12 @@ func RandomPickRows(dataset DatasetInterface, n int, duplicate bool) (
 	return picked, unpicked, pickedIdx, unpickedIdx
 }
 
-//
 // RandomPickColumns will select `n` column randomly from dataset and return
 // new dataset with picked and unpicked columns, and their column index.
 //
 // If duplicate is true, column that has been pick up can be pick up again.
 //
 // If dataset output mode is rows, it will transposed to columns.
-//
 func RandomPickColumns(dataset DatasetInterface, n int, dup bool, excludeIdx []int) (
 	picked DatasetInterface,
 	unpicked DatasetInterface,
@@ -399,9 +381,7 @@ func RandomPickColumns(dataset DatasetInterface, n int, dup bool, excludeIdx []i
 	return picked, unpicked, pickedIdx, unpickedIdx
 }
 
-//
 // SelectColumnsByIdx return new dataset with selected column index.
-//
 func SelectColumnsByIdx(dataset DatasetInterface, colsIdx []int) (
 	newset DatasetInterface,
 ) {

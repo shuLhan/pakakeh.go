@@ -14,9 +14,7 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // Result contains the output of CheckHost function.
-//
 type Result struct {
 	IP       net.IP // The IP address of sender.
 	Domain   []byte // The domain address of sender from SMTP EHLO or MAIL FROM command.
@@ -32,9 +30,7 @@ type Result struct {
 	mods         []*modifier
 }
 
-//
 // newResult initialize new SPF result on single domain.
-//
 func newResult(ip net.IP, domain, sender, hostname string) (result *Result) {
 	bsender := []byte(sender)
 
@@ -57,16 +53,12 @@ func newResult(ip net.IP, domain, sender, hostname string) (result *Result) {
 	return
 }
 
-//
 // Error return the string representation of the result as error message.
-//
 func (result *Result) Error() string {
 	return fmt.Sprintf("spf: %q %s", result.Domain, result.Err)
 }
 
-//
 // lookup the TXT record that contains SPF record on domain name.
-//
 func (result *Result) lookup() {
 	var (
 		dnsMsg *dns.Message
@@ -132,7 +124,6 @@ func (result *Result) lookup() {
 	result.terms = bytes.ToLower(result.terms)
 }
 
-//
 // evaluateSPFRecord parse and evaluate each directive with its modifiers
 // in the SPF record.
 //
@@ -147,7 +138,6 @@ func (result *Result) lookup() {
 //	                 ; where name is not any known modifier
 //
 //	name             = ALPHA *( ALPHA / DIGIT / "-" / "_" / "." )
-//
 func (result *Result) evaluateSPFRecord() {
 	terms := bytes.Fields(result.terms)
 
@@ -179,11 +169,9 @@ func (result *Result) evaluateSPFRecord() {
 	}
 }
 
-//
 // parseDirective parse directive from single term.
 // It will return non-nil if term is a directive, otherwise it will return
 // nil.
-//
 func (result *Result) parseDirective(term []byte) (dir *directive) {
 	var (
 		qual byte

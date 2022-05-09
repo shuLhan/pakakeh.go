@@ -14,10 +14,8 @@ import (
 
 type myResponse EndpointResponse
 
-//
 // The EndpointResponse when returned as error should be able to converted
 // to liberrors.E using errors.As().
-//
 func TestEndpointResponse_errors_As(t *testing.T) {
 	myres := &myResponse{
 		E: liberrors.E{

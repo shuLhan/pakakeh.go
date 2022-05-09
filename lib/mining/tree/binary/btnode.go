@@ -9,9 +9,7 @@ import (
 	"reflect"
 )
 
-//
 // BTNode is a data type for node in binary tree.
-//
 type BTNode struct {
 	// Left branch of node.
 	Left *BTNode
@@ -23,9 +21,7 @@ type BTNode struct {
 	Value interface{}
 }
 
-//
 // NewBTNode create new node for binary tree.
-//
 func NewBTNode(v interface{}, l *BTNode, r *BTNode) (p *BTNode) {
 	p = &BTNode{
 		Left:   l,
@@ -43,25 +39,19 @@ func NewBTNode(v interface{}, l *BTNode, r *BTNode) (p *BTNode) {
 	return p
 }
 
-//
 // SetLeft will set left branch of node to 'c'.
-//
 func (n *BTNode) SetLeft(c *BTNode) {
 	n.Left = c
 	c.Parent = n
 }
 
-//
 // SetRight will set right branch of node to 'c'.
-//
 func (n *BTNode) SetRight(c *BTNode) {
 	n.Right = c
 	c.Parent = n
 }
 
-//
 // String will convert the node to string.
-//
 func (n *BTNode) String() (s string) {
 	var p = n.Parent
 

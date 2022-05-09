@@ -6,9 +6,7 @@ package text
 
 import "fmt"
 
-//
 // Line represent line number and slice of bytes as string.
-//
 type Line struct {
 	N int
 	V []byte

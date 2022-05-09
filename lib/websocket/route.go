@@ -10,10 +10,8 @@ import (
 	"fmt"
 )
 
-//
 // RouteHandler is a function that will be called when registered method and
 // target match with request.
-//
 type RouteHandler func(ctx context.Context, req *Request) (res Response)
 
 type route struct {
@@ -23,9 +21,7 @@ type route struct {
 	isParam bool
 }
 
-//
 // addChild to route.
-//
 func (r *route) addChild(isParam bool, name string) (c *route, err error) {
 	c = r.getChild(isParam, name)
 	if c != nil {
@@ -48,10 +44,8 @@ func (r *route) addChild(isParam bool, name string) (c *route, err error) {
 	return
 }
 
-//
 // getChild of current route which has the same isParam and name value.  It
 // will return nil if not found.
-//
 func (r *route) getChild(isParam bool, name string) *route {
 	for _, c := range r.childs {
 		if isParam == c.isParam && name == c.name {
@@ -61,9 +55,7 @@ func (r *route) getChild(isParam bool, name string) *route {
 	return nil
 }
 
-//
 // getChildAsParam return child route which type is parameter.
-//
 func (r *route) getChildAsParam() *route {
 	for _, c := range r.childs {
 		if c.isParam {
@@ -73,10 +65,8 @@ func (r *route) getChildAsParam() *route {
 	return nil
 }
 
-//
 // String return route representation as string.  This function is to prevent
 // formatted print to print pointer to route as address.
-//
 func (r *route) String() (out string) {
 	bb := _bbPool.Get().(*bytes.Buffer)
 	bb.Reset()

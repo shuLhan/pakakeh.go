@@ -9,15 +9,12 @@ import (
 	"sort"
 )
 
-//
 // Row represent a column-name and value in a tuple.
 // The map's key is the column name in database and the map's value is
 // the column's value.
 // This type can be used to create dynamic insert-update fields.
-//
 type Row map[string]interface{}
 
-//
 // ExtractSQLFields extract the column's name, column place holder, and column
 // values as slices.
 //
@@ -28,7 +25,6 @@ type Row map[string]interface{}
 // will be returned as list of "?".
 //
 // The returned names will be sorted in ascending order.
-//
 func (row Row) ExtractSQLFields(driverName string) (names, holders []string, values []interface{}) {
 	if len(row) == 0 {
 		return nil, nil, nil

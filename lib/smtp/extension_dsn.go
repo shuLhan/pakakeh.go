@@ -7,23 +7,17 @@ package smtp
 type extDSN struct {
 }
 
-//
 // Name return the name of extension, which is "DSN".
-//
 func (dsn *extDSN) Name() string {
 	return "DSN"
 }
 
-//
 // Params return the SMTP extension parameters.
-//
 func (dsn *extDSN) Params() string {
 	return ""
 }
 
-//
 // ValidateCommand validate command parameter for MAIL and RCPT.
-//
 func (dsn *extDSN) ValidateCommand(cmd *Command) (err error) {
 	if cmd == nil {
 		return

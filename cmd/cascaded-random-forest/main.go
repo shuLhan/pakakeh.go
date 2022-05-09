@@ -83,12 +83,10 @@ func un(startTime time.Time) {
 	fmt.Println(tag, "elapsed time", endTime.Sub(startTime))
 }
 
-//
 // createCRF will create cascaded random forest for training, with the
 // following steps,
 // (1) load training configuration.
 // (2) Overwrite configuration parameter if its set from command line.
-//
 func createCRF(o *options) (crforest *crf.Runtime, e error) {
 	// (1)
 	config, e := os.ReadFile(o.trainCfg)
@@ -171,14 +169,12 @@ func test(crforest *crf.Runtime, o *options) {
 	}
 }
 
-//
 // (0) Parse and check command line parameters.
 // (1) If trainCfg parameter is set,
 // (1.1) train the model,
 // (1.2) TODO: load saved model.
 // (2) If testCfg parameter is set,
 // (2.1) Test the model using data from testCfg.
-//
 func main() {
 	var crforest *crf.Runtime
 

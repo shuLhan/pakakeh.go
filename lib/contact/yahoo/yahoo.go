@@ -2,13 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package yahoo implement user's contacts import using Yahoo API.
 //
-// Reference
+// # Reference
 //
 // - https://developer.yahoo.com/social/rest_api_guide/contacts-resource.html
-//
 package yahoo
 
 import (
@@ -25,11 +23,9 @@ const (
 	apiContactsSuffix = "/contacts?format=json&count=max"
 )
 
-//
 // ImportFromJSON will parse JSON input and return list of Contact on success.
 //
 // On fail it will return nil and error.
-//
 func ImportFromJSON(jsonb []byte) (contacts []*contact.Record, err error) {
 	root := &Root{}
 
@@ -46,9 +42,7 @@ func ImportFromJSON(jsonb []byte) (contacts []*contact.Record, err error) {
 	return
 }
 
-//
 // ImportWithOAuth get Yahoo contacts using OAuth HTTP client.
-//
 func ImportWithOAuth(client *http.Client, guid string) (contacts []*contact.Record, err error) {
 	api := apiContactsURL + guid + apiContactsSuffix
 	req, err := http.NewRequest(http.MethodGet, api, nil)

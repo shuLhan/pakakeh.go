@@ -16,14 +16,12 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
-//
 // MultiLogger represent a single log writer that write to multiple outputs.
 // MultiLogger can have zero or more writers for standard output (normal log)
 // and zero or more writers for standard error.
 //
 // Each call to write APIs (Errf, Fatalf, or Outf) will be prefixed with
 // time format in UTC and optional prefix.
-//
 type MultiLogger struct {
 	bufPool *sync.Pool
 
@@ -42,9 +40,7 @@ type MultiLogger struct {
 	prefix []byte
 }
 
-//
 // NewMultiLogger create and initialize new MultiLogger.
-//
 func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) *MultiLogger {
 	var (
 		mlog = createMultiLogger(timeFormat, prefix, outs, errs)
@@ -89,12 +85,10 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 	return mlog
 }
 
-//
 // Errf write the formatted string and its optional values to all error
 // writers.
 //
 // If the generated string does not end with new line, it will be added.
-//
 func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
 	if len(mlog.errs) == 0 {
 		return
@@ -102,18 +96,14 @@ func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
 	mlog.writeTo(mlog.qerr, format, v...)
 }
 
-//
 // Fatalf is equal to Errf and os.Exit(1).
-//
 func (mlog *MultiLogger) Fatalf(format string, v ...interface{}) {
 	mlog.Errf(format, v...)
 	mlog.Flush()
 	os.Exit(1)
 }
 
-//
 // Flush all writes and wait until it finished.
-//
 func (mlog *MultiLogger) Flush() {
 	mlog.qerrFlush <- true
 	mlog.qoutFlush <- true
@@ -121,11 +111,9 @@ func (mlog *MultiLogger) Flush() {
 	<-mlog.qflush
 }
 
-//
 // Outf write the formatted string and its values to all output writers.
 //
 // If the generated string does not end with new line, it will be added.
-//
 func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 	if len(mlog.outs) == 0 {
 		return
@@ -133,9 +121,7 @@ func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 	mlog.writeTo(mlog.qout, format, v...)
 }
 
-//
 // Panicf is equal to Errf and followed by panic.
-//
 func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
 	mlog.Errf(format, v...)
 	mlog.Flush()
@@ -143,7 +129,6 @@ func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
 	panic(msg)
 }
 
-//
 // PrintStack writes to error writers the stack trace returned by
 // debug.Stack.
 //
@@ -156,16 +141,13 @@ func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
 //		mlog.PrintStack()
 //		os.Exit(1)
 //	}
-//
 func (mlog *MultiLogger) PrintStack() {
 	mlog.Errf("%s\n", debug.Stack())
 	mlog.Flush()
 }
 
-//
 // RegisterErrorWriter register the named writer to one of error writers.
 // The writer Name() must not be empty or it will not registered.
-//
 func (mlog *MultiLogger) RegisterErrorWriter(errw NamedWriter) {
 	name := errw.Name()
 	if len(name) == 0 {
@@ -174,10 +156,8 @@ func (mlog *MultiLogger) RegisterErrorWriter(errw NamedWriter) {
 	mlog.errs[name] = errw
 }
 
-//
 // RegisterOutputWriter register the named writer to one of output writers.
 // The writer Name() must not be empty or it will not registered.
-//
 func (mlog *MultiLogger) RegisterOutputWriter(outw NamedWriter) {
 	name := outw.Name()
 	if len(name) == 0 {
@@ -186,38 +166,28 @@ func (mlog *MultiLogger) RegisterOutputWriter(outw NamedWriter) {
 	mlog.outs[name] = outw
 }
 
-//
 // SetPrefix set the default prefix for the subsequence writes.
-//
 func (mlog *MultiLogger) SetPrefix(prefix string) {
 	mlog.prefix = []byte(prefix)
 }
 
-//
 // SetTimeFormat set the default time format for the subsequence writes.
-//
 func (mlog *MultiLogger) SetTimeFormat(layout string) {
 	mlog.timeFormat = layout
 }
 
-//
 // UnregisterErrorWriter remove the error writer by name.
-//
 func (mlog *MultiLogger) UnregisterErrorWriter(name string) {
 	delete(mlog.errs, name)
 }
 
-//
 // UnregisterOutputWriter remove the output writer by name.
-//
 func (mlog *MultiLogger) UnregisterOutputWriter(name string) {
 	delete(mlog.outs, name)
 }
 
-//
 // Write write the b to all error writers.
 // It will always return the length of b without an error.
-//
 func (mlog *MultiLogger) Write(b []byte) (n int, err error) {
 	mlog.qerr <- libbytes.Copy(b)
 	return len(b), nil

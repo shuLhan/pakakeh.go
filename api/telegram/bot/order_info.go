@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // OrderInfo represents information about an order.
-//
 type OrderInfo struct {
 	// Optional. User name
 	Name string `json:"name"`

@@ -1,4 +1,3 @@
-//
 // Package clise implements circular slice.
 // A circular slice is a slice that have fixed size.
 // An append to slice that has reached its length will overwrite and start
@@ -16,7 +15,6 @@
 //	fmt.Printf("%v\n", c.Slice()) // [6 2 3 4 5]
 //
 // See the examples for usage of the package.
-//
 package clise
 
 import "sync"
@@ -29,10 +27,8 @@ type Clise struct {
 	over bool
 }
 
-//
 // New create and initialize circular slice with fixed size.
 // It will return nil if size <= 0.
-//
 func New(size int) (c *Clise) {
 	if size <= 0 {
 		return nil
@@ -44,10 +40,8 @@ func New(size int) (c *Clise) {
 	return c
 }
 
-//
 // Pop remove the last Push()-ed item and return it to caller.
 // It will return nil if no more item inside it.
-//
 func (c *Clise) Pop() (item interface{}) {
 	c.Lock()
 	if c.over {
@@ -69,9 +63,7 @@ func (c *Clise) Pop() (item interface{}) {
 	return item
 }
 
-//
 // Push the item into the slice.
-//
 func (c *Clise) Push(src ...interface{}) {
 	c.Lock()
 	for x := 0; x < len(src); x++ {
@@ -85,9 +77,7 @@ func (c *Clise) Push(src ...interface{}) {
 	c.Unlock()
 }
 
-//
 // RecentSlice return the slice from index zero until the recent item.
-//
 func (c *Clise) RecentSlice() (dst []interface{}) {
 	c.Lock()
 	dst = make([]interface{}, c.last)
@@ -96,9 +86,7 @@ func (c *Clise) RecentSlice() (dst []interface{}) {
 	return dst
 }
 
-//
 // Reset the slice, start from zero.
-//
 func (c *Clise) Reset() {
 	c.Lock()
 	c.last = 0
@@ -106,10 +94,8 @@ func (c *Clise) Reset() {
 	c.Unlock()
 }
 
-//
 // Slice return the content of circular slice as slice in the order of the
 // last item to the recent item.
-//
 func (c *Clise) Slice() (dst []interface{}) {
 	var (
 		start int

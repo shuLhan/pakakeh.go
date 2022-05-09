@@ -8,9 +8,7 @@ const (
 	maxQueue = 128
 )
 
-//
 // Poll represent an interface to network polling.
-//
 type Poll interface {
 	//
 	// Close the poll.

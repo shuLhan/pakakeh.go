@@ -12,9 +12,7 @@ const (
 	ChatTypeSupergroup = "supergroup"
 )
 
-//
 // Chat represents a chat.
-//
 type Chat struct {
 
 	// Unique identifier for this chat.

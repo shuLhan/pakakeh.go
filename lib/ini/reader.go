@@ -39,9 +39,7 @@ var (
 	errValueInvalid   = errors.New("invalid value, line %d at %s")
 )
 
-//
 // reader define the INI file reader.
-//
 type reader struct {
 	br   *bytes.Reader
 	_var *variable
@@ -59,9 +57,7 @@ type reader struct {
 	b       byte
 }
 
-//
 // newReader create, initialize, and return new reader.
-//
 func newReader() (r *reader) {
 	r = &reader{
 		br: bytes.NewReader(nil),
@@ -71,9 +67,7 @@ func newReader() (r *reader) {
 	return
 }
 
-//
 // reset all reader attributes, excluding filename.
-//
 func (reader *reader) reset(src []byte) {
 	reader.br.Reset(src)
 	reader.b = 0
@@ -91,12 +85,10 @@ func (reader *reader) reset(src []byte) {
 	reader.bufSpaces.Reset()
 }
 
-//
 // parseFile will open, read, and parse INI file `filename` and return an
 // instance of Ini.
 //
 // On failure, it return nil and error.
-//
 func (reader *reader) parseFile(filename string) (in *Ini, err error) {
 	src, err := os.ReadFile(filename)
 	if err != nil {
@@ -110,9 +102,7 @@ func (reader *reader) parseFile(filename string) (in *Ini, err error) {
 	return
 }
 
-//
 // Parse will parse INI config from slice of bytes `src` into `in`.
-//
 func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 	in = &Ini{}
 	reader.reset(src)
@@ -366,10 +356,8 @@ func (reader *reader) parseSubsection() (err error) {
 	return reader.parsePossibleComment()
 }
 
-//
 // parsePossibleComment will check only for whitespace and comment start
 // character.
-//
 func (reader *reader) parsePossibleComment() (err error) {
 	var isNewline bool
 
@@ -465,10 +453,8 @@ func (reader *reader) parseVariable() (err error) {
 	return nil
 }
 
-//
 // parsePossibleValue will check if the next character after space is comment
 // or `=`.
-//
 func (reader *reader) parsePossibleValue() (err error) {
 	var isNewline bool
 	for !isNewline {
@@ -501,10 +487,8 @@ func (reader *reader) parsePossibleValue() (err error) {
 	return nil
 }
 
-//
 // At this point we found `=` on source, and we expect the rest of source will
 // be variable value.
-//
 func (reader *reader) parseVarValue() (err error) {
 	reader.buf.Reset()
 	reader.bufSpaces.Reset()

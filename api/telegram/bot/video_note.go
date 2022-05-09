@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // VideoNote represents a video message (available in Telegram apps as of
 // v.4.0).
-//
 type VideoNote struct {
 	Document
 

@@ -14,9 +14,7 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-//
 // TestConnect this test require a websocket server to be run.
-//
 func TestConnect(t *testing.T) {
 	if _testServer == nil {
 		runTestServer()

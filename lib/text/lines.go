@@ -4,14 +4,10 @@
 
 package text
 
-//
 // Lines represent array of line.
-//
 type Lines []Line
 
-//
 // ParseLines convert raw bytes into Lines.
-//
 func ParseLines(raw []byte) (lines Lines) {
 	var (
 		start   int

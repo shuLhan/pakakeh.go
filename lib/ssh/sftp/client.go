@@ -16,9 +16,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-//
 // Client for SFTP.
-//
 type Client struct {
 	sess    *ssh.Session
 	version uint32
@@ -33,13 +31,11 @@ type Client struct {
 	requestId uint32
 }
 
-//
 // NewClient create and initialize new client for SSH file transfer protocol.
 //
 // On failure, it will return ErrSubsystem if the server does not support
 // "sftp" subsystem, ErrVersion if the client does not support the
 // server version, and other errors.
-//
 func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 	logp := "New"
 	cl = &Client{}
@@ -80,9 +76,7 @@ func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 	return cl, nil
 }
 
-//
 // Close the remote file handle.
-//
 func (cl *Client) Close(fh *FileHandle) (err error) {
 	if fh == nil {
 		return nil
@@ -107,20 +101,16 @@ func (cl *Client) Close(fh *FileHandle) (err error) {
 	return nil
 }
 
-//
 // Create creates or truncates the named file.
 // If the remote file does not exist, it will be created.
 // If the remote file already exists, it will be truncated.
 // On success, it will return the remote FileHandle ready for write only.
-//
 func (cl *Client) Create(remoteFile string, fa *FileAttrs) (*FileHandle, error) {
 	pflags := OpenFlagWrite | OpenFlagCreate | OpenFlagTruncate
 	return cl.OpenFile(remoteFile, pflags, fa)
 }
 
-//
 // Fsetstat set the file attributes based on the opened remote file handle.
-//
 func (cl *Client) Fsetstat(fh *FileHandle, fa *FileAttrs) (err error) {
 	var (
 		logp = "Fsetstat"
@@ -145,9 +135,7 @@ func (cl *Client) Fsetstat(fh *FileHandle, fa *FileAttrs) (err error) {
 	return nil
 }
 
-//
 // Fstat get the file attributes based on the opened remote file handle.
-//
 func (cl *Client) Fstat(fh *FileHandle) (fa *FileAttrs, err error) {
 	var (
 		logp    = "Fstat"
@@ -170,11 +158,9 @@ func (cl *Client) Fstat(fh *FileHandle) (fa *FileAttrs, err error) {
 	return fa, nil
 }
 
-//
 // Get copy remote file to local.
 // The local file will be created if its not exist; otherwise it will
 // truncated.
-//
 func (cl *Client) Get(remoteFile, localFile string) (err error) {
 	var (
 		logp   = "Get"
@@ -221,10 +207,8 @@ func (cl *Client) Get(remoteFile, localFile string) (err error) {
 	return err
 }
 
-//
 // Lstat get the file attributes based on the remote file path.
 // Unlike Stat(), the Lstat method does not follow symbolic links.
-//
 func (cl *Client) Lstat(remoteFile string) (fa *FileAttrs, err error) {
 	var (
 		logp    = "Lstat"
@@ -247,9 +231,7 @@ func (cl *Client) Lstat(remoteFile string) (fa *FileAttrs, err error) {
 	return fa, nil
 }
 
-//
 // Mkdir create new directory on the server.
-//
 func (cl *Client) Mkdir(path string, fa *FileAttrs) (err error) {
 	var (
 		logp = "Mkdir"
@@ -272,17 +254,13 @@ func (cl *Client) Mkdir(path string, fa *FileAttrs) (err error) {
 	return nil
 }
 
-//
 // Open the remote file for read only.
-//
 func (cl *Client) Open(remoteFile string) (fh *FileHandle, err error) {
 	return cl.OpenFile(remoteFile, OpenFlagRead, nil)
 }
 
-//
 // OpenFile open remote file with custom open flag (OpenFlagRead,
 // OpenFlagWrite, and so on) and with specific file attributes.
-//
 func (cl *Client) OpenFile(remoteFile string, flags uint32, fa *FileAttrs) (fh *FileHandle, err error) {
 	var (
 		logp = "open"
@@ -310,9 +288,7 @@ func (cl *Client) OpenFile(remoteFile string, flags uint32, fa *FileAttrs) (fh *
 	return fh, nil
 }
 
-//
 // Opendir open the directory on the server.
-//
 func (cl *Client) Opendir(path string) (fh *FileHandle, err error) {
 	var (
 		logp = "Opendir"
@@ -335,9 +311,7 @@ func (cl *Client) Opendir(path string) (fh *FileHandle, err error) {
 	return fh, nil
 }
 
-//
 // Put local file to remote file.
-//
 func (cl *Client) Put(localFile, remoteFile string) (err error) {
 	logp := "Put"
 
@@ -392,10 +366,8 @@ func (cl *Client) Put(localFile, remoteFile string) (err error) {
 	return nil
 }
 
-//
 // Read the remote file using handle on specific offset.
 // On end-of-file it will return empty data with io.EOF.
-//
 func (cl *Client) Read(fh *FileHandle, offset uint64) (data []byte, err error) {
 	var (
 		logp    = "Read"
@@ -419,9 +391,7 @@ func (cl *Client) Read(fh *FileHandle, offset uint64) (data []byte, err error) {
 	return data, nil
 }
 
-//
 // Readdir list files and/or directories inside the handle.
-//
 func (cl *Client) Readdir(fh *FileHandle) (nodes []fs.DirEntry, err error) {
 	var (
 		logp    = "Readdir"
@@ -446,9 +416,7 @@ func (cl *Client) Readdir(fh *FileHandle) (nodes []fs.DirEntry, err error) {
 	return nodes, nil
 }
 
-//
 // Readlink read the target of a symbolic link.
-//
 func (cl *Client) Readlink(linkPath string) (node fs.DirEntry, err error) {
 	var (
 		logp    = "Readlink"
@@ -471,11 +439,9 @@ func (cl *Client) Readlink(linkPath string) (node fs.DirEntry, err error) {
 	return node, nil
 }
 
-//
 // Realpath canonicalize any given path name to an absolute path.
 // This is useful for converting path names containing ".." components or
 // relative pathnames without a leading slash into absolute paths.
-//
 func (cl *Client) Realpath(path string) (node fs.DirEntry, err error) {
 	var (
 		logp    = "Realpath"
@@ -498,9 +464,7 @@ func (cl *Client) Realpath(path string) (node fs.DirEntry, err error) {
 	return node, nil
 }
 
-//
 // Remove the remote file.
-//
 func (cl *Client) Remove(remoteFile string) (err error) {
 	var (
 		logp    = "Remove"
@@ -522,9 +486,7 @@ func (cl *Client) Remove(remoteFile string) (err error) {
 	return nil
 }
 
-//
 // Rename the file, or move the file, from old path to new path.
-//
 func (cl *Client) Rename(oldPath, newPath string) (err error) {
 	var (
 		logp    = "Rename"
@@ -546,9 +508,7 @@ func (cl *Client) Rename(oldPath, newPath string) (err error) {
 	return nil
 }
 
-//
 // Rmdir remove the directory on the server.
-//
 func (cl *Client) Rmdir(path string) (err error) {
 	var (
 		logp    = "Rmdir"
@@ -570,11 +530,9 @@ func (cl *Client) Rmdir(path string) (err error) {
 	return nil
 }
 
-//
 // Setstat change the file attributes on remote file or directory.
 // These request can be used for operations such as changing the ownership,
 // permissions or access times, as well as for truncating a file.
-//
 func (cl *Client) Setstat(remoteFile string, fa *FileAttrs) (err error) {
 	var (
 		logp = "Setstat"
@@ -601,10 +559,8 @@ func (cl *Client) Setstat(remoteFile string, fa *FileAttrs) (err error) {
 	return nil
 }
 
-//
 // Stat get the file attributes based on the remote file path.
 // This method follow symbolic links.
-//
 func (cl *Client) Stat(remoteFile string) (fa *FileAttrs, err error) {
 	var (
 		logp    = "Stat"
@@ -627,11 +583,9 @@ func (cl *Client) Stat(remoteFile string) (fa *FileAttrs, err error) {
 	return fa, nil
 }
 
-//
 // Symlink create a symbolic link on the server.
 // The `linkpath' specifies the path name of the symlink to be created and
 // `targetpath' specifies the target of the symlink.
-//
 func (cl *Client) Symlink(targetPath, linkPath string) (err error) {
 	var (
 		logp    = "Symlink"
@@ -655,9 +609,7 @@ func (cl *Client) Symlink(targetPath, linkPath string) (err error) {
 	return nil
 }
 
-//
 // Write write the data into remote file at specific offset.
-//
 func (cl *Client) Write(fh *FileHandle, offset uint64, data []byte) (err error) {
 	var (
 		logp    = "Write"

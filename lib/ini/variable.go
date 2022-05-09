@@ -9,14 +9,12 @@ import (
 	"fmt"
 )
 
-//
 // variable define the smallest building block in INI format. It represent
 // empty lines, comment, section, section with subsection, and variable.
 //
 // Remember that variable's key is case insensitive. If you want to
 // create variable, set the KeyLower to their lowercase value, and if you
 // want to compare variable, use the KeyLower value.
-//
 type variable struct {
 	format   string
 	secName  string
@@ -32,9 +30,7 @@ type variable struct {
 	isQuoted bool
 }
 
-//
 // String return formatted INI variable.
-//
 func (v *variable) String() string {
 	var (
 		buf bytes.Buffer

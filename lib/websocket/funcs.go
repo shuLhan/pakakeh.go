@@ -15,14 +15,12 @@ import (
 
 const maxBuffer = 1024
 
-//
 // Recv read all content from file descriptor into slice of bytes.
 //
 // On success it will return buffer from pool. Caller must put the buffer back
 // to the pool.
 //
 // On fail it will return nil buffer and error.
-//
 func Recv(fd int) (packet []byte, err error) {
 	buf := make([]byte, maxBuffer)
 
@@ -42,9 +40,7 @@ func Recv(fd int) (packet []byte, err error) {
 	return packet, err
 }
 
-//
 // Send the packet through web socket file descriptor `fd`.
-//
 func Send(fd int, packet []byte) (err error) {
 	var (
 		n, max int
@@ -76,23 +72,19 @@ func Send(fd int, packet []byte) (err error) {
 	return err
 }
 
-//
 // generateHandshakeAccept generate server accept key by concatenating key,
 // defined in step 4 in Section 4.2.2, with the string
 // "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", taking the SHA-1 hash of this
 // concatenated value to obtain a 20-byte value and base64-encoding (see
 // Section 4 of [RFC4648]) this 20-byte hash.
-//
 func generateHandshakeAccept(key []byte) string {
 	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
 	sum := sha1.Sum(key)
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
 
-//
 // generateHandshakeKey randomly selected 16-byte value that has been
 // base64-encoded (see Section 4 of [RFC4648]).
-//
 func generateHandshakeKey() (key []byte) {
 	bkey := make([]byte, 16)
 

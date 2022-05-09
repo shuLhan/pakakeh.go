@@ -24,9 +24,7 @@ const (
 	stateGroupEnd                // 32
 )
 
-//
 // Mailbox represent an invidual mailbox.
-//
 type Mailbox struct {
 	Address string // address contains the combination of "local@domain"
 	Name    []byte
@@ -35,9 +33,7 @@ type Mailbox struct {
 	isAngle bool
 }
 
-//
 // String return the text representation of mailbox.
-//
 func (mbox *Mailbox) String() string {
 	var sb strings.Builder
 
@@ -56,12 +52,10 @@ func (mbox *Mailbox) String() string {
 	return sb.String()
 }
 
-//
 // ParseMailbox parse the raw address(es) and return the first mailbox in the
 // list.
 // If the raw parameter is empty or no mailbox present or mailbox format is
 // invalid, it will return nil.
-//
 func ParseMailbox(raw []byte) (mbox *Mailbox) {
 	mboxes, err := ParseMailboxes(raw)
 	if err != nil {
@@ -73,7 +67,6 @@ func ParseMailbox(raw []byte) (mbox *Mailbox) {
 	return nil
 }
 
-//
 // ParseMailboxes parse raw address into single or multiple mailboxes.
 // Raw address can be a group of address, list of mailbox, or single mailbox.
 //
@@ -98,7 +91,6 @@ func ParseMailbox(raw []byte) (mbox *Mailbox) {
 // A comment have the following syntax,
 //
 //	"(" text [comment] ")"
-//
 func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 	raw = bytes.TrimSpace(raw)
 	if len(raw) == 0 {
@@ -279,7 +271,6 @@ out:
 	return mboxes, nil
 }
 
-//
 // skipComment skip all characters inside parentheses, '(' and ')'.
 //
 // A comment can contains quoted-pair, which means opening or closing
@@ -287,7 +278,6 @@ out:
 // "( a \) comment)".
 //
 // A comment can be nested, for example "(a (comment))"
-//
 func skipComment(r *libio.Reader) (c byte, err error) {
 	seps := []byte{'\\', '(', ')'}
 	c = r.SkipUntil(seps)

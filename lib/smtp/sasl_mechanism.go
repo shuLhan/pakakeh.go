@@ -4,10 +4,8 @@
 
 package smtp
 
-//
 // SaslMechanism represent Simple Authentication and Security Layer (SASL)
 // mechanism (RFC 4422).
-//
 type SaslMechanism int
 
 // List of available SASL mechanism.

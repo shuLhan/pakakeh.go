@@ -26,9 +26,7 @@ const (
 	corsWildcard = "*"
 )
 
-//
 // Server define HTTP server.
-//
 type Server struct {
 	*http.Server
 
@@ -47,10 +45,8 @@ type Server struct {
 	routePuts    []*route
 }
 
-//
 // NewServer create and initialize new HTTP server that serve root directory
 // with custom connection.
-//
 func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	opts.init()
 
@@ -78,9 +74,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	return srv, nil
 }
 
-//
 // RedirectTemp make the request to temporary redirect (307) to new URL.
-//
 func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 	if len(redirectURL) == 0 {
 		redirectURL = "/"
@@ -89,7 +83,6 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-//
 // RegisterEndpoint register the Endpoint based on Method.
 // If Method field is not set, it will default to GET.
 // The Endpoint.Call field MUST be set, or it will return an error.
@@ -99,7 +92,6 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 //
 // Endpoint with method CONNECT and TRACE will return an error because its not
 // supported yet.
-//
 func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 	if ep == nil {
 		return nil
@@ -132,10 +124,8 @@ func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 	return err
 }
 
-//
 // registerDelete register HTTP method DELETE with specific endpoint to handle
 // it.
-//
 func (srv *Server) registerDelete(ep *Endpoint) (err error) {
 	ep.RequestType = RequestTypeQuery
 
@@ -157,17 +147,13 @@ func (srv *Server) registerDelete(ep *Endpoint) (err error) {
 	return nil
 }
 
-//
 // RegisterEvaluator register HTTP middleware that will be called before
 // Endpoint evalutor and callback is called.
-//
 func (srv *Server) RegisterEvaluator(eval Evaluator) {
 	srv.evals = append(srv.evals, eval)
 }
 
-//
 // registerGet register HTTP method GET with callback to handle it.
-//
 func (srv *Server) registerGet(ep *Endpoint) (err error) {
 	ep.RequestType = RequestTypeQuery
 
@@ -189,9 +175,7 @@ func (srv *Server) registerGet(ep *Endpoint) (err error) {
 	return nil
 }
 
-//
 // registerPatch register HTTP method PATCH with callback to handle it.
-//
 func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePatches {
@@ -211,9 +195,7 @@ func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 	return nil
 }
 
-//
 // registerPost register HTTP method POST with callback to handle it.
-//
 func (srv *Server) registerPost(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePosts {
@@ -233,9 +215,7 @@ func (srv *Server) registerPost(ep *Endpoint) (err error) {
 	return nil
 }
 
-//
 // registerPut register HTTP method PUT with callback to handle it.
-//
 func (srv *Server) registerPut(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePuts {
@@ -255,9 +235,7 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 	return nil
 }
 
-//
 // ServeHTTP handle mapping of client request to registered endpoints.
-//
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	var (
 		logp = "ServeHTTP"
@@ -298,9 +276,7 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//
 // Start the HTTP server.
-//
 func (srv *Server) Start() (err error) {
 	if srv.TLSConfig == nil {
 		err = srv.ListenAndServe()
@@ -313,10 +289,8 @@ func (srv *Server) Start() (err error) {
 	return err
 }
 
-//
 // Stop the server using Shutdown method. The wait is set default and minimum
 // to five seconds.
-//
 func (srv *Server) Stop(wait time.Duration) (err error) {
 	var defWait = 5 * time.Second
 	if wait <= defWait {
@@ -373,11 +347,9 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	return node
 }
 
-//
 // handleCORS handle the CORS request.
 //
 // Reference: https://www.html5rocks.com/static/images/cors_server_flowchart.png
-//
 func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
 	var found bool
 	preflightOrigin := req.Header.Get(HeaderOrigin)
@@ -464,10 +436,8 @@ func (srv *Server) handleCORSRequestHeaders(
 	res.Header().Set(HeaderACAllowHeaders, strings.Join(allowHeaders, ","))
 }
 
-//
 // handleDelete handle the DELETE request by searching the registered route
 // and calling the endpoint.
-//
 func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routeDeletes {
 		vals, ok := rute.parse(req.URL.Path)
@@ -479,7 +449,6 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusNotFound)
 }
 
-//
 // HandleFS handle the request as resource in the memory file system.
 // This method only works if the Server.Options.Memfs is not nil.
 //
@@ -492,7 +461,6 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 // If the request Method is HEAD, only the header will be sent back to client.
 //
 // If the request Path is not exist it will return 404 Not Found.
-//
 func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	var (
 		logp = "HandleFS"
@@ -555,10 +523,8 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//
 // handleGet handle the GET request by searching the registered route and
 // calling the endpoint.
-//
 func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routeGets {
 		vals, ok := rute.parse(req.URL.Path)
@@ -605,11 +571,9 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusOK)
 }
 
-//
 // handleOptions return list of allowed methods on requested path in HTTP
 // response header "Allow".
 // If no path found, it will return 404.
-//
 func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	methods := make(map[string]bool)
 
@@ -685,10 +649,8 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusOK)
 }
 
-//
 // handlePatch handle the PATCH request by searching the registered route and
 // calling the endpoint.
-//
 func (srv *Server) handlePatch(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routePatches {
 		vals, ok := rute.parse(req.URL.Path)
@@ -700,10 +662,8 @@ func (srv *Server) handlePatch(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusNotFound)
 }
 
-//
 // handlePost handle the POST request by searching the registered route and
 // calling the endpoint.
-//
 func (srv *Server) handlePost(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routePosts {
 		vals, ok := rute.parse(req.URL.Path)
@@ -715,10 +675,8 @@ func (srv *Server) handlePost(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusNotFound)
 }
 
-//
 // handlePut handle the PUT request by searching the registered route and
 // calling the endpoint.
-//
 func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routePuts {
 		vals, ok := rute.parse(req.URL.Path)

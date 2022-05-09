@@ -13,10 +13,8 @@ import (
 	"strings"
 )
 
-//
 // parser for the SSH config file that merge all "Include" files and convert
 // them all into lines of string.
-//
 type parser struct {
 	workDir string
 	homeDir string
@@ -40,9 +38,7 @@ func newParser() (p *parser, err error) {
 	return p, nil
 }
 
-//
 // load the config file(s) using glob(7) pattern and convert them into lines.
-//
 func (p *parser) load(dir, pattern string) (lines []string, err error) {
 	switch pattern[0] {
 	case '~':
@@ -122,10 +118,8 @@ func (p *parser) load(dir, pattern string) (lines []string, err error) {
 	return lines, nil
 }
 
-//
 // isIncludeDirective will return true if line started with "include", in case
 // insensitive.
-//
 func isIncludeDirective(line string) bool {
 	keyLen := len(keyInclude)
 	if len(line) <= keyLen {
@@ -200,10 +194,8 @@ func parseInclude(line string) (patterns []string) {
 	return patterns
 }
 
-//
 // readLines convert the contents of file into lines as slice of string.
 // Any empty lines or line start with comment '#' will be removed.
-//
 func readLines(file string) (lines []string, err error) {
 	contents, err := os.ReadFile(file)
 	if err != nil {
@@ -228,13 +220,11 @@ func readLines(file string) (lines []string, err error) {
 	return lines, nil
 }
 
-//
 // parseArgs split single line arguments into list of string, separated by
 // `sep` (default to space), grouped by double quote.
 //
 // For example, given raw argument `a "b c" d` it would return "a", "b c", and
 // "d".
-//
 func parseArgs(raw string, sep byte) (args []string) {
 	raw = strings.TrimSpace(raw)
 	if len(raw) == 0 {

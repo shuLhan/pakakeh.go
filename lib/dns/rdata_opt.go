@@ -9,12 +9,10 @@ import (
 	"strings"
 )
 
-//
 // RDataOPT define format of RDATA for OPT.
 //
 // The extended RCODE and flags, which OPT stores in the RR Time to Live
 // (TTL) field, contains ExtRCode, Version
-//
 type RDataOPT struct {
 	// Varies per OPTION-CODE.  MUST be treated as a bit field.
 	Data []byte
@@ -44,9 +42,7 @@ type RDataOPT struct {
 	DO bool
 }
 
-//
 // String return readable representation of OPT record.
-//
 func (opt *RDataOPT) String() string {
 	var b strings.Builder
 

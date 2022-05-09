@@ -13,7 +13,6 @@ import (
 
 type empty struct{}
 
-//
 // parser for DKIM tags.
 //
 // Rules,
@@ -33,7 +32,6 @@ type empty struct{}
 //	tval  = %x21-3A / %x3C-7E
 //	FWS   = *(*(WSP) "\r\n")
 //	WSP   = " " / "\t"
-//
 type parser struct {
 	tags   map[tagKey]empty // Map to check duplicate tags.
 	sepKey []byte
@@ -45,9 +43,7 @@ type parser struct {
 	tok    []byte
 }
 
-//
 // newParser create and initialize new parser for DKIM Signature.
-//
 func newParser(value []byte) (p *parser) {
 	p = &parser{
 		r:      &libio.Reader{},
@@ -60,9 +56,7 @@ func newParser(value []byte) (p *parser) {
 	return p
 }
 
-//
 // fetchTag parse and return single tag from reader.
-//
 func (p *parser) fetchTag() (t *tag, err error) {
 	p.c = p.r.SkipSpaces()
 	if p.c == 0 {
@@ -79,9 +73,7 @@ func (p *parser) fetchTag() (t *tag, err error) {
 	return t, err
 }
 
-//
 // fetchTagKey parse and fetch tag's key.
-//
 func (p *parser) fetchTagKey() (t *tag, err error) {
 	p.tok, p.isTerm, p.c = p.r.ReadUntil(p.sepKey, ascii.Spaces)
 
@@ -110,9 +102,7 @@ func (p *parser) fetchTagKey() (t *tag, err error) {
 	return t, nil
 }
 
-//
 // fetchTagValue parse and fetch tag's value.
-//
 func (p *parser) fetchTagValue(t *tag) (err error) {
 	var v []byte
 	sepCR := []byte{'\r'}

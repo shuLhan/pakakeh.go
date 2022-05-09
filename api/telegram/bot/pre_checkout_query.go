@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // PreCheckoutQuery contains information about an incoming pre-checkout query.
-//
 type PreCheckoutQuery struct {
 	// Unique query identifier.
 	ID string `json:"id"`

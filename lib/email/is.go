@@ -13,18 +13,16 @@ var specialChars = map[byte]struct{}{
 	',': {}, '"': {},
 }
 
-//
 // IsValidLocal will return true if local part contains valid characters.
 // Local part must,
-//   -  start or end without dot character,
-//   -  contains only printable US-ASCII characters, excluding special
-//      characters
-//   -  no multiple sequence of dots.
+//   - start or end without dot character,
+//   - contains only printable US-ASCII characters, excluding special
+//     characters
+//   - no multiple sequence of dots.
 //
 // List of special characters,
 //
-//      "(" / ")" / "<" / ">" / "[" / "]" / ":" / ";" / "@" / "\" / "," / "." / DQUOTE
-//
+//	"(" / ")" / "<" / ">" / "[" / "]" / ":" / ";" / "@" / "\" / "," / "." / DQUOTE
 func IsValidLocal(local []byte) bool {
 	if len(local) == 0 {
 		return false

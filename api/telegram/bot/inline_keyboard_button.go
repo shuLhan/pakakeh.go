@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // InlineKeyboardButton represents one button of an inline keyboard. You must
 // use exactly one of the optional fields.
-//
 type InlineKeyboardButton struct {
 	// Label text on the button.
 	Text string `json:"text"`

@@ -8,19 +8,15 @@ import (
 	"strings"
 )
 
-//
 // ServerInfo provide information about server from response of EHLO or HELO
 // command.
-//
 type ServerInfo struct {
 	Exts   map[string][]string
 	Domain string
 	Info   string
 }
 
-//
 // NewServerInfo create and initialize ServerInfo from EHLO/HELO response.
-//
 func NewServerInfo(res *Response) (srvInfo *ServerInfo) {
 	if res == nil {
 		return nil

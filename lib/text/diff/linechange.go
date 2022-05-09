@@ -10,9 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/text"
 )
 
-//
 // LineChange represent one change in text.
-//
 type LineChange struct {
 	Old  text.Line
 	New  text.Line
@@ -20,16 +18,12 @@ type LineChange struct {
 	Dels text.Chunks
 }
 
-//
 // NewLineChange create a pointer to new LineChange object.
-//
 func NewLineChange(old, new text.Line) *LineChange {
 	return &LineChange{old, new, text.Chunks{}, text.Chunks{}}
 }
 
-//
 // String return formatted content of LineChange.
-//
 func (change LineChange) String() string {
 	return fmt.Sprintf("LineChange: {\n"+
 		" Old  : %s\n"+

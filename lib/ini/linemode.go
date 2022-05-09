@@ -15,11 +15,9 @@ const (
 	lineModeMulti      lineMode = 16
 )
 
-//
 // isLineModeVar will return true if mode is variable, which is either
 // lineModeValue or lineModeMulti; otherwise it will return
 // false.
-//
 func isLineModeVar(mode lineMode) bool {
 	if mode&lineModeValue > 0 {
 		return true

@@ -14,11 +14,9 @@ import (
 	"github.com/shuLhan/share/lib/mlog"
 )
 
-//
 // Endpoint represent route that will be handled by server.
 // Each route have their own evaluator that will be evaluated after global
 // evaluators from server.
-//
 type Endpoint struct {
 	// ErrorHandler define the function that will handle the error
 	// returned from Call.
@@ -44,10 +42,8 @@ type Endpoint struct {
 	Method RequestMethod
 }
 
-//
 // HTTPMethod return the string representation of HTTP method as predefined
 // in "net/http".
-//
 func (ep *Endpoint) HTTPMethod() string {
 	switch ep.Method {
 	case RequestMethodGet:

@@ -8,9 +8,7 @@ import (
 	"fmt"
 )
 
-//
 // RDataMINFO define a resource record for type MINFO.
-//
 type RDataMINFO struct {
 	// A <domain-name> which specifies a mailbox which is responsible for
 	// the mailing list or mailbox.  If this domain name names the root,
@@ -28,9 +26,7 @@ type RDataMINFO struct {
 	EmailBox string
 }
 
-//
 // String return readable representation of MINFO record.
-//
 func (minfo *RDataMINFO) String() string {
 	return fmt.Sprintf("{RMailBox:%s EmailBox:%s}", minfo.RMailBox,
 		minfo.EmailBox)

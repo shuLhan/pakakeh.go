@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package strings provide a library for working with string or slice of
 // strings.
-//
 package strings
 
 import (
@@ -14,10 +12,8 @@ import (
 	"github.com/shuLhan/share/lib/ints"
 )
 
-//
 // AppendUniq append case-insensitive strings to slice of input without
 // duplicate.
-//
 func AppendUniq(in []string, vals ...string) []string {
 	var found bool
 
@@ -38,14 +34,12 @@ func AppendUniq(in []string, vals ...string) []string {
 	return in
 }
 
-//
 // CountMissRate given two slice of string, count number of string that is
 // not equal with each other, and return the miss rate as
 //
 //	number of not equal / number of data
 //
 // and count of missing, and length of input `src`.
-//
 func CountMissRate(src []string, target []string) (
 	missrate float64,
 	nmiss, length int,
@@ -68,9 +62,7 @@ func CountMissRate(src []string, target []string) (
 	return float64(nmiss) / float64(length), nmiss, length
 }
 
-//
 // CountToken will return number of token occurrence in words.
-//
 func CountToken(words []string, token string, sensitive bool) int {
 	if !sensitive {
 		token = strings.ToLower(token)
@@ -89,10 +81,8 @@ func CountToken(words []string, token string, sensitive bool) int {
 	return cnt
 }
 
-//
 // CountTokens count number of occurrence of each `tokens` values in words.
 // Return number of each tokens based on their index.
-//
 func CountTokens(words []string, tokens []string, sensitive bool) []int {
 	tokenslen := len(tokens)
 	if tokenslen <= 0 {
@@ -108,12 +98,10 @@ func CountTokens(words []string, tokens []string, sensitive bool) []int {
 	return counters
 }
 
-//
 // Delete the first item that match with value while still preserving the
 // order.
 // It will return true if there is an item being deleted on slice, otherwise
 // it will return false.
-//
 func Delete(in []string, value string) (out []string, ok bool) {
 	x := 0
 	for ; x < len(in); x++ {
@@ -133,11 +121,9 @@ func Delete(in []string, value string) (out []string, ok bool) {
 	return out, true
 }
 
-//
 // FrequencyOfToken return frequency of token in words using
 //
 //	count-of-token / total-words
-//
 func FrequencyOfToken(words []string, token string, sensitive bool) float64 {
 	wordslen := float64(len(words))
 	if wordslen <= 0 {
@@ -149,9 +135,7 @@ func FrequencyOfToken(words []string, token string, sensitive bool) float64 {
 	return float64(cnt) / wordslen
 }
 
-//
 // FrequencyOfTokens will compute each frequency of token in words.
-//
 func FrequencyOfTokens(words, tokens []string, sensitive bool) (probs []float64) {
 	if len(words) == 0 || len(tokens) == 0 {
 		return
@@ -166,10 +150,8 @@ func FrequencyOfTokens(words, tokens []string, sensitive bool) (probs []float64)
 	return probs
 }
 
-//
 // IsContain return true if elemen `el` is in slice of string `ss`,
 // otherwise return false.
-//
 func IsContain(ss []string, el string) bool {
 	for x := 0; x < len(ss); x++ {
 		if ss[x] == el {
@@ -179,12 +161,10 @@ func IsContain(ss []string, el string) bool {
 	return false
 }
 
-//
 // IsEqual compare elements of two slice of string without regard to
 // their order.
 //
 // Return true if each both slice have the same elements, false otherwise.
-//
 func IsEqual(a, b []string) bool {
 	alen := len(a)
 
@@ -210,11 +190,9 @@ func IsEqual(a, b []string) bool {
 	return true
 }
 
-//
 // Longest find the longest word in words and return their value and index.
 //
 // If words is empty return nil string with negative (-1) index.
-//
 func Longest(words []string) (string, int) {
 	if len(words) == 0 {
 		return "", -1
@@ -235,7 +213,6 @@ func Longest(words []string) (string, int) {
 	return out, idx
 }
 
-//
 // MostFrequentTokens return the token that has highest frequency in words.
 //
 // For example, given input
@@ -245,7 +222,6 @@ func Longest(words []string) (string, int) {
 //
 // it will return A as the majority tokens in words.
 // If tokens has equal frequency, then the first token in order will returned.
-//
 func MostFrequentTokens(words []string, tokens []string, sensitive bool) string {
 	if len(words) == 0 || len(tokens) == 0 {
 		return ""
@@ -257,9 +233,7 @@ func MostFrequentTokens(words []string, tokens []string, sensitive bool) string 
 	return tokens[maxIdx]
 }
 
-//
 // SortByIndex will sort the slice of string in place using list of index.
-//
 func SortByIndex(ss *[]string, sortedIds []int) {
 	newd := make([]string, len(*ss))
 
@@ -270,11 +244,9 @@ func SortByIndex(ss *[]string, sortedIds []int) {
 	(*ss) = newd
 }
 
-//
 // Swap two indices value of string.
 // If x or y is less than zero, it will return unchanged slice.
 // If x or y is greater than length of slice, it will return unchanged slice.
-//
 func Swap(ss []string, x, y int) {
 	if x == y {
 		return
@@ -291,9 +263,7 @@ func Swap(ss []string, x, y int) {
 	ss[y] = tmp
 }
 
-//
 // TotalFrequencyOfTokens return total frequency of list of token in words.
-//
 func TotalFrequencyOfTokens(words, tokens []string, sensitive bool) float64 {
 	if len(words) == 0 || len(tokens) == 0 {
 		return 0
@@ -308,12 +278,10 @@ func TotalFrequencyOfTokens(words, tokens []string, sensitive bool) float64 {
 	return sumfreq
 }
 
-//
 // Uniq remove duplicate string from `words`.  It modify the content of slice
 // in words by replacing duplicate word with empty string ("") and return only
 // unique words.
 // If sensitive is true then compare the string with case sensitive.
-//
 func Uniq(words []string, sensitive bool) (uniques []string) {
 	var xcmp, ycmp string
 

@@ -16,9 +16,7 @@ const (
 	errFloodControl    = "Client exceeding flood control, retry after %d seconds"
 )
 
-//
 // response is the internal, generic response from API.
-//
 type response struct {
 	Ok          bool                `json:"ok"`
 	Description string              `json:"description"`
@@ -27,12 +25,10 @@ type response struct {
 	Result      interface{}         `json:"result"`
 }
 
-//
 // unpack the JSON response.
 //
 // Any non Ok response will be returned as lib/errors.E with following
 // mapping: Description become E.Message, ErrorCode become E.Code.
-//
 func (res *response) unpack(in []byte) (err error) {
 	err = json.Unmarshal(in, res)
 	if err != nil {

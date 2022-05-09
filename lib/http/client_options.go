@@ -9,9 +9,7 @@ const (
 	defClientTimeout = 10 * time.Second
 )
 
-//
 // ClientOptions options for HTTP client.
-//
 type ClientOptions struct {
 	// Headers define default headers that will be send in any request to
 	// server.

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package sftp implement SSH File Transfer Protocol v3 as defined in
 // draft-ietf-secsh-filexfer-02.txt.
 //
@@ -17,7 +16,6 @@
 //	Subsystem sftp /usr/lib/sftp-server
 //
 // should be un-commented on /etc/ssh/sshd_config if its exist.
-//
 package sftp
 
 import (
@@ -71,7 +69,6 @@ const (
 	statusCodeOpUnsupported
 )
 
-//
 // Some response status code from server is mapped to existing errors on
 // standard packages,
 //
@@ -80,7 +77,6 @@ const (
 //	SSH_FX_PERMISSION_DENIED (3) = fs.ErrPermission
 //
 // Other errors is defined below,
-//
 var (
 	// ErrFailure or SSH_FX_FAILURE(4) is a generic catch-all error
 	// message; it should be returned if an error occurs for which there

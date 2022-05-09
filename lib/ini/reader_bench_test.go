@@ -9,7 +9,6 @@ import (
 	"testing"
 )
 
-//
 // 999f056 With bytes.Buffer in functions
 // BenchmarkParse-2  300   17007586 ns/op  6361586 B/op  78712 allocs/op/
 //
@@ -21,7 +20,6 @@ import (
 //
 // Replace field type in Section and Variable from []byte to string
 // BenchmarkParse-2  20000    61150 ns/op    25176 B/op    482 allocs/op
-//
 func BenchmarkParse(b *testing.B) {
 	reader := newReader()
 	src, err := os.ReadFile(testdataInputIni)

@@ -18,9 +18,7 @@ import (
 	"time"
 )
 
-//
 // Signature represents the value of DKIM-Signature header field tag.
-//
 type Signature struct {
 	// Version of specification.
 	// It MUST have the value "1" for compliant with RFC 6376.
@@ -98,10 +96,8 @@ type Signature struct {
 	raw []byte
 }
 
-//
 // Parse DKIM-Signature field value.
 // The signature value MUST be end with CRLF.
-//
 func Parse(value []byte) (sig *Signature, err error) {
 	if len(value) == 0 {
 		return nil, nil
@@ -137,10 +133,8 @@ func Parse(value []byte) (sig *Signature, err error) {
 	return sig, nil
 }
 
-//
 // NewSignature create and initialize new signature using SDID ("d=") and
 // selector ("s=") and default value for the rest of field.
-//
 func NewSignature(sdid, selector []byte) (sig *Signature) {
 	sig = &Signature{
 		SDID:     sdid,
@@ -152,10 +146,8 @@ func NewSignature(sdid, selector []byte) (sig *Signature) {
 	return sig
 }
 
-//
 // Hash compute the hash of input using the defined signature algorithm and
 // return their binary and base64 representation.
-//
 func (sig *Signature) Hash(in []byte) (h, h64 []byte) {
 	if sig.Alg == nil || *sig.Alg == SignAlgRS256 {
 		h256 := sha256.Sum256(in)
@@ -171,12 +163,10 @@ func (sig *Signature) Hash(in []byte) (h, h64 []byte) {
 	return
 }
 
-//
 // Pack the Signature into stream.  Each non empty tag field is printed,
 // ordered by tag priority: required, recommended, and optional.
 // Recommended and optional field values will be printed only if its not
 // empty.
-//
 func (sig *Signature) Pack(simple bool) []byte {
 	bb := new(bytes.Buffer)
 	var sigAlg = signAlgNames[SignAlgRS256]
@@ -252,12 +242,10 @@ func wrap(bb *bytes.Buffer, simple bool) {
 	bb.WriteByte(' ')
 }
 
-//
 // SetDefault signature field's values.
 //
 // The default values are "sha-rsa256" for signing algorithm, and
 // "relaxed/relaxed" for canonicalization in header and body.
-//
 func (sig *Signature) SetDefault() {
 	if len(sig.Version) == 0 {
 		sig.Version = append(sig.Version, '1')
@@ -276,10 +264,8 @@ func (sig *Signature) SetDefault() {
 	}
 }
 
-//
 // Sign compute the signature of message hash header using specific private
 // key and store the base64 result in Signature.Value ("b=").
-//
 func (sig *Signature) Sign(pk *rsa.PrivateKey, hashHeader []byte) (err error) {
 	if pk == nil {
 		return fmt.Errorf("email/dkim: empty private key for signing")
@@ -303,16 +289,12 @@ func (sig *Signature) Sign(pk *rsa.PrivateKey, hashHeader []byte) (err error) {
 	return nil
 }
 
-//
 // Relaxed return the "relaxed" canonicalization of Signature.
-//
 func (sig *Signature) Relaxed() []byte {
 	return sig.Pack(false)
 }
 
-//
 // Simple return the "simple" canonicalization of Signature.
-//
 func (sig *Signature) Simple() []byte {
 	if len(sig.raw) == 0 {
 		return sig.Pack(true)
@@ -320,7 +302,6 @@ func (sig *Signature) Simple() []byte {
 	return sig.raw
 }
 
-//
 // Validate the signature's tag values.
 //
 // Rules of tags,
@@ -335,7 +316,6 @@ func (sig *Signature) Simple() []byte {
 // if both are present.
 //
 // *  The "d=" value MUST be the same or parent domain of "i="
-//
 func (sig *Signature) Validate() (err error) {
 	if len(sig.Version) == 0 || sig.Version[0] != '1' {
 		return fmt.Errorf("dkim: invalid version: '%s'", sig.Version)
@@ -375,10 +355,8 @@ func (sig *Signature) Validate() (err error) {
 	return err
 }
 
-//
 // Verify the signature value ("b=") using DKIM public key record and computed
 // hash of message header.
-//
 func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
 	if key == nil {
 		return fmt.Errorf("email/dkim: key record is empty")
@@ -407,9 +385,7 @@ func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
 	return err
 }
 
-//
 // set the signature field value with value from tag.
-//
 func (sig *Signature) set(t *tag) (err error) {
 	if t == nil {
 		return
@@ -510,10 +486,8 @@ func (sig *Signature) set(t *tag) (err error) {
 	return err
 }
 
-//
 // setQueryMethods parse list of query methods and set Signature.QueryMethod
 // based on first match.
-//
 func (sig *Signature) setQueryMethods(v []byte) {
 	methods := bytes.Split(v, sepColon)
 
@@ -539,9 +513,7 @@ func (sig *Signature) setQueryMethods(v []byte) {
 	}
 }
 
-//
 // setQueryMethod set Signature query type and option.
-//
 func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 	if len(qtype) == 0 {
 		return nil
@@ -579,10 +551,8 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 	return nil
 }
 
-//
 // validateHeaders validate value of header tag "h=" that it MUST contains
 // "from".
-//
 func (sig *Signature) validateHeaders() (err error) {
 	for x := 0; x < len(sig.Headers); x++ {
 		if bytes.Equal(sig.Headers[x], []byte("from")) {

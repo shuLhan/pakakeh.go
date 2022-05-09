@@ -9,9 +9,7 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
-//
 // DecodeQP decode DKIM quoted printable text.
-//
 func DecodeQP(raw []byte) (out []byte) {
 	if len(raw) == 0 {
 		return nil
@@ -41,13 +39,11 @@ func DecodeQP(raw []byte) (out []byte) {
 	return out
 }
 
-//
 // Canonicalize a simple or relaxed input of DKIM-Signature value by removing
 // the value of tag "b=" and CRLF at the end.
 //
 // For example, "v=1; b=base64; bh=base64\r\n" would become
 // "v=1; b=; bh=base64".
-//
 func Canonicalize(raw []byte) (out []byte) {
 	// Find "b=" ...
 	x := 0

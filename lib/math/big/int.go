@@ -14,17 +14,13 @@ import (
 
 var intZero = NewInt(0)
 
-//
 // Int extends the standard big.Int package.
-//
 type Int struct {
 	big.Int
 }
 
-//
 // NewInt create and initialize new Int value from v or nil if v is invalid
 // type that cannot be converted to Int.
-//
 func NewInt(v interface{}) (i *Int) {
 	i = &Int{}
 
@@ -35,9 +31,7 @@ func NewInt(v interface{}) (i *Int) {
 	return i
 }
 
-//
 // Add set the i value to i + v and return the i as the result.
-//
 func (i *Int) Add(v interface{}) *Int {
 	vv := toInt(v, nil)
 	if vv == nil {
@@ -48,9 +42,7 @@ func (i *Int) Add(v interface{}) *Int {
 	return i
 }
 
-//
 // IsGreater will return true if i > v.
-//
 func (i *Int) IsGreater(v interface{}) bool {
 	vv := toInt(v, nil)
 	if vv == nil {
@@ -59,9 +51,7 @@ func (i *Int) IsGreater(v interface{}) bool {
 	return i.Cmp(&vv.Int) > 0
 }
 
-//
 // IsLess will return true if i < v.
-//
 func (i *Int) IsLess(v interface{}) bool {
 	vv := toInt(v, nil)
 	if vv == nil {
@@ -70,20 +60,16 @@ func (i *Int) IsLess(v interface{}) bool {
 	return i.Cmp(&vv.Int) < 0
 }
 
-//
 // IsZero will return true if `i == 0`.
-//
 func (i *Int) IsZero() bool {
 	return i.Cmp(&intZero.Int) == 0
 }
 
-//
 // MarshalJSON implement the json.Marshaler interface and return the output of
 // String method.
 //
 // If the global variable MarshalJSONAsString is true, the Int value will
 // be encoded as string.
-//
 func (i *Int) MarshalJSON() ([]byte, error) {
 	var s string
 	if i == nil {
@@ -97,9 +83,7 @@ func (i *Int) MarshalJSON() ([]byte, error) {
 	return []byte(s), nil
 }
 
-//
 // Scan implement the database's sql.Scan interface.
-//
 func (i *Int) Scan(src interface{}) error {
 	got := toInt(src, i)
 	if got == nil {
@@ -108,9 +92,7 @@ func (i *Int) Scan(src interface{}) error {
 	return nil
 }
 
-//
 // UnmarshalJSON convert the JSON byte value into Int.
-//
 func (i *Int) UnmarshalJSON(in []byte) (err error) {
 	in = bytes.Trim(in, `"`)
 	i.SetInt64(0)
@@ -121,9 +103,7 @@ func (i *Int) UnmarshalJSON(in []byte) (err error) {
 	return nil
 }
 
-//
 // Value implement the sql/driver.Valuer.
-//
 func (i *Int) Value() (driver.Value, error) {
 	var s string = "0"
 	if i != nil {
@@ -132,10 +112,8 @@ func (i *Int) Value() (driver.Value, error) {
 	return []byte(s), nil
 }
 
-//
 // toInt convert any type to Int or nil if type is unknown.
 // If in is not nil, it will be set to out.
-//
 func toInt(v interface{}, in *Int) (out *Int) {
 	out = &Int{}
 

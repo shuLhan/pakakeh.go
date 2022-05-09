@@ -71,10 +71,8 @@ func un(s string, startTime time.Time) {
 		endTime.Sub(startTime))
 }
 
-//
 // createSmote will create and initialize SMOTE object from config file and
 // from command parameter.
-//
 func createSmote(fcfg string, o *options) (smoteRun *smote.Runtime, e error) {
 	smoteRun = &smote.Runtime{}
 
@@ -103,9 +101,7 @@ func createSmote(fcfg string, o *options) (smoteRun *smote.Runtime, e error) {
 	return
 }
 
-//
 // runSmote will select minority class from dataset and run oversampling.
-//
 func runSmote(smote *smote.Runtime, dataset *tabula.Claset) (e error) {
 	minorset := dataset.GetMinorityRows()
 

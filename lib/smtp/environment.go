@@ -4,9 +4,7 @@
 
 package smtp
 
-//
 // Environment contains SMTP server environment.
-//
 type Environment struct {
 	// PrimaryDomain of the SMTP server.
 	// This field is required.

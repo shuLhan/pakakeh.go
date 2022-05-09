@@ -2,19 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package vcard implement RFC6350 for encoding and decoding VCard formatted
 // data.
-//
 package vcard
 
 import (
 	"github.com/shuLhan/share/lib/contact"
 )
 
-//
 // VCard define vcard 4.0 data structure.
-//
 type VCard struct {
 	UID          string
 	Source       []string

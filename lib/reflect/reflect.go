@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package reflect extends the standard reflect package.
-//
 package reflect
 
 import (
@@ -13,10 +11,8 @@ import (
 	"unsafe"
 )
 
-//
 // IsNil will return true if v's type is chan, func, interface, map, pointer,
 // or slice and its value is `nil`; otherwise it will return false.
-//
 func IsNil(v interface{}) bool {
 	val := reflect.ValueOf(v)
 	switch val.Kind() {
@@ -27,10 +23,8 @@ func IsNil(v interface{}) bool {
 	return v == nil
 }
 
-//
 // DoEqual is a naive interfaces comparison that check and use Equaler
 // interface and return an error if its not match.
-//
 func DoEqual(x, y interface{}) (err error) {
 	if x == nil && y == nil {
 		return nil
@@ -42,10 +36,8 @@ func DoEqual(x, y interface{}) (err error) {
 	return doEqual(v1, v2)
 }
 
-//
 // IsEqual is a naive interfaces comparison that check and use Equaler
 // interface.
-//
 func IsEqual(x, y interface{}) bool {
 	if x == nil && y == nil {
 		return true
@@ -57,13 +49,11 @@ func IsEqual(x, y interface{}) bool {
 	return isEqual(v1, v2)
 }
 
-//
 // doEqual compare two kind of objects and return nils if both are equal.
 //
 // If its not equal, it will return the interface{} value of v1 and v2 and
 // additional error message which describe the type and value where its not
 // matched.
-//
 func doEqual(v1, v2 reflect.Value) (err error) {
 	var in1, in2 interface{}
 

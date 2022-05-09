@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // EncryptedPassportElement contains information about documents or other
 // Telegram Passport elements shared with the bot by the user.
-//
 type EncryptedPassportElement struct {
 	//
 	// Element type. One of “personal_details”, “passport”,

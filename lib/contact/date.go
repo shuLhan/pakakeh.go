@@ -4,19 +4,15 @@
 
 package contact
 
-//
 // Date define contact's with type "birthday" and "anniversary".
-//
 type Date struct {
 	Day   string `json:"day"`
 	Month string `json:"month"`
 	Year  string `json:"year"`
 }
 
-//
 // String will return the string representation of date object in `YYYY-MM-DD`
 // format.
-//
 func (date *Date) String() (r string) {
 	if date.Year == "" {
 		return
@@ -27,10 +23,8 @@ func (date *Date) String() (r string) {
 	return
 }
 
-//
 // VCardString will return the string representation of date object in VCard
 // format: `YYYYMMDD` or "--MMDD" if year is empty.
-//
 func (date *Date) VCardString() (r string) {
 	if date.Day == "" || date.Month == "" {
 		return

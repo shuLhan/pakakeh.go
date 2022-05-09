@@ -13,11 +13,9 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-//
 // WebhookClient for slack.
 // Use this for long running program that post message every minutes or
 // seconds.
-//
 type WebhookClient struct {
 	*libhttp.Client
 	webhookPath string
@@ -25,10 +23,8 @@ type WebhookClient struct {
 	channel     string
 }
 
-//
 // NewWebhookClient create new slack client that will write the message using
 // webhook URL and optional user and channel.
-//
 func NewWebhookClient(webhookURL, user, channel string) (wcl *WebhookClient, err error) {
 	wurl, err := url.Parse(webhookURL)
 	if err != nil {
@@ -50,9 +46,7 @@ func NewWebhookClient(webhookURL, user, channel string) (wcl *WebhookClient, err
 	return wcl, nil
 }
 
-//
 // Post the Message as is.
-//
 func (wcl *WebhookClient) Post(msg *Message) (err error) {
 	if wcl.Client == nil {
 		return nil
@@ -67,10 +61,8 @@ func (wcl *WebhookClient) Post(msg *Message) (err error) {
 	return nil
 }
 
-//
 // Write wrap the raw bytes into Message with the user and channel previously
 // defined when creating the client, and post it to slack.
-//
 func (wcl *WebhookClient) Write(b []byte) (n int, err error) {
 	if wcl.Client == nil {
 		return 0, nil
@@ -87,9 +79,7 @@ func (wcl *WebhookClient) Write(b []byte) (n int, err error) {
 	return len(b), nil
 }
 
-//
 // Close the client connection.
-//
 func (wcl *WebhookClient) Close() (err error) {
 	wcl.Client = nil
 	return nil

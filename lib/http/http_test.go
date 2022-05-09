@@ -94,7 +94,6 @@ var (
 	testDownloadBody []byte
 )
 
-//
 // handleFS authenticate the request to Memfs using cookie.
 //
 // If the node does not start with "/auth/" it will return true.
@@ -102,7 +101,6 @@ var (
 // If the node path is start with "/auth/" and cookie name "sid" exist
 // with value "authz" it will return true;
 // otherwise it will redirect to "/" and return false.
-//
 func handleFS(node *memfs.Node, res http.ResponseWriter, req *http.Request) bool {
 	var (
 		lowerPath = strings.ToLower(node.Path)

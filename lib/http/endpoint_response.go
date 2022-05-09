@@ -6,7 +6,6 @@ package http
 
 import liberrors "github.com/shuLhan/share/lib/errors"
 
-//
 // EndpointResponse is one of the common HTTP response container that can be
 // used by Server implementor.
 // Its embed the lib/errors.E type to work seamlessly with Endpoint.Call
@@ -17,7 +16,6 @@ import liberrors "github.com/shuLhan/share/lib/errors"
 // Count.
 //
 // See the example below on how to use it with Endpoint.Call handler.
-//
 type EndpointResponse struct {
 	liberrors.E
 	Data interface{} `json:"data,omitempty"`
@@ -40,9 +38,7 @@ type EndpointResponse struct {
 	Total int64 `json:"total,omitempty"`
 }
 
-//
 // Unwrap return the error as instance of *liberror.E.
-//
 func (epr *EndpointResponse) Unwrap() (err error) {
 	return &epr.E
 }

@@ -26,13 +26,11 @@ var (
 	ErrDurationMissingValue = errors.New("missing value in duration")
 )
 
-//
 // ParseDuration extend the capability of standard time.Duration with
 // additional unit suffix: day and week.
 // Day unit end with "d" and week unit end with "w".
 // A day is equal with "24h", an a week is equal to "7d".
 // Unlike standard time.Duration the week or day units must be before hours.
-//
 func ParseDuration(s string) (time.Duration, error) {
 	var (
 		dur, v float64

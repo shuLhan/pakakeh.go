@@ -2,18 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package math provide generic functions working with math.
-//
 package math
 
 import (
 	"math"
 )
 
-//
 // Factorial compute the factorial of n.
-//
 func Factorial(n int) (f int) {
 	if n >= 0 {
 		f = 1
@@ -29,12 +25,10 @@ func Factorial(n int) (f int) {
 	return f
 }
 
-//
 // BinomialCoefficient or combination, compute number of picking k from
 // n possibilities.
 //
 // Result is n! / ((n - k)! * k!)
-//
 func BinomialCoefficient(n int, k int) int {
 	if k > n {
 		return 0
@@ -42,7 +36,6 @@ func BinomialCoefficient(n int, k int) int {
 	return Factorial(n) / (Factorial(n-k) * Factorial(k))
 }
 
-//
 // StirlingS2 The number of ways of partitioning a set of n elements into
 // k nonempty sets (i.e., k set blocks), also called a Stirling set number.
 //
@@ -51,7 +44,6 @@ func BinomialCoefficient(n int, k int) int {
 // and {{1},{2,3}}; and into one subset in one way: {{1,2,3}}.
 //
 // Ref: http://mathworld.wolfram.com/StirlingNumberoftheSecondKind.html
-//
 func StirlingS2(n int, k int) int {
 	if k == 1 || n == k {
 		return 1

@@ -62,9 +62,7 @@ type ClientRequest struct {
 	Type RequestType
 }
 
-//
 // toHttpRequest convert the ClientRequest into the standard http.Request.
-//
 func (creq *ClientRequest) toHttpRequest(client *Client) (httpReq *http.Request, err error) {
 	var (
 		logp              = "toHttpRequest"

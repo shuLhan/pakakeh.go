@@ -16,11 +16,9 @@ const (
 	defaultMinimumTTL uint32 = 1 * 60 * 60      // 1 Hour.
 )
 
-//
 // RDataSOA contains the authority of zone.
 //
 // All times are in units of seconds.
-//
 type RDataSOA struct {
 	// The primary name server for the zone.
 	MName string

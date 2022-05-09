@@ -6,9 +6,7 @@ package bot
 
 import "crypto/tls"
 
-//
 // Webhook contains options to set Webhook to receive updates.
-//
 type Webhook struct {
 	// HTTPS url to send updates to.
 	// This option will be overridden by environment variable

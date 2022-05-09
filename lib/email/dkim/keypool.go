@@ -11,17 +11,13 @@ import (
 	"sync"
 )
 
-//
 // KeyPool maintain cached DKIM public keys.
-//
 type KeyPool struct {
 	sync.Mutex
 	pool map[string]*Key
 }
 
-//
 // Clear the contents of key pool.
-//
 func (kp *KeyPool) Clear() {
 	kp.Lock()
 	for k := range kp.pool {
@@ -30,9 +26,7 @@ func (kp *KeyPool) Clear() {
 	kp.Unlock()
 }
 
-//
 // Get cached DKIM key from pool or lookup using DNS/TXT method if not exist.
-//
 func (kp *KeyPool) Get(dname string) (key *Key, err error) {
 	if len(dname) == 0 {
 		return nil, nil
@@ -58,9 +52,7 @@ func (kp *KeyPool) Get(dname string) (key *Key, err error) {
 	return key, nil
 }
 
-//
 // Put key to pool based on DKIM domain name ("d=" value plus "s=" value).
-//
 func (kp *KeyPool) Put(dname string, key *Key) {
 	if len(dname) == 0 || key == nil {
 		return
@@ -70,11 +62,9 @@ func (kp *KeyPool) Put(dname string, key *Key) {
 	kp.Unlock()
 }
 
-//
 // String return text representation of DKIM key inside pool sorted by domain
 // name.  Each key is printed with the following format:
 // "{DomainName:ExpiredAt}"
-//
 func (kp *KeyPool) String() string {
 	var sb strings.Builder
 	kp.Lock()

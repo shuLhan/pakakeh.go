@@ -10,9 +10,7 @@ type wikiMarkup struct {
 	end   string
 }
 
-//
 // listWikiMarkup contains list of common markup in Wikimedia software.
-//
 var listWikiMarkup = []wikiMarkup{{
 	begin: "[[Category:",
 	end:   "]]",

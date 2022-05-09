@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // Invoice contains basic information about an invoice.
-//
 type Invoice struct {
 	Title       string `json:"title"`       // Product name
 	Description string `json:"description"` // Product description

@@ -220,9 +220,7 @@ func TestMessage_AddTo(t *testing.T) {
 	}
 }
 
-//
 // NOTE: this test require call to DNS to get the public key.
-//
 func TestMessageDKIMVerify(t *testing.T) {
 	t.Skip("TODO: use local DNS")
 

@@ -4,7 +4,6 @@
 
 package hunspell
 
-//
 // compoundPattern define the option for COMPUNDPATTERN.
 //
 // Forbid compounding, if the first word in the compound ends with endchars,
@@ -15,7 +14,6 @@ package hunspell
 // stems (stems and stems with zero affixes):
 //
 //	CHECKCOMPOUNDPATTERN 0/x /y
-//
 type compoundPattern struct {
 	end       string
 	endFlag   string

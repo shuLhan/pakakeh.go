@@ -4,10 +4,8 @@
 
 package smtp
 
-//
 // Handler define an interface to handle bouncing and incoming mail message,
 // and handling EXPN and VRFY commands.
-//
 type Handler interface {
 	// ServeAuth handle SMTP AUTH parameter username and password.
 	ServeAuth(username, password string) (*Response, error)

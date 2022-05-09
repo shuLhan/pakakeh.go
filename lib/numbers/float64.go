@@ -8,9 +8,7 @@ import (
 	"math"
 )
 
-//
 // Float64Round will round `v` to `nprec` digit in fraction.
-//
 func Float64Round(v float64, nprec int) float64 {
 	pow := math.Pow(10, float64(nprec))
 	tmp := v * pow

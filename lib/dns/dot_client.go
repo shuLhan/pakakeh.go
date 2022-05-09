@@ -14,20 +14,16 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // DoTClient client for DNS over TLS.
-//
 type DoTClient struct {
 	conn    *tls.Conn
 	timeout time.Duration
 }
 
-//
 // NewDoTClient will create new DNS client over TLS connection.
 //
 // The nameserver contains the IP address, not host name, of parent DNS
 // server.  Default port is 853, if not set.
-//
 func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err error) {
 	_, remoteIP, port := libnet.ParseIPPort(nameserver, DefaultTLSPort)
 	if remoteIP == nil {
@@ -52,9 +48,7 @@ func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err err
 	return cl, nil
 }
 
-//
 // Close the client connection.
-//
 func (cl *DoTClient) Close() error {
 	if cl.conn != nil {
 		return cl.conn.Close()
@@ -62,13 +56,11 @@ func (cl *DoTClient) Close() error {
 	return nil
 }
 
-//
 // Lookup DNS records based on MessageQuestion Name and Type, in synchronous
 // mode.
 // The MessageQuestion Class default to IN.
 //
 // It will return an error if the Name is empty.
-//
 func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
 	if len(q.Name) == 0 {
 		return nil, fmt.Errorf("Lookup: empty question name")
@@ -100,9 +92,7 @@ func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 	return res, nil
 }
 
-//
 // Query send DNS Message to name server.
-//
 func (cl *DoTClient) Query(msg *Message) (*Message, error) {
 	_, err := cl.Write(msg.packet)
 	if err != nil {
@@ -124,16 +114,12 @@ func (cl *DoTClient) Query(msg *Message) (*Message, error) {
 	return res, nil
 }
 
-//
 // RemoteAddr return client remote nameserver address.
-//
 func (cl *DoTClient) RemoteAddr() string {
 	return cl.conn.RemoteAddr().String()
 }
 
-//
 // recv will read DNS message from active connection in client into `msg`.
-//
 func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
@@ -159,9 +145,7 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 	return
 }
 
-//
 // Write raw DNS message on active connection.
-//
 func (cl *DoTClient) Write(msg []byte) (n int, err error) {
 	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
@@ -179,16 +163,12 @@ func (cl *DoTClient) Write(msg []byte) (n int, err error) {
 	return
 }
 
-//
 // SetRemoteAddr no-op.
-//
 func (cl *DoTClient) SetRemoteAddr(addr string) (err error) {
 	return
 }
 
-//
 // SetTimeout for sending and receiving packet.
-//
 func (cl *DoTClient) SetTimeout(t time.Duration) {
 	cl.timeout = t
 }

@@ -15,7 +15,6 @@ const (
 	templateNamePathFuncs    = "PATH_FUNCS"
 )
 
-//
 // generateTemplate generate the .go source template.
 //
 // The .go source template contains three sections: HEADER, GENERATE_NODE,
@@ -37,7 +36,6 @@ const (
 //
 // The PATH_FUNCS section generate the init() function that map each
 // Node's Path with the function generated from GENERATE_NODE.
-//
 func generateTemplate() (tmpl *template.Template, err error) {
 	var textTemplate = `{{ define "HEADER" -}}
 {{- .CommentHeader -}}

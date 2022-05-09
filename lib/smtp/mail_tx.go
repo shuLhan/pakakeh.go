@@ -11,9 +11,7 @@ import (
 	"time"
 )
 
-//
 // MailTx define a mail transaction.
-//
 type MailTx struct {
 	Postpone time.Time
 
@@ -40,9 +38,7 @@ type MailTx struct {
 	Retry int
 }
 
-//
 // NewMailTx create and return new mail object.
-//
 func NewMailTx(from string, to []string, data []byte) (mail *MailTx) {
 	mail = &MailTx{
 		From:       from,
@@ -57,9 +53,7 @@ func NewMailTx(from string, to []string, data []byte) (mail *MailTx) {
 	return
 }
 
-//
 // Reset all mail attributes to their zero value.
-//
 func (mail *MailTx) Reset() {
 	mail.ID = ""
 	mail.From = ""
@@ -67,9 +61,7 @@ func (mail *MailTx) Reset() {
 	mail.Data = nil
 }
 
-//
 // isTerminated will return true if data is end with "\r\n.\r\n".
-//
 func (mail *MailTx) isTerminated() bool {
 	l := len(mail.Data)
 	if l < 5 {
@@ -78,9 +70,7 @@ func (mail *MailTx) isTerminated() bool {
 	return bytes.Equal(mail.Data[l-5:l], []byte{'\r', '\n', '.', '\r', '\n'})
 }
 
-//
 // postpone the mail transaction.
-//
 func (mail *MailTx) postpone() {
 	mail.Retry++
 	mail.Postpone = mail.Received.Add(time.Duration(mail.Retry*30) * time.Minute)
@@ -90,9 +80,7 @@ func (mail *MailTx) isPostponed() bool {
 	return mail.Postpone.After(time.Now())
 }
 
-//
 // seal the mail envelope by inserting trace information into message content.
-//
 func (mail *MailTx) seal(clientDomain, clientAddress, localAddress string) {
 	line := fmt.Sprintf("FROM %s (%s)\r\n\tBY %s WITH SMTP ID %s;\r\n\t%s",
 		clientDomain, clientAddress, localAddress, mail.ID,

@@ -1,9 +1,7 @@
-//
 // Package totp implement Time-Based One-Time Password Algorithm based on RFC
 // 6238 [1].
 //
 // [1] https://tools.ietf.org/html/rfc6238
-//
 package totp
 
 import (
@@ -47,17 +45,14 @@ const (
 
 var _digitsPower = []int{1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000}
 
-//
 // Protocol contain methods to work with TOTP using the number of digits and
 // time steps defined from New().
-//
 type Protocol struct {
 	fnHash     func() hash.Hash
 	codeDigits int
 	timeStep   int
 }
 
-//
 // New create TOTP protocol for prover or verifier using "cryptoHash" as the
 // hmac-sha hash function, "codeDigits" as the number of digits to be
 // generated and/or verified, and "timeStep" as the time divisor.
@@ -67,7 +62,6 @@ type Protocol struct {
 // Passing hash value other than that, will revert the value default to SHA1.
 //
 // The maximum value for codeDigits parameter is 8.
-//
 func New(cryptoHash CryptoHash, codeDigits, timeStep int) Protocol {
 	var fnHash func() hash.Hash
 
@@ -93,19 +87,15 @@ func New(cryptoHash CryptoHash, codeDigits, timeStep int) Protocol {
 	}
 }
 
-//
 // Generate one time password using the secret and current timestamp.
-//
 func (p *Protocol) Generate(secret []byte) (otp string, err error) {
 	mac := hmac.New(p.fnHash, secret)
 	now := time.Now().Unix()
 	return p.generateWithTimestamp(mac, now)
 }
 
-//
 // GenerateN generate n number of passwords from (current time - N*timeStep)
 // until the curent time.
-//
 func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error) {
 	mac := hmac.New(p.fnHash, secret)
 	ts := time.Now().Unix()
@@ -120,7 +110,6 @@ func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error)
 	return listOTP, nil
 }
 
-//
 // Verify the token based on the prover secret key.
 // It will return true if the token matched, otherwise it will return false.
 //
@@ -132,7 +121,6 @@ func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error)
 //	(current_timestamp - (2*30)) ... current_timestamp
 //
 // For security reason, the maximum stepsBack is limited to DefStepsBack.
-//
 func (p *Protocol) Verify(secret []byte, token string, stepsBack int) bool {
 	mac := hmac.New(p.fnHash, secret)
 	now := time.Now().Unix()

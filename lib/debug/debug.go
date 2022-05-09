@@ -16,9 +16,7 @@ var (
 	Value = 0
 )
 
-//
 // init initialize debug from system environment.
-//
 func init() {
 	v := os.Getenv("DEBUG")
 	if len(v) > 0 {

@@ -8,23 +8,17 @@ import (
 	"bytes"
 )
 
-//
 // HashAlg define the type for hash algorithm.
-//
 type HashAlg byte
 
-//
 // List of valid and known hash algorithms.
-//
 const (
 	HashAlgALL    HashAlg = iota // (default to allow all)
 	HashAlgSHA256                // sha256
 	HashAlgSHA1                  // sha1
 )
 
-//
 // hashAlgNames contains mapping between type value and their names.
-//
 var hashAlgNames = map[HashAlg][]byte{
 	HashAlgSHA256: []byte("sha256"),
 	HashAlgSHA1:   []byte("sha1"),

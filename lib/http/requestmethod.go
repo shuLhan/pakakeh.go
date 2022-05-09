@@ -24,9 +24,7 @@ const (
 	RequestMethodTrace
 )
 
-//
 // String return the string representation of request method.
-//
 func (rm RequestMethod) String() string {
 	switch rm {
 	case RequestMethodGet:

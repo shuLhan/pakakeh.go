@@ -4,9 +4,7 @@
 
 package tabula
 
-//
 // ColumnInterface define an interface for working with Column.
-//
 type ColumnInterface interface {
 	SetType(tipe int)
 	SetName(name string)

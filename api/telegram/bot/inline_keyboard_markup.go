@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // InlineKeyboardMarkup represents an inline keyboard that appears right next
 // to the message it belongs to.
-//
 type InlineKeyboardMarkup struct {
 	// Array of button rows, each represented by an Array of
 	// InlineKeyboardButton objects.

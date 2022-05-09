@@ -21,9 +21,7 @@ const (
 	localPostmaster = "postmaster"
 )
 
-//
 // Server defines parameters for running an SMTP server.
-//
 type Server struct {
 	// Env contains server environment.
 	Env *Environment
@@ -77,9 +75,7 @@ type Server struct {
 	running bool
 }
 
-//
 // LoadCertificate load TLS certificate and its private key from file.
-//
 func (srv *Server) LoadCertificate(certFile, keyFile string) (err error) {
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
@@ -91,10 +87,8 @@ func (srv *Server) LoadCertificate(certFile, keyFile string) (err error) {
 	return nil
 }
 
-//
 // Start listening for SMTP connections.
 // Each client connection will be handled in a single routine.
-//
 func (srv *Server) Start() (err error) {
 	err = srv.initialize()
 	if err != nil {
@@ -124,9 +118,7 @@ func (srv *Server) Start() (err error) {
 	return nil
 }
 
-//
 // Stop the server.
-//
 func (srv *Server) Stop() {
 	err := srv.tlsListener.Close()
 	if err != nil {
@@ -143,10 +135,8 @@ func (srv *Server) Stop() {
 	close(srv.relayQueue)
 }
 
-//
 // serveIncoming serve incoming message from other mail transfer agent on port
 // 25.
-//
 func (srv *Server) serveIncoming() {
 	for {
 		if debug.Value >= 2 {
@@ -185,9 +175,7 @@ func (srv *Server) serveTLS() {
 	}
 }
 
-//
 // handle receiver connection.
-//
 func (srv *Server) handle(recv *receiver) {
 	err := recv.sendReply(StatusReady, srv.Env.PrimaryDomain.Name, nil)
 	if err != nil {
@@ -252,9 +240,7 @@ out:
 	recv.close()
 }
 
-//
 // handleCommand from client.
-//
 func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	if debug.Value > 0 {
 		log.Printf("handleCommand: %v\n", cmd)
@@ -324,9 +310,7 @@ func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	return err
 }
 
-//
 // handleAUTH process the AUTH command from client.
-//
 func (srv *Server) handleAUTH(recv *receiver, cmd *Command) (err error) {
 	if recv.mode == receiverModeServer {
 		return recv.sendError(errCmdUnknown)
@@ -544,9 +528,7 @@ func (srv *Server) handleVRFY(recv *receiver, cmd *Command) (err error) {
 	return err
 }
 
-//
 // initialize handler, storage, extensions, and listeners.
-//
 func (srv *Server) initialize() (err error) {
 	if srv.Env == nil {
 		return fmt.Errorf("smtp: server environment is not defined")
@@ -624,7 +606,6 @@ func (srv *Server) isOurDomain(d string) bool {
 	return false
 }
 
-//
 // processMailTxQueue process incoming mail transactions.
 //
 // There are three possibilities for incoming mail:
@@ -637,7 +618,6 @@ func (srv *Server) isOurDomain(d string) bool {
 //
 // (3) when recipient address is unknown or invalid, the mail transaction will
 // be bounced back to sender.
-//
 func (srv *Server) processMailTxQueue() {
 	for mail, ok := <-srv.mailTxQueue; ok; {
 		if mail.isPostponed() {
@@ -682,12 +662,10 @@ func (srv *Server) processMailTxQueue() {
 	srv.wg.Done()
 }
 
-//
 // processBounceQueue send the mail back to reverse-path (sender).
 //
 // If sender domain is one of ours, call the handler; otherwise send them
 // using SMTP through relay queue.
-//
 func (srv *Server) processBounceQueue() {
 	var err error
 
@@ -700,12 +678,10 @@ func (srv *Server) processBounceQueue() {
 	srv.wg.Done()
 }
 
-//
 // processRelayQueue send mail to other MTA or final destination.
 // A mail transaction will be relayed on the following conditions: the
 // domain's name in MAIL FROM is managed by server and the recipient domain's
 // address is not managed by server.
-//
 func (srv *Server) processRelayQueue() {
 	for _, ok := <-srv.relayQueue; ok; {
 		// TODO:
@@ -713,11 +689,9 @@ func (srv *Server) processRelayQueue() {
 	srv.wg.Done()
 }
 
-//
 // processMailTx process mail transaction by breaking down recipients into one
 // mail object, storing it into storage, and push it to the queue for further
 // processing.
-//
 func (srv *Server) processMailTx(mail *MailTx) {
 	mails := make([]*MailTx, len(mail.Recipients))
 	for x, rcpt := range mail.Recipients {

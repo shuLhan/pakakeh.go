@@ -15,12 +15,10 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // ResourceRecord The answer, authority, and additional sections all share the
 // same format: a variable number of resource records, where the number of
 // records is specified in the corresponding count field in the header.  Each
 // resource record has the following format:
-//
 type ResourceRecord struct {
 	// Value hold the generic, unpacked rdata based on Type.
 	Value interface{}
@@ -45,19 +43,15 @@ type ResourceRecord struct {
 	TTL uint32
 }
 
-//
 // String return the text representation of ResourceRecord for human.
-//
 func (rr *ResourceRecord) String() string {
 	return fmt.Sprintf("{Name:%s Type:%d Class:%d TTL:%d rdlen:%d}",
 		rr.Name, rr.Type, rr.Class, rr.TTL, rr.rdlen)
 }
 
-//
 // initAndValidate initialize and validate the resource record data.
 // It will return an error if one of the required fields is empty or if its
 // type is not match with its value.
-//
 func (rr *ResourceRecord) initAndValidate() (err error) {
 	var (
 		logp = "initAndValidate"
@@ -179,9 +173,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	return nil
 }
 
-//
 // unpack the resource record from packet start from index startIdx.
-//
 func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err error) {
 	var (
 		logp      = "ResourceRecord.unpack"

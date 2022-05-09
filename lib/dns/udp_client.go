@@ -15,12 +15,10 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // UDPClient for DNS with UDP connection.
 //
 // Any implementation that need to query DNS message in multiple Go routines
 // should create one client per routine.
-//
 type UDPClient struct {
 	addr    *net.UDPAddr // addr contains address of remote connection.
 	conn    *net.UDPConn
@@ -28,12 +26,10 @@ type UDPClient struct {
 	sync.Mutex
 }
 
-//
 // NewUDPClient will create new DNS client with UDP network connection.
 //
 // The nameserver contains the IP address, not host name, of parent DNS
 // server.  Default port is 53, if not set.
-//
 func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 	network := "udp"
 
@@ -60,28 +56,22 @@ func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
 	return
 }
 
-//
 // RemoteAddr return client remote nameserver address.
-//
 func (cl *UDPClient) RemoteAddr() string {
 	return cl.addr.String()
 }
 
-//
 // Close client connection.
-//
 func (cl *UDPClient) Close() error {
 	return cl.conn.Close()
 }
 
-//
 // Lookup DNS records based on MessageQuestion Name and Type, in synchronous
 // mode.
 // The MessageQuestion Class default to IN.
 //
 // It will return an error if the client does not set the name server address,
 // or no connection, or Name is empty.
-//
 func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
 	if cl.addr == nil || cl.conn == nil {
 		return nil, fmt.Errorf("Lookup: no name server or active connection")
@@ -116,9 +106,7 @@ func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 	return res, nil
 }
 
-//
 // Query send DNS query to name server "ns" and return the unpacked response.
-//
 func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 	logp := "Query"
 	cl.Lock()
@@ -157,11 +145,9 @@ func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 	return res, nil
 }
 
-//
 // Write raw DNS response message on active connection.
 // This method is only used by server to write the response of query to
 // client.
-//
 func (cl *UDPClient) Write(msg []byte) (n int, err error) {
 	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
@@ -171,17 +157,13 @@ func (cl *UDPClient) Write(msg []byte) (n int, err error) {
 	return cl.conn.WriteToUDP(msg, cl.addr)
 }
 
-//
 // SetRemoteAddr set the remote address for sending the packet.
-//
 func (cl *UDPClient) SetRemoteAddr(addr string) (err error) {
 	cl.addr, err = net.ResolveUDPAddr("udp", addr)
 	return
 }
 
-//
 // SetTimeout for sending and receiving packet.
-//
 func (cl *UDPClient) SetTimeout(t time.Duration) {
 	cl.timeout = t
 }

@@ -8,22 +8,16 @@ import (
 	"bytes"
 )
 
-//
 // KeyType define a type of algorithm that sign the key.
-//
 type KeyType byte
 
-//
 // List of valid key types.
-//
 const (
 	KeyTypeRSA KeyType = iota // "rsa" (default)
 )
 
-//
 // keyTypeNames contains mapping between key type and their text
 // representation.
-//
 var keyTypeNames = map[KeyType][]byte{
 	KeyTypeRSA: []byte("rsa"),
 }

@@ -23,11 +23,9 @@ const (
 	ParseModeHTML       = "HTML"
 )
 
-//
 // List of Update types.
 //
 // This types can be used to set AllowedUpdates on Options.Webhook.
-//
 const (
 	// New incoming message of any kind — text, photo, sticker, etc.
 	UpdateTypeMessage = "message"
@@ -93,9 +91,7 @@ const (
 	paramNameAllowedUpdates = "allowed_updates"
 )
 
-//
 // Bot for Telegram using webHook.
-//
 type Bot struct {
 	opts     Options
 	client   *http.Client
@@ -105,9 +101,7 @@ type Bot struct {
 	err      chan error
 }
 
-//
 // New create and initialize new Telegram bot.
-//
 func New(opts Options) (bot *Bot, err error) {
 	err = opts.init()
 	if err != nil {
@@ -135,10 +129,8 @@ func New(opts Options) (bot *Bot, err error) {
 	return bot, nil
 }
 
-//
 // DeleteWebhook remove webhook integration if you decide to switch back to
 // getUpdates. Returns True on success. Requires no parameters.
-//
 func (bot *Bot) DeleteWebhook() (err error) {
 	_, resBody, err := bot.client.PostForm(methodDeleteWebhook, nil, nil)
 	if err != nil {
@@ -154,11 +146,9 @@ func (bot *Bot) DeleteWebhook() (err error) {
 	return nil
 }
 
-//
 // GetMe A simple method for testing your bot's auth token.
 // Requires no parameters.
 // Returns basic information about the bot in form of a User object.
-//
 func (bot *Bot) GetMe() (user *User, err error) {
 	_, resBody, err := bot.client.Get(methodGetMe, nil, nil)
 	if err != nil {
@@ -177,9 +167,7 @@ func (bot *Bot) GetMe() (user *User, err error) {
 	return user, nil
 }
 
-//
 // GetMyCommands get the current list of the bot's commands.
-//
 func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 	_, resBody, err := bot.client.Get(methodGetMyCommands, nil, nil)
 	if err != nil {
@@ -197,7 +185,6 @@ func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 	return cmds, nil
 }
 
-//
 // GetWebhookInfo get current webhook status. Requires no parameters.
 // On success, returns a WebhookInfo object.
 // If the bot is using getUpdates, will return an object with the url field
@@ -220,10 +207,8 @@ func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
 	return webhookInfo, nil
 }
 
-//
 // SendMessage send text messages using defined parse mode to specific
 // user.
-//
 func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 	msg *Message, err error,
 ) {
@@ -250,12 +235,10 @@ func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 	return msg, nil
 }
 
-//
 // SetMyCommands change the list of the bot's commands.
 //
 // The value of each Command in the list must be valid according to
 // description in Command type; this is including length and characters.
-//
 func (bot *Bot) SetMyCommands(cmds []Command) (err error) {
 	if len(cmds) == 0 {
 		return nil
@@ -283,12 +266,10 @@ func (bot *Bot) SetMyCommands(cmds []Command) (err error) {
 	return nil
 }
 
-//
 // Start the Bot.
 //
 // If the Webhook option is not nil it will start listening to updates through
 // webhook.
-//
 func (bot *Bot) Start() (err error) {
 	if bot.opts.Webhook != nil {
 		return bot.startWebhook()
@@ -296,9 +277,7 @@ func (bot *Bot) Start() (err error) {
 	return nil
 }
 
-//
 // Stop the Bot.
-//
 func (bot *Bot) Stop() (err error) {
 	if bot.webhook != nil {
 		err = bot.webhook.Shutdown(context.TODO())
@@ -350,10 +329,8 @@ func (bot *Bot) setWebhook() (err error) {
 	return nil
 }
 
-//
 // startWebhook start the HTTP server to receive Update from Telegram API
 // server and register the Webhook.
-//
 func (bot *Bot) startWebhook() (err error) {
 	err = bot.createServer()
 	if err != nil {
@@ -379,9 +356,7 @@ func (bot *Bot) startWebhook() (err error) {
 	return <-bot.err
 }
 
-//
 // createServer start the HTTP server for receiving Update.
-//
 func (bot *Bot) createServer() (err error) {
 	serverOpts := &http.ServerOptions{
 		Address: bot.opts.Webhook.ListenAddress,
@@ -419,9 +394,7 @@ func (bot *Bot) createServer() (err error) {
 	return nil
 }
 
-//
 // handleWebhook handle Updates from Webhook.
-//
 func (bot *Bot) handleWebhook(epr *http.EndpointRequest) (resBody []byte, err error) {
 	update := Update{}
 

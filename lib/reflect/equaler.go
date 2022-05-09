@@ -4,10 +4,8 @@
 
 package reflect
 
-//
 // Equaler is an interface that when implemented by a type, it will be used to
 // compare the value in Assert.
-//
 type Equaler interface {
 	IsEqual(v interface{}) bool
 }

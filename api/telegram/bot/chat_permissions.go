@@ -4,10 +4,8 @@
 
 package bot
 
-//
 // ChatPermissions describes actions that a non-administrator user is allowed
 // to take in a chat.
-//
 type ChatPermissions struct {
 	// Optional. True, if the user is allowed to send text messages,
 	// contacts, locations and venues.

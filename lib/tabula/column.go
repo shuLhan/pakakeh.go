@@ -8,9 +8,7 @@ import (
 	"strconv"
 )
 
-//
 // Column represent slice of record. A vertical representation of data.
-//
 type Column struct {
 	// Name of column. String identifier for the column.
 	Name string
@@ -25,9 +23,7 @@ type Column struct {
 	Records Records
 }
 
-//
 // NewColumn return new column with type and name.
-//
 func NewColumn(colType int, colName string) (col *Column) {
 	col = &Column{
 		Type: colType,
@@ -40,9 +36,7 @@ func NewColumn(colType int, colName string) (col *Column) {
 	return
 }
 
-//
 // NewColumnString initialize column with type anda data as string.
-//
 func NewColumnString(data []string, colType int, colName string) (
 	col *Column,
 	e error,
@@ -64,10 +58,8 @@ func NewColumnString(data []string, colType int, colName string) (
 	return col, nil
 }
 
-//
 // NewColumnInt create new column with record type as integer, and fill it
 // with `data`.
-//
 func NewColumnInt(data []int64, colName string) (col *Column) {
 	col = NewColumn(TInteger, colName)
 
@@ -84,9 +76,7 @@ func NewColumnInt(data []int64, colName string) (col *Column) {
 	return
 }
 
-//
 // NewColumnReal create new column with record type is real.
-//
 func NewColumnReal(data []float64, colName string) (col *Column) {
 	col = NewColumn(TReal, colName)
 
@@ -106,80 +96,58 @@ func NewColumnReal(data []float64, colName string) (col *Column) {
 	return
 }
 
-//
 // SetType will set the type of column to `tipe`.
-//
 func (col *Column) SetType(tipe int) {
 	col.Type = tipe
 }
 
-//
 // SetName will set the name of column to `name`.
-//
 func (col *Column) SetName(name string) {
 	col.Name = name
 }
 
-//
 // GetType return the type of column.
-//
 func (col *Column) GetType() int {
 	return col.Type
 }
 
-//
 // GetName return the column name.
-//
 func (col *Column) GetName() string {
 	return col.Name
 }
 
-//
 // SetRecords will set records in column to `recs`.
-//
 func (col *Column) SetRecords(recs *Records) {
 	col.Records = *recs
 }
 
-//
 // Interface return the column object as an interface.
-//
 func (col *Column) Interface() interface{} {
 	return col
 }
 
-//
 // Reset column data and flag.
-//
 func (col *Column) Reset() {
 	col.Flag = 0
 	col.Records = make([]*Record, 0)
 }
 
-//
 // Len return number of record.
-//
 func (col *Column) Len() int {
 	return len(col.Records)
 }
 
-//
 // PushBack push record the end of column.
-//
 func (col *Column) PushBack(r *Record) {
 	col.Records = append(col.Records, r)
 }
 
-//
 // PushRecords append slice of record to the end of column's records.
-//
 func (col *Column) PushRecords(rs []*Record) {
 	col.Records = append(col.Records, rs...)
 }
 
-//
 // ToIntegers convert slice of record to slice of int64.
-//
 func (col *Column) ToIntegers() []int64 {
 	newcol := make([]int64, col.Len())
 
@@ -190,9 +158,7 @@ func (col *Column) ToIntegers() []int64 {
 	return newcol
 }
 
-//
 // ToFloatSlice convert slice of record to slice of float64.
-//
 func (col *Column) ToFloatSlice() (newcol []float64) {
 	newcol = make([]float64, col.Len())
 
@@ -203,9 +169,7 @@ func (col *Column) ToFloatSlice() (newcol []float64) {
 	return
 }
 
-//
 // ToStringSlice convert slice of record to slice of string.
-//
 func (col *Column) ToStringSlice() (newcol []string) {
 	newcol = make([]string, col.Len())
 
@@ -216,20 +180,16 @@ func (col *Column) ToStringSlice() (newcol []string) {
 	return
 }
 
-//
 // ClearValues set all value in column to empty string or zero if column type is
 // numeric.
-//
 func (col *Column) ClearValues() {
 	for _, r := range col.Records {
 		r.Reset()
 	}
 }
 
-//
 // SetValueAt will set column value at cell `idx` with `v`, unless the index
 // is out of range.
-//
 func (col *Column) SetValueAt(idx int, v string) {
 	if idx < 0 {
 		return
@@ -240,10 +200,8 @@ func (col *Column) SetValueAt(idx int, v string) {
 	_ = col.Records[idx].SetValue(v, col.Type)
 }
 
-//
 // SetValueByNumericAt will set column value at cell `idx` with numeric value
 // `v`, unless the index is out of range.
-//
 func (col *Column) SetValueByNumericAt(idx int, v float64) {
 	if idx < 0 {
 		return
@@ -261,9 +219,7 @@ func (col *Column) SetValueByNumericAt(idx int, v float64) {
 	}
 }
 
-//
 // SetValues of all column record.
-//
 func (col *Column) SetValues(values []string) {
 	vallen := len(values)
 	reclen := col.Len()
@@ -285,9 +241,7 @@ func (col *Column) SetValues(values []string) {
 	}
 }
 
-//
 // DeleteRecordAt will delete record at index `i` and return it.
-//
 func (col *Column) DeleteRecordAt(i int) *Record {
 	if i < 0 {
 		return nil

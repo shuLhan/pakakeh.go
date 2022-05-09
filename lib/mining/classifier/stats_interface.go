@@ -4,10 +4,8 @@
 
 package classifier
 
-//
 // ComputeFMeasures given array of precisions and recalls, compute F-measure
 // of each instance and return it.
-//
 func ComputeFMeasures(precisions, recalls []float64) (fmeasures []float64) {
 	// Get the minimum length of precision and recall.
 	// This is to make sure that we are not looping out of range.
@@ -24,13 +22,11 @@ func ComputeFMeasures(precisions, recalls []float64) (fmeasures []float64) {
 	return
 }
 
-//
 // ComputeAccuracies will compute and return accuracy from array of
 // true-positive, false-positive, true-negative, and false-negative; using
 // formula,
 //
 //	(tp + tn) / (tp + tn + tn + fn)
-//
 func ComputeAccuracies(tp, fp, tn, fn []int64) (accuracies []float64) {
 	// Get minimum length of input, just to make sure we are not looping
 	// out of range.
@@ -50,10 +46,8 @@ func ComputeAccuracies(tp, fp, tn, fn []int64) (accuracies []float64) {
 	return
 }
 
-//
 // ComputeElapsedTimes will compute and return elapsed time between `start`
 // and `end` timestamps.
-//
 func ComputeElapsedTimes(start, end []int64) (elaps []int64) {
 	// Get minimum length.
 	minlen := len(start)

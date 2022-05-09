@@ -20,9 +20,7 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // Client for SMTP.
-//
 type Client struct {
 	opts ClientOptions
 
@@ -41,7 +39,6 @@ type Client struct {
 	isStartTLS bool
 }
 
-//
 // NewClient create and initialize connection to remote SMTP server.
 //
 // When connected, the client send implicit EHLO command issued to server
@@ -53,7 +50,6 @@ type Client struct {
 // will try to authenticate to remote server.
 //
 // On fail, it will return nil client with an error.
-//
 func NewClient(opts ClientOptions) (cl *Client, err error) {
 	var (
 		logp = "NewClient"
@@ -129,10 +125,8 @@ func NewClient(opts ClientOptions) (cl *Client, err error) {
 	return cl, nil
 }
 
-//
 // Authenticate to server using one of SASL mechanism.
 // Currently, the only mechanism available is PLAIN.
-//
 func (cl *Client) Authenticate(mech SaslMechanism, username, password string) (
 	res *Response, err error,
 ) {
@@ -150,12 +144,10 @@ func (cl *Client) Authenticate(mech SaslMechanism, username, password string) (
 	return cl.SendCommand(cmd)
 }
 
-//
 // connect open a connection to server and issue EHLO command immediately.
 //
 // If remoteURL scheme is "smtp+starttls", the client will issue STARTTLS
 // command immediately after connect.
-//
 func (cl *Client) connect(localName string) (res *Response, err error) {
 	logp := "connect"
 
@@ -197,7 +189,6 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 	return res, nil
 }
 
-//
 // ehlo initialize the SMTP session by sending the EHLO command to server.
 // If server does not support EHLO it would return an error, there is no
 // fallback to HELO.
@@ -205,7 +196,6 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 // Client MUST use localName that resolved to DNS A RR (address) (RFC 5321,
 // section 2.3.5), or SHOULD use IP address if not possible (RFC 5321, section
 // 4.1.4).
-//
 func (cl *Client) ehlo(localName string) (res *Response, err error) {
 	if len(localName) == 0 {
 		localName, err = os.Hostname()
@@ -236,9 +226,7 @@ func (cl *Client) ehlo(localName string) (res *Response, err error) {
 	return res, err
 }
 
-//
 // Expand get members of mailing-list.
-//
 func (cl *Client) Expand(mlist string) (res *Response, err error) {
 	if len(mlist) == 0 {
 		return nil, nil
@@ -247,17 +235,13 @@ func (cl *Client) Expand(mlist string) (res *Response, err error) {
 	return cl.SendCommand(cmd)
 }
 
-//
 // Help get information on specific command from server.
-//
 func (cl *Client) Help(cmdName string) (res *Response, err error) {
 	cmd := []byte("HELP " + cmdName + "\r\n")
 	return cl.SendCommand(cmd)
 }
 
-//
 // Quit signal the server that the client will close the connection.
-//
 func (cl *Client) Quit() (res *Response, err error) {
 	_, err = cl.conn.Write([]byte("QUIT\r\n"))
 	if err == nil {
@@ -274,7 +258,6 @@ func (cl *Client) Quit() (res *Response, err error) {
 	return res, err
 }
 
-//
 // MailTx send the mail to server.
 // This function is implementation of mail transaction (MAIL, RCPT, and DATA
 // commands as described in RFC 5321, section 3.3).
@@ -286,7 +269,6 @@ func (cl *Client) Quit() (res *Response, err error) {
 //
 // On fail, it will return response from the failed command with error is
 // string combination of command, response code and message.
-//
 func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 	if mail == nil {
 		// No operation.
@@ -348,11 +330,9 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 	return res, err
 }
 
-//
 // Noop send the NOOP command to server with optional message.
 //
 // On success, it will return response with Code 250, StatusOK.
-//
 func (cl *Client) Noop(msg string) (res *Response, err error) {
 	var cmd string
 	if len(msg) > 0 {
@@ -363,21 +343,17 @@ func (cl *Client) Noop(msg string) (res *Response, err error) {
 	return cl.SendCommand([]byte(cmd))
 }
 
-//
 // Reset send the RSET command to server.
 // This command clear the current buffer on MAIL, RCPT, and DATA, but not the
 // EHLO/HELO buffer.
 //
 // On success, it will return response with Code 250, StatusOK.
-//
 func (cl *Client) Reset() (res *Response, err error) {
 	cmd := []byte("RSET\r\n")
 	return cl.SendCommand(cmd)
 }
 
-//
 // SendCommand send any custom command to server.
-//
 func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
 	if debug.Value >= 3 {
 		fmt.Printf(">>> smtp: Client.SendCommand: %s", cmd)
@@ -391,16 +367,12 @@ func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
 	return cl.recv()
 }
 
-//
 // SendEmail is the wrapper that simplify MailTx.
-//
 func (cl *Client) SendEmail(from string, to []string, subject, bodyText, bodyHtml []byte) (err error) {
 	return nil
 }
 
-//
 // Verify send the VRFY command to server to check if mailbox is exist.
-//
 func (cl *Client) Verify(mailbox string) (res *Response, err error) {
 	if len(mailbox) == 0 {
 		return nil, nil
@@ -409,11 +381,9 @@ func (cl *Client) Verify(mailbox string) (res *Response, err error) {
 	return cl.SendCommand(cmd)
 }
 
-//
 // The remote address can be a hostname or IP address with port.
 // If its a host name, the client will try to lookup the MX record first, if
 // its fail it will resolve the IP address and use it.
-//
 func lookup(address string) (ip net.IP, err error) {
 	mxs, err := net.LookupMX(address)
 	if err == nil && len(mxs) > 0 {
@@ -438,9 +408,7 @@ func lookup(address string) (ip net.IP, err error) {
 	return nil, nil
 }
 
-//
 // getUnicastAddress return the local unicast address other than localhost.
-//
 func getUnicastAddress() (saddr string) {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
@@ -456,9 +424,7 @@ func getUnicastAddress() (saddr string) {
 	return ""
 }
 
-//
 // recv read and parse the response from server.
-//
 func (cl *Client) recv() (res *Response, err error) {
 	cl.buf.Reset()
 
@@ -500,11 +466,9 @@ func (cl *Client) recv() (res *Response, err error) {
 	return res, nil
 }
 
-//
 // StartTLS upgrade the underlying connection to TLS.  This method only works
 // if client connected to remote URL using scheme "smtp+starttls" or on port
 // 587, and on server that support STARTTLS extension.
-//
 func (cl *Client) StartTLS() (res *Response, err error) {
 	req := []byte("STARTTLS\r\n")
 	res, err = cl.SendCommand(req)

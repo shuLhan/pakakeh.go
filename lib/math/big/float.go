@@ -10,7 +10,6 @@ import (
 	"math/big"
 )
 
-//
 // DefaultBitPrecision define the maximum number of mantissa bits available to
 // represent the value.
 //
@@ -18,31 +17,24 @@ import (
 //
 // One should change this value before using the new extended Float in the
 // program.
-//
 var DefaultBitPrecision uint = 128
 
-//
 // DefaultRoundingMode define the default rounding mode for all instance of
 // Float.
 //
 // One should change this value before using the new extended Float in the
 // program.
-//
 var DefaultRoundingMode = big.ToNearestAway
 
-//
 // Float extend the standard big.Float by setting each instance precision to
 // DefaultBitPrecision, rounding mode to DefaultRoundingMode, and using
 // DefaultDigitPrecision value after decimal point when converted to string.
-//
 type Float struct {
 	big.Float
 }
 
-//
 // AddFloat return the rounded sum `f[0]+f[1]+...`.
 // It will return nil if the first parameter is not convertable to Float.
-//
 func AddFloat(f ...interface{}) *Float {
 	if len(f) == 0 {
 		return nil
@@ -61,17 +53,13 @@ func AddFloat(f ...interface{}) *Float {
 	return total
 }
 
-//
 // NewFloat create and initialize new Float with default bit precision,
 // and rounding mode.
-//
 func NewFloat(v interface{}) *Float {
 	return toFloat(v)
 }
 
-//
 // Create Float with default bit precision and rounding mode.
-//
 func CreateFloat(v float64) Float {
 	f := Float{}
 	f.SetPrec(DefaultBitPrecision)
@@ -80,10 +68,8 @@ func CreateFloat(v float64) Float {
 	return f
 }
 
-//
 // MulFloat return the result of multiplication `f*g`.
 // It will return nil if `f` or `g` is not convertible to Float.
-//
 func MulFloat(f, g interface{}) *Float {
 	ff := toFloat(f)
 	if ff == nil {
@@ -97,9 +83,7 @@ func MulFloat(f, g interface{}) *Float {
 	return h.Mul(gf)
 }
 
-//
 // MustParseFloat convert the string `s` into Float or panic.
-//
 func MustParseFloat(s string) (f *Float) {
 	f = NewFloat(0)
 	_, _, err := f.Float.Parse(s, 10)
@@ -109,9 +93,7 @@ func MustParseFloat(s string) (f *Float) {
 	return f
 }
 
-//
 // ParseFloat the string s into Float value.
-//
 func ParseFloat(s string) (f *Float, err error) {
 	f = NewFloat(0)
 	_, _, err = f.Float.Parse(s, 10)
@@ -121,9 +103,7 @@ func ParseFloat(s string) (f *Float, err error) {
 	return f, nil
 }
 
-//
 // QuoFloat return the quotient of `f/g` as new Float.
-//
 func QuoFloat(f, g interface{}) *Float {
 	ff := toFloat(f)
 	if ff == nil {
@@ -138,17 +118,13 @@ func QuoFloat(f, g interface{}) *Float {
 	return h.Quo(gf)
 }
 
-//
 // SubFloat return the result of subtraction `f-g` as new Float.
-//
 func SubFloat(f, g *Float) *Float {
 	h := f.Clone()
 	return h.Sub(g)
 }
 
-//
 // Add sets f to `f+g` and return the f as the result.
-//
 func (f *Float) Add(g interface{}) *Float {
 	gf := toFloat(g)
 	if gf == nil {
@@ -158,26 +134,20 @@ func (f *Float) Add(g interface{}) *Float {
 	return f
 }
 
-//
 // Clone the instance to new Float.
-//
 func (f *Float) Clone() *Float {
 	g := NewFloat(0)
 	g.Float.Set(&f.Float)
 	return g
 }
 
-//
 // Int64 return the integer resulting from truncating x towards zero.
-//
 func (f *Float) Int64() int64 {
 	i64, _ := f.Float.Int64()
 	return i64
 }
 
-//
 // IsEqual will return true if `f == g`.
-//
 func (f *Float) IsEqual(g interface{}) bool {
 	gf := toFloat(g)
 	if gf == nil {
@@ -186,9 +156,7 @@ func (f *Float) IsEqual(g interface{}) bool {
 	return f.Cmp(&gf.Float) == 0
 }
 
-//
 // IsGreater will return true if `f > g`.
-//
 func (f *Float) IsGreater(g interface{}) bool {
 	gf := toFloat(g)
 	if gf == nil {
@@ -197,9 +165,7 @@ func (f *Float) IsGreater(g interface{}) bool {
 	return f.Cmp(&gf.Float) > 0
 }
 
-//
 // IsGreaterOrEqual will return true if `f >= g`.
-//
 func (f *Float) IsGreaterOrEqual(g interface{}) bool {
 	gf := toFloat(g)
 	if gf == nil {
@@ -208,9 +174,7 @@ func (f *Float) IsGreaterOrEqual(g interface{}) bool {
 	return f.Cmp(&gf.Float) >= 0
 }
 
-//
 // IsLess will return true if `f < g`.
-//
 func (f *Float) IsLess(g interface{}) bool {
 	gf := toFloat(g)
 	if gf == nil {
@@ -219,9 +183,7 @@ func (f *Float) IsLess(g interface{}) bool {
 	return f.Cmp(&gf.Float) < 0
 }
 
-//
 // IsLessOrEqual will return true if `f <= g`.
-//
 func (f *Float) IsLessOrEqual(g interface{}) bool {
 	gf := toFloat(g)
 	if gf == nil {
@@ -230,18 +192,14 @@ func (f *Float) IsLessOrEqual(g interface{}) bool {
 	return f.Cmp(&gf.Float) <= 0
 }
 
-//
 // IsZero will return true if `f == 0`.
-//
 func (f *Float) IsZero() bool {
 	gf := NewFloat(0)
 	return f.Cmp(&gf.Float) == 0
 }
 
-//
 // MarshalJSON implement the json.Marshaler interface and return the output of
 // String method.
-//
 func (f *Float) MarshalJSON() ([]byte, error) {
 	s := f.String()
 	if MarshalJSONAsString {
@@ -250,10 +208,8 @@ func (f *Float) MarshalJSON() ([]byte, error) {
 	return []byte(s), nil
 }
 
-//
 // Mul sets f to product of `f * g` and return the result as f.
 // If g is not convertible to Float it will return nil.
-//
 func (f *Float) Mul(g interface{}) *Float {
 	gf := toFloat(g)
 	if gf == nil {
@@ -263,9 +219,7 @@ func (f *Float) Mul(g interface{}) *Float {
 	return f
 }
 
-//
 // Parse the string into Float value.
-//
 func (f *Float) ParseFloat(s string) (err error) {
 	f.SetPrec(DefaultBitPrecision)
 	f.SetMode(DefaultRoundingMode)
@@ -276,10 +230,8 @@ func (f *Float) ParseFloat(s string) (err error) {
 	return nil
 }
 
-//
 // Quo sets f to quotient of `f/g` and return the result as f.
 // If g is not convertible to Float it will return nil.
-//
 func (f *Float) Quo(g interface{}) *Float {
 	gf := toFloat(g)
 	if gf == nil {
@@ -289,13 +241,11 @@ func (f *Float) Quo(g interface{}) *Float {
 	return f
 }
 
-//
 // String format the Float value into string with maximum mantissa is set by
 // digit precision option.
 //
 // Unlike standard String method, this method will trim trailing zero digit or
 // decimal point at the end of mantissa.
-//
 func (f *Float) String() string {
 	b := []byte(f.Text('f', DefaultDigitPrecision))
 
@@ -310,9 +260,7 @@ func (f *Float) String() string {
 	return string(b)
 }
 
-//
 // Sub sets f to rounded difference `f-g` and return f.
-//
 func (f *Float) Sub(g interface{}) *Float {
 	gf := toFloat(g)
 	if gf == nil {
@@ -322,9 +270,7 @@ func (f *Float) Sub(g interface{}) *Float {
 	return f
 }
 
-//
 // UnmarshalJSON convert the JSON byte value into Float.
-//
 func (f *Float) UnmarshalJSON(in []byte) (err error) {
 	if f == nil {
 		f = NewFloat(0)
@@ -333,9 +279,7 @@ func (f *Float) UnmarshalJSON(in []byte) (err error) {
 	return err
 }
 
-//
 // toFloat convert v type to Float or nil if v type is unknown.
-//
 func toFloat(g interface{}) (out *Float) {
 	out = &Float{}
 	out.SetPrec(DefaultBitPrecision).SetMode(DefaultRoundingMode)

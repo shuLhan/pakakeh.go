@@ -26,9 +26,7 @@ func xmlBegin(dec *xml.Decoder) (err error) {
 	return nil
 }
 
-//
 // xmlMustCData parse the CDATA inside the tag.
-//
 func xmlMustCData(dec *xml.Decoder, tag string) (cdata string, err error) {
 	err = xmlMustStart(dec, tag)
 	if err != nil {
@@ -69,10 +67,8 @@ func xmlMustCData(dec *xml.Decoder, tag string) (cdata string, err error) {
 	return cdata, nil
 }
 
-//
 // xmlMustStart parse the first XML element that must start with passed
 // openTag.
-//
 func xmlMustStart(dec *xml.Decoder, tag string) (err error) {
 	token, err := dec.Token()
 	if err != nil {
@@ -101,9 +97,7 @@ func xmlMustStart(dec *xml.Decoder, tag string) (err error) {
 	return nil
 }
 
-//
 // xmlMustEnd parse the next XML element that must be a closed tag.
-//
 func xmlMustEnd(dec *xml.Decoder, tag string) (err error) {
 	token, err := dec.Token()
 	if err != nil {
@@ -169,9 +163,7 @@ func xmlStart(dec *xml.Decoder, openTag, closeTag string) (isOpen bool, err erro
 	return true, nil
 }
 
-//
 // xmlParseParams parse the optional <params> elements.
-//
 func xmlParseParams(dec *xml.Decoder, closeTag string) (params []*Value, hasParams bool, err error) {
 	isOpen, err := xmlStart(dec, elNameParams, closeTag)
 	if err != nil {
@@ -195,9 +187,7 @@ func xmlParseParams(dec *xml.Decoder, closeTag string) (params []*Value, hasPara
 	return params, true, nil
 }
 
-//
 // xmlParseParam parse the <param> element.
-//
 func xmlParseParam(dec *xml.Decoder, closeTag string) (param *Value, err error) {
 	isOpen, err := xmlStart(dec, elNameParam, closeTag)
 	if err != nil {

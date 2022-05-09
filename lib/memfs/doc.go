@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package memfs provide a library for mapping file system into memory and/or
 // to embed it inside go source file.
 //
-// Usage
+// # Usage
 //
 // The first step is to create new instance of memfs using `New()`.
 // The following example embed all files inside directory named "include" or
@@ -50,7 +49,7 @@
 //	}
 //	// Do something with content of file system.
 //
-// Go embed
+// # Go embed
 //
 // The memfs package also support embedding the files into Go generated source
 // file.
@@ -90,5 +89,4 @@
 // with each content encoded (compressed) using gzip.
 //
 // Thats it!
-//
 package memfs

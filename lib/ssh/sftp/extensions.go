@@ -6,10 +6,8 @@ package sftp
 
 import "encoding/binary"
 
-//
 // extensions contains mapping of extension-pair name and data, as defined in
 // #section-4.2.
-//
 type extensions map[string]string
 
 func unpackExtensions(payload []byte) (exts extensions) {

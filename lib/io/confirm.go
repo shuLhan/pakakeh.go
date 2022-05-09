@@ -11,13 +11,11 @@ import (
 	"os"
 )
 
-//
 // ConfirmYesNo display a question to standard output and read for answer
 // from input Reader for simple yes "y" or no "n" answer.
 // If input Reader is nil, it will set to standard input.
 // If "defIsYes" is true and answer is empty (only new line), then it will
 // return true.
-//
 func ConfirmYesNo(in io.Reader, msg string, defIsYes bool) bool {
 	var (
 		r         *bufio.Reader

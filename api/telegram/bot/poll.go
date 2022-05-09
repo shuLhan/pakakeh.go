@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // Poll contains information about a poll.
-//
 type Poll struct {
 	// Unique poll identifier
 	ID string `json:"id"`

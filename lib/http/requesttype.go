@@ -17,11 +17,9 @@ const (
 	RequestTypeXML
 )
 
-//
 // String return the string representation of request type as in
 // "Content-Type" header.
 // For RequestTypeNone or RequestTypeQuery it will return an empty string "".
-//
 func (rt RequestType) String() string {
 	switch rt {
 	case RequestTypeForm:

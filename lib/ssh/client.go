@@ -18,9 +18,7 @@ import (
 	"github.com/shuLhan/share/lib/ssh/config"
 )
 
-//
 // Client for SSH connection.
-//
 type Client struct {
 	*ssh.Client
 
@@ -29,10 +27,8 @@ type Client struct {
 	stderr io.Writer
 }
 
-//
 // NewClientFromConfig create a new SSH connection using predefined
 // configuration.
-//
 func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
@@ -84,9 +80,7 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	return cl, nil
 }
 
-//
 // Execute a command on remote server.
-//
 func (cl *Client) Execute(cmd string) (err error) {
 	sess, err := cl.NewSession()
 	if err != nil {
@@ -113,12 +107,10 @@ func (cl *Client) Execute(cmd string) (err error) {
 	return err
 }
 
-//
 // ScpGet copy file from remote into local storage using scp.
 //
 // The local file should be use the absolute path, or relative to the file in
 // config.Section.WorkingDir.
-//
 func (cl *Client) ScpGet(remote, local string) (err error) {
 	logp := "ScpGet"
 
@@ -153,12 +145,10 @@ func (cl *Client) ScpGet(remote, local string) (err error) {
 	return nil
 }
 
-//
 // ScpPut copy a file from local storage to remote using scp command.
 //
 // The local file should be use the absolute path, or relative to the file in
 // config.Section's WorkingDir.
-//
 func (cl *Client) ScpPut(local, remote string) (err error) {
 	logp := "ScpPut"
 
@@ -193,10 +183,8 @@ func (cl *Client) ScpPut(local, remote string) (err error) {
 	return nil
 }
 
-//
 // SetSessionOutputError set the standard output and error for future remote
 // execution.
-//
 func (cl *Client) SetSessionOutputError(stdout, stderr io.Writer) {
 	if stdout != nil {
 		cl.stdout = stdout

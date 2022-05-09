@@ -11,9 +11,7 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
-//
 // MessageQuestion contains the "question" in most queries.
-//
 type MessageQuestion struct {
 	// The domain name to be queried.
 	Name string
@@ -25,9 +23,7 @@ type MessageQuestion struct {
 	Class RecordClass
 }
 
-//
 // Reset the message question field to it's default values for query.
-//
 func (qst *MessageQuestion) Reset() {
 	qst.Name = ""
 	qst.Type = RecordTypeA
@@ -38,18 +34,14 @@ func (qst *MessageQuestion) String() string {
 	return fmt.Sprintf("{Name:%s Type:%s}", qst.Name, RecordTypeNames[qst.Type])
 }
 
-//
 // size return the section question size, length of name + 2 (1 octet for
 // beginning size plus 1 octet for end of label) + 2 octets of
 // rtype + 2 octets of rclass
-//
 func (qst *MessageQuestion) size() int {
 	return len(qst.Name) + 6
 }
 
-//
 // unpack the DNS question section from packet.
-//
 func (qst *MessageQuestion) unpack(packet []byte) (err error) {
 	if len(packet) == 0 {
 		return nil

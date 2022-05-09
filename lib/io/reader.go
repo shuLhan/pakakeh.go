@@ -10,7 +10,6 @@ import (
 	"github.com/shuLhan/share/lib/ascii"
 )
 
-//
 // Reader represent a buffered reader that use an index to move through slice
 // of bytes.
 //
@@ -22,15 +21,12 @@ import (
 //	   ^
 //	   |
 //	  r.X
-//
 type Reader struct {
 	V []byte // V contains the buffer.
 	X int    // X contains the current index of readed buffer.
 }
 
-//
 // NewReader open the file in path for reading.
-//
 func NewReader(path string) (*Reader, error) {
 	var err error
 	r := new(Reader)
@@ -43,17 +39,13 @@ func NewReader(path string) (*Reader, error) {
 	return r, nil
 }
 
-//
 // Init initialize reader buffer from slice of byte.
-//
 func (r *Reader) Init(src []byte) {
 	r.X = 0
 	r.V = src
 }
 
-//
 // Current byte at index position or 0 if EOF.
-//
 func (r *Reader) Current() byte {
 	if r.X == len(r.V) {
 		return 0
@@ -61,9 +53,7 @@ func (r *Reader) Current() byte {
 	return r.V[r.X]
 }
 
-//
 // ReadLine read one line including the line feed '\n' character.
-//
 func (r *Reader) ReadLine() (line []byte) {
 	if r.X == len(r.V) {
 		return
@@ -83,12 +73,10 @@ func (r *Reader) ReadLine() (line []byte) {
 	return line
 }
 
-//
 // ReadUntil read the content of buffer until one of separator found,
 // or until one of terminator character found, or until EOF.
 // If terminator found, the returned isTerm value will be true, and c
 // value will be the character that cause the termination.
-//
 func (r *Reader) ReadUntil(seps, terms []byte) (tok []byte, isTerm bool, c byte) {
 	start := r.X
 	for r.X < len(r.V) {
@@ -113,14 +101,11 @@ func (r *Reader) ReadUntil(seps, terms []byte) (tok []byte, isTerm bool, c byte)
 	return tok, false, 0
 }
 
-//
 // Rest return the rest of unreaded buffer.
-//
 func (r *Reader) Rest() []byte {
 	return r.V[r.X:]
 }
 
-//
 // ScanInt64 convert textual representation of number into int64 and return
 // it.
 // Any spaces before actual reading of text will be ignored.
@@ -129,7 +114,6 @@ func (r *Reader) Rest() []byte {
 //
 // On success, c is non digit character that terminate scan, if its 0, its
 // mean EOF.
-//
 func (r *Reader) ScanInt64() (n int64, c byte) {
 	var min int64 = 1
 	if len(r.V) == r.X {
@@ -166,9 +150,7 @@ func (r *Reader) ScanInt64() (n int64, c byte) {
 	return n, c
 }
 
-//
 // SkipN skip reading n bytes from buffer and return true if EOF.
-//
 func (r *Reader) SkipN(n int) bool {
 	r.X += n
 	if r.X >= len(r.V) {
@@ -178,11 +160,9 @@ func (r *Reader) SkipN(n int) bool {
 	return false
 }
 
-//
 // SkipSpaces read until no white spaces found and return the first byte that
 // is not white spaces.
 // On EOF, it will return 0.
-//
 func (r *Reader) SkipSpaces() (c byte) {
 	for r.X < len(r.V) {
 		c = r.V[r.X]
@@ -195,11 +175,9 @@ func (r *Reader) SkipSpaces() (c byte) {
 	return 0
 }
 
-//
 // SkipHorizontalSpace read until no space, carriage return, or tab occurred
 // on buffer.
 // On EOF it will return 0.
-//
 func (r *Reader) SkipHorizontalSpace() (n int, c byte) {
 	for r.X < len(r.V) {
 		if r.V[r.X] == '\t' || r.V[r.X] == '\r' || r.V[r.X] == ' ' {
@@ -215,9 +193,7 @@ func (r *Reader) SkipHorizontalSpace() (n int, c byte) {
 	return n, r.V[r.X]
 }
 
-//
 // SkipUntil skip reading content until one of separator found or EOF.
-//
 func (r *Reader) SkipUntil(seps []byte) (c byte) {
 	for r.X < len(r.V) {
 		c = r.V[r.X]
@@ -232,9 +208,7 @@ func (r *Reader) SkipUntil(seps []byte) (c byte) {
 	return 0
 }
 
-//
 // SkipLine skip reading content until newline.
-//
 func (r *Reader) SkipLine() {
 	for r.X < len(r.V) {
 		if r.V[r.X] == '\n' {
@@ -245,19 +219,15 @@ func (r *Reader) SkipLine() {
 	}
 }
 
-//
 // String return all unreaded content as string.
-//
 func (r *Reader) String() string {
 	return string(r.V[r.X:])
 }
 
-//
 // UnreadN unread the buffer N characters and return the character its pointed
 // to.
 // If N greater than buffer length, it will reset the pointer index back to
 // zero.
-//
 func (r *Reader) UnreadN(n int) byte {
 	if n > r.X {
 		r.X = 0

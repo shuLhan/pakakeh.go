@@ -4,9 +4,7 @@
 
 package email
 
-//
 // FieldType represent numerical identification of field name.
-//
 type FieldType int
 
 // List of valid email envelope headers.
@@ -53,9 +51,7 @@ const (
 	FieldTypeDKIMSignature
 )
 
-//
 // fieldNames contains mapping between field type and their lowercase name.
-//
 var fieldNames = map[FieldType][]byte{
 	FieldTypeDate: []byte("date"),
 

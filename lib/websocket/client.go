@@ -41,7 +41,6 @@ var (
 	ErrConnClosed = fmt.Errorf("websocket: client is not connected")
 )
 
-//
 // Client for WebSocket protocol.
 //
 // Unlike HTTP client or other most commmon TCP oriented client, the WebSocket
@@ -57,7 +56,7 @@ var (
 // Due to this model, the way to handle response from server is centralized
 // using handlers instead of using single send request-response.
 //
-// Client Example
+// # Client Example
 //
 // The following snippet show how to create a client and handling response
 // from request or broadcast from server,
@@ -86,7 +85,6 @@ var (
 // underlying connection automatically.
 // Implementor can check closed connection from error returned from Send
 // methods to match with ErrConnClosed.
-//
 type Client struct {
 	sync.Mutex
 	conn net.Conn
@@ -169,9 +167,7 @@ type Client struct {
 	gracefulClose chan bool
 }
 
-//
 // Close gracefully close the client connection.
-//
 func (cl *Client) Close() (err error) {
 	cl.Lock()
 	defer cl.Unlock()
@@ -213,9 +209,7 @@ loop:
 	return err
 }
 
-//
 // Connect to endpoint.
-//
 func (cl *Client) Connect() (err error) {
 	err = cl.init()
 	if err != nil {
@@ -260,17 +254,13 @@ func (cl *Client) Connect() (err error) {
 	return nil
 }
 
-//
 // dummyHandle define dummy handle for HandleText and HandleBin.
-//
 func dummyHandle(cl *Client, frame *Frame) error {
 	return nil
 }
 
-//
 // init parse the endpoint URI and (re) initialize the client remote address
 // and headers.
-//
 func (cl *Client) init() (err error) {
 	if cl.HandleBin == nil {
 		cl.HandleBin = dummyHandle
@@ -301,7 +291,6 @@ func (cl *Client) init() (err error) {
 	return nil
 }
 
-//
 // parseURI parse WebSocket connection URI from Endpoint and get the remote
 // URL (for checking up scheme) and remote address.
 // By default, if no port is given, it will be set to 80 or 443 for "wss" or
@@ -309,7 +298,6 @@ func (cl *Client) init() (err error) {
 //
 // On success it will set the remote address that can be used on open().
 // On fail it will return an error.
-//
 func (cl *Client) parseURI() (err error) {
 	cl.remoteURL, err = url.ParseRequestURI(cl.Endpoint)
 	if err != nil {
@@ -343,11 +331,9 @@ func (cl *Client) parseURI() (err error) {
 	return nil
 }
 
-//
 // open TCP connection to WebSocket remote address.
 // If client "TLSConfig" field is not nil, the connection is opened with TLS
 // protocol and the remote name MUST have a valid certificate.
-//
 func (cl *Client) open() (err error) {
 	dialer := &net.Dialer{
 		Timeout: 30 * time.Second,
@@ -371,9 +357,7 @@ func (cl *Client) open() (err error) {
 	return nil
 }
 
-//
 // handshake send the WebSocket opening handshake.
-//
 func (cl *Client) handshake() (rest []byte, err error) {
 	var bb bytes.Buffer
 
@@ -437,9 +421,7 @@ func (cl *Client) doHandshake(keyAccept string, req []byte) (
 	return rest, nil
 }
 
-//
 // handleBadRequest by sending Close frame with status.
-//
 func (cl *Client) handleBadRequest() {
 	frameClose := NewFrameClose(true, StatusBadRequest, nil)
 
@@ -449,9 +431,7 @@ func (cl *Client) handleBadRequest() {
 	}
 }
 
-//
 // clientOnClose request from server.
-//
 func clientOnClose(cl *Client, frame *Frame) error {
 	switch {
 	case frame.closeCode == 0:
@@ -512,9 +492,7 @@ func clientOnClose(cl *Client, frame *Frame) error {
 	return nil
 }
 
-//
 // handleFragment will handle continuation frame (fragmentation).
-//
 func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Client.handleFragment: frame:{fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
@@ -581,9 +559,7 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 	return false
 }
 
-//
 // handleFrame handle a single frame from client.
-//
 func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 	if !frame.isValid(false, cl.allowRsv1, cl.allowRsv2, cl.allowRsv3) {
 		cl.handleBadRequest()
@@ -658,9 +634,7 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
 	return rest, nil
 }
 
-//
 // handleInvalidData by sending Close frame with status 1007.
-//
 func (cl *Client) handleInvalidData() {
 	frameClose := NewFrameClose(true, StatusInvalidData, nil)
 
@@ -670,9 +644,7 @@ func (cl *Client) handleInvalidData() {
 	}
 }
 
-//
 // handleRaw packet from server.
-//
 func (cl *Client) handleRaw(packet []byte) (isClosing bool) {
 	frames := Unpack(packet)
 	if frames == nil {
@@ -694,52 +666,40 @@ func (cl *Client) handleRaw(packet []byte) (isClosing bool) {
 	return false
 }
 
-//
 // SendBin send data frame as binary to server.
 // If handler is nil, no response will be read from server.
-//
 func (cl *Client) SendBin(payload []byte) error {
 	packet := NewFrameBin(true, payload)
 	return cl.send(packet)
 }
 
-//
 // sendClose send the control CLOSE frame to server.
-//
 func (cl *Client) sendClose(status CloseCode, payload []byte) (err error) {
 	packet := NewFrameClose(true, status, payload)
 	return cl.send(packet)
 }
 
-//
 // SendPing send control PING frame to server, expecting PONG as response.
-//
 func (cl *Client) SendPing(payload []byte) error {
 	packet := NewFramePing(true, payload)
 	return cl.send(packet)
 }
 
-//
 // SendPong send the control frame PONG to server, by using payload from PING
 // frame.
-//
 func (cl *Client) SendPong(payload []byte) error {
 	packet := NewFramePong(true, payload)
 	return cl.send(packet)
 }
 
-//
 // SendText send data frame as text to server.
 // If handler is nil, no response will be read from server.
-//
 func (cl *Client) SendText(payload []byte) (err error) {
 	packet := NewFrameText(true, payload)
 	return cl.send(packet)
 }
 
-//
 // serve read one data frame at a time from server and propagated to handler.
-//
 func (cl *Client) serve() {
 	if cl.conn == nil {
 		log.Println("websocket: Client.serve: client is not connected")
@@ -782,11 +742,9 @@ func (cl *Client) serve() {
 	cl.Quit()
 }
 
-//
 // Quit force close the client connection without sending CLOSE control frame.
 // This function MUST be used only when error receiving packet from server
 // (e.g. lost connection) to release the resource.
-//
 func (cl *Client) Quit() {
 	cl.Lock()
 	if cl.conn == nil {
@@ -804,10 +762,8 @@ func (cl *Client) Quit() {
 	}
 }
 
-//
 // clientOnPing default handler when client receive control PING frame from
 // server.
-//
 func clientOnPing(cl *Client, frame *Frame) error {
 	if frame == nil {
 		return nil
@@ -815,9 +771,7 @@ func clientOnPing(cl *Client, frame *Frame) error {
 	return cl.SendPong(frame.payload)
 }
 
-//
 // recv read raw stream from server.
-//
 func (cl *Client) recv() (packet []byte, err error) {
 	if cl.conn == nil {
 		return nil, ErrConnClosed
@@ -887,9 +841,7 @@ func (cl *Client) send(packet []byte) (err error) {
 	return nil
 }
 
-//
 // pinger send the PING control frame every 10 seconds.
-//
 func (cl *Client) pinger() {
 	var err error
 

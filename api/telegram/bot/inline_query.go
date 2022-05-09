@@ -4,11 +4,9 @@
 
 package bot
 
-//
 // InlineQuery represents an incoming inline query.
 // When the user sends an empty query, your bot could return some default or
 // trending results.
-//
 type InlineQuery struct {
 	ID    string `json:"id"`    // Unique identifier for this qery
 	From  *User  `json:"from"`  // Sender

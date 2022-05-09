@@ -9,9 +9,7 @@ import (
 	"strconv"
 )
 
-//
 // ToBytes convert slice of string into slice of slice of bytes.
-//
 func ToBytes(ss []string) (sv [][]byte) {
 	for x := 0; x < len(ss); x++ {
 		sv = append(sv, []byte(ss[x]))
@@ -19,10 +17,8 @@ func ToBytes(ss []string) (sv [][]byte) {
 	return sv
 }
 
-//
 // ToFloat64 convert slice of string to slice of float64. If converted
 // string return error it will set the float value to 0.
-//
 func ToFloat64(ss []string) (sv []float64) {
 	var v float64
 	var e error
@@ -39,10 +35,8 @@ func ToFloat64(ss []string) (sv []float64) {
 	return
 }
 
-//
 // ToInt64 convert slice of string to slice of int64. If converted
 // string return an error it will set the integer value to 0.
-//
 func ToInt64(ss []string) (sv []int64) {
 	for _, s := range ss {
 		v, e := strconv.ParseInt(s, 10, 64)
@@ -66,9 +60,7 @@ func ToInt64(ss []string) (sv []int64) {
 	return
 }
 
-//
 // ToStrings convert slice of interface to slice of string.
-//
 func ToStrings(is []interface{}) (vs []string) {
 	for x := 0; x < len(is); x++ {
 		v := fmt.Sprintf("%v", is[x])

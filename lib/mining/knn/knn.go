@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package knn implement the K Nearest Neighbor using Euclidean to compute the
 // distance between samples.
-//
 package knn
 
 import (
@@ -22,9 +20,7 @@ const (
 	TEuclidianDistance = 0
 )
 
-//
 // Runtime parameters for KNN processing.
-//
 type Runtime struct {
 	// DistanceMethod define how the distance between sample will be
 	// measured.
@@ -38,10 +34,8 @@ type Runtime struct {
 	AllNeighbors Neighbors
 }
 
-//
 // ComputeEuclidianDistance compute the distance of instance with each sample in
 // dataset `samples` and return it.
-//
 func (in *Runtime) ComputeEuclidianDistance(samples *tabula.Rows,
 	instance *tabula.Row,
 ) {
@@ -74,10 +68,8 @@ func (in *Runtime) ComputeEuclidianDistance(samples *tabula.Rows,
 	sort.Sort(&in.AllNeighbors)
 }
 
-//
 // FindNeighbors Given sample set and an instance, return the nearest neighbors as
 // a slice of neighbors.
-//
 func (in *Runtime) FindNeighbors(samples *tabula.Rows, instance *tabula.Row) (
 	kneighbors Neighbors,
 ) {

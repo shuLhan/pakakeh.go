@@ -33,10 +33,8 @@ const (
 		" (github.com/shuLhan/share/lib/http; ms@kilabit.info)"
 )
 
-//
 // Client is a wrapper for standard http.Client with simplified usabilities,
 // including setting default headers, uncompressing response body.
-//
 type Client struct {
 	flateReader io.ReadCloser
 	gzipReader  *gzip.Reader
@@ -46,12 +44,10 @@ type Client struct {
 	*http.Client
 }
 
-//
 // NewClient create and initialize new Client.
 //
 // The client will have KeepAlive timeout set to 30 seconds, with 1 maximum
 // idle connection, and 90 seconds IdleConnTimeout.
-//
 func NewClient(opts *ClientOptions) (client *Client) {
 	opts.init()
 
@@ -83,11 +79,9 @@ func NewClient(opts *ClientOptions) (client *Client) {
 	return client
 }
 
-//
 // Delete send the DELETE request to server using path and params as query
 // parameters.
 // On success, it will return the uncompressed response body.
-//
 func (client *Client) Delete(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -98,10 +92,8 @@ func (client *Client) Delete(path string, headers http.Header, params url.Values
 	return client.doRequest(http.MethodDelete, headers, path, "", nil)
 }
 
-//
 // Do overwrite the standard http Client.Do to allow debugging request and
 // response, and to read and return the response body immediately.
-//
 func (client *Client) Do(httpRequest *http.Request) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -151,7 +143,6 @@ func (client *Client) Do(httpRequest *http.Request) (
 	return httpRes, resBody, nil
 }
 
-//
 // Download a resource from remote server and write it into
 // DownloadRequest.Output.
 //
@@ -159,7 +150,6 @@ func (client *Client) Do(httpRequest *http.Request) (
 // ErrClientDownloadNoOutput.
 // If server return HTTP code beside 200, it will return non-nil
 // http.Response with an error.
-//
 func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err error) {
 	var (
 		logp     = "Download"
@@ -203,7 +193,6 @@ out:
 	return httpRes, err
 }
 
-//
 // GenerateHttpRequest generate http.Request from method, path, requestType,
 // headers, and params.
 //
@@ -226,7 +215,6 @@ out:
 //
 // * If requestType is RequestTypeJSON and params is not nil, the params will
 // be encoded as JSON in body.
-//
 func (client *Client) GenerateHttpRequest(
 	method RequestMethod,
 	path string,
@@ -312,11 +300,9 @@ func (client *Client) GenerateHttpRequest(
 	return httpRequest, nil
 }
 
-//
 // Get send the GET request to server using path and params as query
 // parameters.
 // On success, it will return the uncompressed response body.
-//
 func (client *Client) Get(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -327,10 +313,8 @@ func (client *Client) Get(path string, headers http.Header, params url.Values) (
 	return client.doRequest(http.MethodGet, headers, path, "", nil)
 }
 
-//
 // Post send the POST request to path without setting "Content-Type".
 // If the params is not nil, it will send as query parameters in the path.
-//
 func (client *Client) Post(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -341,10 +325,8 @@ func (client *Client) Post(path string, headers http.Header, params url.Values) 
 	return client.doRequest(http.MethodPost, headers, path, "", nil)
 }
 
-//
 // PostForm send the POST request to path using
 // "application/x-www-form-urlencoded".
-//
 func (client *Client) PostForm(path string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -353,10 +335,8 @@ func (client *Client) PostForm(path string, headers http.Header, params url.Valu
 	return client.doRequest(http.MethodPost, headers, path, ContentTypeForm, body)
 }
 
-//
 // PostFormData send the POST request to path with all parameters is send
 // using "multipart/form-data".
-//
 func (client *Client) PostFormData(
 	path string,
 	headers http.Header,
@@ -374,10 +354,8 @@ func (client *Client) PostFormData(
 	return client.doRequest(http.MethodPost, headers, path, contentType, body)
 }
 
-//
 // PostJSON send the POST request with content type set to "application/json"
 // and params encoded automatically to JSON.
-//
 func (client *Client) PostJSON(path string, headers http.Header, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -391,10 +369,8 @@ func (client *Client) PostJSON(path string, headers http.Header, params interfac
 	return client.doRequest(http.MethodPost, headers, path, ContentTypeJSON, body)
 }
 
-//
 // Put send the HTTP PUT request with specific content type and body to
 // specific path at the server.
-//
 func (client *Client) Put(path string, headers http.Header, body []byte) (
 	*http.Response, []byte, error,
 ) {
@@ -402,10 +378,8 @@ func (client *Client) Put(path string, headers http.Header, body []byte) (
 	return client.doRequest(http.MethodPut, headers, path, "", bodyReader)
 }
 
-//
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
-//
 func (client *Client) PutJSON(path string, headers http.Header, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
@@ -444,9 +418,7 @@ func (client *Client) doRequest(
 	return client.Do(httpReq)
 }
 
-//
 // setUserAgent set the User-Agent header only if its not defined by user.
-//
 func (client *Client) setUserAgent() {
 	v := client.opts.Headers.Get(HeaderUserAgent)
 	if len(v) > 0 {
@@ -455,11 +427,9 @@ func (client *Client) setUserAgent() {
 	client.opts.Headers.Set(HeaderUserAgent, defUserAgent)
 }
 
-//
 // uncompress the response body only if the response.Uncompressed is false or
 // user's is not explicitly disable compression and the Content-Type is
 // "text/*" or JSON.
-//
 func (client *Client) uncompress(res *http.Response, body []byte) (
 	out []byte, err error,
 ) {

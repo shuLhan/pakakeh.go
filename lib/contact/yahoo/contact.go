@@ -10,9 +10,7 @@ import (
 	"github.com/shuLhan/share/lib/contact"
 )
 
-//
 // Contact define the contact item in response.
-//
 type Contact struct {
 	Fields []Field `json:"fields"`
 
@@ -25,10 +23,8 @@ type Contact struct {
 	//Meta
 }
 
-//
 // Decode will convert the interface value in each field into its struct
 // representation.
-//
 func (c *Contact) Decode() (to *contact.Record) {
 	to = &contact.Record{}
 
@@ -42,12 +38,10 @@ func (c *Contact) Decode() (to *contact.Record) {
 	return
 }
 
-//
 // ParseJSON will parse JSON input and return contact.Record object on
 // success.
 //
 // On fail it will return nil and error.
-//
 func ParseJSON(jsonb []byte) (to *contact.Record, err error) {
 	ycontact := &Contact{}
 

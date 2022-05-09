@@ -4,9 +4,7 @@
 
 package smtp
 
-//
 // ClientOptions contains all options to create new client.
-//
 type ClientOptions struct {
 	// LocalName define the client domain address, used when issuing EHLO
 	// command to server.

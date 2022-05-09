@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package exec wrap the standar package "os/exec" to simplify calling Run
 // with stdout and stderr.
-//
 package exec
 
 import (
@@ -15,11 +13,9 @@ import (
 	"strings"
 )
 
-//
 // ParseCommandArgs parse the input string into command and arguments.
 // This function detect single, double, or back quote on arguments; and
 // escaped spaces using backslash.
-//
 func ParseCommandArgs(in string) (cmd string, args []string) {
 	var (
 		prev    rune
@@ -106,10 +102,8 @@ func ParseCommandArgs(in string) (cmd string, args []string) {
 	return cmd, args
 }
 
-//
 // Run the command and arguments in the string cmd.
 // If stdout or stderr is nil, it will default to os.Stdout and/or os.Stderr.
-//
 func Run(command string, stdout, stderr io.Writer) (err error) {
 	cmd, args := ParseCommandArgs(command)
 

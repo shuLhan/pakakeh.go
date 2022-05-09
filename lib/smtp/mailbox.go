@@ -4,9 +4,7 @@
 
 package smtp
 
-//
 // Mailbox represent a mailbox format.
-//
 type Mailbox struct {
 	Name   string // Name of user in system.
 	Local  string // Local part.

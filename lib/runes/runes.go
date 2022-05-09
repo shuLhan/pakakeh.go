@@ -2,21 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package runes provide a library for working with a single rune or slice of
 // rune.
-//
 package runes
 
 import (
 	"unicode"
 )
 
-//
 // Contain find a rune `c` inside `s`.
 // If `c` found in `s` it will return boolean true and index of `c` in `s`;
 // otherwise it will return false and -1.
-//
 func Contain(s []rune, c rune) (bool, int) {
 	for x, v := range s {
 		if v == c {
@@ -26,9 +22,7 @@ func Contain(s []rune, c rune) (bool, int) {
 	return false, -1
 }
 
-//
 // Diff return the difference between two slice of rune.
-//
 func Diff(l []rune, r []rune) (diff []rune) {
 	var found bool
 	dupDiff := []rune{}
@@ -67,14 +61,12 @@ func Diff(l []rune, r []rune) (diff []rune) {
 	return diff
 }
 
-//
 // EncloseRemove given a line, remove all characters inside it, starting
 // from `leftcap` until the `rightcap` and return cutted line and changed to
 // true.
 //
 // If no `leftcap` or `rightcap` is found, the line will unchanged, and
 // returned status will be false.
-//
 func EncloseRemove(line, leftcap, rightcap []rune) ([]rune, bool) {
 	lidx := TokenFind(line, leftcap, 0)
 	ridx := TokenFind(line, rightcap, lidx+1)
@@ -91,11 +83,9 @@ func EncloseRemove(line, leftcap, rightcap []rune) ([]rune, bool) {
 	return newline, true
 }
 
-//
 // FindSpace find any unicode spaces in line start from index `startAt` and
 // return their index.
 // If no spaces found it will return -1.
-//
 func FindSpace(line []rune, startAt int) (idx int) {
 	lineLen := len(line)
 	if startAt < 0 {
@@ -110,10 +100,8 @@ func FindSpace(line []rune, startAt int) (idx int) {
 	return -1
 }
 
-//
 // Inverse the input slice of rune with inplace reversion (without allocating
 // another slice).
-//
 func Inverse(in []rune) []rune {
 	var (
 		left, right rune
@@ -129,12 +117,10 @@ func Inverse(in []rune) []rune {
 	return in
 }
 
-//
 // TokenFind will search token in text starting from index `startAt` and
 // return the position where the match start.
 //
 // If no token is found it will return -1.
-//
 func TokenFind(line, token []rune, startAt int) (at int) {
 	y := 0
 	tokenlen := len(token)

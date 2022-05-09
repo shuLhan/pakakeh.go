@@ -71,9 +71,7 @@ func newZoneParser(file string) *zoneParser {
 	}
 }
 
-//
 // Init parse zoneParser file from string.
-//
 func (m *zoneParser) Init(data, origin string, ttl uint32) {
 	m.zone = NewZone("(data)", "")
 	m.lineno = 1
@@ -85,7 +83,6 @@ func (m *zoneParser) Init(data, origin string, ttl uint32) {
 	m.reader.Init([]byte(data))
 }
 
-//
 // The format of these files is a sequence of entries.  Entries are
 // predominantly line-oriented, though parentheses can be used to continue
 // a list of items across a line boundary, and text literals can contain
@@ -96,15 +93,15 @@ func (m *zoneParser) Init(data, origin string, ttl uint32) {
 //
 // The following entries are defined:
 //
-//    <blank>[<comment>]
+//	<blank>[<comment>]
 //
-//    $ORIGIN <domain-name> [<comment>]
+//	$ORIGIN <domain-name> [<comment>]
 //
-//    $INCLUDE <file-name> [<domain-name>] [<comment>]
+//	$INCLUDE <file-name> [<domain-name>] [<comment>]
 //
-//    <domain-name><rr> [<comment>]
+//	<domain-name><rr> [<comment>]
 //
-//    <blank><rr> [<comment>]
+//	<blank><rr> [<comment>]
 //
 // Blank lines, with or without comments, are allowed anywhere in the file.
 //
@@ -142,22 +139,25 @@ func (m *zoneParser) Init(data, origin string, ttl uint32) {
 // @               A free standing @ is used to denote the current origin.
 //
 // \X              where X is any character other than a digit (0-9), is
-//                 used to quote that character so that its special meaning
-//                 does not apply.  For example, "\." can be used to place
-//                 a dot character in a label.
+//
+//	used to quote that character so that its special meaning
+//	does not apply.  For example, "\." can be used to place
+//	a dot character in a label.
 //
 // \DDD            where each D is a digit is the octet corresponding to
-//                 the decimal number described by DDD.  The resulting
-//                 octet is assumed to be text and is not checked for
-//                 special meaning.
+//
+//	the decimal number described by DDD.  The resulting
+//	octet is assumed to be text and is not checked for
+//	special meaning.
 //
 // ( )             Parentheses are used to group data that crosses a line
-//                 boundary.  In effect, line terminations are not
-//                 recognized within parentheses.
+//
+//	boundary.  In effect, line terminations are not
+//	recognized within parentheses.
 //
 // ;               Semicolon is used to start a comment; the remainder of
-//                 the line is ignored.
 //
+//	the line is ignored.
 func (m *zoneParser) parse() (err error) {
 	var rr *ResourceRecord
 
@@ -218,9 +218,7 @@ func (m *zoneParser) parse() (err error) {
 	return nil
 }
 
-//
-//    $ORIGIN <domain-name> [<comment>]
-//
+// $ORIGIN <domain-name> [<comment>]
 func (m *zoneParser) parseDirectiveOrigin() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
@@ -256,9 +254,7 @@ func (m *zoneParser) parseDirectiveOrigin() (err error) {
 	return nil
 }
 
-//
-//    $INCLUDE <file-name> [<domain-name>] [<comment>]
-//
+// $INCLUDE <file-name> [<domain-name>] [<comment>]
 func (m *zoneParser) parseDirectiveInclude() (err error) {
 	_, c := m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
@@ -358,9 +354,7 @@ func (m *zoneParser) parseDirectiveTTL() (err error) {
 	return nil
 }
 
-//
 // parseTTL convert characters of duration, with or without unit, to seconds.
-//
 func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 	var (
 		v   uint64
@@ -388,12 +382,11 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 	return seconds, nil
 }
 
-//
 // <rr> contents take one of the following forms:
 //
-//    [<TTL>] [<class>] <type> <RDATA>
+//	[<TTL>] [<class>] <type> <RDATA>
 //
-//    [<class>] [<TTL>] <type> <RDATA>
+//	[<class>] [<TTL>] <type> <RDATA>
 //
 // The RR begins with optional TTL and class fields, followed by a type and
 // RDATA field appropriate to the type and class.  Class and type use the
@@ -402,7 +395,6 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 // class mnemonics are disjoint, the parse is unique.  (Note that this
 // order is different from the order used in examples and the order used in
 // the actual RRs; the given order allows easier parsing and defaulting.)
-//
 func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 	rr *ResourceRecord, err error,
 ) {
@@ -540,10 +532,8 @@ out:
 	return rr, nil
 }
 
-//
 // parseRRClassOrType check if token either class or type.
 // It will return true if one of them is set, otherwise it will return false.
-//
 func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 	isClass := m.parseRRClass(rr, stok)
 	if isClass {
@@ -560,11 +550,9 @@ func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 	return false
 }
 
-//
 // parseRRClass check if token is known class.
 // It will set the rr.Class and return true if stok is one of known class;
 // otherwise it will return false.
-//
 func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 	for k, v := range RecordClasses {
 		if stok == k {
@@ -575,11 +563,9 @@ func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 	return false
 }
 
-//
 // parseRRType check if token is one of known query type.
 // It will set rr.Type and return true if token found, otherwise it will
 // return false.
-//
 func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
 	for k, v := range RecordTypes {
 		if stok == k {
@@ -855,13 +841,11 @@ func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	return nil
 }
 
-//
 // parseTXT parse TXT resource data.  The TXT rdata use the following format,
 //
 //	DQUOTE text DQUOTE
 //
 // The rdata MUST contains double quote at the beginning and end of text.
-//
 func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	tok, _, _ := m.reader.ReadUntil(nil, []byte{'\n'})
 	v = append(v, tok...)
@@ -968,11 +952,9 @@ func (m *zoneParser) generateDomainName(dname []byte) (out string) {
 	return out
 }
 
-//
 // push resource record (RR) into message answer only if domain name, type,
 // and class already exist; otherwise it will create new message with question
 // based on RR.
-//
 func (m *zoneParser) push(rr *ResourceRecord) error {
 	m.lastRR = rr
 	return m.zone.Add(rr)

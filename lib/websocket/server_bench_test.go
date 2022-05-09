@@ -1,9 +1,7 @@
-//
 // This benchmark is taken from github.com/gobwas/ws [1][2].
 //
 // [1] https://github.com/gobwas/ws/blob/master/server_test.go
 // [2] https://medium.freecodecamp.org/million-websockets-and-go-cc58418460bb
-//
 package websocket
 
 import (

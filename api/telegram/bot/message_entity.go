@@ -22,10 +22,8 @@ const (
 	EntityTypeTextMention   = "text_mention"  // for users without usernames.
 )
 
-//
 // MessageEntity represents one special entity in a text message. For example,
 // hashtags, usernames, URLs, etc.
-//
 type MessageEntity struct {
 	// Type of the entity.
 	Type string `json:"type"`

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package smote resamples a dataset by applying the Synthetic Minority
 // Oversampling TEchnique (SMOTE). The original dataset must fit entirely in
 // memory.  The amount of SMOTE and number of nearest neighbors may be specified.
@@ -10,7 +9,6 @@
 //
 // Nitesh V. Chawla et. al. (2002). Synthetic Minority Over-sampling
 // Technique. Journal of Artificial Intelligence Research. 16:321-357.
-//
 package smote
 
 import (
@@ -23,9 +21,7 @@ import (
 	"github.com/shuLhan/share/lib/tabula"
 )
 
-//
 // Runtime for input and output.
-//
 type Runtime struct {
 	// Runtime the K-Nearest-Neighbourhood parameters.
 	knn.Runtime
@@ -39,9 +35,7 @@ type Runtime struct {
 	Synthetics tabula.Dataset
 }
 
-//
 // New create and return new smote runtime.
-//
 func New(percentOver, k, classIndex int) (smoteRun *Runtime) {
 	smoteRun = &Runtime{
 		Runtime: knn.Runtime{
@@ -54,9 +48,7 @@ func New(percentOver, k, classIndex int) (smoteRun *Runtime) {
 	return
 }
 
-//
 // Init will recheck input and set to default value if its not valid.
-//
 func (smote *Runtime) Init() {
 	rand.Seed(time.Now().UnixNano())
 
@@ -68,16 +60,12 @@ func (smote *Runtime) Init() {
 	}
 }
 
-//
 // GetSynthetics return synthetic samples.
-//
 func (smote *Runtime) GetSynthetics() tabula.DatasetInterface {
 	return &smote.Synthetics
 }
 
-//
 // populate will generate new synthetic sample using nearest neighbors.
-//
 func (smote *Runtime) populate(instance *tabula.Row, neighbors knn.Neighbors) {
 	lenAttr := len(*instance)
 
@@ -114,7 +102,6 @@ func (smote *Runtime) populate(instance *tabula.Row, neighbors knn.Neighbors) {
 	}
 }
 
-//
 // Resampling will run resampling algorithm using values that has been defined
 // in `Runtime` and return list of synthetic samples.
 //
@@ -124,15 +111,15 @@ func (smote *Runtime) populate(instance *tabula.Row, neighbors knn.Neighbors) {
 //
 // (0) If oversampling percentage less than 100, then
 // (0.1) replace the input dataset by selecting n random sample from dataset
-//       without replacement, where n is
 //
-//	(percentage-oversampling / 100) * number-of-sample
+//	      without replacement, where n is
+//
+//		(percentage-oversampling / 100) * number-of-sample
 //
 // (1) For each `sample` in dataset,
 // (1.1) find k-nearest-neighbors of `sample`,
 // (1.2) generate synthetic sample in neighbors.
 // (2) Write synthetic samples to file, only if `SyntheticFile` is not empty.
-//
 func (smote *Runtime) Resampling(dataset tabula.Rows) (e error) {
 	smote.Init()
 
@@ -163,9 +150,7 @@ func (smote *Runtime) Resampling(dataset tabula.Rows) (e error) {
 	return
 }
 
-//
 // Write will write synthetic samples to file defined in `file`.
-//
 func (smote *Runtime) Write(file string) error {
 	return resampling.WriteSynthetics(smote, file)
 }

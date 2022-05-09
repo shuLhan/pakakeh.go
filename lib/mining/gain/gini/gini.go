@@ -2,12 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
 // Package gini contain function to calculating Gini gain.
 //
 // Gini gain, which is an impurity-based criterion that measures the divergences
 // between the probability distribution of the target attributes' values.
-//
 package gini
 
 import (
@@ -18,10 +16,8 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
-//
 // Gini contain slice of sorted index, slice of partition values, slice of Gini
 // index, Gini value for all samples.
-//
 type Gini struct {
 	// Skip if its true, the gain value would not be searched on this
 	// instance.
@@ -54,13 +50,11 @@ type Gini struct {
 	Gain []float64
 }
 
-//
 // ComputeDiscrete Given an attribute "src" with discrete value 'discval', and
 // the target attribute "target" which contain n classes, compute the
 // information gain of "src".
 //
 // The result is saved as gain value in MaxGainValue for each partition.
-//
 func (gini *Gini) ComputeDiscrete(src, discval, target, classes *[]string) {
 	gini.IsContinu = false
 
@@ -81,9 +75,7 @@ func (gini *Gini) ComputeDiscrete(src, discval, target, classes *[]string) {
 	gini.computeDiscreteGain(src, target, classes)
 }
 
-//
 // computeDiscreteGain will compute Gini index and Gain for each partition.
-//
 func (gini *Gini) computeDiscreteGain(src, target, classes *[]string) {
 	// number of samples
 	nsample := float64(len(*src))
@@ -160,10 +152,8 @@ func (gini *Gini) computeDiscreteGain(src, target, classes *[]string) {
 	}
 }
 
-//
 // createDiscretePartition will create possible combination for discrete value
 // in DiscretePart.
-//
 func (gini *Gini) createDiscretePartition(discval []string) {
 	// no discrete values ?
 	if len(discval) == 0 {
@@ -175,13 +165,11 @@ func (gini *Gini) createDiscretePartition(discval []string) {
 	gini.DiscretePart = libstrings.Partition(discval, 2)
 }
 
-//
 // ComputeContinu Given an attribute "src" and the target attribute "target"
 // which contain n classes, compute the information gain of "src".
 //
 // The result of Gini partitions value, Gini Index, and Gini Gain is saved in
 // ContinuPart, Index, and Gain.
-//
 func (gini *Gini) ComputeContinu(src *[]float64, target, classes *[]string) {
 	gini.IsContinu = true
 
@@ -215,11 +203,9 @@ func (gini *Gini) ComputeContinu(src *[]float64, target, classes *[]string) {
 	gini.computeContinuGain(&A2, &T2, classes)
 }
 
-//
 // createContinuPartition for dividing class and computing Gini index.
 //
 // This is assuming that the data `src` has been sorted in ascending order.
-//
 func (gini *Gini) createContinuPartition(src *[]float64) {
 	l := len(*src)
 	gini.ContinuPart = make([]float64, 0)
@@ -252,13 +238,11 @@ func (gini *Gini) createContinuPartition(src *[]float64) {
 	}
 }
 
-//
 // compute value for attribute T.
 //
 // Return Gini value in the form of,
 //
 // 1 - sum (probability of each classes in T)
-//
 func (gini *Gini) compute(target, classes *[]string) float64 {
 	n := float64(len(*target))
 	if n == 0 {
@@ -282,18 +266,16 @@ func (gini *Gini) compute(target, classes *[]string) float64 {
 	return 1 - sump2
 }
 
-//
 // computeContinuGain for each partition.
 //
 // The Gini gain formula we used here is,
 //
 // Gain(part,S) = Gini(S) - ((count(left)/S * Gini(left))
-// 			+ (count(right)/S * Gini(right)))
+//   - (count(right)/S * Gini(right)))
 //
 // where,
 // - left is sub-sample from S that is less than part value.
 // - right is sub-sample from S that is greater than part value.
-//
 func (gini *Gini) computeContinuGain(src *[]float64, target, classes *[]string) {
 	var gleft, gright float64
 	var tleft, tright []string
@@ -360,9 +342,7 @@ func (gini *Gini) computeContinuGain(src *[]float64, target, classes *[]string) 
 	}
 }
 
-//
 // GetMaxPartGainValue return the partition that have the maximum Gini gain.
-//
 func (gini *Gini) GetMaxPartGainValue() interface{} {
 	if gini.IsContinu {
 		return gini.ContinuPart[gini.MaxPartGain]
@@ -371,17 +351,13 @@ func (gini *Gini) GetMaxPartGainValue() interface{} {
 	return gini.DiscretePart[gini.MaxPartGain]
 }
 
-//
 // GetMaxGainValue return the value of partition which contain the maximum Gini
 // gain.
-//
 func (gini *Gini) GetMaxGainValue() float64 {
 	return gini.MaxGainValue
 }
 
-//
 // GetMinIndexPartValue return the partition that have the minimum Gini index.
-//
 func (gini *Gini) GetMinIndexPartValue() interface{} {
 	if gini.IsContinu {
 		return gini.ContinuPart[gini.MinIndexPart]
@@ -390,17 +366,13 @@ func (gini *Gini) GetMinIndexPartValue() interface{} {
 	return gini.DiscretePart[gini.MinIndexPart]
 }
 
-//
 // GetMinIndexValue return the minimum Gini index value.
-//
 func (gini *Gini) GetMinIndexValue() float64 {
 	return gini.MinIndexValue
 }
 
-//
 // FindMaxGain find the attribute and value that have the maximum gain.
 // The returned value is index of attribute.
-//
 func FindMaxGain(gains *[]Gini) (maxGainIdx int) {
 	var gainValue float64
 	var maxGainValue float64
@@ -418,9 +390,7 @@ func FindMaxGain(gains *[]Gini) (maxGainIdx int) {
 	return maxGainIdx
 }
 
-//
 // FindMinGiniIndex return the index of attribute that have the minimum Gini index.
-//
 func FindMinGiniIndex(ginis *[]Gini) (minIndexIdx int) {
 	var indexV float64
 	minIndexV := 1.0
@@ -435,9 +405,7 @@ func FindMinGiniIndex(ginis *[]Gini) (minIndexIdx int) {
 	return minIndexIdx
 }
 
-//
 // String yes, it will print it JSON like format.
-//
 func (gini Gini) String() (s string) {
 	s = fmt.Sprint("{\n",
 		"  Skip          :", gini.Skip, "\n",

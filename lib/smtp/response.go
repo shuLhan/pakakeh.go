@@ -13,19 +13,15 @@ import (
 	libio "github.com/shuLhan/share/lib/io"
 )
 
-//
 // Response represent a generic single or multilines response from server.
-//
 type Response struct {
 	Message string
 	Body    []string
 	Code    int
 }
 
-//
 // NewResponse create and initialize new Response from parsing the raw
 // response text.
-//
 func NewResponse(raw []byte) (res *Response, err error) {
 	if len(raw) == 0 {
 		return nil, nil
@@ -63,9 +59,7 @@ func NewResponse(raw []byte) (res *Response, err error) {
 	return res, err
 }
 
-//
 // parseCode parse the first response code.
-//
 func (res *Response) parseCode(raw []byte) (code []byte, isMultiline bool, err error) {
 	code = raw[0:3]
 
@@ -83,9 +77,7 @@ func (res *Response) parseCode(raw []byte) (code []byte, isMultiline bool, err e
 	return code, isMultiline, err
 }
 
-//
 // parseMessage parse the first line of response as response Message.
-//
 func (res *Response) parseMessage(
 	reader *libio.Reader,
 	isMultiline bool,

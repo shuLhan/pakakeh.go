@@ -4,9 +4,7 @@
 
 package smtp
 
-//
 // Extension is an interface to implement extension for SMTP server.
-//
 type Extension interface {
 	//
 	// Name return the SMTP extension name to be used on reply of EHLO.

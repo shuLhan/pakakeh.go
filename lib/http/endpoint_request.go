@@ -6,7 +6,6 @@ package http
 
 import "net/http"
 
-//
 // EndpointRequest wrap the called Endpoint and common two parameters in HTTP
 // handler: the http.ResponseWriter and http.Request.
 //
@@ -14,7 +13,6 @@ import "net/http"
 // read.
 //
 // The Error field is used by CallbackErrorHandler.
-//
 type EndpointRequest struct {
 	HttpWriter  http.ResponseWriter
 	Error       error

@@ -4,9 +4,7 @@
 
 package bot
 
-//
 // PollAnswer represents an answer of a user in a non-anonymous poll.
-//
 type PollAnswer struct {
 	// Unique poll identifier
 	PollID string `json:"poll_id"`

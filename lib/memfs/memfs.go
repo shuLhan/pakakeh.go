@@ -26,9 +26,7 @@ const (
 	defContentType = "text/plain" // Default content type for empty file.
 )
 
-//
 // MemFS contains directory tree of file system in memory.
-//
 type MemFS struct {
 	http.FileSystem
 
@@ -42,12 +40,10 @@ type MemFS struct {
 	excRE   []*regexp.Regexp
 }
 
-//
 // Merge one or more instances of MemFS into single hierarchy.
 //
 // If there are two instance of Node that have the same path, the last
 // instance will be ignored.
-//
 func Merge(params ...*MemFS) (merged *MemFS) {
 	merged = &MemFS{
 		PathNodes: NewPathNode(),
@@ -83,10 +79,8 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 	return merged
 }
 
-//
 // New create and initialize new memory file system from directory Root using
 // list of regular expresssion for Including or Excluding files.
-//
 func New(opts *Options) (mfs *MemFS, err error) {
 	logp := "New"
 
@@ -102,12 +96,10 @@ func New(opts *Options) (mfs *MemFS, err error) {
 	return mfs, nil
 }
 
-//
 // AddChild add FileInfo fi as new child of parent node.
 //
 // It will return nil without an error if the system path of parent+fi.Name()
 // is excluded by one of Options.Excludes pattern.
-//
 func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
 	var (
 		logp    = "AddChild"
@@ -146,12 +138,10 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 	return child, nil
 }
 
-//
 // AddFile add the external file directly as internal file.
 // If the internal file is already exist it will be replaced.
 // Any directories in the internal path will be generated automatically if its
 // not exist.
-//
 func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err error) {
 	if len(internalPath) == 0 {
 		return nil, nil
@@ -228,10 +218,8 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 	return node, nil
 }
 
-//
 // Get the node representation of file in memory.  If path is not exist it
 // will return os.ErrNotExist.
-//
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	logp := "Get"
 
@@ -261,11 +249,9 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	return node, nil
 }
 
-//
 // Init initialize the MemFS instance.
 // This method provided to initialize MemFS if its Options is set directly,
 // not through New() function.
-//
 func (mfs *MemFS) Init() (err error) {
 	var (
 		logp = "Init"
@@ -305,46 +291,36 @@ func (mfs *MemFS) Init() (err error) {
 	return nil
 }
 
-//
 // ListNames list all files in memory sorted by name.
-//
 func (mfs *MemFS) ListNames() (paths []string) {
 	paths = mfs.PathNodes.Paths()
 	return paths
 }
 
-//
 // MarshalJSON encode the MemFS object into JSON format.
 //
 // The field that being encoded is the Root node.
-//
 func (mfs *MemFS) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	mfs.Root.packAsJson(&buf, 0)
 	return buf.Bytes(), nil
 }
 
-//
 // MustGet return the Node representation of file in memory by its path if its
 // exist or nil the path is not exist.
-//
 func (mfs *MemFS) MustGet(path string) (node *Node) {
 	node, _ = mfs.Get(path)
 	return node
 }
 
-//
 // Open the named file for reading.
 // This is an alias to Get() method, to make it implement http.FileSystem.
-//
 func (mfs *MemFS) Open(path string) (http.File, error) {
 	return mfs.Get(path)
 }
 
-//
 // RemoveChild remove a child on parent, including its map on PathNode.
 // If child is not part if node's childrens it will return nil.
-//
 func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
 	if parent != nil {
 		removed = parent.removeChild(child)
@@ -355,9 +331,7 @@ func (mfs *MemFS) RemoveChild(parent *Node, child *Node) (removed *Node) {
 	return
 }
 
-//
 // Search one or more strings in each content of files.
-//
 func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult) {
 	if len(words) == 0 {
 		return nil
@@ -416,9 +390,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 	return results
 }
 
-//
 // StopWatch stop watching for update, from calling Watch.
-//
 func (mfs *MemFS) StopWatch() {
 	if mfs.dw == nil {
 		return
@@ -427,13 +399,11 @@ func (mfs *MemFS) StopWatch() {
 	mfs.dw = nil
 }
 
-//
 // Update the node content and information in memory based on new file
 // information.
 // This method only check if the node name is equal with file name, but it's
 // not checking whether the node is part of memfs (node is parent or have the
 // same Root node).
-//
 func (mfs *MemFS) Update(node *Node, newInfo os.FileInfo) {
 	if node == nil {
 		return
@@ -476,10 +446,8 @@ func (mfs *MemFS) createRoot() error {
 	return nil
 }
 
-//
 // isExcluded will return true if the system path is excluded from being
 // watched or included.
-//
 func (mfs *MemFS) isExcluded(sysPath string, mode os.FileMode) bool {
 	var (
 		re *regexp.Regexp
@@ -492,10 +460,8 @@ func (mfs *MemFS) isExcluded(sysPath string, mode os.FileMode) bool {
 	return false
 }
 
-//
 // isIncluded will return true if the system path is filtered to be included,
 // pass the list of Includes regexp or no filter defined.
-//
 func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 	var (
 		re      *regexp.Regexp
@@ -535,9 +501,7 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 	return false
 }
 
-//
 // isWatched will return true if the system path is filtered to be watched.
-//
 func (mfs *MemFS) isWatched(sysPath string, mode os.FileMode) bool {
 	var (
 		re *regexp.Regexp
@@ -550,14 +514,12 @@ func (mfs *MemFS) isWatched(sysPath string, mode os.FileMode) bool {
 	return false
 }
 
-//
 // mount the directory recursively into the memory as root directory.
 // For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
 // access file "a" we call Get("/a"), not Get("/tmp/a").
 //
 // mount does not have any effect if current directory contains ".go"
 // file generated from GoEmbed().
-//
 func (mfs *MemFS) mount() (err error) {
 	if len(mfs.Opts.Root) == 0 {
 		return nil
@@ -659,9 +621,7 @@ out:
 	return n, err
 }
 
-//
 // refresh the tree by rescanning from the root.
-//
 func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	logp := "refresh"
 	syspath := filepath.Join(mfs.Root.SysPath, url)
@@ -684,15 +644,12 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	return node, nil
 }
 
-//
 // resetAllModTime set the modTime on Root and its childs to the t.
 // This method is only intended for testing.
-//
 func (mfs *MemFS) resetAllModTime(t time.Time) {
 	mfs.Root.resetAllModTime(t)
 }
 
-//
 // Watch create and start the DirWatcher that monitor the memfs Root
 // directory based on the list of pattern on WatchOptions.Watches and
 // Options.Includes.
@@ -702,7 +659,6 @@ func (mfs *MemFS) resetAllModTime(t time.Time) {
 //
 // The returned DirWatcher is ready to use.
 // To stop watching for update call the StopWatch.
-//
 func (mfs *MemFS) Watch(opts WatchOptions) (dw *DirWatcher, err error) {
 	var (
 		logp = "Watch"

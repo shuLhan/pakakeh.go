@@ -22,10 +22,8 @@ const (
 	FieldTypePhone    = "phone"
 )
 
-//
 // Field define a composite attribute in Contact.
 // Known value for Type: "phone", "name", "address".
-//
 type Field struct {
 	Type  string      `json:"type"`
 	Value interface{} `json:"value"`
@@ -38,9 +36,7 @@ type Field struct {
 	//Meta
 }
 
-//
 // getValueType will return the Go type of field's Value.
-//
 func (field *Field) getValueType() (
 	vmap map[string]interface{},
 	vstr string,
@@ -60,9 +56,7 @@ func (field *Field) getValueType() (
 	return
 }
 
-//
 // getFlag will return the first flag or empty string if flags fields is empty.
-//
 func (field *Field) getFlag() string {
 	if len(field.Flags) > 0 {
 		return strings.ToLower(field.Flags[0])
@@ -70,9 +64,7 @@ func (field *Field) getFlag() string {
 	return ""
 }
 
-//
 // decodeAddress will convert Yahoo address format to contact address format.
-//
 func (field *Field) decodeAddress(flag string, vmap map[string]interface{}) (
 	adr contact.Address,
 ) {
@@ -90,10 +82,8 @@ func (field *Field) decodeAddress(flag string, vmap map[string]interface{}) (
 	return
 }
 
-//
 // Decode will convert Yahoo' contact field value and save it to contact
 // Contact format.
-//
 func (field *Field) Decode(to *contact.Record) {
 	vmap, vstr, ok := field.getValueType()
 

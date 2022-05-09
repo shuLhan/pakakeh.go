@@ -15,9 +15,7 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
-//
 // TCPClient for DNS with TCP connection and list of remote addresses.
-//
 type TCPClient struct {
 	conn         net.Conn
 	addr         *net.TCPAddr
@@ -25,12 +23,10 @@ type TCPClient struct {
 	writeTimeout time.Duration
 }
 
-//
 // NewTCPClient will create new DNS client with TCP network connection.
 //
 // The nameserver contains the IP address, not host name, of parent DNS
 // server.  Default port is 53, if not set.
-//
 func NewTCPClient(nameserver string) (*TCPClient, error) {
 	_, remoteIP, remotePort := libnet.ParseIPPort(nameserver, DefaultPort)
 	if remoteIP == nil {
@@ -56,9 +52,7 @@ func NewTCPClient(nameserver string) (*TCPClient, error) {
 	return cl, nil
 }
 
-//
 // Close client connection.
-//
 func (cl *TCPClient) Close() error {
 	if cl.conn != nil {
 		return cl.conn.Close()
@@ -66,9 +60,7 @@ func (cl *TCPClient) Close() error {
 	return nil
 }
 
-//
 // Connect to remote address.
-//
 func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {
 	laddr := &net.TCPAddr{IP: nil, Port: 0}
 
@@ -77,14 +69,12 @@ func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {
 	return
 }
 
-//
 // Lookup DNS records based on MessageQuestion Name and Type, in synchronous
 // mode.
 // The MessageQuestion Class default to IN.
 //
 // It will return an error if the client does not set the name server address,
 // or no connection, or Name is empty.
-//
 func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
 	if cl.addr == nil || cl.conn == nil {
 		return nil, fmt.Errorf("Lookup: no name server or active connection")
@@ -119,10 +109,8 @@ func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 	return res, nil
 }
 
-//
 // Query send DNS query to name server.
 // The addr parameter is unused.
-//
 func (cl *TCPClient) Query(msg *Message) (res *Message, err error) {
 	_, err = cl.Write(msg.packet)
 	if err != nil {
@@ -142,34 +130,26 @@ func (cl *TCPClient) Query(msg *Message) (res *Message, err error) {
 	return res, nil
 }
 
-//
 // RemoteAddr return client remote nameserver address.
-//
 func (cl *TCPClient) RemoteAddr() string {
 	return cl.addr.String()
 }
 
-//
 // SetRemoteAddr set the remote address for sending the packet.
-//
 func (cl *TCPClient) SetRemoteAddr(addr string) (err error) {
 	cl.addr, err = net.ResolveTCPAddr("udp", addr)
 	return
 }
 
-//
 // SetTimeout for sending and receiving packet.
-//
 func (cl *TCPClient) SetTimeout(t time.Duration) {
 	cl.readTimeout = t
 	cl.writeTimeout = t
 }
 
-//
 // Write raw DNS response message on active connection.
 // This method is only used by server to write the response of query to
 // client.
-//
 func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 	if cl.writeTimeout > 0 {
 		err = cl.conn.SetWriteDeadline(time.Now().Add(cl.writeTimeout))
@@ -189,9 +169,7 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 	return
 }
 
-//
 // recv receive DNS message.
-//
 func (cl *TCPClient) recv() (res *Message, err error) {
 	if cl.readTimeout > 0 {
 		err = cl.conn.SetReadDeadline(time.Now().Add(cl.readTimeout))
