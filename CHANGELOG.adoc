@@ -6,6 +6,123 @@ Shulhan <ms@kilabit.info>
 
 This library is released every month, usually at the first week of month.
 
+[#v0.37.0]
+==  share v0.37.0 (2022-05-09)
+
+[#v0.37.0_breaking_changes]
+===  Breaking changes
+
+*  lib/dns: refactor Server RemoveCachesByNames to return removed Answer
++
+--
+Previously, RemoveCachesByNames does not return anything, its only
+print the domain name being removed if debugging level is set to >= 1.
+
+This changes rewrite the RemoveCachesByNames to return list of Answer
+being removed to allow the caller to inspect and/or print the Answer.
+--
+
+*  lib/memfs: change the Watch method to accept struct
++
+--
+Previously, we assume that the list of files being Watch-ed is same
+with the list of files in Includes.
+This may not be correct.
+For example, we may want to watch "*.ts" files only but did not want
+it to be included during GoEmbed.
+
+This changes introduce list of pattern for files to be watched in
+the `WatchOptions.Watches` field.
+If this field is empty, only files match the Includes filter will be
+watched.
+--
+
+[#v0.37.0_new_features]
+===  New features
+
+*  lib/dns: add method to get the record in HostsFile by name and/or value
++
+--
+The Get method return the first resource record that match with domain
+name and/or value.
+The value parameter is optional, if its empty, then only the first record
+that match with domain name that will be returned.
+
+If no record matched, it will return nil.
+
+While at it, reformat the hosts_file comments with next Go 1.19 format.
+--
+
+*  lib/dns: add method CachesClear to remove all caches
+
+*  lib/net: add method to populate query on ResolvConf
++
+--
+Given a domain name to be resolved, the PopulateQuery generate
+list of names to be queried based on registered Domain and Search
+in the resolv.conf file.
+
+The domain name itself will be on top of the list if its contains any
+dot.
+--
+
+*  lib/dns: add function to create new client using name server URL
++
+--
+The NewClient create new DNS client using the name server URL.
+The name server URL is defined in the same format as ServerOptions's
+NameServer.
+
+The function also accept second parameter: isInsecure, which is only
+usable for DNS over TLS and DNS over HTTPS.
+--
+
+[#v0.37.0_bug_fixes]
+===  Bug fixes
+
+*  lib/ini: fix panic when marshaling unexported field with type struct
++
+While at it, split the example for marshaling and unmarshaling
+struct into separate examples.
+
+*  lib/memfs: make the Node's addChild to be idempotent
++
+If the same Node's Path already exists on the Childs, adding another
+Node with same Path should not add the Node to the Childs.
+
+[#v0.37.0_enhancements]
+===  Enhancements
+
+*  lib/ini: implement marshaling and unmarshaling map with struct element
++
+--
+For a field F with type map[K]S `ini:"sec"`, where K is string and S is
+a struct or pointer to struct element, marshaling the field F will
+result in the following ini format,
+
+	[sec "K"]
+	<S.Field.Tag> = <S.Field.Value>
+
+Each field in struct S unmarshaled normally as "key = value".
+
+This rule is also applied when unmarshalling from ini text into map[K]V.
+
+This implementation allow multiple section with dynamic subsections as
+key.
+--
+
+[#v0.37.0_chores]
+===  Chores
+
+*  all: reformat all codes using gofmt 1.19 (the Go tip)
+
+*  all: replace any usage of ioutil package with `os` or `io`
++
+Since Go 1.16, the ioutil package has been deprecated.
+This changes replace any usage that use functions from ioutil package
+with their replacement from package os or package io.
+
+
 [#v0.36.0]
 ==  share v0.36.0 (2022-04-03)
 
@@ -752,6 +869,7 @@ Other string beside "none" will be considered as path to socket.
 
 *  math/big: return nil on Quo and QuoRat instead of panic
 +
+--
 Previously, if the first parameter of Quo or the second/next parameters
 of QuoRat is not convertable to Rat or zero, the method/function will
 panic.

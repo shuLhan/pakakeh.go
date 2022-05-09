@@ -244,6 +244,15 @@ dd {
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#v0.37.0">share v0.37.0 (2022-05-09)</a>
+<ul class="sectlevel2">
+<li><a href="#v0.37.0_breaking_changes">Breaking changes</a></li>
+<li><a href="#v0.37.0_new_features">New features</a></li>
+<li><a href="#v0.37.0_bug_fixes">Bug fixes</a></li>
+<li><a href="#v0.37.0_enhancements">Enhancements</a></li>
+<li><a href="#v0.37.0_chores">Chores</a></li>
+</ul>
+</li>
 <li><a href="#v0.36.0">share v0.36.0 (2022-04-03)</a>
 <ul class="sectlevel2">
 <li><a href="#v0.36.0_breaking_changes">Breaking changes</a></li>
@@ -560,6 +569,189 @@ dd {
 <div class="sectionbody">
 <div class="paragraph">
 <p>This library is released every month, usually at the first week of month.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0.37.0"><a class="anchor" href="#v0.37.0"></a><a class="link" href="#v0.37.0">share v0.37.0 (2022-05-09)</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="v0.37.0_breaking_changes"><a class="anchor" href="#v0.37.0_breaking_changes"></a><a class="link" href="#v0.37.0_breaking_changes">Breaking changes</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/dns: refactor Server RemoveCachesByNames to return removed Answer</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously, RemoveCachesByNames does not return anything, its only
+print the domain name being removed if debugging level is set to &gt;= 1.</p>
+</div>
+<div class="paragraph">
+<p>This changes rewrite the RemoveCachesByNames to return list of Answer
+being removed to allow the caller to inspect and/or print the Answer.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/memfs: change the Watch method to accept struct</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously, we assume that the list of files being Watch-ed is same
+with the list of files in Includes.
+This may not be correct.
+For example, we may want to watch "*.ts" files only but did not want
+it to be included during GoEmbed.</p>
+</div>
+<div class="paragraph">
+<p>This changes introduce list of pattern for files to be watched in
+the <code>WatchOptions.Watches</code> field.
+If this field is empty, only files match the Includes filter will be
+watched.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0.37.0_new_features"><a class="anchor" href="#v0.37.0_new_features"></a><a class="link" href="#v0.37.0_new_features">New features</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/dns: add method to get the record in HostsFile by name and/or value</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The Get method return the first resource record that match with domain
+name and/or value.
+The value parameter is optional, if its empty, then only the first record
+that match with domain name that will be returned.</p>
+</div>
+<div class="paragraph">
+<p>If no record matched, it will return nil.</p>
+</div>
+<div class="paragraph">
+<p>While at it, reformat the hosts_file comments with next Go 1.19 format.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: add method CachesClear to remove all caches</p>
+</li>
+<li>
+<p>lib/net: add method to populate query on ResolvConf</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Given a domain name to be resolved, the PopulateQuery generate
+list of names to be queried based on registered Domain and Search
+in the resolv.conf file.</p>
+</div>
+<div class="paragraph">
+<p>The domain name itself will be on top of the list if its contains any
+dot.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: add function to create new client using name server URL</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The NewClient create new DNS client using the name server URL.
+The name server URL is defined in the same format as ServerOptions&#8217;s
+NameServer.</p>
+</div>
+<div class="paragraph">
+<p>The function also accept second parameter: isInsecure, which is only
+usable for DNS over TLS and DNS over HTTPS.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0.37.0_bug_fixes"><a class="anchor" href="#v0.37.0_bug_fixes"></a><a class="link" href="#v0.37.0_bug_fixes">Bug fixes</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/ini: fix panic when marshaling unexported field with type struct</p>
+<div class="paragraph">
+<p>While at it, split the example for marshaling and unmarshaling
+struct into separate examples.</p>
+</div>
+</li>
+<li>
+<p>lib/memfs: make the Node&#8217;s addChild to be idempotent</p>
+<div class="paragraph">
+<p>If the same Node&#8217;s Path already exists on the Childs, adding another
+Node with same Path should not add the Node to the Childs.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0.37.0_enhancements"><a class="anchor" href="#v0.37.0_enhancements"></a><a class="link" href="#v0.37.0_enhancements">Enhancements</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/ini: implement marshaling and unmarshaling map with struct element</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>For a field F with type map[K]S <code>ini:"sec"</code>, where K is string and S is
+a struct or pointer to struct element, marshaling the field F will
+result in the following ini format,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>[sec "K"]
+&lt;S.Field.Tag&gt; = &lt;S.Field.Value&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each field in struct S unmarshaled normally as "key = value".</p>
+</div>
+<div class="paragraph">
+<p>This rule is also applied when unmarshalling from ini text into map[K]V.</p>
+</div>
+<div class="paragraph">
+<p>This implementation allow multiple section with dynamic subsections as
+key.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0.37.0_chores"><a class="anchor" href="#v0.37.0_chores"></a><a class="link" href="#v0.37.0_chores">Chores</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>all: reformat all codes using gofmt 1.19 (the Go tip)</p>
+</li>
+<li>
+<p>all: replace any usage of ioutil package with <code>os</code> or <code>io</code>
+</p>
+<div class="paragraph">
+<p>Since Go 1.16, the ioutil package has been deprecated.
+This changes replace any usage that use functions from ioutil package
+with their replacement from package os or package io.</p>
+</div>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -1724,21 +1916,20 @@ Other string beside "none" will be considered as path to socket.</p>
 <ul>
 <li>
 <p>math/big: return nil on Quo and QuoRat instead of panic</p>
+<div class="openblock">
+<div class="content">
 <div class="paragraph">
 <p>Previously, if the first parameter of Quo or the second/next parameters
 of QuoRat is not convertable to Rat or zero, the method/function will
 panic.</p>
 </div>
-</li>
-</ul>
-</div>
 <div class="paragraph">
 <p>This changes make it less intrusive, instead of panic we check for
-zero value and return nil immediately.
-&#8212;</p>
+zero value and return nil immediately.</p>
 </div>
-<div class="ulist">
-<ul>
+</div>
+</div>
+</li>
 <li>
 <p>lib/dns: do not cache truncated answer</p>
 <div class="openblock">
@@ -6056,7 +6247,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-02 23:22:36 +0700
+Last updated 2022-05-09 21:53:28 +0700
 </div>
 </div>
 			</div>
