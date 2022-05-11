@@ -292,17 +292,20 @@ func (hfile *HostsFile) Names() (names []string) {
 
 // RemoveRecord remove single record from hosts file by domain name.
 // It will return true if record found and removed.
-func (hfile *HostsFile) RemoveRecord(dname string) bool {
-	for x := 0; x < len(hfile.Records); x++ {
-		if hfile.Records[x].Name != dname {
+func (hfile *HostsFile) RemoveRecord(dname string) (rr *ResourceRecord) {
+	var (
+		x int
+	)
+	for x, rr = range hfile.Records {
+		if rr.Name != dname {
 			continue
 		}
 		copy(hfile.Records[x:], hfile.Records[x+1:])
 		hfile.Records[len(hfile.Records)-1] = nil
 		hfile.Records = hfile.Records[:len(hfile.Records)-1]
-		return true
+		return rr
 	}
-	return false
+	return nil
 }
 
 // Save the hosts records into the file defined by field "Path".
