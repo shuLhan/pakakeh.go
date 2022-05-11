@@ -75,10 +75,8 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 {{end}}
 {{define "PATH_FUNCS"}}
 	{{- $varname := .Opts.Embed.VarName }}
-//
 // _{{ $varname}}_getNode is internal function to minimize duplicate node
 // created on Node.AddChild() and on generatedPathNode.Set().
-//
 func _{{$varname}}_getNode(mfs *memfs.MemFS, path string, fn func() *memfs.Node) (node *memfs.Node) {
 	node = mfs.PathNodes.Get(path)
 	if node != nil {
