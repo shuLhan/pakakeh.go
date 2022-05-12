@@ -159,10 +159,17 @@ func (m *zoneParser) Init(data, origin string, ttl uint32) {
 //
 //	the line is ignored.
 func (m *zoneParser) parse() (err error) {
-	var rr *ResourceRecord
+	var (
+		rr     *ResourceRecord
+		tok    []byte
+		stok   string
+		n      int
+		c      byte
+		isTerm bool
+	)
 
 	for {
-		n, c := m.reader.SkipHorizontalSpace()
+		n, c = m.reader.SkipHorizontalSpace()
 		if c == 0 {
 			break
 		}
@@ -172,14 +179,14 @@ func (m *zoneParser) parse() (err error) {
 			continue
 		}
 
-		tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
+		tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 		if isTerm {
 			return fmt.Errorf("line %d: invalid line %q",
 				m.lineno, m.reader.Rest())
 		}
 
 		tok = ascii.ToUpper(tok)
-		stok := string(tok)
+		stok = string(tok)
 
 		switch stok {
 		case "$ORIGIN":
@@ -220,12 +227,17 @@ func (m *zoneParser) parse() (err error) {
 
 // $ORIGIN <domain-name> [<comment>]
 func (m *zoneParser) parseDirectiveOrigin() (err error) {
-	_, c := m.reader.SkipHorizontalSpace()
+	var (
+		tok    []byte
+		c      byte
+		isTerm bool
+	)
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: empty $origin directive", m.lineno)
 	}
 
-	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("line %d: empty $origin directive", m.lineno)
 	}
@@ -256,12 +268,18 @@ func (m *zoneParser) parseDirectiveOrigin() (err error) {
 
 // $INCLUDE <file-name> [<domain-name>] [<comment>]
 func (m *zoneParser) parseDirectiveInclude() (err error) {
-	_, c := m.reader.SkipHorizontalSpace()
+	var (
+		c      byte
+		tok    []byte
+		isTerm bool
+	)
+
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: empty $include directive", m.lineno)
 	}
 
-	tok, isTerm, c := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("line %d: empty $include directive", m.lineno)
 	}
@@ -299,7 +317,9 @@ func (m *zoneParser) parseDirectiveInclude() (err error) {
 		}
 	}
 
-	zoneFile, err := ParseZoneFile(incfile, dname, m.ttl)
+	var zoneFile *Zone
+
+	zoneFile, err = ParseZoneFile(incfile, dname, m.ttl)
 	if err != nil {
 		return err
 	}
@@ -311,9 +331,10 @@ func (m *zoneParser) parseDirectiveInclude() (err error) {
 
 func (m *zoneParser) parseDirectiveTTL() (err error) {
 	var (
+		stok   string
+		tok    []byte
 		c      byte
 		isTerm bool
-		tok    []byte
 	)
 
 	_, c = m.reader.SkipHorizontalSpace()
@@ -327,7 +348,7 @@ func (m *zoneParser) parseDirectiveTTL() (err error) {
 	}
 
 	tok = ascii.ToLower(tok)
-	stok := string(tok)
+	stok = string(tok)
 
 	m.ttl, err = parseTTL(tok, stok)
 	if err != nil {
@@ -399,10 +420,14 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 	rr *ResourceRecord, err error,
 ) {
 	var (
-		isTerm bool
-	)
+		stok = string(tok)
 
-	stok := string(tok)
+		ttl    uint32
+		orgtok []byte
+		c      byte
+		isTerm bool
+		ok     bool
+	)
 
 	rr = &ResourceRecord{}
 
@@ -422,14 +447,14 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 		rr.Class = prevRR.Class
 
 		if ascii.IsDigit(tok[0]) {
-			ttl, err := parseTTL(tok, stok)
+			ttl, err = parseTTL(tok, stok)
 			if err != nil {
 				return nil, err
 			}
 			rr.TTL = ttl
 			m.flag |= parseRRTTL
 		} else {
-			ok := m.parseRRClassOrType(rr, stok)
+			ok = m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("line %d: unknown class or type '%s'",
 					m.lineno, stok)
@@ -439,7 +464,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 	}
 
 	for {
-		_, c := m.reader.SkipHorizontalSpace()
+		_, c = m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
 			err = fmt.Errorf("line %d: invalid RR statement '%s'",
 				m.lineno, stok)
@@ -453,7 +478,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			return nil, err
 		}
 
-		orgtok := libbytes.Copy(tok)
+		orgtok = libbytes.Copy(tok)
 		tok = ascii.ToUpper(tok)
 		stok = string(tok)
 
@@ -468,14 +493,14 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 				continue
 			}
 
-			ok := m.parseRRClassOrType(rr, stok)
+			ok = m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("line %d: unknown class or type '%s'", m.lineno, stok)
 				return nil, err
 			}
 
 		case parseRRTTL:
-			ok := m.parseRRClassOrType(rr, stok)
+			ok = m.parseRRClassOrType(rr, stok)
 			if !ok {
 				err = fmt.Errorf("line %d: unknown class or type '%s'", m.lineno, stok)
 				return nil, err
@@ -491,8 +516,8 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 				continue
 			}
 
-			isType := m.parseRRType(rr, stok)
-			if isType {
+			ok = m.parseRRType(rr, stok)
+			if ok {
 				m.flag |= parseRRType
 				continue
 			}
@@ -501,8 +526,8 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			return nil, err
 
 		case parseRRTTL | parseRRClass:
-			isType := m.parseRRType(rr, stok)
-			if isType {
+			ok = m.parseRRType(rr, stok)
+			if ok {
 				m.flag |= parseRRType
 				continue
 			}
@@ -521,7 +546,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 				}
 			}
 
-			err := m.parseRRData(rr, orgtok)
+			err = m.parseRRData(rr, orgtok)
 			if err != nil {
 				return nil, err
 			}
@@ -535,14 +560,16 @@ out:
 // parseRRClassOrType check if token either class or type.
 // It will return true if one of them is set, otherwise it will return false.
 func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
-	isClass := m.parseRRClass(rr, stok)
-	if isClass {
+	var ok bool
+
+	ok = m.parseRRClass(rr, stok)
+	if ok {
 		m.flag |= parseRRClass
 		return true
 	}
 
-	isType := m.parseRRType(rr, stok)
-	if isType {
+	ok = m.parseRRType(rr, stok)
+	if ok {
 		m.flag |= parseRRType
 		return true
 	}
@@ -554,7 +581,12 @@ func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
 // It will set the rr.Class and return true if stok is one of known class;
 // otherwise it will return false.
 func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
-	for k, v := range RecordClasses {
+	var (
+		k string
+		v RecordClass
+	)
+
+	for k, v = range RecordClasses {
 		if stok == k {
 			rr.Class = v
 			return true
@@ -567,7 +599,11 @@ func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
 // It will set rr.Type and return true if token found, otherwise it will
 // return false.
 func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
-	for k, v := range RecordTypes {
+	var (
+		k string
+		v RecordType
+	)
+	for k, v = range RecordTypes {
 		if stok == k {
 			rr.Type = v
 			return true
@@ -618,28 +654,32 @@ func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	tok = ascii.ToLower(tok)
 
-	rrSOA := &RDataSOA{
-		MName: m.generateDomainName(tok),
-	}
+	var (
+		rrSOA = &RDataSOA{
+			MName: m.generateDomainName(tok),
+		}
+		terms = []byte{'\n', ';'}
+
+		v           int64
+		c           byte
+		isTerm      bool
+		isMultiline bool
+	)
 	rr.Value = rrSOA
 
-	_, c := m.reader.SkipHorizontalSpace()
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: incomplete SOA values", m.lineno)
 	}
 
 	// Get RNAME
-	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 || isTerm {
 		return fmt.Errorf("line %d: Invalid SOA RNAME '%s'", m.lineno, tok)
 	}
 
 	tok = ascii.ToLower(tok)
 	rrSOA.RName = m.generateDomainName(tok)
-
-	var v int64
-	isMultiline := false
-	terms := []byte{'\n', ';'}
 
 	// Get '(' or serial value
 	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
@@ -756,18 +796,24 @@ out:
 }
 
 func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
-	rrHInfo := &RDataHINFO{
-		CPU: tok,
-	}
+	var (
+		rrHInfo = &RDataHINFO{
+			CPU: tok,
+		}
+
+		c      byte
+		isTerm bool
+	)
+
 	rr.Value = rrHInfo
 
-	_, c := m.reader.SkipHorizontalSpace()
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: missing HInfo OS value", m.lineno)
 	}
 
 	// Get OS
-	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("line %d: missing HInfo OS value", m.lineno)
 	}
@@ -783,18 +829,24 @@ func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
-	rrMInfo := &RDataMINFO{
-		RMailBox: string(tok),
-	}
+	var (
+		rrMInfo = &RDataMINFO{
+			RMailBox: string(tok),
+		}
+
+		c      byte
+		isTerm bool
+	)
+
 	rr.Value = rrMInfo
 
-	_, c := m.reader.SkipHorizontalSpace()
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: missing MInfo EmailBox value", m.lineno)
 	}
 
 	// Get EmailBox value
-	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("line %d: missing MInfo EmailBox value", m.lineno)
 	}
@@ -810,23 +862,30 @@ func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
-	pref, err := strconv.ParseInt(string(tok), 10, 64)
+	var (
+		rrMX   *RDataMX
+		pref   int64
+		c      byte
+		isTerm bool
+	)
+
+	pref, err = strconv.ParseInt(string(tok), 10, 64)
 	if err != nil {
 		return fmt.Errorf("line %d: invalid MX Preference: %w", m.lineno, err)
 	}
 
-	rrMX := &RDataMX{
+	rrMX = &RDataMX{
 		Preference: int16(pref),
 	}
 	rr.Value = rrMX
 
-	_, c := m.reader.SkipHorizontalSpace()
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == 0 || c == ';' {
 		return fmt.Errorf("line %d: Missing MX Exchange value", m.lineno)
 	}
 
 	// Get EmailBox value
-	tok, isTerm, _ := m.reader.ReadUntil(m.seps, m.terms)
+	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
 	if len(tok) == 0 {
 		return fmt.Errorf("line %d: missing MX Exchange value", m.lineno)
 	}
@@ -847,7 +906,11 @@ func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 //
 // The rdata MUST contains double quote at the beginning and end of text.
 func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
-	tok, _, _ := m.reader.ReadUntil(nil, []byte{'\n'})
+	var (
+		tok []byte
+	)
+
+	tok, _, _ = m.reader.ReadUntil(nil, []byte{'\n'})
 	v = append(v, tok...)
 	v = bytes.TrimSpace(v)
 	if v[0] != '"' {
@@ -864,17 +927,21 @@ func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 }
 
 func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
-	var v int
+	var (
+		rrSRV = &RDataSRV{
+			Service: string(tok),
+		}
 
-	rrSRV := &RDataSRV{
-		Service: string(tok),
-	}
+		v int
+		c byte
+	)
+
 	rr.Value = rrSRV
 
 	m.flag = parseSRVService
 
 	for {
-		_, c := m.reader.SkipHorizontalSpace()
+		_, c = m.reader.SkipHorizontalSpace()
 		if c == 0 || c == ';' {
 			return fmt.Errorf("line %d: incomplete SRV RDATA", m.lineno)
 		}
@@ -930,7 +997,7 @@ func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 		}
 	}
 out:
-	_, c := m.reader.SkipHorizontalSpace()
+	_, c = m.reader.SkipHorizontalSpace()
 	if c == ';' {
 		m.reader.SkipLine()
 		m.lineno++
@@ -961,18 +1028,23 @@ func (m *zoneParser) push(rr *ResourceRecord) error {
 }
 
 func (m *zoneParser) setMinimumTTL() {
-	for _, msg := range m.zone.messages {
-		for x := 0; x < len(msg.Answer); x++ {
+	var (
+		msg *Message
+		x   int
+	)
+
+	for _, msg = range m.zone.messages {
+		for x = 0; x < len(msg.Answer); x++ {
 			if msg.Answer[x].TTL < m.ttl {
 				msg.Answer[x].TTL = m.ttl
 			}
 		}
-		for x := 0; x < len(msg.Authority); x++ {
+		for x = 0; x < len(msg.Authority); x++ {
 			if msg.Authority[x].TTL < m.ttl {
 				msg.Authority[x].TTL = m.ttl
 			}
 		}
-		for x := 0; x < len(msg.Additional); x++ {
+		for x = 0; x < len(msg.Additional); x++ {
 			if msg.Additional[x].TTL < m.ttl {
 				msg.Additional[x].TTL = m.ttl
 			}
@@ -981,12 +1053,18 @@ func (m *zoneParser) setMinimumTTL() {
 }
 
 func (m *zoneParser) pack() {
-	for _, msg := range m.zone.messages {
+	var (
+		msg *Message
+		rr  ResourceRecord
+		err error
+	)
+
+	for _, msg = range m.zone.messages {
 		msg.Header.ANCount = uint16(len(msg.Answer))
 		msg.Header.NSCount = uint16(len(msg.Authority))
 		msg.Header.ARCount = uint16(len(msg.Additional))
 
-		_, err := msg.Pack()
+		_, err = msg.Pack()
 		if err != nil {
 			log.Printf("! pack: %s\n", err)
 			msg.Header.ANCount = 0
@@ -995,9 +1073,9 @@ func (m *zoneParser) pack() {
 		if debug.Value >= 3 {
 			fmt.Printf("= Header: %+v\n", msg.Header)
 			fmt.Printf("  Question: %s\n", msg.Question.String())
-			for x := 0; x < len(msg.Answer); x++ {
-				fmt.Printf("  Answer: %s\n", msg.Answer[x].String())
-				fmt.Printf("  RData: %s\n", msg.Answer[x].Value)
+			for _, rr = range msg.Answer {
+				fmt.Printf("  Answer: %s\n", rr.String())
+				fmt.Printf("  RData: %s\n", rr.Value)
 			}
 		}
 	}

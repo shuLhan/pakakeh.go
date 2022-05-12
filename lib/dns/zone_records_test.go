@@ -11,6 +11,10 @@ import (
 )
 
 func testGenerateZoneRecords() (zoneRR zoneRecords, listRR []*ResourceRecord) {
+	var (
+		rr *ResourceRecord
+	)
+
 	zoneRR = zoneRecords{}
 
 	listRR = []*ResourceRecord{{
@@ -42,7 +46,7 @@ func testGenerateZoneRecords() (zoneRR zoneRecords, listRR []*ResourceRecord) {
 		TTL:   5,
 	}}
 
-	for _, rr := range listRR {
+	for _, rr = range listRR {
 		zoneRR.add(rr)
 	}
 
@@ -50,9 +54,15 @@ func testGenerateZoneRecords() (zoneRR zoneRecords, listRR []*ResourceRecord) {
 }
 
 func TestZoneRecords_add(t *testing.T) {
-	gotZoneRR, listRR := testGenerateZoneRecords()
+	var (
+		expZoneRR zoneRecords
+		gotZoneRR zoneRecords
+		listRR    []*ResourceRecord
+	)
 
-	expZoneRR := zoneRecords{
+	gotZoneRR, listRR = testGenerateZoneRecords()
+
+	expZoneRR = zoneRecords{
 		"test": []*ResourceRecord{
 			listRR[0],
 			listRR[3],
@@ -65,13 +75,23 @@ func TestZoneRecords_add(t *testing.T) {
 }
 
 func TestZoneRecords_remove(t *testing.T) {
-	gotZoneRR, listRR := testGenerateZoneRecords()
-
-	cases := []struct {
+	type testCase struct {
 		rr           *ResourceRecord
 		expZoneRR    zoneRecords
 		expIsRemoved bool
-	}{{
+	}
+
+	var (
+		gotZoneRR    zoneRecords
+		listRR       []*ResourceRecord
+		cases        []testCase
+		c            testCase
+		gotIsRemoved bool
+	)
+
+	gotZoneRR, listRR = testGenerateZoneRecords()
+
+	cases = []testCase{{
 		// With different value.
 		rr: &ResourceRecord{
 			Name:  "test",
@@ -104,8 +124,8 @@ func TestZoneRecords_remove(t *testing.T) {
 		expIsRemoved: true,
 	}}
 
-	for _, c := range cases {
-		gotIsRemoved := gotZoneRR.remove(c.rr)
+	for _, c = range cases {
+		gotIsRemoved = gotZoneRR.remove(c.rr)
 		test.Assert(t, "is removed", c.expIsRemoved, gotIsRemoved)
 		test.Assert(t, "after removed", c.expZoneRR, gotZoneRR)
 	}

@@ -31,15 +31,21 @@ type UDPClient struct {
 // The nameserver contains the IP address, not host name, of parent DNS
 // server.  Default port is 53, if not set.
 func NewUDPClient(nameserver string) (cl *UDPClient, err error) {
-	network := "udp"
+	var (
+		network = "udp"
+		laddr   = &net.UDPAddr{}
 
-	_, remoteIP, remotePort := libnet.ParseIPPort(nameserver, DefaultPort)
+		conn       *net.UDPConn
+		remoteIP   net.IP
+		remotePort uint16
+	)
+
+	_, remoteIP, remotePort = libnet.ParseIPPort(nameserver, DefaultPort)
 	if remoteIP == nil {
 		return nil, fmt.Errorf("dns: invalid address '%s'", nameserver)
 	}
 
-	laddr := &net.UDPAddr{IP: nil, Port: 0}
-	conn, err := net.ListenUDP(network, laddr)
+	conn, err = net.ListenUDP(network, laddr)
 	if err != nil {
 		return
 	}
@@ -72,7 +78,7 @@ func (cl *UDPClient) Close() error {
 //
 // It will return an error if the client does not set the name server address,
 // or no connection, or Name is empty.
-func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
+func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (msg *Message, err error) {
 	if cl.addr == nil || cl.conn == nil {
 		return nil, fmt.Errorf("Lookup: no name server or active connection")
 	}
@@ -86,7 +92,7 @@ func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		q.Class = RecordClassIN
 	}
 
-	msg := NewMessage()
+	msg = NewMessage()
 
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
@@ -98,17 +104,23 @@ func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
-	res, err = cl.Query(msg)
+	msg, err = cl.Query(msg)
 	if err != nil {
 		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
-	return res, nil
+	return msg, nil
 }
 
 // Query send DNS query to name server "ns" and return the unpacked response.
 func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
-	logp := "Query"
+	var (
+		logp = "Query"
+
+		packet []byte
+		n      int
+	)
+
 	cl.Lock()
 	defer cl.Unlock()
 
@@ -122,9 +134,9 @@ func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	packet := make([]byte, maxUdpPacketSize)
+	packet = make([]byte, maxUdpPacketSize)
 
-	n, _, err := cl.conn.ReadFromUDP(packet)
+	n, _, err = cl.conn.ReadFromUDP(packet)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

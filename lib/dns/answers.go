@@ -41,7 +41,11 @@ func (ans *answers) get(rtype RecordType, rclass RecordClass) (an *Answer, x int
 
 // remove the answer from list.
 func (ans *answers) remove(rtype RecordType, rclass RecordClass) {
-	an, x := ans.get(rtype, rclass)
+	var (
+		an *Answer
+		x  int
+	)
+	an, x = ans.get(rtype, rclass)
 	if an != nil {
 		ans.v[x] = ans.v[len(ans.v)-1]
 		ans.v[len(ans.v)-1] = nil

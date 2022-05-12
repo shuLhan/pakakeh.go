@@ -1,3 +1,7 @@
+// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package dns
 
 import (
@@ -7,7 +11,12 @@ import (
 )
 
 func TestParseHostsFile(t *testing.T) {
-	hostsFile, err := ParseHostsFile("testdata/hosts")
+	var (
+		hostsFile *HostsFile
+		err       error
+	)
+
+	hostsFile, err = ParseHostsFile("testdata/hosts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -16,7 +25,11 @@ func TestParseHostsFile(t *testing.T) {
 }
 
 func TestHostsLoad2(t *testing.T) {
-	_, err := ParseHostsFile("testdata/hosts.block")
+	var (
+		err error
+	)
+
+	_, err = ParseHostsFile("testdata/hosts.block")
 	if err != nil {
 		t.Fatal(err)
 	}

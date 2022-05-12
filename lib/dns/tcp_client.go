@@ -27,24 +27,29 @@ type TCPClient struct {
 //
 // The nameserver contains the IP address, not host name, of parent DNS
 // server.  Default port is 53, if not set.
-func NewTCPClient(nameserver string) (*TCPClient, error) {
-	_, remoteIP, remotePort := libnet.ParseIPPort(nameserver, DefaultPort)
+func NewTCPClient(nameserver string) (cl *TCPClient, err error) {
+	var (
+		raddr = &net.TCPAddr{}
+
+		remoteIP   net.IP
+		remotePort uint16
+	)
+
+	_, remoteIP, remotePort = libnet.ParseIPPort(nameserver, DefaultPort)
 	if remoteIP == nil {
 		return nil, fmt.Errorf("dns: invalid address '%s'", nameserver)
 	}
 
-	raddr := &net.TCPAddr{
-		IP:   remoteIP,
-		Port: int(remotePort),
-	}
+	raddr.IP = remoteIP
+	raddr.Port = int(remotePort)
 
-	cl := &TCPClient{
+	cl = &TCPClient{
 		readTimeout:  clientTimeout,
 		writeTimeout: clientTimeout,
 		addr:         raddr,
 	}
 
-	err := cl.Connect(raddr)
+	err = cl.Connect(raddr)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +67,9 @@ func (cl *TCPClient) Close() error {
 
 // Connect to remote address.
 func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {
-	laddr := &net.TCPAddr{IP: nil, Port: 0}
+	var (
+		laddr = &net.TCPAddr{IP: nil, Port: 0}
+	)
 
 	cl.conn, err = net.DialTCP("tcp", laddr, raddr)
 
@@ -75,7 +82,7 @@ func (cl *TCPClient) Connect(raddr *net.TCPAddr) (err error) {
 //
 // It will return an error if the client does not set the name server address,
 // or no connection, or Name is empty.
-func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
+func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (msg *Message, err error) {
 	if cl.addr == nil || cl.conn == nil {
 		return nil, fmt.Errorf("Lookup: no name server or active connection")
 	}
@@ -89,7 +96,7 @@ func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		q.Class = RecordClassIN
 	}
 
-	msg := NewMessage()
+	msg = NewMessage()
 
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
@@ -101,12 +108,12 @@ func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
-	res, err = cl.Query(msg)
+	msg, err = cl.Query(msg)
 	if err != nil {
 		return nil, fmt.Errorf("Lookup: %w", err)
 	}
 
-	return res, nil
+	return msg, nil
 }
 
 // Query send DNS query to name server.
@@ -158,8 +165,10 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 		}
 	}
 
-	lenmsg := len(msg)
-	packet := make([]byte, 0, 2+lenmsg)
+	var (
+		lenmsg = len(msg)
+		packet = make([]byte, 0, 2+lenmsg)
+	)
 
 	packet = libbytes.AppendUint16(packet, uint16(lenmsg))
 	packet = append(packet, msg...)
@@ -178,9 +187,13 @@ func (cl *TCPClient) recv() (res *Message, err error) {
 		}
 	}
 
-	packet := make([]byte, maxTcpPacketSize)
+	var (
+		packet = make([]byte, maxTcpPacketSize)
 
-	n, err := cl.conn.Read(packet)
+		n int
+	)
+
+	n, err = cl.conn.Read(packet)
 	if err != nil {
 		return nil, err
 	}

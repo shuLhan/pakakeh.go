@@ -50,12 +50,21 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 		return nil, nil
 	}
 
-	d, err := os.Open(dir)
+	var (
+		d            *os.File
+		zoneFile     *Zone
+		fi           os.FileInfo
+		fis          []os.FileInfo
+		name         string
+		zoneFilePath string
+	)
+
+	d, err = os.Open(dir)
 	if err != nil {
 		return nil, fmt.Errorf("LoadZoneDir: %w", err)
 	}
 
-	fis, err := d.Readdir(0)
+	fis, err = d.Readdir(0)
 	if err != nil {
 		err = d.Close()
 		if err != nil {
@@ -66,20 +75,20 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 
 	zoneFiles = make(map[string]*Zone)
 
-	for x := 0; x < len(fis); x++ {
-		if fis[x].IsDir() {
+	for _, fi = range fis {
+		if fi.IsDir() {
 			continue
 		}
 
 		// Ignore file that start with "." .
-		name := fis[x].Name()
+		name = fi.Name()
 		if name[0] == '.' {
 			continue
 		}
 
-		zoneFilePath := filepath.Join(dir, name)
+		zoneFilePath = filepath.Join(dir, name)
 
-		zoneFile, err := ParseZoneFile(zoneFilePath, "", 0)
+		zoneFile, err = ParseZoneFile(zoneFilePath, "", 0)
 		if err != nil {
 			return zoneFiles, fmt.Errorf("LoadZoneDir %q: %w", dir, err)
 		}
@@ -98,10 +107,11 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 // ParseZoneFile parse zone file.
 // The file name will be assumed as origin if parameter origin or $ORIGIN is
 // not set.
-func ParseZoneFile(file, origin string, ttl uint32) (*Zone, error) {
-	var err error
+func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
+	var (
+		m *zoneParser = newZoneParser(file)
+	)
 
-	m := newZoneParser(file)
 	m.ttl = ttl
 
 	if len(origin) > 0 {
@@ -124,20 +134,24 @@ func ParseZoneFile(file, origin string, ttl uint32) (*Zone, error) {
 
 	m.zone.Name = m.origin
 
-	zone := m.zone
+	zone = m.zone
 	m.zone = nil
 	return zone, nil
 }
 
 // Add add new ResourceRecord to Zone.
 func (zone *Zone) Add(rr *ResourceRecord) (err error) {
+	var (
+		msg *Message
+	)
+
 	if rr.Type == RecordTypeSOA {
 		zone.SOA = *rr
 	} else {
 		zone.Records.add(rr)
 	}
 
-	for _, msg := range zone.messages {
+	for _, msg = range zone.messages {
 		if msg.Question.Name != rr.Name {
 			continue
 		}
@@ -150,7 +164,7 @@ func (zone *Zone) Add(rr *ResourceRecord) (err error) {
 		return msg.AddAnswer(rr)
 	}
 
-	msg := &Message{
+	msg = &Message{
 		Header: MessageHeader{
 			IsAA:    true,
 			QDCount: 1,
@@ -194,20 +208,27 @@ func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 
 // Save the content of zone records to file defined by Path.
 func (zone *Zone) Save() (err error) {
-	out, err := os.OpenFile(zone.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC,
-		0600)
+	var (
+		out *os.File
+	)
+
+	out, err = os.OpenFile(zone.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
 
 	var (
+		soa    *RDataSOA
+		dname  string
 		names  []string
 		listRR []*ResourceRecord
+		errc   error
+		ok     bool
 	)
 
 	fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
 
-	soa, ok := zone.SOA.Value.(*RDataSOA)
+	soa, ok = zone.SOA.Value.(*RDataSOA)
 	if ok && len(soa.MName) > 0 {
 		_, err = fmt.Fprintf(out,
 			"@ SOA %s. %s. %d %d %d %d %d\n",
@@ -229,7 +250,7 @@ func (zone *Zone) Save() (err error) {
 
 	// Save the records ordered by name.
 	names = make([]string, 0, len(zone.Records))
-	for dname := range zone.Records {
+	for dname = range zone.Records {
 		if dname == zone.Name {
 			continue
 		}
@@ -237,8 +258,8 @@ func (zone *Zone) Save() (err error) {
 	}
 	sort.Strings(names)
 
-	for _, dname := range names {
-		listRR := zone.Records[dname]
+	for _, dname = range names {
+		listRR = zone.Records[dname]
 		dname = strings.TrimSuffix(dname, "."+zone.Name)
 		err = zone.saveListRR(out, dname, listRR)
 		if err != nil {
@@ -246,7 +267,7 @@ func (zone *Zone) Save() (err error) {
 		}
 	}
 out:
-	errc := out.Close()
+	errc = out.Close()
 	if errc != nil {
 		if err == nil {
 			err = errc
@@ -256,7 +277,19 @@ out:
 }
 
 func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecord) (err error) {
-	for x, rr := range listRR {
+	var (
+		hinfo *RDataHINFO
+		minfo *RDataMINFO
+		mx    *RDataMX
+		rr    *ResourceRecord
+		srv   *RDataSRV
+		wks   *RDataWKS
+		v     string
+		x     int
+		ok    bool
+	)
+
+	for x, rr = range listRR {
 		if x > 0 {
 			dname = "\t"
 		}
@@ -273,7 +306,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 
 		case RecordTypeNS, RecordTypeCNAME, RecordTypeMB,
 			RecordTypeMG, RecordTypeMR:
-			v, ok := rr.Value.(string)
+			v, ok = rr.Value.(string)
 			if !ok {
 				err = errors.New("invalid record value for " +
 					RecordTypeNames[rr.Type])
@@ -289,7 +322,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				RecordTypeNames[rr.Type], v)
 
 		case RecordTypePTR:
-			v, ok := rr.Value.(string)
+			v, ok = rr.Value.(string)
 			if !ok {
 				err = errors.New("invalid record value for " +
 					RecordTypeNames[rr.Type])
@@ -304,7 +337,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				rr.Name, rr.TTL, v)
 
 		case RecordTypeWKS:
-			wks, ok := rr.Value.(*RDataWKS)
+			wks, ok = rr.Value.(*RDataWKS)
 			if !ok {
 				err = errors.New("invalid record value for WKS")
 				break
@@ -315,7 +348,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				wks.Address, wks.Protocol, wks.BitMap)
 
 		case RecordTypeHINFO:
-			hinfo, ok := rr.Value.(*RDataHINFO)
+			hinfo, ok = rr.Value.(*RDataHINFO)
 			if !ok {
 				err = errors.New("invalid record value for HINFO")
 				break
@@ -326,7 +359,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				hinfo.CPU, hinfo.OS)
 
 		case RecordTypeMINFO:
-			minfo, ok := rr.Value.(*RDataMINFO)
+			minfo, ok = rr.Value.(*RDataMINFO)
 			if !ok {
 				err = errors.New("invalid record value for MINFO")
 				break
@@ -337,7 +370,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				minfo.RMailBox, minfo.EmailBox)
 
 		case RecordTypeMX:
-			mx, ok := rr.Value.(*RDataMX)
+			mx, ok = rr.Value.(*RDataMX)
 			if !ok {
 				err = errors.New("invalid record value for MX")
 				break
@@ -348,7 +381,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				mx.Preference, mx.Exchange)
 
 		case RecordTypeSRV:
-			srv, ok := rr.Value.(*RDataSRV)
+			srv, ok = rr.Value.(*RDataSRV)
 			if !ok {
 				err = errors.New("invalid record value for SRV")
 				break

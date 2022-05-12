@@ -14,11 +14,16 @@ import "testing"
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageQuestion_String-8        7138899               168.3 ns/op            56 B/op          3 allocs/op
 func BenchmarkMessageQuestion_String(b *testing.B) {
-	mq := MessageQuestion{
-		Name: "test",
-		Type: RecordTypeA,
-	}
-	for x := 0; x < b.N; x++ {
+	var (
+		mq = MessageQuestion{
+			Name: "test",
+			Type: RecordTypeA,
+		}
+
+		x int
+	)
+
+	for ; x < b.N; x++ {
 		_ = mq.String()
 	}
 }
@@ -40,10 +45,13 @@ func BenchmarkMessageQuestion_unpack(b *testing.B) {
 			0x00, 0x01,
 			0x00, 0x01,
 		}
+		mq = MessageQuestion{}
+
+		x   int
 		err error
 	)
-	mq := MessageQuestion{}
-	for x := 0; x < b.N; x++ {
+
+	for ; x < b.N; x++ {
 		err = mq.unpack(packet)
 		if err != nil {
 			b.Fatal(err)

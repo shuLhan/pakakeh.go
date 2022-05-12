@@ -20,7 +20,9 @@ type RDataHINFO struct {
 
 // unpack the HINFO RDATA from DNS message.
 func (hinfo *RDataHINFO) unpack(packet []byte) error {
-	x := 0
+	var (
+		x int
+	)
 	for ; x < len(packet); x++ {
 		if packet[x] == 0 {
 			break

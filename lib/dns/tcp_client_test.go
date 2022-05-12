@@ -11,17 +11,27 @@ import (
 )
 
 func TestTCPClientLookup(t *testing.T) {
-	cl, err := NewTCPClient(testServerAddress)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		exp            *Message
 		desc           string
 		qst            MessageQuestion
 		allowRecursion bool
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+		cl    *TCPClient
+		got   *Message
+		err   error
+	)
+
+	cl, err = NewTCPClient(testServerAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc: "RType:A RClass:IN QName:kilabit.info",
 		qst: MessageQuestion{
 			Name: "kilabit.info",
@@ -115,10 +125,10 @@ func TestTCPClientLookup(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.qst, c.allowRecursion)
+		got, err = cl.Lookup(c.qst, c.allowRecursion)
 		if err != nil {
 			t.Fatal(err)
 		}

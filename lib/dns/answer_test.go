@@ -13,28 +13,7 @@ import (
 )
 
 func TestNewAnswer(t *testing.T) {
-	at := time.Now().Unix()
-
-	msg1 := &Message{
-		Header: MessageHeader{
-			ID: 1,
-		},
-		Question: MessageQuestion{
-			Name:  "test",
-			Type:  1,
-			Class: 1,
-		},
-		Answer: []ResourceRecord{{
-			Name:  "test",
-			Type:  RecordTypeA,
-			Class: RecordClassIN,
-			TTL:   3600,
-			rdlen: 4,
-			Value: "127.0.0.1",
-		}},
-	}
-
-	cases := []struct {
+	type testCase struct {
 		desc      string
 		msg       *Message
 		exp       *Answer
@@ -43,7 +22,35 @@ func TestNewAnswer(t *testing.T) {
 		expRType  RecordType
 		expRClass RecordClass
 		isLocal   bool
-	}{{
+	}
+
+	var (
+		at   = time.Now().Unix()
+		msg1 = &Message{
+			Header: MessageHeader{
+				ID: 1,
+			},
+			Question: MessageQuestion{
+				Name:  "test",
+				Type:  1,
+				Class: 1,
+			},
+			Answer: []ResourceRecord{{
+				Name:  "test",
+				Type:  RecordTypeA,
+				Class: RecordClassIN,
+				TTL:   3600,
+				rdlen: 4,
+				Value: "127.0.0.1",
+			}},
+		}
+
+		cases []testCase
+		c     testCase
+		got   *Answer
+	)
+
+	cases = []testCase{{
 		desc:    "With local message",
 		msg:     msg1,
 		isLocal: true,
@@ -72,10 +79,10 @@ func TestNewAnswer(t *testing.T) {
 		expMsg:    msg1,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got := newAnswer(c.msg, c.isLocal)
+		got = newAnswer(c.msg, c.isLocal)
 
 		if got == nil {
 			test.Assert(t, "newAnswer", got, c.exp)
@@ -98,64 +105,73 @@ func TestNewAnswer(t *testing.T) {
 }
 
 func TestAnswerClear(t *testing.T) {
-	msg := NewMessage()
-	el := &list.Element{
-		Value: 1,
-	}
+	var (
+		msg = NewMessage()
+		el  = &list.Element{
+			Value: 1,
+		}
+		an = &Answer{
+			msg: msg,
+			el:  el,
+		}
 
-	an := &Answer{
-		msg: msg,
-		el:  el,
-	}
+		expMsg *Message
+		expEl  *list.Element
+	)
 
 	an.clear()
-
-	var expMsg *Message
-	var expEl *list.Element
 
 	test.Assert(t, "answer.msg", expMsg, an.msg)
 	test.Assert(t, "answer.el", expEl, an.el)
 }
 
 func TestAnswerGet(t *testing.T) {
-	// kilabit.info A
-	res := &Message{
-		Header: MessageHeader{
-			ID:      1,
-			QDCount: 1,
-			ANCount: 1,
-		},
-		Question: MessageQuestion{
-			Name:  "kilabit.info",
-			Type:  RecordTypeA,
-			Class: RecordClassIN,
-		},
-		Answer: []ResourceRecord{{
-			Name:  "kilabit.info",
-			Type:  RecordTypeA,
-			Class: RecordClassIN,
-			TTL:   3600,
-			rdlen: 4,
-			Value: "127.0.0.1",
-		}},
-		Authority:  []ResourceRecord{},
-		Additional: []ResourceRecord{},
-	}
-
-	_, err := res.Pack()
-	if err != nil {
-		t.Fatal("Pack: ", err)
-	}
-
-	at := time.Now().Unix()
-
-	type caseAnswerGet struct {
+	type testCase struct {
 		msg     *Message
 		desc    string
 		isLocal bool
 	}
 
-	cases := []caseAnswerGet{{
+	var (
+		// kilabit.info A
+		res = &Message{
+			Header: MessageHeader{
+				ID:      1,
+				QDCount: 1,
+				ANCount: 1,
+			},
+			Question: MessageQuestion{
+				Name:  "kilabit.info",
+				Type:  RecordTypeA,
+				Class: RecordClassIN,
+			},
+			Answer: []ResourceRecord{{
+				Name:  "kilabit.info",
+				Type:  RecordTypeA,
+				Class: RecordClassIN,
+				TTL:   3600,
+				rdlen: 4,
+				Value: "127.0.0.1",
+			}},
+			Authority:  []ResourceRecord{},
+			Additional: []ResourceRecord{},
+		}
+		at = time.Now().Unix()
+
+		cases     []testCase
+		c         testCase
+		an        *Answer
+		got       *Message
+		gotPacket []byte
+		err       error
+	)
+
+	_, err = res.Pack()
+	if err != nil {
+		t.Fatal("Pack: ", err)
+	}
+
+	cases = []testCase{{
 		desc:    "With local answer",
 		msg:     res,
 		isLocal: true,
@@ -164,16 +180,16 @@ func TestAnswerGet(t *testing.T) {
 		msg:  res,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		an := newAnswer(c.msg, c.isLocal)
+		an = newAnswer(c.msg, c.isLocal)
 
 		if !c.isLocal {
 			an.ReceivedAt -= 5
 		}
 
-		gotPacket := an.get()
+		gotPacket = an.get()
 
 		if c.isLocal {
 			test.Assert(t, "ReceivedAt", int64(0), an.ReceivedAt)
@@ -184,12 +200,12 @@ func TestAnswerGet(t *testing.T) {
 
 		test.Assert(t, "ReceivedAt", an.ReceivedAt >= at-5, true)
 		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true)
-		got := &Message{
+		got = &Message{
 			Header:   MessageHeader{},
 			Question: MessageQuestion{},
 			packet:   gotPacket,
 		}
-		err := got.Unpack()
+		err = got.Unpack()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -200,19 +216,7 @@ func TestAnswerGet(t *testing.T) {
 }
 
 func TestAnswerUpdate(t *testing.T) {
-	at := time.Now().Unix() - 5
-	msg1 := &Message{
-		Header: MessageHeader{
-			ID: 1,
-		},
-	}
-	msg2 := &Message{
-		Header: MessageHeader{
-			ID: 1,
-		},
-	}
-
-	type caseAnswerUpdate struct {
+	type testCase struct {
 		an            *Answer
 		nu            *Answer
 		expMsg        *Message
@@ -221,7 +225,24 @@ func TestAnswerUpdate(t *testing.T) {
 		expAccessedAt int64
 	}
 
-	cases := []caseAnswerUpdate{{
+	var (
+		at   = time.Now().Unix() - 5
+		msg1 = &Message{
+			Header: MessageHeader{
+				ID: 1,
+			},
+		}
+		msg2 = &Message{
+			Header: MessageHeader{
+				ID: 1,
+			},
+		}
+
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		desc: "With nil parameter",
 		an: &Answer{
 			ReceivedAt: 1,
@@ -263,7 +284,7 @@ func TestAnswerUpdate(t *testing.T) {
 		expMsg:        nil,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		c.an.update(c.nu)

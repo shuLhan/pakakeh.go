@@ -28,18 +28,21 @@ import (
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageHeader_pack-8           54183505                21.66 ns/op           16 B/op          1 allocs/op
 func BenchmarkMessageHeader_pack(b *testing.B) {
-	hdr := &MessageHeader{
-		ID:      0xABCD,
-		Op:      OpCodeQuery,
-		IsAA:    true,
-		IsRD:    true,
-		QDCount: 1,
-		ANCount: 4,
-		NSCount: 1,
-		ARCount: 1,
-	}
+	var (
+		hdr = &MessageHeader{
+			ID:      0xABCD,
+			Op:      OpCodeQuery,
+			IsAA:    true,
+			IsRD:    true,
+			QDCount: 1,
+			ANCount: 4,
+			NSCount: 1,
+			ARCount: 1,
+		}
+		x int
+	)
 
-	for x := 0; x < b.N; x++ {
+	for ; x < b.N; x++ {
 		_ = hdr.pack()
 	}
 }
@@ -52,17 +55,20 @@ func BenchmarkMessageHeader_pack(b *testing.B) {
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageHeader_unpack-8         310460067                3.848 ns/op           0 B/op          0 allocs/op
 func BenchmarkMessageHeader_unpack(b *testing.B) {
-	hdr := &MessageHeader{}
-	packet := []byte{
-		0xab, 0xcd,
-		0x85, 0x00,
-		0x00, 0x01,
-		0x00, 0x04,
-		0x00, 0x01,
-		0x00, 0x01,
-	}
+	var (
+		hdr    = &MessageHeader{}
+		packet = []byte{
+			0xab, 0xcd,
+			0x85, 0x00,
+			0x00, 0x01,
+			0x00, 0x04,
+			0x00, 0x01,
+			0x00, 0x01,
+		}
+		x int
+	)
 
-	for x := 0; x < b.N; x++ {
+	for ; x < b.N; x++ {
 		hdr.unpack(packet)
 	}
 }

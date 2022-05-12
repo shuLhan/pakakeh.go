@@ -7,6 +7,7 @@ package dns
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
@@ -25,7 +26,13 @@ type DoTClient struct {
 // The nameserver contains the IP address, not host name, of parent DNS
 // server.  Default port is 853, if not set.
 func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err error) {
-	_, remoteIP, port := libnet.ParseIPPort(nameserver, DefaultTLSPort)
+	var (
+		tlsConfig tls.Config
+		remoteIP  net.IP
+		port      uint16
+	)
+
+	_, remoteIP, port = libnet.ParseIPPort(nameserver, DefaultTLSPort)
 	if remoteIP == nil {
 		return nil, fmt.Errorf("dns: invalid address '%s'", nameserver)
 	}
@@ -36,9 +43,7 @@ func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err err
 
 	nameserver = fmt.Sprintf("%s:%d", remoteIP, port)
 
-	tlsConfig := tls.Config{
-		InsecureSkipVerify: allowInsecure,
-	}
+	tlsConfig.InsecureSkipVerify = allowInsecure
 
 	cl.conn, err = tls.Dial("tcp", nameserver, &tlsConfig)
 	if err != nil {
@@ -72,7 +77,9 @@ func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		q.Class = RecordClassIN
 	}
 
-	msg := NewMessage()
+	var (
+		msg *Message = NewMessage()
+	)
 
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
@@ -93,13 +100,13 @@ func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 }
 
 // Query send DNS Message to name server.
-func (cl *DoTClient) Query(msg *Message) (*Message, error) {
-	_, err := cl.Write(msg.packet)
+func (cl *DoTClient) Query(msg *Message) (res *Message, err error) {
+	_, err = cl.Write(msg.packet)
 	if err != nil {
 		return nil, err
 	}
 
-	res := NewMessage()
+	res = NewMessage()
 
 	_, err = cl.recv(res)
 	if err != nil {
@@ -126,7 +133,7 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	packet := make([]byte, maxTcpPacketSize)
+	var packet = make([]byte, maxTcpPacketSize)
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {
@@ -152,8 +159,10 @@ func (cl *DoTClient) Write(msg []byte) (n int, err error) {
 		return
 	}
 
-	lenmsg := len(msg)
-	packet := make([]byte, 0, 2+lenmsg)
+	var (
+		lenmsg int    = len(msg)
+		packet []byte = make([]byte, 0, 2+lenmsg)
+	)
 
 	packet = libbytes.AppendUint16(packet, uint16(lenmsg))
 	packet = append(packet, msg...)

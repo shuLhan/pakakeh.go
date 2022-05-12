@@ -41,10 +41,12 @@ func newRequest() *request {
 
 // error set the request message as an error.
 func (req *request) error(rcode ResponseCode) {
+	var err error
+
 	req.message.SetQuery(false)
 	req.message.SetResponseCode(rcode)
 
-	_, err := req.writer.Write(req.message.packet)
+	_, err = req.writer.Write(req.message.packet)
 	if err != nil {
 		log.Println("dns: request.error:", err.Error())
 	}

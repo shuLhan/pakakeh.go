@@ -173,8 +173,17 @@ func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
 // If the name server format contains no scheme, it will be assumed to be
 // "udp".
 func (opts *ServerOptions) parseNameServers(nameServers []string) {
-	for _, ns := range nameServers {
-		dnsURL, err := url.Parse(ns)
+	var (
+		dnsURL  *url.URL
+		tcpAddr *net.TCPAddr
+		udpAddr *net.UDPAddr
+		ip      net.IP
+		ns      string
+		err     error
+	)
+
+	for _, ns = range nameServers {
+		dnsURL, err = url.Parse(ns)
 		if err != nil {
 			log.Printf("dns: invalid name server URI %q", ns)
 			continue
@@ -182,7 +191,7 @@ func (opts *ServerOptions) parseNameServers(nameServers []string) {
 
 		switch dnsURL.Scheme {
 		case "tcp":
-			tcpAddr, err := libnet.ParseTCPAddr(dnsURL.Host, DefaultPort)
+			tcpAddr, err = libnet.ParseTCPAddr(dnsURL.Host, DefaultPort)
 			if err != nil {
 				log.Printf("dns: invalid IP address %q", dnsURL.Host)
 				continue
@@ -190,7 +199,7 @@ func (opts *ServerOptions) parseNameServers(nameServers []string) {
 			opts.primaryTCP = append(opts.primaryTCP, tcpAddr)
 
 		case "https":
-			ip := net.ParseIP(dnsURL.Hostname())
+			ip = net.ParseIP(dnsURL.Hostname())
 			if ip == nil {
 				opts.primaryDoh = append(opts.primaryDoh, ns)
 			} else {
@@ -202,14 +211,14 @@ func (opts *ServerOptions) parseNameServers(nameServers []string) {
 				ns = dnsURL.Host
 			}
 
-			udpAddr, err := libnet.ParseUDPAddr(ns, DefaultPort)
+			udpAddr, err = libnet.ParseUDPAddr(ns, DefaultPort)
 			if err != nil {
 				log.Printf("dns: invalid IP address %q", ns)
 				continue
 			}
 			opts.primaryUDP = append(opts.primaryUDP, udpAddr)
 
-			tcpAddr, err := libnet.ParseTCPAddr(ns, DefaultPort)
+			tcpAddr, err = libnet.ParseTCPAddr(ns, DefaultPort)
 			if err != nil {
 				log.Printf("dns: invalid IP address %q", ns)
 				continue

@@ -31,8 +31,13 @@ type DoHClient struct {
 }
 
 // NewDoHClient will create new DNS client with HTTP connection.
-func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
-	nsURL, err := url.Parse(nameserver)
+func NewDoHClient(nameserver string, allowInsecure bool) (cl *DoHClient, err error) {
+	var (
+		nsURL *url.URL
+		tr    *http.Transport
+	)
+
+	nsURL, err = url.Parse(nameserver)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +47,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
 		return nil, err
 	}
 
-	tr := &http.Transport{
+	tr = &http.Transport{
 		MaxIdleConns:    1,
 		IdleConnTimeout: 30 * time.Second,
 		TLSClientConfig: &tls.Config{
@@ -50,7 +55,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (*DoHClient, error) {
 		},
 	}
 
-	cl := &DoHClient{
+	cl = &DoHClient{
 		addr: nsURL,
 		headers: http.Header{
 			"accept": []string{
@@ -100,7 +105,7 @@ func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		q.Class = RecordClassIN
 	}
 
-	msg := NewMessage()
+	var msg *Message = NewMessage()
 
 	// No ID.
 	// HTTP correlates the request and response, thus eliminating
@@ -127,19 +132,23 @@ func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 
 // Post send query to name server using HTTP POST and return the response
 // as unpacked message.
-func (cl *DoHClient) Post(msg *Message) (*Message, error) {
+func (cl *DoHClient) Post(msg *Message) (res *Message, err error) {
+	var (
+		httpRes *http.Response
+	)
+
 	cl.req.Method = http.MethodPost
 	cl.req.Body = io.NopCloser(bytes.NewReader(msg.packet))
 	cl.req.URL.RawQuery = ""
 
-	httpRes, err := cl.conn.Do(cl.req)
+	httpRes, err = cl.conn.Do(cl.req)
 	if err != nil {
 		cl.req.Body.Close()
 		return nil, err
 	}
 	cl.req.Body.Close()
 
-	res := NewMessage()
+	res = NewMessage()
 
 	res.packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
@@ -154,20 +163,24 @@ func (cl *DoHClient) Post(msg *Message) (*Message, error) {
 
 // Get send query to name server using HTTP GET and return the response as
 // unpacked message.
-func (cl *DoHClient) Get(msg *Message) (*Message, error) {
-	q := base64.RawURLEncoding.EncodeToString(msg.packet)
+func (cl *DoHClient) Get(msg *Message) (res *Message, err error) {
+	var (
+		q string = base64.RawURLEncoding.EncodeToString(msg.packet)
+
+		httpRes *http.Response
+	)
 
 	cl.query.Set("dns", q)
 	cl.req.Method = http.MethodGet
 	cl.req.Body = nil
 	cl.req.URL.RawQuery = cl.query.Encode()
 
-	httpRes, err := cl.conn.Do(cl.req)
+	httpRes, err = cl.conn.Do(cl.req)
 	if err != nil {
 		return nil, err
 	}
 
-	res := NewMessage()
+	res = NewMessage()
 
 	res.packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
@@ -234,7 +247,12 @@ func (cl *DoHClient) Write(packet []byte) (n int, err error) {
 // This method is to prevent the function that process the HTTP request
 // terminated and write empty response.
 func (cl *DoHClient) waitResponse() {
-	success, ok := <-cl.responded
+	var (
+		success bool
+		ok      bool
+	)
+
+	success, ok = <-cl.responded
 	if !success || !ok {
 		cl.w.WriteHeader(http.StatusGatewayTimeout)
 	}

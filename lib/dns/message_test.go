@@ -11,11 +11,19 @@ import (
 )
 
 func TestMessageIsExpired(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		msg  *Message
 		desc string
 		exp  bool
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+		got   bool
+	)
+
+	cases = []testCase{{
 		desc: "Message is not expired",
 		msg: &Message{
 			Answer: []ResourceRecord{{
@@ -33,20 +41,29 @@ func TestMessageIsExpired(t *testing.T) {
 		exp: true,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got := c.msg.IsExpired()
+		got = c.msg.IsExpired()
 
 		test.Assert(t, "IsExpired", c.exp, got)
 	}
 }
 
 func TestMessagePackDomainName(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		in  []byte
 		exp []byte
-	}{{
+	}
+
+	var (
+		msg = NewMessage()
+
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		in:  []byte("a.b"),
 		exp: []byte{1, 'a', 1, 'b', 0},
 	}, {
@@ -63,10 +80,9 @@ func TestMessagePackDomainName(t *testing.T) {
 		exp: []byte{2, 'a', 'a', 0},
 	}}
 
-	msg := NewMessage()
 	msg.dnameOff = make(map[string]uint16)
 
-	for _, c := range cases {
+	for _, c = range cases {
 		msg.Reset()
 		msg.packet = msg.packet[:0]
 
@@ -77,11 +93,18 @@ func TestMessagePackDomainName(t *testing.T) {
 }
 
 func TestMessagePackQuestion(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc string
 		msg  *Message
 		exp  []byte
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		desc: "Empty name",
 		msg: &Message{
 			Question: MessageQuestion{
@@ -142,7 +165,7 @@ func TestMessagePackQuestion(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		c.msg.packQuestion()
@@ -152,11 +175,19 @@ func TestMessagePackQuestion(t *testing.T) {
 }
 
 func TestMessagePack(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc string
 		msg  *Message
 		exp  []byte
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+		got   []byte
+	)
+
+	cases = []testCase{{
 		desc: "Simple query",
 		msg: &Message{
 			Header: MessageHeader{
@@ -825,10 +856,10 @@ func TestMessagePack(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got, _ := c.msg.Pack()
+		got, _ = c.msg.Pack()
 
 		t.Logf("Message: %+v\n", c.msg)
 		test.Assert(t, c.desc, c.exp, got)
@@ -836,33 +867,45 @@ func TestMessagePack(t *testing.T) {
 }
 
 func TestMessageSetAuthoritativeAnswer(t *testing.T) {
-	msgQuery := &Message{
-		Header: MessageHeader{
-			ID:      1,
-			IsQuery: true,
-			IsAA:    true,
-			IsRD:    true,
-		},
-		Question: MessageQuestion{},
-		packet:   make([]byte, maxUdpPacketSize),
-		dnameOff: make(map[string]uint16),
+	type testCase struct {
+		msg  *Message
+		desc string
+		exp  []byte
+		isAA bool
 	}
 
-	_, err := msgQuery.Pack()
+	var (
+		msgQuery = &Message{
+			Header: MessageHeader{
+				ID:      1,
+				IsQuery: true,
+				IsAA:    true,
+				IsRD:    true,
+			},
+			Question: MessageQuestion{},
+			packet:   make([]byte, maxUdpPacketSize),
+			dnameOff: make(map[string]uint16),
+		}
+		msgResponse = &Message{
+			Header: MessageHeader{
+				ID:   1,
+				IsAA: true,
+				IsRD: true,
+				IsRA: true,
+			},
+			Question: MessageQuestion{},
+			packet:   make([]byte, maxUdpPacketSize),
+			dnameOff: make(map[string]uint16),
+		}
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	_, err = msgQuery.Pack()
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	msgResponse := &Message{
-		Header: MessageHeader{
-			ID:   1,
-			IsAA: true,
-			IsRD: true,
-			IsRA: true,
-		},
-		Question: MessageQuestion{},
-		packet:   make([]byte, maxUdpPacketSize),
-		dnameOff: make(map[string]uint16),
 	}
 
 	_, err = msgResponse.Pack()
@@ -870,12 +913,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		msg  *Message
-		desc string
-		exp  []byte
-		isAA bool
-	}{{
+	cases = []testCase{{
 		desc: "With query and isAA is false",
 		msg:  msgQuery,
 		exp:  []byte{0x00, 0x01, 0x01, 0x00},
@@ -895,7 +933,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 		exp:  []byte{0x00, 0x01, 0x85, 0x80},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		c.msg.SetAuthorativeAnswer(c.isAA)
@@ -905,29 +943,37 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 }
 
 func TestMessageSetQuery(t *testing.T) {
-	msgQuery := &Message{
-		Header: MessageHeader{
-			ID:      1,
-			IsQuery: true,
-			IsAA:    true,
-			IsRD:    true,
-		},
-		Question: MessageQuestion{},
-		packet:   make([]byte, maxUdpPacketSize),
-		dnameOff: make(map[string]uint16),
-	}
-
-	_, err := msgQuery.Pack()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		msg     *Message
 		desc    string
 		exp     []byte
 		isQuery bool
-	}{{
+	}
+
+	var (
+		msgQuery = &Message{
+			Header: MessageHeader{
+				ID:      1,
+				IsQuery: true,
+				IsAA:    true,
+				IsRD:    true,
+			},
+			Question: MessageQuestion{},
+			packet:   make([]byte, maxUdpPacketSize),
+			dnameOff: make(map[string]uint16),
+		}
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	_, err = msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc: "With isQuery is false",
 		msg:  msgQuery,
 		exp:  []byte{0x00, 0x01, 0x81, 0x00},
@@ -938,7 +984,7 @@ func TestMessageSetQuery(t *testing.T) {
 		exp:     []byte{0x00, 0x01, 0x01, 0x00},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		c.msg.SetQuery(c.isQuery)
@@ -948,29 +994,37 @@ func TestMessageSetQuery(t *testing.T) {
 }
 
 func TestMessageSetRecursionDesired(t *testing.T) {
-	msgQuery := &Message{
-		Header: MessageHeader{
-			ID:      1,
-			IsQuery: true,
-			IsAA:    true,
-			IsRD:    true,
-		},
-		Question: MessageQuestion{},
-		packet:   make([]byte, maxUdpPacketSize),
-		dnameOff: make(map[string]uint16),
-	}
-
-	_, err := msgQuery.Pack()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		msg  *Message
 		desc string
 		exp  []byte
 		isRD bool
-	}{{
+	}
+
+	var (
+		msgQuery = &Message{
+			Header: MessageHeader{
+				ID:      1,
+				IsQuery: true,
+				IsAA:    true,
+				IsRD:    true,
+			},
+			Question: MessageQuestion{},
+			packet:   make([]byte, maxUdpPacketSize),
+			dnameOff: make(map[string]uint16),
+		}
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	_, err = msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc: "With isRD is false",
 		msg:  msgQuery,
 		exp:  []byte{0x00, 0x01, 0x00, 0x00},
@@ -981,7 +1035,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 		exp:  []byte{0x00, 0x01, 0x01, 0x00},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		c.msg.SetRecursionDesired(c.isRD)
@@ -991,29 +1045,37 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 }
 
 func TestMessageSetResponseCode(t *testing.T) {
-	msgQuery := &Message{
-		Header: MessageHeader{
-			ID:      1,
-			IsQuery: true,
-			IsAA:    true,
-			IsRD:    true,
-		},
-		Question: MessageQuestion{},
-		packet:   make([]byte, maxUdpPacketSize),
-		dnameOff: make(map[string]uint16),
-	}
-
-	_, err := msgQuery.Pack()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		msg  *Message
 		desc string
 		exp  []byte
 		code ResponseCode
-	}{{
+	}
+
+	var (
+		msgQuery = &Message{
+			Header: MessageHeader{
+				ID:      1,
+				IsQuery: true,
+				IsAA:    true,
+				IsRD:    true,
+			},
+			Question: MessageQuestion{},
+			packet:   make([]byte, maxUdpPacketSize),
+			dnameOff: make(map[string]uint16),
+		}
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	_, err = msgQuery.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc: "With code is error format",
 		msg:  msgQuery,
 		code: RCodeErrName,
@@ -1025,7 +1087,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 		exp:  []byte{0x00, 0x01, 0x01, 0x00},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		c.msg.SetResponseCode(c.code)
@@ -1035,11 +1097,23 @@ func TestMessageSetResponseCode(t *testing.T) {
 }
 
 func TestMessageUnpack(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		exp    *Message
 		desc   string
 		packet []byte
-	}{{
+	}
+
+	var (
+		msg = NewMessage()
+
+		cases []testCase
+		c     testCase
+		expRR ResourceRecord
+		err   error
+		x     int
+	)
+
+	cases = []testCase{{
 		desc: "RR with A",
 		packet: []byte{
 			// Header
@@ -1846,15 +1920,13 @@ func TestMessageUnpack(t *testing.T) {
 		},
 	}}
 
-	msg := NewMessage()
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		msg.Reset()
 		msg.packet = c.packet
 
-		err := msg.Unpack()
+		err = msg.Unpack()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1865,32 +1937,32 @@ func TestMessageUnpack(t *testing.T) {
 		test.Assert(t, "Authority Length", len(c.exp.Authority), len(msg.Authority))
 		test.Assert(t, "Additional Length", len(c.exp.Additional), len(msg.Additional))
 
-		for x := 0; x < len(c.exp.Answer); x++ {
-			test.Assert(t, "Answer.Name", c.exp.Answer[x].Name, msg.Answer[x].Name)
-			test.Assert(t, "Answer.Type", c.exp.Answer[x].Type, msg.Answer[x].Type)
-			test.Assert(t, "Answer.Class", c.exp.Answer[x].Class, msg.Answer[x].Class)
-			test.Assert(t, "Answer.TTL", c.exp.Answer[x].TTL, msg.Answer[x].TTL)
-			test.Assert(t, "Answer.rdlen", c.exp.Answer[x].rdlen, msg.Answer[x].rdlen)
-			test.Assert(t, "Answer.rdata", c.exp.Answer[x].rdata, msg.Answer[x].rdata)
-			test.Assert(t, "Answer.Value", c.exp.Answer[x].Value, msg.Answer[x].Value)
+		for x, expRR = range c.exp.Answer {
+			test.Assert(t, "Answer.Name", expRR.Name, msg.Answer[x].Name)
+			test.Assert(t, "Answer.Type", expRR.Type, msg.Answer[x].Type)
+			test.Assert(t, "Answer.Class", expRR.Class, msg.Answer[x].Class)
+			test.Assert(t, "Answer.TTL", expRR.TTL, msg.Answer[x].TTL)
+			test.Assert(t, "Answer.rdlen", expRR.rdlen, msg.Answer[x].rdlen)
+			test.Assert(t, "Answer.rdata", expRR.rdata, msg.Answer[x].rdata)
+			test.Assert(t, "Answer.Value", expRR.Value, msg.Answer[x].Value)
 		}
-		for x := 0; x < len(c.exp.Authority); x++ {
-			test.Assert(t, "Authority.Name", c.exp.Authority[x].Name, msg.Authority[x].Name)
-			test.Assert(t, "Authority.Type", c.exp.Authority[x].Type, msg.Authority[x].Type)
-			test.Assert(t, "Authority.Class", c.exp.Authority[x].Class, msg.Authority[x].Class)
-			test.Assert(t, "Authority.TTL", c.exp.Authority[x].TTL, msg.Authority[x].TTL)
-			test.Assert(t, "Authority.rdlen", c.exp.Authority[x].rdlen, msg.Authority[x].rdlen)
-			test.Assert(t, "Authority.rdata", c.exp.Authority[x].rdata, msg.Authority[x].rdata)
-			test.Assert(t, "Authority.Value", c.exp.Authority[x].Value, msg.Authority[x].Value)
+		for x, expRR = range c.exp.Authority {
+			test.Assert(t, "Authority.Name", expRR.Name, msg.Authority[x].Name)
+			test.Assert(t, "Authority.Type", expRR.Type, msg.Authority[x].Type)
+			test.Assert(t, "Authority.Class", expRR.Class, msg.Authority[x].Class)
+			test.Assert(t, "Authority.TTL", expRR.TTL, msg.Authority[x].TTL)
+			test.Assert(t, "Authority.rdlen", expRR.rdlen, msg.Authority[x].rdlen)
+			test.Assert(t, "Authority.rdata", expRR.rdata, msg.Authority[x].rdata)
+			test.Assert(t, "Authority.Value", expRR.Value, msg.Authority[x].Value)
 		}
-		for x := 0; x < len(c.exp.Additional); x++ {
-			test.Assert(t, "Additional.Name", c.exp.Additional[x].Name, msg.Additional[x].Name)
-			test.Assert(t, "Additional.Type", c.exp.Additional[x].Type, msg.Additional[x].Type)
-			test.Assert(t, "Additional.Class", c.exp.Additional[x].Class, msg.Additional[x].Class)
-			test.Assert(t, "Additional.TTL", c.exp.Additional[x].TTL, msg.Additional[x].TTL)
-			test.Assert(t, "Additional.rdlen", c.exp.Additional[x].rdlen, msg.Additional[x].rdlen)
-			test.Assert(t, "Additional.rdata", c.exp.Additional[x].rdata, msg.Additional[x].rdata)
-			test.Assert(t, "Additional.Value", c.exp.Additional[x].Value, msg.Additional[x].Value)
+		for x, expRR = range c.exp.Additional {
+			test.Assert(t, "Additional.Name", expRR.Name, msg.Additional[x].Name)
+			test.Assert(t, "Additional.Type", expRR.Type, msg.Additional[x].Type)
+			test.Assert(t, "Additional.Class", expRR.Class, msg.Additional[x].Class)
+			test.Assert(t, "Additional.TTL", expRR.TTL, msg.Additional[x].TTL)
+			test.Assert(t, "Additional.rdlen", expRR.rdlen, msg.Additional[x].rdlen)
+			test.Assert(t, "Additional.rdata", expRR.rdata, msg.Additional[x].rdata)
+			test.Assert(t, "Additional.Value", expRR.Value, msg.Additional[x].Value)
 		}
 	}
 }

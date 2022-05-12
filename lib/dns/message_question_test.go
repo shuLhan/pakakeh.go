@@ -11,11 +11,18 @@ import (
 )
 
 func TestMessageQuestion_String(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc string
 		exp  string
 		mq   MessageQuestion
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		desc: "With unknown type",
 		mq: MessageQuestion{
 			Name: "test",
@@ -31,18 +38,27 @@ func TestMessageQuestion_String(t *testing.T) {
 		exp: `{Name:test Type:A}`,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		test.Assert(t, c.desc, c.exp, c.mq.String())
 	}
 }
 
 func TestMessageQuestion_unpack(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc   string
 		expErr string
 		mq     MessageQuestion
 		packet []byte
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+		gotMQ MessageQuestion
+		err   error
+	)
+
+	cases = []testCase{{
 		desc: "With empty packet",
 		mq:   MessageQuestion{},
 	}, {
@@ -92,10 +108,10 @@ func TestMessageQuestion_unpack(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
-		gotMQ := MessageQuestion{}
-		err := gotMQ.unpack(c.packet)
+		gotMQ = MessageQuestion{}
+		err = gotMQ.unpack(c.packet)
 		if err != nil {
 			test.Assert(t, c.desc, c.expErr, err.Error())
 			continue

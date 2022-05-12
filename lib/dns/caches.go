@@ -115,10 +115,14 @@ func (c *caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *a
 }
 
 // list return all answers in LRU.
-func (c *caches) list() (list []*Answer) {
+func (c *caches) list() (answers []*Answer) {
+	var (
+		e *list.Element
+	)
+
 	c.Lock()
-	for e := c.lru.Front(); e != nil; e = e.Next() {
-		list = append(list, e.Value.(*Answer))
+	for e = c.lru.Front(); e != nil; e = e.Next() {
+		answers = append(answers, e.Value.(*Answer))
 	}
 	c.Unlock()
 	return
@@ -173,6 +177,10 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 		logp   = "caches.read"
 		header = &cachesFileHeader{}
 		dec    = gob.NewDecoder(r)
+
+		item   *cachesFileV1
+		msg    *Message
+		answer *Answer
 	)
 
 	err = dec.Decode(header)
@@ -185,7 +193,7 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 	}
 
 	for {
-		item := &cachesFileV1{}
+		item = &cachesFileV1{}
 		err = dec.Decode(item)
 		if err != nil {
 			if errors.Is(err, io.EOF) {
@@ -194,14 +202,14 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
-		msg := NewMessage()
+		msg = NewMessage()
 		msg.packet = item.Packet
 		err = msg.Unpack()
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
-		answer := newAnswer(msg, false)
+		answer = newAnswer(msg, false)
 		answer.ReceivedAt = item.ReceivedAt
 		answer.AccessedAt = item.AccessedAt
 
@@ -243,14 +251,20 @@ func (c *caches) remove(qname string) (listAnswer []*Answer) {
 // removeLocalRR remove the local ResourceRecord from caches by its name,
 // type, class, and value.
 func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
+	var (
+		ans *answers
+		an  *Answer
+		ok  bool
+	)
+
 	c.Lock()
 	defer c.Unlock()
 
-	ans, ok := c.v[rr.Name]
+	ans, ok = c.v[rr.Name]
 	if !ok {
 		return nil
 	}
-	for _, an := range ans.v {
+	for _, an = range ans.v {
 		if an.RType != rr.Type {
 			continue
 		}
@@ -265,9 +279,14 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 
 // search for non-local DNS answer that match with regular expression.
 func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
+	var (
+		e      *list.Element
+		answer *Answer
+	)
+
 	c.Lock()
-	for e := c.lru.Front(); e != nil; e = e.Next() {
-		answer := e.Value.(*Answer)
+	for e = c.lru.Front(); e != nil; e = e.Next() {
+		answer = e.Value.(*Answer)
 		if re.MatchString(answer.QName) {
 			listMsg = append(listMsg, answer.msg)
 		}
@@ -284,9 +303,15 @@ func (c *caches) upsert(nu *Answer) (inserted bool) {
 		return
 	}
 
+	var (
+		answers *answers
+		an      *Answer
+		found   bool
+	)
+
 	c.Lock()
 
-	answers, found := c.v[nu.QName]
+	answers, found = c.v[nu.QName]
 	if !found {
 		inserted = true
 		c.v[nu.QName] = newAnswers(nu)
@@ -294,7 +319,7 @@ func (c *caches) upsert(nu *Answer) (inserted bool) {
 			nu.el = c.lru.PushBack(nu)
 		}
 	} else {
-		an := answers.upsert(nu)
+		an = answers.upsert(nu)
 		if an == nil {
 			inserted = true
 			if nu.ReceivedAt > 0 {
@@ -326,21 +351,27 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	c.Lock()
 	defer c.Unlock()
 
-	ans := c.v[rr.Name]
+	var (
+		ans *answers = c.v[rr.Name]
+
+		an  *Answer
+		msg *Message
+	)
+
 	if ans == nil {
-		msg, err := NewMessageFromRR(rr)
+		msg, err = NewMessageFromRR(rr)
 		if err != nil {
 			return err
 		}
-		an := newAnswer(msg, true)
+		an = newAnswer(msg, true)
 		c.v[rr.Name] = newAnswers(an)
 		return nil
 	}
 
-	an, _ := ans.get(rr.Type, rr.Class)
+	an, _ = ans.get(rr.Type, rr.Class)
 	if an == nil {
 		// The domain name is already exist, but without the RR type.
-		msg, err := NewMessageFromRR(rr)
+		msg, err = NewMessageFromRR(rr)
 		if err != nil {
 			return err
 		}
@@ -383,6 +414,9 @@ func (c *caches) write(w io.Writer) (n int, err error) {
 			Version: cachesFileFormatV1,
 		}
 		enc = gob.NewEncoder(w)
+
+		answer *Answer
+		item   *cachesFileV1
 	)
 
 	err = enc.Encode(header)
@@ -390,8 +424,8 @@ func (c *caches) write(w io.Writer) (n int, err error) {
 		return 0, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	for _, answer := range answers {
-		item := &cachesFileV1{
+	for _, answer = range answers {
+		item = &cachesFileV1{
 			ReceivedAt: answer.ReceivedAt,
 			AccessedAt: answer.AccessedAt,
 			Packet:     answer.msg.packet,

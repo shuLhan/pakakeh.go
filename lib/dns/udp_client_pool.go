@@ -41,12 +41,17 @@ func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 		New: ucp.newClient,
 	}
 
+	var (
+		cl *UDPClient
+		x  int
+	)
+
 	// Create new client for each name server, and push it to pool.
 	// This is required to check if each name server is a valid IP
 	// address because we did not want the New method return nil client
 	// later.
-	for x := 0; x < len(nameServers); x++ {
-		cl, err := NewUDPClient(nameServers[x])
+	for x = 0; x < len(nameServers); x++ {
+		cl, err = NewUDPClient(nameServers[x])
 		if err != nil {
 			return nil, err
 		}
@@ -58,14 +63,20 @@ func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 
 // newClient create a new udp client.
 func (ucp *UDPClientPool) newClient() interface{} {
+	var (
+		cl  *UDPClient
+		err error
+	)
+
 	ucp.Lock()
+	defer ucp.Unlock()
+
 	ucp.seq %= len(ucp.ns)
-	cl, err := NewUDPClient(ucp.ns[ucp.seq])
+	cl, err = NewUDPClient(ucp.ns[ucp.seq])
 	if err != nil {
 		log.Fatal("udp: UDPClientPool: cannot create new client: ", err)
 	}
 	ucp.seq++
-	ucp.Unlock()
 	return cl
 }
 

@@ -11,17 +11,27 @@ import (
 )
 
 func TestUDPClientLookup(t *testing.T) {
-	cl, err := NewUDPClient(testServerAddress)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		exp            *Message
 		desc           string
 		qst            MessageQuestion
 		allowRecursion bool
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+		cl    *UDPClient
+		got   *Message
+		err   error
+	)
+
+	cl, err = NewUDPClient(testServerAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc: "QType:A RClass:IN QName:kilabit.info",
 		qst: MessageQuestion{
 			Name: "kilabit.info",
@@ -151,10 +161,10 @@ func TestUDPClientLookup(t *testing.T) {
 		allowRecursion: true,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.qst, c.allowRecursion)
+		got, err = cl.Lookup(c.qst, c.allowRecursion)
 		if err != nil {
 			t.Fatal(err)
 		}

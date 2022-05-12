@@ -11,12 +11,22 @@ import (
 )
 
 func TestZoneParseDirectiveOrigin(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc   string
 		in     string
 		expErr string
 		exp    string
-	}{{
+	}
+
+	var (
+		m = newZoneParser("")
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	cases = []testCase{{
 		desc:   "Without value",
 		in:     `$origin`,
 		expErr: "line 1: empty $origin directive",
@@ -34,14 +44,12 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 		exp:  "x",
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, "", 0)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 			continue
@@ -52,11 +60,21 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 }
 
 func TestZoneParseDirectiveInclude(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc   string
 		in     string
 		expErr string
-	}{{
+	}
+
+	var (
+		m = newZoneParser("")
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	cases = []testCase{{
 		desc:   "Without value",
 		in:     `$include`,
 		expErr: "line 1: empty $include directive",
@@ -72,14 +90,12 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 		in:   `$origin testdata/sub.domain ;comment`,
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, "", 0)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 			continue
@@ -88,12 +104,22 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 }
 
 func TestZoneParseDirectiveTTL(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc   string
 		in     string
 		expErr string
 		exp    uint32
-	}{{
+	}
+
+	var (
+		m = newZoneParser("")
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	cases = []testCase{{
 		desc:   "Without value",
 		in:     `$ttl`,
 		expErr: "line 1: empty $TTL directive",
@@ -111,14 +137,12 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 		exp:  1,
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, "", 0)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 			continue
@@ -138,7 +162,18 @@ func TestZoneInitRFC1035(t *testing.T) {
 		ttl    uint32
 	}
 
-	cases := []caseZoneInit{{
+	var (
+		m = newZoneParser("")
+
+		msg   *Message
+		rr    ResourceRecord
+		cases []caseZoneInit
+		c     caseZoneInit
+		err   error
+		x, y  int
+	)
+
+	cases = []caseZoneInit{{
 		desc:   "RFC1035 section 5.3",
 		origin: "ISI.EDU",
 		ttl:    3600,
@@ -320,14 +355,12 @@ VAXA    A       10.2.0.27
 		}},
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 			continue
@@ -336,44 +369,57 @@ VAXA    A       10.2.0.27
 		test.Assert(t, "messages length:",
 			len(c.exp), len(m.zone.messages))
 
-		for x, msg := range m.zone.messages {
+		for x, msg = range m.zone.messages {
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
-			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
+			for y, rr = range msg.Answer {
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
 			}
-			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
+			for y, rr = range msg.Authority {
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
 			}
-			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
+			for y, rr = range msg.Additional {
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
 			}
 		}
 	}
 }
 
 func TestZoneInit2(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		expErr error
 		desc   string
 		origin string
 		in     string
 		exp    []*Message
 		ttl    uint32
-	}{{
+	}
+
+	var (
+		m = newZoneParser("")
+
+		msg   *Message
+		rr    ResourceRecord
+		cases []testCase
+		c     testCase
+		err   error
+		x, y  int
+	)
+
+	cases = []testCase{{
 		desc: "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
 		in: `
 $ORIGIN pcguide.com.
@@ -578,14 +624,12 @@ relay IN CNAME relay.pair.com.
 		}},
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 			continue
@@ -594,44 +638,57 @@ relay IN CNAME relay.pair.com.
 		test.Assert(t, "messages length:", len(c.exp),
 			len(m.zone.messages))
 
-		for x, msg := range m.zone.messages {
+		for x, msg = range m.zone.messages {
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
-			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
+			for y, rr = range msg.Answer {
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
 			}
-			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
+			for y, rr = range msg.Authority {
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
 			}
-			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
+			for y, rr = range msg.Additional {
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
 			}
 		}
 	}
 }
 
 func TestZoneInit3(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		expErr error
 		desc   string
 		origin string
 		in     string
 		exp    []*Message
 		ttl    uint32
-	}{{
+	}
+
+	var (
+		m = newZoneParser("")
+
+		msg   *Message
+		rr    ResourceRecord
+		cases []testCase
+		c     testCase
+		err   error
+		x, y  int
+	)
+
+	cases = []testCase{{
 		desc:   "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
 		origin: "localdomain",
 		in: `
@@ -699,14 +756,12 @@ angularjs.doc       A  127.0.0.1
 		}},
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		m.Init(c.in, c.origin, c.ttl)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 			continue
@@ -715,41 +770,54 @@ angularjs.doc       A  127.0.0.1
 		test.Assert(t, "messages length:", len(c.exp),
 			len(m.zone.messages))
 
-		for x, msg := range m.zone.messages {
+		for x, msg = range m.zone.messages {
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
-			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
+			for y, rr = range msg.Answer {
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
 			}
-			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
+			for y, rr = range msg.Authority {
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
 			}
-			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
+			for y, rr = range msg.Additional {
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
 			}
 		}
 	}
 }
 
 func TestZoneParseTXT(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		in       string
 		expError string
 		exp      []*Message
-	}{{
+	}
+
+	var (
+		m = newZoneParser("")
+
+		msg   *Message
+		rr    ResourceRecord
+		cases []testCase
+		c     testCase
+		err   error
+		x, y  int
+	)
+
+	cases = []testCase{{
 		in: `@ IN TXT "This is a test"`,
 		exp: []*Message{{
 			Header: MessageHeader{
@@ -772,12 +840,10 @@ func TestZoneParseTXT(t *testing.T) {
 		}},
 	}}
 
-	m := newZoneParser("")
-
-	for _, c := range cases {
+	for _, c = range cases {
 		m.Init(c.in, "kilabit.local", 3600)
 
-		err := m.parse()
+		err = m.parse()
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error())
 			continue
@@ -785,30 +851,30 @@ func TestZoneParseTXT(t *testing.T) {
 
 		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
 
-		for x, msg := range m.zone.messages {
+		for x, msg = range m.zone.messages {
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
-			for y, answer := range msg.Answer {
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, answer.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, answer.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, answer.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, answer.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, answer.Value)
+			for y, rr = range msg.Answer {
+				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
+				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
+				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
+				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
+				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
 			}
-			for y, auth := range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, auth.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, auth.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, auth.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, auth.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, auth.Value)
+			for y, rr = range msg.Authority {
+				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
+				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
+				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
+				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
+				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
 			}
-			for y, add := range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, add.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, add.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, add.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, add.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, add.Value)
+			for y, rr = range msg.Additional {
+				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
+				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
+				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
+				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
+				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
 			}
 		}
 	}

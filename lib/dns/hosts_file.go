@@ -63,15 +63,25 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 		return nil, nil
 	}
 
-	d, err := os.Open(dir)
+	var (
+		d             *os.File
+		hfile         *HostsFile
+		fi            os.FileInfo
+		fis           []os.FileInfo
+		name          string
+		hostsFilePath string
+		errClose      error
+	)
+
+	d, err = os.Open(dir)
 	if err != nil {
 		return nil, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
 	}
 
-	fis, err := d.Readdir(0)
+	fis, err = d.Readdir(0)
 	if err != nil {
 		log.Println("dns: LoadHostsDir: ", err)
-		errClose := d.Close()
+		errClose = d.Close()
 		if errClose != nil {
 			log.Println("dns: LoadHostsDir: ", errClose)
 		}
@@ -80,20 +90,20 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 
 	hostsFiles = make(map[string]*HostsFile)
 
-	for x := 0; x < len(fis); x++ {
-		if fis[x].IsDir() {
+	for _, fi = range fis {
+		if fi.IsDir() {
 			continue
 		}
 
 		// Ignore file that start with "." .
-		name := fis[x].Name()
+		name = fi.Name()
 		if name[0] == '.' {
 			continue
 		}
 
-		hostsFilePath := filepath.Join(dir, name)
+		hostsFilePath = filepath.Join(dir, name)
 
-		hfile, err := ParseHostsFile(hostsFilePath)
+		hfile, err = ParseHostsFile(hostsFilePath)
 		if err != nil {
 			return hostsFiles, fmt.Errorf("LoadHostsDir %q: %w", dir, err)
 		}
@@ -112,11 +122,15 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 // ParseHostsFile parse the content of hosts file as packed DNS message.
 // If path is empty, it will load from the system hosts file.
 func ParseHostsFile(path string) (hfile *HostsFile, err error) {
+	var (
+		reader *libio.Reader
+	)
+
 	if len(path) == 0 {
 		path = GetSystemHosts()
 	}
 
-	reader, err := libio.NewReader(path)
+	reader, err = libio.NewReader(path)
 	if err != nil {
 		return nil, fmt.Errorf("ParseHostsFile %q: %w", path, err)
 	}
@@ -146,10 +160,17 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 	var (
 		seps  = []byte{'\t', '\v', ' '}
 		terms = []byte{'\n', '\f', '#'}
+
+		rr     *ResourceRecord
+		addr   []byte
+		hname  []byte
+		rtype  RecordType
+		c      byte
+		isTerm bool
 	)
 
 	for {
-		c := reader.SkipSpaces()
+		c = reader.SkipSpaces()
 		if c == 0 {
 			break
 		}
@@ -158,7 +179,7 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 			continue
 		}
 
-		addr, isTerm, c := reader.ReadUntil(seps, terms)
+		addr, isTerm, c = reader.ReadUntil(seps, terms)
 		if isTerm {
 			if c == 0 {
 				break
@@ -170,7 +191,7 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 		}
 
 		for {
-			c := reader.SkipSpaces()
+			c = reader.SkipSpaces()
 			if c == 0 {
 				break
 			}
@@ -178,13 +199,13 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 				reader.SkipLine()
 				break
 			}
-			hname, isTerm, c := reader.ReadUntil(seps, terms)
+			hname, isTerm, c = reader.ReadUntil(seps, terms)
 			if len(hname) > 0 {
-				rtype := RecordTypeFromAddress(addr)
+				rtype = RecordTypeFromAddress(addr)
 				if rtype == 0 {
 					continue
 				}
-				rr := &ResourceRecord{
+				rr = &ResourceRecord{
 					Name:  string(bytes.ToLower(hname)),
 					Type:  rtype,
 					Class: RecordClassIN,
@@ -210,7 +231,14 @@ func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
 
 // AppendAndSaveRecord append new record and save it to hosts file.
 func (hfile *HostsFile) AppendAndSaveRecord(rr *ResourceRecord) (err error) {
-	f, err := os.OpenFile(
+	var (
+		f         *os.File
+		ipAddress string
+		errClose  error
+		ok        bool
+	)
+
+	f, err = os.OpenFile(
 		hfile.Path,
 		os.O_RDWR|os.O_CREATE|os.O_APPEND,
 		0600,
@@ -219,12 +247,12 @@ func (hfile *HostsFile) AppendAndSaveRecord(rr *ResourceRecord) (err error) {
 		return err
 	}
 
-	ipAddress, ok := rr.Value.(string)
+	ipAddress, ok = rr.Value.(string)
 	if ok {
 		_, err = fmt.Fprintf(f, "%s %s\n", ipAddress, rr.Name)
 	}
 
-	errClose := f.Close()
+	errClose = f.Close()
 	if errClose != nil {
 		if err == nil {
 			err = errClose
@@ -281,9 +309,13 @@ func (hfile *HostsFile) Get(dname, value string) (rr *ResourceRecord) {
 
 // Names return all hosts domain names.
 func (hfile *HostsFile) Names() (names []string) {
+	var (
+		rr *ResourceRecord
+	)
+
 	names = make([]string, 0, len(hfile.Records))
 
-	for _, rr := range hfile.Records {
+	for _, rr = range hfile.Records {
 		names = append(names, rr.Name)
 	}
 
@@ -323,11 +355,17 @@ func (hfile *HostsFile) Save() (err error) {
 		return err
 	}
 
-	for _, rr := range hfile.Records {
+	var (
+		rr        *ResourceRecord
+		ipAddress string
+		ok        bool
+	)
+
+	for _, rr = range hfile.Records {
 		if len(rr.Name) == 0 || rr.Value == nil {
 			continue
 		}
-		ipAddress, ok := rr.Value.(string)
+		ipAddress, ok = rr.Value.(string)
 		if !ok {
 			continue
 		}

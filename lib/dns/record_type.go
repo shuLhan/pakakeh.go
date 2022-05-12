@@ -97,13 +97,19 @@ var RecordTypeNames = map[RecordType]string{
 // RecordTypeFromAddress return RecordTypeA or RecordTypeAAAA if addr is valid
 // IPv4 or IPv6 address, respectively, otherwise it will return 0.
 func RecordTypeFromAddress(addr []byte) (rtype RecordType) {
-	ip := net.ParseIP(string(addr))
+	var (
+		ip net.IP = net.ParseIP(string(addr))
+
+		ipv4 net.IP
+		ipv6 net.IP
+	)
+
 	if ip != nil {
-		ipv4 := ip.To4()
+		ipv4 = ip.To4()
 		if ipv4 != nil {
 			return RecordTypeA
 		}
-		ipv6 := ip.To16()
+		ipv6 = ip.To16()
 		if ipv6 != nil {
 			return RecordTypeAAAA
 		}

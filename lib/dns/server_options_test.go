@@ -13,14 +13,22 @@ import (
 )
 
 func TestServerOptionsInit(t *testing.T) {
-	ip := net.ParseIP("0.0.0.0")
-
-	cases := []struct {
+	type testCase struct {
 		desc     string
 		so       *ServerOptions
 		exp      *ServerOptions
 		expError string
-	}{{
+	}
+
+	var (
+		ip net.IP = net.ParseIP("0.0.0.0")
+
+		cases []testCase
+		c     testCase
+		err   error
+	)
+
+	cases = []testCase{{
 		desc: "With empty value",
 		so:   &ServerOptions{},
 		exp: &ServerOptions{
@@ -77,10 +85,10 @@ func TestServerOptionsInit(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		err := c.so.init()
+		err = c.so.init()
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error())
 			continue
@@ -91,16 +99,23 @@ func TestServerOptionsInit(t *testing.T) {
 }
 
 func TestServerOptionsParseNameServers(t *testing.T) {
-	so := &ServerOptions{}
-	ip := net.ParseIP("127.0.0.1")
-
-	cases := []struct {
+	type testCase struct {
 		desc          string
 		nameServers   []string
 		expUDPServers []net.Addr
 		expTCPServers []net.Addr
 		expDoHServers []string
-	}{{
+	}
+
+	var (
+		so = &ServerOptions{}
+		ip = net.ParseIP("127.0.0.1")
+
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		desc: "With empty input",
 	}, {
 		desc: "With invalid URI",
@@ -156,7 +171,7 @@ func TestServerOptionsParseNameServers(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		so.NameServers = c.nameServers

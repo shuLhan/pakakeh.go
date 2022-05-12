@@ -14,6 +14,7 @@ import (
 	"math"
 	"net"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"sync"
@@ -103,20 +104,29 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 		tcpq:     make(chan *request, 512),
 	}
 
-	udpAddr := opts.getUDPAddress()
+	var (
+		udpAddr *net.UDPAddr
+		tcpAddr *net.TCPAddr
+	)
+
+	udpAddr = opts.getUDPAddress()
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
 	if err != nil {
 		return nil, fmt.Errorf("dns: error listening on UDP '%v': %s", udpAddr, err)
 	}
 
-	tcpAddr := opts.getTCPAddress()
+	tcpAddr = opts.getTCPAddress()
 	srv.tcp, err = net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
 		return nil, fmt.Errorf("dns: error listening on TCP '%v': %s", tcpAddr, err)
 	}
 
 	if len(opts.TLSCertFile) > 0 && len(opts.TLSPrivateKey) > 0 {
-		cert, err := tls.LoadX509KeyPair(opts.TLSCertFile, opts.TLSPrivateKey)
+		var (
+			cert tls.Certificate
+		)
+
+		cert, err = tls.LoadX509KeyPair(opts.TLSCertFile, opts.TLSPrivateKey)
 		if err != nil {
 			return nil, fmt.Errorf("dns: error loading certificate: %w", err)
 		}
@@ -159,13 +169,16 @@ func isResponseValid(req *request, res *Message) bool {
 
 // CachesLoad load the gob encoded answers from r.
 func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
-	logp := "CachesLoad"
+	var (
+		logp   = "CachesLoad"
+		answer *Answer
+	)
 
 	answers, err = srv.caches.read(r)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
-	for _, answer := range answers {
+	for _, answer = range answers {
 		_ = srv.caches.upsert(answer)
 	}
 	return answers, nil
@@ -195,13 +208,15 @@ func (srv *Server) SearchCaches(re *regexp.Regexp) []*Message {
 // PopulateCaches add list of message to caches.
 func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 	var (
+		msg      *Message
+		an       *Answer
 		n        int
 		inserted bool
 		isLocal  = true
 	)
 
-	for _, msg := range msgs {
-		an := newAnswer(msg, isLocal)
+	for _, msg = range msgs {
+		an = newAnswer(msg, isLocal)
 		inserted = srv.caches.upsert(an)
 		if inserted {
 			n++
@@ -214,11 +229,13 @@ func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 }
 
 // PopulateCachesByRR update or insert new ResourceRecord into caches.
-func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (
-	err error,
-) {
-	n := 0
-	for _, rr := range listRR {
+func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (err error) {
+	var (
+		rr *ResourceRecord
+		n  int
+	)
+
+	for _, rr = range listRR {
 		err = srv.caches.upsertRR(rr)
 		if err != nil {
 			return err
@@ -263,8 +280,11 @@ func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) error {
 
 // RemoveLocalCachesByNames remove local caches by domain names.
 func (srv *Server) RemoveLocalCachesByNames(names []string) {
+	var (
+		x int
+	)
 	srv.caches.Lock()
-	for x := 0; x < len(names); x++ {
+	for ; x < len(names); x++ {
 		delete(srv.caches.v, names[x])
 		if debug.Value >= 1 {
 			fmt.Println("dns: - ", names[x])
@@ -306,9 +326,13 @@ func (srv *Server) ListenAndServe() (err error) {
 
 // Stop the forwarders and close all listeners.
 func (srv *Server) Stop() {
+	var (
+		err error
+	)
+
 	srv.stopAllForwarders()
 
-	err := srv.udp.Close()
+	err = srv.udp.Close()
 	if err != nil {
 		log.Println("dns: error when closing UDP: " + err.Error())
 	}
@@ -333,9 +357,11 @@ func (srv *Server) Stop() {
 // serveDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
 func (srv *Server) serveDoH() {
-	var err error
+	var (
+		addr string = srv.opts.getHTTPAddress().String()
 
-	addr := srv.opts.getHTTPAddress().String()
+		err error
+	)
 
 	srv.doh = &http.Server{
 		Addr:        addr,
@@ -363,10 +389,12 @@ func (srv *Server) serveDoH() {
 
 func (srv *Server) serveDoT() {
 	var (
-		err error
-	)
+		dotAddr *net.TCPAddr = srv.opts.getDoTAddress()
 
-	dotAddr := srv.opts.getDoTAddress()
+		cl   *TCPClient
+		conn net.Conn
+		err  error
+	)
 
 	for {
 		if srv.opts.DoHBehindProxy || srv.tlsConfig == nil {
@@ -383,7 +411,7 @@ func (srv *Server) serveDoT() {
 		log.Println("dns.Server: listening for DNS over TLS at", dotAddr.String())
 
 		for {
-			conn, err := srv.dot.Accept()
+			conn, err = srv.dot.Accept()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					err = nil
@@ -394,7 +422,7 @@ func (srv *Server) serveDoT() {
 				break
 			}
 
-			cl := &TCPClient{
+			cl = &TCPClient{
 				writeTimeout: clientTimeout,
 				conn:         conn,
 			}
@@ -406,10 +434,16 @@ func (srv *Server) serveDoT() {
 
 // serveTCP serve DNS request from TCP connection.
 func (srv *Server) serveTCP() {
+	var (
+		cl   *TCPClient
+		conn net.Conn
+		err  error
+	)
+
 	log.Println("dns.Server: listening for DNS over TCP at", srv.tcp.Addr())
 
 	for {
-		conn, err := srv.tcp.AcceptTCP()
+		conn, err = srv.tcp.AcceptTCP()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				err = nil
@@ -420,7 +454,7 @@ func (srv *Server) serveTCP() {
 			return
 		}
 
-		cl := &TCPClient{
+		cl = &TCPClient{
 			writeTimeout: clientTimeout,
 			conn:         conn,
 		}
@@ -474,10 +508,15 @@ func (srv *Server) serveUDP() {
 }
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	hdr := w.Header()
+	var (
+		hdr http.Header = w.Header()
+
+		hdrAcceptValue string
+	)
+
 	hdr.Set(dohHeaderKeyContentType, dohHeaderValDNSMessage)
 
-	hdrAcceptValue := r.Header.Get(dohHeaderKeyAccept)
+	hdrAcceptValue = r.Header.Get(dohHeaderKeyAccept)
 	if len(hdrAcceptValue) == 0 {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 		return
@@ -502,15 +541,20 @@ func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHGet(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	msgBase64 := q.Get("dns")
+	var (
+		q         url.Values = r.URL.Query()
+		msgBase64 string     = q.Get("dns")
+
+		raw []byte
+		err error
+	)
 
 	if len(msgBase64) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	raw, err := base64.RawURLEncoding.DecodeString(msgBase64)
+	raw, err = base64.RawURLEncoding.DecodeString(msgBase64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -520,7 +564,12 @@ func (srv *Server) handleDoHGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
-	raw, err := io.ReadAll(r.Body)
+	var (
+		raw []byte
+		err error
+	)
+
+	raw, err = io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -530,18 +579,21 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
-	req := newRequest()
+	var (
+		req *request = newRequest()
+		cl           = &DoHClient{
+			w:         w,
+			responded: make(chan bool, 1),
+		}
+
+		err error
+	)
 
 	req.kind = connTypeDoH
-	cl := &DoHClient{
-		w:         w,
-		responded: make(chan bool, 1),
-	}
-
 	req.writer = cl
 	req.message.packet = append(req.message.packet[:0], raw...)
 
-	err := req.message.UnpackHeaderQuestion()
+	err = req.message.UnpackHeaderQuestion()
 	if err != nil {
 		log.Println(err)
 		req.error(RCodeErrServer)
@@ -635,7 +687,15 @@ func (srv *Server) isImplemented(msg *Message) bool {
 
 // processRequest from client.
 func (srv *Server) processRequest() {
-	for req := range srv.requestq {
+	var (
+		an  *Answer
+		res *Message
+		req *request
+		ans *answers
+		err error
+	)
+
+	for req = range srv.requestq {
 		if !srv.isImplemented(req.message) {
 			req.error(RCodeNotImplemented)
 			continue
@@ -648,7 +708,7 @@ func (srv *Server) processRequest() {
 				req.message.Question.String())
 		}
 
-		ans, an := srv.caches.get(req.message.Question.Name,
+		ans, an = srv.caches.get(req.message.Question.Name,
 			req.message.Question.Type,
 			req.message.Question.Class)
 
@@ -701,13 +761,13 @@ func (srv *Server) processRequest() {
 
 		an.msg.SetID(req.message.Header.ID)
 		an.updateTTL()
-		res := an.msg
+		res = an.msg
 
 		if debug.Value >= 1 {
 			fmt.Printf("dns: < %s %d:%s\n", connTypeNames[req.kind], res.Header.ID, res.Question.String())
 		}
 
-		_, err := req.writer.Write(res.packet)
+		_, err = req.writer.Write(res.packet)
 		if err != nil {
 			log.Println("dns: processRequest: ", err.Error())
 		}
@@ -720,7 +780,13 @@ func (srv *Server) processResponse(req *request, res *Message) {
 		return
 	}
 
-	_, err := req.writer.Write(res.packet)
+	var (
+		an       *Answer
+		err      error
+		inserted bool
+	)
+
+	_, err = req.writer.Write(res.packet)
 	if err != nil {
 		log.Println("dns: processResponse: ", err.Error())
 		return
@@ -737,8 +803,8 @@ func (srv *Server) processResponse(req *request, res *Message) {
 		return
 	}
 
-	an := newAnswer(res, false)
-	inserted := srv.caches.upsert(an)
+	an = newAnswer(res, false)
+	inserted = srv.caches.upsert(an)
 
 	if debug.Value >= 1 {
 		if inserted {
@@ -755,39 +821,56 @@ func (srv *Server) processResponse(req *request, res *Message) {
 
 func (srv *Server) startAllForwarders() {
 	srv.fwStoppers = nil
-	asPrimary := "primary"
 
-	for x := 0; x < len(srv.opts.primaryUDP); x++ {
-		tag := fmt.Sprintf("UDP-%d-%s", x, asPrimary)
-		nameserver := srv.opts.primaryUDP[x].String()
+	var (
+		asPrimary = "primary"
+
+		tag        string
+		nameserver string
+		x          int
+	)
+
+	for x = 0; x < len(srv.opts.primaryUDP); x++ {
+		tag = fmt.Sprintf("UDP-%d-%s", x, asPrimary)
+		nameserver = srv.opts.primaryUDP[x].String()
 		go srv.runUDPForwarder(tag, nameserver)
 	}
-	for x := 0; x < len(srv.opts.primaryTCP); x++ {
-		tag := fmt.Sprintf("TCP-%d-%s", x, asPrimary)
-		nameserver := srv.opts.primaryTCP[x].String()
+	for x = 0; x < len(srv.opts.primaryTCP); x++ {
+		tag = fmt.Sprintf("TCP-%d-%s", x, asPrimary)
+		nameserver = srv.opts.primaryTCP[x].String()
 		go srv.runTCPForwarder(tag, nameserver)
 	}
-	for x := 0; x < len(srv.opts.primaryDoh); x++ {
-		tag := fmt.Sprintf("DoH-%d-%s", x, asPrimary)
-		nameserver := srv.opts.primaryDoh[x]
+	for x = 0; x < len(srv.opts.primaryDoh); x++ {
+		tag = fmt.Sprintf("DoH-%d-%s", x, asPrimary)
+		nameserver = srv.opts.primaryDoh[x]
 		go srv.runDohForwarder(tag, nameserver)
 	}
-	for x := 0; x < len(srv.opts.primaryDot); x++ {
-		tag := fmt.Sprintf("DoT-%d-%s", x, asPrimary)
-		nameserver := srv.opts.primaryDot[x]
+	for x = 0; x < len(srv.opts.primaryDot); x++ {
+		tag = fmt.Sprintf("DoT-%d-%s", x, asPrimary)
+		nameserver = srv.opts.primaryDot[x]
 		go srv.runTLSForwarder(tag, nameserver)
 	}
 }
 
 func (srv *Server) runDohForwarder(tag, nameserver string) {
-	stopper := srv.newStopper()
+	var (
+		stopper <-chan bool = srv.newStopper()
+
+		forwarder *DoHClient
+		ticker    *time.Ticker
+		req       *request
+		res       *Message
+		err       error
+		isRunning bool
+		ok        bool
+	)
 
 	defer func() {
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
 	for {
-		forwarder, err := NewDoHClient(nameserver, false)
+		forwarder, err = NewDoHClient(nameserver, false)
 		if err != nil {
 			log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 
@@ -805,11 +888,11 @@ func (srv *Server) runDohForwarder(tag, nameserver string) {
 
 		srv.incForwarder()
 
-		isRunning := true
-		ticker := time.NewTicker(aliveInterval)
+		isRunning = true
+		ticker = time.NewTicker(aliveInterval)
 		for isRunning {
 			select {
-			case req, ok := <-srv.primaryq:
+			case req, ok = <-srv.primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
 					srv.stopForwarder(forwarder)
@@ -822,7 +905,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string) {
 						req.message.Question.String())
 				}
 
-				res, err := forwarder.Query(req.message)
+				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 					isRunning = false
@@ -845,14 +928,24 @@ func (srv *Server) runDohForwarder(tag, nameserver string) {
 }
 
 func (srv *Server) runTLSForwarder(tag, nameserver string) {
-	stopper := srv.newStopper()
+	var (
+		stopper <-chan bool = srv.newStopper()
+
+		forwarder *DoTClient
+		ticker    *time.Ticker
+		req       *request
+		res       *Message
+		err       error
+		isRunning bool
+		ok        bool
+	)
 
 	defer func() {
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
 	for {
-		forwarder, err := NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
+		forwarder, err = NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
 		if err != nil {
 			log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 
@@ -870,11 +963,11 @@ func (srv *Server) runTLSForwarder(tag, nameserver string) {
 
 		srv.incForwarder()
 
-		isRunning := true
-		ticker := time.NewTicker(aliveInterval)
+		isRunning = true
+		ticker = time.NewTicker(aliveInterval)
 		for isRunning {
 			select {
-			case req, ok := <-srv.primaryq:
+			case req, ok = <-srv.primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
 					srv.stopForwarder(forwarder)
@@ -887,7 +980,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string) {
 						req.message.Question.String())
 				}
 
-				res, err := forwarder.Query(req.message)
+				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 					isRunning = false
@@ -911,7 +1004,16 @@ func (srv *Server) runTLSForwarder(tag, nameserver string) {
 }
 
 func (srv *Server) runTCPForwarder(tag, nameserver string) {
-	stopper := srv.newStopper()
+	var (
+		stopper <-chan bool = srv.newStopper()
+
+		ticker *time.Ticker
+		cl     *TCPClient
+		req    *request
+		res    *Message
+		err    error
+		ok     bool
+	)
 
 	log.Printf("dns: starting forwarder %s for %s", tag, nameserver)
 
@@ -922,10 +1024,10 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
 	}()
 
-	ticker := time.NewTicker(aliveInterval)
+	ticker = time.NewTicker(aliveInterval)
 	for {
 		select {
-		case req, ok := <-srv.tcpq:
+		case req, ok = <-srv.tcpq:
 			if !ok {
 				log.Println("dns: primary queue has been closed")
 				return
@@ -936,13 +1038,13 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 					req.message.Question.String())
 			}
 
-			cl, err := NewTCPClient(nameserver)
+			cl, err = NewTCPClient(nameserver)
 			if err != nil {
 				log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 				continue
 			}
 
-			res, err := cl.Query(req.message)
+			res, err = cl.Query(req.message)
 			cl.Close()
 			if err != nil {
 				log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
@@ -963,7 +1065,17 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 // runUDPForwarder create a UDP client that consume request from queue
 // and forward it to parent name server.
 func (srv *Server) runUDPForwarder(tag, nameserver string) {
-	stopper := srv.newStopper()
+	var (
+		stopper <-chan bool = srv.newStopper()
+
+		forwarder *UDPClient
+		ticker    *time.Ticker
+		req       *request
+		res       *Message
+		err       error
+		isRunning bool
+		ok        bool
+	)
 
 	defer func() {
 		log.Printf("dns: forwarder %s for %s has been stopped", tag, nameserver)
@@ -971,7 +1083,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string) {
 
 	// The first loop handle broken connection.
 	for {
-		forwarder, err := NewUDPClient(nameserver)
+		forwarder, err = NewUDPClient(nameserver)
 		if err != nil {
 			log.Printf("dns: failed to create forwarder %s: %s", tag, err)
 
@@ -990,11 +1102,11 @@ func (srv *Server) runUDPForwarder(tag, nameserver string) {
 		srv.incForwarder()
 
 		// The second loop consume the forward queue.
-		isRunning := true
-		ticker := time.NewTicker(aliveInterval)
+		isRunning = true
+		ticker = time.NewTicker(aliveInterval)
 		for isRunning {
 			select {
-			case req, ok := <-srv.primaryq:
+			case req, ok = <-srv.primaryq:
 				if !ok {
 					log.Println("dns: primary queue has been closed")
 					srv.stopForwarder(forwarder)
@@ -1007,7 +1119,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string) {
 						req.message.Question.String())
 				}
 
-				res, err := forwarder.Query(req.message)
+				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf("dns: %s forward failed: %s: %s", tag, req.message.Question.Name, err)
 					isRunning = false
@@ -1038,10 +1150,13 @@ func (srv *Server) stopForwarder(fw Client) {
 
 // stopAllForwarders stop all forwarder connections.
 func (srv *Server) stopAllForwarders() {
-	for x := 0; x < len(srv.fwStoppers); x++ {
+	var (
+		x int
+	)
+	for x = 0; x < len(srv.fwStoppers); x++ {
 		srv.fwStoppers[x] <- true
 	}
-	for x := 0; x < len(srv.fwStoppers); x++ {
+	for x = 0; x < len(srv.fwStoppers); x++ {
 		close(srv.fwStoppers[x])
 	}
 
@@ -1051,7 +1166,7 @@ func (srv *Server) stopAllForwarders() {
 func (srv *Server) newStopper() <-chan bool {
 	srv.fwLocker.Lock()
 
-	stopper := make(chan bool, 1)
+	var stopper = make(chan bool, 1)
 	srv.fwStoppers = append(srv.fwStoppers, stopper)
 
 	srv.fwLocker.Unlock()

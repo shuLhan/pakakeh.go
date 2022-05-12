@@ -12,31 +12,49 @@ import (
 )
 
 func TestGetSystemNameServers(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		path string
 		exp  []string
-	}{{
+	}
+
+	var (
+		cases []testCase
+		got   []string
+		c     testCase
+	)
+
+	cases = append(cases, testCase{
 		path: "testdata/resolv.conf",
 		exp: []string{
 			"127.0.0.1",
 		},
-	}}
+	})
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.path)
 
-		got := GetSystemNameServers(c.path)
+		got = GetSystemNameServers(c.path)
 
 		test.Assert(t, "NameServers", c.exp, got)
 	}
 }
 
 func TestReverseIP(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		ip        string
 		exp       []byte
 		expIsIPv4 bool
-	}{{
+	}
+
+	var (
+		ip        net.IP
+		cases     []testCase
+		c         testCase
+		gotIP     []byte
+		gotIsIPv4 bool
+	)
+
+	cases = []testCase{{
 		ip: "",
 	}, {
 		ip:        "192.0.2.1",
@@ -47,10 +65,10 @@ func TestReverseIP(t *testing.T) {
 		exp: []byte("8.6.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2"),
 	}}
 
-	for _, c := range cases {
-		ip := net.ParseIP(c.ip)
+	for _, c = range cases {
+		ip = net.ParseIP(c.ip)
 
-		gotIP, gotIsIPv4 := reverseIP(ip)
+		gotIP, gotIsIPv4 = reverseIP(ip)
 
 		test.Assert(t, "reverseIP", c.exp, gotIP)
 		test.Assert(t, "isIPv4", c.expIsIPv4, gotIsIPv4)
@@ -58,16 +76,26 @@ func TestReverseIP(t *testing.T) {
 }
 
 func TestLookupPTR(t *testing.T) {
-	cl, err := NewUDPClient(testServerAddress)
+	type testCase struct {
+		exp    string
+		expErr string
+		ip     net.IP
+	}
+
+	var (
+		cl    *UDPClient
+		cases []testCase
+		c     testCase
+		got   string
+		err   error
+	)
+
+	cl, err = NewUDPClient(testServerAddress)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		exp    string
-		expErr string
-		ip     net.IP
-	}{{
+	cases = []testCase{{
 		ip:     nil,
 		expErr: "empty IP address",
 	}, {
@@ -83,10 +111,10 @@ func TestLookupPTR(t *testing.T) {
 		exp: "kilabit.info",
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Logf("ip: %s", c.ip)
 
-		got, err := LookupPTR(cl, c.ip)
+		got, err = LookupPTR(cl, c.ip)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue

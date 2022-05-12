@@ -47,7 +47,7 @@ func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	if isLocal {
 		return
 	}
-	at := time.Now().Unix()
+	var at int64 = time.Now().Unix()
 	an.ReceivedAt = at
 	an.AccessedAt = at
 	return
@@ -93,6 +93,6 @@ func (an *Answer) updateTTL() {
 	}
 
 	an.AccessedAt = time.Now().Unix()
-	ttl := uint32(an.AccessedAt - an.ReceivedAt)
+	var ttl uint32 = uint32(an.AccessedAt - an.ReceivedAt)
 	an.msg.SubTTL(ttl)
 }

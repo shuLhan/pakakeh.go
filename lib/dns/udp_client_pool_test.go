@@ -12,11 +12,25 @@ import (
 )
 
 func TestNewUDPClientPool(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc   string
 		expErr string
 		ns     []string
-	}{{
+	}
+
+	var (
+		cases []testCase
+		c     testCase
+
+		clPool *UDPClientPool
+		wg     sync.WaitGroup
+
+		qname string
+		err   error
+		x     int
+	)
+
+	cases = []testCase{{
 		desc:   "With empty name servers",
 		expErr: "udp: UDPClientPool: no name servers defined",
 	}, {
@@ -33,25 +47,28 @@ func TestNewUDPClientPool(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		ucp, err := NewUDPClientPool(c.ns)
+		clPool, err = NewUDPClientPool(c.ns)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
 		}
 
-		var wg sync.WaitGroup
-		qname := "kilabit.info"
-		for x := 0; x < 10; x++ {
+		qname = "kilabit.info"
+		for x = 0; x < 10; x++ {
 			wg.Add(1)
 			go func() {
-				cl := ucp.Get()
-				q := MessageQuestion{
-					Name: qname,
-				}
-				_, err := cl.Lookup(q, false)
+				var (
+					cl = clPool.Get()
+					q  = MessageQuestion{
+						Name: qname,
+					}
+
+					err error
+				)
+				_, err = cl.Lookup(q, false)
 				if err != nil {
 					t.Log("Lookup error: ", err.Error())
 				}

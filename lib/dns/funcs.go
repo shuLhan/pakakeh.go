@@ -17,10 +17,15 @@ import (
 //
 // Default path is "/etc/resolv.conf".
 func GetSystemNameServers(path string) []string {
+	var (
+		rc  *libnet.ResolvConf
+		err error
+	)
+
 	if len(path) == 0 {
 		path = "/etc/resolv.conf"
 	}
-	rc, err := libnet.NewResolvConf(path)
+	rc, err = libnet.NewResolvConf(path)
 	if err != nil {
 		return nil
 	}
@@ -30,11 +35,14 @@ func GetSystemNameServers(path string) []string {
 // ParseNameServers parse list of nameserver into UDP addresses.
 // If one of nameserver is invalid it will stop parsing and return only valid
 // nameserver addresses with error.
-func ParseNameServers(nameservers []string) ([]*net.UDPAddr, error) {
-	udpAddrs := make([]*net.UDPAddr, 0)
+func ParseNameServers(nameservers []string) (udpAddrs []*net.UDPAddr, err error) {
+	var (
+		ns   string
+		addr *net.UDPAddr
+	)
 
-	for _, ns := range nameservers {
-		addr, err := libnet.ParseUDPAddr(ns, DefaultPort)
+	for _, ns = range nameservers {
+		addr, err = libnet.ParseUDPAddr(ns, DefaultPort)
 		if err != nil {
 			return udpAddrs, err
 		}
@@ -53,7 +61,15 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 		return "", fmt.Errorf("empty IP address")
 	}
 
-	revIP, isIPv4 := reverseIP(ip)
+	var (
+		msg       *Message
+		q         MessageQuestion
+		rranswers []ResourceRecord
+		revIP     []byte
+		isIPv4    bool
+	)
+
+	revIP, isIPv4 = reverseIP(ip)
 	if len(revIP) == 0 {
 		return "", fmt.Errorf("invalid IP address %q", ip)
 	}
@@ -64,17 +80,15 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 		revIP = append(revIP, []byte(".ip6.arpa")...)
 	}
 
-	q := MessageQuestion{
-		Name: string(revIP),
-		Type: RecordTypePTR,
-	}
+	q.Name = string(revIP)
+	q.Type = RecordTypePTR
 
-	msg, err := client.Lookup(q, true)
+	msg, err = client.Lookup(q, true)
 	if err != nil {
 		return "", err
 	}
 
-	rranswers := msg.FilterAnswers(RecordTypePTR)
+	rranswers = msg.FilterAnswers(RecordTypePTR)
 	if len(rranswers) == 0 {
 		return "", nil
 	}
@@ -107,8 +121,12 @@ func reverseIP(ip net.IP) (revIP []byte, isIPv4 bool) {
 // For IPv6 with address "2001:db8::cb01" it will return
 // "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.2".
 func reverseByDot(ip []byte) (rev []byte) {
-	addrs := bytes.Split(ip, []byte{'.'})
-	for x := len(addrs) - 1; x >= 0; x-- {
+	var (
+		addrs [][]byte = bytes.Split(ip, []byte{'.'})
+
+		x int
+	)
+	for x = len(addrs) - 1; x >= 0; x-- {
 		if len(rev) > 0 {
 			rev = append(rev, '.')
 		}

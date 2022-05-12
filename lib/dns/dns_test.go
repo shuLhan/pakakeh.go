@@ -22,25 +22,28 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	var err error
-
 	log.SetFlags(0)
 
-	serverOptions := &ServerOptions{
-		ListenAddress:    "127.0.0.1:5300",
-		HTTPPort:         8443,
-		TLSPort:          testTLSPort,
-		TLSCertFile:      "testdata/domain.crt",
-		TLSPrivateKey:    "testdata/domain.key",
-		TLSAllowInsecure: true,
-	}
+	var (
+		serverOptions = &ServerOptions{
+			ListenAddress:    "127.0.0.1:5300",
+			HTTPPort:         8443,
+			TLSPort:          testTLSPort,
+			TLSCertFile:      "testdata/domain.crt",
+			TLSPrivateKey:    "testdata/domain.key",
+			TLSAllowInsecure: true,
+		}
+
+		zoneFile *Zone
+		err      error
+	)
 
 	_testServer, err = NewServer(serverOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	zoneFile, err := ParseZoneFile("testdata/kilabit.info", "", 0)
+	zoneFile, err = ParseZoneFile("testdata/kilabit.info", "", 0)
 	if err != nil {
 		log.Fatal(err)
 	}

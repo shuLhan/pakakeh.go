@@ -55,6 +55,16 @@ func (rr *ResourceRecord) String() string {
 func (rr *ResourceRecord) initAndValidate() (err error) {
 	var (
 		logp = "initAndValidate"
+
+		mx    *RDataMX
+		soa   *RDataSOA
+		srv   *RDataSRV
+		ip    net.IP
+		ipv4  net.IP
+		ipv6  net.IP
+		v     string
+		rtype string
+		ok    bool
 	)
 
 	if len(rr.Name) == 0 {
@@ -67,21 +77,21 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 		rr.TTL = defaultTTL
 	}
 
-	rtype, ok := RecordTypeNames[rr.Type]
+	rtype, ok = RecordTypeNames[rr.Type]
 	if !ok {
 		return fmt.Errorf("%s: unknown type %d", logp, rr.Type)
 	}
 	switch rr.Type {
 	case RecordTypeA:
-		v, ok := rr.Value.(string)
+		v, ok = rr.Value.(string)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
-		ip := net.ParseIP(v)
+		ip = net.ParseIP(v)
 		if ip == nil {
 			return fmt.Errorf("%s: invalid or empty %s: %q", logp, rtype, v)
 		}
-		ipv4 := ip.To4()
+		ipv4 = ip.To4()
 		if ipv4 == nil {
 			return fmt.Errorf("%s: invalid or empty %s: %q", logp, rtype, v)
 		}
@@ -89,7 +99,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 	case RecordTypeNS, RecordTypeCNAME, RecordTypeMB, RecordTypeMG,
 		RecordTypeMR, RecordTypeNULL, RecordTypePTR:
 
-		v, ok := rr.Value.(string)
+		v, ok = rr.Value.(string)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
@@ -99,7 +109,7 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 		}
 
 	case RecordTypeSOA:
-		soa, ok := rr.Value.(*RDataSOA)
+		soa, ok = rr.Value.(*RDataSOA)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
@@ -110,23 +120,23 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 			return fmt.Errorf("%s: invalid or empty %s RName: %q", logp, rtype, soa.RName)
 		}
 	case RecordTypeWKS:
-		_, ok := rr.Value.(*RDataWKS)
+		_, ok = rr.Value.(*RDataWKS)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 
 	case RecordTypeHINFO:
-		_, ok := rr.Value.(*RDataHINFO)
+		_, ok = rr.Value.(*RDataHINFO)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 	case RecordTypeMINFO:
-		_, ok := rr.Value.(*RDataMINFO)
+		_, ok = rr.Value.(*RDataMINFO)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
 	case RecordTypeMX:
-		mx, ok := rr.Value.(*RDataMX)
+		mx, ok = rr.Value.(*RDataMX)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
@@ -135,15 +145,15 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 	case RecordTypeTXT:
-		txt, ok := rr.Value.(string)
+		v, ok = rr.Value.(string)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
-		if len(txt) == 0 {
+		if len(v) == 0 {
 			return fmt.Errorf("%s: empty %s value", logp, rtype)
 		}
 	case RecordTypeSRV:
-		srv, ok := rr.Value.(*RDataSRV)
+		srv, ok = rr.Value.(*RDataSRV)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
@@ -152,20 +162,20 @@ func (rr *ResourceRecord) initAndValidate() (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 	case RecordTypeAAAA:
-		v, ok := rr.Value.(string)
+		v, ok = rr.Value.(string)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
-		ip := net.ParseIP(v)
+		ip = net.ParseIP(v)
 		if ip == nil {
 			return fmt.Errorf("%s: invalid or empty %s value: %q", logp, rtype, v)
 		}
-		ipv6 := ip.To16()
+		ipv6 = ip.To16()
 		if ipv6 == nil {
 			return fmt.Errorf("%s: invalid or empty %s value: %q", logp, rtype, v)
 		}
 	case RecordTypeOPT:
-		_, ok := rr.Value.(*RDataOPT)
+		_, ok = rr.Value.(*RDataOPT)
 		if !ok {
 			return fmt.Errorf("%s: expecting %s got %T", logp, rtype, rr.Value)
 		}
@@ -229,17 +239,20 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 
 func unpackDomainName(packet []byte, start uint) (name string, end uint, err error) {
 	var (
-		x        = int(start)
+		x = int(start)
+
 		out      strings.Builder
+		offset   uint16
 		count, y byte
 	)
+
 	for x < len(packet) {
 		count = packet[x]
 		if count == 0 {
 			break
 		}
 		if (packet[x] & maskPointer) == maskPointer {
-			offset := uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
+			offset = uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
 
 			if end == 0 {
 				end = uint(x + 2)
@@ -271,6 +284,12 @@ func unpackDomainName(packet []byte, start uint) (name string, end uint, err err
 }
 
 func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) {
+	var (
+		rrWKS   *RDataWKS
+		rrHInfo *RDataHINFO
+		endIdx  uint
+	)
+
 	switch rr.Type {
 	case RecordTypeA:
 		return rr.unpackA()
@@ -331,14 +350,14 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	// NULLs are used as placeholders in some experimental extensions of
 	// the DNS.
 	case RecordTypeNULL:
-		endIdx := startIdx + uint(rr.rdlen)
+		endIdx = startIdx + uint(rr.rdlen)
 		rr.Value = string(packet[startIdx : startIdx+endIdx])
 		return nil
 
 	case RecordTypeWKS:
-		rrWKS := new(RDataWKS)
+		rrWKS = new(RDataWKS)
 		rr.Value = rrWKS
-		endIdx := startIdx + uint(rr.rdlen)
+		endIdx = startIdx + uint(rr.rdlen)
 		return rrWKS.unpack(packet[startIdx:endIdx])
 
 	case RecordTypePTR:
@@ -346,9 +365,9 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 		return err
 
 	case RecordTypeHINFO:
-		rrHInfo := new(RDataHINFO)
+		rrHInfo = new(RDataHINFO)
 		rr.Value = rrHInfo
-		endIdx := startIdx + uint(rr.rdlen)
+		endIdx = startIdx + uint(rr.rdlen)
 		return rrHInfo.unpack(packet[startIdx:endIdx])
 
 	case RecordTypeMINFO:
@@ -358,7 +377,7 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 		return rr.unpackMX(packet, startIdx)
 
 	case RecordTypeTXT:
-		endIdx := startIdx + uint(rr.rdlen)
+		endIdx = startIdx + uint(rr.rdlen)
 
 		// The first byte of TXT is length.
 		rr.Value = string(packet[startIdx+1 : endIdx])
@@ -386,7 +405,8 @@ func (rr *ResourceRecord) unpackA() error {
 		return ErrIPv4Length
 	}
 
-	ip := net.IP(rr.rdata)
+	var ip = net.IP(rr.rdata)
+
 	rr.Value = ip.String()
 
 	return nil
@@ -397,7 +417,7 @@ func (rr *ResourceRecord) unpackAAAA() error {
 		return ErrIPv6Length
 	}
 
-	ip := net.IP(rr.rdata)
+	var ip = net.IP(rr.rdata)
 	rr.Value = ip.String()
 
 	return nil
@@ -432,7 +452,10 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) (err error) 
 }
 
 func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) (err error) {
-	rrMX := &RDataMX{}
+	var (
+		rrMX = &RDataMX{}
+	)
+
 	rr.Value = rrMX
 
 	rrMX.Preference = libbytes.ReadInt16(packet, startIdx)
@@ -443,12 +466,16 @@ func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) (err error) {
 }
 
 func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
-	rrSRV := &RDataSRV{}
+	var (
+		rrSRV = &RDataSRV{}
+
+		start int
+		y     int
+	)
+
 	rr.Value = rrSRV
 
 	// Unpack service, proto, and name from RR.Name
-	start := 0
-	y := 0
 	for ; y < len(rr.Name); y++ {
 		if rr.Name[y] == '.' {
 			rrSRV.Service = rr.Name[start:y]
@@ -480,7 +507,12 @@ func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
 }
 
 func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
-	rrOPT := &RDataOPT{}
+	var (
+		rrOPT = &RDataOPT{}
+
+		endIdx uint
+	)
+
 	rr.Value = rrOPT
 
 	// Unpack extended RCODE and flags from TTL.
@@ -500,7 +532,7 @@ func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
 	x += 2
 	rrOPT.Length = libbytes.ReadUint16(packet, x)
 	x += 2
-	endIdx := x + uint(rr.rdlen)
+	endIdx = x + uint(rr.rdlen)
 	if int(endIdx) >= len(packet) {
 		return errors.New("unpackOPT: data length is out of range")
 	}

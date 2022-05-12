@@ -239,19 +239,29 @@ func testMessageHeaderCases() []testMessageHeader {
 }
 
 func TestMessageHeader_pack(t *testing.T) {
-	cases := testMessageHeaderCases()
+	var (
+		cases []testMessageHeader = testMessageHeaderCases()
 
-	for _, c := range cases {
-		got := c.hdr.pack()
+		c   testMessageHeader
+		got []byte
+	)
+
+	for _, c = range cases {
+		got = c.hdr.pack()
 		test.Assert(t, c.desc, c.packet, got)
 	}
 }
 
 func TestMessageHeader_unpack(t *testing.T) {
-	cases := testMessageHeaderCases()
+	var (
+		cases []testMessageHeader = testMessageHeaderCases()
 
-	for _, c := range cases {
-		got := MessageHeader{}
+		c   testMessageHeader
+		got MessageHeader
+	)
+
+	for _, c = range cases {
+		got = MessageHeader{}
 		got.unpack(c.packet)
 		test.Assert(t, c.desc, c.hdr, got)
 	}

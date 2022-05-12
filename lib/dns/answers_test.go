@@ -11,14 +11,20 @@ import (
 )
 
 func TestNewAnswers(t *testing.T) {
-	type caseNewAnswer struct {
+	type testCase struct {
 		an     *Answer
 		desc   string
 		expV   []*Answer
 		expLen int
 	}
 
-	cases := []caseNewAnswer{{
+	var (
+		cases []testCase
+		c     testCase
+		got   *answers
+	)
+
+	cases = []testCase{{
 		desc: "With nil parameter",
 		expV: make([]*Answer, 0, 1),
 	}, {
@@ -37,10 +43,10 @@ func TestNewAnswers(t *testing.T) {
 		}},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got := newAnswers(c.an)
+		got = newAnswers(c.an)
 
 		test.Assert(t, "len(answers.v)", len(got.v), c.expLen)
 		test.Assert(t, "answers.v", got.v, c.expV)
@@ -48,28 +54,37 @@ func TestNewAnswers(t *testing.T) {
 }
 
 func TestAnswersGet(t *testing.T) {
-	msg := &Message{
-		Question: MessageQuestion{
-			Name:  "test",
-			Type:  1,
-			Class: 1,
-		},
-		Answer: []ResourceRecord{{
-			Name:  "test",
-			Type:  RecordTypeA,
-			Class: RecordClassIN,
-		}},
-	}
-	an := newAnswer(msg, true)
-	ans := newAnswers(an)
-
-	cases := []struct {
+	type testCase struct {
 		exp      *Answer
 		desc     string
 		expIndex int
 		RType    RecordType
 		RClass   RecordClass
-	}{{
+	}
+
+	var (
+		msg = &Message{
+			Question: MessageQuestion{
+				Name:  "test",
+				Type:  1,
+				Class: 1,
+			},
+			Answer: []ResourceRecord{{
+				Name:  "test",
+				Type:  RecordTypeA,
+				Class: RecordClassIN,
+			}},
+		}
+		an  = newAnswer(msg, true)
+		ans = newAnswers(an)
+
+		cases []testCase
+		c     testCase
+		got   *Answer
+		x     int
+	)
+
+	cases = []testCase{{
 		desc:     "With query type and class not found",
 		expIndex: 1,
 	}, {
@@ -88,10 +103,10 @@ func TestAnswersGet(t *testing.T) {
 		expIndex: 0,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got, x := ans.get(c.RType, c.RClass)
+		got, x = ans.get(c.RType, c.RClass)
 
 		test.Assert(t, "answers.get", c.exp, got)
 		test.Assert(t, "answers.get index", c.expIndex, x)
@@ -99,29 +114,36 @@ func TestAnswersGet(t *testing.T) {
 }
 
 func TestAnswersRemove(t *testing.T) {
-	msg := &Message{
-		Question: MessageQuestion{
-			Name:  "test",
-			Type:  1,
-			Class: 1,
-		},
-		Answer: []ResourceRecord{{
-			Name:  "test",
-			Type:  RecordTypeA,
-			Class: RecordClassIN,
-		}},
-	}
-
-	an := newAnswer(msg, true)
-	ans := newAnswers(an)
-
-	cases := []struct {
+	type testCase struct {
 		exp    *answers
 		desc   string
 		expLen int
 		RType  RecordType
 		RClass RecordClass
-	}{{
+	}
+
+	var (
+		msg = &Message{
+			Question: MessageQuestion{
+				Name:  "test",
+				Type:  1,
+				Class: 1,
+			},
+			Answer: []ResourceRecord{{
+				Name:  "test",
+				Type:  RecordTypeA,
+				Class: RecordClassIN,
+			}},
+		}
+
+		an  = newAnswer(msg, true)
+		ans = newAnswers(an)
+
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		desc:   "With query type and class not found",
 		exp:    ans,
 		expLen: 1,
@@ -145,7 +167,7 @@ func TestAnswersRemove(t *testing.T) {
 		expLen: 0,
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		ans.remove(c.RType, c.RClass)
@@ -157,42 +179,48 @@ func TestAnswersRemove(t *testing.T) {
 }
 
 func TestAnswersUpdate(t *testing.T) {
-	an1 := &Answer{
-		RType:  1,
-		RClass: 1,
-		msg: &Message{
-			Header: MessageHeader{
-				ID: 1,
-			},
-		},
-	}
-	an2 := &Answer{
-		RType:  2,
-		RClass: 1,
-		msg:    &Message{},
-	}
-	an3 := &Answer{
-		RType:  1,
-		RClass: 2,
-		msg:    &Message{},
-	}
-	an4 := &Answer{
-		RType:  1,
-		RClass: 1,
-		msg: &Message{
-			Header: MessageHeader{
-				ID: 2,
-			},
-		},
-	}
-
-	ans := newAnswers(an1)
-
-	cases := []struct {
+	type testCase struct {
 		nu   *Answer
 		exp  *answers
 		desc string
-	}{{
+	}
+
+	var (
+		an1 = &Answer{
+			RType:  1,
+			RClass: 1,
+			msg: &Message{
+				Header: MessageHeader{
+					ID: 1,
+				},
+			},
+		}
+		an2 = &Answer{
+			RType:  2,
+			RClass: 1,
+			msg:    &Message{},
+		}
+		an3 = &Answer{
+			RType:  1,
+			RClass: 2,
+			msg:    &Message{},
+		}
+		an4 = &Answer{
+			RType:  1,
+			RClass: 1,
+			msg: &Message{
+				Header: MessageHeader{
+					ID: 2,
+				},
+			},
+		}
+		ans = newAnswers(an1)
+
+		cases []testCase
+		c     testCase
+	)
+
+	cases = []testCase{{
 		desc: "With nil parameter",
 		exp:  ans,
 	}, {
@@ -230,7 +258,7 @@ func TestAnswersUpdate(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		ans.upsert(c.nu)

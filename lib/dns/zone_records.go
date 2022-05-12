@@ -12,12 +12,17 @@ type zoneRecords map[string][]*ResourceRecord
 
 // add a ResourceRecord into the zone.
 func (zr zoneRecords) add(rr *ResourceRecord) {
-	listRR := zr[rr.Name]
+	var (
+		listRR []*ResourceRecord = zr[rr.Name]
+
+		in *ResourceRecord
+		x  int
+	)
 
 	// Replace the RR if its type is SOA because only one SOA
 	// should exist per domain name.
 	if rr.Type == RecordTypeSOA {
-		for x, in := range listRR {
+		for x, in = range listRR {
 			if in.Type != RecordTypeSOA {
 				continue
 			}
@@ -32,8 +37,13 @@ func (zr zoneRecords) add(rr *ResourceRecord) {
 // remove a ResourceRecord from list by its Name and Value.
 // It will return true if the RR exist and removed.
 func (zr zoneRecords) remove(rr *ResourceRecord) bool {
-	listRR := zr[rr.Name]
-	for x, in := range listRR {
+	var (
+		listRR []*ResourceRecord = zr[rr.Name]
+		in     *ResourceRecord
+		x      int
+	)
+
+	for x, in = range listRR {
 		if in.Type != rr.Type {
 			continue
 		}

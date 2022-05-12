@@ -11,19 +11,29 @@ import (
 )
 
 func TestDoHClient_Lookup(t *testing.T) {
-	nameserver := "https://127.0.0.1:8443/dns-query"
-
-	cl, err := NewDoHClient(nameserver, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		exp            *Message
 		desc           string
 		qst            MessageQuestion
 		allowRecursion bool
-	}{{
+	}
+
+	var (
+		nameserver = "https://127.0.0.1:8443/dns-query"
+
+		cases []testCase
+		c     testCase
+		got   *Message
+		cl    *DoHClient
+		err   error
+	)
+
+	cl, err = NewDoHClient(nameserver, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc: "QType:A RClass:IN QName:kilabit.info",
 		qst: MessageQuestion{
 			Name: "kilabit.info",
@@ -139,10 +149,10 @@ func TestDoHClient_Lookup(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got, err := cl.Lookup(c.qst, c.allowRecursion)
+		got, err = cl.Lookup(c.qst, c.allowRecursion)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -157,21 +167,32 @@ func TestDoHClient_Lookup(t *testing.T) {
 }
 
 func TestDoHClient_Post(t *testing.T) {
-	nameserver := "https://127.0.0.1:8443/dns-query"
-
-	cl, err := NewDoHClient(nameserver, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		exp            *Message
 		desc           string
 		qname          string
 		rtype          RecordType
 		rclass         RecordClass
 		allowRecursion bool
-	}{{
+	}
+
+	var (
+		nameserver = "https://127.0.0.1:8443/dns-query"
+
+		cases []testCase
+		c     testCase
+		cl    *DoHClient
+		msg   *Message
+		got   *Message
+		err   error
+	)
+
+	cl, err = NewDoHClient(nameserver, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
 		rclass: RecordClassIN,
@@ -284,22 +305,22 @@ func TestDoHClient_Post(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		msg := NewMessage()
+		msg = NewMessage()
 
 		msg.Header.IsRD = c.allowRecursion
 		msg.Question.Type = c.rtype
 		msg.Question.Class = c.rclass
 		msg.Question.Name = c.qname
 
-		_, err := msg.Pack()
+		_, err = msg.Pack()
 		if err != nil {
 			t.Fatal("msg.Pack:", err)
 		}
 
-		got, err := cl.Post(msg)
+		got, err = cl.Post(msg)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -314,21 +335,32 @@ func TestDoHClient_Post(t *testing.T) {
 }
 
 func TestDoHClient_Get(t *testing.T) {
-	nameserver := "https://127.0.0.1:8443/dns-invalid"
-
-	cl, err := NewDoHClient(nameserver, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		exp    *Message
 		desc   string
 		qname  string
 		expErr string
 		rtype  RecordType
 		rclass RecordClass
-	}{{
+	}
+
+	var (
+		nameserver = "https://127.0.0.1:8443/dns-invalid"
+
+		cases []testCase
+		c     testCase
+		cl    *DoHClient
+		msg   *Message
+		got   *Message
+		err   error
+	)
+
+	cl, err = NewDoHClient(nameserver, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases = []testCase{{
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
 		rclass: RecordClassIN,
@@ -342,21 +374,21 @@ func TestDoHClient_Get(t *testing.T) {
 		expErr: "404 page not found\n",
 	}}
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		msg := NewMessage()
+		msg = NewMessage()
 
 		msg.Question.Type = c.rtype
 		msg.Question.Class = c.rclass
 		msg.Question.Name = c.qname
 
-		_, err := msg.Pack()
+		_, err = msg.Pack()
 		if err != nil {
 			t.Fatal("msg.Pack:", err)
 		}
 
-		got, err := cl.Get(msg)
+		got, err = cl.Get(msg)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
