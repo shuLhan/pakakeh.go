@@ -10,12 +10,12 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func testGenerateZoneRecords() (zoneRR zoneRecords, listRR []*ResourceRecord) {
+func testGenerateZoneRecords() (zoneRR ZoneRecords, listRR []*ResourceRecord) {
 	var (
 		rr *ResourceRecord
 	)
 
-	zoneRR = zoneRecords{}
+	zoneRR = ZoneRecords{}
 
 	listRR = []*ResourceRecord{{
 		Name:  "test",
@@ -55,14 +55,14 @@ func testGenerateZoneRecords() (zoneRR zoneRecords, listRR []*ResourceRecord) {
 
 func TestZoneRecords_add(t *testing.T) {
 	var (
-		expZoneRR zoneRecords
-		gotZoneRR zoneRecords
+		expZoneRR ZoneRecords
+		gotZoneRR ZoneRecords
 		listRR    []*ResourceRecord
 	)
 
 	gotZoneRR, listRR = testGenerateZoneRecords()
 
-	expZoneRR = zoneRecords{
+	expZoneRR = ZoneRecords{
 		"test": []*ResourceRecord{
 			listRR[0],
 			listRR[3],
@@ -77,12 +77,12 @@ func TestZoneRecords_add(t *testing.T) {
 func TestZoneRecords_remove(t *testing.T) {
 	type testCase struct {
 		rr           *ResourceRecord
-		expZoneRR    zoneRecords
+		expZoneRR    ZoneRecords
 		expIsRemoved bool
 	}
 
 	var (
-		gotZoneRR    zoneRecords
+		gotZoneRR    ZoneRecords
 		listRR       []*ResourceRecord
 		cases        []testCase
 		c            testCase
@@ -114,7 +114,7 @@ func TestZoneRecords_remove(t *testing.T) {
 	}, {
 		// With RR removed at the end.
 		rr: listRR[4],
-		expZoneRR: zoneRecords{
+		expZoneRR: ZoneRecords{
 			"test": []*ResourceRecord{
 				listRR[0],
 				listRR[3],

@@ -18,7 +18,7 @@ import (
 // Zone represent a group of domain names shared a single root domain.
 // A Zone contains at least one SOA record.
 type Zone struct {
-	Records  zoneRecords
+	Records  ZoneRecords
 	Path     string `json:"-"`
 	Name     string
 	messages []*Message
@@ -36,7 +36,7 @@ func NewZone(file, name string) *Zone {
 				MName: name,
 			},
 		},
-		Records: make(zoneRecords),
+		Records: make(ZoneRecords),
 	}
 }
 

@@ -6,12 +6,12 @@ package dns
 
 import "github.com/shuLhan/share/lib/reflect"
 
-// zoneRecords contains mapping between domain name and its resource
+// ZoneRecords contains mapping between domain name and its resource
 // records.
-type zoneRecords map[string][]*ResourceRecord
+type ZoneRecords map[string][]*ResourceRecord
 
 // add a ResourceRecord into the zone.
-func (zr zoneRecords) add(rr *ResourceRecord) {
+func (zr ZoneRecords) add(rr *ResourceRecord) {
 	var (
 		listRR []*ResourceRecord = zr[rr.Name]
 
@@ -36,7 +36,7 @@ func (zr zoneRecords) add(rr *ResourceRecord) {
 
 // remove a ResourceRecord from list by its Name and Value.
 // It will return true if the RR exist and removed.
-func (zr zoneRecords) remove(rr *ResourceRecord) bool {
+func (zr ZoneRecords) remove(rr *ResourceRecord) bool {
 	var (
 		listRR []*ResourceRecord = zr[rr.Name]
 		in     *ResourceRecord
