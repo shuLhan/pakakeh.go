@@ -22,7 +22,7 @@ type Zone struct {
 	Path     string `json:"-"`
 	Name     string
 	messages []*Message
-	SOA      ResourceRecord
+	SOA      RDataSOA
 }
 
 // NewZone create and initialize new zone.
@@ -30,11 +30,8 @@ func NewZone(file, name string) *Zone {
 	return &Zone{
 		Path: file,
 		Name: name,
-		SOA: ResourceRecord{
-			Type: RecordTypeSOA,
-			Value: &RDataSOA{
-				MName: name,
-			},
+		SOA: RDataSOA{
+			MName: name,
 		},
 		Records: make(ZoneRecords),
 	}
@@ -143,10 +140,14 @@ func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 func (zone *Zone) Add(rr *ResourceRecord) (err error) {
 	var (
 		msg *Message
+		soa *RDataSOA
 	)
 
 	if rr.Type == RecordTypeSOA {
-		zone.SOA = *rr
+		soa, _ = rr.Value.(*RDataSOA)
+		if soa != nil {
+			zone.SOA = *soa
+		}
 	} else {
 		zone.Records.add(rr)
 	}
@@ -194,10 +195,7 @@ func (zone *Zone) Messages() []*Message {
 // Remove a ResourceRecord from zone file.
 func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 	if rr.Type == RecordTypeSOA {
-		zone.SOA = ResourceRecord{
-			Type:  RecordTypeSOA,
-			Value: &RDataSOA{},
-		}
+		zone.SOA = RDataSOA{}
 	} else {
 		if zone.Records.remove(rr) {
 			err = zone.Save()
@@ -218,22 +216,19 @@ func (zone *Zone) Save() (err error) {
 	}
 
 	var (
-		soa    *RDataSOA
 		dname  string
 		names  []string
 		listRR []*ResourceRecord
 		errc   error
-		ok     bool
 	)
 
 	fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
 
-	soa, ok = zone.SOA.Value.(*RDataSOA)
-	if ok && len(soa.MName) > 0 {
+	if len(zone.SOA.MName) > 0 {
 		_, err = fmt.Fprintf(out,
 			"@ SOA %s. %s. %d %d %d %d %d\n",
-			soa.MName, soa.RName, soa.Serial, soa.Refresh,
-			soa.Retry, soa.Expire, soa.Minimum)
+			zone.SOA.MName, zone.SOA.RName, zone.SOA.Serial, zone.SOA.Refresh,
+			zone.SOA.Retry, zone.SOA.Expire, zone.SOA.Minimum)
 		if err != nil {
 			goto out
 		}
