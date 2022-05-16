@@ -18,8 +18,8 @@ import (
 // Zone represent a group of domain names shared a single root domain.
 // A Zone contains at least one SOA record.
 type Zone struct {
-	Records  ZoneRecords
-	Path     string `json:"-"`
+	Records  ZoneRecords `json:"-"`
+	Path     string      `json:"-"`
 	Name     string
 	messages []*Message
 	SOA      RDataSOA
