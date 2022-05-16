@@ -45,8 +45,8 @@ type ResourceRecord struct {
 
 // String return the text representation of ResourceRecord for human.
 func (rr *ResourceRecord) String() string {
-	return fmt.Sprintf("{Name:%s Type:%d Class:%d TTL:%d rdlen:%d}",
-		rr.Name, rr.Type, rr.Class, rr.TTL, rr.rdlen)
+	return fmt.Sprintf("{Name:%s Type:%d Class:%d TTL:%d Value:%v}",
+		rr.Name, rr.Type, rr.Class, rr.TTL, rr.Value)
 }
 
 // initAndValidate initialize and validate the resource record data.
