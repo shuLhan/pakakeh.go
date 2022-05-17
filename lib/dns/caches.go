@@ -250,7 +250,7 @@ func (c *caches) remove(qname string) (listAnswer []*Answer) {
 
 // removeLocalRR remove the local ResourceRecord from caches by its name,
 // type, class, and value.
-func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
+func (c *caches) removeLocalRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
 	var (
 		ans *answers
 		an  *Answer
@@ -262,7 +262,7 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 
 	ans, ok = c.v[rr.Name]
 	if !ok {
-		return nil
+		return nil, nil
 	}
 	for _, an = range ans.v {
 		if an.RType != rr.Type {
@@ -271,10 +271,10 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (err error) {
 		if an.RClass != rr.Class {
 			continue
 		}
-		err = an.msg.RemoveAnswer(rr)
+		rrOut, err = an.msg.RemoveAnswer(rr)
 		break
 	}
-	return err
+	return rrOut, err
 }
 
 // search for non-local DNS answer that match with regular expression.

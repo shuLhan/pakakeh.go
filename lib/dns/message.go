@@ -744,24 +744,27 @@ func (msg *Message) Pack() ([]byte, error) {
 }
 
 // RemoveAnswer remove the RR from list of answer.
-func (msg *Message) RemoveAnswer(rr *ResourceRecord) (err error) {
+func (msg *Message) RemoveAnswer(rrIn *ResourceRecord) (*ResourceRecord, error) {
 	var (
-		an ResourceRecord
-		x  int
+		rrAnswer ResourceRecord
+		err      error
+		x        int
 	)
 
-	for x, an = range msg.Answer {
-		fmt.Printf("RemoveAnswer: %s == %s?\n", an.Value, rr.Value)
-		if !reflect.IsEqual(an.Value, rr.Value) {
+	for x, rrAnswer = range msg.Answer {
+		if !reflect.IsEqual(rrAnswer.Value, rrIn.Value) {
 			continue
 		}
 		copy(msg.Answer[x:], msg.Answer[x+1:])
 		msg.Answer = msg.Answer[:len(msg.Answer)-1]
 		msg.Header.ANCount--
 		_, err = msg.Pack()
-		break
+		if err != nil {
+			return nil, err
+		}
+		return &rrAnswer, nil
 	}
-	return err
+	return nil, nil
 }
 
 // SetAuthorativeAnswer set the header authoritative answer to true (1) or

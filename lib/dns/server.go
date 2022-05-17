@@ -274,8 +274,9 @@ func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
 
 // RemoveCachesByRR remove the answer from caches by ResourceRecord name,
 // type, class, and value.
-func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) error {
-	return srv.caches.removeLocalRR(rr)
+func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
+	rrOut, err = srv.caches.removeLocalRR(rr)
+	return rrOut, err
 }
 
 // RemoveLocalCachesByNames remove local caches by domain names.
