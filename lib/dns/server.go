@@ -74,8 +74,8 @@ const (
 // message ID, and question.
 type Server struct {
 	HostsFiles  map[string]*HostsFile
+	Caches      Caches
 	opts        *ServerOptions
-	caches      *caches
 	tlsConfig   *tls.Config
 	udp         *net.UDPConn
 	tcp         *net.TCPListener
@@ -140,7 +140,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	}
 
 	srv.errListener = make(chan error, 1)
-	srv.caches = newCaches(opts.PruneDelay, opts.PruneThreshold)
+	srv.Caches.init(opts.PruneDelay, opts.PruneThreshold)
 
 	return srv, nil
 }
@@ -174,12 +174,12 @@ func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
 		answer *Answer
 	)
 
-	answers, err = srv.caches.read(r)
+	answers, err = srv.Caches.read(r)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	for _, answer = range answers {
-		_ = srv.caches.upsert(answer)
+		_ = srv.Caches.upsert(answer)
 	}
 	return answers, nil
 }
@@ -187,12 +187,12 @@ func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
 // CachesLRU return list of external caches ordered by the least recently
 // used.
 func (srv *Server) CachesLRU() []*Answer {
-	return srv.caches.list()
+	return srv.Caches.list()
 }
 
 // CachesSave write the external answers into w, encoded with gob.
 func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
-	n, err = srv.caches.write(w)
+	n, err = srv.Caches.write(w)
 	if err != nil {
 		return 0, fmt.Errorf("CachesSave: %w", err)
 	}
@@ -202,7 +202,7 @@ func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
 // SearchCaches search caches by query (domain) name that match with the
 // regular expresion.
 func (srv *Server) SearchCaches(re *regexp.Regexp) []*Message {
-	return srv.caches.search(re)
+	return srv.Caches.search(re)
 }
 
 // PopulateCaches add list of message to caches.
@@ -217,7 +217,7 @@ func (srv *Server) PopulateCaches(msgs []*Message, from string) {
 
 	for _, msg = range msgs {
 		an = newAnswer(msg, isLocal)
-		inserted = srv.caches.upsert(an)
+		inserted = srv.Caches.upsert(an)
 		if inserted {
 			n++
 		}
@@ -236,7 +236,7 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (er
 	)
 
 	for _, rr = range listRR {
-		err = srv.caches.upsertInternalRR(rr)
+		err = srv.Caches.upsertInternalRR(rr)
 		if err != nil {
 			return err
 		}
@@ -250,7 +250,7 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (er
 
 // CachesClear remove all external answers.
 func (srv *Server) CachesClear() (listAnswer []*Answer) {
-	listAnswer = srv.caches.prune(math.MaxInt64)
+	listAnswer = srv.Caches.prune(math.MaxInt64)
 	return listAnswer
 }
 
@@ -261,7 +261,7 @@ func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
 		name    string
 	)
 	for _, name = range names {
-		answers = srv.caches.remove(name)
+		answers = srv.Caches.remove(name)
 		if len(answers) > 0 {
 			listAnswer = append(listAnswer, answers...)
 			if debug.Value >= 1 {
@@ -275,7 +275,7 @@ func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
 // RemoveCachesByRR remove the answer from caches by ResourceRecord name,
 // type, class, and value.
 func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
-	rrOut, err = srv.caches.removeInternalByRR(rr)
+	rrOut, err = srv.Caches.removeInternalByRR(rr)
 	return rrOut, err
 }
 
@@ -284,14 +284,14 @@ func (srv *Server) RemoveLocalCachesByNames(names []string) {
 	var (
 		x int
 	)
-	srv.caches.Lock()
+	srv.Caches.Lock()
 	for ; x < len(names); x++ {
-		delete(srv.caches.internal, names[x])
+		delete(srv.Caches.internal, names[x])
 		if debug.Value >= 1 {
 			fmt.Println("dns: - ", names[x])
 		}
 	}
-	srv.caches.Unlock()
+	srv.Caches.Unlock()
 }
 
 // RestartForwarders stop and start new forwarders with new nameserver address
@@ -709,7 +709,7 @@ func (srv *Server) processRequest() {
 				req.message.Question.String())
 		}
 
-		ans, an = srv.caches.get(req.message.Question.Name,
+		ans, an = srv.Caches.get(req.message.Question.Name,
 			req.message.Question.Type,
 			req.message.Question.Class)
 
@@ -805,7 +805,7 @@ func (srv *Server) processResponse(req *request, res *Message) {
 	}
 
 	an = newAnswer(res, false)
-	inserted = srv.caches.upsert(an)
+	inserted = srv.Caches.upsert(an)
 
 	if debug.Value >= 1 {
 		if inserted {

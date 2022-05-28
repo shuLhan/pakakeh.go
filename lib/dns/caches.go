@@ -21,23 +21,14 @@ const (
 	cachesFileFormatV1 = 1
 )
 
-// caches of DNS answers.
+// Caches of DNS answers.
 //
 // There are two type of answer: internal and external.
 // Internal answer is a DNS record that is loaded from hosts or zone files.
 // Internal answer never get pruned.
 // External answer is a DNS record that is received from parent name
 // servers.
-//
-// Caches stored in two storages: map and list.List.
-// The map caches store internal and external answers, using domain name as a
-// key and list of answers as value,
-//
-//	domain-name -> [{A,IN,...},{AAAA,IN,...}]
-//
-// The list.List store external answers, ordered by last accessed time,
-// it is used to prune least frequently accessed answers.
-type caches struct {
+type Caches struct {
 	// internal contains list of internal answers loaded from hosts or
 	// zone files, indexed by its domain name.
 	internal map[string]*answers
@@ -50,15 +41,6 @@ type caches struct {
 	// ascending order (the least recently used, LRU, record will be on
 	// the top).
 	lru *list.List
-
-	// pruneDelay define a delay where caches will be pruned.
-	// Default to 1 hour.
-	pruneDelay time.Duration
-
-	// pruneThreshold define negative duration where answers will be
-	// pruned from caches.
-	// Default to -1 hour.
-	pruneThreshold time.Duration
 
 	sync.Mutex
 }
@@ -80,12 +62,12 @@ type cachesFileV1 struct {
 	AccessedAt int64
 }
 
-// newCaches create new in memory caches with specific prune delay and
+// init create new in memory caches with specific prune delay and
 // threshold.
 // The prune delay MUST be greater than 1 minute or it will set to 1 hour.
 // The prune threshold MUST be greater than -1 minute or it will be set to -1
 // hour.
-func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
+func (c *Caches) init(pruneDelay, pruneThreshold time.Duration) {
 	if pruneDelay.Minutes() < 1 {
 		pruneDelay = time.Hour
 	}
@@ -93,17 +75,11 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 		pruneThreshold = -1 * time.Hour
 	}
 
-	ca = &caches{
-		internal:       make(map[string]*answers),
-		external:       make(map[string]*answers),
-		lru:            list.New(),
-		pruneDelay:     pruneDelay,
-		pruneThreshold: pruneThreshold,
-	}
+	c.internal = make(map[string]*answers)
+	c.external = make(map[string]*answers)
+	c.lru = list.New()
 
-	go ca.worker()
-
-	return ca
+	go c.worker(pruneDelay, pruneThreshold)
 }
 
 // get an answer based on domain-name, query type, and query class.
@@ -114,7 +90,7 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 // If answer exist on cache and its from external, their accessed time will be
 // updated to current time and moved to back of LRU to prevent being pruned
 // later.
-func (c *caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *answers, an *Answer) {
+func (c *Caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *answers, an *Answer) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -142,7 +118,7 @@ func (c *caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *a
 }
 
 // list return all external answers in least-recently-used order.
-func (c *caches) list() (answers []*Answer) {
+func (c *Caches) list() (answers []*Answer) {
 	var (
 		e *list.Element
 	)
@@ -158,7 +134,7 @@ func (c *caches) list() (answers []*Answer) {
 
 // prune old, external answers that have access time less or equal than
 // expired "exp" time.
-func (c *caches) prune(exp int64) (listAnswer []*Answer) {
+func (c *Caches) prune(exp int64) (listAnswer []*Answer) {
 	var (
 		el, next *list.Element
 		answer   *Answer
@@ -198,9 +174,9 @@ func (c *caches) prune(exp int64) (listAnswer []*Answer) {
 }
 
 // read external caches stored on storage r.
-func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
+func (c *Caches) read(r io.Reader) (answers []*Answer, err error) {
 	var (
-		logp   = "caches.read"
+		logp   = "Caches.read"
 		header = &cachesFileHeader{}
 		dec    = gob.NewDecoder(r)
 
@@ -247,7 +223,7 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 
 // remove an external answers by query name.
 // It will return nil if qname is not exist in the caches.
-func (c *caches) remove(qname string) (listAnswer []*Answer) {
+func (c *Caches) remove(qname string) (listAnswer []*Answer) {
 	var (
 		an  *Answer
 		ans *answers
@@ -273,7 +249,7 @@ func (c *caches) remove(qname string) (listAnswer []*Answer) {
 
 // removeInternalByRR remove internal cache by its record name, type, class,
 // and value.
-func (c *caches) removeInternalByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
+func (c *Caches) removeInternalByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
 	var (
 		ans *answers
 		an  *Answer
@@ -300,7 +276,7 @@ func (c *caches) removeInternalByRR(rr *ResourceRecord) (rrOut *ResourceRecord, 
 }
 
 // search external answers that match with regular expression.
-func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
+func (c *Caches) search(re *regexp.Regexp) (listMsg []*Message) {
 	var (
 		an    *Answer
 		ans   *answers
@@ -325,7 +301,7 @@ func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
 //
 // If the answer is inserted it will return true, otherwise it will return
 // false.
-func (c *caches) upsert(nu *Answer) (inserted bool) {
+func (c *Caches) upsert(nu *Answer) (inserted bool) {
 	if nu == nil || nu.msg == nil {
 		return
 	}
@@ -379,7 +355,7 @@ func (c *caches) upsert(nu *Answer) (inserted bool) {
 // cached.
 // If its exist, it will add or replace the existing RR in the message
 // (dependes on RR type).
-func (c *caches) upsertInternalRR(rr *ResourceRecord) (err error) {
+func (c *Caches) upsertInternalRR(rr *ResourceRecord) (err error) {
 	err = rr.initAndValidate()
 	if err != nil {
 		return err
@@ -427,16 +403,16 @@ func (c *caches) upsertInternalRR(rr *ResourceRecord) (err error) {
 // The worker prune process will run based on prune delay and it will remove
 // any cached answer that has not been accessed less than prune threshold
 // value.
-func (c *caches) worker() {
+func (c *Caches) worker(pruneDelay, pruneThreshold time.Duration) {
 	var (
-		ticker = time.NewTicker(c.pruneDelay)
+		ticker = time.NewTicker(pruneDelay)
 
 		listAnswer []*Answer
 		exp        int64
 	)
 
 	for range ticker.C {
-		exp = time.Now().Add(c.pruneThreshold).Unix()
+		exp = time.Now().Add(pruneThreshold).Unix()
 		listAnswer = c.prune(exp)
 		fmt.Printf("dns: pruning %d records from cache\n", len(listAnswer))
 	}
@@ -444,9 +420,9 @@ func (c *caches) worker() {
 
 // write all external answers to w.
 // On success, it returns the number of answers written to w.
-func (c *caches) write(w io.Writer) (n int, err error) {
+func (c *Caches) write(w io.Writer) (n int, err error) {
 	var (
-		logp    = "caches.write"
+		logp    = "Caches.write"
 		answers = c.list()
 		header  = &cachesFileHeader{
 			Version: cachesFileFormatV1,

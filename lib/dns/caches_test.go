@@ -12,43 +12,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestNewCaches(t *testing.T) {
-	type testCase struct {
-		desc           string
-		pruneDelay     time.Duration
-		pruneThreshold time.Duration
-		expDelay       time.Duration
-		expThreshold   time.Duration
-	}
-
-	var (
-		cases []testCase
-		c     testCase
-		got   *caches
-	)
-
-	cases = []testCase{{
-		desc:         "With invalid delay and threshold",
-		expDelay:     time.Hour,
-		expThreshold: -time.Hour,
-	}, {
-		desc:           "With 2m delay and threshold",
-		pruneDelay:     2 * time.Minute,
-		pruneThreshold: -2 * time.Minute,
-		expDelay:       2 * time.Minute,
-		expThreshold:   -2 * time.Minute,
-	}}
-
-	for _, c = range cases {
-		t.Log(c.desc)
-
-		got = newCaches(c.pruneDelay, c.pruneThreshold)
-
-		test.Assert(t, "caches.pruneDelay", c.expDelay, got.pruneDelay)
-		test.Assert(t, "caches.pruneThreshold", c.expThreshold, got.pruneThreshold)
-	}
-}
-
 func TestCachesGet(t *testing.T) {
 	type testCase struct {
 		exp     *Answer
@@ -93,14 +56,15 @@ func TestCachesGet(t *testing.T) {
 				},
 			},
 		}
-		ca = newCaches(0, 0)
 
+		ca      Caches
 		cases   []testCase
 		c       testCase
 		got     *Answer
 		gotList []*Answer
 	)
 
+	ca.init(0, 0)
 	ca.upsert(an1)
 	ca.upsert(an2)
 	ca.upsert(an3)
@@ -177,13 +141,14 @@ func TestCachesPrune(t *testing.T) {
 				},
 			},
 		}
-		ca = newCaches(0, 0)
 
+		ca      Caches
 		cases   []testCase
 		c       testCase
 		gotList []*Answer
 	)
 
+	ca.init(0, 0)
 	ca.upsert(an1)
 	ca.upsert(an2)
 	ca.upsert(an3)
@@ -217,7 +182,6 @@ func TestCachesUpsert(t *testing.T) {
 	}
 
 	var (
-		ca  = newCaches(0, 0)
 		an1 = &Answer{
 			ReceivedAt: 1,
 			AccessedAt: 1,
@@ -267,11 +231,14 @@ func TestCachesUpsert(t *testing.T) {
 			},
 		}
 
+		ca      Caches
 		cases   []testCase
 		c       testCase
 		gotList []*Answer
 		x       int
 	)
+
+	ca.init(0, 0)
 
 	cases = []testCase{{
 		desc: "With empty answer",
@@ -314,12 +281,12 @@ func TestCachesUpsert(t *testing.T) {
 
 func TestCaches_write(t *testing.T) {
 	var (
-		caches = newCaches(0, 0)
-		msg    = NewMessageAddress([]byte("test.local"), [][]byte{
+		msg = NewMessageAddress([]byte("test.local"), [][]byte{
 			[]byte("127.0.0.1"),
 		})
 		answer = newAnswer(msg, false)
 
+		caches     Caches
 		an         *Answer
 		expAnswers []*Answer
 		gotAnswers []*Answer
@@ -327,6 +294,8 @@ func TestCaches_write(t *testing.T) {
 		err        error
 		ok         bool
 	)
+
+	caches.init(0, 0)
 
 	ok = caches.upsert(answer)
 	if !ok {

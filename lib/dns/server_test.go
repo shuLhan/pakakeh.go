@@ -13,9 +13,7 @@ import (
 
 func TestServer_CachesSave(t *testing.T) {
 	var (
-		srv = &Server{
-			caches: newCaches(0, 0),
-		}
+		srv = &Server{}
 
 		hname   = []byte("caches.save.local")
 		address = []byte("127.0.0.1")
@@ -28,7 +26,9 @@ func TestServer_CachesSave(t *testing.T) {
 		n          int
 	)
 
-	_ = srv.caches.upsert(answer)
+	srv.Caches.init(0, 0)
+
+	_ = srv.Caches.upsert(answer)
 
 	var w bytes.Buffer
 
@@ -47,7 +47,7 @@ func TestServer_CachesSave(t *testing.T) {
 	}
 	expAnswers = append(expAnswers, newAnswer(msg, false))
 
-	srv.caches = newCaches(0, 0)
+	srv.Caches.init(0, 0)
 
 	gotAnswers, err = srv.CachesLoad(&w)
 	if err != nil {
