@@ -89,7 +89,7 @@ func TestCachesGet(t *testing.T) {
 		t.Log(c.desc)
 
 		_, got = ca.get(c.QName, c.RType, c.RClass)
-		gotList = ca.list()
+		gotList = ca.ExternalLRU()
 
 		test.Assert(t, "caches.get", c.exp, got)
 		test.Assert(t, "caches.list", c.expList, gotList)
@@ -153,7 +153,7 @@ func TestCachesPrune(t *testing.T) {
 	ca.upsert(an2)
 	ca.upsert(an3)
 
-	t.Logf("%+v\n", ca.list())
+	t.Logf("%+v\n", ca.ExternalLRU())
 
 	cases = []testCase{{
 		desc: "With several caches got pruned",
@@ -167,10 +167,59 @@ func TestCachesPrune(t *testing.T) {
 
 		_ = ca.prune(3)
 
-		gotList = ca.list()
+		gotList = ca.ExternalLRU()
 
 		test.Assert(t, "caches.list", c.expList, gotList)
 	}
+}
+
+func TestCaches_ExternalSave(t *testing.T) {
+	var (
+		srv = &Server{}
+
+		hname   = []byte("caches.save.local")
+		address = []byte("127.0.0.1")
+		msg     = NewMessageAddress(hname, [][]byte{address})
+		answer  = newAnswer(msg, false)
+
+		w          bytes.Buffer
+		expAnswers []*Answer
+		gotAnswers []*Answer
+		err        error
+		n          int
+	)
+
+	srv.Caches.init(0, 0)
+
+	_ = srv.Caches.upsert(answer)
+
+	n, err = srv.Caches.ExternalSave(&w)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, "Caches.ExternalSave", 1, n)
+
+	msg = NewMessage()
+	msg.packet = answer.msg.packet
+	err = msg.Unpack()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expAnswers = append(expAnswers, newAnswer(msg, false))
+
+	srv.Caches.init(0, 0)
+
+	gotAnswers, err = srv.Caches.ExternalLoad(&w)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, answer = range gotAnswers {
+		answer.el = nil
+	}
+
+	test.Assert(t, "Caches.Write", expAnswers, gotAnswers)
 }
 
 func TestCachesUpsert(t *testing.T) {
@@ -269,7 +318,7 @@ func TestCachesUpsert(t *testing.T) {
 
 		ca.upsert(c.nu)
 
-		gotList = ca.list()
+		gotList = ca.ExternalLRU()
 
 		test.Assert(t, "len(caches.list)", c.expLen, len(gotList))
 
@@ -277,54 +326,4 @@ func TestCachesUpsert(t *testing.T) {
 			test.Assert(t, "caches.list", c.expList[x], gotList[x])
 		}
 	}
-}
-
-func TestCaches_write(t *testing.T) {
-	var (
-		msg = NewMessageAddress([]byte("test.local"), [][]byte{
-			[]byte("127.0.0.1"),
-		})
-		answer = newAnswer(msg, false)
-
-		caches     Caches
-		an         *Answer
-		expAnswers []*Answer
-		gotAnswers []*Answer
-		answers    []*Answer
-		err        error
-		ok         bool
-	)
-
-	caches.init(0, 0)
-
-	ok = caches.upsert(answer)
-	if !ok {
-		t.Fatal("answer not inserted to cache")
-	}
-
-	answers = caches.list()
-	for _, an = range answers {
-		msg = NewMessage()
-		msg.packet = an.msg.packet
-		err = msg.Unpack()
-		if err != nil {
-			t.Fatal(err)
-		}
-		answer = newAnswer(msg, false)
-		expAnswers = append(expAnswers, answer)
-	}
-
-	var buf bytes.Buffer
-
-	_, err = caches.write(&buf)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	gotAnswers, err = caches.read(&buf)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	test.Assert(t, "caches.write", expAnswers, gotAnswers)
 }

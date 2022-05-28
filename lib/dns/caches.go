@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"regexp"
 	"sync"
 	"time"
@@ -82,6 +83,149 @@ func (c *Caches) init(pruneDelay, pruneThreshold time.Duration) {
 	go c.worker(pruneDelay, pruneThreshold)
 }
 
+// ExternalClear remove all external answers.
+func (c *Caches) ExternalClear() (listAnswer []*Answer) {
+	listAnswer = c.prune(math.MaxInt64)
+	return listAnswer
+}
+
+// ExternalLoad the gob encoded external answers from r.
+func (c *Caches) ExternalLoad(r io.Reader) (answers []*Answer, err error) {
+	var (
+		logp = "Caches.ExternalLoad"
+
+		answer *Answer
+	)
+
+	answers, err = c.read(r)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+	for _, answer = range answers {
+		_ = c.upsert(answer)
+	}
+	return answers, nil
+}
+
+// ExternalLRU return list of external caches ordered by the least recently
+// used.
+func (c *Caches) ExternalLRU() (answers []*Answer) {
+	var (
+		e *list.Element
+	)
+
+	c.Lock()
+	defer c.Unlock()
+
+	for e = c.lru.Front(); e != nil; e = e.Next() {
+		answers = append(answers, e.Value.(*Answer))
+	}
+	return answers
+}
+
+// externalRemoveName remove an external answers by domain name.
+// It will return nil if qname is not exist in the caches.
+func (c *Caches) externalRemoveName(qname string) (listAnswer []*Answer) {
+	var (
+		an  *Answer
+		ans *answers
+	)
+
+	c.Lock()
+	defer c.Unlock()
+
+	ans = c.external[qname]
+	if ans == nil {
+		return nil
+	}
+
+	for _, an = range ans.v {
+		c.lru.Remove(an.el)
+		an.clear()
+	}
+	listAnswer = ans.v
+	ans.v = nil
+
+	return listAnswer
+}
+
+// ExternalRemoveNames remove external caches by domain names.
+func (c *Caches) ExternalRemoveNames(names []string) (listAnswer []*Answer) {
+	var (
+		answers []*Answer
+		name    string
+	)
+	for _, name = range names {
+		answers = c.externalRemoveName(name)
+		if len(answers) > 0 {
+			listAnswer = append(listAnswer, answers...)
+			if debug.Value >= 1 {
+				fmt.Println("dns: - ", name)
+			}
+		}
+	}
+	return listAnswer
+}
+
+// ExternalSave write all external answers into w, encoded with gob.
+// On success, it returns the number of answers written to w.
+func (c *Caches) ExternalSave(w io.Writer) (n int, err error) {
+	var (
+		logp    = "ExternalSave"
+		answers = c.ExternalLRU()
+		header  = &cachesFileHeader{
+			Version: cachesFileFormatV1,
+		}
+		enc = gob.NewEncoder(w)
+
+		answer *Answer
+		item   *cachesFileV1
+	)
+
+	err = enc.Encode(header)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	for _, answer = range answers {
+		item = &cachesFileV1{
+			ReceivedAt: answer.ReceivedAt,
+			AccessedAt: answer.AccessedAt,
+			Packet:     answer.msg.packet,
+		}
+		err = enc.Encode(item)
+		if err != nil {
+			return 0, fmt.Errorf("%s: %w", logp, err)
+		}
+		n++
+	}
+
+	return n, nil
+}
+
+// ExternalSearch search external answers where domain name match with regular
+// expression.
+func (c *Caches) ExternalSearch(re *regexp.Regexp) (listMsg []*Message) {
+	var (
+		an    *Answer
+		ans   *answers
+		dname string
+	)
+
+	c.Lock()
+	defer c.Unlock()
+
+	for dname, ans = range c.external {
+		if re.MatchString(dname) {
+			for _, an = range ans.v {
+				listMsg = append(listMsg, an.msg)
+			}
+		}
+	}
+
+	return listMsg
+}
+
 // get an answer based on domain-name, query type, and query class.
 //
 // If query name exist but the query type or class does not exist,
@@ -94,9 +238,9 @@ func (c *Caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *a
 	c.Lock()
 	defer c.Unlock()
 
-	ans, _ = c.internal[qname]
+	ans = c.internal[qname]
 	if ans == nil {
-		ans, _ = c.external[qname]
+		ans = c.external[qname]
 		if ans == nil {
 			return nil, nil
 		}
@@ -117,19 +261,145 @@ func (c *Caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *a
 	return ans, an
 }
 
-// list return all external answers in least-recently-used order.
-func (c *Caches) list() (answers []*Answer) {
+// InternalPopulate add list of message to internal caches.
+func (c *Caches) InternalPopulate(msgs []*Message, from string) {
 	var (
-		e *list.Element
+		isLocal = true
+
+		msg      *Message
+		an       *Answer
+		n        int
+		inserted bool
+	)
+
+	for _, msg = range msgs {
+		an = newAnswer(msg, isLocal)
+		inserted = c.upsert(an)
+		if inserted {
+			n++
+		}
+	}
+
+	if debug.Value >= 1 {
+		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(msgs), from)
+	}
+}
+
+// InternalPopulateRecords update or insert new ResourceRecord into internal
+// caches.
+func (c *Caches) InternalPopulateRecords(listRR []*ResourceRecord, from string) (err error) {
+	var (
+		rr *ResourceRecord
+		n  int
+	)
+
+	for _, rr = range listRR {
+		err = c.internalUpsertRecord(rr)
+		if err != nil {
+			return err
+		}
+		n++
+	}
+	if debug.Value >= 1 {
+		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
+	}
+	return nil
+}
+
+// InternalRemoveNames remove internal caches by domain names.
+func (c *Caches) InternalRemoveNames(names []string) {
+	var (
+		x int
 	)
 
 	c.Lock()
 	defer c.Unlock()
 
-	for e = c.lru.Front(); e != nil; e = e.Next() {
-		answers = append(answers, e.Value.(*Answer))
+	for ; x < len(names); x++ {
+		delete(c.internal, names[x])
+		if debug.Value >= 1 {
+			fmt.Println("dns: - ", names[x])
+		}
 	}
-	return
+}
+
+// InternalRemoveRecord remove the answer from caches by ResourceRecord name, type,
+// class, and value.
+func (c *Caches) InternalRemoveRecord(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
+	var (
+		ans *answers
+		an  *Answer
+	)
+
+	c.Lock()
+	defer c.Unlock()
+
+	ans = c.internal[rr.Name]
+	if ans == nil {
+		return nil, nil
+	}
+	for _, an = range ans.v {
+		if an.RType != rr.Type {
+			continue
+		}
+		if an.RClass != rr.Class {
+			continue
+		}
+		rrOut, err = an.msg.RemoveAnswer(rr)
+		break
+	}
+	return rrOut, err
+
+}
+
+// internalUpsertRecord update or insert new answer by RR.
+//
+// First, it will check if the answer already exist in cache.
+// If it not exist, the new message and answer will created and inserted to
+// cached.
+// If its exist, it will add or replace the existing RR in the message
+// (dependes on RR type).
+func (c *Caches) internalUpsertRecord(rr *ResourceRecord) (err error) {
+	err = rr.initAndValidate()
+	if err != nil {
+		return err
+	}
+
+	c.Lock()
+	defer c.Unlock()
+
+	var (
+		ans *answers = c.internal[rr.Name]
+
+		an  *Answer
+		msg *Message
+	)
+
+	if ans == nil {
+		msg, err = NewMessageFromRR(rr)
+		if err != nil {
+			return err
+		}
+		an = newAnswer(msg, true)
+		ans = newAnswers(an)
+		c.internal[rr.Name] = ans
+		return nil
+	}
+
+	an, _ = ans.get(rr.Type, rr.Class)
+	if an == nil {
+		// The domain name is already exist, but without the RR type.
+		msg, err = NewMessageFromRR(rr)
+		if err != nil {
+			return err
+		}
+
+		an = newAnswer(msg, true)
+		ans.v = append(ans.v, an)
+		return nil
+	}
+
+	return an.msg.AddAnswer(rr)
 }
 
 // prune old, external answers that have access time less or equal than
@@ -221,83 +491,7 @@ func (c *Caches) read(r io.Reader) (answers []*Answer, err error) {
 	return answers, nil
 }
 
-// remove an external answers by query name.
-// It will return nil if qname is not exist in the caches.
-func (c *Caches) remove(qname string) (listAnswer []*Answer) {
-	var (
-		an  *Answer
-		ans *answers
-	)
-
-	c.Lock()
-	defer c.Unlock()
-
-	ans = c.external[qname]
-	if ans == nil {
-		return nil
-	}
-
-	for _, an = range ans.v {
-		c.lru.Remove(an.el)
-		an.clear()
-	}
-	listAnswer = ans.v
-	ans.v = nil
-
-	return listAnswer
-}
-
-// removeInternalByRR remove internal cache by its record name, type, class,
-// and value.
-func (c *Caches) removeInternalByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
-	var (
-		ans *answers
-		an  *Answer
-	)
-
-	c.Lock()
-	defer c.Unlock()
-
-	ans = c.internal[rr.Name]
-	if ans == nil {
-		return nil, nil
-	}
-	for _, an = range ans.v {
-		if an.RType != rr.Type {
-			continue
-		}
-		if an.RClass != rr.Class {
-			continue
-		}
-		rrOut, err = an.msg.RemoveAnswer(rr)
-		break
-	}
-	return rrOut, err
-}
-
-// search external answers that match with regular expression.
-func (c *Caches) search(re *regexp.Regexp) (listMsg []*Message) {
-	var (
-		an    *Answer
-		ans   *answers
-		dname string
-	)
-
-	c.Lock()
-	defer c.Unlock()
-
-	for dname, ans = range c.external {
-		if re.MatchString(dname) {
-			for _, an = range ans.v {
-				listMsg = append(listMsg, an.msg)
-			}
-		}
-	}
-
-	return listMsg
-}
-
-// upsert update or insert answer to external caches.
+// upsert update or insert answer in caches.
 //
 // If the answer is inserted it will return true, otherwise it will return
 // false.
@@ -348,56 +542,6 @@ func (c *Caches) upsert(nu *Answer) (inserted bool) {
 	return inserted
 }
 
-// upsertInternalRR update or insert new answer by RR.
-//
-// First, it will check if the answer already exist in cache.
-// If it not exist, the new message and answer will created and inserted to
-// cached.
-// If its exist, it will add or replace the existing RR in the message
-// (dependes on RR type).
-func (c *Caches) upsertInternalRR(rr *ResourceRecord) (err error) {
-	err = rr.initAndValidate()
-	if err != nil {
-		return err
-	}
-
-	c.Lock()
-	defer c.Unlock()
-
-	var (
-		ans *answers = c.internal[rr.Name]
-
-		an  *Answer
-		msg *Message
-	)
-
-	if ans == nil {
-		msg, err = NewMessageFromRR(rr)
-		if err != nil {
-			return err
-		}
-		an = newAnswer(msg, true)
-		ans = newAnswers(an)
-		c.internal[rr.Name] = ans
-		return nil
-	}
-
-	an, _ = ans.get(rr.Type, rr.Class)
-	if an == nil {
-		// The domain name is already exist, but without the RR type.
-		msg, err = NewMessageFromRR(rr)
-		if err != nil {
-			return err
-		}
-
-		an = newAnswer(msg, true)
-		ans.v = append(ans.v, an)
-		return nil
-	}
-
-	return an.msg.AddAnswer(rr)
-}
-
 // worker for pruning unused caches.
 //
 // The worker prune process will run based on prune delay and it will remove
@@ -416,40 +560,4 @@ func (c *Caches) worker(pruneDelay, pruneThreshold time.Duration) {
 		listAnswer = c.prune(exp)
 		fmt.Printf("dns: pruning %d records from cache\n", len(listAnswer))
 	}
-}
-
-// write all external answers to w.
-// On success, it returns the number of answers written to w.
-func (c *Caches) write(w io.Writer) (n int, err error) {
-	var (
-		logp    = "Caches.write"
-		answers = c.list()
-		header  = &cachesFileHeader{
-			Version: cachesFileFormatV1,
-		}
-		enc = gob.NewEncoder(w)
-
-		answer *Answer
-		item   *cachesFileV1
-	)
-
-	err = enc.Encode(header)
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	for _, answer = range answers {
-		item = &cachesFileV1{
-			ReceivedAt: answer.ReceivedAt,
-			AccessedAt: answer.AccessedAt,
-			Packet:     answer.msg.packet,
-		}
-		err = enc.Encode(item)
-		if err != nil {
-			return 0, fmt.Errorf("%s: %w", logp, err)
-		}
-		n++
-	}
-
-	return n, nil
 }

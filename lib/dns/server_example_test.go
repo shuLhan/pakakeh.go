@@ -74,7 +74,7 @@ func ExampleServer() {
 		log.Fatal(err)
 	}
 
-	server.PopulateCaches(zoneFile.Messages(), zoneFile.Path)
+	server.Caches.InternalPopulate(zoneFile.Messages(), zoneFile.Path)
 
 	go func() {
 		err = server.ListenAndServe()

@@ -11,11 +11,9 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math"
 	"net"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -165,133 +163,6 @@ func isResponseValid(req *request, res *Message) bool {
 	}
 
 	return true
-}
-
-// CachesLoad load the gob encoded external answers from r.
-func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
-	var (
-		logp   = "CachesLoad"
-		answer *Answer
-	)
-
-	answers, err = srv.Caches.read(r)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-	for _, answer = range answers {
-		_ = srv.Caches.upsert(answer)
-	}
-	return answers, nil
-}
-
-// CachesLRU return list of external caches ordered by the least recently
-// used.
-func (srv *Server) CachesLRU() []*Answer {
-	return srv.Caches.list()
-}
-
-// CachesSave write the external answers into w, encoded with gob.
-func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
-	n, err = srv.Caches.write(w)
-	if err != nil {
-		return 0, fmt.Errorf("CachesSave: %w", err)
-	}
-	return n, nil
-}
-
-// SearchCaches search caches by query (domain) name that match with the
-// regular expresion.
-func (srv *Server) SearchCaches(re *regexp.Regexp) []*Message {
-	return srv.Caches.search(re)
-}
-
-// PopulateCaches add list of message to caches.
-func (srv *Server) PopulateCaches(msgs []*Message, from string) {
-	var (
-		msg      *Message
-		an       *Answer
-		n        int
-		inserted bool
-		isLocal  = true
-	)
-
-	for _, msg = range msgs {
-		an = newAnswer(msg, isLocal)
-		inserted = srv.Caches.upsert(an)
-		if inserted {
-			n++
-		}
-	}
-
-	if debug.Value >= 1 {
-		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(msgs), from)
-	}
-}
-
-// PopulateCachesByRR update or insert new ResourceRecord into caches.
-func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (err error) {
-	var (
-		rr *ResourceRecord
-		n  int
-	)
-
-	for _, rr = range listRR {
-		err = srv.Caches.upsertInternalRR(rr)
-		if err != nil {
-			return err
-		}
-		n++
-	}
-	if debug.Value >= 1 {
-		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
-	}
-	return nil
-}
-
-// CachesClear remove all external answers.
-func (srv *Server) CachesClear() (listAnswer []*Answer) {
-	listAnswer = srv.Caches.prune(math.MaxInt64)
-	return listAnswer
-}
-
-// RemoveCachesByNames remove the caches by domain names.
-func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
-	var (
-		answers []*Answer
-		name    string
-	)
-	for _, name = range names {
-		answers = srv.Caches.remove(name)
-		if len(answers) > 0 {
-			listAnswer = append(listAnswer, answers...)
-			if debug.Value >= 1 {
-				fmt.Println("dns: - ", name)
-			}
-		}
-	}
-	return listAnswer
-}
-
-// RemoveCachesByRR remove the answer from caches by ResourceRecord name,
-// type, class, and value.
-func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
-	rrOut, err = srv.Caches.removeInternalByRR(rr)
-	return rrOut, err
-}
-
-// RemoveLocalCachesByNames remove internal caches by domain names.
-func (srv *Server) RemoveLocalCachesByNames(names []string) {
-	var (
-		x int
-	)
-	srv.Caches.Lock()
-	for ; x < len(names); x++ {
-		delete(srv.Caches.internal, names[x])
-		if debug.Value >= 1 {
-			fmt.Println("dns: - ", names[x])
-		}
-	}
-	srv.Caches.Unlock()
 }
 
 // RestartForwarders stop and start new forwarders with new nameserver address

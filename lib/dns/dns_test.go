@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	_testServer.PopulateCaches(zoneFile.messages, zoneFile.Path)
+	_testServer.Caches.InternalPopulate(zoneFile.messages, zoneFile.Path)
 
 	go func() {
 		err = _testServer.ListenAndServe()
