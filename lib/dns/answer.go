@@ -20,16 +20,18 @@ type Answer struct {
 	// QName contains DNS question name, a copy of msg.Question.Name.
 	QName string
 
-	// ReceivedAt contains time when message is received.  If answer is
-	// from local cache (host or zone file), its value is 0.
+	// ReceivedAt contains time when message is received.
+	// A zero value indicated local answer (loaded from hosts or zone
+	// files).
 	ReceivedAt int64
 
-	// AccessedAt contains time when message last accessed.  This field
-	// is used to prune old answer from caches.
+	// AccessedAt contains time when message last accessed.
+	// This field is used to prune old answer from caches.
 	AccessedAt int64
 
 	// RType contains record type, a copy of msg.Question.Type.
 	RType RecordType
+
 	// RClass contains record class, a copy of msg.Question.Class.
 	RClass RecordClass
 }

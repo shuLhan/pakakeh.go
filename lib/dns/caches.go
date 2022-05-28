@@ -22,13 +22,33 @@ const (
 )
 
 // caches of DNS answers.
+//
+// There are two type of answer: internal and external.
+// Internal answer is a DNS record that is loaded from hosts or zone files.
+// Internal answer never get pruned.
+// External answer is a DNS record that is received from parent name
+// servers.
+//
+// Caches stored in two storages: map and list.List.
+// The map caches store internal and external answers, using domain name as a
+// key and list of answers as value,
+//
+//	domain-name -> [{A,IN,...},{AAAA,IN,...}]
+//
+// The list.List store external answers, ordered by last accessed time,
+// it is used to prune least frequently accessed answers.
 type caches struct {
-	// v contains mapping of DNS question name (a domain name) with their
-	// list of answer.
-	v map[string]*answers
+	// internal contains list of internal answers loaded from hosts or
+	// zone files, indexed by its domain name.
+	internal map[string]*answers
 
-	// lru represent list of non local answers, ordered based on answer
-	// access time in ascending order.
+	// external contains list of answers from parent name servers, indexed
+	// by is domain name.
+	external map[string]*answers
+
+	// lru contains list of external answers, ordered by access time in
+	// ascending order (the least recently used, LRU, record will be on
+	// the top).
 	lru *list.List
 
 	// pruneDelay define a delay where caches will be pruned.
@@ -74,69 +94,75 @@ func newCaches(pruneDelay, pruneThreshold time.Duration) (ca *caches) {
 	}
 
 	ca = &caches{
-		v:              make(map[string]*answers),
+		internal:       make(map[string]*answers),
+		external:       make(map[string]*answers),
 		lru:            list.New(),
 		pruneDelay:     pruneDelay,
 		pruneThreshold: pruneThreshold,
 	}
 
-	go ca.startWorker()
+	go ca.worker()
 
 	return ca
 }
 
-// get an answer from cache based on domain-name, query type, and query class.
+// get an answer based on domain-name, query type, and query class.
 //
 // If query name exist but the query type or class does not exist,
 // it will return list of answer and nil answer.
 //
-// If answer exist on cache, their accessed time will be updated to current
-// time and moved to back of LRU to prevent being pruned later.
+// If answer exist on cache and its from external, their accessed time will be
+// updated to current time and moved to back of LRU to prevent being pruned
+// later.
 func (c *caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *answers, an *Answer) {
 	c.Lock()
+	defer c.Unlock()
 
-	var found bool
-
-	ans, found = c.v[qname]
-	if found {
-		an, _ = ans.get(rtype, rclass)
-		if an != nil {
-			// Move the answer to the back of LRU if its not
-			// local and update its accessed time.
-			if an.ReceivedAt > 0 {
-				c.lru.MoveToBack(an.el)
-				an.AccessedAt = time.Now().Unix()
-			}
+	ans, _ = c.internal[qname]
+	if ans == nil {
+		ans, _ = c.external[qname]
+		if ans == nil {
+			return nil, nil
 		}
 	}
 
-	c.Unlock()
-	return
+	an, _ = ans.get(rtype, rclass)
+	if an == nil {
+		return ans, nil
+	}
+
+	// Move the answer to the back of LRU if its external
+	// answer and update its accessed time.
+	if an.ReceivedAt > 0 {
+		c.lru.MoveToBack(an.el)
+		an.AccessedAt = time.Now().Unix()
+	}
+
+	return ans, an
 }
 
-// list return all answers in LRU.
+// list return all external answers in least-recently-used order.
 func (c *caches) list() (answers []*Answer) {
 	var (
 		e *list.Element
 	)
 
 	c.Lock()
+	defer c.Unlock()
+
 	for e = c.lru.Front(); e != nil; e = e.Next() {
 		answers = append(answers, e.Value.(*Answer))
 	}
-	c.Unlock()
 	return
 }
 
-// prune will remove old answers from caches based on accessed time.
-// If the accessed time is greater than expired time (exp) it will be removed,
-// otherwise it will stay on caches.
+// prune old, external answers that have access time less or equal than
+// expired "exp" time.
 func (c *caches) prune(exp int64) (listAnswer []*Answer) {
 	var (
 		el, next *list.Element
 		answer   *Answer
 		answers  *answers
-		found    bool
 	)
 
 	c.Lock()
@@ -155,11 +181,11 @@ func (c *caches) prune(exp int64) (listAnswer []*Answer) {
 
 		next = el.Next()
 		_ = c.lru.Remove(el)
-		answers, found = c.v[answer.QName]
-		if found {
+		answers = c.external[answer.QName]
+		if answers != nil {
 			answers.remove(answer.RType, answer.RClass)
 			if len(answers.v) == 0 {
-				delete(c.v, answer.QName)
+				delete(c.external, answer.QName)
 			}
 		}
 		answer.clear()
@@ -171,7 +197,7 @@ func (c *caches) prune(exp int64) (listAnswer []*Answer) {
 	return listAnswer
 }
 
-// read caches stored on storage r.
+// read external caches stored on storage r.
 func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 	var (
 		logp   = "caches.read"
@@ -219,49 +245,45 @@ func (c *caches) read(r io.Reader) (answers []*Answer, err error) {
 	return answers, nil
 }
 
-// remove an answer from caches by query name.
+// remove an external answers by query name.
 // It will return nil if qname is not exist in the caches.
 func (c *caches) remove(qname string) (listAnswer []*Answer) {
 	var (
-		answer *Answer
-		el     *list.Element
-		next   *list.Element
+		an  *Answer
+		ans *answers
 	)
 
 	c.Lock()
 	defer c.Unlock()
 
-	el = c.lru.Front()
-	for el != nil {
-		next = el.Next()
-		answer = el.Value.(*Answer)
-		if answer.QName != qname {
-			el = next
-			continue
-		}
-
-		c.lru.Remove(el)
-		answer.clear()
-		listAnswer = append(listAnswer, answer)
-		el = next
+	ans = c.external[qname]
+	if ans == nil {
+		return nil
 	}
+
+	for _, an = range ans.v {
+		c.lru.Remove(an.el)
+		an.clear()
+	}
+	listAnswer = ans.v
+	ans.v = nil
+
 	return listAnswer
 }
 
-// removeLocalRR remove the local ResourceRecord from caches by its name,
-// type, class, and value.
-func (c *caches) removeLocalRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
+// removeInternalByRR remove internal cache by its record name, type, class,
+// and value.
+func (c *caches) removeInternalByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
 	var (
 		ans *answers
 		an  *Answer
-		ok  bool
 	)
 
 	c.Lock()
 	defer c.Unlock()
 
-	ans, ok = c.v[rr.Name]
-	if !ok {
+	ans = c.internal[rr.Name]
+	if ans == nil {
 		return nil, nil
 	}
 	for _, an = range ans.v {
@@ -277,26 +299,31 @@ func (c *caches) removeLocalRR(rr *ResourceRecord) (rrOut *ResourceRecord, err e
 	return rrOut, err
 }
 
-// search for non-local DNS answer that match with regular expression.
+// search external answers that match with regular expression.
 func (c *caches) search(re *regexp.Regexp) (listMsg []*Message) {
 	var (
-		e      *list.Element
-		answer *Answer
+		an    *Answer
+		ans   *answers
+		dname string
 	)
 
 	c.Lock()
-	for e = c.lru.Front(); e != nil; e = e.Next() {
-		answer = e.Value.(*Answer)
-		if re.MatchString(answer.QName) {
-			listMsg = append(listMsg, answer.msg)
+	defer c.Unlock()
+
+	for dname, ans = range c.external {
+		if re.MatchString(dname) {
+			for _, an = range ans.v {
+				listMsg = append(listMsg, an.msg)
+			}
 		}
 	}
-	c.Unlock()
+
 	return listMsg
 }
 
-// upsert update or insert answer to caches.  If the answer is inserted to
-// caches it will return true, otherwise when its updated it will return
+// upsert update or insert answer to external caches.
+//
+// If the answer is inserted it will return true, otherwise it will return
 // false.
 func (c *caches) upsert(nu *Answer) (inserted bool) {
 	if nu == nil || nu.msg == nil {
@@ -306,43 +333,53 @@ func (c *caches) upsert(nu *Answer) (inserted bool) {
 	var (
 		answers *answers
 		an      *Answer
-		found   bool
 	)
 
 	c.Lock()
+	defer c.Unlock()
 
-	answers, found = c.v[nu.QName]
-	if !found {
-		inserted = true
-		c.v[nu.QName] = newAnswers(nu)
-		if nu.ReceivedAt > 0 {
-			nu.el = c.lru.PushBack(nu)
-		}
-	} else {
-		an = answers.upsert(nu)
-		if an == nil {
+	if nu.ReceivedAt == 0 {
+		answers = c.internal[nu.QName]
+		if answers == nil {
+			answers = newAnswers(nu)
+			c.internal[nu.QName] = answers
 			inserted = true
-			if nu.ReceivedAt > 0 {
-				// Push the new answer to LRU if new answer is
-				// not local and its inserted to list.
-				nu.el = c.lru.PushBack(nu)
+		} else {
+			an = answers.upsert(nu)
+			if an == nil {
+				inserted = true
 			}
 		}
+	} else {
+		answers = c.external[nu.QName]
+		if answers == nil {
+			answers = newAnswers(nu)
+			c.external[nu.QName] = answers
+			inserted = true
+		} else {
+			an = answers.upsert(nu)
+			if an == nil {
+				inserted = true
+			}
+		}
+		if inserted {
+			// Push the new answer to LRU if new answer is
+			// external and its inserted to list.
+			nu.el = c.lru.PushBack(nu)
+		}
 	}
-
-	c.Unlock()
 
 	return inserted
 }
 
-// upsertRR update or insert new answer by RR.
+// upsertInternalRR update or insert new answer by RR.
 //
 // First, it will check if the answer already exist in cache.
 // If it not exist, the new message and answer will created and inserted to
 // cached.
 // If its exist, it will add or replace the existing RR in the message
 // (dependes on RR type).
-func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
+func (c *caches) upsertInternalRR(rr *ResourceRecord) (err error) {
 	err = rr.initAndValidate()
 	if err != nil {
 		return err
@@ -352,7 +389,7 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	defer c.Unlock()
 
 	var (
-		ans *answers = c.v[rr.Name]
+		ans *answers = c.internal[rr.Name]
 
 		an  *Answer
 		msg *Message
@@ -364,7 +401,8 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 			return err
 		}
 		an = newAnswer(msg, true)
-		c.v[rr.Name] = newAnswers(an)
+		ans = newAnswers(an)
+		c.internal[rr.Name] = ans
 		return nil
 	}
 
@@ -384,12 +422,12 @@ func (c *caches) upsertRR(rr *ResourceRecord) (err error) {
 	return an.msg.AddAnswer(rr)
 }
 
-// startWorker start the worker pruning process.
+// worker for pruning unused caches.
 //
 // The worker prune process will run based on prune delay and it will remove
 // any cached answer that has not been accessed less than prune threshold
 // value.
-func (c *caches) startWorker() {
+func (c *caches) worker() {
 	var (
 		ticker = time.NewTicker(c.pruneDelay)
 
@@ -404,7 +442,7 @@ func (c *caches) startWorker() {
 	}
 }
 
-// write all non-local answers to w.
+// write all external answers to w.
 // On success, it returns the number of answers written to w.
 func (c *caches) write(w io.Writer) (n int, err error) {
 	var (

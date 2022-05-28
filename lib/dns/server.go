@@ -37,20 +37,20 @@ const (
 //
 // # Caches
 //
-// There are two type of answer: local and non-local.
-// Local answer is a DNS record that is loaded from hosts or zone file.
-// Non-local answer is a DNS record that is received from parent name
+// There are two type of answer: internal and external.
+// Internal answers is DNS records that are loaded from hosts or zone files.
+// Internal answers never get pruned.
+// External answers is DNS records that are received from parent name
 // servers.
 //
-// Server caches the DNS answers in two storages: map and list.
-// The map caches store local and non local answers, using domain name as a
+// Server caches the DNS answers in two storages: map and list.List.
+// The map caches store internal and external answers, using domain name as a
 // key and list of answers as value,
 //
 //	domain-name -> [{A,IN,...},{AAAA,IN,...}]
 //
-// The list caches store non-local answers, ordered by last accessed time,
+// The list.List store external answers, ordered by accessed time,
 // it is used to prune least frequently accessed answers.
-// Local caches will never get pruned.
 //
 // # Debugging
 //
@@ -167,7 +167,7 @@ func isResponseValid(req *request, res *Message) bool {
 	return true
 }
 
-// CachesLoad load the gob encoded answers from r.
+// CachesLoad load the gob encoded external answers from r.
 func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
 	var (
 		logp   = "CachesLoad"
@@ -184,13 +184,13 @@ func (srv *Server) CachesLoad(r io.Reader) (answers []*Answer, err error) {
 	return answers, nil
 }
 
-// CachesLRU return list of non-local caches ordered by the least recently
+// CachesLRU return list of external caches ordered by the least recently
 // used.
 func (srv *Server) CachesLRU() []*Answer {
 	return srv.caches.list()
 }
 
-// CachesSave write the non-local answers into w, encoded with gob.
+// CachesSave write the external answers into w, encoded with gob.
 func (srv *Server) CachesSave(w io.Writer) (n int, err error) {
 	n, err = srv.caches.write(w)
 	if err != nil {
@@ -236,7 +236,7 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (er
 	)
 
 	for _, rr = range listRR {
-		err = srv.caches.upsertRR(rr)
+		err = srv.caches.upsertInternalRR(rr)
 		if err != nil {
 			return err
 		}
@@ -248,7 +248,7 @@ func (srv *Server) PopulateCachesByRR(listRR []*ResourceRecord, from string) (er
 	return nil
 }
 
-// CachesClear remove all caches.
+// CachesClear remove all external answers.
 func (srv *Server) CachesClear() (listAnswer []*Answer) {
 	listAnswer = srv.caches.prune(math.MaxInt64)
 	return listAnswer
@@ -275,18 +275,18 @@ func (srv *Server) RemoveCachesByNames(names []string) (listAnswer []*Answer) {
 // RemoveCachesByRR remove the answer from caches by ResourceRecord name,
 // type, class, and value.
 func (srv *Server) RemoveCachesByRR(rr *ResourceRecord) (rrOut *ResourceRecord, err error) {
-	rrOut, err = srv.caches.removeLocalRR(rr)
+	rrOut, err = srv.caches.removeInternalByRR(rr)
 	return rrOut, err
 }
 
-// RemoveLocalCachesByNames remove local caches by domain names.
+// RemoveLocalCachesByNames remove internal caches by domain names.
 func (srv *Server) RemoveLocalCachesByNames(names []string) {
 	var (
 		x int
 	)
 	srv.caches.Lock()
 	for ; x < len(names); x++ {
-		delete(srv.caches.v, names[x])
+		delete(srv.caches.internal, names[x])
 		if debug.Value >= 1 {
 			fmt.Println("dns: - ", names[x])
 		}
