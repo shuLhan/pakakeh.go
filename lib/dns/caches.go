@@ -549,14 +549,15 @@ func (c *Caches) upsert(nu *Answer) (inserted bool) {
 // value.
 func (c *Caches) worker(pruneDelay, pruneThreshold time.Duration) {
 	var (
-		ticker = time.NewTicker(pruneDelay)
+		pruneTimer = time.NewTimer(pruneDelay)
 
+		now        time.Time
 		listAnswer []*Answer
 		exp        int64
 	)
 
-	for range ticker.C {
-		exp = time.Now().Add(pruneThreshold).Unix()
+	for now = range pruneTimer.C {
+		exp = now.Add(pruneThreshold).Unix()
 		listAnswer = c.prune(exp)
 		fmt.Printf("dns: pruning %d records from cache\n", len(listAnswer))
 	}
