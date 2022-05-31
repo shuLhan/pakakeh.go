@@ -6,10 +6,10 @@ Shulhan <ms@kilabit.info>
 
 This library is released every month, usually at the first week of month.
 
-[#v0.37.0]
+[#v0_37_0]
 ==  share v0.37.0 (2022-05-09)
 
-[#v0.37.0_breaking_changes]
+[#v0_37_0_breaking_changes]
 ===  Breaking changes
 
 *  lib/dns: refactor Server RemoveCachesByNames to return removed Answer
@@ -37,7 +37,7 @@ If this field is empty, only files match the Includes filter will be
 watched.
 --
 
-[#v0.37.0_new_features]
+[#v0_37_0_new_features]
 ===  New features
 
 *  lib/dns: add method to get the record in HostsFile by name and/or value
@@ -77,7 +77,7 @@ The function also accept second parameter: isInsecure, which is only
 usable for DNS over TLS and DNS over HTTPS.
 --
 
-[#v0.37.0_bug_fixes]
+[#v0_37_0_bug_fixes]
 ===  Bug fixes
 
 *  lib/ini: fix panic when marshaling unexported field with type struct
@@ -90,7 +90,7 @@ struct into separate examples.
 If the same Node's Path already exists on the Childs, adding another
 Node with same Path should not add the Node to the Childs.
 
-[#v0.37.0_enhancements]
+[#v0_37_0_enhancements]
 ===  Enhancements
 
 *  lib/ini: implement marshaling and unmarshaling map with struct element
@@ -111,7 +111,7 @@ This implementation allow multiple section with dynamic subsections as
 key.
 --
 
-[#v0.37.0_chores]
+[#v0_37_0_chores]
 ===  Chores
 
 *  all: reformat all codes using gofmt 1.19 (the Go tip)
@@ -123,10 +123,10 @@ This changes replace any usage that use functions from ioutil package
 with their replacement from package os or package io.
 
 
-[#v0.36.0]
+[#v0_36_0]
 ==  share v0.36.0 (2022-04-03)
 
-[#v0.36.0_breaking_changes]
+[#v0_36_0_breaking_changes]
 ===  Breaking changes
 
 *  lib/memfs: update the file mode and/or content on DirWatcher
@@ -241,10 +241,10 @@ With this we do one thing (write testing) and output two things (testing
 the code and give an example for code).
 
 
-[#v0.35.0]
+[#v0_35_0]
 ==  share v0.35.0 (2022-03-04)
 
-[#v0.35.0_breaking_changes]
+[#v0_35_0_breaking_changes]
 ===  Breaking changes
 
 *  lib/email: change the Header and Body fields on Message to non-pointer.
@@ -267,7 +267,7 @@ authenticate the connection, minimize number of step on the caller.
 
 *  lib/smtp: rename Mechanism to SaslMechanism.
 
-[#v0.35.0_new_features]
+[#v0_35_0_new_features]
 === New features
 
 *  cmd/sendemail: command line interface to send an email.
@@ -296,7 +296,7 @@ following file input extension:
 The input file will be removed on success.
 --
 
-[#v0.35.0_enhancements]
+[#v0_35_0_enhancements]
 ===  Enhancements
 
 *  lib/dns: increase the default UDP packet size to 1232.
@@ -401,7 +401,7 @@ This changes fix this issue by sorting the keys on ADT.Amap on
 Marshal-ing, to make the written output predictable.
 --
 
-[#v0.35.0_bug_fixes]
+[#v0_35_0_bug_fixes]
 ===  Bug fixes
 
 *  lib/io: fix DirWatcher not removing old files on rename.
@@ -424,7 +424,7 @@ server by sending invalid packet).
 This changes fix this issue by checking the index and rdata length with
 the length of packet before consuming the rdata itself.
 
-[#v0.35.0_chores]
+[#v0_35_0_chores]
 ===  Chores
 
 *  lib/smtp: provide an example of how to create MailTx from email package.
@@ -441,10 +441,10 @@ Since the default mlog instance is a global variable, using non-pointer
 give advantages on minimize GC pressure.
 
 
-[#v0.34.0]
+[#v0_34_0]
 ==  share v0.34.0 (2022-02-05)
 
-[#v0.34.0_breaking_changes]
+[#v0_34_0_breaking_changes]
 ===  Breaking changes
 
 *  lib/sql: make the table migration customizable
@@ -456,7 +456,7 @@ the name of table where the state of migration will be saved.
 If its empty default to "_migration".
 --
 
-[#v0.34.0_new_features]
+[#v0_34_0_new_features]
 ===  New features
 
 *  lib/os: implement function to Extract compressed and/or archived file
@@ -492,7 +492,7 @@ file system.
 The Download method get a resource from remote server and write it into
 DownloadRequest.Output (a io.Writer).
 
-[#v0.34.0_enhancements]
+[#v0_34_0_enhancements]
 ===  Enhancements
 
 *  lib/websocket: return error if parameter is empty on RegisterTextHandler
@@ -502,7 +502,7 @@ or handler parameter is not set.
 This may cause confusion and hard to debug handler when no connection receive
 but the RegisterTextHandler does not have any error.
 
-[#v0.34.0_chores]
+[#v0_34_0_chores]
 ===  Chores
 
 *  lib/http: change the test port for testing HTTP server
@@ -514,7 +514,7 @@ This changes it to 14832 and we make the full server address stored
 as global variable so any tests can references it.
 
 
-[#v0.33.0]
+[#v0_33_0]
 ==  share v0.33.0 (2022-01-09)
 
 Happy New Year!
@@ -529,7 +529,7 @@ intended "share", and sorry if its too many breaking changes.
 Live long and prosper!
 See you again next year.
 
-[#v0.33.0_new_features]
+[#v0_33_0_new_features]
 ===  New features
 
 *  cmd/gofilemode: new command to decode the Go file mode
@@ -565,7 +565,7 @@ Without a parameter, it will print the current time.
 With single parameter, it will print the time based on that epoch.
 --
 
-[#v0.33.0_breaking_changes]
+[#v0_33_0_breaking_changes]
 ===  Breaking changes
 
 *  lib/http: refactoring NewClient to accept single struct
@@ -616,7 +616,7 @@ This commit changes the signature of ParseMailbox by returning no error.
 
 [1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation
 
-[#v0.33.0_bug_fixes]
+[#v0_33_0_bug_fixes]
 ===  Bug fixes
 
 *  lib/memfs: skip mount if the Root node has been initialized
@@ -638,7 +638,7 @@ But in this, using http.FileSystem, the ioutil.ReadAll now return EOF
 and we need to check it to make the migration can run without an error.
 --
 
-[#v0.33.0_enhancements]
+[#v0_33_0_enhancements]
 ===  Enhancements
 
 *  lib/io: realign all structs
@@ -687,7 +687,7 @@ The realign save storage spaces on struct,
 +
 This changes the storage size from 80 to 72 bytes (-8 bytes).
 
-[#v0.33.0_chores]
+[#v0_33_0_chores]
 ===  Chores
 
 *  github/workflows: remove step to get dependencies
@@ -702,12 +702,12 @@ Since the ParseMailbox is public we can provide an examples and test
 at the same times.
 
 
-[#v0.32.0]
+[#v0_32_0]
 ==  share v0.32.0 (2021-12-03)
 
 This release bring major changes and enhancements to package dns and math/big.
 
-[#v0.32.0_breaking_changes]
+[#v0_32_0_breaking_changes]
 ===  Breaking changes
 
 *  math/big: refactoring AddFloat to accept variadic interface{}
@@ -829,7 +829,7 @@ This changes remove the unnecessary and complex fallback NS from
 server.
 --
 
-[#v0.32.0_new_features]
+[#v0_32_0_new_features]
 ===  New features
 
 *  lib/dns: add support to save and load caches to/from storage
@@ -864,7 +864,7 @@ If value start with "$", then the socket path is set based on value of
 that environment variable.
 Other string beside "none" will be considered as path to socket.
 
-[#v0.32.0_bug_fixes]
+[#v0_32_0_bug_fixes]
 ===  Bug fixes
 
 *  math/big: return nil on Quo and QuoRat instead of panic
@@ -886,7 +886,7 @@ Previously only answer with non-zero response code is ignored.
 This changes ignore also answer where response header is truncated.
 --
 
-[#v0.32.0_enhancements]
+[#v0_32_0_enhancements]
 ===  Enhancements
 
 *  lib/dns: realign all struct fields
@@ -927,10 +927,10 @@ While at it, minimize copying packet if its not reusable inside a method.
 --
 
 
-[#v0.31.0]
+[#v0_31_0]
 ==  share v0.31.0 (2021-11-04)
 
-[#v0.31.0_breaking_changes]
+[#v0_31_0_breaking_changes]
 ===  Breaking changes
 
 *  lib/memfs: move the embedded parameter to Options
@@ -1024,7 +1024,7 @@ generate file gen_test.go to prevent the file being modified and
 re-adding the same file every time we run local tests.
 --
 
-[#v0.31.0_new_features]
+[#v0_31_0_new_features]
 ===  New features
 
 *  lib/ini: add function IsValidVarName
@@ -1071,7 +1071,7 @@ EHLO/HELO buffer.
 On success, it will return response with Code 250, StatusOK.
 --
 
-[#v0.31.0_bug_fixes]
+[#v0_31_0_bug_fixes]
 ===  Bug fixes
 
 *  lib/ascii: fix IsHex return false on 0
@@ -1113,7 +1113,7 @@ the request/response.
 Converting that parameter path to absolute path may cause unpredictable
 result on module that use it.
 
-[#v0.31.0_chores]
+[#v0_31_0_chores]
 ===  Chores
 
 *  lib/ini: add example of marshal/unmarshaling of section with sub
@@ -1134,10 +1134,10 @@ The zero value for V ([]byte) is already nil and Node.Childs
 *  lib/io: use t.Cleanup instead of defer on test
 
 
-[#v0.30.0]
+[#v0_30_0]
 ==  share v0.30.0 (2021-10-04)
 
-[#v0.30.0_breaking_changes]
+[#v0_30_0_breaking_changes]
 === Breaking changes
 
 *  lib/io: separate FileState for updated mode and content
@@ -1153,7 +1153,7 @@ for update on file mode, and FileStateUpdateContent for update on
 file content.
 --
 
-[#v0.30.0_new_features]
+[#v0_30_0_new_features]
 === New features
 
 *  lib/memfs: export the Node Update method
@@ -1185,7 +1185,7 @@ If withSpace is true then white space is allowed, otherwise it would
 also be removed from text.
 --
 
-[#v0.30.0_bug_fixes]
+[#v0_30_0_bug_fixes]
 === Bug fixes
 
 *  lib/memfs: fix symlink to directory not included on mount
@@ -1258,7 +1258,7 @@ This commit fix this issue by checking if the original node mode is a
 directory and return immediately.
 --
 
-[#v0.30.0_enhancements]
+[#v0_30_0_enhancements]
 === Enhancements
 
 *  lib/memfs: check error on File Close on GoGenerate
@@ -1299,7 +1299,7 @@ fmt.Sprintf.
 
 *  math/big: add some examples of Rat.Int64() and RoundToNearestAway
 
-[#v0.30.0_chores]
+[#v0_30_0_chores]
 === Chores
 
 *  github: update the Go version to v1.17.1
@@ -1307,10 +1307,10 @@ fmt.Sprintf.
 *  lib/strings: update comment and example of TrimAlnum
 
 
-[#v0.29.2]
+[#v0_29_2]
 ==  share v0.29.2 (2021-09-06)
 
-[#v0.29.2_bug_fixes]
+[#v0_29_2_bug_fixes]
 ===  Bug fixes
 
 *  os/exec: fix escaped quote inside the same quote
@@ -1395,7 +1395,7 @@ Given the following string "cmd /a\ b" to ParseCommandArgs now
 return "cmd" and ["/a b"] not ["/a\", "b"], because the space after a
 is escaped using backslash.
 
-[#v0.29.2_enhancements]
+[#v0_29_2_enhancements]
 ===  Enhancements
 
 *  lib/memfs: set default content type for empty file to "text/plain"
@@ -1443,7 +1443,7 @@ This changes add method SetSessionOutputError to change the output and
 error for future remote execution.
 --
 
-[#v0.29.2_chores]
+[#v0_29_2_chores]
 ===  Chores
 
 *  lib/reflect: make the IsNil tests to become an example
@@ -1471,7 +1471,7 @@ We try to fix this by creating new client on each test cases.
 --
 
 
-[#v0.29.1]
+[#v0_29_1]
 ==  share v0.29.1 (2021-08-06)
 
 Revert the "lib/errors: return the internal error only if its not nil on
@@ -1483,10 +1483,10 @@ The correct solution to convert an error to errors.E is by implementing the As
 method.
 
 
-[#v0.29.0]
+[#v0_29_0]
 ==  share v0.29.0 (2021-08-06)
 
-[#v0.29.0_new_feature]
+[#v0_29_0_new_feature]
 ===  New feature
 
 ssh/sftp: new package that implement SSH File Transport Protocol v3
@@ -1494,7 +1494,7 @@ ssh/sftp: new package that implement SSH File Transport Protocol v3
 The sftp package extend the golang.org/x/crypto/ssh package by
 implementing "sftp" subsystem using the ssh.Client connection.
 
-[#v0.29.0_breaking_changes]
+[#v0_29_0_breaking_changes]
 ===  Breaking changes
 
 *  text/diff: add functions to compare raw bytes as text and text.Lines
@@ -1508,7 +1508,7 @@ This changes refactoring some functions, notably,
 * Add function Lines that compare two instances of text.Lines
 --
 
-[#v0.29.0_enhancements]
+[#v0_29_0_enhancements]
 ===  Enhancements
 
 *  lib/mlog: add function and method Panicf
@@ -1558,7 +1558,7 @@ So, for example, if path "/x" not exist in memfs, we check if
 "/x/index.html". If its still not exist, we check "/x.html".
 --
 
-[#v0.29.0_bug_fixes]
+[#v0_29_0_bug_fixes]
 ===  Bug fix
 
 *  lib/errors: return the internal error only if its not nil on Unwrap
@@ -1567,10 +1567,10 @@ If the internal error is nil, the Unwrap method will return the instance
 of e itself.
 
 
-[#v0.28.0]
+[#v0_28_0]
 == share v0.28.0 (2021-07-06)
 
-[#v0.28.0_breaking_changes]
+[#v0_28_0_breaking_changes]
 === Breaking changes
 
 * lib/ssh: rename method Get to ScpGet and Put to ScpPut
@@ -1601,7 +1601,7 @@ dependencies as possible.
 Now that Options field has been exported, we did not need to have
 duplicate Memfs, so this field is removed in favor of Options.Memfs.
 
-[#v0.28.0_enhancements]
+[#v0_28_0_enhancements]
 === Enhancements
 
 * websocket: export the Options field on the Server
@@ -1635,13 +1635,13 @@ field, while the required header value stored on their respective fields.
 This commit store all request header key and values into the Header field.
 --
 
-[#v0.27.0]
+[#v0_27_0]
 == share v0.27.0 (2021-06-05)
 
 This release bring better functionalities, usability, and fixes for `xmlrpc`
 package.
 
-[#v0.27.0_breaking_changes]
+[#v0_27_0_breaking_changes]
 === Breaking changes
 
 * xmlrpc: change the Response to embed the errors.E
@@ -1683,7 +1683,7 @@ This changes,
   ArrayValues
 --
 
-[#v0.27.0_new_features]
+[#v0_27_0_new_features]
 === New features
 
 * memfs: add function to Merge one or more instance of MemFS
@@ -1703,7 +1703,7 @@ instance will be ignored.
 The PrintStack function or method will writes to error writers the stack
 trace returned by debug.Stack.
 
-[#v0.27.0_enhancements]
+[#v0_27_0_enhancements]
 === Enhancements
 
 * http: add request type for XML
@@ -1711,7 +1711,7 @@ trace returned by debug.Stack.
 Setting Endpoint's RequestType to RequestTypeXML will check the content
 type of HTTP request to match with "text/xml".
 
-[#v0.27.0_bug_fixes]
+[#v0_27_0_bug_fixes]
 === Bug fixes
 
 * memfs: set the field Parent on Node AddChild
@@ -1736,10 +1736,10 @@ On Arch Linux with Go tip, the content-type for JavaScript file is
 JavaScript file is "application/javascript".
 
 
-[#v0.26.0]
+[#v0_26_0]
 ==  share v0.26.0 (2021-05-03)
 
-[#v0.26.0_new_features]
+[#v0_26_0_new_features]
 === New features
 
 * math/big: add method Add, IsLess, IsGreater, and Scan on Int
@@ -1765,7 +1765,7 @@ values using NewInt().
 +
 Also, make it support marshal/unmarshal JSON
 
-[#v0.26.0_enhancements]
+[#v0_26_0_enhancements]
 === Enhancements
 
 * sql: make the column filename on table _migration as primary key
@@ -1792,7 +1792,7 @@ While at it, move the field comment to its declaration.
 If the private key file is empty, skip it for being added as parameter
 of scp command.  This is to prevent warning message on user side.
 
-[#v0.26.0_chores]
+[#v0_26_0_chores]
 === Chores
 
 * memfs: update the test ContentType for JavaScript files
@@ -1807,7 +1807,7 @@ which is basically binary.Write with parameter output buffer,
 LittleEndian, and input value.
 
 
-[#v0.25.1]
+[#v0_25_1]
 ==  share v0.25.1 (2021-04-06)
 
 Set the minimum Go version to 1.16
@@ -1820,10 +1820,10 @@ by setting the minimum Go version to 1.16.
 We choose to move forward.
 
 
-[#v0.25.0]
+[#v0_25_0]
 ==  share v0.25.0 (2021-04-06)
 
-[#v0.25.0_breaking_changes]
+[#v0_25_0_breaking_changes]
 ===  Breaking changes
 
 *  all: refactoring the test.Assert and test.AssertBench signature
@@ -1864,7 +1864,7 @@ parameter, so the call to client methods would be
 Since one can set the Content-Type in parameter headers, this parameter is
 become redundant.
 
-[#v0.25.0_new_features]
+[#v0_25_0_new_features]
 ===  New features
 
 * http: add method to generate standard HTTP request on Client
@@ -1918,7 +1918,7 @@ To generate signers.
 This method need manual key added by user to SSH agent before calling
 NewClient to make it works.
 
-[#v0.25.0_enhancements]
+[#v0_25_0_enhancements]
 ===  Enhancements
 
 * xmlrpc: add debug statements to print request and response
@@ -1927,10 +1927,10 @@ The debug level is set minimum to 3. If its set it will print the
 request and response to standard output.
 
 
-[#v0.24.0]
+[#v0_24_0]
 ==  share v0.24.0 (2021-03-06)
 
-[#v0.24.0_breaking_changes]
+[#v0_24_0_breaking_changes]
 ===  Breaking changes
 
 *  http: add prefix Header to constants AcceptEncoding and ContentEncoding
@@ -1970,7 +1970,7 @@ EndpointRequest.Error field.
 
 *  http: move the CORS options to separate struct
 
-[#v0.24.0_new_features]
+[#v0_24_0_new_features]
 ===  New features
 
 *  http: add methods IPAddressOfRequest and ParseXForwardedFor
@@ -2067,7 +2067,7 @@ If the V is not nil, it will marshal it into,
 +
 The Rat.Value() return the value as []byte.
 
-[#v0.24.0_enhancements]
+[#v0_24_0_enhancements]
 === Enhancements
 
 *  clise: make all methods safe for concurrent use
@@ -2081,7 +2081,7 @@ The Offset field contains the start of paging.
 The Limit field contains the maximum number of records per page.
 The Count field contains the total number of records.
 
-[#v0.24.0_bug_fixes]
+[#v0_24_0_bug_fixes]
 === Bug fixes
 
 *  reflect: check using equal statement on IsNil
@@ -2089,7 +2089,7 @@ The Count field contains the total number of records.
 Beside using IsNil(), return the last check using "v == nil".
 
 
-[#v0.23.0]
+[#v0_23_0]
 ==  share v0.23.0 (2021-02-05)
 
 This release bring major refactoring to package memfs to allow embedding two
@@ -2097,7 +2097,7 @@ or more directories in single package.
 
 The minimum Go version is increased to 1.14.
 
-[#v0.23.0_breaking_changes]
+[#v0_23_0_breaking_changes]
 ===  Breaking changes
 
 *  memfs: refactoring, allow multiple instances of memfs in single package
@@ -2166,7 +2166,7 @@ predictable.
 +
 While at it, add paramter to change placeholder on ExtractSQLFields.
 
-[#v0.23.0_new_features]
+[#v0_23_0_new_features]
 ===  New features
 
 *  http: add method Post on client
@@ -2216,7 +2216,7 @@ The RoundNearestFraction does not require precision parameter, like in
 other rounds function, but it figure it out based on the last non-zero
 value from fraction.
 
-[#v0.23.0_enhancements]
+[#v0_23_0_enhancements]
 ===  Enhancements
 
 *  dns: change the error messages on ResourceRecord initAndInitialize
@@ -2232,7 +2232,7 @@ the least recently used.
 This changes affect the answer type which must be exported, including
 most of its fields, so consumer can access it.
 
-[#v0.23.0_bug_fixes]
+[#v0_23_0_bug_fixes]
 ===  Bug fixes
 
 *  sql: check nil on Migrate parameter "fs" using reflect.IsNil
@@ -2251,17 +2251,17 @@ The TXT record value must be wrapped with quote when stored on zone
 file.
 
 
-[#v0.22.0]
+[#v0_22_0]
 ==  share v0.22.0 (2021-01-06)
 
-[#v0.22.0_breaking_changes]
+[#v0_22_0_breaking_changes]
 ===  Breaking changes
 
 * contact: remove unused package proofn
 
 * sql: change the new client function parameter into struct of options.
 
-[#v0.22.0_new_features]
+[#v0_22_0_new_features]
 ===  New features
 
 *  cmd: add new CLI "totp"
@@ -2271,7 +2271,7 @@ secret key.
 
 *  totp: add method to generate n number of passwords
 
-[#v0.22.0_enhancements]
+[#v0_22_0_enhancements]
 ===  Enhancements
 
 *  http: print client request if debug value is equal or greater than 2.
@@ -2283,10 +2283,10 @@ standard output.
 *  ssh: print the private key file that has an error when generating signers
 
 
-[#v0.21.0]
+[#v0_21_0]
 ==  share v0.21.0 (2020-12-06)
 
-[#v0.21.0_breaking_changes]
+[#v0_21_0_breaking_changes]
 ===  Breaking changes
 
 *  test: refactoring Assert with better error message
@@ -2294,7 +2294,7 @@ standard output.
 The new Assert function use the reflect.DoEqual that return an error
 which describe which field have unmatched value.
 
-[#v0.21.0_new_features]
+[#v0_21_0_new_features]
 ===  New features
 
 *  http: allow Endpoint to register custom error handler
@@ -2309,7 +2309,7 @@ If the ErrorHandler is nil it will default to DefaultErrorHandler.
 Package totp implement Time-Based One-Time Password Algorithm based on
 RFC 6238.
 
-[#v0.21.0_bug_fixes]
+[#v0_21_0_bug_fixes]
 ===  Bug fixes
 
 *  parser: fix Line method that always return non-empty line
@@ -2323,7 +2323,7 @@ method always return "b, 0" on the last line.
 +
 This is to fix Stop() method waiting for running channel to be consumed.
 
-[#v0.21.0_enhancements]
+[#v0_21_0_enhancements]
 ===  Enhancements
 
 *  big: update the latest expected error message with Go tip
@@ -2342,7 +2342,7 @@ port.
 This changes always return the host either as host name (the same as
 paremeter) or valid IP address.
 
-[#v0.21.0_chores]
+[#v0_21_0_chores]
 ===  Chores
 
 *  all: replace the tasks to serve and generate docs using ciigo as library
@@ -2351,10 +2351,10 @@ This way, one does not need to install ciigo binary, only require Go
 tools.
 
 
-[#v0.20.1]
+[#v0_20_1]
 ==  share v0.20.1 (2020-11-08)
 
-[#v0.20.1_bug_fixes]
+[#v0_20_1_bug_fixes]
 ===  Bug fixes
 
 * websocket: set TLSConfig to nil if Endpoint scheme is not https or wss.
@@ -2365,7 +2365,7 @@ not look like a TLS handshake".
 
 * paseto: add 5 seconds time drift when validating JSONToken
 
-[#v0.20.1_enhancements]
+[#v0_20_1_enhancements]
 ===  Enhancements
 
 * big: add method RoundToNearestAway and RoundToZero
@@ -2382,16 +2382,16 @@ For example, using 2 digit precision, 0.555 would become 0.55.
 The Stop method return the remaining unparsed content and its last
 position, and then call Close to reset the internal state back to zero.
 
-[#v0.20.1_chores]
+[#v0_20_1_chores]
 ===  Chores
 
 * paseto: fix linter warnings
 
 
-[#v0.20.0]
+[#v0_20_0]
 ==  share v0.20.0 (2020-10-05)
 
-[#v0.20.0_new_features]
+[#v0_20_0_new_features]
 ===  New features
 
 *  lib/paseto: a simple, ready to use, implementation of Platform-Agnostic
@@ -2402,7 +2402,7 @@ This implementation only support PASETO Protocol v2.
 This library focus on how to sign and verify data, everything else is
 handled and filled automatically.
 
-[#v0.20.0_enhancements]
+[#v0_20_0_enhancements]
 ===  Enhancements
 
 * dns: serve DoT without SSL if server is behind proxy or tlsConfig is null.
@@ -2415,10 +2415,10 @@ is forwarded to DNS server, so this changes accommodated it.
 * http: increase the debug level from 2 to 3
 
 
-[#v0.19.0]
+[#v0_19_0]
 ==  share v0.19.0 (2020-09-08)
 
-[#v0.19.0_breaking_changes]
+[#v0_19_0_breaking_changes]
 ===  Breaking changes
 
 *  dns: unexport the Messsage's Packet field
@@ -2447,7 +2447,7 @@ Messages.
 
 *  websocket: move the server handler to ServerOptions
 
-[#v0.19.0_new_features]
+[#v0_19_0_new_features]
 ===  New features
 
 *  dns: add method to remove local caches by names on Server
@@ -2474,7 +2474,7 @@ listen.
 This changes add option to change the connect path (default to "/"
 previously) and new path and handler for retrieving server status.
 
-[#v0.19.0_bug_fixes]
+[#v0_19_0_bug_fixes]
 ===  Bug fixes
 
 *  dns: fix parsing SOA resource record data from master file
@@ -2486,10 +2486,10 @@ previously) and new path and handler for retrieving server status.
 *  ini: ignore the last empty line on unsetAll
 
 
-[#v0.18.0]
+[#v0_18_0]
 ==  share v0.18.0 (2020-08-06)
 
-[#v0.18.0_breaking_changes]
+[#v0_18_0_breaking_changes]
 ===  Breaking changes
 
 *  big: add global flag MarshalJSONAsString
@@ -2510,12 +2510,12 @@ else should be handled by user.
 User of this library may want to return something and they will suprised
 if the library always set the response type to None.
 
-[#v0.18.0_bug_fixes]
+[#v0_18_0_bug_fixes]
 ===  Bug fixes
 
 *  http: fix panic if Request.Form is not initialized on Endpoint.call
 
-[#v0.18.0_enhancements]
+[#v0_18_0_enhancements]
 ===  Enhancements
 
 *  dns: add method to create Message from hostname and list of addresses
@@ -2531,10 +2531,10 @@ if the library always set the response type to None.
 *  strings: add function to delete a value from slice of string
 
 
-[#v0.17.0]
+[#v0_17_0]
 ==  share v0.17.0 (2020-07-05)
 
-[#v0.17.0_breaking_changes]
+[#v0_17_0_breaking_changes]
 ===  Breaking changes
 
 *  dns: replace RDataText with plain []byte
@@ -2543,7 +2543,7 @@ if the library always set the response type to None.
 
 *  http: return the http.Response as the first parameter
 
-[#v0.17.0_bug_fixes]
+[#v0_17_0_bug_fixes]
 ===  Bug fixes
 
 *  http: initialize TLSClientConfig only if insecure is true
@@ -2552,7 +2552,7 @@ if the library always set the response type to None.
 
 *  websocket: fix race on pingTicker when stopping server
 
-[#v0.17.0_enhancements]
+[#v0_17_0_enhancements]
 ===  Enhancements
 
 *  http: check for possible index.html file on getFSNode
@@ -2568,10 +2568,10 @@ if the library always set the response type to None.
 *  smtp: check for EOF when receiving data from server
 
 
-[#v0.16.0]
+[#v0_16_0]
 ==  share v0.16.0 (2020-06-05)
 
-[#v0.16.0_breaking_changes]
+[#v0_16_0_breaking_changes]
 ===  Breaking changes
 
 *  dns: refactoring loading hosts and master files
@@ -2606,12 +2606,12 @@ did not need to call Mount manually
 This cause the Mount method and its sibling, Unmount and IsMounted
 become unneeded, so we remove them.
 
-[#v0.16.0_bug_fixes]
+[#v0_16_0_bug_fixes]
 ===  Bug fixes
 
 *  api/telegram/bot: fix  request parameter on GetMyCommands
 
-[#v0.16.0_new_features]
+[#v0_16_0_new_features]
 ===  New features
 
 *  bytes: add function MergeSpaces
@@ -2650,7 +2650,7 @@ the last state.
 The state of migration will be saved in table "_migration" with the SQL
 file name that has been executed and the timestamp.
 
-[#v0.16.0_enhancements]
+[#v0_16_0_enhancements]
 ===  Enhancements
 
 *  api/telegram/bot: delete webhook upon setting new webhook
@@ -2682,16 +2682,16 @@ This changes add all child nodes to generated node.
 *  websocket: allow "https" scheme on Client's Endpoint
 
 
-[#v0.15.0]
+[#v0_15_0]
 ==  share v0.15.0 (2020-05-04)
 
-[#v0.15.0_breaking_changes]
+[#v0_15_0_breaking_changes]
 ===  Breaking changes
 
 *  big: check for zero length slice of byte or string on toRat
 *  ssh: replace the ClientConfig with ConfigSection
 
-[#v0.15.0_new_features]
+[#v0_15_0_new_features]
 ===  New features
 
 * ssh: implement SSH client configuration parser -- ssh_config(5)
@@ -2709,7 +2709,7 @@ This package extends the package by adding methods to get node's attribute
 by name, get the first non-empty child, get the next non-empty sibling, and
 to iterate each node in the tree from top to bottom.
 
-[#v0.15.0_enhancements]
+[#v0_15_0_enhancements]
 ===  Enhancements
 
 *  big: return "0" instead of "<nil>" on Rat.String()
@@ -2718,16 +2718,16 @@ to iterate each node in the tree from top to bottom.
 *  websocket: add method to gracefully Close the client connection
 *  websocket: add routine that send PING control frame on Connect
 
-[#v0.15.0_bug_fixes]
+[#v0_15_0_bug_fixes]
 ===  Bug fixes
 
 *  reflect: remove checking for method IsEqual on type reflect.Ptr
 
 
-[#v0.14.0]
+[#v0_14_0]
 ==  share v0.14.0 (2020-04-03)
 
-[#v0.14.0_breaking_changes]
+[#v0_14_0_breaking_changes]
 ===  Breaking changes
 
 *  http: simplify server Endpoint registrations
@@ -2739,7 +2739,7 @@ will be handled automatically based on value on field Method.
 
 *  mining/math: move the package from "lib/mining/" to "lib/" directory
 
-[#v0.14.0_new_features]
+[#v0_14_0_new_features]
 ===  New features
 
 *  debug: add a wrapper for starting and stopping CPU profile
@@ -2763,7 +2763,7 @@ if the value in interface{} is nil.
 The SingleSpace function convert all sequences of white spaces into
 single space ' '.
 
-[#v0.14.0_enhancements]
+[#v0_14_0_enhancements]
 ===  Enhancements
 
 *  http: embed the standard http package instead of separate field
@@ -2782,27 +2782,27 @@ word.
 
 *  strings: check for other white spaces on MergeSpaces
 
-[#v0.14.0_bug_fixes]
+[#v0_14_0_bug_fixes]
 ===  Bug fixes
 
 *  http: fix the content-length header not set if file is not cached
 
 
-[#v0.13.0]
+[#v0_13_0]
 ==  share v0.13.0 (2020-03-11)
 
-[#v0.13.0_breaking_changes]
+[#v0_13_0_breaking_changes]
 ===  Breaking changes
 
 Set the minimum Go version to 1.13.
 
-[#v0.13.0_new_features]
+[#v0_13_0_new_features]
 ===  New features
 
 *  hunspell: a library to parse the Hunspell file format
 *  parser: provide a common text parser, using delimiters
 
-[#v0.13.0_enhancements]
+[#v0_13_0_enhancements]
 ===  Enhancements
 
 *  dns: use net.Addr for primary and fallback UDP/tCP addresses
@@ -2811,17 +2811,17 @@ Set the minimum Go version to 1.13.
 *  time: add functions to get Unix time in milliseconds (int64 and string)
 *  websocket: allow custom TLS configuration on client
 
-[#v0.13.0_bug_fixes]
+[#v0_13_0_bug_fixes]
 ===  Bug fixes
 
 *  dns: fix handling server without fallback forwarder
 *  dns: check for nil DNS-over-TLS server on server's Stop
 
 
-[#v0.12.0]
+[#v0_12_0]
 ==  share v0.12.0 (2020-02-13)
 
-[#v0.12.0_breaking_changes]
+[#v0_12_0_breaking_changes]
 ===  Breaking changes
 
 *  bytes: move function JSONEscape and JSONUnescape to package json
@@ -2829,33 +2829,33 @@ Set the minimum Go version to 1.13.
 *  time: change the Microsecond return type from int to int64
 *  websocket: change the RouteHandler signature to return Response
 
-[#v0.12.0_new_features]
+[#v0_12_0_new_features]
 ===  New features
 
 *  json: new packages to work with JSON
 *  sql: a new package as an extension to "database/sql"
 *  xmlrpc: new package for working with XML-RPC
 
-[#v0.12.0_enhancements]
+[#v0_12_0_enhancements]
 ===  Enhancements
 
 *  strings: add function to reverse a string
 
-[#v0.12.0_bug_fixes]
+[#v0_12_0_bug_fixes]
 ===  Bug fixes
 
 *  dns: fix index out of range when unpacking OPT RR
 
 
-[#v0.11.0]
+[#v0_11_0]
 ==  share v0.11.0 (2019-12-26)
 
-[#v0.11.0_breaking_changes]
+[#v0_11_0_breaking_changes]
 ===  Breaking changes
 
 *  dns: merge Start and Wait into ListenAndServe
 
-[#v0.11.0_new_features]
+[#v0_11_0_new_features]
 ===  New features
 
 *  memfs: implement http.FileSystem on MemFS
@@ -2863,33 +2863,33 @@ Set the minimum Go version to 1.13.
 *  memfs: implement os.FileInfo on Node
 *  memfs: implement io.Closer, io.Reader, and io.Seeker on Node
 
-[#v0.11.0_enhancements]
+[#v0_11_0_enhancements]
 ===  Enhancements
 
 *  dns: allocate raw packet on receive
 *  dns: log the number of pruned records
 *  errors: add field Name and err
 
-[#v0.11.0_bug_fixes]
+[#v0_11_0_bug_fixes]
 ===  Bug fixes
 
 *  dns: split between read and write timeout for TCPClient
 
 
-[#v0.10.2]
+[#v0_10_2]
 ==  share v0.10.2 (2019-12-07)
 
-[#v0.10.2_bug_fixes]
+[#v0_10_2_bug_fixes]
 ===  Bug fixes
 
 *  dns: check for bad certificate when reading DoT request
 *  dns: fix the use of goroutine on runForwarders
 
 
-[#v0.10.1]
+[#v0_10_1]
 ==  share v0.10.1 (2019-12-05)
 
-[#v0.10.1_bug_fixes]
+[#v0_10_1_bug_fixes]
 ===  Bug fixes
 
 *  dns: close the connection if receiving zero packet on serveTCPClient
@@ -2907,7 +2907,7 @@ Set the minimum Go version to 1.13.
 *  websocket: remove test for empty endpoint due to different format
 *  websocket: fix zero response ID when error on handleText
 
-[#v0.10.1_enhancements]
+[#v0_10_1_enhancements]
 ===  Enhancements
 
 *  dns: remove the use of pointer on Message fields
@@ -2922,23 +2922,23 @@ Set the minimum Go version to 1.13.
 *  websocket: check for read timeout on recv
 *  websocket: remove unused error on NewServer
 
-[#v0.10.0]
+[#v0_10_0]
 ==  share v0.10.0 (2019-11-05)
 
-[#v0.10.0_new_features]
+[#v0_10_0_new_features]
 ===  New features
 
 *  dns: implement client and server for DNS over TLS
 *  ini: add method GetsUniq and ValsUniq that return uniq values only
 *  net: implement network polling using epoll and kqueue
 
-[#v0.10.0_breaking_changes]
+[#v0_10_0_breaking_changes]
 ===  Breaking Changes
 
 *  dns: change the server certificate options to load from files
 *  ini: change Gets return as is, with duplicate values
 
-[#v0.10.0_enhancements]
+[#v0_10_0_enhancements]
 ===  Enhancements
 
 *  dns: allow listening on DoH without requiring certificate
@@ -2947,7 +2947,7 @@ Set the minimum Go version to 1.13.
 *  ini: support marshaling and un-marshaling embedded structs
 *  websocket: websocket: replace epoll implementation with libnet.Poll
 
-[#v0.10.0_bug_fixes]
+[#v0_10_0_bug_fixes]
 ===  Bug fixes
 
 *  dns: return error code 4 if server receive unknown message class or type
@@ -2958,10 +2958,10 @@ Set the minimum Go version to 1.13.
 *  websocket: wrap the response with frame on sendResponse
 
 
-[#v0.9.0]
+[#v0_9_0]
 ==  share v0.9.0 (2019-10-08)
 
-[#v0.9.0_new_features]
+[#v0_9_0_new_features]
 ===  New features
 
 *  bytes: add function to get all indexes of word in string
@@ -2983,7 +2983,7 @@ implement key binding using colon ":" on path.  For example, registering
 path "/:x/y" will bind key "x" to a string value that can be accessed on
 http.Request.Form using Get method.
 
-[#v0.9.0_breaking_changes]
+[#v0_9_0_breaking_changes]
 ===  Breaking Changes
 
 *  ini: set variable with "=" without a value default to empty string
@@ -3003,7 +3003,7 @@ This changes make the variable that end with "=" without any value
 to be an empty string, so "var" value is equal to "".
 --
 
-[#v0.9.0_bug_fixes]
+[#v0_9_0_bug_fixes]
 ===  Bug fixes
 
 *  ini: check for possible nil variable on Write
@@ -3013,7 +3013,7 @@ to be an empty string, so "var" value is equal to "".
 On macOS, turn out, all DNS queries have RD flag set to zero.  This cause
 no DNS queries forwarded to parent server.
 
-[#v0.9.0_enhancements]
+[#v0_9_0_enhancements]
 ===  Enhancements
 
 *  http: export the Memfs field on Server
@@ -3026,10 +3026,10 @@ to Search the content.
 *  memfs: export the Decode method on Node
 
 
-[#v0.8.2]
+[#v0_8_2]
 ==  share v0.8.2 (2019-09-05)
 
-[#v0.8.2_enhancements]
+[#v0_8_2_enhancements]
 ===  Enhancements
 
 *  http: make the request body always available even after ParseForm()
@@ -3063,10 +3063,10 @@ An error for calling NewNode should not stop processing all files
 in directory.
 
 
-[#v0.8.1]
+[#v0_8_1]
 ==  share v0.8.1 (2019-08-05)
 
-[#v0.8.1_enhancements]
+[#v0_8_1_enhancements]
 ===  Enhancements
 
 *  lib/ini: add functions to marshal/unmarshal bytes from/to struct.
@@ -3089,21 +3089,21 @@ file, we want that file to be excluded from .go static source.
 *  lib/memfs: set the Node Size to be zero if node is directory
 
 
-[#v0.8.0]
+[#v0_8_0]
 ==  share v0.8.0 (2019-07-09)
 
-[#v0.8.0_breaking_changes]
+[#v0_8_0_breaking_changes]
 ===  Breaking changes
 
 *  All ASCII related contants and functions now being moved from `bytes`
    package to `ascii` package.
 
-[#v0.8.0_new_features]
+[#v0_8_0_new_features]
 ===  New features
 
 *  ascii: new library for working with ASCII characters
 
-[#v0.8.0_enhancements]
+[#v0_8_0_enhancements]
 ===  Enhancements
 
 *  dns: add method to restart forwarders
@@ -3111,25 +3111,25 @@ file, we want that file to be excluded from .go static source.
 *  ini: create new section or variable if not exist on Set
 
 
-[#v0.7.0]
+[#v0_7_0]
 ==  share v0.7.0 (2019-06-14)
 
 This release bring major refactoring on `ini` package to provide a clean and
 simple API.
 
-[#v0.7.0_breaking_changes]
+[#v0_7_0_breaking_changes]
 ===  Breaking Changes
 
 *  ini: major refactoring
 *  net: add parameter to check Fully Qualified Domain Name on IsHostnameValid
 
-[#v0.7.0_new_features]
+[#v0_7_0_new_features]
 ===  New features
 
 *  spf: implementation of Sender Policy Framework (RFC 7208)
 *  ssh: package ssh provide a wrapper to golang.org/x/crypto/ssh
 
-[#v0.7.0_enhancements]
+[#v0_7_0_enhancements]
 ===  Enhancements
 
 *  dns: add function to lookup PTR record by IP address
@@ -3150,7 +3150,7 @@ simple API.
 *  ns: set log flag to 0, without time prefix
 *  strings: add function to append uniq values to slice of strings
 
-[#v0.7.0_bug_fixes]
+[#v0_7_0_bug_fixes]
 ===  Bug fixes
 
 *  io: watch changes on sub of sub directories on DirWatcher
@@ -3158,7 +3158,7 @@ simple API.
 *  dns: always return true when answers RR exist and no TTL is zero
 
 
-[#v0.6.1]
+[#v0_6_1]
 ==  share v0.6.1 (2019-05-11)
 
 *  `memfs`:
@@ -3168,14 +3168,14 @@ simple API.
 **  fix template when generating empty content
 
 
-[#v0.6.0]
+[#v0_6_0]
 ==  share v0.6.0 (2019-05-07)
 
 This release bring major changes on dns package.
 Most notable changes are adding caches and query forwarding (recursion), and
 removing the server handler.
 
-[#v0.6.0_breaking_changes]
+[#v0_6_0_breaking_changes]
 ===  Breaking Changes
 
 *  `dns`:
@@ -3199,7 +3199,7 @@ removing the server handler.
 *  `memfs`:
 **  refactoring go generate file to use type from memfs
 
-[#v0.6.0_new_features]
+[#v0_6_0_new_features]
 ===  New features
 
 *  `crypto`: new package that provide a wrapper for standard crypto library
@@ -3224,7 +3224,7 @@ removing the server handler.
 
 *  `smtp`: add field DKIMOptions to Domain
 
-[#v0.6.0_bug_fixes]
+[#v0_6_0_bug_fixes]
 ===  Bug fixes
 
 *  `dns`:
@@ -3239,20 +3239,20 @@ removing the server handler.
 **  fix possible invalid system path on file with symbolic link
 **  refresh the directory tree in Development mode if page not found
 
-[#v0.6.0_documentation]
+[#v0_6_0_documentation]
 ===  Documentation
 
 *  add documentation for Sender Policy Framework (RFC 7208)
 
 
-[#v0.5.0]
+[#v0_5_0]
 ==  share v0.5.0 (2019-04-02)
 
 This minor release is dedicated for websocket package.  Major refactoring on
 server and client API to make it easy and extensible.  The websocket is now
 100% pass the autobahn testsuite (minus compression feature).
 
-[#v0.5.0_new_features]
+[#v0_5_0_new_features]
 ===  New features
 
 *  `cmd/smtpcli`: command line interface to SMTP client protocol
@@ -3260,7 +3260,7 @@ server and client API to make it easy and extensible.  The websocket is now
 *  `ints64`: new package for working with slice of 64 bit integer
 *  `floats64`: new package for working with slice of 64 bit float
 
-[#v0.5.0_enhancements]
+[#v0_5_0_enhancements]
 ===  Enhancements
 
 *  `bytes`:
@@ -3277,10 +3277,10 @@ server and client API to make it easy and extensible.  The websocket is now
 **  Generate random mask only if masked field is set
 
 
-[#v0.4.0]
+[#v0_4_0]
 ==  share v0.4.0 (2019-03-01)
 
-[#v0.4.0_new_features]
+[#v0_4_0_new_features]
 ===  New features
 
 *  `email`: new package for working with Internet Message Format (RFC 5322)
@@ -3288,7 +3288,7 @@ server and client API to make it easy and extensible.  The websocket is now
    (RFC 6376)
 *  `email/maildir`: new package to manage email using maildir format
 
-[#v0.4.0_enhancements]
+[#v0_4_0_enhancements]
 ===  Enhancements
 
 *  `bytes`
@@ -3334,7 +3334,7 @@ server and client API to make it easy and extensible.  The websocket is now
 
 *  `time`:  add function to get micro seconds
 
-[#v0.4.0_bug_fixes]
+[#v0_4_0_bug_fixes]
 ===  Bug fixes
 
 *  all: fix the usage of "iota"
@@ -3342,10 +3342,10 @@ server and client API to make it easy and extensible.  The websocket is now
 *  `memfs`: check for empty directory on Mount
 
 
-[#v0.3.0]
+[#v0_3_0]
 ==  share v0.3.0 (2019-02-01)
 
-[#v0.3.0_features_changes]
+[#v0_3_0_features_changes]
 ===  Features Changes
 
 *  `lib/debug`: add function to write heap profile to file
@@ -3356,7 +3356,7 @@ server and client API to make it easy and extensible.  The websocket is now
 *  `lib/http`: add parameter http.ResponseWriter to Callback.
 *  `lib/http`: the RegisterXxx functions now use the Endpoint type.
 
-[#v0.3.0_enhancements]
+[#v0_3_0_enhancements]
 ===  Enhancements
 
 *  Various fixes suggested by linters
@@ -3366,16 +3366,16 @@ server and client API to make it easy and extensible.  The websocket is now
 *  doc: add notes for Internet Message Format (RFC 5322)
 *  doc: add documentation for SMTP and DSN
 
-[#v0.3.0_bug_fixes]
+[#v0_3_0_bug_fixes]
 ===  Bug fixes
 
 *  `lib/git`: fix testdata and test input
 
 
-[#v0.2.0]
+[#v0_2_0]
 ==  share v0.2.0 (2019-01-02)
 
-[#v0.2.0_new_features]
+[#v0_2_0_new_features]
 ===  New features
 
 *  `lib/errors`, package errors provide a custom error with code.
@@ -3383,13 +3383,13 @@ server and client API to make it easy and extensible.  The websocket is now
 *  `lib/http`, package http implement custom HTTP server with memory file
 system and simplified routing handler.
 
-[#v0.2.0_enhancements]
+[#v0_2_0_enhancements]
 ===  Enhancements
 
 Fix warnings from linters.
 
 
-[#v0.1.0]
+[#v0_1_0]
 ==  share v0.1.0 (2018-11-29)
 
 The first release of `share` package contains one command line interface (CLI)
