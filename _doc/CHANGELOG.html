@@ -240,10 +240,18 @@ dd {
 <div class="details">
 <span id="author" class="author">Shulhan</span><br>
 <span id="email" class="email"><a href="mailto:ms@kilabit.info">ms@kilabit.info</a></span><br>
+<span id="revdate">31 May 2022</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#v0_38_0">share v0.38.0 (2022-06-05)</a>
+<ul class="sectlevel2">
+<li><a href="#_breaking_changes">Breaking changes</a></li>
+<li><a href="#v0_38_0_enhancements">Enhancements</a></li>
+<li><a href="#v0_38_0_chores">Chores</a></li>
+</ul>
+</li>
 <li><a href="#v0_37_0">share v0.37.0 (2022-05-09)</a>
 <ul class="sectlevel2">
 <li><a href="#v0_37_0_breaking_changes">Breaking changes</a></li>
@@ -569,6 +577,186 @@ dd {
 <div class="sectionbody">
 <div class="paragraph">
 <p>This library is released every month, usually at the first week of month.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0_38_0"><a class="anchor" href="#v0_38_0"></a><a class="link" href="#v0_38_0">share v0.38.0 (2022-06-05)</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This release update the minimum Go version to 1.17.</p>
+</div>
+<div class="sect2">
+<h3 id="_breaking_changes"><a class="anchor" href="#_breaking_changes"></a><a class="link" href="#_breaking_changes">Breaking changes</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/dns: move all caches operations from Server to Caches type</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously all caches operation are tied to the Server type.</p>
+</div>
+<div class="paragraph">
+<p>In order to separate the responsibilities between server and caches,
+we move all caches operations to Cache type.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: change the Zone SOA field type from ResourceRecord to RDataSOA</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Using the RDataSOA type directly minimize interface check and conversion.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0_38_0_enhancements"><a class="anchor" href="#v0_38_0_enhancements"></a><a class="link" href="#v0_38_0_enhancements">Enhancements</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>lib/dns: replace Ticker with Timer on Caches&#8217; worker</p>
+<div class="paragraph">
+<p>Since the worker call time.Now() inside the body, we can minimize it
+by using Timer.</p>
+</div>
+</li>
+<li>
+<p>lib/dns: export the Caches type and field on Server</p>
+<div class="paragraph">
+<p>The idea is move all server&#8217;s caches operations (methods) to this
+type later.</p>
+</div>
+</li>
+<li>
+<p>lib/dns: split storage between internal and external caches</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously, the indexed caches for internal (records from hosts or zone
+files) and external (records from parent name servers) are stored inside
+single map.</p>
+</div>
+<div class="paragraph">
+<p>This changes split those internal and external caches into two maps,
+so any operation on one caches does not affect the other one, and vice
+versa.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: return the removed record on caches RemoveCachesByRR</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>If the record being removed found on caches, it will return it;
+otherwise it will return nil without error.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: disable JSON marshaling Zone Records field</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>On service that manage many zones, providing an API to fetch list of
+zones only will return large payload if we include the Records field
+in the response.</p>
+</div>
+<div class="paragraph">
+<p>So, it is recommended to provide another API to fetch the records on
+specific zone.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: print the field Value on ResourceRecord Stringer instead of rdlen</p>
+</li>
+<li>
+<p>lib/dns: export the zoneRecords type</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Since the Zone type is exported and its contains exported field Records
+with type zoneRecords, then that field type should also exported.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/dns: return the deleted record on HostsFile RemoveRecord</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously, the RemoveRecord method on HostsFile return a boolean
+true if the record found.</p>
+</div>
+<div class="paragraph">
+<p>This changes the return type to the ResourceRecord being deleted,
+to allow the caller inspect and/or print the record.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0_38_0_chores"><a class="anchor" href="#v0_38_0_chores"></a><a class="link" href="#v0_38_0_chores">Chores</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>all: rewrite all codes to use "var" instead of ":="</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Using ":=" simplify the code but we lose the type.  For example,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>v := F()</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The only way we know what the type of v is by inspecting the function
+F.
+Another disadvantages of using ":=" may cause extra variables
+allocation where two or more variables with same type is declared
+inside body of function where it could be only one.</p>
+</div>
+<div class="paragraph">
+<p>While at it, we split the struct for test case into separate type.</p>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>lib/memfs: format comment in embedded Go template according to gofmt tip</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>In the next gofmt (Go v1.19), the comment format does not allow empty
+lines "//" at the top and bottom of the comment.</p>
+</div>
+<div class="paragraph">
+<p>This changes make the generated Go code from Embed method to match
+as close as possible with output of gofmt.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -6247,7 +6435,7 @@ and several libraries.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-31 21:50:10 +0700
+Last updated 2022-05-31 21:54:29 +0700
 </div>
 </div>
 			</div>
