@@ -34,20 +34,20 @@ func ExampleIsNil() {
 	cases := []struct {
 		v interface{}
 	}{
-		{}, // Unitialized.
+		{}, // Uninitialized interface{}.
 		{v: aBoolean},
 		{v: aChannel},          // Uninitialized channel.
 		{v: aFunction},         // Empty func type.
-		{v: aMap},              // Unitialized map.
+		{v: aMap},              // Uninitialized map.
 		{v: make(map[int]int)}, // Initialized map.
 		{v: aPtr},              // Uninitialized pointer to struct.
 		{v: &T{}},              // Initialized pointer to struct.
-		{v: aSlice},            // Unitialized slice.
+		{v: aSlice},            // Uninitialized slice.
 		{v: make([]int, 0)},    // Initialized slice.
 		{v: anInt},
 		{v: emptyError},
-		{v: errors.New("e")}, // Initialized error
-		{v: fs},              // Unitialized interface type to interface{}
+		{v: errors.New("e")}, // Initialized error.
+		{v: fs},              // Uninitialized interface type to interface{}.
 	}
 
 	for _, c := range cases {
