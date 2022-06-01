@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 )
 
 type F func()
@@ -69,4 +70,36 @@ func ExampleIsNil() {
 	//               <nil>: v == nil is  true, IsNil() is  true
 	// *errors.errorString: v == nil is false, IsNil() is false
 	//               <nil>: v == nil is  true, IsNil() is  true
+}
+
+func ExampleTag() {
+	type T struct {
+		F1 int `atag:" f1 , opt1 , opt2  ,"`
+		F2 int `atag:", opt1"`
+		F3 int
+		f4 int
+	}
+
+	var (
+		t      T
+		vtype  reflect.Type
+		field  reflect.StructField
+		val    string
+		opts   []string
+		x      int
+		hasTag bool
+	)
+
+	vtype = reflect.TypeOf(t)
+
+	for x = 0; x < vtype.NumField(); x++ {
+		field = vtype.Field(x)
+		val, opts, hasTag = Tag(field, "atag")
+		fmt.Printf("%q %v %v\n", val, opts, hasTag)
+	}
+	//Output:
+	//"f1" [opt1 opt2 ] true
+	//"F2" [opt1] false
+	//"F3" [] false
+	//"" [] false
 }

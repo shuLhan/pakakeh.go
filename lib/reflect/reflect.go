@@ -8,6 +8,7 @@ package reflect
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"unsafe"
 )
 
@@ -57,6 +58,56 @@ func IsNil(v interface{}) bool {
 		return val.IsNil()
 	}
 	return v == nil
+}
+
+// Tag simplify lookup on struct's field tag.
+//
+// Given a StructField and the name of tag, return the tag's value and
+// options inside the tag.
+// The options is any string after tag's value, separated by comma.
+// For example, given the following field definition
+//
+//	F `tag:"name,opt1, opt2"`
+//
+// It will return (name, [opt1 opt2], true).
+//
+// If the field is exported but does not have tag, it will return the field
+// name (as is without converting to lower case) in val with hasTag is false:
+// (Name, nil, false).
+//
+// If the field is unexported it will return empty val with hasTag is false
+// ("", nil, false).
+func Tag(field reflect.StructField, tag string) (val string, opts []string, hasTag bool) {
+	if len(field.PkgPath) != 0 {
+		// field is unexported.
+		return "", nil, false
+	}
+
+	var (
+		x int
+	)
+
+	val, hasTag = field.Tag.Lookup(tag)
+	if !hasTag {
+		// Tag not defined, so we use field name as key.
+		val = field.Name
+	} else {
+		opts = strings.Split(val, ",")
+		for x, val = range opts {
+			opts[x] = strings.TrimSpace(val)
+		}
+
+		val = opts[0]
+		opts = opts[1:]
+		if len(val) == 0 {
+			// Tag is empty, use field name as key and
+			// mark it as not OK.
+			val = field.Name
+			hasTag = false
+		}
+	}
+
+	return val, opts, hasTag
 }
 
 // doEqual compare two kind of objects and return nils if both are equal.
