@@ -74,12 +74,278 @@ func ExampleIsNil() {
 	//               <nil>: v == nil is  true, IsNil() is  true
 }
 
+func ExampleSet_bool() {
+	type Bool bool
+
+	var (
+		err    error
+		vbool  bool
+		mybool Bool
+	)
+
+	err = Set(reflect.ValueOf(&vbool), "YES")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println("YES:", vbool)
+	}
+
+	err = Set(reflect.ValueOf(&vbool), "TRUE")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println("TRUE:", vbool)
+	}
+
+	err = Set(reflect.ValueOf(&vbool), "False")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println("False:", vbool)
+	}
+
+	err = Set(reflect.ValueOf(&vbool), "1")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println("1:", vbool)
+	}
+
+	err = Set(reflect.ValueOf(&mybool), "true")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println("true:", mybool)
+	}
+
+	//Output:
+	//YES: true
+	//TRUE: true
+	//False: false
+	//1: true
+	//true: true
+}
+
+func ExampleSet_float() {
+	type myFloat float32
+
+	var (
+		vf32    float32
+		myfloat myFloat
+		err     error
+	)
+
+	err = Set(reflect.ValueOf(&vf32), "1.223")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(vf32)
+	}
+
+	err = Set(reflect.ValueOf(&myfloat), "999.999")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(myfloat)
+	}
+
+	//Output:
+	//1.223
+	//999.999
+}
+
+func ExampleSet_int() {
+	type myInt int
+
+	var (
+		vint   int
+		vint8  int8
+		vint16 int16
+		vmyint myInt
+		err    error
+	)
+
+	err = Set(reflect.ValueOf(&vint), "")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(vint)
+	}
+
+	err = Set(reflect.ValueOf(&vint), "1")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(vint)
+	}
+
+	err = Set(reflect.ValueOf(&vint8), "-128")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(vint8)
+	}
+
+	// Value of int16 is overflow.
+	err = Set(reflect.ValueOf(&vint16), "32768")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(vint16)
+	}
+
+	err = Set(reflect.ValueOf(&vmyint), "32768")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Println(vmyint)
+	}
+
+	//Output:
+	//0
+	//1
+	//-128
+	//error: Set: int16 value is overflow: 32768
+	//32768
+}
+
+func ExampleSet_sliceByte() {
+	type myBytes []byte
+
+	var (
+		vbytes   []byte
+		vmyBytes myBytes
+		err      error
+	)
+
+	err = Set(reflect.ValueOf(vbytes), "Show me")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vbytes)
+	}
+
+	err = Set(reflect.ValueOf(&vbytes), "a hero")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vbytes)
+	}
+
+	err = Set(reflect.ValueOf(&vbytes), "")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vbytes)
+	}
+
+	err = Set(reflect.ValueOf(&vmyBytes), "and I will write you a tragedy")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vmyBytes)
+	}
+
+	//Output:
+	//error: Set: object []uint8 is not setable
+	//a hero
+	//
+	//and I will write you a tragedy
+}
+
+func ExampleSet_sliceString() {
+	var (
+		vstring []string
+		err     error
+	)
+
+	err = Set(reflect.ValueOf(vstring), "Show me")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vstring)
+	}
+
+	err = Set(reflect.ValueOf(&vstring), "a hero")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vstring)
+	}
+
+	err = Set(reflect.ValueOf(&vstring), "and I will write you a tragedy")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", vstring)
+	}
+
+	//Output:
+	//error: Set: object []string is not setable
+	//[a hero]
+	//[a hero and I will write you a tragedy]
+}
+
+func ExampleSet_unmarshal() {
+	var (
+		rat    = big.NewRat(0, 1)
+		myUrl  = &url.URL{}
+		bigInt = big.NewInt(1)
+
+		err error
+	)
+
+	// This Set will call UnmarshalText on big.Rat.
+	err = Set(reflect.ValueOf(rat), "1.234")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", rat.FloatString(4))
+	}
+
+	err = Set(reflect.ValueOf(rat), "")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", rat.FloatString(4))
+	}
+
+	// This Set will call UnmarshalBinary on url.URL.
+	err = Set(reflect.ValueOf(myUrl), "https://kilabit.info")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", myUrl)
+	}
+
+	// This Set will call UnmarshalJSON.
+	err = Set(reflect.ValueOf(bigInt), "123_456")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", bigInt)
+	}
+
+	err = Set(reflect.ValueOf(bigInt), "")
+	if err != nil {
+		fmt.Println("error:", err)
+	} else {
+		fmt.Printf("%s\n", bigInt)
+	}
+
+	//Output:
+	//1.2340
+	//0.0000
+	//https://kilabit.info
+	//123456
+	//0
+}
+
 func ExampleTag() {
 	type T struct {
 		F1 int `atag:" f1 , opt1 , opt2  ,"`
 		F2 int `atag:", opt1"`
 		F3 int
-		f4 int
 	}
 
 	var (
@@ -103,7 +369,6 @@ func ExampleTag() {
 	//"f1" [opt1 opt2 ] true
 	//"F2" [opt1] false
 	//"F3" [] false
-	//"" [] false
 }
 
 func ExampleUnmarshal_unmarshalBinary() {
@@ -167,6 +432,7 @@ func ExampleUnmarshal_unmarshalBinary() {
 func ExampleUnmarshal_unmarshalText() {
 	var (
 		vals = [][]byte{
+			[]byte(""),
 			[]byte("123.456"),
 			[]byte("123_456"),
 			[]byte("123456"),
@@ -186,6 +452,7 @@ func ExampleUnmarshal_unmarshalText() {
 		}
 	}
 	//Output:
+	//0/1
 	//15432/125
 	//123456/1
 	//123456/1

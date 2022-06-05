@@ -8,6 +8,7 @@ package reflect
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -60,6 +61,263 @@ func IsNil(v interface{}) bool {
 	return v == nil
 }
 
+// Set the obj value by converting the string val to the obj type.
+//
+// If the obj type is an interface or struct, its value will be set by calling
+// Unmarshal function.
+//
+// It will return an error if,
+//   - obj is not setable, variable is passed without pointer or pointer
+//     not initialized.
+//   - val is overflow
+//   - obj Kind is Invalid, Array, Chan, Func, Map, or UnsafePointer.
+func Set(obj reflect.Value, val string) (err error) {
+	var (
+		logp                 = "Set"
+		objType reflect.Type = obj.Type()
+		objKind reflect.Kind = obj.Kind()
+
+		objValue reflect.Value
+	)
+
+	if objKind != reflect.Ptr {
+		// Variable passed value (V T).
+		return fmt.Errorf("%s: object %T is not setable", logp, obj.Interface())
+	}
+
+	objValue = obj
+	obj = obj.Elem()
+	objType = objType.Elem()
+	objKind = objType.Kind()
+
+	if objKind == reflect.Ptr {
+		// Variable is passed as **T.
+		if obj.IsNil() {
+			objType = objType.Elem()
+			objValue = reflect.New(objType)
+			obj.Set(objValue)
+		} else {
+			objValue = obj
+		}
+	} else {
+		if objValue.IsNil() {
+			// Variable is passed as pointer (V *T) but not
+			// initialized.
+			return fmt.Errorf("%s: object %T is not initialized", logp, obj.Interface())
+		}
+	}
+
+	switch objKind {
+	case reflect.Invalid:
+		return fmt.Errorf("%s: object %T is invalid", logp, obj)
+
+	case reflect.Array, reflect.Chan, reflect.Func, reflect.Map, reflect.UnsafePointer:
+		return fmt.Errorf("%s: object %T is not setable", logp, obj.Interface())
+
+	case reflect.Slice:
+		objType = objType.Elem()
+		objKind = objType.Kind()
+		if objKind == reflect.Uint8 {
+			err = setValue(objValue, val)
+			if err != nil {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
+		} else {
+			obj, err = setSlice(obj, val)
+			if err != nil {
+				return fmt.Errorf("%s: %w", logp, err)
+			}
+			objValue.Elem().Set(obj)
+		}
+
+	default:
+		err = setValue(objValue, val)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+	}
+	return nil
+}
+
+// setSlice append the string value of val to the slice.
+func setSlice(slice reflect.Value, val string) (sliceOut reflect.Value, err error) {
+	var (
+		sliceKind reflect.Kind = slice.Kind()
+		sliceType reflect.Type = slice.Type()
+
+		elValue  reflect.Value
+		ptrValue reflect.Value
+	)
+
+	if sliceKind != reflect.Slice {
+		return sliceOut, fmt.Errorf("expecting slice, got %T", slice.Interface())
+	}
+
+	sliceType = sliceType.Elem() // T = []T
+	sliceKind = sliceType.Kind()
+
+	if sliceKind == reflect.Ptr {
+		sliceType = sliceType.Elem()
+		sliceKind = sliceType.Kind()
+
+		if sliceKind == reflect.Ptr {
+			elValue = reflect.New(sliceType)  // var t = new(*T)
+			sliceType = sliceType.Elem()      // *T <= **T
+			ptrValue = reflect.New(sliceType) // var pt = new(T)
+			elValue.Elem().Set(ptrValue)      // *t = pt
+		} else {
+			ptrValue = reflect.New(sliceType) // t = new(T)
+			elValue = ptrValue
+		}
+	} else {
+		ptrValue = reflect.New(sliceType) // var pt = new(T)
+		elValue = ptrValue.Elem()         // var t = *pt
+	}
+
+	err = setValue(ptrValue, val)
+	if err != nil {
+		return sliceOut, err
+	}
+
+	sliceOut = reflect.Append(slice, elValue)
+
+	return sliceOut, nil
+}
+
+// setValue the string value val into reflect.Value based on type of object
+// pass in objType.
+//
+// It will return an error if objType Kind is Invalid, Array, Chan, Func, Map,
+// Slice, or UnsafePointer.
+func setValue(obj reflect.Value, val string) (err error) {
+	var (
+		objType = obj.Type()
+		objKind = obj.Kind()
+
+		objValue reflect.Value
+		v        interface{}
+	)
+
+	for objKind == reflect.Ptr {
+		objType = objType.Elem()
+		objKind = objType.Kind()
+	}
+
+	switch objKind {
+	case reflect.Bool:
+		var vbool bool
+		val = strings.ToLower(val)
+		if val == "yes" || val == "true" || val == "1" {
+			vbool = true
+		}
+		v = vbool
+
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		var vint64 int64
+
+		if len(val) != 0 {
+			vint64, err = strconv.ParseInt(val, 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid integer value: %s", val)
+			}
+			if obj.Elem().OverflowInt(vint64) {
+				return fmt.Errorf("%s value is overflow: %s", objKind, val)
+			}
+		}
+		switch objKind {
+		case reflect.Int:
+			v = int(vint64)
+		case reflect.Int8:
+			v = int8(vint64)
+		case reflect.Int16:
+			v = int16(vint64)
+		case reflect.Int32:
+			v = int32(vint64)
+		default:
+			v = vint64
+		}
+
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		var vuint64 uint64
+
+		if len(val) != 0 {
+			vuint64, err = strconv.ParseUint(val, 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid unsigned integer value: %s", val)
+			}
+			if obj.Elem().OverflowUint(vuint64) {
+				return fmt.Errorf("%s value is overflow: %s", objKind, val)
+			}
+		}
+		switch objKind {
+		case reflect.Uint:
+			v = uint(vuint64)
+		case reflect.Uint8:
+			v = uint8(vuint64)
+		case reflect.Uint16:
+			v = uint16(vuint64)
+		case reflect.Uint32:
+			v = uint32(vuint64)
+		default:
+			v = vuint64
+		}
+
+	case reflect.Float32, reflect.Float64:
+		var vf64 float64
+
+		if len(val) != 0 {
+			vf64, err = strconv.ParseFloat(val, 64)
+			if err != nil {
+				return fmt.Errorf("invalid float value: %s", val)
+			}
+			if obj.Elem().OverflowFloat(vf64) {
+				return fmt.Errorf("%s value is overflow: %s", objKind, val)
+			}
+		}
+		if objKind == reflect.Float32 {
+			var f32 = float32(vf64)
+			v = f32
+		} else {
+			v = vf64
+		}
+
+	case reflect.Slice:
+		var (
+			sliceType = objType.Elem()
+			sliceKind = sliceType.Kind()
+		)
+		if sliceKind != reflect.Uint8 {
+			return fmt.Errorf("cannot convert %s to %s", val, objType)
+		}
+		v = []byte(val)
+
+	case reflect.String:
+		v = val
+
+	case reflect.Interface, reflect.Struct:
+		// If type implement UnmarshalBinary, UnmarshalJSON, or
+		// UnmarshalText; use it to set the value.
+
+		_, err = Unmarshal(obj, []byte(val))
+		if err != nil {
+			return err
+		}
+		return nil
+
+	default:
+		return fmt.Errorf("cannot convert %s to %s", val, objType)
+	}
+
+	objValue = reflect.ValueOf(v)
+	if len(objType.PkgPath()) != 0 {
+		// Type is not predeclared (builtin).
+		objValue = objValue.Convert(objType)
+	}
+	obj.Elem().Set(objValue)
+
+	return nil
+}
+
 // Unmarshal set the obj value by calling one of the method:
 // UnmarshalBinary, UnmarshalJSON, or UnmarshalText; in respective
 // order.
@@ -91,7 +349,7 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 		methodName string
 	)
 
-	if objKind != reflect.Pointer {
+	if objKind != reflect.Ptr {
 		// Variable passed as is (V T).
 		return false, nil
 	}
@@ -101,7 +359,7 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 	objType = objType.Elem()
 	objKind = objType.Kind()
 
-	if objKind == reflect.Pointer {
+	if objKind == reflect.Ptr {
 		// Variable is passed as **T.
 		if obj.IsNil() {
 			objType = objType.Elem()
@@ -116,6 +374,11 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 			// initialized.
 			return false, nil
 		}
+	}
+
+	if len(val) == 0 {
+		obj.Set(reflect.Zero(objType))
+		return true, nil
 	}
 
 	for _, methodName = range methodNames {
