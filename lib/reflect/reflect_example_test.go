@@ -7,7 +7,9 @@ package reflect
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"net/http"
+	"net/url"
 	"reflect"
 )
 
@@ -102,4 +104,116 @@ func ExampleTag() {
 	//"F2" [opt1] false
 	//"F3" [] false
 	//"" [] false
+}
+
+func ExampleUnmarshal_unmarshalBinary() {
+	var (
+		val = []byte("https://kilabit.info")
+
+		err error
+		ok  bool
+	)
+
+	// Passing variable will not work...
+	var varB url.URL
+	ok, err = Unmarshal(reflect.ValueOf(varB), val)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%v: %q\n", ok, varB.String())
+
+	// Pass it like these.
+	ok, err = Unmarshal(reflect.ValueOf(&varB), val)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%v: %q\n", ok, varB.String())
+
+	// Passing un-initialized pointer also not working...
+	var varPtrB *url.URL
+	ok, err = Unmarshal(reflect.ValueOf(varPtrB), val)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%v: %q\n", ok, varPtrB)
+
+	// Pass it as **T.
+	ok, err = Unmarshal(reflect.ValueOf(&varPtrB), val)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%v: %q\n", ok, varPtrB)
+
+	var ptrB = &url.URL{}
+	ok, err = Unmarshal(reflect.ValueOf(&ptrB), val)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%v: %q\n", ok, ptrB)
+
+	//Output:
+	//false: ""
+	//true: "https://kilabit.info"
+	//false: <nil>
+	//true: "https://kilabit.info"
+	//true: "https://kilabit.info"
+}
+
+func ExampleUnmarshal_unmarshalText() {
+	var (
+		vals = [][]byte{
+			[]byte("123.456"),
+			[]byte("123_456"),
+			[]byte("123456"),
+		}
+		r = big.NewRat(0, 1)
+
+		val []byte
+		err error
+	)
+
+	for _, val = range vals {
+		_, err = Unmarshal(reflect.ValueOf(r), val)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Printf("%s\n", r)
+		}
+	}
+	//Output:
+	//15432/125
+	//123456/1
+	//123456/1
+}
+
+func ExampleUnmarshal_unmarshalJSON() {
+	var (
+		vals = [][]byte{
+			[]byte("123.456"),
+			[]byte("123_456"),
+			[]byte("123456"),
+		}
+		bigInt = big.NewInt(1)
+
+		val []byte
+		err error
+	)
+
+	for _, val = range vals {
+		_, err = Unmarshal(reflect.ValueOf(bigInt), val)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Printf("%s\n", bigInt)
+		}
+	}
+	//Output:
+	//Unmarshal: math/big: cannot unmarshal "123.456" into a *big.Int
+	//123456
+	//123456
 }

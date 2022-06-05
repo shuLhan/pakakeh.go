@@ -60,6 +60,88 @@ func IsNil(v interface{}) bool {
 	return v == nil
 }
 
+// Unmarshal set the obj value by calling one of the method:
+// UnmarshalBinary, UnmarshalJSON, or UnmarshalText; in respective
+// order.
+//
+// Just like reflect, the obj value must be pointer to initialized variable
+// (&T) or pointer-to-pointer to uninitialized variable (**T).
+//
+// If obj implement one of the method, it will return (true, nil) if there is
+// no error.
+//
+// If none of the method exist on obj, it will return (false, nil).
+func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
+	var (
+		logp        = "Unmarshal"
+		methodNames = []string{
+			"UnmarshalBinary",
+			"UnmarshalJSON",
+			"UnmarshalText",
+		}
+
+		objKind = obj.Kind()
+		objType = obj.Type()
+		callIn  = []reflect.Value{reflect.ValueOf(val)}
+
+		objValue   reflect.Value
+		method     reflect.Value
+		callOut    []reflect.Value
+		callReturn interface{}
+		methodName string
+	)
+
+	if objKind != reflect.Pointer {
+		// Variable passed as is (V T).
+		return false, nil
+	}
+
+	objValue = obj
+	obj = obj.Elem()
+	objType = objType.Elem()
+	objKind = objType.Kind()
+
+	if objKind == reflect.Pointer {
+		// Variable is passed as **T.
+		if obj.IsNil() {
+			objType = objType.Elem()
+			objValue = reflect.New(objType)
+			obj.Set(objValue)
+		} else {
+			objValue = obj
+		}
+	} else {
+		if objValue.IsNil() {
+			// Variable is passed as pointer (V *T) but not
+			// initialized.
+			return false, nil
+		}
+	}
+
+	for _, methodName = range methodNames {
+		method = objValue.MethodByName(methodName)
+		if !method.IsValid() {
+			// IsValid returns false if method is the zero Value
+			// (method not found).
+			continue
+		}
+
+		callOut = method.Call(callIn)
+		if len(callOut) == 0 {
+			// No error?
+			return true, nil
+		}
+		callReturn = callOut[0].Interface()
+		err, _ = callReturn.(error)
+		if err != nil {
+			return false, fmt.Errorf("%s: %w", logp, err)
+		}
+		return true, nil
+	}
+
+	return false, nil
+}
+
 // Tag simplify lookup on struct's field tag.
 //
 // Given a StructField and the name of tag, return the tag's value and
