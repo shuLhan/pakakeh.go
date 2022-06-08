@@ -15,9 +15,9 @@ import (
 type RouteHandler func(ctx context.Context, req *Request) (res Response)
 
 type route struct {
+	handler RouteHandler
 	name    string
 	childs  []*route
-	handler RouteHandler
 	isParam bool
 }
 

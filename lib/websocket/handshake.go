@@ -7,6 +7,7 @@ package websocket
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"sync"
@@ -140,34 +141,32 @@ func (h *Handshake) getBytesChunk(sep byte, tolower bool) (chunk []byte) {
 // parseHTTPLine check if HTTP method is "GET", save the URI, and make sure
 // that HTTP version is 1.1.
 func (h *Handshake) parseHTTPLine() (err error) {
-	chunk := h.getBytesChunk(' ', false)
+	var (
+		chunk []byte = h.getBytesChunk(' ', false)
+	)
+
 	if !bytes.Equal(chunk, []byte("GET")) {
-		err = ErrInvalidHTTPMethod
-		return
+		return ErrInvalidHTTPMethod
 	}
 
 	chunk = h.getBytesChunk(' ', false)
 	if len(chunk) == 0 {
-		err = ErrBadRequest
-		return
+		return fmt.Errorf("empty request path: %w", ErrBadRequest)
 	}
 
 	h.URL, err = url.ParseRequestURI(string(chunk))
 	if err != nil {
-		err = ErrBadRequest
-		return
+		return fmt.Errorf("invalid request path: %w", ErrBadRequest)
 	}
 
 	chunk = h.getBytesChunk('/', false)
 	if !bytes.Equal(chunk, []byte("HTTP")) {
-		err = ErrBadRequest
-		return
+		return fmt.Errorf("invalid HTTP pragma: %s: %w", chunk, ErrBadRequest)
 	}
 
 	chunk = h.getBytesChunk('\n', false)
 	if !bytes.Equal(chunk, []byte("1.1")) {
-		err = ErrInvalidHTTPVersion
-		return
+		return ErrInvalidHTTPVersion
 	}
 
 	return

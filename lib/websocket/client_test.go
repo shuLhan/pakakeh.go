@@ -16,16 +16,18 @@ import (
 
 // TestConnect this test require a websocket server to be run.
 func TestConnect(t *testing.T) {
+	type testCase struct {
+		headers  http.Header
+		desc     string
+		endpoint string
+		expErr   string
+	}
+
 	if _testServer == nil {
 		runTestServer()
 	}
 
-	cases := []struct {
-		desc     string
-		endpoint string
-		headers  http.Header
-		expErr   string
-	}{{
+	var cases = []testCase{{
 		desc:     "With custom header",
 		endpoint: _testEndpointAuth,
 		headers: http.Header{
@@ -42,15 +44,21 @@ func TestConnect(t *testing.T) {
 		expErr:   "websocket: Connect: dial tcp 127.0.0.1:4444: connect: connection refused",
 	}}
 
-	for _, c := range cases {
+	var (
+		c      testCase
+		client *Client
+		err    error
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		client := &Client{
+		client = &Client{
 			Endpoint: c.endpoint,
 			Headers:  c.headers,
 		}
 
-		err := client.Connect()
+		err = client.Connect()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
@@ -61,14 +69,14 @@ func TestConnect(t *testing.T) {
 }
 
 func TestClient_parseURI(t *testing.T) {
-	cl := &Client{}
-
-	cases := []struct {
+	type testCase struct {
+		expTLSConfig     *tls.Config
 		endpoint         string
 		expRemoteAddress string
-		expTLSConfig     *tls.Config
 		expError         string
-	}{{
+	}
+
+	var cases = []testCase{{
 		endpoint:         "ws://127.0.0.1:8080",
 		expRemoteAddress: "127.0.0.1:8080",
 	}, {
@@ -92,14 +100,21 @@ func TestClient_parseURI(t *testing.T) {
 		expTLSConfig:     new(tls.Config),
 	}}
 
-	for _, c := range cases {
+	var (
+		cl = &Client{}
+
+		c   testCase
+		err error
+	)
+
+	for _, c = range cases {
 		t.Log("parseURI", c.endpoint)
 
 		cl.remoteAddr = ""
 		cl.TLSConfig = nil
 		cl.Endpoint = c.endpoint
 
-		err := cl.parseURI()
+		err = cl.parseURI()
 		if err != nil {
 			test.Assert(t, "error", c.expError, err.Error())
 			continue
@@ -111,6 +126,14 @@ func TestClient_parseURI(t *testing.T) {
 }
 
 func TestClientPing(t *testing.T) {
+	type testCase struct {
+		exp       *Frame
+		expClose  *Frame
+		desc      string
+		req       []byte
+		reconnect bool
+	}
+
 	if _testServer == nil {
 		runTestServer()
 	}
@@ -119,21 +142,17 @@ func TestClientPing(t *testing.T) {
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
 		}
-		wg sync.WaitGroup
+
+		wg  sync.WaitGroup
+		err error
 	)
 
-	err := testClient.Connect()
+	err = testClient.Connect()
 	if err != nil {
 		t.Fatal("TestClientPing: " + err.Error())
 	}
 
-	cases := []struct {
-		desc      string
-		reconnect bool
-		req       []byte
-		exp       *Frame
-		expClose  *Frame
-	}{{
+	var cases = []testCase{{
 		desc: "Without payload, unmasked",
 		req:  NewFramePing(false, nil),
 		expClose: &Frame{
@@ -169,12 +188,16 @@ func TestClientPing(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c testCase
+	)
+
+	for _, c = range cases {
 		c := c
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := testClient.Connect()
+			err = testClient.Connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -202,7 +225,7 @@ func TestClientPing(t *testing.T) {
 		}
 
 		wg.Add(1)
-		err := testClient.send(c.req)
+		err = testClient.send(c.req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -214,6 +237,14 @@ func TestClientPing(t *testing.T) {
 }
 
 func TestClientText(t *testing.T) {
+	type testCase struct {
+		exp       *Frame
+		expClose  *Frame
+		desc      string
+		req       []byte
+		reconnect bool
+	}
+
 	if _testServer == nil {
 		runTestServer()
 	}
@@ -222,21 +253,17 @@ func TestClientText(t *testing.T) {
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
 		}
-		wg sync.WaitGroup
+
+		wg  sync.WaitGroup
+		err error
 	)
 
-	err := testClient.Connect()
+	err = testClient.Connect()
 	if err != nil {
 		t.Fatal("TestClientText: " + err.Error())
 	}
 
-	cases := []struct {
-		desc      string
-		reconnect bool
-		req       []byte
-		exp       *Frame
-		expClose  *Frame
-	}{{
+	var cases = []testCase{{
 		desc: "Small payload, unmasked",
 		req:  NewFrameText(false, []byte("Hello")),
 		expClose: &Frame{
@@ -304,12 +331,16 @@ func TestClientText(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c testCase
+	)
+
+	for _, c = range cases {
 		c := c
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := testClient.Connect()
+			err = testClient.Connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -332,7 +363,7 @@ func TestClientText(t *testing.T) {
 		}
 
 		wg.Add(1)
-		err := testClient.send(c.req)
+		err = testClient.send(c.req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -342,6 +373,13 @@ func TestClientText(t *testing.T) {
 }
 
 func TestClientFragmentation(t *testing.T) {
+	type testCase struct {
+		exp      *Frame
+		expClose *Frame
+		desc     string
+		frames   []Frame
+	}
+
 	if _testServer == nil {
 		runTestServer()
 	}
@@ -350,12 +388,7 @@ func TestClientFragmentation(t *testing.T) {
 		wg sync.WaitGroup
 	)
 
-	cases := []struct {
-		desc     string
-		frames   []Frame
-		exp      *Frame
-		expClose *Frame
-	}{{
+	var cases = []testCase{{
 		desc: "Two text frames, unmasked",
 		frames: []Frame{{
 			fin:     0,
@@ -424,12 +457,21 @@ func TestClientFragmentation(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
-		testClient := &Client{
+	var (
+		c          testCase
+		testClient *Client
+		err        error
+		req        []byte
+		x          int
+		brokenPipe bool
+	)
+
+	for _, c = range cases {
+		testClient = &Client{
 			Endpoint: _testEndpointAuth,
 		}
 
-		err := testClient.Connect()
+		err = testClient.Connect()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -453,15 +495,15 @@ func TestClientFragmentation(t *testing.T) {
 		}(c.desc, c.exp)
 
 		wg.Add(1)
-		for x := 0; x < len(c.frames); x++ {
-			req := c.frames[x].pack()
+		for x = 0; x < len(c.frames); x++ {
+			req = c.frames[x].pack()
 
-			err := testClient.send(req)
+			err = testClient.send(req)
 			if err != nil {
 				// If the client send unmasked frame, the
 				// server may close the connection before we
 				// can test send the second frame.
-				brokenPipe := strings.Contains(err.Error(), "write: broken pipe")
+				brokenPipe = strings.Contains(err.Error(), "write: broken pipe")
 				if !brokenPipe {
 					t.Fatalf("expecting broken pipe, got %s", err)
 				}
@@ -481,15 +523,17 @@ func TestClientFragmentation2(t *testing.T) {
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
 		}
-		wg sync.WaitGroup
+
+		wg  sync.WaitGroup
+		err error
 	)
 
-	err := testClient.Connect()
+	err = testClient.Connect()
 	if err != nil {
 		t.Fatal("TestClientFragmentation2: " + err.Error())
 	}
 
-	frames := []Frame{{
+	var frames = []Frame{{
 		fin:     0,
 		opcode:  OpcodeText,
 		masked:  frameIsMasked,
@@ -512,7 +556,7 @@ func TestClientFragmentation2(t *testing.T) {
 	}}
 
 	testClient.handlePong = func(cl *Client, got *Frame) error {
-		exp := &Frame{
+		var exp = &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodePong,
 			len:        4,
@@ -525,7 +569,7 @@ func TestClientFragmentation2(t *testing.T) {
 	}
 
 	testClient.HandleText = func(cl *Client, got *Frame) error {
-		exp := &Frame{
+		var exp = &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeText,
 			len:        14,
@@ -538,10 +582,16 @@ func TestClientFragmentation2(t *testing.T) {
 	}
 
 	wg.Add(2)
-	for x := 0; x < len(frames); x++ {
-		req := frames[x].pack()
 
-		err := testClient.send(req)
+	var (
+		x   int
+		req []byte
+	)
+
+	for x = 0; x < len(frames); x++ {
+		req = frames[x].pack()
+
+		err = testClient.send(req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -551,6 +601,13 @@ func TestClientFragmentation2(t *testing.T) {
 }
 
 func TestClientSendBin(t *testing.T) {
+	type testCase struct {
+		exp       *Frame
+		desc      string
+		payload   []byte
+		reconnect bool
+	}
+
 	if _testServer == nil {
 		runTestServer()
 	}
@@ -559,20 +616,17 @@ func TestClientSendBin(t *testing.T) {
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
 		}
-		wg sync.WaitGroup
+
+		wg  sync.WaitGroup
+		err error
 	)
 
-	err := testClient.Connect()
+	err = testClient.Connect()
 	if err != nil {
 		t.Fatal("TestSendBin: Connect: " + err.Error())
 	}
 
-	cases := []struct {
-		desc      string
-		reconnect bool
-		payload   []byte
-		exp       *Frame
-	}{{
+	var cases = []testCase{{
 		desc:    "Single bin frame",
 		payload: []byte("Hello"),
 		exp: &Frame{
@@ -584,12 +638,16 @@ func TestClientSendBin(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c testCase
+	)
+
+	for _, c = range cases {
 		c := c
 		t.Log(c.desc)
 
 		if c.reconnect {
-			err := testClient.Connect()
+			err = testClient.Connect()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -613,6 +671,12 @@ func TestClientSendBin(t *testing.T) {
 }
 
 func TestClientSendPing(t *testing.T) {
+	type testCase struct {
+		exp     *Frame
+		desc    string
+		payload []byte
+	}
+
 	if _testServer == nil {
 		runTestServer()
 	}
@@ -621,19 +685,17 @@ func TestClientSendPing(t *testing.T) {
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
 		}
-		wg sync.WaitGroup
+
+		wg  sync.WaitGroup
+		err error
 	)
 
-	err := testClient.Connect()
+	err = testClient.Connect()
 	if err != nil {
 		t.Fatal("TestSendBin: Connect: " + err.Error())
 	}
 
-	cases := []struct {
-		desc    string
-		payload []byte
-		exp     *Frame
-	}{{
+	var cases = []testCase{{
 		desc: "Without payload",
 		exp: &Frame{
 			fin:        frameIsFinished,
@@ -653,7 +715,11 @@ func TestClientSendPing(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c testCase
+	)
+
+	for _, c = range cases {
 		c := c
 		t.Log(c.desc)
 
@@ -665,7 +731,7 @@ func TestClientSendPing(t *testing.T) {
 		}
 
 		wg.Add(1)
-		err := testClient.SendPing(c.payload)
+		err = testClient.SendPing(c.payload)
 		if err != nil {
 			t.Fatal("TestSendPing: " + err.Error())
 		}

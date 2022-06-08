@@ -12,12 +12,14 @@ import (
 )
 
 func TestNewFrameBin(t *testing.T) {
-	cases := []struct {
-		desc     string
-		isMasked bool
-		payload  []byte
+	type testCase struct {
 		exp      *Frame
-	}{{
+		desc     string
+		payload  []byte
+		isMasked bool
+	}
+
+	var cases = []testCase{{
 		desc:    "With unmasked",
 		payload: []byte("Hello!"),
 		exp: &Frame{
@@ -37,12 +39,19 @@ func TestNewFrameBin(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c      testCase
+		packet []byte
+		frames *Frames
+		frame  *Frame
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		packet := NewFrameBin(c.isMasked, c.payload)
-		frames := Unpack(packet)
-		frame := frames.v[0]
+		packet = NewFrameBin(c.isMasked, c.payload)
+		frames = Unpack(packet)
+		frame = frames.v[0]
 
 		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
@@ -52,11 +61,13 @@ func TestNewFrameBin(t *testing.T) {
 }
 
 func TestNewFrameClose(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
+		exp     *Frame
 		desc    string
 		payload []byte
-		exp     *Frame
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
@@ -80,12 +91,19 @@ func TestNewFrameClose(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c      testCase
+		packet []byte
+		frames *Frames
+		frame  *Frame
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		packet := NewFrameClose(true, StatusBadRequest, c.payload)
-		frames := Unpack(packet)
-		frame := frames.v[0]
+		packet = NewFrameClose(true, StatusBadRequest, c.payload)
+		frames = Unpack(packet)
+		frame = frames.v[0]
 
 		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
@@ -96,11 +114,13 @@ func TestNewFrameClose(t *testing.T) {
 }
 
 func TestNewFramePing(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
+		exp     *Frame
 		desc    string
 		payload []byte
-		exp     *Frame
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
@@ -120,12 +140,19 @@ func TestNewFramePing(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c      testCase
+		packet []byte
+		frames *Frames
+		frame  *Frame
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		packet := NewFramePing(true, c.payload)
-		frames := Unpack(packet)
-		frame := frames.v[0]
+		packet = NewFramePing(true, c.payload)
+		frames = Unpack(packet)
+		frame = frames.v[0]
 
 		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
@@ -135,11 +162,13 @@ func TestNewFramePing(t *testing.T) {
 }
 
 func TestNewFramePong(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
+		exp     *Frame
 		desc    string
 		payload []byte
-		exp     *Frame
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc:    "With small payload",
 		payload: []byte("Hello!"),
 		exp: &Frame{
@@ -159,12 +188,19 @@ func TestNewFramePong(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c      testCase
+		frames *Frames
+		frame  *Frame
+		packet []byte
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		packet := NewFramePong(true, c.payload)
-		frames := Unpack(packet)
-		frame := frames.v[0]
+		packet = NewFramePong(true, c.payload)
+		frames = Unpack(packet)
+		frame = frames.v[0]
 
 		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
@@ -174,12 +210,14 @@ func TestNewFramePong(t *testing.T) {
 }
 
 func TestNewFrameText(t *testing.T) {
-	cases := []struct {
-		desc     string
-		isMasked bool
-		payload  []byte
+	type testCase struct {
 		exp      *Frame
-	}{{
+		desc     string
+		payload  []byte
+		isMasked bool
+	}
+
+	var cases = []testCase{{
 		desc:    "With unmasked",
 		payload: []byte("Hello!"),
 		exp: &Frame{
@@ -199,12 +237,19 @@ func TestNewFrameText(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c      testCase
+		frames *Frames
+		frame  *Frame
+		packet []byte
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		packet := NewFrameText(c.isMasked, c.payload)
-		frames := Unpack(packet)
-		frame := frames.v[0]
+		packet = NewFrameText(c.isMasked, c.payload)
+		frames = Unpack(packet)
+		frame = frames.v[0]
 
 		test.Assert(t, "Frame.fin", c.exp.fin, frame.fin)
 		test.Assert(t, "Frame.opcode", c.exp.opcode, frame.opcode)
@@ -214,11 +259,13 @@ func TestNewFrameText(t *testing.T) {
 }
 
 func TestFramePack(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		desc string
-		f    Frame
 		exp  []byte
-	}{{
+		f    Frame
+	}
+
+	var cases = []testCase{{
 		desc: "A single-frame unmasked text message",
 		f: Frame{
 			fin:     frameIsFinished,
@@ -339,10 +386,15 @@ func TestFramePack(t *testing.T) {
 		}, _dummyPayload65536Masked),
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		got []byte
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got := c.f.pack()
+		got = c.f.pack()
 
 		test.Assert(t, "", c.exp, got)
 	}

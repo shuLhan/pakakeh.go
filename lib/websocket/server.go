@@ -40,6 +40,8 @@ const (
 
 // Server for websocket.
 type Server struct {
+	poll libnet.Poll
+
 	Clients *ClientManager
 
 	// Options for server, set by calling NewServer.
@@ -49,17 +51,16 @@ type Server struct {
 	// cause undefined effects.
 	Options *ServerOptions
 
-	sock      int
 	chUpgrade chan int
 	running   chan struct{}
-
-	poll libnet.Poll
 
 	routes *rootRoute
 
 	// handlePong callback that will be called after receiving control
 	// PONG frame from client. Default is nil, used only for testing.
 	handlePong HandlerFrameFn
+
+	sock int
 
 	allowRsv1 bool
 	allowRsv2 bool
@@ -259,8 +260,7 @@ func (serv *Server) upgrader() {
 			continue
 		}
 		if hs.URL.Path != serv.Options.ConnectPath {
-			serv.handleError(conn, http.StatusNotFound,
-				"unknown path")
+			serv.handleError(conn, http.StatusNotFound, "unknown path")
 			continue
 		}
 

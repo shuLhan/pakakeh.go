@@ -19,11 +19,6 @@ import (
 // For a custom management of user use HandleClientAdd and HandleClientRemove
 // on Server.
 type ClientManager struct {
-	sync.Mutex
-
-	// all connections.
-	all []int
-
 	// conns contains a one-to-many mapping between user ID and their
 	// connections.
 	conns map[uint64][]int
@@ -40,6 +35,11 @@ type ClientManager struct {
 	// frames contains a one-to-one mapping between a socket and
 	// continuous frame.
 	frames map[int]*Frames
+
+	// all connections.
+	all []int
+
+	sync.Mutex
 }
 
 // newClientManager create and initialize new user sockets.

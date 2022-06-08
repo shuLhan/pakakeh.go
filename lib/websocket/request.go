@@ -31,13 +31,12 @@ var (
 //		"body": "{ \"token\": \"xxx.yyy.zzz\" }"
 //	}
 type Request struct {
-	//
-	// Id is unique between request to differentiate multiple request
-	// since each request is asynchronous.  Client can use incremental
-	// value or, the recommended way, using Unix timestamp with
-	// millisecond.
-	//
-	ID uint64 `json:"id"`
+	// Query is Target query.
+	Query url.Values `json:"-"`
+
+	// Params are parameters as key-value in Target path that has been
+	// parsed.
+	Params targetParam `json:"-"`
 
 	// Method is equal to HTTP method.
 	Method string `json:"method"`
@@ -51,12 +50,13 @@ type Request struct {
 	// Path is Target without query.
 	Path string `json:"-"`
 
-	// Params are parameters as key-value in Target path that has been
-	// parsed.
-	Params targetParam `json:"-"`
-
-	// Query is Target query.
-	Query url.Values `json:"-"`
+	//
+	// Id is unique between request to differentiate multiple request
+	// since each request is asynchronous.  Client can use incremental
+	// value or, the recommended way, using Unix timestamp with
+	// millisecond.
+	//
+	ID uint64 `json:"id"`
 
 	// Conn is the client connection, where the request come from.
 	Conn int

@@ -44,10 +44,10 @@ var (
 //		body: "{ \"id\": ... }"
 //	}
 type Response struct {
-	ID      uint64 `json:"id"`
-	Code    int32  `json:"code"`
 	Message string `json:"message"`
 	Body    string `json:"body"`
+	ID      uint64 `json:"id"`
+	Code    int32  `json:"code"`
 }
 
 // NewBroadcast create a new message for broadcast by server encoded as JSON

@@ -12,11 +12,13 @@ import (
 )
 
 func TestFrameUnpack(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
+		exp  *Frame
 		desc string
 		in   []byte
-		exp  *Frame
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc: "With empty input",
 	}, {
 		desc: "A single-frame unmasked text message",
@@ -171,10 +173,15 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c    testCase
+		gots *Frames
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		gots := Unpack(c.in)
+		gots = Unpack(c.in)
 
 		if gots != nil && len(gots.v) > 0 {
 			test.Assert(t, "", c.exp, gots.v[0])
@@ -183,14 +190,14 @@ func TestFrameUnpack(t *testing.T) {
 }
 
 func TestFramesAppend(t *testing.T) {
-	frames := &Frames{}
-
-	cases := []struct {
-		desc       string
+	type testCase struct {
 		f          *Frame
-		expLen     int
+		desc       string
 		expPayload string
-	}{{
+		expLen     int
+	}
+
+	var cases = []testCase{{
 		desc:       "With nil frame",
 		expLen:     0,
 		expPayload: "",
@@ -204,7 +211,13 @@ func TestFramesAppend(t *testing.T) {
 		expPayload: "A",
 	}}
 
-	for _, c := range cases {
+	var (
+		frames = &Frames{}
+
+		c testCase
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		frames.Append(c.f)
@@ -215,11 +228,13 @@ func TestFramesAppend(t *testing.T) {
 }
 
 func TestFramesIsClosed(t *testing.T) {
-	cases := []struct {
-		desc   string
+	type testCase struct {
 		frames *Frames
+		desc   string
 		exp    bool
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc:   "With empty frames",
 		frames: &Frames{},
 	}, {
@@ -243,19 +258,25 @@ func TestFramesIsClosed(t *testing.T) {
 		exp: true,
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		got bool
+	)
+	for _, c = range cases {
 		t.Log(c.desc)
-		got := c.frames.isClosed()
+		got = c.frames.isClosed()
 		test.Assert(t, "Frames.isClosed", c.exp, got)
 	}
 }
 
 func TestFramesPayload(t *testing.T) {
-	cases := []struct {
-		desc string
+	type testCase struct {
 		fs   *Frames
+		desc string
 		exp  string
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc: "With empty frames",
 		fs:   &Frames{},
 	}, {
@@ -323,10 +344,15 @@ func TestFramesPayload(t *testing.T) {
 		exp: "Hello ",
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		got []byte
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		got := c.fs.payload()
+		got = c.fs.payload()
 
 		test.Assert(t, "Frames.payload", c.exp, string(got))
 	}

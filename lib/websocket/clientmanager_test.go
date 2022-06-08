@@ -13,18 +13,21 @@ import (
 )
 
 func TestClientManagerAdd(t *testing.T) {
-	clients := newClientManager()
-
-	ctx1 := context.WithValue(context.Background(), CtxKeyUID, uint64(1))
-	ctx2 := context.WithValue(context.Background(), CtxKeyUID, uint64(2))
-
-	cases := []struct {
-		desc      string
+	type testCase struct {
 		ctx       context.Context
-		conn      int
+		desc      string
 		expConns  string
+		conn      int
 		expCtxLen int
-	}{{
+	}
+
+	var (
+		clients = newClientManager()
+		ctx1    = context.WithValue(context.Background(), CtxKeyUID, uint64(1))
+		ctx2    = context.WithValue(context.Background(), CtxKeyUID, uint64(2))
+	)
+
+	var cases = []testCase{{
 		desc:      `With new connection`,
 		ctx:       ctx1,
 		conn:      1000,
@@ -50,13 +53,19 @@ func TestClientManagerAdd(t *testing.T) {
 		expCtxLen: 2,
 	}}
 
-	for _, c := range cases {
+	var (
+		c         testCase
+		gotConns  string
+		gotCtxLen int
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		clients.add(c.ctx, c.conn)
 
-		gotConns := fmt.Sprintf("%v", clients.conns)
-		gotCtxLen := len(clients.ctx)
+		gotConns = fmt.Sprintf("%v", clients.conns)
+		gotCtxLen = len(clients.ctx)
 
 		test.Assert(t, "ClientManager.conns", c.expConns, gotConns)
 		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen)
@@ -64,21 +73,24 @@ func TestClientManagerAdd(t *testing.T) {
 }
 
 func TestClientManagerRemove(t *testing.T) {
-	clients := newClientManager()
+	type testCase struct {
+		desc      string
+		expConns  string
+		expCtxLen int
+		conn      int
+	}
 
-	ctx1 := context.WithValue(context.Background(), CtxKeyUID, uint64(1))
-	ctx2 := context.WithValue(context.Background(), CtxKeyUID, uint64(2))
+	var (
+		clients = newClientManager()
+		ctx1    = context.WithValue(context.Background(), CtxKeyUID, uint64(1))
+		ctx2    = context.WithValue(context.Background(), CtxKeyUID, uint64(2))
+	)
 
 	clients.add(ctx1, 1000)
 	clients.add(ctx1, 2000)
 	clients.add(ctx2, 1000)
 
-	cases := []struct {
-		desc      string
-		conn      int
-		expConns  string
-		expCtxLen int
-	}{{
+	var cases = []testCase{{
 		desc:      `With invalid connection`,
 		conn:      99,
 		expConns:  "map[1:[2000] 2:[1000]]",
@@ -95,13 +107,19 @@ func TestClientManagerRemove(t *testing.T) {
 		expCtxLen: 0,
 	}}
 
-	for _, c := range cases {
+	var (
+		c         testCase
+		gotConns  string
+		gotCtxLen int
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		clients.remove(c.conn)
 
-		gotConns := fmt.Sprintf("%v", clients.conns)
-		gotCtxLen := len(clients.ctx)
+		gotConns = fmt.Sprintf("%v", clients.conns)
+		gotCtxLen = len(clients.ctx)
 
 		test.Assert(t, "conns", c.expConns, gotConns)
 		test.Assert(t, "ClientManager.ctx", c.expCtxLen, gotCtxLen)

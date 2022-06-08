@@ -86,20 +86,15 @@ var (
 // Implementor can check closed connection from error returned from Send
 // methods to match with ErrConnClosed.
 type Client struct {
-	sync.Mutex
 	conn net.Conn
 
-	//
-	// Endpoint contains URI of remote server.  The endpoint use the
-	// following format,
-	//
-	//	ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
-	//	wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
-	//
-	// The port component is OPTIONAL, default is 80 for "ws" scheme, and
-	// 443 for "wss" scheme.
-	//
-	Endpoint string
+	// Headers The headers field can be used to pass custom headers during
+	// handshake with server.  Any primary header fields ("host",
+	// "upgrade", "connection", "sec-websocket-key",
+	// "sec-websocket-version") will be deleted before handshake.
+	Headers http.Header
+
+	remoteURL *url.URL
 
 	//
 	// TLSConfig define custom TLS configuration when connecting to secure
@@ -145,26 +140,33 @@ type Client struct {
 	// frame text from server.
 	HandleText ClientHandler
 
-	// Headers The headers field can be used to pass custom headers during
-	// handshake with server.  Any primary header fields ("host",
-	// "upgrade", "connection", "sec-websocket-key",
-	// "sec-websocket-version") will be deleted before handshake.
-	Headers http.Header
+	// gracefulClose is a channel to gracefully close connection by
+	// client.
+	gracefulClose chan bool
+
+	//
+	// Endpoint contains URI of remote server.  The endpoint use the
+	// following format,
+	//
+	//	ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
+	//	wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
+	//
+	// The port component is OPTIONAL, default is 80 for "ws" scheme, and
+	// 443 for "wss" scheme.
+	//
+	Endpoint string
+
+	remoteAddr string
 
 	// The interval where PING control frame will be send to server.
 	// The minimum and default value is 10 seconds.
 	PingInterval time.Duration
 
-	remoteURL  *url.URL
-	remoteAddr string
+	sync.Mutex
 
 	allowRsv1 bool
 	allowRsv2 bool
 	allowRsv3 bool
-
-	// gracefulClose is a channel to gracefully close connection by
-	// client.
-	gracefulClose chan bool
 }
 
 // Close gracefully close the client connection.

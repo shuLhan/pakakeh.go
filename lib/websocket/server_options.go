@@ -15,19 +15,6 @@ const (
 )
 
 type ServerOptions struct {
-	// Address to listen for WebSocket connection.
-	// Default to ":80".
-	Address string
-
-	// ConnectPath define the HTTP path where WebSocket connection
-	// handshake will be processed. Default to "/".
-	ConnectPath string
-
-	// StatusPath define a HTTP path to check for server status.
-	// Default to ConnectPath +"/status" if its empty.
-	// The StatusPath is handled by HandleStatus callback in the server.
-	StatusPath string
-
 	// HandleAuth callback that will be called when receiving
 	// client handshake.
 	HandleAuth HandlerAuthFn
@@ -58,6 +45,19 @@ type ServerOptions struct {
 	// HandleStatus function that will be called when server receive
 	// request for status as defined in ServerOptions.StatusPath.
 	HandleStatus HandlerStatusFn
+
+	// Address to listen for WebSocket connection.
+	// Default to ":80".
+	Address string
+
+	// ConnectPath define the HTTP path where WebSocket connection
+	// handshake will be processed. Default to "/".
+	ConnectPath string
+
+	// StatusPath define a HTTP path to check for server status.
+	// Default to ConnectPath +"/status" if its empty.
+	// The StatusPath is handled by HandleStatus callback in the server.
+	StatusPath string
 }
 
 func (opts *ServerOptions) init() {

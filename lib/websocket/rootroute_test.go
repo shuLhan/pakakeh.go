@@ -26,14 +26,16 @@ func testRouteHandler(t *testing.T, target string) RouteHandler {
 }
 
 func testRootRouteAdd(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
+		expErr  error
+		exp     *route
+		handler RouteHandler
 		desc    string
 		method  string
 		target  string
-		handler RouteHandler
-		expErr  error
-		exp     *route
-	}{{
+	}
+
+	var cases = []testCase{{
 		desc:    "With invalid method",
 		method:  "PUSH",
 		target:  "/",
@@ -148,28 +150,35 @@ func testRootRouteAdd(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		err error
+		got *route
+	)
+	for _, c = range cases {
 		t.Log(c.method + " " + c.target)
 
-		err := _testRootRoute.add(c.method, c.target, c.handler)
+		err = _testRootRoute.add(c.method, c.target, c.handler)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err)
 		}
 
-		got := _testRootRoute.getParent(c.method)
+		got = _testRootRoute.getParent(c.method)
 
 		test.Assert(t, "route", fmt.Sprintf("%+v", c.exp), fmt.Sprintf("%+v", got))
 	}
 }
 
 func testRootRouteGet(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
+		expParams targetParam
 		desc      string
 		method    string
 		target    string
 		expTarget string
-		expParams targetParam
-	}{{
+	}
+
+	var cases = []testCase{{
 		method:    _testDefMethod,
 		target:    "/1000/xyz",
 		expTarget: "/:id/xyz",
@@ -227,10 +236,16 @@ func testRootRouteGet(t *testing.T) {
 		target: "/333/abc/def/444/ghi",
 	}}
 
-	for _, c := range cases {
+	var (
+		c          testCase
+		gotParams  targetParam
+		gotHandler RouteHandler
+	)
+
+	for _, c = range cases {
 		t.Log(c.method + " " + c.target)
 
-		gotParams, gotHandler := _testRootRoute.get(c.method, c.target)
+		gotParams, gotHandler = _testRootRoute.get(c.method, c.target)
 
 		test.Assert(t, "params", c.expParams, gotParams)
 
