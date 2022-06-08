@@ -2,6 +2,7 @@
 //
 // [1] https://github.com/gobwas/ws/blob/master/server_test.go
 // [2] https://medium.freecodecamp.org/million-websockets-and-go-cc58418460bb
+
 package websocket
 
 import (
@@ -21,9 +22,9 @@ const (
 )
 
 type upgradeCase struct {
+	req   *http.Request
 	label string
 	nonce []byte
-	req   *http.Request
 }
 
 var upgradeCases = []upgradeCase{
@@ -195,27 +196,46 @@ var upgradeCases = []upgradeCase{
 }
 
 func BenchmarkUpgrader(b *testing.B) {
-	for _, bench := range upgradeCases {
+	var (
+		u = Server{
+			Options: &ServerOptions{},
+		}
+
+		bench    upgradeCase
+		reqBytes []byte
+	)
+
+	for _, bench = range upgradeCases {
 		bench.req.Header.Set(_hdrKeyWSKey, string(bench.nonce))
 
-		u := Server{}
-
-		reqBytes := dumpRequest(bench.req)
+		reqBytes = dumpRequest(bench.req)
 
 		b.Run(bench.label, func(b *testing.B) {
-			conn := make([][]byte, b.N)
-			for i := 0; i < b.N; i++ {
-				conn[i] = reqBytes
-			}
+			var (
+				conn = make([][]byte, b.N)
+				i    = new(int64)
 
-			i := new(int64)
+				x int
+			)
+			for x = 0; x < b.N; x++ {
+				conn[x] = reqBytes
+			}
 
 			b.ResetTimer()
 			b.ReportAllocs()
 			b.RunParallel(func(pb *testing.PB) {
 				for pb.Next() {
-					c := conn[atomic.AddInt64(i, 1)-1]
-					hs, _ := newHandshake(c)
+					var (
+						c = conn[atomic.AddInt64(i, 1)-1]
+
+						hs  *Handshake
+						err error
+					)
+
+					hs, err = newHandshake(c)
+					if err != nil {
+						continue
+					}
 					_, _, _ = u.handleUpgrade(hs)
 				}
 			})
@@ -223,8 +243,12 @@ func BenchmarkUpgrader(b *testing.B) {
 	}
 }
 
-func mustMakeRequest(method string, headers http.Header) *http.Request {
-	req, err := http.NewRequest(method, "ws://example.org", nil)
+func mustMakeRequest(method string, headers http.Header) (req *http.Request) {
+	var (
+		err error
+	)
+
+	req, err = http.NewRequest(method, "ws://example.org", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -251,8 +275,13 @@ func withoutHeader(header string, req *http.Request) *http.Request {
 // initNonce fills given slice with random base64-encoded nonce bytes.
 func initNonce(dst []byte) {
 	// NOTE: bts does not escapes.
-	bts := make([]byte, nonceKeySize)
-	if _, err := rand.Read(bts); err != nil {
+	var (
+		bts = make([]byte, nonceKeySize)
+
+		err error
+	)
+
+	if _, err = rand.Read(bts); err != nil {
 		panic(fmt.Sprintf("rand read error: %s", err))
 	}
 	base64.StdEncoding.Encode(dst, bts)
@@ -264,8 +293,10 @@ func mustMakeNonce() (ret []byte) {
 	return
 }
 
-func dumpRequest(req *http.Request) []byte {
-	bts, err := httputil.DumpRequest(req, true)
+func dumpRequest(req *http.Request) (bts []byte) {
+	var err error
+
+	bts, err = httputil.DumpRequest(req, true)
 	if err != nil {
 		panic(err)
 	}
