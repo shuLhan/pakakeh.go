@@ -70,17 +70,16 @@ var (
 
 // Handshake contains the websocket HTTP handshake request.
 type Handshake struct {
+	URL         *url.URL
+	Header      http.Header
+	Host        []byte
+	Key         []byte
+	Extensions  []byte
+	Protocol    []byte
+	raw         []byte
 	start       int
 	end         int
 	headerFlags int
-	raw         []byte
-
-	URL        *url.URL
-	Host       []byte
-	Key        []byte
-	Extensions []byte
-	Protocol   []byte
-	Header     http.Header
 }
 
 func newHandshake(req []byte) (h *Handshake, err error) {
