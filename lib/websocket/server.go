@@ -117,17 +117,22 @@ func (serv *Server) createSockServer() (err error) {
 		return
 	}
 
-	host, strPort, err := net.SplitHostPort(serv.Options.Address)
+	var (
+		host    string
+		strPort string
+		addr    unix.SockaddrInet4
+	)
+
+	host, strPort, err = net.SplitHostPort(serv.Options.Address)
 	if err != nil {
 		return
 	}
 
-	port, err := strconv.Atoi(strPort)
+	addr.Port, err = strconv.Atoi(strPort)
 	if err != nil {
 		return
 	}
 
-	addr := unix.SockaddrInet4{Port: port}
 	copy(addr.Addr[:], net.ParseIP(host).To4())
 
 	err = unix.Bind(serv.sock, &addr)
@@ -143,7 +148,7 @@ func (serv *Server) createSockServer() (err error) {
 // RegisterTextHandler register specific function to be called by server when
 // request opcode is text, and method and target matched with Request.
 func (serv *Server) RegisterTextHandler(method, target string, handler RouteHandler) (err error) {
-	logp := "RegisterTextHandler"
+	var logp string = "RegisterTextHandler"
 
 	if len(method) == 0 {
 		return fmt.Errorf("%s: empty method", logp)
@@ -164,9 +169,13 @@ func (serv *Server) RegisterTextHandler(method, target string, handler RouteHand
 }
 
 func (serv *Server) handleError(conn int, code int, msg string) {
-	rspBody := "HTTP/1.1 " + strconv.Itoa(code) + " " + msg + "\r\n\r\n"
+	var (
+		rspBody = "HTTP/1.1 " + strconv.Itoa(code) + " " + msg + "\r\n\r\n"
 
-	err := Send(conn, []byte(rspBody))
+		err error
+	)
+
+	err = Send(conn, []byte(rspBody))
 	if err != nil {
 		log.Println("websocket: server.handleError: " + err.Error())
 	}
@@ -217,7 +226,12 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 
 // ClientRemove remove client connection from server.
 func (serv *Server) ClientRemove(conn int) {
-	ctx, _ := serv.Clients.Context(conn)
+	var (
+		ctx context.Context
+		err error
+	)
+
+	ctx, _ = serv.Clients.Context(conn)
 
 	if ctx != nil && serv.Options.HandleClientRemove != nil {
 		serv.Options.HandleClientRemove(ctx, conn)
@@ -225,7 +239,7 @@ func (serv *Server) ClientRemove(conn int) {
 
 	serv.Clients.remove(conn)
 
-	err := serv.poll.UnregisterRead(conn)
+	err = serv.poll.UnregisterRead(conn)
 	if err != nil {
 		log.Println("websocket: server.ClientRemove: " + err.Error())
 	}
@@ -237,8 +251,19 @@ func (serv *Server) ClientRemove(conn int) {
 }
 
 func (serv *Server) upgrader() {
-	for conn := range serv.chUpgrade {
-		packet, err := Recv(conn)
+	var (
+		ctx      context.Context
+		hs       *Handshake
+		httpRes  string
+		wsAccept string
+		key      []byte
+		packet   []byte
+		conn     int
+		err      error
+	)
+
+	for conn = range serv.chUpgrade {
+		packet, err = Recv(conn)
 		if err != nil {
 			log.Println("websocket: server.upgrader: " + err.Error())
 			unix.Close(conn)
@@ -249,7 +274,7 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		hs, err := newHandshake(packet)
+		hs, err = newHandshake(packet)
 		if err != nil {
 			serv.handleError(conn, http.StatusBadRequest, err.Error())
 			continue
@@ -264,15 +289,15 @@ func (serv *Server) upgrader() {
 			continue
 		}
 
-		ctx, key, err := serv.handleUpgrade(hs)
+		ctx, key, err = serv.handleUpgrade(hs)
 		if err != nil {
 			serv.handleError(conn, http.StatusBadRequest, err.Error())
 			continue
 		}
 
-		wsAccept := generateHandshakeAccept(key)
+		wsAccept = generateHandshakeAccept(key)
 
-		httpRes := _resUpgradeOK + wsAccept + "\r\n\r\n"
+		httpRes = _resUpgradeOK + wsAccept + "\r\n\r\n"
 
 		err = Send(conn, []byte(httpRes))
 		if err != nil {
@@ -320,7 +345,13 @@ func (serv *Server) upgrader() {
 // that is set.
 // (RFC 6455 Section 5.4 Page 34)
 func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
-	frames, ok := serv.Clients.getFrames(conn)
+	var (
+		frames *Frames
+		frame  *Frame
+		ok     bool
+	)
+
+	frames, ok = serv.Clients.getFrames(conn)
 
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
@@ -363,7 +394,7 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 		return false
 	}
 
-	frame := serv.Clients.finFrames(conn, req)
+	frame = serv.Clients.finFrames(conn, req)
 
 	if frame.opcode == OpcodeText {
 		if !utf8.Valid(frame.payload) {
@@ -387,7 +418,7 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 
 	switch frame.opcode {
 	case OpcodeCont, OpcodeText, OpcodeBin:
-		isInvalid := serv.handleFragment(conn, frame)
+		var isInvalid bool = serv.handleFragment(conn, frame)
 		if isInvalid {
 			isClosing = true
 		}
@@ -423,12 +454,14 @@ func (serv *Server) handleText(conn int, payload []byte) {
 		err     error
 		ctx     context.Context
 		req     *Request
+		res     *Response
+		ok      bool
 	)
 
-	res := _resPool.Get().(*Response)
+	res = _resPool.Get().(*Response)
 	res.reset()
 
-	ctx, ok := serv.Clients.Context(conn)
+	ctx, ok = serv.Clients.Context(conn)
 	if !ok {
 		err = errors.New("client context not found")
 		res.Code = http.StatusInternalServerError
@@ -493,9 +526,12 @@ func (serv *Server) handleStatus(conn int) {
 		contentType, data = serv.Options.HandleStatus()
 	}
 
-	res := fmt.Sprintf(_resStatusOK, contentType, len(data), data)
+	var (
+		res string = fmt.Sprintf(_resStatusOK, contentType, len(data), data)
+		err error
+	)
 
-	err := Send(conn, []byte(res))
+	err = Send(conn, []byte(res))
 	if err != nil {
 		log.Println("websocket /health: Send: ", err.Error())
 	}
@@ -549,13 +585,16 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 		}
 	}
 
-	packet := NewFrameClose(false, req.closeCode, req.payload)
+	var (
+		packet []byte = NewFrameClose(false, req.closeCode, req.payload)
+		err    error
+	)
 
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Server.handleClose: req: %+v\n", req)
 	}
 
-	err := Send(conn, packet)
+	err = Send(conn, packet)
 	if err != nil {
 		log.Println("websocket: server.handleClose: Send: " + err.Error())
 	}
@@ -565,9 +604,12 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 
 // handleBadRequest by sending Close frame with status.
 func (serv *Server) handleBadRequest(conn int) {
-	frameClose := NewFrameClose(false, StatusBadRequest, nil)
+	var (
+		frameClose []byte = NewFrameClose(false, StatusBadRequest, nil)
+		err        error
+	)
 
-	err := Send(conn, frameClose)
+	err = Send(conn, frameClose)
 	if err != nil {
 		log.Println("websocket: server.handleBadRequest: " + err.Error())
 	}
@@ -582,9 +624,12 @@ func (serv *Server) handleBadRequest(conn int) {
 
 // handleInvalidData by sending Close frame with status 1007.
 func (serv *Server) handleInvalidData(conn int) {
-	frameClose := NewFrameClose(false, StatusInvalidData, nil)
+	var (
+		frameClose []byte = NewFrameClose(false, StatusInvalidData, nil)
+		err        error
+	)
 
-	err := Send(conn, frameClose)
+	err = Send(conn, frameClose)
 	if err != nil {
 		log.Println("websocket: server.handleInvalidData: " + err.Error())
 	}
@@ -614,9 +659,12 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	req.opcode = OpcodePong
 	req.masked = 0
 
-	res := req.pack()
+	var (
+		res []byte = req.pack()
+		err error
+	)
 
-	err := Send(conn, res)
+	err = Send(conn, res)
 	if err != nil {
 		log.Println("websocket: server.handlePing: " + err.Error())
 		serv.ClientRemove(conn)
@@ -635,24 +683,36 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 // server MAY send a Close frame with a status code of 1002 (protocol error)
 // as defined in Section 7.4.1. (RFC 6455, section 5.1, P27).
 func (serv *Server) reader() {
+	var (
+		frames    *Frames
+		frame     *Frame
+		err       error
+		packet    []byte
+		fds       []int
+		conn      int
+		max       int
+		x         int
+		isClosing bool
+	)
+
 	for {
-		fds, err := serv.poll.WaitRead()
+		fds, err = serv.poll.WaitRead()
 		if err != nil {
 			log.Println("websocket: Server.reader: " + err.Error())
 			break
 		}
 
-		for x := 0; x < len(fds); x++ {
-			conn := fds[x]
+		for x = 0; x < len(fds); x++ {
+			conn = fds[x]
 
-			packet, err := Recv(conn)
+			packet, err = Recv(conn)
 			if err != nil || len(packet) == 0 {
 				serv.ClientRemove(conn)
 				continue
 			}
 
 			if debug.Value >= 3 {
-				max := len(packet)
+				max = len(packet)
 				if max > 16 {
 					max = 16
 				}
@@ -661,12 +721,12 @@ func (serv *Server) reader() {
 			}
 
 			// Handle chopped, unfinished packet or payload.
-			frame, _ := serv.Clients.getFrame(conn)
+			frame, _ = serv.Clients.getFrame(conn)
 			if frame != nil {
 				packet = frame.unpack(packet)
 				if frame.isComplete {
 					serv.Clients.setFrame(conn, nil)
-					isClosing := serv.handleFrame(conn, frame)
+					isClosing = serv.handleFrame(conn, frame)
 					if isClosing {
 						continue
 					}
@@ -677,7 +737,7 @@ func (serv *Server) reader() {
 				}
 			}
 
-			frames := Unpack(packet)
+			frames = Unpack(packet)
 			if frames == nil {
 				serv.ClientRemove(conn)
 				continue
@@ -688,7 +748,7 @@ func (serv *Server) reader() {
 			}
 
 			var isClosing bool
-			for _, frame := range frames.v {
+			for _, frame = range frames.v {
 				if !frame.isComplete {
 					serv.Clients.setFrame(conn, frame)
 					continue
@@ -709,16 +769,22 @@ func (serv *Server) reader() {
 // pinger is a routine that send control PING frame to all client connections
 // every N seconds.
 func (serv *Server) pinger() {
-	pingTicker := time.NewTicker(16 * time.Second)
-	framePing := NewFramePing(false, nil)
+	var (
+		pingTicker *time.Ticker = time.NewTicker(16 * time.Second)
+		framePing  []byte       = NewFramePing(false, nil)
+
+		all  []int
+		conn int
+		err  error
+	)
 
 	for {
 		select {
 		case <-pingTicker.C:
-			all := serv.Clients.All()
+			all = serv.Clients.All()
 
-			for _, conn := range all {
-				err := Send(conn, framePing)
+			for _, conn = range all {
+				err = Send(conn, framePing)
 				if err != nil {
 					// Error on sending PING will be
 					// assumed as bad connection.
@@ -767,7 +833,7 @@ func (serv *Server) Start() (err error) {
 
 // Stop the server.
 func (serv *Server) Stop() {
-	err := unix.Close(serv.sock)
+	var err error = unix.Close(serv.sock)
 	if err != nil {
 		log.Println("websocket: Stop: unix.Close: " + err.Error())
 	}
@@ -781,13 +847,17 @@ func (serv *Server) Stop() {
 
 // sendResponse to client.
 func (serv *Server) sendResponse(conn int, res *Response) (err error) {
-	resb, err := json.Marshal(res)
+	var (
+		packet []byte
+	)
+
+	packet, err = json.Marshal(res)
 	if err != nil {
 		log.Println("websocket: server.sendResponse: " + err.Error())
 		return
 	}
 
-	packet := NewFrameText(false, resb)
+	packet = NewFrameText(false, packet)
 
 	err = Send(conn, packet)
 	if err != nil {

@@ -178,7 +178,10 @@ func (cl *Client) Close() (err error) {
 		return
 	}
 
-	packet := NewFrameClose(true, StatusNormal, nil)
+	var (
+		packet []byte = NewFrameClose(true, StatusNormal, nil)
+		timer  *time.Timer
+	)
 
 	cl.gracefulClose = make(chan bool, 1)
 
@@ -188,7 +191,7 @@ func (cl *Client) Close() (err error) {
 	}
 
 	// Wait for server to response with CLOSE.
-	timer := time.NewTimer(defaultTimeout)
+	timer = time.NewTimer(defaultTimeout)
 loop:
 	for {
 		select {
@@ -240,7 +243,7 @@ func (cl *Client) Connect() (err error) {
 	// response from server may include WebSocket frame, not just HTTP
 	// response.
 	if len(rest) > 0 {
-		isClosing := cl.handleRaw(rest)
+		var isClosing bool = cl.handleRaw(rest)
 		if isClosing {
 			return nil
 		}
@@ -307,8 +310,10 @@ func (cl *Client) parseURI() (err error) {
 		return err
 	}
 
-	serverAddress := cl.remoteURL.Hostname()
-	serverPort := cl.remoteURL.Port()
+	var (
+		serverAddress string = cl.remoteURL.Hostname()
+		serverPort    string = cl.remoteURL.Port()
+	)
 
 	switch cl.remoteURL.Scheme {
 	case schemeWSS, schemeHTTPS:
@@ -337,9 +342,11 @@ func (cl *Client) parseURI() (err error) {
 // If client "TLSConfig" field is not nil, the connection is opened with TLS
 // protocol and the remote name MUST have a valid certificate.
 func (cl *Client) open() (err error) {
-	dialer := &net.Dialer{
-		Timeout: 30 * time.Second,
-	}
+	var (
+		dialer = &net.Dialer{
+			Timeout: 30 * time.Second,
+		}
+	)
 
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Client.open: remoteAddr: %s\n",
@@ -361,9 +368,14 @@ func (cl *Client) open() (err error) {
 
 // handshake send the WebSocket opening handshake.
 func (cl *Client) handshake() (rest []byte, err error) {
-	var bb bytes.Buffer
+	var (
+		path      string = cl.remoteURL.EscapedPath()
+		key       []byte = generateHandshakeKey()
+		keyAccept string = generateHandshakeAccept(key)
 
-	path := cl.remoteURL.EscapedPath()
+		bb  bytes.Buffer
+		req []byte
+	)
 	if len(path) == 0 {
 		path = "/"
 	}
@@ -371,9 +383,6 @@ func (cl *Client) handshake() (rest []byte, err error) {
 	if len(cl.remoteURL.RawQuery) > 0 {
 		path += "?" + cl.remoteURL.RawQuery
 	}
-
-	key := generateHandshakeKey()
-	keyAccept := generateHandshakeAccept(key)
 
 	_, err = fmt.Fprintf(&bb, _handshakeReqFormat, path, cl.remoteURL.Host, key)
 	if err != nil {
@@ -388,7 +397,7 @@ func (cl *Client) handshake() (rest []byte, err error) {
 	}
 
 	bb.WriteString("\r\n")
-	req := bb.Bytes()
+	req = bb.Bytes()
 
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: Client.handshake:\n%s\n--\n", req)
@@ -402,39 +411,40 @@ func (cl *Client) handshake() (rest []byte, err error) {
 	return rest, nil
 }
 
-func (cl *Client) doHandshake(keyAccept string, req []byte) (
-	rest []byte, err error,
-) {
+func (cl *Client) doHandshake(keyAccept string, req []byte) (res []byte, err error) {
 	err = cl.send(req)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := cl.recv()
+	res, err = cl.recv()
 	if err != nil {
 		return nil, err
 	}
 
-	rest, err = cl.handleHandshake(keyAccept, resp)
+	res, err = cl.handleHandshake(keyAccept, res)
 	if err != nil {
 		return nil, err
 	}
 
-	return rest, nil
+	return res, nil
 }
 
 // handleBadRequest by sending Close frame with status.
 func (cl *Client) handleBadRequest() {
-	frameClose := NewFrameClose(true, StatusBadRequest, nil)
+	var (
+		frameClose []byte = NewFrameClose(true, StatusBadRequest, nil)
+		err        error
+	)
 
-	err := cl.send(frameClose)
+	err = cl.send(frameClose)
 	if err != nil {
 		log.Println("websocket: Client.handleBadRequest: " + err.Error())
 	}
 }
 
 // clientOnClose request from server.
-func clientOnClose(cl *Client, frame *Frame) error {
+func clientOnClose(cl *Client, frame *Frame) (err error) {
 	switch {
 	case frame.closeCode == 0:
 		frame.closeCode = StatusBadRequest
@@ -478,13 +488,13 @@ func clientOnClose(cl *Client, frame *Frame) error {
 		}
 	}
 
-	packet := NewFrameClose(true, frame.closeCode, frame.payload)
+	var packet []byte = NewFrameClose(true, frame.closeCode, frame.payload)
 
 	if debug.Value >= 3 {
 		fmt.Printf("websocket: clientOnClose: payload: %s\n", frame.payload)
 	}
 
-	err := cl.send(packet)
+	err = cl.send(packet)
 	if err != nil {
 		log.Println("websocket: clientOnClose: send: " + err.Error())
 	}
@@ -570,7 +580,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 
 	switch frame.opcode {
 	case OpcodeCont, OpcodeText, OpcodeBin:
-		isInvalid := cl.handleFragment(frame)
+		var isInvalid bool = cl.handleFragment(frame)
 		if isInvalid {
 			isClosing = true
 		}
@@ -609,7 +619,7 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
 	rest []byte, err error,
 ) {
 	if debug.Value >= 3 {
-		max := 512
+		var max int = 512
 		if len(resp) < 512 {
 			max = len(resp)
 		}
@@ -628,7 +638,7 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
 		return nil, fmt.Errorf(httpRes.Status)
 	}
 
-	gotAccept := httpRes.Header.Get(_hdrKeyWSAccept)
+	var gotAccept string = httpRes.Header.Get(_hdrKeyWSAccept)
 	if keyAccept != gotAccept {
 		return nil, fmt.Errorf("invalid server accept key")
 	}
@@ -638,9 +648,12 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
 
 // handleInvalidData by sending Close frame with status 1007.
 func (cl *Client) handleInvalidData() {
-	frameClose := NewFrameClose(true, StatusInvalidData, nil)
+	var (
+		frameClose []byte = NewFrameClose(true, StatusInvalidData, nil)
+		err        error
+	)
 
-	err := cl.send(frameClose)
+	err = cl.send(frameClose)
 	if err != nil {
 		log.Println("websocket: Client.handleInvalidData: " + err.Error())
 	}
@@ -648,13 +661,17 @@ func (cl *Client) handleInvalidData() {
 
 // handleRaw packet from server.
 func (cl *Client) handleRaw(packet []byte) (isClosing bool) {
-	frames := Unpack(packet)
+	var (
+		frames *Frames = Unpack(packet)
+		f      *Frame
+	)
+
 	if frames == nil {
 		log.Println("websocket: Client.handleRaw: incomplete frames received")
 		return false
 	}
 
-	for _, f := range frames.v {
+	for _, f = range frames.v {
 		if !f.isComplete {
 			cl.frame = f
 			continue
@@ -671,33 +688,33 @@ func (cl *Client) handleRaw(packet []byte) (isClosing bool) {
 // SendBin send data frame as binary to server.
 // If handler is nil, no response will be read from server.
 func (cl *Client) SendBin(payload []byte) error {
-	packet := NewFrameBin(true, payload)
+	var packet []byte = NewFrameBin(true, payload)
 	return cl.send(packet)
 }
 
 // sendClose send the control CLOSE frame to server.
 func (cl *Client) sendClose(status CloseCode, payload []byte) (err error) {
-	packet := NewFrameClose(true, status, payload)
+	var packet []byte = NewFrameClose(true, status, payload)
 	return cl.send(packet)
 }
 
 // SendPing send control PING frame to server, expecting PONG as response.
 func (cl *Client) SendPing(payload []byte) error {
-	packet := NewFramePing(true, payload)
+	var packet []byte = NewFramePing(true, payload)
 	return cl.send(packet)
 }
 
 // SendPong send the control frame PONG to server, by using payload from PING
 // frame.
 func (cl *Client) SendPong(payload []byte) error {
-	packet := NewFramePong(true, payload)
+	var packet []byte = NewFramePong(true, payload)
 	return cl.send(packet)
 }
 
 // SendText send data frame as text to server.
 // If handler is nil, no response will be read from server.
 func (cl *Client) SendText(payload []byte) (err error) {
-	packet := NewFrameText(true, payload)
+	var packet []byte = NewFrameText(true, payload)
 	return cl.send(packet)
 }
 
@@ -708,8 +725,15 @@ func (cl *Client) serve() {
 		return
 	}
 
+	var (
+		frame     *Frame
+		packet    []byte
+		err       error
+		isClosing bool
+	)
+
 	for {
-		packet, err := cl.recv()
+		packet, err = cl.recv()
 		if err != nil {
 			log.Println("websocket: Client.serve: " + err.Error())
 			break
@@ -724,9 +748,9 @@ func (cl *Client) serve() {
 		if cl.frame != nil {
 			packet = cl.frame.unpack(packet)
 			if cl.frame.isComplete {
-				frame := cl.frame
+				frame = cl.frame
 				cl.frame = nil
-				isClosing := cl.handleFrame(frame)
+				isClosing = cl.handleFrame(frame)
 				if isClosing {
 					return
 				}
@@ -736,7 +760,7 @@ func (cl *Client) serve() {
 			}
 		}
 
-		isClosing := cl.handleRaw(packet)
+		isClosing = cl.handleRaw(packet)
 		if isClosing {
 			return
 		}
@@ -749,16 +773,18 @@ func (cl *Client) serve() {
 // (e.g. lost connection) to release the resource.
 func (cl *Client) Quit() {
 	cl.Lock()
+	defer cl.Unlock()
+
 	if cl.conn == nil {
-		cl.Unlock()
 		return
 	}
-	err := cl.conn.Close()
+
+	var err error = cl.conn.Close()
 	if err != nil {
 		log.Println("websocket: client.Close: " + err.Error())
 	}
+
 	cl.conn = nil
-	cl.Unlock()
 	if cl.HandleQuit != nil {
 		cl.HandleQuit()
 	}
@@ -779,7 +805,13 @@ func (cl *Client) recv() (packet []byte, err error) {
 		return nil, ErrConnClosed
 	}
 
-	buf := make([]byte, 512)
+	var (
+		buf    []byte = make([]byte, 512)
+		neterr net.Error
+		max    int
+		n      int
+		ok     bool
+	)
 
 	for {
 		err = cl.conn.SetReadDeadline(time.Now().Add(defaultTimeout))
@@ -787,9 +819,9 @@ func (cl *Client) recv() (packet []byte, err error) {
 			break
 		}
 
-		n, err := cl.conn.Read(buf)
+		n, err = cl.conn.Read(buf)
 		if err != nil {
-			neterr, ok := err.(net.Error)
+			neterr, ok = err.(net.Error)
 			if ok && neterr.Timeout() {
 				continue
 			}
@@ -806,12 +838,11 @@ func (cl *Client) recv() (packet []byte, err error) {
 	}
 
 	if debug.Value >= 3 {
-		max := len(packet)
+		max = len(packet)
 		if max > 16 {
 			max = 16
 		}
-		fmt.Printf("websocket: Client.recv: packet: len:%d % x\n",
-			len(packet), packet[:max])
+		fmt.Printf("websocket: Client.recv: packet: len:%d % x\n", len(packet), packet[:max])
 	}
 
 	return packet, err
@@ -828,7 +859,7 @@ func (cl *Client) send(packet []byte) (err error) {
 	}
 
 	if debug.Value >= 3 {
-		max := len(packet)
+		var max int = len(packet)
 		if max > 16 {
 			max = 16
 		}
@@ -845,9 +876,11 @@ func (cl *Client) send(packet []byte) (err error) {
 
 // pinger send the PING control frame every 10 seconds.
 func (cl *Client) pinger() {
-	var err error
+	var (
+		t   *time.Ticker = time.NewTicker(cl.PingInterval)
+		err error
+	)
 
-	t := time.NewTicker(cl.PingInterval)
 	for range t.C {
 		err = cl.SendPing(nil)
 		if err != nil {

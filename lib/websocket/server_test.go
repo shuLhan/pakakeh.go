@@ -23,7 +23,7 @@ func createClient(t *testing.T, endpoint string) (cl *Client) {
 		Endpoint: endpoint,
 	}
 
-	err := cl.parseURI()
+	var err error = cl.parseURI()
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -39,17 +39,24 @@ func createClient(t *testing.T, endpoint string) (cl *Client) {
 }
 
 func TestServerHandshake(t *testing.T) {
-	wsURL, err := url.ParseRequestURI(_testWSAddr)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
+	type testCase struct {
 		desc     string
 		req      *http.Request
 		query    url.Values
 		expError string
-	}{{
+	}
+
+	var (
+		wsURL *url.URL
+		err   error
+	)
+
+	wsURL, err = url.ParseRequestURI(_testWSAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var cases = []testCase{{
 		desc: "With valid request and authorization",
 		req: &http.Request{
 			Method: http.MethodGet,
@@ -229,19 +236,27 @@ func TestServerHandshake(t *testing.T) {
 		expError: "400 Missing authorization",
 	}}
 
-	var bb bytes.Buffer
+	var (
+		bb   bytes.Buffer
+		c    testCase
+		cl   *Client
+		v    []string
+		path string
+		k    string
+		x    int
+	)
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c.desc)
 
 		bb.Reset()
-		cl := createClient(t, _testWSAddr)
-		path := c.req.URL.EscapedPath() + "?" + c.query.Encode()
+		cl = createClient(t, _testWSAddr)
+		path = c.req.URL.EscapedPath() + "?" + c.query.Encode()
 
 		fmt.Fprintf(&bb, "%s %s HTTP/1.1\r\n", c.req.Method, path)
 
-		for k, v := range c.req.Header {
-			for x := range v {
+		for k, v = range c.req.Header {
+			for x = range v {
 				fmt.Fprintf(&bb, "%s: %s\r\n", k, v[x])
 			}
 		}
@@ -256,7 +271,12 @@ func TestServerHandshake(t *testing.T) {
 }
 
 func TestServer_Health(t *testing.T) {
-	res, err := http.Get("http://" + _testAddr + "/status")
+	var (
+		res *http.Response
+		err error
+	)
+
+	res, err = http.Get("http://" + _testAddr + "/status")
 	if err != nil {
 		t.Fatal(err)
 	}

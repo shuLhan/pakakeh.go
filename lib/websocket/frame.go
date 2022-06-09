@@ -120,7 +120,7 @@ func NewFrameClose(isMasked bool, code CloseCode, payload []byte) []byte {
 	// If there is a body, the first two bytes of the body MUST be a
 	// 2-byte unsigned integer (in network byte order) representing a
 	// status code.
-	packet := make([]byte, 2+len(payload))
+	var packet []byte = make([]byte, 2+len(payload))
 	binary.BigEndian.PutUint16(packet[:2], uint16(code))
 	copy(packet[2:], payload)
 
@@ -157,7 +157,7 @@ func newControlFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
 // NewFrame create a single finished frame with specific operation code and
 // optional payload.
 func NewFrame(opcode Opcode, isMasked bool, payload []byte) []byte {
-	f := &Frame{
+	var f = &Frame{
 		fin:     frameIsFinished,
 		opcode:  opcode,
 		payload: payload,
@@ -230,8 +230,14 @@ func (f *Frame) Opcode() Opcode {
 // A server MUST NOT mask any frames that it sends to the client.
 // (RFC 6455 5.1-P27).
 func (f *Frame) pack() (out []byte) {
-	headerSize := uint64(2)
-	payloadSize := uint64(len(f.payload))
+	var (
+		headerSize  = uint64(2)
+		payloadSize = uint64(len(f.payload))
+
+		frameSize uint64
+		y         uint64
+		x         int
+	)
 
 	switch {
 	case payloadSize > math.MaxUint16:
@@ -248,10 +254,8 @@ func (f *Frame) pack() (out []byte) {
 		headerSize += 4
 	}
 
-	frameSize := headerSize + payloadSize
+	frameSize = headerSize + payloadSize
 	out = make([]byte, frameSize)
-
-	x := 0
 
 	out[x] = f.fin | byte(f.opcode)
 	x++
@@ -283,7 +287,7 @@ func (f *Frame) pack() (out []byte) {
 		out[x] = f.maskKey[3]
 		x++
 
-		for y := uint64(0); y < payloadSize; y++ {
+		for y = 0; y < payloadSize; y++ {
 			out[x] = f.payload[y] ^ f.maskKey[y%4]
 			x++
 		}
@@ -324,7 +328,10 @@ func (f *Frame) Payload() []byte {
 //	|                     Payload Data continued ...                |
 //	+---------------------------------------------------------------+
 func (f *Frame) unpack(packet []byte) []byte {
-	var isHaveLen bool
+	var (
+		exp       int
+		isHaveLen bool
+	)
 	for !isHaveLen {
 		switch len(f.chopped) {
 		case 0:
@@ -349,7 +356,7 @@ func (f *Frame) unpack(packet []byte) []byte {
 			switch f.len {
 			case frameLargePayload:
 				if len(f.chopped) < 10 {
-					exp := 10 - len(f.chopped)
+					exp = 10 - len(f.chopped)
 					if len(packet) < exp {
 						f.chopped = append(f.chopped,
 							packet...)
@@ -365,7 +372,7 @@ func (f *Frame) unpack(packet []byte) []byte {
 				}
 			case frameMediumPayload:
 				if len(f.chopped) < 4 {
-					exp := 4 - len(f.chopped)
+					exp = 4 - len(f.chopped)
 					if len(packet) < exp {
 						f.chopped = append(f.chopped,
 							packet...)
@@ -386,7 +393,7 @@ func (f *Frame) unpack(packet []byte) []byte {
 			return nil
 		}
 
-		exp := 4 - len(f.maskKey)
+		exp = 4 - len(f.maskKey)
 		if len(packet) < exp {
 			f.maskKey = append(f.maskKey, packet...)
 			return nil
@@ -408,21 +415,24 @@ func (f *Frame) unpack(packet []byte) []byte {
 		return nil
 	}
 
-	exp := f.len - uint64(len(f.payload))
-	if uint64(len(packet)) < exp {
-		exp = uint64(len(packet))
+	var vuint64 uint64 = f.len - uint64(len(f.payload))
+	if uint64(len(packet)) < vuint64 {
+		vuint64 = uint64(len(packet))
 	}
 
 	if f.masked == frameIsMasked {
-		start := len(f.payload) % 4
-		for x := uint64(0); x < exp; x++ {
+		var (
+			start int = len(f.payload) % 4
+			x     uint64
+		)
+		for ; x < vuint64; x++ {
 			packet[x] ^= f.maskKey[start%4]
 			start++
 		}
 	}
 
-	f.payload = append(f.payload, packet[:exp]...)
-	packet = packet[exp:]
+	f.payload = append(f.payload, packet[:vuint64]...)
+	packet = packet[vuint64:]
 
 	if uint64(len(f.payload)) == f.len {
 		if f.opcode == OpcodeClose {

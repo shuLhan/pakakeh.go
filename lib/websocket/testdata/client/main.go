@@ -15,32 +15,37 @@ import (
 )
 
 func main() {
-	var wg sync.WaitGroup
-	var done int
-	var clients []*websocket.Client = make([]*websocket.Client, 0, 301)
+	var (
+		clients []*websocket.Client = make([]*websocket.Client, 0, 301)
+		cl      *websocket.Client
+		wg      sync.WaitGroup
+		err     error
+		done    int
+		x       int
+	)
 
-	handleBin := func(cl *websocket.Client, frame *websocket.Frame) (err error) {
+	var handleBin = func(cl *websocket.Client, frame *websocket.Frame) (err error) {
 		err = cl.SendBin(frame.Payload())
 		if err != nil {
 			log.Fatal("client: SendBin: " + err.Error())
 		}
 		return
 	}
-	handleText := func(cl *websocket.Client, frame *websocket.Frame) (err error) {
+	var handleText = func(cl *websocket.Client, frame *websocket.Frame) (err error) {
 		err = cl.SendText(frame.Payload())
 		if err != nil {
 			log.Fatal("client: SendText: " + err.Error())
 		}
 		return
 	}
-	handleQuit := func() {
+	var handleQuit = func() {
 		done++
 		wg.Done()
 		fmt.Printf(">>> DONE %d\n", done)
 	}
 
-	for x := 1; x <= 301; x++ {
-		cl := &websocket.Client{
+	for x = 1; x <= 301; x++ {
+		cl = &websocket.Client{
 			Endpoint:   fmt.Sprintf("ws://127.0.0.1:9001/runCase?case=%d&agent=libwebsocket", x),
 			HandleBin:  handleBin,
 			HandleText: handleText,
@@ -48,7 +53,7 @@ func main() {
 		}
 
 		wg.Add(1)
-		err := cl.Connect()
+		err = cl.Connect()
 		if err != nil {
 			log.Fatal(err)
 		}

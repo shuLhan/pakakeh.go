@@ -110,7 +110,7 @@ func (h *Handshake) reset(req []byte) {
 }
 
 func (h *Handshake) getBytesChunk(sep byte, tolower bool) (chunk []byte) {
-	cr := false
+	var cr bool
 	for h.end = h.start; h.end < len(h.raw); h.end++ {
 		if h.raw[h.end] != sep {
 			if h.raw[h.end] == '\r' {
@@ -174,7 +174,7 @@ func (h *Handshake) parseHTTPLine() (err error) {
 
 // parseHeader of HTTP request.
 func (h *Handshake) parseHeader() (k, v []byte, err error) {
-	chunk := h.getBytesChunk(':', true)
+	var chunk []byte = h.getBytesChunk(':', true)
 	if len(chunk) == 0 {
 		return
 	}
@@ -198,8 +198,10 @@ func (h *Handshake) parseHeader() (k, v []byte, err error) {
 }
 
 func (h *Handshake) headerValueContains(hv, sub []byte) bool {
-	start := 0
-	x := 0
+	var (
+		start int
+		x     int
+	)
 	for ; x < len(hv); x++ {
 		if hv[x] != ',' {
 			if hv[x] == ' ' {
@@ -333,7 +335,9 @@ func (h *Handshake) parse() (err error) {
 	}
 
 	var (
-		k, v []byte
+		headerKey   string
+		headerValue string
+		k, v        []byte
 	)
 
 	h.Header = make(http.Header)
@@ -347,8 +351,8 @@ func (h *Handshake) parse() (err error) {
 			break
 		}
 
-		headerKey := string(bytes.TrimSpace(k))
-		headerValue := string(bytes.TrimSpace(v))
+		headerKey = string(bytes.TrimSpace(k))
+		headerValue = string(bytes.TrimSpace(v))
 		h.Header.Set(headerKey, headerValue)
 
 		switch headerKey {
@@ -421,7 +425,7 @@ func (h *Handshake) parse() (err error) {
 		}
 	}
 
-	requiredFlags := _hdrFlagHost | _hdrFlagConn | _hdrFlagUpgrade | _hdrFlagWSKey | _hdrFlagWSVersion
+	var requiredFlags int = _hdrFlagHost | _hdrFlagConn | _hdrFlagUpgrade | _hdrFlagWSKey | _hdrFlagWSVersion
 
 	if h.headerFlags&requiredFlags != requiredFlags {
 		return ErrMissingRequiredHeader

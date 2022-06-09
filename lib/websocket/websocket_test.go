@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"strconv"
 	"testing"
@@ -37,11 +38,12 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 
 	payload[0] = 'A'
 
-	for x := uint64(1); x < size; x *= 2 {
+	var x uint64
+	for x = 1; x < size; x *= 2 {
 		copy(payload[x:], payload[:x])
 	}
 
-	for x := uint64(0); x < size; x++ {
+	for x = 0; x < size; x++ {
 		masked[x] = payload[x] ^ _testMaskKey[x%4]
 	}
 
@@ -50,9 +52,12 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 
 // testHandleText from websocket by echo-ing back the payload.
 func testHandleText(conn int, payload []byte) {
-	packet := NewFrameText(false, payload)
+	var (
+		packet []byte = NewFrameText(false, payload)
+		err    error
+	)
 
-	err := Send(conn, packet)
+	err = Send(conn, packet)
 	if err != nil {
 		log.Println("handlePayloadText: " + err.Error())
 	}
@@ -60,9 +65,12 @@ func testHandleText(conn int, payload []byte) {
 
 // testHandleBin from websocket by echo-ing back the payload.
 func testHandleBin(conn int, payload []byte) {
-	packet := NewFrameBin(false, payload)
+	var (
+		packet []byte = NewFrameBin(false, payload)
+		err    error
+	)
 
-	err := Send(conn, packet)
+	err = Send(conn, packet)
 	if err != nil {
 		log.Println("handlePayloadBin: " + err.Error())
 	}
@@ -70,9 +78,13 @@ func testHandleBin(conn int, payload []byte) {
 
 // testHandleAuth with token in query parameter
 func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
-	q := req.URL.Query()
+	var (
+		q url.Values = req.URL.Query()
 
-	extJWT := q.Get(_qKeyTicket)
+		extJWT string
+	)
+
+	extJWT = q.Get(_qKeyTicket)
 	if len(extJWT) == 0 {
 		return nil, fmt.Errorf("Missing authorization")
 	}
@@ -85,19 +97,21 @@ func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 }
 
 func runTestServer() {
-	var err error
-
 	_testAddr = "127.0.0.1:" + strconv.Itoa(_testPort)
 	_testWSAddr = "ws://" + _testAddr + "/"
 	_testEndpointAuth = _testWSAddr + "?" + _qKeyTicket + "=" +
 		_testExternalJWT
 
-	opts := &ServerOptions{
-		Address:    _testAddr,
-		HandleAuth: testHandleAuth,
-		HandleBin:  testHandleBin,
-		HandleText: testHandleText,
-	}
+	var (
+		opts = &ServerOptions{
+			Address:    _testAddr,
+			HandleAuth: testHandleAuth,
+			HandleBin:  testHandleBin,
+			HandleText: testHandleText,
+		}
+
+		err error
+	)
 	_testServer = NewServer(opts)
 
 	go func() {

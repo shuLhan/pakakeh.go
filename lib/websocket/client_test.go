@@ -193,7 +193,7 @@ func TestClientPing(t *testing.T) {
 	)
 
 	for _, c = range cases {
-		c := c
+		var c testCase = c
 		t.Log(c.desc)
 
 		if c.reconnect {
@@ -204,7 +204,8 @@ func TestClientPing(t *testing.T) {
 		}
 
 		testClient.handleClose = func(cl *Client, got *Frame) error {
-			exp := c.expClose
+			var exp *Frame = c.expClose
+
 			test.Assert(t, "close", exp, got)
 
 			if len(got.payload) >= 2 {
@@ -218,8 +219,10 @@ func TestClientPing(t *testing.T) {
 		}
 
 		testClient.handlePong = func(cl *Client, got *Frame) (err error) {
-			exp := c.exp
+			var exp *Frame = c.exp
+
 			test.Assert(t, "handlePong", exp, got)
+
 			wg.Done()
 			return nil
 		}
@@ -336,7 +339,7 @@ func TestClientText(t *testing.T) {
 	)
 
 	for _, c = range cases {
-		c := c
+		var c testCase = c
 		t.Log(c.desc)
 
 		if c.reconnect {
@@ -347,7 +350,7 @@ func TestClientText(t *testing.T) {
 		}
 
 		testClient.handleClose = func(cl *Client, got *Frame) error {
-			exp := c.expClose
+			var exp *Frame = c.expClose
 			test.Assert(t, "close", exp, got)
 			cl.sendClose(got.closeCode, got.payload)
 			cl.Quit()
@@ -356,7 +359,7 @@ func TestClientText(t *testing.T) {
 		}
 
 		testClient.HandleText = func(cl *Client, got *Frame) error {
-			exp := c.exp
+			var exp *Frame = c.exp
 			test.Assert(t, "text", exp, got)
 			wg.Done()
 			return nil
@@ -617,6 +620,7 @@ func TestClientSendBin(t *testing.T) {
 			Endpoint: _testEndpointAuth,
 		}
 
+		c   testCase
 		wg  sync.WaitGroup
 		err error
 	)
@@ -638,15 +642,12 @@ func TestClientSendBin(t *testing.T) {
 		},
 	}}
 
-	var (
-		c testCase
-	)
-
 	for _, c = range cases {
-		c := c
-		t.Log(c.desc)
+		var cc testCase = c
 
-		if c.reconnect {
+		t.Log(cc.desc)
+
+		if cc.reconnect {
 			err = testClient.Connect()
 			if err != nil {
 				t.Fatal(err)
@@ -654,14 +655,14 @@ func TestClientSendBin(t *testing.T) {
 		}
 
 		testClient.HandleBin = func(cl *Client, got *Frame) error {
-			exp := c.exp
+			var exp *Frame = cc.exp
 			test.Assert(t, "HandleBin", exp, got)
 			wg.Done()
 			return nil
 		}
 
 		wg.Add(1)
-		err := testClient.SendBin(c.payload)
+		err = testClient.SendBin(cc.payload)
 		if err != nil {
 			t.Fatal("TestSendBin: " + err.Error())
 		}
@@ -720,18 +721,18 @@ func TestClientSendPing(t *testing.T) {
 	)
 
 	for _, c = range cases {
-		c := c
-		t.Log(c.desc)
+		var cc testCase = c
+		t.Log(cc.desc)
 
 		testClient.handlePong = func(cl *Client, got *Frame) error {
-			exp := c.exp
+			var exp *Frame = cc.exp
 			test.Assert(t, "handlePong", exp, got)
 			wg.Done()
 			return nil
 		}
 
 		wg.Add(1)
-		err = testClient.SendPing(c.payload)
+		err = testClient.SendPing(cc.payload)
 		if err != nil {
 			t.Fatal("TestSendPing: " + err.Error())
 		}
@@ -750,15 +751,17 @@ func TestClient_sendClose(t *testing.T) {
 			Endpoint: _testEndpointAuth,
 		}
 		wg sync.WaitGroup
+
+		err error
 	)
 
-	err := testClient.Connect()
+	err = testClient.Connect()
 	if err != nil {
 		t.Fatal("TestClient_sendClose: Connect: " + err.Error())
 	}
 
 	testClient.handleClose = func(cl *Client, got *Frame) error {
-		exp := &Frame{
+		var exp = &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusNormal,

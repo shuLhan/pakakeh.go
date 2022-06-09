@@ -24,20 +24,24 @@ type Frames struct {
 //
 // On success it will return one or more frames.
 // On fail it will return zero frame.
-func Unpack(in []byte) (frames *Frames) {
-	if len(in) == 0 {
+func Unpack(packet []byte) (frames *Frames) {
+	if len(packet) == 0 {
 		return
 	}
 
 	frames = &Frames{}
-	packet := in
+
+	var (
+		f *Frame
+	)
+
 	for len(packet) > 0 {
-		f := &Frame{}
+		f = &Frame{}
 		packet = f.unpack(packet)
 		frames.Append(f)
 	}
 
-	return
+	return frames
 }
 
 // Append a frame as part of continuous frame.
@@ -54,7 +58,8 @@ func (frames *Frames) Append(f *Frame) {
 func (frames *Frames) fin(last *Frame) (frame *Frame) {
 	frame = frames.v[0]
 
-	for x := 1; x < len(frames.v); x++ {
+	var x int
+	for x = 1; x < len(frames.v); x++ {
 		if frames.v[x].opcode == OpcodeClose {
 			break
 		}
@@ -79,7 +84,9 @@ func (frames *Frames) isClosed() bool {
 	if len(frames.v) == 0 {
 		return false
 	}
-	for x := 0; x < len(frames.v); x++ {
+
+	var x int
+	for ; x < len(frames.v); x++ {
 		if frames.v[x].opcode == OpcodeClose {
 			return true
 		}
@@ -110,7 +117,8 @@ func (frames *Frames) payload() (payload []byte) {
 		return
 	}
 
-	for x := 0; x < len(frames.v); x++ {
+	var x int
+	for ; x < len(frames.v); x++ {
 		if frames.v[x].opcode == OpcodeClose {
 			break
 		}

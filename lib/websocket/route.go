@@ -46,8 +46,8 @@ func (r *route) addChild(isParam bool, name string) (c *route, err error) {
 
 // getChild of current route which has the same isParam and name value.  It
 // will return nil if not found.
-func (r *route) getChild(isParam bool, name string) *route {
-	for _, c := range r.childs {
+func (r *route) getChild(isParam bool, name string) (c *route) {
+	for _, c = range r.childs {
 		if isParam == c.isParam && name == c.name {
 			return c
 		}
@@ -56,8 +56,8 @@ func (r *route) getChild(isParam bool, name string) *route {
 }
 
 // getChildAsParam return child route which type is parameter.
-func (r *route) getChildAsParam() *route {
-	for _, c := range r.childs {
+func (r *route) getChildAsParam() (c *route) {
+	for _, c = range r.childs {
 		if c.isParam {
 			return c
 		}
@@ -68,7 +68,12 @@ func (r *route) getChildAsParam() *route {
 // String return route representation as string.  This function is to prevent
 // formatted print to print pointer to route as address.
 func (r *route) String() (out string) {
-	bb := _bbPool.Get().(*bytes.Buffer)
+	var (
+		bb *bytes.Buffer = _bbPool.Get().(*bytes.Buffer)
+
+		c *route
+		x int
+	)
 	bb.Reset()
 
 	fmt.Fprintf(bb, "{name:%s", r.name)
@@ -76,7 +81,7 @@ func (r *route) String() (out string) {
 	fmt.Fprintf(bb, " handler:%v", r.handler)
 	bb.WriteString(" childs:[")
 
-	for x, c := range r.childs {
+	for x, c = range r.childs {
 		if x > 0 {
 			bb.WriteByte(' ')
 		}

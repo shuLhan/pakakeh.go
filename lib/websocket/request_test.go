@@ -14,7 +14,7 @@ import (
 )
 
 func TestRequestReset(t *testing.T) {
-	req := _reqPool.Get().(*Request)
+	var req *Request = _reqPool.Get().(*Request)
 
 	req.reset()
 
@@ -32,17 +32,21 @@ func testHandleGet(ctx context.Context, req *Request) (res Response) {
 }
 
 func TestRequestUnpack(t *testing.T) {
-	rootRoutes := newRootRoute()
+	type testCase struct {
+		desc      string
+		req       *Request
+		expParams targetParam
+		expQuery  url.Values
+		expErr    string
+	}
+
+	var (
+		rootRoutes = newRootRoute()
+	)
+
 	_ = rootRoutes.add(http.MethodGet, "/get/:id", testHandleGet)
 
-	cases := []struct {
-		desc       string
-		req        *Request
-		expParams  targetParam
-		expQuery   url.Values
-		expHandler RouteHandler
-		expErr     string
-	}{{
+	var cases = []testCase{{
 		desc: "With empty Target",
 		req:  &Request{},
 	}, {
@@ -72,7 +76,6 @@ func TestRequestUnpack(t *testing.T) {
 		expParams: targetParam{
 			"id": "1",
 		},
-		expHandler: testHandleGet,
 	}, {
 		desc: "With query",
 		req: &Request{
@@ -85,13 +88,17 @@ func TestRequestUnpack(t *testing.T) {
 		expQuery: url.Values{
 			"q": []string{"2"},
 		},
-		expHandler: testHandleGet,
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		err error
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		_, err := c.req.unpack(rootRoutes)
+		_, err = c.req.unpack(rootRoutes)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue

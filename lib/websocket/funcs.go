@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"math/rand"
+	"syscall"
 
 	"golang.org/x/sys/unix"
 )
@@ -22,10 +23,13 @@ const maxBuffer = 1024
 //
 // On fail it will return nil buffer and error.
 func Recv(fd int) (packet []byte, err error) {
-	buf := make([]byte, maxBuffer)
+	var (
+		buf []byte = make([]byte, maxBuffer)
+		n   int
+	)
 
 	for {
-		n, err := unix.Read(fd, buf)
+		n, err = unix.Read(fd, buf)
 		if err != nil {
 			break
 		}
@@ -43,7 +47,10 @@ func Recv(fd int) (packet []byte, err error) {
 // Send the packet through web socket file descriptor `fd`.
 func Send(fd int, packet []byte) (err error) {
 	var (
-		n, max int
+		errno syscall.Errno
+		max   int
+		n     int
+		ok    bool
 	)
 
 	for len(packet) > 0 {
@@ -55,7 +62,7 @@ func Send(fd int, packet []byte) (err error) {
 
 		n, err = unix.Write(fd, packet[:max])
 		if err != nil {
-			errno, ok := err.(unix.Errno)
+			errno, ok = err.(unix.Errno)
 			if ok {
 				if errno == unix.EAGAIN {
 					continue
@@ -79,14 +86,14 @@ func Send(fd int, packet []byte) (err error) {
 // Section 4 of [RFC4648]) this 20-byte hash.
 func generateHandshakeAccept(key []byte) string {
 	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
-	sum := sha1.Sum(key)
+	var sum [20]byte = sha1.Sum(key)
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
 
 // generateHandshakeKey randomly selected 16-byte value that has been
 // base64-encoded (see Section 4 of [RFC4648]).
 func generateHandshakeKey() (key []byte) {
-	bkey := make([]byte, 16)
+	var bkey []byte = make([]byte, 16)
 
 	binary.LittleEndian.PutUint64(bkey[0:8], rand.Uint64())
 	binary.LittleEndian.PutUint64(bkey[8:16], rand.Uint64())

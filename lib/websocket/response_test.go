@@ -11,7 +11,7 @@ import (
 )
 
 func TestResponseReset(t *testing.T) {
-	res := _resPool.Get().(*Response)
+	var res *Response = _resPool.Get().(*Response)
 
 	res.reset()
 

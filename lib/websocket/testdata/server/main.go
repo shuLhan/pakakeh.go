@@ -15,9 +15,12 @@ import (
 
 // handleBin from websocket by echo-ing back the payload.
 func handleBin(conn int, payload []byte) {
-	packet := websocket.NewFrameBin(false, payload)
+	var (
+		packet []byte = websocket.NewFrameBin(false, payload)
+		err    error
+	)
 
-	err := websocket.Send(conn, packet)
+	err = websocket.Send(conn, packet)
 	if err != nil {
 		log.Println("handleBin: " + err.Error())
 	}
@@ -25,27 +28,34 @@ func handleBin(conn int, payload []byte) {
 
 // handleText from websocket by echo-ing back the payload.
 func handleText(conn int, payload []byte) {
-	packet := websocket.NewFrameText(false, payload)
+	var (
+		packet []byte = websocket.NewFrameText(false, payload)
+		err    error
+	)
 
 	if debug.Value >= 3 {
 		log.Printf("testdata/server: handleText: {payload.len:%d}\n", len(payload))
 	}
 
-	err := websocket.Send(conn, packet)
+	err = websocket.Send(conn, packet)
 	if err != nil {
 		log.Println("handleText: " + err.Error())
 	}
 }
 
 func main() {
-	opts := &websocket.ServerOptions{
-		Address:    "127.0.0.1:9001",
-		HandleBin:  handleBin,
-		HandleText: handleText,
-	}
-	srv := websocket.NewServer(opts)
+	var (
+		opts = &websocket.ServerOptions{
+			Address:    "127.0.0.1:9001",
+			HandleBin:  handleBin,
+			HandleText: handleText,
+		}
+		srv = websocket.NewServer(opts)
 
-	err := srv.Start()
+		err error
+	)
+
+	err = srv.Start()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -156,7 +156,7 @@ func testRootRouteAdd(t *testing.T) {
 		got *route
 	)
 	for _, c = range cases {
-		t.Log(c.method + " " + c.target)
+		t.Logf("%s: %s %s", c.desc, c.method, c.target)
 
 		err = _testRootRoute.add(c.method, c.target, c.handler)
 		if err != nil {
@@ -172,7 +172,6 @@ func testRootRouteAdd(t *testing.T) {
 func testRootRouteGet(t *testing.T) {
 	type testCase struct {
 		expParams targetParam
-		desc      string
 		method    string
 		target    string
 		expTarget string
@@ -184,15 +183,15 @@ func testRootRouteGet(t *testing.T) {
 		expTarget: "/:id/xyz",
 		expParams: targetParam{"id": "1000"},
 	}, {
-		desc:   "Invalid method",
+		// Invalid method
 		method: "PUSH",
 		target: "/1000/xyz",
 	}, {
-		desc:   "Invalid target",
+		// Invalid target
 		method: _testDefMethod,
 		target: "1000/xy",
 	}, {
-		desc:   "Invalid target",
+		// Invalid target
 		method: _testDefMethod,
 		target: "/1000/xy",
 	}, {

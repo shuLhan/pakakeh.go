@@ -55,7 +55,7 @@ func NewChatClient(user *examples.Account) (cc *ChatClient) {
 		os.Exit(0)
 	}
 
-	err := cc.conn.Connect()
+	var err error = cc.conn.Connect()
 	if err != nil {
 		log.Fatal("Connect: " + err.Error())
 	}
@@ -67,12 +67,18 @@ func NewChatClient(user *examples.Account) (cc *ChatClient) {
 
 // Start the chat client.
 func (cc *ChatClient) Start() {
-	req := &websocket.Request{
-		Method: http.MethodPost,
-		Target: "/message",
-	}
+	var (
+		req = &websocket.Request{
+			Method: http.MethodPost,
+			Target: "/message",
+		}
 
-	reader := bufio.NewReader(os.Stdin)
+		reader *bufio.Reader
+		packet []byte
+		err    error
+	)
+
+	reader = bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print(cc.user.Name + "> ")
 
@@ -84,7 +90,7 @@ func (cc *ChatClient) Start() {
 
 		req.ID = uint64(time.Now().Unix())
 
-		packet, err := json.Marshal(req)
+		packet, err = json.Marshal(req)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -98,7 +104,9 @@ func (cc *ChatClient) Start() {
 
 // handleText process response from request or broadcast from server.
 func (cc *ChatClient) handleText(cl *websocket.Client, frame *websocket.Frame) (err error) {
-	res := &websocket.Response{}
+	var (
+		res = &websocket.Response{}
+	)
 
 	err = json.Unmarshal(frame.Payload(), res)
 	if err != nil {
@@ -126,17 +134,25 @@ func main() {
 		return
 	}
 
-	uid, err := strconv.Atoi(os.Args[1])
+	var (
+		user *examples.Account
+		cc   *ChatClient
+		err  error
+		uid  int
+		ok   bool
+	)
+
+	uid, err = strconv.Atoi(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	user, ok := examples.Users[int64(uid)]
+	user, ok = examples.Users[int64(uid)]
 	if !ok {
 		log.Fatalf("invalid user id: %d", uid)
 	}
 
-	cc := NewChatClient(user)
+	cc = NewChatClient(user)
 
 	cc.Start()
 }

@@ -53,20 +53,23 @@ type Response struct {
 // NewBroadcast create a new message for broadcast by server encoded as JSON
 // and wrapped in TEXT frame.
 func NewBroadcast(message, body string) (packet []byte, err error) {
-	res := _resPool.Get().(*Response)
+	var (
+		res *Response = _resPool.Get().(*Response)
+	)
+
 	res.reset()
 
 	res.Message = message
 	res.Body = body
 
-	payload, err := json.Marshal(res)
+	packet, err = json.Marshal(res)
 	if err != nil {
 		return nil, err
 	}
 
 	_resPool.Put(res)
 
-	packet = NewFrameText(false, payload)
+	packet = NewFrameText(false, packet)
 
 	return packet, nil
 }

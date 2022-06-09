@@ -21,19 +21,22 @@ var server *websocket.Server
 func main() {
 	log.SetFlags(0)
 
-	opts := &websocket.ServerOptions{
-		Address: ":9001",
-		// Register the authentication handler.
-		HandleAuth:         handleAuth,
-		HandleClientAdd:    handleClientAdd,
-		HandleClientRemove: handleClientRemove,
-	}
+	var (
+		opts = &websocket.ServerOptions{
+			Address: ":9001",
+			// Register the authentication handler.
+			HandleAuth:         handleAuth,
+			HandleClientAdd:    handleClientAdd,
+			HandleClientRemove: handleClientRemove,
+		}
+
+		err error
+	)
 
 	server = websocket.NewServer(opts)
 
-	// Register the message handler
-	err := server.RegisterTextHandler(http.MethodPost, "/message",
-		handlePostMessage)
+	// Register the message handler.
+	err = server.RegisterTextHandler(http.MethodPost, "/message", handlePostMessage)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,9 +49,13 @@ func main() {
 // handleAuth authenticated the new connection by checking the Header "Key"
 // value.
 func handleAuth(req *websocket.Handshake) (ctx context.Context, err error) {
-	key := req.Header.Get("Key")
+	var (
+		key  string = req.Header.Get("Key")
+		id   int64
+		user *examples.Account
+	)
 
-	for id, user := range examples.Users {
+	for id, user = range examples.Users {
 		if user.Key == key {
 			ctx = context.WithValue(context.Background(),
 				websocket.CtxKeyUID, id)
@@ -63,21 +70,27 @@ func handleAuth(req *websocket.Handshake) (ctx context.Context, err error) {
 func handleClientAdd(ctx context.Context, conn int) {
 	log.Printf("server: adding client %d ...", conn)
 
-	uid := ctx.Value(websocket.CtxKeyUID).(int64)
-	user := examples.Users[uid]
+	var (
+		uid    int64             = ctx.Value(websocket.CtxKeyUID).(int64)
+		user   *examples.Account = examples.Users[uid]
+		body   string
+		packet []byte
+		err    error
+		c      int
+	)
 
 	// Broadcast to other connections that new user is connected.
-	body := user.Name + " joining conversation..."
-	packet, err := websocket.NewBroadcast(examples.BroadcastSystem, body)
+	body = user.Name + " joining conversation..."
+	packet, err = websocket.NewBroadcast(examples.BroadcastSystem, body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, c := range server.Clients.All() {
+	for _, c = range server.Clients.All() {
 		if c == conn {
 			continue
 		}
-		err := websocket.Send(c, packet)
+		err = websocket.Send(c, packet)
 		if err != nil {
 			log.Println(err)
 		}
@@ -89,21 +102,27 @@ func handleClientAdd(ctx context.Context, conn int) {
 func handleClientRemove(ctx context.Context, conn int) {
 	log.Printf("server: client %d has been disconnected ...", conn)
 
-	uid := ctx.Value(websocket.CtxKeyUID).(int64)
-	user := examples.Users[uid]
+	var (
+		uid    int64             = ctx.Value(websocket.CtxKeyUID).(int64)
+		user   *examples.Account = examples.Users[uid]
+		body   string
+		packet []byte
+		err    error
+		c      int
+	)
 
 	// Broadcast to other connections that user is disconnected.
-	body := user.Name + " leaving conversation..."
-	packet, err := websocket.NewBroadcast(examples.BroadcastSystem, body)
+	body = user.Name + " leaving conversation..."
+	packet, err = websocket.NewBroadcast(examples.BroadcastSystem, body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, c := range server.Clients.All() {
+	for _, c = range server.Clients.All() {
 		if c == conn {
 			continue
 		}
-		err := websocket.Send(c, packet)
+		err = websocket.Send(c, packet)
 		if err != nil {
 			log.Println(err)
 		}
@@ -111,16 +130,19 @@ func handleClientRemove(ctx context.Context, conn int) {
 }
 
 // handlePostMessage handle message that is send to server by client.
-func handlePostMessage(ctx context.Context, req *websocket.Request) (
-	res websocket.Response,
-) {
-	uid := ctx.Value(websocket.CtxKeyUID).(int64)
-	user := examples.Users[uid]
+func handlePostMessage(ctx context.Context, req *websocket.Request) (res websocket.Response) {
+	var (
+		uid    int64             = ctx.Value(websocket.CtxKeyUID).(int64)
+		user   *examples.Account = examples.Users[uid]
+		body   string            = user.Name + ": " + req.Body
+		packet []byte
+		err    error
+		conn   int
+	)
 
 	log.Printf("server: message from %s: %q\n", user.Name, req.Body)
 
-	body := user.Name + ": " + req.Body
-	packet, err := websocket.NewBroadcast(examples.BroadcastMessage, body)
+	packet, err = websocket.NewBroadcast(examples.BroadcastMessage, body)
 	if err != nil {
 		res.Code = http.StatusInternalServerError
 		res.Body = err.Error()
@@ -130,7 +152,7 @@ func handlePostMessage(ctx context.Context, req *websocket.Request) (
 	// Broadcast the message to all connected clients, including our
 	// connections. Remember, that user could connected through many
 	// application.
-	for _, conn := range server.Clients.All() {
+	for _, conn = range server.Clients.All() {
 		if conn == req.Conn {
 			continue
 		}

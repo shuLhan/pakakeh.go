@@ -104,18 +104,25 @@ func (root *rootRoute) add(method, target string, handler RouteHandler) (err err
 
 	method = strings.ToUpper(method)
 
-	parent := root.getParent(method)
+	var (
+		parent *route = root.getParent(method)
+
+		bb      *bytes.Buffer
+		x       int
+		started bool
+		isParam bool
+	)
+
 	if parent == nil {
 		return ErrRouteInvMethod
 	}
 
-	bb := _bbPool.Get().(*bytes.Buffer)
+	bb = _bbPool.Get().(*bytes.Buffer)
 	bb.Reset()
 
-	started := true
-	isParam := false
+	started = true
 
-	for x := 1; x < len(target); x++ {
+	for x = 1; x < len(target); x++ {
 		if started && target[x] == pathParamPrefix {
 			isParam = true
 			started = false
@@ -168,23 +175,30 @@ func (root *rootRoute) get(method, target string) (
 
 	method = strings.ToUpper(method)
 
-	parent := root.getParent(method)
+	var (
+		parent *route = root.getParent(method)
+
+		child *route
+		bb    *bytes.Buffer
+		x     int
+	)
+
 	if parent == nil {
 		return nil, nil
 	}
 
-	bb := _bbPool.Get().(*bytes.Buffer)
+	bb = _bbPool.Get().(*bytes.Buffer)
 	bb.Reset()
 
 	params = make(targetParam)
 
-	for x := 1; x < len(target); x++ {
+	for x = 1; x < len(target); x++ {
 		if target[x] != pathSep {
 			_ = bb.WriteByte(target[x])
 			continue
 		}
 
-		child := parent.getChild(false, bb.String())
+		child = parent.getChild(false, bb.String())
 		if child == nil {
 			child = parent.getChildAsParam()
 			if child == nil {
@@ -198,7 +212,7 @@ func (root *rootRoute) get(method, target string) (
 		bb.Reset()
 	}
 	if bb.Len() > 0 {
-		child := parent.getChild(false, bb.String())
+		child = parent.getChild(false, bb.String())
 		if child == nil {
 			child = parent.getChildAsParam()
 			if child == nil {

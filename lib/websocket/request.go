@@ -79,7 +79,7 @@ func (req *Request) unpack(routes *rootRoute) (handler RouteHandler, err error) 
 		return
 	}
 
-	pathQuery := strings.SplitN(req.Target, pathQuerySep, 2)
+	var pathQuery []string = strings.SplitN(req.Target, pathQuerySep, 2)
 
 	req.Path = pathQuery[0]
 

@@ -55,11 +55,12 @@ func newClientManager() *ClientManager {
 // All return a copy of all client connections.
 func (cls *ClientManager) All() (conns []int) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	if len(cls.all) > 0 {
 		conns = make([]int, len(cls.all))
 		copy(conns, cls.all)
 	}
-	cls.Unlock()
 	return
 }
 
@@ -67,10 +68,15 @@ func (cls *ClientManager) All() (conns []int) {
 // stored frame and frames on behalf of connection.
 func (cls *ClientManager) finFrames(conn int, last *Frame) (f *Frame) {
 	cls.Lock()
+	defer cls.Unlock()
 
-	frames, ok := cls.frames[conn]
+	var (
+		frames *Frames
+		ok     bool
+	)
+
+	frames, ok = cls.frames[conn]
 	if !ok {
-		cls.Unlock()
 		return last
 	}
 
@@ -79,7 +85,6 @@ func (cls *ClientManager) finFrames(conn int, last *Frame) (f *Frame) {
 	delete(cls.frames, conn)
 	delete(cls.frame, conn)
 
-	cls.Unlock()
 	return
 }
 
@@ -90,32 +95,36 @@ func (cls *ClientManager) finFrames(conn int, last *Frame) (f *Frame) {
 // server can broadcast a message to all connections.
 func (cls *ClientManager) Conns(uid uint64) (conns []int) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	conns = cls.conns[uid]
-	cls.Unlock()
 	return
 }
 
 // Context return the client context.
 func (cls *ClientManager) Context(conn int) (ctx context.Context, ok bool) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	ctx, ok = cls.ctx[conn]
-	cls.Unlock()
 	return ctx, ok
 }
 
 // getFrame return an active frame on a client connection.
 func (cls *ClientManager) getFrame(conn int) (frame *Frame, ok bool) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	frame, ok = cls.frame[conn]
-	cls.Unlock()
 	return
 }
 
 // getFrames return continuous frames on behalf of connection.
 func (cls *ClientManager) getFrames(conn int) (frames *Frames, ok bool) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	frames, ok = cls.frames[conn]
-	cls.Unlock()
 	return
 }
 
@@ -123,34 +132,42 @@ func (cls *ClientManager) getFrames(conn int) (frames *Frames, ok bool) {
 // nil, it will delete the stored frame in connection.
 func (cls *ClientManager) setFrame(conn int, frame *Frame) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	if frame == nil {
 		delete(cls.frame, conn)
 	} else {
 		cls.frame[conn] = frame
 	}
-	cls.Unlock()
 }
 
 // setFrames set continuous frames on client connection.  If frames is nil it
 // will clear the stored frames.
 func (cls *ClientManager) setFrames(conn int, frames *Frames) {
 	cls.Lock()
+	defer cls.Unlock()
+
 	if frames == nil {
 		delete(cls.frames, conn)
 	} else {
 		cls.frames[conn] = frames
 	}
-	cls.Unlock()
 }
 
 // add new socket connection to user ID in context.
 func (cls *ClientManager) add(ctx context.Context, conn int) {
-	var uid uint64
+	var (
+		v     interface{}
+		uid   uint64
+		conns []int
+		ok    bool
+	)
 
 	// Delete the previous socket reference on other user ID.
 	cls.remove(conn)
 
 	cls.Lock()
+	defer cls.Unlock()
 
 	if !ints.IsExist(cls.all, conn) {
 		cls.all = append(cls.all, conn)
@@ -158,12 +175,12 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 
 	cls.ctx[conn] = ctx
 
-	v := ctx.Value(CtxKeyUID)
+	v = ctx.Value(CtxKeyUID)
 	if v != nil {
 		uid, _ = v.(uint64)
 	}
 	if uid > 0 {
-		conns, ok := cls.conns[uid]
+		conns, ok = cls.conns[uid]
 		if !ok {
 			conns = make([]int, 0, 1)
 		}
@@ -171,29 +188,35 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 
 		cls.conns[uid] = conns
 	}
-
-	cls.Unlock()
 }
 
 // remove a connection from list of clients.
 func (cls *ClientManager) remove(conn int) {
+	var (
+		ctx   context.Context
+		v     interface{}
+		conns []int
+		ok    bool
+	)
+
 	cls.Lock()
+	defer cls.Unlock()
 
 	delete(cls.frame, conn)
 	delete(cls.frames, conn)
 	cls.all, _ = ints.Remove(cls.all, conn)
 
-	ctx, ok := cls.ctx[conn]
+	ctx, ok = cls.ctx[conn]
 	if ok {
 		var uid uint64
-		v := ctx.Value(CtxKeyUID)
+		v = ctx.Value(CtxKeyUID)
 		if v != nil {
 			uid, _ = v.(uint64)
 		}
 		delete(cls.ctx, conn)
 
 		if uid > 0 {
-			conns, ok := cls.conns[uid]
+			conns, ok = cls.conns[uid]
 			if ok {
 				conns, _ = ints.Remove(conns, conn)
 
@@ -205,6 +228,4 @@ func (cls *ClientManager) remove(conn int) {
 			}
 		}
 	}
-
-	cls.Unlock()
 }
