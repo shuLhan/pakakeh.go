@@ -346,6 +346,7 @@ func ExampleTag() {
 		F1 int `atag:" f1 , opt1 , opt2  ,"`
 		F2 int `atag:", opt1"`
 		F3 int
+		F4 int `atag:" - ,opt1"`
 	}
 
 	var (
@@ -363,12 +364,13 @@ func ExampleTag() {
 	for x = 0; x < vtype.NumField(); x++ {
 		field = vtype.Field(x)
 		val, opts, hasTag = Tag(field, "atag")
-		fmt.Printf("%q %v %v\n", val, opts, hasTag)
+		fmt.Println(val, opts, hasTag)
 	}
 	//Output:
-	//"f1" [opt1 opt2 ] true
-	//"F2" [opt1] false
-	//"F3" [] false
+	//f1 [opt1 opt2 ] true
+	//F2 [opt1] false
+	//F3 [] false
+	//  [] false
 }
 
 func ExampleUnmarshal_unmarshalBinary() {

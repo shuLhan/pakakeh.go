@@ -420,8 +420,8 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 // name (as is without converting to lower case) in val with hasTag is false:
 // (Name, nil, false).
 //
-// If the field is unexported it will return empty val with hasTag is false
-// ("", nil, false).
+// If the field is unexported or tag is "-" it will return empty val with
+// hasTag is false ("", nil, false).
 func Tag(field reflect.StructField, tag string) (val string, opts []string, hasTag bool) {
 	if len(field.PkgPath) != 0 {
 		// field is unexported.
@@ -435,21 +435,23 @@ func Tag(field reflect.StructField, tag string) (val string, opts []string, hasT
 	val, hasTag = field.Tag.Lookup(tag)
 	if !hasTag {
 		// Tag not defined, so we use field name as key.
-		val = field.Name
-	} else {
-		opts = strings.Split(val, ",")
-		for x, val = range opts {
-			opts[x] = strings.TrimSpace(val)
-		}
+		return field.Name, nil, false
+	}
 
-		val = opts[0]
-		opts = opts[1:]
-		if len(val) == 0 {
-			// Tag is empty, use field name as key and
-			// mark it as not OK.
-			val = field.Name
-			hasTag = false
-		}
+	opts = strings.Split(val, ",")
+	for x, val = range opts {
+		opts[x] = strings.TrimSpace(val)
+	}
+
+	val = strings.TrimSpace(opts[0])
+	opts = opts[1:]
+	if len(val) == 0 {
+		// Tag is empty, use field name as key.
+		return field.Name, opts, false
+	}
+	if val == "-" {
+		// Tag is defined but excluded from being processed.
+		return "", nil, false
 	}
 
 	return val, opts, hasTag
