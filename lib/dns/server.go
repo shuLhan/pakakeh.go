@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
@@ -217,12 +218,15 @@ func (srv *Server) Stop() {
 		if err != nil {
 			log.Println("dns: error when closing DoT: " + err.Error())
 		}
+		srv.dot = nil
 	}
 	if srv.doh != nil {
-		err = srv.doh.Close()
+		var ctx context.Context = context.Background()
+		err = srv.doh.Shutdown(ctx)
 		if err != nil {
 			log.Println("dns: error when closing DoH: " + err.Error())
 		}
+		srv.doh = nil
 	}
 }
 
