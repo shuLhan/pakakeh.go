@@ -1,3 +1,7 @@
+// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 // Package clise implements circular slice.
 // A circular slice is a slice that have fixed size.
 // An append to slice that has reached its length will overwrite and start
@@ -17,7 +21,10 @@
 // See the examples for usage of the package.
 package clise
 
-import "sync"
+import (
+	"encoding/json"
+	"sync"
+)
 
 type Clise struct {
 	v    []interface{}
@@ -116,4 +123,11 @@ func (c *Clise) Slice() (dst []interface{}) {
 	}
 	c.Unlock()
 	return dst
+}
+
+// MarshalJSON call Slice on c and convert it into JSON.
+func (c *Clise) MarshalJSON() (out []byte, err error) {
+	var slice = c.Slice()
+	out, err = json.Marshal(slice)
+	return out, err
 }
