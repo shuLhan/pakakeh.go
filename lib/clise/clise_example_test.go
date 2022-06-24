@@ -3,11 +3,15 @@ package clise
 import "fmt"
 
 func ExampleClise_Pop() {
-	c := New(5)
+	var (
+		c    *Clise = New(5)
+		item interface{}
+	)
+
 	c.Push(1, 2, 3, 4, 5, 6)
-	item := c.Pop()
+	item = c.Pop()
 	for item != nil {
-		fmt.Printf("%v\n", item)
+		fmt.Println(item)
 		item = c.Pop()
 	}
 	// Output:
@@ -19,38 +23,38 @@ func ExampleClise_Pop() {
 }
 
 func ExampleClise_RecentSlice() {
-	c := New(5)
+	var c *Clise = New(5)
 	c.Push(1, 2, 3)
-	fmt.Printf("%v\n", c.RecentSlice())
+	fmt.Println(c.RecentSlice())
 	c.Push(4, 5, 6, 7)
-	fmt.Printf("%v\n", c.RecentSlice())
+	fmt.Println(c.RecentSlice())
 	//Output:
 	//[1 2 3]
 	//[6 7]
 }
 
 func ExampleClise_Reset() {
-	c := New(5)
+	var c *Clise = New(5)
 	c.Push(1, 2, 3, 4, 5)
-	fmt.Printf("%v\n", c.Slice())
+	fmt.Println(c.Slice())
 	c.Reset()
 	c.Push(1)
-	fmt.Printf("%v\n", c.Slice())
+	fmt.Println(c.Slice())
 	//Output:
 	//[1 2 3 4 5]
 	//[1]
 }
 
 func ExampleClise_Slice() {
-	c := New(5)
+	var c *Clise = New(5)
 	c.Push(1, 2)
-	fmt.Printf("%v\n", c.Slice())
+	fmt.Println(c.Slice())
 	c.Push(3, 4, 5)
-	fmt.Printf("%v\n", c.Slice())
+	fmt.Println(c.Slice())
 	c.Push(6)
-	fmt.Printf("%v\n", c.Slice())
+	fmt.Println(c.Slice())
 	c.Push(7, 8, 9, 10)
-	fmt.Printf("%v\n", c.Slice())
+	fmt.Println(c.Slice())
 	//Output:
 	//[1 2]
 	//[1 2 3 4 5]

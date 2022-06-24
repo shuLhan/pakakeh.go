@@ -5,14 +5,14 @@
 //
 // For example, a clise with size 5,
 //
-//	c := clise.New(5)
+//	var c *clise.Clise = clise.New(5)
 //	c.Push(1, 2, 3, 4, 5)
-//	fmt.Printf("%v\n", c.Slice()) // [1 2 3 4 5]
+//	fmt.Println(c.Slice()) // [1 2 3 4 5]
 //
 // If we push another item, it will overwrite the first index,
 //
 //	c.Push(6)
-//	fmt.Printf("%v\n", c.Slice()) // [6 2 3 4 5]
+//	fmt.Println(c.Slice()) // [6 2 3 4 5]
 //
 // See the examples for usage of the package.
 package clise
@@ -20,10 +20,10 @@ package clise
 import "sync"
 
 type Clise struct {
-	sync.Mutex
 	v    []interface{}
 	size int
 	last int
+	sync.Mutex
 	over bool
 }
 
@@ -65,8 +65,9 @@ func (c *Clise) Pop() (item interface{}) {
 
 // Push the item into the slice.
 func (c *Clise) Push(src ...interface{}) {
+	var x int
 	c.Lock()
-	for x := 0; x < len(src); x++ {
+	for ; x < len(src); x++ {
 		c.v[c.last] = src[x]
 		c.last++
 		if c.last == c.size {
