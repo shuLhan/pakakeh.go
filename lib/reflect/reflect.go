@@ -61,6 +61,82 @@ func IsNil(v interface{}) bool {
 	return v == nil
 }
 
+// Marshal marshal the obj value to []byte by calling one of the method:
+// MarshalBinary, MarshalJSON, or MarshalText; in respective
+// order.
+//
+// If obj implement one of the method with valid signature, it will return
+// (out, nil, true);
+// unless there is an error.
+//
+// If the method signature invalid it will return (nil, err, false).
+//
+// If obj is nil or none of the method exist it will return (nil, nil, false).
+func Marshal(obj interface{}) (out []byte, err error, ok bool) {
+	var (
+		logp        = "Marshal"
+		methodNames = []string{
+			"MarshalBinary",
+			"MarshalJSON",
+			"MarshalText",
+		}
+		objValue = reflect.ValueOf(obj)
+		objKind  = objValue.Kind()
+
+		methodName string
+		method     reflect.Value
+		callOut    []reflect.Value
+		callReturn interface{}
+	)
+
+	if objKind == reflect.Ptr && objValue.IsNil() {
+		return nil, nil, false
+	}
+
+	for _, methodName = range methodNames {
+		method = objValue.MethodByName(methodName)
+		if !method.IsValid() {
+			// IsValid returns false if method is the zero Value
+			// (method not found).
+			continue
+		}
+
+		callOut = method.Call(nil)
+		if len(callOut) == 0 {
+			// No error?
+			return nil, nil, true
+		}
+		if len(callOut) != 2 {
+			err = fmt.Errorf("%s: expecting two returns got %d", logp, len(callOut))
+			return nil, err, false
+		}
+
+		callReturn = callOut[0].Interface()
+		out, ok = callReturn.([]byte)
+		if !ok {
+			err = fmt.Errorf("%s: expecting first return as []byte got %T", logp, callReturn)
+			return nil, err, false
+		}
+
+		callReturn = callOut[1].Interface()
+		if callReturn == nil {
+			return out, nil, true
+		}
+		err, ok = callReturn.(error)
+		if !ok {
+			err = fmt.Errorf("%s: expecting second return as error got %T", logp, callReturn)
+			return nil, err, false
+		}
+		if err != nil {
+			err = fmt.Errorf("%s: %w", logp, err)
+			return nil, err, true
+		}
+		return out, nil, true
+	}
+
+	return nil, nil, false
+}
+
 // Set the obj value by converting the string val to the obj type.
 //
 // If the obj type is an interface or struct, its value will be set by calling

@@ -74,6 +74,63 @@ func ExampleIsNil() {
 	//               <nil>: v == nil is  true, IsNil() is  true
 }
 
+type InvalidMarshalText struct{}
+
+func (imt *InvalidMarshalText) MarshalText() (string, error) {
+	return "", nil
+}
+
+type ErrorMarshalJson struct{}
+
+func (emj *ErrorMarshalJson) MarshalJSON() ([]byte, error) {
+	return nil, errors.New("ErrorMarshalJson: test")
+}
+
+func ExampleMarshal() {
+	var (
+		vint    = 1
+		vUrl, _ = url.Parse("https://example.org")
+		bigRat  = big.NewRat(100, 2)
+		bigInt  = big.NewInt(50)
+		imt     = &InvalidMarshalText{}
+		emj     = &ErrorMarshalJson{}
+
+		out []byte
+		err error
+		ok  bool
+	)
+
+	out, err, ok = Marshal(vint)
+	fmt.Println(out, err, ok)
+
+	out, err, ok = Marshal(&vint)
+	fmt.Println(out, err, ok)
+
+	out, err, ok = Marshal(vUrl)
+	fmt.Println(string(out), err, ok)
+
+	out, err, ok = Marshal(bigRat)
+	fmt.Println(string(out), err, ok)
+
+	out, err, ok = Marshal(bigInt)
+	fmt.Println(string(out), err, ok)
+
+	out, err, ok = Marshal(imt)
+	fmt.Println(string(out), err, ok)
+
+	out, err, ok = Marshal(emj)
+	fmt.Println(string(out), err, ok)
+
+	//Output:
+	//[] <nil> false
+	//[] <nil> false
+	//https://example.org <nil> true
+	//50 <nil> true
+	//50 <nil> true
+	//  Marshal: expecting first return as []byte got string false
+	//  Marshal: ErrorMarshalJson: test true
+}
+
 func ExampleSet_bool() {
 	type Bool bool
 
