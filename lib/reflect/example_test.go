@@ -222,28 +222,28 @@ func ExampleSet_sliceByte() {
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vbytes)
+		fmt.Println(string(vbytes))
 	}
 
 	err = Set(reflect.ValueOf(&vbytes), "a hero")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vbytes)
+		fmt.Println(string(vbytes))
 	}
 
 	err = Set(reflect.ValueOf(&vbytes), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vbytes)
+		fmt.Println(string(vbytes))
 	}
 
 	err = Set(reflect.ValueOf(&vmyBytes), "and I will write you a tragedy")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vmyBytes)
+		fmt.Println(string(vmyBytes))
 	}
 
 	//Output:
@@ -263,21 +263,21 @@ func ExampleSet_sliceString() {
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vstring)
+		fmt.Println(vstring)
 	}
 
 	err = Set(reflect.ValueOf(&vstring), "a hero")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vstring)
+		fmt.Println(vstring)
 	}
 
 	err = Set(reflect.ValueOf(&vstring), "and I will write you a tragedy")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", vstring)
+		fmt.Println(vstring)
 	}
 
 	//Output:
@@ -300,14 +300,14 @@ func ExampleSet_unmarshal() {
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", rat.FloatString(4))
+		fmt.Println(rat.FloatString(4))
 	}
 
 	err = Set(reflect.ValueOf(rat), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", rat.FloatString(4))
+		fmt.Println(rat.FloatString(4))
 	}
 
 	// This Set will call UnmarshalBinary on url.URL.
@@ -315,7 +315,7 @@ func ExampleSet_unmarshal() {
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", myUrl)
+		fmt.Println(myUrl)
 	}
 
 	// This Set will call UnmarshalJSON.
@@ -323,14 +323,14 @@ func ExampleSet_unmarshal() {
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", bigInt)
+		fmt.Println(bigInt)
 	}
 
 	err = Set(reflect.ValueOf(bigInt), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Printf("%s\n", bigInt)
+		fmt.Println(bigInt)
 	}
 
 	//Output:
@@ -388,7 +388,7 @@ func ExampleUnmarshal_unmarshalBinary() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v: %q\n", ok, varB.String())
+	fmt.Println(varB.String(), ok)
 
 	// Pass it like these.
 	ok, err = Unmarshal(reflect.ValueOf(&varB), val)
@@ -396,7 +396,7 @@ func ExampleUnmarshal_unmarshalBinary() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v: %q\n", ok, varB.String())
+	fmt.Println(varB.String(), ok)
 
 	// Passing un-initialized pointer also not working...
 	var varPtrB *url.URL
@@ -405,7 +405,7 @@ func ExampleUnmarshal_unmarshalBinary() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v: %q\n", ok, varPtrB)
+	fmt.Println(varPtrB, ok)
 
 	// Pass it as **T.
 	ok, err = Unmarshal(reflect.ValueOf(&varPtrB), val)
@@ -413,7 +413,7 @@ func ExampleUnmarshal_unmarshalBinary() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v: %q\n", ok, varPtrB)
+	fmt.Println(varPtrB, ok)
 
 	var ptrB = &url.URL{}
 	ok, err = Unmarshal(reflect.ValueOf(&ptrB), val)
@@ -421,14 +421,14 @@ func ExampleUnmarshal_unmarshalBinary() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v: %q\n", ok, ptrB)
+	fmt.Println(ptrB, ok)
 
 	//Output:
-	//false: ""
-	//true: "https://kilabit.info"
-	//false: <nil>
-	//true: "https://kilabit.info"
-	//true: "https://kilabit.info"
+	//  false
+	//https://kilabit.info true
+	//<nil> false
+	//https://kilabit.info true
+	//https://kilabit.info true
 }
 
 func ExampleUnmarshal_unmarshalText() {
@@ -450,7 +450,7 @@ func ExampleUnmarshal_unmarshalText() {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			fmt.Printf("%s\n", r)
+			fmt.Println(r)
 		}
 	}
 	//Output:
@@ -478,7 +478,7 @@ func ExampleUnmarshal_unmarshalJSON() {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			fmt.Printf("%s\n", bigInt)
+			fmt.Println(bigInt)
 		}
 	}
 	//Output:
