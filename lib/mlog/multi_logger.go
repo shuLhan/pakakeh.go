@@ -99,11 +99,6 @@ func flush(qlog chan []byte, writers map[string]NamedWriter) {
 
 	for x = 0; x < len(qlog); x++ {
 		b = <-qlog
-		if len(b) == 0 {
-			b = append(b, '\n')
-		} else if b[len(b)-1] != '\n' {
-			b = append(b, '\n')
-		}
 		for name, nw = range writers {
 			_, err = nw.Write(b)
 			if err != nil {
@@ -255,11 +250,6 @@ func (mlog *MultiLogger) processErrorQueue() {
 				return
 			}
 
-			if len(b) == 0 {
-				b = append(b, '\n')
-			} else if b[len(b)-1] != '\n' {
-				b = append(b, '\n')
-			}
 			for name, w = range mlog.errs {
 				_, err = w.Write(b)
 				if err != nil {
@@ -296,11 +286,6 @@ func (mlog *MultiLogger) processOutputQueue() {
 				return
 			}
 
-			if len(b) == 0 {
-				b = append(b, '\n')
-			} else if b[len(b)-1] != '\n' {
-				b = append(b, '\n')
-			}
 			for name, w = range mlog.outs {
 				_, err = w.Write(b)
 				if err != nil {
@@ -328,7 +313,8 @@ func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{})
 		bufFmt = mlog.bufPool.Get().(*bytes.Buffer)
 		args   = make([]interface{}, 0, len(v)+2)
 
-		b []byte
+		b    []byte
+		lenb int
 	)
 	buf.Reset()
 	bufFmt.Reset()
@@ -346,6 +332,11 @@ func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{})
 	fmt.Fprintf(buf, bufFmt.String(), args...)
 
 	b = libbytes.Copy(buf.Bytes())
+	lenb = len(b)
+	if lenb == 0 || b[lenb-1] != '\n' {
+		b = append(b, '\n')
+	}
+
 	select {
 	case q <- b:
 	default:
