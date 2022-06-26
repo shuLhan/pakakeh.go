@@ -29,7 +29,6 @@ type MultiLogger struct {
 	qout chan []byte
 
 	qerrFlush chan bool
-	qflush    chan bool
 	qoutFlush chan bool
 
 	errs map[string]NamedWriter
@@ -38,23 +37,23 @@ type MultiLogger struct {
 	timeFormat string
 
 	prefix []byte
+
+	sync.Mutex
+	isClosed bool
 }
 
 // NewMultiLogger create and initialize new MultiLogger.
 func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) *MultiLogger {
-	var (
-		mlog = createMultiLogger(timeFormat, prefix, outs, errs)
-	)
-	return &mlog
+	return createMultiLogger(timeFormat, prefix, outs, errs)
 }
 
-func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog MultiLogger) {
+func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog *MultiLogger) {
 	var (
 		w    NamedWriter
 		name string
 	)
 
-	mlog = MultiLogger{
+	mlog = &MultiLogger{
 		bufPool: &sync.Pool{
 			New: func() interface{} {
 				return new(bytes.Buffer)
@@ -68,7 +67,6 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 		qerr:       make(chan []byte, 512),
 		qerrFlush:  make(chan bool, 1),
 		qoutFlush:  make(chan bool, 1),
-		qflush:     make(chan bool, 1),
 	}
 	for _, w = range outs {
 		name = w.Name()
@@ -90,14 +88,48 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 	return mlog
 }
 
+func flush(qlog chan []byte, writers map[string]NamedWriter) {
+	var (
+		name string
+		err  error
+		nw   NamedWriter
+		b    []byte
+		x    int
+	)
+
+	for x = 0; x < len(qlog); x++ {
+		b = <-qlog
+		if len(b) == 0 {
+			b = append(b, '\n')
+		} else if b[len(b)-1] != '\n' {
+			b = append(b, '\n')
+		}
+		for name, nw = range writers {
+			_, err = nw.Write(b)
+			if err != nil {
+				log.Printf("MultiLogger: %s: %s", name, err)
+			}
+		}
+	}
+}
+
+// Close flush and close all log forwarders.
+// Any write to a closed MultiLogger will be ignored.
+func (mlog *MultiLogger) Close() {
+	mlog.Lock()
+	mlog.isClosed = true
+	close(mlog.qerr)
+	close(mlog.qout)
+	<-mlog.qerrFlush
+	<-mlog.qoutFlush
+	mlog.Unlock()
+}
+
 // Errf write the formatted string and its optional values to all error
 // writers.
 //
 // If the generated string does not end with new line, it will be added.
 func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
-	if len(mlog.errs) == 0 {
-		return
-	}
 	mlog.writeTo(mlog.qerr, format, v...)
 }
 
@@ -110,19 +142,23 @@ func (mlog *MultiLogger) Fatalf(format string, v ...interface{}) {
 
 // Flush all writes and wait until it finished.
 func (mlog *MultiLogger) Flush() {
+	mlog.Lock()
+	if mlog.isClosed {
+		mlog.Unlock()
+		return
+	}
+	mlog.Unlock()
+
 	mlog.qerrFlush <- true
 	mlog.qoutFlush <- true
-	<-mlog.qflush
-	<-mlog.qflush
+	<-mlog.qerrFlush
+	<-mlog.qoutFlush
 }
 
 // Outf write the formatted string and its values to all output writers.
 //
 // If the generated string does not end with new line, it will be added.
 func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
-	if len(mlog.outs) == 0 {
-		return
-	}
 	mlog.writeTo(mlog.qout, format, v...)
 }
 
@@ -147,7 +183,7 @@ func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
 //		os.Exit(1)
 //	}
 func (mlog *MultiLogger) PrintStack() {
-	mlog.Errf("%s\n", debug.Stack())
+	mlog.Errf("%s", debug.Stack())
 	mlog.Flush()
 }
 
@@ -200,88 +236,99 @@ func (mlog *MultiLogger) Write(b []byte) (n int, err error) {
 
 func (mlog *MultiLogger) processErrorQueue() {
 	var (
-		b   []byte
-		w   NamedWriter
-		err error
-		x   int
+		name string
+		b    []byte
+		w    NamedWriter
+		err  error
+		ok   bool
 	)
 	for {
 		select {
-		case b = <-mlog.qerr:
+		case b, ok = <-mlog.qerr:
+			if !ok {
+				// A closed channel is already empty, no need
+				// to flush it.
+				for name = range mlog.errs {
+					delete(mlog.errs, name)
+				}
+				mlog.qerrFlush <- true
+				return
+			}
+
 			if len(b) == 0 {
 				b = append(b, '\n')
 			} else if b[len(b)-1] != '\n' {
 				b = append(b, '\n')
 			}
-			for _, w = range mlog.errs {
+			for name, w = range mlog.errs {
 				_, err = w.Write(b)
 				if err != nil {
-					log.Printf("MultiLogger: %s: %s", w.Name(), err)
+					log.Printf("MultiLogger: %s: %s", name, err)
 				}
 			}
+
 		case <-mlog.qerrFlush:
-			for x = 0; x < len(mlog.qerr); x++ {
-				b = <-mlog.qerr
-				if len(b) == 0 {
-					b = append(b, '\n')
-				} else if b[len(b)-1] != '\n' {
-					b = append(b, '\n')
-				}
-				for _, w = range mlog.errs {
-					_, err = w.Write(b)
-					if err != nil {
-						log.Printf("MultiLogger: %s: %s", w.Name(), err)
-					}
-				}
-			}
-			mlog.qflush <- true
+			flush(mlog.qerr, mlog.errs)
+			mlog.qerrFlush <- true
 		}
 	}
 }
 
 func (mlog *MultiLogger) processOutputQueue() {
 	var (
-		b   []byte
-		w   NamedWriter
-		err error
-		x   int
+		name string
+		b    []byte
+		w    NamedWriter
+		err  error
+		ok   bool
 	)
 
 	for {
 		select {
-		case b = <-mlog.qout:
+		case b, ok = <-mlog.qout:
+			if !ok {
+				// A closed channel is already empty, no need
+				// to flush it.
+				for name = range mlog.outs {
+					delete(mlog.outs, name)
+				}
+				mlog.qoutFlush <- true
+				return
+			}
+
 			if len(b) == 0 {
 				b = append(b, '\n')
 			} else if b[len(b)-1] != '\n' {
 				b = append(b, '\n')
 			}
-			for _, w = range mlog.outs {
+			for name, w = range mlog.outs {
 				_, err = w.Write(b)
 				if err != nil {
-					log.Printf("MultiLogger: %s: %s", w.Name(), err)
+					log.Printf("MultiLogger: %s: %s", name, err)
 				}
 			}
-		case <-mlog.qoutFlush:
-			for x = 0; x < len(mlog.qout); x++ {
-				b = <-mlog.qout
-				for _, w = range mlog.outs {
-					_, err = w.Write(b)
-					if err != nil {
-						log.Printf("MultiLogger: %s: %s", w.Name(), err)
-					}
 
-				}
-			}
-			mlog.qflush <- true
+		case <-mlog.qoutFlush:
+			flush(mlog.qout, mlog.outs)
+			mlog.qoutFlush <- true
 		}
 	}
 }
 
 func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{}) {
+	mlog.Lock()
+	if mlog.isClosed {
+		mlog.Unlock()
+		return
+	}
+	mlog.Unlock()
+
 	var (
 		buf    = mlog.bufPool.Get().(*bytes.Buffer)
 		bufFmt = mlog.bufPool.Get().(*bytes.Buffer)
 		args   = make([]interface{}, 0, len(v)+2)
+
+		b []byte
 	)
 	buf.Reset()
 	bufFmt.Reset()
@@ -298,7 +345,12 @@ func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{})
 	args = append(args, v...)
 	fmt.Fprintf(buf, bufFmt.String(), args...)
 
-	q <- libbytes.Copy(buf.Bytes())
+	b = libbytes.Copy(buf.Bytes())
+	select {
+	case q <- b:
+	default:
+		// Queue is full or closed.
+	}
 
 	mlog.bufPool.Put(bufFmt)
 	mlog.bufPool.Put(buf)

@@ -47,9 +47,11 @@ func ExampleMultiLogger() {
 		//mlog.RegisterErrorWriter(NewNamedWriter("slack", slackc))
 	}
 
-	mlog.Outf("writing to standard output and buffer\n")
-	mlog.Errf("writing to standard error and slack\n")
-	mlog.Flush()
+	mlog.Outf("writing to standard output and buffer")
+	mlog.Errf("writing to standard error and slack")
+	mlog.Close()
+	// Try writing to closed mlog.
+	mlog.Outf("writing to standard output and buffer after close")
 	fmt.Println("Output on buffer:", buf.String())
 
 	// Unordered output:
