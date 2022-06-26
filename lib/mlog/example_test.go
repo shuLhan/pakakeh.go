@@ -18,20 +18,20 @@ func ExampleMultiLogger() {
 	// "github.com/shuLhan/share/api/slack".
 	// The code is intentionally commented to prevent import cycle.
 
-	buf := bytes.Buffer{}
-
-	wouts := []NamedWriter{
-		NewNamedWriter("stdout", os.Stdout),
-		NewNamedWriter("buffer", &buf),
-	}
-	werrs := []NamedWriter{
-		NewNamedWriter("stderr", os.Stdout),
-	}
-
-	mlog := NewMultiLogger("", "mlog:", wouts, werrs)
+	var (
+		buf   = bytes.Buffer{}
+		wouts = []NamedWriter{
+			NewNamedWriter("stdout", os.Stdout),
+			NewNamedWriter("buffer", &buf),
+		}
+		werrs = []NamedWriter{
+			NewNamedWriter("stderr", os.Stdout),
+		}
+		mlog            = NewMultiLogger("", "mlog:", wouts, werrs)
+		slackWebhookURL = os.Getenv("SLACK_WEBHOOK_URL")
+	)
 
 	// Create an error writer to slack.
-	slackWebhookURL := os.Getenv("SLACK_WEBHOOK_URL")
 	if len(slackWebhookURL) > 0 {
 		// Get the Slack configuration from environment.
 		//slackChannel := os.Getenv("SLACK_WEBHOOK_CHANNEL")
@@ -50,7 +50,7 @@ func ExampleMultiLogger() {
 	mlog.Outf("writing to standard output and buffer\n")
 	mlog.Errf("writing to standard error and slack\n")
 	mlog.Flush()
-	fmt.Printf("Output on buffer: %s\n", buf.String())
+	fmt.Println("Output on buffer:", buf.String())
 
 	// Unordered output:
 	// mlog: writing to standard output and buffer

@@ -49,6 +49,11 @@ func NewMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) *MultiL
 }
 
 func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlog MultiLogger) {
+	var (
+		w    NamedWriter
+		name string
+	)
+
 	mlog = MultiLogger{
 		bufPool: &sync.Pool{
 			New: func() interface{} {
@@ -65,15 +70,15 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 		qoutFlush:  make(chan bool, 1),
 		qflush:     make(chan bool, 1),
 	}
-	for _, w := range outs {
-		name := w.Name()
+	for _, w = range outs {
+		name = w.Name()
 		if len(name) == 0 {
 			continue
 		}
 		mlog.outs[name] = w
 	}
-	for _, w := range errs {
-		name := w.Name()
+	for _, w = range errs {
+		name = w.Name()
 		if len(name) == 0 {
 			continue
 		}
@@ -125,7 +130,7 @@ func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
 	mlog.Errf(format, v...)
 	mlog.Flush()
-	msg := fmt.Sprintf(format, v...)
+	var msg string = fmt.Sprintf(format, v...)
 	panic(msg)
 }
 
@@ -149,7 +154,7 @@ func (mlog *MultiLogger) PrintStack() {
 // RegisterErrorWriter register the named writer to one of error writers.
 // The writer Name() must not be empty or it will not registered.
 func (mlog *MultiLogger) RegisterErrorWriter(errw NamedWriter) {
-	name := errw.Name()
+	var name string = errw.Name()
 	if len(name) == 0 {
 		return
 	}
@@ -159,7 +164,7 @@ func (mlog *MultiLogger) RegisterErrorWriter(errw NamedWriter) {
 // RegisterOutputWriter register the named writer to one of output writers.
 // The writer Name() must not be empty or it will not registered.
 func (mlog *MultiLogger) RegisterOutputWriter(outw NamedWriter) {
-	name := outw.Name()
+	var name string = outw.Name()
 	if len(name) == 0 {
 		return
 	}
@@ -194,30 +199,35 @@ func (mlog *MultiLogger) Write(b []byte) (n int, err error) {
 }
 
 func (mlog *MultiLogger) processErrorQueue() {
-	var err error
+	var (
+		b   []byte
+		w   NamedWriter
+		err error
+		x   int
+	)
 	for {
 		select {
-		case b := <-mlog.qerr:
+		case b = <-mlog.qerr:
 			if len(b) == 0 {
 				b = append(b, '\n')
 			} else if b[len(b)-1] != '\n' {
 				b = append(b, '\n')
 			}
-			for _, w := range mlog.errs {
+			for _, w = range mlog.errs {
 				_, err = w.Write(b)
 				if err != nil {
 					log.Printf("MultiLogger: %s: %s", w.Name(), err)
 				}
 			}
 		case <-mlog.qerrFlush:
-			for x := 0; x < len(mlog.qerr); x++ {
-				b := <-mlog.qerr
+			for x = 0; x < len(mlog.qerr); x++ {
+				b = <-mlog.qerr
 				if len(b) == 0 {
 					b = append(b, '\n')
 				} else if b[len(b)-1] != '\n' {
 					b = append(b, '\n')
 				}
-				for _, w := range mlog.errs {
+				for _, w = range mlog.errs {
 					_, err = w.Write(b)
 					if err != nil {
 						log.Printf("MultiLogger: %s: %s", w.Name(), err)
@@ -230,25 +240,31 @@ func (mlog *MultiLogger) processErrorQueue() {
 }
 
 func (mlog *MultiLogger) processOutputQueue() {
-	var err error
+	var (
+		b   []byte
+		w   NamedWriter
+		err error
+		x   int
+	)
+
 	for {
 		select {
-		case b := <-mlog.qout:
+		case b = <-mlog.qout:
 			if len(b) == 0 {
 				b = append(b, '\n')
 			} else if b[len(b)-1] != '\n' {
 				b = append(b, '\n')
 			}
-			for _, w := range mlog.outs {
+			for _, w = range mlog.outs {
 				_, err = w.Write(b)
 				if err != nil {
 					log.Printf("MultiLogger: %s: %s", w.Name(), err)
 				}
 			}
 		case <-mlog.qoutFlush:
-			for x := 0; x < len(mlog.qout); x++ {
-				b := <-mlog.qout
-				for _, w := range mlog.outs {
+			for x = 0; x < len(mlog.qout); x++ {
+				b = <-mlog.qout
+				for _, w = range mlog.outs {
 					_, err = w.Write(b)
 					if err != nil {
 						log.Printf("MultiLogger: %s: %s", w.Name(), err)
