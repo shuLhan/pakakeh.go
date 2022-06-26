@@ -16,6 +16,10 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
+var (
+	cmdFlush = []byte("__flush__")
+)
+
 // MultiLogger represent a single log writer that write to multiple outputs.
 // MultiLogger can have zero or more writers for standard output (normal log)
 // and zero or more writers for standard error.
@@ -28,8 +32,7 @@ type MultiLogger struct {
 	qerr chan []byte
 	qout chan []byte
 
-	qerrFlush chan bool
-	qoutFlush chan bool
+	flushq chan struct{}
 
 	errs map[string]NamedWriter
 	outs map[string]NamedWriter
@@ -65,8 +68,7 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 		errs:       make(map[string]NamedWriter, len(errs)),
 		qout:       make(chan []byte, 512),
 		qerr:       make(chan []byte, 512),
-		qerrFlush:  make(chan bool, 1),
-		qoutFlush:  make(chan bool, 1),
+		flushq:     make(chan struct{}, 1),
 	}
 	for _, w = range outs {
 		name = w.Name()
@@ -115,8 +117,8 @@ func (mlog *MultiLogger) Close() {
 	mlog.isClosed = true
 	close(mlog.qerr)
 	close(mlog.qout)
-	<-mlog.qerrFlush
-	<-mlog.qoutFlush
+	<-mlog.flushq
+	<-mlog.flushq
 	mlog.Unlock()
 }
 
@@ -138,16 +140,15 @@ func (mlog *MultiLogger) Fatalf(format string, v ...interface{}) {
 // Flush all writes and wait until it finished.
 func (mlog *MultiLogger) Flush() {
 	mlog.Lock()
+	defer mlog.Unlock()
+
 	if mlog.isClosed {
-		mlog.Unlock()
 		return
 	}
-	mlog.Unlock()
-
-	mlog.qerrFlush <- true
-	mlog.qoutFlush <- true
-	<-mlog.qerrFlush
-	<-mlog.qoutFlush
+	mlog.qerr <- cmdFlush
+	mlog.qout <- cmdFlush
+	<-mlog.flushq
+	<-mlog.flushq
 }
 
 // Outf write the formatted string and its values to all output writers.
@@ -246,8 +247,14 @@ func (mlog *MultiLogger) processErrorQueue() {
 				for name = range mlog.errs {
 					delete(mlog.errs, name)
 				}
-				mlog.qerrFlush <- true
+				mlog.flushq <- struct{}{}
 				return
+			}
+			if bytes.Equal(b, cmdFlush) {
+				// Empty data indicated flushing the channel.
+				flush(mlog.qerr, mlog.errs)
+				mlog.flushq <- struct{}{}
+				continue
 			}
 
 			for name, w = range mlog.errs {
@@ -256,10 +263,6 @@ func (mlog *MultiLogger) processErrorQueue() {
 					log.Printf("MultiLogger: %s: %s", name, err)
 				}
 			}
-
-		case <-mlog.qerrFlush:
-			flush(mlog.qerr, mlog.errs)
-			mlog.qerrFlush <- true
 		}
 	}
 }
@@ -282,8 +285,13 @@ func (mlog *MultiLogger) processOutputQueue() {
 				for name = range mlog.outs {
 					delete(mlog.outs, name)
 				}
-				mlog.qoutFlush <- true
+				mlog.flushq <- struct{}{}
 				return
+			}
+			if bytes.Equal(b, cmdFlush) {
+				flush(mlog.qout, mlog.outs)
+				mlog.flushq <- struct{}{}
+				continue
 			}
 
 			for name, w = range mlog.outs {
@@ -292,10 +300,6 @@ func (mlog *MultiLogger) processOutputQueue() {
 					log.Printf("MultiLogger: %s: %s", name, err)
 				}
 			}
-
-		case <-mlog.qoutFlush:
-			flush(mlog.qout, mlog.outs)
-			mlog.qoutFlush <- true
 		}
 	}
 }
