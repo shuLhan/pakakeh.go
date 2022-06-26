@@ -313,40 +313,35 @@ func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{})
 	mlog.Unlock()
 
 	var (
-		buf    = mlog.bufPool.Get().(*bytes.Buffer)
-		bufFmt = mlog.bufPool.Get().(*bytes.Buffer)
-		args   = make([]interface{}, 0, len(v)+2)
+		buf = mlog.bufPool.Get().(*bytes.Buffer)
 
 		b    []byte
 		lenb int
 	)
+
 	buf.Reset()
-	bufFmt.Reset()
 
 	if len(mlog.timeFormat) > 0 {
-		args = append(args, time.Now().UTC().Format(mlog.timeFormat))
-		bufFmt.WriteString("%s ")
+		buf.WriteString(time.Now().UTC().Format(mlog.timeFormat))
+		buf.WriteByte(' ')
 	}
 	if len(mlog.prefix) > 0 {
-		args = append(args, mlog.prefix)
-		bufFmt.WriteString("%s ")
+		buf.Write(mlog.prefix)
+		buf.WriteByte(' ')
 	}
-	bufFmt.WriteString(format)
-	args = append(args, v...)
-	fmt.Fprintf(buf, bufFmt.String(), args...)
 
+	buf.WriteString(format)
+
+	lenb = len(format)
+	if lenb != 0 || format[lenb-1] != '\n' {
+		buf.WriteByte('\n')
+	}
+
+	format = buf.String()
+	buf.Reset()
+	fmt.Fprintf(buf, format, v...)
 	b = libbytes.Copy(buf.Bytes())
-	lenb = len(b)
-	if lenb == 0 || b[lenb-1] != '\n' {
-		b = append(b, '\n')
-	}
+	q <- b
 
-	select {
-	case q <- b:
-	default:
-		// Queue is full or closed.
-	}
-
-	mlog.bufPool.Put(bufFmt)
 	mlog.bufPool.Put(buf)
 }
