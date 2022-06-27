@@ -25,33 +25,37 @@ import (
 //   - only ASCII letters, digits, '_', and '-' should be used, and
 //   - it should start with a letter.
 //
-// An empty string is equal to "_".
-// Any other unknown characters will be replaced with '_'.
-// If the input does not start with letter, it will be prefixed with
-// '_', unless it start with '_'.
+// This function,
+//
+//   - Return "_" if input is empty string,
+//   - replace unknown characters with '_',
+//   - prefix output with '_' unless it start with '-', '_', or letters, and
+//   - convert letters to lower cases.
 //
 // [Mozilla specification]: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id.
 func NormalizeForID(in string) (out string) {
 	var (
-		bin  = []byte(in)
-		bout = make([]byte, 0, len(bin)+1)
-		b    byte
+		bin = []byte(in)
+		x   int
+		b   byte
 	)
 
-	for _, b = range bin {
-		if ascii.IsAlnum(b) || b == '-' || b == '_' {
-			bout = append(bout, b)
-		} else {
-			bout = append(bout, '_')
+	for x, b = range bin {
+		if ascii.IsAlpha(b) {
+			if b >= 'A' && b <= 'Z' {
+				bin[x] = b + 32
+			}
+		} else if !(ascii.IsDigit(b) || b == '-' || b == '_') {
+			bin[x] = '_'
 		}
 	}
-	if len(bout) == 0 {
-		bout = append(bout, '_')
-	} else if !ascii.IsAlpha(bout[0]) && bout[0] != '_' {
-		bout = append(bout, '_')
-		copy(bout[1:], bout[:])
-		bout[0] = '_'
+	if len(bin) == 0 {
+		bin = append(bin, '_')
+	} else if !ascii.IsAlpha(bin[0]) && bin[0] != '_' {
+		bin = append(bin, '_')
+		copy(bin[1:], bin[:])
+		bin[0] = '_'
 	}
 
-	return string(bout)
+	return string(bin)
 }
