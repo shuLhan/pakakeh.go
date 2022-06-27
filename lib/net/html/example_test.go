@@ -23,3 +23,27 @@ func ExampleNormalizeForID() {
 	//_123_abc_def
 	//___
 }
+
+func ExampleSanitize() {
+	input := `
+<html>
+	<title>Test</title>
+	<head>
+	</head>
+	<body>
+		This
+		<p> is </p>
+		a
+		<a href="/">link</a>.
+		An another
+		<a href="/">link</a>.
+	</body>
+</html>
+`
+
+	out := Sanitize([]byte(input))
+	fmt.Printf("%s", out)
+
+	// Output:
+	// This is a link. An another link.
+}

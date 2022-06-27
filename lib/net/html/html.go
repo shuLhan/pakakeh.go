@@ -15,6 +15,10 @@
 package html
 
 import (
+	"bytes"
+
+	"golang.org/x/net/html"
+
 	"github.com/shuLhan/share/lib/ascii"
 )
 
@@ -58,4 +62,56 @@ func NormalizeForID(in string) (out string) {
 	}
 
 	return string(bin)
+}
+
+// Sanitize the content of HTML into plain text.
+func Sanitize(in []byte) (plain []byte) {
+	if len(in) == 0 {
+		return plain
+	}
+
+	var (
+		r         = bytes.NewReader(in)
+		twoSpaces = []byte("  ")
+
+		w         bytes.Buffer
+		htmlToken *html.Tokenizer
+		tokenType html.TokenType
+		tagName   []byte
+		x         int
+	)
+
+	htmlToken = html.NewTokenizer(r)
+	for {
+		tokenType = htmlToken.Next()
+		switch tokenType {
+		case html.ErrorToken:
+			goto out
+
+		case html.TextToken:
+			w.Write(htmlToken.Text())
+
+		case html.StartTagToken:
+			tagName, _ = htmlToken.TagName()
+
+			if bytes.Equal(tagName, []byte("title")) ||
+				bytes.Equal(tagName, []byte("script")) {
+				htmlToken.Next()
+			}
+		}
+	}
+out:
+	plain = w.Bytes()
+	plain = bytes.Replace(plain, []byte("\r"), nil, -1)
+	plain = bytes.Replace(plain, []byte("\n"), []byte(" "), -1)
+	plain = bytes.Replace(plain, []byte("\t"), []byte(" "), -1)
+	for {
+		x = bytes.Index(plain, twoSpaces)
+		if x < 0 {
+			break
+		}
+		plain = bytes.Replace(plain, twoSpaces, []byte(" "), -1)
+	}
+
+	return plain
 }

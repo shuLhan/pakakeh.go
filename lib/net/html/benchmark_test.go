@@ -19,3 +19,27 @@ func BenchmarkNormalizeForID(b *testing.B) {
 		NormalizeForID(cases[1])
 	}
 }
+
+func BenchmarkSanitize(b *testing.B) {
+	var (
+		input = []byte(`
+<html>
+	<title>Test</title>
+	<head>
+	</head>
+	<body>
+		This
+		<p> is </p>
+		a
+		<a href="/">link</a>.
+		An another
+		<a href="/">link</a>.
+	</body>
+</html>`)
+		x int
+	)
+
+	for ; x < b.N; x++ {
+		Sanitize(input)
+	}
+}

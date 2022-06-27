@@ -18,7 +18,7 @@ import (
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	libints "github.com/shuLhan/share/lib/ints"
-	"github.com/shuLhan/share/lib/sanitize"
+	libhtml "github.com/shuLhan/share/lib/net/html"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
@@ -359,7 +359,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 			node.plainv = node.Content
 
 			if strings.HasPrefix(node.ContentType, "text/html") {
-				node.plainv = sanitize.HTML(node.plainv)
+				node.plainv = libhtml.Sanitize(node.plainv)
 			}
 
 			node.lowerv = bytes.ToLower(node.plainv)
