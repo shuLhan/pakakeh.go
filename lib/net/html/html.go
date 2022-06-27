@@ -71,14 +71,15 @@ func Sanitize(in []byte) (plain []byte) {
 	}
 
 	var (
-		r         = bytes.NewReader(in)
-		twoSpaces = []byte("  ")
+		r = bytes.NewReader(in)
 
-		w         bytes.Buffer
-		htmlToken *html.Tokenizer
-		tokenType html.TokenType
-		tagName   []byte
-		x         int
+		w           bytes.Buffer
+		htmlToken   *html.Tokenizer
+		tokenType   html.TokenType
+		tagName     []byte
+		x, y        int
+		c           byte
+		prevIsSpace bool
 	)
 
 	htmlToken = html.NewTokenizer(r)
@@ -102,16 +103,27 @@ func Sanitize(in []byte) (plain []byte) {
 	}
 out:
 	plain = w.Bytes()
-	plain = bytes.Replace(plain, []byte("\r"), nil, -1)
-	plain = bytes.Replace(plain, []byte("\n"), []byte(" "), -1)
-	plain = bytes.Replace(plain, []byte("\t"), []byte(" "), -1)
-	for {
-		x = bytes.Index(plain, twoSpaces)
-		if x < 0 {
-			break
+
+	// Remove CR ('\r'), replace LF and TAB with space and trim multiple
+	// spaces.
+	for y, c = range plain {
+		if c == '\r' || c == '\v' {
+			continue
 		}
-		plain = bytes.Replace(plain, twoSpaces, []byte(" "), -1)
+		if c == '\n' || c == '\t' || c == ' ' {
+			if !prevIsSpace {
+				plain[x] = ' '
+				x++
+				prevIsSpace = true
+			}
+			continue
+		}
+		plain[x] = plain[y]
+		x++
+		prevIsSpace = false
 	}
+
+	plain = plain[:x]
 
 	return plain
 }

@@ -13,6 +13,7 @@ func ExampleNormalizeForID() {
 	fmt.Println(NormalizeForID("_id.1"))
 	fmt.Println(NormalizeForID("1-d"))
 	fmt.Println(NormalizeForID(".123 ABC def"))
+	fmt.Println(NormalizeForID("test 123"))
 	fmt.Println(NormalizeForID("⌘"))
 	//Output:
 	//_
@@ -21,6 +22,7 @@ func ExampleNormalizeForID() {
 	//_id_1
 	//_1-d
 	//_123_abc_def
+	//test_123
 	//___
 }
 
