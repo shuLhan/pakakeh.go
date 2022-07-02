@@ -50,13 +50,13 @@ import (
 {{define "GENERATE_NODE"}}
 	{{- $varname := .Opts.Embed.VarName}}
 func {{ .Node.GenFuncName}}() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "{{.Node.SysPath}}",
-		Path:            "{{.Node.Path}}",
-		ContentType:     "{{.Node.ContentType}}",
-		GenFuncName:     "{{.Node.GenFuncName}}",
+	var node = &memfs.Node{
+		SysPath:     "{{.Node.SysPath}}",
+		Path:        "{{.Node.Path}}",
+		ContentType: "{{.Node.ContentType}}",
+		GenFuncName: "{{.Node.GenFuncName}}",
 {{- if .Node.Content }}
-		Content:         []byte("{{range $x, $c := .Node.Content}}{{ printf "\\x%02X" $c }}{{end}}"),
+		Content:     []byte("{{range $x, $c := .Node.Content}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}
 	}
 	node.SetMode({{printf "%d" .Node.Mode}})

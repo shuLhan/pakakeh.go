@@ -9,11 +9,11 @@ import (
 )
 
 func generate_testdata() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata",
-		Path:            "/",
-		ContentType:     "",
-		GenFuncName:     "generate_testdata",
+	var node = &memfs.Node{
+		SysPath:     "testdata",
+		Path:        "/",
+		ContentType: "",
+		GenFuncName: "generate_testdata",
 	}
 	node.SetMode(2147484141)
 	node.SetModTimeUnix(1633772772, 881353676)
@@ -30,11 +30,11 @@ func generate_testdata() *memfs.Node {
 }
 
 func generate_testdata_direct() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/direct",
-		Path:            "/direct",
-		ContentType:     "",
-		GenFuncName:     "generate_testdata_direct",
+	var node = &memfs.Node{
+		SysPath:     "testdata/direct",
+		Path:        "/direct",
+		ContentType: "",
+		GenFuncName: "generate_testdata_direct",
 	}
 	node.SetMode(2147484141)
 	node.SetModTimeUnix(1569586540, 0)
@@ -45,11 +45,11 @@ func generate_testdata_direct() *memfs.Node {
 }
 
 func generate_testdata_direct_add() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/direct/add",
-		Path:            "/direct/add",
-		ContentType:     "",
-		GenFuncName:     "generate_testdata_direct_add",
+	var node = &memfs.Node{
+		SysPath:     "testdata/direct/add",
+		Path:        "/direct/add",
+		ContentType: "",
+		GenFuncName: "generate_testdata_direct_add",
 	}
 	node.SetMode(2147484141)
 	node.SetModTimeUnix(1569586540, 0)
@@ -61,12 +61,12 @@ func generate_testdata_direct_add() *memfs.Node {
 }
 
 func generate_testdata_direct_add_file() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/direct/add/file",
-		Path:            "/direct/add/file",
-		ContentType:     "text/plain; charset=utf-8",
-		GenFuncName:     "generate_testdata_direct_add_file",
-		Content:         []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x2E\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/direct/add/file",
+		Path:        "/direct/add/file",
+		ContentType: "text/plain; charset=utf-8",
+		GenFuncName: "generate_testdata_direct_add_file",
+		Content:     []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1569586540, 0)
@@ -76,12 +76,12 @@ func generate_testdata_direct_add_file() *memfs.Node {
 }
 
 func generate_testdata_direct_add_file2() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/direct/add/file2",
-		Path:            "/direct/add/file2",
-		ContentType:     "text/plain; charset=utf-8",
-		GenFuncName:     "generate_testdata_direct_add_file2",
-		Content:         []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x20\x32\x2E\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/direct/add/file2",
+		Path:        "/direct/add/file2",
+		ContentType: "text/plain; charset=utf-8",
+		GenFuncName: "generate_testdata_direct_add_file2",
+		Content:     []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x20\x32\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1569586540, 0)
@@ -91,11 +91,11 @@ func generate_testdata_direct_add_file2() *memfs.Node {
 }
 
 func generate_testdata_exclude() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/exclude",
-		Path:            "/exclude",
-		ContentType:     "",
-		GenFuncName:     "generate_testdata_exclude",
+	var node = &memfs.Node{
+		SysPath:     "testdata/exclude",
+		Path:        "/exclude",
+		ContentType: "",
+		GenFuncName: "generate_testdata_exclude",
 	}
 	node.SetMode(2147484141)
 	node.SetModTimeUnix(1633792794, 467899662)
@@ -108,12 +108,12 @@ func generate_testdata_exclude() *memfs.Node {
 }
 
 func generate_testdata_exclude_index_link_css() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/exclude/index-link.css",
-		Path:            "/exclude/index-link.css",
-		ContentType:     "text/css; charset=utf-8",
-		GenFuncName:     "generate_testdata_exclude_index_link_css",
-		Content:         []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/exclude/index-link.css",
+		Path:        "/exclude/index-link.css",
+		ContentType: "text/css; charset=utf-8",
+		GenFuncName: "generate_testdata_exclude_index_link_css",
+		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1633792794, 467899662)
@@ -123,12 +123,12 @@ func generate_testdata_exclude_index_link_css() *memfs.Node {
 }
 
 func generate_testdata_exclude_index_link_html() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/exclude/index-link.html",
-		Path:            "/exclude/index-link.html",
-		ContentType:     "text/html; charset=utf-8",
-		GenFuncName:     "generate_testdata_exclude_index_link_html",
-		Content:         []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/exclude/index-link.html",
+		Path:        "/exclude/index-link.html",
+		ContentType: "text/html; charset=utf-8",
+		GenFuncName: "generate_testdata_exclude_index_link_html",
+		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1633792794, 467899662)
@@ -138,12 +138,12 @@ func generate_testdata_exclude_index_link_html() *memfs.Node {
 }
 
 func generate_testdata_exclude_index_link_js() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/exclude/index-link.js",
-		Path:            "/exclude/index-link.js",
-		ContentType:     "text/javascript; charset=utf-8",
-		GenFuncName:     "generate_testdata_exclude_index_link_js",
-		Content:         []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/exclude/index-link.js",
+		Path:        "/exclude/index-link.js",
+		ContentType: "text/javascript; charset=utf-8",
+		GenFuncName: "generate_testdata_exclude_index_link_js",
+		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1633792794, 467899662)
@@ -153,11 +153,11 @@ func generate_testdata_exclude_index_link_js() *memfs.Node {
 }
 
 func generate_testdata_include() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/include",
-		Path:            "/include",
-		ContentType:     "",
-		GenFuncName:     "generate_testdata_include",
+	var node = &memfs.Node{
+		SysPath:     "testdata/include",
+		Path:        "/include",
+		ContentType: "",
+		GenFuncName: "generate_testdata_include",
 	}
 	node.SetMode(2147484141)
 	node.SetModTimeUnix(1629623653, 749800911)
@@ -170,12 +170,12 @@ func generate_testdata_include() *memfs.Node {
 }
 
 func generate_testdata_include_index_css() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/include/index.css",
-		Path:            "/include/index.css",
-		ContentType:     "text/css; charset=utf-8",
-		GenFuncName:     "generate_testdata_include_index_css",
-		Content:         []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/include/index.css",
+		Path:        "/include/index.css",
+		ContentType: "text/css; charset=utf-8",
+		GenFuncName: "generate_testdata_include_index_css",
+		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -185,12 +185,12 @@ func generate_testdata_include_index_css() *memfs.Node {
 }
 
 func generate_testdata_include_index_html() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/include/index.html",
-		Path:            "/include/index.html",
-		ContentType:     "text/html; charset=utf-8",
-		GenFuncName:     "generate_testdata_include_index_html",
-		Content:         []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/include/index.html",
+		Path:        "/include/index.html",
+		ContentType: "text/html; charset=utf-8",
+		GenFuncName: "generate_testdata_include_index_html",
+		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1588592346, 0)
@@ -200,12 +200,12 @@ func generate_testdata_include_index_html() *memfs.Node {
 }
 
 func generate_testdata_include_index_js() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/include/index.js",
-		Path:            "/include/index.js",
-		ContentType:     "text/javascript; charset=utf-8",
-		GenFuncName:     "generate_testdata_include_index_js",
-		Content:         []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/include/index.js",
+		Path:        "/include/index.js",
+		ContentType: "text/javascript; charset=utf-8",
+		GenFuncName: "generate_testdata_include_index_js",
+		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -215,12 +215,12 @@ func generate_testdata_include_index_js() *memfs.Node {
 }
 
 func generate_testdata_index_css() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/index.css",
-		Path:            "/index.css",
-		ContentType:     "text/css; charset=utf-8",
-		GenFuncName:     "generate_testdata_index_css",
-		Content:         []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/index.css",
+		Path:        "/index.css",
+		ContentType: "text/css; charset=utf-8",
+		GenFuncName: "generate_testdata_index_css",
+		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -230,12 +230,12 @@ func generate_testdata_index_css() *memfs.Node {
 }
 
 func generate_testdata_index_html() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/index.html",
-		Path:            "/index.html",
-		ContentType:     "text/html; charset=utf-8",
-		GenFuncName:     "generate_testdata_index_html",
-		Content:         []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/index.html",
+		Path:        "/index.html",
+		ContentType: "text/html; charset=utf-8",
+		GenFuncName: "generate_testdata_index_html",
+		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1588592347, 0)
@@ -245,12 +245,12 @@ func generate_testdata_index_html() *memfs.Node {
 }
 
 func generate_testdata_index_js() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/index.js",
-		Path:            "/index.js",
-		ContentType:     "text/javascript; charset=utf-8",
-		GenFuncName:     "generate_testdata_index_js",
-		Content:         []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/index.js",
+		Path:        "/index.js",
+		ContentType: "text/javascript; charset=utf-8",
+		GenFuncName: "generate_testdata_index_js",
+		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
@@ -260,12 +260,12 @@ func generate_testdata_index_js() *memfs.Node {
 }
 
 func generate_testdata_plain() *memfs.Node {
-	node := &memfs.Node{
-		SysPath:         "testdata/plain",
-		Path:            "/plain",
-		ContentType:     "text/plain; charset=utf-8",
-		GenFuncName:     "generate_testdata_plain",
-		Content:         []byte("\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x70\x6C\x61\x69\x6E\x20\x74\x65\x78\x74\x2E\x0A"),
+	var node = &memfs.Node{
+		SysPath:     "testdata/plain",
+		Path:        "/plain",
+		ContentType: "text/plain; charset=utf-8",
+		GenFuncName: "generate_testdata_plain",
+		Content:     []byte("\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x70\x6C\x61\x69\x6E\x20\x74\x65\x78\x74\x2E\x0A"),
 	}
 	node.SetMode(420)
 	node.SetModTimeUnix(1562038157, 0)
