@@ -1,6 +1,6 @@
 =  CHANGELOG
 Shulhan <ms@kilabit.info>
-31 May 2022
+3 July 2022
 :toc:
 :sectanchors:
 :sectlinks:
@@ -16,6 +16,234 @@ This is changelog for share module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
+
+[#v0_39_0]
+==  share v0.39.0 (2022-07-03)
+
+[#v0_39_0_breaking_changes]
+==  Breaking changes
+
+all: move lib/sanitize.HTML to net/html.Sanitize::
++
+--
+Since the sanitize package only contains HTML function, and the html
+package already exist, we move the function into html package.
+--
+
+[#v0_39_0_new_features]
+==  New features
+
+lib/mlog: add method Close to MultiLogger::
++
+--
+The Close method flush and close all log forwarders.
+Any write to a closed MultiLogger will be ignored.
+
+This changes require adding sync.Mutex to mark if the instance has been
+closed or not; which affect createMultiLogger and defaultMLog to return
+a pointer to prevent copy on Mutex.
+--
+
+lib/clise: implement json.Marshaler on Clise::
++
+--
+The MarshalJSON method convert the Clise into slice by calling Slice
+and then convert it into JSON.
+--
+
+lib/reflect: add function Marshal::
++
+--
+The Marshal function marshal the obj value to []byte by calling one of
+the method: MarshalBinary, MarshalJSON, or MarshalText; in respective
+order.
+
+If obj implement one of the method with valid signature, it will return
+(out, nil, true);
+unless there is an error.
+
+If the method signature invalid it will return (nil, err, false).
+
+If obj is nil or none of the method exist it will return
+(nil, nil, false).
+--
+
+net/html: add function NormalizeForID::
++
+--
+Given an input string, The NormalizeForID normalize it to HTML ID.
+The normalization follow Mozilla specification [1] rules,
+
+* it must not contain whitespace (spaces, tabs etc.),
+* only ASCII letters, digits, '_', and '-' should be used, and
+* it should start with a letter.
+
+The NormalizeForID do this normalization,
+
+* An empty string is equal to "\_".
+* Any other unknown characters will be replaced with '\_'.
+* If the input does not start with letter, it will be prefixed with
+  '\_', unless it start with '\_'.
+* All letters converted to lower case.
+
+[1] https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id.
+--
+
+lib/http: add function to unmarshal url.Values using tag `form:`::
++
+--
+UnmarshalForm read struct fields tagged with `form:` from out as key and
+set its using the value from url.Values based on that key.
+If the field does not have `form:` tag but it is exported, then it will
+use the field name, in case insensitive.
+
+Only the following types are supported: bool, int/intX, uint/uintX,
+floatX, string, []byte, or type that implement BinaryUnmarshaler
+(UnmarshalBinary), json.Unmarshaler (UnmarshalJSON), or TextUnmarshaler
+(UnmarshalText).
+
+A bool type can be set to true using the following string value: "true",
+"yes", or "1".
+
+If the input contains multiple values but the field type is not slice,
+the field will be set using the first value.
+
+It will return an error if the out variable is not set-able (the type is
+not a pointer to a struct).
+It will not return an error if one of the input value is not match with
+field type.
+--
+
+lib/reflect: implement Set function to set reflect.Value by string::
++
+--
+The Set function set the obj value by converting the string val from
+parameter to the obj type.
+
+If the obj is an interface or struct, its value will be set by calling
+Unmarshal.
+
+It will return an error if,
+
+* obj is not setable, variable is passed without pointer or pointer
+    not initialized.
+* val is overflow
+* obj Kind is Invalid, Array, Chan, Func, Map, or UnsafePointer.
+--
+
+lib/reflect: add function Unmarshal::
++
+--
+The Unmarshal function set the obj value by calling one of the method:
+UnmarshalBinary, UnmarshalJSON, or UnmarshalText; in respective
+order.
+
+Just like reflect, the obj value must be pointer to initialized variable
+(&T) or pointer-to-pointer to uninitialized variable (**T).
+
+If obj implement one of the method, it will return (true, nil) if there is
+no error.
+
+If none of the method exist on obj, it will return (false, nil).
+--
+
+lib/reflect: add function Tag to simplify lookup on struct's field tag::
++
+--
+Given a StructField and the name of tag, return the tag's value and
+options inside the tag.
+The options is any string after tag's value, separated by comma.
+For example, given the following field definition
+
+	F `tag:"name,opt1, opt2"`
+
+It will return (name, [opt1 opt2], true).
+
+If the field is exported but does not have tag, it will return the field
+name (as is without converting to lower case) in val with hasTag is
+false: (Name, nil, false).
+
+If the field is un-exported it will return empty val with hasTag is
+false ("", nil, false).
+--
+
+[#v0_39_0_enhancements]
+==  Enhancements
+
+lib/memfs: update the template format::
++
+--
+Replace ":=" with "var" and realign the field assignments.
+--
+
+net/html: use inline replacement to clean up white spaces::
++
+--
+Instead of using bytes.Replace, three times, iterate the plain text
+manually to clean up the white and multiple spaces.
+
+Benchmark result,
+
+----
+name        old time/op    new time/op    delta
+Sanitize-8    4.27µs ±10%    2.64µs ±13%  -38.21%  (p=0.000 n=10+10)
+
+name        old alloc/op   new alloc/op   delta
+Sanitize-8    4.84kB ± 0%    4.45kB ± 0%   -7.94%  (p=0.000 n=10+10)
+
+name        old allocs/op  new allocs/op  delta
+Sanitize-8      13.0 ± 0%       6.0 ± 0%  -53.85%  (p=0.000 n=10+10)
+----
+--
+
+lib/mlog: minimize allocation when generating log::
++
+--
+Instead of using two bytes.Buffer pool, use one;
+and add space after time and prefix by writing to buffer directly instead
+of allocating new arguments to Fprintf.
+
+Benchmark result,
+
+----
+name           old time/op    new time/op    delta
+MultiLogger-8    3.97µs ± 3%    3.68µs ± 2%   -7.43%  (p=0.008 n=5+5)
+
+name           old alloc/op   new alloc/op   delta
+MultiLogger-8      510B ± 1%      300B ± 1%  -41.13%  (p=0.008 n=5+5)
+
+name           old allocs/op  new allocs/op  delta
+MultiLogger-8      10.4 ± 6%       3.4 ±18%  -67.31%  (p=0.008 n=5+5)
+----
+--
+
+lib/dns: use Shutdown to stop DoH server::
++
+--
+Using Shutdown allow active connection not interrupted but it may
+cause delay when restarting the server.
+
+While at it, set the doh and dot server instance to nil to release
+the resource, in case the Server need to start again.
+--
+
+lib/websocket: realign all struct to minimize allocations::
++
+--
+Changes,
+
+* Client: from 176 to 144 (-32 bytes)
+* ClientManager: from 64 to 40 (-24 bytes)
+* Frame: from 72 to 56 bytes (-16 bytes).
+* Handshak: from 160 to 120 bytes (-40 bytes).
+* Request: from 88 to 72 (-16 bytes)
+* Response: from 40 to 24 (-16 bytes)
+* route: from 48 to 32 (-16 bytes)
+* Server: from 72 to 64 (-8 bytes)
+* ServerOptions: from 104 to 96 (s-8 bytes)
+
+Plus other structs in the tests.
+--
 
 [#v0_38_0]
 ==  share v0.38.0 (2022-06-05)

@@ -106,12 +106,11 @@ h3 > span {
 dl {
 	margin: 1.25rem;
 }
+dt {
+	font-weight: bold
+}
 dd {
 	margin: 0 0 0 1.25rem;
-}
-dl,
-dd {
-	font-size: 0.875rem;
 }
 
 /**
@@ -240,11 +239,15 @@ dd {
 <div class="details">
 <span id="author" class="author">Shulhan</span><br>
 <span id="email" class="email"><a href="mailto:ms@kilabit.info">ms@kilabit.info</a></span><br>
-<span id="revdate">31 May 2022</span>
+<span id="revdate">3 July 2022</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#v0_39_0">share v0.39.0 (2022-07-03)</a></li>
+<li><a href="#v0_39_0_breaking_changes">Breaking changes</a></li>
+<li><a href="#v0_39_0_new_features">New features</a></li>
+<li><a href="#v0_39_0_enhancements">Enhancements</a></li>
 <li><a href="#v0_38_0">share v0.38.0 (2022-06-05)</a>
 <ul class="sectlevel2">
 <li><a href="#_breaking_changes">Breaking changes</a></li>
@@ -317,6 +320,387 @@ This is changelog for share module since v0.12.0 until v0.21.0.</p>
 <div class="paragraph">
 <p><a href="CHANGELOG_2018-2019.html" target="_blank" rel="noopener">Changelog from 2018 to 2019</a>.
 This is changelog for share module since v0.1.0 until v0.11.0.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0_39_0"><a class="anchor" href="#v0_39_0"></a><a class="link" href="#v0_39_0">share v0.39.0 (2022-07-03)</a></h2>
+<div class="sectionbody">
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0_39_0_breaking_changes"><a class="anchor" href="#v0_39_0_breaking_changes"></a><a class="link" href="#v0_39_0_breaking_changes">Breaking changes</a></h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">all: move lib/sanitize.HTML to net/html.Sanitize</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Since the sanitize package only contains HTML function, and the html
+package already exist, we move the function into html package.</p>
+</div>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0_39_0_new_features"><a class="anchor" href="#v0_39_0_new_features"></a><a class="link" href="#v0_39_0_new_features">New features</a></h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">lib/mlog: add method Close to MultiLogger</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The Close method flush and close all log forwarders.
+Any write to a closed MultiLogger will be ignored.</p>
+</div>
+<div class="paragraph">
+<p>This changes require adding sync.Mutex to mark if the instance has been
+closed or not; which affect createMultiLogger and defaultMLog to return
+a pointer to prevent copy on Mutex.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/clise: implement json.Marshaler on Clise</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The MarshalJSON method convert the Clise into slice by calling Slice
+and then convert it into JSON.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/reflect: add function Marshal</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The Marshal function marshal the obj value to []byte by calling one of
+the method: MarshalBinary, MarshalJSON, or MarshalText; in respective
+order.</p>
+</div>
+<div class="paragraph">
+<p>If obj implement one of the method with valid signature, it will return
+(out, nil, true);
+unless there is an error.</p>
+</div>
+<div class="paragraph">
+<p>If the method signature invalid it will return (nil, err, false).</p>
+</div>
+<div class="paragraph">
+<p>If obj is nil or none of the method exist it will return
+(nil, nil, false).</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">net/html: add function NormalizeForID</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Given an input string, The NormalizeForID normalize it to HTML ID.
+The normalization follow Mozilla specification [1] rules,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>it must not contain whitespace (spaces, tabs etc.),</p>
+</li>
+<li>
+<p>only ASCII letters, digits, '_', and '-' should be used, and</p>
+</li>
+<li>
+<p>it should start with a letter.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The NormalizeForID do this normalization,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An empty string is equal to "_".</p>
+</li>
+<li>
+<p>Any other unknown characters will be replaced with '_'.</p>
+</li>
+<li>
+<p>If the input does not start with letter, it will be prefixed with
+'_', unless it start with '_'.</p>
+</li>
+<li>
+<p>All letters converted to lower case.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>[1] <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id" class="bare">https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id</a>.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/http: add function to unmarshal url.Values using tag <code>form:</code></dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>UnmarshalForm read struct fields tagged with <code>form:</code> from out as key and
+set its using the value from url.Values based on that key.
+If the field does not have <code>form:</code> tag but it is exported, then it will
+use the field name, in case insensitive.</p>
+</div>
+<div class="paragraph">
+<p>Only the following types are supported: bool, int/intX, uint/uintX,
+floatX, string, []byte, or type that implement BinaryUnmarshaler
+(UnmarshalBinary), json.Unmarshaler (UnmarshalJSON), or TextUnmarshaler
+(UnmarshalText).</p>
+</div>
+<div class="paragraph">
+<p>A bool type can be set to true using the following string value: "true",
+"yes", or "1".</p>
+</div>
+<div class="paragraph">
+<p>If the input contains multiple values but the field type is not slice,
+the field will be set using the first value.</p>
+</div>
+<div class="paragraph">
+<p>It will return an error if the out variable is not set-able (the type is
+not a pointer to a struct).
+It will not return an error if one of the input value is not match with
+field type.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/reflect: implement Set function to set reflect.Value by string</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The Set function set the obj value by converting the string val from
+parameter to the obj type.</p>
+</div>
+<div class="paragraph">
+<p>If the obj is an interface or struct, its value will be set by calling
+Unmarshal.</p>
+</div>
+<div class="paragraph">
+<p>It will return an error if,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>obj is not setable, variable is passed without pointer or pointer
+not initialized.</p>
+</li>
+<li>
+<p>val is overflow</p>
+</li>
+<li>
+<p>obj Kind is Invalid, Array, Chan, Func, Map, or UnsafePointer.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/reflect: add function Unmarshal</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The Unmarshal function set the obj value by calling one of the method:
+UnmarshalBinary, UnmarshalJSON, or UnmarshalText; in respective
+order.</p>
+</div>
+<div class="paragraph">
+<p>Just like reflect, the obj value must be pointer to initialized variable
+(&T) or pointer-to-pointer to uninitialized variable (**T).</p>
+</div>
+<div class="paragraph">
+<p>If obj implement one of the method, it will return (true, nil) if there is
+no error.</p>
+</div>
+<div class="paragraph">
+<p>If none of the method exist on obj, it will return (false, nil).</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/reflect: add function Tag to simplify lookup on struct&#8217;s field tag</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Given a StructField and the name of tag, return the tag&#8217;s value and
+options inside the tag.
+The options is any string after tag&#8217;s value, separated by comma.
+For example, given the following field definition</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>F `tag:"name,opt1, opt2"`</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It will return (name, [opt1 opt2], true).</p>
+</div>
+<div class="paragraph">
+<p>If the field is exported but does not have tag, it will return the field
+name (as is without converting to lower case) in val with hasTag is
+false: (Name, nil, false).</p>
+</div>
+<div class="paragraph">
+<p>If the field is un-exported it will return empty val with hasTag is
+false ("", nil, false).</p>
+</div>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="v0_39_0_enhancements"><a class="anchor" href="#v0_39_0_enhancements"></a><a class="link" href="#v0_39_0_enhancements">Enhancements</a></h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">lib/memfs: update the template format</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Replace ":=" with "var" and realign the field assignments.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">net/html: use inline replacement to clean up white spaces</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Instead of using bytes.Replace, three times, iterate the plain text
+manually to clean up the white and multiple spaces.</p>
+</div>
+<div class="paragraph">
+<p>Benchmark result,</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>name        old time/op    new time/op    delta
+Sanitize-8    4.27µs ±10%    2.64µs ±13%  -38.21%  (p=0.000 n=10+10)
+
+name        old alloc/op   new alloc/op   delta
+Sanitize-8    4.84kB ± 0%    4.45kB ± 0%   -7.94%  (p=0.000 n=10+10)
+
+name        old allocs/op  new allocs/op  delta
+Sanitize-8      13.0 ± 0%       6.0 ± 0%  -53.85%  (p=0.000 n=10+10)</pre>
+</div>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/mlog: minimize allocation when generating log</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Instead of using two bytes.Buffer pool, use one;
+and add space after time and prefix by writing to buffer directly instead
+of allocating new arguments to Fprintf.</p>
+</div>
+<div class="paragraph">
+<p>Benchmark result,</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>name           old time/op    new time/op    delta
+MultiLogger-8    3.97µs ± 3%    3.68µs ± 2%   -7.43%  (p=0.008 n=5+5)
+
+name           old alloc/op   new alloc/op   delta
+MultiLogger-8      510B ± 1%      300B ± 1%  -41.13%  (p=0.008 n=5+5)
+
+name           old allocs/op  new allocs/op  delta
+MultiLogger-8      10.4 ± 6%       3.4 ±18%  -67.31%  (p=0.008 n=5+5)</pre>
+</div>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/dns: use Shutdown to stop DoH server</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Using Shutdown allow active connection not interrupted but it may
+cause delay when restarting the server.</p>
+</div>
+<div class="paragraph">
+<p>While at it, set the doh and dot server instance to nil to release
+the resource, in case the Server need to start again.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/websocket: realign all struct to minimize allocations</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Changes,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Client: from 176 to 144 (-32 bytes)</p>
+</li>
+<li>
+<p>ClientManager: from 64 to 40 (-24 bytes)</p>
+</li>
+<li>
+<p>Frame: from 72 to 56 bytes (-16 bytes).</p>
+</li>
+<li>
+<p>Handshak: from 160 to 120 bytes (-40 bytes).</p>
+</li>
+<li>
+<p>Request: from 88 to 72 (-16 bytes)</p>
+</li>
+<li>
+<p>Response: from 40 to 24 (-16 bytes)</p>
+</li>
+<li>
+<p>route: from 48 to 32 (-16 bytes)</p>
+</li>
+<li>
+<p>Server: from 72 to 64 (-8 bytes)</p>
+</li>
+<li>
+<p>ServerOptions: from 104 to 96 (s-8 bytes)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Plus other structs in the tests.</p>
+</div>
+</div>
+</div>
+</dd>
+</dl>
 </div>
 </div>
 </div>
@@ -1594,7 +1978,7 @@ at the same times.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-03 14:36:51 +0700
+Last updated 2022-07-03 15:04:34 +0700
 </div>
 </div>
 			</div>
