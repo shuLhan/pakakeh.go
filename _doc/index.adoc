@@ -1,5 +1,6 @@
 # shuLhan/share internal documentation
 Shulhan <ms@kilabit.info>
+:toc:
 
 Beside
 https://pkg.go.dev/github.com/shuLhan/share#section-documentation[the Go documentation],
@@ -10,7 +11,35 @@ their scope and limitation of Go doc formatting itself.
 NOTE: The links below is used to be viewed locally, not through Github or
 pkg.go.dev.
 
-* link:CHANGELOG.html[CHANGELOG]
+The documentation is created and generated using
+https://git.sr.ht/~shulhan/ciigo[`ciigo`].
+
+To serve documentation on HTTP server at http://127.0.0.1:21019 and watch
+changes on documentation files (".adoc") and regenerate the HTML
+files, run
+
+----
+$ make docs-serve
+----
+
+
+== Changelog
+
+This library is released every month, usually at the first week of month.
+
+link:CHANGELOG.html[Latest changelog^].
+
+link:CHANGELOG_2021.html[Changelog in 2021^].
+This is changelog for share module since v0.22.0 until v0.32.0.
+
+link:CHANGELOG_2020.html[Changelog in 2020^].
+This is changelog for share module since v0.12.0 until v0.21.0.
+
+link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
+This is changelog for share v0.1.0 until v0.11.0.
+
+
+== Simplified RFCs
 
 * link:IMF.html[Internet Message Format (RFC 5322)]
 ** link:MIME_I_FORMAT.html[MIME Part One: Format of Internet Message Bodies (RFC 2045)]
@@ -31,22 +60,5 @@ pkg.go.dev.
 ** link:ESMTP_AUTH.html[SMTP Service Extension for Authentication (RFC 4954)]
 
 * link:SPF.html[Sender Policy Framework version 1 (RFC 7208)]
-
-The documentation is created and generated using
-https://git.sr.ht/~shulhan/ciigo[`ciigo`].
-
-To serve documentation on HTTP server at http://127.0.0.1:21019 and watch
-changes on documentation files (".adoc") and regenerate the HTML
-files, run
-
-----
-$ make docs-serve
-----
-
-To generate HTML files for all asciidoc files, run
-
-----
-$ make docs
-----
 
 That's it! Happy hacking!

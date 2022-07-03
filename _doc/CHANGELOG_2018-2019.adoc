@@ -1,0 +1,575 @@
+= Changelog from 2018 to 2019
+Shulhan <ms@kilabit.info>
+3 July 2022
+:toc:
+:sectanchors:
+:sectlinks:
+
+link:CHANGELOG.html[Latest changelog^].
+
+link:CHANGELOG_2021.html[Changelog in 2021^].
+This is changelog for share module since v0.22.0 until v0.32.0.
+
+link:CHANGELOG_2020.html[Changelog in 2020^].
+This is changelog for share module since v0.12.0 until v0.21.0.
+
+
+[#v0_11_0]
+==  share v0.11.0 (2019-12-26)
+
+[#v0_11_0_breaking_changes]
+===  Breaking changes
+
+*  dns: merge Start and Wait into ListenAndServe
+
+[#v0_11_0_new_features]
+===  New features
+
+*  memfs: implement http.FileSystem on MemFS
+*  memfs: implement http.File on Node
+*  memfs: implement os.FileInfo on Node
+*  memfs: implement io.Closer, io.Reader, and io.Seeker on Node
+
+[#v0_11_0_enhancements]
+===  Enhancements
+
+*  dns: allocate raw packet on receive
+*  dns: log the number of pruned records
+*  errors: add field Name and err
+
+[#v0_11_0_bug_fixes]
+===  Bug fixes
+
+*  dns: split between read and write timeout for TCPClient
+
+
+[#v0_10_2]
+==  share v0.10.2 (2019-12-07)
+
+[#v0_10_2_bug_fixes]
+===  Bug fixes
+
+*  dns: check for bad certificate when reading DoT request
+*  dns: fix the use of goroutine on runForwarders
+
+
+[#v0_10_1]
+==  share v0.10.1 (2019-12-05)
+
+[#v0_10_1_bug_fixes]
+===  Bug fixes
+
+*  dns: close the connection if receiving zero packet on serveTCPClient
+*  dns: increase and decrease number of forwarders only for primary forwarders
+*  dns: make the stopper channel to be buffered
+*  dns: check for nil forwarder
+*  dns: check for nil connection on DoTClient's Close
+*  dns: check for zero query type and class on TCPClient Lookup method
+*  dns: check for nil connection on Close at TCPClient
+*  dns: minimize double looping on checking error at serveTCPClient
+*  git: fix the test using full path URL and repository directory
+*  io: fix test using existing file instead of generate file
+*  net: handle interrupted system call on epoll Wait
+*  ssh: fix test ClientConfig initialize on Github Actions
+*  websocket: remove test for empty endpoint due to different format
+*  websocket: fix zero response ID when error on handleText
+
+[#v0_10_1_enhancements]
+===  Enhancements
+
+*  dns: remove the use of pointer on Message fields
+*  dns: remove the use of ResourceRecord pool
+*  http: add method HTTPMethod to Endpoint
+*  http: disable creating Memfs if Root options is empty
+*  memfs: remove unneeded call to GeneratedPathNode.Set
+*  mining: move commands to root
+*  websocket: add examples of WebSocket as chat server and client
+*  websocket: add new function to create broadcast response
+*  websocket: add field Conn to represent connection in Request
+*  websocket: check for read timeout on recv
+*  websocket: remove unused error on NewServer
+
+[#v0_10_0]
+==  share v0.10.0 (2019-11-05)
+
+[#v0_10_0_new_features]
+===  New features
+
+*  dns: implement client and server for DNS over TLS
+*  ini: add method GetsUniq and ValsUniq that return uniq values only
+*  net: implement network polling using epoll and kqueue
+
+[#v0_10_0_breaking_changes]
+===  Breaking Changes
+
+*  dns: change the server certificate options to load from files
+*  ini: change Gets return as is, with duplicate values
+
+[#v0_10_0_enhancements]
+===  Enhancements
+
+*  dns: allow listening on DoH without requiring certificate
+*  ini: support marshaling and un-marshaling time.Duration
+*  ini: support marshaling and un-marshaling time.Time
+*  ini: support marshaling and un-marshaling embedded structs
+*  websocket: websocket: replace epoll implementation with libnet.Poll
+
+[#v0_10_0_bug_fixes]
+===  Bug fixes
+
+*  dns: return error code 4 if server receive unknown message class or type
+*  dns: return an error if section question contains invalid packet
+*  ini: fix return value for empty string in IsValueBoolTrue
+*  strings: fix logic of Split function
+*  websocket: set the response ID after calling handler on handleText
+*  websocket: wrap the response with frame on sendResponse
+
+
+[#v0_9_0]
+==  share v0.9.0 (2019-10-08)
+
+[#v0_9_0_new_features]
+===  New features
+
+*  bytes: add function to get all indexes of word in string
+*  bytes: add function to take snippets from string by indexes
+*  bytes: add function to get all indexes of token in string
+*  ints: add function to merge two slices by distance
+*  memfs: add method to add file directly as child of root
+*  memfs: add method to Search content of files
+*  sanitize: new package to sanitize markup document into plain text
++
+Current implementation have a function to sanitize the content of HTML.
+
+*  strings: add function to convert slice of string to slice of slice of bytes
+
+*  http: implement key binding in registered Endpoint's Path
++
+Previously, only raw path can be registered on Endpoint.  This changes
+implement key binding using colon ":" on path.  For example, registering
+path "/:x/y" will bind key "x" to a string value that can be accessed on
+http.Request.Form using Get method.
+
+[#v0_9_0_breaking_changes]
+===  Breaking Changes
+
+*  ini: set variable with "=" without a value default to empty string
++
+--
+Previously, a variable end with "=" will have value set to "true".
+For example,
+
+----
+[section]
+var =
+----
+
+set the "var" value to string "true".
+
+This changes make the variable that end with "=" without any value
+to be an empty string, so "var" value is equal to "".
+--
+
+[#v0_9_0_bug_fixes]
+===  Bug fixes
+
+*  ini: check for possible nil variable on Write
+
+*  dns: allow message with non recursive-desired to be forwarded
++
+On macOS, turn out, all DNS queries have RD flag set to zero.  This cause
+no DNS queries forwarded to parent server.
+
+[#v0_9_0_enhancements]
+===  Enhancements
+
+*  http: export the Memfs field on Server
++
+User of HTTP can use the Memfs field to get the content manually or
+to Search the content.
+
+*  http: add content and response type HTML and XML
+
+*  memfs: export the Decode method on Node
+
+
+[#v0_8_2]
+==  share v0.8.2 (2019-09-05)
+
+[#v0_8_2_enhancements]
+===  Enhancements
+
+*  http: make the request body always available even after ParseForm()
++
+Previously, if the request type is query, form, or JSON, we call the
+ParseForm() to let the http.Request read the Body POST form data and fill
+the Form and/or PostForm fields.  This  method will cause the request
+Body will become empty since its already read and closed.
+One of use case of POST with form data is to check the integrity of POST
+body using checksum, which is not possible using only ParseForm().
+This commit read all the body first into reqBody and recreate the request
+Body back using ioutil.NopCloser and bytes.Buffer.
+
+*  all: replace document generator from asciidoctor to ciigo
++
+Previously, generating HTML files from asciidoc files require installing
+ruby, asciidoctor, and its dependency through Gemfile.
+To simplify this, we replace it with ciigo.  Ciigo not only can convert
+the asciidoc files but it also support serving the file inside HTTP
+server and watching changes on asciidoc files during development for
+local previewing.
+
+*  memfs: log and ignore error from NewNode
++
+An error for calling NewNode should not stop processing all files
+in directory.
+
+*  io: log and ignore error from NewNode
++
+An error for calling NewNode should not stop processing all files
+in directory.
+
+
+[#v0_8_1]
+==  share v0.8.1 (2019-08-05)
+
+[#v0_8_1_enhancements]
+===  Enhancements
+
+*  lib/ini: add functions to marshal/unmarshal bytes from/to struct.
++
+The format to marshal/unmarshal ini stream is behave like JSON.
+
+*  lib/memfs: add method to encode the content of file.
++
+The ContentEncode() method encode each node's content into specific
+encoding, in other words this method can be used to compress the content
+of file in memory before being served or written.
+Only file with size greater than 0 will be encoded.
+List of known encoding is "gzip".
+
+*  lib/memfs: ignore generated output filename on GoGenerate
++
+In case the user Mount() the directory that include the generated output
+file, we want that file to be excluded from .go static source.
+
+*  lib/memfs: set the Node Size to be zero if node is directory
+
+
+[#v0_8_0]
+==  share v0.8.0 (2019-07-09)
+
+[#v0_8_0_breaking_changes]
+===  Breaking changes
+
+*  All ASCII related contants and functions now being moved from `bytes`
+   package to `ascii` package.
+
+[#v0_8_0_new_features]
+===  New features
+
+*  ascii: new library for working with ASCII characters
+
+[#v0_8_0_enhancements]
+===  Enhancements
+
+*  dns: add method to restart forwarders
+*  dns: add fallback nameservers
+*  ini: create new section or variable if not exist on Set
+
+
+[#v0_7_0]
+==  share v0.7.0 (2019-06-14)
+
+This release bring major refactoring on `ini` package to provide a clean and
+simple API.
+
+[#v0_7_0_breaking_changes]
+===  Breaking Changes
+
+*  ini: major refactoring
+*  net: add parameter to check Fully Qualified Domain Name on IsHostnameValid
+
+[#v0_7_0_new_features]
+===  New features
+
+*  spf: implementation of Sender Policy Framework (RFC 7208)
+*  ssh: package ssh provide a wrapper to golang.org/x/crypto/ssh
+
+[#v0_7_0_enhancements]
+===  Enhancements
+
+*  dns: add function to lookup PTR record by IP address
+*  dns: export Lookup method as part of Client interface
+*  doc: regenerate to use new style
+*  http: print the not-found path on Server's getFSNode()
+*  ini: add method Vars that return all variables as map
+*  ini: add method to Rebase other INI object
+*  ini: add method to add, set, and unset variable
+*  ini: add method to convert key-value to map
+*  ini: add method to get section object by section and/or subsection name
+*  ini: add method to get variable values as slice of string
+*  ini: add method to prune INI variables
+*  ini: add methods to support templating
+*  io: add function to check if content of file is binary
+*  net: add function to check if IP address is IPv4 or IPv6
+*  net: add function to convert IPv6 into dot format
+*  ns: set log flag to 0, without time prefix
+*  strings: add function to append uniq values to slice of strings
+
+[#v0_7_0_bug_fixes]
+===  Bug fixes
+
+*  io: watch changes on sub of sub directories on DirWatcher
+*  dns: substract the message TTL when the answer found on cache
+*  dns: always return true when answers RR exist and no TTL is zero
+
+
+[#v0_6_1]
+==  share v0.6.1 (2019-05-11)
+
+*  `memfs`:
+**  fix empty list names from MemFS created from GeneratedPathNode
+**  set root if GeneratedPathNode is not empty
+**  sort the generated file names
+**  fix template when generating empty content
+
+
+[#v0_6_0]
+==  share v0.6.0 (2019-05-07)
+
+This release bring major changes on dns package.
+Most notable changes are adding caches and query forwarding (recursion), and
+removing the server handler.
+
+[#v0_6_0_breaking_changes]
+===  Breaking Changes
+
+*  `dns`:
+**  refactor server to use Start(), Wait(), and Stop()
+**  use direct certificate instance on ServerOptions
+**  rename Send to Write, and change the parameter type to slice of byte
+**  remove "elapsed" parameter on Message.IsExpired()
+**  unexport the Request type
+**  remove receiver interface
+**  unexport connection type
+**  remove unused address parameter on client's Query()
+**  unexport all fields from UDP and TCP clients
+**  remove TCPPort on ServerOptions
+
+*  `http`:
+**  change server initialization using options
+
+*  `io`:
+**  simplify Watcher to use callback instead of channel
+
+*  `memfs`:
+**  refactoring go generate file to use type from memfs
+
+[#v0_6_0_new_features]
+===  New features
+
+*  `crypto`: new package that provide a wrapper for standard crypto library
+
+*  `dns`:
+**  add caches to server
+**  add method to set AA, Query, RD, RCode on Message
+**  add mapping of response code to human readable names
+**  implement recursion, forwarding request to parent name servers
+**  check for zero TTL on authorities and additionals RR on IsExpired
+
+*  `io`:
+**  implement naive directory change notification, DirWatcher
+
+*  `memfs`:
+**  add parameter to make reading file content become optional
+**  add method to unmount directory
+**  add method to check if memfs contains mounted directory
+**  add method to update node content and information
+**  export the method to add new child
+**  add method to remove child from any node
+
+*  `smtp`: add field DKIMOptions to Domain
+
+[#v0_6_0_bug_fixes]
+===  Bug fixes
+
+*  `dns`:
+**  fix data race issue when running test
+**  set the TTL offset when packing resource record
+**  fix parsing TXT from zone file
+
+*  `http`:
+**  allow serving directory with slash
+
+*  `memfs`:
+**  fix possible invalid system path on file with symbolic link
+**  refresh the directory tree in Development mode if page not found
+
+[#v0_6_0_documentation]
+===  Documentation
+
+*  add documentation for Sender Policy Framework (RFC 7208)
+
+
+[#v0_5_0]
+==  share v0.5.0 (2019-04-02)
+
+This minor release is dedicated for websocket package.  Major refactoring on
+server and client API to make it easy and extensible.  The websocket is now
+100% pass the autobahn testsuite (minus compression feature).
+
+[#v0_5_0_new_features]
+===  New features
+
+*  `cmd/smtpcli`: command line interface to SMTP client protocol
+*  `ints`: new package for working with slice of integer
+*  `ints64`: new package for working with slice of 64 bit integer
+*  `floats64`: new package for working with slice of 64 bit float
+
+[#v0_5_0_enhancements]
+===  Enhancements
+
+*  `bytes`:
+**  change the Copy return type to non pointer
+**  add function to concat slice of byte or string into []byte
+
+*  `ints`: add function to remove value from slice
+
+*  `websockets`:
+**  Rewrite most of client and server APIs to be more simple and pass autobahn
+    testsuite
+**  Minimize global variables and unexport internal constants and functions
+**  Handle interjected PING control frame from server
+**  Generate random mask only if masked field is set
+
+
+[#v0_4_0]
+==  share v0.4.0 (2019-03-01)
+
+[#v0_4_0_new_features]
+===  New features
+
+*  `email`: new package for working with Internet Message Format (RFC 5322)
+*  `email/dkim`: new package for parsing and creating DKIM signature
+   (RFC 6376)
+*  `email/maildir`: new package to manage email using maildir format
+
+[#v0_4_0_enhancements]
+===  Enhancements
+
+*  `bytes`
+**  add function to copy slice
+**  add function to convert hexadecimal into byte
+
+*  `dns`
+**  add mapping of connection types and its names
+**  print the section question type by string
+**  add method to filter Message.Answer by specific query type
+**  add pool for UDP client
+**  add function to get list of system name servers
+**  make UDPClient Query routine safe
+**  increase the internal debug level from 2 to 3
+
+*  `http`
+**  add the charset type to content-type "text/plain"
+**  listen and serve using TLS if TLSConfig is defined
+**  add method to temporary redirect request to other location
+
+*  `ini`
+**  unexport the reader
+**  add method to get all variable values with the same key
+
+*  `io`
+**  rename Reader SkipSpace to SkipSpaces
+**  refactoring, export all fields for easy access on Reader
+**  add method read one line with line feed
+**  add method to unread N characters on Reader
+**  optimize ReadUntil without append
+**  add method to return the rest of unreaded buffer on Reader
+**  return the character separator that found on SkipUntil
+
+*  `memfs`
+**  add method to dump files as Go generated source
+**  add variable for allowing bypass file in memory
+
+*  `smtp` (work in progress)
+**  rename StorageFile to LocalStorage
+**  implement server with local handler
+**  add prefix Mail to methods in Storage interface
+**  use different port between normal listener and TLS listener
+
+*  `time`:  add function to get micro seconds
+
+[#v0_4_0_bug_fixes]
+===  Bug fixes
+
+*  all: fix the usage of "iota"
+*  `dns`: fix creating new UDP/TCP client without port number
+*  `memfs`: check for empty directory on Mount
+
+
+[#v0_3_0]
+==  share v0.3.0 (2019-02-01)
+
+[#v0_3_0_features_changes]
+===  Features Changes
+
+*  `lib/debug`: add function to write heap profile to file
+*  `lib/debug`: add type to store relative and difference on memory heap
+*  `lib/dns`: remove request pool
+*  `lib/dns`: export the connection field on UDPClient
+*  `lib/dns`: add type of connection
+*  `lib/http`: add parameter http.ResponseWriter to Callback.
+*  `lib/http`: the RegisterXxx functions now use the Endpoint type.
+
+[#v0_3_0_enhancements]
+===  Enhancements
+
+*  Various fixes suggested by linters
+*  doc: add four summary and notes about DKIM
+*  doc: add summary of Simple Authentication and Security Layer (SASL)
+*  doc: add summary on SMTP over TLS (RFC3207)
+*  doc: add notes for Internet Message Format (RFC 5322)
+*  doc: add documentation for SMTP and DSN
+
+[#v0_3_0_bug_fixes]
+===  Bug fixes
+
+*  `lib/git`: fix testdata and test input
+
+
+[#v0_2_0]
+==  share v0.2.0 (2019-01-02)
+
+[#v0_2_0_new_features]
+===  New features
+
+*  `lib/errors`, package errors provide a custom error with code.
+
+*  `lib/http`, package http implement custom HTTP server with memory file
+system and simplified routing handler.
+
+[#v0_2_0_enhancements]
+===  Enhancements
+
+Fix warnings from linters.
+
+
+[#v0_1_0]
+==  share v0.1.0 (2018-11-29)
+
+The first release of `share` package contains one command line interface (CLI)
+and several libraries.
+
+The CLI is `gofmtcomment` to convert comment from `+/**/+` to `//`.
+
+The libraries are `bytes`, `contact`, `dns`, `dsv`, `ini`, `io`, `memfs`,
+`mining`, `net`, `numbers`, `runes`, `strings`, `tabula`, `test`, `text`,
+`time`, and `websocket`.
+
+Documentation for each package can be viewed at,
+
+	https://godoc.org/github.com/shuLhan/share
+
+I hope it will be stay alive!

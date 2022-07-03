@@ -187,6 +187,14 @@ dd {
 	margin: 2.5rem 0;
 }
 
+.ulist li .paragraph {
+	margin-bottom: 1em;
+}
+
+.ulist li .paragraph {
+	margin-bottom: 1em;
+}
+
 /** Custom classes */
 #toctitle {
 	display: none;
@@ -233,6 +241,14 @@ dd {
 <span id="author" class="author">Shulhan</span><br>
 <span id="email" class="email"><a href="mailto:ms@kilabit.info">ms@kilabit.info</a></span><br>
 </div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_changelog">Changelog</a></li>
+<li><a href="#_simplified_rfcs">Simplified RFCs</a></li>
+</ul>
+
+</div>
 </div>
 <div id="content">
 <div id="preamble">
@@ -257,12 +273,50 @@ pkg.go.dev.
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>The documentation is created and generated using
+<a href="https://git.sr.ht/~shulhan/ciigo"><code>ciigo</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>To serve documentation on HTTP server at <a href="http://127.0.0.1:21019" class="bare">http://127.0.0.1:21019</a> and watch
+changes on documentation files (".adoc") and regenerate the HTML
+files, run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ make docs-serve</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_changelog">Changelog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This library is released every month, usually at the first week of month.</p>
+</div>
+<div class="paragraph">
+<p><a href="CHANGELOG.html" target="_blank" rel="noopener">Latest changelog</a>.</p>
+</div>
+<div class="paragraph">
+<p><a href="CHANGELOG_2021.html" target="_blank" rel="noopener">Changelog in 2021</a>.
+This is changelog for share module since v0.22.0 until v0.32.0.</p>
+</div>
+<div class="paragraph">
+<p><a href="CHANGELOG_2020.html" target="_blank" rel="noopener">Changelog in 2020</a>.
+This is changelog for share module since v0.12.0 until v0.21.0.</p>
+</div>
+<div class="paragraph">
+<p><a href="CHANGELOG_2018-2019.html" target="_blank" rel="noopener">Changelog from 2018 to 2019</a>.
+This is changelog for share v0.1.0 until v0.11.0.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_simplified_rfcs">Simplified RFCs</h2>
+<div class="sectionbody">
 <div class="ulist">
 <ul>
-<li>
-<p><a href="CHANGELOG.html">CHANGELOG</a>
-</p>
-</li>
 <li>
 <p><a href="IMF.html">Internet Message Format (RFC 5322)</a>
 </p>
@@ -342,28 +396,6 @@ pkg.go.dev.
 </ul>
 </div>
 <div class="paragraph">
-<p>The documentation is created and generated using
-<a href="https://git.sr.ht/~shulhan/ciigo"><code>ciigo</code></a>.</p>
-</div>
-<div class="paragraph">
-<p>To serve documentation on HTTP server at <a href="http://127.0.0.1:21019" class="bare">http://127.0.0.1:21019</a> and watch
-changes on documentation files (".adoc") and regenerate the HTML
-files, run</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ make docs-serve</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>To generate HTML files for all asciidoc files, run</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ make docs</pre>
-</div>
-</div>
-<div class="paragraph">
 <p>That&#8217;s it! Happy hacking!</p>
 </div>
 </div>
@@ -371,7 +403,7 @@ files, run</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-02-18 12:30:22 +0700
+Last updated 2022-07-03 14:34:51 +0700
 </div>
 </div>
 			</div>

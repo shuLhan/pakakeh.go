@@ -1,0 +1,581 @@
+= Changelog 2020
+Shulhan <ms@kilabit.info>
+3 July 2022
+:toc:
+:sectanchors:
+:sectlinks:
+
+link:CHANGELOG.html[Latest changelog^].
+
+link:CHANGELOG_2021.html[Changelog in 2021^].
+This is changelog for share module since v0.22.0 until v0.32.0.
+
+link:CHANGELOG_2020.html[Changelog in 2020 (this document)^].
+This is changelog for share module since v0.12.0 until v0.21.0.
+
+link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
+This is changelog for share module since v0.1.0 until v0.11.0.
+
+
+[#v0_21_0]
+==  share v0.21.0 (2020-12-06)
+
+[#v0_21_0_breaking_changes]
+===  Breaking changes
+
+*  test: refactoring Assert with better error message
++
+The new Assert function use the reflect.DoEqual that return an error
+which describe which field have unmatched value.
+
+[#v0_21_0_new_features]
+===  New features
+
+*  http: allow Endpoint to register custom error handler
++
+The new field ErrorHandler on Endpoint allow the implementor to define
+their own function to handler error from Endpoint.Call.
++
+If the ErrorHandler is nil it will default to DefaultErrorHandler.
+
+*  totp: new package that implement TOTP protocol
++
+Package totp implement Time-Based One-Time Password Algorithm based on
+RFC 6238.
+
+[#v0_21_0_bug_fixes]
+===  Bug fixes
+
+*  parser: fix Line method that always return non-empty line
++
+In case of content end without new line, for example "a\nb", the Line()
+method always return "b, 0" on the last line.
+
+*  smtp: update the expired test certificate
+
+*  websocket: create buffered channel for running queue.
++
+This is to fix Stop() method waiting for running channel to be consumed.
+
+[#v0_21_0_enhancements]
+===  Enhancements
+
+*  big: update the latest expected error message with Go tip
+
+*  http: add an example on how to write custom HTTP status code
++
+The example show how to use http.ResponseWriter.WriteHeader to write
+custom HTTP status code instead of relying on errors.E.
+
+*  net: always return the host name or IP on ParseIPPort.
++
+Previously, if the address is an IP address the returned value is empty,
+for example "127.0.0.1" will return empty host but with non-nil IP and
+port.
++
+This changes always return the host either as host name (the same as
+paremeter) or valid IP address.
+
+[#v0_21_0_chores]
+===  Chores
+
+*  all: replace the tasks to serve and generate docs using ciigo as library
++
+This way, one does not need to install ciigo binary, only require Go
+tools.
+
+
+[#v0_20_1]
+==  share v0.20.1 (2020-11-08)
+
+[#v0_20_1_bug_fixes]
+===  Bug fixes
+
+* websocket: set TLSConfig to nil if Endpoint scheme is not https or wss.
++
+If user set TLSConfig but the Endpoint is not start with "https" or "wss",
+client open() method may return an error "Connect: tls: first record does
+not look like a TLS handshake".
+
+* paseto: add 5 seconds time drift when validating JSONToken
+
+[#v0_20_1_enhancements]
+===  Enhancements
+
+* big: add method RoundToNearestAway and RoundToZero
++
+RoundToNearestAway round r to n digit precision using nearest away mode,
+where mantissa is accumulated by the last digit after precision.
+For example, using 2 digit precision, 0.555 would become 0.56.
++
+RoundToZero round r to n digit precision using to zero mode.
+For example, using 2 digit precision, 0.555 would become 0.55.
+
+* parser: add Stop method
++
+The Stop method return the remaining unparsed content and its last
+position, and then call Close to reset the internal state back to zero.
+
+[#v0_20_1_chores]
+===  Chores
+
+* paseto: fix linter warnings
+
+
+[#v0_20_0]
+==  share v0.20.0 (2020-10-05)
+
+[#v0_20_0_new_features]
+===  New features
+
+*  lib/paseto: a simple, ready to use, implementation of Platform-Agnostic
+   SEcurity TOkens
++
+This implementation only support PASETO Protocol v2.
++
+This library focus on how to sign and verify data, everything else is
+handled and filled automatically.
+
+[#v0_20_0_enhancements]
+===  Enhancements
+
+* dns: serve DoT without SSL if server is behind proxy or tlsConfig is null.
++
+Previously we only check for tlsConfig, if its null the DoT server
+will not running.
+There is a use case where the SSL terminated by proxy and the connection
+is forwarded to DNS server, so this changes accommodated it.
+
+* http: increase the debug level from 2 to 3
+
+
+[#v0_19_0]
+==  share v0.19.0 (2020-09-08)
+
+[#v0_19_0_breaking_changes]
+===  Breaking changes
+
+*  dns: unexport the Messsage's Packet field
+
+*  dns: change the HostsFile Messages to list of ResourceRecord
+
+*  dns: unexport the master file path field
+
+*  dns: refactoring the ResourceRecord values from []byte to string
++
+There are two reasons for this changes.  First, to allow JSON encoded
+of ResourceRecord.Value without encoded to base64.
++
+Second, to minimize unreleased packet due to the backing storage is
+still used when assigned to Value (or any []byte field in RDataXXX).
+
+*  dns: dns: split between MasterFile and masterParser
++
+While at it add field Records that contains unpacked ResourceRecord as
+mapping between domain and ResourceRecord.
++
+This is useful for client that need to edit the RR in MasterFile.
++
+This changes also unexport the Messages field, to access it use the method
+Messages.
+
+*  websocket: move the server handler to ServerOptions
+
+[#v0_19_0_new_features]
+===  New features
+
+*  dns: add method to remove local caches by names on Server
+
+*  dns: add method to search caches
+
+*  dns: add method Delete to MasterFile
+
+*  dns: add method to remove RR from cache and master file
+
+*  dns: add method to save the master records to file
+
+*  dns: implement method to add new RR to master file
+
+*  dns: add method to update/insert resource record to caches
+
+*  dns: add method to initialize and validate ResourceRecord
+
+*  websocket: add server options to change the connect and status paths
++
+Previously, there is only one option for server, the port where it will
+listen.
++
+This changes add option to change the connect path (default to "/"
+previously) and new path and handler for retrieving server status.
+
+[#v0_19_0_bug_fixes]
+===  Bug fixes
+
+*  dns: fix parsing SOA resource record data from master file
+
+*  dns: stop all forwarders on Stop()
+
+*  http: write the HTTP status code after setting content-type on error
+
+*  ini: ignore the last empty line on unsetAll
+
+
+[#v0_18_0]
+==  share v0.18.0 (2020-08-06)
+
+[#v0_18_0_breaking_changes]
+===  Breaking changes
+
+*  big: add global flag MarshalJSONAsString
++
+MarshalJSONAsString define the default return behaviour of MarshalJSON().
+If its true (the default) the returned JSON format will encapsulated in
+double quote, as string instead of as numeric.
+
+*  dns: refactoring resource record fields
+
+*  http: do not return error based on response code
++
+The error in doRequest should be about connection error, everything
+else should be handled by user.
+
+*  http: allow setting response type when registering PUT
++
+User of this library may want to return something and they will suprised
+if the library always set the response type to None.
+
+[#v0_18_0_bug_fixes]
+===  Bug fixes
+
+*  http: fix panic if Request.Form is not initialized on Endpoint.call
+
+[#v0_18_0_enhancements]
+===  Enhancements
+
+*  dns: add method to create Message from hostname and list of addresses
+
+*  dns: add method to remove caches by names on Server
+
+*  http: add method Put for Client
+
+*  http: add method to convert RequestMethod to string
+
+*  parser: add method to get single line
+
+*  strings: add function to delete a value from slice of string
+
+
+[#v0_17_0]
+==  share v0.17.0 (2020-07-05)
+
+[#v0_17_0_breaking_changes]
+===  Breaking changes
+
+*  dns: replace RDataText with plain []byte
+
+*  http: add parameter headers to client methods
+
+*  http: return the http.Response as the first parameter
+
+[#v0_17_0_bug_fixes]
+===  Bug fixes
+
+*  http: initialize TLSClientConfig only if insecure is true
+
+*  io: truncate file on Copy
+
+*  websocket: fix race on pingTicker when stopping server
+
+[#v0_17_0_enhancements]
+===  Enhancements
+
+*  http: check for possible index.html file on getFSNode
+
+*  http: add method Delete
+
+*  http: add method Stop for HTTP server
+
+*  http: check the number of bytes written on ResponseWriter.Write
+
+*  http: log error if path not exist if debug value is set to 3 or greater
+
+*  smtp: check for EOF when receiving data from server
+
+
+[#v0_16_0]
+==  share v0.16.0 (2020-06-05)
+
+[#v0_16_0_breaking_changes]
+===  Breaking changes
+
+*  dns: refactoring loading hosts and master files
++
+Instead of as methods in Server, we detach the LoadHostDir and
+LostMasterDir into functions that return list of filename and their
+content.
+
+*  dns: disable serving DoH and DoT if port is not set (0)
++
+Previously, if HTTPPort or TLSPort is not set (0) we set it to default
+value and keep serving the DNS over HTTP and TLS.  Sometimes, user may
+want to serve DNS over UDP only.
++
+This changes disable serving DNS over HTTP (DoH) and TLS (DoT) if port
+is not set, or 0.
+
+*  email: rename ParseAddress function to ParseMailboxes
+
+*  http: add parameter "insecure" when creating new client
+
+*  ini: fix inconsistencies between empty string and boolean true
++
+In Git specification, an empty variable is equal to boolean true.
+This cause inconsistency between empty string and boolean true.
+
+*  memfs: simplify the API, add directory parameter to New
++
+This changes add parameter directory to be mounted in New(), so user
+did not need to call Mount manually
++
+This cause the Mount method and its sibling, Unmount and IsMounted
+become unneeded, so we remove them.
+
+[#v0_16_0_bug_fixes]
+===  Bug fixes
+
+*  api/telegram/bot: fix  request parameter on GetMyCommands
+
+[#v0_16_0_new_features]
+===  New features
+
+*  bytes: add function MergeSpaces
++
+The function MergeSpaces will convert sequences of white space into
+single space ' '.
+
+*  email: add methods to unmarshal/marshal Mailbox from/to JSON
+*  email: add function to parse single mailbox
+*  email: add function to create multipart text and HTML message
+
+*  http: support CORS with white list of origin and headers
+
+*  ini: add method UnsetAll to remove all variables in section and/or
+   subsection that match with the key
+
+*  ini: add method to Unmarshal ini values to struct
+
+*  os/exec: new package to simplify the standard "os/exec"
++
+New extension to standard package is function ParseCommandArgs() that
+receive input as string and return itas command and list of arguments.
+Unlike strings.Fields() which only separated the field by space,
+ParseCommandArgs can detect possible single, double, or back quotes.
++
+Another extension is Run() function that accept the string command
+to be executed and their standard output and error.
+
+*  sql: add method to migrate database schema
++
+The Migrate method migrate the database using list of SQL files inside
+a directory.
+Each SQL file in directory will be executed in alphabetical order based on
+the last state.
++
+The state of migration will be saved in table "_migration" with the SQL
+file name that has been executed and the timestamp.
+
+[#v0_16_0_enhancements]
+===  Enhancements
+
+*  api/telegram/bot: delete webhook upon setting new webhook
+
+*  dns: do not load hidden hosts and master file
++
+Previously, the LoadHostDir and LoadMasterDir load all files inside
+the directory without checking if its hidden (starting with dot) or not.
++
+This changes make the hidden file not loaded so one can disable it
+temporarily by prefixing it with dot.
+
+*  ini: make the add method append the variable after existing same key
+
+*  memfs: make the Node Readdir works when calling from generated Go code
++
+--
+Previously, the Go generated code from call to GoGenerate() set only
+mapping of path to node.  Calling Readdir() using http.File using
+
+	root, err := mfs.Open("/")
+	fis, err := root.Readdir(0)
+
+will return nil on fis.
+
+This changes add all child nodes to generated node.
+--
+
+*  websocket: allow "https" scheme on Client's Endpoint
+
+
+[#v0_15_0]
+==  share v0.15.0 (2020-05-04)
+
+[#v0_15_0_breaking_changes]
+===  Breaking changes
+
+*  big: check for zero length slice of byte or string on toRat
+*  ssh: replace the ClientConfig with ConfigSection
+
+[#v0_15_0_new_features]
+===  New features
+
+* ssh: implement SSH client configuration parser -- ssh_config(5)
+* api/telegram/bot: Go package for Telegram API Bot
+* http: implement a simplified HTTP client
+
+* net/html: new package to simplify the golang.org/x/net/html
++
+The x/net/html package currently only provide bare raw functionalities
+to iterate tree, there is no check for empty node, no function to
+get attribute by name, and no simple way to iterate tree without looping it
+manually.
++
+This package extends the package by adding methods to get node's attribute
+by name, get the first non-empty child, get the next non-empty sibling, and
+to iterate each node in the tree from top to bottom.
+
+[#v0_15_0_enhancements]
+===  Enhancements
+
+*  big: return "0" instead of "<nil>" on Rat.String()
+*  big: return false if Rat is nil on IsGreaterThanZero
+*  http: add parameter to set default client's headers
+*  websocket: add method to gracefully Close the client connection
+*  websocket: add routine that send PING control frame on Connect
+
+[#v0_15_0_bug_fixes]
+===  Bug fixes
+
+*  reflect: remove checking for method IsEqual on type reflect.Ptr
+
+
+[#v0_14_0]
+==  share v0.14.0 (2020-04-03)
+
+[#v0_14_0_breaking_changes]
+===  Breaking changes
+
+*  http: simplify server Endpoint registrations
++
+Previously, each endpoint with method DELETE, GET, PATCH, POST, and PUT
+require calling different call for registration.  This change simplify
+it to one call only, "RegisterEndpoint", and the registration process
+will be handled automatically based on value on field Method.
+
+*  mining/math: move the package from "lib/mining/" to "lib/" directory
+
+[#v0_14_0_new_features]
+===  New features
+
+*  debug: add a wrapper for starting and stopping CPU profile
+
+*  math/big: new package that extends the capabilities of "math/big"
++
+The "big" package add custom global precision, rounding mode, and number
+of digit precision after decimal point for all instance of Float that
+use the package.
+
+*  reflect: new package that extends the standard reflect
++
+This package add new interface "Equaler", it is an interface that
+have single method "IsEqual()".
++
+Also, we have new function "IsNil(interface{})" that will return true
+if the value in interface{} is nil.
+
+*  strings: add function SingleSpace
++
+The SingleSpace function convert all sequences of white spaces into
+single space ' '.
+
+[#v0_14_0_enhancements]
+===  Enhancements
+
+*  http: embed the standard http package instead of separate field
+
+*  hunspell: return the stem instead of root word on Spell() method
+
+*  hunspell: add Stem() method to Spell and Stem
++
+The Stem() method reduce inflected (or sometimes derived) words to
+their word stem, base, or root form.
+
+*  hunspell: add Analyze() method to Spell and Stem
++
+The Analyze() method will return list of morphological fields of the
+word.
+
+*  strings: check for other white spaces on MergeSpaces
+
+[#v0_14_0_bug_fixes]
+===  Bug fixes
+
+*  http: fix the content-length header not set if file is not cached
+
+
+[#v0_13_0]
+==  share v0.13.0 (2020-03-11)
+
+[#v0_13_0_breaking_changes]
+===  Breaking changes
+
+Set the minimum Go version to 1.13.
+
+[#v0_13_0_new_features]
+===  New features
+
+*  hunspell: a library to parse the Hunspell file format
+*  parser: provide a common text parser, using delimiters
+
+[#v0_13_0_enhancements]
+===  Enhancements
+
+*  dns: use net.Addr for primary and fallback UDP/tCP addresses
+*  dns: change the mark of input/output in log output
+*  io: add function to copy file
+*  time: add functions to get Unix time in milliseconds (int64 and string)
+*  websocket: allow custom TLS configuration on client
+
+[#v0_13_0_bug_fixes]
+===  Bug fixes
+
+*  dns: fix handling server without fallback forwarder
+*  dns: check for nil DNS-over-TLS server on server's Stop
+
+
+[#v0_12_0]
+==  share v0.12.0 (2020-02-13)
+
+[#v0_12_0_breaking_changes]
+===  Breaking changes
+
+*  bytes: move function JSONEscape and JSONUnescape to package json
+*  strings: move JSONEscape and JSONUnescape to package json
+*  time: change the Microsecond return type from int to int64
+*  websocket: change the RouteHandler signature to return Response
+
+[#v0_12_0_new_features]
+===  New features
+
+*  json: new packages to work with JSON
+*  sql: a new package as an extension to "database/sql"
+*  xmlrpc: new package for working with XML-RPC
+
+[#v0_12_0_enhancements]
+===  Enhancements
+
+*  strings: add function to reverse a string
+
+[#v0_12_0_bug_fixes]
+===  Bug fixes
+
+*  dns: fix index out of range when unpacking OPT RR
