@@ -240,10 +240,10 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	if mfs.Opts.Development {
-		err = node.Update(nil, mfs.Opts.MaxFileSize)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %s: %w", logp, path, err)
-		}
+		_ = node.Update(nil, mfs.Opts.MaxFileSize)
+		// Ignore error if the file is not exist in storage.
+		// Use case: the node maybe have been result of embed and the
+		// merged with other MemFS instance that use Development flag.
 	}
 
 	return node, nil
