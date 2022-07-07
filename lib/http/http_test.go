@@ -55,7 +55,7 @@ func TestMain(m *testing.M) {
 			Opts: &memfs.Options{
 				Root:        "./testdata",
 				MaxFileSize: 30,
-				Development: true,
+				TryDirect:   true,
 			},
 		},
 		HandleFS: handleFS,

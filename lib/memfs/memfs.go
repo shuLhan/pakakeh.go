@@ -229,7 +229,7 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 
 	node = mfs.PathNodes.Get(path)
 	if node == nil {
-		if mfs.Opts.Development {
+		if mfs.Opts.TryDirect {
 			node, err = mfs.refresh(path)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %s: %w", logp, path, err)
@@ -239,11 +239,11 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 		return nil, os.ErrNotExist
 	}
 
-	if mfs.Opts.Development {
+	if mfs.Opts.TryDirect {
 		_ = node.Update(nil, mfs.Opts.MaxFileSize)
 		// Ignore error if the file is not exist in storage.
 		// Use case: the node maybe have been result of embed and the
-		// merged with other MemFS instance that use Development flag.
+		// merged with other MemFS instance that use TryDirect flag.
 	}
 
 	return node, nil

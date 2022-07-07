@@ -31,10 +31,16 @@ type Options struct {
 	// memory, the MemFS will behave as directory tree.
 	MaxFileSize int64
 
-	// Development define a flag to bypass file in memory.
-	// If its true, any call to Get will result in direct read to file
-	// system.
-	Development bool
+	// TryDirect define a flag to bypass file in memory.
+	// If its true, any call to Get will try direct read to file system.
+	// This flag has several use cases.
+	// First, to test serving file system directly from disk during
+	// development.
+	// Second, to combine embedded MemFS instance with non-embedded
+	// instance.
+	// One is reading content from memory, one is reading content from
+	// disk directly.
+	TryDirect bool
 }
 
 // init initialize the options with default value.
