@@ -12,6 +12,8 @@ import (
 )
 
 func TestKeyLookupKey(t *testing.T) {
+	t.Skip("TODO: use lib/dns.Server that run with predefined records")
+
 	qmethod := QueryMethod{}
 
 	cases := []struct {
@@ -92,6 +94,8 @@ func TestKeyParseTXT(t *testing.T) {
 }
 
 func TestKeyLookupDNSTXT(t *testing.T) {
+	t.Skip("TODO: use lib/dns.Server that run with predefined records")
+
 	cases := []struct {
 		dname  string
 		exp    string
