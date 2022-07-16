@@ -576,7 +576,7 @@ func TestMerge(t *testing.T) {
 			PathNodes: &PathNode{
 				v: map[string]*Node{
 					"/": &Node{
-						SysPath: "..",
+						SysPath: mfsDirect.Root.SysPath,
 						Path:    "/",
 						Childs: []*Node{
 							mfsDirect.MustGet("/add"),
@@ -596,7 +596,7 @@ func TestMerge(t *testing.T) {
 			PathNodes: &PathNode{
 				v: map[string]*Node{
 					"/": &Node{
-						SysPath: "..",
+						SysPath: mfsDirect.Root.SysPath,
 						Path:    "/",
 						Childs: []*Node{
 							mfsDirect.MustGet("/add"),

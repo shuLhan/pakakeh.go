@@ -42,6 +42,9 @@ type MemFS struct {
 
 // Merge one or more instances of MemFS into single hierarchy.
 //
+// The returned MemFS instance will have SysPath set to the first
+// MemFS.SysPath in parameter.
+//
 // If there are two instance of Node that have the same path, the last
 // instance will be ignored.
 func Merge(params ...*MemFS) (merged *MemFS) {
@@ -57,7 +60,16 @@ func Merge(params ...*MemFS) (merged *MemFS) {
 
 	merged.PathNodes.Set("/", merged.Root)
 
-	for _, mfs := range params {
+	var (
+		x   int
+		mfs *MemFS
+	)
+
+	for x, mfs = range params {
+		if x == 0 {
+			merged.Root.SysPath = mfs.Root.SysPath
+		}
+
 		for _, child := range mfs.Root.Childs {
 			gotNode := merged.PathNodes.Get(child.Path)
 			if gotNode != nil {
