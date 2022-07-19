@@ -10,9 +10,9 @@ import (
 
 func TestAssert(t *testing.T) {
 	cases := []struct {
-		desc string
 		in   interface{}
 		exp  interface{}
+		desc string
 	}{
 		{
 			desc: "With nil",
