@@ -1,0 +1,16 @@
+kind: map
+
+Make sure that variables loaded into a map written alphabetical orders by keys
+on Marshal.
+
+>>>
+[test "map"]
+c = 3
+b = 2
+a = 1
+
+<<<
+[test "map"]
+a = 1
+b = 2
+c = 3

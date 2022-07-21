@@ -5,7 +5,11 @@
 package ini
 
 import (
+	"bytes"
+	"fmt"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/test"
@@ -13,25 +17,120 @@ import (
 
 const (
 	testdataInputIni          = "testdata/input.ini"
-	testdataSectionDupIni     = "testdata/section_dup.ini"
-	testdataVarMultiEmpty     = "testdata/var_multi_empty.ini"
-	testdataVarMultiSection   = "testdata/var_multi_section.ini"
 	testdataVarWithoutSection = "testdata/var_without_section.ini"
 )
 
-type A struct {
+type StructA struct {
 	X int  `ini:"a::x"`
 	Y bool `ini:"a::y"`
 }
 
-type B struct {
-	A
+type StructB struct {
+	StructA
 	Z float64 `ini:"b::z"`
 }
 
-type C struct {
-	B
+type StructC struct {
+	StructB
 	XX byte `ini:"c::xx"`
+}
+
+type StructMap struct {
+	Amap map[string]string `ini:"test:map"`
+}
+
+type Y struct {
+	String string `ini:"::string"`
+	Int    int    `ini:"::int"`
+}
+
+type X struct {
+	Time time.Time `ini:"section::time" layout:"2006-01-02 15:04:05"`
+
+	PtrBool     *bool          `ini:"section:pointer:bool"`
+	PtrDuration *time.Duration `ini:"section:pointer:duration"`
+	PtrInt      *int           `ini:"section:pointer:int"`
+	PtrString   *string        `ini:"section:pointer:string"`
+	PtrTime     *time.Time     `ini:"section:pointer:time" layout:"2006-01-02 15:04:05"`
+
+	PtrStruct    *Y `ini:"section:ptr_struct"`
+	PtrStructNil *Y `ini:"section:ptr_struct_nil"`
+
+	Struct Y `ini:"section:struct"`
+
+	String string `ini:"section::string"`
+
+	SliceStruct []Y `ini:"slice:struct"`
+
+	SlicePtrBool     []*bool          `ini:"slice:ptr:bool"`
+	SlicePtrDuration []*time.Duration `ini:"slice:ptr:duration"`
+	SlicePtrInt      []*int           `ini:"slice:ptr:int"`
+	SlicePtrString   []*string        `ini:"slice:ptr:string"`
+	SlicePtrStruct   []*Y             `ini:"slice:ptr_struct"`
+	SlicePtrTime     []*time.Time     `ini:"slice:ptr:time" layout:"2006-01-02 15:04:05"`
+
+	SliceBool     []bool          `ini:"slice::bool"`
+	SliceDuration []time.Duration `ini:"slice::duration"`
+	SliceInt      []int           `ini:"slice::int"`
+	SliceString   []string        `ini:"slice::string"`
+	SliceTime     []time.Time     `ini:"slice::time" layout:"2006-01-02 15:04:05"`
+
+	Duration time.Duration `ini:"section::duration"`
+	Int      int           `ini:"section::int"`
+	Bool     bool          `ini:"section::bool"`
+}
+
+func TestData(t *testing.T) {
+	var (
+		listTestData []*test.Data
+		tdata        *test.Data
+		err          error
+	)
+
+	listTestData, err = test.LoadDataDir("testdata/struct")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tdata = range listTestData {
+		t.Run(tdata.Name, func(t *testing.T) {
+			var (
+				kind   = tdata.Flag["kind"]
+				input  = tdata.Input["default"]
+				expOut = tdata.Output["default"]
+				gotX   = &X{}
+				gotC   = &StructC{}
+				gotMap = &StructMap{}
+
+				obj    interface{}
+				gotOut []byte
+				err    error
+			)
+
+			switch kind {
+			case "":
+				return
+			case "embedded":
+				obj = gotC
+			case "map":
+				obj = gotMap
+			case "struct":
+				obj = gotX
+			}
+
+			err = Unmarshal(input, obj)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			gotOut, err = Marshal(obj)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			test.Assert(t, string(tdata.Desc), string(expOut), string(gotOut))
+		})
+	}
 }
 
 func TestOpen(t *testing.T) {
@@ -198,43 +297,6 @@ func TestGet(t *testing.T) {
 		}
 
 		test.Assert(t, "value", c.expVal, got)
-	}
-}
-
-func TestGetDefault(t *testing.T) {
-	cfg, err := Open(testdataInputIni)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	cases := []struct {
-		desc string
-		sec  string
-		sub  string
-		key  string
-		def  string
-		exp  string
-	}{{
-		desc: "With empty params",
-	}, {
-		desc: "With non existen key",
-		sec:  "test",
-		key:  "key",
-		def:  "def",
-		exp:  "def",
-	}, {
-		desc: "With valid key, empty default",
-		sec:  "user",
-		key:  "name",
-		exp:  "Shulhan",
-	}}
-
-	for _, c := range cases {
-		t.Log(c.desc)
-
-		got, _ := cfg.Get(c.sec, c.sub, c.key, c.def)
-
-		test.Assert(t, "string", c.exp, got)
 	}
 }
 
@@ -458,269 +520,55 @@ func TestGetInputIni(t *testing.T) {
 	}
 }
 
-func TestGetSectionDup(t *testing.T) {
-	cases := []struct {
-		sec     string
-		sub     string
-		keys    []string
-		expOK   []bool
-		expVals []string
-	}{{
-		sec: "core",
-		keys: []string{
-			"dupkey",
-			"old",
-			"new",
-			"test",
-		},
-		expOK: []bool{
-			true,
-			true,
-			true,
-			false,
-		},
-		expVals: []string{
-			"2",
-			"value",
-			"value",
-			"",
-		},
-	}}
-
-	cfg, err := Open(testdataSectionDupIni)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, c := range cases {
-		t.Log(c)
-
-		for x, k := range c.keys {
-			t.Log("  Get:", k)
-
-			got, ok := cfg.Get(c.sec, c.sub, k, "")
-			if !ok {
-				test.Assert(t, "ok", c.expOK[x], ok)
-				continue
-			}
-
-			test.Assert(t, k, c.expVals[x], got)
-		}
-	}
-}
-
-func TestGetVarMultiEmpty(t *testing.T) {
-	cases := []struct {
-		sec     string
-		sub     string
-		keys    []string
-		expOK   []bool
-		expVals []string
-	}{{
-		sec: "alias",
-		keys: []string{
-			"tree",
-			"test",
-		},
-		expOK: []bool{
-			true,
-			false,
-		},
-		expVals: []string{
-			"!git --no-pager log --graph ",
-			"",
-		},
-	}, {
-		sec: "section",
-		keys: []string{
-			"tree",
-			"test",
-		},
-		expOK: []bool{
-			false,
-			true,
-		},
-		expVals: []string{
-			"",
-			"",
-		},
-	}}
-
-	cfg, err := Open(testdataVarMultiEmpty)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, c := range cases {
-		t.Log(c)
-
-		for x, k := range c.keys {
-			t.Log("  Get:", k)
-
-			got, ok := cfg.Get(c.sec, c.sub, k, "")
-			if !ok {
-				test.Assert(t, "ok", c.expOK[x], ok)
-				continue
-			}
-
-			test.Assert(t, k, c.expVals[x], got)
-		}
-	}
-}
-
-func TestGetVarMultiSection(t *testing.T) {
-	cases := []struct {
-		sec     string
-		sub     string
-		keys    []string
-		expOK   []bool
-		expVals []string
-	}{{
-		sec: "alias",
-		keys: []string{
-			"tree",
-			"test",
-		},
-		expOK: []bool{
-			true,
-			true,
-		},
-		expVals: []string{
-			"!git --no-pager log --graph [section]",
-			"",
-		},
-	}, {
-		sec: "section",
-		keys: []string{
-			"test",
-		},
-		expOK: []bool{
-			false,
-		},
-		expVals: []string{
-			"",
-		},
-	}}
-
-	cfg, err := Open(testdataVarMultiSection)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, c := range cases {
-		t.Log(c)
-
-		for x, k := range c.keys {
-			t.Log("  Get:", k)
-
-			got, ok := cfg.Get(c.sec, c.sub, k, "")
-			if !ok {
-				test.Assert(t, "ok", c.expOK[x], ok)
-				continue
-			}
-
-			test.Assert(t, k, c.expVals[x], got)
-		}
-	}
-}
-
-func TestMarshal_embedded(t *testing.T) {
-	c := &C{
-		B: B{
-			A: A{
-				X: 1,
-				Y: true,
-			},
-			Z: 2.3,
-		},
-		XX: 4,
-	}
-	exp := `[a]
-x = 1
-y = true
-
-[b]
-z = 2.3
-
-[c]
-xx = 4
-`
-
-	got, err := Marshal(c)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	test.Assert(t, "TestMarshal_embedded", exp, string(got))
-}
-
-// Make sure that variables loaded into a map, will be stored in
-// alphabetically orders by keys on Marshal.
-func TestMarshal_map_stable(t *testing.T) {
-	type ADT struct {
-		Amap map[string]string `ini:"test:map"`
-	}
-
+func TestIni_Get(t *testing.T) {
 	var (
-		logp = "TestMarshal_map_stable"
-		adt  ADT
-		text []byte
-		exp  []byte
-		got  []byte
-		err  error
+		cfg   *Ini
+		tdata *test.Data
+		got   string
+		def   string
+		tags  []string
+		keys  [][]byte
+		exps  [][]byte
+		key   []byte
+		err   error
+		x     int
+		ok    bool
 	)
 
-	text = []byte(`
-[test "map"]
-c = 3
-b = 2
-a = 1
-`)
-
-	exp = []byte(`[test "map"]
-a = 1
-b = 2
-c = 3
-`)
-
-	err = Unmarshal(text, &adt)
-	if err != nil {
-		t.Fatalf("%s: %s", logp, err)
-	}
-
-	got, err = Marshal(&adt)
-	if err != nil {
-		t.Fatalf("%s: %s", logp, err)
-	}
-
-	test.Assert(t, "Marshal map stable", string(exp), string(got))
-}
-
-func TestUnmarshal_embedded(t *testing.T) {
-	got := &C{}
-	content := []byte(`[a]
-x = 1
-y = true
-[b]
-z = 2.3
-[c]
-xx = 4
-`)
-	exp := &C{
-		B: B{
-			A: A{
-				X: 1,
-				Y: true,
-			},
-			Z: 2.3,
-		},
-		XX: 4,
-	}
-
-	err := Unmarshal(content, got)
+	tdata, err = test.LoadData("testdata/get.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	test.Assert(t, "TestUnmarshal_embedded", exp, got)
+	cfg, err = Parse(tdata.Input["default"])
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	keys = bytes.Split(tdata.Input["keys"], []byte("\n"))
+	exps = bytes.Split(tdata.Output["default"], []byte("\n"))
+
+	if len(keys) != len(exps) {
+		t.Fatalf("%s: input keys length %d does not match with output %d",
+			tdata.Name, len(keys), len(exps))
+	}
+
+	for x, key = range keys {
+		if len(key) == 0 {
+			test.Assert(t, "Get", string(exps[x]), "")
+			continue
+		}
+
+		tags = strings.Split(string(key), fieldTagSeparator)
+		if len(tags) >= 4 {
+			def = tags[3]
+		} else {
+			def = ""
+		}
+
+		got, ok = cfg.Get(tags[0], tags[1], tags[2], def)
+		got = fmt.Sprintf("%t %s.", ok, got)
+
+		test.Assert(t, "Get", string(exps[x]), got)
+	}
 }

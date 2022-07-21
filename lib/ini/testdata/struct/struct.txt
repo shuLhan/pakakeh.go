@@ -1,0 +1,57 @@
+kind: struct
+
+Test Unmarshal-ing with some primitive types.
+
+>>>
+[section "struct"]
+string = struct
+int = 1
+
+[section "ptr_struct"]
+string = ptr_struct
+int = 2
+
+[section "ptr_struct_nil"]
+string = ptr_struct_nil
+int = 3
+
+[section]
+string = a string
+int = 4
+bool = true
+duration = 4m
+time = 2021-02-28 00:12:04
+
+[section "pointer"]
+string = pointer to string
+int = 5
+bool = true
+duration = 5m
+time = 2021-02-28 00:12:05
+
+<<<
+[section]
+time = 2021-02-28 00:12:04
+string = a string
+duration = 4m0s
+int = 4
+bool = true
+
+[section "pointer"]
+bool = true
+duration = 5m0s
+int = 5
+string = pointer to string
+time = 2021-02-28 00:12:05
+
+[section "ptr_struct"]
+string = ptr_struct
+int = 2
+
+[section "ptr_struct_nil"]
+string = ptr_struct_nil
+int = 3
+
+[section "struct"]
+string = struct
+int = 1

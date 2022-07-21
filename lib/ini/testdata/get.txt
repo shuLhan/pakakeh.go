@@ -1,0 +1,57 @@
+kind: get
+
+>>>
+[core]
+	dupkey=1
+	old=old value
+
+[core]
+	dupkey=2
+	new=new value
+
+[sec1]
+	tree = !git --no-pager log --graph \
+
+[sec2]
+	test
+
+[sec3]
+	tree = !git --no-pager log --graph \
+[sec4]
+	test
+
+>>> keys
+::
+
+core::dupkey
+core::old
+core::new
+core::notexist
+core::notexist:default value
+
+sec1::tree
+sec1::test
+sec2::tree
+sec2::test
+
+sec3::tree
+sec3::test
+sec4::test
+
+<<<
+false .
+
+true 2.
+true old value.
+true new value.
+false .
+false default value.
+
+true !git --no-pager log --graph .
+false .
+false .
+true .
+
+true !git --no-pager log --graph [sec4].
+true .
+false .

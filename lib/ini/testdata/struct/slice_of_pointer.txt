@@ -1,0 +1,58 @@
+kind: struct
+
+Test Unmarshal into slice of pointer.
+
+>>>
+[slice "ptr_struct"]
+string = ptr_struct 0
+int = 1
+
+[slice "ptr_struct"]
+string = ptr_struct 1
+int = 2
+
+[slice "ptr"]
+string = string 0
+int = 1
+bool = true
+duration = 1s
+time = 2021-02-28 03:56:01
+
+[slice "ptr"]
+string = string 1
+int = 2
+bool = false
+duration = 2s
+time = 2021-02-28 03:56:02
+
+<<<
+[section]
+time = 0001-01-01 00:00:00
+string =
+duration = 0s
+int = 0
+bool = false
+
+[section "struct"]
+string =
+int = 0
+
+[slice "ptr"]
+bool = true
+bool = false
+duration = 1s
+duration = 2s
+int = 1
+int = 2
+string = string 0
+string = string 1
+time = 2021-02-28 03:56:01
+time = 2021-02-28 03:56:02
+
+[slice "ptr_struct"]
+string = ptr_struct 0
+int = 1
+
+[slice "ptr_struct"]
+string = ptr_struct 1
+int = 2

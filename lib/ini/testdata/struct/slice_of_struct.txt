@@ -1,0 +1,32 @@
+kind: struct
+
+Test unmarshaling into slice of struct.
+
+>>>
+[slice "struct"]
+string = struct 0
+int = 1
+
+[slice "struct"]
+string = struct 1
+int = 2
+
+<<<
+[section]
+time = 0001-01-01 00:00:00
+string =
+duration = 0s
+int = 0
+bool = false
+
+[section "struct"]
+string =
+int = 0
+
+[slice "struct"]
+string = struct 0
+int = 1
+
+[slice "struct"]
+string = struct 1
+int = 2

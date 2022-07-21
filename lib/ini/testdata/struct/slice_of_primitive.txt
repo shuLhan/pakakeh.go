@@ -1,0 +1,46 @@
+kind: struct
+
+Test Unmarshal into slice of string, int, bool, time.Duration, and time.Time.
+
+>>>
+[slice]
+string = string 0
+int = 1
+int = 2
+bool = true
+duration = 1s
+time = 2021-02-28 03:56:01
+
+[slice]
+string = string 1
+string = string 2
+int = 3
+bool = false
+duration = 2s
+time = 2021-02-28 03:56:02
+
+<<<
+[section]
+time = 0001-01-01 00:00:00
+string =
+duration = 0s
+int = 0
+bool = false
+
+[section "struct"]
+string =
+int = 0
+
+[slice]
+bool = true
+bool = false
+duration = 1s
+duration = 2s
+int = 1
+int = 2
+int = 3
+string = string 0
+string = string 1
+string = string 2
+time = 2021-02-28 03:56:01
+time = 2021-02-28 03:56:02
