@@ -176,7 +176,9 @@ func (in *Ini) marshalStruct(
 
 		switch kind {
 		case reflect.String:
-			in.Set(sec, sub, key, fvalue.String())
+			if fvalue.IsValid() {
+				in.Set(sec, sub, key, fvalue.String())
+			}
 
 		case reflect.Array, reflect.Slice:
 			for xx := 0; xx < fvalue.Len(); xx++ {
@@ -252,22 +254,26 @@ func (in *Ini) marshalStruct(
 			}
 
 		case reflect.Struct:
-			vi := fvalue.Interface()
-			t, ok := vi.(time.Time)
-			if ok {
-				value = t.Format(layout)
-				in.Set(sec, sub, key, value)
-				continue
+			if fvalue.IsValid() {
+				vi := fvalue.Interface()
+				t, ok := vi.(time.Time)
+				if ok {
+					value = t.Format(layout)
+					in.Set(sec, sub, key, value)
+					continue
+				}
+				in.marshalStruct(reflect.TypeOf(vi), reflect.ValueOf(vi), sec, sub)
 			}
-			in.marshalStruct(reflect.TypeOf(vi), reflect.ValueOf(vi), sec, sub)
 
 		case reflect.Invalid, reflect.Chan, reflect.Func,
 			reflect.UnsafePointer, reflect.Interface:
 			// Do nothing.
 
 		default:
-			value = fmt.Sprintf("%v", fvalue)
-			in.Set(sec, sub, key, value)
+			if fvalue.IsValid() {
+				value = fmt.Sprintf("%v", fvalue)
+				in.Set(sec, sub, key, value)
+			}
 		}
 	}
 }
