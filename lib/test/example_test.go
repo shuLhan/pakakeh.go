@@ -1,0 +1,100 @@
+// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package test
+
+import (
+	"fmt"
+	"log"
+)
+
+func ExampleLoadDataDir() {
+	var (
+		listData []*Data
+		data     *Data
+		err      error
+		name     string
+		content  []byte
+	)
+
+	listData, err = LoadDataDir("testdata/")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, data = range listData {
+		fmt.Printf("%s\n", data.Name)
+		fmt.Printf("  Flags=%v\n", data.Flag)
+		fmt.Printf("  Desc=%s\n", data.Desc)
+		fmt.Println("  Input")
+		for name, content = range data.Input {
+			fmt.Printf("    %s=%s", name, content)
+		}
+		fmt.Println("  Output")
+		for name, content = range data.Output {
+			fmt.Printf("    %s=%s", name, content)
+		}
+	}
+
+	// Output:
+	// test2.txt
+	//   Flags=map[]
+	//   Desc=
+	//   Input
+	//     default=another test input.
+	//   Output
+	//     default=another test output.
+	// test1.txt
+	//   Flags=map[key:value]
+	//   Desc=Description of test1.
+	//   Input
+	//     default=input.
+	//   Output
+	//     default=output.
+}
+
+func ExampleLoadData() {
+	var (
+		data    *Data
+		name    string
+		content []byte
+		err     error
+	)
+
+	// Content of test1.txt,
+	//
+	//	key: value
+	//	Description of test1.
+	//	>>>
+	//	input.
+	//
+	//	<<<
+	//	output.
+
+	data, err = LoadData("testdata/test1.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s\n", data.Name)
+	fmt.Printf("  Flags=%v\n", data.Flag)
+	fmt.Printf("  Desc=%s\n", data.Desc)
+	fmt.Println("  Input")
+	for name, content = range data.Input {
+		fmt.Printf("    %s=%s", name, content)
+	}
+	fmt.Println("  Output")
+	for name, content = range data.Output {
+		fmt.Printf("    %s=%s", name, content)
+	}
+
+	// Output:
+	// test1.txt
+	//   Flags=map[key:value]
+	//   Desc=Description of test1.
+	//   Input
+	//     default=input.
+	//   Output
+	//     default=output.
+}
