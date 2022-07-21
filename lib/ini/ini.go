@@ -189,11 +189,17 @@ func (in *Ini) marshalStruct(
 				switch item.Kind() {
 				case reflect.Struct:
 					vi := item.Interface()
-					structIni := &Ini{}
-					structIni.marshalStruct(
-						reflect.TypeOf(vi),
-						reflect.ValueOf(vi), sec, sub)
-					in.secs = append(in.secs, structIni.secs...)
+					t, ok := vi.(time.Time)
+					if ok {
+						value = t.Format(layout)
+						in.Add(sec, sub, key, value)
+					} else {
+						structIni := &Ini{}
+						structIni.marshalStruct(
+							reflect.TypeOf(vi),
+							reflect.ValueOf(vi), sec, sub)
+						in.secs = append(in.secs, structIni.secs...)
+					}
 				default:
 					value = fmt.Sprintf("%v", item)
 					in.Add(sec, sub, key, value)
