@@ -43,3 +43,99 @@ func IsValueBoolTrue(v string) bool {
 	}
 	return false
 }
+
+// parseTag parse the ini field tag as used in the struct's field.
+// This returned slice always have 4 string element: section, subsection, key,
+// and default value.
+func parseTag(in string) (tags []string) {
+	var (
+		sb       strings.Builder
+		r        rune
+		x        int
+		foundSep bool
+		isEsc    bool
+	)
+
+	tags = append(tags, ``, ``, ``, ``)
+
+	in = strings.TrimSpace(in)
+	if len(in) == 0 {
+		return tags
+	}
+
+	// Parse the section.
+	for x, r = range in {
+		if r == ':' {
+			foundSep = true
+			break
+		}
+	}
+	if !foundSep {
+		// If no ":" found, the tag is the section.
+		tags[0] = in
+		return tags
+	}
+
+	tags[0] = in[:x]
+	in = in[x+1:]
+
+	// Parse the subsection.
+	foundSep = false
+	sb.Reset()
+	for x, r = range in {
+		if r == '\\' {
+			if isEsc {
+				sb.WriteRune('\\')
+				isEsc = false
+			} else {
+				isEsc = true
+			}
+			continue
+		}
+		if r == '"' {
+			if isEsc {
+				sb.WriteRune(r)
+				isEsc = false
+				continue
+			}
+			break
+		}
+		if r == ':' {
+			if isEsc {
+				sb.WriteRune(r)
+				isEsc = false
+				continue
+			}
+			foundSep = true
+			break
+		}
+		sb.WriteRune(r)
+	}
+	tags[1] = sb.String()
+
+	if !foundSep {
+		return tags
+	}
+	in = in[x+1:]
+
+	// Parse variable name.
+	foundSep = false
+	for x, r = range in {
+		if r == ':' {
+			foundSep = true
+			break
+		}
+	}
+	if !foundSep {
+		tags[2] = in
+		return tags
+	}
+
+	tags[2] = in[:x]
+	in = in[x+1:]
+
+	// The rest is the default value.
+	tags[3] = in
+
+	return tags
+}

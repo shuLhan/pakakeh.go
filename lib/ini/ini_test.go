@@ -7,7 +7,6 @@ package ini
 import (
 	"bytes"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -559,12 +558,8 @@ func TestIni_Get(t *testing.T) {
 			continue
 		}
 
-		tags = strings.Split(string(key), fieldTagSeparator)
-		if len(tags) >= 4 {
-			def = tags[3]
-		} else {
-			def = ""
-		}
+		tags = parseTag(string(key))
+		def = tags[3]
 
 		got, ok = cfg.Get(tags[0], tags[1], tags[2], def)
 		got = fmt.Sprintf("%t %s.", ok, got)

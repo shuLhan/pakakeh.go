@@ -121,8 +121,19 @@
 // # Marshaling
 //
 // The container to be passed when marshaling must be struct type.
-// Each exported field in the struct with "ini" tags will be marshaled based
-// on the section, subsection, and key in the tag.
+// Each exported field in the struct with "ini" tag is marshaled based
+// on the section, subsection, and key in the tag's value.
+//
+// The "ini" tag syntax is,
+//
+//	[SECTION] [':' SUBSECTION] [':' VAR]
+//
+// At least one of the section, subsection, or key should be defined.
+//
+// The subsection can contain colon and double quote.
+// A colon `:` is escaped using double backslash `\\`, for example `a:b\\:c:d`
+// contains section `a`, subsection `b:c`, and variable `d`.
+// A double quote `"` is escaped using triple backslash, for example `\\\"`.
 //
 // If the field type is slice of primitive, for example "[]int", it will be
 // marshaled into multiple key with the same name.

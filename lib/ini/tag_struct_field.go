@@ -17,6 +17,10 @@ type tagStructField map[string]*structField
 // subsection, and/or key along with their reflect type and value into
 // structField.
 func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
+	var (
+		tags []string
+	)
+
 	numField := rtype.NumField()
 	if numField == 0 {
 		return nil
@@ -70,20 +74,14 @@ func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStruct
 			sfield.layout = time.RFC3339
 		}
 
-		tags := strings.Split(tag, fieldTagSeparator)
+		tags = parseTag(tag)
+		sfield.sec = tags[0]
+		sfield.sub = tags[1]
+		sfield.key = strings.ToLower(tags[2])
 
-		switch len(tags) {
-		case 1:
+		if len(sfield.key) == 0 {
 			sfield.sec = tags[0]
 			sfield.key = sfield.fname
-		case 2:
-			sfield.sec = tags[0]
-			sfield.sub = tags[1]
-			sfield.key = sfield.fname
-		default:
-			sfield.sec = tags[0]
-			sfield.sub = tags[1]
-			sfield.key = strings.ToLower(tags[2])
 		}
 
 		out[tag] = sfield

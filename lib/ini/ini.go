@@ -140,23 +140,12 @@ func (in *Ini) marshalStruct(
 
 		var sec, sub, key, value string
 
-		tags = strings.Split(tag, fieldTagSeparator)
-
-		switch len(tags) {
-		case 0:
-			if kind != reflect.Struct {
-				continue
-			}
-		case 1:
-			sec = tags[0]
+		tags = parseTag(tag)
+		sec = tags[0]
+		sub = tags[1]
+		if len(tags[2]) == 0 {
 			key = field.Name
-		case 2:
-			sec = tags[0]
-			sub = tags[1]
-			key = field.Name
-		default:
-			sec = tags[0]
-			sub = tags[1]
+		} else {
 			key = tags[2]
 		}
 		if len(parentSec) > 0 {
@@ -165,7 +154,6 @@ func (in *Ini) marshalStruct(
 		if len(parentSub) > 0 {
 			sub = parentSub
 		}
-
 		key = strings.ToLower(key)
 
 		for kind == reflect.Ptr {

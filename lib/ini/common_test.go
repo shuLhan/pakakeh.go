@@ -5,8 +5,10 @@
 package ini
 
 import (
+	"reflect"
 	"testing"
 
+	libreflect "github.com/shuLhan/share/lib/reflect"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -49,5 +51,76 @@ func TestIsValueBoolTrue(t *testing.T) {
 		got := IsValueBoolTrue(c.v)
 
 		test.Assert(t, "", c.exp, got)
+	}
+}
+
+func TestParseTag(t *testing.T) {
+	type testCase struct {
+		in  string
+		exp []string
+	}
+
+	var cases = []testCase{{
+		in:  `sec`,
+		exp: []string{`sec`, ``, ``, ``},
+	}, {
+		in:  `sec:sub`,
+		exp: []string{`sec`, `sub`, ``, ``},
+	}, {
+		in:  `sec:sub:var`,
+		exp: []string{`sec`, `sub`, `var`, ``},
+	}, {
+		in:  `sec:sub:var:def`,
+		exp: []string{`sec`, `sub`, `var`, `def`},
+	}, {
+		in:  `sec:sub \"\:\\ name:var`,
+		exp: []string{`sec`, `sub ":\ name`, `var`, ``},
+	}}
+
+	var (
+		c   testCase
+		got []string
+	)
+	for _, c = range cases {
+		got = parseTag(c.in)
+		test.Assert(t, c.in, c.exp, got)
+	}
+}
+
+func TestParseTag_fromStruct(t *testing.T) {
+	type ADT struct {
+		F1 int `ini:"a"`
+		F2 int `ini:"a:b"`
+		F3 int `ini:"a:b:c"`
+		F4 int `ini:"a:b:c:d"`
+		F5 int `ini:"a:b \\\"\\: c:d"`
+	}
+
+	var (
+		exp = [][]string{
+			{`a`, ``, ``, ``},
+			{`a`, `b`, ``, ``},
+			{`a`, `b`, `c`, ``},
+			{`a`, `b`, `c`, `d`},
+			{`a`, `b ": c`, `d`, ``},
+		}
+
+		adt   ADT
+		vtype reflect.Type
+		field reflect.StructField
+		tag   string
+		got   []string
+		x     int
+	)
+
+	vtype = reflect.TypeOf(adt)
+
+	for x = 0; x < vtype.NumField(); x++ {
+		field = vtype.Field(x)
+
+		tag, _, _ = libreflect.Tag(field, "ini")
+
+		got = parseTag(tag)
+		test.Assert(t, tag, exp[x], got)
 	}
 }
