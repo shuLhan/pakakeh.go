@@ -1,0 +1,235 @@
+kind: get
+
+Complex ini content.
+
+>>>
+#
+# This is the config file, and
+# a '#' or ';' character indicates
+# a comment
+#
+
+; core variables
+[core]
+	; Don't trust file modes
+	filemode = false
+
+; Our diff algorithm
+[diff]
+	external = /usr/local/bin/diff-wrapper
+	renames = true
+
+; Proxy settings
+[core]
+	gitProxy="ssh" for "kernel.org"
+	gitProxy=default-proxy ; for the rest
+
+; User settings
+[user]
+	name = ms
+	email = ms@localhost.localdomain
+
+; HTTP
+[http]
+	sslVerify
+[http "https://weak.example.com"]
+	sslVerify = false
+	cookieFile = /tmp/cookie.txt
+
+[branch "devel"]
+	remote = origin
+	merge = refs/heads/devel
+
+[include]
+	path = /path/to/foo.inc ; include by absolute path
+	path = foo.inc ; find "foo.inc" relative to the current file
+	path = ~/foo.inc ; find "foo.inc" in your `$HOME` directory
+
+; include if $GIT_DIR is /path/to/foo/.git
+[includeIf "gitdir:/path/to/foo/.git"]
+	path = /path/to/foo.inc
+
+; include for all repositories inside /path/to/group
+[includeIf "gitdir:/path/to/group/"]
+	path = /path/to/foo.inc
+
+; include for all repositories inside $HOME/to/group
+[includeIf "gitdir:~/to/group/"]
+	path = /path/to/foo.inc
+
+; relative paths are always relative to the including
+; file (if the condition is true); their location is not
+; affected by the condition
+[includeIf "gitdir:/path/to/group/"]
+	path = foo.inc
+
+[color]
+	ui = true
+[core]
+	pager = less -R
+	editor = nvim
+	autocrlf = false
+	filemode = true
+[gui]
+	fontui = -family \"xos4 Terminus\" -size 10 -weight normal -slant roman -underline 0 -overstrike 0
+	fontdiff = -family \"xos4 Terminus\" -size 10 -weight normal -slant roman -underline 0 -overstrike 0
+	diffcontext = 4
+	spellingdictionary = none
+[svn]
+	rmdir = true
+[http]
+	cookiefile = /home/ms/.gitcookies
+
+[alias]
+	change = codereview change
+	gofmt = codereview gofmt
+	mail = codereview mail
+	pending = codereview pending
+	submit = codereview submit
+	sync = codereview sync
+	tree = !git --no-pager log --graph \
+		--date=format:'%Y-%m-%d' \
+		--pretty=format:'%C(auto,dim)%ad %<(7,trunc) %an %Creset%m %h %s %Cgreen%d%Creset' \
+		--exclude="*/production" \
+		--exclude="*/dev-*" \
+		--all -n 20
+
+	to-master = !git stash -u \
+		&& git fetch origin \
+		&& git rebase origin/master \
+		&& git stash pop \
+		&& git --no-pager log --graph --decorate --pretty=oneline \
+			--abbrev-commit origin/master~1..HEAD
+
+	to-prod = !git stash -u \
+		&& git fetch origin \
+		&& git rebase origin/production \
+		&& git stash pop \
+		&& git --no-pager log --graph --decorate --pretty=oneline \
+			--abbrev-commit origin/production~1..HEAD
+[user]
+	name = Shulhan
+	email = ms@kilabit.info
+
+[url "git@github.com:"] # Replace HTTP URL with git+ssh
+	insteadOf = https://github.com/
+
+[last]
+	valid0
+	valid1 =
+	valid2 = # comment
+	valid3 = \
+		 ; comment
+	valid4 =
+
+>>> keys
+core::filemode
+core::gitProxy
+core::pager
+core::editor
+core::autocrlf
+
+diff::external
+diff::renames
+
+user
+user::name
+user::email
+
+http::sslVerify
+http::cookiefile
+
+http:https\://weak.example.com:sslVerify
+http:https\://weak.example.com:cookiefile
+
+branch:devel:remote
+:devel:remote
+branch:devel:merge
+
+include::path
+includeIf:gitdir\:/path/to/foo/.git:path
+includeIf:gitdir\:/path/to/group/:path
+includeIf:gitdir\:~/to/group/:path
+
+color::ui
+
+gui::fontui
+gui::fontdiff
+gui::diffcontext
+gui::spellingdictionary
+
+svn::rmdir
+
+alias::change
+alias::gofmt
+alias::mail
+alias::pending
+alias::submit
+alias::sync
+alias::tree
+alias::to-master
+alias::to-prod
+
+url:git@github.com\::insteadOf
+
+last::valid0
+last::valid1
+last::valid2
+last::valid3
+last::valid4
+
+<<<
+true.
+default-proxy.
+less -R.
+nvim.
+false.
+
+/usr/local/bin/diff-wrapper.
+true.
+
+.
+Shulhan.
+ms@kilabit.info.
+
+.
+/home/ms/.gitcookies.
+
+false.
+/tmp/cookie.txt.
+
+origin.
+.
+refs/heads/devel.
+
+~/foo.inc.
+/path/to/foo.inc.
+foo.inc.
+/path/to/foo.inc.
+
+true.
+
+-family "xos4 Terminus" -size 10 -weight normal -slant roman -underline 0 -overstrike 0.
+-family "xos4 Terminus" -size 10 -weight normal -slant roman -underline 0 -overstrike 0.
+4.
+none.
+
+true.
+
+codereview change.
+codereview gofmt.
+codereview mail.
+codereview pending.
+codereview submit.
+codereview sync.
+!git --no-pager log --graph 		--date=format:'%Y-%m-%d' 		--pretty=format:'%C(auto,dim)%ad %<(7,trunc) %an %Creset%m %h %s %Cgreen%d%Creset' 		--exclude=*/production 		--exclude=*/dev-* 		--all -n 20.
+!git stash -u 		&& git fetch origin 		&& git rebase origin/master 		&& git stash pop 		&& git --no-pager log --graph --decorate --pretty=oneline 			--abbrev-commit origin/master~1..HEAD.
+!git stash -u 		&& git fetch origin 		&& git rebase origin/production 		&& git stash pop 		&& git --no-pager log --graph --decorate --pretty=oneline 			--abbrev-commit origin/production~1..HEAD.
+
+https://github.com/.
+
+.
+.
+.
+.
+.

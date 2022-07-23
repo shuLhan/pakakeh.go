@@ -39,19 +39,19 @@ sec3::test
 sec4::test
 
 <<<
-false .
+.
 
-true 2.
-true old value.
-true new value.
-false .
-false default value.
+2.
+old value.
+new value.
+.
+default value.
 
-true !git --no-pager log --graph .
-false .
-false .
-true .
+!git --no-pager log --graph .
+.
+.
+.
 
-true !git --no-pager log --graph [sec4].
-true .
-false .
+!git --no-pager log --graph [sec4].
+.
+.
