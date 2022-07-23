@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	defDataName = "default"
-	defDataExt  = ".txt"
+	defDataName       = "default"
+	defDataFileSuffix = "_test.txt"
 )
 
 var (
@@ -29,8 +29,6 @@ var (
 //
 // The data provides zero or more flags, an optional description, zero or
 // more input, and zero or more output.
-//
-// The data file name must end with ".txt".
 //
 // The data content use the following format,
 //
@@ -115,7 +113,7 @@ func LoadData(file string) (data *Data, err error) {
 }
 
 // LoadDataDir load all data inside a directory.
-// Only file that has ".txt" extension will be loaded.
+// Only file that has file name suffix "_text.txt" will be loaded.
 func LoadDataDir(path string) (listData []*Data, err error) {
 	var (
 		logp = "LoadDataDir"
@@ -125,7 +123,6 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 		fi       os.FileInfo
 		data     *Data
 		name     string
-		ext      string
 		pathData string
 	)
 
@@ -140,15 +137,13 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 	}
 
 	for _, fi = range listfi {
-		if fi.Size() == 0 {
+		if fi.Size() == 0 || fi.IsDir() {
 			continue
 		}
 
 		name = fi.Name()
 
-		ext = filepath.Ext(name)
-		ext = strings.ToLower(ext)
-		if ext != defDataExt {
+		if !strings.HasSuffix(name, "_test.txt") {
 			continue
 		}
 

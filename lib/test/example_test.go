@@ -38,14 +38,14 @@ func ExampleLoadDataDir() {
 	}
 
 	// Output:
-	// test2.txt
+	// data2_test.txt
 	//   Flags=map[]
 	//   Desc=
 	//   Input
 	//     default=another test input.
 	//   Output
 	//     default=another test output.
-	// test1.txt
+	// data1_test.txt
 	//   Flags=map[key:value]
 	//   Desc=Description of test1.
 	//   Input
@@ -62,7 +62,7 @@ func ExampleLoadData() {
 		err     error
 	)
 
-	// Content of test1.txt,
+	// Content of data1_test.txt,
 	//
 	//	key: value
 	//	Description of test1.
@@ -72,7 +72,7 @@ func ExampleLoadData() {
 	//	<<<
 	//	output.
 
-	data, err = LoadData("testdata/test1.txt")
+	data, err = LoadData("testdata/data1_test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func ExampleLoadData() {
 	}
 
 	// Output:
-	// test1.txt
+	// data1_test.txt
 	//   Flags=map[key:value]
 	//   Desc=Description of test1.
 	//   Input
