@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -118,12 +119,13 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 	var (
 		logp = "LoadDataDir"
 
-		dir      *os.File
-		listfi   []os.FileInfo
-		fi       os.FileInfo
-		data     *Data
-		name     string
-		pathData string
+		dir         *os.File
+		listfi      []os.FileInfo
+		listTestTxt []string
+		fi          os.FileInfo
+		data        *Data
+		name        string
+		pathTestTxt string
 	)
 
 	dir, err = os.Open(path)
@@ -143,19 +145,29 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 
 		name = fi.Name()
 
-		if !strings.HasSuffix(name, "_test.txt") {
+		if !strings.HasSuffix(name, defDataFileSuffix) {
 			continue
 		}
 
-		pathData = filepath.Join(path, name)
+		pathTestTxt = filepath.Join(path, name)
+		listTestTxt = append(listTestTxt, pathTestTxt)
+	}
 
-		data, err = LoadData(pathData)
+	if len(listTestTxt) == 0 {
+		return listData, nil
+	}
+
+	sort.Strings(listTestTxt)
+
+	for _, pathTestTxt = range listTestTxt {
+		data, err = LoadData(pathTestTxt)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
 		listData = append(listData, data)
 	}
+
 	return listData, nil
 }
 

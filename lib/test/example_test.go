@@ -38,13 +38,6 @@ func ExampleLoadDataDir() {
 	}
 
 	// Output:
-	// data2_test.txt
-	//   Flags=map[]
-	//   Desc=
-	//   Input
-	//     default=another test input.
-	//   Output
-	//     default=another test output.
 	// data1_test.txt
 	//   Flags=map[key:value]
 	//   Desc=Description of test1.
@@ -52,6 +45,13 @@ func ExampleLoadDataDir() {
 	//     default=input.
 	//   Output
 	//     default=output.
+	// data2_test.txt
+	//   Flags=map[]
+	//   Desc=
+	//   Input
+	//     default=another test input.
+	//   Output
+	//     default=another test output.
 }
 
 func ExampleLoadData() {
