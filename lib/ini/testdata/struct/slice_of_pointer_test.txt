@@ -56,3 +56,4 @@ int = 1
 [slice "ptr_struct"]
 string = ptr_struct 1
 int = 2
+

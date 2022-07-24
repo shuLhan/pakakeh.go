@@ -29,11 +29,11 @@ func ExampleLoadDataDir() {
 		fmt.Printf("  Desc=%s\n", data.Desc)
 		fmt.Println("  Input")
 		for name, content = range data.Input {
-			fmt.Printf("    %s=%s", name, content)
+			fmt.Printf("    %s=%s\n", name, content)
 		}
 		fmt.Println("  Output")
 		for name, content = range data.Output {
-			fmt.Printf("    %s=%s", name, content)
+			fmt.Printf("    %s=%s\n", name, content)
 		}
 	}
 
@@ -82,11 +82,11 @@ func ExampleLoadData() {
 	fmt.Printf("  Desc=%s\n", data.Desc)
 	fmt.Println("  Input")
 	for name, content = range data.Input {
-		fmt.Printf("    %s=%s", name, content)
+		fmt.Printf("    %s=%s\n", name, content)
 	}
 	fmt.Println("  Output")
 	for name, content = range data.Output {
-		fmt.Printf("    %s=%s", name, content)
+		fmt.Printf("    %s=%s\n", name, content)
 	}
 
 	// Output:

@@ -30,3 +30,4 @@ int = 1
 [slice "struct"]
 string = struct 1
 int = 2
+

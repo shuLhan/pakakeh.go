@@ -55,3 +55,4 @@ int = 3
 [section "struct"]
 string = struct
 int = 1
+

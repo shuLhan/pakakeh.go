@@ -55,6 +55,11 @@ var (
 // An output can have a name, if its empty it will be set to "default".
 // An output also can be defined multiple times, with different names.
 //
+// All of both input and output content will have one new line truncated at
+// the end.
+// If they expecting new line at the end, add two empty lines at the end of
+// it.
+//
 // # Example
 //
 // The following code illustrate how to use Data when writing test.
@@ -281,12 +286,12 @@ func (data *Data) parseFlag(content []byte) {
 	data.Flag[string(bkey)] = string(bval)
 }
 
-func (data *Data) parseInputOutput(lines [][]byte) (name string, content []byte, n int) {
+func (data *Data) parseInputOutput(lines [][]byte) (name string, content []byte, x int) {
 	var (
 		line        []byte
 		bname       []byte
 		bufContent  bytes.Buffer
-		x           int
+		n           int
 		isPrevEmpty bool
 	)
 
@@ -310,8 +315,7 @@ func (data *Data) parseInputOutput(lines [][]byte) (name string, content []byte,
 		}
 		if isPrevEmpty {
 			if bytes.HasPrefix(line, prefixInput) || bytes.HasPrefix(line, prefixOutput) {
-				content = bufContent.Bytes()
-				return name, content, x
+				break
 			}
 			bufContent.WriteByte('\n')
 		}
@@ -321,6 +325,10 @@ func (data *Data) parseInputOutput(lines [][]byte) (name string, content []byte,
 	}
 
 	content = bufContent.Bytes()
+	n = len(content) - 1
+	if n > 0 && content[n] == '\n' {
+		content = content[:n]
+	}
 
 	return name, content, x
 }

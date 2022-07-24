@@ -33,7 +33,7 @@ func TestData_parse(t *testing.T) {
 		content: []byte(">>>\n\ninput.\n\n"),
 		expData: Data{
 			Input: map[string][]byte{
-				`default`: []byte("\ninput.\n\n"),
+				`default`: []byte("\ninput.\n"),
 			},
 		},
 	}, {
@@ -41,7 +41,7 @@ func TestData_parse(t *testing.T) {
 		content: []byte("<<<\n\noutput.\n\n"),
 		expData: Data{
 			Output: map[string][]byte{
-				`default`: []byte("\noutput.\n\n"),
+				`default`: []byte("\noutput.\n"),
 			},
 		},
 	}, {
@@ -66,8 +66,8 @@ func TestData_parse(t *testing.T) {
 			},
 			Desc: []byte("Desc."),
 			Input: map[string][]byte{
-				"input 1": []byte("1\n"),
-				"input 2": []byte("2\n"),
+				"input 1": []byte("1"),
+				"input 2": []byte("2"),
 			},
 		},
 	}, {
@@ -80,8 +80,8 @@ func TestData_parse(t *testing.T) {
 			Flag: map[string]string{},
 			Desc: []byte("Desc."),
 			Output: map[string][]byte{
-				"output-1": []byte("1\n\n2\n"),
-				"output-2": []byte("3\n\n4\n"),
+				"output-1": []byte("1\n\n2"),
+				"output-2": []byte("3\n\n4"),
 			},
 		},
 	}, {
@@ -93,7 +93,7 @@ func TestData_parse(t *testing.T) {
 		expData: Data{
 			Flag: map[string]string{},
 			Input: map[string][]byte{
-				"default": []byte("Input 2.\n"),
+				"default": []byte("Input 2."),
 			},
 		},
 	}, {
@@ -105,7 +105,7 @@ func TestData_parse(t *testing.T) {
 		),
 		expData: Data{
 			Input: map[string][]byte{
-				"default": []byte("Input 1.\n<<<\nOutput 1.\n"),
+				"default": []byte("Input 1.\n<<<\nOutput 1."),
 			},
 		},
 	}}
