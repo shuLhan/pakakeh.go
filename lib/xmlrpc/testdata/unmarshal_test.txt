@@ -1,0 +1,74 @@
+Test unmarshaling.
+
+>>> Multiple param
+<?xml version="1.0"?>
+<methodCall>
+	<methodName>method.name</methodName>
+		<params>
+			<param>
+				<value>
+					<string>
+						param-string
+					</string>
+				</value>
+			</param>
+			<param>
+				<value>
+					<int>
+						1
+					</int>
+				</value>
+			</param>
+		</params>
+</methodCall>
+
+<<< Multiple param
+<?xml version="1.0" encoding="UTF-8"?>
+<methodCall><methodName>method.name</methodName><params><param><value><string>param-string</string></value></param><param><value><int>1</int></value></param></params></methodCall>
+
+>>> Param as struct
+<?xml version="1.0"?>
+<methodCall>
+	<methodName>test.struct</methodName>
+	<params>
+		<param>
+			<value>
+				<struct>
+					<member>
+						<name>X</name>
+						<value><int>1</int></value>
+					</member>
+					<member>
+						<name>Y</name>
+						<value><boolean>true</boolean></value>
+					</member>
+				</struct>
+			</value>
+		</param>
+	</params>
+</methodCall>
+
+<<< Param as struct
+<?xml version="1.0" encoding="UTF-8"?>
+<methodCall><methodName>test.struct</methodName><params><param><value><struct><member><name>X</name><value><int>1</int></value></member><member><name>Y</name><value><boolean>true</boolean></value></member></struct></value></param></params></methodCall>
+
+>>> Param as array
+<?xml version="1.0"?>
+<methodCall><methodName>test.array</methodName>
+	<params>
+		<param>
+			<value>
+				<array>
+					<data>
+						<value><string>a</string></value>
+						<value><string>b</string></value>
+					</data>
+				</array>
+			</value>
+		</param>
+	</params>
+</methodCall>
+
+<<< Param as array
+<?xml version="1.0" encoding="UTF-8"?>
+<methodCall><methodName>test.array</methodName><params><param><value><array><data><value><string>a</string></value><value><string>b</string></value></data></array></value></param></params></methodCall>

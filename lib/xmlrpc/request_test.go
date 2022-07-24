@@ -5,7 +5,6 @@
 package xmlrpc
 
 import (
-	"encoding/xml"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -17,22 +16,16 @@ type testStruct struct {
 }
 
 func TestRequest_MarshalText(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		methodName string
 		params     []interface{}
-		exp        string
-	}{{
+	}
+
+	var cases = []testCase{{
 		methodName: "method.name",
 		params: []interface{}{
 			"param-string",
 		},
-		exp: xml.Header + "<methodCall><methodName>method.name</methodName>" +
-			"<params>" +
-			"<param>" +
-			"<value><string>param-string</string></value>" +
-			"</param>" +
-			"</params>" +
-			"</methodCall>",
 	}, {
 		methodName: "test.struct",
 		params: []interface{}{
@@ -41,154 +34,81 @@ func TestRequest_MarshalText(t *testing.T) {
 				Y: true,
 			},
 		},
-		exp: xml.Header + "<methodCall><methodName>test.struct</methodName>" +
-			"<params><param><value><struct>" +
-			"<member>" +
-			"<name>X</name><value><int>1</int></value>" +
-			"</member>" +
-			"<member>" +
-			"<name>Y</name><value><boolean>true</boolean></value>" +
-			"</member>" +
-			"</struct></value></param></params>" +
-			"</methodCall>",
 	}, {
 		methodName: "test.array",
 		params: []interface{}{
 			[]string{"a", "b"},
 		},
-		exp: xml.Header + "<methodCall><methodName>test.array</methodName>" +
-			"<params><param><value><array><data>" +
-			"<value><string>a</string></value>" +
-			"<value><string>b</string></value>" +
-			"</data></array></value></param></params>" +
-			"</methodCall>",
 	}}
 
-	for _, c := range cases {
-		req, err := NewRequest(c.methodName, c.params)
+	var (
+		c     testCase
+		req   Request
+		tdata *test.Data
+		got   []byte
+		exp   []byte
+		err   error
+	)
+
+	tdata, err = test.LoadData("testdata/marshal_test.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, c = range cases {
+		req, err = NewRequest(c.methodName, c.params)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		got, err := req.MarshalText()
+		got, err = req.MarshalText()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, "Pack", c.exp, string(got))
+		exp = tdata.Output[c.methodName]
+		test.Assert(t, "Pack", string(exp), string(got))
 	}
 }
 
 func TestRequest_UnmarshalText(t *testing.T) {
-	cases := []struct {
-		desc     string
-		in       string
-		exp      *Request
-		expError string
-	}{{
-		desc: "Multiple param",
-		in: `<?xml version="1.0"?>
-			<methodCall>
-				<methodName>method.name</methodName>
-				<params>
-					<param>
-						<value>
-							<string>
-								param-string
-							</string>
-						</value>
-					</param>
-					<param>
-						<value>
-							<int>
-								1
-							</int>
-						</value>
-					</param>
-				</params>
-			</methodCall>`,
-		exp: &Request{
-			MethodName: "method.name",
-			Params: []*Value{{
-				Kind: String,
-				In:   "param-string",
-			}, {
-				Kind: Integer,
-				In:   int32(1),
-			}},
-		},
-	}, {
-		desc: "Param as struct",
-		in: `<?xml version="1.0"?>
-			<methodCall>
-				<methodName>test.struct</methodName>
-				<params>
-					<param>
-						<value>
-							<struct>
-								<member>
-									<name>X</name>
-									<value><int>1</int></value>
-								</member>
-								<member>
-									<name>Y</name>
-									<value><boolean>true</boolean></value>
-								</member>
-							</struct>
-						</value>
-					</param>
-				</params>
-			</methodCall>`,
-		exp: &Request{
-			MethodName: "test.struct",
-			Params: []*Value{{
-				Kind: Struct,
-				StructMembers: map[string]*Value{
-					"X": &Value{
-						Kind: Integer,
-						In:   int32(1),
-					},
-					"Y": &Value{
-						Kind: Boolean,
-						In:   true,
-					},
-				},
-			}},
-		},
-	}, {
-		desc: "Param as array",
-		in: `<?xml version="1.0"?>
-			<methodCall><methodName>test.array</methodName>
-				<params><param><value><array><data>
-					<value><string>a</string></value>
-					<value><string>b</string></value>
-				</data></array></value></param></params>
-			</methodCall>`,
-		exp: &Request{
-			MethodName: "test.array",
-			Params: []*Value{{
-				Kind: Array,
-				ArrayValues: []*Value{{
-					Kind: String,
-					In:   "a",
-				}, {
-					Kind: String,
-					In:   "b",
-				}},
-			}},
-		},
-	}}
+	var (
+		tdata    *test.Data
+		name     string
+		xmlInput []byte
+		err      error
+	)
 
-	for _, c := range cases {
-		t.Logf(c.desc)
+	tdata, err = test.LoadData("testdata/unmarshal_test.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		got := &Request{}
-		err := got.UnmarshalText([]byte(c.in))
-		if err != nil {
-			test.Assert(t, "Unmarshal", c.expError, err.Error())
-			continue
-		}
+	for name, xmlInput = range tdata.Input {
+		t.Run(name, func(t *testing.T) {
+			var (
+				req  *Request
+				exp  string
+				got  string
+				xmlb []byte
+				err  error
+			)
 
-		test.Assert(t, "Unmarshal", c.exp, got)
+			exp = string(tdata.Output[name])
+
+			req = &Request{}
+			err = req.UnmarshalText(xmlInput)
+			if err != nil {
+				got = err.Error()
+			} else {
+				xmlb, err = req.MarshalText()
+				if err != nil {
+					t.Fatal(err)
+				}
+				got = string(xmlb)
+			}
+
+			test.Assert(t, name, exp, got)
+		})
 	}
 }
