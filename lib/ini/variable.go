@@ -9,12 +9,12 @@ import (
 	"fmt"
 )
 
-// variable define the smallest building block in INI format. It represent
-// empty lines, comment, section, section with subsection, and variable.
+// variable define the smallest building block in INI format.
+// It represent empty line, comment, section, section with subsection, and
+// variable.
 //
-// Remember that variable's key is case insensitive. If you want to
-// create variable, set the KeyLower to their lowercase value, and if you
-// want to compare variable, use the KeyLower value.
+// Remember that variable's key is case insensitive, so to compare variable,
+// use the KeyLower value.
 type variable struct {
 	format   string
 	secName  string
@@ -22,7 +22,6 @@ type variable struct {
 	key      string
 	keyLower string
 	value    string
-	others   string
 
 	mode    lineMode
 	lineNum int
@@ -49,12 +48,8 @@ func (v *variable) String() string {
 			_, _ = fmt.Fprint(&buf, v.format)
 		}
 	case lineModeComment:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.others)
-		} else {
-			buf.WriteString(v.others)
-			buf.WriteByte('\n')
-		}
+		buf.WriteString(v.format)
+
 	case lineModeValue:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
@@ -65,19 +60,6 @@ func (v *variable) String() string {
 			}
 			buf.WriteByte('\n')
 		}
-	case lineModeValue | lineModeComment:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, val, v.others)
-		} else {
-			buf.WriteString(v.key + " =")
-			if len(val) > 0 {
-				buf.WriteString(" " + val)
-			}
-			if len(v.others) > 0 {
-				buf.WriteString(" " + v.others)
-			}
-			buf.WriteByte('\n')
-		}
 	case lineModeMulti:
 		if len(v.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
@@ -85,19 +67,6 @@ func (v *variable) String() string {
 			buf.WriteString(v.key + " =")
 			if len(val) > 0 {
 				buf.WriteString(" " + val)
-			}
-			buf.WriteByte('\n')
-		}
-	case lineModeMulti | lineModeComment:
-		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, val, v.others)
-		} else {
-			buf.WriteString(v.key + " =")
-			if len(val) > 0 {
-				buf.WriteString(" " + val)
-			}
-			if len(v.others) > 0 {
-				buf.WriteString(" " + v.others)
 			}
 			buf.WriteByte('\n')
 		}

@@ -47,10 +47,9 @@ type reader struct {
 
 	filename string
 
-	buf        bytes.Buffer
-	bufComment bytes.Buffer
-	bufFormat  bytes.Buffer
-	bufSpaces  bytes.Buffer
+	buf       bytes.Buffer
+	bufFormat bytes.Buffer
+	bufSpaces bytes.Buffer
 
 	lineNum int
 	r       rune
@@ -80,7 +79,6 @@ func (reader *reader) reset(src []byte) {
 		mode: lineModeEmpty,
 	}
 	reader.buf.Reset()
-	reader.bufComment.Reset()
 	reader.bufFormat.Reset()
 	reader.bufSpaces.Reset()
 }
@@ -145,7 +143,6 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 				name:    reader._var.secName,
 				sub:     reader._var.subName,
 				format:  reader._var.format,
-				others:  reader._var.others,
 			}
 
 			reader._var = &variable{
@@ -178,30 +175,27 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 }
 
 func (reader *reader) parse() (err error) {
-	var isNewline bool
-
 	reader.bufFormat.Reset()
 
-	for !isNewline {
+	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
-			return err
+			break
 		}
 		switch reader.b {
 		case tokNewLine:
 			reader.bufFormat.WriteByte(reader.b)
 			reader._var.format = reader.bufFormat.String()
-			isNewline = true
+			return nil
 
 		case tokSpace, tokTab:
 			reader.bufFormat.WriteByte(reader.b)
 
 		case tokHash, tokSemiColon:
-			_ = reader.br.UnreadByte()
+			reader.bufFormat.WriteByte(reader.b)
 			return reader.parseComment()
 
 		case tokSecStart:
-			_ = reader.br.UnreadByte()
 			return reader.parseSectionHeader()
 
 		default:
@@ -209,46 +203,28 @@ func (reader *reader) parse() (err error) {
 			return reader.parseVariable()
 		}
 	}
-
-	return nil
+	return err
 }
 
 func (reader *reader) parseComment() (err error) {
-	reader.bufComment.Reset()
-
-	reader._var.mode |= lineModeComment
-
-	reader.bufFormat.Write([]byte{'%', 's'})
-
 	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			break
 		}
+		_ = reader.bufFormat.WriteByte(reader.b)
 		if reader.b == tokNewLine {
-			reader.bufFormat.WriteByte(reader.b)
 			break
 		}
-		_ = reader.bufComment.WriteByte(reader.b)
 	}
 
 	reader._var.format = reader.bufFormat.String()
-	reader._var.others = reader.bufComment.String()
 
 	return
 }
 
 func (reader *reader) parseSectionHeader() (err error) {
 	reader.buf.Reset()
-
-	reader.b, err = reader.br.ReadByte()
-	if err != nil {
-		return errBadConfig
-	}
-
-	if reader.b != tokSecStart {
-		return errBadConfig
-	}
 
 	reader.bufFormat.WriteByte(tokSecStart)
 	reader._var.mode = lineModeSection
@@ -262,31 +238,28 @@ func (reader *reader) parseSectionHeader() (err error) {
 		return errBadConfig
 	}
 
-	var isNewline bool
-	reader.bufFormat.Write([]byte{'%', 's'})
+	reader.bufFormat.WriteString("%s")
 	reader.buf.WriteRune(reader.r)
 
-	for !isNewline {
+	for {
 		reader.r, _, err = reader.br.ReadRune()
 		if err != nil {
 			return errBadConfig
 		}
-		switch {
-		case reader.r == tokSpace, reader.r == tokTab:
-			isNewline = true
-
-		case reader.r == tokSecEnd:
+		if reader.r == tokSpace || reader.r == tokTab {
+			break
+		}
+		if reader.r == tokSecEnd {
 			reader.bufFormat.WriteRune(reader.r)
 			reader._var.secName = reader.buf.String()
 			return reader.parsePossibleComment()
-
-		case unicode.IsLetter(reader.r), unicode.IsDigit(reader.r),
-			reader.r == tokHyphen, reader.r == tokDot:
-			reader.buf.WriteRune(reader.r)
-
-		default:
-			return errBadConfig
 		}
+		if unicode.IsLetter(reader.r) || unicode.IsDigit(reader.r) ||
+			reader.r == tokHyphen || reader.r == tokDot {
+			reader.buf.WriteRune(reader.r)
+			continue
+		}
+		return errBadConfig
 	}
 
 	reader.bufFormat.WriteRune(reader.r)
@@ -356,34 +329,32 @@ func (reader *reader) parseSubsection() (err error) {
 	return reader.parsePossibleComment()
 }
 
-// parsePossibleComment will check only for whitespace and comment start
-// character.
+// parsePossibleComment parse possible comment at the end of section or
+// variable.
 func (reader *reader) parsePossibleComment() (err error) {
-	var isNewline bool
-
-	for !isNewline {
+	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			break
 		}
-		switch reader.b {
-		case tokNewLine:
+		if reader.b == tokNewLine {
 			reader.bufFormat.WriteByte(reader.b)
-			isNewline = true
-		case tokSpace, tokTab:
-			reader.bufFormat.WriteByte(reader.b)
-		case tokHash, tokSemiColon:
-			_ = reader.br.UnreadByte()
-			return reader.parseComment()
-
-		default:
-			return errBadConfig
+			break
 		}
+		if reader.b == tokSpace || reader.b == tokTab {
+			reader.bufFormat.WriteByte(reader.b)
+			continue
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			reader.bufFormat.WriteByte(reader.b)
+			return reader.parseComment()
+		}
+		return errBadConfig
 	}
 
 	reader._var.format = reader.bufFormat.String()
 
-	return
+	return err
 }
 
 func (reader *reader) parseVariable() (err error) {
@@ -426,11 +397,10 @@ func (reader *reader) parseVariable() (err error) {
 			reader.buf.WriteRune(reader.r)
 
 		case reader.r == tokHash, reader.r == tokSemiColon:
-			_ = reader.br.UnreadRune()
-
 			reader._var.mode = lineModeValue
 			reader._var.key = reader.buf.String()
 
+			reader.bufFormat.WriteRune(reader.r)
 			return reader.parseComment()
 
 		case unicode.IsSpace(reader.r):
@@ -471,7 +441,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 			reader.bufFormat.WriteByte(reader.b)
 
 		case tokHash, tokSemiColon:
-			_ = reader.br.UnreadByte()
+			reader.bufFormat.WriteByte(reader.b)
 			return reader.parseComment()
 		case tokEqual:
 			reader.bufFormat.WriteByte(reader.b)
@@ -508,9 +478,9 @@ consume_spaces:
 			continue consume_spaces
 
 		case tokHash, tokSemiColon:
-			_ = reader.br.UnreadByte()
 			reader._var.value = ""
 			reader.bufFormat.WriteString("%s")
+			reader.bufFormat.WriteByte(reader.b)
 			return reader.parseComment()
 
 		case tokNewLine:
@@ -604,8 +574,7 @@ consume_spaces:
 			reader.bufFormat.Write(reader.bufSpaces.Bytes())
 			reader.valueCommit(false)
 
-			_ = reader.br.UnreadByte()
-
+			reader.bufFormat.WriteByte(reader.b)
 			return reader.parseComment()
 
 		default:

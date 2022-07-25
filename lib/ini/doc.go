@@ -33,8 +33,8 @@
 //
 // Section name are case-insensitive.
 //
-// Variable name must start with an alphabetic character, no
-// whitespace before name or after '['.
+// Section name must start with an alphabetic character, no
+// spaces before name or after '['.
 //
 // Section name only allow alphanumeric characters, `-` and `.`.
 //
@@ -51,7 +51,7 @@
 //
 // # Subsection
 //
-// To begin a subsection put its name in double quotes, separated by
+// A subsection begin and end with double quotes, separated by
 // space from the section name, in the section header, for example
 //
 //	[section "subsection"]

@@ -8,6 +8,22 @@ result is at the top.
 
 ==  Parse
 
+=== v0.39.1-0.20220725172542-b6ced5902689 +1
+
+----
+goos: linux
+goarch: amd64
+pkg: github.com/shuLhan/share/lib/ini
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkParse-8           34111             39538 ns/op           24384 B/op        457 allocs/op
+BenchmarkParse-8           30565             36993 ns/op           24384 B/op        457 allocs/op
+BenchmarkParse-8           35026             37068 ns/op           24384 B/op        457 allocs/op
+BenchmarkParse-8           35647             37361 ns/op           24384 B/op        457 allocs/op
+BenchmarkParse-8           36157             35526 ns/op           24384 B/op        457 allocs/op
+PASS
+ok      github.com/shuLhan/share/lib/ini        8.196s
+----
+
 === v0.39.1-0.20220725144718-b2230a98735f
 
 go version devel go1.19-c9c6586ba3 Tue Jul 19 19:01:37 2022 +0700 linux/amd64.

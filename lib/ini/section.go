@@ -18,7 +18,6 @@ type Section struct {
 	sub       string
 	format    string
 	nameLower string
-	others    string
 
 	vars []*variable
 
@@ -70,23 +69,11 @@ func (sec *Section) String() string {
 		} else {
 			_, _ = fmt.Fprintf(&buf, "[%s]\n", sec.name)
 		}
-	case lineModeSection | lineModeComment:
-		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s] %s\n", sec.name, sec.others)
-		}
 	case lineModeSection | lineModeSubsection:
 		if len(sec.format) > 0 {
 			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.sub)
 		} else {
 			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"]\n", sec.name, sec.sub)
-		}
-	case lineModeSection | lineModeSubsection | lineModeComment:
-		if len(sec.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, sec.format, sec.name, sec.sub, sec.others)
-		} else {
-			_, _ = fmt.Fprintf(&buf, "[%s \"%s\"] %s\n", sec.name, sec.sub, sec.others)
 		}
 	}
 

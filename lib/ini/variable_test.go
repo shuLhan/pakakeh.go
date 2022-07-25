@@ -45,25 +45,17 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode empty #2",
 		v: &variable{
-			mode: lineModeEmpty,
+			mode:   lineModeEmpty,
 			format: "	",
 		},
 		exp: "	",
 	}, {
-		desc: "With mode comment #1",
+		desc: "With line mode comment",
 		v: &variable{
 			mode:   lineModeComment,
-			format: "  %s",
-			others: "; comment",
+			format: `  ; comment`,
 		},
-		exp: "  ; comment",
-	}, {
-		desc: "With mode comment #2",
-		v: &variable{
-			mode:   lineModeComment,
-			others: "; comment",
-		},
-		exp: "; comment\n",
+		exp: `  ; comment`,
 	}, {
 		desc: "With mode value",
 		v: &variable{
@@ -73,12 +65,12 @@ func TestVariableString(t *testing.T) {
 		},
 		exp: "name = value\n",
 	}, {
-		desc: "With mode value and comment",
+		desc: `With mode value and comment`,
 		v: &variable{
-			mode:   lineModeValue | lineModeComment,
-			key:    "name",
-			value:  "value",
-			others: "; comment",
+			mode:   lineModeValue,
+			key:    `name`,
+			value:  `value`,
+			format: "%s = %s ; comment\n",
 		},
 		exp: "name = value ; comment\n",
 	}, {
@@ -92,10 +84,10 @@ func TestVariableString(t *testing.T) {
 	}, {
 		desc: "With mode multi and comment",
 		v: &variable{
-			mode:   lineModeMulti | lineModeComment,
-			key:    "name",
-			value:  "value",
-			others: "; comment",
+			mode:   lineModeMulti,
+			key:    `name`,
+			value:  `value`,
+			format: "%s = %s ; comment\n",
 		},
 		exp: "name = value ; comment\n",
 	}}

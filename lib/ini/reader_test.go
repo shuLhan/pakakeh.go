@@ -17,87 +17,76 @@ func TestParseSectionHeader(t *testing.T) {
 		expFormat  string
 		expSecName string
 		expSubName string
-		expComment string
 
 		desc    string
 		in      string
 		expMode lineMode
 	}{{
-		desc:   "With empty input",
+		desc:   `With no section name`,
+		in:     ``,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #0 (no name)",
-		in:     `[`,
+		desc:   `With leading space`,
+		in:     ` section]`,
 		expErr: errBadConfig,
 	}, {
-
-		desc:   "With invalid section #1 (no section start)",
-		in:     `nosection start]`,
+		desc:   `Without closed`,
+		in:     `section`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #2 (with leading space)",
-		in:     `[ section]`,
+		desc:   `With trailing space, no sub`,
+		in:     `section  ]`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #3 (not closed]",
-		in:     `[section`,
+		desc:   `With invalid char`,
+		in:     `section!]`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #4 (no sub)",
-		in:     `[section  ]`,
+		desc:   `With trailing string`,
+		in:     `section] not`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #5 (invalid char)",
-		in:     `[section!]`,
+		desc:   `With sub and trailing string`,
+		in:     `section "subsection"]    not`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #6 (trailing char)",
-		in:     `[section] not`,
+		desc:   `With sub and trailing space`,
+		in:     `section "subsection" ] # comment`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #7 (trailing char)",
-		in:     `[section "subsection"]    not`,
+		desc:   `With subsction and not closed`,
+		in:     `section "subsection" # comment`,
 		expErr: errBadConfig,
 	}, {
-		desc:   "With invalid section #8 (trailing space)",
-		in:     `[section "subsection" ] # comment`,
-		expErr: errBadConfig,
-	}, {
-		desc:   "With invalid section #9 (not closed)",
-		in:     `[section "subsection" # comment`,
-		expErr: errBadConfig,
-	}, {
-		desc:       "With valid name",
-		in:         `[section-.]`,
+		desc:       `With valid name`,
+		in:         `section-.]`,
 		expErr:     io.EOF,
 		expMode:    lineModeSection,
-		expSecName: "section-.",
-		expFormat:  "[%s]",
+		expSecName: `section-.`,
+		expFormat:  `[%s]`,
 	}, {
-		desc:       "With valid name and comment",
-		in:         `[section-.] ; a comment`,
+		desc:       `With valid name and comment`,
+		in:         `section-.] ; a comment`,
 		expErr:     io.EOF,
-		expMode:    lineModeSection | lineModeComment,
-		expSecName: "section-.",
-		expFormat:  "[%s] %s",
-		expComment: "; a comment",
+		expMode:    lineModeSection,
+		expSecName: `section-.`,
+		expFormat:  `[%s] ; a comment`,
 	}, {
-		desc:       "With valid name and sub",
-		in:         `[section-. "su\bsec\tio\n"]`,
+		desc:       `With valid name and sub`,
+		in:         `section-. "su\bsec\tio\n"]`,
 		expErr:     io.EOF,
 		expMode:    lineModeSection | lineModeSubsection,
-		expSecName: "section-.",
-		expSubName: "subsection",
+		expSecName: `section-.`,
+		expSubName: `subsection`,
 		expFormat:  `[%s "%s"]`,
 	}, {
-		desc:       "With valid name, sub, and comment",
-		in:         `[section-. "su\bsec\tio\n"]   # comment`,
+		desc:       `With valid name, sub, and comment`,
+		in:         `section-. "su\bsec\tio\n"]   # comment`,
 		expErr:     io.EOF,
-		expMode:    lineModeSection | lineModeSubsection | lineModeComment,
-		expSecName: "section-.",
-		expSubName: "subsection",
-		expFormat:  `[%s "%s"]   %s`,
-		expComment: "# comment",
+		expMode:    lineModeSection | lineModeSubsection,
+		expSecName: `section-.`,
+		expSubName: `subsection`,
+		expFormat:  `[%s "%s"]   # comment`,
 	}}
 
 	reader := newReader()
@@ -119,16 +108,14 @@ func TestParseSectionHeader(t *testing.T) {
 		test.Assert(t, "format", c.expFormat, reader._var.format)
 		test.Assert(t, "section", c.expSecName, reader._var.secName)
 		test.Assert(t, "subsection", c.expSubName, reader._var.subName)
-		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
 
 func TestParseSubsection(t *testing.T) {
 	cases := []struct {
-		expErr     error
-		expFormat  string
-		expSub     string
-		expComment string
+		expErr    error
+		expFormat string
+		expSub    string
 
 		desc string
 		in   string
@@ -175,17 +162,15 @@ func TestParseSubsection(t *testing.T) {
 		test.Assert(t, "mode", c.expMode, reader._var.mode)
 		test.Assert(t, "format", c.expFormat, reader._var.format)
 		test.Assert(t, "subsection", c.expSub, reader._var.subName)
-		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
 
 func TestParseVariable(t *testing.T) {
 	cases := []struct {
-		expErr     error
-		expFormat  string
-		expComment string
-		expKey     string
-		expValue   string
+		expErr    error
+		expFormat string
+		expKey    string
+		expValue  string
 
 		desc    string
 		in      []byte
@@ -194,8 +179,8 @@ func TestParseVariable(t *testing.T) {
 		desc:   "Empty",
 		expErr: errVarNameInvalid,
 	}, {
-		desc: "Empty with space",
-		in: []byte("  	"),
+		desc:   "Empty with space",
+		in:     []byte("  	"),
 		expErr: errVarNameInvalid,
 	}, {
 		desc:   "Digit at start",
@@ -250,21 +235,19 @@ func TestParseVariable(t *testing.T) {
 		in:     []byte(`na\me`),
 		expErr: errVarNameInvalid,
 	}, {
-		desc:       "With comment #1",
-		in:         []byte(`name; comment`),
-		expErr:     io.EOF,
-		expMode:    lineModeValue | lineModeComment,
-		expKey:     "name",
-		expComment: "; comment",
-		expFormat:  "%s%s",
+		desc:      `Without space before comment`,
+		in:        []byte(`name; comment`),
+		expErr:    io.EOF,
+		expMode:   lineModeValue,
+		expKey:    `name`,
+		expFormat: `%s; comment`,
 	}, {
-		desc:       "With comment #2",
-		in:         []byte(`name ; comment`),
-		expErr:     io.EOF,
-		expMode:    lineModeValue | lineModeComment,
-		expKey:     "name",
-		expComment: "; comment",
-		expFormat:  "%s %s",
+		desc:      `With space before comment`,
+		in:        []byte(`name ; comment`),
+		expErr:    io.EOF,
+		expMode:   lineModeValue,
+		expKey:    `name`,
+		expFormat: `%s ; comment`,
 	}, {
 		desc:      "With empty value #1",
 		in:        []byte(`name=`),
@@ -282,14 +265,13 @@ func TestParseVariable(t *testing.T) {
 		expFormat: "%s =",
 		expValue:  "",
 	}, {
-		desc:       "With empty value and comment",
-		in:         []byte(`name = # a comment`),
-		expErr:     io.EOF,
-		expMode:    lineModeValue | lineModeComment,
-		expKey:     "name",
-		expFormat:  "%s = %s%s",
-		expComment: "# a comment",
-		expValue:   "",
+		desc:      `With empty value and comment`,
+		in:        []byte(`name = # a comment`),
+		expErr:    io.EOF,
+		expMode:   lineModeValue,
+		expKey:    `name`,
+		expFormat: `%s = %s# a comment`,
+		expValue:  ``,
 	}, {
 		desc:      "With empty value #3",
 		in:        []byte(`name     `),
@@ -298,9 +280,8 @@ func TestParseVariable(t *testing.T) {
 		expKey:    "name",
 		expFormat: "%s     ",
 	}, {
-		desc: "With newline",
-		in: []byte(`name 
-`),
+		desc:      `With newline`,
+		in:        []byte("name \n"),
 		expErr:    io.EOF,
 		expMode:   lineModeValue,
 		expKey:    "name",
@@ -344,16 +325,14 @@ func TestParseVariable(t *testing.T) {
 		test.Assert(t, "format", c.expFormat, reader._var.format)
 		test.Assert(t, "key", c.expKey, reader._var.key)
 		test.Assert(t, "value", c.expValue, reader._var.value)
-		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
 
 func TestParseVarValue(t *testing.T) {
 	cases := []struct {
-		expErr     error
-		expFormat  string
-		expValue   string
-		expComment string
+		expErr    error
+		expFormat string
+		expValue  string
 
 		desc string
 		in   []byte
@@ -368,11 +347,11 @@ func TestParseVarValue(t *testing.T) {
 		expFormat: `   `,
 		expValue:  "",
 	}, {
-		desc: `Input with tab`,
-		in: []byte(`	`),
-		expErr: io.EOF,
+		desc:      `Input with tab`,
+		in:        []byte(`	`),
+		expErr:    io.EOF,
 		expFormat: `	`,
-		expValue: "",
+		expValue:  "",
 	}, {
 		desc: `Input with newline`,
 		in: []byte(`
@@ -414,19 +393,17 @@ func TestParseVarValue(t *testing.T) {
 		expFormat: `%s`,
 		expValue:  `\ value "`,
 	}, {
-		desc:       `With comment #`,
-		in:         []byte(`value # comment`),
-		expErr:     io.EOF,
-		expFormat:  `%s %s`,
-		expValue:   "value",
-		expComment: "# comment",
+		desc:      `With comment #`,
+		in:        []byte(`value # comment`),
+		expErr:    io.EOF,
+		expFormat: `%s # comment`,
+		expValue:  `value`,
 	}, {
-		desc:       `With comment ;`,
-		in:         []byte(`value ; comment`),
-		expErr:     io.EOF,
-		expFormat:  "%s %s",
-		expValue:   "value",
-		expComment: "; comment",
+		desc:      `With comment ;`,
+		in:        []byte(`value ; comment`),
+		expErr:    io.EOF,
+		expFormat: `%s ; comment`,
+		expValue:  `value`,
 	}, {
 		desc:      `With comment # inside double-quote`,
 		in:        []byte(`"value # comment"`),
@@ -440,26 +417,23 @@ func TestParseVarValue(t *testing.T) {
 		expFormat: `%s`,
 		expValue:  `value ; comment`,
 	}, {
-		desc:       `Double quote and comment #1`,
-		in:         []byte(`val" "#ue`),
-		expErr:     io.EOF,
-		expFormat:  `%s%s`,
-		expValue:   `val `,
-		expComment: `#ue`,
+		desc:      `Double quote and comment #1`,
+		in:        []byte(`val" "#ue`),
+		expErr:    io.EOF,
+		expFormat: `%s#ue`,
+		expValue:  `val `,
 	}, {
-		desc:       `Double quote and comment #2`,
-		in:         []byte(`val" " #ue`),
-		expErr:     io.EOF,
-		expFormat:  `%s %s`,
-		expValue:   `val `,
-		expComment: `#ue`,
+		desc:      `Double quote and comment #2`,
+		in:        []byte(`val" " #ue`),
+		expErr:    io.EOF,
+		expFormat: `%s #ue`,
+		expValue:  `val `,
 	}, {
-		desc:       `Double quote and comment #3`,
-		in:         []byte(`val " " #ue`),
-		expErr:     io.EOF,
-		expFormat:  `%s %s`,
-		expValue:   `val  `,
-		expComment: `#ue`,
+		desc:      `Double quote and comment #3`,
+		in:        []byte(`val " " #ue`),
+		expErr:    io.EOF,
+		expFormat: `%s #ue`,
+		expValue:  `val  `,
 	}, {
 		desc:      `Escaped chars #1`,
 		in:        []byte(`value \"escaped\" here`),
@@ -495,6 +469,5 @@ func TestParseVarValue(t *testing.T) {
 
 		test.Assert(t, "format", c.expFormat, reader._var.format)
 		test.Assert(t, "value", c.expValue, reader._var.value)
-		test.Assert(t, "comment", c.expComment, reader._var.others)
 	}
 }
