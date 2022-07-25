@@ -140,7 +140,7 @@ func (in *Ini) marshalStruct(
 
 		var sec, sub, key, value string
 
-		tags = parseTag(tag)
+		tags = ParseTag(tag)
 		sec = tags[0]
 		sub = tags[1]
 		if len(tags[2]) == 0 {

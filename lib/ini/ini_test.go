@@ -272,7 +272,7 @@ func TestIni_Get(t *testing.T) {
 				continue
 			}
 
-			tags = parseTag(string(key))
+			tags = ParseTag(string(key))
 			def = tags[3]
 
 			got, _ = cfg.Get(tags[0], tags[1], tags[2], def)

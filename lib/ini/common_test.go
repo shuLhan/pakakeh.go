@@ -82,7 +82,7 @@ func TestParseTag(t *testing.T) {
 		got []string
 	)
 	for _, c = range cases {
-		got = parseTag(c.in)
+		got = ParseTag(c.in)
 		test.Assert(t, c.in, c.exp, got)
 	}
 }
@@ -120,7 +120,7 @@ func TestParseTag_fromStruct(t *testing.T) {
 
 		tag, _, _ = libreflect.Tag(field, "ini")
 
-		got = parseTag(tag)
+		got = ParseTag(tag)
 		test.Assert(t, tag, exp[x], got)
 	}
 }

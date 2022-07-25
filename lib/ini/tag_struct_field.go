@@ -74,7 +74,7 @@ func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStruct
 			sfield.layout = time.RFC3339
 		}
 
-		tags = parseTag(tag)
+		tags = ParseTag(tag)
 		sfield.sec = tags[0]
 		sfield.sub = tags[1]
 		sfield.key = strings.ToLower(tags[2])

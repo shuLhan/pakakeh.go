@@ -44,10 +44,10 @@ func IsValueBoolTrue(v string) bool {
 	return false
 }
 
-// parseTag parse the ini field tag as used in the struct's field.
+// ParseTag parse the ini field tag as used in the struct's field.
 // This returned slice always have 4 string element: section, subsection, key,
 // and default value.
-func parseTag(in string) (tags []string) {
+func ParseTag(in string) (tags []string) {
 	var (
 		sb       strings.Builder
 		r        rune
