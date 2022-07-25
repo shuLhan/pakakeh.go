@@ -1,0 +1,53 @@
+// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+=  Benchmark result history
+
+Each of the benchmark result ordered in descending, which means the latest
+result is at the top.
+
+==  Parse
+
+=== v0.39.1-0.20220725144718-b2230a98735f
+
+go version devel go1.19-c9c6586ba3 Tue Jul 19 19:01:37 2022 +0700 linux/amd64.
+
+----
+goos: linux
+goarch: amd64
+pkg: github.com/shuLhan/share/lib/ini
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkParse-8           31941             39335 ns/op           26496 B/op        480 allocs/op
+BenchmarkParse-8           31231             37825 ns/op           26496 B/op        480 allocs/op
+BenchmarkParse-8           30998             39205 ns/op           26496 B/op        480 allocs/op
+BenchmarkParse-8           30733             38837 ns/op           26496 B/op        480 allocs/op
+BenchmarkParse-8           34423             38275 ns/op           26496 B/op        480 allocs/op
+PASS
+ok      github.com/shuLhan/share/lib/ini        9.150s
+----
+
+=== 488e6c3 (2018-05-10)
+
+Refactor parser using bytes.Reader.
+
+----
+BenchmarkParse-2  20000    72338 ns/op    35400 B/op    550 allocs/op
+----
+
+Replace field type in Section and Variable from []byte to string.
+
+----
+BenchmarkParse-2  20000    61150 ns/op    25176 B/op    482 allocs/op
+----
+
+Move buffer to reader.
+
+----
+BenchmarkParse-2  500   19534400 ns/op  4656335 B/op  81163 allocs/op
+----
+
+With bytes.Buffer in functions.
+
+----
+BenchmarkParse-2  300   17007586 ns/op  6361586 B/op  78712 allocs/op/
+----
