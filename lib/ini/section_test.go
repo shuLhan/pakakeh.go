@@ -57,12 +57,12 @@ func TestSectionSet(t *testing.T) {
 		name:      "section",
 		nameLower: "section",
 		vars: []*variable{{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v1",
 		}, {
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v2",
@@ -86,12 +86,12 @@ func TestSectionSet(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 			}},
@@ -106,12 +106,12 @@ func TestSectionSet(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "false",
@@ -135,12 +135,12 @@ func TestSection_add(t *testing.T) {
 		name:      "section",
 		nameLower: "section",
 		vars: []*variable{{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v1",
 		}, {
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k2",
 			keyLower: "k2",
 			value:    "v2",
@@ -160,12 +160,12 @@ func TestSection_add(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k2",
 				keyLower: "k2",
 				value:    "v2",
@@ -179,16 +179,16 @@ func TestSection_add(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k2",
 				keyLower: "k2",
 				value:    "v2",
@@ -203,16 +203,16 @@ func TestSection_add(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k2",
 				keyLower: "k2",
 				value:    "v2",
@@ -235,12 +235,12 @@ func TestSectionUnset(t *testing.T) {
 		name:      "section",
 		nameLower: "section",
 		vars: []*variable{{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v1",
 		}, {
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v2",
@@ -261,12 +261,12 @@ func TestSectionUnset(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v2",
@@ -281,7 +281,7 @@ func TestSectionUnset(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
@@ -295,7 +295,7 @@ func TestSectionUnset(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
@@ -329,12 +329,12 @@ func TestSectionUnsetAll(t *testing.T) {
 		name:      "section",
 		nameLower: "section",
 		vars: []*variable{{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v1",
 		}, {
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v2",
@@ -353,12 +353,12 @@ func TestSectionUnsetAll(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v2",
@@ -372,12 +372,12 @@ func TestSectionUnsetAll(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v1",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "k",
 				keyLower: "k",
 				value:    "v2",
@@ -435,22 +435,22 @@ func TestSection_replaceAll(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "3",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "33",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "333",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "3333",
@@ -465,27 +465,27 @@ func TestSection_replaceAll(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "3",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "33",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "333",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "key-3",
 				keyLower: "key-3",
 				value:    "3333",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "KEY-4",
 				keyLower: "key-4",
 				value:    "4",
@@ -500,12 +500,12 @@ func TestSection_replaceAll(t *testing.T) {
 			name:      sec.name,
 			nameLower: sec.nameLower,
 			vars: []*variable{{
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "KEY-4",
 				keyLower: "key-4",
 				value:    "4",
 			}, {
-				mode:     lineModeValue,
+				mode:     lineModeKeyValue,
 				key:      "KEY-3",
 				keyLower: "key-3",
 				value:    "replaced",
@@ -528,12 +528,12 @@ func TestSectionGet(t *testing.T) {
 		name:      "section",
 		nameLower: "section",
 		vars: []*variable{{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v1",
 		}, {
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v2",
@@ -576,12 +576,12 @@ func TestSectionGets(t *testing.T) {
 		name:      "section",
 		nameLower: "section",
 		vars: []*variable{{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v1",
 		}, {
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      "k",
 			keyLower: "k",
 			value:    "v2",

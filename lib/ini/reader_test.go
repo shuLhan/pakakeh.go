@@ -167,143 +167,140 @@ func TestParseSubsection(t *testing.T) {
 
 func TestParseVariable(t *testing.T) {
 	cases := []struct {
+		desc      string
+		in        string
 		expErr    error
 		expFormat string
 		expKey    string
 		expValue  string
 
-		desc    string
-		in      []byte
 		expMode lineMode
 	}{{
-		desc:   "Empty",
+		desc:   `Empty`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:   "Empty with space",
-		in:     []byte("  	"),
+		desc:   `Empty with space`,
+		in:     `  	`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:   "Digit at start",
-		in:     []byte("0name"),
+		desc:   `Digit at start`,
+		in:     `0name`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:      "Digit at end",
-		in:        []byte("name0"),
+		desc:      `Digit at end`,
+		in:        `name0`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expFormat: "%s",
-		expKey:    "name0",
+		expMode:   lineModeKeyOnly,
+		expFormat: `%s`,
+		expKey:    `name0`,
 	}, {
-		desc:      "Digit at middle",
-		in:        []byte("na0me"),
+		desc:      `Digit at middle`,
+		in:        `na0me`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expFormat: "%s",
-		expKey:    "na0me",
+		expMode:   lineModeKeyOnly,
+		expFormat: `%s`,
+		expKey:    `na0me`,
 	}, {
-		desc:   "Hyphen at start",
-		in:     []byte("-name"),
+		desc:   `Hyphen at start`,
+		in:     `-name`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:      "Hyphen at end",
-		in:        []byte("name-"),
+		desc:      `Hyphen at end`,
+		in:        `name-`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expFormat: "%s",
-		expKey:    "name-",
+		expMode:   lineModeKeyOnly,
+		expFormat: `%s`,
+		expKey:    `name-`,
 	}, {
-		desc:      "hyphen at middle",
-		in:        []byte("na-me"),
+		desc:      `Gyphen at middle`,
+		in:        `na-me`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expFormat: "%s",
-		expKey:    "na-me",
+		expMode:   lineModeKeyOnly,
+		expFormat: `%s`,
+		expKey:    `na-me`,
 	}, {
-		desc:   "Non alnumhyp at start",
-		in:     []byte("!name"),
+		desc:   `Invalid chart at start`,
+		in:     `!name`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:   "Non alnumhyp at end",
-		in:     []byte("name!"),
+		desc:   `Invalid chart at end`,
+		in:     `name!`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:   "Non alnumhyp at middle",
-		in:     []byte("na!me"),
+		desc:   `Invalid char at middle`,
+		in:     `na!me`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:   "With escaped char \\",
-		in:     []byte(`na\me`),
+		desc:   `With escaped char \\`,
+		in:     `na\me`,
 		expErr: errVarNameInvalid,
 	}, {
 		desc:      `Without space before comment`,
-		in:        []byte(`name; comment`),
+		in:        `name; comment`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
+		expMode:   lineModeKeyOnly,
 		expKey:    `name`,
 		expFormat: `%s; comment`,
 	}, {
 		desc:      `With space before comment`,
-		in:        []byte(`name ; comment`),
+		in:        `name ; comment`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
+		expMode:   lineModeKeyOnly,
 		expKey:    `name`,
 		expFormat: `%s ; comment`,
 	}, {
-		desc:      "With empty value #1",
-		in:        []byte(`name=`),
+		desc:      `With empty value #1`,
+		in:        `name=`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expKey:    "name",
-		expFormat: "%s=",
-		expValue:  "",
+		expMode:   lineModeKeyValue,
+		expKey:    `name`,
+		expFormat: `%s=%s`,
 	}, {
-		desc:      "With empty value #2",
-		in:        []byte(`name =`),
+		desc:      `With empty value #2`,
+		in:        `name =`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expKey:    "name",
-		expFormat: "%s =",
-		expValue:  "",
+		expMode:   lineModeKeyValue,
+		expKey:    `name`,
+		expFormat: `%s =%s`,
 	}, {
 		desc:      `With empty value and comment`,
-		in:        []byte(`name = # a comment`),
+		in:        `name = # a comment`,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
+		expMode:   lineModeKeyValue,
 		expKey:    `name`,
-		expFormat: `%s = %s# a comment`,
-		expValue:  ``,
+		expFormat: `%s =%s# a comment`,
 	}, {
-		desc:      "With empty value #3",
-		in:        []byte(`name     `),
+		desc:      `With empty value #3`,
+		in:        `name     `,
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expKey:    "name",
-		expFormat: "%s     ",
+		expMode:   lineModeKeyOnly,
+		expKey:    `name`,
+		expFormat: `%s     `,
 	}, {
 		desc:      `With newline`,
-		in:        []byte("name \n"),
+		in:        "name \n",
 		expErr:    io.EOF,
-		expMode:   lineModeValue,
-		expKey:    "name",
+		expMode:   lineModeKeyOnly,
+		expKey:    `name`,
 		expFormat: "%s \n",
 	}, {
-		desc:   "With invalid char",
-		in:     []byte(`name 1`),
+		desc:   `With space in the middle`,
+		in:     `name 1`,
 		expErr: errVarNameInvalid,
 	}, {
-		desc:      "With dot",
-		in:        []byte(`name.subname`),
-		expMode:   lineModeValue,
+		desc:      `With dot`,
+		in:        `name.subname`,
+		expMode:   lineModeKeyOnly,
 		expErr:    io.EOF,
-		expKey:    "name.subname",
-		expFormat: "%s",
+		expKey:    `name.subname`,
+		expFormat: `%s`,
 	}, {
-		desc:      "With underscore char",
-		in:        []byte(`name_subname`),
-		expMode:   lineModeValue,
+		desc:      `With underscore char`,
+		in:        `name_subname`,
+		expMode:   lineModeKeyOnly,
 		expErr:    io.EOF,
-		expKey:    "name_subname",
-		expFormat: "%s",
+		expKey:    `name_subname`,
+		expFormat: `%s`,
 	}}
 
 	reader := newReader()
@@ -311,7 +308,7 @@ func TestParseVariable(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		reader.reset(c.in)
+		reader.reset([]byte(c.in))
 
 		err := reader.parseVariable()
 		if err != nil {
@@ -329,137 +326,155 @@ func TestParseVariable(t *testing.T) {
 }
 
 func TestParseVarValue(t *testing.T) {
-	cases := []struct {
-		expErr    error
-		expFormat string
-		expValue  string
+	type testCase struct {
+		expErr      error
+		desc        string
+		in          string
+		expFormat   string
+		expValue    string
+		expRawValue string
+	}
 
-		desc string
-		in   []byte
-	}{{
-		desc:     `Empty input`,
-		expErr:   io.EOF,
-		expValue: "",
-	}, {
-		desc:      `Input with spaces`,
-		in:        []byte(`   `),
-		expErr:    io.EOF,
-		expFormat: `   `,
-		expValue:  "",
-	}, {
-		desc:      `Input with tab`,
-		in:        []byte(`	`),
-		expErr:    io.EOF,
-		expFormat: `	`,
-		expValue:  "",
-	}, {
-		desc: `Input with newline`,
-		in: []byte(`
-`),
-		expErr: nil,
-		expFormat: `
-`,
-		expValue: "",
-	}, {
-		desc:      `Double quoted with spaces`,
-		in:        []byte(`"   "`),
+	var cases = []testCase{{
+		desc:      `Empty input`,
 		expErr:    io.EOF,
 		expFormat: `%s`,
-		expValue:  "   ",
+	}, {
+		desc:        `Input with spaces`,
+		in:          `   `,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expRawValue: `   `,
+	}, {
+		desc:        `Input with tab`,
+		in:          `	`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expRawValue: `	`,
+	}, {
+		desc:        `Input with newline`,
+		in:          "\n",
+		expErr:      nil,
+		expFormat:   "%s\n",
+		expRawValue: "",
+	}, {
+		desc:        `Double quoted with spaces`,
+		in:          `"   "`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `   `,
+		expRawValue: `"   "`,
 	}, {
 		desc:   `Double quote at start only`,
-		in:     []byte(`"\\ value`),
+		in:     `"\\ value`,
 		expErr: errValueInvalid,
 	}, {
 		desc:   `Double quote at end only`,
-		in:     []byte(`\\ value "`),
+		in:     `\\ value "`,
 		expErr: errValueInvalid,
 	}, {
-		desc:      `Double quoted at start only`,
-		in:        []byte(`"\\" value`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  `\ value`,
+		desc:        `Double quoted at start`,
+		in:          `"\\" value`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `\ value`,
+		expRawValue: `"\\" value`,
 	}, {
-		desc:      `Double quoted at end only`,
-		in:        []byte(`value "\""`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  `value "`,
+		desc:        `Double quoted at end only`,
+		in:          `value "\""`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `value "`,
+		expRawValue: `value "\""`,
 	}, {
-		desc:      `Double quoted at start and end`,
-		in:        []byte(`"\\" value "\""`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  `\ value "`,
+		desc:        `Double quoted at start and end`,
+		in:          `"\\" value "\""`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `\ value "`,
+		expRawValue: `"\\" value "\""`,
 	}, {
-		desc:      `With comment #`,
-		in:        []byte(`value # comment`),
-		expErr:    io.EOF,
-		expFormat: `%s # comment`,
-		expValue:  `value`,
+		desc:        `With comment #`,
+		in:          `value # comment`,
+		expErr:      io.EOF,
+		expFormat:   `%s# comment`,
+		expValue:    `value`,
+		expRawValue: `value `,
 	}, {
-		desc:      `With comment ;`,
-		in:        []byte(`value ; comment`),
-		expErr:    io.EOF,
-		expFormat: `%s ; comment`,
-		expValue:  `value`,
+		desc:        `With comment ;`,
+		in:          `value ; comment`,
+		expErr:      io.EOF,
+		expFormat:   `%s; comment`,
+		expValue:    `value`,
+		expRawValue: `value `,
 	}, {
-		desc:      `With comment # inside double-quote`,
-		in:        []byte(`"value # comment"`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  `value # comment`,
+		desc:        `With comment # inside double-quote`,
+		in:          `"value # comment"`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `value # comment`,
+		expRawValue: `"value # comment"`,
 	}, {
-		desc:      `With comment ; inside double-quote`,
-		in:        []byte(`"value ; comment"`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  `value ; comment`,
+		desc:        `With comment ; inside double-quote`,
+		in:          `"value ; comment"`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `value ; comment`,
+		expRawValue: `"value ; comment"`,
 	}, {
-		desc:      `Double quote and comment #1`,
-		in:        []byte(`val" "#ue`),
-		expErr:    io.EOF,
-		expFormat: `%s#ue`,
-		expValue:  `val `,
+		desc:        `Double quote and comment #1`,
+		in:          `val" "#ue`,
+		expErr:      io.EOF,
+		expFormat:   `%s#ue`,
+		expValue:    `val `,
+		expRawValue: `val" "`,
 	}, {
-		desc:      `Double quote and comment #2`,
-		in:        []byte(`val" " #ue`),
-		expErr:    io.EOF,
-		expFormat: `%s #ue`,
-		expValue:  `val `,
+		desc:        `Double quote and comment #2`,
+		in:          `val" " #ue`,
+		expErr:      io.EOF,
+		expFormat:   `%s#ue`,
+		expValue:    `val `,
+		expRawValue: `val" " `,
 	}, {
-		desc:      `Double quote and comment #3`,
-		in:        []byte(`val " " #ue`),
-		expErr:    io.EOF,
-		expFormat: `%s #ue`,
-		expValue:  `val  `,
+		desc:        `Double quote and comment #3`,
+		in:          `val " " #ue`,
+		expErr:      io.EOF,
+		expFormat:   `%s#ue`,
+		expValue:    `val  `,
+		expRawValue: `val " " `,
 	}, {
-		desc:      `Escaped chars #1`,
-		in:        []byte(`value \"escaped\" here`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  `value "escaped" here`,
+		desc:        `Escaped chars #1`,
+		in:          `value \"escaped\" here`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `value "escaped" here`,
+		expRawValue: `value \"escaped\" here`,
 	}, {
-		desc:      `Escaped chars #2`,
-		in:        []byte(`"value\b\n\t\"escaped\" here"`),
-		expErr:    io.EOF,
-		expFormat: `%s`,
-		expValue:  "value\b\n\t\"escaped\" here",
+		desc:        `Escaped chars #2`,
+		in:          `"value\b\n\t\"escaped\" here"`,
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    "value\b\n\t\"escaped\" here",
+		expRawValue: `"value\b\n\t\"escaped\" here"`,
 	}, {
 		desc:   `Invalid escaped chars`,
-		in:     []byte(`"value\b\n\x\"escaped\" here"`),
+		in:     `"value\b\n\x\"escaped\" here"`,
 		expErr: errValueInvalid,
 	}}
 
-	reader := newReader()
+	var (
+		reader = newReader()
 
-	for _, c := range cases {
+		c   testCase
+		err error
+	)
+
+	for _, c = range cases {
 		t.Log(c.desc)
 
-		reader.reset(c.in)
+		reader.reset([]byte(c.in))
 
-		err := reader.parseVarValue()
+		err = reader.parseVarValue()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err)
 			if err != io.EOF {
@@ -467,7 +482,36 @@ func TestParseVarValue(t *testing.T) {
 			}
 		}
 
-		test.Assert(t, "format", c.expFormat, reader._var.format)
+		test.Assert(t, "raw value", c.expRawValue, string(reader._var.rawValue))
 		test.Assert(t, "value", c.expValue, reader._var.value)
+		test.Assert(t, "format", c.expFormat, reader._var.format)
+	}
+}
+
+func TestParseRawValue(t *testing.T) {
+	type testCase struct {
+		in  string
+		exp string
+	}
+
+	var cases = []testCase{{
+		in:  "\\\n \ta",
+		exp: `a`,
+	}, {
+		in:  " a\\\n\t b\\\n \tc",
+		exp: `a b c`,
+	}, {
+		in:  " a\\\n \"\\\" b \"\\\n c",
+		exp: `a " b  c`,
+	}}
+
+	var (
+		c   testCase
+		got string
+	)
+
+	for _, c = range cases {
+		got = parseRawValue([]byte(c.in))
+		test.Assert(t, "parseRawValue", c.exp, got)
 	}
 }

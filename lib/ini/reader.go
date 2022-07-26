@@ -10,8 +10,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"unicode"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
 )
 
@@ -49,7 +51,6 @@ type reader struct {
 
 	buf       bytes.Buffer
 	bufFormat bytes.Buffer
-	bufSpaces bytes.Buffer
 
 	lineNum int
 	r       rune
@@ -80,7 +81,6 @@ func (reader *reader) reset(src []byte) {
 	}
 	reader.buf.Reset()
 	reader.bufFormat.Reset()
-	reader.bufSpaces.Reset()
 }
 
 // parseFile will open, read, and parse INI file `filename` and return an
@@ -88,7 +88,11 @@ func (reader *reader) reset(src []byte) {
 //
 // On failure, it return nil and error.
 func (reader *reader) parseFile(filename string) (in *Ini, err error) {
-	src, err := os.ReadFile(filename)
+	var (
+		src []byte
+	)
+
+	src, err = os.ReadFile(filename)
 	if err != nil {
 		return
 	}
@@ -382,7 +386,6 @@ func (reader *reader) parseVariable() (err error) {
 		case reader.r == tokEqual:
 			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = lineModeValue
 			reader._var.key = reader.buf.String()
 
 			return reader.parseVarValue()
@@ -397,7 +400,7 @@ func (reader *reader) parseVariable() (err error) {
 			reader.buf.WriteRune(reader.r)
 
 		case reader.r == tokHash, reader.r == tokSemiColon:
-			reader._var.mode = lineModeValue
+			reader._var.mode = lineModeKeyOnly
 			reader._var.key = reader.buf.String()
 
 			reader.bufFormat.WriteRune(reader.r)
@@ -406,7 +409,7 @@ func (reader *reader) parseVariable() (err error) {
 		case unicode.IsSpace(reader.r):
 			reader.bufFormat.WriteRune(reader.r)
 
-			reader._var.mode = lineModeValue
+			reader._var.mode = lineModeKeyOnly
 			reader._var.key = reader.buf.String()
 
 			return reader.parsePossibleValue()
@@ -416,7 +419,7 @@ func (reader *reader) parseVariable() (err error) {
 		}
 	}
 
-	reader._var.mode = lineModeValue
+	reader._var.mode = lineModeKeyOnly
 	reader._var.format = reader.bufFormat.String()
 	reader._var.key = reader.buf.String()
 
@@ -451,7 +454,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 		}
 	}
 
-	reader._var.mode = lineModeValue
+	reader._var.mode = lineModeKeyOnly
 	reader._var.format = reader.bufFormat.String()
 
 	return nil
@@ -459,158 +462,139 @@ func (reader *reader) parsePossibleValue() (err error) {
 
 // At this point we found `=` on source, and we expect the rest of source will
 // be variable value.
+// This method consume all characters after '=' as rawValue and normalize it
+// into value.
 func (reader *reader) parseVarValue() (err error) {
 	reader.buf.Reset()
-	reader.bufSpaces.Reset()
-
-	// Consume leading white-spaces.
-consume_spaces:
-	for {
-		reader.b, err = reader.br.ReadByte()
-		if err != nil {
-			reader._var.format = reader.bufFormat.String()
-			reader._var.value = ""
-			return err
-		}
-		switch reader.b {
-		case tokSpace, tokTab:
-			reader.bufFormat.WriteByte(reader.b)
-			continue consume_spaces
-
-		case tokHash, tokSemiColon:
-			reader._var.value = ""
-			reader.bufFormat.WriteString("%s")
-			reader.bufFormat.WriteByte(reader.b)
-			return reader.parseComment()
-
-		case tokNewLine:
-			if len(reader._var.key) > 0 {
-				reader.bufFormat.WriteString("%s")
-			}
-			reader.bufFormat.WriteByte(reader.b)
-			reader._var.format = reader.bufFormat.String()
-			reader._var.value = ""
-			return nil
-		}
-		break
-	}
-
-	reader.bufFormat.Write([]byte{'%', 's'})
-	reader._var.mode = lineModeValue
-	_ = reader.br.UnreadByte()
 
 	var (
-		quoted    bool
-		esc       bool
-		isNewline bool
+		isQuoted bool
+		isEsc    bool
 	)
 
-	for !isNewline {
+	reader.bufFormat.WriteString("%s")
+	reader._var.mode = lineModeKeyValue
+
+	for {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
 			break
 		}
-
-		if esc {
-			switch reader.b {
-			case tokNewLine:
-				reader._var.mode = lineModeMulti
-				reader.valueCommit(true)
-				reader.lineNum++
-				esc = false
-				continue
-
-			case tokBackslash, tokDoubleQuote:
-				reader.valueWriteByte(reader.b)
-				esc = false
-				continue
-
-			case 'b':
-				reader.buf.WriteByte(tokBackspace)
-				esc = false
-				continue
-
-			case 'n':
+		if isEsc {
+			if reader.b == tokNewLine {
+				reader.buf.WriteByte(tokBackslash)
 				reader.buf.WriteByte(tokNewLine)
-				esc = false
+				reader.lineNum++
+				isEsc = false
 				continue
-			case 't':
-				reader.buf.WriteByte(tokTab)
-				esc = false
+			}
+			if reader.b == tokBackslash ||
+				reader.b == tokDoubleQuote ||
+				reader.b == 'b' || reader.b == 'n' ||
+				reader.b == 't' {
+				reader.buf.WriteByte(tokBackslash)
+				reader.buf.WriteByte(reader.b)
+				isEsc = false
 				continue
 			}
 			return errValueInvalid
 		}
-
-		switch reader.b {
-		case tokSpace, tokTab:
-			if quoted {
-				reader.valueWriteByte(reader.b)
-				continue
-			}
-			reader.bufSpaces.WriteByte(reader.b)
-
-		case tokBackslash:
-			esc = true
-
-		case tokDoubleQuote:
-			if quoted {
-				quoted = false
-			} else {
-				reader._var.isQuoted = true
-				quoted = true
-			}
-
-		case tokNewLine:
-			reader.bufFormat.WriteByte(reader.b)
-			isNewline = true
-
-		case tokHash, tokSemiColon:
-			if quoted {
-				reader.valueWriteByte(reader.b)
-				continue
-			}
-
-			reader.bufFormat.Write(reader.bufSpaces.Bytes())
-			reader.valueCommit(false)
-
-			reader.bufFormat.WriteByte(reader.b)
-			return reader.parseComment()
-
-		default:
-			reader.valueWriteByte(reader.b)
+		if reader.b == tokDoubleQuote {
+			reader.buf.WriteByte(reader.b)
+			isQuoted = !isQuoted
+			continue
 		}
+		if reader.b == tokBackslash {
+			isEsc = true
+			continue
+		}
+		if reader.b == tokNewLine {
+			reader.bufFormat.WriteByte(tokNewLine)
+			break
+		}
+		if reader.b == tokHash || reader.b == tokSemiColon {
+			if isQuoted {
+				reader.buf.WriteByte(reader.b)
+				continue
+			}
+
+			reader.bufFormat.WriteByte(reader.b)
+
+			reader._var.rawValue = libbytes.Copy(reader.buf.Bytes())
+			reader._var.value = parseRawValue(reader._var.rawValue)
+
+			return reader.parseComment()
+		}
+		reader.buf.WriteByte(reader.b)
 	}
 
-	if quoted {
+	if isQuoted {
 		return errValueInvalid
 	}
 
-	reader.valueCommit(false)
-
+	reader._var.rawValue = libbytes.Copy(reader.buf.Bytes())
+	reader._var.value = parseRawValue(reader._var.rawValue)
 	reader._var.format = reader.bufFormat.String()
 
 	return nil
 }
 
-func (reader *reader) valueCommit(withSpaces bool) {
-	val := reader.buf.String()
+// parseRawValue parse the multiline and double quoted raw value into single
+// string.
+func parseRawValue(raw []byte) (out string) {
+	var (
+		sb strings.Builder
+		b  byte
 
-	if withSpaces {
-		val += reader.bufSpaces.String()
+		isEsc       bool
+		isPrevSpace bool
+		isQuoted    bool
+	)
+
+	raw = bytes.TrimSpace(raw)
+
+	for _, b = range raw {
+		if b == ' ' || b == '\t' {
+			if isQuoted {
+				sb.WriteByte(b)
+				continue
+			}
+			if isPrevSpace {
+				continue
+			}
+			if sb.Len() > 0 {
+				// Only write space once if sb already
+				// filled.
+				sb.WriteByte(' ')
+			}
+			isPrevSpace = true
+			continue
+		}
+		if isEsc {
+			if b == 'b' {
+				sb.WriteByte(tokBackspace)
+			} else if b == 'n' {
+				sb.WriteByte(tokNewLine)
+			} else if b == 't' {
+				sb.WriteByte(tokTab)
+			} else if b == '\\' {
+				sb.WriteByte(tokBackslash)
+			} else if b == '"' {
+				sb.WriteByte(tokDoubleQuote)
+			}
+			isEsc = false
+			continue
+		}
+		if b == tokBackslash {
+			isEsc = true
+			continue
+		}
+		if b == tokDoubleQuote {
+			isQuoted = !isQuoted
+			continue
+		}
+		sb.WriteByte(b)
+		isPrevSpace = false
 	}
-
-	reader._var.value += val
-
-	reader.buf.Reset()
-	reader.bufSpaces.Reset()
-}
-
-func (reader *reader) valueWriteByte(b byte) {
-	if reader.bufSpaces.Len() > 0 {
-		reader.buf.Write(reader.bufSpaces.Bytes())
-		reader.bufSpaces.Reset()
-	}
-
-	reader.buf.WriteByte(b)
+	return sb.String()
 }

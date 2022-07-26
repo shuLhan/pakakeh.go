@@ -11,19 +11,13 @@ const (
 	lineModeComment    lineMode = 1
 	lineModeSection    lineMode = 2
 	lineModeSubsection lineMode = 4
-	lineModeValue      lineMode = 8
-	lineModeMulti      lineMode = 16
+	lineModeKeyOnly    lineMode = 8
+	lineModeKeyValue   lineMode = 16
 )
 
-// isLineModeVar will return true if mode is variable, which is either
-// lineModeValue or lineModeMulti; otherwise it will return
-// false.
+// isLineModeVar true if mode is variable, which is either lineModeKeyOnly or
+// lineModeKeyValue;
+// otherwise it will return false.
 func isLineModeVar(mode lineMode) bool {
-	if mode&lineModeValue > 0 {
-		return true
-	}
-	if mode&lineModeMulti > 0 {
-		return true
-	}
-	return false
+	return mode >= lineModeKeyOnly
 }

@@ -122,7 +122,7 @@ func (sec *Section) add(key, value string) bool {
 	}
 
 	v := &variable{
-		mode:     lineModeValue,
+		mode:     lineModeKeyValue,
 		key:      key,
 		keyLower: keyLower,
 		value:    value,
@@ -155,7 +155,7 @@ func (sec *Section) addUniqValue(key, value string) {
 		}
 	}
 	v := &variable{
-		mode:     lineModeValue,
+		mode:     lineModeKeyValue,
 		key:      key,
 		keyLower: keyLower,
 		value:    value,
@@ -168,8 +168,7 @@ func (sec *Section) addVariable(v *variable) {
 		return
 	}
 
-	if v.mode&lineModeValue == lineModeValue ||
-		v.mode&lineModeMulti == lineModeMulti {
+	if v.mode == lineModeKeyValue {
 		v.keyLower = strings.ToLower(v.key)
 	}
 
@@ -268,12 +267,16 @@ func (sec *Section) set(key, value string) bool {
 		return false
 	}
 
-	keyLower := strings.ToLower(key)
+	var (
+		keyLower = strings.ToLower(key)
 
-	_, v := sec.getVariable(keyLower)
+		v *variable
+	)
+
+	_, v = sec.getVariable(keyLower)
 	if v == nil {
-		v := &variable{
-			mode:     lineModeValue,
+		v = &variable{
+			mode:     lineModeKeyValue,
 			key:      key,
 			keyLower: strings.ToLower(key),
 			value:    value,
@@ -281,7 +284,11 @@ func (sec *Section) set(key, value string) bool {
 		sec.vars = append(sec.vars, v)
 		return true
 	}
-	v.value = value
+
+	v.value = strings.TrimSpace(value)
+	if len(v.format) > 0 {
+		v.rawValue = []byte(value)
+	}
 
 	return true
 }

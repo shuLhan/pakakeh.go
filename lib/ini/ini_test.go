@@ -6,6 +6,7 @@ package ini
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -237,6 +238,7 @@ func TestIni_Get(t *testing.T) {
 		cfg       *Ini
 		listTData []*test.Data
 		tdata     *test.Data
+		testName  string
 		got       string
 		def       string
 		tags      []string
@@ -278,7 +280,9 @@ func TestIni_Get(t *testing.T) {
 			got, _ = cfg.Get(tags[0], tags[1], tags[2], def)
 			got = got + "."
 
-			test.Assert(t, "Get", string(exps[x]), got)
+			testName = fmt.Sprintf("%s: key #%d: Get", tdata.Name, x)
+
+			test.Assert(t, testName, string(exps[x]), got)
 		}
 	}
 }

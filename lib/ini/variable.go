@@ -22,25 +22,17 @@ type variable struct {
 	key      string
 	keyLower string
 	value    string
+	rawValue []byte
 
 	mode    lineMode
 	lineNum int
-
-	isQuoted bool
 }
 
 // String return formatted INI variable.
 func (v *variable) String() string {
 	var (
 		buf bytes.Buffer
-		val string
 	)
-
-	if v.isQuoted {
-		val = escape(v.value)
-	} else {
-		val = v.value
-	}
 
 	switch v.mode {
 	case lineModeEmpty:
@@ -50,56 +42,27 @@ func (v *variable) String() string {
 	case lineModeComment:
 		buf.WriteString(v.format)
 
-	case lineModeValue:
+	case lineModeKeyOnly:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key)
 		} else {
-			buf.WriteString(v.key + " =")
-			if len(val) > 0 {
-				buf.WriteString(" " + val)
-			}
+			buf.WriteString(v.key)
 			buf.WriteByte('\n')
 		}
-	case lineModeMulti:
+
+	case lineModeKeyValue:
 		if len(v.format) > 0 {
-			_, _ = fmt.Fprintf(&buf, v.format, v.key, val)
+			_, _ = fmt.Fprintf(&buf, v.format, v.key, v.rawValue)
 		} else {
-			buf.WriteString(v.key + " =")
-			if len(val) > 0 {
-				buf.WriteString(" " + val)
+			buf.WriteString(v.key)
+			buf.WriteString(" =")
+			if len(v.value) > 0 {
+				buf.WriteByte(' ')
+				buf.WriteString(v.value)
 			}
 			buf.WriteByte('\n')
 		}
 	}
-
-	return buf.String()
-}
-
-func escape(value string) (out string) {
-	var buf bytes.Buffer
-
-	buf.Grow(len(value) + 2)
-
-	buf.WriteByte('"')
-
-	for _, c := range value {
-		switch c {
-		case '\b':
-			buf.WriteString(`\b`)
-		case '\n':
-			buf.WriteString(`\n`)
-		case '\t':
-			buf.WriteString(`\t`)
-		case '\\':
-			buf.WriteString(`\\`)
-		case '"':
-			buf.WriteString(`\"`)
-		default:
-			buf.WriteRune(c)
-		}
-	}
-
-	buf.WriteByte('"')
 
 	return buf.String()
 }

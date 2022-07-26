@@ -331,7 +331,7 @@ func (in *Ini) Add(secName, subName, key, value string) bool {
 
 	sec = newSection(secName, subName)
 	v := &variable{
-		mode:     lineModeValue,
+		mode:     lineModeKeyValue,
 		key:      key,
 		keyLower: strings.ToLower(key),
 		value:    value,
@@ -390,7 +390,7 @@ func (in *Ini) Set(secName, subName, key, value string) bool {
 	if sec == nil {
 		sec = newSection(secName, subName)
 		v := &variable{
-			mode:     lineModeValue,
+			mode:     lineModeKeyValue,
 			key:      key,
 			keyLower: strings.ToLower(key),
 			value:    value,

@@ -833,26 +833,26 @@ key=value1
 		log.Fatal(err)
 	}
 
-	//Output:
-	//[section]
-	//key=value1 # comment
-	//key2= ; another comment
+	// Output:
+	// [section]
+	// key=value1 # comment
+	// key2= ; another comment
 	//
-	//[section "sub"]
-	//key=value1
+	// [section "sub"]
+	// key=value1
 	//
-	//[section] ; here is comment on section
-	//key=value4
-	//key2=false
+	// [section] ; here is comment on section
+	// key=value4
+	// key2=false
 	//
-	//keynotexist = value4
+	// keynotexist = value4
 	//
-	//[section "sub"]
-	//key=value2
-	//key=value3
+	// [section "sub"]
+	// key=value2
+	// key=value3
 	//
-	//[sectionnotexist "sub"]
-	//key = value3
+	// [sectionnotexist "sub"]
+	// key = value3
 }
 
 func ExampleIni_Subs() {
