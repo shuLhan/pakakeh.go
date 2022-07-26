@@ -2,9 +2,6 @@
 ## Use of this source code is governed by a BSD-style
 ## license that can be found in the LICENSE file.
 
-SRC:=$(shell go list -f '{{$$d:=.Dir}} {{ range .GoFiles }}{{$$d}}/{{.}} {{end}}' ./...)
-SRC_TEST:=$(shell go list -f '{{$$d:=.Dir}} {{ range .TestGoFiles }}{{$$d}}/{{.}} {{end}}' ./...)
-
 COVER_OUT:=cover.out
 COVER_HTML:=cover.html
 CPU_PROF:=cpu.prof
@@ -12,15 +9,21 @@ MEM_PROF:=mem.prof
 
 CIIGO := ${GOBIN}/ciigo
 
-.PHONY: all install lint docs docs-serve clean distclean
+.PHONY: all install lint build docs docs-serve clean distclean
 .PHONY: test test.prof bench.lib.websocket coverbrowse
 
-all: install
+all: test lint build
 
-install: test lint
-	go install ./...
+install:
+	go install ./cmd/...
 
-test: $(COVER_HTML)
+build:
+	mkdir -p _bin/linux-amd64
+	GOOS=linux GOARCH=amd64 go build -o _bin/linux-amd64/ ./cmd/...
+
+test:
+	CGO_ENABLED=1 go test -failfast -race -count=1 -coverprofile=$(COVER_OUT) ./...
+	go tool cover -html=$(COVER_OUT) -o $(COVER_HTML)
 
 test.prof:
 	go test -race -cpuprofile $(CPU_PROF) -memprofile $(MEM_PROF) ./...
@@ -33,16 +36,8 @@ bench.lib.websocket:
 			-memprofile=$(MEM_PROF) \
 			. ./lib/websocket
 
-$(COVER_HTML): $(COVER_OUT)
-	go tool cover -html=$< -o $@
-
-$(COVER_OUT): $(SRC) $(SRC_TEST)
-	export GORACE=history_size=7 && \
-		export CGO_ENABLED=1 && \
-		go test -failfast -race -count=1 -coverprofile=$@ ./...
-
-coverbrowse: $(COVER_HTML)
-	xdg-open $<
+coverbrowse:
+	xdg-open $(COVER_HTML)
 
 lint:
 	-golangci-lint run ./...
