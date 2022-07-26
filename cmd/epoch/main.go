@@ -61,7 +61,9 @@ Print the current date and time,
 	Microsecond: 1639896843382879
 	 Nanosecond: 1639896843382879358
 	 Local time: 2021-12-19 13:54:03.382879358 +0700 WIB m=+0.000041439
+	  Local day: Sunday
 	   UTC time: 2021-12-19 06:54:03.382879358 +0000 UTC
+	    UTC day: Sunday
 
 Print the date and time at epoch 1639800000,
 
@@ -71,7 +73,9 @@ Print the date and time at epoch 1639800000,
 	Microsecond: 1639800000000000
 	 Nanosecond: 1639800000000000000
 	 Local time: 2021-12-18 11:00:00 +0700 WIB
+	  Local day: Saturday
 	   UTC time: 2021-12-18 04:00:00 +0000 UTC
+	    UTC day: Saturday
 
 Print the epoch, date and time from RFC3339 format,
 
@@ -81,7 +85,9 @@ Print the epoch, date and time from RFC3339 format,
 	Microsecond: 1639800000000000
 	 Nanosecond: 1639800000000000000
 	 Local time: 2021-12-18 11:00:00 +0700 WIB
+	  Local day: Saturday
 	   UTC time: 2021-12-18 04:00:00 +0000 UTC
+	    UTC day: Saturday
 
 Print the epoch, date and time from RFC1123 time,
 
@@ -91,7 +97,9 @@ Print the epoch, date and time from RFC1123 time,
 	Microsecond: 1639800000000000
 	 Nanosecond: 1639800000000000000
 	 Local time: 2021-12-18 11:00:00 +0700 WIB
+	  Local day: Saturday
 	   UTC time: 2021-12-18 04:00:00 +0000 UTC
+	    UTC day: Saturday
 
 Print the epoch, date and time from RFC1123Z (with numeric time zone) time,
 
@@ -101,8 +109,9 @@ Print the epoch, date and time from RFC1123Z (with numeric time zone) time,
 	Microsecond: 1639800000000000
 	 Nanosecond: 1639800000000000000
 	 Local time: 2021-12-18 11:00:00 +0700 WIB
+	  Local day: Saturday
 	   UTC time: 2021-12-18 04:00:00 +0000 UTC
-`
+	    UTC day: Saturday`
 
 const (
 	cmdHelp    = "help"
@@ -190,12 +199,16 @@ func main() {
 }
 
 func echo(t time.Time) {
+	var timeUtc = t.UTC()
+
 	fmt.Printf(`     Second: %d
 Millisecond: %d
 Microsecond: %d
  Nanosecond: %d
  Local time: %s
+  Local day: %s
    UTC time: %s
-`, t.Unix(), t.UnixMilli(), t.UnixMicro(), t.UnixNano(), t, t.UTC())
-
+    UTC day: %s
+`, t.Unix(), t.UnixMilli(), t.UnixMicro(), t.UnixNano(), t, t.Weekday(),
+		timeUtc, timeUtc.Weekday())
 }
