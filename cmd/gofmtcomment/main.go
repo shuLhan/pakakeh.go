@@ -11,6 +11,9 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strings"
+
+	"github.com/shuLhan/share"
 )
 
 const (
@@ -23,45 +26,97 @@ var (
 )
 
 func usage() {
-	fmt.Printf("%s: <file>\n", os.Args[0])
+	fmt.Println(`= gofmtcomment
+
+gofmtcomment is a program to convert multi line comments from "/**/" into
+"//".
+
+== SYNOPSIS
+
+	gofmtcomment <file>
+
+== ARGUMENTS
+
+<file>
+	Path to file where comment to be read and replaced.
+
+== EXAMPLE
+
+	$ gofmtcomment main.go`)
 }
 
+const (
+	cmdHelp    = "help"
+	cmdVersion = "version"
+)
+
 func main() {
+	log.SetFlags(0)
+	log.SetPrefix("gofmtcomment: ")
+
 	if len(os.Args) != 2 {
+		usage()
+		os.Exit(1)
+	}
+
+	var (
+		cmd = strings.ToLower(os.Args[1])
+	)
+
+	if cmd == cmdHelp {
 		usage()
 		return
 	}
+	if cmd == cmdVersion {
+		fmt.Println("gofmtcomment v" + share.Version)
+		return
+	}
+
+	var (
+		f   *os.File
+		re  *regexp.Regexp
+		in  []byte
+		err error
+	)
 
 	log.Printf("Reformat comment on %s\n", os.Args[1])
 
-	f, err := os.OpenFile(os.Args[1], os.O_RDWR, 0644)
+	f, err = os.OpenFile(os.Args[1], os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	in, err := io.ReadAll(f)
+	in, err = io.ReadAll(f)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	re := regexp.MustCompile(`(?Us)/\*.+\*/`)
+	re = regexp.MustCompile(`(?Us)/\*.+\*/`)
 
-	var nshift int
-	doubleNewlines := false
-	nreplace := 0
+	var (
+		nshift         int
+		nreplace       int
+		startIdx       int
+		endIdx         int
+		l              int
+		y              int
+		matchIdx       []int
+		matchb         []byte
+		doubleNewlines bool
+	)
 
 	for {
-		matchIdx := re.FindIndex(in)
+		matchIdx = re.FindIndex(in)
 		if matchIdx == nil {
 			break
 		}
 
 		nreplace++
-		startIdx := matchIdx[0]
-		endIdx := matchIdx[1]
+		startIdx = matchIdx[0]
+		endIdx = matchIdx[1]
 
-		matchb := in[startIdx:endIdx]
-		l := len(matchb)
+		matchb = in[startIdx:endIdx]
+		l = len(matchb)
 
 		matchb[0] = '/'
 		matchb[1] = '/'
@@ -69,7 +124,7 @@ func main() {
 		matchb[l-1] = '/'
 
 		l -= 3
-		for y := 2; y < l; y++ {
+		for y = 2; y < l; y++ {
 			if matchb[y] != '\n' {
 				continue
 			}
