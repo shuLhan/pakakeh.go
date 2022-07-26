@@ -28,7 +28,7 @@ import (
 	"github.com/shuLhan/share/lib/debug"
 )
 
-const (
+var (
 	defUserAgent = "libhttp/" + share.Version +
 		" (github.com/shuLhan/share/lib/http; ms@kilabit.info)"
 )

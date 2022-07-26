@@ -8,6 +8,7 @@ CPU_PROF:=cpu.prof
 MEM_PROF:=mem.prof
 
 CIIGO := ${GOBIN}/ciigo
+VERSION := $(shell git describe --tags)
 
 .PHONY: all install lint build docs docs-serve clean distclean
 .PHONY: test test.prof bench.lib.websocket coverbrowse
@@ -17,9 +18,12 @@ all: test lint build
 install:
 	go install ./cmd/...
 
+build: BUILD_FLAGS=-ldflags "-s -w -X 'github.com/shuLhan/share.Version=$(VERSION)'"
+build: GOOS=linux
+build: GOARCH=amd64
 build:
 	mkdir -p _bin/linux-amd64
-	GOOS=linux GOARCH=amd64 go build -o _bin/linux-amd64/ ./cmd/...
+	go build $(BUILD_FLAGS) -o _bin/linux-amd64/ ./cmd/...
 
 test:
 	CGO_ENABLED=1 go test -failfast -race -count=1 -coverprofile=$(COVER_OUT) ./...

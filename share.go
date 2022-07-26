@@ -6,7 +6,7 @@
 // language, and tools written in Go.
 package share
 
-const (
+var (
 	// Version of this module.
 	Version = "0.39.0"
 )
