@@ -1,3 +1,10 @@
+// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// Command xtrk is command line interface to uncompress and/or unarchive a
+// file.
+// Supported format: bzip2, gzip, tar, zip, tar.bz2, tar.gz.
 package main
 
 import (
@@ -5,29 +12,48 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
+	"github.com/shuLhan/share"
 	libos "github.com/shuLhan/share/lib/os"
+)
+
+const (
+	cmdHelp    = "help"
+	cmdVersion = "version"
 )
 
 func main() {
 	log.SetPrefix("xtrk: ")
-
 	log.SetFlags(0)
 
 	flag.Parse()
 
 	var (
-		args   = flag.Args()
+		args = flag.Args()
+
+		cmd    string
 		fileIn string
 		dirOut string
 		err    error
 	)
 
-	switch len(args) {
-	case 0:
+	if len(args) == 0 {
 		usage()
 		os.Exit(1)
+	}
 
+	cmd = strings.ToLower(args[0])
+	if cmd == cmdHelp {
+		usage()
+		return
+	}
+	if cmd == cmdVersion {
+		fmt.Println("xtrk v" + share.Version)
+		return
+	}
+
+	switch len(args) {
 	case 1:
 		fileIn = args[0]
 
@@ -50,8 +76,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Printf(`
-= xtrk
+	fmt.Printf(`= xtrk
 
 xtrk is command line interface to uncompress and/or unarchive a file.
 
