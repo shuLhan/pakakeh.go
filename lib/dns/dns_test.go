@@ -13,8 +13,8 @@ import (
 
 const (
 	testServerAddress    = "127.0.0.1:5300"
-	testDoTServerAddress = "127.0.0.1:8053"
-	testTLSPort          = 8053
+	testDoTServerAddress = "127.0.0.1:18053"
+	testTLSPort          = 18053
 )
 
 var (
