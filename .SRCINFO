@@ -1,0 +1,14 @@
+pkgbase = share-tools
+	pkgdesc = Miscellaneous CLI tools: epoch, ini, xtrk
+	pkgver = 0.39.0.r30.gcf3761a
+	pkgrel = 1
+	url = https://github.com/shuLhan/share
+	arch = x86_64
+	license = BSD
+	makedepends = go
+	makedepends = git
+	provides = share-tools
+	source = share-tools::git+https://github.com/shuLhan/share.git
+	md5sums = SKIP
+
+pkgname = share-tools

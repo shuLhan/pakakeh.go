@@ -64,3 +64,9 @@ clean:
 
 distclean:
 	go clean -i ./...
+
+## For AUR.
+
+aur-release:
+	namcap PKGBUILD
+	makepkg --printsrcinfo > .SRCINFO
