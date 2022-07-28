@@ -14,6 +14,7 @@ const (
 	defServerStatusPath  = "/status"
 )
 
+// ServerOptions contain options to configure the WebSocket server.
 type ServerOptions struct {
 	// HandleAuth callback that will be called when receiving
 	// client handshake.
@@ -51,7 +52,8 @@ type ServerOptions struct {
 	Address string
 
 	// ConnectPath define the HTTP path where WebSocket connection
-	// handshake will be processed. Default to "/".
+	// handshake will be processed.
+	// Default to "/".
 	ConnectPath string
 
 	// StatusPath define a HTTP path to check for server status.

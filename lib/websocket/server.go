@@ -57,7 +57,8 @@ type Server struct {
 	routes *rootRoute
 
 	// handlePong callback that will be called after receiving control
-	// PONG frame from client. Default is nil, used only for testing.
+	// PONG frame from client.
+	// Default is nil, used only for testing.
 	handlePong HandlerFrameFn
 
 	sock int
@@ -67,8 +68,7 @@ type Server struct {
 	allowRsv3 bool
 }
 
-// NewServer will create new web-socket server that listen on specific port
-// number.
+// NewServer create new WebSocket server.
 func NewServer(opts *ServerOptions) (serv *Server) {
 	if opts == nil {
 		opts = &ServerOptions{}

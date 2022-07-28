@@ -89,19 +89,18 @@ type Client struct {
 	conn net.Conn
 
 	// Headers The headers field can be used to pass custom headers during
-	// handshake with server.  Any primary header fields ("host",
-	// "upgrade", "connection", "sec-websocket-key",
-	// "sec-websocket-version") will be deleted before handshake.
+	// handshake with server.
+	// Any primary header fields ("host", "upgrade", "connection",
+	// "sec-websocket-key", "sec-websocket-version") will be deleted
+	// before handshake.
 	Headers http.Header
 
 	remoteURL *url.URL
 
-	//
 	// TLSConfig define custom TLS configuration when connecting to secure
 	// WebSocket server.
 	// The scheme of Endpoint must be "https" or "wss", or it will be
 	// resetting back to nil.
-	//
 	TLSConfig *tls.Config
 
 	frame  *Frame
