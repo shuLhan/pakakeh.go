@@ -501,7 +501,9 @@ func TestClientFragmentation(t *testing.T) {
 		for x = 0; x < len(c.frames); x++ {
 			req = c.frames[x].pack()
 
+			testClient.Lock()
 			err = testClient.send(req)
+			testClient.Unlock()
 			if err != nil {
 				// If the client send unmasked frame, the
 				// server may close the connection before we
