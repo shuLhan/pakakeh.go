@@ -62,6 +62,9 @@ type ServerOptions struct {
 	//
 	NameServers []string `ini:"dns:server:parent"`
 
+	// The root authority for all zones and records under this server.
+	SOA RDataSOA
+
 	// HTTPIdleTimeout number of seconds before considering the client of
 	// HTTP connection to be closed.
 	// This field is optional, default to 120 seconds.
@@ -107,6 +110,8 @@ type ServerOptions struct {
 
 // init initialize the server options.
 func (opts *ServerOptions) init() (err error) {
+	opts.SOA.init()
+
 	if len(opts.ListenAddress) == 0 {
 		opts.ListenAddress = "0.0.0.0:53"
 	}
