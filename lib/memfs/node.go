@@ -21,6 +21,17 @@ import (
 	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
+const (
+	templateIndexHtmlHeader = `<!DOCTYPE html><html>
+<head>
+<meta name="viewport" content="width=device-width">
+<style>
+body{font-family:monospace; white-space:pre;}
+</style>
+</head>
+<body>`
+)
+
 var (
 	errOffset = errors.New("Seek: invalid offset")
 	errWhence = errors.New("Seek: invalid whence")
@@ -137,6 +148,46 @@ func (node *Node) AddChild(child *Node) {
 func (node *Node) Close() error {
 	node.off = 0
 	return nil
+}
+
+// GenerateIndexHtml generate simple directory listing as HTML for all childs
+// in this node.
+// This method is only applicable if node is a directory.
+func (node *Node) GenerateIndexHtml() {
+	if !node.IsDir() {
+		return
+	}
+	if len(node.Content) != 0 {
+		// Either the index has been generated or the node is not
+		// empty.
+		node.size = int64(len(node.Content))
+		return
+	}
+
+	var (
+		buf   bytes.Buffer
+		child *Node
+	)
+
+	buf.WriteString(templateIndexHtmlHeader)
+
+	fmt.Fprintf(&buf, `<h3>Index of %s</h3>`, node.name)
+
+	if node.Parent != nil {
+		buf.WriteString(`<div><a href="..">..</a></div><br/>`)
+	}
+
+	for _, child = range node.Childs {
+		fmt.Fprintf(&buf, `<div>%s <tt>%12d</tt> %s <a href=%q>%s</a></div><br/>`,
+			child.mode, child.size, child.modTime.Format(time.RFC3339),
+			child.Path, child.name)
+	}
+
+	buf.WriteString(`</body></html>`)
+
+	node.ContentType = `text/html; charset=utf-8`
+	node.size = int64(buf.Len())
+	node.Content = libbytes.Copy(buf.Bytes())
 }
 
 func (node *Node) IsDir() bool {
