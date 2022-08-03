@@ -249,6 +249,8 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 			Node:  *newChild,
 			State: FileStateCreated,
 		}
+
+		//nolint
 		select {
 		case dw.qchanges <- ns:
 		}
@@ -301,6 +303,8 @@ func (dw *DirWatcher) onRootCreated() {
 		Node:  *dw.root,
 		State: FileStateCreated,
 	}
+
+	//nolint
 	select {
 	case dw.qchanges <- ns:
 	}
@@ -324,6 +328,8 @@ func (dw *DirWatcher) onRootDeleted() {
 	if debug.Value >= 2 {
 		fmt.Println("DirWatcher.onRootDeleted: root directory deleted")
 	}
+
+	//nolint
 	select {
 	case dw.qchanges <- ns:
 	}
@@ -340,6 +346,8 @@ func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 			State: FileStateUpdateMode,
 		}
 	)
+
+	//nolint
 	select {
 	case dw.qchanges <- ns:
 	}
