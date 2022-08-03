@@ -17,11 +17,194 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_40_0]
+==  share v0.40.0 (2022-08-05)
+
+[#v0_40_0_breaking_changes]
+===  Breaking changes
+
+lib/memfs: set the Root SysPath to the first MemFS instance on Merge::
++
+--
+Previously, calling Merge(...), set the merged MemFS Root.SysPath to
+"..".
+Since we allow the TryDirect to access the file directly (if its set
+to true), this may cause the file system leaks if returned MemFS set
+this flag to true.
+
+To prevent that, we set the SysPath to the first MemFS SysPath.
+--
+
+lib/memfs: rename Option field Development to TryDirect::
++
+--
+This changes the usage of Development flag.
+
+TryDirect define a flag to bypass file in memory.
+If its true, any call to Get will try direct read to file system.
+
+This flag has several use cases.
+First, to test serving file system directly from disk during
+development.
+Second, to combine embedded MemFS instance with non-embedded instance.
+One is reading content from memory, one is reading content from disk
+directly.
+--
+
+
+[#v0_40_0_new_features]
+===  New features
+
+_bin: add script to run Go benchmark::
++
+--
+The go-bench.sh accept two arguments: the method or function to benchmark,
+default to "."; and benchmark number, default to current timestamp
+YYYYmmDD-HHMM.
+--
+
+_bin: add script to run Go test and generate HTML coverage::
++
+--
+The script accept one single argument: the path to package to
+be tested.
+If its empty default to current directory and sub-directories.
+--
+
+_bin: add script go-mod-tip.sh::
++
+--
+The go-mod-tip shell script get and print the latest Go module
+version based on the last tag and the latest commit hash from the
+current working directory.
+
+This command usually used to fix go.mod due to force commit.
+--
+cmd/epoch: print the weekday in local and UTC time::
+
+cmd/epoch: add flag to parse time from RFC3339 and RFC1123 format::
++
+--
+The flag for RFC1123 comes with two options one with string timezone
+(-rfc1123) and one with numeric time zone (-rfc1123z).
+--
+
+cmd/ini: a CLI to get and set values in the INI file format::
++
+--
+This is the CLI that implements the lib/ini for getting and setting
+the key's value from INI file.
+--
+
+lib/test: implement Data, a type to load formatted file for helping test::
++
+--
+Data contains predefined input and output values that is loaded from
+file to be used during test.
+
+The data provides zero or more flags, an optional description, zero or
+more input, and zero or more output.
+
+The data file name must end with ".txt".
+
+The data content use the following format,
+
+	[FLAG_KEY ":" FLAG_VALUE LF]
+	[LF DESCRIPTION]
+	LF
+	">>>" [INPUT_NAME] LF
+	INPUT_CONTENT
+	LF
+	"<<<" [OUTPUT_NAME] LF
+	OUTPUT_CONTENT
+
+The data can contains zero or more flag.
+A flag is key and value separated by ":".
+The flag key must not contain spaces.
+
+The data may contain description.
+
+The line that start with "\\n>>>" defined the beginning of input.
+An input can have a name, if its empty it will be set to "default".
+An input can be defined multiple times, with different names.
+
+The line that start with "\\n<<<" defined the beginning of output.
+An output can have a name, if its empty it will be set to "default".
+An output also can be defined multiple times, with different names.
+--
+
+[#v0_40_0_bug_fixes]
+===  Bug fixes
+
+lib/ini: fix parsing and saving multi line variables::
++
+--
+Previously, if INI file contains multi line variables, for example
+
+	key = a \
+		b
+
+The Get and saved value is "a \\tb", where it should be "a b" for Get and
+"a \\\\\\n\\t\\b" again when saved.
+
+This changes require refactoring how the variable's value is parsed and
+stored.
+A variable value is parsed and stored from character after "=" until new
+line or comment as raw value, and the real value is derived by trimming
+white spaces, handle escaped character and double quotes.
+--
+
+lib/ini: fix marshaling pointer to nil field::
++
+--
+If the field is pointer, the code will thrown panic if its point to
+nil struct or print "<invalid reflct.Value>" for String.
+--
+
+lib/memfs: ignore error on Get when calling node Update::
++
+--
+If node exist in memory, error on Update does not means the file is not
+exist.
+The node may have been embedded and then merged with other MemFS instance
+with Development flag set to true.
+--
+
+[#v0_40_0_enhancements]
+===  Enhancements
+
+lib/dns: add field SOA to the ServerOptions::
++
+--
+The SOA field defined the root authority for all zones and records
+served under the Server.
+--
+
+lib/http: add server options to generate index.html automatically::
++
+--
+If the EnableIndexHtml in the ServeOptions enabled, server generate
+list of files inside the requested path as HTML.
+--
+
+lib/ini: support escaped double-quote and colon in tag subsection::
++
+--
+A colon `:` is escaped using double backslash `\\\\`, for example
+`a:b\\\\:c:d` contains section `a`, subsection `b:c`, and variable `d`.
+
+A double quote `"` is escaped using triple backslash, for example
+(`\\\\\\"`).
+--
+
+lib/ini: handle marshaling slice of time.Time:: -
+
+
 [#v0_39_0]
 ==  share v0.39.0 (2022-07-03)
 
 [#v0_39_0_breaking_changes]
-==  Breaking changes
+===  Breaking changes
 
 all: move lib/sanitize.HTML to net/html.Sanitize::
 +
@@ -31,7 +214,7 @@ package already exist, we move the function into html package.
 --
 
 [#v0_39_0_new_features]
-==  New features
+===  New features
 
 lib/mlog: add method Close to MultiLogger::
 +
@@ -168,7 +351,7 @@ false ("", nil, false).
 --
 
 [#v0_39_0_enhancements]
-==  Enhancements
+===  Enhancements
 
 lib/memfs: update the template format::
 +

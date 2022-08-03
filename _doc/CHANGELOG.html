@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#375EAB" />
-
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="theme-color" content="#375EAB">
+		<meta name="author" content="Shulhan">
+		<meta name="generator" content="asciidoctor-go 0.3.0">
 		<title>CHANGELOG</title>
-
 		<style>
-		
 body {
 	margin: 0;
 	font-family: Arial, sans-serif;
@@ -117,6 +116,49 @@ dd {
  * Custom classes for pages
  */
 
+.admonitionblock > table {
+	border-collapse: separate;
+	border: 0;
+	background: none;
+	width: 100%;
+}
+.admonitionblock > table td.icon {
+	text-align: center;
+	width: 120px;
+}
+.admonitionblock > table td.icon img {
+	max-width: none;
+}
+.admonitionblock > table td.icon .title {
+	font-weight: bold;
+	font-family: "Open Sans","DejaVu Sans",sans-serif;
+	text-transform: uppercase;
+}
+.admonitionblock > table td.content {
+	padding-left: 1.125em;
+	padding-right: 1.25em;
+	border-left: 1px solid #dddddf;
+	word-wrap: anywhere;
+}
+.admonitionblock > table td.content>:last-child>:last-child {
+	margin-bottom: 0;
+}
+.admonitionblock.note td.icon {
+	background-color: whitesmoke;
+}
+.admonitionblock.tip td.icon {
+	background-color: azure;
+}
+.admonitionblock.important td.icon {
+	background-color: honeydew;
+}
+.admonitionblock.caution td.icon {
+	background-color: lavenderbush;
+}
+.admonitionblock.warning td.icon {
+	background-color: mistyrose;
+}
+
 .topbar {
 	background: #e0ebf5;
 	height: 4rem;
@@ -214,14 +256,13 @@ dd {
 		all: unset;
 	}
 }
-
-		</style>
+</style>
 	</head>
 	<body>
 		<div class="topbar">
 			<div class="container">
 				<div class="top-heading">
-					<a href="/">ciigo</a>
+					<a href="/">CHANGELOG</a>
 				</div>
 				<div class="menu">
 					<form class="item" action="/_internal/search">
@@ -233,7 +274,6 @@ dd {
 
 		<div class="page">
 			<div class="container">
-				
 <div id="header">
 <h1>CHANGELOG</h1>
 <div class="details">
@@ -244,13 +284,24 @@ dd {
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#v0_39_0">share v0.39.0 (2022-07-03)</a></li>
+<li><a href="#v0_40_0">share v0.40.0 (2022-08-05)</a>
+<ul class="sectlevel2">
+<li><a href="#v0_40_0_breaking_changes">Breaking changes</a></li>
+<li><a href="#v0_40_0_new_features">New features</a></li>
+<li><a href="#v0_40_0_bug_fixes">Bug fixes</a></li>
+<li><a href="#v0_40_0_enhancements">Enhancements</a></li>
+</ul>
+</li>
+<li><a href="#v0_39_0">share v0.39.0 (2022-07-03)</a>
+<ul class="sectlevel2">
 <li><a href="#v0_39_0_breaking_changes">Breaking changes</a></li>
 <li><a href="#v0_39_0_new_features">New features</a></li>
 <li><a href="#v0_39_0_enhancements">Enhancements</a></li>
+</ul>
+</li>
 <li><a href="#v0_38_0">share v0.38.0 (2022-06-05)</a>
 <ul class="sectlevel2">
-<li><a href="#_breaking_changes">Breaking changes</a></li>
+<li><a href="#breaking_changes">Breaking changes</a></li>
 <li><a href="#v0_38_0_enhancements">Enhancements</a></li>
 <li><a href="#v0_38_0_chores">Chores</a></li>
 </ul>
@@ -267,10 +318,10 @@ dd {
 <li><a href="#v0_36_0">share v0.36.0 (2022-04-03)</a>
 <ul class="sectlevel2">
 <li><a href="#v0_36_0_breaking_changes">Breaking changes</a></li>
-<li><a href="#_new_features">New features</a></li>
-<li><a href="#_enhancements">Enhancements</a></li>
-<li><a href="#_bug_fixes">Bug fixes</a></li>
-<li><a href="#_chores">Chores</a></li>
+<li><a href="#new_features">New features</a></li>
+<li><a href="#enhancements">Enhancements</a></li>
+<li><a href="#bug_fixes">Bug fixes</a></li>
+<li><a href="#chores">Chores</a></li>
 </ul>
 </li>
 <li><a href="#v0_35_0">share v0.35.0 (2022-03-04)</a>
@@ -324,13 +375,289 @@ This is changelog for share module since v0.1.0 until v0.11.0.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="v0_39_0"><a class="anchor" href="#v0_39_0"></a><a class="link" href="#v0_39_0">share v0.39.0 (2022-07-03)</a></h2>
+<h2 id="v0_40_0"><a class="anchor" href="#v0_40_0"></a><a class="link" href="#v0_40_0">share v0.40.0 (2022-08-05)</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="v0_40_0_breaking_changes"><a class="anchor" href="#v0_40_0_breaking_changes"></a><a class="link" href="#v0_40_0_breaking_changes">Breaking changes</a></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">lib/memfs: set the Root SysPath to the first MemFS instance on Merge</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously, calling Merge(&#8230;&#8203;), set the merged MemFS Root.SysPath to
+"..".
+Since we allow the TryDirect to access the file directly (if its set
+to true), this may cause the file system leaks if returned MemFS set
+this flag to true.</p>
+</div>
+<div class="paragraph">
+<p>To prevent that, we set the SysPath to the first MemFS SysPath.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/memfs: rename Option field Development to TryDirect</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>This changes the usage of Development flag.</p>
+</div>
+<div class="paragraph">
+<p>TryDirect define a flag to bypass file in memory.
+If its true, any call to Get will try direct read to file system.</p>
+</div>
+<div class="paragraph">
+<p>This flag has several use cases.
+First, to test serving file system directly from disk during
+development.
+Second, to combine embedded MemFS instance with non-embedded instance.
+One is reading content from memory, one is reading content from disk
+directly.</p>
+</div>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0_40_0_new_features"><a class="anchor" href="#v0_40_0_new_features"></a><a class="link" href="#v0_40_0_new_features">New features</a></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">_bin: add script to run Go benchmark</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The go-bench.sh accept two arguments: the method or function to benchmark,
+default to "."; and benchmark number, default to current timestamp
+YYYYmmDD-HHMM.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">_bin: add script to run Go test and generate HTML coverage</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The script accept one single argument: the path to package to
+be tested.
+If its empty default to current directory and sub-directories.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">_bin: add script go-mod-tip.sh</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The go-mod-tip shell script get and print the latest Go module
+version based on the last tag and the latest commit hash from the
+current working directory.</p>
+</div>
+<div class="paragraph">
+<p>This command usually used to fix go.mod due to force commit.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">cmd/epoch: print the weekday in local and UTC time</dt>
+<dd>
+</dd>
+<dt class="hdlist1">cmd/epoch: add flag to parse time from RFC3339 and RFC1123 format</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The flag for RFC1123 comes with two options one with string timezone
+(-rfc1123) and one with numeric time zone (-rfc1123z).</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">cmd/ini: a CLI to get and set values in the INI file format</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>This is the CLI that implements the lib/ini for getting and setting
+the key&#8217;s value from INI file.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/test: implement Data, a type to load formatted file for helping test</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Data contains predefined input and output values that is loaded from
+file to be used during test.</p>
+</div>
+<div class="paragraph">
+<p>The data provides zero or more flags, an optional description, zero or
+more input, and zero or more output.</p>
+</div>
+<div class="paragraph">
+<p>The data file name must end with ".txt".</p>
+</div>
+<div class="paragraph">
+<p>The data content use the following format,</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>[FLAG_KEY ":" FLAG_VALUE LF]
+[LF DESCRIPTION]
+LF
+"&gt;&gt;&gt;" [INPUT_NAME] LF
+INPUT_CONTENT
+LF
+"&lt;&lt;&lt;" [OUTPUT_NAME] LF
+OUTPUT_CONTENT</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The data can contains zero or more flag.
+A flag is key and value separated by ":".
+The flag key must not contain spaces.</p>
+</div>
+<div class="paragraph">
+<p>The data may contain description.</p>
+</div>
+<div class="paragraph">
+<p>The line that start with "\n&gt;&gt;&gt;" defined the beginning of input.
+An input can have a name, if its empty it will be set to "default".
+An input can be defined multiple times, with different names.</p>
+</div>
+<div class="paragraph">
+<p>The line that start with "\n&lt;&lt;&lt;" defined the beginning of output.
+An output can have a name, if its empty it will be set to "default".
+An output also can be defined multiple times, with different names.</p>
+</div>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0_40_0_bug_fixes"><a class="anchor" href="#v0_40_0_bug_fixes"></a><a class="link" href="#v0_40_0_bug_fixes">Bug fixes</a></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">lib/ini: fix parsing and saving multi line variables</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>Previously, if INI file contains multi line variables, for example</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>key = a \
+b</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Get and saved value is "a \tb", where it should be "a b" for Get and
+"a \\\n\t\b" again when saved.</p>
+</div>
+<div class="paragraph">
+<p>This changes require refactoring how the variable&#8217;s value is parsed and
+stored.
+A variable value is parsed and stored from character after "=" until new
+line or comment as raw value, and the real value is derived by trimming
+white spaces, handle escaped character and double quotes.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/ini: fix marshaling pointer to nil field</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>If the field is pointer, the code will thrown panic if its point to
+nil struct or print "&lt;invalid reflct.Value&gt;" for String.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/memfs: ignore error on Get when calling node Update</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>If node exist in memory, error on Update does not means the file is not
+exist.
+The node may have been embedded and then merged with other MemFS instance
+with Development flag set to true.</p>
+</div>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v0_40_0_enhancements"><a class="anchor" href="#v0_40_0_enhancements"></a><a class="link" href="#v0_40_0_enhancements">Enhancements</a></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">lib/dns: add field SOA to the ServerOptions</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The SOA field defined the root authority for all zones and records
+served under the Server.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/http: add server options to generate index.html automatically</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>If the EnableIndexHtml in the ServeOptions enabled, server generate
+list of files inside the requested path as HTML.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/ini: support escaped double-quote and colon in tag subsection</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>A colon <code>:</code> is escaped using double backslash <code>\\</code>, for example
+<code>a:b\\:c:d</code> contains section <code>a</code>, subsection <code>b:c</code>, and variable <code>d</code>.</p>
+</div>
+<div class="paragraph">
+<p>A double quote <code>"</code> is escaped using triple backslash, for example
+(<code>\\\"</code>).</p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1">lib/ini: handle marshaling slice of time.Time</dt>
+<dd>
+<p>-</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="v0_39_0_breaking_changes"><a class="anchor" href="#v0_39_0_breaking_changes"></a><a class="link" href="#v0_39_0_breaking_changes">Breaking changes</a></h2>
+<h2 id="v0_39_0"><a class="anchor" href="#v0_39_0"></a><a class="link" href="#v0_39_0">share v0.39.0 (2022-07-03)</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="v0_39_0_breaking_changes"><a class="anchor" href="#v0_39_0_breaking_changes"></a><a class="link" href="#v0_39_0_breaking_changes">Breaking changes</a></h3>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">all: move lib/sanitize.HTML to net/html.Sanitize</dt>
@@ -347,10 +674,8 @@ package already exist, we move the function into html package.</p>
 </dl>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="v0_39_0_new_features"><a class="anchor" href="#v0_39_0_new_features"></a><a class="link" href="#v0_39_0_new_features">New features</a></h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="v0_39_0_new_features"><a class="anchor" href="#v0_39_0_new_features"></a><a class="link" href="#v0_39_0_new_features">New features</a></h3>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">lib/mlog: add method Close to MultiLogger</dt>
@@ -572,10 +897,8 @@ false ("", nil, false).</p>
 </dl>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="v0_39_0_enhancements"><a class="anchor" href="#v0_39_0_enhancements"></a><a class="link" href="#v0_39_0_enhancements">Enhancements</a></h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="v0_39_0_enhancements"><a class="anchor" href="#v0_39_0_enhancements"></a><a class="link" href="#v0_39_0_enhancements">Enhancements</a></h3>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">lib/memfs: update the template format</dt>
@@ -704,6 +1027,7 @@ the resource, in case the Server need to start again.</p>
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
 <h2 id="v0_38_0"><a class="anchor" href="#v0_38_0"></a><a class="link" href="#v0_38_0">share v0.38.0 (2022-06-05)</a></h2>
 <div class="sectionbody">
@@ -711,7 +1035,7 @@ the resource, in case the Server need to start again.</p>
 <p>This release update the minimum Go version to 1.17.</p>
 </div>
 <div class="sect2">
-<h3 id="_breaking_changes"><a class="anchor" href="#_breaking_changes"></a><a class="link" href="#_breaking_changes">Breaking changes</a></h3>
+<h3 id="breaking_changes"><a class="anchor" href="#breaking_changes"></a><a class="link" href="#breaking_changes">Breaking changes</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1124,7 +1448,7 @@ If we do that, there will be circular imports.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_new_features"><a class="anchor" href="#_new_features"></a><a class="link" href="#_new_features">New features</a></h3>
+<h3 id="new_features"><a class="anchor" href="#new_features"></a><a class="link" href="#new_features">New features</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1171,7 +1495,7 @@ internal fs inside the DirWatcher is not exported.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_enhancements"><a class="anchor" href="#_enhancements"></a><a class="link" href="#_enhancements">Enhancements</a></h3>
+<h3 id="enhancements"><a class="anchor" href="#enhancements"></a><a class="link" href="#enhancements">Enhancements</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1188,7 +1512,7 @@ log will be written to their predefined writers.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_bug_fixes"><a class="anchor" href="#_bug_fixes"></a><a class="link" href="#_bug_fixes">Bug fixes</a></h3>
+<h3 id="bug_fixes"><a class="anchor" href="#bug_fixes"></a><a class="link" href="#bug_fixes">Bug fixes</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1214,7 +1538,7 @@ in string.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_chores"><a class="anchor" href="#_chores"></a><a class="link" href="#_chores">Chores</a></h3>
+<h3 id="chores"><a class="anchor" href="#chores"></a><a class="link" href="#chores">Chores</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1978,13 +2302,10 @@ at the same times.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-03 15:04:34 +0700
+Last updated 2022-08-05 20:59:02 +0700
 </div>
-</div>
-			</div>
-			
+</div></div>
 		</div>
-		
 
 		<div class="footer">
 			Powered by <a
