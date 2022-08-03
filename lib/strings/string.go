@@ -74,17 +74,18 @@ func CleanURI(text string) string {
 
 // CleanWikiMarkup remove wiki markup from text.
 //
-//	List of known wiki markups,
-//	- [[Category: ... ]]
-//	- [[:Category: ... ]]
-//	- [[File: ... ]]
-//	- [[Help: ... ]]
-//	- [[Image: ... ]]
-//	- [[Special: ... ]]
-//	- [[Wikipedia: ... ]]
-//	- {{DEFAULTSORT: ... }}
-//	- {{Template: ... }}
-//	- <ref ... />
+// List of known wiki markups,
+//
+//   - [[Category: ... ]]
+//   - [[:Category: ... ]]
+//   - [[File: ... ]]
+//   - [[Help: ... ]]
+//   - [[Image: ... ]]
+//   - [[Special: ... ]]
+//   - [[Wikipedia: ... ]]
+//   - {{DEFAULTSORT: ... }}
+//   - {{Template: ... }}
+//   - <ref ... />
 func CleanWikiMarkup(text string) string {
 	ctext := []rune(text)
 
