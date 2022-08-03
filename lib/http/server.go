@@ -304,12 +304,17 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	var (
 		logp = "getFSNode"
-		err  error
+
+		nodeIndexHtml *memfs.Node
+		pathHtml      string
+		err           error
 	)
 
 	if srv.Options.Memfs == nil {
 		return nil
 	}
+
+	pathHtml = path.Join(reqPath, `index.html`)
 
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
@@ -320,12 +325,10 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 			return nil
 		}
 
-		asDir := path.Join(reqPath, "index.html")
-
-		node, err = srv.Options.Memfs.Get(asDir)
+		node, err = srv.Options.Memfs.Get(pathHtml)
 		if err != nil {
-			asHtml := reqPath + ".html"
-			node, err = srv.Options.Memfs.Get(asHtml)
+			pathHtml = reqPath + `.html`
+			node, err = srv.Options.Memfs.Get(pathHtml)
 			if err != nil {
 				if debug.Value >= 3 {
 					mlog.Outf("%s: %q: %s", logp, reqPath, err)
@@ -337,11 +340,16 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	}
 
 	if node.IsDir() {
-		indexHTML := path.Join(reqPath, "index.html")
-		node, err = srv.Options.Memfs.Get(indexHTML)
-		if err != nil {
+		nodeIndexHtml, err = srv.Options.Memfs.Get(pathHtml)
+		if err == nil {
+			return nodeIndexHtml
+		}
+
+		if !srv.Options.EnableIndexHtml {
 			return nil
 		}
+
+		node.GenerateIndexHtml()
 	}
 
 	return node
@@ -468,6 +476,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		node         *memfs.Node
 		responseETag string
 		requestETag  string
+		sizeStr      string
 		body         []byte
 		size         int64
 		err          error
@@ -508,7 +517,8 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		size = int64(len(body))
 	}
 
-	res.Header().Set(HeaderContentLength, strconv.FormatInt(size, 10))
+	sizeStr = strconv.FormatInt(size, 10)
+	res.Header().Set(HeaderContentLength, sizeStr)
 	res.Header().Set(HeaderETag, responseETag)
 
 	if req.Method == http.MethodHead {

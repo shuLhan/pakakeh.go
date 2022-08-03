@@ -48,6 +48,12 @@ type ServerOptions struct {
 
 	// The options for Cross-Origin Resource Sharing.
 	CORS CORSOptions
+
+	// If true, server generate index.html automatically if its not
+	// exist in the directory.
+	// The index.html contains the list of files inside the requested
+	// path.
+	EnableIndexHtml bool
 }
 
 func (opts *ServerOptions) init() {
