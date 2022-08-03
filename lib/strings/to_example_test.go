@@ -9,29 +9,41 @@ import (
 )
 
 func ExampleToBytes() {
-	ss := []string{"This", "is", "a", "string"}
-	fmt.Printf("%s\n", ToBytes(ss))
-	// Output:
-	// [This is a string]
+	var (
+		ss              = []string{`This`, `is`, `a`, `string`}
+		sbytes [][]byte = ToBytes(ss)
+	)
+
+	fmt.Printf(`%s`, sbytes)
+	// Output: [This is a string]
 }
 
 func ExampleToFloat64() {
-	in := []string{"0", "1.1", "e", "3"}
+	var (
+		in             = []string{`0`, `1.1`, `e`, `3`}
+		sf64 []float64 = ToFloat64(in)
+	)
 
-	fmt.Println(ToFloat64(in))
+	fmt.Println(sf64)
 	// Output: [0 1.1 0 3]
 }
 
 func ExampleToInt64() {
-	in := []string{"0", "1", "e", "3.3"}
+	var (
+		in           = []string{`0`, `1`, `e`, `3.3`}
+		si64 []int64 = ToInt64(in)
+	)
 
-	fmt.Println(ToInt64(in))
+	fmt.Println(si64)
 	// Output: [0 1 0 3]
 }
 
 func ExampleToStrings() {
-	i64 := []interface{}{0, 1.99, 2, 3}
+	var (
+		i64          = []interface{}{0, 1.99, 2, 3}
+		ss  []string = ToStrings(i64)
+	)
 
-	fmt.Println(ToStrings(i64))
+	fmt.Println(ss)
 	// Output: [0 1.99 2 3]
 }

@@ -1,0 +1,23 @@
+Test Split with clean and unique parameters.
+
+>>> Single-line
+// Copyright 2016-2018 Shulhan <ms@kilabit.info>. All rights reserved.
+
+<<< Single-line
+Copyright 2016-2018 Shulhan ms@kilabit.info All rights reserved
+
+>>> Multi-line
+The [[United States]] has regularly voted alone and
+against international consensus, using its [[United Nations
+Security Council veto power|veto power]] to block the adoption
+of proposed UN Security Council resolutions supporting the
+[[PLO]] and calling for a two-state solution to the
+[[Israeli-Palestinian conflict]].
+
+<<< Multi-line
+The United States has regularly voted alone and
+against international consensus using its Nations
+Security Council veto power|veto power to block adoption
+of proposed UN resolutions supporting
+PLO calling for a two-state solution
+Israeli-Palestinian conflict

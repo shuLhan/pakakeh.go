@@ -9,42 +9,47 @@ import (
 )
 
 func ExampleAlnum() {
-	cases := []struct {
+	type testCase struct {
 		text      string
 		withSpace bool
-	}{
-		{"A, b.c", false},
-		{"A, b.c", true},
-		{"A1 b", false},
-		{"A1 b", true},
 	}
 
-	for _, c := range cases {
-		fmt.Printf("%s\n", Alnum(c.text, c.withSpace))
+	var cases = []testCase{
+		{`A, b.c`, false},
+		{`A, b.c`, true},
+		{`A1 b`, false},
+		{`A1 b`, true},
 	}
-	//Output:
-	//Abc
-	//A bc
-	//A1b
-	//A1 b
+
+	var (
+		c testCase
+	)
+	for _, c = range cases {
+		fmt.Println(Alnum(c.text, c.withSpace))
+	}
+	// Output:
+	// Abc
+	// A bc
+	// A1b
+	// A1 b
 }
 
 func ExampleCleanURI() {
-	text := `You can visit ftp://hostname or https://hostname/link%202 for more information`
+	var text = `You can visit ftp://hostname or https://hostname/link%202 for more information`
 
-	fmt.Printf("%s\n", CleanURI(text))
+	fmt.Println(CleanURI(text))
 	// Output: You can visit  or  for more information
 }
 
 func ExampleCleanWikiMarkup() {
-	text := `* Test image [[Image:fileto.png]].`
+	var text = `* Test image [[Image:fileto.png]].`
 
-	fmt.Printf("%s\n", CleanWikiMarkup(text))
+	fmt.Println(CleanWikiMarkup(text))
 	// Output: * Test image .
 }
 
 func ExampleMergeSpaces() {
-	line := "   a\n\nb c   d\n\n"
+	var line = "   a\n\nb c   d\n\n"
 	fmt.Printf("Without merging newline: '%s'\n", MergeSpaces(line, false))
 	fmt.Printf("With merging newline: '%s'\n", MergeSpaces(line, true))
 	// Output:
@@ -59,11 +64,11 @@ func ExampleMergeSpaces() {
 }
 
 func ExampleSplit() {
-	line := `a b   c [A] B C`
-	fmt.Printf("%s\n", Split(line, false, false))
-	fmt.Printf("%s\n", Split(line, true, false))
-	fmt.Printf("%s\n", Split(line, false, true))
-	fmt.Printf("%s\n", Split(line, true, true))
+	var line string = `a b   c [A] B C`
+	fmt.Println(Split(line, false, false))
+	fmt.Println(Split(line, true, false))
+	fmt.Println(Split(line, false, true))
+	fmt.Println(Split(line, true, true))
 	// Output:
 	// [a b c [A] B C]
 	// [a b c A B C]
@@ -72,29 +77,32 @@ func ExampleSplit() {
 }
 
 func ExampleTrimNonAlnum() {
-	inputs := []string{
-		"[[alpha]]",
-		"[[alpha",
-		"alpha]]",
-		"alpha",
-		"alpha0",
-		"1alpha",
-		"1alpha0",
-		"[a][b][c]",
-		"[][][]",
-	}
+	var (
+		inputs = []string{
+			`[[alpha]]`,
+			`[[alpha`,
+			`alpha]]`,
+			`alpha`,
+			`alpha0`,
+			`1alpha`,
+			`1alpha0`,
+			`[a][b][c]`,
+			`[][][]`,
+		}
+		in string
+	)
 
-	for _, in := range inputs {
-		fmt.Printf("'%s'\n", TrimNonAlnum(in))
+	for _, in = range inputs {
+		fmt.Println(TrimNonAlnum(in))
 	}
 	// Output:
-	// 'alpha'
-	// 'alpha'
-	// 'alpha'
-	// 'alpha'
-	// 'alpha0'
-	// '1alpha'
-	// '1alpha0'
-	// 'a][b][c'
-	// ''
+	// alpha
+	// alpha
+	// alpha
+	// alpha
+	// alpha0
+	// 1alpha
+	// 1alpha0
+	// a][b][c
+	//
 }

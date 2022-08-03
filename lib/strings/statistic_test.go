@@ -11,73 +11,87 @@ import (
 )
 
 func TestCountAlnum(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  int
-	}{{
-		// Empty
+	}
+
+	var cases = []testCase{{
+		// Empty.
 	}, {
-		text: "// 123",
+		text: `// 123`,
 		exp:  3,
 	}, {
-		text: "// A B C",
+		text: `// A B C`,
 		exp:  3,
 	}, {
-		text: "// A b c 1 2 3",
+		text: `// A b c 1 2 3`,
 		exp:  6,
 	}}
 
-	for _, c := range cases {
-		got := CountAlnum(c.text)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got int
+	)
+	for _, c = range cases {
+		got = CountAlnum(c.text)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestCountAlnumDistribution(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text      string
 		expChars  []rune
 		expCounts []int
-	}{{
-		// Empty
+	}
+
+	var cases = []testCase{{
+		// Empty input.
 	}, {
-		text:      "// 123",
+		text:      `// 123`,
 		expChars:  []rune{'1', '2', '3'},
 		expCounts: []int{1, 1, 1},
 	}, {
-		text:      "// A B C",
+		text:      `// A B C`,
 		expChars:  []rune{'A', 'B', 'C'},
 		expCounts: []int{1, 1, 1},
 	}, {
-		text:      "// A B C A B C",
+		text:      `// A B C A B C`,
 		expChars:  []rune{'A', 'B', 'C'},
 		expCounts: []int{2, 2, 2},
 	}}
 
-	for _, c := range cases {
-		gotChars, gotCounts := CountAlnumDistribution(c.text)
-		test.Assert(t, "chars", c.expChars, gotChars)
-		test.Assert(t, "counts", c.expCounts, gotCounts)
+	var (
+		c         testCase
+		gotChars  []rune
+		gotCounts []int
+	)
+	for _, c = range cases {
+		gotChars, gotCounts = CountAlnumDistribution(c.text)
+		test.Assert(t, `chars`, c.expChars, gotChars)
+		test.Assert(t, `counts`, c.expCounts, gotCounts)
 	}
 }
 
 func TestCountCharSequence(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text      string
 		expChars  []rune
 		expCounts []int
-	}{{
-		text:      "// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.",
+	}
+	var cases = []testCase{{
+		text:      `// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`,
 		expChars:  []rune{'/', 'l'},
 		expCounts: []int{2, 2},
 	}, {
-		text: "Use of this source code is governed by a BSD-style",
+		text: `Use of this source code is governed by a BSD-style`,
 	}, {
-		text:      "aaa abcdee ffgf",
+		text:      `aaa abcdee ffgf`,
 		expChars:  []rune{'a', 'e', 'f'},
 		expCounts: []int{3, 2, 2},
 	}, {
-		text: " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}",
+		text: ` |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}`,
 		expChars: []rune{
 			'{', '0', 'F', 'f', 'o',
 			'}', '{', '0', '2', '5',
@@ -94,302 +108,378 @@ func TestCountCharSequence(t *testing.T) {
 		},
 	}}
 
-	for _, c := range cases {
-		gotChars, gotCounts := CountCharSequence(c.text)
+	var (
+		c         testCase
+		gotChars  []rune
+		gotCounts []int
+	)
+	for _, c = range cases {
+		gotChars, gotCounts = CountCharSequence(c.text)
 
-		test.Assert(t, "", c.expChars, gotChars)
-		test.Assert(t, "", c.expCounts, gotCounts)
+		test.Assert(t, ``, c.expChars, gotChars)
+		test.Assert(t, ``, c.expCounts, gotCounts)
 	}
 }
 
 func TestCountDigit(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  int
-	}{{
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text: "// Copyright 2018 Mhd Sulhan <ms@kilabit.info>. All rights reserved.",
+		text: `// 2018 `,
 		exp:  4,
 	}}
 
-	for _, c := range cases {
-		got := CountDigit(c.text)
+	var (
+		c   testCase
+		got int
+	)
+	for _, c = range cases {
+		got = CountDigit(c.text)
 
-		test.Assert(t, "", c.exp, got)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestCountNonAlnum(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text      string
-		withspace bool
 		exp       int
-	}{{
-		// Empty
+		withspace bool
+	}
+	var cases = []testCase{{
+		// Empty.
 	}, {
-		text: "// 123",
+		text: `// 123`,
 		exp:  2,
 	}, {
-		text:      "// 123",
+		text:      `// 123`,
 		withspace: true,
 		exp:       3,
 	}, {
-		text: "// A B C",
+		text: `// A B C`,
 		exp:  2,
 	}, {
-		text:      "// A B C",
+		text:      `// A B C`,
 		withspace: true,
 		exp:       5,
 	}, {
-		text: "// A b c 1 2 3",
+		text: `// A b c 1 2 3`,
 		exp:  2,
 	}, {
-		text:      "// A b c 1 2 3",
+		text:      `// A b c 1 2 3`,
 		withspace: true,
 		exp:       8,
 	}}
 
-	for _, c := range cases {
-		got := CountNonAlnum(c.text, c.withspace)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got int
+	)
+	for _, c = range cases {
+		got = CountNonAlnum(c.text, c.withspace)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestCountUniqChar(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  int
-	}{{
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text: "abc abc",
+		text: `abc abc`,
 		exp:  4,
 	}, {
-		text: "abc ABC",
+		text: `abc ABC`,
 		exp:  7,
 	}}
 
-	for _, c := range cases {
-		got := CountUniqChar(c.text)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got int
+	)
+	for _, c = range cases {
+		got = CountUniqChar(c.text)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestCountUpperLower(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text     string
 		expUpper int
 		expLower int
-	}{{
-		text:     "// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.",
+	}
+
+	var cases = []testCase{{
+		text:     `// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`,
 		expUpper: 4,
 		expLower: 44,
 	}}
 
-	for _, c := range cases {
-		gotup, gotlo := CountUpperLower(c.text)
+	var (
+		c     testCase
+		gotup int
+		gotlo int
+	)
+	for _, c = range cases {
+		gotup, gotlo = CountUpperLower(c.text)
 
-		test.Assert(t, "", c.expUpper, gotup)
-		test.Assert(t, "", c.expLower, gotlo)
+		test.Assert(t, ``, c.expUpper, gotup)
+		test.Assert(t, ``, c.expLower, gotlo)
 	}
 }
 
 func TestMaxCharSequence(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text  string
 		char  rune
 		count int
-	}{{
-		text:  "// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.",
+	}
+
+	var cases = []testCase{{
+		text:  `// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.`,
 		char:  '/',
 		count: 2,
 	}, {
-		text: "Use of this source code is governed by a BSD-style",
+		text: `Use of this source code is governed by a BSD-style`,
 	}, {
-		text:  "aaa abcdee ffgf",
+		text:  `aaa abcdee ffgf`,
 		char:  'a',
 		count: 3,
 	}, {
-		text:  " |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}",
+		text:  ` |  image name          = {{legend|#0080FF|Areas affected by flooding}}{{legend|#002255|Death(s) affected by flooding}}{{legend|#C83737|Areas affected by flooding and strong winds}}{{legend|#550000|Death(s) affected by flooding and strong winds}}`,
 		char:  '0',
 		count: 4,
 	}}
 
-	for _, c := range cases {
-		gotv, gotc := MaxCharSequence(c.text)
+	var (
+		c    testCase
+		gotv rune
+		gotc int
+	)
+	for _, c = range cases {
+		gotv, gotc = MaxCharSequence(c.text)
 
-		test.Assert(t, "", c.char, gotv)
-		test.Assert(t, "", c.count, gotc)
+		test.Assert(t, ``, c.char, gotv)
+		test.Assert(t, ``, c.count, gotc)
 	}
 }
 
 func TestRatioAlnum(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  float64
-	}{{
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text: "// A b c d",
+		text: `// A b c d`,
 		exp:  0.4,
 	}, {
-		text: "// A123b",
+		text: `// A123b`,
 		exp:  0.625,
 	}}
 
-	for _, c := range cases {
-		got := RatioAlnum(c.text)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got float64
+	)
+	for _, c = range cases {
+		got = RatioAlnum(c.text)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestRatioDigit(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  float64
-	}{{
+	}
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text: "// A b c d",
+		text: `// A b c d`,
 		exp:  0,
 	}, {
-		text: "// A123b",
+		text: `// A123b`,
 		exp:  0.375,
 	}}
 
-	for _, c := range cases {
-		got := RatioDigit(c.text)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got float64
+	)
+	for _, c = range cases {
+		got = RatioDigit(c.text)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestRatioNonAlnum(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text      string
-		withspace bool
 		exp       float64
-	}{{
+		withspace bool
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text: "// A b c d",
+		text: `// A b c d`,
 		exp:  0.2,
 	}, {
-		text:      "// A b c d",
+		text:      `// A b c d`,
 		withspace: true,
 		exp:       0.6,
 	}, {
-		text: "// A123b",
+		text: `// A123b`,
 		exp:  0.25,
 	}, {
-		text:      "// A123b",
+		text:      `// A123b`,
 		withspace: true,
 		exp:       0.375,
 	}}
 
-	for _, c := range cases {
-		got := RatioNonAlnum(c.text, c.withspace)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got float64
+	)
+	for _, c = range cases {
+		got = RatioNonAlnum(c.text, c.withspace)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestRatioUpper(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  float64
-	}{{
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text: "// A b c d",
+		text: `// A b c d`,
 		exp:  0.25,
 	}}
 
-	for _, c := range cases {
-		got := RatioUpper(c.text)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got float64
+	)
+	for _, c = range cases {
+		got = RatioUpper(c.text)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestRatioUpperLower(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text string
 		exp  float64
-	}{{
-		// Empty
+	}
+	var cases = []testCase{{
+		// Empty.
 	}, {
-		text: "// 134234",
+		text: `// 134234`,
 	}, {
-		text: "// A B C",
+		text: `// A B C`,
 		exp:  3,
 	}, {
-		text: "// A b c d e",
+		text: `// A b c d e`,
 		exp:  0.25,
 	}}
 
-	for _, c := range cases {
-		got := RatioUpperLower(c.text)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got float64
+	)
+	for _, c = range cases {
+		got = RatioUpperLower(c.text)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestTextSumCountTokens(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text      string
 		tokens    []string
-		sensitive bool
 		exp       int
-	}{{
+		sensitive bool
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text:   "[[aa]] [[AA]]",
-		tokens: []string{"[["},
+		text:   `[[aa]] [[AA]]`,
+		tokens: []string{`[[`},
 		exp:    2,
 	}, {
-		text:   "[[aa]] [[AA]]",
-		tokens: []string{"]]"},
+		text:   `[[aa]] [[AA]]`,
+		tokens: []string{`]]`},
 		exp:    2,
 	}, {
-		text:   "[[aa]] [[AA]]",
-		tokens: []string{"[[", "]]"},
+		text:   `[[aa]] [[AA]]`,
+		tokens: []string{`[[`, `]]`},
 		exp:    4,
 	}, {
-		text:   "[[aa]] [[AA]]",
-		tokens: []string{"aa"},
+		text:   `[[aa]] [[AA]]`,
+		tokens: []string{`aa`},
 		exp:    2,
 	}, {
-		text:      "[[aa]] [[AA]]",
-		tokens:    []string{"aa"},
+		text:      `[[aa]] [[AA]]`,
+		tokens:    []string{`aa`},
 		sensitive: true,
 		exp:       1,
 	}}
 
-	for _, c := range cases {
-		got := TextSumCountTokens(c.text, c.tokens, c.sensitive)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got int
+	)
+	for _, c = range cases {
+		got = TextSumCountTokens(c.text, c.tokens, c.sensitive)
+		test.Assert(t, ``, c.exp, got)
 	}
 }
 
 func TestTextFrequencyOfTokens(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		text      string
 		tokens    []string
 		sensitive bool
 		exp       float64
-	}{{
+	}
+
+	var cases = []testCase{{
 		// Empty.
 	}, {
-		text:   "a b c d A B C D",
-		tokens: []string{"a"},
+		text:   `a b c d A B C D`,
+		tokens: []string{`a`},
 		exp:    0.25,
 	}, {
-		text:      "a b c d A B C D",
-		tokens:    []string{"a"},
+		text:      `a b c d A B C D`,
+		tokens:    []string{`a`},
 		sensitive: true,
 		exp:       0.125,
 	}}
 
-	for _, c := range cases {
-		got := TextFrequencyOfTokens(c.text, c.tokens, c.sensitive)
-		test.Assert(t, "", c.exp, got)
+	var (
+		c   testCase
+		got float64
+	)
+	for _, c = range cases {
+		got = TextFrequencyOfTokens(c.text, c.tokens, c.sensitive)
+		test.Assert(t, ``, c.exp, got)
 	}
 }

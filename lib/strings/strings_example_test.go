@@ -9,8 +9,10 @@ import (
 )
 
 func ExampleAppendUniq() {
-	in := []string{"a", "", "b", "c"}
-	vals := []string{"b", "", "C", "d"}
+	var (
+		in   = []string{`a`, ``, `b`, `c`}
+		vals = []string{`b`, ``, `C`, `d`}
+	)
 
 	in = AppendUniq(in, vals...)
 
@@ -20,24 +22,27 @@ func ExampleAppendUniq() {
 }
 
 func ExampleCountMissRate() {
-	src := []string{"A", "B", "C", "D"}
-	tgt := []string{"A", "B", "C", "D"}
+	var (
+		src = []string{`A`, `B`, `C`, `D`}
+		tgt = []string{`A`, `B`, `C`, `D`}
+	)
+
 	fmt.Println(CountMissRate(src, tgt))
 
-	src = []string{"A", "B", "C", "D"}
-	tgt = []string{"B", "B", "C", "D"}
+	src = []string{`A`, `B`, `C`, `D`}
+	tgt = []string{`B`, `B`, `C`, `D`}
 	fmt.Println(CountMissRate(src, tgt))
 
-	src = []string{"A", "B", "C", "D"}
-	tgt = []string{"B", "C", "C", "D"}
+	src = []string{`A`, `B`, `C`, `D`}
+	tgt = []string{`B`, `C`, `C`, `D`}
 	fmt.Println(CountMissRate(src, tgt))
 
-	src = []string{"A", "B", "C", "D"}
-	tgt = []string{"B", "C", "D", "D"}
+	src = []string{`A`, `B`, `C`, `D`}
+	tgt = []string{`B`, `C`, `D`, `D`}
 	fmt.Println(CountMissRate(src, tgt))
 
-	src = []string{"A", "B", "C", "D"}
-	tgt = []string{"C", "D", "D", "E"}
+	src = []string{`A`, `B`, `C`, `D`}
+	tgt = []string{`C`, `D`, `D`, `E`}
 	fmt.Println(CountMissRate(src, tgt))
 
 	// Output:
@@ -49,17 +54,23 @@ func ExampleCountMissRate() {
 }
 
 func ExampleCountToken() {
-	words := []string{"A", "B", "C", "a", "b", "c"}
-	fmt.Println(CountToken(words, "C", false))
-	fmt.Println(CountToken(words, "C", true))
+	var (
+		words = []string{`A`, `B`, `C`, `a`, `b`, `c`}
+	)
+
+	fmt.Println(CountToken(words, `C`, false))
+	fmt.Println(CountToken(words, `C`, true))
 	// Output:
 	// 2
 	// 1
 }
 
 func ExampleCountTokens() {
-	words := []string{"A", "B", "C", "a", "b", "c"}
-	tokens := []string{"A", "B"}
+	var (
+		words  = []string{`A`, `B`, `C`, `a`, `b`, `c`}
+		tokens = []string{`A`, `B`}
+	)
+
 	fmt.Println(CountTokens(words, tokens, false))
 	fmt.Println(CountTokens(words, tokens, true))
 	// Output:
@@ -68,17 +79,23 @@ func ExampleCountTokens() {
 }
 
 func ExampleFrequencyOfToken() {
-	words := []string{"A", "B", "C", "a", "b", "c"}
-	fmt.Println(FrequencyOfToken(words, "C", false))
-	fmt.Println(FrequencyOfToken(words, "C", true))
+	var (
+		words = []string{`A`, `B`, `C`, `a`, `b`, `c`}
+	)
+
+	fmt.Println(FrequencyOfToken(words, `C`, false))
+	fmt.Println(FrequencyOfToken(words, `C`, true))
 	// Output:
 	// 0.3333333333333333
 	// 0.16666666666666666
 }
 
 func ExampleFrequencyOfTokens() {
-	words := []string{"A", "B", "C", "a", "b", "c"}
-	tokens := []string{"A", "B"}
+	var (
+		words  = []string{`A`, `B`, `C`, `a`, `b`, `c`}
+		tokens = []string{`A`, `B`}
+	)
+
 	fmt.Println(FrequencyOfTokens(words, tokens, false))
 	fmt.Println(FrequencyOfTokens(words, tokens, true))
 	// Output:
@@ -87,10 +104,10 @@ func ExampleFrequencyOfTokens() {
 }
 
 func ExampleIsEqual() {
-	fmt.Println(IsEqual([]string{"a", "b"}, []string{"a", "b"}))
-	fmt.Println(IsEqual([]string{"a", "b"}, []string{"b", "a"}))
-	fmt.Println(IsEqual([]string{"a", "b"}, []string{"a"}))
-	fmt.Println(IsEqual([]string{"a", "b"}, []string{"b", "b"}))
+	fmt.Println(IsEqual([]string{`a`, `b`}, []string{`a`, `b`}))
+	fmt.Println(IsEqual([]string{`a`, `b`}, []string{`b`, `a`}))
+	fmt.Println(IsEqual([]string{`a`, `b`}, []string{`a`}))
+	fmt.Println(IsEqual([]string{`a`, `b`}, []string{`b`, `b`}))
 	// Output:
 	// true
 	// true
@@ -99,14 +116,20 @@ func ExampleIsEqual() {
 }
 
 func ExampleLongest() {
-	words := []string{"a", "bb", "ccc", "d", "eee"}
+	var (
+		words = []string{`a`, `bb`, `ccc`, `d`, `eee`}
+	)
+
 	fmt.Println(Longest(words))
 	// Output: ccc 2
 }
 
 func ExampleMostFrequentTokens() {
-	words := []string{"a", "b", "B", "B", "a"}
-	tokens := []string{"a", "b"}
+	var (
+		words  = []string{`a`, `b`, `B`, `B`, `a`}
+		tokens = []string{`a`, `b`}
+	)
+
 	fmt.Println(MostFrequentTokens(words, tokens, false))
 	fmt.Println(MostFrequentTokens(words, tokens, true))
 	// Output:
@@ -115,8 +138,10 @@ func ExampleMostFrequentTokens() {
 }
 
 func ExampleSortByIndex() {
-	dat := []string{"Z", "X", "C", "V", "B", "N", "M"}
-	ids := []int{4, 2, 6, 5, 3, 1, 0}
+	var (
+		dat = []string{`Z`, `X`, `C`, `V`, `B`, `N`, `M`}
+		ids = []int{4, 2, 6, 5, 3, 1, 0}
+	)
 
 	fmt.Println(dat)
 	SortByIndex(&dat, ids)
@@ -127,7 +152,10 @@ func ExampleSortByIndex() {
 }
 
 func ExampleSwap() {
-	ss := []string{"a", "b", "c"}
+	var (
+		ss = []string{`a`, `b`, `c`}
+	)
+
 	Swap(ss, -1, 1)
 	fmt.Println(ss)
 	Swap(ss, 1, -1)
@@ -147,8 +175,11 @@ func ExampleSwap() {
 }
 
 func ExampleTotalFrequencyOfTokens() {
-	words := []string{"A", "B", "C", "a", "b", "c"}
-	tokens := []string{"A", "B"}
+	var (
+		words  = []string{`A`, `B`, `C`, `a`, `b`, `c`}
+		tokens = []string{`A`, `B`}
+	)
+
 	fmt.Println(TotalFrequencyOfTokens(words, tokens, false))
 	fmt.Println(TotalFrequencyOfTokens(words, tokens, true))
 	// Output:
@@ -157,9 +188,12 @@ func ExampleTotalFrequencyOfTokens() {
 }
 
 func ExampleUniq() {
-	words := []string{"a", "", "A"}
+	var (
+		words = []string{`a`, ``, `A`}
+	)
+
 	fmt.Printf("%s %s\n", Uniq(words, false), words)
-	words = []string{"a", "", "A"}
+	words = []string{`a`, ``, `A`}
 	fmt.Printf("%s %s\n", Uniq(words, true), words)
 	// Output:
 	// [a] [a  ]

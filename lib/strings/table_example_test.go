@@ -9,11 +9,11 @@ import (
 )
 
 func ExamplePartition() {
-	ss := []string{"a", "b", "c"}
+	var ss = []string{`a`, `b`, `c`}
 
-	fmt.Println("Partition k=1:", Partition(ss, 1))
-	fmt.Println("Partition k=2:", Partition(ss, 2))
-	fmt.Println("Partition k=3:", Partition(ss, 3))
+	fmt.Println(`Partition k=1:`, Partition(ss, 1))
+	fmt.Println(`Partition k=2:`, Partition(ss, 2))
+	fmt.Println(`Partition k=3:`, Partition(ss, 3))
 
 	// Output:
 	// Partition k=1: [[[a b c]]]
@@ -22,30 +22,29 @@ func ExamplePartition() {
 }
 
 func ExampleSinglePartition() {
-	ss := []string{"a", "b", "c"}
+	var ss = []string{`a`, `b`, `c`}
 	fmt.Println(SinglePartition(ss))
-	// Output:
-	// [[[a] [b] [c]]]
+	// Output: [[[a] [b] [c]]]
 }
 
 func ExampleTable_IsEqual() {
-	table := Table{
-		{{"a"}, {"b", "c"}},
-		{{"b"}, {"a", "c"}},
-		{{"c"}, {"a", "b"}},
+	var table = Table{
+		{{`a`}, {`b`, `c`}},
+		{{`b`}, {`a`, `c`}},
+		{{`c`}, {`a`, `b`}},
 	}
 	fmt.Println(table.IsEqual(table))
 
-	other := Table{
-		{{"c"}, {"a", "b"}},
-		{{"a"}, {"b", "c"}},
-		{{"b"}, {"a", "c"}},
+	var other = Table{
+		{{`c`}, {`a`, `b`}},
+		{{`a`}, {`b`, `c`}},
+		{{`b`}, {`a`, `c`}},
 	}
 	fmt.Println(table.IsEqual(other))
 
 	other = Table{
-		{{"a"}, {"b", "c"}},
-		{{"b"}, {"a", "c"}},
+		{{`a`}, {`b`, `c`}},
+		{{`b`}, {`a`, `c`}},
 	}
 	fmt.Println(table.IsEqual(other))
 
@@ -56,10 +55,12 @@ func ExampleTable_IsEqual() {
 }
 
 func ExampleTable_JoinCombination() {
-	table := Table{
-		{{"a"}, {"b"}, {"c"}},
-	}
-	s := "X"
+	var (
+		table = Table{
+			{{`a`}, {`b`}, {`c`}},
+		}
+		s = `X`
+	)
 
 	fmt.Println(table.JoinCombination(s))
 	// Output:

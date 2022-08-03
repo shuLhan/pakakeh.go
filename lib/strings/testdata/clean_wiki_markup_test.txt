@@ -1,0 +1,37 @@
+>>>
+==External links==
+*[http://www.bigfinish.com/24-Doctor-Who-The-Eye-of-the-Scorpion Big Finish Productions - ''The Eye of the Scorpion'']
+*{{Doctor Who RG | id=who_bf24 | title=The Eye of the Scorpion}}
+===Reviews===
+* Test image [[Image:fileto.png]].
+* Test file [[File:fileto.png]].
+*{{OG review | id=bf-24 | title=The Eye of the Scorpion}}
+*{{DWRG | id=eyes | title=The Eye of the Scorpion}}
+
+<br clear="all">
+{{Fifthdoctoraudios}}
+
+{{DEFAULTSORT:Eye of the Scorpion, The}}
+[[Category:Fifth Doctor audio plays]]
+[[Category:Fifth Doctor audio plays]]
+[[:Category:2001 audio plays]]
+{{DoctorWho-stub}}
+
+<<<
+==External links==
+*[http://www.bigfinish.com/24-Doctor-Who-The-Eye-of-the-Scorpion Big Finish Productions - ''The Eye of the Scorpion'']
+*{{Doctor Who RG | id=who_bf24 | title=The Eye of the Scorpion}}
+===Reviews===
+* Test image .
+* Test file .
+*{{OG review | id=bf-24 | title=The Eye of the Scorpion}}
+*{{DWRG | id=eyes | title=The Eye of the Scorpion}}
+
+<br clear="all">
+{{Fifthdoctoraudios}}
+
+
+
+
+
+{{DoctorWho-stub}}
