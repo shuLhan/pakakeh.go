@@ -236,35 +236,28 @@ func (mlog *MultiLogger) processErrorQueue() {
 		b    []byte
 		w    NamedWriter
 		err  error
-		ok   bool
 	)
-	for {
-		select {
-		case b, ok = <-mlog.qerr:
-			if !ok {
-				// A closed channel is already empty, no need
-				// to flush it.
-				for name = range mlog.errs {
-					delete(mlog.errs, name)
-				}
-				mlog.flushq <- struct{}{}
-				return
-			}
-			if bytes.Equal(b, cmdFlush) {
-				// Empty data indicated flushing the channel.
-				flush(mlog.qerr, mlog.errs)
-				mlog.flushq <- struct{}{}
-				continue
-			}
+	for b = range mlog.qerr {
+		if bytes.Equal(b, cmdFlush) {
+			// Empty data indicated flushing the channel.
+			flush(mlog.qerr, mlog.errs)
+			mlog.flushq <- struct{}{}
+			continue
+		}
 
-			for name, w = range mlog.errs {
-				_, err = w.Write(b)
-				if err != nil {
-					log.Printf("MultiLogger: %s: %s", name, err)
-				}
+		for name, w = range mlog.errs {
+			_, err = w.Write(b)
+			if err != nil {
+				log.Printf("MultiLogger: %s: %s", name, err)
 			}
 		}
 	}
+
+	for name = range mlog.errs {
+		// A closed channel is already empty, no need to flush it.
+		delete(mlog.errs, name)
+	}
+	mlog.flushq <- struct{}{}
 }
 
 func (mlog *MultiLogger) processOutputQueue() {
@@ -273,35 +266,28 @@ func (mlog *MultiLogger) processOutputQueue() {
 		b    []byte
 		w    NamedWriter
 		err  error
-		ok   bool
 	)
 
-	for {
-		select {
-		case b, ok = <-mlog.qout:
-			if !ok {
-				// A closed channel is already empty, no need
-				// to flush it.
-				for name = range mlog.outs {
-					delete(mlog.outs, name)
-				}
-				mlog.flushq <- struct{}{}
-				return
-			}
-			if bytes.Equal(b, cmdFlush) {
-				flush(mlog.qout, mlog.outs)
-				mlog.flushq <- struct{}{}
-				continue
-			}
+	for b = range mlog.qout {
+		if bytes.Equal(b, cmdFlush) {
+			flush(mlog.qout, mlog.outs)
+			mlog.flushq <- struct{}{}
+			continue
+		}
 
-			for name, w = range mlog.outs {
-				_, err = w.Write(b)
-				if err != nil {
-					log.Printf("MultiLogger: %s: %s", name, err)
-				}
+		for name, w = range mlog.outs {
+			_, err = w.Write(b)
+			if err != nil {
+				log.Printf("MultiLogger: %s: %s", name, err)
 			}
 		}
 	}
+
+	for name = range mlog.outs {
+		// A closed channel is already empty, no need to flush it.
+		delete(mlog.outs, name)
+	}
+	mlog.flushq <- struct{}{}
 }
 
 func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{}) {
