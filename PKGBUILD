@@ -1,7 +1,7 @@
 # Maintainer: shulhan <ms@kilabit.info>
 
 pkgname=share-tools
-pkgver=0.39.0.r30.gcf3761a
+pkgver=0.39.0.r42.g1060faa
 pkgrel=1
 
 pkgdesc="Miscellaneous CLI tools: epoch, ini, xtrk"
@@ -18,6 +18,7 @@ provides=('share-tools')
 
 source=(
 	"$pkgname::git+https://github.com/shuLhan/share.git"
+	#"$pkgname::git+file:///home/ms/go/src/github.com/shuLhan/share"
 )
 md5sums=(
 	'SKIP'
@@ -39,8 +40,8 @@ build() {
 
 package() {
 	cd "${pkgname}"
-	install -Dm755 _bin/linux-amd64/epoch $pkgdir/usr/bin/epoch
-	install -Dm755 _bin/linux-amd64/ini   $pkgdir/usr/bin/ini
-	install -Dm755 _bin/linux-amd64/xtrk  $pkgdir/usr/bin/xtrk
-	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+	install -Dm755 _bin/epoch $pkgdir/usr/bin/epoch
+	install -Dm755 _bin/ini   $pkgdir/usr/bin/ini
+	install -Dm755 _bin/xtrk  $pkgdir/usr/bin/xtrk
+	install -Dm644 LICENSE    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
