@@ -10,189 +10,238 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
+	"hash"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
 
 func TestProtocol_generateWithTimestamp_sha1(t *testing.T) {
-	secretHex := "3132333435363738393031323334353637383930"
+	type testCase struct {
+		exp  string
+		time int64
+	}
 
-	secretb, err := hex.DecodeString(secretHex)
+	var (
+		secretHex = `3132333435363738393031323334353637383930`
+		proto     = New(CryptoHashSHA1, 8, DefTimeStep)
+
+		secretb []byte
+		err     error
+		mac     hash.Hash
+	)
+
+	secretb, err = hex.DecodeString(secretHex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	mac := hmac.New(sha1.New, secretb)
-	p := New(CryptoHashSHA1, 8, DefTimeStep)
+	mac = hmac.New(sha1.New, secretb)
 
-	cases := []struct {
-		time int64
-		exp  string
-	}{{
+	var cases = []testCase{{
 		time: 59,
-		exp:  "94287082",
+		exp:  `94287082`,
 	}, {
 		time: 1111111109,
-		exp:  "07081804",
+		exp:  `07081804`,
 	}, {
 		time: 1111111111,
-		exp:  "14050471",
+		exp:  `14050471`,
 	}, {
 		time: 1234567890,
-		exp:  "89005924",
+		exp:  `89005924`,
 	}, {
 		time: 2000000000,
-		exp:  "69279037",
+		exp:  `69279037`,
 	}, {
 		time: 20000000000,
-		exp:  "65353130",
+		exp:  `65353130`,
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		got string
+	)
+	for _, c = range cases {
 		mac.Reset()
-		got, err := p.generateWithTimestamp(mac, c.time)
+		got, err = proto.generateWithTimestamp(mac, c.time)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
-		test.Assert(t, "generateWithTimestamp", c.exp, got)
+		test.Assert(t, `generateWithTimestamp`, c.exp, got)
 	}
 }
 
 func TestProtocol_generateWithTimestamp_sha256(t *testing.T) {
-	secretHex := "3132333435363738393031323334353637383930" +
-		"313233343536373839303132"
+	type testCase struct {
+		exp  string
+		time int64
+	}
 
-	secretb, err := hex.DecodeString(secretHex)
+	var (
+		secretHex = `3132333435363738393031323334353637383930313233343536373839303132`
+		proto     = New(CryptoHashSHA256, 8, DefTimeStep)
+
+		mac     hash.Hash
+		secretb []byte
+		err     error
+	)
+
+	secretb, err = hex.DecodeString(secretHex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	mac := hmac.New(sha256.New, secretb)
-	p := New(CryptoHashSHA256, 8, DefTimeStep)
+	mac = hmac.New(sha256.New, secretb)
 
-	cases := []struct {
-		time int64
-		exp  string
-	}{{
+	var cases = []testCase{{
 		time: 59,
-		exp:  "46119246",
+		exp:  `46119246`,
 	}, {
 		time: 1111111109,
-		exp:  "68084774",
+		exp:  `68084774`,
 	}, {
 		time: 1111111111,
-		exp:  "67062674",
+		exp:  `67062674`,
 	}, {
 		time: 1234567890,
-		exp:  "91819424",
+		exp:  `91819424`,
 	}, {
 		time: 2000000000,
-		exp:  "90698825",
+		exp:  `90698825`,
 	}, {
 		time: 20000000000,
-		exp:  "77737706",
+		exp:  `77737706`,
 	}}
 
-	for _, c := range cases {
+	var (
+		c   testCase
+		got string
+	)
+	for _, c = range cases {
 		mac.Reset()
-		got, err := p.generateWithTimestamp(mac, c.time)
+		got, err = proto.generateWithTimestamp(mac, c.time)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
-		test.Assert(t, "generateWithTimestamp", c.exp, got)
+		test.Assert(t, `generateWithTimestamp`, c.exp, got)
 	}
 }
 
 func TestProtocol_generateWithTimestamp_sha512(t *testing.T) {
-	secretHex := "3132333435363738393031323334353637383930" +
-		"3132333435363738393031323334353637383930" +
-		"3132333435363738393031323334353637383930" +
-		"31323334"
+	type testCase struct {
+		exp  string
+		time int64
+	}
 
-	secretb, err := hex.DecodeString(secretHex)
+	var (
+		secretHex = `3132333435363738393031323334353637383930` +
+			`3132333435363738393031323334353637383930` +
+			`3132333435363738393031323334353637383930` +
+			`31323334`
+		proto = New(CryptoHashSHA512, 8, DefTimeStep)
+
+		mac     hash.Hash
+		secretb []byte
+		err     error
+	)
+
+	secretb, err = hex.DecodeString(secretHex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		time int64
-		exp  string
-	}{{
+	mac = hmac.New(sha512.New, secretb)
+
+	var cases = []testCase{{
 		time: 59,
-		exp:  "90693936",
+		exp:  `90693936`,
 	}, {
 		time: 1111111109,
-		exp:  "25091201",
+		exp:  `25091201`,
 	}, {
 		time: 1111111111,
-		exp:  "99943326",
+		exp:  `99943326`,
 	}, {
 		time: 1234567890,
-		exp:  "93441116",
+		exp:  `93441116`,
 	}, {
 		time: 2000000000,
-		exp:  "38618901",
+		exp:  `38618901`,
 	}, {
 		time: 20000000000,
-		exp:  "47863826",
+		exp:  `47863826`,
 	}}
 
-	p := New(CryptoHashSHA512, 8, DefTimeStep)
-	mac := hmac.New(sha512.New, secretb)
-
-	for _, c := range cases {
+	var (
+		c   testCase
+		got string
+	)
+	for _, c = range cases {
 		mac.Reset()
-		got, err := p.generateWithTimestamp(mac, c.time)
+		got, err = proto.generateWithTimestamp(mac, c.time)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
-		test.Assert(t, "generateWithTimestamp sha512", c.exp, got)
+		test.Assert(t, `generateWithTimestamp sha512`, c.exp, got)
 	}
 }
 
 func TestProtocol_verifyWithTimestamp(t *testing.T) {
-	secretHex := "3132333435363738393031323334353637383930"
+	type testCase struct {
+		desc  string
+		token string
+		ts    int64
+		steps int
+		exp   bool
+	}
 
-	secretb, err := hex.DecodeString(secretHex)
+	var (
+		secretHex = `3132333435363738393031323334353637383930`
+		proto     = New(CryptoHashSHA1, 8, DefTimeStep)
+
+		mac     hash.Hash
+		secretb []byte
+		err     error
+	)
+
+	secretb, err = hex.DecodeString(secretHex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	mac := hmac.New(sha1.New, secretb)
-	p := New(CryptoHashSHA1, 8, DefTimeStep)
+	mac = hmac.New(sha1.New, secretb)
 
-	cases := []struct {
-		desc  string
-		ts    int64
-		token string
-		steps int
-		exp   bool
-	}{{
-		desc:  "With OTP ~ timestamp",
+	var cases = []testCase{{
+		desc:  `With OTP ~ timestamp`,
 		ts:    2000000000,
-		token: "69279037",
+		token: `69279037`,
 		steps: 2,
 		exp:   true,
 	}, {
-		desc:  "With previous OTP timestamp",
+		desc:  `With previous OTP timestamp`,
 		ts:    2000000000 - DefTimeStep,
-		token: "40196847",
+		token: `40196847`,
 		steps: 2,
 		exp:   true,
 	}, {
-		desc:  "With timestamp + DefTimeStep",
+		desc:  `With timestamp + DefTimeStep`,
 		ts:    2000000000 + DefTimeStep,
-		token: "69279037",
+		token: `69279037`,
 		steps: 2,
 		exp:   true,
 	}}
 
-	for _, c := range cases {
-		got := p.verifyWithTimestamp(mac, c.token, c.steps, c.ts)
+	var (
+		c   testCase
+		got bool
+	)
+
+	for _, c = range cases {
+		got = proto.verifyWithTimestamp(mac, c.token, c.steps, c.ts)
 		test.Assert(t, c.desc, c.exp, got)
 	}
 }

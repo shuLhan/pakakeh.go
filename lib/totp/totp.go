@@ -89,21 +89,30 @@ func New(cryptoHash CryptoHash, codeDigits, timeStep int) Protocol {
 
 // Generate one time password using the secret and current timestamp.
 func (p *Protocol) Generate(secret []byte) (otp string, err error) {
-	mac := hmac.New(p.fnHash, secret)
-	now := time.Now().Unix()
+	var (
+		mac hash.Hash = hmac.New(p.fnHash, secret)
+		now int64     = time.Now().Unix()
+	)
+
 	return p.generateWithTimestamp(mac, now)
 }
 
 // GenerateN generate n number of passwords from (current time - N*timeStep)
 // until the curent time.
 func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error) {
-	mac := hmac.New(p.fnHash, secret)
-	ts := time.Now().Unix()
-	for x := 0; x < n; x++ {
-		t := ts - int64(x*p.timeStep)
-		otp, err := p.generateWithTimestamp(mac, t)
+	var (
+		mac hash.Hash = hmac.New(p.fnHash, secret)
+		ts  int64     = time.Now().Unix()
+
+		otp string
+		t   int64
+		x   int
+	)
+	for x = 0; x < n; x++ {
+		t = ts - int64(x*p.timeStep)
+		otp, err = p.generateWithTimestamp(mac, t)
 		if err != nil {
-			return nil, fmt.Errorf("GenerateN: %w", err)
+			return nil, fmt.Errorf(`GenerateN: %w`, err)
 		}
 		listOTP = append(listOTP, otp)
 	}
@@ -122,22 +131,30 @@ func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error)
 //
 // For security reason, the maximum stepsBack is limited to DefStepsBack.
 func (p *Protocol) Verify(secret []byte, token string, stepsBack int) bool {
-	mac := hmac.New(p.fnHash, secret)
-	now := time.Now().Unix()
+	var (
+		mac hash.Hash = hmac.New(p.fnHash, secret)
+		now int64     = time.Now().Unix()
+	)
+
 	if stepsBack <= 0 || stepsBack > DefStepsBack {
 		stepsBack = DefStepsBack
 	}
 	return p.verifyWithTimestamp(mac, token, stepsBack, now)
 }
 
-func (p *Protocol) verifyWithTimestamp(
-	mac hash.Hash, token string, steps int, ts int64,
-) bool {
-	for x := 0; x < steps; x++ {
-		t := ts - int64(x*p.timeStep)
-		otp, err := p.generateWithTimestamp(mac, t)
+func (p *Protocol) verifyWithTimestamp(mac hash.Hash, token string, steps int, ts int64) bool {
+	var (
+		otp string
+		err error
+		t   int64
+		x   int
+	)
+
+	for x = 0; x < steps; x++ {
+		t = ts - int64(x*p.timeStep)
+		otp, err = p.generateWithTimestamp(mac, t)
 		if err != nil {
-			log.Printf("Verify %d: %s", t, err.Error())
+			log.Printf(`Verify %d: %s`, t, err.Error())
 			continue
 		}
 		if otp == token {
@@ -147,33 +164,38 @@ func (p *Protocol) verifyWithTimestamp(
 	return false
 }
 
-func (p *Protocol) generateWithTimestamp(mac hash.Hash, time int64) (
-	otp string, err error,
-) {
-	steps := int64((float64(time) / float64(p.timeStep)))
+func (p *Protocol) generateWithTimestamp(mac hash.Hash, time int64) (otp string, err error) {
+	var (
+		steps = int64((float64(time) / float64(p.timeStep)))
+		msg   = fmt.Sprintf(`%016X`, steps)
 
-	msg := fmt.Sprintf("%016X", steps)
-	msgb, err := hex.DecodeString(msg)
+		fmtZeroPadding string
+		binary         int
+		vbytes         []byte
+		offset         byte
+	)
+
+	vbytes, err = hex.DecodeString(msg)
 	if err != nil {
-		return "", err
+		return ``, err
 	}
 
 	mac.Reset()
-	_, _ = mac.Write(msgb)
-	hash := mac.Sum(nil)
+	_, _ = mac.Write(vbytes)
+	vbytes = mac.Sum(nil)
 
-	offset := hash[len(hash)-1] & 0xf
+	offset = vbytes[len(vbytes)-1] & 0xf
 
-	var binary int = int(hash[offset]&0x7f) << 24
-	binary |= int(hash[offset+1]&0xff) << 16
-	binary |= int(hash[offset+2]&0xff) << 8
-	binary |= int(hash[offset+3] & 0xff)
+	binary = int(vbytes[offset]&0x7f) << 24
+	binary |= int(vbytes[offset+1]&0xff) << 16
+	binary |= int(vbytes[offset+2]&0xff) << 8
+	binary |= int(vbytes[offset+3] & 0xff)
 
-	otpb := binary % _digitsPower[p.codeDigits]
+	binary = binary % _digitsPower[p.codeDigits]
 
-	fmtZeroPadding := fmt.Sprintf("%%0%dd", p.codeDigits)
+	fmtZeroPadding = fmt.Sprintf(`%%0%dd`, p.codeDigits)
 
-	otp = fmt.Sprintf(fmtZeroPadding, otpb)
+	otp = fmt.Sprintf(fmtZeroPadding, binary)
 
 	return otp, nil
 }

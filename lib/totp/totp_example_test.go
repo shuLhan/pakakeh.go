@@ -11,21 +11,28 @@ import (
 )
 
 func ExampleProtocol_Verify() {
-	secretHex := "3132333435363738393031323334353637383930"
+	var (
+		secretHex = `3132333435363738393031323334353637383930`
+		proto     = New(CryptoHashSHA1, DefCodeDigits, DefTimeStep)
 
-	secret, err := hex.DecodeString(secretHex)
+		otp    string
+		err    error
+		secret []byte
+	)
+
+	secret, err = hex.DecodeString(secretHex)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	p := New(CryptoHashSHA1, DefCodeDigits, DefTimeStep)
-	otp, _ := p.Generate(secret)
+	otp, _ = proto.Generate(secret)
 
-	if p.Verify(secret, otp, 1) {
-		fmt.Printf("Generated token is valid.\n")
+	if proto.Verify(secret, otp, 1) {
+		fmt.Println(`Generated token is valid.`)
 	} else {
-		fmt.Printf("Generated token is not valid.\n")
+		fmt.Printf(`Generated token is not valid.`)
 	}
-	//Output:
-	//Generated token is valid.
+
+	// Output:
+	// Generated token is valid.
 }
