@@ -1,9 +1,18 @@
-# shuLhan/share internal documentation
-Shulhan <ms@kilabit.info>
+# share
 :toc:
+:sectanchors:
+:sectlinks:
+
+share is a collection of tools, public APIs, and libraries written and for
+working with Go programming language.
+
+This library is released every month, usually at the first week of month.
+
+==  Documentation
 
 Beside
-https://pkg.go.dev/github.com/shuLhan/share#section-documentation[the Go documentation],
+https://pkg.go.dev/github.com/shuLhan/share#section-documentation[the Go
+documentation^],
 that provides documentation for API in the `share` module, there are also
 additional documentations that we can not include inside source code due to
 their scope and limitation of Go doc formatting itself.
@@ -22,8 +31,12 @@ files, run
 $ make docs-serve
 ----
 
+=== link:README.html[README^]
 
-== Changelog
+Overview of the share module.
+
+
+=== Changelog
 
 This library is released every month, usually at the first week of month.
 
@@ -39,7 +52,7 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share v0.1.0 until v0.11.0.
 
 
-== Simplified RFCs
+=== Simplified RFCs
 
 * link:IMF.html[Internet Message Format (RFC 5322)]
 ** link:MIME_I_FORMAT.html[MIME Part One: Format of Internet Message Bodies (RFC 2045)]
@@ -60,5 +73,18 @@ This is changelog for share v0.1.0 until v0.11.0.
 ** link:ESMTP_AUTH.html[SMTP Service Extension for Authentication (RFC 4954)]
 
 * link:SPF.html[Sender Policy Framework version 1 (RFC 7208)]
+
+
+==  Development
+
+https://github.com/shuLhan/share[Repository^]::
+Link to the source code.
+
+https://github.com/shuLhan/share/issues[Issues^]::
+List of open issues.
+
+https://github.com/shuLhan/share/pulls[Patches^]::
+Link to submit the patches.
+
 
 That's it! Happy hacking!

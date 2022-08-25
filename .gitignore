@@ -5,6 +5,7 @@
 *.cprof
 *.csv
 *.dat
+*.html
 *.mprof
 *.oob
 *.perf

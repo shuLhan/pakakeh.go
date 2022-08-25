@@ -1,0 +1,252 @@
+= `import "github/shuLhan/share"`
+:toc:
+:sectanchors:
+:sectlinks:
+:godoc_base_url: https://pkg.go.dev/github.com/shuLhan/share
+:git_base_url: https://github.com/shuLhan/share
+
+{godoc_base_url}[Go documentation^].
+
+A collection of tools, public APIs, and libraries written and for working with
+Go programming language.
+
+This library is released every month, usually at the first week of month.
+
+
+== Public APIs
+
+{godoc_base_url}/api/telegram/bot[**Telegram bot**^]::
+Package bot implement the
+https://core.telegram.org/bots/api[Telegram Bot API^].
+
+
+== Command Line Interface
+
+{godoc_base_url}/cmd/epoch[**epoch**^]::
+Program epoch print the current date and time (Unix seconds, milliseconds,
+nanoseconds, local time, and UTC time) or the date and time based on the
+epoch on first parameter.
+
+{godoc_base_url}/cmd/gofmtcomment[**gofmtcomment**^]::
+Program to convert multi lines "/**/" comments into single line "//" format.
+
+{godoc_base_url}/cmd/ini[**ini**^]::
+Program ini provide a command line interface to get and set values in the
+https://godocs.io/github.com/shuLhan/share/lib/ini[INI file format].
+
+{godoc_base_url}/cmd/smtpcli[**smtpcli**^]::
+Command line interface to SMTP client protocol.
+
+{godoc_base_url}/cmd/xtrk[**xtrk**^]::
+Program xtrk is command line interface to uncompress and/or unarchive a
+file.
+Supported format: bzip2, gzip, tar, zip, tar.bz2, tar.gz.
+
+{godoc_base_url}/cmd/totp[**totp**^]::
+Program to generate Time-based One-time Password using secret key.
+
+
+== Libraries
+
+{godoc_base_url}/lib/ascii[**ascii**^]::
+A library for working with ASCII characters.
+
+{godoc_base_url}/lib/bytes[**bytes**]::
+A library for working with slice of bytes.
+
+{godoc_base_url}/lib/clise[**clise**^]::
+Package clise implements circular slice.
+
+{godoc_base_url}/lib/contact[**contact**^]::
+A library to import contact from Google, Microsoft, or Yahoo.
+
+{godoc_base_url}/lib/crypto[**crypto**^]::
+Package crypto provide a wrapper to simplify working with standard crypto
+package.
+
+{godoc_base_url}/lib/debug[**debug**^]::
+Package debug provide global debug variable, initialized through environment
+variable "DEBUG" or directly.
+
+{godoc_base_url}/lib/dns[**dns**^]::
+A library
+  for working with Domain Name System (DNS) protocol.
+
+{godoc_base_url}/lib/dsv[**dsv**^]::
+A library for working with delimited separated value (DSV).
+
+{godoc_base_url}/lib/email[**email**^]::
+A library for working with Internet Message Format, as defined in RFC 5322.
+
+{godoc_base_url}/lib/email/dkim[**email/dkim**^]::
+A library to parse and create DKIM-Signature header field value, as
+defined in RFC 6376.
+
+{godoc_base_url}/lib/email/maildir[**email/maildir**^]::
+A library to manage email using maildir format.
+
+{godoc_base_url}/lib/errors[**errors**]::
+Package errors provide an error type with Code, Message, and Name.
+
+{godoc_base_url}/lib/floats64[**floats64**^]::
+A library for working with slice of float64.
+
+{godoc_base_url}/lib/git[**git**^]::
+A wrapper for git command line interface.
+
+{godoc_base_url}/lib/http[**http**^]::
+Package http extends the standard http package with simplified routing handler
+and builtin memory file system.
+
+{godoc_base_url}/lib/hunspell[**hunspell**^]::
+A library to parse the Hunspell file format.
+
+{godoc_base_url}/lib/ini[**ini**^]::
+A library for reading and writing INI configuration as defined by Git
+configuration file syntax.
+
+{godoc_base_url}/lib/ints[**ints**^]::
+A library for working with slice of integer.
+
+{godoc_base_url}/lib/ints64[**ints64**^]::
+A library for working with slice of int64.
+
+{godoc_base_url}/lib/io[**io**^]::
+A library for simplify reading and watching files.
+
+{godoc_base_url}/lib/json[**json**^]::
+Package json extends the capabilities of standard json package.
+
+{godoc_base_url}/lib/math[**math**^]::
+Package math provide generic functions working with math.
+
+{godoc_base_url}/lib/math/big[**math/big**^]::
+Package big extends the capabilities of standard "math/big" package by
+adding custom global precision to Float, Int, and Rat, global rounding
+mode, and custom bits precision to Float.
+
+{godoc_base_url}/lib/memfs[**memfs**^]::
+A library for mapping file system into memory and to generate an embedded Go
+file from it.
+
+{godoc_base_url}/lib/mining[**mining**^]::
+A mini library for data mining.
+
+{godoc_base_url}/lib/mining/classifier/cart[**classifier/cart**^]::
+An implementation of the Classification and Regression Tree by Breiman, et al.
+
+{godoc_base_url}/lib/mining/classififer/crf[**classififer/crf**^]::
+An implementation of the Cascaded Random Forest (CRF) algorithm, by
+Baumann, Florian, et al.
+
+{godoc_base_url}/lib/mining/classifier/rf[**classifier/rf**]::
+An implementation of ensemble of classifiers using random forest algorithm by
+Breiman and Cutler.
+
+{godoc_base_url}/lib/gain/gini[**gain/gini**^]::
+A library to calculate Gini gain.
+
+{godoc_base_url}/lib/mining/knn[**knn**^]::
+An implementation of the K Nearest Neighbor (KNN) using Euclidian to
+compute the distance between samples.
+
+{godoc_base_url}/lib/mining/resampling/lnsmote[**resampling/lnsmote**^]::
+An implementation of the Local-Neighborhood algorithm from the paper of
+Maciejewski, Tomasz, and Jerzy Stefanowski.
+
+{godoc_base_url}/lib/mining/resampling/smote[**resampling/smote**^]::
+An implementation of the Synthetic Minority Oversampling TEchnique (SMOTE).
+
+{godoc_base_url}/lib/mining/tree/binary[**tree/binary**^]::
+An implementation of binary tree.
+
+{godoc_base_url}/lib/net[**net**^]::
+Constants and library for networking.
+
+{godoc_base_url}/lib/net/html[**html**^]::
+Package html extends the golang.org/x/net/html by providing simplified
+methods for working with Node.
+
+{godoc_base_url}/lib/numbers[**numbers**^]::
+A library for working with integer, float, slice of integer, and slice of
+floats.
+
+{godoc_base_url}/lib/os/exec[**os/exec**^]::
+Package exec wrap the standar package "os/exec" to simplify calling Run
+with stdout and stderr.
+
+{godoc_base_url}/lib/parser[**parser**^]::
+Package parser provide a common text parser, using delimiters.
+
+{godoc_base_url}/lib/paseto[**paseto**^]::
+A simple, ready to use, implementation of Platform-Agnostic SEcurity TOkens
+(PASETO).
+
+{godoc_base_url}/lib/reflect[**reflect**^]::
+Package reflect extends the standard reflect package.
+
+{godoc_base_url}/lib/runes[**runes**^]::
+A library for working with slice of rune.
+
+{godoc_base_url}/lib/smtp[**smtp**^]::
+A library for building SMTP server or client. This package is working in
+progress.
+
+{godoc_base_url}/lib/spf[**spf**^]::
+Package spf implement Sender Policy Framework (SPF) per RFC 7208.
+
+{godoc_base_url}/lib/sql[**sql**^]::
+Package sql extends the standard library "database/sql.DB" that provide common
+functionality across DBMS.
+
+{godoc_base_url}/lib/ssh[**ssh**^]::
+Package ssh provide a wrapper for golang.org/x/crypto/ssh and a parser for SSH
+client configuration specification ssh_config(5).
+
+{godoc_base_url}/lib/ssh/sftp[**ssh/sftp**^]::
+Package sftp implement native SSH File Transport Protocol v3.
+
+{godoc_base_url}/lib/strings[**strings**^]::
+A library for working with slice of string.
+
+{godoc_base_url}/lib/tabula[**tabula**^]::
+A library for working with rows, columns, or matrix (table), or in another
+terms working with data set.
+
+{godoc_base_url}/lib/test[**test**^]::
+A library for helping with testing.
+
+{godoc_base_url}/lib/text[**text**^]::
+A library for working with text.
+
+{godoc_base_url}/lib/text/diff[**text/diff**^]::
+Package diff implement text comparison.
+
+{godoc_base_url}/lib/time[**time**^]::
+A library for working with time.
+
+{godoc_base_url}/lib/totp[**totp**^]::
+Package totp implement Time-Based One-Time Password Algorithm based on RFC
+6238.
+
+{godoc_base_url}/lib/websocket[**websocket**^]::
+The WebSocket library for server and client. This websocket library has
+been tested with autobahn testsuite with 100% success rate.
+{git_base_url}/blob/master/lib/websocket/AUTOBAHN.adoc[the status reports^].
+
+{godoc_base_url}/lib/xmlrpc[**xmlrpc**^]::
+Package xmlrpc provide an implementation of
+http://xmlrpc.com/spec.md[XML-RPC specification].
+
+
+== Changelog
+
+Latest and full
+{git_base_url}/blob/master/CHANGELOG.adoc[CHANGELOG^].
+
+
+== Credits
+
+* https://github.com/crossbario/autobahn-testsuite[Autobahn testsuite^].
+
+That's it! Happy hacking!
