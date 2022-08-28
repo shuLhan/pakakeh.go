@@ -12,7 +12,7 @@ import (
 
 func TestEscape(t *testing.T) {
 	in := []byte("\"\\/\b\f\n\r\t")
-	exp := []byte(`\"\\\/\b\f\n\r\t`)
+	exp := []byte(`\"\\/\b\f\n\r\t`)
 	got := Escape(in)
 	test.Assert(t, "Escape", exp, got)
 }
@@ -27,7 +27,7 @@ func TestEscapeString(t *testing.T) {
 	}, {
 		in: `	this\ is
 		//\"☺"`,
-		exp: `\tthis\\ is\n\t\t\/\/\\\"☺\"`,
+		exp: `\tthis\\ is\n\t\t//\\\"☺\"`,
 	}, {
 		in: ` `, exp: `\u0002\b\f\u000E\u000F\u0010\u0014\u001E\u001F `,
 	}}

@@ -21,7 +21,6 @@ const (
 const (
 	bDoubleQuote = '"'
 	bRevSolidus  = '\\'
-	bSolidus     = '/'
 	bBackspace   = '\b'
 	bFormFeed    = '\f'
 	bLineFeed    = '\n'
@@ -30,7 +29,7 @@ const (
 )
 
 // Escape the following character: `"` (quotation mark),
-// `\` (reverse solidus), `/` (solidus), `\b` (backspace), `\f` (formfeed),
+// `\` (reverse solidus), `\b` (backspace), `\f` (formfeed),
 // `\n` (newline), `\r` (carriage return`), `\t` (horizontal tab), and control
 // character from 0 - 31.
 //
@@ -41,7 +40,7 @@ func Escape(in []byte) []byte {
 	var buf bytes.Buffer
 
 	for x := 0; x < len(in); x++ {
-		if in[x] == bDoubleQuote || in[x] == bRevSolidus || in[x] == bSolidus {
+		if in[x] == bDoubleQuote || in[x] == bRevSolidus {
 			buf.WriteByte(bRevSolidus)
 			buf.WriteByte(in[x])
 			continue
@@ -83,7 +82,7 @@ func Escape(in []byte) []byte {
 }
 
 // EscapeString escape the following character: `"` (quotation mark),
-// `\` (reverse solidus), `/` (solidus), `\b` (backspace), `\f` (formfeed),
+// `\` (reverse solidus), `\b` (backspace), `\f` (formfeed),
 // `\n` (newline), `\r` (carriage return`), `\t` (horizontal tab), and control
 // character from 0 - 31.
 //
@@ -220,7 +219,7 @@ func Unescape(in []byte, strict bool) ([]byte, error) {
 				esc = false
 				continue
 			}
-			if in[x] == bDoubleQuote || in[x] == bRevSolidus || in[x] == bSolidus {
+			if in[x] == bDoubleQuote || in[x] == bRevSolidus {
 				buf.WriteByte(in[x])
 				esc = false
 				continue
