@@ -1,0 +1,695 @@
+>>> before
+{{Pharaoh Infobox | 
+    Name= Psusennes II | 
+    Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> |
+    Image= |
+    NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>|
+    Nomen=''Hor-Pasebakhaenniut''|
+    PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>|
+Prenomen=''Titkheperure/Tyetkheperre''|
+    Golden= |
+    Nebty= |
+    Horus= |
+    GoldenHiero=  |  
+    NebtyHiero=  |
+    HorusHiero= |
+    Reign=967 &ndash; 943 BC | 
+    Predecessor= [[Siamun]] |
+    Successor= [[Shoshenq I]] |
+    Spouse= |
+    Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] |
+    Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] |
+    Father= |
+    Mother= |
+    Died= [[943 BC]] |
+    Burial= Unknown |
+    Monuments= |
+}}
+
+Titkheperure or Tyetkheperre '''Psusennes II''' <nowiki>[</nowiki>[[Greek language|Greek]] Ψουσέννης<nowiki>]</nowiki> or '''Hor-Pasebakhaenniut II''' <nowiki>[</nowiki>[[Egyptian language|Egyptian]] ''ḥr-p3-sb3-ḫ&#705;ỉ-<n>-nỉwt''<nowiki>]</nowiki>, was the last [[Pharaoh|king]] of the [[Twenty-first dynasty of Egypt]]. His royal name means "Image of the transformation of Re" in Egyptian.<ref>Peter Clayton, Chronology of the Pharaohs, Thames & Hudson Ltd, 1994. p.178</ref> Psusennes II is often considered the same person as the High-Priest of Amun known as [[Psusennes III]].<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.221 Karl Jansen-Winkeln in his treatment for the 'Dynasty 21' chapter of this book writes that "the evidence weighs heavily in favour of his (ie. Psusennes III) being one and the same man, who was first HP and then successor to King Siamun in Tanis, without giving up his Theban office."</ref> The Egyptologist Karl Jansen-Winkeln notes that an important graffito from the Temple of Abydos contains the complete titles of a king ''Tyetkheperre Setepenre Pasebakhaenniut Meryamun'' "who is simultaneously called the HPA (ie. High Priest of Amun) and supreme military commander."<ref>Jansen-Winkeln in Hornung, Krauss & Warburton, p.222</ref> This suggests that Psusennes was both king at Tanis and the High Priest in Thebes at the same time meaning he did not resign his office as High Priest of Amun during his reign.<ref>Jansen-Winkeln in Hornung, Krauss & Warburton, p.223</ref> The few contemporary attestations from his reign include the aforementioned [[Graffito (archaeology)|graffito]] in [[Seti I]]'s [[Abydos, Egypt|Abydos]] temple, an [[ostracon]] from [[Umm el-Qa'ab]], an affiliation at [[Karnak]] and his presumed burial &ndash; which consists of a gilded coffin with a royal [[Uraeus#Golden uraeus of Senusret II|uraeus]] and a [[Mummy]], found in an antechamber of [[Psusennes I]]'s tomb at [[Tanis, Egypt|Tanis]]. He was a [[High Priests of Amun at Thebes|High Priest of Amun at Thebes]] and the son of [[Pinedjem II]] and Istemkheb. His daughter [[Maatkare (daughter of Psusennes II)|Maatkare]] was the [[Great Royal Wife]] of [[Osorkon I]].
+
+Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref>Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, "Psusennes II and Shoshenq I," JEA 79(1993), pp.267-268</ref>  
+
+Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref>Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records--in the following line--the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref>Payraudeau, BIFAO 108, p.294</ref>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. 
+
+==Reign Length==
+Unlike his immediate predecessor and successor &ndash; [[Siamun]] and [[Shoshenq I]] respectively&ndash; Psusennes II is generally less well attested in contemporary historical records even though various versions of [[Manetho]]'s [[Epitome]] credits him with either a 14 or a 35 year reign, (generally amended to 15 years by most scholars including the British Egyptologist [[Kenneth Kitchen]]).<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (c.1100-650 BC), Aris & Phillips Ltd., 1996. p.531</ref> However, the German scholar Rolf Krauss has recently argued that Psusennes II's reign was 24 years rather than Manetho's original figure of 14 years.<ref>Rolf Krauss, Das wrŝ-Datum aus Jahr 5 von Shoshenq [I], Discussions in Egyptology 62 (2005), pp.43-48</ref> This is based on personal information recorded in the Large Dakhla stela which dates to Year 5 of Shoshenq I; the stela preserves a reference to a land-register from ''Year 19 of a 'Pharaoh Psusennes'.'' 
+
+In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref>Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a "Pharaoh Psusennes" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some "80 years" ago during the reign of Psusennes I.<ref>Kitchen, p.290</ref> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14-15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I--a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead--Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. 
+
+The term "mother" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela--a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  
+
+The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name--ie: "'''Pharaoh Shoshenq'''"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was "Pharaoh" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the "High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''."<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref>Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref>Krauss, DE 62, pp.43-48</ref> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II.
+
+==Timeline==
+The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton--accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years--as preserved in surviving copies of Manetho's Epitome--to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref>Kitchen, p.423</ref> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor--demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years.
+
+Psusennes II's royal name has been found associated with his successor, [[Shoshenq I]] in a [[Graffito (archaeology)|graffito]] from tomb [[TT18]], and in an [[ostracon]] from [[Umm el-Qa'ab]].<ref>Aidan Dodson, "Psusennes II and Shoshenq I," [[Journal of Egyptian Archaeology|JEA]] 79(1993), pp.267-268</ref>
+
+==References==
+{{reflist}}
+
+* Aidan Dodson, RdE 38(1987), pp.50-51.
+* Jean Yoyotte, "A propos de Psousennes II," BSSFT 1(1988).
+
+[[Category:Pharaohs of the Twenty-first dynasty of Egypt]]
+
+[[cs:Pasbachaenniut II.]]
+[[de:Psusennes II.]]
+[[es:Psusenes II]]
+[[eu:Psusenes II.a]]
+[[fr:Psousennès II]]
+[[it:Titkheperura-setepenra]]
+[[nl:Psusennes II]]
+[[no:Psusennes II]]
+[[pl:Psusennes II]]
+[[ru:Псусеннес II]]
+[[sh:Psusennes II]]
+
+>>> after
+{{Infobox pharaoh
+| Name= Psusennes II 
+| Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> 
+| Image= 
+| NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>
+| Nomen=''Hor-Pasebakhaenniut''
+| PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>
+|Prenomen=''Titkheperure/Tyetkheperre''
+| Golden= 
+| Nebty= 
+| Horus= 
+| GoldenHiero=  
+| NebtyHiero=  
+| HorusHiero= 
+| Reign=967 &ndash; 943 BC 
+| Predecessor= [[Siamun]] 
+| Successor= [[Shoshenq I]] 
+| Spouse= 
+| Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] 
+| Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] 
+| Father= 
+| Mother= 
+| Died= [[943 BC]] 
+| Burial= Unknown 
+| Monuments=
+}}
+
+Titkheperure or Tyetkheperre '''Psusennes II''' <nowiki>[</nowiki>[[Greek language|Greek]] Ψουσέννης<nowiki>]</nowiki> or '''Hor-Pasebakhaenniut II''' <nowiki>[</nowiki>[[Egyptian language|Egyptian]] ''ḥr-p3-sb3-ḫ&#705;ỉ-<n>-nỉwt''<nowiki>]</nowiki>, was the last [[Pharaoh|king]] of the [[Twenty-first dynasty of Egypt]]. His royal name means "Image of the transformation of Re" in Egyptian.<ref>Peter Clayton, Chronology of the Pharaohs, Thames & Hudson Ltd, 1994. p.178</ref> Psusennes II is often considered the same person as the High-Priest of Amun known as [[Psusennes III]].<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.221 Karl Jansen-Winkeln in his treatment for the 'Dynasty 21' chapter of this book writes that "the evidence weighs heavily in favour of his (ie. Psusennes III) being one and the same man, who was first HP and then successor to King Siamun in Tanis, without giving up his Theban office."</ref> The Egyptologist Karl Jansen-Winkeln notes that an important graffito from the Temple of Abydos contains the complete titles of a king ''Tyetkheperre Setepenre Pasebakhaenniut Meryamun'' "who is simultaneously called the HPA (ie. High Priest of Amun) and supreme military commander."<ref>Jansen-Winkeln in Hornung, Krauss & Warburton, p.222</ref> This suggests that Psusennes was both king at Tanis and the High Priest in Thebes at the same time meaning he did not resign his office as High Priest of Amun during his reign.<ref>Jansen-Winkeln in Hornung, Krauss & Warburton, p.223</ref> The few contemporary attestations from his reign include the aforementioned [[Graffito (archaeology)|graffito]] in [[Seti I]]'s [[Abydos, Egypt|Abydos]] temple, an [[ostracon]] from [[Umm el-Qa'ab]], an affiliation at [[Karnak]] and his presumed burial &ndash; which consists of a gilded coffin with a royal [[Uraeus#Golden uraeus of Senusret II|uraeus]] and a [[Mummy]], found in an antechamber of [[Psusennes I]]'s tomb at [[Tanis, Egypt|Tanis]]. He was a [[High Priests of Amun at Thebes|High Priest of Amun at Thebes]] and the son of [[Pinedjem II]] and Istemkheb. His daughter [[Maatkare (daughter of Psusennes II)|Maatkare]] was the [[Great Royal Wife]] of [[Osorkon I]].
+
+Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref name="Kitchen, p.423">Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, "Psusennes II and Shoshenq I," JEA 79(1993), pp.267-268</ref>  
+
+Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref name="Payraudeau, BIFAO 108, p.294">Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records—in the following line—the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref name="Payraudeau, BIFAO 108, p.294"/>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. 
+
+==Reign Length==
+Unlike his immediate predecessor and successor &ndash; [[Siamun]] and [[Shoshenq I]] respectively&ndash; Psusennes II is generally less well attested in contemporary historical records even though various versions of [[Manetho]]'s [[Epitome]] credits him with either a 14 or a 35 year reign, (generally amended to 15 years by most scholars including the British Egyptologist [[Kenneth Kitchen]]).<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (c.1100-650 BC), Aris & Phillips Ltd., 1996. p.531</ref> However, the German scholar Rolf Krauss has recently argued that Psusennes II's reign was 24 years rather than Manetho's original figure of 14 years.<ref>Rolf Krauss, Das wrŝ-Datum aus Jahr 5 von Shoshenq [I], Discussions in Egyptology 62 (2005), pp.43-48</ref> This is based on personal information recorded in the Large Dakhla stela which dates to Year 5 of Shoshenq I; the stela preserves a reference to a land-register from ''Year 19 of a 'Pharaoh Psusennes'.'' 
+
+In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref name="Kitchen, p.290">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a "Pharaoh Psusennes" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some "80 years" ago during the reign of Psusennes I.<ref name="Kitchen, p.290"/> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14–15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I—a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead—Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. 
+
+The term "mother" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela—a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  
+
+The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name—ie: "'''Pharaoh Shoshenq'''"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was "Pharaoh" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the "High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''."<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref name="Krauss, DE 62, pp.43-48">Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref name="Krauss, DE 62, pp.43-48"/> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II.
+
+==Timeline==
+The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton—accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years—as preserved in surviving copies of Manetho's Epitome—to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref name="Kitchen, p.423"/> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor—demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years.
+
+Psusennes II's royal name has been found associated with his successor, [[Shoshenq I]] in a [[Graffito (archaeology)|graffito]] from tomb [[TT18]], and in an [[ostracon]] from [[Umm el-Qa'ab]].<ref>Aidan Dodson, "Psusennes II and Shoshenq I," [[Journal of Egyptian Archaeology|JEA]] 79(1993), pp.267-268</ref>
+
+==References==
+{{reflist}}
+
+* Aidan Dodson, RdE 38(1987), pp.&nbsp;50-51.
+* Jean Yoyotte, "A propos de Psousennes II," BSSFT 1(1988).
+
+{{DEFAULTSORT:Psusennes Ii}}
+[[Category:Pharaohs of the Twenty-first dynasty of Egypt]]
+
+[[cs:Pasbachaenniut II.]]
+[[de:Psusennes II.]]
+[[es:Psusenes II]]
+[[eu:Psusenes II.a]]
+[[fr:Psousennès II]]
+[[it:Titkheperura-setepenra]]
+[[nl:Psusennes II]]
+[[no:Psusennes II]]
+[[pl:Psusennes II]]
+[[ru:Псусеннес II]]
+[[sh:Psusennes II]]
+
+<<< diffs_LevelLines
+++++
+53 + "{{DEFAULTSORT:Psusennes Ii}}"
+--++
+0 - "{{Pharaoh Infobox | "
+0 + "{{Infobox pharaoh"
+1 - "    Name= Psusennes II | "
+1 + "| Name= Psusennes II "
+2 - "    Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> |"
+2 + "| Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> "
+3 - "    Image= |"
+3 + "| Image= "
+4 - "    NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>|"
+4 + "| NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>"
+5 - "    Nomen=''Hor-Pasebakhaenniut''|"
+5 + "| Nomen=''Hor-Pasebakhaenniut''"
+6 - "    PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>|"
+6 + "| PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>"
+7 - "Prenomen=''Titkheperure/Tyetkheperre''|"
+7 + "|Prenomen=''Titkheperure/Tyetkheperre''"
+8 - "    Golden= |"
+8 + "| Golden= "
+9 - "    Nebty= |"
+9 + "| Nebty= "
+10 - "    Horus= |"
+10 + "| Horus= "
+11 - "    GoldenHiero=  |  "
+11 + "| GoldenHiero=  "
+12 - "    NebtyHiero=  |"
+12 + "| NebtyHiero=  "
+13 - "    HorusHiero= |"
+13 + "| HorusHiero= "
+14 - "    Reign=967 &ndash; 943 BC | "
+14 + "| Reign=967 &ndash; 943 BC "
+15 - "    Predecessor= [[Siamun]] |"
+15 + "| Predecessor= [[Siamun]] "
+16 - "    Successor= [[Shoshenq I]] |"
+16 + "| Successor= [[Shoshenq I]] "
+17 - "    Spouse= |"
+17 + "| Spouse= "
+18 - "    Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] |"
+18 + "| Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] "
+19 - "    Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] |"
+19 + "| Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] "
+20 - "    Father= |"
+20 + "| Father= "
+21 - "    Mother= |"
+21 + "| Mother= "
+22 - "    Died= [[943 BC]] |"
+22 + "| Died= [[943 BC]] "
+23 - "    Burial= Unknown |"
+23 + "| Burial= Unknown "
+24 - "    Monuments= |"
+24 + "| Monuments="
+29 - "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref>Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+29 + "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref name=\"Kitchen, p.423\">Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+31 - "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref>Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records--in the following line--the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref>Payraudeau, BIFAO 108, p.294</ref>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+31 + "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref name=\"Payraudeau, BIFAO 108, p.294\">Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records—in the following line—the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref name=\"Payraudeau, BIFAO 108, p.294\"/>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+36 - "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref>Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref>Kitchen, p.290</ref> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14-15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I--a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead--Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+36 + "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref name=\"Kitchen, p.290\">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref name=\"Kitchen, p.290\"/> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14–15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I—a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead—Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+38 - "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela--a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+38 + "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela—a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+40 - "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name--ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref>Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref>Krauss, DE 62, pp.43-48</ref> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+40 + "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name—ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref name=\"Krauss, DE 62, pp.43-48\">Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref name=\"Krauss, DE 62, pp.43-48\"/> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+43 - "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton--accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years--as preserved in surviving copies of Manetho's Epitome--to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref>Kitchen, p.423</ref> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor--demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+43 + "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton—accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years—as preserved in surviving copies of Manetho's Epitome—to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref name=\"Kitchen, p.423\"/> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor—demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+50 - "* Aidan Dodson, RdE 38(1987), pp.50-51."
+50 + "* Aidan Dodson, RdE 38(1987), pp.&nbsp;50-51."
+
+
+<<< diffs_LevelLines_reverse
+----
+53 - "{{DEFAULTSORT:Psusennes Ii}}"
+--++
+0 - "{{Infobox pharaoh"
+0 + "{{Pharaoh Infobox | "
+1 - "| Name= Psusennes II "
+1 + "    Name= Psusennes II | "
+2 - "| Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> "
+2 + "    Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> |"
+3 - "| Image= "
+3 + "    Image= |"
+4 - "| NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>"
+4 + "    NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>|"
+5 - "| Nomen=''Hor-Pasebakhaenniut''"
+5 + "    Nomen=''Hor-Pasebakhaenniut''|"
+6 - "| PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>"
+6 + "    PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>|"
+7 - "|Prenomen=''Titkheperure/Tyetkheperre''"
+7 + "Prenomen=''Titkheperure/Tyetkheperre''|"
+8 - "| Golden= "
+8 + "    Golden= |"
+9 - "| Nebty= "
+9 + "    Nebty= |"
+10 - "| Horus= "
+10 + "    Horus= |"
+11 - "| GoldenHiero=  "
+11 + "    GoldenHiero=  |  "
+12 - "| NebtyHiero=  "
+12 + "    NebtyHiero=  |"
+13 - "| HorusHiero= "
+13 + "    HorusHiero= |"
+14 - "| Reign=967 &ndash; 943 BC "
+14 + "    Reign=967 &ndash; 943 BC | "
+15 - "| Predecessor= [[Siamun]] "
+15 + "    Predecessor= [[Siamun]] |"
+16 - "| Successor= [[Shoshenq I]] "
+16 + "    Successor= [[Shoshenq I]] |"
+17 - "| Spouse= "
+17 + "    Spouse= |"
+18 - "| Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] "
+18 + "    Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] |"
+19 - "| Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] "
+19 + "    Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] |"
+20 - "| Father= "
+20 + "    Father= |"
+21 - "| Mother= "
+21 + "    Mother= |"
+22 - "| Died= [[943 BC]] "
+22 + "    Died= [[943 BC]] |"
+23 - "| Burial= Unknown "
+23 + "    Burial= Unknown |"
+24 - "| Monuments="
+24 + "    Monuments= |"
+29 - "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref name=\"Kitchen, p.423\">Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+29 + "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref>Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+31 - "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref name=\"Payraudeau, BIFAO 108, p.294\">Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records—in the following line—the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref name=\"Payraudeau, BIFAO 108, p.294\"/>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+31 + "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref>Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records--in the following line--the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref>Payraudeau, BIFAO 108, p.294</ref>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+36 - "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref name=\"Kitchen, p.290\">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref name=\"Kitchen, p.290\"/> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14–15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I—a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead—Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+36 + "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref>Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref>Kitchen, p.290</ref> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14-15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I--a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead--Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+38 - "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela—a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+38 + "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela--a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+40 - "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name—ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref name=\"Krauss, DE 62, pp.43-48\">Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref name=\"Krauss, DE 62, pp.43-48\"/> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+40 + "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name--ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref>Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref>Krauss, DE 62, pp.43-48</ref> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+43 - "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton—accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years—as preserved in surviving copies of Manetho's Epitome—to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref name=\"Kitchen, p.423\"/> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor—demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+43 + "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton--accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years--as preserved in surviving copies of Manetho's Epitome--to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref>Kitchen, p.423</ref> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor--demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+50 - "* Aidan Dodson, RdE 38(1987), pp.&nbsp;50-51."
+50 + "* Aidan Dodson, RdE 38(1987), pp.50-51."
+
+
+<<< diffs_LevelWords
+++++
+53 + "{{DEFAULTSORT:Psusennes Ii}}"
+--++
+0 - "{{Pharaoh Infobox | "
+0 + "{{Infobox pharaoh"
+^2 - "Pharaoh "
+^10 - "| "
+^10 + "pharaoh"
+1 - "    Name= Psusennes II | "
+1 + "| Name= Psusennes II "
+^0 - "   "
+^3 - " "
+^21 - " |"
+^0 + "| "
+2 - "    Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> |"
+2 + "| Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> "
+^0 - "   "
+^3 - " "
+^119 - "|"
+^0 + "| "
+3 - "    Image= |"
+3 + "| Image= "
+^0 - "   "
+^3 - " "
+^10 - "|"
+^0 + "| "
+4 - "    NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>|"
+4 + "| NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>"
+^0 - "   "
+^3 - " "
+^63 - "|"
+^0 + "| "
+5 - "    Nomen=''Hor-Pasebakhaenniut''|"
+5 + "| Nomen=''Hor-Pasebakhaenniut''"
+^0 - "   "
+^3 - " "
+^32 - "|"
+^0 + "| "
+6 - "    PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>|"
+6 + "| PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>"
+^0 - "   "
+^3 - " "
+^55 - "|"
+^0 + "| "
+7 - "Prenomen=''Titkheperure/Tyetkheperre''|"
+7 + "|Prenomen=''Titkheperure/Tyetkheperre''"
+^38 - "|"
+^0 + "|"
+8 - "    Golden= |"
+8 + "| Golden= "
+^0 - "   "
+^3 - " "
+^11 - "|"
+^0 + "| "
+9 - "    Nebty= |"
+9 + "| Nebty= "
+^0 - "   "
+^3 - " "
+^10 - "|"
+^0 + "| "
+10 - "    Horus= |"
+10 + "| Horus= "
+^0 - "   "
+^3 - " "
+^10 - "|"
+^0 + "| "
+11 - "    GoldenHiero=  |  "
+11 + "| GoldenHiero=  "
+^0 - "   "
+^3 - " "
+^15 - "  |"
+^0 + "| "
+12 - "    NebtyHiero=  |"
+12 + "| NebtyHiero=  "
+^0 - "   "
+^3 - " "
+^16 - "|"
+^0 + "| "
+13 - "    HorusHiero= |"
+13 + "| HorusHiero= "
+^0 - "   "
+^3 - " "
+^15 - "|"
+^0 + "| "
+14 - "    Reign=967 &ndash; 943 BC | "
+14 + "| Reign=967 &ndash; 943 BC "
+^0 - "   "
+^3 - " "
+^27 - " |"
+^0 + "| "
+15 - "    Predecessor= [[Siamun]] |"
+15 + "| Predecessor= [[Siamun]] "
+^0 - "   "
+^3 - " "
+^27 - "|"
+^0 + "| "
+16 - "    Successor= [[Shoshenq I]] |"
+16 + "| Successor= [[Shoshenq I]] "
+^0 - "   "
+^3 - " "
+^29 - "|"
+^0 + "| "
+17 - "    Spouse= |"
+17 + "| Spouse= "
+^0 - "   "
+^3 - " "
+^11 - "|"
+^0 + "| "
+18 - "    Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] |"
+18 + "| Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] "
+^0 - "   "
+^3 - " "
+^62 - "|"
+^0 + "| "
+19 - "    Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] |"
+19 + "| Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] "
+^0 - "   "
+^60 - "|"
+^0 + "|"
+20 - "    Father= |"
+20 + "| Father= "
+^0 - "   "
+^3 - " "
+^11 - "|"
+^0 + "| "
+21 - "    Mother= |"
+21 + "| Mother= "
+^0 - "   "
+^3 - " "
+^11 - "|"
+^0 + "| "
+22 - "    Died= [[943 BC]] |"
+22 + "| Died= [[943 BC]] "
+^0 - "   "
+^3 - " "
+^20 - "|"
+^0 + "| "
+23 - "    Burial= Unknown |"
+23 + "| Burial= Unknown "
+^0 - "   "
+^3 - " "
+^19 - "|"
+^0 + "| "
+24 - "    Monuments= |"
+24 + "| Monuments="
+^0 - "   "
+^3 - " "
+^13 - " |"
+^0 + "| "
+29 - "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref>Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+29 + "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref name=\"Kitchen, p.423\">Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+^584 + " name=\"Kitchen, p.423\""
+31 - "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref>Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records--in the following line--the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref>Payraudeau, BIFAO 108, p.294</ref>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+31 + "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref name=\"Payraudeau, BIFAO 108, p.294\">Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records—in the following line—the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref name=\"Payraudeau, BIFAO 108, p.294\"/>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+^895 - "--"
+^918 - "--"
+^1124 - ">"
+^1153 - "</ref"
+^672 + " name=\"Payraudeau, BIFAO 108, p.294\""
+^895 + "—"
+^919 + "—"
+^1126 + " name=\""
+^1161 + "\"/"
+36 - "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref>Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref>Kitchen, p.290</ref> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14-15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I--a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead--Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+36 + "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref name=\"Kitchen, p.290\">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref name=\"Kitchen, p.290\"/> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14–15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I—a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead—Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+^947 - ">"
+^962 - "</ref"
+^1260 - "-"
+^1610 - "--"
+^1849 - "--"
+^388 + " name=\"Kitchen, p.290\""
+^947 + " name=\""
+^968 + "\"/"
+^1263 + "–"
+^1615 + "—"
+^1855 + "—"
+38 - "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela--a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+38 + "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela—a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+^343 - "--"
+^343 + "—"
+40 - "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name--ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref>Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref>Krauss, DE 62, pp.43-48</ref> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+40 + "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name—ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref name=\"Krauss, DE 62, pp.43-48\">Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref name=\"Krauss, DE 62, pp.43-48\"/> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+^322 - "--"
+^2379 - ">"
+^2403 - "</ref"
+^322 + "—"
+^2081 + " name=\"Krauss, DE 62, pp.43-48\""
+^2380 + " name=\""
+^2410 + "\"/"
+43 - "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton--accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years--as preserved in surviving copies of Manetho's Epitome--to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref>Kitchen, p.423</ref> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor--demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+43 + "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton—accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years—as preserved in surviving copies of Manetho's Epitome—to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref name=\"Kitchen, p.423\"/> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor—demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+^134 - "--"
+^561 - "--"
+^616 - "--"
+^701 - ">"
+^716 - "</ref"
+^1030 - "--"
+^134 + "—"
+^562 + "—"
+^618 + "—"
+^704 + " name=\""
+^725 + "\"/"
+^1036 + "—"
+50 - "* Aidan Dodson, RdE 38(1987), pp.50-51."
+50 + "* Aidan Dodson, RdE 38(1987), pp.&nbsp;50-51."
+^33 + "&nbsp;"
+
+
+<<< diffs_LevelWords_reverse
+----
+53 - "{{DEFAULTSORT:Psusennes Ii}}"
+--++
+0 - "{{Infobox pharaoh"
+0 + "{{Pharaoh Infobox | "
+^10 - "pharaoh"
+^2 + "Pharaoh "
+^10 + "| "
+1 - "| Name= Psusennes II "
+1 + "    Name= Psusennes II | "
+^0 - "| "
+^0 + "   "
+^3 + " "
+^20 + " |"
+2 - "| Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> "
+2 + "    Alt= Pasebakhaenniut II<ref>[http://www.digitalegypt.ucl.ac.uk/chronology/psusennesii.html Pasebakhenniut II]</ref> |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^118 + "|"
+3 - "| Image= "
+3 + "    Image= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^9 + "|"
+4 - "| NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>"
+4 + "    NomenHiero= <hiero>M17-Y5:N35:U7-G40-N14*N28-N35:O49</hiero>|"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^62 + "|"
+5 - "| Nomen=''Hor-Pasebakhaenniut''"
+5 + "    Nomen=''Hor-Pasebakhaenniut''|"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^31 + "|"
+6 - "| PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>"
+6 + "    PrenomenHiero= <hiero>ra:D17-xpr-Z3-stp:n-ra</hiero>|"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^54 + "|"
+7 - "|Prenomen=''Titkheperure/Tyetkheperre''"
+7 + "Prenomen=''Titkheperure/Tyetkheperre''|"
+^0 - "|"
+^38 + "|"
+8 - "| Golden= "
+8 + "    Golden= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^10 + "|"
+9 - "| Nebty= "
+9 + "    Nebty= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^9 + "|"
+10 - "| Horus= "
+10 + "    Horus= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^9 + "|"
+11 - "| GoldenHiero=  "
+11 + "    GoldenHiero=  |  "
+^0 - "| "
+^0 + "   "
+^3 + " "
+^14 + "  |"
+12 - "| NebtyHiero=  "
+12 + "    NebtyHiero=  |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^15 + "|"
+13 - "| HorusHiero= "
+13 + "    HorusHiero= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^14 + "|"
+14 - "| Reign=967 &ndash; 943 BC "
+14 + "    Reign=967 &ndash; 943 BC | "
+^0 - "| "
+^0 + "   "
+^3 + " "
+^26 + " |"
+15 - "| Predecessor= [[Siamun]] "
+15 + "    Predecessor= [[Siamun]] |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^26 + "|"
+16 - "| Successor= [[Shoshenq I]] "
+16 + "    Successor= [[Shoshenq I]] |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^28 + "|"
+17 - "| Spouse= "
+17 + "    Spouse= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^10 + "|"
+18 - "| Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] "
+18 + "    Children= [[Maatkare (daughter of Psusennes II)|Maatkare]] |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^61 + "|"
+19 - "| Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] "
+19 + "    Dynasty= [[Twenty-first dynasty of Egypt|21st Dynasty]] |"
+^0 - "|"
+^0 + "   "
+^58 + "|"
+20 - "| Father= "
+20 + "    Father= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^10 + "|"
+21 - "| Mother= "
+21 + "    Mother= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^10 + "|"
+22 - "| Died= [[943 BC]] "
+22 + "    Died= [[943 BC]] |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^19 + "|"
+23 - "| Burial= Unknown "
+23 + "    Burial= Unknown |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^18 + "|"
+24 - "| Monuments="
+24 + "    Monuments= |"
+^0 - "| "
+^0 + "   "
+^3 + " "
+^12 + " |"
+29 - "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref name=\"Kitchen, p.423\">Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+29 + "Items which can be added to this list include a Year 5 Mummy linen that was written with the High Priest Psusennes III's name. It is generally assumed that a '''Year 13 III Peret 10+X''' date in fragment 3B, line 6 of the Karnak Priestly Annals belongs to his reign.<ref>K.A. Kitchen, The Third Intermediate Period in Egypt (1100–650 BC) 3rd ed., Warminster: Aris & Phillips Ltd, p.423</ref> Unfortunately, however, the king's name is not stated and the only thing which is certain is that the fragment must be dated after Siamun's reign whose Year 17 is mentioned in lines 3-5.<ref>Kitchen, p.423</ref> Hence, it belongs to either Psusennes II or possibly Shoshenq I's reign.  More impressive are the number of objects which associate Psusennes II together with his successor, Shoshenq I, such as an old statue of [[Thutmose III]] which contains two parallel columns of texts &ndash; one referring to Psusennes II and the other to [[Shoshenq I]] &ndash; a recently unearthed block from [[Basta]] which preserves the nomen of Shoshenq I together with the prenomen of Psusennes II, and a now lost graffito from [[TT18|Theban Tomb 18]].<ref>Aidan Dodson, \"Psusennes II and Shoshenq I,\" JEA 79(1993), pp.267-268</ref>  "
+^584 - " name=\"Kitchen, p.423\""
+31 - "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref name=\"Payraudeau, BIFAO 108, p.294\">Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records—in the following line—the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref name=\"Payraudeau, BIFAO 108, p.294\"/>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+31 + "Recently, the first conclusive date for king Psusennes II was revealed in a newly published priestly annal stone block. This document, which has been designated as 'Block Karnak 94, CL 2149,' records the induction of a priest named Nesankhefenmaat into the chapel of Amun-Re within the Karnak precint in Year 11 the first month of Shemu day 13 of a king named Psusennes.<ref>Frederic Payraudeau, ''De nouvelles annales sacerdotales de Siamon, Psousennès II et Osorkon Ier.'', BIFAO 108 (2008), p.294</ref> The preceding line of this document recorded the induction of Nesankhefenmaat's father, a certain Nesamun, into the priesthood of Amun-Re in king Siamun's reign.<ref>Payraudeau, BIFAO 108, p.294</ref> Siamun was the predecessor of Psusennes II at Tanis. The identification of the aforementioned Psusennes with Psusennes II is certain since the same fragmentary annal document next records--in the following line--the induction of Hor, the son of Nesankhefenmaat, into the priesthood of the chapel of Amun-Re at Karnak in Year 3 the second month of Akhet day 14 of king Osorkon I's reign just one generation later.<ref>Payraudeau, BIFAO 108, p.294</ref>  Therefore, the Year 11 date can only be assigned to Psusennes II and constitutes the first securely attested date for this pharaoh's reign. "
+^672 - " name=\"Payraudeau, BIFAO 108, p.294\""
+^895 - "—"
+^919 - "—"
+^1126 - " name=\""
+^1161 - "\"/"
+^895 + "--"
+^918 + "--"
+^1124 + ">"
+^1153 + "</ref"
+36 - "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref name=\"Kitchen, p.290\">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref name=\"Kitchen, p.290\"/> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14–15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I—a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead—Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+36 + "In Year 5 of Shoshenq I, this king and the founder of the 22nd Dynasty dispatched a certain [[Meshwesh|Ma]] (ie. Libyan) subordinate named Wayheset to the desert oasis town of Dakhla in order to restore the king's authority over the western oasis region of Upper Egypt. Wayheset's titles include Prince and Governor of the Oasis. His activities are recorded in the Large Dakhla stela.<ref>Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man named Nysu-Bastet.<ref>[[Alan H. Gardiner]], The Large Dakhla stela, JEA 19 (1930), pp.19-30</ref> Kitchen notes that this individual made an appeal to the Year 19 cadastral land-register of king Psusennes which belonged to his mother which historians assumed was made some \"80 years\" ago during the reign of Psusennes I.<ref>Kitchen, p.290</ref> The land register recorded that certain water rights were formerly owned by Nysu-Bastet's mother Tewhunet in Year 19 of a king Psusennes. This ruler was generally assumed by Egyptologists to be Psusennes I rather than Psusennes II since the latter's reign was believed to have lasted only 14-15 years. Based on the land register evidence, Wayheset ordered that these watering rights should now be granted to Nysu-Bastet himself. However, if the oracle dated to Year 19 of Psusennes I as many scholars traditionally assumed, Nysu-Bastet would have been separated from his mother by a total of 80 years from this date into Year 5 of Shoshenq I--a figure which is highly unlikely since Nysu-Bastet would not have waited until extreme old age to uphold his mother's watering rights. This implies that the aforementioned king Psusennes here must be identified with Psusennes II instead--Shoshenq I's immediate predecessor and, more significantly, that Psusennes II enjoyed a minimum reign of 19 years. "
+^393 - "=\"Kitchen, p.290\">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man name"
+^714 - " name=\""
+^735 - "\"/"
+^1030 - "–"
+^1382 - "—"
+^1622 - "—"
+^388 + ">Kitchen, p.290</ref>  This stela states that Wayheset adjudicated in a certain water dispute by consulting a land-register which is explicitly dated to Year 19 of a \"Pharaoh Psusennes\" in order to determine the water rights of a man"
+^714 + ">"
+^729 + "</ref"
+^1027 + "-"
+^1377 + "--"
+^1616 + "--"
+38 - "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela—a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+38 + "The term \"mother\" in ancient Egypt could also be an allusion to an ancestress, the matriarch of a lineage whereby Nysu-Bastet may have been petitioning for his hereditary water rights that belonged to his grandmother, whose family name was Tewhunet. However, this argument does not account for the use of Pharaoh as a title in the Dakhla stela--a literary device which first occurs late during the reign of Siamun, an Egyptian king who ruled between 45 to 64 years after Year 19 of Psusennes I.  "
+^343 - "—"
+^343 + "--"
+40 - "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name—ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref name=\"Krauss, DE 62, pp.43-48\">Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref name=\"Krauss, DE 62, pp.43-48\"/> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+40 + "The most significant component of the Great Dakhla stela is its palaeography: the use of the title Pharaoh Psusennes. A scholar named Helen Jacquet-Gordon believed in the 1970s that the large Dakhla stela belonged to [[Shoshenq III]]'s reign due to its use of the title 'Pharaoh' directly with the ruling king's birth name--ie: \"'''Pharaoh Shoshenq'''\"--which was an important palaeographical development in Egyptian history. Throughout the Old, Middle and New Kingdoms of Ancient Egypt, the word pharaoh was never employed as a title such as Mr. and Mrs. or attached to a king's [[Ancient Egyptian royal titulary#Personal name (nomen)|nomen]] such as ''Pharaoh Ramesses'' or ''Pharaoh Amenhotep''; instead, the word '''pr-`3''' or pharaoh was used as a noun to refer to the ''activities'' of the king (i.e., it was \"Pharaoh\" who ordered the creation of a temple or statue, or the digging of a well, etc.).  Rolf Krauss aptly observes that the earliest attested use of the word pharaoh as a title is documented in Year 17 of the 21st Dynasty king [[Siamun]] from Karnak Priestly Annals fragment 3B<ref>J-M Kruchten, Les annales des prētres de Karnak (OLA) 1989. pp.47-48</ref> while a second use of the title ''''[Pharaoh] [birth name]'''' occurs during Psusennes II's reign where a hieratic graffito in the Ptah chapel of the Abydos temple of Seti I explicitly refers to Psusennes II as the \"High Priest of Amen-Re, King of the Gods, the Leader, '''Pharaoh Psusennes'''.\"<ref>M.A. Murray, The Osireion at Abydos (London, 1989), 36; pl. XXI</ref><ref>Krauss, DE 62, pp.43-44</ref> Consequently, the practice of attaching the title ''pr-`3'' or pharaoh with a king's royal birth name had already started prior to the beginning of Shoshenq I's reign, let alone Shoshenq III. Hence, the Shoshenq mentioned in the large Year 5 Dakhla stela must have been Shoshenq I while the Psusennes mentioned in the same document likewise can only be Psusennes II which means that only 5 years (or 10 years if Psusennes II ruled Egypt for 24 years) would separate Nysu-Bastet from his mother.<ref>Krauss, DE 62, pp.43-48</ref> The additional fact that the Large Dakhla stela contains a Year 5 IV Peret day 25 lunar date has helped date the aforementioned king Shoshenq's accession to 943 BC and demonstrates that the ruler here must be Shoshenq I, not Shoshenq III who ruled a century later.<ref>Krauss, DE 62, pp.43-48</ref> Helen Jacquet-Gordon did not know of the two prior examples pertaining to Siamun and Psusennes II."
+^322 - "—"
+^2081 - " name=\"Krauss, DE 62, pp.43-48\""
+^2380 - " name=\""
+^2410 - "\"/"
+^322 + "--"
+^2379 + ">"
+^2403 + "</ref"
+43 - "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton—accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years—as preserved in surviving copies of Manetho's Epitome—to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref name=\"Kitchen, p.423\"/> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor—demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+43 + "The editors of the recent 2006 book on titled 'Handbook on Ancient Egyptian Chronology'--Erik Hornung, Rolf Krauss and David Warburton--accept this logical reasoning and have amended Manetho's original figure of 14 years for Psusennes II to 24 years instead to Psusennes II.<ref>Erik Hornung, Rolf Krauss & David Warburton (editors), Handbook of Ancient Egyptian Chronology (Handbook of Oriental Studies), Brill: 2006, p.474 & p.488</ref> This is not unprecedented since previous Egyptologists had previously amended the reign of Siamun by a decade from 9 years--as preserved in surviving copies of Manetho's Epitome--to 19 years based on certain Year 16 and Year 17 dates attested for the latter.<ref>Kitchen, p.423</ref> Psusennes II ruled Egypt for a minimum of 19 years based on the internal chronology of the Large Dakhla stela. However, a calculation of a lunar ''Tepi Shemu'' feast which records the induction of Hori son of Nespaneferhor into the Amun priesthood in regnal year 17 of [[Siamun]], Psusennes II's predecessor--demonstrates that this date was equivalent to 970 BC.<ref>Hornung, Krauss & Warburton, pp.474-475</ref> Since Siamun enjoyed a reign of 19 years, he would have died 2 years later in 968/967 BC and been succeeded by Psusennes II by 967 BC at the latest. Consequently, a reign of 24 years or 967-943 BC is now likely for Psusennes II; hence, his reign has been raised from 14 to 24 years."
+^134 - "—"
+^562 - "—"
+^618 - "—"
+^704 - " name=\""
+^725 - "\"/"
+^1036 - "—"
+^134 + "--"
+^561 + "--"
+^616 + "--"
+^701 + ">"
+^716 + "</ref"
+^1030 + "--"
+50 - "* Aidan Dodson, RdE 38(1987), pp.&nbsp;50-51."
+50 + "* Aidan Dodson, RdE 38(1987), pp.50-51."
+^33 - "&nbsp;"
+

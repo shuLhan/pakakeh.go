@@ -1,0 +1,37 @@
+>>> before
+a
+
+
+
+
+
+
+>>> after
+a
+
+
+
+
+<<< diffs_LevelLines
+----
+3 - ""
+4 - ""
+
+
+<<< diffs_LevelLines_reverse
+++++
+3 + ""
+4 + ""
+
+
+<<< diffs_LevelWords
+----
+3 - ""
+4 - ""
+
+
+<<< diffs_LevelWords_reverse
+++++
+3 + ""
+4 + ""
+

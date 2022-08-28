@@ -93,9 +93,7 @@ func IsEqual(oldb, newb []byte) (equal bool) {
 // if no matchs even found.
 // `minTokenLen` define the minimum length of token for searching in both of
 // slice.
-func BytesRatio(old, new []byte, minTokenLen int) (
-	ratio float32, m int, maxlen int,
-) {
+func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen int) {
 	x, y := 0, 0
 
 	oldlen := len(old)

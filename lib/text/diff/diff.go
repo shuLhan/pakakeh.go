@@ -8,6 +8,7 @@ package diff
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/shuLhan/share/lib/text"
 )
@@ -225,25 +226,32 @@ func (diffs *Data) GetAllDels() (chunks text.Chunks) {
 
 // String return formatted data.
 func (diffs Data) String() (s string) {
-	s += "Diffs:\n"
+	var (
+		sb     strings.Builder
+		line   text.Line
+		change LineChange
+	)
 
-	if len(diffs.Adds) > 0 {
-		s += ">>> Adds:\n"
-		for _, add := range diffs.Adds {
-			s += fmt.Sprintf("  + %d : %s", add.N, string(add.V))
+	if len(diffs.Dels) > 0 {
+		sb.WriteString("----\n")
+		for _, line = range diffs.Dels {
+			fmt.Fprintf(&sb, "%d - %q\n", line.N, line.V)
 		}
 	}
 
-	if len(diffs.Dels) > 0 {
-		s += ">>> Dels:\n"
-		for _, del := range diffs.Dels {
-			s += fmt.Sprintf("  - %d : %s", del.N, string(del.V))
+	if len(diffs.Adds) > 0 {
+		sb.WriteString("++++\n")
+		for _, line = range diffs.Adds {
+			fmt.Fprintf(&sb, "%d + %q\n", line.N, line.V)
 		}
 	}
 
 	if len(diffs.Changes) > 0 {
-		s += ">>> Changes:\n" + fmt.Sprint(diffs.Changes)
+		sb.WriteString("--++\n")
+		for _, change = range diffs.Changes {
+			sb.WriteString(change.String())
+		}
 	}
 
-	return
+	return sb.String()
 }

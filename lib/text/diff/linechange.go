@@ -6,6 +6,7 @@ package diff
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/shuLhan/share/lib/text"
 )
@@ -25,10 +26,19 @@ func NewLineChange(old, new text.Line) *LineChange {
 
 // String return formatted content of LineChange.
 func (change LineChange) String() string {
-	return fmt.Sprintf("LineChange: {\n"+
-		" Old  : %s\n"+
-		" New  : %s\n"+
-		" Adds : %s\n"+
-		" Dels : %s\n"+
-		"}\n", change.Old, change.New, change.Adds, change.Dels)
+	var (
+		sb    strings.Builder
+		chunk text.Chunk
+	)
+
+	fmt.Fprintf(&sb, "%d - %q\n", change.Old.N, change.Old.V)
+	fmt.Fprintf(&sb, "%d + %q\n", change.New.N, change.New.V)
+
+	for _, chunk = range change.Dels {
+		fmt.Fprintf(&sb, "^%d - %q\n", chunk.StartAt, chunk.V)
+	}
+	for _, chunk = range change.Adds {
+		fmt.Fprintf(&sb, "^%d + %q\n", chunk.StartAt, chunk.V)
+	}
+	return sb.String()
 }
