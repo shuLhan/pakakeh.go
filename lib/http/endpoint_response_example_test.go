@@ -65,7 +65,7 @@ func ExampleEndpointResponse() {
 			log.Fatal(err)
 		}
 	}()
-	time.Sleep(500)
+	time.Sleep(1 * time.Second)
 
 	clientOpts := &ClientOptions{
 		ServerUrl: "http://127.0.0.1:7016",
