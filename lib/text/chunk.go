@@ -4,7 +4,13 @@
 
 package text
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"strconv"
+
+	"github.com/shuLhan/share/lib/json"
+)
 
 // Chunk represent subset of line, contain starting position and slice of
 // bytes in line.
@@ -25,6 +31,18 @@ func JoinChunks(chunks []Chunk, sep string) string {
 		out += string(chunks[x].V)
 	}
 	return out
+}
+
+func (chunk Chunk) MarshalJSON() ([]byte, error) {
+	var bb bytes.Buffer
+
+	bb.WriteString(`{"StartAt":`)
+	bb.WriteString(strconv.Itoa(chunk.StartAt))
+	bb.WriteString(`,"V":"`)
+	bb.Write(json.Escape(chunk.V))
+	bb.WriteString(`"}`)
+
+	return bb.Bytes(), nil
 }
 
 func (c Chunk) String() string {

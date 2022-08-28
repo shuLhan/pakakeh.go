@@ -4,12 +4,30 @@
 
 package text
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"strconv"
+
+	"github.com/shuLhan/share/lib/json"
+)
 
 // Line represent line number and slice of bytes as string.
 type Line struct {
 	N int
 	V []byte
+}
+
+func (line Line) MarshalJSON() ([]byte, error) {
+	var bb bytes.Buffer
+
+	bb.WriteString(`{"N":`)
+	bb.WriteString(strconv.Itoa(line.N))
+	bb.WriteString(`,"V":"`)
+	bb.Write(json.Escape(line.V))
+	bb.WriteString(`"}`)
+
+	return bb.Bytes(), nil
 }
 
 func (l Line) String() string {
