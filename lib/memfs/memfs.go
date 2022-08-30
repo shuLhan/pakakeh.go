@@ -475,10 +475,9 @@ func (mfs *MemFS) isExcluded(sysPath string, mode os.FileMode) bool {
 // pass the list of Includes regexp or no filter defined.
 func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 	var (
-		re      *regexp.Regexp
-		fi      os.FileInfo
-		absPath string
-		err     error
+		re  *regexp.Regexp
+		fi  os.FileInfo
+		err error
 	)
 
 	if len(mfs.incRE) == 0 {
@@ -490,26 +489,17 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 			return true
 		}
 	}
-	if mode&os.ModeSymlink == 0 {
-		// If file is NOT a symlink and its a directory, include it.
-		return mode.IsDir()
+	if mode&os.ModeSymlink == os.ModeSymlink {
+		// File is symlink, get the real FileInfo to check if its
+		// directory or not.
+		fi, err = os.Stat(sysPath)
+		if err != nil {
+			return false
+		}
+		mode = fi.Mode()
 	}
 
-	// File is symlink, get the real FileInfo to check if its
-	// directory or not.
-	absPath, err = filepath.EvalSymlinks(sysPath)
-	if err != nil {
-		return false
-	}
-
-	fi, err = os.Lstat(absPath)
-	if err != nil {
-		return false
-	}
-	if fi.IsDir() {
-		return true
-	}
-	return false
+	return mode.IsDir()
 }
 
 // isWatched will return true if the system path is filtered to be watched.

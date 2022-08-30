@@ -89,38 +89,28 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 		SysPath: sysPath,
 		Path:    relPath,
 		name:    fi.Name(),
-		modTime: fi.ModTime(),
-		mode:    fi.Mode(),
-		size:    fi.Size(),
 		Parent:  parent,
 	}
 	node.generateFuncName(sysPath)
+
+	// If the file is symbolic link, update the node size and mode based
+	// on original.
+	if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
+		fi, err = os.Stat(sysPath)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+	}
+
+	node.mode = fi.Mode()
+	node.modTime = fi.ModTime()
 
 	if node.mode.IsDir() {
 		node.size = 0
 		return node, nil
 	}
 
-	// If the file is symbolic link, update the node size and mode based
-	// on original.
-	if fi.Mode()&os.ModeSymlink != 0 {
-		sysPath, err = filepath.EvalSymlinks(sysPath)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-
-		fi, err = os.Lstat(sysPath)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-
-		node.mode = fi.Mode()
-		if node.mode.IsDir() {
-			node.size = 0
-			return node, nil
-		}
-		node.size = fi.Size()
-	}
+	node.size = fi.Size()
 
 	err = node.updateContent(maxFileSize)
 	if err != nil {

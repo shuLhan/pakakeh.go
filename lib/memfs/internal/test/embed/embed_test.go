@@ -16,7 +16,7 @@ func generate_testdata() *memfs.Node {
 		GenFuncName: "generate_testdata",
 	}
 	node.SetMode(2147484141)
-	node.SetModTimeUnix(1633772772, 881353676)
+	node.SetModTimeUnix(1661878911, 219020749)
 	node.SetName("/")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/direct", generate_testdata_direct))
@@ -116,7 +116,7 @@ func generate_testdata_exclude_index_link_css() *memfs.Node {
 		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(420)
-	node.SetModTimeUnix(1633792794, 467899662)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index-link.css")
 	node.SetSize(9)
 	return node
@@ -131,7 +131,7 @@ func generate_testdata_exclude_index_link_html() *memfs.Node {
 		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
-	node.SetModTimeUnix(1633792794, 467899662)
+	node.SetModTimeUnix(1588592347, 0)
 	node.SetName("index-link.html")
 	node.SetSize(14)
 	return node
@@ -146,7 +146,7 @@ func generate_testdata_exclude_index_link_js() *memfs.Node {
 		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(420)
-	node.SetModTimeUnix(1633792794, 467899662)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index-link.js")
 	node.SetSize(16)
 	return node
@@ -193,7 +193,7 @@ func generate_testdata_include_index_html() *memfs.Node {
 		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(420)
-	node.SetModTimeUnix(1588592346, 0)
+	node.SetModTimeUnix(1588592347, 0)
 	node.SetName("index.html")
 	node.SetSize(14)
 	return node
