@@ -537,11 +537,11 @@ func TestMemFS_isIncluded(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			got = mfs.isExcluded(sysPath, fi.Mode())
+			got = mfs.isExcluded(sysPath)
 			if got {
 				test.Assert(t, sysPath, !c.exp[x], got)
 			} else {
-				got = mfs.isIncluded(sysPath, fi.Mode())
+				got = mfs.isIncluded(sysPath, fi)
 				test.Assert(t, sysPath, c.exp[x], got)
 			}
 		}

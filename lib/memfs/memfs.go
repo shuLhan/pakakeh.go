@@ -116,13 +116,12 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 	var (
 		logp    = "AddChild"
 		sysPath = filepath.Join(parent.SysPath, fi.Name())
-		fiMode  = fi.Mode()
 	)
 
-	if mfs.isExcluded(sysPath, fiMode) {
+	if mfs.isExcluded(sysPath) {
 		return nil, nil
 	}
-	if mfs.isWatched(sysPath, fiMode) {
+	if mfs.isWatched(sysPath) {
 		child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
 		if err != nil {
 			return nil, fmt.Errorf("%s %s: %w", logp, sysPath, err)
@@ -130,7 +129,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 
 		mfs.PathNodes.Set(child.Path, child)
 	}
-	if !mfs.isIncluded(sysPath, fiMode) {
+	if !mfs.isIncluded(sysPath, fi) {
 		if child != nil {
 			// The path being watched, but not included.
 			// Set the generate function name to empty, to prevent
@@ -459,7 +458,7 @@ func (mfs *MemFS) createRoot() error {
 
 // isExcluded will return true if the system path is excluded from being
 // watched or included.
-func (mfs *MemFS) isExcluded(sysPath string, mode os.FileMode) bool {
+func (mfs *MemFS) isExcluded(sysPath string) bool {
 	var (
 		re *regexp.Regexp
 	)
@@ -473,10 +472,9 @@ func (mfs *MemFS) isExcluded(sysPath string, mode os.FileMode) bool {
 
 // isIncluded will return true if the system path is filtered to be included,
 // pass the list of Includes regexp or no filter defined.
-func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
+func (mfs *MemFS) isIncluded(sysPath string, fi os.FileInfo) bool {
 	var (
 		re  *regexp.Regexp
-		fi  os.FileInfo
 		err error
 	)
 
@@ -489,21 +487,20 @@ func (mfs *MemFS) isIncluded(sysPath string, mode os.FileMode) bool {
 			return true
 		}
 	}
-	if mode&os.ModeSymlink == os.ModeSymlink {
+	if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
 		// File is symlink, get the real FileInfo to check if its
 		// directory or not.
 		fi, err = os.Stat(sysPath)
 		if err != nil {
 			return false
 		}
-		mode = fi.Mode()
 	}
 
-	return mode.IsDir()
+	return fi.IsDir()
 }
 
 // isWatched will return true if the system path is filtered to be watched.
-func (mfs *MemFS) isWatched(sysPath string, mode os.FileMode) bool {
+func (mfs *MemFS) isWatched(sysPath string) bool {
 	var (
 		re *regexp.Regexp
 	)
