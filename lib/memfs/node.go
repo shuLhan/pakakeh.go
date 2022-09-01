@@ -419,6 +419,9 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
 // removeChild remove a children node from list.  If child is not exist, it
 // will return nil.
 func (node *Node) removeChild(child *Node) *Node {
+	if child == nil {
+		return nil
+	}
 	for x := 0; x < len(node.Childs); x++ {
 		if node.Childs[x] != child {
 			continue

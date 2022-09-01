@@ -154,14 +154,18 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 	}
 }
 
-// unmapSubdirs find sub directories in node's childrens, recursively and
-// remove it from map of node.
+// unmapSubdirs remove the node from dw's fs including its childs.
 func (dw *DirWatcher) unmapSubdirs(node *Node) {
-	for _, child := range node.Childs {
+	var (
+		child *Node
+	)
+	for _, child = range node.Childs {
 		if child.IsDir() {
 			delete(dw.dirs, child.Path)
 			dw.unmapSubdirs(child)
 		}
+	}
+	for _, child = range node.Childs {
 		dw.fs.RemoveChild(node, child)
 	}
 	if node.IsDir() {
@@ -250,22 +254,22 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 			State: FileStateCreated,
 		}
 
-		//nolint
-		select {
-		case dw.qchanges <- ns:
-		}
-
 		if newChild.IsDir() {
 			dw.dirs[newChild.Path] = newChild
 			dw.mapSubdirs(newChild)
 			dw.onContentChange(newChild)
-			continue
+		} else {
+			// Start watching the file for modification.
+			_, err = newWatcher(node, newInfo, dw.Delay, dw.qFileChanges)
+			if err != nil {
+				log.Printf("%s: %s", logp, err)
+				continue
+			}
 		}
 
-		// Start watching the file for modification.
-		_, err = newWatcher(node, newInfo, dw.Delay, dw.qFileChanges)
-		if err != nil {
-			log.Printf("%s: %s", logp, err)
+		//nolint
+		select {
+		case dw.qchanges <- ns:
 		}
 	}
 }
@@ -393,13 +397,10 @@ func (dw *DirWatcher) start() {
 				dw.onModified(dw.root, fi)
 				continue
 			}
-			if dw.root.ModTime().Equal(fi.ModTime()) {
-				dw.processSubdirs()
-				continue
+			if !dw.root.ModTime().Equal(fi.ModTime()) {
+				dw.fs.Update(dw.root, fi)
+				dw.onContentChange(dw.root)
 			}
-
-			dw.fs.Update(dw.root, fi)
-			dw.onContentChange(dw.root)
 			dw.processSubdirs()
 
 		case ns = <-dw.qFileChanges:
