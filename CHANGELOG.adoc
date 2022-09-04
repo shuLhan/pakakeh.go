@@ -1,6 +1,6 @@
 =  CHANGELOG
 Shulhan <ms@kilabit.info>
-3 July 2022
+4 Sep 2022
 :toc:
 :sectanchors:
 :sectlinks:
@@ -16,6 +16,94 @@ This is changelog for share module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
+
+[#v0_41_0]
+==  share v0.41.0 (2022-09-04)
+
+[#v0_41_0_breaking_changes]
+===  Breaking changes
+
+lib/json: remove solidus (slash) from being escaped/un-escaped::
++
+--
+The standard json package does not escape the solidus, even though the
+RFC said so.
+Someone also report this as an error in
+https://www.rfc-editor.org/errata/eid3159[RFC 3159^]
+by removing solidus from list of escaped characters but the author itself
+reject it.
+--
+
+[#v0_41_0_bug_fixes]
+===  Bug fixes
+
+lib/memfs: fix SIGSEGV when node is deleted when being watched::
++
+--
+The panic is caused by the item in slice of Childs is being
+removed during iteration.
+
+To fix this, we remove the childs on the second iteration after
+we remove any sub directories inside them.
+--
+
+[#v0_41_0_new_features]
+===  New features
+
+lib/text: add custom MarshalJSON to type Chunk and Line::
+
+[#v0_41_0_chores]
+=== Chores
+
+lib/memfs: simplify checking for symlink::
++
+--
+Instead of calling filepath.EvalSymlink and Lstat, call os.Stat directly
+to the symlink system path.
+
+This also fix the modTime not currently set to the original file when
+creating Node from symlink-ed file.
+--
+
+lib/http: increase time sleep waiting for server on example endpoint::
++
+--
+On container, sometimes the test fail with the following error
+
+----
+2022-08-28 19:32:21 UTC DefaultErrorHandler: POST /error/custom:
+    Custom error
+2022/08/28 19:32:22 Do: Get "http://127.0.0.1:7016/?":
+    dial tcp 127.0.0.1:7016: connect: connection refused
+FAIL	github.com/shuLhan/share/lib/http	1.583s
+----
+
+This was caused by server is not ready yet to accept connection when
+testing executed.
+--
+
+text/diff: rewrite the test using test.Data::
++
+Using test.Data provide much more readable input and outputs and
+simplify modifying the test data instead of manually define the
+expected output in struct.
+
+_doc: cleaning up the documentation::
++
+--
+In the _doc, we remove generated HTML files.
+
+In the index, we add link to README and section about Development that
+include links to repository, issues, and patches.
+
+In the README, we reformat it to use AsciiDoc markup, remove the
+sanitizer library, add CLI for epoch, ini, and xtrk.
+--
+
+lib/totp: cleaning up the codes::
++
+This changes replace ":=" with explicit variable declarations and use
+raw string literal whenever possible.
 
 [#v0_40_0]
 ==  share v0.40.0 (2022-08-05)
