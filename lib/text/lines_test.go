@@ -5,9 +5,8 @@
 package text
 
 import (
+	"reflect"
 	"testing"
-
-	"github.com/shuLhan/share/lib/test"
 )
 
 func TestParseLines(t *testing.T) {
@@ -37,6 +36,8 @@ lines
 
 	for _, c := range cases {
 		got := ParseLines(c.raw)
-		test.Assert(t, "ParseLines", c.exp, got)
+		if !reflect.DeepEqual(c.exp, got) {
+			t.Fatalf(`want %s, got %s`, c.exp, got)
+		}
 	}
 }
