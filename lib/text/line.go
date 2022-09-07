@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-
-	"github.com/shuLhan/share/lib/json"
 )
 
 // Line represent line number and slice of bytes as string.
@@ -23,9 +21,9 @@ func (line Line) MarshalJSON() ([]byte, error) {
 
 	bb.WriteString(`{"N":`)
 	bb.WriteString(strconv.Itoa(line.N))
-	bb.WriteString(`,"V":"`)
-	bb.Write(json.Escape(line.V))
-	bb.WriteString(`"}`)
+	bb.WriteString(`,"V":`)
+	bb.WriteString(strconv.Quote(string(line.V)))
+	bb.WriteString(`}`)
 
 	return bb.Bytes(), nil
 }

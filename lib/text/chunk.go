@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
-
-	"github.com/shuLhan/share/lib/json"
 )
 
 // Chunk represent subset of line, contain starting position and slice of
@@ -38,9 +36,9 @@ func (chunk Chunk) MarshalJSON() ([]byte, error) {
 
 	bb.WriteString(`{"StartAt":`)
 	bb.WriteString(strconv.Itoa(chunk.StartAt))
-	bb.WriteString(`,"V":"`)
-	bb.Write(json.Escape(chunk.V))
-	bb.WriteString(`"}`)
+	bb.WriteString(`,"V":`)
+	bb.WriteString(strconv.Quote(string(chunk.V)))
+	bb.WriteString(`}`)
 
 	return bb.Bytes(), nil
 }
