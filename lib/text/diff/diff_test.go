@@ -5,10 +5,11 @@
 package diff
 
 import (
+	"os"
+	"reflect"
 	"testing"
 
 	libstrings "github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/test"
 	"github.com/shuLhan/share/lib/text"
 )
 
@@ -102,63 +103,142 @@ func TestBytesRatio(t *testing.T) {
 }
 
 func TestText(t *testing.T) {
-	var (
-		dataFiles = []string{
-			`testdata/List_of_United_Nations_test.txt`,
-			`testdata/Psusennes_II_test.txt`,
-			`testdata/Top_Gear_Series_14_test.txt`,
-			`testdata/empty_lines_test.txt`,
-			`testdata/peeps_test.txt`,
-			`testdata/text01_test.txt`,
-			`testdata/text02_test.txt`,
-			`testdata/the_singles_collection_test.txt`,
-		}
+	type testCase struct {
+		textBefore     string
+		textAfter      string
+		diffLevelLines string
+		diffLevelWords string
+	}
 
-		tdata  *test.Data
+	var cases = []testCase{{
+		textBefore:     `testdata/List_of_United_Nations.old`,
+		textAfter:      `testdata/List_of_United_Nations.new`,
+		diffLevelLines: `testdata/List_of_United_Nations_diff_LevelLines`,
+		diffLevelWords: `testdata/List_of_United_Nations_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/List_of_United_Nations.new`,
+		textAfter:      `testdata/List_of_United_Nations.old`,
+		diffLevelLines: `testdata/List_of_United_Nations_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/List_of_United_Nations_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/Psusennes_II.old`,
+		textAfter:      `testdata/Psusennes_II.new`,
+		diffLevelLines: `testdata/Psusennes_II_diff_LevelLines`,
+		diffLevelWords: `testdata/Psusennes_II_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/Psusennes_II.new`,
+		textAfter:      `testdata/Psusennes_II.old`,
+		diffLevelLines: `testdata/Psusennes_II_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/Psusennes_II_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/Top_Gear_Series_14.old`,
+		textAfter:      `testdata/Top_Gear_Series_14.new`,
+		diffLevelLines: `testdata/Top_Gear_Series_14_diff_LevelLines`,
+		diffLevelWords: `testdata/Top_Gear_Series_14_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/Top_Gear_Series_14.new`,
+		textAfter:      `testdata/Top_Gear_Series_14.old`,
+		diffLevelLines: `testdata/Top_Gear_Series_14_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/Top_Gear_Series_14_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/empty3lines.txt`,
+		textAfter:      `testdata/empty5lines.txt`,
+		diffLevelLines: `testdata/empty_lines_diff_LevelLines`,
+		diffLevelWords: `testdata/empty_lines_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/empty5lines.txt`,
+		textAfter:      `testdata/empty3lines.txt`,
+		diffLevelLines: `testdata/empty_lines_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/empty_lines_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/peeps.old`,
+		textAfter:      `testdata/peeps.new`,
+		diffLevelLines: `testdata/peeps_diff_LevelLines`,
+		diffLevelWords: `testdata/peeps_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/peeps.new`,
+		textAfter:      `testdata/peeps.old`,
+		diffLevelLines: `testdata/peeps_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/peeps_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/text01.old`,
+		textAfter:      `testdata/text01.new`,
+		diffLevelLines: `testdata/text01_diff_LevelLines`,
+		diffLevelWords: `testdata/text01_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/text01.new`,
+		textAfter:      `testdata/text01.old`,
+		diffLevelLines: `testdata/text01_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/text01_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/text02.old`,
+		textAfter:      `testdata/text02.new`,
+		diffLevelLines: `testdata/text02_diff_LevelLines`,
+		diffLevelWords: `testdata/text02_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/text02.new`,
+		textAfter:      `testdata/text02.old`,
+		diffLevelLines: `testdata/text02_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/text02_diff_LevelWords_reverse`,
+	}, {
+		textBefore:     `testdata/the_singles_collection.old`,
+		textAfter:      `testdata/the_singles_collection.new`,
+		diffLevelLines: `testdata/the_singles_collection_diff_LevelLines`,
+		diffLevelWords: `testdata/the_singles_collection_diff_LevelWords`,
+	}, {
+		textBefore:     `testdata/the_singles_collection.new`,
+		textAfter:      `testdata/the_singles_collection.old`,
+		diffLevelLines: `testdata/the_singles_collection_diff_LevelLines_reverse`,
+		diffLevelWords: `testdata/the_singles_collection_diff_LevelWords_reverse`,
+	}}
+
+	var (
+		c      testCase
 		diffs  Data
-		dfile  string
-		exp    string
 		got    string
+		expStr string
 		err    error
 		before []byte
 		after  []byte
+		exp    []byte
 	)
 
-	for _, dfile = range dataFiles {
-		t.Run(dfile, func(t *testing.T) {
-			tdata, err = test.LoadData(dfile)
-			if err != nil {
-				t.Fatal(err)
-			}
+	for _, c = range cases {
+		before, err = os.ReadFile(c.textBefore)
+		if err != nil {
+			t.Fatal(err)
+		}
+		after, err = os.ReadFile(c.textAfter)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			before = tdata.Input[`before`]
-			after = tdata.Input[`after`]
+		diffs = Text(before, after, LevelLines)
+		got = diffs.String()
 
-			// Diff with LevelLines.
+		exp, err = os.ReadFile(c.diffLevelLines)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			exp = string(tdata.Output[`diffs_LevelLines`])
-			diffs = Text(before, after, LevelLines)
-			got = diffs.String()
-			test.Assert(t, `Text, LevelLines`, exp, string(got))
+		expStr = string(exp)
+		if !reflect.DeepEqual(expStr, got) {
+			t.Fatalf("%s - %s: LevelLines not matched:\n<<< want:\n%s\n<<< got:\n%s",
+				c.textBefore, c.textAfter, expStr, got)
+		}
 
-			// Reverse the inputs.
-			exp = string(tdata.Output[`diffs_LevelLines_reverse`])
-			diffs = Text(after, before, LevelLines)
-			got = diffs.String()
-			test.Assert(t, `Text, LevelLines, reverse`, exp, string(got))
+		diffs = Text(before, after, LevelWords)
+		got = diffs.String()
 
-			// Diff with LevelWords.
+		exp, err = os.ReadFile(c.diffLevelWords)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			exp = string(tdata.Output[`diffs_LevelWords`])
-			diffs = Text(before, after, LevelWords)
-			got = diffs.String()
-			test.Assert(t, `Text, LevelWords`, exp, string(got))
-
-			// Reverse the inputs.
-			exp = string(tdata.Output[`diffs_LevelWords_reverse`])
-			diffs = Text(after, before, LevelWords)
-			got = diffs.String()
-			test.Assert(t, `Text, LevelWords, reverse`, exp, string(got))
-		})
+		expStr = string(exp)
+		if !reflect.DeepEqual(expStr, got) {
+			t.Fatalf("%s - %s: LevelWords not matched:\n<<< want:\n%s\n<<< got:\n%s",
+				c.textBefore, c.textAfter, expStr, got)
+		}
 	}
 }
