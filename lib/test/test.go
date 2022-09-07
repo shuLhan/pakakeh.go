@@ -7,18 +7,21 @@ package test
 
 import (
 	"runtime"
-	"testing"
 
 	"github.com/shuLhan/share/lib/reflect"
 )
 
-func printStackTrace(t testing.TB, trace []byte) {
+func printStackTrace(w Writer, trace []byte) {
 	var (
-		lines = 0
-		start = 0
-		end   = 0
+		lines int
+		start int
+		end   int
+		x     int
+		b     byte
+		ok    bool
 	)
-	for x, b := range trace {
+
+	for x, b = range trace {
 		if b == '\n' {
 			lines++
 			if lines == 3 {
@@ -31,7 +34,10 @@ func printStackTrace(t testing.TB, trace []byte) {
 		}
 	}
 
-	t.Log("\n!!! ERR " + string(trace[start:end]))
+	_, ok = w.(*testWriter)
+	if !ok {
+		w.Log("\n!!! ERR " + string(trace[start:end]))
+	}
 }
 
 // Assert compare two interfaces: `exp` and `got` for equality.
@@ -43,32 +49,24 @@ func printStackTrace(t testing.TB, trace []byte) {
 //
 // WARNING: this method does not support recursive pointer, for example a node
 // that point to parent and parent that point back to node again.
-func Assert(t *testing.T, name string, exp, got interface{}) {
-	err := reflect.DoEqual(exp, got)
+func Assert(w Writer, name string, exp, got interface{}) {
+	var (
+		err   error
+		trace []byte
+	)
+
+	err = reflect.DoEqual(exp, got)
 	if err == nil {
 		return
 	}
 
-	trace := make([]byte, 1024)
+	trace = make([]byte, 1024)
 	runtime.Stack(trace, false)
-	printStackTrace(t, trace)
+	printStackTrace(w, trace)
 
-	t.Fatalf("!!! %s: %s", name, err)
-}
-
-// AssertBench will compare two interfaces: `exp` and `got` for equality.
-// If both parameters are not equal, the function will call Fatalf that
-// describe the position (type and value) where value are not matched.
-func AssertBench(b *testing.B, name string, exp, got interface{}) {
-	err := reflect.DoEqual(exp, got)
-	if err == nil {
-		return
+	if len(name) == 0 {
+		w.Fatalf(`!!! %s`, err)
+	} else {
+		w.Fatalf(`!!! %s: %s`, name, err)
 	}
-
-	trace := make([]byte, 1024)
-	runtime.Stack(trace, false)
-
-	printStackTrace(b, trace)
-
-	b.Fatalf("!!! %s: %s", name, err)
 }
