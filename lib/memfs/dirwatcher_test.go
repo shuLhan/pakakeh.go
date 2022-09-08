@@ -80,3 +80,62 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 
 	test.Assert(t, "dirs", expDirs, dw.dirsKeys())
 }
+
+func TestDirWatcher_removeDirSymlink(t *testing.T) {
+	var (
+		dirWd string
+		err   error
+	)
+
+	dirWd, err = os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		dirTmp  = t.TempDir()
+		dirSub  = filepath.Join(dirTmp, `sub`)
+		fileOld = filepath.Join(dirWd, `testdata`, `index.html`)
+		fileNew = filepath.Join(dirSub, `index.html`)
+		opts    = Options{
+			Root: dirTmp,
+		}
+		dw = DirWatcher{
+			Options: opts,
+			Delay:   200 * time.Millisecond,
+		}
+
+		got NodeState
+	)
+
+	err = dw.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	time.Sleep(500 * time.Millisecond)
+
+	err = os.Mkdir(dirSub, 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got = <-dw.C
+	test.Assert(t, `Mkdir state`, FileStateCreated, got.State)
+	test.Assert(t, `Mkdir path`, `/sub`, got.Node.Path)
+
+	err = os.Symlink(fileOld, fileNew)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got = <-dw.C
+	test.Assert(t, `Symlink state`, FileStateCreated, got.State)
+	test.Assert(t, `Symlink path`, `/sub/index.html`, got.Node.Path)
+
+	err = os.RemoveAll(dirSub)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got = <-dw.C
+	test.Assert(t, `RemoveAll state`, FileStateDeleted, got.State)
+	test.Assert(t, `RemoveAll path`, `/sub/index.html`, got.Node.Path)
+}
