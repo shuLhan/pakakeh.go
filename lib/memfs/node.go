@@ -6,6 +6,7 @@ package memfs
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -55,8 +56,12 @@ type Node struct {
 	Childs []*Node // List of files in directory.
 
 	Content []byte // Content of file.
-	plainv  []byte // Content of file in plain text.
-	lowerv  []byte // Content of file in lower cases.
+
+	// The content of node compressed using gzip.
+	ContentGzip []byte
+
+	plainv []byte // Content of file in plain text.
+	lowerv []byte // Content of file in lower cases.
 
 	size int64 // Size of file.
 	off  int64 // The cursor position when doing Read or Seek.
@@ -394,6 +399,27 @@ func (node *Node) addChild(
 func (node *Node) generateFuncName(in string) {
 	syspath := string(libbytes.InReplace([]byte(in), []byte(ascii.LettersNumber), '_'))
 	node.GenFuncName = "generate_" + syspath
+}
+
+// compress the Content as gzip and encode it with base64.
+func (node *Node) compress() (err error) {
+	var (
+		bufgz = bytes.Buffer{}
+		gzw   = gzip.NewWriter(&bufgz)
+	)
+
+	_, err = gzw.Write(node.Content)
+	if err != nil {
+		return err
+	}
+	err = gzw.Close()
+	if err != nil {
+		return err
+	}
+
+	node.ContentGzip = bufgz.Bytes()
+
+	return nil
 }
 
 func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {

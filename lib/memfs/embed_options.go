@@ -34,4 +34,8 @@ type EmbedOptions struct {
 	// files and directories are not stored inside generated code, instead
 	// all files will use the current time when the program is running.
 	WithoutModTime bool
+
+	// WithGzip if its true, the embedded content is compressed using
+	// gzip.
+	WithGzip bool
 }
