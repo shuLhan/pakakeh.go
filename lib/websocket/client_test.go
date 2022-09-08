@@ -228,7 +228,9 @@ func TestClientPing(t *testing.T) {
 		}
 
 		wg.Add(1)
+		testClient.Lock()
 		err = testClient.send(c.req)
+		testClient.Unlock()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -596,7 +598,9 @@ func TestClientFragmentation2(t *testing.T) {
 	for x = 0; x < len(frames); x++ {
 		req = frames[x].pack()
 
+		testClient.Lock()
 		err = testClient.send(req)
+		testClient.Unlock()
 		if err != nil {
 			t.Fatal(err)
 		}
