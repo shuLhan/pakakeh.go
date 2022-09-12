@@ -22,12 +22,7 @@ func TestAssert(t *testing.T) {
 		desc: `nil interface{}`,
 		a:    nil,
 		b:    &str,
-		exp:  `!!! DoEqual: IsValid: expecting <invalid Value>(false), got <*string Value>(true)`,
-	}, {
-		desc: `short string`,
-		a:    `a string`,
-		b:    `b string`,
-		exp:  `!!! DoEqual: expecting string(a string), got string(b string)`,
+		exp:  `!!! Assert: IsValid: expecting <invalid Value>(false), got <*string Value>(true)`,
 	}}
 
 	var (
