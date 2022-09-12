@@ -21,13 +21,12 @@ func DoEqual(x, y interface{}) (err error) {
 	}
 
 	var (
-		logp               = "DoEqual"
-		v1   reflect.Value = reflect.ValueOf(x)
-		v2   reflect.Value = reflect.ValueOf(y)
+		v1 reflect.Value = reflect.ValueOf(x)
+		v2 reflect.Value = reflect.ValueOf(y)
 	)
 	err = doEqual(v1, v2)
 	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
+		return err
 	}
 	return nil
 }
