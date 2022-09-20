@@ -58,19 +58,34 @@ func printStackTrace(w Writer, trace []byte) {
 // will use the text/diff.Text to show the difference between them.
 // The diff output is as follow,
 //
-//	!!! string not matched:
+//	!!! "string not matched" / <desc>:
+//	----
+//	<LINE_NUM> - "<STRING>"
+//	...
+//	++++
+//	<LINE_NUM> + "<STRING>"
+//	...
 //	--++
 //	<LINE_NUM> - "<LINE_EXP>"
 //	<LINE_NUM> + "<LINE_GOT>"
 //	^<COL_NUM> - "<DELETED_STRING>"
 //	^<COL_NUM> + "<INSERTED_STRING>"
 //
-// The "<LINE_NUM> - " print the line number in exp followed by line itself.
-// The "<LINE_NUM> + " print the line number in got followed by line itself.
-// The "^<COL_NUM> - " show the character number in exp line followed by
-// deleted string (or string that not exist in got).
-// The "^<COL_NUM> + " show the character number in got line followed by
-// inserted string (or string that not exist in exp).
+// Any lines after "----" indicate the lines that deleted in got (exist in exp
+// but not in got).
+//
+// Any lines after "++++" indicate the lines that inserted in got (does not
+// exist in exp but exist in got).
+//
+// Any lines after "--++" indicate that the line between exp and got has words
+// changes in it.
+//
+//   - The "<LINE_NUM> - " print the line in exp.
+//   - The "<LINE_NUM> + " print the line in got.
+//   - The "^<COL_NUM> - " print the position and the string deleted in exp
+//     (or string that not exist in got).
+//   - The "^<COL_NUM> + " print the position and the string inserted in got
+//     (or string that not exist in exp).
 //
 // WARNING: this method does not support recursive pointer, for example a node
 // that point to parent and parent that point back to node again.
@@ -87,13 +102,13 @@ func Assert(w Writer, name string, exp, got interface{}) {
 		return
 	}
 
-	trace = make([]byte, 1024)
-	runtime.Stack(trace, false)
-	printStackTrace(w, trace)
-
 	if printStringDiff(w, name, exp, got) {
 		return
 	}
+
+	trace = make([]byte, 1024)
+	runtime.Stack(trace, false)
+	printStackTrace(w, trace)
 
 	if len(name) == 0 {
 		w.Fatalf(`!!! %s: %s`, logp, err)
@@ -125,11 +140,14 @@ func printStringDiff(w Writer, name string, exp, got interface{}) bool {
 	}
 
 	diffData = diff.Text([]byte(expStr), []byte(gotStr), diff.LevelWords)
+	if diffData.IsMatched {
+		return true
+	}
 
 	if len(name) == 0 {
-		w.Log("!!! strings not matched:\n", diffData.String())
+		w.Fatal("!!! strings not matched:\n", diffData.String())
 	} else {
-		w.Logf("!!! %s:\n%s", name, diffData.String())
+		w.Fatalf("!!! %s:\n%s", name, diffData.String())
 	}
 
 	return true
