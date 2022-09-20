@@ -19,10 +19,13 @@ var (
 )
 
 // Data represent additions, deletions, and changes between two text.
+// If no difference found, the IsMatched will be true.
 type Data struct {
 	Adds    text.Lines
 	Dels    text.Lines
 	Changes LineChanges
+
+	IsMatched bool
 }
 
 // Text search the difference between two texts.
@@ -186,7 +189,23 @@ func Lines(oldlines, newlines text.Lines, level int) (diffs Data) {
 		}
 	}
 
+	diffs.checkIsMatched()
+
 	return diffs
+}
+
+// checkIsMatched set the IsMatched to true if no changes found.
+func (diffs *Data) checkIsMatched() {
+	if len(diffs.Adds) != 0 {
+		return
+	}
+	if len(diffs.Dels) != 0 {
+		return
+	}
+	if len(diffs.Changes) != 0 {
+		return
+	}
+	diffs.IsMatched = true
 }
 
 // PushAdd will add new line to diff set.
