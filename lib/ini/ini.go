@@ -303,7 +303,7 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
 	}
 
-	tagField := unpackTagStructField(rtipe, rvalue)
+	var tagField *tagStructField = unpackTagStructField(rtipe, rvalue)
 	in.unmarshal(tagField, rtipe, rvalue)
 
 	return nil

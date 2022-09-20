@@ -11,22 +11,28 @@ import (
 	"time"
 )
 
-type tagStructField map[string]*structField
+type tagStructField struct {
+	v map[string]*structField
+}
 
 // unpackTagStructField read each ini tag in the struct's field and store its section,
 // subsection, and/or key along with their reflect type and value into
 // structField.
-func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStructField) {
+func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out *tagStructField) {
 	var (
 		tags []string
+		tsf  *tagStructField
+		key  string
+		sf   *structField
 	)
 
 	numField := rtype.NumField()
-	if numField == 0 {
-		return nil
+	out = &tagStructField{
+		v: make(map[string]*structField, numField),
 	}
-
-	out = make(tagStructField, numField)
+	if numField == 0 {
+		return out
+	}
 
 	for x := 0; x < numField; x++ {
 		field := rtype.Field(x)
@@ -42,8 +48,9 @@ func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStruct
 		if len(tag) == 0 {
 			switch fkind {
 			case reflect.Struct:
-				for k, v := range unpackTagStructField(ftype, fval) {
-					out[k] = v
+				tsf = unpackTagStructField(ftype, fval)
+				for key, sf = range tsf.v {
+					out.v[key] = sf
 				}
 
 			case reflect.Ptr:
@@ -54,8 +61,9 @@ func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStruct
 				fval = fval.Elem()
 				kind := ftype.Kind()
 				if kind == reflect.Struct {
-					for k, v := range unpackTagStructField(ftype, fval) {
-						out[k] = v
+					tsf = unpackTagStructField(ftype, fval)
+					for key, sf = range tsf.v {
+						out.v[key] = sf
 					}
 				}
 			}
@@ -84,15 +92,15 @@ func unpackTagStructField(rtype reflect.Type, rval reflect.Value) (out tagStruct
 			sfield.key = sfield.fname
 		}
 
-		out[tag] = sfield
+		out.v[tag] = sfield
 	}
 	return out
 }
 
-func (tsf tagStructField) getByKey(key string) *structField {
-	for _, f := range tsf {
-		if f.key == key {
-			return f
+func (tsf tagStructField) getByKey(key string) (sf *structField) {
+	for _, sf = range tsf.v {
+		if sf.key == key {
+			return sf
 		}
 	}
 	return nil
@@ -100,9 +108,13 @@ func (tsf tagStructField) getByKey(key string) *structField {
 
 // keys return the map keys sorted in ascending order.
 func (tsf tagStructField) keys() (out []string) {
-	out = make([]string, 0, len(tsf))
-	for k := range tsf {
-		out = append(out, k)
+	var (
+		key string
+	)
+
+	out = make([]string, 0, len(tsf.v))
+	for key = range tsf.v {
+		out = append(out, key)
 	}
 	sort.Strings(out)
 	return out

@@ -278,8 +278,9 @@ func ExampleMarshal() {
 
 func ExampleMarshal_map() {
 	type U struct {
-		String string `ini:"string"`
-		Int    int    `ini:"int"`
+		String      string   `ini:"string"`
+		Int         int      `ini:"int"`
+		SliceString []string `ini:"::slice_string"`
 	}
 	type ADT struct {
 		MapString    map[string]string  `ini:"map:subString"`
@@ -319,22 +320,26 @@ func ExampleMarshal_map() {
 
 			MapStruct: map[string]U{
 				"struct-key-1": {
-					String: "struct-1-string",
-					Int:    1,
+					String:      `struct-1-string`,
+					Int:         1,
+					SliceString: []string{`str-1`, `str-2`},
 				},
 				"struct-key-2": {
-					String: "struct-2-string",
-					Int:    2,
+					String:      `struct-2-string`,
+					Int:         2,
+					SliceString: []string{`str-3`, `str-4`},
 				},
 			},
 			MapPtrStruct: map[string]*U{
 				"ptr-struct-key-1": {
-					String: "struct-1-string",
-					Int:    1,
+					String:      `struct-1-string`,
+					Int:         1,
+					SliceString: []string{`str-5`, `str-6`},
 				},
 				"ptr-struct-key-2": {
-					String: "struct-2-string",
-					Int:    2,
+					String:      `struct-2-string`,
+					Int:         2,
+					SliceString: []string{`str-7`, `str-8`},
 				},
 			},
 			unMapStruct: map[string]U{
@@ -373,18 +378,26 @@ func ExampleMarshal_map() {
 	//[mapstruct "struct-key-1"]
 	//string = struct-1-string
 	//int = 1
+	//slice_string = str-1
+	//slice_string = str-2
 	//
 	//[mapstruct "struct-key-2"]
 	//string = struct-2-string
 	//int = 2
+	//slice_string = str-3
+	//slice_string = str-4
 	//
 	//[mapptrstruct "ptr-struct-key-1"]
 	//string = struct-1-string
 	//int = 1
+	//slice_string = str-5
+	//slice_string = str-6
 	//
 	//[mapptrstruct "ptr-struct-key-2"]
 	//string = struct-2-string
 	//int = 2
+	//slice_string = str-7
+	//slice_string = str-8
 }
 
 func ExampleMarshal_struct() {
@@ -552,8 +565,9 @@ int = 2
 
 func ExampleUnmarshal_map() {
 	type U struct {
-		String string `ini:"string"`
-		Int    int    `ini:"int"`
+		String      string   `ini:"string"`
+		Int         int      `ini:"int"`
+		SliceString []string `ini:"::slice_string"`
 	}
 
 	type ADT struct {
@@ -576,18 +590,26 @@ k2 = 7
 [mapstruct "struct-key-1"]
 string = struct-1-string
 int = 1
+slice_string = str-1
+slice_string = str-2
 
 [mapstruct "struct-key-2"]
 string = struct-2-string
 int = 2
+slice_string = str-3
+slice_string = str-4
 
 [mapptrstruct "struct-key-1"]
 string = struct-1-string
 int = 1
+slice_string = str-5
+slice_string = str-6
 
 [mapptrstruct "struct-key-2"]
 string = struct-2-string
 int = 2
+slice_string = str-7
+slice_string = str-8
 `
 		t   = ADT{}
 		err error
@@ -606,9 +628,9 @@ int = 2
 	//Output:
 	//MapString: map[k:v k2:v2]
 	//MapInt: map[k:6 k2:7]
-	//MapStruct: map[struct-key-1:{struct-1-string 1} struct-key-2:{struct-2-string 2}]
-	//MapPtrStruct: struct-key-1: &{struct-1-string 1}
-	//MapPtrStruct: struct-key-2: &{struct-2-string 2}
+	//MapStruct: map[struct-key-1:{struct-1-string 1 [str-1 str-2]} struct-key-2:{struct-2-string 2 [str-3 str-4]}]
+	//MapPtrStruct: struct-key-1: &{struct-1-string 1 [str-5 str-6]}
+	//MapPtrStruct: struct-key-2: &{struct-2-string 2 [str-7 str-8]}
 }
 
 func ExampleUnmarshal_struct() {

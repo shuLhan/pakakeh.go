@@ -13,7 +13,7 @@ import (
 
 // unmarshal set each section-subsection variables into the struct
 // fields.
-func (in *Ini) unmarshal(tagField tagStructField, rtype reflect.Type, rval reflect.Value) {
+func (in *Ini) unmarshal(tagField *tagStructField, rtype reflect.Type, rval reflect.Value) {
 	var (
 		sec    *Section
 		sfield *structField
@@ -24,17 +24,17 @@ func (in *Ini) unmarshal(tagField tagStructField, rtype reflect.Type, rval refle
 	for _, sec = range in.secs {
 		// Search field that tagged with subsection first.
 		tag = fmt.Sprintf("%s:%s", sec.nameLower, sec.sub)
-		sfield, ok = tagField[tag]
+		sfield, ok = tagField.v[tag]
 		if !ok {
 			// Search field that tagged with section name only.
 			tag = sec.nameLower
-			sfield, ok = tagField[tag]
+			sfield, ok = tagField.v[tag]
 			if !ok {
 				// Unmarshal each variable in section-sub into
 				// field directly.
 				for _, v = range sec.vars {
 					tag = fmt.Sprintf("%s:%s:%s", sec.nameLower, sec.sub, v.keyLower)
-					sfield, ok = tagField[tag]
+					sfield, ok = tagField.v[tag]
 					if !ok {
 						continue
 					}
@@ -96,8 +96,15 @@ func (in *Ini) unmarshal(tagField tagStructField, rtype reflect.Type, rval refle
 
 // unmarshalToMap unmarshal the Section into a map.
 //
-// V map[S]T `ini:"section:sub"` for non-struct value or
-// V map[S]T `ini:"section"` for map of struct.
+// The format is
+//
+//	V map[S]T `ini:"section:sub"`
+//
+// for non-struct value or
+//
+//	V map[S]T `ini:"section"`
+//
+// for map of struct.
 func unmarshalToMap(sec *Section, rtype reflect.Type, rval reflect.Value) bool {
 	if rtype.Key().Kind() != reflect.String {
 		return false
@@ -153,9 +160,15 @@ func unmarshalToMap(sec *Section, rtype reflect.Type, rval reflect.Value) bool {
 }
 
 func unmarshalToStruct(sec *Section, rtype reflect.Type, rval reflect.Value) {
-	tagField := unpackTagStructField(rtype, rval)
-	for _, v := range sec.vars {
-		sfield := tagField.getByKey(v.keyLower)
+	var (
+		tagField *tagStructField = unpackTagStructField(rtype, rval)
+
+		v      *variable
+		sfield *structField
+	)
+
+	for _, v = range sec.vars {
+		sfield = tagField.getByKey(v.keyLower)
 		if sfield == nil {
 			continue
 		}
