@@ -3,8 +3,10 @@
 // license that can be found in the LICENSE file.
 
 // Package paseto provide a simple, ready to use, opinionated implementation
-// of Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in draft of
-// RFC 01 [1].
+// of Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in
+// [paseto-rfc-01].
+//
+// See the examples below for quick reference.
 //
 // # Limitation
 //
@@ -22,16 +24,19 @@
 //
 // Steps for sender when generating new token, the Pack() method,
 //
-//   - Prepare the JSON token claims, set
-//     ** Issuer "iss" to PublicMode.our.ID
-//     ** Subject "sub" to subject value from parameter
-//     ** Audience "aud" to audience value from parameter
-//     ** IssuedAt to current time
-//     ** NotBefore to current time
-//     ** ExpiredAt to current time + 60 seconds
-//     ** Data field to base64 encoded of data value from parameter
-//   - Prepare the JSON footer, set
-//     ** Key ID "kid" to PublicMode.our.ID
+// (1) Prepare the JSON token claims, set
+//
+//   - Issuer "iss" to PublicMode.our.ID
+//   - Subject "sub" to subject value from parameter
+//   - Audience "aud" to audience value from parameter
+//   - IssuedAt to current time
+//   - NotBefore to current time
+//   - ExpiredAt to current time + 60 seconds
+//   - Data field to base64 encoded of data value from parameter
+//
+// (2) Prepare the JSON footer, set
+//
+//   - Key ID "kid" to PublicMode.our.ID
 //
 // The user's claims data is stored using key "data" inside the JSON token,
 // encoded using base64 (with padding).
@@ -71,24 +76,29 @@
 //
 // Step for receiver to process the token, the Unpack() method,
 //
-//   - Decode the token footer
-//   - Get the registered public key based on "kid" value in token footer
-//     ** If no peers key exist matched with "kid" value, reject the token
-//   - Verify the token using the peer public key
-//     ** If verification failed, reject the token
-//   - Validate the token
-//     ** The Issuer must equal to peer ID
-//     ** The Audience must equal to receiver ID
-//     ** If the peer AllowedSubjects is not empty, the Subject must be in
-//     one of them
-//     ** The current time must be after IssuedAt
-//     ** The current time must be after NotBefore
-//     ** The current time must be before ExpiredAt
-//     ** If one of the above condition is not passed, it will return an error.
+// (1) Decode the token footer
+//
+// (2) Get the registered public key based on "kid" value in token footer.
+// If no peers key exist matched with "kid" value, reject the token.
+//
+// (3) Verify the token using the peer public key.
+// If verification failed, reject the token.
+//
+// (4) Validate the token.
+//   - The Issuer must equal to peer ID.
+//   - The Audience must equal to receiver ID.
+//   - If the peer AllowedSubjects is not empty, the Subject must be in
+//     one of them.
+//   - The current time must be after IssuedAt.
+//   - The current time must be after NotBefore.
+//   - The current time must be before ExpiredAt.
+//   - If one of the above condition is not passed, it will return an error.
 //
 // # References
 //
-// [1] https://github.com/paragonie/paseto/blob/master/docs/RFC/draft-paragon-paseto-rfc-01.txt
+//   - [paseto-rfc-01]
+//
+// [paseto-rfc-01]: https://github.com/paragonie/paseto/blob/master/docs/RFC/draft-paragon-paseto-rfc-01.txt
 package paseto
 
 import (

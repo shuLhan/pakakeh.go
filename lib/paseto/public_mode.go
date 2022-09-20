@@ -82,7 +82,7 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 }
 
 // AddPeer add a key to list of known peers for verifying incoming token.
-// The Key.Public
+// The only required fields in Key is ID and Public.
 func (auth *PublicMode) AddPeer(k Key) (err error) {
 	if len(k.ID) == 0 {
 		return fmt.Errorf("empty key ID")
