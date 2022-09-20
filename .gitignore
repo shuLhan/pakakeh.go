@@ -58,7 +58,7 @@
 /lib/websocket/testdata/pip-selfcheck.json
 /lib/websocket/testdata/server/reports
 /lib/websocket/testdata/server/server
-_bin/linux-amd64
+_bin
 cover.*
 pkg/
 share-tools/
