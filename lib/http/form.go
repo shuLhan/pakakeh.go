@@ -44,14 +44,14 @@ func UnmarshalForm(in url.Values, out interface{}) (err error) {
 		rtype reflect.Type  = vout.Type()
 		rkind reflect.Kind  = rtype.Kind()
 
-		tstruct  reflect.Type
-		field    reflect.StructField
-		fval     reflect.Value
-		fptr     reflect.Value
-		key, val string
-		vals     []string
-		x        int
-		hasTag   bool
+		field      reflect.StructField
+		fval       reflect.Value
+		fptr       reflect.Value
+		key, val   string
+		listFields []reflect.StructField
+		vals       []string
+		x          int
+		hasTag     bool
 	)
 
 	if rkind != reflect.Ptr {
@@ -84,10 +84,15 @@ func UnmarshalForm(in url.Values, out interface{}) (err error) {
 		}
 	}
 
-	tstruct = rtype
+	listFields = reflect.VisibleFields(rtype)
 
-	for ; x < vout.NumField(); x++ {
-		field = tstruct.Field(x)
+	for ; x < len(listFields); x++ {
+		field = listFields[x]
+
+		if field.Anonymous {
+			// Skip embedded field.
+			continue
+		}
 
 		key, _, hasTag = libreflect.Tag(field, structTagKey)
 		if len(key) == 0 && !hasTag {
@@ -113,7 +118,7 @@ func UnmarshalForm(in url.Values, out interface{}) (err error) {
 
 		// Now that we have the value, store it into field by its
 		// type.
-		fval = vout.Field(x)
+		fval = vout.FieldByIndex(field.Index)
 		rtype = fval.Type()
 		rkind = fval.Kind()
 
