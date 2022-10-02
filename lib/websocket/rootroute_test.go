@@ -13,11 +13,6 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-var (
-	_testRootRoute = newRootRoute()
-	_testDefMethod string
-)
-
 func testRouteHandler(t *testing.T, target string) RouteHandler {
 	return func(ctx context.Context, req *Request) (res Response) {
 		test.Assert(t, "routeHandler", target, req.Target)
@@ -25,7 +20,7 @@ func testRouteHandler(t *testing.T, target string) RouteHandler {
 	}
 }
 
-func testRootRouteAdd(t *testing.T) {
+func testRootRouteAdd(t *testing.T, defMethod string) {
 	type testCase struct {
 		expErr  error
 		exp     *route
@@ -43,7 +38,7 @@ func testRootRouteAdd(t *testing.T) {
 		expErr:  ErrRouteInvMethod,
 	}, {
 		desc:    "Without absolute path",
-		method:  _testDefMethod,
+		method:  defMethod,
 		target:  ":id/xyz",
 		handler: testRouteHandler(t, ":id/xyz"),
 		expErr:  ErrRouteInvTarget,
@@ -52,7 +47,7 @@ func testRootRouteAdd(t *testing.T) {
 		},
 	}, {
 		desc:    "With parameter at first path",
-		method:  _testDefMethod,
+		method:  defMethod,
 		target:  "/:id/xyz",
 		handler: testRouteHandler(t, "/:id/xyz"),
 		exp: &route{
@@ -68,7 +63,7 @@ func testRootRouteAdd(t *testing.T) {
 		},
 	}, {
 		desc:    "With duplicate parameter",
-		method:  _testDefMethod,
+		method:  defMethod,
 		target:  "/:param/abc",
 		expErr:  ErrRouteDupParam,
 		handler: testRouteHandler(t, "/:id/xyz"),
@@ -85,7 +80,7 @@ func testRootRouteAdd(t *testing.T) {
 		},
 	}, {
 		desc:    "With handle on root",
-		method:  _testDefMethod,
+		method:  defMethod,
 		target:  "/",
 		handler: testRouteHandler(t, "/"),
 		exp: &route{
@@ -102,7 +97,7 @@ func testRootRouteAdd(t *testing.T) {
 		},
 	}, {
 		desc:    "With different sub path",
-		method:  _testDefMethod,
+		method:  defMethod,
 		target:  "/:id/abc",
 		handler: testRouteHandler(t, "/:id/abc"),
 		exp: &route{
@@ -122,7 +117,7 @@ func testRootRouteAdd(t *testing.T) {
 		},
 	}, {
 		desc:    "With another parameter at the end",
-		method:  _testDefMethod,
+		method:  defMethod,
 		target:  "/:id/abc/def/:000",
 		handler: testRouteHandler(t, "/:id/abc/def/:000"),
 		exp: &route{
@@ -151,6 +146,8 @@ func testRootRouteAdd(t *testing.T) {
 	}}
 
 	var (
+		rootRoute = newRootRoute()
+
 		c   testCase
 		err error
 		got *route
@@ -158,18 +155,18 @@ func testRootRouteAdd(t *testing.T) {
 	for _, c = range cases {
 		t.Logf("%s: %s %s", c.desc, c.method, c.target)
 
-		err = _testRootRoute.add(c.method, c.target, c.handler)
+		err = rootRoute.add(c.method, c.target, c.handler)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err)
 		}
 
-		got = _testRootRoute.getParent(c.method)
+		got = rootRoute.getParent(c.method)
 
 		test.Assert(t, "route", fmt.Sprintf("%+v", c.exp), fmt.Sprintf("%+v", got))
 	}
 }
 
-func testRootRouteGet(t *testing.T) {
+func TestRootRoute_Get(t *testing.T) {
 	type testCase struct {
 		expParams targetParam
 		method    string
@@ -178,7 +175,7 @@ func testRootRouteGet(t *testing.T) {
 	}
 
 	var cases = []testCase{{
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/1000/xyz",
 		expTarget: "/:id/xyz",
 		expParams: targetParam{"id": "1000"},
@@ -188,63 +185,86 @@ func testRootRouteGet(t *testing.T) {
 		target: "/1000/xyz",
 	}, {
 		// Invalid target
-		method: _testDefMethod,
+		method: http.MethodGet,
 		target: "1000/xy",
 	}, {
 		// Invalid target
-		method: _testDefMethod,
+		method: http.MethodGet,
 		target: "/1000/xy",
 	}, {
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/",
 		expTarget: "/",
 		expParams: targetParam{},
 	}, {
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/333/abc",
 		expTarget: "/:id/abc",
 		expParams: targetParam{"id": "333"},
 	}, {
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/333/abc/",
 		expTarget: "/:id/abc",
 		expParams: targetParam{"id": "333"},
 	}, {
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/333/abc/def",
 		expTarget: "/:id/abc/def",
 		expParams: targetParam{"id": "333"},
 	}, {
-		method: _testDefMethod,
+		method: http.MethodGet,
 		target: "/333/abc/444",
 	}, {
-		method: _testDefMethod,
+		method: http.MethodGet,
 		target: "/333/abc/444/",
 	}, {
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/333/abc/def/444",
 		expTarget: "/:id/abc/def/:000",
 		expParams: targetParam{"id": "333", "000": "444"},
 	}, {
-		method:    _testDefMethod,
+		method:    http.MethodGet,
 		target:    "/333/abc/def/444/",
 		expTarget: "/:id/abc/def/:000",
 		expParams: targetParam{"id": "333", "000": "444"},
 	}, {
-		method: _testDefMethod,
+		method: http.MethodGet,
 		target: "/333/abc/def/444/ghi",
 	}}
 
 	var (
+		rootRoute = newRootRoute()
+
 		c          testCase
 		gotParams  targetParam
 		gotHandler RouteHandler
+		err        error
 	)
+
+	err = rootRoute.add(http.MethodGet, `/:id/xyz`, testRouteHandler(t, `/:id/xyz`))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = rootRoute.add(http.MethodGet, `/:id/abc`, testRouteHandler(t, `/:id/abc`))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = rootRoute.add(http.MethodGet, `/:id/abc/def`, testRouteHandler(t, `/:id/abc/def`))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = rootRoute.add(http.MethodGet, `/:id/abc/def/:000`, testRouteHandler(t, `/:id/abc/def/:000`))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for _, c = range cases {
 		t.Log(c.method + " " + c.target)
 
-		gotParams, gotHandler = _testRootRoute.get(c.method, c.target)
+		gotParams, gotHandler = rootRoute.get(c.method, c.target)
 
 		test.Assert(t, "params", c.expParams, gotParams)
 
@@ -255,21 +275,9 @@ func testRootRouteGet(t *testing.T) {
 }
 
 func TestRootRoute(t *testing.T) {
-	_testDefMethod = http.MethodDelete
-	t.Run("add/DELETE", testRootRouteAdd)
-
-	_testDefMethod = http.MethodGet
-	t.Run("add/GET", testRootRouteAdd)
-
-	_testDefMethod = http.MethodPatch
-	t.Run("add/PATCH", testRootRouteAdd)
-
-	_testDefMethod = http.MethodPost
-	t.Run("add/POST", testRootRouteAdd)
-
-	_testDefMethod = http.MethodPut
-	t.Run("add/PUT", testRootRouteAdd)
-
-	_testDefMethod = http.MethodGet
-	t.Run("get/GET", testRootRouteGet)
+	testRootRouteAdd(t, http.MethodDelete)
+	testRootRouteAdd(t, http.MethodGet)
+	testRootRouteAdd(t, http.MethodPatch)
+	testRootRouteAdd(t, http.MethodPost)
+	testRootRouteAdd(t, http.MethodPut)
 }
