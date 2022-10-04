@@ -12,6 +12,8 @@ import (
 )
 
 func TestKeyPoolClear(t *testing.T) {
+	DefaultKeyPool.Clear()
+
 	DefaultKeyPool.Put("example.com", &Key{ExpiredAt: 1})
 	got := DefaultKeyPool.String()
 	test.Assert(t, "DefaultKeyPool.Clear", "[{example.com 1}]", got)
