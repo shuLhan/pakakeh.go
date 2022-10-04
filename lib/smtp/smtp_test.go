@@ -26,7 +26,6 @@ const (
 )
 
 var (
-	testClient        *Client
 	testServer        *Server
 	testAccountFirst  *Account
 	testAccountSecond *Account
@@ -84,7 +83,7 @@ func testRunServer() {
 	}()
 }
 
-func TestMain(m *testing.M) {
+func testNewClient(withAuth bool) (cl *Client) {
 	var (
 		opts = ClientOptions{
 			ServerUrl: testSMTPSAddress,
@@ -92,17 +91,29 @@ func TestMain(m *testing.M) {
 		}
 
 		err error
-		s   int
+	)
+	if withAuth {
+		opts.AuthUser = testAccountFirst.Short()
+		opts.AuthPass = testPassword
+		opts.AuthMechanism = SaslMechanismPlain
+	}
+
+	cl, err = NewClient(opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return cl
+}
+
+func TestMain(m *testing.M) {
+	var (
+		s int
 	)
 
 	testRunServer()
 
 	time.Sleep(100 * time.Millisecond)
-
-	testClient, err = NewClient(opts)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
 
 	s = m.Run()
 	os.Exit(s)

@@ -40,17 +40,24 @@ func TestEhlo(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.ehlo(c.arg)
+		cl = testNewClient(false)
+
+		got, err := cl.ehlo(c.arg)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		t.Logf(`got: %+v`, got)
 		test.Assert(t, "Ehlo", c.exp, got)
-		test.Assert(t, "ServerInfo.Domain", c.expServerInfo.Domain, testClient.ServerInfo.Domain)
-		test.Assert(t, "ServerInfo.Info", c.expServerInfo.Info, testClient.ServerInfo.Info)
+		test.Assert(t, "ServerInfo.Domain", c.expServerInfo.Domain, cl.ServerInfo.Domain)
+		test.Assert(t, "ServerInfo.Info", c.expServerInfo.Info, cl.ServerInfo.Info)
 	}
 }
 
@@ -98,10 +105,14 @@ func TestAuth(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client = testNewClient(false)
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.Authenticate(c.mech, c.username, c.password)
+		got, err := cl.Authenticate(c.mech, c.username, c.password)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
@@ -168,10 +179,14 @@ func TestExpand(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client = testNewClient(true)
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.Expand(c.mlist)
+		got, err := cl.Expand(c.mlist)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -193,10 +208,14 @@ func TestHelp(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client = testNewClient(true)
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.Help(c.arg)
+		got, err := cl.Help(c.arg)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -233,10 +252,14 @@ func TestSendCommand(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client = testNewClient(false)
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.SendCommand(c.cmd)
+		got, err := cl.SendCommand(c.cmd)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -278,10 +301,14 @@ func TestMailTx(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client = testNewClient(true)
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.MailTx(c.mail)
+		got, err := cl.MailTx(c.mail)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
@@ -313,10 +340,14 @@ func TestVerify(t *testing.T) {
 		},
 	}}
 
+	var (
+		cl *Client = testNewClient(true)
+	)
+
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, err := testClient.Verify(c.mailbox)
+		got, err := cl.Verify(c.mailbox)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -326,12 +357,18 @@ func TestVerify(t *testing.T) {
 }
 
 func TestQuit(t *testing.T) {
-	exp := &Response{
-		Code:    StatusClosing,
-		Message: "Service closing transmission channel",
-	}
+	var (
+		cl  *Client = testNewClient(false)
+		exp         = &Response{
+			Code:    StatusClosing,
+			Message: "Service closing transmission channel",
+		}
 
-	got, err := testClient.Quit()
+		got *Response
+		err error
+	)
+
+	got, err = cl.Quit()
 	if err != nil {
 		t.Fatal(err)
 	}
