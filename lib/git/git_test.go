@@ -35,6 +35,7 @@ func TestClone(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 		mock.Reset(true)
+		os.RemoveAll(_testRepoDir)
 
 		err := Clone(_testRemoteURL, c.dest)
 		if err != nil {
@@ -354,9 +355,6 @@ func TestMain(m *testing.M) {
 	fmt.Printf("stderr    : %+v\n", _stderr.Name())
 	fmt.Printf("remote URL: %s\n", _testRemoteURL)
 	fmt.Printf("repo dir  : %s\n", _testRepoDir)
-
-	// Cleaning up for TestClone
-	os.RemoveAll(_testRepoDir)
 
 	s := m.Run()
 
