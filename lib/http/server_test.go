@@ -6,12 +6,13 @@ package http
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"testing"
 
-	"github.com/shuLhan/share/lib/errors"
+	liberrors "github.com/shuLhan/share/lib/errors"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -129,7 +130,9 @@ func TestRegisterDelete(t *testing.T) {
 
 		err := testServer.RegisterEndpoint(c.ep)
 		if err != nil {
-			test.Assert(t, "error", c.expError, err.Error())
+			if !errors.Is(ErrEndpointAmbiguous, err) {
+				test.Assert(t, "error", c.expError, err.Error())
+			}
 			continue
 		}
 
@@ -175,7 +178,7 @@ var testEvaluator = func(req *http.Request, reqBody []byte) error {
 	k := req.Form.Get("k")
 
 	if len(k) == 0 {
-		return &errors.E{
+		return &liberrors.E{
 			Code:    http.StatusBadRequest,
 			Message: "Missing input value for k",
 		}
@@ -193,7 +196,9 @@ func TestRegisterEvaluator(t *testing.T) {
 
 	err := testServer.registerDelete(epEvaluate)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	testServer.RegisterEvaluator(testEvaluator)
@@ -250,7 +255,9 @@ func TestRegisterGet(t *testing.T) {
 
 	err := testServer.registerGet(epGet)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {
@@ -309,8 +316,6 @@ func TestRegisterGet(t *testing.T) {
 }
 
 func TestRegisterHead(t *testing.T) {
-	testServer.routeGets = nil
-
 	epAPI := &Endpoint{
 		Path:         "/api",
 		ResponseType: ResponseTypeJSON,
@@ -319,7 +324,9 @@ func TestRegisterHead(t *testing.T) {
 
 	err := testServer.registerGet(epAPI)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {
@@ -387,7 +394,9 @@ func TestRegisterPatch(t *testing.T) {
 
 	err := testServer.registerPatch(ep)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {
@@ -449,7 +458,9 @@ func TestRegisterPost(t *testing.T) {
 
 	err := testServer.registerPost(ep)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {
@@ -520,7 +531,9 @@ func TestRegisterPut(t *testing.T) {
 
 	err := testServer.registerPut(ep)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {
@@ -585,12 +598,16 @@ func TestServeHTTPOptions(t *testing.T) {
 
 	err := testServer.registerDelete(epDelete)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	err = testServer.registerPatch(epPatch)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {
@@ -636,26 +653,22 @@ func TestServeHTTPOptions(t *testing.T) {
 }
 
 func TestStatusError(t *testing.T) {
-	cbError := func(epr *EndpointRequest) (
-		[]byte, error,
-	) {
-		return nil, &errors.E{
-			Code:    http.StatusLengthRequired,
-			Message: "Length required",
+	var (
+		cbError = func(epr *EndpointRequest) ([]byte, error) {
+			return nil, &liberrors.E{
+				Code:    http.StatusLengthRequired,
+				Message: `Length required`,
+			}
 		}
-	}
+		cbNoCode = func(epr *EndpointRequest) ([]byte, error) {
+			return nil, liberrors.Internal(nil)
+		}
+		cbCustomErr = func(epr *EndpointRequest) ([]byte, error) {
+			return nil, fmt.Errorf("Custom error")
+		}
 
-	cbNoCode := func(epr *EndpointRequest) (
-		[]byte, error,
-	) {
-		return nil, errors.Internal(nil)
-	}
-
-	cbCustomErr := func(epr *EndpointRequest) (
-		[]byte, error,
-	) {
-		return nil, fmt.Errorf("Custom error")
-	}
+		err error
+	)
 
 	epErrNoBody := &Endpoint{
 		Path:         "/error/no-body",
@@ -663,9 +676,11 @@ func TestStatusError(t *testing.T) {
 		ResponseType: ResponseTypeNone,
 		Call:         cbError,
 	}
-	err := testServer.registerPost(epErrNoBody)
+	err = testServer.registerPost(epErrNoBody)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	epErrBinary := &Endpoint{
@@ -676,7 +691,9 @@ func TestStatusError(t *testing.T) {
 	}
 	err = testServer.registerPost(epErrBinary)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	epErrJSON := &Endpoint{
@@ -687,7 +704,9 @@ func TestStatusError(t *testing.T) {
 	}
 	err = testServer.registerPost(epErrJSON)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	epErrPlain := &Endpoint{
@@ -698,7 +717,9 @@ func TestStatusError(t *testing.T) {
 	}
 	err = testServer.registerPost(epErrPlain)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	epErrNoCode := &Endpoint{
@@ -709,7 +730,9 @@ func TestStatusError(t *testing.T) {
 	}
 	err = testServer.registerPost(epErrNoCode)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	epErrCustom := &Endpoint{
@@ -720,7 +743,9 @@ func TestStatusError(t *testing.T) {
 	}
 	err = testServer.registerPost(epErrCustom)
 	if err != nil {
-		t.Fatal(err)
+		if !errors.Is(ErrEndpointAmbiguous, err) {
+			t.Fatal(err)
+		}
 	}
 
 	cases := []struct {

@@ -14,14 +14,14 @@ import (
 
 func TestClient_Download(t *testing.T) {
 	var (
-		logp = "Download"
-		out  bytes.Buffer
-		err  error
-
+		logp       = `Download`
 		clientOpts = ClientOptions{
 			ServerUrl: fmt.Sprintf("http://%s", testServer.Options.Address),
 		}
 		client = NewClient(&clientOpts)
+
+		out bytes.Buffer
+		err error
 	)
 
 	cases := []struct {
@@ -84,7 +84,7 @@ func TestClient_Download(t *testing.T) {
 
 		_, err = client.Download(c.req)
 		if err != nil {
-			test.Assert(t, c.desc+" - error", c.expError, err.Error())
+			test.Assert(t, c.desc+`: error`, c.expError, err.Error())
 			continue
 		}
 
