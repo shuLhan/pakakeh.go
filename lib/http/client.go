@@ -29,8 +29,7 @@ import (
 )
 
 var (
-	defUserAgent = "libhttp/" + share.Version +
-		" (github.com/shuLhan/share/lib/http; ms@kilabit.info)"
+	defUserAgent = `libhttp/` + share.Version
 )
 
 // Client is a wrapper for standard http.Client with simplified usabilities,
