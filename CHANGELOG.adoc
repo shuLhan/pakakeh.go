@@ -17,6 +17,84 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_41_1]
+==  share v0.41.1 (2022-10-07)
+
+[#v0_41_1_enhancements]
+===  Enhancements
+
+lib/http: simplify the default user-agent that send by Client::
++
+Remove the comment string, no need to be explicit about it.
+
+lib/http: support embedded field on UnmarshalForm::
+
+lib/test: use text/diff to compare strings on Assert::
++
+--
+If both exp and got types are string and its longer than 50 chars, it
+will use the text/diff.Text to show the difference between them.
+The diff output is as follow,
+
+	!!! string not matched:
+	--++
+	<LINE_NUM> - "<LINE_EXP>"
+	<LINE_NUM> + "<LINE_GOT>"
+	^<COL_NUM> - "<DELETED_STRING>"
+	^<COL_NUM> + "<INSERTED_STRING>"
+
+The "<LINE_NUM> - " print the line number in exp followed by line itself.
+The "<LINE_NUM> + " print the line number in got followed by line itself.
+The "^<COL_NUM> - " show the character number in exp line followed by
+deleted string (or string that not exist in got).
+The "^<COL_NUM> + " show the character number in got line followed by
+inserted string (or string that not exist in exp).
+--
+
+lib/reflect: remove prefix from returned error on DoEqual::
++
+Prefixing an error cause may cause confusion when used on
+lib/test.Assert.
+The returned error from test.Assert will print "DoEqual: ...", where
+user never call DoEqual in their test.
+
+lib/test: change the Assert parameter to Writer::
++
+--
+Since we only need to call Log and Fatalf during Assert, no need to pass
+the whole instance of testing.T to Assert.
+By changing it to Writer, we also can test the Assert.
+
+This remove the AssertBench, because it have the same function
+parameters and body as Assert.
+--
+
+[#v0_41_1_chores]
+===  Chores
+
+all: fix some tests with -count=X, where X>1::
++
+The fixed test are in package lib/dns, lib/http, lib/smtp, lib/git, and
+email/dkim.
+
+lib/ini: add example for marshaling slice inside map[string]T::
++
+While at it, clean up some codes to make it more readable and debug-able.
+
+lib/paseto: reformat the documentation::
+
+lib/websocket: fix possible race during testing Client::
++
+During testing the Client we use the un-exported method send,
+while the test cases itself may close the connection and we did not
+guard it.
+
+text/diff: rewrite the test again by reading from files::
++
+The goal is to remove dependency to lib/test so we can use text/diff
+in the lib/test in the future.
+
+
 [#v0_41_0]
 ==  share v0.41.0 (2022-09-04)
 
