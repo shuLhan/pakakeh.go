@@ -434,19 +434,6 @@ func (cl *Client) doHandshake(keyAccept string, req []byte) (res []byte, err err
 	return res, nil
 }
 
-// handleBadRequest by sending Close frame with status.
-func (cl *Client) handleBadRequest() {
-	var (
-		frameClose []byte = NewFrameClose(true, StatusBadRequest, nil)
-		err        error
-	)
-
-	err = cl.send(frameClose)
-	if err != nil {
-		log.Println("websocket: Client.handleBadRequest: " + err.Error())
-	}
-}
-
 // clientOnClose request from server.
 func clientOnClose(cl *Client, frame *Frame) (err error) {
 	switch {
@@ -522,13 +509,13 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 		if frame.opcode == OpcodeCont {
 			// If a connection does not have continuous frame,
 			// then current frame opcode must not be 0.
-			cl.handleBadRequest()
+			_ = cl.sendClose(StatusBadRequest, nil)
 			return true
 		}
 	} else if frame.opcode != OpcodeCont {
 		// If a connection have continuous frame, the next frame
 		// opcode must be 0.
-		cl.handleBadRequest()
+		_ = cl.sendClose(StatusBadRequest, nil)
 		return true
 	}
 
@@ -562,7 +549,7 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 	var err error
 	if frame.opcode == OpcodeText {
 		if !utf8.Valid(frame.payload) {
-			cl.handleInvalidData()
+			_ = cl.sendClose(StatusInvalidData, nil)
 			return true
 		}
 		err = cl.HandleText(cl, frame)
@@ -570,7 +557,7 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 		err = cl.HandleBin(cl, frame)
 	}
 	if err != nil {
-		cl.handleBadRequest()
+		_ = cl.sendClose(StatusBadRequest, nil)
 		return true
 	}
 
@@ -580,7 +567,7 @@ func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
 // handleFrame handle a single frame from client.
 func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 	if !frame.isValid(false, cl.allowRsv1, cl.allowRsv2, cl.allowRsv3) {
-		cl.handleBadRequest()
+		_ = cl.sendClose(StatusBadRequest, nil)
 		return true
 	}
 
@@ -592,7 +579,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 		}
 	case OpcodeDataRsv3, OpcodeDataRsv4, OpcodeDataRsv5, OpcodeDataRsv6,
 		OpcodeDataRsv7:
-		cl.handleBadRequest()
+		_ = cl.sendClose(StatusBadRequest, nil)
 		return true
 	case OpcodeClose:
 		// Check if we are requesting the close.
@@ -621,9 +608,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 	return isClosing
 }
 
-func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
-	rest []byte, err error,
-) {
+func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, err error) {
 	if debug.Value >= 3 {
 		var max int = 512
 		if len(resp) < 512 {
@@ -650,19 +635,6 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (
 	}
 
 	return rest, nil
-}
-
-// handleInvalidData by sending Close frame with status 1007.
-func (cl *Client) handleInvalidData() {
-	var (
-		frameClose []byte = NewFrameClose(true, StatusInvalidData, nil)
-		err        error
-	)
-
-	err = cl.send(frameClose)
-	if err != nil {
-		log.Println("websocket: Client.handleInvalidData: " + err.Error())
-	}
 }
 
 // handleRaw packet from server.
