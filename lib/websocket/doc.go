@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package websocket provide a library for creating WebSocket server or
-// client.
+// Package websocket provide a library for WebSocket server or client based on
+// [RFC6455].
 //
-// The websocket server is implemented with epoll and kqueue, which means it's
-// only run on Linux, Darwin, or BSD.
+// The websocket server is implemented using epoll and kqueue, which means
+// it's only run on Linux, Darwin, or BSD.
 //
 // # Pub-Sub Example
 //
-// The following example show how create an authenticated WebSocket server
-// that echo the data frame TEXT back to client.
+// The following code snippet show how to create an authenticated WebSocket
+// server that echo the data frame TEXT back to client.
 //
 //	import (
 //		...
@@ -69,11 +69,16 @@
 //		srv.Start()
 //	}
 //
+// # Limitation
+//
+// Only support WebSocket version 13 (the first and most common version used
+// in web browser).
+//
 // # References
 //
-// - https://tools.ietf.org/html/rfc6455
+//   - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
 //
-// - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
+//   - http://man7.org/linux/man-pages/man7/epoll.7.html
 //
-// - http://man7.org/linux/man-pages/man7/epoll.7.html
+// [RFC6455]: https://tools.ietf.org/html/rfc6455
 package websocket

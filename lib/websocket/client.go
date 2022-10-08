@@ -143,16 +143,14 @@ type Client struct {
 	// client.
 	gracefulClose chan bool
 
+	// Endpoint the address of remote server.
+	// The endpoint use the following format,
 	//
-	// Endpoint contains URI of remote server.  The endpoint use the
-	// following format,
-	//
-	//	ws-URI = "ws:" "//" host [ ":" port ] path [ "?" query ]
-	//	wss-URI = "wss:" "//" host [ ":" port ] path [ "?" query ]
+	//	ws-URI = "ws://" host [ ":" port ] path [ "?" query ]
+	//	wss-URI = "wss://" host [ ":" port ] path [ "?" query ]
 	//
 	// The port component is OPTIONAL, default is 80 for "ws" scheme, and
 	// 443 for "wss" scheme.
-	//
 	Endpoint string
 
 	remoteAddr string
@@ -168,7 +166,9 @@ type Client struct {
 	allowRsv3 bool
 }
 
-// Close gracefully close the client connection.
+// Close gracefully close the client connection by sending control CLOSE frame
+// with status normal to server and wait for response for as long as 10
+// seconds.
 func (cl *Client) Close() (err error) {
 	cl.Lock()
 	defer cl.Unlock()
@@ -691,7 +691,7 @@ func (cl *Client) SendBin(payload []byte) error {
 	return cl.send(packet)
 }
 
-// sendClose send the control CLOSE frame to server.
+// sendClose send the control CLOSE frame to server with optional payload.
 func (cl *Client) sendClose(status CloseCode, payload []byte) (err error) {
 	var packet []byte = NewFrameClose(true, status, payload)
 	return cl.send(packet)
@@ -767,7 +767,7 @@ func (cl *Client) serve() {
 	cl.Quit()
 }
 
-// Quit force close the client connection without sending CLOSE control frame.
+// Quit force close the client connection without sending control CLOSE frame.
 // This function MUST be used only when error receiving packet from server
 // (e.g. lost connection) to release the resource.
 func (cl *Client) Quit() {
