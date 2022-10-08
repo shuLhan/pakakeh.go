@@ -7,8 +7,6 @@ package websocket
 import (
 	"crypto/tls"
 	"net/http"
-	"strings"
-	"sync"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -127,35 +125,19 @@ func TestClient_parseURI(t *testing.T) {
 
 func TestClientPing(t *testing.T) {
 	type testCase struct {
-		exp       *Frame
-		expClose  *Frame
-		desc      string
-		req       []byte
-		reconnect bool
+		exp  *Frame
+		desc string
+		req  []byte
 	}
 
 	if _testServer == nil {
 		runTestServer()
 	}
 
-	var (
-		testClient = &Client{
-			Endpoint: _testEndpointAuth,
-		}
-
-		wg  sync.WaitGroup
-		err error
-	)
-
-	err = testClient.Connect()
-	if err != nil {
-		t.Fatal("TestClientPing: " + err.Error())
-	}
-
 	var cases = []testCase{{
-		desc: "Without payload, unmasked",
+		desc: `Without payload, unmasked`,
 		req:  NewFramePing(false, nil),
-		expClose: &Frame{
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -164,10 +146,9 @@ func TestClientPing(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "With payload, unmasked",
-		reconnect: true,
-		req:       NewFramePing(false, []byte("Hello")),
-		expClose: &Frame{
+		desc: `With payload, unmasked`,
+		req:  NewFramePing(false, []byte(`Hello`)),
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -176,102 +157,79 @@ func TestClientPing(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "With payload, masked",
-		reconnect: true,
-		req:       NewFramePing(true, []byte("Hello")),
+		desc: `With payload, masked`,
+		req:  NewFramePing(true, []byte(`Hello`)),
 		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodePong,
 			len:        5,
-			payload:    []byte("Hello"),
+			payload:    []byte(`Hello`),
 			isComplete: true,
 		},
 	}}
 
 	var (
-		c testCase
+		gotFrame = make(chan *Frame)
+
+		cl  *Client
+		got *Frame
+		c   testCase
+		err error
 	)
 
 	for _, c = range cases {
-		var c testCase = c
 		t.Log(c.desc)
 
-		if c.reconnect {
-			err = testClient.Connect()
-			if err != nil {
-				t.Fatal(err)
-			}
+		cl = &Client{
+			Endpoint: _testEndpointAuth,
+			handleClose: func(cl *Client, f *Frame) error {
+				cl.sendClose(f.closeCode, nil)
+				cl.Quit()
+				gotFrame <- f
+				return nil
+			},
+			handlePong: func(cl *Client, f *Frame) (err error) {
+				gotFrame <- f
+				return nil
+			},
 		}
 
-		testClient.handleClose = func(cl *Client, got *Frame) error {
-			var exp *Frame = c.expClose
-
-			test.Assert(t, "close", exp, got)
-
-			if len(got.payload) >= 2 {
-				got.payload = got.payload[2:]
-			}
-
-			cl.sendClose(got.closeCode, got.payload)
-			cl.Quit()
-			wg.Done()
-			return nil
-		}
-
-		testClient.handlePong = func(cl *Client, got *Frame) (err error) {
-			var exp *Frame = c.exp
-
-			test.Assert(t, "handlePong", exp, got)
-
-			wg.Done()
-			return nil
-		}
-
-		wg.Add(1)
-		testClient.Lock()
-		err = testClient.send(c.req)
-		testClient.Unlock()
+		err = cl.Connect()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		wg.Wait()
-	}
+		cl.Lock()
+		err = cl.send(c.req)
+		cl.Unlock()
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	testClient.Quit()
+		got = <-gotFrame
+		test.Assert(t, `response`, c.exp, got)
+
+		if got.opcode != OpcodeClose {
+			cl.Close()
+		}
+	}
 }
 
-func TestClientText(t *testing.T) {
+func TestClient_send_FrameText(t *testing.T) {
 	type testCase struct {
-		exp       *Frame
-		expClose  *Frame
-		desc      string
-		req       []byte
-		reconnect bool
+		exp  *Frame
+		desc string
+		req  []byte
 	}
 
 	if _testServer == nil {
 		runTestServer()
 	}
 
-	var (
-		testClient = &Client{
-			Endpoint: _testEndpointAuth,
-		}
-
-		wg  sync.WaitGroup
-		err error
-	)
-
-	err = testClient.Connect()
-	if err != nil {
-		t.Fatal("TestClientText: " + err.Error())
-	}
-
 	var cases = []testCase{{
-		desc: "Small payload, unmasked",
-		req:  NewFrameText(false, []byte("Hello")),
-		expClose: &Frame{
+		desc: `Small payload, unmasked`,
+		req:  NewFrameText(false, []byte(`Hello`)),
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -280,20 +238,19 @@ func TestClientText(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "Small payload, masked",
-		reconnect: true,
-		req:       NewFrameText(true, []byte("Hello")),
+		desc: `Small payload, masked`,
+		req:  NewFrameText(true, []byte(`Hello`)),
 		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeText,
 			len:        5,
-			payload:    []byte("Hello"),
+			payload:    []byte(`Hello`),
 			isComplete: true,
 		},
 	}, {
-		desc: "Medium payload 256, unmasked",
+		desc: `Medium payload 256, unmasked`,
 		req:  NewFrameText(false, _dummyPayload256),
-		expClose: &Frame{
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -302,9 +259,8 @@ func TestClientText(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "Medium payload 256, masked",
-		reconnect: true,
-		req:       NewFrameText(true, _dummyPayload256),
+		desc: `Medium payload 256, masked`,
+		req:  NewFrameText(true, _dummyPayload256),
 		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeText,
@@ -313,9 +269,9 @@ func TestClientText(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc: "Large payload 65536, unmasked",
+		desc: `Large payload 65536, unmasked`,
 		req:  NewFrameText(false, _dummyPayload65536),
-		expClose: &Frame{
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -324,9 +280,8 @@ func TestClientText(t *testing.T) {
 			isComplete: true,
 		},
 	}, {
-		desc:      "Large payload 65536, masked",
-		reconnect: true,
-		req:       NewFrameText(true, _dummyPayload65536),
+		desc: `Large payload 65536, masked`,
+		req:  NewFrameText(true, _dummyPayload65536),
 		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeText,
@@ -337,61 +292,62 @@ func TestClientText(t *testing.T) {
 	}}
 
 	var (
-		c testCase
+		gotFrame = make(chan *Frame)
+
+		cl  *Client
+		got *Frame
+		c   testCase
+		err error
 	)
 
 	for _, c = range cases {
-		var c testCase = c
 		t.Log(c.desc)
 
-		if c.reconnect {
-			err = testClient.Connect()
-			if err != nil {
-				t.Fatal(err)
-			}
+		cl = &Client{
+			Endpoint: _testEndpointAuth,
+			handleClose: func(cl *Client, f *Frame) error {
+				cl.sendClose(f.closeCode, nil)
+				cl.Quit()
+				gotFrame <- f
+				return nil
+			},
+			HandleText: func(cl *Client, f *Frame) error {
+				gotFrame <- f
+				return nil
+			},
 		}
 
-		testClient.handleClose = func(cl *Client, got *Frame) error {
-			var exp *Frame = c.expClose
-			test.Assert(t, "close", exp, got)
-			cl.sendClose(got.closeCode, got.payload)
-			cl.Quit()
-			wg.Done()
-			return nil
+		err = cl.Connect()
+		if err != nil {
+			t.Fatal(err.Error())
 		}
 
-		testClient.HandleText = func(cl *Client, got *Frame) error {
-			var exp *Frame = c.exp
-			test.Assert(t, "text", exp, got)
-			wg.Done()
-			return nil
-		}
-
-		wg.Add(1)
-		err = testClient.send(c.req)
+		cl.Lock()
+		err = cl.send(c.req)
 		if err != nil {
 			t.Fatal(err)
 		}
+		cl.Unlock()
 
-		wg.Wait()
+		got = <-gotFrame
+		test.Assert(t, `response`, c.exp, got)
+
+		if got.opcode != OpcodeClose {
+			cl.Close()
+		}
 	}
 }
 
 func TestClientFragmentation(t *testing.T) {
 	type testCase struct {
-		exp      *Frame
-		expClose *Frame
-		desc     string
-		frames   []Frame
+		exp    *Frame
+		desc   string
+		frames []Frame
 	}
 
 	if _testServer == nil {
 		runTestServer()
 	}
-
-	var (
-		wg sync.WaitGroup
-	)
 
 	var cases = []testCase{{
 		desc: "Two text frames, unmasked",
@@ -404,7 +360,7 @@ func TestClientFragmentation(t *testing.T) {
 			opcode:  OpcodeCont,
 			payload: []byte{'l', 'o'},
 		}},
-		expClose: &Frame{
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -427,7 +383,7 @@ func TestClientFragmentation(t *testing.T) {
 			opcode:  OpcodeCont,
 			payload: []byte("Shulhan"),
 		}},
-		expClose: &Frame{
+		exp: &Frame{
 			fin:        frameIsFinished,
 			opcode:     OpcodeClose,
 			closeCode:  StatusBadRequest,
@@ -463,76 +419,90 @@ func TestClientFragmentation(t *testing.T) {
 	}}
 
 	var (
-		c          testCase
-		testClient *Client
-		err        error
-		req        []byte
-		x          int
-		brokenPipe bool
+		gotFrame = make(chan *Frame)
+
+		cl    *Client
+		frame Frame
+		got   *Frame
+		c     testCase
+		err   error
+		x     int
+		req   []byte
 	)
 
 	for _, c = range cases {
-		testClient = &Client{
+		t.Log(c.desc)
+
+		cl = &Client{
 			Endpoint: _testEndpointAuth,
+			handleClose: func(cl *Client, f *Frame) error {
+				cl.sendClose(f.closeCode, nil)
+				cl.Quit()
+				gotFrame <- f
+				return nil
+			},
+			HandleText: func(cl *Client, f *Frame) error {
+				gotFrame <- f
+				return nil
+			},
 		}
 
-		err = testClient.Connect()
+		err = cl.Connect()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		testClient.handleClose = func(desc string, exp *Frame) ClientHandler {
-			return func(cl *Client, got *Frame) (err error) {
-				test.Assert(t, desc+": close", exp, got)
-				cl.sendClose(got.closeCode, got.payload)
-				cl.Quit()
-				wg.Done()
-				return nil
-			}
-		}(c.desc, c.expClose)
+		for x, frame = range c.frames {
+			req = frame.pack()
 
-		testClient.HandleText = func(desc string, exp *Frame) ClientHandler {
-			return func(cl *Client, got *Frame) error {
-				test.Assert(t, desc+": text", exp, got)
-				wg.Done()
-				return nil
-			}
-		}(c.desc, c.exp)
-
-		wg.Add(1)
-		for x = 0; x < len(c.frames); x++ {
-			req = c.frames[x].pack()
-
-			testClient.Lock()
-			err = testClient.send(req)
-			testClient.Unlock()
+			cl.Lock()
+			err = cl.send(req)
+			cl.Unlock()
 			if err != nil {
-				// If the client send unmasked frame, the
+				// If the client send unmasked frame,
 				// server may close the connection before we
 				// can test send the second frame.
-				brokenPipe = strings.Contains(err.Error(), "write: broken pipe")
-				if !brokenPipe {
-					t.Fatalf("expecting broken pipe, got %s", err)
-				}
-				break
+				t.Logf(`send frame %d: %s`, x, err)
 			}
 		}
-		wg.Wait()
+
+		got = <-gotFrame
+		test.Assert(t, `response`, c.exp, got)
+
+		if got.opcode != OpcodeClose {
+			cl.Close()
+		}
 	}
 }
 
+// TestClientFragmentation2 We are sending two requests, first request split
+// into 3 frames in between second request (PING):
+//
+//	F1->F2->PING->F3
 func TestClientFragmentation2(t *testing.T) {
 	if _testServer == nil {
 		runTestServer()
 	}
 
 	var (
+		gotFrame   = make(chan *Frame)
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
+			handlePong: func(cl *Client, f *Frame) error {
+				gotFrame <- f
+				return nil
+			},
+			HandleText: func(cl *Client, f *Frame) error {
+				gotFrame <- f
+				return nil
+			},
 		}
 
-		wg  sync.WaitGroup
+		exp *Frame
+		got *Frame
 		err error
+		x   int
+		req []byte
 	)
 
 	err = testClient.Connect()
@@ -562,39 +532,6 @@ func TestClientFragmentation2(t *testing.T) {
 		payload: []byte("Shulhan"),
 	}}
 
-	testClient.handlePong = func(cl *Client, got *Frame) error {
-		var exp = &Frame{
-			fin:        frameIsFinished,
-			opcode:     OpcodePong,
-			len:        4,
-			payload:    []byte("PING"),
-			isComplete: true,
-		}
-		test.Assert(t, "handlePong", exp, got)
-		wg.Done()
-		return nil
-	}
-
-	testClient.HandleText = func(cl *Client, got *Frame) error {
-		var exp = &Frame{
-			fin:        frameIsFinished,
-			opcode:     OpcodeText,
-			len:        14,
-			payload:    []byte("Hello, Shulhan"),
-			isComplete: true,
-		}
-		test.Assert(t, "handlePong", exp, got)
-		wg.Done()
-		return nil
-	}
-
-	wg.Add(2)
-
-	var (
-		x   int
-		req []byte
-	)
-
 	for x = 0; x < len(frames); x++ {
 		req = frames[x].pack()
 
@@ -606,34 +543,37 @@ func TestClientFragmentation2(t *testing.T) {
 		}
 	}
 
-	wg.Wait()
+	// The first response should be PONG.
+	exp = &Frame{
+		fin:        frameIsFinished,
+		opcode:     OpcodePong,
+		len:        4,
+		payload:    []byte(`PING`),
+		isComplete: true,
+	}
+	got = <-gotFrame
+	test.Assert(t, `response PONG`, exp, got)
+
+	exp = &Frame{
+		fin:        frameIsFinished,
+		opcode:     OpcodeText,
+		len:        14,
+		payload:    []byte(`Hello, Shulhan`),
+		isComplete: true,
+	}
+	got = <-gotFrame
+	test.Assert(t, `response TEXT`, exp, got)
 }
 
 func TestClientSendBin(t *testing.T) {
 	type testCase struct {
-		exp       *Frame
-		desc      string
-		payload   []byte
-		reconnect bool
+		exp     *Frame
+		desc    string
+		payload []byte
 	}
 
 	if _testServer == nil {
 		runTestServer()
-	}
-
-	var (
-		testClient = &Client{
-			Endpoint: _testEndpointAuth,
-		}
-
-		c   testCase
-		wg  sync.WaitGroup
-		err error
-	)
-
-	err = testClient.Connect()
-	if err != nil {
-		t.Fatal("TestSendBin: Connect: " + err.Error())
 	}
 
 	var cases = []testCase{{
@@ -648,32 +588,40 @@ func TestClientSendBin(t *testing.T) {
 		},
 	}}
 
+	var (
+		gotFrame = make(chan *Frame)
+
+		cl  *Client
+		got *Frame
+		c   testCase
+		err error
+	)
+
 	for _, c = range cases {
-		var cc testCase = c
+		t.Log(c.desc)
 
-		t.Log(cc.desc)
-
-		if cc.reconnect {
-			err = testClient.Connect()
-			if err != nil {
-				t.Fatal(err)
-			}
+		cl = &Client{
+			Endpoint: _testEndpointAuth,
+			HandleBin: func(cl *Client, f *Frame) error {
+				gotFrame <- f
+				return nil
+			},
 		}
 
-		testClient.HandleBin = func(cl *Client, got *Frame) error {
-			var exp *Frame = cc.exp
-			test.Assert(t, "HandleBin", exp, got)
-			wg.Done()
-			return nil
-		}
-
-		wg.Add(1)
-		err = testClient.SendBin(cc.payload)
+		err = cl.Connect()
 		if err != nil {
-			t.Fatal("TestSendBin: " + err.Error())
+			t.Fatal(err)
 		}
 
-		wg.Wait()
+		err = cl.SendBin(c.payload)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		got = <-gotFrame
+		test.Assert(t, `response`, c.exp, got)
+
+		cl.Close()
 	}
 }
 
@@ -686,20 +634,6 @@ func TestClientSendPing(t *testing.T) {
 
 	if _testServer == nil {
 		runTestServer()
-	}
-
-	var (
-		testClient = &Client{
-			Endpoint: _testEndpointAuth,
-		}
-
-		wg  sync.WaitGroup
-		err error
-	)
-
-	err = testClient.Connect()
-	if err != nil {
-		t.Fatal("TestSendBin: Connect: " + err.Error())
 	}
 
 	var cases = []testCase{{
@@ -723,27 +657,35 @@ func TestClientSendPing(t *testing.T) {
 	}}
 
 	var (
-		c testCase
+		gotFrame   = make(chan *Frame)
+		testClient = &Client{
+			Endpoint: _testEndpointAuth,
+			handlePong: func(cl *Client, f *Frame) error {
+				gotFrame <- f
+				return nil
+			},
+		}
+
+		got *Frame
+		err error
+		c   testCase
 	)
 
+	err = testClient.Connect()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
 	for _, c = range cases {
-		var cc testCase = c
-		t.Log(cc.desc)
+		t.Log(c.desc)
 
-		testClient.handlePong = func(cl *Client, got *Frame) error {
-			var exp *Frame = cc.exp
-			test.Assert(t, "handlePong", exp, got)
-			wg.Done()
-			return nil
-		}
-
-		wg.Add(1)
-		err = testClient.SendPing(cc.payload)
+		err = testClient.SendPing(c.payload)
 		if err != nil {
-			t.Fatal("TestSendPing: " + err.Error())
+			t.Fatal(err.Error())
 		}
 
-		wg.Wait()
+		got = <-gotFrame
+		test.Assert(t, `response`, c.exp, got)
 	}
 }
 
@@ -753,43 +695,42 @@ func TestClient_sendClose(t *testing.T) {
 	}
 
 	var (
-		testClient = &Client{
+		gotFrame = make(chan *Frame)
+		cl       = &Client{
 			Endpoint: _testEndpointAuth,
+			handleClose: func(cl *Client, f *Frame) error {
+				cl.sendClose(f.closeCode, nil)
+				cl.Quit()
+				gotFrame <- f
+				return nil
+			},
 		}
-		wg sync.WaitGroup
 
+		got *Frame
 		err error
 	)
 
-	err = testClient.Connect()
+	err = cl.Connect()
 	if err != nil {
 		t.Fatal("TestClient_sendClose: Connect: " + err.Error())
 	}
 
-	testClient.handleClose = func(cl *Client, got *Frame) error {
-		var exp = &Frame{
-			fin:        frameIsFinished,
-			opcode:     OpcodeClose,
-			closeCode:  StatusNormal,
-			len:        8,
-			payload:    []byte{0x03, 0xE8, 'n', 'o', 'r', 'm', 'a', 'l'},
-			isComplete: true,
-		}
-		test.Assert(t, "handleClose", exp, got)
-		cl.Quit()
-		wg.Done()
-		return nil
-	}
-
-	wg.Add(1)
-	err = testClient.sendClose(StatusNormal, []byte("normal"))
+	err = cl.sendClose(StatusNormal, []byte("normal"))
 	if err != nil {
 		t.Fatal("TestClient_sendClose: " + err.Error())
 	}
 
-	wg.Wait()
+	got = <-gotFrame
+	var exp = &Frame{
+		fin:        frameIsFinished,
+		opcode:     OpcodeClose,
+		closeCode:  StatusNormal,
+		len:        8,
+		payload:    []byte{0x03, 0xE8, 'n', 'o', 'r', 'm', 'a', 'l'},
+		isComplete: true,
+	}
+	test.Assert(t, `sendClose response`, exp, got)
 
-	err = testClient.SendPing(nil)
-
-	test.Assert(t, "error", ErrConnClosed, err)
+	err = cl.SendPing(nil)
+	test.Assert(t, `SendPing should error`, ErrConnClosed, err)
 }

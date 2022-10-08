@@ -178,35 +178,38 @@ func (cl *Client) Close() (err error) {
 	}
 
 	var (
+		logp          = `websocket: Close`
 		packet []byte = NewFrameClose(true, StatusNormal, nil)
-		timer  *time.Timer
+
+		timer *time.Timer
+		wait  bool
 	)
 
 	cl.gracefulClose = make(chan bool, 1)
 
 	err = cl.send(packet)
 	if err != nil {
-		return fmt.Errorf("websocket: Close: %w", err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	// Wait for server to response with CLOSE.
 	timer = time.NewTimer(defaultTimeout)
-loop:
-	for {
+	wait = true
+	for wait {
 		select {
 		case <-timer.C:
 			// We did not receive server CLOSE frame in timely
 			// manner.
-			break loop
+			wait = false
 		case <-cl.gracefulClose:
 			timer.Stop()
-			break loop
+			wait = false
 		}
 	}
 
 	err = cl.conn.Close()
 	if err != nil {
-		err = fmt.Errorf("websocket: Close: %w", err)
+		err = fmt.Errorf(`%s: %w`, logp, err)
 	}
 	cl.conn = nil
 
@@ -215,6 +218,9 @@ loop:
 
 // Connect to endpoint.
 func (cl *Client) Connect() (err error) {
+	cl.Lock()
+	defer cl.Unlock()
+
 	err = cl.init()
 	if err != nil {
 		return fmt.Errorf("websocket: Connect: " + err.Error())
@@ -353,8 +359,7 @@ func (cl *Client) open() (err error) {
 	}
 
 	if cl.TLSConfig != nil {
-		cl.conn, err = tls.DialWithDialer(dialer, "tcp",
-			cl.remoteAddr, cl.TLSConfig)
+		cl.conn, err = tls.DialWithDialer(dialer, "tcp", cl.remoteAddr, cl.TLSConfig)
 	} else {
 		cl.conn, err = dialer.Dial("tcp", cl.remoteAddr)
 	}
@@ -493,7 +498,9 @@ func clientOnClose(cl *Client, frame *Frame) (err error) {
 		fmt.Printf("websocket: clientOnClose: payload: %s\n", frame.payload)
 	}
 
+	cl.Lock()
 	err = cl.send(packet)
+	cl.Unlock()
 	if err != nil {
 		log.Println("websocket: clientOnClose: send: " + err.Error())
 	}
@@ -686,35 +693,50 @@ func (cl *Client) handleRaw(packet []byte) (isClosing bool) {
 
 // SendBin send data frame as binary to server.
 // If handler is nil, no response will be read from server.
-func (cl *Client) SendBin(payload []byte) error {
+func (cl *Client) SendBin(payload []byte) (err error) {
+	cl.Lock()
 	var packet []byte = NewFrameBin(true, payload)
-	return cl.send(packet)
+	err = cl.send(packet)
+	cl.Unlock()
+	return err
 }
 
 // sendClose send the control CLOSE frame to server with optional payload.
 func (cl *Client) sendClose(status CloseCode, payload []byte) (err error) {
+	cl.Lock()
 	var packet []byte = NewFrameClose(true, status, payload)
-	return cl.send(packet)
+	err = cl.send(packet)
+	cl.Unlock()
+	return err
 }
 
 // SendPing send control PING frame to server, expecting PONG as response.
-func (cl *Client) SendPing(payload []byte) error {
+func (cl *Client) SendPing(payload []byte) (err error) {
+	cl.Lock()
 	var packet []byte = NewFramePing(true, payload)
-	return cl.send(packet)
+	err = cl.send(packet)
+	cl.Unlock()
+	return err
 }
 
 // SendPong send the control frame PONG to server, by using payload from PING
 // frame.
-func (cl *Client) SendPong(payload []byte) error {
+func (cl *Client) SendPong(payload []byte) (err error) {
+	cl.Lock()
 	var packet []byte = NewFramePong(true, payload)
-	return cl.send(packet)
+	err = cl.send(packet)
+	cl.Unlock()
+	return err
 }
 
 // SendText send data frame as text to server.
 // If handler is nil, no response will be read from server.
 func (cl *Client) SendText(payload []byte) (err error) {
+	cl.Lock()
 	var packet []byte = NewFrameText(true, payload)
-	return cl.send(packet)
+	err = cl.send(packet)
+	cl.Unlock()
+	return err
 }
 
 // serve read one data frame at a time from server and propagated to handler.
@@ -731,19 +753,20 @@ func (cl *Client) serve() {
 		isClosing bool
 	)
 
-	for {
+	for !isClosing {
 		packet, err = cl.recv()
 		if err != nil {
 			log.Println("websocket: Client.serve: " + err.Error())
-			break
+			isClosing = true
+			continue
 		}
 		if len(packet) == 0 {
 			// Empty packet may indicated that server has closed
 			// the connection abnormally.
 			log.Println("websocket: Client.serve: empty packet received, closing")
-			break
+			isClosing = true
+			continue
 		}
-
 		if cl.frame != nil {
 			packet = cl.frame.unpack(packet)
 			if cl.frame.isComplete {
@@ -751,18 +774,14 @@ func (cl *Client) serve() {
 				cl.frame = nil
 				isClosing = cl.handleFrame(frame)
 				if isClosing {
-					return
+					continue
 				}
 			}
 			if len(packet) == 0 {
 				continue
 			}
 		}
-
 		isClosing = cl.handleRaw(packet)
-		if isClosing {
-			return
-		}
 	}
 	cl.Quit()
 }
@@ -876,7 +895,8 @@ func (cl *Client) send(packet []byte) (err error) {
 // pinger send the PING control frame every 10 seconds.
 func (cl *Client) pinger() {
 	var (
-		t   *time.Ticker = time.NewTicker(cl.PingInterval)
+		t *time.Ticker = time.NewTicker(cl.PingInterval)
+
 		err error
 	)
 
