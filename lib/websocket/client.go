@@ -170,31 +170,27 @@ type Client struct {
 // with status normal to server and wait for response for as long as 10
 // seconds.
 func (cl *Client) Close() (err error) {
+	cl.gracefulClose = make(chan bool, 1)
+	defer func() {
+		close(cl.gracefulClose)
+		cl.gracefulClose = nil
+	}()
+
+	err = cl.sendClose(StatusNormal, nil)
+	if errors.Is(err, ErrConnClosed) {
+		return nil
+	}
+
 	cl.Lock()
 	defer cl.Unlock()
 
-	if cl.conn == nil {
-		return
-	}
-
 	var (
-		logp          = `websocket: Close`
-		packet []byte = NewFrameClose(true, StatusNormal, nil)
-
-		timer *time.Timer
-		wait  bool
+		timer = time.NewTimer(defaultTimeout)
+		wait  = true
 	)
 
-	cl.gracefulClose = make(chan bool, 1)
-
-	err = cl.send(packet)
-	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	// Wait for server to response with CLOSE.
-	timer = time.NewTimer(defaultTimeout)
-	wait = true
+	// Wait for server to response with CLOSE or until 10 seconds without
+	// reponse.
 	for wait {
 		select {
 		case <-timer.C:
@@ -207,9 +203,13 @@ func (cl *Client) Close() (err error) {
 		}
 	}
 
+	if cl.conn == nil {
+		return nil
+	}
+
 	err = cl.conn.Close()
 	if err != nil {
-		err = fmt.Errorf(`%s: %w`, logp, err)
+		err = fmt.Errorf(`websocket: Close: %w`, err)
 	}
 	cl.conn = nil
 
@@ -221,13 +221,14 @@ func (cl *Client) Connect() (err error) {
 	cl.Lock()
 	defer cl.Unlock()
 
+	if cl.conn != nil {
+		_ = cl.conn.Close()
+		cl.conn = nil
+	}
+
 	err = cl.init()
 	if err != nil {
 		return fmt.Errorf("websocket: Connect: " + err.Error())
-	}
-
-	if cl.conn != nil {
-		cl.Quit()
 	}
 
 	err = cl.open()
