@@ -25,12 +25,21 @@ const maxBuffer = 1024
 func Recv(fd int) (packet []byte, err error) {
 	var (
 		buf []byte = make([]byte, maxBuffer)
-		n   int
+
+		errno syscall.Errno
+		n     int
+		ok    bool
 	)
 
 	for {
 		n, err = unix.Read(fd, buf)
 		if err != nil {
+			errno, ok = err.(unix.Errno)
+			if ok {
+				if errno == unix.EAGAIN || errno == unix.EINTR {
+					continue
+				}
+			}
 			break
 		}
 		if n > 0 {
