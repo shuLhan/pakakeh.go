@@ -17,6 +17,69 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_41_2]
+==  share v0.41.2 (2022-10-10)
+
+[#v0_41_2_bug_fixes]
+===  Bug fixes
+
+lib/websocket: check for EAGAIN and EINTR when reading raw socket::
++
+--
+This fix tests that sometimes fail when running with -count=X, where
+X > 1,
+
+	$ go test -race -count=30 -timeout=30s ./lib/websocket
+
+Upon inspecting, when client sending larger payload, for example
+65536 bytes, server sometimes only read half of them and return an
+error "resource temporarily unavailable" or
+"interrupted system call".
+--
+
+lib/websocket: fix possible data race on Client::
++
+--
+The Client have method send that check if the underlying connection (conn)
+has been closed or not.
+Since the conn can be closed anytime, for example server send to the
+control CLOSE frame:
+
+	recv -> handleFrame -> handleClose -> Quit
+
+we need to guard the conn with Mutex before calling send to prevent
+data race.
+--
+
+[#v0_41_2_enhancements]
+=== Enhancements
+
+lib/websocket: cleanup the channel gracefulClose during Close::
++
+--
+When calling Close, we initialize the internal channel gracefulClose
+so the client can check the close response from server on another
+goroutine serve() and signal back to Close to continue the closing
+process.
+
+This channel is never closed and nil-ed again after Close which
+may cause resource leaks.
+
+While at it, use sendClose to minimize duplicate code.
+--
+
+[#v0_41_2_chores]
+=== Chores
+
+lib/websocket: replace handleInvalidData and BadRequest with sendClose::
++
+Both of those functions actually call send control CLOSE frame and not
+exported.
+So, instead of duplicating it, we replace it with sendClose.
+
+lib/websocket: rewords some comment and package documentation::
+
+
 [#v0_41_1]
 ==  share v0.41.1 (2022-10-07)
 
