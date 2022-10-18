@@ -145,6 +145,7 @@ func unpackPacket(payload []byte) (pac *packet, err error) {
 			payload = payload[v:]
 
 			node.attrs, length = unpackFileAttrs(payload)
+			node.attrs.name = node.fileName
 			payload = payload[length:]
 
 			pac.nodes = append(pac.nodes, node)
