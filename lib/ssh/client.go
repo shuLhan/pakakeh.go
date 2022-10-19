@@ -77,12 +77,37 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	sshConfig.Auth = []ssh.AuthMethod{
 		ssh.PublicKeysCallback(cfg.Signers),
 	}
-	sshClient, err := ssh.Dial("tcp", remoteAddr, sshConfig)
-	if err == nil {
-		cl.Client = sshClient
-		return cl, nil
+
+	cl.Client, err = ssh.Dial(`tcp`, remoteAddr, sshConfig)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
-	return nil, fmt.Errorf("%s: %w", logp, err)
+
+	fmt.Printf("ssh config.Section: %+v\n", cfg)
+
+	if agentClient != nil {
+		// TODO(ms): since we did not know which signer is being used,
+		// we added all the private key to agent for now.
+		// Also, should check cfg.AddKeysToAgent == `yes`.
+		var (
+			pkeyFile string
+			pkey     any
+			addedKey agent.AddedKey
+		)
+		for pkeyFile, pkey = range cfg.PrivateKeys {
+			fmt.Printf("Adding key %q to agent.\n", pkeyFile)
+
+			addedKey = agent.AddedKey{
+				PrivateKey: pkey,
+			}
+			err = agentClient.Add(addedKey)
+			if err != nil {
+				log.Printf(`%s: %s`, logp, err)
+			}
+		}
+	}
+
+	return cl, nil
 }
 
 // Execute a command on remote server.
