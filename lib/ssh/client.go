@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
@@ -28,7 +29,9 @@ type Client struct {
 }
 
 // NewClientFromConfig create a new SSH connection using predefined
-// configuration.
+// configuration. This function may dial twice to find appropriate
+// authentication method when SSH_AUTH_SOCK environment variable is
+// set and IdentityFile directive is specified in Host section.
 func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
@@ -36,32 +39,11 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 
 	logp := "NewClient"
 
+	remoteAddr := fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port)
+
 	sshConfig := &ssh.ClientConfig{
 		User:            cfg.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
-
-	sshAgentSockPath := cfg.GetIdentityAgent()
-	if len(sshAgentSockPath) > 0 {
-		sshAgentSock, err := net.Dial("unix", sshAgentSockPath)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-
-		agentClient := agent.NewClient(sshAgentSock)
-
-		sshConfig.Auth = []ssh.AuthMethod{
-			ssh.PublicKeysCallback(agentClient.Signers),
-		}
-	} else {
-		err = cfg.GenerateSigners(nil)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-
-		sshConfig.Auth = []ssh.AuthMethod{
-			ssh.PublicKeys(cfg.Signers...),
-		}
 	}
 
 	cl = &Client{
@@ -70,14 +52,39 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 		stderr: os.Stderr,
 	}
 
-	remoteAddr := fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port)
+	sshAgentSockPath := cfg.GetIdentityAgent()
+	if len(sshAgentSockPath) > 0 {
+		sshAgentSock, err := net.Dial("unix", sshAgentSockPath)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+		agentClient := agent.NewClient(sshAgentSock)
+		sshConfig.Auth = []ssh.AuthMethod{
+			ssh.PublicKeysCallback(agentClient.Signers),
+		}
+		sshClient, err := ssh.Dial("tcp", remoteAddr, sshConfig)
+		if err == nil {
+			cl.Client = sshClient
+			return cl, nil
+		}
+		if len(cfg.IdentityFile) == 0 || !strings.HasSuffix(err.Error(), "no supported methods remain") {
+			return nil, fmt.Errorf("%s: %w", logp, err)
+		}
+	}
 
-	cl.Client, err = ssh.Dial("tcp", remoteAddr, sshConfig)
+	err = cfg.GenerateSigners(nil)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
-
-	return cl, nil
+	sshConfig.Auth = []ssh.AuthMethod{
+		ssh.PublicKeys(cfg.Signers...),
+	}
+	sshClient, err := ssh.Dial("tcp", remoteAddr, sshConfig)
+	if err == nil {
+		cl.Client = sshClient
+		return cl, nil
+	}
+	return nil, fmt.Errorf("%s: %w", logp, err)
 }
 
 // Execute a command on remote server.
