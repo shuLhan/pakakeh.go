@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/agent"
 	"golang.org/x/term"
 )
 
@@ -72,9 +71,6 @@ type Section struct {
 	UseCompression                    bool
 	UseVisualHostKey                  bool
 
-	// List of SSH private keys.
-	Signers []ssh.Signer
-
 	// User's home directory.
 	homeDir string
 
@@ -87,6 +83,10 @@ type Section struct {
 
 	// The first IdentityFile that exist and valid.
 	PrivateKeyFile string
+
+	// PrivateKeys contains IdentityFile that has been parsed.
+	// This field will be set once the Signers has been called.
+	PrivateKeys map[string]any
 
 	// Patterns for Host section.
 	patterns []*pattern
@@ -139,18 +139,26 @@ func newSectionHost(rawPattern string) (host *Section) {
 	return host
 }
 
-// GenerateSigners convert the IdentityFile to ssh.Signer for authentication
-// using PublicKey.
-func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) {
+// Signers convert the IdentityFile to ssh.Signer for authentication
+// using PublicKey and store the parsed-unsigned private key into PrivateKeys.
+//
+// This method will ask for passphrase from terminal, if one of IdentityFile
+// is protected.
+// Unless the value of IdentityFile changes, this method should be called only
+// once, otherwise it will ask passphrase on every call.
+func (section *Section) Signers() (signers []ssh.Signer, err error) {
 	var (
-		logp     = "GenerateSigners"
-		pkeyFile string
-		pkeyPem  []byte
-		pkey     interface{}
-		signer   ssh.Signer
+		logp = `Signers`
+
+		pkeyFile      string
+		pkeyPem       []byte
+		pass          []byte
+		signer        ssh.Signer
+		pkey          any
+		isMissingPass bool
 	)
 
-	section.Signers = make([]ssh.Signer, 0, len(section.IdentityFile))
+	section.PrivateKeys = make(map[string]any, len(section.IdentityFile))
 
 	for _, pkeyFile = range section.IdentityFile {
 		pkeyPem, err = os.ReadFile(pkeyFile)
@@ -158,52 +166,41 @@ func (section *Section) GenerateSigners(agentc agent.ExtendedAgent) (err error) 
 			if errors.Is(err, os.ErrNotExist) {
 				continue
 			}
-			return fmt.Errorf("%s: %w", logp, err)
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
 		pkey, err = ssh.ParseRawPrivateKey(pkeyPem)
 		if err != nil {
-			_, isMissingPass := err.(*ssh.PassphraseMissingError)
+			_, isMissingPass = err.(*ssh.PassphraseMissingError)
 			if !isMissingPass {
-				return fmt.Errorf("%s: %w", logp, err)
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
 
 			fmt.Printf("Enter passphrase for %s:", pkeyFile)
 
-			pass, err := term.ReadPassword(0)
+			pass, err = term.ReadPassword(0)
 			if err != nil {
-				return fmt.Errorf("%s: %w", logp, err)
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
 
 			pkey, err = ssh.ParseRawPrivateKeyWithPassphrase(pkeyPem, pass)
 			if err != nil {
-				return fmt.Errorf("%s: %w", logp, err)
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
 		}
 
 		signer, err = ssh.NewSignerFromKey(pkey)
 		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-
-		if agentc != nil {
-			fmt.Printf("adding key %q to agent\n", pkeyFile)
-
-			key := agent.AddedKey{
-				PrivateKey: pkey,
-			}
-			err = agentc.Add(key)
-			if err != nil {
-				return fmt.Errorf("%s: %w", logp, err)
-			}
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
 		if len(section.PrivateKeyFile) == 0 {
 			section.PrivateKeyFile = pkeyFile
 		}
-		section.Signers = append(section.Signers, signer)
+		signers = append(signers, signer)
+		section.PrivateKeys[pkeyFile] = pkey
 	}
-	return nil
+	return signers, nil
 }
 
 // GetIdentityAgent get the identity agent either from section config variable

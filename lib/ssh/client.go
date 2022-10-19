@@ -37,14 +37,16 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 		return nil, nil
 	}
 
-	logp := "NewClient"
+	var (
+		logp       = `NewClient`
+		remoteAddr = fmt.Sprintf(`%s:%s`, cfg.Hostname, cfg.Port)
+		sshConfig  = &ssh.ClientConfig{
+			User:            cfg.User,
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
 
-	remoteAddr := fmt.Sprintf("%s:%s", cfg.Hostname, cfg.Port)
-
-	sshConfig := &ssh.ClientConfig{
-		User:            cfg.User,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
+		agentClient agent.ExtendedAgent
+	)
 
 	cl = &Client{
 		cfg:    cfg,
@@ -58,7 +60,7 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
-		agentClient := agent.NewClient(sshAgentSock)
+		agentClient = agent.NewClient(sshAgentSock)
 		sshConfig.Auth = []ssh.AuthMethod{
 			ssh.PublicKeysCallback(agentClient.Signers),
 		}
@@ -72,12 +74,8 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 		}
 	}
 
-	err = cfg.GenerateSigners(nil)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
 	sshConfig.Auth = []ssh.AuthMethod{
-		ssh.PublicKeys(cfg.Signers...),
+		ssh.PublicKeysCallback(cfg.Signers),
 	}
 	sshClient, err := ssh.Dial("tcp", remoteAddr, sshConfig)
 	if err == nil {
