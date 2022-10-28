@@ -6,6 +6,7 @@ package http
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -58,11 +59,17 @@ func ExampleEndpoint_errorHandler() {
 
 	params := url.Values{}
 	params.Set("error", "400:error with status code")
-	httpres, resbody, _ := client.Get("/", nil, params)
+	httpres, resbody, err := client.Get(`/`, nil, params)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
 
 	params.Set("error", "error without status code")
-	httpres, resbody, _ = client.Get("/", nil, params)
+	httpres, resbody, err = client.Get(`/`, nil, params)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
 
 	// Output:

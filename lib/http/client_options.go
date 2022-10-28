@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -38,4 +39,5 @@ func (opts *ClientOptions) init() {
 	if opts.Timeout <= 0 {
 		opts.Timeout = defClientTimeout
 	}
+	opts.ServerUrl = strings.TrimSuffix(opts.ServerUrl, `/`)
 }
