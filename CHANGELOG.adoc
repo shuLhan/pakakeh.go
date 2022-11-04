@@ -17,6 +17,65 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_41_3]
+==  share v0.41.3 (2022-11-05)
+
+[#v0_41_3_bug_fixes]
+===  Bug fixes
+
+lib/http: sanitize ServerUrl and request path::
++
+--
+This is to fix double slash in case the ServerUrl end with it and the
+request path begin with it.
+For example, "http://127.0.0.1/" and "/" should send request to
+"http://127.0.0.1/" not "http://127.0.0.1//".
+--
+
+lib/ssh: try both ssh agent and IdentityFile::
++
+--
+If ~/.ssh/config contains a Host section with IdentityFile directive specified
+and SSH_AUTH_SOCK environment variable is also set, but ssh_config
+section does not specify "IdentityAgent none" explicitly, the NewClientFromConfig
+returns an error saying
+
+  NewClient: ssh: handshake failed: ssh: unable to authenticate, attempted
+    methods [none publickey], no supported methods remain.
+
+This changes fix this by dialing remote server twice.
+--
+
+ssh/sftp: set FileAttrs.name to filename::
++
+--
+Current implementation exposes dirEntry.filename as fs.DirEntry.Name().
+However fs.DirEntry.Info().Name() is always empty string.
+--
+
+[#v0_41_3_enhancement]
+===  Enhancements
+
+lib/ssh: add private key to agent once client connected successfully::
++
+--
+In NewClientFromConfig, if Client connect using IdentityFile instead of
+agent and its success, we add the private key to agent directly.
+
+Unfortunately, since we did not know which key is being negotiated, we
+add all private keys parsed from IdentityFile.
+--
+
+ssh/config: change the method GenerateSigners to Signers::
++
+--
+This is to make the method compatible with ssh.PublicKeysCallback.
+
+Each parsed and unsigned IdentityFile is stored in field PrivateKeys,
+replacing the Signers field (which is conflict with method names).
+--
+
+
 [#v0_41_2]
 ==  share v0.41.2 (2022-10-10)
 
