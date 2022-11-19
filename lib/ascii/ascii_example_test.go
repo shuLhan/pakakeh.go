@@ -6,6 +6,7 @@ package ascii
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 func ExampleIsAlnum() {
@@ -109,6 +110,7 @@ func ExampleIsSpace() {
 }
 
 func ExampleRandom() {
+	rand.Seed(42)
 	fmt.Printf("Random 5 Letters: %s\n", Random([]byte(Letters), 5))
 	fmt.Printf("Random 5 LettersNumber: %s\n", Random([]byte(LettersNumber), 5))
 	fmt.Printf("Random 5 HexaLETTERS: %s\n", Random([]byte(HexaLETTERS), 5))
@@ -116,12 +118,12 @@ func ExampleRandom() {
 	fmt.Printf("Random 5 Hexaletters: %s\n", Random([]byte(Hexaletters), 5))
 	fmt.Printf("Random 5 binary: %s\n", Random([]byte("01"), 5))
 	// Output:
-	// Random 5 Letters: XVlBz
-	// Random 5 LettersNumber: 80Aep
-	// Random 5 HexaLETTERS: 6F218
-	// Random 5 HexaLetters: 675DA
-	// Random 5 Hexaletters: fa82f
-	// Random 5 binary: 11001
+	// Random 5 Letters: HRukp
+	// Random 5 LettersNumber: hg1l0
+	// Random 5 HexaLETTERS: 9F7CC
+	// Random 5 HexaLetters: 56feA
+	// Random 5 Hexaletters: a64b0
+	// Random 5 binary: 10111
 }
 
 func ExampleToLower() {
