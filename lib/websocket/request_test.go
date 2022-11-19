@@ -67,6 +67,15 @@ func TestRequestUnpack(t *testing.T) {
 			Target: "/get/1?%in=va",
 		},
 		expErr: `websocket: Request.unpack: invalid URL escape "%in"`,
+
+		// In go version >= 1.20 it will not return an error anymore.
+		// See https://github.com/golang/go/issues/56732
+		expParams: targetParam{
+			"id": "1",
+		},
+		expQuery: url.Values{
+			`%in`: []string{`va`},
+		},
 	}, {
 		desc: "With param",
 		req: &Request{
