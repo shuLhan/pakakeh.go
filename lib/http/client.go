@@ -379,6 +379,39 @@ func (client *Client) Put(requestPath string, headers http.Header, body []byte) 
 	return client.doRequest(http.MethodPut, headers, requestPath, ``, bodyReader)
 }
 
+// PutForm send the PUT request with params set in body using content type
+// "application/x-www-form-urlencoded".
+func (client *Client) PutForm(requestPath string, headers http.Header, params url.Values) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	var (
+		body *strings.Reader = strings.NewReader(params.Encode())
+	)
+
+	return client.doRequest(http.MethodPut, headers, requestPath, ContentTypeForm, body)
+}
+
+// PutFormData send the PUT request with params set in body using content type
+// "multipart/form-data".
+func (client *Client) PutFormData(requestPath string, headers http.Header, params map[string][]byte) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	var (
+		contentType string
+		strBody     string
+		body        *strings.Reader
+	)
+
+	contentType, strBody, err = generateFormData(params)
+	if err != nil {
+		return nil, nil, fmt.Errorf(`http: PutFormData: %w`, err)
+	}
+
+	body = strings.NewReader(strBody)
+
+	return client.doRequest(http.MethodPut, headers, requestPath, contentType, body)
+}
+
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
 func (client *Client) PutJSON(requestPath string, headers http.Header, params interface{}) (
