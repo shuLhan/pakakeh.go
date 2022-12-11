@@ -17,6 +17,46 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_42_0]
+==  share v0.42.0 (2022-12-12)
+
+[#v0_42_0_new_features]
+=== New features
+
+lib/http: add methods PutForm and PutFormData on Client::
++
+--
+The PutForm method send the PUT request with params set in body using
+content type "application/x-www-form-urlencoded".
+
+The PutFormData method send the PUT request with params set in body
+using content type "multipart/form-data".
+--
+
+[#v0_42_0_chores]
+=== Chores
+
+lib/websocket: fix test for the Go 1.20::
++
+--
+In the next Go release (1.20), parsing URL with invalid percent escape
+will not throw error anymore [1].
+
+[1] https://github.com/golang/go/issues/56732
+--
+
+lib/ascii: seed math/rand to fix the example for Random function::
++
+--
+In the next Go release, the math/rand is globally seed randomly [1].
+This cause our example for Random is always fail.
+
+The fix is to seed it manually using predefined number.
+
+[1] https://github.com/golang/go/issues/54880
+--
+
+
 [#v0_41_3]
 ==  share v0.41.3 (2022-11-05)
 
