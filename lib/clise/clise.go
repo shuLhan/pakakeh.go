@@ -23,6 +23,7 @@ package clise
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 )
 
@@ -130,4 +131,27 @@ func (c *Clise) MarshalJSON() (out []byte, err error) {
 	var slice = c.Slice()
 	out, err = json.Marshal(slice)
 	return out, err
+}
+
+// UnmarshalJSON unmarshal JSON array into Clise.
+// If the size is zero, it will be set to the length of JSON array.
+func (c *Clise) UnmarshalJSON(jsonb []byte) (err error) {
+	var (
+		logp  = `UnmarshalJSON`
+		array = make([]interface{}, 0)
+	)
+
+	err = json.Unmarshal(jsonb, &array)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	if c.size == 0 {
+		c.size = len(array)
+		c.v = make([]interface{}, c.size)
+	}
+
+	c.Push(array...)
+
+	return nil
 }
