@@ -48,6 +48,12 @@ func New(size int) (c *Clise) {
 	return c
 }
 
+// Close implement io.Closer, equal to Reset().
+func (c *Clise) Close() error {
+	c.Reset()
+	return nil
+}
+
 // Pop remove the last Push()-ed item and return it to caller.
 // It will return nil if no more item inside it.
 func (c *Clise) Pop() (item interface{}) {
@@ -131,6 +137,24 @@ func (c *Clise) MarshalJSON() (out []byte, err error) {
 	var slice = c.Slice()
 	out, err = json.Marshal(slice)
 	return out, err
+}
+
+// Write implement io.Writer, equal to Push(b).
+func (c *Clise) Write(b []byte) (n int, err error) {
+	c.Push(b)
+	return len(b), nil
+}
+
+// WriteByte implement io.ByteWriter, equal to Push(b).
+func (c *Clise) WriteByte(b byte) error {
+	c.Push(b)
+	return nil
+}
+
+// WriteString implement io.StringWriter, equal to Push(s).
+func (c *Clise) WriteString(s string) (n int, err error) {
+	c.Push(s)
+	return len(s), nil
 }
 
 // UnmarshalJSON unmarshal JSON array into Clise.
