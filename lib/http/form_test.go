@@ -21,6 +21,35 @@ type Z struct {
 	Bool bool `form:"bool"`
 }
 
+func TestMarshalForm(t *testing.T) {
+	var (
+		astruct = Z{
+			Y: Y{
+				X: X{
+					Int: 1000,
+				},
+				String: `string in Y`,
+			},
+			Bool: true,
+		}
+		exp = url.Values{
+			`int`:    []string{`1000`},
+			`string`: []string{`string in Y`},
+			`bool`:   []string{`true`},
+		}
+
+		got url.Values
+		err error
+	)
+
+	got, err = MarshalForm(astruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, `Embedded`, exp, got)
+}
+
 func TestUnmarshalForm(t *testing.T) {
 	var (
 		form = url.Values{}

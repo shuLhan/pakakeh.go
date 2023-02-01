@@ -11,11 +11,127 @@ import (
 	"strings"
 
 	libreflect "github.com/shuLhan/share/lib/reflect"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 const (
 	structTagKey = "form"
 )
+
+// MarshalForm marshal struct fields tagged with `form:` into url.Values.
+//
+// The rules for marshaling follow the same rules as in [UnmarshalForm].
+//
+// It will return an error if the input is not pointer to or a struct.
+func MarshalForm(in any) (out url.Values, err error) {
+	var (
+		logp                  = `MarshalForm`
+		inValue reflect.Value = reflect.ValueOf(in)
+		inType  reflect.Type  = inValue.Type()
+		inKind  reflect.Kind  = inType.Kind()
+
+		listField []reflect.StructField
+		x         int
+	)
+
+	if inKind == reflect.Ptr {
+		inType = inType.Elem()
+		inKind = inType.Kind()
+	}
+	if inKind != reflect.Struct {
+		return nil, fmt.Errorf(`%s: expecting struct got %T`, logp, in)
+	}
+
+	out = url.Values{}
+	listField = reflect.VisibleFields(inType)
+
+	for ; x < len(listField); x++ {
+		var field = listField[x]
+
+		if field.Anonymous {
+			// Skip embedded field.
+			continue
+		}
+
+		var (
+			key    string
+			opts   []string
+			hasTag bool
+		)
+
+		key, opts, hasTag = libreflect.Tag(field, structTagKey)
+		if len(key) == 0 && !hasTag {
+			// Field is unexported.
+			continue
+		}
+
+		var (
+			fval reflect.Value = inValue.FieldByIndex(field.Index)
+		)
+
+		if libstrings.IsContain(opts, `omitempty`) {
+			if libreflect.IsNil(fval) {
+				continue
+			}
+			if fval.IsZero() {
+				continue
+			}
+		}
+
+		var (
+			fkind reflect.Kind = fval.Kind()
+
+			val  string
+			valb []byte
+			ok   bool
+		)
+
+		// Try using one of the method: MarshalBinary, MarshalJSON,
+		// or MarshalText; in respective order.
+		valb, err, ok = libreflect.Marshal(fval)
+		if ok {
+			if err != nil {
+				return nil, fmt.Errorf(`%s: error marshaling: %w`, logp, err)
+			}
+
+			out.Add(key, string(valb))
+			continue
+		}
+
+		if fkind == reflect.Slice {
+			var (
+				sliceType reflect.Type = fval.Type()
+				elType                 = sliceType.Elem()
+			)
+
+			fkind = elType.Kind()
+
+			if fkind == reflect.Uint8 {
+				val = fmt.Sprintf(`%s`, fval.Interface())
+				out.Add(key, val)
+				continue
+			}
+
+			var (
+				size = fval.Len()
+
+				sliceEl reflect.Value
+				y       int
+			)
+			for ; y < size; y++ {
+				sliceEl = fval.Index(y)
+				val = fmt.Sprintf(`%v`, sliceEl.Interface())
+				out.Add(key, val)
+			}
+			continue
+		}
+
+		val = fmt.Sprintf(`%v`, fval.Interface())
+		out.Add(key, val)
+	}
+
+	return out, nil
+}
 
 // UnmarshalForm read struct fields tagged with `form:` from out as key and
 // set its using the value from url.Values based on that key.

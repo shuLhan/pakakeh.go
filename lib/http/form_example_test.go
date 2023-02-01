@@ -2,9 +2,49 @@ package http
 
 import (
 	"fmt"
-	"math/big"
 	"net/url"
+
+	"github.com/shuLhan/share/lib/math/big"
 )
+
+func ExampleMarshalForm() {
+	type T struct {
+		Rat    *big.Rat `form:"big.Rat"`
+		String string   `form:"string"`
+		Bytes  []byte   `form:"bytes"`
+		Int    int      `form:""` // With empty tag.
+		F64    float64  `form:"f64"`
+		F32    float32  `form:"f32"`
+		NotSet int16    `form:"notset"`
+		Uint8  uint8    `form:" uint8 "`
+		Bool   bool     // Without tag.
+	}
+	var (
+		in = T{
+			Rat:    big.NewRat(`1.2345`),
+			String: `a_string`,
+			Bytes:  []byte(`bytes`),
+			Int:    1,
+			F64:    6.4,
+			F32:    3.2,
+			Uint8:  2,
+			Bool:   true,
+		}
+
+		out url.Values
+		err error
+	)
+
+	out, err = MarshalForm(in)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(out.Encode())
+
+	//Output:
+	//Bool=true&Int=1&big.Rat=1.2345&bytes=bytes&f32=3.2&f64=6.4&notset=0&string=a_string&uint8=2
+}
 
 func ExampleUnmarshalForm() {
 	type T struct {
@@ -51,8 +91,8 @@ func ExampleUnmarshalForm() {
 	}
 
 	//Output:
-	//{Rat:2469/2000 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
-	//&{Rat:2469/2000 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
+	//{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
+	//&{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
 }
 
 func ExampleUnmarshalForm_error() {
@@ -193,6 +233,6 @@ func ExampleUnmarshalForm_zero() {
 	}
 
 	//Output:
-	//{Rat:2469/2000 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
-	//{Rat:0/1 String: Bytes:[] Int:0 F64:0 F32:0 NotSet:0 Uint8:0 Bool:false}
+	//{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
+	//{Rat:0 String: Bytes:[] Int:0 F64:0 F32:0 NotSet:0 Uint8:0 Bool:false}
 }
