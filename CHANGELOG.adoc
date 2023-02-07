@@ -17,6 +17,30 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_43_0]
+==  share v0.43.0 (2022-02-07)
+
+===  New features
+
+lib/http: add function MarshalForm::
++
+--
+The MarshalForm marshal struct fields tagged with `form:` into url.Values.
+
+The rules for marshaling follow the same rules as in [UnmarshalForm].
+
+It will return an error if the input is not pointer to or a struct.
+--
+
+
+clise: implement io Closer, Writer, StringWriter, and ByteWriter::
+
+
+clise: add method UnmarshalJSON::
++
+The UnmarshalJSON convert JSON array into Clise.
+
+
 [#v0_42_0]
 ==  share v0.42.0 (2022-12-12)
 
