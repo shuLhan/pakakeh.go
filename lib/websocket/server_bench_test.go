@@ -6,9 +6,9 @@
 package websocket
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/http/httputil"
 	"strings"
