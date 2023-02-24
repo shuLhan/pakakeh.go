@@ -26,9 +26,8 @@ type DirWatcher struct {
 	qFileChanges chan NodeState
 	qrun         chan bool
 
-	root   *Node
-	fs     *MemFS
-	ticker *time.Ticker
+	root *Node
+	fs   *MemFS
 
 	// dirs contains list of directory and their sub-directories that is
 	// being watched for changes.
@@ -115,7 +114,6 @@ func (dw *DirWatcher) Start() (err error) {
 // Stop watching changes on directory.
 func (dw *DirWatcher) Stop() {
 	dw.qrun <- false
-	dw.ticker.Stop()
 }
 
 // dirsKeys return all the key in field dirs sorted in ascending order.
@@ -363,8 +361,9 @@ func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 
 func (dw *DirWatcher) start() {
 	var (
-		logp = "DirWatcher"
-		ever = true
+		logp   = "DirWatcher"
+		ticker = time.NewTicker(dw.Delay)
+		ever   = true
 
 		node *Node
 		fi   os.FileInfo
@@ -372,11 +371,9 @@ func (dw *DirWatcher) start() {
 		err  error
 	)
 
-	dw.ticker = time.NewTicker(dw.Delay)
-
 	for ever {
 		select {
-		case <-dw.ticker.C:
+		case <-ticker.C:
 			fi, err = os.Stat(dw.Root)
 			if err != nil {
 				if !os.IsNotExist(err) {
@@ -420,6 +417,7 @@ func (dw *DirWatcher) start() {
 
 		case <-dw.qrun:
 			ever = false
+			ticker.Stop()
 		}
 	}
 }
