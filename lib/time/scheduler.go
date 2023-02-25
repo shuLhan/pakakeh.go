@@ -112,22 +112,51 @@ type Scheduler struct {
 // For example,
 //   - minutely = every minute
 func NewScheduler(schedule string) (sch *Scheduler, err error) {
+	var (
+		logp = `NewScheduler`
+		now  = Now().UTC()
+	)
+
+	sch, err = newScheduler(schedule, now)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var c = make(chan time.Time, 1)
+
+	sch.C = c
+	sch.c = c
+	sch.cstop = make(chan struct{}, 1)
+
+	go sch.run()
+
+	return sch, nil
+}
+
+func newScheduler(schedule string, now time.Time) (sch *Scheduler, err error) {
+	sch = &Scheduler{}
+
+	err = sch.parse(schedule)
+	if err != nil {
+		return nil, err
+	}
+
+	sch.calcNext(now)
+
+	return sch, nil
+}
+
+func (sch *Scheduler) parse(schedule string) (err error) {
 	schedule = strings.ToLower(schedule)
 
 	var (
-		logp = `NewScheduler`
+		logp = `parse`
 		list = strings.Split(schedule, `@`)
-		c    = make(chan time.Time, 1)
 
 		v string
 	)
 
-	sch = &Scheduler{
-		C:     c,
-		c:     c,
-		cstop: make(chan struct{}, 1),
-		kind:  list[0],
-	}
+	sch.kind = list[0]
 
 	switch sch.kind {
 	case ``:
@@ -174,14 +203,9 @@ func NewScheduler(schedule string) (sch *Scheduler, err error) {
 		sch.parseListTimeOfDay(v)
 
 	default:
-		return nil, fmt.Errorf(`%s: %w`, logp, ErrScheduleUnknown)
+		return fmt.Errorf(`%s %s: %w`, logp, schedule, ErrScheduleUnknown)
 	}
-
-	sch.calcNext(Now().UTC())
-
-	go sch.run()
-
-	return sch, nil
+	return nil
 }
 
 // calcNext calculate the next schedule based on time now.
