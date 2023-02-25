@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/shuLhan/share/lib/ints"
@@ -46,6 +47,8 @@ type Scheduler struct {
 	dom     []int   // List of day in monthly schedule.
 
 	nextSeconds int64
+
+	sync.Mutex
 }
 
 // NewScheduler create new Scheduler from string schedule.
@@ -183,27 +186,39 @@ func NewScheduler(schedule string) (sch *Scheduler, err error) {
 
 // calcNext calculate the next schedule based on time now.
 func (sch *Scheduler) calcNext(now time.Time) {
+	now = now.Round(time.Second)
+
+	var next time.Time
+
 	switch sch.kind {
 	case ScheduleKindMinutely:
-		sch.nextMinutely(now)
+		next = sch.nextMinutely(now)
 
 	case ScheduleKindHourly:
-		sch.nextHourly(now)
+		next = sch.nextHourly(now)
 
 	case ScheduleKindDaily:
-		sch.nextDaily(now)
+		next = sch.nextDaily(now)
 
 	case ScheduleKindWeekly:
-		sch.nextWeekly(now)
+		next = sch.nextWeekly(now)
 
 	case ScheduleKindMonthly:
-		sch.nextMonthly(now)
+		next = sch.nextMonthly(now)
 	}
 
+	sch.Lock()
+	sch.next = next
 	sch.nextSeconds = int64(sch.next.Sub(now).Seconds())
-	if sch.nextSeconds < 0 {
-		sch.nextSeconds = 0
-	}
+	sch.Unlock()
+}
+
+// Next return the next schedule.
+func (sch *Scheduler) Next() (next time.Time) {
+	sch.Lock()
+	next = sch.next
+	sch.Unlock()
+	return next
 }
 
 // parseListDayOfWeek parse comma separated day (Sunday,...) into field dow.
@@ -330,39 +345,39 @@ func (sch *Scheduler) parseListTimeOfDay(v string) {
 }
 
 // nextMinutely calculate the next event for minutely schedule.
-func (sch *Scheduler) nextMinutely(now time.Time) {
-	var diffSecond = 60 - now.Second()
-	sch.next = now.Add(time.Duration(diffSecond) * time.Second)
+func (sch *Scheduler) nextMinutely(now time.Time) (next time.Time) {
+	next = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute()+1, 0, 0, time.UTC)
+	return next
 }
 
 // nextHourly calculate the next event for hourly schedule.
-func (sch *Scheduler) nextHourly(now time.Time) {
+func (sch *Scheduler) nextHourly(now time.Time) (next time.Time) {
 	var (
 		nowMinute = now.Minute()
 
 		m int
 	)
-	if len(sch.minutes) == 0 {
-		m = 60 - nowMinute
-		sch.next = now.Add(time.Duration(m) * time.Minute).Round(time.Hour)
-		return
-	}
 
 	for _, m = range sch.minutes {
-		m = m - nowMinute
-		if m < 0 {
+		if m <= nowMinute {
 			continue
 		}
-		sch.next = now.Add(time.Duration(m) * time.Minute).Round(time.Minute)
-		return
+		next = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), m, 0, 0, time.UTC)
+		return next
+	}
+	if len(sch.minutes) == 0 {
+		m = 0
+	} else {
+		m = sch.minutes[0]
 	}
 
-	m = (60 - nowMinute) + sch.minutes[0]
-	sch.next = now.Add(time.Duration(m) * time.Minute).Round(time.Minute)
+	// Set the next schedule for the first minutes in the next hour.
+	next = time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, m, 0, 0, time.UTC)
+	return next
 }
 
 // nextDaily calculate the next event for daily schedule.
-func (sch *Scheduler) nextDaily(now time.Time) {
+func (sch *Scheduler) nextDaily(now time.Time) (next time.Time) {
 	var (
 		clockNow = Clock{hour: now.Hour(), min: now.Minute()}
 
@@ -372,17 +387,17 @@ func (sch *Scheduler) nextDaily(now time.Time) {
 
 	nextClock, found = sch.nextClock(clockNow)
 
-	sch.next = time.Date(now.Year(), now.Month(), now.Day(),
-		nextClock.hour, nextClock.min, 0, 0, time.UTC)
+	next = time.Date(now.Year(), now.Month(), now.Day(), nextClock.hour, nextClock.min, 0, 0, time.UTC)
 
 	if !found {
 		// No schedule for today, apply the first clock on the next
 		// day.
-		sch.next = sch.next.AddDate(0, 0, 1)
+		next = next.AddDate(0, 0, 1)
 	}
+	return next
 }
 
-func (sch *Scheduler) nextWeekly(now time.Time) {
+func (sch *Scheduler) nextWeekly(now time.Time) (next time.Time) {
 	var (
 		today    = int(now.Weekday())
 		clockNow = Clock{hour: now.Hour(), min: now.Minute()}
@@ -396,9 +411,9 @@ func (sch *Scheduler) nextWeekly(now time.Time) {
 		if found {
 			// Today is registered in day-of-week, and we have
 			// another clock in queue.
-			sch.next = time.Date(now.Year(), now.Month(), now.Day(),
+			next = time.Date(now.Year(), now.Month(), now.Day(),
 				nextClock.hour, nextClock.min, 0, 0, time.UTC)
-			return
+			return next
 		}
 	}
 
@@ -416,10 +431,10 @@ func (sch *Scheduler) nextWeekly(now time.Time) {
 
 	nextClock = sch.tod[0]
 
-	sch.next = time.Date(now.Year(), now.Month(), now.Day(),
-		nextClock.hour, nextClock.min, 0, 0, time.UTC)
+	next = time.Date(now.Year(), now.Month(), now.Day(), nextClock.hour, nextClock.min, 0, 0, time.UTC)
+	next = next.AddDate(0, 0, dayInc)
 
-	sch.next = sch.next.AddDate(0, 0, dayInc)
+	return next
 }
 
 // isDayOfWeek return true if the dayNow is one of the day registered in dow.
@@ -457,7 +472,7 @@ func (sch *Scheduler) nextDayOfWeek(today int) (day int, found bool) {
 }
 
 // nextMonthly calculate the next event for monthly schedule.
-func (sch *Scheduler) nextMonthly(now time.Time) {
+func (sch *Scheduler) nextMonthly(now time.Time) (next time.Time) {
 	var (
 		nowMonth = now.Month()
 		today    = now.Day()
@@ -473,9 +488,9 @@ func (sch *Scheduler) nextMonthly(now time.Time) {
 		if found {
 			// Today is registered in day-of-week, and we have
 			// another clock in queue.
-			sch.next = time.Date(now.Year(), now.Month(), today,
+			next = time.Date(now.Year(), now.Month(), today,
 				nextClock.hour, nextClock.min, 0, 0, time.UTC)
-			return
+			return next
 		}
 	}
 
@@ -483,19 +498,20 @@ func (sch *Scheduler) nextMonthly(now time.Time) {
 
 	nextDay, found = sch.nextDayOfMonth(today)
 	if found {
-		sch.next = time.Date(now.Year(), now.Month(), nextDay,
+		next = time.Date(now.Year(), now.Month(), nextDay,
 			nextClock.hour, nextClock.min, 0, 0, time.UTC)
 
-		if sch.next.Month() != nowMonth {
+		if next.Month() != nowMonth {
 			// The next day is out of range for the current month.
 			// Set the next day to the first day of next month.
-			sch.next = time.Date(now.Year(), now.Month()+1, sch.dom[0],
+			next = time.Date(now.Year(), now.Month()+1, sch.dom[0],
 				nextClock.hour, nextClock.min, 0, 0, time.UTC)
 		}
 	} else {
-		sch.next = time.Date(now.Year(), now.Month()+1, nextDay,
+		next = time.Date(now.Year(), now.Month()+1, nextDay,
 			nextClock.hour, nextClock.min, 0, 0, time.UTC)
 	}
+	return next
 }
 
 // isDayOfWeek return true if today is one of registered day of month.
