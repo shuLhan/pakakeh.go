@@ -1,7 +1,7 @@
 # Maintainer: shulhan <ms@kilabit.info>
 
 pkgname=share-tools
-pkgver=0.39.0.r42.g1060faa
+pkgver=0.43.0.r9.gefa9857
 pkgrel=1
 
 pkgdesc="Miscellaneous CLI tools: epoch, ini, xtrk"

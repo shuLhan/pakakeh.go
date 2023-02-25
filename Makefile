@@ -12,7 +12,6 @@ VERSION := $(shell git describe --tags)
 
 .PHONY: all install build docs docs-serve clean distclean
 .PHONY: lint test test.prof
-.PHONY: aur-release
 
 all: test lint build
 
@@ -52,9 +51,3 @@ clean:
 
 distclean:
 	go clean -i ./...
-
-## For AUR.
-
-aur-release:
-	namcap PKGBUILD
-	makepkg --printsrcinfo > .SRCINFO

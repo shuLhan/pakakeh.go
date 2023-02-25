@@ -58,8 +58,8 @@
 /lib/websocket/testdata/pip-selfcheck.json
 /lib/websocket/testdata/server/reports
 /lib/websocket/testdata/server/server
+_AUR/pkg/
 _bin
 cover.*
-pkg/
 share-tools/
 src/
