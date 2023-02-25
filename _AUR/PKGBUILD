@@ -1,7 +1,7 @@
 # Maintainer: shulhan <ms@kilabit.info>
 
 pkgname=share-tools
-pkgver=0.43.0.r9.gefa9857
+pkgver=0.43.0.r10.g0753ecd
 pkgrel=1
 
 pkgdesc="Miscellaneous CLI tools: epoch, ini, xtrk"
@@ -41,6 +41,8 @@ build() {
 package() {
 	cd "${pkgname}"
 	install -Dm755 _bin/epoch $pkgdir/usr/bin/epoch
+	install -Dm755 _bin/go-test-coverhtml.sh  $pkgdir/usr/bin/go-test-coverhtml.sh
+	install -Dm755 _bin/go-bench.sh           $pkgdir/usr/bin/go-bench.sh
 	install -Dm755 _bin/ini   $pkgdir/usr/bin/ini
 	install -Dm755 _bin/xtrk  $pkgdir/usr/bin/xtrk
 	install -Dm644 LICENSE    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"

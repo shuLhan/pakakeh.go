@@ -8,5 +8,5 @@
 PKGS=${1:-./...}
 
 CGO_ENABLED=1
-go test -race -p=1 -coverprofile=cover.out ${PKGS} && \
-	go tool cover -html=cover.out -o cover.html
+go test -race -p=1 -coverprofile=cover.out ${PKGS}
+go tool cover -html=cover.out -o cover.html
