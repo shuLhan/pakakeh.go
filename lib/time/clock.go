@@ -94,7 +94,7 @@ func (c Clock) After(d Clock) bool {
 	if c.min > d.min {
 		return true
 	}
-	if c.min > d.min {
+	if c.min < d.min {
 		return false
 	}
 	// minute==minute
@@ -117,7 +117,7 @@ func (c Clock) Before(d Clock) bool {
 	if c.min > d.min {
 		return false
 	}
-	if c.min > d.min {
+	if c.min < d.min {
 		return true
 	}
 	// minute==minute
