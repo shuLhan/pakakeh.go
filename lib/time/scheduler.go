@@ -173,9 +173,11 @@ func (sch *Scheduler) parse(schedule string) (err error) {
 		// Minutes is the lowest schedule.
 
 	case ScheduleKindHourly:
+		v = ``
 		if len(list) >= 2 {
-			sch.parseListMinutes(list[1])
+			v = list[1]
 		}
+		sch.parseListMinutes(v)
 
 	case ScheduleKindDaily:
 		v = ``
@@ -369,11 +371,7 @@ func (sch *Scheduler) parseListTimeOfDay(v string) {
 		tod.sec = 0
 		sch.tod = append(sch.tod, tod)
 	}
-	if len(sch.tod) == 0 {
-		sch.tod = append(sch.tod, Clock{})
-	} else {
-		SortClock(sch.tod)
-	}
+	SortClock(sch.tod)
 }
 
 // nextMinutely calculate the next event for minutely schedule.
@@ -397,11 +395,8 @@ func (sch *Scheduler) nextHourly(now time.Time) (next time.Time) {
 		next = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), m, 0, 0, time.UTC)
 		return next
 	}
-	if len(sch.minutes) == 0 {
-		m = 0
-	} else {
-		m = sch.minutes[0]
-	}
+
+	m = sch.minutes[0]
 
 	// Set the next schedule for the first minutes in the next hour.
 	next = time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, m, 0, 0, time.UTC)
