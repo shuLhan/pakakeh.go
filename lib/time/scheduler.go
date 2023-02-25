@@ -55,6 +55,8 @@ type Scheduler struct {
 // A schedule is divided into monthly, weekly, daily, hourly, and minutely.
 // An empty schedule is equal to minutely.
 //
+// # Monthly
+//
 // A monthly schedule can be divided into calendar day and a time, with the
 // following format,
 //
@@ -72,6 +74,8 @@ type Scheduler struct {
 //   - monthly = monthly@1@00:00 = the first day of each month at 00:00.
 //   - monthly@1,15@18:00 = on day 1 and 15 every month at 6 PM.
 //
+// # Weekly
+//
 // A weekly schedule can be divided into day of week and a time, with the
 // following format,
 //
@@ -86,6 +90,8 @@ type Scheduler struct {
 //   - weekly = weekly@Sunday@00:00 = every Sunday at 00:00.
 //   - weekly@Sunday,Tuesday,Friday@15:00 = every Sunday, Tuesday, and Friday
 //     on each week at 3 PM.
+//
+// # Daily
 //
 // A daily schedule can be divided only into time.
 //
@@ -104,6 +110,8 @@ type Scheduler struct {
 // For example,
 //   - hourly = hourly@0 = every hour at minute 0.
 //   - hourly@0,15,30,45 = on minutes 0, 15, 30, 45 every hour.
+//
+// # Minutely
 //
 // A minutely schedule run every minute, with the following format,
 //
