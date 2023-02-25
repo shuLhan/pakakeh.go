@@ -46,7 +46,7 @@ type Scheduler struct {
 	dow     []int   // List of day in weekly schedule.
 	dom     []int   // List of day in monthly schedule.
 
-	nextSeconds int64
+	nextDuration time.Duration
 
 	sync.Mutex
 }
@@ -220,8 +220,6 @@ func (sch *Scheduler) parse(schedule string) (err error) {
 
 // calcNext calculate the next schedule based on time now.
 func (sch *Scheduler) calcNext(now time.Time) {
-	now = now.Round(time.Second)
-
 	var next time.Time
 
 	switch sch.kind {
@@ -243,7 +241,7 @@ func (sch *Scheduler) calcNext(now time.Time) {
 
 	sch.Lock()
 	sch.next = next
-	sch.nextSeconds = int64(sch.next.Sub(now).Seconds())
+	sch.nextDuration = sch.next.Sub(now)
 	sch.Unlock()
 }
 
@@ -565,15 +563,7 @@ func (sch *Scheduler) nextDayOfMonth(today int) (nextDay int, found bool) {
 
 // run the ticker for scheduler.
 func (sch *Scheduler) run() {
-	var (
-		ticker *time.Ticker
-	)
-
-	if sch.nextSeconds <= 0 {
-		sch.nextSeconds = 1
-	}
-
-	ticker = time.NewTicker(time.Duration(sch.nextSeconds) * time.Second)
+	var ticker = time.NewTicker(sch.nextDuration)
 
 	for {
 		select {
@@ -585,11 +575,7 @@ func (sch *Scheduler) run() {
 			}
 
 			sch.calcNext(Now().UTC())
-			for sch.nextSeconds <= 0 {
-				sch.calcNext(Now().UTC())
-			}
-
-			ticker.Reset(time.Duration(sch.nextSeconds) * time.Second)
+			ticker.Reset(sch.nextDuration)
 
 		case <-sch.cstop:
 			ticker.Stop()

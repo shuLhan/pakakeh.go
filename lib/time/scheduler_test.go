@@ -24,10 +24,10 @@ func TestNewScheduler(t *testing.T) {
 		switch step {
 		case 0:
 			step++
-			now = time.Date(2013, time.January, 30, 14, 26, 59, 900000, time.UTC)
+			now = time.Date(2013, time.January, 30, 14, 26, 59, 999999990, time.UTC)
 		case 1:
 			step++
-			now = time.Date(2013, time.January, 30, 14, 27, 59, 900000, time.UTC)
+			now = time.Date(2013, time.January, 30, 14, 27, 59, 999999990, time.UTC)
 		}
 		return now
 	}
@@ -79,16 +79,16 @@ func TestScheduler_minutely(t *testing.T) {
 	var cases = []testCase{{
 		now: time.Date(2013, time.January, 30, 14, 26, 59, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMinutely,
-			next:        time.Date(2013, time.January, 30, 14, 27, 0, 0, time.UTC),
-			nextSeconds: 1,
+			kind:         ScheduleKindMinutely,
+			next:         time.Date(2013, time.January, 30, 14, 27, 0, 0, time.UTC),
+			nextDuration: 1 * time.Second,
 		},
 	}, {
 		now: time.Date(2013, time.January, 30, 14, 27, 1, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMinutely,
-			next:        time.Date(2013, time.January, 30, 14, 28, 0, 0, time.UTC),
-			nextSeconds: 59,
+			kind:         ScheduleKindMinutely,
+			next:         time.Date(2013, time.January, 30, 14, 28, 0, 0, time.UTC),
+			nextDuration: 59 * time.Second,
 		},
 	}}
 
@@ -118,19 +118,19 @@ func TestNewScheduler_hourly(t *testing.T) {
 		schedule: `hourly`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindHourly,
-			next:        time.Date(2013, time.January, 20, 15, 0, 0, 0, time.UTC),
-			nextSeconds: 2040,
-			minutes:     []int{0},
+			kind:         ScheduleKindHourly,
+			next:         time.Date(2013, time.January, 20, 15, 0, 0, 0, time.UTC),
+			nextDuration: 2040 * time.Second,
+			minutes:      []int{0},
 		},
 	}, {
 		schedule: `hourly@5,11,-1,0x1,55`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindHourly,
-			next:        time.Date(2013, time.January, 20, 14, 55, 0, 0, time.UTC),
-			minutes:     []int{5, 11, 55},
-			nextSeconds: 1740,
+			kind:         ScheduleKindHourly,
+			next:         time.Date(2013, time.January, 20, 14, 55, 0, 0, time.UTC),
+			minutes:      []int{5, 11, 55},
+			nextDuration: 1740 * time.Second,
 		},
 	}}
 
@@ -160,9 +160,9 @@ func TestNewScheduler_daily(t *testing.T) {
 		schedule: `daily`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindDaily,
-			next:        time.Date(2013, time.January, 21, 0, 0, 0, 0, time.UTC),
-			nextSeconds: 34440,
+			kind:         ScheduleKindDaily,
+			next:         time.Date(2013, time.January, 21, 0, 0, 0, 0, time.UTC),
+			nextDuration: 34440 * time.Second,
 			tod: []Clock{
 				Clock{},
 			},
@@ -171,9 +171,9 @@ func TestNewScheduler_daily(t *testing.T) {
 		schedule: `daily@00:15,06:16,12:99,24:15`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindDaily,
-			next:        time.Date(2013, time.January, 21, 0, 15, 0, 0, time.UTC),
-			nextSeconds: 35340,
+			kind:         ScheduleKindDaily,
+			next:         time.Date(2013, time.January, 21, 0, 15, 0, 0, time.UTC),
+			nextDuration: 35340 * time.Second,
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 0, min: 15},
@@ -211,9 +211,9 @@ func TestNewScheduler_weekly(t *testing.T) {
 		// The Weekday is Sunday.
 		now: time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.January, 27, 0, 0, 0, 0, time.UTC),
-			nextSeconds: 552840,
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.January, 27, 0, 0, 0, 0, time.UTC),
+			nextDuration: 552840 * time.Second,
 			tod: []Clock{
 				Clock{},
 			},
@@ -223,10 +223,10 @@ func TestNewScheduler_weekly(t *testing.T) {
 		schedule: `weekly@@00:15,06:16,12:99,24:15`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.January, 27, 0, 15, 0, 0, time.UTC),
-			nextSeconds: 553740,
-			dow:         []int{0},
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.January, 27, 0, 15, 0, 0, time.UTC),
+			nextDuration: 553740 * time.Second,
+			dow:          []int{0},
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 0, min: 15},
@@ -239,10 +239,10 @@ func TestNewScheduler_weekly(t *testing.T) {
 		// Sunday 14:26
 		now: time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.January, 21, 0, 15, 0, 0, time.UTC),
-			nextSeconds: 35340,
-			dow:         []int{0, 1},
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.January, 21, 0, 15, 0, 0, time.UTC),
+			nextDuration: 35340 * time.Second,
+			dow:          []int{0, 1},
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 6, min: 16},
@@ -253,10 +253,10 @@ func TestNewScheduler_weekly(t *testing.T) {
 		// Sunday 21:00
 		now: time.Date(2013, time.January, 20, 21, 0, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.January, 21, 0, 15, 0, 0, time.UTC), // Monday 00:15
-			nextSeconds: 11700,
-			dow:         []int{0, 1},
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.January, 21, 0, 15, 0, 0, time.UTC), // Monday 00:15
+			nextDuration: 11700 * time.Second,
+			dow:          []int{0, 1},
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 6, min: 16},
@@ -267,10 +267,10 @@ func TestNewScheduler_weekly(t *testing.T) {
 		// Tuesday 00:00
 		now: time.Date(2013, time.January, 22, 0, 0, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.January, 27, 0, 15, 0, 0, time.UTC), // Sunday 00:15
-			nextSeconds: 432900,
-			dow:         []int{0, 1},
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.January, 27, 0, 15, 0, 0, time.UTC), // Sunday 00:15
+			nextDuration: 432900 * time.Second,
+			dow:          []int{0, 1},
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 6, min: 16},
@@ -281,10 +281,10 @@ func TestNewScheduler_weekly(t *testing.T) {
 		// Saturday 21:00
 		now: time.Date(2013, time.January, 26, 21, 0, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.February, 1, 0, 15, 0, 0, time.UTC), // Friday 00:15
-			nextSeconds: 443700,
-			dow:         []int{5, 6},
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.February, 1, 0, 15, 0, 0, time.UTC), // Friday 00:15
+			nextDuration: 443700 * time.Second,
+			dow:          []int{5, 6},
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 6, min: 16},
@@ -295,10 +295,10 @@ func TestNewScheduler_weekly(t *testing.T) {
 		// Saturday 06:15:59
 		now: time.Date(2013, time.January, 26, 6, 15, 59, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindWeekly,
-			next:        time.Date(2013, time.January, 26, 6, 16, 0, 0, time.UTC),
-			nextSeconds: 1,
-			dow:         []int{0, 1, 2, 3, 4, 5, 6},
+			kind:         ScheduleKindWeekly,
+			next:         time.Date(2013, time.January, 26, 6, 16, 0, 0, time.UTC),
+			nextDuration: 1 * time.Second,
+			dow:          []int{0, 1, 2, 3, 4, 5, 6},
 			tod: []Clock{
 				{hour: 0, min: 15},
 				{hour: 6, min: 16},
@@ -333,9 +333,9 @@ func TestNewScheduler_monthly(t *testing.T) {
 		schedule: `monthly`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC), // The Weekday is Sunday.
 		exp: &Scheduler{
-			kind:        ScheduleKindMonthly,
-			next:        time.Date(2013, time.February, 1, 0, 0, 0, 0, time.UTC),
-			nextSeconds: 984840,
+			kind:         ScheduleKindMonthly,
+			next:         time.Date(2013, time.February, 1, 0, 0, 0, 0, time.UTC),
+			nextDuration: 984840 * time.Second,
 			tod: []Clock{
 				Clock{},
 			},
@@ -345,9 +345,9 @@ func TestNewScheduler_monthly(t *testing.T) {
 		schedule: `monthly@15,31@00:15`,
 		now:      time.Date(2013, time.January, 20, 14, 26, 0, 0, time.UTC), // The Weekday is Sunday.
 		exp: &Scheduler{
-			kind:        ScheduleKindMonthly,
-			next:        time.Date(2013, time.January, 31, 0, 15, 0, 0, time.UTC),
-			nextSeconds: 899340,
+			kind:         ScheduleKindMonthly,
+			next:         time.Date(2013, time.January, 31, 0, 15, 0, 0, time.UTC),
+			nextDuration: 899340 * time.Second,
 			tod: []Clock{
 				Clock{min: 15},
 			},
@@ -358,9 +358,9 @@ func TestNewScheduler_monthly(t *testing.T) {
 		// 2013-02-15 06:14
 		now: time.Date(2013, time.February, 15, 6, 14, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMonthly,
-			next:        time.Date(2013, time.February, 15, 6, 15, 0, 0, time.UTC),
-			nextSeconds: 60,
+			kind:         ScheduleKindMonthly,
+			next:         time.Date(2013, time.February, 15, 6, 15, 0, 0, time.UTC),
+			nextDuration: 60 * time.Second,
 			tod: []Clock{
 				Clock{min: 15},
 				Clock{hour: 6, min: 15},
@@ -372,9 +372,9 @@ func TestNewScheduler_monthly(t *testing.T) {
 		// 2013-02-15 06:16
 		now: time.Date(2013, time.February, 15, 6, 16, 0, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMonthly,
-			next:        time.Date(2013, time.March, 15, 0, 15, 0, 0, time.UTC),
-			nextSeconds: 2397540,
+			kind:         ScheduleKindMonthly,
+			next:         time.Date(2013, time.March, 15, 0, 15, 0, 0, time.UTC),
+			nextDuration: 2397540 * time.Second,
 			tod: []Clock{
 				Clock{min: 15},
 				Clock{hour: 6, min: 15},
@@ -406,23 +406,23 @@ func TestScheduler_calcNext_minutely(t *testing.T) {
 	var cases = []testCase{{
 		now: time.Date(2013, time.January, 30, 14, 26, 59, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMinutely,
-			next:        time.Date(2013, time.January, 30, 14, 27, 0, 0, time.UTC),
-			nextSeconds: 1,
+			kind:         ScheduleKindMinutely,
+			next:         time.Date(2013, time.January, 30, 14, 27, 0, 0, time.UTC),
+			nextDuration: 1 * time.Second,
 		},
 	}, {
 		now: time.Date(2013, time.January, 30, 14, 27, 59, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMinutely,
-			next:        time.Date(2013, time.January, 30, 14, 28, 0, 0, time.UTC),
-			nextSeconds: 1,
+			kind:         ScheduleKindMinutely,
+			next:         time.Date(2013, time.January, 30, 14, 28, 0, 0, time.UTC),
+			nextDuration: 1 * time.Second,
 		},
 	}, {
 		now: time.Date(2013, time.January, 30, 14, 28, 1, 0, time.UTC),
 		exp: &Scheduler{
-			kind:        ScheduleKindMinutely,
-			next:        time.Date(2013, time.January, 30, 14, 29, 0, 0, time.UTC),
-			nextSeconds: 59,
+			kind:         ScheduleKindMinutely,
+			next:         time.Date(2013, time.January, 30, 14, 29, 0, 0, time.UTC),
+			nextDuration: 59 * time.Second,
 		},
 	}}
 
