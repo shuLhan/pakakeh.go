@@ -539,42 +539,30 @@ func (sch *Scheduler) nextDayOfMonth(today int) (nextDay int, found bool) {
 // run the ticker for scheduler.
 func (sch *Scheduler) run() {
 	var (
-		dur int64 = 60
-
-		ticker  *time.Ticker
-		nextDur int64
+		ticker *time.Ticker
 	)
 
-	if sch.nextSeconds < 60 {
-		dur = sch.nextSeconds
+	if sch.nextSeconds <= 0 {
+		sch.nextSeconds = 1
 	}
-	ticker = time.NewTicker(time.Duration(dur) * time.Second)
+
+	ticker = time.NewTicker(time.Duration(sch.nextSeconds) * time.Second)
 
 	for {
 		select {
 		case <-ticker.C:
-			sch.nextSeconds -= dur
+			// Notify the user and calculate the next event.
+			select {
+			case sch.c <- sch.next:
+			default:
+			}
 
-			if sch.nextSeconds <= 0 {
-				// Notify the user and calculate the next
-				// event.
-				select {
-				case sch.c <- sch.next:
-				default:
-				}
-
+			sch.calcNext(Now().UTC())
+			for sch.nextSeconds <= 0 {
 				sch.calcNext(Now().UTC())
 			}
 
-			if sch.nextSeconds < 60 {
-				nextDur = sch.nextSeconds
-			} else {
-				nextDur = 60
-			}
-			if dur != nextDur {
-				ticker.Reset(time.Duration(nextDur) * time.Second)
-			}
-			dur = nextDur
+			ticker.Reset(time.Duration(sch.nextSeconds) * time.Second)
 
 		case <-sch.cstop:
 			ticker.Stop()
