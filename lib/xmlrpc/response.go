@@ -24,15 +24,15 @@ func (resp *Response) MarshalText() (out []byte, err error) {
 	buf.WriteString(xml.Header)
 	buf.WriteString("<methodResponse>")
 
-	if resp.Code <= 200 {
+	if resp.E.Code <= 200 {
 		fmt.Fprintf(&buf, "<params><param>%s</param></params>",
 			resp.Param)
 	} else {
 		buf.WriteString("<fault><value><struct>")
 		fmt.Fprintf(&buf, "<member><name>faultCode</name><value><int>%d</int></value></member>",
-			resp.Code)
+			resp.E.Code)
 		fmt.Fprintf(&buf, "<member><name>faultString</name><value><string>%s</string></value></member>",
-			resp.Message)
+			resp.E.Message)
 		buf.WriteString("</struct></value></fault>")
 	}
 
@@ -113,8 +113,8 @@ func (resp *Response) unmarshalFault(dec *xml.Decoder) (err error) {
 		return fmt.Errorf("unmarshalFault: %w", err)
 	}
 
-	resp.Code = v.GetFieldAsInteger(memberNameFaultCode)
-	resp.Message = v.GetFieldAsString(memberNameFaultString)
+	resp.E.Code = v.GetFieldAsInteger(memberNameFaultCode)
+	resp.E.Message = v.GetFieldAsString(memberNameFaultString)
 
 	return nil
 }

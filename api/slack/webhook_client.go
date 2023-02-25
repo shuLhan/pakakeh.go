@@ -51,7 +51,7 @@ func (wcl *WebhookClient) Post(msg *Message) (err error) {
 	if wcl.Client == nil {
 		return nil
 	}
-	httpRes, resBody, err := wcl.PostJSON(wcl.webhookPath, nil, msg)
+	httpRes, resBody, err := wcl.Client.PostJSON(wcl.webhookPath, nil, msg)
 	if err != nil {
 		return fmt.Errorf("WebhookClient.Post: %w", err)
 	}

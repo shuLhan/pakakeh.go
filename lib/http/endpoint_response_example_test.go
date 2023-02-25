@@ -38,17 +38,17 @@ func ExampleEndpointResponse() {
 			res := &EndpointResponse{}
 			id := epr.HttpRequest.Form.Get("id")
 			if len(id) == 0 {
-				res.Code = http.StatusBadRequest
-				res.Message = "empty parameter id"
+				res.E.Code = http.StatusBadRequest
+				res.E.Message = "empty parameter id"
 				return nil, res
 			}
 			if id == "0" {
 				// If the EndpointResponse.Code is 0, it will
 				// default to http.StatusInternalServerError
-				res.Message = "id value 0 cause internal server error"
+				res.E.Message = "id value 0 cause internal server error"
 				return nil, res
 			}
-			res.Code = http.StatusOK
+			res.E.Code = http.StatusOK
 			res.Data = &myData{
 				ID: id,
 			}

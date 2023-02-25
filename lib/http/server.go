@@ -56,13 +56,13 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 
 	srv.Server = opts.Conn
 	srv.Server.Addr = opts.Address
-	srv.Handler = srv
+	srv.Server.Handler = srv
 
-	if srv.ReadTimeout == 0 {
-		srv.ReadTimeout = defRWTimeout
+	if srv.Server.ReadTimeout == 0 {
+		srv.Server.ReadTimeout = defRWTimeout
 	}
-	if srv.WriteTimeout == 0 {
-		srv.WriteTimeout = defRWTimeout
+	if srv.Server.WriteTimeout == 0 {
+		srv.Server.WriteTimeout = defRWTimeout
 	}
 	if srv.Options.Memfs != nil {
 		err = srv.Options.Memfs.Init()
@@ -278,10 +278,10 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 // Start the HTTP server.
 func (srv *Server) Start() (err error) {
-	if srv.TLSConfig == nil {
-		err = srv.ListenAndServe()
+	if srv.Server.TLSConfig == nil {
+		err = srv.Server.ListenAndServe()
 	} else {
-		err = srv.ListenAndServeTLS("", "")
+		err = srv.Server.ListenAndServeTLS("", "")
 	}
 	if errors.Is(err, http.ErrServerClosed) {
 		err = nil
@@ -298,7 +298,7 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
-	return srv.Shutdown(ctx)
+	return srv.Server.Shutdown(ctx)
 }
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {

@@ -112,7 +112,7 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 
 // Execute a command on remote server.
 func (cl *Client) Execute(cmd string) (err error) {
-	sess, err := cl.NewSession()
+	sess, err := cl.Client.NewSession()
 	if err != nil {
 		return fmt.Errorf("ssh: NewSession: " + err.Error())
 	}

@@ -12,15 +12,23 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-type myResponse EndpointResponse
+type myResponse struct {
+	EndpointResponse
+}
+
+func (myres *myResponse) Error() string {
+	return myres.EndpointResponse.Error()
+}
 
 // The EndpointResponse when returned as error should be able to converted
 // to liberrors.E using errors.As().
 func TestEndpointResponse_errors_As(t *testing.T) {
 	myres := &myResponse{
-		E: liberrors.E{
-			Code:    400,
-			Message: "bad request",
+		EndpointResponse: EndpointResponse{
+			E: liberrors.E{
+				Code:    400,
+				Message: "bad request",
+			},
 		},
 	}
 

@@ -38,6 +38,10 @@ type EndpointResponse struct {
 	Total int64 `json:"total,omitempty"`
 }
 
+func (epr *EndpointResponse) Error() string {
+	return epr.E.Error()
+}
+
 // Unwrap return the error as instance of *liberror.E.
 func (epr *EndpointResponse) Unwrap() (err error) {
 	return &epr.E
