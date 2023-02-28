@@ -116,6 +116,10 @@ func (c *Clise) Slice() (dst []interface{}) {
 		start int
 		end   int = c.size
 	)
+
+	c.Lock()
+	defer c.Unlock()
+
 	if c.over {
 		dst = make([]interface{}, c.size)
 		start = c.last
@@ -123,12 +127,12 @@ func (c *Clise) Slice() (dst []interface{}) {
 		dst = make([]interface{}, c.last)
 		end = c.last
 	}
-	c.Lock()
+
 	copy(dst, c.v[start:end])
 	if c.over {
 		copy(dst[end-start:], c.v[0:start])
 	}
-	c.Unlock()
+
 	return dst
 }
 
