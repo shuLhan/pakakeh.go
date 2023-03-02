@@ -6,9 +6,12 @@
 package test
 
 import (
+	"bytes"
+	"fmt"
 	"runtime"
 
 	"github.com/shuLhan/share/lib/reflect"
+	"github.com/shuLhan/share/lib/text"
 	"github.com/shuLhan/share/lib/text/diff"
 )
 
@@ -144,11 +147,38 @@ func printStringDiff(w Writer, name string, exp, got interface{}) bool {
 		return true
 	}
 
-	if len(name) == 0 {
-		w.Fatal("!!! strings not matched:\n", diffData.String())
-	} else {
-		w.Fatalf("!!! %s:\n%s", name, diffData.String())
+	var (
+		bb   bytes.Buffer
+		line text.Line
+	)
+
+	fmt.Fprintf(&bb, "!!! %s:\n", name)
+
+	if len(diffData.Dels) > 0 {
+		bb.WriteString("---- EXPECTED\n")
+		for _, line = range diffData.Dels {
+			fmt.Fprintf(&bb, "%d - %s\n", line.N, line.V)
+		}
 	}
+
+	if len(diffData.Adds) > 0 {
+		bb.WriteString("++++ GOT\n")
+		for _, line = range diffData.Adds {
+			fmt.Fprintf(&bb, "%d + %s\n", line.N, line.V)
+		}
+	}
+
+	if len(diffData.Changes) > 0 {
+		bb.WriteString("--++\n")
+
+		var change diff.LineChange
+		for _, change = range diffData.Changes {
+			fmt.Fprintf(&bb, "%d - %s\n", change.Old.N, change.Old.V)
+			fmt.Fprintf(&bb, "%d + %s\n", change.New.N, change.New.V)
+		}
+	}
+
+	w.Fatal(bb.String())
 
 	return true
 }

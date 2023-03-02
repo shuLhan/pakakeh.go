@@ -92,15 +92,10 @@ func ExampleAssert_string() {
 	fmt.Println(tw.String())
 	// Output:
 	// !!! Assert: expecting string(a string), got string(b string)
-	// !!! strings not matched:
+	// !!! :
 	// --++
-	// 0 - "func (tw *testWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }"
-	// 0 + "func (tw *testWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }"
-	// ^27 - "("
-	// ^41 - "                "
-	// ^27 + "f(format string, "
-	// ^69 + "f"
-	// ^56 + ", format"
+	// 0 - func (tw *testWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
+	// 0 + func (tw *testWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
 }
 
 func ExampleLoadDataDir() {
