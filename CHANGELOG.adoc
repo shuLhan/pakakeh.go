@@ -1,6 +1,5 @@
 =  CHANGELOG
 Shulhan <ms@kilabit.info>
-4 Sep 2022
 :toc:
 :sectanchors:
 :sectlinks:
@@ -15,6 +14,85 @@ This is changelog for share module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
+
+
+[#v0_44_0]
+==  share v0.44.0 (2022-03-02)
+
+[#v0_44_0]
+===  New features
+
+lib/time: implement Scheduler::
++
+--
+Scheduler is a timer that run periodically based on calendar or day time.
+
+A schedule is divided into monthly, weekly, daily, hourly, and minutely.
+An empty schedule is equal to minutely, a schedule that run every minute.
+--
+
+
+lib/time: add new type Clock::
++
+Clock represent 24 hours time with hour, minute, and second.
+An hour value is from 0 to 23, a minute value is from 0 to 59, and
+a second value is from 0 to 59.
+
+
+[#v0_44_0__bug_fixes]
+===  Bug fixes
+
+lib/clise: fix potential data race between Push and Slice::
++
+The data race may occur if Push is called, the .last field is incremented
+and at the same time an other goroutine call Slice that access the .last
+field.
+
+
+lib/memfs: minimize data race on DirWatcher::
++
+Calling DirWatcher Stop while the start method set dw.ticker can cause
+data race.  This changes fix this issue.
+
+
+go.mod: update all dependencies::
++
+This update use "go get all" which resolve to semver for each dependencies.
+
+
+[#v0_44_0__chores]
+=== Chores
+
+all: set the test timeout to 1m::
++
+Some flaky test, caused by waiting for channel, require waiting for 10m
+before it considered fail.
+This changes we cut the default timeout to 1 minute.
+
+
+all: access embedded field or methods using the type name::
++
+This is for clarity in the code, better to be explicit by typing where
+the field or methods come from.
+
+
+lib/email: add an example for Filter method on Header::
+
+
+cmd: temporarily hide unused commands::
++
+The cart, cascaded-random-forest, lnsmote, random-forest, and smote
+are part of completing thesis and they never used anymore.
+
+
+AUR: add go-test-coverhtml.sh and go-bench.sh into package::
++
+While at it, changes the go-bench count to 10.
+
+
+lib/websocket: replace math/rand.Read with crypto/rand.Read::
++
+The math/rand will be deprecated in Go 1.20.
 
 
 [#v0_43_0]
