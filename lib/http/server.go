@@ -565,6 +565,10 @@ func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 	srv.HandleFS(res, req)
 }
 
+// handleHead handle HTTP method [HEAD] request.
+// The HEAD request only applicable to GET endpoint.
+//
+// [HEAD]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD
 func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 	var (
 		rute *route

@@ -203,18 +203,15 @@ out:
 // For HTTP method is PATCH, POST, or PUT; the params will converted based on
 // requestType rules below,
 //
-// * If requestType is RequestTypeQuery and params is url.Values it will be
-// added as query parameters in the path.
-//
-// * If requestType is RequestTypeForm and params is url.Values it will be
-// added as URL encoded in the body.
-//
-// * If requestType is RequestTypeMultipartForm and params type is
-// map[string][]byte, then it will be converted as multipart form in the
-// body.
-//
-// * If requestType is RequestTypeJSON and params is not nil, the params will
-// be encoded as JSON in body.
+//   - If requestType is RequestTypeQuery and params is url.Values it will be
+//     added as query parameters in the path.
+//   - If requestType is RequestTypeForm and params is url.Values it will be
+//     added as URL encoded in the body.
+//   - If requestType is RequestTypeMultipartForm and params type is
+//     map[string][]byte, then it will be converted as multipart form in the
+//     body.
+//   - If requestType is RequestTypeJSON and params is not nil, the params will
+//     be encoded as JSON in body.
 func (client *Client) GenerateHttpRequest(
 	method RequestMethod,
 	requestPath string,
@@ -549,9 +546,8 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 	return out, err
 }
 
-func generateFormData(params map[string][]byte) (
-	contentType, body string, err error,
-) {
+// generateFormData generate multipart/form-data body from params.
+func generateFormData(params map[string][]byte) (contentType, body string, err error) {
 	sb := new(strings.Builder)
 	w := multipart.NewWriter(sb)
 	for k, v := range params {
