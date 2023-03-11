@@ -1,6 +1,10 @@
 package http
 
 import (
+	"errors"
+	"fmt"
+	"io"
+	"mime/multipart"
 	"strconv"
 	"strings"
 
@@ -23,6 +27,47 @@ func NewRange(unit string) (r *Range) {
 	}
 	r = &Range{unit: unit}
 	return r
+}
+
+// ParseMultipartRange parse multipart/byteranges response body.
+// Each Content-Range position and body part in the multipart will be stored
+// under RangePosition.
+func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) {
+	var (
+		logp   = `ParseMultipartRange`
+		reader = multipart.NewReader(body, boundary)
+	)
+	r = NewRange(``)
+	for {
+		var part *multipart.Part
+
+		part, err = reader.NextPart()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return nil, fmt.Errorf(`%s: on NextPart: %w`, logp, err)
+		}
+
+		var contentRange = part.Header.Get(HeaderContentRange)
+
+		if len(contentRange) == 0 {
+			continue
+		}
+
+		var pos = ParseContentRange(contentRange)
+		if pos == nil {
+			continue
+		}
+
+		pos.content, err = io.ReadAll(part)
+		if err != nil && !errors.Is(err, io.EOF) {
+			return nil, fmt.Errorf(`%s: on ReadAll part: %s`, logp, err)
+		}
+
+		r.positions = append(r.positions, *pos)
+	}
+	return r, nil
 }
 
 // ParseRange parses raw range value in the following format,

@@ -22,6 +22,14 @@ This is changelog for share module since v0.1.0 until v0.11.0.
 [#v0_45_0__new_features]
 ===  New features
 
+lib/http: add function to parse multipart Range response for Client::
++
+The ParseMultipartRange parse the multipart/byteranges body or response
+from HTTP Range request.
+Each Content-Range position and body part in the multipart will be stored
+under RangePosition.
+
+
 lib/http: add support for HTTP Range in Server::
 +
 --

@@ -1,0 +1,12 @@
+>>> body
+--zxcv
+Content-Range: bytes 10-15/50
+
+Part 1
+
+<<< error
+ParseMultipartRange: on ReadAll part: unexpected EOF
+
+<<< expected
+
+<<< END

@@ -1,0 +1,16 @@
+>>> body
+--zxcv
+Content-Range: bytes 0-6/50
+
+
+--zxcv --
+Content-Range: bytes 0-6/50
+
+
+
+<<< error
+ParseMultipartRange: on NextPart: multipart: expecting a new Part; got line "--zxcv --\r\n"
+
+<<< expected
+
+<<< END

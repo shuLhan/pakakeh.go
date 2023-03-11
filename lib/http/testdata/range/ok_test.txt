@@ -1,0 +1,19 @@
+>>> body
+--zxcv
+Content-Range: bytes 10-15/50
+
+Part 1
+--zxcv
+Content-Range: bytes 20-25/50
+
+Part 2
+--zxcv--
+
+<<< error
+
+<<< expected
+10-15: Part 1
+20-25: Part 2
+
+
+<<< END

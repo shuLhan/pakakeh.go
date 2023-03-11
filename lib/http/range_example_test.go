@@ -1,10 +1,58 @@
 package http_test
 
 import (
+	"bytes"
 	"fmt"
+	"log"
+	"strings"
 
 	libhttp "github.com/shuLhan/share/lib/http"
 )
+
+func ExampleParseMultipartRange() {
+	var (
+		boundary = `zxcv`
+	)
+
+	var body = `--zxcv
+Content-Range: bytes 0-6/50
+
+Part 1
+--zxcv
+
+Missing Content-Range header, skipped.
+--zxcv
+Content-Range: bytes 7-13
+
+Invalid Content-Range, missing size, skipped.
+--zxcv
+Content-Range: bytes 14-19/50
+
+Part 2
+--zxcv--
+`
+
+	body = strings.ReplaceAll(body, "\n", "\r\n")
+
+	var (
+		reader = bytes.NewReader([]byte(body))
+
+		r   *libhttp.Range
+		err error
+	)
+	r, err = libhttp.ParseMultipartRange(reader, boundary)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var pos libhttp.RangePosition
+	for _, pos = range r.Positions() {
+		fmt.Printf("%s: %s\n", pos.String(), pos.Content())
+	}
+	// Output:
+	// 0-6: Part 1
+	// 14-19: Part 2
+}
 
 func ExampleParseRange() {
 	var r libhttp.Range

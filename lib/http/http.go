@@ -15,7 +15,7 @@
 //   - Simplify sending body with application/x-www-form-urlencoded,
 //     multipart/form-data, application/json with POST or PUT methods in
 //     Client.
-//   - Add support for [HTTP Range] in Server
+//   - Add support for [HTTP Range] in Server and Client
 //
 // # Problems
 //
