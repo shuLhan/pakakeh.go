@@ -956,3 +956,35 @@ func TestServer_handleRange(t *testing.T) {
 		test.Assert(t, tag, string(exp), got)
 	}
 }
+
+func TestServer_handleRange_HEAD(t *testing.T) {
+	var (
+		clOpts = &ClientOptions{
+			ServerUrl: testServerUrl,
+		}
+		cl = NewClient(clOpts)
+
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/server/head_range_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var httpRes *http.Response
+
+	httpRes, err = cl.Client.Head(testServerUrl + `/index.html`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		skipHeaders = []string{HeaderDate, HeaderETag}
+		got         = dumpHttpResponse(httpRes, skipHeaders)
+		tag         = `http_headers`
+		exp         = tdata.Output[tag]
+	)
+	test.Assert(t, tag, string(exp), got)
+}
