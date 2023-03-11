@@ -22,6 +22,11 @@ This is changelog for share module since v0.1.0 until v0.11.0.
 [#v0_45_0__enhancements]
 ===  Enhancements
 
+lib/parser: add method TokenTrimSpace::
++
+The TokenTrimSpace read the next token until one of the delimiter found,
+with leading and trailing spaces are ignored.
+
 lib/parser: add method SetDelimiters::
 +
 The SetDelimiters replace the current delimiters.

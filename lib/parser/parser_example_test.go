@@ -27,3 +27,27 @@ func ExampleNew() {
 	// "key" '='
 	// "value" '\x00'
 }
+
+func ExampleParser_TokenTrimSpace() {
+	var (
+		content = " 1 , \r\t\f, 2 , 3 , 4 , "
+		p       = New(content, `,`)
+
+		tok string
+		r   rune
+	)
+	for {
+		tok, r = p.TokenTrimSpace()
+		fmt.Printf("%q\n", tok)
+		if r == 0 {
+			break
+		}
+	}
+	// Output:
+	// "1"
+	// ""
+	// "2"
+	// "3"
+	// "4"
+	// ""
+}

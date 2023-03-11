@@ -84,6 +84,17 @@ func (p *Parser) Close() {
 	p.d = 0
 }
 
+// isDelim true if r is one of delimiters.
+func (p *Parser) isDelim(r rune) bool {
+	var d rune
+	for _, d = range p.delims {
+		if r == d {
+			return true
+		}
+	}
+	return false
+}
+
 // Lines return all non-empty lines from the content.
 func (p *Parser) Lines() []string {
 	var start, end int
@@ -246,6 +257,53 @@ func (p *Parser) TokenEscaped(esc rune) (string, rune) {
 	return string(p.token), p.d
 }
 
+// TokenTrimSpace read the next token until one of the delimiter found, with
+// leading and trailing spaces are ignored.
+func (p *Parser) TokenTrimSpace() (v string, r rune) {
+	p.d = 0
+	p.token = p.token[:0]
+
+	if p.x >= len(p.v) {
+		return "", 0
+	}
+
+	var x int
+
+	// Skip leading spaces.
+	for x, r = range p.v[p.x:] {
+		if isHorizontalSpace(r) {
+			continue
+		}
+		break
+	}
+	p.x += x
+
+	for x, r = range p.v[p.x:] {
+		if p.isDelim(r) {
+			p.d = r
+			break
+		}
+		p.token = append(p.token, r)
+	}
+
+	p.x += x + 1 // +1 to skip the delimiter.
+
+	// Remove trailing spaces.
+	for x = len(p.token) - 1; x >= 0; x-- {
+		if isHorizontalSpace(p.token[x]) {
+			continue
+		}
+		break
+	}
+	if x < 0 {
+		// Empty token.
+		return "", p.d
+	}
+	p.token = p.token[:x+1]
+
+	return string(p.token), p.d
+}
+
 // ReadEnclosed read the token inside opening and closing characters, ignoring
 // all delimiters that previously set.
 //
@@ -345,4 +403,9 @@ func (p *Parser) SkipLine() rune {
 	p.d = 0
 
 	return 0
+}
+
+// isHorizontalSpace true if r is space, tab, carriage return, or form feed.
+func isHorizontalSpace(r rune) bool {
+	return r == ' ' || r == '\t' || r == '\r' || r == '\f'
 }
