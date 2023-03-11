@@ -16,6 +16,17 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_45_0]
+==  share v0.45.0-dev (2023-04-xx)
+
+[#v0_45_0__enhancements]
+===  Enhancements
+
+lib/parser: add method SetDelimiters::
++
+The SetDelimiters replace the current delimiters.
+
+
 [#v0_44_0]
 ==  share v0.44.0 (2022-03-02)
 

@@ -159,6 +159,11 @@ func (p *Parser) Line() (string, rune) {
 	return string(p.token), 0
 }
 
+// SetDelimiters replace the current delimiters with delims.
+func (p *Parser) SetDelimiters(delims string) {
+	p.delims = delims
+}
+
 // Stop the parser, return the remaining unparsed content and its last
 // position, and then call Close to reset the internal state back to zero.
 func (p *Parser) Stop() (remain string, pos int) {
