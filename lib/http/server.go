@@ -5,9 +5,12 @@
 package http
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -16,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shuLhan/share/lib/ascii"
 	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
@@ -476,8 +480,6 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		node         *memfs.Node
 		responseETag string
 		requestETag  string
-		sizeStr      string
-		body         []byte
 		size         int64
 		err          error
 		ok           bool
@@ -505,32 +507,48 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	var bodyReader io.ReadSeeker
+
 	if len(node.Content) > 0 {
-		body = node.Content
+		bodyReader = bytes.NewReader(node.Content)
 		size = node.Size()
 	} else {
-		body, err = os.ReadFile(node.SysPath)
+		var f *os.File
+		f, err = os.Open(node.SysPath)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		size = int64(len(body))
+		defer f.Close()
+
+		var fstat os.FileInfo
+		fstat, err = f.Stat()
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		bodyReader = f
+		size = fstat.Size()
 	}
 
-	sizeStr = strconv.FormatInt(size, 10)
-	res.Header().Set(HeaderContentLength, sizeStr)
 	res.Header().Set(HeaderETag, responseETag)
 
 	if req.Method == http.MethodHead {
+		var sizeStr = strconv.FormatInt(size, 10)
+		res.Header().Set(HeaderContentLength, sizeStr)
+		res.Header().Set(HeaderAcceptRanges, AcceptRangesBytes)
 		res.WriteHeader(http.StatusOK)
 		return
 	}
 
-	res.WriteHeader(http.StatusOK)
-	_, err = res.Write(body)
-	if err != nil {
-		mlog.Errf("%s: %s %s: %s", logp, req.Method, req.URL.Path, err)
+	var reqRange = req.Header.Get(HeaderRange)
+	if len(reqRange) != 0 {
+		handleRange(res, req, bodyReader, ``, reqRange)
+		return
 	}
+
+	responseWrite(logp, res, req, bodyReader)
 }
 
 // handleGet handle the GET request by searching the registered route and
@@ -696,4 +714,174 @@ func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 	res.WriteHeader(http.StatusNotFound)
+}
+
+// HandleRange handle [HTTP Range] request using "bytes" unit.
+//
+// The body parameter contains the content of resource being requested that
+// implement Reader and Seeker.
+//
+// If the Request method is not GET, or no Range in header request it will
+// return all the body [RFC7233 S-3.1].
+//
+// The contentType is optional, if its empty, it will detected by
+// [http.ResponseWriter] during Write.
+//
+// It will return HTTP Code,
+//   - 406 StatusNotAcceptable, if the Range unit is not "bytes".
+//   - 416 StatusRequestedRangeNotSatisfiable, if the request Range start
+//     position is greater than resource size.
+//
+// [HTTP Range]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
+// [RFC7233 S-3.1]: https://datatracker.ietf.org/doc/html/rfc7233#section-3.1
+func HandleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadSeeker, contentType string) {
+	var (
+		logp     = `HandleRange`
+		reqRange = req.Header.Get(HeaderRange)
+	)
+
+	if req.Method != http.MethodGet || len(reqRange) == 0 {
+		if len(contentType) > 0 {
+			res.Header().Set(HeaderContentType, contentType)
+		}
+		responseWrite(logp, res, req, bodyReader)
+		return
+	}
+
+	handleRange(res, req, bodyReader, contentType, reqRange)
+}
+
+func handleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadSeeker, contentType, reqRange string) {
+	var (
+		logp = `handleRange`
+		r    = ParseRange(reqRange)
+	)
+	if r.IsEmpty() {
+		// No range specified, write the full body.
+		responseWrite(logp, res, req, bodyReader)
+		return
+	}
+	if r.unit != AcceptRangesBytes {
+		res.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if len(contentType) == 0 {
+		contentType = rangeContentType(bodyReader)
+	}
+
+	var (
+		size int64
+		err  error
+	)
+	size, err = bodyReader.Seek(0, io.SeekEnd)
+	if err != nil {
+		// An error here assume that the size is unknown ('*').
+		log.Printf(`%s: seek body size: %s`, logp, err)
+	}
+
+	var (
+		listPos  = r.Positions()
+		listBody = make([][]byte, 0, len(listPos))
+
+		pos RangePosition
+	)
+	for _, pos = range listPos {
+		if pos.Start < 0 {
+			_, err = bodyReader.Seek(pos.Start, io.SeekEnd)
+		} else {
+			_, err = bodyReader.Seek(pos.Start, io.SeekStart)
+		}
+		if err != nil {
+			log.Printf(`%s: seek %d: %s`, logp, pos.Start, err)
+			res.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+			return
+		}
+
+		var (
+			body []byte
+			n    int
+		)
+		if pos.Length > 0 {
+			body = make([]byte, pos.Length)
+		} else {
+			body = make([]byte, size)
+		}
+
+		n, err = bodyReader.Read(body)
+		if n == 0 || err != nil {
+			log.Printf(`%s: seek %d, size %d: %s`, logp, pos.Start, size, err)
+			res.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+			return
+		}
+		body = body[:n]
+		listBody = append(listBody, body)
+	}
+
+	var header = res.Header()
+
+	if len(listBody) == 1 {
+		pos = listPos[0]
+		header.Set(HeaderContentRange, pos.ContentRange(r.unit, size))
+		res.WriteHeader(http.StatusPartialContent)
+		res.Write(listBody[0])
+		return
+	}
+
+	var (
+		boundary = ascii.Random([]byte(ascii.Hexaletters), 16)
+
+		bb bytes.Buffer
+		x  int
+	)
+
+	for x, pos = range listPos {
+		fmt.Fprintf(&bb, "--%s\r\n", boundary)
+		fmt.Fprintf(&bb, "%s: %s\r\n", HeaderContentType, contentType)
+		fmt.Fprintf(&bb, "%s: %s\r\n\r\n", HeaderContentRange, pos.ContentRange(r.unit, size))
+		bb.Write(listBody[x])
+		bb.WriteString("\r\n")
+	}
+	fmt.Fprintf(&bb, "--%s--\r\n", boundary)
+
+	var v = fmt.Sprintf(`%s; boundary=%s`, ContentTypeMultipartByteRanges, boundary)
+	header.Set(HeaderContentType, v)
+
+	v = strconv.FormatInt(int64(bb.Len()), 10)
+	header.Set(HeaderContentLength, v)
+
+	res.WriteHeader(http.StatusPartialContent)
+	res.Write(bb.Bytes())
+}
+
+// rangeContentType detect the body content type for range reply.
+func rangeContentType(bodyReader io.ReadSeeker) (contentType string) {
+	var (
+		part = make([]byte, 512)
+		err  error
+	)
+	_, err = bodyReader.Read(part)
+	if err != nil {
+		return ContentTypeBinary
+	}
+	contentType = http.DetectContentType(part)
+	return contentType
+}
+
+func responseWrite(logp string, res http.ResponseWriter, req *http.Request, bodyReader io.ReadSeeker) {
+	var (
+		body []byte
+		err  error
+	)
+
+	body, err = io.ReadAll(bodyReader)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_, err = res.Write(body)
+	if err != nil {
+		mlog.Errf(`%s: %s %s: %s`, logp, req.Method, req.URL.Path, err)
+	}
 }

@@ -898,3 +898,61 @@ func TestServer_Options_HandleFS(t *testing.T) {
 		test.Assert(t, "response body", c.expResBody, string(gotBody))
 	}
 }
+
+func TestServer_handleRange(t *testing.T) {
+	var (
+		clOpts = &ClientOptions{
+			ServerUrl: testServerUrl,
+		}
+		cl          = NewClient(clOpts)
+		skipHeaders = []string{HeaderDate, HeaderETag}
+
+		listTestData []*test.Data
+		tdata        *test.Data
+		httpRes      *http.Response
+		resBody      []byte
+		err          error
+	)
+
+	listTestData, err = test.LoadDataDir(`testdata/server/range/`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tdata = range listTestData {
+		t.Log(tdata.Name)
+
+		var (
+			header      = http.Header{}
+			headerRange = tdata.Input[`header_range`]
+		)
+
+		header.Set(HeaderRange, string(headerRange))
+
+		httpRes, resBody, err = cl.Get(`/index.html`, header, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var (
+			tag = `http_headers`
+			exp = tdata.Output[tag]
+			got = dumpHttpResponse(httpRes, skipHeaders)
+		)
+		test.Assert(t, tag, string(exp), got)
+
+		tag = `http_body`
+		exp = tdata.Output[tag]
+
+		// Replace the response body CRLF with LF.
+		resBody = bytes.ReplaceAll(resBody, []byte("\r\n"), []byte("\n"))
+
+		test.Assert(t, tag, string(exp), string(resBody))
+
+		tag = `all_body`
+		exp = tdata.Output[tag]
+		got = dumpMultipartBody(httpRes)
+
+		test.Assert(t, tag, string(exp), got)
+	}
+}

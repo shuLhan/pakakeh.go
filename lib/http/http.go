@@ -5,6 +5,18 @@
 // Package http implement custom HTTP server with memory file system and
 // simplified routing handler.
 //
+// # Features
+//
+// The following enhancements are added to Server and Client,
+//
+//   - Simplify registering routing with key binding in Server
+//   - Add support for handling CORS in Server
+//   - Serving files using [memfs.MemFS] in Server
+//   - Simplify sending body with application/x-www-form-urlencoded,
+//     multipart/form-data, application/json with POST or PUT methods in
+//     Client.
+//   - Add support for [HTTP Range] in Server
+//
 // # Problems
 //
 // There are two problems that this library try to handle.
@@ -49,14 +61,17 @@
 // This cause more memory to be consumed on server side but we minimize path
 // lookup, and cache-miss on OS level.
 //
-// Serving file system is handled by package memfs, which can be set on
+// Serving file system is handled by package [memfs], which can be set on
 // ServerOptions.
 // For example, to serve all content in directory "www", we can set the
 // ServerOptions to,
 //
 //	opts := &http.ServerOptions{
-//		Options: memfs.Options{
-//			Root: "www",
+//		Memfs: &memfs.MemFS{
+//			Opts: &memfs.Options{
+//				Root:        `./www`,
+//				TryDirect:   true,
+//			},
 //		},
 //		Address: ":8080",
 //	}
@@ -175,15 +190,17 @@
 //		// contents in Memfs.
 //	}
 //
-// # Known Bugs and Limitations
+// # Bugs and Limitations
 //
-// * The server does not handle CONNECT method
+//   - The server does not handle CONNECT method
 //
-// * Missing test for request with content-type multipart-form
+//   - Missing test for request with content-type multipart-form
 //
-// * We can not register path with ambigous route.  For example, "/:x" and
-// "/y" are ambiguous because one is dynamic path using key binding "x" and
-// the last one is static path to "y".
+//   - Server can not register path with ambigous route.  For example, "/:x" and
+//     "/y" are ambiguous because one is dynamic path using key binding "x" and
+//     the last one is static path to "y".
+//
+// [HTTP Range]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
 package http
 
 import (
@@ -194,6 +211,12 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
+// List of header value for HTTP header Accept-Ranges.
+const (
+	AcceptRangesBytes = `bytes`
+	AcceptRangesNone  = `none`
+)
+
 // List of known HTTP header keys and values.
 const (
 	ContentEncodingBzip2    = "bzip2"
@@ -201,13 +224,14 @@ const (
 	ContentEncodingGzip     = "gzip"
 	ContentEncodingDeflate  = "deflate" // Using zlib.
 
-	ContentTypeBinary        = "application/octet-stream"
-	ContentTypeForm          = "application/x-www-form-urlencoded"
-	ContentTypeMultipartForm = "multipart/form-data"
-	ContentTypeHTML          = "text/html; charset=utf-8"
-	ContentTypeJSON          = "application/json"
-	ContentTypePlain         = "text/plain; charset=utf-8"
-	ContentTypeXML           = "text/xml; charset=utf-8"
+	ContentTypeBinary              = "application/octet-stream"
+	ContentTypeForm                = "application/x-www-form-urlencoded"
+	ContentTypeMultipartByteRanges = `multipart/byteranges`
+	ContentTypeMultipartForm       = "multipart/form-data"
+	ContentTypeHTML                = "text/html; charset=utf-8"
+	ContentTypeJSON                = "application/json"
+	ContentTypePlain               = "text/plain; charset=utf-8"
+	ContentTypeXML                 = "text/xml; charset=utf-8"
 
 	HeaderACAllowCredentials = "Access-Control-Allow-Credentials"
 	HeaderACAllowHeaders     = "Access-Control-Allow-Headers"
@@ -218,18 +242,22 @@ const (
 	HeaderACRequestHeaders   = "Access-Control-Request-Headers"
 	HeaderACRequestMethod    = "Access-Control-Request-Method"
 	HeaderAcceptEncoding     = "Accept-Encoding"
+	HeaderAcceptRanges       = `Accept-Ranges`
 	HeaderAllow              = "Allow"
 	HeaderAuthKeyBearer      = "Bearer"
 	HeaderAuthorization      = "Authorization"
 	HeaderContentEncoding    = "Content-Encoding"
 	HeaderContentLength      = "Content-Length"
+	HeaderContentRange       = `Content-Range`
 	HeaderContentType        = "Content-Type"
 	HeaderCookie             = "Cookie"
-	HeaderETag               = "ETag"
+	HeaderDate               = `Date`
+	HeaderETag               = "Etag"
 	HeaderHost               = "Host"
 	HeaderIfNoneMatch        = "If-None-Match"
 	HeaderLocation           = "Location"
 	HeaderOrigin             = "Origin"
+	HeaderRange              = `Range`
 	HeaderUserAgent          = "User-Agent"
 	HeaderXForwardedFor      = "X-Forwarded-For" // https://en.wikipedia.org/wiki/X-Forwarded-For
 	HeaderXRealIp            = "X-Real-Ip"

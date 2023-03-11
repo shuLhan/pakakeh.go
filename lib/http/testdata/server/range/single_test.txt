@@ -1,0 +1,16 @@
+>>> header_range
+bytes=10-15
+
+<<< http_headers
+HTTP/1.1 206 Partial Content
+Content-Length: 6
+Content-Range: bytes 10-15/40
+Content-Type: text/html; charset=utf-8
+
+<<< http_body
+y>Hell
+
+<<< all_body
+y>Hell
+
+<<< END

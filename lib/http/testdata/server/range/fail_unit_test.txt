@@ -1,0 +1,13 @@
+>>> header_range
+myunit=10-15
+
+<<< http_headers
+HTTP/1.1 406 Not Acceptable
+Content-Length: 0
+Content-Type: text/html; charset=utf-8
+
+<<< http_body
+
+<<< all_body
+
+<<< END

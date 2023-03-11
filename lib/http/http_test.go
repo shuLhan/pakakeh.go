@@ -5,15 +5,22 @@
 package http
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"log"
+	"math/rand"
+	"mime"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/shuLhan/share/lib/memfs"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 var (
@@ -49,6 +56,10 @@ func TestMain(m *testing.M) {
 		serverAddress = "127.0.0.1:14832"
 		err           error
 	)
+
+	// Make sure the all random generated values, like boundary are
+	// predictable.
+	rand.Seed(42)
 
 	opts := &ServerOptions{
 		Memfs: &memfs.MemFS{
@@ -154,4 +165,85 @@ func registerEndpoints() {
 	if err != nil {
 		log.Fatalf("TestMain: %s", err)
 	}
+}
+
+// dumpHttpResponse write headers ordered by key in ascending with option to
+// skip certain header keys.
+func dumpHttpResponse(httpRes *http.Response, skipHeaders []string) string {
+	var (
+		keys []string
+		hkey string
+	)
+	for hkey = range httpRes.Header {
+		if libstrings.IsContain(skipHeaders, hkey) {
+			continue
+		}
+		keys = append(keys, hkey)
+	}
+	sort.Strings(keys)
+
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "%s %s\n", httpRes.Proto, httpRes.Status)
+	for _, hkey = range keys {
+		fmt.Fprintf(&sb, "%s: %s\n", hkey, httpRes.Header.Get(hkey))
+	}
+	return sb.String()
+}
+
+// dumpMultipartBody Concatenate each multipart body into one string.
+// If the the Content-Type header is not multipart, it will return all the
+// body.
+func dumpMultipartBody(httpRes *http.Response) string {
+	var (
+		logp        = `dumpMultipartBody`
+		contentType = httpRes.Header.Get(`Content-Type`)
+
+		mediaType string
+		params    map[string]string
+		err       error
+	)
+
+	mediaType, params, err = mime.ParseMediaType(contentType)
+	if err != nil {
+		log.Fatalf(`%s: ParseMediaType: %s`, logp, err)
+	}
+
+	var body []byte
+
+	if !strings.HasPrefix(mediaType, `multipart/`) {
+		body, err = io.ReadAll(httpRes.Body)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return ``
+			}
+			log.Fatalf(`%s: ReadAll httpRes.Body: %s`, logp, err)
+		}
+		return string(body)
+	}
+
+	var (
+		reader *multipart.Reader
+		part   *multipart.Part
+		sb     strings.Builder
+	)
+
+	reader = multipart.NewReader(httpRes.Body, params[`boundary`])
+	for {
+		part, err = reader.NextPart()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			log.Fatalf(`%s: NextPart: %s`, logp, err)
+		}
+		body, err = io.ReadAll(part)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				continue
+			}
+			log.Fatalf(`%s: ReadAll part: %s`, logp, err)
+		}
+		sb.Write(body)
+	}
+	return sb.String()
 }

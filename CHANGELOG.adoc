@@ -19,6 +19,31 @@ This is changelog for share module since v0.1.0 until v0.11.0.
 [#v0_45_0]
 ==  share v0.45.0-dev (2023-04-xx)
 
+[#v0_45_0__new_features]
+===  New features
+
+lib/http: add support for HTTP Range in Server::
++
+--
+For HTTP Server using HandleFS, the Range request is handled
+automatically.
+For other HTTP server, user can use the HandleRange function.
+
+The HandleRange function handle [HTTP Range] request using "bytes" unit.
+The body parameter contains the content of resource being requested that
+accept Seek method.
+
+If the Request method is not GET, or no Range in header request it will
+return all the body [RFC7233 S-3.1].
+
+The contentType is optional, if its empty, it will detected by
+http.ResponseWriter during Write.
+
+[HTTP Range]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
+[RFC7233 S-3.1]: https://datatracker.ietf.org/doc/html/rfc7233#section-3.1
+--
+
+
 [#v0_45_0__enhancements]
 ===  Enhancements
 

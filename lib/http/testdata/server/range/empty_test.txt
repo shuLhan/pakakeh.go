@@ -1,0 +1,17 @@
+>>> header_range
+bytes=
+
+<<< http_headers
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: text/html; charset=utf-8
+
+<<< http_body
+<html><body>Hello, world!</body></html>
+
+
+<<< all_body
+<html><body>Hello, world!</body></html>
+
+
+<<< END
