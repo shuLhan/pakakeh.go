@@ -25,6 +25,14 @@ This is changelog for share module since v0.1.0 until v0.11.0.
 [#v0_45_0__new_features]
 ===  New features
 
+lib/telemetry: package for collecting and forwarding metrics::
++
+Package telemetry is a library for collecting various Metric, for example
+from standard runtime/metrics, and send or write it to one or more
+Forwarder.
+Each Forwarder has capability to format the Metric before sending or
+writing it using Formatter.
+
 lib/http: add function to parse multipart Range response for Client::
 +
 The ParseMultipartRange parse the multipart/byteranges body or response
