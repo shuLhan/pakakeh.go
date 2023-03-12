@@ -58,40 +58,32 @@ func printStackTrace(w Writer, trace []byte) {
 //	!!! Assert: [<name>: ] T.<Field>: expecting <type>(<value>), got <type>(<value>)
 //
 // If both exp and got types are string and its longer than 50 chars, it
-// will use the text/diff.Text to show the difference between them.
+// will use the [diff.Text] to show the difference between them.
 // The diff output is as follow,
 //
 //	!!! "string not matched" / <desc>:
-//	----
+//	---- EXPECTED
 //	<LINE_NUM> - "<STRING>"
 //	...
-//	++++
+//	++++ GOT
 //	<LINE_NUM> + "<STRING>"
 //	...
 //	--++
 //	<LINE_NUM> - "<LINE_EXP>"
 //	<LINE_NUM> + "<LINE_GOT>"
-//	^<COL_NUM> - "<DELETED_STRING>"
-//	^<COL_NUM> + "<INSERTED_STRING>"
 //
-// Any lines after "----" indicate the lines that deleted in got (exist in exp
-// but not in got).
+// Any lines after "----" indicate the lines that test expected.
 //
-// Any lines after "++++" indicate the lines that inserted in got (does not
-// exist in exp but exist in got).
+// Any lines after "++++" indicate the lines that test got.
 //
-// Any lines after "--++" indicate that the line between exp and got has words
-// changes in it.
+// Any lines after "--++" indicate that the same line between expected and got
+// but different content.
 //
-//   - The "<LINE_NUM> - " print the line in exp.
-//   - The "<LINE_NUM> + " print the line in got.
-//   - The "^<COL_NUM> - " print the position and the string deleted in exp
-//     (or string that not exist in got).
-//   - The "^<COL_NUM> + " print the position and the string inserted in got
-//     (or string that not exist in exp).
+//   - The "<LINE_NUM> - " print the expected line.
+//   - The "<LINE_NUM> + " print the got line.
 //
-// WARNING: this method does not support recursive pointer, for example a node
-// that point to parent and parent that point back to node again.
+// LIMITATION: this method does not support recursive pointer, for example a
+// node that point to parent and parent that point back to node again.
 func Assert(w Writer, name string, exp, got interface{}) {
 	var (
 		logp = `Assert`

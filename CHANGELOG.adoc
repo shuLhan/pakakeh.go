@@ -62,6 +62,21 @@ lib/parser: add method SetDelimiters::
 +
 The SetDelimiters replace the current delimiters.
 
+[#v0_45_0__enhancements]
+===  Enhancements
+
+lib/test: simplify the string diff output from Assert::
++
+--
+In the output, instead of using %q we replace it with %s, because printing
+string with double quote cause escaping and hard to read
+This change may cause difference in white spaces not showed in the
+terminal.
+
+In the diff changes, only print the Old and New, without printing each
+chunk.
+--
+
 
 [#v0_44_0]
 ==  share v0.44.0 (2023-03-02)
