@@ -67,3 +67,46 @@ func TestReaderScanInt64(t *testing.T) {
 		test.Assert(t, "c", c.expc, gotc)
 	}
 }
+
+func TestReaderReplaceAll(t *testing.T) {
+	type testCase struct {
+		r   Reader
+		old []byte
+		new []byte
+		exp string
+	}
+
+	var cases = []testCase{{
+		r: Reader{
+			V: []byte(`foo foo foo`),
+		},
+		old: []byte(`foo`),
+		new: []byte(`bar`),
+		exp: `bar bar bar`,
+	}, {
+		r: Reader{
+			V: []byte(`foo foo foo`),
+			X: 1,
+		},
+		old: []byte(`foo`),
+		new: []byte(`bar`),
+		exp: `foo bar bar`,
+	}, {
+		r: Reader{
+			V: []byte(`foo foo foo`),
+			X: 4,
+		},
+		old: []byte(`foo`),
+		new: []byte(`bar`),
+		exp: `foo bar bar`,
+	}}
+
+	var (
+		c testCase
+	)
+	for _, c = range cases {
+		c.r.ReplaceAll(c.old, c.new)
+
+		test.Assert(t, ``, c.exp, string(c.r.V))
+	}
+}

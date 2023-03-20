@@ -5,6 +5,7 @@
 package io
 
 import (
+	"bytes"
 	"os"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -99,6 +100,13 @@ func (r *Reader) ReadUntil(seps, terms []byte) (tok []byte, isTerm bool, c byte)
 	}
 	tok = r.V[start:]
 	return tok, false, 0
+}
+
+// ReplaceAll replace all occurence of old with new, start from the current
+// index.
+func (r *Reader) ReplaceAll(old, new []byte) {
+	var repl = bytes.ReplaceAll(r.V[r.X:], old, new)
+	copy(r.V[r.X:], repl)
 }
 
 // Rest return the rest of unreaded buffer.
