@@ -5,6 +5,7 @@
 package bytes
 
 import (
+	"bytes"
 	"fmt"
 	"math"
 
@@ -395,6 +396,22 @@ func ExampleWordIndexes() {
 	// []
 	// [0 11]
 	// []
+}
+
+func ExampleDumpPrettyTable() {
+	var (
+		data = []byte{1, 2, 3, 'H', 'e', 'l', 'l', 'o', 254, 255}
+		bb   bytes.Buffer
+	)
+
+	DumpPrettyTable(&bb, `DumpPrettyTable`, data)
+	fmt.Println(bb.String())
+	// Output:
+	// DumpPrettyTable
+	//     |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
+	//     |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
+	// 0x00| 01 02 03 48 65 6c 6c 6f| . . . H e l l o|   1   2   3  72 101 108 108 111|00
+	// 0x08| fe ff                  | . .            | 254 255                        |08
 }
 
 func ExampleWriteUint16() {

@@ -8,6 +8,7 @@ package bytes
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"unicode"
 )
 
@@ -581,6 +582,58 @@ func WordIndexes(s []byte, word []byte) (idxs []int) {
 	}
 
 	return idxs
+}
+
+// DumpPrettyTable write each byte in slice data as hexadecimal, ASCII
+// character, and integer with 8 columns width.
+func DumpPrettyTable(w io.Writer, title string, data []byte) {
+	const ncol = 8
+
+	fmt.Fprintf(w, "%s\n", title)
+	fmt.Fprint(w, "    |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|\n")
+	fmt.Fprint(w, "    |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|\n")
+
+	var (
+		chunks = SplitEach(data, ncol)
+		chunk  []byte
+		x      int
+		y      int
+		c      byte
+	)
+	for x, chunk = range chunks {
+		fmt.Fprintf(w, `%#02x|`, x*ncol)
+
+		// Print as hex.
+		for y, c = range chunk {
+			fmt.Fprintf(w, ` %02x`, c)
+		}
+		for y++; y < ncol; y++ {
+			fmt.Fprint(w, `   `)
+		}
+
+		// Print as char.
+		fmt.Fprint(w, `|`)
+		for y, c = range chunk {
+			if c >= 33 && c <= 126 {
+				fmt.Fprintf(w, ` %c`, c)
+			} else {
+				fmt.Fprint(w, ` .`)
+			}
+		}
+		for y++; y < ncol; y++ {
+			fmt.Fprint(w, `  `)
+		}
+
+		// Print as integer.
+		fmt.Fprint(w, `|`)
+		for y, c = range chunk {
+			fmt.Fprintf(w, ` %3d`, c)
+		}
+		for y++; y < ncol; y++ {
+			fmt.Fprint(w, `    `)
+		}
+		fmt.Fprintf(w, "|%02d\n", x*ncol)
+	}
 }
 
 // WriteUint16 write uint16 value "v" into "data" start at position "x".
