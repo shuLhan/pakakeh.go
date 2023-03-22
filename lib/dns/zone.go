@@ -106,7 +106,7 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 // not set.
 func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 	var (
-		m *zoneParser = newZoneParser(file)
+		m *zoneParser = newZoneParser(nil)
 	)
 
 	m.ttl = ttl

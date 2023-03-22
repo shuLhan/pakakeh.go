@@ -19,7 +19,7 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		cases []testCase
 		c     testCase
@@ -67,7 +67,7 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		cases []testCase
 		c     testCase
@@ -112,7 +112,7 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		cases []testCase
 		c     testCase
@@ -163,7 +163,7 @@ func TestZoneInitRFC1035(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		msg   *Message
 		rr    ResourceRecord
@@ -409,7 +409,7 @@ func TestZoneInit2(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		msg   *Message
 		rr    ResourceRecord
@@ -678,7 +678,7 @@ func TestZoneInit3(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		msg   *Message
 		rr    ResourceRecord
@@ -807,7 +807,7 @@ func TestZoneParseTXT(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser("")
+		m = newZoneParser(nil)
 
 		msg   *Message
 		rr    ResourceRecord

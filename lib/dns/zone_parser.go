@@ -62,13 +62,17 @@ type zoneParser struct {
 	ttl    uint32
 }
 
-func newZoneParser(file string) *zoneParser {
-	return &zoneParser{
-		zone:   NewZone(file, ""),
+func newZoneParser(zone *Zone) (zp *zoneParser) {
+	zp = &zoneParser{
 		lineno: 1,
 		seps:   []byte{' ', '\t'},
 		terms:  []byte{';', '\n'},
 	}
+	if zone == nil {
+		zone = NewZone(``, ``)
+	}
+	zp.zone = zone
+	return zp
 }
 
 // Init parse zoneParser file from string.
