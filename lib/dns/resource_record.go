@@ -189,24 +189,14 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 		logp      = "ResourceRecord.unpack"
 		lenPacket = uint(len(packet))
 
-		end       uint
 		lenXRdata uint
 	)
 
 	x = startIdx
 
-	rr.Name, end, err = unpackDomainName(packet, x)
+	rr.Name, x, err = unpackDomainName(packet, x)
 	if err != nil {
 		return x, fmt.Errorf("%s: %w", logp, err)
-	}
-	if end > 0 {
-		x = end
-	} else {
-		if len(rr.Name) == 0 {
-			x++
-		} else {
-			x += uint(len(rr.Name) + 2)
-		}
 	}
 
 	rr.Type = RecordType(libbytes.ReadUint16(packet, x))
@@ -237,47 +227,64 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	return x, nil
 }
 
+// unpackDomainName unpack domain name from packet from index start.
+// It will return the domain name and the last index where domain name end.
 func unpackDomainName(packet []byte, start uint) (name string, end uint, err error) {
 	var (
-		x = int(start)
+		logp = `unpackDomainName`
+		x    = int(start)
 
 		out      strings.Builder
-		offset   uint16
 		count, y byte
+		isJump   bool
 	)
+
+	end = start
 
 	for x < len(packet) {
 		count = packet[x]
 		if count == 0 {
+			if !isJump {
+				end++
+			}
 			break
 		}
 		if (packet[x] & maskPointer) == maskPointer {
-			offset = uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
-
-			if end == 0 {
-				end = uint(x + 2)
-			}
+			var offset = uint16(packet[x]&maskOffset)<<8 | uint16(packet[x+1])
 			// Jump to index defined by offset.
 			x = int(offset)
+			if !isJump {
+				end += 2
+				isJump = true
+			}
 			continue
 		}
 		if count > maxLabelSize {
-			return "", end, fmt.Errorf("unpackDomainName: at %d: %w", x, ErrLabelSizeLimit)
-		}
-		if out.Len() > 0 {
-			out.WriteByte('.')
+			return ``, end, fmt.Errorf(`%s: at %d: %w`, logp, x, ErrLabelSizeLimit)
 		}
 
 		x++
+		if !isJump {
+			end++
+		}
+		if x+int(count) >= len(packet) {
+			// It should not goes here, invalid packet.
+			return ``, end, fmt.Errorf(`%s: label size %d greater than packet length %d`, logp, count, len(packet))
+		}
+
+		if out.Len() > 0 {
+			out.WriteByte('.')
+		}
 		for y = 0; y < count; y++ {
-			if x >= len(packet) {
-				break
-			}
 			if packet[x] >= 'A' && packet[x] <= 'Z' {
-				packet[x] += 32
+				out.WriteByte(packet[x] + 32)
+			} else {
+				out.WriteByte(packet[x])
 			}
-			out.WriteByte(packet[x])
 			x++
+		}
+		if !isJump {
+			end = end + uint(count)
 		}
 	}
 	return out.String(), end, nil
@@ -428,19 +435,13 @@ func (rr *ResourceRecord) unpackMInfo(packet []byte, startIdx uint) (err error) 
 		logp    = "unpackMInfo"
 		rrMInfo = &RDataMINFO{}
 		x       = startIdx
-		end     uint
 	)
 
 	rr.Value = rrMInfo
 
-	rrMInfo.RMailBox, end, err = unpackDomainName(packet, x)
+	rrMInfo.RMailBox, x, err = unpackDomainName(packet, x)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
-	}
-	if end > 0 {
-		x = end
-	} else {
-		x += uint(len(rrMInfo.RMailBox) + 2)
 	}
 
 	rrMInfo.EmailBox, _, err = unpackDomainName(packet, x)
