@@ -84,11 +84,10 @@ func TestMessagePackDomainName(t *testing.T) {
 
 	for _, c = range cases {
 		msg.Reset()
-		msg.packet = msg.packet[:0]
 
 		msg.packDomainName(c.in, false)
 
-		test.Assert(t, "packDomainName", c.exp, msg.packet)
+		test.Assert(t, string(c.in), c.exp, msg.packet)
 	}
 }
 
@@ -861,7 +860,6 @@ func TestMessagePack(t *testing.T) {
 
 		got, _ = c.msg.Pack()
 
-		t.Logf("Message: %+v\n", c.msg)
 		test.Assert(t, c.desc, c.exp, got)
 	}
 }
