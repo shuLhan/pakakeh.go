@@ -12,8 +12,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-
-	libio "github.com/shuLhan/share/lib/io"
 )
 
 // Zone represent a group of domain names shared a single root domain.
@@ -102,42 +100,50 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 	return zoneFiles, nil
 }
 
+// ParseZone parse zone from raw bytes.
+func ParseZone(content []byte, origin string, ttl uint32) (zone *Zone, err error) {
+	var (
+		logp = `ParseZone`
+		zp   = newZoneParser(nil)
+	)
+
+	zp.Reset(content, origin, ttl)
+
+	err = zp.parse()
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	zone = zp.zone
+	zp.zone = nil
+
+	zone.Name = zp.origin
+
+	return zone, nil
+}
+
 // ParseZoneFile parse zone file.
 // The file name will be assumed as origin if parameter origin or $ORIGIN is
 // not set.
 func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 	var (
-		logp = `ParseZoneFile`
-		m    = newZoneParser(nil)
+		logp    = `ParseZoneFile`
+		content []byte
 	)
 
-	m.ttl = ttl
-
-	if len(origin) > 0 {
-		m.origin = origin
-	} else {
-		m.origin = filepath.Base(file)
+	if len(origin) == 0 {
+		origin = filepath.Base(file)
 	}
 
-	m.origin = strings.ToLower(m.origin)
-	if m.origin[len(m.origin)-1] != '.' {
-		m.origin += `.`
-	}
-
-	m.reader, err = libio.NewReader(file)
+	content, err = os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %q: %w`, logp, file, err)
 	}
 
-	err = m.parse()
+	zone, err = ParseZone(content, origin, ttl)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %q: %w`, logp, file, err)
 	}
-
-	m.zone.Name = m.origin
-
-	zone = m.zone
-	m.zone = nil
 	return zone, nil
 }
 

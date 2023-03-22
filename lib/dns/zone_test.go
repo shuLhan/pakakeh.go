@@ -5,10 +5,84 @@
 package dns
 
 import (
+	"bytes"
+	"fmt"
+	"strconv"
 	"testing"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/test"
 )
+
+func TestParseZone(t *testing.T) {
+	var (
+		listTData []*test.Data
+		err       error
+	)
+
+	listTData, err = test.LoadDataDir(`testdata/zone/`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		tdata  *test.Data
+		zone   *Zone
+		bb     bytes.Buffer
+		origin string
+		vstr   string
+		vbytes []byte
+		ttl    int64
+	)
+	for _, tdata = range listTData {
+		t.Log(tdata.Name)
+
+		origin = tdata.Flag[`origin`]
+
+		vstr = tdata.Flag[`ttl`]
+		if len(vstr) > 0 {
+			ttl, err = strconv.ParseInt(vstr, 10, 64)
+			if err != nil {
+				t.Fatal(err)
+			}
+		} else {
+			ttl = 0
+		}
+
+		vbytes = tdata.Input[`zone_in.txt`]
+		zone, err = ParseZone(vbytes, origin, uint32(ttl))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Compare the zone by writing back to text.
+
+		bb.Reset()
+		_, err = zone.WriteTo(&bb)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		vbytes = tdata.Output[`zone_out.txt`]
+		test.Assert(t, tdata.Name, string(vbytes), bb.String())
+
+		// Compare the packed zone as message.
+
+		var (
+			msg *Message
+			tag string
+			x   int
+		)
+		for x, msg = range zone.messages {
+			bb.Reset()
+			libbytes.DumpPrettyTable(&bb, msg.Question.String(), msg.packet)
+
+			tag = fmt.Sprintf(`message_%d.hex`, x)
+			vbytes = tdata.Output[tag]
+			test.Assert(t, tag, string(vbytes), bb.String())
+		}
+	}
+}
 
 func TestZoneParseDirectiveOrigin(t *testing.T) {
 	type testCase struct {
@@ -149,656 +223,6 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 		}
 
 		test.Assert(t, "ttl", c.exp, m.ttl)
-	}
-}
-
-func TestZoneInitRFC1035(t *testing.T) {
-	type caseZoneInit struct {
-		expErr error
-		desc   string
-		origin string
-		in     string
-		exp    []*Message
-		ttl    uint32
-	}
-
-	var (
-		m = newZoneParser(nil)
-
-		msg   *Message
-		rr    ResourceRecord
-		cases []caseZoneInit
-		c     caseZoneInit
-		err   error
-		x, y  int
-	)
-
-	cases = []caseZoneInit{{
-		desc:   "RFC1035 section 5.3",
-		origin: "ISI.EDU",
-		ttl:    3600,
-		in: `
-@   IN  SOA     VENERA      Action\.domains (
-                                 20     ; SERIAL
-                                 7200   ; REFRESH
-                                 600    ; RETRY
-                                 3600000; EXPIRE
-                                 60)    ; MINIMUM
-
-        NS      A.ISI.EDU.
-        NS      VENERA
-        NS      VAXA
-        MX      10      VENERA
-        MX      20      VAXA
-
-A       A       26.3.0.103
-
-VENERA  A       10.1.0.52
-        A       128.9.0.32
-
-VAXA    A       10.2.0.27
-        A       128.9.0.33
-
-`,
-		exp: []*Message{{
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `isi.edu.`,
-				Type:  RecordTypeSOA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `isi.edu.`,
-				Type:  RecordTypeSOA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: &RDataSOA{
-					MName:   `venera.isi.edu.`,
-					RName:   `action\.domains.isi.edu.`,
-					Serial:  20,
-					Refresh: 7200,
-					Retry:   600,
-					Expire:  3600000,
-					Minimum: 60,
-				},
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 3,
-			},
-			Question: MessageQuestion{
-				Name:  `isi.edu.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `isi.edu.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `a.isi.edu.`,
-			}, {
-				Name:  `isi.edu.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `venera.isi.edu.`,
-			}, {
-				Name:  `isi.edu.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `vaxa.isi.edu.`,
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 2,
-			},
-			Question: MessageQuestion{
-				Name:  `isi.edu.`,
-				Type:  RecordTypeMX,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `isi.edu.`,
-				Type:  RecordTypeMX,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: &RDataMX{
-					Preference: 10,
-					Exchange:   `venera.isi.edu.`,
-				},
-			}, {
-				Name:  `isi.edu.`,
-				Type:  RecordTypeMX,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: &RDataMX{
-					Preference: 20,
-					Exchange:   `vaxa.isi.edu.`,
-				},
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `a.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `a.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "26.3.0.103",
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 2,
-			},
-			Question: MessageQuestion{
-				Name:  `venera.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `venera.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "10.1.0.52",
-			}, {
-				Name:  `venera.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "128.9.0.32",
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 2,
-			},
-			Question: MessageQuestion{
-				Name:  `vaxa.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `vaxa.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "10.2.0.27",
-			}, {
-				Name:  `vaxa.isi.edu.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "128.9.0.33",
-			}},
-		}},
-	}}
-
-	for _, c = range cases {
-		t.Log(c.desc)
-
-		m.Reset([]byte(c.in), c.origin, c.ttl)
-
-		err = m.parse()
-		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error())
-			continue
-		}
-
-		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
-
-		for x, msg = range m.zone.messages {
-			t.Logf(`message #%d`, x)
-			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
-			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
-
-			for y, rr = range msg.Answer {
-				t.Logf(`  answer #%d`, y)
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
-			}
-			for y, rr = range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
-			}
-			for y, rr = range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
-			}
-		}
-	}
-}
-
-func TestZoneInit2(t *testing.T) {
-	type testCase struct {
-		expErr error
-		desc   string
-		origin string
-		in     string
-		exp    []*Message
-		ttl    uint32
-	}
-
-	var (
-		m = newZoneParser(nil)
-
-		msg   *Message
-		rr    ResourceRecord
-		cases []testCase
-		c     testCase
-		err   error
-		x, y  int
-	)
-
-	cases = []testCase{{
-		desc: "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
-		in: `
-$ORIGIN pcguide.com.
-@ IN SOA ns23.pair.com. root.pair.com. (
-2001072300 ; Serial
-3600 ; Refresh
-300 ; Retry
-604800 ; Expire
-3600 ) ; Minimum
-
-@ IN NS ns23.pair.com.
-@ IN NS ns0.ns0.com.
-
-localhost IN A 127.0.0.1
-@ IN A 209.68.14.80
-  IN MX 50 qs939.pair.com.
-
-www IN CNAME @
-ftp IN CNAME @
-mail IN CNAME @
-relay IN CNAME relay.pair.com.
-`,
-		exp: []*Message{{
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeSOA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeSOA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: &RDataSOA{
-					MName:   `ns23.pair.com.`,
-					RName:   `root.pair.com.`,
-					Serial:  2001072300,
-					Refresh: 3600,
-					Retry:   300,
-					Expire:  604800,
-					Minimum: 3600,
-				},
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 2,
-			},
-			Question: MessageQuestion{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `ns23.pair.com.`,
-			}, {
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeNS,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `ns0.ns0.com.`,
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `localhost.pcguide.com.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `localhost.pcguide.com.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "127.0.0.1",
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "209.68.14.80",
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeMX,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `pcguide.com.`,
-				Type:  RecordTypeMX,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: &RDataMX{
-					Preference: 50,
-					Exchange:   `qs939.pair.com.`,
-				},
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `www.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `www.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `pcguide.com.`,
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `ftp.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `ftp.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `pcguide.com.`,
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `mail.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `mail.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `pcguide.com.`,
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `relay.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `relay.pcguide.com.`,
-				Type:  RecordTypeCNAME,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: `relay.pair.com.`,
-			}},
-		}},
-	}}
-
-	for _, c = range cases {
-		t.Log(c.desc)
-
-		m.Reset([]byte(c.in), c.origin, c.ttl)
-
-		err = m.parse()
-		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error())
-			continue
-		}
-
-		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
-
-		for x, msg = range m.zone.messages {
-			t.Logf(`message #%d`, x)
-			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
-			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
-
-			for y, rr = range msg.Answer {
-				t.Logf(`  answer #%d`, y)
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
-			}
-			for y, rr = range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
-			}
-			for y, rr = range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
-			}
-		}
-	}
-}
-
-func TestZoneInit3(t *testing.T) {
-	type testCase struct {
-		expErr error
-		desc   string
-		origin string
-		in     string
-		exp    []*Message
-		ttl    uint32
-	}
-
-	var (
-		m = newZoneParser(nil)
-
-		msg   *Message
-		rr    ResourceRecord
-		cases []testCase
-		c     testCase
-		err   error
-		x, y  int
-	)
-
-	cases = []testCase{{
-		desc:   "From http://www.tcpipguide.com/free/t_DNSZoneFileFormat-4.htm",
-		origin: "localdomain",
-		in: `
-; Applications.
-dev.kilabit.info.  A  127.0.0.1
-dev.kilabit.com.   A  127.0.0.1
-
-; Documentations.
-angularjs.doc       A  127.0.0.1
-`,
-		exp: []*Message{{
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `dev.kilabit.info.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `dev.kilabit.info.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "127.0.0.1",
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `dev.kilabit.com.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `dev.kilabit.com.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "127.0.0.1",
-			}},
-		}, {
-			Header: MessageHeader{
-				IsAA:    true,
-				QDCount: 1,
-				ANCount: 1,
-			},
-			Question: MessageQuestion{
-				Name:  `angularjs.doc.localdomain.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-			},
-			Answer: []ResourceRecord{{
-				Name:  `angularjs.doc.localdomain.`,
-				Type:  RecordTypeA,
-				Class: RecordClassIN,
-				TTL:   3600,
-				Value: "127.0.0.1",
-			}},
-		}},
-	}}
-
-	for _, c = range cases {
-		t.Log(c.desc)
-
-		m.Reset([]byte(c.in), c.origin, c.ttl)
-
-		err = m.parse()
-		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error())
-			continue
-		}
-
-		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
-
-		for x, msg = range m.zone.messages {
-			t.Logf(`message #%d`, x)
-			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
-			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
-
-			for y, rr = range msg.Answer {
-				t.Logf(`  answer #%d`, y)
-				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
-				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
-				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
-				test.Assert(t, "Answer.TTL", c.exp[x].Answer[y].TTL, rr.TTL)
-				test.Assert(t, "Answer.Value", c.exp[x].Answer[y].Value, rr.Value)
-			}
-			for y, rr = range msg.Authority {
-				test.Assert(t, "Authority.Name", c.exp[x].Authority[y].Name, rr.Name)
-				test.Assert(t, "Authority.Type", c.exp[x].Authority[y].Type, rr.Type)
-				test.Assert(t, "Authority.Class", c.exp[x].Authority[y].Class, rr.Class)
-				test.Assert(t, "Authority.TTL", c.exp[x].Authority[y].TTL, rr.TTL)
-				test.Assert(t, "Authority.Value", c.exp[x].Authority[y].Value, rr.Value)
-			}
-			for y, rr = range msg.Additional {
-				test.Assert(t, "Additional.Name", c.exp[x].Additional[y].Name, rr.Name)
-				test.Assert(t, "Additional.Type", c.exp[x].Additional[y].Type, rr.Type)
-				test.Assert(t, "Additional.Class", c.exp[x].Additional[y].Class, rr.Class)
-				test.Assert(t, "Additional.TTL", c.exp[x].Additional[y].TTL, rr.TTL)
-				test.Assert(t, "Additional.Value", c.exp[x].Additional[y].Value, rr.Value)
-			}
-		}
 	}
 }
 
