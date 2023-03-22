@@ -89,6 +89,8 @@ func (m *zoneParser) Reset(data []byte, origin string, ttl uint32) {
 	if m.reader == nil {
 		m.reader = new(libio.Reader)
 	}
+	data = bytes.TrimSpace(data)
+	data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
 	m.reader.Init([]byte(data))
 }
 
@@ -715,7 +717,7 @@ func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 			if c == ';' {
 				m.reader.SkipLine()
 				m.lineno++
-				_ = m.reader.SkipSpaces()
+				c = m.reader.SkipSpaces()
 			}
 		} else {
 			_, c = m.reader.SkipHorizontalSpace()
@@ -731,7 +733,7 @@ func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		if c == ';' {
 			m.reader.SkipLine()
 			m.lineno++
-			_ = m.reader.SkipSpaces()
+			c = m.reader.SkipSpaces()
 		}
 
 		v, err = strconv.ParseInt(string(tok), 10, 64)
@@ -772,18 +774,22 @@ func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 	}
 out:
 	if isMultiline {
-		if isTerm {
-			for c == ';' {
+		if !isTerm {
+			c = m.reader.SkipSpaces()
+		}
+		for c != 0 {
+			if c == ';' {
 				m.reader.SkipLine()
 				m.lineno++
 				c = m.reader.SkipSpaces()
+				continue
 			}
-			for c == '\n' {
+			if c == '\n' {
 				m.lineno++
 				c = m.reader.SkipSpaces()
+				continue
 			}
-		} else {
-			c = m.reader.SkipSpaces()
+			break
 		}
 
 		if c != ')' {
