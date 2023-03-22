@@ -207,18 +207,18 @@ VAXA    A       10.2.0.27
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
-					MName:   "venera.isi.edu",
-					RName:   "action\\.domains.isi.edu",
+					MName:   `venera.isi.edu.`,
+					RName:   `action\.domains.isi.edu.`,
 					Serial:  20,
 					Refresh: 7200,
 					Retry:   600,
@@ -233,28 +233,28 @@ VAXA    A       10.2.0.27
 				ANCount: 3,
 			},
 			Question: MessageQuestion{
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "a.isi.edu",
+				Value: `a.isi.edu.`,
 			}, {
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "venera.isi.edu",
+				Value: `venera.isi.edu.`,
 			}, {
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "vaxa.isi.edu",
+				Value: `vaxa.isi.edu.`,
 			}},
 		}, {
 			Header: MessageHeader{
@@ -263,27 +263,27 @@ VAXA    A       10.2.0.27
 				ANCount: 2,
 			},
 			Question: MessageQuestion{
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 10,
-					Exchange:   "venera.isi.edu",
+					Exchange:   `venera.isi.edu.`,
 				},
 			}, {
-				Name:  "isi.edu",
+				Name:  `isi.edu.`,
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 20,
-					Exchange:   "vaxa.isi.edu",
+					Exchange:   `vaxa.isi.edu.`,
 				},
 			}},
 		}, {
@@ -293,12 +293,12 @@ VAXA    A       10.2.0.27
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "a.isi.edu",
+				Name:  `a.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "a.isi.edu",
+				Name:  `a.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -311,18 +311,18 @@ VAXA    A       10.2.0.27
 				ANCount: 2,
 			},
 			Question: MessageQuestion{
-				Name:  "venera.isi.edu",
+				Name:  `venera.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "venera.isi.edu",
+				Name:  `venera.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "10.1.0.52",
 			}, {
-				Name:  "venera.isi.edu",
+				Name:  `venera.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -335,18 +335,18 @@ VAXA    A       10.2.0.27
 				ANCount: 2,
 			},
 			Question: MessageQuestion{
-				Name:  "vaxa.isi.edu",
+				Name:  `vaxa.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "vaxa.isi.edu",
+				Name:  `vaxa.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: "10.2.0.27",
 			}, {
-				Name:  "vaxa.isi.edu",
+				Name:  `vaxa.isi.edu.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -366,14 +366,15 @@ VAXA    A       10.2.0.27
 			continue
 		}
 
-		test.Assert(t, "messages length:",
-			len(c.exp), len(m.zone.messages))
+		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
 
 		for x, msg = range m.zone.messages {
+			t.Logf(`message #%d`, x)
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, rr = range msg.Answer {
+				t.Logf(`  answer #%d`, y)
 				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
 				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
 				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
@@ -449,18 +450,18 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeSOA,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataSOA{
-					MName:   "ns23.pair.com",
-					RName:   "root.pair.com",
+					MName:   `ns23.pair.com.`,
+					RName:   `root.pair.com.`,
 					Serial:  2001072300,
 					Refresh: 3600,
 					Retry:   300,
@@ -475,22 +476,22 @@ relay IN CNAME relay.pair.com.
 				ANCount: 2,
 			},
 			Question: MessageQuestion{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "ns23.pair.com",
+				Value: `ns23.pair.com.`,
 			}, {
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeNS,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "ns0.ns0.com",
+				Value: `ns0.ns0.com.`,
 			}},
 		}, {
 			Header: MessageHeader{
@@ -499,12 +500,12 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "localhost.pcguide.com",
+				Name:  `localhost.pcguide.com.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "localhost.pcguide.com",
+				Name:  `localhost.pcguide.com.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -517,12 +518,12 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -535,18 +536,18 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "pcguide.com",
+				Name:  `pcguide.com.`,
 				Type:  RecordTypeMX,
 				Class: RecordClassIN,
 				TTL:   3600,
 				Value: &RDataMX{
 					Preference: 50,
-					Exchange:   "qs939.pair.com",
+					Exchange:   `qs939.pair.com.`,
 				},
 			}},
 		}, {
@@ -556,16 +557,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "www.pcguide.com",
+				Name:  `www.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "www.pcguide.com",
+				Name:  `www.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "pcguide.com",
+				Value: `pcguide.com.`,
 			}},
 		}, {
 			Header: MessageHeader{
@@ -574,16 +575,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "ftp.pcguide.com",
+				Name:  `ftp.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "ftp.pcguide.com",
+				Name:  `ftp.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "pcguide.com",
+				Value: `pcguide.com.`,
 			}},
 		}, {
 			Header: MessageHeader{
@@ -592,16 +593,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "mail.pcguide.com",
+				Name:  `mail.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "mail.pcguide.com",
+				Name:  `mail.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "pcguide.com",
+				Value: `pcguide.com.`,
 			}},
 		}, {
 			Header: MessageHeader{
@@ -610,16 +611,16 @@ relay IN CNAME relay.pair.com.
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "relay.pcguide.com",
+				Name:  `relay.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "relay.pcguide.com",
+				Name:  `relay.pcguide.com.`,
 				Type:  RecordTypeCNAME,
 				Class: RecordClassIN,
 				TTL:   3600,
-				Value: "relay.pair.com",
+				Value: `relay.pair.com.`,
 			}},
 		}},
 	}}
@@ -635,14 +636,15 @@ relay IN CNAME relay.pair.com.
 			continue
 		}
 
-		test.Assert(t, "messages length:", len(c.exp),
-			len(m.zone.messages))
+		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
 
 		for x, msg = range m.zone.messages {
+			t.Logf(`message #%d`, x)
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, rr = range msg.Answer {
+				t.Logf(`  answer #%d`, y)
 				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
 				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
 				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
@@ -706,12 +708,12 @@ angularjs.doc       A  127.0.0.1
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "dev.kilabit.info",
+				Name:  `dev.kilabit.info.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "dev.kilabit.info",
+				Name:  `dev.kilabit.info.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -724,12 +726,12 @@ angularjs.doc       A  127.0.0.1
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "dev.kilabit.com",
+				Name:  `dev.kilabit.com.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "dev.kilabit.com",
+				Name:  `dev.kilabit.com.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -742,12 +744,12 @@ angularjs.doc       A  127.0.0.1
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "angularjs.doc.localdomain",
+				Name:  `angularjs.doc.localdomain.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "angularjs.doc.localdomain",
+				Name:  `angularjs.doc.localdomain.`,
 				Type:  RecordTypeA,
 				Class: RecordClassIN,
 				TTL:   3600,
@@ -767,14 +769,15 @@ angularjs.doc       A  127.0.0.1
 			continue
 		}
 
-		test.Assert(t, "messages length:", len(c.exp),
-			len(m.zone.messages))
+		test.Assert(t, "messages length:", len(c.exp), len(m.zone.messages))
 
 		for x, msg = range m.zone.messages {
+			t.Logf(`message #%d`, x)
 			test.Assert(t, "Message.Header", c.exp[x].Header, msg.Header)
 			test.Assert(t, "Message.Question", c.exp[x].Question, msg.Question)
 
 			for y, rr = range msg.Answer {
+				t.Logf(`  answer #%d`, y)
 				test.Assert(t, "Answer.Name", c.exp[x].Answer[y].Name, rr.Name)
 				test.Assert(t, "Answer.Type", c.exp[x].Answer[y].Type, rr.Type)
 				test.Assert(t, "Answer.Class", c.exp[x].Answer[y].Class, rr.Class)
@@ -826,12 +829,12 @@ func TestZoneParseTXT(t *testing.T) {
 				ANCount: 1,
 			},
 			Question: MessageQuestion{
-				Name:  "kilabit.local",
+				Name:  `kilabit.local.`,
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,
 			},
 			Answer: []ResourceRecord{{
-				Name:  "kilabit.local",
+				Name:  `kilabit.local.`,
 				Type:  RecordTypeTXT,
 				Class: RecordClassIN,
 				TTL:   3600,

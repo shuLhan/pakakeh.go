@@ -12,6 +12,7 @@ import (
 	"io"
 	"math"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -369,7 +370,8 @@ func (c *Caches) internalUpsertRecord(rr *ResourceRecord) (err error) {
 	defer c.Unlock()
 
 	var (
-		ans *answers = c.internal[rr.Name]
+		rrName = strings.TrimSuffix(rr.Name, `.`)
+		ans    = c.internal[rrName]
 
 		an  *Answer
 		msg *Message
@@ -382,7 +384,7 @@ func (c *Caches) internalUpsertRecord(rr *ResourceRecord) (err error) {
 		}
 		an = newAnswer(msg, true)
 		ans = newAnswers(an)
-		c.internal[rr.Name] = ans
+		c.internal[rrName] = ans
 		return nil
 	}
 

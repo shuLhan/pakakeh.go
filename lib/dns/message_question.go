@@ -34,11 +34,21 @@ func (qst *MessageQuestion) String() string {
 	return fmt.Sprintf("{Name:%s Type:%s}", qst.Name, RecordTypeNames[qst.Type])
 }
 
-// size return the section question size, length of name + 2 (1 octet for
-// beginning size plus 1 octet for end of label) + 2 octets of
-// rtype + 2 octets of rclass
+// size return the section question size.
+// The size depends on the Name.
+// If the Name end with '.', it will return length of Name + 4 + 1; otherwise
+// it will return length of Name + 4 + 2.
+// The 4 is size of type and class, 1 is for the first length, and another 1
+// for zero length at the end.
 func (qst *MessageQuestion) size() int {
-	return len(qst.Name) + 6
+	var (
+		size  = len(qst.Name)
+		lastc = size - 1
+	)
+	if lastc >= 0 && qst.Name[lastc] == '.' {
+		return size + 5
+	}
+	return size + 6
 }
 
 // unpack the DNS question section from packet.

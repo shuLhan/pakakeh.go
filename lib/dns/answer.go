@@ -6,6 +6,7 @@ package dns
 
 import (
 	"container/list"
+	"strings"
 	"time"
 )
 
@@ -41,7 +42,8 @@ type Answer struct {
 // to current timestamp.
 func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	an = &Answer{
-		QName:  msg.Question.Name,
+		// Trim the dot at the end for Message that is come from zone.
+		QName:  strings.TrimSuffix(msg.Question.Name, `.`),
 		RType:  msg.Question.Type,
 		RClass: msg.Question.Class,
 		msg:    msg,

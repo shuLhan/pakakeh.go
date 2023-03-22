@@ -80,6 +80,11 @@ func (m *zoneParser) Reset(data, origin string, ttl uint32) {
 	m.zone = NewZone("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
+	if len(m.origin) > 0 {
+		if m.origin[len(m.origin)-1] != '.' {
+			m.origin += `.`
+		}
+	}
 	m.ttl = ttl
 	if m.reader == nil {
 		m.reader = new(libio.Reader)
@@ -246,7 +251,7 @@ func (m *zoneParser) parseDirectiveOrigin() (err error) {
 		return fmt.Errorf("line %d: empty $origin directive", m.lineno)
 	}
 
-	m.origin = strings.TrimSuffix(strings.ToLower(string(tok)), ".")
+	m.origin = strings.ToLower(string(tok))
 
 	if isTerm {
 		if c == ';' {
@@ -1012,14 +1017,13 @@ out:
 
 func (m *zoneParser) generateDomainName(dname []byte) (out string) {
 	dname = ascii.ToLower(dname)
-	switch {
-	case dname[0] == '@':
-		out = m.origin
-	case dname[len(dname)-1] == '.':
-		out = string(dname[:len(dname)-1])
-	default:
-		out = string(dname) + "." + m.origin
+	if bytes.Equal(dname, []byte("@")) {
+		return m.origin
 	}
+	if dname[len(dname)-1] == '.' {
+		return string(dname)
+	}
+	out = string(dname) + "." + m.origin
 	return out
 }
 

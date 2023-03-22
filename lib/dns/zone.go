@@ -107,7 +107,8 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 // not set.
 func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 	var (
-		m *zoneParser = newZoneParser(nil)
+		logp = `ParseZoneFile`
+		m    = newZoneParser(nil)
 	)
 
 	m.ttl = ttl
@@ -119,15 +120,18 @@ func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 	}
 
 	m.origin = strings.ToLower(m.origin)
+	if m.origin[len(m.origin)-1] != '.' {
+		m.origin += `.`
+	}
 
 	m.reader, err = libio.NewReader(file)
 	if err != nil {
-		return nil, fmt.Errorf("ParseZone %q: %w", file, err)
+		return nil, fmt.Errorf(`%s: %q: %w`, logp, file, err)
 	}
 
 	err = m.parse()
 	if err != nil {
-		return nil, fmt.Errorf("ParseZone %q: %w", file, err)
+		return nil, fmt.Errorf(`%s: %q: %w`, logp, file, err)
 	}
 
 	m.zone.Name = m.origin
@@ -235,6 +239,8 @@ func (zone *Zone) Save() (err error) {
 
 func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceRecord) (total int, err error) {
 	var (
+		suffixOrigin = "." + zone.Name
+
 		hinfo *RDataHINFO
 		minfo *RDataMINFO
 		mx    *RDataMX
@@ -270,10 +276,11 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 					RecordTypeNames[rr.Type])
 				break
 			}
-			if strings.HasSuffix(v, zone.Name) {
-				v = strings.TrimSuffix(v, "."+zone.Name)
-			} else {
-				v += "."
+
+			if v == zone.Name {
+				v = "@"
+			} else if strings.HasSuffix(v, suffixOrigin) {
+				v = strings.TrimSuffix(v, suffixOrigin)
 			}
 			n, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
@@ -286,12 +293,10 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 					RecordTypeNames[rr.Type])
 				break
 			}
-			if strings.HasSuffix(v, zone.Name) {
-				v = strings.TrimSuffix(v, "."+zone.Name)
-			} else {
-				v += "."
+			if strings.HasSuffix(v, suffixOrigin) {
+				v = strings.TrimSuffix(v, suffixOrigin)
 			}
-			n, err = fmt.Fprintf(out, "%s. %d IN PTR %s\n",
+			n, err = fmt.Fprintf(out, "%s %d IN PTR %s\n",
 				rr.Name, rr.TTL, v)
 
 		case RecordTypeWKS:
@@ -333,10 +338,14 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 				err = errors.New("invalid record value for MX")
 				break
 			}
+			v = mx.Exchange
+			if strings.HasSuffix(v, suffixOrigin) {
+				v = strings.TrimSuffix(v, suffixOrigin)
+			}
 			n, err = fmt.Fprintf(out,
-				"%s %d %s MX %d %s.\n",
+				"%s %d %s MX %d %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
-				mx.Preference, mx.Exchange)
+				mx.Preference, v)
 
 		case RecordTypeSRV:
 			srv, ok = rr.Value.(*RDataSRV)
@@ -344,11 +353,15 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 				err = errors.New("invalid record value for SRV")
 				break
 			}
+			v = srv.Target
+			if strings.HasSuffix(v, suffixOrigin) {
+				v = strings.TrimSuffix(v, suffixOrigin)
+			}
 			n, err = fmt.Fprintf(out,
-				"%s %d %s SRV %d %d %d %s.\n",
+				"%s %d %s SRV %d %d %d %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				srv.Priority, srv.Weight,
-				srv.Port, srv.Target)
+				srv.Port, v)
 		}
 		if err != nil {
 			return total, err
@@ -367,12 +380,12 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		n    int
 	)
 
-	n, _ = fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
+	n, _ = fmt.Fprintf(out, "$ORIGIN %s\n", zone.Name)
 	total += n
 
 	if len(zone.SOA.MName) > 0 {
 		n, err = fmt.Fprintf(out,
-			"@ SOA %s. %s. %d %d %d %d %d\n",
+			"@ SOA %s %s %d %d %d %d %d\n",
 			zone.SOA.MName, zone.SOA.RName, zone.SOA.Serial, zone.SOA.Refresh,
 			zone.SOA.Retry, zone.SOA.Expire, zone.SOA.Minimum)
 		if err != nil {
