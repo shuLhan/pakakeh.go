@@ -47,7 +47,7 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Init(c.in, "", 0)
+		m.Reset(c.in, ``, 0)
 
 		err = m.parse()
 		if err != nil {
@@ -93,7 +93,7 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Init(c.in, "", 0)
+		m.Reset(c.in, ``, 0)
 
 		err = m.parse()
 		if err != nil {
@@ -140,7 +140,7 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Init(c.in, "", 0)
+		m.Reset(c.in, ``, 0)
 
 		err = m.parse()
 		if err != nil {
@@ -358,7 +358,7 @@ VAXA    A       10.2.0.27
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Init(c.in, c.origin, c.ttl)
+		m.Reset(c.in, c.origin, c.ttl)
 
 		err = m.parse()
 		if err != nil {
@@ -627,7 +627,7 @@ relay IN CNAME relay.pair.com.
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Init(c.in, c.origin, c.ttl)
+		m.Reset(c.in, c.origin, c.ttl)
 
 		err = m.parse()
 		if err != nil {
@@ -759,7 +759,7 @@ angularjs.doc       A  127.0.0.1
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Init(c.in, c.origin, c.ttl)
+		m.Reset(c.in, c.origin, c.ttl)
 
 		err = m.parse()
 		if err != nil {
@@ -841,7 +841,7 @@ func TestZoneParseTXT(t *testing.T) {
 	}}
 
 	for _, c = range cases {
-		m.Init(c.in, "kilabit.local", 3600)
+		m.Reset(c.in, `kilabit.local`, 3600)
 
 		err = m.parse()
 		if err != nil {
