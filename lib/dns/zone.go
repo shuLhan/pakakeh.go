@@ -7,6 +7,7 @@ package dns
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -204,74 +205,35 @@ func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 	return err
 }
 
-// Save the content of zone records to file defined by Path.
+// Save the content of zone records to file defined by Zone.Path.
+// The zone content will be different with original file, since it does not
+// preserve comment and indentation.
 func (zone *Zone) Save() (err error) {
 	var (
-		out *os.File
+		logp = `Save`
+		out  *os.File
 	)
 
 	out, err = os.OpenFile(zone.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return err
+		return fmt.Errorf(`%s: %s: %w`, logp, zone.Path, err)
 	}
 
-	var (
-		dname  string
-		names  []string
-		listRR []*ResourceRecord
-		errc   error
-	)
-
-	fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
-
-	if len(zone.SOA.MName) > 0 {
-		_, err = fmt.Fprintf(out,
-			"@ SOA %s. %s. %d %d %d %d %d\n",
-			zone.SOA.MName, zone.SOA.RName, zone.SOA.Serial, zone.SOA.Refresh,
-			zone.SOA.Retry, zone.SOA.Expire, zone.SOA.Minimum)
-		if err != nil {
-			goto out
-		}
+	_, err = zone.WriteTo(out)
+	if err != nil {
+		err = fmt.Errorf(`%s: %s: %w`, logp, zone.Path, err)
 	}
 
-	// Save the origin records first.
-	listRR = zone.Records[zone.Name]
-	if len(listRR) > 0 {
-		err = zone.saveListRR(out, "@", listRR)
-		if err != nil {
-			goto out
-		}
-	}
-
-	// Save the records ordered by name.
-	names = make([]string, 0, len(zone.Records))
-	for dname = range zone.Records {
-		if dname == zone.Name {
-			continue
-		}
-		names = append(names, dname)
-	}
-	sort.Strings(names)
-
-	for _, dname = range names {
-		listRR = zone.Records[dname]
-		dname = strings.TrimSuffix(dname, "."+zone.Name)
-		err = zone.saveListRR(out, dname, listRR)
-		if err != nil {
-			break
-		}
-	}
-out:
-	errc = out.Close()
+	var errc = out.Close()
 	if errc != nil {
 		if err == nil {
-			err = errc
+			return fmt.Errorf(`%s: %s: %w`, logp, zone.Path, errc)
 		}
 	}
 	return err
 }
 
-func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecord) (err error) {
+func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceRecord) (total int, err error) {
 	var (
 		hinfo *RDataHINFO
 		minfo *RDataMINFO
@@ -280,6 +242,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 		srv   *RDataSRV
 		wks   *RDataWKS
 		v     string
+		n     int
 		x     int
 		ok    bool
 	)
@@ -290,12 +253,12 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 		}
 		switch rr.Type {
 		case RecordTypeA, RecordTypeNULL, RecordTypeAAAA:
-			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
+			n, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				RecordTypeNames[rr.Type], rr.Value.(string))
 
 		case RecordTypeTXT:
-			_, err = fmt.Fprintf(out, "%s %d %s %s %q\n",
+			n, err = fmt.Fprintf(out, "%s %d %s %s %q\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				RecordTypeNames[rr.Type], rr.Value.(string))
 
@@ -312,7 +275,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 			} else {
 				v += "."
 			}
-			_, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
+			n, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				RecordTypeNames[rr.Type], v)
 
@@ -328,7 +291,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 			} else {
 				v += "."
 			}
-			_, err = fmt.Fprintf(out, "%s. %d IN PTR %s\n",
+			n, err = fmt.Fprintf(out, "%s. %d IN PTR %s\n",
 				rr.Name, rr.TTL, v)
 
 		case RecordTypeWKS:
@@ -337,7 +300,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				err = errors.New("invalid record value for WKS")
 				break
 			}
-			_, err = fmt.Fprintf(out,
+			n, err = fmt.Fprintf(out,
 				"%s %d %s WKS %s %d %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				wks.Address, wks.Protocol, wks.BitMap)
@@ -348,7 +311,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				err = errors.New("invalid record value for HINFO")
 				break
 			}
-			_, err = fmt.Fprintf(out,
+			n, err = fmt.Fprintf(out,
 				"%s %d %s HINFO %s %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				hinfo.CPU, hinfo.OS)
@@ -359,7 +322,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				err = errors.New("invalid record value for MINFO")
 				break
 			}
-			_, err = fmt.Fprintf(out,
+			n, err = fmt.Fprintf(out,
 				"%s %d %s MINFO %s %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				minfo.RMailBox, minfo.EmailBox)
@@ -370,7 +333,7 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				err = errors.New("invalid record value for MX")
 				break
 			}
-			_, err = fmt.Fprintf(out,
+			n, err = fmt.Fprintf(out,
 				"%s %d %s MX %d %s.\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				mx.Preference, mx.Exchange)
@@ -381,15 +344,75 @@ func (zone *Zone) saveListRR(out *os.File, dname string, listRR []*ResourceRecor
 				err = errors.New("invalid record value for SRV")
 				break
 			}
-			_, err = fmt.Fprintf(out,
+			n, err = fmt.Fprintf(out,
 				"%s %d %s SRV %d %d %d %s.\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				srv.Priority, srv.Weight,
 				srv.Port, srv.Target)
 		}
 		if err != nil {
-			return err
+			return total, err
 		}
+		total += n
 	}
-	return nil
+	return total, nil
+}
+
+// WriteTo write the zone as text into w.
+// The result of WriteTo will be different with original content of zone file,
+// since it does not preserve comment and indentation.
+func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
+	var (
+		logp = `Write`
+		n    int
+	)
+
+	n, _ = fmt.Fprintf(out, "$ORIGIN %s.\n", zone.Name)
+	total += n
+
+	if len(zone.SOA.MName) > 0 {
+		n, err = fmt.Fprintf(out,
+			"@ SOA %s. %s. %d %d %d %d %d\n",
+			zone.SOA.MName, zone.SOA.RName, zone.SOA.Serial, zone.SOA.Refresh,
+			zone.SOA.Retry, zone.SOA.Expire, zone.SOA.Minimum)
+		if err != nil {
+			return total, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		total += n
+	}
+
+	// Save the origin records first.
+	var listRR = zone.Records[zone.Name]
+	if len(listRR) > 0 {
+		n, err = zone.saveListRR(out, `@`, listRR)
+		if err != nil {
+			return total, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		total += n
+	}
+
+	// Save the records ordered by name.
+	var (
+		names = make([]string, 0, len(zone.Records))
+
+		dname string
+	)
+	for dname = range zone.Records {
+		if dname == zone.Name {
+			continue
+		}
+		names = append(names, dname)
+	}
+	sort.Strings(names)
+
+	for _, dname = range names {
+		listRR = zone.Records[dname]
+		dname = strings.TrimSuffix(dname, `.`+zone.Name)
+		n, err = zone.saveListRR(out, dname, listRR)
+		if err != nil {
+			return total, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		total += n
+	}
+	return total, nil
 }
