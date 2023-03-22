@@ -351,6 +351,22 @@ func ExampleSnippetByIndexes() {
 	// reserved.
 }
 
+func ExampleSplitEach() {
+	var data = []byte(`Hello`)
+
+	fmt.Printf("%s\n", SplitEach(data, 0))
+	fmt.Printf("%s\n", SplitEach(data, 1))
+	fmt.Printf("%s\n", SplitEach(data, 2))
+	fmt.Printf("%s\n", SplitEach(data, 5))
+	fmt.Printf("%s\n", SplitEach(data, 10))
+	// Output:
+	// [Hello]
+	// [H e l l o]
+	// [He ll o]
+	// [Hello]
+	// [Hello]
+}
+
 func ExampleTokenFind() {
 	text := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
 

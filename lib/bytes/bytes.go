@@ -491,6 +491,29 @@ func SnippetByIndexes(s []byte, indexes []int, sniplen int) (snippets [][]byte) 
 	return snippets
 }
 
+// SplitEach split the data into n number of bytes.
+// If n is less or equal than zero, it will return the data as chunks.
+func SplitEach(data []byte, n int) (chunks [][]byte) {
+	if n <= 0 {
+		chunks = append(chunks, data)
+		return chunks
+	}
+
+	var (
+		size  = len(data)
+		rows  = (size / n)
+		total int
+	)
+	for x := 0; x < rows; x++ {
+		chunks = append(chunks, data[total:total+n])
+		total += n
+	}
+	if total < size {
+		chunks = append(chunks, data[total:])
+	}
+	return chunks
+}
+
 // TokenFind return the first index of matched token in text, start at custom
 // index.
 // If "startat" parameter is less than 0, then it will be set to 0.
