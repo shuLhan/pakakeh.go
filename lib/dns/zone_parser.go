@@ -75,8 +75,8 @@ func newZoneParser(zone *Zone) (zp *zoneParser) {
 	return zp
 }
 
-// Reset zoneParser by parsing from string data.
-func (m *zoneParser) Reset(data, origin string, ttl uint32) {
+// Reset zoneParser by parsing from slice of byte.
+func (m *zoneParser) Reset(data []byte, origin string, ttl uint32) {
 	m.zone = NewZone("(data)", "")
 	m.lineno = 1
 	m.origin = strings.ToLower(origin)
