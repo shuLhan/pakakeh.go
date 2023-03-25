@@ -7,7 +7,6 @@ package dns
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -41,10 +40,7 @@ const (
 )
 
 const (
-	parseSRVService = 1 << iota
-	parseSRVProto
-	parseSRVName
-	parseSRVPriority
+	parseSRVPriority = iota
 	parseSRVWeight
 	parseSRVPort
 	parseSRVTarget
@@ -457,13 +453,14 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 		rr.TTL = prevRR.TTL
 		rr.Class = prevRR.Class
 
+		m.flag |= parseRRTTL
+
 		if ascii.IsDigit(tok[0]) {
 			ttl, err = parseTTL(tok, stok)
 			if err != nil {
 				return nil, err
 			}
 			rr.TTL = ttl
-			m.flag |= parseRRTTL
 		} else {
 			ok = m.parseRRClassOrType(rr, stok)
 			if !ok {
@@ -968,82 +965,86 @@ func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	return nil
 }
 
+// parseSRV parse the SRV record.
+// The tok parameter contains the unparsed field for priority.
 func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	var (
+		logp         = `parseSRV`
+		svcProtoName = strings.SplitN(rr.Name, `.`, 3)
+	)
+	if len(svcProtoName) <= 1 {
+		return fmt.Errorf(`%s: line %d: invalid _service._proto.name: %s`, logp, m.lineno, rr.Name)
+	}
+
+	var (
 		rrSRV = &RDataSRV{
-			Service: string(tok),
+			Service: svcProtoName[0],
+			Proto:   svcProtoName[1],
 		}
 
-		v int
-		c byte
+		v      int
+		c      byte
+		isTerm bool
 	)
 
-	rr.Value = rrSRV
+	if len(svcProtoName) == 2 {
+		rrSRV.Name = m.origin
+	} else {
+		rrSRV.Name = svcProtoName[2]
+	}
 
-	m.flag = parseSRVService
+	m.flag = parseSRVPriority
 
 	for {
-		_, c = m.reader.SkipHorizontalSpace()
-		if c == 0 || c == ';' {
-			return fmt.Errorf("line %d: incomplete SRV RDATA", m.lineno)
-		}
-
-		tok, _, _ = m.reader.ReadUntil(m.seps, m.terms)
-		if len(tok) == 0 {
-			return fmt.Errorf("line %d: incomplete SRV RDATA", m.lineno)
-		}
-
 		switch m.flag {
-		case parseSRVService:
-			rrSRV.Proto = string(tok)
-			m.flag |= parseSRVProto
-
-		case parseSRVService | parseSRVProto:
-			rrSRV.Name = string(tok)
-			m.flag |= parseSRVName
-
-		case parseSRVService | parseSRVProto | parseSRVName:
+		case parseSRVPriority:
 			v, err = strconv.Atoi(string(tok))
 			if err != nil {
-				return fmt.Errorf("line %d: invalid SRV Priority value: %w",
-					m.lineno, err)
+				return fmt.Errorf(`%s: line %d: invalid Priority value %s: %w`, logp, m.lineno, tok, err)
 			}
 			rrSRV.Priority = uint16(v)
-			m.flag |= parseSRVPriority
+			m.flag = parseSRVWeight
 
-		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority:
+		case parseSRVWeight:
 			v, err = strconv.Atoi(string(tok))
 			if err != nil {
-				return fmt.Errorf("line %d: invalid SRV Weight value: %w",
-					m.lineno, err)
+				return fmt.Errorf(`%s: line %d: invalid Weight value %s: %w`, logp, m.lineno, tok, err)
 			}
 			rrSRV.Weight = uint16(v)
-			m.flag |= parseSRVWeight
+			m.flag = parseSRVPort
 
-		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority | parseSRVWeight:
+		case parseSRVPort:
 			v, err = strconv.Atoi(string(tok))
 			if err != nil {
-				return fmt.Errorf("line %d: invalid SRV Port value: %w",
-					m.lineno, err)
+				return fmt.Errorf(`%s: line %d: invalid Port value %s: %w`, logp, m.lineno, tok, err)
 			}
 			rrSRV.Port = uint16(v)
-			m.flag |= parseSRVPort
+			m.flag = parseSRVTarget
 
-		case parseSRVService | parseSRVProto | parseSRVName | parseSRVPriority | parseSRVWeight | parseSRVPort:
+		case parseSRVTarget:
 			rrSRV.Target = string(tok)
-			m.flag |= parseSRVTarget
 			goto out
-
-		default:
-			return fmt.Errorf("line %d: invalid SRV RData", m.lineno)
 		}
+
+		_, c = m.reader.SkipHorizontalSpace()
+		if c == 0 || c == ';' {
+			return fmt.Errorf(`%s: line %d: incomplete SRV RDATA`, logp, m.lineno)
+		}
+
+		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
 	}
 out:
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == ';' {
+	if isTerm {
+		if c == ';' {
+			m.reader.SkipLine()
+			m.lineno++
+		}
+	} else {
 		m.reader.SkipLine()
 		m.lineno++
 	}
+
+	rr.Value = rrSRV
 
 	return nil
 }
@@ -1205,7 +1206,6 @@ func (m *zoneParser) pack() {
 
 		_, err = msg.Pack()
 		if err != nil {
-			log.Printf("! pack: %s\n", err)
 			msg.Header.ANCount = 0
 		}
 

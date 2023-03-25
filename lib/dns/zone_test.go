@@ -63,23 +63,23 @@ func TestParseZone(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		vbytes = tdata.Output[`zone_out.txt`]
-		test.Assert(t, tdata.Name, string(vbytes), bb.String())
+		vstr = `zone_out.txt`
+		vbytes = tdata.Output[vstr]
+		test.Assert(t, vstr, string(vbytes), bb.String())
 
 		// Compare the packed zone as message.
 
 		var (
 			msg *Message
-			tag string
 			x   int
 		)
 		for x, msg = range zone.messages {
 			bb.Reset()
 			libbytes.DumpPrettyTable(&bb, msg.Question.String(), msg.packet)
 
-			tag = fmt.Sprintf(`message_%d.hex`, x)
-			vbytes = tdata.Output[tag]
-			test.Assert(t, tag, string(vbytes), bb.String())
+			vstr = fmt.Sprintf(`message_%d.hex`, x)
+			vbytes = tdata.Output[vstr]
+			test.Assert(t, vstr, string(vbytes), bb.String())
 		}
 	}
 }
