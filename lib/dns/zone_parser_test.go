@@ -8,9 +8,9 @@ import (
 
 func TestZoneParserDecodeString(t *testing.T) {
 	type testCase struct {
-		in       []byte
 		exp      string
 		expError string
+		in       []byte
 	}
 
 	var cases = []testCase{{

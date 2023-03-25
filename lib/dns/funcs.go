@@ -122,7 +122,7 @@ func reverseIP(ip net.IP) (revIP []byte, isIPv4 bool) {
 // "1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.2".
 func reverseByDot(ip []byte) (rev []byte) {
 	var (
-		addrs [][]byte = bytes.Split(ip, []byte{'.'})
+		addrs = bytes.Split(ip, []byte{'.'})
 
 		x int
 	)

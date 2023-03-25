@@ -14,7 +14,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -221,7 +220,7 @@ func (srv *Server) Stop() {
 		srv.dot = nil
 	}
 	if srv.doh != nil {
-		var ctx context.Context = context.Background()
+		var ctx = context.Background()
 		err = srv.doh.Shutdown(ctx)
 		if err != nil {
 			log.Println("dns: error when closing DoH: " + err.Error())
@@ -234,7 +233,7 @@ func (srv *Server) Stop() {
 // file in parameter.  The path to request is static "/dns-query".
 func (srv *Server) serveDoH() {
 	var (
-		addr string = srv.opts.getHTTPAddress().String()
+		addr = srv.opts.getHTTPAddress().String()
 
 		err error
 	)
@@ -265,7 +264,7 @@ func (srv *Server) serveDoH() {
 
 func (srv *Server) serveDoT() {
 	var (
-		dotAddr *net.TCPAddr = srv.opts.getDoTAddress()
+		dotAddr = srv.opts.getDoTAddress()
 
 		cl   *TCPClient
 		conn net.Conn
@@ -385,7 +384,7 @@ func (srv *Server) serveUDP() {
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
-		hdr http.Header = w.Header()
+		hdr = w.Header()
 
 		hdrAcceptValue string
 	)
@@ -418,8 +417,8 @@ func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) handleDoHGet(w http.ResponseWriter, r *http.Request) {
 	var (
-		q         url.Values = r.URL.Query()
-		msgBase64 string     = q.Get("dns")
+		q         = r.URL.Query()
+		msgBase64 = q.Get("dns")
 
 		raw []byte
 		err error
@@ -456,8 +455,8 @@ func (srv *Server) handleDoHPost(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 	var (
-		req *request = newRequest()
-		cl           = &DoHClient{
+		req = newRequest()
+		cl  = &DoHClient{
 			w:         w,
 			responded: make(chan bool, 1),
 		}
@@ -730,7 +729,7 @@ func (srv *Server) startAllForwarders() {
 
 func (srv *Server) runDohForwarder(tag, nameserver string) {
 	var (
-		stopper <-chan bool = srv.newStopper()
+		stopper = srv.newStopper()
 
 		forwarder *DoHClient
 		ticker    *time.Ticker
@@ -805,7 +804,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string) {
 
 func (srv *Server) runTLSForwarder(tag, nameserver string) {
 	var (
-		stopper <-chan bool = srv.newStopper()
+		stopper = srv.newStopper()
 
 		forwarder *DoTClient
 		ticker    *time.Ticker
@@ -881,7 +880,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string) {
 
 func (srv *Server) runTCPForwarder(tag, nameserver string) {
 	var (
-		stopper <-chan bool = srv.newStopper()
+		stopper = srv.newStopper()
 
 		ticker *time.Ticker
 		cl     *TCPClient
@@ -942,7 +941,7 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 // and forward it to parent name server.
 func (srv *Server) runUDPForwarder(tag, nameserver string) {
 	var (
-		stopper <-chan bool = srv.newStopper()
+		stopper = srv.newStopper()
 
 		forwarder *UDPClient
 		ticker    *time.Ticker

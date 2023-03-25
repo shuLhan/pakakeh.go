@@ -8,11 +8,11 @@ import (
 
 func TestUnpackDomainName(t *testing.T) {
 	type testCase struct {
+		expDomainName string
+		expError      string
 		packet        []byte
 		start         uint
-		expDomainName string
 		expEnd        uint
-		expError      string
 	}
 
 	var packet = []byte{

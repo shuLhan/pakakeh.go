@@ -77,9 +77,7 @@ func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		q.Class = RecordClassIN
 	}
 
-	var (
-		msg *Message = NewMessage()
-	)
+	var msg = NewMessage()
 
 	msg.Header.ID = getNextID()
 	msg.Header.IsRD = allowRecursion
@@ -160,8 +158,8 @@ func (cl *DoTClient) Write(msg []byte) (n int, err error) {
 	}
 
 	var (
-		lenmsg int    = len(msg)
-		packet []byte = make([]byte, 0, 2+lenmsg)
+		lenmsg = len(msg)
+		packet = make([]byte, 0, 2+lenmsg)
 	)
 
 	packet = libbytes.AppendUint16(packet, uint16(lenmsg))
@@ -173,7 +171,7 @@ func (cl *DoTClient) Write(msg []byte) (n int, err error) {
 }
 
 // SetRemoteAddr no-op.
-func (cl *DoTClient) SetRemoteAddr(addr string) (err error) {
+func (cl *DoTClient) SetRemoteAddr(_ string) (err error) {
 	return
 }
 

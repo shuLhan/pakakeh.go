@@ -21,8 +21,8 @@ func TestServerOptionsInit(t *testing.T) {
 	}
 
 	var (
-		ip     net.IP = net.ParseIP("0.0.0.0")
-		defSoa        = RDataSOA{
+		ip     = net.ParseIP("0.0.0.0")
+		defSoa = RDataSOA{
 			RName:   defaultRName,
 			Serial:  uint32(time.Now().Unix()),
 			Refresh: defaultRefresh,

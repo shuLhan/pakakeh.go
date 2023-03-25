@@ -240,7 +240,7 @@ func testMessageHeaderCases() []testMessageHeader {
 
 func TestMessageHeader_pack(t *testing.T) {
 	var (
-		cases []testMessageHeader = testMessageHeaderCases()
+		cases = testMessageHeaderCases()
 
 		c   testMessageHeader
 		got []byte
@@ -254,7 +254,7 @@ func TestMessageHeader_pack(t *testing.T) {
 
 func TestMessageHeader_unpack(t *testing.T) {
 	var (
-		cases []testMessageHeader = testMessageHeaderCases()
+		cases = testMessageHeaderCases()
 
 		c   testMessageHeader
 		got MessageHeader

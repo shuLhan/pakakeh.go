@@ -105,7 +105,7 @@ func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 		q.Class = RecordClassIN
 	}
 
-	var msg *Message = NewMessage()
+	var msg = NewMessage()
 
 	// No ID.
 	// HTTP correlates the request and response, thus eliminating
@@ -165,7 +165,7 @@ func (cl *DoHClient) Post(msg *Message) (res *Message, err error) {
 // unpacked message.
 func (cl *DoHClient) Get(msg *Message) (res *Message, err error) {
 	var (
-		q string = base64.RawURLEncoding.EncodeToString(msg.packet)
+		q = base64.RawURLEncoding.EncodeToString(msg.packet)
 
 		httpRes *http.Response
 	)

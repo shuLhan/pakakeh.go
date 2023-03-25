@@ -13,7 +13,7 @@ type ZoneRecords map[string][]*ResourceRecord
 // add a ResourceRecord into the zone.
 func (zr ZoneRecords) add(rr *ResourceRecord) {
 	var (
-		listRR []*ResourceRecord = zr[rr.Name]
+		listRR = zr[rr.Name]
 
 		in *ResourceRecord
 		x  int
@@ -38,9 +38,10 @@ func (zr ZoneRecords) add(rr *ResourceRecord) {
 // It will return true if the RR exist and removed.
 func (zr ZoneRecords) remove(rr *ResourceRecord) bool {
 	var (
-		listRR []*ResourceRecord = zr[rr.Name]
-		in     *ResourceRecord
-		x      int
+		listRR = zr[rr.Name]
+
+		in *ResourceRecord
+		x  int
 	)
 
 	for x, in = range listRR {

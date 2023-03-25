@@ -4,6 +4,7 @@
 
 package dns
 
+// RecordClass represent the class for resource record.
 type RecordClass uint16
 
 // List of known record class, ordered by value.

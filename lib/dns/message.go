@@ -92,8 +92,8 @@ func NewMessageAddress(hname []byte, addresses [][]byte) (msg *Message) {
 	}
 
 	var (
-		addr  []byte     = addresses[0]
-		rtype RecordType = RecordTypeFromAddress(addr)
+		addr  = addresses[0]
+		rtype = RecordTypeFromAddress(addr)
 
 		rr  ResourceRecord
 		err error
@@ -579,8 +579,8 @@ func (msg *Message) packSRV(rr *ResourceRecord) {
 
 func (msg *Message) packAAAA(rr *ResourceRecord) {
 	var (
-		rrText, _        = rr.Value.(string)
-		ip        net.IP = net.ParseIP(rrText)
+		rrText, _ = rr.Value.(string)
+		ip        = net.ParseIP(rrText)
 	)
 
 	msg.packet = libbytes.AppendUint16(msg.packet, rdataIPv6Size)
@@ -689,7 +689,7 @@ func (msg *Message) Pack() ([]byte, error) {
 	msg.Header.ARCount = uint16(len(msg.Additional))
 
 	var (
-		header []byte = msg.Header.pack()
+		header = msg.Header.pack()
 
 		x int
 	)
