@@ -1021,6 +1021,104 @@ out:
 	return nil
 }
 
+// decodeString decode a [character-string].
+//
+// A character-string is expressed in one or two ways: as a contiguous set of
+// characters without interior spaces, or as a string beginning with a " and
+// ending with a ".
+//
+// For contiguous string without double quotes, the following encoding are
+// recognized,
+//
+//   - \X where X is any character other than a digit (0-9), is used to quote
+//     that character so that its special meaning does not apply.
+//     For example, "\." can be used to place a dot character in a label.
+//   - \DDD  where each D is a digit is the octet corresponding to the decimal
+//     number described by DDD.
+//     The resulting octet is assumed to be text and is not checked for
+//     special meaning.
+//
+// For quoted string, inside a " delimited string any character can occur,
+// except for a " itself, which must be quoted using \ (back slash).
+//
+// [character-string]: https://datatracker.ietf.org/doc/html/rfc1035#section-5.1
+func (m *zoneParser) decodeString(in []byte) (out []byte, err error) {
+	var (
+		logp = `decodeString`
+		size = len(in)
+
+		c     byte
+		isEsc bool
+	)
+
+	out = make([]byte, 0, len(in))
+	if in[0] == '"' && in[size-1] == '"' {
+		// Un-escape the backslash quote only
+		for _, c = range in[1 : size-1] {
+			if isEsc {
+				if c == '"' {
+					out = append(out, '"')
+				} else {
+					out = append(out, '\\', c)
+				}
+				isEsc = false
+				continue
+			}
+			if c == '\\' {
+				isEsc = true
+				continue
+			}
+			out = append(out, c)
+		}
+		return out, nil
+	}
+
+	var x int
+	for x = 0; x < size; x++ {
+		c = in[x]
+		if ascii.IsSpace(c) {
+			break
+		}
+		if isEsc {
+			if !ascii.IsDigit(c) {
+				out = append(out, c)
+				isEsc = false
+				continue
+			}
+
+			var digits = make([]byte, 0, 3)
+
+			for x < size && len(digits) <= 2 {
+				digits = append(digits, in[x])
+				if !ascii.IsDigit(in[x]) {
+					return nil, fmt.Errorf(`%s: invalid digits: \%s`, logp, digits)
+				}
+				x++
+			}
+			if len(digits) != 3 {
+				return nil, fmt.Errorf(`%s: invalid digits length: \%s`, logp, digits)
+			}
+			x--
+
+			var vint int64
+			vint, err = strconv.ParseInt(string(digits), 10, 8)
+			if err != nil {
+				return nil, fmt.Errorf(`%s: invalid octet: \%s`, logp, digits)
+			}
+
+			out = append(out, byte(vint))
+			isEsc = false
+			continue
+		}
+		if c == '\\' {
+			isEsc = true
+			continue
+		}
+		out = append(out, c)
+	}
+	return out, nil
+}
+
 func (m *zoneParser) generateDomainName(dname []byte) (out string) {
 	dname = ascii.ToLower(dname)
 	if bytes.Equal(dname, []byte("@")) {
