@@ -17,6 +17,8 @@ $ORIGIN exaple.com.
                 IN      NS      ns2.exaple.com.
                 IN      NS      ns3.exaple.com.
 
+_acme-challenge IN   TXT  1iG9QDAgheMRmWz69jwupWG2QMbrubnNjZ47IrDb-40
+
 
 <<< zone_out.txt
 $ORIGIN exaple.com.
@@ -25,6 +27,7 @@ $ORIGIN exaple.com.
 	 3600 IN NS ns
 	 3600 IN NS ns2
 	 3600 IN NS ns3
+_acme-challenge 3600 IN TXT "1iG9QDAgheMRmWz69jwupWG2QMbrubnNjZ47IrDb-40"
 
 <<< message_0.hex
 {Name:exaple.com. Type:SOA}
@@ -67,3 +70,21 @@ $ORIGIN exaple.com.
 0x40| 0c 00 02 00 01 00 00 0e| . . . . . . . .|  12   0   2   0   1   0   0  14|64
 0x48| 10 00 06 03 6e 73 33 c0| . . . . n s 3 .|  16   0   6   3 110 115  51 192|72
 0x50| 0c                     | .              |  12                            |80
+
+<<< message_3.hex
+{Name:_acme-challenge.exaple.com. Type:TXT}
+    |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
+    |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
+0x00| 00 00 84 00 00 01 00 01| . . . . . . . .|   0   0 132   0   0   1   0   1|00
+0x08| 00 00 00 00 0f 5f 61 63| . . . . . _ a c|   0   0   0   0  15  95  97  99|08
+0x10| 6d 65 2d 63 68 61 6c 6c| m e - c h a l l| 109 101  45  99 104  97 108 108|16
+0x18| 65 6e 67 65 06 65 78 61| e n g e . e x a| 101 110 103 101   6 101 120  97|24
+0x20| 70 6c 65 03 63 6f 6d 00| p l e . c o m .| 112 108 101   3  99 111 109   0|32
+0x28| 00 10 00 01 c0 0c 00 10| . . . . . . . .|   0  16   0   1 192  12   0  16|40
+0x30| 00 01 00 00 0e 10 00 2c| . . . . . . . ,|   0   1   0   0  14  16   0  44|48
+0x38| 2b 31 69 47 39 51 44 41| + 1 i G 9 Q D A|  43  49 105  71  57  81  68  65|56
+0x40| 67 68 65 4d 52 6d 57 7a| g h e M R m W z| 103 104 101  77  82 109  87 122|64
+0x48| 36 39 6a 77 75 70 57 47| 6 9 j w u p W G|  54  57 106 119 117 112  87  71|72
+0x50| 32 51 4d 62 72 75 62 6e| 2 Q M b r u b n|  50  81  77  98 114 117  98 110|80
+0x58| 4e 6a 5a 34 37 49 72 44| N j Z 4 7 I r D|  78 106  90  52  55  73 114  68|88
+0x60| 62 2d 34 30            | b - 4 0        |  98  45  52  48                |96

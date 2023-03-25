@@ -552,7 +552,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 			parseRRTTL | parseRRClass | parseRRType:
 
 			if rr.Type == RecordTypeTXT {
-				if !isTerm {
+				if c != 0 && !isTerm {
 					orgtok = append(orgtok, c)
 				}
 			}
@@ -915,27 +915,54 @@ func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	return nil
 }
 
-// parseTXT parse TXT resource data.  The TXT rdata use the following format,
+// parseTXT parse TXT resource data (rdata).
+// For rdata that contains space, it must be double quote or use the encoding
+// \DDD. for example, given the following rdata "a page", it could be encoded
+// as
 //
-//	DQUOTE text DQUOTE
-//
-// The rdata MUST contains double quote at the beginning and end of text.
+//	TXT "a page"
+//	TXT a\032page
 func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
 	var (
-		tok []byte
+		logp = `parseTXT`
+
+		c        byte
+		isEsc    bool
+		isQuoted bool
 	)
 
-	tok, _, _ = m.reader.ReadUntil(nil, []byte{'\n'})
-	v = append(v, tok...)
-	v = bytes.TrimSpace(v)
-	if v[0] != '"' {
-		return fmt.Errorf("dns: missing start quote on TXT data")
+	if v[0] == '"' {
+		isQuoted = true
 	}
-	if v[len(v)-1] != '"' {
-		return fmt.Errorf("dns: missing end quote on TXT data")
+	for ; m.reader.X < len(m.reader.V); m.reader.X++ {
+		c = m.reader.V[m.reader.X]
+		if isEsc {
+			v = append(v, '\\', c)
+			isEsc = false
+			continue
+		}
+		if c == '\\' {
+			isEsc = true
+			continue
+		}
+		if ascii.IsSpace(c) && !isQuoted {
+			m.reader.X++
+			break
+		}
+		if c == '"' && isQuoted {
+			v = append(v, c)
+			m.reader.X++
+			break
+		}
+		v = append(v, c)
 	}
-	v = v[1 : len(v)-1]
 
+	m.reader.SkipLine()
+
+	v, err = m.decodeString(v)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
 	rr.Value = string(v)
 
 	return nil

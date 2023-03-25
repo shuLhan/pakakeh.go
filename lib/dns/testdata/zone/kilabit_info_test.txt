@@ -17,6 +17,8 @@ origin: kilabit.info.
 
 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. PTR kilabit.info.
 
+txt_noquote TXT This\032is a text ; Without quote terminated by space.
+
 <<< zone_out.txt
 $ORIGIN kilabit.info.
 @ SOA kilabit.info. admin.kilabit.info. 20180832 3600 60 3600 3600
@@ -25,6 +27,7 @@ $ORIGIN kilabit.info.
 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. 3600 IN PTR kilabit.info.
 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. 3600 IN PTR kilabit.info.
 10.0.0.127.in-addr.arpa. 3600 IN PTR kilabit.info.
+txt_noquote 3600 IN TXT "This is"
 
 <<< message_0.hex
 {Name:kilabit.info. Type:SOA}
@@ -117,3 +120,16 @@ $ORIGIN kilabit.info.
 0x60| 00 00 0e 10 00 0e 07 6b| . . . . . . . k|   0   0  14  16   0  14   7 107|96
 0x68| 69 6c 61 62 69 74 04 69| i l a b i t . i| 105 108  97  98 105 116   4 105|104
 0x70| 6e 66 6f 00            | n f o .        | 110 102 111   0                |112
+
+<<< message_6.hex
+{Name:txt_noquote.kilabit.info. Type:TXT}
+    |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
+    |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
+0x00| 00 00 84 00 00 01 00 01| . . . . . . . .|   0   0 132   0   0   1   0   1|00
+0x08| 00 00 00 00 0b 74 78 74| . . . . . t x t|   0   0   0   0  11 116 120 116|08
+0x10| 5f 6e 6f 71 75 6f 74 65| _ n o q u o t e|  95 110 111 113 117 111 116 101|16
+0x18| 07 6b 69 6c 61 62 69 74| . k i l a b i t|   7 107 105 108  97  98 105 116|24
+0x20| 04 69 6e 66 6f 00 00 10| . i n f o . . .|   4 105 110 102 111   0   0  16|32
+0x28| 00 01 c0 0c 00 10 00 01| . . . . . . . .|   0   1 192  12   0  16   0   1|40
+0x30| 00 00 0e 10 00 08 07 54| . . . . . . . T|   0   0  14  16   0   8   7  84|48
+0x38| 68 69 73 20 69 73      | h i s . i s    | 104 105 115  32 105 115        |56
