@@ -1,4 +1,4 @@
-name: Go1.18
+name: Go1.19
 on: [push]
 jobs:
 
@@ -7,17 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.18.6
-      uses: actions/setup-go@v1
+    - name: Set up Go 1.19
+      uses: actions/setup-go@v4
       with:
-        go-version: 1.18.6
+        go-version: '^1.19.7'
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
 
     - name: Build
-      run: go build -v ./...
+      run: make build
 
     - name: Test
-      run: go test -race -p=1 ./...
+      run: make test

@@ -1,6 +1,6 @@
 module github.com/shuLhan/share
 
-go 1.18
+go 1.19
 
 require (
 	golang.org/x/crypto v0.6.0
