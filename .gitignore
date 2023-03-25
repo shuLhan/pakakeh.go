@@ -59,7 +59,14 @@
 /lib/websocket/testdata/server/reports
 /lib/websocket/testdata/server/server
 _AUR/pkg/
-_bin
+/_bin/epoch
+/_bin/gofmtcomment
+/_bin/hexo
+/_bin/ini
+/_bin/sendemail
+/_bin/smtpcli
+/_bin/totp
+/_bin/xtrk
 cover.*
 share-tools/
 src/

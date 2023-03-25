@@ -1,6 +1,6 @@
 pkgbase = share-tools
 	pkgdesc = Miscellaneous CLI tools: epoch, ini, xtrk
-	pkgver = 0.43.0.r10.g0753ecd
+	pkgver = 0.44.0.r31.gabd5213
 	pkgrel = 1
 	url = https://github.com/shuLhan/share
 	arch = x86_64
