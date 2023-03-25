@@ -8,8 +8,12 @@
 @  IN A   127.0.0.1
       TXT "This is a test server"
 
+; 12 - PTR records.
 10.0.0.127.in-addr.arpa. PTR kilabit.info.
-
 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. PTR kilabit.info.
-
 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. PTR kilabit.info.
+
+; 13 - HINFO record (obsolete).
+@ IN HINFO x86_64 ArchLinux
+
+txt_noquote TXT This\032is a text ; Without quote terminated by space.

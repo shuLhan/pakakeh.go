@@ -7,6 +7,8 @@ package dns
 import (
 	"fmt"
 	"strings"
+
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 // RDataHINFO HINFO records are used to acquire general information about a
@@ -21,17 +23,15 @@ type RDataHINFO struct {
 // unpack the HINFO RDATA from DNS message.
 func (hinfo *RDataHINFO) unpack(packet []byte) error {
 	var (
-		x int
+		x    = 0
+		size = int(packet[x])
 	)
-	for ; x < len(packet); x++ {
-		if packet[x] == 0 {
-			break
-		}
-	}
-	hinfo.CPU = append(hinfo.CPU, packet[0:x]...)
 	x++
-	hinfo.OS = append(hinfo.OS, packet[x:]...)
-
+	hinfo.CPU = libbytes.Copy(packet[x : x+size])
+	x = x + size
+	size = int(packet[x])
+	x++
+	hinfo.OS = libbytes.Copy(packet[x : x+size])
 	return nil
 }
 

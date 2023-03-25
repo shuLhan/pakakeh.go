@@ -496,13 +496,15 @@ func (msg *Message) packWKS(rr *ResourceRecord) {
 func (msg *Message) packHINFO(rr *ResourceRecord) {
 	var (
 		rrHInfo, _ = rr.Value.(*RDataHINFO)
-		n          = len(rrHInfo.CPU)
+		n          = len(rrHInfo.CPU) + 1
 	)
 
 	// Write rdlength.
-	n += len(rrHInfo.OS)
+	n += len(rrHInfo.OS) + 1
 	msg.packet = libbytes.AppendUint16(msg.packet, uint16(n))
+	msg.packet = append(msg.packet, byte(len(rrHInfo.CPU)))
 	msg.packet = append(msg.packet, rrHInfo.CPU...)
+	msg.packet = append(msg.packet, byte(len(rrHInfo.OS)))
 	msg.packet = append(msg.packet, rrHInfo.OS...)
 }
 

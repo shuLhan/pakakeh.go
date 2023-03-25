@@ -11,11 +11,13 @@ origin: kilabit.info.
 @  IN A   127.0.0.1
       TXT "This is a test server"
 
+; 12 - PTR records.
 10.0.0.127.in-addr.arpa. PTR kilabit.info.
-
 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. PTR kilabit.info.
-
 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. PTR kilabit.info.
+
+; 13 - HINFO record (obsolete).
+@ IN HINFO x86_64 ArchLinux
 
 txt_noquote TXT This\032is a text ; Without quote terminated by space.
 
@@ -24,6 +26,7 @@ $ORIGIN kilabit.info.
 @ SOA kilabit.info. admin.kilabit.info. 20180832 3600 60 3600 3600
 @ 3600 IN A 127.0.0.1
 	 3600 IN TXT "This is a test server"
+	 3600 IN HINFO x86_64 ArchLinux
 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. 3600 IN PTR kilabit.info.
 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. 3600 IN PTR kilabit.info.
 10.0.0.127.in-addr.arpa. 3600 IN PTR kilabit.info.
@@ -122,6 +125,19 @@ txt_noquote 3600 IN TXT "This is"
 0x70| 6e 66 6f 00            | n f o .        | 110 102 111   0                |112
 
 <<< message_6.hex
+{Name:kilabit.info. Type:HINFO}
+    |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
+    |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
+0x00| 00 00 84 00 00 01 00 01| . . . . . . . .|   0   0 132   0   0   1   0   1|00
+0x08| 00 00 00 00 07 6b 69 6c| . . . . . k i l|   0   0   0   0   7 107 105 108|08
+0x10| 61 62 69 74 04 69 6e 66| a b i t . i n f|  97  98 105 116   4 105 110 102|16
+0x18| 6f 00 00 0d 00 01 c0 0c| o . . . . . . .| 111   0   0  13   0   1 192  12|24
+0x20| 00 0d 00 01 00 00 0e 10| . . . . . . . .|   0  13   0   1   0   0  14  16|32
+0x28| 00 11 06 78 38 36 5f 36| . . . x 8 6 _ 6|   0  17   6 120  56  54  95  54|40
+0x30| 34 09 41 72 63 68 4c 69| 4 . A r c h L i|  52   9  65 114  99 104  76 105|48
+0x38| 6e 75 78               | n u x          | 110 117 120                    |56
+
+<<< message_7.hex
 {Name:txt_noquote.kilabit.info. Type:TXT}
     |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
     |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
