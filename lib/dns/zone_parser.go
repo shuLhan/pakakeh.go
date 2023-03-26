@@ -843,7 +843,7 @@ func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	var (
 		rrMInfo = &RDataMINFO{
-			RMailBox: string(tok),
+			RMailBox: m.generateDomainName(tok),
 		}
 
 		c      byte
@@ -863,7 +863,7 @@ func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 		return fmt.Errorf("line %d: missing MInfo EmailBox value", m.lineno)
 	}
 
-	rrMInfo.EmailBox = string(tok)
+	rrMInfo.EmailBox = m.generateDomainName(tok)
 
 	if !isTerm {
 		m.reader.SkipLine()

@@ -16,4 +16,7 @@
 ; 13 - HINFO record (obsolete).
 @ IN HINFO x86_64 ArchLinux
 
+; 14 - MINFO record (obsolete).
+  MINFO post-request admin
+
 txt_noquote TXT This\032is a text ; Without quote terminated by space.

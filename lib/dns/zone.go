@@ -334,7 +334,8 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 			n, err = fmt.Fprintf(out,
 				"%s %d %s MINFO %s %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
-				minfo.RMailBox, minfo.EmailBox)
+				strings.TrimSuffix(minfo.RMailBox, suffixOrigin),
+				strings.TrimSuffix(minfo.EmailBox, suffixOrigin))
 
 		case RecordTypeMX:
 			mx, ok = rr.Value.(*RDataMX)

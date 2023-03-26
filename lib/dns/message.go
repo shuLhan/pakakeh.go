@@ -520,7 +520,7 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 	msg.packet = libbytes.AppendUint16(msg.packet, 0)
 
 	n = msg.packDomainName([]byte(rrMInfo.RMailBox), true)
-	n = msg.packDomainName([]byte(rrMInfo.EmailBox), true)
+	n += msg.packDomainName([]byte(rrMInfo.EmailBox), true)
 
 	// Write rdlength.
 	libbytes.WriteUint16(msg.packet, off, uint16(n))

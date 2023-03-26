@@ -19,6 +19,9 @@ origin: kilabit.info.
 ; 13 - HINFO record (obsolete).
 @ IN HINFO x86_64 ArchLinux
 
+; 14 - MINFO record (obsolete).
+  MINFO post-request admin
+
 txt_noquote TXT This\032is a text ; Without quote terminated by space.
 
 <<< zone_out.txt
@@ -27,6 +30,7 @@ $ORIGIN kilabit.info.
 @ 3600 IN A 127.0.0.1
 	 3600 IN TXT "This is a test server"
 	 3600 IN HINFO x86_64 ArchLinux
+	 3600 IN MINFO post-request admin
 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. 3600 IN PTR kilabit.info.
 1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. 3600 IN PTR kilabit.info.
 10.0.0.127.in-addr.arpa. 3600 IN PTR kilabit.info.
@@ -138,6 +142,20 @@ txt_noquote 3600 IN TXT "This is"
 0x38| 6e 75 78               | n u x          | 110 117 120                    |56
 
 <<< message_7.hex
+{Name:kilabit.info. Type:MINFO}
+    |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
+    |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
+0x00| 00 00 84 00 00 01 00 01| . . . . . . . .|   0   0 132   0   0   1   0   1|00
+0x08| 00 00 00 00 07 6b 69 6c| . . . . . k i l|   0   0   0   0   7 107 105 108|08
+0x10| 61 62 69 74 04 69 6e 66| a b i t . i n f|  97  98 105 116   4 105 110 102|16
+0x18| 6f 00 00 0e 00 01 c0 0c| o . . . . . . .| 111   0   0  14   0   1 192  12|24
+0x20| 00 0e 00 01 00 00 0e 10| . . . . . . . .|   0  14   0   1   0   0  14  16|32
+0x28| 00 17 0c 70 6f 73 74 2d| . . . p o s t -|   0  23  12 112 111 115 116  45|40
+0x30| 72 65 71 75 65 73 74 c0| r e q u e s t .| 114 101 113 117 101 115 116 192|48
+0x38| 0c 05 61 64 6d 69 6e c0| . . a d m i n .|  12   5  97 100 109 105 110 192|56
+0x40| 0c                     | .              |  12                            |64
+
+<<< message_8.hex
 {Name:txt_noquote.kilabit.info. Type:TXT}
     |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
     |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
