@@ -20,19 +20,9 @@ func ExampleHeader_Filter() {
 		bodyText    = []byte(`Email body as plain text`)
 		bodyHtml    = []byte(`Email body as <b>HTML</b>`)
 
-		recipients []string
-		mboxes     []*email.Mailbox
-		msg        *email.Message
-		err        error
+		msg *email.Message
+		err error
 	)
-
-	mboxes, err = email.ParseMailboxes(toAddresses)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, mbox := range mboxes {
-		recipients = append(recipients, mbox.Address)
-	}
 
 	msg, err = email.NewMultipart(
 		fromAddress,
