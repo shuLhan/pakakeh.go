@@ -828,7 +828,10 @@ func handleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadS
 		pos = listPos[0]
 		header.Set(HeaderContentRange, pos.ContentRange(r.unit, size))
 		res.WriteHeader(http.StatusPartialContent)
-		res.Write(listBody[0])
+		_, err = res.Write(listBody[0])
+		if err != nil {
+			mlog.Errf(`%s: %s`, logp, err)
+		}
 		return
 	}
 
@@ -855,7 +858,10 @@ func handleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadS
 	header.Set(HeaderContentLength, v)
 
 	res.WriteHeader(http.StatusPartialContent)
-	res.Write(bb.Bytes())
+	_, err = res.Write(bb.Bytes())
+	if err != nil {
+		mlog.Errf(`%s: %s`, logp, err)
+	}
 }
 
 // rangeContentType detect the body content type for range reply.
