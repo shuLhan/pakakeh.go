@@ -49,7 +49,7 @@ func (fwd *QuestdbForwarder) Close() (err error) {
 
 	err = fwd.conn.Close()
 	if err != nil {
-		fmt.Errorf(`%s: %w`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 	return nil
 }
