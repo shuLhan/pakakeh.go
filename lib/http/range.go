@@ -151,6 +151,8 @@ func ParseRange(v string) (r Range) {
 		tok, delim = par.TokenTrimSpace()
 		if delim == '-' {
 			// Invalid range "start-end-"
+			skipPosition(par, delim)
+			continue
 		}
 		if len(tok) == 0 {
 			if start == 0 {
