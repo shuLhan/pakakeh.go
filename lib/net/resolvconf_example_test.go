@@ -11,6 +11,7 @@ func ExampleResolvConf_PopulateQuery() {
 		resconf = &ResolvConf{
 			Domain: "internal",
 			Search: []string{"my.internal"},
+			NDots:  1,
 		}
 		queries []string
 	)
@@ -20,6 +21,6 @@ func ExampleResolvConf_PopulateQuery() {
 	queries = resconf.PopulateQuery("a.machine")
 	fmt.Println(queries)
 	//Output:
-	//[vpn.internal vpn.my.internal]
-	//[a.machine a.machine.internal a.machine.my.internal]
+	//[vpn vpn.my.internal]
+	//[a.machine]
 }

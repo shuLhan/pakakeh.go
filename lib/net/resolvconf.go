@@ -326,8 +326,10 @@ func (rc *ResolvConf) sanitize() {
 }
 
 // PopulateQuery given a domain name to be resolved, generate list of names
-// to be queried based on registered Domain and Search in the resolv.conf.
-// The dname itself will be on top of the list if its contains any dot.
+// to be queried based on registered Search in the resolv.conf.
+// The dname itself will be on top of the list.
+// If the number of dots in dname less than NDots then each Search domain will
+// be appended as suffix and added to the list.
 func (rc *ResolvConf) PopulateQuery(dname string) (queries []string) {
 	var (
 		s     string
@@ -342,11 +344,9 @@ func (rc *ResolvConf) PopulateQuery(dname string) (queries []string) {
 		}
 	}
 
-	if ndots > 0 {
-		queries = append(queries, dname)
-	}
-	if len(rc.Domain) > 0 {
-		queries = append(queries, dname+"."+rc.Domain)
+	queries = append(queries, dname)
+	if ndots >= rc.NDots {
+		return queries
 	}
 	for _, s = range rc.Search {
 		queries = append(queries, dname+"."+s)
