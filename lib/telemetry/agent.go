@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/shuLhan/share/lib/mlog"
 )
 
 const (
@@ -78,15 +80,20 @@ func (agent *Agent) collect() (all []Metric) {
 // collector collect the metrics on each interval and forward it.
 func (agent *Agent) collector() {
 	var (
+		logp    = `collector`
 		ticker  = time.NewTicker(agent.opts.Interval)
 		metrics []Metric
+		err     error
 	)
 
 	for {
 		select {
 		case <-ticker.C:
 			metrics = agent.collect()
-			agent.BulkForward(context.Background(), metrics)
+			err = agent.BulkForward(context.Background(), metrics)
+			if err != nil {
+				mlog.Errf(`%s: %s`, logp, err)
+			}
 
 		case <-agent.running:
 			ticker.Stop()
