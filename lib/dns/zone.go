@@ -285,7 +285,7 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 
 			if v == zone.Name {
 				v = "@"
-			} else if strings.HasSuffix(v, suffixOrigin) {
+			} else {
 				v = strings.TrimSuffix(v, suffixOrigin)
 			}
 			n, err = fmt.Fprintf(out, "%s %d %s %s %s\n",
@@ -299,9 +299,7 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 					RecordTypeNames[rr.Type])
 				break
 			}
-			if strings.HasSuffix(v, suffixOrigin) {
-				v = strings.TrimSuffix(v, suffixOrigin)
-			}
+			v = strings.TrimSuffix(v, suffixOrigin)
 			n, err = fmt.Fprintf(out, "%s %d IN PTR %s\n",
 				rr.Name, rr.TTL, v)
 
@@ -344,10 +342,7 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 				err = errors.New("invalid record value for MX")
 				break
 			}
-			v = mx.Exchange
-			if strings.HasSuffix(v, suffixOrigin) {
-				v = strings.TrimSuffix(v, suffixOrigin)
-			}
+			v = strings.TrimSuffix(mx.Exchange, suffixOrigin)
 			n, err = fmt.Fprintf(out,
 				"%s %d %s MX %d %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
@@ -359,15 +354,11 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 				err = errors.New("invalid record value for SRV")
 				break
 			}
-			v = srv.Target
-			if strings.HasSuffix(v, suffixOrigin) {
-				v = strings.TrimSuffix(v, suffixOrigin)
-			}
+			v = strings.TrimSuffix(srv.Target, suffixOrigin)
 			n, err = fmt.Fprintf(out,
 				"%s %d %s SRV %d %d %d %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
-				srv.Priority, srv.Weight,
-				srv.Port, v)
+				srv.Priority, srv.Weight, srv.Port, v)
 		}
 		if err != nil {
 			return total, err
