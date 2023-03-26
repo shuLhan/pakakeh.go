@@ -18,9 +18,10 @@ import (
 
 func main() {
 	var (
-		col       = createGoMemStatsCollector()
-		ilpFmt    = telemetry.NewIlpFormatter(`rescached`)
-		stdoutFwd = telemetry.NewStdoutForwarder(ilpFmt)
+		colGoMemstats = createGoMemStatsCollector()
+		colGoMetrics  = createGoMetricsCollector()
+		ilpFmt        = telemetry.NewIlpFormatter(`rescached`)
+		stdoutFwd     = telemetry.NewStdoutForwarder(ilpFmt)
 	)
 
 	// Create metadata.
@@ -37,7 +38,8 @@ func main() {
 				stdoutFwd,
 			},
 			Collectors: []telemetry.Collector{
-				col,
+				colGoMemstats,
+				colGoMetrics,
 			},
 			Interval: 10 * time.Second,
 		}
