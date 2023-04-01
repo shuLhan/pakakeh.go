@@ -132,44 +132,51 @@ file from it.
 {godoc_base_url}/lib/mining[**mining**^]::
 A mini library for data mining.
 
-{godoc_base_url}/lib/mining/classifier/cart[**classifier/cart**^]::
+{godoc_base_url}/lib/mining/classifier/cart[**mining/classifier/cart**^]::
 An implementation of the Classification and Regression Tree by Breiman, et al.
 
-{godoc_base_url}/lib/mining/classififer/crf[**classififer/crf**^]::
+{godoc_base_url}/lib/mining/classififer/crf[**mining/classifier/crf**^]::
 An implementation of the Cascaded Random Forest (CRF) algorithm, by
 Baumann, Florian, et al.
 
-{godoc_base_url}/lib/mining/classifier/rf[**classifier/rf**]::
+{godoc_base_url}/lib/mining/classifier/rf[**mining/classifier/rf**]::
 An implementation of ensemble of classifiers using random forest algorithm by
 Breiman and Cutler.
 
-{godoc_base_url}/lib/gain/gini[**gain/gini**^]::
+{godoc_base_url}/lib/gain/gini[**mining/gain/gini**^]::
 A library to calculate Gini gain.
 
-{godoc_base_url}/lib/mining/knn[**knn**^]::
+{godoc_base_url}/lib/mining/knn[**mining/knn**^]::
 An implementation of the K Nearest Neighbor (KNN) using Euclidian to
 compute the distance between samples.
 
-{godoc_base_url}/lib/mining/resampling/lnsmote[**resampling/lnsmote**^]::
+{godoc_base_url}/lib/mining/resampling/lnsmote[**mining/resampling/lnsmote**^]::
 An implementation of the Local-Neighborhood algorithm from the paper of
 Maciejewski, Tomasz, and Jerzy Stefanowski.
 
-{godoc_base_url}/lib/mining/resampling/smote[**resampling/smote**^]::
+{godoc_base_url}/lib/mining/resampling/smote[**mining/resampling/smote**^]::
 An implementation of the Synthetic Minority Oversampling TEchnique (SMOTE).
 
-{godoc_base_url}/lib/mining/tree/binary[**tree/binary**^]::
+{godoc_base_url}/lib/mining/tree/binary[**mining/tree/binary**^]::
 An implementation of binary tree.
+
+{godoc_base_url}/lib/mlog[**mlog**^]::
+Package mlog implement buffered multi writers of log.
 
 {godoc_base_url}/lib/net[**net**^]::
 Constants and library for networking.
 
-{godoc_base_url}/lib/net/html[**html**^]::
+{godoc_base_url}/lib/net/html[**net/html**^]::
 Package html extends the golang.org/x/net/html by providing simplified
 methods for working with Node.
 
 {godoc_base_url}/lib/numbers[**numbers**^]::
 A library for working with integer, float, slice of integer, and slice of
 floats.
+
+{godoc_base_url}/lib/os[**os**^]::
+Package os extend the standard os package to provide additional
+functionalities.
 
 {godoc_base_url}/lib/os/exec[**os/exec**^]::
 Package exec wrap the standar package "os/exec" to simplify calling Run
@@ -203,6 +210,9 @@ functionality across DBMS.
 Package ssh provide a wrapper for golang.org/x/crypto/ssh and a parser for SSH
 client configuration specification ssh_config(5).
 
+{godoc_base_url}/lib/ssh/config[**ssh/config**^]::
+Package config provide the ssh_config(5) parser and getter.
+
 {godoc_base_url}/lib/ssh/sftp[**ssh/sftp**^]::
 Package sftp implement native SSH File Transport Protocol v3.
 
@@ -213,8 +223,16 @@ A library for working with slice of string.
 A library for working with rows, columns, or matrix (table), or in another
 terms working with data set.
 
+{godoc_base_url}/lib/telemetry[**telemetry**^]::
+Package telemetry is a library for collecting various [Metric], for example
+from standard runtime/metrics, and send or write it to one or more
+[Forwarder].
+
 {godoc_base_url}/lib/test[**test**^]::
 A library for helping with testing.
+
+{godoc_base_url}/lib/test/mock[**test/mock**^]::
+Package mock provide a mocking for standard output and standard error.
 
 {godoc_base_url}/lib/text[**text**^]::
 A library for working with text.
