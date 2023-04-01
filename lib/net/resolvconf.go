@@ -5,7 +5,11 @@
 package net
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -352,4 +356,50 @@ func (rc *ResolvConf) PopulateQuery(dname string) (queries []string) {
 		queries = append(queries, dname+"."+s)
 	}
 	return queries
+}
+
+// WriteTo write the ResolvConf into w.
+func (rc *ResolvConf) WriteTo(w io.Writer) (n int, err error) {
+	var bb bytes.Buffer
+
+	if len(rc.Domain) > 0 {
+		fmt.Fprintf(&bb, "domain %s\n", rc.Domain)
+	}
+
+	var k string
+
+	if len(rc.Search) > 0 {
+		fmt.Fprint(&bb, `search`)
+		for _, k = range rc.Search {
+			bb.WriteString(` ` + k)
+		}
+		bb.WriteByte('\n')
+	}
+	for _, k = range rc.NameServers {
+		fmt.Fprintf(&bb, "nameserver %s\n", k)
+	}
+
+	if rc.NDots > 0 {
+		fmt.Fprintf(&bb, "options ndots:%d\n", rc.NDots)
+	}
+	if rc.Timeout > 0 {
+		fmt.Fprintf(&bb, "options timeout:%d\n", rc.Timeout)
+	}
+	if rc.Attempts > 0 {
+		fmt.Fprintf(&bb, "options attempts:%d\n", rc.Attempts)
+	}
+
+	if len(rc.OptMisc) > 0 {
+		var keys []string
+		for k = range rc.OptMisc {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for _, k = range keys {
+			fmt.Fprintf(&bb, "options %s\n", k)
+		}
+	}
+
+	return w.Write(bb.Bytes())
 }

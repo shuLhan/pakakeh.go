@@ -4,7 +4,11 @@
 
 package net
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"log"
+)
 
 func ExampleResolvConf_PopulateQuery() {
 	var (
@@ -23,4 +27,41 @@ func ExampleResolvConf_PopulateQuery() {
 	//Output:
 	//[vpn vpn.my.internal]
 	//[a.machine]
+}
+
+func ExampleResolvConf_WriteTo() {
+	var (
+		rc = &ResolvConf{
+			Domain:      `internal`,
+			Search:      []string{`a.internal`, `b.internal`},
+			NameServers: []string{`127.0.0.1`, `192.168.1.1`},
+			NDots:       1,
+			Timeout:     5,
+			Attempts:    3,
+			OptMisc: map[string]bool{
+				`rotate`: true,
+				`debug`:  true,
+			},
+		}
+
+		bb  bytes.Buffer
+		err error
+	)
+
+	_, err = rc.WriteTo(&bb)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(bb.String())
+	// Output:
+	// domain internal
+	// search a.internal b.internal
+	// nameserver 127.0.0.1
+	// nameserver 192.168.1.1
+	// options ndots:1
+	// options timeout:5
+	// options attempts:3
+	// options debug
+	// options rotate
 }
