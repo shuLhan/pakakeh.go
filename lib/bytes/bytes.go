@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 	"unicode"
+
+	inbytes "github.com/shuLhan/share/internal/bytes"
 )
 
 // AppendInt16 append an int16 value into slice of byte.
@@ -520,39 +522,7 @@ func SplitEach(data []byte, n int) (chunks [][]byte) {
 // If "startat" parameter is less than 0, then it will be set to 0.
 // If token is empty or no token found it will return -1.
 func TokenFind(text, token []byte, startat int) (at int) {
-	textlen := len(text)
-	tokenlen := len(token)
-	if tokenlen == 0 {
-		return -1
-	}
-	if startat < 0 {
-		startat = 0
-	}
-
-	y := 0
-	at = -1
-	for x := startat; x < textlen; x++ {
-		if text[x] == token[y] {
-			if y == 0 {
-				at = x
-			}
-			y++
-			if y == tokenlen {
-				// we found it!
-				return at
-			}
-		} else if at != -1 {
-			// reset back
-			y = 0
-			at = -1
-		}
-	}
-	// x run out before y
-	if y < tokenlen {
-		at = -1
-	}
-
-	return at
+	return inbytes.TokenFind(text, token, startat)
 }
 
 // WordIndexes returns the index of the all instance of word in s as long as

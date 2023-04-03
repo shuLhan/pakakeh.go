@@ -9,7 +9,7 @@ import (
 	"io"
 	"os"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	inbytes "github.com/shuLhan/share/internal/bytes"
 	"github.com/shuLhan/share/lib/text"
 )
 
@@ -162,7 +162,7 @@ func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen 
 		for ; x < max; x++ {
 			token := old[x : x+minlen]
 
-			y = libbytes.TokenFind(new, token, 0)
+			y = inbytes.TokenFind(new, token, 0)
 			if y > 0 {
 				break
 			}
@@ -330,7 +330,7 @@ func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	}
 	xtoken := oldleft[:minlen]
 
-	xaty := libbytes.TokenFind(newleft, xtoken, 0)
+	xaty := inbytes.TokenFind(newleft, xtoken, 0)
 
 	// Get miniminal token to search in the old left over.
 	minlen = DefMatchLen
@@ -339,7 +339,7 @@ func Bytes(old, new []byte, atx, aty int) (adds, dels text.Chunks) {
 	}
 	ytoken := newleft[:minlen]
 
-	yatx := libbytes.TokenFind(oldleft, ytoken, 0)
+	yatx := inbytes.TokenFind(oldleft, ytoken, 0)
 
 	// Case 4:
 	// We did not find matching token of x in y, its mean the some chunk
@@ -420,7 +420,7 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 	for ; xx < oldleftlen-minlen; xx++ {
 		token := (*oldleft)[xx : xx+minlen]
 
-		xaty = libbytes.TokenFind(*newleft, token, 0)
+		xaty = inbytes.TokenFind(*newleft, token, 0)
 		if xaty > 0 {
 			break
 		}
@@ -436,7 +436,7 @@ func searchForward(atx, aty int, x, y *int, oldleft, newleft *[]byte) (
 	for ; yy < newleftlen-minlen; yy++ {
 		token := (*newleft)[yy : yy+minlen]
 
-		yatx = libbytes.TokenFind(*oldleft, token, 0)
+		yatx = inbytes.TokenFind(*oldleft, token, 0)
 		if yatx > 0 {
 			break
 		}
