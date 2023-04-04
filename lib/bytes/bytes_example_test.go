@@ -386,6 +386,14 @@ func ExampleTokenFind() {
 	// 64
 }
 
+func ExampleTrimNull() {
+	var in = []byte{0, 'H', 'e', 'l', 'l', 'o', 0, 0}
+
+	in = TrimNull(in)
+	fmt.Printf(`%s`, in)
+	// Output: Hello
+}
+
 func ExampleWordIndexes() {
 	text := []byte("moo moomoo moo")
 

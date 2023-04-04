@@ -525,6 +525,27 @@ func TokenFind(text, token []byte, startat int) (at int) {
 	return inbytes.TokenFind(text, token, startat)
 }
 
+// TrimNull remove 0 value ("\0" or NULL in C) at leading and trailing of
+// in.
+func TrimNull(in []byte) (out []byte) {
+	var start int
+	for ; start < len(in); start++ {
+		if in[start] != 0 {
+			break
+		}
+	}
+
+	var end = len(in) - 1
+	for ; end > start; end-- {
+		if in[end] != 0 {
+			break
+		}
+	}
+	end++
+
+	return in[start:end]
+}
+
 // WordIndexes returns the index of the all instance of word in s as long as
 // word is separated by space or at the beginning or end of s.
 func WordIndexes(s []byte, word []byte) (idxs []int) {
