@@ -408,10 +408,10 @@ func ExampleDumpPrettyTable() {
 	fmt.Println(bb.String())
 	// Output:
 	// DumpPrettyTable
-	//     |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|
-	//     |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|
-	// 0x00| 01 02 03 48 65 6c 6c 6f| . . . H e l l o|   1   2   3  72 101 108 108 111|00
-	// 0x08| fe ff                  | . .            | 254 255                        |08
+	//           |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+	//           |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+	// 0x00000000| 01 02 03 48 65 6c 6c 6f | ...Hello |   1   2   3  72 101 108 108 111 |0
+	// 0x00000008| fe ff                   | ..       | 254 255                         |8
 }
 
 func ExampleWriteUint16() {

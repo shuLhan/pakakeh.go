@@ -560,8 +560,8 @@ func DumpPrettyTable(w io.Writer, title string, data []byte) {
 	const ncol = 8
 
 	fmt.Fprintf(w, "%s\n", title)
-	fmt.Fprint(w, "    |  0  1  2  3  4  5  6  7| 0 1 2 3 4 5 6 7|   0   1   2   3   4   5   6   7|\n")
-	fmt.Fprint(w, "    |  8  9  A  B  C  D  E  F| 8 9 A B C D E F|   8   9   A   B   C   D   E   F|\n")
+	fmt.Fprint(w, "          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |\n")
+	fmt.Fprint(w, "          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |\n")
 
 	var (
 		chunks = SplitEach(data, ncol)
@@ -571,7 +571,7 @@ func DumpPrettyTable(w io.Writer, title string, data []byte) {
 		c      byte
 	)
 	for x, chunk = range chunks {
-		fmt.Fprintf(w, `%#02x|`, x*ncol)
+		fmt.Fprintf(w, `%#08x|`, x*ncol)
 
 		// Print as hex.
 		for y, c = range chunk {
@@ -582,27 +582,27 @@ func DumpPrettyTable(w io.Writer, title string, data []byte) {
 		}
 
 		// Print as char.
-		fmt.Fprint(w, `|`)
+		fmt.Fprint(w, ` | `)
 		for y, c = range chunk {
 			if c >= 33 && c <= 126 {
-				fmt.Fprintf(w, ` %c`, c)
+				fmt.Fprintf(w, `%c`, c)
 			} else {
-				fmt.Fprint(w, ` .`)
+				fmt.Fprint(w, `.`)
 			}
 		}
 		for y++; y < ncol; y++ {
-			fmt.Fprint(w, `  `)
+			fmt.Fprint(w, ` `)
 		}
 
 		// Print as integer.
-		fmt.Fprint(w, `|`)
+		fmt.Fprint(w, ` |`)
 		for y, c = range chunk {
 			fmt.Fprintf(w, ` %3d`, c)
 		}
 		for y++; y < ncol; y++ {
 			fmt.Fprint(w, `    `)
 		}
-		fmt.Fprintf(w, "|%02d\n", x*ncol)
+		fmt.Fprintf(w, " |%d\n", x*ncol)
 	}
 }
 
