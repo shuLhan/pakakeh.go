@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strconv"
 	"unicode"
 
 	inbytes "github.com/shuLhan/share/internal/bytes"
@@ -293,6 +294,98 @@ func MergeSpaces(in []byte) (out []byte) {
 	}
 
 	return out
+}
+
+// ParseHexDump parse the default output of [hexdump](1) utility from
+// parameter in back into stream of byte.
+//
+// An example of default output of hexdump is
+//
+//	0000000 7865 5f70 6964 2f72 0000 0000 0000 0000
+//	0000010 0000 0000 0000 0000 0000 0000 0000 0000
+//	*
+//	0000060 0000 0000 3030 3030 3537 0035 3030 3130
+//
+// The first column is the address and the rest of the column is the data.
+// Each data column is 16-bit words in big-endian order, so in the above
+// example, the first byte would be 65, second byte is 78 and so on.
+// The asterisk "*" means that the address from 0000020 to 0000050 is equal to
+// the previous line, 0000010.
+//
+// [hexdump]: https://man.archlinux.org/man/hexdump.1
+func ParseHexDump(in []byte) (out []byte, err error) {
+	var (
+		logp        = `ParseHexDump`
+		parser      = NewParser(in, []byte(" \n"))
+		d      byte = 255 // Just to make the first for-loop pass.
+
+		token      []byte
+		vint64     int64
+		x          int
+		isAsterisk bool
+	)
+	for d != 0 {
+		// Read the address.
+		token, d = parser.Read()
+		if len(token) == 0 {
+			break
+		}
+		if len(token) == 1 {
+			if token[0] != '*' {
+				break
+			}
+			isAsterisk = true
+			continue
+		}
+
+		vint64, err = strconv.ParseInt(string(token), 16, 64)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		if isAsterisk {
+			if len(out) > 0 {
+				var start = len(out)
+				if start < 16 {
+					start = 0
+				} else {
+					start = start - 16
+				}
+				var (
+					prevRow      = out[start:]
+					identicalRow = int((vint64 - int64(len(out))) / 16)
+				)
+				for x = 0; x < identicalRow; x++ {
+					out = append(out, prevRow...)
+				}
+			}
+		}
+
+		// Read the two-hex, 16-bit words.
+		for x = 0; x < 8; x++ {
+			token, d = parser.Read()
+			if len(token) == 0 {
+				break
+			}
+
+			vint64, err = strconv.ParseInt(string(token), 16, 64)
+			if err != nil {
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
+			}
+
+			out = append(out, byte(vint64))
+			out = append(out, byte(vint64>>8))
+
+			if d == '\n' {
+				break
+			}
+		}
+		// Ignore trailing characters.
+		if d != '\n' {
+			parser.SkipLine()
+		}
+	}
+	return out, nil
 }
 
 // PrintHex will print each byte in slice as hexadecimal value into N column

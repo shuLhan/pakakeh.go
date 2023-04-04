@@ -1,0 +1,48 @@
+>>> trailing new line
+0000000 6548 6c6c 2c6f 7720 726f 646c 0a21
+
+
+<<< trailing new line
+Hello, world!
+
+
+>>> invalid address
+000000x 6548 6c6c 2c6f 7720 726f 646c 0a21
+
+<<< invalid address
+ParseHexDump: strconv.ParseInt: parsing "000000x": invalid syntax
+
+>>> start with asterisk
+*
+0000000 6548 6c6c 2c6f 7720 726f 646c 0a21
+
+<<< start with asterisk
+Hello, world!
+
+
+>>> first row < 16
+0000000 6548 6c6c 2c6f 7720 726f 646c 0a21
+*
+0000020 6548 6c6c 2c6f 7720 726f 646c 0a21
+
+<<< first row < 16
+Hello, world!
+Hello, world!
+Hello, world!
+
+
+>>> invalid hex
+0000000 654x 6c6c 2c6f 7720 726f 646c 0a21
+
+<<< invalid hex
+ParseHexDump: strconv.ParseInt: parsing "654x": invalid syntax
+
+>>> invalid character on new line
+0000000 6548 6c6c 2c6f 7720 726f 646c 0a21
+-
+
+<<< invalid character on new line
+Hello, world!
+
+
+<<< DONE.

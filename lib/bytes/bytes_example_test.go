@@ -7,6 +7,7 @@ package bytes
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"math"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -247,6 +248,24 @@ func ExampleMergeSpaces() {
 	// Output:
 	//
 	//  a
+}
+
+func ExampleParseHexDump() {
+	var (
+		in = []byte("0000000 6548 6c6c 2c6f 7720 726f 646c 0021")
+
+		out []byte
+		err error
+	)
+
+	out, err = ParseHexDump(in)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(`%s`, TrimNull(out))
+	// Output:
+	// Hello, world!
 }
 
 func ExamplePrintHex() {

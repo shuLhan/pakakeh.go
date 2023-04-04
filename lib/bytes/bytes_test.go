@@ -5,10 +5,75 @@
 package bytes
 
 import (
+	"fmt"
+	"os"
+	"path"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
+
+func TestParseHexDump(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/ParseHexDump_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		tag string
+		in  []byte
+		exp []byte
+		got []byte
+	)
+	for tag, in = range tdata.Input {
+		exp = tdata.Output[tag]
+
+		got, err = ParseHexDump(in)
+		if err != nil {
+			test.Assert(t, tag, string(exp), err.Error())
+			continue
+		}
+
+		test.Assert(t, tag, string(exp), string(got))
+	}
+}
+
+func TestParseHexDumpExpDirTar(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/ParseHexDump_exp_dir_tar_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		tag     = `exp_dir.tar`
+		expFile = path.Join(`testdata`, tag)
+
+		exp []byte
+		got []byte
+	)
+
+	got, err = ParseHexDump(tdata.Input[tag])
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exp, err = os.ReadFile(expFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Assert(t, tag, exp, got)
+}
 
 func TestTrimNull(t *testing.T) {
 	type testCase struct {
