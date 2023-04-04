@@ -6,7 +6,6 @@ package websocket
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -162,7 +161,7 @@ func testRootRouteAdd(t *testing.T, defMethod string) {
 
 		got = rootRoute.getParent(c.method)
 
-		test.Assert(t, "route", fmt.Sprintf("%+v", c.exp), fmt.Sprintf("%+v", got))
+		test.Assert(t, "route", c.exp, got)
 	}
 }
 
