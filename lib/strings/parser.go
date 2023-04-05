@@ -2,11 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package parser provide a common text parser, using delimiters.
-//
-// DEPRECATED: this package has been merged with package lib/strings and will
-// be removed in the next six release v0.51.0.
-package parser
+package strings
 
 import (
 	"fmt"
@@ -15,27 +11,27 @@ import (
 	libascii "github.com/shuLhan/share/lib/ascii"
 )
 
-// Parser implement text parsing.
+// Parser implement text parsing over string.
 type Parser struct {
 	file   string
 	delims string
-	x      int    // x is the position of read in v.
 	v      string // v contains the text to be parsed.
 	token  []rune // token that has been parsed.
+	x      int    // x is the position of read in v.
 	d      rune   // d is one of delims character that terminated parsing.
 }
 
-// Lines parse the content of path and return non-empty lines.
-func Lines(file string) ([]string, error) {
-	p, err := Open(file, "")
+// LinesOfFile parse the content of file and return non-empty lines.
+func LinesOfFile(file string) ([]string, error) {
+	p, err := OpenForParser(file, ``)
 	if err != nil {
-		return nil, fmt.Errorf("Lines: %w", err)
+		return nil, fmt.Errorf(`LinesOfFile: %w`, err)
 	}
 	return p.Lines(), nil
 }
 
-// New create and initialize parser from content and delimiters.
-func New(content, delims string) (p *Parser) {
+// NewParser create and initialize parser from content and delimiters.
+func NewParser(content, delims string) (p *Parser) {
 	p = &Parser{
 		token: make([]rune, 0, 16),
 	}
@@ -45,16 +41,15 @@ func New(content, delims string) (p *Parser) {
 	return p
 }
 
-// Open create and initialize the parser using predefined delimiters.
-// All the content of file will be loaded first.
+// OpenForParser create and initialize the Parser using content from file.
 // If delimiters is empty, it would default to all whitespaces characters.
-func Open(file, delims string) (p *Parser, err error) {
+func OpenForParser(file, delims string) (p *Parser, err error) {
 	v, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	p = New(string(v), delims)
+	p = NewParser(string(v), delims)
 	p.file = file
 
 	return p, nil
@@ -79,10 +74,10 @@ func (p *Parser) AddDelimiters(delims string) {
 
 // Close the parser by resetting all its internal state to zero value.
 func (p *Parser) Close() {
-	p.file = ""
-	p.delims = ""
+	p.file = ``
+	p.delims = ``
 	p.x = 0
-	p.v = ""
+	p.v = ``
 	p.token = p.token[:0]
 	p.d = 0
 }
@@ -187,15 +182,15 @@ func (p *Parser) Stop() (remain string, pos int) {
 	return remain, pos
 }
 
-// Token read the next token from content until one of the delimiter found.
+// Read read the next token from content until one of the delimiter found.
 // if no delimiter found, its mean all of content has been read, the returned
 // delimiter will be 0.
-func (p *Parser) Token() (string, rune) {
+func (p *Parser) Read() (string, rune) {
 	p.d = 0
 	p.token = p.token[:0]
 
 	if p.x >= len(p.v) {
-		return "", 0
+		return ``, 0
 	}
 
 	for x, r := range p.v[p.x:] {
@@ -214,19 +209,19 @@ func (p *Parser) Token() (string, rune) {
 	return string(p.token), 0
 }
 
-// TokenEscaped read the next token from content until one of the delimiter
+// ReadEscaped read the next token from content until one of the delimiter
 // found, unless its escaped with value of esc character.
 //
 // For example, if the content is "a b" and one of the delimiter is " ",
 // escaping it with "\" will return as "a b" not "a".
-func (p *Parser) TokenEscaped(esc rune) (string, rune) {
+func (p *Parser) ReadEscaped(esc rune) (string, rune) {
 	var isEscaped bool
 
 	p.token = p.token[:0]
 
 	if p.x >= len(p.v) {
 		p.d = 0
-		return "", 0
+		return ``, 0
 	}
 
 	for x, r := range p.v[p.x:] {
@@ -260,14 +255,14 @@ func (p *Parser) TokenEscaped(esc rune) (string, rune) {
 	return string(p.token), p.d
 }
 
-// TokenTrimSpace read the next token until one of the delimiter found, with
+// ReadNoSpace read the next token until one of the delimiter found, with
 // leading and trailing spaces are ignored.
-func (p *Parser) TokenTrimSpace() (v string, r rune) {
+func (p *Parser) ReadNoSpace() (v string, r rune) {
 	p.d = 0
 	p.token = p.token[:0]
 
 	if p.x >= len(p.v) {
-		return "", 0
+		return ``, 0
 	}
 
 	var x int
@@ -300,7 +295,7 @@ func (p *Parser) TokenTrimSpace() (v string, r rune) {
 	}
 	if x < 0 {
 		// Empty token.
-		return "", p.d
+		return ``, p.d
 	}
 	p.token = p.token[:x+1]
 
