@@ -64,7 +64,7 @@ func ExampleMergeSpaces() {
 }
 
 func ExampleSplit() {
-	var line string = `a b   c [A] B C`
+	var line = `a b   c [A] B C`
 	fmt.Println(Split(line, false, false))
 	fmt.Println(Split(line, true, false))
 	fmt.Println(Split(line, false, true))
