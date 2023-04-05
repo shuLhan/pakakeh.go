@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/shuLhan/share/lib/ascii"
-	libio "github.com/shuLhan/share/lib/io"
+	libos "github.com/shuLhan/share/lib/os"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
@@ -175,7 +175,7 @@ func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
 	}
 
 	if len(inFiles) == 1 {
-		err = libio.Copy(outFile, inFiles[0])
+		err = libos.Copy(outFile, inFiles[0])
 		return 0, err
 	}
 
