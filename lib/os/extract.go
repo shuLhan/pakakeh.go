@@ -31,6 +31,9 @@ const (
 )
 
 var (
+	// ErrExtractInputExt define an error when the input file extension is
+	// unknown.
+	// This does not means that the file is not supported.
 	ErrExtractInputExt = errors.New("unknown extract input extension")
 )
 
