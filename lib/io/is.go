@@ -15,6 +15,8 @@ import (
 // IsBinary will return true if content of file is binary.
 // If file is not exist or there is an error when reading or closing the file,
 // it will return false.
+//
+// DEPRECATED: moved to [lib/os#IsBinary].
 func IsBinary(file string) bool {
 	var (
 		total     int
@@ -59,6 +61,8 @@ func IsBinary(file string) bool {
 
 // IsDirEmpty will return true if directory is not exist or empty; otherwise
 // it will return false.
+//
+// DEPRECATED: moved to [lib/os#IsDirEmpty].
 func IsDirEmpty(dir string) (ok bool) {
 	d, err := os.Open(dir)
 	if err != nil {
@@ -80,6 +84,8 @@ func IsDirEmpty(dir string) (ok bool) {
 
 // IsFileExist will return true if relative path is exist on parent directory;
 // otherwise it will return false.
+//
+// DEPRECATED: moved to [lib/os#IsFileExist].
 func IsFileExist(parent, relpath string) bool {
 	path := filepath.Join(parent, relpath)
 

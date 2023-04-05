@@ -16,6 +16,8 @@ import (
 // If the output file is already exist, it will be truncated.
 // If the file is not exist, it will created with permission set to user's
 // read-write only.
+//
+// DEPRECATED: moved to lib/os#Copy.
 func Copy(out, in string) (err error) {
 	fin, err := os.Open(in)
 	if err != nil {

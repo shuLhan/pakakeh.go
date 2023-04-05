@@ -11,6 +11,8 @@ import (
 
 // RmdirEmptyAll remove directory in path if it's empty until one of the
 // parent is not empty.
+//
+// DEPRECATED: moved to [lib/os#RmdirEmptyAll].
 func RmdirEmptyAll(path string) error {
 	if len(path) == 0 {
 		return nil

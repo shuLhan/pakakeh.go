@@ -3,7 +3,207 @@ package os
 import (
 	"os"
 	"testing"
+
+	"github.com/shuLhan/share/lib/test"
 )
+
+func TestCopy(t *testing.T) {
+	cases := []struct {
+		desc   string
+		in     string
+		out    string
+		expErr string
+	}{{
+		desc:   `Without output file`,
+		in:     `testdata/Copy/input.txt`,
+		expErr: `Copy: failed to open output file: open : no such file or directory`,
+	}, {
+		desc:   `Without input file`,
+		out:    `testdata/Copy/output.txt`,
+		expErr: `Copy: failed to open input file: open : no such file or directory`,
+	}, {
+		desc: `With input and output`,
+		in:   `testdata/Copy/input.txt`,
+		out:  `testdata/Copy/output.txt`,
+	}}
+
+	for _, c := range cases {
+		err := Copy(c.out, c.in)
+		if err != nil {
+			test.Assert(t, c.desc, c.expErr, err.Error())
+			continue
+		}
+
+		exp, err := os.ReadFile(c.in)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := os.ReadFile(c.out)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.desc, string(exp), string(got))
+	}
+}
+
+func TestIsDirEmpty(t *testing.T) {
+	emptyDir := "testdata/dirempty"
+	err := os.MkdirAll(emptyDir, 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc string
+		path string
+		exp  bool
+	}{{
+		desc: `With dir not exist`,
+		path: `testdata/notexist`,
+		exp:  true,
+	}, {
+		desc: `With dir exist and not empty`,
+		path: `testdata`,
+	}, {
+		desc: `With dir exist and empty`,
+		path: `testdata/dirempty`,
+		exp:  true,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := IsDirEmpty(c.path)
+
+		test.Assert(t, "", c.exp, got)
+	}
+}
+
+func TestIsFileExist(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		desc, parent, relpath string
+		exp                   bool
+	}{{
+		desc:    "With directory",
+		relpath: "testdata",
+	}, {
+		desc:    "With non existen path",
+		parent:  "/random",
+		relpath: "file",
+	}, {
+		desc:    "With file exist without parent",
+		relpath: "testdata/.empty",
+		exp:     true,
+	}, {
+		desc:    "With file exist",
+		parent:  wd,
+		relpath: "testdata/.empty",
+		exp:     true,
+	}}
+
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		got := IsFileExist(c.parent, c.relpath)
+
+		test.Assert(t, "", c.exp, got)
+	}
+}
+
+func TestRmdirEmptyAll(t *testing.T) {
+	t.Cleanup(func() {
+		_ = os.Remove(`testdata/file`)
+		_ = os.RemoveAll(`testdata/a`)
+		_ = os.RemoveAll(`testdata/dirempty`)
+	})
+
+	cases := []struct {
+		desc        string
+		createDir   string
+		createFile  string
+		path        string
+		expExist    string
+		expNotExist string
+	}{{
+		desc:       `With path as file`,
+		path:       `testdata/file`,
+		createFile: `testdata/file`,
+		expExist:   `testdata/file`,
+	}, {
+		desc:      `With empty path`,
+		createDir: `testdata/a/b/c/d`,
+		expExist:  `testdata/a/b/c/d`,
+	}, {
+		desc:        `With non empty at middle`,
+		createDir:   `testdata/a/b/c/d`,
+		createFile:  `testdata/a/b/file`,
+		path:        `testdata/a/b/c/d`,
+		expExist:    `testdata/a/b/file`,
+		expNotExist: `testdata/a/b/c`,
+	}, {
+		desc:        `With first path not exist`,
+		createDir:   `testdata/a/b/c`,
+		path:        `testdata/a/b/c/d`,
+		expExist:    `testdata/a/b/file`,
+		expNotExist: `testdata/a/b/c`,
+	}, {
+		desc:        `With non empty at parent`,
+		createDir:   `testdata/dirempty/a/b/c/d`,
+		path:        `testdata/dirempty/a/b/c/d`,
+		expExist:    `testdata`,
+		expNotExist: `testdata/dirempty`,
+	}}
+
+	var (
+		err error
+		f   *os.File
+	)
+	for _, c := range cases {
+		t.Log(c.desc)
+
+		if len(c.createDir) > 0 {
+			err = os.MkdirAll(c.createDir, 0700)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		if len(c.createFile) > 0 {
+			f, err = os.Create(c.createFile)
+			if err != nil {
+				t.Fatal(err)
+			}
+			err = f.Close()
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		err = RmdirEmptyAll(c.path)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(c.expExist) > 0 {
+			_, err = os.Stat(c.expExist)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		if len(c.expNotExist) > 0 {
+			_, err = os.Stat(c.expNotExist)
+			if !os.IsNotExist(err) {
+				t.Fatal(err)
+			}
+		}
+	}
+}
 
 // TestStat test to see the difference between Stat and Lstat.
 func TestStat(t *testing.T) {
