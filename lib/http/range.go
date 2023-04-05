@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 // Range define the unit and list of start-end positions for resource.
@@ -82,7 +82,7 @@ func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) 
 // An invalid position will be skipped.
 func ParseRange(v string) (r Range) {
 	var (
-		par = parser.New(v, `=`)
+		par = libstrings.NewParser(v, `=`)
 
 		tok   string
 		delim rune
@@ -90,7 +90,7 @@ func ParseRange(v string) (r Range) {
 	)
 
 	for {
-		tok, delim = par.TokenTrimSpace()
+		tok, delim = par.ReadNoSpace()
 		if delim == 0 {
 			// No '=' found.
 			return r
@@ -107,7 +107,7 @@ func ParseRange(v string) (r Range) {
 	)
 	par.SetDelimiters(`-,`)
 	for delim != 0 {
-		tok, delim = par.TokenTrimSpace()
+		tok, delim = par.ReadNoSpace()
 		if len(tok) == 0 {
 			if delim == 0 {
 				break
@@ -118,7 +118,7 @@ func ParseRange(v string) (r Range) {
 			}
 			if delim == '-' {
 				// Probably "-last".
-				tok, delim = par.TokenTrimSpace()
+				tok, delim = par.ReadNoSpace()
 				if delim != 0 && delim != ',' {
 					// Invalid "-start-" or "-start-end".
 					skipPosition(par, delim)
@@ -148,7 +148,7 @@ func ParseRange(v string) (r Range) {
 			continue
 		}
 
-		tok, delim = par.TokenTrimSpace()
+		tok, delim = par.ReadNoSpace()
 		if delim == '-' {
 			// Invalid range "start-end-"
 			skipPosition(par, delim)
@@ -177,9 +177,9 @@ func ParseRange(v string) (r Range) {
 }
 
 // skipPosition Ignore any string until ','.
-func skipPosition(par *parser.Parser, delim rune) {
+func skipPosition(par *libstrings.Parser, delim rune) {
 	for delim != ',' && delim != 0 {
-		_, delim = par.Token()
+		_, delim = par.Read()
 	}
 }
 

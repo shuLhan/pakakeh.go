@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 type RangePosition struct {
@@ -30,7 +30,7 @@ type RangePosition struct {
 // It will return nil if the v is invalid.
 func ParseContentRange(v string) (pos *RangePosition) {
 	var (
-		p = parser.New(v, ` `)
+		p = libstrings.NewParser(v, ` `)
 
 		tok   string
 		delim rune
@@ -39,7 +39,7 @@ func ParseContentRange(v string) (pos *RangePosition) {
 
 	pos = &RangePosition{}
 
-	tok, delim = p.TokenTrimSpace()
+	tok, delim = p.ReadNoSpace()
 	if delim != ' ' {
 		return nil
 	}
@@ -48,10 +48,10 @@ func ParseContentRange(v string) (pos *RangePosition) {
 
 	p.SetDelimiters(`-/`)
 
-	tok, delim = p.TokenTrimSpace()
+	tok, delim = p.ReadNoSpace()
 	if len(tok) == 0 && delim == '-' {
 		// Probably "-last".
-		tok, delim = p.TokenTrimSpace()
+		tok, delim = p.ReadNoSpace()
 		if delim != '/' {
 			return nil
 		}
@@ -72,7 +72,7 @@ func ParseContentRange(v string) (pos *RangePosition) {
 			return nil
 		}
 
-		tok, delim = p.TokenTrimSpace()
+		tok, delim = p.ReadNoSpace()
 		if delim != '/' {
 			return nil
 		}
@@ -88,7 +88,7 @@ func ParseContentRange(v string) (pos *RangePosition) {
 	}
 
 	// The size.
-	tok, delim = p.TokenTrimSpace()
+	tok, delim = p.ReadNoSpace()
 	if delim != 0 {
 		return nil
 	}
