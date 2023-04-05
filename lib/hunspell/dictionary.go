@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 type dictionary struct {
@@ -35,7 +35,7 @@ func (dict *dictionary) open(file string, opts *affixOptions) (err error) {
 
 // load dictionary from string.
 func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
-	p := parser.New(content, "")
+	p := libstrings.NewParser(content, "")
 
 	// The string splitted into lines and then parsed one by one.
 	lines := p.Lines()

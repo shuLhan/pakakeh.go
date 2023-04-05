@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 // Stem contains the word and its attributes.
@@ -81,16 +81,17 @@ func (stem *Stem) Analyze() Morphemes {
 //	STEM := WORD [ " " WORD ] [ "/" FLAGS ] [ *MORPHEME ]
 func (stem *Stem) parse(line string) (err error) {
 	var (
+		p = libstrings.NewParser(line, " \t")
+
 		token  string
 		sep    rune
 		nwords int
-		p      = parser.New(line, " \t")
 	)
 
 	// Parse one or two words with optional flags, and possibly one
 	// morpheme.
 	for {
-		token, sep = p.Token()
+		token, sep = p.Read()
 		if len(token) == 0 {
 			return nil
 		}
@@ -131,7 +132,7 @@ func (stem *Stem) parse(line string) (err error) {
 	}
 	// Parse the rest of morphemes.
 	for {
-		token, _ = p.Token()
+		token, _ = p.Read()
 		if len(token) == 0 {
 			break
 		}

@@ -13,7 +13,6 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/shuLhan/share/lib/parser"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
@@ -175,7 +174,7 @@ func (opts *affixOptions) open(file string) (err error) {
 
 // load affix options from string.
 func (opts *affixOptions) load(content string) (err error) {
-	p := parser.New(content, "")
+	p := libstrings.NewParser(content, "")
 
 	lines := p.Lines()
 

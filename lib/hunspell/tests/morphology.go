@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/shuLhan/share/lib/hunspell"
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 const (
@@ -24,7 +24,7 @@ type morphology struct {
 }
 
 func parseMorphologiesFile(morphFile string) (morphs map[string]morphology, err error) {
-	lines, err := parser.Lines(morphFile)
+	lines, err := libstrings.LinesOfFile(morphFile)
 	if err != nil {
 		return nil, err
 	}
@@ -82,11 +82,11 @@ func (morph *morphology) parseAnalyze(line string) (err error) {
 		sep   rune
 	)
 	for {
-		token, sep = p.Token()
+		token, sep = p.Read()
 		if sep == 0 {
 			break
 		}
-		morph.analyze[token], _ = p.Token()
+		morph.analyze[token], _ = p.Read()
 		p.SkipHorizontalSpaces()
 	}
 	return nil
@@ -98,19 +98,17 @@ func (morph *morphology) parseStem(line string) (err error) {
 		return fmt.Errorf("parseStem: %w", err)
 	}
 
-	morph.stem, _ = p.Token()
+	morph.stem, _ = p.Read()
 
 	return nil
 }
 
-func (morph *morphology) initParser(line, exp string) (
-	p *parser.Parser, err error,
-) {
-	p = parser.New(line, "()=: \t")
+func (morph *morphology) initParser(line, exp string) (p *libstrings.Parser, err error) {
+	p = libstrings.NewParser(line, "()=: \t")
 
 	p.SkipHorizontalSpaces()
 
-	token, sep := p.Token()
+	token, sep := p.Read()
 	if token != exp {
 		return nil, fmt.Errorf("expecting %q, got %q", exp, token)
 	}
@@ -120,7 +118,7 @@ func (morph *morphology) initParser(line, exp string) (
 
 	p.SkipHorizontalSpaces()
 
-	token, sep = p.Token()
+	token, sep = p.Read()
 	if sep != ')' {
 		return nil, fmt.Errorf("expecting ')', got %q", sep)
 	}
@@ -130,7 +128,7 @@ func (morph *morphology) initParser(line, exp string) (
 
 	p.SkipHorizontalSpaces()
 
-	token, sep = p.Token()
+	token, sep = p.Read()
 	if sep != '=' {
 		return nil, fmt.Errorf("expecting '=', got %q", sep)
 	}

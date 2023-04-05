@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/shuLhan/share/lib/hunspell"
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -37,7 +37,7 @@ func TestHunspell(t *testing.T) {
 			t.Fatalf("%s: %s", affFile, err)
 		}
 
-		exps, err := parser.Lines(goodFile)
+		exps, err := libstrings.LinesOfFile(goodFile)
 		if err != nil {
 			t.Fatalf("%s: %s", goodFile, err)
 		}

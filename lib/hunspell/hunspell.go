@@ -13,7 +13,7 @@ import (
 
 	"github.com/shuLhan/share/lib/ascii"
 	libio "github.com/shuLhan/share/lib/io"
-	"github.com/shuLhan/share/lib/parser"
+	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
 // List of affix file general options.
@@ -182,7 +182,7 @@ func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
 	dict := make(map[string]string, 1024)
 
 	for x := 0; x < len(inFiles); x++ {
-		lines, err := parser.Lines(inFiles[x])
+		lines, err := libstrings.LinesOfFile(inFiles[x])
 		if err != nil {
 			return 0, err
 		}
