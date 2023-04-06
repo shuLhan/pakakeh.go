@@ -145,93 +145,105 @@ func TestUnpackDate(t *testing.T) {
 		exp    time.Time
 		expErr string
 		desc   string
-		value  []byte
+		value  string
 	}{{
-		desc:   "With empty value",
-		expErr: "unpackDate: empty date",
+		desc:   `With empty value`,
+		expErr: `unpackDate: empty date`,
 	}, {
-		desc:   "With only spaces",
-		value:  []byte("  "),
-		expErr: "unpackDate: empty date",
+		desc:   `With only spaces`,
+		value:  `  `,
+		expErr: `unpackDate: empty date`,
 	}, {
-		desc:   "With invalid date format",
-		value:  []byte("Sat"),
-		expErr: "unpackDate: invalid date format",
+		desc:   `With missing day`,
+		value:  `Sat`,
+		expErr: `unpackDate: invalid or missing day Sat`,
 	}, {
-		desc:   "With invalid date format",
-		value:  []byte("Sat,"),
-		expErr: "unpackDate: invalid date format",
+		desc:   `With missing day`,
+		value:  `Sat,`,
+		expErr: `unpackDate: invalid or missing day `,
 	}, {
-		desc:   "With missing month",
-		value:  []byte("Sat, 2"),
-		expErr: "unpackDate: missing month",
+		desc:   `With invalid day of week`,
+		value:  `Satu, 2`,
+		expErr: `unpackDate: invalid day of week Satu`,
 	}, {
-		desc:   "With missing month",
-		value:  []byte("Sat, 2 "),
-		expErr: "unpackDate: missing month",
+		desc:   `With missing month`,
+		value:  `Sat, 2`,
+		expErr: `unpackDate: invalid or missing month `,
 	}, {
-		desc:   "With invalid month",
-		value:  []byte("Sat, 2 X 2019"),
-		expErr: "unpackDate: invalid month: 'X'",
+		desc:   `With invalid month`,
+		value:  `Sat, 2 X 2019`,
+		expErr: `unpackDate: invalid or missing month X`,
 	}, {
-		desc:   "With missing year",
-		value:  []byte("Sat, 2 Feb"),
-		expErr: "unpackDate: invalid year",
+		desc:   `With missing year`,
+		value:  `Sat, 2 Feb`,
+		expErr: `unpackDate: invalid or missing year `,
 	}, {
-		desc:   "With invalid year",
-		value:  []byte("Sat, 2 Feb 2019"),
-		expErr: "unpackDate: invalid year",
+		desc:   `With missing hour`,
+		value:  `Sat, 2 Feb 2019`,
+		expErr: `unpackDate: invalid or missing hour `,
 	}, {
-		desc:   "With invalid hour",
-		value:  []byte("Sat, 2 Feb 2019 00"),
-		expErr: "unpackDate: invalid hour",
+		desc:   `With missing minute`,
+		value:  `Sat, 2 Feb 2019 00`,
+		expErr: `unpackDate: invalid or missing time separator`,
 	}, {
-		desc:   "With invalid hour",
-		value:  []byte("Sat, 2 Feb 2019 24:55:16 +0000"),
-		expErr: "unpackDate: invalid hour: 24",
+		desc:   `With invalid hour`,
+		value:  `Sat, 2 Feb 2019 24:55:16 +0000`,
+		expErr: `unpackDate: invalid hour 24`,
 	}, {
-		desc:   "With invalid minute",
-		value:  []byte("Sat, 2 Feb 2019 00:60:16 +0000"),
-		expErr: "unpackDate: invalid minute: 60",
+		desc:   `With invalid minute`,
+		value:  `Sat, 2 Feb 2019 00:a`,
+		expErr: `unpackDate: invalid or missing minute a`,
 	}, {
-		desc:   "Without second and missing zone",
-		value:  []byte("Sat, 2 Feb 2019 00:55"),
-		expErr: "unpackDate: missing zone",
+		desc:   `With invalid minute #2`,
+		value:  `Sat, 2 Feb 2019 00:60:16 +0000`,
+		expErr: `unpackDate: invalid minute 60`,
 	}, {
-		desc:   "With invalid second",
-		value:  []byte("Sat, 2 Feb 2019 00:55:60 +0000"),
-		expErr: "unpackDate: invalid second: 60",
+		desc:   `Without second and missing zone`,
+		value:  `Sat, 2 Feb 2019 00:55`,
+		expErr: `unpackDate: invalid or missing zone `,
 	}, {
-		desc:   "With missing zone",
-		value:  []byte("Sat, 2 Feb 2019 00:55:16"),
-		expErr: "unpackDate: missing zone",
+		desc:   `With invalid second`,
+		value:  `Sat, 2 Feb 2019 00:55:xx +0000`,
+		expErr: `unpackDate: invalid second xx`,
 	}, {
-		desc:  "With zone",
-		value: []byte("Sat, 2 Feb 2019 00:55:16 UTC"),
+		desc:   `With invalid second #2`,
+		value:  `Sat, 2 Feb 2019 00:55:60 +0000`,
+		expErr: `unpackDate: invalid second 60`,
+	}, {
+		desc:   `With second and missing zone`,
+		value:  `Sat, 2 Feb 2019 00:55:16`,
+		expErr: `unpackDate: invalid or missing zone `,
+	}, {
+		desc:   `With invalid zone offset`,
+		value:  `Sat, 2 Feb 2019 00:55:16 +00T00`,
+		expErr: `unpackDate: invalid or missing zone offset +00T00`,
+	}, {
+		desc:  `With zone`,
+		value: `Sat, 2 Feb 2019 00:55:16 UTC`,
 		exp:   time.Date(2019, time.February, 2, 0, 55, 16, 0, time.UTC),
 	}, {
-		desc:  "With +0800",
-		value: []byte("Sat, 2 Feb 2019 00:55:16 +0800"),
-		exp:   time.Date(2019, time.February, 2, 0, 55, 16, 0, time.FixedZone("UTC", 8*60*60)),
+		desc:  `With +0800`,
+		value: `Sat, 2 Feb 2019 00:55:16 +0800`,
+		exp:   time.Date(2019, time.February, 2, 0, 55, 16, 0, time.FixedZone(`UTC`, 8*60*60)),
 	}, {
-		desc:  "Without week day",
-		value: []byte("2 Feb 2019 00:55:16 UTC"),
+		desc:  `Without week day`,
+		value: `2 Feb 2019 00:55:16 UTC`,
 		exp:   time.Date(2019, time.February, 2, 0, 55, 16, 0, time.UTC),
 	}, {
-		desc:  "Without second",
-		value: []byte("Sat, 2 Feb 2019 00:55 UTC"),
+		desc:  `Without second`,
+		value: `Sat, 2 Feb 2019 00:55 UTC`,
 		exp:   time.Date(2019, time.February, 2, 0, 55, 0, 0, time.UTC),
 	}, {
-		desc:  "Without week-day and second",
-		value: []byte("2 Feb 2019 00:55 UTC"),
+		desc:  `Without week-day and second`,
+		value: `2 Feb 2019 00:55 UTC`,
 		exp:   time.Date(2019, time.February, 2, 0, 55, 0, 0, time.UTC),
 	}, {
-		desc:  "With obsolete year 2 digits",
-		value: []byte("2 Feb 19 00:55 UTC"),
+		desc:  `With obsolete year 2 digits`,
+		value: `2 Feb 19 00:55 UTC`,
 		exp:   time.Date(2019, time.February, 2, 0, 55, 0, 0, time.UTC),
 	}, {
-		desc:  "With obsolete year 3 digits",
-		value: []byte("2 Feb 89 00:55 UTC"),
+		desc:  `With obsolete year 3 digits`,
+		value: `2 Feb 89 00:55 UTC`,
 		exp:   time.Date(1989, time.February, 2, 0, 55, 0, 0, time.UTC),
 	}}
 
@@ -242,15 +254,15 @@ func TestUnpackDate(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		field.setValue(c.value)
+		field.setValue([]byte(c.value))
 
 		err := field.unpack()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
+			test.Assert(t, `error`, c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "date", c.exp.String(), field.date.String())
+		test.Assert(t, `date`, c.exp.String(), field.date.String())
 	}
 }
 

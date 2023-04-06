@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"strings"
 
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 // Body represent single or multiple message body parts.
@@ -63,15 +63,19 @@ func ParseBody(raw, boundary []byte) (body *Body, rest []byte, err error) {
 	return body, rest, nil
 }
 
-func skipPreamble(raw, boundary []byte) []byte {
-	r := &libio.Reader{}
-	r.Init(raw)
+func skipPreamble(raw, boundary []byte) (remain []byte) {
+	var (
+		parser = libbytes.NewParser(raw, []byte{'\n'})
+		line   []byte
+	)
 
 	for {
-		line := r.ReadLine()
+		line, _ = parser.Read()
 		if len(line) == 0 {
-			return r.Rest()
+			remain, _ = parser.Stop()
+			return remain
 		}
+		line = append(line, lf)
 		if len(line) < len(boundary)+4 {
 			continue
 		}
@@ -84,10 +88,11 @@ func skipPreamble(raw, boundary []byte) []byte {
 		if !bytes.Equal(line[2:2+len(boundary)], boundary) {
 			continue
 		}
-		r.UnreadN(len(line))
+		parser.UnreadN(len(line))
 		break
 	}
-	return r.Rest()
+	remain, _ = parser.Stop()
+	return remain
 }
 
 // Add new MIME part to the body.

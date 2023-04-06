@@ -8,11 +8,12 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/shuLhan/share/lib/ascii"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
-	libio "github.com/shuLhan/share/lib/io"
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
@@ -327,66 +328,72 @@ func (field *Field) updateType() {
 //
 // Format,
 //
-//		[day-of-week ","] day month year hour ":" minute [ ":" second ] zone
+//	[day-of-week ","] day SP month SP year SP hour ":" minute [ ":" second ] SP zone
 //
-//	     day-of-week = "Mon" / ... / "Sun"
-//	     day         = 1*2DIGIT
-//	     month       = "Jan" / ... / "Dec"
-//	     year        = 4*DIGIT
-//	     hour        = 2DIGIT
-//	     minute      = 2DIGIT
-//	     second      = 2DIGIT
-//		zone        = ("+" / "-") 4DIGIT
+//	day-of-week = "Mon" / ... / "Sun"
+//	day         = 1*2DIGIT
+//	month       = "Jan" / ... / "Dec"
+//	year        = 4*DIGIT
+//	hour        = 2DIGIT
+//	minute      = 2DIGIT
+//	second      = 2DIGIT
+//	zone        = ("+" / "-") 4DIGIT
 func (field *Field) unpackDate() (err error) {
-	var (
-		v              []byte
-		ok             bool
-		c              byte
-		space          = []byte{' ', cr, lf}
-		day, year      int64
-		hour, min, sec int64
-		off            int64
-		month          time.Month
-		loc            *time.Location
-	)
+	var logp = `unpackDate`
 
 	if len(field.Value) == 0 {
-		return fmt.Errorf("unpackDate: empty date")
+		return fmt.Errorf(`%s: empty date`, logp)
 	}
 
-	r := &libio.Reader{}
-	r.Init(field.Value)
+	var (
+		parser = libbytes.NewParser(field.Value, []byte{',', ' ', cr, lf})
 
-	c = r.SkipSpaces()
-	if !ascii.IsDigit(c) {
-		v, _, c = r.ReadUntil([]byte{','}, nil)
-		if len(v) == 0 || c != ',' {
-			return fmt.Errorf("unpackDate: invalid date format")
+		vstr  string
+		token []byte
+		c     byte
+		ok    bool
+	)
+
+	token, c = parser.ReadNoSpace()
+	parser.RemoveDelimiters([]byte{','})
+	if c == ',' {
+		var dow = string(token)
+		for _, vstr = range libtime.ShortDayNames {
+			if vstr == dow {
+				ok = true
+				break
+			}
 		}
-		if c = r.SkipSpaces(); c == 0 {
-			return fmt.Errorf("unpackDate: invalid date format")
+		if !ok {
+			return fmt.Errorf(`%s: invalid day of week %s`, logp, dow)
 		}
+		token, _ = parser.ReadNoSpace()
 	}
 
-	// Get day ....
-	if day, c = r.ScanInt64(); c == 0 || c != ' ' {
-		return fmt.Errorf("unpackDate: missing month")
+	// Get day ...
+	var day int64
+	day, err = strconv.ParseInt(string(token), 10, 64)
+	if err != nil {
+		return fmt.Errorf(`%s: invalid or missing day %s`, logp, token)
 	}
+
 	// Get month ...
-	r.SkipSpaces()
-	v, _, _ = r.ReadUntil(space, nil)
-	month, ok = libtime.ShortMonths[string(v)]
+	var month time.Month
+	token, _ = parser.ReadNoSpace()
+	month, ok = libtime.ShortMonths[string(token)]
 	if !ok {
-		return fmt.Errorf("unpackDate: invalid month: '%s'", v)
+		return fmt.Errorf(`%s: invalid or missing month %s`, logp, token)
 	}
 
 	// Get year ...
-	r.SkipSpaces()
-	if year, c = r.ScanInt64(); c == 0 || c != ' ' {
-		return fmt.Errorf("unpackDate: invalid year")
+	var year int64
+	token, _ = parser.ReadNoSpace()
+	year, err = strconv.ParseInt(string(token), 10, 64)
+	if err != nil {
+		return fmt.Errorf(`%s: invalid or missing year %s`, logp, token)
 	}
 
-	// Obsolete year allow two or three digits.
+	// Obsolete year format allow two or three digits.
 	switch {
 	case year < 50:
 		year += 2000
@@ -394,43 +401,77 @@ func (field *Field) unpackDate() (err error) {
 		year += 1900
 	}
 
+	parser.AddDelimiters([]byte{':'})
+
 	// Get hour ...
-	if hour, c = r.ScanInt64(); c == 0 || c != ':' {
-		return fmt.Errorf("unpackDate: invalid hour")
+	var hour int64
+	token, c = parser.ReadNoSpace()
+	hour, err = strconv.ParseInt(string(token), 10, 64)
+	if err != nil {
+		return fmt.Errorf(`%s: invalid or missing hour %s`, logp, token)
 	}
 	if hour < 0 || hour > 23 {
-		return fmt.Errorf("unpackDate: invalid hour: %d", hour)
+		return fmt.Errorf(`%s: invalid hour %d`, logp, hour)
+	}
+	if c != ':' {
+		return fmt.Errorf(`%s: invalid or missing time separator`, logp)
 	}
 
 	// Get minute ...
-	r.SkipN(1)
-	min, c = r.ScanInt64()
+	var min int64
+	token, c = parser.ReadNoSpace()
+	min, err = strconv.ParseInt(string(token), 10, 64)
+	if err != nil {
+		return fmt.Errorf(`%s: invalid or missing minute %s`, logp, token)
+	}
 	if min < 0 || min > 59 {
-		return fmt.Errorf("unpackDate: invalid minute: %d", min)
+		return fmt.Errorf(`%s: invalid minute %d`, logp, min)
 	}
 
 	// Get second ...
+	var sec int64
 	if c == ':' {
-		r.SkipN(1)
-		sec, _ = r.ScanInt64()
+		parser.RemoveDelimiters([]byte{':'})
+		token, _ = parser.ReadNoSpace()
+		sec, err = strconv.ParseInt(string(token), 10, 64)
+		if err != nil {
+			return fmt.Errorf(`%s: invalid second %s`, logp, token)
+		}
 		if sec < 0 || sec > 59 {
-			return fmt.Errorf("unpackDate: invalid second: %d", sec)
+			return fmt.Errorf(`%s: invalid second %d`, logp, sec)
 		}
 	}
 
 	// Get zone offset ...
-	c = r.SkipSpaces()
-	if c == 0 {
-		return fmt.Errorf("unpackDate: missing zone")
+	var (
+		off  int64
+		zone string
+	)
+	token, _ = parser.ReadNoSpace()
+	if len(token) == 0 {
+		return fmt.Errorf(`%s: invalid or missing zone %s`, logp, token)
 	}
-	off, _ = r.ScanInt64()
+	if len(token) != 0 {
+		if token[0] == '+' || token[0] == '-' {
+			off, err = strconv.ParseInt(string(token), 10, 64)
+			if err != nil {
+				return fmt.Errorf(`%s: invalid or missing zone offset %s`, logp, token)
+			}
+			zone = `UTC`
+		} else {
+			zone = string(token)
+		}
+	}
 
-	loc = time.FixedZone("UTC", computeOffSeconds(off))
-	td := time.Date(int(year), month, int(day), int(hour), int(min), int(sec), 0, loc)
+	var (
+		loc = time.FixedZone(zone, computeOffSeconds(off))
+		td  = time.Date(int(year), month, int(day), int(hour), int(min), int(sec), 0, loc)
+	)
+
 	field.date = &td
 	field.unpacked = true
 
-	return err
+	return nil
 }
 
 func computeOffSeconds(off int64) int {
