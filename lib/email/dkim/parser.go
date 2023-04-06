@@ -7,8 +7,7 @@ package dkim
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/ascii"
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 type empty struct{}
@@ -34,87 +33,60 @@ type empty struct{}
 //	WSP   = " " / "\t"
 type parser struct {
 	tags   map[tagKey]empty // Map to check duplicate tags.
-	sepKey []byte
-	sepVal []byte
-
-	r      *libio.Reader
-	c      byte
-	isTerm bool
-	tok    []byte
+	parser *libbytes.Parser
 }
 
 // newParser create and initialize new parser for DKIM Signature.
 func newParser(value []byte) (p *parser) {
 	p = &parser{
-		r:      &libio.Reader{},
-		sepKey: []byte{'='},
-		sepVal: []byte{';'},
+		parser: libbytes.NewParser(value, nil),
 		tags:   make(map[tagKey]empty),
 	}
-	p.r.Init(value)
 
 	return p
 }
 
 // fetchTag parse and return single tag from reader.
 func (p *parser) fetchTag() (t *tag, err error) {
-	p.c = p.r.SkipSpaces()
-	if p.c == 0 {
+	var (
+		token []byte
+		d     byte
+	)
+
+	p.parser.SetDelimiters([]byte{'='})
+
+	token, d = p.parser.ReadNoSpace()
+	if d == 0 {
 		return nil, nil
 	}
-
-	t, err = p.fetchTagKey()
-	if err != nil || p.c == 0 {
-		return t, err
+	if d != '=' {
+		return nil, fmt.Errorf(`dkim: missing '='`)
 	}
 
-	err = p.fetchTagValue(t)
-
-	return t, err
-}
-
-// fetchTagKey parse and fetch tag's key.
-func (p *parser) fetchTagKey() (t *tag, err error) {
-	p.tok, p.isTerm, p.c = p.r.ReadUntil(p.sepKey, ascii.Spaces)
-
-	t, err = newTag(p.tok)
-	if err != nil || t == nil {
+	t, err = newTag(token)
+	if err != nil {
 		return nil, err
 	}
-
-	if p.isTerm || p.c == 0 {
-		p.c = p.r.SkipSpaces()
-		if p.c != '=' {
-			return nil, fmt.Errorf("dkim: missing '=': '%s'", p.r.Rest())
-		}
-		p.r.SkipN(1)
+	if t == nil {
+		return nil, nil
 	}
 	if t.key != tagUnknown {
-		_, ok := p.tags[t.key]
+		var ok bool
+		_, ok = p.tags[t.key]
 		if ok {
-			return nil, fmt.Errorf("dkim: duplicate tag: '%s'", p.tok)
+			return nil, fmt.Errorf(`dkim: duplicate tag: '%s'`, token)
 		}
 		p.tags[t.key] = empty{}
 	}
 
-	p.c = p.r.SkipSpaces()
+	p.parser.SetDelimiters([]byte{';'})
+
+	token, _ = p.parser.ReadNoSpace()
+
+	err = t.setValue(token)
+	if err != nil {
+		return nil, err
+	}
 
 	return t, nil
-}
-
-// fetchTagValue parse and fetch tag's value.
-func (p *parser) fetchTagValue(t *tag) (err error) {
-	var v []byte
-	sepCR := []byte{'\r'}
-	for {
-		p.tok, p.isTerm, p.c = p.r.ReadUntil(sepCR, p.sepVal)
-		v = append(v, p.tok...)
-		if p.isTerm || p.c == 0 {
-			break
-		}
-		p.c = p.r.SkipSpaces()
-	}
-	err = t.setValue(v)
-
-	return err
 }
