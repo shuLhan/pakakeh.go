@@ -11,7 +11,7 @@ import (
 	"mime/quotedprintable"
 	"strings"
 
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 // MIME represent part of message body with their header and content.
@@ -71,20 +71,23 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 		return nil, raw, errors.New("ParseBodyPart: boundary parameter is empty")
 	}
 
-	r := &libio.Reader{}
-	r.Init(raw)
 	var (
-		line   []byte
+		parser = libbytes.NewParser(raw, []byte{lf})
 		minlen = len(boundary) + 2
+
+		line []byte
 	)
 
 	// find boundary ...
-	r.SkipSpaces()
-	line = r.ReadLine()
+	parser.SkipSpaces()
+	line, _ = parser.Read()
+	rest, _ = parser.Stop()
+
 	if len(line) == 0 {
-		rest = r.Rest()
 		return nil, rest, nil
 	}
+
+	line = append(line, lf)
 	if len(line) < minlen {
 		return nil, raw, errors.New("ParseBodyPart: missing boundary line")
 	}
@@ -99,22 +102,23 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	}
 	if bytes.Equal(line[minlen:len(line)-2], boundSeps) {
 		// End of body.
-		return nil, r.Rest(), nil
+		return nil, rest, nil
 	}
 
 	mime = &MIME{}
-	mime.Header, rest, err = ParseHeader(r.Rest())
+	mime.Header, rest, err = ParseHeader(rest)
 	if err != nil {
 		return nil, raw, err
 	}
 
-	r.Init(rest)
+	parser.Reset(rest, []byte{lf})
 
 	for {
-		line = r.ReadLine()
+		line, _ = parser.Read()
 		if len(line) == 0 {
 			break
 		}
+		line = append(line, lf)
 		if len(line) < minlen {
 			mime.Content = append(mime.Content, line...)
 			continue
@@ -131,11 +135,11 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 			mime.Content = append(mime.Content, line...)
 			continue
 		}
-		r.UnreadN(len(line))
+		parser.UnreadN(len(line))
 		break
 	}
 
-	rest = r.Rest()
+	rest, _ = parser.Stop()
 
 	return mime, rest, err
 }
