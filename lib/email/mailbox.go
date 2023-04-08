@@ -10,18 +10,9 @@ import (
 	"fmt"
 	"strings"
 
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	libjson "github.com/shuLhan/share/lib/json"
 	libnet "github.com/shuLhan/share/lib/net"
-)
-
-const (
-	stateBegin       = 1 << iota // 1
-	stateDisplayName             // 2
-	stateLocalPart               // 4
-	stateDomain                  // 8
-	stateEnd                     // 16
-	stateGroupEnd                // 32
 )
 
 // Mailbox represent an invidual mailbox.
@@ -62,12 +53,12 @@ func ParseMailbox(raw []byte) (mbox *Mailbox) {
 		return nil
 	}
 	if len(mboxes) > 0 {
-		return mboxes[0]
+		mbox = mboxes[0]
 	}
-	return nil
+	return mbox
 }
 
-// ParseMailboxes parse raw address into single or multiple mailboxes.
+// ParseMailboxes parse raw [address] into single or multiple mailboxes.
 // Raw address can be a group of address, list of mailbox, or single mailbox.
 //
 // A group of address have the following syntax,
@@ -91,184 +82,206 @@ func ParseMailbox(raw []byte) (mbox *Mailbox) {
 // A comment have the following syntax,
 //
 //	"(" text [comment] ")"
+//
+// [address]: https://www.rfc-editor.org/rfc/rfc5322.html#section-3.4
 func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
+	var logp = `ParseMailboxes`
+
 	raw = bytes.TrimSpace(raw)
 	if len(raw) == 0 {
-		return nil, fmt.Errorf("ParseMailboxes %q: empty address", raw)
+		return nil, fmt.Errorf(`%s: empty address`, logp)
 	}
 
-	r := &libio.Reader{}
-	r.Init(raw)
-
 	var (
-		seps    = []byte{'(', ':', '<', '@', '>', ',', ';'}
-		tok     []byte
-		value   []byte
+		delims = []byte{'(', ':', '<', '@', '>', ',', ';'}
+		parser = libbytes.NewParser(raw, delims)
+
+		token   []byte
 		isGroup bool
 		c       byte
 		mbox    *Mailbox
-		state   = stateBegin
 	)
 
-	_ = r.SkipSpaces()
-	tok, _, c = r.ReadUntil(seps, nil)
-	for {
-		switch c {
-		case '(':
-			_, err = skipComment(r)
-			if err != nil {
-				return nil, fmt.Errorf("ParseMailboxes %q: %w", raw, err)
-			}
-			if len(tok) > 0 {
-				value = append(value, tok...)
-			}
+	token, c, err = parseMailboxText(parser)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	if c == 0 || c == '>' || c == ',' || c == ';' {
+		return nil, fmt.Errorf(`%s: empty or invalid address`, logp)
+	}
 
-		case ':':
-			if state != stateBegin {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: ':'", raw)
-			}
-			isGroup = true
-			value = nil
-			state = stateDisplayName
-			_ = r.SkipSpaces()
+	token = bytes.TrimSpace(token)
+	mbox = &Mailbox{}
+	if c == ':' {
+		// We are parsing group of mailbox.
+		isGroup = true
+	} else if c == '<' {
+		mbox.isAngle = true
+		mbox.Name = token
+	} else if c == '@' {
+		if len(token) == 0 {
+			return nil, fmt.Errorf(`%s: empty local`, logp)
+		}
+		if !IsValidLocal(token) {
+			return nil, fmt.Errorf(`%s: invalid local '%s'`, logp, token)
+		}
+		mbox.Local = token
+	}
 
-		case '<':
-			if state >= stateLocalPart {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: '<'", raw)
-			}
-			value = append(value, tok...)
-			value = bytes.TrimSpace(value)
-			mbox = &Mailbox{
-				isAngle: true,
-			}
-			if len(value) > 0 {
-				mbox.Name = value
-			}
-			value = nil
-			state = stateLocalPart
+	c, err = parseMailbox(mbox, parser, c)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	mboxes = append(mboxes, mbox)
 
-		case '@':
-			if state >= stateDomain {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: '@'", raw)
-			}
-			value = append(value, tok...)
-			value = bytes.TrimSpace(value)
+	for c == ',' {
+		mbox = &Mailbox{}
+		c, err = parseMailbox(mbox, parser, c)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		mboxes = append(mboxes, mbox)
+	}
+
+	if isGroup {
+		if c != ';' {
+			return nil, fmt.Errorf(`%s: missing group terminator ';'`, logp)
+		}
+	} else {
+		if c != 0 {
+			return nil, fmt.Errorf(`%s: invalid character '%c'`, logp, c)
+		}
+	}
+
+	return mboxes, nil
+}
+
+// parseMailbox continue parsing single mailbox based on previous delimiter
+// prevd.
+// On success it will return the last delimiter that is not for mailbox,
+// either ',' for list of mailbox or ';' for end of group.
+func parseMailbox(mbox *Mailbox, parser *libbytes.Parser, prevd byte) (c byte, err error) {
+	var (
+		logp = `parseMailbox`
+
+		value []byte
+	)
+
+	c = prevd
+	if c == ':' || c == ',' {
+		// Get the name or local part.
+		value, c, err = parseMailboxText(parser)
+		if err != nil {
+			return c, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		if c == '<' {
+			mbox.isAngle = true
+			mbox.Name = value
+		} else if c == '@' {
 			if len(value) == 0 {
-				return nil, fmt.Errorf("ParseMailboxes %q: empty local", raw)
-			}
-			if mbox == nil {
-				mbox = &Mailbox{}
+				return c, fmt.Errorf(`%s: empty local`, logp)
 			}
 			if !IsValidLocal(value) {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid local: '%s'", raw, value)
+				return c, fmt.Errorf(`%s: invalid local '%s'`, logp, value)
 			}
 			mbox.Local = value
-			value = nil
-			state = stateDomain
-
-		case '>':
-			if state > stateDomain || !mbox.isAngle {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: '>'", raw)
-			}
-			value = append(value, tok...)
-			value = bytes.TrimSpace(value)
-			if state == stateDomain {
-				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
-				}
-			}
-			mbox.Domain = value
-			mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)
-			mboxes = append(mboxes, mbox)
-			mbox = nil
-			value = nil
-			state = stateEnd
-
-		case ';':
-			if state < stateDomain || !isGroup {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: ';'", raw)
-			}
-			if mbox != nil && mbox.isAngle {
-				return nil, fmt.Errorf("ParseMailboxes %q: missing '>'", raw)
-			}
-			value = append(value, tok...)
-			value = bytes.TrimSpace(value)
-			switch state {
-			case stateDomain:
-				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
-				}
-				mbox.Domain = value
-				mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)
-				mboxes = append(mboxes, mbox)
-				mbox = nil
-			case stateEnd:
-				if len(value) > 0 {
-					return nil, fmt.Errorf("ParseMailboxes %q: invalid token: '%s'", raw, value)
-				}
-			}
-			isGroup = false
-			value = nil
-			state = stateGroupEnd
-		case ',':
-			if state < stateDomain {
-				return nil, fmt.Errorf("ParseMailboxes %q: invalid character: ','", raw)
-			}
-			if mbox != nil && mbox.isAngle {
-				return nil, fmt.Errorf("ParseMailboxes %q: missing '>'", raw)
-			}
-			value = append(value, tok...)
-			value = bytes.TrimSpace(value)
-			switch state {
-			case stateDomain:
-				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
-				}
-				mbox.Domain = value
-				mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)
-				mboxes = append(mboxes, mbox)
-				mbox = nil
-			case stateEnd:
-				if len(value) > 0 {
-					return nil, fmt.Errorf("ParseMailboxes %q: invalid token: '%s'", raw, value)
-				}
-			}
-			value = nil
-			state = stateBegin
-		case 0:
-			if state < stateDomain {
-				return nil, fmt.Errorf("ParseMailboxes %q: empty or invalid address", raw)
-			}
-			if state != stateEnd && mbox != nil && mbox.isAngle {
-				return nil, fmt.Errorf("ParseMailboxes %q: missing '>'", raw)
-			}
-			if isGroup {
-				return nil, fmt.Errorf("ParseMailboxes %q: missing ';'", raw)
-			}
-
-			value = append(value, tok...)
-			value = bytes.TrimSpace(value)
-			if state == stateGroupEnd {
-				if len(value) > 0 {
-					return nil, fmt.Errorf("ParseMailboxes %q: trailing text: '%s'", raw, value)
-				}
-			}
-
-			if state == stateDomain {
-				if !libnet.IsHostnameValid(value, false) {
-					return nil, fmt.Errorf("ParseMailboxes %q: invalid domain: '%s'", raw, value)
-				}
-				mbox.Domain = value
-				mbox.Address = fmt.Sprintf("%s@%s", mbox.Local, mbox.Domain)
-				mboxes = append(mboxes, mbox)
-				mbox = nil
-			}
-			goto out
 		}
-		tok, _, c = r.ReadUntil(seps, nil)
 	}
-out:
-	return mboxes, nil
+	if c == '<' {
+		// Get the local or domain part.
+		value, c, err = parseMailboxText(parser)
+		if err != nil {
+			return c, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		if c == '>' {
+			// No local part, only domain part, "<domain>".
+			goto domain
+		}
+		if c != '@' {
+			return c, fmt.Errorf(`%s: invalid character '%c'`, logp, c)
+		}
+		if !IsValidLocal(value) {
+			return c, fmt.Errorf(`%s: invalid local '%s'`, logp, value)
+		}
+		mbox.Local = value
+	}
+
+	// Get the domain part.
+	value, c, err = parseMailboxText(parser)
+	if err != nil {
+		return c, fmt.Errorf(`%s: %w`, logp, err)
+	}
+domain:
+	if len(value) != 0 {
+		if !libnet.IsHostnameValid(value, false) {
+			return c, fmt.Errorf(`%s: invalid domain '%s'`, logp, value)
+		}
+	}
+	if len(mbox.Local) != 0 && len(value) == 0 {
+		return c, fmt.Errorf(`%s: invalid domain '%s'`, logp, value)
+	}
+	mbox.Domain = value
+	mbox.Address = fmt.Sprintf(`%s@%s`, mbox.Local, mbox.Domain)
+
+	if mbox.isAngle {
+		if c != '>' {
+			return c, fmt.Errorf(`%s: missing '>'`, logp)
+		}
+		value, c, err = parseMailboxText(parser)
+		if err != nil {
+			return c, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		if len(value) != 0 {
+			return c, fmt.Errorf(`%s: unknown token '%s'`, logp, value)
+		}
+	}
+
+	if c == ',' || c == ';' || c == 0 {
+		return c, nil
+	}
+
+	return c, fmt.Errorf(`%s: invalid character '%c'`, logp, c)
+}
+
+// parseMailboxText parse text (display-name, local-part, or domain) probably
+// with comment inside.
+func parseMailboxText(parser *libbytes.Parser) (text []byte, c byte, err error) {
+	var (
+		logp   = `parseMailboxText`
+		delims = []byte{'\\', ')'}
+
+		token []byte
+	)
+
+	parser.AddDelimiters(delims)
+	defer parser.RemoveDelimiters(delims)
+
+	token, c = parser.ReadNoSpace()
+	for {
+		text = append(text, token...)
+
+		if c == ')' {
+			return nil, c, fmt.Errorf(`%s: invalid character '%c'`, logp, c)
+		}
+		if c == '\\' {
+			token, _ = parser.ReadN(1)
+			text = append(text, token...)
+			token, c = parser.ReadNoSpace()
+			continue
+		}
+		if c == '(' {
+			err = skipComment(parser)
+			if err != nil {
+				return nil, 0, fmt.Errorf(`%s: %w`, logp, err)
+			}
+			token, c = parser.ReadNoSpace()
+			continue
+		}
+		break
+	}
+	text = bytes.TrimSpace(text)
+	return text, c, nil
 }
 
 // skipComment skip all characters inside parentheses, '(' and ')'.
@@ -278,33 +291,30 @@ out:
 // "( a \) comment)".
 //
 // A comment can be nested, for example "(a (comment))"
-func skipComment(r *libio.Reader) (c byte, err error) {
-	seps := []byte{'\\', '(', ')'}
-	c = r.SkipUntil(seps)
+func skipComment(parser *libbytes.Parser) (err error) {
+	var c = parser.Skip()
 	for {
-		switch c {
-		case 0:
-			return c, errors.New("missing comment close parentheses")
-		case '\\':
-			// We found backslash, skip one character and continue
-			// looking for separator.
-			r.SkipN(1)
-		case '(':
-			c, err = skipComment(r)
-			if err != nil {
-				return c, err
-			}
-		case ')':
-			c = r.SkipSpaces()
-			if c != '(' {
-				goto out
-			}
-			r.SkipN(1)
+		if c == 0 {
+			return errors.New(`missing comment close parentheses`)
 		}
-		c = r.SkipUntil(seps)
+		if c == ')' {
+			break
+		}
+		if c == '(' {
+			err = skipComment(parser)
+			if err != nil {
+				return err
+			}
+			c = parser.Skip()
+			continue
+		}
+		// c == '\\'
+		// We found backslash, skip one character and continue
+		// looking for next delimiter.
+		parser.SkipN(1)
+		c = parser.Skip()
 	}
-out:
-	return c, nil
+	return nil
 }
 
 func (mbox *Mailbox) UnmarshalJSON(b []byte) (err error) {

@@ -165,7 +165,7 @@ func TestMessage_AddCC(t *testing.T) {
 	}, {
 		desc:      "Invalid mailbox",
 		mailboxes: "a",
-		expError:  `AddCC: ParseMailboxes "a": empty or invalid address`,
+		expError:  `AddCC: ParseMailboxes: empty or invalid address`,
 		expMsg:    "cc:one <a@b.c>\r\n\r\n",
 	}, {
 		desc:      "Multiple mailboxes",
@@ -203,7 +203,7 @@ func TestMessage_AddTo(t *testing.T) {
 	}, {
 		desc:      "Invalid mailbox",
 		mailboxes: "a",
-		expError:  `AddTo: ParseMailboxes "a": empty or invalid address`,
+		expError:  `AddTo: ParseMailboxes: empty or invalid address`,
 		expMsg:    "to:one <a@b.c>\r\n\r\n",
 	}, {
 		desc:      "Multiple mailboxes",
@@ -464,7 +464,7 @@ func TestMessage_SetCC(t *testing.T) {
 	}, {
 		desc:      "Invalid mailbox",
 		mailboxes: "a",
-		expError:  `SetCC: Set: ParseMailboxes "a": empty or invalid address`,
+		expError:  `SetCC: Set: ParseMailboxes: empty or invalid address`,
 		expMsg:    "cc:test <a@b.c>\r\n\r\n",
 	}, {
 		desc:      "Multiple mailboxes",
@@ -502,7 +502,7 @@ func TestMessage_SetFrom(t *testing.T) {
 	}, {
 		desc:     "Invalid mailbox",
 		mailbox:  "a",
-		expError: `SetFrom: Set: ParseMailboxes "a": empty or invalid address`,
+		expError: `SetFrom: Set: ParseMailboxes: empty or invalid address`,
 		expMsg:   "from:test <a@b.c>\r\n\r\n",
 	}, {
 		desc:    "New mailbox",
@@ -569,7 +569,7 @@ func TestMessage_SetTo(t *testing.T) {
 		desc:      "Invalid mailbox",
 		mailboxes: "a",
 		expMsg:    "to:test <a@b.c>\r\n\r\n",
-		expError:  `SetTo: Set: ParseMailboxes "a": empty or invalid address`,
+		expError:  `SetTo: Set: ParseMailboxes: empty or invalid address`,
 	}, {
 		desc:      "Multiple mailboxes",
 		mailboxes: "new <a@b.c>, from <a@b.c>",
