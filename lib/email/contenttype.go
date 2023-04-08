@@ -6,11 +6,10 @@ package email
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"strings"
 
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 var (
@@ -41,63 +40,71 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 		return ct, nil
 	}
 
-	r := &libio.Reader{}
-	r.Init(raw)
-	var c byte
+	var (
+		logp   = `ParseContentType`
+		parser = libbytes.NewParser(raw, []byte{'/', ';'})
+		c      byte
+	)
 
-	ct.Top, _, c = r.ReadUntil([]byte{'/'}, nil)
-	if c == 0 {
-		return nil, errors.New("ParseContentType: missing subtype")
+	ct.Top, c = parser.Read()
+	if c != '/' {
+		return nil, fmt.Errorf(`%s: missing subtype`, logp)
 	}
 	if !isValidToken(ct.Top, false) {
-		return nil, fmt.Errorf("ParseContentType: invalid type: '%s'", ct.Top)
+		return nil, fmt.Errorf(`%s: invalid type '%s'`, logp, ct.Top)
 	}
 
-	ct.Sub, _, c = r.ReadUntil([]byte{';'}, nil)
+	ct.Sub, c = parser.Read()
 	if !isValidToken(ct.Sub, false) {
-		return nil, fmt.Errorf("ParseContentType: invalid subtype: '%s'", ct.Sub)
+		return nil, fmt.Errorf(`%s: invalid subtype '%s'`, logp, ct.Sub)
 	}
 	if c == 0 {
 		return ct, nil
 	}
 
-	c = r.SkipSpaces()
-	ksep := []byte{'='}
-	qsep := []byte{'"'}
-	vsep := []byte{' '}
+	c = parser.SkipSpaces()
+	parser.SetDelimiters([]byte{'=', '"'})
 	for c != 0 {
 		param := Param{}
 
-		param.Key, _, c = r.ReadUntil(ksep, nil)
+		param.Key, c = parser.ReadNoSpace()
 		if c == 0 {
 			// Ignore key without value
 			break
 		}
+		if c != '=' {
+			return nil, fmt.Errorf(`%s: expecting '=', got '%c'`, logp, c)
+		}
 		if !isValidToken(param.Key, false) {
-			err = fmt.Errorf("ParseContentType: invalid parameter key: '%s'", param.Key)
-			return nil, err
+			return nil, fmt.Errorf(`%s: invalid parameter key '%s'`, logp, param.Key)
 		}
 
-		c = r.Current()
+		param.Value, c = parser.ReadNoSpace()
 		if c == '"' {
-			r.SkipN(1)
-			param.Value, _, c = r.ReadUntil(qsep, nil)
+			if len(param.Value) != 0 {
+				return nil, fmt.Errorf(`%s: invalid parameter value '%s'`, logp, param.Value)
+			}
+
+			// The param value may contain '=', remove it
+			// temporarily.
+			parser.RemoveDelimiters([]byte{'='})
+
+			param.Value, c = parser.ReadNoSpace()
 			if c != '"' {
-				return nil, errors.New("ParseContentType: missing closing quote")
+				return nil, fmt.Errorf(`%s: missing closing quote`, logp)
 			}
 			param.Quoted = true
-		} else {
-			param.Value, _, _ = r.ReadUntil(vsep, nil)
+
+			parser.AddDelimiters([]byte{'='})
 		}
 		if !isValidToken(param.Value, param.Quoted) {
-			err = fmt.Errorf("ParseContentType: invalid parameter value: '%s'", param.Value)
-			return nil, err
+			return nil, fmt.Errorf(`%s: invalid parameter value '%s'`, logp, param.Value)
 		}
 
 		param.Key = bytes.ToLower(param.Key)
 		ct.Params = append(ct.Params, param)
 
-		c = r.SkipSpaces()
+		c = parser.SkipSpaces()
 	}
 
 	return ct, nil

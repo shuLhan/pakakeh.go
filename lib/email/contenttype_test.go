@@ -12,47 +12,53 @@ import (
 
 func TestParseContentType(t *testing.T) {
 	cases := []struct {
+		in     string
 		expErr string
 		exp    string
-		in     []byte
 	}{{
-		exp: "text/plain; charset=us-ascii",
+		exp: `text/plain; charset=us-ascii`,
 	}, {
-		in:     []byte("text/;"),
-		expErr: "ParseContentType: invalid subtype: ''",
+		in:     `text/;`,
+		expErr: `ParseContentType: invalid subtype ''`,
 	}, {
-		in:  []byte("text/plain"),
-		exp: "text/plain;",
+		in:  `text/plain`,
+		exp: `text/plain;`,
 	}, {
-		in:     []byte("text ;"),
-		expErr: "ParseContentType: missing subtype",
+		in:     `text ;`,
+		expErr: `ParseContentType: missing subtype`,
 	}, {
-		in:     []byte("text /plain;"),
-		expErr: "ParseContentType: invalid type: 'text '",
+		in:     `text /plain;`,
+		expErr: `ParseContentType: invalid type 'text '`,
 	}, {
-		in:     []byte("text/ plain;"),
-		expErr: "ParseContentType: invalid subtype: ' plain'",
+		in:     `text/ plain;`,
+		expErr: `ParseContentType: invalid subtype ' plain'`,
 	}, {
-		in:  []byte("text/plain; key"),
-		exp: "text/plain;",
+		in:  `text/plain; key`,
+		exp: `text/plain;`,
 	}, {
-		in:     []byte("text/plain; ke(y)=value"),
-		expErr: "ParseContentType: invalid parameter key: 'ke(y)'",
+		in:     `text/plain; ke(y)=value`,
+		expErr: `ParseContentType: invalid parameter key 'ke(y)'`,
 	}, {
-		in:     []byte("text/plain; key=value?"),
-		expErr: "ParseContentType: invalid parameter value: 'value?'",
+		in:     `text/plain; key=value?`,
+		expErr: `ParseContentType: invalid parameter value 'value?'`,
 	}, {
-		in:     []byte(`text/plain; key="value?`),
-		expErr: "ParseContentType: missing closing quote",
+		in:     `text/plain; key"value"`,
+		expErr: `ParseContentType: expecting '=', got '"'`,
 	}, {
-		in:  []byte(`text/plain; key="value ?"`),
+		in:     `text/plain; key=val "value"`,
+		expErr: `ParseContentType: invalid parameter value 'val'`,
+	}, {
+		in:     `text/plain; key="value?`,
+		expErr: `ParseContentType: missing closing quote`,
+	}, {
+		in:  `text/plain; key="value ?"`,
 		exp: `text/plain; key="value ?"`,
 	}}
 
 	for _, c := range cases {
-		t.Logf("%s", c.in)
+		t.Log(c.in)
 
-		got, err := ParseContentType(c.in)
+		got, err := ParseContentType([]byte(c.in))
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
