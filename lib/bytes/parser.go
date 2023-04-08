@@ -118,6 +118,11 @@ out:
 	return token, d
 }
 
+// Remaining return the copy of un-parsed content.
+func (bp *Parser) Remaining() []byte {
+	return Copy(bp.content[bp.x:])
+}
+
 // RemoveDelimiters remove delimiters delims from current delimiters.
 func (bp *Parser) RemoveDelimiters(delims []byte) {
 	var (

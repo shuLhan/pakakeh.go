@@ -78,6 +78,20 @@ func ExampleParser_ReadNoSpace() {
 	// :0
 }
 
+func ExampleParser_Remaining() {
+	var (
+		content = []byte(` a = b ;`)
+		delims  = []byte(`=;`)
+		parser  = libbytes.NewParser(content, delims)
+	)
+
+	token, d := parser.ReadNoSpace()
+	remain := parser.Remaining()
+	fmt.Printf("token:%s d:%c remain:%s\n", token, d, remain)
+	// Output:
+	// token:a d:= remain: b ;
+}
+
 func ExampleParser_RemoveDelimiters() {
 	var (
 		content = []byte(` a = b ; c = d `)
