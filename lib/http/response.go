@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 // ParseResponseHeader parse HTTP response header and return it as standard
@@ -72,23 +72,22 @@ func ParseResponseHeader(raw []byte) (resp *http.Response, rest []byte, err erro
 }
 
 func parseHeaders(raw []byte) (header http.Header, rest []byte, err error) {
-	spaces := []byte{'\r', '\n', '\v', '\t', ' '}
-	delims := []byte{'"', '(', ')', ',', '/', ':', ';', '<', '=', '>',
-		'?', '@', '[', '\\', ']', '{', '}'}
-	lf := []byte{'\n'}
+	var (
+		parser = libbytes.NewParser(raw, []byte{':', '\n'})
 
-	rest = raw
-	reader := &libio.Reader{
-		V: raw,
-	}
+		key string
+		tok []byte
+		c   byte
+	)
 
 	header = make(http.Header)
+	rest = raw
 
 	// Loop until we found an empty line with CRLF.
 	for len(rest) > 0 {
 		switch len(rest) {
 		case 1:
-			return nil, rest, fmt.Errorf("http: missing CRLF at the end, found \"%s\"", rest)
+			return nil, rest, fmt.Errorf(`http: missing CRLF at the end`)
 		default:
 			if rest[0] == '\r' && rest[1] == '\n' {
 				rest = rest[2:]
@@ -97,29 +96,29 @@ func parseHeaders(raw []byte) (header http.Header, rest []byte, err error) {
 		}
 
 		// Get the field name.
-		tok, isTerm, c := reader.ReadUntil(spaces, delims)
-		if !isTerm || c != ':' {
-			return nil, nil, fmt.Errorf("http: missing field separator at line \"%s\"", rest)
+		tok, c = parser.Read()
+		if c != ':' {
+			return nil, nil, fmt.Errorf(`http: missing field value at line '%s'`, rest)
 		}
 
-		key := string(tok)
+		key = string(tok)
 
-		tok, isTerm, _ = reader.ReadUntil(nil, lf)
-		if !isTerm {
-			return nil, nil, fmt.Errorf("http: missing CRLF at the end of field line")
+		tok, c = parser.Read()
+		if c != '\n' {
+			return nil, nil, fmt.Errorf(`http: missing CRLF at the end of field line`)
 		}
-		if reader.V[reader.X-2] != '\r' {
-			return nil, nil, fmt.Errorf("http: missing CR at the end of line")
+		if tok[len(tok)-1] != '\r' {
+			return nil, nil, fmt.Errorf(`http: missing CR at the end of line`)
 		}
 
-		tok = bytes.TrimSpace(tok[:len(tok)-1])
+		tok = bytes.TrimSpace(tok)
 		if len(tok) == 0 {
-			return nil, nil, fmt.Errorf("http: key '%s' have empty value", key)
+			return nil, nil, fmt.Errorf(`http: key '%s' have empty value`, key)
 		}
 
 		header.Add(key, string(tok))
 
-		rest = reader.V[reader.X:]
+		rest = parser.Remaining()
 	}
 
 	return header, rest, nil
