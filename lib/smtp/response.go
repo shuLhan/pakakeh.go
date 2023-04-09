@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/shuLhan/share/lib/ascii"
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 // Response represent a generic single or multilines response from server.
@@ -39,13 +39,9 @@ func NewResponse(raw []byte) (res *Response, err error) {
 		return nil, err
 	}
 
-	reader := &libio.Reader{}
-	seps := []byte{'-', ' '}
-	terms := []byte{'\n'}
+	var parser = libbytes.NewParser(raw[4:], []byte{'-', ' ', '\n'})
 
-	reader.Init(raw[4:])
-
-	err = res.parseMessage(reader, isMultiline, terms)
+	err = res.parseMessage(parser, isMultiline)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +50,7 @@ func NewResponse(raw []byte) (res *Response, err error) {
 		return res, nil
 	}
 
-	err = res.parseBody(reader, code, seps, terms)
+	err = res.parseBody(parser, code)
 
 	return res, err
 }
@@ -78,20 +74,23 @@ func (res *Response) parseCode(raw []byte) (code []byte, isMultiline bool, err e
 }
 
 // parseMessage parse the first line of response as response Message.
-func (res *Response) parseMessage(
-	reader *libio.Reader,
-	isMultiline bool,
-	terms []byte,
-) (err error) {
-	bb, _, c := reader.ReadUntil(nil, terms)
+func (res *Response) parseMessage(parser *libbytes.Parser, isMultiline bool) (err error) {
+	var (
+		tok []byte
+		c   byte
+	)
+
+	parser.SetDelimiters([]byte{'\n'})
+
+	tok, c = parser.Read()
 	if c == 0 {
 		// It should be '\n'
 		return errors.New("missing CRLF at message line")
 	}
 
-	res.Message = string(bytes.TrimSpace(bb))
+	res.Message = string(bytes.TrimSpace(tok))
 
-	c = reader.SkipSpaces()
+	_, c = parser.SkipSpaces()
 	if !isMultiline && c != 0 {
 		return errors.New("trailing characters at message line")
 	}
@@ -99,37 +98,35 @@ func (res *Response) parseMessage(
 	return nil
 }
 
-func (res *Response) parseBody(reader *libio.Reader, code, seps, terms []byte) (err error) {
+func (res *Response) parseBody(parser *libbytes.Parser, code []byte) (err error) {
 	var (
-		bb         []byte
-		isLastLine bool
+		tok        []byte
 		c          byte
+		isLastLine bool
 	)
 
+	parser.SetDelimiters([]byte{'-', ' '})
+
 	for {
-		bb, _, c = reader.ReadUntil(seps, terms)
-		switch c {
-		case '-':
-		case ' ':
+		tok, c = parser.Read()
+		if c == ' ' {
 			isLastLine = true
-		default:
-			return errors.New("invalid separator after code")
 		}
-		if !bytes.Equal(bb, code) {
+		if !bytes.Equal(tok, code) {
 			return errors.New("inconsistent code")
 		}
 
-		bb, _, c = reader.ReadUntil(nil, terms)
+		tok, c = parser.ReadLine()
 		if c == 0 {
 			return errors.New("missing CRLF")
 		}
 
-		bb = bytes.TrimSpace(bb)
-		if len(bb) > 0 {
-			res.Body = append(res.Body, string(bb))
+		tok = bytes.TrimSpace(tok)
+		if len(tok) > 0 {
+			res.Body = append(res.Body, string(tok))
 		}
 		if isLastLine {
-			c = reader.SkipSpaces()
+			_, c = parser.SkipSpaces()
 			if c != 0 {
 				return errors.New("trailing characters")
 			}

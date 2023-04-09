@@ -63,9 +63,9 @@ func TestNewResponse(t *testing.T) {
 		in:     "220-test.local \r\n210-A\r\n220 B\r\n",
 		expErr: "inconsistent code",
 	}, {
-		desc:   "With invalid separator on multiline",
+		desc:   `With invalid separator on multiline`,
 		in:     "220-test.local \r\n210A\r\n220 B\r\n",
-		expErr: "invalid separator after code",
+		expErr: `inconsistent code`,
 	}, {
 		desc:   "With missing CRLF on multiline",
 		in:     "220-test.local \r\n220-A",
