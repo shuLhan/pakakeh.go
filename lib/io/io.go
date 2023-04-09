@@ -3,6 +3,9 @@
 // license that can be found in the LICENSE file.
 
 // Package io extends the standard io library.
+//
+// DEPRECATED: This package has been merged into package lib/os and will
+// be removed in the next six release v0.51.0.
 package io
 
 import (

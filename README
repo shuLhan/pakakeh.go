@@ -112,7 +112,7 @@ A library for working with slice of integer.
 A library for working with slice of int64.
 
 {godoc_base_url}/lib/io[**io**^]::
-A library for simplify reading and watching files.
+[DEPRECATED] A library for simplify reading and watching files.
 
 {godoc_base_url}/lib/json[**json**^]::
 Package json extends the capabilities of standard json package.
@@ -183,7 +183,7 @@ Package exec wrap the standar package "os/exec" to simplify calling Run
 with stdout and stderr.
 
 {godoc_base_url}/lib/parser[**parser**^]::
-Package parser provide a common text parser, using delimiters.
+[DEPRECATED] Package parser provide a common text parser, using delimiters.
 
 {godoc_base_url}/lib/paseto[**paseto**^]::
 A simple, ready to use, implementation of Platform-Agnostic SEcurity TOkens
