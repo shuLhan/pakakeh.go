@@ -52,7 +52,10 @@ func TestParseDuration(t *testing.T) {
 			`time: unknown unit " " in duration "100 "`, // go > 1.14
 		},
 	}, {
-		in: "100",
+		in: `100`,
+		expErr: []string{
+			`time: missing unit in duration "100"`,
+		},
 	}}
 
 	for _, c := range cases {
@@ -63,7 +66,7 @@ func TestParseDuration(t *testing.T) {
 			if strings.IsContain(c.expErr, err.Error()) {
 				continue
 			}
-			test.Assert(t, "error", c.expErr, err.Error())
+			t.Fatalf(`want error %s, got %s`, err.Error(), c.expErr)
 		}
 
 		test.Assert(t, "duration", c.exp, got)

@@ -9,8 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/shuLhan/share/lib/ascii"
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 const (
@@ -33,27 +32,24 @@ var (
 // Unlike standard time.Duration the week or day units must be before hours.
 func ParseDuration(s string) (time.Duration, error) {
 	var (
-		dur, v float64
-		err    error
+		delims = []byte{' ', '\t', 'w', 'd', 'h', 'm', 's', 'u', 'n'}
+		parser = libbytes.NewParser([]byte(s), delims)
+
+		stok string
+		tok  []byte
+		dur  float64
+		v    float64
+		c    byte
+		err  error
 	)
 
-	seps := []byte{'w', 'd', 'h', 'm', 's', 'u', 'n'}
-
-	reader := &libio.Reader{}
-	reader.Init([]byte(s))
-
-	c := reader.SkipSpaces()
-	if !ascii.IsDigit(c) {
-		return 0, ErrDurationMissingValue
-	}
-
 	for {
-		tok, _, c := reader.ReadUntil(seps, ascii.Spaces)
-		if c == 0 {
+		tok, c = parser.Read()
+		if len(tok) == 0 {
 			break
 		}
 
-		stok := string(tok)
+		stok = string(tok)
 
 		v, err = strconv.ParseFloat(stok, 64)
 		if err != nil {
@@ -66,7 +62,9 @@ func ParseDuration(s string) (time.Duration, error) {
 		case 'd':
 			dur += v * float64(Day)
 		default:
-			stok += string(c)
+			if c != 0 {
+				stok += string(c)
+			}
 			rest, err := time.ParseDuration(stok)
 			if err != nil {
 				return 0, err
