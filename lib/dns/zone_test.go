@@ -101,21 +101,21 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 	)
 
 	cases = []testCase{{
-		desc:   "Without value",
+		desc:   `Without value`,
 		in:     `$origin`,
-		expErr: "line 1: empty $origin directive",
+		expErr: `parse: parseDirectiveOrigin: line 1: empty $origin directive`,
 	}, {
-		desc:   "Without value and with comment",
+		desc:   `Without value and with comment`,
 		in:     `$origin ; comment`,
-		expErr: "line 1: empty $origin directive",
+		expErr: `parse: parseDirectiveOrigin: line 1: empty $origin directive`,
 	}, {
-		desc: "With value",
+		desc: `With value`,
 		in:   `$origin x`,
-		exp:  "x",
+		exp:  `x`,
 	}, {
-		desc: "With value and comment",
+		desc: `With value and comment`,
 		in:   `$origin x ;comment`,
-		exp:  "x",
+		exp:  `x`,
 	}}
 
 	for _, c = range cases {
@@ -125,11 +125,11 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 
 		err = m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error())
+			test.Assert(t, `error`, c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "origin", c.exp, m.origin)
+		test.Assert(t, `origin`, c.exp, m.origin)
 	}
 }
 
@@ -149,19 +149,22 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 	)
 
 	cases = []testCase{{
-		desc:   "Without value",
+		desc:   `Without value`,
 		in:     `$include`,
-		expErr: "line 1: empty $include directive",
+		expErr: `parse: parseDirectiveInclude: line 1: empty $include directive`,
 	}, {
-		desc:   "Without value and with comment",
+		desc:   `Without value and with comment`,
 		in:     `$include ; comment`,
-		expErr: "line 1: empty $include directive",
+		expErr: `parse: parseDirectiveInclude: line 1: empty $include directive`,
 	}, {
-		desc: "With value",
+		desc: `With value`,
 		in:   `$include testdata/sub.domain`,
 	}, {
-		desc: "With value and comment",
-		in:   `$origin testdata/sub.domain ;comment`,
+		desc: `With value and comment`,
+		in:   `$include testdata/sub.domain ;comment`,
+	}, {
+		desc: `With value and domain name`,
+		in:   `$include testdata/sub.domain sub.include`,
 	}}
 
 	for _, c = range cases {
@@ -194,21 +197,29 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 	)
 
 	cases = []testCase{{
-		desc:   "Without value",
+		desc:   `Without value`,
 		in:     `$ttl`,
-		expErr: "line 1: empty $TTL directive",
+		expErr: `parse: parseDirectiveTTL: line 1: empty $TTL directive`,
 	}, {
-		desc:   "Without value and with comment",
+		desc:   `Without value and with comment`,
 		in:     `$ttl ; comment`,
-		expErr: "line 1: empty $TTL directive",
+		expErr: `parse: parseDirectiveTTL: line 1: empty $TTL directive`,
 	}, {
-		desc: "With value",
+		desc:   `With invalid value`,
+		in:     `$ttl a`,
+		expErr: `parse: parseDirectiveTTL: line 1: invalid TTL value 'a'`,
+	}, {
+		desc: `With seconds value`,
 		in:   `$ttl 1`,
 		exp:  1,
 	}, {
-		desc: "With value and comment",
+		desc: `With seconds value and comment`,
 		in:   `$ttl 1 ;comment`,
 		exp:  1,
+	}, {
+		desc: `With time.Duration value and comment`,
+		in:   `$ttl 1m ;comment`,
+		exp:  60,
 	}}
 
 	for _, c = range cases {
@@ -218,10 +229,10 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 
 		err = m.parse()
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err.Error())
+			test.Assert(t, `error`, c.expErr, err.Error())
 			continue
 		}
 
-		test.Assert(t, "ttl", c.exp, m.ttl)
+		test.Assert(t, `ttl`, c.exp, m.ttl)
 	}
 }

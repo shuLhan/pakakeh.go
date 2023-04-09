@@ -14,7 +14,6 @@ import (
 	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/debug"
-	libio "github.com/shuLhan/share/lib/io"
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
@@ -22,47 +21,27 @@ const (
 	defMinimumTTL = 3600
 )
 
+// List of flag for parsing RR.
 const (
-	parseRRStart = 0
-	parseRRTTL   = 1
-	parseRRClass = 2
-	parseRRType  = 4
-)
-
-const (
-	parseSOAStart   = 0
-	parseSOASerial  = 1
-	parseSOARefresh = 2
-	parseSOARetry   = 4
-	parseSOAExpire  = 8
-	parseSOAMinimum = 16
-	parseSOAEnd     = 31
-)
-
-const (
-	parseSRVPriority = iota
-	parseSRVWeight
-	parseSRVPort
-	parseSRVTarget
+	flagRRStart = 0
+	flagRRTtl   = 1
+	flagRRClass = 2
+	flagRRType  = 4 // Once the type has known the order is linear.
+	flagRREnd   = 8
 )
 
 type zoneParser struct {
 	zone   *Zone
-	reader *libio.Reader
+	parser *libbytes.Parser
 	lastRR *ResourceRecord
 	origin string
-	seps   []byte
-	terms  []byte
 	lineno int
-	flag   int
 	ttl    uint32
 }
 
 func newZoneParser(zone *Zone) (zp *zoneParser) {
 	zp = &zoneParser{
 		lineno: 1,
-		seps:   []byte{' ', '\t'},
-		terms:  []byte{';', '\n'},
 	}
 	if zone == nil {
 		zone = NewZone(``, ``)
@@ -82,12 +61,12 @@ func (m *zoneParser) Reset(data []byte, origin string, ttl uint32) {
 		}
 	}
 	m.ttl = ttl
-	if m.reader == nil {
-		m.reader = new(libio.Reader)
+	if m.parser == nil {
+		m.parser = libbytes.NewParser(nil, nil)
 	}
 	data = bytes.TrimSpace(data)
 	data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
-	m.reader.Init([]byte(data))
+	m.parser.Reset(data, []byte{' ', '\t', '\n', ';'})
 }
 
 // The format of these files is a sequence of entries.  Entries are
@@ -143,66 +122,59 @@ func (m *zoneParser) Reset(data []byte, origin string, ttl uint32) {
 // Because these files are text files several special encodings are
 // necessary to allow arbitrary data to be loaded.  In particular:
 //
-// @               A free standing @ is used to denote the current origin.
+//	@ - A free standing @ is used to denote the current origin.
 //
-// \X              where X is any character other than a digit (0-9), is
+//	\X - where X is any character other than a digit (0-9), is used to
+//	quote that character so that its special meaning does not apply.
+//	For example, "\." can be used to place a dot character in a label.
 //
-//	used to quote that character so that its special meaning
-//	does not apply.  For example, "\." can be used to place
-//	a dot character in a label.
-//
-// \DDD            where each D is a digit is the octet corresponding to
-//
-//	the decimal number described by DDD.  The resulting
-//	octet is assumed to be text and is not checked for
+//	\DDD - where each D is a digit is the octet corresponding to the
+//	decimal number described by DDD.
+//	The resulting octet is assumed to be text and is not checked for
 //	special meaning.
 //
-// ( )             Parentheses are used to group data that crosses a line
+//	( ) - Parentheses are used to group data that crosses a line
+//	boundary.  In effect, line terminations are not	recognized within
+//	parentheses.
 //
-//	boundary.  In effect, line terminations are not
-//	recognized within parentheses.
-//
-// ;               Semicolon is used to start a comment; the remainder of
-//
-//	the line is ignored.
+//	; - Semicolon is used to start a comment; the remainder of the line is
+//	ignored.
 func (m *zoneParser) parse() (err error) {
 	var (
-		rr     *ResourceRecord
-		tok    []byte
-		stok   string
-		n      int
-		c      byte
-		isTerm bool
+		logp = `parse`
+
+		rr   *ResourceRecord
+		tok  []byte
+		stok string
+		n    int
+		c    byte
 	)
 
 	for {
-		n, c = m.reader.SkipHorizontalSpace()
+		// Check if the RR start with space or not.
+		n, c = m.parser.SkipHorizontalSpaces()
 		if c == 0 {
 			break
 		}
 		if c == '\n' || c == ';' {
-			m.reader.SkipLine()
+			m.parser.SkipLine()
 			m.lineno++
 			continue
 		}
 
-		tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
-		if isTerm {
-			return fmt.Errorf("line %d: invalid line %q",
-				m.lineno, m.reader.Rest())
-		}
+		tok, c = m.parser.ReadNoSpace()
 
 		tok = ascii.ToUpper(tok)
 		stok = string(tok)
 
 		switch stok {
-		case "$ORIGIN":
-			err = m.parseDirectiveOrigin()
-		case "$INCLUDE":
-			err = m.parseDirectiveInclude()
-		case "$TTL":
-			err = m.parseDirectiveTTL()
-		case "@":
+		case `$ORIGIN`:
+			err = m.parseDirectiveOrigin(c)
+		case `$INCLUDE`:
+			err = m.parseDirectiveInclude(c)
+		case `$TTL`:
+			err = m.parseDirectiveTTL(c)
+		case `@`:
 			rr, err = m.parseRR(nil, tok)
 		default:
 			if n == 0 {
@@ -212,12 +184,12 @@ func (m *zoneParser) parse() (err error) {
 			}
 		}
 		if err != nil {
-			return err
+			return fmt.Errorf(`%s: %w`, logp, err)
 		}
 		if rr != nil {
 			err = m.push(rr)
 			if err != nil {
-				return err
+				return fmt.Errorf(`%s: %w`, logp, err)
 			}
 		}
 	}
@@ -232,103 +204,80 @@ func (m *zoneParser) parse() (err error) {
 	return nil
 }
 
-// $ORIGIN <domain-name> [<comment>]
-func (m *zoneParser) parseDirectiveOrigin() (err error) {
+// parseDirectiveOrigin parse the $ORIGIN directive in the following format,
+//
+//	$ORIGIN <domain-name> [<comment>]
+func (m *zoneParser) parseDirectiveOrigin(c byte) (err error) {
 	var (
-		tok    []byte
-		c      byte
-		isTerm bool
+		logp = `parseDirectiveOrigin`
+
+		tok []byte
 	)
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: empty $origin directive", m.lineno)
+
+	if c == ';' || c == '\n' || c == 0 {
+		return fmt.Errorf(`%s: line %d: empty $origin directive`, logp, m.lineno)
 	}
 
-	tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
+	tok, c = m.parser.ReadNoSpace()
 	if len(tok) == 0 {
-		return fmt.Errorf("line %d: empty $origin directive", m.lineno)
+		return fmt.Errorf(`%s: line %d: empty $origin directive`, logp, m.lineno)
 	}
 
 	m.origin = strings.ToLower(string(tok))
 
-	if isTerm {
-		if c == ';' {
-			m.reader.SkipLine()
-		}
-		m.lineno++
-	} else {
-		c = m.reader.SkipSpaces()
-		if c == 0 {
-			return nil
-		}
-		if c == ';' {
-			m.reader.SkipLine()
-			m.lineno++
-		} else {
-			return fmt.Errorf("line %d: invalid character '%c' after '%s'",
-				m.lineno, c, tok)
-		}
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
 }
 
-// $INCLUDE <file-name> [<domain-name>] [<comment>]
-func (m *zoneParser) parseDirectiveInclude() (err error) {
+// parseDirectiveInclude parse the $INCLUDE directive in the following format,
+//
+//	$INCLUDE <file-name> [<domain-name>] [<comment>]
+func (m *zoneParser) parseDirectiveInclude(c byte) (err error) {
 	var (
-		c      byte
-		tok    []byte
-		isTerm bool
+		logp = `parseDirectiveInclude`
+
+		tok []byte
 	)
 
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: empty $include directive", m.lineno)
+	if c == ';' || c == '\n' || c == 0 {
+		return fmt.Errorf(`%s: line %d: empty $include directive`, logp, m.lineno)
 	}
 
-	tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
+	tok, c = m.parser.ReadNoSpace()
 	if len(tok) == 0 {
-		return fmt.Errorf("line %d: empty $include directive", m.lineno)
+		return fmt.Errorf(`%s: line %d: empty $include directive`, logp, m.lineno)
 	}
-
-	var incfile, dname string
 
 	tok = ascii.ToLower(tok)
-	incfile = string(tok)
 
-	// check if include followed by domain name.
-	if !isTerm {
-		c = m.reader.SkipSpaces()
+	var (
+		incfile = string(tok)
+		dname   = m.origin
+	)
+
+	// Check if include followed by domain name.
+	if c == ' ' || c == '\t' {
+		tok, c = m.parser.ReadNoSpace()
+		if len(tok) != 0 {
+			tok = ascii.ToLower(tok)
+			dname = string(tok)
+		}
 	}
 
-	if c == ';' {
-		m.reader.SkipLine()
-		m.lineno++
-	} else if c != 0 {
-		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
-		if !isTerm {
-			c = m.reader.SkipSpaces()
-		}
-		if c != ';' {
-			return fmt.Errorf("line %d: invalid character '%c' after '%s'",
-				m.lineno, c, tok)
-		}
-
-		m.reader.SkipLine()
-		m.lineno++
-
-		if len(tok) > 0 {
-			dname = string(tok)
-		} else {
-			dname = m.origin
-		}
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	var zoneFile *Zone
 
 	zoneFile, err = ParseZoneFile(incfile, dname, m.ttl)
 	if err != nil {
-		return err
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	m.zone.messages = append(m.zone.messages, zoneFile.messages...)
@@ -336,22 +285,24 @@ func (m *zoneParser) parseDirectiveInclude() (err error) {
 	return nil
 }
 
-func (m *zoneParser) parseDirectiveTTL() (err error) {
+// parseDirectiveTTL parse the $TTL directive in the following format,
+//
+//	$TTL <digits> [comment]
+func (m *zoneParser) parseDirectiveTTL(c byte) (err error) {
 	var (
-		stok   string
-		tok    []byte
-		c      byte
-		isTerm bool
+		logp = `parseDirectiveTTL`
+
+		stok string
+		tok  []byte
 	)
 
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: empty $TTL directive", m.lineno)
+	if c == ';' || c == '\n' || c == 0 {
+		return fmt.Errorf(`%s: line %d: empty $TTL directive`, logp, m.lineno)
 	}
 
-	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
+	tok, c = m.parser.ReadNoSpace()
 	if len(tok) == 0 {
-		return fmt.Errorf("line %d: empty $ttl directive", m.lineno)
+		return fmt.Errorf(`%s: line %d: empty $TTL directive`, logp, m.lineno)
 	}
 
 	tok = ascii.ToLower(tok)
@@ -359,24 +310,12 @@ func (m *zoneParser) parseDirectiveTTL() (err error) {
 
 	m.ttl, err = parseTTL(tok, stok)
 	if err != nil {
-		return err
+		return fmt.Errorf(`%s: line %d: %w`, logp, m.lineno, err)
 	}
 
-	if isTerm {
-		m.reader.SkipLine()
-		m.lineno++
-	} else {
-		c = m.reader.SkipSpaces()
-		if c == 0 {
-			return nil
-		}
-		if c == ';' {
-			m.reader.SkipLine()
-			m.lineno++
-		} else {
-			return fmt.Errorf("line %d: invalid character '%c' after '%s'",
-				m.lineno, c, tok)
-		}
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -392,7 +331,7 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 	if ascii.IsDigits(tok) {
 		v, err = strconv.ParseUint(stok, 10, 32)
 		if err != nil {
-			return 0, err
+			return 0, fmt.Errorf(`invalid TTL value '%s'`, tok)
 		}
 
 		seconds = uint32(v)
@@ -402,7 +341,7 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 
 	dur, err = libtime.ParseDuration(stok)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf(`invalid TTL value '%s'`, tok)
 	}
 
 	seconds = uint32(dur.Seconds())
@@ -410,35 +349,36 @@ func parseTTL(tok []byte, stok string) (seconds uint32, err error) {
 	return seconds, nil
 }
 
-// <rr> contents take one of the following forms:
+// parserRR parse the Resource Record (RR).
+// If the RR start with blank, the prevRR is the previous line of RR and tok
+// may contains TTL or class.
+// If the RR does not start with blank, the prevRR is nil and tok contains the
+// domain name.
+//
+// The RR contents take one of the following forms:
 //
 //	[<TTL>] [<class>] <type> <RDATA>
 //
 //	[<class>] [<TTL>] <type> <RDATA>
 //
 // The RR begins with optional TTL and class fields, followed by a type and
-// RDATA field appropriate to the type and class.  Class and type use the
-// standard mnemonics, TTL is a decimal integer.  Omitted class and TTL
-// values are default to the last explicitly stated values.  Since type and
-// class mnemonics are disjoint, the parse is unique.  (Note that this
-// order is different from the order used in examples and the order used in
-// the actual RRs; the given order allows easier parsing and defaulting.)
-func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
-	rr *ResourceRecord, err error,
-) {
+// RDATA field appropriate to the type and class.
+// Class and type use the standard mnemonics, TTL is a decimal integer.
+// Omitted class and TTL values are default to the last explicitly stated
+// values.
+func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRecord, err error) {
 	var (
-		stok = string(tok)
+		logp = `parseRR`
+		flag = flagRRStart
 
+		stok   string
 		ttl    uint32
 		orgtok []byte
 		c      byte
-		isTerm bool
 		ok     bool
 	)
 
 	rr = &ResourceRecord{}
-
-	m.flag = 0
 
 	if prevRR == nil {
 		rr.Name = m.generateDomainName(tok)
@@ -453,136 +393,101 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (
 		rr.TTL = prevRR.TTL
 		rr.Class = prevRR.Class
 
-		m.flag |= parseRRTTL
+		tok = ascii.ToUpper(tok)
+		stok = string(tok)
 
 		if ascii.IsDigit(tok[0]) {
 			ttl, err = parseTTL(tok, stok)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf(`%s: line %d: invalid TTL '%s': %w`, logp, m.lineno, tok, err)
 			}
 			rr.TTL = ttl
+			flag |= flagRRTtl
 		} else {
-			ok = m.parseRRClassOrType(rr, stok)
+			flag, ok = m.parseRRClassOrType(rr, stok, flag)
 			if !ok {
-				err = fmt.Errorf("line %d: unknown class or type '%s'",
-					m.lineno, stok)
-				return nil, err
+				return nil, fmt.Errorf(`%s: line %d: unknown class or type '%s'`, logp, m.lineno, tok)
 			}
 		}
 	}
 
-	for {
-		_, c = m.reader.SkipHorizontalSpace()
-		if c == 0 || c == ';' {
-			err = fmt.Errorf("line %d: invalid RR statement '%s'",
-				m.lineno, stok)
-			return nil, err
-		}
-
-		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
+	for flag != flagRREnd {
+		tok, c = m.parser.ReadNoSpace()
 		if len(tok) == 0 {
-			err = fmt.Errorf("line %d: invalid RR statement '%s'",
-				m.lineno, stok)
-			return nil, err
+			return nil, fmt.Errorf(`%s: line %d: invalid RR statement '%s'`, logp, m.lineno, tok)
 		}
 
 		orgtok = libbytes.Copy(tok)
 		tok = ascii.ToUpper(tok)
 		stok = string(tok)
 
-		switch m.flag {
-		case parseRRStart:
+		switch flag {
+		case flagRRStart:
+			if ascii.IsDigit(tok[0]) {
+				rr.TTL, err = parseTTL(tok, stok)
+				if err != nil {
+					return nil, fmt.Errorf(`%s: invalid TTL '%s': %w`, logp, tok, err)
+				}
+				flag |= flagRRTtl
+				continue
+			}
+
+			fallthrough // If its not TTL, maybe class or type.
+
+		case flagRRTtl:
+			flag, ok = m.parseRRClassOrType(rr, stok, flag)
+			if !ok {
+				return nil, fmt.Errorf(`%s: line %d: unknown class or type '%s'`, logp, m.lineno, stok)
+			}
+
+		case flagRRClass:
 			if ascii.IsDigit(tok[0]) {
 				rr.TTL, err = parseTTL(tok, stok)
 				if err != nil {
 					return nil, err
 				}
-				m.flag |= parseRRTTL
+				flag |= flagRRTtl
 				continue
 			}
 
-			ok = m.parseRRClassOrType(rr, stok)
-			if !ok {
-				err = fmt.Errorf("line %d: unknown class or type '%s'", m.lineno, stok)
-				return nil, err
-			}
+			fallthrough // If its not digit maybe type.
 
-		case parseRRTTL:
-			ok = m.parseRRClassOrType(rr, stok)
-			if !ok {
-				err = fmt.Errorf("line %d: unknown class or type '%s'", m.lineno, stok)
-				return nil, err
-			}
-
-		case parseRRClass:
-			if ascii.IsDigit(tok[0]) {
-				rr.TTL, err = parseTTL(tok, stok)
-				if err != nil {
-					return nil, err
-				}
-				m.flag |= parseRRTTL
-				continue
-			}
-
+		case flagRRTtl | flagRRClass:
 			ok = m.parseRRType(rr, stok)
-			if ok {
-				m.flag |= parseRRType
-				continue
+			if !ok {
+				return nil, fmt.Errorf(`%s: line %d: unknown class or type '%s'`, logp, m.lineno, stok)
 			}
+			flag = flagRRType
 
-			err = fmt.Errorf("line %d: unknown type '%s'", m.lineno, stok)
-			return nil, err
-
-		case parseRRTTL | parseRRClass:
-			ok = m.parseRRType(rr, stok)
-			if ok {
-				m.flag |= parseRRType
-				continue
-			}
-
-			err = fmt.Errorf("line %d: unknown class or type '%s'", m.lineno, stok)
-			return nil, err
-
-		case parseRRType,
-			parseRRTTL | parseRRType,
-			parseRRClass | parseRRType,
-			parseRRTTL | parseRRClass | parseRRType:
-
-			if rr.Type == RecordTypeTXT {
-				if c != 0 && !isTerm {
-					orgtok = append(orgtok, c)
-				}
-			}
-
-			err = m.parseRRData(rr, orgtok)
+		case flagRRType:
+			err = m.parseRRData(rr, orgtok, c)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf(`%s: line %d: %s`, logp, m.lineno, err)
 			}
-			goto out
+			flag = flagRREnd
 		}
 	}
-out:
 	return rr, nil
 }
 
 // parseRRClassOrType check if token either class or type.
 // It will return true if one of them is set, otherwise it will return false.
-func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string) bool {
+func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string, flag int) (int, bool) {
 	var ok bool
 
 	ok = m.parseRRClass(rr, stok)
 	if ok {
-		m.flag |= parseRRClass
-		return true
+		flag |= flagRRClass
+		return flag, true
 	}
 
 	ok = m.parseRRType(rr, stok)
 	if ok {
-		m.flag |= parseRRType
-		return true
+		flag = flagRRType
+		return flag, true
 	}
 
-	return false
+	return flag, false
 }
 
 // parseRRClass check if token is known class.
@@ -620,13 +525,15 @@ func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
 	return false
 }
 
-func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
+func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte, c byte) (err error) {
 	switch rr.Type {
 	case RecordTypeA, RecordTypeAAAA:
 		rr.Value = string(tok)
+		err = m.skipLine(c)
 
 	case RecordTypeNS, RecordTypeCNAME, RecordTypeMB, RecordTypeMG, RecordTypeMR, RecordTypePTR:
 		rr.Value = m.generateDomainName(tok)
+		err = m.skipLine(c)
 
 	case RecordTypeSOA:
 		err = m.parseSOA(rr, tok)
@@ -639,6 +546,7 @@ func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 	// mnemonics or decimal numbers.
 	case RecordTypeWKS:
 		// TODO(ms)
+		_ = m.skipLine(c)
 
 	case RecordTypeHINFO:
 		err = m.parseHInfo(rr, tok)
@@ -650,7 +558,7 @@ func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 		err = m.parseMX(rr, tok)
 
 	case RecordTypeTXT:
-		err = m.parseTXT(rr, tok)
+		err = m.parseTXT(rr, tok, c)
 
 	case RecordTypeSRV:
 		err = m.parseSRV(rr, tok)
@@ -660,144 +568,117 @@ func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte) (err error) {
 }
 
 func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
-	tok = ascii.ToLower(tok)
-
 	var (
-		rrSOA = &RDataSOA{
-			MName: m.generateDomainName(tok),
-		}
-		terms = []byte{'\n', ';'}
+		logp  = `parseSOA`
+		rrSOA = &RDataSOA{}
 
-		v           int64
+		vint64      int64
 		c           byte
-		isTerm      bool
 		isMultiline bool
 	)
+
 	rr.Value = rrSOA
 
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: incomplete SOA values", m.lineno)
-	}
+	tok = ascii.ToLower(tok)
+	rrSOA.MName = m.generateDomainName(tok)
 
 	// Get RNAME
-	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
-	if len(tok) == 0 || isTerm {
-		return fmt.Errorf("line %d: Invalid SOA RNAME '%s'", m.lineno, tok)
+	tok, c = m.parser.ReadNoSpace()
+	if len(tok) == 0 || c == 0 || c == ';' {
+		return fmt.Errorf(`%s: line %d: incomplete SOA values`, logp, m.lineno)
 	}
 
 	tok = ascii.ToLower(tok)
 	rrSOA.RName = m.generateDomainName(tok)
 
-	// Get '(' or serial value
-	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
-	if len(tok) == 0 {
-		return fmt.Errorf("line %d: invalid SOA SERIAL '%s'", m.lineno, tok)
-	}
+	// Get serial value.
 
-	if len(tok) == 1 && tok[0] == '(' {
+	m.parser.AddDelimiters([]byte{'('})
+
+	tok, c = m.parser.ReadNoSpace()
+	if c == '(' {
 		isMultiline = true
-		terms = append(terms, ')')
-		m.flag = parseSOAStart
-	} else {
-		v, err = strconv.ParseInt(string(tok), 10, 64)
-		if err != nil {
-			return err
+		m.parser.AddDelimiters([]byte{')'})
+		if len(tok) == 0 {
+			tok, c = m.getMultilineToken(m.parser)
 		}
-		rrSOA.Serial = uint32(v)
-		m.flag = parseSOASerial
 	}
 
-	for {
+	vint64, err = strconv.ParseInt(string(tok), 10, 64)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+	rrSOA.Serial = uint32(vint64)
+
+	// List of flag to know which part has been parsed.
+	const (
+		flagSerial  = 1
+		flagRefresh = 2
+		flagRetry   = 4
+		flagExpire  = 8
+		flagMinimum = 16
+	)
+	var flag = flagSerial
+
+	for flag != flagMinimum {
 		if isMultiline {
-			c = m.reader.SkipSpaces()
-			if c == ';' {
-				m.reader.SkipLine()
-				m.lineno++
-				c = m.reader.SkipSpaces()
+			tok, c = m.getMultilineToken(m.parser)
+			if flag < flagExpire && c == ')' {
+				return fmt.Errorf(`%s: line %d: incomplete SOA statement '%s'`, logp, m.lineno, tok)
 			}
 		} else {
-			_, c = m.reader.SkipHorizontalSpace()
+			tok, c = m.parser.ReadNoSpace()
+			if c == ';' || c == '\n' {
+				return fmt.Errorf(`%s: line %d: incomplete SOA statement '%s'`, logp, m.lineno, tok)
+			}
 		}
-		if c == 0 {
-			break
-		}
-
-		tok, isTerm, c = m.reader.ReadUntil(m.seps, terms)
-		if len(tok) == 0 {
-			return fmt.Errorf("line %d: invalid SOA statement '%s'", m.lineno, tok)
-		}
-		if c == ';' {
-			m.reader.SkipLine()
-			m.lineno++
-			c = m.reader.SkipSpaces()
+		if len(tok) == 0 || c == 0 {
+			return fmt.Errorf(`%s: line %d: incomplete SOA statement '%s'`, logp, m.lineno, tok)
 		}
 
-		v, err = strconv.ParseInt(string(tok), 10, 64)
+		vint64, err = strconv.ParseInt(string(tok), 10, 64)
 		if err != nil {
-			return fmt.Errorf("line %d: invalid SOA value %s: %w",
-				m.lineno, tok, err)
+			return fmt.Errorf(`%s: line %d: invalid SOA value %s: %w`, logp, m.lineno, tok, err)
 		}
 
-		switch m.flag {
-		case parseSOAStart:
-			rrSOA.Serial = uint32(v)
-			m.flag |= parseSOASerial
+		switch flag {
+		case flagSerial:
+			rrSOA.Refresh = int32(vint64)
+			flag = flagRefresh
 
-		case parseSOASerial:
-			rrSOA.Refresh = int32(v)
-			m.flag |= parseSOARefresh
+		case flagRefresh:
+			rrSOA.Retry = int32(vint64)
+			flag = flagRetry
 
-		case parseSOASerial | parseSOARefresh:
-			rrSOA.Retry = int32(v)
-			m.flag |= parseSOARetry
+		case flagRetry:
+			rrSOA.Expire = int32(vint64)
+			flag = flagExpire
 
-		case parseSOASerial | parseSOARefresh | parseSOARetry:
-			rrSOA.Expire = int32(v)
-			m.flag |= parseSOAExpire
-
-		case parseSOASerial | parseSOARefresh | parseSOARetry | parseSOAExpire:
-			rrSOA.Minimum = uint32(v)
-			m.flag |= parseSOAMinimum
-			goto out
-
-		default:
-			return fmt.Errorf("line %d: invalid SOA flag %d '%s'",
-				m.lineno, m.flag, string(tok))
+		case flagExpire:
+			rrSOA.Minimum = uint32(vint64)
+			flag = flagMinimum
 		}
 	}
-	if m.flag != parseSOAEnd {
-		return fmt.Errorf("line %d: incomplete SOA statement", m.lineno)
-	}
-out:
+
 	if isMultiline {
-		if !isTerm {
-			c = m.reader.SkipSpaces()
-		}
-		for c != 0 {
-			if c == ';' {
-				m.reader.SkipLine()
-				m.lineno++
-				c = m.reader.SkipSpaces()
-				continue
+		for c != ')' {
+			tok, c = m.getMultilineToken(m.parser)
+			if len(tok) != 0 {
+				return fmt.Errorf(`%s: line %d: unknown token '%s'`, logp, m.lineno, tok)
 			}
-			if c == '\n' {
-				m.lineno++
-				c = m.reader.SkipSpaces()
-				continue
+			if c == 0 {
+				break
 			}
-			break
 		}
-
 		if c != ')' {
-			return fmt.Errorf("line %d: missing SOA closing parentheses", m.lineno)
+			return fmt.Errorf(`%s: line %d: missing SOA closing parentheses`, logp, m.lineno)
 		}
+		m.parser.RemoveDelimiters([]byte{'(', ')'})
+	}
 
-		_, _, c = m.reader.ReadUntil(m.seps, m.terms)
-		if c == ';' {
-			m.reader.SkipLine()
-			m.lineno++
-		}
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	if m.ttl == 0 {
@@ -807,34 +688,44 @@ out:
 	return nil
 }
 
+// getMultilineToken get the next token skipping empty or commented line.
+func (m *zoneParser) getMultilineToken(parser *libbytes.Parser) (tok []byte, c byte) {
+	for {
+		tok, c = parser.ReadNoSpace()
+		if c == ';' || c == '\n' {
+			c = parser.SkipLine()
+			m.lineno++
+		}
+		if len(tok) != 0 || c == 0 || c == ')' {
+			break
+		}
+	}
+	return tok, c
+}
+
 func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	var (
-		rrHInfo = &RDataHINFO{
-			CPU: tok,
-		}
+		logp    = `parseHInfo`
+		rrHInfo = &RDataHINFO{}
 
-		c      byte
-		isTerm bool
+		c byte
 	)
 
 	rr.Value = rrHInfo
 
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: missing HInfo OS value", m.lineno)
-	}
+	rrHInfo.CPU = tok
 
 	// Get OS
-	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
+	tok, c = m.parser.ReadNoSpace()
 	if len(tok) == 0 {
-		return fmt.Errorf("line %d: missing HInfo OS value", m.lineno)
+		return fmt.Errorf(`%s: line %d: missing HInfo OS value`, logp, m.lineno)
 	}
 
 	rrHInfo.OS = tok
 
-	if !isTerm {
-		m.reader.SkipLine()
-		m.lineno++
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -842,32 +733,27 @@ func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 
 func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 	var (
-		rrMInfo = &RDataMINFO{
-			RMailBox: m.generateDomainName(tok),
-		}
+		logp    = `parseMInfo`
+		rrMInfo = &RDataMINFO{}
 
-		c      byte
-		isTerm bool
+		c byte
 	)
 
 	rr.Value = rrMInfo
 
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: missing MInfo EmailBox value", m.lineno)
-	}
+	rrMInfo.RMailBox = m.generateDomainName(tok)
 
 	// Get EmailBox value
-	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
+	tok, c = m.parser.ReadNoSpace()
 	if len(tok) == 0 {
-		return fmt.Errorf("line %d: missing MInfo EmailBox value", m.lineno)
+		return fmt.Errorf(`%s: line %d: missing MInfo EmailBox value`, logp, m.lineno)
 	}
 
 	rrMInfo.EmailBox = m.generateDomainName(tok)
 
-	if !isTerm {
-		m.reader.SkipLine()
-		m.lineno++
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -875,15 +761,16 @@ func (m *zoneParser) parseMInfo(rr *ResourceRecord, tok []byte) (err error) {
 
 func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	var (
-		rrMX   *RDataMX
-		pref   int64
-		c      byte
-		isTerm bool
+		logp = `parseMX`
+
+		rrMX *RDataMX
+		pref int64
+		c    byte
 	)
 
 	pref, err = strconv.ParseInt(string(tok), 10, 64)
 	if err != nil {
-		return fmt.Errorf("line %d: invalid MX Preference: %w", m.lineno, err)
+		return fmt.Errorf(`%s: line %d: invalid MX Preference '%s': %w`, logp, m.lineno, tok, err)
 	}
 
 	rrMX = &RDataMX{
@@ -891,22 +778,17 @@ func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 	}
 	rr.Value = rrMX
 
-	_, c = m.reader.SkipHorizontalSpace()
-	if c == 0 || c == ';' {
-		return fmt.Errorf("line %d: Missing MX Exchange value", m.lineno)
-	}
-
-	// Get EmailBox value
-	tok, isTerm, _ = m.reader.ReadUntil(m.seps, m.terms)
+	// Get Exchange value
+	tok, c = m.parser.ReadNoSpace()
 	if len(tok) == 0 {
-		return fmt.Errorf("line %d: missing MX Exchange value", m.lineno)
+		return fmt.Errorf(`%s: line %d: missing MX Exchange value`, logp, m.lineno)
 	}
 
 	rrMX.Exchange = m.generateDomainName(tok)
 
-	if !isTerm {
-		m.reader.SkipLine()
-		m.lineno++
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -919,48 +801,43 @@ func (m *zoneParser) parseMX(rr *ResourceRecord, tok []byte) (err error) {
 //
 //	TXT "a page"
 //	TXT a\032page
-func (m *zoneParser) parseTXT(rr *ResourceRecord, v []byte) (err error) {
+func (m *zoneParser) parseTXT(rr *ResourceRecord, txt []byte, c byte) (err error) {
 	var (
-		logp = `parseTXT`
+		logp        = `parseTXT`
+		spaceDelims = []byte{' ', '\t'}
+		quoteDelims = []byte{'"'}
 
-		c        byte
-		isEsc    bool
-		isQuoted bool
+		tok []byte
 	)
 
-	if v[0] == '"' {
-		isQuoted = true
-	}
-	for ; m.reader.X < len(m.reader.V); m.reader.X++ {
-		c = m.reader.V[m.reader.X]
-		if isEsc {
-			v = append(v, '\\', c)
-			isEsc = false
-			continue
+	if txt[0] == '"' {
+		if c == ' ' || c == '\t' {
+			txt = append(txt, c)
 		}
-		if c == '\\' {
-			isEsc = true
-			continue
+
+		m.parser.RemoveDelimiters(spaceDelims)
+		m.parser.AddDelimiters(quoteDelims)
+
+		tok, c = m.parser.Read()
+		if c != '"' {
+			return fmt.Errorf(`%s: missing closing '"'`, logp)
 		}
-		if ascii.IsSpace(c) && !isQuoted {
-			m.reader.X++
-			break
-		}
-		if c == '"' && isQuoted {
-			v = append(v, c)
-			m.reader.X++
-			break
-		}
-		v = append(v, c)
+		txt = append(txt, tok...)
+		txt = append(txt, '"')
+
+		m.parser.RemoveDelimiters(quoteDelims)
+		m.parser.AddDelimiters(spaceDelims)
 	}
 
-	m.reader.SkipLine()
+	m.parser.SkipLine()
+	m.lineno++
 
-	v, err = m.decodeString(v)
+	txt, err = m.decodeString(txt)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
-	rr.Value = string(v)
+
+	rr.Value = string(txt)
 
 	return nil
 }
@@ -981,10 +858,6 @@ func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 			Service: svcProtoName[0],
 			Proto:   svcProtoName[1],
 		}
-
-		v      int
-		c      byte
-		isTerm bool
 	)
 
 	if len(svcProtoName) == 2 {
@@ -993,58 +866,83 @@ func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 		rrSRV.Name = svcProtoName[2]
 	}
 
-	m.flag = parseSRVPriority
+	const (
+		flagPriority = iota
+		flagWeight
+		flagPort
+		flagTarget
+	)
+	var (
+		flag int
+		stok string
+		vint int
+		c    byte
+	)
 
-	for {
-		switch m.flag {
-		case parseSRVPriority:
-			v, err = strconv.Atoi(string(tok))
-			if err != nil {
-				return fmt.Errorf(`%s: line %d: invalid Priority value %s: %w`, logp, m.lineno, tok, err)
-			}
-			rrSRV.Priority = uint16(v)
-			m.flag = parseSRVWeight
+	stok = string(tok)
+	vint, err = strconv.Atoi(stok)
+	if err != nil {
+		return fmt.Errorf(`%s: line %d: invalid Priority value %s: %w`, logp, m.lineno, tok, err)
+	}
+	rrSRV.Priority = uint16(vint)
+	flag = flagPriority
 
-		case parseSRVWeight:
-			v, err = strconv.Atoi(string(tok))
-			if err != nil {
-				return fmt.Errorf(`%s: line %d: invalid Weight value %s: %w`, logp, m.lineno, tok, err)
-			}
-			rrSRV.Weight = uint16(v)
-			m.flag = parseSRVPort
-
-		case parseSRVPort:
-			v, err = strconv.Atoi(string(tok))
-			if err != nil {
-				return fmt.Errorf(`%s: line %d: invalid Port value %s: %w`, logp, m.lineno, tok, err)
-			}
-			rrSRV.Port = uint16(v)
-			m.flag = parseSRVTarget
-
-		case parseSRVTarget:
-			rrSRV.Target = string(tok)
-			goto out
-		}
-
-		_, c = m.reader.SkipHorizontalSpace()
-		if c == 0 || c == ';' {
+	for flag != flagTarget {
+		tok, c = m.parser.ReadNoSpace()
+		if len(tok) == 0 {
 			return fmt.Errorf(`%s: line %d: incomplete SRV RDATA`, logp, m.lineno)
 		}
 
-		tok, isTerm, c = m.reader.ReadUntil(m.seps, m.terms)
-	}
-out:
-	if isTerm {
-		if c == ';' {
-			m.reader.SkipLine()
-			m.lineno++
+		stok = string(tok)
+
+		switch flag {
+		case flagPriority:
+			vint, err = strconv.Atoi(stok)
+			if err != nil {
+				return fmt.Errorf(`%s: line %d: invalid Weight value %s: %w`, logp, m.lineno, tok, err)
+			}
+			rrSRV.Weight = uint16(vint)
+			flag = flagWeight
+
+		case flagWeight:
+			vint, err = strconv.Atoi(stok)
+			if err != nil {
+				return fmt.Errorf(`%s: line %d: invalid Port value %s: %w`, logp, m.lineno, tok, err)
+			}
+			rrSRV.Port = uint16(vint)
+			flag = flagPort
+
+		case flagPort:
+			rrSRV.Target = string(tok)
+			flag = flagTarget
 		}
-	} else {
-		m.reader.SkipLine()
-		m.lineno++
+	}
+
+	err = m.skipLine(c)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	rr.Value = rrSRV
+
+	return nil
+}
+
+func (m *zoneParser) skipLine(c byte) (err error) {
+	var tok []byte
+
+	if c == ' ' || c == '\t' {
+		tok, c = m.parser.ReadNoSpace()
+		if len(tok) != 0 {
+			return fmt.Errorf(`unknown token '%s'`, tok)
+		}
+	}
+	switch c {
+	case 0, '\n':
+	case ';':
+		m.parser.SkipLine()
+	}
+	m.lineno++
 
 	return nil
 }
