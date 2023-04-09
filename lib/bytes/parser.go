@@ -194,17 +194,18 @@ func (bp *Parser) SkipN(n int) (c byte) {
 }
 
 // SkipHorizontalSpaces skip space (" "), tab ("\t"), carriage return
-// ("\r"), and form feed ("\f") characters; and return the first non-space
-// character or 0 if it reach end-of-content.
-func (bp *Parser) SkipHorizontalSpaces() (c byte) {
+// ("\r"), and form feed ("\f") characters; and return the number of space
+// skipped and first non-space character or 0 if it reach end-of-content.
+func (bp *Parser) SkipHorizontalSpaces() (n int, c byte) {
 	for ; bp.x < bp.size; bp.x++ {
 		c = bp.content[bp.x]
 		if c == ' ' || c == '\t' || c == '\r' || c == '\f' {
+			n++
 			continue
 		}
-		return c
+		return n, c
 	}
-	return 0
+	return n, 0
 }
 
 // SkipLine skip all characters until new line.
@@ -222,16 +223,18 @@ func (bp *Parser) SkipLine() (c byte) {
 }
 
 // SkipSpaces skip all spaces character (' ', '\f', '\n', '\r', '\t') and
-// return the first non-space character or 0 if it reach end-of-content.
-func (bp *Parser) SkipSpaces() (c byte) {
+// return the number of spaces skipped and first non-space character or 0 if
+// it reach end-of-content.
+func (bp *Parser) SkipSpaces() (n int, c byte) {
 	for ; bp.x < bp.size; bp.x++ {
 		c = bp.content[bp.x]
 		if ascii.IsSpace(c) {
+			n++
 			continue
 		}
-		return c
+		return n, c
 	}
-	return 0
+	return n, 0
 }
 
 // Stop the parser, return the remaining unparsed content and its last

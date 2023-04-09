@@ -62,7 +62,7 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 		return ct, nil
 	}
 
-	c = parser.SkipSpaces()
+	_, c = parser.SkipSpaces()
 	parser.SetDelimiters([]byte{'=', '"'})
 	for c != 0 {
 		param := Param{}
@@ -104,7 +104,7 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 		param.Key = bytes.ToLower(param.Key)
 		ct.Params = append(ct.Params, param)
 
-		c = parser.SkipSpaces()
+		_, c = parser.SkipSpaces()
 	}
 
 	return ct, nil

@@ -209,25 +209,26 @@ func ExampleParser_SkipHorizontalSpaces() {
 		content = []byte(" \t\r\fA. \nB.")
 		delims  = []byte{'.'}
 		parser  = libbytes.NewParser(content, delims)
+		n       int
 	)
 
-	parser.SkipHorizontalSpaces()
+	n, _ = parser.SkipHorizontalSpaces()
 	token, d := parser.Read()
-	fmt.Printf("token:%s delim:%c\n", token, d)
+	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
 
-	parser.SkipHorizontalSpaces()
+	n, _ = parser.SkipHorizontalSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("token:%s delim:%c\n", token, d)
+	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
 
-	parser.SkipHorizontalSpaces()
+	n, _ = parser.SkipHorizontalSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("token:%s delim:%d\n", token, d)
+	fmt.Printf("n:%d token:%s delim:%d\n", n, token, d)
 
 	// Output:
-	// token:A delim:.
-	// token:
+	// n:4 token:A delim:.
+	// n:1 token:
 	// B delim:.
-	// token: delim:0
+	// n:0 token: delim:0
 }
 
 func ExampleParser_SkipSpaces() {
@@ -235,24 +236,25 @@ func ExampleParser_SkipSpaces() {
 		content = []byte(" \t\r\fA. \nB.")
 		delims  = []byte{'.'}
 		parser  = libbytes.NewParser(content, delims)
+		n       int
 	)
 
-	parser.SkipSpaces()
+	n, _ = parser.SkipSpaces()
 	token, d := parser.Read()
-	fmt.Printf("token:%s delim:%c\n", token, d)
+	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
 
-	parser.SkipSpaces()
+	n, _ = parser.SkipSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("token:%s delim:%c\n", token, d)
+	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
 
-	parser.SkipSpaces()
+	n, _ = parser.SkipSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("token:%s delim:%d\n", token, d)
+	fmt.Printf("n:%d token:%s delim:%d\n", n, token, d)
 
 	// Output:
-	// token:A delim:.
-	// token:B delim:.
-	// token: delim:0
+	// n:4 token:A delim:.
+	// n:2 token:B delim:.
+	// n:0 token: delim:0
 }
 
 func ExampleParser_Stop() {
