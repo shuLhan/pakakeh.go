@@ -5,7 +5,70 @@ import (
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
+	"github.com/shuLhan/share/lib/test/mock"
 )
+
+func TestConfirmYesNo(t *testing.T) {
+	cases := []struct {
+		answer   string
+		defIsYes bool
+		exp      bool
+	}{{
+		defIsYes: true,
+		exp:      true,
+	}, {
+		defIsYes: true,
+		answer:   `  `,
+		exp:      true,
+	}, {
+		defIsYes: true,
+		answer:   `  no`,
+		exp:      false,
+	}, {
+		defIsYes: true,
+		answer:   ` yes`,
+		exp:      true,
+	}, {
+		defIsYes: true,
+		answer:   ` Ys`,
+		exp:      true,
+	}, {
+		defIsYes: false,
+		exp:      false,
+	}, {
+		defIsYes: false,
+		answer:   ``,
+		exp:      false,
+	}, {
+
+		defIsYes: false,
+		answer:   `  no`,
+		exp:      false,
+	}, {
+		defIsYes: false,
+		answer:   `  yes`,
+		exp:      true,
+	}}
+
+	in := mock.Stdin()
+
+	for _, c := range cases {
+		t.Log(c)
+
+		_, err := in.WriteString(c.answer + "\n")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mock.ResetStdin(false)
+
+		got := ConfirmYesNo(in, `confirm`, c.defIsYes)
+
+		test.Assert(t, `answer`, c.exp, got)
+
+		mock.ResetStdin(true)
+	}
+}
 
 func TestCopy(t *testing.T) {
 	cases := []struct {
