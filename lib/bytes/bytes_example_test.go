@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package bytes
+package bytes_test
 
 import (
 	"bytes"
@@ -11,11 +11,12 @@ import (
 	"math"
 
 	"github.com/shuLhan/share/lib/ascii"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 func ExampleAppendInt16() {
 	for _, v := range []int16{math.MinInt16, 0xab, 0xabc, math.MaxInt16} {
-		out := AppendInt16([]byte{}, v)
+		out := libbytes.AppendInt16([]byte{}, v)
 		fmt.Printf("%6d => %#04x => %#02v\n", v, v, out)
 	}
 	// Output:
@@ -27,7 +28,7 @@ func ExampleAppendInt16() {
 
 func ExampleAppendInt32() {
 	for _, v := range []int32{math.MinInt32, 0xab, 0xabc, math.MaxInt32} {
-		out := AppendInt32([]byte{}, v)
+		out := libbytes.AppendInt32([]byte{}, v)
 		fmt.Printf("%11d => %#x => %#v\n", v, v, out)
 	}
 	// Output:
@@ -40,12 +41,12 @@ func ExampleAppendInt32() {
 func ExampleAppendUint16() {
 	inputs := []uint16{0, 0xab, 0xabc, math.MaxInt16, math.MaxUint16}
 	for _, v := range inputs {
-		out := AppendUint16([]byte{}, v)
+		out := libbytes.AppendUint16([]byte{}, v)
 		fmt.Printf("%5d => %#04x => %#02v\n", v, v, out)
 	}
 
 	v := inputs[4] + 1 // MaxUint16 + 1
-	out := AppendUint16([]byte{}, v)
+	out := libbytes.AppendUint16([]byte{}, v)
 	fmt.Printf("%5d => %#04x => %#02v\n", v, v, out)
 
 	// Output:
@@ -60,12 +61,12 @@ func ExampleAppendUint16() {
 func ExampleAppendUint32() {
 	inputs := []uint32{0, 0xab, 0xabc, math.MaxInt32, math.MaxUint32}
 	for _, v := range inputs {
-		out := AppendUint32([]byte{}, v)
+		out := libbytes.AppendUint32([]byte{}, v)
 		fmt.Printf("%11d => %#x => %#v\n", v, v, out)
 	}
 
 	v := inputs[4] + 2 // MaxUint32 + 2
-	out := AppendUint32([]byte{}, v)
+	out := libbytes.AppendUint32([]byte{}, v)
 	fmt.Printf("%11d => %#x => %#v\n", v, v, out)
 
 	// Output:
@@ -78,12 +79,12 @@ func ExampleAppendUint32() {
 }
 
 func ExampleConcat() {
-	fmt.Printf("%s\n", Concat())
-	fmt.Printf("%s\n", Concat([]byte{}))
-	fmt.Printf("%s\n", Concat([]byte{}, []byte("B")))
-	fmt.Printf("%s\n", Concat("with []int:", []int{1, 2}))
-	fmt.Printf("%s\n", Concat([]byte("bytes"), " and ", []byte("string")))
-	fmt.Printf("%s\n", Concat([]byte("A"), 1, []int{2}, []byte{}, []byte("C")))
+	fmt.Printf("%s\n", libbytes.Concat())
+	fmt.Printf("%s\n", libbytes.Concat([]byte{}))
+	fmt.Printf("%s\n", libbytes.Concat([]byte{}, []byte("B")))
+	fmt.Printf("%s\n", libbytes.Concat("with []int:", []int{1, 2}))
+	fmt.Printf("%s\n", libbytes.Concat([]byte("bytes"), " and ", []byte("string")))
+	fmt.Printf("%s\n", libbytes.Concat([]byte("A"), 1, []int{2}, []byte{}, []byte("C")))
 	// Output:
 	//
 	//
@@ -96,12 +97,12 @@ func ExampleConcat() {
 func ExampleCopy() {
 	// Copying empty slice.
 	org := []byte{}
-	cp := Copy(org)
+	cp := libbytes.Copy(org)
 	fmt.Printf("%d %q\n", len(cp), cp)
 
 	org = []byte("slice of life")
 	tmp := org
-	cp = Copy(org)
+	cp = libbytes.Copy(org)
 	fmt.Printf("%d %q\n", len(cp), cp)
 	fmt.Printf("Original address == tmp address: %v\n", &org[0] == &tmp[0])
 	fmt.Printf("Original address == copy address: %v\n", &org[0] == &cp[0])
@@ -116,19 +117,19 @@ func ExampleCopy() {
 func ExampleCutUntilToken() {
 	text := []byte(`\\abc \def \deg`)
 
-	cut, pos, found := CutUntilToken(text, nil, 0, false)
+	cut, pos, found := libbytes.CutUntilToken(text, nil, 0, false)
 	fmt.Printf("'%s' %d %t\n", cut, pos, found)
 
-	cut, pos, found = CutUntilToken(text, []byte("def"), 0, false)
+	cut, pos, found = libbytes.CutUntilToken(text, []byte("def"), 0, false)
 	fmt.Printf("'%s' %d %t\n", cut, pos, found)
 
-	cut, pos, found = CutUntilToken(text, []byte("def"), 0, true)
+	cut, pos, found = libbytes.CutUntilToken(text, []byte("def"), 0, true)
 	fmt.Printf("'%s' %d %t\n", cut, pos, found)
 
-	cut, pos, found = CutUntilToken(text, []byte("ef"), -1, true)
+	cut, pos, found = libbytes.CutUntilToken(text, []byte("ef"), -1, true)
 	fmt.Printf("'%s' %d %t\n", cut, pos, found)
 
-	cut, pos, found = CutUntilToken(text, []byte("hi"), 0, true)
+	cut, pos, found = libbytes.CutUntilToken(text, []byte("hi"), 0, true)
 	fmt.Printf("'%s' %d %t\n", cut, pos, found)
 
 	// Output:
@@ -142,26 +143,26 @@ func ExampleCutUntilToken() {
 func ExampleEncloseRemove() {
 	text := []byte(`[[ A ]]-[[ B ]] C`)
 
-	got, isCut := EncloseRemove(text, []byte("[["), []byte("]]"))
+	got, isCut := libbytes.EncloseRemove(text, []byte("[["), []byte("]]"))
 	fmt.Printf("'%s' %t\n", got, isCut)
 
-	got, isCut = EncloseRemove(text, []byte("[["), []byte("}}"))
+	got, isCut = libbytes.EncloseRemove(text, []byte("[["), []byte("}}"))
 	fmt.Printf("'%s' %t\n", got, isCut)
 
 	text = []byte(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 
-	got, isCut = EncloseRemove(text, []byte("<"), []byte(">"))
+	got, isCut = libbytes.EncloseRemove(text, []byte("<"), []byte(">"))
 	fmt.Printf("'%s' %t\n", got, isCut)
 
-	got, isCut = EncloseRemove(text, []byte(`"`), []byte(`"`))
+	got, isCut = libbytes.EncloseRemove(text, []byte(`"`), []byte(`"`))
 	fmt.Printf("'%s' %t\n", got, isCut)
 
-	got, isCut = EncloseRemove(text, []byte(`/`), []byte(`/`))
+	got, isCut = libbytes.EncloseRemove(text, []byte(`/`), []byte(`/`))
 	fmt.Printf("'%s' %t\n", got, isCut)
 
 	text = []byte(`/* TEST */`)
 
-	got, isCut = EncloseRemove(text, []byte(`/*`), []byte(`*/`))
+	got, isCut = libbytes.EncloseRemove(text, []byte(`/*`), []byte(`*/`))
 	fmt.Printf("'%s' %t\n", got, isCut)
 
 	// Output:
@@ -176,16 +177,16 @@ func ExampleEncloseRemove() {
 func ExampleEncloseToken() {
 	text := []byte(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 
-	got, isChanged := EncloseToken(text, []byte(`"`), []byte(`\`), []byte(`_`))
+	got, isChanged := libbytes.EncloseToken(text, []byte(`"`), []byte(`\`), []byte(`_`))
 	fmt.Printf("%t '%s'\n", isChanged, got)
 
-	got, isChanged = EncloseToken(text, []byte(`_`), []byte(`-`), []byte(`-`))
+	got, isChanged = libbytes.EncloseToken(text, []byte(`_`), []byte(`-`), []byte(`-`))
 	fmt.Printf("%t '%s'\n", isChanged, got)
 
-	got, isChanged = EncloseToken(text, []byte(`/`), []byte(`\`), nil)
+	got, isChanged = libbytes.EncloseToken(text, []byte(`/`), []byte(`\`), nil)
 	fmt.Printf("%t '%s'\n", isChanged, got)
 
-	got, isChanged = EncloseToken(text, []byte(`<`), []byte(`<`), []byte(` `))
+	got, isChanged = libbytes.EncloseToken(text, []byte(`<`), []byte(`<`), []byte(` `))
 	fmt.Printf("%t '%s'\n", isChanged, got)
 
 	// Output:
@@ -196,13 +197,13 @@ func ExampleEncloseToken() {
 }
 
 func ExampleInReplace() {
-	text := InReplace([]byte{}, []byte(ascii.LettersNumber), '_')
+	text := libbytes.InReplace([]byte{}, []byte(ascii.LettersNumber), '_')
 	fmt.Printf("%q\n", text)
 
-	text = InReplace([]byte("/a/b/c"), []byte(ascii.LettersNumber), '_')
+	text = libbytes.InReplace([]byte("/a/b/c"), []byte(ascii.LettersNumber), '_')
 	fmt.Printf("%q\n", text)
 
-	_ = InReplace(text, []byte(ascii.LettersNumber), '/')
+	_ = libbytes.InReplace(text, []byte(ascii.LettersNumber), '/')
 	fmt.Printf("%q\n", text)
 
 	// Output:
@@ -212,9 +213,9 @@ func ExampleInReplace() {
 }
 
 func ExampleIndexes() {
-	fmt.Println(Indexes([]byte(""), []byte("moo")))
-	fmt.Println(Indexes([]byte("moo moomoo"), []byte{}))
-	fmt.Println(Indexes([]byte("moo moomoo"), []byte("moo")))
+	fmt.Println(libbytes.Indexes([]byte(""), []byte("moo")))
+	fmt.Println(libbytes.Indexes([]byte("moo moomoo"), []byte{}))
+	fmt.Println(libbytes.Indexes([]byte("moo moomoo"), []byte("moo")))
 	// Output:
 	// []
 	// []
@@ -227,12 +228,12 @@ func ExampleIsTokenAt() {
 	tokenWorlds := []byte("worlds")
 	tokenEmpty := []byte{}
 
-	fmt.Printf("%t\n", IsTokenAt(text, tokenEmpty, 6))
-	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, -1))
-	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, 6))
-	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, 7))
-	fmt.Printf("%t\n", IsTokenAt(text, tokenWorld, 8))
-	fmt.Printf("%t\n", IsTokenAt(text, tokenWorlds, 8))
+	fmt.Printf("%t\n", libbytes.IsTokenAt(text, tokenEmpty, 6))
+	fmt.Printf("%t\n", libbytes.IsTokenAt(text, tokenWorld, -1))
+	fmt.Printf("%t\n", libbytes.IsTokenAt(text, tokenWorld, 6))
+	fmt.Printf("%t\n", libbytes.IsTokenAt(text, tokenWorld, 7))
+	fmt.Printf("%t\n", libbytes.IsTokenAt(text, tokenWorld, 8))
+	fmt.Printf("%t\n", libbytes.IsTokenAt(text, tokenWorlds, 8))
 	// Output:
 	// false
 	// false
@@ -243,8 +244,8 @@ func ExampleIsTokenAt() {
 }
 
 func ExampleMergeSpaces() {
-	fmt.Printf("%s\n", MergeSpaces([]byte("")))
-	fmt.Printf("%s\n", MergeSpaces([]byte(" \t\v\r\n\r\n\fa \t\v\r\n\r\n\f")))
+	fmt.Printf("%s\n", libbytes.MergeSpaces([]byte("")))
+	fmt.Printf("%s\n", libbytes.MergeSpaces([]byte(" \t\v\r\n\r\n\fa \t\v\r\n\r\n\f")))
 	// Output:
 	//
 	//  a
@@ -258,12 +259,12 @@ func ExampleParseHexDump() {
 		err error
 	)
 
-	out, err = ParseHexDump(in)
+	out, err = libbytes.ParseHexDump(in)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf(`%s`, TrimNull(out))
+	fmt.Printf(`%s`, libbytes.TrimNull(out))
 	// Output:
 	// Hello, world!
 }
@@ -271,7 +272,7 @@ func ExampleParseHexDump() {
 func ExamplePrintHex() {
 	title := "PrintHex"
 	data := []byte("Hello, world !")
-	PrintHex(title, data, 5)
+	libbytes.PrintHex(title, data, 5)
 	// Output:
 	// PrintHex
 	//    0 - 48 65 6C 6C 6F || H e l l o
@@ -280,14 +281,14 @@ func ExamplePrintHex() {
 }
 
 func ExampleReadHexByte() {
-	fmt.Println(ReadHexByte([]byte{}, 0))
-	fmt.Println(ReadHexByte([]byte("x0"), 0))
-	fmt.Println(ReadHexByte([]byte("00"), 0))
-	fmt.Println(ReadHexByte([]byte("01"), 0))
-	fmt.Println(ReadHexByte([]byte("10"), 0))
-	fmt.Println(ReadHexByte([]byte("1A"), 0))
-	fmt.Println(ReadHexByte([]byte("1a"), 0))
-	fmt.Println(ReadHexByte([]byte("1a"), -1))
+	fmt.Println(libbytes.ReadHexByte([]byte{}, 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("x0"), 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("00"), 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("01"), 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("10"), 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("1A"), 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("1a"), 0))
+	fmt.Println(libbytes.ReadHexByte([]byte("1a"), -1))
 	// Output:
 	// 0 false
 	// 0 false
@@ -300,9 +301,9 @@ func ExampleReadHexByte() {
 }
 
 func ExampleReadInt16() {
-	fmt.Println(ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 3)) // x is out of range.
-	fmt.Println(ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x0102
-	fmt.Println(ReadInt16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
+	fmt.Println(libbytes.ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 3)) // x is out of range.
+	fmt.Println(libbytes.ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x0102
+	fmt.Println(libbytes.ReadInt16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
 	// Output:
 	// 0
 	// 258
@@ -310,9 +311,9 @@ func ExampleReadInt16() {
 }
 
 func ExampleReadInt32() {
-	fmt.Println(ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
-	fmt.Println(ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
-	fmt.Println(ReadInt32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
+	fmt.Println(libbytes.ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
+	fmt.Println(libbytes.ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
+	fmt.Println(libbytes.ReadInt32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
 	// Output:
 	// 0
 	// 16909060
@@ -320,9 +321,9 @@ func ExampleReadInt32() {
 }
 
 func ExampleReadUint16() {
-	fmt.Println(ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 3)) // x is out of range.
-	fmt.Println(ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 0)) // 0x0102
-	fmt.Println(ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
+	fmt.Println(libbytes.ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 3)) // x is out of range.
+	fmt.Println(libbytes.ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 0)) // 0x0102
+	fmt.Println(libbytes.ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
 	// Output:
 	// 0
 	// 258
@@ -330,9 +331,9 @@ func ExampleReadUint16() {
 }
 
 func ExampleReadUint32() {
-	fmt.Println(ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
-	fmt.Println(ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
-	fmt.Println(ReadUint32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
+	fmt.Println(libbytes.ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
+	fmt.Println(libbytes.ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
+	fmt.Println(libbytes.ReadUint32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
 	// Output:
 	// 0
 	// 16909060
@@ -342,12 +343,12 @@ func ExampleReadUint32() {
 func ExampleSkipAfterToken() {
 	text := []byte(`abc \def ghi`)
 
-	fmt.Println(SkipAfterToken(text, []byte("def"), -1, false))
-	fmt.Println(SkipAfterToken(text, []byte("def"), 0, true))
-	fmt.Println(SkipAfterToken(text, []byte("deg"), 0, false))
-	fmt.Println(SkipAfterToken(text, []byte("deg"), 0, true))
-	fmt.Println(SkipAfterToken(text, []byte("ef"), 0, true))
-	fmt.Println(SkipAfterToken(text, []byte("hi"), 0, true))
+	fmt.Println(libbytes.SkipAfterToken(text, []byte("def"), -1, false))
+	fmt.Println(libbytes.SkipAfterToken(text, []byte("def"), 0, true))
+	fmt.Println(libbytes.SkipAfterToken(text, []byte("deg"), 0, false))
+	fmt.Println(libbytes.SkipAfterToken(text, []byte("deg"), 0, true))
+	fmt.Println(libbytes.SkipAfterToken(text, []byte("ef"), 0, true))
+	fmt.Println(libbytes.SkipAfterToken(text, []byte("hi"), 0, true))
 	// Output:
 	// 8 true
 	// -1 false
@@ -361,7 +362,7 @@ func ExampleSnippetByIndexes() {
 	s := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
 	indexes := []int{3, 20, len(s) - 4}
 
-	snippets := SnippetByIndexes(s, indexes, 5)
+	snippets := libbytes.SnippetByIndexes(s, indexes, 5)
 	for _, snip := range snippets {
 		fmt.Printf("%s\n", snip)
 	}
@@ -374,11 +375,11 @@ func ExampleSnippetByIndexes() {
 func ExampleSplitEach() {
 	var data = []byte(`Hello`)
 
-	fmt.Printf("%s\n", SplitEach(data, 0))
-	fmt.Printf("%s\n", SplitEach(data, 1))
-	fmt.Printf("%s\n", SplitEach(data, 2))
-	fmt.Printf("%s\n", SplitEach(data, 5))
-	fmt.Printf("%s\n", SplitEach(data, 10))
+	fmt.Printf("%s\n", libbytes.SplitEach(data, 0))
+	fmt.Printf("%s\n", libbytes.SplitEach(data, 1))
+	fmt.Printf("%s\n", libbytes.SplitEach(data, 2))
+	fmt.Printf("%s\n", libbytes.SplitEach(data, 5))
+	fmt.Printf("%s\n", libbytes.SplitEach(data, 10))
 	// Output:
 	// [Hello]
 	// [H e l l o]
@@ -390,12 +391,12 @@ func ExampleSplitEach() {
 func ExampleTokenFind() {
 	text := []byte("// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.")
 
-	fmt.Println(TokenFind(text, []byte{}, 0))
-	fmt.Println(TokenFind(text, []byte("right"), -1))
-	fmt.Println(TokenFind(text, []byte("."), 0))
-	fmt.Println(TokenFind(text, []byte("."), 42))
-	fmt.Println(TokenFind(text, []byte("."), 48))
-	fmt.Println(TokenFind(text, []byte("d."), 0))
+	fmt.Println(libbytes.TokenFind(text, []byte{}, 0))
+	fmt.Println(libbytes.TokenFind(text, []byte("right"), -1))
+	fmt.Println(libbytes.TokenFind(text, []byte("."), 0))
+	fmt.Println(libbytes.TokenFind(text, []byte("."), 42))
+	fmt.Println(libbytes.TokenFind(text, []byte("."), 48))
+	fmt.Println(libbytes.TokenFind(text, []byte("d."), 0))
 	// Output:
 	// -1
 	// 7
@@ -408,7 +409,7 @@ func ExampleTokenFind() {
 func ExampleTrimNull() {
 	var in = []byte{0, 'H', 'e', 'l', 'l', 'o', 0, 0}
 
-	in = TrimNull(in)
+	in = libbytes.TrimNull(in)
 	fmt.Printf(`%s`, in)
 	// Output: Hello
 }
@@ -416,9 +417,9 @@ func ExampleTrimNull() {
 func ExampleWordIndexes() {
 	text := []byte("moo moomoo moo")
 
-	fmt.Println(WordIndexes(text, []byte("mo")))
-	fmt.Println(WordIndexes(text, []byte("moo")))
-	fmt.Println(WordIndexes(text, []byte("mooo")))
+	fmt.Println(libbytes.WordIndexes(text, []byte("mo")))
+	fmt.Println(libbytes.WordIndexes(text, []byte("moo")))
+	fmt.Println(libbytes.WordIndexes(text, []byte("mooo")))
 	// Output:
 	// []
 	// [0 11]
@@ -431,7 +432,7 @@ func ExampleDumpPrettyTable() {
 		bb   bytes.Buffer
 	)
 
-	DumpPrettyTable(&bb, `DumpPrettyTable`, data)
+	libbytes.DumpPrettyTable(&bb, `DumpPrettyTable`, data)
 	fmt.Println(bb.String())
 	// Output:
 	// DumpPrettyTable
@@ -449,10 +450,10 @@ func ExampleWriteUint16() {
 	v = 'h' << 8
 	v |= 'E'
 
-	WriteUint16(data, uint(len(data)-1), v) // Index out of range
+	libbytes.WriteUint16(data, uint(len(data)-1), v) // Index out of range
 	fmt.Println(string(data))
 
-	WriteUint16(data, 0, v)
+	libbytes.WriteUint16(data, 0, v)
 	fmt.Println(string(data))
 	// Output:
 	// Hello, world!
@@ -469,13 +470,13 @@ func ExampleWriteUint32() {
 	v |= 'L' << 8
 	v |= 'L'
 
-	WriteUint32(data, uint(len(data)-1), v) // Index out of range
+	libbytes.WriteUint32(data, uint(len(data)-1), v) // Index out of range
 	fmt.Println(string(data))
 
-	WriteUint32(data, 0, v)
+	libbytes.WriteUint32(data, 0, v)
 	fmt.Println(string(data))
 
-	WriteUint32(data, 7, v)
+	libbytes.WriteUint32(data, 7, v)
 	fmt.Println(string(data))
 	// Output:
 	// Hello, world!
