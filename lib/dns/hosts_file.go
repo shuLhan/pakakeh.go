@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"strings"
 
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 // List of known hosts file by OS.
@@ -123,23 +123,26 @@ func LoadHostsDir(dir string) (hostsFiles map[string]*HostsFile, err error) {
 // If path is empty, it will load from the system hosts file.
 func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 	var (
-		reader *libio.Reader
+		logp = `ParseHostsFile`
+
+		content []byte
 	)
 
 	if len(path) == 0 {
 		path = GetSystemHosts()
 	}
 
-	reader, err = libio.NewReader(path)
+	content, err = os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("ParseHostsFile %q: %w", path, err)
+		return nil, fmt.Errorf(`%s: %s: %w`, logp, path, err)
 	}
 
 	hfile = &HostsFile{
-		Path:    path,
-		Name:    filepath.Base(path),
-		Records: parse(reader),
+		Path: path,
+		Name: filepath.Base(path),
 	}
+
+	hfile.Records = parse(content)
 
 	return hfile, nil
 }
@@ -156,71 +159,63 @@ func ParseHostsFile(path string) (hfile *HostsFile, err error) {
 // shorter hostnames, or generic hostnames (for example, localhost). [1]
 //
 // [1] man 5 hosts
-func parse(reader *libio.Reader) (listRR []*ResourceRecord) {
+func parse(content []byte) (listRR []*ResourceRecord) {
 	var (
-		seps  = []byte{'\t', '\v', ' '}
-		terms = []byte{'\n', '\f', '#'}
+		delims = []byte{'#', '\t', ' ', '\n'}
+		parser = libbytes.NewParser(content, delims)
 
-		rr     *ResourceRecord
-		addr   []byte
-		hname  []byte
-		rtype  RecordType
-		c      byte
-		isTerm bool
+		rr    *ResourceRecord
+		addr  []byte
+		hname []byte
+		rtype RecordType
+		c     byte
 	)
 
 	for {
-		c = reader.SkipSpaces()
+		addr, c = parser.ReadNoSpace()
 		if c == 0 {
+			// This could be address without hname,
+			// "127.0.0.1".
 			break
 		}
 		if c == '#' {
-			reader.SkipLine()
+			// This could be address without hname,
+			// "127.0.0.1 #comment\n".
+			parser.SkipLine()
 			continue
 		}
-
-		addr, isTerm, c = reader.ReadUntil(seps, terms)
-		if isTerm {
-			if c == 0 {
-				break
-			}
-			if c == '#' {
-				reader.SkipLine()
-			}
+		if c == '\n' {
+			// This could be address without hname,
+			// "127.0.0.1\n".
+			continue
+		}
+		rtype = RecordTypeFromAddress(addr)
+		if rtype == 0 {
+			// Ignore invalid address, "127.0.0"
+			parser.SkipLine()
 			continue
 		}
 
 		for {
-			c = reader.SkipSpaces()
-			if c == 0 {
+			hname, c = parser.ReadNoSpace()
+			if len(hname) == 0 {
 				break
 			}
+
+			rr = &ResourceRecord{
+				Name:  string(bytes.ToLower(hname)),
+				Type:  rtype,
+				Class: RecordClassIN,
+				TTL:   defaultTTL,
+				Value: string(addr),
+			}
+			listRR = append(listRR, rr)
+
 			if c == '#' {
-				reader.SkipLine()
+				parser.SkipLine()
 				break
 			}
-			hname, isTerm, c = reader.ReadUntil(seps, terms)
-			if len(hname) > 0 {
-				rtype = RecordTypeFromAddress(addr)
-				if rtype == 0 {
-					continue
-				}
-				rr = &ResourceRecord{
-					Name:  string(bytes.ToLower(hname)),
-					Type:  rtype,
-					Class: RecordClassIN,
-					TTL:   defaultTTL,
-					Value: string(addr),
-				}
-				listRR = append(listRR, rr)
-			}
-			if isTerm {
-				if c == 0 {
-					break
-				}
-				if c == '#' {
-					reader.SkipLine()
-				}
+			if c == '\n' {
 				break
 			}
 		}
