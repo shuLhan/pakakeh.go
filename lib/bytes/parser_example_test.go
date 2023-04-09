@@ -37,6 +37,24 @@ func ExampleParser_Delimiters() {
 	// =;
 }
 
+func ExampleParser_ReadLine() {
+	var (
+		content = []byte("a=b;\nc=d;")
+		delims  = []byte{'=', ';'}
+		parser  = libbytes.NewParser(content, delims)
+	)
+
+	token, c := parser.ReadLine()
+	fmt.Printf("token:%s c:%d\n", token, c)
+
+	token, c = parser.ReadLine()
+	fmt.Printf("token:%s c:%d\n", token, c)
+
+	// Output:
+	// token:a=b; c:10
+	// token:c=d; c:0
+}
+
 func ExampleParser_ReadN() {
 	var (
 		content = []byte(`a=b;c=d;`)

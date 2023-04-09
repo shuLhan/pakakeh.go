@@ -56,6 +56,22 @@ func (bp *Parser) Read() (token []byte, d byte) {
 	return token, 0
 }
 
+// ReadLine read until it found new line ('\n') or end of content, ignoring
+// all delimiters.
+// The returned line will not contain '\n'.
+func (bp *Parser) ReadLine() (line []byte, c byte) {
+	for bp.x < bp.size {
+		c = bp.content[bp.x]
+		if c == '\n' {
+			bp.x++
+			return line, c
+		}
+		line = append(line, c)
+		bp.x++
+	}
+	return line, 0
+}
+
 // ReadN read exactly n characters ignoring the delimiters.
 // It will return the token and the character after n or 0 if end-of-content.
 func (bp *Parser) ReadN(n int) (token []byte, d byte) {
