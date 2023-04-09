@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/shuLhan/share/lib/ascii"
-	libio "github.com/shuLhan/share/lib/io"
+	libbytes "github.com/shuLhan/share/lib/bytes"
 )
 
 const (
@@ -22,8 +22,6 @@ const (
 )
 
 var (
-	newLineTerms = []byte{'\n'}
-
 	// lambda to test os.Hostname.
 	getHostname = os.Hostname
 )
@@ -102,33 +100,38 @@ type ResolvConf struct {
 }
 
 // NewResolvConf open resolv.conf file in path and return the parsed records.
-func NewResolvConf(path string) (*ResolvConf, error) {
-	rc := &ResolvConf{
+func NewResolvConf(path string) (rc *ResolvConf, err error) {
+	var (
+		logp = `NewResolvConf`
+
+		content []byte
+	)
+
+	content, err = os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var parser = libbytes.NewParser(content, nil)
+
+	rc = &ResolvConf{
 		OptMisc: make(map[string]bool),
 	}
-
-	reader, err := libio.NewReader(path)
-	if err != nil {
-		return nil, err
-	}
-
-	rc.parse(reader)
+	rc.parse(parser)
 
 	return rc, nil
 }
 
 // Init parse resolv.conf from string.
 func (rc *ResolvConf) Init(src string) {
-	reader := new(libio.Reader)
-	reader.Init([]byte(src))
+	var parser = libbytes.NewParser([]byte(src), nil)
 
 	rc.reset()
-
-	rc.parse(reader)
+	rc.parse(parser)
 }
 
 func (rc *ResolvConf) reset() {
-	rc.Domain = ""
+	rc.Domain = ``
 	rc.Search = nil
 	rc.NameServers = nil
 	rc.OptMisc = make(map[string]bool)
@@ -144,148 +147,156 @@ func (rc *ResolvConf) reset() {
 // by white space.
 //
 // See `man resolv.conf`
-func (rc *ResolvConf) parse(reader *libio.Reader) {
+func (rc *ResolvConf) parse(parser *libbytes.Parser) {
+	parser.SetDelimiters([]byte{' ', '\t', ';', '#', '\n'})
+
+	var (
+		stok string
+		tok  []byte
+		c    byte
+	)
+
 	for {
-		c := reader.SkipSpaces()
-		if c == 0 {
-			break
-		}
-		if c == ';' || c == '#' {
-			reader.SkipUntil(newLineTerms)
+		tok, c = parser.ReadNoSpace()
+		if len(tok) == 0 {
+			if c == 0 {
+				break
+			}
+			if c == ';' || c == '#' {
+				// Skip empty line or keyword without value.
+				parser.SkipLine()
+			}
 			continue
 		}
 
-		tok, isTerm, _ := reader.ReadUntil(ascii.Spaces, newLineTerms)
-		if isTerm {
-			// We found keyword without value.
+		_, c = parser.SkipHorizontalSpaces()
+		if c == '\n' || c == ';' || c == '#' {
+			// Skip empty line or keyword without value.
+			parser.SkipLine()
 			continue
 		}
 
 		tok = ascii.ToLower(tok)
-		v := string(tok)
-		switch v {
-		case "domain":
-			rc.parseValue(reader, &rc.Domain)
-		case "search":
-			rc.parseSearch(reader)
-		case "nameserver":
-			v = ""
-			rc.parseValue(reader, &v)
-			if len(rc.NameServers) < 3 && len(v) > 0 {
-				rc.NameServers = append(rc.NameServers, v)
+		stok = string(tok)
+
+		switch stok {
+		case `domain`:
+			tok, c = parser.ReadNoSpace()
+			if len(tok) != 0 {
+				rc.Domain = string(tok)
 			}
-		case "options":
-			rc.parseOptions(reader)
+			if c != '\n' {
+				parser.SkipLine()
+			}
+
+		case `search`:
+			rc.parseSearch(parser)
+
+		case `nameserver`:
+			tok, c = parser.ReadNoSpace()
+			if len(tok) != 0 {
+				if len(rc.NameServers) < 3 && len(tok) > 0 {
+					rc.NameServers = append(rc.NameServers, string(tok))
+				}
+			}
+			if c != '\n' {
+				parser.SkipLine()
+			}
+
+		case `options`:
+			rc.parseOptions(parser)
+
 		default:
-			reader.SkipUntil(newLineTerms)
+			parser.SkipLine()
 		}
 	}
 
 	rc.sanitize()
 }
 
-func (rc *ResolvConf) parseValue(reader *libio.Reader, out *string) {
-	_, c := reader.SkipHorizontalSpace()
-	if c == '\n' || c == 0 {
-		return
-	}
+// parseSearch parse the "search" directive using the following format,
+//
+//	search domain *(domain)
+//
+// The domain and search keywords are mutually exclusive.
+// If more than one instance of these keywords is present, the last instance
+// wins.
+func (rc *ResolvConf) parseSearch(parser *libbytes.Parser) {
+	var (
+		max    = 6
+		maxLen = 255
 
-	tok, isTerm, _ := reader.ReadUntil(ascii.Spaces, newLineTerms)
-	if len(tok) > 0 {
-		*out = string(tok)
-	}
+		curLen int
+		tok    []byte
+		c      byte
+	)
 
-	if !isTerm {
-		reader.SkipUntil(newLineTerms)
-	}
-}
-
-// (1) The domain and search keywords are mutually exclusive.  If more than
-// one instance of these keywords is present, the last instance wins.
-func (rc *ResolvConf) parseSearch(reader *libio.Reader) {
-	max := 6
-	maxLen := 255
-	var curLen int
-
-	// (1)
 	rc.Search = nil
 
 	for {
-		_, c := reader.SkipHorizontalSpace()
-		if c == '\n' || c == 0 {
+		tok, c = parser.ReadNoSpace()
+
+		if curLen+len(tok) > maxLen {
 			break
 		}
 
-		tok, isTerm, _ := reader.ReadUntil(ascii.Spaces, newLineTerms)
-		if len(tok) > 0 {
-			if curLen+len(tok) > maxLen {
-				break
-			}
-
-			rc.Search = append(rc.Search, string(tok))
-			if len(rc.Search) == max {
-				break
-			}
-
-			curLen += len(tok)
+		rc.Search = append(rc.Search, string(tok))
+		if len(rc.Search) == max {
+			break
 		}
-		if isTerm {
+
+		curLen += len(tok)
+
+		if c == '\n' {
 			break
 		}
 	}
-
-	reader.SkipUntil(newLineTerms)
+	if c != '\n' {
+		parser.SkipLine()
+	}
 }
 
-func (rc *ResolvConf) parseOptions(reader *libio.Reader) {
+func (rc *ResolvConf) parseOptions(parser *libbytes.Parser) {
 	var (
-		c      byte
-		isTerm bool
-		tok    []byte
+		tok []byte
+		c   byte
 	)
-	for {
-		_, c = reader.SkipHorizontalSpace()
-		if c == '\n' || c == 0 {
-			break
-		}
 
-		tok, isTerm, _ = reader.ReadUntil(ascii.Spaces, newLineTerms)
-		if len(tok) > 0 {
-			rc.parseOptionsKV(tok)
-		}
-		if isTerm {
+	for {
+		tok, c = parser.ReadNoSpace()
+		if len(tok) == 0 {
 			break
 		}
+		rc.parseOptionsKV(tok)
+		if c == '\n' {
+			break
+		}
+	}
+	if c != '\n' {
+		parser.SkipLine()
 	}
 }
 
 func (rc *ResolvConf) parseOptionsKV(opt []byte) {
-	var k, v []byte
-	for x := 0; x < len(opt); x++ {
-		if opt[x] == ':' {
-			k = opt[:x]
-			if x+1 < len(opt) {
-				v = opt[x+1:]
-			}
-			break
-		}
-	}
-	if len(k) == 0 {
-		k = opt
+	var (
+		kv  = bytes.SplitN(opt, []byte{':'}, 2)
+		key = string(kv[0])
+
+		value string
+	)
+	if len(kv) == 2 {
+		value = string(kv[1])
 	}
 
-	sk := string(k)
-	switch sk {
-	case "ndots":
-		rc.NDots, _ = strconv.Atoi(string(v))
-	case "timeout":
-		rc.Timeout, _ = strconv.Atoi(string(v))
-	case "attempts":
-		rc.Attempts, _ = strconv.Atoi(string(v))
+	switch key {
+	case `ndots`:
+		rc.NDots, _ = strconv.Atoi(value)
+	case `timeout`:
+		rc.Timeout, _ = strconv.Atoi(value)
+	case `attempts`:
+		rc.Attempts, _ = strconv.Atoi(value)
 	default:
-		if len(k) > 0 {
-			rc.OptMisc[sk] = true
-		}
+		rc.OptMisc[key] = true
 	}
 }
 

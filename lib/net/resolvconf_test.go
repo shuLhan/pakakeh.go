@@ -19,17 +19,17 @@ func TestNewResolvConf(t *testing.T) {
 		exp    *ResolvConf
 		expErr string
 	}{{
-		desc:   "With invalid file",
-		path:   "",
+		desc:   `With invalid file`,
+		path:   ``,
 		exp:    nil,
-		expErr: "open : no such file or directory",
+		expErr: `NewResolvConf: open : no such file or directory`,
 	}, {
-		desc: "From testdata/resolv.conf",
-		path: "testdata/resolv.conf",
+		desc: `From testdata/resolv.conf`,
+		path: `testdata/resolv.conf`,
 		exp: &ResolvConf{
-			Domain:      "a",
-			Search:      []string{"d", "e", "f", "g", "h", "i"},
-			NameServers: []string{"127.0.0.1", "1.1.1.1", "2.2.2.2"},
+			Domain:      `a`,
+			Search:      []string{`d`, `e`, `f`, `g`, `h`, `i`},
+			NameServers: []string{`127.0.0.1`, `1.1.1.1`, `2.2.2.2`},
 			NDots:       1,
 			Timeout:     5,
 			Attempts:    2,
@@ -42,10 +42,11 @@ func TestNewResolvConf(t *testing.T) {
 
 		rc, err := NewResolvConf(c.path)
 		if err != nil {
-			test.Assert(t, "expError", c.expErr, err.Error())
+			test.Assert(t, `error`, c.expErr, err.Error())
+			continue
 		}
 
-		test.Assert(t, "exp", c.exp, rc)
+		test.Assert(t, `exp`, c.exp, rc)
 	}
 }
 
