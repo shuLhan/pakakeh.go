@@ -37,6 +37,26 @@ func ExampleParser_Delimiters() {
 	// =;
 }
 
+func ExampleParser_Read() {
+	var (
+		content = []byte("a = b; ")
+		delims  = []byte{'=', ';'}
+		parser  = libbytes.NewParser(content, delims)
+	)
+
+	token, c := parser.Read()
+	fmt.Printf("token:'%s' c:'%c'\n", token, c)
+	token, c = parser.Read()
+	fmt.Printf("token:'%s' c:'%c'\n", token, c)
+	token, c = parser.Read()
+	fmt.Printf("token:'%s' c:%d\n", token, c)
+
+	// Output:
+	// token:'a ' c:'='
+	// token:' b' c:';'
+	// token:' ' c:0
+}
+
 func ExampleParser_ReadLine() {
 	var (
 		content = []byte("a=b;\nc=d;")
@@ -189,6 +209,25 @@ func ExampleParser_Skip() {
 	// b
 	// d
 	//
+}
+
+func ExampleParser_SkipLine() {
+	var (
+		content = []byte("a\nb\nc\nd e\n")
+		delims  = []byte("\n")
+		parser  = libbytes.NewParser(content, delims)
+	)
+
+	parser.SkipLine()
+	token, _ := parser.Read()
+	fmt.Printf("token:'%s'\n", token)
+
+	parser.SkipLine()
+	token, _ = parser.Read()
+	fmt.Printf("token:'%s'\n", token)
+	// Output:
+	// token:'b'
+	// token:'d e'
 }
 
 func ExampleParser_SkipN() {
