@@ -443,7 +443,7 @@ func ReadHexByte(data []byte, x int) (b byte, ok bool) {
 	if len(data) < x+2 {
 		return 0, false
 	}
-	var y int = 4
+	var y = 4
 	for y >= 0 {
 		switch {
 		case data[x] >= '0' && data[x] <= '9':
