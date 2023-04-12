@@ -2,15 +2,18 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package reflect
+package reflect_test
 
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"net/http"
 	"net/url"
 	"reflect"
+
+	libreflect "github.com/shuLhan/share/lib/reflect"
 )
 
 func ExampleDoEqual_struct() {
@@ -30,7 +33,7 @@ func ExampleDoEqual_struct() {
 		}
 	)
 
-	fmt.Println(DoEqual(t1, t2))
+	fmt.Println(libreflect.DoEqual(t1, t2))
 	// Output:
 	// <nil>
 }
@@ -52,7 +55,7 @@ func ExampleIsEqual_struct() {
 		}
 	)
 
-	fmt.Println(IsEqual(t1, t2))
+	fmt.Println(libreflect.IsEqual(t1, t2))
 	// Output:
 	// true
 }
@@ -98,18 +101,18 @@ func ExampleIsNil() {
 	}
 
 	for _, c := range cases {
-		fmt.Printf("%19T: v == nil is %5t, IsNil() is %5t\n", c.v, c.v == nil, IsNil(c.v))
+		fmt.Printf("%19T: v == nil is %5t, IsNil() is %5t\n", c.v, c.v == nil, libreflect.IsNil(c.v))
 	}
 
 	//Output:
 	// <nil>: v == nil is  true, IsNil() is  true
 	//                bool: v == nil is false, IsNil() is false
 	//            chan int: v == nil is false, IsNil() is  true
-	//           reflect.F: v == nil is false, IsNil() is  true
+	//      reflect_test.F: v == nil is false, IsNil() is  true
 	//         map[int]int: v == nil is false, IsNil() is  true
 	//         map[int]int: v == nil is false, IsNil() is false
-	//          *reflect.T: v == nil is false, IsNil() is  true
-	//          *reflect.T: v == nil is false, IsNil() is false
+	//     *reflect_test.T: v == nil is false, IsNil() is  true
+	//     *reflect_test.T: v == nil is false, IsNil() is false
 	//               []int: v == nil is false, IsNil() is  true
 	//               []int: v == nil is false, IsNil() is false
 	//                 int: v == nil is false, IsNil() is false
@@ -143,25 +146,25 @@ func ExampleMarshal() {
 		err error
 	)
 
-	out, err = Marshal(vint)
+	out, err = libreflect.Marshal(vint)
 	fmt.Println(out, err)
 
-	out, err = Marshal(&vint)
+	out, err = libreflect.Marshal(&vint)
 	fmt.Println(out, err)
 
-	out, err = Marshal(vUrl)
+	out, err = libreflect.Marshal(vUrl)
 	fmt.Println(string(out), err)
 
-	out, err = Marshal(bigRat)
+	out, err = libreflect.Marshal(bigRat)
 	fmt.Println(string(out), err)
 
-	out, err = Marshal(bigInt)
+	out, err = libreflect.Marshal(bigInt)
 	fmt.Println(string(out), err)
 
-	out, err = Marshal(imt)
+	out, err = libreflect.Marshal(imt)
 	fmt.Println(string(out), err)
 
-	out, err = Marshal(emj)
+	out, err = libreflect.Marshal(emj)
 	fmt.Println(string(out), err)
 
 	//Output:
@@ -183,35 +186,35 @@ func ExampleSet_bool() {
 		mybool Bool
 	)
 
-	err = Set(reflect.ValueOf(&vbool), "YES")
+	err = libreflect.Set(reflect.ValueOf(&vbool), "YES")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println("YES:", vbool)
 	}
 
-	err = Set(reflect.ValueOf(&vbool), "TRUE")
+	err = libreflect.Set(reflect.ValueOf(&vbool), "TRUE")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println("TRUE:", vbool)
 	}
 
-	err = Set(reflect.ValueOf(&vbool), "False")
+	err = libreflect.Set(reflect.ValueOf(&vbool), "False")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println("False:", vbool)
 	}
 
-	err = Set(reflect.ValueOf(&vbool), "1")
+	err = libreflect.Set(reflect.ValueOf(&vbool), "1")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println("1:", vbool)
 	}
 
-	err = Set(reflect.ValueOf(&mybool), "true")
+	err = libreflect.Set(reflect.ValueOf(&mybool), "true")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -235,14 +238,14 @@ func ExampleSet_float() {
 		err     error
 	)
 
-	err = Set(reflect.ValueOf(&vf32), "1.223")
+	err = libreflect.Set(reflect.ValueOf(&vf32), "1.223")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(vf32)
 	}
 
-	err = Set(reflect.ValueOf(&myfloat), "999.999")
+	err = libreflect.Set(reflect.ValueOf(&myfloat), "999.999")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -265,21 +268,21 @@ func ExampleSet_int() {
 		err    error
 	)
 
-	err = Set(reflect.ValueOf(&vint), "")
+	err = libreflect.Set(reflect.ValueOf(&vint), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(vint)
 	}
 
-	err = Set(reflect.ValueOf(&vint), "1")
+	err = libreflect.Set(reflect.ValueOf(&vint), "1")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(vint)
 	}
 
-	err = Set(reflect.ValueOf(&vint8), "-128")
+	err = libreflect.Set(reflect.ValueOf(&vint8), "-128")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -287,14 +290,14 @@ func ExampleSet_int() {
 	}
 
 	// Value of int16 is overflow.
-	err = Set(reflect.ValueOf(&vint16), "32768")
+	err = libreflect.Set(reflect.ValueOf(&vint16), "32768")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(vint16)
 	}
 
-	err = Set(reflect.ValueOf(&vmyint), "32768")
+	err = libreflect.Set(reflect.ValueOf(&vmyint), "32768")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -318,28 +321,28 @@ func ExampleSet_sliceByte() {
 		err      error
 	)
 
-	err = Set(reflect.ValueOf(vbytes), "Show me")
+	err = libreflect.Set(reflect.ValueOf(vbytes), "Show me")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(string(vbytes))
 	}
 
-	err = Set(reflect.ValueOf(&vbytes), "a hero")
+	err = libreflect.Set(reflect.ValueOf(&vbytes), "a hero")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(string(vbytes))
 	}
 
-	err = Set(reflect.ValueOf(&vbytes), "")
+	err = libreflect.Set(reflect.ValueOf(&vbytes), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(string(vbytes))
 	}
 
-	err = Set(reflect.ValueOf(&vmyBytes), "and I will write you a tragedy")
+	err = libreflect.Set(reflect.ValueOf(&vmyBytes), "and I will write you a tragedy")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -359,21 +362,21 @@ func ExampleSet_sliceString() {
 		err     error
 	)
 
-	err = Set(reflect.ValueOf(vstring), "Show me")
+	err = libreflect.Set(reflect.ValueOf(vstring), "Show me")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(vstring)
 	}
 
-	err = Set(reflect.ValueOf(&vstring), "a hero")
+	err = libreflect.Set(reflect.ValueOf(&vstring), "a hero")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(vstring)
 	}
 
-	err = Set(reflect.ValueOf(&vstring), "and I will write you a tragedy")
+	err = libreflect.Set(reflect.ValueOf(&vstring), "and I will write you a tragedy")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -396,14 +399,14 @@ func ExampleSet_unmarshal() {
 	)
 
 	// This Set will call UnmarshalText on big.Rat.
-	err = Set(reflect.ValueOf(rat), "1.234")
+	err = libreflect.Set(reflect.ValueOf(rat), "1.234")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(rat.FloatString(4))
 	}
 
-	err = Set(reflect.ValueOf(rat), "")
+	err = libreflect.Set(reflect.ValueOf(rat), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -411,7 +414,7 @@ func ExampleSet_unmarshal() {
 	}
 
 	// This Set will call UnmarshalBinary on url.URL.
-	err = Set(reflect.ValueOf(myUrl), "https://kilabit.info")
+	err = libreflect.Set(reflect.ValueOf(myUrl), "https://kilabit.info")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -419,14 +422,14 @@ func ExampleSet_unmarshal() {
 	}
 
 	// This Set will call UnmarshalJSON.
-	err = Set(reflect.ValueOf(bigInt), "123_456")
+	err = libreflect.Set(reflect.ValueOf(bigInt), "123_456")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
 		fmt.Println(bigInt)
 	}
 
-	err = Set(reflect.ValueOf(bigInt), "")
+	err = libreflect.Set(reflect.ValueOf(bigInt), "")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
@@ -463,7 +466,7 @@ func ExampleTag() {
 
 	for x = 0; x < vtype.NumField(); x++ {
 		field = vtype.Field(x)
-		val, opts, hasTag = Tag(field, "atag")
+		val, opts, hasTag = libreflect.Tag(field, "atag")
 		fmt.Println(val, opts, hasTag)
 	}
 	//Output:
@@ -483,43 +486,38 @@ func ExampleUnmarshal_unmarshalBinary() {
 
 	// Passing variable will not work...
 	var varB url.URL
-	ok, err = Unmarshal(reflect.ValueOf(varB), val)
+	ok, err = libreflect.Unmarshal(reflect.ValueOf(varB), val)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 	fmt.Println(varB.String(), ok)
 
 	// Pass it like these.
-	ok, err = Unmarshal(reflect.ValueOf(&varB), val)
+	ok, err = libreflect.Unmarshal(reflect.ValueOf(&varB), val)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 	fmt.Println(varB.String(), ok)
 
 	// Passing un-initialized pointer also not working...
 	var varPtrB *url.URL
-	ok, err = Unmarshal(reflect.ValueOf(varPtrB), val)
+	ok, err = libreflect.Unmarshal(reflect.ValueOf(varPtrB), val)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 	fmt.Println(varPtrB, ok)
 
 	// Pass it as **T.
-	ok, err = Unmarshal(reflect.ValueOf(&varPtrB), val)
+	ok, err = libreflect.Unmarshal(reflect.ValueOf(&varPtrB), val)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 	fmt.Println(varPtrB, ok)
 
 	var ptrB = &url.URL{}
-	ok, err = Unmarshal(reflect.ValueOf(&ptrB), val)
+	ok, err = libreflect.Unmarshal(reflect.ValueOf(&ptrB), val)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 	fmt.Println(ptrB, ok)
 
@@ -546,7 +544,7 @@ func ExampleUnmarshal_unmarshalText() {
 	)
 
 	for _, val = range vals {
-		_, err = Unmarshal(reflect.ValueOf(r), val)
+		_, err = libreflect.Unmarshal(reflect.ValueOf(r), val)
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -574,7 +572,7 @@ func ExampleUnmarshal_unmarshalJSON() {
 	)
 
 	for _, val = range vals {
-		_, err = Unmarshal(reflect.ValueOf(bigInt), val)
+		_, err = libreflect.Unmarshal(reflect.ValueOf(bigInt), val)
 		if err != nil {
 			fmt.Println(err)
 		} else {
