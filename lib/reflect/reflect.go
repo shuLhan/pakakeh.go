@@ -65,13 +65,13 @@ func IsNil(v interface{}) bool {
 // order.
 //
 // If obj implement one of the method with valid signature, it will return
-// (out, nil, true);
-// unless there is an error.
+// the marshaled bytes.
 //
-// If the method signature invalid it will return (nil, err, false).
+// If the method signature invalid it will return an error.
 //
-// If obj is nil or none of the method exist it will return (nil, nil, false).
-func Marshal(obj interface{}) (out []byte, err error, ok bool) {
+// If obj is nil or none of the method exist it will return nil without an
+// error.
+func Marshal(obj interface{}) (out []byte, err error) {
 	var (
 		logp        = "Marshal"
 		methodNames = []string{
@@ -86,10 +86,11 @@ func Marshal(obj interface{}) (out []byte, err error, ok bool) {
 		method     reflect.Value
 		callOut    []reflect.Value
 		callReturn interface{}
+		ok         bool
 	)
 
 	if objKind == reflect.Ptr && objValue.IsNil() {
-		return nil, nil, false
+		return nil, nil
 	}
 
 	for _, methodName = range methodNames {
@@ -103,37 +104,33 @@ func Marshal(obj interface{}) (out []byte, err error, ok bool) {
 		callOut = method.Call(nil)
 		if len(callOut) == 0 {
 			// No error?
-			return nil, nil, true
+			return nil, nil
 		}
 		if len(callOut) != 2 {
 			err = fmt.Errorf("%s: expecting two returns got %d", logp, len(callOut))
-			return nil, err, false
+			return nil, err
 		}
 
 		callReturn = callOut[0].Interface()
 		out, ok = callReturn.([]byte)
 		if !ok {
-			err = fmt.Errorf("%s: expecting first return as []byte got %T", logp, callReturn)
-			return nil, err, false
+			return nil, fmt.Errorf("%s: expecting first return as []byte got %T", logp, callReturn)
 		}
 
 		callReturn = callOut[1].Interface()
 		if callReturn == nil {
-			return out, nil, true
+			return out, nil
 		}
 		err, ok = callReturn.(error)
 		if !ok {
-			err = fmt.Errorf("%s: expecting second return as error got %T", logp, callReturn)
-			return nil, err, false
+			return nil, fmt.Errorf("%s: expecting second return as error got %T", logp, callReturn)
 		}
 		if err != nil {
-			err = fmt.Errorf("%s: %w", logp, err)
-			return nil, err, true
+			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
-		return out, nil, true
+		return out, nil
 	}
-
-	return nil, nil, false
+	return nil, nil
 }
 
 // Set the obj value by converting the string val to the obj type.

@@ -83,17 +83,15 @@ func MarshalForm(in any) (out url.Values, err error) {
 
 			val  string
 			valb []byte
-			ok   bool
 		)
 
 		// Try using one of the method: MarshalBinary, MarshalJSON,
 		// or MarshalText; in respective order.
-		valb, err, ok = libreflect.Marshal(fval)
-		if ok {
-			if err != nil {
-				return nil, fmt.Errorf(`%s: error marshaling: %w`, logp, err)
-			}
-
+		valb, err = libreflect.Marshal(fval)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: error marshaling: %w`, logp, err)
+		}
+		if len(valb) != 0 {
 			out.Add(key, string(valb))
 			continue
 		}

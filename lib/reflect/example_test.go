@@ -97,38 +97,37 @@ func ExampleMarshal() {
 
 		out []byte
 		err error
-		ok  bool
 	)
 
-	out, err, ok = Marshal(vint)
-	fmt.Println(out, err, ok)
+	out, err = Marshal(vint)
+	fmt.Println(out, err)
 
-	out, err, ok = Marshal(&vint)
-	fmt.Println(out, err, ok)
+	out, err = Marshal(&vint)
+	fmt.Println(out, err)
 
-	out, err, ok = Marshal(vUrl)
-	fmt.Println(string(out), err, ok)
+	out, err = Marshal(vUrl)
+	fmt.Println(string(out), err)
 
-	out, err, ok = Marshal(bigRat)
-	fmt.Println(string(out), err, ok)
+	out, err = Marshal(bigRat)
+	fmt.Println(string(out), err)
 
-	out, err, ok = Marshal(bigInt)
-	fmt.Println(string(out), err, ok)
+	out, err = Marshal(bigInt)
+	fmt.Println(string(out), err)
 
-	out, err, ok = Marshal(imt)
-	fmt.Println(string(out), err, ok)
+	out, err = Marshal(imt)
+	fmt.Println(string(out), err)
 
-	out, err, ok = Marshal(emj)
-	fmt.Println(string(out), err, ok)
+	out, err = Marshal(emj)
+	fmt.Println(string(out), err)
 
 	//Output:
-	//[] <nil> false
-	//[] <nil> false
-	//https://example.org <nil> true
-	//50 <nil> true
-	//50 <nil> true
-	//  Marshal: expecting first return as []byte got string false
-	//  Marshal: ErrorMarshalJson: test true
+	//[] <nil>
+	//[] <nil>
+	//https://example.org <nil>
+	//50 <nil>
+	//50 <nil>
+	//  Marshal: expecting first return as []byte got string
+	//  Marshal: ErrorMarshalJson: test
 }
 
 func ExampleSet_bool() {
