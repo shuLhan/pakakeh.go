@@ -49,10 +49,11 @@ func IsEqual(x, y interface{}) bool {
 	}
 
 	var (
-		v1 reflect.Value = reflect.ValueOf(x)
-		v2 reflect.Value = reflect.ValueOf(y)
+		v1  reflect.Value = reflect.ValueOf(x)
+		v2  reflect.Value = reflect.ValueOf(y)
+		err               = doEqual(v1, v2)
 	)
-	return isEqual(v1, v2)
+	return err == nil
 }
 
 // IsNil will return true if v's type is chan, func, interface, map, pointer,
@@ -575,8 +576,6 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 		return fmt.Errorf("Kind: expecting %s(%v), got %s(%v)",
 			name1, v1.String(), name2, v2.String())
 	}
-	// For debugging.
-	//log.Printf("v1:%v(%s(%v)) v2:%v(%s(%v))", k1, t1.String(), v1, k2, t2.String(), v2)
 
 	if v1.CanSet() {
 		in1 = v1.Interface()
@@ -597,15 +596,13 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 		}
 		return fmt.Errorf("expecting %s(%v), got %s(%v)", name1, v1.Bool(), name2, v2.Bool())
 
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
-		reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if v1.Int() == v2.Int() {
 			return nil
 		}
 		return fmt.Errorf("expecting %s(%v), got %s(%v)", name1, v1.Int(), name2, v2.Int())
 
-	case reflect.Uint, reflect.Uint8, reflect.Uint16,
-		reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		if v1.Uint() == v2.Uint() {
 			return nil
 		}
@@ -803,206 +800,4 @@ func doEqualStruct(v1, v2 reflect.Value) (err error) {
 		}
 	}
 	return nil
-}
-
-func isEqual(v1, v2 reflect.Value) bool {
-	if !v1.IsValid() || !v2.IsValid() {
-		return v1.IsValid() == v2.IsValid()
-	}
-
-	var (
-		t1 reflect.Type = v1.Type()
-		t2 reflect.Type = v2.Type()
-	)
-	if t1 != t2 {
-		return false
-	}
-
-	var (
-		k1 reflect.Kind = v1.Kind()
-		k2 reflect.Kind = v2.Kind()
-	)
-	if k1 != k2 {
-		return false
-	}
-
-	// For debugging.
-	//log.Printf("v1:%v(%s(%v)) v2:%v(%s(%v))", k1, t1.String(), v1,
-	//	k2, t2.String(), v2)
-
-	var (
-		x int
-	)
-
-	switch k1 {
-	case reflect.Bool:
-		return v1.Bool() == v2.Bool()
-
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
-		reflect.Int64:
-		return v1.Int() == v2.Int()
-
-	case reflect.Uint, reflect.Uint8, reflect.Uint16,
-		reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return v1.Uint() == v2.Uint()
-
-	case reflect.Float32, reflect.Float64:
-		return v1.Float() == v2.Float()
-
-	case reflect.Complex64, reflect.Complex128:
-		return v1.Complex() == v2.Complex()
-
-	case reflect.Array:
-		if v1.Len() != v2.Len() {
-			return false
-		}
-		for x = 0; x < v1.Len(); x++ {
-			if !isEqual(v1.Index(x), v2.Index(x)) {
-				return false
-			}
-		}
-		return true
-
-	case reflect.Chan:
-		if v1.IsNil() && v2.IsNil() {
-			return true
-		}
-		return t1 == t2
-
-	case reflect.Func:
-		if v1.IsNil() && v2.IsNil() {
-			return true
-		}
-		if v2.IsNil() {
-			return false
-		}
-		return t1 == t2
-
-	case reflect.Interface:
-		if v1.IsNil() && v2.IsNil() {
-			return true
-		}
-		if v2.IsNil() {
-			return false
-		}
-		return isEqual(v1.Elem(), v2.Elem())
-
-	case reflect.Map:
-		return isEqualMap(v1, v2)
-
-	case reflect.Ptr:
-		if v1.IsNil() && v2.IsNil() {
-			return true
-		}
-		if v2.IsNil() {
-			return false
-		}
-		if v1.Pointer() == v2.Pointer() {
-			return true
-		}
-		return isEqual(v1.Elem(), v2.Elem())
-
-	case reflect.Slice:
-		if v1.IsNil() && v2.IsNil() {
-			return true
-		}
-		if v2.IsNil() {
-			return false
-		}
-
-		var (
-			l1 = v1.Len()
-			l2 = v2.Len()
-
-			s1, s2 reflect.Value
-		)
-		if l1 != l2 {
-			return false
-		}
-
-		for x = 0; x < l1; x++ {
-			s1 = v1.Index(x)
-			s2 = v2.Index(x)
-			if !isEqual(s1, s2) {
-				return false
-			}
-		}
-		return true
-
-	case reflect.String:
-		return v1.String() == v2.String()
-
-	case reflect.Struct:
-		return isEqualStruct(v1, v2)
-
-	case reflect.UnsafePointer:
-		return v1.UnsafeAddr() == v2.UnsafeAddr()
-	}
-
-	return false
-}
-
-func isEqualMap(v1, v2 reflect.Value) bool {
-	if v1.IsNil() && v2.IsNil() {
-		return true
-	}
-	if v2.IsNil() {
-		return false
-	}
-	if v1.Len() != v2.Len() {
-		return false
-	}
-	var (
-		keys []reflect.Value = v1.MapKeys()
-
-		x int
-	)
-	for ; x < len(keys); x++ {
-		if !isEqual(v1.MapIndex(keys[x]), v2.MapIndex(keys[x])) {
-			return false
-		}
-	}
-	return true
-}
-
-// isEqualStruct compare two struct v1 and v2 and return true if all its
-// fields has equal value.
-// The type of both struct is already equal when this function called.
-func isEqualStruct(v1, v2 reflect.Value) bool {
-	var (
-		m1 = v1.MethodByName("IsEqual")
-
-		callIn  []reflect.Value
-		callOut []reflect.Value
-	)
-	if m1.IsValid() {
-		callIn = append(callIn, v2.Addr())
-		callOut = m1.Call(callIn)
-		if len(callOut) == 1 && callOut[0].Kind() == reflect.Bool {
-			return callOut[0].Bool()
-		}
-	}
-
-	var (
-		type1 = v1.Type()
-		n     = v1.NumField()
-
-		f1 reflect.Value
-		f2 reflect.Value
-		ok bool
-	)
-	for x := 0; x < n; x++ {
-		_, ok = type1.Field(x).Tag.Lookup(tagNoEqual)
-		if ok {
-			// Skip field tagged with `noequal`
-			continue
-		}
-
-		f1 = v1.Field(x)
-		f2 = v2.Field(x)
-		if !isEqual(f1, f2) {
-			return false
-		}
-	}
-	return true
 }
