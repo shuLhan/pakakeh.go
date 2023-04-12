@@ -13,6 +13,50 @@ import (
 	"reflect"
 )
 
+func ExampleDoEqual_struct() {
+	type T struct {
+		vstring  string
+		vnoequal string `noequal:""` // This field will not checked for equality.
+	}
+
+	var (
+		t1 = &T{
+			vstring:  `a string`,
+			vnoequal: `skip`,
+		}
+		t2 = &T{
+			vstring:  `a string`,
+			vnoequal: `skipped too`,
+		}
+	)
+
+	fmt.Println(DoEqual(t1, t2))
+	// Output:
+	// <nil>
+}
+
+func ExampleIsEqual_struct() {
+	type T struct {
+		vstring  string
+		vnoequal string `noequal:""` // This field will not checked for equality.
+	}
+
+	var (
+		t1 = &T{
+			vstring:  `a string`,
+			vnoequal: `skip`,
+		}
+		t2 = &T{
+			vstring:  `a string`,
+			vnoequal: `skipped too`,
+		}
+	)
+
+	fmt.Println(IsEqual(t1, t2))
+	// Output:
+	// true
+}
+
 type F func()
 
 type T struct{}

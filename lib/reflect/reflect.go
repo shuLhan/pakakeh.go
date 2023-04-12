@@ -13,8 +13,15 @@ import (
 	"unsafe"
 )
 
+const (
+	tagNoEqual = `noequal`
+)
+
 // DoEqual is a naive interfaces comparison that check and use Equaler
 // interface and return an error if its not match.
+//
+// A struct's field tagged with `noequal:""` will be skipped from being
+// processed.
 func DoEqual(x, y interface{}) (err error) {
 	if x == nil && y == nil {
 		return nil
@@ -33,6 +40,9 @@ func DoEqual(x, y interface{}) (err error) {
 
 // IsEqual is a naive interfaces comparison that check and use Equaler
 // interface.
+//
+// A struct's field tagged with `noequal:""` will be skipped from being
+// processed.
 func IsEqual(x, y interface{}) bool {
 	if x == nil && y == nil {
 		return true
@@ -744,6 +754,9 @@ func doEqualMap(v1, v2 reflect.Value) (err error) {
 	return nil
 }
 
+// doEqualStruct compare two struct v1 and v2 and return nil if all its
+// fields has equal value.
+// The type of both struct is already equal when this function called.
 func doEqualStruct(v1, v2 reflect.Value) (err error) {
 	var (
 		m1 reflect.Value = v1.MethodByName("IsEqual")
@@ -771,8 +784,15 @@ func doEqualStruct(v1, v2 reflect.Value) (err error) {
 		f1, f2 reflect.Value
 		f1Name string
 		x      int
+		ok     bool
 	)
 	for ; x < n; x++ {
+		_, ok = t1.Field(x).Tag.Lookup(tagNoEqual)
+		if ok {
+			// Skip field tagged with `noequal`
+			continue
+		}
+
 		f1 = v1.Field(x)
 		f1Name = t1.Field(x).Name
 		f2 = v2.Field(x)
@@ -945,14 +965,15 @@ func isEqualMap(v1, v2 reflect.Value) bool {
 	return true
 }
 
+// isEqualStruct compare two struct v1 and v2 and return true if all its
+// fields has equal value.
+// The type of both struct is already equal when this function called.
 func isEqualStruct(v1, v2 reflect.Value) bool {
 	var (
-		m1 reflect.Value = v1.MethodByName("IsEqual")
+		m1 = v1.MethodByName("IsEqual")
 
 		callIn  []reflect.Value
 		callOut []reflect.Value
-		f1, f2  reflect.Value
-		n, x    int
 	)
 	if m1.IsValid() {
 		callIn = append(callIn, v2.Addr())
@@ -962,8 +983,21 @@ func isEqualStruct(v1, v2 reflect.Value) bool {
 		}
 	}
 
-	n = v1.NumField()
-	for ; x < n; x++ {
+	var (
+		type1 = v1.Type()
+		n     = v1.NumField()
+
+		f1 reflect.Value
+		f2 reflect.Value
+		ok bool
+	)
+	for x := 0; x < n; x++ {
+		_, ok = type1.Field(x).Tag.Lookup(tagNoEqual)
+		if ok {
+			// Skip field tagged with `noequal`
+			continue
+		}
+
 		f1 = v1.Field(x)
 		f2 = v2.Field(x)
 		if !isEqual(f1, f2) {
