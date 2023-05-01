@@ -568,14 +568,18 @@ func (sch *Scheduler) run() {
 	for {
 		select {
 		case <-ticker.C:
-			// Notify the user and calculate the next event.
-			select {
-			case sch.c <- sch.next:
-			default:
-			}
+			// Calculate the next event and notify user.
+			// This will allow user to call the Next method after
+			// receiving the event.
+			var now = sch.next
 
 			sch.calcNext(Now().UTC())
 			ticker.Reset(sch.nextDuration)
+
+			select {
+			case sch.c <- now:
+			default:
+			}
 
 		case <-sch.cstop:
 			ticker.Stop()
