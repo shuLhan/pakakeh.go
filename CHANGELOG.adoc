@@ -19,6 +19,138 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_46_0]
+==  share v0.46.0 (2023-05-02)
+
+This release deprecated lib/io and lib/parser.
+
+
+[#v0_46_0__breaking_changes]
+===  Breaking changes
+
+lib/reflect: remove the third return value from Marshal::
++
+The third, boolean, return value is redundant with the second error value.
+
+lib/bytes: changes the DumpPrettyTable output format::
++
+The change is to accommodate large bytes data, more than 0xFFFF.
+The hex address in the first column is increased to 8 digits, the
+characters compacted without space in between.
+
+
+[#v0_46_0__new_features]
+===  New features
+
+lib/os: merge some functions from lib/io::
++
+Functions like Copy, IsBinary, IsDirEmpty, IsFileExist, RmdirEmptyAll
+are read and operate on file and directory on operating system level, so
+it is not correct to put it in package io.
+
+lib/strings: merge lib/parser here::
++
+--
+The first idea of parser is to provide generic parser for both bytes and
+string.
+After we introduce lib/parser there is not much changes to that package.
+Also, since we create another Parser in lib/bytes that accept and
+return token as []byte, the lib/parser is not unique anymore.
+
+The following function/methods changes to minimize conflict in the future,
+
+* Lines become LinesOfFile
+* New become NewParser
+* Open become OpenForParser
+* Token become Read
+* TokenEscaped become ReadEscaped
+* TokenTrimSpace become ReadNoSpace
+--
+
+lib/bytes: implement function ParseHexDump::
++
+--
+The ParseHexDump parse the default output of [hexdump](1) utility from
+parameter in back into stream of byte.
+
+An example of default output of hexdump is
+
+	0000000 7865 5f70 6964 2f72 0000 0000 0000 0000
+	0000010 0000 0000 0000 0000 0000 0000 0000 0000
+	*
+	0000060 0000 0000 3030 3030 3537 0035 3030 3130
+
+The first column is the address and the rest of the column is the data.
+Each data column is 16-bit words in big-endian order, so in the above
+example, the first byte would be 65, second byte is 78 and so on.
+The asterisk "*" means that the address from 0000020 to 0000050 is equal to
+the previous line, 0000010.
+
+[hexdump]: https://man.archlinux.org/man/hexdump.1
+--
+
+lib/bytes: implement tokenize Parser::
++
+The Parser type parse stream of byte using one or more delimiters as
+separator between token.
+
+lib/bytes: add function TrimNull::
++
+The TrimNull function remove 0 value ("\0" or NULL in C) at leading
+and trailing of input.
+
+lib/net: add method WriteTo to ResolvConf::
++
+The WriteTo method write the ResolvConf as text.
+
+
+[#v0_46_0__enhancements]
+===  Enhancements
+
+lib/time: calculate the next event before notify the user on Scheduler run::
++
+This allow user to call the Next method, to know the next time the
+scheduler will be triggered, after receiving the event.
+
+lib/reflect: add option to skip processing struct field in Do/IsEqual::
++
+A struct's field tagged with `noequal:""`, its value will not be processed for
+equality.
+
+
+[#v0_46_0__chores]
+===  Chores
+
+lib/reflect: use doEqual inside IsEqual::
++
+Previously, IsEqual internally use isEqual, which have the same logic as
+doEqual.
+This changes minimize duplicate code between IsEqual and DoEqual, by
+calling doEqual for both of functions.
+
+lib/time: replace lib/io#Reader with lib/bytes#Parser::
+
+lib/smtp: replace lib/io#Reader with lib/bytes#Parser::
+
+lib/dns: replace lib/io#Reader with lib/bytes#Parser::
+
+lib/http: replace lib/io#Reader with lib/bytes#Parser::
+
+lib/email: replace lib/io#Reader with lib/bytes#Parser::
+
+email/dkim: replace lib/io#Reader with lib/bytes#Parser::
+
+lib/hunspell: replace lib/io with lib/os::
+
+lib/hunspell: replace lib/parser with lib/strings::
+
+lib/http: replace lib/parser with lib/strings::
+
+lib/bytes: copy TokenFind to internal/bytes#TokenFind::
++
+This is to prevent import cycle later when we use lib/test in bytes.
+
+
 [#v0_45_0]
 ==  share v0.45.0 (2023-04-01)
 
@@ -100,7 +232,7 @@ For HTTP Server using HandleFS, the Range request is handled
 automatically.
 For other HTTP server, user can use the HandleRange function.
 
-The HandleRange function handle 
+The HandleRange function handle
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests[HTTP Range]
 request using "bytes" unit.
 The body parameter contains the content of resource being requested that
@@ -108,7 +240,7 @@ accept Seek method.
 
 If the Request method is not GET, or no Range in header request it will
 return all the body
-https://datatracker.ietf.org/doc/html/rfc7233#section-3.1[RFC7233 S-3.1]. 
+https://datatracker.ietf.org/doc/html/rfc7233#section-3.1[RFC7233 S-3.1].
 
 The contentType is optional, if its empty, it will detected by
 http.ResponseWriter during Write.
