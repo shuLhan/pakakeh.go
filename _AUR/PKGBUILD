@@ -4,7 +4,7 @@ pkgname=share-tools
 pkgver=0.44.0.r31.gabd5213
 pkgrel=1
 
-pkgdesc="Miscellaneous CLI tools: epoch, ini, xtrk"
+pkgdesc="Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk"
 arch=(x86_64)
 url='https://github.com/shuLhan/share'
 license=('BSD')
@@ -40,6 +40,7 @@ build() {
 
 package() {
 	cd "${pkgname}"
+	install -Dm755 _bin/bcrypt $pkgdir/usr/bin/bcrypt
 	install -Dm755 _bin/epoch $pkgdir/usr/bin/epoch
 	install -Dm755 _bin/go-test-coverhtml.sh  $pkgdir/usr/bin/go-test-coverhtml.sh
 	install -Dm755 _bin/go-bench.sh           $pkgdir/usr/bin/go-bench.sh
