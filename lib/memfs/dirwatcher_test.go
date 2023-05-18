@@ -113,6 +113,7 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Wait for all watcher started.
 	time.Sleep(500 * time.Millisecond)
 
 	err = os.Mkdir(dirSub, 0700)

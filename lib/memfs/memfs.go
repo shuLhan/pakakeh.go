@@ -26,6 +26,10 @@ const (
 	defContentType = "text/plain" // Default content type for empty file.
 )
 
+// osStat define the variable that can be replaced during testing Watcher and
+// DirWatcher to mock os.Stat.
+var osStat = os.Stat
+
 // MemFS contains directory tree of file system in memory.
 type MemFS struct {
 	http.FileSystem
