@@ -628,7 +628,7 @@ func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 			}
 		} else {
 			tok, c = m.parser.ReadNoSpace()
-			if c == ';' || c == '\n' {
+			if c == ';' {
 				return fmt.Errorf(`%s: line %d: incomplete SOA statement '%s'`, logp, m.lineno, tok)
 			}
 		}
