@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package memfs
+package memfs_test
 
 import (
 	"fmt"
@@ -10,16 +10,18 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/shuLhan/share/lib/memfs"
 )
 
 func ExampleDirWatcher() {
 	var (
-		ns      NodeState
+		ns      memfs.NodeState
 		rootDir string
 		err     error
 	)
 
-	rootDir, err = os.MkdirTemp("", "libmemfs")
+	rootDir, err = os.MkdirTemp(``, `libmemfs`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,8 +29,8 @@ func ExampleDirWatcher() {
 	// In this example, we watch sub directory "assets" and its contents,
 	// include only file with .adoc extension and ignoring files with
 	// .html extension.
-	dw := &DirWatcher{
-		Options: Options{
+	var dw = &memfs.DirWatcher{
+		Options: memfs.Options{
 			Root: rootDir,
 			Includes: []string{
 				`assets/.*`,
@@ -46,85 +48,84 @@ func ExampleDirWatcher() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Deleting the root directory:\n")
+	fmt.Println(`Deleting the root directory:`)
 	err = os.Remove(rootDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s\n", ns.State, ns.Node.Path)
+	fmt.Println(`--`, ns.State, ns.Node.Path)
 
 	// Create the root directory back with sub directory
 	// This will trigger two FileStateCreated events, one for "/" and one
 	// for "/assets".
-	dirAssets := filepath.Join(rootDir, "assets")
-	fmt.Printf("Re-create root directory with sub-directory:\n")
+	fmt.Println(`Re-create root directory with sub-directory:`)
+	var dirAssets = filepath.Join(rootDir, `assets`)
 	err = os.MkdirAll(dirAssets, 0770)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s\n", ns.State, ns.Node.Path)
+	fmt.Println(`--`, ns.State, ns.Node.Path)
 	ns = <-dw.C
-	fmt.Printf("-- %s %s\n", ns.State, ns.Node.Path)
+	fmt.Println(`--`, ns.State, ns.Node.Path)
 
 	// Modify the permission on root directory
-	fmt.Printf("Chmod on root directory:\n")
+	fmt.Println(`Chmod on root directory:`)
 	err = os.Chmod(rootDir, 0700)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
-	newFile := filepath.Join(rootDir, "new.adoc")
-	fmt.Println("Create new file on root directory: /new.adoc")
+	fmt.Println(`Create new file on root directory: /new.adoc`)
+	var newFile = filepath.Join(rootDir, `new.adoc`)
 	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
-	fmt.Println("Remove file on root directory: /new.adoc")
+	fmt.Println(`Remove file on root directory: /new.adoc`)
 	err = os.Remove(newFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
-	// Create sub-directory.
-	subDir := filepath.Join(rootDir, "subdir")
-	fmt.Println("Create new sub-directory: /subdir")
+	fmt.Println(`Create new sub-directory: /subdir`)
+	var subDir = filepath.Join(rootDir, `subdir`)
 	err = os.Mkdir(subDir, 0770)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
 	// Add new file in sub directory.
-	newFile = filepath.Join(subDir, "new.adoc")
-	fmt.Println("Create new file in sub directory: /subdir/new.adoc")
+	newFile = filepath.Join(subDir, `new.adoc`)
+	fmt.Println(`Create new file in sub directory: /subdir/new.adoc`)
 	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
-	fmt.Println("Remove file in sub directory: /subdir/new.adoc")
+	fmt.Println(`Remove file in sub directory: /subdir/new.adoc`)
 	err = os.Remove(newFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
 	// Creating file that is excluded should not trigger event.
-	newFile = filepath.Join(subDir, "new.html")
-	fmt.Println("Create excluded file in sub directory: /subdir/new.html")
+	fmt.Println(`Create excluded file in sub directory: /subdir/new.html`)
+	newFile = filepath.Join(subDir, `new.html`)
 	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
@@ -132,14 +133,14 @@ func ExampleDirWatcher() {
 
 	// Create file without extension in directory "assets" should trigger
 	// event.
-	newFile = filepath.Join(dirAssets, "new")
-	fmt.Println("Create new file under assets: /assets/new")
+	newFile = filepath.Join(dirAssets, `new`)
+	fmt.Println(`Create new file under assets: /assets/new`)
 	err = os.WriteFile(newFile, nil, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
 	ns = <-dw.C
-	fmt.Printf("-- %s %s %s\n", ns.State, ns.Node.Path, ns.Node.Mode())
+	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
 	dw.Stop()
 

@@ -2,32 +2,34 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package memfs
+package memfs_test
 
 import (
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/shuLhan/share/lib/memfs"
 )
 
 func ExampleNewWatcher() {
 	var (
-		content = "Content of file"
+		content = `Content of file`
 
 		f       *os.File
-		watcher *Watcher
-		ns      NodeState
+		watcher *memfs.Watcher
+		ns      memfs.NodeState
 		err     error
 	)
 
 	// Create a file to be watched.
-	f, err = os.CreateTemp("", "watcher")
+	f, err = os.CreateTemp(``, `watcher`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	watcher, err = NewWatcher(f.Name(), 150*time.Millisecond)
+	watcher, err = memfs.NewWatcher(f.Name(), 150*time.Millisecond)
 	if err != nil {
 		log.Fatal(err)
 	}
