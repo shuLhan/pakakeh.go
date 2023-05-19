@@ -573,6 +573,10 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 
 	f, err = os.Open(node.SysPath)
 	if err != nil {
+		if os.IsPermission(err) {
+			// Ignore error due to permission
+			return 0, nil
+		}
 		return 0, fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
 	}
 
