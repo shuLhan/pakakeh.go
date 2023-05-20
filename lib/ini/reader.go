@@ -14,7 +14,6 @@ import (
 	"unicode"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -122,10 +121,6 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 			break
 		}
 
-		if debug.Value >= 3 {
-			fmt.Print(reader._var)
-		}
-
 		reader._var.lineNum = reader.lineNum
 
 		if isLineModeVar(reader._var.mode) {
@@ -163,10 +158,6 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 	}
 
 	if reader._var.mode != lineModeEmpty {
-		if debug.Value >= 3 {
-			fmt.Println(reader._var)
-		}
-
 		reader.sec.addVariable(reader._var)
 	}
 

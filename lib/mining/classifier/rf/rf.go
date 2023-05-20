@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/floats64"
 	"github.com/shuLhan/share/lib/ints"
 	"github.com/shuLhan/share/lib/mining/classifier"
@@ -147,10 +146,6 @@ func (forest *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 
 	// (1)
 	for t := 0; t < forest.NTree; t++ {
-		if debug.Value >= 1 {
-			fmt.Println(tag, "tree #", t)
-		}
-
 		// (1.1)
 		for {
 			_, _, e = forest.GrowTree(samples)
@@ -191,11 +186,6 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 
 	bagset := bag.(tabula.ClasetInterface)
 
-	if debug.Value >= 2 {
-		bagset.RecountMajorMinor()
-		fmt.Println(tag, "Bagging:", bagset)
-	}
-
 	// (2)
 	cart, e := cart.New(bagset, cart.SplitMethodGini,
 		forest.NRandomFeature)
@@ -219,19 +209,11 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 
 	stat.End()
 
-	if debug.Value >= 3 && forest.RunOOB {
-		fmt.Println(tag, "Elapsed time (s):", stat.ElapsedTime)
-	}
-
 	forest.AddStat(stat)
 
 	// (6)
 	if forest.RunOOB {
 		forest.ComputeStatFromCM(stat, cm)
-
-		if debug.Value >= 2 {
-			fmt.Println(tag, "OOB stat:", stat)
-		}
 	}
 
 	forest.ComputeStatTotal(stat)

@@ -11,10 +11,8 @@
 package lnsmote
 
 import (
-	"fmt"
 	"math/rand"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/dsv"
 	"github.com/shuLhan/share/lib/mining/knn"
 	"github.com/shuLhan/share/lib/mining/resampling/smote"
@@ -76,11 +74,6 @@ func (in *Runtime) Init(dataset tabula.DatasetInterface) {
 		in.ClassMinor)
 
 	in.outliers = make(tabula.Rows, 0)
-
-	if debug.Value >= 1 {
-		fmt.Println("[lnsmote] n:", in.NSynthetic)
-		fmt.Println("[lnsmote] n minority:", in.minorset.Len())
-	}
 }
 
 // Resampling will run resampling process on dataset and return the synthetic
@@ -97,21 +90,12 @@ func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 
 		neighbors := in.FindNeighbors(in.datasetRows, p)
 
-		if debug.Value >= 3 {
-			fmt.Println("[lnsmote] neighbors:", neighbors.Rows())
-		}
-
 		for y := 0; y < in.NSynthetic; y++ {
 			syn := in.createSynthetic(p, neighbors)
 
 			if syn != nil {
 				in.Synthetics.PushRow(syn)
 			}
-		}
-
-		if debug.Value >= 1 {
-			fmt.Printf("[lnsmote] %-4d n synthetics: %v\n", x,
-				in.Synthetics.Len())
 		}
 	}
 
@@ -137,10 +121,6 @@ func (in *Runtime) createSynthetic(p *tabula.Row, neighbors knn.Neighbors) (
 	// Check if synthetic sample can be created from p and n.
 	canit, slp, sln := in.canCreate(p, n)
 	if !canit {
-		if debug.Value >= 2 {
-			fmt.Println("[lnsmote] can not create synthetic")
-		}
-
 		if slp.Len() <= 0 {
 			in.outliers.PushBack(p)
 		}
@@ -174,11 +154,6 @@ func (in *Runtime) canCreate(p, n *tabula.Row) (bool, knn.Neighbors,
 	slp := in.safeLevel(p)
 	sln := in.safeLevel2(p, n)
 
-	if debug.Value >= 2 {
-		fmt.Println("[lnsmote] slp : ", slp.Len())
-		fmt.Println("[lnsmote] sln : ", sln.Len())
-	}
-
 	return slp.Len() != 0 || sln.Len() != 0, slp, sln
 }
 
@@ -202,20 +177,9 @@ func (in *Runtime) safeLevel2(p, n *tabula.Row) knn.Neighbors {
 
 	// if p in neighbors, replace it with neighbours in K+1
 	if nIsMinor && pInNeighbors {
-		if debug.Value >= 1 {
-			fmt.Println("[lnsmote] Replacing ", pidx)
-		}
-		if debug.Value >= 2 {
-			fmt.Println("[lnsmote] Replacing ", pidx, " in ", neighbors)
-		}
-
 		row := in.AllNeighbors.Row(in.K + 1)
 		dist := in.AllNeighbors.Distance(in.K + 1)
 		neighbors.Replace(pidx, row, dist)
-
-		if debug.Value >= 2 {
-			fmt.Println("[lnsmote] Replacement ", neighbors)
-		}
 	}
 
 	minorNeighbors := neighbors.SelectWhere(in.ClassIndex, in.ClassMinor)

@@ -7,11 +7,9 @@
 package knn
 
 import (
-	"fmt"
 	"math"
 	"sort"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/tabula"
 )
 
@@ -86,15 +84,7 @@ func (in *Runtime) FindNeighbors(samples *tabula.Rows, instance *tabula.Row) (
 		minK = in.K
 	}
 
-	if debug.Value >= 2 {
-		fmt.Println("[knn] all neighbors:", in.AllNeighbors.Len())
-	}
-
 	kneighbors = in.AllNeighbors.SelectRange(0, minK)
-
-	if debug.Value >= 2 {
-		fmt.Println("[knn] k neighbors:", kneighbors.Len())
-	}
 
 	return
 }

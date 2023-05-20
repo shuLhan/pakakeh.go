@@ -4,12 +4,6 @@
 
 package strings
 
-import (
-	"fmt"
-
-	"github.com/shuLhan/share/lib/debug"
-)
-
 // Table is for working with set of row.
 //
 // Each element in table is in the form of
@@ -19,14 +13,6 @@ import (
 //		[["x"],["y",z"],...]   // Row
 //	]
 type Table []Row
-
-// createIndent create n space indentation and return it.
-func createIndent(n int) (s string) {
-	for i := 0; i < n; i++ {
-		s += " "
-	}
-	return
-}
 
 // Partition group the each element of slice "ss" into non-empty
 // record, in such a way that every element is included in one and only of the
@@ -44,10 +30,6 @@ func Partition(ss []string, k int) (table Table) {
 	n := len(ss)
 	seed := make([]string, n)
 	copy(seed, ss)
-
-	if debug.Value >= 1 {
-		fmt.Printf("lib/strings: %s Partition(%v,%v)\n", createIndent(n), n, k)
-	}
 
 	// if only one split return the set contain only seed as list.
 	// input: {a,b,c},  output: {{a,b,c}}
@@ -72,41 +54,19 @@ func Partition(ss []string, k int) (table Table) {
 	// remove the first element from set
 	seed = append(seed[:0], seed[1:]...)
 
-	if debug.Value >= 1 {
-		fmt.Printf("[tekstus] %s el: %s, seed: %s", createIndent(n), el, seed)
-	}
-
 	// generate child list
 	genTable := Partition(seed, k)
-
-	if debug.Value >= 1 {
-		fmt.Printf("[tekstus] %s genTable join: %v", createIndent(n), genTable)
-	}
 
 	// join elemen with generated set
 	table = genTable.JoinCombination(el)
 
-	if debug.Value >= 1 {
-		fmt.Printf("[tekstus] %s join %s      : %v\n", createIndent(n), el,
-			table)
-	}
-
 	genTable = Partition(seed, k-1)
-
-	if debug.Value >= 1 {
-		fmt.Printf("[tesktus] %s genTable append: %s", createIndent(n), genTable)
-	}
 
 	for _, row := range genTable {
 		list := make(Row, len(row))
 		copy(list, row)
 		list = append(list, []string{el})
 		table = append(table, list)
-	}
-
-	if debug.Value >= 1 {
-		fmt.Printf("[tesktus] %s append %v      : %v\n", createIndent(n), el,
-			table)
 	}
 
 	return table

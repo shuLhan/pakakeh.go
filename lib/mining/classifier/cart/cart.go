@@ -17,7 +17,6 @@ package cart
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/mining/gain/gini"
 	"github.com/shuLhan/share/lib/mining/tree/binary"
 	"github.com/shuLhan/share/lib/numbers"
@@ -105,11 +104,6 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 	nrow := claset.GetNRow()
 
 	if nrow <= 0 {
-		if debug.Value >= 2 {
-			fmt.Printf("[cart] empty dataset (%s) : %v\n",
-				claset.MajorityClass(), claset)
-		}
-
 		node.Value = NodeValue{
 			IsLeaf: true,
 			Class:  claset.MajorityClass(),
@@ -122,21 +116,12 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 	// is set to that class.
 	single, name := claset.IsInSingleClass()
 	if single {
-		if debug.Value >= 2 {
-			fmt.Printf("[cart] in single class (%s): %v\n", name,
-				claset.GetColumns())
-		}
-
 		node.Value = NodeValue{
 			IsLeaf: true,
 			Class:  name,
 			Size:   nrow,
 		}
 		return node, nil
-	}
-
-	if debug.Value >= 2 {
-		fmt.Println("[cart] claset:", claset)
 	}
 
 	// calculate the Gini gain for each attribute.
@@ -149,12 +134,6 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 	// if maxgain value is 0, use majority class as node and terminate
 	// the process
 	if MaxGain.GetMaxGainValue() == 0 {
-		if debug.Value >= 2 {
-			fmt.Println("[cart] max gain 0 with target",
-				claset.GetClassAsStrings(),
-				" and majority class is ", claset.MajorityClass())
-		}
-
 		node.Value = NodeValue{
 			IsLeaf: true,
 			Class:  claset.MajorityClass(),
@@ -165,10 +144,6 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 
 	// using the sorted index in MaxGain, sort all field in dataset
 	tabula.SortColumnsByIndex(claset, MaxGain.SortedIndex)
-
-	if debug.Value >= 2 {
-		fmt.Println("[cart] maxgain:", MaxGain)
-	}
 
 	// Now that we have attribute with max gain in MaxGainIdx, and their
 	// gain dan partition value in Gains[MaxGainIdx] and
@@ -185,11 +160,6 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 		attrPartV := MaxGain.GetMaxPartGainValue()
 		attrSubV := attrPartV.(libstrings.Row)
 		splitV = attrSubV[0]
-	}
-
-	if debug.Value >= 2 {
-		fmt.Println("[cart] maxgainindex:", MaxGainIdx)
-		fmt.Println("[cart] split v:", splitV)
 	}
 
 	node.Value = NodeValue{
@@ -286,11 +256,6 @@ func (runtime *Runtime) SelectRandomFeature(claset tabula.ClasetInterface) {
 		col := claset.GetColumn(idx)
 		col.Flag &^= ColFlagSkip
 	}
-
-	if debug.Value >= 1 {
-		fmt.Println("[cart] selected random features:", pickedIdx)
-		fmt.Println("[cart] selected columns        :", claset.GetColumns())
-	}
 }
 
 // computeGain calculate the gini index for each value in each attribute.
@@ -345,18 +310,9 @@ func (runtime *Runtime) computeGain(claset tabula.ClasetInterface) (
 			attr := col.ToStringSlice()
 			attrV := col.ValueSpace
 
-			if debug.Value >= 2 {
-				fmt.Println("[cart] attr :", attr)
-				fmt.Println("[cart] attrV:", attrV)
-			}
-
 			target := claset.GetClassAsStrings()
 			gains[x].ComputeDiscrete(&attr, &attrV, &target,
 				&classVS)
-		}
-
-		if debug.Value >= 2 {
-			fmt.Println("[cart] gain :", gains[x])
 		}
 	}
 	return gains
@@ -415,11 +371,6 @@ func (runtime *Runtime) CountOOBError(oob tabula.Claset) (
 	// save the original target to be compared later.
 	origTarget := oob.GetClassAsStrings()
 
-	if debug.Value >= 2 {
-		fmt.Println("[cart] OOB:", oob.Columns)
-		fmt.Println("[cart] TREE:", &runtime.Tree)
-	}
-
 	// reset the target.
 	oobtarget := oob.GetClassColumn()
 	oobtarget.ClearValues()
@@ -433,11 +384,6 @@ func (runtime *Runtime) CountOOBError(oob tabula.Claset) (
 	}
 
 	target := oobtarget.ToStringSlice()
-
-	if debug.Value >= 2 {
-		fmt.Println("[cart] original target:", origTarget)
-		fmt.Println("[cart] classify target:", target)
-	}
 
 	// count how many target value is miss-classified.
 	runtime.OOBErrVal, _, _ = libstrings.CountMissRate(origTarget, target)

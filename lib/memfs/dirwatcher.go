@@ -11,8 +11,6 @@ import (
 	"os"
 	"sort"
 	"time"
-
-	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -181,10 +179,6 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		logp = "onContentChange"
 	)
 
-	if debug.Value >= 2 {
-		fmt.Printf("%s: %+v\n", logp, node)
-	}
-
 	f, err := os.Open(node.SysPath)
 	if err != nil {
 		log.Printf("%s: %s", logp, err)
@@ -214,9 +208,6 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		if found {
 			continue
 		}
-		if debug.Value >= 2 {
-			fmt.Printf("%s: %q deleted\n", logp, child.Path)
-		}
 		dw.unmapSubdirs(child)
 	}
 
@@ -241,10 +232,6 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		if newChild == nil {
 			// a node is excluded.
 			continue
-		}
-
-		if debug.Value >= 2 {
-			fmt.Printf("%s: new child %s\n", logp, newChild.Path)
 		}
 
 		ns := NodeState{
@@ -297,10 +284,6 @@ func (dw *DirWatcher) onRootCreated() {
 	dw.dirs = make(map[string]*Node)
 	dw.mapSubdirs(dw.root)
 
-	if debug.Value >= 2 {
-		fmt.Printf("%s: %s\n", logp, dw.root.Path)
-	}
-
 	ns := NodeState{
 		Node:  *dw.root,
 		State: FileStateCreated,
@@ -327,10 +310,6 @@ func (dw *DirWatcher) onRootDeleted() {
 	dw.root = nil
 	dw.dirs = nil
 
-	if debug.Value >= 2 {
-		fmt.Println("DirWatcher.onRootDeleted: root directory deleted")
-	}
-
 	//nolint
 	select {
 	case dw.qchanges <- ns:
@@ -352,10 +331,6 @@ func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 	//nolint
 	select {
 	case dw.qchanges <- ns:
-	}
-
-	if debug.Value >= 2 {
-		fmt.Printf("DirWatcher.onModified: %s\n", node.Path)
 	}
 }
 
@@ -426,10 +401,6 @@ func (dw *DirWatcher) processSubdirs() {
 	logp := "processSubdirs"
 
 	for _, node := range dw.dirs {
-		if debug.Value >= 3 {
-			fmt.Printf("%s: %q\n", logp, node.SysPath)
-		}
-
 		newDirInfo, err := osStat(node.SysPath)
 		if err != nil {
 			if os.IsNotExist(err) {

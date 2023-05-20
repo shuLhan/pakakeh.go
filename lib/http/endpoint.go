@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/mlog"
 )
 
@@ -108,9 +107,6 @@ func (ep *Endpoint) call(
 		return
 	}
 
-	if debug.Value >= 3 {
-		mlog.Outf("%s: %s %s: request body: %s", logp, req.Method, req.URL.Path, epr.RequestBody)
-	}
 	if len(vals) > 0 && req.Form == nil {
 		req.Form = make(url.Values, len(vals))
 	}

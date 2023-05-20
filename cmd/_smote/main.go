@@ -11,7 +11,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/dsv"
 	"github.com/shuLhan/share/lib/mining/resampling/smote"
 	"github.com/shuLhan/share/lib/tabula"
@@ -94,10 +93,6 @@ func createSmote(fcfg string, o *options) (smoteRun *smote.Runtime, e error) {
 		smoteRun.K = o.knn
 	}
 
-	if debug.Value >= 1 {
-		fmt.Println("[smote]", smoteRun)
-	}
-
 	return
 }
 
@@ -105,17 +100,9 @@ func createSmote(fcfg string, o *options) (smoteRun *smote.Runtime, e error) {
 func runSmote(smote *smote.Runtime, dataset *tabula.Claset) (e error) {
 	minorset := dataset.GetMinorityRows()
 
-	if debug.Value >= 1 {
-		fmt.Println("[smote] # minority samples:", minorset.Len())
-	}
-
 	e = smote.Resampling(*minorset)
 	if e != nil {
 		return
-	}
-
-	if debug.Value >= 1 {
-		fmt.Println("[smote] # synthetics:", smote.Synthetics.Len())
 	}
 
 	return
@@ -137,10 +124,6 @@ func runMerge(smote *smote.Runtime, dataset *tabula.Claset) (e error) {
 	n, e := writer.WriteRawDataset(dataset, &sep)
 	if e != nil {
 		return
-	}
-
-	if debug.Value >= 1 {
-		fmt.Println("[smote] # appended:", n)
 	}
 
 	return writer.Close()

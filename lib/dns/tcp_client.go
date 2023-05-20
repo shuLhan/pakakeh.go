@@ -11,7 +11,6 @@ import (
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -203,10 +202,6 @@ func (cl *TCPClient) recv() (res *Message, err error) {
 
 	res = &Message{
 		packet: packet[2:n],
-	}
-
-	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> TCPClient.recv: ", res.packet, 8)
 	}
 
 	return res, nil

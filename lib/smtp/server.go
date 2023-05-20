@@ -13,8 +13,6 @@ import (
 	"net"
 	"strings"
 	"sync"
-
-	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -139,10 +137,6 @@ func (srv *Server) Stop() {
 // 25.
 func (srv *Server) serveIncoming() {
 	for {
-		if debug.Value >= 2 {
-			fmt.Println("smtp: server: MTA ready ...")
-		}
-
 		conn, err := srv.listener.Accept()
 		if err != nil {
 			log.Printf("smtp: listener.Accept: %s", err)
@@ -158,10 +152,6 @@ func (srv *Server) serveIncoming() {
 
 func (srv *Server) serveTLS() {
 	for {
-		if debug.Value >= 2 {
-			fmt.Println("smtp: server: MSA ready ...")
-		}
-
 		conn, err := srv.tlsListener.Accept()
 		if err != nil {
 			log.Printf("smtp: tlsListener.Accept: %s", err)
@@ -242,10 +232,6 @@ out:
 
 // handleCommand from client.
 func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
-	if debug.Value > 0 {
-		log.Printf("handleCommand: %v\n", cmd)
-	}
-
 	switch cmd.Kind {
 	case CommandAUTH:
 		err = srv.handleAUTH(recv, cmd)

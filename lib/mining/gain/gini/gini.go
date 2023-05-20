@@ -11,7 +11,6 @@ package gini
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/floats64"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
@@ -61,10 +60,6 @@ func (gini *Gini) ComputeDiscrete(src, discval, target, classes *[]string) {
 	// create partition for possible combination of discrete values.
 	gini.createDiscretePartition((*discval))
 
-	if debug.Value >= 2 {
-		fmt.Println("[gini] part :", gini.DiscretePart)
-	}
-
 	gini.Index = make([]float64, len(gini.DiscretePart))
 	gini.Gain = make([]float64, len(gini.DiscretePart))
 	gini.MinIndexValue = 1.0
@@ -79,11 +74,6 @@ func (gini *Gini) ComputeDiscrete(src, discval, target, classes *[]string) {
 func (gini *Gini) computeDiscreteGain(src, target, classes *[]string) {
 	// number of samples
 	nsample := float64(len(*src))
-
-	if debug.Value >= 3 {
-		fmt.Println("[gini] sample:", target)
-		fmt.Printf("[gini] Gini(a=%s) = %f\n", (*src), gini.Value)
-	}
 
 	// compute gini index for each discrete values
 	for i, subPart := range gini.DiscretePart {
@@ -121,24 +111,10 @@ func (gini *Gini) computeDiscreteGain(src, target, classes *[]string) {
 
 			// sum all probabilities times gini index.
 			sumGI += probIndex
-
-			if debug.Value >= 3 {
-				fmt.Printf("[gini] subsample: %v\n", subT)
-				fmt.Printf("[gini] Gini(a=%s) = %f/%f * %f = %f\n",
-					part, ndisc, nsample,
-					giniIndex, probIndex)
-			}
 		}
 
 		gini.Index[i] = sumGI
 		gini.Gain[i] = gini.Value - sumGI
-
-		if debug.Value >= 3 {
-			fmt.Printf("[gini] sample: %v\n", subPart)
-			fmt.Printf("[gini] Gain(a=%s) = %f - %f = %f\n",
-				subPart, gini.Value, sumGI,
-				gini.Gain[i])
-		}
 
 		if gini.MinIndexValue > gini.Index[i] && gini.Index[i] != 0 {
 			gini.MinIndexValue = gini.Index[i]
@@ -181,10 +157,6 @@ func (gini *Gini) ComputeContinu(src *[]float64, target, classes *[]string) {
 	copy(T2, *target)
 
 	gini.SortedIndex = floats64.IndirectSort(A2, true)
-
-	if debug.Value >= 1 {
-		fmt.Println("[gini] attr sorted :", A2)
-	}
 
 	// sort the target attribute using sorted index.
 	libstrings.SortByIndex(&T2, gini.SortedIndex)
@@ -253,14 +225,9 @@ func (gini *Gini) compute(target, classes *[]string) float64 {
 
 	var sump2 float64
 
-	for x, v := range classCount {
+	for _, v := range classCount {
 		p := float64(v) / n
 		sump2 += (p * p)
-
-		if debug.Value >= 3 {
-			fmt.Printf("[gini] compute (%s): (%d/%f)^2 = %f\n",
-				(*classes)[x], v, n, p*p)
-		}
 	}
 
 	return 1 - sump2
@@ -281,11 +248,6 @@ func (gini *Gini) computeContinuGain(src *[]float64, target, classes *[]string) 
 	var tleft, tright []string
 
 	nsample := len(*src)
-
-	if debug.Value >= 2 {
-		fmt.Println("[gini] sorted data:", src)
-		fmt.Println("[gini] Gini.Value:", gini.Value)
-	}
 
 	for p, contVal := range gini.ContinuPart {
 		// find the split of samples between partition based on
@@ -320,15 +282,6 @@ func (gini *Gini) computeContinuGain(src *[]float64, target, classes *[]string) 
 		// count class in partition
 		gini.Index[p] = ((pleft * gleft) + (pright * gright))
 		gini.Gain[p] = gini.Value - gini.Index[p]
-
-		if debug.Value >= 3 {
-			fmt.Println("[gini] tleft:", tleft)
-			fmt.Println("[gini] tright:", tright)
-
-			fmt.Printf("[gini] GiniGain(%v) = %f - (%f * %f) + (%f * %f) = %f\n",
-				contVal, gini.Value, pleft, gleft,
-				pright, gright, gini.Gain[p])
-		}
 
 		if gini.MinIndexValue > gini.Index[p] && gini.Index[p] != 0 {
 			gini.MinIndexValue = gini.Index[p]

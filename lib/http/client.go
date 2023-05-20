@@ -19,14 +19,12 @@ import (
 	"mime/multipart"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"path"
 	"strings"
 	"time"
 
 	"github.com/shuLhan/share"
-	"github.com/shuLhan/share/lib/debug"
 )
 
 var (
@@ -99,27 +97,9 @@ func (client *Client) Do(httpRequest *http.Request) (
 ) {
 	logp := "Do"
 
-	if debug.Value >= 3 {
-		dump, err := httputil.DumpRequestOut(httpRequest, true)
-		if err != nil {
-			log.Printf("%s: %s\n", logp, err)
-		} else {
-			fmt.Printf("%s\n", dump)
-		}
-	}
-
 	httpRes, err = client.Client.Do(httpRequest)
 	if err != nil {
 		return nil, nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	if debug.Value >= 3 {
-		dump, err := httputil.DumpResponse(httpRes, true)
-		if err != nil {
-			log.Printf("%s: %s", logp, err)
-		} else {
-			fmt.Printf("%s\n", dump)
-		}
 	}
 
 	rawBody, err := io.ReadAll(httpRes.Body)

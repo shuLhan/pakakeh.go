@@ -11,7 +11,6 @@ import (
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -142,10 +141,6 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 	}
 
 	msg.packet = packet[2:n]
-
-	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> DoTClient: recv: ", msg.packet, 8)
-	}
 
 	return
 }

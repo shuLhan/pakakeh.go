@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/ascii"
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
 )
@@ -241,14 +240,6 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 
 // ServeHTTP handle mapping of client request to registered endpoints.
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	var (
-		logp = "ServeHTTP"
-	)
-
-	if debug.Value >= 3 {
-		mlog.Outf("%s: %s %+v", logp, req.Method, req.URL)
-	}
-
 	switch req.Method {
 	case http.MethodDelete:
 		srv.handleDelete(res, req)
@@ -307,8 +298,6 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	var (
-		logp = "getFSNode"
-
 		nodeIndexHtml *memfs.Node
 		pathHtml      string
 		err           error
@@ -323,9 +312,6 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			if debug.Value >= 3 {
-				mlog.Outf("%s: %q: %s", logp, reqPath, err)
-			}
 			return nil
 		}
 
@@ -334,9 +320,6 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 			pathHtml = reqPath + `.html`
 			node, err = srv.Options.Memfs.Get(pathHtml)
 			if err != nil {
-				if debug.Value >= 3 {
-					mlog.Outf("%s: %q: %s", logp, reqPath, err)
-				}
 				return nil
 			}
 			return node

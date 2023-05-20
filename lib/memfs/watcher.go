@@ -11,8 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -118,15 +116,9 @@ func (w *Watcher) start() {
 		ns      NodeState
 		err     error
 	)
-	if debug.Value >= 2 {
-		fmt.Printf("%s: %s: watching for changes\n", logp, w.node.SysPath)
-	}
 	for range w.ticker.C {
 		newInfo, err = osStat(w.node.SysPath)
 		if err != nil {
-			if debug.Value >= 2 {
-				fmt.Printf("%s: %s: deleted\n", logp, w.node.SysPath)
-			}
 			if !os.IsNotExist(err) {
 				log.Printf("%s: %s: %s", logp, w.node.SysPath, err)
 				continue
@@ -144,9 +136,6 @@ func (w *Watcher) start() {
 		}
 
 		if w.node.Mode() != newInfo.Mode() {
-			if debug.Value >= 2 {
-				fmt.Printf("%s: %s: mode updated\n", logp, w.node.SysPath)
-			}
 			w.node.SetMode(newInfo.Mode())
 
 			ns.Node = *w.node
@@ -160,9 +149,6 @@ func (w *Watcher) start() {
 		}
 		if w.node.ModTime().Equal(newInfo.ModTime()) {
 			continue
-		}
-		if debug.Value >= 2 {
-			fmt.Printf("%s: %s: content updated\n", logp, w.node.SysPath)
 		}
 
 		w.node.SetModTime(newInfo.ModTime())

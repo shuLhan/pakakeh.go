@@ -13,7 +13,6 @@ import (
 
 	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
@@ -1093,7 +1092,6 @@ func (m *zoneParser) setMinimumTTL() {
 func (m *zoneParser) pack() {
 	var (
 		msg *Message
-		rr  ResourceRecord
 		err error
 	)
 
@@ -1105,15 +1103,6 @@ func (m *zoneParser) pack() {
 		_, err = msg.Pack()
 		if err != nil {
 			msg.Header.ANCount = 0
-		}
-
-		if debug.Value >= 3 {
-			fmt.Printf("= Header: %+v\n", msg.Header)
-			fmt.Printf("  Question: %s\n", msg.Question.String())
-			for _, rr = range msg.Answer {
-				fmt.Printf("  Answer: %s\n", rr.String())
-				fmt.Printf("  RData: %s\n", rr.Value)
-			}
 		}
 	}
 }

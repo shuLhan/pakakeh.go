@@ -10,8 +10,6 @@ import (
 	"sync"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -143,10 +141,6 @@ func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 
 	res = &Message{
 		packet: packet[:n],
-	}
-
-	if debug.Value >= 3 {
-		libbytes.PrintHex(">>> UDPClient.recv:", res.packet, 8)
 	}
 
 	err = res.Unpack()

@@ -17,7 +17,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/shuLhan/share/lib/debug"
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
@@ -354,11 +353,6 @@ func (cl *Client) open() (err error) {
 		}
 	)
 
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: Client.open: remoteAddr: %s\n",
-			cl.remoteAddr)
-	}
-
 	if cl.TLSConfig != nil {
 		cl.conn, err = tls.DialWithDialer(dialer, "tcp", cl.remoteAddr, cl.TLSConfig)
 	} else {
@@ -403,10 +397,6 @@ func (cl *Client) handshake() (rest []byte, err error) {
 
 	bb.WriteString("\r\n")
 	req = bb.Bytes()
-
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: Client.handshake:\n%s\n--\n", req)
-	}
 
 	rest, err = cl.doHandshake(keyAccept, req)
 	if err != nil {
@@ -482,10 +472,6 @@ func clientOnClose(cl *Client, frame *Frame) (err error) {
 
 	var packet []byte = NewFrameClose(true, frame.closeCode, frame.payload)
 
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: clientOnClose: payload: %s\n", frame.payload)
-	}
-
 	cl.Lock()
 	err = cl.send(packet)
 	cl.Unlock()
@@ -500,12 +486,6 @@ func clientOnClose(cl *Client, frame *Frame) (err error) {
 
 // handleFragment will handle continuation frame (fragmentation).
 func (cl *Client) handleFragment(frame *Frame) (isInvalid bool) {
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: Client.handleFragment: frame:{fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
-			frame.fin, frame.opcode, frame.masked, frame.len,
-			len(frame.payload))
-	}
-
 	if cl.frames == nil {
 		if frame.opcode == OpcodeCont {
 			// If a connection does not have continuous frame,
@@ -610,15 +590,6 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 }
 
 func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, err error) {
-	if debug.Value >= 3 {
-		var max int = 512
-		if len(resp) < 512 {
-			max = len(resp)
-		}
-		fmt.Printf("websocket: Client.handleHandshake:\n%s\n--\n",
-			resp[:max])
-	}
-
 	var httpRes *http.Response
 
 	httpRes, rest, err = libhttp.ParseResponseHeader(resp)
@@ -799,7 +770,6 @@ func (cl *Client) recv() (packet []byte, err error) {
 	var (
 		buf    []byte = make([]byte, 512)
 		neterr net.Error
-		max    int
 		n      int
 		ok     bool
 	)
@@ -828,14 +798,6 @@ func (cl *Client) recv() (packet []byte, err error) {
 		}
 	}
 
-	if debug.Value >= 3 {
-		max = len(packet)
-		if max > 16 {
-			max = 16
-		}
-		fmt.Printf("websocket: Client.recv: packet: len:%d % x\n", len(packet), packet[:max])
-	}
-
 	return packet, err
 }
 
@@ -847,14 +809,6 @@ func (cl *Client) send(packet []byte) (err error) {
 	err = cl.conn.SetWriteDeadline(time.Now().Add(defaultTimeout))
 	if err != nil {
 		return err
-	}
-
-	if debug.Value >= 3 {
-		var max int = len(packet)
-		if max > 16 {
-			max = 16
-		}
-		fmt.Printf("websocket: Client.send: % x\n", packet[:max])
 	}
 
 	_, err = cl.conn.Write(packet)

@@ -6,14 +6,12 @@ package dns
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"strconv"
 	"strings"
 
 	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
 	"github.com/shuLhan/share/lib/reflect"
 )
@@ -907,10 +905,6 @@ func (msg *Message) Unpack() (err error) {
 		msg.Answer = append(msg.Answer, rr)
 	}
 
-	if debug.Value >= 3 {
-		log.Printf("msg.Answer: %+v\n", msg.Answer)
-	}
-
 	for x = 0; x < msg.Header.NSCount; x++ {
 		rr = ResourceRecord{}
 
@@ -919,10 +913,6 @@ func (msg *Message) Unpack() (err error) {
 			return err
 		}
 		msg.Authority = append(msg.Authority, rr)
-	}
-
-	if debug.Value >= 3 {
-		log.Printf("msg.Authority: %+v\n", msg.Authority)
 	}
 
 	for x = 0; x < msg.Header.ARCount; x++ {
@@ -934,10 +924,6 @@ func (msg *Message) Unpack() (err error) {
 		}
 
 		msg.Additional = append(msg.Additional, rr)
-	}
-
-	if debug.Value >= 3 {
-		log.Printf("msg.Additional: %+v\n", msg.Additional)
 	}
 
 	return nil
@@ -953,17 +939,9 @@ func (msg *Message) UnpackHeaderQuestion() (err error) {
 
 	msg.Header.unpack(msg.packet)
 
-	if debug.Value >= 3 {
-		log.Printf("msg.Header: %+v\n", msg.Header)
-	}
-
 	err = msg.Question.unpack(msg.packet[sectionHeaderSize:])
 	if err != nil {
 		return err
-	}
-
-	if debug.Value >= 3 {
-		log.Printf("msg.Question: %s\n", msg.Question.String())
 	}
 
 	return nil

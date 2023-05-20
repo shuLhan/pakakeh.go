@@ -16,7 +16,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -96,17 +95,9 @@ func NewClient(opts ClientOptions) (cl *Client, err error) {
 	cl.data = make([]byte, 4096)
 	cl.raddr.Port = int(port)
 
-	if debug.Value >= 3 {
-		fmt.Printf("%s: remote address is %v\n", logp, cl.raddr)
-	}
-
 	_, err = cl.connect(opts.LocalName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	if debug.Value >= 3 {
-		fmt.Printf("%s: ServerInfo: %+v\n", logp, cl.ServerInfo)
 	}
 
 	if len(opts.AuthUser) == 0 || len(opts.AuthPass) == 0 {
@@ -163,10 +154,6 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 		}
 
 		cl.conn = tls.Client(cl.conn, tlsConfig)
-	}
-
-	if debug.Value >= 3 {
-		fmt.Println(">>> Connected ...")
 	}
 
 	res, err = cl.recv()
@@ -355,10 +342,6 @@ func (cl *Client) Reset() (res *Response, err error) {
 
 // SendCommand send any custom command to server.
 func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
-	if debug.Value >= 3 {
-		fmt.Printf(">>> smtp: Client.SendCommand: %s", cmd)
-	}
-
 	_, err = cl.conn.Write(cmd)
 	if err != nil {
 		return nil, err
@@ -449,10 +432,6 @@ func (cl *Client) recv() (res *Response, err error) {
 			continue
 		}
 		break
-	}
-
-	if debug.Value >= 3 {
-		fmt.Printf("<<< smtp: Client.recv: %s", cl.buf.Bytes())
 	}
 
 	res, err = NewResponse(cl.buf.Bytes())

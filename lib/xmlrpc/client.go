@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/shuLhan/share/lib/debug"
 	libhttp "github.com/shuLhan/share/lib/http"
 	libnet "github.com/shuLhan/share/lib/net"
 )
@@ -81,10 +80,6 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 	xmlbin, _ := req.MarshalText()
 	reqBody := bytes.NewReader(xmlbin)
 
-	if debug.Value >= 3 {
-		fmt.Printf("<<< Send: request body:\n%s\n", xmlbin)
-	}
-
 	httpRequest, err := http.NewRequest("POST", cl.url.String(), reqBody)
 	if err != nil {
 		return resp, fmt.Errorf("%s: %w", logp, err)
@@ -95,10 +90,6 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 	_, resBody, err := cl.conn.Do(httpRequest)
 	if err != nil {
 		return resp, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	if debug.Value >= 3 {
-		fmt.Printf(">>> Send: response:\n%s\n", resBody)
 	}
 
 	if len(resBody) > 0 {

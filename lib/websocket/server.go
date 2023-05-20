@@ -19,7 +19,6 @@ import (
 	"golang.org/x/sys/unix"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -353,12 +352,6 @@ func (serv *Server) handleFragment(conn int, req *Frame) (isInvalid bool) {
 
 	frames, ok = serv.Clients.getFrames(conn)
 
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: Server.handleFragment: frame: {fin:%d opcode:%d masked:%d len:%d, payload.len:%d}\n",
-			req.fin, req.opcode, req.masked, req.len,
-			len(req.payload))
-	}
-
 	if frames == nil {
 		if req.opcode == OpcodeCont {
 			// If a connection does not have continuous frame,
@@ -590,10 +583,6 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 		err    error
 	)
 
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: Server.handleClose: req: %+v\n", req)
-	}
-
 	err = Send(conn, packet)
 	if err != nil {
 		log.Println("websocket: server.handleClose: Send: " + err.Error())
@@ -651,11 +640,6 @@ func (serv *Server) handleInvalidData(conn int) {
 // being replied to.
 // “`
 func (serv *Server) handlePing(conn int, req *Frame) {
-	if debug.Value >= 3 {
-		fmt.Printf("websocket: Server.handlePing: conn:%d frame:%+v\n",
-			conn, req)
-	}
-
 	req.opcode = OpcodePong
 	req.masked = 0
 
@@ -690,7 +674,6 @@ func (serv *Server) reader() {
 		packet    []byte
 		fds       []int
 		conn      int
-		max       int
 		x         int
 		isClosing bool
 	)
@@ -709,15 +692,6 @@ func (serv *Server) reader() {
 			if err != nil || len(packet) == 0 {
 				serv.ClientRemove(conn)
 				continue
-			}
-
-			if debug.Value >= 3 {
-				max = len(packet)
-				if max > 16 {
-					max = 16
-				}
-				fmt.Printf("websocket: Server.reader: packet {len:%d value:% x ...}\n",
-					len(packet), packet[:max])
 			}
 
 			// Handle chopped, unfinished packet or payload.
@@ -741,10 +715,6 @@ func (serv *Server) reader() {
 			if frames == nil {
 				serv.ClientRemove(conn)
 				continue
-			}
-
-			if debug.Value >= 3 {
-				fmt.Printf("websocket: Server.reader: frames: len:%d\n", len(frames.v))
 			}
 
 			var isClosing bool

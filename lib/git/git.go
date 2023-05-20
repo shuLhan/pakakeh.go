@@ -12,7 +12,6 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/ini"
 )
 
@@ -54,9 +53,7 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-	if debug.Value >= 1 {
-		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
-	}
+
 	err := cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("CheckoutRevision: %s", err)
@@ -64,17 +61,12 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 	}
 
 	cmd = exec.Command("git", "checkout")
-	if debug.Value == 0 {
-		cmd.Args = append(cmd.Args, "--quiet")
-	}
+	cmd.Args = append(cmd.Args, "--quiet")
 	cmd.Args = append(cmd.Args, "--track", ref, "-B", branch)
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
-	}
 	err = cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("CheckoutRevision: %s", err)
@@ -82,17 +74,12 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 	}
 
 	cmd = exec.Command("git", "reset")
-	if debug.Value == 0 {
-		cmd.Args = append(cmd.Args, "--quiet")
-	}
+	cmd.Args = append(cmd.Args, "--quiet")
 	cmd.Args = append(cmd.Args, "--hard", revision)
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= CheckoutRevision %s %s\n", cmd.Dir, cmd.Args)
-	}
 	err = cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("CheckoutRevision: %s", err)
@@ -112,17 +99,11 @@ func Clone(remoteURL, dest string) (err error) {
 	}
 
 	cmd := exec.Command("git", "clone")
-	if debug.Value == 0 {
-		cmd.Args = append(cmd.Args, "--quiet")
-	}
+	cmd.Args = append(cmd.Args, "--quiet")
 	cmd.Args = append(cmd.Args, remoteURL, ".")
 	cmd.Dir = dest
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= Clone %s %s %s\n", remoteURL, cmd.Dir, cmd.Args)
-	}
 
 	err = cmd.Run()
 	if err != nil {
@@ -135,17 +116,11 @@ func Clone(remoteURL, dest string) (err error) {
 // FetchAll will fetch the latest commits and tags from remote.
 func FetchAll(repoDir string) (err error) {
 	cmd := exec.Command("git", "fetch")
-	if debug.Value == 0 {
-		cmd.Args = append(cmd.Args, "--quiet")
-	}
+	cmd.Args = append(cmd.Args, "--quiet")
 	cmd.Args = append(cmd.Args, "--all", "--tags", "--force")
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= FetchAll %s %s\n", cmd.Dir, cmd.Args)
-	}
 
 	err = cmd.Run()
 	if err != nil {
@@ -158,17 +133,11 @@ func FetchAll(repoDir string) (err error) {
 // FetchTags will fetch all tags from remote.
 func FetchTags(repoDir string) error {
 	cmd := exec.Command("git", "fetch")
-	if debug.Value == 0 {
-		cmd.Args = append(cmd.Args, "--quiet")
-	}
+	cmd.Args = append(cmd.Args, "--quiet")
 	cmd.Args = append(cmd.Args, "--tags", "--force")
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= FetchTags %s %s\n", cmd.Dir, cmd.Args)
-	}
 
 	err := cmd.Run()
 	if err != nil {
@@ -214,10 +183,6 @@ func GetTag(repoDir, revision string) (tag string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= GetTag %s %s\n", cmd.Dir, cmd.Args)
-	}
-
 	btag, err := cmd.Output()
 	if err != nil {
 		err = fmt.Errorf("GetTag: %s", err)
@@ -241,10 +206,6 @@ func LatestCommit(repoDir, ref string) (commit string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= LatestCommit %s %s\n", cmd.Dir, cmd.Args)
-	}
-
 	bcommit, err := cmd.Output()
 	if err != nil {
 		err = fmt.Errorf("LatestCommit: %s", err)
@@ -263,10 +224,6 @@ func LatestTag(repoDir string) (tag string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= LatestTag %s %s\n", cmd.Dir, cmd.Args)
-	}
-
 	bout, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("LatestTag: %s", err)
@@ -281,10 +238,6 @@ func LatestTag(repoDir string) (tag string, err error) {
 	cmd.Args = append(cmd.Args, "describe", "--tags", "--abbrev=0", out)
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= LatestTag %s %s\n", cmd.Dir, cmd.Args)
-	}
 
 	bout, err = cmd.Output()
 	if err != nil {
@@ -325,10 +278,6 @@ func ListTags(repoDir string) (tags []string, err error) {
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= ListTags %s %s\n", cmd.Dir, cmd.Args)
-	}
-
 	bout, err := cmd.Output()
 	if err != nil {
 		err = fmt.Errorf("ListTag: %s", err)
@@ -357,10 +306,6 @@ func LogRevisions(repoDir, prevRevision, nextRevision string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= CompareRevisions %s %s\n", cmd.Dir, cmd.Args)
-	}
-
 	err := cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("CompareRevisions: %s", err)
@@ -382,10 +327,6 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	if debug.Value >= 1 {
-		fmt.Printf("= RemoteChange %s %s\n", cmd.Dir, cmd.Args)
-	}
-
 	err := cmd.Run()
 	if err != nil {
 		err = fmt.Errorf("RemoteChange: %s", err)
@@ -397,10 +338,6 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	cmd.Dir = repoDir
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= RemoteChange %s %s\n", cmd.Dir, cmd.Args)
-	}
 
 	err = cmd.Run()
 	if err != nil {
@@ -419,10 +356,6 @@ func RemoteBranches(repoDir string) ([]string, error) {
 	cmd := exec.Command("git", "--no-pager", "branch", "-r", "--format", "%(refname:lstrip=3)")
 	cmd.Dir = repoDir
 	cmd.Stderr = _stderr
-
-	if debug.Value >= 1 {
-		fmt.Printf("= RemoteBranches %s %s\n", cmd.Dir, cmd.Args)
-	}
 
 	bout, err := cmd.Output()
 	if err != nil {
@@ -445,10 +378,6 @@ func RemoteBranches(repoDir string) ([]string, error) {
 			continue
 		}
 		branches = append(branches, string(bbranches[x]))
-	}
-
-	if debug.Value >= 1 {
-		fmt.Printf("= RemoteBranches: %s\n", branches)
 	}
 
 	return branches, nil

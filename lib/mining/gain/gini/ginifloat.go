@@ -5,9 +5,6 @@
 package gini
 
 import (
-	"fmt"
-
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/floats64"
 )
 
@@ -27,10 +24,6 @@ func (gini *Gini) ComputeContinuFloat(src, target, classes *[]float64) {
 	gini.IsContinu = true
 
 	gini.SortedIndex = floats64.IndirectSort(*src, true)
-
-	if debug.Value >= 1 {
-		fmt.Println("[gini] attr sorted :", src)
-	}
 
 	// (1)
 	floats64.SortByIndex(target, gini.SortedIndex)
@@ -64,14 +57,9 @@ func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 
 	var sump2 float64
 
-	for x, v := range classCount {
+	for _, v := range classCount {
 		p := float64(v) / n
 		sump2 += (p * p)
-
-		if debug.Value >= 3 {
-			fmt.Printf("[gini] compute (%f): (%d/%f)^2 = %f\n",
-				(*classes)[x], v, n, p*p)
-		}
 	}
 
 	return 1 - sump2
@@ -97,11 +85,6 @@ func (gini *Gini) computeContinuGainFloat(src, target, classes *[]float64) {
 	var tleft, tright []float64
 
 	nsample := len(*src)
-
-	if debug.Value >= 2 {
-		fmt.Println("[gini] sorted data:", src)
-		fmt.Println("[gini] Gini.Value:", gini.Value)
-	}
 
 	// (0)
 	for p, contVal := range gini.ContinuPart {
@@ -137,15 +120,6 @@ func (gini *Gini) computeContinuGainFloat(src, target, classes *[]float64) {
 		gini.Index[p] = ((probLeft * gainLeft) +
 			(probRight * gainRight))
 		gini.Gain[p] = gini.Value - gini.Index[p]
-
-		if debug.Value >= 3 {
-			fmt.Println("[gini] tleft:", tleft)
-			fmt.Println("[gini] tright:", tright)
-
-			fmt.Printf("[gini] GiniGain(%v) = %f - (%f * %f) + (%f * %f) = %f\n",
-				contVal, gini.Value, probLeft, gainLeft,
-				probRight, gainRight, gini.Gain[p])
-		}
 
 		if gini.MinIndexValue > gini.Index[p] && gini.Index[p] != 0 {
 			gini.MinIndexValue = gini.Index[p]

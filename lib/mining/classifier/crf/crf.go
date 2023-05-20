@@ -15,7 +15,6 @@ import (
 	"math"
 	"sort"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/floats64"
 	"github.com/shuLhan/share/lib/mining/classifier"
 	"github.com/shuLhan/share/lib/mining/classifier/rf"
@@ -151,10 +150,6 @@ func (crf *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 	fmt.Println(tag, "Config:", crf)
 
 	for x := 0; x < crf.NStage; x++ {
-		if debug.Value >= 1 {
-			fmt.Println(tag, "Stage #", x)
-		}
-
 		forest, e := crf.createForest(samples)
 		if e != nil {
 			return e
@@ -206,10 +201,6 @@ func (crf *Runtime) createForest(samples tabula.ClasetInterface) (
 
 	// (2)
 	for t := 0; t < crf.NTree; t++ {
-		if debug.Value >= 2 {
-			fmt.Println(tag, "Tree #", t)
-		}
-
 		// (2.1)
 		for {
 			cm, stat, e = forest.GrowTree(samples)
@@ -232,10 +223,6 @@ func (crf *Runtime) createForest(samples tabula.ClasetInterface) (
 
 	// (3)
 	crf.computeWeight(stat)
-
-	if debug.Value >= 1 {
-		fmt.Println(tag, "Weight:", stat.FMeasure)
-	}
 
 	// (4)
 	crf.deleteTrueNegative(samples, cm)
@@ -260,10 +247,6 @@ func (crf *Runtime) finalizeStage(forest *rf.Runtime) (e error) {
 
 	crf.AddStat(stat)
 	crf.ComputeStatTotal(stat)
-
-	if debug.Value >= 1 {
-		crf.PrintStatTotal(nil)
-	}
 
 	// (7)
 	crf.AddForest(forest)
@@ -309,10 +292,6 @@ func (crf *Runtime) deleteTrueNegative(samples tabula.ClasetInterface,
 			c++
 		}
 	}
-
-	if debug.Value >= 1 {
-		fmt.Println(tag, "# TN", len(tnids), "# deleted", c)
-	}
 }
 
 // refillWithFP will copy the false-positive data in training set `tnset`
@@ -337,10 +316,6 @@ func (crf *Runtime) refillWithFP(samples, tnset tabula.ClasetInterface,
 		if row != nil {
 			c++
 		}
-	}
-
-	if debug.Value >= 1 {
-		fmt.Println(tag, "# FP", len(fpids), "# refilled", c)
 	}
 }
 

@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shuLhan/share/lib/debug"
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
@@ -35,10 +34,6 @@ func Open(filename string) (in *Ini, err error) {
 	reader := newReader()
 
 	in, err = reader.parseFile(filename)
-
-	if debug.Value >= 3 && err == nil {
-		err = in.Write(os.Stdout)
-	}
 
 	return
 }

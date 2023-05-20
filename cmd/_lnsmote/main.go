@@ -11,7 +11,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/dsv"
 	"github.com/shuLhan/share/lib/mining/resampling/lnsmote"
 	"github.com/shuLhan/share/lib/tabula"
@@ -96,10 +95,6 @@ func createLnsmote(fcfg string, opts *options) (lnsmoteRun *lnsmote.Runtime, e e
 		lnsmoteRun.K = opts.knn
 	}
 
-	if debug.Value >= 1 {
-		fmt.Println("[lnsmote]", lnsmoteRun)
-	}
-
 	return
 }
 
@@ -108,11 +103,6 @@ func runLnsmote(lnsmoteRun *lnsmote.Runtime, dataset *tabula.Claset) (e error) {
 	e = lnsmoteRun.Resampling(dataset)
 	if e != nil {
 		return
-	}
-
-	if debug.Value >= 1 {
-		fmt.Println("[lnsmote] # synthetics:",
-			lnsmoteRun.GetSynthetics().Len())
 	}
 
 	return
@@ -134,10 +124,6 @@ func runMerge(lnsmoteRun *lnsmote.Runtime, dataset *tabula.Claset) (e error) {
 	n, e := writer.WriteRawDataset(dataset, &sep)
 	if e != nil {
 		return
-	}
-
-	if debug.Value >= 1 {
-		fmt.Println("[lnsmote] # appended:", n)
 	}
 
 	return writer.Close()

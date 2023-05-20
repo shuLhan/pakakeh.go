@@ -11,7 +11,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/dsv"
 	"github.com/shuLhan/share/lib/mining/classifier/cart"
 	"github.com/shuLhan/share/lib/tabula"
@@ -95,16 +94,8 @@ func main() {
 		panic(e)
 	}
 
-	if debug.Value >= 1 {
-		fmt.Printf("[cart] Class index: %v\n", dataset.GetClassIndex())
-	}
-
 	e = cartrt.Build(&dataset)
 	if e != nil {
 		panic(e)
-	}
-
-	if debug.Value >= 1 {
-		fmt.Println("[cart] CART tree:\n", cartrt)
 	}
 }

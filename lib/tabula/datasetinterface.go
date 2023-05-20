@@ -6,10 +6,7 @@ package tabula
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-
-	"github.com/shuLhan/share/lib/debug"
 )
 
 // DatasetInterface is the interface for working with DSV data.
@@ -125,10 +122,6 @@ func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 		di.TransposeToRows()
 	}
 
-	if debug.Value >= 2 {
-		fmt.Println("[tabula] dataset:", di)
-	}
-
 	splitLess = di.Clone().(DatasetInterface)
 	splitGreater = di.Clone().(DatasetInterface)
 
@@ -139,11 +132,6 @@ func SplitRowsByNumeric(di DatasetInterface, colidx int, splitVal float64) (
 		} else {
 			splitGreater.PushRow(row)
 		}
-	}
-
-	if debug.Value >= 2 {
-		fmt.Println("[tabula] split less:", splitLess)
-		fmt.Println("[tabula] split greater:", splitGreater)
 	}
 
 	switch orgmode {

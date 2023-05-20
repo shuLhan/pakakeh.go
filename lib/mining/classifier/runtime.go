@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/shuLhan/share/lib/debug"
 	"github.com/shuLhan/share/lib/dsv"
 	"github.com/shuLhan/share/lib/floats64"
 	"github.com/shuLhan/share/lib/ints"
@@ -110,10 +109,6 @@ func (rt *Runtime) ComputeCM(sampleIds []int,
 	cm.ComputeStrings(vs, actuals, predicts)
 	cm.GroupIndexPredictionsStrings(sampleIds, actuals, predicts)
 
-	if debug.Value >= 2 {
-		fmt.Println(tag, cm)
-	}
-
 	return cm
 }
 
@@ -169,11 +164,6 @@ func (rt *Runtime) ComputeStatFromCM(stat *Stat, cm *CM) {
 		stat.Accuracy = 0
 	} else {
 		stat.Accuracy = float64(stat.TP+stat.TN) / t
-	}
-
-	if debug.Value >= 1 {
-		rt.PrintOobStat(stat, cm)
-		rt.PrintStat(stat)
 	}
 }
 

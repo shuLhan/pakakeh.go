@@ -7,13 +7,11 @@ package email
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/shuLhan/share/lib/ascii"
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
@@ -153,9 +151,6 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) {
 
 invalid:
 	if x < len(raw) {
-		if debug.Value >= 3 {
-			log.Printf("! email: invalid field '%s'\n", raw[:x])
-		}
 		rest = raw[x:]
 	}
 	return nil, rest, err
