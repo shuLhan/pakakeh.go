@@ -15,8 +15,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -44,6 +42,8 @@ type Caches struct {
 	// the top).
 	lru *list.List
 
+	debug int
+
 	sync.Mutex
 }
 
@@ -69,7 +69,7 @@ type cachesFileV1 struct {
 // The prune delay MUST be greater than 1 minute or it will set to 1 hour.
 // The prune threshold MUST be greater than -1 minute or it will be set to -1
 // hour.
-func (c *Caches) init(pruneDelay, pruneThreshold time.Duration) {
+func (c *Caches) init(pruneDelay, pruneThreshold time.Duration, debug int) {
 	if pruneDelay.Minutes() < 1 {
 		pruneDelay = time.Hour
 	}
@@ -80,6 +80,7 @@ func (c *Caches) init(pruneDelay, pruneThreshold time.Duration) {
 	c.internal = make(map[string]*answers)
 	c.external = make(map[string]*answers)
 	c.lru = list.New()
+	c.debug = debug
 
 	go c.worker(pruneDelay, pruneThreshold)
 }
@@ -160,7 +161,7 @@ func (c *Caches) ExternalRemoveNames(names []string) (listAnswer []*Answer) {
 		answers = c.externalRemoveName(name)
 		if len(answers) > 0 {
 			listAnswer = append(listAnswer, answers...)
-			if debug.Value >= 1 {
+			if c.debug >= 1 {
 				fmt.Println("dns: - ", name)
 			}
 		}
@@ -281,7 +282,7 @@ func (c *Caches) InternalPopulate(msgs []*Message, from string) {
 		}
 	}
 
-	if debug.Value >= 1 {
+	if c.debug >= 1 {
 		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(msgs), from)
 	}
 }
@@ -301,7 +302,7 @@ func (c *Caches) InternalPopulateRecords(listRR []*ResourceRecord, from string) 
 		}
 		n++
 	}
-	if debug.Value >= 1 {
+	if c.debug >= 1 {
 		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
 	}
 	return nil
@@ -318,7 +319,7 @@ func (c *Caches) InternalRemoveNames(names []string) {
 
 	for ; x < len(names); x++ {
 		delete(c.internal, names[x])
-		if debug.Value >= 1 {
+		if c.debug >= 1 {
 			fmt.Println("dns: - ", names[x])
 		}
 	}
@@ -423,7 +424,7 @@ func (c *Caches) prune(exp int64) (listAnswer []*Answer) {
 			break
 		}
 
-		if debug.Value >= 1 {
+		if c.debug >= 1 {
 			fmt.Printf("dns: - 0:%s\n", answer.msg.Question.String())
 		}
 

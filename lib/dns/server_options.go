@@ -86,6 +86,9 @@ type ServerOptions struct {
 	// accessed in the last 1 minute will be removed from cache.
 	PruneThreshold time.Duration `ini:"dns:server:cache.prune_threshold"`
 
+	// Debug level for server, accept value from 0 (quiet) to 3 (verbose).
+	Debug int `ini:"dns:server:debug"`
+
 	// HTTPPort port for listening DNS over HTTP (DoH), default to 0.
 	// If its zero, the server will not serve DNS over HTTP.
 	HTTPPort uint16 `ini:"dns:server:http.port"`

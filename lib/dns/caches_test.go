@@ -64,7 +64,7 @@ func TestCachesGet(t *testing.T) {
 		gotList []*Answer
 	)
 
-	ca.init(0, 0)
+	ca.init(0, 0, 0)
 	ca.upsert(an1)
 	ca.upsert(an2)
 	ca.upsert(an3)
@@ -148,7 +148,7 @@ func TestCachesPrune(t *testing.T) {
 		gotList []*Answer
 	)
 
-	ca.init(0, 0)
+	ca.init(0, 0, 0)
 	ca.upsert(an1)
 	ca.upsert(an2)
 	ca.upsert(an3)
@@ -189,7 +189,7 @@ func TestCaches_ExternalSave(t *testing.T) {
 		n          int
 	)
 
-	srv.Caches.init(0, 0)
+	srv.Caches.init(0, 0, 0)
 
 	_ = srv.Caches.upsert(answer)
 
@@ -208,7 +208,7 @@ func TestCaches_ExternalSave(t *testing.T) {
 	}
 	expAnswers = append(expAnswers, newAnswer(msg, false))
 
-	srv.Caches.init(0, 0)
+	srv.Caches.init(0, 0, 0)
 
 	gotAnswers, err = srv.Caches.ExternalLoad(&w)
 	if err != nil {
@@ -287,7 +287,7 @@ func TestCachesUpsert(t *testing.T) {
 		x       int
 	)
 
-	ca.init(0, 0)
+	ca.init(0, 0, 0)
 
 	cases = []testCase{{
 		desc: "With empty answer",

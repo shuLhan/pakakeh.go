@@ -19,7 +19,6 @@ import (
 	"time"
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/debug"
 )
 
 const (
@@ -52,8 +51,8 @@ const (
 //
 // # Debugging
 //
-// If debug.Value is set to value greater than 1, server will print each
-// processed request, forward, and response.
+// If [ServerOptions].Debug is set to value greater than 1, server will print
+// each processed request, forward, and response.
 // The debug information prefixed with single character to differentiate
 // single action,
 //
@@ -138,7 +137,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	}
 
 	srv.errListener = make(chan error, 1)
-	srv.Caches.init(opts.PruneDelay, opts.PruneThreshold)
+	srv.Caches.init(opts.PruneDelay, opts.PruneThreshold, opts.Debug)
 
 	return srv, nil
 }
@@ -576,7 +575,7 @@ func (srv *Server) processRequest() {
 			continue
 		}
 
-		if debug.Value >= 1 {
+		if srv.opts.Debug >= 1 {
 			fmt.Printf("dns: > %s %d:%s\n",
 				connTypeNames[req.kind],
 				req.message.Header.ID,
@@ -596,7 +595,7 @@ func (srv *Server) processRequest() {
 					srv.primaryq <- req
 				}
 			default:
-				if debug.Value >= 1 {
+				if srv.opts.Debug >= 1 {
 					fmt.Printf("dns: * %s %d:%s\n",
 						connTypeNames[req.kind],
 						req.message.Header.ID,
@@ -610,7 +609,7 @@ func (srv *Server) processRequest() {
 		if an.msg.IsExpired() {
 			switch {
 			case srv.hasForwarders():
-				if debug.Value >= 1 {
+				if srv.opts.Debug >= 1 {
 					fmt.Printf("dns: ~ %s %d:%s\n",
 						connTypeNames[req.kind],
 						req.message.Header.ID,
@@ -623,7 +622,7 @@ func (srv *Server) processRequest() {
 				}
 
 			default:
-				if debug.Value >= 1 {
+				if srv.opts.Debug >= 1 {
 					fmt.Printf("dns: * %s %d:%s\n",
 						connTypeNames[req.kind],
 						req.message.Header.ID,
@@ -638,7 +637,7 @@ func (srv *Server) processRequest() {
 		an.updateTTL()
 		res = an.msg
 
-		if debug.Value >= 1 {
+		if srv.opts.Debug >= 1 {
 			fmt.Printf("dns: < %s %d:%s\n", connTypeNames[req.kind], res.Header.ID, res.Question.String())
 		}
 
@@ -681,7 +680,7 @@ func (srv *Server) processResponse(req *request, res *Message) {
 	an = newAnswer(res, false)
 	inserted = srv.Caches.upsert(an)
 
-	if debug.Value >= 1 {
+	if srv.opts.Debug >= 1 {
 		if inserted {
 			fmt.Printf("dns: + %s %d:%s\n",
 				connTypeNames[req.kind],
@@ -773,7 +772,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string) {
 					srv.stopForwarder(forwarder)
 					return
 				}
-				if debug.Value >= 1 {
+				if srv.opts.Debug >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
 						tag, nameserver,
 						req.message.Header.ID,
@@ -788,7 +787,7 @@ func (srv *Server) runDohForwarder(tag, nameserver string) {
 				}
 				srv.processResponse(req, res)
 			case <-ticker.C:
-				if debug.Value >= 2 {
+				if srv.opts.Debug >= 2 {
 					log.Printf("dns: %s alive", tag)
 				}
 			case <-stopper:
@@ -848,7 +847,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string) {
 					srv.stopForwarder(forwarder)
 					return
 				}
-				if debug.Value >= 1 {
+				if srv.opts.Debug >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
 						tag, nameserver,
 						req.message.Header.ID,
@@ -864,7 +863,7 @@ func (srv *Server) runTLSForwarder(tag, nameserver string) {
 
 				srv.processResponse(req, res)
 			case <-ticker.C:
-				if debug.Value >= 2 {
+				if srv.opts.Debug >= 2 {
 					log.Printf("dns: %s alive", tag)
 				}
 			case <-stopper:
@@ -907,7 +906,7 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 				log.Println("dns: primary queue has been closed")
 				return
 			}
-			if debug.Value >= 1 {
+			if srv.opts.Debug >= 1 {
 				fmt.Printf("dns: ^ %s %s %d:%s\n", tag, nameserver,
 					req.message.Header.ID,
 					req.message.Question.String())
@@ -928,7 +927,7 @@ func (srv *Server) runTCPForwarder(tag, nameserver string) {
 
 			srv.processResponse(req, res)
 		case <-ticker.C:
-			if debug.Value >= 2 {
+			if srv.opts.Debug >= 2 {
 				log.Printf("dns: %s alive", tag)
 			}
 		case <-stopper:
@@ -987,7 +986,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string) {
 					srv.stopForwarder(forwarder)
 					return
 				}
-				if debug.Value >= 1 {
+				if srv.opts.Debug >= 1 {
 					fmt.Printf("dns: ^ %s %s %d:%s\n",
 						tag, nameserver,
 						req.message.Header.ID,
@@ -1002,7 +1001,7 @@ func (srv *Server) runUDPForwarder(tag, nameserver string) {
 				}
 				srv.processResponse(req, res)
 			case <-ticker.C:
-				if debug.Value >= 2 {
+				if srv.opts.Debug >= 2 {
 					log.Printf("dns: %s alive", tag)
 				}
 			case <-stopper:
