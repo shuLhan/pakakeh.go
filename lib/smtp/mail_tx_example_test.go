@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package smtp
+package smtp_test
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/email"
+	"github.com/shuLhan/share/lib/smtp"
 )
 
 func ExampleNewMailTx() {
@@ -38,7 +39,7 @@ func ExampleNewMailTx() {
 		recipients []string
 		mboxes     []*email.Mailbox
 		msg        *email.Message
-		mailtx     *MailTx
+		mailtx     *smtp.MailTx
 		reDate     *regexp.Regexp
 		hostname   string
 		data       []byte
@@ -69,7 +70,7 @@ func ExampleNewMailTx() {
 	// sending the email on behalf of fromAddress domain, while the
 	// fromAddress define the address that viewed by recipients.
 	data, _ = msg.Pack()
-	mailtx = NewMailTx(txFrom, recipients, data)
+	mailtx = smtp.NewMailTx(txFrom, recipients, data)
 
 	fmt.Printf("Tx From: %s\n", mailtx.From)
 	fmt.Printf("Tx Recipients: %s\n", mailtx.Recipients)
