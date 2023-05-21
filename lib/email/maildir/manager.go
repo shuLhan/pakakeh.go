@@ -2,259 +2,233 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package maildir provide a library to manage email using maildir format.
-//
-// # References
-//
-// [1] http://www.qmail.org/qmail-manual-html/man5/maildir.html
-//
-// [2] https://cr.yp.to/proto/maildir.html
 package maildir
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	"time"
-
-	libtime "github.com/shuLhan/share/lib/time"
+	"strings"
 )
 
-// Manager manage email in a directory.
+// List of maildir directories.
+const (
+	maildirCur = `cur`
+	maildirNew = `new`
+	maildirTmp = `tmp`
+)
+
+// Manager manage messages and folders in a directory.
+// This is the main Maildir.
 type Manager struct {
 	dirCur   string
 	dirNew   string
-	dirOut   string
 	dirTmp   string
 	hostname string
+	counter  int64
 	pid      int
-	counter  int
 }
 
-// New create new maildir Manager in directory and initialize the hostname,
+// NewManager create new maildir Manager in directory and initialize the hostname,
 // pid, and counter for generating unique name.
-func New(dir string) (mg *Manager, err error) {
+func NewManager(dir string) (mg *Manager, err error) {
+	var logp = `NewManager`
+
+	dir = strings.TrimSpace(dir)
 	if len(dir) == 0 {
-		return nil, fmt.Errorf("email/maildir: New: empty base directory")
+		return nil, fmt.Errorf(`%s: empty base directory`, logp)
 	}
 
 	mg = &Manager{
-		pid: os.Getpid(),
+		pid: osGetpid(),
 	}
 
 	err = mg.initDirs(dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	mg.hostname, err = os.Hostname()
-	if len(mg.hostname) == 0 && err != nil {
-		mg.hostname = os.Getenv("HOST")
+	mg.hostname, err = osHostname()
+	if err != nil || len(mg.hostname) == 0 {
+		mg.hostname = os.Getenv(`HOST`)
 		if len(mg.hostname) == 0 {
-			mg.hostname = "localhost"
+			mg.hostname = `localhost`
 		}
 	}
-
 	return mg, nil
 }
 
+// initDirs initialize the maildir directories.
 func (mg *Manager) initDirs(dir string) (err error) {
-	mg.dirCur = filepath.Join(dir, "cur")
+	var logp = `initDirs`
+
+	mg.dirCur = filepath.Join(dir, maildirCur)
 	err = os.MkdirAll(mg.dirCur, 0750)
 	if err != nil {
-		return fmt.Errorf("email/maildir: initDirs: %s", err.Error())
+		return fmt.Errorf(`%s: %s`, logp, err)
 	}
 
-	mg.dirNew = filepath.Join(dir, "new")
+	mg.dirNew = filepath.Join(dir, maildirNew)
 	err = os.MkdirAll(mg.dirNew, 0750)
 	if err != nil {
-		return fmt.Errorf("email/maildir: initDirs: %s", err.Error())
+		return fmt.Errorf(`%s: %s`, logp, err)
 	}
 
-	mg.dirOut = filepath.Join(dir, "out")
-	err = os.MkdirAll(mg.dirOut, 0700)
-	if err != nil {
-		return fmt.Errorf("email/maildir: initDirs: %s", err.Error())
-	}
-
-	mg.dirTmp = filepath.Join(dir, "tmp")
+	mg.dirTmp = filepath.Join(dir, maildirTmp)
 	err = os.MkdirAll(mg.dirTmp, 0700)
 	if err != nil {
-		return fmt.Errorf("email/maildir: initDirs: %s", err.Error())
+		return fmt.Errorf(`%s: %s`, logp, err)
 	}
 
 	return nil
 }
 
-// Delete email file in "cur".
-func (mg *Manager) Delete(fname string) (err error) {
-	if len(fname) == 0 {
-		return fmt.Errorf("email/maildir: Delete: empty file name")
-	}
-
-	fdel := filepath.Join(mg.dirCur, fname)
-
-	err = os.Remove(fdel)
-	if err != nil {
-		return fmt.Errorf("email/maildir: Delete: %s", err.Error())
-	}
-
-	return nil
-}
-
-// DeleteOutQueue delete temporary file in send queue.
-func (mg *Manager) DeleteOutQueue(fname string) (err error) {
-	if len(fname) == 0 {
+// Delete hard delete a message file in "cur".
+// It will return no error if the file does not exist.
+func (mg *Manager) Delete(fnCur string) (err error) {
+	fnCur = strings.TrimSpace(fnCur)
+	if len(fnCur) == 0 {
+		// Prevent removing the cur directory.
 		return nil
 	}
 
-	fname = filepath.Join(mg.dirOut, fname)
+	var (
+		logp = `Delete`
+		fdel = filepath.Join(mg.dirCur, fnCur)
+	)
 
-	err = os.Remove(fname)
+	err = os.Remove(fdel)
 	if err != nil {
-		return fmt.Errorf("email/maildir: DeleteOutQueue: %s", err.Error())
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
-
 	return nil
 }
 
-// OutQueue save the email in temporary queue directory before sending it to
-// external MTA or processed.
+// FetchNew fetch the message from "new" directory by its file name.
+// This operation move email from "new" to "cur" with prefix ":2" added to
+// file name.
+// It will return nil without an error if string fnNew is zero or file does
+// not exist.
+func (mg *Manager) FetchNew(fnNew string) (fnCur string, msg []byte, err error) {
+	fnNew = strings.TrimSpace(fnNew)
+	if len(fnNew) == 0 {
+		return ``, nil, nil
+	}
+
+	fnCur = fnNew
+
+	var (
+		logp    = `FetchNew`
+		pathNew = filepath.Join(mg.dirNew, fnNew)
+		pathCur = filepath.Join(mg.dirCur, fnCur)
+	)
+
+	msg, err = os.ReadFile(pathNew)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return ``, nil, nil
+		}
+		return ``, nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	err = os.Rename(pathNew, pathCur)
+	if err != nil {
+		return ``, nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return fnCur, msg, nil
+}
+
+// Incoming save message received from external MTA in directory
+// "${dir}/tmp/${unique}".
+// Upon success, hard link it to "${dir}/new/${unique}" and delete the
+// temporary file, and return the path of new file.
+func (mg *Manager) Incoming(msg []byte) (fnNew string, err error) {
+	var logp = `Incoming`
+
+	if len(msg) == 0 {
+		return ``, fmt.Errorf(`%s: empty message`, logp)
+	}
+
+	var (
+		fname   = createFilename(mg.pid, mg.counter, mg.hostname)
+		pathTmp = filepath.Join(mg.dirTmp, fname.nameTmp)
+	)
+
+	_, err = os.Stat(pathTmp)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return ``, fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+
+	err = os.WriteFile(pathTmp, msg, 0660)
+	if err != nil {
+		return ``, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	fnNew, err = fname.generateNameNew(pathTmp, int64(len(msg)))
+	if err != nil {
+		return ``, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var pathNew = filepath.Join(mg.dirNew, fnNew)
+
+	err = os.Link(pathTmp, pathNew)
+	if err != nil {
+		_ = os.Remove(pathTmp)
+		return ``, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	err = os.Remove(pathTmp)
+	if err != nil {
+		log.Printf(`%s: %s`, logp, err)
+	}
+
+	mg.counter++
+
+	return fnNew, nil
+}
+
+// OutgoingQueue save the message in temporary queue directory before sending
+// it to external MTA or processed.
 //
 // When mail is coming from MUA and received by server, the mail need
 // to be successfully stored into disk by server, before replying with
 // "250 OK" to client.
-func (mg *Manager) OutQueue(email []byte) (err error) {
-	if len(email) == 0 {
-		return nil
-	}
-
-	fname, _, err := mg.generateUniqueName(mg.dirOut)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(fname, email, 0400)
-	if err != nil {
-		err = fmt.Errorf("email/maildir: OutQueue: %s", err.Error())
-		return err
-	}
-
-	mg.counter++
-
-	return nil
-}
-
-// Get will move email from "new" to "cur".
-func (mg *Manager) Get(fname string) (err error) {
-	if len(fname) == 0 {
-		return nil
-	}
-
-	src := filepath.Join(mg.dirNew, fname)
-	dst := filepath.Join(mg.dirCur, fname)
-
-	err = os.Rename(src, dst)
-	if err != nil {
-		return fmt.Errorf("email/maildir: Read: %s", err.Error())
-	}
-
-	return nil
-}
-
-// Incoming save incoming message, from external MTA, in directory
-// "${dir}/tmp/${unique}".  Upon success, hard link it to
-// "${dir}/new/${unique}" and delete the temporary file.
-func (mg *Manager) Incoming(email []byte) (err error) {
-	if len(email) == 0 {
-		return nil
-	}
-
-	tmpFile, uniqueName, err := mg.generateUniqueName(mg.dirTmp)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(tmpFile, email, 0660)
-	if err != nil {
-		err = fmt.Errorf("email/maildir: Incoming: %s", err.Error())
-		return err
-	}
-
-	newFile := filepath.Join(mg.dirNew, uniqueName)
-
-	err = os.Link(tmpFile, newFile)
-	if err != nil {
-		_ = os.Remove(tmpFile)
-		err = fmt.Errorf("email/maildir: Incoming: %s", err.Error())
-		return err
-	}
-
-	err = os.Remove(tmpFile)
-	if err != nil {
-		log.Printf("email/maildir: Incoming: %s", err.Error())
-	}
-
-	mg.counter++
-
-	return nil
-}
-
-// RemoveAll remove all files inside a directory.
-func (mg *Manager) RemoveAll(dir string) {
-	d, err := os.Open(dir)
-	if err != nil {
-		log.Println("email/maildir: RemoveAll: " + err.Error())
-		return
-	}
-	fis, err := d.Readdir(0)
-	if err != nil {
-		log.Println("email/maildir: RemoveAll: " + err.Error())
-		return
-	}
-	for _, fi := range fis {
-		if fi.IsDir() {
-			continue
-		}
-
-		file := filepath.Join(dir, fi.Name())
-		err = os.Remove(file)
-		if err != nil {
-			log.Println("email/maildir: RemoveAll: " + err.Error())
-		}
-	}
-}
-
-// generateUniqueName try generate unique name until 5 attempts or return an
-// error.
-func (mg *Manager) generateUniqueName(dir string) (fname, uniqueName string, err error) {
-	x := 0
-	for x < 5 {
-		uniqueName = mg.uniqueName()
-		fname = filepath.Join(dir, uniqueName)
-		_, err = os.Stat(fname)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return fname, uniqueName, nil
-			}
-		}
-		time.Sleep(2 * time.Second)
-		x++
-	}
-
-	err = fmt.Errorf("email/maildir: OutQueue: %s", err.Error())
-
-	return "", "", err
-}
-
-// uniqueName generate a unique name using the following format,
 //
-//	UnixTimestamp "." "M"(microsecond) "P"(ProcessID) "Q"(Counter) "."
-//	hostname
-func (mg *Manager) uniqueName() string {
-	now := time.Now()
+// On success it will return the file name.
+func (mg *Manager) OutgoingQueue(msg []byte) (nameTmp string, err error) {
+	var logp = `OutgoingQueue`
 
-	return fmt.Sprintf("%d.M%dP%dQ%d.%s", now.Unix(),
-		libtime.Microsecond(&now), mg.pid, mg.counter, mg.hostname)
+	if len(msg) == 0 {
+		return ``, fmt.Errorf(`%s: empty message`, logp)
+	}
+
+	var (
+		fname   = createFilename(mg.pid, mg.counter, mg.hostname)
+		pathTmp = filepath.Join(mg.dirTmp, fname.nameTmp)
+	)
+
+	_, err = os.Stat(pathTmp)
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return ``, fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+
+	err = os.WriteFile(pathTmp, msg, 0400)
+	if err != nil {
+		return ``, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	mg.counter++
+	nameTmp = fname.nameTmp
+
+	return nameTmp, nil
 }
