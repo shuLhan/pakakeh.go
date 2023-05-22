@@ -57,25 +57,25 @@ This is changelog for share v0.1.0 until v0.11.0.
 
 === Simplified RFCs
 
-* link:IMF.html[Internet Message Format (RFC 5322)]
-** link:MIME_I_FORMAT.html[MIME Part One: Format of Internet Message Bodies (RFC 2045)]
-** link:MIME_II_MEDIA_TYPES.html[MIME Part Two: Media Types (RFC 2046)]
-** link:MIME_V_CONFORMANCE.html[MIME Part Five: Conformance Criteria and Examples (RFC 2049)]
+* link:RFC_5322__IMF.html[RFC 5322: Internet Message Format]
+** link:RFC_2045__MIME_I_FORMAT.html[RFC 2045: MIME Part One - Format of Internet Message Bodies]
+** link:RFC_2046__MIME_II_MEDIA_TYPES.html[RFC 2046: MIME Part Two - Media Types]
+** link:RFC_2049__MIME_V_CONFORMANCE.html[RFC 2049: MIME Part Five: Conformance Criteria and Examples]
 
-* link:SASL.html[Simple Authentication and Security Layer (RFC 4422)]
-** link:SASL_PLAIN.html[The PLAIN Simple Authentication and Security Layer (SASL) Mechanism (RFC 4616)]
+* link:RFC_4422__SASL.html[RFC 4422: Simple Authentication and Security Layer]
+** link:RFC_4616__SASL_PLAIN.html[RFC 4616: The PLAIN Simple Authentication and Security Layer (SASL) Mechanism]
 
-* link:DKIM_OVERVIEW.html[DomainKeys Identified Mail Service Overview (RFC 5585)]
-** link:DKIM_THREATS.html[Analysis of Threats Motivating DKIM (RFC 4686)]
-** link:DKIM_DEVOPS.html[DKIM Development, Deployment, and Operations (RFC 5863)]
-** link:DKIM_SIGNATURES.html[DKIM Signatures (RFC 6376)]
+* link:RFC_5585__DKIM_OVERVIEW.html[RFC 5585: DomainKeys Identified Mail Service Overview]
+** link:RFC_4865__DKIM_THREATS.html[RFC 4685: Analysis of Threats Motivating DKIM]
+** link:RFC_5863__DKIM_DEVOPS.html[RFC 5863: DKIM Development, Deployment, and Operations]
+** link:RFC_6376__DKIM_SIGNATURES.html[RFC 6376: DKIM Signatures]
 
-* link:SMTP.html[Simple Mail Transfer Protocol (RFC 5321)]
-** link:ESMTP_DSN.html["Delivery Status Notification (RFC 3461, 3462, 3463, 3464)"]
-** link:ESMTP_TLS.html[SMTP Service Extension for Secure SMTP over Transport Layer Security (RFC 3207)]
-** link:ESMTP_AUTH.html[SMTP Service Extension for Authentication (RFC 4954)]
+* link:RFC_5321__SMTP.html[RFC 5321: Simple Mail Transfer Protocol]
+** link:RFC_3207__ESMTP_TLS.html[RFC 3207: SMTP Service Extension for Secure SMTP over Transport Layer Security]
+** link:RFC_3461-3464__ESMTP_DSN.html["RFC 3461-3464: Delivery Status Notification"]
+** link:RFC_4954__ESMTP_AUTH.html[RFC 4954: SMTP Service Extension for Authentication]
 
-* link:SPF.html[Sender Policy Framework version 1 (RFC 7208)]
+* link:RFC_7808__SPFv1.html[RFC 7208: Sender Policy Framework version 1]
 
 
 ==  Development
