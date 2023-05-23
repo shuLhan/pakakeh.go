@@ -50,6 +50,65 @@ func TestNewManager(t *testing.T) {
 	assertDirExist(t, md.dirTmp)
 }
 
+func TestManager_scanDir(t *testing.T) {
+	var (
+		dir = t.TempDir()
+
+		folder *Folder
+		err    error
+	)
+
+	// Folder without dot.
+	var dirFolder = filepath.Join(dir, `nodot`)
+	err = os.Mkdir(dirFolder, 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Folder without "maildirfolder".
+	dirFolder = filepath.Join(dir, `.nomaildir`)
+	err = os.Mkdir(dirFolder, 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Folder with no permission.
+	dirFolder = filepath.Join(dir, `.noperm`)
+	err = os.Mkdir(dirFolder, 0400)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Folder with "maildirfolder" but no "cur".
+	dirFolder = filepath.Join(dir, `.nocur`)
+	err = os.Mkdir(dirFolder, 0400)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = os.WriteFile(filepath.Join(dir, fileMaildirFolder), nil, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Folder with "maildirfolder".
+	folder, err = CreateFolder(dir, `.folder`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var md *Manager
+
+	md, err = NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var expFolders = map[string]*Folder{
+		`.folder`: folder,
+	}
+	test.Assert(t, `folders`, expFolders, md.folders)
+}
+
 func TestDelete(t *testing.T) {
 	var (
 		mg       *Manager

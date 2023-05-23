@@ -20,9 +20,11 @@ const (
 	maildirTmp = `tmp`
 )
 
-// Manager manage messages and folders in a directory.
+// Manager manage messages and folders in single file system.
 // This is the main Maildir.
 type Manager struct {
+	folders  map[string]*Folder
+	dir      string
 	dirCur   string
 	dirNew   string
 	dirTmp   string
@@ -42,10 +44,17 @@ func NewManager(dir string) (mg *Manager, err error) {
 	}
 
 	mg = &Manager{
-		pid: osGetpid(),
+		folders: map[string]*Folder{},
+		dir:     dir,
+		pid:     osGetpid(),
 	}
 
 	err = mg.initDirs(dir)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	err = mg.scanFolders()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -80,6 +89,55 @@ func (mg *Manager) initDirs(dir string) (err error) {
 	err = os.MkdirAll(mg.dirTmp, 0700)
 	if err != nil {
 		return fmt.Errorf(`%s: %s`, logp, err)
+	}
+
+	return nil
+}
+
+// scanFolders scan folders inside the main maildir.
+// A folder name begin with '.' and contains empty file named `maildirfolder`.
+func (mg *Manager) scanFolders() (err error) {
+	var (
+		logp = `scanFolders`
+
+		listEntry []os.DirEntry
+	)
+
+	listEntry, err = os.ReadDir(mg.dir)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var (
+		entry        os.DirEntry
+		name         string
+		fileMdfolder string
+		folder       *Folder
+	)
+	for _, entry = range listEntry {
+		if !entry.IsDir() {
+			continue
+		}
+
+		name = entry.Name()
+		if name == `.` || name == `..` {
+			continue
+		}
+		if name[0] != '.' {
+			continue
+		}
+
+		fileMdfolder = filepath.Join(mg.dir, name, fileMaildirFolder)
+		_, err = os.Stat(fileMdfolder)
+		if err != nil {
+			continue
+		}
+
+		folder, err = NewFolder(mg.dir, name)
+		if err != nil {
+			continue
+		}
+		mg.folders[name] = folder
 	}
 
 	return nil
