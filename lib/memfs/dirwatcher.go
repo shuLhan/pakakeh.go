@@ -198,6 +198,9 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 
 	// Find deleted files in directory.
 	for _, child := range node.Childs {
+		if child == nil {
+			continue
+		}
 		found := false
 		for _, newInfo := range fis {
 			if child.Name() == newInfo.Name() {
