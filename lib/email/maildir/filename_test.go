@@ -46,6 +46,6 @@ func TestFilename_generateNewName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var expNameNew = `1684640949.M875494_P1000_V36_I170430_Q2.localhost,S=15:2`
+	var expNameNew = `1684640949.M875494_P1000_V36_I170430_Q2.localhost,S=15`
 	test.Assert(t, `generateNameNew`, expNameNew, nameNew)
 }

@@ -56,7 +56,7 @@ func (fname *filename) generateNameNew(pathTmp string, size int64) (nameNew stri
 		size = stat.Size
 	}
 
-	fname.nameNew = fmt.Sprintf(`%d.M%d_P%d_V%d_I%d_Q%d.%s,S=%d:2`,
+	fname.nameNew = fmt.Sprintf(`%d.M%d_P%d_V%d_I%d_Q%d.%s,S=%d`,
 		fname.epoch, fname.usecond, fname.pid, stat.Dev, stat.Ino,
 		fname.counter, fname.hostname, size)
 
