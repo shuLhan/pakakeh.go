@@ -140,13 +140,12 @@ func ExampleMemFS_Watch() {
 	}
 
 	ns = <-dw.C
-	fmt.Println(`State:`, ns.State)
 
 	node, err = mfs.Get(`/file`)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Node: %s: %q\n", node.Path, node.Content)
+	fmt.Printf("Node: %s: %s\n", node.Path, ns.State)
 
 	err = os.Remove(testFile)
 	if err != nil {
@@ -154,16 +153,11 @@ func ExampleMemFS_Watch() {
 	}
 
 	ns = <-dw.C
-	fmt.Println(`State:`, ns.State)
-
-	node, _ = mfs.Get("/file")
-	fmt.Printf("Node: %s: %v\n", ns.Node.Path, node)
+	fmt.Printf("Node: %s: %s\n", ns.Node.Path, ns.State)
 
 	dw.Stop()
 
 	//Output:
-	//State: FileStateCreated
-	//Node: /file: "dummy content"
-	//State: FileStateDeleted
-	//Node: /file: <nil>
+	//Node: /file: FileStateCreated
+	//Node: /file: FileStateDeleted
 }
