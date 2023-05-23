@@ -676,6 +676,19 @@ func (srv *Server) processResponse(req *request, res *Message) {
 		log.Printf("dns: ! %s TRUNCATED %s", connTypeNames[req.kind], res.Question.String())
 		return
 	}
+	if res.Header.ANCount == 0 {
+		// Ignore empty answers.
+		// The use case if one use and switch between two different
+		// networks with internal zone, frequently.
+		// For example, if on network Y they have domain MY.Y and
+		// current connection is X, request to MY.Y will return an
+		// empty answers.
+		// Once they connect to Y again, any request to MY.Y will not
+		// be possible because rescached caches contains empty answer
+		// for MY.Y.
+		log.Printf(`dns: ! %s EMPTY: %s`, connTypeNames[req.kind], res.Question.String())
+		return
+	}
 
 	an = newAnswer(res, false)
 	inserted = srv.Caches.upsert(an)
