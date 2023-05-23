@@ -140,7 +140,7 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fnCur, _, err = mg.FetchNew(fnNew)
+	fnCur, _, err = mg.Fetch(fnNew)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,7 +172,7 @@ func TestFetchNew(t *testing.T) {
 
 	// Case: empty file name.
 
-	fnCur, msg, err = mg.FetchNew(``)
+	fnCur, msg, err = mg.Fetch(``)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +181,7 @@ func TestFetchNew(t *testing.T) {
 
 	// Case: file not exist.
 
-	fnCur, msg, err = mg.FetchNew(`filenotexist`)
+	fnCur, msg, err = mg.Fetch(`filenotexist`)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -199,7 +199,7 @@ func TestFetchNew(t *testing.T) {
 	}
 
 	expMsg = msg
-	fnCur, msg, err = mg.FetchNew(fnNew)
+	fnCur, msg, err = mg.Fetch(fnNew)
 	if err != nil {
 		t.Fatal(err)
 	}

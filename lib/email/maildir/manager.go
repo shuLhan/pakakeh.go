@@ -23,11 +23,11 @@ const (
 // Manager manage messages and folders in single file system.
 // This is the main Maildir.
 type Manager struct {
-	folders  map[string]*Folder
-	dir      string
-	dirCur   string
-	dirNew   string
-	dirTmp   string
+	// Folder embeded as the main maildir.
+	Folder
+
+	folders map[string]*Folder
+
 	hostname string
 	counter  int64
 	pid      int
@@ -44,8 +44,10 @@ func NewManager(dir string) (mg *Manager, err error) {
 	}
 
 	mg = &Manager{
+		Folder: Folder{
+			dir: dir,
+		},
 		folders: map[string]*Folder{},
-		dir:     dir,
 		pid:     osGetpid(),
 	}
 
@@ -141,65 +143,6 @@ func (mg *Manager) scanFolders() (err error) {
 	}
 
 	return nil
-}
-
-// Delete hard delete a message file in "cur".
-// It will return no error if the file does not exist.
-func (mg *Manager) Delete(fnCur string) (err error) {
-	fnCur = strings.TrimSpace(fnCur)
-	if len(fnCur) == 0 {
-		// Prevent removing the cur directory.
-		return nil
-	}
-
-	var (
-		logp = `Delete`
-		fdel = filepath.Join(mg.dirCur, fnCur)
-	)
-
-	err = os.Remove(fdel)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil
-		}
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-	return nil
-}
-
-// FetchNew fetch the message from "new" directory by its file name.
-// This operation move email from "new" to "cur" with prefix ":2" added to
-// file name.
-// It will return nil without an error if string fnNew is zero or file does
-// not exist.
-func (mg *Manager) FetchNew(fnNew string) (fnCur string, msg []byte, err error) {
-	fnNew = strings.TrimSpace(fnNew)
-	if len(fnNew) == 0 {
-		return ``, nil, nil
-	}
-
-	fnCur = fnNew
-
-	var (
-		logp    = `FetchNew`
-		pathNew = filepath.Join(mg.dirNew, fnNew)
-		pathCur = filepath.Join(mg.dirCur, fnCur)
-	)
-
-	msg, err = os.ReadFile(pathNew)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return ``, nil, nil
-		}
-		return ``, nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	err = os.Rename(pathNew, pathCur)
-	if err != nil {
-		return ``, nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	return fnCur, msg, nil
 }
 
 // Incoming save message received from external MTA in directory
