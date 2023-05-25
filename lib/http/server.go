@@ -296,7 +296,18 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 	return srv.Server.Shutdown(ctx)
 }
 
-func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
+// getFSNode get the memfs Node based on the request path.
+//
+// If the path is not exist, try path with index.html;
+// if it still not exist try path with suffix .html.
+//
+// If the path is directory and contains index.html, the node for index.html
+// with true will be returned.
+//
+// If the path is directory and does not contains index.html and
+// EnableIndexHtml is true, server will generate list of content for
+// index.html.
+func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	var (
 		nodeIndexHtml *memfs.Node
 		pathHtml      string
@@ -304,7 +315,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	)
 
 	if srv.Options.Memfs == nil {
-		return nil
+		return nil, false
 	}
 
 	pathHtml = path.Join(reqPath, `index.html`)
@@ -312,7 +323,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			return nil
+			return nil, false
 		}
 
 		node, err = srv.Options.Memfs.Get(pathHtml)
@@ -320,26 +331,26 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 			pathHtml = reqPath + `.html`
 			node, err = srv.Options.Memfs.Get(pathHtml)
 			if err != nil {
-				return nil
+				return nil, false
 			}
-			return node
+			return node, false
 		}
 	}
 
 	if node.IsDir() {
 		nodeIndexHtml, err = srv.Options.Memfs.Get(pathHtml)
 		if err == nil {
-			return nodeIndexHtml
+			return nodeIndexHtml, true
 		}
 
 		if !srv.Options.EnableIndexHtml {
-			return nil
+			return nil, false
 		}
 
 		node.GenerateIndexHtml()
 	}
 
-	return node
+	return node, false
 }
 
 // handleCORS handle the CORS request.
@@ -465,12 +476,21 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		requestETag  string
 		size         int64
 		err          error
+		isDir        bool
 		ok           bool
 	)
 
-	node = srv.getFSNode(req.URL.Path)
+	node, isDir = srv.getFSNode(req.URL.Path)
 	if node == nil {
 		res.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if isDir && req.URL.Path[len(req.URL.Path)-1] != '/' {
+		// If request path is a directory and it is not end with
+		// slash, redirect request to location with slash to allow
+		// relative links works inside the HTML content.
+		http.Redirect(res, req, req.URL.Path+"/", http.StatusFound)
 		return
 	}
 
@@ -592,7 +612,7 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	methods := make(map[string]bool)
 
-	node := srv.getFSNode(req.URL.Path)
+	node, _ := srv.getFSNode(req.URL.Path)
 	if node != nil {
 		methods[http.MethodGet] = true
 		methods[http.MethodHead] = true
