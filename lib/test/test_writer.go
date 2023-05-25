@@ -9,14 +9,14 @@ import (
 	"fmt"
 )
 
-// testWriter implement some of testing.TB.
-type testWriter struct {
+// TestWriter write Errorx, Fatalx, and Logx to bytes.Buffer.
+type TestWriter struct {
 	bytes.Buffer
 }
 
-func (tw *testWriter) Error(args ...any)                 {}
-func (tw *testWriter) Errorf(format string, args ...any) {}
-func (tw *testWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
-func (tw *testWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
-func (tw *testWriter) Log(args ...any)                   { fmt.Fprint(tw, args...) }
-func (tw *testWriter) Logf(format string, args ...any)   { fmt.Fprintf(tw, format, args...) }
+func (tw *TestWriter) Error(args ...any)                 {}
+func (tw *TestWriter) Errorf(format string, args ...any) {}
+func (tw *TestWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
+func (tw *TestWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
+func (tw *TestWriter) Log(args ...any)                   { fmt.Fprint(tw, args...) }
+func (tw *TestWriter) Logf(format string, args ...any)   { fmt.Fprintf(tw, format, args...) }

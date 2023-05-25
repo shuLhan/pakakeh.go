@@ -27,7 +27,7 @@ func TestAssert(t *testing.T) {
 
 	var (
 		c   testCase
-		tw  testWriter
+		tw  TestWriter
 		got string
 	)
 

@@ -38,7 +38,7 @@ func printStackTrace(w Writer, trace []byte) {
 		}
 	}
 
-	_, ok = w.(*testWriter)
+	_, ok = w.(*TestWriter)
 	if !ok {
 		w.Log("\n!!! ERR " + string(trace[start:end]))
 	}

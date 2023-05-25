@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package test
+package test_test
 
 import (
 	"fmt"
 	"log"
 	"math/big"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 func ExampleAssert_struct() {
@@ -58,11 +60,11 @@ func ExampleAssert_struct() {
 	}}
 
 	var (
-		tw = testWriter{}
+		tw = test.TestWriter{}
 	)
 
 	for _, c := range cases {
-		Assert(&tw, c.desc, c.exp, c.got)
+		test.Assert(&tw, c.desc, c.exp, c.got)
 		fmt.Println(tw.String())
 		tw.Reset()
 	}
@@ -75,39 +77,39 @@ func ExampleAssert_struct() {
 
 func ExampleAssert_string() {
 	var (
-		tw  = testWriter{}
+		tw  = test.TestWriter{}
 		exp string
 		got string
 	)
 
 	exp = `a string`
 	got = `b string`
-	Assert(&tw, ``, exp, got)
+	test.Assert(&tw, ``, exp, got)
 	fmt.Println(tw.String())
 
-	exp = `func (tw *testWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }`
-	got = `func (tw *testWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }`
+	exp = `func (tw *TestWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }`
+	got = `func (tw *TestWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }`
 	tw.Reset()
-	Assert(&tw, ``, exp, got)
+	test.Assert(&tw, ``, exp, got)
 	fmt.Println(tw.String())
 	// Output:
 	// !!! Assert: expecting string(a string), got string(b string)
 	// !!! :
 	// --++
-	// 0 - func (tw *testWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
-	// 0 + func (tw *testWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
+	// 0 - func (tw *TestWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
+	// 0 + func (tw *TestWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
 }
 
 func ExampleLoadDataDir() {
 	var (
-		listData []*Data
-		data     *Data
+		listData []*test.Data
+		data     *test.Data
 		err      error
 		name     string
 		content  []byte
 	)
 
-	listData, err = LoadDataDir("testdata/")
+	listData, err = test.LoadDataDir("testdata/")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -145,7 +147,7 @@ func ExampleLoadDataDir() {
 
 func ExampleLoadData() {
 	var (
-		data    *Data
+		data    *test.Data
 		name    string
 		content []byte
 		err     error
@@ -161,7 +163,7 @@ func ExampleLoadData() {
 	//	<<<
 	//	output.
 
-	data, err = LoadData("testdata/data1_test.txt")
+	data, err = test.LoadData("testdata/data1_test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
