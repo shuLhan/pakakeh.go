@@ -7,8 +7,10 @@ package net
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"strings"
+	"time"
 )
 
 const (
@@ -145,4 +147,32 @@ func ToDotIPv6(ip net.IP) (out []byte) {
 	}
 
 	return out
+}
+
+// WaitAlive try to connect to network at address until timeout reached.
+// If connection cannot established it will return an error.
+//
+// Unlike [net.DialTimeout], this function will retry not returning an error
+// immediately if the address has not ready yet.
+func WaitAlive(network, address string, timeout time.Duration) (err error) {
+	var (
+		logp        = `WaitAlive`
+		dialTimeout = 100 * time.Millisecond
+		total       = dialTimeout
+		dialer      = net.Dialer{Timeout: timeout}
+
+		conn net.Conn
+	)
+
+	for total < timeout {
+		conn, err = dialer.Dial(network, address)
+		if err != nil {
+			total += dialTimeout
+			continue
+		}
+		// Connection successfully established.
+		_ = conn.Close()
+		return nil
+	}
+	return fmt.Errorf(`%s: timeout connecting to %s after %s`, logp, address, timeout)
 }
