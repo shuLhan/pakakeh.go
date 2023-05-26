@@ -2,28 +2,31 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package net
+package net_test
 
 import (
 	"bytes"
 	"fmt"
 	"log"
+
+	libnet "github.com/shuLhan/share/lib/net"
 )
 
 func ExampleResolvConf_PopulateQuery() {
 	var (
-		resconf = &ResolvConf{
-			Domain: "internal",
-			Search: []string{"my.internal"},
+		resconf = &libnet.ResolvConf{
+			Domain: `internal`,
+			Search: []string{`my.internal`},
 			NDots:  1,
 		}
 		queries []string
 	)
 
-	queries = resconf.PopulateQuery("vpn")
+	queries = resconf.PopulateQuery(`vpn`)
 	fmt.Println(queries)
-	queries = resconf.PopulateQuery("a.machine")
+	queries = resconf.PopulateQuery(`a.machine`)
 	fmt.Println(queries)
+
 	//Output:
 	//[vpn vpn.my.internal]
 	//[a.machine]
@@ -31,7 +34,7 @@ func ExampleResolvConf_PopulateQuery() {
 
 func ExampleResolvConf_WriteTo() {
 	var (
-		rc = &ResolvConf{
+		rc = &libnet.ResolvConf{
 			Domain:      `internal`,
 			Search:      []string{`a.internal`, `b.internal`},
 			NameServers: []string{`127.0.0.1`, `192.168.1.1`},
