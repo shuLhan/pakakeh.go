@@ -12,6 +12,7 @@ import (
 
 	libcrypto "github.com/shuLhan/share/lib/crypto"
 	"github.com/shuLhan/share/lib/email/dkim"
+	libnet "github.com/shuLhan/share/lib/net"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -107,16 +108,19 @@ func testNewClient(withAuth bool) (cl *Client) {
 }
 
 func TestMain(m *testing.M) {
-	var (
-		s int
-	)
-
 	testRunServer()
 
-	time.Sleep(100 * time.Millisecond)
+	// Wait for server to be alive.
+	var (
+		timeout = 5 * time.Second
+		err     error
+	)
+	err = libnet.WaitAlive(`tcp`, testAddress, timeout)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	s = m.Run()
-	os.Exit(s)
+	os.Exit(m.Run())
 }
 
 func TestParsePath(t *testing.T) {
