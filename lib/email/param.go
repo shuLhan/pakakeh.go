@@ -16,13 +16,13 @@ var (
 	// Parameter for "multipart", RFC 2046 section 5.1.
 	ParamNameBoundary = []byte("boundary")
 
-	// PArameters for "mulitpart/partial", RFC 2046 section 5.2.2.
+	// Parameters for "multipart/partial", RFC 2046 section 5.2.2.
 	ParamNameID     = []byte("id")
 	ParamNameNumber = []byte("number")
 	ParamNameTotal  = []byte("total")
 )
 
-// Param represent a key-value in slice of bytes.
+// Param represent a key-value using slice of bytes.
 type Param struct {
 	Key    []byte
 	Value  []byte
