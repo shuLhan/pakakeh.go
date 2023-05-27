@@ -343,7 +343,7 @@ func TestUnpackContentType(t *testing.T) {
 		expErr: "ParseContentType: missing subtype",
 	}, {
 		in:  []byte("Content-Type: text/plain;\r\n"),
-		exp: "text/plain;",
+		exp: "text/plain",
 	}}
 
 	for _, c := range cases {

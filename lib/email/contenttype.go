@@ -61,22 +61,26 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 	if c == 0 {
 		return ct, nil
 	}
+	if c != ';' {
+		return nil, fmt.Errorf(`%s: invalid character '%c'`, logp, c)
+	}
 
-	_, c = parser.SkipSpaces()
-	parser.SetDelimiters([]byte{'=', '"'})
-	for c != 0 {
+	parser.SetDelimiters([]byte{'=', '"', ';'})
+	for c == ';' {
 		param := Param{}
 
 		param.Key, c = parser.ReadNoSpace()
 		if c == 0 {
-			// Ignore key without value
+			// Ignore key without value.
 			break
 		}
-		if c != '=' {
-			return nil, fmt.Errorf(`%s: expecting '=', got '%c'`, logp, c)
-		}
+
 		if !isValidToken(param.Key, false) {
 			return nil, fmt.Errorf(`%s: invalid parameter key '%s'`, logp, param.Key)
+		}
+
+		if c != '=' {
+			return nil, fmt.Errorf(`%s: expecting '=', got '%c'`, logp, c)
 		}
 
 		param.Value, c = parser.ReadNoSpace()
@@ -85,26 +89,25 @@ func ParseContentType(raw []byte) (ct *ContentType, err error) {
 				return nil, fmt.Errorf(`%s: invalid parameter value '%s'`, logp, param.Value)
 			}
 
-			// The param value may contain '=', remove it
+			// The param value may contain '=' or ';', remove it
 			// temporarily.
-			parser.RemoveDelimiters([]byte{'='})
+			parser.RemoveDelimiters([]byte{'=', ';'})
 
-			param.Value, c = parser.ReadNoSpace()
+			param.Value, c = parser.Read()
 			if c != '"' {
 				return nil, fmt.Errorf(`%s: missing closing quote`, logp)
 			}
 			param.Quoted = true
 
-			parser.AddDelimiters([]byte{'='})
+			parser.AddDelimiters([]byte{'=', ';'})
+
+			c = parser.Skip()
 		}
 		if !isValidToken(param.Value, param.Quoted) {
 			return nil, fmt.Errorf(`%s: invalid parameter value '%s'`, logp, param.Value)
 		}
 
-		param.Key = bytes.ToLower(param.Key)
 		ct.Params = append(ct.Params, param)
-
-		_, c = parser.SkipSpaces()
 	}
 
 	return ct, nil
@@ -177,8 +180,8 @@ func (ct *ContentType) String() string {
 	sb.Write(ct.Top)
 	sb.WriteByte('/')
 	sb.Write(ct.Sub)
-	sb.WriteByte(';')
 	for _, p := range ct.Params {
+		sb.WriteByte(';')
 		sb.WriteByte(' ')
 		sb.Write(p.Key)
 		sb.WriteByte('=')

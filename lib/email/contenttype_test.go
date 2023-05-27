@@ -21,9 +21,6 @@ func TestParseContentType(t *testing.T) {
 		in:     `text/;`,
 		expErr: `ParseContentType: invalid subtype ''`,
 	}, {
-		in:  `text/plain`,
-		exp: `text/plain;`,
-	}, {
 		in:     `text ;`,
 		expErr: `ParseContentType: missing subtype`,
 	}, {
@@ -33,8 +30,8 @@ func TestParseContentType(t *testing.T) {
 		in:     `text/ plain;`,
 		expErr: `ParseContentType: invalid subtype ' plain'`,
 	}, {
-		in:  `text/plain; key`,
-		exp: `text/plain;`,
+		in:     `text/plain/;`,
+		expErr: `ParseContentType: invalid character '/'`,
 	}, {
 		in:     `text/plain; ke(y)=value`,
 		expErr: `ParseContentType: invalid parameter key 'ke(y)'`,
@@ -51,8 +48,23 @@ func TestParseContentType(t *testing.T) {
 		in:     `text/plain; key="value?`,
 		expErr: `ParseContentType: missing closing quote`,
 	}, {
+		in:  `text/plain`,
+		exp: `text/plain`,
+	}, {
+		in:  `text/plain;`,
+		exp: `text/plain`,
+	}, {
+		in:  `text/plain; key`,
+		exp: `text/plain`,
+	}, {
+		in:  `text/plain; key=val;`,
+		exp: `text/plain; key=val`,
+	}, {
 		in:  `text/plain; key="value ?"`,
 		exp: `text/plain; key="value ?"`,
+	}, {
+		in:  `text/plain; key="value ?"; key2="b=c;d"; key3=";e=f"`,
+		exp: `text/plain; key="value ?"; key2="b=c;d"; key3=";e=f"`,
 	}}
 
 	for _, c := range cases {
