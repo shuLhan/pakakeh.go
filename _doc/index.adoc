@@ -1,6 +1,5 @@
 # share
 :toc:
-:sectanchors:
 :sectlinks:
 
 share is a collection of tools, public APIs, and libraries written and for

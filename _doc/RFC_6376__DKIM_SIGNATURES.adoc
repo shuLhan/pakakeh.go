@@ -1,15 +1,14 @@
 = DomainKeys Identified Mail (DKIM) Signatures
-:author: Shulhan
-:email: <ms@kilabit.info>
 :toc:
 :sectnums:
+:sectlinks:
 :url-rfc4685: https://tools.ietf.org/html/rfc4685
 :url-rfc5585: https://tools.ietf.org/html/rfc5585
 :url-rfc5863: https://tools.ietf.org/html/rfc5863
 :url-rfc6376: https://tools.ietf.org/html/rfc6376
 
-This document provide note and summary of RFC 6376, DomainKeys Identified Mail
-(DKIM) Signatures.
+This document provide note and summary of
+{url-rfc6376}[RFC 6376^], DomainKeys Identified Mail (DKIM) Signatures.
 
 ==  Introduction
 

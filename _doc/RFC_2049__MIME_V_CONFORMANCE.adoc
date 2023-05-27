@@ -1,12 +1,13 @@
 =  MIME Part Five: Conformance Criteria and Examples
-:author: Shulhan
-:email: <ms@kilabit.info>
 :toc:
+:sectlinks:
 :sectnums:
 :url-rfc2049: https://tools.ietf.org/html/rfc2049
 
-This document provide note and summary of RFC 2046, Multipurpose Internet Mail
-Extensions (MIME) Part Five: Conformance Criteria and Examples
+This document provide note and summary of
+{url-rfc2049}[RFC 2046^],
+Multipurpose Internet Mail Extensions (MIME) Part Five: Conformance Criteria
+and Examples.
 
 
 ==  MIME Conformance
@@ -15,7 +16,7 @@ The concept of "MIME-conformance" is to define a certain level of
 implementation that allows the useful interworking of messages with content
 that differs from US-ASCII text.
 
-A MUA that is MIME-conformant MUST:
+A MUA that is MIME conformant MUST:
 
 .  Always generate "MIME-Version: 1.0" in header field
 

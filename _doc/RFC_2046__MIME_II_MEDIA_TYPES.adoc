@@ -1,11 +1,11 @@
 =  MIME Part Two: Media Types
-:author: Shulhan
-:email: <ms@kilabit.info>
 :toc:
+:sectlinks:
 :sectnums:
 :url-rfc2046: https://tools.ietf.org/html/rfc2046
 
-This document provide note and summary of {url-rfc2046}[RFC 2046^],
+This document provide note and summary of
+{url-rfc2046}[RFC 2046^],
 Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types.
 
 ==  Introduction

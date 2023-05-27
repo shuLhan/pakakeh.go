@@ -1,9 +1,8 @@
 = Simple Mail Transfer Protocol (SMTP)
-:author: Shulhan
-:email: <ms@kilabit.info>
 :toc:
 :toclevels: 4
 :sectnums:
+:sectlinks:
 :url-rfc5321: https://tools.ietf.org/html/rfc5321
 
 This documentation provide summary and notes on implementation of SMTP

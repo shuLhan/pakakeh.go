@@ -1,12 +1,13 @@
 =  MIME Part One: Format of Internet Message Bodies
-:author: Shulhan
-:email: <ms@kilabit.info>
 :toc:
+:sectlinks:
 :sectnums:
-:url-rfc2046: https://tools.ietf.org/html/rfc2046
+:url-rfc2045: https://tools.ietf.org/html/rfc2045
 
-This document provide note and summary of RFC 2045, Multipurpose Internet Mail
-Extensions (MIME) Part One: Format of Internet Message Bodies.
+This document provide note and summary of
+{url-rfc2045}[RFC 2045^],
+Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet
+Message Bodies.
 
 
 ==  MIME Header Fields

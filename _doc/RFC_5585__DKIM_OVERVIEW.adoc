@@ -1,11 +1,11 @@
 = DomainKeys Identified Mail (DKIM) Service Overview
-:author: Shulhan
-:email: <ms@kilabit.info>
 :toc:
 :sectnums:
+:sectlinks:
 :url-rfc5585: https://tools.ietf.org/html/rfc5585
 
-This document provide note and summary of RFC 5585, DKIM Service Overview.
+This document provide note and summary of
+{url-rfc5585}[RFC 5585], DKIM Service Overview.
 
 ==  Introduction
 
