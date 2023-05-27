@@ -80,28 +80,35 @@ func TestParseContentType(t *testing.T) {
 	}
 }
 
-func TestGetParamValue(t *testing.T) {
-	paramValue := []byte("multipart/mixed; boundary=\"----=_Part_1245\"\r\n")
-	ct, err := ParseContentType(paramValue)
-	if err != nil {
-		t.Fatal(err)
+func TestContentType_isEqual(t *testing.T) {
+	var (
+		ct = &ContentType{
+			Top: []byte(`text`),
+			Sub: []byte(`plain`),
+		}
+		got bool
+	)
+
+	// Case: with nil.
+	got = ct.isEqual(nil)
+	if got != false {
+		t.Fatalf(`want false, got %v`, got)
 	}
 
-	cases := []struct {
-		in  []byte
-		exp []byte
-	}{{
-		in: []byte("notexist"),
-	}, {
-		in:  []byte("Boundary"),
-		exp: []byte("----=_Part_1245"),
-	}}
+	// Case: with Top not match.
+	got = ct.isEqual(&ContentType{Top: []byte(`TEX`)})
+	if got != false {
+		t.Fatalf(`want false, got %v`, got)
+	}
 
-	for _, c := range cases {
-		t.Log(c.in)
+	// Case: with Sub not match.
+	got = ct.isEqual(&ContentType{Top: []byte(`TEXT`), Sub: []byte(`PLAI`)})
+	if got != false {
+		t.Fatalf(`want false, got %v`, got)
+	}
 
-		got := ct.GetParamValue(c.in)
-
-		test.Assert(t, "GetParamValue", c.exp, got)
+	got = ct.isEqual(&ContentType{Top: []byte(`TEXT`), Sub: []byte(`PLAIN`)})
+	if got != true {
+		t.Fatalf(`want true, got %v`, got)
 	}
 }

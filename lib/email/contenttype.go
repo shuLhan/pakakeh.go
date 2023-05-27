@@ -138,30 +138,30 @@ func isValidToken(tok []byte, quoted bool) bool {
 
 // GetParamValue return parameter value related to specific name.
 func (ct *ContentType) GetParamValue(name []byte) []byte {
-	name = bytes.ToLower(name)
 	for _, p := range ct.Params {
-		if bytes.Equal(p.Key, name) {
+		if bytes.EqualFold(p.Key, name) {
 			return p.Value
 		}
 	}
 	return nil
 }
 
-// isEqual will return true if the ct's Top and Sub matched with other.
+// isEqual will return true if the Top and Sub matched with other, in
+// case-insensitive matter.
 func (ct *ContentType) isEqual(other *ContentType) bool {
 	if other == nil {
 		return false
 	}
-	if !bytes.Equal(ct.Top, other.Top) {
+	if !bytes.EqualFold(ct.Top, other.Top) {
 		return false
 	}
-	return bytes.Equal(ct.Sub, other.Sub)
+	return bytes.EqualFold(ct.Sub, other.Sub)
 }
 
-// SetBoundary set the parameter boundary in content-type header's value.
+// SetBoundary set or replace the Value for Key "boundary".
 func (ct *ContentType) SetBoundary(boundary []byte) {
 	for x := 0; x < len(ct.Params); x++ {
-		if bytes.Equal(ct.Params[x].Key, ParamNameBoundary) {
+		if bytes.EqualFold(ct.Params[x].Key, ParamNameBoundary) {
 			ct.Params[x].Value = boundary
 			return
 		}
