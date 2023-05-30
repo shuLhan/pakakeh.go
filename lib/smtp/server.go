@@ -32,12 +32,13 @@ type Server struct {
 	//
 	Handler Handler
 
-	// listener is a socket that listen for new connection from client.
-	listener net.Listener
+	// listenMta is a socket that listen for new connection from other mail
+	// transfer agent (MTA) on port 25.
+	listenMta net.Listener
 
-	// tlsListener is a socket that listen for new connection from client
-	// on secure layer on port 465.
-	tlsListener net.Listener
+	// listenerSubmission is a socket that listen for new connection from
+	// client on secure layer on port 465.
+	listenSubmission net.Listener
 
 	// mailTxQueue hold mail objects before being relayed or stored.
 	mailTxQueue chan *MailTx
@@ -108,7 +109,7 @@ func (srv *Server) Start() (err error) {
 	go srv.serveIncoming()
 
 	srv.wg.Add(1)
-	go srv.serveTLS()
+	go srv.serveSubmission()
 
 	srv.wg.Wait()
 	srv.running = false
@@ -118,14 +119,14 @@ func (srv *Server) Start() (err error) {
 
 // Stop the server.
 func (srv *Server) Stop() {
-	err := srv.tlsListener.Close()
+	err := srv.listenSubmission.Close()
 	if err != nil {
-		log.Printf("smtp: tlsListener.Close: %s", err)
+		log.Printf("smtp: listenSubmission.Close: %s", err)
 	}
 
-	err = srv.listener.Close()
+	err = srv.listenMta.Close()
 	if err != nil {
-		log.Printf("smtp: listener.Close: %s", err)
+		log.Printf("smtp: listenMta.Close: %s", err)
 	}
 
 	close(srv.mailTxQueue)
@@ -137,9 +138,9 @@ func (srv *Server) Stop() {
 // 25.
 func (srv *Server) serveIncoming() {
 	for {
-		conn, err := srv.listener.Accept()
+		conn, err := srv.listenMta.Accept()
 		if err != nil {
-			log.Printf("smtp: listener.Accept: %s", err)
+			log.Printf("smtp: listenMta.Accept: %s", err)
 			srv.wg.Done()
 			return
 		}
@@ -150,11 +151,11 @@ func (srv *Server) serveIncoming() {
 	}
 }
 
-func (srv *Server) serveTLS() {
+func (srv *Server) serveSubmission() {
 	for {
-		conn, err := srv.tlsListener.Accept()
+		conn, err := srv.listenSubmission.Accept()
 		if err != nil {
-			log.Printf("smtp: tlsListener.Accept: %s", err)
+			log.Printf("smtp: listenSubmission.Accept: %s", err)
 			srv.wg.Done()
 			return
 		}
@@ -555,7 +556,7 @@ func (srv *Server) initListener() (err error) {
 		return err
 	}
 
-	srv.listener, err = net.ListenTCP("tcp", addr)
+	srv.listenMta, err = net.ListenTCP("tcp", addr)
 	if err != nil {
 		return err
 	}
@@ -575,7 +576,7 @@ func (srv *Server) initListener() (err error) {
 		srv.tlsAddress = ":465"
 	}
 
-	srv.tlsListener, err = tls.Listen("tcp", srv.tlsAddress, tlsCfg)
+	srv.listenSubmission, err = tls.Listen("tcp", srv.tlsAddress, tlsCfg)
 
 	return err
 }
