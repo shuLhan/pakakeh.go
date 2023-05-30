@@ -28,37 +28,40 @@ var (
 // Data contains predefined input and output values that is loaded from
 // file to be used during test.
 //
-// The data provides zero or more flags, an optional description, zero or
+// The Data provides zero or more flags, an optional description, zero or
 // more input, and zero or more output.
 //
 // The data content use the following format,
 //
 //	[FLAG_KEY ":" FLAG_VALUE LF]
 //	[LF DESCRIPTION]
+//	LF
 //	">>>" [INPUT_NAME] LF
 //	INPUT_CONTENT
 //	LF
 //	"<<<" [OUTPUT_NAME] LF
 //	OUTPUT_CONTENT
 //
-// The data can contains zero or more flag.
-// A flag is key and value separated by ":".
-// The flag key must not contain spaces.
+// The Data can contains zero or more flag.
+// A Flag is map of key and value separated by ":".
+// The Flag's key must not contain spaces.
 //
-// The data may contain description.
+// The Data may contain description, to describe the content of test file.
 //
-// The line that start with "\n>>>" defined the beginning of input.
-// An input can have a name, if its empty it will be set to "default".
-// An input can be defined multiple times, with different names.
+// The line that start with "\n>>>" (new line followed by three '>') define
+// the beginning of Input.
+// An Input can have a name, if its empty it will be set to "default".
+// An Input can be defined multiple times, with different names.
 //
-// The line that start with "\n<<<" defined the beginning of output.
-// An output can have a name, if its empty it will be set to "default".
-// An output also can be defined multiple times, with different names.
+// The line that start with "\n<<<" (new line followed by three '<') defined
+// the beginning of Output.
+// An Output can have a name, if its empty it will be set to "default".
+// An Output also can be defined multiple times, with different names.
 //
-// All of both input and output content will have one new line truncated at
-// the end.
-// If they expecting new line at the end, add two empty lines at the end of
-// it.
+// All of both Input and Output content will have one new line at the end, to
+// separated them with each others.
+// If the content of Input or Output itself expecting empty line at the end,
+// add two empty lines at the end of it.
 //
 // # Example
 //
@@ -84,6 +87,10 @@ var (
 //
 // That is the gist, the real application can consume one or more input; or
 // generate one or more output.
+//
+// # Articles
+//
+//   - https://kilabit.local/journal/2023/go_test_data/
 type Data struct {
 	Flag   map[string]string
 	Input  map[string][]byte

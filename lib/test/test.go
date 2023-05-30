@@ -61,7 +61,7 @@ func printStackTrace(w Writer, trace []byte) {
 // will use the [diff.Text] to show the difference between them.
 // The diff output is as follow,
 //
-//	!!! "string not matched" / <desc>:
+//	!!! <name>:
 //	---- EXPECTED
 //	<LINE_NUM> - "<STRING>"
 //	...
@@ -72,9 +72,11 @@ func printStackTrace(w Writer, trace []byte) {
 //	<LINE_NUM> - "<LINE_EXP>"
 //	<LINE_NUM> + "<LINE_GOT>"
 //
-// Any lines after "----" indicate the lines that test expected.
+// Any lines after "----" indicate the lines that test expected, from `exp`
+// parameter.
 //
-// Any lines after "++++" indicate the lines that test got.
+// Any lines after "++++" indicate the lines that test got, from `got`
+// parameter.
 //
 // Any lines after "--++" indicate that the same line between expected and got
 // but different content.
