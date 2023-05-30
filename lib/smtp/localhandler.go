@@ -12,10 +12,11 @@ type LocalHandler struct {
 }
 
 // NewLocalHandler create an handler using local environment.
-func NewLocalHandler(env *Environment) Handler {
-	return &LocalHandler{
+func NewLocalHandler(env *Environment) (local *LocalHandler) {
+	local = &LocalHandler{
 		env: env,
 	}
+	return local
 }
 
 // ServeAuth handle SMTP AUTH parameter username and password.

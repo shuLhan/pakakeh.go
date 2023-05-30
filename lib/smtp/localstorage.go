@@ -28,7 +28,7 @@ type LocalStorage struct {
 
 // NewLocalStorage create and initialize new file storage.  If directory is
 // empty, the default storage is located at "/var/spool/smtp/".
-func NewLocalStorage(dir string) (storage Storage, err error) {
+func NewLocalStorage(dir string) (storage *LocalStorage, err error) {
 	if len(dir) == 0 {
 		dir = defDirSpool
 	}
@@ -45,14 +45,14 @@ func NewLocalStorage(dir string) (storage Storage, err error) {
 		return nil, err
 	}
 
-	fs := &LocalStorage{
+	storage = &LocalStorage{
 		dir: dir,
 	}
 
-	fs.enc = gob.NewEncoder(&fs.buff)
-	fs.dec = gob.NewDecoder(&fs.buff)
+	storage.enc = gob.NewEncoder(&storage.buff)
+	storage.dec = gob.NewDecoder(&storage.buff)
 
-	return fs, nil
+	return storage, nil
 }
 
 // MailBounce move the incoming mail to bounced state.  In this storage
