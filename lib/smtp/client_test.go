@@ -6,10 +6,55 @@ package smtp
 
 import (
 	"encoding/base64"
+	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
 )
+
+// Test client using live server.
+func TestClient_live(t *testing.T) {
+	t.Skip(`live testing`)
+
+	var (
+		clientOpts = ClientOptions{
+			ServerUrl:     os.Getenv(`SMTP_SERVER`),
+			AuthUser:      os.Getenv(`SMTP_USER`),
+			AuthPass:      os.Getenv(`SMTP_PASS`),
+			AuthMechanism: SaslMechanismPlain,
+			Insecure:      true,
+		}
+
+		cl    *Client
+		tdata *test.Data
+		err   error
+	)
+
+	t.Logf(`clientOpts: %+v`, clientOpts)
+
+	tdata, err = test.LoadData(`testdata/client_live_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cl, err = NewClient(clientOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		from     = clientOpts.AuthUser
+		to       = []string{`Shulhan <m.shulhan@gmail.com>`}
+		subject  = tdata.Input[`subject`]
+		bodyText = tdata.Input[`bodyText`]
+		bodyHtml = tdata.Input[`bodyHtml`]
+	)
+
+	err = cl.SendEmail(from, to, subject, bodyText, bodyHtml)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 
 func TestEhlo(t *testing.T) {
 	cases := []struct {

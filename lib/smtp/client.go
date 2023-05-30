@@ -16,6 +16,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/shuLhan/share/lib/email"
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
@@ -350,8 +351,42 @@ func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
 	return cl.recv()
 }
 
-// SendEmail is the wrapper that simplify MailTx.
+// SendEmail is the wrapper that simplify sending email.
+// This method automatically create [MailTx] for passing it to method
+// [Client.MailTx].
 func (cl *Client) SendEmail(from string, to []string, subject, bodyText, bodyHtml []byte) (err error) {
+	var (
+		logp        = `SendEmail`
+		toAddresses = strings.Join(to, `, `)
+
+		msg *email.Message
+	)
+
+	msg, err = email.NewMultipart(
+		[]byte(from),
+		[]byte(toAddresses),
+		[]byte(subject),
+		bodyText,
+		bodyHtml,
+	)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var msgData []byte
+
+	msgData, err = msg.Pack()
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var mailtx = NewMailTx(from, to, msgData)
+
+	_, err = cl.MailTx(mailtx)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
 	return nil
 }
 

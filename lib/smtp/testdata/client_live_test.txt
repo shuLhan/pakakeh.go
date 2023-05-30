@@ -1,0 +1,21 @@
+>>> subject
+Test SendEmail from lib/smtp
+
+>>> bodyText
+Hi Shulhan,
+
+This is the message body in text format.
+
+Best,
+Yourself
+
+>>> bodyHtml
+Hi <b>Shulhan</b>,
+<p>
+This is the message body in <code>HTML</code> format.
+</p>
+<p>
+Best, <br/>
+Yourself
+</p>
+
