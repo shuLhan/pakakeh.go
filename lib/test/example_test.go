@@ -100,6 +100,39 @@ func ExampleAssert_string() {
 	// 0 + func (tw *TestWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
 }
 
+func ExampleAssert_string2() {
+	var (
+		tw  = test.TestWriter{}
+		exp string
+		got string
+	)
+
+	exp = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Fusce cursus libero in velit dapibus tincidunt.
+Vestibulum vulputate ipsum ac nisl viverra pharetra.
+Sed at mi in urna lobortis bibendum.
+Vivamus tempus enim in urna fermentum, non volutpat nisi lacinia.`
+
+	got = `Fusce cursus libero in velit dapibus tincidunt.
+Vestibulum vulputate ipsum ac nisl viverra pharetra.
+Sed at mi in urna lobortis bibendum.
+Sed pretium nisl ut dolor ullamcorper blandit.
+Sed faucibus felis iaculis, sagittis erat quis, tempor nisi.`
+
+	test.Assert(&tw, `Assert string`, exp, got)
+	fmt.Println(tw.String())
+
+	// Output:
+	// !!! Assert string:
+	// ---- EXPECTED
+	// 0 - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+	// ++++ GOT
+	// 4 + Sed faucibus felis iaculis, sagittis erat quis, tempor nisi.
+	// --++
+	// 4 - Vivamus tempus enim in urna fermentum, non volutpat nisi lacinia.
+	// 3 + Sed pretium nisl ut dolor ullamcorper blandit.
+}
+
 func ExampleLoadDataDir() {
 	var (
 		listData []*test.Data
