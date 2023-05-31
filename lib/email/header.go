@@ -108,14 +108,14 @@ func (hdr *Header) ContentType() *ContentType {
 		if f.Type != FieldTypeContentType {
 			continue
 		}
-		if f.ContentType == nil {
+		if f.contentType == nil {
 			err := f.unpack()
 			if err != nil {
 				log.Println("ContentType: ", err)
 				return nil
 			}
 		}
-		return f.ContentType
+		return f.contentType
 	}
 	return nil
 }
@@ -265,7 +265,7 @@ func (hdr *Header) WriteTo(w io.Writer) (n int, err error) {
 	)
 	for _, f = range hdr.fields {
 		if f.Type == FieldTypeContentType {
-			m, err = fmt.Fprintf(w, "%s: %s\r\n", f.Name, f.ContentType.String())
+			m, err = fmt.Fprintf(w, "%s: %s\r\n", f.Name, f.contentType.String())
 		} else if f.Type == FieldTypeMessageID {
 			m, err = fmt.Fprintf(w, "%s: <%s>\r\n", f.Name, f.oriValue)
 		} else {

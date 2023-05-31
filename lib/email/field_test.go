@@ -333,7 +333,7 @@ func TestUnpackMailboxList(t *testing.T) {
 	}
 }
 
-func TestUnpackContentType(t *testing.T) {
+func TestField_unpackContentType(t *testing.T) {
 	cases := []struct {
 		expErr string
 		exp    string
@@ -361,7 +361,7 @@ func TestUnpackContentType(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "Content-Type", c.exp, field.ContentType.String())
+		test.Assert(t, "Content-Type", c.exp, field.contentType.String())
 		test.Assert(t, "field.unpacked", true, field.unpacked)
 
 		err = field.unpack()
@@ -370,7 +370,7 @@ func TestUnpackContentType(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, "Content-Type", c.exp, field.ContentType.String())
+		test.Assert(t, "Content-Type", c.exp, field.contentType.String())
 		test.Assert(t, "field.unpacked", true, field.unpacked)
 	}
 }

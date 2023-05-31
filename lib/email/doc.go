@@ -23,13 +23,13 @@
 //
 // A [Header] contains one or more [Field],
 //
-//	+-------------+---------------------+
-//	| Field                             |
-//	+-------------+------+-------+------+
-//	| ContentType | Name | Value | Type |
-//	+-------------+------+-------+------+
+//	+---------------------+
+//	| Field               |
+//	+------+-------+------+
+//	| Name | Value | Type |
+//	+------+-------+------+
 //
-// [Field] is parsed line that contains key and value separated by ": ".
+// [Field] is parsed line that contains Name and Value separated by ": ".
 //
 // A [ContentType] is special Field where Name is "Content-Type", and its
 // Value is parsed from string "top/sub; <param>; ...".

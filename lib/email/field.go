@@ -17,9 +17,9 @@ import (
 
 // Field represent field name and value in header.
 type Field struct {
-	// ContentType contains unpacked value of field with Name
+	// contentType contains unpacked value of field with Name
 	// "Content-Type" or nil if still packed.
-	ContentType *ContentType
+	contentType *ContentType
 
 	date   *time.Time
 	mboxes []*Mailbox
@@ -508,12 +508,11 @@ func (field *Field) unpackContentType() (err error) {
 		return nil
 	}
 
-	ContentType, err := ParseContentType(field.Value)
+	field.contentType, err = ParseContentType(field.Value)
 	if err != nil {
 		return err
 	}
 
-	field.ContentType = ContentType
 	field.unpacked = true
 
 	return nil
