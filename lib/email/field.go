@@ -37,6 +37,10 @@ type Field struct {
 	// Type of field, the numeric representation of field name.
 	Type FieldType
 
+	// isFolded set to true if field line contains folding, CRLF following
+	// by space and values.
+	isFolded bool
+
 	// true if field.unpack has been called, false when field.setValue is
 	// called again.
 	unpacked bool
@@ -54,54 +58,85 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) {
 		return nil, nil, nil
 	}
 
-	field = &Field{}
-	isFolded := false
-	start := 0
+	var logp = `ParseField`
 
-	// Get field's name.
-	// Valid values: %d33-57 / %d59-126 .
-	x := 0
+	field = &Field{}
+
+	raw, err = field.parseName(raw)
+	if err != nil {
+		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	raw, err = field.parseValue(raw)
+	if err != nil {
+		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	if !field.isFolded {
+		if (len(field.oriName) + len(field.oriValue) + 1) > 1000 {
+			return nil, nil, fmt.Errorf(`%s: field line greater than 998 characters`, logp)
+		}
+	}
+
+	rest = raw
+	return field, rest, nil
+}
+
+// parseName parse the field Name.
+// Format,
+//
+//	field-name = 1*(ftext / obs-ftext) ":"
+//	obs-ftext  = %d32 / ftext
+//	           ; space allowed in [obsolete] specification.
+//	[ftext]    = %d33-57 / %d59-126
+//	           ; printable ASCII character except colon (%d58).
+//
+// [ftext]: https://datatracker.ietf.org/doc/html/rfc5322#section-2.2
+// [obsolete]: https://datatracker.ietf.org/doc/html/rfc5322#section-4.5
+func (field *Field) parseName(raw []byte) (rest []byte, err error) {
+	var (
+		logp = `parseName`
+		x    int
+	)
 	for ; x < len(raw); x++ {
-		if raw[x] == ' ' || raw[x] == ':' {
+		if raw[x] == '\t' || raw[x] == ' ' || raw[x] == ':' {
 			break
 		}
 		if raw[x] < 33 || raw[x] > 126 {
-			err = fmt.Errorf("email: invalid field at '%s'", raw[:x])
-			goto invalid
+			return nil, fmt.Errorf(`%s: invalid character %q`, logp, raw[x])
 		}
 	}
-	if len(raw) == x {
-		err = fmt.Errorf("email: invalid field at '%s'", raw[:x])
-		goto invalid
-	}
-
 	// Skip WSP before ':'.
 	for ; x < len(raw) && (raw[x] == '\t' || raw[x] == ' '); x++ {
 	}
 	if len(raw) == x {
-		err = fmt.Errorf("email: invalid field at '%s'", raw[:x])
-		goto invalid
+		return nil, fmt.Errorf(`%s: missing value`, logp)
 	}
 	if raw[x] != ':' {
-		err = fmt.Errorf("email: missing field separator at '%s'", raw[:x])
-		goto invalid
+		return nil, fmt.Errorf(`%s: missing field separator`, logp)
 	}
 
 	field.setName(raw[:x])
-	x++
-	start = x
 
-	// Skip WSP after ':'.
-	for ; x < len(raw) && (raw[x] == '\t' || raw[x] == ' '); x++ {
-	}
+	rest = raw[x+1:]
 
-	if len(raw) == x {
-		err = fmt.Errorf("email: empty field value at '%s'", raw[:x])
-		goto invalid
-	}
+	return rest, nil
+}
 
-	// Get field's value.
-	// Valid values: WSP / %d33-126 .
+// parseValue parse field value.
+// Format,
+//
+//	field-body = 1*(FWS / WSP / %d33-126) CRLF
+//	FWS        = CRLF WSP              ; \r\n followed by space.
+//	WSP        = %d9 / %d32            ; tab or space.
+//
+// [Reference]: https://datatracker.ietf.org/doc/html/rfc5322#section-2.2
+func (field *Field) parseValue(raw []byte) (rest []byte, err error) {
+	var (
+		logp = `parseValue`
+		x    int
+	)
+
 	for ; x < len(raw); x++ {
 		for ; x < len(raw); x++ {
 			if raw[x] == '\t' || raw[x] == ' ' {
@@ -112,48 +147,34 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) {
 				break
 			}
 			if raw[x] < 33 || raw[x] > 126 {
-				err = fmt.Errorf("email: invalid field value at '%s'", raw[:x])
-				goto invalid
+				return nil, fmt.Errorf(`%s: invalid field value %q`, logp, raw[x])
 			}
 		}
 		if x == len(raw) || raw[x] != lf {
-			err = fmt.Errorf("email: field value without CRLF at '%s'", raw[:x])
-			goto invalid
+			return nil, fmt.Errorf(`%s: invalid or missing termination`, logp)
 		}
-		if x++; x == len(raw) {
+		x++
+		if x == len(raw) {
 			break
 		}
-
 		// Unfolding ...
 		if raw[x] == '\t' || raw[x] == ' ' {
-			isFolded = true
+			field.isFolded = true
 			continue
 		}
+		// End with CRLF.
 		break
 	}
-	if !isFolded && x > 1000 {
-		err = fmt.Errorf("email: field line greater than 998 characters")
-		return nil, nil, err
-	}
 
-	field.setValue(raw[start:x])
+	field.setValue(raw[:x])
 
 	if len(field.Value) == 0 {
-		err = fmt.Errorf("email: empty field value at '%s'", raw[:x])
-		goto invalid
+		return nil, fmt.Errorf(`%s: empty field value`, logp)
 	}
 
-	if len(raw) > x {
-		rest = raw[x:]
-	}
+	rest = raw[x:]
 
-	return field, rest, nil
-
-invalid:
-	if x < len(raw) {
-		rest = raw[x:]
-	}
-	return nil, rest, err
+	return rest, nil
 }
 
 // addMailboxes append zero or more mailboxes to current mboxes.
@@ -213,7 +234,7 @@ func (field *Field) appendValue(raw []byte) {
 
 // setName set field Name by canonicalizing raw field name using "simple" and
 // "relaxed" algorithms.
-// .
+//
 // "simple" algorithm store raw field name as is.
 //
 // "relaxed" algorithm convert field name to lowercase and removing trailing

@@ -26,59 +26,59 @@ func TestParseField(t *testing.T) {
 	}, {
 		desc:   "With long line",
 		raw:    []byte("name:" + longValue + "\r\n"),
-		expErr: "email: field line greater than 998 characters",
+		expErr: `ParseField: field line greater than 998 characters`,
 	}, {
 		desc:   "With only whitespaces",
 		raw:    []byte("  "),
-		expErr: "email: invalid field at '  '",
+		expErr: `ParseField: parseName: missing value`,
 	}, {
 		desc:   "With only CRLF",
 		raw:    []byte("\r\n"),
-		expErr: "email: invalid field at ''",
+		expErr: `ParseField: parseName: invalid character '\r'`,
 	}, {
 		desc:   "Without separator and CRLF",
 		raw:    []byte("name"),
-		expErr: "email: invalid field at 'name'",
+		expErr: `ParseField: parseName: missing value`,
 	}, {
 		desc:   "Without separator",
 		raw:    []byte("name\r\n"),
-		expErr: "email: invalid field at 'name'",
+		expErr: `ParseField: parseName: invalid character '\r'`,
 	}, {
 		desc:   "With space on name",
 		raw:    []byte("na me\r\n"),
-		expErr: "email: missing field separator at 'na '",
+		expErr: `ParseField: parseName: missing field separator`,
 	}, {
 		desc:   "Without value and CRLF",
 		raw:    []byte("name:"),
-		expErr: "email: empty field value at 'name:'",
+		expErr: `ParseField: parseValue: empty field value`,
 	}, {
 		desc:   "Without value and CRLF",
 		raw:    []byte("name: "),
-		expErr: "email: empty field value at 'name: '",
+		expErr: `ParseField: parseValue: invalid or missing termination`,
 	}, {
 		desc:   "Without value",
 		raw:    []byte("name:\r\n"),
-		expErr: "email: empty field value at 'name:\r\n'",
+		expErr: `ParseField: parseValue: empty field value`,
 	}, {
 		desc:   "Without value",
 		raw:    []byte("name: \r\n"),
-		expErr: "email: empty field value at 'name: \r\n'",
+		expErr: `ParseField: parseValue: empty field value`,
 	}, {
 		desc:   "Without CRLF",
 		raw:    []byte("name:value"),
-		expErr: "email: field value without CRLF at 'name:value'",
+		expErr: `ParseField: parseValue: invalid or missing termination`,
 	}, {
 		desc:   "Without CR",
 		raw:    []byte("name:value\n"),
-		expErr: "email: invalid field value at 'name:value'",
+		expErr: `ParseField: parseValue: invalid field value '\n'`,
 	}, {
 		desc:   "Without LF",
 		raw:    []byte("name:value\r"),
-		expErr: "email: field value without CRLF at 'name:value\r'",
+		expErr: `ParseField: parseValue: invalid or missing termination`,
 	}, {
 		desc:   "With CR inside value",
 		raw:    []byte("name:valu\re"),
-		expErr: "email: field value without CRLF at 'name:valu\r'",
+		expErr: `ParseField: parseValue: invalid or missing termination`,
 	}, {
 		desc: "With valid input",
 		raw:  []byte("NAME : VALUE\r\n"),
@@ -308,7 +308,7 @@ func TestUnpackMailboxList(t *testing.T) {
 		in     []byte
 	}{{
 		in:     []byte("From: \r\n"),
-		expErr: "email: empty field value at 'From: \r\n'",
+		expErr: `ParseField: parseValue: empty field value`,
 	}, {
 		in:  []byte("From: test@one, test@two\r\n"),
 		exp: "from:test@one, test@two\r\n",

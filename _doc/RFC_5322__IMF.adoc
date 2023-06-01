@@ -12,26 +12,29 @@ Message Format as defined in {url-rfc5322}[RFC 5322^].
 ==  Syntax
 
 ....
-message         =   (fields / obs-fields)
+message         =   header
                     [CRLF body]
 
-fields          =   *(field-name ":" (field-body / unstructured) CRLF)
+header          =   *field
 
-field-name      =   1*ftext
+field           =   field-name ":" field-body CRLF
 
-field-body      =   (*([FWS] VCHAR) *WSP)
+field-name      =   1*(ftext / obs-ftext)
 
-unstructured    =   (*([FWS] VCHAR) *WSP) / obs-unstruct
+field-body      =   *(FWS / WSP / VCHAR)
 
 VCHAR           =   %d33-126
 
 WSP             =   %d9 / %d32
                 ; tab or space
 
+obs-ftext       =   %d32 / ftext
+                ; Allow space in obsolete syntax.
+
 ftext           =   %d33-57 / %d59-126
                 ; Printable US-ASCII, except %d0-32 and %d58 (":")
 
-body            =   (*(*998text CRLF) *998text) / obs-body
+body            =   (*(*998text CRLF) *998text)
 
 text            =   %d1-9 /            ; Characters excluding CR
                     %d11 /             ;  and LF
@@ -39,12 +42,11 @@ text            =   %d1-9 /            ; Characters excluding CR
                     %d14-127
 ....
 
-*  Each line MUST be no more than 998 characters, excluding CRLF.
+*  Each line in a message (header and body) MUST be no more than 998
+   characters, excluding CRLF.
 
-*  Each line SHOULD be no more than 78 characters, excluding the CRLF.
-
-*  CR and LF MUST only occur together as CRLF; they MUST NOT appear
-   independently in the body.
+*  Each line in a message SHOULD be no more than 78 characters, excluding the
+   CRLF.
 
 *  Each header field SHOULD be treated in its unfolded form for further
    syntactic and semantic evaluation.
@@ -52,13 +54,16 @@ text            =   %d1-9 /            ; Characters excluding CR
 *  "field-body" MUST NOT include CR and LF except when used in "folding" and
    "unfolding".
 
+*  CR and LF MUST only occur together as CRLF; they MUST NOT appear
+   independently in the body.
+
 
 ===   Folding White Space and Comments
 
 ....
 CFWS            =   (1*([FWS] comment) [FWS]) / FWS
 
-FWS             =   ([*WSP CRLF] 1*WSP) / obs-FWS
+FWS             =   CRLF 1*WSP / obs-FWS
                 ; Folding white space
 
 comment         =   "(" *([FWS] ccontent) [FWS] ")"

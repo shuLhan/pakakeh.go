@@ -38,7 +38,7 @@ func TestParseBody(t *testing.T) {
 			"--boundary\r\n" +
 			"Content-Encoding:\r\n\r\n",
 		boundary: "boundary",
-		expErr:   "email: empty field value at 'Content-Encoding:\r\n'",
+		expErr:   `ParseField: parseValue: empty field value`,
 	}, {
 		desc: "With epilogue",
 		in: "preamble\r\n\r\n" +

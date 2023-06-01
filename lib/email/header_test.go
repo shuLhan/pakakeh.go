@@ -69,7 +69,7 @@ func TestParseHeader(t *testing.T) {
 	}, {
 		desc:   "With whitespaces only",
 		raw:    []byte(" \t"),
-		expErr: "email: invalid field at ' \t'",
+		expErr: `ParseField: parseName: missing value`,
 	}, {
 		desc:    "With CRLF only",
 		raw:     []byte("\r\n"),
@@ -81,7 +81,7 @@ func TestParseHeader(t *testing.T) {
 	}, {
 		desc:   "With invalid field: missing value",
 		raw:    []byte("a:\r\n\t"),
-		expErr: "email: empty field value at 'a:\r\n\t'",
+		expErr: `ParseField: parseValue: empty field value`,
 	}, {
 		desc:       "With single field",
 		raw:        []byte("a:1\r\n"),

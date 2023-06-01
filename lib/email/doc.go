@@ -29,7 +29,7 @@
 //	| Name | Value | Type |
 //	+------+-------+------+
 //
-// [Field] is parsed line that contains Name and Value separated by ": ".
+// [Field] is parsed line that contains Name and Value separated by colon ':'.
 //
 // A [ContentType] is special Field where Name is "Content-Type", and its
 // Value is parsed from string "top/sub; <param>; ...".
