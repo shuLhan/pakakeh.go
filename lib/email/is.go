@@ -7,6 +7,14 @@ package email
 import "github.com/shuLhan/share/internal/asciiset"
 
 var specialChars, _ = asciiset.MakeASCIISet(`()<>[]:;@\,"`)
+var specialCharsOld = map[byte]struct{}{
+	'(': {}, ')': {},
+	'<': {}, '>': {},
+	'[': {}, ']': {},
+	':': {}, ';': {},
+	'@': {}, '\\': {},
+	',': {}, '"': {},
+}
 
 // IsValidLocal will return true if local part contains valid characters.
 // Local part must,
@@ -38,7 +46,8 @@ func IsValidLocal(local []byte) bool {
 			continue
 		}
 		dot = false
-		if ok := specialChars.Contains(local[x]); ok {
+		// if _, ok := specialCharsOld[local[x]]; ok {
+		if specialChars.Contains(local[x]) {
 			return false
 		}
 	}
