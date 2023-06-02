@@ -6,7 +6,7 @@ package email
 
 import "github.com/shuLhan/share/internal/asciiset"
 
-var specialChars, _ = asciiset.MakeASCIISet("()<>[]:;@\\,\"")
+var specialChars, _ = asciiset.MakeASCIISet(`()<>[]:;@\,"`)
 
 // IsValidLocal will return true if local part contains valid characters.
 // Local part must,
