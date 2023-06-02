@@ -119,8 +119,8 @@ func (as *ASCIISet) Subtract(as2 ASCIISet) (as3 ASCIISet) {
 	return
 }
 
-// Equals reports whether as contains the same characters as as2.
-func (as *ASCIISet) Equals(as2 ASCIISet) bool {
+// Equal reports whether as contains the same characters as as2.
+func (as *ASCIISet) Equal(as2 ASCIISet) bool {
 	return as[0] == as2[0] && as[1] == as2[1] && as[2] == as2[2] && as[3] == as2[3]
 }
 
