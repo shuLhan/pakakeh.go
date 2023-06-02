@@ -39,7 +39,7 @@ func TestIsValidLocal(t *testing.T) {
 		test.Assert(t, "IsValidLocal", c.exp, got)
 	}
 
-	for k := range specialChars {
+	specialChars.Visit(func(k byte) bool {
 		local := []byte("loc")
 		local = append(local, k)
 		local = append(local, "al"...)
@@ -49,5 +49,6 @@ func TestIsValidLocal(t *testing.T) {
 		got := IsValidLocal(local)
 
 		test.Assert(t, "IsValidLocal", false, got)
-	}
+		return false
+	})
 }
