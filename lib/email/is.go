@@ -4,7 +4,7 @@
 
 package email
 
-import "github.com/elliotwutingfeng/asciiset"
+import "github.com/shuLhan/share/internal/asciiset"
 
 var specialChars, _ = asciiset.MakeASCIISet("()<>[]:;@\\,\"")
 
