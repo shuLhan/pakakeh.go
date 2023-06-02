@@ -12,9 +12,10 @@ import (
 
 func TestHeaderBoundary(t *testing.T) {
 	cases := []struct {
-		desc string
-		in   string
-		exp  []byte
+		desc     string
+		in       string
+		expError string
+		exp      []byte
 	}{{
 		desc: "With no content-type",
 		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
@@ -23,7 +24,7 @@ func TestHeaderBoundary(t *testing.T) {
 			"Subject: Sample message\r\n" +
 			"\r\n",
 	}, {
-		desc: "With invalid content-type",
+		desc: "With invalid content-type boundary",
 		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
 			"To: Ned Freed <ned@innosoft.com>\r\n" +
 			"Date: Sun, 21 Mar 1993 23:56:48 -0800 (PST)\r\n" +
@@ -31,6 +32,7 @@ func TestHeaderBoundary(t *testing.T) {
 			"MIME-Version: 1.0\r\n" +
 			"Content-type: multipart/mixed; boundary=simple:boundary\r\n" +
 			"\r\n",
+		expError: `ParseField: ParseContentType: invalid parameter value 'simple:boundary'`,
 	}, {
 		desc: "With boundary",
 		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
@@ -48,7 +50,8 @@ func TestHeaderBoundary(t *testing.T) {
 
 		header, _, err := ParseHeader([]byte(c.in))
 		if err != nil {
-			t.Fatal(err)
+			test.Assert(t, `error`, c.expError, err.Error())
+			continue
 		}
 
 		test.Assert(t, "Boundary", c.exp, header.Boundary())

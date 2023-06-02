@@ -29,6 +29,10 @@ type Field struct {
 	// Value contains "relaxed" canonicalization of field value.
 	Value []byte
 
+	// Params contains unpacked parameter from Value.
+	// Not all content type has parameters.
+	Params []Param
+
 	// oriName contains "simple" canonicalization of field name.
 	oriName []byte
 	// oriValue contains "simple" canonicalization of field value.
@@ -76,6 +80,12 @@ func ParseField(raw []byte) (field *Field, rest []byte, err error) {
 		if (len(field.oriName) + len(field.oriValue) + 1) > 1000 {
 			return nil, nil, fmt.Errorf(`%s: field line greater than 998 characters`, logp)
 		}
+	}
+
+	field.updateType()
+	err = field.unpack()
+	if err != nil {
+		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	rest = raw
@@ -554,6 +564,7 @@ func (field *Field) unpackContentType() (err error) {
 		return err
 	}
 
+	field.Params = field.contentType.Params
 	field.unpacked = true
 
 	return nil

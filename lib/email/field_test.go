@@ -273,10 +273,10 @@ func TestUnpackMailbox(t *testing.T) {
 		in     []byte
 	}{{
 		in:     []byte("Sender: local\r\n"),
-		expErr: `ParseMailboxes: empty or invalid address`,
+		expErr: `ParseField: ParseMailboxes: empty or invalid address`,
 	}, {
 		in:     []byte("Sender: test@one, test@two\r\n"),
-		expErr: "multiple address in sender: 'test@one, test@two\r\n'",
+		expErr: "ParseField: multiple address in sender: 'test@one, test@two\r\n'",
 	}, {
 		in:  []byte("Sender: <test@one>\r\n"),
 		exp: "sender:<test@one>\r\n",
@@ -286,12 +286,6 @@ func TestUnpackMailbox(t *testing.T) {
 		t.Logf("%s", c.in)
 
 		field, _, err := ParseField(c.in)
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
-			continue
-		}
-
-		err = field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
@@ -323,12 +317,6 @@ func TestUnpackMailboxList(t *testing.T) {
 			continue
 		}
 
-		err = field.unpack()
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
-			continue
-		}
-
 		test.Assert(t, "From:", []byte(c.exp), field.Relaxed())
 	}
 }
@@ -340,7 +328,7 @@ func TestField_unpackContentType(t *testing.T) {
 		in     []byte
 	}{{
 		in:     []byte("Content-Type: text;\r\n"),
-		expErr: "ParseContentType: missing subtype",
+		expErr: "ParseField: ParseContentType: missing subtype",
 	}, {
 		in:  []byte("Content-Type: text/plain;\r\n"),
 		exp: "text/plain",
@@ -350,21 +338,6 @@ func TestField_unpackContentType(t *testing.T) {
 		t.Logf("%s", c.in)
 
 		field, _, err := ParseField(c.in)
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
-			continue
-		}
-
-		err = field.unpack()
-		if err != nil {
-			test.Assert(t, "error", c.expErr, err.Error())
-			continue
-		}
-
-		test.Assert(t, "Content-Type", c.exp, field.contentType.String())
-		test.Assert(t, "field.unpacked", true, field.unpacked)
-
-		err = field.unpack()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue
