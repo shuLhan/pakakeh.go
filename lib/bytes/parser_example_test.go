@@ -45,16 +45,16 @@ func ExampleParser_Read() {
 	)
 
 	token, c := parser.Read()
-	fmt.Printf("token:'%s' c:'%c'\n", token, c)
+	fmt.Printf("token:'%s' c:%q\n", token, c)
 	token, c = parser.Read()
-	fmt.Printf("token:'%s' c:'%c'\n", token, c)
+	fmt.Printf("token:'%s' c:%q\n", token, c)
 	token, c = parser.Read()
-	fmt.Printf("token:'%s' c:%d\n", token, c)
+	fmt.Printf("token:'%s' c:%q\n", token, c)
 
 	// Output:
 	// token:'a ' c:'='
 	// token:' b' c:';'
-	// token:' ' c:0
+	// token:' ' c:'\x00'
 }
 
 func ExampleParser_ReadLine() {
@@ -65,14 +65,14 @@ func ExampleParser_ReadLine() {
 	)
 
 	token, c := parser.ReadLine()
-	fmt.Printf("token:%s c:%d\n", token, c)
+	fmt.Printf("token:%s c:%q\n", token, c)
 
 	token, c = parser.ReadLine()
-	fmt.Printf("token:%s c:%d\n", token, c)
+	fmt.Printf("token:%s c:%q\n", token, c)
 
 	// Output:
-	// token:a=b; c:10
-	// token:c=d; c:0
+	// token:a=b; c:'\n'
+	// token:c=d; c:'\x00'
 }
 
 func ExampleParser_ReadN() {
@@ -83,17 +83,17 @@ func ExampleParser_ReadN() {
 	)
 
 	token, c := parser.ReadN(2)
-	fmt.Printf("token:%s c:%d\n", token, c)
+	fmt.Printf("token:%s c:%q\n", token, c)
 
 	token, c = parser.ReadN(0)
-	fmt.Printf("token:%s c:%d\n", token, c)
+	fmt.Printf("token:%s c:%q\n", token, c)
 
 	token, c = parser.ReadN(10)
-	fmt.Printf("token:%s c:%d\n", token, c)
+	fmt.Printf("token:%s c:%q\n", token, c)
 	// Output:
-	// token:a= c:98
-	// token: c:98
-	// token:b;c=d; c:0
+	// token:a= c:'b'
+	// token: c:'b'
+	// token:b;c=d; c:'\x00'
 }
 
 func ExampleParser_ReadNoSpace() {
@@ -105,15 +105,15 @@ func ExampleParser_ReadNoSpace() {
 
 	for {
 		token, d := parser.ReadNoSpace()
-		fmt.Printf("%s:%d\n", token, d)
+		fmt.Printf("%s:%q\n", token, d)
 		if d == 0 {
 			break
 		}
 	}
 	// Output:
-	// a:61
-	// b:59
-	// :0
+	// a:'='
+	// b:';'
+	// :'\x00'
 }
 
 func ExampleParser_Remaining() {
@@ -271,21 +271,21 @@ func ExampleParser_SkipHorizontalSpaces() {
 
 	n, _ = parser.SkipHorizontalSpaces()
 	token, d := parser.Read()
-	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
+	fmt.Printf("n:%d token:%s delim:%q\n", n, token, d)
 
 	n, _ = parser.SkipHorizontalSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
+	fmt.Printf("n:%d token:%s delim:%q\n", n, token, d)
 
 	n, _ = parser.SkipHorizontalSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("n:%d token:%s delim:%d\n", n, token, d)
+	fmt.Printf("n:%d token:%s delim:%q\n", n, token, d)
 
 	// Output:
-	// n:4 token:A delim:.
+	// n:4 token:A delim:'.'
 	// n:1 token:
-	// B delim:.
-	// n:0 token: delim:0
+	// B delim:'.'
+	// n:0 token: delim:'\x00'
 }
 
 func ExampleParser_SkipSpaces() {
@@ -298,20 +298,20 @@ func ExampleParser_SkipSpaces() {
 
 	n, _ = parser.SkipSpaces()
 	token, d := parser.Read()
-	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
+	fmt.Printf("n:%d token:%s delim:%q\n", n, token, d)
 
 	n, _ = parser.SkipSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("n:%d token:%s delim:%c\n", n, token, d)
+	fmt.Printf("n:%d token:%s delim:%q\n", n, token, d)
 
 	n, _ = parser.SkipSpaces()
 	token, d = parser.Read() // The token include \n.
-	fmt.Printf("n:%d token:%s delim:%d\n", n, token, d)
+	fmt.Printf("n:%d token:%s delim:%q\n", n, token, d)
 
 	// Output:
-	// n:4 token:A delim:.
-	// n:2 token:B delim:.
-	// n:0 token: delim:0
+	// n:4 token:A delim:'.'
+	// n:2 token:B delim:'.'
+	// n:0 token: delim:'\x00'
 }
 
 func ExampleParser_Stop() {
