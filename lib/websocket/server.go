@@ -23,7 +23,8 @@ import (
 )
 
 const (
-	_maxQueue = 128
+	// _maxQueue define maximum connection waiting to be upgraded.
+	_maxQueue = 4096
 
 	_resUpgradeOK = "HTTP/1.1 101 Switching Protocols\r\n" +
 		"Upgrade: websocket\r\n" +

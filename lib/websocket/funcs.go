@@ -14,7 +14,9 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-const maxBuffer = 1024
+// maxBuffer define maximum payload that we read/write from socket at one
+// time.
+const maxBuffer = 4096
 
 // Recv read all content from file descriptor into slice of bytes.
 //
