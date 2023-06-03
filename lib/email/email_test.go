@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/shuLhan/share/lib/email/dkim"
+	"github.com/shuLhan/share/lib/test"
 )
 
 var (
@@ -60,4 +61,34 @@ func initKeys(t *testing.T) {
 
 	dname := "brisbane._domainkey.example.com"
 	dkim.DefaultKeyPool.Put(dname, key)
+}
+
+func TestSanitize(t *testing.T) {
+	type testCase struct {
+		in  []byte
+		exp []byte
+	}
+
+	var cases = []testCase{{
+		in:  []byte("not\n a\t comment"),
+		exp: []byte("not a comment"),
+	}, {
+		in:  []byte("A B \n (comment \t) C \r\n ( \tcomment )\r\n\tD\r\n "),
+		exp: []byte(`A B C D`),
+	}, {
+		in:  []byte("A B \r\n ( C (D\r\n (E)) \t) F\r\n "),
+		exp: []byte(`A B F`),
+	}, {
+		in:  []byte("Fri, 21 Nov 1997 09(comment): 55 : 06 -0600\r\n"),
+		exp: []byte("Fri, 21 Nov 1997 09: 55 : 06 -0600"),
+	}}
+
+	var (
+		c   testCase
+		got []byte
+	)
+	for _, c = range cases {
+		got = sanitize(c.in)
+		test.Assert(t, `sanitize`, string(c.exp), string(got))
+	}
 }

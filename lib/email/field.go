@@ -362,7 +362,8 @@ func (field *Field) unpackDate() (err error) {
 	}
 
 	var (
-		parser = libbytes.NewParser(field.Value, []byte{',', ' ', cr, lf})
+		value  = sanitize(field.Value)
+		parser = libbytes.NewParser(value, []byte{',', ' '})
 
 		vstr  string
 		token []byte
@@ -429,6 +430,9 @@ func (field *Field) unpackDate() (err error) {
 	if hour < 0 || hour > 23 {
 		return fmt.Errorf(`%s: invalid hour %d`, logp, hour)
 	}
+	if c == ' ' {
+		_, c = parser.SkipSpaces()
+	}
 	if c != ':' {
 		return fmt.Errorf(`%s: invalid or missing time separator`, logp)
 	}
@@ -443,11 +447,24 @@ func (field *Field) unpackDate() (err error) {
 	if min < 0 || min > 59 {
 		return fmt.Errorf(`%s: invalid minute %d`, logp, min)
 	}
+	token = nil
+
+	if c == ' ' {
+		token, c = parser.ReadNoSpace()
+		if c == ':' && len(token) != 0 {
+			return fmt.Errorf(`%s: unknown token after minute %q`, logp, token)
+		}
+		// At this point the date may have second and token may be a
+		// zone.
+		// We check again later if token is nil after parsing the
+		// second part.
+	}
+
+	parser.RemoveDelimiters([]byte{':'})
 
 	// Get second ...
 	var sec int64
 	if c == ':' {
-		parser.RemoveDelimiters([]byte{':'})
 		token, _ = parser.ReadNoSpace()
 		sec, err = strconv.ParseInt(string(token), 10, 64)
 		if err != nil {
@@ -456,16 +473,19 @@ func (field *Field) unpackDate() (err error) {
 		if sec < 0 || sec > 59 {
 			return fmt.Errorf(`%s: invalid second %d`, logp, sec)
 		}
+		token = nil
 	}
 
-	// Get zone offset ...
+	// Get zone offset.
 	var (
 		off  int64
 		zone string
 	)
-	token, _ = parser.ReadNoSpace()
-	if len(token) == 0 {
-		return fmt.Errorf(`%s: invalid or missing zone %s`, logp, token)
+	if token == nil { // The data contains second.
+		token, _ = parser.ReadNoSpace()
+		if len(token) == 0 {
+			return fmt.Errorf(`%s: invalid or missing zone %s`, logp, token)
+		}
 	}
 	if len(token) != 0 {
 		if token[0] == '+' || token[0] == '-' {

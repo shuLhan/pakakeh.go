@@ -45,3 +45,39 @@ func randomChars(n int) []byte {
 	rand.Seed(Epoch())
 	return ascii.Random([]byte(ascii.LettersNumber), n)
 }
+
+// sanitize remove comment from in and merge multiple spaces into one.
+// A comment start with '(' and end with ')' and can be nested
+// "(...(...(...)...)".
+func sanitize(in []byte) (out []byte) {
+	var (
+		c         byte
+		inComment int
+		hasSpace  bool
+	)
+	out = make([]byte, 0, len(in))
+	for _, c = range in {
+		if inComment != 0 {
+			if c == ')' {
+				inComment--
+			} else if c == '(' {
+				inComment++
+			}
+			continue
+		}
+		if c == '(' {
+			inComment++
+			continue
+		}
+		if ascii.IsSpace(c) {
+			hasSpace = true
+			continue
+		}
+		if hasSpace {
+			out = append(out, ' ')
+			hasSpace = false
+		}
+		out = append(out, c)
+	}
+	return out
+}
