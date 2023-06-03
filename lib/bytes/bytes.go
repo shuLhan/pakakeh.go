@@ -13,6 +13,7 @@ import (
 	"unicode"
 
 	inbytes "github.com/shuLhan/share/internal/bytes"
+	"github.com/shuLhan/share/lib/ascii"
 )
 
 // AppendInt16 append an int16 value into slice of byte.
@@ -508,6 +509,19 @@ func ReadUint32(data []byte, x uint) (v uint32) {
 	v |= uint32(data[x+2]) << 8
 	v |= uint32(data[x+3])
 	return v
+}
+
+// RemoveSpaces remove all spaces from input in.
+func RemoveSpaces(in []byte) (out []byte) {
+	var c byte
+	out = make([]byte, 0, len(in))
+	for _, c = range in {
+		if ascii.IsSpace(c) {
+			continue
+		}
+		out = append(out, c)
+	}
+	return out
 }
 
 // SkipAfterToken skip all bytes until matched "token" is found and return the

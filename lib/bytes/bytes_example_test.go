@@ -340,6 +340,18 @@ func ExampleReadUint32() {
 	// 4043440900
 }
 
+func ExampleRemoveSpaces() {
+	var (
+		in  = []byte(" a\nb\tc d\r")
+		out = libbytes.RemoveSpaces(in)
+	)
+
+	fmt.Printf("%s\n", out)
+
+	// Output:
+	// abcd
+}
+
 func ExampleSkipAfterToken() {
 	text := []byte(`abc \def ghi`)
 
