@@ -214,6 +214,9 @@ func parseMailbox(mbox *Mailbox, parser *libbytes.Parser, prevd byte) (c byte, e
 	}
 domain:
 	if len(value) != 0 {
+		// Remove all spaces between characters to handle obsolete
+		// domain value, for example "domain . tld" are valid.
+		value = libbytes.RemoveSpaces(value)
 		if !libnet.IsHostnameValid(value, false) {
 			return c, fmt.Errorf(`%s: invalid domain '%s'`, logp, value)
 		}
