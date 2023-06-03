@@ -3,6 +3,10 @@
 // license that can be found in the LICENSE file.
 
 // Command smtpcli provide a command line interface to SMTP client protocol.
+// This is an example of implementation Client from
+// [lib/smtp].
+//
+// [lib/smtp]: https://pkg.go.dev/github.com/shuLhan/share/lib/smtp
 package main
 
 import (

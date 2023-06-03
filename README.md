@@ -32,7 +32,9 @@ Program ini provide a command line interface to get and set values in the
 [INI file format](https://godocs.io/github.com/shuLhan/share/lib/ini).
 
 [**smtpcli**](https://pkg.go.dev/github.com/shuLhan/share/cmd/smtpcli)::
-Command line interface to SMTP client protocol.
+Command line interface SMTP client protocol.
+This is an example of implementation Client from
+[lib/smtp](https://pkg.go.dev/github.com/shuLhan/share/lib/smtp).
 
 [**xtrk**](https://pkg.go.dev/github.com/shuLhan/share/cmd/xtrk)::
 Program xtrk is command line interface to uncompress and/or unarchive a
@@ -41,7 +43,11 @@ Supported format: bzip2, gzip, tar, zip, tar.bz2, tar.gz.
 
 [**totp**](https://pkg.go.dev/github.com/shuLhan/share/cmd/totp)::
 Program to generate Time-based One-time Password using secret key.
-
+This is just an example of implementation of
+[lib/totp](https://pkg.go.dev/github.com/shuLhan/share/lib/totp).
+See
+<https://sr.ht/~shulhan/gotp/> for a complete implementation that support
+encryption.
 
 ## Libraries
 

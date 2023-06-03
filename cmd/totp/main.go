@@ -1,4 +1,9 @@
 // Program totp generate Time-based One-time Password from secret key.
+// This is just an example of implementation of [lib/totp]
+// See [gotp] for a complete implementation that support encryption.
+//
+// [lib/totp]: https://pkg.go.dev/github.com/shuLhan/share/lib/totp
+// [gotp]: https://sr.ht/~shulhan/gotp
 package main
 
 import (
