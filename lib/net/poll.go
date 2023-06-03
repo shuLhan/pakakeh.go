@@ -5,7 +5,11 @@
 package net
 
 const (
-	maxQueue = 128
+	// maxQueue define the number of events that can be read from poll at
+	// one time.
+	// Increasing this number also increase the memory consumed by
+	// process.
+	maxQueue = 2048
 )
 
 // Poll represent an interface to network polling.
