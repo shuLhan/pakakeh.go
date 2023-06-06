@@ -4,7 +4,10 @@
 
 package email
 
-var specialChars = map[byte]struct{}{
+import "github.com/shuLhan/share/internal/asciiset"
+
+var specialChars, _ = asciiset.MakeASCIISet(`()<>[]:;@\,"`)
+var specialCharsOld = map[byte]struct{}{
 	'(': {}, ')': {},
 	'<': {}, '>': {},
 	'[': {}, ']': {},
@@ -43,7 +46,8 @@ func IsValidLocal(local []byte) bool {
 			continue
 		}
 		dot = false
-		if _, ok := specialChars[local[x]]; ok {
+		// if _, ok := specialCharsOld[local[x]]; ok {
+		if specialChars.Contains(local[x]) {
 			return false
 		}
 	}
