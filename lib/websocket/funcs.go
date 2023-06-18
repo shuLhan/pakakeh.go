@@ -16,7 +16,8 @@ import (
 
 // maxBuffer define maximum payload that we read/write from socket at one
 // time.
-const maxBuffer = 4096
+// This number should be lower than MTU for better handling larger payload.
+const maxBuffer = 1024
 
 // Recv read all content from file descriptor into slice of bytes.
 //
