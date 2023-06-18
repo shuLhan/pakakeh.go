@@ -218,7 +218,6 @@ func (cl *Client) Close() (err error) {
 // Connect to endpoint.
 func (cl *Client) Connect() (err error) {
 	cl.Lock()
-	defer cl.Unlock()
 
 	if cl.conn != nil {
 		_ = cl.conn.Close()
@@ -227,11 +226,13 @@ func (cl *Client) Connect() (err error) {
 
 	err = cl.init()
 	if err != nil {
+		cl.Unlock()
 		return fmt.Errorf("websocket: Connect: " + err.Error())
 	}
 
 	err = cl.open()
 	if err != nil {
+		cl.Unlock()
 		return fmt.Errorf("websocket: Connect: " + err.Error())
 	}
 
@@ -241,8 +242,11 @@ func (cl *Client) Connect() (err error) {
 	if err != nil {
 		_ = cl.conn.Close()
 		cl.conn = nil
+		cl.Unlock()
 		return fmt.Errorf("websocket: Connect: " + err.Error())
 	}
+
+	cl.Unlock()
 
 	// At this point client successfully connected to server, but the
 	// response from server may include WebSocket frame, not just HTTP
@@ -250,6 +254,7 @@ func (cl *Client) Connect() (err error) {
 	if len(rest) > 0 {
 		var isClosing bool = cl.handleRaw(rest)
 		if isClosing {
+			cl.Quit()
 			return nil
 		}
 	}
