@@ -4,17 +4,9 @@
 
 package email
 
-import "github.com/shuLhan/share/internal/asciiset"
+import "github.com/shuLhan/share/lib/ascii"
 
-var specialChars, _ = asciiset.MakeASCIISet(`()<>[]:;@\,"`)
-var specialCharsOld = map[byte]struct{}{
-	'(': {}, ')': {},
-	'<': {}, '>': {},
-	'[': {}, ']': {},
-	':': {}, ';': {},
-	'@': {}, '\\': {},
-	',': {}, '"': {},
-}
+var specialChars, _ = ascii.MakeSet(`()<>[]:;@\,"`)
 
 // IsValidLocal will return true if local part contains valid characters.
 // Local part must,
