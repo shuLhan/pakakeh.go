@@ -2,45 +2,24 @@
 
 This document track the status report from autobahn testsuite [1].
 
-==  Setting up Autobahn Testsuite
+==  Requirements
 
-The following instruction describe how to setup autobahn testsuite on this
-package,
-
-----
-$ cd testdata
-$ virtualenv .
-$ source ./bin/activate
-$ pip install autobahntestsuite
-----
+* Podman
 
 ==  Testing Server
 
-First, run our WebSocket test server,
-
 ----
-$ cd testdata/server
-$ go build .
-$ ./server
-----
-
-Second, open new terminal and run the autobahn test server,
-
-----
-$ cd testdata/server
-$ source ../bin/activate
-$ wstest -m fuzzingclient
+$ cd testdata
+$ make test-server
 ----
 
 Wait for the test to complete.  After that, we can view the reports on
-"reports/index.html".
-
-===  Server Reports Status
+"testdata/server/reports/index.html".
 
 Summary of autobahn testsuite reports for server,
 
 ----
-1.  Framing (14/16)
+1.  Framing (16/16)
 1.1.  Text Messages (8/8)
 1.2.  Binary Messages (8/8)
 2.  Pings/Pongs (11/11)
@@ -51,13 +30,11 @@ Summary of autobahn testsuite reports for server,
 5.  Fragmentation (20/20)
 6.  UTF-8 Handling  (145/145)
 6.1.  Valid UTF-8 with zero payload fragments  (3/3)
-6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
-code-points  (4/4)
+6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within code-points  (4/4)
 6.3.  Invalid UTF-8 differently fragmented  (2/2)
 6.4.  Fail-fast on invalid UTF-8  (4/4)
 6.5.  Some valid UTF-8 sequences  (5/5)
-6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code
-points  (11/11)
+6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code points  (11/11)
 6.7.  First possible sequence of a certain length (4/4)
 6.8.  First possible sequence length 5/6 (invalid codepoints) (2/2)
 6.9.  Last possible sequence of a certain length (4/4)
@@ -104,43 +81,26 @@ points  (11/11)
 11.  (-/-)
 12.  WebSocket Compression (different payloads)  (-/-)
 13.  WebSocket Compression (different parameters)  (-/-)
-(excluded)
+
+Total test cases    = 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Total success cases = 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Success Rate        = 301/301*100 = 100%
 ----
-
-
-Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
-Total success cases: 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
-
-Success Rate = 100%
 
 ==  Testing Client
 
-First, run the autobahn test server,
-
 ----
-$ cd testdata/client
-$ source ../bin/activate
-$ wstest -m fuzzingserver
+$ cd testdata
+$ make test-client
 ----
 
-Second, run our WebSocket test client,
-
-----
-$ cd testdata/client
-$ go build .
-$ ./client
-----
-
-Wait for the test to complete.  After that, open the browser at
-http://127.0.0.1:8080/test_browser.html , and click on "Update Reports
-(Manual)" to update client reports at "testdata/client/reports/index.html".
-
-===  Client Reports Status
+On success, the reports will be generated at
+"testdata/client/reports/index.html".
 
 Summary of autobahn testsuite reports for client,
 
 ----
-1.  Framing (14/16)
+1.  Framing (16/16)
 1.1.  Text Messages (8/8)
 1.2.  Binary Messages (8/8)
 2.  Pings/Pongs (11/11)
@@ -151,13 +111,11 @@ Summary of autobahn testsuite reports for client,
 5.  Fragmentation (20/20)
 6.  UTF-8 Handling  (145/145)
 6.1.  Valid UTF-8 with zero payload fragments  (3/3)
-6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within
-code-points  (4/4)
+6.2.  Valid UTF-8 unfragmented, fragmented on code-points and within code-points  (4/4)
 6.3.  Invalid UTF-8 differently fragmented  (2/2)
 6.4.  Fail-fast on invalid UTF-8  (4/4)
 6.5.  Some valid UTF-8 sequences  (5/5)
-6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code
-points  (11/11)
+6.6.  All prefixes of a valid UTF-8 string that contains multi-byte code points  (11/11)
 6.7.  First possible sequence of a certain length (4/4)
 6.8.  First possible sequence length 5/6 (invalid codepoints) (2/2)
 6.9.  Last possible sequence of a certain length (4/4)
@@ -204,14 +162,11 @@ points  (11/11)
 11.  (-/-)
 12.  WebSocket Compression (different payloads)  (-/-)
 13.  WebSocket Compression (different parameters)  (-/-)
-(excluded)
+
+Total test cases    = 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Total success cases = 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
+Success Rate        = 301/301*100 = 100%
 ----
-
-
-Total test cases   : 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
-Total success cases: 16 + 11 + 7 + 10 + 20 + 145 + 37 + 0 + 54 + 1 + 0 + 0 + 0 = 301
-
-Success Rate = 100%
 
 
 ==  Reference

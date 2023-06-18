@@ -9,57 +9,69 @@ package main
 import (
 	"fmt"
 	"log"
-	"sync"
 
 	"github.com/shuLhan/share/lib/websocket"
 )
 
 func main() {
 	var (
-		clients []*websocket.Client = make([]*websocket.Client, 0, 301)
-		cl      *websocket.Client
-		wg      sync.WaitGroup
-		err     error
-		done    int
-		x       int
+		x int
 	)
 
-	var handleBin = func(cl *websocket.Client, frame *websocket.Frame) (err error) {
-		err = cl.SendBin(frame.Payload())
-		if err != nil {
-			log.Fatal("client: SendBin: " + err.Error())
-		}
-		return
-	}
-	var handleText = func(cl *websocket.Client, frame *websocket.Frame) (err error) {
-		err = cl.SendText(frame.Payload())
-		if err != nil {
-			log.Fatal("client: SendText: " + err.Error())
-		}
-		return
-	}
-	var handleQuit = func() {
-		done++
-		wg.Done()
-		fmt.Printf(">>> DONE %d\n", done)
-	}
-
 	for x = 1; x <= 301; x++ {
-		cl = &websocket.Client{
-			Endpoint:   fmt.Sprintf("ws://127.0.0.1:9001/runCase?case=%d&agent=libwebsocket", x),
-			HandleBin:  handleBin,
-			HandleText: handleText,
-			HandleQuit: handleQuit,
-		}
-
-		wg.Add(1)
-		err = cl.Connect()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		clients = append(clients, cl)
+		clientTestCase(x)
 	}
 
-	wg.Wait()
+	clientUpdateReports()
+}
+
+func clientTestCase(testnum int) {
+	log.Printf(`Running test case %d`, testnum)
+
+	var (
+		chQuit = make(chan struct{}, 1)
+		cl     = &websocket.Client{
+			Endpoint: fmt.Sprintf(`ws://0.0.0.0:9001/runCase?agent=libwebsocket&case=%d`, testnum),
+
+			HandleBin: func(cl *websocket.Client, frame *websocket.Frame) (err error) {
+				err = cl.SendBin(frame.Payload())
+				if err != nil {
+					log.Fatal("client: SendBin: " + err.Error())
+				}
+				return
+			},
+
+			HandleText: func(cl *websocket.Client, frame *websocket.Frame) (err error) {
+				var payload = frame.Payload()
+				err = cl.SendText(payload)
+				if err != nil {
+					log.Fatal("client: SendText: " + err.Error())
+				}
+				return
+			},
+
+			HandleQuit: func() {
+				chQuit <- struct{}{}
+			},
+		}
+	)
+
+	var err = cl.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	<-chQuit
+	log.Printf(`--- DONE %d`, testnum)
+}
+
+func clientUpdateReports() {
+	var cl = &websocket.Client{
+		Endpoint: fmt.Sprintf(`ws://0.0.0.0:9001/updateReports?agent=libwebsocket`),
+	}
+
+	var err = cl.Connect()
+	if err != nil {
+		log.Fatal(`clientUpdateReports:`, err)
+	}
+	_ = cl.Close()
 }

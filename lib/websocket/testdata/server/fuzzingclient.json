@@ -2,7 +2,7 @@
   "outdir": "./reports",
   "servers": [
     {
-      "url": "ws://127.0.0.1:9001"
+      "url": "ws://host.containers.internal:9001"
     }
   ],
   "cases": ["*"],
