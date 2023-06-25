@@ -9,12 +9,12 @@ This document track the status report from autobahn testsuite [1].
 ==  Testing Server
 
 ----
-$ cd testdata
+$ cd internal/autobahn
 $ make test-server
 ----
 
 Wait for the test to complete.  After that, we can view the reports on
-"testdata/server/reports/index.html".
+"internal/autobahn/server/testdata/index.html".
 
 Summary of autobahn testsuite reports for server,
 
@@ -90,12 +90,12 @@ Success Rate        = 301/301*100 = 100%
 ==  Testing Client
 
 ----
-$ cd testdata
+$ cd internal/autobahn
 $ make test-client
 ----
 
 On success, the reports will be generated at
-"testdata/client/reports/index.html".
+"internal/autobahn/client/testdata/index.html".
 
 Summary of autobahn testsuite reports for client,
 

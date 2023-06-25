@@ -9,8 +9,8 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/shuLhan/share/lib/websocket"
@@ -53,7 +53,7 @@ func main() {
 				log.Println("handleBin: " + err.Error())
 			}
 
-			var elapsed = time.Now().Sub(timeStart)
+			var elapsed = time.Since(timeStart)
 			if elapsed >= timeout {
 				log.Printf(`HandleBin: %s`, elapsed)
 			}
@@ -71,7 +71,7 @@ func main() {
 				log.Println("handleText: " + err.Error())
 			}
 
-			var elapsed = time.Now().Sub(timeStart)
+			var elapsed = time.Since(timeStart)
 			if elapsed >= timeout {
 				log.Printf(`HandleText: %s`, elapsed)
 			}
@@ -97,7 +97,7 @@ func doShutdown() {
 	var (
 		logp = `doShutdown`
 		cl   = &websocket.Client{
-			Endpoint: fmt.Sprintf(`ws://0.0.0.0:9001`),
+			Endpoint: `ws://0.0.0.0:9001`,
 		}
 	)
 

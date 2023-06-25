@@ -6,7 +6,7 @@ run-autobahn-client:
 	sleep 2
 	podman run -it --rm \
 		--volume="${PWD}/server:/config" \
-		--volume="${PWD}/server/reports:/reports" \
+		--volume="${PWD}/server/testdata:/reports" \
 		--name=fuzzingclient \
 		docker.io/crossbario/autobahn-testsuite \
 		wstest --mode fuzzingclient --spec=/config/fuzzingclient.json
@@ -18,16 +18,17 @@ run-test-server:
 .PHONY: test-server
 test-server: run-test-server run-autobahn-client
 	go run ./server shutdown
+	go run ./server reports
 
 ##
 ## Run autobahn server to test our client in the background.
 ##
 .PHONY: run-autobahn-server
 run-autobahn-server:
-	podman stop fuzzingserver
+	-podman stop fuzzingserver
 	podman run -it --rm --detach \
 		--volume "${PWD}/client:/config" \
-		--volume "${PWD}/client/reports:/reports" \
+		--volume "${PWD}/client/testdata:/reports" \
 		--publish 9001:9001 \
 		--publish 8080:8080 \
 		--name fuzzingserver \

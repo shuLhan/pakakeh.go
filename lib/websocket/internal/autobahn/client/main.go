@@ -66,7 +66,7 @@ func clientTestCase(testnum int) {
 
 func clientUpdateReports() {
 	var cl = &websocket.Client{
-		Endpoint: fmt.Sprintf(`ws://0.0.0.0:9001/updateReports?agent=libwebsocket`),
+		Endpoint: `ws://0.0.0.0:9001/updateReports?agent=libwebsocket`,
 	}
 
 	var err = cl.Connect()
