@@ -57,7 +57,7 @@ func testHandleText(conn int, payload []byte) {
 		err    error
 	)
 
-	err = Send(conn, packet)
+	err = Send(conn, packet, 1*time.Second)
 	if err != nil {
 		log.Println("handlePayloadText: " + err.Error())
 	}
@@ -70,7 +70,7 @@ func testHandleBin(conn int, payload []byte) {
 		err    error
 	)
 
-	err = Send(conn, packet)
+	err = Send(conn, packet, 1*time.Second)
 	if err != nil {
 		log.Println("handlePayloadBin: " + err.Error())
 	}

@@ -6,12 +6,15 @@ package websocket
 
 import (
 	"path"
+	"time"
 )
 
 const (
 	defServerAddress     = ":80"
 	defServerConnectPath = "/"
 	defServerStatusPath  = "/status"
+
+	defServerReadWriteTimeout = 30 * time.Second
 )
 
 // ServerOptions contain options to configure the WebSocket server.
@@ -60,6 +63,12 @@ type ServerOptions struct {
 	// Default to ConnectPath +"/status" if its empty.
 	// The StatusPath is handled by HandleStatus callback in the server.
 	StatusPath string
+
+	// ReadWriteTimeout define the maximum duration the server wait for
+	// receiving/sending packet from/to client before considering the
+	// connection as broken.
+	// Default to 30 seconds.
+	ReadWriteTimeout time.Duration
 }
 
 func (opts *ServerOptions) init() {
@@ -71,5 +80,8 @@ func (opts *ServerOptions) init() {
 	}
 	if len(opts.StatusPath) == 0 {
 		opts.StatusPath = path.Join(opts.ConnectPath, defServerStatusPath)
+	}
+	if opts.ReadWriteTimeout <= 0 {
+		opts.ReadWriteTimeout = defServerReadWriteTimeout
 	}
 }

@@ -175,7 +175,7 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 		err error
 	)
 
-	err = Send(conn, []byte(rspBody))
+	err = Send(conn, []byte(rspBody), serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handleError: " + err.Error())
 	}
@@ -263,7 +263,7 @@ func (serv *Server) upgrader() {
 	)
 
 	for conn = range serv.chUpgrade {
-		packet, err = Recv(conn)
+		packet, err = Recv(conn, serv.Options.ReadWriteTimeout)
 		if err != nil {
 			log.Println("websocket: server.upgrader: " + err.Error())
 			unix.Close(conn)
@@ -299,7 +299,7 @@ func (serv *Server) upgrader() {
 
 		httpRes = _resUpgradeOK + wsAccept + "\r\n\r\n"
 
-		err = Send(conn, []byte(httpRes))
+		err = Send(conn, []byte(httpRes), serv.Options.ReadWriteTimeout)
 		if err != nil {
 			log.Println("websocket: server.upgrader: Send: ",
 				err.Error())
@@ -525,7 +525,7 @@ func (serv *Server) handleStatus(conn int) {
 		err error
 	)
 
-	err = Send(conn, []byte(res))
+	err = Send(conn, []byte(res), serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket /health: Send: ", err.Error())
 	}
@@ -584,7 +584,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 		err    error
 	)
 
-	err = Send(conn, packet)
+	err = Send(conn, packet, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handleClose: Send: " + err.Error())
 	}
@@ -599,12 +599,12 @@ func (serv *Server) handleBadRequest(conn int) {
 		err        error
 	)
 
-	err = Send(conn, frameClose)
+	err = Send(conn, frameClose, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handleBadRequest: " + err.Error())
 	}
 
-	_, err = Recv(conn)
+	_, err = Recv(conn, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handleBadRequest: " + err.Error())
 	}
@@ -619,12 +619,12 @@ func (serv *Server) handleInvalidData(conn int) {
 		err        error
 	)
 
-	err = Send(conn, frameClose)
+	err = Send(conn, frameClose, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handleInvalidData: " + err.Error())
 	}
 
-	_, err = Recv(conn)
+	_, err = Recv(conn, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handleInvalidData: " + err.Error())
 	}
@@ -649,7 +649,7 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 		err error
 	)
 
-	err = Send(conn, res)
+	err = Send(conn, res, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.handlePing: " + err.Error())
 		serv.ClientRemove(conn)
@@ -689,7 +689,7 @@ func (serv *Server) reader() {
 		for x = 0; x < len(fds); x++ {
 			conn = fds[x]
 
-			packet, err = Recv(conn)
+			packet, err = Recv(conn, serv.Options.ReadWriteTimeout)
 			if err != nil || len(packet) == 0 {
 				serv.ClientRemove(conn)
 				continue
@@ -755,7 +755,7 @@ func (serv *Server) pinger() {
 			all = serv.Clients.All()
 
 			for _, conn = range all {
-				err = Send(conn, framePing)
+				err = Send(conn, framePing, serv.Options.ReadWriteTimeout)
 				if err != nil {
 					// Error on sending PING will be
 					// assumed as bad connection.
@@ -830,7 +830,7 @@ func (serv *Server) sendResponse(conn int, res *Response) (err error) {
 
 	packet = NewFrameText(false, packet)
 
-	err = Send(conn, packet)
+	err = Send(conn, packet, serv.Options.ReadWriteTimeout)
 	if err != nil {
 		log.Println("websocket: server.sendResponse: " + err.Error())
 	}

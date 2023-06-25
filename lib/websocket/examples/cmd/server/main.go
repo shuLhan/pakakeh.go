@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/shuLhan/share/lib/websocket"
 	"github.com/shuLhan/share/lib/websocket/examples"
@@ -90,7 +91,7 @@ func handleClientAdd(ctx context.Context, conn int) {
 		if c == conn {
 			continue
 		}
-		err = websocket.Send(c, packet)
+		err = websocket.Send(c, packet, 1*time.Second)
 		if err != nil {
 			log.Println(err)
 		}
@@ -122,7 +123,7 @@ func handleClientRemove(ctx context.Context, conn int) {
 		if c == conn {
 			continue
 		}
-		err = websocket.Send(c, packet)
+		err = websocket.Send(c, packet, 1*time.Second)
 		if err != nil {
 			log.Println(err)
 		}
@@ -156,7 +157,7 @@ func handlePostMessage(ctx context.Context, req *websocket.Request) (res websock
 		if conn == req.Conn {
 			continue
 		}
-		err = websocket.Send(conn, packet)
+		err = websocket.Send(conn, packet, 1*time.Second)
 		if err != nil {
 			log.Println(err)
 		}

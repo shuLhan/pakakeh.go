@@ -8,8 +8,11 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/binary"
+	"fmt"
 	"math/rand"
+	"os"
 	"syscall"
+	"time"
 
 	"golang.org/x/sys/unix"
 )
@@ -19,31 +22,49 @@ import (
 // This number should be lower than MTU for better handling larger payload.
 const maxBuffer = 1024
 
-// Recv read all content from file descriptor into slice of bytes.
-//
-// On success it will return buffer from pool. Caller must put the buffer back
-// to the pool.
-//
-// On fail it will return nil buffer and error.
-func Recv(fd int) (packet []byte, err error) {
+// Recv read packet from socket fd.
+// The timeout parameter is optional, define the timeout when reading from
+// socket.
+// If timeout is zero the Recv operation will block until a data arrived.
+// If timeout is greater than zero, the Recv operation will return
+// os.ErrDeadlineExceeded when no data received after timeout duration.
+func Recv(fd int, timeout time.Duration) (packet []byte, err error) {
 	var (
-		buf []byte = make([]byte, maxBuffer)
+		logp    = `Recv`
+		buf     = make([]byte, maxBuffer)
+		timeval = unix.Timeval{}
 
 		errno syscall.Errno
 		n     int
 		ok    bool
 	)
 
+	err = unix.SetNonblock(fd, false)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: SetNonblock: %w`, logp, err)
+	}
+
+	if timeout > 0 {
+		timeval.Sec = int64(timeout.Seconds())
+		err = unix.SetsockoptTimeval(fd, unix.SOL_SOCKET, unix.SO_RCVTIMEO, &timeval)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: SetsockoptTimeval: %w`, logp, err)
+		}
+	}
+
 	for {
 		n, err = unix.Read(fd, buf)
 		if err != nil {
 			errno, ok = err.(unix.Errno)
 			if ok {
-				if errno == unix.EAGAIN || errno == unix.EINTR {
+				if errno == unix.EINTR {
 					continue
 				}
+				if errno == unix.EAGAIN || errno == unix.EWOULDBLOCK {
+					return nil, fmt.Errorf(`%s: %w`, logp, os.ErrDeadlineExceeded)
+				}
 			}
-			break
+			return nil, fmt.Errorf(`%s: Read: %w`, logp, err)
 		}
 		if n > 0 {
 			packet = append(packet, buf[:n]...)
@@ -53,17 +74,38 @@ func Recv(fd int) (packet []byte, err error) {
 		}
 	}
 
-	return packet, err
+	return packet, nil
 }
 
-// Send the packet through web socket file descriptor `fd`.
-func Send(fd int, packet []byte) (err error) {
+// Send the packet through socket file descriptor fd.
+// The timeout parameter is optional, its define the maximum duration when
+// socket write should wait before considered fail.
+// If timeout is zero, Send will block until buffer is available.
+// If timeout is greater than zero, and Send has wait for this duration for
+// buffer available then it will return os.ErrDeadlineExceeded.
+func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 	var (
+		logp    = `Send`
+		timeval = unix.Timeval{}
+
 		errno syscall.Errno
 		max   int
 		n     int
 		ok    bool
 	)
+
+	err = unix.SetNonblock(fd, false)
+	if err != nil {
+		return fmt.Errorf(`%s: SetNonblock: %w`, logp, err)
+	}
+
+	if timeout > 0 {
+		timeval.Sec = int64(timeout.Seconds())
+		err = unix.SetsockoptTimeval(fd, unix.SOL_SOCKET, unix.SO_SNDTIMEO, &timeval)
+		if err != nil {
+			return fmt.Errorf(`%s: SetsockoptTimeval: %w`, logp, err)
+		}
+	}
 
 	for len(packet) > 0 {
 		if len(packet) < maxBuffer {
@@ -76,11 +118,14 @@ func Send(fd int, packet []byte) (err error) {
 		if err != nil {
 			errno, ok = err.(unix.Errno)
 			if ok {
-				if errno == unix.EAGAIN {
+				if errno == unix.EINTR {
 					continue
 				}
+				if errno == unix.EAGAIN || errno == unix.EWOULDBLOCK {
+					return fmt.Errorf(`%s: %w`, logp, os.ErrDeadlineExceeded)
+				}
 			}
-			return err
+			return fmt.Errorf(`%s: Write: %w`, logp, err)
 		}
 
 		if n > 0 {
@@ -88,7 +133,7 @@ func Send(fd int, packet []byte) (err error) {
 		}
 	}
 
-	return err
+	return nil
 }
 
 // generateHandshakeAccept generate server accept key by concatenating key,

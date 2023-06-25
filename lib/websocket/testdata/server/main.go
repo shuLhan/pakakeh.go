@@ -11,6 +11,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/shuLhan/share/lib/websocket"
 )
@@ -22,6 +23,8 @@ const (
 // handleBin from websocket by echo-ing back the payload.
 func main() {
 	var (
+		timeout = 30 * time.Second
+
 		srv *websocket.Server
 		err error
 	)
@@ -40,29 +43,42 @@ func main() {
 		Address: `0.0.0.0:9001`,
 		HandleBin: func(conn int, payload []byte) {
 			var (
-				packet []byte = websocket.NewFrameBin(false, payload)
-				err    error
+				timeStart        = time.Now()
+				packet    []byte = websocket.NewFrameBin(false, payload)
+				err       error
 			)
 
-			err = websocket.Send(conn, packet)
+			err = websocket.Send(conn, packet, timeout)
 			if err != nil {
 				log.Println("handleBin: " + err.Error())
+			}
+
+			var elapsed = time.Now().Sub(timeStart)
+			if elapsed >= timeout {
+				log.Printf(`HandleBin: %s`, elapsed)
 			}
 		},
 
 		HandleText: func(conn int, payload []byte) {
 			var (
-				packet []byte = websocket.NewFrameText(false, payload)
-				err    error
+				timeStart        = time.Now()
+				packet    []byte = websocket.NewFrameText(false, payload)
+				err       error
 			)
-			err = websocket.Send(conn, packet)
+
+			err = websocket.Send(conn, packet, timeout)
 			if err != nil {
 				log.Println("handleText: " + err.Error())
 			}
 
+			var elapsed = time.Now().Sub(timeStart)
+			if elapsed >= timeout {
+				log.Printf(`HandleText: %s`, elapsed)
+			}
+
 			if bytes.Equal(payload, []byte(cmdShutdown)) {
 				log.Println(`Shutting down server...`)
-				srv.Stop()
+				os.Exit(0)
 			}
 		},
 	}
