@@ -9,6 +9,7 @@ package net
 
 import (
 	"fmt"
+	"log"
 
 	"golang.org/x/sys/unix"
 )
@@ -60,7 +61,10 @@ func (poll *kqueue) RegisterRead(fd int) (err error) {
 }
 
 func (poll *kqueue) ReregisterRead(idx, fd int) {
-	// no-op
+	var err = unix.SetNonblock(fd, true)
+	if err != nil {
+		log.Printf(`ReregisterRead: %s`, err)
+	}
 }
 
 func (poll *kqueue) UnregisterRead(fd int) (err error) {
