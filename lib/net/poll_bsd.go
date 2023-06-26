@@ -60,6 +60,18 @@ func (poll *kqueue) RegisterRead(fd int) (err error) {
 	return nil
 }
 
+func (poll *kqueue) ReregisterEvent(event PollEvent) (err error) {
+	var (
+		logp = `ReregisterEvent`
+		fd   = int(event.Descriptor())
+	)
+	err = unix.SetNonblock(fd, true)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+	return nil
+}
+
 func (poll *kqueue) ReregisterRead(idx, fd int) {
 	var err = unix.SetNonblock(fd, true)
 	if err != nil {
@@ -85,9 +97,17 @@ func (poll *kqueue) UnregisterRead(fd int) (err error) {
 }
 
 func (poll *kqueue) WaitRead() (fds []int, err error) {
-	n, err := unix.Kevent(poll.read, nil, poll.events[:], nil)
-	if err != nil {
-		return nil, fmt.Errorf("kqueue.WaitRead: %s", err.Error())
+	var (
+		n int
+	)
+	for n == 0 {
+		n, err = unix.Kevent(poll.read, nil, poll.events[:], nil)
+		if err != nil {
+			if err == unix.EINTR {
+				continue
+			}
+			return nil, fmt.Errorf("kqueue.WaitRead: %s", err.Error())
+		}
 	}
 
 	for x := 0; x < n; x++ {
@@ -97,4 +117,34 @@ func (poll *kqueue) WaitRead() (fds []int, err error) {
 	}
 
 	return fds, nil
+}
+
+func (poll *kqueue) WaitReadEvents() (events []PollEvent, err error) {
+	var (
+		logp = `WaitReadEvents`
+
+		n int
+		x int
+	)
+
+	for n == 0 {
+		n, err = unix.Kevent(poll.read, nil, poll.events[:], nil)
+		if err != nil {
+			if err == unix.EINTR {
+				continue
+			}
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+
+	for x = 0; x < n; x++ {
+		if poll.events[x].Filter == unix.EVFILT_READ {
+			events = append(events, &pollEvent{
+				fd:    poll.events[x].Ident,
+				event: poll.events[x],
+			})
+		}
+	}
+
+	return events, nil
 }
