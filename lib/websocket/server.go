@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"sync/atomic"
 	"time"
 	"unicode/utf8"
 
@@ -63,6 +64,8 @@ type Server struct {
 
 	sock int
 
+	numGoUpgrade atomic.Int32
+
 	allowRsv1 bool
 	allowRsv2 bool
 	allowRsv3 bool
@@ -75,10 +78,11 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 	}
 
 	serv = &Server{
-		Options: opts,
-		Clients: newClientManager(),
-		routes:  newRootRoute(),
-		running: make(chan struct{}, 1),
+		Options:   opts,
+		Clients:   newClientManager(),
+		routes:    newRootRoute(),
+		chUpgrade: make(chan int),
+		running:   make(chan struct{}, 1),
 	}
 
 	opts.init()
@@ -252,6 +256,8 @@ func (serv *Server) ClientRemove(conn int) {
 
 func (serv *Server) upgrader() {
 	var (
+		logp = `upgrader`
+
 		ctx      context.Context
 		hs       *Handshake
 		httpRes  string
@@ -265,7 +271,7 @@ func (serv *Server) upgrader() {
 	for conn = range serv.chUpgrade {
 		packet, err = Recv(conn, serv.Options.ReadWriteTimeout)
 		if err != nil {
-			log.Println("websocket: server.upgrader: " + err.Error())
+			log.Printf(`%s: %s`, logp, err)
 			unix.Close(conn)
 			continue
 		}
@@ -301,8 +307,7 @@ func (serv *Server) upgrader() {
 
 		err = Send(conn, []byte(httpRes), serv.Options.ReadWriteTimeout)
 		if err != nil {
-			log.Println("websocket: server.upgrader: Send: ",
-				err.Error())
+			log.Printf(`%s: %s`, logp, err)
 			unix.Close(conn)
 			continue
 		}
@@ -313,8 +318,7 @@ func (serv *Server) upgrader() {
 
 		err = serv.clientAdd(ctx, conn)
 		if err != nil {
-			log.Println("websocket: server.upgrader: clientAdd: ",
-				err.Error())
+			log.Printf(`%s: %s`, logp, err)
 			unix.Close(conn)
 		}
 	}
@@ -775,8 +779,8 @@ func (serv *Server) Start() (err error) {
 		return
 	}
 
-	serv.chUpgrade = make(chan int, _maxQueue)
 	go serv.upgrader()
+	serv.numGoUpgrade.Add(1)
 
 	serv.poll, err = libnet.NewPoll()
 	if err != nil {
@@ -786,7 +790,10 @@ func (serv *Server) Start() (err error) {
 	go serv.reader()
 	go serv.pinger()
 
-	var conn int
+	var (
+		conn        int
+		numUpgrader int32
+	)
 	for {
 		conn, _, err = unix.Accept(serv.sock)
 		if err != nil {
@@ -798,8 +805,40 @@ func (serv *Server) Start() (err error) {
 			return
 		}
 
-		serv.chUpgrade <- conn
+		select {
+		case serv.chUpgrade <- conn:
+		default:
+			numUpgrader = serv.numGoUpgrade.Load()
+			if numUpgrader < serv.Options.maxGoroutineUpgrader {
+				go serv.upgrader()
+				serv.numGoUpgrade.Add(1)
+				serv.chUpgrade <- conn
+			} else {
+				go serv.delayUpgrade(conn)
+			}
+		}
 	}
+}
+
+// delayUpgrade the maximum goroutine for upgrader has reached, we wait for
+// 300 milliseconds and try to push to upgrade queue again until total wait is
+// greater than ReadWriteTimeout.
+// If its still full, close the connection.
+func (serv *Server) delayUpgrade(conn int) {
+	var (
+		delay = 300 * time.Millisecond
+		total time.Duration
+	)
+	for total < serv.Options.ReadWriteTimeout {
+		time.Sleep(delay)
+		select {
+		case serv.chUpgrade <- conn:
+			return
+		default:
+			total += delay
+		}
+	}
+	unix.Close(conn)
 }
 
 // Stop the server.

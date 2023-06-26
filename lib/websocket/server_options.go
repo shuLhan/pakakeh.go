@@ -14,7 +14,8 @@ const (
 	defServerConnectPath = "/"
 	defServerStatusPath  = "/status"
 
-	defServerReadWriteTimeout = 30 * time.Second
+	defServerReadWriteTimeout           = 30 * time.Second
+	defServerMaxGoroutineUpgrader int32 = 128
 )
 
 // ServerOptions contain options to configure the WebSocket server.
@@ -69,6 +70,13 @@ type ServerOptions struct {
 	// connection as broken.
 	// Default to 30 seconds.
 	ReadWriteTimeout time.Duration
+
+	// maxGoroutineUpgrader define maximum goroutines running at the same
+	// time to handle client upgrade.
+	// The new goroutine only dispatched when others are full, so it will
+	// run incrementally not all at once.
+	// Default to defServerMaxGoroutineUpgrader if its not set.
+	maxGoroutineUpgrader int32
 }
 
 func (opts *ServerOptions) init() {
@@ -83,5 +91,8 @@ func (opts *ServerOptions) init() {
 	}
 	if opts.ReadWriteTimeout <= 0 {
 		opts.ReadWriteTimeout = defServerReadWriteTimeout
+	}
+	if opts.maxGoroutineUpgrader <= 0 {
+		opts.maxGoroutineUpgrader = defServerMaxGoroutineUpgrader
 	}
 }

@@ -7,6 +7,7 @@ package websocket
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"testing"
@@ -282,4 +283,51 @@ func TestServer_Health(t *testing.T) {
 	}
 
 	test.Assert(t, "/status response code", http.StatusOK, res.StatusCode)
+}
+
+// TestServer_upgrader test to make sure that server upgrade does not block
+// other requests.
+func TestServer_upgrader_nonblocking(t *testing.T) {
+	var (
+		err error
+	)
+
+	// Open new connection that does not send anything, that will trigger
+	// the server Accept and continue to Recv.
+	_, err = net.Dial(`tcp`, _testAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create new client that send text.
+	// The client should able to receive response without waiting the
+	// above connection for timeout.
+	var (
+		qtext = make(chan []byte, 1)
+		cl    = &Client{
+			Endpoint: _testEndpointAuth,
+			HandleText: func(cl *Client, frame *Frame) (err error) {
+				qtext <- frame.Payload()
+				return nil
+			},
+		}
+	)
+
+	err = cl.Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		msg = []byte(`hello world`)
+		got []byte
+	)
+
+	err = cl.SendText(msg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got = <-qtext
+	test.Assert(t, `SendText`, msg, got)
 }
