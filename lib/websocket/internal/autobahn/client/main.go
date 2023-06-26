@@ -9,8 +9,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/shuLhan/share/lib/websocket"
+	"github.com/shuLhan/share/lib/websocket/internal/autobahn"
 )
 
 func main() {
@@ -23,6 +25,8 @@ func main() {
 	}
 
 	clientUpdateReports()
+	time.Sleep(1 * time.Second)
+	autobahn.PrintReports(`./client/testdata/index.json`)
 }
 
 func clientTestCase(testnum int) {

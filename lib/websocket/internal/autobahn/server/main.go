@@ -11,13 +11,16 @@ import (
 	"flag"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/shuLhan/share/lib/websocket"
+	"github.com/shuLhan/share/lib/websocket/internal/autobahn"
 )
 
 const (
-	cmdShutdown = `shutdown`
+	cmdPrintReports = `print-reports`
+	cmdShutdown     = `shutdown`
 )
 
 // handleBin from websocket by echo-ing back the payload.
@@ -31,9 +34,13 @@ func main() {
 
 	flag.Parse()
 
-	var cmd = flag.Arg(0)
-	if cmd == cmdShutdown {
+	var cmd = strings.ToLower(flag.Arg(0))
+	switch cmd {
+	case cmdShutdown:
 		doShutdown()
+		return
+	case cmdPrintReports:
+		autobahn.PrintReports(`./server/testdata/index.json`)
 		return
 	}
 

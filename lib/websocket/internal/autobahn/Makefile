@@ -18,7 +18,7 @@ run-test-server:
 .PHONY: test-server
 test-server: run-test-server run-autobahn-client
 	go run ./server shutdown
-	go run ./server reports
+	go run ./server print-reports
 
 ##
 ## Run autobahn server to test our client in the background.
