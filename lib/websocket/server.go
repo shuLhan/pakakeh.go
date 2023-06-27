@@ -53,6 +53,7 @@ type Server struct {
 	Options *ServerOptions
 
 	chUpgrade chan int
+	qreader   chan int
 	running   chan struct{}
 
 	routes *rootRoute
@@ -65,6 +66,7 @@ type Server struct {
 	sock int
 
 	numGoUpgrade atomic.Int32
+	numGoReader  atomic.Int32
 
 	allowRsv1 bool
 	allowRsv2 bool
@@ -82,6 +84,7 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 		Clients:   newClientManager(),
 		routes:    newRootRoute(),
 		chUpgrade: make(chan int),
+		qreader:   make(chan int),
 		running:   make(chan struct{}, 1),
 	}
 
@@ -231,8 +234,9 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 // ClientRemove remove client connection from server.
 func (serv *Server) ClientRemove(conn int) {
 	var (
-		ctx context.Context
-		err error
+		logp = `ClientRemove`
+		ctx  context.Context
+		err  error
 	)
 
 	ctx, _ = serv.Clients.Context(conn)
@@ -243,14 +247,9 @@ func (serv *Server) ClientRemove(conn int) {
 
 	serv.Clients.remove(conn)
 
-	err = serv.poll.UnregisterRead(conn)
-	if err != nil {
-		log.Println("websocket: server.ClientRemove: " + err.Error())
-	}
-
 	err = unix.Close(conn)
 	if err != nil {
-		log.Println("websocket: server.ClientRemove: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
 	}
 }
 
@@ -661,7 +660,8 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	}
 }
 
-// reader read request from client.
+// pollReader fetch client connections that are have request from poll and
+// push it to queue to be processed by on of goroutine reader.
 //
 // To avoid confusing network intermediaries (such as intercepting proxies)
 // and for security reasons that are further discussed in Section 10.3, a
@@ -671,80 +671,141 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 // connection upon receiving a frame that is not masked.  In this case, a
 // server MAY send a Close frame with a status code of 1002 (protocol error)
 // as defined in Section 7.4.1. (RFC 6455, section 5.1, P27).
-func (serv *Server) reader() {
+func (serv *Server) pollReader() {
 	var (
-		frames    *Frames
-		frame     *Frame
+		listConn  []int
 		err       error
-		packet    []byte
-		fds       []int
+		numReader int32
 		conn      int
-		x         int
-		isClosing bool
 	)
 
 	for {
-		fds, err = serv.poll.WaitRead()
+		listConn, err = serv.poll.WaitRead()
 		if err != nil {
 			log.Println("websocket: Server.reader: " + err.Error())
 			break
 		}
 
-		for x = 0; x < len(fds); x++ {
-			conn = fds[x]
-
-			packet, err = Recv(conn, serv.Options.ReadWriteTimeout)
-			if err != nil || len(packet) == 0 {
-				serv.ClientRemove(conn)
-				continue
-			}
-
-			// Handle chopped, unfinished packet or payload.
-			frame, _ = serv.Clients.getFrame(conn)
-			if frame != nil {
-				packet = frame.unpack(packet)
-				if frame.isComplete {
-					serv.Clients.setFrame(conn, nil)
-					isClosing = serv.handleFrame(conn, frame)
-					if isClosing {
-						continue
-					}
+		for _, conn = range listConn {
+			select {
+			case serv.qreader <- conn:
+			default:
+				numReader = serv.numGoReader.Load()
+				if numReader < serv.Options.maxGoroutineReader {
+					go serv.reader()
+					serv.numGoReader.Add(1)
+					serv.qreader <- conn
+				} else {
+					go serv.delayReader(conn)
 				}
-				if len(packet) == 0 {
-					serv.poll.ReregisterRead(x, conn)
-					continue
-				}
-			}
-
-			frames = Unpack(packet)
-			if frames == nil {
-				serv.ClientRemove(conn)
-				continue
-			}
-
-			var isClosing bool
-			for _, frame = range frames.v {
-				if !frame.isComplete {
-					serv.Clients.setFrame(conn, frame)
-					continue
-				}
-
-				isClosing = serv.handleFrame(conn, frame)
-				if isClosing {
-					break
-				}
-			}
-			if !isClosing {
-				serv.poll.ReregisterRead(x, conn)
 			}
 		}
 	}
+}
+
+// reader goroutine that consume channel that are ready to be read.
+func (serv *Server) reader() {
+	var (
+		logp      = `reader`
+		frames    *Frames
+		frame     *Frame
+		err       error
+		packet    []byte
+		conn      int
+		isClosing bool
+	)
+
+	for conn = range serv.qreader {
+		packet, err = Recv(conn, serv.Options.ReadWriteTimeout)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			serv.ClientRemove(conn)
+			continue
+		}
+		if len(packet) == 0 {
+			log.Printf(`%s: empty packet`, logp)
+			serv.ClientRemove(conn)
+			continue
+		}
+
+		// Handle chopped, unfinished packet or payload.
+		frame, _ = serv.Clients.getFrame(conn)
+		if frame != nil {
+			packet = frame.unpack(packet)
+			if frame.isComplete {
+				serv.Clients.setFrame(conn, nil)
+				isClosing = serv.handleFrame(conn, frame)
+				if isClosing {
+					continue
+				}
+			}
+			if len(packet) == 0 {
+				err = serv.poll.RegisterRead(conn)
+				if err != nil {
+					log.Printf(`%s: %s`, logp, err)
+					serv.ClientRemove(conn)
+				}
+				continue
+			}
+		}
+
+		frames = Unpack(packet)
+		if frames == nil {
+			log.Printf(`%s: empty frames`, logp)
+			serv.ClientRemove(conn)
+			continue
+		}
+
+		var isClosing bool
+		for _, frame = range frames.v {
+			if !frame.isComplete {
+				serv.Clients.setFrame(conn, frame)
+				continue
+			}
+
+			isClosing = serv.handleFrame(conn, frame)
+			if isClosing {
+				break
+			}
+		}
+		if !isClosing {
+			err = serv.poll.RegisterRead(conn)
+			if err != nil {
+				log.Printf(`%s: %s`, logp, err)
+				serv.ClientRemove(conn)
+			}
+		}
+	}
+}
+
+// delayReader wait for 300 millisecond until one of the reader can consume
+// the queue.
+// If total wait greater than ReadWriteTimeout, close the connection.
+func (serv *Server) delayReader(conn int) {
+	var (
+		delay = 300 * time.Millisecond
+		total time.Duration
+	)
+	for total < serv.Options.ReadWriteTimeout {
+		time.Sleep(delay)
+		select {
+		case serv.qreader <- conn:
+			return
+		default:
+			total += delay
+		}
+	}
+	var req = Frame{
+		closeCode: StatusInternalError,
+	}
+	serv.handleClose(conn, &req)
 }
 
 // pinger is a routine that send control PING frame to all client connections
 // every N seconds.
 func (serv *Server) pinger() {
 	var (
+		logp                    = `pinger`
 		pingTicker *time.Ticker = time.NewTicker(16 * time.Second)
 		framePing  []byte       = NewFramePing(false, nil)
 
@@ -787,7 +848,10 @@ func (serv *Server) Start() (err error) {
 		return
 	}
 
+	go serv.pollReader()
 	go serv.reader()
+	serv.numGoReader.Add(1)
+
 	go serv.pinger()
 
 	var (

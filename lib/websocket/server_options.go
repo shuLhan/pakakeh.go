@@ -15,6 +15,7 @@ const (
 	defServerStatusPath  = "/status"
 
 	defServerReadWriteTimeout           = 30 * time.Second
+	defServerMaxGoroutineReader         = 1024
 	defServerMaxGoroutineUpgrader int32 = 128
 )
 
@@ -71,6 +72,8 @@ type ServerOptions struct {
 	// Default to 30 seconds.
 	ReadWriteTimeout time.Duration
 
+	maxGoroutineReader int32
+
 	// maxGoroutineUpgrader define maximum goroutines running at the same
 	// time to handle client upgrade.
 	// The new goroutine only dispatched when others are full, so it will
@@ -91,6 +94,9 @@ func (opts *ServerOptions) init() {
 	}
 	if opts.ReadWriteTimeout <= 0 {
 		opts.ReadWriteTimeout = defServerReadWriteTimeout
+	}
+	if opts.maxGoroutineReader <= 0 {
+		opts.maxGoroutineReader = defServerMaxGoroutineReader
 	}
 	if opts.maxGoroutineUpgrader <= 0 {
 		opts.maxGoroutineUpgrader = defServerMaxGoroutineUpgrader
