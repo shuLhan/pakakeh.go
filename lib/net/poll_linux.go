@@ -57,56 +57,6 @@ func (poll *epoll) RegisterRead(fd int) (err error) {
 	return nil
 }
 
-func (poll *epoll) ReregisterEvent(event PollEvent) (err error) {
-	var (
-		logp = `ReregisterEvent`
-		fd   = int(event.Descriptor())
-		obj  = event.Event()
-
-		epollEvent unix.EpollEvent
-		ok         bool
-	)
-
-	epollEvent, ok = obj.(unix.EpollEvent)
-	if !ok {
-		return fmt.Errorf(`%s: expecting unix.EpollEvent, got %T`, logp, obj)
-	}
-
-	epollEvent.Events = unix.EPOLLIN | unix.EPOLLONESHOT
-
-	err = unix.SetNonblock(fd, true)
-	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	err = unix.EpollCtl(poll.read, unix.EPOLL_CTL_MOD, fd, &epollEvent)
-	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	return nil
-}
-
-func (poll *epoll) ReregisterRead(idx, fd int) {
-	var err error
-
-	poll.events[idx].Events = unix.EPOLLIN | unix.EPOLLONESHOT
-
-	err = unix.SetNonblock(fd, true)
-	if err != nil {
-		log.Printf("epoll.ReregisterRead: %s", err.Error())
-	}
-
-	err = unix.EpollCtl(poll.read, unix.EPOLL_CTL_MOD, fd, &poll.events[idx])
-	if err != nil {
-		log.Println("epoll.RegisterRead: unix.EpollCtl: " + err.Error())
-		err = poll.UnregisterRead(fd)
-		if err != nil {
-			log.Println("epoll.RegisterRead: " + err.Error())
-		}
-	}
-}
-
 func (poll *epoll) UnregisterRead(fd int) (err error) {
 	err = unix.EpollCtl(poll.read, unix.EPOLL_CTL_DEL, fd, nil)
 	if err != nil {
@@ -117,20 +67,40 @@ func (poll *epoll) UnregisterRead(fd int) (err error) {
 }
 
 func (poll *epoll) WaitRead() (fds []int, err error) {
-	var n int
+	var (
+		logp = `WaitRead`
+
+		n  int
+		x  int
+		fd int
+	)
 	for {
 		n, err = unix.EpollWait(poll.read, poll.events[:], -1)
 		if err != nil {
 			if err == unix.EINTR {
 				continue
 			}
-			return nil, fmt.Errorf("epoll.WaitRead: %s", err.Error())
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 		break
 	}
 
-	for x := 0; x < n; x++ {
-		fds = append(fds, int(poll.events[x].Fd))
+	for x = 0; x < n; x++ {
+		fd = int(poll.events[x].Fd)
+
+		err = poll.UnregisterRead(fd)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		err = unix.SetNonblock(fd, false)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		fds = append(fds, fd)
 	}
 
 	return fds, nil
@@ -140,8 +110,9 @@ func (poll *epoll) WaitReadEvents() (events []PollEvent, err error) {
 	var (
 		logp = `WaitReadEvents`
 
-		n int
-		x int
+		n  int
+		x  int
+		fd int
 	)
 
 	for n == 0 {
@@ -156,10 +127,25 @@ func (poll *epoll) WaitReadEvents() (events []PollEvent, err error) {
 	}
 
 	for x = 0; x < n; x++ {
-		events = append(events, &pollEvent{
+		fd = int(poll.events[x].Fd)
+
+		err = poll.UnregisterRead(fd)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		err = unix.SetNonblock(fd, false)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		var event = &pollEvent{
 			fd:    poll.events[x].Fd,
 			event: poll.events[x],
-		})
+		}
+		events = append(events, event)
 	}
 
 	return events, nil

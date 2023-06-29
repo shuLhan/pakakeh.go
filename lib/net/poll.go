@@ -20,27 +20,18 @@ type Poll interface {
 	// RegisterRead add the file descriptor to read poll.
 	RegisterRead(fd int) (err error)
 
-	// ReregisterEvent register the event back.
-	// This method must be called back after calling WaitReadEvent when
-	// PollEvent descriptor still being used.
-	ReregisterEvent(pe PollEvent) error
-
-	// ReregisterRead register the file descriptor back to events.
-	// This method must be called back after calling WaitRead when fd
-	// still being used.
-	//
-	// See https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
-	ReregisterRead(idx, fd int)
-
 	// UnregisterRead remove file descriptor from the poll.
 	UnregisterRead(fd int) (err error)
 
-	// WaitRead wait for read event received and return list of file
-	// descriptor that are ready for reading.
+	// WaitRead wait and return list of file descriptor (fd) that are
+	// ready for reading from the pool.
+	// The returned fd is detached from poll to allow concurrent
+	// processing of fd at the same time.
+	// Once the data has been read from the fd and its still need to be
+	// used, one need to put it back to poll using RegisterRead.
 	WaitRead() (fds []int, err error)
 
-	// WaitReadEvents wait for read event received and return list of
-	// PollEvent that contains the file descriptor and the underlying
-	// OS specific event state.
+	// WaitReadEvents wait and return list of PollEvent that contains the
+	// file descriptor and the underlying OS specific event state.
 	WaitReadEvents() (events []PollEvent, err error)
 }

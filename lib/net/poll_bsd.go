@@ -60,25 +60,6 @@ func (poll *kqueue) RegisterRead(fd int) (err error) {
 	return nil
 }
 
-func (poll *kqueue) ReregisterEvent(event PollEvent) (err error) {
-	var (
-		logp = `ReregisterEvent`
-		fd   = int(event.Descriptor())
-	)
-	err = unix.SetNonblock(fd, true)
-	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-	return nil
-}
-
-func (poll *kqueue) ReregisterRead(idx, fd int) {
-	var err = unix.SetNonblock(fd, true)
-	if err != nil {
-		log.Printf(`ReregisterRead: %s`, err)
-	}
-}
-
 func (poll *kqueue) UnregisterRead(fd int) (err error) {
 	kevent := unix.Kevent_t{}
 
@@ -98,7 +79,11 @@ func (poll *kqueue) UnregisterRead(fd int) (err error) {
 
 func (poll *kqueue) WaitRead() (fds []int, err error) {
 	var (
-		n int
+		logp = `WaitRead`
+
+		n  int
+		x  int
+		fd int
 	)
 	for n == 0 {
 		n, err = unix.Kevent(poll.read, nil, poll.events[:], nil)
@@ -110,10 +95,26 @@ func (poll *kqueue) WaitRead() (fds []int, err error) {
 		}
 	}
 
-	for x := 0; x < n; x++ {
-		if poll.events[x].Filter == unix.EVFILT_READ {
-			fds = append(fds, int(poll.events[x].Ident))
+	for x = 0; x < n; x++ {
+		if poll.events[x].Filter != unix.EVFILT_READ {
+			continue
 		}
+
+		fd = int(poll.events[x].Ident)
+
+		err = poll.UnregisterRead(fd)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		err = unix.SetNonblock(fd, false)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		fds = append(fds, fd)
 	}
 
 	return fds, nil
@@ -123,8 +124,9 @@ func (poll *kqueue) WaitReadEvents() (events []PollEvent, err error) {
 	var (
 		logp = `WaitReadEvents`
 
-		n int
-		x int
+		n  int
+		x  int
+		fd int
 	)
 
 	for n == 0 {
@@ -138,12 +140,29 @@ func (poll *kqueue) WaitReadEvents() (events []PollEvent, err error) {
 	}
 
 	for x = 0; x < n; x++ {
-		if poll.events[x].Filter == unix.EVFILT_READ {
-			events = append(events, &pollEvent{
-				fd:    poll.events[x].Ident,
-				event: poll.events[x],
-			})
+		if poll.events[x].Filter != unix.EVFILT_READ {
+			continue
 		}
+
+		fd = int(poll.events[x].Ident)
+
+		err = poll.UnregisterRead(fd)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		err = unix.SetNonblock(fd, false)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
+			continue
+		}
+
+		var event = &pollEvent{
+			fd:    poll.events[x].Ident,
+			event: poll.events[x],
+		}
+		events = append(events, event)
 	}
 
 	return events, nil
