@@ -23,16 +23,16 @@ type route struct {
 
 // addChild to route.
 func (r *route) addChild(isParam bool, name string) (c *route, err error) {
+	var logp = `addChild`
+
 	c = r.getChild(isParam, name)
 	if c != nil {
-		return
+		return c, nil
 	}
 	if isParam {
 		c = r.getChildAsParam()
 		if c != nil {
-			err = ErrRouteDupParam
-			c = nil
-			return
+			return nil, fmt.Errorf(`%s: %w`, logp, ErrRouteDupParam)
 		}
 	}
 	c = &route{
@@ -41,7 +41,7 @@ func (r *route) addChild(isParam bool, name string) (c *route, err error) {
 	}
 	r.childs = append(r.childs, c)
 
-	return
+	return c, nil
 }
 
 // getChild of current route which has the same isParam and name value.  It

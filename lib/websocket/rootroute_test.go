@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -21,7 +22,7 @@ func testRouteHandler(t *testing.T, target string) RouteHandler {
 
 func testRootRouteAdd(t *testing.T, defMethod string) {
 	type testCase struct {
-		expErr  error
+		expErr  string
 		exp     *route
 		handler RouteHandler
 		desc    string
@@ -34,13 +35,13 @@ func testRootRouteAdd(t *testing.T, defMethod string) {
 		method:  "PUSH",
 		target:  "/",
 		handler: testRouteHandler(t, "/"),
-		expErr:  ErrRouteInvMethod,
+		expErr:  fmt.Sprintf(`add: %s`, ErrRouteInvMethod),
 	}, {
 		desc:    "Without absolute path",
 		method:  defMethod,
 		target:  ":id/xyz",
 		handler: testRouteHandler(t, ":id/xyz"),
-		expErr:  ErrRouteInvTarget,
+		expErr:  fmt.Sprintf(`add: %s`, ErrRouteInvTarget),
 		exp: &route{
 			name: "/",
 		},
@@ -64,7 +65,7 @@ func testRootRouteAdd(t *testing.T, defMethod string) {
 		desc:    "With duplicate parameter",
 		method:  defMethod,
 		target:  "/:param/abc",
-		expErr:  ErrRouteDupParam,
+		expErr:  fmt.Sprintf(`add: addChild: %s`, ErrRouteDupParam),
 		handler: testRouteHandler(t, "/:id/xyz"),
 		exp: &route{
 			name: "/",
@@ -156,7 +157,7 @@ func testRootRouteAdd(t *testing.T, defMethod string) {
 
 		err = rootRoute.add(c.method, c.target, c.handler)
 		if err != nil {
-			test.Assert(t, "err", c.expErr, err)
+			test.Assert(t, `error`, c.expErr, err.Error())
 		}
 
 		got = rootRoute.getParent(c.method)

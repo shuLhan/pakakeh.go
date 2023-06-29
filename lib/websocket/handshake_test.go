@@ -5,6 +5,7 @@
 package websocket
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -25,19 +26,19 @@ func TestHandshakeParseHTTPLine(t *testing.T) {
 	}, {
 		desc:   "Without HTTP version",
 		req:    "GET /\r\n",
-		expErr: "invalid request path: " + ErrBadRequest.Error(),
+		expErr: fmt.Sprintf(`%s: invalid request path`, ErrBadRequest),
 	}, {
 		desc:   "With invalid HTTP pragma",
 		req:    "GET / HTTPS/1.1\r\n",
-		expErr: "invalid HTTP pragma: HTTPS: " + ErrBadRequest.Error(),
+		expErr: fmt.Sprintf(`%s: invalid HTTP pragma`, ErrBadRequest),
 	}, {
 		desc:   "With invalid HTTP version",
 		req:    "GET / HTTP/1.0\r\n",
-		expErr: ErrInvalidHTTPVersion.Error(),
+		expErr: fmt.Sprintf(`%s`, ErrInvalidHTTPVersion),
 	}, {
 		desc:   "With invalid line",
 		req:    "GET / HTTP/1.1 \r\n",
-		expErr: ErrInvalidHTTPVersion.Error(),
+		expErr: fmt.Sprintf(`%s`, ErrInvalidHTTPVersion),
 	}, {
 		desc:   "With valid line",
 		req:    "GET / HTTP/1.1\r\n",

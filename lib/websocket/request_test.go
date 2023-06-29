@@ -66,7 +66,7 @@ func TestRequestUnpack(t *testing.T) {
 			Method: http.MethodGet,
 			Target: "/get/1?%in=va",
 		},
-		expErr: `websocket: Request.unpack: invalid URL escape "%in"`,
+		expErr: `unpack: invalid URL escape "%in"`,
 
 		// In go version >= 1.20 it will not return an error anymore.
 		// See https://github.com/golang/go/issues/56732

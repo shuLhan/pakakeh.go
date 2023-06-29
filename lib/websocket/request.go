@@ -75,8 +75,10 @@ func (req *Request) reset() {
 
 // unpack the request, parse parameters and query from target.
 func (req *Request) unpack(routes *rootRoute) (handler RouteHandler, err error) {
+	var logp = `unpack`
+
 	if len(req.Target) == 0 {
-		return
+		return nil, nil
 	}
 
 	var pathQuery []string = strings.SplitN(req.Target, pathQuerySep, 2)
@@ -85,16 +87,15 @@ func (req *Request) unpack(routes *rootRoute) (handler RouteHandler, err error) 
 
 	req.Params, handler = routes.get(req.Method, req.Path)
 	if handler == nil {
-		return
+		return nil, nil
 	}
 
 	if len(pathQuery) == 2 {
 		req.Query, err = url.ParseQuery(pathQuery[1])
 		if err != nil {
-			err = fmt.Errorf("websocket: Request.unpack: %s", err.Error())
-			return nil, err
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 
-	return
+	return handler, nil
 }

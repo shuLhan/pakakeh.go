@@ -114,14 +114,16 @@ func (serv *Server) AllowReservedBits(one, two, three bool) {
 }
 
 func (serv *Server) createSockServer() (err error) {
+	var logp = `createSockServer`
+
 	serv.sock, err = unix.Socket(unix.AF_INET, unix.SOCK_STREAM, 0)
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: Socket: %w`, logp, err)
 	}
 
 	err = unix.SetsockoptInt(serv.sock, unix.SOL_SOCKET, unix.SO_REUSEADDR, 1)
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: SetsockoptInt: %w`, logp, err)
 	}
 
 	var (
@@ -132,30 +134,33 @@ func (serv *Server) createSockServer() (err error) {
 
 	host, strPort, err = net.SplitHostPort(serv.Options.Address)
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	addr.Port, err = strconv.Atoi(strPort)
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	copy(addr.Addr[:], net.ParseIP(host).To4())
 
 	err = unix.Bind(serv.sock, &addr)
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: Bind: %w`, logp, err)
 	}
 
 	err = unix.Listen(serv.sock, _maxQueue)
+	if err != nil {
+		return fmt.Errorf(`%s: Listen: %w`, logp, err)
+	}
 
-	return
+	return nil
 }
 
 // RegisterTextHandler register specific function to be called by server when
 // request opcode is text, and method and target matched with Request.
 func (serv *Server) RegisterTextHandler(method, target string, handler RouteHandler) (err error) {
-	var logp string = "RegisterTextHandler"
+	var logp string = `RegisterTextHandler`
 
 	if len(method) == 0 {
 		return fmt.Errorf("%s: empty method", logp)
@@ -177,6 +182,7 @@ func (serv *Server) RegisterTextHandler(method, target string, handler RouteHand
 
 func (serv *Server) handleError(conn int, code int, msg string) {
 	var (
+		logp    = `handleError`
 		rspBody = "HTTP/1.1 " + strconv.Itoa(code) + " " + msg + "\r\n\r\n"
 
 		err error
@@ -184,7 +190,7 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 
 	err = Send(conn, []byte(rspBody), serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handleError: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
 	}
 
 	unix.Close(conn)
@@ -196,28 +202,35 @@ func (serv *Server) handleError(conn int, code int, msg string) {
 //
 // On success it will return the context from authentication and the WebSocket
 // key.
-func (serv *Server) handleUpgrade(hs *Handshake) (
-	ctx context.Context, key []byte, err error,
-) {
+func (serv *Server) handleUpgrade(hs *Handshake) (ctx context.Context, key []byte, err error) {
 	err = hs.parse()
-	if err == nil {
-		key = libbytes.Copy(hs.Key)
-		if serv.Options.HandleAuth != nil {
-			ctx, err = serv.Options.HandleAuth(hs)
-		}
+	if err != nil {
+		goto out
 	}
 
+	key = libbytes.Copy(hs.Key)
+	if serv.Options.HandleAuth != nil {
+		ctx, err = serv.Options.HandleAuth(hs)
+	}
+
+out:
 	hs.reset(nil)
 	_handshakePool.Put(hs)
 
-	return ctx, key, err
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ctx, key, nil
 }
 
 // clientAdd add the new client connection to epoll and to list of clients.
 func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
+	var logp = `clientAdd`
+
 	err = serv.poll.RegisterRead(conn)
 	if err != nil {
-		return fmt.Errorf("websocket: Server.clientAdd: " + err.Error())
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	if ctx != nil {
@@ -235,8 +248,9 @@ func (serv *Server) clientAdd(ctx context.Context, conn int) (err error) {
 func (serv *Server) ClientRemove(conn int) {
 	var (
 		logp = `ClientRemove`
-		ctx  context.Context
-		err  error
+
+		ctx context.Context
+		err error
 	)
 
 	ctx, _ = serv.Clients.Context(conn)
@@ -447,6 +461,8 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 // handleText message from client.
 func (serv *Server) handleText(conn int, payload []byte) {
 	var (
+		logp = `handleText`
+
 		handler RouteHandler
 		err     error
 		ctx     context.Context
@@ -500,6 +516,7 @@ out:
 
 	err = serv.sendResponse(conn, res)
 	if err != nil {
+		log.Printf(`%s: %s`, logp, err)
 		serv.ClientRemove(conn)
 	}
 
@@ -512,6 +529,8 @@ func (serv *Server) handleBin(conn int, payload []byte) {}
 
 func (serv *Server) handleStatus(conn int) {
 	var (
+		logp = `handleStatus`
+
 		contentType string
 		data        []byte
 	)
@@ -530,7 +549,7 @@ func (serv *Server) handleStatus(conn int) {
 
 	err = Send(conn, []byte(res), serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket /health: Send: ", err.Error())
+		log.Printf(`%s: Send: %s`, logp, err)
 	}
 
 	unix.Close(conn)
@@ -538,6 +557,8 @@ func (serv *Server) handleStatus(conn int) {
 
 // handleClose request from client.
 func (serv *Server) handleClose(conn int, req *Frame) {
+	var logp = `handleClose`
+
 	switch {
 	case req.closeCode == 0:
 		req.closeCode = StatusBadRequest
@@ -589,7 +610,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 
 	err = Send(conn, packet, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handleClose: Send: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
 	}
 
 	serv.ClientRemove(conn)
@@ -598,40 +619,46 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 // handleBadRequest by sending Close frame with status.
 func (serv *Server) handleBadRequest(conn int) {
 	var (
+		logp              = `handleBadRequest`
 		frameClose []byte = NewFrameClose(false, StatusBadRequest, nil)
-		err        error
+
+		err error
 	)
 
 	err = Send(conn, frameClose, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handleBadRequest: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
+		goto out
 	}
 
 	_, err = Recv(conn, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handleBadRequest: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
 	}
-
+out:
 	serv.ClientRemove(conn)
 }
 
 // handleInvalidData by sending Close frame with status 1007.
 func (serv *Server) handleInvalidData(conn int) {
 	var (
+		logp              = `handleInvalidData`
 		frameClose []byte = NewFrameClose(false, StatusInvalidData, nil)
-		err        error
+
+		err error
 	)
 
 	err = Send(conn, frameClose, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handleInvalidData: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
+		goto out
 	}
 
 	_, err = Recv(conn, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handleInvalidData: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
 	}
-
+out:
 	serv.ClientRemove(conn)
 }
 
@@ -648,15 +675,16 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	req.masked = 0
 
 	var (
-		res []byte = req.pack()
+		logp        = `handlePing`
+		res  []byte = req.pack()
+
 		err error
 	)
 
 	err = Send(conn, res, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.handlePing: " + err.Error())
+		log.Printf(`%s: %s`, logp, err)
 		serv.ClientRemove(conn)
-		return
 	}
 }
 
@@ -673,6 +701,8 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 // as defined in Section 7.4.1. (RFC 6455, section 5.1, P27).
 func (serv *Server) pollReader() {
 	var (
+		logp = `pollReader`
+
 		listConn  []int
 		err       error
 		numReader int32
@@ -682,7 +712,7 @@ func (serv *Server) pollReader() {
 	for {
 		listConn, err = serv.poll.WaitRead()
 		if err != nil {
-			log.Println("websocket: Server.reader: " + err.Error())
+			log.Printf(`%s: %s`, logp, err)
 			break
 		}
 
@@ -706,7 +736,8 @@ func (serv *Server) pollReader() {
 // reader goroutine that consume channel that are ready to be read.
 func (serv *Server) reader() {
 	var (
-		logp      = `reader`
+		logp = `reader`
+
 		frames    *Frames
 		frame     *Frame
 		err       error
@@ -824,6 +855,7 @@ func (serv *Server) pinger() {
 				if err != nil {
 					// Error on sending PING will be
 					// assumed as bad connection.
+					log.Printf(`%s: %s`, logp, err)
 					serv.ClientRemove(conn)
 				}
 			}
@@ -835,9 +867,11 @@ func (serv *Server) pinger() {
 
 // Start accepting incoming connection from clients.
 func (serv *Server) Start() (err error) {
+	var logp = `Start`
+
 	err = serv.createSockServer()
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	go serv.upgrader()
@@ -845,7 +879,7 @@ func (serv *Server) Start() (err error) {
 
 	serv.poll, err = libnet.NewPoll()
 	if err != nil {
-		return
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	go serv.pollReader()
@@ -862,10 +896,10 @@ func (serv *Server) Start() (err error) {
 		conn, _, err = unix.Accept(serv.sock)
 		if err != nil {
 			if err.Error() == "software caused connection abort" {
-				// Stop has been called
+				// Stop has been called.
 				return nil
 			}
-			log.Println("websocket: unix.Accept: " + err.Error())
+			log.Printf(`%s: %s`, logp, err)
 			return
 		}
 
@@ -907,9 +941,14 @@ func (serv *Server) delayUpgrade(conn int) {
 
 // Stop the server.
 func (serv *Server) Stop() {
-	var err error = unix.Close(serv.sock)
+	var (
+		logp = `Stop`
+		err  error
+	)
+
+	err = unix.Close(serv.sock)
 	if err != nil {
-		log.Println("websocket: Stop: unix.Close: " + err.Error())
+		log.Printf(`%s: Close: %s`, logp, err)
 	}
 
 	serv.running <- struct{}{}
@@ -922,21 +961,22 @@ func (serv *Server) Stop() {
 // sendResponse to client.
 func (serv *Server) sendResponse(conn int, res *Response) (err error) {
 	var (
+		logp = `sendResponse`
+
 		packet []byte
 	)
 
 	packet, err = json.Marshal(res)
 	if err != nil {
-		log.Println("websocket: server.sendResponse: " + err.Error())
-		return
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	packet = NewFrameText(false, packet)
 
 	err = Send(conn, packet, serv.Options.ReadWriteTimeout)
 	if err != nil {
-		log.Println("websocket: server.sendResponse: " + err.Error())
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	return
+	return nil
 }

@@ -151,17 +151,17 @@ func (h *Handshake) parseHTTPLine() (err error) {
 
 	chunk = h.getBytesChunk(' ', false)
 	if len(chunk) == 0 {
-		return fmt.Errorf("empty request path: %w", ErrBadRequest)
+		return fmt.Errorf(`%w: empty request path`, ErrBadRequest)
 	}
 
 	h.URL, err = url.ParseRequestURI(string(chunk))
 	if err != nil {
-		return fmt.Errorf("invalid request path: %w", ErrBadRequest)
+		return fmt.Errorf(`%w: invalid request path`, ErrBadRequest)
 	}
 
 	chunk = h.getBytesChunk('/', false)
 	if !bytes.Equal(chunk, []byte("HTTP")) {
-		return fmt.Errorf("invalid HTTP pragma: %s: %w", chunk, ErrBadRequest)
+		return fmt.Errorf(`%w: invalid HTTP pragma`, ErrBadRequest)
 	}
 
 	chunk = h.getBytesChunk('\n', false)
@@ -174,13 +174,15 @@ func (h *Handshake) parseHTTPLine() (err error) {
 
 // parseHeader of HTTP request.
 func (h *Handshake) parseHeader() (k, v []byte, err error) {
-	var chunk []byte = h.getBytesChunk(':', true)
+	var (
+		chunk []byte = h.getBytesChunk(':', true)
+	)
+
 	if len(chunk) == 0 {
-		return
+		return nil, nil, nil
 	}
 	if h.raw[h.start] != ' ' {
-		err = ErrInvalidHeaderFormat
-		return
+		return nil, nil, ErrInvalidHeaderFormat
 	}
 	h.start++
 
@@ -188,13 +190,12 @@ func (h *Handshake) parseHeader() (k, v []byte, err error) {
 
 	chunk = h.getBytesChunk('\n', false)
 	if len(chunk) == 0 {
-		err = ErrInvalidHeaderFormat
-		return
+		return nil, nil, ErrInvalidHeaderFormat
 	}
 
 	v = chunk
 
-	return
+	return k, v, nil
 }
 
 func (h *Handshake) headerValueContains(hv, sub []byte) bool {
@@ -330,8 +331,7 @@ func (h *Handshake) parse() (err error) {
 	}
 
 	if len(h.raw)-h.start < 128 {
-		err = ErrRequestHeaderLength
-		return err
+		return ErrRequestHeaderLength
 	}
 
 	var (

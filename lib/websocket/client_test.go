@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -35,11 +36,11 @@ func TestConnect(t *testing.T) {
 	}, {
 		desc:     "Without credential",
 		endpoint: _testWSAddr,
-		expErr:   "websocket: Connect: 400 Missing authorization",
+		expErr:   `Connect: handshake: 400 Missing authorization`,
 	}, {
 		desc:     "With closed connection",
 		endpoint: "ws://127.0.0.1:4444",
-		expErr:   "websocket: Connect: dial tcp 127.0.0.1:4444: connect: connection refused",
+		expErr:   `Connect: open: dial tcp 127.0.0.1:4444: connect: connection refused`,
 	}}
 
 	var (
@@ -732,5 +733,6 @@ func TestClient_sendClose(t *testing.T) {
 	test.Assert(t, `sendClose response`, exp, got)
 
 	err = cl.SendPing(nil)
-	test.Assert(t, `SendPing should error`, ErrConnClosed, err)
+	var expError = fmt.Sprintf(`SendPing: send: %s`, ErrConnClosed)
+	test.Assert(t, `SendPing should error`, expError, err.Error())
 }

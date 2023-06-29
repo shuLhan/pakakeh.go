@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 )
 
@@ -54,7 +55,8 @@ type Response struct {
 // and wrapped in TEXT frame.
 func NewBroadcast(message, body string) (packet []byte, err error) {
 	var (
-		res *Response = _resPool.Get().(*Response)
+		logp           = `NewBroadcast`
+		res  *Response = _resPool.Get().(*Response)
 	)
 
 	res.reset()
@@ -64,7 +66,7 @@ func NewBroadcast(message, body string) (packet []byte, err error) {
 
 	packet, err = json.Marshal(res)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	_resPool.Put(res)

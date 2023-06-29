@@ -7,6 +7,7 @@ package websocket
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -98,8 +99,10 @@ func (root *rootRoute) getParent(method string) *route {
 //		}}
 //	}`
 func (root *rootRoute) add(method, target string, handler RouteHandler) (err error) {
+	var logp = `add`
+
 	if target[0] != pathSep {
-		return ErrRouteInvTarget
+		return fmt.Errorf(`%s: %w`, logp, ErrRouteInvTarget)
 	}
 
 	method = strings.ToUpper(method)
@@ -114,7 +117,7 @@ func (root *rootRoute) add(method, target string, handler RouteHandler) (err err
 	)
 
 	if parent == nil {
-		return ErrRouteInvMethod
+		return fmt.Errorf(`%s: %w`, logp, ErrRouteInvMethod)
 	}
 
 	bb = _bbPool.Get().(*bytes.Buffer)
@@ -159,13 +162,15 @@ func (root *rootRoute) add(method, target string, handler RouteHandler) (err err
 out:
 	_bbPool.Put(bb)
 
-	return err
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return nil
 }
 
 // get the route parameters values and their handler.
-func (root *rootRoute) get(method, target string) (
-	params targetParam, handler RouteHandler,
-) {
+func (root *rootRoute) get(method, target string) (params targetParam, handler RouteHandler) {
 	if len(method) == 0 || len(target) == 0 {
 		return nil, nil
 	}
