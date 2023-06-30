@@ -52,6 +52,7 @@ type Server struct {
 	// cause undefined effects.
 	Options *ServerOptions
 
+	qpinger   chan int
 	chUpgrade chan int
 	qreader   chan int
 	running   chan struct{}
@@ -65,6 +66,7 @@ type Server struct {
 
 	sock int
 
+	numGoPinger  atomic.Int32
 	numGoUpgrade atomic.Int32
 	numGoReader  atomic.Int32
 
@@ -83,6 +85,7 @@ func NewServer(opts *ServerOptions) (serv *Server) {
 		Options:   opts,
 		Clients:   newClientManager(),
 		routes:    newRootRoute(),
+		qpinger:   make(chan int),
 		chUpgrade: make(chan int),
 		qreader:   make(chan int),
 		running:   make(chan struct{}, 1),
@@ -832,17 +835,15 @@ func (serv *Server) delayReader(conn int) {
 	serv.handleClose(conn, &req)
 }
 
-// pinger is a routine that send control PING frame to all client connections
+// pollPinger is a routine that send control PING frame to all client connections
 // every N seconds.
-func (serv *Server) pinger() {
+func (serv *Server) pollPinger() {
 	var (
-		logp                    = `pinger`
 		pingTicker *time.Ticker = time.NewTicker(16 * time.Second)
-		framePing  []byte       = NewFramePing(false, nil)
 
-		all  []int
-		conn int
-		err  error
+		all       []int
+		conn      int
+		numPinger int32
 	)
 
 	for {
@@ -851,18 +852,61 @@ func (serv *Server) pinger() {
 			all = serv.Clients.All()
 
 			for _, conn = range all {
-				err = Send(conn, framePing, serv.Options.ReadWriteTimeout)
-				if err != nil {
-					// Error on sending PING will be
-					// assumed as bad connection.
-					log.Printf(`%s: %s`, logp, err)
-					serv.ClientRemove(conn)
+				select {
+				case serv.qpinger <- conn:
+				default:
+					numPinger = serv.numGoPinger.Load()
+					if numPinger < serv.Options.maxGoroutinePinger {
+						go serv.pinger()
+						serv.numGoPinger.Add(1)
+						serv.qpinger <- conn
+					} else {
+						go serv.delayPinger(conn)
+					}
 				}
+
 			}
 		case <-serv.running:
 			return
 		}
 	}
+}
+
+func (serv *Server) pinger() {
+	var (
+		framePing = NewFramePing(false, nil)
+
+		conn int
+		err  error
+	)
+	for conn = range serv.qpinger {
+		err = Send(conn, framePing, serv.Options.ReadWriteTimeout)
+		if err != nil {
+			// Error on sending PING will be assumed as bad
+			// connection.
+			serv.ClientRemove(conn)
+		}
+	}
+}
+
+func (serv *Server) delayPinger(conn int) {
+	var (
+		delay = 300 * time.Millisecond
+		total time.Duration
+	)
+	for total < serv.Options.ReadWriteTimeout {
+		time.Sleep(delay)
+		select {
+		case serv.qpinger <- conn:
+			return
+		default:
+			total += delay
+		}
+	}
+	var req = Frame{
+		closeCode: StatusInternalError,
+	}
+	serv.handleClose(conn, &req)
 }
 
 // Start accepting incoming connection from clients.
@@ -886,7 +930,9 @@ func (serv *Server) Start() (err error) {
 	go serv.reader()
 	serv.numGoReader.Add(1)
 
+	go serv.pollPinger()
 	go serv.pinger()
+	serv.numGoPinger.Add(1)
 
 	var (
 		conn        int
