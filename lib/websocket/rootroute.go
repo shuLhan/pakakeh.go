@@ -85,11 +85,11 @@ func (root *rootRoute) getParent(method string) *route {
 
 // add new route handler by method and target.
 //
-// method is one of HTTP method that is allowed: DELETE, GET, PATCH, POST, or
-// PUT.
-// target is absolute path, MUST start with slash "/", and can contains
-// parameter by prefixing it with colon ":".  For example, "/book/:id", will
-// be parsed into,
+// The method parameter is one of HTTP method that is allowed: DELETE, GET,
+// PATCH, POST, or PUT.
+// The target parameter is absolute path, MUST start with slash "/", and can
+// contains parameter by prefixing it with colon ":".  For example,
+// "/book/:id", will be parsed into,
 //
 //	{
 //		name:"book",

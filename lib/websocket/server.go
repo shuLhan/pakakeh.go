@@ -346,17 +346,18 @@ func (serv *Server) upgrader() {
 // A fragmented message consists of a single frame with the FIN bit
 // clear and an opcode other than 0, followed by zero or more frames
 // with the FIN bit clear and the opcode set to 0, and terminated by
-// a single frame with the FIN bit set and an opcode of 0.  A
-// fragmented message is conceptually equivalent to a single larger
+// a single frame with the FIN bit set and an opcode of 0.
+// A/ fragmented message is conceptually equivalent to a single larger
 // message whose payload is equal to the concatenation of the
 // payloads of the fragments in order; however, in the presence of
 // extensions, this may not hold true as the extension defines the
-// interpretation of the "Extension data" present.  For instance,
-// "Extension data" may only be present at the beginning of the first
-// fragment and apply to subsequent fragments, or there may be
-// "Extension data" present in each of the fragments that applies
-// only to that particular fragment.  In the absence of "Extension
-// data", the following example demonstrates how fragmentation works.
+// interpretation of the "Extension data" present.
+// For instance, "Extension data" may only be present at the beginning of the
+// first fragment and apply to subsequent fragments, or there may be
+// "Extension data" present in each of the fragments that applies only to that
+// particular fragment.
+// In the absence of "Extension data", the following example demonstrates how
+// fragmentation works.
 //
 // EXAMPLE: For a text message sent as three fragments, the first
 // fragment would have an opcode of 0x1 and a FIN bit clear, the
@@ -565,17 +566,21 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	switch {
 	case req.closeCode == 0:
 		req.closeCode = StatusBadRequest
+
 	case req.closeCode < StatusNormal:
 		req.closeCode = StatusBadRequest
+
 	case req.closeCode == 1004:
 		// Reserved.  The specific meaning might be defined in the future.
 		req.closeCode = StatusBadRequest
+
 	case req.closeCode == 1005:
 		// 1005 is a reserved value and MUST NOT be set as a status
 		// code in a Close control frame by an endpoint.  It is
 		// designated for use in applications expecting a status code
 		// to indicate that no status code was actually present.
 		req.closeCode = StatusBadRequest
+
 	case req.closeCode == 1006:
 		//  1006 is a reserved value and MUST NOT be set as a status
 		//  code in a Close control frame by an endpoint.  It is
@@ -583,14 +588,17 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 		//  to indicate that the connection was closed abnormally,
 		//  e.g., without sending or receiving a Close control frame.
 		req.closeCode = StatusBadRequest
+
 	case req.closeCode >= 1015 && req.closeCode <= 2999:
 		req.closeCode = StatusBadRequest
+
 	case req.closeCode >= 3000 && req.closeCode <= 3999:
 		// Status codes in the range 3000-3999 are reserved for use by
 		// libraries, frameworks, and applications.  These status
 		// codes are registered directly with IANA.  The
 		// interpretation of these codes is undefined by this
 		// protocol.
+
 	case req.closeCode >= 4000 && req.closeCode <= 4999:
 		// Status codes in the range 4000-4999 are reserved for
 		// private use and thus can't be registered.  Such codes can

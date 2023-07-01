@@ -34,18 +34,16 @@ const (
 	defPort     = "80"
 )
 
-var (
-	// ErrConnClosed define an error if client is not connected and try to
-	// send a message.
-	ErrConnClosed = errors.New(`client is not connected`)
-)
+// ErrConnClosed define an error if client is not connected and try to
+// send a message.
+var ErrConnClosed = errors.New(`client is not connected`)
 
 // Client for WebSocket protocol.
 //
 // Unlike HTTP client or other most commmon TCP oriented client, the WebSocket
-// client is actually asynchronous or passive-active instead of synchronous.
+// client is asynchronous or passive-active instead of synchronous.
 // At any time client connection is open to server, client can receive a
-// message broadcast from server.
+// message broadcasted from server.
 //
 // Case examples: if client send "A" to server, and expect that server
 // response with "A+", server may send message "B" before sending "A+".
@@ -61,7 +59,7 @@ var (
 // from request or broadcast from server,
 //
 //	cl := &Client{
-//		Endpoint: "ws://127.0.0.1:9001",
+//		Endpoint: `ws://127.0.0.1:9001`,
 //		HandleText: func(cl *Client, frame *Frame) error {
 //			// Process response from request or broadcast from
 //			// server.
@@ -71,18 +69,18 @@ var (
 //
 //	err := cl.Connect()
 //	if err != nil {
-//		log.Fatal(err.Error())
+//		log.Fatal(err)
 //	}
 //
 //	err = cl.SendText([]byte("Hello from client"))
 //	if err != nil {
-//		log.Fatal(err.Error())
+//		log.Fatal(err)
 //	}
 //
-// At any time, server may send PING or CLOSE the connection.  For this
-// messages, client already handled it by sending PONG message or by closing
-// underlying connection automatically.
-// Implementor can check closed connection from error returned from Send
+// At any time, server may send PING or CLOSE the connection.
+// For this messages, client already handled it by sending PONG message or by
+// closing underlying connection automatically.
+// Implementor can check a closed connection from error returned from Send
 // methods to match with ErrConnClosed.
 type Client struct {
 	conn net.Conn
@@ -110,18 +108,21 @@ type Client struct {
 	HandleBin ClientHandler
 
 	// handleClose function that will be called when client receive
-	// control CLOSE frame from server.  Default handle is to response
-	// with control CLOSE frame with the same payload.
+	// control CLOSE frame from server.
+	// Default handle is to response with control CLOSE frame with the
+	// same payload.
 	// This field is not exported, and only defined to allow testing.
 	handleClose ClientHandler
 
 	// handlePing function that will be called when client receive control
-	// PING frame from server.  Default handler is to response with PONG.
+	// PING frame from server.
+	// Default handler is to response with PONG.
 	// This field is not exported, and only defined to allow testing.
 	handlePing ClientHandler
 
 	// handlePong a function that will be called when client receive
-	// control PONG frame from server.  Default is nil.
+	// control PONG frame from server.
+	// Default is nil.
 	handlePong ClientHandler
 
 	// HandleQuit function that will be called when client connection is
@@ -442,36 +443,44 @@ func clientOnClose(cl *Client, frame *Frame) (err error) {
 	switch {
 	case frame.closeCode == 0:
 		frame.closeCode = StatusBadRequest
+
 	case frame.closeCode < StatusNormal:
 		frame.closeCode = StatusBadRequest
+
 	case frame.closeCode == 1004:
-		// Reserved.  The specific meaning might be defined in the future.
+		// Reserved.
+		// The specific meaning might be defined in the future.
 		frame.closeCode = StatusBadRequest
+
 	case frame.closeCode == 1005:
 		// 1005 is a reserved value and MUST NOT be set as a status
-		// code in a Close control frame by an endpoint.  It is
-		// designated for use in applications expecting a status code
-		// to indicate that no status code was actually present.
+		// code in a Close control frame by an endpoint.
+		// It is designated for use in applications expecting a status
+		// code to indicate that no status code was actually present.
 		frame.closeCode = StatusBadRequest
+
 	case frame.closeCode == 1006:
 		// 1006 is a reserved value and MUST NOT be set as a status
-		// code in a Close control frame by an endpoint.  It is
-		// designated for use in applications expecting a status code
-		// to indicate that the connection was closed abnormally,
+		// code in a Close control frame by an endpoint.
+		// It is designated for use in applications expecting a status
+		// code to indicate that the connection was closed abnormally,
 		// e.g., without sending or receiving a Close control frame.
 		frame.closeCode = StatusBadRequest
+
 	case frame.closeCode >= 1015 && frame.closeCode <= 2999:
 		frame.closeCode = StatusBadRequest
+
 	case frame.closeCode >= 3000 && frame.closeCode <= 3999:
 		// Status codes in the range 3000-3999 are reserved for use by
-		// libraries, frameworks, and applications.  These status
-		// codes are registered directly with IANA.  The
-		// interpretation of these codes is undefined by this
+		// libraries, frameworks, and applications.
+		// These status codes are registered directly with IANA.
+		// The interpretation of these codes is undefined by this
 		// protocol.
 	case frame.closeCode >= 4000 && frame.closeCode <= 4999:
 		// Status codes in the range 4000-4999 are reserved for
-		// private use and thus can't be registered.  Such codes can
-		// be used by prior agreements between WebSocket applications.
+		// private use and thus can't be registered.
+		// Such codes can be used by prior agreements between
+		// WebSocket applications.
 		// The interpretation of these codes is undefined by this
 		// protocol.
 	}
@@ -483,20 +492,16 @@ func clientOnClose(cl *Client, frame *Frame) (err error) {
 	}
 
 	var (
-		logp          = `clientOnClose`
 		packet []byte = NewFrameClose(true, frame.closeCode, frame.payload)
 	)
 
 	cl.Lock()
 	err = cl.send(packet)
 	cl.Unlock()
-	if err != nil {
-		log.Printf(`%s: %s`, logp, err)
-	}
 
 	cl.Quit()
 
-	return nil
+	return err
 }
 
 // handleFragment will handle continuation frame (fragmentation).

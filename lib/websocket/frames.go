@@ -17,9 +17,10 @@ type Frames struct {
 // Unpack websocket data protocol from raw bytes to one or more frames.
 //
 // When receiving packet from client, the underlying protocol or operating
-// system may buffered the packet.  Client may send a single frame one at
-// time, but server may receive one or more frame in one packet; and vice
-// versa.  That's the reason why the Unpack return multiple frame instead of
+// system may buffered the packet.
+// Client may send a single frame one at time, but server may receive one or
+// more frame in one packet; and vice versa.
+// That's the reason why the Unpack return multiple frame instead of
 // single frame.
 //
 // On success it will return one or more frames.
