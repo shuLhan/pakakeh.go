@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"sync"
 	"time"
 )
 
@@ -31,7 +32,8 @@ type DirWatcher struct {
 	// being watched for changes.
 	// The map key is relative path to directory and its value is a node
 	// information.
-	dirs map[string]*Node
+	dirs       map[string]*Node
+	dirsLocker sync.Mutex
 
 	// This struct embed Options to map the directory to be watched
 	// into memory.
@@ -119,9 +121,11 @@ func (dw *DirWatcher) dirsKeys() (keys []string) {
 	var (
 		key string
 	)
+	dw.dirsLocker.Lock()
 	for key = range dw.dirs {
 		keys = append(keys, key)
 	}
+	dw.dirsLocker.Unlock()
 	sort.Strings(keys)
 	return keys
 }
@@ -139,7 +143,9 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 
 	for _, child := range node.Childs {
 		if child.IsDir() {
+			dw.dirsLocker.Lock()
 			dw.dirs[child.Path] = child
+			dw.dirsLocker.Unlock()
 			dw.mapSubdirs(child)
 			continue
 		}
@@ -157,7 +163,9 @@ func (dw *DirWatcher) unmapSubdirs(node *Node) {
 	)
 	for _, child = range node.Childs {
 		if child.IsDir() {
+			dw.dirsLocker.Lock()
 			delete(dw.dirs, child.Path)
+			dw.dirsLocker.Unlock()
 			dw.unmapSubdirs(child)
 		}
 	}
@@ -165,7 +173,9 @@ func (dw *DirWatcher) unmapSubdirs(node *Node) {
 		dw.fs.RemoveChild(node, child)
 	}
 	if node.IsDir() {
+		dw.dirsLocker.Lock()
 		delete(dw.dirs, node.Path)
+		dw.dirsLocker.Unlock()
 	}
 	dw.fs.RemoveChild(node.Parent, node)
 }
@@ -243,7 +253,10 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		}
 
 		if newChild.IsDir() {
+			dw.dirsLocker.Lock()
 			dw.dirs[newChild.Path] = newChild
+			dw.dirsLocker.Unlock()
+
 			dw.mapSubdirs(newChild)
 			dw.onContentChange(newChild)
 		} else {
@@ -255,9 +268,9 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 			}
 		}
 
-		//nolint
 		select {
 		case dw.qchanges <- ns:
+		default:
 		}
 	}
 }
@@ -284,7 +297,9 @@ func (dw *DirWatcher) onRootCreated() {
 		return
 	}
 
+	dw.dirsLocker.Lock()
 	dw.dirs = make(map[string]*Node)
+	dw.dirsLocker.Unlock()
 	dw.mapSubdirs(dw.root)
 
 	ns := NodeState{
@@ -292,9 +307,9 @@ func (dw *DirWatcher) onRootCreated() {
 		State: FileStateCreated,
 	}
 
-	//nolint
 	select {
 	case dw.qchanges <- ns:
+	default:
 	}
 }
 
@@ -311,11 +326,13 @@ func (dw *DirWatcher) onRootDeleted() {
 
 	dw.fs = nil
 	dw.root = nil
+	dw.dirsLocker.Lock()
 	dw.dirs = nil
+	dw.dirsLocker.Unlock()
 
-	//nolint
 	select {
 	case dw.qchanges <- ns:
+	default:
 	}
 }
 
@@ -331,9 +348,9 @@ func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
 		}
 	)
 
-	//nolint
 	select {
 	case dw.qchanges <- ns:
+	default:
 	}
 }
 

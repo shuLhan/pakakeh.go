@@ -127,9 +127,9 @@ func (w *Watcher) start() {
 			ns.Node = *w.node
 			ns.State = FileStateDeleted
 
-			//nolint
 			select {
 			case w.qchanges <- ns:
+			default:
 			}
 			w.node = nil
 			return
@@ -141,9 +141,9 @@ func (w *Watcher) start() {
 			ns.Node = *w.node
 			ns.State = FileStateUpdateMode
 
-			//nolint
 			select {
 			case w.qchanges <- ns:
+			default:
 			}
 			continue
 		}
@@ -157,9 +157,9 @@ func (w *Watcher) start() {
 		ns.Node = *w.node
 		ns.State = FileStateUpdateContent
 
-		//nolint
 		select {
 		case w.qchanges <- ns:
+		default:
 		}
 	}
 }
