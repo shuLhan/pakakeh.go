@@ -19,6 +19,144 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_48_0]
+==  share v0.48.0 (2023-07-07)
+
+This release bring many enhancements to lib/websocket including timeout,
+handling upgrade and read/write concurrently using goroutine.
+
+[#v0_48_0__breaking_changes]
+=== Breaking changes
+
+lib/net: changes the WaitRead/Event model on Poll::
++
+--
+Previously, the Pool's WaitRead and WaitReadEVent methods return list of
+file descriptor (fd) and keeps the fd in the pool.
+In case we want to process the returned fd concurrently, by running it
+in different goroutine, the next call WaitRead may return the same fd
+if its goroutine not fast enough to read from fd.
+
+This changes fix this issue by removing list of fd from poll and set the
+fd flag to blocking mode again after returning it from WaitRead or
+WaitReadEvent.
+
+This changes also remove the ReregisterRead and ReregisterEvent methods
+since it is not applicable anymore.
+--
+
+[#v0_48_0__bug_fixes]
+=== Bug fixes
+
+lib/websocket: call Quit when handshake contains close or invalid frame::
++
+If the HTTP handshake response contains trailing frame, handle it
+directly.
+If the frame is invalid or contains control close operation, call Quit
+directly to trigger the HandleQuit if its defined by user.
+
+lib/websocket: revert maxBuffer back to 1024::
++
+In v0.47.0 we increase the maxBuffer to 4096 to try increasing the
+performance when handling large payload.
+Turns out increasing this break the autobahn test suite.
+
+
+[#v0_48_0__new_features]
+=== New features
+
+lib/ascii: add type Set::
++
+--
+The Set type is a bitmap that represent list of ASCII characters for faster
+lookup.
+
+A Set is a 36-byte value, where each bit in the first 32-bytes represents
+the presence of a given ASCII character in the set.
+The remaining 4-bytes is a counter for the number of ASCII characters in the
+set.
+The 128-bits of the first 16 bytes, starting with the least-significant bit of
+the lowest word to the most-significant bit of the highest word, map to the
+full range of all 128 ASCII characters.
+The 128-bits of the next 16 bytes will be zeroed, ensuring that any non-ASCII
+character will be reported as not in the set.
+--
+
+lib/net: implement generic PollEvent::
++
+--
+The PollEvent contains file descriptor and the underlying event
+based on OS, unix.EpollEvent on Linux or unix.Kevent_t on BSD.
+
+The Poll interface provides two APIs to works with PollEvent,
+WaitReadEvents that return list of PollEvent ready for read, and
+ReregisterEvent to register the event back to poll (only for Linux).
+--
+
+[#v0_48_0__enhancements]
+=== Enhancements
+
+lib/websocket: add option to set read/write timeout on Server::
++
+--
+The ReadWriteTimeout define the maximum duration the server wait when
+receiving/sending packet from/to client before considering the
+connection as broken.
+
+Default read-write timeout is 30 seconds if not set.
+
+This changes affect the exported function Send and Recv by adding
+additional parameter timeout to both of them.
+--
+
+lib/websocket: handle concurrent upgrade using goroutine::
++
+--
+The maxGoroutineUpgrader define maximum goroutines running at the same
+time to handle client upgrade.
+The new goroutine only dispatched when others are full, so it will
+run incrementally not all at once.
+Default to defServerMaxGoroutineUpgrader (128) if its not set.
+--
+
+lib/websocket: handle concurrent Server read using goroutines::
++
+The Server now dispatch a goroutine to consume event from poll reader
+for each client connection that is ready to read.
+The maximum number of goroutine is defined in ServerOptions
+maxGoroutineReader, which currently set to 1024.
+
+lib/websocket: handle concurrent ping using goroutines::
++
+The maximum goroutines is quarter of max queue.
+The new goroutine for pinger will be dispatched when no goroutine can
+consume the current processed connection.
+
+
+[#v0_48_0__chores]
+===  Chores
+
+websocket/testdata: rewrite autobahn test using container::
++
+--
+Since the autobahn script can only run on Python 2, it become hard to
+setup and run the test on distro that does not provide Python 2 anymore.
+The autobahn repository recommend to use docker instead.
+
+When testing the server, we simplify it by using make task "test-server".
+The test-server task run our test server in background, and then run the
+autobahn fuzzingclient from container.
+Once the tests completed, we trigger the server to shutdown by sending
+text frame with payload "shutdown".
+
+When testing the client, we simplify it by using make task "test-client".
+The test-client task run the autobahn fuzzingserver and then
+we run our client.
+Once client finished, we trigger the server to generate the reports
+and cleanup the container.
+--
+
+
 [#v0_47_0]
 ==  share v0.47.0 (2023-06-05)
 
