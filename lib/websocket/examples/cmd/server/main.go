@@ -20,11 +20,9 @@ import (
 var server *websocket.Server
 
 func main() {
-	log.SetFlags(0)
-
 	var (
 		opts = &websocket.ServerOptions{
-			Address: ":9001",
+			Address: `:9101`,
 			// Register the authentication handler.
 			HandleAuth:         handleAuth,
 			HandleClientAdd:    handleClientAdd,
@@ -44,7 +42,10 @@ func main() {
 
 	log.Println("server: starting ...")
 
-	server.Start()
+	err = server.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // handleAuth authenticated the new connection by checking the Header "Key"
@@ -140,8 +141,6 @@ func handlePostMessage(ctx context.Context, req *websocket.Request) (res websock
 		err    error
 		conn   int
 	)
-
-	log.Printf("server: message from %s: %q\n", user.Name, req.Body)
 
 	packet, err = websocket.NewBroadcast(examples.BroadcastMessage, body)
 	if err != nil {

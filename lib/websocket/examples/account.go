@@ -28,4 +28,9 @@ var Users map[int64]*Account = map[int64]*Account{
 		Name: "Hulk",
 		Key:  "arrrr",
 	},
+	4: {
+		ID:   4,
+		Name: `Ironman`,
+		Key:  `pewpew`,
+	},
 }
