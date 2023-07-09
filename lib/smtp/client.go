@@ -311,8 +311,11 @@ func (cl *Client) MailTx(mail *MailTx) (res *Response, err error) {
 	}
 
 	res, err = cl.recv()
-	if err != nil || res.Code != StatusOK {
-		err = fmt.Errorf("client.MailTx: Message: %d - %s", res.Code, res.Message)
+	if err != nil {
+		return nil, err
+	}
+	if res.Code != StatusOK {
+		return nil, fmt.Errorf("client.MailTx: Message: %d - %s", res.Code, res.Message)
 	}
 
 	return res, err
