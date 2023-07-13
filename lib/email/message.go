@@ -105,7 +105,7 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 
 		hdr      *Header
 		body     *Body
-		boundary []byte
+		boundary string
 	)
 
 	msg = &Message{}
@@ -117,7 +117,7 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 
 	boundary = hdr.Boundary()
 
-	body, rest, err = ParseBody(rest, boundary)
+	body, rest, err = ParseBody(rest, []byte(boundary))
 	if err != nil {
 		return nil, rest, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -192,9 +192,9 @@ func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error
 	dkimField := &Field{
 		Type:     FieldTypeDKIMSignature,
 		Name:     fieldNames[FieldTypeDKIMSignature],
-		Value:    sig.Pack(false),
-		oriName:  []byte("DKIM-Signature"),
-		oriValue: sig.Pack(true),
+		Value:    string(sig.Pack(false)),
+		oriName:  `DKIM-Signature`,
+		oriValue: string(sig.Pack(true)),
 	}
 
 	subHeader := &Header{
@@ -210,8 +210,8 @@ func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error
 	}
 
 	// Regenerate the DKIM field again with non empty signature "b=".
-	dkimField.Value = sig.Pack(false)
-	dkimField.oriValue = sig.Pack(true)
+	dkimField.Value = string(sig.Pack(false))
+	dkimField.oriValue = string(sig.Pack(true))
 
 	msg.Header.PushTop(dkimField)
 
@@ -238,7 +238,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 		return msg.dkimStatus, nil
 	}
 
-	sig, err := dkim.Parse(subHeader.fields[0].Value)
+	sig, err := dkim.Parse([]byte(subHeader.fields[0].Value))
 
 	if sig != nil && len(sig.SDID) > 0 {
 		msg.dkimStatus.SDID = libbytes.Copy(sig.SDID)
@@ -436,7 +436,7 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 	}
 
 	for x := 0; x < len(msg.DKIMSignature.Headers); x++ {
-		signedField := subHeader.popByName(msg.DKIMSignature.Headers[x])
+		signedField := subHeader.popByName(string(msg.DKIMSignature.Headers[x]))
 		if signedField == nil {
 			continue
 		}
@@ -450,13 +450,13 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 	// The last one to hash is DKIM-Signature itself without "b=" value
 	// and CRLF.
 	if canonType == dkim.CanonSimple {
-		bb.Write(dkimField.oriName)
+		bb.WriteString(dkimField.oriName)
 		bb.WriteByte(':')
-		bb.Write(dkim.Canonicalize(dkimField.oriValue))
+		bb.Write(dkim.Canonicalize([]byte(dkimField.oriValue)))
 	} else {
-		bb.Write(dkimField.Name)
+		bb.WriteString(dkimField.Name)
 		bb.WriteByte(':')
-		bb.Write(dkim.Canonicalize(dkimField.Value))
+		bb.Write(dkim.Canonicalize([]byte(dkimField.Value)))
 	}
 
 	return bb.Bytes()
@@ -537,7 +537,7 @@ func (msg *Message) packMultipartAlternative() (out []byte, err error) {
 	var (
 		mime     *MIME
 		buf      bytes.Buffer
-		boundary []byte
+		boundary string
 	)
 
 	boundary = msg.Header.Boundary()
@@ -625,6 +625,6 @@ func (msg *Message) setDKIMHeaders(sig *dkim.Signature) {
 	sig.Headers = make([][]byte, 0, len(msg.Header.fields))
 
 	for _, f := range msg.Header.fields {
-		sig.Headers = append(sig.Headers, f.Name)
+		sig.Headers = append(sig.Headers, []byte(f.Name))
 	}
 }

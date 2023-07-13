@@ -15,8 +15,8 @@ import (
 
 func TestParseMailbox(t *testing.T) {
 	type testCase struct {
-		in  string
 		exp *Mailbox
+		in  string
 	}
 
 	var cases = []testCase{{
@@ -25,15 +25,15 @@ func TestParseMailbox(t *testing.T) {
 	}, {
 		in: `one@example`,
 		exp: &Mailbox{
-			Local:   []byte(`one`),
-			Domain:  []byte(`example`),
+			Local:   `one`,
+			Domain:  `example`,
 			Address: `one@example`,
 		},
 	}, {
 		in: `one@example , two@example`,
 		exp: &Mailbox{
-			Local:   []byte(`one`),
-			Domain:  []byte(`example`),
+			Local:   `one`,
+			Domain:  `example`,
 			Address: `one@example`,
 		},
 	}}
@@ -338,10 +338,10 @@ func TestMailbox_UnmarshalJSON(t *testing.T) {
 
 	exp := &ADT{
 		Address: &Mailbox{
-			Name:    []byte("Name"),
-			Local:   []byte("local"),
-			Domain:  []byte("domain"),
-			Address: "local@domain",
+			Name:    `Name`,
+			Local:   `local`,
+			Domain:  `domain`,
+			Address: `local@domain`,
 			isAngle: true,
 		},
 	}
@@ -352,10 +352,10 @@ func TestMailbox_UnmarshalJSON(t *testing.T) {
 func TestMailbox_MarshalJSON(t *testing.T) {
 	adt := &ADT{
 		Address: &Mailbox{
-			Name:    []byte("Name"),
-			Local:   []byte("local"),
-			Domain:  []byte("domain"),
-			Address: "local@domain",
+			Name:    `Name`,
+			Local:   `local`,
+			Domain:  `domain`,
+			Address: `local@domain`,
 			isAngle: true,
 		},
 	}

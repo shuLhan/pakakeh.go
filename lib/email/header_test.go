@@ -15,7 +15,7 @@ func TestHeaderBoundary(t *testing.T) {
 		desc     string
 		in       string
 		expError string
-		exp      []byte
+		exp      string
 	}{{
 		desc: "With no content-type",
 		in: "From: Nathaniel Borenstein <nsb@bellcore.com>\r\n" +
@@ -42,7 +42,7 @@ func TestHeaderBoundary(t *testing.T) {
 			"MIME-Version: 1.0\r\n" +
 			"Content-type: multipart/mixed; boundary=\"simple boundary\"\r\n" +
 			"\r\n",
-		exp: []byte("simple boundary"),
+		exp: `simple boundary`,
 	}}
 
 	for _, c := range cases {

@@ -43,29 +43,28 @@ func ExampleContentType_GetParamValue() {
 		log.Fatal(err)
 	}
 
-	var key = []byte(`notexist`)
+	var key = `notexist`
 	fmt.Printf("%s=%q\n", key, ct.GetParamValue(key))
 
-	key = []byte(`KEY1`)
+	key = `KEY1`
 	fmt.Printf("%s=%q\n", key, ct.GetParamValue(key))
 
-	key = []byte(`key2`)
+	key = `key2`
 	fmt.Printf("%s=%q\n", key, ct.GetParamValue(key))
 
 	// Output:
 	// notexist=""
 	// KEY1="val1"
 	// key2="value 2"
-
 }
 
 func ExampleContentType_SetBoundary() {
 	var ct = &email.ContentType{}
 
-	ct.SetBoundary([]byte(`42`))
+	ct.SetBoundary(`42`)
 	fmt.Println(ct.String())
 
-	ct.SetBoundary([]byte(`43`))
+	ct.SetBoundary(`43`)
 	fmt.Println(ct.String())
 
 	// Output:

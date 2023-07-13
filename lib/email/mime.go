@@ -144,9 +144,9 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	return mime, rest, err
 }
 
-func (mime *MIME) isContentType(top, sub []byte) bool {
-	if bytes.Equal(mime.contentType.Top, top) {
-		return bytes.Equal(mime.contentType.Sub, sub)
+func (mime *MIME) isContentType(top, sub string) bool {
+	if strings.EqualFold(mime.contentType.Top, top) {
+		return strings.EqualFold(mime.contentType.Sub, sub)
 	}
 	return false
 }

@@ -52,41 +52,41 @@ const (
 )
 
 // fieldNames contains mapping between field type and their lowercase name.
-var fieldNames = map[FieldType][]byte{
-	FieldTypeDate: []byte("date"),
+var fieldNames = map[FieldType]string{
+	FieldTypeDate: `date`,
 
-	FieldTypeFrom:    []byte("from"),
-	FieldTypeSender:  []byte("sender"),
-	FieldTypeReplyTo: []byte("reply-to"),
+	FieldTypeFrom:    `from`,
+	FieldTypeSender:  `sender`,
+	FieldTypeReplyTo: `reply-to`,
 
-	FieldTypeTo:  []byte("to"),
-	FieldTypeCC:  []byte("cc"),
-	FieldTypeBCC: []byte("bcc"),
+	FieldTypeTo:  `to`,
+	FieldTypeCC:  `cc`,
+	FieldTypeBCC: `bcc`,
 
-	FieldTypeMessageID:  []byte("message-id"),
-	FieldTypeInReplyTo:  []byte("in-reply-to"),
-	FieldTypeReferences: []byte("references"),
+	FieldTypeMessageID:  `message-id`,
+	FieldTypeInReplyTo:  `in-reply-to`,
+	FieldTypeReferences: `references`,
 
-	FieldTypeSubject:  []byte("subject"),
-	FieldTypeComments: []byte("comments"),
-	FieldTypeKeywords: []byte("keywords"),
+	FieldTypeSubject:  `subject`,
+	FieldTypeComments: `comments`,
+	FieldTypeKeywords: `keywords`,
 
-	FieldTypeResentDate:      []byte("resent-date"),
-	FieldTypeResentFrom:      []byte("resent-from"),
-	FieldTypeResentSender:    []byte("resent-sender"),
-	FieldTypeResentTo:        []byte("resent-to"),
-	FieldTypeResentCC:        []byte("resent-cc"),
-	FieldTypeResentBCC:       []byte("resent-bcc"),
-	FieldTypeResentMessageID: []byte("resent-message-id"),
+	FieldTypeResentDate:      `resent-date`,
+	FieldTypeResentFrom:      `resent-from`,
+	FieldTypeResentSender:    `resent-sender`,
+	FieldTypeResentTo:        `resent-to`,
+	FieldTypeResentCC:        `resent-cc`,
+	FieldTypeResentBCC:       `resent-bcc`,
+	FieldTypeResentMessageID: `resent-message-id`,
 
-	FieldTypeReturnPath: []byte("return-path"),
-	FieldTypeReceived:   []byte("received"),
+	FieldTypeReturnPath: `return-path`,
+	FieldTypeReceived:   `received`,
 
-	FieldTypeMIMEVersion:             []byte("mime-version"),
-	FieldTypeContentType:             []byte("content-type"),
-	FieldTypeContentTransferEncoding: []byte("content-transfer-encoding"),
-	FieldTypeContentID:               []byte("content-id"),
-	FieldTypeContentDescription:      []byte("content-description"),
+	FieldTypeMIMEVersion:             `mime-version`,
+	FieldTypeContentType:             `content-type`,
+	FieldTypeContentTransferEncoding: `content-transfer-encoding`,
+	FieldTypeContentID:               `content-id`,
+	FieldTypeContentDescription:      `content-description`,
 
-	FieldTypeDKIMSignature: []byte("dkim-signature"),
+	FieldTypeDKIMSignature: `dkim-signature`,
 }

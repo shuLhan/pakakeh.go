@@ -46,6 +46,13 @@ func randomChars(n int) []byte {
 	return ascii.Random([]byte(ascii.LettersNumber), n)
 }
 
+// randomString generate random string with n characters.
+func randomString(n int) string {
+	rand.Seed(Epoch())
+	var v = ascii.Random([]byte(ascii.LettersNumber), n)
+	return string(v)
+}
+
 // sanitize remove comment from in and merge multiple spaces into one.
 // A comment start with '(' and end with ')' and can be nested
 // "(...(...(...)...)".

@@ -9,17 +9,16 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 )
 
 // Header represent list of fields in message.
 type Header struct {
-	//
 	// fields is ordered from top to bottom, the first field in message
 	// header is equal to the first element in slice.
 	//
 	// We are not using map here it to prevent the header being reordered
 	// when packing the message back into raw format.
-	//
 	fields []*Field
 }
 
@@ -83,7 +82,7 @@ func (hdr *Header) addMailboxes(ft FieldType, mailboxes []byte) (err error) {
 			Type: ft,
 		}
 		hdr.fields = append(hdr.fields, field)
-		field.setName(fieldNames[ft])
+		field.setName([]byte(fieldNames[ft]))
 		field.setValue(mailboxes)
 		return field.unpack()
 	}
@@ -93,10 +92,10 @@ func (hdr *Header) addMailboxes(ft FieldType, mailboxes []byte) (err error) {
 
 // Boundary return the message body boundary defined in Content-Type.
 // If no field Content-Type or no boundary it will return nil.
-func (hdr *Header) Boundary() []byte {
+func (hdr *Header) Boundary() string {
 	ct := hdr.ContentType()
 	if ct == nil {
-		return nil
+		return ``
 	}
 	return ct.GetParamValue(ParamNameBoundary)
 }
@@ -193,7 +192,7 @@ func (hdr *Header) Set(ft FieldType, value []byte) (err error) {
 		x int
 	)
 
-	field.setName(fieldNames[ft])
+	field.setName([]byte(fieldNames[ft]))
 	field.setValue(value)
 	err = field.unpack()
 	if err != nil {
@@ -216,9 +215,9 @@ func (hdr *Header) Simple() []byte {
 
 	for _, f := range hdr.fields {
 		if len(f.oriName) > 0 && len(f.oriValue) > 0 {
-			bb.Write(f.oriName)
+			bb.WriteString(f.oriName)
 			bb.WriteByte(':')
-			bb.Write(f.oriValue)
+			bb.WriteString(f.oriValue)
 		}
 	}
 
@@ -226,9 +225,9 @@ func (hdr *Header) Simple() []byte {
 }
 
 // popByName remove the field where the name match from header.
-func (hdr *Header) popByName(name []byte) (f *Field) {
+func (hdr *Header) popByName(name string) (f *Field) {
 	for x := len(hdr.fields) - 1; x >= 0; x-- {
-		if bytes.Equal(hdr.fields[x].Name, name) {
+		if strings.EqualFold(hdr.fields[x].Name, name) {
 			f = hdr.fields[x]
 			hdr.fields = append(hdr.fields[:x], hdr.fields[x+1:]...)
 		}
@@ -248,7 +247,7 @@ func (hdr *Header) SetMultipart() (err error) {
 		return fmt.Errorf("email.SetMultipart: %w", err)
 	}
 
-	boundary := randomChars(32)
+	var boundary = randomString(32)
 	contentType := hdr.ContentType()
 	contentType.SetBoundary(boundary)
 

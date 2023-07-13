@@ -101,12 +101,12 @@ func (body *Body) Add(mime *MIME) {
 }
 
 // getPart get the body part by top and sub content type.
-func (body *Body) getPart(top, sub []byte) (mime *MIME) {
+func (body *Body) getPart(top, sub string) (mime *MIME) {
 	for _, mime = range body.Parts {
-		if !bytes.Equal(mime.contentType.Top, top) {
+		if !strings.EqualFold(mime.contentType.Top, top) {
 			continue
 		}
-		if !bytes.Equal(mime.contentType.Sub, sub) {
+		if !strings.EqualFold(mime.contentType.Sub, sub) {
 			continue
 		}
 		return mime

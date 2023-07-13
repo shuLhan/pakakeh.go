@@ -5,26 +5,26 @@
 package email
 
 // List of known parameter name in header field's value.
-var (
+const (
 	// Parameter for Text Media Type, RFC 2046 section 4.1.
-	ParamNameCharset = []byte("charset")
+	ParamNameCharset = `charset`
 
 	// Parameters for "application/octet-stream", RFC 2046 section 4.5.1.
-	ParamNameType    = []byte("type")
-	ParamNamePadding = []byte("padding")
+	ParamNameType    = `type`
+	ParamNamePadding = `padding`
 
 	// Parameter for "multipart", RFC 2046 section 5.1.
-	ParamNameBoundary = []byte("boundary")
+	ParamNameBoundary = `boundary`
 
 	// Parameters for "multipart/partial", RFC 2046 section 5.2.2.
-	ParamNameID     = []byte("id")
-	ParamNameNumber = []byte("number")
-	ParamNameTotal  = []byte("total")
+	ParamNameID     = `id`
+	ParamNameNumber = `number`
+	ParamNameTotal  = `total`
 )
 
-// Param represent a key-value using slice of bytes.
+// Param represent a mapping of key with its value.
 type Param struct {
-	Key    []byte
-	Value  []byte
+	Key    string
+	Value  string
 	Quoted bool // Quoted is true if value is contains special characters.
 }

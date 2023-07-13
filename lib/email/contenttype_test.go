@@ -83,8 +83,8 @@ func TestParseContentType(t *testing.T) {
 func TestContentType_isEqual(t *testing.T) {
 	var (
 		ct = &ContentType{
-			Top: []byte(`text`),
-			Sub: []byte(`plain`),
+			Top: `text`,
+			Sub: `plain`,
 		}
 		got bool
 	)
@@ -96,18 +96,18 @@ func TestContentType_isEqual(t *testing.T) {
 	}
 
 	// Case: with Top not match.
-	got = ct.isEqual(&ContentType{Top: []byte(`TEX`)})
+	got = ct.isEqual(&ContentType{Top: `TEX`})
 	if got != false {
 		t.Fatalf(`want false, got %v`, got)
 	}
 
 	// Case: with Sub not match.
-	got = ct.isEqual(&ContentType{Top: []byte(`TEXT`), Sub: []byte(`PLAI`)})
+	got = ct.isEqual(&ContentType{Top: `TEXT`, Sub: `PLAI`})
 	if got != false {
 		t.Fatalf(`want false, got %v`, got)
 	}
 
-	got = ct.isEqual(&ContentType{Top: []byte(`TEXT`), Sub: []byte(`PLAIN`)})
+	got = ct.isEqual(&ContentType{Top: `TEXT`, Sub: `PLAIN`})
 	if got != true {
 		t.Fatalf(`want true, got %v`, got)
 	}

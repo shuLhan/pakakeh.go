@@ -18,9 +18,9 @@ import (
 // Mailbox represent an invidual mailbox.
 type Mailbox struct {
 	Address string // address contains the combination of "local@domain"
-	Name    []byte
-	Local   []byte
-	Domain  []byte
+	Name    string
+	Local   string
+	Domain  string
 	isAngle bool
 }
 
@@ -29,14 +29,14 @@ func (mbox *Mailbox) String() string {
 	var sb strings.Builder
 
 	if len(mbox.Name) > 0 {
-		sb.Write(mbox.Name)
+		sb.WriteString(mbox.Name)
 		sb.WriteByte(' ')
 	}
 	sb.WriteByte('<')
-	sb.Write(mbox.Local)
+	sb.WriteString(mbox.Local)
 	if len(mbox.Domain) > 0 {
 		sb.WriteByte('@')
-		sb.Write(mbox.Domain)
+		sb.WriteString(mbox.Domain)
 	}
 	sb.WriteByte('>')
 
@@ -117,7 +117,7 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 		isGroup = true
 	} else if c == '<' {
 		mbox.isAngle = true
-		mbox.Name = token
+		mbox.Name = string(token)
 	} else if c == '@' {
 		if len(token) == 0 {
 			return nil, fmt.Errorf(`%s: empty local`, logp)
@@ -125,7 +125,7 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 		if !IsValidLocal(token) {
 			return nil, fmt.Errorf(`%s: invalid local '%s'`, logp, token)
 		}
-		mbox.Local = token
+		mbox.Local = string(token)
 	}
 
 	c, err = parseMailbox(mbox, parser, c)
@@ -177,7 +177,7 @@ func parseMailbox(mbox *Mailbox, parser *libbytes.Parser, prevd byte) (c byte, e
 
 		if c == '<' {
 			mbox.isAngle = true
-			mbox.Name = value
+			mbox.Name = string(value)
 		} else if c == '@' {
 			if len(value) == 0 {
 				return c, fmt.Errorf(`%s: empty local`, logp)
@@ -185,7 +185,7 @@ func parseMailbox(mbox *Mailbox, parser *libbytes.Parser, prevd byte) (c byte, e
 			if !IsValidLocal(value) {
 				return c, fmt.Errorf(`%s: invalid local '%s'`, logp, value)
 			}
-			mbox.Local = value
+			mbox.Local = string(value)
 		}
 	}
 	if c == '<' {
@@ -204,7 +204,7 @@ func parseMailbox(mbox *Mailbox, parser *libbytes.Parser, prevd byte) (c byte, e
 		if !IsValidLocal(value) {
 			return c, fmt.Errorf(`%s: invalid local '%s'`, logp, value)
 		}
-		mbox.Local = value
+		mbox.Local = string(value)
 	}
 
 	// Get the domain part.
@@ -224,7 +224,7 @@ domain:
 	if len(mbox.Local) != 0 && len(value) == 0 {
 		return c, fmt.Errorf(`%s: invalid domain '%s'`, logp, value)
 	}
-	mbox.Domain = value
+	mbox.Domain = string(value)
 	mbox.Address = fmt.Sprintf(`%s@%s`, mbox.Local, mbox.Domain)
 
 	if mbox.isAngle {

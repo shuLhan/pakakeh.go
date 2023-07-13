@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -17,6 +18,16 @@ import (
 
 // Field represent field name and value in header.
 type Field struct {
+	// Name contains "relaxed" canonicalization of field name.
+	Name string
+	// Value contains "relaxed" canonicalization of field value.
+	Value string
+
+	// oriName contains "simple" canonicalization of field name.
+	oriName string
+	// oriValue contains "simple" canonicalization of field value.
+	oriValue string
+
 	// contentType contains unpacked value of field with Name
 	// "Content-Type" or nil if still packed.
 	contentType *ContentType
@@ -24,39 +35,29 @@ type Field struct {
 	date   *time.Time
 	mboxes []*Mailbox
 
-	// Name contains "relaxed" canonicalization of field name.
-	Name []byte
-	// Value contains "relaxed" canonicalization of field value.
-	Value []byte
-
 	// Params contains unpacked parameter from Value.
 	// Not all content type has parameters.
 	Params []Param
 
-	// oriName contains "simple" canonicalization of field name.
-	oriName []byte
-	// oriValue contains "simple" canonicalization of field value.
-	oriValue []byte
-
 	// Type of field, the numeric representation of field name.
 	Type FieldType
 
-	// isFolded set to true if field line contains folding, CRLF following
-	// by space and values.
+	// isFolded set to true if field line contains folding, CRLF
+	// following by space and values.
 	isFolded bool
 
-	// true if field.unpack has been called, false when field.setValue is
-	// called again.
+	// true if field.unpack has been called, false when field.setValue
+	// is called again.
 	unpacked bool
 }
 
 // ParseField create and initialize Field by parsing a single line message
-// header field from raw input.
+// header.
 //
 // If raw input contains multiple lines, the rest of lines will be returned.
 //
-// On error, it will return nil Field, and rest will contains the beginning of
-// invalid input.
+// On error, it will return nil Field, and rest will contains the beginning
+// of invalid input.
 func ParseField(raw []byte) (field *Field, rest []byte, err error) {
 	if len(raw) == 0 {
 		return nil, nil, nil
@@ -202,16 +203,34 @@ func (field *Field) addMailboxes(mailboxes []byte) (err error) {
 	field.mboxes = append(field.mboxes, mboxes...)
 
 	if len(field.Value) > 0 {
-		field.Value = bytes.TrimSpace(field.Value)
-		field.Value = append(field.Value, ',', ' ')
+		field.Value = strings.TrimSpace(field.Value)
+		field.Value += `, `
 	}
-	field.appendValue(mailboxes)
+
+	mailboxes = relaxedValue(mailboxes)
+	field.Value += string(mailboxes)
 
 	return nil
 }
 
-func (field *Field) appendValue(raw []byte) {
+func relaxedName(raw []byte) (rel []byte) {
+	rel = make([]byte, 0, len(raw))
+	for x := 0; x < len(raw); x++ {
+		if raw[x] == ' ' || raw[x] < 33 || raw[x] > 126 {
+			break
+		}
+		if raw[x] >= 'A' && raw[x] <= 'Z' {
+			rel = append(rel, raw[x]+32)
+		} else {
+			rel = append(rel, raw[x])
+		}
+	}
+	return rel
+}
+
+func relaxedValue(raw []byte) (rel []byte) {
 	var (
+		bb     bytes.Buffer
 		x      int
 		spaces int
 	)
@@ -229,17 +248,16 @@ func (field *Field) appendValue(raw []byte) {
 			continue
 		}
 		if spaces > 0 {
-			field.Value = append(field.Value, ' ')
+			bb.WriteByte(' ')
 			spaces = 0
 		}
-		field.Value = append(field.Value, raw[x])
+		bb.WriteByte(raw[x])
 	}
-	if len(field.Value) > 0 {
-		field.Value = append(field.Value, cr)
-		field.Value = append(field.Value, lf)
+	if bb.Len() > 0 {
+		bb.WriteByte(cr)
+		bb.WriteByte(lf)
 	}
-	field.unpacked = false
-
+	return bb.Bytes()
 }
 
 // setName set field Name by canonicalizing raw field name using "simple" and
@@ -250,18 +268,10 @@ func (field *Field) appendValue(raw []byte) {
 // "relaxed" algorithm convert field name to lowercase and removing trailing
 // whitespaces.
 func (field *Field) setName(raw []byte) {
-	field.oriName = raw
-	field.Name = make([]byte, 0, len(raw))
-	for x := 0; x < len(raw); x++ {
-		if raw[x] == ' ' || raw[x] < 33 || raw[x] > 126 {
-			break
-		}
-		if raw[x] >= 'A' && raw[x] <= 'Z' {
-			field.Name = append(field.Name, raw[x]+32)
-		} else {
-			field.Name = append(field.Name, raw[x])
-		}
-	}
+	field.oriName = string(raw)
+
+	raw = relaxedName(raw)
+	field.Name = string(raw)
 	field.updateType()
 }
 
@@ -273,9 +283,11 @@ func (field *Field) setName(raw []byte) {
 // "relaxed" algorithm remove leading and trailing WSP, replacing all
 // CFWS with single space, but not removing CRLF at end.
 func (field *Field) setValue(raw []byte) {
-	field.oriValue = raw
-	field.Value = make([]byte, 0, len(raw))
-	field.appendValue(raw)
+	field.oriValue = string(raw)
+
+	raw = relaxedValue(raw)
+	field.Value = string(raw)
+	field.unpacked = false
 }
 
 // Relaxed return the relaxed canonicalization of field name and value.
@@ -290,9 +302,9 @@ func (field *Field) Relaxed() (out []byte) {
 // Simple return the simple canonicalization of field name and value.
 func (field *Field) Simple() (out []byte) {
 	out = make([]byte, 0, len(field.oriName)+len(field.oriValue)+1)
-	out = append(out, field.oriName...)
+	out = append(out, []byte(field.oriName)...)
 	out = append(out, ':')
-	out = append(out, field.oriValue...)
+	out = append(out, []byte(field.oriValue)...)
 	return
 }
 
@@ -342,7 +354,7 @@ func (field *Field) unpack() (err error) {
 // updateType update the field type based on field name.
 func (field *Field) updateType() {
 	for k, v := range fieldNames {
-		if bytes.Equal(v, field.Name) {
+		if strings.EqualFold(v, field.Name) {
 			field.Type = k
 			return
 		}
@@ -372,7 +384,7 @@ func (field *Field) unpackDate() (err error) {
 	}
 
 	var (
-		value  = sanitize(field.Value)
+		value  = sanitize([]byte(field.Value))
 		parser = libbytes.NewParser(value, []byte{',', ' '})
 
 		vstr  string
@@ -528,7 +540,7 @@ func computeOffSeconds(off int64) int {
 
 // unpackMailboxList unpack list of mailbox from field Value.
 func (field *Field) unpackMailboxList() (err error) {
-	field.mboxes, err = ParseMailboxes(field.Value)
+	field.mboxes, err = ParseMailboxes([]byte(field.Value))
 	if err == nil {
 		field.unpacked = true
 	}
@@ -539,7 +551,7 @@ func (field *Field) unpackMailboxList() (err error) {
 // It will return an error if address is invalid or contains multiple
 // addresses.
 func (field *Field) unpackMailbox() (err error) {
-	mboxes, err := ParseMailboxes(field.Value)
+	mboxes, err := ParseMailboxes([]byte(field.Value))
 	if err != nil {
 		return err
 	}
@@ -559,7 +571,7 @@ func (field *Field) unpackContentType() (err error) {
 		return nil
 	}
 
-	field.contentType, err = ParseContentType(field.Value)
+	field.contentType, err = ParseContentType([]byte(field.Value))
 	if err != nil {
 		return err
 	}
