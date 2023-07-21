@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/shuLhan/share/lib/ascii"
 )
@@ -198,6 +199,55 @@ func IsFileExist(parent, relpath string) bool {
 		return false
 	}
 	return true
+}
+
+// PathFold replace the path "in" with tilde "~" if its prefix match with
+// user's home directory from [os.UserHomeDir].
+func PathFold(in string) (out string, err error) {
+	var (
+		logp = `PathFold`
+
+		userHomeDir string
+	)
+
+	in = filepath.Clean(in)
+
+	userHomeDir, err = os.UserHomeDir()
+	if err != nil {
+		return ``, fmt.Errorf(`%s: %s: %w`, logp, in, err)
+	}
+	if strings.HasPrefix(in, userHomeDir) {
+		out = filepath.Join(`~`, in[len(userHomeDir):])
+	} else {
+		out = in
+	}
+	return out, nil
+}
+
+// PathUnfold expand the tilde "~/" prefix into user's home directory using
+// [os.UserHomeDir] and environment variables using [os.ExpandEnv] inside
+// the string path "in".
+func PathUnfold(in string) (out string, err error) {
+	var (
+		logp = `PathUnfold`
+
+		userHomeDir string
+	)
+
+	if strings.HasPrefix(in, `~/`) {
+		userHomeDir, err = os.UserHomeDir()
+		if err != nil {
+			return ``, fmt.Errorf(`%s: %s: %w`, logp, in, err)
+		}
+		out = filepath.Join(userHomeDir, in[2:])
+	} else {
+		out = in
+	}
+
+	out = os.ExpandEnv(out)
+	out = filepath.Clean(out)
+
+	return out, nil
 }
 
 // RmdirEmptyAll remove directory in path if it's empty until one of the
