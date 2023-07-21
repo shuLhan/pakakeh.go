@@ -569,7 +569,7 @@ func (srv *Server) initListener() (err error) {
 		Certificates: []tls.Certificate{
 			*srv.TLSCert,
 		},
-		MinVersion: tls.VersionTLS11,
+		MinVersion: tls.VersionTLS12,
 	}
 
 	if len(srv.tlsAddress) == 0 {
