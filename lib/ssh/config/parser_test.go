@@ -101,8 +101,8 @@ func TestConfigParser_load(t *testing.T) {
 	cases := []struct {
 		dir      string
 		pattern  string
-		exp      []string
 		expError string
+		exp      []string
 	}{{
 		dir:     wd,
 		pattern: "testdata/config",

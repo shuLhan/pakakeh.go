@@ -16,9 +16,9 @@ import (
 // parser for the SSH config file that merge all "Include" files and convert
 // them all into lines of string.
 type parser struct {
+	files   map[string]struct{}
 	workDir string
 	homeDir string
-	files   map[string]struct{}
 }
 
 func newParser() (p *parser, err error) {

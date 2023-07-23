@@ -39,40 +39,30 @@ const (
 // Section is the type that represent SSH client Host and Match section in
 // configuration.
 type Section struct {
-	AddKeysToAgent              string
-	AddressFamily               string
-	BindAddress                 string
-	BindInterface               string
-	CanonicalDomains            []string
-	CanonicalizeHostname        string
-	CanonicalizeMaxDots         int
-	CanonicalizePermittedCNAMEs *PermittedCNAMEs
-	CASignatureAlgorithms       []string
-	CertificateFile             []string
-	ConnectionAttempts          int
-	ConnectTimeout              int
-
 	// Environments contains system environment variables that will be
 	// passed to Execute().
 	// The key and value is derived from "SendEnv" and "SetEnv".
 	Environments map[string]string
 
-	Hostname                          string
-	identityAgent                     string
-	IdentityFile                      []string
-	Port                              string
-	User                              string
-	XAuthLocation                     string
-	IsBatchMode                       bool
-	IsCanonicalizeFallbackLocal       bool
-	IsChallengeResponseAuthentication bool
-	IsCheckHostIP                     bool
-	IsClearAllForwardings             bool
-	UseCompression                    bool
-	UseVisualHostKey                  bool
+	// PrivateKeys contains IdentityFile that has been parsed.
+	// This field will be set once the Signers has been called.
+	PrivateKeys map[string]any
 
-	// User's home directory.
-	homeDir string
+	CanonicalizePermittedCNAMEs *PermittedCNAMEs
+
+	AddKeysToAgent       string
+	AddressFamily        string
+	BindAddress          string
+	BindInterface        string
+	CanonicalizeHostname string
+
+	Hostname string
+	Port     string
+
+	// The first IdentityFile that exist and valid.
+	PrivateKeyFile string
+
+	User string
 
 	// WorkingDir contains the directory where the SSH client started.
 	// This value is required when client want to copy file from/to
@@ -81,18 +71,36 @@ type Section struct {
 	// os.Getwd() or user's home directory.
 	WorkingDir string
 
-	// The first IdentityFile that exist and valid.
-	PrivateKeyFile string
+	XAuthLocation string
 
-	// PrivateKeys contains IdentityFile that has been parsed.
-	// This field will be set once the Signers has been called.
-	PrivateKeys map[string]any
+	// User's home directory.
+	homeDir string
+
+	identityAgent string
+
+	CanonicalDomains      []string
+	CASignatureAlgorithms []string
+	CertificateFile       []string
+	IdentityFile          []string
 
 	// Patterns for Host section.
 	patterns []*pattern
 
 	// Criteria for Match section.
-	criteria    []*matchCriteria
+	criteria []*matchCriteria
+
+	CanonicalizeMaxDots int
+	ConnectionAttempts  int
+	ConnectTimeout      int
+
+	IsBatchMode                       bool
+	IsCanonicalizeFallbackLocal       bool
+	IsChallengeResponseAuthentication bool
+	IsCheckHostIP                     bool
+	IsClearAllForwardings             bool
+	UseCompression                    bool
+	UseVisualHostKey                  bool
+
 	useCriteria bool
 
 	useDefaultIdentityFile bool // Flag for the IdentityFile.
@@ -101,8 +109,13 @@ type Section struct {
 // newSection create new Host or Match with default values.
 func newSection() *Section {
 	return &Section{
+		Environments: map[string]string{},
+
 		AddKeysToAgent: valueNo,
 		AddressFamily:  valueAny,
+		Port:           defPort,
+		XAuthLocation:  defXAuthLocation,
+
 		CASignatureAlgorithms: []string{
 			ssh.KeyAlgoECDSA256,
 			ssh.KeyAlgoECDSA384,
@@ -110,16 +123,16 @@ func newSection() *Section {
 			ssh.KeyAlgoED25519,
 			ssh.KeyAlgoRSA,
 		},
-		ConnectionAttempts: defConnectionAttempts,
-		Environments:       map[string]string{},
+
 		IdentityFile: []string{
 			"~/.ssh/id_dsa",
 			"~/.ssh/id_ecdsa",
 			"~/.ssh/id_ed25519",
 			"~/.ssh/id_rsa",
 		},
-		Port:                              defPort,
-		XAuthLocation:                     defXAuthLocation,
+
+		ConnectionAttempts: defConnectionAttempts,
+
 		useDefaultIdentityFile:            true,
 		IsChallengeResponseAuthentication: true,
 		IsCheckHostIP:                     true,

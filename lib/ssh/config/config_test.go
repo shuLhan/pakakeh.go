@@ -60,8 +60,8 @@ func TestConfig_Get(t *testing.T) {
 	}
 
 	cases := []struct {
-		s   string
 		exp func(def Section) *Section
+		s   string
 	}{{
 		s: "",
 		exp: func(def Section) *Section {

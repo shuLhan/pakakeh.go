@@ -11,8 +11,8 @@ import (
 
 func TestNewSectionHost(t *testing.T) {
 	cases := []struct {
-		rawPattern string
 		exp        func(def Section) *Section
+		rawPattern string
 	}{{
 		rawPattern: "",
 		exp: func(exp Section) *Section {
@@ -93,8 +93,8 @@ func TestSection_setEnv(t *testing.T) {
 		Environments: make(map[string]string),
 	}
 	cases := []struct {
-		value string
 		exp   map[string]string
+		value string
 	}{{
 		value: "a",
 		exp:   make(map[string]string),
@@ -122,8 +122,8 @@ func TestSection_setSendEnv(t *testing.T) {
 	}
 
 	cases := []struct {
-		pattern string
 		exp     map[string]string
+		pattern string
 	}{{
 		pattern: "key_1",
 		exp: map[string]string{

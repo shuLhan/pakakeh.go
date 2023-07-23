@@ -126,8 +126,8 @@ var (
 // Config contains mapping of host's patterns and its options from SSH
 // configuration file.
 type Config struct {
-	sections []*Section
 	envs     map[string]string
+	sections []*Section
 }
 
 // Load SSH configuration from file.
