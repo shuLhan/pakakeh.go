@@ -55,74 +55,92 @@ func TestPatternToRegex(t *testing.T) {
 }
 
 func TestConfig_Get(t *testing.T) {
-	cfg, err := Load("./testdata/config")
+	type testCase struct {
+		exp func() Section
+		s   string
+	}
+
+	var (
+		cfg *Config
+		err error
+	)
+
+	cfg, err = Load(`./testdata/config`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		exp func(def Section) *Section
-		s   string
-	}{{
-		s: "",
-		exp: func(def Section) *Section {
-			return nil
+	var listTestCase = []testCase{{
+		s: ``,
+		exp: func() Section {
+			var sec = *testDefaultSection
+			return sec
 		},
 	}, {
-		s: "example.local",
-		exp: func(def Section) *Section {
-			def.name = `example.local`
-			def.Hostname = "127.0.0.1"
-			def.User = "test"
-			def.PrivateKeyFile = ""
-			def.IdentityFile = []string{
-				filepath.Join(def.homeDir, ".ssh", "notexist"),
+		s: `example.local`,
+		exp: func() Section {
+			var sec = *testDefaultSection
+			sec.name = `example.local`
+			sec.Hostname = `127.0.0.1`
+			sec.User = `test`
+			sec.IdentityFile = []string{
+				filepath.Join(testDefaultSection.homeDir, `.ssh`, `notexist`),
 			}
-			def.useDefaultIdentityFile = false
-			def.Field = map[string]string{
+			sec.useDefaultIdentityFile = false
+			sec.Field = map[string]string{
 				`hostname`:     `127.0.0.1`,
 				`user`:         `test`,
 				`identityfile`: `~/.ssh/notexist`,
 			}
-			return &def
+			return sec
 		},
 	}, {
-		s: "my.example.local",
-		exp: func(def Section) *Section {
-			def.name = `*.example.local`
-			def.Hostname = "127.0.0.2"
-			def.User = "wildcard"
-			def.PrivateKeyFile = ""
-			def.IdentityFile = []string{
-				filepath.Join(def.homeDir, ".ssh", "notexist"),
+		s: `my.example.local`,
+		exp: func() Section {
+			var sec = *testDefaultSection
+			sec.name = `my.example.local`
+			sec.Hostname = `127.0.0.2`
+			sec.User = `wildcard`
+			sec.IdentityFile = []string{
+				filepath.Join(testDefaultSection.homeDir, `.ssh`, `notexist`),
 			}
-			def.useDefaultIdentityFile = false
-			def.Field = map[string]string{
+			sec.useDefaultIdentityFile = false
+			sec.Field = map[string]string{
 				`hostname`:     `127.0.0.2`,
 				`user`:         `wildcard`,
 				`identityfile`: `~/.ssh/notexist`,
 			}
-			return &def
+			return sec
+		},
+	}, {
+		s: `foo.local`,
+		exp: func() Section {
+			var sec = *testDefaultSection
+			sec.name = `foo.local`
+			sec.Hostname = `127.0.0.3`
+			sec.User = `allfoo`
+			sec.IdentityFile = []string{
+				filepath.Join(testDefaultSection.homeDir, `.ssh`, `foo`),
+				filepath.Join(testDefaultSection.homeDir, `.ssh`, `allfoo`),
+			}
+			sec.useDefaultIdentityFile = false
+			sec.Field = map[string]string{
+				`hostname`:     `127.0.0.3`,
+				`user`:         `allfoo`,
+				`identityfile`: `~/.ssh/allfoo`,
+			}
+			return sec
 		},
 	}}
 
-	for _, c := range cases {
-		got := cfg.Get(c.s)
+	var (
+		c   testCase
+		got *Section
+	)
 
-		// Clear the patterns and criteria for comparison.
-		if got != nil {
-			got.patterns = nil
-			got.criteria = nil
-			got.init(testParser.workDir, testParser.homeDir)
-		}
-
-		exp := c.exp(*testDefaultSection)
-		if exp != nil {
-			exp.init(testParser.workDir, testParser.homeDir)
-		} else if got == nil {
-			continue
-		}
-		test.Assert(t, c.s, *exp, *got)
+	for _, c = range listTestCase {
+		got = cfg.Get(c.s)
+		test.Assert(t, c.s, c.exp(), *got)
 	}
 }
 

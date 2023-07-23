@@ -371,7 +371,17 @@ func (section *Section) init(workDir, homeDir string) {
 	}
 }
 
-func (section *Section) merge(other *Section) {
+// mergeField merge the Field from other Section.
+func (section *Section) mergeField(cfg *Config, other *Section) {
+	var (
+		key   string
+		value string
+	)
+	for key, value = range other.Field {
+		// The key and value in other should be valid, so no need to
+		// check for error.
+		_ = section.set(cfg, key, value)
+	}
 }
 
 // set the section field by raw key and value.

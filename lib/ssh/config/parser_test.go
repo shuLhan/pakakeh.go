@@ -6,8 +6,9 @@ package config
 
 import (
 	"os"
-	"reflect"
 	"testing"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestIsIncludeDirective(t *testing.T) {
@@ -57,9 +58,7 @@ func TestParseInclude(t *testing.T) {
 
 	for _, c := range cases {
 		got := parseInclude(c.line)
-		if !reflect.DeepEqual(c.exp, got) {
-			t.Fatalf("parseInclude: expecting %v, got %v", c.exp, got)
-		}
+		test.Assert(t, c.line, c.exp, got)
 	}
 }
 
@@ -77,6 +76,13 @@ func TestReadLines(t *testing.T) {
 			`IdentityFile ~/.ssh/notexist`,
 			`Host *.example.local`,
 			`Include sub/config`,
+			`Host foo.local`,
+			`Hostname 127.0.0.3`,
+			`User foo`,
+			`IdentityFile ~/.ssh/foo`,
+			`Host *foo.local`,
+			`User allfoo`,
+			`IdentityFile ~/.ssh/allfoo`,
 		},
 	}}
 
@@ -86,9 +92,7 @@ func TestReadLines(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if !reflect.DeepEqual(c.exp, got) {
-			t.Fatalf("readLines: expecting %v, got %v", c.exp, got)
-		}
+		test.Assert(t, c.file, c.exp, got)
 	}
 }
 
@@ -117,6 +121,13 @@ func TestConfigParser_load(t *testing.T) {
 			`Hostname 127.0.0.2`,
 			`User wildcard`,
 			`IdentityFile ~/.ssh/notexist`,
+			`Host foo.local`,
+			`Hostname 127.0.0.3`,
+			`User foo`,
+			`IdentityFile ~/.ssh/foo`,
+			`Host *foo.local`,
+			`User allfoo`,
+			`IdentityFile ~/.ssh/allfoo`,
 		},
 	}}
 
@@ -133,9 +144,7 @@ func TestConfigParser_load(t *testing.T) {
 			}
 			continue
 		}
-		if !reflect.DeepEqual(c.exp, got) {
-			t.Fatalf("parser.load: expecting %v, got %v", c.exp, got)
-		}
+		test.Assert(t, c.pattern, c.exp, got)
 	}
 }
 
@@ -169,8 +178,6 @@ func TestParseArgs(t *testing.T) {
 	for _, c := range cases {
 		got := parseArgs(c.raw, ' ')
 
-		if !reflect.DeepEqual(c.exp, got) {
-			t.Fatalf("parseArgs: expecting %v, got %v", c.exp, got)
-		}
+		test.Assert(t, c.raw, c.exp, got)
 	}
 }

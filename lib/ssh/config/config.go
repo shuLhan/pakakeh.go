@@ -114,13 +114,17 @@ func Load(file string) (cfg *Config, err error) {
 }
 
 // Get the Host or Match configuration that match with the pattern "s".
+// If no Host or Match found, it still return non-nil Section but with empty
+// fields.
 func (cfg *Config) Get(s string) (section *Section) {
-	for _, section := range cfg.sections {
-		if section.isMatch(s) {
-			return section
+	section = newSection(s)
+	for _, hostMatch := range cfg.sections {
+		if hostMatch.isMatch(s) {
+			section.mergeField(cfg, hostMatch)
 		}
 	}
-	return nil
+	section.init(cfg.workDir, cfg.homeDir)
+	return section
 }
 
 // Prepend other Config's sections to this Config.

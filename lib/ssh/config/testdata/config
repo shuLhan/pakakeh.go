@@ -9,3 +9,13 @@ Host example.local
 	# comment
 Host *.example.local
 	Include sub/config
+
+Host foo.local
+	Hostname 127.0.0.3
+	User foo
+	IdentityFile ~/.ssh/foo
+
+## Override the foo.local using wildcard.
+Host *foo.local
+	User allfoo
+	IdentityFile ~/.ssh/allfoo
