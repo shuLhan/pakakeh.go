@@ -632,6 +632,10 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	logp := "refresh"
 	syspath := filepath.Join(mfs.Root.SysPath, url)
 
+	if !strings.HasPrefix(syspath, mfs.Root.SysPath) {
+		return nil, os.ErrNotExist
+	}
+
 	_, err = os.Stat(syspath)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s: %w", logp, url, err)
