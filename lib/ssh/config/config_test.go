@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	testDefaultSection = newSection()
+	testDefaultSection = newSection(``)
 	testParser         *parser
 )
 
@@ -71,6 +71,7 @@ func TestConfig_Get(t *testing.T) {
 	}, {
 		s: "example.local",
 		exp: func(def Section) *Section {
+			def.name = `example.local`
 			def.Hostname = "127.0.0.1"
 			def.User = "test"
 			def.PrivateKeyFile = ""
@@ -88,6 +89,7 @@ func TestConfig_Get(t *testing.T) {
 	}, {
 		s: "my.example.local",
 		exp: func(def Section) *Section {
+			def.name = `*.example.local`
 			def.Hostname = "127.0.0.2"
 			def.User = "wildcard"
 			def.PrivateKeyFile = ""

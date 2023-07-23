@@ -5,8 +5,9 @@
 package config
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestNewSectionMatch(t *testing.T) {
@@ -30,9 +31,7 @@ func TestNewSectionMatch(t *testing.T) {
 		}
 		got.init(testParser.workDir, testParser.homeDir)
 
-		if !reflect.DeepEqual(*c.exp, *got) {
-			t.Fatalf("newSectionMatch: expecting %v, got %v", c.exp, got)
-		}
+		test.Assert(t, c.raw, *c.exp, *got)
 	}
 }
 
@@ -44,6 +43,7 @@ func TestParseCriteriaAll(t *testing.T) {
 	}{{
 		raw: "all ",
 		exp: func(exp Section) *Section {
+			exp.name = `all `
 			exp.criteria = []*matchCriteria{{
 				name: criteriaAll,
 			}}
@@ -54,6 +54,7 @@ func TestParseCriteriaAll(t *testing.T) {
 
 		raw: "canonical all",
 		exp: func(exp Section) *Section {
+			exp.name = `canonical all`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaCanonical,
 			}, {
@@ -65,6 +66,7 @@ func TestParseCriteriaAll(t *testing.T) {
 	}, {
 		raw: "final all",
 		exp: func(exp Section) *Section {
+			exp.name = `final all`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaFinal,
 			}, {
@@ -93,9 +95,7 @@ func TestParseCriteriaAll(t *testing.T) {
 		got.init(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
-		if !reflect.DeepEqual(*exp, *got) {
-			t.Fatalf("parseCriteriaAll: expecting %v, got %v", exp, got)
-		}
+		test.Assert(t, c.raw, *exp, *got)
 	}
 }
 
@@ -107,6 +107,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	}{{
 		raw: `exec "echo true"`,
 		exp: func(exp Section) *Section {
+			exp.name = `exec "echo true"`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaExec,
 				arg:  `echo true`,
@@ -117,6 +118,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	}, {
 		raw: `exec "echo true`,
 		exp: func(exp Section) *Section {
+			exp.name = `exec "echo true`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaExec,
 				arg:  `echo true`,
@@ -138,9 +140,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 		got.init(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
-		if !reflect.DeepEqual(*exp, *got) {
-			t.Fatalf("parseCriteriaExec: expecting %v, got %v", exp, got)
-		}
+		test.Assert(t, c.raw, *exp, *got)
 	}
 }
 
@@ -152,6 +152,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	}{{
 		raw: `user name*`,
 		exp: func(exp Section) *Section {
+			exp.name = `user name*`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `name*`,
@@ -165,6 +166,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	}, {
 		raw: `user "a*,b*"`,
 		exp: func(exp Section) *Section {
+			exp.name = `user "a*,b*"`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `a*,b*`,
@@ -180,6 +182,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	}, {
 		raw: `user "a*,b*`,
 		exp: func(exp Section) *Section {
+			exp.name = `user "a*,b*`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaUser,
 				arg:  `a*,b*`,
@@ -206,8 +209,6 @@ func TestParseCriteriaWithArg(t *testing.T) {
 		got.init(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
-		if !reflect.DeepEqual(*exp, *got) {
-			t.Fatalf("parseCriteriaWithArg: expecting %v, got %v", exp, got)
-		}
+		test.Assert(t, c.raw, *exp, *got)
 	}
 }

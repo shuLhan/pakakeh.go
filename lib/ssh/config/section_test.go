@@ -5,8 +5,9 @@
 package config
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 func TestNewSectionHost(t *testing.T) {
@@ -22,6 +23,7 @@ func TestNewSectionHost(t *testing.T) {
 	}, {
 		rawPattern: "*",
 		exp: func(exp Section) *Section {
+			exp.name = `*`
 			exp.patterns = []*pattern{{
 				value: "*",
 			}}
@@ -30,6 +32,7 @@ func TestNewSectionHost(t *testing.T) {
 	}, {
 		rawPattern: "192.168.1.?",
 		exp: func(exp Section) *Section {
+			exp.name = `192.168.1.?`
 			exp.patterns = []*pattern{{
 				value: `192.168.1.?`,
 			}}
@@ -38,6 +41,7 @@ func TestNewSectionHost(t *testing.T) {
 	}, {
 		rawPattern: "!*.co.uk *",
 		exp: func(exp Section) *Section {
+			exp.name = `!*.co.uk *`
 			exp.patterns = []*pattern{{
 				value:    `*.co.uk`,
 				isNegate: true,
@@ -53,9 +57,7 @@ func TestNewSectionHost(t *testing.T) {
 		got.init(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
-		if !reflect.DeepEqual(*exp, *got) {
-			t.Fatalf("newSectionHost: expecting %v, got %v", exp, got)
-		}
+		test.Assert(t, c.rawPattern, *exp, *got)
 	}
 }
 
@@ -82,9 +84,7 @@ func TestSection_init(t *testing.T) {
 		got.init(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
-		if !reflect.DeepEqual(exp.IdentityFile, got.IdentityFile) {
-			t.Fatalf("init: expecting %v, got %v", exp, got)
-		}
+		test.Assert(t, `init`, exp.IdentityFile, got.IdentityFile)
 	}
 }
 
@@ -108,9 +108,7 @@ func TestSection_setEnv(t *testing.T) {
 	for _, c := range cases {
 		cfg.setEnv(c.value)
 
-		if !reflect.DeepEqual(c.exp, cfg.Environments) {
-			t.Fatalf("setEnv: expecting %v, got %v", c.exp, cfg.Environments)
-		}
+		test.Assert(t, c.value, c.exp, cfg.Environments)
 	}
 }
 
@@ -143,8 +141,6 @@ func TestSection_setSendEnv(t *testing.T) {
 
 	for _, c := range cases {
 		cfg.setSendEnv(envs, c.pattern)
-		if !reflect.DeepEqual(c.exp, cfg.Environments) {
-			t.Fatalf("setSendEnv: %s: expecting %v, got %v", c.pattern, c.exp, cfg.Environments)
-		}
+		test.Assert(t, c.pattern, c.exp, cfg.Environments)
 	}
 }

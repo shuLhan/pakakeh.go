@@ -155,6 +155,9 @@ type Section struct {
 
 	CanonicalizePermittedCNAMEs *PermittedCNAMEs
 
+	// name contains the raw value after Host or Match.
+	name string
+
 	AddKeysToAgent       string
 	AddressFamily        string
 	BindAddress          string
@@ -212,11 +215,12 @@ type Section struct {
 }
 
 // newSection create new Host or Match with default values.
-func newSection() *Section {
+func newSection(name string) *Section {
 	return &Section{
 		Environments: map[string]string{},
 		Field:        map[string]string{},
 
+		name:           name,
 		AddKeysToAgent: valueNo,
 		AddressFamily:  valueAny,
 		Port:           defPort,
@@ -248,7 +252,7 @@ func newSection() *Section {
 func newSectionHost(rawPattern string) (host *Section) {
 	patterns := strings.Fields(rawPattern)
 
-	host = newSection()
+	host = newSection(rawPattern)
 	host.patterns = make([]*pattern, 0, len(patterns))
 
 	for _, pattern := range patterns {
