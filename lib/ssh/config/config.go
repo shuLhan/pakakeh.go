@@ -28,7 +28,11 @@ var (
 // Config contains mapping of host's patterns and its options from SSH
 // configuration file.
 type Config struct {
-	envs     map[string]string
+	envs map[string]string
+
+	workDir string
+	homeDir string
+
 	sections []*Section
 }
 
@@ -53,6 +57,9 @@ func Load(file string) (cfg *Config, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
 	}
+
+	cfg.workDir = p.workDir
+	cfg.homeDir = p.homeDir
 
 	lines, err := p.load("", file)
 	if err != nil {
