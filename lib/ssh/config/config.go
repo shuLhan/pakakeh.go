@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -20,103 +19,6 @@ const (
 const (
 	keyHost  = "host"
 	keyMatch = "match"
-
-	// List of valid keys in Host or Match section.
-	keyAddKeysToAgent                  = "addkeystoagent"
-	keyAddressFamily                   = "addressfamily"
-	keyBatchMode                       = "batchmode"
-	keyBindAddress                     = "bindaddress"
-	keyBindInterface                   = "bindinterface"
-	keyCASignatureAlgorithms           = "casignaturealgorithms"
-	keyCanonicalDomains                = "canonicaldomains"
-	keyCanonicalizeFallbackLocal       = "canonicalizefallbacklocal"
-	keyCanonicalizeHostname            = "canonicalizehostname"
-	keyCanonicalizeMaxDots             = "canonicalizemaxdots"
-	keyCanonicalizePermittedCNAMEs     = "canonicalizepermittedcnames"
-	keyCertificateFile                 = "certificatefile"
-	keyChallengeResponseAuthentication = "challengeresponseauthentication"
-	keyCheckHostIP                     = "checkhostip"
-	keyClearAllForwardings             = "clearallforwardings"
-	keyCompression                     = "compression"
-	keyConnectTimeout                  = "connecttimeout"
-	keyConnectionAttempts              = "connectionattempts"
-	keyHostname                        = "hostname"
-	keyIdentityAgent                   = "identityagent"
-	keyIdentityFile                    = "identityfile"
-	keyPort                            = "port"
-	keySendEnv                         = "sendenv"
-	keySetEnv                          = "setenv"
-	keyUser                            = "user"
-	keyVisualHostKey                   = "visualhostkey"
-	keyXAuthLocation                   = "xauthlocation"
-)
-
-// TODO: list of keys that are not implemented yet due to hard or
-// unknown how to test it.
-// nolint: deadcode,varcheck
-const (
-	keyCiphers                          = "ciphers"
-	keyControlMaster                    = "controlmaster"
-	keyControlPath                      = "controlpath"
-	keyControlPersist                   = "controlpersist"
-	keyDynamicForward                   = "dynamicforward"
-	keyEnableSSHKeysign                 = "enablesshkeysign"
-	keyEscapeChar                       = "escapechar"
-	keyExitOnForwardFailure             = "keyexitonforwardfailure"
-	keyFingerprintHash                  = "fingerprinthash"
-	keyForwardAgent                     = "forwardagent"
-	keyForwardX11                       = "forwardx11"
-	keyForwardX11Timeout                = "forwardx11timeout"
-	keyForwardX11Trusted                = "forwardx11trusted"
-	keyGatewayPorts                     = "gatewayports"
-	keyGlobalKnownHostsFile             = "globalknownhostsfile"
-	keyGSSAPIAuthentication             = "gssapiauthentication"
-	keyGSSAPIDelegateCredentials        = "gssapidelegatecredentials"
-	keyHashKnownHosts                   = "hashknownhosts"
-	keyHostBasedAuthentication          = "hostbasedauthentication"
-	keyHostBaseKeyTypes                 = "hostbasedkeytypes"
-	keyHostKeyAlgorithms                = "hostkeyalgorithms"
-	keyHostKeyAlias                     = "hostkeyalias"
-	keyIdentitiesOnly                   = "identitiesonly"
-	keyIgnoreUnknown                    = "ignoreunknown"
-	keyInclude                          = "include"
-	keyIPQoS                            = "ipqos"
-	keyKbdInteractiveAuthentication     = "kbdinteractiveauthentication"
-	keyKbdInteractiveDevices            = "kbdinteractivedevices"
-	keyKexAlgorithms                    = "kexalgorithms"
-	keyLocalCommand                     = "localcommand"
-	keyLocalForward                     = "localforward"
-	keyLogLevel                         = "loglevel"
-	keyMACs                             = "macs"
-	keyNoHostAuthenticationForLocalhost = "nohostauthenticationforlocalhost"
-	keyNumberOfPasswordPrompts          = "numberofpasswordprompts"
-	keyPasswordAuthentication           = "passwordauthentication"
-	keyPermitLocalCommand               = "permitlocalcommand"
-	keyPKCS11Provider                   = "pkcs11provider"
-	keyPreferredAuthentications         = "preferredauthentications"
-	keyProxyCommand                     = "proxycommand"
-	keyProxyJump                        = "proxyjump"
-	keyProxyUseFdpass                   = "proxyusefdpass"
-	keyPubkeyAcceptedKeyTypes           = "pubkeyacceptedkeytypes"
-	keyPubkeyAuthentication             = "pubkeyauthentication"
-	keyRekeyLimit                       = "rekeylimit"
-	keyRemoteCommand                    = "remotecommand"
-	keyRemoteForward                    = "remoteforward"
-	keyRequestTTY                       = "requesttty"
-	keyRevokeHostKeys                   = "revokehostkeys"
-	keyServerAliveCountMax              = "serveralivecountmax"
-	keyServerAliveInterval              = "serveraliveinterval"
-	keyStreamLocalBindMask              = "streamlocalbindmask"
-	keyStreamLocalBindUnlink            = "streamlocalbindunlink"
-	keyStrictHostKeyChecking            = "stricthostkeychecking"
-	keySyslogFacility                   = "syslogfacility"
-	keyTCPKeepAlive                     = "tcpkeepalive"
-	keyTunnel                           = "tunnel"
-	keyTunnelDevince                    = "tunneldevice"
-	keyUpdatehostKeys                   = "updatehostkeys"
-	keyUseKeychain                      = "usekeychain"
-	keyUserKnownHostsFile               = "userknownhostsfile"
-	keyVerifyHostKeyDNS                 = "verifyhostkeydns"
 )
 
 var (
@@ -181,79 +83,18 @@ func Load(file string) (cfg *Config, err error) {
 				section = nil
 			}
 			section, err = newSectionMatch(value)
-		case keyAddKeysToAgent:
-			err = section.setAddKeysToAgent(value)
-		case keyAddressFamily:
-			err = section.setAddressFamily(value)
-		case keyBatchMode:
-			section.IsBatchMode, err = parseBool(key, value)
-		case keyBindAddress:
-			section.BindAddress = value
-		case keyBindInterface:
-			section.BindInterface = value
-		case keyCanonicalDomains:
-			section.CanonicalDomains = strings.Fields(value)
-		case keyCanonicalizeFallbackLocal:
-			section.IsCanonicalizeFallbackLocal, err = parseBool(key, value)
-		case keyCanonicalizeHostname:
-			err = section.setCanonicalizeHostname(value)
-		case keyCanonicalizeMaxDots:
-			section.CanonicalizeMaxDots, err = strconv.Atoi(value)
-
-		case keyCanonicalizePermittedCNAMEs:
-			err = section.setCanonicalizePermittedCNAMEs(value)
-
-		case keyCASignatureAlgorithms:
-			section.setCASignatureAlgorithms(value)
-
-		case keyCertificateFile:
-			section.CertificateFile = append(
-				section.CertificateFile,
-				value)
-
-		case keyChallengeResponseAuthentication:
-			section.IsChallengeResponseAuthentication, err = parseBool(key, value)
-
-		case keyCheckHostIP:
-			section.IsCheckHostIP, err = parseBool(key, value)
-
-		case keyClearAllForwardings:
-			section.IsClearAllForwardings, err = parseBool(key, value)
-		case keyCompression:
-			section.UseCompression, err = parseBool(key, value)
-		case keyConnectionAttempts:
-			section.ConnectionAttempts, err = strconv.Atoi(value)
-		case keyConnectTimeout:
-			section.ConnectTimeout, err = strconv.Atoi(value)
-
-		case keyIdentityAgent:
-			section.setIdentityAgent(value)
-		case keyIdentityFile:
-			if section.useDefaultIdentityFile {
-				section.IdentityFile = []string{value}
-				section.useDefaultIdentityFile = false
-			} else {
-				section.IdentityFile = append(
-					section.IdentityFile, value)
+			if err != nil {
+				return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x+1, err)
 			}
-
-		case keyHostname:
-			section.Hostname = value
-		case keyPort:
-			section.Port = value
-		case keySendEnv:
-			section.setSendEnv(cfg.envs, value)
-		case keySetEnv:
-			section.setEnv(value)
-		case keyUser:
-			section.User = value
-		case keyVisualHostKey:
-			section.UseVisualHostKey, err = parseBool(key, value)
-		case keyXAuthLocation:
-			section.XAuthLocation = value
-		}
-		if err != nil {
-			return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x+1, err)
+		default:
+			if section == nil {
+				// No "Host" or "Match" define yet.
+				continue
+			}
+			err = section.set(cfg, key, value)
+			if err != nil {
+				return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x+1, err)
+			}
 		}
 	}
 	if section != nil {
