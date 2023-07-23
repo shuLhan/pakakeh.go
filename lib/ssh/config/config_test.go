@@ -8,8 +8,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
+
+	"github.com/shuLhan/share/lib/test"
 )
 
 var (
@@ -77,6 +78,11 @@ func TestConfig_Get(t *testing.T) {
 				filepath.Join(def.homeDir, ".ssh", "notexist"),
 			}
 			def.useDefaultIdentityFile = false
+			def.Field = map[string]string{
+				`hostname`:     `127.0.0.1`,
+				`user`:         `test`,
+				`identityfile`: `~/.ssh/notexist`,
+			}
 			return &def
 		},
 	}, {
@@ -89,6 +95,11 @@ func TestConfig_Get(t *testing.T) {
 				filepath.Join(def.homeDir, ".ssh", "notexist"),
 			}
 			def.useDefaultIdentityFile = false
+			def.Field = map[string]string{
+				`hostname`:     `127.0.0.2`,
+				`user`:         `wildcard`,
+				`identityfile`: `~/.ssh/notexist`,
+			}
 			return &def
 		},
 	}}
@@ -109,9 +120,7 @@ func TestConfig_Get(t *testing.T) {
 		} else if got == nil {
 			continue
 		}
-		if !reflect.DeepEqual(*exp, *got) {
-			t.Fatalf("Config.Get: expecting %v, got %v", exp, got)
-		}
+		test.Assert(t, c.s, *exp, *got)
 	}
 }
 

@@ -150,6 +150,9 @@ type Section struct {
 	// This field will be set once the Signers has been called.
 	PrivateKeys map[string]any
 
+	// Field store the unpacked key and value of Section.
+	Field map[string]string
+
 	CanonicalizePermittedCNAMEs *PermittedCNAMEs
 
 	AddKeysToAgent       string
@@ -212,6 +215,7 @@ type Section struct {
 func newSection() *Section {
 	return &Section{
 		Environments: map[string]string{},
+		Field:        map[string]string{},
 
 		AddKeysToAgent: valueNo,
 		AddressFamily:  valueAny,
@@ -437,8 +441,14 @@ func (section *Section) set(cfg *Config, key, value string) (err error) {
 		section.UseVisualHostKey, err = parseBool(key, value)
 	case keyXAuthLocation:
 		section.XAuthLocation = value
+	default:
+		// Store the unknown key into Field.
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	section.Field[key] = value
+	return nil
 }
 
 func (section *Section) setAddKeysToAgent(val string) (err error) {
