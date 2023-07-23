@@ -322,6 +322,10 @@ func (xtrk *extractor) untar(fin io.Reader) (err error) {
 		fi = hdr.FileInfo()
 		filePath = filepath.Join(xtrk.dirOutput, hdr.Name)
 
+		if !strings.HasPrefix(filePath, xtrk.dirOutput) {
+			return fmt.Errorf(`%s: extract path outside of output directory`, logp)
+		}
+
 		if fi.IsDir() {
 			err = os.Mkdir(filePath, fi.Mode())
 			if err != nil {
@@ -396,6 +400,10 @@ func (xtrk *extractor) unzip(fin *os.File) (err error) {
 
 		fi = zipFile.FileInfo()
 		filePath = filepath.Join(xtrk.dirOutput, zipFile.Name)
+
+		if !strings.HasPrefix(filePath, xtrk.dirOutput) {
+			return fmt.Errorf(`%s: extract path outside of output directory`, logp)
+		}
 
 		if fi.IsDir() {
 			err = os.Mkdir(filePath, fi.Mode())
