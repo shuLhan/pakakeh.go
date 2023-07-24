@@ -81,16 +81,18 @@ func TestConfig_Get(t *testing.T) {
 		exp: func() Section {
 			var sec = *testDefaultSection
 			sec.name = `example.local`
-			sec.Hostname = `127.0.0.1`
-			sec.User = `test`
 			sec.IdentityFile = []string{
 				filepath.Join(testDefaultSection.homeDir, `.ssh`, `notexist`),
 			}
-			sec.useDefaultIdentityFile = false
 			sec.Field = map[string]string{
-				`hostname`:     `127.0.0.1`,
-				`user`:         `test`,
-				`identityfile`: `~/.ssh/notexist`,
+				KeyChallengeResponseAuthentication: ValueYes,
+				KeyCheckHostIP:                     ValueYes,
+				KeyConnectionAttempts:              DefConnectionAttempts,
+				KeyHostname:                        `127.0.0.1`,
+				KeyIdentityFile:                    `~/.ssh/notexist`,
+				KeyPort:                            DefPort,
+				KeyUser:                            `test`,
+				KeyXAuthLocation:                   DefXAuthLocation,
 			}
 			return sec
 		},
@@ -99,16 +101,18 @@ func TestConfig_Get(t *testing.T) {
 		exp: func() Section {
 			var sec = *testDefaultSection
 			sec.name = `my.example.local`
-			sec.Hostname = `127.0.0.2`
-			sec.User = `wildcard`
 			sec.IdentityFile = []string{
 				filepath.Join(testDefaultSection.homeDir, `.ssh`, `notexist`),
 			}
-			sec.useDefaultIdentityFile = false
 			sec.Field = map[string]string{
-				`hostname`:     `127.0.0.2`,
-				`user`:         `wildcard`,
-				`identityfile`: `~/.ssh/notexist`,
+				KeyChallengeResponseAuthentication: ValueYes,
+				KeyCheckHostIP:                     ValueYes,
+				KeyConnectionAttempts:              DefConnectionAttempts,
+				KeyHostname:                        `127.0.0.2`,
+				KeyIdentityFile:                    `~/.ssh/notexist`,
+				KeyPort:                            DefPort,
+				KeyUser:                            `wildcard`,
+				KeyXAuthLocation:                   DefXAuthLocation,
 			}
 			return sec
 		},
@@ -117,17 +121,19 @@ func TestConfig_Get(t *testing.T) {
 		exp: func() Section {
 			var sec = *testDefaultSection
 			sec.name = `foo.local`
-			sec.Hostname = `127.0.0.3`
-			sec.User = `allfoo`
 			sec.IdentityFile = []string{
 				filepath.Join(testDefaultSection.homeDir, `.ssh`, `foo`),
 				filepath.Join(testDefaultSection.homeDir, `.ssh`, `allfoo`),
 			}
-			sec.useDefaultIdentityFile = false
 			sec.Field = map[string]string{
-				`hostname`:     `127.0.0.3`,
-				`user`:         `allfoo`,
-				`identityfile`: `~/.ssh/allfoo`,
+				KeyChallengeResponseAuthentication: ValueYes,
+				KeyCheckHostIP:                     ValueYes,
+				KeyConnectionAttempts:              DefConnectionAttempts,
+				KeyHostname:                        `127.0.0.3`,
+				KeyPort:                            DefPort,
+				KeyUser:                            `allfoo`,
+				KeyIdentityFile:                    `~/.ssh/allfoo`,
+				KeyXAuthLocation:                   DefXAuthLocation,
 			}
 			return sec
 		},

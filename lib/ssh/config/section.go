@@ -18,33 +18,42 @@ import (
 
 // List of valid keys in Host or Match section.
 const (
-	keyAddKeysToAgent                  = "addkeystoagent"
-	keyAddressFamily                   = "addressfamily"
-	keyBatchMode                       = "batchmode"
-	keyBindAddress                     = "bindaddress"
-	keyBindInterface                   = "bindinterface"
-	keyCASignatureAlgorithms           = "casignaturealgorithms"
-	keyCanonicalDomains                = "canonicaldomains"
-	keyCanonicalizeFallbackLocal       = "canonicalizefallbacklocal"
-	keyCanonicalizeHostname            = "canonicalizehostname"
-	keyCanonicalizeMaxDots             = "canonicalizemaxdots"
-	keyCanonicalizePermittedCNAMEs     = "canonicalizepermittedcnames"
-	keyCertificateFile                 = "certificatefile"
-	keyChallengeResponseAuthentication = "challengeresponseauthentication"
-	keyCheckHostIP                     = "checkhostip"
-	keyClearAllForwardings             = "clearallforwardings"
-	keyCompression                     = "compression"
-	keyConnectTimeout                  = "connecttimeout"
-	keyConnectionAttempts              = "connectionattempts"
-	keyHostname                        = "hostname"
-	keyIdentityAgent                   = "identityagent"
-	keyIdentityFile                    = "identityfile"
-	keyPort                            = "port"
-	keySendEnv                         = "sendenv"
-	keySetEnv                          = "setenv"
-	keyUser                            = "user"
-	keyVisualHostKey                   = "visualhostkey"
-	keyXAuthLocation                   = "xauthlocation"
+	// List of key in Host or Match with single, string value.
+	KeyAddKeysToAgent       = `addkeystoagent`
+	KeyAddressFamily        = `addressfamily`
+	KeyBindAddress          = `bindaddress`
+	KeyBindInterface        = `bindinterface`
+	KeyCanonicalizeHostname = `canonicalizehostname`
+	KeySetEnv               = `setenv`
+	KeyXAuthLocation        = `xauthlocation`
+
+	// List of key in Host or Match with multiple, string values.
+	KeyCASignatureAlgorithms = `casignaturealgorithms`
+	KeyCanonicalDomains      = `canonicaldomains`
+	KeyCertificateFile       = `certificatefile`
+	KeyIdentityFile          = `identityfile`
+	KeySendEnv               = `sendenv`
+
+	// List of key in Host or Match with integer value.
+	KeyCanonicalizeMaxDots = `canonicalizemaxdots`
+	KeyConnectTimeout      = `connecttimeout`
+	KeyConnectionAttempts  = `connectionattempts`
+
+	// List of key in Host or Match with boolean value.
+	KeyBatchMode                       = `batchmode`
+	KeyCanonicalizeFallbackLocal       = `canonicalizefallbacklocal`
+	KeyChallengeResponseAuthentication = `challengeresponseauthentication`
+	KeyCheckHostIP                     = `checkhostip`
+	KeyClearAllForwardings             = `clearallforwardings`
+	KeyCompression                     = `compression`
+	KeyVisualHostKey                   = `visualhostkey`
+
+	// List of key in Host or Match with value fetched using method.
+	KeyCanonicalizePermittedCNames = `canonicalizepermittedcnames`
+	KeyHostname                    = `hostname`
+	KeyIdentityAgent               = `identityagent`
+	KeyPort                        = `port`
+	KeyUser                        = `user`
 )
 
 // TODO: list of keys that are not implemented yet due to hard or
@@ -115,62 +124,71 @@ const (
 	keyVerifyHostKeyDNS                 = "verifyhostkeydns"
 )
 
-// Valid values for AddKeysToAgent.
+// Valid values for key AddKeysToAgent.
 const (
-	valueAsk     = "ask"
-	valueConfirm = "confirm"
-	valueNo      = "no"
-	valueYes     = "yes"
-	valueAlways  = "always"
+	ValueAlways  = `always`
+	ValueAsk     = `ask`
+	ValueConfirm = `confirm`
+	ValueNo      = `no`
+	ValueYes     = `yes`
 )
 
-// Valid values for AddressFamily.
+// Valid values for key AddressFamily.
 const (
-	valueAny   = "any"
-	valueInet  = "inet"
-	valueInet6 = "inet6"
+	ValueAny   = `any`
+	ValueInet  = `inet`
+	ValueInet6 = `inet6`
 )
 
-// List of default values.
+// List of default key value.
 const (
-	defConnectionAttempts = 1
-	defPort               = "22"
-	defXAuthLocation      = "/usr/X11R6/bin/xauth"
+	DefConnectionAttempts = `1`
+	DefPort               = `22`
+	DefXAuthLocation      = `/usr/X11R6/bin/xauth`
 )
+
+// defaultCASignatureAlgorithms return list of default signature algorithms
+// that client supported.
+func defaultCASignatureAlgorithms() []string {
+	return []string{
+		ssh.KeyAlgoECDSA256,
+		ssh.KeyAlgoECDSA384,
+		ssh.KeyAlgoECDSA521,
+		ssh.KeyAlgoED25519,
+		ssh.KeyAlgoRSA,
+	}
+}
+
+// defaultIdentityFile return list of default IdentityFile.
+func defaultIdentityFile() []string {
+	return []string{
+		`~/.ssh/id_dsa`,
+		`~/.ssh/id_ecdsa`,
+		`~/.ssh/id_ed25519`,
+		`~/.ssh/id_rsa`,
+	}
+}
 
 // Section is the type that represent SSH client Host and Match section in
 // configuration.
 type Section struct {
-	// Environments contains system environment variables that will be
-	// passed to Execute().
-	// The key and value is derived from "SendEnv" and "SetEnv".
-	Environments map[string]string
-
 	// PrivateKeys contains IdentityFile that has been parsed.
 	// This field will be set once the Signers has been called.
 	PrivateKeys map[string]any
 
 	// Field store the unpacked key and value of Section.
+	// For section key that is not expecting string value, one can use
+	// FieldBool or FieldInt.
 	Field map[string]string
 
-	CanonicalizePermittedCNAMEs *PermittedCNAMEs
+	// env contains the key and value from SetEnv field.
+	env map[string]string
 
 	// name contains the raw value after Host or Match.
 	name string
 
-	AddKeysToAgent       string
-	AddressFamily        string
-	BindAddress          string
-	BindInterface        string
-	CanonicalizeHostname string
-
-	Hostname string
-	Port     string
-
 	// The first IdentityFile that exist and valid.
 	PrivateKeyFile string
-
-	User string
 
 	// WorkingDir contains the directory where the SSH client started.
 	// This value is required when client want to copy file from/to
@@ -179,17 +197,12 @@ type Section struct {
 	// os.Getwd() or user's home directory.
 	WorkingDir string
 
-	XAuthLocation string
-
 	// User's home directory.
 	homeDir string
 
-	identityAgent string
-
-	CanonicalDomains      []string
-	CASignatureAlgorithms []string
-	CertificateFile       []string
-	IdentityFile          []string
+	certificateFile []string
+	IdentityFile    []string
+	sendEnv         []string
 
 	// Patterns for Host section.
 	patterns []*pattern
@@ -197,55 +210,21 @@ type Section struct {
 	// Criteria for Match section.
 	criteria []*matchCriteria
 
-	CanonicalizeMaxDots int
-	ConnectionAttempts  int
-	ConnectTimeout      int
-
-	IsBatchMode                       bool
-	IsCanonicalizeFallbackLocal       bool
-	IsChallengeResponseAuthentication bool
-	IsCheckHostIP                     bool
-	IsClearAllForwardings             bool
-	UseCompression                    bool
-	UseVisualHostKey                  bool
-
 	useCriteria bool
-
-	useDefaultIdentityFile bool // Flag for the IdentityFile.
 }
 
 // newSection create new Host or Match with default values.
 func newSection(name string) *Section {
 	return &Section{
-		Environments: map[string]string{},
-		Field:        map[string]string{},
-
-		name:           name,
-		AddKeysToAgent: valueNo,
-		AddressFamily:  valueAny,
-		Port:           defPort,
-		XAuthLocation:  defXAuthLocation,
-
-		CASignatureAlgorithms: []string{
-			ssh.KeyAlgoECDSA256,
-			ssh.KeyAlgoECDSA384,
-			ssh.KeyAlgoECDSA521,
-			ssh.KeyAlgoED25519,
-			ssh.KeyAlgoRSA,
+		Field: map[string]string{
+			KeyChallengeResponseAuthentication: ValueYes,
+			KeyCheckHostIP:                     ValueYes,
+			KeyConnectionAttempts:              DefConnectionAttempts,
+			KeyPort:                            DefPort,
+			KeyXAuthLocation:                   DefXAuthLocation,
 		},
-
-		IdentityFile: []string{
-			"~/.ssh/id_dsa",
-			"~/.ssh/id_ecdsa",
-			"~/.ssh/id_ed25519",
-			"~/.ssh/id_rsa",
-		},
-
-		ConnectionAttempts: defConnectionAttempts,
-
-		useDefaultIdentityFile:            true,
-		IsChallengeResponseAuthentication: true,
-		IsCheckHostIP:                     true,
+		env:  map[string]string{},
+		name: name,
 	}
 }
 
@@ -262,13 +241,143 @@ func newSectionHost(rawPattern string) (host *Section) {
 	return host
 }
 
-// Signers convert the IdentityFile to ssh.Signer for authentication
-// using PublicKey and store the parsed-unsigned private key into PrivateKeys.
+// CASignatureAlgorithms return list of signature algorithms set from
+// KeyCASignatureAlgorithms.
+// If not set it will return the default CA signature algorithms.
+func (section *Section) CASignatureAlgorithms() []string {
+	var value = section.Field[KeyCASignatureAlgorithms]
+	if len(value) == 0 {
+		return defaultCASignatureAlgorithms()
+	}
+	return strings.Split(value, `,`)
+}
+
+// CanonicalDomains return list CanonicalDomains set in Section.
+func (section *Section) CanonicalDomains() []string {
+	var value = section.Field[KeyCanonicalDomains]
+	if len(value) == 0 {
+		return nil
+	}
+	return strings.Fields(value)
+}
+
+// CanonicalizePermittedCNames return the permitted CNAMEs set in Section,
+// from KeyCanonicalizePermittedCNames.
+func (section *Section) CanonicalizePermittedCNames() (pcnames *PermittedCNAMEs, err error) {
+	var value = section.Field[KeyCanonicalizePermittedCNames]
+	if len(value) == 0 {
+		return nil, nil
+	}
+	pcnames, err = parseCanonicalizePermittedCNames(value)
+	if err != nil {
+		return nil, err
+	}
+	return pcnames, nil
+}
+
+// CertificateFile return list of certificate file, if its set in Host or
+// Match configuration.
+func (section *Section) CertificateFile() []string {
+	return section.certificateFile
+}
+
+// Environments return system and/or custom environment that will be passed
+// to remote machine.
+// The key and value is derived from "SendEnv" and "SetEnv".
+func (section *Section) Environments(sysEnv map[string]string) (env map[string]string) {
+	var (
+		key         string
+		val         string
+		sendPattern string
+		ok          bool
+	)
+
+	env = make(map[string]string, len(section.sendEnv)+len(section.env))
+
+	for key, val = range sysEnv {
+		for _, sendPattern = range section.sendEnv {
+			ok, _ = filepath.Match(sendPattern, key)
+			if ok {
+				env[key] = val
+			}
+		}
+	}
+	for key, val = range section.env {
+		env[key] = val
+	}
+	return env
+}
+
+// FieldBool get the Field value as boolean.
+// It will return false if key is not exist or value is invalid.
+func (section *Section) FieldBool(key string) (vbool bool) {
+	var vstr = section.Field[key]
+	if len(vstr) == 0 {
+		return false
+	}
+	vbool, _ = parseBool(key, vstr)
+	return vbool
+}
+
+// FieldInt get the Field value as int.
+// It the value is unparseable as numeric it will return 0.
+func (section *Section) FieldInt(key string) (vint int) {
+	var vstr = section.Field[key]
+	if len(vstr) == 0 {
+		return 0
+	}
+	var vi64 int64
+	vi64, _ = strconv.ParseInt(vstr, 10, 64)
+	return int(vi64)
+}
+
+// Hostname return the hostname of this section.
+func (section *Section) Hostname() string {
+	return section.Field[KeyHostname]
+}
+
+// IdentityAgent get the identity agent either from section config variable
+// "IdentityAgent" or from environment variable SSH_AUTH_SOCK.
+//
+// There are four possible value: SSH_AUTH_SOCK, <$STRING>, <PATH>, or
+// "none".
+// If SSH_AUTH_SOCK, the socket path is read from the environment variable
+// SSH_AUTH_SOCK.
+// If value start with "$", then the socket path is set based on value of
+// that environment variable.
+// Other string beside "none" will be considered as path to socket.
+//
+// It will return empty string if IdentityAgent set to "none" or
+// SSH_AUTH_SOCK is empty.
+func (section *Section) IdentityAgent() string {
+	var value = section.Field[KeyIdentityAgent]
+	if value == `none` {
+		return ``
+	}
+	if len(value) == 0 || value == envSshAuthSock {
+		return os.Getenv(envSshAuthSock)
+	}
+	if value[0] == '$' {
+		// Read the socket from environment variable defined by
+		// value.
+		return os.Getenv(value[1:])
+	}
+	// IdentityAgent set to path to socket.
+	return value
+}
+
+// Port return the remote machine port of this section.
+func (section *Section) Port() string {
+	return section.Field[KeyPort]
+}
+
+// Signers convert the IdentityFile to ssh.Signer for authentication using
+// PublicKey and store the parsed-unsigned private key into PrivateKeys.
 //
 // This method will ask for passphrase from terminal, if one of IdentityFile
 // is protected.
-// Unless the value of IdentityFile changes, this method should be called only
-// once, otherwise it will ask passphrase on every call.
+// Unless the value of IdentityFile changes, this method should be called
+// only once, otherwise it will ask passphrase on every call.
 func (section *Section) Signers() (signers []ssh.Signer, err error) {
 	var (
 		logp = `Signers`
@@ -326,20 +435,6 @@ func (section *Section) Signers() (signers []ssh.Signer, err error) {
 	return signers, nil
 }
 
-// GetIdentityAgent get the identity agent either from section config variable
-// IdentityAgent or from environment variable SSH_AUTH_SOCK.
-// It will return empty string if IdentityAgent set to "none" or SSH_AUTH_SOCK
-// is empty.
-func (section *Section) GetIdentityAgent() string {
-	if section.identityAgent == "none" {
-		return ""
-	}
-	if len(section.identityAgent) > 0 {
-		return section.identityAgent
-	}
-	return os.Getenv(envSshAuthSock)
-}
-
 // isMatch will return true if the string "s" match with one of Host or Match
 // section.
 func (section *Section) isMatch(s string) bool {
@@ -364,6 +459,10 @@ func (section *Section) init(workDir, homeDir string) {
 	section.homeDir = homeDir
 	section.WorkingDir = workDir
 
+	if len(section.IdentityFile) == 0 {
+		section.IdentityFile = defaultIdentityFile()
+	}
+
 	for x, identFile := range section.IdentityFile {
 		if identFile[0] == '~' {
 			section.IdentityFile[x] = strings.Replace(identFile, "~", section.homeDir, 1)
@@ -372,7 +471,7 @@ func (section *Section) init(workDir, homeDir string) {
 }
 
 // mergeField merge the Field from other Section.
-func (section *Section) mergeField(cfg *Config, other *Section) {
+func (section *Section) mergeField(other *Section) {
 	var (
 		key   string
 		value string
@@ -380,81 +479,69 @@ func (section *Section) mergeField(cfg *Config, other *Section) {
 	for key, value = range other.Field {
 		// The key and value in other should be valid, so no need to
 		// check for error.
-		_ = section.set(cfg, key, value)
+		_ = section.Set(key, value)
 	}
 }
 
-// set the section field by raw key and value.
-func (section *Section) set(cfg *Config, key, value string) (err error) {
+// Set the section field by raw key and value.
+func (section *Section) Set(key, value string) (err error) {
 	switch key {
-	case keyAddKeysToAgent:
-		err = section.setAddKeysToAgent(value)
-	case keyAddressFamily:
-		err = section.setAddressFamily(value)
-	case keyBatchMode:
-		section.IsBatchMode, err = parseBool(key, value)
-	case keyBindAddress:
-		section.BindAddress = value
-	case keyBindInterface:
-		section.BindInterface = value
-	case keyCanonicalDomains:
-		section.CanonicalDomains = strings.Fields(value)
-	case keyCanonicalizeFallbackLocal:
-		section.IsCanonicalizeFallbackLocal, err = parseBool(key, value)
-	case keyCanonicalizeHostname:
-		err = section.setCanonicalizeHostname(value)
-	case keyCanonicalizeMaxDots:
-		section.CanonicalizeMaxDots, err = strconv.Atoi(value)
+	case KeyAddKeysToAgent:
+		err = validateAddKeysToAgent(value)
+	case KeyAddressFamily:
+		err = validateAddressFamily(value)
+	case KeyBatchMode:
+		_, err = parseBool(key, value)
+	case KeyBindAddress:
+	case KeyBindInterface:
+	case KeyCanonicalDomains:
+	case KeyCanonicalizeFallbackLocal:
+		_, err = parseBool(key, value)
+	case KeyCanonicalizeHostname:
+		err = validateCanonicalizeHostname(value)
+	case KeyCanonicalizeMaxDots:
+		_, err = strconv.Atoi(value)
 
-	case keyCanonicalizePermittedCNAMEs:
-		err = section.setCanonicalizePermittedCNAMEs(value)
+	case KeyCanonicalizePermittedCNames:
+		_, err = parseCanonicalizePermittedCNames(value)
 
-	case keyCASignatureAlgorithms:
-		section.setCASignatureAlgorithms(value)
+	case KeyCASignatureAlgorithms:
 
-	case keyCertificateFile:
-		section.CertificateFile = append(section.CertificateFile, value)
+	case KeyCertificateFile:
+		section.certificateFile = append(section.certificateFile, value)
 
-	case keyChallengeResponseAuthentication:
-		section.IsChallengeResponseAuthentication, err = parseBool(key, value)
+	case KeyChallengeResponseAuthentication:
+		_, err = parseBool(key, value)
 
-	case keyCheckHostIP:
-		section.IsCheckHostIP, err = parseBool(key, value)
+	case KeyCheckHostIP:
+		_, err = parseBool(key, value)
 
-	case keyClearAllForwardings:
-		section.IsClearAllForwardings, err = parseBool(key, value)
-	case keyCompression:
-		section.UseCompression, err = parseBool(key, value)
-	case keyConnectionAttempts:
-		section.ConnectionAttempts, err = strconv.Atoi(value)
-	case keyConnectTimeout:
-		section.ConnectTimeout, err = strconv.Atoi(value)
+	case KeyClearAllForwardings:
+		_, err = parseBool(key, value)
+	case KeyCompression:
+		_, err = parseBool(key, value)
+	case KeyConnectionAttempts:
+		_, err = strconv.Atoi(value)
+	case KeyConnectTimeout:
+		_, err = strconv.Atoi(value)
 
-	case keyIdentityAgent:
-		section.setIdentityAgent(value)
+	case KeyIdentityAgent:
 
-	case keyIdentityFile:
-		if section.useDefaultIdentityFile {
-			section.IdentityFile = []string{value}
-			section.useDefaultIdentityFile = false
-		} else {
-			section.IdentityFile = append(section.IdentityFile, value)
-		}
+	case KeyIdentityFile:
+		section.IdentityFile = append(section.IdentityFile, value)
 
-	case keyHostname:
-		section.Hostname = value
-	case keyPort:
-		section.Port = value
-	case keySendEnv:
-		section.setSendEnv(cfg.envs, value)
-	case keySetEnv:
+	case KeyHostname:
+	case KeyPort:
+		_, err = strconv.Atoi(value)
+
+	case KeySendEnv:
+		section.sendEnv = append(section.sendEnv, value)
+	case KeySetEnv:
 		section.setEnv(value)
-	case keyUser:
-		section.User = value
-	case keyVisualHostKey:
-		section.UseVisualHostKey, err = parseBool(key, value)
-	case keyXAuthLocation:
-		section.XAuthLocation = value
+	case KeyUser:
+	case KeyVisualHostKey:
+		_, err = parseBool(key, value)
+	case KeyXAuthLocation:
 	default:
 		// Store the unknown key into Field.
 	}
@@ -465,40 +552,50 @@ func (section *Section) set(cfg *Config, key, value string) (err error) {
 	return nil
 }
 
-func (section *Section) setAddKeysToAgent(val string) (err error) {
+// User return the user value of this section.
+func (section *Section) User() string {
+	return section.Field[KeyUser]
+}
+
+// setEnv set the Environments with key and value of format "KEY=VALUE".
+func (section *Section) setEnv(env string) {
+	kv := strings.SplitN(env, "=", 2)
+	if len(kv) == 2 {
+		section.env[kv[0]] = kv[1]
+	}
+}
+
+func validateAddKeysToAgent(val string) (err error) {
 	switch val {
-	case valueAsk, valueConfirm, valueNo, valueYes:
-		section.AddKeysToAgent = val
+	case ValueAlways, ValueAsk, ValueConfirm, ValueNo, ValueYes:
 	default:
-		return fmt.Errorf("%s: invalid value %q", keyAddKeysToAgent, val)
+		return fmt.Errorf(`%s: invalid value %q`, KeyAddKeysToAgent, val)
 	}
 	return nil
 }
 
-func (section *Section) setAddressFamily(val string) (err error) {
+func validateAddressFamily(val string) (err error) {
 	switch val {
-	case valueAny, valueInet, valueInet6:
-		section.AddressFamily = val
+	case ValueAny, ValueInet, ValueInet6:
 	default:
-		return fmt.Errorf("%s: invalid value %q", keyAddressFamily, val)
+		return fmt.Errorf(`%s: invalid value %q`, KeyAddressFamily, val)
 	}
 	return nil
 }
 
-func (section *Section) setCanonicalizeHostname(val string) (err error) {
+func validateCanonicalizeHostname(val string) (err error) {
 	switch val {
-	case valueNo, valueAlways, valueYes:
-		section.CanonicalizeHostname = val
+	case ValueNo, ValueAlways, ValueYes:
 	default:
-		return fmt.Errorf("%s: invalid value %q", keyBatchMode, val)
+		return fmt.Errorf(`%s: invalid value %q`, KeyCanonicalizeHostname, val)
 	}
 	return nil
 }
 
-func (section *Section) setCanonicalizePermittedCNAMEs(val string) (err error) {
+func parseCanonicalizePermittedCNames(val string) (pcnames *PermittedCNAMEs, err error) {
 	sourceTarget := strings.Split(val, ":")
 	if len(sourceTarget) != 2 {
-		return fmt.Errorf("%s: invalid rule", keyCanonicalizePermittedCNAMEs)
+		return nil, fmt.Errorf(`%s: invalid rule`, KeyCanonicalizePermittedCNames)
 	}
 
 	listSource := strings.Split(sourceTarget[0], ",")
@@ -515,52 +612,9 @@ func (section *Section) setCanonicalizePermittedCNAMEs(val string) (err error) {
 		targets = append(targets, target)
 	}
 
-	section.CanonicalizePermittedCNAMEs = &PermittedCNAMEs{
+	pcnames = &PermittedCNAMEs{
 		sources: sources,
 		targets: targets,
 	}
-	return nil
-}
-
-func (section *Section) setCASignatureAlgorithms(val string) {
-	section.CASignatureAlgorithms = strings.Split(val, ",")
-}
-
-// setEnv set the Environments with key and value of format "KEY=VALUE".
-func (section *Section) setEnv(env string) {
-	kv := strings.SplitN(env, "=", 2)
-	if len(kv) == 2 {
-		section.Environments[kv[0]] = kv[1]
-	}
-}
-
-// setIdentityAgent set the UNIX-domain socket used to communicate with
-// the authentication agent.
-// There are four possible value: SSH_AUTH_SOCK, <$STRING>, <PATH>, or
-// "none".
-// If SSH_AUTH_SOCK, the socket path is read from the environment variable
-// SSH_AUTH_SOCK.
-// If value start with "$", then the socket path is set based on value of that
-// environment variable.
-// Other string beside "none" will be considered as path to socket.
-func (section *Section) setIdentityAgent(val string) {
-	if val == envSshAuthSock {
-		section.identityAgent = os.Getenv(envSshAuthSock)
-		return
-	}
-	if val[0] == '$' {
-		// Read the socket from environment variable defined by value.
-		section.identityAgent = os.Getenv(val[1:])
-		return
-	}
-	section.identityAgent = val
-}
-
-func (section *Section) setSendEnv(envs map[string]string, pattern string) {
-	for k, v := range envs {
-		ok, _ := filepath.Match(pattern, k)
-		if ok {
-			section.Environments[k] = v
-		}
-	}
+	return pcnames, nil
 }

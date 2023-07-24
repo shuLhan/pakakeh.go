@@ -16,11 +16,13 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 
+	libos "github.com/shuLhan/share/lib/os"
 	"github.com/shuLhan/share/lib/ssh/config"
 )
 
 // Client for SSH connection.
 type Client struct {
+	sysEnvs map[string]string
 	*ssh.Client
 
 	cfg    *config.Section
@@ -39,9 +41,9 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 
 	var (
 		logp       = `NewClient`
-		remoteAddr = fmt.Sprintf(`%s:%s`, cfg.Hostname, cfg.Port)
+		remoteAddr = fmt.Sprintf(`%s:%s`, cfg.Hostname(), cfg.Port())
 		sshConfig  = &ssh.ClientConfig{
-			User:            cfg.User,
+			User:            cfg.User(),
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		}
 
@@ -49,12 +51,13 @@ func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
 	)
 
 	cl = &Client{
-		cfg:    cfg,
-		stdout: os.Stdout,
-		stderr: os.Stderr,
+		sysEnvs: libos.Environments(),
+		cfg:     cfg,
+		stdout:  os.Stdout,
+		stderr:  os.Stderr,
 	}
 
-	sshAgentSockPath := cfg.GetIdentityAgent()
+	sshAgentSockPath := cfg.IdentityAgent()
 	if len(sshAgentSockPath) > 0 {
 		sshAgentSock, err := net.Dial("unix", sshAgentSockPath)
 		if err != nil {
@@ -120,7 +123,7 @@ func (cl *Client) Execute(cmd string) (err error) {
 	sess.Stdout = cl.stdout
 	sess.Stderr = cl.stderr
 
-	for k, v := range cl.cfg.Environments {
+	for k, v := range cl.cfg.Environments(cl.sysEnvs) {
 		err = sess.Setenv(k, v)
 		if err != nil {
 			log.Printf("Execute: Setenv %q=%q:%s\n", k, v, err.Error())
@@ -151,9 +154,9 @@ func (cl *Client) ScpGet(remote, local string) (err error) {
 		return fmt.Errorf("%s: empty local file", logp)
 	}
 
-	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
+	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User(), cl.cfg.Hostname(), remote)
 
-	args := []string{"-r", "-P", cl.cfg.Port}
+	args := []string{"-r", "-P", cl.cfg.Port()}
 	if len(cl.cfg.PrivateKeyFile) > 0 {
 		args = append(args, "-i")
 		args = append(args, cl.cfg.PrivateKeyFile)
@@ -189,9 +192,9 @@ func (cl *Client) ScpPut(local, remote string) (err error) {
 		return fmt.Errorf("%s: empty remote file", logp)
 	}
 
-	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User, cl.cfg.Hostname, remote)
+	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User(), cl.cfg.Hostname(), remote)
 
-	args := []string{"-r", "-P", cl.cfg.Port}
+	args := []string{"-r", "-P", cl.cfg.Port()}
 	if len(cl.cfg.PrivateKeyFile) > 0 {
 		args = append(args, "-i")
 		args = append(args, cl.cfg.PrivateKeyFile)
@@ -225,5 +228,5 @@ func (cl *Client) SetSessionOutputError(stdout, stderr io.Writer) {
 }
 
 func (cl *Client) String() string {
-	return cl.cfg.User + "@" + cl.cfg.Hostname + ":" + cl.cfg.Port
+	return cl.cfg.User() + "@" + cl.cfg.Hostname() + ":" + cl.cfg.Port()
 }

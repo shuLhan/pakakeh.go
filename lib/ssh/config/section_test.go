@@ -90,7 +90,7 @@ func TestSection_init(t *testing.T) {
 
 func TestSection_setEnv(t *testing.T) {
 	cfg := &Section{
-		Environments: make(map[string]string),
+		env: make(map[string]string),
 	}
 	cases := []struct {
 		exp   map[string]string
@@ -108,11 +108,11 @@ func TestSection_setEnv(t *testing.T) {
 	for _, c := range cases {
 		cfg.setEnv(c.value)
 
-		test.Assert(t, c.value, c.exp, cfg.Environments)
+		test.Assert(t, c.value, c.exp, cfg.env)
 	}
 }
 
-func TestSection_setSendEnv(t *testing.T) {
+func TestSection_Environments(t *testing.T) {
 	envs := map[string]string{
 		"key_1": "1",
 		"key_2": "2",
@@ -135,12 +135,17 @@ func TestSection_setSendEnv(t *testing.T) {
 		},
 	}}
 
-	cfg := &Section{
-		Environments: make(map[string]string),
-	}
+	var (
+		section = &Section{
+			Field: map[string]string{},
+			env:   map[string]string{},
+		}
+	)
 
 	for _, c := range cases {
-		cfg.setSendEnv(envs, c.pattern)
-		test.Assert(t, c.pattern, c.exp, cfg.Environments)
+		section.sendEnv = nil
+		_ = section.Set(KeySendEnv, c.pattern)
+		got := section.Environments(envs)
+		test.Assert(t, c.pattern, c.exp, got)
 	}
 }

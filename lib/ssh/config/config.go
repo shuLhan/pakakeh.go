@@ -98,7 +98,7 @@ func Load(file string) (cfg *Config, err error) {
 				// No "Host" or "Match" define yet.
 				continue
 			}
-			err = section.set(cfg, key, value)
+			err = section.Set(key, value)
 			if err != nil {
 				return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x+1, err)
 			}
@@ -120,7 +120,7 @@ func (cfg *Config) Get(s string) (section *Section) {
 	section = newSection(s)
 	for _, hostMatch := range cfg.sections {
 		if hostMatch.isMatch(s) {
-			section.mergeField(cfg, hostMatch)
+			section.mergeField(hostMatch)
 		}
 	}
 	section.init(cfg.workDir, cfg.homeDir)
@@ -154,9 +154,9 @@ func (cfg *Config) loadEnvironments() {
 
 func parseBool(key, val string) (out bool, err error) {
 	switch val {
-	case valueNo:
+	case ValueNo:
 		return false, nil
-	case valueYes:
+	case ValueYes:
 		return true, nil
 	}
 	return false, fmt.Errorf("%s: invalid value %q", key, val)

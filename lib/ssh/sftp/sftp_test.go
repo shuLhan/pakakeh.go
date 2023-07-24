@@ -34,9 +34,11 @@ func TestMain(m *testing.M) {
 	}
 
 	cfg := &config.Section{
-		User:     "ms",
-		Hostname: "127.0.0.1",
-		Port:     "22",
+		Field: map[string]string{
+			config.KeyUser:     `ms`,
+			config.KeyHostname: `127.0.0.1`,
+			config.KeyPort:     `22`,
+		},
 		IdentityFile: []string{
 			"./testdata/id_ed25519",
 		},
