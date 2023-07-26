@@ -40,3 +40,13 @@ func TestMailTx_isTerminated(t *testing.T) {
 		test.Assert(t, "isTerminated", c.exp, c.mail.isTerminated())
 	}
 }
+
+func TestFormat(t *testing.T) {
+	var (
+		in  = ".\n..\r\na.text.\n.message\r\n.\r\n"
+		exp = "..\r\n...\r\na.text.\r\n..message\r\n..\r\n"
+		got []byte
+	)
+	got = format([]byte(in))
+	test.Assert(t, `format`, []byte(exp), got)
+}

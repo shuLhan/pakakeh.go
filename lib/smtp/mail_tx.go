@@ -16,23 +16,23 @@ type MailTx struct {
 	Postpone time.Time
 
 	// Received contains the time when the message arrived on server.
-	// This field is ignored in Client.Send().
+	// This field is ignored in Client.MailTx.
 	Received time.Time
 
 	// ID of message.
-	// This field is ignored in Client.Send().
+	// This field is ignored in Client.MailTx.
 	ID string
 
 	// From contains originator address.
-	// This field is required in Client.Send().
+	// This field is required in Client.MailTx.
 	From string
 
 	// Recipients contains list of the destination address.
-	// This field is required in Client.Send().
+	// This field is required in Client.MailTx.
 	Recipients []string
 
 	// Data contains content of message.
-	// This field is optional in Client.Send().
+	// This field is optional in Client.MailTx.
 	Data []byte
 
 	Retry int
@@ -47,8 +47,7 @@ func NewMailTx(from string, to []string, data []byte) (mail *MailTx) {
 	}
 
 	mail.ID = strconv.FormatInt(mail.Received.UnixNano(), 10)
-	mail.Data = make([]byte, len(data))
-	copy(mail.Data, data)
+	mail.Data = format(data)
 
 	return
 }
@@ -86,4 +85,34 @@ func (mail *MailTx) seal(clientDomain, clientAddress, localAddress string) {
 		clientDomain, clientAddress, localAddress, mail.ID,
 		mail.Received.Format(time.RFC1123Z))
 	mail.Data = append([]byte(line), mail.Data...)
+}
+
+// format format the email data by ending all line with CRLF and adding
+// period to line that start with period.
+func format(in []byte) (out []byte) {
+	var (
+		isNewLine = true
+
+		prevc byte
+		x     int
+	)
+
+	out = make([]byte, 0, len(in))
+	for x < len(in) {
+		if isNewLine {
+			if in[x] == '.' {
+				out = append(out, '.')
+			}
+			isNewLine = false
+		} else if in[x] == '\n' {
+			if prevc != '\r' {
+				out = append(out, '\r')
+			}
+			isNewLine = true
+		}
+		out = append(out, in[x])
+		prevc = in[x]
+		x++
+	}
+	return out
 }
