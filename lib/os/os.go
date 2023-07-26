@@ -120,6 +120,25 @@ func Copy(out, in string) (err error) {
 	return nil
 }
 
+// Environments return list of system environment as map of key and value.
+func Environments() (envs map[string]string) {
+	var (
+		sysEnvs = os.Environ()
+
+		sysEnv string
+		kv     []string
+	)
+
+	envs = make(map[string]string, len(sysEnvs))
+	for _, sysEnv = range sysEnvs {
+		kv = strings.SplitN(sysEnv, `=`, 2)
+		if len(kv) == 2 {
+			envs[kv[0]] = kv[1]
+		}
+	}
+	return envs
+}
+
 // IsBinary will return true if content of file is binary.
 // If file is not exist or there is an error when reading or closing the file,
 // it will return false.

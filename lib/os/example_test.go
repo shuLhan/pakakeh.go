@@ -6,9 +6,20 @@ package os_test
 
 import (
 	"fmt"
+	"os"
 
 	libos "github.com/shuLhan/share/lib/os"
 )
+
+func ExampleEnvironments() {
+	os.Clearenv()
+	os.Setenv(`USER`, `gopher`)
+	os.Setenv(`HOME`, `/home/underground`)
+	var osEnvs = libos.Environments()
+	fmt.Println(osEnvs)
+	// Output:
+	// map[HOME:/home/underground USER:gopher]
+}
 
 func ExampleIsBinary() {
 	fmt.Println(libos.IsBinary("/bin/bash"))
