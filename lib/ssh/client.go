@@ -11,7 +11,6 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
@@ -23,94 +22,166 @@ import (
 // Client for SSH connection.
 type Client struct {
 	sysEnvs map[string]string
+
 	*ssh.Client
+	config *ssh.ClientConfig
 
 	cfg    *config.Section
 	stdout io.Writer
 	stderr io.Writer
+
+	remoteAddr string
 }
 
-// NewClientFromConfig create a new SSH connection using predefined
-// configuration. This function may dial twice to find appropriate
-// authentication method when SSH_AUTH_SOCK environment variable is
-// set and IdentityFile directive is specified in Host section.
-func NewClientFromConfig(cfg *config.Section) (cl *Client, err error) {
+// NewClientInteractive create a new SSH connection using predefined
+// configuration, possibly interactively.
+//
+// This function may dial twice to find appropriate authentication method
+// when SSH_AUTH_SOCK environment variable is set but no valid key exist and
+// IdentityFile directive is specified in the Host section.
+//
+// If the IdentityFile is encrypted, it will prompt for passphrase in
+// terminal.
+func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
 	}
 
 	var (
-		logp       = `NewClient`
-		remoteAddr = fmt.Sprintf(`%s:%s`, cfg.Hostname(), cfg.Port())
-		sshConfig  = &ssh.ClientConfig{
-			User:            cfg.User(),
-			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		}
+		logp = `NewClientInteractive`
 
-		agentClient agent.ExtendedAgent
+		sshAgent agent.ExtendedAgent
+		signers  []ssh.Signer
+		signer   ssh.Signer
 	)
 
 	cl = &Client{
 		sysEnvs: libos.Environments(),
-		cfg:     cfg,
-		stdout:  os.Stdout,
-		stderr:  os.Stderr,
+		config: &ssh.ClientConfig{
+			User:            cfg.User(),
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		},
+		cfg:        cfg,
+		stdout:     os.Stdout,
+		stderr:     os.Stderr,
+		remoteAddr: fmt.Sprintf(`%s:%s`, cfg.Hostname(), cfg.Port()),
 	}
 
-	sshAgentSockPath := cfg.IdentityAgent()
+	var sshAgentSockPath = cfg.IdentityAgent()
 	if len(sshAgentSockPath) > 0 {
-		sshAgentSock, err := net.Dial("unix", sshAgentSockPath)
+		var sshAgentSock net.Conn
+
+		sshAgentSock, err = net.Dial("unix", sshAgentSockPath)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
-		agentClient = agent.NewClient(sshAgentSock)
-		sshConfig.Auth = []ssh.AuthMethod{
-			ssh.PublicKeysCallback(agentClient.Signers),
+
+		sshAgent = agent.NewClient(sshAgentSock)
+
+		signers, err = sshAgent.Signers()
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
-		sshClient, err := ssh.Dial("tcp", remoteAddr, sshConfig)
-		if err == nil {
-			cl.Client = sshClient
+
+		signer = cl.dialWithSigners(signers)
+		if signer != nil {
+			// Client connected with one of the key in agent.
 			return cl, nil
 		}
-		if len(cfg.IdentityFile) == 0 || !strings.HasSuffix(err.Error(), "no supported methods remain") {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
 	}
 
-	sshConfig.Auth = []ssh.AuthMethod{
-		ssh.PublicKeysCallback(cfg.Signers),
+	if len(cfg.IdentityFile) == 0 {
+		return nil, fmt.Errorf(`%s: empty IdentityFile`, logp)
 	}
 
-	cl.Client, err = ssh.Dial(`tcp`, remoteAddr, sshConfig)
+	err = cl.dialWithPrivateKeys(sshAgent)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	fmt.Printf("ssh config.Section: %+v\n", cfg)
+	return cl, nil
+}
 
-	if agentClient != nil {
-		// TODO(ms): since we did not know which signer is being used,
-		// we added all the private key to agent for now.
-		// Also, should check cfg.AddKeysToAgent == `yes`.
-		var (
-			pkeyFile string
-			pkey     any
-			addedKey agent.AddedKey
-		)
-		for pkeyFile, pkey = range cfg.PrivateKeys {
-			fmt.Printf("Adding key %q to agent.\n", pkeyFile)
-
-			addedKey = agent.AddedKey{
-				PrivateKey: pkey,
-			}
-			err = agentClient.Add(addedKey)
-			if err != nil {
-				log.Printf(`%s: %s`, logp, err)
-			}
+// dialWithSigners connect to the remote machine using AuthMethod PublicKeys
+// using each of signer in the list.
+// On success it will return the signer that can connect to remote address.
+func (cl *Client) dialWithSigners(signers []ssh.Signer) (signer ssh.Signer) {
+	if len(signers) == 0 {
+		return nil
+	}
+	var err error
+	for _, signer = range signers {
+		cl.config.Auth = []ssh.AuthMethod{
+			ssh.PublicKeys(signer),
+		}
+		cl.Client, err = ssh.Dial(`tcp`, cl.remoteAddr, cl.config)
+		if err == nil {
+			return signer
 		}
 	}
+	return nil
+}
 
-	return cl, nil
+// dialWithPrivateKeys connect to the remote machine using each of the
+// private key in IdentityFile.
+// If the private key is encrypted it will ask for correct passphrase three
+// times or continue to the next key.
+// If the key is valid and sshAgent is not nil, the key will be added to the
+// SSH agent.
+func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) {
+	var (
+		logp       = `dialWithPrivateKeys`
+		maxAttempt = 3
+
+		pkeyFile string
+		pkey     any
+		signer   ssh.Signer
+	)
+
+	for _, pkeyFile = range cl.cfg.IdentityFile {
+		fmt.Printf("%s: %s\n", logp, pkeyFile)
+
+		pkey, err = LoadPrivateKeyInteractive(pkeyFile, maxAttempt)
+		if err != nil {
+			continue
+		}
+
+		signer, err = ssh.NewSignerFromKey(pkey)
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		cl.config.Auth = []ssh.AuthMethod{
+			ssh.PublicKeys(signer),
+		}
+
+		cl.Client, err = ssh.Dial(`tcp`, cl.remoteAddr, cl.config)
+		if err == nil {
+			break
+		}
+	}
+	if cl.Client == nil {
+		// None of the private key can connect to remote address.
+		return fmt.Errorf(`%s: no IdentityFile supported`, logp)
+	}
+
+	// Add key to agent.
+	if sshAgent == nil {
+		return nil
+	}
+
+	// TODO(ms): check for AddKeysToAgent.
+
+	fmt.Printf("Adding key %q to agent.\n", pkeyFile)
+
+	var addedKey = agent.AddedKey{
+		PrivateKey: pkey,
+	}
+	err = sshAgent.Add(addedKey)
+	if err != nil {
+		log.Printf(`%s: %s`, logp, err)
+	}
+	return nil
 }
 
 // Execute a command on remote server.

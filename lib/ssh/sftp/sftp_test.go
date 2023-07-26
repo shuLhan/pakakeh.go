@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 		},
 	}
 
-	sshClient, err := ssh.NewClientFromConfig(cfg)
+	sshClient, err := ssh.NewClientInteractive(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
