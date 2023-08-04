@@ -19,6 +19,149 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_49_0]
+== share v0.49.0 (2023-08-04)
+
+[#v0_49_0__breaking_changes]
+=== Breaking changes
+
+lib/email: refactoring, replace field with type []byte to string::
++
+Using string provide safety, guaranteed that if we pass it as parameter
+the receiver will not be able to modify its content.
+
+ssh/config: refactoring, simplify the Section fields::
++
+--
+Instead of storing each Section value in separate field, store them
+inside a map, Field.
+This reduce the size of Section and simplify adding or getting the
+key that we are not supported but maybe usable by user in the future.
+
+This changes introduce several new methods as replacement of field:
+
+* CASignatureAlgorithms: a method that return list of signature
+  algorithms that Section set or the default
+* CanonicalDomains: a method that return CanonicalDomains set in Section
+* CanonicalizePermittedCNames: return the permitted CNAMEs set in Section,
+  from KeyCanonicalizePermittedCNames.
+* CertificateFile: return list of certificate file
+* Environments: return system and/or custom environment that will be
+  passed to remote machine.
+  The key and value is derived from "SendEnv" and "SetEnv".
+* FieldBool: return field value as boolean
+* FieldInt: return the field value as int
+* Hostname: return the Hostname in this Section
+* IdentityAgent: return the path to SSH agent socket to be used
+* Port: return the remote machine port
+* User: return the remote user name
+* Set: set the Field using key and value
+--
+
+lib/ssh: refactoring NewClientFromConfig, renamed to NewClientInteractive::
++
+--
+Previously, the NewClientInteractive blindly use the signers from
+Section.Signers.
+If one of the IdentityFile valid, it will add all the keys in
+IdentityFile to SSH agent.
+
+In this changes we try each IdentityFile independently.
+If the key is valid, client connected to remote machine, then only that
+key will be added to SSH agent.
+
+While at it we also rename the method to NewClientInteractive to
+indicate that the function will prompt for passphrase if one of the
+IdentityFile is encrypted.
+--
+
+[#v0_49_0__bug_fixes]
+=== Bug fixes
+
+lib/http: fix missing query when handling redirect in HandleFS::
++
+In 06e6cbdd511c, we redirect request by adding end slash to the path
+if the requested resource is directory, but somehow we miss adding the
+original request query.
+This changes fix this issue.
+
+lib/os: check for extract path in untar and unzip::
++
+--
+Once we Join-ed the directory output with the file name, we check if
+the result of join is still under directory output, if its not, return
+an error to prevent
+https://cwe.mitre.org/data/definitions/22.html[Zip Slip vulnerability].
+--
+
+lib/smtp: format the passed data in NewMailTx::
++
+--
+The following rules are applied to the data,
+
+* all lines must end with CRLF
+* if the line start with period, additional period is inserted before
+  the line. This recommendation based on RFC 5321 section 4.5.2 [1] to
+  prevent data that contains CRLF "." CRLF does not corrupt the message,
+  causing the server terminate reading the message where it should not.
+
+[1] https://datatracker.ietf.org/doc/html/rfc5321#section-4.5.2
+--
+
+[#v0_49_0__new_features]
+=== New features
+
+lib/os: add function PathFold and PathUnfold::
++
+--
+The PathFold replace the path "in" with tilde "~" if its prefix match
+with user's home directory from os.UserHomeDir.
+
+The PathUnfold expand the tilde "~/" prefix into user's home directory
+using os.UserHomeDir and environment variables using os.ExpandEnv
+inside the string path "in".
+--
+
+lib/os: add function Environments::
++
+The Environments function return list of system environment as map of
+key and value.
+
+lib/ssh: add function LoadPrivateKeyInteractive::
++
+The LoadPrivateKeyInteractive load private key from file.
+If key is encrypted, it will prompt the passphrase in terminal with
+maximum maxAttempt times.
+If the passphrase still invalid after maxAttempt it will return an error.
+
+[#v0_49_0__enhancements]
+=== Enhancements
+
+lib/smtp: set minimum Server TLS to v1.2::
++
+Using the TLS v1.1 is considered insecure and should not be used in
+server anymore.
+
+lib/memfs: check for refresh URL outside of Root SysPath::
++
+The case when refresh URL outside of Root SysPath is only exist when
+the memfs TryDirect is set to true, usually during development.
+In the production, the TryDirect should be false, hence the refresh
+always return nil Node.
+
+ssh/config: reorder struct fields for better alignment::
++
+--
+Changes,
+
+* Config: changes allocated size from 32 to 16 bytes (-8 bytes)
+* parser: changes allocated size from 40 to 32 bytes (-8 bytes)
+* Section: changes allocated size from 392 to 360 bytes (-32 bytes)
+
+The rest of changes that are not mentioned are from test files.
+--
+
+
 [#v0_48_0]
 ==  share v0.48.0 (2023-07-07)
 
