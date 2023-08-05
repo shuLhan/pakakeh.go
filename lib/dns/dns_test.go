@@ -15,6 +15,9 @@ const (
 	testServerAddress    = "127.0.0.1:5300"
 	testDoTServerAddress = "127.0.0.1:18053"
 	testTLSPort          = 18053
+
+	// Equal to 2023-08-05 07:53:20 +0000 UTC.
+	testNowEpoch = 1691222000
 )
 
 var (
@@ -23,6 +26,10 @@ var (
 
 func TestMain(m *testing.M) {
 	log.SetFlags(0)
+
+	timeNow = func() time.Time {
+		return time.Unix(testNowEpoch, 0)
+	}
 
 	var (
 		serverOptions = &ServerOptions{

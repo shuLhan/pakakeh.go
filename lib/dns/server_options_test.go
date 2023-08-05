@@ -22,13 +22,7 @@ func TestServerOptionsInit(t *testing.T) {
 
 	var (
 		ip     = net.ParseIP("0.0.0.0")
-		defSoa = RDataSOA{
-			RName:   defaultRName,
-			Serial:  uint32(time.Now().Unix()),
-			Refresh: defaultRefresh,
-			Retry:   defaultRetry,
-			Minimum: defaultMinimumTTL,
-		}
+		defSoa = NewRDataSOA(``, ``)
 
 		cases []testCase
 		c     testCase
@@ -41,7 +35,7 @@ func TestServerOptionsInit(t *testing.T) {
 		exp: &ServerOptions{
 			ListenAddress:   "0.0.0.0:53",
 			HTTPIdleTimeout: defaultHTTPIdleTimeout,
-			SOA:             defSoa,
+			SOA:             *defSoa,
 			PruneDelay:      time.Hour,
 			PruneThreshold:  -1 * time.Hour,
 			ip:              ip,
@@ -74,7 +68,7 @@ func TestServerOptionsInit(t *testing.T) {
 			NameServers: []string{
 				"udp://127.0.0.1",
 			},
-			SOA:            defSoa,
+			SOA:            *defSoa,
 			PruneDelay:     time.Hour,
 			PruneThreshold: -1 * time.Hour,
 			ip:             ip,

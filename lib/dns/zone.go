@@ -21,19 +21,18 @@ type Zone struct {
 	Path     string      `json:"-"`
 	Name     string
 	messages []*Message
-	SOA      RDataSOA
+	SOA      *RDataSOA
 }
 
 // NewZone create and initialize new zone.
-func NewZone(file, name string) *Zone {
-	return &Zone{
-		Path: file,
-		Name: name,
-		SOA: RDataSOA{
-			MName: name,
-		},
+func NewZone(file, name string) (zone *Zone) {
+	zone = &Zone{
+		Path:    file,
+		Name:    name,
+		SOA:     NewRDataSOA(name, ``),
 		Records: make(ZoneRecords),
 	}
+	return zone
 }
 
 // LoadZoneDir load DNS record from zone formatted files in
@@ -157,7 +156,9 @@ func (zone *Zone) Add(rr *ResourceRecord) (err error) {
 	if rr.Type == RecordTypeSOA {
 		soa, _ = rr.Value.(*RDataSOA)
 		if soa != nil {
-			zone.SOA = *soa
+			var cloneSoa = *soa
+			zone.SOA = &cloneSoa
+			zone.SOA.init()
 		}
 	} else {
 		zone.Records.add(rr)
@@ -204,9 +205,10 @@ func (zone *Zone) Messages() []*Message {
 }
 
 // Remove a ResourceRecord from zone file.
+// If the RR is SOA it will reset the value back to default.
 func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 	if rr.Type == RecordTypeSOA {
-		zone.SOA = RDataSOA{}
+		zone.SOA = NewRDataSOA(zone.Name, ``)
 	} else {
 		if zone.Records.remove(rr) {
 			err = zone.Save()

@@ -6,14 +6,14 @@ package dns
 
 import (
 	"strings"
-	"time"
 )
 
+// Default SOA record value.
 const (
-	defaultRName      string = "root"
-	defaultRefresh    int32  = 1 * 24 * 60 * 60 // 1 Day.
-	defaultRetry      int32  = 1 * 60 * 60      // 1 Hour.
-	defaultMinimumTTL uint32 = 1 * 60 * 60      // 1 Hour.
+	DefaultSoaRName      string = `root`
+	DefaultSoaRefresh    int32  = 1 * 24 * 60 * 60 // 1 Day.
+	DefaultSoaRetry      int32  = 1 * 60 * 60      // 1 Hour.
+	DefaultSoaMinimumTtl uint32 = 1 * 60 * 60      // 1 Hour.
 )
 
 // RDataSOA contains the authority of zone.
@@ -52,6 +52,17 @@ type RDataSOA struct {
 	Minimum uint32
 }
 
+// NewRDataSOA create and initialize the new SOA record using default values
+// for Serial, Refresh, Retry, Expiry, and Minimum.
+func NewRDataSOA(mname, rname string) (soa *RDataSOA) {
+	soa = &RDataSOA{
+		MName: mname,
+		RName: rname,
+	}
+	soa.init()
+	return soa
+}
+
 // init initialize the SOA record by setting fields to its default value if
 // its empty.
 func (soa *RDataSOA) init() {
@@ -61,18 +72,18 @@ func (soa *RDataSOA) init() {
 	if len(soa.RName) > 0 {
 		soa.RName = strings.ToLower(soa.RName)
 	} else {
-		soa.RName = defaultRName
+		soa.RName = DefaultSoaRName
 	}
 	if soa.Serial == 0 {
-		soa.Serial = uint32(time.Now().Unix())
+		soa.Serial = uint32(timeNow().Unix())
 	}
 	if soa.Refresh == 0 {
-		soa.Refresh = defaultRefresh
+		soa.Refresh = DefaultSoaRefresh
 	}
 	if soa.Retry == 0 {
-		soa.Retry = defaultRetry
+		soa.Retry = DefaultSoaRetry
 	}
 	if soa.Minimum == 0 {
-		soa.Minimum = defaultMinimumTTL
+		soa.Minimum = DefaultSoaMinimumTtl
 	}
 }

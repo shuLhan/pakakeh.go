@@ -134,3 +134,9 @@ var rcodeNames = map[ResponseCode]string{
 	RCodeNotImplemented: "ERR_NOT_IMPLEMENTED",
 	RCodeRefused:        "ERR_REFUSED",
 }
+
+// timeNow return the current time.
+// This variable provides to help mocking the test that require time value.
+var timeNow = func() time.Time {
+	return time.Now()
+}

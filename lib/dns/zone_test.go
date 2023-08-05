@@ -236,3 +236,56 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 		test.Assert(t, `ttl`, c.exp, m.ttl)
 	}
 }
+
+// TestZone_SOA test related to SOA, when SOA record updated, removed, or
+// other records added or removed.
+func TestZone_SOA(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/zone_soa_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		zone = NewZone(``, `test.soa`)
+		buf  bytes.Buffer
+		exp  []byte
+	)
+
+	_, _ = zone.WriteTo(&buf)
+	exp = tdata.Output[`NewZone`]
+	test.Assert(t, `NewZone`, string(exp), buf.String())
+
+	// Add SOA.
+	var (
+		rdataSoa = NewRDataSOA(`new.soa`, `admin`)
+		rrSoa    = &ResourceRecord{
+			Value: rdataSoa,
+			Name:  zone.Name,
+			Type:  RecordTypeSOA,
+			Class: RecordClassIN,
+		}
+	)
+
+	err = zone.Add(rrSoa)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	buf.Reset()
+	_, _ = zone.WriteTo(&buf)
+	exp = tdata.Output[`Add_SOA`]
+	test.Assert(t, `Add_SOA`, string(exp), buf.String())
+
+	// Remove SOA.
+	_ = zone.Remove(rrSoa)
+
+	buf.Reset()
+	_, _ = zone.WriteTo(&buf)
+	exp = tdata.Output[`Remove_SOA`]
+	test.Assert(t, `Remove_SOA`, string(exp), buf.String())
+}
