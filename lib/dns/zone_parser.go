@@ -452,7 +452,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRe
 			fallthrough // If its not digit maybe type.
 
 		case flagRRTtl | flagRRClass:
-			ok = m.parseRRType(rr, stok)
+			rr.Type, ok = RecordTypes[stok]
 			if !ok {
 				return nil, fmt.Errorf(`%s: line %d: unknown class or type '%s'`, logp, m.lineno, stok)
 			}
@@ -474,54 +474,22 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRe
 func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string, flag int) (int, bool) {
 	var ok bool
 
-	ok = m.parseRRClass(rr, stok)
+	rr.Class, ok = RecordClasses[stok]
 	if ok {
 		flag |= flagRRClass
-		return flag, true
+		return flag, ok
 	}
 
-	ok = m.parseRRType(rr, stok)
+	// Set back to default class.
+	rr.Class = RecordClassIN
+
+	rr.Type, ok = RecordTypes[stok]
 	if ok {
 		flag = flagRRType
-		return flag, true
+		return flag, ok
 	}
 
 	return flag, false
-}
-
-// parseRRClass check if token is known class.
-// It will set the rr.Class and return true if stok is one of known class;
-// otherwise it will return false.
-func (m *zoneParser) parseRRClass(rr *ResourceRecord, stok string) bool {
-	var (
-		k string
-		v RecordClass
-	)
-
-	for k, v = range RecordClasses {
-		if stok == k {
-			rr.Class = v
-			return true
-		}
-	}
-	return false
-}
-
-// parseRRType check if token is one of known query type.
-// It will set rr.Type and return true if token found, otherwise it will
-// return false.
-func (m *zoneParser) parseRRType(rr *ResourceRecord, stok string) bool {
-	var (
-		k string
-		v RecordType
-	)
-	for k, v = range RecordTypes {
-		if stok == k {
-			rr.Type = v
-			return true
-		}
-	}
-	return false
 }
 
 func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte, c byte) (err error) {
