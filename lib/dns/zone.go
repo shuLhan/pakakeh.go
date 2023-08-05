@@ -12,25 +12,32 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/shuLhan/share/lib/reflect"
 )
 
 // Zone represent a group of domain names shared a single root domain.
 // A Zone contains at least one SOA record.
 type Zone struct {
-	Records  ZoneRecords `json:"-"`
-	Path     string      `json:"-"`
-	Name     string
+	// Records contains mapping between domain name and its resource
+	// records.
+	Records map[string][]*ResourceRecord `json:"-"`
+
+	SOA *RDataSOA
+
+	Path string `json:"-"`
+	Name string
+
 	messages []*Message
-	SOA      *RDataSOA
 }
 
 // NewZone create and initialize new zone.
 func NewZone(file, name string) (zone *Zone) {
 	zone = &Zone{
+		Records: make(map[string][]*ResourceRecord),
+		SOA:     NewRDataSOA(name, ``),
 		Path:    file,
 		Name:    name,
-		SOA:     NewRDataSOA(name, ``),
-		Records: make(ZoneRecords),
 	}
 	return zone
 }
@@ -171,7 +178,7 @@ func (zone *Zone) add(rr *ResourceRecord) (err error) {
 			zone.SOA.init()
 		}
 	} else {
-		zone.Records.add(rr)
+		zone.recordAdd(rr)
 	}
 
 	for _, msg = range zone.messages {
@@ -222,7 +229,7 @@ func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 	if rr.Type == RecordTypeSOA {
 		zone.SOA = NewRDataSOA(zone.Name, ``)
 	} else {
-		if zone.Records.remove(rr) {
+		if zone.recordRemove(rr) {
 			err = zone.Save()
 			if err != nil {
 				return fmt.Errorf(`%s: %w`, logp, err)
@@ -457,4 +464,57 @@ func (zone *Zone) onUpdate() {
 		serial = zone.SOA.Serial + 1
 	}
 	zone.SOA.Serial = serial
+}
+
+// recordAdd a ResourceRecord into the zone.
+func (zone *Zone) recordAdd(rr *ResourceRecord) {
+	var (
+		listRR = zone.Records[rr.Name]
+
+		in *ResourceRecord
+		x  int
+	)
+
+	// Replace the RR if its type is SOA because only one SOA
+	// should exist per domain name.
+	if rr.Type == RecordTypeSOA {
+		for x, in = range listRR {
+			if in.Type != RecordTypeSOA {
+				continue
+			}
+			listRR[x] = rr
+			return
+		}
+	}
+	listRR = append(listRR, rr)
+	zone.Records[rr.Name] = listRR
+}
+
+// recordRemove remove a ResourceRecord from list by its Name and Value.
+// It will return true if the RR exist and removed.
+func (zone *Zone) recordRemove(rr *ResourceRecord) bool {
+	var (
+		listRR = zone.Records[rr.Name]
+		nlist  = len(listRR)
+
+		in *ResourceRecord
+		x  int
+	)
+
+	for x, in = range listRR {
+		if in.Type != rr.Type {
+			continue
+		}
+		if in.Class != rr.Class {
+			continue
+		}
+		if !reflect.IsEqual(in.Value, rr.Value) {
+			continue
+		}
+		copy(listRR[x:], listRR[x+1:])
+		listRR[nlist-1] = nil
+		zone.Records[rr.Name] = listRR[:nlist-1]
+		return true
+	}
+	return false
 }

@@ -289,3 +289,120 @@ func TestZone_SOA(t *testing.T) {
 	exp = tdata.Output[`Remove_SOA`]
 	test.Assert(t, `Remove_SOA`, string(exp), buf.String())
 }
+
+func testGenerateZoneRecords() (zone *Zone, listRR []*ResourceRecord) {
+	zone = NewZone(``, `test`)
+
+	listRR = []*ResourceRecord{{
+		Name:  `test`,
+		Type:  RecordTypeA,
+		Class: RecordClassIN,
+		Value: `127.0.0.1`,
+		TTL:   1,
+	}, {
+		Name:  `test`,
+		Type:  RecordTypeSOA,
+		Class: RecordClassIN,
+		Value: &RDataSOA{},
+		TTL:   2,
+	}, {
+		Name:  `test`,
+		Type:  RecordTypeMX,
+		Class: RecordClassIN,
+		TTL:   3,
+	}, {
+		Name:  `test`,
+		Type:  RecordTypeSOA,
+		Class: RecordClassIN,
+		TTL:   4,
+	}, {
+		Name:  `test`,
+		Type:  RecordTypeA,
+		Class: RecordClassCH,
+		TTL:   5,
+	}}
+
+	var rr *ResourceRecord
+	for _, rr = range listRR {
+		zone.recordAdd(rr)
+	}
+
+	return zone, listRR
+}
+
+func TestZoneRecordAdd(t *testing.T) {
+	var (
+		gotZone *Zone
+		listRR  []*ResourceRecord
+	)
+
+	gotZone, listRR = testGenerateZoneRecords()
+
+	var expZoneRecords = map[string][]*ResourceRecord{
+		`test`: []*ResourceRecord{
+			listRR[0],
+			listRR[3],
+			listRR[2],
+			listRR[4],
+		},
+	}
+
+	test.Assert(t, `add`, expZoneRecords, gotZone.Records)
+}
+
+func TestZoneRecordRemove(t *testing.T) {
+	type testCase struct {
+		rr           *ResourceRecord
+		expZoneRR    map[string][]*ResourceRecord
+		expIsRemoved bool
+	}
+
+	var (
+		gotZone      *Zone
+		listRR       []*ResourceRecord
+		cases        []testCase
+		c            testCase
+		gotIsRemoved bool
+	)
+
+	gotZone, listRR = testGenerateZoneRecords()
+
+	cases = []testCase{{
+		// With different value.
+		rr: &ResourceRecord{
+			Name:  `test`,
+			Type:  RecordTypeA,
+			Class: RecordClassIN,
+			Value: `127.0.0.2`,
+		},
+		expZoneRR:    gotZone.Records,
+		expIsRemoved: false,
+	}, {
+		// With different Class.
+		rr: &ResourceRecord{
+			Name:  `test`,
+			Type:  RecordTypeA,
+			Class: RecordClassCH,
+			Value: `127.0.0.1`,
+		},
+		expZoneRR:    gotZone.Records,
+		expIsRemoved: false,
+	}, {
+		// With RR removed at the end.
+		rr: listRR[4],
+		expZoneRR: map[string][]*ResourceRecord{
+			`test`: []*ResourceRecord{
+				listRR[0],
+				listRR[3],
+				listRR[2],
+			},
+		},
+		expIsRemoved: true,
+	}}
+
+	for _, c = range cases {
+		gotIsRemoved = gotZone.recordRemove(c.rr)
+		test.Assert(t, `is removed`, c.expIsRemoved, gotIsRemoved)
+		test.Assert(t, `after removed`, c.expZoneRR, gotZone.Records)
+	}
+}
