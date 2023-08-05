@@ -1029,7 +1029,7 @@ func (m *zoneParser) generateDomainName(dname []byte) (out string) {
 // based on RR.
 func (m *zoneParser) push(rr *ResourceRecord) error {
 	m.lastRR = rr
-	return m.zone.Add(rr)
+	return m.zone.add(rr)
 }
 
 func (m *zoneParser) setMinimumTTL() {

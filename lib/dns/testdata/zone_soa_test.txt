@@ -4,8 +4,8 @@ $ORIGIN test.soa
 
 <<< Add_SOA
 $ORIGIN test.soa
-@ SOA new.soa admin 1691222000 86400 3600 0 3600
+@ SOA new.soa admin 1691222001 86400 3600 0 3600
 
 <<< Remove_SOA
 $ORIGIN test.soa
-@ SOA test.soa root 1691222000 86400 3600 0 3600
+@ SOA test.soa root 1691222001 86400 3600 0 3600

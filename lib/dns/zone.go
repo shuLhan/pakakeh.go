@@ -148,6 +148,16 @@ func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 
 // Add add new ResourceRecord to Zone.
 func (zone *Zone) Add(rr *ResourceRecord) (err error) {
+	var logp = `Add`
+	err = zone.add(rr)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+	zone.onUpdate()
+	return nil
+}
+
+func (zone *Zone) add(rr *ResourceRecord) (err error) {
 	var (
 		msg *Message
 		soa *RDataSOA
@@ -207,14 +217,20 @@ func (zone *Zone) Messages() []*Message {
 // Remove a ResourceRecord from zone file.
 // If the RR is SOA it will reset the value back to default.
 func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
+	var logp = `Remove`
+
 	if rr.Type == RecordTypeSOA {
 		zone.SOA = NewRDataSOA(zone.Name, ``)
 	} else {
 		if zone.Records.remove(rr) {
 			err = zone.Save()
+			if err != nil {
+				return fmt.Errorf(`%s: %w`, logp, err)
+			}
 		}
 	}
-	return err
+	zone.onUpdate()
+	return nil
 }
 
 // Save the content of zone records to file defined by Zone.Path.
@@ -428,4 +444,17 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		total += n
 	}
 	return total, nil
+}
+
+// onUpdate handle when a record inserted, updated, or removed from zone.
+// Basically, it set the SOA serial to current epoch or increase by one if
+// the current serial and epoch are equal.
+func (zone *Zone) onUpdate() {
+	var serial = uint32(timeNow().Unix())
+	if zone.SOA.Serial == serial {
+		serial++
+	} else if zone.SOA.Serial > serial {
+		serial = zone.SOA.Serial + 1
+	}
+	zone.SOA.Serial = serial
 }
