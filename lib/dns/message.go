@@ -191,6 +191,85 @@ func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 	return err
 }
 
+// AddAuthority add the rr to list of Authority.
+// Calling this method mark the message as answer, instead of query.
+//
+// If the rr is SOA, it will replace the existing record if exist and set
+// the flag authoritative answer (IsAA) in header to true.
+// If the rr is NS, it will be added only if its not exist.
+//
+// It will return an error if the rr type is not SOA or NS or the size of
+// records in Authority is full, maximum four records.
+func (msg *Message) AddAuthority(rr *ResourceRecord) (err error) {
+	var (
+		logp = `AddAuthority`
+
+		rrAuth ResourceRecord
+		x      int
+		found  bool
+	)
+
+	switch rr.Type {
+	case RecordTypeSOA:
+		for x, rrAuth = range msg.Authority {
+			if rrAuth.Type == RecordTypeSOA {
+				msg.Authority[x] = *rr
+				found = true
+				break
+			}
+		}
+	case RecordTypeNS:
+		var (
+			rrVal string
+			val   string
+			ok    bool
+		)
+
+		rrVal, ok = rr.Value.(string)
+		if !ok {
+			return fmt.Errorf(`%s: expecting NS value as string, got %T`, logp, rr.Value)
+		}
+
+		for _, rrAuth = range msg.Authority {
+			if rrAuth.Type != RecordTypeNS {
+				continue
+			}
+			val, ok = rrAuth.Value.(string)
+			if !ok {
+				return fmt.Errorf(`%s: expecting NS value as string, got %T`, logp, rr.Value)
+			}
+			if rrVal == val {
+				found = true
+				break
+			}
+		}
+
+	default:
+		return fmt.Errorf(`%s: expecting SOA or NS, got %s`, logp, RecordTypeNames[rr.Type])
+	}
+
+	if !found {
+		if len(msg.Authority) >= 4 {
+			return fmt.Errorf(`%s: records is full`, logp)
+		}
+		msg.Authority = append(msg.Authority, *rr)
+	}
+
+	msg.Header.NSCount = uint16(len(msg.Authority))
+	msg.SetQuery(false)
+
+	if rr.Type == RecordTypeSOA {
+		msg.SetAuthorativeAnswer(true)
+	}
+
+	_, err = msg.Pack()
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return nil
+}
+
 // FilterAnswers return resource record in Answer that match only with
 // specific query type.
 func (msg *Message) FilterAnswers(t RecordType) (answers []ResourceRecord) {

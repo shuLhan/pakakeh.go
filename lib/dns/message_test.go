@@ -5,8 +5,10 @@
 package dns
 
 import (
+	"bytes"
 	"testing"
 
+	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -862,6 +864,119 @@ func TestMessagePack(t *testing.T) {
 
 		test.Assert(t, c.desc, c.exp, got)
 	}
+}
+
+func TestMessageAddAuthority(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/message/add_authority_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		msg   = NewMessage()
+		rrTxt = &ResourceRecord{
+			Type:  RecordTypeTXT,
+			Class: RecordClassIN,
+		}
+
+		exp []byte
+		bb  bytes.Buffer
+	)
+
+	msg.Header.IsQuery = false
+
+	err = msg.AddAuthority(rrTxt)
+	if err != nil {
+		exp = tdata.Output[`error_with_txt`]
+		test.Assert(t, `AddAuthority with rr TXT`, string(exp), err.Error())
+	}
+
+	// Test adding SOA.
+
+	var (
+		rdataSoa = NewRDataSOA(`test.soa`, ``)
+		rrSoa    = &ResourceRecord{
+			Name:  `test.soa`,
+			Type:  RecordTypeSOA,
+			Class: RecordClassIN,
+			Value: rdataSoa,
+		}
+	)
+
+	err = msg.AddAuthority(rrSoa)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Adding another SOA should replace the existing.
+
+	rrSoa.Name = `update.soa`
+
+	err = msg.AddAuthority(rrSoa)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Test adding NS.
+
+	var (
+		listNS = []string{
+			`ns1.update.soa`,
+			`ns2.update.soa`,
+			`ns3.update.soa`,
+		}
+
+		rrNS *ResourceRecord
+		ns   string
+	)
+
+	for _, ns = range listNS {
+		rrNS = &ResourceRecord{
+			Name:  rrSoa.Name,
+			Type:  RecordTypeNS,
+			Class: RecordClassIN,
+			Value: ns,
+		}
+
+		err = msg.AddAuthority(rrNS)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Adding the same NS should not expand the Authority
+		// records.
+		err = msg.AddAuthority(rrNS)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Adding another NS where Authority records is full should return
+	// an error.
+	rrNS = &ResourceRecord{
+		Name:  `update.soa`,
+		Type:  RecordTypeNS,
+		Class: RecordClassIN,
+		Value: `ns4.update.soa`,
+	}
+	err = msg.AddAuthority(rrNS)
+	if err != nil {
+		exp = tdata.Output[`error_full`]
+		test.Assert(t, `error_full`, string(exp), err.Error())
+	}
+
+	// Compare the message packet.
+
+	bb.Reset()
+	libbytes.DumpPrettyTable(&bb, msg.Question.String(), msg.packet)
+
+	exp = tdata.Output[`packet`]
+	test.Assert(t, `AddAuthority`, string(exp), bb.String())
 }
 
 func TestMessageSetAuthoritativeAnswer(t *testing.T) {
