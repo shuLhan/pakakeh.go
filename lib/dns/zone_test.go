@@ -265,7 +265,7 @@ func TestZone_SOA(t *testing.T) {
 		rdataSoa = NewRDataSOA(`new.soa`, `admin`)
 		rrSoa    = &ResourceRecord{
 			Value: rdataSoa,
-			Name:  zone.Name,
+			Name:  zone.Origin,
 			Type:  RecordTypeSOA,
 			Class: RecordClassIN,
 		}

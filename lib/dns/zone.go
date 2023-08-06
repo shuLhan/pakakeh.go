@@ -26,18 +26,21 @@ type Zone struct {
 	SOA *RDataSOA
 
 	Path string `json:"-"`
-	Name string
+
+	// The base domain of zone.
+	// It must be absolute domain, end with period.
+	Origin string
 
 	messages []*Message
 }
 
 // NewZone create and initialize new zone.
-func NewZone(file, name string) (zone *Zone) {
+func NewZone(file, origin string) (zone *Zone) {
 	zone = &Zone{
 		Records: make(map[string][]*ResourceRecord),
-		SOA:     NewRDataSOA(name, ``),
+		SOA:     NewRDataSOA(origin, ``),
 		Path:    file,
-		Name:    name,
+		Origin:  origin,
 	}
 	return zone
 }
@@ -123,7 +126,7 @@ func ParseZone(content []byte, origin string, ttl uint32) (zone *Zone, err error
 	zone = zp.zone
 	zp.zone = nil
 
-	zone.Name = zp.origin
+	zone.Origin = zp.origin
 
 	return zone, nil
 }
@@ -227,7 +230,7 @@ func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 	var logp = `Remove`
 
 	if rr.Type == RecordTypeSOA {
-		zone.SOA = NewRDataSOA(zone.Name, ``)
+		zone.SOA = NewRDataSOA(zone.Origin, ``)
 	} else {
 		if zone.recordRemove(rr) {
 			err = zone.Save()
@@ -270,7 +273,7 @@ func (zone *Zone) Save() (err error) {
 
 func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceRecord) (total int, err error) {
 	var (
-		suffixOrigin = "." + zone.Name
+		suffixOrigin = "." + zone.Origin
 
 		hinfo *RDataHINFO
 		minfo *RDataMINFO
@@ -308,7 +311,7 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 				break
 			}
 
-			if v == zone.Name {
+			if v == zone.Origin {
 				v = "@"
 			} else {
 				v = strings.TrimSuffix(v, suffixOrigin)
@@ -403,7 +406,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		n    int
 	)
 
-	n, _ = fmt.Fprintf(out, "$ORIGIN %s\n", zone.Name)
+	n, _ = fmt.Fprintf(out, "$ORIGIN %s\n", zone.Origin)
 	total += n
 
 	if len(zone.SOA.MName) > 0 {
@@ -418,7 +421,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 	}
 
 	// Save the origin records first.
-	var listRR = zone.Records[zone.Name]
+	var listRR = zone.Records[zone.Origin]
 	if len(listRR) > 0 {
 		n, err = zone.saveListRR(out, `@`, listRR)
 		if err != nil {
@@ -434,7 +437,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		dname string
 	)
 	for dname = range zone.Records {
-		if dname == zone.Name {
+		if dname == zone.Origin {
 			continue
 		}
 		names = append(names, dname)
@@ -443,7 +446,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 
 	for _, dname = range names {
 		listRR = zone.Records[dname]
-		dname = strings.TrimSuffix(dname, `.`+zone.Name)
+		dname = strings.TrimSuffix(dname, `.`+zone.Origin)
 		n, err = zone.saveListRR(out, dname, listRR)
 		if err != nil {
 			return total, fmt.Errorf(`%s: %w`, logp, err)
