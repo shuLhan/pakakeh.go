@@ -154,6 +154,9 @@ func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %q: %w`, logp, file, err)
 	}
+
+	zone.Path = file
+
 	return zone, nil
 }
 
