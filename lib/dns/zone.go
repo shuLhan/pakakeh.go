@@ -36,6 +36,7 @@ type Zone struct {
 
 // NewZone create and initialize new zone.
 func NewZone(file, origin string) (zone *Zone) {
+	origin = strings.ToLower(toDomainAbsolute(origin))
 	zone = &Zone{
 		Records: make(map[string][]*ResourceRecord),
 		SOA:     NewRDataSOA(origin, ``),
@@ -154,6 +155,18 @@ func ParseZoneFile(file, origin string, ttl uint32) (zone *Zone, err error) {
 		return nil, fmt.Errorf(`%s: %q: %w`, logp, file, err)
 	}
 	return zone, nil
+}
+
+// toDomainAbsolute add the period '.' to the end of domain d, if its not
+// exist, to make it absolute domain.
+func toDomainAbsolute(d string) string {
+	var n = len(d)
+	if n == 0 {
+		d = `.`
+	} else if d[n-1] != '.' {
+		d += `.`
+	}
+	return d
 }
 
 // Add add new ResourceRecord to Zone.

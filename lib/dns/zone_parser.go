@@ -53,12 +53,7 @@ func newZoneParser(zone *Zone) (zp *zoneParser) {
 func (m *zoneParser) Reset(data []byte, origin string, ttl uint32) {
 	m.zone = NewZone("(data)", "")
 	m.lineno = 1
-	m.origin = strings.ToLower(origin)
-	if len(m.origin) > 0 {
-		if m.origin[len(m.origin)-1] != '.' {
-			m.origin += `.`
-		}
-	}
+	m.origin = strings.ToLower(toDomainAbsolute(origin))
 	m.ttl = ttl
 	if m.parser == nil {
 		m.parser = libbytes.NewParser(nil, nil)
@@ -222,7 +217,7 @@ func (m *zoneParser) parseDirectiveOrigin(c byte) (err error) {
 		return fmt.Errorf(`%s: line %d: empty $origin directive`, logp, m.lineno)
 	}
 
-	m.origin = strings.ToLower(string(tok))
+	m.origin = strings.ToLower(toDomainAbsolute(string(tok)))
 
 	err = m.skipLine(c)
 	if err != nil {

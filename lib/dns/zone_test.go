@@ -111,11 +111,11 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 	}, {
 		desc: `With value`,
 		in:   `$origin x`,
-		exp:  `x`,
+		exp:  `x.`,
 	}, {
 		desc: `With value and comment`,
 		in:   `$origin x ;comment`,
-		exp:  `x`,
+		exp:  `x.`,
 	}}
 
 	for _, c = range cases {
