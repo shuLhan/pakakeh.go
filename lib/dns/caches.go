@@ -37,6 +37,9 @@ type Caches struct {
 	// by is domain name.
 	external map[string]*answers
 
+	// zone contains internal zones, with its origin as the key.
+	zone map[string]*Zone
+
 	// lru contains list of external answers, ordered by access time in
 	// ascending order (the least recently used, LRU, record will be on
 	// the top).
@@ -79,6 +82,7 @@ func (c *Caches) init(pruneDelay, pruneThreshold time.Duration, debug int) {
 
 	c.internal = make(map[string]*answers)
 	c.external = make(map[string]*answers)
+	c.zone = make(map[string]*Zone)
 	c.lru = list.New()
 	c.debug = debug
 
@@ -306,6 +310,18 @@ func (c *Caches) InternalPopulateRecords(listRR []*ResourceRecord, from string) 
 		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
 	}
 	return nil
+}
+
+// InternalPopulateZone populate the internal caches from Zone.
+func (c *Caches) InternalPopulateZone(zone *Zone) {
+	if zone == nil {
+		return
+	}
+	if len(zone.Origin) == 0 {
+		return
+	}
+	c.zone[zone.Origin] = zone
+	c.InternalPopulate(zone.Messages(), zone.Path)
 }
 
 // InternalRemoveNames remove internal caches by domain names.
