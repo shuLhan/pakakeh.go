@@ -48,7 +48,7 @@ func NewZone(file, origin string) (zone *Zone) {
 
 // LoadZoneDir load DNS record from zone formatted files in
 // directory "dir".
-// On success, it will return map of file name and Zone content as list
+// On success, it will return map of zone Origin and its content as list
 // of Message.
 // On fail, it will return possible partially parse zone file and an error.
 func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
@@ -99,7 +99,7 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 			return zoneFiles, fmt.Errorf("LoadZoneDir %q: %w", dir, err)
 		}
 
-		zoneFiles[name] = zone
+		zoneFiles[zone.Origin] = zone
 	}
 
 	err = d.Close()
