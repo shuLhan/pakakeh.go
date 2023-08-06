@@ -16,10 +16,6 @@ import (
 	libtime "github.com/shuLhan/share/lib/time"
 )
 
-const (
-	defMinimumTTL = 3600
-)
-
 // List of flag for parsing RR.
 const (
 	flagRRStart = 0
@@ -33,31 +29,27 @@ type zoneParser struct {
 	zone   *Zone
 	parser *libbytes.Parser
 	lastRR *ResourceRecord
-	origin string
 	lineno int
-	ttl    uint32
 }
 
-func newZoneParser(zone *Zone) (zp *zoneParser) {
-	zp = &zoneParser{
-		lineno: 1,
-	}
-	if zone == nil {
-		zone = NewZone(``, ``)
-	}
-	zp.zone = zone
+func newZoneParser(data []byte, zone *Zone) (zp *zoneParser) {
+	zp = &zoneParser{}
+	zp.Reset(data, zone)
 	return zp
 }
 
 // Reset zoneParser by parsing from slice of byte.
-func (m *zoneParser) Reset(data []byte, origin string, ttl uint32) {
-	m.zone = NewZone("(data)", "")
+func (m *zoneParser) Reset(data []byte, zone *Zone) {
+	if zone == nil {
+		zone = NewZone(`(data)`, ``)
+	}
+
+	m.zone = zone
 	m.lineno = 1
-	m.origin = strings.ToLower(toDomainAbsolute(origin))
-	m.ttl = ttl
 	if m.parser == nil {
 		m.parser = libbytes.NewParser(nil, nil)
 	}
+
 	data = bytes.TrimSpace(data)
 	data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
 	m.parser.Reset(data, []byte{' ', '\t', '\n', ';'})
@@ -188,10 +180,6 @@ func (m *zoneParser) parse() (err error) {
 		}
 	}
 
-	if m.ttl == 0 {
-		m.ttl = defMinimumTTL
-	}
-
 	m.setMinimumTTL()
 	m.pack()
 
@@ -217,7 +205,7 @@ func (m *zoneParser) parseDirectiveOrigin(c byte) (err error) {
 		return fmt.Errorf(`%s: line %d: empty $origin directive`, logp, m.lineno)
 	}
 
-	m.origin = strings.ToLower(toDomainAbsolute(string(tok)))
+	m.zone.Origin = strings.ToLower(toDomainAbsolute(string(tok)))
 
 	err = m.skipLine(c)
 	if err != nil {
@@ -250,7 +238,7 @@ func (m *zoneParser) parseDirectiveInclude(c byte) (err error) {
 
 	var (
 		incfile = string(tok)
-		dname   = m.origin
+		dname   = m.zone.Origin
 	)
 
 	// Check if include followed by domain name.
@@ -269,7 +257,7 @@ func (m *zoneParser) parseDirectiveInclude(c byte) (err error) {
 
 	var zoneFile *Zone
 
-	zoneFile, err = ParseZoneFile(incfile, dname, m.ttl)
+	zoneFile, err = ParseZoneFile(incfile, dname, m.zone.SOA.Minimum)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -302,7 +290,7 @@ func (m *zoneParser) parseDirectiveTTL(c byte) (err error) {
 	tok = ascii.ToLower(tok)
 	stok = string(tok)
 
-	m.ttl, err = parseTTL(tok, stok)
+	m.zone.SOA.Minimum, err = parseTTL(tok, stok)
 	if err != nil {
 		return fmt.Errorf(`%s: line %d: %w`, logp, m.lineno, err)
 	}
@@ -372,11 +360,12 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRe
 		ok     bool
 	)
 
-	rr = &ResourceRecord{}
+	rr = &ResourceRecord{
+		TTL: m.zone.SOA.Minimum,
+	}
 
 	if prevRR == nil {
 		rr.Name = m.generateDomainName(tok)
-		rr.TTL = m.ttl
 		if m.lastRR != nil {
 			rr.Class = m.lastRR.Class
 		} else {
@@ -384,7 +373,9 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRe
 		}
 	} else {
 		rr.Name = prevRR.Name
-		rr.TTL = prevRR.TTL
+		if prevRR.Type != RecordTypeSOA {
+			rr.TTL = prevRR.TTL
+		}
 		rr.Class = prevRR.Class
 
 		tok = ascii.ToUpper(tok)
@@ -643,10 +634,6 @@ func (m *zoneParser) parseSOA(rr *ResourceRecord, tok []byte) (err error) {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	if m.ttl == 0 {
-		m.ttl = rrSOA.Minimum
-	}
-
 	return nil
 }
 
@@ -823,7 +810,7 @@ func (m *zoneParser) parseSRV(rr *ResourceRecord, tok []byte) (err error) {
 	)
 
 	if len(svcProtoName) == 2 {
-		rrSRV.Name = m.origin
+		rrSRV.Name = m.zone.Origin
 	} else {
 		rrSRV.Name = svcProtoName[2]
 	}
@@ -1010,12 +997,12 @@ func (m *zoneParser) decodeString(in []byte) (out []byte, err error) {
 func (m *zoneParser) generateDomainName(dname []byte) (out string) {
 	dname = ascii.ToLower(dname)
 	if bytes.Equal(dname, []byte("@")) {
-		return m.origin
+		return m.zone.Origin
 	}
 	if dname[len(dname)-1] == '.' {
 		return string(dname)
 	}
-	out = string(dname) + "." + m.origin
+	out = string(dname) + "." + m.zone.Origin
 	return out
 }
 
@@ -1035,18 +1022,18 @@ func (m *zoneParser) setMinimumTTL() {
 
 	for _, msg = range m.zone.messages {
 		for x = 0; x < len(msg.Answer); x++ {
-			if msg.Answer[x].TTL < m.ttl {
-				msg.Answer[x].TTL = m.ttl
+			if msg.Answer[x].TTL < m.zone.SOA.Minimum {
+				msg.Answer[x].TTL = m.zone.SOA.Minimum
 			}
 		}
 		for x = 0; x < len(msg.Authority); x++ {
-			if msg.Authority[x].TTL < m.ttl {
-				msg.Authority[x].TTL = m.ttl
+			if msg.Authority[x].TTL < m.zone.SOA.Minimum {
+				msg.Authority[x].TTL = m.zone.SOA.Minimum
 			}
 		}
 		for x = 0; x < len(msg.Additional); x++ {
-			if msg.Additional[x].TTL < m.ttl {
-				msg.Additional[x].TTL = m.ttl
+			if msg.Additional[x].TTL < m.zone.SOA.Minimum {
+				msg.Additional[x].TTL = m.zone.SOA.Minimum
 			}
 		}
 	}

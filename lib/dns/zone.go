@@ -58,7 +58,7 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 
 	var (
 		d            *os.File
-		zoneFile     *Zone
+		zone         *Zone
 		fi           os.FileInfo
 		fis          []os.FileInfo
 		name         string
@@ -94,12 +94,12 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 
 		zoneFilePath = filepath.Join(dir, name)
 
-		zoneFile, err = ParseZoneFile(zoneFilePath, "", 0)
+		zone, err = ParseZoneFile(zoneFilePath, "", 0)
 		if err != nil {
 			return zoneFiles, fmt.Errorf("LoadZoneDir %q: %w", dir, err)
 		}
 
-		zoneFiles[name] = zoneFile
+		zoneFiles[name] = zone
 	}
 
 	err = d.Close()
@@ -114,20 +114,24 @@ func LoadZoneDir(dir string) (zoneFiles map[string]*Zone, err error) {
 func ParseZone(content []byte, origin string, ttl uint32) (zone *Zone, err error) {
 	var (
 		logp = `ParseZone`
-		zp   = newZoneParser(nil)
+		zp   *zoneParser
 	)
 
-	zp.Reset(content, origin, ttl)
+	if ttl <= 0 {
+		ttl = DefaultSoaMinimumTtl
+	}
+
+	zone = NewZone(``, origin)
+	zone.SOA.Minimum = ttl
+
+	zp = newZoneParser(content, zone)
 
 	err = zp.parse()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	zone = zp.zone
 	zp.zone = nil
-
-	zone.Origin = zp.origin
 
 	return zone, nil
 }
@@ -189,7 +193,7 @@ func (zone *Zone) add(rr *ResourceRecord) (err error) {
 		soa *RDataSOA
 	)
 
-	if rr.Type == RecordTypeSOA {
+	if rr.Type == RecordTypeSOA && rr.Name == zone.Origin {
 		soa, _ = rr.Value.(*RDataSOA)
 		if soa != nil {
 			var cloneSoa = *soa

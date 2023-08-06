@@ -11,7 +11,7 @@ angularjs.doc       A  127.0.0.1
 
 <<< zone_out.txt
 $ORIGIN localdomain.
-@ SOA . root 1691222000 86400 3600 0 3600
+@ SOA localdomain. root 1691222000 86400 3600 0 3600
 angularjs.doc 3600 IN A 127.0.0.1
 dev.kilabit.com. 3600 IN A 127.0.0.1
 dev.kilabit.info. 3600 IN A 127.0.0.1

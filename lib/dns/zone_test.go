@@ -93,7 +93,7 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser(nil)
+		m = newZoneParser(nil, nil)
 
 		cases []testCase
 		c     testCase
@@ -121,7 +121,7 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Reset([]byte(c.in), ``, 0)
+		m.Reset([]byte(c.in), nil)
 
 		err = m.parse()
 		if err != nil {
@@ -129,7 +129,7 @@ func TestZoneParseDirectiveOrigin(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, `origin`, c.exp, m.origin)
+		test.Assert(t, `origin`, c.exp, m.zone.Origin)
 	}
 }
 
@@ -141,7 +141,7 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser(nil)
+		m = newZoneParser(nil, nil)
 
 		cases []testCase
 		c     testCase
@@ -170,7 +170,7 @@ func TestZoneParseDirectiveInclude(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Reset([]byte(c.in), ``, 0)
+		m.Reset([]byte(c.in), nil)
 
 		err = m.parse()
 		if err != nil {
@@ -189,7 +189,7 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 	}
 
 	var (
-		m = newZoneParser(nil)
+		m = newZoneParser(nil, nil)
 
 		cases []testCase
 		c     testCase
@@ -225,7 +225,7 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		m.Reset([]byte(c.in), ``, 0)
+		m.Reset([]byte(c.in), nil)
 
 		err = m.parse()
 		if err != nil {
@@ -233,7 +233,7 @@ func TestZoneParseDirectiveTTL(t *testing.T) {
 			continue
 		}
 
-		test.Assert(t, `ttl`, c.exp, m.ttl)
+		test.Assert(t, `ttl`, c.exp, m.zone.SOA.Minimum)
 	}
 }
 

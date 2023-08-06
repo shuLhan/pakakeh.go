@@ -29,9 +29,9 @@ new-fast-box     A   172.30.79.13
 <<< zone_out.txt
 $ORIGIN example.com.
 @ SOA server.example.com. root.example.com. 1995032001 3600 3600 604800 86400
-@ 0 IN NS server
-	 0 IN NS ns1.ip-provider.net.
-	 0 IN NS ns2.ip-provider.net.
+@ 86400 IN NS server
+	 86400 IN NS ns1.ip-provider.net.
+	 86400 IN NS ns2.ip-provider.net.
 *._tcp 86400 IN SRV 0 0 0 .
 *._udp 86400 IN SRV 0 0 0 .
 _foobar._tcp 86400 IN SRV 0 1 9 old-slow-box
