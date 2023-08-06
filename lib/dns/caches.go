@@ -232,39 +232,61 @@ func (c *Caches) ExternalSearch(re *regexp.Regexp) (listMsg []*Message) {
 	return listMsg
 }
 
-// get an answer based on domain-name, query type, and query class.
-//
-// If query name exist but the query type or class does not exist,
-// it will return list of answer and nil answer.
-//
-// If answer exist on cache and its from external, their accessed time will be
-// updated to current time and moved to back of LRU to prevent being pruned
-// later.
-func (c *Caches) get(qname string, rtype RecordType, rclass RecordClass) (ans *answers, an *Answer) {
-	c.Lock()
-	defer c.Unlock()
+func (c *Caches) query(msg *Message) (an *Answer) {
+	var ans *answers
 
-	ans = c.internal[qname]
+	c.Lock()
+
+	ans = c.internal[msg.Question.Name]
 	if ans == nil {
-		ans = c.external[qname]
+		ans = c.external[msg.Question.Name]
 		if ans == nil {
-			return nil, nil
+			goto out
 		}
 	}
 
-	an, _ = ans.get(rtype, rclass)
+	an, _ = ans.get(msg.Question.Type, msg.Question.Class)
 	if an == nil {
-		return ans, nil
+		goto out
 	}
 
-	// Move the answer to the back of LRU if its external
-	// answer and update its accessed time.
+	// Move the answer to the back of LRU if its external answer and
+	// update its accessed time.
 	if an.ReceivedAt > 0 {
 		c.lru.MoveToBack(an.el)
-		an.AccessedAt = time.Now().Unix()
+		an.AccessedAt = timeNow().Unix()
 	}
 
-	return ans, an
+out:
+	c.Unlock()
+
+	if an == nil {
+		// No answers found in internal and external caches.
+		// If the requested domain is subset of our internal
+		// zone, return answer with error and Authority.
+		var zone = c.internalZone(msg.Question.Name)
+		if zone == nil {
+			return nil
+		}
+		an = &Answer{
+			msg: msg,
+		}
+		_ = an.msg.AddAuthority(zone.soaRecord())
+		an.msg.SetResponseCode(RCodeErrName)
+	}
+	return an
+}
+
+// internalZone will return the zone if the query name is suffix of one of
+// the Zone Origin.
+func (c *Caches) internalZone(qname string) (zone *Zone) {
+	qname = toDomainAbsolute(qname)
+	for _, zone = range c.zone {
+		if strings.HasSuffix(qname, `.`+zone.Origin) {
+			return zone
+		}
+	}
+	return nil
 }
 
 // InternalPopulate add list of message to internal caches.

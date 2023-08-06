@@ -565,7 +565,6 @@ func (srv *Server) processRequest() {
 		an  *Answer
 		res *Message
 		req *request
-		ans *answers
 		err error
 	)
 
@@ -582,11 +581,8 @@ func (srv *Server) processRequest() {
 				req.message.Question.String())
 		}
 
-		ans, an = srv.Caches.get(req.message.Question.Name,
-			req.message.Question.Type,
-			req.message.Question.Class)
-
-		if ans == nil || an == nil {
+		an = srv.Caches.query(req.message)
+		if an == nil {
 			switch {
 			case srv.hasForwarders():
 				if req.kind == connTypeTCP {

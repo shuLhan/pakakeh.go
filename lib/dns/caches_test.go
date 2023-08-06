@@ -12,14 +12,12 @@ import (
 	"github.com/shuLhan/share/lib/test"
 )
 
-func TestCachesGet(t *testing.T) {
+func TestCachesQuery(t *testing.T) {
 	type testCase struct {
 		exp     *Answer
+		msg     Message
 		desc    string
-		QName   string
 		expList []*Answer
-		RType   RecordType
-		RClass  RecordClass
 	}
 
 	var (
@@ -75,11 +73,15 @@ func TestCachesGet(t *testing.T) {
 			an1, an2, an3,
 		},
 	}, {
-		desc:   "With query found",
-		QName:  "test",
-		RType:  1,
-		RClass: 1,
-		exp:    an1,
+		desc: "With query found",
+		msg: Message{
+			Question: MessageQuestion{
+				Name:  "test",
+				Type:  1,
+				Class: 1,
+			},
+		},
+		exp: an1,
 		expList: []*Answer{
 			an2, an3, an1,
 		},
@@ -88,10 +90,10 @@ func TestCachesGet(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		_, got = ca.get(c.QName, c.RType, c.RClass)
+		got = ca.query(&c.msg)
 		gotList = ca.ExternalLRU()
 
-		test.Assert(t, "caches.get", c.exp, got)
+		test.Assert(t, "caches.query", c.exp, got)
 		test.Assert(t, "caches.list", c.expList, gotList)
 	}
 }
@@ -325,5 +327,38 @@ func TestCachesUpsert(t *testing.T) {
 		for x = 0; x < len(gotList); x++ {
 			test.Assert(t, "caches.list", c.expList[x], gotList[x])
 		}
+	}
+}
+
+func TestCaches_internalZone(t *testing.T) {
+	type testCase struct {
+		qname string
+		exp   bool
+	}
+
+	var caches = &Caches{
+		zone: map[string]*Zone{
+			`my.internal.`: NewZone(``, `my.internal.`),
+		},
+	}
+
+	var listCase = []testCase{{
+		qname: `notmy.internal`,
+		exp:   false,
+	}, {
+		qname: `sub.my.internal`,
+		exp:   true,
+	}, {
+		qname: `sub.my.internal.`,
+		exp:   true,
+	}}
+
+	var (
+		c   testCase
+		got *Zone
+	)
+	for _, c = range listCase {
+		got = caches.internalZone(c.qname)
+		test.Assert(t, c.qname, c.exp, got != nil)
 	}
 }

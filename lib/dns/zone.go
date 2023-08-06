@@ -23,7 +23,8 @@ type Zone struct {
 	// records.
 	Records map[string][]*ResourceRecord `json:"-"`
 
-	SOA *RDataSOA
+	SOA   *RDataSOA
+	rrSOA *ResourceRecord
 
 	Path string `json:"-"`
 
@@ -540,4 +541,17 @@ func (zone *Zone) recordRemove(rr *ResourceRecord) bool {
 		return true
 	}
 	return false
+}
+
+func (zone *Zone) soaRecord() (rrsoa *ResourceRecord) {
+	if zone.rrSOA == nil {
+		zone.rrSOA = &ResourceRecord{
+			Value: zone.SOA,
+			Name:  zone.Origin,
+			Type:  RecordTypeSOA,
+			Class: RecordClassIN,
+			TTL:   zone.SOA.Minimum,
+		}
+	}
+	return zone.rrSOA
 }
