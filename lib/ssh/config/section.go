@@ -33,6 +33,7 @@ const (
 	KeyCertificateFile       = `certificatefile`
 	KeyIdentityFile          = `identityfile`
 	KeySendEnv               = `sendenv`
+	KeyUserKnownHostsFile    = `userknownhostsfile`
 
 	// List of key in Host or Match with integer value.
 	KeyCanonicalizeMaxDots = `canonicalizemaxdots`
@@ -120,17 +121,19 @@ const (
 	keyTunnelDevince                    = "tunneldevice"
 	keyUpdatehostKeys                   = "updatehostkeys"
 	keyUseKeychain                      = "usekeychain"
-	keyUserKnownHostsFile               = "userknownhostsfile"
 	keyVerifyHostKeyDNS                 = "verifyhostkeydns"
 )
 
-// Valid values for key AddKeysToAgent.
+// Known values for key.
 const (
-	ValueAlways  = `always`
-	ValueAsk     = `ask`
-	ValueConfirm = `confirm`
-	ValueNo      = `no`
-	ValueYes     = `yes`
+	ValueAcceptNew = `accept-new`
+	ValueAlways    = `always`
+	ValueAsk       = `ask`
+	ValueConfirm   = `confirm`
+	ValueOff       = `off`
+	ValueNo        = `no`
+	ValueNone      = `none`
+	ValueYes       = `yes`
 )
 
 // Valid values for key AddressFamily.
@@ -169,6 +172,14 @@ func defaultIdentityFile() []string {
 	}
 }
 
+// defaultUserKnownHostsFile return list of default KnownHostsFile.
+func defaultUserKnownHostsFile() []string {
+	return []string{
+		`~/.ssh/known_hosts`,
+		`~/.ssh/known_hosts2`,
+	}
+}
+
 // Section is the type that represent SSH client Host and Match section in
 // configuration.
 type Section struct {
@@ -202,6 +213,7 @@ type Section struct {
 
 	certificateFile []string
 	IdentityFile    []string
+	knownHostsFile  []string
 	sendEnv         []string
 
 	// Patterns for Host section.
@@ -542,6 +554,9 @@ func (section *Section) Set(key, value string) (err error) {
 		section.setEnv(value)
 	case KeyUser:
 		// User name is case sensitive.
+	case KeyUserKnownHostsFile:
+		section.setUserKnownHostsFile(value)
+
 	case KeyVisualHostKey:
 		_, err = parseBool(key, value)
 	case KeyXAuthLocation:
@@ -560,11 +575,27 @@ func (section *Section) User() string {
 	return section.Field[KeyUser]
 }
 
+// UserKnownHostsFile return list of user known_hosts file set in this
+// Section.
+func (section *Section) UserKnownHostsFile() []string {
+	if len(section.knownHostsFile) == 0 {
+		return defaultUserKnownHostsFile()
+	}
+	return section.knownHostsFile
+}
+
 // setEnv set the Environments with key and value of format "KEY=VALUE".
 func (section *Section) setEnv(env string) {
 	kv := strings.SplitN(env, "=", 2)
 	if len(kv) == 2 {
 		section.env[kv[0]] = kv[1]
+	}
+}
+
+func (section *Section) setUserKnownHostsFile(val string) {
+	var list = strings.Fields(val)
+	if len(list) > 0 {
+		section.knownHostsFile = append(section.knownHostsFile, list...)
 	}
 }
 

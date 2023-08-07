@@ -149,3 +149,34 @@ func TestSection_Environments(t *testing.T) {
 		test.Assert(t, c.pattern, c.exp, got)
 	}
 }
+
+func TestSection_UserKnownHostsFile(t *testing.T) {
+	type testCase struct {
+		value string
+		exp   []string
+	}
+
+	var listCase = []testCase{{
+		exp: defaultUserKnownHostsFile(),
+	}, {
+		value: `~/.ssh/myhost ~/.ssh/myhost2`,
+		exp: []string{
+			`~/.ssh/myhost`,
+			`~/.ssh/myhost2`,
+		},
+	}}
+
+	var (
+		section = newSection(`test`)
+
+		c   testCase
+		err error
+	)
+	for _, c = range listCase {
+		err = section.Set(KeyUserKnownHostsFile, c.value)
+		if err != nil {
+			t.Fatal(err)
+		}
+		test.Assert(t, c.value, c.exp, section.UserKnownHostsFile())
+	}
+}
