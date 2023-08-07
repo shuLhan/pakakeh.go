@@ -506,6 +506,7 @@ func (section *Section) Set(key, value string) (err error) {
 		_, err = parseCanonicalizePermittedCNames(value)
 
 	case KeyCASignatureAlgorithms:
+		value = strings.ToLower(value)
 
 	case KeyCertificateFile:
 		section.certificateFile = append(section.certificateFile, value)
@@ -531,6 +532,7 @@ func (section *Section) Set(key, value string) (err error) {
 		section.IdentityFile = append(section.IdentityFile, value)
 
 	case KeyHostname:
+		value = strings.ToLower(value)
 	case KeyPort:
 		_, err = strconv.Atoi(value)
 
@@ -539,6 +541,7 @@ func (section *Section) Set(key, value string) (err error) {
 	case KeySetEnv:
 		section.setEnv(value)
 	case KeyUser:
+		// User name is case sensitive.
 	case KeyVisualHostKey:
 		_, err = parseBool(key, value)
 	case KeyXAuthLocation:
