@@ -167,7 +167,7 @@ func TestSection_UserKnownHostsFile(t *testing.T) {
 	}}
 
 	var (
-		section = newSection(`test`)
+		section = NewSection(`test`)
 
 		c   testCase
 		err error

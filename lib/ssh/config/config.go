@@ -117,7 +117,7 @@ func Load(file string) (cfg *Config, err error) {
 // If no Host or Match found, it still return non-nil Section but with empty
 // fields.
 func (cfg *Config) Get(s string) (section *Section) {
-	section = newSection(s)
+	section = NewSection(s)
 	for _, hostMatch := range cfg.sections {
 		if hostMatch.isMatch(s) {
 			section.mergeField(hostMatch)

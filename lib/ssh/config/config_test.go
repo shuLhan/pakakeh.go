@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	testDefaultSection = newSection(``)
+	testDefaultSection = NewSection(``)
 	testParser         *parser
 )
 

@@ -29,7 +29,7 @@ func newSectionMatch(rawPattern string) (match *Section, err error) {
 		criteria     *matchCriteria
 	)
 
-	match = newSection(rawPattern)
+	match = NewSection(rawPattern)
 	match.criteria = make([]*matchCriteria, 0)
 	match.useCriteria = true
 

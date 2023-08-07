@@ -225,8 +225,8 @@ type Section struct {
 	useCriteria bool
 }
 
-// newSection create new Host or Match with default values.
-func newSection(name string) *Section {
+// NewSection create new Host or Match with default values.
+func NewSection(name string) *Section {
 	return &Section{
 		Field: map[string]string{
 			KeyChallengeResponseAuthentication: ValueYes,
@@ -243,7 +243,7 @@ func newSection(name string) *Section {
 func newSectionHost(rawPattern string) (host *Section) {
 	patterns := strings.Fields(rawPattern)
 
-	host = newSection(rawPattern)
+	host = NewSection(rawPattern)
 	host.patterns = make([]*pattern, 0, len(patterns))
 
 	for _, pattern := range patterns {
