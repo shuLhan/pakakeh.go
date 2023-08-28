@@ -5,6 +5,7 @@
 package ssh
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
+	"golang.org/x/crypto/ssh/knownhosts"
 
 	libos "github.com/shuLhan/share/lib/os"
 	"github.com/shuLhan/share/lib/ssh/config"
@@ -26,11 +28,15 @@ type Client struct {
 	*ssh.Client
 	config *ssh.ClientConfig
 
+	configHostKeyCallback ssh.HostKeyCallback
+
 	cfg    *config.Section
 	stdout io.Writer
 	stderr io.Writer
 
 	remoteAddr string
+
+	listKnownHosts []string
 }
 
 // NewClientInteractive create a new SSH connection using predefined
@@ -42,6 +48,15 @@ type Client struct {
 //
 // If the IdentityFile is encrypted, it will prompt for passphrase in
 // terminal.
+//
+// The following section keys are recognized and implemented by Client,
+//   - Hostname
+//   - IdentityAgent
+//   - IdentityFile
+//   - Port
+//   - User
+//   - UserKnownHostsFile, setting this to "none" will set HostKeyCallback
+//     to [ssh.InsecureIgnoreHostKey].
 func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 	if cfg == nil {
 		return nil, nil
@@ -58,13 +73,17 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 	cl = &Client{
 		sysEnvs: libos.Environments(),
 		config: &ssh.ClientConfig{
-			User:            cfg.User(),
-			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+			User: cfg.User(),
 		},
 		cfg:        cfg,
 		stdout:     os.Stdout,
 		stderr:     os.Stderr,
 		remoteAddr: fmt.Sprintf(`%s:%s`, cfg.Hostname(), cfg.Port()),
+	}
+
+	err = cl.setConfigHostKeyCallback()
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	var sshAgentSockPath = cfg.IdentityAgent()
@@ -83,10 +102,18 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
-		signer = cl.dialWithSigners(signers)
+		signer, err = cl.dialWithSigners(signers)
 		if signer != nil {
 			// Client connected with one of the key in agent.
 			return cl, nil
+		}
+
+		var errKey *knownhosts.KeyError
+		if errors.As(err, &errKey) {
+			// Host key is either unknown or mismatch with one
+			// of known_hosts files, so no need to continue with
+			// dialWithPrivateKeys.
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 
@@ -102,24 +129,83 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 	return cl, nil
 }
 
+// setConfigHostKeyCallback set the config.HostKeyCallback based on the
+// UserKnownHostsFile in the Section.
+// If one of the UserKnownHostsFile set to "none" it will use
+// [ssh.InsecureIgnoreHostKey].
+func (cl *Client) setConfigHostKeyCallback() (err error) {
+	var (
+		logp           = `setConfigHostKeyCallback`
+		userKnownHosts = cl.cfg.UserKnownHostsFile()
+
+		knownHosts string
+	)
+
+	for _, knownHosts = range userKnownHosts {
+		if knownHosts == config.ValueNone {
+			// If one of the UserKnownHosts set to "none" always
+			// accept the remote hosts.
+			cl.config.HostKeyCallback = ssh.InsecureIgnoreHostKey()
+			return nil
+		}
+
+		knownHosts, err = libos.PathUnfold(knownHosts)
+		if err != nil {
+			return fmt.Errorf(`%s: %s: %w`, logp, knownHosts, err)
+		}
+
+		_, err = os.Stat(knownHosts)
+		if err == nil {
+			// Add the user known hosts file only if its exist.
+			cl.listKnownHosts = append(cl.listKnownHosts, knownHosts)
+		}
+	}
+
+	cl.config.HostKeyCallback, err = knownhosts.New(cl.listKnownHosts...)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return nil
+}
+
+// dialError return the error with clear information when the host key is
+// missing or mismatch from known_hosts files.
+func (cl *Client) dialError(logp string, errDial error) (err error) {
+	var (
+		errKey *knownhosts.KeyError
+	)
+	if errors.As(errDial, &errKey) {
+		if len(errKey.Want) == 0 {
+			err = fmt.Errorf(`%s: %w: server host key is missing from %+v`, logp, errDial, cl.listKnownHosts)
+		} else {
+			err = fmt.Errorf(`%s: %w: server host key mismatch in %+v`, logp, errDial, cl.listKnownHosts)
+		}
+	} else {
+		err = fmt.Errorf(`%s: %w`, logp, errDial)
+	}
+	return err
+}
+
 // dialWithSigners connect to the remote machine using AuthMethod PublicKeys
 // using each of signer in the list.
 // On success it will return the signer that can connect to remote address.
-func (cl *Client) dialWithSigners(signers []ssh.Signer) (signer ssh.Signer) {
+func (cl *Client) dialWithSigners(signers []ssh.Signer) (signer ssh.Signer, err error) {
 	if len(signers) == 0 {
-		return nil
+		return nil, nil
 	}
-	var err error
+	var logp = `dialWithSigners`
 	for _, signer = range signers {
 		cl.config.Auth = []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		}
 		cl.Client, err = ssh.Dial(`tcp`, cl.remoteAddr, cl.config)
 		if err == nil {
-			return signer
+			return signer, nil
 		}
+		err = cl.dialError(logp, err)
 	}
-	return nil
+	return nil, err
 }
 
 // dialWithPrivateKeys connect to the remote machine using each of the
@@ -159,6 +245,10 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 		if err == nil {
 			break
 		}
+		err = cl.dialError(logp, err)
+	}
+	if err != nil {
+		return err
 	}
 	if cl.Client == nil {
 		// None of the private key can connect to remote address.
