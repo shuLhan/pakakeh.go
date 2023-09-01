@@ -18,6 +18,81 @@ This is changelog for share module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
+[#v0_49_1]
+== share v0.49.1 (2023-09-02)
+
+[#v0_49_1__bug_fixes]
+===  Bug fixes
+
+lib/dns: fix leaking internal zone::
++
+--
+Previously, if the server have internal zone "my.internal" and the client
+query "sub.my.internal" that does not exist in the zone, the server then
+forward the query to parent name server.
+This cause the internal zone and its domains leaked to parent name server.
+
+This changes fix this issue by checking if the query is subset of
+internal zone Origin if domain does not exist, and response with error
+code 3 (ERR_NAME) with the Zone SOA in Authority.
+--
+
+[#v0_49_1__enhancements]
+=== Enhancements
+
+lib/dns: update the SOA Serial when record added or removed from Zone::
++
+Any call to Zone Add or Remove methods will update the Zone.SOA.Serial to
+current epoch.
+
+lib/dns: add method AddAuthority to Message::
++
+--
+The AddAuthority add the rr to list of Authority.
+Calling this method mark the message as answer, instead of query.
+
+If the rr is SOA, it will replace the existing record if exist and set
+the flag authoritative answer (IsAA) in header to true.
+If the rr is NS, it will be added only if its not exist.
+
+It will return an error if the rr type is not SOA or NS or the size of
+records in Authority is full, maximum four records.
+--
+
+lib/dns: add method to populate internal caches by Zone::
++
+The InternalPopulateZone populate the internal caches from Zone's
+messages.
+
+ssh/config: handle key UserKnownHostsFile::
++
+The UserKnownHostsFile define list of the known_hosts files to be read,
+separated by spaces.
+If not set default to "~/.ssh/known_hosts" and "~/.ssh/known_hosts2".
+
+
+lib/ssh: use UserKnownHostFile from configuration in NewClientInteractive::
++
+--
+Previously, the ssh Client always use InsecureIgnoreHostKey in
+HostKeyCallback.
+This may post security issue, like man-in-the-middle attack, since we
+did not check the server host key with one of key that known by client
+from UserKnownHostFile (for example ~/.ssh/known_hosts).
+
+This changes use the SSH section UserKnownHostFile from configuration
+(default to ~/.ssh/known_hosts) to check if the server host key is
+valid.
+The NewClientInteractive will return an error, "key is unknown", if host
+key not exist in UserKnownHostFile or "key is mismatch" if host key
+not match with one registered in UserKnownHostFile.
+
+This changes depends on patch of golang.org/x/crypto [1] that has not
+reviewed yet, so we need to replace it with one that contains the patch.
+
+[1] https://go-review.googlesource.com/c/crypto/+/523555
+--
+
 
 [#v0_49_0]
 == share v0.49.0 (2023-08-04)
