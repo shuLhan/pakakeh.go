@@ -5,19 +5,44 @@
 package git
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
-	"github.com/shuLhan/share/lib/test/mock"
 )
 
 var (
+	mockStderr bytes.Buffer
+	mockStdout bytes.Buffer
+
 	_testRepoDir   string
 	_testRemoteURL string
 )
+
+func TestMain(m *testing.M) {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	_testRemoteURL = "file://" + wd + "/testdata/beku_test.git"
+	_testRepoDir = wd + "/testdata/repotest"
+
+	_stderr = &mockStderr
+	_stdout = &mockStdout
+
+	fmt.Printf("stdout type: %T\n", _stdout)
+	fmt.Printf("stderr type: %T\n", _stderr)
+	fmt.Printf("remote URL : %s\n", _testRemoteURL)
+	fmt.Printf("repo dir   : %s\n", _testRepoDir)
+
+	s := m.Run()
+
+	os.Exit(s)
+}
 
 func TestClone(t *testing.T) {
 	cases := []struct {
@@ -34,7 +59,8 @@ func TestClone(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 		os.RemoveAll(_testRepoDir)
 
 		err := Clone(_testRemoteURL, c.dest)
@@ -42,8 +68,8 @@ func TestClone(t *testing.T) {
 			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
-		test.Assert(t, "stdout", c.expStdout, mock.Output())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
+		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
 }
 
@@ -75,15 +101,16 @@ Use '--' to separate paths from revisions, like this:
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		err := CheckoutRevision(_testRepoDir, c.remote, c.branch, c.revision)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
-		test.Assert(t, "stdout", c.expStdout, mock.Output())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
+		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
 }
 
@@ -105,7 +132,8 @@ func TestGetRemoteURL(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		got, err := GetRemoteURL(_testRepoDir, c.remoteName)
 		if err != nil {
@@ -113,8 +141,8 @@ func TestGetRemoteURL(t *testing.T) {
 		}
 
 		test.Assert(t, "url", c.exp, got)
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
-		test.Assert(t, "stdout", c.expStdout, mock.Output())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
+		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
 }
 
@@ -141,14 +169,15 @@ func TestGetTag(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		got, err := GetTag(_testRepoDir, c.revision)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
 		test.Assert(t, "stdout", c.expStdout, got)
 	}
 }
@@ -172,14 +201,15 @@ func TestLatestCommit(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		got, err := LatestCommit(_testRepoDir, c.ref)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
 		test.Assert(t, "stdout", c.expStdout, got)
 	}
 }
@@ -197,14 +227,15 @@ func TestLatestTag(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		got, err := LatestTag(_testRepoDir)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
 		test.Assert(t, "stdout", c.expStdout, got)
 	}
 }
@@ -223,7 +254,8 @@ func TestLatestVersion(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		got, err := LatestVersion(_testRepoDir)
 		if err != nil {
@@ -231,8 +263,8 @@ func TestLatestVersion(t *testing.T) {
 		}
 
 		test.Assert(t, "version", c.exp, got)
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
-		test.Assert(t, "stdout", c.expStdout, mock.Output())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
+		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
 }
 
@@ -248,7 +280,8 @@ func TestListTag(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		got, err := ListTags(_testRepoDir)
 		if err != nil {
@@ -292,15 +325,16 @@ ec65455 Add feature A.
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		err := LogRevisions(_testRepoDir, c.prevRevision, c.nextRevision)
 		if err != nil {
 			test.Assert(t, "err", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
-		test.Assert(t, "stdout", c.expStdout, mock.Output())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
+		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
 }
 
@@ -324,7 +358,8 @@ func TestRemoteChange(t *testing.T) {
 
 	for _, c := range cases {
 		t.Log(c.desc)
-		mock.Reset(true)
+		mockStderr.Reset()
+		mockStdout.Reset()
 
 		err := RemoteChange(_testRepoDir, c.oldName, c.newName, c.newURL)
 		if err != nil {
@@ -334,31 +369,7 @@ func TestRemoteChange(t *testing.T) {
 			t.Fatalf("expecting error like %q, got %q", c.expErr, err.Error())
 		}
 
-		test.Assert(t, "stderr", c.expStderr, mock.Error())
-		test.Assert(t, "stdout", c.expStdout, mock.Output())
+		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
+		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
-}
-
-func TestMain(m *testing.M) {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
-	_testRemoteURL = "file://" + wd + "/testdata/beku_test.git"
-	_testRepoDir = wd + "/testdata/repotest"
-
-	_stdout = mock.Stdout()
-	_stderr = mock.Stderr()
-
-	fmt.Printf("stdout: %+v\n", _stdout.Name())
-	fmt.Printf("stderr    : %+v\n", _stderr.Name())
-	fmt.Printf("remote URL: %s\n", _testRemoteURL)
-	fmt.Printf("repo dir  : %s\n", _testRepoDir)
-
-	s := m.Run()
-
-	mock.Close()
-
-	os.Exit(s)
 }

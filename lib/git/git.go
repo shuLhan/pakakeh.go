@@ -8,6 +8,7 @@ package git
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -22,8 +23,8 @@ const (
 )
 
 var (
-	_stdout = os.Stdout
-	_stderr = os.Stderr
+	_stdout io.Writer = os.Stdout
+	_stderr io.Writer = os.Stderr
 )
 
 // CheckoutRevision will set the HEAD to specific revision on specific branch.
