@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package mock provide a mocking for standard output and standard error.
+// Package mock provide a mocking for standard input, standard output,
+// standard error, and io.ReadWriter.
 package mock
 
 import (
