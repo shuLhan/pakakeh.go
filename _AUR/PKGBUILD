@@ -1,7 +1,7 @@
 # Maintainer: shulhan <ms@kilabit.info>
 
 pkgname=share-tools
-pkgver=0.44.0.r31.gabd5213
+pkgver=0.49.1.r4.g072512d
 pkgrel=1
 
 pkgdesc="Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk"
@@ -44,6 +44,7 @@ package() {
 	install -Dm755 _bin/epoch $pkgdir/usr/bin/epoch
 	install -Dm755 _bin/go-test-coverhtml.sh  $pkgdir/usr/bin/go-test-coverhtml.sh
 	install -Dm755 _bin/go-bench.sh           $pkgdir/usr/bin/go-bench.sh
+	install -Dm755 _bin/go-mod-tip.sh         $pkgdir/usr/bin/go-mod-tip.sh
 	install -Dm755 _bin/go-test-lint.sh       $pkgdir/usr/bin/go-test-lint.sh
 	install -Dm755 _bin/ini   $pkgdir/usr/bin/ini
 	install -Dm755 _bin/xtrk  $pkgdir/usr/bin/xtrk

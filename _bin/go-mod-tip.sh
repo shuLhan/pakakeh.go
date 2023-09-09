@@ -6,7 +6,7 @@
 ## For example, if the last tag is v0.39.1 and the latest commit hash is
 ## 38f9f1fb1ebc,
 ##
-##	$ gomod-latest.sh
+##	$ go-mod-tip.sh
 ##	commit timestamp: 1658864676
 ##	github.com/shuLhan/share v0.39.1-0.20220726194436-38f9f1fb1ebc
 ##
