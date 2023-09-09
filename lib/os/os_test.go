@@ -5,19 +5,21 @@
 package os
 
 import (
+	"bytes"
 	"os"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
-	"github.com/shuLhan/share/lib/test/mock"
 )
 
 func TestConfirmYesNo(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		answer   string
 		defIsYes bool
 		exp      bool
-	}{{
+	}
+
+	var cases = []testCase{{
 		defIsYes: true,
 		exp:      true,
 	}, {
@@ -54,23 +56,22 @@ func TestConfirmYesNo(t *testing.T) {
 		exp:      true,
 	}}
 
-	in := mock.Stdin()
+	var (
+		mockReader bytes.Buffer
+		c          testCase
+		got        bool
+	)
 
-	for _, c := range cases {
+	for _, c = range cases {
 		t.Log(c)
+		mockReader.Reset()
 
-		_, err := in.WriteString(c.answer + "\n")
-		if err != nil {
-			t.Fatal(err)
-		}
+		// Write the answer to be read.
+		mockReader.WriteString(c.answer + "\n")
 
-		mock.ResetStdin(false)
-
-		got := ConfirmYesNo(in, `confirm`, c.defIsYes)
+		got = ConfirmYesNo(&mockReader, `confirm`, c.defIsYes)
 
 		test.Assert(t, `answer`, c.exp, got)
-
-		mock.ResetStdin(true)
 	}
 }
 
