@@ -6,8 +6,10 @@ package io
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 )
 
@@ -18,6 +20,8 @@ import (
 // return true.
 func ConfirmYesNo(in io.Reader, msg string, defIsYes bool) bool {
 	var (
+		logp = `ConfirmYesNo`
+
 		r         *bufio.Reader
 		b, answer byte
 		err       error
@@ -40,7 +44,9 @@ func ConfirmYesNo(in io.Reader, msg string, defIsYes bool) bool {
 	for {
 		b, err = r.ReadByte()
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			if !errors.Is(err, io.EOF) {
+				log.Printf(`%s: %s`, logp, err)
+			}
 			break
 		}
 		if b == ' ' || b == '\t' {
@@ -50,6 +56,7 @@ func ConfirmYesNo(in io.Reader, msg string, defIsYes bool) bool {
 			break
 		}
 		if answer == 0 {
+			// Capture only the first non-space character.
 			answer = b
 		}
 	}
