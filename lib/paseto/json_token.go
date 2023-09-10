@@ -13,6 +13,8 @@ const (
 	_validateTimeDrift = 5 * time.Second
 )
 
+// JSONToken define the metadata and data inside the token that are included
+// to generate the signature.
 type JSONToken struct {
 	Issuer    string     `json:"iss,omitempty"`
 	Subject   string     `json:"sub,omitempty"`

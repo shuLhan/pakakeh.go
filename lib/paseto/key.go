@@ -6,6 +6,7 @@ package paseto
 
 import "crypto/ed25519"
 
+// Key define private and public key for public mode.
 type Key struct {
 	// AllowedSubjects contains list of subject that are allowed in the
 	// token's claim "sub" to be signed by this public key.
