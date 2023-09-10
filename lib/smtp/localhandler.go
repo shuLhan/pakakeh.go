@@ -79,15 +79,15 @@ func (lh *LocalHandler) ServeAuth(username, password string) (
 }
 
 // ServeBounce handle email transaction with unknown or invalid recipent.
-func (lh *LocalHandler) ServeBounce(mail *MailTx) (res *Response, err error) {
+func (lh *LocalHandler) ServeBounce(_ *MailTx) (res *Response, err error) {
 	// TODO: send delivery status notification to sender address.
 	return nil, nil
 }
 
 // ServeExpand handle SMTP EXPN command.
 //
-// BUG: The group feature currently is not supported.
-func (lh *LocalHandler) ServeExpand(mailingList string) (res *Response, err error) {
+// TODO: The group feature currently is not supported.
+func (lh *LocalHandler) ServeExpand(_ string) (res *Response, err error) {
 	res = &Response{
 		Code:    StatusCmdNotImplemented,
 		Message: "Command not implemented",
@@ -96,7 +96,8 @@ func (lh *LocalHandler) ServeExpand(mailingList string) (res *Response, err erro
 }
 
 // ServeMailTx handle processing the final delivery of incoming mail.
-func (lh *LocalHandler) ServeMailTx(mail *MailTx) (res *Response, err error) {
+// TODO: implement it.
+func (lh *LocalHandler) ServeMailTx(_ *MailTx) (res *Response, err error) {
 	return nil, nil
 }
 

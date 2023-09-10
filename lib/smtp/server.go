@@ -670,8 +670,12 @@ func (srv *Server) processBounceQueue() {
 // domain's name in MAIL FROM is managed by server and the recipient domain's
 // address is not managed by server.
 func (srv *Server) processRelayQueue() {
-	for _, ok := <-srv.relayQueue; ok; {
-		// TODO:
+	var mailtx *MailTx
+	for mailtx = range srv.relayQueue {
+		// TODO: implement it.
+		if mailtx == nil {
+			break
+		}
 	}
 	srv.wg.Done()
 }
