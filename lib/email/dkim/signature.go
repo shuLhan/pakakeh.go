@@ -20,15 +20,34 @@ import (
 
 // Signature represents the value of DKIM-Signature header field tag.
 type Signature struct {
-	// Version of specification.
-	// It MUST have the value "1" for compliant with RFC 6376.
-	// ("v=", text, REQUIRED).
-	Version []byte
-
 	// Algorithm used to generate the signature.
 	// Valid values is "rsa-sha1" or "rsa-sha256".
 	// ("a=", text, REQUIRED).
 	Alg *SignAlg
+
+	// Type of canonicalization for header.  Default is "simple".
+	// ("c=header/body", text, OPTIONAL).
+	CanonHeader *Canon
+
+	// Type of canonicalization for body.  Default is "simple".
+	// ("c=header/body", text, OPTIONAL).
+	CanonBody *Canon
+
+	// The number of octets in body, after canonicalization, included when
+	// computing hash.
+	// If nil, its means entire body is signed.
+	// If 0, its means the body is not signed.
+	// ("l=", text, OPTIONAL).
+	BodyLength *uint64
+
+	// QMethod define a type and option used to retrieve the public keys.
+	// ("q=type/option", text, OPTIONAL).  Default is "dns/txt".
+	QMethod *QueryMethod
+
+	// Version of specification.
+	// It MUST have the value "1" for compliant with RFC 6376.
+	// ("v=", text, REQUIRED).
+	Version []byte
 
 	// Signer domain
 	// ("d=", text, REQUIRED).
@@ -50,26 +69,6 @@ type Signature struct {
 	// ("b=", base64, REQUIRED)
 	Value []byte
 
-	// RECOMMENDED fields
-
-	// Time when signature created, in UNIX timestamp.
-	// ("t=", text, RECOMMENDED).
-	CreatedAt uint64
-
-	// Expiration time, in UNIX timestamp.
-	// ("x=", text, RECOMMENDED).
-	ExpiredAt uint64
-
-	// OPTIONAL fields
-
-	// Type of canonicalization for header.  Default is "simple".
-	// ("c=header/body", text, OPTIONAL).
-	CanonHeader *Canon
-
-	// Type of canonicalization for body.  Default is "simple".
-	// ("c=header/body", text, OPTIONAL).
-	CanonBody *Canon
-
 	// List of header field name and value that present when the message
 	// is signed.
 	// ("z=", dkim-quoted-printable, OPTIONAL).  Default is null.
@@ -80,20 +79,17 @@ type Signature struct {
 	// ("i=", dkim-quoted-printable, OPTIONAL).
 	AUID []byte
 
-	// The number of octets in body, after canonicalization, included when
-	// computing hash.
-	// If nil, its means entire body is signed.
-	// If 0, its means the body is not signed.
-	// ("l=", text, OPTIONAL).
-	BodyLength *uint64
-
-	// QMethod define a type and option used to retrieve the public keys.
-	// ("q=type/option", text, OPTIONAL).  Default is "dns/txt".
-	QMethod *QueryMethod
-
 	// raw contains original Signature field value, for Simple
 	// canonicalization.
 	raw []byte
+
+	// Time when signature created, in UNIX timestamp.
+	// ("t=", text, RECOMMENDED).
+	CreatedAt uint64
+
+	// Expiration time, in UNIX timestamp.
+	// ("x=", text, RECOMMENDED).
+	ExpiredAt uint64
 }
 
 // Parse DKIM-Signature field value.

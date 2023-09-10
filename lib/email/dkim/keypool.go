@@ -13,8 +13,9 @@ import (
 
 // KeyPool maintain cached DKIM public keys.
 type KeyPool struct {
-	sync.Mutex
 	pool map[string]*Key
+
+	sync.Mutex
 }
 
 // Clear the contents of key pool.

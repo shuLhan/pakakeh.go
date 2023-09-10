@@ -16,7 +16,12 @@ import (
 
 // Key represent a DKIM key record.
 type Key struct {
-	// REQUIRED fields.
+	// Type of key.
+	// ("k=", plain-text, OPTIONAL, default is "rsa").
+	Type *KeyType
+
+	// RSA contains parsed Public key.
+	RSA *rsa.PublicKey
 
 	// Public contains public key data.
 	// ("p=", base64, REQUIRED)
@@ -27,12 +32,6 @@ type Key struct {
 	// Version of DKIM key record.
 	// ("v=", plain-text, RECOMMENDED, default is "DKIM1")
 	Version []byte
-
-	// OPTIONAL fields.
-
-	// Type of key.
-	// ("k=", plain-text, OPTIONAL, default is "rsa").
-	Type *KeyType
 
 	// HashAlgs contains list of hash algorithm that might be used.
 	// ("h=", plain-text colon-separated,  OPTIONAL, defaults to allowing
@@ -51,9 +50,6 @@ type Key struct {
 	// Flags contains list of flags.
 	// ("t=", plain-text colon-separated, OPTIONAL, default is no flags set)
 	Flags []KeyFlag
-
-	// RSA contains parsed Public key.
-	RSA *rsa.PublicKey
 
 	// ExpiredAt define time when the key will be expired.
 	// This is a local value derived from lookup time + RR TTL.

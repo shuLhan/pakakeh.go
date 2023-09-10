@@ -50,9 +50,9 @@ func TestKeyLookupKey(t *testing.T) {
 func TestKeyParseTXT(t *testing.T) {
 	cases := []struct {
 		txt    string
-		ttl    uint32
 		exp    string
 		expErr string
+		ttl    uint32
 	}{{
 		txt: "",
 	}, {

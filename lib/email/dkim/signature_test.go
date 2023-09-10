@@ -242,9 +242,9 @@ func TestSignatureHash(t *testing.T) {
 
 	cases := []struct {
 		desc string
-		alg  SignAlg
 		in   string
 		exp  string
+		alg  SignAlg
 	}{{
 		desc: "With empty input, sha1",
 		alg:  SignAlgRS1,
@@ -284,13 +284,13 @@ func TestSignatureSign(t *testing.T) {
 	sig := &Signature{}
 
 	cases := []struct {
-		desc    string
-		hashAlg SignAlg
-		signAlg SignAlg
 		pk      *rsa.PrivateKey
-		input   []byte
+		desc    string
 		exp     string
 		expErr  string
+		input   []byte
+		hashAlg SignAlg
+		signAlg SignAlg
 	}{{
 		desc:   "With empty private key",
 		expErr: "email/dkim: empty private key for signing",
@@ -499,12 +499,12 @@ func TestSignatureVerify(t *testing.T) {
 	sig := &Signature{}
 
 	cases := []struct {
-		desc     string
-		sigAlg   SignAlg
-		sigValue string
 		key      *Key
+		desc     string
+		sigValue string
 		input    string
 		expErr   string
+		sigAlg   SignAlg
 	}{{
 		desc:   "With empty key",
 		expErr: "email/dkim: key record is empty",

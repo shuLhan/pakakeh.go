@@ -81,8 +81,8 @@ var tagKeys = map[tagKey][]byte{
 
 // tag represent tag's key and its value.
 type tag struct {
-	key   tagKey
 	value []byte
+	key   tagKey
 }
 
 // newTag create new tag only if key is valid: start with ALPHA and contains

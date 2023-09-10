@@ -14,9 +14,9 @@ import (
 func TestNewDNSClientPool(t *testing.T) {
 	cases := []struct {
 		desc         string
-		ns           []string
 		expErr       string
 		expErrLookup string
+		ns           []string
 	}{{
 		desc: "With empty DefaultNameServers",
 		ns:   []string{},
