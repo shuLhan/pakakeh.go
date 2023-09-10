@@ -10,11 +10,14 @@ import (
 	"strings"
 )
 
-const (
-	DefaultEmbedPackageName = "main"              // Default package name for GoEmbed().
-	DefaultEmbedVarName     = "memFS"             // Default variable name for GoEmbed().
-	DefaultEmbedGoFileName  = "memfs_generate.go" // Default file output for GoEmbed().
-)
+// DefaultEmbedPackageName default package name for GoEmbed.
+const DefaultEmbedPackageName = `main`
+
+// DefaultEmbedVarName default variable name for GoEmbed.
+const DefaultEmbedVarName = `memFS`
+
+// DefaultEmbedGoFileName default file output for GoEmbed.
+const DefaultEmbedGoFileName = `memfs_generate.go`
 
 type generateData struct {
 	Opts     *Options

@@ -41,6 +41,7 @@ func (pn *PathNode) Get(path string) (node *Node) {
 	return pn.v[path]
 }
 
+// MarshalJSON encode the PathNode into JSON value.
 func (pn *PathNode) MarshalJSON() ([]byte, error) {
 	var (
 		buf   bytes.Buffer

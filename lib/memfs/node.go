@@ -180,6 +180,7 @@ func (node *Node) GenerateIndexHtml() {
 	node.Content = libbytes.Copy(buf.Bytes())
 }
 
+// IsDir return true if the node is a directory.
 func (node *Node) IsDir() bool {
 	return node.mode.IsDir()
 }
@@ -194,14 +195,17 @@ func (node *Node) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// ModTime return the node modification time.
 func (node *Node) ModTime() time.Time {
 	return node.modTime
 }
 
+// Mode return the node file mode.
 func (node *Node) Mode() os.FileMode {
 	return node.mode
 }
 
+// Name return the node (file) name.
 func (node *Node) Name() string {
 	return node.name
 }

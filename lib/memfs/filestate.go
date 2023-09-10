@@ -10,10 +10,10 @@ package memfs
 type FileState byte
 
 const (
-	FileStateCreated       FileState = iota // New file is created.
-	FileStateUpdateContent                  // The content of file is modified.
-	FileStateUpdateMode                     // The mode of file is modified.
-	FileStateDeleted                        // The file has been deleted.
+	FileStateCreated       FileState = iota // FileStateCreated when new file is created.
+	FileStateUpdateContent                  // FileStateUpdateContent when the content of file is modified.
+	FileStateUpdateMode                     // FileStateUpdateMode when the mode of file is modified.
+	FileStateDeleted                        // FileStateDeleted when the file has been deleted.
 )
 
 // String return the string representation of FileState.
