@@ -7,8 +7,8 @@ import (
 
 func TestLine_MarshalJSON(t *testing.T) {
 	type testCase struct {
-		line Line
 		exp  string
+		line Line
 	}
 
 	var cases = []testCase{{

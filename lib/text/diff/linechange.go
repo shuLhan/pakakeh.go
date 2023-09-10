@@ -13,15 +13,21 @@ import (
 
 // LineChange represent one change in text.
 type LineChange struct {
-	Old  text.Line
-	New  text.Line
 	Adds text.Chunks
 	Dels text.Chunks
+
+	Old text.Line
+	New text.Line
 }
 
 // NewLineChange create a pointer to new LineChange object.
 func NewLineChange(old, new text.Line) *LineChange {
-	return &LineChange{old, new, text.Chunks{}, text.Chunks{}}
+	return &LineChange{
+		Adds: text.Chunks{},
+		Dels: text.Chunks{},
+		Old:  old,
+		New:  new,
+	}
 }
 
 // String return formatted content of LineChange.

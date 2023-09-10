@@ -7,8 +7,8 @@ import (
 
 func TestChunk_MarshalJSON(t *testing.T) {
 	type testCase struct {
-		chunk Chunk
 		exp   string
+		chunk Chunk
 	}
 
 	var cases = []testCase{{

@@ -12,8 +12,8 @@ import (
 
 // Line represent line number and slice of bytes as string.
 type Line struct {
-	N int
 	V []byte
+	N int
 }
 
 func (line Line) MarshalJSON() ([]byte, error) {
