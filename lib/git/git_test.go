@@ -271,8 +271,8 @@ func TestLatestVersion(t *testing.T) {
 func TestListTag(t *testing.T) {
 	cases := []struct {
 		desc   string
-		exp    []string
 		expErr string
+		exp    []string
 	}{{
 		desc: "With default repo",
 		exp:  []string{"v0.1.0", "v0.2.0"},
