@@ -20,10 +20,10 @@ import (
 // example, to provide a key as translation of Message into user's locale
 // defined language.
 type E struct {
-	Code    int    `json:"code,omitempty"`
+	err     error
 	Message string `json:"message,omitempty"`
 	Name    string `json:"name,omitempty"`
-	err     error
+	Code    int    `json:"code,omitempty"`
 }
 
 // Internal define an error caused by server.
