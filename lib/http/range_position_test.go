@@ -8,8 +8,8 @@ import (
 
 func TestParseContentRange(t *testing.T) {
 	type testCase struct {
-		v   string
 		exp *RangePosition
+		v   string
 	}
 
 	var cases = []testCase{{

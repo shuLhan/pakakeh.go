@@ -17,8 +17,9 @@ import liberrors "github.com/shuLhan/share/lib/errors"
 //
 // See the example below on how to use it with Endpoint.Call handler.
 type EndpointResponse struct {
-	liberrors.E
 	Data interface{} `json:"data,omitempty"`
+
+	liberrors.E
 
 	// The Limit field contains the maximum number of records per page.
 	Limit int64 `json:"limit,omitempty"`

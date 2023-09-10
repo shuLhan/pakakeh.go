@@ -98,7 +98,7 @@ func ExampleEndpointResponse() {
 	fmt.Printf("GET /?id=1000 => %s\n", resBody)
 
 	// Output:
-	// GET / => {"code":400,"message":"empty parameter id"}
-	// GET /?id=0 => {"code":500,"message":"id value 0 cause internal server error"}
-	// GET /?id=1000 => {"code":200,"data":{"ID":"1000"}}
+	// GET / => {"message":"empty parameter id","code":400}
+	// GET /?id=0 => {"message":"id value 0 cause internal server error","code":500}
+	// GET /?id=1000 => {"data":{"ID":"1000"},"code":200}
 }

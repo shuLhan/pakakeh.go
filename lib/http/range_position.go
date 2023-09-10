@@ -11,13 +11,13 @@ import (
 type RangePosition struct {
 	unit string
 
+	content []byte
+
 	Start int64
 	End   int64
 
 	// Length of zero means read until the end.
 	Length int64
-
-	content []byte
 }
 
 // ParseContentRange parse Content-Range value, the following format,

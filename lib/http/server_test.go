@@ -757,32 +757,32 @@ func TestStatusError(t *testing.T) {
 		desc:          "With registered error no body",
 		reqURL:        testServerUrl + "/error/no-body?k=v",
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"code":411,"message":"Length required"}`,
+		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error binary",
 		reqURL:        testServerUrl + "/error/binary?k=v",
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"code":411,"message":"Length required"}`,
+		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerUrl + "/error/plain?k=v",
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"code":411,"message":"Length required"}`,
+		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerUrl + "/error/json?k=v",
 		expStatusCode: http.StatusLengthRequired,
-		expBody:       `{"code":411,"message":"Length required"}`,
+		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerUrl + "/error/no-code?k=v",
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `{"code":500,"message":"internal server error","name":"ERR_INTERNAL"}`,
+		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
 	}, {
 		desc:          "With registered error plain",
 		reqURL:        testServerUrl + "/error/custom?k=v",
 		expStatusCode: http.StatusInternalServerError,
-		expBody:       `{"code":500,"message":"internal server error","name":"ERR_INTERNAL"}`,
+		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
 	}}
 
 	for _, c := range cases {
