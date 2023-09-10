@@ -17,6 +17,8 @@ import (
 	"time"
 )
 
+// CryptoHash define an alias to limit the type of hash algorithm to be
+// used in TOTP.
 type CryptoHash crypto.Hash
 
 // List of available hash function that can be used in TOTP.
