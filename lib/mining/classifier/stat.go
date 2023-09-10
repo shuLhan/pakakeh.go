@@ -16,39 +16,55 @@ import (
 type Stat struct {
 	// ID unique id for this statistic (e.g. number of tree).
 	ID int64
+
 	// StartTime contain the start time of classifier in unix timestamp.
 	StartTime int64
+
 	// EndTime contain the end time of classifier in unix timestamp.
 	EndTime int64
+
 	// ElapsedTime contain actual time, in seconds, between end and start
 	// time.
 	ElapsedTime int64
+
 	// TP contain true-positive value.
 	TP int64
+
 	// FP contain false-positive value.
 	FP int64
+
 	// TN contain true-negative value.
 	TN int64
+
 	// FN contain false-negative value.
 	FN int64
+
 	// OobError contain out-of-bag error.
 	OobError float64
+
 	// OobErrorMean contain mean of out-of-bag error.
 	OobErrorMean float64
+
 	// TPRate contain true-positive rate (recall): tp/(tp+fn)
 	TPRate float64
+
 	// FPRate contain false-positive rate: fp/(fp+tn)
 	FPRate float64
+
 	// TNRate contain true-negative rate: tn/(tn+fp)
 	TNRate float64
+
 	// Precision contain: tp/(tp+fp)
 	Precision float64
+
 	// FMeasure contain value of F-measure or the harmonic mean of
 	// precision and recall.
 	FMeasure float64
+
 	// Accuracy contain the degree of closeness of measurements of a
 	// quantity to that quantity's true value.
 	Accuracy float64
+
 	// AUC contain the area under curve.
 	AUC float64
 }

@@ -23,16 +23,20 @@ import (
 
 // Runtime for input and output.
 type Runtime struct {
-	// Runtime the K-Nearest-Neighbourhood parameters.
-	knn.Runtime
-	// PercentOver input for oversampling percentage.
-	PercentOver int `json:"PercentOver"`
-	// SyntheticFile is a filename where synthetic samples will be written.
-	SyntheticFile string `json:"SyntheticFile"`
-	// NSynthetic input for number of new synthetic per sample.
-	NSynthetic int
 	// Synthetics contain output of resampling as synthetic samples.
 	Synthetics tabula.Dataset
+
+	// SyntheticFile is a filename where synthetic samples will be written.
+	SyntheticFile string `json:"SyntheticFile"`
+
+	// Runtime the K-Nearest-Neighbourhood parameters.
+	knn.Runtime
+
+	// PercentOver input for oversampling percentage.
+	PercentOver int `json:"PercentOver"`
+
+	// NSynthetic input for number of new synthetic per sample.
+	NSynthetic int
 }
 
 // New create and return new smote runtime.

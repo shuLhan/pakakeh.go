@@ -20,16 +20,18 @@ const (
 
 // Runtime parameters for KNN processing.
 type Runtime struct {
+	// AllNeighbors contain all neighbours
+	AllNeighbors Neighbors
+
 	// DistanceMethod define how the distance between sample will be
 	// measured.
 	DistanceMethod int
+
 	// ClassIndex define index of class in dataset.
 	ClassIndex int `json:"ClassIndex"`
+
 	// K define number of nearest neighbors that will be searched.
 	K int `json:"K"`
-
-	// AllNeighbors contain all neighbours
-	AllNeighbors Neighbors
 }
 
 // ComputeEuclidianDistance compute the distance of instance with each sample in

@@ -21,13 +21,6 @@ import (
 
 // Runtime parameters for input and output.
 type Runtime struct {
-	// Runtime of SMOTE, since this module extend the SMOTE method.
-	smote.Runtime
-
-	// ClassMinor the minority sample in dataset that we want to
-	// oversampling.
-	ClassMinor string `json:"ClassMinor"`
-
 	// minorset contain minor class in samples.
 	minorset tabula.DatasetInterface
 
@@ -37,9 +30,16 @@ type Runtime struct {
 	// outliersRows contain all sample that is detected as outliers.
 	outliers tabula.Rows
 
+	// ClassMinor the minority sample in dataset that we want to
+	// oversampling.
+	ClassMinor string `json:"ClassMinor"`
+
 	// OutliersFile if its not empty then outliers will be saved in file
 	// specified by this option.
 	OutliersFile string `json:"OutliersFile"`
+
+	// Runtime of SMOTE, since this module extend the SMOTE method.
+	smote.Runtime
 }
 
 // New create and return new LnSmote object.

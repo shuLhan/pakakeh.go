@@ -41,16 +41,19 @@ const (
 
 // Runtime data for building CART.
 type Runtime struct {
+	// Tree in classification.
+	Tree binary.Tree
+
 	// SplitMethod define the criteria to used for splitting.
 	SplitMethod string `json:"SplitMethod"`
+
 	// NRandomFeature if less or equal to zero compute gain on all feature,
 	// otherwise select n random feature and compute gain only on selected
 	// features.
 	NRandomFeature int `json:"NRandomFeature"`
+
 	// OOBErrVal is the last out-of-bag error value in the tree.
 	OOBErrVal float64
-	// Tree in classification.
-	Tree binary.Tree
 }
 
 // New create new Runtime object.

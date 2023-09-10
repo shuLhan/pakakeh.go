@@ -23,8 +23,8 @@ const (
 // Runtime define a generic type which provide common fields that can be
 // embedded by the real classifier (e.g. RandomForest).
 type Runtime struct {
-	// RunOOB if its true the OOB will be computed, default is false.
-	RunOOB bool `json:"RunOOB"`
+	// oobWriter contain file writer for statistic.
+	oobWriter *dsv.Writer
 
 	// OOBStatsFile is the file where OOB statistic will be written.
 	OOBStatsFile string `json:"OOBStatsFile"`
@@ -36,21 +36,21 @@ type Runtime struct {
 	// written.
 	StatFile string `json:"StatFile"`
 
-	// oobCms contain confusion matrix value for each OOB in iteration.
-	oobCms []CM
-
 	// oobStats contain statistic of classifier for each OOB in iteration.
 	oobStats Stats
-
-	// oobStatTotal contain total OOB statistic values.
-	oobStatTotal Stat
-
-	// oobWriter contain file writer for statistic.
-	oobWriter *dsv.Writer
 
 	// perfs contain performance statistic per sample, after classifying
 	// sample on classifier.
 	perfs Stats
+
+	// oobCms contain confusion matrix value for each OOB in iteration.
+	oobCms []CM
+
+	// oobStatTotal contain total OOB statistic values.
+	oobStatTotal Stat
+
+	// RunOOB if its true the OOB will be computed, default is false.
+	RunOOB bool `json:"RunOOB"`
 }
 
 // Initialize will start the runtime for processing by saving start time and

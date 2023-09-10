@@ -18,35 +18,46 @@ import (
 // Gini contain slice of sorted index, slice of partition values, slice of Gini
 // index, Gini value for all samples.
 type Gini struct {
-	// Skip if its true, the gain value would not be searched on this
-	// instance.
-	Skip bool
-	// IsContinue define whether the Gini index came from continuous
-	// attribute or not.
-	IsContinu bool
-	// Value of Gini index for all value in attribute.
-	Value float64
-	// MaxPartGain contain the index of partition which have the maximum
-	// gain.
-	MaxPartGain int
-	// MaxGainValue contain maximum gain of index.
-	MaxGainValue float64
-	// MinIndexPart contain the index of partition which have the minimum
-	// Gini index.
-	MinIndexPart int
-	// MinIndexGini contain minimum Gini index value.
-	MinIndexValue float64
 	// SortedIndex of attribute, sorted by values of attribute. This will
 	// be used to reference the unsorted target attribute.
 	SortedIndex []int
+
 	// ContinuPart contain list of partition value for continuous attribute.
 	ContinuPart []float64
+
 	// DiscretePart contain the possible combination of discrete values.
 	DiscretePart libstrings.Table
+
 	// Index contain list of Gini Index for each partition.
 	Index []float64
+
 	// Gain contain information gain for each partition.
 	Gain []float64
+
+	// MaxGainValue contain maximum gain of index.
+	MaxGainValue float64
+
+	// MinIndexGini contain minimum Gini index value.
+	MinIndexValue float64
+
+	// Value of Gini index for all value in attribute.
+	Value float64
+
+	// MaxPartGain contain the index of partition which have the maximum
+	// gain.
+	MaxPartGain int
+
+	// MinIndexPart contain the index of partition which have the minimum
+	// Gini index.
+	MinIndexPart int
+
+	// Skip if its true, the gain value would not be searched on this
+	// instance.
+	Skip bool
+
+	// IsContinue define whether the Gini index came from continuous
+	// attribute or not.
+	IsContinu bool
 }
 
 // ComputeDiscrete Given an attribute "src" with discrete value 'discval', and

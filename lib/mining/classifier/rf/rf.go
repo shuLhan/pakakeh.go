@@ -50,23 +50,27 @@ var (
 
 // Runtime contains input and output configuration when generating random forest.
 type Runtime struct {
+	// trees contain all tree in the forest.
+	trees []cart.Runtime
+
+	// bagIndices contain list of index of selected samples at bootstraping
+	// for book-keeping.
+	bagIndices [][]int
+
 	// Runtime embed common fields for classifier.
 	classifier.Runtime
 
 	// NTree number of tree in forest.
 	NTree int `json:"NTree"`
+
 	// NRandomFeature number of feature randomly selected for each tree.
 	NRandomFeature int `json:"NRandomFeature"`
+
 	// PercentBoot percentage of sample for bootstraping.
 	PercentBoot int `json:"PercentBoot"`
 
 	// nSubsample number of samples used for bootstraping.
 	nSubsample int
-	// trees contain all tree in the forest.
-	trees []cart.Runtime
-	// bagIndices contain list of index of selected samples at bootstraping
-	// for book-keeping.
-	bagIndices [][]int
 }
 
 // Trees return all tree in forest.

@@ -13,15 +13,8 @@ import (
 
 // CM represent the matrix of classification.
 type CM struct {
-	tabula.Dataset
 	// rowNames contain name in each row.
 	rowNames []string
-	// nSamples contain number of class.
-	nSamples int64
-	// nTrue contain number of true positive and negative.
-	nTrue int64
-	// nFalse contain number of false positive and negative.
-	nFalse int64
 
 	// tpIds contain index of true-positive samples.
 	tpIds []int
@@ -31,6 +24,17 @@ type CM struct {
 	tnIds []int
 	// fnIds contain index of false-negative samples.
 	fnIds []int
+
+	tabula.Dataset
+
+	// nSamples contain number of class.
+	nSamples int64
+
+	// nTrue contain number of true positive and negative.
+	nTrue int64
+
+	// nFalse contain number of false positive and negative.
+	nFalse int64
 }
 
 // initByNumeric will initialize confusion matrix using numeric value space.

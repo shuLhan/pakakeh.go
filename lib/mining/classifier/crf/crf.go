@@ -51,29 +51,35 @@ var (
 
 // Runtime define the cascaded random forest runtime input and output.
 type Runtime struct {
+	// tnset contain sample of all true-negative in each iteration.
+	tnset *tabula.Claset
+
+	// forests contain forest for each stage.
+	forests []*rf.Runtime
+
+	// weights contain weight for each stage.
+	weights []float64
+
 	// Runtime embed common fields for classifier.
 	classifier.Runtime
 
 	// NStage number of stage.
 	NStage int `json:"NStage"`
-	// TPRate threshold for true positive rate per stage.
-	TPRate float64 `json:"TPRate"`
-	// TNRate threshold for true negative rate per stage.
-	TNRate float64 `json:"TNRate"`
 
 	// NTree number of tree in each stage.
 	NTree int `json:"NTree"`
+
+	// TPRate threshold for true positive rate per stage.
+	TPRate float64 `json:"TPRate"`
+
+	// TNRate threshold for true negative rate per stage.
+	TNRate float64 `json:"TNRate"`
+
 	// NRandomFeature number of features used to split the dataset.
 	NRandomFeature int `json:"NRandomFeature"`
+
 	// PercentBoot percentage of bootstrap.
 	PercentBoot int `json:"PercentBoot"`
-
-	// forests contain forest for each stage.
-	forests []*rf.Runtime
-	// weights contain weight for each stage.
-	weights []float64
-	// tnset contain sample of all true-negative in each iteration.
-	tnset *tabula.Claset
 }
 
 // New create and return new input for cascaded random-forest.
