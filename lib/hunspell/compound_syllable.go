@@ -5,6 +5,6 @@
 package hunspell
 
 type compoundSyllable struct {
-	max    int
 	vowels string
+	max    int
 }

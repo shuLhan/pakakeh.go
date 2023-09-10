@@ -15,9 +15,9 @@ func TestMergeDictionaries(t *testing.T) {
 	cases := []struct {
 		desc    string
 		outFile string
+		exp     string
 		inFiles []string
 		expN    int
-		exp     string
 	}{{
 		desc:    "Without input file",
 		outFile: "testdata/out.dic",

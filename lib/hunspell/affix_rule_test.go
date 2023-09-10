@@ -20,10 +20,10 @@ func TestNewAffixRule_prefix(t *testing.T) {
 	}
 
 	cases := []struct {
+		exp       *affixRule
 		stripping string
 		affix     string
 		condition string
-		exp       *affixRule
 	}{{
 		stripping: "0",
 		affix:     "pre1",

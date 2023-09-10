@@ -6,8 +6,8 @@ package hunspell
 
 // Spell contains list of options, root words, expanded words, and affixes.
 type Spell struct {
-	opts affixOptions
 	dict dictionary
+	opts affixOptions
 }
 
 // New create and initialize default Spell.

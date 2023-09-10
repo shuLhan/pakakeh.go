@@ -20,16 +20,16 @@ import (
 //
 //	NRULES         := 1*DIGIT
 type affix struct {
+	// Name of the affix class.
+	name string
+
+	rules []*affixRule
+
 	isPrefix bool
 
 	// isCrossProduct indicate whether an affix can be combined with
 	// another affix.
 	isCrossProduct bool
-
-	// Name of the affix class.
-	name string
-
-	rules []*affixRule
 }
 
 func newAffix(name string, isPrefix, isCrossProduct bool, nrules int) (afx *affix) {

@@ -35,6 +35,22 @@ import (
 // means zero condition, and "1" is an alias to the first morpheme defined in
 // "AM".
 type affixRule struct {
+	// morphemes contains optional morphological fields separated by
+	// spaces or tabulators.
+	morphemes Morphemes
+
+	// condition is a simplified, regular expression-like pattern, which
+	// must be met before the affix can be applied.
+	// A dot signs an arbitrary character.
+	// Characters in braces sign an arbitrary character from the character
+	// subset.
+	// Dash hasn't got special meaning, but circumflex (^) next the first
+	// brace sets the complementer character set.
+	//
+	// Zero condition is indicated by dot ("."), or in our case its a nil
+	// Regexp.
+	condition *regexp.Regexp
+
 	// stripping characters from beginning (at  prefix  rules)  or  end
 	// (at  suffix rules) of the word.
 	// Zero stripping is indicated by zero, in our case its empty.
@@ -47,25 +63,8 @@ type affixRule struct {
 	// An affix rule can contains another affix rules, chaining one or
 	// more affix together.
 	rawFlags string
-	affixes  []*affix
 
-	//
-	// condition is a simplified, regular expression-like pattern, which
-	// must be met before the affix can be applied.
-	// A dot signs an arbitrary character.
-	// Characters in braces sign an arbitrary character from the character
-	// subset.
-	// Dash hasn't got special meaning, but circumflex (^) next the first
-	// brace sets the complementer character set.
-	//
-	// Zero condition is indicated by dot ("."), or in our case its a nil
-	// Regexp.
-	//
-	condition *regexp.Regexp
-
-	// morphemes contains optional morphological fields separated by
-	// spaces or tabulators.
-	morphemes Morphemes
+	affixes []*affix
 }
 
 func newAffixRule(opts *affixOptions, isPrefix bool,
