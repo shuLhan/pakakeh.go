@@ -16,24 +16,31 @@ import (
 type Metadata struct {
 	// Name of the column, optional.
 	Name string `json:"Name"`
+
 	// Type of the column, default to "string".
 	// Valid value are: "string", "integer", "real"
 	Type string `json:"Type"`
-	// T type of column in integer.
-	T int
+
 	// Separator for column in record.
 	Separator string `json:"Separator"`
+
 	// LeftQuote define the characters that enclosed the column in the left
 	// side.
 	LeftQuote string `json:"LeftQuote"`
+
 	// RightQuote define the characters that enclosed the column in the
 	// right side.
 	RightQuote string `json:"RightQuote"`
+
+	// ValueSpace contain the possible value in records
+	ValueSpace []string `json:"ValueSpace"`
+
+	// T type of column in integer.
+	T int
+
 	// Skip, if its true this column will be ignored, not saved in reader
 	// object. Default to false.
 	Skip bool `json:"Skip"`
-	// ValueSpace contain the possible value in records
-	ValueSpace []string `json:"ValueSpace"`
 }
 
 // NewMetadata create and return new metadata.

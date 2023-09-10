@@ -131,16 +131,16 @@ func TestReaderNoInput(t *testing.T) {
 // TestConfigParse test parsing metadata.
 func TestConfigParse(t *testing.T) {
 	cases := []struct {
-		in  string
 		out *Reader
+		in  string
 	}{
 		{
-			jsonSample[1],
 			readers[1],
+			jsonSample[1],
 		},
 		{
-			jsonSample[3],
 			readers[3],
+			jsonSample[3],
 		},
 	}
 
@@ -266,8 +266,8 @@ func TestDatasetMode(t *testing.T) {
 	}`}
 
 	var exps = []struct {
-		status bool
 		value  string
+		status bool
 	}{{
 		status: false,
 		value:  config[0],

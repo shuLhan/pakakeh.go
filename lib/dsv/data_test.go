@@ -31,28 +31,28 @@ var expSkip = []string{
 }
 
 var expSkipColumns = []string{
-	"[{name 0 0 [] [A-B]} {value 0 0 [] [AB]} {integer 1 0 [] [1]} {real 2 0 [] [0.1]}]",
-	"[{name 0 0 [] [A-B-C]} {value 0 0 [] [BCD]} {integer 1 0 [] [2]} {real 2 0 [] [0.02]}]",
-	"[{name 0 0 [] [A;B-C,D]} {value 0 0 [] [A;B C,D]} {integer 1 0 [] [3]} {real 2 0 [] [0.003]}]",
-	"[{name 0 0 [] [A;B-C,D]} {value 0 0 [] [A;B C D]} {integer 1 0 [] [4]} {real 2 0 [] [0.0004]}]",
-	"[{name 0 0 [] []} {value 0 0 [] []} {integer 1 0 [] [6]} {real 2 0 [] [0.000006]}]",
-	"[{name 0 0 [] [ok]} {value 0 0 [] [missing right-quote];8;0.00000008\n9;\"ok\"-[[ok]} {integer 1 0 [] [9]} {real 2 0 [] [0.000000009]}]",
-	"[{name 0 0 [] [test]} {value 0 0 [] [integer]} {integer 1 0 [] [10]} {real 2 0 [] [0.101]}]",
-	"[{name 0 0 [] [test]} {value 0 0 [] [real]} {integer 1 0 [] [123456789]} {real 2 0 [] [0.123456789]}]",
-	"[{name 0 0 [] [string with]} {value 0 0 [] [string with]} {integer 1 0 [] [13]} {real 2 0 [] [13]}]",
-	"[{name 0 0 [] [string with\" quote]} {value 0 0 [] [string with]] escape]} {integer 1 0 [] [14]} {real 2 0 [] [14]}]",
+	`[{name [] [A-B] 0 0} {value [] [AB] 0 0} {integer [] [1] 1 0} {real [] [0.1] 2 0}]`,
+	"[{name [] [A-B-C] 0 0} {value [] [BCD] 0 0} {integer [] [2] 1 0} {real [] [0.02] 2 0}]",
+	"[{name [] [A;B-C,D] 0 0} {value [] [A;B C,D] 0 0} {integer [] [3] 1 0} {real [] [0.003] 2 0}]",
+	"[{name [] [A;B-C,D] 0 0} {value [] [A;B C D] 0 0} {integer [] [4] 1 0} {real [] [0.0004] 2 0}]",
+	"[{name [] [] 0 0} {value [] [] 0 0} {integer [] [6] 1 0} {real [] [0.000006] 2 0}]",
+	"[{name [] [ok] 0 0} {value [] [missing right-quote];8;0.00000008\n9;\"ok\"-[[ok] 0 0} {integer [] [9] 1 0} {real [] [0.000000009] 2 0}]",
+	"[{name [] [test] 0 0} {value [] [integer] 0 0} {integer [] [10] 1 0} {real [] [0.101] 2 0}]",
+	"[{name [] [test] 0 0} {value [] [real] 0 0} {integer [] [123456789] 1 0} {real [] [0.123456789] 2 0}]",
+	"[{name [] [string with] 0 0} {value [] [string with] 0 0} {integer [] [13] 1 0} {real [] [13] 2 0}]",
+	"[{name [] [string with\" quote] 0 0} {value [] [string with]] escape] 0 0} {integer [] [14] 1 0} {real [] [14] 2 0}]",
 }
 
 var expSkipColumnsAll = []string{
-	"{name 0 0 [] [A-B A-B-C A;B-C,D A;B-C,D  ok test test string with string with\" quote]}",
-	"{value 0 0 [] [AB BCD A;B C,D A;B C D  missing right-quote];8;0.00000008\n9;\"ok\"-[[ok integer real string with string with]] escape]}",
-	"{integer 1 0 [] [1 2 3 4 6 9 10 123456789 13 14]}",
-	"{real 2 0 [] [0.1 0.02 0.003 0.0004 0.000006 0.000000009 0.101 0.123456789 13 14]}",
+	"{name [] [A-B A-B-C A;B-C,D A;B-C,D  ok test test string with string with\" quote] 0 0}",
+	"{value [] [AB BCD A;B C,D A;B C D  missing right-quote];8;0.00000008\n9;\"ok\"-[[ok integer real string with string with]] escape] 0 0}",
+	"{integer [] [1 2 3 4 6 9 10 123456789 13 14] 1 0}",
+	"{real [] [0.1 0.02 0.003 0.0004 0.000006 0.000000009 0.101 0.123456789 13 14] 2 0}",
 }
 
 var expSkipColumnsAllRev = []string{
-	"{name 0 0 [] [string with\" quote string with test test ok  A;B-C,D A;B-C,D A-B-C A-B]}",
-	"{value 0 0 [] [string with]] escape string with real integer missing right-quote];8;0.00000008\n9;\"ok\"-[[ok  A;B C D A;B C,D BCD AB]}",
-	"{integer 1 0 [] [14 13 123456789 10 9 6 4 3 2 1]}",
-	"{real 2 0 [] [14 13 0.123456789 0.101 0.000000009 0.000006 0.0004 0.003 0.02 0.1]}",
+	"{name [] [string with\" quote string with test test ok  A;B-C,D A;B-C,D A-B-C A-B] 0 0}",
+	"{value [] [string with]] escape string with real integer missing right-quote];8;0.00000008\n9;\"ok\"-[[ok  A;B C D A;B C,D BCD AB] 0 0}",
+	"{integer [] [14 13 123456789 10 9 6 4 3 2 1] 1 0}",
+	"{real [] [14 13 0.123456789 0.101 0.000000009 0.000006 0.0004 0.003 0.02 0.1] 2 0}",
 }

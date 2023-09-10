@@ -27,16 +27,21 @@ const (
 
 // ReaderError to handle error data and message.
 type ReaderError struct {
-	// T define type of error.
-	T int
 	// Func where error happened
 	Func string
+
 	// What cause the error?
 	What string
+
 	// Line define the line which cause error
 	Line string
+
+	// T define type of error.
+	T int
+
 	// Pos character position which cause error
 	Pos int
+
 	// N line number
 	N int
 }

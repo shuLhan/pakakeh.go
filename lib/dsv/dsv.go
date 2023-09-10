@@ -53,8 +53,8 @@ var (
 
 // ReadWriter combine reader and writer.
 type ReadWriter struct {
-	Reader
 	Writer
+	Reader
 }
 
 // New create a new ReadWriter object.

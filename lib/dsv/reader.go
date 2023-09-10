@@ -64,32 +64,28 @@ const (
 //
 // Thats it.
 type Reader struct {
-	// Config define path of configuration file.
-	//
-	// If the configuration located in other directory, e.g.
-	// "../../config.dsv", and the Input option is set with name only, like
-	// "input.dat", we assume that its in the same directory where the
-	// configuration file belong.
-	Config
 	// Dataset contains the content of input file after read.
 	dataset interface{}
+
+	// fRead is read descriptor.
+	fRead *os.File
+
+	// fReject is reject descriptor.
+	fReject *os.File
+
+	// bufRead is a buffer for working with input file.
+	bufRead *bufio.Reader
+
+	// bufReject is a buffer for working with rejected file.
+	bufReject *bufio.Writer
+
 	// Input file, mandatory.
 	Input string `json:"Input"`
-	// Skip n lines from the head.
-	Skip int `json:"Skip"`
-	// TrimSpace or not. If its true, before parsing the line, the white
-	// space in the beginning and end of each input line will be removed,
-	// otherwise it will leave unmodified.  Default is true.
-	TrimSpace bool `json:"TrimSpace"`
+
 	// Rejected is the file name where row that does not fit
 	// with metadata will be saved.
 	Rejected string `json:"Rejected"`
-	// InputMetadata define format for each column in input data.
-	InputMetadata []Metadata `json:"InputMetadata"`
-	// MaxRows define maximum row that this reader will read and
-	// saved in the memory at one read operation.
-	// If the value is -1, all rows will read.
-	MaxRows int `json:"MaxRows"`
+
 	// DatasetMode define on how do you want the result is saved. There are
 	// three options: either in "rows", "columns", or "matrix" mode.
 	// For example, input data file,
@@ -113,14 +109,30 @@ type Reader struct {
 	// "matrix" mode is where each record saved in their own row and column.
 	//
 	DatasetMode string `json:"DatasetMode"`
-	// fRead is read descriptor.
-	fRead *os.File
-	// fReject is reject descriptor.
-	fReject *os.File
-	// bufRead is a buffer for working with input file.
-	bufRead *bufio.Reader
-	// bufReject is a buffer for working with rejected file.
-	bufReject *bufio.Writer
+
+	// Config define path of configuration file.
+	//
+	// If the configuration located in other directory, e.g.
+	// "../../config.dsv", and the Input option is set with name only, like
+	// "input.dat", we assume that its in the same directory where the
+	// configuration file belong.
+	Config
+
+	// InputMetadata define format for each column in input data.
+	InputMetadata []Metadata `json:"InputMetadata"`
+
+	// Skip n lines from the head.
+	Skip int `json:"Skip"`
+
+	// MaxRows define maximum row that this reader will read and
+	// saved in the memory at one read operation.
+	// If the value is -1, all rows will read.
+	MaxRows int `json:"MaxRows"`
+
+	// TrimSpace or not. If its true, before parsing the line, the white
+	// space in the beginning and end of each input line will be removed,
+	// otherwise it will leave unmodified.  Default is true.
+	TrimSpace bool `json:"TrimSpace"`
 }
 
 // NewReader create and initialize new instance of DSV Reader with default values.

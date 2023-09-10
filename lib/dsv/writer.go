@@ -27,15 +27,19 @@ const (
 // Writer write records from reader or slice using format configuration in
 // metadata.
 type Writer struct {
-	Config `json:"-"`
-	// Output file where the records will be written.
-	Output string `json:"Output"`
-	// OutputMetadata define format for each column.
-	OutputMetadata []Metadata `json:"OutputMetadata"`
 	// fWriter as write descriptor.
 	fWriter *os.File
+
 	// BufWriter for buffered writer.
 	BufWriter *bufio.Writer
+
+	Config `json:"-"`
+
+	// Output file where the records will be written.
+	Output string `json:"Output"`
+
+	// OutputMetadata define format for each column.
+	OutputMetadata []Metadata `json:"OutputMetadata"`
 }
 
 // NewWriter create a writer object.
