@@ -13,7 +13,6 @@ import (
 
 // Value represent dynamic value of XML-RPC type.
 type Value struct {
-	Kind Kind
 	// In contains scalar value for Base64, Boolean, Double, Integer,
 	// String, and DateTime.
 	// It would be nil for Kind of Array and Struct.
@@ -24,6 +23,8 @@ type Value struct {
 
 	// List of array values.
 	ArrayValues []*Value
+
+	Kind Kind
 }
 
 // NewValue convert Go type data into XML-RPC value.

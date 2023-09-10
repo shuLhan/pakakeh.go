@@ -13,8 +13,9 @@ import (
 )
 
 type Response struct {
-	liberrors.E
 	Param *Value
+
+	liberrors.E
 }
 
 // MarshalText encode the Response instance into XML text.

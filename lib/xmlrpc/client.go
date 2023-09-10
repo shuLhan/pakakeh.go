@@ -22,8 +22,8 @@ const (
 // Client for XML-RPC.
 type Client struct {
 	conn    *libhttp.Client
-	timeout time.Duration
 	url     *url.URL
+	timeout time.Duration
 }
 
 // NewClient create and initialize new connection to RPC server.
