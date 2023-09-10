@@ -15,8 +15,8 @@ import (
 func ExampleAssert_struct() {
 	type ADT struct {
 		BigRat *big.Rat
-		Int    int
 		Bytes  []byte
+		Int    int
 	}
 
 	var cases = []struct {
