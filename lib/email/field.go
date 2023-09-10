@@ -118,7 +118,8 @@ func (field *Field) parseName(raw []byte) (rest []byte, err error) {
 		}
 	}
 	// Skip WSP before ':'.
-	for ; x < len(raw) && (raw[x] == '\t' || raw[x] == ' '); x++ {
+	for x < len(raw) && (raw[x] == '\t' || raw[x] == ' ') {
+		x++
 	}
 	if len(raw) == x {
 		return nil, fmt.Errorf(`%s: missing value`, logp)
