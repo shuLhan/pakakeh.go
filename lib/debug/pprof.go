@@ -16,8 +16,8 @@ var prof *profile
 
 type profile struct {
 	data *pprof.Profile
-	path string
 	file *os.File
+	path string
 }
 
 func newProfile(prefix string) *profile {
