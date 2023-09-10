@@ -279,8 +279,8 @@ func ExampleMarshal() {
 func ExampleMarshal_map() {
 	type U struct {
 		String      string   `ini:"string"`
-		Int         int      `ini:"int"`
 		SliceString []string `ini:"::slice_string"`
+		Int         int      `ini:"int"`
 	}
 	type ADT struct {
 		MapString    map[string]string  `ini:"map:subString"`
@@ -377,27 +377,27 @@ func ExampleMarshal_map() {
 	//
 	//[mapstruct "struct-key-1"]
 	//string = struct-1-string
-	//int = 1
 	//slice_string = str-1
 	//slice_string = str-2
+	//int = 1
 	//
 	//[mapstruct "struct-key-2"]
 	//string = struct-2-string
-	//int = 2
 	//slice_string = str-3
 	//slice_string = str-4
+	//int = 2
 	//
 	//[mapptrstruct "ptr-struct-key-1"]
 	//string = struct-1-string
-	//int = 1
 	//slice_string = str-5
 	//slice_string = str-6
+	//int = 1
 	//
 	//[mapptrstruct "ptr-struct-key-2"]
 	//string = struct-2-string
-	//int = 2
 	//slice_string = str-7
 	//slice_string = str-8
+	//int = 2
 }
 
 func ExampleMarshal_struct() {
@@ -566,8 +566,8 @@ int = 2
 func ExampleUnmarshal_map() {
 	type U struct {
 		String      string   `ini:"string"`
-		Int         int      `ini:"int"`
 		SliceString []string `ini:"::slice_string"`
+		Int         int      `ini:"int"`
 	}
 
 	type ADT struct {
@@ -589,27 +589,27 @@ k2 = 7
 
 [mapstruct "struct-key-1"]
 string = struct-1-string
-int = 1
 slice_string = str-1
 slice_string = str-2
+int = 1
 
 [mapstruct "struct-key-2"]
 string = struct-2-string
-int = 2
 slice_string = str-3
 slice_string = str-4
+int = 2
 
 [mapptrstruct "struct-key-1"]
 string = struct-1-string
-int = 1
 slice_string = str-5
 slice_string = str-6
+int = 1
 
 [mapptrstruct "struct-key-2"]
 string = struct-2-string
-int = 2
 slice_string = str-7
 slice_string = str-8
+int = 2
 `
 		t   = ADT{}
 		err error
@@ -628,9 +628,9 @@ slice_string = str-8
 	//Output:
 	//MapString: map[k:v k2:v2]
 	//MapInt: map[k:6 k2:7]
-	//MapStruct: map[struct-key-1:{struct-1-string 1 [str-1 str-2]} struct-key-2:{struct-2-string 2 [str-3 str-4]}]
-	//MapPtrStruct: struct-key-1: &{struct-1-string 1 [str-5 str-6]}
-	//MapPtrStruct: struct-key-2: &{struct-2-string 2 [str-7 str-8]}
+	//MapStruct: map[struct-key-1:{struct-1-string [str-1 str-2] 1} struct-key-2:{struct-2-string [str-3 str-4] 2}]
+	//MapPtrStruct: struct-key-1: &{struct-1-string [str-5 str-6] 1}
+	//MapPtrStruct: struct-key-2: &{struct-2-string [str-7 str-8] 2}
 }
 
 func ExampleUnmarshal_struct() {
