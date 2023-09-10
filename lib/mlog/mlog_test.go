@@ -11,7 +11,7 @@ import (
 )
 
 // Test writing to mlog after closed.
-func TestMultiLogger_Close(t *testing.T) {
+func TestMultiLogger_Close(_ *testing.T) {
 	var (
 		bufOut = bytes.Buffer{}
 		bufErr = bytes.Buffer{}

@@ -2,56 +2,58 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package mlog
+package mlog_test
 
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os"
-	// The following import and code below, is intentionally commented to
-	// prevent import cycle.
-	// "github.com/shuLhan/share/api/slack"
+
+	"github.com/shuLhan/share/api/slack"
+	"github.com/shuLhan/share/lib/mlog"
 )
 
 func ExampleMultiLogger() {
 	// The following example import package
 	// "github.com/shuLhan/share/api/slack".
-	// The code is intentionally commented to prevent import cycle.
 
 	var (
 		buf   = bytes.Buffer{}
-		wouts = []NamedWriter{
-			NewNamedWriter("stdout", os.Stdout),
-			NewNamedWriter("buffer", &buf),
+		wouts = []mlog.NamedWriter{
+			mlog.NewNamedWriter(`stdout`, os.Stdout),
+			mlog.NewNamedWriter(`buffer`, &buf),
 		}
-		werrs = []NamedWriter{
-			NewNamedWriter("stderr", os.Stdout),
+		werrs = []mlog.NamedWriter{
+			mlog.NewNamedWriter(`stderr`, os.Stdout),
 		}
-		mlog            = NewMultiLogger("", "mlog:", wouts, werrs)
+		multilog        = mlog.NewMultiLogger(``, `mlog:`, wouts, werrs)
 		slackWebhookURL = os.Getenv("SLACK_WEBHOOK_URL")
 	)
 
 	// Create an error writer to slack.
 	if len(slackWebhookURL) > 0 {
 		// Get the Slack configuration from environment.
-		//slackChannel := os.Getenv("SLACK_WEBHOOK_CHANNEL")
-		//slackUsername := os.Getenv("SLACK_WEBHOOK_USERNAME")
+		slackChannel := os.Getenv(`SLACK_WEBHOOK_CHANNEL`)
+		slackUsername := os.Getenv(`SLACK_WEBHOOK_USERNAME`)
 
 		// Create Slack's client.
-		//slackc, err := slack.NewWebhookClient(slackWebhookURL, slackUsername, slackChannel)
-		//if err != nil {
-		//log.Fatal(err)
-		//}
+		slackc, err := slack.NewWebhookClient(slackWebhookURL, slackUsername, slackChannel)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		// Forward all errors to Slack client.
-		//mlog.RegisterErrorWriter(NewNamedWriter("slack", slackc))
+		multilog.RegisterErrorWriter(mlog.NewNamedWriter(`slack`, slackc))
 	}
 
-	mlog.Outf("writing to standard output and buffer")
-	mlog.Errf("writing to standard error and slack")
-	mlog.Close()
+	multilog.Outf(`writing to standard output and buffer`)
+	multilog.Errf(`writing to standard error and slack`)
+	multilog.Close()
+
 	// Try writing to closed mlog.
-	mlog.Outf("writing to standard output and buffer after close")
+	multilog.Outf(`writing to standard output and buffer after close`)
+
 	fmt.Println("Output on buffer:", buf.String())
 
 	// Unordered output:
