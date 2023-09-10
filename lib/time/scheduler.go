@@ -16,10 +16,11 @@ import (
 	"github.com/shuLhan/share/lib/ints"
 )
 
-var (
-	ErrScheduleUnknown error = errors.New(`unknown schedule`)
-)
+// ErrScheduleUnknown define an error when unknown schedule kind parsed from
+// value.
+var ErrScheduleUnknown error = errors.New(`unknown schedule`)
 
+// List of kind of schedule.
 const (
 	ScheduleKindMinutely = `minutely`
 	ScheduleKindHourly   = `hourly`

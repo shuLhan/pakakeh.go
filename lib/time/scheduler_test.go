@@ -72,8 +72,8 @@ func TestNewScheduler_error(t *testing.T) {
 func TestScheduler_minutely(t *testing.T) {
 	type testCase struct {
 		exp      *Scheduler
-		schedule string
 		now      time.Time
+		schedule string
 	}
 
 	var cases = []testCase{{

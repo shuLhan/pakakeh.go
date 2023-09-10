@@ -17,30 +17,25 @@ var Now = func() time.Time {
 	return time.Now()
 }
 
-var (
-	ShortDayNames = []string{
-		"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
-	}
+// ShortDayNames contains list of day name in English, in shorter.
+var ShortDayNames = []string{`Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`, `Sun`}
 
-	//
-	// ShortMonths provide mapping between text of month, in English,
-	// short format to their time.Month value
-	//
-	ShortMonths = map[string]time.Month{
-		"Jan": time.January,
-		"Feb": time.February,
-		"Mar": time.March,
-		"Apr": time.April,
-		"May": time.May,
-		"Jun": time.June,
-		"Jul": time.July,
-		"Aug": time.August,
-		"Sep": time.September,
-		"Oct": time.October,
-		"Nov": time.November,
-		"Dec": time.December,
-	}
-)
+// ShortMonths provide mapping between text of month, in English,
+// short format to their time.Month value
+var ShortMonths = map[string]time.Month{
+	`Jan`: time.January,
+	`Feb`: time.February,
+	`Mar`: time.March,
+	`Apr`: time.April,
+	`May`: time.May,
+	`Jun`: time.June,
+	`Jul`: time.July,
+	`Aug`: time.August,
+	`Sep`: time.September,
+	`Oct`: time.October,
+	`Nov`: time.November,
+	`Dec`: time.December,
+}
 
 // Microsecond return the microsecond value of time.
 // For example, if the unix nano seconds is 1612331218913557000 then the micro
