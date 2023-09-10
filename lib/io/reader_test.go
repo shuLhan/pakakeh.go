@@ -70,10 +70,10 @@ func TestReaderScanInt64(t *testing.T) {
 
 func TestReaderReplaceAll(t *testing.T) {
 	type testCase struct {
-		r   Reader
+		exp string
 		old []byte
 		new []byte
-		exp string
+		r   Reader
 	}
 
 	var cases = []testCase{{
