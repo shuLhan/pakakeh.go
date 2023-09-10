@@ -45,10 +45,12 @@ func TestPublicMode_UnpackHTTPRequest(t *testing.T) {
 	}
 
 	cases := []struct {
+		req *http.Request
+
 		desc     string
-		req      *http.Request
-		expData  []byte
 		expError string
+
+		expData []byte
 	}{{
 		desc:     "With request is nil",
 		expError: "empty HTTP request",

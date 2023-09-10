@@ -7,6 +7,6 @@ package paseto
 // PublicToken contains the unpacked public token.
 type PublicToken struct {
 	Token  JSONToken
-	Data   []byte
 	Footer JSONFooter
+	Data   []byte
 }

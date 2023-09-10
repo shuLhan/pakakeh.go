@@ -59,11 +59,12 @@ func TestEncrypt(t *testing.T) {
 	}
 
 	cases := []struct {
-		desc   string
+		desc  string
+		nonce string
+		exp   string
+
 		msg    []byte
-		nonce  string
 		footer []byte
-		exp    string
 	}{{
 		desc: "Encrypt with zero nonce, without footer",
 		msg:  []byte(`{"data":"this is a signed message","exp":"2019-01-01T00:00:00+00:00"}`),
@@ -206,9 +207,10 @@ func TestSign(t *testing.T) {
 
 	cases := []struct {
 		desc string
-		m    []byte
-		f    []byte
 		exp  string
+
+		m []byte
+		f []byte
 	}{{
 		desc: "Sign",
 		m:    m,

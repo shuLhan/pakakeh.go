@@ -29,8 +29,8 @@ var DefaultTTL = 60 * time.Second
 // The PublicMode contains list of peer public keys for verifying the incoming
 // token.
 type PublicMode struct {
-	our   Key
 	peers *keys
+	our   Key
 }
 
 // NewPublicMode create new PublicMode with our private key for signing

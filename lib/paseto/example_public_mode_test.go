@@ -93,6 +93,6 @@ func ExamplePublicMode() {
 
 	// Output:
 	// Received data: hello receiver
-	// Received footer: {KID:sender Data:map[FOOTER:HERE]}
+	// Received footer: {Data:map[FOOTER:HERE] KID:sender}
 	// token subject "unknown-subject" is not allowed for key "sender"
 }
