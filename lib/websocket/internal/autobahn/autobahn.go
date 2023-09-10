@@ -1,3 +1,5 @@
+// Package autobahn provides an helper to parse and print reports from
+// result of Autobahn test suite.
 package autobahn
 
 import (
