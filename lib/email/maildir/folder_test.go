@@ -136,10 +136,10 @@ func TestSanitizeFolderName(t *testing.T) {
 		expError: `folder name must begin with period`,
 	}, {
 		name:     `..`,
-		expError: `folder name must not begin with ..`,
+		expError: `folder name must not begin with ".."`,
 	}, {
 		name:     `..name`,
-		expError: `folder name must not begin with ..`,
+		expError: `folder name must not begin with ".."`,
 	}, {
 		name:     ".\u0001name",
 		expError: `folder name contains unprintable character '\x01'`,

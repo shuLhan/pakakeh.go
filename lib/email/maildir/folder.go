@@ -238,7 +238,7 @@ func sanitizeFolderName(name string) (out string, err error) {
 		return ``, fmt.Errorf(`folder name must begin with period`)
 	}
 	if out[1] == '.' {
-		return ``, fmt.Errorf(`folder name must not begin with ..`)
+		return ``, fmt.Errorf(`folder name must not begin with ".."`)
 	}
 	var r rune
 	for _, r = range out {
