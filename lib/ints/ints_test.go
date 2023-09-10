@@ -399,8 +399,8 @@ func TestIndirectSort_SortByIndex(t *testing.T) {
 func TestRemove(t *testing.T) {
 	cases := []struct {
 		d   []int
-		v   int
 		exp []int
+		v   int
 	}{{
 		d:   []int{},
 		v:   1,
