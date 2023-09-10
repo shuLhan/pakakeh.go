@@ -19,10 +19,12 @@ import (
 type Parser struct {
 	file   string
 	delims string
-	x      int    // x is the position of read in v.
 	v      string // v contains the text to be parsed.
-	token  []rune // token that has been parsed.
-	d      rune   // d is one of delims character that terminated parsing.
+
+	token []rune // token that has been parsed.
+
+	x int  // x is the position of read in v.
+	d rune // d is one of delims character that terminated parsing.
 }
 
 // Lines parse the content of path and return non-empty lines.
