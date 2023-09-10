@@ -320,6 +320,7 @@ func skipComment(parser *libbytes.Parser) (err error) {
 	return nil
 }
 
+// UnmarshalJSON decode JSON string into Mailbox.
 func (mbox *Mailbox) UnmarshalJSON(b []byte) (err error) {
 	// Replace \u003c and \u003e escaped characters back to '<' and '>'.
 	b, err = libjson.Unescape(b, false)
@@ -340,6 +341,7 @@ func (mbox *Mailbox) UnmarshalJSON(b []byte) (err error) {
 	return nil
 }
 
+// MarshalJSON encode the Mailbox into JSON string.
 func (mbox *Mailbox) MarshalJSON() (b []byte, err error) {
 	return []byte(`"` + mbox.String() + `"`), nil
 }
