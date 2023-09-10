@@ -78,9 +78,9 @@ func TestUnescape(t *testing.T) {
 func TestUnescapeString(t *testing.T) {
 	cases := []struct {
 		in     string
-		strict bool
 		exp    string
 		expErr string
+		strict bool
 	}{{
 		in:  "",
 		exp: "",
