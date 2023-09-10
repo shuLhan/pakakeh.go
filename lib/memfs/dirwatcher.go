@@ -32,8 +32,7 @@ type DirWatcher struct {
 	// being watched for changes.
 	// The map key is relative path to directory and its value is a node
 	// information.
-	dirs       map[string]*Node
-	dirsLocker sync.Mutex
+	dirs map[string]*Node
 
 	// This struct embed Options to map the directory to be watched
 	// into memory.
@@ -52,6 +51,8 @@ type DirWatcher struct {
 	// This field is optional, minimum is 100 milli second and default is
 	// 5 seconds.
 	Delay time.Duration
+
+	dirsLocker sync.Mutex
 }
 
 func (dw *DirWatcher) init() (err error) {
