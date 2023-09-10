@@ -47,13 +47,13 @@ import (
 //   - go_memstats_gc_forced_num: [runtime.MemStats.NumForcedGC]
 //   - go_memstats_gc_cpu_fraction: [runtime.MemStats.GCCPUFraction]
 type GoMemStatsCollector struct {
-	memstats runtime.MemStats
+	// map of metric name with its pointer to its value.
+	nameValue map[string]any
 
 	// names contains the filtered metric names.
 	names []string
 
-	// map of metric name with its pointer to its value.
-	nameValue map[string]any
+	memstats runtime.MemStats
 }
 
 // NewGoMemStatsCollector create new MemStats collector with options to filter
