@@ -421,14 +421,14 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 // WriteTo write the zone as text into w.
 // The result of WriteTo will be different with original content of zone file,
 // since it does not preserve comment and indentation.
-func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
+func (zone *Zone) WriteTo(out io.Writer) (total int64, err error) {
 	var (
 		logp = `Write`
 		n    int
 	)
 
 	n, _ = fmt.Fprintf(out, "$ORIGIN %s\n", zone.Origin)
-	total += n
+	total += int64(n)
 
 	if len(zone.SOA.MName) > 0 {
 		n, err = fmt.Fprintf(out,
@@ -438,7 +438,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		if err != nil {
 			return total, fmt.Errorf(`%s: %w`, logp, err)
 		}
-		total += n
+		total += int64(n)
 	}
 
 	// Save the origin records first.
@@ -448,7 +448,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		if err != nil {
 			return total, fmt.Errorf(`%s: %w`, logp, err)
 		}
-		total += n
+		total += int64(n)
 	}
 
 	// Save the records ordered by name.
@@ -472,7 +472,7 @@ func (zone *Zone) WriteTo(out io.Writer) (total int, err error) {
 		if err != nil {
 			return total, fmt.Errorf(`%s: %w`, logp, err)
 		}
-		total += n
+		total += int64(n)
 	}
 	return total, nil
 }

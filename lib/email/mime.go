@@ -166,27 +166,25 @@ func (mime *MIME) String() string {
 }
 
 // WriteTo write the MIME header and content into Writer w.
-func (mime *MIME) WriteTo(w io.Writer) (n int, err error) {
-	var (
-		m int
-	)
-	m, err = mime.Header.WriteTo(w)
+func (mime *MIME) WriteTo(w io.Writer) (n int64, err error) {
+	var m int
+
+	n, err = mime.Header.WriteTo(w)
 	if err != nil {
 		return n, err
 	}
-	n += m
 
 	m, err = w.Write([]byte("\r\n"))
 	if err != nil {
 		return n, err
 	}
-	n += m
+	n += int64(m)
 
 	m, err = w.Write(mime.Content)
 	if err != nil {
 		return n, err
 	}
-	n += m
+	n += int64(m)
 
 	return n, nil
 }

@@ -257,7 +257,7 @@ func (hdr *Header) SetMultipart() (err error) {
 // WriteTo the header into w.
 // The header does not end with an empty line to allow multiple Header
 // written multiple times.
-func (hdr *Header) WriteTo(w io.Writer) (n int, err error) {
+func (hdr *Header) WriteTo(w io.Writer) (n int64, err error) {
 	var (
 		f *Field
 		m int
@@ -273,7 +273,7 @@ func (hdr *Header) WriteTo(w io.Writer) (n int, err error) {
 		if err != nil {
 			return n, err
 		}
-		n += m
+		n += int64(m)
 	}
 	return n, nil
 }

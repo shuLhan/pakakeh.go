@@ -370,7 +370,7 @@ func (rc *ResolvConf) PopulateQuery(dname string) (queries []string) {
 }
 
 // WriteTo write the ResolvConf into w.
-func (rc *ResolvConf) WriteTo(w io.Writer) (n int, err error) {
+func (rc *ResolvConf) WriteTo(w io.Writer) (n int64, err error) {
 	var bb bytes.Buffer
 
 	if len(rc.Domain) > 0 {
@@ -412,5 +412,12 @@ func (rc *ResolvConf) WriteTo(w io.Writer) (n int, err error) {
 		}
 	}
 
-	return w.Write(bb.Bytes())
+	var nwrite int
+
+	nwrite, err = w.Write(bb.Bytes())
+	if err != nil {
+		return int64(nwrite), fmt.Errorf(`WriteTo: %w`, err)
+	}
+
+	return int64(nwrite), nil
 }
