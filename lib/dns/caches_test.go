@@ -14,10 +14,10 @@ import (
 
 func TestCachesQuery(t *testing.T) {
 	type testCase struct {
-		exp     *Answer
-		msg     Message
 		desc    string
+		exp     *Answer
 		expList []*Answer
+		msg     Message
 	}
 
 	var (
