@@ -22,9 +22,9 @@ var (
 
 type client struct {
 	con       *smtp.Client
-	input     []byte
-	remoteURL string
 	mailTx    *smtp.MailTx
+	remoteURL string
+	input     []byte
 }
 
 func newClient(remoteURL string) (cli *client, err error) {
