@@ -16,6 +16,7 @@ type Line struct {
 	N int
 }
 
+// MarshalJSON encode the Line into JSON value.
 func (line Line) MarshalJSON() ([]byte, error) {
 	var bb bytes.Buffer
 
@@ -28,6 +29,6 @@ func (line Line) MarshalJSON() ([]byte, error) {
 	return bb.Bytes(), nil
 }
 
-func (l Line) String() string {
-	return fmt.Sprintf("{N:%d,V:%s}", l.N, l.V)
+func (line Line) String() string {
+	return fmt.Sprintf("{N:%d,V:%s}", line.N, line.V)
 }

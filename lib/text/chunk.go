@@ -31,6 +31,7 @@ func JoinChunks(chunks []Chunk, sep string) string {
 	return out
 }
 
+// MarshalJSON encode the Chunk into JSON value.
 func (chunk Chunk) MarshalJSON() ([]byte, error) {
 	var bb bytes.Buffer
 
@@ -43,6 +44,6 @@ func (chunk Chunk) MarshalJSON() ([]byte, error) {
 	return bb.Bytes(), nil
 }
 
-func (c Chunk) String() string {
-	return fmt.Sprintf("{StartAt:%d,V:%s}", c.StartAt, c.V)
+func (chunk Chunk) String() string {
+	return fmt.Sprintf("{StartAt:%d,V:%s}", chunk.StartAt, chunk.V)
 }

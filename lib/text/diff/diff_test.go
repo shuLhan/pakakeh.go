@@ -55,8 +55,8 @@ func testDiffBytes(t *testing.T, old, new text.Line,
 
 func TestBytes(t *testing.T) {
 	var (
-		old = text.Line{N: 0, V: []byte(`lorem ipsum dolmet`)}
-		new = text.Line{N: 0, V: []byte(`lorem all ipsum`)}
+		oldline = text.Line{N: 0, V: []byte(`lorem ipsum dolmet`)}
+		newline = text.Line{N: 0, V: []byte(`lorem all ipsum`)}
 
 		expAdds = libstrings.Row{
 			[]string{`all `},
@@ -66,36 +66,36 @@ func TestBytes(t *testing.T) {
 		}
 	)
 
-	testDiffBytes(t, old, new, expAdds[0], expDels[0])
+	testDiffBytes(t, oldline, newline, expAdds[0], expDels[0])
 
-	old = text.Line{N: 0, V: []byte(`lorem ipsum dolmet`)}
-	new = text.Line{N: 0, V: []byte(`lorem ipsum`)}
+	oldline = text.Line{N: 0, V: []byte(`lorem ipsum dolmet`)}
+	newline = text.Line{N: 0, V: []byte(`lorem ipsum`)}
 
-	testDiffBytes(t, old, new, []string{}, expDels[0])
+	testDiffBytes(t, oldline, newline, []string{}, expDels[0])
 
-	old = text.Line{N: 0, V: []byte(`lorem ipsum`)}
-	new = text.Line{N: 0, V: []byte(`lorem ipsum dolmet`)}
+	oldline = text.Line{N: 0, V: []byte(`lorem ipsum`)}
+	newline = text.Line{N: 0, V: []byte(`lorem ipsum dolmet`)}
 
-	testDiffBytes(t, old, new, expDels[0], []string{})
+	testDiffBytes(t, oldline, newline, expDels[0], []string{})
 
-	old = text.Line{N: 0, V: []byte(`{{Pharaoh Infobox |`)}
-	new = text.Line{N: 0, V: []byte(`{{Infobox pharaoh`)}
+	oldline = text.Line{N: 0, V: []byte(`{{Pharaoh Infobox |`)}
+	newline = text.Line{N: 0, V: []byte(`{{Infobox pharaoh`)}
 
-	testDiffBytes(t, old, new, []string{`pharaoh`}, []string{`Pharaoh `, `|`})
+	testDiffBytes(t, oldline, newline, []string{`pharaoh`}, []string{`Pharaoh `, `|`})
 }
 
 func TestBytesRatio(t *testing.T) {
 	var (
-		old      = `# [[...Baby One More Time (song)|...Baby One More Time]]`
-		new      = `# "[[...Baby One More Time (song)|...Baby One More Time]]"`
-		newlen   = len(new)
+		oldline  = `# [[...Baby One More Time (song)|...Baby One More Time]]`
+		newline  = `# "[[...Baby One More Time (song)|...Baby One More Time]]"`
+		newlen   = len(newline)
 		expMatch = newlen - 2
 		expRatio = float32(expMatch) / float32(newlen)
 
 		ratio float32
 	)
 
-	ratio, _, _ = BytesRatio([]byte(old), []byte(new), DefMatchLen)
+	ratio, _, _ = BytesRatio([]byte(oldline), []byte(newline), DefMatchLen)
 
 	if expRatio != ratio {
 		t.Fatalf(`Expecting ratio %f got %f`, expRatio, ratio)

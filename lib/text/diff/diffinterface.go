@@ -93,11 +93,11 @@ func IsEqual(oldb, newb []byte) (equal bool) {
 // if no matchs even found.
 // `minTokenLen` define the minimum length of token for searching in both of
 // slice.
-func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen int) {
+func BytesRatio(old, newline []byte, minTokenLen int) (ratio float32, m int, maxlen int) {
 	x, y := 0, 0
 
 	oldlen := len(old)
-	newlen := len(new)
+	newlen := len(newline)
 	minlen := oldlen
 	maxlen = newlen
 	if newlen < oldlen {
@@ -112,7 +112,7 @@ func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen 
 	for {
 		// Count matching bytes from beginning of slice.
 		for x < minlen {
-			if old[x] != new[y] {
+			if old[x] != newline[y] {
 				break
 			}
 			m++
@@ -131,7 +131,7 @@ func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen 
 		yend := newlen - 1
 
 		for xend >= x && yend >= y {
-			if old[xend] != new[yend] {
+			if old[xend] != newline[yend] {
 				break
 			}
 			m++
@@ -146,23 +146,23 @@ func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen 
 
 		// Cut the matching bytes
 		old = old[x : xend+1]
-		new = new[y : yend+1]
+		newline = newline[y : yend+1]
 		oldlen = len(old)
 
-		// Get minimal token to search in the new left over.
+		// Get minimal token to search in the newline left over.
 		minlen = minTokenLen
 		if oldlen < minlen {
 			minlen = oldlen
 		}
 
-		// Search old token in new, chunk by chunk.
+		// Search old token in newline, chunk by chunk.
 		x = 0
 		y = -1
 		max := oldlen - minlen
 		for ; x < max; x++ {
 			token := old[x : x+minlen]
 
-			y = inbytes.TokenFind(new, token, 0)
+			y = inbytes.TokenFind(newline, token, 0)
 			if y > 0 {
 				break
 			}
@@ -175,9 +175,9 @@ func BytesRatio(old, new []byte, minTokenLen int) (ratio float32, m int, maxlen 
 
 		// Cut the changes
 		old = old[x:]
-		new = new[y:]
+		newline = newline[y:]
 		oldlen = len(old)
-		newlen = len(new)
+		newlen = len(newline)
 
 		minlen = oldlen
 		if newlen < minlen {
