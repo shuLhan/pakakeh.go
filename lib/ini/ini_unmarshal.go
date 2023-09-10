@@ -13,7 +13,7 @@ import (
 
 // unmarshal set each section-subsection variables into the struct
 // fields.
-func (in *Ini) unmarshal(tagField *tagStructField, rtype reflect.Type, rval reflect.Value) {
+func (in *Ini) unmarshal(tagField *tagStructField) {
 	var (
 		sec    *Section
 		sfield *structField

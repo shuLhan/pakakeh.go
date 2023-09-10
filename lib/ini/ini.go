@@ -299,7 +299,7 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 	}
 
 	var tagField *tagStructField = unpackTagStructField(rtipe, rvalue)
-	in.unmarshal(tagField, rtipe, rvalue)
+	in.unmarshal(tagField)
 
 	return nil
 }
