@@ -18,6 +18,7 @@ const (
 // defined in XML-RPC.
 type Kind int
 
+// List of available Kind.
 const (
 	Unset    Kind = iota
 	String        // represent Go string type.

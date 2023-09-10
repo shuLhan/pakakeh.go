@@ -131,7 +131,7 @@ func (v *Value) GetFieldAsFloat(key string) float64 {
 	return f64
 }
 
-// GetFieldAsFloat get the struct's field value by its key as boolean.
+// GetFieldAsBoolean get the struct's field value by its key as boolean.
 func (v *Value) GetFieldAsBoolean(key string) bool {
 	if v == nil || v.StructMembers == nil {
 		return false

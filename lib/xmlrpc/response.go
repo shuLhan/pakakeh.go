@@ -12,6 +12,7 @@ import (
 	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
+// Response contains the XML-RPC response.
 type Response struct {
 	Param *Value
 
@@ -42,6 +43,7 @@ func (resp *Response) MarshalText() (out []byte, err error) {
 	return buf.Bytes(), nil
 }
 
+// UnmarshalText convert the XML text into Response.
 func (resp *Response) UnmarshalText(text []byte) (err error) {
 	var (
 		logp = "xmlrpc: Response"
