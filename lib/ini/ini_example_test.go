@@ -293,7 +293,7 @@ func ExampleMarshal_map() {
 		MapPtrStruct map[string]*U `ini:"mapPtrStruct"`
 
 		// This field should not marshaled.
-		unMapStruct map[string]U `ini:"unmapstruct"`
+		unMapStruct map[string]U
 	}
 
 	var (
@@ -410,7 +410,7 @@ func ExampleMarshal_struct() {
 		PtrStruct   *U        `ini:"pointer:struct"`
 		SliceStruct []U       `ini:"slice:OfStruct"`
 		Struct      U         `ini:"section:struct"`
-		unexported  U         `ini:"unexported"` // This field should not be marshaled.
+		unexported  U         // This field should not be marshaled.
 	}
 	var (
 		t = ADT{
@@ -644,7 +644,7 @@ func ExampleUnmarshal_struct() {
 		PtrStruct   *U        `ini:"pointer:struct"`
 		SliceStruct []U       `ini:"slice:OfStruct"`
 		Struct      U         `ini:"section:struct"`
-		unexported  U         `ini:"unexported"`
+		unexported  U         // This field should not be unmarshaled.
 	}
 
 	var (
