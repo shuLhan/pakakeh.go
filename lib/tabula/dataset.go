@@ -33,12 +33,14 @@ var (
 // Dataset contain the data, mode of saved data, number of columns and rows in
 // data.
 type Dataset struct {
-	// Mode define the numeric value of output mode.
-	Mode int
 	// Columns is input data that has been parsed.
 	Columns Columns
+
 	// Rows is input data that has been parsed.
 	Rows Rows
+
+	// Mode define the numeric value of output mode.
+	Mode int
 }
 
 // NewDataset create new dataset, use the mode to initialize the dataset.

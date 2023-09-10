@@ -12,15 +12,19 @@ import (
 type Column struct {
 	// Name of column. String identifier for the column.
 	Name string
+
+	// ValueSpace contain the possible value in records
+	ValueSpace []string
+
+	// Records contain column data.
+	Records Records
+
 	// Type of column. All record in column have the same type.
 	Type int
+
 	// Flag additional attribute that can be set to mark some value on this
 	// column
 	Flag int
-	// ValueSpace contain the possible value in records
-	ValueSpace []string
-	// Records contain column data.
-	Records Records
 }
 
 // NewColumn return new column with type and name.

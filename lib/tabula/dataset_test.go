@@ -82,21 +82,21 @@ func createDataset(t *testing.T) (dataset *Dataset) {
 	return
 }
 
-func DatasetStringJoinByIndex(t *testing.T, dataset [][]string, indis []int) (res string) {
+func DatasetStringJoinByIndex(_ *testing.T, dataset [][]string, indis []int) (res string) {
 	for x := range indis {
 		res += fmt.Sprint("&", dataset[indis[x]])
 	}
 	return res
 }
 
-func DatasetRowsJoin(t *testing.T) (s string) {
+func DatasetRowsJoin(_ *testing.T) (s string) {
 	for x := range datasetRows {
 		s += fmt.Sprint("&", datasetRows[x])
 	}
 	return
 }
 
-func DatasetColumnsJoin(t *testing.T) (s string) {
+func DatasetColumnsJoin(_ *testing.T) (s string) {
 	for x := range datasetCols {
 		s += fmt.Sprint(datasetCols[x])
 	}
@@ -205,7 +205,7 @@ func TestModeRowsPushColumn(t *testing.T) {
 	test.Assert(t, "", exp, got)
 
 	// Check columns
-	exp = "[{int 1 0 [] []} {real 2 0 [] []} {string 0 0 [] []}]"
+	exp = `[{int [] [] 1 0} {real [] [] 2 0} {string [] [] 0 0}]`
 	got = fmt.Sprint(dataset.Columns)
 
 	test.Assert(t, "", exp, got)

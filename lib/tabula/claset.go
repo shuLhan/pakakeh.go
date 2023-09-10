@@ -14,20 +14,23 @@ import (
 
 // Claset define a dataset with class attribute.
 type Claset struct {
-	// Dataset embedded, for implementing the dataset interface.
-	Dataset
-	// ClassIndex contain index for target classification in columns.
-	ClassIndex int `json:"ClassIndex"`
+	// major contain the name of majority class in dataset.
+	major string
+
+	// minor contain the name of minority class in dataset.
+	minor string
 
 	// vs contain a copy of value space.
 	vs []string
+
 	// counts number of value space in current set.
 	counts []int
 
-	// major contain the name of majority class in dataset.
-	major string
-	// minor contain the name of minority class in dataset.
-	minor string
+	// Dataset embedded, for implementing the dataset interface.
+	Dataset
+
+	// ClassIndex contain index for target classification in columns.
+	ClassIndex int `json:"ClassIndex"`
 }
 
 // NewClaset create and return new Claset object.
