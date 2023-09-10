@@ -36,16 +36,20 @@ const (
 
 // FileAttrs define the attributes for opening or creating file on the remote.
 type FileAttrs struct {
-	name        string
+	exts extensions // attr_EXTENDED
+
+	name string
+
+	fsMode fs.FileMode
+
+	size uint64 // attr_SIZE
+
 	flags       uint32
-	size        uint64     // attr_SIZE
-	uid         uint32     // attr_UIDGID
-	gid         uint32     // attr_UIDGID
-	permissions uint32     // attr_PERMISSIONS
-	atime       uint32     // attr_ACMODTIME
-	mtime       uint32     // attr_ACMODTIME
-	exts        extensions // attr_EXTENDED
-	fsMode      fs.FileMode
+	uid         uint32 // attr_UIDGID
+	gid         uint32 // attr_UIDGID
+	permissions uint32 // attr_PERMISSIONS
+	atime       uint32 // attr_ACMODTIME
+	mtime       uint32 // attr_ACMODTIME
 }
 
 // NewFileAttrs create and initialize FileAttrs from FileInfo.
@@ -191,6 +195,7 @@ func (fa *FileAttrs) Mode() fs.FileMode {
 	return fa.fsMode
 }
 
+// Name return the name of file.
 func (fa *FileAttrs) Name() string {
 	return fa.name
 }

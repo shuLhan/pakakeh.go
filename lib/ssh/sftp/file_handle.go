@@ -4,6 +4,7 @@
 
 package sftp
 
+// FileHandle define the container to store remote file.
 type FileHandle struct {
 	remotePath string // The remote path.
 	v          []byte // The handle value returned from open().

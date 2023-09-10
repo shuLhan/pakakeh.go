@@ -47,21 +47,16 @@ const (
 // )
 
 type packet struct {
-	length    uint32
-	kind      byte
-	requestId uint32
-
-	// FxpVersion.
-	version uint32
-	exts    extensions
-
-	// FxpStatus
-	code        uint32
-	message     string
-	languageTag string
-
 	// FxpHandle
 	fh *FileHandle
+
+	// FxpAttrs
+	fa *FileAttrs
+
+	exts extensions // from FxpVersion.
+
+	message     string // from FxpStatus
+	languageTag string // from FxpStatus
 
 	// FxpData
 	data []byte
@@ -69,8 +64,12 @@ type packet struct {
 	// FxpName
 	nodes []*dirEntry
 
-	// FxpAttrs
-	fa *FileAttrs
+	version   uint32 // from FxpVersion.
+	code      uint32 // from FxpStatus
+	length    uint32
+	requestId uint32
+
+	kind byte
 }
 
 func unpackPacket(payload []byte) (pac *packet, err error) {

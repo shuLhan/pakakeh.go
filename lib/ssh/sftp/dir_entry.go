@@ -9,9 +9,10 @@ import "os"
 // dirEntry represent the internal data returned from Readdir, Readlink, or
 // Realpath.
 type dirEntry struct {
+	attrs *FileAttrs
+
 	fileName string
 	longName string
-	attrs    *FileAttrs
 }
 
 func (de *dirEntry) Name() string {

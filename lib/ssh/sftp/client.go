@@ -18,8 +18,8 @@ import (
 
 // Client for SFTP.
 type Client struct {
-	sess    *ssh.Session
-	version uint32
+	sess *ssh.Session
+
 	exts    extensions
 	pipeIn  io.WriteCloser
 	pipeOut io.Reader
@@ -27,8 +27,11 @@ type Client struct {
 
 	// The requestId is unique number that will be incremented by client,
 	// to prevent the same ID generated on concurrent operations.
-	mtxId     sync.Mutex
 	requestId uint32
+
+	version uint32
+
+	mtxId sync.Mutex
 }
 
 // NewClient create and initialize new client for SSH file transfer protocol.
