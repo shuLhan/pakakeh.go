@@ -28,8 +28,6 @@ type Client struct {
 	*ssh.Client
 	config *ssh.ClientConfig
 
-	configHostKeyCallback ssh.HostKeyCallback
-
 	cfg    *config.Section
 	stdout io.Writer
 	stderr io.Writer
