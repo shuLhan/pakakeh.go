@@ -34,14 +34,18 @@ const (
 
 type macro struct {
 	ref *Result
-	out []byte
 
 	// mode is either mechanism "include", modifier "redirect", or
 	// modifier "exp".
-	mode       string
-	nright     int
-	dels       []byte
-	letter     byte
+	mode string
+
+	out  []byte
+	dels []byte
+
+	nright int
+
+	letter byte
+
 	isReversed bool
 }
 

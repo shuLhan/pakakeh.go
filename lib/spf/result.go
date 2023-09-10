@@ -16,18 +16,21 @@ import (
 
 // Result contains the output of CheckHost function.
 type Result struct {
-	IP       net.IP // The IP address of sender.
+	IP net.IP // The IP address of sender.
+
+	Err string
+
 	Domain   []byte // The domain address of sender from SMTP EHLO or MAIL FROM command.
 	Sender   []byte // The email address of sender.
 	Hostname []byte
-	Code     byte // Result of check host.
-	Err      string
 
 	senderLocal  []byte // The local part of sender.
 	senderDomain []byte // The domain part of sender.
 	terms        []byte // terms contains raw DNS RR that have SPF record.
 	dirs         []*directive
 	mods         []*modifier
+
+	Code byte // Result of check host.
 }
 
 // newResult initialize new SPF result on single domain.

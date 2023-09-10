@@ -25,7 +25,7 @@ const (
 )
 
 type directive struct {
-	qual  byte
 	mech  string
 	value []byte
+	qual  byte
 }
