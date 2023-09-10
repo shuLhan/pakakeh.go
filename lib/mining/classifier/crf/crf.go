@@ -83,12 +83,7 @@ type Runtime struct {
 }
 
 // New create and return new input for cascaded random-forest.
-func New(nstage, ntree, percentboot, nfeature int,
-	tprate, tnrate float64,
-	samples tabula.ClasetInterface,
-) (
-	crf *Runtime,
-) {
+func New(nstage, ntree, percentboot, nfeature int, tprate, tnrate float64) (crf *Runtime) {
 	crf = &Runtime{
 		NStage:         nstage,
 		NTree:          ntree,
