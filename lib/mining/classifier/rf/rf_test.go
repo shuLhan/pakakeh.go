@@ -112,7 +112,7 @@ func runRandomForest() {
 	}
 }
 
-func TestEnsemblingGlass(t *testing.T) {
+func TestEnsemblingGlass(_ *testing.T) {
 	SampleDsvFile = "../../testdata/forensic_glass/fgl.dsv"
 	RunOOB = false
 	OOBStatsFile = "glass.oob"
@@ -123,14 +123,14 @@ func TestEnsemblingGlass(t *testing.T) {
 	runRandomForest()
 }
 
-func TestEnsemblingIris(t *testing.T) {
+func TestEnsemblingIris(_ *testing.T) {
 	SampleDsvFile = "../../testdata/iris/iris.dsv"
 	OOBStatsFile = "iris.oob"
 
 	runRandomForest()
 }
 
-func TestEnsemblingPhoneme(t *testing.T) {
+func TestEnsemblingPhoneme(_ *testing.T) {
 	SampleDsvFile = "../../testdata/phoneme/phoneme.dsv"
 	OOBStatsFile = "phoneme.oob.stat"
 	StatFile = "phoneme.stat"
@@ -145,7 +145,7 @@ func TestEnsemblingPhoneme(t *testing.T) {
 	runRandomForest()
 }
 
-func TestEnsemblingSmotePhoneme(t *testing.T) {
+func TestEnsemblingSmotePhoneme(_ *testing.T) {
 	SampleDsvFile = "../../resampling/smote/phoneme_smote.dsv"
 	OOBStatsFile = "phonemesmote.oob"
 
@@ -155,7 +155,7 @@ func TestEnsemblingSmotePhoneme(t *testing.T) {
 	runRandomForest()
 }
 
-func TestEnsemblingLnsmotePhoneme(t *testing.T) {
+func TestEnsemblingLnsmotePhoneme(_ *testing.T) {
 	SampleDsvFile = "../../resampling/lnsmote/phoneme_lnsmote.dsv"
 	OOBStatsFile = "phonemelnsmote.oob"
 
@@ -165,7 +165,7 @@ func TestEnsemblingLnsmotePhoneme(t *testing.T) {
 	runRandomForest()
 }
 
-func TestWvc2010Lnsmote(t *testing.T) {
+func TestWvc2010Lnsmote(_ *testing.T) {
 	SampleDsvFile = "../../testdata/wvc2010lnsmote/wvc2010_features.lnsmote.dsv"
 	OOBStatsFile = "wvc2010lnsmote.oob"
 

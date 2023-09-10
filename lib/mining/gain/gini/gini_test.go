@@ -27,7 +27,7 @@ var (
 	discreteValues = []string{"T", "F"}
 )
 
-func TestComputeContinu(t *testing.T) {
+func TestComputeContinu(_ *testing.T) {
 	target := make([]string, len(targetValues))
 
 	copy(target, targetValues)
@@ -45,7 +45,7 @@ func TestComputeContinu(t *testing.T) {
 	fmt.Println(">>> gini:", GINI)
 }
 
-func TestComputeDiscrete(t *testing.T) {
+func TestComputeDiscrete(_ *testing.T) {
 	gini := Gini{}
 	target := make([]string, len(targetValues))
 
