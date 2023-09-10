@@ -4,6 +4,8 @@
 
 package config
 
+// PermittedCNAMEs contains list of canonical names (CNAME) for source and
+// target.
 type PermittedCNAMEs struct {
 	sources []*pattern
 	targets []*pattern
