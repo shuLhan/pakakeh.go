@@ -4,6 +4,7 @@
 
 package bot
 
+// MessageForward define the content for forwarded message.
 type MessageForward struct {
 	// Optional. For messages forwarded from channels, identifier of the
 	// original message in the channel.

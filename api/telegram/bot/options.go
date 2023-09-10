@@ -28,6 +28,7 @@ const (
 	defListenAddressTLS = ":443"
 )
 
+// UpdateHandler define the handler when Bot receiving updates.
 type UpdateHandler func(update Update)
 
 // Options to create new Bot.
