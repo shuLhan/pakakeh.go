@@ -59,7 +59,7 @@ func NewFloat(v interface{}) *Float {
 	return toFloat(v)
 }
 
-// Create Float with default bit precision and rounding mode.
+// CreateFloat create Float with default bit precision and rounding mode.
 func CreateFloat(v float64) Float {
 	f := Float{}
 	f.SetPrec(DefaultBitPrecision)
@@ -219,7 +219,7 @@ func (f *Float) Mul(g interface{}) *Float {
 	return f
 }
 
-// Parse the string into Float value.
+// ParseFloat parse the string into Float value.
 func (f *Float) ParseFloat(s string) (err error) {
 	f.SetPrec(DefaultBitPrecision)
 	f.SetMode(DefaultRoundingMode)
