@@ -9,6 +9,6 @@ package vcard
 // Sex may contain one of this value: M (male), F (female), O (other), N (none),
 // or U (unknown).
 type Gender struct {
-	Sex  rune
 	Desc string
+	Sex  rune
 }

@@ -12,16 +12,19 @@ import (
 
 // Record define a single contact entity with sane format.
 type Record struct {
-	Name        Name
+	Name Name
+
 	Birthday    *Date
 	Anniversary *Date
-	Addresses   []Address
-	Emails      []Email
-	Phones      []Phone
-	Links       []string
-	Notes       []string
-	Company     string
-	JobTitle    string
+
+	Company  string
+	JobTitle string
+
+	Addresses []Address
+	Emails    []Email
+	Phones    []Phone
+	Links     []string
+	Notes     []string
 }
 
 // SetBirthday will set contact birthday from string format "YYYY-MM-DD" or

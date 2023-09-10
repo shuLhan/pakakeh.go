@@ -36,8 +36,6 @@ type Contact struct {
 	//YomiSurname string `json:"yomiSurname,omitempty"`
 	//YomiCompanyName string `json:"yomiCompanyName,omitempty"`
 
-	IMAddresses []string `json:"imAddresses,omitempty"`
-
 	JobTitle         string `json:"jobTitle,omitempty"`
 	Company          string `json:"companyName,omitempty"`
 	Department       string `json:"department,omitempty"`
@@ -47,19 +45,20 @@ type Contact struct {
 	AssistantName    string `json:"assistantName,omitempty"`
 	Manager          string `json:"manager,omitempty"`
 
-	HomePhones     []string `json:"homePhones,omitempty"`
-	MobilePhone    string   `json:"mobilePhone,omitempty"`
-	BusinessPhones []string `json:"businessPhones,omitempty"`
+	MobilePhone string `json:"mobilePhone,omitempty"`
 
-	SpouseName    string   `json:"spouseName,omitempty"`
-	PersonalNotes string   `json:"personalNotes,omitempty"`
-	Children      []string `json:"children,omitempty"`
-
-	Emails []Email `json:"emailAddresses,omitempty"`
+	SpouseName    string `json:"spouseName,omitempty"`
+	PersonalNotes string `json:"personalNotes,omitempty"`
 
 	HomeAddress     Address `json:"homeAddress,omitempty"`
 	BusinessAddress Address `json:"businessAddress,omitempty"`
 	OtherAddress    Address `json:"otherAddress,omitempty"`
+
+	IMAddresses    []string `json:"imAddresses,omitempty"`
+	HomePhones     []string `json:"homePhones,omitempty"`
+	BusinessPhones []string `json:"businessPhones,omitempty"`
+	Children       []string `json:"children,omitempty"`
+	Emails         []Email  `json:"emailAddresses,omitempty"`
 }
 
 func (c *Contact) decodeEmails(to *contact.Record) {
