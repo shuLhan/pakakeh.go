@@ -27,17 +27,17 @@ func TestAssert(t *testing.T) {
 
 	var (
 		c   testCase
-		tw  TestWriter
+		bw  BufferWriter
 		got string
 	)
 
 	for _, c = range cases {
-		Assert(&tw, ``, c.a, c.b)
-		got = tw.String()
+		Assert(&bw, ``, c.a, c.b)
+		got = bw.String()
 		if c.exp != got {
 			t.Fatalf(`want: %s, got: %s`, c.exp, got)
 		}
 
-		tw.Reset()
+		bw.Reset()
 	}
 }

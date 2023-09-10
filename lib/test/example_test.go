@@ -60,7 +60,7 @@ func ExampleAssert_struct() {
 	}}
 
 	var (
-		tw = test.TestWriter{}
+		tw = test.BufferWriter{}
 	)
 
 	for _, c := range cases {
@@ -77,7 +77,8 @@ func ExampleAssert_struct() {
 
 func ExampleAssert_string() {
 	var (
-		tw  = test.TestWriter{}
+		tw = test.BufferWriter{}
+
 		exp string
 		got string
 	)
@@ -87,8 +88,8 @@ func ExampleAssert_string() {
 	test.Assert(&tw, ``, exp, got)
 	fmt.Println(tw.String())
 
-	exp = `func (tw *TestWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }`
-	got = `func (tw *TestWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }`
+	exp = `func (tw *BufferWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }`
+	got = `func (tw *BufferWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }`
 	tw.Reset()
 	test.Assert(&tw, ``, exp, got)
 	fmt.Println(tw.String())
@@ -96,13 +97,14 @@ func ExampleAssert_string() {
 	// !!! Assert: expecting string(a string), got string(b string)
 	// !!! :
 	// --++
-	// 0 - func (tw *TestWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
-	// 0 + func (tw *TestWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
+	// 0 - func (tw *BufferWriter) Fatal(args ...any)                 { fmt.Fprint(tw, args...) }
+	// 0 + func (tw *BufferWriter) Fatalf(format string, args ...any) { fmt.Fprintf(tw, format, args...) }
 }
 
 func ExampleAssert_string2() {
 	var (
-		tw  = test.TestWriter{}
+		tw = test.BufferWriter{}
+
 		exp string
 		got string
 	)

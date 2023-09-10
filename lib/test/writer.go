@@ -4,8 +4,8 @@
 
 package test
 
-// Writer contains common methods between testing.T and testing.B, a subset of
-// testing.TB that cannot be used do private method.
+// Writer contains common methods between testing.T and testing.B, a subset
+// of testing.TB that cannot be used due to private methods.
 type Writer interface {
 	Error(args ...any)
 	Errorf(format string, args ...any)
