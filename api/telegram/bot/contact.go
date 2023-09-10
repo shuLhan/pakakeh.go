@@ -12,9 +12,9 @@ type Contact struct {
 	// Optional. Contact's last name.
 	LastName string `json:"last_name"`
 
-	// Optional. Contact's user identifier in Telegram
-	UserID int64 `json:"user_id"`
-
 	// Optional. Additional data about the contact in the form of a vCard
 	VCard string `json:"vcard"`
+
+	// Optional. Contact's user identifier in Telegram
+	UserID int64 `json:"user_id"`
 }

@@ -18,11 +18,11 @@ const (
 
 // response is the internal, generic response from API.
 type response struct {
-	Ok          bool                `json:"ok"`
+	Result      interface{}         `json:"result"`
+	Parameters  *responseParameters `json:"parameters"`
 	Description string              `json:"description"`
 	ErrorCode   int                 `json:"error_code"`
-	Parameters  *responseParameters `json:"parameters"`
-	Result      interface{}         `json:"result"`
+	Ok          bool                `json:"ok"`
 }
 
 // unpack the JSON response.

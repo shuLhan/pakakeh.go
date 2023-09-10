@@ -12,9 +12,9 @@ import (
 
 func TestMessage_parseCommandArgs(t *testing.T) {
 	cases := []struct {
-		msg        Message
 		expCommand string
 		expArgs    string
+		msg        Message
 	}{{
 		msg: Message{
 			Text: "Definisi /analisis",

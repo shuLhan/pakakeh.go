@@ -6,14 +6,23 @@ package bot
 
 // PreCheckoutQuery contains information about an incoming pre-checkout query.
 type PreCheckoutQuery struct {
-	// Unique query identifier.
-	ID string `json:"id"`
-
 	// User who sent the query.
 	From *User `json:"from"`
 
+	// Optional. Order info provided by the user.
+	OrderInfo *OrderInfo `json:"order_info"`
+
+	// Unique query identifier.
+	ID string `json:"id"`
+
 	// Three-letter ISO 4217 currency code.
 	Currency string `json:"currency"`
+
+	// Bot specified invoice payload.
+	InvoicePayload string `json:"invoice_payload"`
+
+	// Optional. Identifier of the shipping option chosen by the user.
+	ShippingOptionID string `json:"shipping_option_id"`
 
 	// Total price in the smallest units of the currency (integer, not
 	// float/double).
@@ -22,13 +31,4 @@ type PreCheckoutQuery struct {
 	// of digits past the decimal point for each currency (2 for the
 	// majority of currencies).
 	TotalAmount int `json:"total_amount"`
-
-	// Bot specified invoice payload.
-	InvoicePayload string `json:"invoice_payload"`
-
-	// Optional. Identifier of the shipping option chosen by the user.
-	ShippingOptionID string `json:"shipping_option_id"`
-
-	// Optional. Order info provided by the user.
-	OrderInfo *OrderInfo `json:"order_info"`
 }

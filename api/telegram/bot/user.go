@@ -6,9 +6,6 @@ package bot
 
 // User represents a Telegram user or bot.
 type User struct {
-	// Unique identifier for this user or bot
-	ID int `json:"id"`
-
 	// User‘s or bot’s first name.
 	FirstName string `json:"first_name"`
 
@@ -20,6 +17,9 @@ type User struct {
 
 	// Optional. IETF language tag of the user's language.
 	LanguageCode string `json:"language_code"`
+
+	// Unique identifier for this user or bot
+	ID int `json:"id"`
 
 	// True, if this user is a bot
 	IsBot bool `json:"is_bot"`

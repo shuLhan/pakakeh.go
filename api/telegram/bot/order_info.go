@@ -6,6 +6,9 @@ package bot
 
 // OrderInfo represents information about an order.
 type OrderInfo struct {
+	// Optional. User shipping address
+	ShippingAddress *ShippingAddress `json:"shipping_address"`
+
 	// Optional. User name
 	Name string `json:"name"`
 
@@ -14,7 +17,4 @@ type OrderInfo struct {
 
 	// Optional. User email
 	Email string `json:"email"`
-
-	// Optional. User shipping address
-	ShippingAddress *ShippingAddress `json:"shipping_address"`
 }

@@ -6,9 +6,6 @@ package bot
 
 // Venue represents a venue.
 type Venue struct {
-	// Venue location.
-	Location Location `json:"location"`
-
 	// Name of the venue.
 	Title string `json:"title"`
 
@@ -22,4 +19,7 @@ type Venue struct {
 	// “arts_entertainment/default”, “arts_entertainment/aquarium” or
 	// “food/icecream”).
 	FoursquareType string `json:"foursquare_type"`
+
+	// Venue location.
+	Location Location `json:"location"`
 }

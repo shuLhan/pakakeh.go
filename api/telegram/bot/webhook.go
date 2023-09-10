@@ -8,22 +8,23 @@ import "crypto/tls"
 
 // Webhook contains options to set Webhook to receive updates.
 type Webhook struct {
+	// Optional.  The certificate for Bot server when listening for
+	// Webhook.
+	ListenCertificate *tls.Certificate
+
 	// HTTPS url to send updates to.
 	// This option will be overridden by environment variable
 	// TELEGRAM_WEBHOOK_URL.
 	URL string
 
+	// Optional.  The address and port where the Bot will listen for
+	// Webhook in the following format "<address>:<port>".
+	// Default to ":80" if ListenCertificate is nil or ":443" if not nil.
+	ListenAddress string
+
 	// Optional. Upload your public key certificate so that the root
 	// certificate in use can be checked.
 	Certificate []byte
-
-	// Optional.
-	// Maximum allowed number of simultaneous HTTPS connections
-	// to the webhook for update delivery, 1-100.
-	// Defaults to 40.
-	// Use lower values to limit the load on your bot‘s server, and higher
-	// values to increase your bot’s throughput.
-	MaxConnections int
 
 	// Optional. A JSON-serialized list of the update types you want your
 	// bot to receive.
@@ -34,12 +35,11 @@ type Webhook struct {
 	// (default). If not specified, the previous setting will be used.
 	AllowedUpdates []string
 
-	// Optional.  The address and port where the Bot will listen for
-	// Webhook in the following format "<address>:<port>".
-	// Default to ":80" if ListenCertificate is nil or ":443" if not nil.
-	ListenAddress string
-
-	// Optional.  The certificate for Bot server when listening for
-	// Webhook.
-	ListenCertificate *tls.Certificate
+	// Optional.
+	// Maximum allowed number of simultaneous HTTPS connections
+	// to the webhook for update delivery, 1-100.
+	// Defaults to 40.
+	// Use lower values to limit the load on your bot‘s server, and higher
+	// values to increase your bot’s throughput.
+	MaxConnections int
 }

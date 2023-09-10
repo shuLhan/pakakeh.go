@@ -7,6 +7,9 @@ package bot
 // Document represents a general file (as opposed to photos, voice messages
 // and audio files).
 type Document struct {
+	// Optional. Document thumbnail as defined by sender.
+	Thumb *PhotoSize `json:"thumb"`
+
 	// Identifier for this file, which can be used to download or reuse
 	// the file.
 	FileID string `json:"file_id"`
@@ -24,7 +27,4 @@ type Document struct {
 
 	// Optional. File size.
 	FileSize int `json:"file_size"`
-
-	// Optional. Document thumbnail as defined by sender.
-	Thumb *PhotoSize `json:"thumb"`
 }

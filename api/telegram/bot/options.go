@@ -33,11 +33,6 @@ type UpdateHandler func(update Update)
 
 // Options to create new Bot.
 type Options struct {
-	// Required.  Your Bot authentication token.
-	// This option will be overridden by environment variable
-	// TELEGRAM_TOKEN.
-	Token string
-
 	// Required.  The function that will be called when Bot receiving
 	// Updates.
 	HandleUpdate UpdateHandler
@@ -45,6 +40,11 @@ type Options struct {
 	// Optional.  Set this options if the Bot want to receive updates
 	// using Webhook.
 	Webhook *Webhook
+
+	// Required.  Your Bot authentication token.
+	// This option will be overridden by environment variable
+	// TELEGRAM_TOKEN.
+	Token string
 }
 
 // init check for required fields and initialize empty fields with default

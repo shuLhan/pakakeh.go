@@ -97,8 +97,8 @@ type Bot struct {
 	client   *http.Client
 	webhook  *http.Server
 	user     *User
-	commands commands
 	err      chan error
+	commands commands
 }
 
 // New create and initialize new Telegram bot.

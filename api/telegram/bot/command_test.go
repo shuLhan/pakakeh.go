@@ -15,9 +15,9 @@ func TestCommand_validate(t *testing.T) {
 	s33 := string(ascii.Random([]byte(ascii.Letters), 33))
 
 	cases := []struct {
-		desc string
 		cmd  Command
 		exp  error
+		desc string
 	}{{
 		desc: "with empty command",
 		cmd:  Command{},

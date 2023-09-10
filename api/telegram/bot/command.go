@@ -10,17 +10,17 @@ import (
 
 // Command represents a bot command.
 type Command struct {
+	// Function that will be called when Bot receive the command.
+	// Handler can read command and its arguments through Message.Command
+	// and Message.CommandArgs.
+	Handler UpdateHandler `json:"-"`
+
 	// Text of the command, 1-32 characters. Can contain only lowercase
 	// English letters, digits and underscores.
 	Command string `json:"command"`
 
 	// Description of the command, 3-256 characters.
 	Description string `json:"description"`
-
-	// Function that will be called when Bot receive the command.
-	// Handler can read command and its arguments through Message.Command
-	// and Message.CommandArgs.
-	Handler UpdateHandler `json:"-"`
 }
 
 // validate will return an error if command is not valid.

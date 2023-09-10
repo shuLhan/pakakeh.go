@@ -25,23 +25,23 @@ const (
 // MessageEntity represents one special entity in a text message. For example,
 // hashtags, usernames, URLs, etc.
 type MessageEntity struct {
+	// Optional. For “text_mention” only, the mentioned user.
+	User *User `json:"user"`
+
 	// Type of the entity.
 	Type string `json:"type"`
+
+	// Optional. For “text_link” only, url that will be opened after user
+	// taps on the text.
+	URL string `json:"url"`
+
+	// Optional. For “pre” only, the programming language of the entity
+	// text.
+	Language string `json:"language"`
 
 	// Offset in UTF-16 code units to the start of the entity.
 	Offset int `json:"offset"`
 
 	// Length of the entity in UTF-16 code units.
 	Length int `json:"length"`
-
-	// Optional. For “text_link” only, url that will be opened after user
-	// taps on the text.
-	URL string `json:"url"`
-
-	// Optional. For “text_mention” only, the mentioned user.
-	User *User `json:"user"`
-
-	// Optional. For “pre” only, the programming language of the entity
-	// text.
-	Language string `json:"language"`
 }
