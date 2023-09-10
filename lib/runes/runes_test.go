@@ -44,10 +44,10 @@ func TestEncloseRemove(t *testing.T) {
 	line := []rune(`// Copyright 2016-2018 "Shulhan <ms@kilabit.info>". All rights reserved.`)
 
 	cases := []struct {
+		exp      string
 		line     []rune
 		leftcap  []rune
 		rightcap []rune
-		exp      string
 	}{{
 		line:     line,
 		leftcap:  []rune("<"),
