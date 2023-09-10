@@ -264,25 +264,21 @@ const (
 )
 
 var (
+	// ErrClientDownloadNoOutput define an error when Client's
+	// DownloadRequest does not define the Output.
 	ErrClientDownloadNoOutput = errors.New("invalid or empty client download output")
 
-	//
 	// ErrEndpointAmbiguous define an error when registering path that
 	// already exist.  For example, after registering "/:x", registering
 	// "/:y" or "/z" on the same HTTP method will result in ambiguous.
-	//
 	ErrEndpointAmbiguous = errors.New("ambigous endpoint")
 
-	//
 	// ErrEndpointKeyDuplicate define an error when registering path with
 	// the same keys, for example "/:x/:x".
-	//
 	ErrEndpointKeyDuplicate = errors.New("duplicate key in route")
 
-	//
 	// ErrEndpointKeyEmpty define an error when path contains an empty
 	// key, for example "/:/y".
-	//
 	ErrEndpointKeyEmpty = errors.New("empty route's key")
 )
 

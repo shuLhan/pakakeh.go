@@ -8,6 +8,7 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
+// RangePosition contains the parsed value of Content-Range header.
 type RangePosition struct {
 	unit string
 
