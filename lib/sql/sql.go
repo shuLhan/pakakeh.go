@@ -6,9 +6,12 @@
 // provide common functionality across DBMS.
 package sql
 
+// List of known driver name for database connection.
 const (
 	DriverNameMysql    = "mysql"
 	DriverNamePostgres = "postgres"
-
-	DefaultPlaceHolder = "?"
 )
+
+// DefaultPlaceHolder define default placeholder for DML, which is
+// placeholder for MySQL.
+const DefaultPlaceHolder = "?"
