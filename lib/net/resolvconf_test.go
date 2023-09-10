@@ -58,10 +58,10 @@ func TestResolvConf_Init(t *testing.T) {
 	veryLongName := string(ascii.Random([]byte(ascii.Letters), 255))
 
 	cases := []struct {
+		exp            *ResolvConf
 		desc           string
 		src            string
 		envLocaldomain string
-		exp            *ResolvConf
 	}{{
 		desc: "Duplicate domain",
 		src: `

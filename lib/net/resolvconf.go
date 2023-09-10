@@ -30,6 +30,9 @@ var (
 //
 // Reference: "man resolv.conf" in Linux.
 type ResolvConf struct {
+	// OptMisc contains other options with string key and boolean value.
+	OptMisc map[string]bool
+
 	// Local domain name.
 	// Most queries for names within this domain can use short names
 	// relative to the local domain.  If set to '.', the root domain
@@ -94,9 +97,6 @@ type ResolvConf struct {
 	// application.  The default is 2. The value for this option is
 	// silently capped to 5.
 	Attempts int
-
-	// OptMisc contains other options with string key and boolean value.
-	OptMisc map[string]bool
 }
 
 // NewResolvConf open resolv.conf file in path and return the parsed records.
