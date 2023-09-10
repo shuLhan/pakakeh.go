@@ -27,6 +27,7 @@ import (
 	"sync"
 )
 
+// Clise define the circular slice implementation.
 type Clise struct {
 	v    []interface{}
 	size int

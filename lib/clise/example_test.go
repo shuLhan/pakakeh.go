@@ -11,8 +11,8 @@ import (
 
 func ExampleClise_MarshalJSON() {
 	type T struct {
-		Int    int
 		String string
+		Int    int
 	}
 
 	var (
@@ -38,7 +38,7 @@ func ExampleClise_MarshalJSON() {
 		fmt.Println(string(bjson))
 	}
 
-	c.Push(&T{1, "Hello"}, &T{2, "world"})
+	c.Push(&T{Int: 1, String: `Hello`}, &T{Int: 2, String: `world`})
 	bjson, err = json.Marshal(c)
 	if err != nil {
 		fmt.Println(err)
@@ -49,7 +49,7 @@ func ExampleClise_MarshalJSON() {
 	//Output:
 	//[2,3,4]
 	//["Hello","Clise","MarshalJSON"]
-	//["MarshalJSON",{"Int":1,"String":"Hello"},{"Int":2,"String":"world"}]
+	//["MarshalJSON",{"String":"Hello","Int":1},{"String":"world","Int":2}]
 }
 
 func ExampleClise_UnmarshalJSON() {
