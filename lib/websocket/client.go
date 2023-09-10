@@ -275,7 +275,7 @@ func (cl *Client) Connect() (err error) {
 }
 
 // dummyHandle define dummy handle for HandleText and HandleBin.
-func dummyHandle(cl *Client, frame *Frame) error {
+func dummyHandle(_ *Client, _ *Frame) error {
 	return nil
 }
 

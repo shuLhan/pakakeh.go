@@ -27,7 +27,7 @@ func TestRequestReset(t *testing.T) {
 	test.Assert(t, "Request.Query", url.Values{}, req.Query)
 }
 
-func testHandleGet(ctx context.Context, req *Request) (res Response) {
+func testHandleGet(_ context.Context, _ *Request) (res Response) {
 	return
 }
 

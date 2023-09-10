@@ -539,9 +539,9 @@ out:
 	_resPool.Put(res)
 }
 
-// handleBin message from client.  This is the dummy handler, that can be
-// overwritten by implementer.
-func (serv *Server) handleBin(conn int, payload []byte) {}
+// handleBin message from client.
+// This is the dummy handler, that can be overwritten by implementer.
+func (serv *Server) handleBin(_ int, _ []byte) {}
 
 func (serv *Server) handleStatus(conn int) {
 	var (
