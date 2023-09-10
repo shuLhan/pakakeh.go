@@ -1,3 +1,5 @@
+// Command bcrypt implements command-line interface to generate and compare
+// bcrypt hash.
 package main
 
 import (
