@@ -39,14 +39,14 @@ const (
 	cmdChatbot = `chatbot`
 )
 
-type ChatClient struct {
+type chatClient struct {
 	user *examples.Account
 	conn *websocket.Client
 }
 
-// NewChatClient create new WebSocket client using specific user's account.
-func NewChatClient(user *examples.Account) (cc *ChatClient) {
-	cc = &ChatClient{
+// newChatClient create new WebSocket client using specific user's account.
+func newChatClient(user *examples.Account) (cc *chatClient) {
+	cc = &chatClient{
 		user: user,
 		conn: &websocket.Client{
 			Endpoint: `ws://127.0.0.1:9101`,
@@ -73,7 +73,7 @@ func NewChatClient(user *examples.Account) (cc *ChatClient) {
 }
 
 // Start the chat client.
-func (cc *ChatClient) Start() {
+func (cc *chatClient) Start() {
 	var (
 		req = &websocket.Request{
 			Method: http.MethodPost,
@@ -110,7 +110,7 @@ func (cc *ChatClient) Start() {
 }
 
 // handleText process response from request or broadcast from server.
-func (cc *ChatClient) handleText(cl *websocket.Client, frame *websocket.Frame) (err error) {
+func (cc *chatClient) handleText(_ *websocket.Client, frame *websocket.Frame) (err error) {
 	var (
 		res = &websocket.Response{}
 	)
@@ -170,7 +170,7 @@ func main() {
 func doChat(userIDStr string) {
 	var (
 		user *examples.Account
-		cc   *ChatClient
+		cc   *chatClient
 		err  error
 		uid  int
 		ok   bool
@@ -186,7 +186,7 @@ func doChat(userIDStr string) {
 		log.Fatalf("invalid user id: %d", uid)
 	}
 
-	cc = NewChatClient(user)
+	cc = newChatClient(user)
 
 	cc.Start()
 }
@@ -223,7 +223,7 @@ func runChatbot(wg *sync.WaitGroup, user *examples.Account, n int64) {
 		x      int64
 	)
 
-	var cc = NewChatClient(user)
+	var cc = newChatClient(user)
 
 	for ; x < n; x++ {
 		req.ID = uint64(time.Now().UnixNano())
