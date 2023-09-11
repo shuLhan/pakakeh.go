@@ -61,6 +61,20 @@ func (e *E) As(target interface{}) bool {
 	return false
 }
 
+// Is return true if the target error is instance of *E and the value of
+// field Code and Name match with values in e.
+func (e *E) Is(target error) bool {
+	var (
+		etarget *E
+		ok      bool
+	)
+	etarget, ok = target.(*E)
+	if !ok {
+		return false
+	}
+	return e.Code == etarget.Code && e.Name == etarget.Name
+}
+
 // Unwrap return the internal error.
 func (e *E) Unwrap() error {
 	return e.err
