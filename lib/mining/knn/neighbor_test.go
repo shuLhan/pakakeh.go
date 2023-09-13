@@ -5,10 +5,10 @@
 package knn
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"sort"
 	"testing"
-	"time"
 
 	"github.com/shuLhan/share/lib/tabula"
 	"github.com/shuLhan/share/lib/test"
@@ -55,12 +55,22 @@ func createNeigboursByIdx(indices []int) (neighbors Neighbors) {
 }
 
 func TestContain(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
-
 	neighbors := createNeigbours()
 
 	// pick random sample from neighbors
-	pickIdx := rand.Intn(neighbors.Len())
+	var (
+		randMax = big.NewInt(int64(neighbors.Len()))
+		randv   *big.Int
+		err     error
+	)
+
+	randv, err = rand.Int(rand.Reader, randMax)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var pickIdx = int(randv.Int64())
+
 	randSample := neighbors.Row(pickIdx).Clone()
 
 	isin, idx := neighbors.Contain(randSample)
