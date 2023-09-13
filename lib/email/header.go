@@ -162,6 +162,16 @@ func (hdr *Header) Filter(ft FieldType) (fields []*Field) {
 	return
 }
 
+// ID return the Message-ID or empty if not exist.
+func (hdr *Header) ID() string {
+	for x := len(hdr.fields) - 1; x >= 0; x-- {
+		if hdr.fields[x].Type == FieldTypeMessageID {
+			return hdr.fields[x].oriValue
+		}
+	}
+	return ``
+}
+
 // PushTop put the field at the top of header.
 func (hdr *Header) PushTop(f *Field) {
 	hdr.fields = append([]*Field{f}, hdr.fields...)
