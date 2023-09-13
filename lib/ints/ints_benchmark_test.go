@@ -5,18 +5,28 @@
 package ints
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"log"
+	"math"
+	"math/big"
 	"sort"
 	"testing"
-	"time"
 )
 
 const n = 10000
 
 func generateRandomInts(data []int) {
-	rand.Seed(time.Now().Unix())
+	var (
+		max   = big.NewInt(math.MaxInt)
+		randv *big.Int
+		err   error
+	)
 	for x := 0; x < n; x++ {
-		data[x] = rand.Intn(n)
+		randv, err = rand.Int(rand.Reader, max)
+		if err != nil {
+			log.Fatalf(`generateRandomInts: %s`, err)
+		}
+		data[x] = int(randv.Int64())
 	}
 }
 
