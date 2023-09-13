@@ -5,9 +5,10 @@
 package tabula
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
-	"time"
+	"log"
+	"math/big"
 )
 
 // Rows represent slice of Row.
@@ -108,7 +109,14 @@ func (rows *Rows) RandomPick(n int, duplicate bool) (
 	pickedIdx []int,
 	unpickedIdx []int,
 ) {
-	rowsLen := len(*rows)
+	var (
+		logp    = `RandomPick`
+		randMax = big.NewInt(int64(len(*rows)))
+		rowsLen = len(*rows)
+
+		randv *big.Int
+		err   error
+	)
 
 	// if duplication is not allowed, we can only select as many as rows
 	// that we have.
@@ -116,12 +124,15 @@ func (rows *Rows) RandomPick(n int, duplicate bool) (
 		n = rowsLen
 	}
 
-	rand.Seed(time.Now().UnixNano())
-
 	for ; n >= 1; n-- {
 		idx := 0
 		for {
-			idx = rand.Intn(len(*rows))
+			randv, err = rand.Int(rand.Reader, randMax)
+			if err != nil {
+				log.Panicf(`%s: %s`, logp, err)
+			}
+
+			idx = int(randv.Int64())
 
 			if duplicate {
 				// allow duplicate idx
