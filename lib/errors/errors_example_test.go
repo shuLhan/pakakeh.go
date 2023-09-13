@@ -9,7 +9,7 @@ import (
 	liberrors "github.com/shuLhan/share/lib/errors"
 )
 
-func ExampleErrors_Is() {
+func ExampleE_Is() {
 	var (
 		errFileNotFound = &liberrors.E{
 			Code:    400,
