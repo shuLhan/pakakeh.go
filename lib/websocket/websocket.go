@@ -6,7 +6,6 @@ package websocket
 
 import (
 	"bytes"
-	"math/rand"
 	"sync"
 	"time"
 )
@@ -34,7 +33,3 @@ var (
 		},
 	}
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}

@@ -5,9 +5,11 @@
 package websocket
 
 import (
+	"crypto/rand"
 	"encoding/binary"
+	"log"
 	"math"
-	"math/rand"
+	"math/big"
 )
 
 // Frame represent a WebSocket data protocol.
@@ -268,8 +270,20 @@ func (f *Frame) pack() (out []byte) {
 
 	if f.masked == frameIsMasked {
 		if len(f.maskKey) != 4 {
+			var (
+				randMax = big.NewInt(math.MaxUint32)
+
+				randv *big.Int
+				err   error
+			)
+
+			randv, err = rand.Int(rand.Reader, randMax)
+			if err != nil {
+				log.Panicf(`websocket: Frame.pack: %s`, err)
+			}
+
 			f.maskKey = make([]byte, 4)
-			binary.LittleEndian.PutUint32(f.maskKey, rand.Uint32())
+			binary.LittleEndian.PutUint32(f.maskKey, uint32(randv.Int64()))
 		}
 
 		out[x] = f.maskKey[0]

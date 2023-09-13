@@ -5,11 +5,11 @@
 package websocket
 
 import (
+	"crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
-	"encoding/binary"
 	"fmt"
-	"math/rand"
+	"log"
 	"os"
 	"syscall"
 	"time"
@@ -150,13 +150,19 @@ func generateHandshakeAccept(key []byte) string {
 // generateHandshakeKey randomly selected 16-byte value that has been
 // base64-encoded (see Section 4 of [RFC4648]).
 func generateHandshakeKey() (key []byte) {
-	var bkey []byte = make([]byte, 16)
+	var (
+		bkey = make([]byte, 16)
 
-	binary.LittleEndian.PutUint64(bkey[0:8], rand.Uint64())
-	binary.LittleEndian.PutUint64(bkey[8:16], rand.Uint64())
+		err error
+	)
+
+	_, err = rand.Read(bkey)
+	if err != nil {
+		log.Panicf(`generateHandshakeKey: %s`, err)
+	}
 
 	key = make([]byte, base64.StdEncoding.EncodedLen(len(bkey)))
 	base64.StdEncoding.Encode(key, bkey)
 
-	return
+	return key
 }
