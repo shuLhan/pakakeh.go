@@ -528,10 +528,16 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 
 // generateFormData generate multipart/form-data body from params.
 func generateFormData(params map[string][]byte) (contentType, body string, err error) {
-	sb := new(strings.Builder)
-	w := multipart.NewWriter(sb)
-	for k, v := range params {
-		part, err := w.CreateFormField(k)
+	var (
+		sb = new(strings.Builder)
+		w  = multipart.NewWriter(sb)
+
+		part io.Writer
+		k    string
+		v    []byte
+	)
+	for k, v = range params {
+		part, err = w.CreateFormField(k)
 		if err != nil {
 			return "", "", err
 		}

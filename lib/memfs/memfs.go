@@ -179,7 +179,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 
 	for _, p := range paths {
 		path = filepath.Join(path, p)
-		node, _ := mfs.Get(path)
+		node, _ = mfs.Get(path)
 		if node != nil {
 			parent = node
 			continue

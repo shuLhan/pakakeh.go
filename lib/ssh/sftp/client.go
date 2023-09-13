@@ -180,8 +180,9 @@ func (cl *Client) Get(remoteFile, localFile string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
+	var data []byte
 	for {
-		data, err := cl.Read(fin, offset)
+		data, err = cl.Read(fin, offset)
 		if len(data) > 0 {
 			_, err = fout.Write(data)
 			if err != nil {

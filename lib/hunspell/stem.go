@@ -189,13 +189,16 @@ func (stem *Stem) unpackFlags(opts *affixOptions) (
 	derivatives []*Stem, err error,
 ) {
 	if len(opts.afAliases) > 1 {
-		afIdx, err := strconv.Atoi(stem.rawFlags)
+		var afIdx int
+		afIdx, err = strconv.Atoi(stem.rawFlags)
 		if err == nil {
 			stem.rawFlags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(opts.flag, stem.rawFlags)
+	var flags []string
+
+	flags, err = unpackFlags(opts.flag, stem.rawFlags)
 	if err != nil {
 		return nil, err
 	}
@@ -203,10 +206,16 @@ func (stem *Stem) unpackFlags(opts *affixOptions) (
 		return nil, nil
 	}
 
-	for _, flag := range flags {
-		pfx, ok := opts.prefixes[flag]
+	var (
+		flag string
+		pfx  *affix
+		sfx  *affix
+		ok   bool
+	)
+	for _, flag = range flags {
+		pfx, ok = opts.prefixes[flag]
 		if ok {
-			stems := pfx.apply(stem)
+			var stems = pfx.apply(stem)
 			derivatives = append(derivatives, stems...)
 			if pfx.isCrossProduct {
 				stems = stem.applySuffixes(opts, flags, stems)
@@ -214,9 +223,9 @@ func (stem *Stem) unpackFlags(opts *affixOptions) (
 			}
 			continue
 		}
-		sfx, ok := opts.suffixes[flag]
+		sfx, ok = opts.suffixes[flag]
 		if ok {
-			stems := sfx.apply(stem)
+			var stems = sfx.apply(stem)
 			derivatives = append(derivatives, stems...)
 			continue
 		}

@@ -198,7 +198,6 @@ func (in *Ini) marshalStruct(
 				mapKey    reflect.Value
 				mapValue  reflect.Value
 				valueType reflect.Type
-				key       string
 			)
 			// Collect all the map keys and sort it to make the
 			// output consistent.

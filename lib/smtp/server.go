@@ -335,13 +335,14 @@ func (srv *Server) handleAUTH(recv *receiver, cmd *Command) (err error) {
 			}
 		}
 
-		param, err := base64.StdEncoding.DecodeString(cmd.Param)
+		var param []byte
+		param, err = base64.StdEncoding.DecodeString(cmd.Param)
 		if err != nil {
 			_ = recv.sendError(errCmdSyntaxError)
 			return err
 		}
 
-		args := bytes.Split(param, []byte{'\x00'})
+		var args = bytes.Split(param, []byte{'\x00'})
 		if len(args) != 3 {
 			return recv.sendError(errCmdSyntaxError)
 		}

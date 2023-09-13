@@ -711,7 +711,8 @@ func (opts *affixOptions) parseBreak(arg string) (err error) {
 
 func (opts *affixOptions) parseCompoundRule(arg string) (err error) {
 	if cap(opts.compoundRules) == 0 {
-		n, err := strconv.Atoi(arg)
+		var n int
+		n, err = strconv.Atoi(arg)
 		if err != nil {
 			return fmt.Errorf("COMPOUNDRULE: invalid argument %q: %s", arg, err.Error())
 		}
@@ -721,7 +722,7 @@ func (opts *affixOptions) parseCompoundRule(arg string) (err error) {
 		return nil
 	}
 
-	cr := compoundRule{}
+	var cr = compoundRule{}
 
 	cr.pattern, err = regexp.Compile(arg)
 	if err != nil {
@@ -735,7 +736,8 @@ func (opts *affixOptions) parseCompoundRule(arg string) (err error) {
 
 func (opts *affixOptions) parseCheckCompoundPattern(args []string) (err error) {
 	if cap(opts.compoundPatterns) == 0 {
-		n, err := strconv.Atoi(args[0])
+		var n int
+		n, err = strconv.Atoi(args[0])
 		if err != nil {
 			return fmt.Errorf("CHECKCOMPOUNDPATTERN: invalid argument %q: %s", args[0], err.Error())
 		}
@@ -749,9 +751,10 @@ func (opts *affixOptions) parseCheckCompoundPattern(args []string) (err error) {
 		return fmt.Errorf("CHECKCOMPOUNDPATTERN: invalid argument %q", args)
 	}
 
-	cp := compoundPattern{}
-
-	ss := strings.Split(args[0], "/")
+	var (
+		cp = compoundPattern{}
+		ss = strings.Split(args[0], "/")
+	)
 	if len(ss) >= 1 {
 		cp.end = ss[0]
 	}
@@ -816,9 +819,10 @@ func (opts *affixOptions) parsePfx(args []string) (err error) {
 	pfx, ok := opts.prefixes[flag]
 	if !ok {
 		// Parse the first line of prefix.
-		isCrossProduct := (strings.ToLower(args[1]) == "y")
+		var isCrossProduct = (strings.ToLower(args[1]) == "y")
 
-		n, err := strconv.Atoi(args[2])
+		var n int
+		n, err = strconv.Atoi(args[2])
 		if err != nil {
 			return fmt.Errorf("PFX: invalid number %q", args[2])
 		}
@@ -827,11 +831,12 @@ func (opts *affixOptions) parsePfx(args []string) (err error) {
 	} else {
 		// Parse the prefix rule.
 		var (
+			stripping = args[1]
+			prefix    = args[2]
+
 			condition string
 			morphemes []string
 		)
-		stripping := args[1]
-		prefix := args[2]
 		if len(args) >= 4 {
 			condition = args[3]
 		}
@@ -858,9 +863,10 @@ func (opts *affixOptions) parseSfx(args []string) (err error) {
 
 	sfx, ok := opts.suffixes[flag]
 	if !ok {
-		isCrossProduct := (strings.ToLower(args[1]) == "y")
+		var isCrossProduct = (strings.ToLower(args[1]) == "y")
 
-		n, err := strconv.Atoi(args[2])
+		var n int
+		n, err = strconv.Atoi(args[2])
 		if err != nil {
 			return fmt.Errorf("SFX: invalid number %q", args[2])
 		}

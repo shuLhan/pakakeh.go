@@ -150,26 +150,33 @@ func Environments() (envs map[string]string) {
 // it will return false.
 func IsBinary(file string) bool {
 	var (
+		f         *os.File
+		err       error
 		total     int
 		printable int
 	)
 
-	f, err := os.Open(file)
+	f, err = os.Open(file)
 	if err != nil {
 		return false
 	}
 
-	content := make([]byte, 768)
+	var (
+		content = make([]byte, 768)
+
+		n int
+		x int
+	)
 
 	for total < 512 {
-		n, err := f.Read(content)
+		n, err = f.Read(content)
 		if err != nil {
 			break
 		}
 
 		content = content[:n]
 
-		for x := 0; x < len(content); x++ {
+		for x = 0; x < len(content); x++ {
 			if ascii.IsSpace(content[x]) {
 				continue
 			}
@@ -185,7 +192,7 @@ func IsBinary(file string) bool {
 		return false
 	}
 
-	ratio := float64(printable) / float64(total)
+	var ratio = float64(printable) / float64(total)
 
 	return ratio <= float64(0.75)
 }

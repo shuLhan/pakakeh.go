@@ -179,10 +179,15 @@ func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
 		return 0, err
 	}
 
-	dict := make(map[string]string, 1024)
+	var (
+		dict = make(map[string]string, 1024)
 
-	for x := 0; x < len(inFiles); x++ {
-		lines, err := libstrings.LinesOfFile(inFiles[x])
+		lines []string
+		x     int
+	)
+
+	for x = 0; x < len(inFiles); x++ {
+		lines, err = libstrings.LinesOfFile(inFiles[x])
 		if err != nil {
 			return 0, err
 		}

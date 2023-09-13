@@ -32,18 +32,20 @@ const (
 
 // ReadLines return lines in the file `f`.
 func ReadLines(f string) (lines text.Lines, e error) {
-	fd, e := os.Open(f)
+	var fd *os.File
 
+	fd, e = os.Open(f)
 	if e != nil {
 		return
 	}
 
-	reader := bufio.NewReader(fd)
-
-	n := 1
+	var (
+		reader = bufio.NewReader(fd)
+		n      = 1
+		line   []byte
+	)
 	for {
-		line, e := reader.ReadBytes(DefDelimiter)
-
+		line, e = reader.ReadBytes(DefDelimiter)
 		if e != nil {
 			if e == io.EOF {
 				break

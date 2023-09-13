@@ -116,17 +116,18 @@ func newAffixRule(opts *affixOptions, isPrefix bool,
 }
 
 // unpackFlags apply each of flag rule to the "root" string.
-func (rule *affixRule) unpackFlags(
-	opts *affixOptions, affixes map[string]*affix,
-) (err error) {
+func (rule *affixRule) unpackFlags(opts *affixOptions, affixes map[string]*affix) (err error) {
 	if len(opts.afAliases) > 1 {
-		afIdx, err := strconv.Atoi(rule.rawFlags)
+		var afIdx int
+		afIdx, err = strconv.Atoi(rule.rawFlags)
 		if err == nil {
 			rule.rawFlags = opts.afAliases[afIdx]
 		}
 	}
 
-	flags, err := unpackFlags(opts.flag, rule.rawFlags)
+	var flags []string
+
+	flags, err = unpackFlags(opts.flag, rule.rawFlags)
 	if err != nil {
 		return err
 	}

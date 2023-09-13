@@ -16,28 +16,34 @@ func ExampleServer_customHTTPStatusCode() {
 	type CustomResponse struct {
 		Status int `json:"status"`
 	}
-	exp := CustomResponse{
-		Status: http.StatusBadRequest,
-	}
 
-	opts := &ServerOptions{
-		Address: "127.0.0.1:8123",
-	}
+	var (
+		exp = CustomResponse{
+			Status: http.StatusBadRequest,
+		}
 
-	testServer, err := NewServer(opts)
+		opts = &ServerOptions{
+			Address: "127.0.0.1:8123",
+		}
+
+		srv *Server
+		err error
+	)
+
+	srv, err = NewServer(opts)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	go func() {
-		err = testServer.Start()
+		err = srv.Start()
 		if err != nil {
 			log.Println(err)
 		}
 	}()
 
 	defer func() {
-		_ = testServer.Stop(5 * time.Second)
+		_ = srv.Stop(5 * time.Second)
 	}()
 
 	epCustom := &Endpoint{
@@ -52,7 +58,7 @@ func ExampleServer_customHTTPStatusCode() {
 		},
 	}
 
-	err = testServer.registerPost(epCustom)
+	err = srv.registerPost(epCustom)
 	if err != nil {
 		log.Fatal(err)
 	}

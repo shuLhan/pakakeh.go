@@ -78,9 +78,9 @@ func TestMain(m *testing.M) {
 	registerEndpoints()
 
 	go func() {
-		err := testServer.Start()
-		if err != nil {
-			log.Fatal(err)
+		var errStart = testServer.Start()
+		if errStart != nil {
+			log.Fatal(errStart)
 		}
 	}()
 

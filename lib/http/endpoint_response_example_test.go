@@ -60,9 +60,9 @@ func ExampleEndpointResponse() {
 	}
 
 	go func() {
-		err := server.Start()
-		if err != nil {
-			log.Fatal(err)
+		var errStart = server.Start()
+		if errStart != nil {
+			log.Fatal(errStart)
 		}
 	}()
 	time.Sleep(1 * time.Second)

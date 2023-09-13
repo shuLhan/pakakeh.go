@@ -332,7 +332,8 @@ func xmlParseValue(dec *xml.Decoder, closeTag string) (param *Value, err error) 
 			return nil, fmt.Errorf("invalid double value %s: %w", cdata, err)
 		}
 	case Integer:
-		i64, err := strconv.ParseInt(cdata, 10, 32)
+		var i64 int64
+		i64, err = strconv.ParseInt(cdata, 10, 32)
 		if err != nil {
 			return nil, fmt.Errorf("invalid integer value %s: %w", cdata, err)
 		}
@@ -396,8 +397,9 @@ func xmlParseArray(dec *xml.Decoder) (arr *Value, err error) {
 		return nil, err
 	}
 
+	var v *Value
 	for {
-		v, err := xmlParseValue(dec, elNameData)
+		v, err = xmlParseValue(dec, elNameData)
 		if err != nil {
 			return nil, err
 		}

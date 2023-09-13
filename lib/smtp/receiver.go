@@ -115,9 +115,10 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 
 	cmd = newCommand()
 
+	var n int
 	for {
 		recv.data = recv.data[0:]
-		n, err := recv.conn.Read(recv.data)
+		n, err = recv.conn.Read(recv.data)
 		if n > 0 {
 			_, _ = recv.buff.Write(recv.data[:n])
 		}
@@ -145,9 +146,10 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 
 // readDATA start mail input.
 func (recv *receiver) readDATA() (err error) {
+	var n int
 	for {
 		recv.data = recv.data[0:]
-		n, err := recv.conn.Read(recv.data)
+		n, err = recv.conn.Read(recv.data)
 		if err != nil {
 			return err
 		}
@@ -159,7 +161,7 @@ func (recv *receiver) readDATA() (err error) {
 		}
 	}
 
-	l := len(recv.mail.Data)
+	var l = len(recv.mail.Data)
 
 	// Remove the end-of-mail data indicator.
 	recv.mail.Data = recv.mail.Data[:l-5]

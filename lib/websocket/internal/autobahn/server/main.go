@@ -52,7 +52,6 @@ func main() {
 			var (
 				timeStart        = time.Now()
 				packet    []byte = websocket.NewFrameBin(false, payload)
-				err       error
 			)
 
 			err = websocket.Send(conn, packet, timeout)
@@ -70,7 +69,6 @@ func main() {
 			var (
 				timeStart        = time.Now()
 				packet    []byte = websocket.NewFrameText(false, payload)
-				err       error
 			)
 
 			err = websocket.Send(conn, packet, timeout)

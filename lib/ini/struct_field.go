@@ -71,10 +71,15 @@ func (sfield *structField) set(val string) bool {
 }
 
 func (sfield *structField) append(val string) (slice reflect.Value, ok bool) {
-	ftype := sfield.ftype.Elem()
+	var (
+		ftype = sfield.ftype.Elem()
+
+		rval reflect.Value
+	)
+
 	slice = sfield.fval
 
-	rval, ok := unmarshalValue(ftype, val)
+	rval, ok = unmarshalValue(ftype, val)
 	if ok {
 		slice = reflect.Append(slice, rval)
 		return slice, true
@@ -83,7 +88,7 @@ func (sfield *structField) append(val string) (slice reflect.Value, ok bool) {
 	switch ftype.Kind() {
 	case reflect.Struct:
 		vi := reflect.Zero(ftype).Interface()
-		_, ok := vi.(time.Time)
+		_, ok = vi.(time.Time)
 		if ok {
 			t, err := time.Parse(sfield.layout, val)
 			if err != nil {

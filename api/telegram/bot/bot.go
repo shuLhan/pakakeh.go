@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	stdhttp "net/http"
+	"path"
 	"strconv"
 
 	"github.com/shuLhan/share/lib/errors"
@@ -292,39 +293,44 @@ func (bot *Bot) Stop() (err error) {
 }
 
 func (bot *Bot) setWebhook() (err error) {
-	params := make(map[string][]byte)
-
-	webhookURL := bot.opts.Webhook.URL + "/" + bot.opts.Token
+	var (
+		logp       = `setWebhook`
+		params     = make(map[string][]byte)
+		webhookURL = path.Join(bot.opts.Webhook.URL, bot.opts.Token)
+	)
 
 	params[paramNameURL] = []byte(webhookURL)
 	if len(bot.opts.Webhook.Certificate) > 0 {
 		params[paramNameCertificate] = bot.opts.Webhook.Certificate
 	}
 	if bot.opts.Webhook.MaxConnections > 0 {
-		str := strconv.Itoa(bot.opts.Webhook.MaxConnections)
+		var str = strconv.Itoa(bot.opts.Webhook.MaxConnections)
 		params[paramNameMaxConnections] = []byte(str)
 	}
 	if len(bot.opts.Webhook.AllowedUpdates) > 0 {
-		allowedUpdates, err := json.Marshal(&bot.opts.Webhook.AllowedUpdates)
+		var allowedUpdates []byte
+		allowedUpdates, err = json.Marshal(&bot.opts.Webhook.AllowedUpdates)
 		if err != nil {
-			return fmt.Errorf("setWebhook: %w", err)
+			return fmt.Errorf(`%s: %w`, logp, err)
 		}
 		params[paramNameAllowedUpdates] = allowedUpdates
 	}
 
-	_, resBody, err := bot.client.PostFormData(methodSetWebhook, nil, params)
+	var resBody []byte
+
+	_, resBody, err = bot.client.PostFormData(methodSetWebhook, nil, params)
 	if err != nil {
-		return fmt.Errorf("setWebhook: %w", err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	res := &response{}
+	var res = &response{}
 
 	err = json.Unmarshal(resBody, res)
 	if err != nil {
-		return fmt.Errorf("setWebhook: %w", err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	fmt.Printf("setWebhook: response: %+v\n", res)
+	fmt.Printf("%s: response: %+v\n", logp, res)
 
 	return nil
 }

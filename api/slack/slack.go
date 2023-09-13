@@ -16,21 +16,27 @@ import (
 
 // PostWebhook send a message using "Incoming Webhook".
 func PostWebhook(webhookUrl string, msg *Message) (err error) {
-	var logp = `PostWebhook`
+	var (
+		logp = `PostWebhook`
 
-	payload, err := json.Marshal(&msg)
+		payload []byte
+	)
+
+	payload, err = json.Marshal(&msg)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	res, err := http.DefaultClient.Post(webhookUrl, "application/json",
-		bytes.NewReader(payload))
+	var res *http.Response
+
+	res, err = http.DefaultClient.Post(webhookUrl, `application/json`, bytes.NewReader(payload))
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		resBody, err := io.ReadAll(res.Body)
+		var resBody []byte
+		resBody, err = io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf(`%s: %w`, logp, err)
 		}

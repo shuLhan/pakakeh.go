@@ -449,8 +449,9 @@ func getUnicastAddress() (saddr string) {
 func (cl *Client) recv() (res *Response, err error) {
 	cl.buf.Reset()
 
+	var n int
 	for {
-		n, err := cl.conn.Read(cl.data)
+		n, err = cl.conn.Read(cl.data)
 		if n > 0 {
 			_, err = cl.buf.Write(cl.data[:n])
 			if err != nil {

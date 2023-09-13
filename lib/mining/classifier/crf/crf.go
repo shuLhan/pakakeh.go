@@ -383,12 +383,12 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 			votes := forest.Votes(row, -1)
 
 			// (1.1.2)
-			probs := libstrings.FrequencyOfTokens(votes, vs, false)
+			var votesProbs = libstrings.FrequencyOfTokens(votes, vs, false)
 
 			// (1.1.3)
-			for z := range probs {
-				stageSumProbs[z] += probs[z]
-				stageProbs[z] += probs[z] * crf.weights[y]
+			for z := range votesProbs {
+				stageSumProbs[z] += votesProbs[z]
+				stageProbs[z] += votesProbs[z] * crf.weights[y]
 			}
 		}
 
@@ -405,8 +405,7 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 			predicts = append(predicts, vs[maxi])
 		}
 
-		probs = append(probs, stageSumProbs[0]/
-			float64(len(crf.forests)))
+		probs = append(probs, stageSumProbs[0]/float64(len(crf.forests)))
 	}
 
 	// (2)
