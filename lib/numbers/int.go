@@ -5,8 +5,9 @@
 package numbers
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"log"
+	"math/big"
 )
 
 // IntCreateSeq will create and return sequence of integer from `min` to
@@ -30,15 +31,24 @@ func IntCreateSeq(min, max int) (seq []int) {
 //
 // If excluding index `exsIds` is not empty, do not pick the integer value
 // listed in there.
-func IntPickRandPositive(maxVal int, dup bool, pickedIds, exsIds []int) (
-	idx int,
-) {
-	rand.Seed(time.Now().UnixNano())
+func IntPickRandPositive(maxVal int, dup bool, pickedIds, exsIds []int) (idx int) {
+	var (
+		logp    = `IntPickRandPositive`
+		randMax = big.NewInt(int64(maxVal))
 
-	var excluded, picked bool
+		randv    *big.Int
+		err      error
+		excluded bool
+		picked   bool
+	)
 
 	for {
-		idx = rand.Intn(maxVal)
+		randv, err = rand.Int(rand.Reader, randMax)
+		if err != nil {
+			log.Panicf(`%s: %s`, logp, err)
+		}
+
+		idx = int(randv.Int64())
 
 		// Check in exclude indices.
 		excluded = false
