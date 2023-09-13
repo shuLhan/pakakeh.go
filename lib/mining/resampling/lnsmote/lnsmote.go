@@ -11,7 +11,10 @@
 package lnsmote
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"log"
+	"math"
+	"math/big"
 
 	"github.com/shuLhan/share/lib/dsv"
 	"github.com/shuLhan/share/lib/mining/knn"
@@ -114,8 +117,21 @@ func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 func (in *Runtime) createSynthetic(p *tabula.Row, neighbors knn.Neighbors) (
 	synthetic *tabula.Row,
 ) {
+	var (
+		logp    = `createSynthetic`
+		randMax = big.NewInt(int64(neighbors.Len()))
+
+		randv *big.Int
+		err   error
+	)
+
 	// choose one of the K nearest neighbors
-	randIdx := rand.Intn(neighbors.Len())
+	randv, err = rand.Int(rand.Reader, randMax)
+	if err != nil {
+		log.Panicf(`%s: %s`, logp, err)
+	}
+
+	randIdx := int(randv.Int64())
 	n := neighbors.Row(randIdx)
 
 	// Check if synthetic sample can be created from p and n.
@@ -196,14 +212,28 @@ func (in *Runtime) randomGap(lenslp, lensln int) (
 		return
 	}
 
+	var (
+		logp    = `randomGap`
+		randMax = big.NewInt(math.MaxInt64)
+		randv   *big.Int
+		err     error
+	)
+
+	randv, err = rand.Int(rand.Reader, randMax)
+	if err != nil {
+		log.Panicf(`%s: %s`, logp, err)
+	}
+
+	var randf64 = float64(randv.Int64()) / float64(math.MaxInt64)
+
 	slratio := float64(lenslp) / float64(lensln)
 	switch {
 	case slratio == 1:
-		delta = rand.Float64()
+		delta = randf64
 	case slratio > 1:
-		delta = rand.Float64() * (1 / slratio)
+		delta = randf64 * (1 / slratio)
 	default:
-		delta = 1 - rand.Float64()*slratio
+		delta = 1 - randf64*slratio
 	}
 
 	return delta
