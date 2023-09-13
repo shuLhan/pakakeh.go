@@ -12,9 +12,11 @@
 package smote
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
-	"time"
+	"log"
+	"math"
+	"math/big"
 
 	"github.com/shuLhan/share/lib/mining/knn"
 	"github.com/shuLhan/share/lib/mining/resampling"
@@ -54,8 +56,6 @@ func New(percentOver, k, classIndex int) (smoteRun *Runtime) {
 
 // Init will recheck input and set to default value if its not valid.
 func (smote *Runtime) Init() {
-	rand.Seed(time.Now().UnixNano())
-
 	if smote.K <= 0 {
 		smote.K = resampling.DefaultK
 	}
@@ -71,11 +71,23 @@ func (smote *Runtime) GetSynthetics() tabula.DatasetInterface {
 
 // populate will generate new synthetic sample using nearest neighbors.
 func (smote *Runtime) populate(instance *tabula.Row, neighbors knn.Neighbors) {
-	lenAttr := len(*instance)
+	var (
+		logp         = `populate`
+		randMax      = big.NewInt(int64(neighbors.Len()))
+		randMaxInt64 = big.NewInt(math.MaxInt64)
+		lenAttr      = len(*instance)
+
+		randv *big.Int
+		err   error
+	)
 
 	for x := 0; x < smote.NSynthetic; x++ {
 		// choose one of the K nearest neighbors
-		n := rand.Intn(neighbors.Len())
+		randv, err = rand.Int(rand.Reader, randMax)
+		if err != nil {
+			log.Panicf(`%s: %s`, logp, err)
+		}
+		n := int(randv.Int64())
 		sample := neighbors.Row(n)
 
 		newSynt := make(tabula.Row, lenAttr)
@@ -92,7 +104,20 @@ func (smote *Runtime) populate(instance *tabula.Row, neighbors knn.Neighbors) {
 			sv := sr.Float()
 
 			dif := sv - iv
-			gap := rand.Float64()
+
+			randv, err = rand.Int(rand.Reader, randMaxInt64)
+			if err != nil {
+				log.Panicf(`%s: %s`, logp, err)
+			}
+
+			var (
+				f64 = float64(randv.Int64())
+				gap float64
+			)
+			if f64 > 0 {
+				gap = f64 / float64(math.MaxInt64)
+			}
+
 			newAttr := iv + (gap * dif)
 
 			record := &tabula.Record{}
