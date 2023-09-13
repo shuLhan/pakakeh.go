@@ -1,0 +1,24 @@
+Test creating multipart message.
+
+<<< message.txt
+date: Fri, 25 Feb 2022 17:50:31 +0000
+from: a@b.c
+to: d@e.f
+subject: test
+mime-version: 1.0
+content-type: multipart/alternative; boundary=%s
+message-id: <%s>
+
+--%s
+mime-version: 1.0
+content-type: text/plain; charset="utf-8"
+content-transfer-encoding: quoted-printable
+
+This is plain text
+--%s
+mime-version: 1.0
+content-type: text/html; charset="utf-8"
+content-transfer-encoding: quoted-printable
+
+<b>This is body in HTML</b>
+--%s--

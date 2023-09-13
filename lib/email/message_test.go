@@ -5,6 +5,7 @@
 package email
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -13,70 +14,48 @@ import (
 )
 
 func TestNewMultipart(t *testing.T) {
-	var (
-		gotMsg   *Message
-		hostname string
-		msgb     []byte
-		err      error
-	)
-
 	dateInUtc = true
 
-	hostname, err = os.Hostname()
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/message_newmultipart_test.txt`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		expMsg string
+	var (
+		from     = []byte(`a@b.c`)
+		to       = []byte(`d@e.f`)
+		subject  = []byte(`test`)
+		bodyText = []byte(`This is plain text`)
+		bodyHTML = []byte(`<b>This is body in HTML</b>`)
 
-		from     []byte
-		to       []byte
-		subject  []byte
-		bodyText []byte
-		bodyHTML []byte
-	}{{
-		from:     []byte("a@b.c"),
-		to:       []byte("d@e.f"),
-		subject:  []byte("test"),
-		bodyText: []byte("This is plain text"),
-		bodyHTML: []byte("<b>This is body in HTML</b>"),
-		expMsg: "date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
-			"from: a@b.c\r\n" +
-			"to: d@e.f\r\n" +
-			"subject: test\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: multipart/alternative; boundary=bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6\r\n" +
-			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
-			"\r\n" +
-			"--bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
-			"content-transfer-encoding: quoted-printable\r\n" +
-			"\r\n" +
-			"This is plain text\r\n" +
-			"--bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: text/html; charset=\"utf-8\"\r\n" +
-			"content-transfer-encoding: quoted-printable\r\n" +
-			"\r\n" +
-			"<b>This is body in HTML</b>\r\n" +
-			"--bqOnpYF7Yw1N0jDpjM004riRyz7oPxD6--\r\n",
-	}}
+		msg  *Message
+		msgb []byte
+	)
 
-	for _, c := range cases {
-		gotMsg, err = NewMultipart(c.from, c.to, c.subject, c.bodyText, c.bodyHTML)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		msgb, err = gotMsg.Pack()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		test.Assert(t, "NewMultipart", c.expMsg, string(msgb))
+	msg, err = NewMultipart(from, to, subject, bodyText, bodyHTML)
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	msgb, err = msg.Pack()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		msgBoundary = msg.Header.Boundary()
+		msgID       = msg.Header.ID()
+		exp         = string(tdata.Output[`message.txt`])
+	)
+
+	exp = fmt.Sprintf(exp, msgBoundary, msgID, msgBoundary, msgBoundary, msgBoundary)
+
+	test.Assert(t, `NewMultipart`, exp, string(msgb))
 }
 
 func TestMessageParseMessage(t *testing.T) {
@@ -318,128 +297,105 @@ func TestMessageDKIMSign(t *testing.T) {
 }
 
 func TestMessage_packSingle(t *testing.T) {
-	type testCase struct {
-		desc     string
-		exp      string
-		bodyText []byte
-		bodyHtml []byte
-	}
+	dateInUtc = true
 
 	var (
-		msg      Message
-		hostname string
-		err      error
-		cases    []testCase
-		got      []byte
+		tdata *test.Data
+		msg   Message
+		err   error
+		exp   string
+		got   []byte
 	)
 
-	dateInUtc = true
-	hostname, err = os.Hostname()
+	type testCase struct {
+		bodyText  string
+		bodyHtml  string
+		outputTag string
+	}
+
+	tdata, err = test.LoadData(`testdata/message_packsingle_test.txt`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cases = []testCase{{
-		desc:     "With body text",
-		bodyText: []byte(`this is a body text`),
-		exp: "" +
-			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
-			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
-			"content-transfer-encoding: quoted-printable\r\n" +
-			"\r\n" +
-			"this is a body text\r\n",
+	var cases = []testCase{{
+		bodyText:  `this is a body text`,
+		outputTag: `body.txt`,
 	}, {
-		desc:     "With body HTML",
-		bodyHtml: []byte(`<p>this is an HTML body</p>`),
-		exp: "" +
-			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
-			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: text/html; charset=\"utf-8\"\r\n" +
-			"content-transfer-encoding: quoted-printable\r\n" +
-			"\r\n" +
-			"<p>this is an HTML body</p>\r\n",
+		bodyHtml:  `<p>this is an HTML body</p>`,
+		outputTag: `body.html`,
 	}}
 
 	for _, c := range cases {
 		msg.Body.Parts = nil
 
 		if len(c.bodyText) > 0 {
-			err = msg.SetBodyText(c.bodyText)
-			if err != nil {
-				t.Fatal(err)
-			}
-		} else {
-			err = msg.SetBodyHtml(c.bodyHtml)
+			err = msg.SetBodyText([]byte(c.bodyText))
 			if err != nil {
 				t.Fatal(err)
 			}
 		}
+		if len(c.bodyHtml) > 0 {
+			err = msg.SetBodyHtml([]byte(c.bodyHtml))
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
 		got, err = msg.Pack()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, c.exp, string(got))
+		exp = string(tdata.Output[c.outputTag])
+		exp = fmt.Sprintf(exp, msg.Header.ID())
+		test.Assert(t, c.outputTag, exp, string(got))
 	}
 }
 
 func TestMessage_SetBodyText(t *testing.T) {
-	var (
-		msg      Message
-		hostname string
-		err      error
-	)
-
 	dateInUtc = true
 
-	hostname, err = os.Hostname()
+	var (
+		tdata *test.Data
+		msg   Message
+		err   error
+		exp   string
+		got   []byte
+	)
+
+	tdata, err = test.LoadData(`testdata/message_setbodytext_test.txt`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cases := []struct {
-		desc    string
-		expMsg  string
-		content []byte
-	}{{
-		desc:    "With empty Body",
-		content: []byte("text body"),
-		expMsg: "" +
-			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
-			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
-			"content-transfer-encoding: quoted-printable\r\n" +
-			"\r\n" +
-			"text body\r\n",
+	type testCase struct {
+		body      string
+		outputTag string
+	}
+
+	var cases = []testCase{{
+		body:      `text body`,
+		outputTag: `body1.txt`,
 	}, {
-		desc:    "With new text",
-		content: []byte("new text body"),
-		expMsg: "" +
-			"date: Fri, 25 Feb 2022 17:50:31 +0000\r\n" +
-			"message-id: <1645811431.bqOnpYF7@" + hostname + ">\r\n" +
-			"mime-version: 1.0\r\n" +
-			"content-type: text/plain; charset=\"utf-8\"\r\n" +
-			"content-transfer-encoding: quoted-printable\r\n" +
-			"\r\n" +
-			"new text body\r\n",
+		body:      `new text body`,
+		outputTag: `body2.txt`,
 	}}
 
 	for _, c := range cases {
-		err = msg.SetBodyText(c.content)
+		err = msg.SetBodyText([]byte(c.body))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		msgb, err := msg.Pack()
+		got, err = msg.Pack()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, c.desc, string(c.expMsg), string(msgb))
+		exp = string(tdata.Output[c.outputTag])
+		exp = fmt.Sprintf(exp, msg.Header.ID())
+		test.Assert(t, c.outputTag, exp, string(got))
 	}
 }
 

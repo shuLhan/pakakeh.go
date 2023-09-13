@@ -5,7 +5,6 @@
 package email
 
 import (
-	"math/rand"
 	"time"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -36,7 +35,7 @@ var dateInUtc bool
 
 // Epoch return the UNIX timestamp in seconds.
 //
-// This variable is exported to allow function that use time and math/rand can
+// This variable is exported to allow function that use time can
 // be tested with fixed, predictable value.
 var Epoch = func() int64 {
 	return time.Now().Unix()
@@ -44,13 +43,11 @@ var Epoch = func() int64 {
 
 // randomChars generate n random characters.
 func randomChars(n int) []byte {
-	rand.Seed(Epoch())
 	return ascii.Random([]byte(ascii.LettersNumber), n)
 }
 
 // randomString generate random string with n characters.
 func randomString(n int) string {
-	rand.Seed(Epoch())
 	var v = ascii.Random([]byte(ascii.LettersNumber), n)
 	return string(v)
 }

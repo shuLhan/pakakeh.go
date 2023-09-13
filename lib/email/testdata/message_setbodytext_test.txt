@@ -1,0 +1,19 @@
+
+
+<<< body1.txt
+date: Fri, 25 Feb 2022 17:50:31 +0000
+message-id: <%s>
+mime-version: 1.0
+content-type: text/plain; charset="utf-8"
+content-transfer-encoding: quoted-printable
+
+text body
+
+<<< body2.txt
+date: Fri, 25 Feb 2022 17:50:31 +0000
+message-id: <%s>
+mime-version: 1.0
+content-type: text/plain; charset="utf-8"
+content-transfer-encoding: quoted-printable
+
+new text body

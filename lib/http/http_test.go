@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -56,10 +55,6 @@ func TestMain(m *testing.M) {
 		serverAddress = "127.0.0.1:14832"
 		err           error
 	)
-
-	// Make sure the all random generated values, like boundary are
-	// predictable.
-	rand.Seed(42)
 
 	opts := &ServerOptions{
 		Memfs: &memfs.MemFS{

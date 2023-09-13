@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"time"
 
@@ -40,8 +39,6 @@ func ExampleNewMailTx() {
 		mboxes     []*email.Mailbox
 		msg        *email.Message
 		mailtx     *smtp.MailTx
-		reDate     *regexp.Regexp
-		hostname   string
 		data       []byte
 		err        error
 	)
@@ -76,21 +73,26 @@ func ExampleNewMailTx() {
 	fmt.Printf("Tx Recipients: %s\n", mailtx.Recipients)
 
 	// In order to make the example Output works, we need to replace all
-	// CRLF with LF, "date:" with the system timezone, and message-id
-	// hostname with fixed "hostname".
+	// CRLF with LF, "date:" with the system timezone, and message-id.
+
 	data = bytes.ReplaceAll(mailtx.Data, []byte("\r\n"), []byte("\n"))
 
-	//fmt.Printf("timeNowUtc: %s\n", timeNowUtc)
-	//fmt.Printf("dateNowUtc: %s\n", dateNowUtc)
-
-	reDate = regexp.MustCompile(`^date: Wed(.*) \+....`)
+	var (
+		reDate = regexp.MustCompile(`^date: Wed(.*) \+....`)
+	)
 	data = reDate.ReplaceAll(data, []byte(`date: `+dateNowUtc))
 
-	hostname, err = os.Hostname()
-	if err != nil {
-		log.Fatal(err)
-	}
-	data = bytes.Replace(data, []byte(hostname), []byte("hostname"), 1)
+	var (
+		msgID   = msg.Header.ID()
+		fixedID = `1645600000.QoqDPQfz@hostname`
+	)
+	data = bytes.Replace(data, []byte(msgID), []byte(fixedID), 1)
+
+	var (
+		msgBoundary   = msg.Header.Boundary()
+		fixedBoundary = `QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf`
+	)
+	data = bytes.ReplaceAll(data, []byte(msgBoundary), []byte(fixedBoundary))
 
 	fmt.Printf("Tx Data:\n%s", data)
 	//Output:

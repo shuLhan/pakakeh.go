@@ -6,7 +6,6 @@ package ascii_test
 
 import (
 	"fmt"
-	"math/rand"
 
 	"github.com/shuLhan/share/lib/ascii"
 )
@@ -109,23 +108,6 @@ func ExampleIsSpace() {
 	// 	: true
 	// \: false
 	// 0: false
-}
-
-func ExampleRandom() {
-	rand.Seed(42)
-	fmt.Printf("Random 5 Letters: %s\n", ascii.Random([]byte(ascii.Letters), 5))
-	fmt.Printf("Random 5 LettersNumber: %s\n", ascii.Random([]byte(ascii.LettersNumber), 5))
-	fmt.Printf("Random 5 HexaLETTERS: %s\n", ascii.Random([]byte(ascii.HexaLETTERS), 5))
-	fmt.Printf("Random 5 HexaLetters: %s\n", ascii.Random([]byte(ascii.HexaLetters), 5))
-	fmt.Printf("Random 5 Hexaletters: %s\n", ascii.Random([]byte(ascii.Hexaletters), 5))
-	fmt.Printf("Random 5 binary: %s\n", ascii.Random([]byte(`01`), 5))
-	// Output:
-	// Random 5 Letters: HRukp
-	// Random 5 LettersNumber: hg1l0
-	// Random 5 HexaLETTERS: 9F7CC
-	// Random 5 HexaLetters: 56feA
-	// Random 5 Hexaletters: a64b0
-	// Random 5 binary: 10111
 }
 
 func ExampleToLower() {

@@ -6,7 +6,9 @@
 package ascii
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"log"
+	"math/big"
 )
 
 const (
@@ -85,12 +87,22 @@ func IsSpace(b byte) bool {
 }
 
 // Random generate random sequence of value from source with fixed length.
-//
-// This function assume that random generator has been seeded.
 func Random(source []byte, n int) []byte {
-	b := make([]byte, n)
-	for x := 0; x < n; x++ {
-		b[x] = source[rand.Intn(len(source))]
+	var (
+		b   = make([]byte, n)
+		max = big.NewInt(int64(len(source)))
+
+		randv *big.Int
+		err   error
+		x     int
+	)
+	for ; x < n; x++ {
+		randv, err = rand.Int(rand.Reader, max)
+		if err != nil {
+			log.Panicf(`Random: %s`, err)
+		}
+
+		b[x] = source[int(randv.Int64())]
 	}
 	return b
 }

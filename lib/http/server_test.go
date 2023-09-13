@@ -9,7 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
+	"strings"
 	"testing"
 
 	liberrors "github.com/shuLhan/share/lib/errors"
@@ -934,11 +936,25 @@ func TestServer_handleRange(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		// Replace boundary with fixed string.
+		var params map[string]string
+
+		_, params, _ = mime.ParseMediaType(httpRes.Header.Get(HeaderContentType))
+
+		var (
+			boundary      = params[`boundary`]
+			fixedBoundary = `1b4df158039f7cce`
+		)
+
 		var (
 			tag = `http_headers`
 			exp = tdata.Output[tag]
 			got = dumpHttpResponse(httpRes, skipHeaders)
 		)
+
+		if len(boundary) != 0 {
+			got = strings.ReplaceAll(got, boundary, fixedBoundary)
+		}
 		test.Assert(t, tag, string(exp), got)
 
 		tag = `http_body`
@@ -946,6 +962,10 @@ func TestServer_handleRange(t *testing.T) {
 
 		// Replace the response body CRLF with LF.
 		resBody = bytes.ReplaceAll(resBody, []byte("\r\n"), []byte("\n"))
+
+		if len(boundary) != 0 {
+			resBody = bytes.ReplaceAll(resBody, []byte(boundary), []byte(fixedBoundary))
+		}
 
 		test.Assert(t, tag, string(exp), string(resBody))
 
