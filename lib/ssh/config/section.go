@@ -189,7 +189,7 @@ type Section struct {
 
 	// Field store the unpacked key and value of Section.
 	// For section key that is not expecting string value, one can use
-	// FieldBool or FieldInt.
+	// FieldBool or FieldInt64.
 	Field map[string]string
 
 	// env contains the key and value from SetEnv field.
@@ -331,16 +331,15 @@ func (section *Section) FieldBool(key string) (vbool bool) {
 	return vbool
 }
 
-// FieldInt get the Field value as int.
-// It the value is unparseable as numeric it will return 0.
-func (section *Section) FieldInt(key string) (vint int) {
+// FieldInt64 get the Field value as int64.
+// If the value is unparseable as int64 it will return 0.
+func (section *Section) FieldInt64(key string) (val int64) {
 	var vstr = section.Field[key]
 	if len(vstr) == 0 {
 		return 0
 	}
-	var vi64 int64
-	vi64, _ = strconv.ParseInt(vstr, 10, 64)
-	return int(vi64)
+	val, _ = strconv.ParseInt(vstr, 10, 64)
+	return val
 }
 
 // Hostname return the hostname of this section.
