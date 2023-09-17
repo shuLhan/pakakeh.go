@@ -16,11 +16,17 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
+// In order to keep the struct aligned, each field is grouped by tag,
+// enclosed in <>.
+// List of tag are <general>, <creation>, <suggestion>, <compounding> and
+// <other>
 type affixOptions struct {
-	//
-	// Affix file general options.
-	//
+	compoundSyllable *compoundSyllable // <compounding> COMPOUNDSYLLABLE option.
 
+	prefixes map[string]*affix // <creation> PFX options.
+	suffixes map[string]*affix // <creation> SFX options.
+
+	// <general>
 	//
 	// The "SET" option.
 	//
@@ -30,129 +36,107 @@ type affixOptions struct {
 	// Possible values: UTF-8, ISO8859-1 ... ISO8859-10,
 	// ISO8859-13 ... IS8859-15, KOI8-R, KOI8-U, cp1251, or
 	// ISCII-DEVANAGRI.
-	//
 	encoding string
 
-	//
-	// The "FLAG" option set
+	// <general>
+	// The "FLAG" option set the character type.
 	// Default type is the extended ASCII (8-bit) character.
-	//
 	flag string
 
-	//
-	// The "COMPLEXPREFIXES" option set twofold prefix stripping (but
-	// single suffix stripping), for example, for morphologically complex
-	// languages with right-to-left writing system.
-	//
-	isComplexPrefixes bool
-
-	//
+	// <general>
 	// The "LANG" option set language code for language-specific functions
 	// of Hunspell.
 	//
 	// Use it to activate special casing of Azeri (LANG az), Turkish
 	// (LANG tr) and Crimean Tatar (LANG crh), also not generalized
 	// syllable-counting compounding rules of Hungarian (LANG hu).
-	//
 	lang string
 
-	//
+	// <general>
 	// The "IGNORE" option sets characters to ignore dictionary words,
 	// affixes, and input words.
-	//
 	ignore string
 
-	//
-	// The "AF" option.
-	// afAliases contains list of affix that can be substituted with
-	// number.  In this case, the number is index of slice.
-	//
-	afAliases []string
-
-	//
-	// The "AM" option.
-	// amAliases contains list of affix rules that can be replaced with
-	// ordinal number.
-	//
-	amAliases []string
-
-	//
-	// Affix file options for suggestion
-	//
-
-	// The "KEY" option.
-	keys []string
-
+	// <suggestion>
 	// The "TRY" option.
 	// Hunspell can suggest right word forms, when they differ from the
 	// bad input word by one TRY character.
 	// The parameter of TRY is case sensitive.
 	try string
 
-	noSuggest          []string      // NOSUGGEST option.
-	maxCompundSuggests int           // MAXCPDSUGS option.
-	maxNGramSuggests   int           // MAXNGRAMSUGS option.
-	maxDiff            int           // MAXDIFF option.
-	isOnlyMaxDiff      bool          // ONLYMAXDIFF option.
-	isNoSplitSugs      bool          // NOSPLITSUGS option.
-	isSugsWithDots     bool          // SUGSWITHDOTS option.
-	reps               []replacement // REP option.
-	charsMaps          []charsmap    // MAP option.
-	warn               string        // WARN option.
-	isForbidWarn       bool          // FORBIDWARN option.
+	warn string // <suggestion> WARN option.
 
-	//phone              map[string]string // PHONE option.
+	compoundFlag       string // <compounding> COMPOUNDFLAG option.
+	compoundBegin      string // <compounding> COMPOUNDBEGIN option.
+	compoundLast       string // <compounding> COMPOUNDLAST option.
+	compoundMiddle     string // <compounding> COMPOUNDMIDDLE option.
+	onlyInCompound     string // <compounding> ONLYINCOMPOUND option.
+	compoundPermitFlag string // <compounding> COMPOUNDPERMITFLAG option.
+	compoundForbidFlag string // <compounding> COMPOUNDFORBIDFLAG option.
+	compoundRoot       string // <compounding> COMPOUNDROOT option.
+	forceUCase         string // <compounding> FORCEUCASE option.
+	syllableNum        string // <compounding> SYLLABLENUM option.
 
-	//
-	// Options for compounding.
-	//
+	circumfix     string // <other> CIRCUMFIX option.
+	forbiddenWord string // <other> FORBIDDENWORD option.
+	keepCase      string // <other> KEEPCASE option.
+	lemmaPresent  string // <other> LEMMA_PRESENT option.
+	needAffix     string // <other> NEEDAFFIX option.
+	pseudoRoot    string // <other> PSEUDOROOT option.
+	substandard   string // <other> SUBSTANDARD option.
+	wordchars     string // <other> WORDCHARS option.
 
-	breakOpts              []breakopt        // BREAK option.
-	compoundRules          []compoundRule    // COMPOUNDRULE option.
-	compoundMin            int               // COMPOUNDMIN option.
-	compoundFlag           string            // COMPOUNDFLAG option.
-	compoundBegin          string            // COMPOUNDBEGIN option.
-	compoundLast           string            // COMPOUNDLAST option.
-	compoundMiddle         string            // COMPOUNDMIDDLE option.
-	onlyInCompound         string            // ONLYINCOMPOUND option.
-	compoundPermitFlag     string            // COMPOUNDPERMITFLAG option.
-	compoundForbidFlag     string            // COMPOUNDFORBIDFLAG option.
-	isCompoundMoreSuffixes bool              // COMPOUNDMORESUFFIXES option.
-	compoundRoot           string            // COMPOUNDROOT option.
-	compoundWordMax        int               // COMPOUNDWORDMAX option.
-	isCheckCompoundDup     bool              // CHECKCOMPOUNDDUP option.
-	isCheckCompoundRep     bool              // CHECKCOMPOUNDREP option.
-	isCheckCompoundCase    bool              // CHECKCOMPOUNDCASE option.
-	isCheckCompoundTriple  bool              // CHECKCOMPOUNDTRIPLE option.
-	isSimplifiedTriple     bool              // SIMPLIFIEDTRIPLE option.
-	compoundPatterns       []compoundPattern // CHECKCOMPOUNDPATTERN option.
-	forceUCase             string            // FORCEUCASE option.
-	compoundSyllable       *compoundSyllable // COMPOUNDSYLLABLE option.
-	syllableNum            string            // SYLLABLENUM option.
+	// <general>
+	// The "AF" option.
+	// afAliases contains list of affix that can be substituted with
+	// number.  In this case, the number is index of slice.
+	afAliases []string
 
-	//
-	// Affix file options for affix creation.
-	//
+	// <general>
+	// The "AM" option.
+	// amAliases contains list of affix rules that can be replaced with
+	// ordinal number.
+	amAliases []string
 
-	prefixes map[string]*affix // PFX options.
-	suffixes map[string]*affix // SFX options.
+	keys      []string      // <suggestion> The "KEY" option.
+	noSuggest []string      // <suggestion> NOSUGGEST option.
+	reps      []replacement // <suggestion> REP option.
+	charsMaps []charsmap    // <suggestion> MAP option.
 
-	//
-	// Affix file other options.
-	//
+	breakOpts        []breakopt        // <compounding> BREAK option.
+	compoundRules    []compoundRule    // <compounding> COMPOUNDRULE option.
+	compoundPatterns []compoundPattern // <compounding> CHECKCOMPOUNDPATTERN option.
 
-	circumfix     string       // CIRCUMFIX option.
-	forbiddenWord string       // FORBIDDENWORD option.
-	isFullStrip   bool         // FULLSTRIP option.
-	keepCase      string       // KEEPCASE option.
-	iconv         []conversion // ICONV option.
-	oconv         []conversion // OCONV option.
-	lemmaPresent  string       // LEMMA_PRESENT option.
-	needAffix     string       // NEEDAFFIX option.
-	pseudoRoot    string       // PSEUDOROOT option.
-	substandard   string       // SUBSTANDARD option.
-	wordchars     string       // WORDCHARS option.
-	isCheckSharps bool         // CHECKSHARPS option.
+	iconv []conversion // <other> ICONV option.
+	oconv []conversion // <other> OCONV option.
+
+	maxCompundSuggests int // <suggestion> MAXCPDSUGS option.
+	maxNGramSuggests   int // <suggestion> MAXNGRAMSUGS option.
+	maxDiff            int // <suggestion> MAXDIFF option.
+
+	compoundMin     int // <compounding> COMPOUNDMIN option.
+	compoundWordMax int // <compounding> COMPOUNDWORDMAX option.
+
+	// <general>
+	// The "COMPLEXPREFIXES" option set twofold prefix stripping (but
+	// single suffix stripping), for example, for morphologically complex
+	// languages with right-to-left writing system.
+	isComplexPrefixes bool
+
+	isOnlyMaxDiff  bool // <suggestion> ONLYMAXDIFF option.
+	isNoSplitSugs  bool // <suggestion> NOSPLITSUGS option.
+	isSugsWithDots bool // <suggestion> SUGSWITHDOTS option.
+	isForbidWarn   bool // <suggestion> FORBIDWARN option.
+
+	isCompoundMoreSuffixes bool // <compounding> COMPOUNDMORESUFFIXES option.
+	isCheckCompoundDup     bool // <compounding> CHECKCOMPOUNDDUP option.
+	isCheckCompoundRep     bool // <compounding> CHECKCOMPOUNDREP option.
+	isCheckCompoundCase    bool // <compounding> CHECKCOMPOUNDCASE option.
+	isCheckCompoundTriple  bool // <compounding> CHECKCOMPOUNDTRIPLE option.
+	isSimplifiedTriple     bool // <compounding> SIMPLIFIEDTRIPLE option.
+
+	isFullStrip   bool // <other> FULLSTRIP option.
+	isCheckSharps bool // <other> CHECKSHARPS option.
 }
 
 // open open and parse the affix options from file.
