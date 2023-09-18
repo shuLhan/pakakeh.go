@@ -18,7 +18,11 @@ import (
 // This is a wrapper for [ssh.ParseRawPrivate] that can return either
 // *dsa.PrivateKey, ecdsa.PrivateKey, *ed25519.PrivateKey, or
 // *rsa.PrivateKey.
-func LoadPrivateKey(file string) (pkey crypto.PrivateKey, err error) {
+//
+// The passphrase is optional and will only be used if the private key is
+// encrypted.
+// If its set it will use [ssh.ParseRawPrivateKeyWithPassphrase].
+func LoadPrivateKey(file string, passphrase []byte) (pkey crypto.PrivateKey, err error) {
 	var (
 		logp = `LoadPrivateKey`
 
@@ -30,10 +34,14 @@ func LoadPrivateKey(file string) (pkey crypto.PrivateKey, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	pkey, err = ssh.ParseRawPrivateKey(rawpem)
+	if len(passphrase) != 0 {
+		pkey, err = ssh.ParseRawPrivateKeyWithPassphrase(rawpem, passphrase)
+	} else {
+		pkey, err = ssh.ParseRawPrivateKey(rawpem)
+	}
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	return
+	return pkey, nil
 }

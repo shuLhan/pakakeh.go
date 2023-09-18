@@ -48,7 +48,7 @@ func testRunServer() {
 
 	var primaryKey crypto.PrivateKey
 
-	primaryKey, err = libcrypto.LoadPrivateKey(testFilePrivateKey)
+	primaryKey, err = libcrypto.LoadPrivateKey(testFilePrivateKey, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
