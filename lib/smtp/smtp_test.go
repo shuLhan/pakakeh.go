@@ -5,6 +5,8 @@
 package smtp
 
 import (
+	"crypto"
+	"crypto/rsa"
 	"log"
 	"os"
 	"testing"
@@ -44,14 +46,26 @@ func testRunServer() {
 		log.Fatal(err)
 	}
 
-	primaryKey, err := libcrypto.LoadPrivateKey(testFilePrivateKey)
+	var primaryKey crypto.PrivateKey
+
+	primaryKey, err = libcrypto.LoadPrivateKey(testFilePrivateKey)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	var (
+		rsakey *rsa.PrivateKey
+		ok     bool
+	)
+
+	rsakey, ok = primaryKey.(*rsa.PrivateKey)
+	if !ok {
+		log.Panicf(`%s: expecting RSA private key, got %T`, testFilePrivateKey, primaryKey)
+	}
+
 	primaryDKIMOpts := &DKIMOptions{
 		Signature:  dkim.NewSignature([]byte(testDomain), []byte("default")),
-		PrivateKey: primaryKey,
+		PrivateKey: rsakey,
 	}
 	primaryDomain := NewDomain(testDomain, primaryDKIMOpts)
 	primaryDomain.Accounts["first"] = testAccountFirst

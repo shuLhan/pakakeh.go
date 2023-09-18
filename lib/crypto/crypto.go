@@ -2,30 +2,38 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package crypto provide a wrapper for standard crypto package.
+// Package crypto provide a wrapper for standard crypto package and
+// golang.org/x/crypto.
 package crypto
 
 import (
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
+	"crypto"
 	"fmt"
 	"os"
+
+	"golang.org/x/crypto/ssh"
 )
 
 // LoadPrivateKey read and parse PEM formatted private key from file.
-func LoadPrivateKey(file string) (pkey *rsa.PrivateKey, err error) {
-	rawPEM, err := os.ReadFile(file)
+// This is a wrapper for [ssh.ParseRawPrivate] that can return either
+// *dsa.PrivateKey, ecdsa.PrivateKey, *ed25519.PrivateKey, or
+// *rsa.PrivateKey.
+func LoadPrivateKey(file string) (pkey crypto.PrivateKey, err error) {
+	var (
+		logp = `LoadPrivateKey`
+
+		rawpem []byte
+	)
+
+	rawpem, err = os.ReadFile(file)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	block, _ := pem.Decode(rawPEM)
-	if block == nil {
-		return nil, fmt.Errorf("crypto: failed to parse PEM block from %q", file)
+	pkey, err = ssh.ParseRawPrivateKey(rawpem)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
-
-	pkey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
 
 	return
 }
