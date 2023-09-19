@@ -1,0 +1,57 @@
+2023/07/03 16:17:45 MemFS.Update /tmp/TestDirWatcher_renameDirectory593980368/001/subdir/testfile: Node.Update /tmp/TestDirWatcher_renameDirectory593980368/001/subdir/testfile: stat /tmp/TestDirWatcher_renameDirectory593980368/001/subdir/testfile: no such file or directory
+==================
+WARNING: DATA RACE
+Read at 0x00c00022d7d0 by goroutine 7:
+  runtime.mapiterinit()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/runtime/map.go:815 +0x0
+  github.com/shuLhan/share/lib/memfs.(*DirWatcher).dirsKeys()
+      /home/runner/work/share/share/lib/memfs/dirwatcher.go:122 +0x766
+  github.com/shuLhan/share/lib/memfs.TestDirWatcher_renameDirectory()
+      /home/runner/work/share/share/lib/memfs/dirwatcher_test.go:81 +0x8f4
+  testing.tRunner()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1576 +0x216
+  testing.(*T).Run.func1()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1629 +0x47
+
+Previous write at 0x00c00022d7d0 by goroutine 9:
+  runtime.mapassign_faststr()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/runtime/map_faststr.go:203 +0x0
+  github.com/shuLhan/share/lib/memfs.(*DirWatcher).onContentChange()
+      /home/runner/work/share/share/lib/memfs/dirwatcher.go:246 +0x90b
+  github.com/shuLhan/share/lib/memfs.(*DirWatcher).start()
+      /home/runner/work/share/share/lib/memfs/dirwatcher.go:377 +0xdba
+  github.com/shuLhan/share/lib/memfs.(*DirWatcher).Start.func1()
+      /home/runner/work/share/share/lib/memfs/dirwatcher.go:107 +0x39
+
+Goroutine 7 (running) created at:
+  testing.(*T).Run()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1629 +0x805
+  testing.runTests.func1()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:2036 +0x8d
+  testing.tRunner()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1576 +0x216
+  testing.runTests()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:2034 +0x87c
+  testing.(*M).Run()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1906 +0xb44
+  github.com/shuLhan/share/lib/memfs.TestMain()
+      /home/runner/work/share/share/lib/memfs/memfs_test.go:85 +0x644
+  main.main()
+      _testmain.go:120 +0x33d
+
+Goroutine 9 (running) created at:
+  github.com/shuLhan/share/lib/memfs.(*DirWatcher).Start()
+      /home/runner/work/share/share/lib/memfs/dirwatcher.go:107 +0x1dd
+  github.com/shuLhan/share/lib/memfs.TestDirWatcher_renameDirectory()
+      /home/runner/work/share/share/lib/memfs/dirwatcher_test.go:57 +0x3fd
+  testing.tRunner()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1576 +0x216
+  testing.(*T).Run.func1()
+      /opt/hostedtoolcache/go/1.20.5/x64/src/testing/testing.go:1629 +0x47
+==================
+--- FAIL: TestDirWatcher_renameDirectory (0.62s)
+    testing.go:1446: race detected during execution of test
+2023/07/03 16:17:46 DirWatcher: on file changes /new.adoc: file does not exist
+2023/07/03 16:17:46 DirWatcher: on file changes /subdir/new.adoc: file does not exist
+2023/07/03 16:17:47 DirWatcher: on file changes /file: file does not exist
+FAIL

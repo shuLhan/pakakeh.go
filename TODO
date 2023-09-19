@@ -1,0 +1,7 @@
+= TODO
+
+[ ] lib/ini: allow unmarshal value into []byte
+[ ] lib/ini: remove ';' as comment.
+[x] lib/ascii/ascii_example_test.go:115:2: SA1019: rand.Seed has been deprecated
+[x] lib/numbers/int.go:36:2: SA1019: rand.Seed has been deprecated
+[x] lib/mining/knn/neighbor_test.go:58:2: SA1019: rand.Seed has been deprecated
