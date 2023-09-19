@@ -10,3 +10,5 @@ require (
 )
 
 replace golang.org/x/crypto => git.sr.ht/~shulhan/go-x-crypto v0.13.1-0.20230909112159-a64485d84c14
+
+//replace golang.org/x/term => ../../../golang.org/x/term
