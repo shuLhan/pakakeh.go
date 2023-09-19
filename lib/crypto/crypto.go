@@ -60,9 +60,8 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 	var (
 		logp = `LoadPrivateKeyInteractive`
 
-		passphrase    []byte
-		rawpem        []byte
-		isMissingPass bool
+		passphrase []byte
+		rawpem     []byte
 	)
 
 	rawpem, err = os.ReadFile(file)
@@ -75,8 +74,8 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 		return pkey, nil
 	}
 
-	_, isMissingPass = err.(*ssh.PassphraseMissingError)
-	if !isMissingPass {
+	var errPassphraseMissing = &ssh.PassphraseMissingError{}
+	if !errors.Is(err, errPassphraseMissing) {
 		return nil, err
 	}
 
