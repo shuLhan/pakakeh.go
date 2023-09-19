@@ -1,0 +1,44 @@
+= The Content-Disposition Header Field
+:toc:
+:sectlinks:
+:sectnums:
+:url-rfc2183: https://tools.ietf.org/html/rfc2183
+
+This document provide note and summary of
+{url-rfc2183}[RFC 2183^], Communicating Presentation Information in Internet
+Messages: The Content-Disposition Header Field.
+
+
+==  Syntax
+
+----
+disposition := "Content-Disposition" ":"
+               disposition-type
+               *(";" disposition-parm)
+
+disposition-type := "inline"
+                  / "attachment"
+                  / extension-token
+                  ; values are not case-sensitive
+
+disposition-parm := filename-parm
+                  / creation-date-parm
+                  / modification-date-parm
+                  / read-date-parm
+                  / size-parm
+                  / parameter
+
+filename-parm := "filename" "=" value
+
+creation-date-parm := "creation-date" "=" quoted-date-time
+
+modification-date-parm := "modification-date" "=" quoted-date-time
+
+read-date-parm := "read-date" "=" quoted-date-time
+
+size-parm := "size" "=" 1*DIGIT
+
+quoted-date-time := quoted-string
+                 ; contents MUST be an RFC 822 `date-time'
+                 ; numeric timezones (+HHMM or -HHMM) MUST be used
+----
