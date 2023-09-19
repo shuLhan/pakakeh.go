@@ -17,6 +17,7 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 	"golang.org/x/crypto/ssh/knownhosts"
 
+	"github.com/shuLhan/share/lib/crypto"
 	libos "github.com/shuLhan/share/lib/os"
 	"github.com/shuLhan/share/lib/ssh/config"
 )
@@ -214,8 +215,7 @@ func (cl *Client) dialWithSigners(signers []ssh.Signer) (signer ssh.Signer, err 
 // SSH agent.
 func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) {
 	var (
-		logp       = `dialWithPrivateKeys`
-		maxAttempt = 3
+		logp = `dialWithPrivateKeys`
 
 		pkeyFile string
 		pkey     any
@@ -225,7 +225,7 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 	for _, pkeyFile = range cl.cfg.IdentityFile {
 		fmt.Printf("%s: %s\n", logp, pkeyFile)
 
-		pkey, err = LoadPrivateKeyInteractive(pkeyFile, maxAttempt)
+		pkey, err = crypto.LoadPrivateKeyInteractive(nil, pkeyFile)
 		if err != nil {
 			continue
 		}
