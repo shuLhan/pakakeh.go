@@ -8,14 +8,75 @@ package crypto
 
 import (
 	"crypto"
+	"crypto/rsa"
 	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
+
+// DecryptOaep extend the [rsa.DecryptOAEP] to make it able to decrypt a
+// message larger than its public modulus size.
+func DecryptOaep(hash hash.Hash, random io.Reader, pkey *rsa.PrivateKey, cipher, label []byte) (plain []byte, err error) {
+	var (
+		logp   = `DecryptOaep`
+		msglen = len(cipher)
+		limit  = pkey.PublicKey.Size()
+
+		chunkPlain  []byte
+		chunkCipher []byte
+		x           int
+	)
+	for x < msglen {
+		if x+limit > msglen {
+			chunkCipher = cipher[x:]
+		} else {
+			chunkCipher = cipher[x : x+limit]
+		}
+		chunkPlain, err = rsa.DecryptOAEP(hash, random, pkey, chunkCipher, label)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		plain = append(plain, chunkPlain...)
+		x += limit
+	}
+	return plain, nil
+}
+
+// EncryptOaep extend the [rsa.EncryptOAEP] to make it able to encrypt a
+// message larger than its than (public modulus size - 2*hash.Size - 2).
+//
+// The function signature is the same with [rsa.EncryptOAEP] except the
+// name, to make it distinguishable.
+func EncryptOaep(hash hash.Hash, random io.Reader, pub *rsa.PublicKey, msg, label []byte) (cipher []byte, err error) {
+	var (
+		logp   = `EncryptOaep`
+		msglen = len(msg)
+		limit  = pub.Size() - 2*hash.Size() - 2
+
+		chunkPlain  []byte
+		chunkCipher []byte
+		x           int
+	)
+	for x < msglen {
+		if x+limit > msglen {
+			chunkPlain = msg[x:]
+		} else {
+			chunkPlain = msg[x : x+limit]
+		}
+		chunkCipher, err = rsa.EncryptOAEP(hash, random, pub, chunkPlain, label)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		cipher = append(cipher, chunkCipher...)
+		x += limit
+	}
+	return cipher, nil
+}
 
 // LoadPrivateKey read and parse PEM formatted private key from file.
 // This is a wrapper for [ssh.ParseRawPrivate] that can return either

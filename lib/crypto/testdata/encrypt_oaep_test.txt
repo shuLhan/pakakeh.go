@@ -1,0 +1,51 @@
+Test encrypt and decrypt large message.
+
+>>> private_key.pem
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAlwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAIEA0dv04DDVu5gPpbvTeQbouIJIaKpVcH5CGsbzBM04zzgQu1aD1cwX
+NcEJzNcABqGoojIa3sAut4TCSsllgtP/aomrQufNRgS6q/7OT3MI8iba9O6vsehaz86+mi
+KlrD+iZjYP5Ye+vm9kNWOc9F4SxoKmW9OOxK0edSrW/lA3N58AAAIIJttUKibbVCoAAAAH
+c3NoLXJzYQAAAIEA0dv04DDVu5gPpbvTeQbouIJIaKpVcH5CGsbzBM04zzgQu1aD1cwXNc
+EJzNcABqGoojIa3sAut4TCSsllgtP/aomrQufNRgS6q/7OT3MI8iba9O6vsehaz86+miKl
+rD+iZjYP5Ye+vm9kNWOc9F4SxoKmW9OOxK0edSrW/lA3N58AAAADAQABAAAAgHEBzDSpt3
+6EXPC3WyJSGSG6bnmGN+oS40/+EEFmrY/QthnbdbS8aUc2Ayv+HvJzPRbSemu2+7ExWVri
+ZrpzpJblRWGfipv2E3LZU3z2M7vRrSKXC4KzbrHQbAjRdqoxsbhZrq3J7AeqMgngS/fEeg
+3VdXtsvomKObE0z/WJ9wpZAAAAQQCSKPmtJdALxUn1WI2Tl+3KvGByAjS0Q5r+x5VWBGDD
+pmkbOU1FBtao9geE3o8fdDLsJ0GT3hg+190huK1tD3aiAAAAQQDz4O1fOKc0N3qxJ68aCy
+99hSTEdkH/BFCQMZFaQzu3VOaxzTDEN2JD/MsKNwX/S+qBSV/0OEQr7nnkywMZKnHlAAAA
+QQDcSivycYAPV+p6Js1PXDT9Bk7Cjp17OhiQQObweUcPEVN5j40hhu2ECtyIFfwP//twuV
+PrZO9w/rAJ+5H9S/szAAAAC3Rlc3RAY3J5cHRvAQIDBAUGBw==
+-----END OPENSSH PRIVATE KEY-----
+
+>>> plain.txt
+Copyright (c) 2023 Shulhan (ms@kilabit.info). All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+<<< error_too_long
+crypto/rsa: message too long for RSA key size
