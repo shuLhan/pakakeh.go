@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"io"
 	"testing"
 
 	"golang.org/x/crypto/ssh"
@@ -76,38 +77,54 @@ func TestEncryptOaep(t *testing.T) {
 }
 
 func TestLoadPrivateKeyInteractive(t *testing.T) {
+	type testCase struct {
+		file     string
+		secret   string
+		termrw   io.ReadWriter
+		expError string
+	}
+
 	var (
 		mockrw = mock.ReadWriter{}
-		file   = `testdata/openssl_rsa_pass.key`
 
-		pkey     crypto.PrivateKey
-		expError string
-		err      error
-		ok       bool
+		pkey crypto.PrivateKey
+		err  error
+		ok   bool
 	)
 
-	_, err = mockrw.BufRead.WriteString("s3cret\r\n")
-	if err != nil {
-		t.Fatal(err)
-	}
+	var cases = []testCase{{
+		file:   `testdata/openssl_rsa_pass.key`,
+		secret: "s3cret\r\n",
+		termrw: &mockrw,
+	}, {
+		file:     `testdata/openssl_rsa_pass.key`,
+		termrw:   &mockrw,
+		expError: `LoadPrivateKeyInteractive: empty passphrase`,
+	}, {
+		file: `testdata/openssl_rsa_pass.key`,
+		// Using nil (default to os.Stdin for termrw.
+		termrw:   nil,
+		expError: `LoadPrivateKeyInteractive: MakeRaw: inappropriate ioctl for device`,
+	}}
 
-	pkey, err = LoadPrivateKeyInteractive(&mockrw, file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	var c testCase
 
-	_, ok = pkey.(*rsa.PrivateKey)
-	if !ok {
-		t.Fatalf(`expecting *rsa.PrivateKey, got %T`, pkey)
-	}
+	for _, c = range cases {
+		_, err = mockrw.BufRead.WriteString(c.secret)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	// Using nil (os.Stdin) for termrw.
+		pkey, err = LoadPrivateKeyInteractive(c.termrw, c.file)
+		if err != nil {
+			test.Assert(t, `using os.Stdin in test`, c.expError, err.Error())
+			continue
+		}
 
-	file = `testdata/openssh_ed25519_pass.key`
-	expError = `LoadPrivateKeyInteractive: MakeRaw: inappropriate ioctl for device`
-
-	pkey, err = LoadPrivateKeyInteractive(nil, file)
-	if err != nil {
-		test.Assert(t, `using os.Stdin in test`, expError, err.Error())
+		_, ok = pkey.(*rsa.PrivateKey)
+		if !ok {
+			test.Assert(t, `cast to *rsa.PrivateKey`, c.expError, err.Error())
+			continue
+		}
 	}
 }

@@ -19,6 +19,14 @@ import (
 	"golang.org/x/term"
 )
 
+// ErrEmptyPassphrase returned when private key is encrypted and loaded
+// interactively, using [LoadPrivateKeyInteractive], but the readed
+// passphrase is empty from terminal.
+//
+// This is to catch error "bcrypt_pbkdf: empty password" earlier that cannot
+// be catched using errors.Is after [ssh.ParseRawPrivateKeyWithPassphrase].
+var ErrEmptyPassphrase = errors.New(`empty passphrase`)
+
 // DecryptOaep extend the [rsa.DecryptOAEP] to make it able to decrypt a
 // message larger than its public modulus size.
 func DecryptOaep(hash hash.Hash, random io.Reader, pkey *rsa.PrivateKey, cipher, label []byte) (plain []byte, err error) {
@@ -168,6 +176,9 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 	pass, err = xterm.ReadPassword(prompt)
 	if err != nil && !errors.Is(err, io.EOF) {
 		return nil, fmt.Errorf(`%s: ReadPassword: %w`, logp, err)
+	}
+	if len(pass) == 0 {
+		return nil, fmt.Errorf(`%s: %w`, logp, ErrEmptyPassphrase)
 	}
 
 	passphrase = []byte(pass)
