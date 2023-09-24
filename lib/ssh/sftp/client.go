@@ -79,8 +79,8 @@ func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 	return cl, nil
 }
 
-// Close the remote file handle.
-func (cl *Client) Close(fh *FileHandle) (err error) {
+// CloseFile close the remote file handle.
+func (cl *Client) CloseFile(fh *FileHandle) (err error) {
 	if fh == nil {
 		return nil
 	}
@@ -203,7 +203,7 @@ func (cl *Client) Get(remoteFile, localFile string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = cl.Close(fin)
+	err = cl.CloseFile(fin)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -362,7 +362,7 @@ func (cl *Client) Put(localFile, remoteFile string) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = cl.Close(fout)
+	err = cl.CloseFile(fout)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}

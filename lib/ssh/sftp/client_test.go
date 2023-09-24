@@ -175,7 +175,7 @@ func TestClient_Rename(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = testClient.Close(fh)
+	err = testClient.CloseFile(fh)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -265,7 +265,7 @@ func TestClient_Symlink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = testClient.Close(fh)
+	err = testClient.CloseFile(fh)
 	if err != nil {
 		t.Fatal(err)
 	}
