@@ -183,10 +183,6 @@ func defaultUserKnownHostsFile() []string {
 // Section is the type that represent SSH client Host and Match section in
 // configuration.
 type Section struct {
-	// PrivateKeys contains IdentityFile that has been parsed.
-	// This field will be set once the Signers has been called.
-	PrivateKeys map[string]any
-
 	// Field store the unpacked key and value of Section.
 	// For section key that is not expecting string value, one can use
 	// FieldBool or FieldInt64.
@@ -197,9 +193,6 @@ type Section struct {
 
 	// name contains the raw value after Host or Match.
 	name string
-
-	// The first IdentityFile that exist and valid.
-	PrivateKeyFile string
 
 	// WorkingDir contains the directory where the SSH client started.
 	// This value is required when client want to copy file from/to
@@ -383,7 +376,7 @@ func (section *Section) Port() string {
 }
 
 // Signers convert the IdentityFile to ssh.Signer for authentication using
-// PublicKey and store the parsed-unsigned private key into PrivateKeys.
+// PublicKey.
 //
 // This method will ask for passphrase from terminal, if one of IdentityFile
 // is protected.
@@ -400,8 +393,6 @@ func (section *Section) Signers() (signers []ssh.Signer, err error) {
 		pkey          any
 		isMissingPass bool
 	)
-
-	section.PrivateKeys = make(map[string]any, len(section.IdentityFile))
 
 	for _, pkeyFile = range section.IdentityFile {
 		pkeyPem, err = os.ReadFile(pkeyFile)
@@ -437,11 +428,7 @@ func (section *Section) Signers() (signers []ssh.Signer, err error) {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
-		if len(section.PrivateKeyFile) == 0 {
-			section.PrivateKeyFile = pkeyFile
-		}
 		signers = append(signers, signer)
-		section.PrivateKeys[pkeyFile] = pkey
 	}
 	return signers, nil
 }
