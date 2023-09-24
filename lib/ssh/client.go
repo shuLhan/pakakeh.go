@@ -34,6 +34,9 @@ type Client struct {
 	stdout io.Writer
 	stderr io.Writer
 
+	// identityFile that are able to connect to remoteAddr.
+	identityFile string
+
 	remoteAddr string
 
 	listKnownHosts []string
@@ -218,15 +221,15 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 	var (
 		logp = `dialWithPrivateKeys`
 
-		pkeyFile string
-		pkey     any
-		signer   ssh.Signer
+		identityFile string
+		pkey         any
+		signer       ssh.Signer
 	)
 
-	for _, pkeyFile = range cl.section.IdentityFile {
-		fmt.Printf("%s: %s\n", logp, pkeyFile)
+	for _, identityFile = range cl.section.IdentityFile {
+		fmt.Printf("%s: %s\n", logp, identityFile)
 
-		pkey, err = crypto.LoadPrivateKeyInteractive(nil, pkeyFile)
+		pkey, err = crypto.LoadPrivateKeyInteractive(nil, identityFile)
 		if err != nil {
 			continue
 		}
@@ -242,6 +245,7 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 
 		cl.Client, err = ssh.Dial(`tcp`, cl.remoteAddr, cl.config)
 		if err == nil {
+			cl.identityFile = identityFile
 			break
 		}
 		err = cl.dialError(logp, err)
@@ -261,7 +265,7 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 
 	// TODO(ms): check for AddKeysToAgent.
 
-	fmt.Printf("Adding key %q to agent.\n", pkeyFile)
+	fmt.Printf("Adding key %q to agent.\n", cl.identityFile)
 
 	var addedKey = agent.AddedKey{
 		PrivateKey: pkey,
@@ -331,11 +335,7 @@ func (cl *Client) ScpGet(remote, local string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.section.User(), cl.section.Hostname(), remote)
 
-	args := []string{"-r", "-P", cl.section.Port()}
-	if len(cl.section.PrivateKeyFile) > 0 {
-		args = append(args, "-i")
-		args = append(args, cl.section.PrivateKeyFile)
-	}
+	args := []string{`-r`, `-P`, cl.section.Port(), `-i`, cl.identityFile}
 	args = append(args, remote)
 	args = append(args, local)
 
@@ -369,11 +369,7 @@ func (cl *Client) ScpPut(local, remote string) (err error) {
 
 	remote = fmt.Sprintf("%s@%s:%s", cl.section.User(), cl.section.Hostname(), remote)
 
-	args := []string{"-r", "-P", cl.section.Port()}
-	if len(cl.section.PrivateKeyFile) > 0 {
-		args = append(args, "-i")
-		args = append(args, cl.section.PrivateKeyFile)
-	}
+	args := []string{`-r`, `-P`, cl.section.Port(), `-i`, cl.identityFile}
 	args = append(args, local)
 	args = append(args, remote)
 
