@@ -79,6 +79,18 @@ func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 	return cl, nil
 }
 
+// Close the client sftp session and release all resources.
+func (cl *Client) Close() (err error) {
+	err = cl.sess.Close()
+
+	cl.requestId = 0
+	cl.pipeErr = nil
+	cl.pipeOut = nil
+	cl.pipeIn = nil
+
+	return fmt.Errorf(`Close: %w`, err)
+}
+
 // CloseFile close the remote file handle.
 func (cl *Client) CloseFile(fh *FileHandle) (err error) {
 	if fh == nil {

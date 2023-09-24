@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 	cfg := &config.Section{
 		Field: map[string]string{
 			config.KeyUser:     `ms`,
-			config.KeyHostname: `127.0.0.1`,
+			config.KeyHostname: `localhost`,
 			config.KeyPort:     `22`,
 		},
 		IdentityFile: []string{
@@ -56,6 +56,13 @@ func TestMain(m *testing.M) {
 
 	fmt.Printf("Server version: %d\n", testClient.version)
 	fmt.Printf("Server extensions: %v\n", testClient.exts)
+
+	defer func() {
+		var errClose = testClient.Close()
+		if errClose != nil {
+			log.Printf(`TestMain: %s`, errClose)
+		}
+	}()
 
 	os.Exit(m.Run())
 }
