@@ -27,9 +27,10 @@ type Client struct {
 	sysEnvs map[string]string
 
 	*ssh.Client
-	config *ssh.ClientConfig
 
-	cfg    *config.Section
+	config  *ssh.ClientConfig
+	section *config.Section
+
 	stdout io.Writer
 	stderr io.Writer
 
@@ -56,8 +57,8 @@ type Client struct {
 //   - User
 //   - UserKnownHostsFile, setting this to "none" will set HostKeyCallback
 //     to [ssh.InsecureIgnoreHostKey].
-func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
-	if cfg == nil {
+func NewClientInteractive(section *config.Section) (cl *Client, err error) {
+	if section == nil {
 		return nil, nil
 	}
 
@@ -72,12 +73,12 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 	cl = &Client{
 		sysEnvs: libos.Environments(),
 		config: &ssh.ClientConfig{
-			User: cfg.User(),
+			User: section.User(),
 		},
-		cfg:        cfg,
+		section:    section,
 		stdout:     os.Stdout,
 		stderr:     os.Stderr,
-		remoteAddr: fmt.Sprintf(`%s:%s`, cfg.Hostname(), cfg.Port()),
+		remoteAddr: fmt.Sprintf(`%s:%s`, section.Hostname(), section.Port()),
 	}
 
 	err = cl.setConfigHostKeyCallback()
@@ -85,7 +86,7 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	var sshAgentSockPath = cfg.IdentityAgent()
+	var sshAgentSockPath = section.IdentityAgent()
 	if len(sshAgentSockPath) > 0 {
 		var sshAgentSock net.Conn
 
@@ -116,7 +117,7 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 		}
 	}
 
-	if len(cfg.IdentityFile) == 0 {
+	if len(section.IdentityFile) == 0 {
 		return nil, fmt.Errorf(`%s: empty IdentityFile`, logp)
 	}
 
@@ -135,7 +136,7 @@ func NewClientInteractive(cfg *config.Section) (cl *Client, err error) {
 func (cl *Client) setConfigHostKeyCallback() (err error) {
 	var (
 		logp           = `setConfigHostKeyCallback`
-		userKnownHosts = cl.cfg.UserKnownHostsFile()
+		userKnownHosts = cl.section.UserKnownHostsFile()
 
 		knownHosts string
 	)
@@ -222,7 +223,7 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 		signer   ssh.Signer
 	)
 
-	for _, pkeyFile = range cl.cfg.IdentityFile {
+	for _, pkeyFile = range cl.section.IdentityFile {
 		fmt.Printf("%s: %s\n", logp, pkeyFile)
 
 		pkey, err = crypto.LoadPrivateKeyInteractive(nil, pkeyFile)
@@ -282,7 +283,7 @@ func (cl *Client) Execute(cmd string) (err error) {
 	sess.Stdout = cl.stdout
 	sess.Stderr = cl.stderr
 
-	for k, v := range cl.cfg.Environments(cl.sysEnvs) {
+	for k, v := range cl.section.Environments(cl.sysEnvs) {
 		err = sess.Setenv(k, v)
 		if err != nil {
 			log.Printf("Execute: Setenv %q=%q:%s\n", k, v, err.Error())
@@ -313,19 +314,19 @@ func (cl *Client) ScpGet(remote, local string) (err error) {
 		return fmt.Errorf("%s: empty local file", logp)
 	}
 
-	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User(), cl.cfg.Hostname(), remote)
+	remote = fmt.Sprintf("%s@%s:%s", cl.section.User(), cl.section.Hostname(), remote)
 
-	args := []string{"-r", "-P", cl.cfg.Port()}
-	if len(cl.cfg.PrivateKeyFile) > 0 {
+	args := []string{"-r", "-P", cl.section.Port()}
+	if len(cl.section.PrivateKeyFile) > 0 {
 		args = append(args, "-i")
-		args = append(args, cl.cfg.PrivateKeyFile)
+		args = append(args, cl.section.PrivateKeyFile)
 	}
 	args = append(args, remote)
 	args = append(args, local)
 
 	cmd := exec.Command("scp", args...)
 
-	cmd.Dir = cl.cfg.WorkingDir
+	cmd.Dir = cl.section.WorkingDir
 	cmd.Stdout = cl.stdout
 	cmd.Stderr = cl.stderr
 
@@ -351,19 +352,19 @@ func (cl *Client) ScpPut(local, remote string) (err error) {
 		return fmt.Errorf("%s: empty remote file", logp)
 	}
 
-	remote = fmt.Sprintf("%s@%s:%s", cl.cfg.User(), cl.cfg.Hostname(), remote)
+	remote = fmt.Sprintf("%s@%s:%s", cl.section.User(), cl.section.Hostname(), remote)
 
-	args := []string{"-r", "-P", cl.cfg.Port()}
-	if len(cl.cfg.PrivateKeyFile) > 0 {
+	args := []string{"-r", "-P", cl.section.Port()}
+	if len(cl.section.PrivateKeyFile) > 0 {
 		args = append(args, "-i")
-		args = append(args, cl.cfg.PrivateKeyFile)
+		args = append(args, cl.section.PrivateKeyFile)
 	}
 	args = append(args, local)
 	args = append(args, remote)
 
 	cmd := exec.Command("scp", args...)
 
-	cmd.Dir = cl.cfg.WorkingDir
+	cmd.Dir = cl.section.WorkingDir
 	cmd.Stdout = cl.stdout
 	cmd.Stderr = cl.stderr
 
@@ -387,5 +388,5 @@ func (cl *Client) SetSessionOutputError(stdout, stderr io.Writer) {
 }
 
 func (cl *Client) String() string {
-	return cl.cfg.User() + "@" + cl.cfg.Hostname() + ":" + cl.cfg.Port()
+	return cl.section.User() + "@" + cl.section.Hostname() + ":" + cl.section.Port()
 }
