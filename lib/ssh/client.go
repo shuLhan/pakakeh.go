@@ -273,6 +273,21 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 	return nil
 }
 
+// Close the client connection and release all resources.
+func (cl *Client) Close() (err error) {
+	err = cl.Client.Conn.Close()
+
+	cl.sysEnvs = nil
+	cl.Client = nil
+	cl.config = nil
+	cl.section = nil
+	cl.stdout = nil
+	cl.stderr = nil
+	cl.listKnownHosts = nil
+
+	return err
+}
+
 // Execute a command on remote server.
 func (cl *Client) Execute(cmd string) (err error) {
 	sess, err := cl.Client.NewSession()
