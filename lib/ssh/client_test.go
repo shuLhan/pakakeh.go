@@ -5,11 +5,13 @@
 package ssh
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/shuLhan/share/lib/ssh/config"
+	"github.com/shuLhan/share/lib/test"
 )
 
 // TestNewClient_KeyError test SSH to server with host key does not exist in
@@ -20,9 +22,8 @@ func TestNewClient_KeyError_notExist(t *testing.T) {
 	var (
 		section = config.NewSection(`localhost`)
 
-		wd       string
-		pathFile string
-		err      error
+		wd  string
+		err error
 	)
 
 	wd, err = os.Getwd()
@@ -39,20 +40,26 @@ func TestNewClient_KeyError_notExist(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pathFile = filepath.Join(wd, `testdata/localhost/known_hosts_empty`)
-	err = section.Set(config.KeyUserKnownHostsFile, pathFile)
+	var knownHostsFile = filepath.Join(wd, `testdata/localhost/known_hosts_empty`)
+	err = section.Set(config.KeyUserKnownHostsFile, knownHostsFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pathFile = filepath.Join(wd, `testdata/localhost/client.key`)
-	err = section.Set(config.KeyIdentityFile, pathFile)
+	var pkeyFile = filepath.Join(wd, `testdata/localhost/client.key`)
+	err = section.Set(config.KeyIdentityFile, pkeyFile)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	var (
+		expError = fmt.Sprintf(`NewClientInteractive: dialWithSigners: ssh: handshake failed: knownhosts: key is unknown from known_hosts files [%s]`, knownHostsFile)
+		gotError string
+	)
 
 	_, err = NewClientInteractive(section)
 	if err != nil {
-		t.Fatal(err)
+		gotError = err.Error()
 	}
+	test.Assert(t, `NewClientInteractive: error`, expError, gotError)
 }

@@ -9,6 +9,4 @@ require (
 	golang.org/x/term v0.12.0
 )
 
-replace golang.org/x/crypto => git.sr.ht/~shulhan/go-x-crypto v0.13.1-0.20230918135601-e412699fb523
-
 //replace golang.org/x/term => ../../../golang.org/x/term

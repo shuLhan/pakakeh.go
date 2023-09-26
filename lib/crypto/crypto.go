@@ -14,6 +14,7 @@ import (
 	"hash"
 	"io"
 	"os"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
@@ -143,8 +144,9 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 		return pkey, nil
 	}
 
-	var errPassphraseMissing = &ssh.PassphraseMissingError{}
-	if !errors.Is(err, errPassphraseMissing) {
+	// We can use "err.(*ssh.PassphraseMissingError)", but I don't trust
+	// the golang.org/x/crypto to return error as is yet.
+	if !strings.Contains(err.Error(), `passphrase protected`) {
 		return nil, err
 	}
 

@@ -102,7 +102,7 @@ func TestLoadPrivateKeyInteractive(t *testing.T) {
 		expError: `LoadPrivateKeyInteractive: empty passphrase`,
 	}, {
 		file: `testdata/openssl_rsa_pass.key`,
-		// Using nil (default to os.Stdin for termrw.
+		// Using nil (default to os.Stdin for termrw).
 		termrw:   nil,
 		expError: `LoadPrivateKeyInteractive: MakeRaw: inappropriate ioctl for device`,
 	}}
@@ -117,7 +117,7 @@ func TestLoadPrivateKeyInteractive(t *testing.T) {
 
 		pkey, err = LoadPrivateKeyInteractive(c.termrw, c.file)
 		if err != nil {
-			test.Assert(t, `using os.Stdin in test`, c.expError, err.Error())
+			test.Assert(t, `LoadPrivateKeyInteractive`, c.expError, err.Error())
 			continue
 		}
 

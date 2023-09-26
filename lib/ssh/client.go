@@ -5,13 +5,13 @@
 package ssh
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
@@ -111,8 +111,7 @@ func NewClientInteractive(section *config.Section) (cl *Client, err error) {
 			return cl, nil
 		}
 
-		var errKey *knownhosts.KeyError
-		if errors.As(err, &errKey) {
+		if strings.Contains(err.Error(), `knownhosts`) {
 			// Host key is either unknown or mismatch with one
 			// of known_hosts files, so no need to continue with
 			// dialWithPrivateKeys.
@@ -175,19 +174,16 @@ func (cl *Client) setConfigHostKeyCallback() (err error) {
 // dialError return the error with clear information when the host key is
 // missing or mismatch from known_hosts files.
 func (cl *Client) dialError(logp string, errDial error) (err error) {
-	var (
-		errKey *knownhosts.KeyError
-	)
-	if errors.As(errDial, &errKey) {
-		if len(errKey.Want) == 0 {
-			err = fmt.Errorf(`%s: %w: server host key is missing from %+v`, logp, errDial, cl.listKnownHosts)
-		} else {
-			err = fmt.Errorf(`%s: %w: server host key mismatch in %+v`, logp, errDial, cl.listKnownHosts)
-		}
-	} else {
-		err = fmt.Errorf(`%s: %w`, logp, errDial)
+	var errDialString = errDial.Error()
+
+	if strings.Contains(errDialString, `key is unknown`) {
+		return fmt.Errorf(`%s: %w from known_hosts files %+v`, logp, errDial, cl.listKnownHosts)
 	}
-	return err
+	if strings.Contains(errDialString, `key mismatch`) {
+		return fmt.Errorf(`%s: %w with known_hosts files %+v`, logp, errDial, cl.listKnownHosts)
+	}
+
+	return fmt.Errorf(`%s: %w`, logp, errDial)
 }
 
 // dialWithSigners connect to the remote machine using AuthMethod PublicKeys
