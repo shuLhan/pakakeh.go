@@ -111,7 +111,7 @@ func NewClientInteractive(section *config.Section) (cl *Client, err error) {
 			return cl, nil
 		}
 
-		if strings.Contains(err.Error(), `knownhosts`) {
+		if err != nil && strings.Contains(err.Error(), `knownhosts`) {
 			// Host key is either unknown or mismatch with one
 			// of known_hosts files, so no need to continue with
 			// dialWithPrivateKeys.
