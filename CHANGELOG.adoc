@@ -18,6 +18,133 @@ This is changelog for share module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
+
+[#v0_50_0]
+== share v0.50.0 (2023-10-04)
+
+This release bring many enhancements thanks to linters like revive [1],
+fieldaligment [2], and shadow [3].
+
+This release also replace "math/rand.Seed" with "crypto/rand".
+Since Go 1.20 the "math/rand.Seed" is considered deprecated (the initial
+value of rand is seeded automatically, not zero).
+Now, it is the time to replace "math/rand" with more secure random number
+generator, from "crypto/rand".
+This changes affect tests in package "lib/email", "lib/http", and
+"lib/stmp".
+
+[#v0_50_0__breaking_changes]
+===  Breaking changes
+
+lib/test: refactoring, rename TestWriter to BufferWriter::
++
+--
+The name TestWriter is considered stutter if its called from external
+package, test.TestWriter.
+
+While at it, implement the Error and Errorf in BufferWriter and add
+comment to each exported methods.
+--
+
+ssh/sftp: rename method Close to CloseFile::
++
+Since the method accept FileHandle, that is returned from OpenFile,
+then the method should changed with the same suffix.
+This is also to make the method un-ambiguous later when we add Close method
+to close client connection.
+
+[#v0_50_0__new_features]
+===  New features
+
+lib/errors: implement method Is::
++
+The Is method will return true if the target error is instance of *E
+and the value of field Code and Name match with values in e.
+
+lib/email: add method ID to Header::
++
+The ID method return the Message-ID or empty if its not exist.
+
+test/mock: implement mock for testing io.ReadWriter or io.StringWriter::
++
+--
+The type ReadWriter provide two buffers, BufRead and BufWrite.
+The BufRead is for io.Reader and BufWrite for io.Writer or
+io.StringWriter.
+
+The type provide one method helper, Reset, to reset all buffers.
+--
+
+lib/crypto: add function LoadPrivateKeyInteractive::
++
+--
+The LoadPrivateKeyInteractive load the private key from file.
+If the private key file is encrypted, it will prompt for the passphrase
+from terminal.
+
+This function is taken from package "lib/ssh" with modification by adding
+parameter "io.ReadWriter" and removing parameter maxAttempt.
+--
+
+lib/crypto: implement RSA encrypt and decryption for large message size::
++
+--
+The EncryptOaep extend the "rsa.EncryptOAEP" to make it able to encrypt a
+message larger than its than (public modulus size - 2*hash.Size - 2).
+
+The function signature is the same with "rsa.EncryptOAEP" except the
+name, to make it distinguishable.
+
+The DecryptOaep function extend the "rsa.DecryptOAEP" to make it able to
+decrypt a message larger than its public modulus size.
+--
+
+ssh/sftp: add method to close client connection::
++
+The Close method close the client sftp session and release all its
+resources.
+
+lib/ssh: add method Close to Client::
++
+The Close method close the client connection and release all resources.
+
+
+[#v0_50_0__enhancements]
+===  Enhancements
+
+_AUR: include go-mod-tip.sh to package::
++
+The "go-mod-tip.sh" is a shell script to get and print the latest Go module
+version based on the latest tag and the latest commit hash from current
+working git directory.
+
+lib/crypto: rewrite LoadPrivateKey as wrapper of ssh.ParseRawPrivate::
++
+--
+Previously, the LoadPrivateKey function only able to load private key
+with PKCS#1 format.
+
+This changes make the function as a wrapper for ssh.ParseRawPrivate
+that can load RSA, DSA, ECDSA, and Ed25519 in PKCS#1, PKCS#8, OpenSSL,
+and OpenSSH formats.
+--
+
+lib/ssh: store and use the connected identity file for ScpPut and ScpGet::
++
+Previously, the ScpPut and ScpGet use the first IdentityFile in section
+to use in "-i" argument.
+This is not correct.
+If the section contains two or more IdentityFile and the one that can
+connect are the last one, the ScpPut and ScpGet method may return an
+error when executing the "scp" command.
+
+[1] https://github.com/mgechev/revive
+
+[2] https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/fieldalignment
+
+[3] https://pkg.go.dev/golang.org/x/tools@v0.13.0/go/analysis/passes/shadow
+
+
 [#v0_49_1]
 == share v0.49.1 (2023-09-02)
 
