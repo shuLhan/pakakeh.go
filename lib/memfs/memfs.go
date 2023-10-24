@@ -6,7 +6,9 @@ package memfs
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -114,8 +116,10 @@ func New(opts *Options) (mfs *MemFS, err error) {
 
 // AddChild add FileInfo fi as new child of parent node.
 //
-// It will return nil without an error if the system path of parent+fi.Name()
-// is excluded by one of Options.Excludes pattern.
+// It will return nil without an error if,
+//   - the system path of parent+fi.Name() is excluded by one of
+//     Options.Excludes pattern, or
+//   - fi is symlink to not existen node.
 func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error) {
 	var (
 		logp    = "AddChild"
@@ -128,7 +132,10 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 	if mfs.isWatched(sysPath) {
 		child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
 		if err != nil {
-			return nil, fmt.Errorf("%s %s: %w", logp, sysPath, err)
+			if errors.Is(err, fs.ErrNotExist) {
+				return nil, nil
+			}
+			return nil, fmt.Errorf(`%s %q: %w`, logp, sysPath, err)
 		}
 
 		mfs.PathNodes.Set(child.Path, child)
@@ -145,7 +152,10 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 
 	child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
 	if err != nil {
-		return nil, fmt.Errorf("%s %s: %w", logp, sysPath, err)
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf(`%s %q: %w`, logp, sysPath, err)
 	}
 
 	mfs.PathNodes.Set(child.Path, child)
