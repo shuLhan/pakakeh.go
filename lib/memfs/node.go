@@ -356,7 +356,6 @@ func (node *Node) addChild(
 	sysPath string, fi os.FileInfo, maxFileSize int64,
 ) (child *Node, err error) {
 	var (
-		logp    = "Node.addChild"
 		relPath = path.Join(node.Path, fi.Name())
 		found   bool
 	)
@@ -373,7 +372,7 @@ func (node *Node) addChild(
 
 	child, err = NewNode(node, fi, maxFileSize)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
+		return nil, err
 	}
 
 	child.SysPath = sysPath

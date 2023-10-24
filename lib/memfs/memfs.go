@@ -587,12 +587,12 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 			// Ignore error due to permission
 			return 0, nil
 		}
-		return 0, fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
+		return 0, fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 	}
 
 	fis, err = f.Readdir(0)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
+		return 0, fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 	}
 
 	sort.SliceStable(fis, func(x, y int) bool {
@@ -602,7 +602,7 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 	for _, fi = range fis {
 		child, err = mfs.AddChild(node, fi)
 		if err != nil {
-			err = fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
+			err = fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 			goto out
 		}
 		if child == nil {
@@ -615,7 +615,7 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 
 		nchilds, err = mfs.scanDir(child)
 		if err != nil {
-			err = fmt.Errorf("%s: %s: %w", logp, node.SysPath, err)
+			err = fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 			goto out
 		}
 		if nchilds == 0 {
@@ -628,9 +628,9 @@ out:
 	errClose := f.Close()
 	if errClose != nil {
 		if err == nil {
-			err = fmt.Errorf("%s: %s: %w", logp, node.SysPath, errClose)
+			err = fmt.Errorf(`%s %q: %w`, logp, node.SysPath, errClose)
 		} else {
-			log.Printf("%s: %s: %s", logp, node.SysPath, errClose)
+			log.Printf(`%s %q: %s`, logp, node.SysPath, errClose)
 		}
 	}
 
