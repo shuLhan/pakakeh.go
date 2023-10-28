@@ -134,6 +134,16 @@ func (node *Node) AddChild(child *Node) {
 	child.Parent = node
 }
 
+// Child return the child node based on its name.
+func (node *Node) Child(name string) (cnode *Node) {
+	for _, cnode = range node.Childs {
+		if cnode.name == name {
+			return cnode
+		}
+	}
+	return nil
+}
+
 // Close reset the offset position back to zero.
 func (node *Node) Close() error {
 	node.off = 0

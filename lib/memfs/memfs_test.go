@@ -437,6 +437,39 @@ func TestMemFS_MarshalJSON(t *testing.T) {
 	}
 }
 
+func TestMemFS_RemoveChild(t *testing.T) {
+	var (
+		opts = &Options{
+			Root:        `testdata`,
+			MaxFileSize: -1,
+		}
+		mfs *MemFS
+		err error
+	)
+
+	mfs, err = New(opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var child = mfs.Root.Child(`plain`)
+	if child == nil {
+		t.Fatal(`Expecting child "plain", got nil`)
+	}
+
+	var nodeRemoved = mfs.RemoveChild(mfs.Root, child)
+	if nodeRemoved == nil {
+		t.Fatal(`Expecting child "plain", got nil`)
+	}
+
+	test.Assert(t, `RemoveChild`, child, nodeRemoved)
+
+	child = mfs.Root.Child(`plain`)
+	if child != nil {
+		t.Fatalf(`Expecting child "plain" has been removed, got %v`, child)
+	}
+}
+
 func TestMemFS_isIncluded(t *testing.T) {
 	cases := []struct {
 		desc    string
