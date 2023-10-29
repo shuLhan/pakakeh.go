@@ -89,7 +89,7 @@ func init() {
 	{{$varname}} = &memfs.MemFS{
 		PathNodes: memfs.NewPathNode(),
 		Opts: &memfs.Options{
-			Root: "{{.Opts.Root}}",
+			Root:        "{{.Opts.Root}}",
 			MaxFileSize: {{.Opts.MaxFileSize}},
 			Includes: []string{
 			{{- range $v := .Opts.Includes}}
@@ -102,7 +102,7 @@ func init() {
 			{{- end}}
 			},
 			Embed: memfs.EmbedOptions{
-				CommentHeader:  ` + "`" + `{{.Opts.Embed.CommentHeader}}` + "`" + `,
+				CommentHeader: ` + "`" + `{{.Opts.Embed.CommentHeader}}` + "`" + `,
 				PackageName:    "{{.Opts.Embed.PackageName}}",
 				VarName:        "{{.Opts.Embed.VarName}}",
 				GoFileName:     "{{.Opts.Embed.GoFileName}}",
@@ -120,6 +120,11 @@ func init() {
 {{- end}}
 
 	{{$varname}}.Root = {{$varname}}.PathNodes.Get("/")
+
+	var err = {{$varname}}.Init()
+	if err != nil {
+		panic("{{$varname}}: " + err.Error())
+	}
 }
 {{end}}
 `
