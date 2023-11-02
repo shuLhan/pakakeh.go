@@ -101,9 +101,24 @@ func generate_testdata_exclude() *memfs.Node {
 	node.SetModTimeUnix(1633792794, 467899662)
 	node.SetName("exclude")
 	node.SetSize(0)
+	node.AddChild(_memFS_getNode(memFS, "/exclude/dir", generate_testdata_exclude_dir))
 	node.AddChild(_memFS_getNode(memFS, "/exclude/index-link.css", generate_testdata_exclude_index_link_css))
 	node.AddChild(_memFS_getNode(memFS, "/exclude/index-link.html", generate_testdata_exclude_index_link_html))
 	node.AddChild(_memFS_getNode(memFS, "/exclude/index-link.js", generate_testdata_exclude_index_link_js))
+	return node
+}
+
+func generate_testdata_exclude_dir() *memfs.Node {
+	var node = &memfs.Node{
+		SysPath:     "testdata/exclude/dir",
+		Path:        "/exclude/dir",
+		ContentType: "",
+		GenFuncName: "generate_testdata_exclude_dir",
+	}
+	node.SetMode(2147484096)
+	node.SetModTimeUnix(1629620045, 798024232)
+	node.SetName("dir")
+	node.SetSize(0)
 	return node
 }
 
@@ -163,9 +178,24 @@ func generate_testdata_include() *memfs.Node {
 	node.SetModTimeUnix(1629623653, 749800911)
 	node.SetName("include")
 	node.SetSize(0)
+	node.AddChild(_memFS_getNode(memFS, "/include/dir", generate_testdata_include_dir))
 	node.AddChild(_memFS_getNode(memFS, "/include/index.css", generate_testdata_include_index_css))
 	node.AddChild(_memFS_getNode(memFS, "/include/index.html", generate_testdata_include_index_html))
 	node.AddChild(_memFS_getNode(memFS, "/include/index.js", generate_testdata_include_index_js))
+	return node
+}
+
+func generate_testdata_include_dir() *memfs.Node {
+	var node = &memfs.Node{
+		SysPath:     "testdata/include/dir",
+		Path:        "/include/dir",
+		ContentType: "",
+		GenFuncName: "generate_testdata_include_dir",
+	}
+	node.SetMode(2147484096)
+	node.SetModTimeUnix(1564836597, 0)
+	node.SetName("dir")
+	node.SetSize(0)
 	return node
 }
 
@@ -288,7 +318,7 @@ func init() {
 	memFS = &memfs.MemFS{
 		PathNodes: memfs.NewPathNode(),
 		Opts: &memfs.Options{
-			Root: "testdata",
+			Root:        "testdata",
 			MaxFileSize: 5242880,
 			Includes: []string{
 			},
@@ -297,7 +327,7 @@ func init() {
 				`.*/node_save$`,
 			},
 			Embed: memfs.EmbedOptions{
-				CommentHeader:  `// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
+				CommentHeader: `// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 `,
 				PackageName:    "embed",
@@ -319,6 +349,8 @@ func init() {
 		_memFS_getNode(memFS, "/direct/add/file2", generate_testdata_direct_add_file2))
 	memFS.PathNodes.Set("/exclude",
 		_memFS_getNode(memFS, "/exclude", generate_testdata_exclude))
+	memFS.PathNodes.Set("/exclude/dir",
+		_memFS_getNode(memFS, "/exclude/dir", generate_testdata_exclude_dir))
 	memFS.PathNodes.Set("/exclude/index-link.css",
 		_memFS_getNode(memFS, "/exclude/index-link.css", generate_testdata_exclude_index_link_css))
 	memFS.PathNodes.Set("/exclude/index-link.html",
@@ -327,6 +359,8 @@ func init() {
 		_memFS_getNode(memFS, "/exclude/index-link.js", generate_testdata_exclude_index_link_js))
 	memFS.PathNodes.Set("/include",
 		_memFS_getNode(memFS, "/include", generate_testdata_include))
+	memFS.PathNodes.Set("/include/dir",
+		_memFS_getNode(memFS, "/include/dir", generate_testdata_include_dir))
 	memFS.PathNodes.Set("/include/index.css",
 		_memFS_getNode(memFS, "/include/index.css", generate_testdata_include_index_css))
 	memFS.PathNodes.Set("/include/index.html",
@@ -343,4 +377,9 @@ func init() {
 		_memFS_getNode(memFS, "/plain", generate_testdata_plain))
 
 	memFS.Root = memFS.PathNodes.Get("/")
+
+	var err = memFS.Init()
+	if err != nil {
+		panic("memFS: " + err.Error())
+	}
 }

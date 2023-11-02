@@ -537,7 +537,7 @@ func (mfs *MemFS) mount() (err error) {
 		return nil
 	}
 	if mfs.Root != nil {
-		// The directory has been initialized by embedded.
+		// The Root node may has been initialized through embedding.
 		return nil
 	}
 
@@ -568,17 +568,15 @@ func (mfs *MemFS) Remount() (err error) {
 	return mfs.mount()
 }
 
-// scanDir scan the directory node for files and add them to memory file
-// system.
+// scanDir scan the content of node directory and add them to mfs.
 // It returns number of childs added to the node or an error.
 func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 	var (
-		logp    = "scanDir"
-		child   *Node
-		nchilds int
-		f       *os.File
-		fi      os.FileInfo
-		fis     []os.FileInfo
+		logp  = "scanDir"
+		child *Node
+		f     *os.File
+		fi    os.FileInfo
+		fis   []os.FileInfo
 	)
 
 	f, err = os.Open(node.SysPath)
@@ -613,15 +611,10 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 			continue
 		}
 
-		nchilds, err = mfs.scanDir(child)
+		_, err = mfs.scanDir(child)
 		if err != nil {
 			err = fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 			goto out
-		}
-		if nchilds == 0 {
-			// No childs added, remove it from node.
-			mfs.RemoveChild(node, child)
-			n--
 		}
 	}
 out:

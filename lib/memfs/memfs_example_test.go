@@ -68,7 +68,7 @@ func ExampleNew() {
 
 	// Output:
 	// Content of /index.html: <html></html>
-	// List of embedded files: [/ /include /include/index.css /include/index.html /include/index.js /index.css /index.html /index.js]
+	// List of embedded files: [/ /direct /direct/add /include /include/dir /include/index.css /include/index.html /include/index.js /index.css /index.html /index.js]
 	// Error on Get /exclude/index.html: file does not exist
 }
 

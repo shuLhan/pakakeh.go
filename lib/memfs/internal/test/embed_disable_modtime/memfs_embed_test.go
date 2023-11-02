@@ -101,6 +101,7 @@ func TestNode_Readdir(t *testing.T) {
 	}, {
 		path: "/exclude",
 		exp: []string{
+			"dir",
 			"index-link.css",
 			"index-link.html",
 			"index-link.js",
@@ -108,6 +109,7 @@ func TestNode_Readdir(t *testing.T) {
 	}, {
 		path: "/include",
 		exp: []string{
+			"dir",
 			"index.css",
 			"index.html",
 			"index.js",
