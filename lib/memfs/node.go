@@ -15,6 +15,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/shuLhan/share/lib/ascii"
@@ -492,17 +493,31 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 		return nil
 	}
 
+	var doUpdate = false
+	if newInfo.ModTime().After(node.modTime) {
+		doUpdate = true
+	} else if !newInfo.IsDir() {
+		if newInfo.Size() != node.size {
+			doUpdate = true
+		}
+	}
+
+	if !doUpdate {
+		return nil
+	}
+
 	node.modTime = newInfo.ModTime()
 	node.size = newInfo.Size()
 
 	if newInfo.IsDir() {
-		return nil
+		err = node.updateDir(maxFileSize)
+	} else {
+		err = node.updateContent(maxFileSize)
 	}
-
-	err = node.updateContent(maxFileSize)
 	if err != nil {
 		return fmt.Errorf("%s %s: %w", logp, node.SysPath, err)
 	}
+
 	return nil
 }
 
@@ -511,7 +526,8 @@ func (node *Node) updateContent(maxFileSize int64) (err error) {
 	if maxFileSize < 0 {
 		// Negative maxFileSize means content will not be read.
 		return nil
-	} else if maxFileSize == 0 {
+	}
+	if maxFileSize == 0 {
 		maxFileSize = defaultMaxFileSize
 	}
 	if node.size > maxFileSize {
@@ -530,6 +546,81 @@ func (node *Node) updateContent(maxFileSize int64) (err error) {
 		return fmt.Errorf("updateContent: %w", err)
 	}
 
+	return nil
+}
+
+// updateDir update the childs node by reading content of directory.
+func (node *Node) updateDir(maxFileSize int64) (err error) {
+	var (
+		currChilds = make(map[string]*Node, len(node.Childs))
+		child      *Node
+	)
+
+	// Store the current childs as map first so we can use it later.
+	for _, child = range node.Childs {
+		currChilds[child.name] = child
+	}
+
+	var dir *os.File
+
+	dir, err = os.Open(node.SysPath)
+	if err != nil {
+		if os.IsPermission(err) {
+			// Ignore error due to permission.
+			return nil
+		}
+		return fmt.Errorf(`%q: %w`, node.SysPath, err)
+	}
+
+	var fis []os.FileInfo
+
+	fis, err = dir.Readdir(0)
+	if err != nil {
+		return fmt.Errorf(`%q: %w`, node.SysPath, err)
+	}
+
+	sort.SliceStable(fis, func(x, y int) bool {
+		return fis[x].Name() < fis[y].Name()
+	})
+
+	var fi os.FileInfo
+
+	node.Childs = nil
+	for _, fi = range fis {
+		child = currChilds[fi.Name()]
+		if child == nil {
+			// New node found in directory.
+			child, err = NewNode(node, fi, maxFileSize)
+			if err != nil {
+				if os.IsPermission(err) {
+					// Ignore error due to permission.
+					continue
+				}
+				return err
+			}
+
+			child.SysPath = filepath.Join(node.SysPath, child.name)
+		} else {
+			delete(currChilds, fi.Name())
+		}
+
+		node.Childs = append(node.Childs, child)
+
+		if !child.IsDir() {
+			continue
+		}
+
+		// If node exist and its a directory, try to update their
+		// childs too.
+		err = child.Update(nil, maxFileSize)
+		if err != nil {
+			if os.IsPermission(err) {
+				// Ignore error due to permission.
+				continue
+			}
+			return err
+		}
+	}
 	return nil
 }
 

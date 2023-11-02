@@ -57,16 +57,14 @@ func ExampleDirWatcher() {
 	fmt.Println(`--`, ns.State, ns.Node.Path)
 
 	// Create the root directory back with sub directory
-	// This will trigger two FileStateCreated events, one for "/" and one
-	// for "/assets".
+	// This will trigger one FileStateCreated event, for "/".
 	fmt.Println(`Re-create root directory with sub-directory:`)
 	var dirAssets = filepath.Join(rootDir, `assets`)
 	err = os.MkdirAll(dirAssets, 0770)
 	if err != nil {
 		log.Fatal(err)
 	}
-	ns = <-dw.C
-	fmt.Println(`--`, ns.State, ns.Node.Path)
+
 	ns = <-dw.C
 	fmt.Println(`--`, ns.State, ns.Node.Path)
 
@@ -149,7 +147,6 @@ func ExampleDirWatcher() {
 	//-- FileStateDeleted /
 	//Re-create root directory with sub-directory:
 	//-- FileStateCreated /
-	//-- FileStateCreated /assets
 	//Chmod on root directory:
 	//-- FileStateUpdateMode / drwx------
 	//Create new file on root directory: /new.adoc
