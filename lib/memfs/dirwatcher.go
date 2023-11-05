@@ -20,10 +20,17 @@ const (
 
 // DirWatcher is a naive implementation of directory change notification.
 type DirWatcher struct {
-	C            <-chan NodeState // The channel on which the changes are delivered to user.
-	qchanges     chan NodeState
+	// C channel on which the changes are delivered to user.
+	C <-chan NodeState
+
+	// qchanges channel where all node modification published.
+	qchanges chan NodeState
+
+	// qFileChanges channel where file changes from NewWatcher
+	// consumed.
 	qFileChanges chan NodeState
-	qrun         chan bool
+
+	qrun chan bool
 
 	root *Node
 	fs   *MemFS
@@ -131,18 +138,18 @@ func (dw *DirWatcher) dirsKeys() (keys []string) {
 	return keys
 }
 
-// mapSubdirs iterate each child node and check if its a directory or regular
-// file.
-// If its a directory add it to map of node and recursively iterate
-// the childs.
+// mapSubdirs iterate each child node recursively and map any sub
+// directories into mapSubdirs.
 // If its a regular file, start a NewWatcher.
 func (dw *DirWatcher) mapSubdirs(node *Node) {
 	var (
-		logp = "DirWatcher.mapSubdirs"
-		err  error
+		logp = `DirWatcher.mapSubdirs`
+
+		child *Node
+		err   error
 	)
 
-	for _, child := range node.Childs {
+	for _, child = range node.Childs {
 		if child.IsDir() {
 			dw.dirsLocker.Lock()
 			dw.dirs[child.Path] = child
@@ -152,26 +159,59 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 		}
 		_, err = newWatcher(node, child, dw.Delay, dw.qFileChanges)
 		if err != nil {
-			log.Printf("%s: %q: %s", logp, child.SysPath, err)
+			log.Printf("%s %q: %s", logp, child.SysPath, err)
 		}
 	}
 }
 
-// unmapSubdirs remove the node from dw's fs including its childs.
-func (dw *DirWatcher) unmapSubdirs(node *Node) {
+// onCreated handle new child created on parent node.
+func (dw *DirWatcher) onCreated(parent, child *Node) (err error) {
+	if child.IsDir() {
+		dw.dirsLocker.Lock()
+		dw.dirs[child.Path] = child
+		dw.dirsLocker.Unlock()
+	} else {
+		// Start watching the file for modification.
+		_, err = newWatcher(parent, childInfo, dw.Delay, dw.qFileChanges)
+		if err != nil {
+			return fmt.Errorf(`onCreated: %w`, err)
+		}
+	}
+
+	var ns = NodeState{
+		Node:  *child,
+		State: FileStateCreated,
+	}
+
+	select {
+	case dw.qchanges <- ns:
+	default:
+	}
+	return nil
+}
+
+// onDelete remove the node from being watched and from memfs, including its
+// childs if its a directory.
+func (dw *DirWatcher) onDelete(node *Node) {
 	var (
 		child *Node
 	)
 	for _, child = range node.Childs {
 		if child.IsDir() {
-			dw.dirsLocker.Lock()
-			delete(dw.dirs, child.Path)
-			dw.dirsLocker.Unlock()
-			dw.unmapSubdirs(child)
+			dw.onDelete(child)
 		}
-	}
-	for _, child = range node.Childs {
+
 		dw.fs.RemoveChild(node, child)
+
+		// Push changes for file deletion.
+		var ns = NodeState{
+			State: FileStateDeleted,
+			Node:  *child,
+		}
+		select {
+		case dw.qchanges <- ns:
+		default:
+		}
 	}
 	if node.IsDir() {
 		dw.dirsLocker.Lock()
@@ -179,15 +219,24 @@ func (dw *DirWatcher) unmapSubdirs(node *Node) {
 		dw.dirsLocker.Unlock()
 	}
 	dw.fs.RemoveChild(node.Parent, node)
+
+	var ns = NodeState{
+		State: FileStateDeleted,
+		Node:  *node,
+	}
+	select {
+	case dw.qchanges <- ns:
+	default:
+	}
 }
 
-// onContentChange handle changes on the content of directory.
+// onUpdateDir handle changes on the directory "node".
 //
 // It will re-read the list of files in node directory and compare them with
-// old content to detect deletion and addition of files.
-func (dw *DirWatcher) onContentChange(node *Node) {
+// old content to detect deletion or addition of new file.
+func (dw *DirWatcher) onUpdateDir(node *Node) {
 	var (
-		logp = "onContentChange"
+		logp = "onUpdateDir"
 	)
 
 	f, err := os.Open(node.SysPath)
@@ -207,71 +256,57 @@ func (dw *DirWatcher) onContentChange(node *Node) {
 		log.Printf("%s: %s", logp, err)
 	}
 
-	// Find deleted files in directory.
-	for _, child := range node.Childs {
-		if child == nil {
-			continue
-		}
-		found := false
-		for _, newInfo := range fis {
-			if child.Name() == newInfo.Name() {
-				found = true
-				break
-			}
-		}
-		if found {
-			continue
-		}
-		dw.unmapSubdirs(child)
+	var (
+		mapChild = make(map[string]*Node, len(node.Childs))
+
+		child   *Node
+		newInfo os.FileInfo
+	)
+
+	// Store the current childs into a map first to easily get
+	// existing nodes.
+	for _, child = range node.Childs {
+		mapChild[child.name] = child
 	}
+	node.Childs = nil
 
 	// Find new files in directory.
-	for _, newInfo := range fis {
-		found := false
-		for _, child := range node.Childs {
-			if newInfo.Name() == child.Name() {
-				found = true
-				break
-			}
-		}
-		if found {
+	for _, newInfo = range fis {
+		child = mapChild[newInfo.Name()]
+		if child != nil {
+			// The node already exist previously.
+			node.Childs = append(node.Childs, child)
+			delete(mapChild, newInfo.Name())
 			continue
 		}
 
-		newChild, err := dw.fs.AddChild(node, newInfo)
+		// Process the new child.
+
+		child, err = dw.fs.AddChild(node, newInfo)
 		if err != nil {
 			log.Printf("%s: %s", logp, err)
 			continue
 		}
-		if newChild == nil {
-			// a node is excluded.
+		if child == nil {
+			// The child is being excluded.
 			continue
 		}
 
-		ns := NodeState{
-			Node:  *newChild,
-			State: FileStateCreated,
+		err = dw.onCreated(node, child)
+		if err != nil {
+			log.Printf(`%s: %s`, logp, err)
 		}
-
-		if newChild.IsDir() {
-			dw.dirsLocker.Lock()
-			dw.dirs[newChild.Path] = newChild
-			dw.dirsLocker.Unlock()
-
-			dw.mapSubdirs(newChild)
-			dw.onContentChange(newChild)
-		} else {
-			// Start watching the file for modification.
-			_, err = newWatcher(node, newInfo, dw.Delay, dw.qFileChanges)
-			if err != nil {
-				log.Printf("%s: %s", logp, err)
-				continue
-			}
+		if child.IsDir() {
+			dw.onUpdateDir(child)
 		}
+	}
 
-		select {
-		case dw.qchanges <- ns:
-		default:
+	// The rest of the mapChild now contains the deleted nodes.
+	for _, child = range mapChild {
+		if child.IsDir() {
+			// Only process directory, files is processed by
+			// qFileChanges.
+			dw.onDelete(child)
 		}
 	}
 }
@@ -301,17 +336,10 @@ func (dw *DirWatcher) onRootCreated() {
 	dw.dirsLocker.Lock()
 	dw.dirs = make(map[string]*Node)
 	dw.dirsLocker.Unlock()
+
+	_ = dw.onCreated(nil, dw.root)
+
 	dw.mapSubdirs(dw.root)
-
-	ns := NodeState{
-		Node:  *dw.root,
-		State: FileStateCreated,
-	}
-
-	select {
-	case dw.qchanges <- ns:
-	default:
-	}
 }
 
 // onRootDeleted handle change when the root directory that we watch get
@@ -337,17 +365,61 @@ func (dw *DirWatcher) onRootDeleted() {
 	}
 }
 
-// onModified handle change when permission or attribute on node directory
-// changed.
-func (dw *DirWatcher) onModified(node *Node, newDirInfo os.FileInfo) {
-	dw.fs.Update(node, newDirInfo)
-
+// onUpdateContent handle when the file modification changes.
+func (dw *DirWatcher) onUpdateContent(node *Node, newInfo os.FileInfo) {
 	var (
-		ns = NodeState{
-			Node:  *node,
-			State: FileStateUpdateMode,
-		}
+		logp = `onUpdateContent`
+
+		err error
 	)
+
+	if newInfo == nil {
+		newInfo, err = os.Stat(node.SysPath)
+		if err != nil {
+			log.Printf(`%s %q: %s`, logp, node.Path, err)
+			return
+		}
+	}
+
+	node.modTime = newInfo.ModTime()
+	node.size = newInfo.Size()
+
+	if !node.IsDir() {
+		err = node.updateContent(dw.fs.Opts.MaxFileSize)
+		if err != nil {
+			log.Printf(`%s %q: %s`, logp, node.Path, err)
+		}
+	}
+
+	var ns = NodeState{
+		Node:  *node,
+		State: FileStateUpdateContent,
+	}
+
+	select {
+	case dw.qchanges <- ns:
+	default:
+	}
+}
+
+// onUpdateMode handle change when permission or attribute of node changed.
+func (dw *DirWatcher) onUpdateMode(node *Node, newInfo os.FileInfo) {
+	if newInfo == nil {
+		var err error
+
+		newInfo, err = os.Stat(node.SysPath)
+		if err != nil {
+			log.Printf(`onUpdateMode %q: %s`, node.Path, err)
+			return
+		}
+	}
+
+	node.mode = newInfo.Mode()
+
+	var ns = NodeState{
+		Node:  *node,
+		State: FileStateUpdateMode,
+	}
 
 	select {
 	case dw.qchanges <- ns:
@@ -383,16 +455,14 @@ func (dw *DirWatcher) start() {
 			}
 			if dw.fs == nil {
 				dw.onRootCreated()
-				dw.onContentChange(dw.root)
+				dw.onUpdateDir(dw.root)
 				continue
 			}
 			if dw.root.Mode() != fi.Mode() {
-				dw.onModified(dw.root, fi)
-				continue
+				dw.onUpdateMode(dw.root, fi)
 			}
 			if !dw.root.ModTime().Equal(fi.ModTime()) {
-				dw.fs.Update(dw.root, fi)
-				dw.onContentChange(dw.root)
+				dw.onUpdateDir(dw.root)
 			}
 			dw.processSubdirs()
 
@@ -404,12 +474,13 @@ func (dw *DirWatcher) start() {
 				ns.Node = *node
 				switch ns.State {
 				case FileStateDeleted:
-					dw.fs.RemoveChild(node.Parent, node)
-				default:
-					dw.fs.Update(node, nil)
+					dw.onDelete(node)
+				case FileStateUpdateMode:
+					dw.onUpdateMode(node, nil)
+				case FileStateUpdateContent:
+					dw.onUpdateContent(node, nil)
 				}
 			}
-			dw.qchanges <- ns
 
 		case <-dw.qrun:
 			ever = false
@@ -419,27 +490,29 @@ func (dw *DirWatcher) start() {
 }
 
 func (dw *DirWatcher) processSubdirs() {
-	logp := "processSubdirs"
+	var (
+		logp = `processSubdirs`
 
-	for _, node := range dw.dirs {
-		newDirInfo, err := osStat(node.SysPath)
+		node       *Node
+		newDirInfo os.FileInfo
+		err        error
+	)
+
+	for _, node = range dw.dirs {
+		newDirInfo, err = osStat(node.SysPath)
 		if err != nil {
 			if os.IsNotExist(err) {
-				dw.unmapSubdirs(node)
+				dw.onDelete(node)
 			} else {
 				log.Printf("%s: %q: %s", logp, node.SysPath, err)
 			}
 			continue
 		}
 		if node.Mode() != newDirInfo.Mode() {
-			dw.onModified(node, newDirInfo)
-			continue
+			dw.onUpdateMode(node, newDirInfo)
 		}
-		if node.ModTime().Equal(newDirInfo.ModTime()) {
-			continue
+		if !node.ModTime().Equal(newDirInfo.ModTime()) {
+			dw.onUpdateDir(node)
 		}
-
-		dw.fs.Update(node, newDirInfo)
-		dw.onContentChange(node)
 	}
 }
