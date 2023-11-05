@@ -10,6 +10,7 @@ package json
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -161,7 +162,7 @@ func ToMapStringFloat64(in map[string]interface{}) (out map[string]float64, err 
 // For example, in string "\x", "x" is not valid control character, and the
 // function will return empty string and error.
 // If strict is false, it will return "x".
-func Unescape(in []byte, strict bool) ([]byte, error) {
+func Unescape(in []byte, strict bool) (out []byte, err error) {
 	var (
 		buf bytes.Buffer
 		uni bytes.Buffer
@@ -179,7 +180,9 @@ func Unescape(in []byte, strict bool) ([]byte, error) {
 					y++
 				}
 
-				dec, err := strconv.ParseUint(uni.String(), 16, 32)
+				var dec uint64
+
+				dec, err = strconv.ParseUint(uni.String(), 16, 32)
 				if err != nil {
 					return nil, err
 				}
@@ -187,6 +190,16 @@ func Unescape(in []byte, strict bool) ([]byte, error) {
 				if dec <= 31 {
 					buf.WriteByte(byte(dec))
 				} else {
+					if dec > math.MaxInt32 {
+						// This path actually not
+						// possible because the
+						// maximum value is 0xFFFF
+						// (65535).
+						// We add it to make CodeQL
+						// happy
+						// https://github.com/shuLhan/share/security/code-scanning/48
+						return nil, fmt.Errorf(`Unescape: overflow when converting %s to rune`, uni.String())
+					}
 					buf.WriteRune(rune(dec))
 				}
 
@@ -226,7 +239,7 @@ func Unescape(in []byte, strict bool) ([]byte, error) {
 			}
 
 			if strict {
-				err := fmt.Errorf(errInvalidSyntax, "BytesJSONUnescape", x)
+				err = fmt.Errorf(errInvalidSyntax, "BytesJSONUnescape", x)
 				return nil, err
 			}
 

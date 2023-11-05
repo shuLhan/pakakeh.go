@@ -100,6 +100,9 @@ func TestUnescapeString(t *testing.T) {
 		in:     `\x`,
 		strict: true,
 		expErr: `BytesJSONUnescape: invalid syntax at 1`,
+	}, {
+		in:  `\uFFFF`,
+		exp: "\xEF\xBF\xBF",
 	}}
 
 	var (
@@ -116,6 +119,7 @@ func TestUnescapeString(t *testing.T) {
 			continue
 		}
 
+		t.Logf(`got: %+x`, []byte(got))
 		test.Assert(t, "value", c.exp, got)
 	}
 }
