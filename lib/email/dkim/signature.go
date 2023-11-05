@@ -14,6 +14,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 )
@@ -99,16 +100,20 @@ func Parse(value []byte) (sig *Signature, err error) {
 		return nil, nil
 	}
 
-	l := len(value)
+	var l = len(value)
 	if value[l-2] != '\r' && value[l-1] != '\n' {
 		return nil, errors.New("dkim: value must end with CRLF")
 	}
 
-	p := newParser(value)
+	var (
+		p = newParser(value)
+
+		tag *tag
+	)
 
 	sig = &Signature{}
 	for {
-		tag, err := p.fetchTag()
+		tag, err = p.fetchTag()
 		if err != nil {
 			return sig, err
 		}
@@ -454,7 +459,6 @@ func (sig *Signature) set(t *tag) (err error) {
 			return errors.New("dkim: x=: " + err.Error())
 		}
 		err = sig.validateTime()
-
 	case tagCanon:
 		sig.CanonHeader, sig.CanonBody, err = unpackCanons(t.value)
 
@@ -565,7 +569,14 @@ func (sig *Signature) validateTime() (err error) {
 	if sig.ExpiredAt < sig.CreatedAt {
 		return errCreatedTime
 	}
-
+	if sig.ExpiredAt > math.MaxInt64 {
+		// According to RFC 6376,
+		// "To avoid denial-of-service attacks, implementations MAY
+		// consider any value longer than 12 digits to be
+		// infinite.".
+		sig.ExpiredAt = math.MaxInt64
+		return nil
+	}
 	exp := time.Unix(int64(sig.ExpiredAt), 0)
 	now := time.Now().Add(time.Hour * -1).Unix()
 	if uint64(now) > sig.ExpiredAt {

@@ -189,6 +189,11 @@ func TestSignatureParse(t *testing.T) {
 			"4bmp/YzhwvcubU4=;" +
 			" c=simple/simple;" +
 			" i=joe@football.example.com; q=dns/txt\r\n",
+	}, {
+		desc:       `With expired-at more than 12 digits`,
+		in:         "v=1; a=rsa-sha256; d=example.com; s=mykey; h=from; bh=bh; b=b; t=1117574938; x=9223372036854775808\r\n",
+		expRelaxed: "v=1; a=rsa-sha256; d=example.com; s=mykey; h=from; bh=bh; b=b; t=1117574938; x=9223372036854775807; \r\n",
+		expSimple:  "v=1; a=rsa-sha256; d=example.com; s=mykey; h=from; bh=bh; b=b; t=1117574938; x=9223372036854775808\r\n",
 	}}
 
 	for _, c := range cases {
