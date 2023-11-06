@@ -140,3 +140,68 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 	test.Assert(t, `RemoveAll state`, FileStateDeleted, got.State)
 	test.Assert(t, `RemoveAll path`, `/sub/index.html`, got.Node.Path)
 }
+
+func TestDirWatcher_withSymlink(t *testing.T) {
+	// Initialize the file and directory for symlink.
+
+	var (
+		dirSource     = t.TempDir()
+		dirDest       = t.TempDir()
+		symlinkSource = filepath.Join(dirSource, `symlinkSource`)
+		symlinkDest   = filepath.Join(dirDest, `symlinkDest`)
+		data          = []byte(`content of symlink`)
+
+		err error
+	)
+
+	err = os.WriteFile(symlinkSource, data, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.Symlink(symlinkSource, symlinkDest)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create the DirWatcher instance and start watching the changes.
+
+	var dw = DirWatcher{
+		Options: Options{
+			Root: dirDest,
+		},
+		Delay: 100 * time.Millisecond,
+	}
+
+	err = dw.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Wait for all watcher started.
+	time.Sleep(500 * time.Millisecond)
+
+	var gotns NodeState
+
+	// Write to symlink file source.
+	data = []byte(`new content of symlink`)
+	err = os.WriteFile(symlinkSource, data, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotns = <-dw.C
+	test.Assert(t, `path`, `/symlinkDest`, gotns.Node.Path)
+	test.Assert(t, `state`, FileStateUpdateContent, gotns.State)
+
+	// Write to symlink file destination.
+	data = []byte(`new content of symlink destination`)
+	err = os.WriteFile(symlinkDest, data, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotns = <-dw.C
+	test.Assert(t, `path`, `/symlinkDest`, gotns.Node.Path)
+	test.Assert(t, `state`, FileStateUpdateContent, gotns.State)
+}
