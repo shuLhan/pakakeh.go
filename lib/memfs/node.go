@@ -236,9 +236,8 @@ func (node *Node) Read(p []byte) (n int, err error) {
 }
 
 // Readdir reads the contents of the directory associated with file and
-// returns a slice of up to n FileInfo values, as would be returned by Lstat,
-// in directory order.
-// Subsequent calls on the same file will yield further FileInfos.
+// returns a slice of up to n FileInfo values, as would be returned by
+// [os.Stat].
 func (node *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 	if !node.IsDir() {
 		return nil, nil
@@ -489,7 +488,6 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 
 	if node.mode != newInfo.Mode() {
 		node.mode = newInfo.Mode()
-		return nil
 	}
 
 	var doUpdate = false
