@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	libstrings "github.com/shuLhan/share/lib/strings"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -28,9 +29,9 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 	//
 	// Create a directory with its content to be watched.
 	//
-	//	rootDir
-	//	|_ subDir
-	//	   |_ subDirFile
+	//	rootDir/
+	//	|_ subDir/
+	//	   |_ testfile
 	//
 
 	rootDir = t.TempDir()
@@ -68,9 +69,18 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	<-dw.C
-	<-dw.C
-	<-dw.C
+	var ns NodeState
+	ns = <-dw.C // newsubdir created.
+	t.Logf(`0: %s %s`, ns.State, ns.Node.Path)
+
+	ns = <-dw.C // newsubdir/testfile created.
+	t.Logf(`1: %s %s`, ns.State, ns.Node.Path)
+
+	ns = <-dw.C // subdir/testfile removed.
+	t.Logf(`2: %s %s`, ns.State, ns.Node.Path)
+
+	ns = <-dw.C // subdir removed.
+	t.Logf(`3: %s %s`, ns.State, ns.Node.Path)
 
 	dw.Stop()
 
@@ -142,9 +152,22 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	var oneOf = []string{`/sub`, `/sub/index.html`}
+
 	got = <-dw.C
 	test.Assert(t, `RemoveAll state`, FileStateDeleted, got.State)
-	test.Assert(t, `RemoveAll path`, `/sub/index.html`, got.Node.Path)
+	if !libstrings.IsContain(oneOf, got.Node.Path) {
+		t.Fatalf(`expecting one of %v, got %q`, oneOf, got.Node.Path)
+	}
+
+	got = <-dw.C
+	test.Assert(t, `RemoveAll state`, FileStateDeleted, got.State)
+	if !libstrings.IsContain(oneOf, got.Node.Path) {
+		t.Fatalf(`expecting one of %v, got %q`, oneOf, got.Node.Path)
+	}
+
+	dw.Stop()
 }
 
 func TestDirWatcher_withSymlink(t *testing.T) {

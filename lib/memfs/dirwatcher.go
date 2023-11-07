@@ -30,7 +30,7 @@ type DirWatcher struct {
 	// consumed.
 	qFileChanges chan NodeState
 
-	qrun chan bool
+	qrun chan struct{}
 
 	root *Node
 	fs   *MemFS
@@ -40,6 +40,10 @@ type DirWatcher struct {
 	// The map key is relative path to directory and its value is a node
 	// information.
 	dirs map[string]*Node
+
+	// fileWatcher contains active watcher for file with Node.Path as
+	// key.
+	fileWatcher map[string]*Watcher
 
 	// This struct embed Options to map the directory to be watched
 	// into memory.
@@ -95,9 +99,11 @@ func (dw *DirWatcher) init() (err error) {
 	dw.C = dw.qchanges
 
 	dw.qFileChanges = make(chan NodeState, dirWatcherQueueSize)
-	dw.qrun = make(chan bool, 1)
+	dw.qrun = make(chan struct{})
 
 	dw.dirs = make(map[string]*Node)
+	dw.fileWatcher = make(map[string]*Watcher)
+
 	dw.mapSubdirs(dw.root)
 
 	return nil
@@ -121,7 +127,17 @@ func (dw *DirWatcher) Start() (err error) {
 
 // Stop watching changes on directory.
 func (dw *DirWatcher) Stop() {
-	dw.qrun <- false
+	// Stop all file watchers.
+	var watcher *Watcher
+	for _, watcher = range dw.fileWatcher {
+		watcher.Stop()
+	}
+
+	select {
+	case dw.qrun <- struct{}{}:
+		<-dw.qrun
+	default:
+	}
 }
 
 // dirsKeys return all the key in field dirs sorted in ascending order.
@@ -145,8 +161,9 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 	var (
 		logp = `DirWatcher.mapSubdirs`
 
-		child *Node
-		err   error
+		child   *Node
+		watcher *Watcher
+		err     error
 	)
 
 	for _, child = range node.Childs {
@@ -157,10 +174,12 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 			dw.mapSubdirs(child)
 			continue
 		}
-		_, err = newWatcher(node, child, dw.Delay, dw.qFileChanges)
+		watcher, err = newWatcher(node, child, dw.Delay, dw.qFileChanges)
 		if err != nil {
 			log.Printf("%s %q: %s", logp, child.SysPath, err)
+			continue
 		}
+		dw.fileWatcher[child.Path] = watcher
 	}
 }
 
@@ -172,10 +191,14 @@ func (dw *DirWatcher) onCreated(parent, child *Node) (err error) {
 		dw.dirsLocker.Unlock()
 	} else {
 		// Start watching the file for modification.
-		_, err = newWatcher(parent, childInfo, dw.Delay, dw.qFileChanges)
+		var watcher *Watcher
+
+		watcher, err = newWatcher(parent, child, dw.Delay, dw.qFileChanges)
 		if err != nil {
 			return fmt.Errorf(`onCreated: %w`, err)
 		}
+
+		dw.fileWatcher[child.Path] = watcher
 	}
 
 	var ns = NodeState{
@@ -194,7 +217,8 @@ func (dw *DirWatcher) onCreated(parent, child *Node) (err error) {
 // childs if its a directory.
 func (dw *DirWatcher) onDelete(node *Node) {
 	var (
-		child *Node
+		child   *Node
+		watcher *Watcher
 	)
 	for _, child = range node.Childs {
 		if child.IsDir() {
@@ -217,6 +241,13 @@ func (dw *DirWatcher) onDelete(node *Node) {
 		dw.dirsLocker.Lock()
 		delete(dw.dirs, node.Path)
 		dw.dirsLocker.Unlock()
+	} else {
+		// Stop the file watcher.
+		watcher = dw.fileWatcher[node.Path]
+		if watcher != nil {
+			watcher.Stop()
+			delete(dw.fileWatcher, node.Path)
+		}
 	}
 	dw.fs.RemoveChild(node.Parent, node)
 
@@ -470,6 +501,10 @@ func (dw *DirWatcher) start() {
 			node, err = dw.fs.Get(ns.Node.Path)
 			if err != nil {
 				log.Printf("%s: on file changes %s: %s", logp, ns.Node.Path, err)
+				var watcher = dw.fileWatcher[ns.Node.Path]
+				if watcher != nil {
+					watcher.Stop()
+				}
 			} else {
 				ns.Node = *node
 				switch ns.State {
@@ -485,6 +520,8 @@ func (dw *DirWatcher) start() {
 		case <-dw.qrun:
 			ever = false
 			ticker.Stop()
+			// Signal back to the Stop caller.
+			dw.qrun <- struct{}{}
 		}
 	}
 }
