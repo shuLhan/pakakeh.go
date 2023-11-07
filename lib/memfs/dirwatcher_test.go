@@ -51,7 +51,7 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 		Options: Options{
 			Root: rootDir,
 		},
-		Delay: 200 * time.Millisecond,
+		Delay: 100 * time.Millisecond,
 	}
 
 	err = dw.Start()
@@ -102,7 +102,7 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 		}
 		dw = DirWatcher{
 			Options: opts,
-			Delay:   200 * time.Millisecond,
+			Delay:   100 * time.Millisecond,
 		}
 
 		got NodeState
@@ -113,8 +113,8 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Wait for all watcher started.
-	time.Sleep(500 * time.Millisecond)
+	// Add delay for modtime to changes.
+	time.Sleep(100 * time.Millisecond)
 
 	err = os.Mkdir(dirSub, 0700)
 	if err != nil {
@@ -124,6 +124,9 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 	test.Assert(t, `Mkdir state`, FileStateCreated, got.State)
 	test.Assert(t, `Mkdir path`, `/sub`, got.Node.Path)
 
+	// Add delay for modtime to changes.
+	time.Sleep(100 * time.Millisecond)
+
 	err = os.Symlink(fileOld, fileNew)
 	if err != nil {
 		t.Fatal(err)
@@ -131,6 +134,9 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 	got = <-dw.C
 	test.Assert(t, `Symlink state`, FileStateCreated, got.State)
 	test.Assert(t, `Symlink path`, `/sub/index.html`, got.Node.Path)
+
+	// Add delay for modtime to changes.
+	time.Sleep(100 * time.Millisecond)
 
 	err = os.RemoveAll(dirSub)
 	if err != nil {
@@ -178,12 +184,12 @@ func TestDirWatcher_withSymlink(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Wait for all watcher started.
-	time.Sleep(500 * time.Millisecond)
+	// Add delay for modtime to changes.
+	time.Sleep(100 * time.Millisecond)
 
 	var gotns NodeState
 
-	// Write to symlink file source.
+	// Write to file source.
 	data = []byte(`new content of symlink`)
 	err = os.WriteFile(symlinkSource, data, 0600)
 	if err != nil {
@@ -193,6 +199,9 @@ func TestDirWatcher_withSymlink(t *testing.T) {
 	gotns = <-dw.C
 	test.Assert(t, `path`, `/symlinkDest`, gotns.Node.Path)
 	test.Assert(t, `state`, FileStateUpdateContent, gotns.State)
+
+	// Add delay for modtime to changes.
+	time.Sleep(100 * time.Millisecond)
 
 	// Write to symlink file destination.
 	data = []byte(`new content of symlink destination`)
@@ -204,4 +213,6 @@ func TestDirWatcher_withSymlink(t *testing.T) {
 	gotns = <-dw.C
 	test.Assert(t, `path`, `/symlinkDest`, gotns.Node.Path)
 	test.Assert(t, `state`, FileStateUpdateContent, gotns.State)
+
+	dw.Stop()
 }

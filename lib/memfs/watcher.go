@@ -53,7 +53,7 @@ func NewWatcher(path string, d time.Duration) (w *Watcher, err error) {
 		return nil, fmt.Errorf("%s: path is empty", logp)
 	}
 
-	fi, err = osStat(path)
+	fi, err = os.Stat(path)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -117,7 +117,7 @@ func (w *Watcher) start() {
 		err     error
 	)
 	for range w.ticker.C {
-		newInfo, err = osStat(w.node.SysPath)
+		newInfo, err = os.Stat(w.node.SysPath)
 		if err != nil {
 			if !os.IsNotExist(err) {
 				log.Printf("%s: %s: %s", logp, w.node.SysPath, err)

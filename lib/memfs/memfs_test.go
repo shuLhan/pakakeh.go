@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -19,35 +18,8 @@ import (
 )
 
 var (
-	_epoch  atomic.Int64
 	_testWD string
 )
-
-// mockOsStat mock the os.Stat by returning FileInfo with mocked ModTime that
-// always increased 1 second every call.
-func mockOsStat(path string) (fi os.FileInfo, err error) {
-	var orgfi os.FileInfo
-
-	orgfi, err = os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var node = &Node{
-		name:    orgfi.Name(),
-		size:    orgfi.Size(),
-		mode:    orgfi.Mode(),
-		modTime: time.Unix(_epoch.Load(), 0),
-	}
-	if !orgfi.IsDir() {
-		node.Content, err = os.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-	}
-	_epoch.Add(1)
-	return node, nil
-}
 
 func TestMain(m *testing.M) {
 	var err error
@@ -78,9 +50,6 @@ func TestMain(m *testing.M) {
 			log.Fatal(err)
 		}
 	}
-
-	_epoch.Store(1684424377)
-	osStat = mockOsStat
 
 	os.Exit(m.Run())
 }

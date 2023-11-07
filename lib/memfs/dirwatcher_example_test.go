@@ -40,13 +40,16 @@ func ExampleDirWatcher() {
 				`.*\.html$`,
 			},
 		},
-		Delay: 150 * time.Millisecond,
+		Delay: 100 * time.Millisecond,
 	}
 
 	err = dw.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Add delay for modtime to changes.
+	time.Sleep(100 * time.Millisecond)
 
 	fmt.Println(`Deleting the root directory:`)
 	err = os.Remove(rootDir)

@@ -74,7 +74,7 @@ func (dw *DirWatcher) init() (err error) {
 	}
 
 	if dw.fs == nil {
-		fi, err = osStat(dw.Root)
+		fi, err = os.Stat(dw.Root)
 		if err != nil {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
@@ -442,7 +442,7 @@ func (dw *DirWatcher) start() {
 	for ever {
 		select {
 		case <-ticker.C:
-			fi, err = osStat(dw.Root)
+			fi, err = os.Stat(dw.Root)
 			if err != nil {
 				if !os.IsNotExist(err) {
 					log.Printf("%s: %s", logp, err)
@@ -499,7 +499,7 @@ func (dw *DirWatcher) processSubdirs() {
 	)
 
 	for _, node = range dw.dirs {
-		newDirInfo, err = osStat(node.SysPath)
+		newDirInfo, err = os.Stat(node.SysPath)
 		if err != nil {
 			if os.IsNotExist(err) {
 				dw.onDelete(node)
