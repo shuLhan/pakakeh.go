@@ -213,42 +213,41 @@ func (dw *DirWatcher) onCreated(parent, child *Node) (err error) {
 	return nil
 }
 
-// onDelete remove the node from being watched and from memfs, including its
-// childs if its a directory.
-func (dw *DirWatcher) onDelete(node *Node) {
-	var (
-		child   *Node
-		watcher *Watcher
-	)
+// onDirDeleted remove the node from being watched and from memfs, including
+// its childs if its a directory.
+func (dw *DirWatcher) onDirDeleted(node *Node) {
+	var child *Node
+
 	for _, child = range node.Childs {
 		if child.IsDir() {
-			dw.onDelete(child)
+			dw.onDirDeleted(child)
 		}
-
 		dw.fs.RemoveChild(node, child)
+	}
 
-		// Push changes for file deletion.
-		var ns = NodeState{
-			State: FileStateDeleted,
-			Node:  *child,
-		}
-		select {
-		case dw.qchanges <- ns:
-		default:
-		}
+	dw.dirsLocker.Lock()
+	delete(dw.dirs, node.Path)
+	dw.dirsLocker.Unlock()
+
+	dw.fs.RemoveChild(node.Parent, node)
+
+	var ns = NodeState{
+		State: FileStateDeleted,
+		Node:  *node,
 	}
-	if node.IsDir() {
-		dw.dirsLocker.Lock()
-		delete(dw.dirs, node.Path)
-		dw.dirsLocker.Unlock()
-	} else {
-		// Stop the file watcher.
-		watcher = dw.fileWatcher[node.Path]
-		if watcher != nil {
-			watcher.Stop()
-			delete(dw.fileWatcher, node.Path)
-		}
+	select {
+	case dw.qchanges <- ns:
+	default:
 	}
+}
+
+func (dw *DirWatcher) onFileDeleted(node *Node) {
+	var watcher = dw.fileWatcher[node.Path]
+	if watcher != nil {
+		watcher.Stop()
+		delete(dw.fileWatcher, node.Path)
+	}
+
 	dw.fs.RemoveChild(node.Parent, node)
 
 	var ns = NodeState{
@@ -337,7 +336,7 @@ func (dw *DirWatcher) onUpdateDir(node *Node) {
 		if child.IsDir() {
 			// Only process directory, files is processed by
 			// qFileChanges.
-			dw.onDelete(child)
+			dw.onDirDeleted(child)
 		}
 	}
 }
@@ -501,15 +500,12 @@ func (dw *DirWatcher) start() {
 			node, err = dw.fs.Get(ns.Node.Path)
 			if err != nil {
 				log.Printf("%s: on file changes %s: %s", logp, ns.Node.Path, err)
-				var watcher = dw.fileWatcher[ns.Node.Path]
-				if watcher != nil {
-					watcher.Stop()
-				}
+				dw.onFileDeleted(&ns.Node)
 			} else {
 				ns.Node = *node
 				switch ns.State {
 				case FileStateDeleted:
-					dw.onDelete(node)
+					dw.onFileDeleted(node)
 				case FileStateUpdateMode:
 					dw.onUpdateMode(node, nil)
 				case FileStateUpdateContent:
@@ -539,7 +535,7 @@ func (dw *DirWatcher) processSubdirs() {
 		newDirInfo, err = os.Stat(node.SysPath)
 		if err != nil {
 			if os.IsNotExist(err) {
-				dw.onDelete(node)
+				dw.onDirDeleted(node)
 			} else {
 				log.Printf("%s: %q: %s", logp, node.SysPath, err)
 			}
