@@ -23,6 +23,8 @@ type Watcher struct {
 	C        <-chan NodeState // The channel on which the changes are delivered.
 	qchanges chan NodeState
 
+	done chan struct{}
+
 	node   *Node
 	ticker *time.Ticker
 
@@ -94,6 +96,7 @@ func newWatcher(parent *Node, fi os.FileInfo, d time.Duration, qchanges chan Nod
 		qchanges: qchanges,
 		delay:    d,
 		ticker:   time.NewTicker(d),
+		done:     make(chan struct{}),
 		node:     node,
 	}
 	if w.qchanges == nil {
@@ -111,60 +114,74 @@ func newWatcher(parent *Node, fi os.FileInfo, d time.Duration, qchanges chan Nod
 func (w *Watcher) start() {
 	var (
 		logp = "Watcher"
+		ever = true
 
 		newInfo fs.FileInfo
 		ns      NodeState
 		err     error
 	)
-	for range w.ticker.C {
-		newInfo, err = os.Stat(w.node.SysPath)
-		if err != nil {
-			if !os.IsNotExist(err) {
-				log.Printf("%s: %s: %s", logp, w.node.SysPath, err)
+	for ever {
+		select {
+		case <-w.ticker.C:
+			newInfo, err = os.Stat(w.node.SysPath)
+			if err != nil {
+				if !os.IsNotExist(err) {
+					log.Printf("%s: %s: %s", logp, w.node.SysPath, err)
+					continue
+				}
+
+				ns.Node = *w.node
+				ns.State = FileStateDeleted
+
+				select {
+				case w.qchanges <- ns:
+				default:
+				}
+				ever = false
+				w.ticker.Stop()
 				continue
 			}
 
+			if w.node.Mode() != newInfo.Mode() {
+				w.node.SetMode(newInfo.Mode())
+
+				ns.Node = *w.node
+				ns.State = FileStateUpdateMode
+
+				select {
+				case w.qchanges <- ns:
+				default:
+				}
+				continue
+			}
+			if w.node.ModTime().Equal(newInfo.ModTime()) {
+				continue
+			}
+
+			w.node.SetModTime(newInfo.ModTime())
+			w.node.SetSize(newInfo.Size())
+
 			ns.Node = *w.node
-			ns.State = FileStateDeleted
+			ns.State = FileStateUpdateContent
 
 			select {
 			case w.qchanges <- ns:
 			default:
 			}
-			w.node = nil
-			return
-		}
-
-		if w.node.Mode() != newInfo.Mode() {
-			w.node.SetMode(newInfo.Mode())
-
-			ns.Node = *w.node
-			ns.State = FileStateUpdateMode
-
-			select {
-			case w.qchanges <- ns:
-			default:
-			}
-			continue
-		}
-		if w.node.ModTime().Equal(newInfo.ModTime()) {
-			continue
-		}
-
-		w.node.SetModTime(newInfo.ModTime())
-		w.node.SetSize(newInfo.Size())
-
-		ns.Node = *w.node
-		ns.State = FileStateUpdateContent
-
-		select {
-		case w.qchanges <- ns:
-		default:
+		case <-w.done:
+			ever = false
+			w.ticker.Stop()
+			w.done <- struct{}{}
 		}
 	}
 }
 
 // Stop watching the file.
 func (w *Watcher) Stop() {
-	w.ticker.Stop()
+	select {
+	case w.done <- struct{}{}:
+		<-w.done
+	default:
+		// Ticker has been stopped due to file being deleted.
+	}
 }
