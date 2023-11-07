@@ -39,11 +39,10 @@ var (
 )
 
 // Node represent a single file.
+//
+// This Node implement os.FileInfo and http.File.
 type Node struct {
 	modTime time.Time // ModTime contains file modification time.
-
-	os.FileInfo
-	http.File
 
 	Parent *Node // Pointer to parent directory.
 
