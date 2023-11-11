@@ -460,6 +460,13 @@ func TestParseVarValue(t *testing.T) {
 		desc:   `Invalid escaped chars`,
 		in:     `"value\b\n\x\"escaped\" here"`,
 		expErr: errValueInvalid,
+	}, {
+		desc:        `Multiline no space`,
+		in:          "multi\\\nvalue",
+		expErr:      io.EOF,
+		expFormat:   `%s`,
+		expValue:    `multivalue`,
+		expRawValue: "multi\\\nvalue",
 	}}
 
 	var (
