@@ -286,3 +286,77 @@ func TestIni_Get(t *testing.T) {
 		}
 	}
 }
+
+func TestIni_Set(t *testing.T) {
+	type testCase struct {
+		desc string
+		sec  string
+		sub  string
+		key  string
+		val  string
+		exp  string
+	}
+
+	var (
+		tdata *test.Data
+		ini   *Ini
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/set_test.data`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ini, err = Open(`testdata/set.ini`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var cases = []testCase{{
+		desc: `case#1`,
+		sec:  `host`,
+		key:  `ip_internal`,
+		val:  `127.0.0.2`,
+		exp:  string(tdata.Output[`case#1`]),
+	}, {
+		desc: `case#2`,
+		sec:  `host`,
+		key:  `ip_external`,
+		val:  `192.168.100.205`,
+		exp:  string(tdata.Output[`case#2`]),
+	}, {
+		desc: `case#3`,
+		sec:  `host`,
+		sub:  `ms`,
+		key:  `ip_internal`,
+		val:  `127.1.0.2`,
+		exp:  string(tdata.Output[`case#3`]),
+	}, {
+		desc: `case#4`,
+		sec:  `host`,
+		sub:  `ms`,
+		key:  `ip_external`,
+		val:  `192.168.56.10`,
+		exp:  string(tdata.Output[`case#4`]),
+	}}
+
+	var (
+		c        testCase
+		gotWrite bytes.Buffer
+		gotSet   bool
+	)
+
+	for _, c = range cases {
+		gotSet = ini.Set(c.sec, c.sub, c.key, c.val)
+		test.Assert(t, `Set `+c.key, true, gotSet)
+
+		gotWrite.Reset()
+		err = ini.Write(&gotWrite)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.desc, c.exp, gotWrite.String())
+	}
+}

@@ -175,6 +175,25 @@ func (sec *Section) addVariable(v *variable) {
 	sec.vars = append(sec.vars, v)
 }
 
+// appendVar append the variable v after the last non-empty line.
+func (sec *Section) appendVar(v *variable) {
+	var x = len(sec.vars) - 1
+	for ; x >= 0; x-- {
+		if sec.vars[x].mode != lineModeEmpty {
+			break
+		}
+	}
+	if x < 0 {
+		sec.vars = append(sec.vars, v)
+		return
+	}
+	var tmp = make([]*variable, 0, len(sec.vars)+1)
+	tmp = append(tmp, sec.vars[:x+1]...)
+	tmp = append(tmp, v)
+	tmp = append(tmp, sec.vars[x+1:]...)
+	sec.vars = tmp
+}
+
 // get will return the last variable value based on key.
 // If no key found it will return default value and false.
 func (sec *Section) get(key, def string) (val string, ok bool) {
@@ -278,16 +297,18 @@ func (sec *Section) set(key, value string) bool {
 		v = &variable{
 			mode:     lineModeKeyValue,
 			key:      key,
-			keyLower: strings.ToLower(key),
+			keyLower: keyLower,
 			value:    value,
 		}
-		sec.vars = append(sec.vars, v)
+		sec.appendVar(v)
 		return true
 	}
 
 	v.value = strings.TrimSpace(value)
 	if len(v.format) > 0 {
-		v.rawValue = []byte(value)
+		v.rawValue = make([]byte, 0, len(value)+1)
+		v.rawValue = append(v.rawValue, ' ')
+		v.rawValue = append(v.rawValue, []byte(value)...)
 	}
 
 	return true
