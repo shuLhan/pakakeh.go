@@ -195,6 +195,21 @@ func (node *Node) IsDir() bool {
 	return node.mode.IsDir()
 }
 
+// JSON encode the Node into JSON.
+// This method provides an alternative to MarshalJSON with granular options.
+//
+// The depth set the level of childs to be encoded.
+// The depth=0 only encode the Root Node itself (with its childs), depth=1
+// encode the Root node and its subdirectories, and so on.
+//
+// If withoutModTime is set to true, all of the node ModTime will not be
+// included in output.
+func (node *Node) JSON(depth int, withoutModTime bool) (rawjson []byte, err error) {
+	var buf bytes.Buffer
+	node.packAsJson(&buf, depth, withoutModTime)
+	return buf.Bytes(), nil
+}
+
 // MarshalJSON encode the node into JSON format.
 // If the node is a file it will return the content of file;
 // otherwise it will return the node with list of childs, but not including
@@ -415,13 +430,13 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int, withoutModTime bool) 
 	}
 
 	_, _ = fmt.Fprintf(buf, `"childs":`)
-	if depth == 0 {
+	if depth >= 0 {
 		_ = buf.WriteByte('[')
 		for x, child := range node.Childs {
 			if x > 0 {
 				_ = buf.WriteByte(',')
 			}
-			child.packAsJson(buf, depth+1, withoutModTime)
+			child.packAsJson(buf, depth-1, withoutModTime)
 		}
 		_ = buf.WriteByte(']')
 	} else {
