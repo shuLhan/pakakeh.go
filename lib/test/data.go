@@ -90,7 +90,7 @@ var (
 //
 // # Articles
 //
-//   - https://kilabit.local/journal/2023/go_test_data/
+//   - https://kilabit.info/journal/2023/go_test_data/
 type Data struct {
 	Flag   map[string]string
 	Input  map[string][]byte
