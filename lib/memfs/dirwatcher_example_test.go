@@ -48,8 +48,9 @@ func ExampleDirWatcher() {
 		log.Fatal(err)
 	}
 
-	// Add delay for modtime to changes.
-	time.Sleep(100 * time.Millisecond)
+	// Add delay for goroutine to catch up and modtime to changes.
+	// We try with 100ms but sometimes it stuck on the first <-dw.C.
+	time.Sleep(200 * time.Millisecond)
 
 	fmt.Println(`Deleting the root directory:`)
 	err = os.Remove(rootDir)
