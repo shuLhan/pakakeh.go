@@ -201,7 +201,7 @@ func (node *Node) IsDir() bool {
 // childs of childs.
 func (node *Node) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	node.packAsJson(&buf, 0)
+	node.packAsJson(&buf, 0, false)
 	return buf.Bytes(), nil
 }
 
@@ -395,7 +395,7 @@ func (node *Node) generateFuncName(in string) {
 	node.GenFuncName = "generate_" + syspath
 }
 
-func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
+func (node *Node) packAsJson(buf *bytes.Buffer, depth int, withoutModTime bool) {
 	isDir := node.IsDir()
 
 	_ = buf.WriteByte('{')
@@ -403,11 +403,13 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
 	_, _ = fmt.Fprintf(buf, `"path":%q,`, node.Path)
 	_, _ = fmt.Fprintf(buf, `"name":%q,`, node.name)
 	_, _ = fmt.Fprintf(buf, `"content_type":%q,`, node.ContentType)
-	_, _ = fmt.Fprintf(buf, `"mod_time":%d,`, node.modTime.Unix())
+	if !withoutModTime {
+		_, _ = fmt.Fprintf(buf, `"mod_time":%d,`, node.modTime.Unix())
+	}
 	_, _ = fmt.Fprintf(buf, `"mode_string":%q,`, node.mode)
 	_, _ = fmt.Fprintf(buf, `"size":%d,`, node.size)
 	_, _ = fmt.Fprintf(buf, `"is_dir":%t,`, isDir)
-	if !isDir && depth == 0 {
+	if !isDir {
 		content := base64.StdEncoding.EncodeToString(node.Content)
 		_, _ = fmt.Fprintf(buf, `"content":%q,`, content)
 	}
@@ -419,7 +421,7 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int) {
 			if x > 0 {
 				_ = buf.WriteByte(',')
 			}
-			child.packAsJson(buf, depth+1)
+			child.packAsJson(buf, depth+1, withoutModTime)
 		}
 		_ = buf.WriteByte(']')
 	} else {
