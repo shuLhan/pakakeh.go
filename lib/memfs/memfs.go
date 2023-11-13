@@ -256,7 +256,12 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 
 		node, err = mfs.refresh(path)
 		if err != nil {
-			return nil, fmt.Errorf(`%s: %s: %w`, logp, path, err)
+			if errors.Is(err, fs.ErrNotExist) {
+				err = fmt.Errorf(`%s %q: %w`, logp, path, fs.ErrNotExist)
+			} else {
+				err = fmt.Errorf(`%s %q: %w`, logp, path, err)
+			}
+			return nil, err
 		}
 	} else if mfs.Opts.TryDirect {
 		_ = node.Update(nil, mfs.Opts.MaxFileSize)
