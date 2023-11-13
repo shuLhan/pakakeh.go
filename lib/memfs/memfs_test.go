@@ -5,6 +5,7 @@
 package memfs
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -356,6 +357,92 @@ func TestMemFS_Get(t *testing.T) {
 			t.Errorf("expecting one of the Content-Type %v, got %s",
 				c.expContentType, got.ContentType)
 		}
+	}
+}
+
+func TestMemFS_Get_refresh(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`internal/testdata/get_refresh_test.data`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		tempDir = t.TempDir()
+		opts    = Options{
+			Root:      tempDir,
+			TryDirect: true,
+		}
+
+		mfs *MemFS
+	)
+
+	mfs, err = New(&opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		node        *Node
+		filePath    string
+		tag         string
+		path        string
+		expJson     string
+		expError    string
+		fileContent []byte
+		rawJson     []byte
+		gotJson     bytes.Buffer
+	)
+
+	for filePath, fileContent = range tdata.Input {
+		path = filepath.Join(tempDir, filepath.Dir(filePath))
+
+		err = os.MkdirAll(path, 0700)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(fileContent) != 0 {
+			// Only create the file if content is set.
+			path = filepath.Join(tempDir, filePath)
+			err = os.WriteFile(path, fileContent, 0600)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		// Try Get the file.
+
+		tag = filePath + `:error`
+		expError = string(tdata.Output[tag])
+
+		node, err = mfs.Get(filePath)
+		if err != nil {
+			test.Assert(t, tag, expError, err.Error())
+			continue
+		}
+
+		// Check the tree of MemFS.
+
+		rawJson, err = mfs.Root.JSON(9999, true)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		gotJson.Reset()
+		err = json.Indent(&gotJson, rawJson, ``, `  `)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, filePath, string(fileContent), string(node.Content))
+
+		expJson = string(tdata.Output[filePath])
+		test.Assert(t, filePath, expJson, gotJson.String())
 	}
 }
 

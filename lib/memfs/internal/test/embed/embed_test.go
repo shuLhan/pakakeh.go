@@ -16,7 +16,7 @@ func generate_testdata() *memfs.Node {
 		GenFuncName: "generate_testdata",
 	}
 	node.SetMode(2147484141)
-	node.SetModTimeUnix(1699291828, 99871888)
+	node.SetModTimeUnix(1699901114, 455911441)
 	node.SetName("/")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/direct", generate_testdata_direct))

@@ -633,7 +633,6 @@ out:
 
 // refresh the tree by rescanning from the root.
 func (mfs *MemFS) refresh(url string) (node *Node, err error) {
-	logp := "refresh"
 	syspath := filepath.Join(mfs.Root.SysPath, url)
 
 	if !strings.HasPrefix(syspath, mfs.Root.SysPath) {
@@ -642,12 +641,24 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 
 	_, err = os.Stat(syspath)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %s: %w", logp, url, err)
+		return nil, err
 	}
 
-	_, err = mfs.scanDir(mfs.Root)
+	// syspath exist in the file system but not in the mfs, try reload
+	// all trees start from the closes directory exist in path.
+
+	// The syspath is already cleaning-up, use it to get the relative
+	// url path back.
+	var dir = strings.TrimPrefix(syspath, mfs.Root.SysPath)
+
+	for node == nil {
+		dir = filepath.Dir(dir)
+		node = mfs.PathNodes.Get(dir)
+	}
+
+	_, err = mfs.scanDir(node)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %s: %w", logp, url, err)
+		return nil, err
 	}
 
 	node = mfs.PathNodes.Get(url)

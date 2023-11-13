@@ -1,0 +1,109 @@
+Test Get that trigger refresh.
+The MemFS Options TryDirect must be set to true.
+If the input content is not set then the file will not be written.
+
+>>> /dir-a/dir-b/file
+Content of file.
+
+<<< /dir-a/dir-b/file
+{
+  "path": "/",
+  "name": "/",
+  "content_type": "",
+  "mode_string": "drwxr-xr-x",
+  "size": 0,
+  "is_dir": true,
+  "childs": [
+    {
+      "path": "/dir-a",
+      "name": "dir-a",
+      "content_type": "",
+      "mode_string": "drwx------",
+      "size": 0,
+      "is_dir": true,
+      "childs": [
+        {
+          "path": "/dir-a/dir-b",
+          "name": "dir-b",
+          "content_type": "",
+          "mode_string": "drwx------",
+          "size": 0,
+          "is_dir": true,
+          "childs": [
+            {
+              "path": "/dir-a/dir-b/file",
+              "name": "file",
+              "content_type": "text/plain; charset=utf-8",
+              "mode_string": "-rw-------",
+              "size": 16,
+              "is_dir": false,
+              "content": "Q29udGVudCBvZiBmaWxlLg==",
+              "childs": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+>>> /dir-a/dir-b/file2
+Content of file2.
+
+<<< /dir-a/dir-b/file2
+{
+  "path": "/",
+  "name": "/",
+  "content_type": "",
+  "mode_string": "drwxr-xr-x",
+  "size": 0,
+  "is_dir": true,
+  "childs": [
+    {
+      "path": "/dir-a",
+      "name": "dir-a",
+      "content_type": "",
+      "mode_string": "drwx------",
+      "size": 0,
+      "is_dir": true,
+      "childs": [
+        {
+          "path": "/dir-a/dir-b",
+          "name": "dir-b",
+          "content_type": "",
+          "mode_string": "drwx------",
+          "size": 0,
+          "is_dir": true,
+          "childs": [
+            {
+              "path": "/dir-a/dir-b/file",
+              "name": "file",
+              "content_type": "text/plain; charset=utf-8",
+              "mode_string": "-rw-------",
+              "size": 16,
+              "is_dir": false,
+              "content": "Q29udGVudCBvZiBmaWxlLg==",
+              "childs": []
+            },
+            {
+              "path": "/dir-a/dir-b/file2",
+              "name": "file2",
+              "content_type": "text/plain; charset=utf-8",
+              "mode_string": "-rw-------",
+              "size": 17,
+              "is_dir": false,
+              "content": "Q29udGVudCBvZiBmaWxlMi4=",
+              "childs": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+>>> /dir-a/dir-b/notcreated
+
+<<< /dir-a/dir-b/notcreated:error
+Get "/dir-a/dir-b/notcreated": file does not exist
+
