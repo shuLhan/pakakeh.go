@@ -253,7 +253,7 @@ func TestMemFS_AddFile(t *testing.T) {
 
 func TestMemFS_Get(t *testing.T) {
 	cases := []struct {
-		expErr         error
+		expErr         string
 		path           string
 		expV           []byte
 		expContentType []string
@@ -263,7 +263,7 @@ func TestMemFS_Get(t *testing.T) {
 		path: "/exclude",
 	}, {
 		path:   "/exclude/dir",
-		expErr: os.ErrNotExist,
+		expErr: os.ErrNotExist.Error(),
 	}, {
 		path:           "/exclude/index-link.css",
 		expV:           []byte("body {\n}\n"),
@@ -283,7 +283,7 @@ func TestMemFS_Get(t *testing.T) {
 		path: "/include",
 	}, {
 		path:   "/include/dir",
-		expErr: os.ErrNotExist,
+		expErr: os.ErrNotExist.Error(),
 	}, {
 		path:           "/include/index.css",
 		expV:           []byte("body {\n}\n"),
@@ -316,6 +316,9 @@ func TestMemFS_Get(t *testing.T) {
 	}, {
 		path:           "/plain",
 		expContentType: []string{"application/octet-stream"},
+	}, {
+		path:   ``,
+		expErr: `Get: empty path`,
 	}}
 
 	dir := filepath.Join(_testWD, "/testdata")
@@ -334,7 +337,7 @@ func TestMemFS_Get(t *testing.T) {
 	for _, c := range cases {
 		got, err := mfs.Get(c.path)
 		if err != nil {
-			test.Assert(t, c.path+": error", c.expErr, err)
+			test.Assert(t, c.path+": error", c.expErr, err.Error())
 			continue
 		}
 

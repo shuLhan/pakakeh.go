@@ -247,6 +247,10 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	if mfs == nil || mfs.PathNodes == nil {
 		return nil, fmt.Errorf("%s %s: %w", logp, path, os.ErrNotExist)
 	}
+	path = strings.TrimSpace(path)
+	if len(path) == 0 {
+		return nil, fmt.Errorf(`%s: empty path`, logp)
+	}
 
 	node = mfs.PathNodes.Get(path)
 	if node == nil {
