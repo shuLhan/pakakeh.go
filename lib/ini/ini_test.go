@@ -138,7 +138,7 @@ func TestOpen(t *testing.T) {
 		expErr string
 	}{{
 		desc:   "With no file",
-		expErr: "open : no such file or directory",
+		expErr: "Open: open : no such file or directory",
 	}, {
 		desc:   "With variable without section",
 		inFile: testdataVarWithoutSection,
@@ -167,7 +167,7 @@ func TestSave(t *testing.T) {
 		expErr  string
 	}{{
 		desc:   "With no file",
-		expErr: "open : no such file or directory",
+		expErr: "Open: open : no such file or directory",
 	}, {
 		desc:   "With variable without section",
 		inFile: testdataVarWithoutSection,

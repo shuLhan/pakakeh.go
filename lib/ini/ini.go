@@ -6,8 +6,10 @@ package ini
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"reflect"
 	"sort"
@@ -28,14 +30,56 @@ type Ini struct {
 }
 
 // Open and parse INI formatted file.
+// If the file is not exist, it will be created.
 //
 // On fail it will return incomplete instance of Ini with an error.
 func Open(filename string) (in *Ini, err error) {
-	reader := newReader()
+	var (
+		logp = `Open`
 
-	in, err = reader.parseFile(filename)
+		f       *os.File
+		reader  *reader
+		content []byte
+	)
 
-	return
+	f, err = os.Open(filename)
+	if err != nil {
+		if !errors.Is(err, fs.ErrNotExist) {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		// Create the file if not exist.
+
+		f, err = os.Create(filename)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		in = &Ini{}
+
+		return in, nil
+	}
+
+	content, err = io.ReadAll(f)
+	if err != nil {
+		goto out
+	}
+
+	reader = newReader()
+
+	reader.filename = filename
+
+	in, err = reader.Parse(content)
+out:
+	var errClose = f.Close()
+	if errClose != nil {
+		if err == nil {
+			err = fmt.Errorf(`%s: %w`, logp, errClose)
+		} else {
+			err = fmt.Errorf(`%s: %w: %w`, logp, err, errClose)
+		}
+	}
+	return in, err
 }
 
 // Parse INI format from text.
