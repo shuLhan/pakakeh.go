@@ -50,7 +50,8 @@ type Client struct {
 // IdentityFile directive is specified in the Host section.
 //
 // If the IdentityFile is encrypted, it will prompt for passphrase in
-// terminal.
+// terminal or from program defined in SSH_ASKPASS, see
+// [crypto.LoadPrivateKeyInteractive] for more information.
 //
 // The following section keys are recognized and implemented by Client,
 //   - Hostname

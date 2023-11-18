@@ -7,6 +7,7 @@
 package crypto
 
 import (
+	"bytes"
 	"crypto"
 	"crypto/rsa"
 	"errors"
@@ -16,17 +17,32 @@ import (
 	"os"
 	"strings"
 
+	"github.com/shuLhan/share/lib/os/exec"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
 
 // ErrEmptyPassphrase returned when private key is encrypted and loaded
 // interactively, using [LoadPrivateKeyInteractive], but the readed
-// passphrase is empty from terminal.
+// passphrase is empty.
 //
 // This is to catch error "bcrypt_pbkdf: empty password" earlier that cannot
-// be catched using errors.Is after [ssh.ParseRawPrivateKeyWithPassphrase].
+// be catched using [errors.Is] after
+// [ssh.ParseRawPrivateKeyWithPassphrase].
 var ErrEmptyPassphrase = errors.New(`empty passphrase`)
+
+// ErrStdinPassphrase error when program cannot changes [os.Stdin] for
+// reading passphrase in terminal.
+// The original error message is "inappropriate ioctl for device".
+var ErrStdinPassphrase = errors.New(`cannot read passhprase from stdin`)
+
+// List of environment variables reads when reading passphrase
+// interactively.
+const (
+	envKeySshAskpassRequire = `SSH_ASKPASS_REQUIRE`
+	envKeySshAskpass        = `SSH_ASKPASS`
+	envKeyDisplay           = `DISPLAY`
+)
 
 // DecryptOaep extend the [rsa.DecryptOAEP] to make it able to decrypt a
 // message larger than its public modulus size.
@@ -121,11 +137,30 @@ func LoadPrivateKey(file string, passphrase []byte) (pkey crypto.PrivateKey, err
 
 // LoadPrivateKeyInteractive load the private key from file.
 // If the private key file is encrypted, it will prompt for the passphrase
-// from terminal.
+// from terminal or from program defined in SSH_ASKPASS environment
+// variable.
 //
 // The termrw parameter is optional, default to os.Stdin if its nil.
 // Its provide as reader-and-writer to prompt and read password from
-// terminal; or for testing.
+// terminal (or for testing).
+//
+// The SSH_ASKPASS is controlled by environment SSH_ASKPASS_REQUIRE.
+//
+//   - If SSH_ASKPASS_REQUIRE is empty the passphrase will read from
+//     terminal first, if not possible then using SSH_ASKPASS program.
+//
+//   - If SSH_ASKPASS_REQUIRE is set to "never", the passphrase will read
+//     from terminal only.
+//
+//   - If SSH_ASKPASS_REQUIRE is set to "prefer", the passphrase will read
+//     using SSH_ASKPASS program not from terminal, but require
+//     DISPLAY environment to be set.
+//
+//   - If SSH_ASKPASS_REQUIRE is set to "force", the passphrase will read
+//     using SSH_ASKPASS program not from terminal without checking DISPLAY
+//     environment.
+//
+// See ssh(1) manual page for more information.
 func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.PrivateKey, err error) {
 	var (
 		logp = `LoadPrivateKeyInteractive`
@@ -151,10 +186,56 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 	}
 
 	var (
+		askpassRequire = os.Getenv(envKeySshAskpassRequire)
+
+		pass string
+	)
+
+	switch askpassRequire {
+	default:
+		// Accept empty SSH_ASKPASS_REQUIRE, "never", or other
+		// unknown string.
+		// Try to read passphrase from terminal first.
+		pass, err = readPassTerm(termrw, file)
+		if err != nil {
+			if !strings.Contains(err.Error(), `inappropriate ioctl`) {
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
+			}
+			if askpassRequire == `` {
+				// We cannot changes the os.Stdin to raw
+				// terminal, try using SSH_ASKPASS program
+				// instead.
+				pass, err = sshAskpass(askpassRequire)
+				if err != nil {
+					return nil, fmt.Errorf(`%s: %w`, logp, err)
+				}
+			}
+		}
+
+	case `prefer`, `force`:
+		// Use SSH_ASKPASS program instead of reading from terminal.
+		pass, err = sshAskpass(askpassRequire)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+
+	passphrase = []byte(pass)
+
+	pkey, err = ssh.ParseRawPrivateKeyWithPassphrase(rawpem, passphrase)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return pkey, nil
+}
+
+// readPassTerm read the passphrase from terminal.
+func readPassTerm(termrw io.ReadWriter, file string) (pass string, err error) {
+	var (
 		prompt = fmt.Sprintf(`Enter passphrase for %q:`, file)
 
 		xterm *term.Terminal
-		pass  string
 	)
 
 	if termrw == nil {
@@ -166,7 +247,7 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 
 		oldState, err = term.MakeRaw(stdin)
 		if err != nil {
-			return nil, fmt.Errorf(`%s: MakeRaw: %w`, logp, err)
+			return ``, fmt.Errorf(`MakeRaw: %w`, err)
 		}
 		defer term.Restore(stdin, oldState)
 
@@ -177,18 +258,41 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 
 	pass, err = xterm.ReadPassword(prompt)
 	if err != nil && !errors.Is(err, io.EOF) {
-		return nil, fmt.Errorf(`%s: ReadPassword: %w`, logp, err)
+		return ``, fmt.Errorf(`ReadPassword: %w`, err)
 	}
 	if len(pass) == 0 {
-		return nil, fmt.Errorf(`%s: %w`, logp, ErrEmptyPassphrase)
+		return ``, ErrEmptyPassphrase
+	}
+	return pass, nil
+}
+
+// sshAskpass get passphrase from the program defined in environment
+// SSH_ASKPASS.
+// This require the DISPLAY environment also be set only if
+// SSH_ASKPASS_REQUIRE is set to "prefer".
+func sshAskpass(askpassRequire string) (pass string, err error) {
+	var val string
+
+	if askpassRequire == `prefer` {
+		val = os.Getenv(envKeyDisplay)
+		if len(val) == 0 {
+			return ``, ErrStdinPassphrase
+		}
 	}
 
-	passphrase = []byte(pass)
+	val = os.Getenv(envKeySshAskpass)
+	if len(val) == 0 {
+		return ``, ErrStdinPassphrase
+	}
 
-	pkey, err = ssh.ParseRawPrivateKeyWithPassphrase(rawpem, passphrase)
+	var stdout bytes.Buffer
+
+	err = exec.Run(val, &stdout, os.Stderr)
 	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
+		return ``, err
 	}
 
-	return pkey, nil
+	pass = stdout.String()
+
+	return pass, nil
 }

@@ -6,6 +6,8 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"io"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"golang.org/x/crypto/ssh"
@@ -78,52 +80,106 @@ func TestEncryptOaep(t *testing.T) {
 
 func TestLoadPrivateKeyInteractive(t *testing.T) {
 	type testCase struct {
+		desc     string
 		file     string
 		secret   string
 		termrw   io.ReadWriter
 		expError string
+
+		// Environment variables for testing with SSH_ASKPASS and
+		// SSH_ASKPASS_REQUIRE.
+		envDisplay           string
+		envSshAskpass        string
+		envSshAskpassRequire string
 	}
 
 	var (
-		mockrw = mock.ReadWriter{}
+		wd  string
+		err error
+	)
+
+	wd, err = os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		mockrw         = mock.ReadWriter{}
+		askpassProgram = filepath.Join(wd, `testdata`, `askpass.sh`)
 
 		pkey crypto.PrivateKey
-		err  error
 		ok   bool
 	)
 
 	var cases = []testCase{{
+		desc:   `withValidPassphrase`,
 		file:   `testdata/openssl_rsa_pass.key`,
 		secret: "s3cret\r\n",
 		termrw: &mockrw,
 	}, {
+		desc:     `withMockedrw`,
 		file:     `testdata/openssl_rsa_pass.key`,
 		termrw:   &mockrw,
 		expError: `LoadPrivateKeyInteractive: empty passphrase`,
 	}, {
-		file: `testdata/openssl_rsa_pass.key`,
-		// Using nil (default to os.Stdin for termrw).
-		termrw:   nil,
-		expError: `LoadPrivateKeyInteractive: MakeRaw: inappropriate ioctl for device`,
+		desc:     `withDefaultTermrw`,
+		file:     `testdata/openssl_rsa_pass.key`,
+		termrw:   nil, // Using nil default to os.Stdin for termrw.
+		expError: `LoadPrivateKeyInteractive: cannot read passhprase from stdin`,
+	}, {
+		desc:                 `withAskpassRequire=prefer`,
+		file:                 `testdata/openssl_rsa_pass.key`,
+		envDisplay:           `:0`,
+		envSshAskpass:        askpassProgram,
+		envSshAskpassRequire: `prefer`,
+	}, {
+		desc:                 `withAskpassRequire=prefer, no DISPLAY`,
+		file:                 `testdata/openssl_rsa_pass.key`,
+		envSshAskpass:        askpassProgram,
+		envSshAskpassRequire: `prefer`,
+		expError:             `LoadPrivateKeyInteractive: cannot read passhprase from stdin`,
+	}, {
+		desc:                 `withAskpassRequire=prefer, empty SSH_ASKPASS`,
+		file:                 `testdata/openssl_rsa_pass.key`,
+		envDisplay:           `:0`,
+		envSshAskpassRequire: `prefer`,
+		expError:             `LoadPrivateKeyInteractive: cannot read passhprase from stdin`,
+	}, {
+		desc:                 `withAskpassRequire=prefer, invalid program`,
+		file:                 `testdata/openssl_rsa_pass.key`,
+		envDisplay:           `:0`,
+		envSshAskpass:        `/invalid/program`,
+		envSshAskpassRequire: `prefer`,
+		expError:             `LoadPrivateKeyInteractive: fork/exec /invalid/program: no such file or directory`,
+	}, {
+		desc:                 `withAskpassRequire=force`,
+		file:                 `testdata/openssl_rsa_pass.key`,
+		envDisplay:           `:0`,
+		envSshAskpass:        askpassProgram,
+		envSshAskpassRequire: `force`,
 	}}
 
 	var c testCase
 
 	for _, c = range cases {
+		os.Setenv(envKeyDisplay, c.envDisplay)
+		os.Setenv(envKeySshAskpass, c.envSshAskpass)
+		os.Setenv(envKeySshAskpassRequire, c.envSshAskpassRequire)
+
 		_, err = mockrw.BufRead.WriteString(c.secret)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf(`%s: %s`, c.desc, err)
 		}
 
 		pkey, err = LoadPrivateKeyInteractive(c.termrw, c.file)
 		if err != nil {
-			test.Assert(t, `LoadPrivateKeyInteractive`, c.expError, err.Error())
+			test.Assert(t, c.desc+` error`, c.expError, err.Error())
 			continue
 		}
 
 		_, ok = pkey.(*rsa.PrivateKey)
 		if !ok {
-			test.Assert(t, `cast to *rsa.PrivateKey`, c.expError, err.Error())
+			test.Assert(t, c.desc+` cast to *rsa.PrivateKey`, c.expError, err.Error())
 			continue
 		}
 	}
