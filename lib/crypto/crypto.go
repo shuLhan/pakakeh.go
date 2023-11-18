@@ -292,7 +292,7 @@ func sshAskpass(askpassRequire string) (pass string, err error) {
 		return ``, err
 	}
 
-	pass = stdout.String()
+	pass = strings.TrimSpace(stdout.String())
 
 	return pass, nil
 }

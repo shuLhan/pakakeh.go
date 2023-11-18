@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo -n s3cret
+echo s3cret
