@@ -127,6 +127,34 @@ func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 	return err
 }
 
+// RegisterSSE register Server-Sent Events endpoint.
+// It will return an error if the Call field is not set or
+// [ErrEndpointAmbiguous], if the same path is already registered.
+func (srv *Server) RegisterSSE(ep *SSEEndpoint) (err error) {
+	var logp = `RegisterSSE`
+
+	if ep.Call == nil {
+		return fmt.Errorf(`%s: Call field not set`, logp)
+	}
+
+	// Check if the same GET path already registered.
+	var (
+		rute  *route
+		exist bool
+	)
+	for _, rute = range srv.routeGets {
+		_, exist = rute.parse(ep.Path)
+		if exist {
+			return fmt.Errorf(`%s: %w`, logp, ErrEndpointAmbiguous)
+		}
+	}
+
+	rute = newRouteSSE(ep)
+	srv.routeGets = append(srv.routeGets, rute)
+
+	return nil
+}
+
 // registerDelete register HTTP method DELETE with specific endpoint to handle
 // it.
 func (srv *Server) registerDelete(ep *Endpoint) (err error) {
@@ -561,12 +589,25 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 // handleGet handle the GET request by searching the registered route and
 // calling the endpoint.
 func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
-	for _, rute := range srv.routeGets {
-		vals, ok := rute.parse(req.URL.Path)
-		if ok {
+	var (
+		rute *route
+		vals map[string]string
+		ok   bool
+	)
+	for _, rute = range srv.routeGets {
+		vals, ok = rute.parse(req.URL.Path)
+		if !ok {
+			continue
+		}
+		if rute.kind == routeKindHttp {
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
 		}
+		if rute.kind == routeKindSSE {
+			rute.endpointSSE.call(res, req, srv.evals, vals)
+			return
+		}
+		// Unknown kind will be handled by HandleFS.
 	}
 
 	srv.HandleFS(res, req)

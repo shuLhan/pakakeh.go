@@ -16,6 +16,8 @@
 //     multipart/form-data, application/json with POST or PUT methods in
 //     Client.
 //   - Add support for [HTTP Range] in Server and Client
+//   - Add support for [Server-Sent Events] (SSE) in Server.
+//     For client see the sub package [sseclient].
 //
 // # Problems
 //
@@ -201,6 +203,7 @@
 //     the last one is static path to "y".
 //
 // [HTTP Range]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
+// [Server-Sent Events]: https://html.spec.whatwg.org/multipage/server-sent-events.html
 package http
 
 import (
@@ -225,6 +228,7 @@ const (
 	ContentEncodingDeflate  = "deflate" // Using zlib.
 
 	ContentTypeBinary              = "application/octet-stream"
+	ContentTypeEventStream         = `text/event-stream`
 	ContentTypeForm                = "application/x-www-form-urlencoded"
 	ContentTypeMultipartByteRanges = `multipart/byteranges`
 	ContentTypeMultipartForm       = "multipart/form-data"
@@ -241,11 +245,13 @@ const (
 	HeaderACMaxAge           = "Access-Control-Max-Age"
 	HeaderACRequestHeaders   = "Access-Control-Request-Headers"
 	HeaderACRequestMethod    = "Access-Control-Request-Method"
+	HeaderAccept             = `Accept`
 	HeaderAcceptEncoding     = "Accept-Encoding"
 	HeaderAcceptRanges       = `Accept-Ranges`
 	HeaderAllow              = "Allow"
 	HeaderAuthKeyBearer      = "Bearer"
 	HeaderAuthorization      = "Authorization"
+	HeaderCacheControl       = `Cache-Control`
 	HeaderContentEncoding    = "Content-Encoding"
 	HeaderContentLength      = "Content-Length"
 	HeaderContentRange       = `Content-Range`
@@ -255,6 +261,7 @@ const (
 	HeaderETag               = "Etag"
 	HeaderHost               = "Host"
 	HeaderIfNoneMatch        = "If-None-Match"
+	HeaderLastEventID        = `Last-Event-ID`
 	HeaderLocation           = "Location"
 	HeaderOrigin             = "Origin"
 	HeaderRange              = `Range`

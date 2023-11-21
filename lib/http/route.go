@@ -5,15 +5,26 @@
 package http
 
 import (
+	"path"
 	"strings"
+)
+
+// List of kind for route.
+const (
+	routeKindHttp int = iota // Normal routing.
+	routeKindSSE             // Routing for Server-Sent Events (SSE).
 )
 
 // route represent the route to endpoint.
 type route struct {
-	endpoint *Endpoint // endpoint of route.
-	path     string    // path contains Endpoint's path that has been cleaned up.
-	nodes    []*node   // nodes contains sub-path.
-	nkey     int       // nkey contains the number of keys in nodes.
+	endpoint    *Endpoint    // endpoint of route.
+	endpointSSE *SSEEndpoint // Endpoint for SSE.
+
+	path  string  // path contains Endpoint's path that has been cleaned up.
+	nodes []*node // nodes contains sub-path.
+	nkey  int     // nkey contains the number of keys in nodes.
+
+	kind int
 }
 
 // newRoute parse the Endpoint's path, store the key(s) in path if available
@@ -67,6 +78,16 @@ func newRoute(ep *Endpoint) (rute *route, err error) {
 	rute.path = rute.generatePath()
 
 	return rute, nil
+}
+
+// newRouteSSE create and initialize new route for SSE.
+func newRouteSSE(ep *SSEEndpoint) (rute *route) {
+	rute = &route{
+		endpointSSE: ep,
+		path:        path.Clean(ep.Path),
+		kind:        routeKindSSE,
+	}
+	return rute
 }
 
 // isKeyExist will return true if the key already exist in nodes; otherwise it
