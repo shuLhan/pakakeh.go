@@ -605,6 +605,9 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 	for _, fi = range fis {
 		child, err = mfs.AddChild(node, fi)
 		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				continue
+			}
 			err = fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 			goto out
 		}

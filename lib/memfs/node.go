@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"mime"
 	"net/http"
 	"os"
@@ -608,6 +609,10 @@ func (node *Node) updateDir(maxFileSize int64) (err error) {
 			if err != nil {
 				if os.IsPermission(err) {
 					// Ignore error due to permission.
+					continue
+				}
+				if errors.Is(err, fs.ErrNotExist) {
+					// File exist but a broken symlink.
 					continue
 				}
 				return err
