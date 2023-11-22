@@ -46,7 +46,7 @@ func TestGeneratePathNode(t *testing.T) {
 		expError string
 	}{{
 		path:     "/gen_test.go",
-		expError: "file does not exist",
+		expError: `Get "/gen_test.go": file does not exist`,
 	}, {
 		path: "/",
 		exp:  expRoot,

@@ -40,6 +40,10 @@ type MemFS struct {
 	watchRE []*regexp.Regexp
 	incRE   []*regexp.Regexp
 	excRE   []*regexp.Regexp
+
+	// subfs contains another MemFS instances.
+	// During Get, it will evaluated in order.
+	subfs []*MemFS
 }
 
 // Merge one or more instances of MemFS into single hierarchy.
@@ -49,6 +53,9 @@ type MemFS struct {
 //
 // If there are two instance of Node that have the same path, the last
 // instance will be ignored.
+//
+// DEPRECATED: use [MemFS.Merge] instead.
+// TODO: Remove in the next three release cycles, v0.53.0.
 func Merge(params ...*MemFS) (merged *MemFS) {
 	merged = &MemFS{
 		PathNodes: NewPathNode(),
@@ -240,12 +247,12 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 }
 
 // Get the node representation of file in memory.  If path is not exist it
-// will return os.ErrNotExist.
+// will return fs.ErrNotExist.
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	logp := "Get"
 
 	if mfs == nil || mfs.PathNodes == nil {
-		return nil, fmt.Errorf("%s %s: %w", logp, path, os.ErrNotExist)
+		return nil, fmt.Errorf("%s %s: %w", logp, path, fs.ErrNotExist)
 	}
 	path = strings.TrimSpace(path)
 	if len(path) == 0 {
@@ -253,29 +260,58 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	}
 
 	node = mfs.PathNodes.Get(path)
-	if node == nil {
-		if !mfs.Opts.TryDirect {
-			return nil, os.ErrNotExist
-		}
+	if node != nil {
+		if mfs.Opts.TryDirect {
+			_ = node.Update(nil, mfs.Opts.MaxFileSize)
 
-		node, err = mfs.refresh(path)
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
-				err = fmt.Errorf(`%s %q: %w`, logp, path, fs.ErrNotExist)
-			} else {
-				err = fmt.Errorf(`%s %q: %w`, logp, path, err)
-			}
-			return nil, err
+			// Ignore error if the file is not exist in storage.
+			// Use case: the node maybe have been result of embed and the
+			// merged with other MemFS instance that use TryDirect flag.
 		}
-	} else if mfs.Opts.TryDirect {
-		_ = node.Update(nil, mfs.Opts.MaxFileSize)
-
-		// Ignore error if the file is not exist in storage.
-		// Use case: the node maybe have been result of embed and the
-		// merged with other MemFS instance that use TryDirect flag.
+		return node, nil
 	}
 
-	return node, nil
+	// Get node from sub.
+	var sub *MemFS
+	for _, sub = range mfs.subfs {
+		node, _ = sub.Get(path)
+		if node != nil {
+			return node, nil
+		}
+	}
+
+	// Refresh the root FS first.
+
+	if mfs.Opts.TryDirect {
+		node, err = mfs.refresh(path)
+		if err != nil {
+			if !errors.Is(err, fs.ErrNotExist) {
+				return nil, fmt.Errorf(`%s %q: %w`, logp, path, err)
+			}
+		}
+		if node != nil {
+			return node, nil
+		}
+	}
+
+	// Refresh the subfs.
+
+	for _, sub = range mfs.subfs {
+		if !sub.Opts.TryDirect {
+			continue
+		}
+		node, err = sub.refresh(path)
+		if err != nil {
+			if !errors.Is(err, fs.ErrNotExist) {
+				return nil, fmt.Errorf(`%s %q: %w`, logp, path, err)
+			}
+		}
+		if node != nil {
+			return node, nil
+		}
+	}
+
+	return nil, fmt.Errorf(`%s %q: %w`, logp, path, fs.ErrNotExist)
 }
 
 // Init initialize the MemFS instance.
@@ -333,6 +369,16 @@ func (mfs *MemFS) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	mfs.Root.packAsJson(&buf, 0, false)
 	return buf.Bytes(), nil
+}
+
+// Merge other MemFS instance as sub file system.
+//
+// When Get method called, each sub fs will be evaluated in order of Merge.
+func (mfs *MemFS) Merge(sub *MemFS) {
+	if sub == nil {
+		return
+	}
+	mfs.subfs = append(mfs.subfs, sub)
 }
 
 // MustGet return the Node representation of file in memory by its path if its
@@ -643,7 +689,7 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	syspath := filepath.Join(mfs.Root.SysPath, url)
 
 	if !strings.HasPrefix(syspath, mfs.Root.SysPath) {
-		return nil, os.ErrNotExist
+		return nil, fs.ErrNotExist
 	}
 
 	_, err = os.Stat(syspath)
@@ -670,7 +716,7 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 
 	node = mfs.PathNodes.Get(url)
 	if node == nil {
-		return nil, os.ErrNotExist
+		return nil, fs.ErrNotExist
 	}
 
 	return node, nil

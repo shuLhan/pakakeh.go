@@ -63,13 +63,13 @@ func ExampleNew() {
 
 	_, err = mfs.Get("/exclude/index.html")
 	if err != nil {
-		fmt.Println(`Error on Get /exclude/index.html:`, err)
+		fmt.Println(`Error:`, err)
 	}
 
 	// Output:
 	// Content of /index.html: <html></html>
 	// List of embedded files: [/ /direct /direct/add /include /include/dir /include/index.css /include/index.html /include/index.js /index.css /index.html /index.js]
-	// Error on Get /exclude/index.html: file does not exist
+	// Error: Get "/exclude/index.html": file does not exist
 }
 
 func ExampleMemFS_Search() {
