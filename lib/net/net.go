@@ -8,6 +8,7 @@ package net
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net"
 	"strings"
 	"time"
@@ -17,10 +18,12 @@ const (
 	maxPort = (1 << 16) - 1
 )
 
-// List of error messages.
-var (
-	ErrHostAddress = errors.New("invalid host address")
-)
+// ErrHostAddress define an error if address of connection is invalid.
+var ErrHostAddress = errors.New("invalid host address")
+
+// ErrReadTimeout define an error when [Read] operation receive no data
+// after waiting for specific duration.
+var ErrReadTimeout = errors.New(`read timeout`)
 
 // Type of network.
 type Type uint16
@@ -98,6 +101,74 @@ func IsTypeUDP(t Type) bool {
 // tcp(4,6) or udp(4,6); otherwise it will return false.
 func IsTypeTransport(t Type) bool {
 	return IsTypeTCP(t) || IsTypeUDP(t)
+}
+
+// Read packet from network.
+//
+// If the conn parameter is nil it will return [net.ErrClosed].
+//
+// The bufsize parameter set the size of buffer for each read operation,
+// default to 1024 if not set or invalid (less than 0 or greater than
+// 65535).
+//
+// The timeout parameter set how long to wait for data before considering
+// it as failed.
+// If its not set, less or equal to 0, it will wait forever.
+// If no data received and timeout is set, it will return [ErrReadTimeout].
+//
+// If there is data received and connection closed at the same time, it will
+// return the data first without error.
+// The subsequent Read will return empty packet with [ErrClosed].
+func Read(conn net.Conn, bufsize int, timeout time.Duration) (packet []byte, err error) {
+	var logp = `Read`
+
+	if conn == nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, net.ErrClosed)
+	}
+	if bufsize <= 0 || bufsize > math.MaxUint16 {
+		bufsize = 1024
+	}
+
+	var (
+		buf []byte = make([]byte, bufsize)
+		n   int
+	)
+
+	if timeout > 0 {
+		err = conn.SetReadDeadline(time.Now().Add(timeout))
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+	for {
+		n, err = conn.Read(buf)
+		if err != nil {
+			var (
+				neterr net.Error
+				ok     bool
+			)
+			neterr, ok = err.(net.Error)
+			if ok && neterr.Timeout() {
+				return nil, ErrReadTimeout
+			}
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		if n == 0 {
+			// Connection closed by peer.
+			break
+		}
+
+		packet = append(packet, buf[:n]...)
+		if n < len(buf) {
+			break
+		}
+		// Keep reading if we read full buffer.
+	}
+	if len(packet) == 0 {
+		return nil, net.ErrClosed
+	}
+	return packet, nil
+
 }
 
 // ToDotIPv6 convert the IPv6 address format from "::1" format into
