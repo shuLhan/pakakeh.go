@@ -49,10 +49,12 @@ type SSEEndpoint struct {
 // If msg contains new line character ('\n'), the message will be split into
 // multiple "data:".
 //
-// The id parameter is optional, can be empty.
+// The id parameter is optional.
+// If its nil, it will be ignored.
+// if its non-nil and empty, it will be send as empty ID.
 //
 // It will return an error if its failed to write to peer connection.
-func (ep *SSEEndpoint) WriteEvent(event, msg, id string) (err error) {
+func (ep *SSEEndpoint) WriteEvent(event, msg string, id *string) (err error) {
 	event = strings.TrimSpace(event)
 	if len(event) == 0 {
 		return nil
@@ -83,10 +85,12 @@ func (ep *SSEEndpoint) WriteEvent(event, msg, id string) (err error) {
 // If msg contains new line character ('\n'), the message will be split into
 // multiple "data:".
 //
-// The id parameter is optional, can be empty.
+// The id parameter is optional.
+// If its nil, it will be ignored.
+// if its non-nil and empty, it will be send as empty ID.
 //
 // It will return an error if its failed to write to peer connection.
-func (ep *SSEEndpoint) WriteMessage(msg, id string) (err error) {
+func (ep *SSEEndpoint) WriteMessage(msg string, id *string) (err error) {
 	if len(msg) == 0 {
 		return nil
 	}
@@ -116,7 +120,7 @@ func (ep *SSEEndpoint) WriteRetry(retry time.Duration) (err error) {
 	return nil
 }
 
-func (ep *SSEEndpoint) writeData(buf *bytes.Buffer, msg, id string) {
+func (ep *SSEEndpoint) writeData(buf *bytes.Buffer, msg string, id *string) {
 	var (
 		lines = strings.Split(msg, "\n")
 		line  string
@@ -126,9 +130,9 @@ func (ep *SSEEndpoint) writeData(buf *bytes.Buffer, msg, id string) {
 		buf.WriteString(line)
 		buf.WriteByte('\n')
 	}
-	if len(id) != 0 {
+	if id != nil {
 		buf.WriteString(`id:`)
-		buf.WriteString(id)
+		buf.WriteString(*id)
 		buf.WriteByte('\n')
 	}
 	buf.WriteByte('\n')

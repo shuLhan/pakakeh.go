@@ -17,51 +17,83 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	var expEvents = []Event{{
-		Type: EventTypeOpen,
+	type testCase struct {
+		kind string
+		data string
+		id   func() *string
+		exp  Event
+	}
+
+	var fnoid = func() *string { return nil }
+
+	var cases = []testCase{{
+		kind: EventTypeOpen,
+		exp: Event{
+			Type: EventTypeOpen,
+		},
 	}, {
-		Type: EventTypeMessage,
-		Data: `Hello, world`,
+		kind: EventTypeMessage,
+		data: `Hello, world`,
+		id:   fnoid,
+		exp: Event{
+			Type: EventTypeMessage,
+			Data: `Hello, world`,
+		},
 	}, {
-		Type: EventTypeMessage,
-		Data: "Hello\nmulti\nline\nworld",
+		kind: EventTypeMessage,
+		data: "Hello\nmulti\nline\nworld",
+		id:   fnoid,
+		exp: Event{
+			Type: EventTypeMessage,
+			Data: "Hello\nmulti\nline\nworld",
+		},
 	}, {
-		Type: `join`,
-		Data: `John join the event`,
+		kind: `join`,
+		data: `John join the event`,
+		id:   fnoid,
+		exp: Event{
+			Type: `join`,
+			Data: `John join the event`,
+		},
 	}, {
-		Type: `join`,
-		Data: `Jane join the event`,
-		ID:   `1`,
+		kind: `join`,
+		data: `Jane join the event`,
+		id:   func() *string { id := `1`; return &id },
+		exp: Event{
+			Type: `join`,
+			Data: `Jane join the event`,
+			ID:   `1`,
+		},
 	}}
 
 	var expq = make(chan Event)
 
 	var servercb = func(ep *libhttp.SSEEndpoint, _ *http.Request) {
 		var (
-			ev     Event
-			ewrite error
-			x      int
+			c   testCase
+			err error
+			x   int
 		)
-		for x, ev = range expEvents {
-			switch ev.Type {
+		for x, c = range cases {
+			switch c.kind {
 			case EventTypeOpen:
 				// NO-OP, this is sent during connect.
 			case EventTypeError:
 				// NO-OP, this is sent when client has an
 				// error.
 			case EventTypeMessage:
-				ewrite = ep.WriteMessage(ev.Data, ev.ID)
-				if ewrite != nil {
-					t.Fatal(`WriteMessage`, ewrite)
+				err = ep.WriteMessage(c.data, c.id())
+				if err != nil {
+					t.Fatal(`WriteMessage`, err)
 				}
 			default:
 				// Named type.
-				ewrite = ep.WriteEvent(ev.Type, ev.Data, ev.ID)
-				if ewrite != nil {
-					t.Fatalf(`WriteEvent #%d: %s`, x, ewrite)
+				err = ep.WriteEvent(c.kind, c.data, c.id())
+				if err != nil {
+					t.Fatalf(`WriteEvent #%d: %s`, x, err)
 				}
 			}
-			expq <- ev
+			expq <- c.exp
 		}
 	}
 
@@ -93,7 +125,7 @@ func TestClient(t *testing.T) {
 		tag      string
 		x        int
 	)
-	for x, expEvent = range expEvents {
+	for x = range cases {
 		tag = fmt.Sprintf(`expEvent #%d`, x)
 		select {
 		case <-ticker.C:
