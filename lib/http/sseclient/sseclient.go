@@ -125,11 +125,9 @@ func (cl *Client) Connect(header http.Header) (err error) {
 	default:
 	}
 
-	if len(packet) != 0 {
-		// The HTTP response may contains events in the body,
-		// consume it.
-		cl.parseEvent(packet)
-	}
+	// The HTTP response may contains events in the body,
+	// consume it.
+	cl.parseEvent(packet)
 
 	go cl.consume()
 
