@@ -4,6 +4,15 @@
 
 // Package sseclient implement HTTP client for Server-Sent Events (SSE).
 //
+// # Notes on implementation
+//
+// The SSE specification have inconsistent state when dispatching empty
+// data.
+// In the "9.2.6 Interpreting an event stream", if the data buffer is empty
+// it would return; but in the third example it can dispatch an empty
+// string.
+// In this implement we ignore an empty string in server and client.
+//
 // References,
 //   - [whatwg.org Server-sent events]
 //
@@ -342,8 +351,8 @@ func (cl *Client) parseEvent(raw []byte) {
 				}
 				data.Reset()
 				if ev.ID != cl.LastEventID {
-					// Only set LastEventID if event
-					// message is complete.
+					// Only set LastEventID if message
+					// is complete.
 					cl.LastEventID = ev.ID
 				}
 			}

@@ -107,6 +107,16 @@ func (ep *SSEEndpoint) WriteMessage(msg string, id *string) (err error) {
 	return nil
 }
 
+// WriteRaw write raw event message directly, without any parsing.
+func (ep *SSEEndpoint) WriteRaw(msg []byte) (err error) {
+	_, err = ep.bufrw.Write(msg)
+	if err != nil {
+		return fmt.Errorf(`WriteRaw: %w`, err)
+	}
+	ep.bufrw.Flush()
+	return nil
+}
+
 // WriteRetry inform user how long they should wait, after disconnect,
 // before re-connecting back to server.
 //

@@ -1,0 +1,42 @@
+Test Server write WriteRaw.
+
+>>> case/1
+data: YHOO
+data: +2
+data: 10
+
+
+>>> case/2
+: test stream
+
+data: first event
+id: 1
+
+data:second event
+id
+
+data:  third event
+
+
+>>> case/3
+data
+
+data
+data
+
+data:
+
+>>> case/4
+data:test
+
+data: test
+
+
+>>> case/5
+event: join
+data: Named event
+data:  with multiple
+data:   ID
+id: 1
+id: 2
+
