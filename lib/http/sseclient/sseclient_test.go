@@ -7,7 +7,7 @@ package sseclient
 import (
 	"fmt"
 	"math/rand"
-	"net/http"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -68,7 +68,7 @@ func TestClient(t *testing.T) {
 
 	var expq = make(chan Event)
 
-	var servercb = func(ep *libhttp.SSEEndpoint, _ *http.Request) {
+	var servercb = func(sseconn *libhttp.SSEConn) {
 		var (
 			c   testCase
 			err error
@@ -82,13 +82,13 @@ func TestClient(t *testing.T) {
 				// NO-OP, this is sent when client has an
 				// error.
 			case EventTypeMessage:
-				err = ep.WriteMessage(c.data, c.id())
+				err = sseconn.WriteMessage(c.data, c.id())
 				if err != nil {
 					t.Fatal(`WriteMessage`, err)
 				}
 			default:
 				// Named type.
-				err = ep.WriteEvent(c.kind, c.data, c.id())
+				err = sseconn.WriteEvent(c.kind, c.data, c.id())
 				if err != nil {
 					t.Fatalf(`WriteEvent #%d: %s`, x, err)
 				}
@@ -98,17 +98,18 @@ func TestClient(t *testing.T) {
 	}
 
 	var (
-		serverAddress string
-		err           error
+		srv *libhttp.Server
+		err error
 	)
 
-	serverAddress, err = testRunSSEServer(t, servercb)
+	srv, err = testRunSSEServer(t, servercb)
 	if err != nil {
 		t.Fatal(`testRunSSEServer:`, err)
 	}
+	t.Cleanup(func() { srv.Stop(1 * time.Second) })
 
 	var cl = Client{
-		Endpoint: fmt.Sprintf(`http://%s/sse`, serverAddress),
+		Endpoint: fmt.Sprintf(`http://%s/sse`, srv.Options.Address),
 	}
 
 	err = cl.Connect(nil)
@@ -211,17 +212,17 @@ func TestClient_raw(t *testing.T) {
 
 	var expq = make(chan Event)
 
-	var servercb = func(ep *libhttp.SSEEndpoint, _ *http.Request) {
+	var servercb = func(sseconn *libhttp.SSEConn) {
 		var (
-			c   testCase
-			ev  Event
-			err error
-			x   int
+			c    testCase
+			ev   Event
+			errw error
+			x    int
 		)
 		for x, c = range cases {
-			err = ep.WriteRaw([]byte(c.raw))
-			if err != nil {
-				t.Fatalf(`WriteRaw #%d: %s`, x, err)
+			errw = sseconn.WriteRaw([]byte(c.raw))
+			if errw != nil {
+				t.Fatalf(`WriteRaw #%d: %s`, x, errw)
 			}
 			for _, ev = range c.exp {
 				expq <- ev
@@ -229,15 +230,16 @@ func TestClient_raw(t *testing.T) {
 		}
 	}
 
-	var addr string
+	var srv *libhttp.Server
 
-	addr, err = testRunSSEServer(t, servercb)
+	srv, err = testRunSSEServer(t, servercb)
 	if err != nil {
 		t.Fatal(`testRunSSEServer:`, err)
 	}
+	t.Cleanup(func() { srv.Stop(1 * time.Second) })
 
 	var cl = Client{
-		Endpoint: fmt.Sprintf(`http://%s/sse`, addr),
+		Endpoint: fmt.Sprintf(`http://%s/sse`, srv.Options.Address),
 	}
 
 	err = cl.Connect(nil)
@@ -274,6 +276,116 @@ func TestClient_raw(t *testing.T) {
 	test.Assert(t, `LastEventID`, `2`, cl.LastEventID)
 }
 
+func TestClientRetry(t *testing.T) {
+	const testKindClose = `close`
+
+	type testCase struct {
+		kind string
+		raw  []byte
+		exp  []Event
+	}
+
+	var cases = []testCase{{
+		raw: []byte("retry: 100\n\n"),
+		exp: []Event{{
+			Type: EventTypeOpen, // The first message always open.
+		}},
+	}, {
+		// This is where server close its handler.
+		kind: testKindClose,
+	}, {
+		raw: []byte("data: after close\n\n"),
+		exp: []Event{{
+			Type: EventTypeOpen, // The first message after reconnect.
+		}, {
+			Type: EventTypeMessage,
+			Data: `after close`,
+		}},
+	}}
+
+	var expq = make(chan Event)
+
+	// Counter for test case between open and close in server
+	// callback.
+	var casenum atomic.Int64
+
+	var servercb = func(sseconn *libhttp.SSEConn) {
+		var (
+			x   = int(casenum.Load())
+			c   testCase
+			ev  Event
+			err error
+		)
+		for x < len(cases) {
+			c = cases[x]
+			x++
+			casenum.Store(int64(x))
+
+			switch c.kind {
+			case testKindClose:
+				// Close the connection here, continue
+				// later.
+				return
+			default:
+				err = sseconn.WriteRaw([]byte(c.raw))
+				if err != nil {
+					t.Fatalf(`WriteRaw #%d: %s`, x, err)
+				}
+			}
+			for _, ev = range c.exp {
+				expq <- ev
+			}
+		}
+	}
+
+	var (
+		srv *libhttp.Server
+		err error
+	)
+
+	srv, err = testRunSSEServer(t, servercb)
+	if err != nil {
+		t.Fatal(`testRunSSEServer:`, err)
+	}
+	t.Cleanup(func() { srv.Stop(1 * time.Second) })
+
+	var cl = Client{
+		Endpoint: fmt.Sprintf(`http://%s/sse`, srv.Options.Address),
+	}
+	err = cl.Connect(nil)
+	if err != nil {
+		t.Fatal(`Connect:`, err)
+	}
+
+	var (
+		timeout = 1 * time.Second
+		ticker  = time.NewTicker(timeout)
+
+		c        testCase
+		expEvent Event
+		gotEvent Event
+		tag      string
+		x, y     int
+	)
+	for x, c = range cases {
+		for y = range c.exp {
+			tag = fmt.Sprintf(`Case #%d/#%d`, x, y)
+
+			select {
+			case <-ticker.C:
+				t.Fatalf(`%s: timeout`, tag)
+
+			case gotEvent = <-cl.C:
+				expEvent = <-expq
+				test.Assert(t, tag, expEvent, gotEvent)
+			}
+			ticker.Reset(timeout)
+		}
+	}
+	_ = cl.Close()
+
+}
+
 // testGenerateAddress generate random port for server address.
 func testGenerateAddress() (addr string) {
 	var port = rand.Int() % 60000
@@ -283,18 +395,17 @@ func testGenerateAddress() (addr string) {
 	return fmt.Sprintf(`127.0.0.1:%d`, port)
 }
 
-func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (address string, err error) {
-	address = testGenerateAddress()
+func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (srv *libhttp.Server, err error) {
+	var address = testGenerateAddress()
 
 	var (
 		serverOpts = &libhttp.ServerOptions{
 			Address: address,
 		}
-		srv *libhttp.Server
 	)
 	srv, err = libhttp.NewServer(serverOpts)
 	if err != nil {
-		return ``, err
+		return nil, err
 	}
 
 	var sse = &libhttp.SSEEndpoint{
@@ -304,7 +415,7 @@ func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (address string, err
 
 	err = srv.RegisterSSE(sse)
 	if err != nil {
-		return ``, err
+		return nil, err
 	}
 
 	go srv.Start()
@@ -315,7 +426,5 @@ func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (address string, err
 		t.Skip(err)
 	}
 
-	t.Cleanup(func() { srv.Stop(1 * time.Second) })
-
-	return address, nil
+	return srv, nil
 }

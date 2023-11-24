@@ -5,7 +5,6 @@
 package http
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -57,7 +56,7 @@ func testSSEEndpointDuplicatePath(t *testing.T, httpd *Server) {
 
 	var sse = &SSEEndpoint{
 		Path: `/sse`,
-		Call: func(ep *SSEEndpoint, req *http.Request) {},
+		Call: func(sseconn *SSEConn) {},
 	}
 
 	err = httpd.RegisterSSE(sse)

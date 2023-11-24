@@ -47,6 +47,9 @@ type Client struct {
 	C     <-chan Event
 	event chan Event
 
+	serverUrl *url.URL
+	header    http.Header
+
 	conn   net.Conn
 	closeq chan struct{}
 
@@ -64,7 +67,12 @@ type Client struct {
 	// This field is optional default to 10 seconds.
 	Timeout time.Duration
 
-	retry time.Duration
+	// Retry define how long, in milliseconds, the client should wait
+	// before reconnecting back to server after disconnect.
+	// Zero or negative value disable it.
+	//
+	// This field is optional, default to 0, not retrying.
+	Retry time.Duration
 
 	// Insecure allow connect to HTTPS Endpoint with invalid
 	// certificate.
@@ -76,14 +84,16 @@ func (cl *Client) Close() (err error) {
 	// Close the connection, wait until it catched by consume goroutine.
 	if cl.conn != nil {
 		err = cl.conn.Close()
+
+		var timeWait = time.NewTimer(50 * time.Millisecond)
 		select {
 		case cl.closeq <- struct{}{}:
 			// Tell the consume goroutine we initiate the close.
-			cl.conn = nil
-		default:
+		case <-timeWait.C:
 			// The consume goroutine may already end or end at
 			// the same time.
 		}
+		cl.conn = nil
 	}
 	return err
 }
@@ -95,30 +105,38 @@ func (cl *Client) Close() (err error) {
 // during handshake.
 // The following header cannot be set: Host, User-Agent, and Accept.
 func (cl *Client) Connect(header http.Header) (err error) {
-	var (
-		logp      = `Connect`
-		serverUrl *url.URL
-	)
+	var logp = `Connect`
 
-	serverUrl, err = cl.init()
+	err = cl.init(header)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = cl.dial(serverUrl)
-	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	var packet []byte
-
-	packet, err = cl.handshake(serverUrl, header)
+	err = cl.connect()
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	// Reset the ID to store the ID from server.
 	cl.LastEventID = ``
+
+	go cl.consume()
+
+	return nil
+}
+
+func (cl *Client) connect() (err error) {
+	err = cl.dial()
+	if err != nil {
+		return err
+	}
+
+	var packet []byte
+
+	packet, err = cl.handshake()
+	if err != nil {
+		return err
+	}
 
 	select {
 	case cl.event <- Event{Type: EventTypeOpen}:
@@ -129,35 +147,41 @@ func (cl *Client) Connect(header http.Header) (err error) {
 	// consume it.
 	cl.parseEvent(packet)
 
-	go cl.consume()
-
 	return nil
 }
 
 // init validate and set default field values.
-func (cl *Client) init() (serverUrl *url.URL, err error) {
-	serverUrl, err = url.Parse(cl.Endpoint)
+func (cl *Client) init(header http.Header) (err error) {
+	cl.serverUrl, err = url.Parse(cl.Endpoint)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var host, port string
 
-	host, port, err = net.SplitHostPort(serverUrl.Host)
+	host, port, err = net.SplitHostPort(cl.serverUrl.Host)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if len(port) == 0 {
-		switch serverUrl.Scheme {
+		switch cl.serverUrl.Scheme {
 		case `http`:
 			port = `80`
 		case `https`:
 			port = `443`
 		default:
-			return nil, fmt.Errorf(`unknown scheme %q`, serverUrl.Scheme)
+			return fmt.Errorf(`unknown scheme %q`, cl.serverUrl.Scheme)
 		}
 	}
-	serverUrl.Host = net.JoinHostPort(host, port)
+	cl.serverUrl.Host = net.JoinHostPort(host, port)
+
+	cl.header = header
+	if cl.header == nil {
+		cl.header = http.Header{}
+	}
+	cl.header.Set(libhttp.HeaderHost, cl.serverUrl.Host)
+	cl.header.Set(libhttp.HeaderUserAgent, `libhttp/`+share.Version)
+	cl.header.Set(libhttp.HeaderAccept, libhttp.ContentTypeEventStream)
 
 	if cl.Timeout <= 0 {
 		cl.Timeout = defTimeout
@@ -167,17 +191,17 @@ func (cl *Client) init() (serverUrl *url.URL, err error) {
 	cl.C = cl.event
 	cl.closeq = make(chan struct{})
 
-	return serverUrl, nil
+	return nil
 }
 
-func (cl *Client) dial(serverUrl *url.URL) (err error) {
-	if serverUrl.Scheme == `https` {
+func (cl *Client) dial() (err error) {
+	if cl.serverUrl.Scheme == `https` {
 		var tlsConfig = &tls.Config{
 			InsecureSkipVerify: cl.Insecure,
 		}
-		cl.conn, err = tls.Dial(`tcp`, serverUrl.Host, tlsConfig)
+		cl.conn, err = tls.Dial(`tcp`, cl.serverUrl.Host, tlsConfig)
 	} else {
-		cl.conn, err = net.Dial(`tcp`, serverUrl.Host)
+		cl.conn, err = net.Dial(`tcp`, cl.serverUrl.Host)
 	}
 	if err != nil {
 		return err
@@ -190,8 +214,8 @@ func (cl *Client) dial(serverUrl *url.URL) (err error) {
 // "text/event-stream".
 //
 // If the response is not empty, it contains event message, return it.
-func (cl *Client) handshake(serverUrl *url.URL, header http.Header) (packet []byte, err error) {
-	err = cl.handshakeRequest(serverUrl, header)
+func (cl *Client) handshake() (packet []byte, err error) {
+	err = cl.handshakeRequest()
 	if err != nil {
 		return nil, err
 	}
@@ -220,27 +244,21 @@ func (cl *Client) handshake(serverUrl *url.URL, header http.Header) (packet []by
 	return packet, nil
 }
 
-func (cl *Client) handshakeRequest(serverUrl *url.URL, header http.Header) (err error) {
+func (cl *Client) handshakeRequest() (err error) {
 	var buf bytes.Buffer
 
-	fmt.Fprintf(&buf, `GET %s`, serverUrl.Path)
-	if len(serverUrl.RawQuery) != 0 {
+	fmt.Fprintf(&buf, `GET %s`, cl.serverUrl.Path)
+	if len(cl.serverUrl.RawQuery) != 0 {
 		buf.WriteByte('?')
-		buf.WriteString(serverUrl.RawQuery)
+		buf.WriteString(cl.serverUrl.RawQuery)
 	}
 	buf.WriteString(" HTTP/1.1\r\n")
 
 	// Write the known values to prevent user overwrite our default
 	// values.
 
-	if header == nil {
-		header = http.Header{}
-	}
-	header.Set(libhttp.HeaderHost, serverUrl.Host)
-	header.Set(libhttp.HeaderUserAgent, `libhttp/`+share.Version)
-	header.Set(libhttp.HeaderAccept, libhttp.ContentTypeEventStream)
 	if len(cl.LastEventID) != 0 {
-		header.Set(libhttp.HeaderLastEventID, cl.LastEventID)
+		cl.header.Set(libhttp.HeaderLastEventID, cl.LastEventID)
 	}
 
 	var (
@@ -248,7 +266,7 @@ func (cl *Client) handshakeRequest(serverUrl *url.URL, header http.Header) (err 
 		hvals []string
 		val   string
 	)
-	for hkey, hvals = range header {
+	for hkey, hvals = range cl.header {
 		if len(hvals) == 0 {
 			continue
 		}
@@ -288,17 +306,44 @@ func (cl *Client) consume() {
 	for {
 		data, err = libnet.Read(cl.conn, 0, cl.Timeout)
 		if err != nil {
-			// TODO: retry?
+			if cl.Retry <= 0 {
+				return
+			}
+
+			// Check if this user Close or not.
+			var timeWait = time.NewTimer(50 * time.Millisecond)
 			select {
 			case <-cl.closeq:
-				// User call Close.
-			default:
-				// Peer initiated close or connection error.
-				// At the same time user may also call
-				// Close, to prevent data race, let the user
-				// clear it out.
+				// User initiated close.
+				if !timeWait.Stop() {
+					<-timeWait.C
+				}
+				return
+			case <-timeWait.C:
+				_ = cl.conn.Close()
+				cl.conn = nil
+				// Not from user, try to re-connect.
 			}
-			return
+
+			var connected bool
+			timeWait = time.NewTimer(cl.Retry)
+			for !connected {
+				select {
+				case <-timeWait.C:
+					err = cl.connect()
+					if err != nil {
+						timeWait.Reset(cl.Retry)
+						continue
+					}
+					connected = true
+				case <-cl.closeq:
+					// User initiated close.
+					if !timeWait.Stop() {
+						<-timeWait.C
+					}
+					return
+				}
+			}
 		}
 		cl.parseEvent(data)
 	}
@@ -397,7 +442,7 @@ func (cl *Client) parseEvent(raw []byte) {
 			var retry int64
 			retry, err = strconv.ParseInt(string(fval), 10, 64)
 			if err == nil {
-				cl.retry = time.Duration(retry) * time.Millisecond
+				cl.Retry = time.Duration(retry)
 			}
 		default:
 			// Ignore the field.

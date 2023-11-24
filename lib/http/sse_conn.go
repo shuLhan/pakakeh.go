@@ -1,0 +1,149 @@
+// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package http
+
+import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"net"
+	"net/http"
+	"strings"
+	"time"
+)
+
+// SSECallback define the handler for Server-Sent Events (SSE).
+//
+// SSECallback type pass SSEConn that contains original HTTP request.
+// This allow the server to check for header "Last-Event-ID" and/or for
+// authentication.
+// Remember that "the original Request.Body must not be used" according to
+// [http.Hijacker] documentation.
+type SSECallback func(sse *SSEConn)
+
+// SSEConn define the connection when the SSE request accepted by server.
+type SSEConn struct {
+	HttpRequest *http.Request
+
+	bufrw *bufio.ReadWriter
+	conn  net.Conn
+}
+
+// WriteEvent write message with event type to client.
+//
+// The event parameter must not be empty, otherwise it will not be sent.
+//
+// The msg parameter must not be empty, otherwise it will not be sent
+// If msg contains new line character ('\n'), the message will be split into
+// multiple "data:".
+//
+// The id parameter is optional.
+// If its nil, it will be ignored.
+// if its non-nil and empty, it will be send as empty ID.
+//
+// It will return an error if its failed to write to peer connection.
+func (ep *SSEConn) WriteEvent(event, msg string, id *string) (err error) {
+	event = strings.TrimSpace(event)
+	if len(event) == 0 {
+		return nil
+	}
+	if len(msg) == 0 {
+		return nil
+	}
+
+	var buf bytes.Buffer
+
+	buf.WriteString(`event:`)
+	buf.WriteString(event)
+	buf.WriteByte('\n')
+
+	ep.writeData(&buf, msg, id)
+
+	_, err = ep.bufrw.Write(buf.Bytes())
+	if err != nil {
+		return fmt.Errorf(`WriteMessage: %w`, err)
+	}
+	ep.bufrw.Flush()
+	return nil
+}
+
+// WriteMessage write a message with optional id to client.
+//
+// The msg parameter must not be empty, otherwise it will not be sent
+// If msg contains new line character ('\n'), the message will be split into
+// multiple "data:".
+//
+// The id parameter is optional.
+// If its nil, it will be ignored.
+// if its non-nil and empty, it will be send as empty ID.
+//
+// It will return an error if its failed to write to peer connection.
+func (ep *SSEConn) WriteMessage(msg string, id *string) (err error) {
+	if len(msg) == 0 {
+		return nil
+	}
+
+	var buf bytes.Buffer
+
+	ep.writeData(&buf, msg, id)
+
+	_, err = ep.bufrw.Write(buf.Bytes())
+	if err != nil {
+		return fmt.Errorf(`WriteMessage: %w`, err)
+	}
+	ep.bufrw.Flush()
+	return nil
+}
+
+// WriteRaw write raw event message directly, without any parsing.
+func (ep *SSEConn) WriteRaw(msg []byte) (err error) {
+	_, err = ep.bufrw.Write(msg)
+	if err != nil {
+		return fmt.Errorf(`WriteRaw: %w`, err)
+	}
+	ep.bufrw.Flush()
+	return nil
+}
+
+// WriteRetry inform user how long they should wait, after disconnect,
+// before re-connecting back to server.
+//
+// The duration must be in millisecond.
+func (ep *SSEConn) WriteRetry(retry time.Duration) (err error) {
+	_, err = fmt.Fprintf(ep.bufrw, "retry:%d\n\n", retry.Milliseconds())
+	if err != nil {
+		return fmt.Errorf(`WriteRetry: %w`, err)
+	}
+	ep.bufrw.Flush()
+	return nil
+}
+
+func (ep *SSEConn) writeData(buf *bytes.Buffer, msg string, id *string) {
+	var (
+		lines = strings.Split(msg, "\n")
+		line  string
+	)
+	for _, line = range lines {
+		buf.WriteString(`data:`)
+		buf.WriteString(line)
+		buf.WriteByte('\n')
+	}
+	if id != nil {
+		buf.WriteString(`id:`)
+		buf.WriteString(*id)
+		buf.WriteByte('\n')
+	}
+	buf.WriteByte('\n')
+}
+
+// handshake write the last HTTP response to indicate the connection is
+// accepted.
+func (ep *SSEConn) handshake() {
+	ep.bufrw.WriteString("HTTP/1.1 200 OK\r\n")
+	ep.bufrw.WriteString("content-type: text/event-stream\r\n")
+	ep.bufrw.WriteString("cache-control: no-cache\r\n")
+	ep.bufrw.WriteString("\r\n")
+	ep.bufrw.Flush()
+}
