@@ -231,19 +231,25 @@ func WaitAlive(network, address string, timeout time.Duration) (err error) {
 		dialTimeout = 100 * time.Millisecond
 		total       = dialTimeout
 		dialer      = net.Dialer{Timeout: timeout}
+		ticker      = time.NewTicker(dialTimeout)
 
 		conn net.Conn
 	)
 
 	for total < timeout {
-		conn, err = dialer.Dial(network, address)
-		if err != nil {
-			total += dialTimeout
-			continue
+		select {
+		case <-ticker.C:
+			conn, err = dialer.Dial(network, address)
+			if err != nil {
+				total += dialTimeout
+				continue
+			}
+			// Connection successfully established.
+			ticker.Stop()
+			_ = conn.Close()
+			return nil
 		}
-		// Connection successfully established.
-		_ = conn.Close()
-		return nil
 	}
+	ticker.Stop()
 	return fmt.Errorf(`%s: timeout connecting to %s after %s`, logp, address, timeout)
 }
