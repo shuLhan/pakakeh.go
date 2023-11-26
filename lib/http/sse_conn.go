@@ -31,67 +31,40 @@ type SSEConn struct {
 	conn  net.Conn
 }
 
-// WriteEvent write message with event type to client.
+// WriteEvent write message with optional event type and id to client.
 //
-// The event parameter must not be empty, otherwise it will not be sent.
+// The "event" parameter is optional.
+// If its empty, no "event:" line will be send to client.
 //
-// The msg parameter must not be empty, otherwise it will not be sent
-// If msg contains new line character ('\n'), the message will be split into
-// multiple "data:".
+// The "data" parameter must not be empty, otherwise no message will be
+// send.
+// If "data" value contains new line character ('\n'), the message will be
+// split into multiple "data:".
 //
 // The id parameter is optional.
 // If its nil, it will be ignored.
 // if its non-nil and empty, it will be send as empty ID.
 //
 // It will return an error if its failed to write to peer connection.
-func (ep *SSEConn) WriteEvent(event, msg string, id *string) (err error) {
+func (ep *SSEConn) WriteEvent(event, data string, id *string) (err error) {
 	event = strings.TrimSpace(event)
-	if len(event) == 0 {
-		return nil
-	}
-	if len(msg) == 0 {
+	if len(data) == 0 {
 		return nil
 	}
 
 	var buf bytes.Buffer
 
-	buf.WriteString(`event:`)
-	buf.WriteString(event)
-	buf.WriteByte('\n')
+	if len(event) != 0 {
+		buf.WriteString(`event:`)
+		buf.WriteString(event)
+		buf.WriteByte('\n')
+	}
 
-	ep.writeData(&buf, msg, id)
+	ep.writeData(&buf, data, id)
 
 	_, err = ep.bufrw.Write(buf.Bytes())
 	if err != nil {
-		return fmt.Errorf(`WriteMessage: %w`, err)
-	}
-	ep.bufrw.Flush()
-	return nil
-}
-
-// WriteMessage write a message with optional id to client.
-//
-// The msg parameter must not be empty, otherwise it will not be sent
-// If msg contains new line character ('\n'), the message will be split into
-// multiple "data:".
-//
-// The id parameter is optional.
-// If its nil, it will be ignored.
-// if its non-nil and empty, it will be send as empty ID.
-//
-// It will return an error if its failed to write to peer connection.
-func (ep *SSEConn) WriteMessage(msg string, id *string) (err error) {
-	if len(msg) == 0 {
-		return nil
-	}
-
-	var buf bytes.Buffer
-
-	ep.writeData(&buf, msg, id)
-
-	_, err = ep.bufrw.Write(buf.Bytes())
-	if err != nil {
-		return fmt.Errorf(`WriteMessage: %w`, err)
+		return fmt.Errorf(`WriteEvent: %w`, err)
 	}
 	ep.bufrw.Flush()
 	return nil
@@ -120,9 +93,9 @@ func (ep *SSEConn) WriteRetry(retry time.Duration) (err error) {
 	return nil
 }
 
-func (ep *SSEConn) writeData(buf *bytes.Buffer, msg string, id *string) {
+func (ep *SSEConn) writeData(buf *bytes.Buffer, data string, id *string) {
 	var (
-		lines = strings.Split(msg, "\n")
+		lines = strings.Split(data, "\n")
 		line  string
 	)
 	for _, line = range lines {

@@ -81,11 +81,6 @@ func TestClient(t *testing.T) {
 			case EventTypeError:
 				// NO-OP, this is sent when client has an
 				// error.
-			case EventTypeMessage:
-				err = sseconn.WriteMessage(c.data, c.id())
-				if err != nil {
-					t.Fatal(`WriteMessage`, err)
-				}
 			default:
 				// Named type.
 				err = sseconn.WriteEvent(c.kind, c.data, c.id())
