@@ -17,8 +17,9 @@ type ClientOptions struct {
 	// This field is optional.
 	Headers http.Header
 
-	// ServerUrl is any path that is static and will never changes during
-	// request to server.
+	// ServerUrl define the server address without path, for example
+	// "https://example.com" or "http://10.148.0.12:8080".
+	// This value should not changed during call of client's method.
 	// This field is required.
 	ServerUrl string
 

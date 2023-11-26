@@ -334,6 +334,8 @@ func (client *Client) PostFormData(
 
 // PostJSON send the POST request with content type set to "application/json"
 // and params encoded automatically to JSON.
+// The params must be a type than can be marshalled with [json.Marshal] or
+// type that implement [json.Marshaler].
 func (client *Client) PostJSON(requestPath string, headers http.Header, params interface{}) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
