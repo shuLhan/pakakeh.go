@@ -4,6 +4,8 @@
 
 package sseclient
 
+import "strconv"
+
 // List of system event type.
 const (
 	// EventTypeOpen is set when connection succesfully established.
@@ -22,6 +24,13 @@ type Event struct {
 	Type string
 	Data string
 	ID   string
+}
+
+// IDInt return the ID as int64.
+// If the ID cannot be converted to integer it would return 0.
+func (ev *Event) IDInt() (id int64) {
+	id, _ = strconv.ParseInt(ev.ID, 10, 64)
+	return id
 }
 
 func (ev *Event) reset(id string) {
