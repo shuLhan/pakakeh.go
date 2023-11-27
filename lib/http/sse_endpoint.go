@@ -8,9 +8,12 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"time"
 
 	liberrors "github.com/shuLhan/share/lib/errors"
 )
+
+const defKeepAliveInterval = 5 * time.Second
 
 // SSEEndpoint endpoint to create Server-Sent Events (SSE) on server.
 //
@@ -21,6 +24,11 @@ type SSEEndpoint struct {
 
 	// Path where server accept the request for SSE.
 	Path string
+
+	// KeepAliveInterval define the interval where server will send an
+	// empty message to active connection periodically.
+	// This field is optional, default and minimum value is 5 seconds.
+	KeepAliveInterval time.Duration
 }
 
 func (ep *SSEEndpoint) call(
@@ -64,6 +72,10 @@ func (ep *SSEEndpoint) call(
 	}
 
 	sseconn.handshake()
+	if ep.KeepAliveInterval < defKeepAliveInterval {
+		ep.KeepAliveInterval = defKeepAliveInterval
+	}
+	go sseconn.workerKeepAlive(ep.KeepAliveInterval)
 	ep.Call(sseconn)
 	sseconn.conn.Close()
 }

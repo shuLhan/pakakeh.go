@@ -93,6 +93,26 @@ func (ep *SSEConn) WriteRetry(retry time.Duration) (err error) {
 	return nil
 }
 
+// workerKeepAlive periodically send an empty message to client to keep the
+// connection alive.
+func (ep *SSEConn) workerKeepAlive(interval time.Duration) {
+	var (
+		ticker   = time.NewTicker(interval)
+		emptyMsg = []byte(":\n\n")
+
+		err error
+	)
+	for _ = range ticker.C {
+		err = ep.WriteRaw(emptyMsg)
+		if err != nil {
+			// Write failed, probably connection has been
+			// closed.
+			ticker.Stop()
+			return
+		}
+	}
+}
+
 func (ep *SSEConn) writeData(buf *bytes.Buffer, data string, id *string) {
 	var (
 		lines = strings.Split(data, "\n")
