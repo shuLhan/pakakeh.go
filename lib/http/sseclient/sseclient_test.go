@@ -48,6 +48,14 @@ func TestClient(t *testing.T) {
 			Data: "Hello\nmulti\nline\nworld",
 		},
 	}, {
+		kind: EventTypeMessage,
+		data: "line 1\n\nline2\n\n",
+		id:   fnoid,
+		exp: Event{
+			Type: EventTypeMessage,
+			Data: "line 1\n\nline2\n\n",
+		},
+	}, {
 		kind: `join`,
 		data: `John join the event`,
 		id:   fnoid,
