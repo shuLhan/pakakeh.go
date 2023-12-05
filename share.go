@@ -8,5 +8,5 @@ package share
 
 var (
 	// Version of this module.
-	Version = `0.50.1`
+	Version = `0.51.0`
 )

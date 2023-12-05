@@ -19,6 +19,178 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_51_0]
+== share v0.51.0 (2023-12-06)
+
+[#v0_51_0__new_features]
+=== New features
+
+lib/http: implement Server-Sent Events (SSE)::
++
+--
+For server SSE, we add new type SSEEndpoint, for registering endpoint
+that can handle SSE.
+
+For client SSE, we add it in new sub package "sseclient".
+--
+
+lib/net: add method Read::
++
+--
+The Read method read packet from raw connection.
+
+If the conn parameter is nil it will return [net.ErrClosed].
+
+The bufsize parameter set the size of buffer for each read operation,
+default to 1024 if not set or invalid (less than 0 or greater than
+65535).
+
+The timeout parameter set how long to wait for data before considering
+it as failed.
+If its not set, less or equal to 0, it will wait forever.
+If no data received and timeout is set, it will return [ErrReadTimeout].
+
+If there is data received and connection closed at the same time, it will
+return the data first without error.
+The subsequent Read will return empty packet with [ErrClosed].
+--
+
+lib/crypto: add support for reading passphrase using SSH_ASKPASS::
++
+--
+If the library failed to changes os.Stdin to raw, it will try to use
+a program defined in SSH_ASKPASS environment variable.
+
+The SSH_ASKPASS is controlled by environment SSH_ASKPASS_REQUIRE.
+
+- If SSH_ASKPASS_REQUIRE is empty the passphrase will read from
+  terminal first, if not possible then using SSH_ASKPASS program.
+
+- If SSH_ASKPASS_REQUIRE is set to "never" the passphrase will read
+  from terminal only.
+
+- If SSH_ASKPASS_REQUIRE is set to "prefer", the passphrase will read
+  using SSH_ASKPASS program not from terminal, but require
+  DISPLAY environment to be set.
+
+- If SSH_ASKPASS_REQUIRE is set to "force", the passphrase will read
+  using SSH_ASKPASS program not from terminal, without checking DISPLAY
+  environment.
+--
+
+This changes affect the [ssh.NewClientInteractive] indirectly.
+
+lib/memfs: add method JSON to Node::
++
+--
+The JSON method encode the Node into JSON.
+This method provides an alternative to MarshalJSON with granular options,
+depth and withoutModTime.
+
+The depth set the level of childs to be encoded.
+The depth=0 only encode the Root Node itself (with its childs), depth=1
+encode the Root node and its subdirectories, and so on.
+
+If withoutModTime is set to true, all of the node ModTime will not be
+included in output.
+--
+
+
+[#v0_51_0__enhancements]
+=== Enhancements
+
+lib/ini: create the file if its not exist on Open::
++
+Previously, Open will return an error if file not exist.
+This changes create the file if not exist.
+
+lib/net: use [time.Ticker] to loop in WaitAlive::
++
+--
+The Timeout field in net.Dialer sometimes does not have any effect.
+In the for-loop, we expect that each Dial at least consume 100 ms
+before returning an error.
+
+Turns out, on several occasion, the loop run too quickly, less than the
+passed timeout.
+This is probably because the listening address has not been
+active yet and we run it in the same machine, the OS (or Go?) return
+immediately without waiting for timeout.
+--
+
+lib/memfs: add sub file system::
++
+--
+This implemented simplified version of merging multiple MemFS instances.
+The sub file system (subfs) can be added to the parent MemFS instance
+by calling new method "Merge".
+
+  parent.Merge(other *MemfS)
+
+When Get method called, each subfs will be evaluated in order of Merge
+called.
+
+This deprecated the function Merge.
+--
+
+lib/memfs: improve the refresh method::
++
+--
+Instead of refreshing from the Root, find the directory that closes
+to the requested path.
+
+While at it, simplify the returned error.
+--
+
+lib/ini: append variable into section before any empty lines::
++
+--
+Previously, appending a new variable into section always create an empty
+line before after the variable.
+This changes fix this by appending variable only after non-empty lines.
+While at it, add empty space before variable value.
+--
+
+lib/memfs: stop all Watcher spawn by DirWatcher::
++
+--
+Previously, the Watcher goroutine will stopped only if the file is
+being deleted.
+If the DirWatcher stopped manually, by calling Stop method, the
+Watcher goroutine will still running in the background.
+
+This changes record all spawned Watcher and stop it when files inside
+a deleted directory or when Stop called.
+--
+
+lib/memfs: remove embedding os.FileInfo and http.File::
++
+The original idea of embedding those interface is to guard the Node
+implementation to always follow all methods in the os.FileInfo and
+http.File, in case there is additional methods in the future.
+But, embedding interfaces make the struct store it as field "FileInfo"
+and File with "<nil>" values, which add storage cost to Node.
+
+lib/memfs: refactoring, simplify DirWatcher logic::
++
+In this changes, we simplify re-scanning the directory content.
+Instead of looping on node Child to detect new or delete files, use map
+to store previous Child first.
+If node path exist in map then add it again as child, otherwise delete it.
+
+email/dkim: set ExpiredAt to MaxInt64 if value is greater than 12 digits::
++
+--
+According to RFC 6376,
+
+  To avoid denial-of-service attacks, implementations MAY consider any
+  value longer than 12 digits to be infinite.
+
+Since ExpiredAt type is uint64, we cannot set it to infinite, so set it
+to maximum value int64 (not maximum of uint64).
+--
+
+
 [#v0_50_1]
 == share v0.50.1 (2023-11-05)
 
