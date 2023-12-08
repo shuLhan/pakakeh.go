@@ -60,7 +60,7 @@ func (pn *PathNode) MarshalJSON() ([]byte, error) {
 		fmt.Fprintf(&buf, "%q:", path)
 		node = pn.v[path]
 		if node != nil {
-			node.packAsJson(&buf, 0, false)
+			node.packAsJson(&buf, 0, true, true)
 		}
 	}
 	_ = buf.WriteByte('}')

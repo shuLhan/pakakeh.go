@@ -367,7 +367,7 @@ func (mfs *MemFS) ListNames() (paths []string) {
 // The field that being encoded is the Root node.
 func (mfs *MemFS) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	mfs.Root.packAsJson(&buf, 0, false)
+	mfs.Root.packAsJson(&buf, 0, true, true)
 	return buf.Bytes(), nil
 }
 

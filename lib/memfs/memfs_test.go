@@ -431,7 +431,7 @@ func TestMemFS_Get_refresh(t *testing.T) {
 
 		// Check the tree of MemFS.
 
-		rawJson, err = mfs.Root.JSON(9999, true)
+		rawJson, err = mfs.Root.JSON(9999, true, false)
 		if err != nil {
 			t.Fatal(err)
 		}
