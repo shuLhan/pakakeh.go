@@ -185,9 +185,6 @@ functionalities.
 Package exec wrap the standar package "os/exec" to simplify calling Run
 with stdout and stderr.
 
-[**parser**](https://pkg.go.dev/github.com/shuLhan/share/lib/parser)::
-[DEPRECATED] Package parser provide a common text parser, using delimiters.
-
 [**paseto**](https://pkg.go.dev/github.com/shuLhan/share/lib/paseto)::
 A simple, ready to use, implementation of Platform-Agnostic SEcurity TOkens
 (PASETO).
