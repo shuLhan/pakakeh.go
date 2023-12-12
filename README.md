@@ -114,9 +114,6 @@ A library for working with slice of integer.
 [**ints64**](https://pkg.go.dev/github.com/shuLhan/share/lib/ints64)::
 A library for working with slice of int64.
 
-[**io**](https://pkg.go.dev/github.com/shuLhan/share/lib/io)::
-[DEPRECATED] A library for simplify reading and watching files.
-
 [**json**](https://pkg.go.dev/github.com/shuLhan/share/lib/json)::
 Package json extends the capabilities of standard json package.
 
