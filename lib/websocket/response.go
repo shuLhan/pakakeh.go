@@ -55,8 +55,8 @@ type Response struct {
 // and wrapped in TEXT frame.
 func NewBroadcast(message, body string) (packet []byte, err error) {
 	var (
-		logp           = `NewBroadcast`
-		res  *Response = _resPool.Get().(*Response)
+		logp = `NewBroadcast`
+		res  = _resPool.Get().(*Response)
 	)
 
 	res.reset()

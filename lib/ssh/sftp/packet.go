@@ -67,7 +67,7 @@ type packet struct {
 	version   uint32 // from FxpVersion.
 	code      uint32 // from FxpStatus
 	length    uint32
-	requestId uint32
+	requestID uint32
 
 	kind byte
 }
@@ -96,7 +96,7 @@ func unpackPacket(payload []byte) (pac *packet, err error) {
 		return pac, nil
 	}
 
-	pac.requestId = v
+	pac.requestID = v
 
 	switch pac.kind {
 	case packetKindFxpStatus:
@@ -161,7 +161,7 @@ func (pac *packet) fxpClose(fh *FileHandle) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpClose)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(fh.v)))
 	_ = binary.Write(&buf, binary.BigEndian, fh.v)
 
@@ -172,7 +172,7 @@ func (pac *packet) fxpFsetstat(fh *FileHandle, fa *FileAttrs) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpFsetstat)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(fh.v)))
 	_ = binary.Write(&buf, binary.BigEndian, fh.v)
 	fa.pack(&buf)
@@ -184,7 +184,7 @@ func (pac *packet) fxpFstat(fh *FileHandle) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpFstat)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(fh.v)))
 	_ = binary.Write(&buf, binary.BigEndian, fh.v)
 
@@ -207,7 +207,7 @@ func (pac *packet) fxpLstat(remoteFile string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpLstat)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(remoteFile)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(remoteFile))
 
@@ -218,7 +218,7 @@ func (pac *packet) fxpMkdir(path string, fa *FileAttrs) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpMkdir)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(path)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(path))
 	fa.pack(&buf)
@@ -230,7 +230,7 @@ func (pac *packet) fxpOpen(filename string, pflags uint32, fa *FileAttrs) []byte
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpOpen)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(filename)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(filename))
 	_ = binary.Write(&buf, binary.BigEndian, pflags)
@@ -243,7 +243,7 @@ func (pac *packet) fxpOpendir(path string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpOpendir)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(path)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(path))
 
@@ -254,7 +254,7 @@ func (pac *packet) fxpRead(fh *FileHandle, offset uint64, length uint32) []byte 
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpRead)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(fh.v)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(fh.v))
 	_ = binary.Write(&buf, binary.BigEndian, offset)
@@ -267,7 +267,7 @@ func (pac *packet) fxpReaddir(fh *FileHandle) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpReaddir)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(fh.v)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(fh.v))
 
@@ -278,7 +278,7 @@ func (pac *packet) fxpReadlink(linkPath string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpReadlink)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(linkPath)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(linkPath))
 
@@ -289,7 +289,7 @@ func (pac *packet) fxpRealpath(path string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpRealpath)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(path)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(path))
 
@@ -300,7 +300,7 @@ func (pac *packet) fxpRemove(remoteFile string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpRemove)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(remoteFile)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(remoteFile))
 
@@ -311,7 +311,7 @@ func (pac *packet) fxpRename(oldPath, newPath string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpRename)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(oldPath)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(oldPath))
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(newPath)))
@@ -324,7 +324,7 @@ func (pac *packet) fxpRmdir(path string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpRmdir)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(path)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(path))
 
@@ -335,7 +335,7 @@ func (pac *packet) fxpSetstat(remoteFile string, fa *FileAttrs) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpSetstat)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(remoteFile)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(remoteFile))
 	fa.pack(&buf)
@@ -347,7 +347,7 @@ func (pac *packet) fxpStat(remoteFile string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpStat)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(remoteFile)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(remoteFile))
 
@@ -358,7 +358,7 @@ func (pac *packet) fxpSymlink(linkPath, targetPath string) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpSymlink)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(linkPath)))
 	_ = binary.Write(&buf, binary.BigEndian, []byte(linkPath))
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(targetPath)))
@@ -371,7 +371,7 @@ func (pac *packet) fxpWrite(fh *FileHandle, offset uint64, data []byte) []byte {
 	var buf bytes.Buffer
 
 	_ = binary.Write(&buf, binary.BigEndian, packetKindFxpWrite)
-	_ = binary.Write(&buf, binary.BigEndian, pac.requestId)
+	_ = binary.Write(&buf, binary.BigEndian, pac.requestID)
 	_ = binary.Write(&buf, binary.BigEndian, uint32(len(fh.v)))
 	_ = binary.Write(&buf, binary.BigEndian, fh.v)
 	_ = binary.Write(&buf, binary.BigEndian, offset)

@@ -162,7 +162,7 @@ func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
 func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
 	mlog.Errf(format, v...)
 	mlog.Flush()
-	var msg string = fmt.Sprintf(format, v...)
+	var msg = fmt.Sprintf(format, v...)
 	panic(msg)
 }
 
@@ -186,7 +186,7 @@ func (mlog *MultiLogger) PrintStack() {
 // RegisterErrorWriter register the named writer to one of error writers.
 // The writer Name() must not be empty or it will not registered.
 func (mlog *MultiLogger) RegisterErrorWriter(errw NamedWriter) {
-	var name string = errw.Name()
+	var name = errw.Name()
 	if len(name) == 0 {
 		return
 	}
@@ -196,7 +196,7 @@ func (mlog *MultiLogger) RegisterErrorWriter(errw NamedWriter) {
 // RegisterOutputWriter register the named writer to one of output writers.
 // The writer Name() must not be empty or it will not registered.
 func (mlog *MultiLogger) RegisterOutputWriter(outw NamedWriter) {
-	var name string = outw.Name()
+	var name = outw.Name()
 	if len(name) == 0 {
 		return
 	}

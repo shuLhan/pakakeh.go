@@ -12,7 +12,7 @@ type Account struct {
 }
 
 // Users contain list of user's account in the system.
-var Users map[int64]*Account = map[int64]*Account{
+var Users = map[int64]*Account{
 	1: {
 		ID:   1,
 		Name: "Groot",

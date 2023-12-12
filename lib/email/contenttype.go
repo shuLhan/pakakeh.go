@@ -15,7 +15,7 @@ import (
 var (
 	topText  = `text`
 	subPlain = `plain`
-	subHtml  = `html`
+	subHTML  = `html`
 )
 
 // ContentType represent MIME header "Content-Type" field.

@@ -62,24 +62,24 @@ type ClientRequest struct {
 	Type RequestType
 }
 
-// toHttpRequest convert the ClientRequest into the standard http.Request.
-func (creq *ClientRequest) toHttpRequest(client *Client) (httpReq *http.Request, err error) {
+// toHTTPRequest convert the ClientRequest into the standard http.Request.
+func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request, err error) {
 	var (
-		logp              = "toHttpRequest"
-		paramsAsUrlValues url.Values
+		logp              = `toHTTPRequest`
+		paramsAsURLValues url.Values
 		paramsAsJSON      []byte
 		contentType       = creq.Type.String()
 		path              strings.Builder
 		body              io.Reader
 		strBody           string
-		isParamsUrlValues bool
+		isParamsURLValues bool
 	)
 
 	if client != nil {
 		path.WriteString(client.opts.ServerUrl)
 	}
 	path.WriteString(creq.Path)
-	paramsAsUrlValues, isParamsUrlValues = creq.Params.(url.Values)
+	paramsAsURLValues, isParamsURLValues = creq.Params.(url.Values)
 
 	switch creq.Method {
 	case RequestMethodGet,
@@ -89,9 +89,9 @@ func (creq *ClientRequest) toHttpRequest(client *Client) (httpReq *http.Request,
 		RequestMethodOptions,
 		RequestMethodTrace:
 
-		if isParamsUrlValues {
+		if isParamsURLValues {
 			path.WriteString("?")
-			path.WriteString(paramsAsUrlValues.Encode())
+			path.WriteString(paramsAsURLValues.Encode())
 		}
 
 	case RequestMethodPatch,
@@ -99,14 +99,14 @@ func (creq *ClientRequest) toHttpRequest(client *Client) (httpReq *http.Request,
 		RequestMethodPut:
 		switch creq.Type {
 		case RequestTypeQuery:
-			if isParamsUrlValues {
+			if isParamsURLValues {
 				path.WriteString("?")
-				path.WriteString(paramsAsUrlValues.Encode())
+				path.WriteString(paramsAsURLValues.Encode())
 			}
 
 		case RequestTypeForm:
-			if isParamsUrlValues {
-				strBody = paramsAsUrlValues.Encode()
+			if isParamsURLValues {
+				strBody = paramsAsURLValues.Encode()
 				body = strings.NewReader(strBody)
 			}
 

@@ -47,10 +47,10 @@ func TestClient_live(t *testing.T) {
 		to       = []string{`Shulhan <m.shulhan@gmail.com>`}
 		subject  = tdata.Input[`subject`]
 		bodyText = tdata.Input[`bodyText`]
-		bodyHtml = tdata.Input[`bodyHtml`]
+		bodyHTML = tdata.Input[`bodyHtml`]
 	)
 
-	err = cl.SendEmail(from, to, subject, bodyText, bodyHtml)
+	err = cl.SendEmail(from, to, subject, bodyText, bodyHTML)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,9 +150,7 @@ func TestAuth(t *testing.T) {
 		},
 	}}
 
-	var (
-		cl *Client = testNewClient(false)
-	)
+	var cl = testNewClient(false)
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -224,9 +222,7 @@ func TestExpand(t *testing.T) {
 		},
 	}}
 
-	var (
-		cl *Client = testNewClient(true)
-	)
+	var cl = testNewClient(true)
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -253,9 +249,7 @@ func TestHelp(t *testing.T) {
 		},
 	}}
 
-	var (
-		cl *Client = testNewClient(true)
-	)
+	var cl = testNewClient(true)
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -297,9 +291,7 @@ func TestSendCommand(t *testing.T) {
 		},
 	}}
 
-	var (
-		cl *Client = testNewClient(false)
-	)
+	var cl = testNewClient(false)
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -346,9 +338,7 @@ func TestMailTx(t *testing.T) {
 		},
 	}}
 
-	var (
-		cl *Client = testNewClient(true)
-	)
+	var cl = testNewClient(true)
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -385,9 +375,7 @@ func TestVerify(t *testing.T) {
 		},
 	}}
 
-	var (
-		cl *Client = testNewClient(true)
-	)
+	var cl = testNewClient(true)
 
 	for _, c := range cases {
 		t.Log(c.desc)
@@ -403,8 +391,8 @@ func TestVerify(t *testing.T) {
 
 func TestQuit(t *testing.T) {
 	var (
-		cl  *Client = testNewClient(false)
-		exp         = &Response{
+		cl  = testNewClient(false)
+		exp = &Response{
 			Code:    StatusClosing,
 			Message: "Service closing transmission channel",
 		}

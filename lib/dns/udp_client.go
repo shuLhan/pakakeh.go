@@ -132,7 +132,7 @@ func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	packet = make([]byte, maxUdpPacketSize)
+	packet = make([]byte, maxUDPPacketSize)
 
 	n, _, err = cl.conn.ReadFromUDP(packet)
 	if err != nil {

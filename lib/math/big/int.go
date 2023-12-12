@@ -105,7 +105,7 @@ func (i *Int) UnmarshalJSON(in []byte) (err error) {
 
 // Value implement the sql/driver.Valuer.
 func (i *Int) Value() (driver.Value, error) {
-	var s string = "0"
+	var s = `0`
 	if i != nil {
 		s = i.String()
 	}

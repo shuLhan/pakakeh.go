@@ -267,7 +267,7 @@ const (
 	HeaderRange              = `Range`
 	HeaderUserAgent          = "User-Agent"
 	HeaderXForwardedFor      = "X-Forwarded-For" // https://en.wikipedia.org/wiki/X-Forwarded-For
-	HeaderXRealIp            = "X-Real-Ip"
+	HeaderXRealIp            = `X-Real-Ip`       //revive:disable-line
 )
 
 var (

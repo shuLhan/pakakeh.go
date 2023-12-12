@@ -996,7 +996,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 				IsRD:    true,
 			},
 			Question: MessageQuestion{},
-			packet:   make([]byte, maxUdpPacketSize),
+			packet:   make([]byte, maxUDPPacketSize),
 			dnameOff: make(map[string]uint16),
 		}
 		msgResponse = &Message{
@@ -1007,7 +1007,7 @@ func TestMessageSetAuthoritativeAnswer(t *testing.T) {
 				IsRA: true,
 			},
 			Question: MessageQuestion{},
-			packet:   make([]byte, maxUdpPacketSize),
+			packet:   make([]byte, maxUDPPacketSize),
 			dnameOff: make(map[string]uint16),
 		}
 
@@ -1072,7 +1072,7 @@ func TestMessageSetQuery(t *testing.T) {
 				IsRD:    true,
 			},
 			Question: MessageQuestion{},
-			packet:   make([]byte, maxUdpPacketSize),
+			packet:   make([]byte, maxUDPPacketSize),
 			dnameOff: make(map[string]uint16),
 		}
 
@@ -1123,7 +1123,7 @@ func TestMessageSetRecursionDesired(t *testing.T) {
 				IsRD:    true,
 			},
 			Question: MessageQuestion{},
-			packet:   make([]byte, maxUdpPacketSize),
+			packet:   make([]byte, maxUDPPacketSize),
 			dnameOff: make(map[string]uint16),
 		}
 
@@ -1174,7 +1174,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 				IsRD:    true,
 			},
 			Question: MessageQuestion{},
-			packet:   make([]byte, maxUdpPacketSize),
+			packet:   make([]byte, maxUDPPacketSize),
 			dnameOff: make(map[string]uint16),
 		}
 

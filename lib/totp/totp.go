@@ -92,8 +92,8 @@ func New(cryptoHash CryptoHash, codeDigits, timeStep int) Protocol {
 // Generate one time password using the secret and current timestamp.
 func (p *Protocol) Generate(secret []byte) (otp string, err error) {
 	var (
-		mac hash.Hash = hmac.New(p.fnHash, secret)
-		now int64     = time.Now().Unix()
+		mac = hmac.New(p.fnHash, secret)
+		now = time.Now().Unix()
 	)
 
 	return p.generateWithTimestamp(mac, now)
@@ -103,8 +103,8 @@ func (p *Protocol) Generate(secret []byte) (otp string, err error) {
 // until the curent time.
 func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error) {
 	var (
-		mac hash.Hash = hmac.New(p.fnHash, secret)
-		ts  int64     = time.Now().Unix()
+		mac = hmac.New(p.fnHash, secret)
+		ts  = time.Now().Unix()
 
 		otp string
 		t   int64
@@ -134,8 +134,8 @@ func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error)
 // For security reason, the maximum stepsBack is limited to DefStepsBack.
 func (p *Protocol) Verify(secret []byte, token string, stepsBack int) bool {
 	var (
-		mac hash.Hash = hmac.New(p.fnHash, secret)
-		now int64     = time.Now().Unix()
+		mac = hmac.New(p.fnHash, secret)
+		now = time.Now().Unix()
 	)
 
 	if stepsBack <= 0 || stepsBack > DefStepsBack {

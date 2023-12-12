@@ -275,7 +275,7 @@ func (data *Data) parse(content []byte) (err error) {
 
 func (data *Data) parseFlag(content []byte) {
 	var (
-		idx  int = bytes.IndexByte(content, ':')
+		idx  = bytes.IndexByte(content, ':')
 		bkey []byte
 		bval []byte
 	)

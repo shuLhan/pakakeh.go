@@ -37,7 +37,7 @@ const (
 	defTimeFormat = "2006-01-02 15:04:05 MST"
 )
 
-var defaultMLog *MultiLogger = createMultiLogger(defTimeFormat, "",
+var defaultMLog = createMultiLogger(defTimeFormat, ``,
 	[]NamedWriter{
 		NewNamedWriter("stdout", os.Stdout),
 	},

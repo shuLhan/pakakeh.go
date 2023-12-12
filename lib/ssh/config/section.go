@@ -358,8 +358,8 @@ func (section *Section) IdentityAgent() string {
 	if value == `none` {
 		return ``
 	}
-	if len(value) == 0 || value == envSshAuthSock {
-		return os.Getenv(envSshAuthSock)
+	if len(value) == 0 || value == envSSHAuthSock {
+		return os.Getenv(envSSHAuthSock)
 	}
 	if value[0] == '$' {
 		// Read the socket from environment variable defined by

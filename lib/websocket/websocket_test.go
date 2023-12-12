@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"strconv"
 	"testing"
@@ -53,7 +52,7 @@ func generateDummyPayload(size uint64) (payload []byte, masked []byte) {
 // testHandleText from websocket by echo-ing back the payload.
 func testHandleText(conn int, payload []byte) {
 	var (
-		packet []byte = NewFrameText(false, payload)
+		packet = NewFrameText(false, payload)
 		err    error
 	)
 
@@ -66,7 +65,7 @@ func testHandleText(conn int, payload []byte) {
 // testHandleBin from websocket by echo-ing back the payload.
 func testHandleBin(conn int, payload []byte) {
 	var (
-		packet []byte = NewFrameBin(false, payload)
+		packet = NewFrameBin(false, payload)
 		err    error
 	)
 
@@ -79,7 +78,7 @@ func testHandleBin(conn int, payload []byte) {
 // testHandleAuth with token in query parameter
 func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 	var (
-		q url.Values = req.URL.Query()
+		q = req.URL.Query()
 
 		extJWT string
 	)

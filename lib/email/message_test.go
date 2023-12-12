@@ -309,7 +309,7 @@ func TestMessage_packSingle(t *testing.T) {
 
 	type testCase struct {
 		bodyText  string
-		bodyHtml  string
+		bodyHTML  string
 		outputTag string
 	}
 
@@ -322,7 +322,7 @@ func TestMessage_packSingle(t *testing.T) {
 		bodyText:  `this is a body text`,
 		outputTag: `body.txt`,
 	}, {
-		bodyHtml:  `<p>this is an HTML body</p>`,
+		bodyHTML:  `<p>this is an HTML body</p>`,
 		outputTag: `body.html`,
 	}}
 
@@ -335,8 +335,8 @@ func TestMessage_packSingle(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		if len(c.bodyHtml) > 0 {
-			err = msg.SetBodyHtml([]byte(c.bodyHtml))
+		if len(c.bodyHTML) > 0 {
+			err = msg.SetBodyHtml([]byte(c.bodyHTML))
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -27,29 +27,29 @@ const (
 
 // List of valid values for FileAttrs.flags.
 const (
-	attr_SIZE        uint32 = 0x00000001
-	attr_UIDGID      uint32 = 0x00000002
-	attr_PERMISSIONS uint32 = 0x00000004
-	attr_ACMODTIME   uint32 = 0x00000008
-	attr_EXTENDED    uint32 = 0x80000000
+	attrSize        uint32 = 0x00000001
+	attrUIDGID      uint32 = 0x00000002
+	attrPermissions uint32 = 0x00000004
+	attrAcModtime   uint32 = 0x00000008
+	attrExtended    uint32 = 0x80000000
 )
 
 // FileAttrs define the attributes for opening or creating file on the remote.
 type FileAttrs struct {
-	exts extensions // attr_EXTENDED
+	exts extensions // attrExtended
 
 	name string
 
 	fsMode fs.FileMode
 
-	size uint64 // attr_SIZE
+	size uint64 // attrSize
 
 	flags       uint32
-	uid         uint32 // attr_UIDGID
-	gid         uint32 // attr_UIDGID
-	permissions uint32 // attr_PERMISSIONS
-	atime       uint32 // attr_ACMODTIME
-	mtime       uint32 // attr_ACMODTIME
+	uid         uint32 // attrUIDGID
+	gid         uint32 // attrUIDGID
+	permissions uint32 // attrPermissions
+	atime       uint32 // attrAcModtime
+	mtime       uint32 // attrAcModtime
 }
 
 // NewFileAttrs create and initialize FileAttrs from FileInfo.
@@ -79,12 +79,12 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 	payload = payload[4:]
 	length += 4
 
-	if fa.flags&attr_SIZE != 0 {
+	if fa.flags&attrSize != 0 {
 		fa.size = binary.BigEndian.Uint64(payload)
 		payload = payload[8:]
 		length += 8
 	}
-	if fa.flags&attr_UIDGID != 0 {
+	if fa.flags&attrUIDGID != 0 {
 		fa.uid = binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
 		length += 4
@@ -92,13 +92,13 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 		payload = payload[4:]
 		length += 4
 	}
-	if fa.flags&attr_PERMISSIONS != 0 {
+	if fa.flags&attrPermissions != 0 {
 		fa.permissions = binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
 		length += 4
 		fa.updateFsmode()
 	}
-	if fa.flags&attr_ACMODTIME != 0 {
+	if fa.flags&attrAcModtime != 0 {
 		fa.atime = binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
 		length += 4
@@ -106,7 +106,7 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 		payload = payload[4:]
 		length += 4
 	}
-	if fa.flags&attr_EXTENDED != 0 {
+	if fa.flags&attrExtended != 0 {
 		n := binary.BigEndian.Uint32(payload)
 		payload = payload[4:]
 		length += 4
@@ -138,21 +138,21 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 func (fa *FileAttrs) pack(w io.Writer) {
 	_ = binary.Write(w, binary.BigEndian, fa.flags)
 
-	if fa.flags&attr_SIZE != 0 {
+	if fa.flags&attrSize != 0 {
 		_ = binary.Write(w, binary.BigEndian, fa.size)
 	}
-	if fa.flags&attr_UIDGID != 0 {
+	if fa.flags&attrUIDGID != 0 {
 		_ = binary.Write(w, binary.BigEndian, fa.uid)
 		_ = binary.Write(w, binary.BigEndian, fa.gid)
 	}
-	if fa.flags&attr_PERMISSIONS != 0 {
+	if fa.flags&attrPermissions != 0 {
 		_ = binary.Write(w, binary.BigEndian, fa.permissions)
 	}
-	if fa.flags&attr_ACMODTIME != 0 {
+	if fa.flags&attrAcModtime != 0 {
 		_ = binary.Write(w, binary.BigEndian, fa.atime)
 		_ = binary.Write(w, binary.BigEndian, fa.mtime)
 	}
-	if fa.flags&attr_EXTENDED != 0 {
+	if fa.flags&attrExtended != 0 {
 		n := uint32(len(fa.exts))
 		_ = binary.Write(w, binary.BigEndian, n)
 		for k, v := range fa.exts {
@@ -207,7 +207,7 @@ func (fa *FileAttrs) Permissions() uint32 {
 
 // SetAccessTime set the file attribute access time.
 func (fa *FileAttrs) SetAccessTime(v uint32) {
-	fa.flags |= attr_ACMODTIME
+	fa.flags |= attrAcModtime
 	fa.atime = v
 }
 
@@ -216,38 +216,38 @@ func (fa *FileAttrs) SetExtension(name, data string) {
 	if fa.exts == nil {
 		fa.exts = extensions{}
 	}
-	fa.flags |= attr_EXTENDED
+	fa.flags |= attrExtended
 	fa.exts[name] = data
 }
 
 // SetGid set the file attribute group ID.
 func (fa *FileAttrs) SetGid(gid uint32) {
-	fa.flags |= attr_UIDGID
+	fa.flags |= attrUIDGID
 	fa.gid = gid
 }
 
 // SetModifiedTime set the file attribute modified time.
 func (fa *FileAttrs) SetModifiedTime(v uint32) {
-	fa.flags |= attr_ACMODTIME
+	fa.flags |= attrAcModtime
 	fa.mtime = v
 }
 
 // SetPermissions set the remote file permission.
 func (fa *FileAttrs) SetPermissions(v uint32) {
-	fa.flags |= attr_PERMISSIONS
+	fa.flags |= attrPermissions
 	fa.permissions = v
 	fa.updateFsmode()
 }
 
 // SetSize set the remote file size.
 func (fa *FileAttrs) SetSize(v uint64) {
-	fa.flags |= attr_SIZE
+	fa.flags |= attrSize
 	fa.size = v
 }
 
 // SetUid set the file attribute user ID.
-func (fa *FileAttrs) SetUid(uid uint32) {
-	fa.flags |= attr_UIDGID
+func (fa *FileAttrs) SetUid(uid uint32) { //revive:disable-line
+	fa.flags |= attrUIDGID
 	fa.uid = uid
 }
 
@@ -262,7 +262,7 @@ func (fa *FileAttrs) Sys() interface{} {
 }
 
 // Uid return the user ID of file.
-func (fa *FileAttrs) Uid() uint32 {
+func (fa *FileAttrs) Uid() uint32 { //revive:disable-line
 	return fa.uid
 }
 

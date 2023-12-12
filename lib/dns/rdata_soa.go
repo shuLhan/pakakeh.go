@@ -10,10 +10,12 @@ import (
 
 // Default SOA record value.
 const (
-	DefaultSoaRName      string = `root`
-	DefaultSoaRefresh    int32  = 1 * 24 * 60 * 60 // 1 Day.
-	DefaultSoaRetry      int32  = 1 * 60 * 60      // 1 Hour.
-	DefaultSoaMinimumTtl uint32 = 1 * 60 * 60      // 1 Hour.
+	DefaultSoaRName   string = `root`
+	DefaultSoaRefresh int32  = 1 * 24 * 60 * 60 // 1 Day.
+	DefaultSoaRetry   int32  = 1 * 60 * 60      // 1 Hour.
+
+	//revive:disable-next-line
+	DefaultSoaMinimumTtl uint32 = 1 * 60 * 60 // 1 Hour.
 )
 
 // RDataSOA contains the authority of zone.

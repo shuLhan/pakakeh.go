@@ -357,7 +357,7 @@ func (cl *Client) SendCommand(cmd []byte) (res *Response, err error) {
 // SendEmail is the wrapper that simplify sending email.
 // This method automatically create [MailTx] for passing it to method
 // [Client.MailTx].
-func (cl *Client) SendEmail(from string, to []string, subject, bodyText, bodyHtml []byte) (err error) {
+func (cl *Client) SendEmail(from string, to []string, subject, bodyText, bodyHTML []byte) (err error) {
 	var (
 		logp        = `SendEmail`
 		toAddresses = strings.Join(to, `, `)
@@ -370,7 +370,7 @@ func (cl *Client) SendEmail(from string, to []string, subject, bodyText, bodyHtm
 		[]byte(toAddresses),
 		[]byte(subject),
 		bodyText,
-		bodyHtml,
+		bodyHTML,
 	)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)

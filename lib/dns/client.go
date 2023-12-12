@@ -34,7 +34,7 @@ type Client interface {
 //   - "tcp://127.0.0.1:53" for TCP client.
 //   - "https://127.0.0.1:853" (HTTPS with IP address) for DoT.
 //   - "https://localhost/dns-query" (HTTPS with domain name) for DoH.
-func NewClient(nsUrl string, isInsecure bool) (cl Client, err error) {
+func NewClient(nsURL string, isInsecure bool) (cl Client, err error) {
 	var (
 		logp = "NewClient"
 
@@ -45,9 +45,9 @@ func NewClient(nsUrl string, isInsecure bool) (cl Client, err error) {
 		ipport []string
 	)
 
-	urlNS, err = url.Parse(nsUrl)
+	urlNS, err = url.Parse(nsURL)
 	if err != nil {
-		return nil, fmt.Errorf("%s: invalid name server URL: %q", logp, nsUrl)
+		return nil, fmt.Errorf(`%s: invalid name server URL: %q`, logp, nsURL)
 	}
 
 	ipport = strings.Split(urlNS.Host, ":")
@@ -58,7 +58,7 @@ func NewClient(nsUrl string, isInsecure bool) (cl Client, err error) {
 		iphost = ipport[0]
 		port = ipport[1]
 	default:
-		return nil, fmt.Errorf("%s: invalid name server URL: %q", logp, nsUrl)
+		return nil, fmt.Errorf(`%s: invalid name server URL: %q`, logp, nsURL)
 	}
 
 	switch urlNS.Scheme {
@@ -69,7 +69,7 @@ func NewClient(nsUrl string, isInsecure bool) (cl Client, err error) {
 	case "https":
 		ip = net.ParseIP(iphost)
 		if ip == nil {
-			cl, err = NewDoHClient(nsUrl, isInsecure)
+			cl, err = NewDoHClient(nsURL, isInsecure)
 		} else {
 			if len(port) == 0 {
 				port = "853"

@@ -47,7 +47,7 @@ type Client struct {
 	C     <-chan Event
 	event chan Event
 
-	serverUrl *url.URL
+	serverURL *url.URL
 	header    http.Header
 
 	conn   net.Conn
@@ -152,34 +152,34 @@ func (cl *Client) connect() (err error) {
 
 // init validate and set default field values.
 func (cl *Client) init(header http.Header) (err error) {
-	cl.serverUrl, err = url.Parse(cl.Endpoint)
+	cl.serverURL, err = url.Parse(cl.Endpoint)
 	if err != nil {
 		return err
 	}
 
 	var host, port string
 
-	host, port, err = net.SplitHostPort(cl.serverUrl.Host)
+	host, port, err = net.SplitHostPort(cl.serverURL.Host)
 	if err != nil {
 		return err
 	}
 	if len(port) == 0 {
-		switch cl.serverUrl.Scheme {
+		switch cl.serverURL.Scheme {
 		case `http`:
 			port = `80`
 		case `https`:
 			port = `443`
 		default:
-			return fmt.Errorf(`unknown scheme %q`, cl.serverUrl.Scheme)
+			return fmt.Errorf(`unknown scheme %q`, cl.serverURL.Scheme)
 		}
 	}
-	cl.serverUrl.Host = net.JoinHostPort(host, port)
+	cl.serverURL.Host = net.JoinHostPort(host, port)
 
 	cl.header = header
 	if cl.header == nil {
 		cl.header = http.Header{}
 	}
-	cl.header.Set(libhttp.HeaderHost, cl.serverUrl.Host)
+	cl.header.Set(libhttp.HeaderHost, cl.serverURL.Host)
 	cl.header.Set(libhttp.HeaderUserAgent, `libhttp/`+share.Version)
 	cl.header.Set(libhttp.HeaderAccept, libhttp.ContentTypeEventStream)
 
@@ -195,13 +195,13 @@ func (cl *Client) init(header http.Header) (err error) {
 }
 
 func (cl *Client) dial() (err error) {
-	if cl.serverUrl.Scheme == `https` {
+	if cl.serverURL.Scheme == `https` {
 		var tlsConfig = &tls.Config{
 			InsecureSkipVerify: cl.Insecure,
 		}
-		cl.conn, err = tls.Dial(`tcp`, cl.serverUrl.Host, tlsConfig)
+		cl.conn, err = tls.Dial(`tcp`, cl.serverURL.Host, tlsConfig)
 	} else {
-		cl.conn, err = net.Dial(`tcp`, cl.serverUrl.Host)
+		cl.conn, err = net.Dial(`tcp`, cl.serverURL.Host)
 	}
 	if err != nil {
 		return err
@@ -247,10 +247,10 @@ func (cl *Client) handshake() (packet []byte, err error) {
 func (cl *Client) handshakeRequest() (err error) {
 	var buf bytes.Buffer
 
-	fmt.Fprintf(&buf, `GET %s`, cl.serverUrl.Path)
-	if len(cl.serverUrl.RawQuery) != 0 {
+	fmt.Fprintf(&buf, `GET %s`, cl.serverURL.Path)
+	if len(cl.serverURL.RawQuery) != 0 {
 		buf.WriteByte('?')
-		buf.WriteString(cl.serverUrl.RawQuery)
+		buf.WriteString(cl.serverURL.RawQuery)
 	}
 	buf.WriteString(" HTTP/1.1\r\n")
 

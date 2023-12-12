@@ -28,8 +28,8 @@ func DoEqual(x, y interface{}) (err error) {
 	}
 
 	var (
-		v1 reflect.Value = reflect.ValueOf(x)
-		v2 reflect.Value = reflect.ValueOf(y)
+		v1 = reflect.ValueOf(x)
+		v2 = reflect.ValueOf(y)
 	)
 	err = doEqual(v1, v2)
 	if err != nil {
@@ -49,9 +49,9 @@ func IsEqual(x, y interface{}) bool {
 	}
 
 	var (
-		v1  reflect.Value = reflect.ValueOf(x)
-		v2  reflect.Value = reflect.ValueOf(y)
-		err               = doEqual(v1, v2)
+		v1  = reflect.ValueOf(x)
+		v2  = reflect.ValueOf(y)
+		err = doEqual(v1, v2)
 	)
 	return err == nil
 }
@@ -59,9 +59,7 @@ func IsEqual(x, y interface{}) bool {
 // IsNil will return true if v's type is chan, func, interface, map, pointer,
 // or slice and its value is `nil`; otherwise it will return false.
 func IsNil(v interface{}) bool {
-	var (
-		val reflect.Value = reflect.ValueOf(v)
-	)
+	var val = reflect.ValueOf(v)
 
 	switch val.Kind() {
 	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map,
@@ -156,9 +154,9 @@ func Marshal(obj interface{}) (out []byte, err error) {
 //   - obj Kind is Invalid, Array, Chan, Func, Map, or UnsafePointer.
 func Set(obj reflect.Value, val string) (err error) {
 	var (
-		logp                 = "Set"
-		objType reflect.Type = obj.Type()
-		objKind reflect.Kind = obj.Kind()
+		logp    = `Set`
+		objType = obj.Type()
+		objKind = obj.Kind()
 
 		objValue reflect.Value
 	)
@@ -225,8 +223,8 @@ func Set(obj reflect.Value, val string) (err error) {
 // setSlice append the string value of val to the slice.
 func setSlice(slice reflect.Value, val string) (sliceOut reflect.Value, err error) {
 	var (
-		sliceKind reflect.Kind = slice.Kind()
-		sliceType reflect.Type = slice.Type()
+		sliceKind = slice.Kind()
+		sliceType = slice.Type()
 
 		elValue  reflect.Value
 		ptrValue reflect.Value
@@ -511,15 +509,13 @@ func Tag(field reflect.StructField, tag string) (val string, opts []string, hasT
 		return "", nil, false
 	}
 
-	var (
-		x int
-	)
-
 	val, hasTag = field.Tag.Lookup(tag)
 	if !hasTag {
 		// Tag not defined, so we use field name as key.
 		return field.Name, nil, false
 	}
+
+	var x int
 
 	opts = strings.Split(val, ",")
 	for x, val = range opts {
@@ -559,12 +555,12 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 	}
 
 	var (
-		k1    reflect.Kind = v1.Kind()
-		k2    reflect.Kind = v2.Kind()
-		t1    reflect.Type = v1.Type()
-		t2    reflect.Type = v2.Type()
-		name1              = t1.Name()
-		name2              = t2.Name()
+		k1    = v1.Kind()
+		k2    = v2.Kind()
+		t1    = v1.Type()
+		t2    = v2.Type()
+		name1 = t1.Name()
+		name2 = t2.Name()
 
 		x int
 	)
@@ -733,7 +729,7 @@ func doEqualMap(v1, v2 reflect.Value) (err error) {
 	}
 
 	var (
-		keys []reflect.Value = v1.MapKeys()
+		keys = v1.MapKeys()
 
 		tipe reflect.Type
 		name string
@@ -756,7 +752,7 @@ func doEqualMap(v1, v2 reflect.Value) (err error) {
 // The type of both struct is already equal when this function called.
 func doEqualStruct(v1, v2 reflect.Value) (err error) {
 	var (
-		m1 reflect.Value = v1.MethodByName("IsEqual")
+		m1 = v1.MethodByName(`IsEqual`)
 
 		callIn  []reflect.Value
 		callOut []reflect.Value
@@ -774,9 +770,9 @@ func doEqualStruct(v1, v2 reflect.Value) (err error) {
 	}
 
 	var (
-		t1     reflect.Type = v1.Type()
-		v1Name string       = t1.Name()
-		n      int          = v1.NumField()
+		t1     = v1.Type()
+		v1Name = t1.Name()
+		n      = v1.NumField()
 
 		f1, f2 reflect.Value
 		f1Name string

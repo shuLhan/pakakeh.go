@@ -141,9 +141,7 @@ func (h *Handshake) getBytesChunk(sep byte, tolower bool) (chunk []byte) {
 // parseHTTPLine check if HTTP method is "GET", save the URI, and make sure
 // that HTTP version is 1.1.
 func (h *Handshake) parseHTTPLine() (err error) {
-	var (
-		chunk []byte = h.getBytesChunk(' ', false)
-	)
+	var chunk = h.getBytesChunk(' ', false)
 
 	if !bytes.Equal(chunk, []byte("GET")) {
 		return ErrInvalidHTTPMethod
@@ -174,9 +172,7 @@ func (h *Handshake) parseHTTPLine() (err error) {
 
 // parseHeader of HTTP request.
 func (h *Handshake) parseHeader() (k, v []byte, err error) {
-	var (
-		chunk []byte = h.getBytesChunk(':', true)
-	)
+	var chunk = h.getBytesChunk(':', true)
 
 	if len(chunk) == 0 {
 		return nil, nil, nil
@@ -425,7 +421,7 @@ func (h *Handshake) parse() (err error) {
 		}
 	}
 
-	var requiredFlags int = _hdrFlagHost | _hdrFlagConn | _hdrFlagUpgrade | _hdrFlagWSKey | _hdrFlagWSVersion
+	var requiredFlags = _hdrFlagHost | _hdrFlagConn | _hdrFlagUpgrade | _hdrFlagWSKey | _hdrFlagWSVersion
 
 	if h.headerFlags&requiredFlags != requiredFlags {
 		return ErrMissingRequiredHeader

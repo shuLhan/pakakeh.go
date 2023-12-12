@@ -46,11 +46,11 @@ func TestRegisterDelete(t *testing.T) {
 		expError: ErrEndpointAmbiguous.Error(),
 	}, {
 		desc:          "With unknown path",
-		reqURL:        testServerUrl,
+		reqURL:        testServerURL,
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:           "With known path and subtree root",
-		reqURL:         testServerUrl + "/delete/",
+		reqURL:         testServerURL + `/delete/`,
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[]\nmap[]\n<nil>\n",
@@ -62,7 +62,7 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypeNone,
 			Call:         cbNone,
 		},
-		reqURL:        testServerUrl + "/delete/none?k=v",
+		reqURL:        testServerURL + `/delete/none?k=v`,
 		expStatusCode: http.StatusNoContent,
 	}, {
 		desc: "With response type binary",
@@ -72,13 +72,13 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypeBinary,
 			Call:         cbPlain,
 		},
-		reqURL:         testServerUrl + "/delete/bin?k=v",
+		reqURL:         testServerURL + `/delete/bin?k=v`,
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypeBinary,
 		expBody:        "map[k:[v]]\nmap[]\n<nil>\n",
 	}, {
 		desc:           "With response type plain",
-		reqURL:         testServerUrl + "/delete?k=v",
+		reqURL:         testServerURL + `/delete?k=v`,
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[k:[v]]\nmap[]\n<nil>\n",
@@ -90,7 +90,7 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypeJSON,
 			Call:         cbJSON,
 		},
-		reqURL:         testServerUrl + "/delete/json?k=v",
+		reqURL:         testServerURL + `/delete/json?k=v`,
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypeJSON,
 		expBody: `{
@@ -115,13 +115,13 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
 		},
-		reqURL:         testServerUrl + "/delete/1/x?k=v",
+		reqURL:         testServerURL + `/delete/1/x?k=v`,
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[id:[1] k:[v]]\nmap[]\n<nil>\n",
 	}, {
 		desc:           "With duplicate key in query",
-		reqURL:         testServerUrl + "/delete/1/x?id=v",
+		reqURL:         testServerURL + `/delete/1/x?id=v`,
 		expStatusCode:  http.StatusOK,
 		expContentType: ContentTypePlain,
 		expBody:        "map[id:[1]]\nmap[]\n<nil>\n",
@@ -211,11 +211,11 @@ func TestRegisterEvaluator(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With invalid evaluate",
-		reqURL:        testServerUrl + "/evaluate",
+		reqURL:        testServerURL + `/evaluate`,
 		expStatusCode: http.StatusBadRequest,
 	}, {
 		desc:          "With valid evaluate",
-		reqURL:        testServerUrl + "/evaluate?k=v",
+		reqURL:        testServerURL + `/evaluate?k=v`,
 		expStatusCode: http.StatusOK,
 	}}
 
@@ -269,22 +269,22 @@ func TestRegisterGet(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        testServerUrl,
+		reqURL:        testServerURL,
 		expStatusCode: http.StatusOK,
 		expBody:       "<html><body>Hello, world!</body></html>\n",
 	}, {
 		desc:          "With known path",
-		reqURL:        testServerUrl + "/index.js",
+		reqURL:        testServerURL + `/index.js`,
 		expStatusCode: http.StatusOK,
 		expBody:       "var a = \"Hello, world!\"\n",
 	}, {
 		desc:          "With known path and subtree root",
-		reqURL:        testServerUrl + "/get/",
+		reqURL:        testServerURL + `/get/`,
 		expStatusCode: http.StatusOK,
 		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With known path",
-		reqURL:        testServerUrl + "/get?k=v",
+		reqURL:        testServerURL + `/get?k=v`,
 		expStatusCode: http.StatusOK,
 		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}}
@@ -340,18 +340,18 @@ func TestRegisterHead(t *testing.T) {
 		expStatusCode    int
 	}{{
 		desc:             "With root path",
-		reqURL:           testServerUrl + "/",
+		reqURL:           testServerURL + `/`,
 		expStatusCode:    http.StatusOK,
 		expContentType:   []string{"text/html; charset=utf-8"},
 		expContentLength: []string{"40"},
 	}, {
 		desc:           "With registered GET and subtree root",
-		reqURL:         testServerUrl + "/api/",
+		reqURL:         testServerURL + `/api/`,
 		expStatusCode:  http.StatusOK,
 		expContentType: []string{ContentTypeJSON},
 	}, {
 		desc:           "With registered GET",
-		reqURL:         testServerUrl + "/api?k=v",
+		reqURL:         testServerURL + `/api?k=v`,
 		expStatusCode:  http.StatusOK,
 		expContentType: []string{ContentTypeJSON},
 	}}
@@ -408,16 +408,16 @@ func TestRegisterPatch(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        testServerUrl + "/",
+		reqURL:        testServerURL + `/`,
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:          "With registered PATCH and subtree root",
-		reqURL:        testServerUrl + "/patch/",
+		reqURL:        testServerURL + `/patch/`,
 		expStatusCode: http.StatusOK,
 		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With registered PATCH and query",
-		reqURL:        testServerUrl + "/patch?k=v",
+		reqURL:        testServerURL + `/patch?k=v`,
 		expStatusCode: http.StatusOK,
 		expBody:       "map[k:[v]]\nmap[]\n<nil>\n",
 	}}
@@ -473,16 +473,16 @@ func TestRegisterPost(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        testServerUrl + "/",
+		reqURL:        testServerURL + `/`,
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:          "With registered POST and subtree root",
-		reqURL:        testServerUrl + "/post/",
+		reqURL:        testServerURL + `/post/`,
 		expStatusCode: http.StatusOK,
 		expBody:       "map[]\nmap[]\n<nil>\n",
 	}, {
 		desc:          "With registered POST and query",
-		reqURL:        testServerUrl + "/post?k=v",
+		reqURL:        testServerURL + `/post?k=v`,
 		reqBody:       "k=vv",
 		expStatusCode: http.StatusOK,
 		expBody: `map[k:[vv v]]
@@ -545,15 +545,15 @@ func TestRegisterPut(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        testServerUrl + "/",
+		reqURL:        testServerURL + `/`,
 		expStatusCode: http.StatusNotFound,
 	}, {
 		desc:          "With registered PUT and subtree root",
-		reqURL:        testServerUrl + "/put/",
+		reqURL:        testServerURL + `/put/`,
 		expStatusCode: http.StatusNoContent,
 	}, {
 		desc:          "With registered PUT and query",
-		reqURL:        testServerUrl + "/put?k=v",
+		reqURL:        testServerURL + `/put?k=v`,
 		expStatusCode: http.StatusNoContent,
 	}}
 
@@ -619,17 +619,17 @@ func TestServeHTTPOptions(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With root path",
-		reqURL:        testServerUrl + "/",
+		reqURL:        testServerURL + `/`,
 		expStatusCode: http.StatusOK,
 		expAllow:      "GET, HEAD, OPTIONS",
 	}, {
 		desc:          "With registered PATCH and subtree root",
-		reqURL:        testServerUrl + "/options/",
+		reqURL:        testServerURL + `/options/`,
 		expStatusCode: http.StatusOK,
 		expAllow:      "DELETE, OPTIONS, PATCH",
 	}, {
 		desc:          "With registered PATCH and query",
-		reqURL:        testServerUrl + "/options?k=v",
+		reqURL:        testServerURL + `/options?k=v`,
 		expStatusCode: http.StatusOK,
 		expAllow:      "DELETE, OPTIONS, PATCH",
 	}}
@@ -757,32 +757,32 @@ func TestStatusError(t *testing.T) {
 		expStatusCode int
 	}{{
 		desc:          "With registered error no body",
-		reqURL:        testServerUrl + "/error/no-body?k=v",
+		reqURL:        testServerURL + `/error/no-body?k=v`,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error binary",
-		reqURL:        testServerUrl + "/error/binary?k=v",
+		reqURL:        testServerURL + `/error/binary?k=v`,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        testServerUrl + "/error/plain?k=v",
+		reqURL:        testServerURL + `/error/plain?k=v`,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        testServerUrl + "/error/json?k=v",
+		reqURL:        testServerURL + `/error/json?k=v`,
 		expStatusCode: http.StatusLengthRequired,
 		expBody:       `{"message":"Length required","code":411}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        testServerUrl + "/error/no-code?k=v",
+		reqURL:        testServerURL + `/error/no-code?k=v`,
 		expStatusCode: http.StatusInternalServerError,
 		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
 	}, {
 		desc:          "With registered error plain",
-		reqURL:        testServerUrl + "/error/custom?k=v",
+		reqURL:        testServerURL + `/error/custom?k=v`,
 		expStatusCode: http.StatusInternalServerError,
 		expBody:       `{"message":"internal server error","name":"ERR_INTERNAL","code":500}`,
 	}}
@@ -876,7 +876,7 @@ func TestServer_Options_HandleFS(t *testing.T) {
 	}}
 
 	for _, c = range cases {
-		req, err = http.NewRequest(http.MethodGet, testServerUrl+c.reqPath, nil)
+		req, err = http.NewRequest(http.MethodGet, testServerURL+c.reqPath, nil)
 		if err != nil {
 			t.Fatalf("%s: %s", c.desc, err)
 		}
@@ -904,7 +904,7 @@ func TestServer_Options_HandleFS(t *testing.T) {
 func TestServer_handleRange(t *testing.T) {
 	var (
 		clOpts = &ClientOptions{
-			ServerUrl: testServerUrl,
+			ServerUrl: testServerURL,
 		}
 		cl          = NewClient(clOpts)
 		skipHeaders = []string{HeaderDate, HeaderETag}
@@ -949,7 +949,7 @@ func TestServer_handleRange(t *testing.T) {
 		var (
 			tag = `http_headers`
 			exp = tdata.Output[tag]
-			got = dumpHttpResponse(httpRes, skipHeaders)
+			got = dumpHTTPResponse(httpRes, skipHeaders)
 		)
 
 		if len(boundary) != 0 {
@@ -980,7 +980,7 @@ func TestServer_handleRange(t *testing.T) {
 func TestServer_handleRange_HEAD(t *testing.T) {
 	var (
 		clOpts = &ClientOptions{
-			ServerUrl: testServerUrl,
+			ServerUrl: testServerURL,
 		}
 		cl = NewClient(clOpts)
 
@@ -995,14 +995,14 @@ func TestServer_handleRange_HEAD(t *testing.T) {
 
 	var httpRes *http.Response
 
-	httpRes, err = cl.Client.Head(testServerUrl + `/index.html`)
+	httpRes, err = cl.Client.Head(testServerURL + `/index.html`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	var (
 		skipHeaders = []string{HeaderDate, HeaderETag}
-		got         = dumpHttpResponse(httpRes, skipHeaders)
+		got         = dumpHTTPResponse(httpRes, skipHeaders)
 		tag         = `http_headers`
 		exp         = tdata.Output[tag]
 	)

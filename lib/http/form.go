@@ -25,10 +25,10 @@ const (
 // It will return an error if the input is not pointer to or a struct.
 func MarshalForm(in any) (out url.Values, err error) {
 	var (
-		logp                  = `MarshalForm`
-		inValue reflect.Value = reflect.ValueOf(in)
-		inType  reflect.Type  = inValue.Type()
-		inKind  reflect.Kind  = inType.Kind()
+		logp    = `MarshalForm`
+		inValue = reflect.ValueOf(in)
+		inType  = inValue.Type()
+		inKind  = inType.Kind()
 
 		listField []reflect.StructField
 		x         int
@@ -65,9 +65,7 @@ func MarshalForm(in any) (out url.Values, err error) {
 			continue
 		}
 
-		var (
-			fval reflect.Value = inValue.FieldByIndex(field.Index)
-		)
+		var fval = inValue.FieldByIndex(field.Index)
 
 		if libstrings.IsContain(opts, `omitempty`) {
 			if libreflect.IsNil(fval) {
@@ -79,7 +77,7 @@ func MarshalForm(in any) (out url.Values, err error) {
 		}
 
 		var (
-			fkind reflect.Kind = fval.Kind()
+			fkind = fval.Kind()
 
 			val  string
 			valb []byte
@@ -98,8 +96,8 @@ func MarshalForm(in any) (out url.Values, err error) {
 
 		if fkind == reflect.Slice {
 			var (
-				sliceType reflect.Type = fval.Type()
-				elType                 = sliceType.Elem()
+				sliceType = fval.Type()
+				elType    = sliceType.Elem()
 			)
 
 			fkind = elType.Kind()
@@ -153,10 +151,10 @@ func MarshalForm(in any) (out url.Values, err error) {
 // field type.
 func UnmarshalForm(in url.Values, out interface{}) (err error) {
 	var (
-		logp                = "UnmarshalForm"
-		vout  reflect.Value = reflect.ValueOf(out)
-		rtype reflect.Type  = vout.Type()
-		rkind reflect.Kind  = rtype.Kind()
+		logp  = `UnmarshalForm`
+		vout  = reflect.ValueOf(out)
+		rtype = vout.Type()
+		rkind = rtype.Kind()
 
 		field      reflect.StructField
 		fval       reflect.Value

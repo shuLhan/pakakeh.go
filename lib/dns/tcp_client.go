@@ -187,7 +187,7 @@ func (cl *TCPClient) recv() (res *Message, err error) {
 	}
 
 	var (
-		packet = make([]byte, maxTcpPacketSize)
+		packet = make([]byte, maxTCPPacketSize)
 
 		n int
 	)

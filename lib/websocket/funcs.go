@@ -143,7 +143,7 @@ func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 // Section 4 of [RFC4648]) this 20-byte hash.
 func generateHandshakeAccept(key []byte) string {
 	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
-	var sum [20]byte = sha1.Sum(key)
+	var sum = sha1.Sum(key)
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
 

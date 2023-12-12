@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	envSmtpUsername = "SMTP_USERNAME"
-	envSmtpPassword = "SMTP_PASSWORD"
+	envSMTPUsername = `SMTP_USERNAME`
+	envSMTPPassword = `SMTP_PASSWORD`
 )
 
 func main() {
@@ -30,8 +30,8 @@ func main() {
 		to           string
 		subject      string
 		fileBodyText string
-		fileBodyHtml string
-		serverUrl    string
+		fileBodyHTML string
+		serverURL    string
 
 		content []byte
 		mailb   []byte
@@ -47,7 +47,7 @@ func main() {
 	flag.StringVar(&to, "to", "", "Set the recipients.")
 	flag.StringVar(&subject, "subject", "", "Set the subject.")
 	flag.StringVar(&fileBodyText, "bodytext", "", "Set the text body from content of file.")
-	flag.StringVar(&fileBodyHtml, "bodyhtml", "", "Set the HTML body from content of file.")
+	flag.StringVar(&fileBodyHTML, `bodyhtml`, ``, `Set the HTML body from content of file.`)
 	flag.Usage = usage
 	flag.Parse()
 
@@ -56,8 +56,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	serverUrl = flag.Arg(0)
-	if len(serverUrl) == 0 {
+	serverURL = flag.Arg(0)
+	if len(serverURL) == 0 {
 		log.Printf("missing server URL")
 		os.Exit(1)
 	}
@@ -88,7 +88,7 @@ func main() {
 	}
 	msg.SetSubject(subject)
 
-	if len(fileBodyText) == 0 && len(fileBodyHtml) == 0 {
+	if len(fileBodyText) == 0 && len(fileBodyHTML) == 0 {
 		log.Printf("missing -bodytext or -bodyhtml")
 		os.Exit(1)
 	}
@@ -101,8 +101,8 @@ func main() {
 		_ = msg.SetBodyText(content)
 	}
 
-	if len(fileBodyHtml) > 0 {
-		content, err = os.ReadFile(fileBodyHtml)
+	if len(fileBodyHTML) > 0 {
+		content, err = os.ReadFile(fileBodyHTML)
 		if err != nil {
 			log.Println(err)
 		}
@@ -120,9 +120,9 @@ func main() {
 	mailtx = smtp.NewMailTx(from, []string{to}, mailb)
 
 	clientOpts = smtp.ClientOptions{
-		ServerUrl:     serverUrl,
-		AuthUser:      os.Getenv(envSmtpUsername),
-		AuthPass:      os.Getenv(envSmtpPassword),
+		ServerUrl:     serverURL,
+		AuthUser:      os.Getenv(envSMTPUsername),
+		AuthPass:      os.Getenv(envSMTPPassword),
 		AuthMechanism: smtp.SaslMechanismPlain,
 	}
 

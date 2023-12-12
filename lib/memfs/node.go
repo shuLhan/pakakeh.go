@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	templateIndexHtmlHeader = `<!DOCTYPE html><html>
+	templateIndexHTMLHeader = `<!DOCTYPE html><html>
 <head>
 <meta name="viewport" content="width=device-width">
 <style>
@@ -154,6 +154,8 @@ func (node *Node) Close() error {
 // GenerateIndexHtml generate simple directory listing as HTML for all childs
 // in this node.
 // This method is only applicable if node is a directory.
+//
+//revive:disable-next-line
 func (node *Node) GenerateIndexHtml() {
 	if !node.IsDir() {
 		return
@@ -170,7 +172,7 @@ func (node *Node) GenerateIndexHtml() {
 		child *Node
 	)
 
-	buf.WriteString(templateIndexHtmlHeader)
+	buf.WriteString(templateIndexHTMLHeader)
 
 	fmt.Fprintf(&buf, `<h3>Index of %s</h3>`, node.name)
 
@@ -210,7 +212,7 @@ func (node *Node) IsDir() bool {
 // included in the output.
 func (node *Node) JSON(depth int, withContent, withModTime bool) (rawjson []byte, err error) {
 	var buf bytes.Buffer
-	node.packAsJson(&buf, depth, withContent, withModTime)
+	node.packAsJSON(&buf, depth, withContent, withModTime)
 	return buf.Bytes(), nil
 }
 
@@ -220,7 +222,7 @@ func (node *Node) JSON(depth int, withContent, withModTime bool) (rawjson []byte
 // childs of childs.
 func (node *Node) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	node.packAsJson(&buf, 0, true, true)
+	node.packAsJSON(&buf, 0, true, true)
 	return buf.Bytes(), nil
 }
 
@@ -414,7 +416,7 @@ func (node *Node) generateFuncName(in string) {
 	node.GenFuncName = "generate_" + syspath
 }
 
-func (node *Node) packAsJson(buf *bytes.Buffer, depth int, withContent, withModTime bool) {
+func (node *Node) packAsJSON(buf *bytes.Buffer, depth int, withContent, withModTime bool) {
 	isDir := node.IsDir()
 
 	_ = buf.WriteByte('{')
@@ -442,7 +444,7 @@ func (node *Node) packAsJson(buf *bytes.Buffer, depth int, withContent, withModT
 			if x > 0 {
 				_ = buf.WriteByte(',')
 			}
-			child.packAsJson(buf, depth-1, withContent, withModTime)
+			child.packAsJSON(buf, depth-1, withContent, withModTime)
 		}
 		_ = buf.WriteByte(']')
 	} else {

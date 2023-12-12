@@ -39,8 +39,8 @@ var ErrStdinPassphrase = errors.New(`cannot read passhprase from stdin`)
 // List of environment variables reads when reading passphrase
 // interactively.
 const (
-	envKeySshAskpassRequire = `SSH_ASKPASS_REQUIRE`
-	envKeySshAskpass        = `SSH_ASKPASS`
+	envKeySSHAskpassRequire = `SSH_ASKPASS_REQUIRE`
+	envKeySSHAskpass        = `SSH_ASKPASS`
 	envKeyDisplay           = `DISPLAY`
 )
 
@@ -186,7 +186,7 @@ func LoadPrivateKeyInteractive(termrw io.ReadWriter, file string) (pkey crypto.P
 	}
 
 	var (
-		askpassRequire = os.Getenv(envKeySshAskpassRequire)
+		askpassRequire = os.Getenv(envKeySSHAskpassRequire)
 
 		pass string
 	)
@@ -280,7 +280,7 @@ func sshAskpass(askpassRequire string) (pass string, err error) {
 		}
 	}
 
-	val = os.Getenv(envKeySshAskpass)
+	val = os.Getenv(envKeySSHAskpass)
 	if len(val) == 0 {
 		return ``, ErrStdinPassphrase
 	}

@@ -140,7 +140,7 @@ func (in *Ini) marshalStruct(
 	rtipe reflect.Type, rvalue reflect.Value,
 	parentSec, parentSub string,
 ) {
-	var numField int = rtipe.NumField()
+	var numField = rtipe.NumField()
 	if numField == 0 {
 		return
 	}
@@ -341,7 +341,8 @@ func (in *Ini) Unmarshal(v interface{}) (err error) {
 		return fmt.Errorf("ini: Unmarshal: expecting pointer to struct, got %v", kind)
 	}
 
-	var tagField *tagStructField = unpackTagStructField(rtipe, rvalue)
+	var tagField = unpackTagStructField(rtipe, rvalue)
+
 	in.unmarshal(tagField)
 
 	return nil

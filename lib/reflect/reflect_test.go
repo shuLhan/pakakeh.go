@@ -11,10 +11,10 @@ import (
 
 func TestAppendSlice(t *testing.T) {
 	var (
-		v123  int  = 123
-		v456  int  = 456
-		pv123 *int = &v123
-		pv456 *int = &v456
+		v123  = 123
+		v456  = 456
+		pv123 = &v123
+		pv456 = &v456
 
 		sliceT       []int
 		slicePtrT    []*int

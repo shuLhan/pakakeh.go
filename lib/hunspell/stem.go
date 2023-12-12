@@ -260,9 +260,10 @@ func (stem *Stem) applySuffixes(
 
 func parseWordFlags(in string) (word, flags string, err error) {
 	var (
-		end int = -1
-		esc bool
+		end = -1
 		v   = make([]rune, 0, len(in))
+
+		esc bool
 	)
 	for x, c := range in {
 		if esc {

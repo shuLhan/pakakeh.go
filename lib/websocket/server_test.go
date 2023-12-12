@@ -24,7 +24,7 @@ func createClient(t *testing.T, endpoint string) (cl *Client) {
 		Endpoint: endpoint,
 	}
 
-	var err error = cl.parseURI()
+	var err = cl.parseURI()
 	if err != nil {
 		t.Fatal(err)
 		return

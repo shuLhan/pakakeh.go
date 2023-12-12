@@ -116,7 +116,8 @@ func NewFrameClose(isMasked bool, code CloseCode, payload []byte) []byte {
 	// If there is a body, the first two bytes of the body MUST be a
 	// 2-byte unsigned integer (in network byte order) representing a
 	// status code.
-	var packet []byte = make([]byte, 2+len(payload))
+	var packet = make([]byte, 2+len(payload))
+
 	binary.BigEndian.PutUint16(packet[:2], uint16(code))
 	copy(packet[2:], payload)
 
@@ -423,14 +424,14 @@ func (f *Frame) unpack(packet []byte) []byte {
 		return nil
 	}
 
-	var vuint64 uint64 = f.len - uint64(len(f.payload))
+	var vuint64 = f.len - uint64(len(f.payload))
 	if uint64(len(packet)) < vuint64 {
 		vuint64 = uint64(len(packet))
 	}
 
 	if f.masked == frameIsMasked {
 		var (
-			start int = len(f.payload) % 4
+			start = len(f.payload) % 4
 			x     uint64
 		)
 		for ; x < vuint64; x++ {

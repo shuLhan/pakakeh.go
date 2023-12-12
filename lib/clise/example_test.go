@@ -54,7 +54,7 @@ func ExampleClise_MarshalJSON() {
 
 func ExampleClise_UnmarshalJSON() {
 	var (
-		clise *Clise = New(3)
+		clise = New(3)
 
 		cases = []string{
 			`{"k":1}`, // Non array.
@@ -64,12 +64,12 @@ func ExampleClise_UnmarshalJSON() {
 			`["MarshalJSON",{"Int":1,"String":"Hello"},{"Int":2,"String":"world"}]`,
 		}
 
-		rawJson string
+		rawJSON string
 		err     error
 	)
 
-	for _, rawJson = range cases {
-		err = clise.UnmarshalJSON([]byte(rawJson))
+	for _, rawJSON = range cases {
+		err = clise.UnmarshalJSON([]byte(rawJSON))
 		if err != nil {
 			fmt.Println(err)
 		} else {

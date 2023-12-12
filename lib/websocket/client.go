@@ -257,7 +257,7 @@ func (cl *Client) Connect() (err error) {
 	// response from server may include WebSocket frame, not just HTTP
 	// response.
 	if len(rest) > 0 {
-		var isClosing bool = cl.handleRaw(rest)
+		var isClosing = cl.handleRaw(rest)
 		if isClosing {
 			cl.Quit()
 			return nil
@@ -327,8 +327,8 @@ func (cl *Client) parseURI() (err error) {
 	}
 
 	var (
-		serverAddress string = cl.remoteURL.Hostname()
-		serverPort    string = cl.remoteURL.Port()
+		serverAddress = cl.remoteURL.Hostname()
+		serverPort    = cl.remoteURL.Port()
 	)
 
 	switch cl.remoteURL.Scheme {
@@ -380,10 +380,10 @@ func (cl *Client) open() (err error) {
 // handshake send the WebSocket opening handshake.
 func (cl *Client) handshake() (rest []byte, err error) {
 	var (
-		logp             = `handshake`
-		path      string = cl.remoteURL.EscapedPath()
-		key       []byte = generateHandshakeKey()
-		keyAccept string = generateHandshakeAccept(key)
+		logp      = `handshake`
+		path      = cl.remoteURL.EscapedPath()
+		key       = generateHandshakeKey()
+		keyAccept = generateHandshakeAccept(key)
 
 		bb  bytes.Buffer
 		req []byte
@@ -491,9 +491,7 @@ func clientOnClose(cl *Client, frame *Frame) (err error) {
 		}
 	}
 
-	var (
-		packet []byte = NewFrameClose(true, frame.closeCode, frame.payload)
-	)
+	var packet = NewFrameClose(true, frame.closeCode, frame.payload)
 
 	cl.Lock()
 	err = cl.send(packet)
@@ -574,7 +572,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 
 	switch frame.opcode {
 	case OpcodeCont, OpcodeText, OpcodeBin:
-		var isInvalid bool = cl.handleFragment(frame)
+		var isInvalid = cl.handleFragment(frame)
 		if isInvalid {
 			isClosing = true
 		}
@@ -610,9 +608,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 }
 
 func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, err error) {
-	var (
-		httpRes *http.Response
-	)
+	var httpRes *http.Response
 
 	httpRes, rest, err = libhttp.ParseResponseHeader(resp)
 	if err != nil {
@@ -623,7 +619,8 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, e
 		return nil, errors.New(httpRes.Status)
 	}
 
-	var gotAccept string = httpRes.Header.Get(_hdrKeyWSAccept)
+	var gotAccept = httpRes.Header.Get(_hdrKeyWSAccept)
+
 	if keyAccept != gotAccept {
 		return nil, errors.New(`invalid server accept key`)
 	}
@@ -634,8 +631,8 @@ func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, e
 // handleRaw packet from server.
 func (cl *Client) handleRaw(packet []byte) (isClosing bool) {
 	var (
-		logp           = `handleRaw`
-		frames *Frames = Unpack(packet)
+		logp   = `handleRaw`
+		frames = Unpack(packet)
 
 		f *Frame
 	)
@@ -725,8 +722,8 @@ func (cl *Client) SendPong(payload []byte) (err error) {
 // If handler is nil, no response will be read from server.
 func (cl *Client) SendText(payload []byte) (err error) {
 	var (
-		logp          = `SendText`
-		packet []byte = NewFrameText(true, payload)
+		logp   = `SendText`
+		packet = NewFrameText(true, payload)
 	)
 	cl.Lock()
 	err = cl.send(packet)
@@ -833,7 +830,7 @@ func (cl *Client) recv() (packet []byte, err error) {
 	}
 
 	var (
-		buf    []byte = make([]byte, 512)
+		buf    = make([]byte, 512)
 		neterr net.Error
 		n      int
 		ok     bool
@@ -889,8 +886,8 @@ func (cl *Client) send(packet []byte) (err error) {
 // pinger send the PING control frame every 10 seconds.
 func (cl *Client) pinger() {
 	var (
-		logp              = `pinger`
-		t    *time.Ticker = time.NewTicker(cl.PingInterval)
+		logp = `pinger`
+		t    = time.NewTicker(cl.PingInterval)
 
 		err error
 	)

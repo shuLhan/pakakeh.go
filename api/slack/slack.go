@@ -15,7 +15,7 @@ import (
 )
 
 // PostWebhook send a message using "Incoming Webhook".
-func PostWebhook(webhookUrl string, msg *Message) (err error) {
+func PostWebhook(webhookURL string, msg *Message) (err error) {
 	var (
 		logp = `PostWebhook`
 
@@ -29,7 +29,7 @@ func PostWebhook(webhookUrl string, msg *Message) (err error) {
 
 	var res *http.Response
 
-	res, err = http.DefaultClient.Post(webhookUrl, `application/json`, bytes.NewReader(payload))
+	res, err = http.DefaultClient.Post(webhookURL, `application/json`, bytes.NewReader(payload))
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}

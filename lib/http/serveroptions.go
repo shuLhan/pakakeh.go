@@ -53,7 +53,7 @@ type ServerOptions struct {
 	// exist in the directory.
 	// The index.html contains the list of files inside the requested
 	// path.
-	EnableIndexHtml bool
+	EnableIndexHtml bool //revive:disable-line
 }
 
 func (opts *ServerOptions) init() {

@@ -24,10 +24,10 @@ type QuestdbOptions struct {
 	// Usually set to IlpFormatter.
 	Fmt Formatter
 
-	// ServerUrl define the QuestDB server URL.
+	// ServerURL define the QuestDB server URL.
 	// Currently, it only support the TCP scheme using the following
 	// format "tcp://<host>:<port>".
-	ServerUrl string
+	ServerURL string
 
 	proto   string
 	address string
@@ -40,7 +40,7 @@ type QuestdbOptions struct {
 func (opts *QuestdbOptions) init() (err error) {
 	var surl *url.URL
 
-	surl, err = url.Parse(opts.ServerUrl)
+	surl, err = url.Parse(opts.ServerURL)
 	if err != nil {
 		return err
 	}

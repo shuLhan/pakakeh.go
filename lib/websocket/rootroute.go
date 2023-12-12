@@ -108,7 +108,7 @@ func (root *rootRoute) add(method, target string, handler RouteHandler) (err err
 	method = strings.ToUpper(method)
 
 	var (
-		parent *route = root.getParent(method)
+		parent = root.getParent(method)
 
 		bb      *bytes.Buffer
 		x       int
@@ -181,7 +181,7 @@ func (root *rootRoute) get(method, target string) (params targetParam, handler R
 	method = strings.ToUpper(method)
 
 	var (
-		parent *route = root.getParent(method)
+		parent = root.getParent(method)
 
 		child *route
 		bb    *bytes.Buffer

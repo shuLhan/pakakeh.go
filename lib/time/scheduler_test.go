@@ -427,7 +427,7 @@ func TestScheduler_calcNext_minutely(t *testing.T) {
 	}}
 
 	var (
-		c testCase = cases[0]
+		c = cases[0]
 
 		got *Scheduler
 		err error

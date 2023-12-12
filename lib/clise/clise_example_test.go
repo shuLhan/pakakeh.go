@@ -4,7 +4,7 @@ import "fmt"
 
 func ExampleClise_Pop() {
 	var (
-		c    *Clise = New(5)
+		c    = New(5)
 		item interface{}
 	)
 
@@ -23,7 +23,7 @@ func ExampleClise_Pop() {
 }
 
 func ExampleClise_RecentSlice() {
-	var c *Clise = New(5)
+	var c = New(5)
 	c.Push(1, 2, 3)
 	fmt.Println(c.RecentSlice())
 	c.Push(4, 5, 6, 7)
@@ -34,7 +34,7 @@ func ExampleClise_RecentSlice() {
 }
 
 func ExampleClise_Reset() {
-	var c *Clise = New(5)
+	var c = New(5)
 	c.Push(1, 2, 3, 4, 5)
 	fmt.Println(c.Slice())
 	c.Reset()
@@ -46,7 +46,7 @@ func ExampleClise_Reset() {
 }
 
 func ExampleClise_Slice() {
-	var c *Clise = New(5)
+	var c = New(5)
 	c.Push(1, 2)
 	fmt.Println(c.Slice())
 	c.Push(3, 4, 5)

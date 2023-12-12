@@ -135,10 +135,11 @@ func isIncludeDirective(line string) bool {
 
 func parseInclude(line string) (patterns []string) {
 	var (
-		useQuote bool
-		x        int = len(keyInclude)
+		x = len(keyInclude)
+
 		start    int
 		end      int
+		useQuote bool
 	)
 
 	for ; x < len(line); x++ {

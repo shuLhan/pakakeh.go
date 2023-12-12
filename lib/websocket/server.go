@@ -163,7 +163,7 @@ func (serv *Server) createSockServer() (err error) {
 // RegisterTextHandler register specific function to be called by server when
 // request opcode is text, and method and target matched with Request.
 func (serv *Server) RegisterTextHandler(method, target string, handler RouteHandler) (err error) {
-	var logp string = `RegisterTextHandler`
+	var logp = `RegisterTextHandler`
 
 	if len(method) == 0 {
 		return fmt.Errorf("%s: empty method", logp)
@@ -445,7 +445,7 @@ func (serv *Server) handleFrame(conn int, frame *Frame) (isClosing bool) {
 
 	switch frame.opcode {
 	case OpcodeCont, OpcodeText, OpcodeBin:
-		var isInvalid bool = serv.handleFragment(conn, frame)
+		var isInvalid = serv.handleFragment(conn, frame)
 		if isInvalid {
 			isClosing = true
 		}
@@ -559,7 +559,7 @@ func (serv *Server) handleStatus(conn int) {
 	}
 
 	var (
-		res string = fmt.Sprintf(_resStatusOK, contentType, len(data), data)
+		res = fmt.Sprintf(_resStatusOK, contentType, len(data), data)
 		err error
 	)
 
@@ -627,7 +627,7 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 	}
 
 	var (
-		packet []byte = NewFrameClose(false, req.closeCode, req.payload)
+		packet = NewFrameClose(false, req.closeCode, req.payload)
 		err    error
 	)
 
@@ -642,8 +642,8 @@ func (serv *Server) handleClose(conn int, req *Frame) {
 // handleBadRequest by sending Close frame with status.
 func (serv *Server) handleBadRequest(conn int) {
 	var (
-		logp              = `handleBadRequest`
-		frameClose []byte = NewFrameClose(false, StatusBadRequest, nil)
+		logp       = `handleBadRequest`
+		frameClose = NewFrameClose(false, StatusBadRequest, nil)
 
 		err error
 	)
@@ -665,8 +665,8 @@ out:
 // handleInvalidData by sending Close frame with status 1007.
 func (serv *Server) handleInvalidData(conn int) {
 	var (
-		logp              = `handleInvalidData`
-		frameClose []byte = NewFrameClose(false, StatusInvalidData, nil)
+		logp       = `handleInvalidData`
+		frameClose = NewFrameClose(false, StatusInvalidData, nil)
 
 		err error
 	)
@@ -698,8 +698,8 @@ func (serv *Server) handlePing(conn int, req *Frame) {
 	req.masked = 0
 
 	var (
-		logp        = `handlePing`
-		res  []byte = req.pack()
+		logp = `handlePing`
+		res  = req.pack()
 
 		err error
 	)
@@ -870,7 +870,7 @@ func (serv *Server) delayReader(conn int) {
 // every N seconds.
 func (serv *Server) pollPinger() {
 	var (
-		pingTicker *time.Ticker = time.NewTicker(16 * time.Second)
+		pingTicker = time.NewTicker(16 * time.Second)
 
 		all       []int
 		conn      int

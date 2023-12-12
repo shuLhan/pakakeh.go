@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	envSshAuthSock = "SSH_AUTH_SOCK"
+	envSSHAuthSock = `SSH_AUTH_SOCK`
 )
 
 const (

@@ -21,7 +21,7 @@ type ClientOptions struct {
 	// "https://example.com" or "http://10.148.0.12:8080".
 	// This value should not changed during call of client's method.
 	// This field is required.
-	ServerUrl string
+	ServerUrl string //revive:disable-line
 
 	// Timeout affect the http Transport Timeout and TLSHandshakeTimeout.
 	// This field is optional, if not set it will set to 10 seconds.

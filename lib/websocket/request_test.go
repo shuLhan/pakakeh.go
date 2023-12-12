@@ -14,7 +14,7 @@ import (
 )
 
 func TestRequestReset(t *testing.T) {
-	var req *Request = _reqPool.Get().(*Request)
+	var req = _reqPool.Get().(*Request)
 
 	req.reset()
 

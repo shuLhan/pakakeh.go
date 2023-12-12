@@ -25,7 +25,7 @@ type SSECallback func(sse *SSEConn)
 
 // SSEConn define the connection when the SSE request accepted by server.
 type SSEConn struct {
-	HttpRequest *http.Request
+	HttpRequest *http.Request //revive:disable-line
 
 	bufrw *bufio.ReadWriter
 	conn  net.Conn

@@ -130,7 +130,7 @@ func (cl *DoTClient) recv(msg *Message) (n int, err error) {
 		return
 	}
 
-	var packet = make([]byte, maxTcpPacketSize)
+	var packet = make([]byte, maxTCPPacketSize)
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {

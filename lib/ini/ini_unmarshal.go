@@ -161,7 +161,7 @@ func unmarshalToMap(sec *Section, rtype reflect.Type, rval reflect.Value) bool {
 
 func unmarshalToStruct(sec *Section, rtype reflect.Type, rval reflect.Value) {
 	var (
-		tagField *tagStructField = unpackTagStructField(rtype, rval)
+		tagField = unpackTagStructField(rtype, rval)
 
 		v      *variable
 		sfield *structField

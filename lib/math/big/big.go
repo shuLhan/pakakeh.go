@@ -20,4 +20,4 @@ var DefaultDigitPrecision = 8
 // MarshalJSONAsString define the default return behaviour of MarshalJSON().
 // If its true (the default) the returned JSON format will encapsulated in
 // double quote, as string instead of as numeric.
-var MarshalJSONAsString bool = true
+var MarshalJSONAsString = true

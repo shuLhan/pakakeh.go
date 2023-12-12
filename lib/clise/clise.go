@@ -114,8 +114,9 @@ func (c *Clise) Reset() {
 // last item to the recent item.
 func (c *Clise) Slice() (dst []interface{}) {
 	var (
+		end = c.size
+
 		start int
-		end   int = c.size
 	)
 
 	c.Lock()

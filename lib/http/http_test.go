@@ -24,7 +24,7 @@ import (
 
 var (
 	testServer    *Server
-	testServerUrl string
+	testServerURL string
 
 	client = &http.Client{}
 
@@ -68,7 +68,7 @@ func TestMain(m *testing.M) {
 		Address:  serverAddress,
 	}
 
-	testServerUrl = fmt.Sprintf("http://" + serverAddress)
+	testServerURL = fmt.Sprintf("http://" + serverAddress)
 
 	testServer, err = NewServer(opts)
 	if err != nil {
@@ -162,9 +162,9 @@ func registerEndpoints() {
 	}
 }
 
-// dumpHttpResponse write headers ordered by key in ascending with option to
+// dumpHTTPResponse write headers ordered by key in ascending with option to
 // skip certain header keys.
-func dumpHttpResponse(httpRes *http.Response, skipHeaders []string) string {
+func dumpHTTPResponse(httpRes *http.Response, skipHeaders []string) string {
 	var (
 		keys []string
 		hkey string

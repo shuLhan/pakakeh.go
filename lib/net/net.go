@@ -130,7 +130,7 @@ func Read(conn net.Conn, bufsize int, timeout time.Duration) (packet []byte, err
 	}
 
 	var (
-		buf []byte = make([]byte, bufsize)
+		buf = make([]byte, bufsize)
 		n   int
 	)
 

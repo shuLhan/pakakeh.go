@@ -62,7 +62,7 @@ func newChatClient(user *examples.Account) (cc *chatClient) {
 		os.Exit(0)
 	}
 
-	var err error = cc.conn.Connect()
+	var err = cc.conn.Connect()
 	if err != nil {
 		log.Fatal("Connect: " + err.Error())
 	}

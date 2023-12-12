@@ -89,8 +89,8 @@ func TestLoadPrivateKeyInteractive(t *testing.T) {
 		// Environment variables for testing with SSH_ASKPASS and
 		// SSH_ASKPASS_REQUIRE.
 		envDisplay           string
-		envSshAskpass        string
-		envSshAskpassRequire string
+		envSSHAskpass        string
+		envSSHAskpassRequire string
 	}
 
 	var (
@@ -130,41 +130,41 @@ func TestLoadPrivateKeyInteractive(t *testing.T) {
 		desc:                 `withAskpassRequire=prefer`,
 		file:                 `testdata/openssl_rsa_pass.key`,
 		envDisplay:           `:0`,
-		envSshAskpass:        askpassProgram,
-		envSshAskpassRequire: `prefer`,
+		envSSHAskpass:        askpassProgram,
+		envSSHAskpassRequire: `prefer`,
 	}, {
 		desc:                 `withAskpassRequire=prefer, no DISPLAY`,
 		file:                 `testdata/openssl_rsa_pass.key`,
-		envSshAskpass:        askpassProgram,
-		envSshAskpassRequire: `prefer`,
+		envSSHAskpass:        askpassProgram,
+		envSSHAskpassRequire: `prefer`,
 		expError:             `LoadPrivateKeyInteractive: cannot read passhprase from stdin`,
 	}, {
 		desc:                 `withAskpassRequire=prefer, empty SSH_ASKPASS`,
 		file:                 `testdata/openssl_rsa_pass.key`,
 		envDisplay:           `:0`,
-		envSshAskpassRequire: `prefer`,
+		envSSHAskpassRequire: `prefer`,
 		expError:             `LoadPrivateKeyInteractive: cannot read passhprase from stdin`,
 	}, {
 		desc:                 `withAskpassRequire=prefer, invalid program`,
 		file:                 `testdata/openssl_rsa_pass.key`,
 		envDisplay:           `:0`,
-		envSshAskpass:        `/invalid/program`,
-		envSshAskpassRequire: `prefer`,
+		envSSHAskpass:        `/invalid/program`,
+		envSSHAskpassRequire: `prefer`,
 		expError:             `LoadPrivateKeyInteractive: fork/exec /invalid/program: no such file or directory`,
 	}, {
 		desc:                 `withAskpassRequire=force`,
 		file:                 `testdata/openssl_rsa_pass.key`,
 		envDisplay:           `:0`,
-		envSshAskpass:        askpassProgram,
-		envSshAskpassRequire: `force`,
+		envSSHAskpass:        askpassProgram,
+		envSSHAskpassRequire: `force`,
 	}}
 
 	var c testCase
 
 	for _, c = range cases {
 		os.Setenv(envKeyDisplay, c.envDisplay)
-		os.Setenv(envKeySshAskpass, c.envSshAskpass)
-		os.Setenv(envKeySshAskpassRequire, c.envSshAskpassRequire)
+		os.Setenv(envKeySSHAskpass, c.envSSHAskpass)
+		os.Setenv(envKeySSHAskpassRequire, c.envSSHAskpassRequire)
 
 		_, err = mockrw.BufRead.WriteString(c.secret)
 		if err != nil {

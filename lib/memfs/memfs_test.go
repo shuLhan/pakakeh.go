@@ -394,11 +394,11 @@ func TestMemFS_Get_refresh(t *testing.T) {
 		filePath    string
 		tag         string
 		path        string
-		expJson     string
+		expJSON     string
 		expError    string
 		fileContent []byte
-		rawJson     []byte
-		gotJson     bytes.Buffer
+		rawJSON     []byte
+		gotJSON     bytes.Buffer
 	)
 
 	for filePath, fileContent = range tdata.Input {
@@ -431,21 +431,21 @@ func TestMemFS_Get_refresh(t *testing.T) {
 
 		// Check the tree of MemFS.
 
-		rawJson, err = mfs.Root.JSON(9999, true, false)
+		rawJSON, err = mfs.Root.JSON(9999, true, false)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		gotJson.Reset()
-		err = json.Indent(&gotJson, rawJson, ``, `  `)
+		gotJSON.Reset()
+		err = json.Indent(&gotJSON, rawJSON, ``, `  `)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		test.Assert(t, filePath, string(fileContent), string(node.Content))
 
-		expJson = string(tdata.Output[filePath])
-		test.Assert(t, filePath, expJson, gotJson.String())
+		expJSON = string(tdata.Output[filePath])
+		test.Assert(t, filePath, expJSON, gotJSON.String())
 	}
 }
 

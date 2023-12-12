@@ -52,7 +52,8 @@ func main() {
 // value.
 func handleAuth(req *websocket.Handshake) (ctx context.Context, err error) {
 	var (
-		key  string = req.Header.Get("Key")
+		key = req.Header.Get(`Key`)
+
 		id   int64
 		user *examples.Account
 	)
@@ -73,8 +74,9 @@ func handleClientAdd(ctx context.Context, conn int) {
 	log.Printf("server: adding client %d ...", conn)
 
 	var (
-		uid    int64             = ctx.Value(websocket.CtxKeyUID).(int64)
-		user   *examples.Account = examples.Users[uid]
+		uid  = ctx.Value(websocket.CtxKeyUID).(int64)
+		user = examples.Users[uid]
+
 		body   string
 		packet []byte
 		err    error
@@ -105,8 +107,9 @@ func handleClientRemove(ctx context.Context, conn int) {
 	log.Printf("server: client %d has been disconnected ...", conn)
 
 	var (
-		uid    int64             = ctx.Value(websocket.CtxKeyUID).(int64)
-		user   *examples.Account = examples.Users[uid]
+		uid  = ctx.Value(websocket.CtxKeyUID).(int64)
+		user = examples.Users[uid]
+
 		body   string
 		packet []byte
 		err    error
@@ -134,9 +137,10 @@ func handleClientRemove(ctx context.Context, conn int) {
 // handlePostMessage handle message that is send to server by client.
 func handlePostMessage(ctx context.Context, req *websocket.Request) (res websocket.Response) {
 	var (
-		uid    int64             = ctx.Value(websocket.CtxKeyUID).(int64)
-		user   *examples.Account = examples.Users[uid]
-		body   string            = user.Name + ": " + req.Body
+		uid  = ctx.Value(websocket.CtxKeyUID).(int64)
+		user = examples.Users[uid]
+		body = user.Name + `: ` + req.Body
+
 		packet []byte
 		err    error
 		conn   int

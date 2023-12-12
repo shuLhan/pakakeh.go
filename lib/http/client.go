@@ -141,7 +141,7 @@ func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err
 		return nil, fmt.Errorf("%s: %w", logp, ErrClientDownloadNoOutput)
 	}
 
-	httpReq, err = req.toHttpRequest(client)
+	httpReq, err = req.toHTTPRequest(client)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", logp, err)
 	}
@@ -192,7 +192,7 @@ out:
 //     body.
 //   - If requestType is RequestTypeJSON and params is not nil, the params will
 //     be encoded as JSON in body.
-func (client *Client) GenerateHttpRequest(
+func (client *Client) GenerateHttpRequest( //revive:disable-line
 	method RequestMethod,
 	requestPath string,
 	requestType RequestType,
@@ -201,15 +201,15 @@ func (client *Client) GenerateHttpRequest(
 ) (httpRequest *http.Request, err error) {
 	var (
 		logp              = "GenerateHttpRequest"
-		paramsAsUrlValues url.Values
-		isParamsUrlValues bool
+		paramsAsURLValues url.Values
+		isParamsURLValues bool
 		paramsAsJSON      []byte
 		contentType       = requestType.String()
 		strBody           string
 		body              io.Reader
 	)
 
-	paramsAsUrlValues, isParamsUrlValues = params.(url.Values)
+	paramsAsURLValues, isParamsURLValues = params.(url.Values)
 
 	switch method {
 	case RequestMethodGet,
@@ -219,8 +219,8 @@ func (client *Client) GenerateHttpRequest(
 		RequestMethodOptions,
 		RequestMethodTrace:
 
-		if isParamsUrlValues {
-			requestPath += `?` + paramsAsUrlValues.Encode()
+		if isParamsURLValues {
+			requestPath += `?` + paramsAsURLValues.Encode()
 		}
 
 	case RequestMethodPatch,
@@ -228,13 +228,13 @@ func (client *Client) GenerateHttpRequest(
 		RequestMethodPut:
 		switch requestType {
 		case RequestTypeQuery:
-			if isParamsUrlValues {
-				requestPath += `?` + paramsAsUrlValues.Encode()
+			if isParamsURLValues {
+				requestPath += `?` + paramsAsURLValues.Encode()
 			}
 
 		case RequestTypeForm:
-			if isParamsUrlValues {
-				strBody = paramsAsUrlValues.Encode()
+			if isParamsURLValues {
+				strBody = paramsAsURLValues.Encode()
 				body = strings.NewReader(strBody)
 			}
 
@@ -363,9 +363,7 @@ func (client *Client) Put(requestPath string, headers http.Header, body []byte) 
 func (client *Client) PutForm(requestPath string, headers http.Header, params url.Values) (
 	httpRes *http.Response, resBody []byte, err error,
 ) {
-	var (
-		body *strings.Reader = strings.NewReader(params.Encode())
-	)
+	var body = strings.NewReader(params.Encode())
 
 	return client.doRequest(http.MethodPut, headers, requestPath, ContentTypeForm, body)
 }

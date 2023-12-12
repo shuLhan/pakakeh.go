@@ -69,7 +69,7 @@ func (r *route) getChildAsParam() (c *route) {
 // formatted print to print pointer to route as address.
 func (r *route) String() (out string) {
 	var (
-		bb *bytes.Buffer = _bbPool.Get().(*bytes.Buffer)
+		bb = _bbPool.Get().(*bytes.Buffer)
 
 		c *route
 		x int

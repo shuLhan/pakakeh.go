@@ -25,13 +25,13 @@ type Client struct {
 	pipeOut io.Reader
 	pipeErr io.Reader
 
-	// The requestId is unique number that will be incremented by client,
+	// The requestID is unique number that will be incremented by client,
 	// to prevent the same ID generated on concurrent operations.
-	requestId uint32
+	requestID uint32
 
 	version uint32
 
-	mtxId sync.Mutex
+	mtxID sync.Mutex
 }
 
 // NewClient create and initialize new client for SSH file transfer protocol.
@@ -69,7 +69,7 @@ func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 		return nil, fmt.Errorf("%s: RequestSubsystem: %w", logp, err)
 	}
 
-	cl.requestId = uint32(time.Now().Unix())
+	cl.requestID = uint32(time.Now().Unix())
 
 	err = cl.init()
 	if err != nil {
@@ -83,7 +83,7 @@ func NewClient(sshc *ssh.Client) (cl *Client, err error) {
 func (cl *Client) Close() (err error) {
 	err = cl.sess.Close()
 
-	cl.requestId = 0
+	cl.requestID = 0
 	cl.pipeErr = nil
 	cl.pipeOut = nil
 	cl.pipeIn = nil
@@ -647,12 +647,12 @@ func (cl *Client) Write(fh *FileHandle, offset uint64, data []byte) (err error) 
 }
 
 func (cl *Client) generatePacket() (pac *packet) {
-	cl.mtxId.Lock()
-	cl.requestId++
+	cl.mtxID.Lock()
+	cl.requestID++
 	pac = &packet{
-		requestId: cl.requestId,
+		requestID: cl.requestID,
 	}
-	cl.mtxId.Unlock()
+	cl.mtxID.Unlock()
 	return pac
 }
 

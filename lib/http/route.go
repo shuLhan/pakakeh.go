@@ -11,7 +11,7 @@ import (
 
 // List of kind for route.
 const (
-	routeKindHttp int = iota // Normal routing.
+	routeKindHTTP int = iota // Normal routing.
 	routeKindSSE             // Routing for Server-Sent Events (SSE).
 )
 

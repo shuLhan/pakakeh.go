@@ -18,7 +18,7 @@ import (
 
 // ErrScheduleUnknown define an error when unknown schedule kind parsed from
 // value.
-var ErrScheduleUnknown error = errors.New(`unknown schedule`)
+var ErrScheduleUnknown = errors.New(`unknown schedule`)
 
 // List of kind of schedule.
 const (

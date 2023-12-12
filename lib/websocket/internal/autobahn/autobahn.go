@@ -54,9 +54,9 @@ type autobahnCaseReport map[string]autobahnTestReport
 
 type autobahnReport map[string]autobahnCaseReport
 
-// PrintReports read the JSON reports from fileReportsJson and print the
+// PrintReports read the JSON reports from fileReportsJSON and print the
 // total test cases and the failed one.
-func PrintReports(fileReportsJson string) {
+func PrintReports(fileReportsJSON string) {
 	var (
 		logp = `PrintReports`
 
@@ -65,7 +65,7 @@ func PrintReports(fileReportsJson string) {
 		err    error
 	)
 
-	raw, err = os.ReadFile(fileReportsJson)
+	raw, err = os.ReadFile(fileReportsJSON)
 	if err != nil {
 		log.Fatalf(`%s: %s`, logp, err)
 	}

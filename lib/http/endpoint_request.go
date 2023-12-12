@@ -14,9 +14,9 @@ import "net/http"
 //
 // The Error field is used by CallbackErrorHandler.
 type EndpointRequest struct {
-	HttpWriter  http.ResponseWriter
+	HttpWriter  http.ResponseWriter //revive:disable-line
 	Error       error
 	Endpoint    *Endpoint
-	HttpRequest *http.Request
+	HttpRequest *http.Request //revive:disable-line
 	RequestBody []byte
 }

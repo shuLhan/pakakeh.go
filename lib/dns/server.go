@@ -341,7 +341,7 @@ func (srv *Server) serveTCP() {
 func (srv *Server) serveUDP() {
 	var (
 		n      int
-		packet = make([]byte, maxUdpPacketSize)
+		packet = make([]byte, maxUDPPacketSize)
 		raddr  *net.UDPAddr
 		req    *request
 		err    error

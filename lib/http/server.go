@@ -337,8 +337,8 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 // index.html.
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	var (
-		nodeIndexHtml *memfs.Node
-		pathHtml      string
+		nodeIndexHTML *memfs.Node
+		pathHTML      string
 		err           error
 	)
 
@@ -346,7 +346,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 		return nil, false
 	}
 
-	pathHtml = path.Join(reqPath, `index.html`)
+	pathHTML = path.Join(reqPath, `index.html`)
 
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
@@ -354,10 +354,10 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 			return nil, false
 		}
 
-		node, err = srv.Options.Memfs.Get(pathHtml)
+		node, err = srv.Options.Memfs.Get(pathHTML)
 		if err != nil {
-			pathHtml = reqPath + `.html`
-			node, err = srv.Options.Memfs.Get(pathHtml)
+			pathHTML = reqPath + `.html`
+			node, err = srv.Options.Memfs.Get(pathHTML)
 			if err != nil {
 				return nil, false
 			}
@@ -366,9 +366,9 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	}
 
 	if node.IsDir() {
-		nodeIndexHtml, err = srv.Options.Memfs.Get(pathHtml)
+		nodeIndexHTML, err = srv.Options.Memfs.Get(pathHTML)
 		if err == nil {
-			return nodeIndexHtml, true
+			return nodeIndexHTML, true
 		}
 
 		if !srv.Options.EnableIndexHtml {
@@ -599,7 +599,7 @@ func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 		if !ok {
 			continue
 		}
-		if rute.kind == routeKindHttp {
+		if rute.kind == routeKindHTTP {
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
 		}

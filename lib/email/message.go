@@ -305,7 +305,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 }
 
 // SetBodyHtml set or replace the message's body HTML content.
-func (msg *Message) SetBodyHtml(content []byte) (err error) {
+func (msg *Message) SetBodyHtml(content []byte) (err error) { //revive:disable-line
 	err = msg.setBody([]byte(contentTypeTextHTML), content)
 	if err != nil {
 		return fmt.Errorf("SetBodyHtml: %w", err)
@@ -567,7 +567,7 @@ func (msg *Message) packMultipartAlternative() (out []byte, err error) {
 		}
 	}
 
-	mime = msg.Body.getPart(topText, subHtml)
+	mime = msg.Body.getPart(topText, subHTML)
 	if mime != nil {
 		fmt.Fprintf(&buf, "--%s\r\n", boundary)
 		_, err = mime.WriteTo(&buf)
@@ -581,7 +581,7 @@ func (msg *Message) packMultipartAlternative() (out []byte, err error) {
 		if mime.isContentType(topText, subPlain) {
 			continue
 		}
-		if mime.isContentType(topText, subHtml) {
+		if mime.isContentType(topText, subHTML) {
 			continue
 		}
 
