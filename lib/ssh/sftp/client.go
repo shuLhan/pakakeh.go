@@ -88,7 +88,10 @@ func (cl *Client) Close() (err error) {
 	cl.pipeOut = nil
 	cl.pipeIn = nil
 
-	return fmt.Errorf(`Close: %w`, err)
+	if err != nil {
+		return fmt.Errorf(`Close: %w`, err)
+	}
+	return nil
 }
 
 // CloseFile close the remote file handle.
