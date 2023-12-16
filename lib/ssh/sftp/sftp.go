@@ -3,19 +3,21 @@
 // license that can be found in the LICENSE file.
 
 // Package sftp implement SSH File Transfer Protocol v3 as defined in
-// draft-ietf-secsh-filexfer-02.txt.
+// [draft-ietf-secsh-filexfer-02.txt].
 //
 // The sftp package extend the golang.org/x/crypto/ssh package by
-// implementing "sftp" subsystem using the ssh.Client connection.
+// implementing "sftp" subsystem using the [ssh.Client] connection.
 //
 // For information, even if scp working normally on server, this package
-// functionalities will not working if the server disable or does not support
-// the "sftp" subsystem.
+// functionalities will not working if the server disable or does not
+// support the "sftp" subsystem.
 // For reference, on openssh, the following configuration
 //
 //	Subsystem sftp /usr/lib/sftp-server
 //
 // should be un-commented on /etc/ssh/sshd_config if its exist.
+//
+// [draft-ietf-secsh-filexfer-02.txt]: https://datatracker.ietf.org/doc/html/draft-ietf-secsh-filexfer-02#page-15
 package sftp
 
 import (
@@ -72,9 +74,9 @@ const (
 // Some response status code from server is mapped to existing errors on
 // standard packages,
 //
-//	SSH_FX_EOF               (1) = io.EOF
-//	SSH_FX_NO_SUCH_FILE      (2) = fs.ErrNotExist
-//	SSH_FX_PERMISSION_DENIED (3) = fs.ErrPermission
+//   - SSH_FX_EOF               (1) = [io.EOF]
+//   - SSH_FX_NO_SUCH_FILE      (2) = [fs.ErrNotExist]
+//   - SSH_FX_PERMISSION_DENIED (3) = [fs.ErrPermission]
 //
 // Other errors is defined below,
 var (

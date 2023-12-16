@@ -52,7 +52,7 @@ type FileAttrs struct {
 	mtime       uint32 // attrAcModtime
 }
 
-// NewFileAttrs create and initialize FileAttrs from FileInfo.
+// NewFileAttrs create and initialize [FileAttrs] from [fs.FileInfo].
 func NewFileAttrs(fi fs.FileInfo) (fa *FileAttrs) {
 	fa = &FileAttrs{
 		name: fi.Name(),
@@ -190,7 +190,7 @@ func (fa *FileAttrs) ModTime() time.Time {
 	return time.Unix(int64(fa.mtime), 0)
 }
 
-// Mode return the file mode bits as standard fs.FileMode type.
+// Mode return the file mode bits as standard [fs.FileMode] type.
 func (fa *FileAttrs) Mode() fs.FileMode {
 	return fa.fsMode
 }
@@ -256,7 +256,8 @@ func (fa *FileAttrs) Size() int64 {
 	return int64(fa.size)
 }
 
-// Sys return the pointer to FileAttrs itself.
+// Sys return the pointer to [FileAttrs] itself.
+// This method is added to comply with [fs.FileInfo] interface.
 func (fa *FileAttrs) Sys() interface{} {
 	return fa
 }

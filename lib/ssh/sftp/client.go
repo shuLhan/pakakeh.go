@@ -36,7 +36,7 @@ type Client struct {
 
 // NewClient create and initialize new client for SSH file transfer protocol.
 //
-// On failure, it will return ErrSubsystem if the server does not support
+// On failure, it will return [ErrSubsystem] if the server does not support
 // "sftp" subsystem, ErrVersion if the client does not support the
 // server version, and other errors.
 func NewClient(sshc *ssh.Client) (cl *Client, err error) {
@@ -122,7 +122,7 @@ func (cl *Client) CloseFile(fh *FileHandle) (err error) {
 // Create creates or truncates the named file.
 // If the remote file does not exist, it will be created.
 // If the remote file already exists, it will be truncated.
-// On success, it will return the remote FileHandle ready for write only.
+// On success, it will return the remote [FileHandle] ready for write only.
 func (cl *Client) Create(remoteFile string, fa *FileAttrs) (*FileHandle, error) {
 	pflags := OpenFlagWrite | OpenFlagCreate | OpenFlagTruncate
 	return cl.OpenFile(remoteFile, pflags, fa)
@@ -227,7 +227,7 @@ func (cl *Client) Get(remoteFile, localFile string) (err error) {
 }
 
 // Lstat get the file attributes based on the remote file path.
-// Unlike Stat(), the Lstat method does not follow symbolic links.
+// Unlike [Client.Stat], the Lstat method does not follow symbolic links.
 func (cl *Client) Lstat(remoteFile string) (fa *FileAttrs, err error) {
 	var (
 		logp    = "Lstat"
@@ -278,8 +278,8 @@ func (cl *Client) Open(remoteFile string) (fh *FileHandle, err error) {
 	return cl.OpenFile(remoteFile, OpenFlagRead, nil)
 }
 
-// OpenFile open remote file with custom open flag (OpenFlagRead,
-// OpenFlagWrite, and so on) and with specific file attributes.
+// OpenFile open remote file with custom open flag ([OpenFlagRead],
+// [OpenFlagWrite], and so on) and with specific file attributes.
 func (cl *Client) OpenFile(remoteFile string, flags uint32, fa *FileAttrs) (fh *FileHandle, err error) {
 	var (
 		logp = "open"
@@ -386,7 +386,7 @@ func (cl *Client) Put(localFile, remoteFile string) (err error) {
 }
 
 // Read the remote file using handle on specific offset.
-// On end-of-file it will return empty data with io.EOF.
+// On end-of-file it will return empty data with [io.EOF].
 func (cl *Client) Read(fh *FileHandle, offset uint64) (data []byte, err error) {
 	var (
 		logp    = "Read"
