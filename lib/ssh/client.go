@@ -5,6 +5,7 @@
 package ssh
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -314,6 +315,43 @@ func (cl *Client) Execute(cmd string) (err error) {
 	sess.Close()
 
 	return err
+}
+
+// Output run the command and return its standard output and error as is.
+// Any other error beside standard error, like connection, will be returned
+// as error.
+func (cl *Client) Output(cmd string) (stdout, stderr []byte, err error) {
+	var logp = `Output`
+
+	var sess *ssh.Session
+
+	sess, err = cl.Client.NewSession()
+	if err != nil {
+		return nil, nil, fmt.Errorf(`%s %q: %w`, logp, cmd, err)
+	}
+
+	var k, v string
+	for k, v = range cl.section.Environments(cl.sysEnvs) {
+		err = sess.Setenv(k, v)
+		if err != nil {
+			log.Printf(`%s: Setenv %q=%q: %s`, logp, k, v, err)
+		}
+	}
+
+	var (
+		bufout bytes.Buffer
+		buferr bytes.Buffer
+	)
+	sess.Stdout = &bufout
+	sess.Stderr = &buferr
+
+	err = sess.Run(cmd)
+	sess.Close()
+	if err != nil {
+		return nil, nil, fmt.Errorf(`%s %q: %w`, logp, cmd, err)
+	}
+
+	return bufout.Bytes(), buferr.Bytes(), nil
 }
 
 // ScpGet copy file from remote into local storage using scp.
