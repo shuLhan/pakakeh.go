@@ -80,40 +80,40 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 	length += 4
 
 	if fa.flags&attrSize != 0 {
-		fa.size = binary.BigEndian.Uint64(payload)
+		fa.size = binary.BigEndian.Uint64(payload[:8])
 		payload = payload[8:]
 		length += 8
 	}
 	if fa.flags&attrUIDGID != 0 {
-		fa.uid = binary.BigEndian.Uint32(payload)
+		fa.uid = binary.BigEndian.Uint32(payload[:4])
 		payload = payload[4:]
 		length += 4
-		fa.gid = binary.BigEndian.Uint32(payload)
+		fa.gid = binary.BigEndian.Uint32(payload[:4])
 		payload = payload[4:]
 		length += 4
 	}
 	if fa.flags&attrPermissions != 0 {
-		fa.permissions = binary.BigEndian.Uint32(payload)
+		fa.permissions = binary.BigEndian.Uint32(payload[:4])
 		payload = payload[4:]
 		length += 4
 		fa.updateFsmode()
 	}
 	if fa.flags&attrAcModtime != 0 {
-		fa.atime = binary.BigEndian.Uint32(payload)
+		fa.atime = binary.BigEndian.Uint32(payload[:4])
 		payload = payload[4:]
 		length += 4
-		fa.mtime = binary.BigEndian.Uint32(payload)
+		fa.mtime = binary.BigEndian.Uint32(payload[:4])
 		payload = payload[4:]
 		length += 4
 	}
 	if fa.flags&attrExtended != 0 {
-		n := binary.BigEndian.Uint32(payload)
+		n := binary.BigEndian.Uint32(payload[:4])
 		payload = payload[4:]
 		length += 4
 
 		fa.exts = make(extensions, n)
 		for x := uint32(0); x < n; x++ {
-			size := binary.BigEndian.Uint32(payload)
+			size := binary.BigEndian.Uint32(payload[:4])
 			payload = payload[4:]
 			length += 4
 
@@ -121,7 +121,7 @@ func unpackFileAttrs(payload []byte) (fa *FileAttrs, length int) {
 			payload = payload[size:]
 			length += int(size)
 
-			size = binary.BigEndian.Uint32(payload)
+			size = binary.BigEndian.Uint32(payload[:4])
 			payload = payload[4:]
 			length += 4
 
