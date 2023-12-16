@@ -5,6 +5,7 @@
 package sftp
 
 import (
+	"io/fs"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -95,15 +96,146 @@ func TestClient_Mkdir(t *testing.T) {
 		t.Skipf("%s not set", envNameTestManual)
 	}
 
-	path := "/tmp/lib-ssh-sftp-mkdir"
-	err := testClient.Mkdir(path, nil)
-	if err != nil {
-		t.Fatal(err)
+	type testCase struct {
+		path     string
+		expError string
 	}
 
-	err = testClient.Rmdir(path)
-	if err != nil {
-		t.Fatal(err)
+	var cases = []testCase{{
+		path: `/tmp/lib-ssh-sftp-mkdir`,
+	}, {
+		path:     `/perm`,
+		expError: fs.ErrPermission.Error(),
+	}}
+
+	var (
+		c   testCase
+		err error
+	)
+
+	for _, c = range cases {
+		t.Log(c.path)
+
+		err = testClient.Mkdir(c.path, nil)
+		if err != nil {
+			test.Assert(t, `error`, c.expError, err.Error())
+			continue
+		}
+
+		err = testClient.Rmdir(c.path)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestClient_MkdirAll(t *testing.T) {
+	if !isTestManual {
+		t.Skipf(`%s not set`, envNameTestManual)
+	}
+
+	type testCase struct {
+		expStat  *FileAttrs
+		path     string
+		expError string
+	}
+
+	var cases = []testCase{{
+		path: `/tmp/a/b/c`,
+		expStat: &FileAttrs{
+			name:        `/tmp/a/b/c`,
+			fsMode:      fs.ModeDir | 0700,
+			flags:       attrSize | attrUIDGID | attrPermissions | attrAcModtime,
+			size:        40,
+			permissions: fileTypeDirectory | 0700,
+			uid:         1000,
+			gid:         1000,
+		},
+	}, {
+		// Creating the same directory should not return an error.
+		path: `/tmp/a/b/c`,
+		expStat: &FileAttrs{
+			name:        `/tmp/a/b/c`,
+			fsMode:      fs.ModeDir | 0700,
+			flags:       attrSize | attrUIDGID | attrPermissions | attrAcModtime,
+			size:        40,
+			permissions: fileTypeDirectory | 0700,
+			uid:         1000,
+			gid:         1000,
+		},
+	}, {
+		path: ``,
+		expStat: &FileAttrs{
+			name:        `.`,
+			fsMode:      fs.ModeDir | 0755,
+			flags:       attrSize | attrUIDGID | attrPermissions | attrAcModtime,
+			size:        4096,
+			permissions: fileTypeDirectory | 0755,
+			uid:         1000,
+			gid:         33,
+		},
+	}, {
+		path: `.cache/a/b/c`,
+		expStat: &FileAttrs{
+			name:        `.cache/a/b/c`,
+			fsMode:      fs.ModeDir | 0700,
+			flags:       attrSize | attrUIDGID | attrPermissions | attrAcModtime,
+			size:        4096,
+			permissions: fileTypeDirectory | 0700,
+			uid:         1000,
+			gid:         1000,
+		},
+	}, {
+		// Creating the same directory should not return an error.
+		path: `.cache/a/b/c`,
+		expStat: &FileAttrs{
+			name:        `.cache/a/b/c`,
+			fsMode:      fs.ModeDir | 0700,
+			flags:       attrSize | attrUIDGID | attrPermissions | attrAcModtime,
+			size:        4096,
+			permissions: fileTypeDirectory | 0700,
+			uid:         1000,
+			gid:         1000,
+		},
+	}, {
+		path: `.cache/a b/c`,
+		expStat: &FileAttrs{
+			name:        `.cache/a b/c`,
+			fsMode:      fs.ModeDir | 0700,
+			flags:       attrSize | attrUIDGID | attrPermissions | attrAcModtime,
+			size:        4096,
+			permissions: fileTypeDirectory | 0700,
+			uid:         1000,
+			gid:         1000,
+		},
+	}}
+
+	var (
+		c       testCase
+		gotStat *FileAttrs
+		err     error
+	)
+
+	for _, c = range cases {
+		t.Log(c.path)
+
+		err = testClient.MkdirAll(c.path, nil)
+		if err != nil {
+			test.Assert(t, `error`, c.expError, err.Error())
+			continue
+		}
+
+		gotStat, err = testClient.Stat(c.path)
+		if err != nil {
+			test.Assert(t, `error`, c.expError, err.Error())
+			continue
+		}
+
+		// Exclude access and modification times from being checked.
+		gotStat.atime = 0
+		gotStat.mtime = 0
+
+		test.Assert(t, `Stat `+c.path, c.expStat, gotStat)
 	}
 }
 

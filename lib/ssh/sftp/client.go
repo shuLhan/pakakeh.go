@@ -10,6 +10,8 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path"
+	"strings"
 	"sync"
 	"time"
 
@@ -269,6 +271,78 @@ func (cl *Client) Mkdir(path string, fa *FileAttrs) (err error) {
 	}
 	if res.code != statusCodeOK {
 		return handleStatusCode(res.code, res.message)
+	}
+	return nil
+}
+
+// MkdirAll create directory on the server, from left to right.
+// Each directory is separated by '/', where the left part is the parent of
+// the right part.
+// This method is similar to [os.MkdirAll].
+//
+// Note that using `~` as home directory is not working.
+// If you want to create directory under home, use relative path, for
+// example "a/b/c" will create directory "~/a/b/c".
+func (cl *Client) MkdirAll(dir string, fa *FileAttrs) (err error) {
+	var logp = `MkdirAll`
+
+	if fa == nil {
+		fa = newFileAttrs()
+		fa.SetPermissions(0700)
+	}
+
+	dir = path.Clean(dir)
+	var (
+		listDir = strings.Split(dir, `/`)
+
+		req     *packet
+		res     *packet
+		lastErr error
+		item    string
+		payload []byte
+	)
+	dir = ``
+	for _, item = range listDir {
+		if item == `` && len(listDir) > 1 {
+			// The first item of "/a/b" in [strings.Split] is
+			// empty, which indicate the root.
+			item = `/`
+		}
+		dir = path.Join(dir, item)
+		if dir == `/` {
+			// Skip creating root, since it should be already
+			// exist.
+			continue
+		}
+		if dir == `` {
+			// Skip creating home directory, since it should be
+			// already exist.
+			continue
+		}
+
+		req = cl.generatePacket()
+		payload = req.fxpMkdir(dir, fa)
+
+		res, err = cl.send(payload)
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
+		}
+		if res.kind != packetKindFxpStatus {
+			return errUnexpectedResponse(packetKindFxpStatus, res.kind)
+		}
+		if res.code != statusCodeOK {
+			if res.code == statusCodeFailure {
+				// Directory may already exist but its
+				// returned as failure, keep going.
+				continue
+			}
+			lastErr = handleStatusCode(res.code, res.message)
+		}
+		// Reset last error if its success.
+		lastErr = nil
+	}
+	if lastErr != nil {
+		return lastErr
 	}
 	return nil
 }
