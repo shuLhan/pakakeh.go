@@ -580,7 +580,13 @@ func (cl *Client) Setstat(remoteFile string, fa *FileAttrs) (err error) {
 
 // Stat get the file attributes based on the remote file path.
 // This method follow symbolic links.
+//
+// To stat the user's home directory pass empty string or '.' in remoteFile
+// parameter.
 func (cl *Client) Stat(remoteFile string) (fa *FileAttrs, err error) {
+	if remoteFile == `` {
+		remoteFile = `.`
+	}
 	var (
 		logp    = "Stat"
 		req     = cl.generatePacket()
