@@ -16,20 +16,6 @@ func ExampleMicrosecond() {
 	//123456
 }
 
-func ExampleUnixMicro() {
-	nano := time.Unix(1612331000, 123456789)
-	fmt.Printf("%d", UnixMicro(&nano))
-	//Output:
-	//1612331000123456
-}
-
-func ExampleUnixMilli() {
-	nano := time.Unix(1612331000, 123456789)
-	fmt.Printf("%d", UnixMilli(nano))
-	//Output:
-	//1612331000123
-}
-
 func ExampleUnixMilliString() {
 	nano := time.Unix(1612331000, 123456789)
 	fmt.Printf("%s", UnixMilliString(nano))

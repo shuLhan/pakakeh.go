@@ -41,26 +41,13 @@ var ShortMonths = map[string]time.Month{
 // For example, if the unix nano seconds is 1612331218913557000 then the micro
 // second value is 913557.
 //
-// To get the unix microsecond use UnixMicro().
+// To get the unix microsecond use [time.Time.UnixMicro].
 func Microsecond(t *time.Time) int64 {
 	seconds := t.Unix() * int64(time.Second)
 	return (t.UnixNano() - seconds) / int64(time.Microsecond)
 }
 
-// UnixMicro returns t as a Unix time in microsecond.
-// For example, if the unix nano seconds is 1612331218913557000 then the
-// UnixMicro value is 1612331218913557.
-func UnixMicro(t *time.Time) int64 {
-	return t.UnixNano() / int64(time.Microsecond)
-}
-
-// UnixMilli returns t as a Unix time, the number of milliseconds elapsed
-// since January 1, 1970 UTC.
-func UnixMilli(t time.Time) int64 {
-	return t.UnixNano() / int64(time.Millisecond)
-}
-
 // UnixMilliString returns the UnixMilli() as string.
 func UnixMilliString(t time.Time) string {
-	return strconv.FormatInt(UnixMilli(t), 10)
+	return strconv.FormatInt(t.UnixMilli(), 10)
 }
