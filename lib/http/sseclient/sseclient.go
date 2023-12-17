@@ -71,10 +71,10 @@ type Client struct {
 	// before reconnecting back to server after disconnect.
 	// Zero or negative value disable it.
 	//
-	// This field is optional, default to 0, not retrying.
+	// This field is optional, default to 0 (not retrying).
 	Retry time.Duration
 
-	// Insecure allow connect to HTTPS Endpoint with invalid
+	// Insecure allow connect to HTTPS endpoint with invalid
 	// certificate.
 	Insecure bool
 }
@@ -442,7 +442,7 @@ func (cl *Client) parseEvent(raw []byte) {
 			var retry int64
 			retry, err = strconv.ParseInt(string(fval), 10, 64)
 			if err == nil {
-				cl.Retry = time.Duration(retry)
+				cl.Retry = time.Duration(retry) * time.Millisecond
 			}
 		default:
 			// Ignore the field.
