@@ -300,52 +300,50 @@ func (cl *Client) handshakeRequest() (err error) {
 
 func (cl *Client) consume() {
 	var (
-		data []byte
-		err  error
+		timeWait  *time.Timer
+		data      []byte
+		err       error
+		connected bool
 	)
 	for {
 		data, err = libnet.Read(cl.conn, 0, cl.Timeout)
-		if err != nil {
-			if cl.Retry <= 0 {
-				return
-			}
-
-			// Check if this user Close or not.
-			var timeWait = time.NewTimer(50 * time.Millisecond)
+		if err == nil {
+			cl.parseEvent(data)
+			continue
+		}
+		if cl.Retry <= 0 {
+			// Set timeout to check if connection Close-d
+			// by user.
+			timeWait = time.NewTimer(100 * time.Millisecond)
+		} else {
+			timeWait = time.NewTimer(cl.Retry)
+		}
+		connected = false
+		for !connected {
 			select {
+			case <-timeWait.C:
+				if cl.Retry <= 0 {
+					// Retry actually not set,
+					// we close connection here.
+					_ = cl.conn.Close()
+					cl.conn = nil
+					return
+				}
+
+				err = cl.connect()
+				if err != nil {
+					timeWait.Reset(cl.Retry)
+					continue
+				}
+				connected = true
 			case <-cl.closeq:
 				// User initiated close.
 				if !timeWait.Stop() {
 					<-timeWait.C
 				}
 				return
-			case <-timeWait.C:
-				_ = cl.conn.Close()
-				cl.conn = nil
-				// Not from user, try to re-connect.
-			}
-
-			var connected bool
-			timeWait = time.NewTimer(cl.Retry)
-			for !connected {
-				select {
-				case <-timeWait.C:
-					err = cl.connect()
-					if err != nil {
-						timeWait.Reset(cl.Retry)
-						continue
-					}
-					connected = true
-				case <-cl.closeq:
-					// User initiated close.
-					if !timeWait.Stop() {
-						<-timeWait.C
-					}
-					return
-				}
 			}
 		}
-		cl.parseEvent(data)
 	}
 }
 
