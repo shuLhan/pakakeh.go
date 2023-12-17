@@ -123,7 +123,7 @@ type Scheduler struct {
 func NewScheduler(schedule string) (sch *Scheduler, err error) {
 	var (
 		logp = `NewScheduler`
-		now  = Now().UTC()
+		now  = timeNow().UTC()
 	)
 
 	sch, err = newScheduler(schedule, now)
@@ -574,7 +574,7 @@ func (sch *Scheduler) run() {
 			// receiving the event.
 			var now = sch.next
 
-			sch.calcNext(Now().UTC())
+			sch.calcNext(timeNow().UTC())
 			ticker.Reset(sch.nextDuration)
 
 			select {

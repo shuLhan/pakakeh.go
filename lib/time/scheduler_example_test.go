@@ -1,25 +1,23 @@
-package time_test
+package time
 
 import (
 	"fmt"
 	"log"
 	"time"
-
-	libtime "github.com/shuLhan/share/lib/time"
 )
 
 func ExampleScheduler_Next() {
-	// Override Now for making this example works.
-	libtime.Now = func() time.Time {
+	// Override timeNow to make this example works.
+	timeNow = func() time.Time {
 		return time.Date(2013, time.January, 20, 14, 26, 59, 0, time.UTC)
 	}
 
 	var (
-		sch *libtime.Scheduler
+		sch *Scheduler
 		err error
 	)
 
-	sch, err = libtime.NewScheduler(`minutely`)
+	sch, err = NewScheduler(`minutely`)
 	if err != nil {
 		log.Fatal(err)
 	}

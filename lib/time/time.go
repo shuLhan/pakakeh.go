@@ -10,10 +10,10 @@ import (
 	"time"
 )
 
-// Now returns the current local time.
-// Unlike standard library, this is a variable that can be override to mock
-// the current time during testing.
-var Now = func() time.Time {
+// timeNow returns the current local time.
+// This is a variable that can be override to mock the current time during
+// testing.
+var timeNow = func() time.Time {
 	return time.Now()
 }
 

@@ -20,7 +20,7 @@ func TestNewScheduler(t *testing.T) {
 		err  error
 	)
 
-	Now = func() (now time.Time) {
+	timeNow = func() (now time.Time) {
 		switch step {
 		case 0:
 			step++
