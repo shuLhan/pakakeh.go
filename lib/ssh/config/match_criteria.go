@@ -4,7 +4,11 @@
 
 package config
 
-import "strings"
+import (
+	"bytes"
+	"io"
+	"strings"
+)
 
 const (
 	criteriaAll          = "all"
@@ -45,6 +49,41 @@ func newMatchCriteria(name, arg string) (criteria *matchCriteria, err error) {
 	}
 
 	return criteria, nil
+}
+
+// MarshalText encode the criteria back to ssh_config format.
+func (mcriteria *matchCriteria) MarshalText() (text []byte, err error) {
+	var buf bytes.Buffer
+
+	if mcriteria.isNegate {
+		buf.WriteByte('!')
+	}
+	buf.WriteString(mcriteria.name)
+
+	var (
+		pat *pattern
+		x   int
+	)
+	for x, pat = range mcriteria.patterns {
+		if x == 0 {
+			buf.WriteByte(' ')
+		} else {
+			buf.WriteByte(',')
+		}
+		pat.WriteTo(&buf)
+	}
+
+	return buf.Bytes(), nil
+}
+
+// WriteTo marshal the matchCriteria into text and write it to w.
+func (mcriteria *matchCriteria) WriteTo(w io.Writer) (n int64, err error) {
+	var text []byte
+	text, _ = mcriteria.MarshalText()
+
+	var c int
+	c, err = w.Write(text)
+	return int64(c), err
 }
 
 func (mcriteria *matchCriteria) isMatch(s string) bool {

@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	errCriteriaAll = errors.New(`the "all" criteria must appear alone` +
-		` or immediately after "canonical" or "final`)
+	errCriteriaAll = errors.New(`the "all" criteria must appear alone or immediately after "canonical" or "final`)
 )
 
 // newSectionMatch create new Match section using one or more criteria or the
@@ -65,7 +64,7 @@ func newSectionMatch(rawPattern string) (match *Section, err error) {
 			criteria, err = newMatchCriteria(token, arg)
 			x++
 		default:
-			return nil, fmt.Errorf("unknown criteria %q", token)
+			err = fmt.Errorf(`unknown criteria %q`, token)
 		}
 		if err != nil {
 			return nil, err

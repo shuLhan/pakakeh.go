@@ -5,10 +5,13 @@
 package config
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -215,6 +218,7 @@ type Section struct {
 	// Criteria for Match section.
 	criteria []*matchCriteria
 
+	// If true indicated that this is Match section.
 	useCriteria bool
 }
 
@@ -568,6 +572,86 @@ func (section *Section) UserKnownHostsFile() []string {
 		return defaultUserKnownHostsFile()
 	}
 	return section.knownHostsFile
+}
+
+// MarshalText encode the Section back to ssh_config format.
+// The key is indented by two spaces.
+func (section *Section) MarshalText() (text []byte, err error) {
+	var buf bytes.Buffer
+
+	if section.useCriteria {
+		buf.WriteString(`Match`)
+
+		var criteria *matchCriteria
+		for _, criteria = range section.criteria {
+			buf.WriteByte(' ')
+			criteria.WriteTo(&buf)
+		}
+	} else {
+		buf.WriteString(`Host`)
+
+		if len(section.patterns) == 0 {
+			buf.WriteByte(' ')
+			buf.WriteString(section.name)
+		} else {
+			var pat *pattern
+			for _, pat = range section.patterns {
+				buf.WriteByte(' ')
+				pat.WriteTo(&buf)
+			}
+		}
+	}
+	buf.WriteByte('\n')
+
+	var (
+		listKey = make([]string, 0, len(section.Field))
+		key     string
+		val     string
+	)
+	for key = range section.Field {
+		listKey = append(listKey, key)
+	}
+	sort.Strings(listKey)
+
+	for _, key = range listKey {
+		if key == KeyIdentityFile {
+			for _, val = range section.IdentityFile {
+				buf.WriteString(`  `)
+				buf.WriteString(key)
+				buf.WriteByte(' ')
+				buf.WriteString(section.pathUnfold(val))
+				buf.WriteByte('\n')
+			}
+			continue
+		}
+
+		buf.WriteString(`  `)
+		buf.WriteString(key)
+		buf.WriteByte(' ')
+		buf.WriteString(section.Field[key])
+		buf.WriteByte('\n')
+	}
+
+	return buf.Bytes(), nil
+}
+
+// WriteTo marshal the Section into text and write it to w.
+func (section *Section) WriteTo(w io.Writer) (n int64, err error) {
+	var text []byte
+	text, _ = section.MarshalText()
+
+	var c int
+	c, err = w.Write(text)
+	return int64(c), err
+}
+
+// pathUnfold replace the home directory prefix with '~'.
+func (section *Section) pathUnfold(in string) (out string) {
+	if !strings.HasPrefix(in, section.homeDir) {
+		return in
+	}
+	out = `~` + in[len(section.homeDir):]
+	return out
 }
 
 // setEnv set the Environments with key and value of format "KEY=VALUE".

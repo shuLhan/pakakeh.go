@@ -222,10 +222,10 @@ func readLines(file string) (lines []string, err error) {
 }
 
 // parseArgs split single line arguments into list of string, separated by
-// `sep` (default to space), grouped by double quote.
+// sep (default to space), grouped by double quote.
 //
-// For example, given raw argument `a "b c" d` it would return "a", "b c", and
-// "d".
+// For example, given raw argument `a "b c" d` it would return
+// ["a" "b c" "d"].
 func parseArgs(raw string, sep byte) (args []string) {
 	raw = strings.TrimSpace(raw)
 	if len(raw) == 0 {
