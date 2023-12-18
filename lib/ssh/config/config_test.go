@@ -89,6 +89,10 @@ func TestConfigGet(t *testing.T) {
 	}, {
 		name: `foo.local`,
 		exp:  string(tdata.Output[`foo.local`]),
+	}, {
+		// With Hostname key not set but match Host wildcard.
+		name: `my.foo.local`,
+		exp:  string(tdata.Output[`my.foo.local`]),
 	}}
 
 	var (

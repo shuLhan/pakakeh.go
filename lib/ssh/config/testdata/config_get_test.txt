@@ -41,3 +41,14 @@ Host foo.local
   port 22
   user allfoo
   xauthlocation /usr/X11R6/bin/xauth
+
+<<< my.foo.local
+Host my.foo.local
+  challengeresponseauthentication yes
+  checkhostip yes
+  connectionattempts 1
+  hostname my.foo.local
+  identityfile ~/.ssh/allfoo
+  port 22
+  user allfoo
+  xauthlocation /usr/X11R6/bin/xauth

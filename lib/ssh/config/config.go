@@ -124,6 +124,11 @@ func (cfg *Config) Get(s string) (section *Section) {
 		}
 	}
 	section.init(cfg.workDir, cfg.homeDir)
+
+	if s != `` && section.Field[KeyHostname] == `` {
+		section.Set(KeyHostname, s)
+	}
+
 	return section
 }
 
