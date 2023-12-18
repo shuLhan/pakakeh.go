@@ -1,0 +1,43 @@
+Test output for [Section.Get].
+
+<<< empty
+Host *
+  challengeresponseauthentication yes
+  checkhostip yes
+  connectionattempts 1
+  port 22
+  xauthlocation /usr/X11R6/bin/xauth
+
+<<< example.local
+Host example.local
+  challengeresponseauthentication yes
+  checkhostip yes
+  connectionattempts 1
+  hostname 127.0.0.1
+  identityfile ~/.ssh/notexist
+  port 22
+  user test
+  xauthlocation /usr/X11R6/bin/xauth
+
+<<< my.example.local
+Host my.example.local
+  challengeresponseauthentication yes
+  checkhostip yes
+  connectionattempts 1
+  hostname 127.0.0.2
+  identityfile ~/.ssh/notexist
+  port 22
+  user wildcard
+  xauthlocation /usr/X11R6/bin/xauth
+
+<<< foo.local
+Host foo.local
+  challengeresponseauthentication yes
+  checkhostip yes
+  connectionattempts 1
+  hostname 127.0.0.3
+  identityfile ~/.ssh/foo
+  identityfile ~/.ssh/allfoo
+  port 22
+  user allfoo
+  xauthlocation /usr/X11R6/bin/xauth

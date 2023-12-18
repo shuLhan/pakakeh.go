@@ -5,9 +5,9 @@
 package config
 
 import (
+	"bytes"
 	"log"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/shuLhan/share/lib/test"
@@ -54,99 +54,53 @@ func TestPatternToRegex(t *testing.T) {
 	}
 }
 
-func TestConfig_Get(t *testing.T) {
+func TestConfigGet(t *testing.T) {
 	type testCase struct {
-		exp func() Section
-		s   string
+		name string
+		exp  string
 	}
 
 	var (
-		cfg *Config
-		err error
+		tdata *test.Data
+		err   error
 	)
+
+	tdata, err = test.LoadData(`testdata/config_get_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var cfg *Config
 
 	cfg, err = Load(`./testdata/config`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var listTestCase = []testCase{{
-		s: ``,
-		exp: func() Section {
-			var sec = *testDefaultSection
-			return sec
-		},
+	var cases = []testCase{{
+		name: ``,
+		exp:  string(tdata.Output[`empty`]),
 	}, {
-		s: `example.local`,
-		exp: func() Section {
-			var sec = *testDefaultSection
-			sec.name = `example.local`
-			sec.IdentityFile = []string{
-				filepath.Join(testDefaultSection.homeDir, `.ssh`, `notexist`),
-			}
-			sec.Field = map[string]string{
-				KeyChallengeResponseAuthentication: ValueYes,
-				KeyCheckHostIP:                     ValueYes,
-				KeyConnectionAttempts:              DefConnectionAttempts,
-				KeyHostname:                        `127.0.0.1`,
-				KeyIdentityFile:                    `~/.ssh/notexist`,
-				KeyPort:                            DefPort,
-				KeyUser:                            `test`,
-				KeyXAuthLocation:                   DefXAuthLocation,
-			}
-			return sec
-		},
+		name: `example.local`,
+		exp:  string(tdata.Output[`example.local`]),
 	}, {
-		s: `my.example.local`,
-		exp: func() Section {
-			var sec = *testDefaultSection
-			sec.name = `my.example.local`
-			sec.IdentityFile = []string{
-				filepath.Join(testDefaultSection.homeDir, `.ssh`, `notexist`),
-			}
-			sec.Field = map[string]string{
-				KeyChallengeResponseAuthentication: ValueYes,
-				KeyCheckHostIP:                     ValueYes,
-				KeyConnectionAttempts:              DefConnectionAttempts,
-				KeyHostname:                        `127.0.0.2`,
-				KeyIdentityFile:                    `~/.ssh/notexist`,
-				KeyPort:                            DefPort,
-				KeyUser:                            `wildcard`,
-				KeyXAuthLocation:                   DefXAuthLocation,
-			}
-			return sec
-		},
+		name: `my.example.local`,
+		exp:  string(tdata.Output[`my.example.local`]),
 	}, {
-		s: `foo.local`,
-		exp: func() Section {
-			var sec = *testDefaultSection
-			sec.name = `foo.local`
-			sec.IdentityFile = []string{
-				filepath.Join(testDefaultSection.homeDir, `.ssh`, `foo`),
-				filepath.Join(testDefaultSection.homeDir, `.ssh`, `allfoo`),
-			}
-			sec.Field = map[string]string{
-				KeyChallengeResponseAuthentication: ValueYes,
-				KeyCheckHostIP:                     ValueYes,
-				KeyConnectionAttempts:              DefConnectionAttempts,
-				KeyHostname:                        `127.0.0.3`,
-				KeyPort:                            DefPort,
-				KeyUser:                            `allfoo`,
-				KeyIdentityFile:                    `~/.ssh/allfoo`,
-				KeyXAuthLocation:                   DefXAuthLocation,
-			}
-			return sec
-		},
+		name: `foo.local`,
+		exp:  string(tdata.Output[`foo.local`]),
 	}}
 
 	var (
-		c   testCase
-		got *Section
+		section *Section
+		buf     bytes.Buffer
+		c       testCase
 	)
-
-	for _, c = range listTestCase {
-		got = cfg.Get(c.s)
-		test.Assert(t, c.s, c.exp(), *got)
+	for _, c = range cases {
+		section = cfg.Get(c.name)
+		buf.Reset()
+		section.WriteTo(&buf)
+		test.Assert(t, c.name, c.exp, buf.String())
 	}
 }
 
