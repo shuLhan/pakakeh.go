@@ -43,7 +43,7 @@ func TestParseCriteriaAll(t *testing.T) {
 	}{{
 		raw: "all ",
 		exp: func(exp Section) *Section {
-			exp.name = `all `
+			exp.name = `all`
 			exp.criteria = []*matchCriteria{{
 				name: criteriaAll,
 			}}

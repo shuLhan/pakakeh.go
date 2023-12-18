@@ -224,6 +224,11 @@ type Section struct {
 
 // NewSection create new Host or Match with default values.
 func NewSection(name string) *Section {
+	name = strings.TrimSpace(name)
+	if len(name) == 0 {
+		name = `*`
+	}
+
 	return &Section{
 		Field: map[string]string{
 			KeyChallengeResponseAuthentication: ValueYes,
