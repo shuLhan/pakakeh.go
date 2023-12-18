@@ -50,6 +50,8 @@ func newSectionMatch(rawPattern string) (match *Section, err error) {
 		if token[0] == '!' {
 			isNegate = true
 			token = token[1:]
+		} else {
+			isNegate = false
 		}
 
 		switch token {
