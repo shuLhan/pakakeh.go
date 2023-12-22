@@ -6,6 +6,7 @@ package ssh
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -291,7 +292,7 @@ func (cl *Client) Close() (err error) {
 }
 
 // Execute a command on remote server.
-func (cl *Client) Execute(cmd string) (err error) {
+func (cl *Client) Execute(ctx context.Context, cmd string) (err error) {
 	sess, err := cl.Client.NewSession()
 	if err != nil {
 		return fmt.Errorf("ssh: NewSession: " + err.Error())
@@ -307,7 +308,7 @@ func (cl *Client) Execute(cmd string) (err error) {
 		}
 	}
 
-	err = sess.Run(cmd)
+	err = sess.RunWithContext(ctx, cmd)
 	if err != nil {
 		err = fmt.Errorf("ssh: Run %q: %s", cmd, err.Error())
 	}
