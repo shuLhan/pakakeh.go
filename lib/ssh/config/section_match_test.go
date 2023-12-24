@@ -29,7 +29,7 @@ func TestNewSectionMatch(t *testing.T) {
 			}
 			continue
 		}
-		got.init(testParser.workDir, testParser.homeDir)
+		got.setDefaults(testParser.workDir, testParser.homeDir)
 
 		test.Assert(t, c.raw, *c.exp, *got)
 	}
@@ -92,7 +92,7 @@ func TestParseCriteriaAll(t *testing.T) {
 			}
 			continue
 		}
-		got.init(testParser.workDir, testParser.homeDir)
+		got.setDefaults(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.raw, *exp, *got)
@@ -137,7 +137,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 			}
 			continue
 		}
-		got.init(testParser.workDir, testParser.homeDir)
+		got.setDefaults(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.raw, *exp, *got)
@@ -206,7 +206,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 			}
 			continue
 		}
-		got.init(testParser.workDir, testParser.homeDir)
+		got.setDefaults(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.raw, *exp, *got)

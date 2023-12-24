@@ -54,14 +54,14 @@ func TestNewSectionHost(t *testing.T) {
 
 	for _, c := range cases {
 		got := newSectionHost(c.rawPattern)
-		got.init(testParser.workDir, testParser.homeDir)
+		got.setDefaults(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.rawPattern, *exp, *got)
 	}
 }
 
-func TestSection_init(t *testing.T) {
+func TestSectionSetDefaults(t *testing.T) {
 	cases := []struct {
 		section func(def Section) *Section
 		exp     func(def Section) *Section
@@ -81,10 +81,10 @@ func TestSection_init(t *testing.T) {
 	}}
 	for _, c := range cases {
 		got := c.section(*testDefaultSection)
-		got.init(testParser.workDir, testParser.homeDir)
+		got.setDefaults(testParser.workDir, testParser.homeDir)
 
 		exp := c.exp(*testDefaultSection)
-		test.Assert(t, `init`, exp.IdentityFile, got.IdentityFile)
+		test.Assert(t, `setDefaults`, exp.IdentityFile, got.IdentityFile)
 	}
 }
 

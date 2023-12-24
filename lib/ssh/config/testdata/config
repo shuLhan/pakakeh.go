@@ -12,6 +12,7 @@ Host *.example.local
 
 Host foo.local
 	Hostname 127.0.0.3
+	Port 28022
 	User foo
 	IdentityFile ~/.ssh/foo
 

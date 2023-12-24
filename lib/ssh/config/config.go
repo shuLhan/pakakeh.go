@@ -78,14 +78,12 @@ func Load(file string) (cfg *Config, err error) {
 		switch key {
 		case keyHost:
 			if section != nil {
-				section.init(p.workDir, p.homeDir)
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
 			section = newSectionHost(value)
 		case keyMatch:
 			if section != nil {
-				section.init(p.workDir, p.homeDir)
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
@@ -105,7 +103,6 @@ func Load(file string) (cfg *Config, err error) {
 		}
 	}
 	if section != nil {
-		section.init(p.workDir, p.homeDir)
 		cfg.sections = append(cfg.sections, section)
 		section = nil
 	}
@@ -123,7 +120,7 @@ func (cfg *Config) Get(s string) (section *Section) {
 			section.mergeField(hostMatch)
 		}
 	}
-	section.init(cfg.workDir, cfg.homeDir)
+	section.setDefaults(cfg.workDir, cfg.homeDir)
 
 	if s != `` && section.Field[KeyHostname] == `` {
 		section.Set(KeyHostname, s)

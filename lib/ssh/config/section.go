@@ -153,6 +153,15 @@ const (
 	DefXAuthLocation      = `/usr/X11R6/bin/xauth`
 )
 
+// defaultFields define default field value for known key.
+var defaultFields = map[string]string{
+	KeyChallengeResponseAuthentication: ValueYes,
+	KeyCheckHostIP:                     ValueYes,
+	KeyConnectionAttempts:              DefConnectionAttempts,
+	KeyPort:                            DefPort,
+	KeyXAuthLocation:                   DefXAuthLocation,
+}
+
 // defaultCASignatureAlgorithms return list of default signature algorithms
 // that client supported.
 func defaultCASignatureAlgorithms() []string {
@@ -222,7 +231,7 @@ type Section struct {
 	useCriteria bool
 }
 
-// NewSection create new Host or Match with default values.
+// NewSection create an empty Host or Match section.
 func NewSection(name string) *Section {
 	name = strings.TrimSpace(name)
 	if len(name) == 0 {
@@ -230,15 +239,9 @@ func NewSection(name string) *Section {
 	}
 
 	return &Section{
-		Field: map[string]string{
-			KeyChallengeResponseAuthentication: ValueYes,
-			KeyCheckHostIP:                     ValueYes,
-			KeyConnectionAttempts:              DefConnectionAttempts,
-			KeyPort:                            DefPort,
-			KeyXAuthLocation:                   DefXAuthLocation,
-		},
-		env:  map[string]string{},
-		name: name,
+		Field: map[string]string{},
+		env:   map[string]string{},
+		name:  name,
 	}
 }
 
@@ -461,8 +464,8 @@ func (section *Section) isMatch(s string) bool {
 	return false
 }
 
-// init check, parse, and expand all of the fields values.
-func (section *Section) init(workDir, homeDir string) {
+// setDefaults set and expand all of the fields values if its not set.
+func (section *Section) setDefaults(workDir, homeDir string) {
 	section.homeDir = homeDir
 	section.WorkingDir = workDir
 
@@ -473,6 +476,18 @@ func (section *Section) init(workDir, homeDir string) {
 	for x, identFile := range section.IdentityFile {
 		if identFile[0] == '~' {
 			section.IdentityFile[x] = strings.Replace(identFile, "~", section.homeDir, 1)
+		}
+	}
+
+	var (
+		key   string
+		val   string
+		exist bool
+	)
+	for key, val = range defaultFields {
+		_, exist = section.Field[key]
+		if !exist {
+			section.Field[key] = val
 		}
 	}
 }

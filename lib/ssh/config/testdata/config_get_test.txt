@@ -38,7 +38,7 @@ Host foo.local
   hostname 127.0.0.3
   identityfile ~/.ssh/foo
   identityfile ~/.ssh/allfoo
-  port 22
+  port 28022
   user allfoo
   xauthlocation /usr/X11R6/bin/xauth
 
