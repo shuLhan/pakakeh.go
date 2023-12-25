@@ -206,6 +206,9 @@ type Section struct {
 	// name contains the raw value after Host or Match.
 	name string
 
+	// dir store the path to the "config" directory.
+	dir string
+
 	// WorkingDir contains the directory where the SSH client started.
 	// This value is required when client want to copy file from/to
 	// remote.
@@ -248,6 +251,7 @@ func NewSection(cfg *Config, name string) (section *Section) {
 	}
 
 	if cfg != nil {
+		section.dir = cfg.dir
 		section.homeDir = cfg.homeDir
 		section.WorkingDir = cfg.workDir
 	}
@@ -481,11 +485,20 @@ func (section *Section) setDefaults() {
 	if len(section.IdentityFile) == 0 {
 		section.IdentityFile = defaultIdentityFile()
 	}
+	var (
+		file string
+		x    int
+	)
+	for x, file = range section.IdentityFile {
+		section.IdentityFile[x] = section.pathUnfold(file)
+	}
 
-	for x, identFile := range section.IdentityFile {
-		if identFile[0] == '~' {
-			section.IdentityFile[x] = strings.Replace(identFile, "~", section.homeDir, 1)
-		}
+	// Set and expand the UserKnownHostsFile.
+	if len(section.knownHostsFile) == 0 {
+		section.knownHostsFile = defaultUserKnownHostsFile()
+	}
+	for x, file = range section.knownHostsFile {
+		section.knownHostsFile[x] = section.pathUnfold(file)
 	}
 
 	var (
@@ -597,9 +610,6 @@ func (section *Section) User() string {
 // UserKnownHostsFile return list of user known_hosts file set in this
 // Section.
 func (section *Section) UserKnownHostsFile() []string {
-	if len(section.knownHostsFile) == 0 {
-		return defaultUserKnownHostsFile()
-	}
 	return section.knownHostsFile
 }
 
@@ -648,7 +658,7 @@ func (section *Section) MarshalText() (text []byte, err error) {
 				buf.WriteString(`  `)
 				buf.WriteString(key)
 				buf.WriteByte(' ')
-				buf.WriteString(section.pathUnfold(val))
+				buf.WriteString(section.pathFold(val))
 				buf.WriteByte('\n')
 			}
 			continue
@@ -674,13 +684,31 @@ func (section *Section) WriteTo(w io.Writer) (n int64, err error) {
 	return int64(c), err
 }
 
-// pathUnfold replace the home directory prefix with '~'.
-func (section *Section) pathUnfold(in string) (out string) {
+// pathFold replace the home directory prefix with '~'.
+func (section *Section) pathFold(in string) (out string) {
 	if !strings.HasPrefix(in, section.homeDir) {
 		return in
 	}
 	out = `~` + in[len(section.homeDir):]
 	return out
+}
+
+// pathUnfold expand the file to make it absolute.
+// If the file prefixed with '~', it will expanded into home directory.
+// If the file is relative (does not start with '/'), it will expanded based
+// on the "config" directory.
+func (section *Section) pathUnfold(in string) string {
+	if len(in) == 0 {
+		return in
+	}
+	if in[0] == '/' {
+		return in
+	}
+	if in[0] == '~' {
+		return filepath.Join(section.homeDir, in[1:])
+	}
+	// The path in is relative to the "config" directory.
+	return filepath.Join(section.dir, in)
 }
 
 // setEnv set the Environments with key and value of format "KEY=VALUE".

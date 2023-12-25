@@ -15,6 +15,7 @@ Host foo.local
 	Port 28022
 	User foo
 	IdentityFile ~/.ssh/foo
+	UserKnownHostsFile known_hosts
 
 ## Override the foo.local using wildcard.
 Host *foo.local

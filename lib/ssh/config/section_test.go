@@ -156,7 +156,7 @@ func TestSection_UserKnownHostsFile(t *testing.T) {
 	}
 
 	var listCase = []testCase{{
-		exp: defaultUserKnownHostsFile(),
+		value: ``,
 	}, {
 		value: `~/.ssh/myhost ~/.ssh/myhost2`,
 		exp: []string{

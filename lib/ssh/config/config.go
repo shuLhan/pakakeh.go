@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -30,6 +31,9 @@ var (
 type Config struct {
 	envs map[string]string
 
+	// dir store the path to the "config" directory.
+	dir string
+
 	// workDir store the current working directory.
 	workDir string
 
@@ -41,6 +45,12 @@ type Config struct {
 // newConfig create new SSH Config instance from file.
 func newConfig(file string) (cfg *Config, err error) {
 	cfg = &Config{}
+
+	// If file is empty, the dir is set to ".".
+	cfg.dir, err = filepath.Abs(filepath.Dir(file))
+	if err != nil {
+		return nil, err
+	}
 
 	cfg.workDir, err = os.Getwd()
 	if err != nil {
@@ -161,8 +171,7 @@ func (cfg *Config) Get(host string) (section *Section) {
 // This function can be useful if we want to load another SSH config file
 // without using Include directive.
 func (cfg *Config) Prepend(other *Config) {
-	newSections := make([]*Section, 0,
-		len(cfg.sections)+len(other.sections))
+	newSections := make([]*Section, 0, len(cfg.sections)+len(other.sections))
 	newSections = append(newSections, other.sections...)
 	newSections = append(newSections, cfg.sections...)
 	cfg.sections = newSections

@@ -40,6 +40,7 @@ Host foo.local
   identityfile ~/.ssh/allfoo
   port 28022
   user allfoo
+  userknownhostsfile known_hosts
   xauthlocation /usr/X11R6/bin/xauth
 
 <<< my.foo.local
