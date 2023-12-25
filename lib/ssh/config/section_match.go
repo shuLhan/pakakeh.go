@@ -22,14 +22,13 @@ var (
 // Other criteria may be combined arbitrarily.
 // All criteria but "all", "canonical", and "final" require an argument.
 // Criteria may be negated by prepending an exclamation mark (`!').
-func newSectionMatch(rawPattern string) (match *Section, err error) {
+func newSectionMatch(cfg *Config, rawPattern string) (match *Section, err error) {
 	var (
 		prevCriteria *matchCriteria
 		criteria     *matchCriteria
 	)
 
-	match = NewSection(rawPattern)
-	match.criteria = make([]*matchCriteria, 0)
+	match = NewSection(cfg, rawPattern)
 	match.useCriteria = true
 
 	args := parseArgs(rawPattern, ' ')

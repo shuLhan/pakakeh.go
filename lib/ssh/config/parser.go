@@ -21,18 +21,11 @@ type parser struct {
 	homeDir string
 }
 
-func newParser() (p *parser, err error) {
+func newParser(cfg *Config) (p *parser, err error) {
 	p = &parser{
-		files: make(map[string]struct{}),
-	}
-
-	p.workDir, err = os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	p.homeDir, err = os.UserHomeDir()
-	if err != nil {
-		return nil, err
+		files:   make(map[string]struct{}),
+		workDir: cfg.workDir,
+		homeDir: cfg.homeDir,
 	}
 
 	return p, nil

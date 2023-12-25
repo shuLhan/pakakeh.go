@@ -21,7 +21,7 @@ func TestNewSectionMatch(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got, err := newSectionMatch(c.raw)
+		got, err := newSectionMatch(dummyConfig, c.raw)
 		if err != nil {
 			if c.expError != err.Error() {
 				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
@@ -29,7 +29,7 @@ func TestNewSectionMatch(t *testing.T) {
 			}
 			continue
 		}
-		got.setDefaults(testParser.workDir, testParser.homeDir)
+		got.setDefaults()
 
 		test.Assert(t, c.raw, *c.exp, *got)
 	}
@@ -84,7 +84,7 @@ func TestParseCriteriaAll(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got, err := newSectionMatch(c.raw)
+		got, err := newSectionMatch(dummyConfig, c.raw)
 		if err != nil {
 			if c.expError != err.Error() {
 				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
@@ -92,7 +92,7 @@ func TestParseCriteriaAll(t *testing.T) {
 			}
 			continue
 		}
-		got.setDefaults(testParser.workDir, testParser.homeDir)
+		got.setDefaults()
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.raw, *exp, *got)
@@ -129,7 +129,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got, err := newSectionMatch(c.raw)
+		got, err := newSectionMatch(dummyConfig, c.raw)
 		if err != nil {
 			if c.expError != err.Error() {
 				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
@@ -137,7 +137,7 @@ func TestNewSectionMatch_ParseCriteriaExec(t *testing.T) {
 			}
 			continue
 		}
-		got.setDefaults(testParser.workDir, testParser.homeDir)
+		got.setDefaults()
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.raw, *exp, *got)
@@ -198,7 +198,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got, err := newSectionMatch(c.raw)
+		got, err := newSectionMatch(dummyConfig, c.raw)
 		if err != nil {
 			if c.expError != err.Error() {
 				t.Fatalf("parseCriteriaWithArg: expecting error %s, got %s",
@@ -206,7 +206,7 @@ func TestParseCriteriaWithArg(t *testing.T) {
 			}
 			continue
 		}
-		got.setDefaults(testParser.workDir, testParser.homeDir)
+		got.setDefaults()
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.raw, *exp, *got)

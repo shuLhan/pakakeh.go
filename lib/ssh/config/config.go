@@ -30,10 +30,29 @@ var (
 type Config struct {
 	envs map[string]string
 
+	// workDir store the current working directory.
 	workDir string
+
 	homeDir string
 
 	sections []*Section
+}
+
+// newConfig create new SSH Config instance from file.
+func newConfig(file string) (cfg *Config, err error) {
+	cfg = &Config{}
+
+	cfg.workDir, err = os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.homeDir, err = os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
 }
 
 // Load SSH configuration from file.
@@ -47,26 +66,32 @@ func Load(file string) (cfg *Config, err error) {
 		section *Section
 	)
 
-	cfg = &Config{
-		sections: make([]*Section, 0),
+	cfg, err = newConfig(file)
+	if err != nil {
+		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
 	}
 
 	cfg.loadEnvironments()
 
-	p, err := newParser()
+	var p *parser
+
+	p, err = newParser(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
 	}
 
-	cfg.workDir = p.workDir
-	cfg.homeDir = p.homeDir
+	var lines []string
 
-	lines, err := p.load("", file)
+	lines, err = p.load("", file)
 	if err != nil {
 		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
 	}
 
-	for x, line := range lines {
+	var (
+		line string
+		x    int
+	)
+	for x, line = range lines {
 		if line[0] == '#' {
 			continue
 		}
@@ -81,13 +106,13 @@ func Load(file string) (cfg *Config, err error) {
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
-			section = newSectionHost(value)
+			section = newSectionHost(cfg, value)
 		case keyMatch:
 			if section != nil {
 				cfg.sections = append(cfg.sections, section)
 				section = nil
 			}
-			section, err = newSectionMatch(value)
+			section, err = newSectionMatch(cfg, value)
 			if err != nil {
 				return nil, fmt.Errorf("%s %s line %d: %w", logp, file, x+1, err)
 			}
@@ -114,13 +139,13 @@ func Load(file string) (cfg *Config, err error) {
 // If no Host or Match found, it still return non-nil Section but with empty
 // fields.
 func (cfg *Config) Get(s string) (section *Section) {
-	section = NewSection(s)
+	section = NewSection(cfg, s)
 	for _, hostMatch := range cfg.sections {
 		if hostMatch.isMatch(s) {
 			section.mergeField(hostMatch)
 		}
 	}
-	section.setDefaults(cfg.workDir, cfg.homeDir)
+	section.setDefaults()
 
 	if s != `` && section.Field[KeyHostname] == `` {
 		section.Set(KeyHostname, s)

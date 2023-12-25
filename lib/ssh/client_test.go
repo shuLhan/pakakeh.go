@@ -20,7 +20,7 @@ func TestNewClient_KeyError_notExist(t *testing.T) {
 	t.Skip(`Require active SSH server`)
 
 	var (
-		section = config.NewSection(`localhost`)
+		section = config.NewSection(nil, `localhost`)
 
 		wd  string
 		err error

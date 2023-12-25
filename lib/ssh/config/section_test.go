@@ -17,7 +17,6 @@ func TestNewSectionHost(t *testing.T) {
 	}{{
 		rawPattern: "",
 		exp: func(exp Section) *Section {
-			exp.patterns = make([]*pattern, 0)
 			return &exp
 		},
 	}, {
@@ -53,8 +52,8 @@ func TestNewSectionHost(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		got := newSectionHost(c.rawPattern)
-		got.setDefaults(testParser.workDir, testParser.homeDir)
+		got := newSectionHost(dummyConfig, c.rawPattern)
+		got.setDefaults()
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, c.rawPattern, *exp, *got)
@@ -81,7 +80,7 @@ func TestSectionSetDefaults(t *testing.T) {
 	}}
 	for _, c := range cases {
 		got := c.section(*testDefaultSection)
-		got.setDefaults(testParser.workDir, testParser.homeDir)
+		got.setDefaults()
 
 		exp := c.exp(*testDefaultSection)
 		test.Assert(t, `setDefaults`, exp.IdentityFile, got.IdentityFile)
@@ -167,7 +166,7 @@ func TestSection_UserKnownHostsFile(t *testing.T) {
 	}}
 
 	var (
-		section = NewSection(`test`)
+		section = NewSection(dummyConfig, `test`)
 
 		c   testCase
 		err error

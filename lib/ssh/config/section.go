@@ -232,27 +232,39 @@ type Section struct {
 }
 
 // NewSection create an empty Host or Match section.
-func NewSection(name string) *Section {
+//
+// The Config parameter is optional, if not set the section will assume that
+// any path is relative to current working directory or using absolute path.
+func NewSection(cfg *Config, name string) (section *Section) {
 	name = strings.TrimSpace(name)
 	if len(name) == 0 {
 		name = `*`
 	}
 
-	return &Section{
+	section = &Section{
 		Field: map[string]string{},
 		env:   map[string]string{},
 		name:  name,
 	}
+
+	if cfg != nil {
+		section.homeDir = cfg.homeDir
+		section.WorkingDir = cfg.workDir
+	}
+
+	return section
 }
 
-func newSectionHost(rawPattern string) (host *Section) {
-	patterns := strings.Fields(rawPattern)
+func newSectionHost(cfg *Config, rawPattern string) (host *Section) {
+	host = NewSection(cfg, rawPattern)
 
-	host = NewSection(rawPattern)
-	host.patterns = make([]*pattern, 0, len(patterns))
-
-	for _, pattern := range patterns {
-		pat := newPattern(pattern)
+	var (
+		patterns = strings.Fields(rawPattern)
+		s        string
+		pat      *pattern
+	)
+	for _, s = range patterns {
+		pat = newPattern(s)
 		host.patterns = append(host.patterns, pat)
 	}
 	return host
@@ -465,10 +477,7 @@ func (section *Section) isMatch(s string) bool {
 }
 
 // setDefaults set and expand all of the fields values if its not set.
-func (section *Section) setDefaults(workDir, homeDir string) {
-	section.homeDir = homeDir
-	section.WorkingDir = workDir
-
+func (section *Section) setDefaults() {
 	if len(section.IdentityFile) == 0 {
 		section.IdentityFile = defaultIdentityFile()
 	}

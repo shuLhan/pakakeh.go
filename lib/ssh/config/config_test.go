@@ -14,19 +14,26 @@ import (
 )
 
 var (
-	testDefaultSection = NewSection(``)
+	dummyConfig        *Config
+	testDefaultSection *Section
 	testParser         *parser
 )
 
 func TestMain(m *testing.M) {
 	var err error
 
-	testParser, err = newParser()
+	dummyConfig, err = newConfig(``)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	testDefaultSection.setDefaults(testParser.workDir, testParser.homeDir)
+	testParser, err = newParser(dummyConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	testDefaultSection = NewSection(dummyConfig, ``)
+	testDefaultSection.setDefaults()
 
 	os.Exit(m.Run())
 }
