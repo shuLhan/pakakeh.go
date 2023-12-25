@@ -153,7 +153,7 @@ func (cfg *Config) Get(host string) (section *Section) {
 	var hostMatch *Section
 	for _, hostMatch = range cfg.sections {
 		if hostMatch.isMatch(host) {
-			section.mergeField(hostMatch)
+			section.merge(hostMatch)
 		}
 	}
 	section.setDefaults()

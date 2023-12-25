@@ -514,8 +514,8 @@ func (section *Section) setDefaults() {
 	}
 }
 
-// mergeField merge the Field from other Section.
-func (section *Section) mergeField(other *Section) {
+// merge the other Section.
+func (section *Section) merge(other *Section) {
 	var (
 		key   string
 		value string
@@ -523,8 +523,12 @@ func (section *Section) mergeField(other *Section) {
 	for key, value = range other.Field {
 		// The key and value in other should be valid, so no need to
 		// check for error.
-		_ = section.Set(key, value)
+		section.Field[key] = value
 	}
+	section.certificateFile = append(section.certificateFile, other.certificateFile...)
+	section.IdentityFile = append(section.IdentityFile, other.IdentityFile...)
+	section.knownHostsFile = append(section.knownHostsFile, other.knownHostsFile...)
+	section.sendEnv = append(section.sendEnv, other.sendEnv...)
 }
 
 // Set the section field by raw key and value.
