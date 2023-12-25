@@ -135,20 +135,21 @@ func Load(file string) (cfg *Config, err error) {
 	return cfg, nil
 }
 
-// Get the Host or Match configuration that match with the pattern "s".
-// If no Host or Match found, it still return non-nil Section but with empty
-// fields.
-func (cfg *Config) Get(s string) (section *Section) {
-	section = NewSection(cfg, s)
-	for _, hostMatch := range cfg.sections {
-		if hostMatch.isMatch(s) {
+// Get the Host or Match configuration that match with the host name "s".
+// If no Host or Match found, it return non-nil Section with default values.
+func (cfg *Config) Get(host string) (section *Section) {
+	section = NewSection(cfg, host)
+
+	var hostMatch *Section
+	for _, hostMatch = range cfg.sections {
+		if hostMatch.isMatch(host) {
 			section.mergeField(hostMatch)
 		}
 	}
 	section.setDefaults()
 
-	if s != `` && section.Field[KeyHostname] == `` {
-		section.Set(KeyHostname, s)
+	if host != `` && section.Field[KeyHostname] == `` {
+		section.Set(KeyHostname, host)
 	}
 
 	return section
