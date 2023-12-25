@@ -1,0 +1,4 @@
+  Hostname 127.0.0.2
+  User wildcard
+  IdentityFile ~/.ssh/notexist
+  UserKnownHostsFile ~/.ssh/known_hosts_example_local

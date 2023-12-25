@@ -115,6 +115,45 @@ func TestConfigGet(t *testing.T) {
 	}
 }
 
+func TestConfigMerge(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/config_merge_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var cfg *Config
+
+	cfg, err = Load(`./testdata/sub/config`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var topcfg *Config
+
+	topcfg, err = Load(`./testdata/config`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cfg.Merge(topcfg)
+
+	var (
+		host       = `my.example.local`
+		gotSection = cfg.Get(host)
+
+		buf bytes.Buffer
+	)
+
+	gotSection.WriteTo(&buf)
+
+	test.Assert(t, host, string(tdata.Output[host]), buf.String())
+}
+
 func TestParseKeyValue(t *testing.T) {
 	cases := []struct {
 		line     string

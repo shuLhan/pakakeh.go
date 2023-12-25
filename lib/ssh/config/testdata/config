@@ -8,7 +8,7 @@ Host example.local
 
 	# comment
 Host *.example.local
-	Include sub/config
+	Include sub/include
 
 Host foo.local
 	Hostname 127.0.0.3

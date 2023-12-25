@@ -667,6 +667,16 @@ func (section *Section) MarshalText() (text []byte, err error) {
 			}
 			continue
 		}
+		if key == KeyUserKnownHostsFile {
+			for _, val = range section.knownHostsFile {
+				buf.WriteString(`  `)
+				buf.WriteString(key)
+				buf.WriteByte(' ')
+				buf.WriteString(section.pathFold(val))
+				buf.WriteByte('\n')
+			}
+			continue
+		}
 
 		buf.WriteString(`  `)
 		buf.WriteString(key)
@@ -688,13 +698,18 @@ func (section *Section) WriteTo(w io.Writer) (n int64, err error) {
 	return int64(c), err
 }
 
-// pathFold replace the home directory prefix with '~'.
+// pathFold remove the path prefix from input file "in", start from the
+// "config" directory and then the user's home directory.
 func (section *Section) pathFold(in string) (out string) {
-	if !strings.HasPrefix(in, section.homeDir) {
-		return in
+	if filepath.HasPrefix(in, section.dir) {
+		out, _ = filepath.Rel(section.dir, in)
+		return out
 	}
-	out = `~` + in[len(section.homeDir):]
-	return out
+	if filepath.HasPrefix(in, section.homeDir) {
+		out, _ = filepath.Rel(section.homeDir, in)
+		return `~/` + out
+	}
+	return in
 }
 
 // pathUnfold expand the file to make it absolute.

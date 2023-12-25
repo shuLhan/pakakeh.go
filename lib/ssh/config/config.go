@@ -40,6 +40,9 @@ type Config struct {
 	homeDir string
 
 	sections []*Section
+
+	// others Config, as result of [Config.Merge].
+	others []*Config
 }
 
 // newConfig create new SSH Config instance from file.
@@ -156,6 +159,16 @@ func (cfg *Config) Get(host string) (section *Section) {
 			section.merge(hostMatch)
 		}
 	}
+
+	var (
+		other  *Config
+		subsec *Section
+	)
+	for _, other = range cfg.others {
+		subsec = other.Get(host)
+		section.merge(subsec)
+	}
+
 	section.setDefaults()
 
 	if host != `` && section.Field[KeyHostname] == `` {
@@ -165,16 +178,18 @@ func (cfg *Config) Get(host string) (section *Section) {
 	return section
 }
 
-// Prepend other Config's sections to this Config.
-// The other's sections will be at the top of the list.
+// Merge other Config as part of this Config.
+// This function can be used to combine multiple SSH config files into one.
 //
-// This function can be useful if we want to load another SSH config file
-// without using Include directive.
-func (cfg *Config) Prepend(other *Config) {
-	newSections := make([]*Section, 0, len(cfg.sections)+len(other.sections))
-	newSections = append(newSections, other.sections...)
-	newSections = append(newSections, cfg.sections...)
-	cfg.sections = newSections
+// For example after the user's "~/.ssh/config" has been loaded, we can
+// merge it with system "/etc/ssh/ssh_config".
+// During [Config.Get] the top Config will be evaluated first, and then the
+// other Config is evaluated in order of Merge-d.
+func (cfg *Config) Merge(other *Config) {
+	if other == nil {
+		return
+	}
+	cfg.others = append(cfg.others, other)
 }
 
 // loadEnvironments get all environments variables and store it in the map for

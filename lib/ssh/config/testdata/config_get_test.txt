@@ -28,6 +28,7 @@ Host my.example.local
   identityfile ~/.ssh/notexist
   port 22
   user wildcard
+  userknownhostsfile ~/.ssh/known_hosts_example_local
   xauthlocation /usr/X11R6/bin/xauth
 
 <<< foo.local
