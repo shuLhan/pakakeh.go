@@ -41,6 +41,9 @@ This library is released every month, usually at the first week of month.
 
 link:CHANGELOG.html[Latest changelog^].
 
+link:CHANGELOG_2023.html[Changelog in 2023^].
+This is changelog for share module since v0.43.0 until v0.51.0.
+
 link:CHANGELOG_2022.html[Changelog in 2022^].
 This is changelog for share module since v0.33.0 until v0.42.0.
 
