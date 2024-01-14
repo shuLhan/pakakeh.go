@@ -161,9 +161,7 @@ func (in *Ini) marshalStruct(
 		ftype = field.Type
 		kind = ftype.Kind()
 
-		// TODO: replace with IsExported() once go.mod version set to
-		// 1.17.
-		if field.PkgPath != "" {
+		if !field.IsExported() {
 			continue
 		}
 
