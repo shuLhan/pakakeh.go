@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -1047,4 +1048,46 @@ func ExampleIni_Vars() {
 	// section::key2 = false
 	//
 	// key = value3
+}
+
+func ExampleIni_Keys() {
+	const iniContent = `
+[section1]
+key3 = 3
+key2 = 2
+
+[section2 "sub 1"]
+key3 = 3
+key2 = 2
+
+[section1]
+key1 = 1
+
+[section2 "sub 1"]
+key2 = 2.2
+key1 = 1
+`
+
+	var (
+		ini *Ini
+		err error
+	)
+
+	ini, err = Parse([]byte(iniContent))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var (
+		keys    = ini.Keys()
+		gotkeys = strings.Join(keys, "\n")
+	)
+	fmt.Println(gotkeys)
+	// Output:
+	// section1::key1
+	// section1::key2
+	// section1::key3
+	// section2:sub 1:key1
+	// section2:sub 1:key2
+	// section2:sub 1:key3
 }

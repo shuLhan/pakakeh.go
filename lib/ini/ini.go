@@ -613,6 +613,21 @@ func (in *Ini) GetsUniq(secName, subName, key string, caseSensitive bool) (out [
 	return libstrings.Uniq(in.Gets(secName, subName, key), caseSensitive)
 }
 
+// Keys return sorted list of all section, subsection, and variables as
+// string where each of them separated by ":", for example
+// "section:sub:var".
+func (in *Ini) Keys() (keys []string) {
+	var (
+		mapKeyValue = in.AsMap(``, ``)
+		key         string
+	)
+	for key = range mapKeyValue {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 // Prune remove all empty lines, comments, and merge all section and
 // subsection with the same name into one group.
 func (in *Ini) Prune() {
