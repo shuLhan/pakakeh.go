@@ -291,6 +291,18 @@ func (client *Client) Get(requestPath string, headers http.Header, params url.Va
 	return client.doRequest(http.MethodGet, headers, requestPath, ``, nil)
 }
 
+// Head send the HEAD request to path, with optional headers and params in
+// query parameters.
+// The returned resBody shoule be always nil.
+func (client *Client) Head(path string, headers http.Header, params url.Values) (
+	httpRes *http.Response, resBody []byte, err error,
+) {
+	if params != nil {
+		path += `?` + params.Encode()
+	}
+	return client.doRequest(http.MethodHead, headers, path, ``, nil)
+}
+
 // Post send the POST request to path without setting "Content-Type".
 // If the params is not nil, it will send as query parameters in the path.
 func (client *Client) Post(requestPath string, headers http.Header, params url.Values) (
