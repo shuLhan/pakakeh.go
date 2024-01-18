@@ -1,0 +1,14 @@
+
+<<< HEAD /big
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 10485760
+Content-Type: application/octet-stream
+Etag: 1704070861
+
+<<< GET /big:Range=0-
+HTTP/1.1 206 Partial Content
+Content-Length: 8388608
+Content-Range: bytes 0-8388608/10485760
+Content-Type: application/octet-stream
+Etag: 1704070861

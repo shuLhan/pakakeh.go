@@ -9,12 +9,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	liberrors "github.com/shuLhan/share/lib/errors"
+	"github.com/shuLhan/share/lib/memfs"
+	libnet "github.com/shuLhan/share/lib/net"
 	"github.com/shuLhan/share/lib/test"
 )
 
@@ -1007,4 +1013,179 @@ func TestServer_handleRange_HEAD(t *testing.T) {
 		exp         = tdata.Output[tag]
 	)
 	test.Assert(t, tag, string(exp), got)
+}
+
+// Test HTTP Range request on big file using Range.
+//
+// When server receive,
+//
+//	GET /big
+//	Range: bytes=0-
+//
+// and the requested resources is quite larger, where writing all content of
+// file result in i/o timeout, it is best practice [1][2] if the server
+// write only partial content and let the client continue with the
+// subsequent Range request.
+//
+// In above case the server should response with,
+//
+//	HTTP/1.1 206 Partial content
+//	Content-Range: bytes 0-<limit>/<size>
+//	Content-Length: <limit>
+//
+// Where limit is maximum packet that is reasonable [3] for most of the
+// client.
+//
+// [1]: https://stackoverflow.com/questions/63614008/how-best-to-respond-to-an-open-http-range-request
+// [2]: https://bugzilla.mozilla.org/show_bug.cgi?id=570755
+// [3]: https://docs.aws.amazon.com/whitepapers/latest/s3-optimizing-performance-best-practices/use-byte-range-fetches.html
+func TestServerHandleRangeBig(t *testing.T) {
+	var (
+		pathBig     = `/big`
+		tempDir     = t.TempDir()
+		filepathBig = filepath.Join(tempDir, pathBig)
+		bigSize     = 10485760 // 10MB
+	)
+
+	createBigFile(t, filepathBig, int64(bigSize))
+
+	var (
+		serverAddress = `127.0.0.1:22672`
+		srv           *Server
+	)
+
+	srv = runServerFS(t, serverAddress, tempDir)
+	defer srv.Stop(100 * time.Millisecond)
+
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/server/range_big_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		clOpts = &ClientOptions{
+			ServerUrl: `http://` + serverAddress,
+		}
+		cl *Client
+	)
+
+	cl = NewClient(clOpts)
+
+	var (
+		tag         = `HEAD /big`
+		skipHeaders = []string{HeaderDate}
+
+		httpRes *http.Response
+		gotResp string
+		resBody []byte
+	)
+
+	httpRes, resBody, err = cl.Head(pathBig, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotResp = dumpHTTPResponse(httpRes, skipHeaders)
+
+	test.Assert(t, tag, string(tdata.Output[tag]), gotResp)
+	test.Assert(t, tag+`- response body size`, 0, len(resBody))
+
+	var (
+		headers = http.Header{}
+	)
+
+	headers.Set(HeaderRange, `bytes=0-`)
+
+	httpRes, resBody, err = cl.Get(pathBig, headers, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotResp = dumpHTTPResponse(httpRes, skipHeaders)
+	tag = `GET /big:Range=0-`
+	test.Assert(t, tag, string(tdata.Output[tag]), gotResp)
+	test.Assert(t, tag+`- response body size`, DefRangeLimit, len(resBody))
+}
+
+func createBigFile(t *testing.T, path string, size int64) {
+	var (
+		fbig *os.File
+		err  error
+	)
+
+	fbig, err = os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = fbig.Truncate(size)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = fbig.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func runServerFS(t *testing.T, address, dir string) (srv *Server) {
+	var (
+		mfsOpts = &memfs.Options{
+			Root:        dir,
+			MaxFileSize: -1,
+		}
+
+		mfs *memfs.MemFS
+		err error
+	)
+
+	mfs, err = memfs.New(mfsOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Set the file modification time for predictable result.
+	var (
+		pathBigModTime = time.Date(2024, 1, 1, 1, 1, 1, 0, time.UTC)
+		nodeBig        *memfs.Node
+	)
+
+	nodeBig, err = mfs.Get(`/big`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nodeBig.SetModTime(pathBigModTime)
+
+	var (
+		srvOpts = &ServerOptions{
+			Memfs:   mfs,
+			Address: address,
+		}
+	)
+
+	srv, err = NewServer(srvOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	go func() {
+		var err2 = srv.Start()
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+	}()
+
+	err = libnet.WaitAlive(`tcp`, address, 1*time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return srv
 }

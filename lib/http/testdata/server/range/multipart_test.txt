@@ -3,7 +3,7 @@ bytes=0-5,10-15,-10
 
 <<< http_headers
 HTTP/1.1 206 Partial Content
-Content-Length: 325
+Content-Length: 327
 Content-Type: multipart/byteranges; boundary=1b4df158039f7cce
 
 <<< http_body
@@ -19,7 +19,7 @@ Content-Range: bytes 10-15/40
 y>Hell
 --1b4df158039f7cce
 Content-Type: text/html; charset=utf-8
-Content-Range: bytes -10/40
+Content-Range: bytes 30-39/40
 
 y></html>
 

@@ -156,6 +156,32 @@
 //
 //	{"code":<HTTP_STATUS_CODE>,"message":<err.Error()>}
 //
+// # Range request
+//
+// The standard http package provide [http.ServeContent] function that
+// support serving resources with Range request, except that it sometime it
+// has an issue.
+//
+// When server receive,
+//
+//	GET /big
+//	Range: bytes=0-
+//
+// and the requested resources is quite larger, where writing all content of
+// file result in i/o timeout, it is [best] [practice] if the server
+// write only partial content and let the client continue with the
+// subsequent Range request.
+//
+// In the above case, the server should response with,
+//
+//	HTTP/1.1 206 Partial content
+//	Content-Range: bytes 0-<limit>/<size>
+//	Content-Length: <limit>
+//
+// Where limit is maximum packet that is [reasonable] for most of the
+// client.
+// In this server we choose 8MB as limit, see [DefRangeLimit].
+//
 // # Summary
 //
 // The pseudocode below illustrate how Endpoint, Callback, and
@@ -202,6 +228,9 @@
 //     "/y" are ambiguous because one is dynamic path using key binding "x" and
 //     the last one is static path to "y".
 //
+// [best]: https://stackoverflow.com/questions/63614008/how-best-to-respond-to-an-open-http-range-request
+// [practice]: https://bugzilla.mozilla.org/show_bug.cgi?id=570755
+// [reasonable]: https://docs.aws.amazon.com/whitepapers/latest/s3-optimizing-performance-best-practices/use-byte-range-fetches.html
 // [HTTP Range]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
 // [Server-Sent Events]: https://html.spec.whatwg.org/multipage/server-sent-events.html
 package http

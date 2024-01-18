@@ -12,21 +12,27 @@ import (
 type RangePosition struct {
 	unit string
 
+	start *int64
+	end   *int64
+
+	// length of resources.
+	// A nil length, or "*", indicated an unknown size.
+	length *int64
+
 	content []byte
-
-	Start int64
-	End   int64
-
-	// Length of zero means read until the end.
-	Length int64
 }
 
-// ParseContentRange parse Content-Range value, the following format,
+// ParseContentRange parse the HTTP header "Content-Range" value, as
+// response from server, with the following format,
 //
-//	unit SP position "/" size
-//	SP       = " "
-//	position = start "-" end / start "-" / "-" last
-//	start, end, last, size = 1*DIGIT
+//	Content-Range = unit SP valid-range / invalid-range
+//	           SP = " "
+//	  valid-range = position "/" size
+//	invalid-range = "*" "/" size
+//	     position = start "-" end
+//	         size = 1*DIGIT / "*"
+//	        start = 1*DIGIT
+//	          end = 1*DIGIT
 //
 // It will return nil if the v is invalid.
 func ParseContentRange(v string) (pos *RangePosition) {
@@ -50,62 +56,70 @@ func ParseContentRange(v string) (pos *RangePosition) {
 	p.SetDelimiters(`-/`)
 
 	tok, delim = p.ReadNoSpace()
-	if len(tok) == 0 && delim == '-' {
-		// Probably "-last".
-		tok, delim = p.ReadNoSpace()
+	if len(tok) == 0 {
+		return nil
+	}
+	if tok == `*` {
 		if delim != '/' {
 			return nil
 		}
-
-		pos.Length, err = strconv.ParseInt(tok, 10, 64)
-		if err != nil {
-			return nil
-		}
-
-		pos.Start = -1 * pos.Length
-	} else {
-		if delim != '-' || delim == 0 {
-			return nil
-		}
-
-		pos.Start, err = strconv.ParseInt(tok, 10, 64)
-		if err != nil {
-			return nil
-		}
-
 		tok, delim = p.ReadNoSpace()
-		if delim != '/' {
+		if delim != 0 {
 			return nil
 		}
-
-		if len(tok) != 0 {
-			// Case of "start-end/size".
-			pos.End, err = strconv.ParseInt(tok, 10, 64)
-			if err != nil {
-				return nil
-			}
-			pos.Length = (pos.End - pos.Start) + 1
+		if tok == `*` {
+			// "*/*": invalid range requested with unknown size.
+			pos = &RangePosition{}
+			return pos
 		}
+
+		pos = &RangePosition{}
+		goto parselength
+	}
+	if delim != '-' {
+		return nil
 	}
 
-	// The size.
+	pos = &RangePosition{
+		start:  new(int64),
+		end:    new(int64),
+		length: new(int64),
+	}
+
+	*pos.start, err = strconv.ParseInt(tok, 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	tok, delim = p.ReadNoSpace()
+	if delim != '/' {
+		return nil
+	}
+	*pos.end, err = strconv.ParseInt(tok, 10, 64)
+	if err != nil {
+		return nil
+	}
+	if *pos.end < *pos.start {
+		return nil
+	}
+
 	tok, delim = p.ReadNoSpace()
 	if delim != 0 {
 		return nil
 	}
-
-	if tok != "*" {
-		var size int64
-		size, err = strconv.ParseInt(tok, 10, 64)
-		if err != nil {
-			return nil
-		}
-		if pos.End == 0 {
-			// Case of "start-/size".
-			pos.Length = (size - pos.Start)
-		}
+	if tok == `*` {
+		// "x-y/*"
+		return pos
 	}
 
+parselength:
+	*pos.length, err = strconv.ParseInt(tok, 10, 64)
+	if err != nil {
+		return nil
+	}
+	if *pos.length < 0 {
+		return nil
+	}
 	return pos
 }
 
@@ -126,11 +140,14 @@ func (pos RangePosition) ContentRange(unit string, size int64) (v string) {
 }
 
 func (pos RangePosition) String() string {
-	if pos.Start < 0 {
-		return fmt.Sprintf(`%d`, pos.Start)
+	if pos.start == nil {
+		if pos.end == nil {
+			return `*`
+		}
+		return fmt.Sprintf(`-%d`, *pos.end)
 	}
-	if pos.Start > 0 && pos.End == 0 {
-		return fmt.Sprintf(`%d-`, pos.Start)
+	if pos.end == nil {
+		return fmt.Sprintf(`%d-`, *pos.start)
 	}
-	return fmt.Sprintf(`%d-%d`, pos.Start, pos.End)
+	return fmt.Sprintf(`%d-%d`, *pos.start, *pos.end)
 }

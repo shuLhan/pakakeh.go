@@ -11,10 +11,14 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
+// DefRangeLimit limit of content served by server when Range request
+// without end, in example "0-".
+const DefRangeLimit = 8388608
+
 // Range define the unit and list of start-end positions for resource.
 type Range struct {
 	unit      string
-	positions []RangePosition
+	positions []*RangePosition
 }
 
 // NewRange create new Range with specified unit.
@@ -29,7 +33,7 @@ func NewRange(unit string) (r *Range) {
 	return r
 }
 
-// ParseMultipartRange parse multipart/byteranges response body.
+// ParseMultipartRange parse "multipart/byteranges" response body.
 // Each Content-Range position and body part in the multipart will be stored
 // under RangePosition.
 func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) {
@@ -65,7 +69,7 @@ func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) 
 			return nil, fmt.Errorf(`%s: on ReadAll part: %s`, logp, err)
 		}
 
-		r.positions = append(r.positions, *pos)
+		r.positions = append(r.positions, pos)
 	}
 	return r, nil
 }
@@ -102,9 +106,6 @@ func ParseRange(v string) (r Range) {
 
 	r.unit = strings.ToLower(tok)
 
-	var (
-		start, end int64
-	)
 	par.SetDelimiters(`-,`)
 	for delim != 0 {
 		tok, delim = par.ReadNoSpace()
@@ -119,29 +120,36 @@ func ParseRange(v string) (r Range) {
 			if delim == '-' {
 				// Probably "-last".
 				tok, delim = par.ReadNoSpace()
-				if delim != 0 && delim != ',' {
+				if delim == '-' {
 					// Invalid "-start-" or "-start-end".
 					skipPosition(par, delim)
 					continue
 				}
 
-				start, err = strconv.ParseInt(tok, 10, 64)
+				var end int64
+				end, err = strconv.ParseInt(tok, 10, 64)
 				if err != nil {
-					skipPosition(par, delim)
+					continue
+				}
+				if end == 0 {
+					// Invalid range "-0".
 					continue
 				}
 
-				r.Add(-1*start, 0)
-				skipPosition(par, delim)
+				r.Add(nil, &end)
 				continue
 			}
 		}
-		if delim == ',' || delim == 0 {
-			// Invalid range "start,..." or "start$".
+		if delim == ',' {
+			// Invalid range "start,".
 			continue
 		}
-
-		// delim == '-'
+		if delim == 0 {
+			// Invalid range with "start" only.
+			break
+		}
+		// delim is '-'.
+		var start int64
 		start, err = strconv.ParseInt(tok, 10, 64)
 		if err != nil {
 			skipPosition(par, delim)
@@ -155,22 +163,18 @@ func ParseRange(v string) (r Range) {
 			continue
 		}
 		if len(tok) == 0 {
-			if start == 0 {
-				// Invalid range, "0-" equal to whole body.
-				continue
-			}
-
-			// Range "start-".
-			end = 0
+			// Range is "start-".
+			r.Add(&start, nil)
 		} else {
-			// Range "start-end".
+			// Range is "start-end".
+			var end int64
 			end, err = strconv.ParseInt(tok, 10, 64)
 			if err != nil {
 				skipPosition(par, delim)
 				continue
 			}
+			r.Add(&start, &end)
 		}
-		r.Add(start, end)
 	}
 
 	return r
@@ -178,7 +182,7 @@ func ParseRange(v string) (r Range) {
 
 // skipPosition Ignore any string until ','.
 func skipPosition(par *libstrings.Parser, delim rune) {
-	for delim != ',' && delim != 0 {
+	for delim == '-' {
 		_, delim = par.Read()
 	}
 }
@@ -189,61 +193,89 @@ func skipPosition(par *libstrings.Parser, delim rune) {
 // zero.
 // For example,
 //
-//   - [0,0] is valid and equal to first byte (but unusual)
-//   - [0,9] is valid and equal to the first 10 bytes.
-//   - [10,0] is valid and equal to the bytes from offset 10 until the end.
-//   - [-10,0] is valid and equal to the last 10 bytes.
-//   - [10,1] or [0,-10] or [-10,10] is not valid position.
+//   - [0,+x] is valid, from offset 0 until x+1.
+//   - [0,0] is valid and equal to first byte (but unusual).
+//   - [+x,+y] is valid iff x <= y.
+//   - [+x,-y] is invalid.
+//   - [-x,+y] is invalid.
 //
-// The new position will be added and return true if only if it does not
-// overlap with existing list.
-func (r *Range) Add(start, end int64) bool {
-	if end != 0 && end < start {
-		// [10,1] or [0,-10]
+// The start or end can be nil, but not both.
+// For example,
+//
+//   - [nil,+x] is valid, equal to "-x" or the last x bytes.
+//   - [nil,0] is invalid.
+//   - [nil,-x] is invalid.
+//   - [x,nil] is valid, equal to "x-" or from offset x until end of file.
+//   - [-x,nil] is invalid.
+//
+// The new position will be added and return true iff it does not overlap
+// with existing list.
+func (r *Range) Add(start, end *int64) bool {
+	if start == nil && end == nil {
 		return false
 	}
-	if start < 0 && end != 0 {
-		// [-10,10]
-		return false
-	}
-
-	var pos RangePosition
-	for _, pos = range r.positions {
-		if pos.Start < 0 {
-			if start < 0 {
-				// Given pos:[-10,0], adding another negative
-				// start like -20 or -5 will always cause
-				// overlap.
-				return false
-			}
-		} else if pos.Start == 0 {
-			if start >= 0 && start <= pos.End {
-				// pos:[0,+y], start<y.
-				return false
-			}
-		} else {
-			if pos.End == 0 {
-				// pos:[+x,0] already accept until the end.
-				return false
-			}
-			if start >= 0 && start <= pos.End {
-				// pos:[+x,+y], start<y.
-				return false
-			}
+	if start == nil {
+		if *end <= 0 {
+			return false
+		}
+	} else if end == nil {
+		if *start < 0 {
+			return false
+		}
+	} else {
+		if *start < 0 || *end < 0 || *end < *start {
+			return false
 		}
 	}
 
-	pos = RangePosition{
-		Start: start,
-		End:   end,
+	var lastpos *RangePosition
+
+	if len(r.positions) == 0 {
+		goto ok
 	}
-	if start < 0 {
-		pos.Length = start * -1
-	} else if start >= 0 && end >= 0 {
-		pos.Length = (end - start) + 1
+
+	lastpos = r.positions[len(r.positions)-1]
+	if lastpos.end == nil {
+		return false
+	}
+	if lastpos.start == nil {
+		if start == nil {
+			// last=[nil,+b] vs. pos=[nil,+y]
+			// The pos will always overlap with previous.
+			return false
+		}
+		if end == nil {
+			// last=[nil,+b] vs. pos=[+x,nil]
+			// The pos will always overlap with previous.
+			return false
+		}
+		goto ok
+	}
+	if start == nil {
+		// [+a,+b] vs. [nil,+y]
+		goto ok
+	}
+	if end == nil {
+		// [+a,+b] vs. [+x,nil]
+		if *lastpos.end >= *start {
+			return false
+		}
+	}
+	if *lastpos.end >= *start {
+		return false
+	}
+
+ok:
+	var pos = &RangePosition{}
+	if start != nil {
+		pos.start = new(int64)
+		*pos.start = *start
+	}
+	if end != nil {
+		pos.end = new(int64)
+		*pos.end = *end
 	}
 	r.positions = append(r.positions, pos)
-
 	return true
 }
 
@@ -253,7 +285,7 @@ func (r *Range) IsEmpty() bool {
 }
 
 // Positions return the list of range position.
-func (r *Range) Positions() []RangePosition {
+func (r *Range) Positions() []*RangePosition {
 	return r.positions
 }
 
@@ -266,7 +298,7 @@ func (r *Range) String() string {
 
 	var (
 		sb  strings.Builder
-		pos RangePosition
+		pos *RangePosition
 		x   int
 	)
 

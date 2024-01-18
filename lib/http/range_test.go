@@ -26,7 +26,7 @@ func TestParseMultipartRange(t *testing.T) {
 		tdata  *test.Data
 		reader *bytes.Reader
 		r      *Range
-		pos    RangePosition
+		pos    *RangePosition
 		vbyte  []byte
 		got    strings.Builder
 	)

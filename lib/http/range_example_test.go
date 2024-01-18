@@ -45,7 +45,7 @@ Part 2
 		log.Fatal(err)
 	}
 
-	var pos libhttp.RangePosition
+	var pos *libhttp.RangePosition
 	for _, pos = range r.Positions() {
 		fmt.Printf("%s: %s\n", pos.String(), pos.Content())
 	}
@@ -82,7 +82,6 @@ func ExampleParseRange() {
 	r = libhttp.ParseRange(`bytes=0-9,10-19,-20`)
 	fmt.Println(r.String())
 
-	// The 0- is invalid because its equal to whole content.
 	r = libhttp.ParseRange(`bytes=0-`)
 	fmt.Println(r.String())
 
@@ -100,27 +99,38 @@ func ExampleParseRange() {
 	// bytes=10-20
 	// bytes=-20
 	// bytes=0-9,10-19,-20
-	//
+	// bytes=0-
 	// bytes=0-9,10-19,-20
 }
 
+func ptrInt64(v int64) *int64 { return &v }
+
 func ExampleRange_Add() {
+	var listpos = []struct {
+		start *int64
+		end   *int64
+	}{
+		{ptrInt64(0), ptrInt64(9)},  // OK.
+		{ptrInt64(0), ptrInt64(5)},  // Overlap with [0,9].
+		{ptrInt64(9), ptrInt64(19)}, // Overlap with [0,9].
+
+		{ptrInt64(10), ptrInt64(19)}, // OK.
+		{ptrInt64(19), ptrInt64(20)}, // Overlap with [10,19].
+		{ptrInt64(20), ptrInt64(19)}, // End less than start.
+
+		{nil, ptrInt64(10)}, // OK.
+		{nil, ptrInt64(20)}, // Overlap with [nil,10].
+
+		{ptrInt64(20), nil},          // Overlap with [nil,10].
+		{ptrInt64(30), ptrInt64(40)}, // Overlap with [20,nil].
+		{ptrInt64(30), nil},          // Overlap with [20,nil].
+	}
+
 	var r = libhttp.NewRange(``)
 
-	fmt.Println(r.Add(0, 9), r.String())  // OK.
-	fmt.Println(r.Add(0, 5), r.String())  // Overlap with [0,9].
-	fmt.Println(r.Add(9, 19), r.String()) // Overlap with [0,9].
-
-	fmt.Println(r.Add(10, 19), r.String())  // OK.
-	fmt.Println(r.Add(19, 20), r.String())  // Overlap with [10,19].
-	fmt.Println(r.Add(-10, 19), r.String()) // Invalid end.
-
-	fmt.Println(r.Add(-10, 0), r.String()) // OK.
-	fmt.Println(r.Add(20, 19), r.String()) // Invalid end.
-
-	fmt.Println(r.Add(20, 0), r.String()) // OK.
-	fmt.Println(r.Add(-5, 0), r.String()) // Overlap with [-10,0].
-	fmt.Println(r.Add(30, 0), r.String()) // Overlap with [20,0].
+	for _, pos := range listpos {
+		fmt.Println(r.Add(pos.start, pos.end), r.String())
+	}
 
 	// Output:
 	// true bytes=0-9
@@ -131,16 +141,16 @@ func ExampleRange_Add() {
 	// false bytes=0-9,10-19
 	// true bytes=0-9,10-19,-10
 	// false bytes=0-9,10-19,-10
-	// true bytes=0-9,10-19,-10,20-
-	// false bytes=0-9,10-19,-10,20-
-	// false bytes=0-9,10-19,-10,20-
+	// false bytes=0-9,10-19,-10
+	// true bytes=0-9,10-19,-10,30-40
+	// false bytes=0-9,10-19,-10,30-40
 }
 
 func ExampleRange_Positions() {
 	var r = libhttp.NewRange(``)
 	fmt.Println(r.Positions()) // Empty positions.
 
-	r.Add(10, 20)
+	r.Add(ptrInt64(10), ptrInt64(20))
 	fmt.Println(r.Positions())
 	// Output:
 	// []
@@ -152,7 +162,7 @@ func ExampleRange_String() {
 
 	fmt.Println(r.String()) // Empty range will return empty string.
 
-	r.Add(0, 9)
+	r.Add(ptrInt64(0), ptrInt64(9))
 	fmt.Println(r.String())
 	// Output:
 	//

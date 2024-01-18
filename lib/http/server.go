@@ -784,7 +784,7 @@ func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 //   - 416 StatusRequestedRangeNotSatisfiable, if the request Range start
 //     position is greater than resource size.
 //
-// [HTTP Range]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
+// [HTTP Range]: https://datatracker.ietf.org/doc/html/rfc7233
 // [RFC7233 S-3.1]: https://datatracker.ietf.org/doc/html/rfc7233#section-3.1
 func HandleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadSeeker, contentType string) {
 	var (
@@ -823,46 +823,76 @@ func handleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadS
 	}
 
 	var (
-		size int64
-		err  error
+		size  int64
+		nread int64
+		err   error
 	)
+
 	size, err = bodyReader.Seek(0, io.SeekEnd)
 	if err != nil {
 		// An error here assume that the size is unknown ('*').
 		log.Printf(`%s: seek body size: %s`, logp, err)
+		res.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+		return
 	}
 
 	var (
-		listPos  = r.Positions()
-		listBody = make([][]byte, 0, len(listPos))
+		header   = res.Header()
+		listBody = make([][]byte, 0, len(r.positions))
 
-		pos RangePosition
+		pos *RangePosition
 	)
-	for _, pos = range listPos {
-		if pos.Start < 0 {
-			_, err = bodyReader.Seek(pos.Start, io.SeekEnd)
-		} else {
-			_, err = bodyReader.Seek(pos.Start, io.SeekStart)
+	for _, pos = range r.positions {
+		// Refill the position if its nil, for response later,
+		// calculate the number of bytes to read, and move the file
+		// position for read.
+		if pos.start == nil {
+			pos.start = new(int64)
+			if *pos.end > size {
+				*pos.start = 0
+			} else {
+				*pos.start = size - *pos.end
+			}
+			*pos.end = size - 1
+		} else if pos.end == nil {
+			if *pos.start > size {
+				// rfc7233#section-4.4
+				// the first-byte-pos of all of the
+				// byte-range-spec values were greater than
+				// the current length of the selected
+				// representation.
+				pos.start = nil
+				header.Set(HeaderContentRange, pos.ContentRange(r.unit, size))
+				res.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+				return
+			}
+			pos.end = new(int64)
+			*pos.end = size - 1
 		}
+
+		_, err = bodyReader.Seek(*pos.start, io.SeekStart)
 		if err != nil {
-			log.Printf(`%s: seek %d: %s`, logp, pos.Start, err)
+			log.Printf(`%s: seek %s: %s`, logp, pos, err)
 			res.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
 			return
 		}
 
+		nread = (*pos.end - *pos.start) + 1
+
+		if nread > DefRangeLimit {
+			nread = DefRangeLimit
+			*pos.end = *pos.start + nread
+		}
+
 		var (
-			body []byte
+			body = make([]byte, nread)
 			n    int
 		)
-		if pos.Length > 0 {
-			body = make([]byte, pos.Length)
-		} else {
-			body = make([]byte, size)
-		}
 
 		n, err = bodyReader.Read(body)
 		if n == 0 || err != nil {
-			log.Printf(`%s: seek %d, size %d: %s`, logp, pos.Start, size, err)
+			log.Printf(`%s: range %s/%d: %s`, logp, pos, size, err)
+			header.Set(HeaderContentRange, pos.ContentRange(r.unit, size))
 			res.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
 			return
 		}
@@ -870,11 +900,15 @@ func handleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadS
 		listBody = append(listBody, body)
 	}
 
-	var header = res.Header()
-
 	if len(listBody) == 1 {
-		pos = listPos[0]
+		var (
+			body  = listBody[0]
+			nbody = strconv.FormatInt(int64(len(body)), 10)
+		)
+		pos = r.positions[0]
+		header.Set(HeaderContentLength, nbody)
 		header.Set(HeaderContentRange, pos.ContentRange(r.unit, size))
+		header.Set(HeaderContentType, contentType)
 		res.WriteHeader(http.StatusPartialContent)
 		_, err = res.Write(listBody[0])
 		if err != nil {
@@ -890,7 +924,7 @@ func handleRange(res http.ResponseWriter, req *http.Request, bodyReader io.ReadS
 		x  int
 	)
 
-	for x, pos = range listPos {
+	for x, pos = range r.positions {
 		fmt.Fprintf(&bb, "--%s\r\n", boundary)
 		fmt.Fprintf(&bb, "%s: %s\r\n", HeaderContentType, contentType)
 		fmt.Fprintf(&bb, "%s: %s\r\n\r\n", HeaderContentRange, pos.ContentRange(r.unit, size))

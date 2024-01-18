@@ -4,6 +4,7 @@ bytes=50-
 <<< http_headers
 HTTP/1.1 416 Requested Range Not Satisfiable
 Content-Length: 0
+Content-Range: bytes */40
 Content-Type: text/html; charset=utf-8
 
 <<< http_body
