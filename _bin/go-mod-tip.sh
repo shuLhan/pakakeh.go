@@ -13,7 +13,7 @@
 ## This command usually used to fix go.mod due to force commit.
 
 MODNAME=$(go list -m)
-COMMIT_TS=$(git log -n 1 --pretty=format:'%at')
+COMMIT_TS=$(git log -n 1 --pretty=format:'%ct')
 DATE=$(date -u --date="@${COMMIT_TS}" +%Y%m%d%H%M%S)
 HASH=$(git log -n 1 --pretty=format:'%h' --abbrev=12)
 TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
