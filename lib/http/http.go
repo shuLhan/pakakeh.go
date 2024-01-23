@@ -249,73 +249,79 @@ const (
 	AcceptRangesNone  = `none`
 )
 
-// List of known HTTP header keys and values.
+// List of known "Content-Encoding" header values.
 const (
-	ContentEncodingBzip2    = "bzip2"
-	ContentEncodingCompress = "compress" // Using LZW.
-	ContentEncodingGzip     = "gzip"
-	ContentEncodingDeflate  = "deflate" // Using zlib.
+	ContentEncodingBzip2    = `bzip2`
+	ContentEncodingCompress = `compress` // Using LZW.
+	ContentEncodingGzip     = `gzip`
+	ContentEncodingDeflate  = `deflate` // Using zlib.
+)
 
-	ContentTypeBinary              = "application/octet-stream"
+// List of known "Content-Type" header values.
+const (
+	ContentTypeBinary              = `application/octet-stream`
 	ContentTypeEventStream         = `text/event-stream`
-	ContentTypeForm                = "application/x-www-form-urlencoded"
+	ContentTypeForm                = `application/x-www-form-urlencoded`
 	ContentTypeMultipartByteRanges = `multipart/byteranges`
-	ContentTypeMultipartForm       = "multipart/form-data"
-	ContentTypeHTML                = "text/html; charset=utf-8"
-	ContentTypeJSON                = "application/json"
-	ContentTypePlain               = "text/plain; charset=utf-8"
-	ContentTypeXML                 = "text/xml; charset=utf-8"
+	ContentTypeMultipartForm       = `multipart/form-data`
+	ContentTypeHTML                = `text/html; charset=utf-8`
+	ContentTypeJSON                = `application/json`
+	ContentTypePlain               = `text/plain; charset=utf-8`
+	ContentTypeXML                 = `text/xml; charset=utf-8`
+)
 
-	HeaderACAllowCredentials = "Access-Control-Allow-Credentials"
-	HeaderACAllowHeaders     = "Access-Control-Allow-Headers"
-	HeaderACAllowMethod      = "Access-Control-Allow-Method"
-	HeaderACAllowOrigin      = "Access-Control-Allow-Origin"
-	HeaderACExposeHeaders    = "Access-Control-Expose-Headers"
-	HeaderACMaxAge           = "Access-Control-Max-Age"
-	HeaderACRequestHeaders   = "Access-Control-Request-Headers"
-	HeaderACRequestMethod    = "Access-Control-Request-Method"
+// List of known header names.
+const (
+	HeaderACAllowCredentials = `Access-Control-Allow-Credentials`
+	HeaderACAllowHeaders     = `Access-Control-Allow-Headers`
+	HeaderACAllowMethod      = `Access-Control-Allow-Method`
+	HeaderACAllowOrigin      = `Access-Control-Allow-Origin`
+	HeaderACExposeHeaders    = `Access-Control-Expose-Headers`
+	HeaderACMaxAge           = `Access-Control-Max-Age`
+	HeaderACRequestHeaders   = `Access-Control-Request-Headers`
+	HeaderACRequestMethod    = `Access-Control-Request-Method`
 	HeaderAccept             = `Accept`
-	HeaderAcceptEncoding     = "Accept-Encoding"
+	HeaderAcceptEncoding     = `Accept-Encoding`
 	HeaderAcceptRanges       = `Accept-Ranges`
-	HeaderAllow              = "Allow"
-	HeaderAuthKeyBearer      = "Bearer"
-	HeaderAuthorization      = "Authorization"
+	HeaderAllow              = `Allow`
+	HeaderAuthKeyBearer      = `Bearer`
+	HeaderAuthorization      = `Authorization`
 	HeaderCacheControl       = `Cache-Control`
-	HeaderContentEncoding    = "Content-Encoding"
-	HeaderContentLength      = "Content-Length"
+	HeaderContentEncoding    = `Content-Encoding`
+	HeaderContentLength      = `Content-Length`
 	HeaderContentRange       = `Content-Range`
-	HeaderContentType        = "Content-Type"
-	HeaderCookie             = "Cookie"
+	HeaderContentType        = `Content-Type`
+	HeaderCookie             = `Cookie`
 	HeaderDate               = `Date`
-	HeaderETag               = "Etag"
-	HeaderHost               = "Host"
-	HeaderIfNoneMatch        = "If-None-Match"
+	HeaderETag               = `Etag`
+	HeaderHost               = `Host`
+	HeaderIfNoneMatch        = `If-None-Match`
 	HeaderLastEventID        = `Last-Event-ID`
-	HeaderLocation           = "Location"
-	HeaderOrigin             = "Origin"
+	HeaderLocation           = `Location`
+	HeaderOrigin             = `Origin`
 	HeaderRange              = `Range`
-	HeaderUserAgent          = "User-Agent"
-	HeaderXForwardedFor      = "X-Forwarded-For" // https://en.wikipedia.org/wiki/X-Forwarded-For
+	HeaderUserAgent          = `User-Agent`
+	HeaderXForwardedFor      = `X-Forwarded-For` // https://en.wikipedia.org/wiki/X-Forwarded-For
 	HeaderXRealIp            = `X-Real-Ip`       //revive:disable-line
 )
 
 var (
 	// ErrClientDownloadNoOutput define an error when Client's
 	// DownloadRequest does not define the Output.
-	ErrClientDownloadNoOutput = errors.New("invalid or empty client download output")
+	ErrClientDownloadNoOutput = errors.New(`invalid or empty client download output`)
 
 	// ErrEndpointAmbiguous define an error when registering path that
 	// already exist.  For example, after registering "/:x", registering
 	// "/:y" or "/z" on the same HTTP method will result in ambiguous.
-	ErrEndpointAmbiguous = errors.New("ambigous endpoint")
+	ErrEndpointAmbiguous = errors.New(`ambigous endpoint`)
 
 	// ErrEndpointKeyDuplicate define an error when registering path with
 	// the same keys, for example "/:x/:x".
-	ErrEndpointKeyDuplicate = errors.New("duplicate key in route")
+	ErrEndpointKeyDuplicate = errors.New(`duplicate key in route`)
 
 	// ErrEndpointKeyEmpty define an error when path contains an empty
 	// key, for example "/:/y".
-	ErrEndpointKeyEmpty = errors.New("empty route's key")
+	ErrEndpointKeyEmpty = errors.New(`empty route's key`)
 )
 
 // IPAddressOfRequest get the client IP address from HTTP request header
@@ -338,9 +344,9 @@ func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
 // proxy addressess.
 func ParseXForwardedFor(val string) (clientAddr string, proxyAddrs []string) {
 	if len(val) == 0 {
-		return "", nil
+		return ``, nil
 	}
-	addrs := strings.Split(val, ",")
+	addrs := strings.Split(val, `,`)
 	for x, addr := range addrs {
 		if x == 0 {
 			clientAddr = strings.TrimSpace(addr)
