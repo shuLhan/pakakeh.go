@@ -86,15 +86,15 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 	res.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-// RegisterEndpoint register the Endpoint based on Method.
-// If Method field is not set, it will default to GET.
-// The Endpoint.Call field MUST be set, or it will return an error.
+// RegisterEndpoint register the [Endpoint] based on Method.
+// If [Endpoint.Method] field is not set, it will default to GET.
+// The [Endpoint.Call] field MUST be set, or it will return an error.
 //
-// Endpoint with method HEAD and OPTIONS does not have any effect because it
+// Endpoint with Method HEAD or OPTIONS does not have any effect because it
 // already handled automatically by server.
 //
-// Endpoint with method CONNECT and TRACE will return an error because its not
-// supported yet.
+// Endpoint with Method CONNECT or TRACE will return an error because its
+// not supported, yet.
 func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 	if ep == nil {
 		return nil
@@ -128,8 +128,8 @@ func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 }
 
 // RegisterSSE register Server-Sent Events endpoint.
-// It will return an error if the Call field is not set or
-// [ErrEndpointAmbiguous], if the same path is already registered.
+// It will return an error if the [SSEEndpoint.Call] field is not set or
+// [ErrEndpointAmbiguous] if the same path is already registered.
 func (srv *Server) RegisterSSE(ep *SSEEndpoint) (err error) {
 	var logp = `RegisterSSE`
 
@@ -179,7 +179,7 @@ func (srv *Server) registerDelete(ep *Endpoint) (err error) {
 }
 
 // RegisterEvaluator register HTTP middleware that will be called before
-// Endpoint evalutor and callback is called.
+// [Endpoint.Eval] and [Endpoint.Call] is called.
 func (srv *Server) RegisterEvaluator(eval Evaluator) {
 	srv.evals = append(srv.evals, eval)
 }
@@ -484,9 +484,9 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 }
 
 // HandleFS handle the request as resource in the memory file system.
-// This method only works if the Server.Options.Memfs is not nil.
+// This method only works if the [ServerOptions.Memfs] is not nil.
 //
-// If the request Path exists and Server Options FSHandler is set and
+// If the request Path exists and [ServerOptions.HandleFS] is set and
 // returning false, it will return immediately.
 //
 // If the request Path exists in file system, it will return 200 OK with the
@@ -773,16 +773,16 @@ func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 // The body parameter contains the content of resource being requested that
 // implement Reader and Seeker.
 //
-// If the Request method is not GET, or no Range in header request it will
-// return all the body [RFC7233 S-3.1].
+// If the [http.Request.Method] is not GET, or no "Range" in
+// [http.Request.Header], it will return all the body [RFC7233 S-3.1].
 //
 // The contentType is optional, if its empty, it will detected by
 // [http.ResponseWriter] during Write.
 //
 // It will return HTTP Code,
-//   - 406 StatusNotAcceptable, if the Range unit is not "bytes".
-//   - 416 StatusRequestedRangeNotSatisfiable, if the request Range start
-//     position is greater than resource size.
+//   - 406 [http.StatusNotAcceptable], if the [Range] unit is not "bytes".
+//   - 416 [http.StatusRequestedRangeNotSatisfiable], if the request Range
+//     start position is greater than resource size.
 //
 // [HTTP Range]: https://datatracker.ietf.org/doc/html/rfc7233
 // [RFC7233 S-3.1]: https://datatracker.ietf.org/doc/html/rfc7233#section-3.1

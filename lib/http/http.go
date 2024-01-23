@@ -12,8 +12,8 @@
 //   - Simplify registering routing with key binding in Server
 //   - Add support for handling CORS in Server
 //   - Serving files using [memfs.MemFS] in Server
-//   - Simplify sending body with application/x-www-form-urlencoded,
-//     multipart/form-data, application/json with POST or PUT methods in
+//   - Simplify sending body with "application/x-www-form-urlencoded",
+//     "multipart/form-data", "application/json" with POST or PUT methods in
 //     Client.
 //   - Add support for [HTTP Range] in Server and Client
 //   - Add support for [Server-Sent Events] (SSE) in Server.
@@ -25,14 +25,14 @@
 // First, optimizing serving local file system; second, complexity of routing
 // regarding to their method, request type, and response type.
 //
-// Assuming that we want to serve file system and API using ServeMux, the
-// simplest registered handler are,
+// Assuming that we want to serve file system and API using [http.ServeMux],
+// the simplest registered handler are,
 //
 //	mux.HandleFunc("/", handleFileSystem)
 //	mux.HandleFunc("/api", handleAPI)
 //
-// The first problem is regarding to "http.ServeFile".
-// Everytime the request hit "handleFileSystem" the "http.ServeFile" try to
+// The first problem is regarding to [http.ServeFile].
+// Everytime the request hit "handleFileSystem" the [http.ServeFile] try to
 // locate the file regarding to request path in system, read the content of
 // file, parse its content type, and finally write the content-type,
 // content-length, and body as response.
@@ -64,9 +64,9 @@
 // lookup, and cache-miss on OS level.
 //
 // Serving file system is handled by package [memfs], which can be set on
-// ServerOptions.
+// [ServerOptions].
 // For example, to serve all content in directory "www", we can set the
-// ServerOptions to,
+// [ServerOptions] to,
 //
 //	opts := &http.ServerOptions{
 //		Memfs: &memfs.MemFS{
@@ -105,7 +105,7 @@
 //	...
 //
 // Upon receiving request to "POST /api/login", the library will call
-// "HttpRequest.ParseForm()", read the content of body and pass them to
+// [http.HttpRequest.ParseForm], read the content of body and pass them to
 // "handleLogin",
 //
 //	func handleLogin(epr *EndpointRequest) (resBody []byte, err error) {
@@ -116,10 +116,10 @@
 //
 // # Routing
 //
-// The Endpoint allow binding the unique key into path using colon ":" as the
-// first character.
+// The [Endpoint] allow binding the unique key into path using colon ":" as
+// the first character.
 //
-// For example, after registering the following Endpoint,
+// For example, after registering the following [Endpoint],
 //
 //	epBinding := &libhttp.Endpoint{
 //		Method: libhttp.RequestMethodGet,
@@ -131,8 +131,8 @@
 //	server.RegisterEndpoint(epBinding)
 //
 // when the server receiving GET request using path "/category/book?limit=10",
-// it will put the "book" and "10" into http.Request's Form with key is "name"
-// and "limit"
+// it will put the "book" and "10" into [http.Request.Form] with key is
+// "name" and "limit"
 //
 //	fmt.Println("request.Form:", req.Form)
 //	// request.Form: map[name:[book] limit:[10]]
@@ -140,7 +140,7 @@
 // The key binding must be unique between path and query.  If query has the
 // same key then it will be overridden by value in path.  For example, using
 // the above endpoint, request with "/category/book?name=Hitchiker" will
-// result in Request.Form:
+// result in [http.Request.Form]:
 //
 //	map[name:[book]]
 //
@@ -150,9 +150,9 @@
 //
 // # Callback error handling
 //
-// Each Endpoint can have their own error handler. If its nil, it will default
-// to DefaultErrorHandler, which return the error as JSON with the following
-// format,
+// Each [Endpoint] can have their own error handler.
+// If its nil, it will default to [DefaultErrorHandler], which return the
+// error as JSON with the following format,
 //
 //	{"code":<HTTP_STATUS_CODE>,"message":<err.Error()>}
 //
@@ -184,8 +184,8 @@
 //
 // # Summary
 //
-// The pseudocode below illustrate how Endpoint, Callback, and
-// CallbackErrorHandler works when the Server receive HTTP request,
+// The pseudocode below illustrate how [Endpoint], [Callback], and
+// [CallbackErrorHandler] works when the [Server] receive HTTP request,
 //
 //	func (server *Server) (w http.ResponseWriter, req *http.Request) {
 //		for _, endpoint := range server.endpoints {

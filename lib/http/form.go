@@ -18,7 +18,7 @@ const (
 	structTagKey = "form"
 )
 
-// MarshalForm marshal struct fields tagged with `form:` into url.Values.
+// MarshalForm marshal struct fields tagged with `form:` into [url.Values].
 //
 // The rules for marshaling follow the same rules as in [UnmarshalForm].
 //
@@ -130,14 +130,14 @@ func MarshalForm(in any) (out url.Values, err error) {
 }
 
 // UnmarshalForm read struct fields tagged with `form:` from out as key and
-// set its using the value from url.Values based on that key.
-// If the field does not have `form:` tag but it is exported, then it will use
-// the field name, in case insensitive.
+// set its using the value from [url.Values] based on that key.
+// If the field does not have `form:` tag but it is exported, then it will
+// use the field name, in case insensitive manner.
 //
 // Only the following types are supported: bool, int/intX, uint/uintX,
-// floatX, string, []byte, or type that implement BinaryUnmarshaler
-// (UnmarshalBinary), json.Unmarshaler (UnmarshalJSON), or TextUnmarshaler
-// (UnmarshalText).
+// floatX, string, []byte, or type that implement
+// [encoding.BinaryUnmarshaler] (UnmarshalBinary), [json.Unmarshaler]
+// (UnmarshalJSON), or [encoding.TextUnmarshaler] (UnmarshalText).
 //
 // A bool type can be set to true using the following string value: "true",
 // "yes", or "1".

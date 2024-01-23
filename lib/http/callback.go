@@ -13,8 +13,8 @@ package http
 // The [EndpointRequest.HttpWriter] can be used to write custom header or to
 // write cookies but should not be used to write response body.
 //
-// The error return type should be an instance of *errors.E, with E.Code
-// define the HTTP status code.
+// The error return type should be an instance of *[liberrors.E], with
+// [liberrors.E.Code] define the HTTP status code.
 // If error is not nil and not *[liberrors.E], server will response with
 // [http.StatusInternalServerError] status code.
 type Callback func(req *EndpointRequest) (resBody []byte, err error)

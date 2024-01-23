@@ -8,14 +8,14 @@ import liberrors "github.com/shuLhan/share/lib/errors"
 
 // EndpointResponse is one of the common HTTP response container that can be
 // used by Server implementor.
-// Its embed the lib/errors.E type to work seamlessly with Endpoint.Call
+// Its embed the [liberrors.E] type to work seamlessly with [Endpoint.Call]
 // handler for checking the returned error.
 //
 // If the response is paging, contains more than one item in Data, one
 // can set the current status of paging in field Limit, Offset, Page, and
 // Count.
 //
-// See the example below on how to use it with Endpoint.Call handler.
+// See the example below on how to use it with [Endpoint.Call] handler.
 type EndpointResponse struct {
 	Data interface{} `json:"data,omitempty"`
 
@@ -43,7 +43,7 @@ func (epr *EndpointResponse) Error() string {
 	return epr.E.Error()
 }
 
-// Unwrap return the error as instance of *liberror.E.
+// Unwrap return the error as instance of [*liberrors.E].
 func (epr *EndpointResponse) Unwrap() (err error) {
 	return &epr.E
 }

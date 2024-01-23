@@ -11,7 +11,7 @@ import (
 	libstrings "github.com/shuLhan/share/lib/strings"
 )
 
-// DefRangeLimit limit of content served by server when Range request
+// DefRangeLimit limit of content served by server when [Range] request
 // without end, in example "0-".
 const DefRangeLimit = 8388608
 
@@ -35,7 +35,7 @@ func NewRange(unit string) (r *Range) {
 
 // ParseMultipartRange parse "multipart/byteranges" response body.
 // Each Content-Range position and body part in the multipart will be stored
-// under RangePosition.
+// under [RangePosition].
 func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) {
 	var (
 		logp   = `ParseMultipartRange`

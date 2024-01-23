@@ -6,7 +6,7 @@ package http
 
 import "io"
 
-// DownloadRequest define the parameter for Client's Download() method.
+// DownloadRequest define the parameter for [Client.Download] method.
 type DownloadRequest struct {
 	// Output define where the downloaded resource from server will be
 	// writen.

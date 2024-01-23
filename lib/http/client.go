@@ -31,8 +31,9 @@ var (
 	defUserAgent = `libhttp/` + share.Version
 )
 
-// Client is a wrapper for standard http.Client with simplified usabilities,
-// including setting default headers, uncompressing response body.
+// Client is a wrapper for standard [http.Client] with simplified
+// usabilities, including setting default headers, uncompressing response
+// body.
 type Client struct {
 	flateReader io.ReadCloser
 	gzipReader  *gzip.Reader
@@ -42,10 +43,11 @@ type Client struct {
 	*http.Client
 }
 
-// NewClient create and initialize new Client.
+// NewClient create and initialize new [Client].
 //
-// The client will have KeepAlive timeout set to 30 seconds, with 1 maximum
-// idle connection, and 90 seconds IdleConnTimeout.
+// The client will have [net.Dialer.KeepAlive] timeout set to 30
+// seconds, with 1 [http.Transport.MaxIdleConns], and 90 seconds
+// [http.Transport.IdleConnTimeout].
 func NewClient(opts *ClientOptions) (client *Client) {
 	opts.init()
 
@@ -90,7 +92,7 @@ func (client *Client) Delete(requestPath string, headers http.Header, params url
 	return client.doRequest(http.MethodDelete, headers, requestPath, ``, nil)
 }
 
-// Do overwrite the standard http Client.Do to allow debugging request and
+// Do overwrite the standard [http.Client.Do] to allow debugging request and
 // response, and to read and return the response body immediately.
 func (client *Client) Do(httpRequest *http.Request) (
 	httpRes *http.Response, resBody []byte, err error,
@@ -124,12 +126,12 @@ func (client *Client) Do(httpRequest *http.Request) (
 }
 
 // Download a resource from remote server and write it into
-// DownloadRequest.Output.
+// [DownloadRequest.Output].
 //
-// If the DownloadRequest.Output is nil, it will return an error
-// ErrClientDownloadNoOutput.
+// If the [DownloadRequest.Output] is nil, it will return an error
+// [ErrClientDownloadNoOutput].
 // If server return HTTP code beside 200, it will return non-nil
-// http.Response with an error.
+// [http.Response] with an error.
 func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err error) {
 	var (
 		logp     = "Download"
@@ -173,25 +175,25 @@ out:
 	return httpRes, err
 }
 
-// GenerateHttpRequest generate http.Request from method, path, requestType,
-// headers, and params.
+// GenerateHttpRequest generate [http.Request] from method, path,
+// requestType, headers, and params.
 //
 // For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
-// value should be nil or url.Values.
-// If its url.Values, then the params will be encoded as query parameters.
+// value should be nil or [url.Values].
+// If its [url.Values], then the params will be encoded as query parameters.
 //
 // For HTTP method is PATCH, POST, or PUT; the params will converted based on
 // requestType rules below,
 //
-//   - If requestType is RequestTypeQuery and params is url.Values it will be
-//     added as query parameters in the path.
-//   - If requestType is RequestTypeForm and params is url.Values it will be
-//     added as URL encoded in the body.
-//   - If requestType is RequestTypeMultipartForm and params type is
+//   - If requestType is [RequestTypeQuery] and params is [url.Values] it
+//     will be added as query parameters in the path.
+//   - If requestType is [RequestTypeForm] and params is [url.Values] it
+//     will be added as URL encoded in the body.
+//   - If requestType is [RequestTypeMultipartForm] and params type is
 //     map[string][]byte, then it will be converted as multipart form in the
 //     body.
-//   - If requestType is RequestTypeJSON and params is not nil, the params will
-//     be encoded as JSON in body.
+//   - If requestType is [RequestTypeJSON] and params is not nil, the params
+//     will be encoded as JSON in body.
 func (client *Client) GenerateHttpRequest( //revive:disable-line
 	method RequestMethod,
 	requestPath string,

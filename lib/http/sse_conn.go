@@ -16,11 +16,11 @@ import (
 
 // SSECallback define the handler for Server-Sent Events (SSE).
 //
-// SSECallback type pass SSEConn that contains original HTTP request.
+// SSECallback type pass [SSEConn] that contains original HTTP request.
 // This allow the server to check for header "Last-Event-ID" and/or for
 // authentication.
-// Remember that "the original Request.Body must not be used" according to
-// [http.Hijacker] documentation.
+// Remember that "the original [http.Request.Body] must not be used"
+// according to [http.Hijacker] documentation.
 type SSECallback func(sse *SSEConn)
 
 // SSEConn define the connection when the SSE request accepted by server.
