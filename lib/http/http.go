@@ -295,6 +295,7 @@ const (
 	HeaderDate               = `Date`
 	HeaderETag               = `Etag`
 	HeaderHost               = `Host`
+	HeaderIfModifiedSince    = `If-Modified-Since`
 	HeaderIfNoneMatch        = `If-None-Match`
 	HeaderLastEventID        = `Last-Event-ID`
 	HeaderLocation           = `Location`

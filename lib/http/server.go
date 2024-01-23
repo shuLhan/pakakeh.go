@@ -535,11 +535,26 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set(HeaderContentType, node.ContentType)
 
-	responseETag = strconv.FormatInt(node.ModTime().Unix(), 10)
+	var nodeModtime = node.ModTime().Unix()
+
+	responseETag = strconv.FormatInt(nodeModtime, 10)
 	requestETag = req.Header.Get(HeaderIfNoneMatch)
 	if requestETag == responseETag {
 		res.WriteHeader(http.StatusNotModified)
 		return
+	}
+
+	var ifModifiedSince = req.Header.Get(HeaderIfModifiedSince)
+	if len(ifModifiedSince) != 0 {
+		var timeModsince time.Time
+
+		timeModsince, err = time.Parse(time.RFC1123, ifModifiedSince)
+		if err == nil {
+			if nodeModtime <= timeModsince.Unix() {
+				res.WriteHeader(http.StatusNotModified)
+				return
+			}
+		}
 	}
 
 	var bodyReader io.ReadSeeker
