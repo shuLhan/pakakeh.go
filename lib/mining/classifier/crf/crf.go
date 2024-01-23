@@ -328,8 +328,8 @@ func (crf *Runtime) runTPSet(samples tabula.ClasetInterface) {
 		return
 	}
 
-	tnIds := numbers.IntCreateSeq(0, crf.tnset.Len()-1)
-	_, cm, _ := crf.ClassifySetByWeight(crf.tnset, tnIds)
+	tnListID := numbers.IntCreateSeq(0, crf.tnset.Len()-1)
+	_, cm, _ := crf.ClassifySetByWeight(crf.tnset, tnListID)
 
 	crf.refillWithFP(samples, crf.tnset, cm)
 }
@@ -358,7 +358,7 @@ func (crf *Runtime) runTPSet(samples tabula.ClasetInterface) {
 // (1.4) Save stage probabilities for positive class.
 // (2) Compute confusion matrix.
 func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
-	sampleIds []int,
+	sampleListID []int,
 ) (
 	predicts []string, cm *classifier.CM, probs []float64,
 ) {
@@ -410,7 +410,7 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 
 	// (2)
 	actuals := samples.GetClassAsStrings()
-	cm = crf.ComputeCM(sampleIds, vs, actuals, predicts)
+	cm = crf.ComputeCM(sampleListID, vs, actuals, predicts)
 
 	crf.ComputeStatFromCM(&stat, cm)
 	stat.End()

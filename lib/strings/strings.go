@@ -234,11 +234,11 @@ func MostFrequentTokens(words []string, tokens []string, sensitive bool) string 
 }
 
 // SortByIndex will sort the slice of string in place using list of index.
-func SortByIndex(ss *[]string, sortedIds []int) {
+func SortByIndex(ss *[]string, sortedListID []int) {
 	newd := make([]string, len(*ss))
 
-	for x := 0; x < len(sortedIds); x++ {
-		newd[x] = (*ss)[sortedIds[x]]
+	for x := 0; x < len(sortedListID); x++ {
+		newd[x] = (*ss)[sortedListID[x]]
 	}
 
 	(*ss) = newd

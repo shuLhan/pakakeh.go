@@ -24,14 +24,14 @@ func IntCreateSeq(min, max int) (seq []int) {
 // IntPickRandPositive return random integer value from 0 to maximum value
 // `maxVal`.
 //
-// The random value is checked with already picked index: `pickedIds`.
+// The random value is checked with already picked index: `pickedListID`.
 //
-// If `dup` is true, allow duplicate value in `pickedIds`, otherwise only
-// single unique value allowed in `pickedIds`.
+// If `dup` is true, allow duplicate value in `pickedListID`, otherwise only
+// single unique value allowed in `pickedListID`.
 //
-// If excluding index `exsIds` is not empty, do not pick the integer value
+// If excluding index `exsListID` is not empty, do not pick the integer value
 // listed in there.
-func IntPickRandPositive(maxVal int, dup bool, pickedIds, exsIds []int) (idx int) {
+func IntPickRandPositive(maxVal int, dup bool, pickedListID, exsListID []int) (idx int) {
 	var (
 		logp    = `IntPickRandPositive`
 		randMax = big.NewInt(int64(maxVal))
@@ -52,7 +52,7 @@ func IntPickRandPositive(maxVal int, dup bool, pickedIds, exsIds []int) (idx int
 
 		// Check in exclude indices.
 		excluded = false
-		for _, v := range exsIds {
+		for _, v := range exsListID {
 			if idx == v {
 				excluded = true
 				break
@@ -69,7 +69,7 @@ func IntPickRandPositive(maxVal int, dup bool, pickedIds, exsIds []int) (idx int
 
 		// Check if its already picked.
 		picked = false
-		for _, v := range pickedIds {
+		for _, v := range pickedListID {
 			if idx == v {
 				picked = true
 				break

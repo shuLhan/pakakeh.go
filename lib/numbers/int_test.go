@@ -18,16 +18,16 @@ func TestIntCreateSeq(t *testing.T) {
 }
 
 func TestIntPickRandPositive(t *testing.T) {
-	pickedIds := []int{0, 1, 2, 3, 4, 5, 7}
-	exsIds := []int{8, 9}
+	pickedListID := []int{0, 1, 2, 3, 4, 5, 7}
+	exsListID := []int{8, 9}
 	exp := 6
 
 	// Pick random without duplicate.
-	got := IntPickRandPositive(7, false, pickedIds, nil)
+	got := IntPickRandPositive(7, false, pickedListID, nil)
 
 	test.Assert(t, "", exp, got)
 
 	// Pick random with exclude indices.
-	got = IntPickRandPositive(9, false, pickedIds, exsIds)
+	got = IntPickRandPositive(9, false, pickedListID, exsListID)
 	test.Assert(t, "", exp, got)
 }

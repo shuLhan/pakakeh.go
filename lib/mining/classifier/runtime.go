@@ -99,7 +99,7 @@ func (rt *Runtime) AddStat(stat *Stat) {
 
 // ComputeCM will compute confusion matrix of sample using value space, actual
 // and prediction values.
-func (rt *Runtime) ComputeCM(sampleIds []int,
+func (rt *Runtime) ComputeCM(sampleListID []int,
 	vs, actuals, predicts []string,
 ) (
 	cm *CM,
@@ -107,7 +107,7 @@ func (rt *Runtime) ComputeCM(sampleIds []int,
 	cm = &CM{}
 
 	cm.ComputeStrings(vs, actuals, predicts)
-	cm.GroupIndexPredictionsStrings(sampleIds, actuals, predicts)
+	cm.GroupIndexPredictionsStrings(sampleListID, actuals, predicts)
 
 	return cm
 }
@@ -309,12 +309,12 @@ func (rt *Runtime) Performance(samples tabula.ClasetInterface,
 ) {
 	// (1)
 	actuals := samples.GetClassAsStrings()
-	sortedIds := numbers.IntCreateSeq(0, len(probs)-1)
-	floats64.InplaceMergesort(probs, sortedIds, 0, len(probs), false)
+	sortedListID := numbers.IntCreateSeq(0, len(probs)-1)
+	floats64.InplaceMergesort(probs, sortedListID, 0, len(probs), false)
 
 	// (2)
-	libstrings.SortByIndex(&actuals, sortedIds)
-	libstrings.SortByIndex(&predicts, sortedIds)
+	libstrings.SortByIndex(&actuals, sortedListID)
+	libstrings.SortByIndex(&predicts, sortedListID)
 
 	// (3)
 	rt.computePerfByProbs(samples, actuals, probs)

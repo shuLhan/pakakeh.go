@@ -48,7 +48,7 @@ func TestComputeStrings(t *testing.T) {
 }
 
 func TestGroupIndexPredictions(t *testing.T) {
-	testIds := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	testListID := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 	actuals := []int64{1, 1, 1, 1, 0, 0, 0, 0, 0, 0}
 	predics := []int64{1, 1, 0, 1, 0, 0, 0, 0, 1, 0}
 	exp := [][]int{
@@ -60,7 +60,7 @@ func TestGroupIndexPredictions(t *testing.T) {
 
 	cm := &CM{}
 
-	cm.GroupIndexPredictions(testIds, actuals, predics)
+	cm.GroupIndexPredictions(testListID, actuals, predics)
 
 	test.Assert(t, "", exp[0], cm.TPIndices())
 	test.Assert(t, "", exp[1], cm.FNIndices())

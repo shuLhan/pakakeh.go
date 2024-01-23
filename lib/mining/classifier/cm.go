@@ -16,14 +16,14 @@ type CM struct {
 	// rowNames contain name in each row.
 	rowNames []string
 
-	// tpIds contain index of true-positive samples.
-	tpIds []int
-	// fpIds contain index of false-positive samples.
-	fpIds []int
-	// tnIds contain index of true-negative samples.
-	tnIds []int
-	// fnIds contain index of false-negative samples.
-	fnIds []int
+	// tpListID contain index of true-positive samples.
+	tpListID []int
+	// fpListID contain index of false-positive samples.
+	fpListID []int
+	// tnListID contain index of true-negative samples.
+	tnListID []int
+	// fnListID contain index of false-negative samples.
+	fnListID []int
 
 	tabula.Dataset
 
@@ -201,7 +201,7 @@ func (cm *CM) computeClassError() {
 // GroupIndexPredictions given index of samples, group the samples by their
 // class of prediction. For example,
 //
-//	sampleIds:   [0, 1, 2, 3, 4, 5]
+//	sampleListID:   [0, 1, 2, 3, 4, 5]
 //	actuals:     [1, 1, 0, 0, 1, 0]
 //	predictions: [1, 0, 1, 0, 1, 1]
 //
@@ -214,18 +214,18 @@ func (cm *CM) computeClassError() {
 //	     false-negative indices: [1]
 //
 // This function assume that positive value as "1" and negative value as "0".
-func (cm *CM) GroupIndexPredictions(sampleIds []int,
+func (cm *CM) GroupIndexPredictions(sampleListID []int,
 	actuals, predictions []int64,
 ) {
 	// Reset indices.
-	cm.tpIds = nil
-	cm.fpIds = nil
-	cm.tnIds = nil
-	cm.fnIds = nil
+	cm.tpListID = nil
+	cm.fpListID = nil
+	cm.tnListID = nil
+	cm.fnListID = nil
 
 	// Make sure we are not out-of-range when looping, always pick the
 	// minimum length between the three parameters.
-	min := len(sampleIds)
+	min := len(sampleListID)
 	if len(actuals) < min {
 		min = len(actuals)
 	}
@@ -236,15 +236,15 @@ func (cm *CM) GroupIndexPredictions(sampleIds []int,
 	for x := 0; x < min; x++ {
 		if actuals[x] == 1 {
 			if predictions[x] == 1 {
-				cm.tpIds = append(cm.tpIds, sampleIds[x])
+				cm.tpListID = append(cm.tpListID, sampleListID[x])
 			} else {
-				cm.fnIds = append(cm.fnIds, sampleIds[x])
+				cm.fnListID = append(cm.fnListID, sampleListID[x])
 			}
 		} else {
 			if predictions[x] == 1 {
-				cm.fpIds = append(cm.fpIds, sampleIds[x])
+				cm.fpListID = append(cm.fpListID, sampleListID[x])
 			} else {
-				cm.tnIds = append(cm.tnIds, sampleIds[x])
+				cm.tnListID = append(cm.tnListID, sampleListID[x])
 			}
 		}
 	}
@@ -252,22 +252,22 @@ func (cm *CM) GroupIndexPredictions(sampleIds []int,
 
 // GroupIndexPredictionsStrings is an alternative to GroupIndexPredictions
 // which work with string class.
-func (cm *CM) GroupIndexPredictionsStrings(sampleIds []int,
+func (cm *CM) GroupIndexPredictionsStrings(sampleListID []int,
 	actuals, predictions []string,
 ) {
-	if len(sampleIds) == 0 {
+	if len(sampleListID) == 0 {
 		return
 	}
 
 	// Reset indices.
-	cm.tpIds = nil
-	cm.fpIds = nil
-	cm.tnIds = nil
-	cm.fnIds = nil
+	cm.tpListID = nil
+	cm.fpListID = nil
+	cm.tnListID = nil
+	cm.fnListID = nil
 
 	// Make sure we are not out-of-range when looping, always pick the
 	// minimum length between the three parameters.
-	min := len(sampleIds)
+	min := len(sampleListID)
 	if len(actuals) < min {
 		min = len(actuals)
 	}
@@ -278,15 +278,15 @@ func (cm *CM) GroupIndexPredictionsStrings(sampleIds []int,
 	for x := 0; x < min; x++ {
 		if actuals[x] == "1" {
 			if predictions[x] == "1" {
-				cm.tpIds = append(cm.tpIds, sampleIds[x])
+				cm.tpListID = append(cm.tpListID, sampleListID[x])
 			} else {
-				cm.fnIds = append(cm.fnIds, sampleIds[x])
+				cm.fnListID = append(cm.fnListID, sampleListID[x])
 			}
 		} else {
 			if predictions[x] == "1" {
-				cm.fpIds = append(cm.fpIds, sampleIds[x])
+				cm.fpListID = append(cm.fpListID, sampleListID[x])
 			} else {
-				cm.tnIds = append(cm.tnIds, sampleIds[x])
+				cm.tnListID = append(cm.tnListID, sampleListID[x])
 			}
 		}
 	}
@@ -356,22 +356,22 @@ func (cm *CM) TN() int {
 
 // TPIndices return indices of all true-positive samples.
 func (cm *CM) TPIndices() []int {
-	return cm.tpIds
+	return cm.tpListID
 }
 
 // FNIndices return indices of all false-negative samples.
 func (cm *CM) FNIndices() []int {
-	return cm.fnIds
+	return cm.fnListID
 }
 
 // FPIndices return indices of all false-positive samples.
 func (cm *CM) FPIndices() []int {
-	return cm.fpIds
+	return cm.fpListID
 }
 
 // TNIndices return indices of all true-negative samples.
 func (cm *CM) TNIndices() []int {
-	return cm.tnIds
+	return cm.tnListID
 }
 
 // String will return the output of confusion matrix in table like format.
@@ -395,8 +395,8 @@ func (cm *CM) String() (s string) {
 		s += "\n"
 	}
 
-	s += fmt.Sprintf("TP-FP indices %d %d\n", len(cm.tpIds), len(cm.fpIds))
-	s += fmt.Sprintf("FN-TN indices %d %d\n", len(cm.fnIds), len(cm.tnIds))
+	s += fmt.Sprintf("TP-FP indices %d %d\n", len(cm.tpListID), len(cm.fpListID))
+	s += fmt.Sprintf("FN-TN indices %d %d\n", len(cm.fnListID), len(cm.tnListID))
 
 	return
 }

@@ -378,18 +378,18 @@ func TestInplaceMergesort(t *testing.T) {
 }
 
 func TestIndirectSort_SortByIndex(t *testing.T) {
-	expIds := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+	expListID := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in1 := []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
 	in2 := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	exp := fmt.Sprint(in1)
 
-	sortedIds := IndirectSort(in1, true)
+	sortedListID := IndirectSort(in1, true)
 
-	test.Assert(t, "", expIds, sortedIds)
+	test.Assert(t, "", expListID, sortedListID)
 
 	// Reverse the sort.
-	SortByIndex(&in2, sortedIds)
+	SortByIndex(&in2, sortedListID)
 
 	got := fmt.Sprint(in2)
 

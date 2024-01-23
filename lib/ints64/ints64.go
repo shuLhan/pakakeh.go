@@ -223,12 +223,12 @@ func MinRange(d []int64, l, r int) (v int64, i int) {
 	return
 }
 
-// SortByIndex will sort the slice `d` using sorted index `sortedIds`.
-func SortByIndex(d *[]int64, sortedIds []int) {
+// SortByIndex will sort the slice `d` using sorted index `sortedListID`.
+func SortByIndex(d *[]int64, sortedListID []int) {
 	newd := make([]int64, len(*d))
 
-	for x := range sortedIds {
-		newd[x] = (*d)[sortedIds[x]]
+	for x := range sortedListID {
+		newd[x] = (*d)[sortedListID[x]]
 	}
 
 	(*d) = newd

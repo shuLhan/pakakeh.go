@@ -228,11 +228,11 @@ func MinRange(d []float64, l, r int) (m int) {
 }
 
 // SortByIndex sort the slice of float using sorted index.
-func SortByIndex(d *[]float64, sortedIds []int) {
+func SortByIndex(d *[]float64, sortedListID []int) {
 	newd := make([]float64, len(*d))
 
-	for i := range sortedIds {
-		newd[i] = (*d)[sortedIds[i]]
+	for i := range sortedListID {
+		newd[i] = (*d)[sortedListID[i]]
 	}
 
 	(*d) = newd

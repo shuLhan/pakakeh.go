@@ -228,9 +228,9 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 
 // ClassifySet given a samples predict their class by running each sample in
 // forest, and return their class prediction with confusion matrix.
-// `samples` is the sample that will be predicted, `sampleIds` is the index of
+// `samples` is the sample that will be predicted, `sampleListID` is the index of
 // samples.
-// If `sampleIds` is not nil, then sample index will be checked in each tree,
+// If `sampleListID` is not nil, then sample index will be checked in each tree,
 // if the sample is used for training, their vote is not counted.
 //
 // Algorithm,
@@ -242,17 +242,17 @@ func (forest *Runtime) GrowTree(samples tabula.ClasetInterface) (
 // (1.3) compute and save the actual class probabilities.
 // (2) Compute confusion matrix from predictions.
 // (3) Compute stat from confusion matrix.
-// (4) Write the stat to file only if sampleIds is empty, which mean its run
+// (4) Write the stat to file only if sampleListID is empty, which mean its run
 // not from OOB set.
 func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
-	sampleIds []int,
+	sampleListID []int,
 ) (
 	predicts []string, cm *classifier.CM, probs []float64,
 ) {
 	stat := classifier.Stat{}
 	stat.Start()
 
-	if len(sampleIds) == 0 {
+	if len(sampleListID) == 0 {
 		fmt.Println(tag, "Classify set:", samples)
 		fmt.Println(tag, "Classify set sample (one row):",
 			samples.GetRow(0))
@@ -267,8 +267,8 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 	rows := samples.GetRows()
 	for x, row := range *rows {
 		// (1.1)
-		if len(sampleIds) > 0 {
-			sampleIdx = sampleIds[x]
+		if len(sampleListID) > 0 {
+			sampleIdx = sampleListID[x]
 		}
 		votes := forest.Votes(row, sampleIdx)
 
@@ -286,13 +286,13 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 	}
 
 	// (2)
-	cm = forest.ComputeCM(sampleIds, vs, actuals, predicts)
+	cm = forest.ComputeCM(sampleListID, vs, actuals, predicts)
 
 	// (3)
 	forest.ComputeStatFromCM(&stat, cm)
 	stat.End()
 
-	if len(sampleIds) == 0 {
+	if len(sampleListID) == 0 {
 		fmt.Println(tag, "CM:", cm)
 		fmt.Println(tag, "Classifying stat:", stat)
 		_ = stat.Write(forest.StatFile)

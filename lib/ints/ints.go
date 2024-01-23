@@ -258,12 +258,12 @@ func Remove(d []int, v int) ([]int, bool) {
 	return d, false
 }
 
-// SortByIndex will sort the slice `d` using sorted index `sortedIds`.
-func SortByIndex(d *[]int, sortedIds []int) {
+// SortByIndex will sort the slice `d` using sorted index `sortedListID`.
+func SortByIndex(d *[]int, sortedListID []int) {
 	newd := make([]int, len(*d))
 
-	for x := 0; x < len(sortedIds); x++ {
-		newd[x] = (*d)[sortedIds[x]]
+	for x := 0; x < len(sortedListID); x++ {
+		newd[x] = (*d)[sortedListID[x]]
 	}
 
 	(*d) = newd

@@ -23,7 +23,7 @@ func runCRF(t *testing.T, sampleFile, statFile, perfFile string, nstage, ntree i
 	}
 
 	nbag := (samples.Len() * 63) / 100
-	train, test, _, testIds := tabula.RandomPickRows(&samples, nbag, false)
+	train, test, _, testListID := tabula.RandomPickRows(&samples, nbag, false)
 
 	trainset := train.(tabula.ClasetInterface)
 	testset := test.(tabula.ClasetInterface)
@@ -45,7 +45,7 @@ func runCRF(t *testing.T, sampleFile, statFile, perfFile string, nstage, ntree i
 	testset.RecountMajorMinor()
 	fmt.Println("Testset:", testset)
 
-	predicts, cm, probs := crfRuntime.ClassifySetByWeight(testset, testIds)
+	predicts, cm, probs := crfRuntime.ClassifySetByWeight(testset, testListID)
 
 	fmt.Println("Confusion matrix:", cm)
 
