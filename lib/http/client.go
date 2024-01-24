@@ -45,8 +45,8 @@ type Client struct {
 
 // NewClient create and initialize new [Client].
 //
-// The client will have [net.Dialer.KeepAlive] timeout set to 30
-// seconds, with 1 [http.Transport.MaxIdleConns], and 90 seconds
+// The client will have [net.Dialer.KeepAlive] set to 30 seconds, with one
+// [http.Transport.MaxIdleConns], and 90 seconds
 // [http.Transport.IdleConnTimeout].
 func NewClient(opts *ClientOptions) (client *Client) {
 	opts.init()
@@ -79,50 +79,48 @@ func NewClient(opts *ClientOptions) (client *Client) {
 	return client
 }
 
-// Delete send the DELETE request to server using path and params as query
-// parameters.
+// Delete send the DELETE request to server using rpath as target endpoint
+// and params as query parameters.
 // On success, it will return the uncompressed response body.
-func (client *Client) Delete(requestPath string, headers http.Header, params url.Values) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) Delete(rpath string, hdr http.Header, params url.Values) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
-		requestPath += `?` + params.Encode()
+		rpath += `?` + params.Encode()
 	}
 
-	return client.doRequest(http.MethodDelete, headers, requestPath, ``, nil)
+	return client.doRequest(http.MethodDelete, hdr, rpath, ``, nil)
 }
 
 // Do overwrite the standard [http.Client.Do] to allow debugging request and
 // response, and to read and return the response body immediately.
-func (client *Client) Do(httpRequest *http.Request) (
-	httpRes *http.Response, resBody []byte, err error,
-) {
+func (client *Client) Do(req *http.Request) (res *http.Response, resBody []byte, err error) {
 	logp := "Do"
 
-	httpRes, err = client.Client.Do(httpRequest)
+	res, err = client.Client.Do(req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	rawBody, err := io.ReadAll(httpRes.Body)
+	rawBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = httpRes.Body.Close()
+	err = res.Body.Close()
 	if err != nil {
-		return httpRes, resBody, fmt.Errorf("%s: %w", logp, err)
+		return res, resBody, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	resBody, err = client.uncompress(httpRes, rawBody)
+	resBody, err = client.uncompress(res, rawBody)
 	if err != nil {
-		return httpRes, resBody, fmt.Errorf("%s: %w", logp, err)
+		return res, resBody, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	// Recreate the body to prevent error on caller.
-	httpRes.Body = io.NopCloser(bytes.NewReader(rawBody))
+	res.Body = io.NopCloser(bytes.NewReader(rawBody))
 
-	return httpRes, resBody, nil
+	return res, resBody, nil
 }
 
 // Download a resource from remote server and write it into
@@ -132,7 +130,7 @@ func (client *Client) Do(httpRequest *http.Request) (
 // [ErrClientDownloadNoOutput].
 // If server return HTTP code beside 200, it will return non-nil
 // [http.Response] with an error.
-func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err error) {
+func (client *Client) Download(req DownloadRequest) (res *http.Response, err error) {
 	var (
 		logp     = "Download"
 		httpReq  *http.Request
@@ -148,22 +146,22 @@ func (client *Client) Download(req DownloadRequest) (httpRes *http.Response, err
 		return nil, fmt.Errorf("%s: %s", logp, err)
 	}
 
-	httpRes, err = client.Client.Do(httpReq)
+	res, err = client.Client.Do(httpReq)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	if httpRes.StatusCode != http.StatusOK {
-		err = fmt.Errorf("%s: %s", logp, httpRes.Status)
+	if res.StatusCode != http.StatusOK {
+		err = fmt.Errorf("%s: %s", logp, res.Status)
 		goto out
 	}
 
-	_, err = io.Copy(req.Output, httpRes.Body)
+	_, err = io.Copy(req.Output, res.Body)
 	if err != nil {
 		err = fmt.Errorf("%s: %w", logp, err)
 	}
 out:
-	errClose = httpRes.Body.Close()
+	errClose = res.Body.Close()
 	if errClose != nil {
 		if err == nil {
 			err = fmt.Errorf("%s: %w", logp, errClose)
@@ -172,41 +170,43 @@ out:
 		}
 	}
 
-	return httpRes, err
+	return res, err
 }
 
-// GenerateHttpRequest generate [http.Request] from method, path,
-// requestType, headers, and params.
+// GenerateHttpRequest generate [http.Request] from method, rpath,
+// rtype, hdr, and params.
 //
 // For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
 // value should be nil or [url.Values].
 // If its [url.Values], then the params will be encoded as query parameters.
 //
-// For HTTP method is PATCH, POST, or PUT; the params will converted based on
-// requestType rules below,
+// For HTTP method is PATCH, POST, or PUT; the params will converted based
+// on rtype rules below,
 //
-//   - If requestType is [RequestTypeQuery] and params is [url.Values] it
-//     will be added as query parameters in the path.
-//   - If requestType is [RequestTypeForm] and params is [url.Values] it
+//   - If rtype is [RequestTypeQuery] and params is [url.Values] it
+//     will be added as query parameters in the rpath.
+//   - If rtype is [RequestTypeForm] and params is [url.Values] it
 //     will be added as URL encoded in the body.
-//   - If requestType is [RequestTypeMultipartForm] and params type is
+//   - If rtype is [RequestTypeMultipartForm] and params type is
 //     map[string][]byte, then it will be converted as multipart form in the
 //     body.
-//   - If requestType is [RequestTypeJSON] and params is not nil, the params
+//   - If rtype is [RequestTypeJSON] and params is not nil, the params
 //     will be encoded as JSON in body.
-func (client *Client) GenerateHttpRequest( //revive:disable-line
+//
+//revive:disable-next-line
+func (client *Client) GenerateHttpRequest(
 	method RequestMethod,
-	requestPath string,
-	requestType RequestType,
-	headers http.Header,
+	rpath string,
+	rtype RequestType,
+	hdr http.Header,
 	params interface{},
-) (httpRequest *http.Request, err error) {
+) (req *http.Request, err error) {
 	var (
 		logp              = "GenerateHttpRequest"
 		paramsAsURLValues url.Values
 		isParamsURLValues bool
 		paramsAsJSON      []byte
-		contentType       = requestType.String()
+		contentType       = rtype.String()
 		strBody           string
 		body              io.Reader
 	)
@@ -222,16 +222,16 @@ func (client *Client) GenerateHttpRequest( //revive:disable-line
 		RequestMethodTrace:
 
 		if isParamsURLValues {
-			requestPath += `?` + paramsAsURLValues.Encode()
+			rpath += `?` + paramsAsURLValues.Encode()
 		}
 
 	case RequestMethodPatch,
 		RequestMethodPost,
 		RequestMethodPut:
-		switch requestType {
+		switch rtype {
 		case RequestTypeQuery:
 			if isParamsURLValues {
-				requestPath += `?` + paramsAsURLValues.Encode()
+				rpath += `?` + paramsAsURLValues.Encode()
 			}
 
 		case RequestTypeForm:
@@ -262,79 +262,79 @@ func (client *Client) GenerateHttpRequest( //revive:disable-line
 		}
 	}
 
-	requestPath = path.Join(`/`, requestPath)
-	fullURL := client.opts.ServerUrl + requestPath
+	rpath = path.Join(`/`, rpath)
+	fullURL := client.opts.ServerUrl + rpath
 
-	httpRequest, err = http.NewRequest(method.String(), fullURL, body)
+	req, err = http.NewRequest(method.String(), fullURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	setHeaders(httpRequest, client.opts.Headers)
-	setHeaders(httpRequest, headers)
+	setHeaders(req, client.opts.Headers)
+	setHeaders(req, hdr)
 
 	if len(contentType) > 0 {
-		httpRequest.Header.Set(HeaderContentType, contentType)
+		req.Header.Set(HeaderContentType, contentType)
 	}
 
-	return httpRequest, nil
+	return req, nil
 }
 
-// Get send the GET request to server using path and params as query
-// parameters.
+// Get send the GET request to server using rpath as target endpoint and
+// params as query parameters.
 // On success, it will return the uncompressed response body.
-func (client *Client) Get(requestPath string, headers http.Header, params url.Values) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) Get(rpath string, hdr http.Header, params url.Values) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
-		requestPath += `?` + params.Encode()
+		rpath += `?` + params.Encode()
 	}
 
-	return client.doRequest(http.MethodGet, headers, requestPath, ``, nil)
+	return client.doRequest(http.MethodGet, hdr, rpath, ``, nil)
 }
 
-// Head send the HEAD request to path, with optional headers and params in
-// query parameters.
+// Head send the HEAD request to rpath endpoint, with optional hdr and
+// params in query parameters.
 // The returned resBody shoule be always nil.
-func (client *Client) Head(path string, headers http.Header, params url.Values) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) Head(rpath string, hdr http.Header, params url.Values) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
-		path += `?` + params.Encode()
+		rpath += `?` + params.Encode()
 	}
-	return client.doRequest(http.MethodHead, headers, path, ``, nil)
+	return client.doRequest(http.MethodHead, hdr, rpath, ``, nil)
 }
 
-// Post send the POST request to path without setting "Content-Type".
-// If the params is not nil, it will send as query parameters in the path.
-func (client *Client) Post(requestPath string, headers http.Header, params url.Values) (
-	httpRes *http.Response, resBody []byte, err error,
+// Post send the POST request to rpath without setting "Content-Type".
+// If the params is not nil, it will send as query parameters in the rpath.
+func (client *Client) Post(rpath string, hdr http.Header, params url.Values) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	if params != nil {
-		requestPath += `?` + params.Encode()
+		rpath += `?` + params.Encode()
 	}
 
-	return client.doRequest(http.MethodPost, headers, requestPath, ``, nil)
+	return client.doRequest(http.MethodPost, hdr, rpath, ``, nil)
 }
 
-// PostForm send the POST request to path using
+// PostForm send the POST request to rpath using
 // "application/x-www-form-urlencoded".
-func (client *Client) PostForm(requestPath string, headers http.Header, params url.Values) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) PostForm(rpath string, hdr http.Header, params url.Values) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	body := strings.NewReader(params.Encode())
 
-	return client.doRequest(http.MethodPost, headers, requestPath, ContentTypeForm, body)
+	return client.doRequest(http.MethodPost, hdr, rpath, ContentTypeForm, body)
 }
 
-// PostFormData send the POST request to path with all parameters is send
+// PostFormData send the POST request to rpath with all parameters is send
 // using "multipart/form-data".
 func (client *Client) PostFormData(
-	requestPath string,
-	headers http.Header,
+	rpath string,
+	hdr http.Header,
 	params map[string][]byte,
 ) (
-	httpRes *http.Response, resBody []byte, err error,
+	res *http.Response, resBody []byte, err error,
 ) {
 	contentType, strBody, err := generateFormData(params)
 	if err != nil {
@@ -343,15 +343,15 @@ func (client *Client) PostFormData(
 
 	body := strings.NewReader(strBody)
 
-	return client.doRequest(http.MethodPost, headers, requestPath, contentType, body)
+	return client.doRequest(http.MethodPost, hdr, rpath, contentType, body)
 }
 
 // PostJSON send the POST request with content type set to "application/json"
 // and params encoded automatically to JSON.
 // The params must be a type than can be marshalled with [json.Marshal] or
 // type that implement [json.Marshaler].
-func (client *Client) PostJSON(requestPath string, headers http.Header, params interface{}) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) PostJSON(rpath string, hdr http.Header, params interface{}) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)
 	if err != nil {
@@ -360,32 +360,32 @@ func (client *Client) PostJSON(requestPath string, headers http.Header, params i
 
 	body := bytes.NewReader(paramsJSON)
 
-	return client.doRequest(http.MethodPost, headers, requestPath, ContentTypeJSON, body)
+	return client.doRequest(http.MethodPost, hdr, rpath, ContentTypeJSON, body)
 }
 
-// Put send the HTTP PUT request with specific content type and body to
-// specific path at the server.
-func (client *Client) Put(requestPath string, headers http.Header, body []byte) (
+// Put send the HTTP PUT request to rpath with optional, raw body.
+// The Content-Type can be set in the hdr.
+func (client *Client) Put(rpath string, hdr http.Header, body []byte) (
 	*http.Response, []byte, error,
 ) {
 	bodyReader := bytes.NewReader(body)
-	return client.doRequest(http.MethodPut, headers, requestPath, ``, bodyReader)
+	return client.doRequest(http.MethodPut, hdr, rpath, ``, bodyReader)
 }
 
 // PutForm send the PUT request with params set in body using content type
 // "application/x-www-form-urlencoded".
-func (client *Client) PutForm(requestPath string, headers http.Header, params url.Values) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) PutForm(rpath string, hdr http.Header, params url.Values) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	var body = strings.NewReader(params.Encode())
 
-	return client.doRequest(http.MethodPut, headers, requestPath, ContentTypeForm, body)
+	return client.doRequest(http.MethodPut, hdr, rpath, ContentTypeForm, body)
 }
 
 // PutFormData send the PUT request with params set in body using content type
 // "multipart/form-data".
-func (client *Client) PutFormData(requestPath string, headers http.Header, params map[string][]byte) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) PutFormData(rpath string, hdr http.Header, params map[string][]byte) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	var (
 		contentType string
@@ -400,13 +400,13 @@ func (client *Client) PutFormData(requestPath string, headers http.Header, param
 
 	body = strings.NewReader(strBody)
 
-	return client.doRequest(http.MethodPut, headers, requestPath, contentType, body)
+	return client.doRequest(http.MethodPut, hdr, rpath, contentType, body)
 }
 
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
-func (client *Client) PutJSON(requestPath string, headers http.Header, params interface{}) (
-	httpRes *http.Response, resBody []byte, err error,
+func (client *Client) PutJSON(rpath string, hdr http.Header, params interface{}) (
+	res *http.Response, resBody []byte, err error,
 ) {
 	paramsJSON, err := json.Marshal(params)
 	if err != nil {
@@ -415,19 +415,19 @@ func (client *Client) PutJSON(requestPath string, headers http.Header, params in
 
 	body := bytes.NewReader(paramsJSON)
 
-	return client.doRequest(http.MethodPut, headers, requestPath, ContentTypeJSON, body)
+	return client.doRequest(http.MethodPut, hdr, rpath, ContentTypeJSON, body)
 }
 
 func (client *Client) doRequest(
 	httpMethod string,
-	headers http.Header,
-	requestPath, contentType string,
+	hdr http.Header,
+	rpath, contentType string,
 	body io.Reader,
 ) (
-	httpRes *http.Response, resBody []byte, err error,
+	res *http.Response, resBody []byte, err error,
 ) {
-	requestPath = path.Join(`/`, requestPath)
-	fullURL := client.opts.ServerUrl + requestPath
+	rpath = path.Join(`/`, rpath)
+	fullURL := client.opts.ServerUrl + rpath
 
 	httpReq, err := http.NewRequest(httpMethod, fullURL, body)
 	if err != nil {
@@ -435,7 +435,7 @@ func (client *Client) doRequest(
 	}
 
 	setHeaders(httpReq, client.opts.Headers)
-	setHeaders(httpReq, headers)
+	setHeaders(httpReq, hdr)
 
 	if len(contentType) > 0 {
 		httpReq.Header.Set(HeaderContentType, contentType)
