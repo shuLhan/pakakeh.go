@@ -17,6 +17,7 @@
 *.zst
 /_bin/ansua
 /_bin/bcrypt
+/_bin/emaildecode
 /_bin/epoch
 /_bin/gofmtcomment
 /_bin/hexo
