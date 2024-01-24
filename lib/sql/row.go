@@ -13,7 +13,39 @@ import (
 // The map's key is the column name in database and the map's value is
 // the column's value.
 // This type can be used to create dynamic insert-update fields.
+//
+// DEPRECATED: use [Meta] instead.
 type Row map[string]interface{}
+
+// Meta convert the Row into Meta.
+func (row Row) Meta(driverName string) (meta *Meta) {
+	meta = &Meta{}
+
+	if len(row) == 0 {
+		return meta
+	}
+
+	meta.ListName = make([]string, 0, len(row))
+	meta.ListHolder = make([]string, 0, len(row))
+	meta.ListValue = make([]interface{}, 0, len(row))
+
+	var colName string
+	for colName = range row {
+		meta.ListName = append(meta.ListName, colName)
+	}
+	sort.Strings(meta.ListName)
+
+	var x int
+	for x, colName = range meta.ListName {
+		if driverName == DriverNamePostgres {
+			meta.ListHolder = append(meta.ListHolder, fmt.Sprintf(`$%d`, x+1))
+		} else {
+			meta.ListHolder = append(meta.ListHolder, DefaultPlaceHolder)
+		}
+		meta.ListValue = append(meta.ListValue, row[colName])
+	}
+	return meta
+}
 
 // ExtractSQLFields extract the column's name, column place holder, and column
 // values as slices.
@@ -30,23 +62,7 @@ func (row Row) ExtractSQLFields(driverName string) (names, holders []string, val
 		return nil, nil, nil
 	}
 
-	names = make([]string, 0, len(row))
-	holders = make([]string, 0, len(row))
-	values = make([]interface{}, 0, len(row))
+	var meta = row.Meta(driverName)
 
-	for k := range row {
-		names = append(names, k)
-	}
-	sort.Strings(names)
-
-	for x, k := range names {
-		if driverName == DriverNamePostgres {
-			holders = append(holders, fmt.Sprintf("$%d", x+1))
-		} else {
-			holders = append(holders, DefaultPlaceHolder)
-		}
-		values = append(values, row[k])
-	}
-
-	return names, holders, values
+	return meta.ListName, meta.ListHolder, meta.ListValue
 }
