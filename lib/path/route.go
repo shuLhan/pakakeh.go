@@ -53,12 +53,12 @@ func NewRoute(rpath string) (rute *Route, err error) {
 		var node = &routeNode{}
 
 		if subpath[0] == ':' {
-			node.key = strings.TrimSpace(subpath[1:])
-			if len(node.key) == 0 {
+			node.name = strings.TrimSpace(subpath[1:])
+			if len(node.name) == 0 {
 				return nil, ErrPathKeyEmpty
 			}
 
-			if rute.isKeyExist(node.key) {
+			if rute.isKeyExist(node.name) {
 				return nil, ErrPathKeyDuplicate
 			}
 
@@ -87,7 +87,7 @@ func (rute *Route) isKeyExist(key string) bool {
 		if !node.isKey {
 			continue
 		}
-		if node.key == key {
+		if node.name == key {
 			return true
 		}
 	}
@@ -121,7 +121,7 @@ func (rute *Route) Parse(rpath string) (vals map[string]string, ok bool) {
 
 	for x, node = range rute.nodes {
 		if node.isKey {
-			vals[node.key] = paths[x]
+			vals[node.name] = paths[x]
 		} else if paths[x] != node.name {
 			return nil, false
 		}
@@ -130,17 +130,49 @@ func (rute *Route) Parse(rpath string) (vals map[string]string, ok bool) {
 	return vals, true
 }
 
-// String generate a clean path without any white spaces and single "/"
-// between sub-path.
-func (rute *Route) String() (path string) {
+// Set or replace the key's value in path with parameter val.
+// If the key exist it will return true; otherwise it will return false.
+func (rute *Route) Set(key, val string) bool {
+	key = strings.TrimSpace(key)
+	if len(key) == 0 {
+		return false
+	}
+	key = strings.ToLower(key)
+
 	var node *routeNode
 	for _, node = range rute.nodes {
-		path += `/`
-		if node.isKey {
-			path += `:` + node.key
-		} else {
-			path += node.name
+		if !node.isKey {
+			continue
+		}
+		if node.name == key {
+			node.val = val
+			return true
 		}
 	}
-	return path
+	return false
+}
+
+// String generate a clean path without any white spaces and single "/"
+// between sub-path.
+// If the key has been [Route.Set], the sub-path will be replaced with its
+// value, otherwise it will returned as ":<key>".
+func (rute *Route) String() (path string) {
+	var (
+		node *routeNode
+		pb   strings.Builder
+	)
+	for _, node = range rute.nodes {
+		pb.WriteByte('/')
+		if node.isKey {
+			if len(node.val) == 0 {
+				pb.WriteByte(':')
+				pb.WriteString(node.name)
+			} else {
+				pb.WriteString(node.val)
+			}
+		} else {
+			pb.WriteString(node.name)
+		}
+	}
+	return pb.String()
 }

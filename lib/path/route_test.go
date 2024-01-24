@@ -46,10 +46,10 @@ func TestNewRoute(t *testing.T) {
 		exp: &Route{
 			path: `/:user/:repo`,
 			nodes: []*routeNode{{
-				key:   `user`,
+				name:  `user`,
 				isKey: true,
 			}, {
-				key:   `repo`,
+				name:  `repo`,
 				isKey: true,
 			}},
 			nkey: 2,

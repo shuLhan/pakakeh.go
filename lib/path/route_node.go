@@ -10,7 +10,7 @@ package path
 // A sub-path that start with colon ":" is a key; otherwise its normal
 // sub-path.
 type routeNode struct {
-	key   string
 	name  string
+	val   string
 	isKey bool
 }
