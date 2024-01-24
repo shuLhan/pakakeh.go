@@ -5,8 +5,7 @@
 package http
 
 import (
-	"path"
-	"strings"
+	libpath "github.com/shuLhan/share/lib/path"
 )
 
 // List of kind for route.
@@ -17,12 +16,10 @@ const (
 
 // route represent the route to endpoint.
 type route struct {
+	*libpath.Route
+
 	endpoint    *Endpoint    // endpoint of route.
 	endpointSSE *SSEEndpoint // Endpoint for SSE.
-
-	path  string  // path contains Endpoint's path that has been cleaned up.
-	nodes []*node // nodes contains sub-path.
-	nkey  int     // nkey contains the number of keys in nodes.
 
 	kind int
 }
@@ -42,105 +39,22 @@ func newRoute(ep *Endpoint) (rute *route, err error) {
 	if ep.ErrorHandler == nil {
 		ep.ErrorHandler = DefaultErrorHandler
 	}
-
-	paths := strings.Split(strings.ToLower(strings.Trim(ep.Path, "/")), "/")
-
-	for _, path := range paths {
-		path = strings.TrimSpace(path)
-		if len(path) == 0 {
-			continue
-		}
-
-		nod := &node{}
-
-		if path[0] == ':' {
-			nod.key = strings.TrimSpace(path[1:])
-			if len(nod.key) == 0 {
-				return nil, ErrEndpointKeyEmpty
-			}
-
-			if rute.isKeyExist(nod.key) {
-				return nil, ErrEndpointKeyDuplicate
-			}
-
-			nod.isKey = true
-			rute.nkey++
-		} else {
-			nod.name = path
-		}
-
-		rute.nodes = append(rute.nodes, nod)
+	rute.Route, err = libpath.NewRoute(ep.Path)
+	if err != nil {
+		return nil, err
 	}
-	if len(rute.nodes) == 0 {
-		rute.nodes = append(rute.nodes, &node{})
-	}
-
-	rute.path = rute.generatePath()
-
 	return rute, nil
 }
 
 // newRouteSSE create and initialize new route for SSE.
-func newRouteSSE(ep *SSEEndpoint) (rute *route) {
+func newRouteSSE(ep *SSEEndpoint) (rute *route, err error) {
 	rute = &route{
 		endpointSSE: ep,
-		path:        path.Clean(ep.Path),
 		kind:        routeKindSSE,
 	}
-	return rute
-}
-
-// isKeyExist will return true if the key already exist in nodes; otherwise it
-// will return false.
-func (rute *route) isKeyExist(key string) bool {
-	for _, node := range rute.nodes {
-		if !node.isKey {
-			continue
-		}
-		if node.key == key {
-			return true
-		}
+	rute.Route, err = libpath.NewRoute(ep.Path)
+	if err != nil {
+		return nil, err
 	}
-	return false
-}
-
-// parse the path and return the key-value association and true if path is
-// matched with current route; otherwise it will return nil and false.
-func (rute *route) parse(path string) (vals map[string]string, ok bool) {
-	if rute.nkey == 0 {
-		if path == rute.path {
-			return nil, true
-		}
-	}
-
-	paths := strings.Split(strings.ToLower(strings.Trim(path, "/")), "/")
-
-	if len(paths) != len(rute.nodes) {
-		return nil, false
-	}
-
-	vals = make(map[string]string, rute.nkey)
-	for x, node := range rute.nodes {
-		if node.isKey {
-			vals[node.key] = paths[x]
-		} else if paths[x] != node.name {
-			return nil, false
-		}
-	}
-
-	return vals, true
-}
-
-// generatePath generate a clean path without any white spaces and single "/"
-// between sub-path.
-func (rute *route) generatePath() (path string) {
-	for _, node := range rute.nodes {
-		path += "/"
-		if node.isKey {
-			path += ":" + node.key
-		} else {
-			path += node.name
-		}
-	}
-	return path
+	return rute, nil
 }

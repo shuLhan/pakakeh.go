@@ -143,13 +143,17 @@ func (srv *Server) RegisterSSE(ep *SSEEndpoint) (err error) {
 		exist bool
 	)
 	for _, rute = range srv.routeGets {
-		_, exist = rute.parse(ep.Path)
+		_, exist = rute.Parse(ep.Path)
 		if exist {
 			return fmt.Errorf(`%s: %w`, logp, ErrEndpointAmbiguous)
 		}
 	}
 
-	rute = newRouteSSE(ep)
+	rute, err = newRouteSSE(ep)
+	if err != nil {
+		return err
+	}
+
 	srv.routeGets = append(srv.routeGets, rute)
 
 	return nil
@@ -162,7 +166,7 @@ func (srv *Server) registerDelete(ep *Endpoint) (err error) {
 
 	// Check if the same route already registered.
 	for _, rute := range srv.routeDeletes {
-		_, ok := rute.parse(ep.Path)
+		_, ok := rute.Parse(ep.Path)
 		if ok {
 			return ErrEndpointAmbiguous
 		}
@@ -190,7 +194,7 @@ func (srv *Server) registerGet(ep *Endpoint) (err error) {
 
 	// Check if the same route already registered.
 	for _, rute := range srv.routeGets {
-		_, ok := rute.parse(ep.Path)
+		_, ok := rute.Parse(ep.Path)
 		if ok {
 			return ErrEndpointAmbiguous
 		}
@@ -210,7 +214,7 @@ func (srv *Server) registerGet(ep *Endpoint) (err error) {
 func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePatches {
-		_, ok := rute.parse(ep.Path)
+		_, ok := rute.Parse(ep.Path)
 		if ok {
 			return ErrEndpointAmbiguous
 		}
@@ -230,7 +234,7 @@ func (srv *Server) registerPatch(ep *Endpoint) (err error) {
 func (srv *Server) registerPost(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePosts {
-		_, ok := rute.parse(ep.Path)
+		_, ok := rute.Parse(ep.Path)
 		if ok {
 			return ErrEndpointAmbiguous
 		}
@@ -250,7 +254,7 @@ func (srv *Server) registerPost(ep *Endpoint) (err error) {
 func (srv *Server) registerPut(ep *Endpoint) (err error) {
 	// Check if the same route already registered.
 	for _, rute := range srv.routePuts {
-		_, ok := rute.parse(ep.Path)
+		_, ok := rute.Parse(ep.Path)
 		if ok {
 			return ErrEndpointAmbiguous
 		}
@@ -474,7 +478,7 @@ func (srv *Server) handleCORSRequestHeaders(
 // and calling the endpoint.
 func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routeDeletes {
-		vals, ok := rute.parse(req.URL.Path)
+		vals, ok := rute.Parse(req.URL.Path)
 		if ok {
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
@@ -610,7 +614,7 @@ func (srv *Server) handleGet(res http.ResponseWriter, req *http.Request) {
 		ok   bool
 	)
 	for _, rute = range srv.routeGets {
-		vals, ok = rute.parse(req.URL.Path)
+		vals, ok = rute.Parse(req.URL.Path)
 		if !ok {
 			continue
 		}
@@ -639,7 +643,7 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 	)
 
 	for _, rute = range srv.routeGets {
-		_, ok = rute.parse(req.URL.Path)
+		_, ok = rute.Parse(req.URL.Path)
 		if ok {
 			break
 		}
@@ -679,7 +683,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, rute := range srv.routeDeletes {
-		_, ok := rute.parse(req.URL.Path)
+		_, ok := rute.Parse(req.URL.Path)
 		if ok {
 			methods[http.MethodDelete] = true
 			break
@@ -687,7 +691,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, rute := range srv.routeGets {
-		_, ok := rute.parse(req.URL.Path)
+		_, ok := rute.Parse(req.URL.Path)
 		if ok {
 			methods[http.MethodGet] = true
 			break
@@ -695,7 +699,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, rute := range srv.routePatches {
-		_, ok := rute.parse(req.URL.Path)
+		_, ok := rute.Parse(req.URL.Path)
 		if ok {
 			methods[http.MethodPatch] = true
 			break
@@ -703,7 +707,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, rute := range srv.routePosts {
-		_, ok := rute.parse(req.URL.Path)
+		_, ok := rute.Parse(req.URL.Path)
 		if ok {
 			methods[http.MethodPost] = true
 			break
@@ -711,7 +715,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, rute := range srv.routePuts {
-		_, ok := rute.parse(req.URL.Path)
+		_, ok := rute.Parse(req.URL.Path)
 		if ok {
 			methods[http.MethodPut] = true
 			break
@@ -748,7 +752,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 // calling the endpoint.
 func (srv *Server) handlePatch(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routePatches {
-		vals, ok := rute.parse(req.URL.Path)
+		vals, ok := rute.Parse(req.URL.Path)
 		if ok {
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
@@ -761,7 +765,7 @@ func (srv *Server) handlePatch(res http.ResponseWriter, req *http.Request) {
 // calling the endpoint.
 func (srv *Server) handlePost(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routePosts {
-		vals, ok := rute.parse(req.URL.Path)
+		vals, ok := rute.Parse(req.URL.Path)
 		if ok {
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
@@ -774,7 +778,7 @@ func (srv *Server) handlePost(res http.ResponseWriter, req *http.Request) {
 // calling the endpoint.
 func (srv *Server) handlePut(res http.ResponseWriter, req *http.Request) {
 	for _, rute := range srv.routePuts {
-		vals, ok := rute.parse(req.URL.Path)
+		vals, ok := rute.Parse(req.URL.Path)
 		if ok {
 			rute.endpoint.call(res, req, srv.evals, vals)
 			return
