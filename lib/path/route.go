@@ -58,7 +58,7 @@ func NewRoute(rpath string) (rute *Route, err error) {
 				return nil, ErrPathKeyEmpty
 			}
 
-			if rute.isKeyExist(node.name) {
+			if rute.IsKeyExists(node.name) {
 				return nil, ErrPathKeyDuplicate
 			}
 
@@ -79,9 +79,12 @@ func NewRoute(rpath string) (rute *Route, err error) {
 	return rute, nil
 }
 
-// isKeyExist will return true if the key already exist in nodes; otherwise
-// it will return false.
-func (rute *Route) isKeyExist(key string) bool {
+// IsKeyExists will return true if the key exist in Route; otherwise it will
+// return false.
+// Remember that the key is stored in lower case, so it will be matched
+// after the parameter key is converted to lower case.
+func (rute *Route) IsKeyExists(key string) bool {
+	key = strings.ToLower(key)
 	var node *routeNode
 	for _, node = range rute.nodes {
 		if !node.isKey {
@@ -92,6 +95,22 @@ func (rute *Route) isKeyExist(key string) bool {
 		}
 	}
 	return false
+}
+
+// Keys return list of key in path.
+func (rute *Route) Keys() (keys []string) {
+	var node *routeNode
+	for _, node = range rute.nodes {
+		if node.isKey {
+			keys = append(keys, node.name)
+		}
+	}
+	return keys
+}
+
+// NKey return the number of key in path.
+func (rute *Route) NKey() (n int) {
+	return rute.nkey
 }
 
 // Parse the path and return the key-value association and true if path is

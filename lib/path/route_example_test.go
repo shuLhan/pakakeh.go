@@ -11,6 +11,58 @@ import (
 	libpath "github.com/shuLhan/share/lib/path"
 )
 
+func ExampleRoute_IsKeyExists() {
+	var (
+		rute *libpath.Route
+		err  error
+	)
+
+	rute, err = libpath.NewRoute(`/book/:title/:page`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(rute.IsKeyExists(`book`))
+	fmt.Println(rute.IsKeyExists(`title`))
+	fmt.Println(rute.IsKeyExists(`TITLE`))
+	// Output:
+	// false
+	// true
+	// true
+}
+
+func ExampleRoute_Keys() {
+	var (
+		rute *libpath.Route
+		err  error
+	)
+
+	rute, err = libpath.NewRoute(`/book/:title/:page`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(rute.Keys())
+	// Output:
+	// [title page]
+}
+
+func ExampleRoute_NKey() {
+	var (
+		rute *libpath.Route
+		err  error
+	)
+
+	rute, err = libpath.NewRoute(`/book/:title/:page`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(rute.NKey())
+	// Output:
+	// 2
+}
+
 func ExampleRoute_Parse() {
 	var (
 		rute *libpath.Route
