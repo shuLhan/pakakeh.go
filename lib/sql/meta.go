@@ -25,6 +25,10 @@ type Meta struct {
 	// select.
 	ListValue []any
 
+	// ListWhereHolder contains list of column holder, as in "?" or
+	// "$x", depends on driver; expanded by calling AddWhere.
+	ListWhereHolder []string
+
 	// ListWhereValue contains list of values for where condition.
 	ListWhereValue []any
 }
@@ -55,6 +59,13 @@ func (meta *Meta) Add(colName string, val any) {
 // It return the length of ListWhereValue in list after addition.
 func (meta *Meta) AddWhere(val any) int {
 	meta.ListWhereValue = append(meta.ListWhereValue, val)
+
+	if meta.driver == DriverNamePostgres {
+		meta.ListWhereHolder = append(meta.ListWhereHolder, fmt.Sprintf(`$%d`, len(meta.ListWhereValue)))
+	} else {
+		meta.ListWhereHolder = append(meta.ListWhereHolder, DefaultPlaceHolder)
+	}
+
 	return len(meta.ListWhereValue)
 }
 
@@ -81,4 +92,11 @@ func (meta *Meta) UpdateFields() string {
 		fmt.Fprintf(&sb, `%s=%s`, meta.ListName[x], meta.ListHolder[x])
 	}
 	return sb.String()
+}
+
+// WhereHolders generate string of holder, for example "$1,$2, ...", based
+// on number of item added with [Meta.AddWhere].
+// Similar to method Holders but for where condition.
+func (meta *Meta) WhereHolders() string {
+	return strings.Join(meta.ListWhereHolder, `,`)
 }

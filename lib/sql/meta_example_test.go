@@ -71,7 +71,27 @@ func ExampleMeta_AddWhere() {
 
 	idx = meta.AddWhere(vals[1])
 	fmt.Println(idx, meta.ListWhereValue)
+
 	// Output:
 	// 1 [1000]
 	// 2 [1000 name]
+}
+
+func ExampleMeta_WhereHolders() {
+	var (
+		meta = sql.NewMeta(sql.DriverNamePostgres)
+		vals = []any{
+			int(1000),
+			string(`name`),
+		}
+		v any
+	)
+
+	for _, v = range vals {
+		meta.AddWhere(v)
+	}
+	fmt.Println(meta.WhereHolders())
+
+	// Output:
+	// $1,$2
 }
