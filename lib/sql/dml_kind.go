@@ -4,13 +4,13 @@
 
 package sql
 
-// DmlKind define the kind for Data Manipulation Language (DML).
-type DmlKind string
+// DMLKind define the kind for Data Manipulation Language (DML).
+type DMLKind string
 
-// List of valid DmlKind.
+// List of valid DMLKind.
 const (
-	DmlKindDelete DmlKind = `DELETE`
-	DmlKindInsert DmlKind = `INSERT`
-	DmlKindSelect DmlKind = `SELECT`
-	DmlKindUpdate DmlKind = `UPDATE`
+	DMLKindDelete DMLKind = `DELETE`
+	DMLKindInsert DMLKind = `INSERT`
+	DMLKindSelect DMLKind = `SELECT`
+	DMLKindUpdate DMLKind = `UPDATE`
 )

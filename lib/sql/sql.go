@@ -15,3 +15,12 @@ const (
 // DefaultPlaceHolder define default placeholder for DML, which is
 // placeholder for MySQL.
 const DefaultPlaceHolder = "?"
+
+// JoinValues join list of slice of values into single slice.
+func JoinValues(s ...[]any) (all []any) {
+	var sub []any
+	for _, sub = range s {
+		all = append(all, sub...)
+	}
+	return all
+}
