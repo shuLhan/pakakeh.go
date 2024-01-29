@@ -99,13 +99,31 @@ func (p *Protocol) Generate(secret []byte) (otp string, err error) {
 	return p.generateWithTimestamp(mac, now)
 }
 
-// GenerateN generate n number of passwords from (current time - N*timeStep)
-// until the curent time.
+// GenerateWithTime generate one time password using ts as time and secret.
+func (p *Protocol) GenerateWithTime(ts time.Time, secret []byte) (otp string, err error) {
+	var mac = hmac.New(p.fnHash, secret)
+	return p.generateWithTimestamp(mac, ts.Unix())
+}
+
+// GenerateN generate n number of passwords from (ts - 0*timeStep)
+// until (ts - N*timeStep).
 func (p *Protocol) GenerateN(secret []byte, n int) (listOTP []string, err error) {
 	var (
 		mac = hmac.New(p.fnHash, secret)
 		ts  = time.Now().Unix()
+	)
+	return p.generateN(mac, ts, n)
+}
 
+// GenerateNWithTime generate n number of passwords from (ts - 0*timeStep)
+// until (ts - N*timeStep).
+func (p *Protocol) GenerateNWithTime(ts time.Time, secret []byte, n int) (listOTP []string, err error) {
+	var mac = hmac.New(p.fnHash, secret)
+	return p.generateN(mac, ts.Unix(), n)
+}
+
+func (p *Protocol) generateN(mac hash.Hash, ts int64, n int) (listOTP []string, err error) {
+	var (
 		otp string
 		t   int64
 		x   int
