@@ -75,8 +75,9 @@ func (meta *Meta) Bind(colName string, val any) {
 }
 
 // BindWhere bind value for where condition.
-// The cond string is optional, can be a column name or any text like
-// "and col".
+//
+// The cond string is optional, can be a column name with operator or any
+// text like "AND col=" or "OR col=".
 //
 // It return the length of [Meta.ListHolder].
 //
@@ -164,7 +165,7 @@ func (meta *Meta) UpdateValues() (listVal []any) {
 	return listVal
 }
 
-// WhereFields merge the ListWhereCond and ListHolder separated by "=".
+// WhereFields merge the ListWhereCond and ListHolder.
 //
 // It will return an empty string if kind is DML INSERT.
 func (meta *Meta) WhereFields() string {
@@ -173,17 +174,19 @@ func (meta *Meta) WhereFields() string {
 	}
 
 	var (
-		off = len(meta.ListValue)
-
-		sb strings.Builder
-		x  int
+		off int
+		sb  strings.Builder
+		x   int
 	)
 
+	if meta.kind == DMLKindUpdate || meta.kind == DMLKindInsert {
+		off = len(meta.ListValue)
+	}
 	for ; x < len(meta.ListWhereCond); x++ {
 		if x > 0 {
 			sb.WriteByte(' ')
 		}
-		fmt.Fprintf(&sb, `%s=%s`, meta.ListWhereCond[x], meta.ListHolder[off+x])
+		fmt.Fprintf(&sb, `%s%s`, meta.ListWhereCond[x], meta.ListHolder[off+x])
 	}
 	return sb.String()
 }

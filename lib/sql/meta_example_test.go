@@ -181,8 +181,8 @@ func ExampleMeta_UpdateFields() {
 
 	meta.Bind(`id`, t.ID)
 	meta.Bind(`name`, t.Name)
-	meta.BindWhere(`id`, qid)
-	meta.BindWhere(`AND name`, qname)
+	meta.BindWhere(`id=`, qid)
+	meta.BindWhere(`AND name=`, qname)
 
 	var q = fmt.Sprintf(`UPDATE t SET %s WHERE %s;`, meta.UpdateFields(), meta.WhereFields())
 
@@ -242,8 +242,8 @@ func ExampleMeta_UpdateValues() {
 func ExampleMeta_WhereFields() {
 	var meta = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindSelect)
 
-	meta.BindWhere(`id`, 1000)
-	meta.BindWhere(`AND name`, `share`)
+	meta.BindWhere(`id=`, 1000)
+	meta.BindWhere(`AND name=`, `share`)
 
 	fmt.Printf(`SELECT * FROM t WHERE %s;`, meta.WhereFields())
 	// Output:
@@ -273,8 +273,8 @@ func ExampleMeta_deleteOnPostgresql() {
 		qname = `hello`
 	)
 
-	meta.BindWhere(`id`, qid)
-	meta.BindWhere(`OR name`, qname)
+	meta.BindWhere(`id=`, qid)
+	meta.BindWhere(`OR name=`, qname)
 
 	var q = fmt.Sprintf(`DELETE FROM t WHERE %s;`, meta.WhereFields())
 
@@ -332,21 +332,21 @@ func ExampleMeta_selectOnPostgresql() {
 
 	meta.Bind(`id`, &t.ID)
 	meta.Bind(`name`, &t.Name)
-	meta.BindWhere(`id`, qid)
-	meta.BindWhere(`name`, qname)
+	meta.BindWhere(`id=`, qid)
+	meta.BindWhere(`OR name=`, qname)
 
-	var q = fmt.Sprintf(`SELECT %s FROM t WHERE id=$1 OR name=$2;`, meta.Names())
+	var q = fmt.Sprintf(`SELECT %s FROM t WHERE %s;`, meta.Names(), meta.WhereFields())
 
 	// db.QueryRow(q, meta.ListWhereValue...).Scan(meta.ListValue...)
 
 	fmt.Println(q)
+	fmt.Println(`WHERE=`, meta.ListWhereValue)
 	fmt.Println(len(meta.ListValue))
-	fmt.Println(meta.ListWhereValue)
 
 	// Output:
 	// SELECT id,name FROM t WHERE id=$1 OR name=$2;
+	// WHERE= [1 hello]
 	// 2
-	// [1 hello]
 }
 
 // Sometime the query need to be stiched piece by piece.
