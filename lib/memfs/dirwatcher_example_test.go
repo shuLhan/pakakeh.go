@@ -16,7 +16,6 @@ import (
 
 func ExampleDirWatcher() {
 	var (
-		ns      memfs.NodeState
 		rootDir string
 		err     error
 	)
@@ -26,9 +25,9 @@ func ExampleDirWatcher() {
 		log.Fatal(err)
 	}
 
-	// In this example, we watch sub directory "assets" and its contents,
-	// include only file with .adoc extension and ignoring files with
-	// .html extension.
+	// In this example, we watch sub directory "assets" and its
+	// contents, including only files with ".adoc" extension and
+	// excluding files with ".html" extension.
 	var dw = &memfs.DirWatcher{
 		Options: memfs.Options{
 			Root: rootDir,
@@ -48,16 +47,13 @@ func ExampleDirWatcher() {
 		log.Fatal(err)
 	}
 
-	// Add delay for goroutine to catch up and modtime to changes.
-	// We try with 100ms but sometimes it stuck on the first <-dw.C.
-	time.Sleep(200 * time.Millisecond)
-
 	fmt.Println(`Deleting the root directory:`)
 	err = os.Remove(rootDir)
 	if err != nil {
 		log.Fatal(err)
 	}
-	ns = <-dw.C
+
+	var ns = <-dw.C
 	fmt.Println(`--`, ns.State, ns.Node.Path)
 
 	// Create the root directory back with sub directory
