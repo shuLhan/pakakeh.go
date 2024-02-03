@@ -246,13 +246,13 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 	return node, nil
 }
 
-// Get the node representation of file in memory.  If path is not exist it
-// will return fs.ErrNotExist.
+// Get the node representation of file in memory.
+// If path is not exist it will return [fs.ErrNotExist].
 func (mfs *MemFS) Get(path string) (node *Node, err error) {
-	logp := "Get"
+	var logp = `Get`
 
 	if mfs == nil || mfs.PathNodes == nil {
-		return nil, fmt.Errorf("%s %s: %w", logp, path, fs.ErrNotExist)
+		return nil, fmt.Errorf(`%s %q: %w`, logp, path, fs.ErrNotExist)
 	}
 	path = strings.TrimSpace(path)
 	if len(path) == 0 {
@@ -271,8 +271,9 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 		return node, nil
 	}
 
-	// Get node from sub.
+	// Get node from sub fs.
 	var sub *MemFS
+
 	for _, sub = range mfs.subfs {
 		node, _ = sub.Get(path)
 		if node != nil {

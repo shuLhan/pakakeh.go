@@ -364,6 +364,10 @@ func TestMemFS_Get(t *testing.T) {
 }
 
 func TestMemFS_Get_refresh(t *testing.T) {
+	type testCase struct {
+		filePath string
+	}
+
 	var (
 		tdata *test.Data
 		err   error
@@ -389,30 +393,28 @@ func TestMemFS_Get_refresh(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	var listCase = []testCase{{
+		filePath: `/dir-a/dir-b/file`,
+	}, {
+		filePath: `/dir-a/dir-b/file2`,
+	}}
+
 	var (
-		node        *Node
-		filePath    string
-		tag         string
-		path        string
-		expJSON     string
-		expError    string
-		fileContent []byte
-		rawJSON     []byte
-		gotJSON     bytes.Buffer
+		c       testCase
+		gotJSON bytes.Buffer
 	)
+	for _, c = range listCase {
+		var fullpath = filepath.Join(tempDir, c.filePath)
 
-	for filePath, fileContent = range tdata.Input {
-		path = filepath.Join(tempDir, filepath.Dir(filePath))
-
-		err = os.MkdirAll(path, 0700)
+		err = os.MkdirAll(filepath.Dir(fullpath), 0700)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if len(fileContent) != 0 {
+		var expContent = tdata.Input[c.filePath]
+		if len(expContent) != 0 {
 			// Only create the file if content is set.
-			path = filepath.Join(tempDir, filePath)
-			err = os.WriteFile(path, fileContent, 0600)
+			err = os.WriteFile(fullpath, expContent, 0600)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -420,16 +422,21 @@ func TestMemFS_Get_refresh(t *testing.T) {
 
 		// Try Get the file.
 
-		tag = filePath + `:error`
-		expError = string(tdata.Output[tag])
+		var (
+			tag      = c.filePath + `:error`
+			expError = string(tdata.Output[tag])
+			node     *Node
+		)
 
-		node, err = mfs.Get(filePath)
+		node, err = mfs.Get(c.filePath)
 		if err != nil {
 			test.Assert(t, tag, expError, err.Error())
 			continue
 		}
 
 		// Check the tree of MemFS.
+
+		var rawJSON []byte
 
 		rawJSON, err = mfs.Root.JSON(9999, true, false)
 		if err != nil {
@@ -442,10 +449,10 @@ func TestMemFS_Get_refresh(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		test.Assert(t, filePath, string(fileContent), string(node.Content))
+		test.Assert(t, c.filePath+` content`, string(expContent), string(node.Content))
 
-		expJSON = string(tdata.Output[filePath])
-		test.Assert(t, filePath, expJSON, gotJSON.String())
+		var expJSON = string(tdata.Output[c.filePath])
+		test.Assert(t, c.filePath+` JSON of memfs.Root`, expJSON, gotJSON.String())
 	}
 }
 
