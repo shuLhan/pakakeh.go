@@ -19,6 +19,113 @@ This is changelog for share module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
+
+[#v0_53_0]
+== share v0.53.0 (2024-02-04)
+
+[#v0_53_0__new_features]
+===  New features
+
+test/mock: implement mock for crypto [rand.Reader]::
++
+--
+The RandReader implement [io.Reader].
+To provide predictable result, the RandReader is seeded with slice of
+bytes.
+A call to Read will fill the passed bytes with those seed.
+
+For example, given seed as "abc" (length is three), calling Read with
+bytes length five will return "abcab".
+--
+
+
+lib/sql: add new type Meta::
++
+--
+Meta contains the DML meta data, including driver name, list of column
+names, list of column holders, and list of values.
+
+The Meta type replace the Row type.
+--
+
+
+lib/path: new package to work with path::
++
+--
+The path package provide a new type Route, detached from "lib/http".
+
+A Route represent a parsed path.
+A path can have a key, or binding, that can be replaced with string
+value.
+For example, "/org/:user/:repo" have two keys "user" and "repo".
+
+Route handle the path in case-insensitive manner.
+--
+
+
+[#v0_53_0__bug_fixes]
+===  Bug fixes
+
+_bin/go-mod-tip: use committer timestamp instead of author timestamp::
++
+If the tip is rebased to upstream, the author timestamp is not changes,
+but the commit timestamp changes.
+
+
+[#v0_53_0__enhancements]
+===  Enhancements
+
+lib/totp: add method GenerateWithTime and GenerateNWithTime::
++
+The GenerateWithTime and GenerateNWithTime accept parameter
+[time.Time] as the relative time for generated password.
+
+
+lib/http: add support for If-Modified-Since in HandleFS::
++
+If the node modification time is less than requested time value in
+request header If-Modified-Since, server will response with
+304 Not Modified.
+
+
+lib/http: refactoring Range request, limit content served by server::
++
+--
+When server receive,
+
+	GET /big
+	Range: bytes=0-
+
+and the requested resources is quite larger, where writing all content of
+file result in i/o timeout, it is best practice [1][2] if the server
+write only partial content and let the client continue with the
+subsequent Range request.
+
+In the above case, the server should response with,
+
+	HTTP/1.1 206 Partial content
+	Content-Range: bytes 0-<limit>/<size>
+	Content-Length: <limit>
+
+Where limit is maximum packet that is reasonable [3] for most of the
+client.
+In this server we choose 8MB as limit.
+--
+
+
+lib/http: add method Head to Client::
++
+The Head method send the HEAD request to path, with optional
+headers, and params in query parameters.
+
+
+lib/ini: add method Keys::
++
+The Keys method return sorted list of all section, subsection, and
+variables as string where each of them separated by ":", for example
+"section:sub:var".
+
+
 [#v0_52_0]
 == share v0.52.0 (2024-01-06)
 
