@@ -14,6 +14,23 @@ import (
 	libnet "github.com/shuLhan/share/lib/net"
 )
 
+// List of [ServerOptions] Debug mode.
+// For example, to log DNS error and cache operations, set the Debug value
+// to 3 or (DebugLevelDNS|DebugLevelCache).
+const (
+	// Log error on DNS level, in example EMPTY answer, ERR_NAME,
+	// ERR_NOT_IMPLEMENTED, ERR_REFUSED.
+	DebugLevelDNS = 1
+
+	// Log cache operations, including new record, updating records,
+	// and pruning record in caches.
+	DebugLevelCache = 2
+
+	// Log low level DNS connection and packet, including request and
+	// response.
+	DebugLevelConnPacket = 4
+)
+
 // ServerOptions describes options for running a DNS server.
 type ServerOptions struct {
 	primaryUDP []net.Addr // List of parent name server addresses using UDP.
@@ -36,7 +53,6 @@ type ServerOptions struct {
 	// TLSPrivateKey contains path to certificate private key file.
 	TLSPrivateKey string `ini:"dns:server:tls.private_key"`
 
-	//
 	// NameServers contains list of parent name servers.
 	//
 	// Answer that does not exist on local will be forwarded to parent
@@ -86,7 +102,9 @@ type ServerOptions struct {
 	// accessed in the last 1 minute will be removed from cache.
 	PruneThreshold time.Duration `ini:"dns:server:cache.prune_threshold"`
 
-	// Debug level for server, accept value from 0 (quiet) to 3 (verbose).
+	// Debug level for server, accept value [DebugLevelDNS],
+	// [DebugLevelCache], [DebugLevelConnPacket], or any combination of
+	// it.
 	Debug int `ini:"dns:server:debug"`
 
 	// HTTPPort port for listening DNS over HTTP (DoH), default to 0.

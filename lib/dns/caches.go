@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"regexp"
 	"strings"
@@ -165,8 +166,8 @@ func (c *Caches) ExternalRemoveNames(names []string) (listAnswer []*Answer) {
 		answers = c.externalRemoveName(name)
 		if len(answers) > 0 {
 			listAnswer = append(listAnswer, answers...)
-			if c.debug >= 1 {
-				fmt.Println("dns: - ", name)
+			if c.debug&DebugLevelCache != 0 {
+				log.Println(`dns: - `, name)
 			}
 		}
 	}
@@ -308,8 +309,8 @@ func (c *Caches) InternalPopulate(msgs []*Message, from string) {
 		}
 	}
 
-	if c.debug >= 1 {
-		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(msgs), from)
+	if c.debug&DebugLevelCache != 0 {
+		log.Printf(`dns: %d out of %d records cached from %q`, n, len(msgs), from)
 	}
 }
 
@@ -328,8 +329,8 @@ func (c *Caches) InternalPopulateRecords(listRR []*ResourceRecord, from string) 
 		}
 		n++
 	}
-	if c.debug >= 1 {
-		fmt.Printf("dns: %d out of %d records cached from %q\n", n, len(listRR), from)
+	if c.debug&DebugLevelCache != 0 {
+		log.Printf(`dns: %d out of %d records cached from %q`, n, len(listRR), from)
 	}
 	return nil
 }
@@ -357,8 +358,8 @@ func (c *Caches) InternalRemoveNames(names []string) {
 
 	for ; x < len(names); x++ {
 		delete(c.internal, names[x])
-		if c.debug >= 1 {
-			fmt.Println("dns: - ", names[x])
+		if c.debug&DebugLevelCache != 0 {
+			log.Println(`dns: - `, names[x])
 		}
 	}
 }
@@ -462,8 +463,8 @@ func (c *Caches) prune(exp int64) (listAnswer []*Answer) {
 			break
 		}
 
-		if c.debug >= 1 {
-			fmt.Printf("dns: - 0:%s\n", answer.msg.Question.String())
+		if c.debug&DebugLevelCache != 0 {
+			log.Printf(`dns: - 0:%s`, answer.msg.Question.String())
 		}
 
 		next = el.Next()
@@ -600,6 +601,8 @@ func (c *Caches) worker(pruneDelay, pruneThreshold time.Duration) {
 	for now = range pruneTimer.C {
 		exp = now.Add(pruneThreshold).Unix()
 		listAnswer = c.prune(exp)
-		fmt.Printf("dns: pruning %d records from cache\n", len(listAnswer))
+		if c.debug&DebugLevelCache != 0 {
+			log.Printf(`dns: pruning %d records from cache`, len(listAnswer))
+		}
 	}
 }
