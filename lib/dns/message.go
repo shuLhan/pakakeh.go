@@ -964,7 +964,7 @@ func (msg *Message) String() string {
 func (msg *Message) Unpack() (err error) {
 	err = msg.UnpackHeaderQuestion()
 	if err != nil {
-		return err
+		return fmt.Errorf(`%w: %w`, errUnpack, err)
 	}
 
 	var (
@@ -978,7 +978,7 @@ func (msg *Message) Unpack() (err error) {
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
 		if err != nil {
-			return err
+			return fmt.Errorf(`%w: %w`, errUnpack, err)
 		}
 
 		msg.Answer = append(msg.Answer, rr)
@@ -989,7 +989,7 @@ func (msg *Message) Unpack() (err error) {
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
 		if err != nil {
-			return err
+			return fmt.Errorf(`%w: %w`, errUnpack, err)
 		}
 		msg.Authority = append(msg.Authority, rr)
 	}
@@ -999,7 +999,7 @@ func (msg *Message) Unpack() (err error) {
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
 		if err != nil {
-			return err
+			return fmt.Errorf(`%w: %w`, errUnpack, err)
 		}
 
 		msg.Additional = append(msg.Additional, rr)

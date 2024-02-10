@@ -809,7 +809,9 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 				if err != nil {
 					log.Printf(`%s %s: forward failed for %q: %s`,
 						logp, tag, req.message.Question.Name, err)
-					isRunning = false
+					if !errors.Is(err, errUnpack) {
+						isRunning = false
+					}
 					continue
 				}
 				srv.processResponse(req, res)
@@ -886,7 +888,9 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 				if err != nil {
 					log.Printf(`%s %s: forward failed for %s: %s`,
 						logp, tag, req.message.Question.Name, err)
-					isRunning = false
+					if !errors.Is(err, errUnpack) {
+						isRunning = false
+					}
 					continue
 				}
 
@@ -1035,7 +1039,9 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 					log.Printf(`%s %s: forward failed for %s: %s`,
 						logp, tag,
 						req.message.Question.Name, err)
-					isRunning = false
+					if !errors.Is(err, errUnpack) {
+						isRunning = false
+					}
 					continue
 				}
 				srv.processResponse(req, res)
