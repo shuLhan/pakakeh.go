@@ -365,13 +365,13 @@ func TestDoHClient_Get(t *testing.T) {
 		rtype:  RecordTypeA,
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
-		expErr: "404 page not found\n",
+		expErr: "Get: 404 page not found\n",
 	}, {
 		desc:   "QType:A RClass:IN QName:kilabit.info",
 		rtype:  RecordTypeA,
 		rclass: RecordClassIN,
 		qname:  "kilabit.info",
-		expErr: "404 page not found\n",
+		expErr: "Get: 404 page not found\n",
 	}}
 
 	for _, c = range cases {

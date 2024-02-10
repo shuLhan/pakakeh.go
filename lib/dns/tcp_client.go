@@ -118,19 +118,21 @@ func (cl *TCPClient) Lookup(q MessageQuestion, allowRecursion bool) (msg *Messag
 // Query send DNS query to name server.
 // The addr parameter is unused.
 func (cl *TCPClient) Query(msg *Message) (res *Message, err error) {
+	var logp = `Query`
+
 	_, err = cl.Write(msg.packet)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	res, err = cl.recv()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	err = res.Unpack()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return res, nil
@@ -157,10 +159,12 @@ func (cl *TCPClient) SetTimeout(t time.Duration) {
 // This method is only used by server to write the response of query to
 // client.
 func (cl *TCPClient) Write(msg []byte) (n int, err error) {
+	var logp = `Write`
+
 	if cl.writeTimeout > 0 {
 		err = cl.conn.SetWriteDeadline(time.Now().Add(cl.writeTimeout))
 		if err != nil {
-			return
+			return 0, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 
@@ -173,16 +177,21 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 	packet = append(packet, msg...)
 
 	n, err = cl.conn.Write(packet)
+	if err != nil {
+		return 0, fmt.Errorf(`%s: %w`, logp, err)
+	}
 
-	return
+	return n, nil
 }
 
 // recv receive DNS message.
 func (cl *TCPClient) recv() (res *Message, err error) {
+	var logp = `recv`
+
 	if cl.readTimeout > 0 {
 		err = cl.conn.SetReadDeadline(time.Now().Add(cl.readTimeout))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 
@@ -194,7 +203,7 @@ func (cl *TCPClient) recv() (res *Message, err error) {
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 	if n == 0 {
 		return nil, io.EOF

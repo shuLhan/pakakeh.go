@@ -112,12 +112,7 @@ func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (msg *Messag
 
 // Query send DNS query to name server "ns" and return the unpacked response.
 func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
-	var (
-		logp = "Query"
-
-		packet []byte
-		n      int
-	)
+	var logp = `Query`
 
 	cl.Lock()
 	defer cl.Unlock()
@@ -132,7 +127,10 @@ func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	packet = make([]byte, maxUDPPacketSize)
+	var (
+		packet = make([]byte, maxUDPPacketSize)
+		n      int
+	)
 
 	n, _, err = cl.conn.ReadFromUDP(packet)
 	if err != nil {

@@ -98,21 +98,23 @@ func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 
 // Query send DNS Message to name server.
 func (cl *DoTClient) Query(msg *Message) (res *Message, err error) {
+	var logp = `Query`
+
 	_, err = cl.Write(msg.packet)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	res = NewMessage()
 
 	_, err = cl.recv(res)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	err = res.Unpack()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return res, nil
@@ -125,31 +127,35 @@ func (cl *DoTClient) RemoteAddr() string {
 
 // recv will read DNS message from active connection in client into `msg`.
 func (cl *DoTClient) recv(msg *Message) (n int, err error) {
+	var logp = `recv`
+
 	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
-		return
+		return 0, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	var packet = make([]byte, maxTCPPacketSize)
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {
-		return
+		return 0, fmt.Errorf(`%s: %w`, logp, err)
 	}
 	if n == 0 {
-		return
+		return n, nil
 	}
 
 	msg.packet = packet[2:n]
 
-	return
+	return n, nil
 }
 
 // Write raw DNS message on active connection.
 func (cl *DoTClient) Write(msg []byte) (n int, err error) {
+	var logp = `Write`
+
 	err = cl.conn.SetWriteDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
-		return
+		return 0, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	var (
@@ -161,8 +167,11 @@ func (cl *DoTClient) Write(msg []byte) (n int, err error) {
 	packet = append(packet, msg...)
 
 	n, err = cl.conn.Write(packet)
+	if err != nil {
+		return 0, fmt.Errorf(`%s: %w`, logp, err)
+	}
 
-	return
+	return n, nil
 }
 
 // SetRemoteAddr no-op.

@@ -165,9 +165,8 @@ func (cl *DoHClient) Post(msg *Message) (res *Message, err error) {
 // unpacked message.
 func (cl *DoHClient) Get(msg *Message) (res *Message, err error) {
 	var (
-		q = base64.RawURLEncoding.EncodeToString(msg.packet)
-
-		httpRes *http.Response
+		logp = `Get`
+		q    = base64.RawURLEncoding.EncodeToString(msg.packet)
 	)
 
 	cl.query.Set("dns", q)
@@ -175,9 +174,11 @@ func (cl *DoHClient) Get(msg *Message) (res *Message, err error) {
 	cl.req.Body = nil
 	cl.req.URL.RawQuery = cl.query.Encode()
 
+	var httpRes *http.Response
+
 	httpRes, err = cl.conn.Do(cl.req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	res = NewMessage()
@@ -185,21 +186,20 @@ func (cl *DoHClient) Get(msg *Message) (res *Message, err error) {
 	res.packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 	if httpRes.StatusCode != 200 {
-		err = fmt.Errorf("%s", string(res.packet))
-		return nil, err
+		return nil, fmt.Errorf(`%s: %s`, logp, string(res.packet))
 	}
 
 	if len(res.packet) > 20 {
 		err = res.Unpack()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 
-	return res, err
+	return res, nil
 }
 
 // Query send DNS query to name server.  This is an alias to Get method, to
