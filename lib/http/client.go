@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"sort"
 	"strings"
 	"time"
 
@@ -243,7 +244,7 @@ func (client *Client) GenerateHttpRequest(
 		case RequestTypeMultipartForm:
 			paramsAsMultipart, ok := params.(map[string][]byte)
 			if ok {
-				contentType, strBody, err = generateFormData(paramsAsMultipart)
+				contentType, strBody, err = GenerateFormData(paramsAsMultipart)
 				if err != nil {
 					return nil, fmt.Errorf("%s: %w", logp, err)
 				}
@@ -336,7 +337,7 @@ func (client *Client) PostFormData(
 ) (
 	res *http.Response, resBody []byte, err error,
 ) {
-	contentType, strBody, err := generateFormData(params)
+	contentType, strBody, err := GenerateFormData(params)
 	if err != nil {
 		return nil, nil, fmt.Errorf("http: PostFormData: %w", err)
 	}
@@ -393,7 +394,7 @@ func (client *Client) PutFormData(rpath string, hdr http.Header, params map[stri
 		body        *strings.Reader
 	)
 
-	contentType, strBody, err = generateFormData(params)
+	contentType, strBody, err = GenerateFormData(params)
 	if err != nil {
 		return nil, nil, fmt.Errorf(`http: PutFormData: %w`, err)
 	}
@@ -540,21 +541,30 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 	return out, err
 }
 
-// generateFormData generate multipart/form-data body from params.
-func generateFormData(params map[string][]byte) (contentType, body string, err error) {
+// GenerateFormData generate multipart/form-data body from params.
+func GenerateFormData(params map[string][]byte) (contentType, body string, err error) {
 	var (
 		sb = new(strings.Builder)
 		w  = multipart.NewWriter(sb)
 
+		k       string
+		listKey []string
+	)
+	for k = range params {
+		listKey = append(listKey, k)
+	}
+	sort.Strings(listKey)
+
+	var (
 		part io.Writer
-		k    string
 		v    []byte
 	)
-	for k, v = range params {
+	for _, k = range listKey {
 		part, err = w.CreateFormField(k)
 		if err != nil {
 			return "", "", err
 		}
+		v = params[k]
 		_, err = part.Write(v)
 		if err != nil {
 			return "", "", err

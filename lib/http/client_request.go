@@ -113,7 +113,7 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 		case RequestTypeMultipartForm:
 			paramsAsMultipart, ok := creq.Params.(map[string][]byte)
 			if ok {
-				contentType, strBody, err = generateFormData(paramsAsMultipart)
+				contentType, strBody, err = GenerateFormData(paramsAsMultipart)
 				if err != nil {
 					return nil, fmt.Errorf("%s: %w", logp, err)
 				}
