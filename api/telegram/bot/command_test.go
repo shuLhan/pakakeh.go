@@ -62,7 +62,7 @@ func TestCommand_validate(t *testing.T) {
 		cmd: Command{
 			Command:     "help",
 			Description: "Bantuan",
-			Handler:     func(up Update) {},
+			Handler:     func(_ Update) {},
 		},
 	}}
 

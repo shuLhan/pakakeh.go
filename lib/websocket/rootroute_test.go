@@ -14,7 +14,7 @@ import (
 )
 
 func testRouteHandler(t *testing.T, target string) RouteHandler {
-	return func(ctx context.Context, req *Request) (res Response) {
+	return func(_ context.Context, req *Request) (res Response) {
 		test.Assert(t, "routeHandler", target, req.Target)
 		return
 	}

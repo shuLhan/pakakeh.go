@@ -189,7 +189,7 @@ func TestClientPing(t *testing.T) {
 				gotFrame <- f
 				return nil
 			},
-			handlePong: func(cl *Client, f *Frame) (err error) {
+			handlePong: func(_ *Client, f *Frame) (err error) {
 				gotFrame <- f
 				return nil
 			},
@@ -306,13 +306,13 @@ func TestClient_send_FrameText(t *testing.T) {
 
 		cl = &Client{
 			Endpoint: _testEndpointAuth,
-			handleClose: func(cl *Client, f *Frame) error {
+			handleClose: func(_ *Client, f *Frame) error {
 				cl.sendClose(f.closeCode, nil)
 				cl.Quit()
 				gotFrame <- f
 				return nil
 			},
-			HandleText: func(cl *Client, f *Frame) error {
+			HandleText: func(_ *Client, f *Frame) error {
 				gotFrame <- f
 				return nil
 			},
@@ -442,7 +442,7 @@ func TestClientFragmentation(t *testing.T) {
 				gotFrame <- f
 				return nil
 			},
-			HandleText: func(cl *Client, f *Frame) error {
+			HandleText: func(_ *Client, f *Frame) error {
 				gotFrame <- f
 				return nil
 			},
@@ -489,11 +489,11 @@ func TestClientFragmentation2(t *testing.T) {
 		gotFrame   = make(chan *Frame)
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
-			handlePong: func(cl *Client, f *Frame) error {
+			handlePong: func(_ *Client, f *Frame) error {
 				gotFrame <- f
 				return nil
 			},
-			HandleText: func(cl *Client, f *Frame) error {
+			HandleText: func(_ *Client, f *Frame) error {
 				gotFrame <- f
 				return nil
 			},
@@ -603,7 +603,7 @@ func TestClientSendBin(t *testing.T) {
 
 		cl = &Client{
 			Endpoint: _testEndpointAuth,
-			HandleBin: func(cl *Client, f *Frame) error {
+			HandleBin: func(_ *Client, f *Frame) error {
 				gotFrame <- f
 				return nil
 			},
@@ -661,7 +661,7 @@ func TestClientSendPing(t *testing.T) {
 		gotFrame   = make(chan *Frame)
 		testClient = &Client{
 			Endpoint: _testEndpointAuth,
-			handlePong: func(cl *Client, f *Frame) error {
+			handlePong: func(_ *Client, f *Frame) error {
 				gotFrame <- f
 				return nil
 			},

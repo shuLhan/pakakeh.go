@@ -306,7 +306,7 @@ func TestServer_upgrader_nonblocking(t *testing.T) {
 		qtext = make(chan []byte, 1)
 		cl    = &Client{
 			Endpoint: _testEndpointAuth,
-			HandleText: func(cl *Client, frame *Frame) (err error) {
+			HandleText: func(_ *Client, frame *Frame) (err error) {
 				qtext <- frame.Payload()
 				return nil
 			},

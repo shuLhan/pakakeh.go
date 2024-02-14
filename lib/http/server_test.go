@@ -182,7 +182,7 @@ func TestRegisterDelete(t *testing.T) {
 	}
 }
 
-var testEvaluator = func(req *http.Request, reqBody []byte) error {
+var testEvaluator = func(req *http.Request, _ []byte) error {
 	k := req.Form.Get("k")
 
 	if len(k) == 0 {
@@ -662,16 +662,16 @@ func TestServeHTTPOptions(t *testing.T) {
 
 func TestStatusError(t *testing.T) {
 	var (
-		cbError = func(epr *EndpointRequest) ([]byte, error) {
+		cbError = func(_ *EndpointRequest) ([]byte, error) {
 			return nil, &liberrors.E{
 				Code:    http.StatusLengthRequired,
 				Message: `Length required`,
 			}
 		}
-		cbNoCode = func(epr *EndpointRequest) ([]byte, error) {
+		cbNoCode = func(_ *EndpointRequest) ([]byte, error) {
 			return nil, liberrors.Internal(nil)
 		}
-		cbCustomErr = func(epr *EndpointRequest) ([]byte, error) {
+		cbCustomErr = func(_ *EndpointRequest) ([]byte, error) {
 			return nil, fmt.Errorf("Custom error")
 		}
 

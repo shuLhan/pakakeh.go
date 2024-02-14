@@ -28,7 +28,7 @@ var (
 
 	client = &http.Client{}
 
-	cbNone = func(epr *EndpointRequest) ([]byte, error) {
+	cbNone = func(_ *EndpointRequest) ([]byte, error) {
 		return nil, nil
 	}
 
@@ -140,7 +140,7 @@ func registerEndpoints() {
 	err = testServer.RegisterEndpoint(&Endpoint{
 		Path:         "/download",
 		ResponseType: ResponseTypePlain,
-		Call: func(epr *EndpointRequest) ([]byte, error) {
+		Call: func(_ *EndpointRequest) ([]byte, error) {
 			return testDownloadBody, nil
 		},
 	})
