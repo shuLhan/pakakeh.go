@@ -301,6 +301,7 @@ const (
 	HeaderLocation           = `Location`
 	HeaderOrigin             = `Origin`
 	HeaderRange              = `Range`
+	HeaderSetCookie          = `Set-Cookie`
 	HeaderUserAgent          = `User-Agent`
 	HeaderXForwardedFor      = `X-Forwarded-For` // https://en.wikipedia.org/wiki/X-Forwarded-For
 	HeaderXRealIp            = `X-Real-Ip`       //revive:disable-line
