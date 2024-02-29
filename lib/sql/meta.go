@@ -60,6 +60,17 @@ func (meta *Meta) Bind(colName string, val any) {
 		return
 	}
 
+	var (
+		name string
+		x    int
+	)
+	for x, name = range meta.ListName {
+		if name == colName {
+			meta.ListValue[x] = val
+			return
+		}
+	}
+
 	meta.ListName = append(meta.ListName, colName)
 	meta.ListValue = append(meta.ListValue, val)
 
