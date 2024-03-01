@@ -7,7 +7,7 @@ package dns
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestDoTClient_Lookup(t *testing.T) {

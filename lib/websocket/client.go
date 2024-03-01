@@ -17,7 +17,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 const (

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	libstrings "github.com/shuLhan/share/lib/strings"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 // Stem contains the word and its attributes.

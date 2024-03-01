@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/shuLhan/share/lib/hunspell"
-	libstrings "github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/hunspell"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestHunspell(t *testing.T) {

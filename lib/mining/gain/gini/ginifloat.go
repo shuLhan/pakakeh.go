@@ -5,7 +5,7 @@
 package gini
 
 import (
-	"github.com/shuLhan/share/lib/floats64"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
 )
 
 // ComputeContinuFloat Given an attribute A and the target attribute T which contain

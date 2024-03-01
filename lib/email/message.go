@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/email/dkim"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
 )
 
 // Message represent an unpacked internet message format.

@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/shuLhan/share/lib/text"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
 
 var (

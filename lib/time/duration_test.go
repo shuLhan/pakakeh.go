@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestParseDuration(t *testing.T) {

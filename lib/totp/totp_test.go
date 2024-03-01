@@ -13,7 +13,7 @@ import (
 	"hash"
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestProtocol_generateWithTimestamp_sha1(t *testing.T) {

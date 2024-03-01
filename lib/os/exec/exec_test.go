@@ -7,7 +7,7 @@ package exec
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestParseCommandArg(t *testing.T) {

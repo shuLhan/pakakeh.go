@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"testing"
 
-	libstrings "github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/text"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
 
 func compareChunks(t *testing.T, adds, dels text.Chunks, expAdds, expDels []string) {

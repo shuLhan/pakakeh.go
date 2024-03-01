@@ -16,7 +16,7 @@
 //	import (
 //		...
 //
-//		"github.com/shuLhan/share/lib/websocket"
+//		"git.sr.ht/~shulhan/pakakeh.go/lib/websocket"
 //	)
 //
 //	var srv *websocket.Server

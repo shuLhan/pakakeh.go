@@ -10,8 +10,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/shuLhan/share/lib/dns"
-	libnet "github.com/shuLhan/share/lib/net"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dns"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 // Result contains the output of CheckHost function.

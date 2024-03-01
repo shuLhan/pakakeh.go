@@ -13,7 +13,7 @@ import (
 	"net/url"
 	"reflect"
 
-	libreflect "github.com/shuLhan/share/lib/reflect"
+	libreflect "git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 )
 
 func ExampleDoEqual_struct() {

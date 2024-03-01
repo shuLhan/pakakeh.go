@@ -5,7 +5,7 @@
 // Command ini provide a command line interface to get and set values in the
 // [INI file format].
 //
-// [INI file format]: https://godocs.io/github.com/shuLhan/share/lib/ini
+// [INI file format]: https://godocs.io/git.sr.ht/~shulhan/pakakeh.go/lib/ini
 package main
 
 import (
@@ -16,8 +16,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shuLhan/share"
-	"github.com/shuLhan/share/lib/ini"
+	"git.sr.ht/~shulhan/pakakeh.go"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ini"
 )
 
 const usage = `= ini
@@ -78,7 +78,7 @@ Set key's value,
 
 == REFERENCES
 
-[1] https://godocs.io/github.com/shuLhan/share/lib/ini`
+[1] https://godocs.io/git.sr.ht/~shulhan/pakakeh.go/lib/ini`
 
 const (
 	cmdGet     = "get"

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	libascii "github.com/shuLhan/share/lib/ascii"
+	libascii "git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // Parser implement text parsing over string.

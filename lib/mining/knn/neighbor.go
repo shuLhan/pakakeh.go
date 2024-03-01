@@ -5,7 +5,7 @@
 package knn
 
 import (
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 // Neighbors is a mapping between sample and their distance.

@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/shuLhan/share/lib/ascii"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // ConfirmYesNo display a question to standard output and read for answer

@@ -14,8 +14,8 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/shuLhan/share/lib/errors"
-	"github.com/shuLhan/share/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 // List of message parse mode.

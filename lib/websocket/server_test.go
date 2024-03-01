@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 const (

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 	"golang.org/x/crypto/chacha20poly1305"
 )
 

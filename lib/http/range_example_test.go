@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 func ExampleParseMultipartRange() {

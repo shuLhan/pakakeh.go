@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestNewUDPClientPool(t *testing.T) {

@@ -5,8 +5,8 @@
 package tabula
 
 import (
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	libnumbers "github.com/shuLhan/share/lib/numbers"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libnumbers "git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
 )
 
 // Columns represent slice of Column.

@@ -18,10 +18,10 @@ import (
 	"testing"
 	"time"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
-	"github.com/shuLhan/share/lib/memfs"
-	libnet "github.com/shuLhan/share/lib/net"
-	"github.com/shuLhan/share/lib/test"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestRegisterDelete(t *testing.T) {

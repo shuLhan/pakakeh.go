@@ -7,7 +7,7 @@ package smtp
 import (
 	"crypto/rsa"
 
-	"github.com/shuLhan/share/lib/email/dkim"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
 )
 
 // DKIMOptions contains the DKIM signature fields and private key to sign the

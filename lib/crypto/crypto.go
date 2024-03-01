@@ -17,7 +17,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shuLhan/share/lib/os/exec"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/os/exec"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )

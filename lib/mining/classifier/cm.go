@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 // CM represent the matrix of classification.

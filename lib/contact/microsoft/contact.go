@@ -5,7 +5,7 @@
 package microsoft
 
 import (
-	"github.com/shuLhan/share/lib/contact"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
 )
 
 // Contact define Microsoft Live's contact format.

@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/shuLhan/share/lib/reflect"
-	"github.com/shuLhan/share/lib/text"
-	"github.com/shuLhan/share/lib/text/diff"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text/diff"
 )
 
 func printStackTrace(w Writer, trace []byte) {

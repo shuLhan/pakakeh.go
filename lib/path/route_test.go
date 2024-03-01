@@ -7,7 +7,7 @@ package path
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestNewRoute(t *testing.T) {

@@ -58,14 +58,14 @@ PASS
 ok      github.com/gobwas/ws    57.334s
 ```
 
-# github.com/shuLhan/share/lib/websocket
+# git.sr.ht/~shulhan/pakakeh.go/lib/websocket
 
 ## Go v1.10.3
 
 ```
 goos: linux
 goarch: amd64
-pkg: github.com/shuLhan/share/lib/websocket
+pkg: git.sr.ht/~shulhan/pakakeh.go/lib/websocket
 BenchmarkUpgrader/base-8                         5000000              339 ns/op             176 B/op          1 allocs/op
 BenchmarkUpgrader/lowercase-8                    5000000              358 ns/op             176 B/op          1 allocs/op
 BenchmarkUpgrader/uppercase-8                    5000000              352 ns/op             176 B/op          1 allocs/op
@@ -85,7 +85,7 @@ BenchmarkUpgrader/bad_sec_version-8             10000000              138 ns/op 
 BenchmarkUpgrader/bad_sec_key-8                  5000000              343 ns/op             176 B/op          1 allocs/op
 BenchmarkUpgrader/bad_sec_key#01-8               5000000              369 ns/op             176 B/op          1 allocs/op
 PASS
-ok      github.com/shuLhan/share/lib/websocket  50.192s
+ok      git.sr.ht/~shulhan/pakakeh.go/lib/websocket  50.192s
 ```
 
 ## Go v1.12
@@ -96,7 +96,7 @@ Benchmark date   : Thu  7 Mar 22:09:17 WIB 2019
 
 goos: linux
 goarch: amd64
-pkg: github.com/shuLhan/share/lib/websocket
+pkg: git.sr.ht/~shulhan/pakakeh.go/lib/websocket
 BenchmarkUpgrader/base-8                        10000000               165 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/lowercase-8                   10000000               165 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/uppercase-8                   10000000               163 ns/op              32 B/op          1 allocs/op
@@ -116,7 +116,7 @@ BenchmarkUpgrader/bad_sec_version-8             20000000               112 ns/op
 BenchmarkUpgrader/bad_sec_key-8                 10000000               165 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/bad_sec_key#01-8              10000000               166 ns/op              32 B/op          1 allocs/op
 PASS
-ok      github.com/shuLhan/share/lib/websocket  49.379s
+ok      git.sr.ht/~shulhan/pakakeh.go/lib/websocket  49.379s
 ```
 
 ## Go version devel +05b3db24 (>1.12)
@@ -127,7 +127,7 @@ Benchmark date   : Thu  7 Mar 22:09:17 WIB 2019
 
 goos: linux
 goarch: amd64
-pkg: github.com/shuLhan/share/lib/websocket
+pkg: git.sr.ht/~shulhan/pakakeh.go/lib/websocket
 BenchmarkUpgrader/base-8                        10000000               156 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/lowercase-8                   10000000               160 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/uppercase-8                   10000000               153 ns/op              32 B/op          1 allocs/op
@@ -147,5 +147,5 @@ BenchmarkUpgrader/bad_sec_version-8             20000000               113 ns/op
 BenchmarkUpgrader/bad_sec_key-8                 10000000               154 ns/op              32 B/op          1 allocs/op
 BenchmarkUpgrader/bad_sec_key#01-8              10000000               157 ns/op              32 B/op          1 allocs/op
 PASS
-ok      github.com/shuLhan/share/lib/websocket  52.285s
+ok      git.sr.ht/~shulhan/pakakeh.go/lib/websocket  52.285s
 ```

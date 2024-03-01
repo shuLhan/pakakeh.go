@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/shuLhan/share/lib/telemetry"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/telemetry"
 )
 
 func main() {

@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shuLhan/share/lib/test"
-	"github.com/shuLhan/share/lib/text/diff"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text/diff"
 )
 
 var (

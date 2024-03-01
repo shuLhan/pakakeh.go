@@ -10,7 +10,7 @@ This library is released every month, usually at the first week of month.
 ==  Documentation
 
 Beside
-https://pkg.go.dev/github.com/shuLhan/share#section-documentation[the Go
+https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go#section-documentation[the Go
 documentation^],
 that provides documentation for API in the `share` module, there are also
 additional documentations that we can not include inside source code due to
@@ -82,13 +82,13 @@ This is changelog for share v0.1.0 until v0.11.0.
 
 ==  Development
 
-https://github.com/shuLhan/share[Repository^]::
+https://git.sr.ht/~shulhan/pakakeh.go[Repository^]::
 Link to the source code.
 
-https://github.com/shuLhan/share/issues[Issues^]::
+https://git.sr.ht/~shulhan/pakakeh.go/issues[Issues^]::
 List of open issues.
 
-https://github.com/shuLhan/share/pulls[Patches^]::
+https://git.sr.ht/~shulhan/pakakeh.go/pulls[Patches^]::
 Link to submit the patches.
 
 

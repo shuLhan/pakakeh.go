@@ -1,4 +1,4 @@
-module github.com/shuLhan/share
+module git.sr.ht/~shulhan/pakakeh.go
 
 go 1.20
 

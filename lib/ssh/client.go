@@ -19,9 +19,9 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 	"golang.org/x/crypto/ssh/knownhosts"
 
-	"github.com/shuLhan/share/lib/crypto"
-	libos "github.com/shuLhan/share/lib/os"
-	"github.com/shuLhan/share/lib/ssh/config"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/crypto"
+	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh/config"
 )
 
 // Client for SSH connection.

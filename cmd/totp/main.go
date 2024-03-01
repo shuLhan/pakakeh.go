@@ -2,7 +2,7 @@
 // This is just an example of implementation of [lib/totp]
 // See [gotp] for a complete implementation that support encryption.
 //
-// [lib/totp]: https://pkg.go.dev/github.com/shuLhan/share/lib/totp
+// [lib/totp]: https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/totp
 // [gotp]: https://sr.ht/~shulhan/gotp
 package main
 
@@ -13,7 +13,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/shuLhan/share/lib/totp"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/totp"
 )
 
 func main() {

@@ -10,7 +10,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/shuLhan/share/lib/totp"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/totp"
 )
 
 func ExampleProtocol_GenerateNWithTime() {

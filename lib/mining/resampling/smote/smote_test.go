@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/shuLhan/share/lib/dsv"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 func TestSmote(t *testing.T) {

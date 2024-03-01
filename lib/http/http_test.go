@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shuLhan/share/lib/memfs"
-	libstrings "github.com/shuLhan/share/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 var (

@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/shuLhan/share/lib/ascii"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestNewResolvConf(t *testing.T) {

@@ -4,7 +4,7 @@
 
 package bytes
 
-import "github.com/shuLhan/share/lib/ascii"
+import "git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 
 // Parser implement tokenize parser for stream of byte using one or more
 // delimiters as separator between token.

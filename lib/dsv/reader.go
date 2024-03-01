@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 const (

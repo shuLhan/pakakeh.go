@@ -12,7 +12,7 @@ import (
 	"net"
 	"strings"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
 )
 
 type receiverMode int

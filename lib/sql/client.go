@@ -17,7 +17,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shuLhan/share/lib/reflect"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 )
 
 const (

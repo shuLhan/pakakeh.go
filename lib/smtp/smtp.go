@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/shuLhan/share/lib/ascii"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // List of SMTP status codes.

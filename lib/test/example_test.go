@@ -9,7 +9,7 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func ExampleAssert_struct() {

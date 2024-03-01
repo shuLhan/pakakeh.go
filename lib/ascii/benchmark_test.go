@@ -45,21 +45,21 @@ Wed 13 Oct 17:45:42 UTC 2021
 
 goos: linux
 goarch: amd64
-pkg: github.com/shuLhan/share/lib/ascii
+pkg: git.sr.ht/~shulhan/pakakeh.go/lib/ascii
 cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 BenchmarkToLowerStd-8            3683070               328.9 ns/op           256 B/op          1 allocs/op
 BenchmarkToLower-8               5221684               232.0 ns/op             0 B/op          0 allocs/op
 PASS
-ok      github.com/shuLhan/share/lib/ascii      2.990s
+ok      git.sr.ht/~shulhan/pakakeh.go/lib/ascii      2.990s
 
 === go version ???
 
 goos: linux
 goarch: amd64
-pkg: github.com/shuLhan/share/lib/ascii
+pkg: git.sr.ht/~shulhan/pakakeh.go/lib/ascii
 BenchmarkToLowerStd-4            2066588               563 ns/op             256 B/op          1 allocs/op
 BenchmarkToLower-4               5476693               213 ns/op               0 B/op          0 allocs/op
 PASS
-ok      github.com/shuLhan/share/lib/ascii      3.149s
+ok      git.sr.ht/~shulhan/pakakeh.go/lib/ascii      3.149s
 
 ****/

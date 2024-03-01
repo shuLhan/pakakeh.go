@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestNewScheduler(t *testing.T) {

@@ -19,7 +19,7 @@ import (
 
 	"golang.org/x/net/html"
 
-	"github.com/shuLhan/share/lib/ascii"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // NormalizeForID given an input string normalize it to HTML ID.

@@ -7,7 +7,7 @@
 package vcard
 
 import (
-	"github.com/shuLhan/share/lib/contact"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
 )
 
 // VCard define vcard 4.0 data structure.

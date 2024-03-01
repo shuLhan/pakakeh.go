@@ -17,11 +17,11 @@ package cart
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/mining/gain/gini"
-	"github.com/shuLhan/share/lib/mining/tree/binary"
-	"github.com/shuLhan/share/lib/numbers"
-	libstrings "github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/gain/gini"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/tree/binary"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 const (

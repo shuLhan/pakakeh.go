@@ -7,8 +7,8 @@ package tests
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/hunspell"
-	libstrings "github.com/shuLhan/share/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/hunspell"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 const (

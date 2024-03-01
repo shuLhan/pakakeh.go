@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // ParseResponseHeader parse HTTP response header and return it as standard

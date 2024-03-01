@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/shuLhan/share/lib/dns"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dns"
 )
 
 var dnsClientPool *dns.UDPClientPool

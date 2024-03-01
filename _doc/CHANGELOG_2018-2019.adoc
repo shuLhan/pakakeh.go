@@ -570,6 +570,6 @@ The libraries are `bytes`, `contact`, `dns`, `dsv`, `ini`, `io`, `memfs`,
 
 Documentation for each package can be viewed at,
 
-	https://godoc.org/github.com/shuLhan/share
+	https://godoc.org/git.sr.ht/~shulhan/pakakeh.go
 
 I hope it will be stay alive!

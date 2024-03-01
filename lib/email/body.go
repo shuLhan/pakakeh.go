@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // Body represent single or multiple message body parts.

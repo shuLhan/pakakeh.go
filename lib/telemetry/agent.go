@@ -10,7 +10,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/shuLhan/share/lib/mlog"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
 )
 
 const (

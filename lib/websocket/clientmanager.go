@@ -8,7 +8,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/shuLhan/share/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 )
 
 // ClientManager manage list of active websocket connections on server.

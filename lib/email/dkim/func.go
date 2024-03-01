@@ -5,8 +5,8 @@
 package dkim
 
 import (
-	"github.com/shuLhan/share/lib/ascii"
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // DecodeQP decode DKIM quoted printable text.

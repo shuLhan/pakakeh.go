@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 // TestConnect this test require a websocket server to be run.

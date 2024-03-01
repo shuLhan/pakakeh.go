@@ -18,7 +18,7 @@ all: test lint build
 install:
 	go install ./cmd/...
 
-build: BUILD_FLAGS=-ldflags "-s -w -X 'github.com/shuLhan/share.Version=$(VERSION)'"
+build: BUILD_FLAGS=-ldflags "-s -w -X 'git.sr.ht/~shulhan/pakakeh.go.Version=$(VERSION)'"
 build:
 	mkdir -p _bin/
 	go build $(BUILD_FLAGS) -o _bin/ ./cmd/...

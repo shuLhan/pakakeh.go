@@ -1,5 +1,5 @@
-[![GoDoc](https://godoc.org/github.com/shuLhan/share/lib/dsv?status.svg)](https://godoc.org/github.com/shuLhan/share/lib/dsv)
-[![Go Report Card](https://goreportcard.com/badge/github.com/shuLhan/share/lib/dsv)](https://goreportcard.com/report/github.com/shuLhan/share/lib/dsv)
+[![GoDoc](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/dsv?status.svg)](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/dsv)
+[![Go Report Card](https://goreportcard.com/badge/git.sr.ht/~shulhan/pakakeh.go/lib/dsv)](https://goreportcard.com/report/git.sr.ht/~shulhan/pakakeh.go/lib/dsv)
 
 Package `dsv` is a Go library for working with delimited separated value (DSV).
 
@@ -289,10 +289,10 @@ for {
 ### Using different Dataset
 
 Default dataset used by Reader is
-[tabula.Dataset](https://godoc.org/github.com/shuLhan/share/lib/tabula#Dataset).
+[tabula.Dataset](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#Dataset).
 
 You can extend and implement
-[DatasetInterface](https://godoc.org/github.com/shuLhan/share/lib/tabula#DatasetInterface)
+[DatasetInterface](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#DatasetInterface)
 and use it in reader object, either by
 
 - passing it in the second parameter in `NewReader`, for example,
@@ -321,7 +321,7 @@ and use it in reader object, either by
 Since we use tabula package to manage data, any features in those package
 can be used in our dataset.
 For more information see [tabula
-package](https://godoc.org/github.com/shuLhan/share/lib/tabula).
+package](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula).
 
 ## Limitations
 

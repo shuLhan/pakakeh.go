@@ -30,9 +30,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shuLhan/share"
-	libhttp "github.com/shuLhan/share/lib/http"
-	libnet "github.com/shuLhan/share/lib/net"
+	"git.sr.ht/~shulhan/pakakeh.go"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 const defTimeout = 10 * time.Second

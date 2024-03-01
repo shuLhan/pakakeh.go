@@ -1,5 +1,5 @@
-[![GoDoc](https://godoc.org/github.com/shuLhan/share/lib/mining?status.svg)](https://godoc.org/github.com/shuLhan/share/lib/mining)
-[![Go Report Card](https://goreportcard.com/badge/github.com/shuLhan/share/lib/mining)](https://goreportcard.com/report/github.com/shuLhan/share/lib/mining)
+[![GoDoc](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/mining?status.svg)](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/mining)
+[![Go Report Card](https://goreportcard.com/badge/git.sr.ht/~shulhan/pakakeh.go/lib/mining)](https://goreportcard.com/report/git.sr.ht/~shulhan/pakakeh.go/lib/mining)
 
 # go-mining
 

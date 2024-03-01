@@ -13,7 +13,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/shuLhan/share/lib/ini"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ini"
 )
 
 const (

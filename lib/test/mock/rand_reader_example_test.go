@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/shuLhan/share/lib/test/mock"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test/mock"
 )
 
 func ExampleRandReader() {

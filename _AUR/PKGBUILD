@@ -6,7 +6,7 @@ pkgrel=1
 
 pkgdesc="Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk"
 arch=(x86_64)
-url='https://github.com/shuLhan/share'
+url='https://sr.ht/~shulhan/pakakeh.go'
 license=('BSD')
 
 makedepends=(
@@ -17,7 +17,7 @@ makedepends=(
 provides=('share-tools')
 
 source=(
-	"$pkgname::git+https://github.com/shuLhan/share.git"
+	"$pkgname::git+https://git.sr.ht/~shulhan/pakakeh.go"
 )
 md5sums=(
 	'SKIP'

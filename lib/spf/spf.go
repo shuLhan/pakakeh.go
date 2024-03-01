@@ -10,7 +10,7 @@ import (
 	"net"
 	"strings"
 
-	libdns "github.com/shuLhan/share/lib/dns"
+	libdns "git.sr.ht/~shulhan/pakakeh.go/lib/dns"
 )
 
 // List of possible result code as described in RFC 7208 section 2.6.

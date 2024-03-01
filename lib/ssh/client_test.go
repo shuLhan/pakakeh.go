@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/shuLhan/share/lib/ssh/config"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh/config"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 // TestNewClient_KeyError test SSH to server with host key does not exist in

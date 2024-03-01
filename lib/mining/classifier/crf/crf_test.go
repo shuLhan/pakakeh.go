@@ -9,9 +9,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/shuLhan/share/lib/dsv"
-	"github.com/shuLhan/share/lib/mining/classifier"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 func runCRF(t *testing.T, sampleFile, statFile, perfFile string, nstage, ntree int) {

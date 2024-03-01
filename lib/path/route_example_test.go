@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	libpath "github.com/shuLhan/share/lib/path"
+	libpath "git.sr.ht/~shulhan/pakakeh.go/lib/path"
 )
 
 func ExampleRoute_IsKeyExists() {

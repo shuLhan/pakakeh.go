@@ -8,8 +8,8 @@ import (
 	"encoding/xml"
 	"testing"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
-	"github.com/shuLhan/share/lib/test"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestResponse_MarshalText(t *testing.T) {

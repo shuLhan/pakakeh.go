@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/shuLhan/share/lib/sql"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/sql"
 )
 
 func ExampleMeta_Bind() {

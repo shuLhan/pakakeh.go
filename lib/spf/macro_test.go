@@ -8,7 +8,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestMacroExpandIPv4(t *testing.T) {

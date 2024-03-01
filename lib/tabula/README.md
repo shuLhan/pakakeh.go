@@ -1,6 +1,6 @@
-[![GoDoc](https://godoc.org/github.com/shuLhan/share/lib/tabula?status.svg)](https://godoc.org/github.com/shuLhan/share/lib/tabula)
-[![Go Report Card](https://goreportcard.com/badge/github.com/shuLhan/share/lib/tabula)](https://goreportcard.com/report/github.com/shuLhan/share/lib/tabula)
-![cover.run go](https://cover.run/go/github.com/shuLhan/share/lib/tabula.svg)
+[![GoDoc](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula?status.svg)](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula)
+[![Go Report Card](https://goreportcard.com/badge/git.sr.ht/~shulhan/pakakeh.go/lib/tabula)](https://goreportcard.com/report/git.sr.ht/~shulhan/pakakeh.go/lib/tabula)
+![cover.run go](https://cover.run/go/git.sr.ht/~shulhan/pakakeh.go/lib/tabula.svg)
 
 Package tabula is a Go library for working with rows, columns, or matrix
 (table), or in another terms working with data set.
@@ -94,16 +94,16 @@ For example, given a table of data,
 
 - **Switching between rows and columns mode**.
 
-- [**Random pick rows with or without replacement**](https://godoc.org/github.com/shuLhan/share/lib/tabula#RandomPickRows).
+- [**Random pick rows with or without replacement**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#RandomPickRows).
 
-- [**Random pick columns with or without replacement**](https://godoc.org/github.com/shuLhan/share/lib/tabula#RandomPickColumns).
+- [**Random pick columns with or without replacement**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#RandomPickColumns).
 
-- [**Select column from dataset by index**](https://godoc.org/github.com/shuLhan/share/lib/tabula#SelectColumnsByIdx).
+- [**Select column from dataset by index**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#SelectColumnsByIdx).
 
-- [**Sort columns by index**](https://godoc.org/github.com/shuLhan/share/lib/tabula#SortColumnsByIndex),
+- [**Sort columns by index**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#SortColumnsByIndex),
   or indirect sort.
 
-- [**Split rows value by numeric**](https://godoc.org/github.com/shuLhan/share/lib/tabula#SplitRowsByNumeric).
+- [**Split rows value by numeric**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#SplitRowsByNumeric).
   For example, given two numeric rows,
 
   ```
@@ -125,7 +125,7 @@ For example, given a table of data,
   B'': {7,8}
   ```
 
-- [**Split rows by string**](https://godoc.org/github.com/shuLhan/share/lib/tabula#SplitRowsByCategorical).
+- [**Split rows by string**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#SplitRowsByCategorical).
   For example, given two rows,
 
   ```
@@ -148,7 +148,7 @@ For example, given a table of data,
   		Y'': [2,4,6,8]
   ```
 
-- [**Select row where**](https://godoc.org/github.com/shuLhan/share/lib/tabula#SelectRowsWhere).
+- [**Select row where**](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula#SelectRowsWhere).
   Select row at column index x where their value is equal to y (an analogy to
   _select where_ in SQL).
   For example, given a rows of dataset,

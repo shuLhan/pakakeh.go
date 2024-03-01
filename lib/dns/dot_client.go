@@ -10,8 +10,8 @@ import (
 	"net"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	libnet "github.com/shuLhan/share/lib/net"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 // DoTClient client for DNS over TLS.

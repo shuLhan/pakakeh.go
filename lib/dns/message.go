@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shuLhan/share/lib/ascii"
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	libnet "github.com/shuLhan/share/lib/net"
-	"github.com/shuLhan/share/lib/reflect"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 )
 
 // Message represent a DNS message.

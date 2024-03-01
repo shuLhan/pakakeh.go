@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/shuLhan/share/lib/ascii"
-	libdns "github.com/shuLhan/share/lib/dns"
-	libnet "github.com/shuLhan/share/lib/net"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	libdns "git.sr.ht/~shulhan/pakakeh.go/lib/dns"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 const (

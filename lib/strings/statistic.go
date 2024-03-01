@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/shuLhan/share/lib/ints"
-	"github.com/shuLhan/share/lib/runes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/runes"
 )
 
 // CountAlnum return number of alpha-numeric character in text.

@@ -11,14 +11,14 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/shuLhan/share/lib/email"
-	"github.com/shuLhan/share/lib/smtp"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/smtp"
 )
 
 func ExampleNewMailTx() {
 	// Example on how to create MailTx Data using email package [1].
 	//
-	// [1] github.com/shuLhan/share/lib/email
+	// [1] git.sr.ht/~shulhan/pakakeh.go/lib/email
 
 	// Overwrite the email.Epoch to make the example works.
 	email.Epoch = func() int64 {

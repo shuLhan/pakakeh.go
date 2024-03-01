@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/shuLhan/share/lib/math/big"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/math/big"
 )
 
 func ExampleMarshalForm() {

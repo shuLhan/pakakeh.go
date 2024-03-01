@@ -10,8 +10,8 @@ import (
 	"io"
 	"os"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/tabula"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 // ReaderInterface is the interface for reading DSV file.

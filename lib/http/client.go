@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shuLhan/share"
+	"git.sr.ht/~shulhan/pakakeh.go"
 )
 
 var (

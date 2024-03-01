@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shuLhan/share/lib/ascii"
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	libtime "github.com/shuLhan/share/lib/time"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libtime "git.sr.ht/~shulhan/pakakeh.go/lib/time"
 )
 
 // List of flag for parsing RR.

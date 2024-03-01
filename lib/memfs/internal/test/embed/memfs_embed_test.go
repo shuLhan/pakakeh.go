@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shuLhan/share/lib/memfs"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 var memFS *memfs.MemFS

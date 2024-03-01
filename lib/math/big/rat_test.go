@@ -7,7 +7,7 @@ package big
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestRat_IsEqual_unexported(t *testing.T) {

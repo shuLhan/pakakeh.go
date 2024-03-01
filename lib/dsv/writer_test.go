@@ -7,7 +7,7 @@ package dsv
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 // TestWriter test reading and writing DSV.

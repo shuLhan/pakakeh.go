@@ -11,7 +11,7 @@ import (
 	"mime/quotedprintable"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // MIME represent part of message body with their header and content.

@@ -7,8 +7,8 @@ package strings
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/numbers"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestCountMissRate(t *testing.T) {

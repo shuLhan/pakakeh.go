@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
 )
 
 func ExampleE_Is() {

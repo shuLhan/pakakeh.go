@@ -9,8 +9,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/shuLhan/share/lib/contact"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 const (

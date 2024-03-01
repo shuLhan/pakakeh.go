@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 
-	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/test/mock"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test/mock"
 )
 
 func ExampleGenerateFormData() {

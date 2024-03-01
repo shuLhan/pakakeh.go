@@ -3,7 +3,7 @@ package time_test
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/time"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/time"
 )
 
 func ExampleClock_After() {

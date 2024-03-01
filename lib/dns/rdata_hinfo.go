@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // RDataHINFO HINFO records are used to acquire general information about a

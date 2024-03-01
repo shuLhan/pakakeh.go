@@ -60,7 +60,7 @@
 // "relaxed" return the formatted header or body by trimming the space.
 // See [RFC 6376 Section 3.4] or [our summary].
 //
-// [our summary]: https://github.com/shuLhan/share/blob/master/_doc/RFC_6376__DKIM_SIGNATURES.adoc#canonicalization
+// [our summary]: https://git.sr.ht/~shulhan/pakakeh.go/blob/master/_doc/RFC_6376__DKIM_SIGNATURES.adoc#canonicalization
 // [RFC 5322]: https://datatracker.ietf.org/doc/html/rfc5322
 // [RFC 6376 Section 3.4]: https://datatracker.ietf.org/doc/html/rfc6376#section-3.4
 package email

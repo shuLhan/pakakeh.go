@@ -6,7 +6,7 @@
 package floats64
 
 import (
-	"github.com/shuLhan/share/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 )
 
 // Count number of class in data.

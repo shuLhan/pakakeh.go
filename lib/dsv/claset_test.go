@@ -7,8 +7,8 @@ package dsv
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/tabula"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestReaderWithClaset(t *testing.T) {

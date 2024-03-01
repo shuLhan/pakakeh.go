@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	libreflect "github.com/shuLhan/share/lib/reflect"
-	"github.com/shuLhan/share/lib/test"
+	libreflect "git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestIsValueBoolTrue(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/shuLhan/share/lib/errors"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
 )
 
 const (

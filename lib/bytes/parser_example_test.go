@@ -3,7 +3,7 @@ package bytes_test
 import (
 	"fmt"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 func ExampleParser_AddDelimiters() {

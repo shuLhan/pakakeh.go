@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	libnet "github.com/shuLhan/share/lib/net"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 // List of [ServerOptions] Debug mode.

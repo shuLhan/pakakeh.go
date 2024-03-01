@@ -13,7 +13,7 @@ import (
 //
 // goos: linux
 // goarch: amd64
-// pkg: github.com/shuLhan/share/lib/bytes
+// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/bytes
 // BenchmarkEqual-4                200000000                7.49 ns/op            0 B/op          0 allocs/op
 // BenchmarkCompare-4              200000000                6.88 ns/op            0 B/op          0 allocs/op
 func BenchmarkEqual(b *testing.B) {

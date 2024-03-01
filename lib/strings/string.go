@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode"
 
-	librunes "github.com/shuLhan/share/lib/runes"
+	librunes "git.sr.ht/~shulhan/pakakeh.go/lib/runes"
 )
 
 // Alnum remove non alpha-numeric character from text and return it.

@@ -7,7 +7,7 @@ package telemetry_test
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/telemetry"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/telemetry"
 )
 
 func ExampleMetadata() {

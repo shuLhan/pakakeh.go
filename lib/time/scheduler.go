@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shuLhan/share/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 )
 
 // ErrScheduleUnknown define an error when unknown schedule kind parsed from

@@ -11,9 +11,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shuLhan/share/lib/ascii"
-	libos "github.com/shuLhan/share/lib/os"
-	libstrings "github.com/shuLhan/share/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 // List of affix file general options.

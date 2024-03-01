@@ -9,7 +9,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 // Metadata represent on how to parse each column in record.

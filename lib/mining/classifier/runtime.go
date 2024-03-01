@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/shuLhan/share/lib/dsv"
-	"github.com/shuLhan/share/lib/floats64"
-	"github.com/shuLhan/share/lib/ints"
-	"github.com/shuLhan/share/lib/numbers"
-	libstrings "github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 const (

@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	libints "github.com/shuLhan/share/lib/ints"
-	libhtml "github.com/shuLhan/share/lib/net/html"
-	libstrings "github.com/shuLhan/share/lib/strings"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libints "git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/net/html"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 const (

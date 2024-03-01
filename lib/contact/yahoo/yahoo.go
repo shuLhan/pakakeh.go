@@ -14,7 +14,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/shuLhan/share/lib/contact"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/contact"
 )
 
 const (

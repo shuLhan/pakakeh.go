@@ -15,12 +15,12 @@ import (
 	"math"
 	"sort"
 
-	"github.com/shuLhan/share/lib/floats64"
-	"github.com/shuLhan/share/lib/mining/classifier"
-	"github.com/shuLhan/share/lib/mining/classifier/rf"
-	"github.com/shuLhan/share/lib/numbers"
-	libstrings "github.com/shuLhan/share/lib/strings"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/rf"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 const (

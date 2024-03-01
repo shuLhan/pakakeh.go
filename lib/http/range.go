@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	libstrings "github.com/shuLhan/share/lib/strings"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 // DefRangeLimit limit of content served by server when [Range] request

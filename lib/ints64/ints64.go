@@ -6,7 +6,7 @@
 package ints64
 
 import (
-	"github.com/shuLhan/share/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 )
 
 // Count number of class in slice.

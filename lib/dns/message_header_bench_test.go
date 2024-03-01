@@ -14,7 +14,7 @@ import (
 //
 // goos: linux
 // goarch: amd64
-// pkg: github.com/shuLhan/share/lib/dns
+// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/dns
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageHeader_pack-8           19629273                66.25 ns/op           32 B/op          3 allocs/op
 //
@@ -24,7 +24,7 @@ import (
 //
 // goos: linux
 // goarch: amd64
-// pkg: github.com/shuLhan/share/lib/dns
+// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/dns
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageHeader_pack-8           54183505                21.66 ns/op           16 B/op          1 allocs/op
 func BenchmarkMessageHeader_pack(b *testing.B) {
@@ -51,7 +51,7 @@ func BenchmarkMessageHeader_pack(b *testing.B) {
 //
 // goos: linux
 // goarch: amd64
-// pkg: github.com/shuLhan/share/lib/dns
+// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/dns
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageHeader_unpack-8         310460067                3.848 ns/op           0 B/op          0 allocs/op
 func BenchmarkMessageHeader_unpack(b *testing.B) {

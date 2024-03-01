@@ -10,7 +10,7 @@ import "testing"
 //
 // goos: linux
 // goarch: amd64
-// pkg: github.com/shuLhan/share/lib/dns
+// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/dns
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageQuestion_String-8        7138899               168.3 ns/op            56 B/op          3 allocs/op
 func BenchmarkMessageQuestion_String(b *testing.B) {
@@ -32,7 +32,7 @@ func BenchmarkMessageQuestion_String(b *testing.B) {
 //
 // goos: linux
 // goarch: amd64
-// pkg: github.com/shuLhan/share/lib/dns
+// pkg: git.sr.ht/~shulhan/pakakeh.go/lib/dns
 // cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 // BenchmarkMessageQuestion_unpack-8       35717178                35.78 ns/op            8 B/op          1 allocs/op
 func BenchmarkMessageQuestion_unpack(b *testing.B) {

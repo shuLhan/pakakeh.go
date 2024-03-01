@@ -7,8 +7,8 @@ package tests
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/hunspell"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/hunspell"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestMorphology_parseAnalyze(t *testing.T) {

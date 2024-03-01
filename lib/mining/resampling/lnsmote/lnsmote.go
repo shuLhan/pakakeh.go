@@ -16,10 +16,10 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/shuLhan/share/lib/dsv"
-	"github.com/shuLhan/share/lib/mining/knn"
-	"github.com/shuLhan/share/lib/mining/resampling/smote"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/knn"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/resampling/smote"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 // Runtime parameters for input and output.

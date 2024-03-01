@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"strings"
 
-	libreflect "github.com/shuLhan/share/lib/reflect"
-	libstrings "github.com/shuLhan/share/lib/strings"
+	libreflect "git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 const (

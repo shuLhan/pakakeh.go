@@ -5,7 +5,7 @@
 package diff
 
 import (
-	"github.com/shuLhan/share/lib/text"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
 
 // LineChanges represents a set of change in text.

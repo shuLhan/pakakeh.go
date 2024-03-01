@@ -7,7 +7,7 @@ package email
 import (
 	"time"
 
-	"github.com/shuLhan/share/lib/ascii"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // DateFormat define the default date layout in email.

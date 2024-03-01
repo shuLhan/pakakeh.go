@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"unicode"
 
-	inbytes "github.com/shuLhan/share/internal/bytes"
-	"github.com/shuLhan/share/lib/ascii"
+	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // AppendInt16 append an int16 value into slice of byte.

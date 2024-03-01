@@ -312,7 +312,7 @@ On container, sometimes the test fail with the following error
     Custom error
 2022/08/28 19:32:22 Do: Get "http://127.0.0.1:7016/?":
     dial tcp 127.0.0.1:7016: connect: connection refused
-FAIL	github.com/shuLhan/share/lib/http	1.583s
+FAIL	git.sr.ht/~shulhan/pakakeh.go/lib/http	1.583s
 ----
 
 This was caused by server is not ready yet to accept connection when

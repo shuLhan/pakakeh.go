@@ -14,8 +14,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shuLhan/share"
-	libos "github.com/shuLhan/share/lib/os"
+	"git.sr.ht/~shulhan/pakakeh.go"
+	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
 )
 
 const (

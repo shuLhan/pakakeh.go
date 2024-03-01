@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/shuLhan/share/lib/email"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
 )
 
 func ExampleParseContentType() {

@@ -12,8 +12,8 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/shuLhan/share/lib/tabula"
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 // assertFile compare content of two file, print error message and exit

@@ -6,7 +6,7 @@
 // This is an example of implementation Client from
 // [lib/smtp].
 //
-// [lib/smtp]: https://pkg.go.dev/github.com/shuLhan/share/lib/smtp
+// [lib/smtp]: https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/smtp
 package main
 
 import (

@@ -9,8 +9,8 @@ import (
 	"io"
 	"os"
 
-	inbytes "github.com/shuLhan/share/internal/bytes"
-	"github.com/shuLhan/share/lib/text"
+	inbytes "git.sr.ht/~shulhan/pakakeh.go/internal/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 )
 
 const (

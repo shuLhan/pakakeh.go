@@ -13,7 +13,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shuLhan/share/lib/reflect"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 )
 
 // Zone represent a group of domain names shared a single root domain.

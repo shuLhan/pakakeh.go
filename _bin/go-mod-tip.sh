@@ -8,7 +8,7 @@
 ##
 ##	$ go-mod-tip.sh
 ##	commit timestamp: 1658864676
-##	github.com/shuLhan/share v0.39.1-0.20220726194436-38f9f1fb1ebc
+##	git.sr.ht/~shulhan/pakakeh.go v0.39.1-0.20220726194436-38f9f1fb1ebc
 ##
 ## This command usually used to fix go.mod due to force commit.
 

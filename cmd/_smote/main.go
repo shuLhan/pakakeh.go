@@ -11,9 +11,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/shuLhan/share/lib/dsv"
-	"github.com/shuLhan/share/lib/mining/resampling/smote"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/resampling/smote"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 type options struct {

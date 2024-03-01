@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/shuLhan/share/lib/smtp"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/smtp"
 )
 
 var (

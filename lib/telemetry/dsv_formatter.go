@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"fmt"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // DsvFormatter format the [Metric] in single line where each value is separated

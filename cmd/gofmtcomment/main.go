@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/shuLhan/share"
+	"git.sr.ht/~shulhan/pakakeh.go"
 )
 
 const (

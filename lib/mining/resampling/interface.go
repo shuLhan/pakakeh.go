@@ -7,8 +7,8 @@
 package resampling
 
 import (
-	"github.com/shuLhan/share/lib/dsv"
-	"github.com/shuLhan/share/lib/tabula"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
 
 const (

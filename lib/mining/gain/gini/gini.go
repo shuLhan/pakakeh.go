@@ -11,8 +11,8 @@ package gini
 import (
 	"fmt"
 
-	"github.com/shuLhan/share/lib/floats64"
-	libstrings "github.com/shuLhan/share/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
+	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
 // Gini contain slice of sorted index, slice of partition values, slice of Gini

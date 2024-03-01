@@ -8,8 +8,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/shuLhan/share/lib/email"
-	"github.com/shuLhan/share/lib/smtp"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/email"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/smtp"
 )
 
 const (

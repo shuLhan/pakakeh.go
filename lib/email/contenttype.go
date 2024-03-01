@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 var (

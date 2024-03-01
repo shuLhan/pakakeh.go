@@ -7,7 +7,7 @@ package dkim
 import (
 	"fmt"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 type empty struct{}

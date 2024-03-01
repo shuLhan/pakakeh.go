@@ -11,8 +11,8 @@ import (
 	"net/url"
 	"time"
 
-	libhttp "github.com/shuLhan/share/lib/http"
-	libnet "github.com/shuLhan/share/lib/net"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 const (

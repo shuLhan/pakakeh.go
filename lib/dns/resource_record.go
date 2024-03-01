@@ -11,8 +11,8 @@ import (
 	"net"
 	"strings"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	libnet "github.com/shuLhan/share/lib/net"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 // ResourceRecord The answer, authority, and additional sections all share the

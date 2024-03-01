@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"testing"
 
-	libbytes "github.com/shuLhan/share/lib/bytes"
-	"github.com/shuLhan/share/lib/test"
+	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestParseZone(t *testing.T) {

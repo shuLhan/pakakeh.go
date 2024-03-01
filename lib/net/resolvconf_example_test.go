@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"log"
 
-	libnet "github.com/shuLhan/share/lib/net"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
 func ExampleResolvConf_PopulateQuery() {

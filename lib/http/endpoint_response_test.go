@@ -8,8 +8,8 @@ import (
 	"errors"
 	"testing"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
-	"github.com/shuLhan/share/lib/test"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 type myResponse struct {

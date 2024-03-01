@@ -4,7 +4,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/shuLhan/share/lib/ascii"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
 // IsHostnameValid will return true if hostname is valid, otherwise it will

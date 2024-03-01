@@ -7,7 +7,7 @@ package strings
 import (
 	"testing"
 
-	"github.com/shuLhan/share/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 func TestParser_AddDelimiters(t *testing.T) {
