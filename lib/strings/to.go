@@ -5,6 +5,7 @@
 package strings
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -47,8 +48,9 @@ func ToInt64(ss []string) (sv []int64) {
 		}
 
 		// Handle error, try to convert to float64 first.
-		ev := e.(*strconv.NumError)
-		if ev.Err == strconv.ErrSyntax {
+		var ev *strconv.NumError
+
+		if errors.As(e, &ev) && ev.Err == strconv.ErrSyntax {
 			f, e := strconv.ParseFloat(s, 64)
 			if e == nil {
 				v = int64(f)

@@ -10,6 +10,7 @@
 package yahoo
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -44,8 +45,13 @@ func ImportFromJSON(jsonb []byte) (contacts []*contact.Record, err error) {
 
 // ImportWithOAuth get Yahoo contacts using OAuth HTTP client.
 func ImportWithOAuth(client *http.Client, guid string) (contacts []*contact.Record, err error) {
-	api := apiContactsURL + guid + apiContactsSuffix
-	req, err := http.NewRequest(http.MethodGet, api, nil)
+	var (
+		ctx = context.Background()
+		api = apiContactsURL + guid + apiContactsSuffix
+		req *http.Request
+	)
+
+	req, err = http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
 	if err != nil {
 		return
 	}

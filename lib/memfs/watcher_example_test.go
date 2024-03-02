@@ -70,14 +70,14 @@ func ExampleNewWatcher() {
 	fmt.Printf("File mode: %s\n", ns.Node.Mode())
 	fmt.Printf("File size: %d\n", ns.Node.Size())
 
-	//Output:
-	//State: FileStateUpdateMode
-	//File mode: -rwx------
-	//File size: 0
-	//State: FileStateUpdateContent
-	//File mode: -rwx------
-	//File size: 15
-	//State: FileStateDeleted
-	//File mode: -rwx------
-	//File size: 15
+	// Output:
+	// State: FileStateUpdateMode
+	// File mode: -rwx------
+	// File size: 0
+	// State: FileStateUpdateContent
+	// File mode: -rwx------
+	// File size: 15
+	// State: FileStateDeleted
+	// File mode: -rwx------
+	// File size: 15
 }

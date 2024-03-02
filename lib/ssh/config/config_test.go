@@ -27,10 +27,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	testParser, err = newParser(dummyConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	testParser = newParser(dummyConfig)
 
 	testDefaultSection = NewSection(dummyConfig, ``)
 	testDefaultSection.setDefaults()

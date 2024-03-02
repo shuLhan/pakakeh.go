@@ -28,9 +28,9 @@ func ExampleClise_RecentSlice() {
 	fmt.Println(c.RecentSlice())
 	c.Push(4, 5, 6, 7)
 	fmt.Println(c.RecentSlice())
-	//Output:
-	//[1 2 3]
-	//[6 7]
+	// Output:
+	// [1 2 3]
+	// [6 7]
 }
 
 func ExampleClise_Reset() {
@@ -40,9 +40,9 @@ func ExampleClise_Reset() {
 	c.Reset()
 	c.Push(1)
 	fmt.Println(c.Slice())
-	//Output:
-	//[1 2 3 4 5]
-	//[1]
+	// Output:
+	// [1 2 3 4 5]
+	// [1]
 }
 
 func ExampleClise_Slice() {
@@ -55,9 +55,9 @@ func ExampleClise_Slice() {
 	fmt.Println(c.Slice())
 	c.Push(7, 8, 9, 10)
 	fmt.Println(c.Slice())
-	//Output:
-	//[1 2]
-	//[1 2 3 4 5]
-	//[2 3 4 5 6]
-	//[6 7 8 9 10]
+	// Output:
+	// [1 2]
+	// [1 2 3 4 5]
+	// [2 3 4 5 6]
+	// [6 7 8 9 10]
 }

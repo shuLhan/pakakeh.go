@@ -185,6 +185,8 @@ func (v *Value) String() string {
 	buf.WriteString("<value>")
 
 	switch v.Kind {
+	case Unset:
+		// NOOP.
 	case String:
 		fmt.Fprintf(&buf, "<string>%s</string>", v.In.(string))
 	case Boolean:

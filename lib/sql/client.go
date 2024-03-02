@@ -49,6 +49,7 @@ func NewClient(opts ClientOptions) (cl *Client, err error) {
 // FetchTableNames return the table names in current database schema sorted
 // in ascending order.
 func (cl *Client) FetchTableNames() (tableNames []string, err error) {
+	var logp = `FetchTableNames`
 	var q, v string
 
 	switch cl.DriverName {
@@ -63,27 +64,31 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 		`
 	}
 
-	rows, err := cl.DB.Query(q)
+	var rows *sql.Rows
+
+	rows, err = cl.DB.Query(q)
 	if err != nil {
-		return nil, fmt.Errorf("FetchTableNames: " + err.Error())
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	if len(cl.TableNames) > 0 {
 		cl.TableNames = cl.TableNames[:0]
 	}
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	for rows.Next() {
 		err = rows.Scan(&v)
 		if err != nil {
-			_ = rows.Close()
-			return cl.TableNames, err
+			return cl.TableNames, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
 		cl.TableNames = append(cl.TableNames, v)
 	}
 	err = rows.Err()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return cl.TableNames, nil
@@ -313,7 +318,7 @@ func (cl *Client) TruncateTable(tableName string) (err error) {
 
 	_, err = cl.DB.Exec(q)
 	if err != nil {
-		return fmt.Errorf("TruncateTable %q: %s", tableName, err)
+		return fmt.Errorf(`TruncateTable %q: %w`, tableName, err)
 	}
 	return nil
 }

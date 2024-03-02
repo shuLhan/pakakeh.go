@@ -82,9 +82,9 @@ key=value2
 
 	fmt.Println(inis.Gets("section", "", "key"))
 	fmt.Println(inis.Gets("section", "sub", "key"))
-	//Output:
-	//[value1 value3]
-	//[value2 value4 value2]
+	// Output:
+	// [value1 value3]
+	// [value2 value4 value2]
 }
 
 func ExampleIni_GetsUniq() {
@@ -107,9 +107,9 @@ key=value2
 
 	fmt.Println(inis.GetsUniq("section", "", "key", true))
 	fmt.Println(inis.GetsUniq("section", "sub", "key", true))
-	//Output:
-	//[value1 value3]
-	//[value2 value4]
+	// Output:
+	// [value1 value3]
+	// [value2 value4]
 }
 
 func ExampleIni_AsMap() {
@@ -361,44 +361,44 @@ func ExampleMarshal_map() {
 	}
 
 	fmt.Println(string(iniText))
-	//Output:
-	//[map "subString"]
-	//k = v
-	//k2 = v2
+	// Output:
+	// [map "subString"]
+	// k = v
+	// k2 = v2
 	//
-	//[map "subPtrString"]
-	//k = v
-	//k2 = v2
+	// [map "subPtrString"]
+	// k = v
+	// k2 = v2
 	//
-	//[map "subInt"]
-	//keyint = 6
+	// [map "subInt"]
+	// keyint = 6
 	//
-	//[map "subPtrInt"]
-	//keyint = 6
+	// [map "subPtrInt"]
+	// keyint = 6
 	//
-	//[mapstruct "struct-key-1"]
-	//string = struct-1-string
-	//slice_string = str-1
-	//slice_string = str-2
-	//int = 1
+	// [mapstruct "struct-key-1"]
+	// string = struct-1-string
+	// slice_string = str-1
+	// slice_string = str-2
+	// int = 1
 	//
-	//[mapstruct "struct-key-2"]
-	//string = struct-2-string
-	//slice_string = str-3
-	//slice_string = str-4
-	//int = 2
+	// [mapstruct "struct-key-2"]
+	// string = struct-2-string
+	// slice_string = str-3
+	// slice_string = str-4
+	// int = 2
 	//
-	//[mapptrstruct "ptr-struct-key-1"]
-	//string = struct-1-string
-	//slice_string = str-5
-	//slice_string = str-6
-	//int = 1
+	// [mapptrstruct "ptr-struct-key-1"]
+	// string = struct-1-string
+	// slice_string = str-5
+	// slice_string = str-6
+	// int = 1
 	//
-	//[mapptrstruct "ptr-struct-key-2"]
-	//string = struct-2-string
-	//slice_string = str-7
-	//slice_string = str-8
-	//int = 2
+	// [mapptrstruct "ptr-struct-key-2"]
+	// string = struct-2-string
+	// slice_string = str-7
+	// slice_string = str-8
+	// int = 2
 }
 
 func ExampleMarshal_struct() {
@@ -447,25 +447,25 @@ func ExampleMarshal_struct() {
 	}
 
 	fmt.Println(string(iniText))
-	//Output:
-	//[section]
-	//time = 2006-01-02 15:04:05
+	// Output:
+	// [section]
+	// time = 2006-01-02 15:04:05
 	//
-	//[pointer "struct"]
-	//string = PtrStruct.String
-	//int = 1
+	// [pointer "struct"]
+	// string = PtrStruct.String
+	// int = 1
 	//
-	//[slice "OfStruct"]
-	//string = slice-struct-1
-	//int = 2
+	// [slice "OfStruct"]
+	// string = slice-struct-1
+	// int = 2
 	//
-	//[slice "OfStruct"]
-	//string = slice-struct-2
-	//int = 3
+	// [slice "OfStruct"]
+	// string = slice-struct-2
+	// int = 3
 	//
-	//[section "struct"]
-	//string = b
-	//int = 4
+	// [section "struct"]
+	// string = b
+	// int = 4
 }
 
 func ExampleUnmarshal() {
@@ -626,12 +626,12 @@ int = 2
 	fmt.Printf("MapStruct: %v\n", t.MapStruct)
 	fmt.Printf("MapPtrStruct: struct-key-1: %v\n", t.MapPtrStruct["struct-key-1"])
 	fmt.Printf("MapPtrStruct: struct-key-2: %v\n", t.MapPtrStruct["struct-key-2"])
-	//Output:
-	//MapString: map[k:v k2:v2]
-	//MapInt: map[k:6 k2:7]
-	//MapStruct: map[struct-key-1:{struct-1-string [str-1 str-2] 1} struct-key-2:{struct-2-string [str-3 str-4] 2}]
-	//MapPtrStruct: struct-key-1: &{struct-1-string [str-5 str-6] 1}
-	//MapPtrStruct: struct-key-2: &{struct-2-string [str-7 str-8] 2}
+	// Output:
+	// MapString: map[k:v k2:v2]
+	// MapInt: map[k:6 k2:7]
+	// MapStruct: map[struct-key-1:{struct-1-string [str-1 str-2] 1} struct-key-2:{struct-2-string [str-3 str-4] 2}]
+	// MapPtrStruct: struct-key-1: &{struct-1-string [str-5 str-6] 1}
+	// MapPtrStruct: struct-key-2: &{struct-2-string [str-7 str-8] 2}
 }
 
 func ExampleUnmarshal_struct() {
@@ -687,12 +687,12 @@ int = 5
 	fmt.Printf("SliceStruct: %v\n", t.SliceStruct)
 	fmt.Printf("Struct: %v\n", t.Struct)
 	fmt.Printf("unexported: %v\n", t.unexported)
-	//Output:
-	//Time: 2006-01-02 15:04:05 +0000 UTC
-	//PtrStruct: &{PtrStruct.String 1}
-	//SliceStruct: [{slice-struct-1 2} {slice-struct-2 3}]
-	//Struct: {struct 4}
-	//unexported: { 0}
+	// Output:
+	// Time: 2006-01-02 15:04:05 +0000 UTC
+	// PtrStruct: &{PtrStruct.String 1}
+	// SliceStruct: [{slice-struct-1 2} {slice-struct-2 3}]
+	// Struct: {struct 4}
+	// unexported: { 0}
 }
 
 func ExampleIni_Prune() {
@@ -945,20 +945,20 @@ key=value1
 		log.Fatal(err)
 	}
 
-	//Output:
-	//[section]
-	//key=value1 # comment
-	//key2= ; another comment
+	// Output:
+	// [section]
+	// key=value1 # comment
+	// key2= ; another comment
 	//
-	//[section "sub"]
-	//key=value1
+	// [section "sub"]
+	// key=value1
 	//
-	//; here is comment on section
-	//[section]
-	//key2=false
+	// ; here is comment on section
+	// [section]
+	// key2=false
 	//
-	//[section "sub"]
-	//key=value2
+	// [section "sub"]
+	// key=value2
 }
 
 func ExampleIni_Val() {

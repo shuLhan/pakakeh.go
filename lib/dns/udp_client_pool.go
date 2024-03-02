@@ -69,14 +69,17 @@ func (ucp *UDPClientPool) newClient() interface{} {
 	)
 
 	ucp.Lock()
-	defer ucp.Unlock()
 
 	ucp.seq %= len(ucp.ns)
 	cl, err = NewUDPClient(ucp.ns[ucp.seq])
 	if err != nil {
+		ucp.Unlock()
 		log.Fatal("udp: UDPClientPool: cannot create new client: ", err)
 	}
 	ucp.seq++
+
+	ucp.Unlock()
+
 	return cl
 }
 

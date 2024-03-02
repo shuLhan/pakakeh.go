@@ -30,10 +30,11 @@ type Field struct {
 	Flags []string    `json:"flags"`
 
 	// Ignored fields for speedup.
-	//ID         int         `json:"id"`
-	//EditedBy   string      `json:"editedBy"`
-	//Categories []string    `json:"categories"`
-	//Meta
+
+	// ID         int         `json:"id"`
+	// EditedBy   string      `json:"editedBy"`
+	// Categories []string    `json:"categories"`
+	// Meta
 }
 
 // getValueType will return the Go type of field's Value.

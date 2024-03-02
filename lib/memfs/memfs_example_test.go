@@ -113,7 +113,8 @@ func ExampleMemFS_Watch() {
 
 	opts.Root, err = os.MkdirTemp(``, `memfs_watch`)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	defer func() {
@@ -122,12 +123,14 @@ func ExampleMemFS_Watch() {
 
 	mfs, err = memfs.New(&opts)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	dw, err = mfs.Watch(watchOpts)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	// Wait for the goroutine on Watch run.
@@ -136,20 +139,23 @@ func ExampleMemFS_Watch() {
 	testFile := filepath.Join(opts.Root, `file`)
 	err = os.WriteFile(testFile, []byte(`dummy content`), 0700)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	ns = <-dw.C
 
 	node, err = mfs.Get(`/file`)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	fmt.Printf("Node: %s: %s\n", node.Path, ns.State)
 
 	err = os.Remove(testFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	ns = <-dw.C

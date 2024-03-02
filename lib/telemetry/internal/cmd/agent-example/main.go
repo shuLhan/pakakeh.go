@@ -6,7 +6,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"regexp"
@@ -55,12 +54,8 @@ func main() {
 func createGoMetricsCollector() (col *telemetry.GoMetricsCollector) {
 	var (
 		metricsFilter *regexp.Regexp
-		err           error
 	)
-	metricsFilter, err = regexp.Compile(`^go_(cpu|gc|memory|sched)_.*$`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	metricsFilter = regexp.MustCompile(`^go_(cpu|gc|memory|sched)_.*$`)
 	col = telemetry.NewGoMetricsCollector(metricsFilter)
 	return col
 }
@@ -68,12 +63,8 @@ func createGoMetricsCollector() (col *telemetry.GoMetricsCollector) {
 func createGoMemStatsCollector() (col *telemetry.GoMemStatsCollector) {
 	var (
 		metricsFilter *regexp.Regexp
-		err           error
 	)
-	metricsFilter, err = regexp.Compile(`^.*$`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	metricsFilter = regexp.MustCompile(`^.*$`)
 	col = telemetry.NewGoMemStatsCollector(metricsFilter)
 	return col
 }

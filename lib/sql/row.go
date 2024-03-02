@@ -14,7 +14,7 @@ import (
 // the column's value.
 // This type can be used to create dynamic insert-update fields.
 //
-// DEPRECATED: use [Meta] instead.
+// Deprecated: use [Meta] instead.
 type Row map[string]interface{}
 
 // Meta convert the Row into Meta.

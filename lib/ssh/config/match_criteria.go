@@ -99,11 +99,11 @@ func (mcriteria *matchCriteria) isMatch(s string) bool {
 		}
 		return true
 	case criteriaCanonical:
-		//TODO
+		// TODO
 	case criteriaExec:
-		//TODO
+		// TODO
 	case criteriaFinal:
-		//TODO
+		// TODO
 	case criteriaHost, criteriaLocalUser, criteriaOriginalHost, criteriaUser:
 		for _, pat := range mcriteria.patterns {
 			if pat.isMatch(s) {

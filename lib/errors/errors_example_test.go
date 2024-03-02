@@ -22,13 +22,13 @@ func ExampleE_Is() {
 			Message: `resource not found`,
 		}
 
-		rawJson = `{"code":400,"name":"ERR_NOT_FOUND","message":"file not found"}`
+		rawJSON = `{"code":400,"name":"ERR_NOT_FOUND","message":"file not found"}`
 
 		e   *liberrors.E
 		err error
 	)
 
-	err = json.Unmarshal([]byte(rawJson), &e)
+	err = json.Unmarshal([]byte(rawJSON), &e)
 	if err != nil {
 		log.Fatal(err)
 	}

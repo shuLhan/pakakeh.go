@@ -104,7 +104,7 @@ func ExampleIsNil() {
 		fmt.Printf("%19T: v == nil is %5t, IsNil() is %5t\n", c.v, c.v == nil, libreflect.IsNil(c.v))
 	}
 
-	//Output:
+	// Output:
 	// <nil>: v == nil is  true, IsNil() is  true
 	//                bool: v == nil is false, IsNil() is false
 	//            chan int: v == nil is false, IsNil() is  true
@@ -127,20 +127,20 @@ func (imt *InvalidMarshalText) MarshalText() (string, error) {
 	return "", nil
 }
 
-type ErrorMarshalJson struct{}
+type ErrorMarshalJSON struct{}
 
-func (emj *ErrorMarshalJson) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("ErrorMarshalJson: test")
+func (emj *ErrorMarshalJSON) MarshalJSON() ([]byte, error) {
+	return nil, errors.New(`ErrorMarshalJSON: test`)
 }
 
 func ExampleMarshal() {
 	var (
 		vint    = 1
-		vUrl, _ = url.Parse("https://example.org")
+		vURL, _ = url.Parse("https://example.org")
 		bigRat  = big.NewRat(100, 2)
 		bigInt  = big.NewInt(50)
 		imt     = &InvalidMarshalText{}
-		emj     = &ErrorMarshalJson{}
+		emj     = &ErrorMarshalJSON{}
 
 		out []byte
 		err error
@@ -152,7 +152,7 @@ func ExampleMarshal() {
 	out, err = libreflect.Marshal(&vint)
 	fmt.Println(out, err)
 
-	out, err = libreflect.Marshal(vUrl)
+	out, err = libreflect.Marshal(vURL)
 	fmt.Println(string(out), err)
 
 	out, err = libreflect.Marshal(bigRat)
@@ -167,14 +167,14 @@ func ExampleMarshal() {
 	out, err = libreflect.Marshal(emj)
 	fmt.Println(string(out), err)
 
-	//Output:
-	//[] <nil>
-	//[] <nil>
-	//https://example.org <nil>
-	//50 <nil>
-	//50 <nil>
+	// Output:
+	// [] <nil>
+	// [] <nil>
+	// https://example.org <nil>
+	// 50 <nil>
+	// 50 <nil>
 	//  Marshal: expecting first return as []byte got string
-	//  Marshal: ErrorMarshalJson: test
+	//  Marshal: ErrorMarshalJSON: test
 }
 
 func ExampleSet_bool() {
@@ -221,12 +221,12 @@ func ExampleSet_bool() {
 		fmt.Println("true:", mybool)
 	}
 
-	//Output:
-	//YES: true
-	//TRUE: true
-	//False: false
-	//1: true
-	//true: true
+	// Output:
+	// YES: true
+	// TRUE: true
+	// False: false
+	// 1: true
+	// true: true
 }
 
 func ExampleSet_float() {
@@ -252,9 +252,9 @@ func ExampleSet_float() {
 		fmt.Println(myfloat)
 	}
 
-	//Output:
-	//1.223
-	//999.999
+	// Output:
+	// 1.223
+	// 999.999
 }
 
 func ExampleSet_int() {
@@ -304,12 +304,12 @@ func ExampleSet_int() {
 		fmt.Println(vmyint)
 	}
 
-	//Output:
-	//0
-	//1
-	//-128
-	//error: Set: int16 value is overflow: 32768
-	//32768
+	// Output:
+	// 0
+	// 1
+	// -128
+	// error: Set: int16 value is overflow: 32768
+	// 32768
 }
 
 func ExampleSet_sliceByte() {
@@ -349,11 +349,11 @@ func ExampleSet_sliceByte() {
 		fmt.Println(string(vmyBytes))
 	}
 
-	//Output:
-	//error: Set: object []uint8 is not setable
-	//a hero
+	// Output:
+	// error: Set: object []uint8 is not setable
+	// a hero
 	//
-	//and I will write you a tragedy
+	// and I will write you a tragedy
 }
 
 func ExampleSet_sliceString() {
@@ -383,16 +383,16 @@ func ExampleSet_sliceString() {
 		fmt.Println(vstring)
 	}
 
-	//Output:
-	//error: Set: object []string is not setable
-	//[a hero]
-	//[a hero and I will write you a tragedy]
+	// Output:
+	// error: Set: object []string is not setable
+	// [a hero]
+	// [a hero and I will write you a tragedy]
 }
 
 func ExampleSet_unmarshal() {
 	var (
 		rat    = big.NewRat(0, 1)
-		myUrl  = &url.URL{}
+		myURL  = &url.URL{}
 		bigInt = big.NewInt(1)
 
 		err error
@@ -414,11 +414,11 @@ func ExampleSet_unmarshal() {
 	}
 
 	// This Set will call UnmarshalBinary on url.URL.
-	err = libreflect.Set(reflect.ValueOf(myUrl), "https://kilabit.info")
+	err = libreflect.Set(reflect.ValueOf(myURL), "https://kilabit.info")
 	if err != nil {
 		fmt.Println("error:", err)
 	} else {
-		fmt.Println(myUrl)
+		fmt.Println(myURL)
 	}
 
 	// This Set will call UnmarshalJSON.
@@ -436,12 +436,12 @@ func ExampleSet_unmarshal() {
 		fmt.Println(bigInt)
 	}
 
-	//Output:
-	//1.2340
-	//0.0000
-	//https://kilabit.info
-	//123456
-	//0
+	// Output:
+	// 1.2340
+	// 0.0000
+	// https://kilabit.info
+	// 123456
+	// 0
 }
 
 func ExampleTag() {
@@ -469,10 +469,10 @@ func ExampleTag() {
 		val, opts, hasTag = libreflect.Tag(field, "atag")
 		fmt.Println(val, opts, hasTag)
 	}
-	//Output:
-	//f1 [opt1 opt2 ] true
-	//F2 [opt1] false
-	//F3 [] false
+	// Output:
+	// f1 [opt1 opt2 ] true
+	// F2 [opt1] false
+	// F3 [] false
 	//  [] false
 }
 
@@ -521,12 +521,12 @@ func ExampleUnmarshal_unmarshalBinary() {
 	}
 	fmt.Println(ptrB, ok)
 
-	//Output:
-	//  false
-	//https://kilabit.info true
-	//<nil> false
-	//https://kilabit.info true
-	//https://kilabit.info true
+	// Output:
+	//   false
+	// https://kilabit.info true
+	// <nil> false
+	// https://kilabit.info true
+	// https://kilabit.info true
 }
 
 func ExampleUnmarshal_unmarshalText() {
@@ -551,11 +551,11 @@ func ExampleUnmarshal_unmarshalText() {
 			fmt.Println(r)
 		}
 	}
-	//Output:
-	//0/1
-	//15432/125
-	//123456/1
-	//123456/1
+	// Output:
+	// 0/1
+	// 15432/125
+	// 123456/1
+	// 123456/1
 }
 
 func ExampleUnmarshal_unmarshalJSON() {
@@ -579,8 +579,8 @@ func ExampleUnmarshal_unmarshalJSON() {
 			fmt.Println(bigInt)
 		}
 	}
-	//Output:
-	//Unmarshal: math/big: cannot unmarshal "123.456" into a *big.Int
-	//123456
-	//123456
+	// Output:
+	// Unmarshal: math/big: cannot unmarshal "123.456" into a *big.Int
+	// 123456
+	// 123456
 }

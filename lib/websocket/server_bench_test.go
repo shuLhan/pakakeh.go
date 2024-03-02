@@ -6,6 +6,7 @@
 package websocket
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -245,10 +246,11 @@ func BenchmarkUpgrader(b *testing.B) {
 
 func mustMakeRequest(method string, headers http.Header) (req *http.Request) {
 	var (
+		ctx = context.Background()
 		err error
 	)
 
-	req, err = http.NewRequest(method, "ws://example.org", nil)
+	req, err = http.NewRequestWithContext(ctx, method, `ws://example.org`, nil)
 	if err != nil {
 		panic(err)
 	}

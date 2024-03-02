@@ -10,6 +10,7 @@
 package microsoft
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -45,7 +46,12 @@ func ImportFromJSON(jsonb []byte) (
 
 // ImportWithOAuth get Microsoft Live contacts using OAuth HTTP client.
 func ImportWithOAuth(client *http.Client) (contacts []*contact.Record, err error) {
-	req, err := http.NewRequest(http.MethodGet, apiContactsURL, nil)
+	var (
+		ctx = context.Background()
+		req *http.Request
+	)
+
+	req, err = http.NewRequestWithContext(ctx, http.MethodGet, apiContactsURL, nil)
 	if err != nil {
 		return
 	}

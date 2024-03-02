@@ -540,15 +540,16 @@ func parseRawValue(raw []byte) (out string) {
 			continue
 		}
 		if isEsc {
-			if b == 'b' {
+			switch b {
+			case 'b':
 				sb.WriteByte(tokBackspace)
-			} else if b == 'n' {
+			case 'n':
 				sb.WriteByte(tokNewLine)
-			} else if b == 't' {
+			case 't':
 				sb.WriteByte(tokTab)
-			} else if b == '\\' {
+			case '\\':
 				sb.WriteByte(tokBackslash)
-			} else if b == '"' {
+			case '"':
 				sb.WriteByte(tokDoubleQuote)
 			}
 			isEsc = false

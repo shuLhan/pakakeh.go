@@ -54,7 +54,7 @@ type MemFS struct {
 // If there are two instance of Node that have the same path, the last
 // instance will be ignored.
 //
-// DEPRECATED: use [MemFS.Merge] instead.
+// Deprecated: use [MemFS.Merge] instead.
 // TODO: Remove in the next three release cycles, v0.53.0.
 func Merge(params ...*MemFS) (merged *MemFS) {
 	merged = &MemFS{
@@ -604,7 +604,7 @@ func (mfs *MemFS) mount() (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	_, err = mfs.scanDir(mfs.Root)
+	err = mfs.scanDir(mfs.Root)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -622,7 +622,7 @@ func (mfs *MemFS) Remount() (err error) {
 
 // scanDir scan the content of node directory and add them to mfs.
 // It returns number of childs added to the node or an error.
-func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
+func (mfs *MemFS) scanDir(node *Node) (err error) {
 	var (
 		logp  = "scanDir"
 		child *Node
@@ -635,14 +635,14 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 	if err != nil {
 		if os.IsPermission(err) {
 			// Ignore error due to permission
-			return 0, nil
+			return nil
 		}
-		return 0, fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
+		return fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 	}
 
 	fis, err = f.Readdir(0)
 	if err != nil {
-		return 0, fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
+		return fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 	}
 
 	sort.SliceStable(fis, func(x, y int) bool {
@@ -661,12 +661,11 @@ func (mfs *MemFS) scanDir(node *Node) (n int, err error) {
 		if child == nil {
 			continue
 		}
-		n++
 		if !child.mode.IsDir() {
 			continue
 		}
 
-		_, err = mfs.scanDir(child)
+		err = mfs.scanDir(child)
 		if err != nil {
 			err = fmt.Errorf(`%s %q: %w`, logp, node.SysPath, err)
 			goto out
@@ -682,7 +681,7 @@ out:
 		}
 	}
 
-	return n, err
+	return err
 }
 
 // refresh the tree by rescanning from the root.
@@ -710,7 +709,7 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 		node = mfs.PathNodes.Get(dir)
 	}
 
-	_, err = mfs.scanDir(node)
+	err = mfs.scanDir(node)
 	if err != nil {
 		return nil, err
 	}
@@ -765,7 +764,7 @@ func (mfs *MemFS) Watch(opts WatchOptions) (dw *DirWatcher, err error) {
 		Options: *mfs.Opts,
 	}
 
-	_, err = mfs.scanDir(mfs.Root)
+	err = mfs.scanDir(mfs.Root)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

@@ -31,7 +31,7 @@ type Writer struct {
 	fWriter *os.File
 
 	// BufWriter for buffered writer.
-	BufWriter *bufio.Writer
+	BufWriter *bufio.Writer `json:"-"`
 
 	Config `json:"-"`
 

@@ -610,7 +610,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, err error) {
 	var httpRes *http.Response
 
-	httpRes, rest, err = libhttp.ParseResponseHeader(resp)
+	httpRes, rest, err = libhttp.ParseResponseHeader(resp) //nolint: bodyclose
 	if err != nil {
 		return nil, err
 	}

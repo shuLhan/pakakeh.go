@@ -15,15 +15,15 @@ func ExampleNormalizeForID() {
 	fmt.Println(NormalizeForID(".123 ABC def"))
 	fmt.Println(NormalizeForID("test 123"))
 	fmt.Println(NormalizeForID("⌘"))
-	//Output:
-	//_
-	//_id_
-	//_id_
-	//_id_1
-	//_1-d
-	//_123_abc_def
-	//test_123
-	//___
+	// Output:
+	// _
+	// _id_
+	// _id_
+	// _id_1
+	// _1-d
+	// _123_abc_def
+	// test_123
+	// ___
 }
 
 func ExampleSanitize() {

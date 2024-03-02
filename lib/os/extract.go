@@ -379,7 +379,6 @@ func (xtrk *extractor) unzip(fin *os.File) (err error) {
 		inFile    io.ReadCloser
 		filePath  string
 		outFile   *os.File
-		fileTimes []archiveTimes
 	)
 
 	fi, err = fin.Stat()
@@ -391,6 +390,8 @@ func (xtrk *extractor) unzip(fin *os.File) (err error) {
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
+
+	var fileTimes = make([]archiveTimes, 0, len(zipReader.File))
 
 	for _, zipFile := range zipReader.File {
 		inFile, err = zipFile.Open()

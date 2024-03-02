@@ -31,22 +31,24 @@ func ExampleNewMailTx() {
 		toAddresses = []byte("John <john@example.com>, Jane <jane@example.com>")
 		subject     = []byte(`Example subject`)
 		bodyText    = []byte(`Email body as plain text`)
-		bodyHtml    = []byte(`Email body as <b>HTML</b>`)
+		bodyHTML    = []byte(`Email body as <b>HTML</b>`)
 		timeNowUtc  = time.Unix(email.Epoch(), 0).UTC()
 		dateNowUtc  = timeNowUtc.Format(email.DateFormat)
 
-		recipients []string
-		mboxes     []*email.Mailbox
-		msg        *email.Message
-		mailtx     *smtp.MailTx
-		data       []byte
-		err        error
+		mboxes []*email.Mailbox
+		msg    *email.Message
+		mailtx *smtp.MailTx
+		data   []byte
+		err    error
 	)
 
 	mboxes, err = email.ParseMailboxes(toAddresses)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	var recipients = make([]string, 0, len(mboxes))
+
 	for _, mbox := range mboxes {
 		recipients = append(recipients, mbox.Address)
 	}
@@ -56,7 +58,7 @@ func ExampleNewMailTx() {
 		toAddresses,
 		subject,
 		bodyText,
-		bodyHtml,
+		bodyHTML,
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -95,29 +97,29 @@ func ExampleNewMailTx() {
 	data = bytes.ReplaceAll(data, []byte(msgBoundary), []byte(fixedBoundary))
 
 	fmt.Printf("Tx Data:\n%s", data)
-	//Output:
-	//Tx From: Postmaster <postmaster@mail.example.com>
-	//Tx Recipients: [john@example.com jane@example.com]
-	//Tx Data:
-	//date: Wed, 23 Feb 2022 07:06:40 +0000
-	//from: Noreply <noreply@example.com>
-	//to: John <john@example.com>, Jane <jane@example.com>
-	//subject: Example subject
-	//mime-version: 1.0
-	//content-type: multipart/alternative; boundary=QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf
-	//message-id: <1645600000.QoqDPQfz@hostname>
+	// Output:
+	// Tx From: Postmaster <postmaster@mail.example.com>
+	// Tx Recipients: [john@example.com jane@example.com]
+	// Tx Data:
+	// date: Wed, 23 Feb 2022 07:06:40 +0000
+	// from: Noreply <noreply@example.com>
+	// to: John <john@example.com>, Jane <jane@example.com>
+	// subject: Example subject
+	// mime-version: 1.0
+	// content-type: multipart/alternative; boundary=QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf
+	// message-id: <1645600000.QoqDPQfz@hostname>
 	//
-	//--QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf
-	//mime-version: 1.0
-	//content-type: text/plain; charset="utf-8"
-	//content-transfer-encoding: quoted-printable
+	// --QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf
+	// mime-version: 1.0
+	// content-type: text/plain; charset="utf-8"
+	// content-transfer-encoding: quoted-printable
 	//
-	//Email body as plain text
-	//--QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf
-	//mime-version: 1.0
-	//content-type: text/html; charset="utf-8"
-	//content-transfer-encoding: quoted-printable
+	// Email body as plain text
+	// --QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf
+	// mime-version: 1.0
+	// content-type: text/html; charset="utf-8"
+	// content-transfer-encoding: quoted-printable
 	//
-	//Email body as <b>HTML</b>
-	//--QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf--
+	// Email body as <b>HTML</b>
+	// --QoqDPQfzDVkv5R49vrA78GmqPmlfmBHf--
 }

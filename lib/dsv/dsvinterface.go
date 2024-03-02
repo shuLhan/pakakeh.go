@@ -5,6 +5,7 @@
 package dsv
 
 import (
+	"errors"
 	"io"
 )
 
@@ -24,7 +25,7 @@ func SimpleRead(fcfg string, dataset interface{}) (
 	}
 
 	_, e = Read(reader)
-	if e != nil && e != io.EOF {
+	if e != nil && !errors.Is(e, io.EOF) {
 		return nil, e
 	}
 

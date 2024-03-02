@@ -5,6 +5,7 @@
 package hunspell
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -597,7 +598,7 @@ func (opts *affixOptions) parseAM(args []string) (err error) {
 func (opts *affixOptions) parseRep(args []string) (err error) {
 	if cap(opts.reps) == 0 {
 		if len(args) != 1 {
-			return fmt.Errorf("REP: missing number of replacement")
+			return errors.New(`REP: missing number of replacement`)
 		}
 
 		n, err := strconv.Atoi(args[0])
@@ -608,7 +609,7 @@ func (opts *affixOptions) parseRep(args []string) (err error) {
 		opts.reps = make([]replacement, 0, n)
 	} else {
 		if len(args) != 2 {
-			return fmt.Errorf("REP: invalid arguments")
+			return errors.New(`REP: invalid arguments`)
 		}
 
 		rep, err := newReplacement(args[0], args[1])
@@ -683,7 +684,7 @@ func (opts *affixOptions) parseBreak(arg string) (err error) {
 		arg = arg[:len(arg)-1]
 	}
 	if len(arg) == 0 {
-		return fmt.Errorf("BREAK: empty character sequences")
+		return errors.New(`BREAK: empty character sequences`)
 	}
 
 	breakrole.token = arg

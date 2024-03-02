@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -78,7 +79,7 @@ type Server struct {
 func (srv *Server) LoadCertificate(certFile, keyFile string) (err error) {
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
-		return fmt.Errorf("smtp: LoadCertificate: " + err.Error())
+		return fmt.Errorf(`smtp: LoadCertificate: %w`, err)
 	}
 
 	srv.TLSCert = &cert
@@ -519,10 +520,10 @@ func (srv *Server) handleVRFY(recv *receiver, cmd *Command) (err error) {
 // initialize handler, storage, extensions, and listeners.
 func (srv *Server) initialize() (err error) {
 	if srv.Env == nil {
-		return fmt.Errorf("smtp: server environment is not defined")
+		return errors.New(`smtp: server environment is not defined`)
 	}
 	if srv.Env.PrimaryDomain == nil {
-		return fmt.Errorf("smtp: server primary domain is not defined")
+		return errors.New(`smtp: server primary domain is not defined`)
 	}
 
 	if srv.Handler == nil {
@@ -563,7 +564,7 @@ func (srv *Server) initListener() (err error) {
 	}
 
 	if srv.TLSCert == nil {
-		return fmt.Errorf("smtp: server certificate is not defined")
+		return errors.New(`smtp: server certificate is not defined`)
 	}
 
 	tlsCfg := &tls.Config{

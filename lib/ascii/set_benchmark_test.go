@@ -21,9 +21,9 @@ const N int = 10
 // each Set is empty
 //
 // if populate is true, fill each set with every 2nd ASCII character
-func setupSets(n int, populate bool) []Set {
+func setupSets(populate bool) []Set {
 	sets := []Set{}
-	for i := 0; i < n; i++ {
+	for i := 0; i < N; i++ {
 		var as Set
 		if populate {
 			for c := 0; c < utf8.RuneSelf; c += 2 {
@@ -40,9 +40,9 @@ func setupSets(n int, populate bool) []Set {
 // each map[byte]struct{} is empty
 //
 // if populate is true, fill each set with every 2nd ASCII character
-func setupMapSets(n int, populate bool) []map[byte]struct{} {
+func setupMapSets(populate bool) []map[byte]struct{} {
 	sets := []map[byte]struct{}{}
-	for i := 0; i < n; i++ {
+	for i := 0; i < N; i++ {
 		as := make(map[byte]struct{})
 		if populate {
 			for c := 0; c < utf8.RuneSelf; c += 2 {
@@ -57,7 +57,7 @@ func setupMapSets(n int, populate bool) []map[byte]struct{} {
 
 func BenchmarkSet(b *testing.B) {
 	b.Run("Set Add()", func(b *testing.B) {
-		sets := setupSets(N, false)
+		sets := setupSets(false)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
@@ -69,7 +69,7 @@ func BenchmarkSet(b *testing.B) {
 		}
 	})
 	b.Run("Set Contains()", func(b *testing.B) {
-		sets := setupSets(N, true)
+		sets := setupSets(true)
 		var exists bool
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -82,7 +82,7 @@ func BenchmarkSet(b *testing.B) {
 		globalExists = exists
 	})
 	b.Run("Set Remove()", func(b *testing.B) {
-		sets := setupSets(N, true)
+		sets := setupSets(true)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
@@ -93,7 +93,7 @@ func BenchmarkSet(b *testing.B) {
 		}
 	})
 	b.Run("Set Size()", func(b *testing.B) {
-		sets := setupSets(N, true)
+		sets := setupSets(true)
 		var size int
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -106,7 +106,7 @@ func BenchmarkSet(b *testing.B) {
 		globalSize = size
 	})
 	b.Run("Set Visit()", func(b *testing.B) {
-		sets := setupSets(N, true)
+		sets := setupSets(true)
 		var val byte
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -123,7 +123,7 @@ func BenchmarkSet(b *testing.B) {
 
 func BenchmarkMapSet(b *testing.B) {
 	b.Run("map Add", func(b *testing.B) {
-		sets := setupMapSets(N, false)
+		sets := setupMapSets(false)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
@@ -135,7 +135,7 @@ func BenchmarkMapSet(b *testing.B) {
 		}
 	})
 	b.Run("map Contains", func(b *testing.B) {
-		sets := setupMapSets(N, true)
+		sets := setupMapSets(true)
 		var exists bool
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -148,7 +148,7 @@ func BenchmarkMapSet(b *testing.B) {
 		globalExists = exists
 	})
 	b.Run("map Remove", func(b *testing.B) {
-		sets := setupMapSets(N, true)
+		sets := setupMapSets(true)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			for _, as := range sets {
@@ -159,7 +159,7 @@ func BenchmarkMapSet(b *testing.B) {
 		}
 	})
 	b.Run("map Size", func(b *testing.B) {
-		sets := setupMapSets(N, true)
+		sets := setupMapSets(true)
 		var size int
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -172,7 +172,7 @@ func BenchmarkMapSet(b *testing.B) {
 		globalSize = size
 	})
 	b.Run("map Visit", func(b *testing.B) {
-		sets := setupMapSets(N, true)
+		sets := setupMapSets(true)
 		var val byte
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

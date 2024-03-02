@@ -57,14 +57,14 @@ func TestMain(m *testing.M) {
 	fmt.Printf("Server version: %d\n", testClient.version)
 	fmt.Printf("Server extensions: %v\n", testClient.exts)
 
-	defer func() {
-		var errClose = testClient.Close()
-		if errClose != nil {
-			log.Printf(`TestMain: %s`, errClose)
-		}
-	}()
+	var status = m.Run()
 
-	os.Exit(m.Run())
+	err = testClient.Close()
+	if err != nil {
+		log.Printf(`TestMain: %s`, err)
+	}
+
+	os.Exit(status)
 }
 
 func TestErrFailure(t *testing.T) {

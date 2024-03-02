@@ -21,14 +21,14 @@ type parser struct {
 	homeDir string
 }
 
-func newParser(cfg *Config) (p *parser, err error) {
+func newParser(cfg *Config) (p *parser) {
 	p = &parser{
 		files:   make(map[string]struct{}),
 		workDir: cfg.workDir,
 		homeDir: cfg.homeDir,
 	}
 
-	return p, nil
+	return p
 }
 
 // load the config file(s) using glob(7) pattern and convert them into lines.

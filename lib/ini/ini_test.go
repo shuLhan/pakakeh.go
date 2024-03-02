@@ -278,7 +278,7 @@ func TestIni_Get(t *testing.T) {
 			def = tags[3]
 
 			got, _ = cfg.Get(tags[0], tags[1], tags[2], def)
-			got = got + "."
+			got += `.`
 
 			testName = fmt.Sprintf("%s: key #%d: Get", tdata.Name, x)
 

@@ -6,6 +6,7 @@ package dsv
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -195,7 +196,7 @@ func parsingRightQuote(reader ReaderInterface, rq, line []byte, startAt int) (
 		N:    0,
 	}
 
-	if e == io.EOF {
+	if errors.Is(e, io.EOF) {
 		eRead.T &= EReadEOF
 	}
 
@@ -408,7 +409,7 @@ err:
 		What: fmt.Sprint(e),
 	}
 
-	if e == io.EOF {
+	if errors.Is(e, io.EOF) {
 		eRead.T = EReadEOF
 	} else {
 		eRead.T = EReadLine

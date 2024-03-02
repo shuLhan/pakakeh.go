@@ -6,6 +6,7 @@ package dsv
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -72,7 +73,7 @@ func doReadWrite(t *testing.T, dsvReader *Reader, dsvWriter *Writer,
 	for {
 		n, e := Read(dsvReader)
 
-		if e == io.EOF || n == 0 {
+		if errors.Is(e, io.EOF) || n == 0 {
 			_, e = dsvWriter.Write(dsvReader)
 			if e != nil {
 				t.Fatal(e)

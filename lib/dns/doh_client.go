@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,8 +44,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (cl *DoHClient, err err
 	}
 
 	if nsURL.Scheme != "https" {
-		err = fmt.Errorf("DoH name server must be HTTPS")
-		return nil, err
+		return nil, errors.New(`DoH name server must be HTTPS`)
 	}
 
 	tr = &http.Transport{
@@ -96,7 +96,7 @@ func (cl *DoHClient) Close() error {
 // It will return an error if the Name is empty.
 func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
 	if len(q.Name) == 0 {
-		return nil, fmt.Errorf("Lookup: empty question name")
+		return nil, errors.New(`Lookup: empty question name`)
 	}
 	if q.Type == 0 {
 		q.Type = RecordTypeA

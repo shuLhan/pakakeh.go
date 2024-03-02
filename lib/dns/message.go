@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -1013,7 +1014,7 @@ func (msg *Message) Unpack() (err error) {
 // message.
 func (msg *Message) UnpackHeaderQuestion() (err error) {
 	if len(msg.packet) <= sectionHeaderSize {
-		return fmt.Errorf("UnpackHeaderQuestion: missing question")
+		return errors.New(`UnpackHeaderQuestion: missing question`)
 	}
 
 	msg.Header.unpack(msg.packet)

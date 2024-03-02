@@ -12,13 +12,13 @@ import (
 func ExampleMicrosecond() {
 	nano := time.Unix(1612331000, 123456789)
 	fmt.Printf("%d", Microsecond(&nano))
-	//Output:
-	//123456
+	// Output:
+	// 123456
 }
 
 func ExampleUnixMilliString() {
 	nano := time.Unix(1612331000, 123456789)
 	fmt.Printf("%s", UnixMilliString(nano))
-	//Output:
-	//1612331000123
+	// Output:
+	// 1612331000123
 }

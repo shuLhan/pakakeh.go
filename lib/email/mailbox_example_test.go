@@ -11,9 +11,9 @@ func ExampleParseMailbox() {
 	fmt.Printf("%v\n", ParseMailbox([]byte("Name <domain>")))
 	fmt.Printf("%v\n", ParseMailbox([]byte("local@domain")))
 	fmt.Printf("%v\n", ParseMailbox([]byte("Name <local@domain>")))
-	//Output:
-	//<nil>
-	//Name <@domain>
-	//<local@domain>
-	//Name <local@domain>
+	// Output:
+	// <nil>
+	// Name <@domain>
+	// <local@domain>
+	// Name <local@domain>
 }

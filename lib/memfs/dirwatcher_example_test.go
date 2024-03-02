@@ -142,24 +142,24 @@ func ExampleDirWatcher() {
 
 	dw.Stop()
 
-	//Output:
-	//Deleting the root directory:
-	//-- FileStateDeleted /
-	//Re-create root directory with sub-directory:
-	//-- FileStateCreated /
-	//Chmod on root directory:
-	//-- FileStateUpdateMode / drwx------
-	//Create new file on root directory: /new.adoc
-	//-- FileStateCreated /new.adoc -rw-------
-	//Remove file on root directory: /new.adoc
-	//-- FileStateDeleted /new.adoc -rw-------
-	//Create new sub-directory: /subdir
-	//-- FileStateCreated /subdir drwxr-x---
-	//Create new file in sub directory: /subdir/new.adoc
-	//-- FileStateCreated /subdir/new.adoc -rw-------
-	//Remove file in sub directory: /subdir/new.adoc
-	//-- FileStateDeleted /subdir/new.adoc -rw-------
-	//Create excluded file in sub directory: /subdir/new.html
-	//Create new file under assets: /assets/new
-	//-- FileStateCreated /assets/new -rw-------
+	// Output:
+	// Deleting the root directory:
+	// -- FileStateDeleted /
+	// Re-create root directory with sub-directory:
+	// -- FileStateCreated /
+	// Chmod on root directory:
+	// -- FileStateUpdateMode / drwx------
+	// Create new file on root directory: /new.adoc
+	// -- FileStateCreated /new.adoc -rw-------
+	// Remove file on root directory: /new.adoc
+	// -- FileStateDeleted /new.adoc -rw-------
+	// Create new sub-directory: /subdir
+	// -- FileStateCreated /subdir drwxr-x---
+	// Create new file in sub directory: /subdir/new.adoc
+	// -- FileStateCreated /subdir/new.adoc -rw-------
+	// Remove file in sub directory: /subdir/new.adoc
+	// -- FileStateDeleted /subdir/new.adoc -rw-------
+	// Create excluded file in sub directory: /subdir/new.html
+	// Create new file under assets: /assets/new
+	// -- FileStateCreated /assets/new -rw-------
 }

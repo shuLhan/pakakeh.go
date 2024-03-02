@@ -18,7 +18,7 @@ func ExampleHeader_Filter() {
 		toAddresses = []byte("John <john@example.com>, Jane <jane@example.com>")
 		subject     = []byte(`Example subject`)
 		bodyText    = []byte(`Email body as plain text`)
-		bodyHtml    = []byte(`Email body as <b>HTML</b>`)
+		bodyHTML    = []byte(`Email body as <b>HTML</b>`)
 
 		msg *email.Message
 		err error
@@ -29,7 +29,7 @@ func ExampleHeader_Filter() {
 		toAddresses,
 		subject,
 		bodyText,
-		bodyHtml,
+		bodyHTML,
 	)
 	if err != nil {
 		log.Fatal(err)

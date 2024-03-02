@@ -6,6 +6,7 @@ package http
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -22,7 +23,7 @@ func ParseResponseHeader(raw []byte) (resp *http.Response, rest []byte, err erro
 	// The minimum HTTP response without header is 16 bytes:
 	// "HTTP/X.X" SP 3DIGITS CRLF CRLF
 	if len(raw) < 16 {
-		return nil, raw, fmt.Errorf("http: invalid response header length")
+		return nil, raw, errors.New(`http: invalid response header length`)
 	}
 	// The HTTP-name is case sensitive: "HTTP".
 	if !bytes.Equal(raw[:4], []byte("HTTP")) {
@@ -36,7 +37,7 @@ func ParseResponseHeader(raw []byte) (resp *http.Response, rest []byte, err erro
 	}
 	ilf := bytes.Index(raw, []byte{'\n'})
 	if ilf < 0 || raw[ilf-1] != '\r' {
-		return nil, raw, fmt.Errorf("http: missing CRLF on status line")
+		return nil, raw, errors.New(`http: missing CRLF on status line`)
 	}
 
 	resp = &http.Response{
@@ -55,7 +56,7 @@ func ParseResponseHeader(raw []byte) (resp *http.Response, rest []byte, err erro
 
 	resp.StatusCode, err = strconv.Atoi(string(raw[9:12]))
 	if err != nil {
-		return nil, raw, fmt.Errorf("http: status code: " + err.Error())
+		return nil, raw, fmt.Errorf(`http: status code: %w`, err)
 	}
 	if resp.StatusCode < 100 || resp.StatusCode >= 600 {
 		return nil, raw, fmt.Errorf("http: invalid status code '%s'", raw[9:12])
@@ -87,7 +88,7 @@ func parseHeaders(raw []byte) (header http.Header, rest []byte, err error) {
 	for len(rest) > 0 {
 		switch len(rest) {
 		case 1:
-			return nil, rest, fmt.Errorf(`http: missing CRLF at the end`)
+			return nil, rest, errors.New(`http: missing CRLF at the end`)
 		default:
 			if rest[0] == '\r' && rest[1] == '\n' {
 				rest = rest[2:]
@@ -105,10 +106,10 @@ func parseHeaders(raw []byte) (header http.Header, rest []byte, err error) {
 
 		tok, c = parser.Read()
 		if c != '\n' {
-			return nil, nil, fmt.Errorf(`http: missing CRLF at the end of field line`)
+			return nil, nil, errors.New(`http: missing CRLF at the end of field line`)
 		}
 		if tok[len(tok)-1] != '\r' {
-			return nil, nil, fmt.Errorf(`http: missing CR at the end of line`)
+			return nil, nil, errors.New(`http: missing CR at the end of line`)
 		}
 
 		tok = bytes.TrimSpace(tok)

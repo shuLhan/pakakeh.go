@@ -109,13 +109,13 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 	udpAddr = opts.getUDPAddress()
 	srv.udp, err = net.ListenUDP("udp", udpAddr)
 	if err != nil {
-		return nil, fmt.Errorf("dns: error listening on UDP '%v': %s", udpAddr, err)
+		return nil, fmt.Errorf(`dns: error listening on UDP '%v': %w`, udpAddr, err)
 	}
 
 	tcpAddr = opts.getTCPAddress()
 	srv.tcp, err = net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
-		return nil, fmt.Errorf("dns: error listening on TCP '%v': %s", tcpAddr, err)
+		return nil, fmt.Errorf(`dns: error listening on TCP '%v': %w`, tcpAddr, err)
 	}
 
 	if len(opts.TLSCertFile) > 0 && len(opts.TLSPrivateKey) > 0 {

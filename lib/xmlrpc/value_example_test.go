@@ -58,14 +58,14 @@ func ExampleValue_GetFieldAsBoolean() {
 	fmt.Println("Get string field as boolean:")
 	fmt.Println(res.Param.GetFieldAsBoolean("string_0"))
 	fmt.Println(res.Param.GetFieldAsBoolean("string_1"))
-	//Output:
-	//Get boolean field as string:
-	//false
-	//true
-	//Get boolean field as boolean:
-	//false
-	//true
-	//Get string field as boolean:
-	//false
-	//false
+	// Output:
+	// Get boolean field as string:
+	// false
+	// true
+	// Get boolean field as boolean:
+	// false
+	// true
+	// Get string field as boolean:
+	// false
+	// false
 }

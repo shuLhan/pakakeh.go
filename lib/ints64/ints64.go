@@ -247,9 +247,7 @@ func Swap(d []int64, x, y int) {
 	if x == y || len(d) <= 1 || x > len(d) || y > len(d) {
 		return
 	}
-	tmp := d[x]
-	d[x] = d[y]
-	d[y] = tmp
+	d[x], d[y] = d[y], d[x]
 }
 
 // Let `x` be the first index of left-side, `y` be the first index of

@@ -68,7 +68,7 @@ func TestMain(m *testing.M) {
 		Address:  serverAddress,
 	}
 
-	testServerURL = fmt.Sprintf("http://" + serverAddress)
+	testServerURL = `http://` + serverAddress
 
 	testServer, err = NewServer(opts)
 	if err != nil {
@@ -166,7 +166,8 @@ func registerEndpoints() {
 // skip certain header keys.
 func dumpHTTPResponse(httpRes *http.Response, skipHeaders []string) string {
 	var (
-		keys []string
+		keys = make([]string, 0, len(httpRes.Header))
+
 		hkey string
 	)
 	for hkey = range httpRes.Header {

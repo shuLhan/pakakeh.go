@@ -10,12 +10,12 @@ func ExampleIsValidVarName() {
 	fmt.Println(IsValidVarName(".abcd"))
 	fmt.Println(IsValidVarName("a@bcd"))
 	fmt.Println(IsValidVarName("a-b_c.d"))
-	//Output:
-	//false
-	//false
-	//false
-	//false
-	//false
-	//false
-	//true
+	// Output:
+	// false
+	// false
+	// false
+	// false
+	// false
+	// false
+	// true
 }

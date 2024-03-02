@@ -24,8 +24,8 @@ func ExampleHostsFile_Get() {
 	fmt.Println(hostsFile.Get("my.local", ""))
 	fmt.Println(hostsFile.Get("my.local", "127.0.0.2"))
 	fmt.Println(hostsFile.Get("my.my", ""))
-	//Output:
-	//{Name:my.local Type:1 Class:0 TTL:0 Value:127.0.0.1}
-	//{Name:my.local Type:1 Class:0 TTL:0 Value:127.0.0.2}
-	//<nil>
+	// Output:
+	// {Name:my.local Type:1 Class:0 TTL:0 Value:127.0.0.1}
+	// {Name:my.local Type:1 Class:0 TTL:0 Value:127.0.0.2}
+	// <nil>
 }

@@ -26,7 +26,6 @@ func BenchmarkMultiLogger(b *testing.B) {
 		for pb.Next() {
 			mlog.Errf("err")
 			mlog.Outf("out")
-			//mlog.Flush()
 		}
 	})
 }

@@ -8,6 +8,7 @@
 package net
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -77,7 +78,7 @@ func (poll *epoll) WaitRead() (fds []int, err error) {
 	for {
 		n, err = unix.EpollWait(poll.read, poll.events[:], -1)
 		if err != nil {
-			if err == unix.EINTR {
+			if errors.Is(err, unix.EINTR) {
 				continue
 			}
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
@@ -118,7 +119,7 @@ func (poll *epoll) WaitReadEvents() (events []PollEvent, err error) {
 	for n == 0 {
 		n, err = unix.EpollWait(poll.read, poll.events[:], -1)
 		if err != nil {
-			if err == unix.EINTR {
+			if errors.Is(err, unix.EINTR) {
 				continue
 			}
 			return nil, fmt.Errorf(`%s: %w`, logp, err)

@@ -112,13 +112,15 @@ func ParseMailboxes(raw []byte) (mboxes []*Mailbox, err error) {
 
 	token = bytes.TrimSpace(token)
 	mbox = &Mailbox{}
-	if c == ':' {
+
+	switch c {
+	case ':':
 		// We are parsing group of mailbox.
 		isGroup = true
-	} else if c == '<' {
+	case '<':
 		mbox.isAngle = true
 		mbox.Name = string(token)
-	} else if c == '@' {
+	case '@':
 		if len(token) == 0 {
 			return nil, fmt.Errorf(`%s: empty local`, logp)
 		}

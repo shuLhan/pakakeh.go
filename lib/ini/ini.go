@@ -271,8 +271,7 @@ func (in *Ini) marshalStruct(
 				ftype = ftype.Elem()
 				fvalue = fvalue.Elem()
 			}
-			switch ftype.Kind() {
-			case reflect.Struct:
+			if ftype.Kind() == reflect.Struct {
 				vi := fvalue.Interface()
 				t, ok := vi.(time.Time)
 				if ok {

@@ -44,7 +44,7 @@ func TestClient_Download(t *testing.T) {
 			},
 			Output: &out,
 		},
-		expError: fmt.Sprintf("%s: 404 Not Found", logp),
+		expError: logp + `: 404 Not Found`,
 	}, {
 		desc: "With redirect",
 		req: DownloadRequest{
@@ -82,7 +82,7 @@ func TestClient_Download(t *testing.T) {
 	for _, c := range cases {
 		out.Reset()
 
-		_, err = client.Download(c.req)
+		_, err = client.Download(c.req) //nolint: bodyclose
 		if err != nil {
 			test.Assert(t, c.desc+`: error`, c.expError, err.Error())
 			continue

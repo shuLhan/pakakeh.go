@@ -12,13 +12,15 @@ import (
 //
 // Some of the fields are disabled for speed.
 type Contact struct {
-	//ID         GD
-	//ETag       string     `json:"gd$etag,omitempty"`
-	//Updated    GD         `json:"updated,omitempty"`
-	//Edited     GD         `json:"app$edited,omitempty"`
-	//Categories []Category `json:"category,omitempty"`
-	//Title      GD         `json:"title,omitempty"`
-	//Links      []Link     `json:"link,omitempty"`
+	// Ignored fields for speedup.
+
+	// ID         GD
+	// ETag       string     `json:"gd$etag,omitempty"`
+	// Updated    GD         `json:"updated,omitempty"`
+	// Edited     GD         `json:"app$edited,omitempty"`
+	// Categories []Category `json:"category,omitempty"`
+	// Title      GD         `json:"title,omitempty"`
+	// Links      []Link     `json:"link,omitempty"`
 
 	Name      Name      `json:"gd$name,omitempty"`
 	Birthday  Birthday  `json:"gContact$birthday,omitempty"`

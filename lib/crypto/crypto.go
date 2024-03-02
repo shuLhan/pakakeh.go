@@ -39,7 +39,7 @@ var ErrStdinPassphrase = errors.New(`cannot read passhprase from stdin`)
 // List of environment variables reads when reading passphrase
 // interactively.
 const (
-	envKeySSHAskpassRequire = `SSH_ASKPASS_REQUIRE`
+	envKeySSHAskpassRequire = `SSH_ASKPASS_REQUIRE` //nolint: gosec
 	envKeySSHAskpass        = `SSH_ASKPASS`
 	envKeyDisplay           = `DISPLAY`
 )

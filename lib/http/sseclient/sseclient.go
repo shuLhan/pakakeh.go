@@ -227,7 +227,7 @@ func (cl *Client) handshake() (packet []byte, err error) {
 
 	var httpRes *http.Response
 
-	httpRes, packet, err = libhttp.ParseResponseHeader(packet)
+	httpRes, packet, err = libhttp.ParseResponseHeader(packet) //nolint: bodyclose
 	if err != nil {
 		return nil, err
 	}

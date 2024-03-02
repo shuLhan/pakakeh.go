@@ -17,12 +17,13 @@ func ExampleAddRat() {
 	fmt.Println(AddRat("a"))
 	fmt.Println(AddRat(0, 0.0001))
 	fmt.Println(AddRat("1.007", "a", "2.003")) // Invalid parameter "a" is ignored.
-	//Output:
-	//0
-	//0
-	//0
-	//0.0001
-	//3.01
+
+	// Output:
+	// 0
+	// 0
+	// 0
+	// 0.0001
+	// 3.01
 }
 
 func ExampleMulRat() {
@@ -31,12 +32,13 @@ func ExampleMulRat() {
 	fmt.Println(MulRat("a"))
 	fmt.Println(MulRat(0, 1))
 	fmt.Println(MulRat(6, "a", "0.3")) // Invalid parameter "a" is ignored.
-	//Output:
-	//0
-	//0
-	//0
-	//0
-	//1.8
+
+	// Output:
+	// 0
+	// 0
+	// 0
+	// 0
+	// 1.8
 }
 
 func ExampleNewRat() {
@@ -72,27 +74,28 @@ func ExampleNewRat() {
 	for _, v := range inputs {
 		fmt.Println(NewRat(v))
 	}
-	//Output:
-	//0
-	//0
-	//0
-	//0
-	//0
-	//0.00000001
-	//14687233442.06916608
-	//14687233442.06916608
-	//0
-	//14687233442.06916608
-	//14687233442.06916608
-	//0
-	//0
-	//146.87233442
-	//146.87233442
-	//65535
-	//4294967295
-	//18446744073709551615
-	//0
-	//100000000
+
+	// Output:
+	// 0
+	// 0
+	// 0
+	// 0
+	// 0
+	// 0.00000001
+	// 14687233442.06916608
+	// 14687233442.06916608
+	// 0
+	// 14687233442.06916608
+	// 14687233442.06916608
+	// 0
+	// 0
+	// 146.87233442
+	// 146.87233442
+	// 65535
+	// 4294967295
+	// 18446744073709551615
+	// 0
+	// 100000000
 }
 
 func ExampleQuoRat() {
@@ -107,17 +110,17 @@ func ExampleQuoRat() {
 	fmt.Println(QuoRat(int64(1815507979407), NewRat(100000000)))
 	fmt.Println(QuoRat("25494300", "25394000000"))
 
-	//Output:
-	//0
-	//0
-	//0
-	//0
-	//0
-	//0
-	//0
-	//17.0992647
-	//18155.07979407
-	//0.00100395
+	// Output:
+	// 0
+	// 0
+	// 0
+	// 0
+	// 0
+	// 0
+	// 0
+	// 17.0992647
+	// 18155.07979407
+	// 0.00100395
 }
 
 func ExampleSubRat() {
@@ -126,12 +129,13 @@ func ExampleSubRat() {
 	fmt.Println(SubRat("a"))
 	fmt.Println(SubRat(0, 1))
 	fmt.Println(SubRat(6, "a", "0.3"))
-	//Output:
-	//0
-	//0
-	//0
-	//-1
-	//5.7
+
+	// Output:
+	// 0
+	// 0
+	// 0
+	// -1
+	// 5.7
 }
 
 func ExampleRat_Abs() {
@@ -139,21 +143,23 @@ func ExampleRat_Abs() {
 	fmt.Println(NewRat("-1").Abs())
 	fmt.Println(NewRat("-0.00001").Abs())
 	fmt.Println(NewRat("1").Abs())
-	//Output:
-	//0
-	//1
-	//0.00001
-	//1
+
+	// Output:
+	// 0
+	// 1
+	// 0.00001
+	// 1
 }
 
 func ExampleRat_Add() {
 	fmt.Println(NewRat(nil).Add(nil))
 	fmt.Println(NewRat(1).Add(nil))
 	fmt.Println(NewRat(1).Add(1))
-	//Output:
-	//0
-	//1
-	//2
+
+	// Output:
+	// 0
+	// 1
+	// 2
 }
 
 func ExampleRat_Humanize() {
@@ -170,16 +176,17 @@ func ExampleRat_Humanize() {
 	fmt.Printf("%s\n", NewRat("1000.2").Humanize(thousandSep, decimalSep))
 	fmt.Printf("%s\n", NewRat("10000.23").Humanize(thousandSep, decimalSep))
 	fmt.Printf("%s\n", NewRat("100000.234").Humanize(thousandSep, decimalSep))
-	//Output:
-	//0
-	//0
-	//0,1234
-	//100
-	//100,1234
-	//1.000
-	//1.000,2
-	//10.000,23
-	//100.000,234
+
+	// Output:
+	// 0
+	// 0
+	// 0,1234
+	// 100
+	// 100,1234
+	// 1.000
+	// 1.000,2
+	// 10.000,23
+	// 100.000,234
 }
 
 func ExampleRat_Int64() {
@@ -197,19 +204,19 @@ func ExampleRat_Int64() {
 	fmt.Println(QuoRat(128900, 3220).Mul(100000000).Int64())
 	fmt.Println(QuoRat(25494300, QuoRat(25394000000, 100000000)).Int64())
 
-	//Output:
-	//MaxInt64: 9223372036854775807
-	//MaxInt64+1: 9223372036854775807
-	//MinInt64: -9223372036854775808
-	//MinInt64-1: -9223372036854775808
-	//0
-	//0
-	//0
-	//0
-	//401114490002438879
-	//4003105590
-	//4003105590
-	//100394
+	// Output:
+	// MaxInt64: 9223372036854775807
+	// MaxInt64+1: 9223372036854775807
+	// MinInt64: -9223372036854775808
+	// MinInt64-1: -9223372036854775808
+	// 0
+	// 0
+	// 0
+	// 0
+	// 401114490002438879
+	// 4003105590
+	// 4003105590
+	// 100394
 }
 
 func ExampleRat_IsEqual() {
@@ -227,17 +234,17 @@ func ExampleRat_IsEqual() {
 	// Equal due to String() truncation to DefaultDigitPrecision (8) digits.
 	fmt.Println(NewRat("0.1234567890123").IsEqual("0.12345678"))
 
-	//Output:
-	//false
-	//false
-	//true
-	//false
-	//true
-	//true
-	//true
-	//true
-	//true
-	//true
+	// Output:
+	// false
+	// false
+	// true
+	// false
+	// true
+	// true
+	// true
+	// true
+	// true
+	// true
 }
 
 func ExampleRat_IsGreater() {
@@ -248,11 +255,11 @@ func ExampleRat_IsGreater() {
 	fmt.Println(r.IsGreater("0.000_000_5"))
 	fmt.Println(r.IsGreater("0.000_000_49999"))
 
-	//Output:
-	//false
-	//false
-	//false
-	//true
+	// Output:
+	// false
+	// false
+	// false
+	// true
 }
 
 func ExampleRat_IsGreaterOrEqual() {
@@ -264,12 +271,12 @@ func ExampleRat_IsGreaterOrEqual() {
 	fmt.Println(r.IsGreaterOrEqual("0.000_000_5"))
 	fmt.Println(r.IsGreaterOrEqual("0.000_000_49999"))
 
-	//Output:
-	//false
-	//false
-	//false
-	//true
-	//true
+	// Output:
+	// false
+	// false
+	// false
+	// true
+	// true
 }
 
 func ExampleRat_IsGreaterThanZero() {
@@ -278,11 +285,11 @@ func ExampleRat_IsGreaterThanZero() {
 	fmt.Println(NewRat("-0.000_000_000_000_000_001").IsGreaterThanZero())
 	fmt.Println(NewRat("0.000_000_000_000_000_001").IsGreaterThanZero())
 
-	//Output:
-	//false
-	//false
-	//false
-	//true
+	// Output:
+	// false
+	// false
+	// false
+	// true
 }
 
 func ExampleRat_IsLess() {
@@ -294,12 +301,12 @@ func ExampleRat_IsLess() {
 	fmt.Println(r.IsLess("0.000_000_49"))
 	fmt.Println(r.IsLess("0.000_000_500_000_000_001"))
 
-	//Output:
-	//false
-	//false
-	//false
-	//false
-	//true
+	// Output:
+	// false
+	// false
+	// false
+	// false
+	// true
 }
 
 func ExampleRat_IsLessOrEqual() {
@@ -311,12 +318,12 @@ func ExampleRat_IsLessOrEqual() {
 	fmt.Println(r.IsLessOrEqual("0.000_000_49"))
 	fmt.Println(r.IsLessOrEqual("0.000_000_500_000_000_001"))
 
-	//Output:
-	//false
-	//false
-	//true
-	//false
-	//true
+	// Output:
+	// false
+	// false
+	// true
+	// false
+	// true
 }
 
 func ExampleRat_IsLessThanZero() {
@@ -325,11 +332,11 @@ func ExampleRat_IsLessThanZero() {
 	fmt.Println(NewRat("-0.000_000_000_000_000_001").IsLessThanZero())
 	fmt.Println(NewRat("0.000_000_000_000_000_001").IsLessThanZero())
 
-	//Output:
-	//false
-	//false
-	//true
-	//false
+	// Output:
+	// false
+	// false
+	// true
+	// false
 }
 
 func ExampleRat_IsZero() {
@@ -339,12 +346,12 @@ func ExampleRat_IsZero() {
 	fmt.Println(NewRat("-0.000_000_000_000_000_001").IsZero())
 	fmt.Println(NewRat("0.000_000_000_000_000_001").IsZero())
 
-	//Output:
-	//false
-	//true
-	//true
-	//false
-	//false
+	// Output:
+	// false
+	// true
+	// true
+	// false
+	// false
 }
 
 func ExampleRat_MarshalJSON() {
@@ -377,31 +384,31 @@ func ExampleRat_MarshalJSON() {
 		fmt.Printf("%s\n", out)
 	}
 
-	//Output:
-	//"0"
-	//"0"
-	//"0"
-	//"0.1"
-	//"0.00000001"
-	//"0"
-	//"1234567890"
-	//"64.23738872"
-	//"0.12345678"
-	//"142660378.65368736"
-	//"9193394308.8577137"
-	//"14687233442.06916608"
-	//0
-	//0
-	//0
-	//0.1
-	//0.00000001
-	//0
-	//1234567890
-	//64.23738872
-	//0.12345678
-	//142660378.65368736
-	//9193394308.8577137
-	//14687233442.06916608
+	// Output:
+	// "0"
+	// "0"
+	// "0"
+	// "0.1"
+	// "0.00000001"
+	// "0"
+	// "1234567890"
+	// "64.23738872"
+	// "0.12345678"
+	// "142660378.65368736"
+	// "9193394308.8577137"
+	// "14687233442.06916608"
+	// 0
+	// 0
+	// 0
+	// 0.1
+	// 0.00000001
+	// 0
+	// 1234567890
+	// 64.23738872
+	// 0.12345678
+	// 142660378.65368736
+	// 9193394308.8577137
+	// 14687233442.06916608
 }
 
 func ExampleRat_MarshalJSON_withStruct() {
@@ -417,7 +424,7 @@ func ExampleRat_MarshalJSON_withStruct() {
 
 	MarshalJSONAsString = true
 	for _, in := range inputs {
-		out, _ := json.Marshal(&in)
+		out, _ := json.Marshal(in)
 		fmt.Printf("%s\n", out)
 	}
 
@@ -427,13 +434,13 @@ func ExampleRat_MarshalJSON_withStruct() {
 		fmt.Printf("%s\n", out)
 	}
 
-	//Output:
-	//{"V":null}
-	//{"V":"0"}
-	//{"V":"0.12345678"}
-	//{"V":null}
-	//{"V":0}
-	//{"V":0.12345678}
+	// Output:
+	// {"V":null}
+	// {"V":"0"}
+	// {"V":"0.12345678"}
+	// {"V":null}
+	// {"V":0}
+	// {"V":0.12345678}
 }
 
 func ExampleRat_Mul() {
@@ -445,11 +452,12 @@ func ExampleRat_Mul() {
 	fmt.Println(NewRat(defValue).Mul("0"))
 	fmt.Println(NewRat(defValue).Mul(defValue))
 	fmt.Println(NewRat("1.06916608").Mul("1.06916608"))
-	//Output:
-	//0
-	//0
-	//215714826181834884090.46087866
-	//1.1431161
+
+	// Output:
+	// 0
+	// 0
+	// 215714826181834884090.46087866
+	// 1.1431161
 }
 
 func ExampleRat_Quo() {
@@ -461,11 +469,12 @@ func ExampleRat_Quo() {
 	fmt.Println(NewRat(defValue).Quo(nil))
 	fmt.Println(NewRat(defValue).Quo("a"))
 	fmt.Println(NewRat(defValue).Quo("100_000_000"))
-	//Output:
-	//0
-	//0
-	//0
-	//146.87233442
+
+	// Output:
+	// 0
+	// 0
+	// 0
+	// 146.87233442
 }
 
 func ExampleRat_RoundNearestFraction() {
@@ -481,19 +490,20 @@ func ExampleRat_RoundNearestFraction() {
 	fmt.Printf("-0.5: %s\n", NewRat("-0.5").RoundNearestFraction())
 	fmt.Printf("-0.555: %s\n", NewRat("-0.555").RoundNearestFraction())
 	fmt.Printf("-0.545: %s\n", NewRat("-0.545").RoundNearestFraction())
-	//Output:
-	//nil: 0
-	//0.000000001: 0
-	//0.00545: 0.005
-	//0.00555: 0.006
-	//0.0545: 0.05
-	//0.0555: 0.06
-	//0.545: 0.5
-	//0.555: 0.6
-	//0.5: 0.5
-	//-0.5: -0.5
-	//-0.555: -0.6
-	//-0.545: -0.5
+
+	// Output:
+	// nil: 0
+	// 0.000000001: 0
+	// 0.00545: 0.005
+	// 0.00555: 0.006
+	// 0.0545: 0.05
+	// 0.0555: 0.06
+	// 0.545: 0.5
+	// 0.555: 0.6
+	// 0.5: 0.5
+	// -0.5: -0.5
+	// -0.555: -0.6
+	// -0.545: -0.5
 }
 
 func ExampleRat_RoundToNearestAway() {
@@ -512,20 +522,21 @@ func ExampleRat_RoundToNearestAway() {
 
 	fmt.Printf("0.5: %s\n", NewRat("0.5").RoundToNearestAway(0))
 	fmt.Printf("-0.5: %s\n", NewRat("-0.5").RoundToNearestAway(0))
-	//Output:
-	//nil: 0
-	//0.0054: 0.01
-	//0.0054: 0
-	//0.5455: 0.55
-	//0.5555: 0.56
-	//0.5566: 0.56
-	//0.5566: 1
-	//0.02514135: 0.025141
-	//0.02514145: 0.025141
-	//0.02514155: 0.025142
-	//0.02514165: 0.025142
-	//0.5: 1
-	//-0.5: -1
+
+	// Output:
+	// nil: 0
+	// 0.0054: 0.01
+	// 0.0054: 0
+	// 0.5455: 0.55
+	// 0.5555: 0.56
+	// 0.5566: 0.56
+	// 0.5566: 1
+	// 0.02514135: 0.025141
+	// 0.02514145: 0.025141
+	// 0.02514155: 0.025142
+	// 0.02514165: 0.025142
+	// 0.5: 1
+	// -0.5: -1
 }
 
 func ExampleRat_RoundToZero() {
@@ -537,13 +548,14 @@ func ExampleRat_RoundToZero() {
 	// In Go <= 1.18, this will print "-0", but on Go tip "0".
 	// So to make test success on all versions, we multiple it to 1.
 	fmt.Println(NewRat("-0.5").RoundToZero(0).Mul(1))
-	//Output:
-	//0
-	//0.54
-	//0.55
-	//0.55
-	//0
-	//0
+
+	// Output:
+	// 0
+	// 0.54
+	// 0.55
+	// 0.55
+	// 0
+	// 0
 }
 
 func ExampleRat_Scan() {
@@ -566,12 +578,12 @@ func ExampleRat_Scan() {
 		fmt.Println(r)
 	}
 
-	//Output:
-	//1234
-	//error: Rat.Scan: unknown type <nil>
-	//1234
-	//0.0001
-	//0.0001
+	// Output:
+	// 1234
+	// error: Rat.Scan: unknown type <nil>
+	// 1234
+	// 0.0001
+	// 0.0001
 }
 
 func ExampleRat_String() {
@@ -588,32 +600,33 @@ func ExampleRat_String() {
 		"64.23738872403",
 		float64(64.23738872403),
 	}
-	//Output:
-	//0
-	//12345
-	//0
-	//0
-	//0.1
-	//0.1
-	//0.0000001
-	//0.0000001
-	//0
-	//64.23738872
-	//64.23738872
-
 	for _, in := range inputs {
 		fmt.Println(NewRat(in).String())
 	}
+
+	// Output:
+	// 0
+	// 12345
+	// 0
+	// 0
+	// 0.1
+	// 0.1
+	// 0.0000001
+	// 0.0000001
+	// 0
+	// 64.23738872
+	// 64.23738872
 }
 
 func ExampleRat_Sub() {
 	fmt.Println(NewRat(nil).Sub(1))
 	fmt.Println(NewRat(1).Sub(nil))
 	fmt.Println(NewRat(1).Sub(1))
-	//Output:
-	//0
-	//1
-	//0
+
+	// Output:
+	// 0
+	// 1
+	// 0
 }
 
 func ExampleRat_UnmarshalJSON_withStruct() {
@@ -640,14 +653,15 @@ func ExampleRat_UnmarshalJSON_withStruct() {
 		}
 		fmt.Printf("%s %s\n", t.V, t.W)
 	}
-	//Output:
-	//Rat.UnmarshalJSON: cannot convert []uint8([97 98]) to Rat
-	//0 0
-	//invalid character '}' looking for beginning of value
-	//0 0
-	//1 0
-	//0.12345678 0
-	//0.1234 0.5678
+
+	// Output:
+	// Rat.UnmarshalJSON: cannot convert []uint8([97 98]) to Rat
+	// 0 0
+	// invalid character '}' looking for beginning of value
+	// 0 0
+	// 1 0
+	// 0.12345678 0
+	// 0.1234 0.5678
 }
 
 func ExampleRat_Value() {
@@ -661,9 +675,10 @@ func ExampleRat_Value() {
 		out, _ := NewRat(in).Value()
 		fmt.Printf("%s\n", out)
 	}
-	//Output:
-	//0
-	//0
-	//1.2345
-	//12345.67891234
+
+	// Output:
+	// 0
+	// 0
+	// 1.2345
+	// 12345.67891234
 }

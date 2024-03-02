@@ -8,6 +8,7 @@ package slack
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,9 +28,21 @@ func PostWebhook(webhookURL string, msg *Message) (err error) {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
+	var (
+		ctx     = context.Background()
+		httpReq *http.Request
+	)
+
+	httpReq, err = http.NewRequestWithContext(ctx, http.MethodPost, webhookURL, bytes.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	httpReq.Header.Set(`Content-Type`, `application/json`)
+
 	var res *http.Response
 
-	res, err = http.DefaultClient.Post(webhookURL, `application/json`, bytes.NewReader(payload))
+	res, err = http.DefaultClient.Do(httpReq)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}

@@ -46,10 +46,10 @@ func ExampleClise_MarshalJSON() {
 		fmt.Println(string(bjson))
 	}
 
-	//Output:
-	//[2,3,4]
-	//["Hello","Clise","MarshalJSON"]
-	//["MarshalJSON",{"String":"Hello","Int":1},{"String":"world","Int":2}]
+	// Output:
+	// [2,3,4]
+	// ["Hello","Clise","MarshalJSON"]
+	// ["MarshalJSON",{"String":"Hello","Int":1},{"String":"world","Int":2}]
 }
 
 func ExampleClise_UnmarshalJSON() {
@@ -77,10 +77,10 @@ func ExampleClise_UnmarshalJSON() {
 		}
 	}
 
-	//Output:
-	//UnmarshalJSON: json: cannot unmarshal object into Go value of type []interface {}
-	//[2 3 4]
-	//[3 4 5]
-	//[Hello Clise MarshalJSON]
-	//[MarshalJSON map[Int:1 String:Hello] map[Int:2 String:world]]
+	// Output:
+	// UnmarshalJSON: json: cannot unmarshal object into Go value of type []interface {}
+	// [2 3 4]
+	// [3 4 5]
+	// [Hello Clise MarshalJSON]
+	// [MarshalJSON map[Int:1 String:Hello] map[Int:2 String:world]]
 }

@@ -109,7 +109,6 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"strings"
 
 	"golang.org/x/crypto/blake2b"
@@ -174,7 +173,7 @@ func encrypt(aead cipher.AEAD, nonce, plain, footer []byte) (token string, err e
 	base64.RawURLEncoding.Encode(dst, sc)
 	_, err = buf.Write(dst)
 	if err != nil {
-		return "", nil
+		return ``, err
 	}
 
 	if len(footer) > 0 {
@@ -185,7 +184,7 @@ func encrypt(aead cipher.AEAD, nonce, plain, footer []byte) (token string, err e
 		base64.RawURLEncoding.Encode(dst, footer)
 		_, err = buf.Write(dst)
 		if err != nil {
-			return "", nil
+			return ``, err
 		}
 	}
 
@@ -200,10 +199,10 @@ func Decrypt(aead cipher.AEAD, token string) (plain, footer []byte, err error) {
 		return nil, nil, errors.New("invalid token format")
 	}
 	if pieces[0] != "v2" {
-		return nil, nil, fmt.Errorf("unsupported protocol version " + pieces[0])
+		return nil, nil, errors.New(`unsupported protocol version ` + pieces[0])
 	}
 	if pieces[1] != "local" {
-		return nil, nil, fmt.Errorf("expecting local mode, got " + pieces[1])
+		return nil, nil, errors.New(`expecting local mode, got ` + pieces[1])
 	}
 
 	if len(pieces) == 4 {
@@ -292,7 +291,7 @@ func Sign(sk ed25519.PrivateKey, m, f []byte) (token string, err error) {
 // from base64 string); verify that the signature is valid for the message.
 func Verify(pk ed25519.PublicKey, sm, f []byte) (msg []byte, err error) {
 	if len(sm) <= 64 {
-		return nil, fmt.Errorf("invalid signed message length")
+		return nil, errors.New(`invalid signed message length`)
 	}
 
 	msg = sm[:len(sm)-64]
@@ -305,7 +304,7 @@ func Verify(pk ed25519.PublicKey, sm, f []byte) (msg []byte, err error) {
 	}
 
 	if !ed25519.Verify(pk, msg2, sig) {
-		return nil, fmt.Errorf("invalid message signature")
+		return nil, errors.New(`invalid message signature`)
 	}
 
 	return msg, nil

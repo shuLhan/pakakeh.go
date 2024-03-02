@@ -350,7 +350,7 @@ func ParseHexDump(in []byte) (out []byte, err error) {
 				if start < 16 {
 					start = 0
 				} else {
-					start = start - 16
+					start -= 16
 				}
 				var (
 					prevRow      = out[start:]

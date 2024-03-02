@@ -6,6 +6,7 @@ package spf
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -164,14 +165,14 @@ func (m *macro) parse(data []byte) (err error) {
 				}
 
 				if x == len(data) {
-					return fmt.Errorf("missing closing '}'")
+					return errors.New(`missing closing '}'`)
 				}
 			}
 			if data[x] == 'r' {
 				m.isReversed = true
 				x++
 				if x == len(data) {
-					return fmt.Errorf("missing closing '}'")
+					return errors.New(`missing closing '}'`)
 				}
 			}
 			if data[x] != '}' {
@@ -183,7 +184,7 @@ func (m *macro) parse(data []byte) (err error) {
 					break
 				}
 				if x == len(data) {
-					return fmt.Errorf("missing closing '}'")
+					return errors.New(`missing closing '}'`)
 				}
 				if data[x] != '}' {
 					return fmt.Errorf("missing closing '}', got '%c'", data[x])
@@ -263,8 +264,10 @@ func (m *macro) expandLetter() (value []byte) {
 	case macroExpDomain:
 		value = m.ref.Hostname
 	case macroExpCurTime:
-		now := time.Now()
-		strNow := fmt.Sprintf("%d", now.Unix())
+		var (
+			now    = time.Now()
+			strNow = strconv.FormatInt(now.Unix(), 10)
+		)
 		value = []byte(strNow)
 	}
 	return value

@@ -6,8 +6,8 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"mime"
@@ -136,7 +136,7 @@ func TestRegisterDelete(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		err := testServer.RegisterEndpoint(c.ep)
+		var err = testServer.RegisterEndpoint(c.ep)
 		if err != nil {
 			if !errors.Is(ErrEndpointAmbiguous, err) {
 				test.Assert(t, "error", c.expError, err.Error())
@@ -148,9 +148,14 @@ func TestRegisterDelete(t *testing.T) {
 			continue
 		}
 
-		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
-		if e != nil {
-			t.Fatal(e)
+		var (
+			ctx = context.Background()
+			req *http.Request
+		)
+
+		req, err = http.NewRequestWithContext(ctx, http.MethodDelete, c.reqURL, nil)
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		res, e := client.Do(req)
@@ -228,9 +233,15 @@ func TestRegisterEvaluator(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodDelete, c.reqURL, nil)
-		if e != nil {
-			t.Fatal(e)
+		var (
+			ctx = context.Background()
+			req *http.Request
+			err error
+		)
+
+		req, err = http.NewRequestWithContext(ctx, http.MethodDelete, c.reqURL, nil)
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		res, e := client.Do(req)
@@ -298,9 +309,15 @@ func TestRegisterGet(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodGet, c.reqURL, nil)
-		if e != nil {
-			t.Fatal(e)
+		var (
+			ctx = context.Background()
+			req *http.Request
+			err error
+		)
+
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, c.reqURL, nil)
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		res, e := client.Do(req)
@@ -365,9 +382,15 @@ func TestRegisterHead(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodHead, c.reqURL, nil)
-		if e != nil {
-			t.Fatal(e)
+		var (
+			ctx = context.Background()
+			req *http.Request
+			err error
+		)
+
+		req, err = http.NewRequestWithContext(ctx, http.MethodHead, c.reqURL, nil)
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		res, e := client.Do(req)
@@ -431,7 +454,9 @@ func TestRegisterPatch(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodPatch, c.reqURL, nil)
+		var ctx = context.Background()
+
+		req, e := http.NewRequestWithContext(ctx, http.MethodPatch, c.reqURL, nil)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -503,7 +528,9 @@ k=vv`,
 		var buf bytes.Buffer
 		_, _ = buf.WriteString(c.reqBody)
 
-		req, e := http.NewRequest(http.MethodPost, c.reqURL, &buf)
+		var ctx = context.Background()
+
+		req, e := http.NewRequestWithContext(ctx, http.MethodPost, c.reqURL, &buf)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -566,7 +593,9 @@ func TestRegisterPut(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodPut, c.reqURL, nil)
+		var ctx = context.Background()
+
+		req, e := http.NewRequestWithContext(ctx, http.MethodPut, c.reqURL, nil)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -643,7 +672,9 @@ func TestServeHTTPOptions(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, err := http.NewRequest(http.MethodOptions, c.reqURL, nil)
+		var ctx = context.Background()
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodOptions, c.reqURL, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -652,6 +683,7 @@ func TestServeHTTPOptions(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		_ = res.Body.Close()
 
 		gotAllow := res.Header.Get("Allow")
 
@@ -672,7 +704,7 @@ func TestStatusError(t *testing.T) {
 			return nil, liberrors.Internal(nil)
 		}
 		cbCustomErr = func(_ *EndpointRequest) ([]byte, error) {
-			return nil, fmt.Errorf("Custom error")
+			return nil, errors.New(`Custom error`)
 		}
 
 		err error
@@ -796,7 +828,9 @@ func TestStatusError(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		req, e := http.NewRequest(http.MethodPost, c.reqURL, nil)
+		var ctx = context.Background()
+
+		req, e := http.NewRequestWithContext(ctx, http.MethodPost, c.reqURL, nil)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -882,7 +916,9 @@ func TestServer_Options_HandleFS(t *testing.T) {
 	}}
 
 	for _, c = range cases {
-		req, err = http.NewRequest(http.MethodGet, testServerURL+c.reqPath, nil)
+		var ctx = context.Background()
+
+		req, err = http.NewRequestWithContext(ctx, http.MethodGet, testServerURL+c.reqPath, nil)
 		if err != nil {
 			t.Fatalf("%s: %s", c.desc, err)
 		}
@@ -899,6 +935,10 @@ func TestServer_Options_HandleFS(t *testing.T) {
 		test.Assert(t, c.desc, c.expStatusCode, res.StatusCode)
 
 		gotBody, err := io.ReadAll(res.Body)
+		if err != nil {
+			t.Fatalf("%s: %s", c.desc, err)
+		}
+		err = res.Body.Close()
 		if err != nil {
 			t.Fatalf("%s: %s", c.desc, err)
 		}
@@ -937,7 +977,7 @@ func TestServer_handleRange(t *testing.T) {
 
 		header.Set(HeaderRange, string(headerRange))
 
-		httpRes, resBody, err = cl.Get(`/index.html`, header, nil)
+		httpRes, resBody, err = cl.Get(`/index.html`, header, nil) //nolint: bodyclose
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -999,9 +1039,24 @@ func TestServer_handleRange_HEAD(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	var (
+		ctx     = context.Background()
+		url     = testServerURL + `/index.html`
+		httpReq *http.Request
+	)
+
+	httpReq, err = http.NewRequestWithContext(ctx, http.MethodHead, url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	var httpRes *http.Response
 
-	httpRes, err = cl.Client.Head(testServerURL + `/index.html`)
+	httpRes, err = cl.Client.Do(httpReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = httpRes.Body.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1090,7 +1145,7 @@ func TestServerHandleRangeBig(t *testing.T) {
 		resBody []byte
 	)
 
-	httpRes, resBody, err = cl.Head(pathBig, nil, nil)
+	httpRes, resBody, err = cl.Head(pathBig, nil, nil) //nolint: bodyclose
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1106,7 +1161,7 @@ func TestServerHandleRangeBig(t *testing.T) {
 
 	headers.Set(HeaderRange, `bytes=0-`)
 
-	httpRes, resBody, err = cl.Get(pathBig, headers, nil)
+	httpRes, resBody, err = cl.Get(pathBig, headers, nil) //nolint: bodyclose
 	if err != nil {
 		t.Fatal(err)
 	}

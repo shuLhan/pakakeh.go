@@ -6,7 +6,7 @@ package websocket
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"os"
 	"strconv"
@@ -85,7 +85,7 @@ func testHandleAuth(req *Handshake) (ctx context.Context, err error) {
 
 	extJWT = q.Get(_qKeyTicket)
 	if len(extJWT) == 0 {
-		return nil, fmt.Errorf("Missing authorization")
+		return nil, errors.New(`Missing authorization`)
 	}
 
 	ctx = context.WithValue(context.Background(), CtxKeyExternalJWT, extJWT)

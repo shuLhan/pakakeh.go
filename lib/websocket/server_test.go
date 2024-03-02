@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -273,14 +274,25 @@ func TestServerHandshake(t *testing.T) {
 
 func TestServer_Health(t *testing.T) {
 	var (
-		res *http.Response
-		err error
+		ctx = context.Background()
+		url = `http://` + _testAddr + `/status`
+
+		httpReq *http.Request
+		err     error
 	)
 
-	res, err = http.Get("http://" + _testAddr + "/status")
+	httpReq, err = http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	var res *http.Response
+
+	res, err = http.DefaultClient.Do(httpReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = res.Body.Close()
 
 	test.Assert(t, "/status response code", http.StatusOK, res.StatusCode)
 }

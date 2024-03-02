@@ -13,9 +13,7 @@ import (
 // timeNow returns the current local time.
 // This is a variable that can be override to mock the current time during
 // testing.
-var timeNow = func() time.Time {
-	return time.Now()
-}
+var timeNow = time.Now
 
 // ShortDayNames contains list of day name in English, in shorter.
 var ShortDayNames = []string{`Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`, `Sun`}

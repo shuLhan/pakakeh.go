@@ -137,10 +137,7 @@ func TestConfigParser_load(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		p, err := newParser(dummyConfig)
-		if err != nil {
-			t.Fatal(err)
-		}
+		var p = newParser(dummyConfig)
 
 		got, err := p.load(c.dir, c.pattern)
 		if err != nil {

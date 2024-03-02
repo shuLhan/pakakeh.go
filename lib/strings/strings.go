@@ -258,9 +258,7 @@ func Swap(ss []string, x, y int) {
 		return
 	}
 
-	tmp := ss[x]
-	ss[x] = ss[y]
-	ss[y] = tmp
+	ss[x], ss[y] = ss[y], ss[x]
 }
 
 // TotalFrequencyOfTokens return total frequency of list of token in words.

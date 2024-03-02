@@ -6,6 +6,7 @@ package dns
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"time"
@@ -67,7 +68,7 @@ func (cl *DoTClient) Close() error {
 // It will return an error if the Name is empty.
 func (cl *DoTClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Message, err error) {
 	if len(q.Name) == 0 {
-		return nil, fmt.Errorf("Lookup: empty question name")
+		return nil, errors.New(`Lookup: empty question name`)
 	}
 	if q.Type == 0 {
 		q.Type = RecordTypeA

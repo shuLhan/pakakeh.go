@@ -5,6 +5,7 @@
 package dsv
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -207,8 +208,7 @@ func doRead(t *testing.T, dsvReader *Reader, exp []string) {
 			test.Assert(t, "", exp[i], r)
 
 			i++
-		} else if e == io.EOF {
-			// EOF
+		} else if errors.Is(e, io.EOF) {
 			break
 		}
 	}
@@ -325,8 +325,7 @@ func TestReaderToColumns(t *testing.T) {
 			test.Assert(t, "", expectation[i], r)
 
 			i++
-		} else if e == io.EOF {
-			// EOF
+		} else if errors.Is(e, io.EOF) {
 			break
 		}
 	}
@@ -357,7 +356,7 @@ func TestTransposeToColumns(t *testing.T) {
 
 	_, e = Read(reader)
 
-	if e != io.EOF {
+	if !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 
@@ -387,7 +386,7 @@ func TestSortColumnsByIndex(t *testing.T) {
 	reader.SetMaxRows(-1)
 
 	_, e = Read(reader)
-	if e != io.EOF {
+	if !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 
@@ -433,7 +432,7 @@ func TestSplitRowsByValue(t *testing.T) {
 
 	_, e = Read(reader)
 
-	if e != nil && e != io.EOF {
+	if e != nil && !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 
@@ -514,12 +513,12 @@ func TestMergeColumns(t *testing.T) {
 	reader2.SetMaxRows(-1)
 
 	_, e = Read(reader1)
-	if e != io.EOF {
+	if !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 
 	_, e = Read(reader2)
-	if e != io.EOF {
+	if !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 
@@ -558,12 +557,12 @@ func TestMergeRows(t *testing.T) {
 	reader2.SetMaxRows(-1)
 
 	_, e = Read(reader1)
-	if e != io.EOF {
+	if !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 
 	_, e = Read(reader2)
-	if e != io.EOF {
+	if !errors.Is(e, io.EOF) {
 		t.Fatal(e)
 	}
 

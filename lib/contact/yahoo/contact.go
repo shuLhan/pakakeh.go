@@ -15,12 +15,13 @@ type Contact struct {
 	Fields []Field `json:"fields"`
 
 	// Ignored fields for speedup.
-	//ID           int        `json:"id"`
-	//IsConnection bool       `json:"isConnection"`
-	//Error        int        `json:"error"`
-	//RestoredID   int        `json:"restoredId"`
-	//Categories []Category `json:"categories"`
-	//Meta
+
+	// ID           int        `json:"id"`
+	// IsConnection bool       `json:"isConnection"`
+	// Error        int        `json:"error"`
+	// RestoredID   int        `json:"restoredId"`
+	// Categories []Category `json:"categories"`
+	// Meta
 }
 
 // Decode will convert the interface value in each field into its struct

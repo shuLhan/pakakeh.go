@@ -6,6 +6,7 @@ package dns
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net"
 
@@ -58,7 +59,7 @@ func ParseNameServers(nameservers []string) (udpAddrs []*net.UDPAddr, err error)
 // without error.
 func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 	if ip == nil {
-		return "", fmt.Errorf("empty IP address")
+		return ``, errors.New(`empty IP address`)
 	}
 
 	var (
@@ -96,7 +97,7 @@ func LookupPTR(client Client, ip net.IP) (answer string, err error) {
 	var ok bool
 	answer, ok = rranswers[0].Value.(string)
 	if !ok {
-		return "", fmt.Errorf("invalid PTR record data")
+		return ``, errors.New(`invalid PTR record data`)
 	}
 
 	return answer, nil

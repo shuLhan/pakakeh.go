@@ -133,7 +133,6 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 
 		dir         *os.File
 		listfi      []os.FileInfo
-		listTestTxt []string
 		fi          os.FileInfo
 		data        *Data
 		name        string
@@ -150,6 +149,8 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
+	var listTestTxt = make([]string, 0, len(listfi))
+
 	for _, fi = range listfi {
 		if fi.Size() == 0 || fi.IsDir() {
 			continue
@@ -164,7 +165,6 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 		pathTestTxt = filepath.Join(path, name)
 		listTestTxt = append(listTestTxt, pathTestTxt)
 	}
-
 	if len(listTestTxt) == 0 {
 		return listData, nil
 	}

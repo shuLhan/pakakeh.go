@@ -298,15 +298,15 @@ func assertFolder(t *testing.T, folder *Folder) {
 	var err error
 
 	_, err = os.Stat(folder.dirCur)
-	if err != err {
+	if err != nil {
 		t.Fatalf(`want %s, got %s`, folder.dirCur, err)
 	}
 	_, err = os.Stat(folder.dirNew)
-	if err != err {
+	if err != nil {
 		t.Fatalf(`want %s, got %s`, folder.dirNew, err)
 	}
 	_, err = os.Stat(folder.dirTmp)
-	if err != err {
+	if err != nil {
 		t.Fatalf(`want %s, got %s`, folder.dirTmp, err)
 	}
 

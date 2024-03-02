@@ -5,6 +5,7 @@
 package hunspell
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -40,7 +41,7 @@ func (dict *dictionary) load(content string, opts *affixOptions) (err error) {
 	// The string splitted into lines and then parsed one by one.
 	lines := p.Lines()
 	if len(lines) == 0 {
-		return fmt.Errorf("empty file")
+		return errors.New(`empty file`)
 	}
 
 	// The first line is approximately number of words.

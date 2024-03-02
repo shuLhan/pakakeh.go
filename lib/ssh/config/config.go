@@ -88,10 +88,7 @@ func Load(file string) (cfg *Config, err error) {
 
 	var p *parser
 
-	p, err = newParser(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("%s %s: %w", logp, file, err)
-	}
+	p = newParser(cfg)
 
 	var lines []string
 

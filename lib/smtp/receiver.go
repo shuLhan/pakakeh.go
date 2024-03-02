@@ -6,6 +6,7 @@ package smtp
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -126,8 +127,7 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 			if err == io.EOF {
 				break
 			}
-			err = fmt.Errorf("smtp: recv: readCommand: " + err.Error())
-			return nil, err
+			return nil, fmt.Errorf(`smtp: recv: readCommand: %w`, err)
 		}
 		if n == cap(recv.data) {
 			continue
@@ -137,8 +137,7 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 
 	err = cmd.unpack(recv.buff.Bytes())
 	if err != nil {
-		err = fmt.Errorf("smtp: cmd.unpack: " + err.Error())
-		return nil, err
+		return nil, fmt.Errorf(`smtp: cmd.unpack: %w`, err)
 	}
 
 	return cmd, nil
@@ -177,8 +176,9 @@ func (recv *receiver) reset() {
 }
 
 func (recv *receiver) sendError(errRes error) (err error) {
-	reply, ok := errRes.(*liberrors.E)
-	if !ok {
+	var reply *liberrors.E
+
+	if !errors.As(errRes, &reply) {
 		reply = &liberrors.E{}
 		reply.Code = StatusLocalError
 		reply.Message = errRes.Error()

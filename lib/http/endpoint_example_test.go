@@ -5,6 +5,7 @@
 package http
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -26,7 +27,7 @@ func ExampleEndpoint_errorHandler() {
 		RequestType:  RequestTypeQuery,
 		ResponseType: ResponseTypePlain,
 		Call: func(epr *EndpointRequest) ([]byte, error) {
-			return nil, fmt.Errorf(epr.HTTPRequest.Form.Get(`error`))
+			return nil, errors.New(epr.HTTPRequest.Form.Get(`error`))
 		},
 		ErrorHandler: func(epr *EndpointRequest) {
 			epr.HTTPWriter.Header().Set(HeaderContentType, ContentTypePlain)
@@ -59,16 +60,18 @@ func ExampleEndpoint_errorHandler() {
 
 	params := url.Values{}
 	params.Set("error", "400:error with status code")
-	httpres, resbody, err := client.Get(`/`, nil, params)
+	httpres, resbody, err := client.Get(`/`, nil, params) //nolint: bodyclose
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
 
 	params.Set("error", "error without status code")
-	httpres, resbody, err = client.Get(`/`, nil, params)
+	httpres, resbody, err = client.Get(`/`, nil, params) //nolint: bodyclose
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
 

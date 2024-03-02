@@ -36,7 +36,7 @@ type NodeValue struct {
 // String will return the value of node for printable.
 func (nodev *NodeValue) String() (s string) {
 	if nodev.IsLeaf {
-		s = fmt.Sprintf("Class: %s", nodev.Class)
+		s = `Class: ` + nodev.Class
 	} else {
 		s = fmt.Sprintf("(SplitValue: %v)",
 			reflect.ValueOf(nodev.SplitV))

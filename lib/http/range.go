@@ -214,15 +214,16 @@ func (r *Range) Add(start, end *int64) bool {
 	if start == nil && end == nil {
 		return false
 	}
-	if start == nil {
+	switch {
+	case start == nil:
 		if *end <= 0 {
 			return false
 		}
-	} else if end == nil {
+	case end == nil:
 		if *start < 0 {
 			return false
 		}
-	} else {
+	default:
 		if *start < 0 || *end < 0 || *end < *start {
 			return false
 		}

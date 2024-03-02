@@ -57,7 +57,7 @@ func NormalizeForID(in string) (out string) {
 		bin = append(bin, '_')
 	} else if !ascii.IsAlpha(bin[0]) && bin[0] != '_' {
 		bin = append(bin, '_')
-		copy(bin[1:], bin[:])
+		copy(bin[1:], bin)
 		bin[0] = '_'
 	}
 
@@ -86,6 +86,9 @@ func Sanitize(in []byte) (plain []byte) {
 	for {
 		tokenType = htmlToken.Next()
 		switch tokenType {
+		case html.EndTagToken, html.SelfClosingTagToken, html.CommentToken, html.DoctypeToken:
+			// NOOP.
+
 		case html.ErrorToken:
 			goto out
 

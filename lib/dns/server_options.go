@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -159,7 +160,7 @@ func (opts *ServerOptions) init() (err error) {
 	opts.initNameServers()
 
 	if len(opts.primaryUDP) == 0 && len(opts.primaryDoh) == 0 && len(opts.primaryDot) == 0 {
-		return fmt.Errorf("dns: no valid name servers")
+		return errors.New(`dns: no valid name servers`)
 	}
 
 	return nil

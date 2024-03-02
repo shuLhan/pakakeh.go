@@ -47,7 +47,8 @@ func ExampleBufferForwarder() {
 	)
 	err = agent.Forward(ctx, m)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fmt.Printf(`%s`, bufFwd.Bytes())
@@ -59,7 +60,8 @@ func ExampleBufferForwarder() {
 	}
 	err = agent.BulkForward(ctx, list)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fmt.Printf(`%s`, bufFwd.Bytes())

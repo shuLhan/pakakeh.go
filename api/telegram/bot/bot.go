@@ -133,7 +133,7 @@ func New(opts Options) (bot *Bot, err error) {
 // DeleteWebhook remove webhook integration if you decide to switch back to
 // getUpdates. Returns True on success. Requires no parameters.
 func (bot *Bot) DeleteWebhook() (err error) {
-	_, resBody, err := bot.client.PostForm(methodDeleteWebhook, nil, nil)
+	_, resBody, err := bot.client.PostForm(methodDeleteWebhook, nil, nil) //nolint: bodyclose
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
 	}
@@ -151,7 +151,7 @@ func (bot *Bot) DeleteWebhook() (err error) {
 // Requires no parameters.
 // Returns basic information about the bot in form of a User object.
 func (bot *Bot) GetMe() (user *User, err error) {
-	_, resBody, err := bot.client.Get(methodGetMe, nil, nil)
+	_, resBody, err := bot.client.Get(methodGetMe, nil, nil) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("GetMe: %w", err)
 	}
@@ -170,7 +170,7 @@ func (bot *Bot) GetMe() (user *User, err error) {
 
 // GetMyCommands get the current list of the bot's commands.
 func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
-	_, resBody, err := bot.client.Get(methodGetMyCommands, nil, nil)
+	_, resBody, err := bot.client.Get(methodGetMyCommands, nil, nil) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("GetMyCommands: %w", err)
 	}
@@ -191,7 +191,7 @@ func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 // If the bot is using getUpdates, will return an object with the url field
 // empty.
 func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
-	_, resBody, err := bot.client.Get(methodGetWebhookInfo, nil, nil)
+	_, resBody, err := bot.client.Get(methodGetWebhookInfo, nil, nil) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("GetWebhookInfo: %w", err)
 	}
@@ -219,7 +219,7 @@ func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 		ParseMode: parseMode,
 	}
 
-	_, resBody, err := bot.client.PostJSON(methodSendMessage, nil, req)
+	_, resBody, err := bot.client.PostJSON(methodSendMessage, nil, req) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("SendMessage: %w", err)
 	}
@@ -253,7 +253,7 @@ func (bot *Bot) SetMyCommands(cmds []Command) (err error) {
 
 	bot.commands.Commands = cmds
 
-	_, resBody, err := bot.client.PostJSON(methodSetMyCommands, nil, &bot.commands)
+	_, resBody, err := bot.client.PostJSON(methodSetMyCommands, nil, &bot.commands) //nolint: bodyclose
 	if err != nil {
 		return fmt.Errorf("SetMyCommands: %w", err)
 	}
@@ -318,7 +318,7 @@ func (bot *Bot) setWebhook() (err error) {
 
 	var resBody []byte
 
-	_, resBody, err = bot.client.PostFormData(methodSetWebhook, nil, params)
+	_, resBody, err = bot.client.PostFormData(methodSetWebhook, nil, params) //nolint: bodyclose
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -402,7 +402,7 @@ func (bot *Bot) createServer() (err error) {
 
 // handleWebhook handle Updates from Webhook.
 func (bot *Bot) handleWebhook(epr *http.EndpointRequest) (resBody []byte, err error) {
-	update := Update{}
+	var update Update
 
 	err = json.Unmarshal(epr.RequestBody, &update)
 	if err != nil {

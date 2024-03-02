@@ -8,7 +8,6 @@ package tests
 import (
 	"errors"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/hunspell"
@@ -28,10 +27,12 @@ func TestHunspell(t *testing.T) {
 	for _, file := range testFiles {
 		t.Logf("test file: %s", file)
 
-		affFile := filepath.Join(file + ".aff")
-		dicFile := filepath.Join(file + ".dic")
-		goodFile := filepath.Join(file + ".good")
-		morphFile := filepath.Join(file + ".morph")
+		var (
+			affFile   = file + `.aff`
+			dicFile   = file + `.dic`
+			goodFile  = file + `.good`
+			morphFile = file + `.morph`
+		)
 
 		spell, err := hunspell.Open(affFile, dicFile)
 		if err != nil {

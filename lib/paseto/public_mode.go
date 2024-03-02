@@ -7,6 +7,7 @@ package paseto
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -37,10 +38,10 @@ type PublicMode struct {
 // outgoing token.
 func NewPublicMode(our Key) (auth *PublicMode, err error) {
 	if len(our.ID) == 0 {
-		return nil, fmt.Errorf("empty key ID")
+		return nil, errors.New(`empty key ID`)
 	}
 	if len(our.Private) == 0 {
-		return nil, fmt.Errorf("empty private key")
+		return nil, errors.New(`empty private key`)
 	}
 	auth = &PublicMode{
 		our:   our,
@@ -55,7 +56,7 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 	publicToken *PublicToken, err error,
 ) {
 	if req == nil {
-		return nil, fmt.Errorf("empty HTTP request")
+		return nil, errors.New(`empty HTTP request`)
 	}
 
 	var token string
@@ -64,7 +65,7 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 	if len(headerAuth) == 0 {
 		token = req.Form.Get(paramNameAccessToken)
 		if len(token) == 0 {
-			return nil, fmt.Errorf("missing access token")
+			return nil, errors.New(`missing access token`)
 		}
 	} else {
 		vals := strings.Fields(headerAuth)
@@ -85,10 +86,10 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 // The only required fields in Key is ID and Public.
 func (auth *PublicMode) AddPeer(k Key) (err error) {
 	if len(k.ID) == 0 {
-		return fmt.Errorf("empty key ID")
+		return errors.New(`empty key ID`)
 	}
 	if len(k.Public) == 0 {
-		return fmt.Errorf("empty public key")
+		return errors.New(`empty public key`)
 	}
 	auth.peers.upsert(k)
 	return nil
@@ -142,13 +143,13 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 func (auth *PublicMode) Unpack(token string) (publicToken *PublicToken, err error) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) != 4 {
-		return nil, fmt.Errorf("invalid token format")
+		return nil, errors.New(`invalid token format`)
 	}
 	if pieces[0] != "v2" {
-		return nil, fmt.Errorf("unsupported protocol version " + pieces[0])
+		return nil, errors.New(`unsupported protocol version ` + pieces[0])
 	}
 	if pieces[1] != "public" {
-		return nil, fmt.Errorf("expecting public mode, got " + pieces[1])
+		return nil, errors.New(`expecting public mode, got ` + pieces[1])
 	}
 
 	publicToken = &PublicToken{}

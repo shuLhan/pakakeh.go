@@ -28,7 +28,7 @@ func (hinfo *RDataHINFO) unpack(packet []byte) error {
 	)
 	x++
 	hinfo.CPU = libbytes.Copy(packet[x : x+size])
-	x = x + size
+	x += size
 	size = int(packet[x])
 	x++
 	hinfo.OS = libbytes.Copy(packet[x : x+size])

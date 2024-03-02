@@ -5,6 +5,7 @@
 package dkim
 
 import (
+	"errors"
 	"fmt"
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
@@ -60,7 +61,7 @@ func (p *parser) fetchTag() (t *tag, err error) {
 		return nil, nil
 	}
 	if d != '=' {
-		return nil, fmt.Errorf(`dkim: missing '='`)
+		return nil, errors.New(`dkim: missing '='`)
 	}
 
 	t, err = newTag(token)

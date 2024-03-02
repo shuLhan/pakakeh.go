@@ -7,6 +7,7 @@ package git
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -166,10 +167,10 @@ func GetRemoteURL(repoDir, remoteName string) (url string, err error) {
 
 	url, ok := gitIni.Get("remote", remoteName, "url", "")
 	if !ok {
-		err = fmt.Errorf("GetRemote: Empty or invalid remote name")
+		return ``, errors.New(`GetRemote: Empty or invalid remote name`)
 	}
 
-	return
+	return url, nil
 }
 
 // GetTag get the tag from revision.  If revision is empty it's default to

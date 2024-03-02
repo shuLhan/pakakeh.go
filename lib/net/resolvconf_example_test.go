@@ -27,9 +27,9 @@ func ExampleResolvConf_PopulateQuery() {
 	queries = resconf.PopulateQuery(`a.machine`)
 	fmt.Println(queries)
 
-	//Output:
-	//[vpn vpn.my.internal]
-	//[a.machine]
+	// Output:
+	// [vpn vpn.my.internal]
+	// [a.machine]
 }
 
 func ExampleResolvConf_WriteTo() {

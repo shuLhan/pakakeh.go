@@ -349,12 +349,11 @@ func (section *Section) Signers() (signers []ssh.Signer, err error) {
 	var (
 		logp = `Signers`
 
-		pkeyFile      string
-		pkeyPem       []byte
-		pass          []byte
-		signer        ssh.Signer
-		pkey          any
-		isMissingPass bool
+		pkeyFile string
+		pkeyPem  []byte
+		pass     []byte
+		signer   ssh.Signer
+		pkey     any
 	)
 
 	for _, pkeyFile = range section.IdentityFile {
@@ -368,8 +367,9 @@ func (section *Section) Signers() (signers []ssh.Signer, err error) {
 
 		pkey, err = ssh.ParseRawPrivateKey(pkeyPem)
 		if err != nil {
-			_, isMissingPass = err.(*ssh.PassphraseMissingError)
-			if !isMissingPass {
+			var errMissingPass *ssh.PassphraseMissingError
+
+			if !errors.As(err, &errMissingPass) {
 				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
 

@@ -42,8 +42,8 @@ func ExampleMarshalForm() {
 
 	fmt.Println(out.Encode())
 
-	//Output:
-	//Bool=true&Int=1&big.Rat=1.2345&bytes=bytes&f32=3.2&f64=6.4&notset=0&string=a_string&uint8=2
+	// Output:
+	// Bool=true&Int=1&big.Rat=1.2345&bytes=bytes&f32=3.2&f64=6.4&notset=0&string=a_string&uint8=2
 }
 
 func ExampleUnmarshalForm() {
@@ -90,9 +90,9 @@ func ExampleUnmarshalForm() {
 		fmt.Printf("%+v\n", ptrOut)
 	}
 
-	//Output:
-	//{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
-	//&{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
+	// Output:
+	// {Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
+	// &{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
 }
 
 func ExampleUnmarshalForm_error() {
@@ -133,10 +133,10 @@ func ExampleUnmarshalForm_error() {
 		fmt.Println(out)
 	}
 
-	//Output:
-	//UnmarshalForm: expecting *T got http.T
-	//UnmarshalForm: *http.T is not initialized
-	//{0}
+	// Output:
+	// UnmarshalForm: expecting *T got http.T
+	// UnmarshalForm: *http.T is not initialized
+	// {0}
 
 }
 
@@ -176,9 +176,9 @@ func ExampleUnmarshalForm_slice() {
 		fmt.Printf("%+v\n", ptrSliceOut)
 	}
 
-	//Output:
-	//{NotSlice:first SliceString:[multi value] SliceInt:[123 456]}
-	//&{NotSlice:first SliceString:[multi value] SliceInt:[123 456]}
+	// Output:
+	// {NotSlice:first SliceString:[multi value] SliceInt:[123 456]}
+	// &{NotSlice:first SliceString:[multi value] SliceInt:[123 456]}
 }
 
 func ExampleUnmarshalForm_zero() {
@@ -232,7 +232,7 @@ func ExampleUnmarshalForm_zero() {
 		fmt.Printf("%+v\n", out)
 	}
 
-	//Output:
-	//{Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
-	//{Rat:0 String: Bytes:[] Int:0 F64:0 F32:0 NotSet:0 Uint8:0 Bool:false}
+	// Output:
+	// {Rat:1.2345 String:a_string Bytes:[98 121 116 101 115] Int:1 F64:6.4 F32:3.2 NotSet:0 Uint8:2 Bool:true}
+	// {Rat:0 String: Bytes:[] Int:0 F64:0 F32:0 NotSet:0 Uint8:0 Bool:false}
 }

@@ -60,7 +60,8 @@ func ExampleServer_customHTTPStatusCode() {
 
 	err = srv.registerPost(epCustom)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	// Wait for the server fully started.
@@ -71,9 +72,10 @@ func ExampleServer_customHTTPStatusCode() {
 	}
 	client := NewClient(clientOpts)
 
-	httpRes, resBody, err := client.PostJSON(epCustom.Path, nil, nil)
+	httpRes, resBody, err := client.PostJSON(epCustom.Path, nil, nil) //nolint: bodyclose
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fmt.Printf("%d\n", httpRes.StatusCode)

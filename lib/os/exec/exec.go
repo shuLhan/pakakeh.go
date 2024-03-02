@@ -27,7 +27,8 @@ func ParseCommandArgs(in string) (cmd string, args []string) {
 
 	for _, r := range in {
 		if quote > 0 {
-			if r == quote {
+			switch r {
+			case quote:
 				if prev == '\\' {
 					sb.WriteRune(r)
 					prev = r
@@ -39,14 +40,14 @@ func ParseCommandArgs(in string) (cmd string, args []string) {
 					sb.Reset()
 					quote = 0
 				}
-			} else if r == '\\' {
+			case '\\':
 				if prev == '\\' {
 					sb.WriteRune(r)
 					prev = 0
 				} else {
 					prev = r
 				}
-			} else {
+			default:
 				if prev == '\\' {
 					sb.WriteRune('\\')
 				}

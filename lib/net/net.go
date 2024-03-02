@@ -143,12 +143,8 @@ func Read(conn net.Conn, bufsize int, timeout time.Duration) (packet []byte, err
 	for {
 		n, err = conn.Read(buf)
 		if err != nil {
-			var (
-				neterr net.Error
-				ok     bool
-			)
-			neterr, ok = err.(net.Error)
-			if ok && neterr.Timeout() {
+			var neterr net.Error
+			if errors.As(err, &neterr) && neterr.Timeout() {
 				return nil, ErrReadTimeout
 			}
 			return nil, fmt.Errorf(`%s: %w`, logp, err)

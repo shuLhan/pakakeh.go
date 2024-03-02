@@ -6,6 +6,7 @@ package xmlrpc
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -75,19 +76,27 @@ func (cl *Client) Close() {
 func (cl *Client) Send(req Request) (resp Response, err error) {
 	var (
 		logp = "Client.Send"
+
+		xmlbin []byte
 	)
 
-	xmlbin, _ := req.MarshalText()
-	reqBody := bytes.NewReader(xmlbin)
+	xmlbin, _ = req.MarshalText()
+	var reqBody = bytes.NewReader(xmlbin)
 
-	httpRequest, err := http.NewRequest("POST", cl.url.String(), reqBody)
+	var (
+		ctx = context.Background()
+
+		httpRequest *http.Request
+	)
+
+	httpRequest, err = http.NewRequestWithContext(ctx, `POST`, cl.url.String(), reqBody)
 	if err != nil {
 		return resp, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	httpRequest.Header.Set(libhttp.HeaderContentType, libhttp.ContentTypeXML)
 
-	_, resBody, err := cl.conn.Do(httpRequest)
+	_, resBody, err := cl.conn.Do(httpRequest) //nolint: bodyclose
 	if err != nil {
 		return resp, fmt.Errorf("%s: %w", logp, err)
 	}

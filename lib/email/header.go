@@ -273,11 +273,12 @@ func (hdr *Header) WriteTo(w io.Writer) (n int64, err error) {
 		m int
 	)
 	for _, f = range hdr.fields {
-		if f.Type == FieldTypeContentType {
+		switch f.Type {
+		case FieldTypeContentType:
 			m, err = fmt.Fprintf(w, "%s: %s\r\n", f.Name, f.contentType.String())
-		} else if f.Type == FieldTypeMessageID {
+		case FieldTypeMessageID:
 			m, err = fmt.Fprintf(w, "%s: <%s>\r\n", f.Name, f.oriValue)
-		} else {
+		default:
 			m, err = fmt.Fprintf(w, "%s: %s", f.Name, f.Value)
 		}
 		if err != nil {

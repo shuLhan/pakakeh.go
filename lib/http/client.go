@@ -10,6 +10,7 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"compress/lzw"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -262,9 +263,12 @@ func (client *Client) GenerateHTTPRequest(
 	}
 
 	rpath = path.Join(`/`, rpath)
-	var fullURL = client.opts.ServerURL + rpath
+	var (
+		fullURL = client.opts.ServerURL + rpath
+		ctx     = context.Background()
+	)
 
-	req, err = http.NewRequest(method.String(), fullURL, body)
+	req, err = http.NewRequestWithContext(ctx, method.String(), fullURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -426,9 +430,15 @@ func (client *Client) doRequest(
 	res *http.Response, resBody []byte, err error,
 ) {
 	rpath = path.Join(`/`, rpath)
-	var fullURL = client.opts.ServerURL + rpath
 
-	httpReq, err := http.NewRequest(httpMethod, fullURL, body)
+	var (
+		fullURL = client.opts.ServerURL + rpath
+		ctx     = context.Background()
+
+		httpReq *http.Request
+	)
+
+	httpReq, err = http.NewRequestWithContext(ctx, httpMethod, fullURL, body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -542,11 +552,11 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 // GenerateFormData generate multipart/form-data body from params.
 func GenerateFormData(params map[string][]byte) (contentType, body string, err error) {
 	var (
-		sb = new(strings.Builder)
-		w  = multipart.NewWriter(sb)
+		sb      = new(strings.Builder)
+		w       = multipart.NewWriter(sb)
+		listKey = make([]string, 0, len(params))
 
-		k       string
-		listKey []string
+		k string
 	)
 	for k = range params {
 		listKey = append(listKey, k)

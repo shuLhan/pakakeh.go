@@ -211,7 +211,7 @@ func (p *Protocol) generateWithTimestamp(mac hash.Hash, time int64) (otp string,
 	binary |= int(vbytes[offset+2]&0xff) << 8
 	binary |= int(vbytes[offset+3] & 0xff)
 
-	binary = binary % _digitsPower[p.codeDigits]
+	binary %= _digitsPower[p.codeDigits]
 
 	fmtZeroPadding = fmt.Sprintf(`%%0%dd`, p.codeDigits)
 

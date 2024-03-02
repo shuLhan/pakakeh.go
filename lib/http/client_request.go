@@ -6,6 +6,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -131,7 +132,9 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 		}
 	}
 
-	httpReq, err = http.NewRequest(creq.Method.String(), path.String(), body)
+	var ctx = context.Background()
+
+	httpReq, err = http.NewRequestWithContext(ctx, creq.Method.String(), path.String(), body)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

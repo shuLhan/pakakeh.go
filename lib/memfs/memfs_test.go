@@ -7,7 +7,9 @@ package memfs
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,8 +34,8 @@ func TestMain(m *testing.M) {
 
 	err = os.MkdirAll(filepath.Join(_testWD, "testdata/exclude/dir"), 0700)
 	if err != nil {
-		perr, ok := err.(*os.PathError)
-		if !ok {
+		var perr *fs.PathError
+		if !errors.As(err, &perr) {
 			log.Fatal("!ok:", err)
 		}
 		if perr.Err != os.ErrExist {
@@ -43,8 +45,8 @@ func TestMain(m *testing.M) {
 
 	err = os.MkdirAll(filepath.Join(_testWD, "testdata/include/dir"), 0700)
 	if err != nil {
-		perr, ok := err.(*os.PathError)
-		if !ok {
+		var perr *fs.PathError
+		if !errors.As(err, &perr) {
 			log.Fatal(err)
 		}
 		if perr.Err != os.ErrExist {

@@ -130,7 +130,7 @@ func (cl *Client) Authenticate(mech SaslMechanism, username, password string) (
 		initialResponse := base64.StdEncoding.EncodeToString(b)
 		cmd = []byte("AUTH PLAIN " + initialResponse + "\r\n")
 	default:
-		return nil, fmt.Errorf("client.Authenticate: unknown mechanism")
+		return nil, errors.New(`client.Authenticate: unknown mechanism`)
 	}
 
 	return cl.SendCommand(cmd)

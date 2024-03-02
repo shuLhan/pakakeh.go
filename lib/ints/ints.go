@@ -282,9 +282,7 @@ func Swap(d []int, x, y int) {
 	if x == y || len(d) <= 1 || x > len(d) || y > len(d) {
 		return
 	}
-	tmp := d[x]
-	d[x] = d[y]
-	d[y] = tmp
+	d[x], d[y] = d[y], d[x]
 }
 
 // To64 convert slice of integer to 64 bit values.

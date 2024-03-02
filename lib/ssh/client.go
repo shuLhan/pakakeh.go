@@ -293,9 +293,11 @@ func (cl *Client) Close() (err error) {
 
 // Execute a command on remote server.
 func (cl *Client) Execute(ctx context.Context, cmd string) (err error) {
-	sess, err := cl.Client.NewSession()
+	var sess *ssh.Session
+
+	sess, err = cl.Client.NewSession()
 	if err != nil {
-		return fmt.Errorf("ssh: NewSession: " + err.Error())
+		return fmt.Errorf(`ssh: NewSession: %w`, err)
 	}
 
 	sess.Stdout = cl.stdout

@@ -7,6 +7,7 @@ package email
 import (
 	"bytes"
 	"crypto/rsa"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -88,7 +89,7 @@ func NewMultipart(from, to, subject, bodyText, bodyHTML []byte) (
 func ParseFile(inFile string) (msg *Message, rest []byte, err error) {
 	raw, err := os.ReadFile(inFile)
 	if err != nil {
-		return nil, nil, fmt.Errorf("email: " + err.Error())
+		return nil, nil, fmt.Errorf(`email: %w`, err)
 	}
 
 	return ParseMessage(raw)
@@ -162,10 +163,10 @@ func (msg *Message) addMailboxes(ft FieldType, mailboxes []byte) error {
 // already encoded.
 func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error) {
 	if pk == nil {
-		return fmt.Errorf("email: empty private key for signing")
+		return errors.New(`email: empty private key for signing`)
 	}
 	if sig == nil {
-		return fmt.Errorf("email: empty signature for signing")
+		return errors.New(`email: empty signature for signing`)
 	}
 
 	sig.SetDefault()
@@ -260,7 +261,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	from := subHeader.Filter(FieldTypeFrom)
 	if len(from) == 0 {
 		msg.dkimStatus.Type = dkim.StatusPermFail
-		msg.dkimStatus.Error = fmt.Errorf("email: missing 'From' field")
+		msg.dkimStatus.Error = errors.New(`email: missing 'From' field`)
 		return msg.dkimStatus, msg.dkimStatus.Error
 	}
 
@@ -283,7 +284,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	_, bh64 := sig.Hash(canonBody)
 
 	if !bytes.Equal(sig.BodyHash, bh64) {
-		err = fmt.Errorf("email: body hash did not verify")
+		err = errors.New(`email: body hash did not verify`)
 		msg.dkimStatus.Type = dkim.StatusPermFail
 		msg.dkimStatus.Error = err
 		return nil, err

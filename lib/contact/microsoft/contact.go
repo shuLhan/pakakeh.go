@@ -12,14 +12,16 @@ import (
 //
 // Some of the fields are disabled for speed up.
 type Contact struct {
-	//ETag string `json:"@odata.etag,omitempty"`
-	//Id   string `json:"id,omitempty"`
-	//Created string `json:"createdDateTime,omitempty"`
-	//LastModified string `json:"lastModifiedDateTime,omitempty"`
-	//ChangeKey string `json:"changeKey,omitempty"`
-	//Categories []string `json:"categories,omitempty"`
-	//ParentFolderID string `json:"parentFolderId,omitempty"`
-	//FileAs string `json:"fileAs,omitempty"`
+	// Ignored fields for speedup.
+
+	// ETag string `json:"@odata.etag,omitempty"`
+	// Id   string `json:"id,omitempty"`
+	// Created string `json:"createdDateTime,omitempty"`
+	// LastModified string `json:"lastModifiedDateTime,omitempty"`
+	// ChangeKey string `json:"changeKey,omitempty"`
+	// Categories []string `json:"categories,omitempty"`
+	// ParentFolderID string `json:"parentFolderId,omitempty"`
+	// FileAs string `json:"fileAs,omitempty"`
 
 	Birthday string `json:"birthday,omitempty"`
 
@@ -32,9 +34,11 @@ type Contact struct {
 	Title       string `json:"title,omitempty"`
 	Generation  string `json:"generation,omitempty"`
 
-	//YomiGivenName string `json:"yomiGivenName,omitempty"`
-	//YomiSurname string `json:"yomiSurname,omitempty"`
-	//YomiCompanyName string `json:"yomiCompanyName,omitempty"`
+	// Ignored fields for speedup.
+
+	// YomiGivenName string `json:"yomiGivenName,omitempty"`
+	// YomiSurname string `json:"yomiSurname,omitempty"`
+	// YomiCompanyName string `json:"yomiCompanyName,omitempty"`
 
 	JobTitle         string `json:"jobTitle,omitempty"`
 	Company          string `json:"companyName,omitempty"`

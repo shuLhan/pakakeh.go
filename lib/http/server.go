@@ -100,12 +100,12 @@ func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 		return nil
 	}
 	if ep.Call == nil {
-		return fmt.Errorf("http.RegisterEndpoint: empty Call field")
+		return errors.New(`http.RegisterEndpoint: empty Call field`)
 	}
 
 	switch ep.Method {
 	case RequestMethodConnect:
-		return fmt.Errorf("http.RegisterEndpoint: can't handle CONNECT method yet")
+		return errors.New(`http.RegisterEndpoint: can't handle CONNECT method yet`)
 	case RequestMethodDelete:
 		err = srv.registerDelete(ep)
 	case RequestMethodHead:
@@ -119,7 +119,7 @@ func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 	case RequestMethodPut:
 		err = srv.registerPut(ep)
 	case RequestMethodTrace:
-		return fmt.Errorf("http.RegisterEndpoint: can't handle TRACE method yet")
+		return errors.New(`http.RegisterEndpoint: can't handle TRACE method yet`)
 	default:
 		ep.Method = RequestMethodGet
 		err = srv.registerGet(ep)

@@ -284,7 +284,7 @@ func unpackDomainName(packet []byte, start uint) (name string, end uint, err err
 			x++
 		}
 		if !isJump {
-			end = end + uint(count)
+			end += uint(count)
 		}
 	}
 	return out.String(), end, nil

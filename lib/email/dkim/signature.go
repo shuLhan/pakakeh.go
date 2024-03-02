@@ -269,7 +269,7 @@ func (sig *Signature) SetDefault() {
 // key and store the base64 result in Signature.Value ("b=").
 func (sig *Signature) Sign(pk *rsa.PrivateKey, hashHeader []byte) (err error) {
 	if pk == nil {
-		return fmt.Errorf("email/dkim: empty private key for signing")
+		return errors.New(`email/dkim: empty private key for signing`)
 	}
 
 	cryptoHash := crypto.SHA256
@@ -360,10 +360,10 @@ func (sig *Signature) Validate() (err error) {
 // hash of message header.
 func (sig *Signature) Verify(key *Key, headerHash []byte) (err error) {
 	if key == nil {
-		return fmt.Errorf("email/dkim: key record is empty")
+		return errors.New(`email/dkim: key record is empty`)
 	}
 	if key.RSA == nil {
-		return fmt.Errorf("email/dkim: public key is empty")
+		return errors.New(`email/dkim: public key is empty`)
 	}
 
 	sigValue := make([]byte, base64.StdEncoding.DecodedLen(len(sig.Value)))

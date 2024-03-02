@@ -252,12 +252,10 @@ func (zone *Zone) Remove(rr *ResourceRecord) (err error) {
 
 	if rr.Type == RecordTypeSOA {
 		zone.SOA = NewRDataSOA(zone.Origin, ``)
-	} else {
-		if zone.recordRemove(rr) {
-			err = zone.Save()
-			if err != nil {
-				return fmt.Errorf(`%s: %w`, logp, err)
-			}
+	} else if zone.recordRemove(rr) {
+		err = zone.Save()
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 	zone.onUpdate()

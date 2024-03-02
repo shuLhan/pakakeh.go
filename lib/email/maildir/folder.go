@@ -188,19 +188,19 @@ func (folder *Folder) initDirs() (err error) {
 	folder.dirCur = filepath.Join(folder.dir, maildirCur)
 	err = os.Mkdir(folder.dirCur, 0700)
 	if err != nil && !errors.Is(err, os.ErrExist) {
-		return fmt.Errorf(`%s: %s`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	folder.dirNew = filepath.Join(folder.dir, maildirNew)
 	err = os.Mkdir(folder.dirNew, 0700)
 	if err != nil && !errors.Is(err, os.ErrExist) {
-		return fmt.Errorf(`%s: %s`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	folder.dirTmp = filepath.Join(folder.dir, maildirTmp)
 	err = os.Mkdir(folder.dirTmp, 0700)
 	if err != nil && !errors.Is(err, os.ErrExist) {
-		return fmt.Errorf(`%s: %s`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -229,16 +229,16 @@ func checkDir(dir string) (err error) {
 func sanitizeFolderName(name string) (out string, err error) {
 	out = strings.TrimSpace(name)
 	if len(out) == 0 {
-		return ``, fmt.Errorf(`folder name is empty`)
+		return ``, errors.New(`folder name is empty`)
 	}
 	if len(out) == 1 && out[0] == '.' {
-		return ``, fmt.Errorf(`folder name is empty`)
+		return ``, errors.New(`folder name is empty`)
 	}
 	if out[0] != '.' {
-		return ``, fmt.Errorf(`folder name must begin with period`)
+		return ``, errors.New(`folder name must begin with period`)
 	}
 	if out[1] == '.' {
-		return ``, fmt.Errorf(`folder name must not begin with ".."`)
+		return ``, errors.New(`folder name must not begin with ".."`)
 	}
 	var r rune
 	for _, r = range out {
@@ -246,7 +246,7 @@ func sanitizeFolderName(name string) (out string, err error) {
 			return ``, fmt.Errorf(`folder name contains unprintable character %q`, r)
 		}
 		if r == '/' {
-			return ``, fmt.Errorf(`folder name must not contains slash '/'`)
+			return ``, errors.New(`folder name must not contains slash '/'`)
 		}
 	}
 	return out, nil

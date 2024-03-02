@@ -447,7 +447,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRe
 		case flagRRType:
 			err = m.parseRRData(rr, orgtok, c)
 			if err != nil {
-				return nil, fmt.Errorf(`%s: line %d: %s`, logp, m.lineno, err)
+				return nil, fmt.Errorf(`%s: line %d: %w`, logp, m.lineno, err)
 			}
 			flag = flagRREnd
 		}

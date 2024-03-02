@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"sync"
@@ -78,10 +79,10 @@ func (cl *UDPClient) Close() error {
 // or no connection, or Name is empty.
 func (cl *UDPClient) Lookup(q MessageQuestion, allowRecursion bool) (msg *Message, err error) {
 	if cl.addr == nil || cl.conn == nil {
-		return nil, fmt.Errorf("Lookup: no name server or active connection")
+		return nil, errors.New(`Lookup: no name server or active connection`)
 	}
 	if len(q.Name) == 0 {
-		return nil, fmt.Errorf("Lookup: empty question name")
+		return nil, errors.New(`Lookup: empty question name`)
 	}
 	if q.Type == 0 {
 		q.Type = RecordTypeA

@@ -36,7 +36,7 @@ type Metadata struct {
 	ValueSpace []string `json:"ValueSpace"`
 
 	// T type of column in integer.
-	T int
+	T int `json:"T"`
 
 	// Skip, if its true this column will be ignored, not saved in reader
 	// object. Default to false.

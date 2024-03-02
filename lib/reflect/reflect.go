@@ -60,10 +60,14 @@ func IsEqual(x, y interface{}) bool {
 // or slice and its value is `nil`; otherwise it will return false.
 func IsNil(v interface{}) bool {
 	var val = reflect.ValueOf(v)
+	var kind = val.Kind()
 
-	switch val.Kind() {
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map,
-		reflect.Ptr, reflect.Slice:
+	if kind == reflect.Chan ||
+		kind == reflect.Func ||
+		kind == reflect.Interface ||
+		kind == reflect.Map ||
+		kind == reflect.Ptr ||
+		kind == reflect.Slice {
 		return val.IsNil()
 	}
 	return v == nil
@@ -188,14 +192,17 @@ func Set(obj reflect.Value, val string) (err error) {
 		}
 	}
 
-	switch objKind {
-	case reflect.Invalid:
+	if objKind == reflect.Invalid {
 		return fmt.Errorf("%s: object %T is invalid", logp, obj)
-
-	case reflect.Array, reflect.Chan, reflect.Func, reflect.Map, reflect.UnsafePointer:
+	}
+	if objKind == reflect.Array ||
+		objKind == reflect.Chan ||
+		objKind == reflect.Func ||
+		objKind == reflect.Map ||
+		objKind == reflect.UnsafePointer {
 		return fmt.Errorf("%s: object %T is not setable", logp, obj.Interface())
-
-	case reflect.Slice:
+	}
+	if objKind == reflect.Slice {
 		objType = objType.Elem()
 		objKind = objType.Kind()
 		if objKind == reflect.Uint8 {
@@ -210,12 +217,12 @@ func Set(obj reflect.Value, val string) (err error) {
 			}
 			objValue.Elem().Set(obj)
 		}
+		return nil
+	}
 
-	default:
-		err = setValue(objValue, val)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
+	err = setValue(objValue, val)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 	return nil
 }
@@ -385,7 +392,10 @@ func setValue(obj reflect.Value, val string) (err error) {
 		}
 		return nil
 
-	default:
+	case reflect.Invalid, reflect.Uintptr,
+		reflect.Complex64, reflect.Complex128,
+		reflect.Array, reflect.Chan, reflect.Func, reflect.Map,
+		reflect.Pointer, reflect.UnsafePointer:
 		return fmt.Errorf("cannot convert %s to %s", val, objType)
 	}
 
@@ -586,6 +596,12 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 	}
 
 	switch k1 {
+	case reflect.Invalid:
+		if k2 == reflect.Invalid {
+			return nil
+		}
+		return fmt.Errorf("expecting %s(%v), got %s(%v)", name1, k1, name2, k2)
+
 	case reflect.Bool:
 		if v1.Bool() == v2.Bool() {
 			return nil
@@ -623,7 +639,7 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 		for x = 0; x < v1.Len(); x++ {
 			err = doEqual(v1.Index(x), v2.Index(x))
 			if err != nil {
-				return fmt.Errorf("%s[%d]: %s", name1, x, err)
+				return fmt.Errorf(`%s[%d]: %w`, name1, x, err)
 			}
 		}
 		return nil
@@ -694,7 +710,7 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 			s2 = v2.Index(x)
 			err = doEqual(s1, s2)
 			if err != nil {
-				return fmt.Errorf("%s[%d]: %s", name1, x, err)
+				return fmt.Errorf(`%s[%d]: %w`, name1, x, err)
 			}
 		}
 		return nil
@@ -741,7 +757,7 @@ func doEqualMap(v1, v2 reflect.Value) (err error) {
 		name = tipe.Name()
 		err = doEqual(v1.MapIndex(keys[x]), v2.MapIndex(keys[x]))
 		if err != nil {
-			return fmt.Errorf("Map[%s(%v)] %s", name, keys[x].Interface(), err)
+			return fmt.Errorf(`Map[%s(%v)] %w`, name, keys[x].Interface(), err)
 		}
 	}
 	return nil
@@ -792,7 +808,7 @@ func doEqualStruct(v1, v2 reflect.Value) (err error) {
 
 		err = doEqual(f1, f2)
 		if err != nil {
-			return fmt.Errorf("%s.%s: %s", v1Name, f1Name, err)
+			return fmt.Errorf(`%s.%s: %w`, v1Name, f1Name, err)
 		}
 	}
 	return nil

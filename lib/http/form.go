@@ -190,10 +190,8 @@ func UnmarshalForm(in url.Values, out interface{}) (err error) {
 		} else {
 			vout = vout.Elem()
 		}
-	} else {
-		if rkind != reflect.Struct {
-			return fmt.Errorf("%s: expecting *T or **T got %T", logp, out)
-		}
+	} else if rkind != reflect.Struct {
+		return fmt.Errorf(`%s: expecting *T or **T got %T`, logp, out)
 	}
 
 	listFields = reflect.VisibleFields(rtype)

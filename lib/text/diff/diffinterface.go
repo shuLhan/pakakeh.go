@@ -6,6 +6,7 @@ package diff
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"os"
 
@@ -47,7 +48,7 @@ func ReadLines(f string) (lines text.Lines, e error) {
 	for {
 		line, e = reader.ReadBytes(DefDelimiter)
 		if e != nil {
-			if e == io.EOF {
+			if errors.Is(e, io.EOF) {
 				break
 			}
 			return lines, e

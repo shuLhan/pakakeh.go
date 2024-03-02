@@ -34,22 +34,23 @@ func ExampleParse() {
 			fmt.Printf("\t%s\n", node.Data)
 		}
 	}
-	//Output:
-	//html
-	//head
-	//body
-	//ul
-	//li
-	//b
-	//	item
-	//b
-	//span
-	//	one
-	//span
-	//li
-	//ul
-	//body
-	//html
+
+	// Output:
+	// html
+	// head
+	// body
+	// ul
+	// li
+	// b
+	// 	item
+	// b
+	// span
+	// 	one
+	// span
+	// li
+	// ul
+	// body
+	// html
 }
 
 func ExampleNodeIterator_SetNext() {
@@ -82,13 +83,14 @@ func ExampleNodeIterator_SetNext() {
 			fmt.Printf("\t%s\n", node.Data)
 		}
 	}
-	//Output:
-	//html
-	//head
-	//body
-	//h2
-	//	Jump here
-	//h2
-	//body
-	//html
+
+	// Output:
+	// html
+	// head
+	// body
+	// h2
+	// 	Jump here
+	// h2
+	// body
+	// html
 }
