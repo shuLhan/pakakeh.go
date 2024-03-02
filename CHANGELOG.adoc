@@ -20,6 +20,51 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for share module since v0.1.0 until v0.11.0.
 
 
+[#v0_53_1]
+== share v0.53.1 (2024-03-02)
+
+[#v0_53_1__enhancements]
+=== Enhancements
+
+lib/sql: handle binding with the same name::
++
+If [Meta.Bind] is called with the same name again, it should replace
+the existing named value.
+
+
+lib/dns: ignore invalid message::
++
+--
+If Query return a message but the failed to unpack due to invalid
+format, for example
+
+      unpackOPT: data length is out of range
+
+ignore it instead of disconnect the client connection.
+--
+
+
+lib/http: export function to generate "multipart/form-data"::
++
+The GenerateFormData generate the request body with boundary for
+HTTP content-type "multipart/form-data" from map[string][]byte.
+
+
+lib/dns: change the log mechanism by mode instead of by level::
++
+--
+This changes introduce three mode of debug:
+
+* DebugLevelDNS: log error on DNS level, in example empty answer,
+  ERR_NAME (domain name is invalid or not known) and so on.
+
+* DebugLevelCache: log cache operations.
+
+* DebugLevelConnPacket: log low level connection and package,
+  including request and response.
+--
+
+
 [#v0_53_0]
 == share v0.53.0 (2024-02-04)
 
