@@ -9,17 +9,17 @@ import (
 
 func TestMetaBind(t *testing.T) {
 	type bindCase struct {
-		name string
 		val  any
+		name string
 	}
 	type testCase struct {
 		desc         string
 		driver       string
-		kind         DMLKind
-		bind         []bindCase
 		expListName  string
 		expListValue string
 		expIndex     string
+		kind         DMLKind
+		bind         []bindCase
 		expNholder   int
 	}
 
