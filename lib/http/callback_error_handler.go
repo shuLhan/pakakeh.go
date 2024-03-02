@@ -44,14 +44,14 @@ func DefaultErrorHandler(epr *EndpointRequest) {
 			errInternal.Code = http.StatusInternalServerError
 		}
 	} else {
-		mlog.Errf("%s: %s %s: %s", logp, epr.HttpRequest.Method,
-			epr.HttpRequest.URL.Path, epr.Error)
+		mlog.Errf(`%s: %s %s: %s`, logp, epr.HTTPRequest.Method,
+			epr.HTTPRequest.URL.Path, epr.Error)
 
 		errInternal = liberrors.Internal(epr.Error)
 	}
 
-	epr.HttpWriter.Header().Set(HeaderContentType, ContentTypeJSON)
-	epr.HttpWriter.WriteHeader(errInternal.Code)
+	epr.HTTPWriter.Header().Set(HeaderContentType, ContentTypeJSON)
+	epr.HTTPWriter.WriteHeader(errInternal.Code)
 
 	jsonb, err = json.Marshal(errInternal)
 	if err != nil {
@@ -59,7 +59,7 @@ func DefaultErrorHandler(epr *EndpointRequest) {
 		return
 	}
 
-	_, err = epr.HttpWriter.Write(jsonb)
+	_, err = epr.HTTPWriter.Write(jsonb)
 	if err != nil {
 		mlog.Errf("%s: Write: %s", logp, err)
 	}

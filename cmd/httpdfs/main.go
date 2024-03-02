@@ -11,8 +11,9 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
@@ -47,7 +48,7 @@ func main() {
 		os.Exit(0)
 	}
 	if flagVersion {
-		fmt.Println(share.Version)
+		fmt.Println(pakakeh.Version)
 		os.Exit(0)
 	}
 
@@ -84,7 +85,7 @@ func main() {
 		serverOpts = libhttp.ServerOptions{
 			Memfs:           mfs,
 			Address:         flagAddress,
-			EnableIndexHtml: true,
+			EnableIndexHTML: true,
 		}
 		httpd *libhttp.Server
 	)
@@ -95,7 +96,7 @@ func main() {
 	}
 
 	var signalq = make(chan os.Signal, 1)
-	signal.Notify(signalq, os.Interrupt, os.Kill)
+	signal.Notify(signalq, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		log.Printf(`%s: serving %q at http://%s`, cmdName, dirBase, flagAddress)

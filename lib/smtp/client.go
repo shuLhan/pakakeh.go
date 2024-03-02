@@ -59,7 +59,7 @@ func NewClient(opts ClientOptions) (cl *Client, err error) {
 		port uint16
 	)
 
-	rurl, err = url.Parse(opts.ServerUrl)
+	rurl, err = url.Parse(opts.ServerURL)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

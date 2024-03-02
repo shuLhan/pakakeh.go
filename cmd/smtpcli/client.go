@@ -30,7 +30,7 @@ type client struct {
 func newClient(remoteURL string) (cli *client, err error) {
 	var (
 		clientOpts = smtp.ClientOptions{
-			ServerUrl: remoteURL,
+			ServerURL: remoteURL,
 		}
 	)
 

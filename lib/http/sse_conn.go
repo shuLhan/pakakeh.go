@@ -25,7 +25,7 @@ type SSECallback func(sse *SSEConn)
 
 // SSEConn define the connection when the SSE request accepted by server.
 type SSEConn struct {
-	HttpRequest *http.Request //revive:disable-line
+	HTTPRequest *http.Request
 
 	bufrw *bufio.ReadWriter
 	conn  net.Conn
@@ -102,7 +102,7 @@ func (ep *SSEConn) workerKeepAlive(interval time.Duration) {
 
 		err error
 	)
-	for _ = range ticker.C {
+	for range ticker.C {
 		err = ep.WriteRaw(emptyMsg)
 		if err != nil {
 			// Write failed, probably connection has been
@@ -134,9 +134,18 @@ func (ep *SSEConn) writeData(buf *bytes.Buffer, data string, id *string) {
 // handshake write the last HTTP response to indicate the connection is
 // accepted.
 func (ep *SSEConn) handshake() {
-	ep.bufrw.WriteString("HTTP/1.1 200 OK\r\n")
-	ep.bufrw.WriteString("content-type: text/event-stream\r\n")
-	ep.bufrw.WriteString("cache-control: no-cache\r\n")
-	ep.bufrw.WriteString("\r\n")
-	ep.bufrw.Flush()
+	var (
+		bb  bytes.Buffer
+		err error
+	)
+
+	bb.WriteString("HTTP/1.1 200 OK\r\n")
+	bb.WriteString("content-type: text/event-stream\r\n")
+	bb.WriteString("cache-control: no-cache\r\n")
+	bb.WriteString("\r\n")
+
+	_, err = ep.bufrw.Write(bb.Bytes())
+	if err == nil {
+		ep.bufrw.Flush()
+	}
 }

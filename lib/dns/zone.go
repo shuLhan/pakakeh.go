@@ -119,7 +119,7 @@ func ParseZone(content []byte, origin string, ttl uint32) (zone *Zone, err error
 	)
 
 	if ttl <= 0 {
-		ttl = DefaultSoaMinimumTtl
+		ttl = DefaultSoaMinimumTTL
 	}
 
 	zone = NewZone(``, origin)

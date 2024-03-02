@@ -245,8 +245,8 @@ func (fa *FileAttrs) SetSize(v uint64) {
 	fa.size = v
 }
 
-// SetUid set the file attribute user ID.
-func (fa *FileAttrs) SetUid(uid uint32) { //revive:disable-line
+// SetUID set the file attribute user ID.
+func (fa *FileAttrs) SetUID(uid uint32) {
 	fa.flags |= attrUIDGID
 	fa.uid = uid
 }
@@ -262,8 +262,8 @@ func (fa *FileAttrs) Sys() interface{} {
 	return fa
 }
 
-// Uid return the user ID of file.
-func (fa *FileAttrs) Uid() uint32 { //revive:disable-line
+// UID return the user ID of file.
+func (fa *FileAttrs) UID() uint32 {
 	return fa.uid
 }
 

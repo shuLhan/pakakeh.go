@@ -53,7 +53,7 @@ func ExampleServer_customHTTPStatusCode() {
 		Call: func(epr *EndpointRequest) (
 			resbody []byte, err error,
 		) {
-			epr.HttpWriter.WriteHeader(exp.Status)
+			epr.HTTPWriter.WriteHeader(exp.Status)
 			return json.Marshal(exp)
 		},
 	}
@@ -67,7 +67,7 @@ func ExampleServer_customHTTPStatusCode() {
 	time.Sleep(1 * time.Second)
 
 	clientOpts := &ClientOptions{
-		ServerUrl: "http://127.0.0.1:8123",
+		ServerURL: `http://127.0.0.1:8123`,
 	}
 	client := NewClient(clientOpts)
 

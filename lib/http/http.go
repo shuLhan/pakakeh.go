@@ -304,7 +304,7 @@ const (
 	HeaderSetCookie          = `Set-Cookie`
 	HeaderUserAgent          = `User-Agent`
 	HeaderXForwardedFor      = `X-Forwarded-For` // https://en.wikipedia.org/wiki/X-Forwarded-For
-	HeaderXRealIp            = `X-Real-Ip`       //revive:disable-line
+	HeaderXRealIP            = `X-Real-Ip`
 )
 
 var (
@@ -322,7 +322,7 @@ var (
 // "X-Real-IP" or "X-Forwarded-For", which ever non-empty first.
 // If no headers present, use the default address.
 func IPAddressOfRequest(headers http.Header, defAddr string) (addr string) {
-	addr = headers.Get(HeaderXRealIp)
+	addr = headers.Get(HeaderXRealIP)
 	if len(addr) == 0 {
 		addr, _ = ParseXForwardedFor(headers.Get(HeaderXForwardedFor))
 		if len(addr) == 0 {

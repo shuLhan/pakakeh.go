@@ -113,7 +113,7 @@ func (ep *SSEEndpoint) hijack(res http.ResponseWriter, req *http.Request) (sseco
 	}
 
 	sseconn = &SSEConn{
-		HttpRequest: req,
+		HTTPRequest: req,
 	}
 
 	sseconn.conn, sseconn.bufrw, err = hijack.Hijack()

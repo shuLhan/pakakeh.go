@@ -337,6 +337,7 @@ func (cl *Client) MkdirAll(dir string, fa *FileAttrs) (err error) {
 				continue
 			}
 			lastErr = handleStatusCode(res.code, res.message)
+			break
 		}
 		// Reset last error if its success.
 		lastErr = nil

@@ -101,7 +101,7 @@ func testRunServer() {
 func testNewClient(withAuth bool) (cl *Client) {
 	var (
 		opts = ClientOptions{
-			ServerUrl: testSMTPSAddress,
+			ServerURL: testSMTPSAddress,
 			Insecure:  true,
 		}
 

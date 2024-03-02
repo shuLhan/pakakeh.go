@@ -910,7 +910,7 @@ func TestServer_Options_HandleFS(t *testing.T) {
 func TestServer_handleRange(t *testing.T) {
 	var (
 		clOpts = &ClientOptions{
-			ServerUrl: testServerURL,
+			ServerURL: testServerURL,
 		}
 		cl          = NewClient(clOpts)
 		skipHeaders = []string{HeaderDate, HeaderETag}
@@ -986,7 +986,7 @@ func TestServer_handleRange(t *testing.T) {
 func TestServer_handleRange_HEAD(t *testing.T) {
 	var (
 		clOpts = &ClientOptions{
-			ServerUrl: testServerURL,
+			ServerURL: testServerURL,
 		}
 		cl = NewClient(clOpts)
 
@@ -1055,7 +1055,12 @@ func TestServerHandleRangeBig(t *testing.T) {
 	)
 
 	srv = runServerFS(t, serverAddress, tempDir)
-	defer srv.Stop(100 * time.Millisecond)
+	defer func() {
+		var errStop = srv.Stop(100 * time.Millisecond)
+		if errStop != nil {
+			log.Fatal(errStop)
+		}
+	}()
 
 	var (
 		tdata *test.Data
@@ -1069,7 +1074,7 @@ func TestServerHandleRangeBig(t *testing.T) {
 
 	var (
 		clOpts = &ClientOptions{
-			ServerUrl: `http://` + serverAddress,
+			ServerURL: `http://` + serverAddress,
 		}
 		cl *Client
 	)

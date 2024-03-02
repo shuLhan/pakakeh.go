@@ -17,11 +17,11 @@ type ClientOptions struct {
 	// This field is optional.
 	Headers http.Header
 
-	// ServerUrl define the server address without path, for example
+	// ServerURL define the server address without path, for example
 	// "https://example.com" or "http://10.148.0.12:8080".
 	// This value should not changed during call of client's method.
 	// This field is required.
-	ServerUrl string //revive:disable-line
+	ServerURL string
 
 	// Timeout affect the http Transport Timeout and TLSHandshakeTimeout.
 	// This field is optional, if not set it will set to 10 seconds.
@@ -40,5 +40,5 @@ func (opts *ClientOptions) init() {
 	if opts.Timeout <= 0 {
 		opts.Timeout = defClientTimeout
 	}
-	opts.ServerUrl = strings.TrimSuffix(opts.ServerUrl, `/`)
+	opts.ServerURL = strings.TrimSuffix(opts.ServerURL, `/`)
 }

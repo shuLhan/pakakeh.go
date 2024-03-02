@@ -77,8 +77,8 @@ func (ep *Endpoint) call(
 		logp = "Endpoint.call"
 		epr  = &EndpointRequest{
 			Endpoint:    ep,
-			HttpWriter:  res,
-			HttpRequest: req,
+			HTTPWriter:  res,
+			HTTPRequest: req,
 		}
 		responseBody []byte
 		e            error

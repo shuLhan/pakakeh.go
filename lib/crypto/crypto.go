@@ -249,7 +249,9 @@ func readPassTerm(termrw io.ReadWriter, file string) (pass string, err error) {
 		if err != nil {
 			return ``, fmt.Errorf(`MakeRaw: %w`, err)
 		}
-		defer term.Restore(stdin, oldState)
+		defer func() {
+			_ = term.Restore(stdin, oldState)
+		}()
 
 		termrw = os.Stdin
 	}

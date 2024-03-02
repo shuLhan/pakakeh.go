@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"unicode"
 
@@ -80,27 +79,6 @@ func (reader *reader) reset(src []byte) {
 	}
 	reader.buf.Reset()
 	reader.bufFormat.Reset()
-}
-
-// parseFile will open, read, and parse INI file `filename` and return an
-// instance of Ini.
-//
-// On failure, it return nil and error.
-func (reader *reader) parseFile(filename string) (in *Ini, err error) {
-	var (
-		src []byte
-	)
-
-	src, err = os.ReadFile(filename)
-	if err != nil {
-		return
-	}
-
-	reader.filename = filename
-
-	in, err = reader.Parse(src)
-
-	return
 }
 
 // Parse will parse INI config from slice of bytes `src` into `in`.

@@ -50,7 +50,7 @@ func Open(filename string) (in *Ini, err error) {
 
 		// Create the file if not exist.
 
-		f, err = os.Create(filename)
+		_, err = os.Create(filename)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}

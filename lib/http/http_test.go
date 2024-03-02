@@ -33,9 +33,9 @@ var (
 	}
 
 	cbPlain = func(epr *EndpointRequest) (resBody []byte, e error) {
-		s := fmt.Sprintf("%s\n", epr.HttpRequest.Form)
-		s += fmt.Sprintf("%s\n", epr.HttpRequest.PostForm)
-		s += fmt.Sprintf("%v\n", epr.HttpRequest.MultipartForm)
+		var s = fmt.Sprintf("%s\n", epr.HTTPRequest.Form)
+		s += fmt.Sprintf("%s\n", epr.HTTPRequest.PostForm)
+		s += fmt.Sprintf("%v\n", epr.HTTPRequest.MultipartForm)
 		s += string(epr.RequestBody)
 		return []byte(s), nil
 	}
@@ -45,7 +45,7 @@ var (
 "form": "%s",
 "multipartForm": "%v",
 "body": %q
-}`, epr.HttpRequest.Form, epr.HttpRequest.MultipartForm, epr.RequestBody)
+}`, epr.HTTPRequest.Form, epr.HTTPRequest.MultipartForm, epr.RequestBody)
 		return []byte(s), nil
 	}
 )
@@ -153,7 +153,7 @@ func registerEndpoints() {
 		Path:         "/redirect/download",
 		ResponseType: ResponseTypePlain,
 		Call: func(epr *EndpointRequest) ([]byte, error) {
-			http.Redirect(epr.HttpWriter, epr.HttpRequest, "/download", http.StatusFound)
+			http.Redirect(epr.HTTPWriter, epr.HTTPRequest, `/download`, http.StatusFound)
 			return nil, nil
 		},
 	})

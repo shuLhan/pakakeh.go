@@ -151,12 +151,10 @@ func (node *Node) Close() error {
 	return nil
 }
 
-// GenerateIndexHtml generate simple directory listing as HTML for all childs
-// in this node.
+// GenerateIndexHTML generate simple directory listing as HTML for all
+// childs in this node.
 // This method is only applicable if node is a directory.
-//
-//revive:disable-next-line
-func (node *Node) GenerateIndexHtml() {
+func (node *Node) GenerateIndexHTML() {
 	if !node.IsDir() {
 		return
 	}

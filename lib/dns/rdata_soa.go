@@ -14,8 +14,7 @@ const (
 	DefaultSoaRefresh int32  = 1 * 24 * 60 * 60 // 1 Day.
 	DefaultSoaRetry   int32  = 1 * 60 * 60      // 1 Hour.
 
-	//revive:disable-next-line
-	DefaultSoaMinimumTtl uint32 = 1 * 60 * 60 // 1 Hour.
+	DefaultSoaMinimumTTL uint32 = 1 * 60 * 60 // 1 Hour.
 )
 
 // RDataSOA contains the authority of zone.
@@ -86,6 +85,6 @@ func (soa *RDataSOA) init() {
 		soa.Retry = DefaultSoaRetry
 	}
 	if soa.Minimum == 0 {
-		soa.Minimum = DefaultSoaMinimumTtl
+		soa.Minimum = DefaultSoaMinimumTTL
 	}
 }

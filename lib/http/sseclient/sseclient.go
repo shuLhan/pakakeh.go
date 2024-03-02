@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
@@ -180,7 +180,7 @@ func (cl *Client) init(header http.Header) (err error) {
 		cl.header = http.Header{}
 	}
 	cl.header.Set(libhttp.HeaderHost, cl.serverURL.Host)
-	cl.header.Set(libhttp.HeaderUserAgent, `libhttp/`+share.Version)
+	cl.header.Set(libhttp.HeaderUserAgent, `libhttp/`+pakakeh.Version)
 	cl.header.Set(libhttp.HeaderAccept, libhttp.ContentTypeEventStream)
 
 	if cl.Timeout <= 0 {
@@ -245,6 +245,7 @@ func (cl *Client) handshake() (packet []byte, err error) {
 }
 
 func (cl *Client) handshakeRequest() (err error) {
+	var logp = `handshakeRequest`
 	var buf bytes.Buffer
 
 	fmt.Fprintf(&buf, `GET %s`, cl.serverURL.Path)
@@ -281,7 +282,10 @@ func (cl *Client) handshakeRequest() (err error) {
 
 	var deadline = time.Now().Add(cl.Timeout)
 
-	cl.conn.SetWriteDeadline(deadline)
+	err = cl.conn.SetWriteDeadline(deadline)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
 
 	var (
 		buflen = buf.Len()

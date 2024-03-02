@@ -6,6 +6,7 @@ package config
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -53,6 +54,7 @@ func newMatchCriteria(name, arg string) (criteria *matchCriteria, err error) {
 
 // MarshalText encode the criteria back to ssh_config format.
 func (mcriteria *matchCriteria) MarshalText() (text []byte, err error) {
+	var logp = `MarshalText`
 	var buf bytes.Buffer
 
 	if mcriteria.isNegate {
@@ -70,7 +72,10 @@ func (mcriteria *matchCriteria) MarshalText() (text []byte, err error) {
 		} else {
 			buf.WriteByte(',')
 		}
-		pat.WriteTo(&buf)
+		_, err = pat.WriteTo(&buf)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
 	return buf.Bytes(), nil

@@ -110,7 +110,10 @@ func TestConfigGet(t *testing.T) {
 	for _, c = range cases {
 		section = cfg.Get(c.name)
 		buf.Reset()
-		section.WriteTo(&buf)
+		_, err = section.WriteTo(&buf)
+		if err != nil {
+			t.Fatal(err)
+		}
 		test.Assert(t, c.name, c.exp, buf.String())
 	}
 }
@@ -149,7 +152,10 @@ func TestConfigMerge(t *testing.T) {
 		buf bytes.Buffer
 	)
 
-	gotSection.WriteTo(&buf)
+	_, err = gotSection.WriteTo(&buf)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	test.Assert(t, host, string(tdata.Output[host]), buf.String())
 }

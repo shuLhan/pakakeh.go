@@ -9,6 +9,6 @@ type Message struct {
 	Channel   string `json:"channel,omitempty"`
 	Username  string `json:"username,omitempty"`
 	IconEmoji string `json:"icon_emoji,omitempty"`
-	IconUrl   string `json:"icon_url,omitempty"` //revive:disable-line
+	IconURL   string `json:"icon_url,omitempty"`
 	Text      string `json:"text"`
 }

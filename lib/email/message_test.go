@@ -336,7 +336,7 @@ func TestMessage_packSingle(t *testing.T) {
 			}
 		}
 		if len(c.bodyHTML) > 0 {
-			err = msg.SetBodyHtml([]byte(c.bodyHTML))
+			err = msg.SetBodyHTML([]byte(c.bodyHTML))
 			if err != nil {
 				t.Fatal(err)
 			}

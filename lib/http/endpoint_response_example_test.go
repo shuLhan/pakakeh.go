@@ -36,7 +36,7 @@ func ExampleEndpointResponse() {
 		ResponseType: ResponseTypeJSON,
 		Call: func(epr *EndpointRequest) ([]byte, error) {
 			res := &EndpointResponse{}
-			id := epr.HttpRequest.Form.Get("id")
+			id := epr.HTTPRequest.Form.Get(`id`)
 			if len(id) == 0 {
 				res.E.Code = http.StatusBadRequest
 				res.E.Message = "empty parameter id"
@@ -68,7 +68,7 @@ func ExampleEndpointResponse() {
 	time.Sleep(1 * time.Second)
 
 	clientOpts := &ClientOptions{
-		ServerUrl: "http://127.0.0.1:7016",
+		ServerURL: `http://127.0.0.1:7016`,
 	}
 	cl := NewClient(clientOpts)
 	params := url.Values{}

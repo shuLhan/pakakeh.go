@@ -57,12 +57,6 @@ func TestEncryptOaep(t *testing.T) {
 	t.Logf(`max message size = public key size (%d) - 2*hash.Size (%d) - 2 = %d`,
 		rsapub.Size(), 2*hash.Size(), maxSize)
 
-	cipher, err = rsa.EncryptOAEP(hash, rand.Reader, rsapub, expPlain, nil)
-	if err != nil {
-		var expError = string(tdata.Output[`error_too_long`])
-		test.Assert(t, `rsa.EncryptOAEP`, expError, err.Error())
-	}
-
 	cipher, err = EncryptOaep(hash, rand.Reader, rsapub, expPlain, nil)
 	if err != nil {
 		t.Fatal(err)

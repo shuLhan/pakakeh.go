@@ -110,7 +110,7 @@ func New(opts Options) (bot *Bot, err error) {
 	}
 
 	clientOpts := &http.ClientOptions{
-		ServerUrl: defURL + opts.Token + "/",
+		ServerURL: defURL + opts.Token + `/`,
 	}
 	bot = &Bot{
 		opts:   opts,

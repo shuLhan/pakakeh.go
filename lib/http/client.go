@@ -25,11 +25,11 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 )
 
 var (
-	defUserAgent = `libhttp/` + share.Version
+	defUserAgent = `libhttp/` + pakakeh.Version
 )
 
 // Client is a wrapper for standard [http.Client] with simplified
@@ -174,7 +174,7 @@ out:
 	return res, err
 }
 
-// GenerateHttpRequest generate [http.Request] from method, rpath,
+// GenerateHTTPRequest generate [http.Request] from method, rpath,
 // rtype, hdr, and params.
 //
 // For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the params
@@ -193,9 +193,7 @@ out:
 //     body.
 //   - If rtype is [RequestTypeJSON] and params is not nil, the params
 //     will be encoded as JSON in body.
-//
-//revive:disable-next-line
-func (client *Client) GenerateHttpRequest(
+func (client *Client) GenerateHTTPRequest(
 	method RequestMethod,
 	rpath string,
 	rtype RequestType,
@@ -203,7 +201,7 @@ func (client *Client) GenerateHttpRequest(
 	params interface{},
 ) (req *http.Request, err error) {
 	var (
-		logp              = "GenerateHttpRequest"
+		logp              = `GenerateHTTPRequest`
 		paramsAsURLValues url.Values
 		isParamsURLValues bool
 		paramsAsJSON      []byte
@@ -264,7 +262,7 @@ func (client *Client) GenerateHttpRequest(
 	}
 
 	rpath = path.Join(`/`, rpath)
-	fullURL := client.opts.ServerUrl + rpath
+	var fullURL = client.opts.ServerURL + rpath
 
 	req, err = http.NewRequest(method.String(), fullURL, body)
 	if err != nil {
@@ -428,7 +426,7 @@ func (client *Client) doRequest(
 	res *http.Response, resBody []byte, err error,
 ) {
 	rpath = path.Join(`/`, rpath)
-	fullURL := client.opts.ServerUrl + rpath
+	var fullURL = client.opts.ServerURL + rpath
 
 	httpReq, err := http.NewRequest(httpMethod, fullURL, body)
 	if err != nil {

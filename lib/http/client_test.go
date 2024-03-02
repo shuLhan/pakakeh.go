@@ -16,7 +16,7 @@ func TestClient_Download(t *testing.T) {
 	var (
 		logp       = `Download`
 		clientOpts = ClientOptions{
-			ServerUrl: fmt.Sprintf("http://%s", testServer.Options.Address),
+			ServerURL: `http://` + testServer.Options.Address,
 		}
 		client = NewClient(&clientOpts)
 

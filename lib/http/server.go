@@ -337,8 +337,8 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 // with true will be returned.
 //
 // If the path is directory and does not contains index.html and
-// EnableIndexHtml is true, server will generate list of content for
-// index.html.
+// [ServerOptions.EnableIndexHTML] is true, server will generate list of
+// content for index.html.
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	var (
 		nodeIndexHTML *memfs.Node
@@ -375,11 +375,11 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 			return nodeIndexHTML, true
 		}
 
-		if !srv.Options.EnableIndexHtml {
+		if !srv.Options.EnableIndexHTML {
 			return nil, false
 		}
 
-		node.GenerateIndexHtml()
+		node.GenerateIndexHTML()
 	}
 
 	return node, false

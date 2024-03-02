@@ -262,11 +262,6 @@ func ExampleMeta_WhereHolders() {
 }
 
 func ExampleMeta_deleteOnPostgresql() {
-	type Table struct {
-		Name string
-		ID   int
-	}
-
 	var (
 		meta  = sql.NewMeta(sql.DriverNamePostgres, sql.DMLKindUpdate)
 		qid   = 1

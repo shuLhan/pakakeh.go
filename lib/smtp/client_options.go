@@ -25,7 +25,7 @@ type ClientOptions struct {
 	// remote address at port 465 (implicit TLS).
 	// If scheme is "smtp+starttls" and no port is given, client will
 	// connect to remote address at port 587.
-	ServerUrl string //revive:disable-line
+	ServerURL string
 
 	// The user name to authenticate to remote server.
 	//

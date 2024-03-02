@@ -6,6 +6,7 @@ package sseclient
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"sync/atomic"
 	"testing"
@@ -109,7 +110,9 @@ func TestClient(t *testing.T) {
 	if err != nil {
 		t.Fatal(`testRunSSEServer:`, err)
 	}
-	t.Cleanup(func() { srv.Stop(1 * time.Second) })
+	t.Cleanup(func() {
+		_ = srv.Stop(1 * time.Second)
+	})
 
 	var cl = Client{
 		Endpoint: fmt.Sprintf(`http://%s/sse`, srv.Options.Address),
@@ -239,7 +242,9 @@ func TestClient_raw(t *testing.T) {
 	if err != nil {
 		t.Fatal(`testRunSSEServer:`, err)
 	}
-	t.Cleanup(func() { srv.Stop(1 * time.Second) })
+	t.Cleanup(func() {
+		_ = srv.Stop(1 * time.Second)
+	})
 
 	var cl = Client{
 		Endpoint: fmt.Sprintf(`http://%s/sse`, srv.Options.Address),
@@ -350,7 +355,9 @@ func TestClientRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(`testRunSSEServer:`, err)
 	}
-	t.Cleanup(func() { srv.Stop(1 * time.Second) })
+	t.Cleanup(func() {
+		_ = srv.Stop(1 * time.Second)
+	})
 
 	var cl = Client{
 		Endpoint: fmt.Sprintf(`http://%s/sse`, srv.Options.Address),
@@ -421,7 +428,12 @@ func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (srv *libhttp.Server
 		return nil, err
 	}
 
-	go srv.Start()
+	go func() {
+		var errStart = srv.Start()
+		if errStart != nil {
+			log.Fatal(errStart)
+		}
+	}()
 
 	err = libnet.WaitAlive(`tcp`, address, 1*time.Second)
 	if err != nil {

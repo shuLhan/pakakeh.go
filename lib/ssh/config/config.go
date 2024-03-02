@@ -172,7 +172,10 @@ func (cfg *Config) Get(host string) (section *Section) {
 	section.setDefaults()
 
 	if host != `` && section.Field[KeyHostname] == `` {
-		section.Set(KeyHostname, host)
+		var err = section.Set(KeyHostname, host)
+		if err != nil {
+			return nil
+		}
 	}
 
 	return section

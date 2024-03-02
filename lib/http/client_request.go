@@ -76,7 +76,7 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 	)
 
 	if client != nil {
-		path.WriteString(client.opts.ServerUrl)
+		path.WriteString(client.opts.ServerURL)
 	}
 	path.WriteString(creq.Path)
 	paramsAsURLValues, isParamsURLValues = creq.Params.(url.Values)

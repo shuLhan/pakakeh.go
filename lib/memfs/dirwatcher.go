@@ -184,12 +184,17 @@ func (dw *DirWatcher) mapSubdirs(node *Node) {
 
 // onCreated handle new child created on parent node.
 func (dw *DirWatcher) onCreated(parent, child *Node) (err error) {
+	var logp = `onCreated`
+
 	if child.IsDir() {
 		dw.dirsLocker.Lock()
 		dw.dirs[child.Path] = child
 		dw.dirsLocker.Unlock()
 	} else {
-		dw.startWatchingFile(parent, child)
+		err = dw.startWatchingFile(parent, child)
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
 	var ns = NodeState{

@@ -21,6 +21,8 @@ import (
 
 // List of valid keys in Host or Match section.
 const (
+	keyInclude = `include`
+
 	// List of key in Host or Match with single, string value.
 	KeyAddKeysToAgent       = `addkeystoagent`
 	KeyAddressFamily        = `addressfamily`
@@ -58,73 +60,6 @@ const (
 	KeyIdentityAgent               = `identityagent`
 	KeyPort                        = `port`
 	KeyUser                        = `user`
-)
-
-// TODO: list of keys that are not implemented yet due to hard or
-// unknown how to test it.
-// nolint: deadcode,varcheck
-const (
-	keyCiphers                          = "ciphers"
-	keyControlMaster                    = "controlmaster"
-	keyControlPath                      = "controlpath"
-	keyControlPersist                   = "controlpersist"
-	keyDynamicForward                   = "dynamicforward"
-	keyEnableSSHKeysign                 = "enablesshkeysign"
-	keyEscapeChar                       = "escapechar"
-	keyExitOnForwardFailure             = "keyexitonforwardfailure"
-	keyFingerprintHash                  = "fingerprinthash"
-	keyForwardAgent                     = "forwardagent"
-	keyForwardX11                       = "forwardx11"
-	keyForwardX11Timeout                = "forwardx11timeout"
-	keyForwardX11Trusted                = "forwardx11trusted"
-	keyGatewayPorts                     = "gatewayports"
-	keyGlobalKnownHostsFile             = "globalknownhostsfile"
-	keyGSSAPIAuthentication             = "gssapiauthentication"
-	keyGSSAPIDelegateCredentials        = "gssapidelegatecredentials"
-	keyHashKnownHosts                   = "hashknownhosts"
-	keyHostBasedAuthentication          = "hostbasedauthentication"
-	keyHostBaseKeyTypes                 = "hostbasedkeytypes"
-	keyHostKeyAlgorithms                = "hostkeyalgorithms"
-	keyHostKeyAlias                     = "hostkeyalias"
-	keyIdentitiesOnly                   = "identitiesonly"
-	keyIgnoreUnknown                    = "ignoreunknown"
-	keyInclude                          = "include"
-	keyIPQoS                            = "ipqos"
-	keyKbdInteractiveAuthentication     = "kbdinteractiveauthentication"
-	keyKbdInteractiveDevices            = "kbdinteractivedevices"
-	keyKexAlgorithms                    = "kexalgorithms"
-	keyLocalCommand                     = "localcommand"
-	keyLocalForward                     = "localforward"
-	keyLogLevel                         = "loglevel"
-	keyMACs                             = "macs"
-	keyNoHostAuthenticationForLocalhost = "nohostauthenticationforlocalhost"
-	keyNumberOfPasswordPrompts          = "numberofpasswordprompts"
-	keyPasswordAuthentication           = "passwordauthentication"
-	keyPermitLocalCommand               = "permitlocalcommand"
-	keyPKCS11Provider                   = "pkcs11provider"
-	keyPreferredAuthentications         = "preferredauthentications"
-	keyProxyCommand                     = "proxycommand"
-	keyProxyJump                        = "proxyjump"
-	keyProxyUseFdpass                   = "proxyusefdpass"
-	keyPubkeyAcceptedKeyTypes           = "pubkeyacceptedkeytypes"
-	keyPubkeyAuthentication             = "pubkeyauthentication"
-	keyRekeyLimit                       = "rekeylimit"
-	keyRemoteCommand                    = "remotecommand"
-	keyRemoteForward                    = "remoteforward"
-	keyRequestTTY                       = "requesttty"
-	keyRevokeHostKeys                   = "revokehostkeys"
-	keyServerAliveCountMax              = "serveralivecountmax"
-	keyServerAliveInterval              = "serveraliveinterval"
-	keyStreamLocalBindMask              = "streamlocalbindmask"
-	keyStreamLocalBindUnlink            = "streamlocalbindunlink"
-	keyStrictHostKeyChecking            = "stricthostkeychecking"
-	keySyslogFacility                   = "syslogfacility"
-	keyTCPKeepAlive                     = "tcpkeepalive"
-	keyTunnel                           = "tunnel"
-	keyTunnelDevince                    = "tunneldevice"
-	keyUpdatehostKeys                   = "updatehostkeys"
-	keyUseKeychain                      = "usekeychain"
-	keyVerifyHostKeyDNS                 = "verifyhostkeydns"
 )
 
 // Known values for key.
@@ -620,6 +555,7 @@ func (section *Section) UserKnownHostsFile() []string {
 // MarshalText encode the Section back to ssh_config format.
 // The key is indented by two spaces.
 func (section *Section) MarshalText() (text []byte, err error) {
+	var logp = `MarshalText`
 	var buf bytes.Buffer
 
 	if section.useCriteria {
@@ -628,7 +564,10 @@ func (section *Section) MarshalText() (text []byte, err error) {
 		var criteria *matchCriteria
 		for _, criteria = range section.criteria {
 			buf.WriteByte(' ')
-			criteria.WriteTo(&buf)
+			_, err = criteria.WriteTo(&buf)
+			if err != nil {
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
+			}
 		}
 	} else {
 		buf.WriteString(`Host`)
@@ -640,7 +579,10 @@ func (section *Section) MarshalText() (text []byte, err error) {
 			var pat *pattern
 			for _, pat = range section.patterns {
 				buf.WriteByte(' ')
-				pat.WriteTo(&buf)
+				_, err = pat.WriteTo(&buf)
+				if err != nil {
+					return nil, fmt.Errorf(`%s: %w`, logp, err)
+				}
 			}
 		}
 	}
@@ -701,11 +643,11 @@ func (section *Section) WriteTo(w io.Writer) (n int64, err error) {
 // pathFold remove the path prefix from input file "in", start from the
 // "config" directory and then the user's home directory.
 func (section *Section) pathFold(in string) (out string) {
-	if filepath.HasPrefix(in, section.dir) {
+	if strings.HasPrefix(in, section.dir) {
 		out, _ = filepath.Rel(section.dir, in)
 		return out
 	}
-	if filepath.HasPrefix(in, section.homeDir) {
+	if strings.HasPrefix(in, section.homeDir) {
 		out, _ = filepath.Rel(section.homeDir, in)
 		return `~/` + out
 	}

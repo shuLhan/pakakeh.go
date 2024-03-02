@@ -52,12 +52,12 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 		if port == 0 {
 			port = 443
 		}
-		clientOpts.ServerUrl = fmt.Sprintf("https://%s:%d", host, port)
+		clientOpts.ServerURL = fmt.Sprintf(`https://%s:%d`, host, port)
 	} else {
 		if port == 0 {
 			port = 80
 		}
-		clientOpts.ServerUrl = fmt.Sprintf("http://%s:%d", host, port)
+		clientOpts.ServerURL = fmt.Sprintf(`http://%s:%d`, host, port)
 	}
 
 	client.conn = libhttp.NewClient(clientOpts)

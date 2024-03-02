@@ -18,7 +18,7 @@ func TestClient_live(t *testing.T) {
 
 	var (
 		clientOpts = ClientOptions{
-			ServerUrl:     os.Getenv(`SMTP_SERVER`),
+			ServerURL:     os.Getenv(`SMTP_SERVER`),
 			AuthUser:      os.Getenv(`SMTP_USER`),
 			AuthPass:      os.Getenv(`SMTP_PASS`),
 			AuthMechanism: SaslMechanismPlain,
@@ -168,7 +168,7 @@ func TestAuth(t *testing.T) {
 func TestAuth2(t *testing.T) {
 	var (
 		opts = ClientOptions{
-			ServerUrl: testSMTPSAddress,
+			ServerURL: testSMTPSAddress,
 			Insecure:  true,
 		}
 

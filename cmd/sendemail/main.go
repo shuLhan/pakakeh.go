@@ -106,7 +106,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		_ = msg.SetBodyHtml(content)
+		_ = msg.SetBodyHTML(content)
 	}
 
 	mailb, err = msg.Pack()
@@ -120,7 +120,7 @@ func main() {
 	mailtx = smtp.NewMailTx(from, []string{to}, mailb)
 
 	clientOpts = smtp.ClientOptions{
-		ServerUrl:     serverURL,
+		ServerURL:     serverURL,
 		AuthUser:      os.Getenv(envSMTPUsername),
 		AuthPass:      os.Getenv(envSMTPPassword),
 		AuthMechanism: smtp.SaslMechanismPlain,

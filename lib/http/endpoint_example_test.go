@@ -26,19 +26,19 @@ func ExampleEndpoint_errorHandler() {
 		RequestType:  RequestTypeQuery,
 		ResponseType: ResponseTypePlain,
 		Call: func(epr *EndpointRequest) ([]byte, error) {
-			return nil, fmt.Errorf(epr.HttpRequest.Form.Get("error"))
+			return nil, fmt.Errorf(epr.HTTPRequest.Form.Get(`error`))
 		},
 		ErrorHandler: func(epr *EndpointRequest) {
-			epr.HttpWriter.Header().Set(HeaderContentType, ContentTypePlain)
+			epr.HTTPWriter.Header().Set(HeaderContentType, ContentTypePlain)
 
 			codeMsg := strings.Split(epr.Error.Error(), ":")
 			if len(codeMsg) != 2 {
-				epr.HttpWriter.WriteHeader(http.StatusInternalServerError)
-				_, _ = epr.HttpWriter.Write([]byte(epr.Error.Error()))
+				epr.HTTPWriter.WriteHeader(http.StatusInternalServerError)
+				_, _ = epr.HTTPWriter.Write([]byte(epr.Error.Error()))
 			} else {
 				code, _ := strconv.Atoi(codeMsg[0])
-				epr.HttpWriter.WriteHeader(code)
-				_, _ = epr.HttpWriter.Write([]byte(codeMsg[1]))
+				epr.HTTPWriter.WriteHeader(code)
+				_, _ = epr.HTTPWriter.Write([]byte(codeMsg[1]))
 			}
 		},
 	}
@@ -53,7 +53,7 @@ func ExampleEndpoint_errorHandler() {
 	time.Sleep(1 * time.Second)
 
 	clientOpts := &ClientOptions{
-		ServerUrl: "http://" + serverOpts.Address,
+		ServerURL: `http://` + serverOpts.Address,
 	}
 	client := NewClient(clientOpts)
 

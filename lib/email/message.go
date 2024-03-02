@@ -304,8 +304,8 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	return msg.dkimStatus, nil
 }
 
-// SetBodyHtml set or replace the message's body HTML content.
-func (msg *Message) SetBodyHtml(content []byte) (err error) { //revive:disable-line
+// SetBodyHTML set or replace the message's body HTML content.
+func (msg *Message) SetBodyHTML(content []byte) (err error) {
 	err = msg.setBody([]byte(contentTypeTextHTML), content)
 	if err != nil {
 		return fmt.Errorf("SetBodyHtml: %w", err)
