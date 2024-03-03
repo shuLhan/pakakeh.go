@@ -58,8 +58,7 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("CheckoutRevision: %s", err)
-		return err
+		return fmt.Errorf(`CheckoutRevision: %w`, err)
 	}
 
 	cmd = exec.Command("git", "checkout")
@@ -71,8 +70,7 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 
 	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("CheckoutRevision: %s", err)
-		return err
+		return fmt.Errorf(`CheckoutRevision: %w`, err)
 	}
 
 	cmd = exec.Command("git", "reset")
@@ -84,10 +82,10 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 
 	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("CheckoutRevision: %s", err)
+		return fmt.Errorf(`CheckoutRevision: %w`, err)
 	}
 
-	return err
+	return nil
 }
 
 // Clone the repository into destination directory.
@@ -96,8 +94,7 @@ func CheckoutRevision(repoDir, remoteName, branch, revision string) error {
 func Clone(remoteURL, dest string) (err error) {
 	err = os.MkdirAll(dest, 0700)
 	if err != nil {
-		err = fmt.Errorf("Clone: %s", err)
-		return
+		return fmt.Errorf(`Clone: %w`, err)
 	}
 
 	cmd := exec.Command("git", "clone")
@@ -109,10 +106,9 @@ func Clone(remoteURL, dest string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("Clone: %s", err)
+		return fmt.Errorf(`Clone: %w`, err)
 	}
-
-	return
+	return nil
 }
 
 // FetchAll will fetch the latest commits and tags from remote.
@@ -126,14 +122,13 @@ func FetchAll(repoDir string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("FetchAll: %s", err)
+		return fmt.Errorf(`FetchAll: %w`, err)
 	}
-
-	return
+	return nil
 }
 
 // FetchTags will fetch all tags from remote.
-func FetchTags(repoDir string) error {
+func FetchTags(repoDir string) (err error) {
 	cmd := exec.Command("git", "fetch")
 	cmd.Args = append(cmd.Args, "--quiet")
 	cmd.Args = append(cmd.Args, "--tags", "--force")
@@ -141,12 +136,11 @@ func FetchTags(repoDir string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("FetchTags: %s", err)
+		return fmt.Errorf(`FetchTags: %w`, err)
 	}
-
-	return err
+	return nil
 }
 
 // GetRemoteURL return remote URL or error if repository is not git or url is
@@ -161,8 +155,7 @@ func GetRemoteURL(repoDir, remoteName string) (url string, err error) {
 
 	gitIni, err := ini.Open(gitConfig)
 	if err != nil {
-		err = fmt.Errorf("GetRemote: %s", err)
-		return
+		return ``, fmt.Errorf(`GetRemote: %w`, err)
 	}
 
 	url, ok := gitIni.Get("remote", remoteName, "url", "")
@@ -187,13 +180,12 @@ func GetTag(repoDir, revision string) (tag string, err error) {
 
 	btag, err := cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("GetTag: %s", err)
-		return
+		return ``, fmt.Errorf(`GetTag: %w`, err)
 	}
 
 	tag = string(bytes.TrimSpace(btag))
 
-	return
+	return tag, nil
 }
 
 // LatestCommit get the latest commit hash in short format from "ref".
@@ -210,13 +202,12 @@ func LatestCommit(repoDir, ref string) (commit string, err error) {
 
 	bcommit, err := cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("LatestCommit: %s", err)
-		return
+		return ``, fmt.Errorf(`LatestCommit: %w`, err)
 	}
 
 	commit = string(bytes.TrimSpace(bcommit))
 
-	return
+	return commit, nil
 }
 
 // LatestTag get latest tag.
@@ -228,7 +219,7 @@ func LatestTag(repoDir string) (tag string, err error) {
 
 	bout, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("LatestTag: %s", err)
+		return ``, fmt.Errorf(`LatestTag: %w`, err)
 	}
 
 	out := string(bytes.TrimSpace(bout))
@@ -243,7 +234,7 @@ func LatestTag(repoDir string) (tag string, err error) {
 
 	bout, err = cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("LatestTag: %s", err)
+		return ``, fmt.Errorf(`LatestTag: %w`, err)
 	}
 
 	tag = string(bytes.TrimSpace(bout))
@@ -254,18 +245,19 @@ func LatestTag(repoDir string) (tag string, err error) {
 // LatestVersion will try to get latest tag from repository.
 // If it's fail get the latest commit hash.
 func LatestVersion(repoDir string) (version string, err error) {
+	var logp = `LatestVersion`
+
 	version, err = LatestTag(repoDir)
 	if err == nil && len(version) > 0 {
-		return
+		return version, nil
 	}
 
 	version, err = LatestCommit(repoDir, "")
-	if err == nil {
-		return
+	if err != nil {
+		return ``, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = fmt.Errorf("GetVersion: %s", err)
-	return
+	return version, nil
 }
 
 // ListTags get all tags from repository.
@@ -282,8 +274,7 @@ func ListTags(repoDir string) (tags []string, err error) {
 
 	bout, err := cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("ListTag: %s", err)
-		return nil, err
+		return nil, fmt.Errorf(`ListTag: %w`, err)
 	}
 
 	sep := []byte{'\n'}
@@ -300,7 +291,7 @@ func ListTags(repoDir string) (tags []string, err error) {
 }
 
 // LogRevisions get commits between two revisions.
-func LogRevisions(repoDir, prevRevision, nextRevision string) error {
+func LogRevisions(repoDir, prevRevision, nextRevision string) (err error) {
 	cmd := exec.Command("git")
 	cmd.Args = append(cmd.Args, "--no-pager", "log", "--oneline",
 		prevRevision+"..."+nextRevision)
@@ -308,17 +299,17 @@ func LogRevisions(repoDir, prevRevision, nextRevision string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("CompareRevisions: %s", err)
+		return fmt.Errorf(`CompareRevisions: %w`, err)
 	}
 
-	return err
+	return nil
 }
 
 // RemoteChange change current repository remote name (e.g. "origin") to new
 // remote name and URL.
-func RemoteChange(repoDir, oldName, newName, newURL string) error {
+func RemoteChange(repoDir, oldName, newName, newURL string) (err error) {
 	if len(repoDir) == 0 {
 		return nil
 	}
@@ -329,10 +320,9 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 	cmd.Stdout = _stdout
 	cmd.Stderr = _stderr
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("RemoteChange: %s", err)
-		return err
+		return fmt.Errorf(`RemoteChange: %w`, err)
 	}
 
 	cmd = exec.Command("git")
@@ -343,10 +333,10 @@ func RemoteChange(repoDir, oldName, newName, newURL string) error {
 
 	err = cmd.Run()
 	if err != nil {
-		err = fmt.Errorf("RemoteChange: %s", err)
+		return fmt.Errorf(`RemoteChange: %w`, err)
 	}
 
-	return err
+	return nil
 }
 
 // RemoteBranches return list of remote branches.
@@ -361,13 +351,12 @@ func RemoteBranches(repoDir string) ([]string, error) {
 
 	bout, err := cmd.Output()
 	if err != nil {
-		err = fmt.Errorf("RemoteBranches: %s", err)
-		return nil, err
+		return nil, fmt.Errorf(`RemoteBranches: %w`, err)
 	}
 
 	bbranches := bytes.Split(bout, []byte{'\n'})
 	if len(bbranches) == 0 {
-		return nil, err
+		return nil, nil
 	}
 
 	var branches []string

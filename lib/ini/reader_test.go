@@ -5,6 +5,7 @@
 package ini
 
 import (
+	"errors"
 	"io"
 	"testing"
 
@@ -99,7 +100,7 @@ func TestParseSectionHeader(t *testing.T) {
 		err := reader.parseSectionHeader()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err)
-			if err != io.EOF {
+			if !errors.Is(err, io.EOF) {
 				continue
 			}
 		}
@@ -154,7 +155,7 @@ func TestParseSubsection(t *testing.T) {
 		err := reader.parseSubsection()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err)
-			if err != io.EOF {
+			if !errors.Is(err, io.EOF) {
 				continue
 			}
 		}
@@ -313,7 +314,7 @@ func TestParseVariable(t *testing.T) {
 		err := reader.parseVariable()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err)
-			if err != io.EOF {
+			if !errors.Is(err, io.EOF) {
 				continue
 			}
 		}
@@ -484,7 +485,7 @@ func TestParseVarValue(t *testing.T) {
 		err = reader.parseVarValue()
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err)
-			if err != io.EOF {
+			if !errors.Is(err, io.EOF) {
 				continue
 			}
 		}

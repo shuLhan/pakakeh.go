@@ -88,7 +88,7 @@ func (recv *receiver) readAuthData(cmd *Command) (err error) {
 			_, _ = recv.buff.Write(recv.data[:n])
 		}
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return err
@@ -124,7 +124,7 @@ func (recv *receiver) readCommand() (cmd *Command, err error) {
 			_, _ = recv.buff.Write(recv.data[:n])
 		}
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, fmt.Errorf(`smtp: recv: readCommand: %w`, err)

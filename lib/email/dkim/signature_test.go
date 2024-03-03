@@ -273,7 +273,8 @@ func TestSignatureHash(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		sig.Alg = &c.alg
+		sig.Alg = new(SignAlg)
+		*sig.Alg = c.alg
 
 		_, got64 := sig.Hash([]byte(c.in))
 
@@ -343,11 +344,13 @@ func TestSignatureSign(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		sig.Alg = &c.hashAlg
+		sig.Alg = new(SignAlg)
+		*sig.Alg = c.hashAlg
 
 		hashed, _ := sig.Hash(c.input)
 
-		sig.Alg = &c.signAlg
+		sig.Alg = new(SignAlg)
+		*sig.Alg = c.signAlg
 
 		err := sig.Sign(c.pk, hashed)
 		if err != nil {
@@ -562,7 +565,8 @@ func TestSignatureVerify(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		sig.Alg = &c.sigAlg
+		sig.Alg = new(SignAlg)
+		*sig.Alg = c.sigAlg
 		sig.Value = []byte(c.sigValue)
 
 		bhash, _ := sig.Hash([]byte(c.input))

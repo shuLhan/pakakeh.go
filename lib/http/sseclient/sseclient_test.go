@@ -5,9 +5,10 @@
 package sseclient
 
 import (
+	"crypto/rand"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -398,7 +399,20 @@ func TestClientRetry(t *testing.T) {
 
 // testGenerateAddress generate random port for server address.
 func testGenerateAddress() (addr string) {
-	var port = rand.Int() % 60000
+	var (
+		logp = `testGenerateAddress`
+		max  = big.NewInt(60000)
+
+		randInt *big.Int
+		err     error
+	)
+
+	randInt, err = rand.Int(rand.Reader, max)
+	if err != nil {
+		log.Fatalf(`%s: %s`, logp, err)
+	}
+
+	var port = randInt.Int64()
 	if port < 1024 {
 		port += 1024
 	}

@@ -150,6 +150,8 @@ func (cl *Client) setConfigHostKeyCallback() (err error) {
 		if knownHosts == config.ValueNone {
 			// If one of the UserKnownHosts set to "none" always
 			// accept the remote hosts.
+			//
+			//nolint:gosec
 			cl.config.HostKeyCallback = ssh.InsecureIgnoreHostKey()
 			return nil
 		}

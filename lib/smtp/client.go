@@ -151,7 +151,7 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 	if cl.isTLS {
 		tlsConfig := &tls.Config{
 			ServerName:         cl.serverName,
-			InsecureSkipVerify: cl.opts.Insecure,
+			InsecureSkipVerify: cl.opts.Insecure, //nolint:gosec
 		}
 
 		cl.conn = tls.Client(cl.conn, tlsConfig)
@@ -501,7 +501,7 @@ func (cl *Client) StartTLS() (res *Response, err error) {
 
 	tlsConfig := &tls.Config{
 		ServerName:         cl.serverName,
-		InsecureSkipVerify: cl.opts.Insecure,
+		InsecureSkipVerify: cl.opts.Insecure, //nolint:gosec
 	}
 
 	cl.conn = tls.Client(cl.conn, tlsConfig)

@@ -9,7 +9,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
@@ -154,7 +154,7 @@ func (sig *Signature) Hash(in []byte) (h, h64 []byte) {
 		h256 := sha256.Sum256(in)
 		h = h256[:]
 	} else {
-		h1 := sha1.Sum(in)
+		h1 := sha1.Sum(in) //nolint:gosec
 		h = h1[:]
 	}
 

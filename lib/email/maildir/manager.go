@@ -78,19 +78,19 @@ func (mg *Manager) initDirs(dir string) (err error) {
 	mg.dirCur = filepath.Join(dir, maildirCur)
 	err = os.MkdirAll(mg.dirCur, 0750)
 	if err != nil {
-		return fmt.Errorf(`%s: %s`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	mg.dirNew = filepath.Join(dir, maildirNew)
 	err = os.MkdirAll(mg.dirNew, 0750)
 	if err != nil {
-		return fmt.Errorf(`%s: %s`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	mg.dirTmp = filepath.Join(dir, maildirTmp)
 	err = os.MkdirAll(mg.dirTmp, 0700)
 	if err != nil {
-		return fmt.Errorf(`%s: %s`, logp, err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -168,7 +168,7 @@ func (mg *Manager) Incoming(msg []byte) (fnNew string, err error) {
 		}
 	}
 
-	err = os.WriteFile(pathTmp, msg, 0660)
+	err = os.WriteFile(pathTmp, msg, 0600)
 	if err != nil {
 		return ``, fmt.Errorf(`%s: %w`, logp, err)
 	}

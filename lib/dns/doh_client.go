@@ -51,7 +51,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (cl *DoHClient, err err
 		MaxIdleConns:    1,
 		IdleConnTimeout: 30 * time.Second,
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: allowInsecure,
+			InsecureSkipVerify: allowInsecure, //nolint:gosec
 		},
 	}
 

@@ -137,7 +137,7 @@ func ExampleMemFS_Watch() {
 	time.Sleep(200 * time.Millisecond)
 
 	testFile := filepath.Join(opts.Root, `file`)
-	err = os.WriteFile(testFile, []byte(`dummy content`), 0700)
+	err = os.WriteFile(testFile, []byte(`dummy content`), 0600)
 	if err != nil {
 		log.Println(err)
 		return

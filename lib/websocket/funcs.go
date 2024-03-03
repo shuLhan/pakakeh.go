@@ -6,12 +6,12 @@ package websocket
 
 import (
 	"crypto/rand"
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"log"
 	"os"
-	"syscall"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -33,10 +33,6 @@ func Recv(fd int, timeout time.Duration) (packet []byte, err error) {
 		logp    = `Recv`
 		buf     = make([]byte, maxBuffer)
 		timeval = unix.Timeval{}
-
-		errno syscall.Errno
-		n     int
-		ok    bool
 	)
 
 	err = unix.SetNonblock(fd, false)
@@ -52,17 +48,15 @@ func Recv(fd int, timeout time.Duration) (packet []byte, err error) {
 		}
 	}
 
+	var n int
 	for {
 		n, err = unix.Read(fd, buf)
 		if err != nil {
-			errno, ok = err.(unix.Errno)
-			if ok {
-				if errno == unix.EINTR {
-					continue
-				}
-				if errno == unix.EAGAIN || errno == unix.EWOULDBLOCK {
-					return nil, fmt.Errorf(`%s: %w`, logp, os.ErrDeadlineExceeded)
-				}
+			if errors.Is(err, unix.EINTR) {
+				continue
+			}
+			if errors.Is(err, unix.EAGAIN) || errors.Is(err, unix.EWOULDBLOCK) {
+				return nil, fmt.Errorf(`%s: %w`, logp, os.ErrDeadlineExceeded)
 			}
 			return nil, fmt.Errorf(`%s: Read: %w`, logp, err)
 		}
@@ -88,10 +82,8 @@ func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 		logp    = `Send`
 		timeval = unix.Timeval{}
 
-		errno syscall.Errno
-		max   int
-		n     int
-		ok    bool
+		max int
+		n   int
 	)
 
 	err = unix.SetNonblock(fd, false)
@@ -116,14 +108,11 @@ func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 
 		n, err = unix.Write(fd, packet[:max])
 		if err != nil {
-			errno, ok = err.(unix.Errno)
-			if ok {
-				if errno == unix.EINTR {
-					continue
-				}
-				if errno == unix.EAGAIN || errno == unix.EWOULDBLOCK {
-					return fmt.Errorf(`%s: %w`, logp, os.ErrDeadlineExceeded)
-				}
+			if errors.Is(err, unix.EINTR) {
+				continue
+			}
+			if errors.Is(err, unix.EAGAIN) || errors.Is(err, unix.EWOULDBLOCK) {
+				return fmt.Errorf(`%s: %w`, logp, os.ErrDeadlineExceeded)
 			}
 			return fmt.Errorf(`%s: Write: %w`, logp, err)
 		}
@@ -143,7 +132,7 @@ func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 // Section 4 of [RFC4648]) this 20-byte hash.
 func generateHandshakeAccept(key []byte) string {
 	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
-	var sum = sha1.Sum(key)
+	var sum = sha1.Sum(key) //nolint:gosec
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
 

@@ -7,6 +7,7 @@ package big
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"math/big"
 )
@@ -422,15 +423,26 @@ func ExampleRat_MarshalJSON_withStruct() {
 		{V: NewRat("0.1234567890")},
 	}
 
+	var (
+		in  T
+		err error
+		out []byte
+	)
 	MarshalJSONAsString = true
-	for _, in := range inputs {
-		out, _ := json.Marshal(in)
+	for _, in = range inputs {
+		out, err = json.Marshal(in)
+		if err != nil {
+			log.Fatal(err)
+		}
 		fmt.Printf("%s\n", out)
 	}
 
 	MarshalJSONAsString = false
-	for _, in := range inputs {
-		out, _ := json.Marshal(&in)
+	for _, in = range inputs {
+		out, err = json.Marshal(&in)
+		if err != nil {
+			log.Fatal(err)
+		}
 		fmt.Printf("%s\n", out)
 	}
 

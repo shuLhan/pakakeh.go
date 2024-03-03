@@ -95,6 +95,9 @@ func (ep *Endpoint) call(
 	req.Body = io.NopCloser(bytes.NewBuffer(epr.RequestBody))
 
 	switch ep.RequestType {
+	case RequestTypeNone, RequestTypeXML:
+		// NOOP.
+
 	case RequestTypeForm, RequestTypeQuery, RequestTypeJSON:
 		e = req.ParseForm()
 
@@ -144,6 +147,8 @@ func (ep *Endpoint) call(
 		return
 	case ResponseTypeBinary:
 		res.Header().Set(HeaderContentType, ContentTypeBinary)
+	case ResponseTypeHTML:
+		res.Header().Set(HeaderContentType, ContentTypeHTML)
 	case ResponseTypeJSON:
 		res.Header().Set(HeaderContentType, ContentTypeJSON)
 	case ResponseTypePlain:

@@ -19,9 +19,11 @@ const (
 
 // String return the string representation of ResponseType as in
 // "Content-Type" header.
-// For ResponseTypeNone it will return an empty string "".
+// For ResponseTypeNone it will return an empty string.
 func (restype ResponseType) String() string {
 	switch restype {
+	case ResponseTypeNone:
+		return ``
 	case ResponseTypeBinary:
 		return ContentTypeBinary
 	case ResponseTypeHTML:
@@ -33,5 +35,5 @@ func (restype ResponseType) String() string {
 	case ResponseTypeXML:
 		return ContentTypeXML
 	}
-	return ""
+	return ``
 }

@@ -81,11 +81,12 @@ func (result *Result) lookup() {
 
 	switch dnsMsg.Header.RCode {
 	case dns.RCodeOK:
+		// NOOP.
 	case dns.RCodeErrName:
 		result.Code = ResultCodeNone
 		result.Err = "domain name does not exist"
 		return
-	default:
+	case dns.RCodeErrFormat, dns.RCodeErrServer, dns.RCodeNotImplemented, dns.RCodeRefused:
 		result.Code = ResultCodeTempError
 		result.Err = "server failure"
 		return

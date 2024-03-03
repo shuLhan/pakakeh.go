@@ -39,9 +39,8 @@ func TestMetadataIsEqual(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		r := c.in.IsEqual(&c.out)
-
-		if r != c.result {
+		var got = c.in.IsEqual(&c.out)
+		if got != c.result {
 			t.Error("Test failed on ", c.in, c.out)
 		}
 	}

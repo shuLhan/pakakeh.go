@@ -43,7 +43,7 @@ func NewDoTClient(nameserver string, allowInsecure bool) (cl *DoTClient, err err
 
 	nameserver = fmt.Sprintf("%s:%d", remoteIP, port)
 
-	tlsConfig.InsecureSkipVerify = allowInsecure
+	tlsConfig.InsecureSkipVerify = allowInsecure //nolint:gosec
 
 	cl.conn, err = tls.Dial("tcp", nameserver, &tlsConfig)
 	if err != nil {

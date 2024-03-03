@@ -98,7 +98,11 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 	case RequestMethodPatch,
 		RequestMethodPost,
 		RequestMethodPut:
+
 		switch creq.Type {
+		case RequestTypeNone, RequestTypeXML:
+			// NOOP.
+
 		case RequestTypeQuery:
 			if isParamsURLValues {
 				path.WriteString("?")

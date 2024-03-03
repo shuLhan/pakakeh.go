@@ -68,12 +68,12 @@ func (fwd *QuestdbForwarder) Write(b []byte) (n int, err error) {
 
 	err = fwd.conn.SetWriteDeadline(now.Add(5 * time.Second))
 	if err != nil {
-		return 0, fmt.Errorf(`%s: SetWriteDeadline: %s`, logp, err)
+		return 0, fmt.Errorf(`%s: SetWriteDeadline: %w`, logp, err)
 	}
 
 	_, err = fwd.conn.Write(b)
 	if err != nil {
-		return 0, fmt.Errorf(`%s: %s`, logp, err)
+		return 0, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return n, nil

@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 		if !errors.As(err, &perr) {
 			log.Fatal("!ok:", err)
 		}
-		if perr.Err != os.ErrExist {
+		if !errors.Is(perr.Err, os.ErrExist) {
 			log.Fatalf("perr: %+v %+v\n", perr.Err, os.ErrExist)
 		}
 	}
@@ -49,7 +49,7 @@ func TestMain(m *testing.M) {
 		if !errors.As(err, &perr) {
 			log.Fatal(err)
 		}
-		if perr.Err != os.ErrExist {
+		if !errors.Is(perr.Err, os.ErrExist) {
 			log.Fatal(err)
 		}
 	}
@@ -151,10 +151,14 @@ func TestNew(t *testing.T) {
 		},
 	}}
 
+	var (
+		mfs *MemFS
+		err error
+	)
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		mfs, err := New(&c.opts)
+		mfs, err = New(&c.opts)
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue

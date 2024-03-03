@@ -132,7 +132,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 			Certificates: []tls.Certificate{
 				cert,
 			},
-			InsecureSkipVerify: opts.TLSAllowInsecure,
+			InsecureSkipVerify: opts.TLSAllowInsecure, //nolint:gosec
 		}
 	}
 
@@ -239,8 +239,9 @@ func (srv *Server) serveDoH() {
 	)
 
 	srv.doh = &http.Server{
-		Addr:        addr,
-		IdleTimeout: srv.opts.HTTPIdleTimeout,
+		Addr:              addr,
+		IdleTimeout:       srv.opts.HTTPIdleTimeout,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	http.Handle("/dns-query", srv)

@@ -13,6 +13,7 @@ import (
 	stdhttp "net/http"
 	"path"
 	"strconv"
+	"time"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/http"
@@ -369,13 +370,16 @@ func (bot *Bot) createServer() (err error) {
 	}
 
 	if bot.opts.Webhook.ListenCertificate != nil {
-		tlsConfig := &tls.Config{}
+		tlsConfig := &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
 		tlsConfig.Certificates = append(
 			tlsConfig.Certificates,
 			*bot.opts.Webhook.ListenCertificate,
 		)
 		serverOpts.Conn = &stdhttp.Server{
-			TLSConfig: tlsConfig,
+			TLSConfig:         tlsConfig,
+			ReadHeaderTimeout: 5 * time.Second,
 		}
 	}
 

@@ -81,22 +81,30 @@ func TestClient_parseURI(t *testing.T) {
 	}, {
 		endpoint:         "wss://127.0.0.1",
 		expRemoteAddress: "127.0.0.1:443",
-		expTLSConfig:     new(tls.Config),
+		expTLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		},
 	}, {
 		endpoint:         "wss://127.0.0.1:8000",
 		expRemoteAddress: "127.0.0.1:8000",
-		expTLSConfig:     new(tls.Config),
+		expTLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		},
 	}, {
 		endpoint:         "http://127.0.0.1",
 		expRemoteAddress: "127.0.0.1:80",
 	}, {
 		endpoint:         "https://127.0.0.1",
 		expRemoteAddress: "127.0.0.1:443",
-		expTLSConfig:     new(tls.Config),
+		expTLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		},
 	}, {
 		endpoint:         "https://127.0.0.1:8443",
 		expRemoteAddress: "127.0.0.1:8443",
-		expTLSConfig:     new(tls.Config),
+		expTLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		},
 	}}
 
 	var (

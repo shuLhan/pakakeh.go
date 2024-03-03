@@ -120,7 +120,7 @@ func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
 		err = srv.registerPut(ep)
 	case RequestMethodTrace:
 		return errors.New(`http.RegisterEndpoint: can't handle TRACE method yet`)
-	default:
+	case RequestMethodGet:
 		ep.Method = RequestMethodGet
 		err = srv.registerGet(ep)
 	}
@@ -661,6 +661,8 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 		res.Header().Set(HeaderContentType, ContentTypeBinary)
 	case ResponseTypeJSON:
 		res.Header().Set(HeaderContentType, ContentTypeJSON)
+	case ResponseTypeHTML:
+		res.Header().Set(HeaderContentType, ContentTypeHTML)
 	case ResponseTypePlain:
 		res.Header().Set(HeaderContentType, ContentTypePlain)
 	case ResponseTypeXML:

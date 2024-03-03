@@ -91,7 +91,7 @@ func (reader *reader) Parse(src []byte) (in *Ini, err error) {
 
 		err = reader.parse()
 		if err != nil {
-			if err != io.EOF {
+			if !errors.Is(err, io.EOF) {
 				err = fmt.Errorf(err.Error(), reader.lineNum,
 					reader.filename)
 				return nil, err
@@ -349,6 +349,9 @@ func (reader *reader) parseVariable() (err error) {
 	for !isNewline {
 		reader.r, _, err = reader.br.ReadRune()
 		if err != nil {
+			// The only possible error here is [io.EOF], so we
+			// end it.
+			err = nil
 			break
 		}
 		switch {
@@ -402,6 +405,9 @@ func (reader *reader) parsePossibleValue() (err error) {
 	for !isNewline {
 		reader.b, err = reader.br.ReadByte()
 		if err != nil {
+			// The only possible error here is [io.EOF], so we
+			// end it.
+			err = nil
 			break
 		}
 		switch reader.b {

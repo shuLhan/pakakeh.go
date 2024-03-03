@@ -71,7 +71,7 @@ func NewClient(opts *ClientOptions) (client *Client) {
 	}
 	if opts.AllowInsecure {
 		httpTransport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: opts.AllowInsecure,
+			InsecureSkipVerify: opts.AllowInsecure, //nolint:gosec
 		}
 	}
 	client.Client.Transport = httpTransport
@@ -145,7 +145,7 @@ func (client *Client) Download(req DownloadRequest) (res *http.Response, err err
 
 	httpReq, err = req.toHTTPRequest(client)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %s", logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	res, err = client.Client.Do(httpReq)
@@ -168,7 +168,7 @@ out:
 		if err == nil {
 			err = fmt.Errorf("%s: %w", logp, errClose)
 		} else {
-			err = fmt.Errorf("%w: %s", err, errClose)
+			err = fmt.Errorf(`%w: %w`, err, errClose)
 		}
 	}
 
@@ -228,7 +228,11 @@ func (client *Client) GenerateHTTPRequest(
 	case RequestMethodPatch,
 		RequestMethodPost,
 		RequestMethodPut:
+
 		switch rtype {
+		case RequestTypeNone, RequestTypeXML:
+			// NOOP.
+
 		case RequestTypeQuery:
 			if isParamsURLValues {
 				rpath += `?` + paramsAsURLValues.Encode()

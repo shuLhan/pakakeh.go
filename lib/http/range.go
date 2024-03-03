@@ -66,7 +66,7 @@ func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) 
 
 		pos.content, err = io.ReadAll(part)
 		if err != nil && !errors.Is(err, io.EOF) {
-			return nil, fmt.Errorf(`%s: on ReadAll part: %s`, logp, err)
+			return nil, fmt.Errorf(`%s: on ReadAll part: %w`, logp, err)
 		}
 
 		r.positions = append(r.positions, pos)

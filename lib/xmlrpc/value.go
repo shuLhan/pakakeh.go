@@ -108,7 +108,9 @@ func NewValue(in interface{}) (out *Value) {
 	case reflect.Interface, reflect.Ptr:
 		return NewValue(refv.Elem())
 
-	default:
+	case reflect.Invalid, reflect.Complex64, reflect.Complex128,
+		reflect.Chan, reflect.Func, reflect.Map,
+		reflect.UnsafePointer:
 		return nil
 	}
 

@@ -107,7 +107,7 @@ fail:
 	errClose := f.Close()
 	if errClose != nil {
 		if err != nil {
-			return fmt.Errorf("%s: %s: %w", logp, errClose, err)
+			return fmt.Errorf(`%s: %w: %w`, logp, errClose, err)
 		}
 		return fmt.Errorf("%s: %w", logp, errClose)
 	}

@@ -337,7 +337,9 @@ func (cl *Client) parseURI() (err error) {
 			serverPort = defTLSPort
 		}
 		if cl.TLSConfig == nil {
-			cl.TLSConfig = &tls.Config{}
+			cl.TLSConfig = &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			}
 		}
 	default:
 		if len(serverPort) == 0 {
@@ -830,10 +832,8 @@ func (cl *Client) recv() (packet []byte, err error) {
 	}
 
 	var (
-		buf    = make([]byte, 512)
-		neterr net.Error
-		n      int
-		ok     bool
+		buf = make([]byte, 512)
+		n   int
 	)
 
 	for {
@@ -844,8 +844,8 @@ func (cl *Client) recv() (packet []byte, err error) {
 
 		n, err = cl.conn.Read(buf)
 		if err != nil {
-			neterr, ok = err.(net.Error)
-			if ok && neterr.Timeout() {
+			var neterr net.Error
+			if errors.As(err, &neterr) && neterr.Timeout() {
 				continue
 			}
 			return nil, fmt.Errorf(`%s: %w`, logp, err)

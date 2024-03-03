@@ -161,7 +161,7 @@ func (m *macro) parse(data []byte) (err error) {
 
 				m.nright, err = strconv.Atoi(string(digits))
 				if err != nil {
-					return fmt.Errorf("failed to convert digits %q: %s", digits, err)
+					return fmt.Errorf(`failed to convert digits %q: %w`, digits, err)
 				}
 
 				if x == len(data) {

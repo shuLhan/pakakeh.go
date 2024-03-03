@@ -197,7 +197,7 @@ func (cl *Client) init(header http.Header) (err error) {
 func (cl *Client) dial() (err error) {
 	if cl.serverURL.Scheme == `https` {
 		var tlsConfig = &tls.Config{
-			InsecureSkipVerify: cl.Insecure,
+			InsecureSkipVerify: cl.Insecure, //nolint:gosec
 		}
 		cl.conn, err = tls.Dial(`tcp`, cl.serverURL.Host, tlsConfig)
 	} else {
@@ -227,7 +227,7 @@ func (cl *Client) handshake() (packet []byte, err error) {
 
 	var httpRes *http.Response
 
-	httpRes, packet, err = libhttp.ParseResponseHeader(packet) //nolint: bodyclose
+	httpRes, packet, err = libhttp.ParseResponseHeader(packet) //nolint:bodyclose
 	if err != nil {
 		return nil, err
 	}

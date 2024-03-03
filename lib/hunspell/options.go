@@ -205,7 +205,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseAF(tokens[1])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optAM:
@@ -214,7 +214,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseAM(tokens[1:])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optKey:
@@ -259,7 +259,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			opts.maxDiff, err = strconv.Atoi(tokens[1])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 			if opts.maxDiff < 1 || opts.maxDiff > 10 {
 				opts.maxDiff = 5
@@ -276,7 +276,7 @@ func (opts *affixOptions) load(content string) (err error) {
 		case optRep:
 			err = opts.parseRep(tokens[1:])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optMap:
@@ -285,7 +285,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseMap(tokens[1])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optPhone:
@@ -306,7 +306,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseBreak(tokens[1])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optCompoundRule:
@@ -315,7 +315,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseCompoundRule(tokens[1])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optCompoundMin:
@@ -404,7 +404,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseCheckCompoundPattern(tokens)
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optForceUcase:
@@ -421,7 +421,7 @@ func (opts *affixOptions) load(content string) (err error) {
 
 			cs.max, err = strconv.Atoi(tokens[1])
 			if err != nil {
-				return fmt.Errorf("line %d: COMPOUNDSYLLABLE: invalid argument %q: %s", x, tokens[1], err.Error())
+				return fmt.Errorf(`line %d: COMPOUNDSYLLABLE: invalid argument %q: %w`, x, tokens[1], err)
 			}
 			cs.vowels = tokens[2]
 			opts.compoundSyllable = cs
@@ -438,7 +438,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parsePfx(tokens[1:])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optSFX:
@@ -447,7 +447,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseSfx(tokens[1:])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optCircumfix:
@@ -477,7 +477,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseIconv(tokens[1:])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optOconv:
@@ -486,7 +486,7 @@ func (opts *affixOptions) load(content string) (err error) {
 			}
 			err = opts.parseOconv(tokens[1:])
 			if err != nil {
-				return fmt.Errorf("line %d: %s", x, err.Error())
+				return fmt.Errorf(`line %d: %w`, x, err)
 			}
 
 		case optLemmaPresent:
@@ -626,7 +626,7 @@ func (opts *affixOptions) parseMap(arg string) (err error) {
 	if cap(opts.charsMaps) == 0 {
 		n, err := strconv.Atoi(arg)
 		if err != nil {
-			return fmt.Errorf("MAP: invalid argument %q: %s", arg, err.Error())
+			return fmt.Errorf(`MAP: invalid argument %q: %w`, arg, err)
 		}
 		opts.charsMaps = make([]charsmap, 0, n)
 		return nil
@@ -665,7 +665,7 @@ func (opts *affixOptions) parseBreak(arg string) (err error) {
 	if cap(opts.breakOpts) == 0 {
 		n, err := strconv.Atoi(arg)
 		if err != nil {
-			return fmt.Errorf("BREAK: invalid argument %q: %s", arg, err.Error())
+			return fmt.Errorf(`BREAK: invalid argument %q: %w`, arg, err)
 		}
 
 		opts.breakOpts = make([]breakopt, 0, n)
@@ -699,7 +699,7 @@ func (opts *affixOptions) parseCompoundRule(arg string) (err error) {
 		var n int
 		n, err = strconv.Atoi(arg)
 		if err != nil {
-			return fmt.Errorf("COMPOUNDRULE: invalid argument %q: %s", arg, err.Error())
+			return fmt.Errorf(`COMPOUNDRULE: invalid argument %q: %w`, arg, err)
 		}
 
 		opts.compoundRules = make([]compoundRule, 0, n)
@@ -724,7 +724,7 @@ func (opts *affixOptions) parseCheckCompoundPattern(args []string) (err error) {
 		var n int
 		n, err = strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("CHECKCOMPOUNDPATTERN: invalid argument %q: %s", args[0], err.Error())
+			return fmt.Errorf(`CHECKCOMPOUNDPATTERN: invalid argument %q: %w`, args[0], err)
 		}
 
 		opts.compoundPatterns = make([]compoundPattern, 0, n)
@@ -874,7 +874,7 @@ func (opts *affixOptions) parseSfx(args []string) (err error) {
 
 		err = sfx.addRule(opts, stripping, suffix, condition, morphemes)
 		if err != nil {
-			return fmt.Errorf("SFX: %s", err.Error())
+			return fmt.Errorf(`SFX: %w`, err)
 		}
 	}
 
@@ -885,8 +885,7 @@ func (opts *affixOptions) parseIconv(args []string) (err error) {
 	if cap(opts.iconv) == 0 {
 		n, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("ICONV: invalid argument %q: %s",
-				args[0], err)
+			return fmt.Errorf(`ICONV: invalid argument %q: %w`, args[0], err)
 		}
 
 		opts.iconv = make([]conversion, 0, n)
@@ -910,8 +909,7 @@ func (opts *affixOptions) parseOconv(args []string) (err error) {
 	if cap(opts.oconv) == 0 {
 		n, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("ICONV: invalid argument %q: %s",
-				args[0], err)
+			return fmt.Errorf(`ICONV: invalid argument %q: %w`, args[0], err)
 		}
 
 		opts.oconv = make([]conversion, 0, n)
@@ -953,7 +951,7 @@ func (opts *affixOptions) isValidFlag(flag string) error {
 	case FlagNum:
 		_, err := strconv.Atoi(flag)
 		if err != nil {
-			return fmt.Errorf("invalud num flag: %q: %s", flag, err.Error())
+			return fmt.Errorf(`invalid num flag: %q: %w`, flag, err)
 		}
 	}
 	return nil

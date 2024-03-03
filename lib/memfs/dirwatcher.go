@@ -496,6 +496,8 @@ func (dw *DirWatcher) start() {
 			} else {
 				ns.Node = *node
 				switch ns.State {
+				case FileStateCreated:
+					// NOOP.
 				case FileStateDeleted:
 					dw.onFileDeleted(node)
 				case FileStateUpdateMode:
@@ -522,7 +524,7 @@ func (dw *DirWatcher) startWatchingFile(parent, child *Node) (err error) {
 
 	watcher, err = newWatcher(parent, child, dw.Delay, dw.qFileChanges)
 	if err != nil {
-		return fmt.Errorf(`%s %q: %s`, logp, child.SysPath, err)
+		return fmt.Errorf(`%s %q: %w`, logp, child.SysPath, err)
 	}
 
 	dw.mtxFileWatcher.Lock()

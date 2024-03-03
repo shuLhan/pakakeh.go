@@ -19,9 +19,11 @@ const (
 
 // String return the string representation of request type as in
 // "Content-Type" header.
-// For RequestTypeNone or RequestTypeQuery it will return an empty string "".
+// For RequestTypeNone or RequestTypeQuery it will return an empty string.
 func (rt RequestType) String() string {
 	switch rt {
+	case RequestTypeNone, RequestTypeQuery:
+		return ``
 	case RequestTypeForm:
 		return ContentTypeForm
 	case RequestTypeMultipartForm:
@@ -31,5 +33,5 @@ func (rt RequestType) String() string {
 	case RequestTypeXML:
 		return ContentTypeXML
 	}
-	return ""
+	return ``
 }

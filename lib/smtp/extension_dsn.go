@@ -20,15 +20,15 @@ func (dsn *extDSN) Params() string {
 // ValidateCommand validate command parameter for MAIL and RCPT.
 func (dsn *extDSN) ValidateCommand(cmd *Command) (err error) {
 	if cmd == nil {
-		return
+		return nil
 	}
 
 	switch cmd.Kind {
 	case CommandMAIL:
 	case CommandRCPT:
-	default:
-		return
+	case CommandZERO:
+		return nil
 	}
 
-	return
+	return nil
 }

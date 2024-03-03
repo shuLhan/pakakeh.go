@@ -313,6 +313,8 @@ func xmlParseValue(dec *xml.Decoder, closeTag string) (param *Value, err error) 
 	}
 
 	switch param.Kind {
+	case Array, Struct:
+		// NOOP.
 	case Unset, String, Base64:
 		param.Kind = String
 		param.In = cdata

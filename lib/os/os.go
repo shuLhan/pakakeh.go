@@ -84,12 +84,12 @@ func ConfirmYesNo(in io.Reader, msg string, defIsYes bool) bool {
 func Copy(out, in string) (err error) {
 	fin, err := os.Open(in)
 	if err != nil {
-		return fmt.Errorf(`Copy: failed to open input file: %s`, err)
+		return fmt.Errorf(`Copy: failed to open input file: %w`, err)
 	}
 
 	fout, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf(`Copy: failed to open output file: %s`, err)
+		return fmt.Errorf(`Copy: failed to open output file: %w`, err)
 	}
 
 	defer func() {
@@ -109,7 +109,7 @@ func Copy(out, in string) (err error) {
 	for {
 		n, err := fin.Read(buf)
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return err
@@ -208,7 +208,7 @@ func IsDirEmpty(dir string) (ok bool) {
 
 	_, err = d.Readdirnames(1)
 	if err != nil {
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			ok = true
 		}
 	}

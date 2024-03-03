@@ -165,9 +165,9 @@ func (agent *Agent) forwardBulk(ctx context.Context, list []Metric) (err error) 
 			_, errfwd = fwd.Write(wire)
 			if errfwd != nil {
 				if err == nil {
-					err = fmt.Errorf(`forwardBulk: %s`, errfwd)
+					err = fmt.Errorf(`forwardBulk: %w`, errfwd)
 				} else {
-					err = fmt.Errorf(`%s: %s`, err, errfwd)
+					err = fmt.Errorf(`%w: %w`, err, errfwd)
 				}
 			}
 		}
@@ -220,9 +220,9 @@ func (agent *Agent) forwardSingle(ctx context.Context, m *Metric) (err error) {
 			_, errfwd = fwd.Write(wire)
 			if errfwd != nil {
 				if err == nil {
-					err = fmt.Errorf(`forwardSingle: %s`, errfwd)
+					err = fmt.Errorf(`forwardSingle: %w`, errfwd)
 				} else {
-					err = fmt.Errorf(`%s: %s`, err, errfwd)
+					err = fmt.Errorf(`%w: %w`, err, errfwd)
 				}
 			}
 		}

@@ -205,6 +205,9 @@ func (srv *Server) handle(recv *receiver) {
 		}
 
 		switch recv.state {
+		case CommandZERO:
+			// NOOP.
+
 		case CommandDATA:
 			srv.processMailTx(recv.mail)
 			// TODO: add return error and check it.
@@ -235,6 +238,9 @@ out:
 // handleCommand from client.
 func (srv *Server) handleCommand(recv *receiver, cmd *Command) (err error) {
 	switch cmd.Kind {
+	case CommandZERO:
+		// NOOP.
+
 	case CommandAUTH:
 		err = srv.handleAUTH(recv, cmd)
 
