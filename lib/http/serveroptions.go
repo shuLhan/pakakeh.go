@@ -8,8 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
@@ -72,25 +70,5 @@ func (opts *ServerOptions) init() {
 		}
 	}
 
-	for x := 0; x < len(opts.CORS.AllowOrigins); x++ {
-		if opts.CORS.AllowOrigins[x] == corsWildcard {
-			opts.CORS.allowOriginsAll = true
-			break
-		}
-	}
-
-	for x := 0; x < len(opts.CORS.AllowHeaders); x++ {
-		if opts.CORS.AllowHeaders[x] == corsWildcard {
-			opts.CORS.allowHeadersAll = true
-		} else {
-			opts.CORS.AllowHeaders[x] = strings.ToLower(opts.CORS.AllowHeaders[x])
-		}
-	}
-
-	if len(opts.CORS.ExposeHeaders) > 0 {
-		opts.CORS.exposeHeaders = strings.Join(opts.CORS.ExposeHeaders, ",")
-	}
-	if opts.CORS.MaxAge > 0 {
-		opts.CORS.maxAge = strconv.Itoa(opts.CORS.MaxAge)
-	}
+	opts.CORS.init()
 }

@@ -277,11 +277,11 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		srv.handleDelete(res, req)
 
 	case http.MethodGet:
-		srv.handleCORS(res, req)
+		srv.Options.CORS.handle(res, req)
 		srv.handleGet(res, req)
 
 	case http.MethodHead:
-		srv.handleCORS(res, req)
+		srv.Options.CORS.handle(res, req)
 		srv.handleHead(res, req)
 
 	case http.MethodOptions:
@@ -291,7 +291,7 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		srv.handlePatch(res, req)
 
 	case http.MethodPost:
-		srv.handleCORS(res, req)
+		srv.Options.CORS.handle(res, req)
 		srv.handlePost(res, req)
 
 	case http.MethodPut:
@@ -383,98 +383,6 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	}
 
 	return node, false
-}
-
-// handleCORS handle the CORS request.
-//
-// Reference: https://www.html5rocks.com/static/images/cors_server_flowchart.png
-func (srv *Server) handleCORS(res http.ResponseWriter, req *http.Request) {
-	var preflightOrigin = req.Header.Get(HeaderOrigin)
-	if len(preflightOrigin) == 0 {
-		return
-	}
-
-	// Set the "Access-Control-Allow-Origin" header based on the request
-	// Origin and matched allowed origin.
-	// If one of the AllowOrigins contains wildcard "*", then allow all.
-
-	for _, origin := range srv.Options.CORS.AllowOrigins {
-		if origin == corsWildcard {
-			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
-			break
-		}
-		if origin == preflightOrigin {
-			res.Header().Set(HeaderACAllowOrigin, preflightOrigin)
-			break
-		}
-	}
-
-	// Set the "Access-Control-Allow-Method" header based on the request
-	// header "Access-Control-Request-Method", only allow HTTP method
-	// DELETE, GET, PATCH, POST, and PUT.
-	// If no "Access-Control-Request-Method", set the response header
-	// "Access-Control-Expose-Headers" based on predefined values.
-
-	var preflightMethod = req.Header.Get(HeaderACRequestMethod)
-	if len(preflightMethod) == 0 {
-		if len(srv.Options.CORS.exposeHeaders) > 0 {
-			res.Header().Set(HeaderACExposeHeaders, srv.Options.CORS.exposeHeaders)
-		}
-	} else if preflightMethod == http.MethodDelete ||
-		preflightMethod == http.MethodGet ||
-		preflightMethod == http.MethodPatch ||
-		preflightMethod == http.MethodPost ||
-		preflightMethod == http.MethodPut {
-		res.Header().Set(HeaderACAllowMethod, preflightMethod)
-	}
-
-	srv.handleCORSRequestHeaders(res, req)
-
-	if len(srv.Options.CORS.maxAge) > 0 {
-		res.Header().Set(HeaderACMaxAge, srv.Options.CORS.maxAge)
-	}
-	if srv.Options.CORS.AllowCredentials {
-		res.Header().Set(HeaderACAllowCredentials, "true")
-	}
-}
-
-// handleCORSRequestHeaders set the response header
-// "Access-Control-Allow-Headers" based on the request header
-// "Access-Control-Request-Headers".
-// If [CORSOptions.AllowHeaders] is empty, no requested headers will be
-// allowed.
-// If [CORSOptions.AllowHeaders] contains wildcard "*", all requested
-// headers are allowed.
-func (srv *Server) handleCORSRequestHeaders(res http.ResponseWriter, req *http.Request) {
-	preflightHeaders := req.Header.Get(HeaderACRequestHeaders)
-	if len(preflightHeaders) == 0 {
-		return
-	}
-
-	reqHeaders := strings.Split(preflightHeaders, ",")
-	for x := 0; x < len(reqHeaders); x++ {
-		reqHeaders[x] = strings.ToLower(strings.TrimSpace(reqHeaders[x]))
-	}
-
-	allowHeaders := make([]string, 0, len(reqHeaders))
-
-	for _, reqHeader := range reqHeaders {
-		for _, allowHeader := range srv.Options.CORS.AllowHeaders {
-			if allowHeader == corsWildcard {
-				allowHeaders = append(allowHeaders, reqHeader)
-				break
-			}
-			if reqHeader == allowHeader {
-				allowHeaders = append(allowHeaders, reqHeader)
-				break
-			}
-		}
-	}
-	if len(allowHeaders) == 0 {
-		return
-	}
-
-	res.Header().Set(HeaderACAllowHeaders, strings.Join(allowHeaders, ","))
 }
 
 // handleDelete handle the DELETE request by searching the registered route
@@ -748,7 +656,7 @@ func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set(HeaderAllow, strings.Join(allows, ", "))
 
-	srv.handleCORS(res, req)
+	srv.Options.CORS.handle(res, req)
 
 	res.WriteHeader(http.StatusOK)
 }
