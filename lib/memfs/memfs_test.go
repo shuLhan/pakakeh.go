@@ -58,14 +58,16 @@ func TestMain(m *testing.M) {
 }
 
 func TestNew(t *testing.T) {
-	afile := filepath.Join(_testWD, "testdata/index.html")
-
-	cases := []struct {
+	type testCase struct {
 		desc       string
 		expErr     string
 		expMapKeys []string
 		opts       Options
-	}{{
+	}
+
+	var afile = filepath.Join(_testWD, `testdata/index.html`)
+
+	var listCase = []testCase{{
 		desc:   "With empty dir",
 		expErr: "open : no such file or directory",
 	}, {
@@ -152,10 +154,11 @@ func TestNew(t *testing.T) {
 	}}
 
 	var (
+		c   testCase
 		mfs *MemFS
 		err error
 	)
-	for _, c := range cases {
+	for _, c = range listCase {
 		t.Log(c.desc)
 
 		mfs, err = New(&c.opts)

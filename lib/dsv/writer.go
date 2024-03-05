@@ -470,7 +470,6 @@ func (writer *Writer) Write(reader ReaderInterface) (int, error) {
 // String yes, it will print it in JSON like format.
 func (writer *Writer) String() string {
 	r, e := json.MarshalIndent(writer, "", "\t")
-
 	if nil != e {
 		log.Print(e)
 	}

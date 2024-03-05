@@ -231,10 +231,15 @@ func (xtrk *extractor) bunzip2(fin *os.File) (fout *os.File, err error) {
 
 	bz2Reader = bzip2.NewReader(bufio.NewReader(fin))
 
-	_, err = io.Copy(fout, bz2Reader)
-	if err != nil {
-		_ = fout.Close()
-		return nil, fmt.Errorf("%s: %w", logp, err)
+	for {
+		_, err = io.CopyN(fout, bz2Reader, 1024)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			_ = fout.Close()
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
 	// Reset the file output descriptor to the beginning.
@@ -273,11 +278,16 @@ func (xtrk *extractor) gunzip(fin *os.File) (fout *os.File, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	_, err = io.Copy(fout, gzReader)
-	if err != nil {
-		_ = fout.Close()
-		_ = gzReader.Close()
-		return nil, fmt.Errorf("%s: %w", logp, err)
+	for {
+		_, err = io.CopyN(fout, gzReader, 1024)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			_ = fout.Close()
+			_ = gzReader.Close()
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
 	err = gzReader.Close()
@@ -319,13 +329,20 @@ func (xtrk *extractor) untar(fin io.Reader) (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 
-		fi = hdr.FileInfo()
+		// gosec detect the following line as G305 or [CWE-22].
+		// We handle it by detecting the joined path, if its not
+		// under the dirOutput, then we return it as error.
+		//
+		// [CWE-22]: https://cwe.mitre.org/data/definitions/22.html
+		//
+		//nolint:gosec
 		filePath = filepath.Join(xtrk.dirOutput, hdr.Name)
 
 		if !strings.HasPrefix(filePath, xtrk.dirOutput) {
 			return fmt.Errorf(`%s: extract path outside of output directory`, logp)
 		}
 
+		fi = hdr.FileInfo()
 		if fi.IsDir() {
 			err = os.Mkdir(filePath, fi.Mode())
 			if err != nil {
@@ -399,13 +416,20 @@ func (xtrk *extractor) unzip(fin *os.File) (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 
-		fi = zipFile.FileInfo()
+		// gosec detect the following line as G305 or [CWE-22].
+		// We handle it by detecting the joined path, if its not
+		// under the dirOutput, then we return it as error.
+		//
+		// [CWE-22]: https://cwe.mitre.org/data/definitions/22.html
+		//
+		//nolint:gosec
 		filePath = filepath.Join(xtrk.dirOutput, zipFile.Name)
 
 		if !strings.HasPrefix(filePath, xtrk.dirOutput) {
 			return fmt.Errorf(`%s: extract path outside of output directory`, logp)
 		}
 
+		fi = zipFile.FileInfo()
 		if fi.IsDir() {
 			err = os.Mkdir(filePath, fi.Mode())
 			if err != nil {

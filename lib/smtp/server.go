@@ -412,10 +412,12 @@ func (srv *Server) handleDATA(recv *receiver) (err error) {
 func (srv *Server) handleEHLO(recv *receiver, cmd *Command) (err error) {
 	recv.clientDomain = cmd.Arg
 
-	body := make([]string, len(srv.Exts))
-	for x, ext := range srv.Exts {
-		body[x] = ext.Name()
-		body[x] += " " + ext.Params()
+	var (
+		body = make([]string, 0, len(srv.Exts))
+		ext  Extension
+	)
+	for _, ext = range srv.Exts {
+		body = append(body, ext.Name()+` `+ext.Params())
 	}
 
 	if !recv.isAuthenticated() {

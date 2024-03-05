@@ -262,9 +262,10 @@ func (node *Node) Readdir(count int) (fis []os.FileInfo, err error) {
 		return nil, nil
 	}
 	if count <= 0 || count >= len(node.Childs) {
-		fis = make([]os.FileInfo, len(node.Childs))
-		for x := 0; x < len(node.Childs); x++ {
-			fis[x] = node.Childs[x]
+		fis = make([]os.FileInfo, 0, len(node.Childs))
+		var child *Node
+		for _, child = range node.Childs {
+			fis = append(fis, child)
 		}
 		node.off = 0
 		return fis, nil

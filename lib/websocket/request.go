@@ -59,7 +59,7 @@ type Request struct {
 	ID uint64 `json:"id"`
 
 	// Conn is the client connection, where the request come from.
-	Conn int
+	Conn int `json:"-"`
 }
 
 // reset all Request field's value to zero.

@@ -9,39 +9,38 @@ import (
 )
 
 func TestMetadataIsEqual(t *testing.T) {
-	cases := []struct {
+	type testCase struct {
 		in     Metadata
 		out    Metadata
 		result bool
-	}{
-		{
-			Metadata{
-				Name:      "A",
-				Separator: ",",
-			},
-			Metadata{
-				Name:      "A",
-				Separator: ",",
-			},
-			true,
-		},
-		{
-			Metadata{
-				Name:      "A",
-				Separator: ",",
-			},
-			Metadata{
-				Name:      "A",
-				Separator: ";",
-			},
-			false,
-		},
 	}
+	var listCase = []testCase{{
+		Metadata{
+			Name:      `A`,
+			Separator: `,`,
+		},
+		Metadata{
+			Name:      `A`,
+			Separator: `,`,
+		},
+		true,
+	}, {
+		Metadata{
+			Name:      `A`,
+			Separator: `,`,
+		},
+		Metadata{
+			Name:      `A`,
+			Separator: `;`,
+		},
+		false,
+	}}
 
-	for _, c := range cases {
+	var c testCase
+	for _, c = range listCase {
 		var got = c.in.IsEqual(&c.out)
 		if got != c.result {
-			t.Error("Test failed on ", c.in, c.out)
+			t.Error(`Test failed on `, c.in, c.out)
 		}
 	}
 }

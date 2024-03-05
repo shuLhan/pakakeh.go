@@ -414,7 +414,7 @@ func ExampleRat_MarshalJSON() {
 
 func ExampleRat_MarshalJSON_withStruct() {
 	type T struct {
-		V *Rat
+		V *Rat `json:"V"`
 	}
 
 	inputs := []T{
@@ -430,7 +430,7 @@ func ExampleRat_MarshalJSON_withStruct() {
 	)
 	MarshalJSONAsString = true
 	for _, in = range inputs {
-		out, err = json.Marshal(in)
+		out, err = json.Marshal(&in)
 		if err != nil {
 			log.Fatal(err)
 		}

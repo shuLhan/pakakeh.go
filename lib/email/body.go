@@ -241,7 +241,7 @@ func (body *Body) Simple() (out []byte) {
 	case 1:
 	default:
 		if out[x-1] != cr && out[x] != lf {
-			out = append(out, "\r\n"...)
+			out = append(out, "\r\n"...) //nolint:makezero
 		}
 	}
 
