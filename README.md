@@ -100,6 +100,10 @@ A wrapper for git command line interface.
 Package http extends the standard http package with simplified routing handler
 and builtin memory file system.
 
+[**html**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/html)::
+Package html extends the golang.org/x/net/html by providing simplified
+methods for working with Node.
+
 [**hunspell**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/hunspell)::
 [WORK IN PROGRESS].
 A library to parse the Hunspell file format.
@@ -165,10 +169,6 @@ Package mlog implement buffered multi writers of log.
 
 [**net**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/net)::
 Constants and library for networking.
-
-[**net/html**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/net/html)::
-Package html extends the golang.org/x/net/html by providing simplified
-methods for working with Node.
 
 [**numbers**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/numbers)::
 A library for working with integer, float, slice of integer, and slice of

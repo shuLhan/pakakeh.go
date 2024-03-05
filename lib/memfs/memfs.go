@@ -20,7 +20,7 @@ import (
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libints "git.sr.ht/~shulhan/pakakeh.go/lib/ints"
-	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/net/html"
+	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/html"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
