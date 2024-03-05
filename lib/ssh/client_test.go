@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh/config"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/sshconfig"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -20,7 +20,7 @@ func TestNewClient_KeyError_notExist(t *testing.T) {
 	t.Skip(`Require active SSH server`)
 
 	var (
-		section = config.NewSection(nil, `localhost`)
+		section = sshconfig.NewSection(nil, `localhost`)
 
 		wd  string
 		err error
@@ -31,23 +31,23 @@ func TestNewClient_KeyError_notExist(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = section.Set(config.KeyUser, `ms`)
+	err = section.Set(sshconfig.KeyUser, `ms`)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = section.Set(config.KeyHostname, `localhost`)
+	err = section.Set(sshconfig.KeyHostname, `localhost`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	var knownHostsFile = filepath.Join(wd, `testdata/localhost/known_hosts_empty`)
-	err = section.Set(config.KeyUserKnownHostsFile, knownHostsFile)
+	err = section.Set(sshconfig.KeyUserKnownHostsFile, knownHostsFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	var pkeyFile = filepath.Join(wd, `testdata/localhost/client.key`)
-	err = section.Set(config.KeyIdentityFile, pkeyFile)
+	err = section.Set(sshconfig.KeyIdentityFile, pkeyFile)
 	if err != nil {
 		t.Fatal(err)
 	}

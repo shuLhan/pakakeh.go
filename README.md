@@ -207,11 +207,11 @@ functionality across DBMS.
 Package ssh provide a wrapper for golang.org/x/crypto/ssh and a parser for SSH
 client configuration specification ssh_config(5).
 
-[**ssh/config**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ssh/config)::
-Package config provide the ssh_config(5) parser and getter.
-
 [**ssh/sftp**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ssh/sftp)::
 Package sftp implement native SSH File Transport Protocol v3.
+
+[**sshconfig**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/sshconfig)::
+Package config provide the ssh_config(5) parser and getter.
 
 [**strings**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/strings)::
 A library for working with slice of string.

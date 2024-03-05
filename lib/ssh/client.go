@@ -21,7 +21,7 @@ import (
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/crypto"
 	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh/config"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/sshconfig"
 )
 
 // Client for SSH connection.
@@ -31,7 +31,7 @@ type Client struct {
 	*ssh.Client
 
 	config  *ssh.ClientConfig
-	section *config.Section
+	section *sshconfig.Section
 
 	stdout io.Writer
 	stderr io.Writer
@@ -63,7 +63,7 @@ type Client struct {
 //   - User
 //   - UserKnownHostsFile, setting this to "none" will set HostKeyCallback
 //     to [ssh.InsecureIgnoreHostKey].
-func NewClientInteractive(section *config.Section) (cl *Client, err error) {
+func NewClientInteractive(section *sshconfig.Section) (cl *Client, err error) {
 	if section == nil {
 		return nil, nil
 	}
@@ -134,7 +134,7 @@ func NewClientInteractive(section *config.Section) (cl *Client, err error) {
 	return cl, nil
 }
 
-// setConfigHostKeyCallback set the config.HostKeyCallback based on the
+// setConfigHostKeyCallback set the [sshconfig.HostKeyCallback] based on the
 // UserKnownHostsFile in the Section.
 // If one of the UserKnownHostsFile set to "none" it will use
 // [ssh.InsecureIgnoreHostKey].
@@ -147,7 +147,7 @@ func (cl *Client) setConfigHostKeyCallback() (err error) {
 	)
 
 	for _, knownHosts = range userKnownHosts {
-		if knownHosts == config.ValueNone {
+		if knownHosts == sshconfig.ValueNone {
 			// If one of the UserKnownHosts set to "none" always
 			// accept the remote hosts.
 			//
@@ -362,7 +362,7 @@ func (cl *Client) Output(cmd string) (stdout, stderr []byte, err error) {
 // ScpGet copy file from remote into local storage using scp.
 //
 // The local file should be use the absolute path, or relative to the file in
-// config.Section.WorkingDir.
+// [sshconfig.Section.WorkingDir].
 func (cl *Client) ScpGet(remote, local string) (err error) {
 	logp := "ScpGet"
 
@@ -396,7 +396,7 @@ func (cl *Client) ScpGet(remote, local string) (err error) {
 // ScpPut copy a file from local storage to remote using scp command.
 //
 // The local file should be use the absolute path, or relative to the file in
-// config.Section's WorkingDir.
+// [sshconfig.Section] WorkingDir.
 func (cl *Client) ScpPut(local, remote string) (err error) {
 	logp := "ScpPut"
 

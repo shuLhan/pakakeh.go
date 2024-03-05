@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package config provide the ssh_config(5) parser and getter.
-package config
+// Package sshconfig provide the [ssh_config(5)] parser and getter.
+//
+// [ssh_config(5)]: https://man.archlinux.org/man/ssh_config.5
+package sshconfig
 
 import (
 	"errors"

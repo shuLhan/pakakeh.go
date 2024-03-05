@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ssh/config"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/sshconfig"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -33,11 +33,11 @@ func TestMain(m *testing.M) {
 		return
 	}
 
-	cfg := &config.Section{
+	cfg := &sshconfig.Section{
 		Field: map[string]string{
-			config.KeyUser:     `ms`,
-			config.KeyHostname: `localhost`,
-			config.KeyPort:     `22`,
+			sshconfig.KeyUser:     `ms`,
+			sshconfig.KeyHostname: `localhost`,
+			sshconfig.KeyPort:     `22`,
 		},
 		IdentityFile: []string{
 			"./testdata/id_ed25519",
