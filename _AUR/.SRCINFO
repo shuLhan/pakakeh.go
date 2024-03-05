@@ -1,14 +1,16 @@
-pkgbase = share-tools
+pkgbase = pakakeh.go-tools
 	pkgdesc = Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk
-	pkgver = 0.51.0.r2.ga507deaa
+	pkgver = 0.53.1.r8.g76510776
 	pkgrel = 1
-	url = https://github.com/shuLhan/share
+	url = https://sr.ht/~shulhan/pakakeh.go
 	arch = x86_64
 	license = BSD
 	makedepends = go
 	makedepends = git
-	provides = share-tools
-	source = share-tools::git+https://github.com/shuLhan/share.git
+	provides = pakakeh.go-tools
+	conflicts = share-tools
+	replaces = share-tools
+	source = pakakeh.go-tools::git+https://git.sr.ht/~shulhan/pakakeh.go
 	md5sums = SKIP
 
-pkgname = share-tools
+pkgname = pakakeh.go-tools

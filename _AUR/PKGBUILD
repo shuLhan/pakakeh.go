@@ -1,20 +1,22 @@
 # Maintainer: shulhan <ms@kilabit.info>
 
-pkgname=share-tools
-pkgver=0.51.0.r2.ga507deaa
+pkgname=pakakeh.go-tools
+pkgver=0.53.1.r8.g76510776
 pkgrel=1
 
 pkgdesc="Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk"
 arch=(x86_64)
 url='https://sr.ht/~shulhan/pakakeh.go'
 license=('BSD')
+conflicts=('share-tools')
+replaces=('share-tools')
 
 makedepends=(
 	'go'
 	'git'
 )
 
-provides=('share-tools')
+provides=('pakakeh.go-tools')
 
 source=(
 	"$pkgname::git+https://git.sr.ht/~shulhan/pakakeh.go"
