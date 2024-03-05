@@ -46,60 +46,6 @@ type MemFS struct {
 	subfs []*MemFS
 }
 
-// Merge one or more instances of MemFS into single hierarchy.
-//
-// The returned MemFS instance will have SysPath set to the first
-// MemFS.SysPath in parameter.
-//
-// If there are two instance of Node that have the same path, the last
-// instance will be ignored.
-//
-// Deprecated: use [MemFS.Merge] instead.
-// TODO: Remove in the next three release cycles, v0.53.0.
-func Merge(params ...*MemFS) (merged *MemFS) {
-	merged = &MemFS{
-		PathNodes: NewPathNode(),
-		Root: &Node{
-			SysPath: "..",
-			Path:    "/",
-			mode:    2147484141,
-		},
-		Opts: &Options{},
-	}
-
-	merged.PathNodes.Set("/", merged.Root)
-
-	var (
-		x   int
-		mfs *MemFS
-	)
-
-	for x, mfs = range params {
-		if x == 0 {
-			merged.Root.SysPath = mfs.Root.SysPath
-		}
-
-		for _, child := range mfs.Root.Childs {
-			gotNode := merged.PathNodes.Get(child.Path)
-			if gotNode != nil {
-				continue
-			}
-			merged.Root.AddChild(child)
-		}
-		paths := mfs.PathNodes.Paths()
-		for _, path := range paths {
-			if path == "/" {
-				continue
-			}
-			gotNode := merged.PathNodes.Get(path)
-			if gotNode == nil {
-				merged.PathNodes.Set(path, mfs.PathNodes.Get(path))
-			}
-		}
-	}
-	return merged
-}
-
 // New create and initialize new memory file system from directory Root using
 // list of regular expresssion for Including or Excluding files.
 func New(opts *Options) (mfs *MemFS, err error) {
