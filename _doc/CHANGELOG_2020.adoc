@@ -8,17 +8,17 @@ Shulhan <ms@kilabit.info>
 link:CHANGELOG.html[Latest changelog^].
 
 link:CHANGELOG_2021.html[Changelog in 2021^].
-This is changelog for share module since v0.22.0 until v0.32.0.
+This is changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
 
 link:CHANGELOG_2020.html[Changelog in 2020 (this document)^].
-This is changelog for share module since v0.12.0 until v0.21.0.
+This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
-This is changelog for share module since v0.1.0 until v0.11.0.
+This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
 [#v0_21_0]
-==  share v0.21.0 (2020-12-06)
+==  pakakeh.go v0.21.0 (2020-12-06)
 
 [#v0_21_0_breaking_changes]
 ===  Breaking changes
@@ -86,7 +86,7 @@ tools.
 
 
 [#v0_20_1]
-==  share v0.20.1 (2020-11-08)
+==  pakakeh.go v0.20.1 (2020-11-08)
 
 [#v0_20_1_bug_fixes]
 ===  Bug fixes
@@ -123,7 +123,7 @@ position, and then call Close to reset the internal state back to zero.
 
 
 [#v0_20_0]
-==  share v0.20.0 (2020-10-05)
+==  pakakeh.go v0.20.0 (2020-10-05)
 
 [#v0_20_0_new_features]
 ===  New features
@@ -150,7 +150,7 @@ is forwarded to DNS server, so this changes accommodated it.
 
 
 [#v0_19_0]
-==  share v0.19.0 (2020-09-08)
+==  pakakeh.go v0.19.0 (2020-09-08)
 
 [#v0_19_0_breaking_changes]
 ===  Breaking changes
@@ -221,7 +221,7 @@ previously) and new path and handler for retrieving server status.
 
 
 [#v0_18_0]
-==  share v0.18.0 (2020-08-06)
+==  pakakeh.go v0.18.0 (2020-08-06)
 
 [#v0_18_0_breaking_changes]
 ===  Breaking changes
@@ -266,7 +266,7 @@ if the library always set the response type to None.
 
 
 [#v0_17_0]
-==  share v0.17.0 (2020-07-05)
+==  pakakeh.go v0.17.0 (2020-07-05)
 
 [#v0_17_0_breaking_changes]
 ===  Breaking changes
@@ -303,7 +303,7 @@ if the library always set the response type to None.
 
 
 [#v0_16_0]
-==  share v0.16.0 (2020-06-05)
+==  pakakeh.go v0.16.0 (2020-06-05)
 
 [#v0_16_0_breaking_changes]
 ===  Breaking changes
@@ -417,7 +417,7 @@ This changes add all child nodes to generated node.
 
 
 [#v0_15_0]
-==  share v0.15.0 (2020-05-04)
+==  pakakeh.go v0.15.0 (2020-05-04)
 
 [#v0_15_0_breaking_changes]
 ===  Breaking changes
@@ -459,7 +459,7 @@ to iterate each node in the tree from top to bottom.
 
 
 [#v0_14_0]
-==  share v0.14.0 (2020-04-03)
+==  pakakeh.go v0.14.0 (2020-04-03)
 
 [#v0_14_0_breaking_changes]
 ===  Breaking changes
@@ -523,7 +523,7 @@ word.
 
 
 [#v0_13_0]
-==  share v0.13.0 (2020-03-11)
+==  pakakeh.go v0.13.0 (2020-03-11)
 
 [#v0_13_0_breaking_changes]
 ===  Breaking changes
@@ -553,7 +553,7 @@ Set the minimum Go version to 1.13.
 
 
 [#v0_12_0]
-==  share v0.12.0 (2020-02-13)
+==  pakakeh.go v0.12.0 (2020-02-13)
 
 [#v0_12_0_breaking_changes]
 ===  Breaking changes

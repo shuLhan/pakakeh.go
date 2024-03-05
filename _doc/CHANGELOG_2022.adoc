@@ -5,17 +5,17 @@ Shulhan <ms@kilabit.info>
 :sectlinks:
 
 link:CHANGELOG_2021.html[Changelog in 2021^].
-This is changelog for share module since v0.22.0 until v0.32.0.
+This is changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
 
 link:CHANGELOG_2020.html[Changelog in 2020^].
-This is changelog for share module since v0.12.0 until v0.21.0.
+This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
-This is changelog for share module since v0.1.0 until v0.11.0.
+This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
 [#v0_42_0]
-==  share v0.42.0 (2022-12-12)
+==  pakakeh.go v0.42.0 (2022-12-12)
 
 [#v0_42_0_new_features]
 === New features
@@ -55,7 +55,7 @@ The fix is to seed it manually using predefined number.
 
 
 [#v0_41_3]
-==  share v0.41.3 (2022-11-05)
+==  pakakeh.go v0.41.3 (2022-11-05)
 
 [#v0_41_3_bug_fixes]
 ===  Bug fixes
@@ -114,7 +114,7 @@ replacing the Signers field (which is conflict with method names).
 
 
 [#v0_41_2]
-==  share v0.41.2 (2022-10-10)
+==  pakakeh.go v0.41.2 (2022-10-10)
 
 [#v0_41_2_bug_fixes]
 ===  Bug fixes
@@ -177,7 +177,7 @@ lib/websocket: rewords some comment and package documentation::
 
 
 [#v0_41_1]
-==  share v0.41.1 (2022-10-07)
+==  pakakeh.go v0.41.1 (2022-10-07)
 
 [#v0_41_1_enhancements]
 ===  Enhancements
@@ -255,7 +255,7 @@ in the lib/test in the future.
 
 
 [#v0_41_0]
-==  share v0.41.0 (2022-09-04)
+==  pakakeh.go v0.41.0 (2022-09-04)
 
 [#v0_41_0_breaking_changes]
 ===  Breaking changes
@@ -343,7 +343,7 @@ This changes replace ":=" with explicit variable declarations and use
 raw string literal whenever possible.
 
 [#v0_40_0]
-==  share v0.40.0 (2022-08-05)
+==  pakakeh.go v0.40.0 (2022-08-05)
 
 [#v0_40_0_breaking_changes]
 ===  Breaking changes
@@ -526,7 +526,7 @@ lib/ini: handle marshaling slice of time.Time:: -
 
 
 [#v0_39_0]
-==  share v0.39.0 (2022-07-03)
+==  pakakeh.go v0.39.0 (2022-07-03)
 
 [#v0_39_0_breaking_changes]
 ===  Breaking changes
@@ -754,7 +754,7 @@ Plus other structs in the tests.
 --
 
 [#v0_38_0]
-==  share v0.38.0 (2022-06-05)
+==  pakakeh.go v0.38.0 (2022-06-05)
 
 This release update the minimum Go version to 1.17.
 
@@ -868,7 +868,7 @@ as close as possible with output of gofmt.
 
 
 [#v0_37_0]
-==  share v0.37.0 (2022-05-09)
+==  pakakeh.go v0.37.0 (2022-05-09)
 
 [#v0_37_0_breaking_changes]
 ===  Breaking changes
@@ -985,7 +985,7 @@ with their replacement from package os or package io.
 
 
 [#v0_36_0]
-==  share v0.36.0 (2022-04-03)
+==  pakakeh.go v0.36.0 (2022-04-03)
 
 [#v0_36_0_breaking_changes]
 ===  Breaking changes
@@ -1103,7 +1103,7 @@ the code and give an example for code).
 
 
 [#v0_35_0]
-==  share v0.35.0 (2022-03-04)
+==  pakakeh.go v0.35.0 (2022-03-04)
 
 [#v0_35_0_breaking_changes]
 ===  Breaking changes
@@ -1303,7 +1303,7 @@ give advantages on minimize GC pressure.
 
 
 [#v0_34_0]
-==  share v0.34.0 (2022-02-05)
+==  pakakeh.go v0.34.0 (2022-02-05)
 
 [#v0_34_0_breaking_changes]
 ===  Breaking changes
@@ -1376,7 +1376,7 @@ as global variable so any tests can references it.
 
 
 [#v0_33_0]
-==  share v0.33.0 (2022-01-09)
+==  pakakeh.go v0.33.0 (2022-01-09)
 
 Happy New Year!
 
@@ -1385,7 +1385,7 @@ module), and we have released at least 33 new features with several bugs here
 and there.
 
 For anyone who use this module, I hope it help you, as the module name
-intended "share", and sorry if its too many breaking changes.
+intended "pakakeh.go", and sorry if its too many breaking changes.
 
 Live long and prosper!
 See you again next year.

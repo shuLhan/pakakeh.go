@@ -7,20 +7,20 @@ Shulhan <ms@kilabit.info>
 This library is released every month, usually at the first week of month.
 
 link:CHANGELOG_2022.html[Changelog in 2022^].
-This is changelog for share module since v0.33.0 until v0.42.0.
+This is changelog for `pakakeh.go` module since v0.33.0 until v0.42.0.
 
 link:CHANGELOG_2021.html[Changelog in 2021^].
-This is changelog for share module since v0.22.0 until v0.32.0.
+This is changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
 
 link:CHANGELOG_2020.html[Changelog in 2020^].
-This is changelog for share module since v0.12.0 until v0.21.0.
+This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
-This is changelog for share module since v0.1.0 until v0.11.0.
+This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
 [#v0_51_0]
-== share v0.51.0 (2023-12-06)
+== pakakeh.go v0.51.0 (2023-12-06)
 
 [#v0_51_0__new_features]
 === New features
@@ -192,7 +192,7 @@ to maximum value int64 (not maximum of uint64).
 
 
 [#v0_50_1]
-== share v0.50.1 (2023-11-05)
+== pakakeh.go v0.50.1 (2023-11-05)
 
 This release bring many enhancements to "lib/memfs", a library for caching
 file system in memory.
@@ -256,7 +256,7 @@ content should be updated too on "MemFS.Get".
 
 
 [#v0_50_0]
-== share v0.50.0 (2023-10-04)
+== pakakeh.go v0.50.0 (2023-10-04)
 
 This release bring many enhancements thanks to linters like revive [1],
 fieldaligment [2], and shadow [3].
@@ -382,7 +382,7 @@ error when executing the "scp" command.
 
 
 [#v0_49_1]
-== share v0.49.1 (2023-09-02)
+== pakakeh.go v0.49.1 (2023-09-02)
 
 [#v0_49_1__bug_fixes]
 ===  Bug fixes
@@ -458,7 +458,7 @@ reviewed yet, so we need to replace it with one that contains the patch.
 
 
 [#v0_49_0]
-== share v0.49.0 (2023-08-04)
+== pakakeh.go v0.49.0 (2023-08-04)
 
 [#v0_49_0__breaking_changes]
 === Breaking changes
@@ -601,7 +601,7 @@ The rest of changes that are not mentioned are from test files.
 
 
 [#v0_48_0]
-==  share v0.48.0 (2023-07-07)
+==  pakakeh.go v0.48.0 (2023-07-07)
 
 This release bring many enhancements to lib/websocket including timeout,
 handling upgrade and read/write concurrently using goroutine.
@@ -739,7 +739,7 @@ and cleanup the container.
 
 
 [#v0_47_0]
-==  share v0.47.0 (2023-06-05)
+==  pakakeh.go v0.47.0 (2023-06-05)
 
 [#v0_47_0__breaking_changes]
 ===  Breaking changes
@@ -918,7 +918,7 @@ all: record the contributors of this module in file AUTHORS::
 
 
 [#v0_46_0]
-==  share v0.46.0 (2023-05-02)
+==  pakakeh.go v0.46.0 (2023-05-02)
 
 This release deprecated lib/io and lib/parser.
 
@@ -1050,7 +1050,7 @@ This is to prevent import cycle later when we use lib/test in bytes.
 
 
 [#v0_45_0]
-==  share v0.45.0 (2023-04-01)
+==  pakakeh.go v0.45.0 (2023-04-01)
 
 This release set the Go version to 1.19.
 
@@ -1243,7 +1243,7 @@ chunk.
 
 
 [#v0_44_0]
-==  share v0.44.0 (2023-03-02)
+==  pakakeh.go v0.44.0 (2023-03-02)
 
 [#v0_44_0__new_features]
 ===  New features
@@ -1312,7 +1312,7 @@ The math/rand will be deprecated in Go 1.20.
 
 
 [#v0_43_0]
-==  share v0.43.0 (2023-02-07)
+==  pakakeh.go v0.43.0 (2023-02-07)
 
 [#v0_43_0__new_features]
 ===  New features

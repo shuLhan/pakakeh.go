@@ -8,17 +8,17 @@ Shulhan <ms@kilabit.info>
 link:CHANGELOG.html[Latest changelog^].
 
 link:CHANGELOG_2021.html[Changelog in 2021 (this document)^].
-This is changelog for share module since v0.22.0 until v0.32.0.
+This is changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
 
 link:CHANGELOG_2020.html[Changelog in 2020^].
-This is changelog for share module since v0.12.0 until v0.21.0.
+This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
-This is changelog for share module since v0.1.0 until v0.11.0.
+This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
 [#v0_32_0]
-==  share v0.32.0 (2021-12-03)
+==  pakakeh.go v0.32.0 (2021-12-03)
 
 This release bring major changes and enhancements to package dns and math/big.
 
@@ -243,7 +243,7 @@ While at it, minimize copying packet if its not reusable inside a method.
 
 
 [#v0_31_0]
-==  share v0.31.0 (2021-11-04)
+==  pakakeh.go v0.31.0 (2021-11-04)
 
 [#v0_31_0_breaking_changes]
 ===  Breaking changes
@@ -450,7 +450,7 @@ The zero value for V ([]byte) is already nil and Node.Childs
 
 
 [#v0_30_0]
-==  share v0.30.0 (2021-10-04)
+==  pakakeh.go v0.30.0 (2021-10-04)
 
 [#v0_30_0_breaking_changes]
 === Breaking changes
@@ -623,7 +623,7 @@ fmt.Sprintf.
 
 
 [#v0_29_2]
-==  share v0.29.2 (2021-09-06)
+==  pakakeh.go v0.29.2 (2021-09-06)
 
 [#v0_29_2_bug_fixes]
 ===  Bug fixes
@@ -787,7 +787,7 @@ We try to fix this by creating new client on each test cases.
 
 
 [#v0_29_1]
-==  share v0.29.1 (2021-08-06)
+==  pakakeh.go v0.29.1 (2021-08-06)
 
 Revert the "lib/errors: return the internal error only if its not nil on
 Unwrap".
@@ -799,7 +799,7 @@ method.
 
 
 [#v0_29_0]
-==  share v0.29.0 (2021-08-06)
+==  pakakeh.go v0.29.0 (2021-08-06)
 
 [#v0_29_0_new_feature]
 ===  New feature
@@ -883,7 +883,7 @@ of e itself.
 
 
 [#v0_28_0]
-== share v0.28.0 (2021-07-06)
+== pakakeh.go v0.28.0 (2021-07-06)
 
 [#v0_28_0_breaking_changes]
 === Breaking changes
@@ -951,7 +951,7 @@ This commit store all request header key and values into the Header field.
 --
 
 [#v0_27_0]
-== share v0.27.0 (2021-06-05)
+== pakakeh.go v0.27.0 (2021-06-05)
 
 This release bring better functionalities, usability, and fixes for `xmlrpc`
 package.
@@ -1052,7 +1052,7 @@ JavaScript file is "application/javascript".
 
 
 [#v0_26_0]
-==  share v0.26.0 (2021-05-03)
+==  pakakeh.go v0.26.0 (2021-05-03)
 
 [#v0_26_0_new_features]
 === New features
@@ -1123,7 +1123,7 @@ LittleEndian, and input value.
 
 
 [#v0_25_1]
-==  share v0.25.1 (2021-04-06)
+==  pakakeh.go v0.25.1 (2021-04-06)
 
 Set the minimum Go version to 1.16
 
@@ -1136,7 +1136,7 @@ We choose to move forward.
 
 
 [#v0_25_0]
-==  share v0.25.0 (2021-04-06)
+==  pakakeh.go v0.25.0 (2021-04-06)
 
 [#v0_25_0_breaking_changes]
 ===  Breaking changes
@@ -1243,7 +1243,7 @@ request and response to standard output.
 
 
 [#v0_24_0]
-==  share v0.24.0 (2021-03-06)
+==  pakakeh.go v0.24.0 (2021-03-06)
 
 [#v0_24_0_breaking_changes]
 ===  Breaking changes
@@ -1405,7 +1405,7 @@ Beside using IsNil(), return the last check using "v == nil".
 
 
 [#v0_23_0]
-==  share v0.23.0 (2021-02-05)
+==  pakakeh.go v0.23.0 (2021-02-05)
 
 This release bring major refactoring to package memfs to allow embedding two
 or more directories in single package.
@@ -1567,7 +1567,7 @@ file.
 
 
 [#v0_22_0]
-==  share v0.22.0 (2021-01-06)
+==  pakakeh.go v0.22.0 (2021-01-06)
 
 [#v0_22_0_breaking_changes]
 ===  Breaking changes
