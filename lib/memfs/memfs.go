@@ -19,8 +19,8 @@ import (
 	"time"
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
-	libints "git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/html"
+	libints "git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 

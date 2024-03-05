@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 )
 
 const (
@@ -68,7 +68,7 @@ func main() {
 		return
 	}
 	if cmd == cmdVersion {
-		fmt.Println("gofmtcomment v" + share.Version)
+		fmt.Println(`gofmtcomment v` + pakakeh.Version)
 		return
 	}
 

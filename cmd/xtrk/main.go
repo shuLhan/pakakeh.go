@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 	libos "git.sr.ht/~shulhan/pakakeh.go/lib/os"
 )
 
@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 	if cmd == cmdVersion {
-		fmt.Println("xtrk v" + share.Version)
+		fmt.Println(`xtrk v` + pakakeh.Version)
 		return
 	}
 

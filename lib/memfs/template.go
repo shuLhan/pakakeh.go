@@ -91,7 +91,7 @@ func init() {
 		Opts: &memfs.Options{
 			Root:        "{{.Opts.Root}}",
 			MaxFileSize: {{.Opts.MaxFileSize}},
-			Includes: []string{
+			Includes:    []string{
 			{{- range $v := .Opts.Includes}}
 				` + "`{{$v}}`" + `,
 			{{- end}}
@@ -102,7 +102,7 @@ func init() {
 			{{- end}}
 			},
 			Embed: memfs.EmbedOptions{
-				CommentHeader: ` + "`" + `{{.Opts.Embed.CommentHeader}}` + "`" + `,
+				CommentHeader:  ` + "`" + `{{.Opts.Embed.CommentHeader}}` + "`" + `,
 				PackageName:    "{{.Opts.Embed.PackageName}}",
 				VarName:        "{{.Opts.Embed.VarName}}",
 				GoFileName:     "{{.Opts.Embed.GoFileName}}",

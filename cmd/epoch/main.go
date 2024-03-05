@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 )
 
 const usage = `= epoch
@@ -176,7 +176,7 @@ func main() {
 		return
 
 	case cmdVersion:
-		fmt.Println("epoch v" + share.Version)
+		fmt.Println(`epoch v` + pakakeh.Version)
 		return
 
 	default:

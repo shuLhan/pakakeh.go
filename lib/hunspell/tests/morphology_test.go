@@ -64,7 +64,7 @@ func TestMorphology_parseStem(t *testing.T) {
 		exp:  "x",
 	}, {
 		line: "	stem(x) = x ",
-		exp: "x",
+		exp:  "x",
 	}}
 
 	got := morphology{

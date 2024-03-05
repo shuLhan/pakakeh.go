@@ -16,7 +16,7 @@ import (
 	"os"
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go"
+	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ini"
 )
 
@@ -116,7 +116,7 @@ func main() {
 		doSet(args[1:])
 
 	case cmdVersion:
-		fmt.Println("ini v" + share.Version)
+		fmt.Println(`ini v` + pakakeh.Version)
 
 	default:
 		log.Println("ini: unknown command:", cmd)

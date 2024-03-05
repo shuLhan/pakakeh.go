@@ -320,14 +320,14 @@ func init() {
 		Opts: &memfs.Options{
 			Root:        "testdata",
 			MaxFileSize: 5242880,
-			Includes: []string{
+			Includes:    []string{
 			},
 			Excludes: []string{
 				`^\..*`,
 				`.*/node_save$`,
 			},
 			Embed: memfs.EmbedOptions{
-				CommentHeader: `// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
+				CommentHeader:  `// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 `,
 				PackageName:    "embed",

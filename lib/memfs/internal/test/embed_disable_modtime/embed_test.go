@@ -299,14 +299,14 @@ func init() {
 		Opts: &memfs.Options{
 			Root:        "testdata",
 			MaxFileSize: 5242880,
-			Includes: []string{
+			Includes:    []string{
 			},
 			Excludes: []string{
 				`^\..*`,
 				`.*/node_save$`,
 			},
 			Embed: memfs.EmbedOptions{
-				CommentHeader: ``,
+				CommentHeader:  ``,
 				PackageName:    "embed",
 				VarName:        "memFS",
 				GoFileName:     "./internal/test/embed_disable_modtime/embed_test.go",
