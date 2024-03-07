@@ -13,7 +13,7 @@ VERSION := $(shell git describe --tags)
 .PHONY: all install build docs docs-serve clean distclean
 .PHONY: lint test test.prof
 
-all: test lint build
+all: lint build test
 
 install:
 	go install ./cmd/...
@@ -21,7 +21,12 @@ install:
 build: BUILD_FLAGS=-ldflags "-s -w -X 'git.sr.ht/~shulhan/pakakeh.go.Version=$(VERSION)'"
 build:
 	mkdir -p _bin/
-	go build $(BUILD_FLAGS) -o _bin/ ./cmd/...
+	go build \
+		-trimpath \
+		-buildmode=pie \
+		-mod=readonly \
+		-modcacherw \
+		$(BUILD_FLAGS) -o _bin/ ./cmd/...
 
 test:
 	CGO_ENABLED=1 go test -failfast -timeout=1m -race -coverprofile=$(COVER_OUT) ./...
