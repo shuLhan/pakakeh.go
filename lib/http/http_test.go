@@ -52,23 +52,22 @@ var (
 
 func TestMain(m *testing.M) {
 	var (
-		serverAddress = "127.0.0.1:14832"
-		err           error
+		opts = ServerOptions{
+			Memfs: &memfs.MemFS{
+				Opts: &memfs.Options{
+					Root:        `./testdata`,
+					MaxFileSize: 30,
+					TryDirect:   true,
+				},
+			},
+			HandleFS: handleFS,
+			Address:  `127.0.0.1:14832`,
+		}
+
+		err error
 	)
 
-	opts := &ServerOptions{
-		Memfs: &memfs.MemFS{
-			Opts: &memfs.Options{
-				Root:        "./testdata",
-				MaxFileSize: 30,
-				TryDirect:   true,
-			},
-		},
-		HandleFS: handleFS,
-		Address:  serverAddress,
-	}
-
-	testServerURL = `http://` + serverAddress
+	testServerURL = `http://` + opts.Address
 
 	testServer, err = NewServer(opts)
 	if err != nil {

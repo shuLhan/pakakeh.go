@@ -21,8 +21,7 @@ func ExampleServer_customHTTPStatusCode() {
 		exp = CustomResponse{
 			Status: http.StatusBadRequest,
 		}
-
-		opts = &ServerOptions{
+		opts = ServerOptions{
 			Address: "127.0.0.1:8123",
 		}
 
@@ -67,10 +66,12 @@ func ExampleServer_customHTTPStatusCode() {
 	// Wait for the server fully started.
 	time.Sleep(1 * time.Second)
 
-	clientOpts := &ClientOptions{
-		ServerURL: `http://127.0.0.1:8123`,
-	}
-	client := NewClient(clientOpts)
+	var (
+		clientOpts = ClientOptions{
+			ServerURL: `http://127.0.0.1:8123`,
+		}
+		client = NewClient(clientOpts)
+	)
 
 	httpRes, resBody, err := client.PostJSON(epCustom.Path, nil, nil) //nolint: bodyclose
 	if err != nil {

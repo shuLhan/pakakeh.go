@@ -42,7 +42,7 @@ func NewClient(url *url.URL, timeout time.Duration) (client *Client, err error) 
 		url:     url,
 		timeout: timeout,
 	}
-	clientOpts := &libhttp.ClientOptions{
+	var clientOpts = libhttp.ClientOptions{
 		Timeout: timeout,
 	}
 

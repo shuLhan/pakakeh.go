@@ -90,7 +90,7 @@ func main() {
 		httpd *libhttp.Server
 	)
 
-	httpd, err = libhttp.NewServer(&serverOpts)
+	httpd, err = libhttp.NewServer(serverOpts)
 	if err != nil {
 		log.Fatalf(`%s: %s`, cmdName, err)
 	}

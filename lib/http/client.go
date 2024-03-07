@@ -40,9 +40,9 @@ type Client struct {
 	flateReader io.ReadCloser
 	gzipReader  *gzip.Reader
 
-	opts *ClientOptions
-
 	*http.Client
+
+	opts ClientOptions
 }
 
 // NewClient create and initialize new [Client].
@@ -50,7 +50,7 @@ type Client struct {
 // The client will have [net.Dialer.KeepAlive] set to 30 seconds, with one
 // [http.Transport.MaxIdleConns], and 90 seconds
 // [http.Transport.IdleConnTimeout].
-func NewClient(opts *ClientOptions) (client *Client) {
+func NewClient(opts ClientOptions) (client *Client) {
 	opts.init()
 
 	httpTransport := &http.Transport{

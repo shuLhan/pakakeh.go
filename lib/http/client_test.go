@@ -18,7 +18,7 @@ func TestClient_Download(t *testing.T) {
 		clientOpts = ClientOptions{
 			ServerURL: `http://` + testServer.Options.Address,
 		}
-		client = NewClient(&clientOpts)
+		client = NewClient(clientOpts)
 
 		out bytes.Buffer
 		err error

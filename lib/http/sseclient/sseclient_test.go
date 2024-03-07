@@ -423,7 +423,7 @@ func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (srv *libhttp.Server
 	var address = testGenerateAddress()
 
 	var (
-		serverOpts = &libhttp.ServerOptions{
+		serverOpts = libhttp.ServerOptions{
 			Address: address,
 		}
 	)

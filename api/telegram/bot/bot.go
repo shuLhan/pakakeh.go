@@ -110,7 +110,7 @@ func New(opts Options) (bot *Bot, err error) {
 		return nil, fmt.Errorf("bot.New: %w", err)
 	}
 
-	clientOpts := &http.ClientOptions{
+	var clientOpts = http.ClientOptions{
 		ServerURL: defURL + opts.Token + `/`,
 	}
 	bot = &Bot{
@@ -365,7 +365,7 @@ func (bot *Bot) startWebhook() (err error) {
 
 // createServer start the HTTP server for receiving Update.
 func (bot *Bot) createServer() (err error) {
-	serverOpts := &http.ServerOptions{
+	var serverOpts = http.ServerOptions{
 		Address: bot.opts.Webhook.ListenAddress,
 	}
 

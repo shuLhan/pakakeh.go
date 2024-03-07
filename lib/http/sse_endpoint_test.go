@@ -11,11 +11,10 @@ import (
 )
 
 func TestSSEEndpoint(t *testing.T) {
-	var opts = &ServerOptions{
-		Address: `127.0.0.1:24168`,
-	}
-
 	var (
+		opts = ServerOptions{
+			Address: `127.0.0.1:24168`,
+		}
 		httpd *Server
 		err   error
 	)

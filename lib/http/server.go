@@ -33,24 +33,24 @@ const (
 type Server struct {
 	*http.Server
 
-	// Options for server, set by calling NewServer.
-	// This field is exported only for reference, for example logging in
-	// the Options when server started.
-	// Modifying the value of Options after server has been started may
-	// cause undefined effects.
-	Options *ServerOptions
-
 	evals        []Evaluator
 	routeDeletes []*route
 	routeGets    []*route
 	routePatches []*route
 	routePosts   []*route
 	routePuts    []*route
+
+	// Options for server, set by calling NewServer.
+	// This field is exported only for reference, for example logging in
+	// the Options when server started.
+	// Modifying the value of Options after server has been started may
+	// cause undefined effects.
+	Options ServerOptions
 }
 
 // NewServer create and initialize new HTTP server that serve root directory
 // with custom connection.
-func NewServer(opts *ServerOptions) (srv *Server, err error) {
+func NewServer(opts ServerOptions) (srv *Server, err error) {
 	opts.init()
 
 	srv = &Server{

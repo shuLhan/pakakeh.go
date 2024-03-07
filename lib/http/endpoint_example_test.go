@@ -16,10 +16,14 @@ import (
 )
 
 func ExampleEndpoint_errorHandler() {
-	serverOpts := &ServerOptions{
-		Address: "127.0.0.1:8123",
-	}
-	server, _ := NewServer(serverOpts)
+	var (
+		serverOpts = ServerOptions{
+			Address: `127.0.0.1:8123`,
+		}
+		server *Server
+	)
+
+	server, _ = NewServer(serverOpts)
 
 	var endpointError = Endpoint{
 		Method:       RequestMethodGet,
@@ -53,10 +57,12 @@ func ExampleEndpoint_errorHandler() {
 	}()
 	time.Sleep(1 * time.Second)
 
-	clientOpts := &ClientOptions{
-		ServerURL: `http://` + serverOpts.Address,
-	}
-	client := NewClient(clientOpts)
+	var (
+		clientOpts = ClientOptions{
+			ServerURL: `http://` + serverOpts.Address,
+		}
+		client = NewClient(clientOpts)
+	)
 
 	params := url.Values{}
 	params.Set("error", "400:error with status code")

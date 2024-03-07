@@ -18,7 +18,12 @@ func ExampleEndpointResponse() {
 		ID string
 	}
 
-	server, err := NewServer(&ServerOptions{
+	var (
+		server *Server
+		err    error
+	)
+
+	server, err = NewServer(ServerOptions{
 		Address: "127.0.0.1:7016",
 	})
 	if err != nil {
@@ -67,11 +72,13 @@ func ExampleEndpointResponse() {
 	}()
 	time.Sleep(1 * time.Second)
 
-	clientOpts := &ClientOptions{
-		ServerURL: `http://127.0.0.1:7016`,
-	}
-	cl := NewClient(clientOpts)
-	params := url.Values{}
+	var (
+		clientOpts = ClientOptions{
+			ServerURL: `http://127.0.0.1:7016`,
+		}
+		cl     = NewClient(clientOpts)
+		params = url.Values{}
+	)
 
 	// Test call endpoint without "id" parameter.
 	_, resBody, err := cl.Get("/", nil, params) //nolint: bodyclose
