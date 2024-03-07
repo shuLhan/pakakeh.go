@@ -388,7 +388,7 @@ func (bot *Bot) createServer() (err error) {
 		return fmt.Errorf("createServer: %w", err)
 	}
 
-	epToken := &http.Endpoint{
+	var epToken = http.Endpoint{
 		Method:       http.RequestMethodPost,
 		Path:         "/" + bot.opts.Token,
 		RequestType:  http.RequestTypeJSON,

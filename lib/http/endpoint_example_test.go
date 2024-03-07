@@ -21,7 +21,7 @@ func ExampleEndpoint_errorHandler() {
 	}
 	server, _ := NewServer(serverOpts)
 
-	endpointError := &Endpoint{
+	var endpointError = Endpoint{
 		Method:       RequestMethodGet,
 		Path:         "/",
 		RequestType:  RequestTypeQuery,

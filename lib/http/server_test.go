@@ -49,7 +49,7 @@ func TestRegisterDelete(t *testing.T) {
 			ResponseType: ResponseTypePlain,
 			Call:         cbPlain,
 		},
-		expError: ErrEndpointAmbiguous.Error(),
+		expError: `RegisterEndpoint: ` + ErrEndpointAmbiguous.Error(),
 	}, {
 		desc:          "With unknown path",
 		reqURL:        testServerURL,
@@ -133,15 +133,16 @@ func TestRegisterDelete(t *testing.T) {
 		expBody:        "map[id:[1]]\nmap[]\n<nil>\n",
 	}}
 
+	var err error
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		var err = testServer.RegisterEndpoint(c.ep)
-		if err != nil {
-			if !errors.Is(ErrEndpointAmbiguous, err) {
-				test.Assert(t, "error", c.expError, err.Error())
+		if c.ep != nil {
+			err = testServer.RegisterEndpoint(*c.ep)
+			if err != nil {
+				test.Assert(t, `error`, c.expError, err.Error())
+				continue
 			}
-			continue
 		}
 
 		if len(c.reqURL) == 0 {

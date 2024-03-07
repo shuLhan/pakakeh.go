@@ -432,7 +432,7 @@ func testRunSSEServer(t *testing.T, cb libhttp.SSECallback) (srv *libhttp.Server
 		return nil, err
 	}
 
-	var sse = &libhttp.SSEEndpoint{
+	var sse = libhttp.SSEEndpoint{
 		Path: `/sse`,
 		Call: cb,
 	}

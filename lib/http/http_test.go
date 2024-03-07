@@ -137,7 +137,7 @@ func registerEndpoints() {
 	}
 
 	// Endpoint to test the client Download().
-	err = testServer.RegisterEndpoint(&Endpoint{
+	err = testServer.RegisterEndpoint(Endpoint{
 		Path:         "/download",
 		ResponseType: ResponseTypePlain,
 		Call: func(_ *EndpointRequest) ([]byte, error) {
@@ -149,7 +149,7 @@ func registerEndpoints() {
 	}
 
 	// Endpoint to test the client Download() with HTTP 302 redirect.
-	err = testServer.RegisterEndpoint(&Endpoint{
+	err = testServer.RegisterEndpoint(Endpoint{
 		Path:         "/redirect/download",
 		ResponseType: ResponseTypePlain,
 		Call: func(epr *EndpointRequest) ([]byte, error) {

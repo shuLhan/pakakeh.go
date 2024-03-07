@@ -34,7 +34,7 @@ func TestSSEEndpoint(t *testing.T) {
 }
 
 func testSSEEndpointEmptyCall(t *testing.T, httpd *Server) {
-	var sse = &SSEEndpoint{
+	var sse = SSEEndpoint{
 		Path: `/sse`,
 	}
 
@@ -44,7 +44,7 @@ func testSSEEndpointEmptyCall(t *testing.T, httpd *Server) {
 }
 
 func testSSEEndpointDuplicatePath(t *testing.T, httpd *Server) {
-	var ep = &Endpoint{
+	var ep = Endpoint{
 		Path: `/sse`,
 		Call: func(_ *EndpointRequest) ([]byte, error) { return nil, nil },
 	}
@@ -54,7 +54,7 @@ func testSSEEndpointDuplicatePath(t *testing.T, httpd *Server) {
 		t.Fatal(err)
 	}
 
-	var sse = &SSEEndpoint{
+	var sse = SSEEndpoint{
 		Path: `/sse`,
 		Call: func(_ *SSEConn) {},
 	}

@@ -30,7 +30,7 @@ func ExampleEndpointResponse() {
 	// myData as JSON format.
 	// If the parameter "id" is missing or empty it will return an HTTP
 	// status code with message as defined in EndpointResponse.
-	err = server.RegisterEndpoint(&Endpoint{
+	err = server.RegisterEndpoint(Endpoint{
 		Method:       RequestMethodGet,
 		RequestType:  RequestTypeQuery,
 		ResponseType: ResponseTypeJSON,

@@ -95,42 +95,43 @@ func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 //
 // Endpoint with Method CONNECT or TRACE will return an error because its
 // not supported, yet.
-func (srv *Server) RegisterEndpoint(ep *Endpoint) (err error) {
-	if ep == nil {
-		return nil
-	}
+func (srv *Server) RegisterEndpoint(ep Endpoint) (err error) {
+	var logp = `RegisterEndpoint`
+
 	if ep.Call == nil {
-		return errors.New(`http.RegisterEndpoint: empty Call field`)
+		return errors.New(logp + `: empty Call field`)
 	}
 
 	switch ep.Method {
 	case RequestMethodConnect:
-		return errors.New(`http.RegisterEndpoint: can't handle CONNECT method yet`)
+		return errors.New(logp + `: can't handle CONNECT method yet`)
 	case RequestMethodDelete:
-		err = srv.registerDelete(ep)
+		err = srv.registerDelete(&ep)
 	case RequestMethodHead:
 		return nil
 	case RequestMethodOptions:
 		return nil
 	case RequestMethodPatch:
-		err = srv.registerPatch(ep)
+		err = srv.registerPatch(&ep)
 	case RequestMethodPost:
-		err = srv.registerPost(ep)
+		err = srv.registerPost(&ep)
 	case RequestMethodPut:
-		err = srv.registerPut(ep)
+		err = srv.registerPut(&ep)
 	case RequestMethodTrace:
-		return errors.New(`http.RegisterEndpoint: can't handle TRACE method yet`)
+		return errors.New(logp + `: can't handle TRACE method yet`)
 	case RequestMethodGet:
-		ep.Method = RequestMethodGet
-		err = srv.registerGet(ep)
+		err = srv.registerGet(&ep)
 	}
-	return err
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+	return nil
 }
 
 // RegisterSSE register Server-Sent Events endpoint.
 // It will return an error if the [SSEEndpoint.Call] field is not set or
 // [ErrEndpointAmbiguous] if the same path is already registered.
-func (srv *Server) RegisterSSE(ep *SSEEndpoint) (err error) {
+func (srv *Server) RegisterSSE(ep SSEEndpoint) (err error) {
 	var logp = `RegisterSSE`
 
 	if ep.Call == nil {
@@ -149,7 +150,7 @@ func (srv *Server) RegisterSSE(ep *SSEEndpoint) (err error) {
 		}
 	}
 
-	rute, err = newRouteSSE(ep)
+	rute, err = newRouteSSE(&ep)
 	if err != nil {
 		return err
 	}
@@ -190,6 +191,7 @@ func (srv *Server) RegisterEvaluator(eval Evaluator) {
 
 // registerGet register HTTP method GET with callback to handle it.
 func (srv *Server) registerGet(ep *Endpoint) (err error) {
+	ep.Method = RequestMethodGet
 	ep.RequestType = RequestTypeQuery
 
 	// Check if the same route already registered.
