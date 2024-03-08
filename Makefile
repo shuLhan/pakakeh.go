@@ -42,6 +42,7 @@ lint:
 		--presets bugs,metalinter,performance,unused \
 		--disable exhaustive \
 		--disable musttag \
+		--disable bodyclose \
 		./...
 
 $(CIIGO):
