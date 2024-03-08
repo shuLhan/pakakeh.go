@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"mime"
@@ -22,6 +23,7 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test/httptest"
 )
 
 func TestRegisterDelete(t *testing.T) {
@@ -945,6 +947,77 @@ func TestServer_Options_HandleFS(t *testing.T) {
 		}
 
 		test.Assert(t, "response body", c.expResBody, string(gotBody))
+	}
+}
+
+func TestServer_handleDelete(t *testing.T) {
+	type testCase struct {
+		tag string
+		req httptest.SimulateRequest
+	}
+
+	var (
+		srv = &Server{}
+		err error
+	)
+
+	err = srv.RegisterEndpoint(Endpoint{
+		Method:       RequestMethodDelete,
+		Path:         `/a/b/c/:d/e`,
+		RequestType:  RequestTypeNone,
+		ResponseType: ResponseTypePlain,
+		Call: func(epr *EndpointRequest) ([]byte, error) {
+			var buf bytes.Buffer
+			fmt.Fprintf(&buf, `Request.Form=%v`, epr.HTTPRequest.Form)
+			return buf.Bytes(), nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var tdata *test.Data
+
+	tdata, err = test.LoadData(`testdata/handleDelete_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var listCase = []testCase{{
+		tag: `valid`,
+		req: httptest.SimulateRequest{
+			Method: http.MethodDelete,
+			Path:   `/a/b/c/dddd/e`,
+		},
+	}}
+	var (
+		c      testCase
+		result *httptest.SimulateResult
+		tag    string
+		exp    string
+		got    []byte
+	)
+	for _, c = range listCase {
+		result, err = httptest.Simulate(srv.ServeHTTP, &c.req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got, err = result.DumpRequest(nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		tag = c.tag + `:request_body`
+		exp = string(tdata.Output[tag])
+		test.Assert(t, tag, exp, string(got))
+
+		got, err = result.DumpResponse(nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		tag = c.tag + `:response_body`
+		exp = string(tdata.Output[tag])
+		test.Assert(t, tag, exp, string(got))
 	}
 }
 

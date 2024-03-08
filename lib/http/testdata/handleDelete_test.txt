@@ -1,0 +1,14 @@
+Test data for handleDelete in Server.
+
+<<< valid:request_body
+DELETE /a/b/c/dddd/e HTTP/1.1
+Host: example.com
+
+
+
+<<< valid:response_body
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/plain; charset=utf-8
+
+Request.Form=map[d:[dddd]]
