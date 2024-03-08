@@ -1,7 +1,6 @@
 **/testdata/bench
 **/testdata/pprof
 *.bak
-*.bench
 *.cprof
 *.csv
 *.dat
@@ -69,6 +68,7 @@
 /lib/websocket/testdata/lib
 /lib/websocket/testdata/pip-selfcheck.json
 /lib/websocket/testdata/server/server
+bench_*
 cover.*
 share-tools/
 src/
