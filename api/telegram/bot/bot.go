@@ -10,13 +10,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	stdhttp "net/http"
+	"net/http"
 	"path"
 	"strconv"
 	"time"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/errors"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 // List of message parse mode.
@@ -96,8 +96,8 @@ const (
 // Bot for Telegram using webHook.
 type Bot struct {
 	opts     Options
-	client   *http.Client
-	webhook  *http.Server
+	client   *libhttp.Client
+	webhook  *libhttp.Server
 	user     *User
 	err      chan error
 	commands commands
@@ -110,12 +110,12 @@ func New(opts Options) (bot *Bot, err error) {
 		return nil, fmt.Errorf("bot.New: %w", err)
 	}
 
-	var clientOpts = http.ClientOptions{
+	var clientOpts = libhttp.ClientOptions{
 		ServerURL: defURL + opts.Token + `/`,
 	}
 	bot = &Bot{
 		opts:   opts,
-		client: http.NewClient(clientOpts),
+		client: libhttp.NewClient(clientOpts),
 	}
 
 	fmt.Printf("Bot options: %+v\n", opts)
@@ -134,12 +134,19 @@ func New(opts Options) (bot *Bot, err error) {
 // DeleteWebhook remove webhook integration if you decide to switch back to
 // getUpdates. Returns True on success. Requires no parameters.
 func (bot *Bot) DeleteWebhook() (err error) {
-	_, resBody, err := bot.client.PostForm(methodDeleteWebhook, nil, nil) //nolint: bodyclose
+	var (
+		req = libhttp.ClientRequest{
+			Path: methodDeleteWebhook,
+		}
+		resBody []byte
+	)
+
+	_, resBody, err = bot.client.PostForm(req) //nolint: bodyclose
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
 	}
 
-	res := &response{}
+	var res = &response{}
 	err = json.Unmarshal(resBody, res)
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
@@ -152,7 +159,14 @@ func (bot *Bot) DeleteWebhook() (err error) {
 // Requires no parameters.
 // Returns basic information about the bot in form of a User object.
 func (bot *Bot) GetMe() (user *User, err error) {
-	_, resBody, err := bot.client.Get(methodGetMe, nil, nil) //nolint: bodyclose
+	var (
+		req = libhttp.ClientRequest{
+			Path: methodGetMe,
+		}
+		resBody []byte
+	)
+
+	_, resBody, err = bot.client.Get(req) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("GetMe: %w", err)
 	}
@@ -171,7 +185,14 @@ func (bot *Bot) GetMe() (user *User, err error) {
 
 // GetMyCommands get the current list of the bot's commands.
 func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
-	_, resBody, err := bot.client.Get(methodGetMyCommands, nil, nil) //nolint: bodyclose
+	var (
+		req = libhttp.ClientRequest{
+			Path: methodGetMyCommands,
+		}
+		resBody []byte
+	)
+
+	_, resBody, err = bot.client.Get(req) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("GetMyCommands: %w", err)
 	}
@@ -192,7 +213,14 @@ func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 // If the bot is using getUpdates, will return an object with the url field
 // empty.
 func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
-	_, resBody, err := bot.client.Get(methodGetWebhookInfo, nil, nil) //nolint: bodyclose
+	var (
+		req = libhttp.ClientRequest{
+			Path: methodGetWebhookInfo,
+		}
+		resBody []byte
+	)
+
+	_, resBody, err = bot.client.Get(req) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("GetWebhookInfo: %w", err)
 	}
@@ -214,13 +242,20 @@ func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
 func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 	msg *Message, err error,
 ) {
-	req := messageRequest{
-		ChatID:    parent.Chat.ID,
-		Text:      text,
-		ParseMode: parseMode,
-	}
+	var (
+		params = messageRequest{
+			ChatID:    parent.Chat.ID,
+			Text:      text,
+			ParseMode: parseMode,
+		}
+		req = libhttp.ClientRequest{
+			Path:   methodSendMessage,
+			Params: params,
+		}
+		resBody []byte
+	)
 
-	_, resBody, err := bot.client.PostJSON(methodSendMessage, nil, req) //nolint: bodyclose
+	_, resBody, err = bot.client.PostJSON(req) //nolint: bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("SendMessage: %w", err)
 	}
@@ -254,7 +289,15 @@ func (bot *Bot) SetMyCommands(cmds []Command) (err error) {
 
 	bot.commands.Commands = cmds
 
-	_, resBody, err := bot.client.PostJSON(methodSetMyCommands, nil, &bot.commands) //nolint: bodyclose
+	var (
+		req = libhttp.ClientRequest{
+			Path:   methodSetMyCommands,
+			Params: &bot.commands,
+		}
+		resBody []byte
+	)
+
+	_, resBody, err = bot.client.PostJSON(req) //nolint: bodyclose
 	if err != nil {
 		return fmt.Errorf("SetMyCommands: %w", err)
 	}
@@ -317,9 +360,15 @@ func (bot *Bot) setWebhook() (err error) {
 		params[paramNameAllowedUpdates] = allowedUpdates
 	}
 
-	var resBody []byte
+	var (
+		req = libhttp.ClientRequest{
+			Path:   methodSetWebhook,
+			Params: params,
+		}
+		resBody []byte
+	)
 
-	_, resBody, err = bot.client.PostFormData(methodSetWebhook, nil, params) //nolint: bodyclose
+	_, resBody, err = bot.client.PostFormData(req) //nolint: bodyclose
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -365,7 +414,7 @@ func (bot *Bot) startWebhook() (err error) {
 
 // createServer start the HTTP server for receiving Update.
 func (bot *Bot) createServer() (err error) {
-	var serverOpts = http.ServerOptions{
+	var serverOpts = libhttp.ServerOptions{
 		Address: bot.opts.Webhook.ListenAddress,
 	}
 
@@ -377,22 +426,22 @@ func (bot *Bot) createServer() (err error) {
 			tlsConfig.Certificates,
 			*bot.opts.Webhook.ListenCertificate,
 		)
-		serverOpts.Conn = &stdhttp.Server{
+		serverOpts.Conn = &http.Server{
 			TLSConfig:         tlsConfig,
 			ReadHeaderTimeout: 5 * time.Second,
 		}
 	}
 
-	bot.webhook, err = http.NewServer(serverOpts)
+	bot.webhook, err = libhttp.NewServer(serverOpts)
 	if err != nil {
 		return fmt.Errorf("createServer: %w", err)
 	}
 
-	var epToken = http.Endpoint{
-		Method:       http.RequestMethodPost,
+	var epToken = libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
 		Path:         "/" + bot.opts.Token,
-		RequestType:  http.RequestTypeJSON,
-		ResponseType: http.ResponseTypeNone,
+		RequestType:  libhttp.RequestTypeJSON,
+		ResponseType: libhttp.ResponseTypeNone,
 		Call:         bot.handleWebhook,
 	}
 
@@ -405,7 +454,7 @@ func (bot *Bot) createServer() (err error) {
 }
 
 // handleWebhook handle Updates from Webhook.
-func (bot *Bot) handleWebhook(epr *http.EndpointRequest) (resBody []byte, err error) {
+func (bot *Bot) handleWebhook(epr *libhttp.EndpointRequest) (resBody []byte, err error) {
 	var update Update
 
 	err = json.Unmarshal(epr.RequestBody, &update)

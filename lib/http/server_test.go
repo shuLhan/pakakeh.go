@@ -1051,7 +1051,11 @@ func TestServer_handleRange(t *testing.T) {
 
 		header.Set(HeaderRange, string(headerRange))
 
-		httpRes, resBody, err = cl.Get(`/index.html`, header, nil) //nolint: bodyclose
+		var req = ClientRequest{
+			Path:   `/index.html`,
+			Header: header,
+		}
+		httpRes, resBody, err = cl.Get(req) //nolint: bodyclose
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1215,7 +1219,11 @@ func TestServerHandleRangeBig(t *testing.T) {
 		resBody []byte
 	)
 
-	httpRes, resBody, err = cl.Head(pathBig, nil, nil) //nolint: bodyclose
+	var req = ClientRequest{
+		Path: pathBig,
+	}
+
+	httpRes, resBody, err = cl.Head(req) //nolint: bodyclose
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1231,7 +1239,12 @@ func TestServerHandleRangeBig(t *testing.T) {
 
 	headers.Set(HeaderRange, `bytes=0-`)
 
-	httpRes, resBody, err = cl.Get(pathBig, headers, nil) //nolint: bodyclose
+	req = ClientRequest{
+		Path:   pathBig,
+		Header: headers,
+	}
+
+	httpRes, resBody, err = cl.Get(req) //nolint: bodyclose
 	if err != nil {
 		t.Fatal(err)
 	}

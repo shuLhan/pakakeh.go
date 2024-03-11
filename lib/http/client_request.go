@@ -17,9 +17,9 @@ import (
 
 // ClientRequest define the parameters for each Client methods.
 type ClientRequest struct {
-	// Headers additional header to be send on request.
+	// Header additional header to be send on request.
 	// This field is optional.
-	Headers http.Header
+	Header http.Header
 
 	//
 	// Params define parameter to be send on request.
@@ -46,11 +46,15 @@ type ClientRequest struct {
 	// * If Type is RequestTypeJSON and Params is not nil, the params will
 	// be encoded as JSON in body using json.Encode().
 	//
-	Params interface{}
+	Params any
+
+	body io.Reader
 
 	// The Path to resource on the server.
 	// This field is required, if its empty default to "/".
 	Path string
+
+	contentType string
 
 	// The HTTP method of request.
 	// This field is optional, if its empty default to RequestMethodGet
@@ -146,11 +150,64 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 	if client != nil {
 		setHeaders(httpReq, client.opts.Headers)
 	}
-	setHeaders(httpReq, creq.Headers)
+	setHeaders(httpReq, creq.Header)
 
 	if len(contentType) > 0 {
 		httpReq.Header.Set(HeaderContentType, contentType)
 	}
 
 	return httpReq, nil
+}
+
+// paramsAsURLEncoded convert the Params as [url.Values] and return the
+// [Encode]d value.
+// If Params is nil or Params is not [url.Values], it will return an empty
+// string.
+func (creq *ClientRequest) paramsAsURLEncoded() string {
+	if creq.Params == nil {
+		return ``
+	}
+
+	var (
+		params url.Values
+		ok     bool
+	)
+	params, ok = creq.Params.(url.Values)
+	if !ok {
+		return ``
+	}
+	return params.Encode()
+}
+
+// paramsAsMultipart convert the Params as "map[string][]byte" and return the
+// content type and body.
+func (creq *ClientRequest) paramsAsMultipart() (params map[string][]byte) {
+	if creq.Params == nil {
+		return nil
+	}
+
+	var ok bool
+
+	params, ok = creq.Params.(map[string][]byte)
+	if !ok {
+		return nil
+	}
+
+	return params
+}
+
+// paramsAsBytes convert the Params as []byte.
+func (creq *ClientRequest) paramsAsBytes() (body []byte) {
+	if creq.Params == nil {
+		return nil
+	}
+
+	var ok bool
+
+	body, ok = creq.Params.([]byte)
+	if !ok {
+		return nil
+	}
+
+	return body
 }
