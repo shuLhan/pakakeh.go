@@ -9,42 +9,17 @@ import (
 )
 
 // RequestMethod define type of HTTP method.
-type RequestMethod int
+type RequestMethod string
 
 // List of known HTTP methods.
 const (
-	RequestMethodGet RequestMethod = iota
-	RequestMethodConnect
-	RequestMethodDelete
-	RequestMethodHead
-	RequestMethodOptions
-	RequestMethodPatch
-	RequestMethodPost
-	RequestMethodPut
-	RequestMethodTrace
+	RequestMethodConnect RequestMethod = http.MethodConnect
+	RequestMethodDelete  RequestMethod = http.MethodDelete
+	RequestMethodGet     RequestMethod = http.MethodGet
+	RequestMethodHead    RequestMethod = http.MethodHead
+	RequestMethodOptions RequestMethod = http.MethodOptions
+	RequestMethodPatch   RequestMethod = http.MethodPatch
+	RequestMethodPost    RequestMethod = http.MethodPost
+	RequestMethodPut     RequestMethod = http.MethodPut
+	RequestMethodTrace   RequestMethod = http.MethodTrace
 )
-
-// String return the string representation of request method.
-func (rm RequestMethod) String() string {
-	switch rm {
-	case RequestMethodGet:
-		return http.MethodGet
-	case RequestMethodConnect:
-		return http.MethodConnect
-	case RequestMethodDelete:
-		return http.MethodDelete
-	case RequestMethodHead:
-		return http.MethodHead
-	case RequestMethodOptions:
-		return http.MethodOptions
-	case RequestMethodPatch:
-		return http.MethodPatch
-	case RequestMethodPost:
-		return http.MethodPost
-	case RequestMethodPut:
-		return http.MethodPut
-	case RequestMethodTrace:
-		return http.MethodTrace
-	}
-	return ""
-}

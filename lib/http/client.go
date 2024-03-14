@@ -272,7 +272,7 @@ func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Requ
 		ctx     = context.Background()
 	)
 
-	httpReq, err = http.NewRequestWithContext(ctx, req.Method.String(), fullURL, body)
+	httpReq, err = http.NewRequestWithContext(ctx, string(req.Method), fullURL, body)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -475,7 +475,11 @@ func (client *Client) doRequest(req ClientRequest) (res *ClientResponse, err err
 		httpReq *http.Request
 	)
 
-	httpReq, err = http.NewRequestWithContext(ctx, req.Method.String(), fullURL, req.body)
+	if len(req.Method) == 0 {
+		req.Method = RequestMethodGet
+	}
+
+	httpReq, err = http.NewRequestWithContext(ctx, string(req.Method), fullURL, req.body)
 	if err != nil {
 		return nil, err
 	}

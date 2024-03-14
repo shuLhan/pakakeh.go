@@ -142,7 +142,7 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 
 	var ctx = context.Background()
 
-	httpReq, err = http.NewRequestWithContext(ctx, creq.Method.String(), path.String(), body)
+	httpReq, err = http.NewRequestWithContext(ctx, string(creq.Method), path.String(), body)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

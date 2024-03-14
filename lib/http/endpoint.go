@@ -28,6 +28,9 @@ type Endpoint struct {
 	// Call is the main process of route.
 	Call Callback
 
+	// Method contains HTTP method, default to GET.
+	Method RequestMethod
+
 	// Path contains route to be served, default to "/" if its empty.
 	Path string
 
@@ -36,35 +39,6 @@ type Endpoint struct {
 
 	// ResponseType contains type of request, default to ResponseTypeNone.
 	ResponseType ResponseType
-
-	// Method contains HTTP method, default to GET.
-	Method RequestMethod
-}
-
-// HTTPMethod return the string representation of HTTP method as predefined
-// in "net/http".
-func (ep *Endpoint) HTTPMethod() string {
-	switch ep.Method {
-	case RequestMethodGet:
-		return http.MethodGet
-	case RequestMethodConnect:
-		return http.MethodConnect
-	case RequestMethodDelete:
-		return http.MethodDelete
-	case RequestMethodHead:
-		return http.MethodHead
-	case RequestMethodOptions:
-		return http.MethodOptions
-	case RequestMethodPatch:
-		return http.MethodPatch
-	case RequestMethodPost:
-		return http.MethodPost
-	case RequestMethodPut:
-		return http.MethodPut
-	case RequestMethodTrace:
-		return http.MethodTrace
-	}
-	return http.MethodGet
 }
 
 func (ep *Endpoint) call(

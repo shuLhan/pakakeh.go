@@ -101,6 +101,9 @@ func (srv *Server) RegisterEndpoint(ep Endpoint) (err error) {
 	if ep.Call == nil {
 		return errors.New(logp + `: empty Call field`)
 	}
+	if len(ep.Method) == 0 {
+		ep.Method = RequestMethodGet
+	}
 
 	switch ep.Method {
 	case RequestMethodConnect:
