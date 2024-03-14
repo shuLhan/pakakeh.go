@@ -5,16 +5,16 @@
 package http
 
 // RequestType define type of HTTP request.
-type RequestType int
+type RequestType string
 
 // List of valid request type.
 const (
-	RequestTypeNone RequestType = iota
-	RequestTypeQuery
-	RequestTypeForm
-	RequestTypeMultipartForm
-	RequestTypeJSON
-	RequestTypeXML
+	RequestTypeNone          RequestType = ``
+	RequestTypeQuery         RequestType = `query`
+	RequestTypeForm          RequestType = `form-urlencoded`
+	RequestTypeMultipartForm RequestType = `form-data`
+	RequestTypeJSON          RequestType = `json`
+	RequestTypeXML           RequestType = `xml`
 )
 
 // String return the string representation of request type as in

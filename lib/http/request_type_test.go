@@ -15,11 +15,12 @@ func TestRequestType_String(t *testing.T) {
 		exp string
 		rt  RequestType
 	}{
-		{rt: 0, exp: ""},
-		{rt: 1, exp: ""},
-		{rt: 2, exp: ContentTypeForm},
-		{rt: 3, exp: ContentTypeMultipartForm},
-		{rt: 4, exp: ContentTypeJSON},
+		{rt: RequestTypeNone, exp: ``},
+		{rt: RequestTypeQuery, exp: ``},
+		{rt: RequestTypeForm, exp: ContentTypeForm},
+		{rt: RequestTypeMultipartForm, exp: ContentTypeMultipartForm},
+		{rt: RequestTypeJSON, exp: ContentTypeJSON},
+		{rt: RequestTypeXML, exp: ContentTypeXML},
 	}
 
 	for _, c := range cases {
