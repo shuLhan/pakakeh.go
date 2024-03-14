@@ -72,21 +72,26 @@ func ExampleEndpoint_errorHandler() {
 		Params: params,
 	}
 
-	httpres, resbody, err := client.Get(req) //nolint: bodyclose
+	var (
+		res *ClientResponse
+		err error
+	)
+
+	res, err = client.Get(req)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
+	fmt.Printf("%d: %s\n", res.HTTPResponse.StatusCode, res.Body)
 
 	params.Set("error", "error without status code")
 
-	httpres, resbody, err = client.Get(req) //nolint: bodyclose
+	res, err = client.Get(req)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	fmt.Printf("%d: %s\n", httpres.StatusCode, resbody)
+	fmt.Printf("%d: %s\n", res.HTTPResponse.StatusCode, res.Body)
 
 	// Output:
 	// 400: error with status code

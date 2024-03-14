@@ -82,14 +82,16 @@ func ExampleEndpointResponse() {
 			Path:   `/`,
 			Params: params,
 		}
+
+		res *ClientResponse
 	)
 
 	// Test call endpoint without "id" parameter.
-	_, resBody, err := cl.Get(req) //nolint: bodyclose
+	res, err = cl.Get(req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("GET / => %s\n", resBody)
+	fmt.Printf("GET / => %s\n", res.Body)
 
 	// Test call endpoint with "id" parameter set to "0", it should return
 	// HTTP status 500 with custom message.
@@ -97,22 +99,22 @@ func ExampleEndpointResponse() {
 	params.Set("id", "0")
 	req.Params = params
 
-	_, resBody, err = cl.Get(req) //nolint: bodyclose
+	res, err = cl.Get(req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("GET /?id=0 => %s\n", resBody)
+	fmt.Printf("GET /?id=0 => %s\n", res.Body)
 
 	// Test with "id" parameter is set.
 
 	params.Set("id", "1000")
 	req.Params = params
 
-	_, resBody, err = cl.Get(req) //nolint: bodyclose
+	res, err = cl.Get(req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("GET /?id=1000 => %s\n", resBody)
+	fmt.Printf("GET /?id=1000 => %s\n", res.Body)
 
 	// Output:
 	// GET / => {"message":"empty parameter id","code":400}

@@ -75,18 +75,17 @@ func ExampleServer_customHTTPStatusCode() {
 			Path: epCustom.Path,
 		}
 
-		httpRes *http.Response
-		resBody []byte
+		res *ClientResponse
 	)
 
-	httpRes, resBody, err = client.PostJSON(req) //nolint: bodyclose
+	res, err = client.PostJSON(req)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	fmt.Printf("%d\n", httpRes.StatusCode)
-	fmt.Printf("%s\n", resBody)
+	fmt.Printf("%d\n", res.HTTPResponse.StatusCode)
+	fmt.Printf("%s\n", res.Body)
 
 	// Output:
 	// 400

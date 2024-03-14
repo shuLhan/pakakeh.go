@@ -1031,8 +1031,7 @@ func TestServer_handleRange(t *testing.T) {
 
 		listTestData []*test.Data
 		tdata        *test.Data
-		httpRes      *http.Response
-		resBody      []byte
+		res          *ClientResponse
 		err          error
 	)
 
@@ -1055,7 +1054,8 @@ func TestServer_handleRange(t *testing.T) {
 			Path:   `/index.html`,
 			Header: header,
 		}
-		httpRes, resBody, err = cl.Get(req) //nolint: bodyclose
+
+		res, err = cl.Get(req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1063,7 +1063,7 @@ func TestServer_handleRange(t *testing.T) {
 		// Replace boundary with fixed string.
 		var params map[string]string
 
-		_, params, _ = mime.ParseMediaType(httpRes.Header.Get(HeaderContentType))
+		_, params, _ = mime.ParseMediaType(res.HTTPResponse.Header.Get(HeaderContentType))
 
 		var (
 			boundary      = params[`boundary`]
@@ -1073,7 +1073,7 @@ func TestServer_handleRange(t *testing.T) {
 		var (
 			tag = `http_headers`
 			exp = tdata.Output[tag]
-			got = dumpHTTPResponse(httpRes, skipHeaders)
+			got = dumpHTTPResponse(res.HTTPResponse, skipHeaders)
 		)
 
 		if len(boundary) != 0 {
@@ -1085,17 +1085,17 @@ func TestServer_handleRange(t *testing.T) {
 		exp = tdata.Output[tag]
 
 		// Replace the response body CRLF with LF.
-		resBody = bytes.ReplaceAll(resBody, []byte("\r\n"), []byte("\n"))
+		res.Body = bytes.ReplaceAll(res.Body, []byte("\r\n"), []byte("\n"))
 
 		if len(boundary) != 0 {
-			resBody = bytes.ReplaceAll(resBody, []byte(boundary), []byte(fixedBoundary))
+			res.Body = bytes.ReplaceAll(res.Body, []byte(boundary), []byte(fixedBoundary))
 		}
 
-		test.Assert(t, tag, string(exp), string(resBody))
+		test.Assert(t, tag, string(exp), string(res.Body))
 
 		tag = `all_body`
 		exp = tdata.Output[tag]
-		got = dumpMultipartBody(httpRes)
+		got = dumpMultipartBody(res.HTTPResponse)
 
 		test.Assert(t, tag, string(exp), got)
 	}
@@ -1214,28 +1214,25 @@ func TestServerHandleRangeBig(t *testing.T) {
 		tag         = `HEAD /big`
 		skipHeaders = []string{HeaderDate}
 
-		httpRes *http.Response
+		res     *ClientResponse
 		gotResp string
-		resBody []byte
 	)
 
 	var req = ClientRequest{
 		Path: pathBig,
 	}
 
-	httpRes, resBody, err = cl.Head(req) //nolint: bodyclose
+	res, err = cl.Head(req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gotResp = dumpHTTPResponse(httpRes, skipHeaders)
+	gotResp = dumpHTTPResponse(res.HTTPResponse, skipHeaders)
 
 	test.Assert(t, tag, string(tdata.Output[tag]), gotResp)
-	test.Assert(t, tag+`- response body size`, 0, len(resBody))
+	test.Assert(t, tag+`- response body size`, 0, len(res.Body))
 
-	var (
-		headers = http.Header{}
-	)
+	var headers = http.Header{}
 
 	headers.Set(HeaderRange, `bytes=0-`)
 
@@ -1244,15 +1241,15 @@ func TestServerHandleRangeBig(t *testing.T) {
 		Header: headers,
 	}
 
-	httpRes, resBody, err = cl.Get(req) //nolint: bodyclose
+	res, err = cl.Get(req)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gotResp = dumpHTTPResponse(httpRes, skipHeaders)
+	gotResp = dumpHTTPResponse(res.HTTPResponse, skipHeaders)
 	tag = `GET /big:Range=0-`
 	test.Assert(t, tag, string(tdata.Output[tag]), gotResp)
-	test.Assert(t, tag+`- response body size`, DefRangeLimit, len(resBody))
+	test.Assert(t, tag+`- response body size`, DefRangeLimit, len(res.Body))
 }
 
 func createBigFile(t *testing.T, path string, size int64) {

@@ -138,16 +138,16 @@ func (bot *Bot) DeleteWebhook() (err error) {
 		req = libhttp.ClientRequest{
 			Path: methodDeleteWebhook,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.PostForm(req) //nolint: bodyclose
+	clientRes, err = bot.client.PostForm(req)
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
 	}
 
 	var res = &response{}
-	err = json.Unmarshal(resBody, res)
+	err = json.Unmarshal(clientRes.Body, res)
 	if err != nil {
 		return fmt.Errorf("DeleteWebhook: %w", err)
 	}
@@ -163,19 +163,19 @@ func (bot *Bot) GetMe() (user *User, err error) {
 		req = libhttp.ClientRequest{
 			Path: methodGetMe,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.Get(req) //nolint: bodyclose
+	clientRes, err = bot.client.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("GetMe: %w", err)
 	}
 
 	user = &User{}
-	res := &response{
+	var res = &response{
 		Result: user,
 	}
-	err = res.unpack(resBody)
+	err = res.unpack(clientRes.Body)
 	if err != nil {
 		return nil, fmt.Errorf("GetMe: %w", err)
 	}
@@ -189,10 +189,10 @@ func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 		req = libhttp.ClientRequest{
 			Path: methodGetMyCommands,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.Get(req) //nolint: bodyclose
+	clientRes, err = bot.client.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("GetMyCommands: %w", err)
 	}
@@ -200,7 +200,7 @@ func (bot *Bot) GetMyCommands() (cmds []Command, err error) {
 	res := &response{
 		Result: cmds,
 	}
-	err = res.unpack(resBody)
+	err = res.unpack(clientRes.Body)
 	if err != nil {
 		return nil, fmt.Errorf("GetMyCommands: %w", err)
 	}
@@ -217,10 +217,10 @@ func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
 		req = libhttp.ClientRequest{
 			Path: methodGetWebhookInfo,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.Get(req) //nolint: bodyclose
+	clientRes, err = bot.client.Get(req)
 	if err != nil {
 		return nil, fmt.Errorf("GetWebhookInfo: %w", err)
 	}
@@ -229,7 +229,7 @@ func (bot *Bot) GetWebhookInfo() (webhookInfo *WebhookInfo, err error) {
 	res := &response{
 		Result: webhookInfo,
 	}
-	err = res.unpack(resBody)
+	err = res.unpack(clientRes.Body)
 	if err != nil {
 		return nil, fmt.Errorf("GetWebhookInfo: %w", err)
 	}
@@ -252,10 +252,10 @@ func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 			Path:   methodSendMessage,
 			Params: params,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.PostJSON(req) //nolint: bodyclose
+	clientRes, err = bot.client.PostJSON(req)
 	if err != nil {
 		return nil, fmt.Errorf("SendMessage: %w", err)
 	}
@@ -264,7 +264,7 @@ func (bot *Bot) SendMessage(parent *Message, parseMode, text string) (
 	res := response{
 		Result: msg,
 	}
-	err = res.unpack(resBody)
+	err = res.unpack(clientRes.Body)
 	if err != nil {
 		return nil, fmt.Errorf("SendMessage: %w", err)
 	}
@@ -294,16 +294,16 @@ func (bot *Bot) SetMyCommands(cmds []Command) (err error) {
 			Path:   methodSetMyCommands,
 			Params: &bot.commands,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.PostJSON(req) //nolint: bodyclose
+	clientRes, err = bot.client.PostJSON(req)
 	if err != nil {
 		return fmt.Errorf("SetMyCommands: %w", err)
 	}
 
 	res := &response{}
-	err = res.unpack(resBody)
+	err = res.unpack(clientRes.Body)
 	if err != nil {
 		return fmt.Errorf("SetMyCommands: %w", err)
 	}
@@ -365,17 +365,17 @@ func (bot *Bot) setWebhook() (err error) {
 			Path:   methodSetWebhook,
 			Params: params,
 		}
-		resBody []byte
+		clientRes *libhttp.ClientResponse
 	)
 
-	_, resBody, err = bot.client.PostFormData(req) //nolint: bodyclose
+	clientRes, err = bot.client.PostFormData(req)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	var res = &response{}
 
-	err = json.Unmarshal(resBody, res)
+	err = json.Unmarshal(clientRes.Body, res)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}

@@ -96,13 +96,15 @@ func (cl *Client) Send(req Request) (resp Response, err error) {
 
 	httpRequest.Header.Set(libhttp.HeaderContentType, libhttp.ContentTypeXML)
 
-	_, resBody, err := cl.conn.Do(httpRequest) //nolint: bodyclose
+	var clientRes *libhttp.ClientResponse
+
+	clientRes, err = cl.conn.Do(httpRequest)
 	if err != nil {
 		return resp, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	if len(resBody) > 0 {
-		err = resp.UnmarshalText(resBody)
+	if len(clientRes.Body) > 0 {
+		err = resp.UnmarshalText(clientRes.Body)
 		if err != nil {
 			return resp, err
 		}

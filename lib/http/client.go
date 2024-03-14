@@ -83,7 +83,7 @@ func NewClient(opts ClientOptions) (client *Client) {
 // Delete send the DELETE request to server using rpath as target endpoint
 // and params as query parameters.
 // On success, it will return the uncompressed response body.
-func (client *Client) Delete(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) Delete(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
 		req.Path += `?` + params
@@ -96,33 +96,37 @@ func (client *Client) Delete(req ClientRequest) (res *http.Response, resBody []b
 
 // Do overwrite the standard [http.Client.Do] to allow debugging request and
 // response, and to read and return the response body immediately.
-func (client *Client) Do(req *http.Request) (res *http.Response, resBody []byte, err error) {
-	logp := "Do"
+func (client *Client) Do(req *http.Request) (res *ClientResponse, err error) {
+	var logp = `Do`
 
-	res, err = client.Client.Do(req)
+	res = &ClientResponse{}
+
+	res.HTTPResponse, err = client.Client.Do(req)
 	if err != nil {
-		return nil, nil, fmt.Errorf("%s: %w", logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	rawBody, err := io.ReadAll(res.Body)
+	var resBody []byte
+
+	resBody, err = io.ReadAll(res.HTTPResponse.Body)
 	if err != nil {
-		return nil, nil, fmt.Errorf("%s: %w", logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = res.Body.Close()
+	err = res.HTTPResponse.Body.Close()
 	if err != nil {
-		return res, resBody, fmt.Errorf("%s: %w", logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	resBody, err = client.uncompress(res, rawBody)
+	res.Body, err = client.uncompress(res.HTTPResponse, resBody)
 	if err != nil {
-		return res, resBody, fmt.Errorf("%s: %w", logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	// Recreate the body to prevent error on caller.
-	res.Body = io.NopCloser(bytes.NewReader(rawBody))
+	res.HTTPResponse.Body = io.NopCloser(bytes.NewReader(res.Body))
 
-	return res, resBody, nil
+	return res, nil
 }
 
 // Download a resource from remote server and write it into
@@ -286,7 +290,7 @@ func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Requ
 // Get send the GET request to server using [ClientRequest.Path] as target
 // endpoint and [ClientRequest.Params] as query parameters.
 // On success, it will return the uncompressed response body.
-func (client *Client) Get(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) Get(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
 		req.Path += `?` + params
@@ -300,7 +304,7 @@ func (client *Client) Get(req ClientRequest) (res *http.Response, resBody []byte
 // Head send the HEAD request to rpath endpoint, with optional hdr and
 // params in query parameters.
 // The returned resBody shoule be always nil.
-func (client *Client) Head(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) Head(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
 		req.Path += `?` + params
@@ -313,7 +317,7 @@ func (client *Client) Head(req ClientRequest) (res *http.Response, resBody []byt
 
 // Post send the POST request to rpath without setting "Content-Type".
 // If the params is not nil, it will send as query parameters in the rpath.
-func (client *Client) Post(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) Post(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 	if len(params) != 0 {
 		req.Path += `?` + params
@@ -326,7 +330,7 @@ func (client *Client) Post(req ClientRequest) (res *http.Response, resBody []byt
 
 // PostForm send the POST request to rpath using
 // "application/x-www-form-urlencoded".
-func (client *Client) PostForm(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) PostForm(req ClientRequest) (res *ClientResponse, err error) {
 	var params = req.paramsAsURLEncoded()
 
 	req.Method = RequestMethodPost
@@ -338,7 +342,7 @@ func (client *Client) PostForm(req ClientRequest) (res *http.Response, resBody [
 
 // PostFormData send the POST request to Path with all parameters is send
 // using "multipart/form-data".
-func (client *Client) PostFormData(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) PostFormData(req ClientRequest) (res *ClientResponse, err error) {
 	var (
 		logp = `PostFormData`
 
@@ -355,7 +359,7 @@ func (client *Client) PostFormData(req ClientRequest) (res *http.Response, resBo
 
 		req.contentType, body, err = GenerateFormData(params)
 		if err != nil {
-			return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
 		req.body = strings.NewReader(body)
@@ -370,7 +374,7 @@ func (client *Client) PostFormData(req ClientRequest) (res *http.Response, resBo
 // and Params encoded automatically to JSON.
 // The Params must be a type than can be marshalled with [json.Marshal] or
 // type that implement [json.Marshaler].
-func (client *Client) PostJSON(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) PostJSON(req ClientRequest) (res *ClientResponse, err error) {
 	var (
 		logp = `PostJSON`
 
@@ -379,7 +383,7 @@ func (client *Client) PostJSON(req ClientRequest) (res *http.Response, resBody [
 
 	params, err = json.Marshal(req.Params)
 	if err != nil {
-		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	req.Method = RequestMethodPost
@@ -391,7 +395,7 @@ func (client *Client) PostJSON(req ClientRequest) (res *http.Response, resBody [
 
 // Put send the HTTP PUT request to rpath with optional, raw body.
 // The Content-Type can be set in the hdr.
-func (client *Client) Put(req ClientRequest) (*http.Response, []byte, error) {
+func (client *Client) Put(req ClientRequest) (*ClientResponse, error) {
 	var params = req.paramsAsBytes()
 
 	req.Method = RequestMethodPut
@@ -402,7 +406,7 @@ func (client *Client) Put(req ClientRequest) (*http.Response, []byte, error) {
 
 // PutForm send the PUT request with params set in body using content type
 // "application/x-www-form-urlencoded".
-func (client *Client) PutForm(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) PutForm(req ClientRequest) (*ClientResponse, error) {
 	var params = req.paramsAsURLEncoded()
 
 	req.Method = RequestMethodPut
@@ -414,7 +418,7 @@ func (client *Client) PutForm(req ClientRequest) (res *http.Response, resBody []
 
 // PutFormData send the PUT request with params set in body using content type
 // "multipart/form-data".
-func (client *Client) PutFormData(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) PutFormData(req ClientRequest) (res *ClientResponse, err error) {
 	var (
 		logp   = `PutFormData`
 		params map[string][]byte
@@ -430,7 +434,7 @@ func (client *Client) PutFormData(req ClientRequest) (res *http.Response, resBod
 
 		req.contentType, body, err = GenerateFormData(params)
 		if err != nil {
-			return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
 		req.body = strings.NewReader(body)
@@ -443,7 +447,7 @@ func (client *Client) PutFormData(req ClientRequest) (res *http.Response, resBod
 
 // PutJSON send the PUT request with content type set to "application/json"
 // and params encoded automatically to JSON.
-func (client *Client) PutJSON(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) PutJSON(req ClientRequest) (res *ClientResponse, err error) {
 	var (
 		logp   = `PutJSON`
 		params []byte
@@ -451,7 +455,7 @@ func (client *Client) PutJSON(req ClientRequest) (res *http.Response, resBody []
 
 	params, err = json.Marshal(params)
 	if err != nil {
-		return nil, nil, fmt.Errorf(`%s: %w`, logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	req.Method = RequestMethodPut
@@ -461,7 +465,7 @@ func (client *Client) PutJSON(req ClientRequest) (res *http.Response, resBody []
 	return client.doRequest(req)
 }
 
-func (client *Client) doRequest(req ClientRequest) (res *http.Response, resBody []byte, err error) {
+func (client *Client) doRequest(req ClientRequest) (res *ClientResponse, err error) {
 	req.Path = path.Join(`/`, req.Path)
 
 	var (
@@ -473,7 +477,7 @@ func (client *Client) doRequest(req ClientRequest) (res *http.Response, resBody 
 
 	httpReq, err = http.NewRequestWithContext(ctx, req.Method.String(), fullURL, req.body)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	setHeaders(httpReq, client.opts.Headers)

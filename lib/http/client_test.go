@@ -82,7 +82,7 @@ func TestClient_Download(t *testing.T) {
 	for _, c := range cases {
 		out.Reset()
 
-		_, err = client.Download(c.req) //nolint: bodyclose
+		_, err = client.Download(c.req)
 		if err != nil {
 			test.Assert(t, c.desc+`: error`, c.expError, err.Error())
 			continue
