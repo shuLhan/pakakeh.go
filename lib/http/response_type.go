@@ -4,17 +4,17 @@
 
 package http
 
-// ResponseType define type for HTTP response.
-type ResponseType int
+// ResponseType define the content type for HTTP response.
+type ResponseType string
 
 // List of valid response type.
 const (
-	ResponseTypeNone ResponseType = iota
-	ResponseTypeBinary
-	ResponseTypeHTML
-	ResponseTypeJSON
-	ResponseTypePlain
-	ResponseTypeXML
+	ResponseTypeNone   ResponseType = ``
+	ResponseTypeBinary ResponseType = `binary`
+	ResponseTypeHTML   ResponseType = `html`
+	ResponseTypeJSON   ResponseType = `json`
+	ResponseTypePlain  ResponseType = `plain`
+	ResponseTypeXML    ResponseType = `xml`
 )
 
 // String return the string representation of ResponseType as in

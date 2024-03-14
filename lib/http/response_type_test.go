@@ -15,12 +15,12 @@ func TestResponseType_String(t *testing.T) {
 		exp     string
 		restype ResponseType
 	}{
-		{restype: 0, exp: ""},
-		{restype: 1, exp: ContentTypeBinary},
-		{restype: 2, exp: ContentTypeHTML},
-		{restype: 3, exp: ContentTypeJSON},
-		{restype: 4, exp: ContentTypePlain},
-		{restype: 5, exp: ContentTypeXML},
+		{restype: ``, exp: ``},
+		{restype: `binary`, exp: ContentTypeBinary},
+		{restype: `html`, exp: ContentTypeHTML},
+		{restype: `json`, exp: ContentTypeJSON},
+		{restype: `plain`, exp: ContentTypePlain},
+		{restype: `xml`, exp: ContentTypeXML},
 		{restype: ResponseTypeNone, exp: ""},
 		{restype: ResponseTypeBinary, exp: ContentTypeBinary},
 		{restype: ResponseTypeHTML, exp: ContentTypeHTML},
