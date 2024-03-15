@@ -419,22 +419,19 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	var (
 		logp = "HandleFS"
 
-		node         *memfs.Node
-		responseETag string
-		requestETag  string
-		size         int64
-		err          error
-		isDir        bool
-		ok           bool
+		node  *memfs.Node
+		err   error
+		isDir bool
 	)
 
 	node, isDir = srv.getFSNode(req.URL.Path)
 	if node == nil {
-		res.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	if isDir && req.URL.Path[len(req.URL.Path)-1] != '/' {
+		if srv.Options.HandleFS == nil {
+			res.WriteHeader(http.StatusNotFound)
+			return
+		}
+		// Fallthrough, call HandleFS below.
+	} else if isDir && req.URL.Path[len(req.URL.Path)-1] != '/' {
 		// If request path is a directory and it is not end with
 		// slash, redirect request to location with slash to allow
 		// relative links works inside the HTML content.
@@ -447,8 +444,8 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if srv.Options.HandleFS != nil {
-		ok = srv.Options.HandleFS(node, res, req)
-		if !ok {
+		node = srv.Options.HandleFS(node, res, req)
+		if node == nil {
 			return
 		}
 	}
@@ -457,8 +454,10 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 
 	var nodeModtime = node.ModTime().Unix()
 
-	responseETag = strconv.FormatInt(nodeModtime, 10)
-	requestETag = req.Header.Get(HeaderIfNoneMatch)
+	var (
+		responseETag = strconv.FormatInt(nodeModtime, 10)
+		requestETag  = req.Header.Get(HeaderIfNoneMatch)
+	)
 	if requestETag == responseETag {
 		res.WriteHeader(http.StatusNotModified)
 		return
@@ -477,7 +476,10 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	var bodyReader io.ReadSeeker
+	var (
+		bodyReader io.ReadSeeker
+		size       int64
+	)
 
 	if len(node.Content) > 0 {
 		bodyReader = bytes.NewReader(node.Content)

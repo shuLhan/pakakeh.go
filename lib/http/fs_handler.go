@@ -12,12 +12,14 @@ import (
 
 // FSHandler define the function to inspect each GET request to Server
 // [memfs.MemFS] instance.
-// The node parameter contains the requested file inside the memfs.
+// The node parameter contains the requested file inside the memfs or nil
+// if the file does not exist.
 //
-// If the handler return true, server will continue processing the node
-// (writing the [memfs.Node] content type, body, and so on).
+// If the handler return non-nil [*memfs.Node], server will continue
+// processing the node, writing the [memfs.Node] content type, body, and so
+// on.
 //
-// If the handler return false, server stop processing the node and return
+// If the handler return nil, server stop processing the node and return
 // immediately, which means the function should have already handle writing
 // the header, status code, and/or body.
-type FSHandler func(node *memfs.Node, res http.ResponseWriter, req *http.Request) bool
+type FSHandler func(node *memfs.Node, res http.ResponseWriter, req *http.Request) (out *memfs.Node)
