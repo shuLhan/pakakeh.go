@@ -291,6 +291,8 @@ func TestMemFS_Get(t *testing.T) {
 	}, {
 		path: "/include",
 	}, {
+		path: "/include/",
+	}, {
 		path:   "/include/dir",
 		expErr: os.ErrNotExist.Error(),
 	}, {

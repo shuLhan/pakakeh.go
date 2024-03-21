@@ -204,6 +204,9 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 	if len(path) == 0 {
 		return nil, fmt.Errorf(`%s: empty path`, logp)
 	}
+	if path != `/` {
+		path = strings.TrimSuffix(path, `/`)
+	}
 
 	node = mfs.PathNodes.Get(path)
 	if node != nil {

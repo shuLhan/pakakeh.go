@@ -345,23 +345,19 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 // [ServerOptions.EnableIndexHTML] is true, server will generate list of
 // content for index.html.
 func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
-	var (
-		nodeIndexHTML *memfs.Node
-		pathHTML      string
-		err           error
-	)
-
 	if srv.Options.Memfs == nil {
 		return nil, false
 	}
 
-	pathHTML = path.Join(reqPath, `index.html`)
+	var err error
 
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			return nil, false
 		}
+
+		var pathHTML = path.Join(reqPath, `index.html`)
 
 		node, err = srv.Options.Memfs.Get(pathHTML)
 		if err != nil {
@@ -375,9 +371,14 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	}
 
 	if node.IsDir() {
+		var (
+			pathHTML      = path.Join(reqPath, `index.html`)
+			nodeIndexHTML *memfs.Node
+		)
+
 		nodeIndexHTML, err = srv.Options.Memfs.Get(pathHTML)
 		if err == nil {
-			return nodeIndexHTML, true
+			return nodeIndexHTML, false
 		}
 
 		if !srv.Options.EnableIndexHTML {
@@ -385,6 +386,9 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 		}
 
 		node.GenerateIndexHTML()
+
+		// Do not return isDir=true, to prevent the caller check and
+		// redirect the user to path with slash.
 	}
 
 	return node, false
