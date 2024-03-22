@@ -42,53 +42,72 @@ This library is released every month, usually at the first week of month.
 link:CHANGELOG.html[Latest changelog^].
 
 link:CHANGELOG_2023.html[Changelog in 2023^].
-This is changelog for `pakakeh.go` module since v0.43.0 until v0.51.0.
+Changelog for `pakakeh.go` module since v0.43.0 until v0.51.0.
 
 link:CHANGELOG_2022.html[Changelog in 2022^].
-This is changelog for `pakakeh.go` module since v0.33.0 until v0.42.0.
+Changelog for `pakakeh.go` module since v0.33.0 until v0.42.0.
 
 link:CHANGELOG_2021.html[Changelog in 2021^].
-This is changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
+Changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
 
 link:CHANGELOG_2020.html[Changelog in 2020^].
-This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
+Changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
-This is changelog for `pakakeh.go` v0.1.0 until v0.11.0.
+Changelog for `pakakeh.go` v0.1.0 until v0.11.0.
 
 
 === Simplified RFCs
 
+MIME::
++
+--
+* link:RFC_2045__MIME_I_FORMAT.html[RFC 2045: MIME Part One - Format of Internet Message Bodies]
+* link:RFC_2046__MIME_II_MEDIA_TYPES.html[RFC 2046: MIME Part Two - Media Types]
+* link:RFC_2049__MIME_V_CONFORMANCE.html[RFC 2049: MIME Part Five: Conformance Criteria and Examples]
 * link:RFC_5322__IMF.html[RFC 5322: Internet Message Format]
-** link:RFC_2045__MIME_I_FORMAT.html[RFC 2045: MIME Part One - Format of Internet Message Bodies]
-** link:RFC_2046__MIME_II_MEDIA_TYPES.html[RFC 2046: MIME Part Two - Media Types]
-** link:RFC_2049__MIME_V_CONFORMANCE.html[RFC 2049: MIME Part Five: Conformance Criteria and Examples]
+--
 
+SASL::
++
+--
 * link:RFC_4422__SASL.html[RFC 4422: Simple Authentication and Security Layer]
-** link:RFC_4616__SASL_PLAIN.html[RFC 4616: The PLAIN Simple Authentication and Security Layer (SASL) Mechanism]
+* link:RFC_4616__SASL_PLAIN.html[RFC 4616: The PLAIN Simple Authentication and Security Layer (SASL) Mechanism]
+--
 
+DKIM::
++
+--
+* link:RFC_4865__DKIM_THREATS.html[RFC 4685: Analysis of Threats Motivating DKIM]
 * link:RFC_5585__DKIM_OVERVIEW.html[RFC 5585: DomainKeys Identified Mail Service Overview]
-** link:RFC_4865__DKIM_THREATS.html[RFC 4685: Analysis of Threats Motivating DKIM]
-** link:RFC_5863__DKIM_DEVOPS.html[RFC 5863: DKIM Development, Deployment, and Operations]
-** link:RFC_6376__DKIM_SIGNATURES.html[RFC 6376: DKIM Signatures]
+* link:RFC_5863__DKIM_DEVOPS.html[RFC 5863: DKIM Development, Deployment, and Operations]
+* link:RFC_6376__DKIM_SIGNATURES.html[RFC 6376: DKIM Signatures]
+--
 
+SMTP::
++
+--
+* link:RFC_3207__ESMTP_TLS.html[RFC 3207: SMTP Service Extension for Secure SMTP over Transport Layer Security]
+* link:RFC_3461-3464__ESMTP_DSN.html["RFC 3461-3464: Delivery Status Notification"]
+* link:RFC_4954__ESMTP_AUTH.html[RFC 4954: SMTP Service Extension for Authentication]
 * link:RFC_5321__SMTP.html[RFC 5321: Simple Mail Transfer Protocol]
-** link:RFC_3207__ESMTP_TLS.html[RFC 3207: SMTP Service Extension for Secure SMTP over Transport Layer Security]
-** link:RFC_3461-3464__ESMTP_DSN.html["RFC 3461-3464: Delivery Status Notification"]
-** link:RFC_4954__ESMTP_AUTH.html[RFC 4954: SMTP Service Extension for Authentication]
+--
 
+SPF::
++
+--
 * link:RFC_7808__SPFv1.html[RFC 7208: Sender Policy Framework version 1]
-
+--
 
 ==  Development
 
 https://git.sr.ht/~shulhan/pakakeh.go[Repository^]::
 Link to the source code.
 
-https://git.sr.ht/~shulhan/pakakeh.go/issues[Issues^]::
+https://todo.sr.ht/~shulhan/pakakeh.go[Issues^]::
 List of open issues.
 
-https://git.sr.ht/~shulhan/pakakeh.go/pulls[Patches^]::
+https://lists.sr.ht/~shulhan/pakakeh.go[Patches^]::
 Link to submit the patches.
 
 
