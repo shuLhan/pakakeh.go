@@ -5,6 +5,7 @@
 package dns
 
 import (
+	"flag"
 	"log"
 	"os"
 	"testing"
@@ -27,10 +28,23 @@ var (
 func TestMain(m *testing.M) {
 	log.SetFlags(0)
 
+	var flagNoServer bool
+
+	flag.BoolVar(&flagNoServer, `no-server`, false, `Skip running servers`)
+	flag.Parse()
+
 	timeNow = func() time.Time {
 		return time.Unix(testNowEpoch, 0)
 	}
 
+	if !flagNoServer {
+		runServer()
+	}
+
+	os.Exit(m.Run())
+}
+
+func runServer() {
 	var (
 		serverOptions = &ServerOptions{
 			ListenAddress:    "127.0.0.1:5300",
@@ -41,14 +55,15 @@ func TestMain(m *testing.M) {
 			TLSAllowInsecure: true,
 		}
 
-		zoneFile *Zone
-		err      error
+		err error
 	)
 
 	_testServer, err = NewServer(serverOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	var zoneFile *Zone
 
 	zoneFile, err = ParseZoneFile("testdata/kilabit.info", "", 0)
 	if err != nil {
@@ -66,6 +81,4 @@ func TestMain(m *testing.M) {
 
 	// Wait for all listeners running.
 	time.Sleep(500 * time.Millisecond)
-
-	os.Exit(m.Run())
 }
