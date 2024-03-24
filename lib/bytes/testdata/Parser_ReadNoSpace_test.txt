@@ -1,0 +1,37 @@
+The test initialize Parser with seven delimiters.
+
+>>> multiline:delims
+	=
+ "()
+
+>>> multiline
+a b = c (
+  d e = f
+  g
+  )
+h=i (
+ j="k l m"
+)
+
+<<< multiline:ReadNoSpace
+"a" ' '
+"b" ' '
+"" '='
+"c" ' '
+"" '('
+"d" ' '
+"e" ' '
+"" '='
+"f" '\n'
+"g" '\n'
+"" ')'
+"h" '='
+"i" ' '
+"" '('
+"j" '='
+"" '"'
+"k" ' '
+"l" ' '
+"m" '"'
+"" ')'
+"" '\x00'
