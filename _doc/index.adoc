@@ -99,6 +99,13 @@ SPF::
 * link:RFC_7808__SPFv1.html[RFC 7208: Sender Policy Framework version 1]
 --
 
+DNS::
++
+--
+* link:RFC_9460__SVCB_and_HTTP_RR.html[RFC 9460 Service Binding and
+  Parameter Specification via the DNS (SVCB and HTTPS Resource Records)]
+--
+
 ==  Development
 
 https://git.sr.ht/~shulhan/pakakeh.go[Repository^]::

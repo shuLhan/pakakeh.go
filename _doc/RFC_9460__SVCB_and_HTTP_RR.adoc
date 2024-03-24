@@ -1,0 +1,350 @@
+= RFC 9460 - Service Binding and Parameter Specification via the DNS
+:toc:
+:sectlinks:
+
+This notes is intended for user who already know DNS message format, RDATA,
+and zone file.
+
+[#svcb_rr]
+== SVCB RR
+
+SVCB record type is 64 within the Internet ("IN") class.
+
+
+[#svcb_rr_rdata]
+=== RDATA Format
+
+----
++-------------+
+| SvcPriority | 2-octets.
++-------------+
+/ TargetName  / A <domain-name>.
+/             /
++-------------+
+/ SvcParams   / A <character-string>.
+/             /
++-------------+
+----
+
+SVCB RR has two modes: AliasMode and ServiceMode.
+SvcParams SHALL be used only for ServiceMode.
+SvcParams contains a series of SvcParamKey=SvcParamValue pairs, with the
+following format,
+
+----
++-------------------+
+| SvcParamKey       | ; 2-octets.
++-------------------+
+| SvcParamKeyLength | ; 2-octets, indicates the length of SvcParamValue.
++-------------------+
+/ SvcParamValue     / ; Dynamic value based on the key.
+/                   /
++-------------------+
+----
+
+The RDATA considered malformed if:
+
+* RDATA end at SvcParamKeyLength with non-zero value.
+* SvcParamKey are not in increasing numeric order, for example: 1, 3, 2.
+* Contains duplicate SvcParamKey.
+* Contains invalid SvcParamValue format.
+
+
+[#svcb_rr_zone]
+=== Zone format
+
+----
+DNS_RR      = OwnerName "IN" TTL "SVCB" SvcPriority TargetName SvcParams
+
+OwnerName   = DOMAIN_NAME
+TTL         = 0-2147483647  ; 32 bit signed integer.
+SvcPriority = 0-65535
+TargetName  = DOMAIN_NAME
+
+SvcParams     = *(SvcParam (WSP SvcParam)
+SvcParam      = SvcParamKey [ "=" SvcParamValue ]
+SvcParamKey   = 1*63(ASCII_LETTER / ASCII_DIGIT / "-")
+SvcParamValue = STRING
+WSP           = " " / "\t"
+ASCII_LETTER  = ; a-z
+ASCII_DIGIT   = ; 0-9
+----
+
+SvcParamKey MAY appear in any order but MUST appear only once.
+
+In SvcParamValue, where values is a comma separated list, the comma can be
+included as value by escaping it with backslash '\\'.
+Note that when escaping value, it must be escaped twice, one for SvcParam
+and one for character-string in zone level.
+
+For example, the following list of value ["a,b", "c\\d"], is escaped by
+SVCB writer first into
+
+    ["a\,b", "c\\d"]
+
+and then escaped again so the final key in zone file would be,
+
+    "a\\,b,c\\\\d"
+
+
+[#svcb_rr_mode]
+=== Mode
+
+SVCB RR has two modes: AliasMode and ServiceMode.
+
+SvcPriority with value 0 indicates SVCB RR as AliasMode.
+
+
+[#svcb_rr_mode_alias]
+==== AliasMode
+
+The TargetName SHOULD NOT be equal to the owner name.
+
+The TargetName with value "." indicates that the service does not exist.
+
+The SvcParams MUST be ignored, if its exist.
+
+Example: location of "foo://example.com:8080" that also can be accessed at
+"foosvc.example.net", the zone format is
+
+    _8080._foo.example.com. 3600 IN SVCB 0 foosvc.example.net.
+
+
+[#svcb_rr_mode_service]
+==== ServiceMode
+
+The TargetName with value "." equal to the owner-name.
+
+
+[#svcb_rr_parameters]
+=== Service parameters
+
+This section list of known service parameter keys.
+
+[#svcb_rr_param_mandatory]
+==== mandatory
+
+The "mandatory" key indicate set of keys for SVCB that when one of the key
+is missing from the SvcParams, the service will not function correctly.
+
+The zone format for "mandatory" key is
+
+    SvcParamMandatory = "mandatory" "=" MandatoryValue
+    MandatoryValue    = SvcParamKey *("," SvcParamKey)
+
+SvcParamKey can be in any order but MUST not duplicate.
+Each of listed key MUST appear in the subsequent SvcParams.
+The MandatoryValue MUST NOT contain escape sequences.
+
+The SvcParamKey value in RDATA for "mandatory" is 0.
+
+The SvcParamValue in RDATA for "mandatory" is total length (2 octets)
+followed by each key value (2 octets).
+
+The SvcParamValue MUST NOT contain escape sequences.
+
+Example,
+
+----
+example.com.   SVCB   16 foo.example.org. (
+                          alpn=h2,h3-19 mandatory=ipv4hint,alpn
+                          ipv4hint=192.0.2.1
+                          )
+----
+
+The domain "example.com" provides a service "foo.example.org" with two
+mandatory parameters: "alpn" and "ipv4hint".
+
+The above parameters when encoded to RDATA (displayed in decimal for
+readability),
+
+    +----+-----------------+
+    | 16 / foo.example.org /
+    +----+-----------------+
+    ; SvcPriority=16               (2 octets)
+    ; TargetName="foo.example.org" (domain-name, max 255 octects)
+    +---+---+---+---+
+    | 0 | 4 | 1 | 4 |
+    +---+---+---+---+
+    ; SvcParamKey=0 (mandatory)  (2 octets)
+    ; length=4                   (2 octets)
+    ; value[0]: 1 (alpn)         (2 octets)
+    ; value[1]: 4 (ipv4hint)     (2 octets)
+    +---+---+---+----+---+-------+
+    | 1 | 9 | 2 | h2 | 5 | h3-19 |
+    +---+---+---+----+---+-------+
+    ; SvcParamKey=1 (alpn)              (2 octets)
+    ; length=9                          (2 octets)
+    ; value[0]: length=2, value="h2"    (1 + 2 octets)
+    ; value[1]: length=5, value="h3-19" (1 + 5 octets)
+    +---+---+-----------+
+    | 4 | 4 | 192.0.2.1 |
+    +---+---+-----------+
+    ; SvcParamKey=4 (ipv4hint)  (2 octets)
+    ; length=4                  (2 octets)
+    ; value="192.0.2.1"         (4 octets)
+
+
+[#svcb_rr_param_alpn]
+==== alpn
+
+The "alpn" key indicate the set of additional Application-Layer Protocol
+Negotiation (ALPN) and associated transport protocols supported by the
+service.
+
+The zone format for "alpn" key is
+
+    SvcParamAlpn = "alpn" "=" 1*AlpnValue
+    AlpnValue    = alpn-id *("," alpn-id)
+    alpn-id      = 1*255OCTET
+
+The SvcParamKey in RDATA for "alpn" key is 1.
+
+The SvcParamValue in RDATA for "alpn" is total length (2 octets) of all
+alpn-id (length-value pairs combined).
+
+See the "mandatory" example for RDATA format of "alpn".
+
+
+[#svcb_rr_param_nodefaultalpn]
+==== no-default-alpn
+
+The "no-default-alpn" key indicate that the service does not have default
+ALPN defined.
+
+When "no-default-alpn" is set in RR, "alpn" MUST also be specified.
+
+The zone format for "no-default-alpn" is
+
+    SvcParamNodefaultalpn = "no-default-alpn"
+
+
+The SvcParamKey value in RDATA for "no-default-alpn" is 2.
+
+
+[#svcb_rr_param_port]
+==== port
+
+The "port" key indicate the TCP or UDP port of TargetName.
+If this key is not set, client SHALL use the default port number, based on
+the authority endpoint.
+
+The zone format for "port" is,
+
+    SvcParamPort = "port=" PortValue
+    PortValue    = 0-65535; ASCII digit from 0 to 65535.
+
+The SvcParamKey value in RDATA for key "port" is 3.
+
+The SvcParamValue in RDATA is 2 octets length and 2 octets port value in
+network byte order.
+The SvcParamValue MUST NOT contain escape sequences.
+
+
+[#svcb_rr_param_ipv4hint]
+==== ipv4hint
+
+The "ipv4hint" key contains the DNS RR A record (IPv4) that client MAY use
+to reach TargetName.
+
+This parameter SHOULD NOT included if most clients are using compliant
+recursive resolvers (the resolver add DNS A record to additional RR when
+receiving SVCB request).
+
+If the TargetName and OwnerName is equal, server SHOULD NOT include these
+parameter.
+
+The zone format for "ipv4hint",
+
+    SvcParamIpv4hint = "ipv4hint=" 1*Ipv4hintValue
+    Ipv4hintValue    = IPv4 ("," IPv4)
+
+The SvcParamKey value in RDATA for "ipv4hint" is 4.
+
+The SvcParamValue in RDATA for "ipv4hint" is total length (2 octets)
+followed by each IPv4 value (4 octets) in network byte order.
+
+The SvcParamValue MUST NOT contain escape sequences.
+
+For example, given the following zone description,
+
+    ipv4hint=192.168.0,1,192.168.0.2
+
+The RDATA would be
+
+    +---+---+-------------+-------------+
+    | 4 | 8 | 192.168.0.1 | 192.168.0.2 |
+    +---+---+-------------+-------------+
+    ; 4 is ID for "ipv4hint" (2 octets)
+    ; 8 is 2 * 4 octets      (2 octets)
+    ; 192.168.0.1            (4 octets)
+    ; 192.168.0.2            (4 octets)
+
+
+[#svcb_rr_param_ech]
+==== ech
+
+Reserved, help for Encrypted ClientHello.
+
+[#svcb_rr_param_ipv6hint]
+==== ipv6hint
+
+This parameter is similar to "ipv4hint".
+
+Zone format,
+
+    SvcParamIpv6hint = "ipv6hint=" Ipv6hintValue
+    Ipv6hintValue    = IPv6 *("," IPv6)
+
+The SvcParamKey value in RDATA is 6.
+
+The SvcParamValue in RDATA is total length (2 octets) followed by each IPv6
+address (8 octets) in network byte order.
+
+The SvcParamValue MUST NOT contain escape sequences.
+
+
+[#svcb_rr_param_custom]
+==== Custom parameter
+
+Domain operator can define custom parameter by prefixing the parameter name
+with "key" followed by digits other than 0, 1, 2, 3, 4, 5, or 6.
+For example,
+
+    key123="arbitrary value"
+
+The SvcParamKey value in RDATA is "123", while SvcParamValue is total length
+of string value followed by actual values.
+
+
+[#https_rr]
+== HTTPS RR
+
+HTTPS RR is SVCB-compatible RR type.
+Clients MUST NOT perform SVCB queries or accept SVCB responses for "https"
+or "http" schemes.
+
+HTTPS record type is 65 within the Internet ("IN") class.
+
+
+[#https_rr_zone_format]
+=== Zone format
+
+    HTTPS_RR = OwnerName "IN" TTL "HTTPS" SvcPriority TargetName SvcParams
+
+Example: the domain "example.com" can be accessed using HTTPS at
+"\https://svc.example.net", the zone format is
+
+    example.com. 3600 IN HTTPS 0 svc.example.net.
+
+
+=== Service parameters
+
+The default alpn key value is "http/1.1".
+
+The default mandatory keys is "no-default-alpn" and "port".
+
+
+== References
+
+* https://datatracker.ietf.org/doc/html/rfc9460[RFC 9460^]
