@@ -975,8 +975,8 @@ func (m *zoneParser) decodeString(in []byte) (out []byte, err error) {
 			}
 			x--
 
-			var vint int64
-			vint, err = strconv.ParseInt(string(digits), 10, 8)
+			var vint uint64
+			vint, err = strconv.ParseUint(string(digits), 10, 8)
 			if err != nil {
 				return nil, fmt.Errorf(`%s: invalid octet: \%s`, logp, digits)
 			}
