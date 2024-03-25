@@ -12,6 +12,8 @@
 //   - RFC2782 A DNS RR for specifying the location of services (DNS SRV)
 //   - RFC6891 Extension Mechanisms for DNS (EDNS(0))
 //   - RFC8484 DNS Queries over HTTPS (DoH)
+//   - RFC9460 Service Binding and Parameter Specification via the DNS (SVCB
+//     and HTTPS Resource Records)
 package dns
 
 import (

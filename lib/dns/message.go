@@ -487,6 +487,10 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 		msg.packAAAA(rr)
 	case RecordTypeOPT:
 		msg.packOPT(rr)
+	case RecordTypeSVCB:
+		msg.packSVCB(rr)
+	case RecordTypeHTTPS:
+		msg.packHTTPS(rr)
 	}
 }
 
@@ -703,6 +707,77 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 	// Write rdlength.
 	n = 4 + rrOPT.Length
 	libbytes.WriteUint16(msg.packet, off, n)
+}
+
+func (msg *Message) packSVCB(rr *ResourceRecord) {
+	var (
+		svcb *RDataSVCB
+		ok   bool
+	)
+
+	svcb, ok = rr.Value.(*RDataSVCB)
+	if !ok {
+		return
+	}
+
+	// Reserve two octets for rdlength.
+	var off = uint(len(msg.packet))
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+
+	var n = svcb.pack(msg)
+
+	// Write rdlength.
+	libbytes.WriteUint16(msg.packet, off, uint16(n))
+}
+
+func (msg *Message) packHTTPS(rr *ResourceRecord) {
+	var (
+		rrhttps *RDataHTTPS
+		ok      bool
+	)
+
+	rrhttps, ok = rr.Value.(*RDataHTTPS)
+	if !ok {
+		return
+	}
+
+	// Reserve two octets for rdlength.
+	var off = uint(len(msg.packet))
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+
+	// Priority.
+	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+
+	var n = msg.packDomainName([]byte(rrhttps.TargetName), false)
+
+	// In HTTPS (AliasMode), Params is ignored.
+
+	// Write rdlength.
+	libbytes.WriteUint16(msg.packet, off, uint16(n))
+}
+
+func (msg *Message) packIPv4(addr string) {
+	var ip = net.ParseIP(addr)
+	if ip == nil {
+		msg.packet = append(msg.packet, []byte{0, 0, 0, 0}...)
+	} else {
+		var ipv4 = ip.To4()
+		if ipv4 == nil {
+			msg.packet = append(msg.packet, []byte{0, 0, 0, 0}...)
+		} else {
+			msg.packet = append(msg.packet, ipv4...)
+		}
+	}
+}
+
+func (msg *Message) packIPv6(addr string) {
+	var ip = net.ParseIP(addr)
+
+	if ip == nil {
+		msg.packet = append(msg.packet, []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}...)
+	} else {
+		msg.packet = append(msg.packet, ip...)
+	}
 }
 
 // Reset the message fields.

@@ -6,6 +6,7 @@ package dns
 
 import (
 	"bytes"
+	"encoding/json"
 	"testing"
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
@@ -2077,5 +2078,54 @@ func TestMessageUnpack(t *testing.T) {
 			test.Assert(t, "Additional.rdata", expRR.rdata, msg.Additional[x].rdata)
 			test.Assert(t, "Additional.Value", expRR.Value, msg.Additional[x].Value)
 		}
+	}
+}
+
+func TestUnpackMessage_SVCB(t *testing.T) {
+	var (
+		logp  = `TestUnpackMessage_SVCB`
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/message/UnpackMessage_SVCB_test.txt`)
+	if err != nil {
+		t.Fatal(logp, err)
+	}
+
+	var listCase = []string{
+		`AliasMode`,
+		`ServiceMode`,
+		`ServiceMode:port`,
+		`ServiceMode:keyGeneric667`,
+		`ServiceMode:keyGenericQuoted`,
+		`ServiceMode:TwoQuotedIpv6Hint`,
+		`ServiceMode:Ipv6hintEmbedIpv4`,
+		`ServiceMode:WithMandatoryKey`,
+		`ServiceMode:AlpnWithEscapedComma`,
+	}
+
+	var (
+		name    string
+		msgjson []byte
+	)
+	for _, name = range listCase {
+		var msg Message
+
+		msg.packet, err = libbytes.ParseHexDump(tdata.Input[name], true)
+		if err != nil {
+			t.Fatal(logp, err)
+		}
+
+		err = msg.Unpack()
+		if err != nil {
+			t.Fatal(logp, err)
+		}
+
+		msgjson, err = json.MarshalIndent(&msg, ``, `  `)
+		if err != nil {
+			t.Fatal(logp, err)
+		}
+		test.Assert(t, name, string(tdata.Output[name]), string(msgjson))
 	}
 }

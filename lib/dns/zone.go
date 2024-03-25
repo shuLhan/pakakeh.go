@@ -292,6 +292,7 @@ func (zone *Zone) Save() (err error) {
 
 func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceRecord) (total int, err error) {
 	var (
+		logp         = `saveListRR`
 		suffixOrigin = "." + zone.Origin
 
 		hinfo *RDataHINFO
@@ -407,6 +408,34 @@ func (zone *Zone) saveListRR(out io.Writer, dname string, listRR []*ResourceReco
 				"%s %d %s SRV %d %d %d %s\n",
 				dname, rr.TTL, RecordClassName[rr.Class],
 				srv.Priority, srv.Weight, srv.Port, v)
+
+		case RecordTypeSVCB:
+			var svcb *RDataSVCB
+
+			svcb, ok = rr.Value.(*RDataSVCB)
+			if !ok {
+				return total, fmt.Errorf(`%s: expecting %T, got %T`, logp, svcb, rr.Value)
+			}
+			n, _ = fmt.Fprintf(out, `%s %d IN `, dname, rr.TTL)
+			total += n
+
+			var n64 int64
+			n64, _ = svcb.WriteTo(out)
+			n = int(n64)
+
+		case RecordTypeHTTPS:
+			var https *RDataHTTPS
+
+			https, ok = rr.Value.(*RDataHTTPS)
+			if !ok {
+				return total, fmt.Errorf(`%s: expecting %T, got %T`, logp, https, rr.Value)
+			}
+			n, err = fmt.Fprintf(out, `%s %d IN `, dname, rr.TTL)
+			total += n
+
+			var n64 int64
+			n64, _ = https.WriteTo(out)
+			n = int(n64)
 		}
 		if err != nil {
 			return total, err

@@ -84,6 +84,86 @@ func TestParseZone(t *testing.T) {
 	}
 }
 
+func TestParseZone_SVCB(t *testing.T) {
+	var (
+		logp = `TestParseZone_SVCB`
+
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/ParseZone_SVCB_test.txt`)
+	if err != nil {
+		t.Fatal(logp, err)
+	}
+
+	var listCase = []string{
+		`AliasMode`,
+		`ServiceMode`,
+		`ServiceMode:port`,
+		`ServiceMode:keyGeneric667`,
+		`ServiceMode:keyGenericQuoted`,
+		`ServiceMode:TwoQuotedIpv6Hint`,
+		`ServiceMode:Ipv6hintEmbedIpv4`,
+		`ServiceMode:WithMandatoryKey`,
+		`ServiceMode:AlpnWithEscapedComma`,
+		`ServiceMode:AlpnWithEscapedBackslash`,
+		`FailureMode:DuplicateKey`,
+		`FailureMode:KeyMandatoryNoValue`,
+		`FailureMode:KeyAlpnNoValue`,
+		`FailureMode:KeyPortNoValue`,
+		`FailureMode:KeyIpv4hintNoValue`,
+		`FailureMode:KeyIpv6hintNoValue`,
+		`FailureMode:KeyNodefaultalpnWithValue`,
+		`FailureMode:MissingMandatoryKey`,
+		`FailureMode:RecursiveMandatoryKey`,
+		`FailureMode:DuplicateMandatoryKey`,
+	}
+
+	var (
+		origin        = `example.com`
+		ttl    uint32 = 60
+
+		name   string
+		stream []byte
+		zone   *Zone
+		out    bytes.Buffer
+
+		tag string
+		msg *Message
+		x   int
+	)
+
+	for _, name = range listCase {
+		stream = tdata.Input[name]
+		if len(stream) == 0 {
+			t.Fatalf(`%s: %s: empty input`, logp, name)
+		}
+
+		zone, err = ParseZone(stream, origin, ttl)
+		if err != nil {
+			tag = name + `:error`
+			test.Assert(t, tag, string(tdata.Output[tag]), err.Error())
+			continue
+		}
+
+		out.Reset()
+
+		_, _ = zone.WriteTo(&out)
+		stream = tdata.Output[name]
+		test.Assert(t, name, string(stream), out.String())
+
+		for x, msg = range zone.messages {
+			out.Reset()
+			libbytes.DumpPrettyTable(&out, msg.Question.String(), msg.packet)
+
+			tag = fmt.Sprintf(`%s:message_%d.hex`, name, x)
+			stream = tdata.Output[tag]
+			test.Assert(t, tag, string(stream), out.String())
+		}
+	}
+}
+
 func TestZoneParseDirectiveOrigin(t *testing.T) {
 	type testCase struct {
 		desc   string

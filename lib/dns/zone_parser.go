@@ -7,6 +7,8 @@ package dns
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -26,10 +28,15 @@ const (
 )
 
 type zoneParser struct {
+	err    error
 	zone   *Zone
 	parser *libbytes.Parser
 	lastRR *ResourceRecord
-	lineno int
+
+	token       []byte
+	lineno      int
+	delim       byte
+	isMultiline bool
 }
 
 func newZoneParser(data []byte, zone *Zone) (zp *zoneParser) {
@@ -52,7 +59,12 @@ func (m *zoneParser) Reset(data []byte, zone *Zone) {
 
 	data = bytes.TrimSpace(data)
 	data = bytes.ReplaceAll(data, []byte("\r\n"), []byte("\n"))
-	m.parser.Reset(data, []byte{' ', '\t', '\n', ';'})
+	m.parser.Reset(data, []byte{' ', '\t', '(', ')', '\n', ';'})
+
+	m.err = nil
+	m.token = nil
+	m.delim = ' '
+	m.isMultiline = false
 }
 
 // The format of these files is a sequence of entries.  Entries are
@@ -479,6 +491,8 @@ func (m *zoneParser) parseRRClassOrType(rr *ResourceRecord, stok string, flag in
 }
 
 func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte, c byte) (err error) {
+	var logp = `parseRRData`
+
 	switch rr.Type {
 	case RecordTypeA, RecordTypeAAAA:
 		rr.Value = string(tok)
@@ -515,6 +529,15 @@ func (m *zoneParser) parseRRData(rr *ResourceRecord, tok []byte, c byte) (err er
 
 	case RecordTypeSRV:
 		err = m.parseSRV(rr, tok)
+
+	case RecordTypeSVCB:
+		err = m.parseSVCB(rr, tok)
+
+	case RecordTypeHTTPS:
+		err = m.parseHTTPS(rr, tok)
+
+	default:
+		err = fmt.Errorf(`%s: unknown record type %d`, logp, rr.Type)
 	}
 
 	return err
@@ -676,6 +699,86 @@ func (m *zoneParser) parseHInfo(rr *ResourceRecord, tok []byte) (err error) {
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
+
+	return nil
+}
+
+func (m *zoneParser) parseSVCB(rr *ResourceRecord, tok []byte) (err error) {
+	var (
+		logp = `parseSVCB`
+		stok = string(tok)
+
+		priority int64
+	)
+
+	priority, err = strconv.ParseInt(stok, 10, 16)
+	if err != nil {
+		return fmt.Errorf(`%s: invalid SvcPriority %q: %w`, logp, stok, err)
+	}
+	if priority > math.MaxUint16 {
+		return fmt.Errorf(`%s: overflow SvcPriority %d`, logp, priority)
+	}
+
+	err = m.next()
+	if err != nil {
+		return fmt.Errorf(`%s: missing TargetName`, logp)
+	}
+
+	var svcb = &RDataSVCB{
+		Priority:   uint16(priority),
+		TargetName: m.generateDomainName(m.token),
+		Params:     map[int][]string{},
+	}
+
+	err = svcb.parseParams(m)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	err = svcb.validate()
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	rr.Value = svcb
+
+	return nil
+}
+
+func (m *zoneParser) parseHTTPS(rr *ResourceRecord, tok []byte) (err error) {
+	var (
+		logp = `parseHTTPS`
+		stok = string(tok)
+
+		priority int64
+	)
+
+	priority, err = strconv.ParseInt(stok, 10, 64)
+	if err != nil {
+		return fmt.Errorf(`%s: invalid SvcPriority %q: %w`, logp, stok, err)
+	}
+	if priority != 0 {
+		return fmt.Errorf(`%s: expecting 0, got %q`, logp, stok)
+	}
+
+	err = m.next()
+	if err != nil {
+		return fmt.Errorf(`%s: missing TargetName`, logp)
+	}
+
+	var https = &RDataHTTPS{
+		RDataSVCB: RDataSVCB{
+			TargetName: m.generateDomainName(m.token),
+			Params:     map[int][]string{},
+		},
+	}
+
+	err = https.RDataSVCB.parseParams(m)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	rr.Value = https
 
 	return nil
 }
@@ -1055,4 +1158,76 @@ func (m *zoneParser) pack() {
 			msg.Header.ANCount = 0
 		}
 	}
+}
+
+// next get next token and delimiter.
+// The end of reading single record indicated by [zoneParser.delim] set to
+// LF ("\n").
+// A multiline record always return ' ' even if token is end with LF.
+func (m *zoneParser) next() (err error) {
+	if m.delim == 0 {
+		// Calling next when we reached EOF always return false.
+		m.token = nil
+		return io.EOF
+	}
+	if m.delim == ';' {
+		// Skip until new line.
+		m.delim = m.parser.SkipLine()
+		if m.delim == 0 {
+			return io.EOF
+		}
+	}
+
+	for {
+		m.token, m.delim = m.parser.ReadNoSpace()
+		switch m.delim {
+		case ';':
+			m.delim = m.parser.SkipLine()
+			if m.isMultiline {
+				if m.delim == '\n' {
+					m.delim = ' '
+				}
+				return nil
+			}
+			if len(m.token) == 0 {
+				return nil
+			}
+
+		case '(':
+			if m.isMultiline {
+				return fmt.Errorf(`line %d: multiple '('`, m.lineno)
+			}
+			m.isMultiline = true
+
+		case ')':
+			if !m.isMultiline {
+				return fmt.Errorf(`line %d: unexpected ')'`, m.lineno)
+			}
+			m.isMultiline = false
+
+		case '\n':
+			m.lineno++
+
+			if !m.isMultiline {
+				// Delimiter '\n' mark the end of the
+				// record for non-multiline, so we return
+				// immediately here.
+				return nil
+			}
+
+		case 0:
+			if len(m.token) == 0 {
+				return io.EOF
+			}
+
+			// Token is not empty, so we return true first.
+			// The next call will return false with empty token.
+			return nil
+		}
+		if len(m.token) != 0 {
+			break
+		}
+		// Read the next token.
+	}
+	return nil
 }

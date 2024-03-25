@@ -1,0 +1,301 @@
+vi: set tw=0:
+
+Test data for parsing SVCB and HTTPS record from zone file, based on
+RFC 9460, Appendix D.
+
+>>> AliasMode
+example.com.   HTTPS   0 foo.example.com.
+
+<<< AliasMode
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN HTTPS 0 foo.example.com.
+
+<<< AliasMode:message_0.hex
+{Name:example.com. Type:HTTPS}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 41 00 01 c0 0c 00 | ..A..... |   0   0  65   0   1 192  12   0 |24
+0x00000020| 41 00 01 00 00 00 3c 00 | A.....<. |  65   0   1   0   0   0  60   0 |32
+0x00000028| 11 00 00 03 66 6f 6f 07 | ....foo. |  17   0   0   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 63 6f 6d 00             | com.     |  99 111 109   0                 |56
+
+>>> ServiceMode
+example.com.   SVCB   1 .
+
+<<< ServiceMode
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 1 .
+
+<<< ServiceMode:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 03 00 01 00             | ....     |   3   0   1   0                 |40
+
+>>> ServiceMode:port
+example.com.   SVCB   16 foo.example.com. port=53
+
+<<< ServiceMode:port
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 16 foo.example.com. port=53
+
+<<< ServiceMode:port:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 19 00 10 03 66 6f 6f 07 | ....foo. |  25   0  16   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 63 6f 6d 00 00 03 00 02 | com..... |  99 111 109   0   0   3   0   2 |56
+0x00000040| 00 35                   | .5       |   0  53                         |64
+
+>>> ServiceMode:keyGeneric667
+example.com.   SVCB   1 foo.example.com. key667=hello
+
+<<< ServiceMode:keyGeneric667
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 1 foo.example.com. key667=hello
+
+<<< ServiceMode:keyGeneric667:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 1c 00 01 03 66 6f 6f 07 | ....foo. |  28   0   1   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 63 6f 6d 00 02 9b 00 05 | com..... |  99 111 109   0   2 155   0   5 |56
+0x00000040| 68 65 6c 6c 6f          | hello    | 104 101 108 108 111             |64
+
+>>> ServiceMode:keyGenericQuoted
+example.com.   SVCB   1 foo.example.com. key667="hello\210qoo"
+
+<<< ServiceMode:keyGenericQuoted
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 1 foo.example.com. key667="hello\210qoo"
+
+<<< ServiceMode:keyGenericQuoted:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 20 00 01 03 66 6f 6f 07 | ....foo. |  32   0   1   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 63 6f 6d 00 02 9b 00 09 | com..... |  99 111 109   0   2 155   0   9 |56
+0x00000040| 68 65 6c 6c 6f d2 71 6f | hello.qo | 104 101 108 108 111 210 113 111 |64
+0x00000048| 6f                      | o        | 111                             |72
+
+>>> ServiceMode:TwoQuotedIpv6Hint
+example.com.   SVCB   1 foo.example.com. (
+                      ipv6hint="2001:db8::1,2001:db8::53:1"
+                      )
+
+<<< ServiceMode:TwoQuotedIpv6Hint
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 1 foo.example.com. ipv6hint=2001:db8::1,2001:db8::53:1
+
+<<< ServiceMode:TwoQuotedIpv6Hint:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 37 00 01 03 66 6f 6f 07 | 7...foo. |  55   0   1   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 63 6f 6d 00 00 06 00 20 | com..... |  99 111 109   0   0   6   0  32 |56
+0x00000040| 20 01 0d b8 00 00 00 00 | ........ |  32   1  13 184   0   0   0   0 |64
+0x00000048| 00 00 00 00 00 00 00 01 | ........ |   0   0   0   0   0   0   0   1 |72
+0x00000050| 20 01 0d b8 00 00 00 00 | ........ |  32   1  13 184   0   0   0   0 |80
+0x00000058| 00 00 00 00 00 53 00 01 | .....S.. |   0   0   0   0   0  83   0   1 |88
+
+>>> ServiceMode:Ipv6hintEmbedIpv4
+example.com.   SVCB   1 example.com. (
+                        ipv6hint="2001:db8:122:344::192.0.2.33"
+                        )
+
+<<< ServiceMode:Ipv6hintEmbedIpv4
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 1 example.com. ipv6hint=2001:db8:122:344::192.0.2.33
+
+<<< ServiceMode:Ipv6hintEmbedIpv4:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 23 00 01 07 65 78 61 6d | #...exam |  35   0   1   7 101 120  97 109 |40
+0x00000030| 70 6c 65 03 63 6f 6d 00 | ple.com. | 112 108 101   3  99 111 109   0 |48
+0x00000038| 00 06 00 10 20 01 0d b8 | ........ |   0   6   0  16  32   1  13 184 |56
+0x00000040| 01 22 03 44 00 00 00 00 | .".D.... |   1  34   3  68   0   0   0   0 |64
+0x00000048| c0 00 02 21             | ...!     | 192   0   2  33                 |72
+
+>>> ServiceMode:WithMandatoryKey
+example.com.   SVCB   16 foo.example.org. (
+                      alpn=h2,h3-19 mandatory=ipv4hint,alpn
+                      ipv4hint=192.0.2.1
+                      )
+
+<<< ServiceMode:WithMandatoryKey
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 16 foo.example.org. mandatory=ipv4hint,alpn alpn=h2,h3-19 ipv4hint=192.0.2.1
+
+<<< ServiceMode:WithMandatoryKey:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 30 00 10 03 66 6f 6f 07 | 0...foo. |  48   0  16   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 6f 72 67 00 00 00 00 04 | org..... | 111 114 103   0   0   0   0   4 |56
+0x00000040| 00 01 00 04 00 01 00 09 | ........ |   0   1   0   4   0   1   0   9 |64
+0x00000048| 02 68 32 05 68 33 2d 31 | .h2.h3-1 |   2 104  50   5 104  51  45  49 |72
+0x00000050| 39 00 04 00 04 c0 00 02 | 9....... |  57   0   4   0   4 192   0   2 |80
+0x00000058| 01                      | .        |   1                             |88
+
+>>> ServiceMode:AlpnWithEscapedComma
+example.com.   SVCB   16 foo.example.org. alpn="f\\\\oo\\,bar,h2"
+
+<<< ServiceMode:AlpnWithEscapedComma
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 16 foo.example.org. alpn="f\\\\oo\\\,bar,h2"
+
+<<< ServiceMode:AlpnWithEscapedComma:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 23 00 10 03 66 6f 6f 07 | #...foo. |  35   0  16   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 6f 72 67 00 00 01 00 0c | org..... | 111 114 103   0   0   1   0  12 |56
+0x00000040| 08 66 5c 6f 6f 2c 62 61 | .f\oo,ba |   8 102  92 111 111  44  98  97 |64
+0x00000048| 72 02 68 32             | r.h2     | 114   2 104  50                 |72
+
+>>> ServiceMode:AlpnWithEscapedBackslash
+example.com.   SVCB   16 foo.example.org. alpn=f\\\092oo\092,bar,h2
+
+<<< ServiceMode:AlpnWithEscapedBackslash
+$ORIGIN example.com.
+@ SOA example.com. root 1691222000 86400 3600 0 60
+@ 60 IN SVCB 16 foo.example.org. alpn="f\\\\oo\\\,bar,h2"
+
+<<< ServiceMode:AlpnWithEscapedBackslash:message_0.hex
+{Name:example.com. Type:SVCB}
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 00 00 84 00 00 01 00 01 | ........ |   0   0 132   0   0   1   0   1 |0
+0x00000008| 00 00 00 00 07 65 78 61 | .....exa |   0   0   0   0   7 101 120  97 |8
+0x00000010| 6d 70 6c 65 03 63 6f 6d | mple.com | 109 112 108 101   3  99 111 109 |16
+0x00000018| 00 00 40 00 01 c0 0c 00 | ..@..... |   0   0  64   0   1 192  12   0 |24
+0x00000020| 40 00 01 00 00 00 3c 00 | @.....<. |  64   0   1   0   0   0  60   0 |32
+0x00000028| 23 00 10 03 66 6f 6f 07 | #...foo. |  35   0  16   3 102 111 111   7 |40
+0x00000030| 65 78 61 6d 70 6c 65 03 | example. | 101 120  97 109 112 108 101   3 |48
+0x00000038| 6f 72 67 00 00 01 00 0c | org..... | 111 114 103   0   0   1   0  12 |56
+0x00000040| 08 66 5c 6f 6f 2c 62 61 | .f\oo,ba |   8 102  92 111 111  44  98  97 |64
+0x00000048| 72 02 68 32             | r.h2     | 114   2 104  50                 |72
+
+>>> FailureMode:DuplicateKey
+example.com.   SVCB   1 foo.example.com. (
+                          key123=abc key123=def
+                          )
+
+<<< FailureMode:DuplicateKey:error
+ParseZone: parse: parseRR: line 2: parseSVCB: parseParams: AddParam: duplicate key "key123"
+
+>>> FailureMode:KeyMandatoryNoValue
+example.com.   SVCB   1 foo.example.com. mandatory
+
+<<< FailureMode:KeyMandatoryNoValue:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: missing value for key "mandatory"
+
+>>> FailureMode:KeyAlpnNoValue
+example.com.   SVCB   1 foo.example.com. alpn
+
+<<< FailureMode:KeyAlpnNoValue:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: missing value for key "alpn"
+
+>>> FailureMode:KeyPortNoValue
+example.com.   SVCB   1 foo.example.com. port
+
+<<< FailureMode:KeyPortNoValue:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: missing value for key "port"
+
+>>> FailureMode:KeyIpv4hintNoValue
+example.com.   SVCB   1 foo.example.com. ipv4hint
+
+<<< FailureMode:KeyIpv4hintNoValue:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: missing value for key "ipv4hint"
+
+>>> FailureMode:KeyIpv6hintNoValue
+example.com.   SVCB   1 foo.example.com. ipv6hint
+
+<<< FailureMode:KeyIpv6hintNoValue:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: missing value for key "ipv6hint"
+
+>>> FailureMode:KeyNodefaultalpnWithValue
+example.com.   SVCB   1 foo.example.com. no-default-alpn=abc
+
+<<< FailureMode:KeyNodefaultalpnWithValue:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: key "no-default-alpn" must not have value
+
+>>> FailureMode:MissingMandatoryKey
+example.com.   SVCB   1 foo.example.com. mandatory=key123
+
+<<< FailureMode:MissingMandatoryKey:error
+ParseZone: parse: parseRR: line 1: parseSVCB: missing mandatory key "key123"
+
+>>> FailureMode:RecursiveMandatoryKey
+example.com.   SVCB   1 foo.example.com. mandatory=mandatory
+
+<<< FailureMode:RecursiveMandatoryKey:error
+ParseZone: parse: parseRR: line 1: parseSVCB: mandatory key must not be included in the "mandatory" value
+
+>>> FailureMode:DuplicateMandatoryKey
+example.com.   SVCB   1 foo.example.com. (
+                         mandatory=key123,key123 key123=abc
+                         )
+
+<<< FailureMode:DuplicateMandatoryKey:error
+ParseZone: parse: parseRR: line 1: parseSVCB: parseParams: AddParam: duplicate mandatory key "key123"

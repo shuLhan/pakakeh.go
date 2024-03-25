@@ -1,0 +1,441 @@
+Test data for parsing SVCB record from bytes.
+The test input taken from output of parsing SVCB record from zone file.
+
+>>> AliasMode
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4100 01c0 0c00
+0000020 4100 0100 0000 3c00 1100 0003 666f 6f07
+0000030 6578 616d 706c 6503 636f 6d00
+
+<<< AliasMode
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {},
+        "TargetName": "foo.example.com",
+        "Priority": 0
+      },
+      "Name": "example.com",
+      "Type": 65,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 65,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 0300 0100
+
+<<< ServiceMode
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {},
+        "TargetName": "",
+        "Priority": 1
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:port
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 1900 1003 666f 6f07
+0000030 6578 616d 706c 6503 636f 6d00 0003 0002
+0000040 0035
+
+<<< ServiceMode:port
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "3": [
+            "53"
+          ]
+        },
+        "TargetName": "foo.example.com",
+        "Priority": 16
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:keyGeneric667
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 1c00 0103 666f 6f07
+0000030 6578 616d 706c 6503 636f 6d00 029b 0005
+0000040 6865 6c6c 6f
+
+<<< ServiceMode:keyGeneric667
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "667": [
+            "hello"
+          ]
+        },
+        "TargetName": "foo.example.com",
+        "Priority": 1
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:keyGenericQuoted
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 2000 0103 666f 6f07
+0000030 6578 616d 706c 6503 636f 6d00 029b 0009
+0000040 6865 6c6c 6fd2 716f 6f
+
+<<< ServiceMode:keyGenericQuoted
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "667": [
+            "hello\ufffdqoo"
+          ]
+        },
+        "TargetName": "foo.example.com",
+        "Priority": 1
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:TwoQuotedIpv6Hint
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 3700 0103 666f 6f07
+0000030 6578 616d 706c 6503 636f 6d00 0006 0020
+0000040 2001 0db8 0000 0000 0000 0000 0000 0001
+0000050 2001 0db8 0000 0000 0000 0000 0053 0001
+
+<<< ServiceMode:TwoQuotedIpv6Hint
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "6": [
+            "2001:db8::1",
+            "2001:db8::53:1"
+          ]
+        },
+        "TargetName": "foo.example.com",
+        "Priority": 1
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:Ipv6hintEmbedIpv4
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 2300 0107 6578 616d
+0000030 706c 6503 636f 6d00 0006 0010 2001 0db8
+0000040 0122 0344 0000 0000 c000 0221
+
+<<< ServiceMode:Ipv6hintEmbedIpv4
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "6": [
+            "2001:db8:122:344::c000:221"
+          ]
+        },
+        "TargetName": "example.com",
+        "Priority": 1
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:WithMandatoryKey
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 3000 1003 666f 6f07
+0000030 6578 616d 706c 6503 6f72 6700 0000 0004
+0000040 0001 0004 0001 0009 0268 3205 6833 2d31
+0000050 3900 0400 04c0 0002 01
+
+<<< ServiceMode:WithMandatoryKey
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "0": [
+            "alpn",
+            "ipv4hint"
+          ],
+          "1": [
+            "h2",
+            "h3-19"
+          ]
+        },
+        "TargetName": "foo.example.org",
+        "Priority": 16
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}
+
+>>> ServiceMode:AlpnWithEscapedComma
+0000000 0000 8400 0001 0001 0000 0000 0765 7861
+0000010 6d70 6c65 0363 6f6d 0000 4000 01c0 0c00
+0000020 4000 0100 0000 3c00 2300 1003 666f 6f07
+0000030 6578 616d 706c 6503 6f72 6700 0001 000c
+0000040 0866 5c6f 6f2c 6261 7202 6832          
+
+<<< ServiceMode:AlpnWithEscapedComma
+{
+  "Answer": [
+    {
+      "Value": {
+        "Params": {
+          "1": [
+            "f\\oo,bar",
+            "h2"
+          ]
+        },
+        "TargetName": "foo.example.org",
+        "Priority": 16
+      },
+      "Name": "example.com",
+      "Type": 64,
+      "Class": 1,
+      "TTL": 60
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "example.com",
+    "Type": 64,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 0,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": true,
+    "IsTC": false,
+    "IsRD": false,
+    "IsRA": false,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 1,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}

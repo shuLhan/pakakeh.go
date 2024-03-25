@@ -400,6 +400,12 @@ func (rr *ResourceRecord) unpackRData(packet []byte, startIdx uint) (err error) 
 	case RecordTypeOPT:
 		return rr.unpackOPT(packet, startIdx)
 
+	case RecordTypeSVCB:
+		return rr.unpackSVCB(packet, startIdx)
+
+	case RecordTypeHTTPS:
+		return rr.unpackHTTPS(packet, startIdx)
+
 	default:
 		log.Printf("= Unknown query type: %d\n", rr.Type)
 	}
@@ -538,6 +544,48 @@ func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
 		return errors.New("unpackOPT: data length is out of range")
 	}
 	rrOPT.Data = append(rrOPT.Data, packet[x:endIdx]...)
+	return nil
+}
+
+func (rr *ResourceRecord) unpackSVCB(packet []byte, x uint) (err error) {
+	var (
+		logp = `unpackSVCB`
+		svcb = &RDataSVCB{
+			Params: map[int][]string{},
+		}
+	)
+
+	packet = packet[x:]
+
+	err = svcb.unpack(packet)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	rr.Value = svcb
+
+	return nil
+}
+
+func (rr *ResourceRecord) unpackHTTPS(packet []byte, x uint) (err error) {
+	var (
+		logp  = `unpackHTTPS`
+		https = &RDataHTTPS{
+			RDataSVCB: RDataSVCB{
+				Params: map[int][]string{},
+			},
+		}
+	)
+
+	packet = packet[x:]
+
+	err = https.RDataSVCB.unpack(packet)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	rr.Value = https
+
 	return nil
 }
 

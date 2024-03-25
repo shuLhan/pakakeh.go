@@ -1,6 +1,8 @@
 package dns
 
 import (
+	"bytes"
+	"fmt"
 	"testing"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
@@ -47,5 +49,43 @@ func TestZoneParserDecodeString(t *testing.T) {
 			continue
 		}
 		test.Assert(t, string(c.in), c.exp, string(got))
+	}
+}
+
+func TestZoneParser_next(t *testing.T) {
+	var (
+		logp = `TestZoneParser_next`
+
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/zoneParser_next_test.txt`)
+	if err != nil {
+		t.Fatal(logp, err)
+	}
+
+	var listCase = []string{
+		`comments`,
+		`multiline`,
+	}
+	var (
+		tag  string
+		buf  bytes.Buffer
+		zone Zone
+		zp   zoneParser
+	)
+	for _, tag = range listCase {
+		buf.Reset()
+		zp.Reset(tdata.Input[tag], &zone)
+		for {
+			err = zp.next()
+			if err != nil {
+				t.Logf(`err:%s`, err)
+				break
+			}
+			fmt.Fprintf(&buf, "%q %q\n", zp.token, zp.delim)
+		}
+		test.Assert(t, tag, string(tdata.Output[tag]), buf.String())
 	}
 }

@@ -1,0 +1,35 @@
+
+>>> comments
+a b ; c d
+e; f g
+;h i
+;j k
+
+<<< comments
+"a" ' '
+"b" ' '
+"" '\n'
+"e" '\n'
+"" '\n'
+"" '\x00'
+
+
+>>> multiline
+a b c=d e="f g" (
+ h=i j="k l"
+) m n
+( o p )
+
+<<< multiline
+"a" ' '
+"b" ' '
+"c=d" ' '
+"e=\"f" ' '
+"g\"" ' '
+"h=i" ' '
+"j=\"k" ' '
+"l\"" '\n'
+"m" ' '
+"n" '\n'
+"o" ' '
+"p" ' '

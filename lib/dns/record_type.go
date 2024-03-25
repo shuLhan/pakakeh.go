@@ -29,9 +29,13 @@ const (
 	RecordTypeMX                      // 15 - Mail exchange
 	RecordTypeTXT                     // 16 - Text strings
 
-	RecordTypeAAAA  RecordType = 28  // IPv6 address
-	RecordTypeSRV   RecordType = 33  // A SRV RR for locating service.
-	RecordTypeOPT   RecordType = 41  // An OPT pseudo-RR (sometimes called a meta-RR)
+	RecordTypeAAAA RecordType = 28 // IPv6 address
+	RecordTypeSRV  RecordType = 33 // A SRV RR for locating service.
+	RecordTypeOPT  RecordType = 41 // An OPT pseudo-RR (sometimes called a meta-RR)
+
+	RecordTypeSVCB  RecordType = 64 // RFC 9460.
+	RecordTypeHTTPS RecordType = 65 // RFC 9460.
+
 	RecordTypeAXFR  RecordType = 252 // A request for a transfer of an entire zone
 	RecordTypeMAILB RecordType = 253 // A request for mailbox-related records (MB, MG or MR)
 	RecordTypeMAILA RecordType = 254 // A request for mail agent RRs (Obsolete - see MX)
@@ -47,6 +51,7 @@ var RecordTypes = map[string]RecordType{
 	"AXFR":  RecordTypeAXFR,
 	"CNAME": RecordTypeCNAME,
 	"HINFO": RecordTypeHINFO,
+	`HTTPS`: RecordTypeHTTPS,
 	"MAILA": RecordTypeMAILA,
 	"MAILB": RecordTypeMAILB,
 	"MB":    RecordTypeMB,
@@ -61,6 +66,7 @@ var RecordTypes = map[string]RecordType{
 	"OPT":   RecordTypeOPT,
 	"PTR":   RecordTypePTR,
 	"SOA":   RecordTypeSOA,
+	`SVCB`:  RecordTypeSVCB,
 	"SRV":   RecordTypeSRV,
 	"TXT":   RecordTypeTXT,
 	"WKS":   RecordTypeWKS,
@@ -75,6 +81,7 @@ var RecordTypeNames = map[RecordType]string{
 	RecordTypeAXFR:  "AXFR",
 	RecordTypeCNAME: "CNAME",
 	RecordTypeHINFO: "HINFO",
+	RecordTypeHTTPS: `HTTPS`,
 	RecordTypeMAILA: "MAILA",
 	RecordTypeMAILB: "MAILB",
 	RecordTypeMB:    "MB",
@@ -89,6 +96,7 @@ var RecordTypeNames = map[RecordType]string{
 	RecordTypeOPT:   "OPT",
 	RecordTypePTR:   "PTR",
 	RecordTypeSOA:   "SOA",
+	RecordTypeSVCB:  `SVCB`,
 	RecordTypeSRV:   "SRV",
 	RecordTypeTXT:   "TXT",
 	RecordTypeWKS:   "WKS",
