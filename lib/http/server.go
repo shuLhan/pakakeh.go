@@ -344,9 +344,9 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 // If the path is directory and does not contains index.html and
 // [ServerOptions.EnableIndexHTML] is true, server will generate list of
 // content for index.html.
-func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
+func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
 	if srv.Options.Memfs == nil {
-		return nil, false
+		return nil
 	}
 
 	var err error
@@ -354,7 +354,7 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			return nil, false
+			return nil
 		}
 
 		var pathHTML = path.Join(reqPath, `index.html`)
@@ -364,9 +364,9 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 			pathHTML = reqPath + `.html`
 			node, err = srv.Options.Memfs.Get(pathHTML)
 			if err != nil {
-				return nil, false
+				return nil
 			}
-			return node, false
+			return node
 		}
 	}
 
@@ -378,20 +378,17 @@ func (srv *Server) getFSNode(reqPath string) (node *memfs.Node, isDir bool) {
 
 		nodeIndexHTML, err = srv.Options.Memfs.Get(pathHTML)
 		if err == nil {
-			return nodeIndexHTML, false
+			return nodeIndexHTML
 		}
 
 		if !srv.Options.EnableIndexHTML {
-			return nil, false
+			return node
 		}
 
 		node.GenerateIndexHTML()
-
-		// Do not return isDir=true, to prevent the caller check and
-		// redirect the user to path with slash.
 	}
 
-	return node, false
+	return node
 }
 
 // handleDelete handle the DELETE request by searching the registered route
@@ -423,19 +420,18 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	var (
 		logp = "HandleFS"
 
-		node  *memfs.Node
-		err   error
-		isDir bool
+		node *memfs.Node
+		err  error
 	)
 
-	node, isDir = srv.getFSNode(req.URL.Path)
+	node = srv.getFSNode(req.URL.Path)
 	if node == nil {
 		if srv.Options.HandleFS == nil {
 			res.WriteHeader(http.StatusNotFound)
 			return
 		}
 		// Fallthrough, call HandleFS below.
-	} else if isDir && req.URL.Path[len(req.URL.Path)-1] != '/' {
+	} else if node.IsDir() && req.URL.Path[len(req.URL.Path)-1] != '/' {
 		// If request path is a directory and it is not end with
 		// slash, redirect request to location with slash to allow
 		// relative links works inside the HTML content.
@@ -600,7 +596,7 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	methods := make(map[string]bool)
 
-	node, _ := srv.getFSNode(req.URL.Path)
+	var node = srv.getFSNode(req.URL.Path)
 	if node != nil {
 		methods[http.MethodGet] = true
 		methods[http.MethodHead] = true
