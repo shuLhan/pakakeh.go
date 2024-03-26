@@ -308,13 +308,17 @@ func MergeSpaces(in []byte) (out []byte) {
 //	0000060 0000 0000 3030 3030 3537 0035 3030 3130
 //
 // The first column is the address and the rest of the column is the data.
+//
 // Each data column is 16-bit words in big-endian order, so in the above
 // example, the first byte would be 65, second byte is 78 and so on.
-// The asterisk "*" means that the address from 0000020 to 0000050 is equal to
-// the previous line, 0000010.
+// If parameter networkByteOrder is true, the first byte would be 78, second
+// by is 65, and so on.
+//
+// The asterisk "*" means that the address from 0000020 to 0000050 is equal
+// to the previous line, 0000010.
 //
 // [hexdump]: https://man.archlinux.org/man/hexdump.1
-func ParseHexDump(in []byte) (out []byte, err error) {
+func ParseHexDump(in []byte, networkByteOrder bool) (out []byte, err error) {
 	var (
 		logp        = `ParseHexDump`
 		parser      = NewParser(in, []byte(" \n"))
@@ -374,8 +378,18 @@ func ParseHexDump(in []byte) (out []byte, err error) {
 				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
 
-			out = append(out, byte(vint64))
-			out = append(out, byte(vint64>>8))
+			switch len(token) {
+			case 2:
+				out = append(out, byte(vint64))
+			case 4:
+				if networkByteOrder {
+					out = append(out, byte(vint64>>8))
+					out = append(out, byte(vint64))
+				} else {
+					out = append(out, byte(vint64))
+					out = append(out, byte(vint64>>8))
+				}
+			}
 
 			if d == '\n' {
 				break

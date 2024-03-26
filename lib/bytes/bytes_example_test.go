@@ -259,7 +259,7 @@ func ExampleParseHexDump() {
 		err error
 	)
 
-	out, err = libbytes.ParseHexDump(in)
+	out, err = libbytes.ParseHexDump(in, false)
 	if err != nil {
 		log.Fatal(err)
 	}

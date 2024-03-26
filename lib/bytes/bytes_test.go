@@ -33,7 +33,7 @@ func TestParseHexDump(t *testing.T) {
 	for tag, in = range tdata.Input {
 		exp = tdata.Output[tag]
 
-		got, err = ParseHexDump(in)
+		got, err = ParseHexDump(in, false)
 		if err != nil {
 			test.Assert(t, tag, string(exp), err.Error())
 			continue
@@ -62,7 +62,7 @@ func TestParseHexDumpExpDirTar(t *testing.T) {
 		got []byte
 	)
 
-	got, err = ParseHexDump(tdata.Input[tag])
+	got, err = ParseHexDump(tdata.Input[tag], false)
 	if err != nil {
 		t.Fatal(err)
 	}
