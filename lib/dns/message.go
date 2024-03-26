@@ -173,6 +173,60 @@ func NewMessageFromRR(rr *ResourceRecord) (msg *Message, err error) {
 	return msg, nil
 }
 
+// Unpack the raw DNS packet into a Message.
+func UnpackMessage(packet []byte) (msg *Message, err error) {
+	var logp = `UnpackMessage`
+
+	msg = &Message{
+		packet: packet,
+	}
+
+	err = msg.UnpackHeaderQuestion()
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var (
+		startIdx = uint(sectionHeaderSize + msg.Question.size())
+
+		rr ResourceRecord
+		x  uint16
+	)
+	for ; x < msg.Header.ANCount; x++ {
+		rr = ResourceRecord{}
+
+		startIdx, err = rr.unpack(msg.packet, startIdx)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		msg.Answer = append(msg.Answer, rr)
+	}
+
+	for x = 0; x < msg.Header.NSCount; x++ {
+		rr = ResourceRecord{}
+
+		startIdx, err = rr.unpack(msg.packet, startIdx)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+		msg.Authority = append(msg.Authority, rr)
+	}
+
+	for x = 0; x < msg.Header.ARCount; x++ {
+		rr = ResourceRecord{}
+
+		startIdx, err = rr.unpack(msg.packet, startIdx)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		msg.Additional = append(msg.Additional, rr)
+	}
+
+	return msg, nil
+}
+
 // AddAnswer to the Answer field and re-pack it again.
 func (msg *Message) AddAnswer(rr *ResourceRecord) (err error) {
 	switch rr.Type {
@@ -1034,54 +1088,6 @@ func (msg *Message) String() string {
 	b.WriteString("]}")
 
 	return b.String()
-}
-
-// Unpack the packet to fill the message fields.
-func (msg *Message) Unpack() (err error) {
-	err = msg.UnpackHeaderQuestion()
-	if err != nil {
-		return fmt.Errorf(`%w: %w`, errUnpack, err)
-	}
-
-	var (
-		startIdx = uint(sectionHeaderSize + msg.Question.size())
-		rr       ResourceRecord
-	)
-
-	var x uint16
-	for ; x < msg.Header.ANCount; x++ {
-		rr = ResourceRecord{}
-
-		startIdx, err = rr.unpack(msg.packet, startIdx)
-		if err != nil {
-			return fmt.Errorf(`%w: %w`, errUnpack, err)
-		}
-
-		msg.Answer = append(msg.Answer, rr)
-	}
-
-	for x = 0; x < msg.Header.NSCount; x++ {
-		rr = ResourceRecord{}
-
-		startIdx, err = rr.unpack(msg.packet, startIdx)
-		if err != nil {
-			return fmt.Errorf(`%w: %w`, errUnpack, err)
-		}
-		msg.Authority = append(msg.Authority, rr)
-	}
-
-	for x = 0; x < msg.Header.ARCount; x++ {
-		rr = ResourceRecord{}
-
-		startIdx, err = rr.unpack(msg.packet, startIdx)
-		if err != nil {
-			return fmt.Errorf(`%w: %w`, errUnpack, err)
-		}
-
-		msg.Additional = append(msg.Additional, rr)
-	}
-
-	return nil
 }
 
 // UnpackHeaderQuestion extract only DNS header and question from message

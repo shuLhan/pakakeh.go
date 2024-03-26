@@ -106,14 +106,14 @@ func (cl *DoTClient) Query(msg *Message) (res *Message, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	res = NewMessage()
+	var packet []byte
 
-	_, err = cl.recv(res)
+	packet, err = cl.recv()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = res.Unpack()
+	res, err = UnpackMessage(packet)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -126,28 +126,30 @@ func (cl *DoTClient) RemoteAddr() string {
 	return cl.conn.RemoteAddr().String()
 }
 
-// recv will read DNS message from active connection in client into `msg`.
-func (cl *DoTClient) recv(msg *Message) (n int, err error) {
+// recv will read DNS message from active connection.
+func (cl *DoTClient) recv() (packet []byte, err error) {
 	var logp = `recv`
 
 	err = cl.conn.SetReadDeadline(time.Now().Add(cl.timeout))
 	if err != nil {
-		return 0, fmt.Errorf(`%s: %w`, logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	var packet = make([]byte, maxTCPPacketSize)
+	var n int
+
+	packet = make([]byte, maxTCPPacketSize)
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {
-		return 0, fmt.Errorf(`%s: %w`, logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 	if n == 0 {
-		return n, nil
+		return packet, nil
 	}
 
-	msg.packet = packet[2:n]
+	packet = packet[2:n]
 
-	return n, nil
+	return packet, nil
 }
 
 // Write raw DNS message on active connection.

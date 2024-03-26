@@ -126,12 +126,14 @@ func (cl *TCPClient) Query(msg *Message) (res *Message, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	res, err = cl.recv()
+	var packet []byte
+
+	packet, err = cl.recv()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = res.Unpack()
+	res, err = UnpackMessage(packet)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -186,7 +188,7 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 }
 
 // recv receive DNS message.
-func (cl *TCPClient) recv() (res *Message, err error) {
+func (cl *TCPClient) recv() (packet []byte, err error) {
 	var logp = `recv`
 
 	if cl.readTimeout > 0 {
@@ -196,11 +198,9 @@ func (cl *TCPClient) recv() (res *Message, err error) {
 		}
 	}
 
-	var (
-		packet = make([]byte, maxTCPPacketSize)
+	var n int
 
-		n int
-	)
+	packet = make([]byte, maxTCPPacketSize)
 
 	n, err = cl.conn.Read(packet)
 	if err != nil {
@@ -210,9 +210,7 @@ func (cl *TCPClient) recv() (res *Message, err error) {
 		return nil, io.EOF
 	}
 
-	res = &Message{
-		packet: packet[2:n],
-	}
+	packet = packet[2:n]
 
-	return res, nil
+	return packet, nil
 }

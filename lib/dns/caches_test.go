@@ -202,9 +202,7 @@ func TestCaches_ExternalSave(t *testing.T) {
 
 	test.Assert(t, "Caches.ExternalSave", 1, n)
 
-	msg = NewMessage()
-	msg.packet = answer.msg.packet
-	err = msg.Unpack()
+	msg, err = UnpackMessage(answer.msg.packet)
 	if err != nil {
 		t.Fatal(err)
 	}

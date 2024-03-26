@@ -513,13 +513,14 @@ func (srv *Server) incForwarder() {
 func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 	var (
 		logp = `serveTCPClient`
-		req  *request
-		err  error
+
+		req *request
+		err error
 	)
 	for {
 		req = newRequest()
 
-		req.message, err = cl.recv()
+		req.message.packet, err = cl.recv()
 		if err != nil {
 			if !errors.Is(err, io.EOF) {
 				log.Printf(`%s %s: %s`, logp, connTypeNames[kind], err)

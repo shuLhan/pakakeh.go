@@ -200,12 +200,8 @@ func TestAnswerGet(t *testing.T) {
 
 		test.Assert(t, "ReceivedAt", an.ReceivedAt >= at-5, true)
 		test.Assert(t, "AccessedAt", an.AccessedAt >= at, true)
-		got = &Message{
-			Header:   MessageHeader{},
-			Question: MessageQuestion{},
-			packet:   gotPacket,
-		}
-		err = got.Unpack()
+
+		got, err = UnpackMessage(gotPacket)
 		if err != nil {
 			t.Fatal(err)
 		}

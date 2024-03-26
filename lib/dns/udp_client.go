@@ -138,11 +138,8 @@ func (cl *UDPClient) Query(req *Message) (res *Message, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	res = &Message{
-		packet: packet[:n],
-	}
-
-	err = res.Unpack()
+	packet = packet[:n]
+	res, err = UnpackMessage(packet)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

@@ -516,9 +516,7 @@ func (c *Caches) read(r io.Reader) (answers []*Answer, err error) {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}
 
-		msg = NewMessage()
-		msg.packet = item.Packet
-		err = msg.Unpack()
+		msg, err = UnpackMessage(item.Packet)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", logp, err)
 		}

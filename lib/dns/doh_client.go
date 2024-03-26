@@ -134,6 +134,8 @@ func (cl *DoHClient) Lookup(q MessageQuestion, allowRecursion bool) (res *Messag
 // as unpacked message.
 func (cl *DoHClient) Post(msg *Message) (res *Message, err error) {
 	var (
+		logp = `Post`
+
 		httpRes *http.Response
 	)
 
@@ -148,17 +150,20 @@ func (cl *DoHClient) Post(msg *Message) (res *Message, err error) {
 	}
 	cl.req.Body.Close()
 
-	res = NewMessage()
+	var packet []byte
 
-	res.packet, err = io.ReadAll(httpRes.Body)
+	packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	err = res.Unpack()
+	res, err = UnpackMessage(packet)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
 
-	return res, err
+	return res, nil
 }
 
 // Get send query to name server using HTTP GET and return the response as
@@ -181,19 +186,19 @@ func (cl *DoHClient) Get(msg *Message) (res *Message, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	res = NewMessage()
+	var packet []byte
 
-	res.packet, err = io.ReadAll(httpRes.Body)
+	packet, err = io.ReadAll(httpRes.Body)
 	httpRes.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 	if httpRes.StatusCode != 200 {
-		return nil, fmt.Errorf(`%s: %s`, logp, string(res.packet))
+		return nil, fmt.Errorf(`%s: %s`, logp, string(packet))
 	}
 
-	if len(res.packet) > 20 {
-		err = res.Unpack()
+	if len(packet) > 20 {
+		res, err = UnpackMessage(packet)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}

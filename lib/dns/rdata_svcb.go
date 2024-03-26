@@ -564,7 +564,10 @@ func (svcb *RDataSVCB) unpack(packet []byte) (err error) {
 	}
 	packet = packet[x:]
 
-	svcb.unpackParams(packet)
+	err = svcb.unpackParams(packet)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -663,7 +666,7 @@ func (svcb *RDataSVCB) unpackParamALPN(packet []byte) ([]byte, error) {
 
 		var n = int(packet[0])
 		packet = packet[1:]
-		total -= 1
+		total--
 
 		if len(packet) < int(total) {
 			return packet, fmt.Errorf(`%s: mismatch value length, want %d got %d`, logp, n, len(packet))

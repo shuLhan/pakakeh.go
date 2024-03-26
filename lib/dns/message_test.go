@@ -1210,7 +1210,7 @@ func TestMessageSetResponseCode(t *testing.T) {
 	}
 }
 
-func TestMessageUnpack(t *testing.T) {
+func TestUnpackMessage(t *testing.T) {
 	type testCase struct {
 		exp    *Message
 		desc   string
@@ -2037,10 +2037,7 @@ func TestMessageUnpack(t *testing.T) {
 	for _, c = range cases {
 		t.Log(c.desc)
 
-		msg.Reset()
-		msg.packet = c.packet
-
-		err = msg.Unpack()
+		msg, err = UnpackMessage(c.packet)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -2106,26 +2103,26 @@ func TestUnpackMessage_SVCB(t *testing.T) {
 	}
 
 	var (
-		name    string
-		msgjson []byte
+		name   string
+		stream []byte
+		msg    *Message
 	)
 	for _, name = range listCase {
-		var msg Message
 
-		msg.packet, err = libbytes.ParseHexDump(tdata.Input[name], true)
+		stream, err = libbytes.ParseHexDump(tdata.Input[name], true)
 		if err != nil {
 			t.Fatal(logp, err)
 		}
 
-		err = msg.Unpack()
+		msg, err = UnpackMessage(stream)
 		if err != nil {
 			t.Fatal(logp, err)
 		}
 
-		msgjson, err = json.MarshalIndent(&msg, ``, `  `)
+		stream, err = json.MarshalIndent(&msg, ``, `  `)
 		if err != nil {
 			t.Fatal(logp, err)
 		}
-		test.Assert(t, name, string(tdata.Output[name]), string(msgjson))
+		test.Assert(t, name, string(tdata.Output[name]), string(stream))
 	}
 }
