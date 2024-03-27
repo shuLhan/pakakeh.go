@@ -1,10 +1,11 @@
 # Maintainer: shulhan <ms@kilabit.info>
 
 pkgname=pakakeh.go-tools
-pkgver=0.53.1.r8.g76510776
+pkgver=0.53.1.r42.g1ffdc03b
 pkgrel=1
+_sourcedir=$pkgname
 
-pkgdesc="Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk"
+pkgdesc="Miscellaneous CLI tools: ansua, bcrypt, epoch, ini, xtrk"
 arch=(x86_64)
 url='https://sr.ht/~shulhan/pakakeh.go'
 license=('BSD')
@@ -21,22 +22,30 @@ provides=('pakakeh.go-tools')
 source=(
 	"$pkgname::git+https://git.sr.ht/~shulhan/pakakeh.go"
 )
+
+## For testing in local environment.
+#_sourcedir=pakakeh.go-tools-local
+#source=(
+#	"$_sourcedir::git+file:///home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go#branch=dev"
+#)
+
 md5sums=(
 	'SKIP'
 )
 
 pkgver() {
-	cd "${pkgname}"
+	cd "${_sourcedir}"
 	git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build() {
-	cd "${pkgname}"
+	cd "${_sourcedir}"
 	make build
 }
 
 package() {
-	cd "${pkgname}"
+	cd "${_sourcedir}"
+	install -Dm755 _bin/ansua $pkgdir/usr/bin/ansua
 	install -Dm755 _bin/bcrypt $pkgdir/usr/bin/bcrypt
 	install -Dm755 _bin/epoch $pkgdir/usr/bin/epoch
 	install -Dm755 _bin/go-test-coverhtml.sh  $pkgdir/usr/bin/go-test-coverhtml.sh

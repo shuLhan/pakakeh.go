@@ -1,6 +1,6 @@
 pkgbase = pakakeh.go-tools
-	pkgdesc = Miscellaneous CLI tools: bcrypt, epoch, ini, xtrk
-	pkgver = 0.53.1.r8.g76510776
+	pkgdesc = Miscellaneous CLI tools: ansua, bcrypt, epoch, ini, xtrk
+	pkgver = 0.53.1.r42.g1ffdc03b
 	pkgrel = 1
 	url = https://sr.ht/~shulhan/pakakeh.go
 	arch = x86_64
@@ -10,7 +10,7 @@ pkgbase = pakakeh.go-tools
 	provides = pakakeh.go-tools
 	conflicts = share-tools
 	replaces = share-tools
-	source = pakakeh.go-tools::git+https://git.sr.ht/~shulhan/pakakeh.go
+	source = pakakeh.go-tools-local::git+file:///home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go#branch=dev
 	md5sums = SKIP
 
 pkgname = pakakeh.go-tools
