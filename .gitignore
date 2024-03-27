@@ -15,6 +15,7 @@
 *.stats
 *.test
 *.zst
+/_bin/ansua
 /_bin/bcrypt
 /_bin/epoch
 /_bin/gofmtcomment
