@@ -20,7 +20,6 @@ import (
 
 const (
 	defAddress = `127.0.0.1:28194`
-	defInclude = `.*\.(css|html|ico|js|jpg|png|svg)$`
 )
 
 func main() {
@@ -36,7 +35,7 @@ func main() {
 	flag.StringVar(&flagAddress, `address`, defAddress, `Listen address`)
 	flag.StringVar(&flagExclude, `exclude`, ``, `Regex to exclude files in base directory`)
 	flag.BoolVar(&flagHelp, `help`, false, `Print the command usage`)
-	flag.StringVar(&flagInclude, `include`, defInclude, `Regex to include files in base directory`)
+	flag.StringVar(&flagInclude, `include`, ``, `Regex to include files in base directory`)
 	flag.BoolVar(&flagVersion, `version`, false, `Print the program version`)
 
 	flag.Parse()
@@ -66,12 +65,14 @@ func main() {
 	var (
 		mfsOpts = memfs.Options{
 			Root:        dirBase,
-			Includes:    []string{flagInclude},
 			MaxFileSize: -1,
 			TryDirect:   true,
 		}
 		mfs *memfs.MemFS
 	)
+	if len(flagInclude) != 0 {
+		mfsOpts.Includes = []string{flagInclude}
+	}
 	if len(flagExclude) != 0 {
 		mfsOpts.Excludes = []string{flagExclude}
 	}
