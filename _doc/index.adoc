@@ -102,6 +102,8 @@ SPF::
 DNS::
 +
 --
+* link:RFC_6891_EDNS0.html[RFC 6891: Extension Mechanisms for DNS (EDNS(0))^]
+
 * link:RFC_9460__SVCB_and_HTTP_RR.html[RFC 9460 Service Binding and
   Parameter Specification via the DNS (SVCB and HTTPS Resource Records)]
 --

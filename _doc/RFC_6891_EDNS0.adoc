@@ -1,0 +1,76 @@
+=  Extension Mechanisms for DNS - EDNS(0)
+:toc:
+:sectlinks:
+
+The
+https://datatracker.ietf.org/doc/html/rfc6891[RFC 6891]
+define the pseudo resource record (RR) or meta RR for DNS named OPT.
+
+The OPT record provides an extension to DNS, nicknamed as "EDNS(0)", which
+was previously called "EDNS0" specified in
+https://datatracker.ietf.org/doc/html/rfc2671/[RFC 2671].
+
+The OPT RR has RR type 41 (0x21).
+
+The OPT record can only be added to the additional section of DNS response.
+
+== Implementation requirements
+
+OPT RRs MUST NOT be cached, forwarded, or stored in or loaded from master
+files.
+
+When an OPT RR is included within any DNS message, it MUST be the
+only OPT RR in that message.
+If a query message with more than one OPT RR is received, a FORMERR (format
+error with response code (RCODE) value 1) MUST be returned.
+
+== Record format
+
+The OPT RR changes the definition of CLASS and TTL from normal DNS RR.
+
+----
++--------+
+| NAME   | ; 2-octets, MUST be 0 (an empty label).
++--------+
+| TYPE   | ; 16-bit unsigned integer, with value 0x0029 (or 41)
++--------+
+| CLASS  | ; 16-bit unsigned integer, requester's UDP payload size.
++--------+
+| TTL    | ; 32-bit unsigned integer, extended RCODE and flags.
+|        |
++--------+
+| RDLEN  | ; 16-bit unsigned integer, length of RDATA.
++--------+
+/ RDATA  / ; Arbitrary length based on RDLEN.
++--------+
+----
+
+Inside the TTL, the extended RCODE and flags define as below,
+
+----
++----------------+
+| EXTENDED-RCODE | 1-octet, the extended RCODE.
++----------------+
+| VERSION        | 1-octet, version of implementation.
++----------------+
+| DO             | 1-bit.
++----------------+
+| Z              | 15-bit, zero bits.
++----------------+
+----
+
+Note that EXTENDED-RCODE value 0 indicates that an unextended RCODE is in
+use.
+
+The RDATA contains zero or more options as a pair of code-value in the
+following format,
+
+----
++---------------+
+| OPTION-CODE   | ; 2-octets.
++---------------+
+| OPTION-LENGTH | ; 2-octets, the length of value in octets.
++---------------+
+/ OPTION-VALUE  / ; Arbitrary length of value based on OPTION-LENGTH;
++---------------+
+----

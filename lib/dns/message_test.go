@@ -2078,6 +2078,59 @@ func TestUnpackMessage(t *testing.T) {
 	}
 }
 
+func TestUnpackMessage_OPT(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/message/UnpackMessage_OPT_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var listCase = []string{
+		`cgv5hi6hcnsdsf1etkyqzvuzdyus.multi.surbl.org:00`,
+		`cgv5hi6hcnsdsf1etkyqzvuzdyus.multi.surbl.org:01`,
+	}
+
+	var (
+		tcase  string
+		stream []byte
+		msg    *Message
+		bbuf   bytes.Buffer
+	)
+	for _, tcase = range listCase {
+		stream, err = libbytes.ParseHexDump(tdata.Input[tcase], true)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		msg, err = UnpackMessage(stream)
+		if err != nil {
+			t.Fatal(tcase, err)
+		}
+
+		stream, err = json.MarshalIndent(&msg, ``, `  `)
+		if err != nil {
+			t.Fatal(err)
+		}
+		test.Assert(t, tcase, string(tdata.Output[tcase]), string(stream))
+
+		// Pack the unpacked message again to generate hexdump that
+		// should be equal with input.
+
+		stream, err = msg.Pack()
+		if err != nil {
+			t.Fatal(err)
+		}
+		bbuf.Reset()
+		libbytes.DumpPrettyTable(&bbuf, msg.Question.String(), stream)
+		tcase += `.hexdump`
+		test.Assert(t, tcase, string(tdata.Output[tcase]), bbuf.String())
+	}
+}
+
 func TestUnpackMessage_SVCB(t *testing.T) {
 	var (
 		logp  = `TestUnpackMessage_SVCB`
@@ -2108,7 +2161,6 @@ func TestUnpackMessage_SVCB(t *testing.T) {
 		msg    *Message
 	)
 	for _, name = range listCase {
-
 		stream, err = libbytes.ParseHexDump(tdata.Input[name], true)
 		if err != nil {
 			t.Fatal(logp, err)

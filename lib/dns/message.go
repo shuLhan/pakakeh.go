@@ -730,37 +730,15 @@ func (msg *Message) packAAAA(rr *ResourceRecord) {
 	}
 }
 
+// packOPT pack the RDLEN and RDATA of OPT record.
 func (msg *Message) packOPT(rr *ResourceRecord) {
-	var (
-		rrOPT, _ = rr.Value.(*RDataOPT)
-		off      = uint(len(msg.packet))
+	var rrOPT *RDataOPT
 
-		n uint16
-	)
+	rrOPT, _ = rr.Value.(*RDataOPT)
 
-	// Reserve two octets for rdlength.
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
-
-	if rrOPT.Length == 0 {
-		return
-	}
-
-	// Pack OPT rdata
-	msg.packet = libbytes.AppendUint16(msg.packet, rrOPT.Code)
-
-	// Values of less than 512 bytes MUST be treated as equal to 512
-	// bytes (RFC6891 P11).
-	if rrOPT.Length < 512 {
-		msg.packet = libbytes.AppendUint16(msg.packet, 512)
-	} else {
-		msg.packet = libbytes.AppendUint16(msg.packet, rrOPT.Length)
-	}
-
-	msg.packet = append(msg.packet, rrOPT.Data[:rrOPT.Length]...)
-
-	// Write rdlength.
-	n = 4 + rrOPT.Length
-	libbytes.WriteUint16(msg.packet, off, n)
+	var rdata = rrOPT.pack()
+	msg.packet = libbytes.AppendUint16(msg.packet, uint16(len(rdata)))
+	msg.packet = append(msg.packet, rdata...)
 }
 
 func (msg *Message) packSVCB(rr *ResourceRecord) {

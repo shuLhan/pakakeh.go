@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -188,8 +187,6 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	var (
 		logp      = "ResourceRecord.unpack"
 		lenPacket = uint(len(packet))
-
-		lenXRdata uint
 	)
 
 	x = startIdx
@@ -209,7 +206,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	rr.rdlen = libbytes.ReadUint16(packet, x)
 	x += 2
 
-	lenXRdata = x + uint(rr.rdlen)
+	var lenXRdata uint = x + uint(rr.rdlen)
 	if lenPacket < lenXRdata {
 		return x, fmt.Errorf("%s: %s %d: packet length %d smaller than index+rdata %d+%d (%d)",
 			logp, rr.Name, rr.Type, lenPacket, x, rr.rdlen, lenXRdata)
@@ -513,37 +510,26 @@ func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
 	return
 }
 
-func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) error {
-	var (
-		rrOPT = &RDataOPT{}
-
-		endIdx uint
-	)
+func (rr *ResourceRecord) unpackOPT(packet []byte, x uint) (err error) {
+	var rrOPT = &RDataOPT{}
 
 	rr.Value = rrOPT
 
-	// Unpack extended RCODE and flags from TTL.
 	rrOPT.ExtRCode = byte(rr.TTL >> 24)
 	rrOPT.Version = byte(rr.TTL >> 16)
 
 	if rr.TTL&maskOPTDO == maskOPTDO {
 		rrOPT.DO = true
 	}
-
 	if rr.rdlen == 0 {
 		return nil
 	}
 
-	// Unpack the RDATA
-	rrOPT.Code = libbytes.ReadUint16(packet, x)
-	x += 2
-	rrOPT.Length = libbytes.ReadUint16(packet, x)
-	x += 2
-	endIdx = x + uint(rr.rdlen)
-	if int(endIdx) >= len(packet) {
-		return errors.New("unpackOPT: data length is out of range")
+	err = rrOPT.unpack(int(rr.rdlen), packet[x:])
+	if err != nil {
+		return fmt.Errorf(`unpackOPT: %w`, err)
 	}
-	rrOPT.Data = append(rrOPT.Data, packet[x:endIdx]...)
+
 	return nil
 }
 
