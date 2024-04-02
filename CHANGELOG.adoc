@@ -20,6 +20,229 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_54_0]
+== pakakeh.go v0.54.0 (2024-04-04)
+
+This is the first release after we move the repository to SourceHut under
+different name: "pakakeh.go".
+There are several reasons for moving and naming.
+
+First, related to the name of package.
+We accidentally name the package with "share" a common word in English
+that does not reflect the content of repository.
+By moving to other repository, we can rename it to better and unique
+name, in this "pakakeh.go".
+Pakakeh is Minang word for tools, and ".go" suffix indicate that the
+repository related to Go programming language.
+
+Second, supporting open source.
+The new repository is hosted under sourcehut.org, the founder is known
+to support open source, and all their services are licensed under AGPL,
+unlike GitHub that are closed sources.
+
+Third, regarding GitHub CoPilot.
+https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#4-license-grant-to-us[The
+GitHub Terms of Service],
+allow any public content that are hosted there granted them to parse the
+content.
+On one side, GitHub helps and flourish the open source, but on another
+side have an issues
+https://githubcopilotinvestigation.com[issues]
+regarding scraping the copyleft license.
+
+
+[#v0_54_0__breaking_changes]
+=== Breaking changes
+
+Since we are moving to new repository, we fix all linter warnings and
+inconsistencies that we cannot changes on previous module.
+
+Breaking changes related to naming,
+
+* api/slack: [Message.IconUrl] become [Message.IconURL]
+* lib/dns: DefaultSoaMinumumTtl become DefaultSoaMinimumTTL
+* lib/email: [Message.SetBodyHtml] become [Message.SetBodyHTML]
+* lib/http: [Client.GenerateHttpRequest] become
+  [Client.GenerateHTTPRequest]
+* lib/http: [ClientOptions.ServerUrl] become [ClientOptions.ServerURL]
+* lib/http: [EndpointRequest.HttpWriter] become
+  [EndpointRequest.HTTPWriter]
+* lib/http: [EndpointRequest.HttpRequest] become
+  [EndpointRequest.HTTPRequest]
+* lib/http: [ServerOptions.EnableIndexHtml] become
+  [ServerOptions.EnableIndexHTML]
+* lib/http: [SSEConn.HttpRequest] become [SSEConn.HTTPRequest]
+* lib/smtp: [ClientOptions.ServerUrl] become [ClientOptions.ServerURL]
+* lib/ssh/sftp: [FileAttrs.SetUid] become [FileAttrs.SetUID]
+* lib/ssh/sftp: [FileAttrs.Uid] become [FileAttrs.UID]
+
+Changes on packages,
+
+lib/sql: remove deprecated Row type::
++
+The Row type has been replaced with Meta type with more flexibility
+and features for generating type-safe SQL DML.
+
+lib/memfs: remove deprecated Merge function::
++
+The Merge function has been replaced with [memfs.MemFS.Merge] for
+better API.
+
+lib: move package "net/html" to "lib/html"::
++
+Putting "html" under "net" package make no sense.
+Another reason is to make the package flat under "lib/" directory.
+
+lib: move package "ssh/config" to "lib/sshconfig"::
++
+Previously the "ssh/config" is used by the parent package "ssh" and
+"ssh/sftp" which is break the rule of package layer (the top package
+should be imported by sub package, not the other way around).
+
+lib/http: refactor of RegisterEndpoint and RegisterSSE to non-pointer::
++
+Once the endpoint registered, the caller should not able to changes
+any values on endpoint again.
+
+lib/http: refactoring NewServer and NewClient::
++
+The NewServer and NewClient now accept non-pointer options, so the
+caller unable to modify the options once the server or client has
+been created.
+
+lib/http: refactor Client methods to use struct ClientRequest::
++
+Instead of three parameters, the Client methods now accept single struct
+[ClientRequest].
+
+lib/http: refactoring Client methods to return struct ClientResponse::
++
+Instead of returning three variables, [http.Response], []byte, and error,
+we combine the [http.Response] and []byte into single struct:
+ClientResponse.
+
+lib/http: refactoring type of RequestMethod from int to string::
++
+The reason is to make storing or encoding the RequestMethod value readable
+from user point of view instead of number, 0, 1, 2, etc.
+
+lib/http: refactor type of RequestType from int to string::
++
+The reason is to make storing or encoding the RequestType value readable
+from human point of view instead of number, 0, 1, 2, etc.
+
+lib/http: refactoring type of ResponseType from int to string::
++
+The reason is to make storing or encoding the value readable
+from human point of view instead of number, 0, 1, 2, etc.
+
+lib/http: refactoring FSHandler type to return [*memfs.Node]::
++
+--
+Changing FSHandler type to return [*memfs.Node], allow the handler to
+redirect or return custom node.
+
+One of the use case is when service Single Page Application (SPA), where
+route is handled by JavaScript.
+
+For example, when user requested "/dashboard" but dashboard directory
+does not exist, one can write the following handler to return
+"/index.html",
+
+    node, _ = memfs.Get(`/index.html`)
+    return node
+--
+
+lib/dns: refactor [Message.Unpack] to [UnpackMessage]::
++
+--
+The previous API for Message is a little bit weird.
+Its provides creating Message manually, but expose the method
+[UnpackHeaderQuestion], meanwhile the field packet itself is unexported.
+
+In order to make it more clear we refactor [Message.Unpack] to
+function [UnpackMessage] that accept raw DNS packet.
+--
+
+
+[#v0_54_0__new_features]
+=== New features
+
+test/httptest: new helper for testing HTTP server handler::
++
+--
+The Simulate function simulate HTTP server handler by generating
+[http.Request] from fields in [SimulateRequest]; and then call
+[http.HandlerFunc].
+
+The HTTP response from serve along with its raw body and original HTTP
+request then returned in [*SimulateResult].
+--
+
+lib/dns: implements RFC 9460 for SVCB RR and HTTPS RR::
++
+The dns package now support packing and unpacking DNS with record type 64
+(SVCB) and 65 (HTTPS).
+
+cmd/ansua: command line interface to help tracking time::
++
+--
+Usage,
+
+    ansua <duration> [ "<command>" ]
+
+ansua execute a timer on defined duration and optionally run a command
+when timer finished.
+
+When ansua timer is running, one can pause the timer by pressing p+Enter,
+and resume it by pressing r+Enter, or stopping it using CTRL+c.
+--
+
+
+[#v0_54_0__bug_fixes]
+=== Bug fixes
+
+lib/memfs: trim trailing slash ("/") in the path of Get method::
++
+The MemFS always store directory without slash.
+If caller request a directory node with slash, it will always return nil.
+
+lib/dns: use ParseUint to parse escaped octet in "\NNN" format::
++
+Previously, we use ParseInt to parse escaped octet "\NNN", but using
+this method only allow decimal from 0 to 127, while the specification
+allow 0 to 255.
+
+
+[#v0_54_0__enhancements]
+=== Enhancements
+
+lib/http: handle CORS independently::
++
+--
+Previously, if [CORSOptions.AllowOrigins] not found we return it
+immediately without checking request "Access-Control-Request-Method",
+"Access-Control-Request-Headers", and other CORS options.
+
+This changes check each of them, a missing allow origins does not
+means empty allowed method, headers, MaxAge, or credentials.
+--
+
+lib/bytes: add parameter networkByteOrder to ParseHexDump::
++
+--
+If networkByteOrder is true, the ParseHexDump read each hex string
+in network byte order or as order defined in text.
+
+While at it, fix reading and parsing single byte hex.
+--
+
+cmd/httpdfs: set default include options to empty::
++
+By default httpdfs now serve all files under base directory.
+
+
+
 [#v0_53_1]
 == pakakeh.go v0.53.1 (2024-03-02)
 
