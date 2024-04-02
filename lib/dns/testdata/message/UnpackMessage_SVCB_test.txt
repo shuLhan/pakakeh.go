@@ -356,6 +356,9 @@ The test input taken from output of parsing SVCB record from zone file.
           "1": [
             "h2",
             "h3-19"
+          ],
+          "4": [
+            "192.0.2.1"
           ]
         },
         "TargetName": "foo.example.org",

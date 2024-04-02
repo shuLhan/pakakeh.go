@@ -735,6 +735,7 @@ func (svcb *RDataSVCB) unpackParamIpv4hint(packet []byte) ([]byte, error) {
 		var ip = net.IP(packet[0:4])
 		packet = packet[4:]
 		listValue = append(listValue, ip.String())
+		n--
 	}
 
 	svcb.Params[svcbKeyIDIpv4hint] = listValue

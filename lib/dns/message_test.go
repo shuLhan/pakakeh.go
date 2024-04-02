@@ -2116,7 +2116,7 @@ func TestUnpackMessage_SVCB(t *testing.T) {
 
 		msg, err = UnpackMessage(stream)
 		if err != nil {
-			t.Fatal(logp, err)
+			t.Fatal(logp, name, err)
 		}
 
 		stream, err = json.MarshalIndent(&msg, ``, `  `)
