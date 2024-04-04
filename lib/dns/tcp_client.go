@@ -209,6 +209,9 @@ func (cl *TCPClient) recv() (packet []byte, err error) {
 	if n == 0 {
 		return nil, io.EOF
 	}
+	if n < 2 {
+		return nil, fmt.Errorf(`%s: invalid packet`, logp)
+	}
 
 	packet = packet[2:n]
 

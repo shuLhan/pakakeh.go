@@ -398,6 +398,7 @@ func (svcb *RDataSVCB) pack(msg *Message) (n int) {
 
 func (svcb *RDataSVCB) packMandatory(msg *Message, listValue []string) {
 	msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDMandatory))
+
 	var total = 2 * len(listValue)
 	msg.packet = libbytes.AppendUint16(msg.packet, uint16(total))
 
@@ -628,7 +629,7 @@ func (svcb *RDataSVCB) unpackParamMandatory(packet []byte) ([]byte, error) {
 		listValue []string
 	)
 	for n > 0 {
-		if len(packet) == 0 {
+		if len(packet) < 2 {
 			return packet, fmt.Errorf(`missing mandatory value on index %d`, len(listValue))
 		}
 
