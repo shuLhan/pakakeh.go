@@ -59,7 +59,7 @@ func {{ .Node.GenFuncName}}() *memfs.Node {
 		Content:     []byte("{{range $x, $c := .Node.Content}}{{ printf "\\x%02X" $c }}{{end}}"),
 {{- end }}
 	}
-	node.SetMode({{printf "%d" .Node.Mode}})
+	node.SetMode({{printf "%O" .Node.Mode}})
 {{- if not .Opts.Embed.WithoutModTime }}
 	node.SetModTimeUnix({{.Node.ModTime.Unix}}, {{.Node.ModTime.Nanosecond}})
 {{- end }}
