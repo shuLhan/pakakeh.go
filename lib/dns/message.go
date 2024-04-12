@@ -183,7 +183,7 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 
 	err = msg.UnpackHeaderQuestion()
 	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
+		return nil, fmt.Errorf(`%s: %w: %w`, logp, errInvalidMessage, err)
 	}
 
 	var (
@@ -197,7 +197,7 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
 		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, logp, err)
+			return nil, fmt.Errorf(`%s: %w: %w`, logp, errInvalidMessage, err)
 		}
 
 		msg.Answer = append(msg.Answer, rr)
@@ -208,7 +208,7 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
 		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, logp, err)
+			return nil, fmt.Errorf(`%s: %w: %w`, logp, errInvalidMessage, err)
 		}
 		msg.Authority = append(msg.Authority, rr)
 	}
@@ -218,7 +218,7 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
 		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, logp, err)
+			return nil, fmt.Errorf(`%s: %w: %w`, logp, errInvalidMessage, err)
 		}
 
 		msg.Additional = append(msg.Additional, rr)

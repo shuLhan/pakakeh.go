@@ -6,5 +6,5 @@ package dns
 
 import "errors"
 
-// errUnpack define an error if packet failed to be parsed.
-var errUnpack = errors.New(`unpack: invalid message`)
+// errInvalidMessage define an error when raw DNS message cannot be parsed.
+var errInvalidMessage = errors.New(`invalid message`)
