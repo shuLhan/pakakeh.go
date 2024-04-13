@@ -39,7 +39,7 @@ const (
 	RecordTypeAXFR  RecordType = 252 // A request for a transfer of an entire zone
 	RecordTypeMAILB RecordType = 253 // A request for mailbox-related records (MB, MG or MR)
 	RecordTypeMAILA RecordType = 254 // A request for mail agent RRs (Obsolete - see MX)
-	RecordTypeALL   RecordType = 255 // A request for all records
+	RecordTypeANY   RecordType = 255 // A request for all records.
 )
 
 // RecordTypes contains a mapping between string representation of DNS record
@@ -47,7 +47,7 @@ const (
 var RecordTypes = map[string]RecordType{
 	"A":     RecordTypeA,
 	"AAAA":  RecordTypeAAAA,
-	"ALL":   RecordTypeALL,
+	`ANY`:   RecordTypeANY,
 	"AXFR":  RecordTypeAXFR,
 	"CNAME": RecordTypeCNAME,
 	"HINFO": RecordTypeHINFO,
@@ -77,7 +77,7 @@ var RecordTypes = map[string]RecordType{
 var RecordTypeNames = map[RecordType]string{
 	RecordTypeA:     "A",
 	RecordTypeAAAA:  "AAAA",
-	RecordTypeALL:   "ALL",
+	RecordTypeANY:   `ANY`,
 	RecordTypeAXFR:  "AXFR",
 	RecordTypeCNAME: "CNAME",
 	RecordTypeHINFO: "HINFO",

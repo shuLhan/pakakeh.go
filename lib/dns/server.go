@@ -561,7 +561,7 @@ func (srv *Server) isImplemented(msg *Message) bool {
 	}
 	switch msg.Question.Type {
 	case RecordTypeAAAA, RecordTypeSRV, RecordTypeOPT, RecordTypeAXFR,
-		RecordTypeMAILB, RecordTypeMAILA,
+		RecordTypeMAILB, RecordTypeMAILA, RecordTypeANY,
 		RecordTypeSVCB, RecordTypeHTTPS:
 		return true
 	}
