@@ -23,11 +23,6 @@ const (
 	EnvWebhookURL = "TELEGRAM_WEBHOOK_URL"
 )
 
-const (
-	defListenAddress    = ":80"
-	defListenAddressTLS = ":443"
-)
-
 // UpdateHandler define the handler when Bot receiving updates.
 type UpdateHandler func(update Update)
 
@@ -73,18 +68,11 @@ func (opts *Options) init() (err error) {
 	if opts.Webhook == nil {
 		return errors.New("empty Webhook URL")
 	}
-	if len(opts.Webhook.URL) == 0 {
-		// Even thought empty URL is allowed by API, which
-		// means to clear the previous setWebhook, use the
-		// DeleteWebhook instead for consistency.
-		return errors.New("empty Webhook URL")
+
+	err = opts.Webhook.init()
+	if err != nil {
+		return err
 	}
-	if len(opts.Webhook.ListenAddress) == 0 {
-		if opts.Webhook.ListenCertificate == nil {
-			opts.Webhook.ListenAddress = defListenAddress
-		} else {
-			opts.Webhook.ListenAddress = defListenAddressTLS
-		}
-	}
+
 	return nil
 }

@@ -4,7 +4,15 @@
 
 package bot
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+	"errors"
+)
+
+const (
+	defListenAddress    = `:80`
+	defListenAddressTLS = `:443`
+)
 
 // Webhook contains options to set Webhook to receive updates.
 type Webhook struct {
@@ -42,4 +50,22 @@ type Webhook struct {
 	// Use lower values to limit the load on your bot‘s server, and higher
 	// values to increase your bot’s throughput.
 	MaxConnections int
+}
+
+func (webhook *Webhook) init() (err error) {
+	if len(webhook.URL) == 0 {
+		// Even thought empty URL is allowed by API, which
+		// means to clear the previous setWebhook, use the
+		// DeleteWebhook instead for consistency.
+		return errors.New(`empty Webhook URL`)
+	}
+
+	if len(webhook.ListenAddress) == 0 {
+		if webhook.ListenCertificate == nil {
+			webhook.ListenAddress = defListenAddress
+		} else {
+			webhook.ListenAddress = defListenAddressTLS
+		}
+	}
+	return nil
 }
