@@ -340,7 +340,7 @@ func (bot *Bot) setWebhook() (err error) {
 	var (
 		logp       = `setWebhook`
 		params     = make(map[string][]byte)
-		webhookURL = path.Join(bot.opts.Webhook.URL, bot.opts.Token)
+		webhookURL = bot.opts.Webhook.URL + path.Join(`/`, bot.opts.Token)
 	)
 
 	params[paramNameURL] = []byte(webhookURL)
