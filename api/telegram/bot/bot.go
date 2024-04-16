@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"time"
@@ -414,6 +415,8 @@ func (bot *Bot) startWebhook() (err error) {
 
 // createServer start the HTTP server for receiving Update.
 func (bot *Bot) createServer() (err error) {
+	var logp = `createServer`
+
 	var serverOpts = libhttp.ServerOptions{
 		Address: bot.opts.Webhook.ListenAddress,
 	}
@@ -434,20 +437,42 @@ func (bot *Bot) createServer() (err error) {
 
 	bot.webhook, err = libhttp.NewServer(serverOpts)
 	if err != nil {
-		return fmt.Errorf("createServer: %w", err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	var epToken = libhttp.Endpoint{
+	var webhookURL *url.URL
+
+	webhookURL, err = url.Parse(bot.opts.Webhook.URL)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var fullPath = path.Join(webhookURL.Path, bot.opts.Token)
+
+	var ep = libhttp.Endpoint{
+		Method:       libhttp.RequestMethodGet,
+		Path:         fullPath,
+		RequestType:  libhttp.RequestTypeNone,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         bot.handleWebhookGet,
+	}
+
+	err = bot.webhook.RegisterEndpoint(ep)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	ep = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
-		Path:         "/" + bot.opts.Token,
+		Path:         fullPath,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeNone,
 		Call:         bot.handleWebhook,
 	}
 
-	err = bot.webhook.RegisterEndpoint(epToken)
+	err = bot.webhook.RegisterEndpoint(ep)
 	if err != nil {
-		return fmt.Errorf("createServer: %w", err)
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil
@@ -473,6 +498,17 @@ func (bot *Bot) handleWebhook(epr *libhttp.EndpointRequest) (resBody []byte, err
 		bot.opts.HandleUpdate(update)
 	}
 
+	return resBody, nil
+}
+
+func (bot *Bot) handleWebhookGet(_ *libhttp.EndpointRequest) (resBody []byte, err error) {
+	var res = libhttp.EndpointResponse{}
+	res.Code = 200
+	res.Message = `OK`
+	resBody, err = json.Marshal(&res)
+	if err != nil {
+		return nil, err
+	}
 	return resBody, nil
 }
 
