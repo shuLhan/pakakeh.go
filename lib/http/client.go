@@ -21,7 +21,6 @@ import (
 	"net"
 	"net/http"
 	"path"
-	"sort"
 	"strings"
 	"time"
 
@@ -193,7 +192,7 @@ out:
 //   - If Type is [RequestTypeForm] and Params is [url.Values] it
 //     will be send as URL encoded in the body.
 //   - If Type is [RequestTypeMultipartForm] and Params type is
-//     map[string][]byte, then it will send as multipart form in the
+//     [*multipart.Form], then it will send as multipart form in the
 //     body.
 //   - If Type is [RequestTypeJSON] and Params is not nil, the Params
 //     will be encoded as JSON in the body.
@@ -224,15 +223,15 @@ func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Requ
 
 	case RequestTypeMultipartForm:
 		var (
-			paramsAsMultipart map[string][]byte
-			ok                bool
+			mpform *multipart.Form
+			ok     bool
 		)
 
-		paramsAsMultipart, ok = req.Params.(map[string][]byte)
+		mpform, ok = req.Params.(*multipart.Form)
 		if ok {
 			var strBody string
 
-			contentType, strBody, err = GenerateFormData(paramsAsMultipart)
+			contentType, strBody, err = GenerateFormData(mpform)
 			if err != nil {
 				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
@@ -331,7 +330,7 @@ func (client *Client) PostFormData(req ClientRequest) (res *ClientResponse, err 
 	var (
 		logp = `PostFormData`
 
-		params map[string][]byte
+		params *multipart.Form
 	)
 
 	req.contentType = req.Type.String()
@@ -405,8 +404,9 @@ func (client *Client) PutForm(req ClientRequest) (*ClientResponse, error) {
 // "multipart/form-data".
 func (client *Client) PutFormData(req ClientRequest) (res *ClientResponse, err error) {
 	var (
-		logp   = `PutFormData`
-		params map[string][]byte
+		logp = `PutFormData`
+
+		params *multipart.Form
 	)
 
 	req.contentType = req.Type.String()
@@ -573,44 +573,4 @@ func (client *Client) uncompress(res *http.Response, body []byte) (
 	}
 
 	return out, err
-}
-
-// GenerateFormData generate multipart/form-data body from params.
-func GenerateFormData(params map[string][]byte) (contentType, body string, err error) {
-	var (
-		sb      = new(strings.Builder)
-		w       = multipart.NewWriter(sb)
-		listKey = make([]string, 0, len(params))
-
-		k string
-	)
-	for k = range params {
-		listKey = append(listKey, k)
-	}
-	sort.Strings(listKey)
-
-	var (
-		part io.Writer
-		v    []byte
-	)
-	for _, k = range listKey {
-		part, err = w.CreateFormField(k)
-		if err != nil {
-			return "", "", err
-		}
-		v = params[k]
-		_, err = part.Write(v)
-		if err != nil {
-			return "", "", err
-		}
-	}
-
-	err = w.Close()
-	if err != nil {
-		return "", "", err
-	}
-
-	contentType = w.FormDataContentType()
-
-	return contentType, sb.String(), nil
 }

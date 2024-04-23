@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"log"
+	"mime/multipart"
 	"strings"
 
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
@@ -15,9 +16,11 @@ func ExampleGenerateFormData() {
 	// NOTE: do not do this on real code.
 	rand.Reader = mock.NewRandReader([]byte(`randomseed`))
 
-	var data = map[string][]byte{
-		`name`: []byte(`test.txt`),
-		`size`: []byte(`42`),
+	var data = &multipart.Form{
+		Value: map[string][]string{
+			`name`: []string{`test.txt`},
+			`size`: []string{`42`},
+		},
 	}
 
 	var (

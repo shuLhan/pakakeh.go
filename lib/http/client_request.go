@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -111,7 +112,7 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 			}
 
 		case RequestTypeMultipartForm:
-			paramsAsMultipart, ok := creq.Params.(map[string][]byte)
+			paramsAsMultipart, ok := creq.Params.(*multipart.Form)
 			if ok {
 				contentType, strBody, err = GenerateFormData(paramsAsMultipart)
 				if err != nil {
@@ -170,16 +171,16 @@ func (creq *ClientRequest) paramsAsURLEncoded() string {
 	return params.Encode()
 }
 
-// paramsAsMultipart convert the Params as "map[string][]byte" and return the
-// content type and body.
-func (creq *ClientRequest) paramsAsMultipart() (params map[string][]byte) {
+// paramsAsMultipart convert the Params as [*multipart.Form] or nil if its
+// empty.
+func (creq *ClientRequest) paramsAsMultipart() (params *multipart.Form) {
 	if creq.Params == nil {
 		return nil
 	}
 
 	var ok bool
 
-	params, ok = creq.Params.(map[string][]byte)
+	params, ok = creq.Params.(*multipart.Form)
 	if !ok {
 		return nil
 	}

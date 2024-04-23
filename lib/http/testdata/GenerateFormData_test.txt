@@ -1,0 +1,22 @@
+
+>>> file0
+Content of file0.
+
+<<< file0.ContentType
+multipart/form-data; boundary=616e646f6d73656564616e646f6d73656564616e646f6d73656564616e64
+
+<<< file0.Body
+--616e646f6d73656564616e646f6d73656564616e646f6d73656564616e64
+Content-Disposition: form-data; name="field0"; filename="file0"
+Content-Type: application/octet-stream
+
+Content of file0.
+--616e646f6d73656564616e646f6d73656564616e646f6d73656564616e64
+Content-Disposition: form-data; name="field1"
+
+value1
+--616e646f6d73656564616e646f6d73656564616e646f6d73656564616e64
+Content-Disposition: form-data; name="field1"
+
+value1.1
+--616e646f6d73656564616e646f6d73656564616e646f6d73656564616e64--
