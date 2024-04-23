@@ -182,8 +182,8 @@ out:
 // GenerateHTTPRequest generate [http.Request] from [ClientRequest].
 //
 // For HTTP method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the
-// [ClientRequest.Params] value should be nil or [url.Values].
-// If its [url.Values], then the params will be encoded as query parameters.
+// [ClientRequest.Params] value [should be nil] or [url.Values].
+// If its not nil, it will be converted as rules below.
 //
 // For HTTP method PATCH, POST, or PUT; the [ClientRequest.Params] will
 // converted based on [ClientRequest.Type] rules below,
@@ -197,6 +197,8 @@ out:
 //     body.
 //   - If Type is [RequestTypeJSON] and Params is not nil, the Params
 //     will be encoded as JSON in the body.
+//
+// [should be nil]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET
 func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Request, err error) {
 	var (
 		logp          = `GenerateHTTPRequest`
@@ -206,63 +208,46 @@ func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Requ
 		body io.Reader
 	)
 
-	switch req.Method {
-	case RequestMethodGet,
-		RequestMethodConnect,
-		RequestMethodDelete,
-		RequestMethodHead,
-		RequestMethodOptions,
-		RequestMethodTrace:
+	switch req.Type {
+	case RequestTypeNone, RequestTypeXML:
+		// NOOP.
 
+	case RequestTypeQuery:
 		if len(paramsEncoded) != 0 {
 			req.Path += `?` + paramsEncoded
 		}
 
-	case RequestMethodPatch,
-		RequestMethodPost,
-		RequestMethodPut:
+	case RequestTypeForm:
+		if len(paramsEncoded) != 0 {
+			body = strings.NewReader(paramsEncoded)
+		}
 
-		switch req.Type {
-		case RequestTypeNone, RequestTypeXML:
-			// NOOP.
+	case RequestTypeMultipartForm:
+		var (
+			paramsAsMultipart map[string][]byte
+			ok                bool
+		)
 
-		case RequestTypeQuery:
-			if len(paramsEncoded) != 0 {
-				req.Path += `?` + paramsEncoded
+		paramsAsMultipart, ok = req.Params.(map[string][]byte)
+		if ok {
+			var strBody string
+
+			contentType, strBody, err = GenerateFormData(paramsAsMultipart)
+			if err != nil {
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
 
-		case RequestTypeForm:
-			if len(paramsEncoded) != 0 {
-				body = strings.NewReader(paramsEncoded)
+			body = strings.NewReader(strBody)
+		}
+
+	case RequestTypeJSON:
+		if req.Params != nil {
+			var paramsAsJSON []byte
+			paramsAsJSON, err = json.Marshal(req.Params)
+			if err != nil {
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
 			}
-
-		case RequestTypeMultipartForm:
-			var (
-				paramsAsMultipart map[string][]byte
-				ok                bool
-			)
-
-			paramsAsMultipart, ok = req.Params.(map[string][]byte)
-			if ok {
-				var strBody string
-
-				contentType, strBody, err = GenerateFormData(paramsAsMultipart)
-				if err != nil {
-					return nil, fmt.Errorf(`%s: %w`, logp, err)
-				}
-
-				body = strings.NewReader(strBody)
-			}
-
-		case RequestTypeJSON:
-			if req.Params != nil {
-				var paramsAsJSON []byte
-				paramsAsJSON, err = json.Marshal(req.Params)
-				if err != nil {
-					return nil, fmt.Errorf(`%s: %w`, logp, err)
-				}
-				body = bytes.NewReader(paramsAsJSON)
-			}
+			body = bytes.NewReader(paramsAsJSON)
 		}
 	}
 

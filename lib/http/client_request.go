@@ -21,31 +21,22 @@ type ClientRequest struct {
 	// This field is optional.
 	Header http.Header
 
-	//
 	// Params define parameter to be send on request.
 	// This field is optional.
+	// It will converted based on Type rules below,
 	//
-	// For Method GET, CONNECT, DELETE, HEAD, OPTIONS, or TRACE; the
-	// params value should be nil or url.Values.
-	// If its url.Values, then the params will be encoded as query
-	// parameters.
+	// * If Type is [RequestTypeQuery] and Params is [url.Values] it
+	//   will be added as query parameters in the Path.
 	//
-	// For Method PATCH, POST, or PUT; the Params will converted based on
-	// Type rules below,
+	// * If Type is [RequestTypeForm] and Params is [url.Values] it
+	//   will be added as URL encoded in the body.
 	//
-	// * If Type is RequestTypeQuery and Params is url.Values it will be
-	// added as query parameters in the Path.
+	// * If Type is [RequestTypeMultipartForm] and Params is
+	//   map[string][]byte, then it will be converted as multipart form
+	//   in the body.
 	//
-	// * If Type is RequestTypeForm and Params is url.Values it will be
-	// added as URL encoded in the body.
-	//
-	// * If Type is RequestTypeMultipartForm and Params is
-	// map[string][]byte, then it will be converted as multipart form in
-	// the body.
-	//
-	// * If Type is RequestTypeJSON and Params is not nil, the params will
-	// be encoded as JSON in body using json.Encode().
-	//
+	// * If Type is [RequestTypeJSON] and Params is not nil, the params
+	//   will be encoded as JSON in body using [json.Encode].
 	Params any
 
 	body io.Reader
