@@ -20,6 +20,81 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_55_0]
+== pakakeh.go v0.55.0 (2024-05-04)
+
+[#v_55_0__breaking_changes]
+=== Breaking changes
+
+lib/http: refactoring "multipart/form-data" parameters in ClientRequest::
++
+--
+Previously, ClientRequest with type RequestTypeMultipartForm pass the
+type "map[string][]byte" in Params.
+This type hold the file upload, where key is the file name and []byte is
+content of file.
+Unfortunately, this model does not correct because a
+"multipart/form-data" can contains different field name and file name,
+for example
+
+----
+--boundary
+Content-Disposition: form-data; name="field0"; filename="file0"
+Content-Type: application/octet-stream
+
+<Content of file0>
+----
+
+This changes fix this by changing the parameter type for
+RequestTypeMultipartForm to [*multipart.Form], which affect several
+functions including [Client.PutFormData] and [GenerateFormData].
+--
+
+[#v0_55_0__bug_fixes]
+=== Bug fixes
+
+lib/dns: fix packing and unpacking OPT record::
++
+The RDATA in OPT records can contains zero or _more_ options.
+Previously, we only handle unpacking and packing one option, now we
+handle multiple options.
+
+telegram/bot: fix Webhook URL registration::
++
+Using [path.Join] cause "https://domain" become "https:/domain" which
+is not a valid URL.
+This bug caused by refactoring in b89afa24f.
+
+
+[#v0_55_0__enhancements]
+=== Enhancements
+
+lib/memfs: set embed file mode to print as octal::
++
+Using octal in mode make the embedded code more readable, for example mode
+with permission "0o644" much more readable than 420".
+
+telegram/bot: register GET endpoint to test webhook::
++
+--
+The call to get "GET <Webhook.URL.Path>/<Token>" will return HTTP status
+200 with JSON body '{"code":200,"message":"OK"}'.
+
+This endpoint is to check if the bot server is really running.
+--
+
+lib/http: allow all HTTP method to generate HTTP request with body::
++
+Although the RFC 7231 says that no special defined meaning for a
+payload in GET, some implementation of HTTP API sometimes use GET with
+content type "application/x-www-form-urlencoded".
+
+lib/http: add new function [CreateMultipartFileHeader]::
++
+The CreateMultipartFileHeader help creating [multipart.FileHeader]
+from raw bytes, that can be assigned to [*multipart.Form].
+
+
 [#v0_54_0]
 == pakakeh.go v0.54.0 (2024-04-04)
 
