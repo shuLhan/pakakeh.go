@@ -1,5 +1,5 @@
-git.sr.ht/~shulhan/go-x-crypto v0.21.1-0.20240316083930-db093b454c7e h1:E8rBuql7phkpfhEn7QTxNQDj1Eg3OzcTFXbmoYGK34U=
-git.sr.ht/~shulhan/go-x-crypto v0.21.1-0.20240316083930-db093b454c7e/go.mod h1:0BP7YvVV9gBbVKyeTG0Gyn+gZm94bibOW5BjDEYAOMs=
+git.sr.ht/~shulhan/go-x-crypto v0.22.1-0.20240504075244-918d40784a11 h1:P/CubU4VUUIISAHuHK3wH/hRwN46ioguelYLOvrolKo=
+git.sr.ht/~shulhan/go-x-crypto v0.22.1-0.20240504075244-918d40784a11/go.mod h1:vr6Su+7cTlO45qkww3VDJlzDn0ctJvRgYbC2NvXHt+M=
 golang.org/x/net v0.24.0 h1:1PcaxkF854Fu3+lvBIx5SYn9wRlBzzcnHZSiaFFAb0w=
 golang.org/x/net v0.24.0/go.mod h1:2Q7sJY5mzlzWjKtYUEXSlBWCdyaioyXzRB2RtU8KVE8=
 golang.org/x/sys v0.19.0 h1:q5f1RH2jigJ1MoAWp2KTp3gm5zAGFUTarQZ5U386+4o=
