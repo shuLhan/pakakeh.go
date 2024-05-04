@@ -17,8 +17,8 @@ import (
 func TestGenerateFormData(t *testing.T) {
 	type testcase struct {
 		form           multipart.Form
-		tagOutput      string
 		field2filename map[string]string
+		tagOutput      string
 	}
 
 	rand.Reader = mock.NewRandReader([]byte(`randomseed`))

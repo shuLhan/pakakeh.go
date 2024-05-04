@@ -206,7 +206,7 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 	rr.rdlen = libbytes.ReadUint16(packet, x)
 	x += 2
 
-	var lenXRdata uint = x + uint(rr.rdlen)
+	var lenXRdata = x + uint(rr.rdlen)
 	if lenPacket < lenXRdata {
 		return x, fmt.Errorf("%s: %s %d: packet length %d smaller than index+rdata %d+%d (%d)",
 			logp, rr.Name, rr.Type, lenPacket, x, rr.rdlen, lenXRdata)
