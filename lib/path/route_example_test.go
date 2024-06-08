@@ -94,6 +94,31 @@ func ExampleRoute_Parse() {
 	// false map[]
 }
 
+func ExampleRoute_Path() {
+	var (
+		rute *libpath.Route
+		err  error
+	)
+
+	rute, err = libpath.NewRoute(`/:user/:repo`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(rute.Path())
+
+	rute.Set(`user`, `shuLhan`)
+	fmt.Println(rute.Path())
+
+	rute.Set(`repo`, `pakakeh.go`)
+	fmt.Println(rute.Path())
+
+	// Output:
+	// //
+	// /shuLhan/
+	// /shuLhan/pakakeh.go
+}
+
 func ExampleRoute_Set() {
 	var (
 		rute *libpath.Route

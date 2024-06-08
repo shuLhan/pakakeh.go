@@ -149,6 +149,25 @@ func (rute *Route) Parse(rpath string) (vals map[string]string, ok bool) {
 	return vals, true
 }
 
+// Path return the path with all the keys has been substituted with values,
+// even if its empty.
+// See [Route.String] for returning path with key name (as in ":name").
+func (rute *Route) Path() string {
+	var (
+		node *routeNode
+		pb   strings.Builder
+	)
+	for _, node = range rute.nodes {
+		pb.WriteByte('/')
+		if node.isKey {
+			pb.WriteString(node.val)
+		} else {
+			pb.WriteString(node.name)
+		}
+	}
+	return pb.String()
+}
+
 // Set or replace the key's value in path with parameter val.
 // If the key exist it will return true; otherwise it will return false.
 func (rute *Route) Set(key, val string) bool {
@@ -175,6 +194,9 @@ func (rute *Route) Set(key, val string) bool {
 // between sub-path.
 // If the key has been [Route.Set], the sub-path will be replaced with its
 // value, otherwise it will returned as ":<key>".
+//
+// To return the path with all keys has been substituted, even empty, use
+// [Route.Path].
 func (rute *Route) String() (path string) {
 	var (
 		node *routeNode
