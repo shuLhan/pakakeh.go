@@ -208,7 +208,7 @@ func (client *Client) GenerateHTTPRequest(req ClientRequest) (httpReq *http.Requ
 	)
 
 	switch req.Type {
-	case RequestTypeNone, RequestTypeXML:
+	case RequestTypeNone, RequestTypeHTML, RequestTypeXML:
 		// NOOP.
 
 	case RequestTypeQuery:

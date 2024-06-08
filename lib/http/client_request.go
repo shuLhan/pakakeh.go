@@ -96,7 +96,7 @@ func (creq *ClientRequest) toHTTPRequest(client *Client) (httpReq *http.Request,
 		RequestMethodPut:
 
 		switch creq.Type {
-		case RequestTypeNone, RequestTypeXML:
+		case RequestTypeNone, RequestTypeHTML, RequestTypeXML:
 			// NOOP.
 
 		case RequestTypeQuery:

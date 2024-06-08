@@ -12,6 +12,7 @@ const (
 	RequestTypeNone          RequestType = ``
 	RequestTypeQuery         RequestType = `query`
 	RequestTypeForm          RequestType = `form-urlencoded`
+	RequestTypeHTML          RequestType = `html`
 	RequestTypeMultipartForm RequestType = `form-data`
 	RequestTypeJSON          RequestType = `json`
 	RequestTypeXML           RequestType = `xml`
@@ -26,6 +27,8 @@ func (rt RequestType) String() string {
 		return ``
 	case RequestTypeForm:
 		return ContentTypeForm
+	case RequestTypeHTML:
+		return ContentTypeHTML
 	case RequestTypeMultipartForm:
 		return ContentTypeMultipartForm
 	case RequestTypeJSON:

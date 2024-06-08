@@ -69,7 +69,7 @@ func (ep *Endpoint) call(
 	req.Body = io.NopCloser(bytes.NewBuffer(epr.RequestBody))
 
 	switch ep.RequestType {
-	case RequestTypeNone, RequestTypeXML:
+	case RequestTypeNone, RequestTypeHTML, RequestTypeXML:
 		// NOOP.
 
 	case RequestTypeForm, RequestTypeQuery, RequestTypeJSON:
