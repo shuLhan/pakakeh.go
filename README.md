@@ -247,7 +247,7 @@ Package totp implement Time-Based One-Time Password Algorithm based on RFC
 [**websocket**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/websocket)::
 The WebSocket library for server and client. This WebSocket library has
 been tested with autobahn testsuite with 100% success rate.
-[the status report](https://git.sr.ht/~shulhan/pakakeh.go/blob/master/lib/websocket/AUTOBAHN.adoc).
+[the status report](https://git.sr.ht/~shulhan/pakakeh.go/blob/main/lib/websocket/AUTOBAHN.adoc).
 
 [**xmlrpc**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/xmlrpc)::
 Package xmlrpc provide an implementation of
@@ -257,7 +257,7 @@ Package xmlrpc provide an implementation of
 ## Changelog
 
 Latest
-[CHANGELOG](https://git.sr.ht/~shulhan/pakakeh.go/blob/master/CHANGELOG.adoc).
+[CHANGELOG](https://git.sr.ht/~shulhan/pakakeh.go/blob/main/CHANGELOG.adoc).
 
 
 ## Credits
