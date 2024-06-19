@@ -20,6 +20,23 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_55_1]
+== pakakeh.go v0.55.1 (2024-06-20)
+
+[#v0_55_1__enhancements]
+=== Enhancements
+
+lib/http: add request type HTML::
++
+The RequestTypeHTML define the content type "text/html".
+
+lib/path: add method Path to Route::
++
+Unlike String method that may return the key's name in returned path,
+the Path method return the path with all the keys has been substituted
+with values, even if its empty.
+
+
 [#v0_55_0]
 == pakakeh.go v0.55.0 (2024-05-04)
 
