@@ -49,14 +49,16 @@ func doCompare(hash, pass string) {
 }
 
 func doGen(pass string, optCost int) {
+	var err error
+
 	if pass == `-` {
-		fmt.Fscanln(os.Stdin, &pass)
+		_, err = fmt.Fscanln(os.Stdin, &pass)
+		if err != nil {
+			log.Fatalf(`%s: %s`, cmd, err)
+		}
 	}
 
-	var (
-		hash []byte
-		err  error
-	)
+	var hash []byte
 
 	hash, err = bcrypt.GenerateFromPassword([]byte(pass), optCost)
 	if err != nil {
