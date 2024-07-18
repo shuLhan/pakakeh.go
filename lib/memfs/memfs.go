@@ -637,6 +637,13 @@ out:
 func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	syspath := filepath.Join(mfs.Root.SysPath, url)
 
+	if syspath[0] != '/' {
+		// When "." joined with url "/file", the syspath become
+		// "file" instead of "./file", this cause
+		// [strings.HasPrefix] return false.
+		syspath = `./` + syspath
+	}
+
 	if !strings.HasPrefix(syspath, mfs.Root.SysPath) {
 		return nil, fs.ErrNotExist
 	}
@@ -655,6 +662,11 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 
 	for node == nil {
 		dir = filepath.Dir(dir)
+		if dir == `.` {
+			// On "./file" it will return ".".
+			node = mfs.Root
+			break
+		}
 		node = mfs.PathNodes.Get(dir)
 	}
 

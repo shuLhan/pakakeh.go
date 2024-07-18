@@ -4,6 +4,8 @@
 
 package memfs
 
+import "strings"
+
 const (
 	defaultMaxFileSize = 1024 * 1024 * 5
 )
@@ -47,5 +49,9 @@ type Options struct {
 func (opts *Options) init() {
 	if opts.MaxFileSize == 0 {
 		opts.MaxFileSize = defaultMaxFileSize
+	}
+	opts.Root = strings.TrimSuffix(opts.Root, `/`)
+	if len(opts.Root) == 0 {
+		opts.Root = `.`
 	}
 }

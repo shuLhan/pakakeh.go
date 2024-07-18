@@ -65,11 +65,46 @@ func TestNew(t *testing.T) {
 		opts       Options
 	}
 
+	var dirTestdata = filepath.Join(_testWD, `testdata`)
+	var err error
+
+	err = os.Chdir(dirTestdata)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		err = os.Chdir(_testWD)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+
 	var afile = filepath.Join(_testWD, `testdata/index.html`)
 
 	var listCase = []testCase{{
-		desc:   "With empty dir",
-		expErr: "open : no such file or directory",
+		desc: `With empty dir`,
+		expMapKeys: []string{
+			`/`,
+			`/direct`,
+			`/direct/add`,
+			`/direct/add/file`,
+			`/direct/add/file2`,
+			`/exclude`,
+			`/exclude/dir`,
+			`/exclude/index-link.css`,
+			`/exclude/index-link.html`,
+			`/exclude/index-link.js`,
+			`/include`,
+			`/include/dir`,
+			`/include/index.css`,
+			`/include/index.html`,
+			`/include/index.js`,
+			`/index.css`,
+			`/index.html`,
+			`/index.js`,
+			`/plain`,
+		},
 	}, {
 		desc: "With file",
 		opts: Options{
@@ -79,7 +114,7 @@ func TestNew(t *testing.T) {
 	}, {
 		desc: "With directory",
 		opts: Options{
-			Root: filepath.Join(_testWD, "testdata"),
+			Root: dirTestdata,
 			Excludes: []string{
 				"memfs_generate.go$",
 				"direct$",
@@ -156,7 +191,6 @@ func TestNew(t *testing.T) {
 	var (
 		c   testCase
 		mfs *MemFS
-		err error
 	)
 	for _, c = range listCase {
 		t.Log(c.desc)
@@ -392,7 +426,7 @@ func TestMemFS_Get_refresh(t *testing.T) {
 	var (
 		tempDir = t.TempDir()
 		opts    = Options{
-			Root:      tempDir,
+			Root:      tempDir + `/`,
 			TryDirect: true,
 		}
 
@@ -405,9 +439,127 @@ func TestMemFS_Get_refresh(t *testing.T) {
 	}
 
 	var listCase = []testCase{{
-		filePath: `/dir-a/dir-b/file`,
+		filePath: `/file1`,
 	}, {
 		filePath: `/dir-a/dir-b/file2`,
+	}, {
+		filePath: `/dir-a/dir-b/file3`,
+	}}
+
+	var (
+		c       testCase
+		gotJSON bytes.Buffer
+	)
+	for _, c = range listCase {
+		var fullpath = filepath.Join(tempDir, c.filePath)
+
+		err = os.MkdirAll(filepath.Dir(fullpath), 0700)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var expContent = tdata.Input[c.filePath]
+		if len(expContent) != 0 {
+			// Only create the file if content is set.
+			err = os.WriteFile(fullpath, expContent, 0600)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		// Try Get the file.
+
+		var (
+			tag      = c.filePath + `:error`
+			expError = string(tdata.Output[tag])
+			node     *Node
+		)
+
+		node, err = mfs.Get(c.filePath)
+		if err != nil {
+			test.Assert(t, tag, expError, err.Error())
+			continue
+		}
+
+		// Check the tree of MemFS.
+
+		var rawJSON []byte
+
+		rawJSON, err = mfs.Root.JSON(9999, true, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		gotJSON.Reset()
+		err = json.Indent(&gotJSON, rawJSON, ``, `  `)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.Assert(t, c.filePath+` content`, string(expContent), string(node.Content))
+
+		var expJSON = string(tdata.Output[c.filePath])
+		test.Assert(t, c.filePath+` JSON of memfs.Root`, expJSON, gotJSON.String())
+	}
+}
+
+// TestMemFS_Get_refresh_withDot test [MemFS.refresh] using "." as Root
+// directory.
+func TestMemFS_Get_refresh_withDot(t *testing.T) {
+	type testCase struct {
+		filePath string
+	}
+
+	var (
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`internal/testdata/get_refresh_test.data`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		tempDir = t.TempDir()
+		opts    = Options{
+			Root:      `.`,
+			TryDirect: true,
+		}
+		workDir string
+		mfs     *MemFS
+	)
+
+	workDir, err = os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.Chdir(tempDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		err = os.Chdir(workDir)
+		if err != nil {
+			t.Logf(err.Error())
+		}
+	})
+
+	mfs, err = New(&opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var listCase = []testCase{{
+		filePath: `/`,
+	}, {
+		filePath: `/file1`,
+	}, {
+		filePath: `/dir-a/dir-b/file2`,
+	}, {
+		filePath: `/dir-a/dir-b/file3`,
 	}}
 
 	var (
