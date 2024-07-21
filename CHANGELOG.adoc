@@ -20,6 +20,21 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_55_2]
+== pakakeh.go v0.55.2 (2024-07-22)
+
+[#v0_55_2__bug_fix]
+=== Bug fix
+
+lib/memfs: sanitize the Root directory to fix refresh::
++
+In [MemFS.refresh], if the requested url is "/file1" and [Options.Root]
+is ".", the path during refresh become "file1" and if passed to
+[filepath.Dir] it will return ".".
+This cause the loop on refresh never end because there is no PathNodes
+equal with ".".
+
+
 [#v0_55_1]
 == pakakeh.go v0.55.1 (2024-06-20)
 

@@ -8,5 +8,5 @@ package pakakeh
 
 var (
 	// Version of this module.
-	Version = `0.55.1`
+	Version = `0.55.2`
 )
