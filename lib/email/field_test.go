@@ -34,7 +34,7 @@ func TestParseField(t *testing.T) {
 	}, {
 		desc:   "With only CRLF",
 		raw:    []byte("\r\n"),
-		expErr: `ParseField: parseName: invalid character '\r'`,
+		expErr: `ParseField: parseName: "" invalid character '\r'`,
 	}, {
 		desc:   "Without separator and CRLF",
 		raw:    []byte("name"),
@@ -42,7 +42,7 @@ func TestParseField(t *testing.T) {
 	}, {
 		desc:   "Without separator",
 		raw:    []byte("name\r\n"),
-		expErr: `ParseField: parseName: invalid character '\r'`,
+		expErr: `ParseField: parseName: "name" invalid character '\r'`,
 	}, {
 		desc:   "With space on name",
 		raw:    []byte("na me\r\n"),
@@ -68,9 +68,14 @@ func TestParseField(t *testing.T) {
 		raw:    []byte("name:value"),
 		expErr: `ParseField: parseValue: invalid or missing termination`,
 	}, {
-		desc:   "Without CR",
-		raw:    []byte("name:value\n"),
-		expErr: `ParseField: parseValue: invalid field value '\n'`,
+		desc: `Without CR`,
+		raw:  []byte("name:value\n"),
+		exp: &Field{
+			Name:     "name",
+			Value:    "value\r\n",
+			oriName:  "name",
+			oriValue: "value\n",
+		},
 	}, {
 		desc:   "Without LF",
 		raw:    []byte("name:value\r"),

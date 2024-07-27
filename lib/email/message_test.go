@@ -69,7 +69,7 @@ func TestMessageParseMessage(t *testing.T) {
 		exp: "\r\n",
 	}, {
 		in:     "testdata/invalid-header.txt",
-		expErr: `ParseMessage: ParseField: parseValue: invalid field value '\n'`,
+		expErr: `ParseMessage: ParseField: ParseMailboxes: empty or invalid address`,
 	}, {
 		in: "testdata/rfc5322-A.6.3.txt",
 		exp: "from:John Doe <jdoe@machine(comment). example>\r\n" +

@@ -114,7 +114,7 @@ func (field *Field) parseName(raw []byte) (rest []byte, err error) {
 			break
 		}
 		if raw[x] < 33 || raw[x] > 126 {
-			return nil, fmt.Errorf(`%s: invalid character %q`, logp, raw[x])
+			return nil, fmt.Errorf(`%s: %q invalid character %q`, logp, raw[:x], raw[x])
 		}
 	}
 	// Skip WSP before ':'.
@@ -156,6 +156,9 @@ func (field *Field) parseValue(raw []byte) (rest []byte, err error) {
 			}
 			if raw[x] == cr {
 				x++
+				break
+			}
+			if raw[x] == lf {
 				break
 			}
 			if raw[x] < 33 || raw[x] > 126 {
