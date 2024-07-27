@@ -16,7 +16,7 @@ func generate_testdata() *memfs.Node {
 		GenFuncName: "generate_testdata",
 	}
 	node.SetMode(0o20000000755)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1699901114, 455911441)
 	node.SetName("/")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/direct", generate_testdata_direct))
@@ -37,7 +37,7 @@ func generate_testdata_direct() *memfs.Node {
 		GenFuncName: "generate_testdata_direct",
 	}
 	node.SetMode(0o20000000755)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1569586540, 0)
 	node.SetName("direct")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/direct/add", generate_testdata_direct_add))
@@ -52,7 +52,7 @@ func generate_testdata_direct_add() *memfs.Node {
 		GenFuncName: "generate_testdata_direct_add",
 	}
 	node.SetMode(0o20000000755)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1569586540, 0)
 	node.SetName("add")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/direct/add/file", generate_testdata_direct_add_file))
@@ -69,7 +69,7 @@ func generate_testdata_direct_add_file() *memfs.Node {
 		Content:     []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x2E\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1569586540, 0)
 	node.SetName("file")
 	node.SetSize(22)
 	return node
@@ -84,7 +84,7 @@ func generate_testdata_direct_add_file2() *memfs.Node {
 		Content:     []byte("\x54\x65\x73\x74\x20\x64\x69\x72\x65\x63\x74\x20\x61\x64\x64\x20\x66\x69\x6C\x65\x20\x32\x2E\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1569586540, 0)
 	node.SetName("file2")
 	node.SetSize(24)
 	return node
@@ -98,7 +98,7 @@ func generate_testdata_exclude() *memfs.Node {
 		GenFuncName: "generate_testdata_exclude",
 	}
 	node.SetMode(0o20000000755)
-	node.SetModTimeUnix(1710216708, 236975330)
+	node.SetModTimeUnix(1633792794, 467899662)
 	node.SetName("exclude")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/exclude/dir", generate_testdata_exclude_dir))
@@ -116,7 +116,7 @@ func generate_testdata_exclude_dir() *memfs.Node {
 		GenFuncName: "generate_testdata_exclude_dir",
 	}
 	node.SetMode(0o20000000700)
-	node.SetModTimeUnix(1710216708, 236975330)
+	node.SetModTimeUnix(1629620045, 798024232)
 	node.SetName("dir")
 	node.SetSize(0)
 	return node
@@ -131,7 +131,7 @@ func generate_testdata_exclude_index_link_css() *memfs.Node {
 		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index-link.css")
 	node.SetSize(9)
 	return node
@@ -146,7 +146,7 @@ func generate_testdata_exclude_index_link_html() *memfs.Node {
 		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1588592347, 0)
 	node.SetName("index-link.html")
 	node.SetSize(14)
 	return node
@@ -161,7 +161,7 @@ func generate_testdata_exclude_index_link_js() *memfs.Node {
 		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index-link.js")
 	node.SetSize(16)
 	return node
@@ -175,7 +175,7 @@ func generate_testdata_include() *memfs.Node {
 		GenFuncName: "generate_testdata_include",
 	}
 	node.SetMode(0o20000000755)
-	node.SetModTimeUnix(1710216708, 236975330)
+	node.SetModTimeUnix(1629623653, 749800911)
 	node.SetName("include")
 	node.SetSize(0)
 	node.AddChild(_memFS_getNode(memFS, "/include/dir", generate_testdata_include_dir))
@@ -193,7 +193,7 @@ func generate_testdata_include_dir() *memfs.Node {
 		GenFuncName: "generate_testdata_include_dir",
 	}
 	node.SetMode(0o20000000700)
-	node.SetModTimeUnix(1710216708, 236975330)
+	node.SetModTimeUnix(1564836597, 0)
 	node.SetName("dir")
 	node.SetSize(0)
 	return node
@@ -208,7 +208,7 @@ func generate_testdata_include_index_css() *memfs.Node {
 		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index.css")
 	node.SetSize(9)
 	return node
@@ -223,7 +223,7 @@ func generate_testdata_include_index_html() *memfs.Node {
 		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1588592347, 0)
 	node.SetName("index.html")
 	node.SetSize(14)
 	return node
@@ -238,7 +238,7 @@ func generate_testdata_include_index_js() *memfs.Node {
 		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index.js")
 	node.SetSize(16)
 	return node
@@ -253,7 +253,7 @@ func generate_testdata_index_css() *memfs.Node {
 		Content:     []byte("\x62\x6F\x64\x79\x20\x7B\x0A\x7D\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 626038828)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index.css")
 	node.SetSize(9)
 	return node
@@ -268,7 +268,7 @@ func generate_testdata_index_html() *memfs.Node {
 		Content:     []byte("\x3C\x68\x74\x6D\x6C\x3E\x3C\x2F\x68\x74\x6D\x6C\x3E\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1588592347, 0)
 	node.SetName("index.html")
 	node.SetSize(14)
 	return node
@@ -283,7 +283,7 @@ func generate_testdata_index_js() *memfs.Node {
 		Content:     []byte("\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x58\x28\x29\x20\x7B\x7D\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("index.js")
 	node.SetSize(16)
 	return node
@@ -298,7 +298,7 @@ func generate_testdata_plain() *memfs.Node {
 		Content:     []byte("\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x70\x6C\x61\x69\x6E\x20\x74\x65\x78\x74\x2E\x0A"),
 	}
 	node.SetMode(0o644)
-	node.SetModTimeUnix(1709751019, 629372161)
+	node.SetModTimeUnix(1562038157, 0)
 	node.SetName("plain")
 	node.SetSize(22)
 	return node

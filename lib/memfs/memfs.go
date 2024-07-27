@@ -635,9 +635,9 @@ out:
 
 // refresh the tree by rescanning from the root.
 func (mfs *MemFS) refresh(url string) (node *Node, err error) {
-	syspath := filepath.Join(mfs.Root.SysPath, url)
+	var syspath = filepath.Join(mfs.Root.SysPath, url)
 
-	if syspath[0] != '/' {
+	if mfs.Root.SysPath == `.` {
 		// When "." joined with url "/file", the syspath become
 		// "file" instead of "./file", this cause
 		// [strings.HasPrefix] return false.
@@ -645,6 +645,8 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 	}
 
 	if !strings.HasPrefix(syspath, mfs.Root.SysPath) {
+		// Make sure the requested url always under the served
+		// directory, to prevent accessing private files.
 		return nil, fs.ErrNotExist
 	}
 
@@ -653,13 +655,13 @@ func (mfs *MemFS) refresh(url string) (node *Node, err error) {
 		return nil, err
 	}
 
-	// syspath exist in the file system but not in the mfs, try reload
-	// all trees start from the closes directory exist in path.
-
 	// The syspath is already cleaning-up, use it to get the relative
 	// url path back.
 	var dir = strings.TrimPrefix(syspath, mfs.Root.SysPath)
 
+	// syspath exist in the file system but not in the mfs, try to scan
+	// all trees start from the closes directory exist in the dir.
+	// This is to handle detecting new file inside new directory.
 	for node == nil {
 		dir = filepath.Dir(dir)
 		if dir == `.` {
