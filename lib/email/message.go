@@ -123,6 +123,19 @@ func ParseMessage(raw []byte) (msg *Message, rest []byte, err error) {
 		return nil, rest, fmt.Errorf("%s: %w", logp, err)
 	}
 
+	var (
+		listEncoding = hdr.Filter(FieldTypeContentTransferEncoding)
+		encoding     string
+	)
+	if len(listEncoding) > 0 {
+		encoding = strings.TrimSpace(listEncoding[len(listEncoding)-1].Value)
+	}
+
+	err = body.decode(encoding)
+	if err != nil {
+		return nil, rest, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
 	msg.Header = *hdr
 	msg.Body = *body
 

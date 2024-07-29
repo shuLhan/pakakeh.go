@@ -17,8 +17,13 @@ const (
 	contentTypeMultipartAlternative = "multipart/alternative"
 	contentTypeTextPlain            = `text/plain; charset="utf-8"`
 	contentTypeTextHTML             = `text/html; charset="utf-8"`
-	encodingQuotedPrintable         = "quoted-printable"
 	mimeVersion1                    = "1.0"
+)
+
+// List of content type encoding.
+const (
+	encodingQuotedPrintable = `quoted-printable`
+	encodingBase64          = `base64`
 )
 
 const (

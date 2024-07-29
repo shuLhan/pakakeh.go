@@ -6,7 +6,9 @@ package email
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	"mime/quotedprintable"
 	"strings"
@@ -142,6 +144,56 @@ func ParseBodyPart(raw, boundary []byte) (mime *MIME, rest []byte, err error) {
 	rest, _ = parser.Stop()
 
 	return mime, rest, err
+}
+
+func (mime *MIME) decode(encoding string) (err error) {
+	var logp = `decode`
+
+	if mime.Header != nil {
+		var partEncoding []*Field = mime.Header.Filter(FieldTypeContentTransferEncoding)
+		var npart = len(partEncoding)
+		if npart > 0 {
+			encoding = strings.TrimSpace(partEncoding[npart-1].Value)
+		}
+	}
+
+	switch encoding {
+	case encodingBase64:
+		err = mime.decodeBase64()
+	case encodingQuotedPrintable:
+		err = mime.decodeQuotedPrintable()
+	default:
+		// NO-OP.
+	}
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+	return nil
+}
+
+func (mime *MIME) decodeBase64() (err error) {
+	var n = base64.RawStdEncoding.DecodedLen(len(mime.Content))
+	var dest = make([]byte, n)
+	n, err = base64.RawStdEncoding.Decode(dest, mime.Content)
+	if err != nil {
+		return fmt.Errorf(`decodeBase64: %w`, err)
+	}
+	mime.Content = dest[:n]
+	return nil
+}
+
+func (mime *MIME) decodeQuotedPrintable() (err error) {
+	var (
+		logp = `decodeQuotedPrintable`
+		qpr  = quotedprintable.NewReader(bytes.NewReader(mime.Content))
+	)
+
+	mime.Content, err = io.ReadAll(qpr)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return nil
 }
 
 func (mime *MIME) isContentType(top, sub string) bool {

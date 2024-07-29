@@ -1,0 +1,720 @@
+Test parsing message with quoted printable.
+
+>>> quoted-printable
+Delivered-To: m.shulhan@gmail.com
+Received: by 2002:a05:6520:424b:b0:283:5bff:7bf2 with SMTP id p11csp2571262lkv;
+        Mon, 18 Dec 2023 03:00:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGL6iDYQUwXzHa+roREKmud+xezjcKpN5l10XHf5H0iozqKY56Tle6Cw0QNQgfEbP3w4tpa
+X-Received: by 2002:a17:902:c944:b0:1d3:c469:e7 with SMTP id i4-20020a170902c94400b001d3c46900e7mr708318pla.65.1702897257024;
+        Mon, 18 Dec 2023 03:00:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1702897257; cv=none;
+        d=google.com; s=arc-20160816;
+        b=Z0AuoCLr2uUGiA/9yqX7TWkavHIZkuzqaVqSGxWMsxjb4vHq74rVC6Ea6wdyveLTbO
+         2/CsArpTrhfQlPpAzFAAsnOYVPjEAeqgi1aHsoTQ/KHHXAIIdlnEt7AZiXypyvFYMfEU
+         qk2DkdGLqQ0VSp3WIAUcEccQp+xxb1TqR12aBw8gz3LCE9frVOnSUrmjynV71dBU4kHA
+         5Ie7yFrVqPsRRezAuW2mwUB0y3mSFORHfUeZQZkn/kyf1GvMV2dThgQAE36SBP5PR3VD
+         KlZ58GMJjRwtY88BE5m2zU1tHYl0JCR13YjfRCLGSVpJt65OoWWKu1nET29jLdCZFS3m
+         /dIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=content-transfer-encoding:mime-version:to:from:subject:date
+         :message-id:dkim-signature:dkim-filter;
+        bh=fNHGzVruBkXqg4DtQTIk9pFuHWrMUpvh5EgDV8lQ+70=;
+        fh=XyaHsBA9ixQGdT9JYsNfVabvSL4GHvpMWbK7X1jOGgY=;
+        b=lannfjghyaghIPe1jvxRBcf4epJgL3a10uD6dloGL6rM8wjeiV1wIIaDI1mJvPA7WC
+         CWkU4hTFlya6wsKDKFo8TaG6G07njuTohx6BfIH12Dl9n9/T0L9lTe54ciZ76YRefRpW
+         q/1qWjJC9OL9c23/jyh0e9k3WCtNlUg1KoPnaWF6jVOsLwqankjsfMYaBZA8lNzqFuuD
+         r3n8DMZhXZYHDp5T9rFGkafh6Ucg8/kiwfhJHqbc2xKqyfECGprK1/2u58/LCRy6eVNU
+         sK7FFcwSmVaVujahjVcRWXDo0SYMzVi0dPERXqtndaaX4QUR3X69ciW9bRpnKLIj2N86
+         IbOQ==
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@kai.id header.s=kaiid header.b=AbOnLTGW;
+       spf=pass (google.com: domain of notifapp@kai.id designates 103.54.225.200 as permitted sender) smtp.mailfrom=notifapp@kai.id;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=kai.id
+Return-Path: <notifapp@kai.id>
+Received: from ppsagent05.kai.id (smtp-notif1.kai.id. [103.54.225.200])
+        by mx.google.com with ESMTPS id q14-20020a170902788e00b001d0bf633564si10716110pll.243.2023.12.18.03.00.56
+        for <m.shulhan@gmail.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Dec 2023 03:00:56 -0800 (PST)
+Received-SPF: pass (google.com: domain of notifapp@kai.id designates 103.54.225.200 as permitted sender) client-ip=103.54.225.200;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@kai.id header.s=kaiid header.b=AbOnLTGW;
+       spf=pass (google.com: domain of notifapp@kai.id designates 103.54.225.200 as permitted sender) smtp.mailfrom=notifapp@kai.id;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=kai.id
+Received: from pps.filterd (ppsagent05.kai.id [127.0.0.1])
+	by ppsagent05.kai.id (8.17.1.22/8.17.1.22) with ESMTP id 3BI9idEZ015858
+	for <m.shulhan@gmail.com>; Mon, 18 Dec 2023 18:00:55 +0700
+Received: from smtp-notif4.kai.id ([172.16.10.236])
+	by ppsagent05.kai.id (PPS) with ESMTPS id 3v1m5qw8yn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <m.shulhan@gmail.com>; Mon, 18 Dec 2023 18:00:55 +0700 (+42000)
+Received: from smtp-notif4.kai.id (localhost [127.0.0.1])
+	by smtp-notif4.kai.id (Postfix) with ESMTPS id BCFA641E5270
+	for <m.shulhan@gmail.com>; Mon, 18 Dec 2023 18:00:54 +0700 (WIB)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp-notif4.kai.id (Postfix) with ESMTP id A3C30404592D
+	for <m.shulhan@gmail.com>; Mon, 18 Dec 2023 18:00:54 +0700 (WIB)
+DKIM-Filter: OpenDKIM Filter v2.10.3 smtp-notif4.kai.id A3C30404592D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kai.id; s=kaiid;
+	t=1702897254; bh=fNHGzVruBkXqg4DtQTIk9pFuHWrMUpvh5EgDV8lQ+70=;
+	h=Message-ID:Date:From:To:MIME-Version;
+	b=AbOnLTGWVnHPzKYvG/Mp2VnOP5+ehP2dOS6oiIypaayGpzUwYGa24DA69wCZo0b+6
+	 8jLyeOYusFnBUgSToYu4WDEXPRXTxu+D1+qISenUeLc8uk0VoFlhrSTgSSIcut/no7
+	 K39oMDDMHFlkpLvF537UhILoRixYMSgP44iABFcA=
+Received: from smtp-notif4.kai.id ([127.0.0.1])
+ by localhost (smtp-notif4.kai.id [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id A5ckkPKEn7HB for <m.shulhan@gmail.com>;
+ Mon, 18 Dec 2023 18:00:54 +0700 (WIB)
+Received: from emailnotif.kai.id (ldap-notif1.kai.id [172.16.10.236])
+	by smtp-notif4.kai.id (Postfix) with ESMTP id 9062C411A1AE
+	for <m.shulhan@gmail.com>; Mon, 18 Dec 2023 18:00:54 +0700 (WIB)
+Message-ID: <8ed623e7a422fcdd6255f8a2edea16d3@emailnotif.kai.id>
+Date: Mon, 18 Dec 2023 18:00:54 +0700
+Subject: Forgot Password
+From: "PT. Kereta Api Indonesia" <notifapp@kai.id>
+To: m.shulhan@gmail.com
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: La9K9FYSeAYCHcyrBNQ2PWlAgjpOiani
+X-Proofpoint-GUID: La9K9FYSeAYCHcyrBNQ2PWlAgjpOiani
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-18_06,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Reason: safe
+
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset=3D"utf-8">
+  <meta=
+ http-equiv=3D"x-ua-compatible" content=3D"ie=3Dedge">
+  <title>Password =
+Reset</title>
+  <meta name=3D"viewport" content=3D"width=3Ddevice-width, =
+initial-scale=3D1">
+  <style type=3D"text/css">
+  /**
+   * Google web=
+fonts. Recommended to include the .woff version for cross-client compatibil=
+ity.
+   */
+  @media  screen {
+    @font-face {
+      font-family: '=
+Source Sans Pro';
+      font-style: normal;
+      font-weight: 400;
+ =
+     src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'),=
+ url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0=
+YzuT7MdOe03otPbuUS0.woff) format('woff');
+    }
+    @font-face {
+    =
+  font-family: 'Source Sans Pro';
+      font-style: normal;
+      font-=
+weight: 700;
+      src: local('Source Sans Pro Bold'), local('SourceSansP=
+ro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38=
+dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff) format('woff');
+    }
+  }
+  /**=
+
+   * Avoid browser level font resizing.
+   * 1. Windows Mobile
+   * =
+2. iOS / OSX
+   */
+  body,
+  table,
+  td,
+  a {
+    -ms-text-si=
+ze-adjust: 100%; /* 1 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+  =
+}
+  /**
+   * Remove extra space added to tables and cells in Outlook.=
+
+   */
+  table,
+  td {
+    mso-table-rspace: 0pt;
+    mso-table-l=
+space: 0pt;
+  }
+  /**
+   * Better fluid images in Internet Explorer.=
+
+   */
+  img {
+    -ms-interpolation-mode: bicubic;
+  }
+  /**
+ =
+  * Remove blue links for iOS devices.
+   */
+  a[x-apple-data-detectors=
+] {
+    font-family: inherit !important;
+    font-size: inherit !import=
+ant;
+    font-weight: inherit !important;
+    line-height: inherit !imp=
+ortant;
+    color: inherit !important;
+    text-decoration: none !impor=
+tant;
+  }
+  /**
+   * Fix centering issues in Android 4.4.
+   */
+ =
+ div[style*=3D"margin: 16px 0;"] {
+    margin: 0 !important;
+  }
+  bo=
+dy {
+    width: 100% !important;
+    height: 100% !important;
+    pad=
+ding: 0 !important;
+    margin: 0 !important;
+  }
+  /**
+   * Collap=
+se table borders to avoid space between cells.
+   */
+  table {
+    bo=
+rder-collapse: collapse !important;
+  }
+  a {
+    color: #1a82e2;
+ =
+ }
+  img {
+    height: auto;
+    line-height: 100%;
+    text-decora=
+tion: none;
+    border: 0;
+    outline: none;
+  }
+  </style>
+
+<=
+/head>
+<body style=3D"background-color: #e9ecef;">
+
+  <!-- start preh=
+eader -->
+  <div class=3D"preheader" style=3D"display: none; max-width: 0=
+; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color:=
+ #fff; opacity: 0;">
+    Reset password
+  </div>
+  <!-- end preheader=
+ -->
+
+  <!-- start body -->
+  <table border=3D"0" cellpadding=3D"0" c=
+ellspacing=3D"0" width=3D"100%">
+
+    <!-- start logo -->
+    <tr>
+=
+      <td align=3D"center" bgcolor=3D"#e9ecef">
+        <!--[if (gte mso =
+9)|(IE)]>
+        <table align=3D"center" border=3D"0" cellpadding=3D"0" =
+cellspacing=3D"0" width=3D"600">
+        <tr>
+        <td align=3D"cent=
+er" valign=3D"top" width=3D"600">
+        <![endif]-->
+        <table b=
+order=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=3D"max=
+-width: 600px;">
+          <tr>
+            <td align=3D"center" valign=
+=3D"top" style=3D"padding: 36px 24px;">
+              <a href=3D"https://=
+sendgrid.com" target=3D"_blank" style=3D"display: inline-block;">
+       =
+        =20
+              </a>
+            </td>
+          </tr>
+    =
+    </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+       =
+ </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>=
+
+    <!-- end logo -->
+
+    <!-- start hero -->
+    <tr>
+      <t=
+d align=3D"center" bgcolor=3D"#e9ecef">
+        <!--[if (gte mso 9)|(IE)]=
+>
+        <table align=3D"center" border=3D"0" cellpadding=3D"0" cellspac=
+ing=3D"0" width=3D"600">
+        <tr>
+        <td align=3D"center" vali=
+gn=3D"top" width=3D"600">
+        <![endif]-->
+        <table border=3D=
+"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=3D"max-width: =
+600px;">
+          <tr>
+            <td align=3D"left" bgcolor=3D"#ffff=
+ff" style=3D"padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetic=
+a, Arial, sans-serif; border-top: 3px solid #d4dadf;">
+              <h1 =
+style=3D"margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px=
+; line-height: 48px;">Reset Your Password</h1>
+            </td>
+      =
+    </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+       =
+ </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </=
+td>
+    </tr>
+    <!-- end hero -->
+
+    <!-- start copy block -->=
+
+    <tr>
+      <td align=3D"center" bgcolor=3D"#e9ecef">
+        <!-=
+-[if (gte mso 9)|(IE)]>
+        <table align=3D"center" border=3D"0" cell=
+padding=3D"0" cellspacing=3D"0" width=3D"600">
+        <tr>
+        <td=
+ align=3D"center" valign=3D"top" width=3D"600">
+        <![endif]-->
+  =
+      <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%=
+" style=3D"max-width: 600px;">
+
+          <!-- start copy -->
+       =
+   <tr>
+            <td align=3D"left" bgcolor=3D"#ffffff" style=3D"paddi=
+ng: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; fon=
+t-size: 16px; line-height: 24px;">
+              <p style=3D"margin: 0;">=
+Tap the button below to reset your customer account password. If you didn't=
+ request a new password, you can safely delete this email.</p>
+          =
+  </td>
+          </tr>
+          <!-- end copy -->
+
+          <!--=
+ start button -->
+          <tr>
+            <td align=3D"left" bgcolor=
+=3D"#ffffff">
+              <table border=3D"0" cellpadding=3D"0" cellspa=
+cing=3D"0" width=3D"100%">
+                <tr>
+                  <td a=
+lign=3D"center" bgcolor=3D"#ffffff" style=3D"padding: 12px;">
+           =
+         <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0">
+       =
+               <tr>
+                        <td align=3D"center" bgcolor=
+=3D"#1a82e2" style=3D"border-radius: 6px;">
+                          <a =
+href=3D"https://emailnotif.kai.id/api/forgotPassword/UjyeYkKru9FcU2XgDZK1ER=
+5QSeGRDpKzFS6WgiwNPeyo&lt;+BSSpHRY11Q+6V&lt;9FR&lt;" target=3D"_blank" styl=
+e=3D"display: inline-block; padding: 16px 36px; font-family: 'Source Sans P=
+ro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-de=
+coration: none; border-radius: 6px;">Reset Password</a>
+                 =
+       </td>
+                      </tr>
+                    </table>=
+
+                  </td>
+                </tr>
+              </table>=
+
+            </td>
+          </tr>
+          <!-- end button -->
+=
+
+          <!-- start copy -->
+          <tr>
+            <td align=
+=3D"left" bgcolor=3D"#ffffff" style=3D"padding: 24px; font-family: 'Source =
+Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px=
+; border-bottom: 3px solid #d4dadf">
+              <p style=3D"margin: 0;=
+">Best regards,<br><strong>PT Kereta Api Indonesia</strong></p>
+         =
+   </td>
+          </tr>
+          <!-- end copy -->
+
+        </tab=
+le>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+=
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-=
+- end copy block -->
+
+    <!-- start footer -->
+    <tr>
+      <td =
+align=3D"center" bgcolor=3D"#e9ecef" style=3D"padding: 24px;">
+        <!=
+--[if (gte mso 9)|(IE)]>
+        <table align=3D"center" border=3D"0" cel=
+lpadding=3D"0" cellspacing=3D"0" width=3D"600">
+        <tr>
+        <t=
+d align=3D"center" valign=3D"top" width=3D"600">
+        <![endif]-->
+ =
+       <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100=
+%" style=3D"max-width: 600px;">
+
+          <!-- start permission -->
+=
+          <tr>
+            <td align=3D"center" bgcolor=3D"#e9ecef" style=
+=3D"padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, s=
+ans-serif; font-size: 14px; line-height: 20px; color: #666;">
+           =
+   <!-- <p style=3D"margin: 0;">PENTING Informasi yang disampaikan melalui =
+email ini termasuk lampirannya bila ada, hanya ditujukan kepada penerima se=
+bagaimana dimaksud pada tujuan email ini. Jika terdapat kesalahan pengirima=
+n (Anda bukan penerima yang dituju), maka Anda tidak diperkenankan untuk me=
+manfaatkan, menyebarkan, mendistribusikan, atau menggandakan email ini dan =
+diharapkan kerjasamanya untuk dapat menghapusnya. Seluruh pendapat yang ada=
+ dalam email ini merupakan pendapat pribadi dari pengirim dan tidak serta m=
+erta mencerminkan pandangan PT. KERETA API INDONESIA (PERSERO). </p> -->
+=
+            </td>
+          </tr>
+          <!-- end permission -->
+=
+
+          <!-- start unsubscribe -->
+          <tr>
+            <td =
+align=3D"center" bgcolor=3D"#e9ecef" style=3D"padding: 12px 24px; font-fami=
+ly: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-=
+height: 20px; color: #666;">
+              <p style=3D"margin: 0;">PT. Ke=
+reta Api Indonesia (Persero)</p>
+              <p style=3D"margin: 0;">Jl=
+. Perintis Kemerdekaan No. 1 Bandung. 40117</p>
+            </td>
+     =
+     </tr>
+          <!-- end unsubscribe -->
+
+        </table>
+   =
+     <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        <=
+/table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end foo=
+ter -->
+
+  </table>
+  <!-- end body -->
+
+</body>
+</html>
+
+<<< quoted-printable.body
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Password Reset</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+  /**
+   * Google webfonts. Recommended to include the .woff version for cross-client compatibility.
+   */
+  @media  screen {
+    @font-face {
+      font-family: 'Source Sans Pro';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff) format('woff');
+    }
+    @font-face {
+      font-family: 'Source Sans Pro';
+      font-style: normal;
+      font-weight: 700;
+      src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff) format('woff');
+    }
+  }
+  /**
+   * Avoid browser level font resizing.
+   * 1. Windows Mobile
+   * 2. iOS / OSX
+   */
+  body,
+  table,
+  td,
+  a {
+    -ms-text-size-adjust: 100%; /* 1 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+  }
+  /**
+   * Remove extra space added to tables and cells in Outlook.
+   */
+  table,
+  td {
+    mso-table-rspace: 0pt;
+    mso-table-lspace: 0pt;
+  }
+  /**
+   * Better fluid images in Internet Explorer.
+   */
+  img {
+    -ms-interpolation-mode: bicubic;
+  }
+  /**
+   * Remove blue links for iOS devices.
+   */
+  a[x-apple-data-detectors] {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  /**
+   * Fix centering issues in Android 4.4.
+   */
+  div[style*="margin: 16px 0;"] {
+    margin: 0 !important;
+  }
+  body {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  /**
+   * Collapse table borders to avoid space between cells.
+   */
+  table {
+    border-collapse: collapse !important;
+  }
+  a {
+    color: #1a82e2;
+  }
+  img {
+    height: auto;
+    line-height: 100%;
+    text-decoration: none;
+    border: 0;
+    outline: none;
+  }
+  </style>
+
+</head>
+<body style="background-color: #e9ecef;">
+
+  <!-- start preheader -->
+  <div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
+    Reset password
+  </div>
+  <!-- end preheader -->
+
+  <!-- start body -->
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+    <!-- start logo -->
+    <tr>
+      <td align="center" bgcolor="#e9ecef">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+        <tr>
+        <td align="center" valign="top" width="600">
+        <![endif]-->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+          <tr>
+            <td align="center" valign="top" style="padding: 36px 24px;">
+              <a href="https://sendgrid.com" target="_blank" style="display: inline-block;">
+                
+              </a>
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end logo -->
+
+    <!-- start hero -->
+    <tr>
+      <td align="center" bgcolor="#e9ecef">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+        <tr>
+        <td align="center" valign="top" width="600">
+        <![endif]-->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+          <tr>
+            <td align="left" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
+              <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Reset Your Password</h1>
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end hero -->
+
+    <!-- start copy block -->
+    <tr>
+      <td align="center" bgcolor="#e9ecef">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+        <tr>
+        <td align="center" valign="top" width="600">
+        <![endif]-->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+
+          <!-- start copy -->
+          <tr>
+            <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+              <p style="margin: 0;">Tap the button below to reset your customer account password. If you didn't request a new password, you can safely delete this email.</p>
+            </td>
+          </tr>
+          <!-- end copy -->
+
+          <!-- start button -->
+          <tr>
+            <td align="left" bgcolor="#ffffff">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" bgcolor="#ffffff" style="padding: 12px;">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
+                          <a href="https://emailnotif.kai.id/api/forgotPassword/UjyeYkKru9FcU2XgDZK1ER5QSeGRDpKzFS6WgiwNPeyo&lt;+BSSpHRY11Q+6V&lt;9FR&lt;" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Reset Password</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- end button -->
+
+          <!-- start copy -->
+          <tr>
+            <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf">
+              <p style="margin: 0;">Best regards,<br><strong>PT Kereta Api Indonesia</strong></p>
+            </td>
+          </tr>
+          <!-- end copy -->
+
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end copy block -->
+
+    <!-- start footer -->
+    <tr>
+      <td align="center" bgcolor="#e9ecef" style="padding: 24px;">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+        <tr>
+        <td align="center" valign="top" width="600">
+        <![endif]-->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+
+          <!-- start permission -->
+          <tr>
+            <td align="center" bgcolor="#e9ecef" style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
+              <!-- <p style="margin: 0;">PENTING Informasi yang disampaikan melalui email ini termasuk lampirannya bila ada, hanya ditujukan kepada penerima sebagaimana dimaksud pada tujuan email ini. Jika terdapat kesalahan pengiriman (Anda bukan penerima yang dituju), maka Anda tidak diperkenankan untuk memanfaatkan, menyebarkan, mendistribusikan, atau menggandakan email ini dan diharapkan kerjasamanya untuk dapat menghapusnya. Seluruh pendapat yang ada dalam email ini merupakan pendapat pribadi dari pengirim dan tidak serta merta mencerminkan pandangan PT. KERETA API INDONESIA (PERSERO). </p> -->
+            </td>
+          </tr>
+          <!-- end permission -->
+
+          <!-- start unsubscribe -->
+          <tr>
+            <td align="center" bgcolor="#e9ecef" style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
+              <p style="margin: 0;">PT. Kereta Api Indonesia (Persero)</p>
+              <p style="margin: 0;">Jl. Perintis Kemerdekaan No. 1 Bandung. 40117</p>
+            </td>
+          </tr>
+          <!-- end unsubscribe -->
+
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end footer -->
+
+  </table>
+  <!-- end body -->
+
+</body>
+</html>

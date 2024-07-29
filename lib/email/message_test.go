@@ -123,6 +123,32 @@ func TestMessageParseMessage(t *testing.T) {
 	}
 }
 
+func TestParseMessage_quotedPrintable(t *testing.T) {
+	var (
+		tdata *test.Data
+		err   error
+	)
+	tdata, err = test.LoadData(`testdata/message_quoted-printable_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		msg  *Message
+		rest []byte
+	)
+	msg, rest, err = ParseMessage(tdata.Input[`quoted-printable`])
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var expBody = string(tdata.Output[`quoted-printable.body`])
+	var gotBody = string(msg.Body.Parts[0].Content)
+	test.Assert(t, `ParseMessage: Body.Parts[0].Content:`, expBody, gotBody)
+
+	test.Assert(t, `ParseMessage: rest:`, ``, string(rest))
+}
+
 func TestMessage_AddCC(t *testing.T) {
 	var (
 		msg Message

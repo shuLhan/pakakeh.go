@@ -6,6 +6,7 @@ package email
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
@@ -98,6 +99,21 @@ func skipPreamble(raw, boundary []byte) (remain []byte) {
 // Add new MIME part to the body.
 func (body *Body) Add(mime *MIME) {
 	body.Parts = append(body.Parts, mime)
+}
+
+// decode the body parts based on the value of content-type-encoding.
+func (body *Body) decode(encoding string) (err error) {
+	var (
+		logp = `decode`
+		mime *MIME
+	)
+	for _, mime = range body.Parts {
+		err = mime.decode(encoding)
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+	return nil
 }
 
 // getPart get the body part by top and sub content type.
