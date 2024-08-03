@@ -212,9 +212,9 @@ func (msg *Message) DKIMSign(pk *rsa.PrivateKey, sig *dkim.Signature) (err error
 	}
 
 	subHeader := &Header{
-		fields: make([]*Field, len(msg.Header.fields)),
+		Fields: make([]*Field, len(msg.Header.Fields)),
 	}
-	copy(subHeader.fields, msg.Header.fields)
+	copy(subHeader.Fields, msg.Header.Fields)
 
 	hh, _ := sig.Hash(msg.CanonHeader(subHeader, dkimField))
 
@@ -247,12 +247,12 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 
 	// Only process the first DKIM-Signature for now.
 	subHeader := msg.Header.DKIM(1)
-	if subHeader == nil || len(subHeader.fields) == 0 {
+	if subHeader == nil || len(subHeader.Fields) == 0 {
 		msg.dkimStatus.Type = dkim.StatusNoSignature
 		return msg.dkimStatus, nil
 	}
 
-	sig, err := dkim.Parse([]byte(subHeader.fields[0].Value))
+	sig, err := dkim.Parse([]byte(subHeader.Fields[0].Value))
 
 	if sig != nil && len(sig.SDID) > 0 {
 		msg.dkimStatus.SDID = libbytes.Copy(sig.SDID)
@@ -303,7 +303,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 		return nil, err
 	}
 
-	canonHeader := msg.CanonHeader(subHeader, subHeader.fields[0])
+	canonHeader := msg.CanonHeader(subHeader, subHeader.Fields[0])
 	hh, _ := sig.Hash(canonHeader)
 
 	err = sig.Verify(key, hh)
@@ -636,9 +636,9 @@ func (msg *Message) setDKIMHeaders(sig *dkim.Signature) {
 		return
 	}
 
-	sig.Headers = make([][]byte, 0, len(msg.Header.fields))
+	sig.Headers = make([][]byte, 0, len(msg.Header.Fields))
 
-	for _, f := range msg.Header.fields {
+	for _, f := range msg.Header.Fields {
 		sig.Headers = append(sig.Headers, []byte(f.Name))
 	}
 }
