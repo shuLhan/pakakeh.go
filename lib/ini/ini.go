@@ -104,6 +104,8 @@ func Parse(text []byte) (in *Ini, err error) {
 // field's name.
 //
 // An array or slice will be encoded as multiple keys.
+// Marshaling "[]byte" does not supported, due to ambiguity between
+// "byte" and "uint8" during reflection.
 //
 // One exception to above rule is map type.
 // A map's key will override the key defined in tag.

@@ -139,6 +139,8 @@ A double quote is escaped using triple backslash, for example `\\\"`.
 
 If the field type is slice of primitive, for example "[]int", it will be
 marshaled into multiple key with the same name.
+Note that, marshaling "[]byte" does not supported, due to ambiguity between
+"byte" and "uint8" during reflection.
 
 If the field type is struct, it will marshaled as new section and/or
 subsection based on tag on the struct field
