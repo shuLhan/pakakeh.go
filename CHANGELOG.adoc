@@ -20,6 +20,60 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_56_0]
+== pakakeh.go v0.56.0 (2024-08-04)
+
+[#v0_56_0__new_features]
+=== New features
+
+cmd/emaildecode: CLI to decode email body to plain text::
++
+The emaildecode accept file as input.
+If the email header contains content-transfer-encoding with value
+quoted-printable or base64, it will decode the message body and print it
+to stdout as plain text.
+
+[#v0_56_0__bug_fixes]
+=== Bug fixes
+
+lib/memfs: another fix for refresh::
++
+In previous commit we use wrong condition when handling directory "." as
+Root.
+
+[#v0_56_0__enhancements]
+=== Enhancements
+
+lib/email: allow message that end lines with LF only::
++
+Although, a message from network must end with CRLF, a message from
+(another) client may have been sanitized and end with LF only.
+
+lib/email: decode the message body based on content-transfer-encoding::
++
+After the header and body has been parsed, if the header contains
+Content-Transfer-Encoding, we decode the body into its local formats.
+Currently supported encoding is "quoted-printable" and "base64".
+
+[#v0_56_0__others]
+=== Others
+
+lib/email: export the Header fields::
++
+By exporting the fields, this allow the caller to filter or manage the
+field manually.
+
+_doc: add partial note and summary for RFC 2183::
++
+The RFC 2183 is define Content-Disposition header field in the internet
+message.
+
+lib/ini: mention that marshaling []byte does not supported::
++
+Due to "byte" is considered as "uint8" during reflection, we cannot tell
+whether the value is slice of byte of slice of number with type uint8.
+
+
 [#v0_55_2]
 == pakakeh.go v0.55.2 (2024-07-22)
 
