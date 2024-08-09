@@ -10,13 +10,13 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 )
 
@@ -103,14 +103,23 @@ func (cl *Client) FetchTableNames() (tableNames []string, err error) {
 // If its empty default to "_migration".
 // The state including the SQL file name that has been executed and the
 // timestamp.
-func (cl *Client) Migrate(tableMigration string, fs http.FileSystem) (err error) {
+func (cl *Client) Migrate(tableMigration string, fs *memfs.MemFS) (err error) {
 	logp := "Migrate"
 
 	if reflect.IsNil(fs) {
 		if len(cl.MigrationDir) == 0 {
 			return nil
 		}
-		fs = http.Dir(cl.MigrationDir)
+		var mfsopts = memfs.Options{
+			Root: cl.MigrationDir,
+			Includes: []string{
+				`.*\.(sql)$`,
+			},
+		}
+		fs, err = memfs.New(&mfsopts)
+		if err != nil {
+			return fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
 	root, err := fs.Open("/")
@@ -279,9 +288,7 @@ func (cl *Client) migrateFinished(tx *sql.Tx, tableMigration, file string) (err 
 	return nil
 }
 
-func loadSQL(fs http.FileSystem, fi os.FileInfo, filename string) (
-	sqlRaw []byte, err error,
-) {
+func loadSQL(fs *memfs.MemFS, fi os.FileInfo, filename string) (sqlRaw []byte, err error) {
 	logp := "loadSQL"
 
 	if strings.ToLower(filepath.Ext(filename)) != sqlExtension {
