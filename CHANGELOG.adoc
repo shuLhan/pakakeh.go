@@ -20,6 +20,48 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_57_0]
+== pakakeh.go v0.57.0 (2024-09-03)
+
+[#v0_57_0__breaking_changes]
+=== Breaking changes
+
+lib/sql: replace [http.FileSystem] with [memfs.MemFS]::
++
+--
+Accepting the [http.FileSystem] means that the parameter can receive an
+instance of [embed.FS], but in most cases, it will fail.
+
+Case example, when we embed SQL files for migration under
+"db/migration" using the "go:embed" directive,
+
+	//go:embed db/migration/*.sql
+	var DBMigrationFS embed.FS
+
+and then call the [Migrate] function, it will not find any ".sql"
+files inside the "/" directory because the files is stored under
+"db/migration/" prefix (also there is no "/" when using embed.FS).
+--
+
+[#v0_57_0__chores]
+=== Chores
+
+lib/memfs: document the comparison with "go:embed" directive::
++
+--
+Compare it to "go:embed", the memfs package is more flexible and
+portable.
+Currently, we found three disadvantages of using "go:embed",
+
+- The "go:embed" only works if files or directory to be
+  embedded is in the same parent directory.
+- Accessing the embedded file require the original path.
+- No development mode.
+
+None of those limitation affected the memfs package.
+--
+
+
 [#v0_56_0]
 == pakakeh.go v0.56.0 (2024-08-04)
 
