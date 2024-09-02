@@ -183,7 +183,7 @@ func TestSave(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Logf(c.desc)
+		t.Log(c.desc)
 
 		cfg, err := Open(c.inFile)
 		if err != nil {

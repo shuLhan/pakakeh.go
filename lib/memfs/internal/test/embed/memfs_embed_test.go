@@ -117,7 +117,7 @@ func TestNode_Readdir(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Logf(c.path)
+		t.Log(c.path)
 
 		file, err := memFS.Open(c.path)
 		if err != nil {

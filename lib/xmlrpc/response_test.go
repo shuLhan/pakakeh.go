@@ -49,7 +49,7 @@ func TestResponse_MarshalText(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Logf(c.desc)
+		t.Log(c.desc)
 
 		got, err := c.resp.MarshalText()
 		if err != nil {
@@ -142,7 +142,7 @@ func TestResponse_UnmarshalText(t *testing.T) {
 	}}
 
 	for _, c := range cases {
-		t.Logf(c.desc)
+		t.Log(c.desc)
 
 		var got Response
 

@@ -40,9 +40,11 @@ lint:
 	-shadow ./...
 	-golangci-lint run \
 		--presets bugs,metalinter,performance,unused \
-		--disable exhaustive \
-		--disable musttag \
 		--disable bodyclose \
+		--disable exhaustive \
+		--disable fatcontext \
+		--disable gosec \
+		--disable musttag \
 		./...
 
 $(CIIGO):

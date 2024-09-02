@@ -54,8 +54,7 @@ func main() {
 		log.Fatalf(`missing file input`)
 	}
 
-	switch fileInput {
-	case cmdHelp:
+	if fileInput == cmdHelp {
 		fmt.Println(usage)
 		os.Exit(0)
 	}

@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 			log.Fatal("!ok:", err)
 		}
 		if !errors.Is(perr.Err, os.ErrExist) {
-			log.Fatalf("perr: %+v %+v\n", perr.Err, os.ErrExist)
+			log.Fatalf("perr: %+v %+v", perr.Err, os.ErrExist)
 		}
 	}
 
@@ -543,7 +543,7 @@ func TestMemFS_Get_refresh_withDot(t *testing.T) {
 	t.Cleanup(func() {
 		err = os.Chdir(workDir)
 		if err != nil {
-			t.Logf(err.Error())
+			t.Log(err.Error())
 		}
 	})
 

@@ -150,7 +150,7 @@ func (mime *MIME) decode(encoding string) (err error) {
 	var logp = `decode`
 
 	if mime.Header != nil {
-		var partEncoding []*Field = mime.Header.Filter(FieldTypeContentTransferEncoding)
+		var partEncoding = mime.Header.Filter(FieldTypeContentTransferEncoding)
 		var npart = len(partEncoding)
 		if npart > 0 {
 			encoding = strings.TrimSpace(partEncoding[npart-1].Value)
