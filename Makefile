@@ -38,14 +38,7 @@ test.prof:
 lint:
 	-fieldalignment ./...
 	-shadow ./...
-	-golangci-lint run \
-		--presets bugs,metalinter,performance,unused \
-		--disable bodyclose \
-		--disable exhaustive \
-		--disable fatcontext \
-		--disable gosec \
-		--disable musttag \
-		./...
+	-go vet ./...
 
 $(CIIGO):
 	go install git.sr.ht/~shulhan/ciigo/cmd/ciigo
