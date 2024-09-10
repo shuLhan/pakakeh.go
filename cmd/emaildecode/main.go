@@ -1,6 +1,6 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Program emaildecode convert the email body from quoted-printable to plain
 // text.

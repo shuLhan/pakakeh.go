@@ -1,6 +1,6 @@
-## SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
-##
-## SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+#
+# SPDX-License-Identifier: BSD-3-Clause
 
 COVER_OUT:=cover.out
 COVER_HTML:=cover.html

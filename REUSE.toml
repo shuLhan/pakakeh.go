@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2026 M. Shulhan <ms@kilabit.info>
+
+version = 1
+
+[[annotations]]
+path = ["lib/text/diff/testdata/**"]
+SPDX-FileCopyrightText = "2018 Shulhan <ms@kilabit.info>"
+SPDX-License-Identifier = "BSD-3-Clause"

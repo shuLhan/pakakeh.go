@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+
+SPDX-License-Identifier: BSD-3-Clause
+-->
+
 # ansua
 
 ansua is a command line interface to help tracking time.

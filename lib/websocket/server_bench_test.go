@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 // This benchmark is taken from github.com/gobwas/ws [1][2].
 //
 // [1] https://github.com/gobwas/ws/blob/master/server_test.go
