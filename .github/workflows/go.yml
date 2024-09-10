@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 name: Go1.23.2
 on: [push]
 jobs:
