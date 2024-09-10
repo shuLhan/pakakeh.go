@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+
+SPDX-License-Identifier: BSD-3-Clause
+-->
+
 # `import "git.sr.ht/~shulhan/pakakeh.go"`
 
 [Go documentation](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go).

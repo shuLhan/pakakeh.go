@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+
+SPDX-License-Identifier: BSD-3-Clause
+-->
+
 This note document a benchmark between gobwas vs our websocket library.
 
 # github.com/gobwas/ws@v0.1.0

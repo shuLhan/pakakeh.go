@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 // Command bcrypt implements command-line interface to generate and compare
 // bcrypt hash.
 package main

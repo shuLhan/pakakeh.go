@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 =  Autobahn WebSocket Testsuite Status Report
 
 This document track the status report from autobahn testsuite [1].

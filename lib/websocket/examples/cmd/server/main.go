@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Program server provide an example of WebSocket server as group chat.
 // The client that connect to the server must be authenticated using key.
