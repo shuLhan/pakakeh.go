@@ -1,6 +1,6 @@
-// Copyright 2024, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -704,9 +704,7 @@ func (svcb *RDataSVCB) unpackParamPort(packet []byte) ([]byte, error) {
 	}
 	packet = packet[2:]
 
-	var portv string
-
-	portv = strconv.FormatUint(uint64(u16), 10)
+	var portv = strconv.FormatUint(uint64(u16), 10)
 	svcb.Params[svcbKeyIDPort] = []string{portv}
 
 	return packet, nil

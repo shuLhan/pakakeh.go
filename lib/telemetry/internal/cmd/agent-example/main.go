@@ -1,6 +1,6 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Program agent-example provide an example of how to create agent.
 package main
@@ -52,19 +52,13 @@ func main() {
 }
 
 func createGoMetricsCollector() (col *telemetry.GoMetricsCollector) {
-	var (
-		metricsFilter *regexp.Regexp
-	)
-	metricsFilter = regexp.MustCompile(`^go_(cpu|gc|memory|sched)_.*$`)
+	var metricsFilter = regexp.MustCompile(`^go_(cpu|gc|memory|sched)_.*$`)
 	col = telemetry.NewGoMetricsCollector(metricsFilter)
 	return col
 }
 
 func createGoMemStatsCollector() (col *telemetry.GoMemStatsCollector) {
-	var (
-		metricsFilter *regexp.Regexp
-	)
-	metricsFilter = regexp.MustCompile(`^.*$`)
+	var metricsFilter = regexp.MustCompile(`^.*$`)
 	col = telemetry.NewGoMemStatsCollector(metricsFilter)
 	return col
 }

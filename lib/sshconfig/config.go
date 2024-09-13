@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package sshconfig provide the [ssh_config(5)] parser and getter.
 //
@@ -88,10 +88,7 @@ func Load(file string) (cfg *Config, err error) {
 
 	cfg.loadEnvironments()
 
-	var p *parser
-
-	p = newParser(cfg)
-
+	var p = newParser(cfg)
 	var lines []string
 
 	lines, err = p.load("", file)

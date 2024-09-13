@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 package main
 
 import (
@@ -140,7 +144,7 @@ func getExecArg() (execArgs string) {
 }
 
 func onStopped(cause string, orgDur time.Duration, timeStart time.Time) {
-	var dur = orgDur - time.Now().Sub(timeStart).Round(time.Second)
+	var dur = orgDur - time.Since(timeStart).Round(time.Second)
 	fmt.Printf("%s remaining duration is %s.\n", cause, dur)
 }
 
