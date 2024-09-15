@@ -1,0 +1,15 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+>>> no_package
+import "fmt"
+
+func main() {
+	fmt.Printf(`Hello, world`)
+}
+
+<<< no_package
+
+<<< no_package:error
+Format: main.go:1:1: expected 'package', found 'import'

@@ -1,0 +1,42 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+
+>>> invalid_content_type
+{}
+
+<<< invalid_content_type
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Type: application/json
+
+{"name":"ERR_CONTENT_TYPE","code":415}
+
+>>> no_package
+import "fmt"
+
+func main() {
+	fmt.Printf(`Hello, world`)
+}
+
+<<< no_package
+HTTP/1.1 422 Unprocessable Entity
+Connection: close
+Content-Type: application/json
+
+{"message":"Format: main.go:1:1: expected 'package', found 'import'","name":"ERR_CODE","code":422}
+
+>>> indent_and_missing_import
+package main
+
+func main() {
+  fmt.Printf(`Hello, world`)
+}
+
+<<< indent_and_missing_import
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json
+
+{"data":"package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Printf(`Hello, world`)\n}\n","code":200}

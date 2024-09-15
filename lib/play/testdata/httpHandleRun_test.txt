@@ -1,0 +1,61 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+>>> no-content-type
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println(`Hello, world`)
+}
+
+<<< no-content-type
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Type: application/json
+
+{"message":"invalid content type","name":"ERR_CONTENT_TYPE","code":415}
+
+>>> helloworld
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println(`Hello, world`)
+}
+
+<<< helloworld
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json
+Set-Cookie: sid=2d4a99a2e766f055; Path=/; Max-Age=604800; SameSite=Strict
+
+{"data":"Hello, world\n","code":200}
+
+>>> nopackage
+import "fmt"
+
+func main() {
+	fmt.Println(`Hello, world`)
+}
+
+<<< nopackage
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json
+Set-Cookie: sid=1b892f6da92bf0a3; Path=/; Max-Age=604800; SameSite=Strict
+
+{"data":"main.go:1:1: expected 'package', found 'import'\n\nexit status 1\n","code":200}
+
+>>> noimport
+package main
+
+func main() {
+	fmt.Println(`Hello, world`)
+}
+
+<<< noimport
+

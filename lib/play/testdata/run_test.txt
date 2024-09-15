@@ -1,0 +1,35 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+>>> nopackage
+import "fmt"
+
+func main() {
+	fmt.Println(`Hello, world`)
+}
+
+<<< nopackage-error
+Run: exit status 1
+
+<<< nopackage
+main.go:1:1: expected 'package', found 'import'
+
+exit status 1
+
+>>> noimport
+package main
+
+func main() {
+	fmt.Println(`Hello, world`)
+}
+
+<<< noimport-error
+Run: exit status 1
+
+<<< noimport
+# play.local
+./main.go:4:2: undefined: fmt
+
+exit status 1
+

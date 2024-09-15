@@ -1,0 +1,56 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+>>> run1
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"time"
+)
+
+func main() {
+	var (
+		sigq = make(chan os.Signal, 1)
+		x    uint
+		s    os.Signal
+	)
+	signal.Notify(sigq, os.Interrupt, os.Kill)
+	for {
+		select {
+		case s = <-sigq:
+			log.Println("STOPPED by signal:", s)
+			return
+		default:
+			fmt.Println(x)
+			time.Sleep(50 * time.Millisecond)
+			x++
+		}
+	}
+}
+
+<<< run1-error
+Run: signal: killed
+
+<<< run1-output
+signal: killed
+
+
+>>> run2
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello, Go!")
+}
+
+<<< run2-error
+
+<<< run2-output
+Hello, Go!
+
