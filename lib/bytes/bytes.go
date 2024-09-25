@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package bytes provide a library for working with byte or slice of bytes.
 package bytes
@@ -32,6 +32,19 @@ func AppendInt32(data []byte, v int32) []byte {
 	return data
 }
 
+// AppendInt64 append an int64 value into slice of byte.
+func AppendInt64(data []byte, v int64) []byte {
+	data = append(data, byte(v>>56))
+	data = append(data, byte(v>>48))
+	data = append(data, byte(v>>40))
+	data = append(data, byte(v>>32))
+	data = append(data, byte(v>>24))
+	data = append(data, byte(v>>16))
+	data = append(data, byte(v>>8))
+	data = append(data, byte(v))
+	return data
+}
+
 // AppendUint16 append an uint16 value into slice of byte.
 func AppendUint16(data []byte, v uint16) []byte {
 	data = append(data, byte(v>>8))
@@ -41,6 +54,19 @@ func AppendUint16(data []byte, v uint16) []byte {
 
 // AppendUint32 append an uint32 value into slice of byte.
 func AppendUint32(data []byte, v uint32) []byte {
+	data = append(data, byte(v>>24))
+	data = append(data, byte(v>>16))
+	data = append(data, byte(v>>8))
+	data = append(data, byte(v))
+	return data
+}
+
+// AppendUint64 append an uint64 value into slice of byte.
+func AppendUint64(data []byte, v uint64) []byte {
+	data = append(data, byte(v>>56))
+	data = append(data, byte(v>>48))
+	data = append(data, byte(v>>40))
+	data = append(data, byte(v>>32))
 	data = append(data, byte(v>>24))
 	data = append(data, byte(v>>16))
 	data = append(data, byte(v>>8))

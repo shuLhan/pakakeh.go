@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package bytes_test
 
@@ -36,6 +36,33 @@ func ExampleAppendInt32() {
 	//         171 => 0xab => []byte{0x0, 0x0, 0x0, 0xab}
 	//        2748 => 0xabc => []byte{0x0, 0x0, 0xa, 0xbc}
 	//  2147483647 => 0x7fffffff => []byte{0x7f, 0xff, 0xff, 0xff}
+}
+
+func ExampleAppendInt64() {
+	var listInt64 = []int64{
+		math.MaxInt64,
+		1000,
+		math.MinInt64,
+	}
+
+	var (
+		v   int64
+		out []byte
+	)
+	for _, v = range listInt64 {
+		out = libbytes.AppendInt64(nil, v)
+		fmt.Printf("%d\n=> %#x\n=> %#v\n", v, v, out)
+	}
+	// Output:
+	// 9223372036854775807
+	// => 0x7fffffffffffffff
+	// => []byte{0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	// 1000
+	// => 0x3e8
+	// => []byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3, 0xe8}
+	// -9223372036854775808
+	// => -0x8000000000000000
+	// => []byte{0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
 }
 
 func ExampleAppendUint16() {
@@ -76,6 +103,33 @@ func ExampleAppendUint32() {
 	//  2147483647 => 0x7fffffff => []byte{0x7f, 0xff, 0xff, 0xff}
 	//  4294967295 => 0xffffffff => []byte{0xff, 0xff, 0xff, 0xff}
 	//           1 => 0x1 => []byte{0x0, 0x0, 0x0, 0x1}
+}
+
+func ExampleAppendUint64() {
+	var listUint64 = []uint64{
+		math.MaxUint64,
+		math.MaxInt64,
+		1000,
+	}
+
+	var (
+		v   uint64
+		out []byte
+	)
+	for _, v = range listUint64 {
+		out = libbytes.AppendUint64(nil, v)
+		fmt.Printf("%d\n=> %#x\n=> %#v\n", v, v, out)
+	}
+	// Output:
+	// 18446744073709551615
+	// => 0xffffffffffffffff
+	// => []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	// 9223372036854775807
+	// => 0x7fffffffffffffff
+	// => []byte{0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	// 1000
+	// => 0x3e8
+	// => []byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3, 0xe8}
 }
 
 func ExampleConcat() {
