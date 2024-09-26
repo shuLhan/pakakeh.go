@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -71,7 +71,7 @@ func TestRegisterDelete(t *testing.T) {
 			Call:         cbNone,
 		},
 		reqURL:        testServerURL + `/delete/none?k=v`,
-		expStatusCode: http.StatusNoContent,
+		expStatusCode: http.StatusOK,
 	}, {
 		desc: "With response type binary",
 		ep: &Endpoint{
@@ -586,11 +586,11 @@ func TestRegisterPut(t *testing.T) {
 	}, {
 		desc:          "With registered PUT and subtree root",
 		reqURL:        testServerURL + `/put/`,
-		expStatusCode: http.StatusNoContent,
+		expStatusCode: http.StatusOK,
 	}, {
 		desc:          "With registered PUT and query",
 		reqURL:        testServerURL + `/put?k=v`,
-		expStatusCode: http.StatusNoContent,
+		expStatusCode: http.StatusOK,
 	}}
 
 	for _, c := range cases {

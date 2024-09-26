@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -117,7 +117,6 @@ func (ep *Endpoint) call(
 
 	switch ep.ResponseType {
 	case ResponseTypeNone:
-		res.WriteHeader(http.StatusNoContent)
 		return
 	case ResponseTypeBinary:
 		res.Header().Set(HeaderContentType, ContentTypeBinary)
