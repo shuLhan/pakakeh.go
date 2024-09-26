@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -129,6 +129,47 @@ func (srv *Server) RegisterEndpoint(ep Endpoint) (err error) {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 	return nil
+}
+
+// RegisterHandlerFunc register a pattern with a handler, similar to
+// [http.ServeMux.HandleFunc].
+// The pattern follow the Go 1.22 format:
+//
+//	[METHOD] PATH
+//
+// The METHOD is optional, default to GET.
+// The PATH must not contains the domain name and space.
+// Unlike standard library, variable in PATH is read using ":var" not
+// "{var}".
+// This endpoint will accept any content type and return the body as is;
+// it is up to the handler to read and set the content type and the response
+// headers.
+//
+// If the METHOD and/or PATH is already registered it will panic.
+func (srv *Server) RegisterHandleFunc(
+	pattern string,
+	handler func(http.ResponseWriter, *http.Request),
+) {
+	var (
+		logp       = `RegisterHandleFunc`
+		methodPath = strings.Fields(pattern)
+		ep         = Endpoint{
+			Call: func(epr *EndpointRequest) (resp []byte, err error) {
+				handler(epr.HTTPWriter, epr.HTTPRequest)
+				return nil, nil
+			},
+		}
+	)
+	if len(methodPath) == 1 {
+		ep.Path = methodPath[0]
+	} else if len(methodPath) > 1 {
+		ep.Method = RequestMethod(strings.ToUpper(methodPath[0]))
+		ep.Path = methodPath[1]
+	}
+	var err = srv.RegisterEndpoint(ep)
+	if err != nil {
+		log.Panicf(`%s: %s %q`, logp, err, ep.Path)
+	}
 }
 
 // RegisterSSE register Server-Sent Events endpoint.

@@ -13,6 +13,8 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"net/http/httptest"
+	"net/http/httputil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,7 +25,7 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/test/httptest"
+	libhttptest "git.sr.ht/~shulhan/pakakeh.go/lib/test/httptest"
 )
 
 func TestRegisterDelete(t *testing.T) {
@@ -953,7 +955,7 @@ func TestServer_Options_HandleFS(t *testing.T) {
 func TestServer_handleDelete(t *testing.T) {
 	type testCase struct {
 		tag string
-		req httptest.SimulateRequest
+		req libhttptest.SimulateRequest
 	}
 
 	var (
@@ -985,20 +987,20 @@ func TestServer_handleDelete(t *testing.T) {
 
 	var listCase = []testCase{{
 		tag: `valid`,
-		req: httptest.SimulateRequest{
+		req: libhttptest.SimulateRequest{
 			Method: http.MethodDelete,
 			Path:   `/a/b/c/dddd/e`,
 		},
 	}}
 	var (
 		c      testCase
-		result *httptest.SimulateResult
+		result *libhttptest.SimulateResult
 		tag    string
 		exp    string
 		got    []byte
 	)
 	for _, c = range listCase {
-		result, err = httptest.Simulate(srv.ServeHTTP, &c.req)
+		result, err = libhttptest.Simulate(srv.ServeHTTP, &c.req)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1252,6 +1254,108 @@ func TestServerHandleRangeBig(t *testing.T) {
 	test.Assert(t, tag+`- response body size`, DefRangeLimit, len(res.Body))
 }
 
+func TestServer_RegisterHandleFunc(t *testing.T) {
+	var (
+		serverOpts = ServerOptions{}
+
+		server *Server
+		err    error
+	)
+	server, err = NewServer(serverOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	server.RegisterHandleFunc(`/no/method`, testHandleFunc)
+	server.RegisterHandleFunc(`PUT /book/:id`, testHandleFunc)
+
+	type testCase struct {
+		request *http.Request
+		tag     string
+	}
+	var listCase = []testCase{{
+		tag:     `GET /no/method`,
+		request: mustHTTPRequest(`GET`, `/no/method`, nil),
+	}, {
+		tag:     `POST /no/method`,
+		request: mustHTTPRequest(`POST`, `/no/method`, nil),
+	}, {
+		tag:     `PUT /book/1`,
+		request: mustHTTPRequest(`PUT`, `/book/1`, nil),
+	}}
+
+	var tdata *test.Data
+	tdata, err = test.LoadData(`testdata/Server_RegisterHandleFunc_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var (
+		tcase    testCase
+		httpResp *http.Response
+		got      []byte
+		exp      string
+	)
+	for _, tcase = range listCase {
+		var respRec = httptest.NewRecorder()
+		server.ServeHTTP(respRec, tcase.request)
+
+		httpResp = respRec.Result()
+
+		got, err = httputil.DumpResponse(httpResp, true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got = bytes.ReplaceAll(got, []byte("\r"), []byte(""))
+		exp = string(tdata.Output[tcase.tag])
+		test.Assert(t, tcase.tag, exp, string(got))
+	}
+}
+
+func testHandleFunc(httpwriter http.ResponseWriter, httpreq *http.Request) {
+	var (
+		rawb []byte
+		err  error
+	)
+	rawb, err = httputil.DumpRequest(httpreq, true)
+	if err != nil {
+		log.Fatalf(`%s: %s`, httpreq.URL, err)
+	}
+	httpwriter.Write(rawb)
+	fmt.Fprintf(httpwriter, `Form: %+v`, httpreq.Form)
+}
+
+func TestServer_RegisterHandleFunc_duplicate(t *testing.T) {
+	var (
+		serverOpts = ServerOptions{}
+
+		server *Server
+		err    error
+	)
+	server, err = NewServer(serverOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		var msg = recover()
+		test.Assert(t, `recover on duplicate pattern`,
+			`RegisterHandleFunc: RegisterEndpoint: ambigous endpoint "/no/method"`,
+			msg,
+		)
+	}()
+
+	server.RegisterHandleFunc(`/no/method`,
+		func(httpwriter http.ResponseWriter, httpreq *http.Request) {
+			return
+		},
+	)
+	server.RegisterHandleFunc(`GET /no/method`,
+		func(httpwriter http.ResponseWriter, httpreq *http.Request) {
+			return
+		},
+	)
+}
+
 func createBigFile(t *testing.T, path string, size int64) {
 	var (
 		fbig *os.File
@@ -1272,6 +1376,19 @@ func createBigFile(t *testing.T, path string, size int64) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func mustHTTPRequest(method, url string, body []byte) (httpreq *http.Request) {
+	var (
+		reqbody = bytes.NewBuffer(body)
+		err     error
+	)
+
+	httpreq, err = http.NewRequest(method, url, io.NopCloser(reqbody))
+	if err != nil {
+		panic(err.Error())
+	}
+	return httpreq
 }
 
 func runServerFS(t *testing.T, address, dir string) (srv *Server) {

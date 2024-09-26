@@ -1,0 +1,34 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+>>> GET /no/method
+
+<<< GET /no/method
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/plain; charset=utf-8
+
+GET /no/method HTTP/1.1
+
+Form: map[]
+
+
+>>> POST /no/method
+
+<<< POST /no/method
+HTTP/1.1 404 Not Found
+Connection: close
+
+
+
+>>> PUT /book/1
+
+<<< PUT /book/1
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/plain; charset=utf-8
+
+PUT /book/1 HTTP/1.1
+
+Form: map[id:[1]]

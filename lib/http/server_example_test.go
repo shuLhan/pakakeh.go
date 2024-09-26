@@ -1,14 +1,17 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"time"
 )
 
@@ -90,4 +93,36 @@ func ExampleServer_customHTTPStatusCode() {
 	// Output:
 	// 400
 	// {"status":400}
+}
+
+func ExampleServer_RegisterHandleFunc() {
+	var serverOpts = ServerOptions{}
+	server, _ := NewServer(serverOpts)
+	server.RegisterHandleFunc(`PUT /api/book/:id`,
+		func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+			fmt.Fprintf(w, "Request.URL: %s\n", r.URL)
+			fmt.Fprintf(w, "Request.Form: %+v\n", r.Form)
+			fmt.Fprintf(w, "Request.PostForm: %+v\n", r.PostForm)
+		},
+	)
+
+	var respRec = httptest.NewRecorder()
+
+	var body = []byte(`title=BahasaPemrogramanGo&author=Shulhan`)
+	var req = httptest.NewRequest(`PUT`, `/api/book/123`, bytes.NewReader(body))
+	req.Header.Set(`Content-Type`, `application/x-www-form-urlencoded`)
+
+	server.ServeHTTP(respRec, req)
+
+	var resp = respRec.Result()
+
+	body, _ = io.ReadAll(resp.Body)
+	fmt.Println(resp.Status)
+	fmt.Printf("%s", body)
+	// Output:
+	// 200 OK
+	// Request.URL: /api/book/123
+	// Request.Form: map[id:[123]]
+	// Request.PostForm: map[author:[Shulhan] title:[BahasaPemrogramanGo]]
 }
