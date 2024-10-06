@@ -1,4 +1,4 @@
-= CHANGELOG
+= pakakeh.go CHANGELOG
 :toc:
 :sectanchors:
 
@@ -18,6 +18,58 @@ This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
+
+
+[#v0_58_0]
+== pakakeh.go v0.58.0 (2024-10-06)
+
+This release update the minimum Go module to 1.22.0, the last version
+supported by Go tools.
+
+[#v0_58_0__breaking_changes]
+===  Breaking changes
+
+lib/http: remove writing StatusNoContent on ResponseTypeNode::
++
+To make it consistent with RequestTypeNone, the
+ResponseTypeNone should not write any response header or
+HTTP status code.
+It will be handled manually by [Endpoint.Call].
+
+[#v0_58_0__new_features]
+===  New features
+
+lib/play: new package for formatting and running Go code::
++
+Package play provides callable APIs and HTTP handlers to format and
+run Go code, similar to Go playground, but using HTTP instead of
+WebSocket.
+
+lib/http: add Server method to register handler by function::
++
+--
+The RegisterHandleFunc register a pattern with a handler, similar to
+[http.ServeMux.HandleFunc].
+The pattern follow the Go 1.22 format:
+
+	[METHOD] PATH
+
+The METHOD is optional, default to GET.
+The PATH must not contains the domain name and space.
+Unlike standard library, variable in PATH is read using ":var" not
+"{var}".
+This endpoint will accept any content type and return the body as is;
+it is up to the handler to read and set the content type and the
+response headers.
+
+If the METHOD and/or PATH is already registered it will panic.
+--
+
+
+lib/bytes: add function AppendInt64 and AppendUint64::
++
+The AppendInt64 append an int64 value into slice of byte.
+The AppendUint64 append an uint64 value into slice of byte.
 
 
 [#v0_57_0]
