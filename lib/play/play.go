@@ -50,6 +50,10 @@ import (
 // code.
 var GoVersion = `1.23.2`
 
+// Timeout define the maximum time the program can be run until it get
+// terminated.
+var Timeout = 10 * time.Second
+
 var gomodTemplate = `
 module play.local
 

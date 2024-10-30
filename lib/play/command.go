@@ -23,14 +23,12 @@ type command struct {
 }
 
 func newCommand(req *Request, workingDir string) (cmd *command, err error) {
-	const defCommandTimeout = 30 * time.Second
-
 	cmd = &command{
 		buf: &bytes.Buffer{},
 		pid: make(chan int, 1),
 	}
 	var ctxParent = context.Background()
-	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, defCommandTimeout)
+	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, Timeout)
 
 	var userHomeDir string
 
