@@ -59,3 +59,32 @@ func main() {
 
 <<< noimport
 
+>>> go121_for
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	for x := 1; x < 5; x++ {
+		wg.Add(1)
+		go func() {
+			fmt.Println(`x =`, x)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+}
+
+<<< go121_for
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json
+Set-Cookie: sid=d964b22e8f2e75d9; Path=/; Max-Age=604800; SameSite=Strict
+
+{"data":"x = 5\nx = 5\nx = 5\nx = 5\n","code":200}
+
+>>> noop

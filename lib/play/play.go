@@ -11,10 +11,19 @@
 // format,
 //
 //	{
-//		"body":<string>
+//		"goversion": <string>, // For run only.
+//		"without_race": <boolean>, // For run only.
+//		"body": <string>
 //	}
 //
-// where "body" field contains the Go code to be formatted or run.
+// The "goversion" field define the Go tools and toolchain version to be
+// used to compile the code.
+// The default "goversion" is defined as global variable [GoVersion] in this
+// package.
+// If "without_race" is false, the Run command will not run with "-race"
+// option.
+// The "body" field contains the Go code to be formatted or run.
+//
 // Both have the following response format,
 //
 //	{
@@ -53,12 +62,6 @@ var GoVersion = `1.23.2`
 // Timeout define the maximum time the program can be run until it get
 // terminated.
 var Timeout = 10 * time.Second
-
-var gomodTemplate = `
-module play.local
-
-go ` + GoVersion + `
-`
 
 var now = func() int64 {
 	return time.Now().Unix()
@@ -268,6 +271,8 @@ func Run(req *Request) (out []byte, err error) {
 	}
 
 	var gomod = filepath.Join(tempdir, `go.mod`)
+
+	var gomodTemplate = "module play.local\n\ngo " + req.GoVersion + "\n"
 
 	err = os.WriteFile(gomod, []byte(gomodTemplate), 0600)
 	if err != nil {

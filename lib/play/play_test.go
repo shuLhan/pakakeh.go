@@ -128,6 +128,7 @@ func TestHTTPHandleRun(t *testing.T) {
 	type testCase struct {
 		tag         string
 		contentType string
+		req         Request
 	}
 
 	var (
@@ -150,32 +151,38 @@ func TestHTTPHandleRun(t *testing.T) {
 	}, {
 		tag:         `nopackage`,
 		contentType: libhttp.ContentTypeJSON,
+	}, {
+		tag:         `go121_for`,
+		contentType: libhttp.ContentTypeJSON,
+		req: Request{
+			GoVersion:   `1.21.13`,
+			WithoutRace: true,
+		},
 	}}
 
 	var (
 		withBody = true
 
-		req   Request
 		tcase testCase
 		rawb  []byte
 		body  bytes.Buffer
 	)
 	for _, tcase = range listCase {
-		req.Body = string(tdata.Input[tcase.tag])
+		tcase.req.Body = string(tdata.Input[tcase.tag])
 
-		rawb, err = json.Marshal(&req)
+		rawb, err = json.Marshal(&tcase.req)
 		if err != nil {
 			t.Fatal(err)
 		}
 		body.Reset()
 		body.Write(rawb)
 
-		var req *http.Request = httptest.NewRequest(`POST`, `/`, &body)
-		req.Header.Set(libhttp.HeaderContentType, tcase.contentType)
+		var httpReq *http.Request = httptest.NewRequest(`POST`, `/`, &body)
+		httpReq.Header.Set(libhttp.HeaderContentType, tcase.contentType)
 
 		var writer *httptest.ResponseRecorder = httptest.NewRecorder()
 
-		HTTPHandleRun(writer, req)
+		HTTPHandleRun(writer, httpReq)
 
 		var result *http.Response = writer.Result()
 		rawb, err = httputil.DumpResponse(result, withBody)

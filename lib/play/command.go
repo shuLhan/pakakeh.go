@@ -37,7 +37,13 @@ func newCommand(req *Request, workingDir string) (cmd *command, err error) {
 		return nil, fmt.Errorf(`newCommand: %w`, err)
 	}
 
-	cmd.execGoRun = exec.CommandContext(cmd.ctx, `go`, `run`, `-race`, `.`)
+	var listArg = []string{`run`}
+	if !req.WithoutRace {
+		listArg = append(listArg, `-race`)
+	}
+	listArg = append(listArg, `.`)
+
+	cmd.execGoRun = exec.CommandContext(cmd.ctx, `go`, listArg...)
 	cmd.execGoRun.Env = append(cmd.execGoRun.Env, `CGO_ENABLED=1`)
 	cmd.execGoRun.Env = append(cmd.execGoRun.Env, `HOME=`+userHomeDir)
 	cmd.execGoRun.Env = append(cmd.execGoRun.Env, `PATH=/usr/bin:/usr/local/bin`)

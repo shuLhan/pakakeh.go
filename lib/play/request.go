@@ -23,8 +23,14 @@ type Request struct {
 	// In the HTTP request, the sid is read from cookie named "sid".
 	cookieSid *http.Cookie
 
+	// The Go version that will be used in go.mod.
+	GoVersion string `json:"goversion"`
+
 	// Body contains the Go code to be Format-ed or Run.
 	Body string `json:"body"`
+
+	// WithoutRace define option opt out "-race" when running Go code.
+	WithoutRace bool `json:"without_race"`
 }
 
 func (req *Request) init() {
@@ -37,6 +43,10 @@ func (req *Request) init() {
 	req.cookieSid.Path = `/`
 	req.cookieSid.MaxAge = 604800 // Seven days.
 	req.cookieSid.SameSite = http.SameSiteStrictMode
+
+	if req.GoVersion == `` {
+		req.GoVersion = GoVersion
+	}
 }
 
 // generateSid generate session ID from the first 16 hex of SHA256 hash of
