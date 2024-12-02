@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -36,10 +35,7 @@ type MemFS struct {
 	Root      *Node
 	Opts      *Options
 	dw        *DirWatcher
-
-	watchRE []*regexp.Regexp
-	incRE   []*regexp.Regexp
-	excRE   []*regexp.Regexp
+	watchopts *WatchOptions
 
 	// subfs contains another MemFS instances.
 	// During Get, it will evaluated in order.
@@ -75,10 +71,10 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		sysPath = filepath.Join(parent.SysPath, fi.Name())
 	)
 
-	if mfs.isExcluded(sysPath) {
+	if mfs.Opts.isExcluded(sysPath) {
 		return nil, nil
 	}
-	if mfs.isWatched(sysPath) {
+	if mfs.watchopts != nil && mfs.watchopts.isWatched(sysPath) {
 		child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
 		if err != nil {
 			if errors.Is(err, fs.ErrNotExist) {
@@ -89,7 +85,7 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 
 		mfs.PathNodes.Set(child.Path, child)
 	}
-	if !mfs.isIncluded(sysPath, fi) {
+	if !mfs.Opts.isIncluded(sysPath, fi) {
 		if child != nil {
 			// The path being watched, but not included.
 			// Set the generate function name to empty, to prevent
@@ -268,34 +264,18 @@ func (mfs *MemFS) Get(path string) (node *Node, err error) {
 // This method provided to initialize MemFS if its Options is set directly,
 // not through New() function.
 func (mfs *MemFS) Init() (err error) {
-	var (
-		logp = "Init"
-		v    string
-		re   *regexp.Regexp
-	)
+	var logp = `Init`
 
 	if mfs.Opts == nil {
 		mfs.Opts = &Options{}
 	}
-	mfs.Opts.init()
-
 	if mfs.PathNodes == nil {
 		mfs.PathNodes = NewPathNode()
 	}
 
-	for _, v = range mfs.Opts.Includes {
-		re, err = regexp.Compile(v)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-		mfs.incRE = append(mfs.incRE, re)
-	}
-	for _, v = range mfs.Opts.Excludes {
-		re, err = regexp.Compile(v)
-		if err != nil {
-			return fmt.Errorf("%s: %w", logp, err)
-		}
-		mfs.excRE = append(mfs.excRE, re)
+	err = mfs.Opts.init()
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	err = mfs.mount()
@@ -471,62 +451,6 @@ func (mfs *MemFS) createRoot() error {
 	return nil
 }
 
-// isExcluded will return true if the system path is excluded from being
-// watched or included.
-func (mfs *MemFS) isExcluded(sysPath string) bool {
-	var (
-		re *regexp.Regexp
-	)
-	for _, re = range mfs.excRE {
-		if re.MatchString(sysPath) {
-			return true
-		}
-	}
-	return false
-}
-
-// isIncluded will return true if the system path is filtered to be included,
-// pass the list of Includes regexp or no filter defined.
-func (mfs *MemFS) isIncluded(sysPath string, fi os.FileInfo) bool {
-	var (
-		re  *regexp.Regexp
-		err error
-	)
-
-	if len(mfs.incRE) == 0 {
-		// No filter defined, default to always included.
-		return true
-	}
-	for _, re = range mfs.incRE {
-		if re.MatchString(sysPath) {
-			return true
-		}
-	}
-	if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
-		// File is symlink, get the real FileInfo to check if its
-		// directory or not.
-		fi, err = os.Stat(sysPath)
-		if err != nil {
-			return false
-		}
-	}
-
-	return fi.IsDir()
-}
-
-// isWatched will return true if the system path is filtered to be watched.
-func (mfs *MemFS) isWatched(sysPath string) bool {
-	var (
-		re *regexp.Regexp
-	)
-	for _, re = range mfs.watchRE {
-		if re.MatchString(sysPath) {
-			return true
-		}
-	}
-	return false
-}
-
 // mount the directory recursively into the memory as root directory.
 // For example, if we mount directory "/tmp" and "/tmp" contains file "a", to
 // access file "a" we call Get("/a"), not Get("/tmp/a").
@@ -700,30 +624,22 @@ func (mfs *MemFS) resetAllModTime(t time.Time) {
 //
 // The returned DirWatcher is ready to use.
 // To stop watching for update call the StopWatch.
-func (mfs *MemFS) Watch(opts WatchOptions) (dw *DirWatcher, err error) {
-	var (
-		logp = "Watch"
+func (mfs *MemFS) Watch(watchopts WatchOptions) (dw *DirWatcher, err error) {
+	var logp = `Watch`
 
-		re *regexp.Regexp
-		v  string
-	)
+	err = watchopts.init()
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	mfs.watchopts = &watchopts
 
 	if mfs.dw != nil {
 		return mfs.dw, nil
 	}
 
-	mfs.watchRE = nil
-	for _, v = range opts.Watches {
-		re, err = regexp.Compile(v)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", logp, err)
-		}
-		mfs.watchRE = append(mfs.watchRE, re)
-	}
-
 	mfs.dw = &DirWatcher{
 		fs:      mfs,
-		Delay:   opts.Delay,
+		Delay:   watchopts.Delay,
 		Options: *mfs.Opts,
 	}
 

@@ -4,7 +4,10 @@
 
 package memfs
 
-import "time"
+import (
+	"regexp"
+	"time"
+)
 
 // WatchOptions define an options for the MemFS Watch method.
 type WatchOptions struct {
@@ -14,9 +17,42 @@ type WatchOptions struct {
 	// watched.
 	Watches []string
 
+	watchRE []*regexp.Regexp
+
 	// Delay define the duration when the new changes will be checked from
 	// system.
 	// This field set the DirWatcher.Delay returned from Watch().
 	// This field is optional, default is 5 seconds.
 	Delay time.Duration
+}
+
+func (watchopts *WatchOptions) init() (err error) {
+	if watchopts.Delay < 100*time.Millisecond {
+		watchopts.Delay = defWatchDelay
+	}
+
+	var (
+		v  string
+		re *regexp.Regexp
+	)
+	watchopts.watchRE = nil
+	for _, v = range watchopts.Watches {
+		re, err = regexp.Compile(v)
+		if err != nil {
+			return err
+		}
+		watchopts.watchRE = append(watchopts.watchRE, re)
+	}
+	return nil
+}
+
+// isWatched return true if the sysPath is filtered to be watched.
+func (watchopts *WatchOptions) isWatched(sysPath string) bool {
+	var re *regexp.Regexp
+	for _, re = range watchopts.watchRE {
+		if re.MatchString(sysPath) {
+			return true
+		}
+	}
+	return false
 }
