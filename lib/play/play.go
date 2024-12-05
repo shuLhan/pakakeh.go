@@ -20,11 +20,11 @@
 // used to compile the code.
 // The default "goversion" is defined as global variable [GoVersion] in this
 // package.
-// If "without_race" is false, the Run command will not run with "-race"
+// If "without_race" is true, the Run command will not run with "-race"
 // option.
 // The "body" field contains the Go code to be formatted or run.
 //
-// Both have the following response format,
+// Both return the following JSON response format,
 //
 //	{
 //		"code": <integer, HTTP status code>,
@@ -38,6 +38,20 @@
 // For the [HTTPHandleRun], the response "data" contains the output from
 // running the Go code, the "message" contains an error pre-Run, like bad
 // request or file system related error.
+//
+// As exceptional, the [Run] and [HTTPHandleRun] accept the following
+// request for running program inside custom "go.mod",
+//
+//	{
+//		"unsafe_run": <path>
+//	}
+//
+// The "unsafe_run" define the path to directory relative to HTTP server
+// working directory.
+// Once request accepted it will change the directory into "unsafe_run" first
+// and then run "go run ." directly.
+// Go code that executed inside "unsafe_run" should be not modifiable and
+// safe from mallicious execution.
 package play
 
 import (
@@ -253,6 +267,10 @@ func Run(req *Request) (out []byte, err error) {
 		runningCmd.delete(req.cookieSid.Value)
 	}
 
+	if len(req.UnsafeRun) != 0 {
+		return unsafeRun(req)
+	}
+
 	if len(req.Body) == 0 {
 		return nil, nil
 	}
@@ -287,6 +305,21 @@ func Run(req *Request) (out []byte, err error) {
 	}
 
 	cmd, err = newCommand(req, tempdir)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	runningCmd.store(req.cookieSid.Value, cmd)
+
+	out = cmd.run()
+
+	return out, nil
+}
+
+func unsafeRun(req *Request) (out []byte, err error) {
+	var logp = `unsafeRun`
+
+	var cmd *command
+	cmd, err = newCommand(req, req.UnsafeRun)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}

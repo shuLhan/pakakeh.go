@@ -29,6 +29,10 @@ type Request struct {
 	// Body contains the Go code to be Format-ed or Run.
 	Body string `json:"body"`
 
+	// UnsafeRun define the working directory where "go run ." will be
+	// executed directly.
+	UnsafeRun string `json:"unsafe_run"`
+
 	// WithoutRace define option opt out "-race" when running Go code.
 	WithoutRace bool `json:"without_race"`
 }

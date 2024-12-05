@@ -320,3 +320,21 @@ func testRunOverlap(t *testing.T, runwg *sync.WaitGroup, tdata *test.Data,
 			exp, string(out))
 	}
 }
+
+func TestRunUnsafeRun(t *testing.T) {
+	var req = &Request{
+		UnsafeRun: `testdata/unsafe_run/cmd/forum`,
+	}
+
+	var (
+		out []byte
+		err error
+	)
+	out, err = Run(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var exp = "Hello...\n"
+	test.Assert(t, `unsafeRun`, exp, string(out))
+}
