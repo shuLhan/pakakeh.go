@@ -20,6 +20,47 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
+[#v0_58_1]
+== pakakeh.go v0.58.1 (2024-12-07)
+
+[#v0_58_1__enhancements]
+=== Enhancements
+
+lib/play: add custom request to run unsafe directory directly::
++
+--
+As exceptional, the Run and HTTPHandleRun accept the following
+request for running program inside custom "go.mod",
+
+----
+{
+	"unsafe_run": <path>
+}
+----
+
+The "unsafe_run" define the path to directory relative to HTTP
+server working directory.
+Once request accepted it will change the directory into
+"unsafe_run" first and then run "go run ." directly.
+Go code that executed inside "unsafe_run" should be not
+modifiable and safe from mallicious execution.
+--
+
+
+lib/play: add option to Run with specific Go version and without race::
++
+The idea is to allow testing Go code on specific Go version.
+For example, before Go 1.22, the for loop with variable is shared
+among block statements, which cause every use of that variable is run
+with the last value.
+
+
+lib/play: expose the Timeout variable::
++
+By exposing the Timeout, user can set their maximum time the program
+can run in their playground.
+
+
 [#v0_58_0]
 == pakakeh.go v0.58.0 (2024-10-06)
 
