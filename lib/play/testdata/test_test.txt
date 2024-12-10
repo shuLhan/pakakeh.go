@@ -1,0 +1,71 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+>>> ok
+package test
+
+import "testing"
+
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3)
+	if total != 6 {
+		t.Fatalf(`got %d, want 6`, total)
+	}
+}
+
+<<< ok
+ok  	git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata Xs
+
+>>> fail
+package test
+
+import "testing"
+
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3, 4)
+	if total != 6 {
+		t.Fatalf(`got %d, want 6`, total)
+	}
+}
+
+<<< fail
+--- FAIL: TestSum (0.00s)
+    test_test.go:8: got 10, want 6
+FAIL
+FAIL	git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata Xs
+FAIL
+
+exit status 1
+
+>>> buildFailed
+package test
+
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3)
+	if total != 6 {
+		t.Fatalf(`got %d, want 6`, total)
+	}
+}
+
+<<< buildFailed
+# git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata [git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata.test]
+./test_test.go:3:17: undefined: testing
+FAIL	git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata [build failed]
+FAIL
+
+exit status 1
+
+>>> emptyFile
+package test
+
+import "testing"
+
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3)
+	if total != 6 {
+		t.Fatalf(`got %d, want 6`, total)
+	}
+}
+
+<<< emptyFile

@@ -13,6 +13,7 @@ import (
 )
 
 const cookieNameSid = `sid`
+const defTestFile = `test_test.go`
 
 // Request for calling [Format] and [Run].
 type Request struct {
@@ -25,6 +26,10 @@ type Request struct {
 
 	// The Go version that will be used in go.mod.
 	GoVersion string `json:"goversion"`
+
+	// File define the path to test "_test.go" file.
+	// This field is for Test.
+	File string `json:"file"`
 
 	// Body contains the Go code to be Format-ed or Run.
 	Body string `json:"body"`
