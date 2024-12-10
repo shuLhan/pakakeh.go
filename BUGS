@@ -1,0 +1,20 @@
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*RDataSVCB).unpackParamMandatory(0xc000038200, {0xc001a1253b, 0x9, 0x495})
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/rdata_svcb.go:633 +0x37d
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*RDataSVCB).unpackParams(0xc000038200, {0xc001a1252f?, 0x4129a5?, 0x20?})
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/rdata_svcb.go:581 +0x1a5
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*RDataSVCB).unpack(0xc000038200, {0xc001a1252c?, 0x18, 0x4a4})
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/rdata_svcb.go:567 +0xe8
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*ResourceRecord).unpackHTTPS(0xc0008a7b90, {0xc001a12500, 0x44, 0x4d0}, 0x2c)
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/resource_record.go:583 +0xbc
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*ResourceRecord).unpackRData(0xc00163db90, {0xc001a12500, 0x926bc5?, 0x4d0}, 0x2c)
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/resource_record.go:407 +0x656
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*ResourceRecord).unpack(0xc0008a7b90, {0xc001a12500, 0x44, 0x4d0}, 0x411b9b?)
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/resource_record.go:220 +0x27e
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*Message).Unpack(0xc0019eadc0)
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/message.go:1055 +0x1b5
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*UDPClient).Query(0xc001644000, 0xc00163dd1c?)
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/udp_client.go:145 +0x367
+git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*Server).udpForwarder(0xc000000000, {0xc00110d8b0, 0xd}, {0xc00110d8d0, 0xa})
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/server.go:1039 +0x849
+created by git.sr.ht/~shulhan/pakakeh.go/lib/dns.(*Server).startAllForwarders in goroutine 21
+        /home/ms/go/src/git.sr.ht/~shulhan/pakakeh.go/lib/dns/server.go:736 +0x6c

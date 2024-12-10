@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"syscall"
@@ -337,4 +338,62 @@ func TestRunUnsafeRun(t *testing.T) {
 
 	var exp = "Hello...\n"
 	test.Assert(t, `unsafeRun`, exp, string(out))
+}
+
+func TestTest(t *testing.T) {
+	type testCase struct {
+		tag      string
+		exp      string
+		expError string
+		treq     Request
+	}
+
+	var (
+		tdata *test.Data
+		err   error
+	)
+	tdata, err = test.LoadData(`testdata/test_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var listCase = []testCase{{
+		tag: `ok`,
+		treq: Request{
+			File: `testdata/test_test.go`,
+		},
+	}, {
+		tag: `fail`,
+		treq: Request{
+			File: `testdata/test_test.go`,
+		},
+	}, {
+		tag: `buildFailed`,
+		treq: Request{
+			File: `testdata/test_test.go`,
+		},
+	}, {
+		tag:      `emptyFile`,
+		expError: ErrEmptyFile.Error(),
+	}}
+
+	var rexDuration = regexp.MustCompile(`(?m)\s+(\d+\.\d+)s$`)
+
+	var (
+		tcase testCase
+		exp   string
+		got   []byte
+	)
+	for _, tcase = range listCase {
+		tcase.treq.Body = string(tdata.Input[tcase.tag])
+		tcase.treq.init()
+
+		got, err = Test(&tcase.treq)
+		if err != nil {
+			test.Assert(t, tcase.tag, tcase.expError, err.Error())
+		}
+		got = rexDuration.ReplaceAll(got, []byte(" Xs"))
+		exp = string(tdata.Output[tcase.tag])
+		test.Assert(t, tcase.tag, exp, string(got))
+	}
 }

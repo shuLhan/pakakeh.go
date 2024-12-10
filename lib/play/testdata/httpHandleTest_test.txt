@@ -1,0 +1,53 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
+
+>>> noContentType
+{}
+
+<<< noContentType
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Type: application/json
+
+{"message":"invalid content type","name":"ERR_CONTENT_TYPE","code":415}
+
+>>> ok
+package test
+
+import "testing"
+
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3)
+	if total != 6 {
+		t.Fatalf(`got %d, want 6`, total)
+	}
+}
+
+<<< ok
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json
+Set-Cookie: sid=c4832036755b3539; Path=/; Max-Age=604800; SameSite=Strict
+
+{"data":"ok  \tgit.sr.ht/~shulhan/pakakeh.go/lib/play/testdata Xs\n","code":200}
+
+>>> invalidFile
+package test
+
+import "testing"
+
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3)
+	if total != 6 {
+		t.Fatalf(`got %d, want 6`, total)
+	}
+}
+
+<<< invalidFile
+HTTP/1.1 500 Internal Server Error
+Connection: close
+Content-Type: application/json
+
+{"message":"Test: open testdata/notexist/test_test.go: no such file or directory","name":"ERR_INTERNAL","code":500}

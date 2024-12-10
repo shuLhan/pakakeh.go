@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 )
 
 func ExampleFormat() {
@@ -148,4 +149,35 @@ func main() {
 
 	//Output:
 	//Hello, world
+}
+
+func ExampleTest() {
+	const codeTest = `
+package test
+import "testing"
+func TestSum(t *testing.T) {
+	var total = sum(1, 2, 3)
+	if total != 6 {
+		t.Fatalf("got %d, want 6", total)
+	}
+}`
+	var req = Request{
+		Body: codeTest,
+		File: `testdata/test_test.go`,
+	}
+	var (
+		rexDuration = regexp.MustCompile(`(?m)\s+(\d+\.\d+)s$`)
+		out         []byte
+		err         error
+	)
+	out, err = Test(&req)
+	if err != nil {
+		fmt.Printf(`error: %s`, err)
+	}
+	// Replace the test duration.
+	out = rexDuration.ReplaceAll(out, []byte(" Xs"))
+	fmt.Printf(`%s`, out)
+
+	//Output:
+	//ok  	git.sr.ht/~shulhan/pakakeh.go/lib/play/testdata Xs
 }
