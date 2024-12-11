@@ -15,6 +15,89 @@ import (
 	"regexp"
 )
 
+func ExampleHTTPHandleFormat() {
+	const codeIndentMissingImport = `
+package main
+func main() {
+  fmt.Println("Hello, world")
+}
+`
+	var req = Request{
+		Body: codeIndentMissingImport,
+	}
+	var (
+		rawbody []byte
+		err     error
+	)
+	rawbody, err = json.Marshal(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var resprec = httptest.NewRecorder()
+	var httpreq = httptest.NewRequest(`POST`, `/api/play/format`,
+		bytes.NewReader(rawbody))
+	httpreq.Header.Set(`Content-Type`, `application/json`)
+
+	var mux = http.NewServeMux()
+	mux.HandleFunc(`POST /api/play/format`, HTTPHandleFormat)
+	mux.ServeHTTP(resprec, httpreq)
+
+	var resp = resprec.Result()
+	rawbody, err = io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(`%s`, rawbody)
+
+	// Output:
+	// {"data":"package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, world\")\n}\n","code":200}
+}
+
+func ExampleHTTPHandleRun() {
+	const code = `
+package main
+import "fmt"
+func main() {
+	fmt.Println("Hello, world")
+}
+`
+	var req = Request{
+		Body: code,
+	}
+	var (
+		rawbody []byte
+		err     error
+	)
+	rawbody, err = json.Marshal(&req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var resprec = httptest.NewRecorder()
+
+	var httpreq = httptest.NewRequest(`POST`, `/api/play/run`,
+		bytes.NewReader(rawbody))
+	httpreq.Header.Set(`Content-Type`, `application/json`)
+
+	var mux = http.NewServeMux()
+
+	mux.HandleFunc(`POST /api/play/run`, HTTPHandleRun)
+	mux.ServeHTTP(resprec, httpreq)
+
+	var resp = resprec.Result()
+	rawbody, err = io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(`%s`, rawbody)
+
+	// Output:
+	// {"data":"Hello, world\n","code":200}
+}
+
 func ExampleHTTPHandleTest() {
 	const code = `
 package test

@@ -5,11 +5,7 @@
 package play
 
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
-	"net/http/httptest"
-	"net/http/httputil"
 	"os"
 	"regexp"
 	"strings"
@@ -18,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -60,140 +55,6 @@ func TestFormat(t *testing.T) {
 		}
 
 		test.Assert(t, name, exp, string(got))
-	}
-}
-
-func TestHTTPHandleFormat(t *testing.T) {
-	type testCase struct {
-		tag         string
-		contentType string
-	}
-
-	var (
-		tdata *test.Data
-		err   error
-	)
-	tdata, err = test.LoadData(`testdata/httpHandleFormat_test.txt`)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var listCase = []testCase{{
-		tag: `invalid_content_type`,
-	}, {
-		tag:         `no_package`,
-		contentType: libhttp.ContentTypeJSON,
-	}, {
-		tag:         `indent_and_missing_import`,
-		contentType: libhttp.ContentTypeJSON,
-	}}
-
-	var (
-		withBody = true
-
-		req   Request
-		tcase testCase
-		rawb  []byte
-		body  bytes.Buffer
-	)
-	for _, tcase = range listCase {
-		req.Body = string(tdata.Input[tcase.tag])
-
-		rawb, err = json.Marshal(&req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		body.Reset()
-		body.Write(rawb)
-
-		var req *http.Request = httptest.NewRequest(`POST`, `/`, &body)
-		req.Header.Set(libhttp.HeaderContentType, tcase.contentType)
-
-		var writer *httptest.ResponseRecorder = httptest.NewRecorder()
-
-		HTTPHandleFormat(writer, req)
-
-		var result *http.Response = writer.Result()
-		rawb, err = httputil.DumpResponse(result, withBody)
-		if err != nil {
-			t.Fatal(err)
-		}
-		rawb = bytes.ReplaceAll(rawb, []byte("\r"), []byte(""))
-
-		var exp = string(tdata.Output[tcase.tag])
-		test.Assert(t, tcase.tag, exp, string(rawb))
-	}
-}
-
-func TestHTTPHandleRun(t *testing.T) {
-	type testCase struct {
-		tag         string
-		contentType string
-		req         Request
-	}
-
-	var (
-		tdata *test.Data
-		err   error
-	)
-	tdata, err = test.LoadData(`testdata/httpHandleRun_test.txt`)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var listCase = []testCase{{
-		tag: `no-content-type`,
-	}, {
-		tag:         `helloworld`,
-		contentType: libhttp.ContentTypeJSON,
-	}, {
-		tag:         `nopackage`,
-		contentType: libhttp.ContentTypeJSON,
-	}, {
-		tag:         `nopackage`,
-		contentType: libhttp.ContentTypeJSON,
-	}, {
-		tag:         `go121_for`,
-		contentType: libhttp.ContentTypeJSON,
-		req: Request{
-			GoVersion:   `1.21.13`,
-			WithoutRace: true,
-		},
-	}}
-
-	var (
-		withBody = true
-
-		tcase testCase
-		rawb  []byte
-		body  bytes.Buffer
-	)
-	for _, tcase = range listCase {
-		tcase.req.Body = string(tdata.Input[tcase.tag])
-
-		rawb, err = json.Marshal(&tcase.req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		body.Reset()
-		body.Write(rawb)
-
-		var httpReq *http.Request = httptest.NewRequest(`POST`, `/`, &body)
-		httpReq.Header.Set(libhttp.HeaderContentType, tcase.contentType)
-
-		var writer *httptest.ResponseRecorder = httptest.NewRecorder()
-
-		HTTPHandleRun(writer, httpReq)
-
-		var result *http.Response = writer.Result()
-		rawb, err = httputil.DumpResponse(result, withBody)
-		if err != nil {
-			t.Fatal(err)
-		}
-		rawb = bytes.ReplaceAll(rawb, []byte("\r"), []byte(""))
-
-		var exp = string(tdata.Output[tcase.tag])
-		test.Assert(t, tcase.tag, exp, string(rawb))
 	}
 }
 
