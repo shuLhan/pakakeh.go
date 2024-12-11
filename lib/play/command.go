@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
-	"os"
 	"os/exec"
 	"time"
 )
@@ -22,20 +20,13 @@ type command struct {
 	pid       chan int
 }
 
-func newCommand(req *Request, workingDir string) (cmd *command, err error) {
+func newCommand(req *Request, workingDir string) (cmd *command) {
 	cmd = &command{
 		buf: &bytes.Buffer{},
 		pid: make(chan int, 1),
 	}
 	var ctxParent = context.Background()
 	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, Timeout)
-
-	var userHomeDir string
-
-	userHomeDir, err = os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf(`newCommand: %w`, err)
-	}
 
 	var listArg = []string{`run`}
 	if !req.WithoutRace {
@@ -52,23 +43,16 @@ func newCommand(req *Request, workingDir string) (cmd *command, err error) {
 	cmd.execGoRun.Stderr = cmd.buf
 	cmd.execGoRun.WaitDelay = 100 * time.Millisecond
 
-	return cmd, nil
+	return cmd
 }
 
-func newTestCommand(treq *Request) (cmd *command, err error) {
+func newTestCommand(treq *Request) (cmd *command) {
 	cmd = &command{
 		buf: &bytes.Buffer{},
 		pid: make(chan int, 1),
 	}
 	var ctxParent = context.Background()
 	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, Timeout)
-
-	var userHomeDir string
-
-	userHomeDir, err = os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf(`newCommand: %w`, err)
-	}
 
 	var listArg = []string{`test`, `-count=1`}
 	if !treq.WithoutRace {
@@ -86,7 +70,7 @@ func newTestCommand(treq *Request) (cmd *command, err error) {
 	cmd.execGoRun.Stderr = cmd.buf
 	cmd.execGoRun.WaitDelay = 100 * time.Millisecond
 
-	return cmd, nil
+	return cmd
 }
 
 // run the command using [exec.Command.Start] and [exec.Command.Wait].
