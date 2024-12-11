@@ -59,35 +59,41 @@ func TestFormat(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
+	type testCase struct {
+		tag string
+		req Request
+	}
+
 	var (
 		tdata *test.Data
 		err   error
 	)
-
 	tdata, err = test.LoadData(`testdata/run_test.txt`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	var listCase = []testCase{{
+		tag: `nopackage`,
+	}, {
+		tag: `noimport`,
+	}}
 	var (
-		req = &Request{
-			cookieSid: &http.Cookie{},
-		}
-		sid   string
+		tcase testCase
 		exp   string
-		input []byte
 		got   []byte
 	)
-	for sid, input = range tdata.Input {
-		req.cookieSid.Value = sid
-		req.Body = string(input)
-		got, err = Run(req)
+	for _, tcase = range listCase {
+		tcase.req.Body = string(tdata.Input[tcase.tag])
+
+		got, err = Run(&tcase.req)
 		if err != nil {
-			exp = string(tdata.Output[sid+`-error`])
-			test.Assert(t, sid+`-error`, exp, err.Error())
+			var tagError = tcase.tag + `Error`
+			exp = string(tdata.Output[tagError])
+			test.Assert(t, tagError, exp, err.Error())
 		}
-		exp = string(tdata.Output[sid])
-		test.Assert(t, sid, exp, string(got))
+		exp = string(tdata.Output[tcase.tag])
+		test.Assert(t, tcase.tag, exp, string(got))
 	}
 }
 
@@ -120,17 +126,17 @@ func TestRunOverlap(t *testing.T) {
 	if cmd1 == nil {
 		t.Fatal(`expecting cmd1, got nil`)
 	}
-	var cmd1Pid int = <-cmd1.pid
 
 	// Second Run.
 
 	runwg.Add(1)
 	go testRunOverlap(t, &runwg, tdata, `run2`, sid)
-	time.Sleep(200 * time.Millisecond)
+
+	runwg.Wait()
 
 	// The cmd1 Run should have been killed.
 	var proc *os.Process
-	proc, err = os.FindProcess(cmd1Pid)
+	proc, err = os.FindProcess(cmd1.execGoRun.Process.Pid)
 	if err != nil {
 		t.Fatalf(`find process: %s`, err)
 	}
@@ -140,8 +146,6 @@ func TestRunOverlap(t *testing.T) {
 		var exp = os.ErrProcessDone.Error()
 		test.Assert(t, `signal error`, exp, err.Error())
 	}
-
-	runwg.Wait()
 }
 
 func testRunOverlap(t *testing.T, runwg *sync.WaitGroup, tdata *test.Data,
