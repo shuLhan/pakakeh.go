@@ -8,6 +8,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
@@ -71,4 +73,33 @@ func (req *Request) generateSid() string {
 	hex.Encode(dst, cipher[:])
 
 	return string(dst[:16])
+}
+
+// writes write the go.mod and main.go files inside the unsafe directory.
+func (req *Request) writes() (err error) {
+	req.UnsafeRun = filepath.Join(userCacheDir, `goplay`,
+		req.cookieSid.Value)
+
+	err = os.MkdirAll(req.UnsafeRun, 0700)
+	if err != nil {
+		return err
+	}
+
+	var gomod = filepath.Join(req.UnsafeRun, `go.mod`)
+
+	var gomodTemplate = "module play.local\n\n" +
+		"go " + req.GoVersion + "\n"
+
+	err = os.WriteFile(gomod, []byte(gomodTemplate), 0600)
+	if err != nil {
+		return err
+	}
+
+	var maingo = filepath.Join(req.UnsafeRun, `main.go`)
+
+	err = os.WriteFile(maingo, []byte(req.Body), 0600)
+	if err != nil {
+		return err
+	}
+	return nil
 }

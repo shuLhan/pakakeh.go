@@ -9,7 +9,7 @@ func main() {
 	fmt.Println(`Hello, world`)
 }
 
-<<< nopackage-error
+<<< nopackageError
 Run: exit status 1
 
 <<< nopackage
@@ -24,7 +24,7 @@ func main() {
 	fmt.Println(`Hello, world`)
 }
 
-<<< noimport-error
+<<< noimportError
 Run: exit status 1
 
 <<< noimport
@@ -32,4 +32,3 @@ Run: exit status 1
 ./main.go:4:2: undefined: fmt
 
 exit status 1
-

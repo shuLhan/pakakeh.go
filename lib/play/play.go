@@ -157,47 +157,18 @@ func Run(req *Request) (out []byte, err error) {
 		runningCmd.delete(req.cookieSid.Value)
 	}
 
-	if len(req.UnsafeRun) != 0 {
-		return unsafeRun(req)
-	}
-	if len(req.Body) == 0 {
-		return nil, nil
-	}
-
-	var tempdir = filepath.Join(userCacheDir, `goplay`, req.cookieSid.Value)
-
-	err = os.MkdirAll(tempdir, 0700)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: MkdirAll %q: %w`, logp, tempdir, err)
+	if len(req.UnsafeRun) == 0 {
+		if len(req.Body) == 0 {
+			return nil, nil
+		}
+		err = req.writes()
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
-	var gomod = filepath.Join(tempdir, `go.mod`)
-
-	var gomodTemplate = "module play.local\n\ngo " + req.GoVersion + "\n"
-
-	err = os.WriteFile(gomod, []byte(gomodTemplate), 0600)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: WriteFile %q: %w`, logp, gomod, err)
-	}
-
-	var maingo = filepath.Join(tempdir, `main.go`)
-
-	err = os.WriteFile(maingo, []byte(req.Body), 0600)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: WriteFile %q: %w`, logp, maingo, err)
-	}
-
-	cmd = newCommand(req, tempdir)
+	cmd = newCommand(req)
 	runningCmd.store(req.cookieSid.Value, cmd)
-	out = cmd.run()
-
-	return out, nil
-}
-
-func unsafeRun(req *Request) (out []byte, err error) {
-	var cmd = newCommand(req, req.UnsafeRun)
-	runningCmd.store(req.cookieSid.Value, cmd)
-
 	out = cmd.run()
 
 	return out, nil
