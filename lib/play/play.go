@@ -122,6 +122,22 @@ var runningCmd = runManager{
 	sidCommand: make(map[string]*command),
 }
 
+var userHomeDir string
+var userCacheDir string
+
+func init() {
+	var err error
+	userHomeDir, err = os.UserHomeDir()
+	if err != nil {
+		userHomeDir = os.TempDir()
+	}
+
+	userCacheDir, err = os.UserCacheDir()
+	if err != nil {
+		userCacheDir = os.TempDir()
+	}
+}
+
 // Format the Go code in the [Request.Body] and return the result to out.
 // Any syntax error on the code will be returned as error.
 func Format(req Request) (out []byte, err error) {
@@ -305,15 +321,8 @@ func Run(req *Request) (out []byte, err error) {
 	if len(req.UnsafeRun) != 0 {
 		return unsafeRun(req)
 	}
-
 	if len(req.Body) == 0 {
 		return nil, nil
-	}
-
-	var userCacheDir string
-	userCacheDir, err = os.UserCacheDir()
-	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	var tempdir = filepath.Join(userCacheDir, `goplay`, req.cookieSid.Value)
@@ -339,25 +348,15 @@ func Run(req *Request) (out []byte, err error) {
 		return nil, fmt.Errorf(`%s: WriteFile %q: %w`, logp, maingo, err)
 	}
 
-	cmd, err = newCommand(req, tempdir)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
+	cmd = newCommand(req, tempdir)
 	runningCmd.store(req.cookieSid.Value, cmd)
-
 	out = cmd.run()
 
 	return out, nil
 }
 
 func unsafeRun(req *Request) (out []byte, err error) {
-	var logp = `unsafeRun`
-
-	var cmd *command
-	cmd, err = newCommand(req, req.UnsafeRun)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
+	var cmd = newCommand(req, req.UnsafeRun)
 	runningCmd.store(req.cookieSid.Value, cmd)
 
 	out = cmd.run()
@@ -389,12 +388,8 @@ func Test(req *Request) (out []byte, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	cmd, err = newTestCommand(req)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
+	cmd = newTestCommand(req)
 	runningCmd.store(req.cookieSid.Value, cmd)
-
 	out = cmd.run()
 
 	return out, nil
