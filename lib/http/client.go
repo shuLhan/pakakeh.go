@@ -51,7 +51,12 @@ type Client struct {
 func NewClient(opts ClientOptions) (client *Client) {
 	opts.init()
 
-	httpTransport := &http.Transport{
+	client = &Client{
+		opts:   opts,
+		Client: &http.Client{},
+	}
+
+	client.Client.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			Timeout:   opts.Timeout,
@@ -60,19 +65,11 @@ func NewClient(opts ClientOptions) (client *Client) {
 		MaxIdleConns:          1,
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   opts.Timeout,
-		ExpectContinueTimeout: 1 * time.Second,
+		ExpectContinueTimeout: opts.Timeout,
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: opts.AllowInsecure,
+		},
 	}
-
-	client = &Client{
-		opts:   opts,
-		Client: &http.Client{},
-	}
-	if opts.AllowInsecure {
-		httpTransport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: opts.AllowInsecure, //nolint:gosec
-		}
-	}
-	client.Client.Transport = httpTransport
 
 	client.setUserAgent()
 
