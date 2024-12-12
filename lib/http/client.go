@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -448,6 +448,13 @@ func (client *Client) PutJSON(req ClientRequest) (res *ClientResponse, err error
 	req.body = bytes.NewReader(params)
 
 	return client.doRequest(req)
+}
+
+// Transport return the [http.Transport] that Client use in the
+// RoundTripper.
+func (client *Client) Transport() (transport *http.Transport) {
+	transport, _ = client.Client.Transport.(*http.Transport)
+	return transport
 }
 
 func (client *Client) doRequest(req ClientRequest) (res *ClientResponse, err error) {
