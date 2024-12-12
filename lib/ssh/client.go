@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package ssh
 
@@ -312,7 +312,7 @@ func (cl *Client) Execute(ctx context.Context, cmd string) (err error) {
 		}
 	}
 
-	err = sess.RunWithContext(ctx, cmd)
+	err = runWithContext(ctx, sess, cmd)
 	if err != nil {
 		err = fmt.Errorf("ssh: Run %q: %s", cmd, err.Error())
 	}
@@ -440,4 +440,26 @@ func (cl *Client) SetSessionOutputError(stdout, stderr io.Writer) {
 
 func (cl *Client) String() string {
 	return cl.section.User() + "@" + cl.section.Hostname() + ":" + cl.section.Port()
+}
+
+func runWithContext(ctx context.Context, sess *ssh.Session, cmd string) (
+	err error,
+) {
+	err = sess.Start(cmd)
+	if err != nil {
+		return err
+	}
+
+	var waitq = make(chan error)
+	go func() {
+		waitq <- sess.Wait()
+	}()
+
+	select {
+	case <-ctx.Done():
+		err = sess.Signal(ssh.SIGKILL)
+	case err = <-waitq:
+	}
+
+	return err
 }
