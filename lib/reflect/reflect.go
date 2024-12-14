@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package reflect extends the standard reflect package.
 package reflect
@@ -17,9 +17,10 @@ const (
 	tagNoEqual = `noequal`
 )
 
-// DoEqual is a naive interfaces comparison that check and use Equaler
-// interface and return an error if its not match.
+// DoEqual is a naive interfaces comparison for two values.
 //
+// If the type is a struct and implement [Equaler] interface it will use the
+// [Equal] method in that struct to compare the values.
 // A struct's field tagged with `noequal:""` will be skipped from being
 // processed.
 func DoEqual(x, y interface{}) (err error) {
@@ -38,9 +39,10 @@ func DoEqual(x, y interface{}) (err error) {
 	return nil
 }
 
-// IsEqual is a naive interfaces comparison that check and use Equaler
-// interface.
+// IsEqual is a naive interfaces comparison for two values.
 //
+// If the type is a struct and implement [Equaler] interface it will use the
+// [Equal] method in that struct to compare the values.
 // A struct's field tagged with `noequal:""` will be skipped from being
 // processed.
 func IsEqual(x, y interface{}) bool {
@@ -767,22 +769,16 @@ func doEqualMap(v1, v2 reflect.Value) (err error) {
 // fields has equal value.
 // The type of both struct is already equal when this function called.
 func doEqualStruct(v1, v2 reflect.Value) (err error) {
-	var (
-		m1 = v1.MethodByName(`IsEqual`)
-
-		callIn  []reflect.Value
-		callOut []reflect.Value
-	)
-
-	if m1.IsValid() {
-		callIn = append(callIn, v2.Addr())
-		callOut = m1.Call(callIn)
-		if len(callOut) == 1 && callOut[0].Kind() == reflect.Bool {
-			if callOut[0].Bool() {
-				return nil
-			}
-			return fmt.Errorf("IsEqual: %s.IsEqual(%s) return false", v1.String(), v2.String())
+	var equalerType = reflect.TypeOf((*Equaler)(nil)).Elem()
+	if v1.Type().Implements(equalerType) {
+		var m1 = v1.MethodByName(`Equal`)
+		var callIn = []reflect.Value{v2.Addr()}
+		var callOut []reflect.Value = m1.Call(callIn)
+		var val = callOut[0].Interface()
+		if val == nil {
+			return nil
 		}
+		return val.(error)
 	}
 
 	var (
