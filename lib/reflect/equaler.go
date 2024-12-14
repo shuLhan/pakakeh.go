@@ -1,11 +1,14 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package reflect
 
-// Equaler is an interface that when implemented by a type, it will be used to
-// compare the value in Assert.
+// Equaler is an interface that when implemented by a struct type, it will
+// be used to compare the value in [DoEqual] or [IsEqual].
 type Equaler interface {
-	IsEqual(v interface{}) bool
+	// Equal compare the struct receiver with parameter v.
+	// The v value can be converted to struct type T using (*T).
+	// If both struct values are equal it should return nil.
+	Equal(v any) error
 }
