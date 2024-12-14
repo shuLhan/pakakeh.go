@@ -244,6 +244,11 @@ A library for working with time.
 Package totp implement Time-Based One-Time Password Algorithm based on RFC
 6238.
 
+[**watchfs/v2**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2)::
+Package watchfs implement naive file watcher.
+The version 2 simplify watching single file and directory.
+For directory watcher, it watch only one file instead of all included files.
+
 [**websocket**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/websocket)::
 The WebSocket library for server and client. This WebSocket library has
 been tested with autobahn testsuite with 100% success rate.
