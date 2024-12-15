@@ -4,7 +4,6 @@
 *.cprof
 *.csv
 *.dat
-*.html
 *.mprof
 *.oob
 *.perf
@@ -15,6 +14,7 @@
 *.stats
 *.test
 *.zst
+/*.html
 /_bin/ansua
 /_bin/bcrypt
 /_bin/emaildecode
