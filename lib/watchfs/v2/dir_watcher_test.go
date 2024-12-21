@@ -38,6 +38,7 @@ func TestWatchDirOptions(t *testing.T) {
 
 func TestWatchDirInitialScan(t *testing.T) {
 	listCase := []struct {
+		expFiles map[string]os.FileInfo
 		desc     string
 		opts     DirWatcherOptions
 		expIndex DirWatcher
@@ -76,6 +77,13 @@ func TestWatchDirInitialScan(t *testing.T) {
 				`testdata/inc/index.html`: nodeExcluded,
 			},
 		},
+		expFiles: map[string]os.FileInfo{
+			`testdata/inc/index.adoc`: &node{
+				name: `testdata/inc/index.adoc`,
+				size: 7,
+				mode: 0644,
+			},
+		},
 	}, {
 		desc: `With empty includes`,
 		opts: DirWatcherOptions{
@@ -112,6 +120,16 @@ func TestWatchDirInitialScan(t *testing.T) {
 				},
 			},
 		},
+		expFiles: map[string]os.FileInfo{
+			`testdata/inc/index.css`: &node{
+				name: `testdata/inc/index.css`,
+				mode: 0644,
+			},
+			`testdata/inc/index.html`: &node{
+				name: `testdata/inc/index.html`,
+				mode: 0644,
+			},
+		},
 	}}
 
 	for _, tc := range listCase {
@@ -122,6 +140,8 @@ func TestWatchDirInitialScan(t *testing.T) {
 		dwatch.Stop()
 		test.Assert(t, tc.desc+`: idxDir`, tc.expIndex.idxDir, dwatch.idxDir)
 		test.Assert(t, tc.desc+`: idxFile`, tc.expIndex.idxFile, dwatch.idxFile)
+		gotFiles := dwatch.Files()
+		test.Assert(t, tc.desc+`: Files`, tc.expFiles, gotFiles)
 	}
 }
 

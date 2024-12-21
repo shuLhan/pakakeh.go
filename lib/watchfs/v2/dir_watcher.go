@@ -66,6 +66,20 @@ func WatchDir(opts DirWatcherOptions) (dwatch *DirWatcher, err error) {
 	return dwatch, nil
 }
 
+// Files return all the files currently being watched, the one that filtered
+// by [watchfs.DirWatcherOptions.Includes], with its file information.
+// This method is not safe when called when DirWatcher has been running.
+func (dwatch *DirWatcher) Files() (files map[string]os.FileInfo) {
+	files = make(map[string]os.FileInfo)
+	for key, node := range dwatch.idxFile {
+		if node.size == nodeFlagExcluded {
+			continue
+		}
+		files[key] = &node
+	}
+	return files
+}
+
 // ForceRescan force to rescan for changes without waiting for
 // [watchfs.DirWatcherOptions.File] to be updated.
 func (dwatch *DirWatcher) ForceRescan() {
