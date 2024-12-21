@@ -160,10 +160,8 @@ func TestWatchDir(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = os.WriteFile(opts.FileWatcherOptions.File, []byte(`created`), 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
+
+		dwatch.ForceRescan()
 
 		var gotNames []string = listFileName(<-dwatch.C)
 		var expNames = []string{

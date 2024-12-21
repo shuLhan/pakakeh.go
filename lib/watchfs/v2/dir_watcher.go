@@ -66,6 +66,14 @@ func WatchDir(opts DirWatcherOptions) (dwatch *DirWatcher, err error) {
 	return dwatch, nil
 }
 
+// ForceRescan force to rescan for changes without waiting for
+// [watchfs.DirWatcherOptions.File] to be updated.
+func (dwatch *DirWatcher) ForceRescan() {
+	if dwatch.fwatch != nil {
+		dwatch.fwatch.c <- nil
+	}
+}
+
 // Stop watching the file and re-scanning the Root directory.
 func (dwatch *DirWatcher) Stop() {
 	if dwatch.fwatch != nil {
