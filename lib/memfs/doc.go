@@ -1,6 +1,5 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package memfs provide a library for mapping file system into memory and/or
 // to embed it inside go source file.
@@ -26,7 +25,8 @@
 //
 // By default only file with size less or equal to 5 MB will be included in
 // memory.
-// To increase the default size set the [Options.MaxFileSize] (in bytes).
+// To increase the default size set the [memfs.Options.MaxFileSize] (in
+// bytes).
 // For example, to change maximum file size to 10 MB,
 //
 //	var opts = memfs.Options{
@@ -56,8 +56,8 @@
 //
 // The memfs package support embedding the files into Go generated source
 // code.
-// After we create the MemFS instance, call the [GoEmbed] method to dump all
-// directory and files into Go source code.
+// After we create the MemFS instance, call the [memfs.GoEmbed] method to
+// dump all directory and files into Go source code.
 //
 // First, define global variable as container for all files to be embedded
 // in the same package as generated code,
@@ -66,7 +66,7 @@
 //
 //	var myFS *memfs.MemFS
 //
-// Second, create new instance of MemFS with [Options.Embed] is set,
+// Next, create new instance of MemFS with [memfs.Options.Embed] is set,
 //
 //	var opts = &Options{
 //		Embed: EmbedOptions{
@@ -88,7 +88,7 @@
 //	mfs, err = memfs.New(opts)
 //	...
 //
-// Third, call method [MemFS.GoEmbed] from the instance,
+// Finally, call method [MemFS.GoEmbed] from the instance,
 //
 //	mfs.GoEmbed()
 //

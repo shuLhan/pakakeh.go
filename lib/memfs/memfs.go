@@ -1,6 +1,5 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
 package memfs
 
@@ -21,6 +20,7 @@ import (
 	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/html"
 	libints "git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
 )
 
 const (
@@ -29,17 +29,17 @@ const (
 
 // MemFS contains directory tree of file system in memory.
 type MemFS struct {
-	http.FileSystem
-
 	PathNodes *PathNode
 	Root      *Node
 	Opts      *Options
-	dw        *DirWatcher
-	watchopts *WatchOptions
+	dw        *watchfs.DirWatcher
 
 	// subfs contains another MemFS instances.
 	// During Get, it will evaluated in order.
 	subfs []*MemFS
+
+	dwOptions watchfs.DirWatcherOptions
+	watchopts WatchOptions
 }
 
 // New create and initialize new memory file system from directory Root using
@@ -73,17 +73,6 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 
 	if mfs.Opts.isExcluded(sysPath) {
 		return nil, nil
-	}
-	if mfs.watchopts != nil && mfs.watchopts.isWatched(sysPath) {
-		child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
-				return nil, nil
-			}
-			return nil, fmt.Errorf(`%s %q: %w`, logp, sysPath, err)
-		}
-
-		mfs.PathNodes.Set(child.Path, child)
 	}
 	if !mfs.Opts.isIncluded(sysPath, fi) {
 		if child != nil {
@@ -397,11 +386,10 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 
 // StopWatch stop watching for update, from calling Watch.
 func (mfs *MemFS) StopWatch() {
-	if mfs.dw == nil {
-		return
+	if mfs.dw != nil {
+		mfs.dw.Stop()
+		mfs.dw = nil
 	}
-	mfs.dw.Stop()
-	mfs.dw = nil
 }
 
 // Update the node content and information in memory based on new file
@@ -615,32 +603,26 @@ func (mfs *MemFS) resetAllModTime(t time.Time) {
 	mfs.Root.resetAllModTime(t)
 }
 
-// Watch create and start the DirWatcher that monitor the memfs Root
-// directory based on the list of pattern on WatchOptions.Watches and
-// Options.Includes.
+// Watch create and start the [watchfs/v2.DirWatcher] that re-scan the content
+// of Root directory recursively on every [memfs.WatchOptions.Interval],
+// triggered by changes on [memfs.WatchOptions.File].
 //
-// The MemFS will remove or update the tree and node content automatically if
-// the file being watched get deleted or updated.
+// The watcher will remove or update the tree and node content automatically
+// if the included files is being deleted, created, or updated.
 //
-// The returned DirWatcher is ready to use.
-// To stop watching for update call the StopWatch.
-func (mfs *MemFS) Watch(watchopts WatchOptions) (dw *DirWatcher, err error) {
+// The returned channel changes return list of Node that has been deleted,
+// created, or updated.
+// To stop watching for update call the [MemFS.StopWatch].
+func (mfs *MemFS) Watch(watchopts WatchOptions) (
+	changes <-chan []*Node, err error,
+) {
 	var logp = `Watch`
 
-	err = watchopts.init()
-	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
-	mfs.watchopts = &watchopts
+	watchopts.init(mfs.Opts.Root)
+	mfs.watchopts = watchopts
 
 	if mfs.dw != nil {
-		return mfs.dw, nil
-	}
-
-	mfs.dw = &DirWatcher{
-		fs:      mfs,
-		Delay:   watchopts.Delay,
-		Options: *mfs.Opts,
+		mfs.StopWatch()
 	}
 
 	err = mfs.scanDir(mfs.Root)
@@ -648,12 +630,95 @@ func (mfs *MemFS) Watch(watchopts WatchOptions) (dw *DirWatcher, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = mfs.dw.Start()
+	mfs.dwOptions = watchfs.DirWatcherOptions{
+		FileWatcherOptions: watchopts.FileWatcherOptions,
+		Root:               mfs.Opts.Root,
+		Includes:           mfs.Opts.Includes,
+		Excludes:           mfs.Opts.Excludes,
+	}
+
+	mfs.dw, err = watchfs.WatchDir(mfs.dwOptions)
 	if err != nil {
 		// There should be no error here, since we already check and
 		// filled the required fields for DirWatcher.
-		return nil, fmt.Errorf("%s: %w", logp, err)
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	return mfs.dw, nil
+	var c = make(chan []*Node, 1)
+	go mfs.watch(c)
+
+	return c, nil
+}
+
+func (mfs *MemFS) watch(c chan []*Node) {
+	var (
+		changes []os.FileInfo
+		fi      os.FileInfo
+		node    *Node
+		err     error
+	)
+	for changes = range mfs.dw.C {
+		var listNode []*Node
+		for _, fi = range changes {
+			var sysPath = fi.Name()
+			var intPath = strings.TrimPrefix(sysPath, mfs.Opts.Root)
+			intPath = filepath.Join(`/`, intPath)
+			node, err = mfs.Get(intPath)
+			if err != nil {
+				if !errors.Is(err, fs.ErrNotExist) {
+					// Nothing we can do.
+					continue
+				}
+				node, err = mfs.addWatchFile(intPath, fi)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				listNode = append(listNode, node)
+				continue
+			}
+			if fi.Size() == watchfs.FileFlagDeleted {
+				if mfs.watchopts.Verbose {
+					fmt.Printf("MemFS: file deleted: %q\n", intPath)
+				}
+				mfs.RemoveChild(node.Parent, node)
+				listNode = append(listNode, node)
+				continue
+			}
+			if mfs.watchopts.Verbose {
+				fmt.Printf("MemFS: file updated: %q\n", intPath)
+			}
+			mfs.Update(node, fi)
+			listNode = append(listNode, node)
+		}
+		c <- listNode
+	}
+	close(c)
+}
+
+func (mfs *MemFS) addWatchFile(intPath string, watchfi os.FileInfo) (node *Node, err error) {
+	var dirPath = filepath.Dir(intPath)
+	var parent *Node
+	parent, err = mfs.Get(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	if parent == nil {
+		return nil, fmt.Errorf(`addWatchFile: cannot find parent of %q`, intPath)
+	}
+	var fi = &Node{
+		modTime: watchfi.ModTime(),
+		Path:    intPath,
+		name:    filepath.Base(intPath),
+		size:    watchfi.Size(),
+		mode:    watchfi.Mode(),
+	}
+	node, err = mfs.AddChild(parent, fi)
+	if err != nil {
+		return nil, err
+	}
+	if mfs.watchopts.Verbose {
+		fmt.Printf("MemFS: file created: %q\n", intPath)
+	}
+	return node, nil
 }

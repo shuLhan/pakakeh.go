@@ -1,6 +1,5 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
 package memfs_test
 
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
 )
 
 func ExampleNew() {
@@ -99,71 +99,73 @@ func ExampleMemFS_Search() {
 
 func ExampleMemFS_Watch() {
 	var (
-		watchOpts = memfs.WatchOptions{
-			Delay: 200 * time.Millisecond,
-		}
-
-		mfs  *memfs.MemFS
-		dw   *memfs.DirWatcher
-		node *memfs.Node
 		opts memfs.Options
-		ns   memfs.NodeState
 		err  error
 	)
 
-	opts.Root, err = os.MkdirTemp(``, `memfs_watch`)
+	opts.Root, err = os.MkdirTemp(``, `ExampleMemFS_Watch`)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	defer func() {
 		_ = os.RemoveAll(opts.Root)
 	}()
 
+	var mfs *memfs.MemFS
+
 	mfs, err = memfs.New(&opts)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
-	dw, err = mfs.Watch(watchOpts)
+	var fileToWatch = filepath.Join(opts.Root, memfs.DefaultWatchFile)
+	var watchOpts = memfs.WatchOptions{
+		FileWatcherOptions: watchfs.FileWatcherOptions{
+			File:     fileToWatch,
+			Interval: 200 * time.Millisecond,
+		},
+		Verbose: true,
+	}
+
+	var changesq <-chan []*memfs.Node
+
+	changesq, err = mfs.Watch(watchOpts)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
-	// Wait for the goroutine on Watch run.
-	time.Sleep(200 * time.Millisecond)
-
-	testFile := filepath.Join(opts.Root, `file`)
+	var testFile = filepath.Join(opts.Root, `file`)
 	err = os.WriteFile(testFile, []byte(`dummy content`), 0600)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
-	ns = <-dw.C
-
-	node, err = mfs.Get(`/file`)
+	err = os.WriteFile(fileToWatch, []byte(`x`), 0600)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
-	fmt.Printf("Node: %s: %s\n", node.Path, ns.State)
+	<-changesq
+
+	_, err = mfs.Get(`/file`)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	err = os.Remove(testFile)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
-	ns = <-dw.C
-	fmt.Printf("Node: %s: %s\n", ns.Node.Path, ns.State)
+	err = os.WriteFile(fileToWatch, []byte(`xx`), 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+	<-changesq
+	mfs.StopWatch()
+	<-changesq
 
-	dw.Stop()
-
-	//Output:
-	//Node: /file: FileStateCreated
-	//Node: /file: FileStateDeleted
+	// Output:
+	// MemFS: file created: "/file"
+	// MemFS: file deleted: "/file"
 }
