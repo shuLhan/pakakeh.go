@@ -1,58 +1,39 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
 package memfs
 
 import (
-	"regexp"
+	"path/filepath"
 	"time"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
 )
 
+// DefaultWatchFile define default file name to be watch for changes.
+// Any update to this file will trigger rescan on the memfs tree.
+const DefaultWatchFile = `.memfs_rescan`
+
+const defWatchInterval = 5 * time.Second
+
 // WatchOptions define an options for the MemFS Watch method.
+//
+// If the [watchfs.FileWatcherOptions.File] is empty it will default to
+// [DefaultWatchFile] inside the [memfs.Options.Root].
+// The [watchfs.FileWatcherOptions.Interval] must be greater than 10
+// milliseconds, otherwise it will default to 5 seconds.
 type WatchOptions struct {
-	// Watches contain list of regular expressions for files to be watched
-	// inside the Root, as addition to Includes pattern.
-	// If this field is empty, only files pass the Includes filter will be
-	// watched.
-	Watches []string
+	watchfs.FileWatcherOptions
 
-	watchRE []*regexp.Regexp
-
-	// Delay define the duration when the new changes will be checked from
-	// system.
-	// This field set the DirWatcher.Delay returned from Watch().
-	// This field is optional, default is 5 seconds.
-	Delay time.Duration
+	// Verbose if true print the file changes information to stdout.
+	Verbose bool
 }
 
-func (watchopts *WatchOptions) init() (err error) {
-	if watchopts.Delay < 100*time.Millisecond {
-		watchopts.Delay = defWatchDelay
+func (watchopts *WatchOptions) init(root string) {
+	if len(watchopts.File) == 0 {
+		watchopts.File = filepath.Join(root, DefaultWatchFile)
 	}
-
-	var (
-		v  string
-		re *regexp.Regexp
-	)
-	watchopts.watchRE = nil
-	for _, v = range watchopts.Watches {
-		re, err = regexp.Compile(v)
-		if err != nil {
-			return err
-		}
-		watchopts.watchRE = append(watchopts.watchRE, re)
+	if watchopts.Interval < 10*time.Millisecond {
+		watchopts.Interval = defWatchInterval
 	}
-	return nil
-}
-
-// isWatched return true if the sysPath is filtered to be watched.
-func (watchopts *WatchOptions) isWatched(sysPath string) bool {
-	var re *regexp.Regexp
-	for _, re = range watchopts.watchRE {
-		if re.MatchString(sysPath) {
-			return true
-		}
-	}
-	return false
 }
