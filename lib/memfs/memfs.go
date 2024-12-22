@@ -161,7 +161,7 @@ func (mfs *MemFS) AddFile(internalPath, externalPath string) (node *Node, err er
 	}
 	node.generateFuncName(path)
 
-	err = node.updateContent(mfs.Opts.MaxFileSize)
+	err = node.UpdateContent(mfs.Opts.MaxFileSize)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

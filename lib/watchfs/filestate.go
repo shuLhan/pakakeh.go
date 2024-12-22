@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: BSD-3-Clause
 
-package memfs
+package watchfs
 
 // FileState define the state of file.
 // There are four states of file: created, updated on mode, updated on content

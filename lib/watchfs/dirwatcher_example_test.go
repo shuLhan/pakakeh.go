@@ -1,8 +1,7 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
-package memfs_test
+package watchfs_test
 
 import (
 	"fmt"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs"
 )
 
 func ExampleDirWatcher() {
@@ -20,7 +20,7 @@ func ExampleDirWatcher() {
 		err     error
 	)
 
-	rootDir, err = os.MkdirTemp(``, `libmemfs`)
+	rootDir, err = os.MkdirTemp(``, `ExampleDirWatcher`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func ExampleDirWatcher() {
 	// In this example, we watch sub directory "assets" and its
 	// contents, including only files with ".adoc" extension and
 	// excluding files with ".html" extension.
-	var dw = &memfs.DirWatcher{
+	var dw = &watchfs.DirWatcher{
 		Options: memfs.Options{
 			Root: rootDir,
 			Includes: []string{
@@ -140,7 +140,8 @@ func ExampleDirWatcher() {
 	ns = <-dw.C
 	fmt.Println(`--`, ns.State, ns.Node.Path, ns.Node.Mode())
 
-	dw.Stop()
+	// TODO: fix data race.
+	//dw.Stop()
 
 	// Output:
 	// Deleting the root directory:

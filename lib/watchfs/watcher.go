@@ -1,8 +1,7 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
-package memfs
+package watchfs
 
 import (
 	"fmt"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
 
 const (
@@ -83,7 +84,7 @@ func newWatcher(parent *Node, fi os.FileInfo, d time.Duration, qchanges chan Nod
 	)
 
 	// Create new node based on FileInfo without caching the content.
-	node, err = NewNode(parent, fi, -1)
+	node, err = memfs.NewNode(parent, fi, -1)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

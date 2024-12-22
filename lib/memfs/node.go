@@ -112,7 +112,7 @@ func NewNode(parent *Node, fi os.FileInfo, maxFileSize int64) (node *Node, err e
 
 	node.size = fi.Size()
 
-	err = node.updateContent(maxFileSize)
+	err = node.UpdateContent(maxFileSize)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -532,7 +532,7 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	if newInfo.IsDir() {
 		err = node.updateDir(maxFileSize)
 	} else {
-		err = node.updateContent(maxFileSize)
+		err = node.UpdateContent(maxFileSize)
 	}
 	if err != nil {
 		return fmt.Errorf("%s %s: %w", logp, node.SysPath, err)
@@ -541,8 +541,8 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 	return nil
 }
 
-// updateContent read the content of file.
-func (node *Node) updateContent(maxFileSize int64) (err error) {
+// UpdateContent read the content of file.
+func (node *Node) UpdateContent(maxFileSize int64) (err error) {
 	if maxFileSize < 0 {
 		// Negative maxFileSize means content will not be read.
 		return nil
@@ -563,7 +563,7 @@ func (node *Node) updateContent(maxFileSize int64) (err error) {
 		if errors.Is(err, io.EOF) {
 			return nil
 		}
-		return fmt.Errorf("updateContent: %w", err)
+		return fmt.Errorf("UpdateContent: %w", err)
 	}
 
 	return nil
