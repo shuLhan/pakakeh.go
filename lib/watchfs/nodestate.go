@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: BSD-3-Clause
 
-package memfs
+package watchfs
 
 // NodeState contains the information about the file and its state.
 type NodeState struct {

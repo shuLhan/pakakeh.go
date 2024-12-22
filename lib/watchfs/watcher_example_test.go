@@ -1,8 +1,7 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
-package memfs_test
+package watchfs_test
 
 import (
 	"fmt"
@@ -10,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs"
 )
 
 func ExampleNewWatcher() {
@@ -18,8 +17,8 @@ func ExampleNewWatcher() {
 		content = `Content of file`
 
 		f       *os.File
-		watcher *memfs.Watcher
-		ns      memfs.NodeState
+		watcher *watchfs.Watcher
+		ns      watchfs.NodeState
 		err     error
 	)
 
@@ -29,7 +28,7 @@ func ExampleNewWatcher() {
 		log.Fatal(err)
 	}
 
-	watcher, err = memfs.NewWatcher(f.Name(), 150*time.Millisecond)
+	watcher, err = watchfs.NewWatcher(f.Name(), 150*time.Millisecond)
 	if err != nil {
 		log.Fatal(err)
 	}

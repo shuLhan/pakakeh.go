@@ -1,8 +1,7 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
-package memfs
+package watchfs
 
 // WatchCallback is a function that will be called when Watcher or DirWatcher
 // detect any changes on its file or directory.

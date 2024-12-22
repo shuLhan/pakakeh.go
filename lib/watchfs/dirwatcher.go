@@ -1,8 +1,7 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
-package memfs
+package watchfs
 
 import (
 	"fmt"
@@ -12,6 +11,8 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
 
 const (
@@ -33,7 +34,7 @@ type DirWatcher struct {
 	qrun chan struct{}
 
 	// The fs field initialized from Root if its nil.
-	fs *MemFS
+	fs *memfs.MemFS
 
 	// The root Node in fs.
 	root *Node
@@ -96,7 +97,7 @@ func (dw *DirWatcher) init() (err error) {
 
 		dw.Options.MaxFileSize = -1
 
-		dw.fs, err = New(&dw.Options)
+		dw.fs, err = memfs.New(&dw.Options)
 		if err != nil {
 			return fmt.Errorf(`%s: %w`, logp, err)
 		}
@@ -286,7 +287,7 @@ func (dw *DirWatcher) onUpdateDir(node *Node) {
 	// Store the current childs into a map first to easily get
 	// existing nodes.
 	for _, child = range node.Childs {
-		mapChild[child.name] = child
+		mapChild[child.Name()] = child
 	}
 	node.Childs = nil
 
@@ -341,7 +342,7 @@ func (dw *DirWatcher) onRootCreated() {
 		err  error
 	)
 
-	dw.fs, err = New(&dw.Options)
+	dw.fs, err = memfs.New(&dw.Options)
 	if err != nil {
 		log.Printf("%s: %s", logp, err)
 		return
@@ -402,11 +403,11 @@ func (dw *DirWatcher) onUpdateContent(node *Node, newInfo os.FileInfo) {
 		}
 	}
 
-	node.modTime = newInfo.ModTime()
-	node.size = newInfo.Size()
+	node.SetModTime(newInfo.ModTime())
+	node.SetSize(newInfo.Size())
 
 	if !node.IsDir() {
-		err = node.updateContent(dw.fs.Opts.MaxFileSize)
+		err = node.UpdateContent(dw.fs.Opts.MaxFileSize)
 		if err != nil {
 			log.Printf(`%s %q: %s`, logp, node.Path, err)
 		}
@@ -435,7 +436,7 @@ func (dw *DirWatcher) onUpdateMode(node *Node, newInfo os.FileInfo) {
 		}
 	}
 
-	node.mode = newInfo.Mode()
+	node.SetMode(newInfo.Mode())
 
 	var ns = NodeState{
 		Node:  *node,
