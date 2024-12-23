@@ -215,6 +215,7 @@ func (dw *DirWatcher) onCreated(parent, child *Node) (err error) {
 func (dw *DirWatcher) onDirDeleted(node *Node) {
 	var child *Node
 
+	dw.mtxFileWatcher.Lock()
 	for _, child = range node.Childs {
 		if child.IsDir() {
 			dw.onDirDeleted(child)
@@ -227,6 +228,7 @@ func (dw *DirWatcher) onDirDeleted(node *Node) {
 	dw.dirsLocker.Unlock()
 
 	dw.fs.RemoveChild(node.Parent, node)
+	dw.mtxFileWatcher.Unlock()
 
 	var ns = NodeState{
 		State: FileStateDeleted,
