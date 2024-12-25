@@ -54,6 +54,12 @@ encryption.
 [**ascii**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ascii)::
 A library for working with ASCII characters.
 
+[**binary**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/binary)::
+Package binary complement the standard [binary] package.
+Currently it implement append-only binary that encode the data using
+binary.Writer.
+We call them "Apo" for short.
+
 [**bytes**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/bytes)::
 A library for working with slice of bytes.
 

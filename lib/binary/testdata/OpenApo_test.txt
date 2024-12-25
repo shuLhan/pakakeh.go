@@ -1,0 +1,15 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
+
+Test opening Apo file for writing and reading.
+
+<<< This is what the file looks like on empty data.
+
+<<< empty
+empty
+          |  0  1  2  3  4  5  6  7 | 01234567 |   0   1   2   3   4   5   6   7 |
+          |  8  9  A  B  C  D  E  F | 89ABCDEF |   8   9   A   B   C   D   E   F |
+0x00000000| 01 00 00 00 00 00 00 00 | ........ |   1   0   0   0   0   0   0   0 |0
+0x00000008| 00 00 00 00 00 00 00 00 | ........ |   0   0   0   0   0   0   0   0 |8
+0x00000010| 11 00 00 00 00 00 00 00 | ........ |  17   0   0   0   0   0   0   0 |16
+0x00000018| 00                      | .        |   0                             |24
