@@ -9,6 +9,5 @@ package watchfs
 
 import "git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 
+// Node represent single file or directory.
 type Node = memfs.Node
-
-type Options = memfs.Options

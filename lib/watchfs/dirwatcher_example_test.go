@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs"
 )
 
@@ -29,7 +28,7 @@ func ExampleDirWatcher() {
 	// contents, including only files with ".adoc" extension and
 	// excluding files with ".html" extension.
 	var dw = &watchfs.DirWatcher{
-		Options: memfs.Options{
+		Options: watchfs.DirWatcherOptions{
 			Root: rootDir,
 			Includes: []string{
 				`assets/.*`,
@@ -38,8 +37,8 @@ func ExampleDirWatcher() {
 			Excludes: []string{
 				`.*\.html$`,
 			},
+			Delay: 100 * time.Millisecond,
 		},
-		Delay: 100 * time.Millisecond,
 	}
 
 	err = dw.Start()

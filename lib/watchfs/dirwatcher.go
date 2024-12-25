@@ -49,23 +49,7 @@ type DirWatcher struct {
 	// key.
 	fileWatcher map[string]*Watcher
 
-	// This struct embed Options to map the directory to be watched
-	// into memory.
-	//
-	// The Root field define the directory that we want to watch.
-	//
-	// Includes contains list of regex to filter file names that we want
-	// to be notified.
-	//
-	// Excludes contains list of regex to filter file names that we did
-	// not want to be notified.
-	Options
-
-	// Delay define a duration when the new changes will be fetched from
-	// system.
-	// This field is optional, minimum is 100 milli second and default
-	// is 5 seconds.
-	Delay time.Duration
+	Options DirWatcherOptions
 
 	// dirsLocker protect adding and removing key in [dirs].
 	dirsLocker sync.Mutex
@@ -80,24 +64,29 @@ type DirWatcher struct {
 func (dw *DirWatcher) init() (err error) {
 	var logp = `init`
 
-	if dw.Delay < 100*time.Millisecond {
-		dw.Delay = defWatchDelay
+	if dw.Options.Delay < 100*time.Millisecond {
+		dw.Options.Delay = defWatchDelay
 	}
 
 	if dw.fs == nil {
 		var fi fs.FileInfo
 
-		fi, err = os.Stat(dw.Root)
+		fi, err = os.Stat(dw.Options.Root)
 		if err != nil {
 			return fmt.Errorf(`%s: %w`, logp, err)
 		}
 		if !fi.IsDir() {
-			return fmt.Errorf(`%s: %q is not a directory`, logp, dw.Root)
+			return fmt.Errorf(`%s: %q is not a directory`,
+				logp, dw.Options.Root)
 		}
 
-		dw.Options.MaxFileSize = -1
-
-		dw.fs, err = memfs.New(&dw.Options)
+		var mfsOpts = memfs.Options{
+			MaxFileSize: -1,
+			Root:        dw.Options.Root,
+			Includes:    dw.Options.Includes,
+			Excludes:    dw.Options.Excludes,
+		}
+		dw.fs, err = memfs.New(&mfsOpts)
 		if err != nil {
 			return fmt.Errorf(`%s: %w`, logp, err)
 		}
@@ -344,7 +333,13 @@ func (dw *DirWatcher) onRootCreated() {
 		err  error
 	)
 
-	dw.fs, err = memfs.New(&dw.Options)
+	var mfsOpts = memfs.Options{
+		MaxFileSize: -1,
+		Root:        dw.Options.Root,
+		Includes:    dw.Options.Includes,
+		Excludes:    dw.Options.Excludes,
+	}
+	dw.fs, err = memfs.New(&mfsOpts)
 	if err != nil {
 		log.Printf("%s: %s", logp, err)
 		return
@@ -454,7 +449,7 @@ func (dw *DirWatcher) onUpdateMode(node *Node, newInfo os.FileInfo) {
 func (dw *DirWatcher) start() {
 	var (
 		logp   = `DirWatcher`
-		ticker = time.NewTicker(dw.Delay)
+		ticker = time.NewTicker(dw.Options.Delay)
 
 		ns  NodeState
 		err error
@@ -465,7 +460,7 @@ func (dw *DirWatcher) start() {
 		case <-ticker.C:
 			var fi os.FileInfo
 
-			fi, err = os.Stat(dw.Root)
+			fi, err = os.Stat(dw.Options.Root)
 			if err != nil {
 				if os.IsNotExist(err) {
 					if dw.fs != nil {
@@ -525,7 +520,7 @@ func (dw *DirWatcher) startWatchingFile(parent, child *Node) (err error) {
 		watcher *Watcher
 	)
 
-	watcher, err = newWatcher(parent, child, dw.Delay, dw.qFileChanges)
+	watcher, err = newWatcher(parent, child, dw.Options.Delay, dw.qFileChanges)
 	if err != nil {
 		return fmt.Errorf(`%s %q: %w`, logp, child.SysPath, err)
 	}

@@ -48,10 +48,10 @@ func TestDirWatcher_renameDirectory(t *testing.T) {
 	}
 
 	dw = DirWatcher{
-		Options: Options{
-			Root: rootDir,
+		Options: DirWatcherOptions{
+			Root:  rootDir,
+			Delay: 100 * time.Millisecond,
 		},
-		Delay: 100 * time.Millisecond,
 	}
 
 	err = dw.Start()
@@ -106,12 +106,11 @@ func TestDirWatcher_removeDirSymlink(t *testing.T) {
 		dirSub  = filepath.Join(dirTmp, `sub`)
 		fileOld = filepath.Join(dirWd, `testdata`, `index.html`)
 		fileNew = filepath.Join(dirSub, `index.html`)
-		opts    = Options{
-			Root: dirTmp,
-		}
-		dw = DirWatcher{
-			Options: opts,
-			Delay:   100 * time.Millisecond,
+		dw      = DirWatcher{
+			Options: DirWatcherOptions{
+				Root:  dirTmp,
+				Delay: 100 * time.Millisecond,
+			},
 		}
 
 		got NodeState
@@ -195,10 +194,10 @@ func TestDirWatcher_withSymlink(t *testing.T) {
 	// Create the DirWatcher instance and start watching the changes.
 
 	var dw = DirWatcher{
-		Options: Options{
-			Root: dirDest,
+		Options: DirWatcherOptions{
+			Root:  dirDest,
+			Delay: 100 * time.Millisecond,
 		},
-		Delay: 100 * time.Millisecond,
 	}
 
 	err = dw.Start()
