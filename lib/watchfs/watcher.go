@@ -14,14 +14,13 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
 
-const (
-	defWatchDelay    = 5 * time.Second
-	watcherQueueSize = 16
-)
+const watcherQueueSize = 16
 
 // Watcher is a naive implementation of file event change notification.
 type Watcher struct {
-	C        <-chan NodeState // The channel on which the changes are delivered.
+	// The channel on which the changes are delivered.
+	C <-chan NodeState
+
 	qchanges chan NodeState
 
 	done chan struct{}
