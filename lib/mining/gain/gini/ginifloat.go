@@ -4,9 +4,7 @@
 
 package gini
 
-import (
-	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
-)
+import "git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 
 // ComputeContinuFloat Given an attribute A and the target attribute T which contain
 // N classes in C, compute the information gain of A.
@@ -23,10 +21,10 @@ import (
 func (gini *Gini) ComputeContinuFloat(src, target, classes *[]float64) {
 	gini.IsContinu = true
 
-	gini.SortedIndex = floats64.IndirectSort(*src, true)
+	gini.SortedIndex = slices.IndirectSort(*src, true)
 
 	// (1)
-	floats64.SortByIndex(target, gini.SortedIndex)
+	slices.SortByIndex(target, gini.SortedIndex)
 
 	// (2)
 	gini.createContinuPartition(src)
@@ -53,7 +51,7 @@ func (gini *Gini) computeFloat(target, classes *[]float64) float64 {
 		return 0
 	}
 
-	classCount := floats64.Counts(*target, *classes)
+	classCount := slices.Counts(*target, *classes)
 
 	var sump2 float64
 

@@ -9,7 +9,6 @@ import (
 	"math"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
@@ -310,7 +309,7 @@ func (rt *Runtime) Performance(samples tabula.ClasetInterface,
 	// (1)
 	actuals := samples.GetClassAsStrings()
 	sortedListID := numbers.IntCreateSeq(0, len(probs)-1)
-	floats64.InplaceMergesort(probs, sortedListID, 0, len(probs), false)
+	slices.InplaceMergesort(probs, sortedListID, 0, len(probs), false)
 
 	// (2)
 	libstrings.SortByIndex(&actuals, sortedListID)

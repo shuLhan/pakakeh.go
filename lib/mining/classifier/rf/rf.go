@@ -16,9 +16,9 @@ import (
 	"math"
 	"slices"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/cart"
+	libslices "git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
@@ -275,9 +275,8 @@ func (forest *Runtime) ClassifySet(samples tabula.ClasetInterface,
 		// (1.2)
 		classProbs := libstrings.FrequencyOfTokens(votes, vs, false)
 
-		_, idx, ok := floats64.Max(classProbs)
-
-		if ok {
+		_, idx := libslices.Max2(classProbs)
+		if idx >= 0 {
 			predicts = append(predicts, vs[idx])
 		}
 

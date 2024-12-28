@@ -11,7 +11,7 @@ package gini
 import (
 	"fmt"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
@@ -167,7 +167,7 @@ func (gini *Gini) ComputeContinu(src *[]float64, target, classes *[]string) {
 	T2 := make([]string, len(*target))
 	copy(T2, *target)
 
-	gini.SortedIndex = floats64.IndirectSort(A2, true)
+	gini.SortedIndex = slices.IndirectSort(A2, true)
 
 	// sort the target attribute using sorted index.
 	libstrings.SortByIndex(&T2, gini.SortedIndex)

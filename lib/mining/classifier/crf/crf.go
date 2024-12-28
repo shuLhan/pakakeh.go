@@ -15,10 +15,10 @@ import (
 	"math"
 	"sort"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/rf"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
@@ -368,7 +368,7 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 	vs := samples.GetClassValueSpace()
 	stageProbs := make([]float64, len(vs))
 	stageSumProbs := make([]float64, len(vs))
-	sumWeights := floats64.Sum(crf.weights)
+	sumWeights := slices.Sum(crf.weights)
 
 	// (1)
 	rows := samples.GetDataAsRows()
@@ -400,8 +400,8 @@ func (crf *Runtime) ClassifySetByWeight(samples tabula.ClasetInterface,
 		}
 
 		// (1.3)
-		_, maxi, ok := floats64.Max(stageProbs)
-		if ok {
+		_, maxi := slices.Max2(stageProbs)
+		if maxi >= 0 {
 			predicts = append(predicts, vs[maxi])
 		}
 
