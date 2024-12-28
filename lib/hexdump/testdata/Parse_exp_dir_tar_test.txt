@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 >>> exp_dir.tar
 0000000 7865 5f70 6964 2f72 0000 0000 0000 0000
 0000010 0000 0000 0000 0000 0000 0000 0000 0000

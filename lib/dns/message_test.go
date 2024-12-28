@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -974,7 +974,7 @@ func TestMessageAddAuthority(t *testing.T) {
 	// Compare the message packet.
 
 	bb.Reset()
-	libbytes.DumpPrettyTable(&bb, msg.Question.String(), msg.packet)
+	hexdump.PrettyPrint(&bb, msg.Question.String(), msg.packet)
 
 	exp = tdata.Output[`packet`]
 	test.Assert(t, `AddAuthority`, string(exp), bb.String())
@@ -2101,7 +2101,7 @@ func TestUnpackMessage_OPT(t *testing.T) {
 		bbuf   bytes.Buffer
 	)
 	for _, tcase = range listCase {
-		stream, err = libbytes.ParseHexDump(tdata.Input[tcase], true)
+		stream, err = hexdump.Parse(tdata.Input[tcase], true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -2125,7 +2125,7 @@ func TestUnpackMessage_OPT(t *testing.T) {
 			t.Fatal(err)
 		}
 		bbuf.Reset()
-		libbytes.DumpPrettyTable(&bbuf, msg.Question.String(), stream)
+		hexdump.PrettyPrint(&bbuf, msg.Question.String(), stream)
 		tcase += `.hexdump`
 		test.Assert(t, tcase, string(tdata.Output[tcase]), bbuf.String())
 	}
@@ -2161,7 +2161,7 @@ func TestUnpackMessage_SVCB(t *testing.T) {
 		msg    *Message
 	)
 	for _, name = range listCase {
-		stream, err = libbytes.ParseHexDump(tdata.Input[name], true)
+		stream, err = hexdump.Parse(tdata.Input[name], true)
 		if err != nil {
 			t.Fatal(logp, err)
 		}

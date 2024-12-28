@@ -102,6 +102,11 @@ A library for working with slice of float64.
 [**git**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/git)::
 A wrapper for git command line interface.
 
+[**hexdump**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/hexdump)::
+Package hexdump implements reading and writing bytes from and into
+hexadecimal number.
+It support parsing output from hexdump(1) tool.
+
 [**http**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/http)::
 Package http extends the standard http package with simplified routing handler
 and builtin memory file system.

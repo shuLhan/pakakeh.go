@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"testing"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -75,7 +75,7 @@ func TestParseZone(t *testing.T) {
 		)
 		for x, msg = range zone.messages {
 			bb.Reset()
-			libbytes.DumpPrettyTable(&bb, msg.Question.String(), msg.packet)
+			hexdump.PrettyPrint(&bb, msg.Question.String(), msg.packet)
 
 			vstr = fmt.Sprintf(`message_%d.hex`, x)
 			vbytes = tdata.Output[vstr]
@@ -155,7 +155,7 @@ func TestParseZone_SVCB(t *testing.T) {
 
 		for x, msg = range zone.messages {
 			out.Reset()
-			libbytes.DumpPrettyTable(&out, msg.Question.String(), msg.packet)
+			hexdump.PrettyPrint(&out, msg.Question.String(), msg.packet)
 
 			tag = fmt.Sprintf(`%s:message_%d.hex`, name, x)
 			stream = tdata.Output[tag]

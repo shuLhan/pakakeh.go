@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
 // SPDX-License-Identifier: BSD-3-Clause
 
 package binary
@@ -9,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/hexdump"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -47,7 +48,7 @@ func TestOpenApo(t *testing.T) {
 	}
 
 	var gotDump bytes.Buffer
-	libbytes.DumpPrettyTable(&gotDump, `empty`, gotb)
+	hexdump.PrettyPrint(&gotDump, `empty`, gotb)
 
 	var exp = string(tdata.Output[`empty`])
 	test.Assert(t, `empty`, exp, gotDump.String())
@@ -141,7 +142,7 @@ func testWrite(t *testing.T, tcase testCaseWrite, apow *ApoFile) {
 	}
 
 	var gotDump bytes.Buffer
-	libbytes.DumpPrettyTable(&gotDump, tcase.tag, gotb)
+	hexdump.PrettyPrint(&gotDump, tcase.tag, gotb)
 
 	test.Assert(t, tcase.tag, tcase.expHexdump, gotDump.String())
 }

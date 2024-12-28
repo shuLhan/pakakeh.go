@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 >>> trailing new line
 0000000 6548 6c6c 2c6f 7720 726f 646c 0a21
 
