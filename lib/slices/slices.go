@@ -3,7 +3,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Package slices complement the standard [slices] package for working with
-// slices with type that is comparable.
+// slices comparable and [cmp.Ordered] types.
+//
+// List of current features,
+//
+//   - sort slice of [cmp.Ordered] types using in-place mergesort algorithm.
+//   - sort slice of [cmp.Ordered] types by predefined index.
+//   - count number of value occurrence in slice of [comparable] types.
+//   - find minimum or maximum value in slice of [cmp.Ordered] types.
+//   - sum slice of [constraints.Integer] or [constraints.Float] types.
 package slices
 
 import (
@@ -11,6 +19,10 @@ import (
 
 	"golang.org/x/exp/constraints"
 )
+
+// sortThreshold when the data less than sortThreshold, insertion sort
+// will be used to replace mergesort.
+const sortThreshold = 7
 
 // Count the number of occurence of val in slice.
 func Count[S []E, E comparable](slice S, val E) (count int) {
@@ -91,7 +103,7 @@ func InplaceInsertionSort[S []E, E cmp.Ordered](
 func InplaceMergesort[S []E, E cmp.Ordered](
 	slice S, ids []int, l, r int, isAsc bool,
 ) {
-	if l+7 >= r {
+	if r-l <= sortThreshold {
 		// If data length <= Threshold, then use insertion sort.
 		InplaceInsertionSort(slice, ids, l, r, isAsc)
 		return
