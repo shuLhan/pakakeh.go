@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package numbers provide miscellaneous functions for working with integer,
 // float, slice of integer, and slice of floats.
@@ -16,8 +16,6 @@
 //   - sum slice of integer/float
 package numbers
 
-const (
-	// SortThreshold when the data less than SortThreshold, insertion sort
-	// will be used to replace mergesort.
-	SortThreshold = 7
-)
+// SortThreshold when the data less than SortThreshold, insertion sort
+// will be used to replace mergesort.
+const SortThreshold = 7
