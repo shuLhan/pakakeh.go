@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
+// Command ansua is CLI to help tracking time.
+// The ansua command run a timer on defined duration and optionally run a
+// command when timer finished.
 package main
 
 import (

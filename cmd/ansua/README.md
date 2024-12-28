@@ -8,7 +8,7 @@ ansua is a command line interface to help tracking time.
 
 ## DESCRIPTION
 
-ansua execute a timer on defined duration and optionally run a command when
+ansua run a timer on defined duration and optionally run a command when
 timer finished.
 
 When ansua timer is running, one can pause the timer by pressing p+Enter,
