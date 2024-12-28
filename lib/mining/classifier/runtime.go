@@ -10,8 +10,8 @@ import (
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/dsv"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/numbers"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/tabula"
 )
@@ -336,7 +336,7 @@ func (rt *Runtime) computePerfByProbs(samples tabula.ClasetInterface,
 	actuals []string, probs []float64,
 ) {
 	vs := samples.GetClassValueSpace()
-	nactuals := ints.To64(samples.Counts())
+	nactuals := slices.ToInt64(samples.Counts())
 	nclass := libstrings.CountTokens(actuals, vs, false)
 
 	pprev := math.Inf(-1)

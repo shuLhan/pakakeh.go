@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 )
 
@@ -186,13 +186,13 @@ func (claset *Claset) CountValueSpaces() {
 func (claset *Claset) RecountMajorMinor() {
 	claset.CountValueSpaces()
 
-	_, maxIdx, maxok := ints.Max(claset.counts)
-	_, minIdx, minok := ints.Min(claset.counts)
+	_, maxIdx := slices.Max2(claset.counts)
+	_, minIdx := slices.Min2(claset.counts)
 
-	if maxok {
+	if maxIdx >= 0 {
 		claset.major = claset.vs[maxIdx]
 	}
-	if minok {
+	if minIdx >= 0 {
 		claset.minor = claset.vs[minIdx]
 	}
 }

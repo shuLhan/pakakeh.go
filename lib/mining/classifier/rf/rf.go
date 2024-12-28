@@ -14,9 +14,9 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/floats64"
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mining/classifier/cart"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
@@ -314,7 +314,7 @@ func (forest *Runtime) Votes(sample *tabula.Row, sampleIdx int) (
 	for x, tree := range forest.trees {
 		// (1)
 		if sampleIdx >= 0 {
-			exist := ints.IsExist(forest.bagIndices[x],
+			exist := slices.Contains(forest.bagIndices[x],
 				sampleIdx)
 			if exist {
 				continue

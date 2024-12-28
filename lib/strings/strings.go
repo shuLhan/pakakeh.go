@@ -9,7 +9,7 @@ package strings
 import (
 	"strings"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 )
 
 // AppendUniq append case-insensitive strings to slice of input without
@@ -228,7 +228,7 @@ func MostFrequentTokens(words []string, tokens []string, sensitive bool) string 
 	}
 
 	tokensCount := CountTokens(words, tokens, sensitive)
-	_, maxIdx, _ := ints.Max(tokensCount)
+	_, maxIdx := slices.Max2(tokensCount)
 
 	return tokens[maxIdx]
 }

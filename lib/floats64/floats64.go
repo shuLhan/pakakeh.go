@@ -5,9 +5,7 @@
 // Package floats64 provide a library for working with slice of 64 bit float.
 package floats64
 
-import (
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
-)
+import "git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 
 // Count number of class in data.
 func Count(d []float64, class float64) (count int) {
@@ -104,12 +102,12 @@ func InplaceInsertionSort(d []float64, ids []int, l, r int, asc bool) {
 		for y := x + 1; y < r; y++ {
 			if asc {
 				if d[x] > d[y] {
-					ints.Swap(ids, x, y)
+					slices.Swap(ids, x, y)
 					Swap(d, x, y)
 				}
 			} else {
 				if d[x] < d[y] {
-					ints.Swap(ids, x, y)
+					slices.Swap(ids, x, y)
 					Swap(d, x, y)
 				}
 			}
@@ -186,7 +184,7 @@ func MaxCountOf(d, classes []float64) (float64, bool) {
 
 	counts := Counts(d, classes)
 
-	_, maxi, _ := ints.Max(counts)
+	_, maxi := slices.Max2(counts)
 
 	return classes[maxi], true
 }
@@ -340,7 +338,7 @@ func moveY(d []float64, x, y, r int, asc bool) int {
 
 func multiswap(d []float64, idx []int, x, y, ylast int) int {
 	for y < ylast {
-		ints.Swap(idx, x, y)
+		slices.Swap(idx, x, y)
 		Swap(d, x, y)
 		x++
 		y++

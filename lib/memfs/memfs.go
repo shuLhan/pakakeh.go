@@ -18,7 +18,7 @@ import (
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libhtml "git.sr.ht/~shulhan/pakakeh.go/lib/html"
-	libints "git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 	libstrings "git.sr.ht/~shulhan/pakakeh.go/lib/strings"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
 )
@@ -372,7 +372,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 			continue
 		}
 
-		allIndexes = libints.MergeByDistance(allIndexes, nil, snippetLen)
+		allIndexes = slices.MergeByDistance(allIndexes, nil, snippetLen)
 		snippets := libbytes.SnippetByIndexes(node.lowerv, allIndexes, snippetLen)
 		for _, snippet := range snippets {
 			result.Snippets = append(result.Snippets, string(snippet))

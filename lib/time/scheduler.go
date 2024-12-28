@@ -7,13 +7,12 @@ package time
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 )
 
 // ErrScheduleUnknown define an error when unknown schedule kind parsed from
@@ -290,7 +289,7 @@ func (sch *Scheduler) parseListDayOfWeek(days string) {
 		if dayInt == -1 {
 			continue
 		}
-		if !ints.IsExist(sch.dow, dayInt) {
+		if !slices.Contains(sch.dow, dayInt) {
 			sch.dow = append(sch.dow, dayInt)
 		}
 	}

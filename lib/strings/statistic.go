@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/runes"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 )
 
 // CountAlnum return number of alpha-numeric character in text.
@@ -163,7 +163,7 @@ func MaxCharSequence(text string) (rune, int) {
 		return 0, 0
 	}
 
-	_, idx, _ := ints.Max(counts)
+	_, idx := slices.Max2(counts)
 
 	return chars[idx], counts[idx]
 }

@@ -6,9 +6,10 @@ package websocket
 
 import (
 	"context"
+	"slices"
 	"sync"
 
-	"git.sr.ht/~shulhan/pakakeh.go/lib/ints"
+	libslices "git.sr.ht/~shulhan/pakakeh.go/lib/slices"
 )
 
 // ClientManager manage list of active websocket connections on server.
@@ -169,7 +170,7 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 	cls.Lock()
 	defer cls.Unlock()
 
-	if !ints.IsExist(cls.all, conn) {
+	if !slices.Contains(cls.all, conn) {
 		cls.all = append(cls.all, conn)
 	}
 
@@ -204,7 +205,7 @@ func (cls *ClientManager) remove(conn int) {
 
 	delete(cls.frame, conn)
 	delete(cls.frames, conn)
-	cls.all, _ = ints.Remove(cls.all, conn)
+	cls.all, _ = libslices.Remove(cls.all, conn)
 
 	ctx, ok = cls.ctx[conn]
 	if ok {
@@ -218,7 +219,7 @@ func (cls *ClientManager) remove(conn int) {
 		if uid > 0 {
 			conns, ok = cls.conns[uid]
 			if ok {
-				conns, _ = ints.Remove(conns, conn)
+				conns, _ = libslices.Remove(conns, conn)
 
 				if len(conns) == 0 {
 					delete(cls.conns, uid)

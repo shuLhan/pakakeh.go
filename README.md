@@ -123,9 +123,6 @@ A library to parse the Hunspell file format.
 A library for reading and writing INI configuration as defined by Git
 configuration file syntax.
 
-[**ints**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ints)::
-A library for working with slice of integer.
-
 [**ints64**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ints64)::
 A library for working with slice of int64.
 
