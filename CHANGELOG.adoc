@@ -1,8 +1,15 @@
-= pakakeh.go CHANGELOG
-:toc:
-:sectanchors:
+// SPDX-FileCopyrightText: 2025 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: BSD-3-Clause
 
-This library is released every month, usually at the first week of month.
+= pakakeh.go CHANGELOG
+:sectanchors:
+:sectlinks:
+:toc:
+
+This Go module usually released every month, at the first week of the month.
+
+link:CHANGELOG_2024.html[Changelog in 2024^].
+This is changelog for `pakakeh.go` module since v0.52.0 until v0.58.1.
 
 link:CHANGELOG_2023.html[Changelog in 2023^].
 This is changelog for `pakakeh.go` module since v0.43.0 until v0.51.0.
@@ -20,849 +27,226 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 
-[#v0_58_1]
-== pakakeh.go v0.58.1 (2024-12-07)
+[#v0_59_0]
+== pakakeh.go v0.59.0 (2025-01-06)
 
-[#v0_58_1__enhancements]
-=== Enhancements
+This is the first release of pakakeh.go on the year 2025.
+There are many new features and cleaning up, including packages that
+merged into single package with help of type parameters.
 
-lib/play: add custom request to run unsafe directory directly::
-+
---
-As exceptional, the Run and HTTPHandleRun accept the following
-request for running program inside custom "go.mod",
+The first major changes is indicated by using "go 1.23.4" as minimum Go
+version in this module, to allow us using new packages like "slices" and
+"maps".
+
+In this release notes, we try new format.
+Instead of grouping each changes by Breaking changes, New features, Bug
+fixes, Enhancements, and/or Chores; we group them by package.
+Each paragraph in the package sections will be prefixed with tag "[BREAKING
+CHANGE]", "[NEW FEATURE]", "[BUG FIX]", "[ENHANCEMENT]", "[CHORE]" to
+indicates the type of changes.
+
+
+[#v0_59_0__lib_binary]
+=== lib/binary
+
+The "lib/binary] is new package that complement the standard binary package.
+
+[NEW FEATURE] +
+Implement append-only binary that encode the data using [binary.Writer].
+We call them "Apo" for short.
+
+[NEW FEATURE] +
+Implement buffer for reading/writing in BigEndian.
+The `BigEndianBuffer` provides backing storage for writing (most of) Go
+native types into binary in big-endian order.
+The zero value of BigEndianBuffer is an empty buffer ready to use.
+
+The following basic types are supported for Write and Read: bool, byte,
+int, float, complex, and string.
+The slice and array are also supported as long as the slice's element type
+is one of basic types.
+
+
+[#v0_59_0__lib_bytes]
+=== lib/bytes
+
+[BREAKING CHANGE] +
+In the "lib/bytes" we split the `hexdump` related functions to separate
+package, "lib/hexdump".
+
+
+[#v0_59_0__lib_floats64]
+=== lib/floats64
+
+[BREAKING CHANGE] +
+This package has been removed, merged into "slices" package.
+
+
+[#v0_59_0__lib_hexdump]
+=== lib/hexdump
+
+[NEW FEATURE] +
+Package `hexdump` implements reading and writing bytes from and into
+hexadecimal number.
+It support parsing output from
+https://man.archlinux.org/man/hexdump.1[hexdump(1)] tool.
+
+
+[#v0_59_0__lib_http]
+=== lib/http
+
+[NEW FEATURE] +
+In the [lib/http.Client] we add new method `Transport` that return default
+HTTP Transport.
+The returned [http.Transport] is created after the Client instantiated.
+Their value can be customized by user when needed, which should affect
+the Transport inside the Client.
+
+
+[#v0_59_0__lib_ints]
+=== lib/ints
+
+[BREAKING CHANGE] +
+This package has been removed, merged into "slices" package.
+
+
+[#v0_59_0__lib_ints64]
+=== lib/ints64
+
+[BREAKING CHANGE] +
+This package has been removed, merged into "slices" package.
+
+
+[#v0_59_0__lib_memfs]
+=== lib/memfs
+
+[ENHANCEMENT] +
+In the "lib/memfs" we refactoring the `Watch` method to use the new
+"watchfs/v2" package.
+
+[BREAKING CHANGE] +
+The old Watcher and DirWatcher types now moved to `watchfs` package.
+This changes require exporting method [memfs.MemFS.UpdateContent].
+
+
+[#v0_59_0__lib_numbers]
+=== lib/numbers
+
+[CHORE] +
+In the package level, we remove unused README and LICENSE files.
+This package README has been merged into the package documentation and the
+LICENSE is same with the module one.
+
+We also remove some package documentation that should be in "lib/slices".
+
+
+[#v0_59_0__lib_play]
+=== lib/play
+
+[NEW FEATURE] +
+The [lib/play] now has function and HTTP handler to run Go test code.
+Since the test must run inside the directory that contains
+the Go file to be tested, the [HTTPHandleTest] API accept the following
+request format,
 
 ----
 {
-	"unsafe_run": <path>
+	"goversion": <string>,
+	"file": <string>,
+	"body": <string>,
+	"without_race": <boolean>
 }
 ----
 
-The "unsafe_run" define the path to directory relative to HTTP
-server working directory.
-Once request accepted it will change the directory into
-"unsafe_run" first and then run "go run ." directly.
-Go code that executed inside "unsafe_run" should be not
-modifiable and safe from mallicious execution.
---
-
-
-lib/play: add option to Run with specific Go version and without race::
-+
-The idea is to allow testing Go code on specific Go version.
-For example, before Go 1.22, the for loop with variable is shared
-among block statements, which cause every use of that variable is run
-with the last value.
-
-
-lib/play: expose the Timeout variable::
-+
-By exposing the Timeout, user can set their maximum time the program
-can run in their playground.
-
-
-[#v0_58_0]
-== pakakeh.go v0.58.0 (2024-10-06)
-
-This release update the minimum Go module to 1.22.0, the last version
-supported by Go tools.
-
-[#v0_58_0__breaking_changes]
-===  Breaking changes
-
-lib/http: remove writing StatusNoContent on ResponseTypeNode::
-+
-To make it consistent with RequestTypeNone, the
-ResponseTypeNone should not write any response header or
-HTTP status code.
-It will be handled manually by [Endpoint.Call].
-
-[#v0_58_0__new_features]
-===  New features
-
-lib/play: new package for formatting and running Go code::
-+
-Package play provides callable APIs and HTTP handlers to format and
-run Go code, similar to Go playground, but using HTTP instead of
-WebSocket.
-
-lib/http: add Server method to register handler by function::
-+
---
-The RegisterHandleFunc register a pattern with a handler, similar to
-[http.ServeMux.HandleFunc].
-The pattern follow the Go 1.22 format:
-
-	[METHOD] PATH
-
-The METHOD is optional, default to GET.
-The PATH must not contains the domain name and space.
-Unlike standard library, variable in PATH is read using ":var" not
-"{var}".
-This endpoint will accept any content type and return the body as is;
-it is up to the handler to read and set the content type and the
-response headers.
-
-If the METHOD and/or PATH is already registered it will panic.
---
-
-
-lib/bytes: add function AppendInt64 and AppendUint64::
-+
-The AppendInt64 append an int64 value into slice of byte.
-The AppendUint64 append an uint64 value into slice of byte.
-
-
-[#v0_57_0]
-== pakakeh.go v0.57.0 (2024-09-03)
-
-[#v0_57_0__breaking_changes]
-=== Breaking changes
-
-lib/sql: replace [http.FileSystem] with [memfs.MemFS]::
-+
---
-Accepting the [http.FileSystem] means that the parameter can receive an
-instance of [embed.FS], but in most cases, it will fail.
-
-Case example, when we embed SQL files for migration under
-"db/migration" using the "go:embed" directive,
-
-	//go:embed db/migration/*.sql
-	var DBMigrationFS embed.FS
-
-and then call the [Migrate] function, it will not find any ".sql"
-files inside the "/" directory because the files is stored under
-"db/migration/" prefix (also there is no "/" when using embed.FS).
---
-
-[#v0_57_0__chores]
-=== Chores
-
-lib/memfs: document the comparison with "go:embed" directive::
-+
---
-Compare it to "go:embed", the memfs package is more flexible and
-portable.
-Currently, we found three disadvantages of using "go:embed",
-
-- The "go:embed" only works if files or directory to be
-  embedded is in the same parent directory.
-- Accessing the embedded file require the original path.
-- No development mode.
-
-None of those limitation affected the memfs package.
---
-
-
-[#v0_56_0]
-== pakakeh.go v0.56.0 (2024-08-04)
-
-[#v0_56_0__new_features]
-=== New features
-
-cmd/emaildecode: CLI to decode email body to plain text::
-+
-The emaildecode accept file as input.
-If the email header contains content-transfer-encoding with value
-quoted-printable or base64, it will decode the message body and print it
-to stdout as plain text.
-
-[#v0_56_0__bug_fixes]
-=== Bug fixes
-
-lib/memfs: another fix for refresh::
-+
-In previous commit we use wrong condition when handling directory "." as
-Root.
-
-[#v0_56_0__enhancements]
-=== Enhancements
-
-lib/email: allow message that end lines with LF only::
-+
-Although, a message from network must end with CRLF, a message from
-(another) client may have been sanitized and end with LF only.
-
-lib/email: decode the message body based on content-transfer-encoding::
-+
-After the header and body has been parsed, if the header contains
-Content-Transfer-Encoding, we decode the body into its local formats.
-Currently supported encoding is "quoted-printable" and "base64".
-
-[#v0_56_0__others]
-=== Others
-
-lib/email: export the Header fields::
-+
-By exporting the fields, this allow the caller to filter or manage the
-field manually.
-
-_doc: add partial note and summary for RFC 2183::
-+
-The RFC 2183 is define Content-Disposition header field in the internet
-message.
-
-lib/ini: mention that marshaling []byte does not supported::
-+
-Due to "byte" is considered as "uint8" during reflection, we cannot tell
-whether the value is slice of byte of slice of number with type uint8.
-
-
-[#v0_55_2]
-== pakakeh.go v0.55.2 (2024-07-22)
-
-[#v0_55_2__bug_fix]
-=== Bug fix
-
-lib/memfs: sanitize the Root directory to fix refresh::
-+
-In [MemFS.refresh], if the requested url is "/file1" and [Options.Root]
-is ".", the path during refresh become "file1" and if passed to
-[filepath.Dir] it will return ".".
-This cause the loop on refresh never end because there is no PathNodes
-equal with ".".
-
-
-[#v0_55_1]
-== pakakeh.go v0.55.1 (2024-06-20)
-
-[#v0_55_1__enhancements]
-=== Enhancements
-
-lib/http: add request type HTML::
-+
-The RequestTypeHTML define the content type "text/html".
-
-lib/path: add method Path to Route::
-+
-Unlike String method that may return the key's name in returned path,
-the Path method return the path with all the keys has been substituted
-with values, even if its empty.
-
-
-[#v0_55_0]
-== pakakeh.go v0.55.0 (2024-05-04)
-
-[#v_55_0__breaking_changes]
-=== Breaking changes
-
-lib/http: refactoring "multipart/form-data" parameters in ClientRequest::
-+
---
-Previously, ClientRequest with type RequestTypeMultipartForm pass the
-type "map[string][]byte" in Params.
-This type hold the file upload, where key is the file name and []byte is
-content of file.
-Unfortunately, this model does not correct because a
-"multipart/form-data" can contains different field name and file name,
-for example
-
-----
---boundary
-Content-Disposition: form-data; name="field0"; filename="file0"
-Content-Type: application/octet-stream
-
-<Content of file0>
-----
-
-This changes fix this by changing the parameter type for
-RequestTypeMultipartForm to [*multipart.Form], which affect several
-functions including [Client.PutFormData] and [GenerateFormData].
---
-
-[#v0_55_0__bug_fixes]
-=== Bug fixes
-
-lib/dns: fix packing and unpacking OPT record::
-+
-The RDATA in OPT records can contains zero or _more_ options.
-Previously, we only handle unpacking and packing one option, now we
-handle multiple options.
-
-telegram/bot: fix Webhook URL registration::
-+
-Using [path.Join] cause "https://domain" become "https:/domain" which
-is not a valid URL.
-This bug caused by refactoring in b89afa24f.
-
-
-[#v0_55_0__enhancements]
-=== Enhancements
-
-lib/memfs: set embed file mode to print as octal::
-+
-Using octal in mode make the embedded code more readable, for example mode
-with permission "0o644" much more readable than 420".
-
-telegram/bot: register GET endpoint to test webhook::
-+
---
-The call to get "GET <Webhook.URL.Path>/<Token>" will return HTTP status
-200 with JSON body '{"code":200,"message":"OK"}'.
-
-This endpoint is to check if the bot server is really running.
---
-
-lib/http: allow all HTTP method to generate HTTP request with body::
-+
-Although the RFC 7231 says that no special defined meaning for a
-payload in GET, some implementation of HTTP API sometimes use GET with
-content type "application/x-www-form-urlencoded".
-
-lib/http: add new function [CreateMultipartFileHeader]::
-+
-The CreateMultipartFileHeader help creating [multipart.FileHeader]
-from raw bytes, that can be assigned to [*multipart.Form].
-
-
-[#v0_54_0]
-== pakakeh.go v0.54.0 (2024-04-04)
-
-This is the first release after we move the repository to SourceHut under
-different name: "pakakeh.go".
-There are several reasons for moving and naming.
-
-First, related to the name of package.
-We accidentally name the package with "share" a common word in English
-that does not reflect the content of repository.
-By moving to other repository, we can rename it to better and unique
-name, in this "pakakeh.go".
-Pakakeh is Minang word for tools, and ".go" suffix indicate that the
-repository related to Go programming language.
-
-Second, supporting open source.
-The new repository is hosted under sourcehut.org, the founder is known
-to support open source, and all their services are licensed under AGPL,
-unlike GitHub that are closed sources.
-
-Third, regarding GitHub CoPilot.
-https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#4-license-grant-to-us[The
-GitHub Terms of Service],
-allow any public content that are hosted there granted them to parse the
-content.
-On one side, GitHub helps and flourish the open source, but on another
-side have an issues
-https://githubcopilotinvestigation.com[issues]
-regarding scraping the copyleft license.
-
-
-[#v0_54_0__breaking_changes]
-=== Breaking changes
-
-Since we are moving to new repository, we fix all linter warnings and
-inconsistencies that we cannot changes on previous module.
-
-Breaking changes related to naming,
-
-* api/slack: [Message.IconUrl] become [Message.IconURL]
-* lib/dns: DefaultSoaMinumumTtl become DefaultSoaMinimumTTL
-* lib/email: [Message.SetBodyHtml] become [Message.SetBodyHTML]
-* lib/http: [Client.GenerateHttpRequest] become
-  [Client.GenerateHTTPRequest]
-* lib/http: [ClientOptions.ServerUrl] become [ClientOptions.ServerURL]
-* lib/http: [EndpointRequest.HttpWriter] become
-  [EndpointRequest.HTTPWriter]
-* lib/http: [EndpointRequest.HttpRequest] become
-  [EndpointRequest.HTTPRequest]
-* lib/http: [ServerOptions.EnableIndexHtml] become
-  [ServerOptions.EnableIndexHTML]
-* lib/http: [SSEConn.HttpRequest] become [SSEConn.HTTPRequest]
-* lib/smtp: [ClientOptions.ServerUrl] become [ClientOptions.ServerURL]
-* lib/ssh/sftp: [FileAttrs.SetUid] become [FileAttrs.SetUID]
-* lib/ssh/sftp: [FileAttrs.Uid] become [FileAttrs.UID]
-
-Changes on packages,
-
-lib/sql: remove deprecated Row type::
-+
-The Row type has been replaced with Meta type with more flexibility
-and features for generating type-safe SQL DML.
-
-lib/memfs: remove deprecated Merge function::
-+
-The Merge function has been replaced with [memfs.MemFS.Merge] for
-better API.
-
-lib: move package "net/html" to "lib/html"::
-+
-Putting "html" under "net" package make no sense.
-Another reason is to make the package flat under "lib/" directory.
-
-lib: move package "ssh/config" to "lib/sshconfig"::
-+
-Previously the "ssh/config" is used by the parent package "ssh" and
-"ssh/sftp" which is break the rule of package layer (the top package
-should be imported by sub package, not the other way around).
-
-lib/http: refactor of RegisterEndpoint and RegisterSSE to non-pointer::
-+
-Once the endpoint registered, the caller should not able to changes
-any values on endpoint again.
-
-lib/http: refactoring NewServer and NewClient::
-+
-The NewServer and NewClient now accept non-pointer options, so the
-caller unable to modify the options once the server or client has
-been created.
-
-lib/http: refactor Client methods to use struct ClientRequest::
-+
-Instead of three parameters, the Client methods now accept single struct
-[ClientRequest].
-
-lib/http: refactoring Client methods to return struct ClientResponse::
-+
-Instead of returning three variables, [http.Response], []byte, and error,
-we combine the [http.Response] and []byte into single struct:
-ClientResponse.
-
-lib/http: refactoring type of RequestMethod from int to string::
-+
-The reason is to make storing or encoding the RequestMethod value readable
-from user point of view instead of number, 0, 1, 2, etc.
-
-lib/http: refactor type of RequestType from int to string::
-+
-The reason is to make storing or encoding the RequestType value readable
-from human point of view instead of number, 0, 1, 2, etc.
-
-lib/http: refactoring type of ResponseType from int to string::
-+
-The reason is to make storing or encoding the value readable
-from human point of view instead of number, 0, 1, 2, etc.
-
-lib/http: refactoring FSHandler type to return [*memfs.Node]::
-+
---
-Changing FSHandler type to return [*memfs.Node], allow the handler to
-redirect or return custom node.
-
-One of the use case is when service Single Page Application (SPA), where
-route is handled by JavaScript.
-
-For example, when user requested "/dashboard" but dashboard directory
-does not exist, one can write the following handler to return
-"/index.html",
-
-    node, _ = memfs.Get(`/index.html`)
-    return node
---
-
-lib/dns: refactor [Message.Unpack] to [UnpackMessage]::
-+
---
-The previous API for Message is a little bit weird.
-Its provides creating Message manually, but expose the method
-[UnpackHeaderQuestion], meanwhile the field packet itself is unexported.
-
-In order to make it more clear we refactor [Message.Unpack] to
-function [UnpackMessage] that accept raw DNS packet.
---
-
-
-[#v0_54_0__new_features]
-=== New features
-
-test/httptest: new helper for testing HTTP server handler::
-+
---
-The Simulate function simulate HTTP server handler by generating
-[http.Request] from fields in [SimulateRequest]; and then call
-[http.HandlerFunc].
-
-The HTTP response from serve along with its raw body and original HTTP
-request then returned in [*SimulateResult].
---
-
-lib/dns: implements RFC 9460 for SVCB RR and HTTPS RR::
-+
-The dns package now support packing and unpacking DNS with record type 64
-(SVCB) and 65 (HTTPS).
-
-cmd/ansua: command line interface to help tracking time::
-+
---
-Usage,
-
-    ansua <duration> [ "<command>" ]
-
-ansua execute a timer on defined duration and optionally run a command
-when timer finished.
-
-When ansua timer is running, one can pause the timer by pressing p+Enter,
-and resume it by pressing r+Enter, or stopping it using CTRL+c.
---
-
-
-[#v0_54_0__bug_fixes]
-=== Bug fixes
-
-lib/memfs: trim trailing slash ("/") in the path of Get method::
-+
-The MemFS always store directory without slash.
-If caller request a directory node with slash, it will always return nil.
-
-lib/dns: use ParseUint to parse escaped octet in "\NNN" format::
-+
-Previously, we use ParseInt to parse escaped octet "\NNN", but using
-this method only allow decimal from 0 to 127, while the specification
-allow 0 to 255.
-
-
-[#v0_54_0__enhancements]
-=== Enhancements
-
-lib/http: handle CORS independently::
-+
---
-Previously, if [CORSOptions.AllowOrigins] not found we return it
-immediately without checking request "Access-Control-Request-Method",
-"Access-Control-Request-Headers", and other CORS options.
-
-This changes check each of them, a missing allow origins does not
-means empty allowed method, headers, MaxAge, or credentials.
---
-
-lib/bytes: add parameter networkByteOrder to ParseHexDump::
-+
---
-If networkByteOrder is true, the ParseHexDump read each hex string
-in network byte order or as order defined in text.
-
-While at it, fix reading and parsing single byte hex.
---
-
-cmd/httpdfs: set default include options to empty::
-+
-By default httpdfs now serve all files under base directory.
-
-
-
-[#v0_53_1]
-== pakakeh.go v0.53.1 (2024-03-02)
-
-[#v0_53_1__enhancements]
-=== Enhancements
-
-lib/sql: handle binding with the same name::
-+
-If [Meta.Bind] is called with the same name again, it should replace
-the existing named value.
-
-
-lib/dns: ignore invalid message::
-+
---
-If Query return a message but the failed to unpack due to invalid
-format, for example
-
-      unpackOPT: data length is out of range
-
-ignore it instead of disconnect the client connection.
---
-
-
-lib/http: export function to generate "multipart/form-data"::
-+
-The GenerateFormData generate the request body with boundary for
-HTTP content-type "multipart/form-data" from map[string][]byte.
-
-
-lib/dns: change the log mechanism by mode instead of by level::
-+
---
-This changes introduce three mode of debug:
-
-* DebugLevelDNS: log error on DNS level, in example empty answer,
-  ERR_NAME (domain name is invalid or not known) and so on.
-
-* DebugLevelCache: log cache operations.
-
-* DebugLevelConnPacket: log low level connection and package,
-  including request and response.
---
-
-
-[#v0_53_0]
-== pakakeh.go v0.53.0 (2024-02-04)
-
-[#v0_53_0__new_features]
-===  New features
-
-test/mock: implement mock for crypto [rand.Reader]::
-+
---
-The RandReader implement [io.Reader].
-To provide predictable result, the RandReader is seeded with slice of
-bytes.
-A call to Read will fill the passed bytes with those seed.
-
-For example, given seed as "abc" (length is three), calling Read with
-bytes length five will return "abcab".
---
-
-
-lib/sql: add new type Meta::
-+
---
-Meta contains the DML meta data, including driver name, list of column
-names, list of column holders, and list of values.
-
-The Meta type replace the Row type.
---
-
-
-lib/path: new package to work with path::
-+
---
-The path package provide a new type Route, detached from "lib/http".
-
-A Route represent a parsed path.
-A path can have a key, or binding, that can be replaced with string
-value.
-For example, "/org/:user/:repo" have two keys "user" and "repo".
-
-Route handle the path in case-insensitive manner.
---
-
-
-[#v0_53_0__bug_fixes]
-===  Bug fixes
-
-_bin/go-mod-tip: use committer timestamp instead of author timestamp::
-+
-If the tip is rebased to upstream, the author timestamp is not changes,
-but the commit timestamp changes.
-
-
-[#v0_53_0__enhancements]
-===  Enhancements
-
-lib/totp: add method GenerateWithTime and GenerateNWithTime::
-+
-The GenerateWithTime and GenerateNWithTime accept parameter
-[time.Time] as the relative time for generated password.
-
-
-lib/http: add support for If-Modified-Since in HandleFS::
-+
-If the node modification time is less than requested time value in
-request header If-Modified-Since, server will response with
-304 Not Modified.
-
-
-lib/http: refactoring Range request, limit content served by server::
-+
---
-When server receive,
-
-	GET /big
-	Range: bytes=0-
-
-and the requested resources is quite larger, where writing all content of
-file result in i/o timeout, it is best practice [1][2] if the server
-write only partial content and let the client continue with the
-subsequent Range request.
-
-In the above case, the server should response with,
-
-	HTTP/1.1 206 Partial content
-	Content-Range: bytes 0-<limit>/<size>
-	Content-Length: <limit>
-
-Where limit is maximum packet that is reasonable [3] for most of the
-client.
-In this server we choose 8MB as limit.
---
-
-
-lib/http: add method Head to Client::
-+
-The Head method send the HEAD request to path, with optional
-headers, and params in query parameters.
-
-
-lib/ini: add method Keys::
-+
-The Keys method return sorted list of all section, subsection, and
-variables as string where each of them separated by ":", for example
-"section:sub:var".
-
-
-[#v0_52_0]
-== pakakeh.go v0.52.0 (2024-01-06)
-
-[#v0_52_0__new_features]
-===  New features
-
-ssh/config: add method MarshalText and WriteTo::
-+
---
-The MarshalText method encode the Section back to ssh_config format
-with two spaces as indentation in key.
-
-The WriteTo method marshal the Section into text and write it to
-[io.Writer] w.
---
-
-lib/ssh: implement method Output on Client::
-+
---
-The Output method run the command and return its standard output and
-error as is.
-Any other error beside standard error, like connection, will be returned
-as error.
---
-
-ssh/sftp: implement method MkdirAll on Client::
-+
---
-The MkdirAll create directory on the server, from left to right.
-Each directory is separated by '/', where the left part is the parent of
-the right part.
-This method is similar to [os.MkdirAll].
---
-
-cmd/httpdfs: implement [libhttp.Server] with [memfs.MemFS]::
-+
---
-The httpdfs is a program to serve a directory under HTTP.
---
-
-[#v0_52_0__breaking_changes]
-=== Breaking changes
-
-ssh/config: refactoring the Config merge::
-+
---
-This changes rename method [Config.Prepend] to [Config.Merge].
-
-The way that how the other Config merged is changed.
-Instead of appending all of other's sections into the current Config,
-append the other Config instance to the current instance of Config.
-
-During [Config.Get] the top Config will be evaluated first, and then the
-other Config is evaluated in order of Merge.
---
-
-ssh/config: add parameter Config to NewSection::
-+
---
-This changes how the Section and parser initialized.
-
-Previously, the Config depends on the parser to set the workDir and
-homeDir and Section depends on Config only on Get; now its the other
-way around, from top to bottom.
-Config initialized first, then parser initialized using Config instance,
-and then Section initialized also using Config instance.
---
-
-lib/ssh: add parameter context to Execute method::
-+
---
-This changes require the fork of our golang.org/x/crypto.
---
-
-lib/time: remove UnixMicro and UnixMilli::
-+
---
-Both of those methods has been added into standard library as
-[Time.UnixMicro] and [Time.UnixMilli] since Go 1.17.
---
-
-lib/io: removed, this package has been merged into "lib/os"::
-+
---
-While some functions are merged to "lib/os", some are not used anymore
-like io.Reader.
---
-
-lib/parser: removed, this package has been merged into lib/strings::
-
-
-[#v0_52_0__bug_fixes]
-=== Bug fixes
-
-ssh/config: fix setting the default values::
-+
---
-The field default value should be set on Get, after all the Host or
-Match fields merged.
-In this way, if the field key already set, its not overridden by the
-default value or subsequent Host or Match value.
---
-
-ssh/config: set the Hostname if its not set on [Config.Get]::
-+
---
-Per manual ssh_config(5) on Hostname,
-
-[quote]
-The default is the name given on the command line.
-
-So, if the requested host name match with one of Host or Match, but
-Hostname is not set, it should be default to the requested parameter
-name.
---
-
-http/sseclient: fix data race on [Client.Close]::
-+
---
-The data race happened when Close set conn to nil but the consume
-method still on Read.
-The fix is by waiting for 100ms so consume goroutine can check if closeq
-is triggered from Close or not.
---
-
-http/sseclient: fix Retry value not set to millisecond::
-+
---
-When client receive "retry:" message, the value is in millisecond, but
-when we store it we only convert it to [time.Duration] which default
-to nanosecond.
-
-While at it, update comments on field [Client.Retry] and
-[Client.Insecure].
---
-
-ssh/sftp: fix Stat on empty remote file name::
-+
---
-The implementation of SSH server (openssh) for Stat is not consistent with
-the RFC.
-The RFC mentioned that
-
-[quote]
-An empty path name is valid, and it refers to the user's default
-directory (usually the user's home directory).
-
-But this only working on some command, like Mkdir, but not Stat.
---
-
-ssh/sftp: fix non-nil returned error on Close::
-+
---
-This changes fix the Close that always return an error.
---
-
-
-[#v0_52_0__enhancements]
-===  Enhancements
-
-ssh/config: merge the Section slice values on [Section.merge]::
-+
---
-Instead of using [Section.Set], set the key-value directly.
-
-While at it, merge the certificateFile, IdentityFile, knownHostFiles,
-and sendEnv.
---
-
-ssh/config: set the default UserKnownHostsFile in setDefaults::
-+
---
-While at it, unfold each value of IdentityFile and UserKnownHostsFile
-in setDefaults, by expanding "~" into user's home directory or joining
-with "config" directory if its relative.
---
+The "file" field define the path to the "_test.go" file, default to
+"test_test.go" if its empty.
+The "body" field contains the Go code that will be saved to
+"file".
+The test will run, by default, with "go test -count=1 -race $dirname"
+where "$dirname" is the path directory to the "file" relative to where
+the program is running.
+If "without_race" is true, the test command will not run with "-race"
+option.
+
+[ENHANCEMENT] +
+On package level, the home and cache directory now initialized on package
+init since there are never changes when program running.
+If Go failed to get the home and cache it will be set to system temporary
+directory.
+
+[ENHANCEMENT] +
+We also simplify running Go code by removing the field `pid` in the struct
+`command` that wait for process ID.
+Instead we execute cmd with Run directly.
+In the Run function, we use the `UnsafeRun` to store temporary directory
+and move the statements that writes `go.mod` and `main.go` into the method
+writes of `Request`.
+This remove unnecessary `unsafeRun` function.
+
+
+[#v0_59_0__lib_reflect]
+=== lib/reflect
+
+[BREAKING CHANGE] +
+This release changes the Equal signature from "Equal(v any) bool" to
+"Equal(v any) error".
+The reason for this changes is to force the method to return an error
+message that is understand-able by caller.
+
+
+[#v0_59_0__lib_slices]
+=== lib/slices
+
+[NEW FEATURE] +
+Package "lib/ints", "lib/ints64", and "lib/floats64" are merged into
+"slices".
+Now that Go has type parameter, we can use it to use the same function
+that accept different types for working with slice of int, int64, and
+float64.
+
+
+[#v0_59_0__lib_ssh]
+=== lib/ssh
+
+[ENHANCEMENT] +
+In the lib/ssh, we implement Run with context internally.
+Instead of depends on fork of crypto with CL that needs
+https://go-review.googlesource.com/c/crypto/+/552435[proposal^],
+we implement them in here so we can update crypto module to the latest
+release.
+
+
+[#v0_59_0__lib_watchfs]
+=== lib/watchfs
+
+The `watchfs` package now contains the original, v1, of the
+`Watcher` and `DirWatcher` types from "lib/memfs".
+
+
+[#v0_59_0__lib_watchfs_v2]
+=== lib/watchfs/v2
+
+[NEW FEATURE] +
+The "lib/watchfs/v2" is the new package that implement new file and
+directory watcher, that replace the Watcher and DirWatcher in the
+"lib/memfs".
+
+The new implementation, `FileWatcher`, much more simple than what
+we have in [memfs.Watcher].
+
+The new directory watcher, DirWatcher, scan the content of directory in
+[fs.DirWatcherOptions.Root] recursively for the files to be watched, using
+the [fs.DirWatcherOptions.Includes] field.
+A single file, [fs.DirWatcherOptions.FileWatcherOptions.FilePath], will
+be watched for changes that trigger re-scanning the content of Root
+recursively.
+
+The result of re-scanning is list of the Includes files (only files not
+new directory) that are changes, which send to channel C.
+On each [os.FileInfo] received from C, a deleted file have
+[os.FileInfo.Size] equal to [NodeFlagDeleted].
+The channel send an empty slice if no changes.
+
+The implementation of file changes in this code is naive, using loop and
+comparison of mode, modification time, and size; at least it should
+works on most operating system.

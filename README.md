@@ -5,7 +5,7 @@
 "pakakeh.go" is a collection of tools, public HTTP APIs, and libraries
 written and for working with Go programming language.
 
-This library is released every month, usually at the first week of month.
+This Go module usually released every month, at the first week of the month.
 
 ## Public APIs
 
