@@ -1,0 +1,77 @@
+
+>>> graph.facebook.com
+0000000 4a42 8180 0001 0003 0000 0000 0567 7261
+0000010 7068 0866 6163 6562 6f6f 6b03 636f 6d00
+0000020 0041 0001 c00c 0005 0001 0000 0bc3 000c
+0000030 0473 7461 7204 6331 3072 c012 c030 0041
+0000040 0001 0000 19d3 000d 0001 0000 0100 0602
+0000050 6832 0268 33c0 3000 4100 0100 0019 d300
+0000060 2d00 0204 7374 6172 0866 616c 6c62 6163
+0000070 6b04 6331 3072 0866 6163 6562 6f6f 6b03
+0000080 636f 6d00 0001 0006 0268 3202 6833
+
+<<< graph.facebook.com
+{
+  "Answer": [
+    {
+      "Value": "star.c10r.facebook.com",
+      "Name": "graph.facebook.com",
+      "Type": 5,
+      "Class": 1,
+      "TTL": 3011
+    },
+    {
+      "Value": {
+        "Params": {
+          "1": [
+            "h2",
+            "h3"
+          ]
+        },
+        "TargetName": "",
+        "Priority": 1
+      },
+      "Name": "star.c10r.facebook.com",
+      "Type": 65,
+      "Class": 1,
+      "TTL": 6611
+    },
+    {
+      "Value": {
+        "Params": {
+          "1": [
+            "h2",
+            "h3"
+          ]
+        },
+        "TargetName": "star.fallback.c10r.facebook.com",
+        "Priority": 2
+      },
+      "Name": "star.c10r.facebook.com",
+      "Type": 65,
+      "Class": 1,
+      "TTL": 6611
+    }
+  ],
+  "Authority": null,
+  "Additional": null,
+  "Question": {
+    "Name": "graph.facebook.com",
+    "Type": 65,
+    "Class": 1
+  },
+  "Header": {
+    "ID": 19010,
+    "IsQuery": false,
+    "Op": 0,
+    "IsAA": false,
+    "IsTC": false,
+    "IsRD": true,
+    "IsRA": true,
+    "RCode": 0,
+    "QDCount": 1,
+    "ANCount": 3,
+    "NSCount": 0,
+    "ARCount": 0
+  }
+}

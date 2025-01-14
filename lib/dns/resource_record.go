@@ -539,11 +539,10 @@ func (rr *ResourceRecord) unpackSVCB(packet []byte, x uint) (err error) {
 		svcb = &RDataSVCB{
 			Params: map[int][]string{},
 		}
+		rdata = packet[x : x+uint(rr.rdlen)]
 	)
 
-	packet = packet[x:]
-
-	err = svcb.unpack(packet)
+	err = svcb.unpack(packet, rdata, x)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -561,11 +560,10 @@ func (rr *ResourceRecord) unpackHTTPS(packet []byte, x uint) (err error) {
 				Params: map[int][]string{},
 			},
 		}
+		rdata = packet[x : x+uint(rr.rdlen)]
 	)
 
-	packet = packet[x:]
-
-	err = https.RDataSVCB.unpack(packet)
+	err = https.RDataSVCB.unpack(packet, rdata, x)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}

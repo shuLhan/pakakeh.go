@@ -2178,3 +2178,40 @@ func TestUnpackMessage_SVCB(t *testing.T) {
 		test.Assert(t, name, string(tdata.Output[name]), string(stream))
 	}
 }
+
+func TestUnpackMessage_HTTPS(t *testing.T) {
+	var (
+		logp  = `TestUnpackMessage_HTTPS`
+		tdata *test.Data
+		err   error
+	)
+
+	tdata, err = test.LoadData(`testdata/message/UnpackMessage_HTTPS_test.txt`)
+	if err != nil {
+		t.Fatal(logp, err)
+	}
+
+	var (
+		name   string
+		input  []byte
+		stream []byte
+		msg    *Message
+	)
+	for name, input = range tdata.Input {
+		stream, err = hexdump.Parse(input, true)
+		if err != nil {
+			t.Fatal(logp, err)
+		}
+
+		msg, err = UnpackMessage(stream)
+		if err != nil {
+			t.Fatal(logp, name, err)
+		}
+
+		stream, err = json.MarshalIndent(&msg, ``, `  `)
+		if err != nil {
+			t.Fatal(logp, err)
+		}
+		test.Assert(t, name, string(tdata.Output[name]), string(stream))
+	}
+}

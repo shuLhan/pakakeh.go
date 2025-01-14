@@ -553,19 +553,19 @@ func (svcb *RDataSVCB) parseParams(zp *zoneParser) (err error) {
 	return nil
 }
 
-func (svcb *RDataSVCB) unpack(packet []byte) (err error) {
-	svcb.Priority = libbytes.ReadUint16(packet, 0)
-	packet = packet[2:]
+func (svcb *RDataSVCB) unpack(packet, rdata []byte, start uint) (err error) {
+	svcb.Priority = libbytes.ReadUint16(rdata, 0)
+	rdata = rdata[2:]
+	start += 2
 
-	var x uint
-
-	svcb.TargetName, x, err = unpackDomainName(packet, 0)
+	var end uint
+	svcb.TargetName, end, err = unpackDomainName(packet, start)
 	if err != nil {
 		return err
 	}
-	packet = packet[x:]
-
-	err = svcb.unpackParams(packet)
+	start = end - start
+	rdata = rdata[start:]
+	err = svcb.unpackParams(rdata)
 	if err != nil {
 		return err
 	}
