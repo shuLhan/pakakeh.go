@@ -5,6 +5,8 @@
 package play
 
 import (
+	"fmt"
+	"path/filepath"
 	"time"
 )
 
@@ -13,6 +15,9 @@ type GoOptions struct {
 	// Root directory of where the Go code to be written, run, or test.
 	// Default to [os.UserCacheDir] if its not set.
 	Root string
+
+	// absRoot the absolute path of Root directory.
+	absRoot string
 
 	// Version define the Go tool version in go.mod to be used to run the
 	// code.
@@ -25,9 +30,14 @@ type GoOptions struct {
 	Timeout time.Duration
 }
 
-func (opts *GoOptions) init() {
+func (opts *GoOptions) init() (err error) {
 	if len(opts.Root) == 0 {
 		opts.Root = userCacheDir
+	} else {
+		opts.absRoot, err = filepath.Abs(opts.Root)
+		if err != nil {
+			return err
+		}
 	}
 	if len(opts.Version) == 0 {
 		opts.Version = GoVersion
@@ -35,6 +45,7 @@ func (opts *GoOptions) init() {
 	if opts.Timeout <= 0 {
 		opts.Timeout = Timeout
 	}
+	return nil
 }
 
 // Go define the type that can format, run, and test Go code.
@@ -43,10 +54,13 @@ type Go struct {
 }
 
 // NewGo create and initialize new Go tools.
-func NewGo(opts GoOptions) (playgo *Go) {
-	opts.init()
+func NewGo(opts GoOptions) (playgo *Go, err error) {
+	err = opts.init()
+	if err != nil {
+		return nil, fmt.Errorf(`NewGo: %w`, err)
+	}
 	playgo = &Go{
 		opts: opts,
 	}
-	return playgo
+	return playgo, nil
 }

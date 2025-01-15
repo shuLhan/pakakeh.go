@@ -50,4 +50,4 @@ HTTP/1.1 500 Internal Server Error
 Connection: close
 Content-Type: application/json
 
-{"message":"Test: open testdata/notexist/test_test.go: no such file or directory","name":"ERR_INTERNAL","code":500}
+{"message":"Test: open /notexist/test_test.go: no such file or directory","name":"ERR_INTERNAL","code":500}

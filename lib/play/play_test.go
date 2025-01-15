@@ -25,24 +25,27 @@ func TestMain(m *testing.M) {
 }
 
 func TestGo_Format(t *testing.T) {
-	var (
-		tdata *test.Data
-		err   error
-	)
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/format_test.txt`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var (
-		playgo = Go{}
-		name   string
-		input  []byte
-	)
-	for name, input = range tdata.Input {
-		var req Request
+	var playgo *Go
+	playgo, err = NewGo(GoOptions{
+		Root: t.TempDir(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		req.Body = string(input)
+	var name string
+	var input []byte
+	for name, input = range tdata.Input {
+		var req = Request{
+			Body: string(input),
+		}
 
 		var exp = string(tdata.Output[name])
 		var got []byte
@@ -65,10 +68,8 @@ func TestGo_Run(t *testing.T) {
 		req Request
 	}
 
-	var (
-		tdata *test.Data
-		err   error
-	)
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/run_test.txt`)
 	if err != nil {
 		t.Fatal(err)
@@ -79,22 +80,27 @@ func TestGo_Run(t *testing.T) {
 	}, {
 		tag: `noimport`,
 	}}
-	var (
-		playgo = NewGo(GoOptions{})
-		tcase  testCase
-		exp    string
-		got    []byte
-	)
+
+	var playgo *Go
+	playgo, err = NewGo(GoOptions{
+		Root: t.TempDir(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var tcase testCase
 	for _, tcase = range listCase {
 		tcase.req.Body = string(tdata.Input[tcase.tag])
 
+		var got []byte
 		got, err = playgo.Run(&tcase.req)
 		if err != nil {
 			var tagError = tcase.tag + `Error`
-			exp = string(tdata.Output[tagError])
+			var exp = string(tdata.Output[tagError])
 			test.Assert(t, tagError, exp, err.Error())
 		}
-		exp = string(tdata.Output[tcase.tag])
+		var exp = string(tdata.Output[tcase.tag])
 		test.Assert(t, tcase.tag, exp, string(got))
 	}
 }
@@ -104,21 +110,16 @@ func TestGo_Run(t *testing.T) {
 // The second Run, run normal code.
 // On the second Run, the first Run should be cancelled or killed.
 func TestGo_Run_Overlap(t *testing.T) {
-	var (
-		tdata *test.Data
-		err   error
-	)
-
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/run_overlap_test.txt`)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// First Run.
-	var (
-		sid   = `overlap`
-		runwg sync.WaitGroup
-	)
+	var sid = `overlap`
+	var runwg sync.WaitGroup
 
 	runwg.Add(1)
 	go testRunOverlap(t, &runwg, tdata, `run1`, sid)
@@ -157,26 +158,29 @@ func testRunOverlap(t *testing.T, runwg *sync.WaitGroup, tdata *test.Data,
 	// the top and call it using defer fix the issue.
 	defer runwg.Done()
 
-	var (
-		playgo = NewGo(GoOptions{})
-		req    = &Request{
-			cookieSid: &http.Cookie{
-				Value: sid,
-			},
-			Body: string(tdata.Input[runName]),
-		}
-		exp string
-		out []byte
-		err error
-	)
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: t.TempDir(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	var req = &Request{
+		cookieSid: &http.Cookie{
+			Value: sid,
+		},
+		Body: string(tdata.Input[runName]),
+	}
+	var out []byte
 	out, err = playgo.Run(req)
 	if err != nil {
-		exp = string(tdata.Output[runName+`-error`])
+		var exp = string(tdata.Output[runName+`-error`])
 		test.Assert(t, runName+` error`, exp, err.Error())
 	}
 
-	exp = string(tdata.Output[runName+`-output`])
+	var exp = string(tdata.Output[runName+`-output`])
 
 	// On Inspiron PC, the test run and can be checked using
 	// [test.Assert].
@@ -192,14 +196,19 @@ func testRunOverlap(t *testing.T, runwg *sync.WaitGroup, tdata *test.Data,
 
 func TestGo_Run_UnsafeRun(t *testing.T) {
 	var req = &Request{
-		UnsafeRun: `testdata/unsafe_run/cmd/forum`,
+		UnsafeRun: `/unsafe_run/cmd/forum`,
 	}
 
-	var (
-		playgo = NewGo(GoOptions{})
-		out    []byte
-		err    error
-	)
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: `testdata/`,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var out []byte
 	out, err = playgo.Run(req)
 	if err != nil {
 		t.Fatal(err)
@@ -217,11 +226,17 @@ func TestGo_Test(t *testing.T) {
 		treq     Request
 	}
 
-	var (
-		tdata *test.Data
-		err   error
-	)
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/test_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var playgo *Go
+	playgo, err = NewGo(GoOptions{
+		Root: `testdata/`,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,41 +244,43 @@ func TestGo_Test(t *testing.T) {
 	var listCase = []testCase{{
 		tag: `ok`,
 		treq: Request{
-			File: `testdata/test_test.go`,
+			File: `/test_test.go`,
 		},
 	}, {
 		tag: `fail`,
 		treq: Request{
-			File: `testdata/test_test.go`,
+			File: `/test_test.go`,
 		},
 	}, {
 		tag: `buildFailed`,
 		treq: Request{
-			File: `testdata/test_test.go`,
+			File: `/test_test.go`,
 		},
 	}, {
 		tag:      `emptyFile`,
 		expError: ErrEmptyFile.Error(),
+	}, {
+		tag: `ErrPermission`,
+		treq: Request{
+			File: `../../etc/outside`,
+		},
+		expError: `Test: File "../../etc/outside" is outside Root: permission denied`,
 	}}
 
 	var rexDuration = regexp.MustCompile(`(?m)\s+(\d+\.\d+)s$`)
-
-	var (
-		playgo = NewGo(GoOptions{})
-		tcase  testCase
-		exp    string
-		got    []byte
-	)
+	var tcase testCase
 	for _, tcase = range listCase {
 		tcase.treq.Body = string(tdata.Input[tcase.tag])
 		tcase.treq.init(playgo.opts)
 
+		var got []byte
 		got, err = playgo.Test(&tcase.treq)
 		if err != nil {
 			test.Assert(t, tcase.tag, tcase.expError, err.Error())
 		}
 		got = rexDuration.ReplaceAll(got, []byte(" Xs"))
-		exp = string(tdata.Output[tcase.tag])
+
+		var exp = string(tdata.Output[tcase.tag])
 		test.Assert(t, tcase.tag, exp, string(got))
 	}
 }

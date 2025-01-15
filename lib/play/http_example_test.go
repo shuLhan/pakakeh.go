@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"regexp"
 )
 
@@ -22,13 +23,19 @@ func main() {
   fmt.Println("Hello, world")
 }
 `
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: os.TempDir(),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var req = Request{
 		Body: codeIndentMissingImport,
 	}
-	var (
-		rawbody []byte
-		err     error
-	)
+	var rawbody []byte
 	rawbody, err = json.Marshal(&req)
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +46,6 @@ func main() {
 		bytes.NewReader(rawbody))
 	httpreq.Header.Set(`Content-Type`, `application/json`)
 
-	var playgo = NewGo(GoOptions{})
 	var mux = http.NewServeMux()
 	mux.HandleFunc(`POST /api/play/format`, playgo.HTTPHandleFormat)
 	mux.ServeHTTP(resprec, httpreq)
@@ -64,27 +70,30 @@ func main() {
 	fmt.Println("Hello, world")
 }
 `
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: os.TempDir(),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var req = Request{
 		Body: code,
 	}
-	var (
-		rawbody []byte
-		err     error
-	)
+	var rawbody []byte
 	rawbody, err = json.Marshal(&req)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var resprec = httptest.NewRecorder()
-
 	var httpreq = httptest.NewRequest(`POST`, `/api/play/run`,
 		bytes.NewReader(rawbody))
 	httpreq.Header.Set(`Content-Type`, `application/json`)
 
-	var playgo = NewGo(GoOptions{})
 	var mux = http.NewServeMux()
-
 	mux.HandleFunc(`POST /api/play/run`, playgo.HTTPHandleRun)
 	mux.ServeHTTP(resprec, httpreq)
 
@@ -110,20 +119,25 @@ func TestSum(t *testing.T) {
 		t.Fatalf("got %d, want 6", total)
 	}
 }`
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: `testdata/`,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var req = Request{
 		Body: code,
-		File: `testdata/test_test.go`,
+		File: `/test_test.go`,
 	}
-	var (
-		rawbody []byte
-		err     error
-	)
+	var rawbody []byte
 	rawbody, err = json.Marshal(&req)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var playgo = NewGo(GoOptions{})
 	var mux = http.NewServeMux()
 
 	mux.HandleFunc(`POST /api/play/test`, playgo.HTTPHandleTest)

@@ -22,10 +22,8 @@ func TestGo_HTTPHandleFormat(t *testing.T) {
 		contentType string
 	}
 
-	var (
-		tdata *test.Data
-		err   error
-	)
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/httpHandleFormat_test.txt`)
 	if err != nil {
 		t.Fatal(err)
@@ -41,16 +39,20 @@ func TestGo_HTTPHandleFormat(t *testing.T) {
 		contentType: libhttp.ContentTypeJSON,
 	}}
 
-	var (
-		playgo = NewGo(GoOptions{})
+	var playgo *Go
+	playgo, err = NewGo(GoOptions{
+		Root: t.TempDir(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		req   Request
-		tcase testCase
-		rawb  []byte
-	)
+	var tcase testCase
 	for _, tcase = range listCase {
+		var req Request
 		req.Body = string(tdata.Input[tcase.tag])
 
+		var rawb []byte
 		rawb, err = json.Marshal(&req)
 		if err != nil {
 			t.Fatal(err)
@@ -83,10 +85,8 @@ func TestGo_HTTPHandleRun(t *testing.T) {
 		req         Request
 	}
 
-	var (
-		tdata *test.Data
-		err   error
-	)
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/httpHandleRun_test.txt`)
 	if err != nil {
 		t.Fatal(err)
@@ -112,15 +112,19 @@ func TestGo_HTTPHandleRun(t *testing.T) {
 		},
 	}}
 
-	var (
-		playgo = NewGo(GoOptions{})
+	var playgo *Go
+	playgo, err = NewGo(GoOptions{
+		Root: t.TempDir(),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		tcase testCase
-		rawb  []byte
-	)
+	var tcase testCase
 	for _, tcase = range listCase {
 		tcase.req.Body = string(tdata.Input[tcase.tag])
 
+		var rawb []byte
 		rawb, err = json.Marshal(&tcase.req)
 		if err != nil {
 			t.Fatal(err)
@@ -154,11 +158,17 @@ func TestGo_HTTPHandleTest(t *testing.T) {
 		req         Request
 	}
 
-	var (
-		tdata *test.Data
-		err   error
-	)
+	var tdata *test.Data
+	var err error
 	tdata, err = test.LoadData(`testdata/httpHandleTest_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var playgo *Go
+	playgo, err = NewGo(GoOptions{
+		Root: `testdata/`,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,25 +179,23 @@ func TestGo_HTTPHandleTest(t *testing.T) {
 		tag:         `ok`,
 		contentType: libhttp.ContentTypeJSON,
 		req: Request{
-			File: `testdata/test_test.go`,
+			File: `/test_test.go`,
 		},
 	}, {
 		tag:         `invalidFile`,
 		contentType: libhttp.ContentTypeJSON,
 		req: Request{
-			File: `testdata/notexist/test_test.go`,
+			File: `/notexist/test_test.go`,
 		},
 	}}
 
-	var (
-		playgo      = NewGo(GoOptions{})
-		rexDuration = regexp.MustCompile(`(?m)\\t(\d+\.\d+)s`)
-		tcase       testCase
-		rawb        []byte
-	)
+	var rexDuration = regexp.MustCompile(`(?m)\\t(\d+\.\d+)s`)
+	var empty = []byte(``)
+	var tcase testCase
 	for _, tcase = range listCase {
 		tcase.req.Body = string(tdata.Input[tcase.tag])
 
+		var rawb []byte
 		rawb, err = json.Marshal(&tcase.req)
 		if err != nil {
 			t.Fatal(err)
@@ -207,7 +215,9 @@ func TestGo_HTTPHandleTest(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		rawb = bytes.ReplaceAll(rawb, []byte("\r"), []byte(""))
+		rawb = bytes.ReplaceAll(rawb, []byte("\r"), empty)
+		rawb = bytes.ReplaceAll(rawb, []byte(playgo.opts.absRoot),
+			empty)
 		rawb = rexDuration.ReplaceAll(rawb, []byte(" Xs"))
 
 		var exp = string(tdata.Output[tcase.tag])

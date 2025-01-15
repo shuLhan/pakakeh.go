@@ -7,6 +7,7 @@ package play
 import (
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 )
 
@@ -17,15 +18,19 @@ func main() {
   fmt.Println("Hello, world")
 }
 `
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: os.TempDir(),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var req = Request{
 		Body: codeIndentMissingImport,
 	}
-	var (
-		playgo = NewGo(GoOptions{})
-
-		out []byte
-		err error
-	)
+	var out []byte
 	out, err = playgo.Format(req)
 	if err != nil {
 		log.Fatal(err)
@@ -50,18 +55,22 @@ func main() {
 	fmt.Println("Hello, world")
 }`
 
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: os.TempDir(),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var req = Request{
 		Body: codeRun,
 	}
-	var (
-		playgo = NewGo(GoOptions{})
-
-		out []byte
-		err error
-	)
+	var out []byte
 	out, err = playgo.Run(&req)
 	if err != nil {
-		fmt.Printf(`error: %s`, err)
+		log.Fatal(err)
 	}
 	fmt.Printf(`%s`, out)
 
@@ -79,19 +88,25 @@ func TestSum(t *testing.T) {
 		t.Fatalf("got %d, want 6", total)
 	}
 }`
+	var rexDuration = regexp.MustCompile(`(?m)\s+(\d+\.\d+)s$`)
+
+	var playgo *Go
+	var err error
+	playgo, err = NewGo(GoOptions{
+		Root: `testdata/`,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var req = Request{
 		Body: codeTest,
-		File: `testdata/test_test.go`,
+		File: `/test_test.go`,
 	}
-	var (
-		playgo      = NewGo(GoOptions{})
-		rexDuration = regexp.MustCompile(`(?m)\s+(\d+\.\d+)s$`)
-		out         []byte
-		err         error
-	)
+	var out []byte
 	out, err = playgo.Test(&req)
 	if err != nil {
-		fmt.Printf(`error: %s`, err)
+		log.Fatal(err)
 	}
 	// Replace the test duration.
 	out = rexDuration.ReplaceAll(out, []byte(" Xs"))

@@ -7,9 +7,11 @@ package play
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
@@ -61,13 +63,22 @@ func (req *Request) init(opts GoOptions) {
 	}
 }
 
+func (req *Request) initUnsafe(opts GoOptions) (err error) {
+	var absUnsafe = filepath.Join(opts.absRoot, req.UnsafeRun)
+	if !strings.HasPrefix(absUnsafe, opts.absRoot) {
+		return fmt.Errorf(`UnsafeRun %q is outside Root: %w`,
+			req.UnsafeRun, os.ErrPermission)
+	}
+	req.UnsafeRun = absUnsafe
+	return nil
+}
+
 // generateSid generate session ID from the first 16 hex of SHA256 hash of
 // request body plus current epoch in.
 func (req *Request) generateSid() string {
-	var (
-		plain = []byte(req.Body)
-		epoch = now()
-	)
+	var plain = []byte(req.Body)
+	var epoch = now()
+
 	plain = libbytes.AppendInt64(plain, epoch)
 	var cipher = sha256.Sum256(plain)
 	var dst = make([]byte, hex.EncodedLen(len(cipher)))
@@ -78,7 +89,7 @@ func (req *Request) generateSid() string {
 
 // writes write the go.mod and main.go files inside the unsafe directory.
 func (req *Request) writes(opts GoOptions) (err error) {
-	req.UnsafeRun = filepath.Join(opts.Root, `goplay`, req.cookieSid.Value)
+	req.UnsafeRun = filepath.Join(opts.absRoot, `goplay`, req.cookieSid.Value)
 
 	err = os.MkdirAll(req.UnsafeRun, 0700)
 	if err != nil {

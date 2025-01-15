@@ -88,6 +88,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"golang.org/x/tools/imports"
@@ -161,9 +162,11 @@ func (playgo *Go) Run(req *Request) (out []byte, err error) {
 			return nil, nil
 		}
 		err = req.writes(playgo.opts)
-		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, logp, err)
-		}
+	} else {
+		err = req.initUnsafe(playgo.opts)
+	}
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	cmd = newCommand(playgo.opts, req)
@@ -188,11 +191,23 @@ func (playgo *Go) Test(req *Request) (out []byte, err error) {
 	if len(req.File) == 0 {
 		return nil, ErrEmptyFile
 	}
-	if len(req.UnsafeRun) == 0 {
-		req.UnsafeRun = filepath.Dir(req.File)
+
+	var absPathFile = filepath.Join(playgo.opts.absRoot, req.File)
+	if !strings.HasPrefix(absPathFile, playgo.opts.absRoot) {
+		return nil, fmt.Errorf(`%s: File %q is outside Root: %w`,
+			logp, req.File, os.ErrPermission)
 	}
 
-	err = os.WriteFile(req.File, []byte(req.Body), 0600)
+	if len(req.UnsafeRun) == 0 {
+		req.UnsafeRun = filepath.Dir(absPathFile)
+	} else {
+		err = req.initUnsafe(playgo.opts)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+	}
+
+	err = os.WriteFile(absPathFile, []byte(req.Body), 0600)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
