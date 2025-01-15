@@ -15,7 +15,7 @@ import (
 	"regexp"
 )
 
-func ExampleHTTPHandleFormat() {
+func ExampleGo_HTTPHandleFormat() {
 	const codeIndentMissingImport = `
 package main
 func main() {
@@ -39,8 +39,9 @@ func main() {
 		bytes.NewReader(rawbody))
 	httpreq.Header.Set(`Content-Type`, `application/json`)
 
+	var playgo = NewGo(GoOptions{})
 	var mux = http.NewServeMux()
-	mux.HandleFunc(`POST /api/play/format`, HTTPHandleFormat)
+	mux.HandleFunc(`POST /api/play/format`, playgo.HTTPHandleFormat)
 	mux.ServeHTTP(resprec, httpreq)
 
 	var resp = resprec.Result()
@@ -55,7 +56,7 @@ func main() {
 	// {"data":"package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, world\")\n}\n","code":200}
 }
 
-func ExampleHTTPHandleRun() {
+func ExampleGo_HTTPHandleRun() {
 	const code = `
 package main
 import "fmt"
@@ -81,9 +82,10 @@ func main() {
 		bytes.NewReader(rawbody))
 	httpreq.Header.Set(`Content-Type`, `application/json`)
 
+	var playgo = NewGo(GoOptions{})
 	var mux = http.NewServeMux()
 
-	mux.HandleFunc(`POST /api/play/run`, HTTPHandleRun)
+	mux.HandleFunc(`POST /api/play/run`, playgo.HTTPHandleRun)
 	mux.ServeHTTP(resprec, httpreq)
 
 	var resp = resprec.Result()
@@ -98,7 +100,7 @@ func main() {
 	// {"data":"Hello, world\n","code":200}
 }
 
-func ExampleHTTPHandleTest() {
+func ExampleGo_HTTPHandleTest() {
 	const code = `
 package test
 import "testing"
@@ -121,9 +123,10 @@ func TestSum(t *testing.T) {
 		log.Fatal(err)
 	}
 
+	var playgo = NewGo(GoOptions{})
 	var mux = http.NewServeMux()
 
-	mux.HandleFunc(`POST /api/play/test`, HTTPHandleTest)
+	mux.HandleFunc(`POST /api/play/test`, playgo.HTTPHandleTest)
 
 	var resprec = httptest.NewRecorder()
 	var httpreq = httptest.NewRequest(`POST`, `/api/play/test`,

@@ -16,7 +16,7 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
-func TestHTTPHandleFormat(t *testing.T) {
+func TestGo_HTTPHandleFormat(t *testing.T) {
 	type testCase struct {
 		tag         string
 		contentType string
@@ -42,6 +42,8 @@ func TestHTTPHandleFormat(t *testing.T) {
 	}}
 
 	var (
+		playgo = NewGo(GoOptions{})
+
 		req   Request
 		tcase testCase
 		rawb  []byte
@@ -54,13 +56,13 @@ func TestHTTPHandleFormat(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		var req = httptest.NewRequest(`POST`, `/`,
+		var httpReq = httptest.NewRequest(`POST`, `/`,
 			bytes.NewReader(rawb))
-		req.Header.Set(libhttp.HeaderContentType, tcase.contentType)
+		httpReq.Header.Set(libhttp.HeaderContentType, tcase.contentType)
 
 		var httpWriter = httptest.NewRecorder()
 
-		HTTPHandleFormat(httpWriter, req)
+		playgo.HTTPHandleFormat(httpWriter, httpReq)
 
 		var result = httpWriter.Result()
 		rawb, err = httputil.DumpResponse(result, true)
@@ -74,7 +76,7 @@ func TestHTTPHandleFormat(t *testing.T) {
 	}
 }
 
-func TestHTTPHandleRun(t *testing.T) {
+func TestGo_HTTPHandleRun(t *testing.T) {
 	type testCase struct {
 		tag         string
 		contentType string
@@ -111,6 +113,8 @@ func TestHTTPHandleRun(t *testing.T) {
 	}}
 
 	var (
+		playgo = NewGo(GoOptions{})
+
 		tcase testCase
 		rawb  []byte
 	)
@@ -129,7 +133,7 @@ func TestHTTPHandleRun(t *testing.T) {
 
 		var httpWriter = httptest.NewRecorder()
 
-		HTTPHandleRun(httpWriter, httpReq)
+		playgo.HTTPHandleRun(httpWriter, httpReq)
 
 		var result = httpWriter.Result()
 		rawb, err = httputil.DumpResponse(result, true)
@@ -143,7 +147,7 @@ func TestHTTPHandleRun(t *testing.T) {
 	}
 }
 
-func TestHTTPHandleTest(t *testing.T) {
+func TestGo_HTTPHandleTest(t *testing.T) {
 	type testCase struct {
 		tag         string
 		contentType string
@@ -176,6 +180,7 @@ func TestHTTPHandleTest(t *testing.T) {
 	}}
 
 	var (
+		playgo      = NewGo(GoOptions{})
 		rexDuration = regexp.MustCompile(`(?m)\\t(\d+\.\d+)s`)
 		tcase       testCase
 		rawb        []byte
@@ -195,7 +200,7 @@ func TestHTTPHandleTest(t *testing.T) {
 
 		var httpWriter = httptest.NewRecorder()
 
-		HTTPHandleTest(httpWriter, httpReq)
+		playgo.HTTPHandleTest(httpWriter, httpReq)
 
 		var httpResp = httpWriter.Result()
 		rawb, err = httputil.DumpResponse(httpResp, true)

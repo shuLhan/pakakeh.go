@@ -10,7 +10,7 @@ import (
 	"regexp"
 )
 
-func ExampleFormat() {
+func ExampleGo_Format() {
 	const codeIndentMissingImport = `
 package main
 func main() {
@@ -21,10 +21,12 @@ func main() {
 		Body: codeIndentMissingImport,
 	}
 	var (
+		playgo = NewGo(GoOptions{})
+
 		out []byte
 		err error
 	)
-	out, err = Format(req)
+	out, err = playgo.Format(req)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +42,7 @@ func main() {
 	//}
 }
 
-func ExampleRun() {
+func ExampleGo_Run() {
 	const codeRun = `
 package main
 import "fmt"
@@ -52,10 +54,12 @@ func main() {
 		Body: codeRun,
 	}
 	var (
+		playgo = NewGo(GoOptions{})
+
 		out []byte
 		err error
 	)
-	out, err = Run(&req)
+	out, err = playgo.Run(&req)
 	if err != nil {
 		fmt.Printf(`error: %s`, err)
 	}
@@ -65,7 +69,7 @@ func main() {
 	//Hello, world
 }
 
-func ExampleTest() {
+func ExampleGo_Test() {
 	const codeTest = `
 package test
 import "testing"
@@ -80,11 +84,12 @@ func TestSum(t *testing.T) {
 		File: `testdata/test_test.go`,
 	}
 	var (
+		playgo      = NewGo(GoOptions{})
 		rexDuration = regexp.MustCompile(`(?m)\s+(\d+\.\d+)s$`)
 		out         []byte
 		err         error
 	)
-	out, err = Test(&req)
+	out, err = playgo.Test(&req)
 	if err != nil {
 		fmt.Printf(`error: %s`, err)
 	}

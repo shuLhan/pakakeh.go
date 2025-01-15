@@ -17,7 +17,7 @@ import (
 const cookieNameSid = `sid`
 const defTestFile = `test_test.go`
 
-// Request for calling [Format] and [Run].
+// Request for calling [Go.Format], [Go.Run], or [Go.Test].
 type Request struct {
 	// cookieSid contains unique session ID between request.
 	// A single session can only run one command at a time, otherwise
@@ -40,11 +40,12 @@ type Request struct {
 	// executed directly.
 	UnsafeRun string `json:"unsafe_run"`
 
-	// WithoutRace define option opt out "-race" when running Go code.
+	// WithoutRace define the field to opt out the "-race" option when
+	// running Go code.
 	WithoutRace bool `json:"without_race"`
 }
 
-func (req *Request) init() {
+func (req *Request) init(opts GoOptions) {
 	if req.cookieSid == nil {
 		req.cookieSid = &http.Cookie{
 			Name:  cookieNameSid,
@@ -56,7 +57,7 @@ func (req *Request) init() {
 	req.cookieSid.SameSite = http.SameSiteStrictMode
 
 	if req.GoVersion == `` {
-		req.GoVersion = GoVersion
+		req.GoVersion = opts.Version
 	}
 }
 
@@ -76,9 +77,8 @@ func (req *Request) generateSid() string {
 }
 
 // writes write the go.mod and main.go files inside the unsafe directory.
-func (req *Request) writes() (err error) {
-	req.UnsafeRun = filepath.Join(userCacheDir, `goplay`,
-		req.cookieSid.Value)
+func (req *Request) writes(opts GoOptions) (err error) {
+	req.UnsafeRun = filepath.Join(opts.Root, `goplay`, req.cookieSid.Value)
 
 	err = os.MkdirAll(req.UnsafeRun, 0700)
 	if err != nil {

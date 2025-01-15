@@ -18,12 +18,12 @@ type command struct {
 	ctxCancel context.CancelFunc
 }
 
-func newCommand(req *Request) (cmd *command) {
+func newCommand(opts GoOptions, req *Request) (cmd *command) {
 	cmd = &command{
 		buf: &bytes.Buffer{},
 	}
 	var ctxParent = context.Background()
-	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, Timeout)
+	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, opts.Timeout)
 
 	var listArg = []string{`run`}
 	if !req.WithoutRace {
@@ -44,12 +44,12 @@ func newCommand(req *Request) (cmd *command) {
 	return cmd
 }
 
-func newTestCommand(treq *Request) (cmd *command) {
+func newTestCommand(opts GoOptions, treq *Request) (cmd *command) {
 	cmd = &command{
 		buf: &bytes.Buffer{},
 	}
 	var ctxParent = context.Background()
-	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, Timeout)
+	cmd.ctx, cmd.ctxCancel = context.WithTimeout(ctxParent, opts.Timeout)
 
 	var listArg = []string{`test`, `-count=1`}
 	if !treq.WithoutRace {

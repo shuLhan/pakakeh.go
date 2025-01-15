@@ -14,8 +14,8 @@ import (
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
-// HTTPHandleFormat define the HTTP handler for formating Go code.
-func HTTPHandleFormat(httpresw http.ResponseWriter, httpreq *http.Request) {
+// HTTPHandleFormat define the HTTP handler for [Go.Format].
+func (playgo *Go) HTTPHandleFormat(httpresw http.ResponseWriter, httpreq *http.Request) {
 	var (
 		logp = `HTTPHandleFormat`
 		resp = libhttp.EndpointResponse{}
@@ -48,7 +48,7 @@ func HTTPHandleFormat(httpresw http.ResponseWriter, httpreq *http.Request) {
 		goto out
 	}
 
-	rawbody, err = Format(req)
+	rawbody, err = playgo.Format(req)
 	if err != nil {
 		resp.Code = http.StatusUnprocessableEntity
 		resp.Name = `ERR_CODE`
@@ -70,10 +70,12 @@ out:
 	httpresw.Write(rawbody)
 }
 
-// HTTPHandleRun define the HTTP handler for running Go code.
-// Each client is identified by unique cookie, so if two Run requests come
-// from the same client, the previous Run will be cancelled.
-func HTTPHandleRun(httpresw http.ResponseWriter, httpreq *http.Request) {
+// HTTPHandleRun define the HTTP handler for [Go.Run].
+// Each client is identified by unique cookie, so if two requests come from
+// the same client, the previous run will be cancelled.
+func (playgo *Go) HTTPHandleRun(
+	httpresw http.ResponseWriter, httpreq *http.Request,
+) {
 	var (
 		logp = `HTTPHandleRun`
 
@@ -88,7 +90,7 @@ func HTTPHandleRun(httpresw http.ResponseWriter, httpreq *http.Request) {
 		goto out
 	}
 
-	rawb, err = Run(req)
+	rawb, err = playgo.Run(req)
 	if err != nil {
 		resp = &libhttp.EndpointResponse{
 			E: liberrors.E{
@@ -169,10 +171,12 @@ func readRequest(httpreq *http.Request) (
 	return req, nil
 }
 
-// HTTPHandleTest define the HTTP handler for testing Go code.
-// Each client is identified by unique cookie, so if two Run requests come
+// HTTPHandleTest define the HTTP handler for testing [Go.Test].
+// Each client is identified by unique cookie, so if two requests come
 // from the same client, the previous Test will be cancelled.
-func HTTPHandleTest(httpresw http.ResponseWriter, httpreq *http.Request) {
+func (playgo *Go) HTTPHandleTest(
+	httpresw http.ResponseWriter, httpreq *http.Request,
+) {
 	var (
 		logp = `HTTPHandleTest`
 
@@ -187,7 +191,7 @@ func HTTPHandleTest(httpresw http.ResponseWriter, httpreq *http.Request) {
 		goto out
 	}
 
-	rawb, err = Test(treq)
+	rawb, err = playgo.Test(treq)
 	if err != nil {
 		resp = &libhttp.EndpointResponse{
 			E: liberrors.E{

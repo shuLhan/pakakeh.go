@@ -11,8 +11,8 @@
 //
 // # Formatting and running Go code
 //
-// HTTP APIs for formatting and running Go code accept JSON content type,
-// with the following request format,
+// The HTTP APIs for formatting and running Go code accept the following JSON
+// request format,
 //
 //	{
 //		"goversion": <string>, // For run only.
@@ -22,13 +22,13 @@
 //
 // The "goversion" field define the Go tools and toolchain version to be
 // used to compile the code.
-// The default "goversion" is defined as global variable [GoVersion] in this
+// The default "goversion" is defined in global variable [GoVersion] in this
 // package.
 // If "without_race" is true, the Run command will not run with "-race"
 // option.
 // The "body" field contains the Go code to be formatted or run.
 //
-// Both return the following JSON response format,
+// Both request return the following JSON response format,
 //
 //	{
 //		"code": <integer, HTTP status code>,
@@ -37,33 +37,34 @@
 //		"data": <string>
 //	}
 //
-// For the [HTTPHandleFormat], the response "data" contains the formatted Go
+// For the [Go.HTTPHandleFormat], the response "data" contains the formatted Go
 // code.
-// For the [HTTPHandleRun], the response "data" contains the output from
-// running the Go code, the "message" contains an error pre-Run, like bad
-// request or file system related error.
+// For the [Go.HTTPHandleRun], the response "data" contains the output from
+// running the Go code.
+// The "message" field contains an error on pre-Run, like bad request or file
+// system related error.
 //
 // # Unsafe run
 //
-// As exceptional, the [Run] and [HTTPHandleRun] accept the following
+// As exceptional, the [Go.Run] and [Go.HTTPHandleRun] accept the following
 // request for running program inside custom "go.mod",
 //
 //	{
 //		"unsafe_run": <path>
 //	}
 //
-// The "unsafe_run" define the path to directory relative to HTTP server
-// working directory.
-// Once request accepted it will change the directory into "unsafe_run" first
-// and then run "go run ." directly.
+// The "unsafe_run" define the path to directory relative to
+// [play.GoOptions.Root] working directory.
+// Once the request is accepted it will change the directory into "unsafe_run"
+// first and then execute "go run ." directly.
 // Go code that executed inside "unsafe_run" should be not modifiable and
 // safe from mallicious execution.
 //
 // # Testing
 //
-// For testing, since the test must run inside the directory that contains
-// the Go file to be tested, the [HTTPHandleTest] API accept the following
-// request format,
+// The [Go.Test] or [Go.HTTPHandleTest] must run inside the directory that
+// contains the Go code file to be tested.
+// The [Go.HTTPHandleTest] API accept the following request format,
 //
 //	{
 //		"goversion": <string>,
@@ -74,11 +75,10 @@
 //
 // The "file" field define the path to the "_test.go" file, default to
 // "test_test.go" if its empty.
-// The "body" field contains the Go code that will be saved to
-// "file".
+// The "body" field contains the Go code that will be saved to that "file".
 // The test will run, by default, with "go test -count=1 -race $dirname"
-// where "$dirname" is the path directory to the "file" relative to where
-// the program is running.
+// where "$dirname" is the path to directory where "file" located, must be
+// under the [play.GoOptions.Root] directory.
 // If "without_race" is true, the test command will not run with "-race"
 // option.
 package play
@@ -93,17 +93,16 @@ import (
 	"golang.org/x/tools/imports"
 )
 
-// ErrEmptyFile error when running [Test] with empty File field in the
-// [Request].
+// ErrEmptyFile error when running [Go.Test] with empty [play.Request.File].
 var ErrEmptyFile = errors.New(`empty File`)
 
 // GoVersion define the Go tool version for go.mod to be used to run the
 // code.
-var GoVersion = `1.23.2`
+const GoVersion = `1.23.2`
 
 // Timeout define the maximum time the program can be run until it get
 // terminated.
-var Timeout = 10 * time.Second
+const Timeout = 10 * time.Second
 
 var now = func() int64 {
 	return time.Now().Unix()
@@ -131,9 +130,9 @@ func init() {
 	}
 }
 
-// Format the Go code in the [Request.Body] and return the result to out.
+// Format the Go code in the [play.Request.Body] and return the result to out.
 // Any syntax error on the code will be returned as error.
-func Format(req Request) (out []byte, err error) {
+func (playgo *Go) Format(req Request) (out []byte, err error) {
 	var logp = `Format`
 	var fmtbody []byte
 
@@ -145,11 +144,11 @@ func Format(req Request) (out []byte, err error) {
 	return fmtbody, nil
 }
 
-// Run the Go code in the [Request.Body].
-func Run(req *Request) (out []byte, err error) {
+// Run the Go code in the [play.Request.Body].
+func (playgo *Go) Run(req *Request) (out []byte, err error) {
 	var logp = `Run`
 
-	req.init()
+	req.init(playgo.opts)
 
 	var cmd *command = runningCmd.get(req.cookieSid.Value)
 	if cmd != nil {
@@ -161,24 +160,24 @@ func Run(req *Request) (out []byte, err error) {
 		if len(req.Body) == 0 {
 			return nil, nil
 		}
-		err = req.writes()
+		err = req.writes(playgo.opts)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 
-	cmd = newCommand(req)
+	cmd = newCommand(playgo.opts, req)
 	runningCmd.store(req.cookieSid.Value, cmd)
 	out = cmd.run()
 
 	return out, nil
 }
 
-// Test the Go code in the [Request.Body].
-func Test(req *Request) (out []byte, err error) {
+// Test the Go code in the [play.Request.Body].
+func (playgo *Go) Test(req *Request) (out []byte, err error) {
 	var logp = `Test`
 
-	req.init()
+	req.init(playgo.opts)
 
 	var cmd *command = runningCmd.get(req.cookieSid.Value)
 	if cmd != nil {
@@ -198,7 +197,7 @@ func Test(req *Request) (out []byte, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	cmd = newTestCommand(req)
+	cmd = newTestCommand(playgo.opts, req)
 	runningCmd.store(req.cookieSid.Value, cmd)
 	out = cmd.run()
 
