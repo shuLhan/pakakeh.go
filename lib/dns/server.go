@@ -305,7 +305,7 @@ func (srv *Server) serveDoT() {
 				conn:         conn,
 			}
 
-			go srv.serveTCPClient(cl, connTypeDoT)
+			go srv.serveTCPClient(`serveDoTClient`, cl, connTypeDoT)
 		}
 	}
 }
@@ -338,7 +338,7 @@ func (srv *Server) serveTCP() {
 			conn:         conn,
 		}
 
-		go srv.serveTCPClient(cl, connTypeTCP)
+		go srv.serveTCPClient(`serveTCPClient`, cl, connTypeTCP)
 	}
 }
 
@@ -510,20 +510,15 @@ func (srv *Server) incForwarder() {
 	srv.fwLocker.Unlock()
 }
 
-func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
-	var (
-		logp = `serveTCPClient`
-
-		req *request
-		err error
-	)
+func (srv *Server) serveTCPClient(logp string, cl *TCPClient, kind connType) {
 	for {
-		req = newRequest()
+		var err error
+		var req = newRequest()
 
 		req.message.packet, err = cl.recv()
 		if err != nil {
 			if !errors.Is(err, io.EOF) {
-				log.Printf(`%s %s: %s`, logp, connTypeNames[kind], err)
+				log.Printf(`%s: %s`, logp, err)
 			}
 			break
 		}
@@ -533,7 +528,7 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 
 		err = req.message.UnpackHeaderQuestion()
 		if err != nil {
-			log.Printf(`%s %s: %s`, logp, connTypeNames[kind], err)
+			log.Printf(`%s: %s`, logp, err)
 			req.error(RCodeErrServer)
 			continue
 		}
@@ -541,9 +536,9 @@ func (srv *Server) serveTCPClient(cl *TCPClient, kind connType) {
 		srv.requestq <- req
 	}
 
-	err = cl.conn.Close()
+	var err = cl.conn.Close()
 	if err != nil {
-		log.Printf(`%s %s: connection closed: %s`, logp, connTypeNames[kind], err)
+		log.Printf(`%s: connection closed: %s`, logp, err)
 	}
 }
 
