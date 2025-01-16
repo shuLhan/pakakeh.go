@@ -1210,6 +1210,42 @@ func TestMessageSetResponseCode(t *testing.T) {
 	}
 }
 
+func TestMessage_UnpackHeaderQuestion(t *testing.T) {
+	var tdata *test.Data
+	var err error
+	tdata, err = test.LoadData(`testdata/message/UnpackHeaderQuestion_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var name string
+	var rawb []byte
+	var msg Message
+	for name, rawb = range tdata.Input {
+		t.Run(name, func(t *testing.T) {
+			msg.packet, err = hexdump.Parse(rawb, true)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = msg.UnpackHeaderQuestion()
+			if err != nil {
+				var expError = tdata.Output[name+`Error`]
+				test.Assert(t, `error`, string(expError),
+					err.Error())
+				return
+			}
+
+			rawb, err = json.MarshalIndent(&msg, ``, `  `)
+			if err != nil {
+				t.Fatal(err)
+			}
+			test.Assert(t, `message`, string(tdata.Output[name]),
+				string(rawb))
+		})
+	}
+}
+
 func TestUnpackMessage(t *testing.T) {
 	type testCase struct {
 		exp    *Message

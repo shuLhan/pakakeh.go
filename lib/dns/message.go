@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -1072,15 +1071,16 @@ func (msg *Message) String() string {
 // packet.  This method assume that message.packet already set to DNS raw
 // message.
 func (msg *Message) UnpackHeaderQuestion() (err error) {
-	if len(msg.packet) <= sectionHeaderSize {
-		return errors.New(`UnpackHeaderQuestion: missing question`)
-	}
+	var logp = `UnpackHeaderQuestion`
 
-	msg.Header.unpack(msg.packet)
+	err = msg.Header.unpack(msg.packet)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
 
 	err = msg.Question.unpack(msg.packet[sectionHeaderSize:])
 	if err != nil {
-		return err
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	return nil

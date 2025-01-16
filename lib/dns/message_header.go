@@ -5,6 +5,9 @@
 package dns
 
 import (
+	"errors"
+	"fmt"
+
 	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
@@ -161,19 +164,31 @@ func (hdr *MessageHeader) pack() []byte {
 }
 
 // unpack the DNS header section.
-func (hdr *MessageHeader) unpack(packet []byte) {
+func (hdr *MessageHeader) unpack(packet []byte) (err error) {
+	if len(packet) < sectionHeaderSize {
+		return errors.New(`header too small`)
+	}
+	hdr.Op = OpCode((packet[2] & headerMaskOpCode) >> 3)
+	if hdr.Op < 0 || hdr.Op > OpCodeStatus {
+		return fmt.Errorf(`unknown op code=%d`, hdr.Op)
+	}
+	hdr.RCode = ResponseCode(headerMaskRCode & packet[3])
+	if hdr.RCode < 0 || hdr.RCode > RCodeRefused {
+		return fmt.Errorf(`unknown response code=%d`, hdr.RCode)
+	}
+
 	hdr.ID = libbytes.ReadUint16(packet, 0)
 
 	hdr.IsQuery = packet[2]&headerIsResponse != headerIsResponse
-	hdr.Op = OpCode((packet[2] & headerMaskOpCode) >> 3)
 	hdr.IsAA = packet[2]&headerIsAA == headerIsAA
 	hdr.IsTC = packet[2]&headerIsTC == headerIsTC
 	hdr.IsRD = packet[2]&headerIsRD == headerIsRD
 	hdr.IsRA = packet[3]&headerIsRA == headerIsRA
-	hdr.RCode = ResponseCode(headerMaskRCode & packet[3])
 
 	hdr.QDCount = libbytes.ReadUint16(packet, 4)
 	hdr.ANCount = libbytes.ReadUint16(packet, 6)
 	hdr.NSCount = libbytes.ReadUint16(packet, 8)
 	hdr.ARCount = libbytes.ReadUint16(packet, 10)
+
+	return nil
 }

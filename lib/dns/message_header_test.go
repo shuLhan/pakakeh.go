@@ -262,7 +262,10 @@ func TestMessageHeader_unpack(t *testing.T) {
 
 	for _, c = range cases {
 		got = MessageHeader{}
-		got.unpack(c.packet)
+		var err = got.unpack(c.packet)
+		if err != nil {
+			t.Fatal(err)
+		}
 		test.Assert(t, c.desc, c.hdr, got)
 	}
 }
