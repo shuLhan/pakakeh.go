@@ -8,41 +8,11 @@ package test
 import (
 	"bytes"
 	"fmt"
-	"runtime"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/text"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/text/diff"
 )
-
-func printStackTrace(w Writer, trace []byte) {
-	var (
-		lines int
-		start int
-		end   int
-		x     int
-		b     byte
-		ok    bool
-	)
-
-	for x, b = range trace {
-		if b == '\n' {
-			lines++
-			if lines == 3 {
-				start = x + 1
-			}
-			if lines == 5 {
-				end = x + 1
-				break
-			}
-		}
-	}
-
-	_, ok = w.(*BufferWriter)
-	if !ok {
-		w.Log("\n!!! ERR " + string(trace[start:end]))
-	}
-}
 
 // Assert compare two interfaces: exp and got for equality.
 // If both parameters are not equal, the function will call print and try to
@@ -87,12 +57,10 @@ func printStackTrace(w Writer, trace []byte) {
 // LIMITATION: this method does not support recursive pointer, for example a
 // node that point to parent and parent that point back to node again.
 func Assert(w Writer, name string, exp, got interface{}) {
-	var (
-		logp = `Assert`
+	w.Helper()
 
-		err   error
-		trace []byte
-	)
+	var logp = `Assert`
+	var err error
 
 	err = reflect.DoEqual(exp, got)
 	if err == nil {
@@ -102,10 +70,6 @@ func Assert(w Writer, name string, exp, got interface{}) {
 	if printStringDiff(w, name, exp, got) {
 		return
 	}
-
-	trace = make([]byte, 1024)
-	runtime.Stack(trace, false)
-	printStackTrace(w, trace)
 
 	if len(name) == 0 {
 		w.Fatalf(`!!! %s: %s`, logp, err)

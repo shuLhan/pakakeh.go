@@ -36,6 +36,10 @@ func (bw *BufferWriter) Fatalf(format string, args ...any) {
 	fmt.Fprintf(bw, format, args...)
 }
 
+func (bw *BufferWriter) Helper() {
+	// NOOP
+}
+
 // Log write the arguments into buffer.
 func (bw *BufferWriter) Log(args ...any) {
 	fmt.Fprint(bw, args...)
