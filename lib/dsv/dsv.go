@@ -1,6 +1,6 @@
-// Copyright 2015-2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package dsv is a library for working with delimited separated value (DSV).
 //
@@ -58,7 +58,7 @@ type ReadWriter struct {
 }
 
 // New create a new ReadWriter object.
-func New(config string, dataset interface{}) (rw *ReadWriter, e error) {
+func New(config string, dataset any) (rw *ReadWriter, e error) {
 	rw = &ReadWriter{}
 
 	e = rw.Reader.Init(config, dataset)

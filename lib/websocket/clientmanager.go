@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
@@ -158,7 +158,7 @@ func (cls *ClientManager) setFrames(conn int, frames *Frames) {
 // add new socket connection to user ID in context.
 func (cls *ClientManager) add(ctx context.Context, conn int) {
 	var (
-		v     interface{}
+		v     any
 		uid   uint64
 		conns []int
 		ok    bool
@@ -195,7 +195,7 @@ func (cls *ClientManager) add(ctx context.Context, conn int) {
 func (cls *ClientManager) remove(conn int) {
 	var (
 		ctx   context.Context
-		v     interface{}
+		v     any
 		conns []int
 		ok    bool
 	)

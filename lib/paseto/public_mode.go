@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package paseto
 
@@ -106,7 +106,7 @@ func (auth *PublicMode) RemovePeer(id string) {
 }
 
 // Pack the data into token.
-func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[string]interface{}) (
+func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[string]any) (
 	token string, err error,
 ) {
 	now := time.Now().Round(time.Second)

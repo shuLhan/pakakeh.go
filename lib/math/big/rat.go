@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package big
 
@@ -25,7 +25,7 @@ type Rat struct {
 
 // AddRat return the sum of `f[0]+f[1]+...`.
 // It will return nil if the first parameter is not convertable to Rat.
-func AddRat(f ...interface{}) *Rat {
+func AddRat(f ...any) *Rat {
 	if len(f) == 0 {
 		return nil
 	}
@@ -48,13 +48,13 @@ func AddRat(f ...interface{}) *Rat {
 //
 // Empty string or empty []byte still considered as valid, and it will return
 // it as zero.
-func NewRat(v interface{}) (r *Rat) {
+func NewRat(v any) (r *Rat) {
 	return toRat(v)
 }
 
 // MulRat return the result of multiplication `f[0]*f[1]*...`.
 // It will return nil if the first parameter is not convertable to Rat.
-func MulRat(f ...interface{}) *Rat {
+func MulRat(f ...any) *Rat {
 	if len(f) == 0 {
 		return nil
 	}
@@ -77,7 +77,7 @@ func MulRat(f ...interface{}) *Rat {
 // It will return nil if the first parameter is not convertable to Rat.
 // If the second or rest of parameters can not be converted to Rat or zero it
 // will return nil instead of panic.
-func QuoRat(f ...interface{}) *Rat {
+func QuoRat(f ...any) *Rat {
 	if len(f) == 0 {
 		return nil
 	}
@@ -97,7 +97,7 @@ func QuoRat(f ...interface{}) *Rat {
 
 // SubRat return the result of subtraction `f[0]-f[1]-...` as new Rat.
 // It will return nil if the first parameter is not convertable to Rat.
-func SubRat(f ...interface{}) *Rat {
+func SubRat(f ...any) *Rat {
 	if len(f) == 0 {
 		return nil
 	}
@@ -126,7 +126,7 @@ func (r *Rat) Abs() *Rat {
 
 // Add sets r to `r+g` and return the r as the result.
 // If g is not convertable to Rat it will equal to r+0.
-func (r *Rat) Add(g interface{}) *Rat {
+func (r *Rat) Add(g any) *Rat {
 	if r == nil {
 		return nil
 	}
@@ -184,7 +184,7 @@ func (r *Rat) Int64() int64 {
 // Unlike the standard Cmp(), if the first call to Cmp is not 0, it will try
 // to compare the string values of r and g, truncated by
 // DefaultDigitPrecision.
-func (r *Rat) IsEqual(g interface{}) bool {
+func (r *Rat) IsEqual(g any) bool {
 	y := toRat(g)
 	if y == nil {
 		return r == nil
@@ -203,7 +203,7 @@ func (r *Rat) IsEqual(g interface{}) bool {
 
 // IsGreater will return true if `r > g`.
 // If g is not convertable to Rat it will return false.
-func (r *Rat) IsGreater(g interface{}) bool {
+func (r *Rat) IsGreater(g any) bool {
 	if r == nil {
 		return false
 	}
@@ -216,7 +216,7 @@ func (r *Rat) IsGreater(g interface{}) bool {
 
 // IsGreaterOrEqual will return true if `r >= g`.
 // If g is not convertable to Rat it will return false.
-func (r *Rat) IsGreaterOrEqual(g interface{}) bool {
+func (r *Rat) IsGreaterOrEqual(g any) bool {
 	if r == nil {
 		return false
 	}
@@ -237,7 +237,7 @@ func (r *Rat) IsGreaterThanZero() bool {
 
 // IsLess will return true if `r < g`.
 // If r is nill or g is not convertable to Rat it will return false.
-func (r *Rat) IsLess(g interface{}) bool {
+func (r *Rat) IsLess(g any) bool {
 	if r == nil {
 		return false
 	}
@@ -250,7 +250,7 @@ func (r *Rat) IsLess(g interface{}) bool {
 
 // IsLessOrEqual will return true if `r <= g`.
 // It r is nil or g is not convertable to Rat it will return false.
-func (r *Rat) IsLessOrEqual(g interface{}) bool {
+func (r *Rat) IsLessOrEqual(g any) bool {
 	if r == nil {
 		return false
 	}
@@ -298,7 +298,7 @@ func (r *Rat) MarshalJSON() ([]byte, error) {
 
 // Mul sets r to product of `r * g` and return the result as r.
 // If g is not convertible to Rat it will return nil.
-func (r *Rat) Mul(g interface{}) *Rat {
+func (r *Rat) Mul(g any) *Rat {
 	y := toRat(g)
 	if y == nil {
 		return nil
@@ -316,7 +316,7 @@ func (r *Rat) Mul(g interface{}) *Rat {
 
 // Quo sets r to quotient of `r/g` and return the result as r.
 // If r is nil or g is not convertible to Rat or zero it will return nil.
-func (r *Rat) Quo(g interface{}) *Rat {
+func (r *Rat) Quo(g any) *Rat {
 	if r == nil {
 		return nil
 	}
@@ -383,7 +383,7 @@ func (r *Rat) RoundToZero(prec int) *Rat {
 }
 
 // Scan implement the database's sql.Scan interface.
-func (r *Rat) Scan(v interface{}) error {
+func (r *Rat) Scan(v any) error {
 	got := toRat(v)
 	if got == nil {
 		return fmt.Errorf("Rat.Scan: unknown type %T", v)
@@ -426,7 +426,7 @@ func (r *Rat) String() string {
 
 // Sub sets r to rounded difference `r-g` and return r.
 // If g is not convertable to Rat, it will return as r-0.
-func (r *Rat) Sub(g interface{}) *Rat {
+func (r *Rat) Sub(g any) *Rat {
 	if r == nil {
 		return nil
 	}
@@ -464,7 +464,7 @@ func (r *Rat) Value() (driver.Value, error) {
 }
 
 // toRat convert v type to Rat or nil if v type is unknown.
-func toRat(g interface{}) (out *Rat) {
+func toRat(g any) (out *Rat) {
 	out = &Rat{}
 
 	switch v := g.(type) {

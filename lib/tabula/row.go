@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -69,7 +69,7 @@ func (row *Row) GetRecord(i int) *Record {
 
 // GetValueAt return the value of row record at index `idx`. If the index is
 // out of range it will return nil and false
-func (row *Row) GetValueAt(idx int) (interface{}, bool) {
+func (row *Row) GetValueAt(idx int) (any, bool) {
 	if row.Len() <= idx {
 		return nil, false
 	}

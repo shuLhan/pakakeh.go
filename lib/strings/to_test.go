@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package strings
 
@@ -32,7 +32,7 @@ func TestToInt64(t *testing.T) {
 
 func TestToStrings(t *testing.T) {
 	var (
-		is  = make([]interface{}, 0)
+		is  = make([]any, 0)
 		i64 = []int64{0, 1, 2, 3}
 		exp = []string{`0`, `1`, `2`, `3`}
 

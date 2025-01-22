@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package xmlrpc
 
@@ -18,7 +18,7 @@ type Request struct {
 }
 
 // NewRequest create and initialize new request.
-func NewRequest(methodName string, params []interface{}) (req Request, err error) {
+func NewRequest(methodName string, params []any) (req Request, err error) {
 	req = Request{
 		MethodName: methodName,
 		Params:     make([]*Value, 0, len(params)),

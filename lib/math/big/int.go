@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package big
 
@@ -21,7 +21,7 @@ type Int struct {
 
 // NewInt create and initialize new Int value from v or nil if v is invalid
 // type that cannot be converted to Int.
-func NewInt(v interface{}) (i *Int) {
+func NewInt(v any) (i *Int) {
 	i = &Int{}
 
 	got := toInt(v, i)
@@ -32,7 +32,7 @@ func NewInt(v interface{}) (i *Int) {
 }
 
 // Add set the i value to i + v and return the i as the result.
-func (i *Int) Add(v interface{}) *Int {
+func (i *Int) Add(v any) *Int {
 	vv := toInt(v, nil)
 	if vv == nil {
 		// Its equal to `i+0`
@@ -43,7 +43,7 @@ func (i *Int) Add(v interface{}) *Int {
 }
 
 // IsGreater will return true if i > v.
-func (i *Int) IsGreater(v interface{}) bool {
+func (i *Int) IsGreater(v any) bool {
 	vv := toInt(v, nil)
 	if vv == nil {
 		return false
@@ -52,7 +52,7 @@ func (i *Int) IsGreater(v interface{}) bool {
 }
 
 // IsLess will return true if i < v.
-func (i *Int) IsLess(v interface{}) bool {
+func (i *Int) IsLess(v any) bool {
 	vv := toInt(v, nil)
 	if vv == nil {
 		return false
@@ -84,7 +84,7 @@ func (i *Int) MarshalJSON() ([]byte, error) {
 }
 
 // Scan implement the database's sql.Scan interface.
-func (i *Int) Scan(src interface{}) error {
+func (i *Int) Scan(src any) error {
 	got := toInt(src, i)
 	if got == nil {
 		return fmt.Errorf("Int.Scan: unknown type %T", src)
@@ -114,7 +114,7 @@ func (i *Int) Value() (driver.Value, error) {
 
 // toInt convert any type to Int or nil if type is unknown.
 // If in is not nil, it will be set to out.
-func toInt(v interface{}, in *Int) (out *Int) {
+func toInt(v any, in *Int) (out *Int) {
 	out = &Int{}
 
 	switch v := v.(type) {

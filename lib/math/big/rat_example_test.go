@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package big
 
@@ -49,7 +49,7 @@ func ExampleNewRat() {
 		stdRat    big.Rat
 		nilRat    *Rat
 	)
-	inputs := []interface{}{
+	inputs := []any{
 		nil,
 		[]byte{},
 		"",
@@ -576,7 +576,7 @@ func ExampleRat_Scan() {
 		err error
 	)
 
-	inputs := []interface{}{
+	inputs := []any{
 		1234,
 		nil,
 		"0.0001",
@@ -599,7 +599,7 @@ func ExampleRat_Scan() {
 }
 
 func ExampleRat_String() {
-	inputs := []interface{}{
+	inputs := []any{
 		nil,
 		"12345",
 		"0.00000000",
@@ -677,7 +677,7 @@ func ExampleRat_UnmarshalJSON_withStruct() {
 }
 
 func ExampleRat_Value() {
-	inputs := []interface{}{
+	inputs := []any{
 		nil,
 		0,
 		1.2345,

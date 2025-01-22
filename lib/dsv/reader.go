@@ -1,6 +1,6 @@
-// Copyright 2015-2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dsv
 
@@ -65,7 +65,7 @@ const (
 // Thats it.
 type Reader struct {
 	// Dataset contains the content of input file after read.
-	dataset interface{}
+	dataset any
 
 	// fRead is read descriptor.
 	fRead *os.File
@@ -136,7 +136,7 @@ type Reader struct {
 }
 
 // NewReader create and initialize new instance of DSV Reader with default values.
-func NewReader(config string, dataset interface{}) (reader *Reader, e error) {
+func NewReader(config string, dataset any) (reader *Reader, e error) {
 	reader = &Reader{
 		Input:         "",
 		Skip:          0,
@@ -173,7 +173,7 @@ func NewReader(config string, dataset interface{}) (reader *Reader, e error) {
 //
 // (7) Open rejected file.
 // (8) Open input file.
-func (reader *Reader) Init(fcfg string, dataset interface{}) (e error) {
+func (reader *Reader) Init(fcfg string, dataset any) (e error) {
 	// (1)
 	if dataset == nil {
 		dataset = reader.GetDataset()
@@ -533,7 +533,7 @@ func (reader *Reader) IsEqual(other *Reader) bool {
 }
 
 // GetDataset return reader dataset.
-func (reader *Reader) GetDataset() interface{} {
+func (reader *Reader) GetDataset() any {
 	return reader.dataset
 }
 

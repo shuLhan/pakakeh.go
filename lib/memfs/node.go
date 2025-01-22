@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
 // SPDX-License-Identifier: BSD-3-Clause
 
 package memfs
@@ -369,7 +370,7 @@ func (node *Node) Stat() (os.FileInfo, error) {
 }
 
 // Sys return the underlying data source (can return nil).
-func (node *Node) Sys() interface{} {
+func (node *Node) Sys() any {
 	return node
 }
 

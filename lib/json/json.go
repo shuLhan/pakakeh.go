@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package json provide a library for working with JSON.
 //
@@ -101,12 +101,12 @@ func EscapeString(in string) string {
 	return string(outb)
 }
 
-// ToMapStringFloat64 convert the map of string-interface{} into map of
+// ToMapStringFloat64 convert the map of string-any into map of
 // string-float64.
 // This function convert the map's key to lower-cases and ignore zero value in
-// interface{}.
-// The interface{} value only accept basic numeric types and slice of byte.
-func ToMapStringFloat64(in map[string]interface{}) (out map[string]float64, err error) {
+// any.
+// The any value only accept basic numeric types and slice of byte.
+func ToMapStringFloat64(in map[string]any) (out map[string]float64, err error) {
 	out = make(map[string]float64, len(in))
 
 	for k, v := range in {

@@ -1,6 +1,6 @@
-// Copyright 2015 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package cart
 
@@ -12,7 +12,7 @@ import (
 // NodeValue of tree in CART.
 type NodeValue struct {
 	// SplitV define the split value.
-	SplitV interface{}
+	SplitV any
 
 	// Class of leaf node.
 	Class string

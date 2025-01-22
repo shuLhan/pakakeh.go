@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package json
 
@@ -44,7 +44,7 @@ func TestEscapeString(t *testing.T) {
 }
 
 func TestToMapStringFloat64(t *testing.T) {
-	in := map[string]interface{}{
+	in := map[string]any{
 		"string": "1",
 		"zero":   "0",
 		"byte":   byte(3),

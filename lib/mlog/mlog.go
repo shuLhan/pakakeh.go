@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package mlog implement buffered multi writers of log.
 // It can have zero or more normal writers (for example, os.Stdout and
@@ -49,12 +49,12 @@ var defaultMLog = createMultiLogger(defTimeFormat, ``,
 // The default registered error writer is os.Stderr.
 //
 // If the generated string does not end with new line, it will be added.
-func Errf(format string, v ...interface{}) {
+func Errf(format string, v ...any) {
 	defaultMLog.Errf(format, v...)
 }
 
 // Fatalf is equal to Errf and os.Exit(1).
-func Fatalf(format string, v ...interface{}) {
+func Fatalf(format string, v ...any) {
 	defaultMLog.Fatalf(format, v...)
 }
 
@@ -67,12 +67,12 @@ func Flush() {
 // The default registered output writer is os.Stdout.
 //
 // If the generated string does not end with new line, it will be added.
-func Outf(format string, v ...interface{}) {
+func Outf(format string, v ...any) {
 	defaultMLog.Outf(format, v...)
 }
 
 // Panicf is equal to Errf followed by panic.
-func Panicf(format string, v ...interface{}) {
+func Panicf(format string, v ...any) {
 	defaultMLog.Panicf(format, v...)
 }
 

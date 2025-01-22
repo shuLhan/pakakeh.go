@@ -56,7 +56,7 @@ import (
 //
 // LIMITATION: this method does not support recursive pointer, for example a
 // node that point to parent and parent that point back to node again.
-func Assert(w Writer, name string, exp, got interface{}) {
+func Assert(w Writer, name string, exp, got any) {
 	w.Helper()
 
 	var logp = `Assert`
@@ -78,7 +78,7 @@ func Assert(w Writer, name string, exp, got interface{}) {
 	}
 }
 
-func printStringDiff(w Writer, name string, exp, got interface{}) bool {
+func printStringDiff(w Writer, name string, exp, got any) bool {
 	var (
 		diffData diff.Data
 		expStr   string

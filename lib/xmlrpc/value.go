@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package xmlrpc
 
@@ -16,7 +16,7 @@ type Value struct {
 	// In contains scalar value for Base64, Boolean, Double, Integer,
 	// String, and DateTime.
 	// It would be nil for Kind of Array and Struct.
-	In interface{}
+	In any
 
 	// Pair of struct member name and its value.
 	StructMembers map[string]*Value
@@ -28,7 +28,7 @@ type Value struct {
 }
 
 // NewValue convert Go type data into XML-RPC value.
-func NewValue(in interface{}) (out *Value) {
+func NewValue(in any) (out *Value) {
 	reft := reflect.TypeOf(in)
 	if reft == nil {
 		return nil

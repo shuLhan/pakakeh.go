@@ -23,7 +23,7 @@ const (
 // [Equal] method in that struct to compare the values.
 // A struct's field tagged with `noequal:""` will be skipped from being
 // processed.
-func DoEqual(x, y interface{}) (err error) {
+func DoEqual(x, y any) (err error) {
 	if x == nil && y == nil {
 		return nil
 	}
@@ -45,7 +45,7 @@ func DoEqual(x, y interface{}) (err error) {
 // [Equal] method in that struct to compare the values.
 // A struct's field tagged with `noequal:""` will be skipped from being
 // processed.
-func IsEqual(x, y interface{}) bool {
+func IsEqual(x, y any) bool {
 	if x == nil && y == nil {
 		return true
 	}
@@ -60,7 +60,7 @@ func IsEqual(x, y interface{}) bool {
 
 // IsNil will return true if v's type is chan, func, interface, map, pointer,
 // or slice and its value is `nil`; otherwise it will return false.
-func IsNil(v interface{}) bool {
+func IsNil(v any) bool {
 	var val = reflect.ValueOf(v)
 	var kind = val.Kind()
 
@@ -86,7 +86,7 @@ func IsNil(v interface{}) bool {
 //
 // If obj is nil or none of the method exist it will return nil without an
 // error.
-func Marshal(obj interface{}) (out []byte, err error) {
+func Marshal(obj any) (out []byte, err error) {
 	var (
 		logp        = "Marshal"
 		methodNames = []string{
@@ -100,7 +100,7 @@ func Marshal(obj interface{}) (out []byte, err error) {
 		methodName string
 		method     reflect.Value
 		callOut    []reflect.Value
-		callReturn interface{}
+		callReturn any
 		ok         bool
 	)
 
@@ -285,7 +285,7 @@ func setValue(obj reflect.Value, val string) (err error) {
 		objKind = obj.Kind()
 
 		objValue reflect.Value
-		v        interface{}
+		v        any
 	)
 
 	for objKind == reflect.Ptr {
@@ -438,7 +438,7 @@ func Unmarshal(obj reflect.Value, val []byte) (ok bool, err error) {
 		objValue   reflect.Value
 		method     reflect.Value
 		callOut    []reflect.Value
-		callReturn interface{}
+		callReturn any
 		methodName string
 	)
 
@@ -550,12 +550,12 @@ func Tag(field reflect.StructField, tag string) (val string, opts []string, hasT
 
 // doEqual compare two kind of objects and return nils if both are equal.
 //
-// If its not equal, it will return the interface{} value of v1 and v2 and
+// If its not equal, it will return the any value of v1 and v2 and
 // additional error message which describe the type and value where its not
 // matched.
 func doEqual(v1, v2 reflect.Value) (err error) {
 	var (
-		in1, in2 interface{}
+		in1, in2 any
 	)
 
 	if !v1.IsValid() || !v2.IsValid() {

@@ -1,6 +1,6 @@
-// Copyright 2015 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package binary
 
@@ -18,11 +18,11 @@ type BTNode struct {
 	// Parent of node.
 	Parent *BTNode
 	// Value of node.
-	Value interface{}
+	Value any
 }
 
 // NewBTNode create new node for binary tree.
-func NewBTNode(v interface{}, l *BTNode, r *BTNode) (p *BTNode) {
+func NewBTNode(v any, l *BTNode, r *BTNode) (p *BTNode) {
 	p = &BTNode{
 		Left:   l,
 		Right:  r,

@@ -1,6 +1,6 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package reflect
 
@@ -23,8 +23,8 @@ func TestAppendSlice(t *testing.T) {
 	)
 
 	type testCase struct {
-		obj  interface{}
-		exp  interface{}
+		obj  any
+		exp  any
 		desc string
 		vals []string
 	}

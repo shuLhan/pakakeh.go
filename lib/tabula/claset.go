@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -45,7 +45,7 @@ func NewClaset(mode int, types []int, names []string) (claset *Claset) {
 }
 
 // Clone return a copy of current claset object.
-func (claset *Claset) Clone() interface{} {
+func (claset *Claset) Clone() any {
 	clone := Claset{
 		ClassIndex: claset.GetClassIndex(),
 		major:      claset.MajorityClass(),

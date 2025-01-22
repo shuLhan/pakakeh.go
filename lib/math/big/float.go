@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package big
 
@@ -35,7 +35,7 @@ type Float struct {
 
 // AddFloat return the rounded sum `f[0]+f[1]+...`.
 // It will return nil if the first parameter is not convertable to Float.
-func AddFloat(f ...interface{}) *Float {
+func AddFloat(f ...any) *Float {
 	if len(f) == 0 {
 		return nil
 	}
@@ -55,7 +55,7 @@ func AddFloat(f ...interface{}) *Float {
 
 // NewFloat create and initialize new Float with default bit precision,
 // and rounding mode.
-func NewFloat(v interface{}) *Float {
+func NewFloat(v any) *Float {
 	return toFloat(v)
 }
 
@@ -70,7 +70,7 @@ func CreateFloat(v float64) Float {
 
 // MulFloat return the result of multiplication `f*g`.
 // It will return nil if `f` or `g` is not convertible to Float.
-func MulFloat(f, g interface{}) *Float {
+func MulFloat(f, g any) *Float {
 	ff := toFloat(f)
 	if ff == nil {
 		return nil
@@ -104,7 +104,7 @@ func ParseFloat(s string) (f *Float, err error) {
 }
 
 // QuoFloat return the quotient of `f/g` as new Float.
-func QuoFloat(f, g interface{}) *Float {
+func QuoFloat(f, g any) *Float {
 	ff := toFloat(f)
 	if ff == nil {
 		return nil
@@ -125,7 +125,7 @@ func SubFloat(f, g *Float) *Float {
 }
 
 // Add sets f to `f+g` and return the f as the result.
-func (f *Float) Add(g interface{}) *Float {
+func (f *Float) Add(g any) *Float {
 	gf := toFloat(g)
 	if gf == nil {
 		return nil
@@ -148,7 +148,7 @@ func (f *Float) Int64() int64 {
 }
 
 // IsEqual will return true if `f == g`.
-func (f *Float) IsEqual(g interface{}) bool {
+func (f *Float) IsEqual(g any) bool {
 	gf := toFloat(g)
 	if gf == nil {
 		return false
@@ -157,7 +157,7 @@ func (f *Float) IsEqual(g interface{}) bool {
 }
 
 // IsGreater will return true if `f > g`.
-func (f *Float) IsGreater(g interface{}) bool {
+func (f *Float) IsGreater(g any) bool {
 	gf := toFloat(g)
 	if gf == nil {
 		return false
@@ -166,7 +166,7 @@ func (f *Float) IsGreater(g interface{}) bool {
 }
 
 // IsGreaterOrEqual will return true if `f >= g`.
-func (f *Float) IsGreaterOrEqual(g interface{}) bool {
+func (f *Float) IsGreaterOrEqual(g any) bool {
 	gf := toFloat(g)
 	if gf == nil {
 		return false
@@ -175,7 +175,7 @@ func (f *Float) IsGreaterOrEqual(g interface{}) bool {
 }
 
 // IsLess will return true if `f < g`.
-func (f *Float) IsLess(g interface{}) bool {
+func (f *Float) IsLess(g any) bool {
 	gf := toFloat(g)
 	if gf == nil {
 		return false
@@ -184,7 +184,7 @@ func (f *Float) IsLess(g interface{}) bool {
 }
 
 // IsLessOrEqual will return true if `f <= g`.
-func (f *Float) IsLessOrEqual(g interface{}) bool {
+func (f *Float) IsLessOrEqual(g any) bool {
 	gf := toFloat(g)
 	if gf == nil {
 		return false
@@ -210,7 +210,7 @@ func (f *Float) MarshalJSON() ([]byte, error) {
 
 // Mul sets f to product of `f * g` and return the result as f.
 // If g is not convertible to Float it will return nil.
-func (f *Float) Mul(g interface{}) *Float {
+func (f *Float) Mul(g any) *Float {
 	gf := toFloat(g)
 	if gf == nil {
 		return nil
@@ -232,7 +232,7 @@ func (f *Float) ParseFloat(s string) (err error) {
 
 // Quo sets f to quotient of `f/g` and return the result as f.
 // If g is not convertible to Float it will return nil.
-func (f *Float) Quo(g interface{}) *Float {
+func (f *Float) Quo(g any) *Float {
 	gf := toFloat(g)
 	if gf == nil {
 		return nil
@@ -261,7 +261,7 @@ func (f *Float) String() string {
 }
 
 // Sub sets f to rounded difference `f-g` and return f.
-func (f *Float) Sub(g interface{}) *Float {
+func (f *Float) Sub(g any) *Float {
 	gf := toFloat(g)
 	if gf == nil {
 		return nil
@@ -280,7 +280,7 @@ func (f *Float) UnmarshalJSON(in []byte) (err error) {
 }
 
 // toFloat convert v type to Float or nil if v type is unknown.
-func toFloat(g interface{}) (out *Float) {
+func toFloat(g any) (out *Float) {
 	out = &Float{}
 	out.SetPrec(DefaultBitPrecision).SetMode(DefaultRoundingMode)
 

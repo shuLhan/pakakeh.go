@@ -1,6 +1,6 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -149,7 +149,7 @@ func MarshalForm(in any) (out url.Values, err error) {
 // not a pointer to a struct).
 // It will not return an error if one of the input value is not match with
 // field type.
-func UnmarshalForm(in url.Values, out interface{}) (err error) {
+func UnmarshalForm(in url.Values, out any) (err error) {
 	var (
 		logp  = `UnmarshalForm`
 		vout  = reflect.ValueOf(out)

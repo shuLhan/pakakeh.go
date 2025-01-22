@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package ini
 
@@ -109,7 +109,7 @@ func Parse(text []byte) (in *Ini, err error) {
 //
 // One exception to above rule is map type.
 // A map's key will override the key defined in tag.
-func Marshal(v interface{}) (b []byte, err error) {
+func Marshal(v any) (b []byte, err error) {
 	rtipe := reflect.TypeOf(v)
 	rvalue := reflect.ValueOf(v)
 	kind := rtipe.Kind()
@@ -313,7 +313,7 @@ func (in *Ini) marshalStruct(
 // struct of `v`.
 // All the properties and specifications of field's tag follow the Marshal
 // function.
-func Unmarshal(b []byte, v interface{}) (err error) {
+func Unmarshal(b []byte, v any) (err error) {
 	ini, err := Parse(b)
 	if err != nil {
 		return err
@@ -324,7 +324,7 @@ func Unmarshal(b []byte, v interface{}) (err error) {
 
 // Unmarshal store the value from configuration, based on `ini` tag, into a
 // struct pointed by interface `v`.
-func (in *Ini) Unmarshal(v interface{}) (err error) {
+func (in *Ini) Unmarshal(v any) (err error) {
 	rtipe := reflect.TypeOf(v)
 	rvalue := reflect.ValueOf(v)
 	kind := rtipe.Kind()

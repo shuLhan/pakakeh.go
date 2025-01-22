@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -23,7 +23,7 @@ const (
 
 // Record represent the smallest building block of data-set.
 type Record struct {
-	v interface{}
+	v any
 }
 
 // NewRecord will create and return record with nil value.
@@ -143,7 +143,7 @@ func (r *Record) IsMissingValue() bool {
 }
 
 // Interface return record value as interface.
-func (r *Record) Interface() interface{} {
+func (r *Record) Interface() any {
 	return r.v
 }
 
@@ -226,7 +226,7 @@ func (r *Record) IsEqualToString(v string) bool {
 
 // IsEqualToInterface return true if interface type and value equal to record
 // type and value.
-func (r *Record) IsEqualToInterface(v interface{}) bool {
+func (r *Record) IsEqualToInterface(v any) bool {
 	return reflect.DeepEqual(r.v, v)
 }
 

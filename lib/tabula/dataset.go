@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -68,7 +68,7 @@ func (dataset *Dataset) Init(mode int, types []int, names []string) {
 }
 
 // Clone return a copy of current dataset.
-func (dataset *Dataset) Clone() interface{} {
+func (dataset *Dataset) Clone() any {
 	clone := NewDataset(dataset.GetMode(), nil, nil)
 
 	for _, col := range dataset.Columns {
@@ -299,7 +299,7 @@ func (dataset *Dataset) SetRows(rows *Rows) {
 }
 
 // GetData return the data, based on mode (rows, columns, or matrix).
-func (dataset *Dataset) GetData() interface{} {
+func (dataset *Dataset) GetData() any {
 	switch dataset.Mode {
 	case DatasetModeRows:
 		return &dataset.Rows

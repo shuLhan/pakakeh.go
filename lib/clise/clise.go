@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package clise implements circular slice.
 // A circular slice is a slice that have fixed size.
@@ -29,7 +29,7 @@ import (
 
 // Clise define the circular slice implementation.
 type Clise struct {
-	v    []interface{}
+	v    []any
 	size int
 	last int
 	sync.Mutex
@@ -43,7 +43,7 @@ func New(size int) (c *Clise) {
 		return nil
 	}
 	c = &Clise{
-		v:    make([]interface{}, size),
+		v:    make([]any, size),
 		size: size,
 	}
 	return c
@@ -57,7 +57,7 @@ func (c *Clise) Close() error {
 
 // Pop remove the last Push()-ed item and return it to caller.
 // It will return nil if no more item inside it.
-func (c *Clise) Pop() (item interface{}) {
+func (c *Clise) Pop() (item any) {
 	c.Lock()
 	if c.over {
 		if c.last == 0 {
@@ -79,7 +79,7 @@ func (c *Clise) Pop() (item interface{}) {
 }
 
 // Push the item into the slice.
-func (c *Clise) Push(src ...interface{}) {
+func (c *Clise) Push(src ...any) {
 	var x int
 	c.Lock()
 	for ; x < len(src); x++ {
@@ -94,9 +94,9 @@ func (c *Clise) Push(src ...interface{}) {
 }
 
 // RecentSlice return the slice from index zero until the recent item.
-func (c *Clise) RecentSlice() (dst []interface{}) {
+func (c *Clise) RecentSlice() (dst []any) {
 	c.Lock()
-	dst = make([]interface{}, c.last)
+	dst = make([]any, c.last)
 	copy(dst, c.v[:c.last])
 	c.Unlock()
 	return dst
@@ -112,7 +112,7 @@ func (c *Clise) Reset() {
 
 // Slice return the content of circular slice as slice in the order of the
 // last item to the recent item.
-func (c *Clise) Slice() (dst []interface{}) {
+func (c *Clise) Slice() (dst []any) {
 	var (
 		end = c.size
 
@@ -123,10 +123,10 @@ func (c *Clise) Slice() (dst []interface{}) {
 	defer c.Unlock()
 
 	if c.over {
-		dst = make([]interface{}, c.size)
+		dst = make([]any, c.size)
 		start = c.last
 	} else {
-		dst = make([]interface{}, c.last)
+		dst = make([]any, c.last)
 		end = c.last
 	}
 
@@ -168,7 +168,7 @@ func (c *Clise) WriteString(s string) (n int, err error) {
 func (c *Clise) UnmarshalJSON(jsonb []byte) (err error) {
 	var (
 		logp  = `UnmarshalJSON`
-		array = make([]interface{}, 0)
+		array = make([]any, 0)
 	)
 
 	err = json.Unmarshal(jsonb, &array)
@@ -178,7 +178,7 @@ func (c *Clise) UnmarshalJSON(jsonb []byte) (err error) {
 
 	if c.size == 0 {
 		c.size = len(array)
-		c.v = make([]interface{}, c.size)
+		c.v = make([]any, c.size)
 	}
 
 	c.Push(array...)

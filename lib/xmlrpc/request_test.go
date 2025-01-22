@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package xmlrpc
 
@@ -18,17 +18,17 @@ type testStruct struct {
 func TestRequest_MarshalText(t *testing.T) {
 	type testCase struct {
 		methodName string
-		params     []interface{}
+		params     []any
 	}
 
 	var cases = []testCase{{
 		methodName: "method.name",
-		params: []interface{}{
+		params: []any{
 			"param-string",
 		},
 	}, {
 		methodName: "test.struct",
-		params: []interface{}{
+		params: []any{
 			testStruct{
 				X: 1,
 				Y: true,
@@ -36,7 +36,7 @@ func TestRequest_MarshalText(t *testing.T) {
 		},
 	}, {
 		methodName: "test.array",
-		params: []interface{}{
+		params: []any{
 			[]string{"a", "b"},
 		},
 	}}

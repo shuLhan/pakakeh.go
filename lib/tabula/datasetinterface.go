@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -12,7 +12,7 @@ import (
 // DatasetInterface is the interface for working with DSV data.
 type DatasetInterface interface {
 	Init(mode int, types []int, names []string)
-	Clone() interface{}
+	Clone() any
 	Reset() error
 
 	GetMode() int
@@ -42,7 +42,7 @@ type DatasetInterface interface {
 	SetRows(*Rows)
 	DeleteRow(idx int) *Row
 
-	GetData() interface{}
+	GetData() any
 	GetDataAsRows() *Rows
 	GetDataAsColumns() *Columns
 
@@ -61,7 +61,7 @@ type DatasetInterface interface {
 
 // ReadDatasetConfig open dataset configuration file and initialize dataset
 // field from there.
-func ReadDatasetConfig(ds interface{}, fcfg string) (e error) {
+func ReadDatasetConfig(ds any, fcfg string) (e error) {
 	cfg, e := os.ReadFile(fcfg)
 
 	if nil != e {
@@ -221,7 +221,7 @@ func SplitRowsByCategorical(di DatasetInterface, colidx int, splitVal []string) 
 // split data using value in column `colidx`. If value is numeric it will return
 // any rows that have column value less than `value` in `splitL`, and any column
 // value greater or equal to `value` in `splitR`.
-func SplitRowsByValue(di DatasetInterface, colidx int, value interface{}) (
+func SplitRowsByValue(di DatasetInterface, colidx int, value any) (
 	splitL DatasetInterface,
 	splitR DatasetInterface,
 	e error,

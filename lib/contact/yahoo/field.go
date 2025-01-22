@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package yahoo
 
@@ -25,9 +25,9 @@ const (
 // Field define a composite attribute in Contact.
 // Known value for Type: "phone", "name", "address".
 type Field struct {
-	Type  string      `json:"type"`
-	Value interface{} `json:"value"`
-	Flags []string    `json:"flags"`
+	Type  string   `json:"type"`
+	Value any      `json:"value"`
+	Flags []string `json:"flags"`
 
 	// Ignored fields for speedup.
 
@@ -39,14 +39,14 @@ type Field struct {
 
 // getValueType will return the Go type of field's Value.
 func (field *Field) getValueType() (
-	vmap map[string]interface{},
+	vmap map[string]any,
 	vstr string,
 	ok bool,
 ) {
 	ok = true
 
 	switch v := field.Value.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		vmap = v
 	case string:
 		vstr = v
@@ -66,7 +66,7 @@ func (field *Field) getFlag() string {
 }
 
 // decodeAddress will convert Yahoo address format to contact address format.
-func (field *Field) decodeAddress(flag string, vmap map[string]interface{}) (
+func (field *Field) decodeAddress(flag string, vmap map[string]any) (
 	adr contact.Address,
 ) {
 	adr = contact.Address{

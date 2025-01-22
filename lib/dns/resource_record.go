@@ -20,7 +20,7 @@ import (
 // resource record has the following format:
 type ResourceRecord struct {
 	// Value hold the generic, unpacked rdata based on Type.
-	Value interface{}
+	Value any
 
 	// A domain name to which this resource record pertains.
 	Name string

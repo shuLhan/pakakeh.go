@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package reflect_test
 
@@ -82,9 +82,9 @@ func ExampleIsNil() {
 	)
 
 	cases := []struct {
-		v interface{}
+		v any
 	}{
-		{}, // Uninitialized interface{}.
+		{}, // Uninitialized any.
 		{v: aBoolean},
 		{v: aChannel},          // Uninitialized channel.
 		{v: aFunction},         // Empty func type.
@@ -97,7 +97,7 @@ func ExampleIsNil() {
 		{v: anInt},
 		{v: emptyError},
 		{v: errors.New("e")}, // Initialized error.
-		{v: fs},              // Uninitialized interface type to interface{}.
+		{v: fs},              // Uninitialized interface type to any.
 	}
 
 	for _, c := range cases {

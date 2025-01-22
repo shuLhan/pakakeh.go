@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -25,7 +25,7 @@ func (recs *Records) SortByIndex(sortedIdx []int) *Records {
 
 // CountWhere return number of record where its value is equal to `v` type and
 // value.
-func (recs *Records) CountWhere(v interface{}) (c int) {
+func (recs *Records) CountWhere(v any) (c int) {
 	for _, r := range *recs {
 		if r.IsEqualToInterface(v) {
 			c++
@@ -35,7 +35,7 @@ func (recs *Records) CountWhere(v interface{}) (c int) {
 }
 
 // CountsWhere will return count of each value in slice `sv`.
-func (recs *Records) CountsWhere(vs []interface{}) (counts []int) {
+func (recs *Records) CountsWhere(vs []any) (counts []int) {
 	for _, v := range vs {
 		c := recs.CountWhere(v)
 		counts = append(counts, c)

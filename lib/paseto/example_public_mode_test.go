@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package paseto
 
@@ -47,7 +47,7 @@ func ExamplePublicMode() {
 		log.Fatal(err)
 	}
 
-	footer := map[string]interface{}{
+	footer := map[string]any{
 		"FOOTER": "HERE",
 	}
 	token, err := sender.Pack(receiverKey.ID, subjectMessage, []byte("hello receiver"), footer)

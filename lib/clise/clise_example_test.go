@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 package clise
 
 import "fmt"
@@ -5,7 +9,7 @@ import "fmt"
 func ExampleClise_Pop() {
 	var (
 		c    = New(5)
-		item interface{}
+		item any
 	)
 
 	c.Push(1, 2, 3, 4, 5, 6)

@@ -56,7 +56,7 @@ func createMultiLogger(timeFormat, prefix string, outs, errs []NamedWriter) (mlo
 
 	mlog = &MultiLogger{
 		bufPool: &sync.Pool{
-			New: func() interface{} {
+			New: func() any {
 				return new(bytes.Buffer)
 			},
 		},
@@ -124,12 +124,12 @@ func (mlog *MultiLogger) Close() {
 // writers.
 //
 // If the generated string does not end with new line, it will be added.
-func (mlog *MultiLogger) Errf(format string, v ...interface{}) {
+func (mlog *MultiLogger) Errf(format string, v ...any) {
 	mlog.writeTo(mlog.qerr, format, v...)
 }
 
 // Fatalf is equal to Errf and os.Exit(1).
-func (mlog *MultiLogger) Fatalf(format string, v ...interface{}) {
+func (mlog *MultiLogger) Fatalf(format string, v ...any) {
 	mlog.Errf(format, v...)
 	mlog.Flush()
 	os.Exit(1)
@@ -152,12 +152,12 @@ func (mlog *MultiLogger) Flush() {
 // Outf write the formatted string and its values to all output writers.
 //
 // If the generated string does not end with new line, it will be added.
-func (mlog *MultiLogger) Outf(format string, v ...interface{}) {
+func (mlog *MultiLogger) Outf(format string, v ...any) {
 	mlog.writeTo(mlog.qout, format, v...)
 }
 
 // Panicf is equal to Errf and followed by panic.
-func (mlog *MultiLogger) Panicf(format string, v ...interface{}) {
+func (mlog *MultiLogger) Panicf(format string, v ...any) {
 	mlog.Errf(format, v...)
 	mlog.Flush()
 	var msg = fmt.Sprintf(format, v...)
@@ -288,7 +288,7 @@ func (mlog *MultiLogger) processOutputQueue() {
 	mlog.flushq <- struct{}{}
 }
 
-func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{}) {
+func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...any) {
 	mlog.Lock()
 	if mlog.isClosed {
 		mlog.Unlock()

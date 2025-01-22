@@ -1,6 +1,6 @@
-// Copyright 2017, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be found
-// in the LICENSE file.
+// SPDX-FileCopyrightText: 2017 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package tabula
 
@@ -126,7 +126,7 @@ func (col *Column) SetRecords(recs *Records) {
 }
 
 // Interface return the column object as an interface.
-func (col *Column) Interface() interface{} {
+func (col *Column) Interface() any {
 	return col
 }
 

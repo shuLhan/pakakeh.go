@@ -1,6 +1,6 @@
-// Copyright 2015-2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dsv
 
@@ -14,7 +14,7 @@ import (
 // Return the reader contained data or error if failed.
 // Reader object upon returned has been closed, so if one need to read all
 // data in it simply set the `MaxRows` to `-1` in config file.
-func SimpleRead(fcfg string, dataset interface{}) (
+func SimpleRead(fcfg string, dataset any) (
 	reader ReaderInterface,
 	e error,
 ) {
@@ -60,7 +60,7 @@ func SimpleWrite(reader ReaderInterface, fcfg string) (nrows int, e error) {
 // - "DatasetMode" to "columns" to speeding up process.
 //
 // This function return the merged reader or error if failed.
-func SimpleMerge(fin1, fin2 string, dataset1, dataset2 interface{}) (
+func SimpleMerge(fin1, fin2 string, dataset1, dataset2 any) (
 	ReaderInterface,
 	error,
 ) {

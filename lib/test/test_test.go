@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package test
 
@@ -10,8 +10,8 @@ import (
 
 func TestAssert(t *testing.T) {
 	type testCase struct {
-		a    interface{}
-		b    interface{}
+		a    any
+		b    any
 		exp  string
 		desc string
 	}
@@ -19,7 +19,7 @@ func TestAssert(t *testing.T) {
 	var str = `a string`
 
 	var cases = []testCase{{
-		desc: `nil interface{}`,
+		desc: `nil any`,
 		a:    nil,
 		b:    &str,
 		exp:  `!!! Assert: IsValid: expecting <invalid Value>(false), got <*string Value>(true)`,

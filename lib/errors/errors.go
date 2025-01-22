@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package errors provide an error type with code.
 package errors
@@ -51,7 +51,7 @@ func (e *E) Error() string {
 }
 
 // As set the target to e only if only target is **E.
-func (e *E) As(target interface{}) bool {
+func (e *E) As(target any) bool {
 	_, ok := target.(**E)
 	if ok {
 		val := reflect.ValueOf(target)

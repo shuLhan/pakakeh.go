@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package sftp
 
@@ -258,7 +258,7 @@ func (fa *FileAttrs) Size() int64 {
 
 // Sys return the pointer to [FileAttrs] itself.
 // This method is added to comply with [fs.FileInfo] interface.
-func (fa *FileAttrs) Sys() interface{} {
+func (fa *FileAttrs) Sys() any {
 	return fa
 }
 

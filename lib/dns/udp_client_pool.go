@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -62,7 +62,7 @@ func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 }
 
 // newClient create a new udp client.
-func (ucp *UDPClientPool) newClient() interface{} {
+func (ucp *UDPClientPool) newClient() any {
 	var (
 		cl  *UDPClient
 		err error
@@ -92,7 +92,7 @@ func (ucp *UDPClientPool) Get() *UDPClient {
 //
 // WARNING: any client connection that call Send(), MUST call Recv()
 // before putting client back to pool.  You have been warned.
-func (ucp *UDPClientPool) Put(cl interface{}) {
+func (ucp *UDPClientPool) Put(cl any) {
 	if cl != nil {
 		ucp.pool.Put(cl)
 	}

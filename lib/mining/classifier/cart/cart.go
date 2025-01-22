@@ -1,6 +1,6 @@
-// Copyright 2015 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package cart implement the Classification and Regression Tree by Breiman, et al.
 // CART is binary decision tree.
@@ -155,7 +155,7 @@ func (runtime *Runtime) splitTreeByGain(claset tabula.ClasetInterface) (
 	// If its continuous, split the attribute using numeric value.
 	// If its discrete, split the attribute using subset (partition) of
 	// nominal values.
-	var splitV interface{}
+	var splitV any
 
 	if MaxGain.IsContinu {
 		splitV = MaxGain.GetMaxPartGainValue()
