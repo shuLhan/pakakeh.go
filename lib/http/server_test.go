@@ -17,6 +17,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -858,6 +859,82 @@ func TestStatusError(t *testing.T) {
 		test.Assert(t, "StatusCode", c.expStatusCode, res.StatusCode)
 		test.Assert(t, "Body", c.expBody, string(body))
 	}
+}
+
+func TestServer_HandleFS(t *testing.T) {
+	var tdata *test.Data
+	var err error
+	tdata, err = test.LoadData(`testdata/Server_HandleFS_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var root = t.TempDir()
+	var mfsOpts = memfs.Options{
+		Root:        root,
+		MaxFileSize: -1,
+		TryDirect:   true,
+	}
+	var mfs *memfs.MemFS
+	mfs, err = memfs.New(&mfsOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var serverOpts = ServerOptions{
+		Memfs:           mfs,
+		Address:         `127.0.0.1:15213`,
+		EnableIndexHTML: true,
+	}
+	var httpd *Server
+	httpd, err = NewServer(serverOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var redactTime = regexp.MustCompile(`\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d`)
+	var redactedTime = []byte(`0000-00-00T00:00:00`)
+	var simreq = libhttptest.SimulateRequest{
+		Path: `/`,
+	}
+	var simres *libhttptest.SimulateResult
+	var exp string
+	var got []byte
+
+	t.Run(`OnEmptyRoot`, func(t *testing.T) {
+		simres, err = libhttptest.Simulate(httpd.ServeHTTP, &simreq)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		exp = string(tdata.Output[t.Name()])
+		got, err = simres.DumpResponse([]string{HeaderETag})
+		if err != nil {
+			t.Fatal(err)
+		}
+		test.Assert(t, `response`, exp, string(got))
+	})
+
+	t.Run(`OnNewDirectory`, func(t *testing.T) {
+		var newDir = filepath.Join(root, `dirA`)
+		err = os.MkdirAll(newDir, 0755)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		simres, err = libhttptest.Simulate(httpd.ServeHTTP, &simreq)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		exp = string(tdata.Output[t.Name()])
+		got, err = simres.DumpResponse([]string{HeaderETag})
+		if err != nil {
+			t.Fatal(err)
+		}
+		got = redactTime.ReplaceAll(got, redactedTime)
+		test.Assert(t, `response`, exp, string(got))
+	})
 }
 
 // TestServer_Options_HandleFS test GET on memfs with authorization.

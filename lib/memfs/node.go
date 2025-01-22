@@ -15,6 +15,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"time"
 
@@ -30,7 +31,8 @@ const (
 body{font-family:monospace; white-space:pre;}
 </style>
 </head>
-<body>`
+<body>
+`
 )
 
 var (
@@ -157,12 +159,6 @@ func (node *Node) GenerateIndexHTML() {
 	if !node.IsDir() {
 		return
 	}
-	if len(node.Content) != 0 {
-		// Either the index has been generated or the node is not
-		// empty.
-		node.size = int64(len(node.Content))
-		return
-	}
 
 	var (
 		buf   bytes.Buffer
@@ -171,23 +167,23 @@ func (node *Node) GenerateIndexHTML() {
 
 	buf.WriteString(templateIndexHTMLHeader)
 
-	fmt.Fprintf(&buf, `<h3>Index of %s</h3>`, node.name)
+	fmt.Fprintf(&buf, "<h3>Index of %s</h3>\n", node.name)
 
 	if node.Parent != nil {
-		buf.WriteString(`<div><a href="..">..</a></div><br/>`)
+		buf.WriteString("<div><a href='..'>..</a></div><br/>\n")
 	}
 
 	for _, child = range node.Childs {
-		fmt.Fprintf(&buf, `<div>%s <tt>%12d</tt> %s <a href=%q>%s</a></div><br/>`,
-			child.mode, child.size, child.modTime.Format(time.RFC3339),
+		fmt.Fprintf(&buf, "<div>%s <tt>%12d</tt> %s <a href=%q>%s</a></div><br/>\n",
+			child.mode, child.size, child.modTime.UTC().Format(time.RFC3339),
 			child.Path, child.name)
 	}
 
-	buf.WriteString(`</body></html>`)
+	buf.WriteString("</body></html>\n")
 
 	node.ContentType = `text/html; charset=utf-8`
 	node.size = int64(buf.Len())
-	node.Content = libbytes.Copy(buf.Bytes())
+	node.Content = slices.Clone(buf.Bytes())
 }
 
 // IsDir return true if the node is a directory.
@@ -522,16 +518,16 @@ func (node *Node) Update(newInfo os.FileInfo, maxFileSize int64) (err error) {
 		}
 	}
 
-	if !doUpdate {
+	if !newInfo.IsDir() && !doUpdate {
 		return nil
 	}
 
 	node.modTime = newInfo.ModTime()
-	node.size = newInfo.Size()
 
 	if newInfo.IsDir() {
 		err = node.updateDir(maxFileSize)
 	} else {
+		node.size = newInfo.Size()
 		err = node.UpdateContent(maxFileSize)
 	}
 	if err != nil {

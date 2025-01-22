@@ -499,7 +499,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		responseETag = strconv.FormatInt(nodeModtime, 10)
 		requestETag  = req.Header.Get(HeaderIfNoneMatch)
 	)
-	if requestETag == responseETag {
+	if !node.IsDir() && requestETag == responseETag {
 		res.WriteHeader(http.StatusNotModified)
 		return
 	}

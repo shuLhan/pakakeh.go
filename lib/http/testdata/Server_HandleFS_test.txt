@@ -1,0 +1,33 @@
+
+<<< TestServer_HandleFS/OnEmptyRoot
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/html; charset=utf-8
+
+<!DOCTYPE html><html>
+<head>
+<meta name="viewport" content="width=device-width">
+<style>
+body{font-family:monospace; white-space:pre;}
+</style>
+</head>
+<body>
+<h3>Index of /</h3>
+</body></html>
+
+<<< TestServer_HandleFS/OnNewDirectory
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/html; charset=utf-8
+
+<!DOCTYPE html><html>
+<head>
+<meta name="viewport" content="width=device-width">
+<style>
+body{font-family:monospace; white-space:pre;}
+</style>
+</head>
+<body>
+<h3>Index of /</h3>
+<div>drwxr-xr-x <tt>           0</tt> 0000-00-00T00:00:00Z <a href="/dirA">dirA</a></div><br/>
+</body></html>
