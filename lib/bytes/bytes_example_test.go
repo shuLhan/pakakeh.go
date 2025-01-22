@@ -130,42 +130,6 @@ func ExampleAppendUint64() {
 	// => []byte{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3, 0xe8}
 }
 
-func ExampleConcat() {
-	fmt.Printf("%s\n", libbytes.Concat())
-	fmt.Printf("%s\n", libbytes.Concat([]byte{}))
-	fmt.Printf("%s\n", libbytes.Concat([]byte{}, []byte("B")))
-	fmt.Printf("%s\n", libbytes.Concat("with []int:", []int{1, 2}))
-	fmt.Printf("%s\n", libbytes.Concat([]byte("bytes"), " and ", []byte("string")))
-	fmt.Printf("%s\n", libbytes.Concat([]byte("A"), 1, []int{2}, []byte{}, []byte("C")))
-	// Output:
-	//
-	//
-	// B
-	// with []int:
-	// bytes and string
-	// AC
-}
-
-func ExampleCopy() {
-	// Copying empty slice.
-	org := []byte{}
-	cp := libbytes.Copy(org)
-	fmt.Printf("%d %q\n", len(cp), cp)
-
-	org = []byte("slice of life")
-	tmp := org
-	cp = libbytes.Copy(org)
-	fmt.Printf("%d %q\n", len(cp), cp)
-	fmt.Printf("Original address == tmp address: %v\n", &org[0] == &tmp[0])
-	fmt.Printf("Original address == copy address: %v\n", &org[0] == &cp[0])
-
-	// Output:
-	// 0 ""
-	// 13 "slice of life"
-	// Original address == tmp address: true
-	// Original address == copy address: false
-}
-
 func ExampleCutUntilToken() {
 	text := []byte(`\\abc \def \deg`)
 

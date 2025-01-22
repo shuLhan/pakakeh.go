@@ -71,31 +71,6 @@ func AppendUint64(data []byte, v uint64) []byte {
 	return data
 }
 
-// Concat merge one or more []byte or string in args into slice of
-// byte.
-// Any type that is not []byte or string in args will be ignored.
-func Concat(args ...interface{}) (out []byte) {
-	for _, arg := range args {
-		switch v := arg.(type) {
-		case string:
-			out = append(out, []byte(v)...)
-		case []byte:
-			out = append(out, v...)
-		}
-	}
-	return out
-}
-
-// Copy slice of bytes from parameter.
-func Copy(src []byte) (dst []byte) {
-	if len(src) == 0 {
-		return
-	}
-	dst = make([]byte, len(src))
-	copy(dst, src)
-	return
-}
-
 // CutUntilToken cut text until we found token.
 //
 // If token found, it will return all bytes before token, position of byte

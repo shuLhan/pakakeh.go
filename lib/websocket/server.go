@@ -1,10 +1,11 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -19,7 +20,6 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
@@ -211,7 +211,7 @@ func (serv *Server) handleUpgrade(hs *Handshake) (ctx context.Context, key []byt
 		goto out
 	}
 
-	key = libbytes.Copy(hs.Key)
+	key = bytes.Clone(hs.Key)
 	if serv.Options.HandleAuth != nil {
 		ctx, err = serv.Options.HandleAuth(hs)
 	}

@@ -1,14 +1,12 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package telemetry
 
 import (
 	"bytes"
 	"fmt"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 const (
@@ -71,7 +69,7 @@ func (ilp *IlpFormatter) BulkFormat(list []Metric, md *Metadata) []byte {
 
 	fmt.Fprintf(&bb, " %d\n", m.Timestamp)
 
-	return libbytes.Copy(bb.Bytes())
+	return bytes.Clone(bb.Bytes())
 }
 
 // Format single Metric.
@@ -99,7 +97,7 @@ func (ilp *IlpFormatter) generateMetadata(md *Metadata) {
 		v = vals[k]
 		fmt.Fprintf(&bb, `,%s=%s`, k, v)
 	}
-	ilp.mdRaw = libbytes.Copy(bb.Bytes())
+	ilp.mdRaw = bytes.Clone(bb.Bytes())
 	ilp.mdVersion = mdVersion
 }
 

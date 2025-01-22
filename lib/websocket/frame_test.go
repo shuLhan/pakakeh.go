@@ -1,13 +1,13 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
 import (
+	"slices"
 	"testing"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -75,7 +75,7 @@ func TestNewFrameClose(t *testing.T) {
 			opcode:    OpcodeClose,
 			closeCode: StatusBadRequest,
 			masked:    frameIsMasked,
-			payload: libbytes.Concat([]byte{0x03, 0xEA},
+			payload: slices.Concat([]byte{0x03, 0xEA},
 				[]byte("Hello!")),
 		},
 	}, {
@@ -86,7 +86,7 @@ func TestNewFrameClose(t *testing.T) {
 			opcode:    OpcodeClose,
 			closeCode: StatusBadRequest,
 			masked:    frameIsMasked,
-			payload: libbytes.Concat([]byte{0x03, 0xEA},
+			payload: slices.Concat([]byte{0x03, 0xEA},
 				_dummyPayload256[:123]),
 		},
 	}}
@@ -339,7 +339,7 @@ func TestFramePack(t *testing.T) {
 			masked:  0,
 			payload: _dummyPayload256,
 		},
-		exp: libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00},
+		exp: slices.Concat([]byte{0x82, 0x7E, 0x01, 0x00},
 			_dummyPayload256),
 	}, {
 		desc: `256 bytes binary message in a single masked frame`,
@@ -350,7 +350,7 @@ func TestFramePack(t *testing.T) {
 			payload: _dummyPayload256,
 			maskKey: _testMaskKey,
 		},
-		exp: libbytes.Concat([]byte{
+		exp: slices.Concat([]byte{
 			0x82, 0xFE,
 			0x01, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
@@ -364,7 +364,7 @@ func TestFramePack(t *testing.T) {
 			masked:  0,
 			payload: _dummyPayload65536,
 		},
-		exp: libbytes.Concat([]byte{
+		exp: slices.Concat([]byte{
 			0x82, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 		}, _dummyPayload65536),
@@ -378,7 +378,7 @@ func TestFramePack(t *testing.T) {
 			maskKey: _testMaskKey,
 			len:     65536,
 		},
-		exp: libbytes.Concat([]byte{
+		exp: slices.Concat([]byte{
 			0x82, 0xFF,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],

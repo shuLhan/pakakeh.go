@@ -1,14 +1,13 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // RDataHINFO HINFO records are used to acquire general information about a
@@ -27,11 +26,11 @@ func (hinfo *RDataHINFO) unpack(packet []byte) error {
 		size = int(packet[x])
 	)
 	x++
-	hinfo.CPU = libbytes.Copy(packet[x : x+size])
+	hinfo.CPU = bytes.Clone(packet[x : x+size])
 	x += size
 	size = int(packet[x])
 	x++
-	hinfo.OS = libbytes.Copy(packet[x : x+size])
+	hinfo.OS = bytes.Clone(packet[x : x+size])
 	return nil
 }
 

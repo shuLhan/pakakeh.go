@@ -1,14 +1,12 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package telemetry
 
 import (
 	"bytes"
 	"fmt"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // DsvFormatter format the [Metric] in single line where each value is separated
@@ -54,7 +52,7 @@ func (dsv *DsvFormatter) BulkFormat(listm []Metric, md *Metadata) []byte {
 	for _, m = range listm {
 		dsv.formatMetric(&bb, m)
 	}
-	return libbytes.Copy(bb.Bytes())
+	return bytes.Clone(bb.Bytes())
 }
 
 // Format single Metric into single line DSV.
@@ -95,7 +93,7 @@ func (dsv *DsvFormatter) generateMetadata(md *Metadata) {
 		v = vals[k]
 		fmt.Fprintf(&bb, `%s=%s`, k, v)
 	}
-	dsv.mdRaw = libbytes.Copy(bb.Bytes())
+	dsv.mdRaw = bytes.Clone(bb.Bytes())
 	dsv.mdVersion = mdVersion
 }
 

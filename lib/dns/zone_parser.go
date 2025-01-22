@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -414,7 +414,7 @@ func (m *zoneParser) parseRR(prevRR *ResourceRecord, tok []byte) (rr *ResourceRe
 			return nil, fmt.Errorf(`%s: line %d: invalid RR statement '%s'`, logp, m.lineno, tok)
 		}
 
-		orgtok = libbytes.Copy(tok)
+		orgtok = bytes.Clone(tok)
 		tok = ascii.ToUpper(tok)
 		stok = string(tok)
 

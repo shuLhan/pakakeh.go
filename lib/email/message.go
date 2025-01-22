@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package email
 
@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/email/dkim"
 )
 
@@ -255,7 +254,7 @@ func (msg *Message) DKIMVerify() (*dkim.Status, error) {
 	sig, err := dkim.Parse([]byte(subHeader.Fields[0].Value))
 
 	if sig != nil && len(sig.SDID) > 0 {
-		msg.dkimStatus.SDID = libbytes.Copy(sig.SDID)
+		msg.dkimStatus.SDID = bytes.Clone(sig.SDID)
 	}
 	if err != nil {
 		msg.dkimStatus.Type = dkim.StatusPermFail

@@ -1,13 +1,13 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
 import (
+	"slices"
 	"testing"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
@@ -114,7 +114,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `256 bytes binary message in a single unmasked frame`,
-		in: libbytes.Concat([]byte{0x82, 0x7E, 0x01, 0x00},
+		in: slices.Concat([]byte{0x82, 0x7E, 0x01, 0x00},
 			_dummyPayload256),
 		exp: &Frame{
 			fin:        frameIsFinished,
@@ -126,7 +126,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `256 bytes binary message in a single masked frame`,
-		in: libbytes.Concat([]byte{
+		in: slices.Concat([]byte{
 			0x82, 0xFE, 0x01, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],
 			_testMaskKey[3],
@@ -142,7 +142,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `65536 binary message in a single unmasked frame`,
-		in: libbytes.Concat([]byte{
+		in: slices.Concat([]byte{
 			0x82, 0x7F,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 		}, _dummyPayload65536),
@@ -156,7 +156,7 @@ func TestFrameUnpack(t *testing.T) {
 		},
 	}, {
 		desc: `65536 binary message in a single masked frame`,
-		in: libbytes.Concat([]byte{
+		in: slices.Concat([]byte{
 			0x82, 0xFF,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 			_testMaskKey[0], _testMaskKey[1], _testMaskKey[2],

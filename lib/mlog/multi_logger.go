@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package mlog
 
@@ -12,8 +12,6 @@ import (
 	"runtime/debug"
 	"sync"
 	"time"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 var (
@@ -226,7 +224,7 @@ func (mlog *MultiLogger) UnregisterOutputWriter(name string) {
 // Write write the b to all error writers.
 // It will always return the length of b without an error.
 func (mlog *MultiLogger) Write(b []byte) (n int, err error) {
-	mlog.qerr <- libbytes.Copy(b)
+	mlog.qerr <- bytes.Clone(b)
 	return len(b), nil
 }
 
@@ -326,7 +324,7 @@ func (mlog *MultiLogger) writeTo(q chan []byte, format string, v ...interface{})
 	format = buf.String()
 	buf.Reset()
 	fmt.Fprintf(buf, format, v...)
-	b = libbytes.Copy(buf.Bytes())
+	b = bytes.Clone(buf.Bytes())
 	q <- b
 
 	mlog.bufPool.Put(buf)

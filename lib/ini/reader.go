@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package ini
 
@@ -11,8 +11,6 @@ import (
 	"io"
 	"strings"
 	"unicode"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 const (
@@ -493,7 +491,7 @@ func (reader *reader) parseVarValue() (err error) {
 
 			reader.bufFormat.WriteByte(reader.b)
 
-			reader._var.rawValue = libbytes.Copy(reader.buf.Bytes())
+			reader._var.rawValue = bytes.Clone(reader.buf.Bytes())
 			reader._var.value = parseRawValue(reader._var.rawValue)
 
 			return reader.parseComment()
@@ -505,7 +503,7 @@ func (reader *reader) parseVarValue() (err error) {
 		return errValueInvalid
 	}
 
-	reader._var.rawValue = libbytes.Copy(reader.buf.Bytes())
+	reader._var.rawValue = bytes.Clone(reader.buf.Bytes())
 	reader._var.value = parseRawValue(reader._var.rawValue)
 	reader._var.format = reader.bufFormat.String()
 

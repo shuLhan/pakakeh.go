@@ -1,10 +1,14 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package bytes
 
-import "git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+import (
+	"bytes"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
+)
 
 // Parser implement tokenize parser for stream of byte using one or more
 // delimiters as separator between token.
@@ -33,7 +37,7 @@ func (bp *Parser) AddDelimiters(delims []byte) {
 
 // Delimiters return the copy of current delimiters.
 func (bp *Parser) Delimiters() []byte {
-	return Copy(bp.delims)
+	return bytes.Clone(bp.delims)
 }
 
 // Read read a token until one of the delimiters found.
@@ -136,7 +140,7 @@ out:
 
 // Remaining return the copy of un-parsed content.
 func (bp *Parser) Remaining() []byte {
-	return Copy(bp.content[bp.x:])
+	return bytes.Clone(bp.content[bp.x:])
 }
 
 // RemoveDelimiters remove delimiters delims from current delimiters.
@@ -256,7 +260,7 @@ func (bp *Parser) SkipSpaces() (n int, c byte) {
 // Stop the parser, return the remaining unparsed content and its last
 // position, and then call Reset to reset the internal state back to zero.
 func (bp *Parser) Stop() (remain []byte, pos int) {
-	remain = Copy(bp.content[bp.x:])
+	remain = bytes.Clone(bp.content[bp.x:])
 	pos = bp.x
 	bp.Reset(nil, nil)
 	return remain, pos
