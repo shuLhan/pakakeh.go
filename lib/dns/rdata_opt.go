@@ -1,10 +1,11 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strings"
 
@@ -54,8 +55,8 @@ func (opt *RDataOPT) String() string {
 func (opt *RDataOPT) pack() (rdata []byte) {
 	var optvar RDataOPTVar
 	for _, optvar = range opt.ListVar {
-		rdata = libbytes.AppendUint16(rdata, optvar.Code)
-		rdata = libbytes.AppendUint16(rdata, uint16(len(optvar.Data)))
+		rdata = binary.BigEndian.AppendUint16(rdata, optvar.Code)
+		rdata = binary.BigEndian.AppendUint16(rdata, uint16(len(optvar.Data)))
 		rdata = append(rdata, optvar.Data...)
 	}
 	return rdata

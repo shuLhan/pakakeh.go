@@ -13,64 +13,6 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
-// AppendInt16 append an int16 value into slice of byte.
-func AppendInt16(data []byte, v int16) []byte {
-	data = append(data, byte(v>>8))
-	data = append(data, byte(v))
-	return data
-}
-
-// AppendInt32 append an int32 value into slice of byte.
-func AppendInt32(data []byte, v int32) []byte {
-	data = append(data, byte(v>>24))
-	data = append(data, byte(v>>16))
-	data = append(data, byte(v>>8))
-	data = append(data, byte(v))
-	return data
-}
-
-// AppendInt64 append an int64 value into slice of byte.
-func AppendInt64(data []byte, v int64) []byte {
-	data = append(data, byte(v>>56))
-	data = append(data, byte(v>>48))
-	data = append(data, byte(v>>40))
-	data = append(data, byte(v>>32))
-	data = append(data, byte(v>>24))
-	data = append(data, byte(v>>16))
-	data = append(data, byte(v>>8))
-	data = append(data, byte(v))
-	return data
-}
-
-// AppendUint16 append an uint16 value into slice of byte.
-func AppendUint16(data []byte, v uint16) []byte {
-	data = append(data, byte(v>>8))
-	data = append(data, byte(v))
-	return data
-}
-
-// AppendUint32 append an uint32 value into slice of byte.
-func AppendUint32(data []byte, v uint32) []byte {
-	data = append(data, byte(v>>24))
-	data = append(data, byte(v>>16))
-	data = append(data, byte(v>>8))
-	data = append(data, byte(v))
-	return data
-}
-
-// AppendUint64 append an uint64 value into slice of byte.
-func AppendUint64(data []byte, v uint64) []byte {
-	data = append(data, byte(v>>56))
-	data = append(data, byte(v>>48))
-	data = append(data, byte(v>>40))
-	data = append(data, byte(v>>32))
-	data = append(data, byte(v>>24))
-	data = append(data, byte(v>>16))
-	data = append(data, byte(v>>8))
-	data = append(data, byte(v))
-	return data
-}
-
 // CutUntilToken cut text until we found token.
 //
 // If token found, it will return all bytes before token, position of byte

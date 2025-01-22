@@ -6,6 +6,7 @@ package dns
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -352,7 +353,7 @@ func (svcb *RDataSVCB) keys() (listKey []int) {
 func (svcb *RDataSVCB) pack(msg *Message) (n int) {
 	n = len(msg.packet)
 
-	msg.packet = libbytes.AppendUint16(msg.packet, svcb.Priority)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, svcb.Priority)
 
 	_ = msg.packDomainName([]byte(svcb.TargetName), false)
 
@@ -373,7 +374,8 @@ func (svcb *RDataSVCB) pack(msg *Message) (n int) {
 			svcb.packALPN(msg, listValue)
 
 		case svcbKeyIDNoDefaultALPN:
-			msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDNoDefaultALPN))
+			msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+				uint16(svcbKeyIDNoDefaultALPN))
 
 		case svcbKeyIDPort:
 			svcb.packPort(msg, listValue)
@@ -397,10 +399,11 @@ func (svcb *RDataSVCB) pack(msg *Message) (n int) {
 }
 
 func (svcb *RDataSVCB) packMandatory(msg *Message, listValue []string) {
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDMandatory))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(svcbKeyIDMandatory))
 
 	var total = 2 * len(listValue)
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(total))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(total))
 
 	var (
 		listKeyID = make([]int, 0, len(listValue))
@@ -413,7 +416,7 @@ func (svcb *RDataSVCB) packMandatory(msg *Message, listValue []string) {
 	}
 	sort.Ints(listKeyID)
 	for _, keyid = range listKeyID {
-		msg.packet = libbytes.AppendUint16(msg.packet, uint16(keyid))
+		msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(keyid))
 	}
 }
 
@@ -426,8 +429,8 @@ func (svcb *RDataSVCB) packALPN(msg *Message, listValue []string) {
 		total += 1 + len(val)
 	}
 
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDALPN))
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(total))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(svcbKeyIDALPN))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(total))
 
 	for _, val = range listValue {
 		msg.packet = append(msg.packet, byte(len(val)))
@@ -446,16 +449,18 @@ func (svcb *RDataSVCB) packPort(msg *Message, listValue []string) {
 		return
 	}
 
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDPort))
-	msg.packet = libbytes.AppendUint16(msg.packet, 2)
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(port))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(svcbKeyIDPort))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 2)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(port))
 }
 
 func (svcb *RDataSVCB) packIpv4hint(msg *Message, listValue []string) {
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDIpv4hint))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(svcbKeyIDIpv4hint))
 
 	var total = 4 * len(listValue)
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(total))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(total))
 
 	var val string
 
@@ -465,10 +470,11 @@ func (svcb *RDataSVCB) packIpv4hint(msg *Message, listValue []string) {
 }
 
 func (svcb *RDataSVCB) packIpv6hint(msg *Message, listValue []string) {
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(svcbKeyIDIpv6hint))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(svcbKeyIDIpv6hint))
 
 	var total = 16 * len(listValue)
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(total))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(total))
 
 	var val string
 
@@ -480,8 +486,8 @@ func (svcb *RDataSVCB) packIpv6hint(msg *Message, listValue []string) {
 func (svcb *RDataSVCB) packGenericValue(keyid int, msg *Message, listValue []string) {
 	var val = strings.Join(listValue, `,`)
 
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(keyid))
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(len(val)))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(keyid))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(len(val)))
 	msg.packet = append(msg.packet, []byte(val)...)
 }
 

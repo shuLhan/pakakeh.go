@@ -1,10 +1,11 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"strconv"
@@ -462,8 +463,10 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 
 func (msg *Message) packQuestion() {
 	msg.packDomainName([]byte(msg.Question.Name), false)
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(msg.Question.Type))
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(msg.Question.Class))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(msg.Question.Type))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(msg.Question.Class))
 }
 
 func (msg *Message) packRR(rr *ResourceRecord) {
@@ -479,8 +482,8 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 		msg.packDomainName([]byte(rr.Name), true)
 	}
 
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(rr.Type))
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(rr.Class))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(rr.Type))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(rr.Class))
 
 	if rr.Type == RecordTypeOPT {
 		rr.TTL = 0
@@ -495,7 +498,7 @@ func (msg *Message) packRR(rr *ResourceRecord) {
 	}
 
 	rr.idxTTL = uint16(len(msg.packet))
-	msg.packet = libbytes.AppendUint32(msg.packet, rr.TTL)
+	msg.packet = binary.BigEndian.AppendUint32(msg.packet, rr.TTL)
 
 	msg.packRData(rr)
 }
@@ -548,7 +551,7 @@ func (msg *Message) packRData(rr *ResourceRecord) {
 }
 
 func (msg *Message) packA(rr *ResourceRecord) {
-	msg.packet = libbytes.AppendUint16(msg.packet, rdataIPv4Size)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, rdataIPv4Size)
 
 	var (
 		rrText string
@@ -580,7 +583,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	)
 
 	// Reserve two octets for rdlength
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	n = msg.packDomainName([]byte(rrText), true)
 	libbytes.WriteUint16(msg.packet, off, uint16(n))
@@ -596,18 +599,21 @@ func (msg *Message) packSOA(rr *ResourceRecord) {
 	)
 
 	// Reserve two octets for rdlength.
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	n = msg.packDomainName([]byte(rrSOA.MName), true)
 	total = n
 	n = msg.packDomainName([]byte(rrSOA.RName), true)
 	total += n
 
-	msg.packet = libbytes.AppendUint32(msg.packet, rrSOA.Serial)
-	msg.packet = libbytes.AppendInt32(msg.packet, rrSOA.Refresh)
-	msg.packet = libbytes.AppendInt32(msg.packet, rrSOA.Retry)
-	msg.packet = libbytes.AppendInt32(msg.packet, rrSOA.Expire)
-	msg.packet = libbytes.AppendUint32(msg.packet, rrSOA.Minimum)
+	msg.packet = binary.BigEndian.AppendUint32(msg.packet, rrSOA.Serial)
+	msg.packet = binary.BigEndian.AppendUint32(msg.packet,
+		uint32(rrSOA.Refresh))
+	msg.packet = binary.BigEndian.AppendUint32(msg.packet,
+		uint32(rrSOA.Retry))
+	msg.packet = binary.BigEndian.AppendUint32(msg.packet,
+		uint32(rrSOA.Expire))
+	msg.packet = binary.BigEndian.AppendUint32(msg.packet, rrSOA.Minimum)
 	total += 20
 
 	// Write rdlength.
@@ -621,7 +627,7 @@ func (msg *Message) packWKS(rr *ResourceRecord) {
 	)
 
 	// Write rdlength.
-	msg.packet = libbytes.AppendUint16(msg.packet, n)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, n)
 
 	msg.packet = append(msg.packet, rrWKS.Address[:4]...)
 	msg.packet = append(msg.packet, rrWKS.Protocol)
@@ -636,7 +642,7 @@ func (msg *Message) packHINFO(rr *ResourceRecord) {
 
 	// Write rdlength.
 	n += len(rrHInfo.OS) + 1
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(n))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(n))
 	msg.packet = append(msg.packet, byte(len(rrHInfo.CPU)))
 	msg.packet = append(msg.packet, rrHInfo.CPU...)
 	msg.packet = append(msg.packet, byte(len(rrHInfo.OS)))
@@ -652,7 +658,7 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 	)
 
 	// Reserve two octets for rdlength.
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	n = msg.packDomainName([]byte(rrMInfo.RMailBox), true)
 	n += msg.packDomainName([]byte(rrMInfo.EmailBox), true)
@@ -671,9 +677,10 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength.
 	off = uint(len(msg.packet))
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
-	msg.packet = libbytes.AppendInt16(msg.packet, rrMX.Preference)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet,
+		uint16(rrMX.Preference))
 
 	n = msg.packDomainName([]byte(rrMX.Exchange), true)
 
@@ -687,7 +694,7 @@ func (msg *Message) packTXT(rr *ResourceRecord) {
 		n         = uint16(len(rrText))
 	)
 
-	msg.packet = libbytes.AppendUint16(msg.packet, n+1)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, n+1)
 
 	msg.packet = append(msg.packet, byte(n))
 	msg.packet = append(msg.packet, rrText...)
@@ -702,11 +709,11 @@ func (msg *Message) packSRV(rr *ResourceRecord) {
 	)
 
 	// Reserve two octets for rdlength
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
-	msg.packet = libbytes.AppendUint16(msg.packet, rrSRV.Priority)
-	msg.packet = libbytes.AppendUint16(msg.packet, rrSRV.Weight)
-	msg.packet = libbytes.AppendUint16(msg.packet, rrSRV.Port)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, rrSRV.Priority)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, rrSRV.Weight)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, rrSRV.Port)
 
 	n = msg.packDomainName([]byte(rrSRV.Target), false) + 6
 
@@ -720,7 +727,7 @@ func (msg *Message) packAAAA(rr *ResourceRecord) {
 		ip        = net.ParseIP(rrText)
 	)
 
-	msg.packet = libbytes.AppendUint16(msg.packet, rdataIPv6Size)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, rdataIPv6Size)
 
 	if ip == nil {
 		msg.packet = append(msg.packet, rrText[:rdataIPv6Size]...)
@@ -736,7 +743,7 @@ func (msg *Message) packOPT(rr *ResourceRecord) {
 	rrOPT, _ = rr.Value.(*RDataOPT)
 
 	var rdata = rrOPT.pack()
-	msg.packet = libbytes.AppendUint16(msg.packet, uint16(len(rdata)))
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, uint16(len(rdata)))
 	msg.packet = append(msg.packet, rdata...)
 }
 
@@ -753,7 +760,7 @@ func (msg *Message) packSVCB(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength.
 	var off = uint(len(msg.packet))
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	var n = svcb.pack(msg)
 
@@ -774,10 +781,10 @@ func (msg *Message) packHTTPS(rr *ResourceRecord) {
 
 	// Reserve two octets for rdlength.
 	var off = uint(len(msg.packet))
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	// Priority.
-	msg.packet = libbytes.AppendUint16(msg.packet, 0)
+	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	var n = msg.packDomainName([]byte(rrhttps.TargetName), false)
 

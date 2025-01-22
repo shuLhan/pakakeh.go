@@ -1,17 +1,17 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"time"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
@@ -176,7 +176,7 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 		packet = make([]byte, 0, 2+lenmsg)
 	)
 
-	packet = libbytes.AppendUint16(packet, uint16(lenmsg))
+	packet = binary.BigEndian.AppendUint16(packet, uint16(lenmsg))
 	packet = append(packet, msg...)
 
 	n, err = cl.conn.Write(packet)

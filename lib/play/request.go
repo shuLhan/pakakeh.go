@@ -6,14 +6,13 @@ package play
 
 import (
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 const cookieNameSid = `sid`
@@ -79,7 +78,7 @@ func (req *Request) generateSid() string {
 	var plain = []byte(req.Body)
 	var epoch = now()
 
-	plain = libbytes.AppendInt64(plain, epoch)
+	plain = binary.BigEndian.AppendUint64(plain, uint64(epoch))
 	var cipher = sha256.Sum256(plain)
 	var dst = make([]byte, hex.EncodedLen(len(cipher)))
 	hex.Encode(dst, cipher[:])
