@@ -134,7 +134,6 @@ func TestGo_Run_Overlap(t *testing.T) {
 
 	runwg.Add(1)
 	go testRunOverlap(t, &runwg, tdata, `run2`, sid)
-
 	runwg.Wait()
 
 	// The cmd1 Run should have been killed.
@@ -164,7 +163,8 @@ func testRunOverlap(t *testing.T, runwg *sync.WaitGroup, tdata *test.Data,
 		Root: t.TempDir(),
 	})
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
+		return
 	}
 
 	var req = &Request{
