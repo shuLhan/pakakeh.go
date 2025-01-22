@@ -1,16 +1,16 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"encoding/binary"
 	"fmt"
 	"log"
 	"net"
 	"strings"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
@@ -196,14 +196,14 @@ func (rr *ResourceRecord) unpack(packet []byte, startIdx uint) (x uint, err erro
 		return x, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	rr.Type = RecordType(libbytes.ReadUint16(packet, x))
+	rr.Type = RecordType(binary.BigEndian.Uint16(packet[x:]))
 	x += 2
-	rr.Class = RecordClass(libbytes.ReadUint16(packet, x))
+	rr.Class = RecordClass(binary.BigEndian.Uint16(packet[x:]))
 	x += 2
 	rr.idxTTL = uint16(x)
-	rr.TTL = libbytes.ReadUint32(packet, x)
+	rr.TTL = binary.BigEndian.Uint32(packet[x:])
 	x += 4
-	rr.rdlen = libbytes.ReadUint16(packet, x)
+	rr.rdlen = binary.BigEndian.Uint16(packet[x:])
 	x += 2
 
 	var lenXRdata = x + uint(rr.rdlen)
@@ -462,7 +462,7 @@ func (rr *ResourceRecord) unpackMX(packet []byte, startIdx uint) (err error) {
 
 	rr.Value = rrMX
 
-	rrMX.Preference = libbytes.ReadInt16(packet, startIdx)
+	rrMX.Preference = int16(binary.BigEndian.Uint16(packet[startIdx:]))
 
 	rrMX.Exchange, _, err = unpackDomainName(packet, startIdx+2)
 
@@ -498,11 +498,11 @@ func (rr *ResourceRecord) unpackSRV(packet []byte, x uint) (err error) {
 	rrSRV.Name = rr.Name[y:]
 
 	// Unpack RDATA
-	rrSRV.Priority = libbytes.ReadUint16(packet, x)
+	rrSRV.Priority = binary.BigEndian.Uint16(packet[x:])
 	x += 2
-	rrSRV.Weight = libbytes.ReadUint16(packet, x)
+	rrSRV.Weight = binary.BigEndian.Uint16(packet[x:])
 	x += 2
-	rrSRV.Port = libbytes.ReadUint16(packet, x)
+	rrSRV.Port = binary.BigEndian.Uint16(packet[x:])
 	x += 2
 
 	rrSRV.Target, _, err = unpackDomainName(packet, x)
@@ -603,15 +603,15 @@ func (rr *ResourceRecord) unpackSOA(packet []byte, startIdx uint) (err error) {
 		x += uint(len(rrSOA.RName) + 2)
 	}
 
-	rrSOA.Serial = libbytes.ReadUint32(packet, x)
+	rrSOA.Serial = binary.BigEndian.Uint32(packet[x:])
 	x += 4
-	rrSOA.Refresh = libbytes.ReadInt32(packet, x)
+	rrSOA.Refresh = int32(binary.BigEndian.Uint32(packet[x:]))
 	x += 4
-	rrSOA.Retry = libbytes.ReadInt32(packet, x)
+	rrSOA.Retry = int32(binary.BigEndian.Uint32(packet[x:]))
 	x += 4
-	rrSOA.Expire = libbytes.ReadInt32(packet, x)
+	rrSOA.Expire = int32(binary.BigEndian.Uint32(packet[x:]))
 	x += 4
-	rrSOA.Minimum = libbytes.ReadUint32(packet, x)
+	rrSOA.Minimum = binary.BigEndian.Uint32(packet[x:])
 
 	return nil
 }

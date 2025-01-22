@@ -267,54 +267,6 @@ func ReadHexByte(data []byte, x int) (b byte, ok bool) {
 	return b, true
 }
 
-// ReadInt16 read int16 value from "data" start at index "x".
-// It will return 0 if "x" is out of range.
-func ReadInt16(data []byte, x uint) (v int16) {
-	if x+1 >= uint(len(data)) {
-		return 0
-	}
-	v = int16(data[x]) << 8
-	v |= int16(data[x+1])
-	return v
-}
-
-// ReadInt32 read int32 value from "data" start at index "x".
-// It will return 0 if "x" is out of range.
-func ReadInt32(data []byte, x uint) (v int32) {
-	if x+3 >= uint(len(data)) {
-		return 0
-	}
-	v = int32(data[x]) << 24
-	v |= int32(data[x+1]) << 16
-	v |= int32(data[x+2]) << 8
-	v |= int32(data[x+3])
-	return v
-}
-
-// ReadUint16 read uint16 value from "data" start at index "x".
-// If x is out of range, it will return 0.
-func ReadUint16(data []byte, x uint) (v uint16) {
-	if x+1 >= uint(len(data)) {
-		return 0
-	}
-	v = uint16(data[x]) << 8
-	v |= uint16(data[x+1])
-	return v
-}
-
-// ReadUint32 read uint32 value from "data" start at index "x".
-// If x is out of range, it will return 0.
-func ReadUint32(data []byte, x uint) (v uint32) {
-	if x+3 >= uint(len(data)) {
-		return 0
-	}
-	v = uint32(data[x]) << 24
-	v |= uint32(data[x+1]) << 16
-	v |= uint32(data[x+2]) << 8
-	v |= uint32(data[x+3])
-	return v
-}
-
 // RemoveSpaces remove all spaces from input in.
 func RemoveSpaces(in []byte) (out []byte) {
 	var c byte

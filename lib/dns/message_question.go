@@ -1,14 +1,13 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strings"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // MessageQuestion contains the "question" in most queries.
@@ -93,9 +92,9 @@ func (qst *MessageQuestion) unpack(packet []byte) (err error) {
 	}
 
 	qst.Name = sb.String()
-	qst.Type = RecordType(libbytes.ReadUint16(packet, uint(x)))
+	qst.Type = RecordType(binary.BigEndian.Uint16(packet[x:]))
 	x += 2
-	qst.Class = RecordClass(libbytes.ReadUint16(packet, uint(x)))
+	qst.Class = RecordClass(binary.BigEndian.Uint16(packet[x:]))
 
 	return nil
 }

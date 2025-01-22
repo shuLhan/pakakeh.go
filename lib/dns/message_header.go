@@ -1,10 +1,11 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 
@@ -177,7 +178,7 @@ func (hdr *MessageHeader) unpack(packet []byte) (err error) {
 		return fmt.Errorf(`unknown response code=%d`, hdr.RCode)
 	}
 
-	hdr.ID = libbytes.ReadUint16(packet, 0)
+	hdr.ID = binary.BigEndian.Uint16(packet)
 
 	hdr.IsQuery = packet[2]&headerIsResponse != headerIsResponse
 	hdr.IsAA = packet[2]&headerIsAA == headerIsAA
@@ -185,10 +186,10 @@ func (hdr *MessageHeader) unpack(packet []byte) (err error) {
 	hdr.IsRD = packet[2]&headerIsRD == headerIsRD
 	hdr.IsRA = packet[3]&headerIsRA == headerIsRA
 
-	hdr.QDCount = libbytes.ReadUint16(packet, 4)
-	hdr.ANCount = libbytes.ReadUint16(packet, 6)
-	hdr.NSCount = libbytes.ReadUint16(packet, 8)
-	hdr.ARCount = libbytes.ReadUint16(packet, 10)
+	hdr.QDCount = binary.BigEndian.Uint16(packet[4:])
+	hdr.ANCount = binary.BigEndian.Uint16(packet[6:])
+	hdr.NSCount = binary.BigEndian.Uint16(packet[8:])
+	hdr.ARCount = binary.BigEndian.Uint16(packet[10:])
 
 	return nil
 }

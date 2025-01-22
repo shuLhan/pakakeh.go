@@ -8,8 +8,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strings"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // RDataOPT define format of RDATA for OPT.
@@ -70,10 +68,10 @@ func (opt *RDataOPT) unpack(rdlen int, packet []byte) (err error) {
 	for x < rdlen {
 		var optvar = RDataOPTVar{}
 
-		optvar.Code = libbytes.ReadUint16(packet, uint(x))
+		optvar.Code = binary.BigEndian.Uint16(packet[x:])
 		x += 2
 
-		var optlen = int(libbytes.ReadUint16(packet, uint(x)))
+		var optlen = int(binary.BigEndian.Uint16(packet[x:]))
 		x += 2
 
 		if x+optlen > len(packet) {

@@ -15,8 +15,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 // List of known parameter names for SVCB.
@@ -560,7 +558,7 @@ func (svcb *RDataSVCB) parseParams(zp *zoneParser) (err error) {
 }
 
 func (svcb *RDataSVCB) unpack(packet, rdata []byte, start uint) (err error) {
-	svcb.Priority = libbytes.ReadUint16(rdata, 0)
+	svcb.Priority = binary.BigEndian.Uint16(rdata)
 	rdata = rdata[2:]
 	start += 2
 
@@ -583,7 +581,7 @@ func (svcb *RDataSVCB) unpackParams(packet []byte) (err error) {
 	var keyid uint16
 
 	for len(packet) > 0 {
-		keyid = libbytes.ReadUint16(packet, 0)
+		keyid = binary.BigEndian.Uint16(packet)
 		packet = packet[2:]
 
 		switch int(keyid) {
@@ -623,7 +621,7 @@ func (svcb *RDataSVCB) unpackParamMandatory(packet []byte) ([]byte, error) {
 		return packet, errors.New(`missing mandatory key value`)
 	}
 
-	var size = libbytes.ReadUint16(packet, 0)
+	var size = binary.BigEndian.Uint16(packet)
 	if size <= 0 {
 		return packet, fmt.Errorf(`invalid mandatory length %d`, size)
 	}
@@ -639,7 +637,7 @@ func (svcb *RDataSVCB) unpackParamMandatory(packet []byte) ([]byte, error) {
 			return packet, fmt.Errorf(`missing mandatory value on index %d`, len(listValue))
 		}
 
-		var keyid = libbytes.ReadUint16(packet, 0)
+		var keyid = binary.BigEndian.Uint16(packet)
 		packet = packet[2:]
 
 		var keyName = svcbKeyName(int(keyid))
@@ -658,7 +656,7 @@ func (svcb *RDataSVCB) unpackParamALPN(packet []byte) ([]byte, error) {
 		return packet, fmt.Errorf(`%s: missing length and value`, logp)
 	}
 
-	var total = int(libbytes.ReadUint16(packet, 0))
+	var total = int(binary.BigEndian.Uint16(packet))
 	if total <= 0 {
 		return packet, fmt.Errorf(`%s: invalid length %d`, logp, total)
 	}
@@ -698,13 +696,13 @@ func (svcb *RDataSVCB) unpackParamPort(packet []byte) ([]byte, error) {
 		return packet, fmt.Errorf(`%s: missing value`, logp)
 	}
 
-	var u16 = libbytes.ReadUint16(packet, 0)
+	var u16 = binary.BigEndian.Uint16(packet)
 	if u16 <= 0 {
 		return packet, fmt.Errorf(`%s: invalid length %d`, logp, u16)
 	}
 	packet = packet[2:]
 
-	u16 = libbytes.ReadUint16(packet, 0)
+	u16 = binary.BigEndian.Uint16(packet)
 	if u16 <= 0 {
 		return packet, fmt.Errorf(`%s: invalid port %d`, logp, u16)
 	}
@@ -723,7 +721,7 @@ func (svcb *RDataSVCB) unpackParamIpv4hint(packet []byte) ([]byte, error) {
 		return packet, fmt.Errorf(`%s: missing value`, logp)
 	}
 
-	var size = int(libbytes.ReadUint16(packet, 0))
+	var size = int(binary.BigEndian.Uint16(packet))
 	if size <= 0 {
 		return nil, fmt.Errorf(`%s: invalid length %d`, logp, size)
 	}
@@ -754,7 +752,7 @@ func (svcb *RDataSVCB) unpackParamIpv6hint(packet []byte) ([]byte, error) {
 		return packet, fmt.Errorf(`%s: missing value`, logp)
 	}
 
-	var size = int(libbytes.ReadUint16(packet, 0))
+	var size = int(binary.BigEndian.Uint16(packet))
 	if size <= 0 {
 		return nil, fmt.Errorf(`%s: invalid length %d`, logp, size)
 	}
@@ -786,7 +784,7 @@ func (svcb *RDataSVCB) unpackParamGeneric(packet []byte, keyid int) ([]byte, err
 		return nil, fmt.Errorf(`%s: missing parameter value`, logp)
 	}
 
-	var size = int(libbytes.ReadUint16(packet, 0))
+	var size = int(binary.BigEndian.Uint16(packet))
 	if size <= 0 {
 		return packet, fmt.Errorf(`%s: invalid length %d`, logp, size)
 	}

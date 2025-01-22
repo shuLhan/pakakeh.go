@@ -168,46 +168,6 @@ func ExampleReadHexByte() {
 	// 0 false
 }
 
-func ExampleReadInt16() {
-	fmt.Println(libbytes.ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 3)) // x is out of range.
-	fmt.Println(libbytes.ReadInt16([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x0102
-	fmt.Println(libbytes.ReadInt16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
-	// Output:
-	// 0
-	// 258
-	// -4092
-}
-
-func ExampleReadInt32() {
-	fmt.Println(libbytes.ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
-	fmt.Println(libbytes.ReadInt32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
-	fmt.Println(libbytes.ReadInt32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
-	// Output:
-	// 0
-	// 16909060
-	// -251526396
-}
-
-func ExampleReadUint16() {
-	fmt.Println(libbytes.ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 3)) // x is out of range.
-	fmt.Println(libbytes.ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 0)) // 0x0102
-	fmt.Println(libbytes.ReadUint16([]byte{0x01, 0x02, 0xf0, 0x04}, 2)) // 0xf004
-	// Output:
-	// 0
-	// 258
-	// 61444
-}
-
-func ExampleReadUint32() {
-	fmt.Println(libbytes.ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 1)) // x is out of range.
-	fmt.Println(libbytes.ReadUint32([]byte{0x01, 0x02, 0x03, 0x04}, 0)) // 0x01020304
-	fmt.Println(libbytes.ReadUint32([]byte{0xf1, 0x02, 0x03, 0x04}, 0)) // 0xf1020304
-	// Output:
-	// 0
-	// 16909060
-	// 4043440900
-}
-
 func ExampleRemoveSpaces() {
 	var (
 		in  = []byte(" a\nb\tc d\r")
