@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package hunspell is a library to parse the Hunspell file format.
 package hunspell
@@ -181,10 +181,9 @@ func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
 		dict = make(map[string]string, 1024)
 
 		lines []string
-		x     int
 	)
 
-	for x = 0; x < len(inFiles); x++ {
+	for x := range len(inFiles) {
 		lines, err = libstrings.LinesOfFile(inFiles[x])
 		if err != nil {
 			return 0, err
@@ -222,7 +221,7 @@ func MergeDictionaries(outFile string, inFiles ...string) (n int, err error) {
 	}
 
 	fmt.Fprintf(fout, "%d\n", len(words))
-	for x := 0; x < len(words); x++ {
+	for x := range len(words) {
 		fmt.Fprintf(fout, "%s\n", words[x])
 	}
 

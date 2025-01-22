@@ -1,6 +1,6 @@
-// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package classifier
 
@@ -152,7 +152,7 @@ func (cm *CM) countNumeric(act, pred int64, actuals, predictions []int64) (
 		minlen = len(predictions)
 	}
 
-	for x := 0; x < minlen; x++ {
+	for x := range minlen {
 		if actuals[x] != act {
 			continue
 		}
@@ -233,7 +233,7 @@ func (cm *CM) GroupIndexPredictions(sampleListID []int,
 		min = len(predictions)
 	}
 
-	for x := 0; x < min; x++ {
+	for x := range min {
 		if actuals[x] == 1 {
 			if predictions[x] == 1 {
 				cm.tpListID = append(cm.tpListID, sampleListID[x])
@@ -275,7 +275,7 @@ func (cm *CM) GroupIndexPredictionsStrings(sampleListID []int,
 		min = len(predictions)
 	}
 
-	for x := 0; x < min; x++ {
+	for x := range min {
 		if actuals[x] == "1" {
 			if predictions[x] == "1" {
 				cm.tpListID = append(cm.tpListID, sampleListID[x])

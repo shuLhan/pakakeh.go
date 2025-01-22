@@ -448,7 +448,7 @@ func (msg *Message) CanonHeader(subHeader *Header, dkimField *Field) []byte {
 		canonType = dkim.CanonSimple
 	}
 
-	for x := 0; x < len(msg.DKIMSignature.Headers); x++ {
+	for x := range len(msg.DKIMSignature.Headers) {
 		signedField := subHeader.popByName(string(msg.DKIMSignature.Headers[x]))
 		if signedField == nil {
 			continue

@@ -155,9 +155,8 @@ func (in *Ini) marshalStruct(
 		tag    string
 		layout string
 		tags   []string
-		x      int
 	)
-	for x = 0; x < numField; x++ {
+	for x := range numField {
 		field = rtipe.Field(x)
 		fvalue = rvalue.Field(x)
 		ftype = field.Type
@@ -396,7 +395,7 @@ func (in *Ini) Section(secName, subName string) (sec *Section) {
 	}
 
 	secName = strings.ToLower(secName)
-	for x := 0; x < len(in.secs); x++ {
+	for x := range len(in.secs) {
 		if secName != in.secs[x].nameLower {
 			continue
 		}
@@ -501,7 +500,7 @@ func (in *Ini) addSection(sec *Section) {
 func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 	out = make(map[string][]string)
 
-	for x := 0; x < len(in.secs); x++ {
+	for x := range len(in.secs) {
 		sec := in.secs[x]
 
 		if len(sectionName) > 0 && sectionName != sec.nameLower {
@@ -511,7 +510,7 @@ func (in *Ini) AsMap(sectionName, subName string) (out map[string][]string) {
 			continue
 		}
 
-		for y := 0; y < len(sec.vars); y++ {
+		for y := range len(sec.vars) {
 			v := sec.vars[y]
 
 			if v.mode == lineModeEmpty {
@@ -667,7 +666,7 @@ func (in *Ini) Prune() {
 
 // mergeSection merge a section (and subsection) into slice.
 func mergeSection(secs []*Section, newSec *Section) []*Section {
-	for x := 0; x < len(secs); x++ {
+	for x := range len(secs) {
 		if secs[x].nameLower != newSec.nameLower {
 			continue
 		}
@@ -720,7 +719,7 @@ func (in *Ini) Subs(secName string) (subs []*Section) {
 
 	secName = strings.ToLower(secName)
 
-	for x := 0; x < len(in.secs); x++ {
+	for x := range len(in.secs) {
 		if in.secs[x].mode == lineModeEmpty || in.secs[x].mode == lineModeComment {
 			continue
 		}
@@ -817,7 +816,7 @@ func (in *Ini) Write(w io.Writer) (err error) {
 		v          *variable
 	)
 
-	for x := 0; x < len(in.secs); x++ {
+	for x := range len(in.secs) {
 		// Add an empty line before section statement.
 		if endWithVar {
 			fmt.Fprintln(w)

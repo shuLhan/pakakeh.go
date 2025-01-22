@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
 // SPDX-License-Identifier: BSD-3-Clause
 
 package memfs
@@ -335,7 +336,7 @@ func (mfs *MemFS) Search(words []string, snippetLen int) (results []SearchResult
 	}
 
 	tokens := libstrings.ToBytes(words)
-	for x := 0; x < len(tokens); x++ {
+	for x := range len(tokens) {
 		tokens[x] = bytes.ToLower(tokens[x])
 	}
 

@@ -1,6 +1,6 @@
-// Copyright 2015-2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dsv
 
@@ -445,7 +445,7 @@ func TestSplitRowsByValue(t *testing.T) {
 
 	// test left split
 	exp := ""
-	for x := 0; x < 4; x++ {
+	for x := range 4 {
 		exp += expectation[x]
 	}
 

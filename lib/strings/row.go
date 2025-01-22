@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package strings
 
@@ -43,7 +43,7 @@ func (row Row) IsEqual(b Row) bool {
 // Join list of slice of string using `lsep` as separator between row items
 // and `ssep` for element in each item.
 func (row Row) Join(lsep string, ssep string) (s string) {
-	for x := 0; x < len(row); x++ {
+	for x := range len(row) {
 		if x > 0 {
 			s += lsep
 		}

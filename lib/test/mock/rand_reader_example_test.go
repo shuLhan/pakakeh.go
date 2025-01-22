@@ -1,6 +1,6 @@
-// Copyright 2024, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package mock_test
 
@@ -18,14 +18,13 @@ func ExampleRandReader() {
 		rr   = mock.NewRandReader(seed)
 		b    = make([]byte, 8)
 
-		x   int
 		n   int
 		err error
 	)
 
 	rand.Reader = rr
 
-	for x = 0; x <= len(seed); x++ {
+	for range len(seed) + 1 {
 		n, err = rand.Read(b)
 		if err != nil {
 			log.Fatal(err)

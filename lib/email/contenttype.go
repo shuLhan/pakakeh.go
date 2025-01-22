@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package email
 
@@ -121,7 +121,7 @@ func isValidToken(tok []byte, quoted bool) bool {
 	if len(tok) == 0 {
 		return false
 	}
-	for x := 0; x < len(tok); x++ {
+	for x := range len(tok) {
 		if quoted && tok[x] == ' ' {
 			continue
 		}
@@ -164,7 +164,7 @@ func (ct *ContentType) isEqual(other *ContentType) bool {
 
 // SetBoundary set or replace the Value for Key "boundary".
 func (ct *ContentType) SetBoundary(boundary string) {
-	for x := 0; x < len(ct.Params); x++ {
+	for x := range len(ct.Params) {
 		if strings.EqualFold(ct.Params[x].Key, ParamNameBoundary) {
 			ct.Params[x].Value = boundary
 			return

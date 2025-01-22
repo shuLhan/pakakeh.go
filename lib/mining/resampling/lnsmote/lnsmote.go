@@ -1,6 +1,6 @@
-// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package lnsmote implement the Local-Neighborhood algorithm from the paper,
 //
@@ -93,7 +93,7 @@ func (in *Runtime) Resampling(dataset tabula.DatasetInterface) (
 
 		neighbors := in.FindNeighbors(in.datasetRows, p)
 
-		for y := 0; y < in.NSynthetic; y++ {
+		for range in.NSynthetic {
 			syn := in.createSynthetic(p, neighbors)
 
 			if syn != nil {

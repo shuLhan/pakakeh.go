@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package text
 
@@ -22,7 +22,7 @@ type Chunk struct {
 func JoinChunks(chunks []Chunk, sep string) string {
 	var out string
 
-	for x := 0; x < len(chunks); x++ {
+	for x := range len(chunks) {
 		if x > 0 {
 			out += sep
 		}

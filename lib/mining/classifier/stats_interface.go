@@ -1,6 +1,6 @@
-// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package classifier
 
@@ -15,7 +15,7 @@ func ComputeFMeasures(precisions, recalls []float64) (fmeasures []float64) {
 		minlen = recallslen
 	}
 
-	for x := 0; x < minlen; x++ {
+	for x := range minlen {
 		f := 2 / ((1 / precisions[x]) + (1 / recalls[x]))
 		fmeasures = append(fmeasures, f)
 	}
@@ -38,7 +38,7 @@ func ComputeAccuracies(tp, fp, tn, fn []int64) (accuracies []float64) {
 		minlen = len(fn)
 	}
 
-	for x := 0; x < minlen; x++ {
+	for x := range minlen {
 		acc := float64(tp[x]+tn[x]) /
 			float64(tp[x]+fp[x]+tn[x]+fn[x])
 		accuracies = append(accuracies, acc)
@@ -55,7 +55,7 @@ func ComputeElapsedTimes(start, end []int64) (elaps []int64) {
 		minlen = len(end)
 	}
 
-	for x := 0; x < minlen; x++ {
+	for x := range minlen {
 		elaps = append(elaps, end[x]-start[x])
 	}
 	return

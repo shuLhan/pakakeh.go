@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 //go:build linux
 
@@ -71,7 +71,6 @@ func (poll *epoll) WaitRead() (fds []int, err error) {
 		logp = `WaitRead`
 
 		n  int
-		x  int
 		fd int
 	)
 	for {
@@ -85,7 +84,7 @@ func (poll *epoll) WaitRead() (fds []int, err error) {
 		break
 	}
 
-	for x = 0; x < n; x++ {
+	for x := range n {
 		fd = int(poll.events[x].Fd)
 
 		err = poll.UnregisterRead(fd)
@@ -111,7 +110,6 @@ func (poll *epoll) WaitReadEvents() (events []PollEvent, err error) {
 		logp = `WaitReadEvents`
 
 		n  int
-		x  int
 		fd int
 	)
 
@@ -126,7 +124,7 @@ func (poll *epoll) WaitReadEvents() (events []PollEvent, err error) {
 		break
 	}
 
-	for x = 0; x < n; x++ {
+	for x := range n {
 		fd = int(poll.events[x].Fd)
 
 		err = poll.UnregisterRead(fd)

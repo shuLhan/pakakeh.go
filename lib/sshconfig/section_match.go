@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package sshconfig
 
@@ -38,7 +38,8 @@ func newSectionMatch(cfg *Config, rawPattern string) (match *Section, err error)
 		isNegate bool
 	)
 
-	for x := 0; x < len(args); x++ {
+	var x int
+	for ; x < len(args); x++ {
 		token := strings.ToLower(args[x])
 		if x+1 < len(args) {
 			arg = args[x+1]

@@ -40,7 +40,7 @@ const (
 func Escape(in []byte) []byte {
 	var buf bytes.Buffer
 
-	for x := 0; x < len(in); x++ {
+	for x := range len(in) {
 		if in[x] == bDoubleQuote || in[x] == bRevSolidus {
 			buf.WriteByte(bRevSolidus)
 			buf.WriteByte(in[x])
@@ -169,13 +169,15 @@ func Unescape(in []byte, strict bool) (out []byte, err error) {
 		esc bool
 	)
 
-	for x := 0; x < len(in); x++ {
+	var x int
+	for ; x < len(in); x++ {
 		if esc {
 			if in[x] == 'u' {
 				uni.Reset()
 				x++
 
-				for y := 0; y < 4 && x < len(in); x++ {
+				var y int
+				for ; y < 4 && x < len(in); x++ {
 					uni.WriteByte(in[x])
 					y++
 				}

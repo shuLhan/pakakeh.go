@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package email
 
@@ -195,7 +195,8 @@ func (body *Body) Relaxed() (out []byte) {
 	// Reduce sequence of WSP.
 	end := x
 	hasSpace := 0
-	for x = 0; x <= end; x++ {
+	x = 0
+	for ; x <= end; x++ {
 		if body.raw[x] == '\t' || body.raw[x] == ' ' || body.raw[x] == '\n' {
 			hasSpace++
 			continue

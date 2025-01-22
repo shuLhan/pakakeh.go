@@ -453,7 +453,7 @@ func generateRandomInts(data []int, n int) {
 		randv *big.Int
 		err   error
 	)
-	for x := 0; x < n; x++ {
+	for x := range n {
 		randv, err = rand.Int(rand.Reader, max)
 		if err != nil {
 			log.Fatalf(`generateRandomInts: %s`, err)

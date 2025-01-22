@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -27,7 +27,6 @@ func TestNewUDPClientPool(t *testing.T) {
 
 		qname string
 		err   error
-		x     int
 	)
 
 	cases = []testCase{{
@@ -57,7 +56,7 @@ func TestNewUDPClientPool(t *testing.T) {
 		}
 
 		qname = "kilabit.info"
-		for x = 0; x < 10; x++ {
+		for range 10 {
 			wg.Add(1)
 			go func() {
 				var (

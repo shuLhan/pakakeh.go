@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package strings
 
@@ -78,7 +78,7 @@ func SinglePartition(ss []string) Table {
 	table := make(Table, 0)
 	row := make(Row, len(ss))
 
-	for x := 0; x < len(ss); x++ {
+	for x := range len(ss) {
 		row[x] = []string{ss[x]}
 	}
 
@@ -97,8 +97,8 @@ func (table Table) IsEqual(other Table) bool {
 
 	check := make([]bool, len(table))
 
-	for x := 0; x < len(table); x++ {
-		for y := 0; y < len(other); y++ {
+	for x := range len(table) {
+		for y := range len(other) {
 			if table[x].IsEqual(other[y]) {
 				check[x] = true
 				break
@@ -118,7 +118,7 @@ func (table Table) IsEqual(other Table) bool {
 // different record in different new row.
 func (table Table) JoinCombination(s string) (tout Table) {
 	for _, row := range table {
-		for y := 0; y < len(row); y++ {
+		for y := range len(row) {
 			newRow := make(Row, len(row))
 			copy(newRow, row)
 			newRow[y] = append(newRow[y], s)

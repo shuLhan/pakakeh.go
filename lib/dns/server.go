@@ -725,22 +725,22 @@ func (srv *Server) startAllForwarders() {
 		x          int
 	)
 
-	for x = 0; x < len(srv.opts.primaryUDP); x++ {
+	for x = range len(srv.opts.primaryUDP) {
 		tag = fmt.Sprintf("UDP-%d-%s", x, asPrimary)
 		nameserver = srv.opts.primaryUDP[x].String()
 		go srv.udpForwarder(tag, nameserver)
 	}
-	for x = 0; x < len(srv.opts.primaryTCP); x++ {
+	for x = range len(srv.opts.primaryTCP) {
 		tag = fmt.Sprintf("TCP-%d-%s", x, asPrimary)
 		nameserver = srv.opts.primaryTCP[x].String()
 		go srv.tcpForwarder(tag, nameserver)
 	}
-	for x = 0; x < len(srv.opts.primaryDoh); x++ {
+	for x = range len(srv.opts.primaryDoh) {
 		tag = fmt.Sprintf("DoH-%d-%s", x, asPrimary)
 		nameserver = srv.opts.primaryDoh[x]
 		go srv.dohForwarder(tag, nameserver)
 	}
-	for x = 0; x < len(srv.opts.primaryDot); x++ {
+	for x = range len(srv.opts.primaryDot) {
 		tag = fmt.Sprintf("DoT-%d-%s", x, asPrimary)
 		nameserver = srv.opts.primaryDot[x]
 		go srv.tlsForwarder(tag, nameserver)
@@ -1068,10 +1068,10 @@ func (srv *Server) stopAllForwarders() {
 	var (
 		x int
 	)
-	for x = 0; x < len(srv.fwStoppers); x++ {
+	for x = range len(srv.fwStoppers) {
 		srv.fwStoppers[x] <- true
 	}
-	for x = 0; x < len(srv.fwStoppers); x++ {
+	for x = range len(srv.fwStoppers) {
 		close(srv.fwStoppers[x])
 	}
 

@@ -1,6 +1,6 @@
-// Copyright 2015 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2015 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package smote resamples a dataset by applying the Synthetic Minority
 // Oversampling TEchnique (SMOTE). The original dataset must fit entirely in
@@ -81,7 +81,7 @@ func (smote *Runtime) populate(instance *tabula.Row, neighbors knn.Neighbors) {
 		err   error
 	)
 
-	for x := 0; x < smote.NSynthetic; x++ {
+	for range smote.NSynthetic {
 		// choose one of the K nearest neighbors
 		randv, err = rand.Int(rand.Reader, randMax)
 		if err != nil {

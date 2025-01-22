@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package ini
 
@@ -110,12 +110,11 @@ func TestParseTag_fromStruct(t *testing.T) {
 		field reflect.StructField
 		tag   string
 		got   []string
-		x     int
 	)
 
 	vtype = reflect.TypeOf(adt)
 
-	for x = 0; x < vtype.NumField(); x++ {
+	for x := range vtype.NumField() {
 		field = vtype.Field(x)
 
 		tag, _, _ = libreflect.Tag(field, "ini")

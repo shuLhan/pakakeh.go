@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package paseto provide a simple, ready to use, opinionated implementation
 // of Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in
@@ -323,7 +323,7 @@ func pae(pieces [][]byte) (b []byte, err error) {
 		return nil, err
 	}
 
-	for x := 0; x < len(pieces); x++ {
+	for x := range len(pieces) {
 		err = binary.Write(&buf, binary.LittleEndian, uint64(len(pieces[x])))
 		if err != nil {
 			return nil, err

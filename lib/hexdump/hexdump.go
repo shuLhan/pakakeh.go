@@ -44,7 +44,6 @@ func Parse(in []byte, networkByteOrder bool) (out []byte, err error) {
 
 		token      []byte
 		vint64     int64
-		x          int
 		isAsterisk bool
 	)
 	for d != 0 {
@@ -78,14 +77,14 @@ func Parse(in []byte, networkByteOrder bool) (out []byte, err error) {
 					prevRow      = out[start:]
 					identicalRow = int((vint64 - int64(len(out))) / 16)
 				)
-				for x = 0; x < identicalRow; x++ {
+				for range identicalRow {
 					out = append(out, prevRow...)
 				}
 			}
 		}
 
 		// Read the two-hex, 16-bit words.
-		for x = 0; x < 8; x++ {
+		for range 8 {
 			token, d = parser.Read()
 			if len(token) == 0 {
 				break

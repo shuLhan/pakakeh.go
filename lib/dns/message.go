@@ -189,9 +189,8 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 		startIdx = uint(sectionHeaderSize + msg.Question.size())
 
 		rr ResourceRecord
-		x  uint16
 	)
-	for ; x < msg.Header.ANCount; x++ {
+	for range msg.Header.ANCount {
 		rr = ResourceRecord{}
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
@@ -202,7 +201,7 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 		msg.Answer = append(msg.Answer, rr)
 	}
 
-	for x = 0; x < msg.Header.NSCount; x++ {
+	for range msg.Header.NSCount {
 		rr = ResourceRecord{}
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
@@ -212,7 +211,7 @@ func UnpackMessage(packet []byte) (msg *Message, err error) {
 		msg.Authority = append(msg.Authority, rr)
 	}
 
-	for x = 0; x < msg.Header.ARCount; x++ {
+	for range msg.Header.ARCount {
 		rr = ResourceRecord{}
 
 		startIdx, err = rr.unpack(msg.packet, startIdx)
@@ -380,8 +379,7 @@ func (msg *Message) packDomainName(dname []byte, doCompress bool) (n int) {
 	idxCount = len(msg.packet) - 1
 	msg.dnameOff[msg.dname] = uint16(idxCount)
 	n++
-
-	for x = 0; x < len(dname); x++ {
+	for ; x < len(dname); x++ {
 		c = dname[x]
 
 		if c == '\\' {
@@ -852,7 +850,7 @@ func (msg *Message) IsExpired() bool {
 		x int
 	)
 
-	for x = 0; x < len(msg.Answer); x++ {
+	for x = range len(msg.Answer) {
 		if msg.Answer[x].TTL == 0 {
 			return true
 		}
@@ -861,7 +859,7 @@ func (msg *Message) IsExpired() bool {
 		return false
 	}
 
-	for x = 0; x < len(msg.Authority); x++ {
+	for x = range len(msg.Authority) {
 		if msg.Authority[x].TTL == 0 {
 			return true
 		}
@@ -895,13 +893,13 @@ func (msg *Message) Pack() ([]byte, error) {
 		return msg.packet, nil
 	}
 
-	for x = 0; x < len(msg.Answer); x++ {
+	for x = range len(msg.Answer) {
 		msg.packRR(&msg.Answer[x])
 	}
-	for x = 0; x < len(msg.Authority); x++ {
+	for x = range len(msg.Authority) {
 		msg.packRR(&msg.Authority[x])
 	}
-	for x = 0; x < len(msg.Additional); x++ {
+	for x = range len(msg.Additional) {
 		msg.packRR(&msg.Additional[x])
 	}
 
@@ -1005,7 +1003,7 @@ func (msg *Message) SubTTL(n uint32) {
 		x int
 	)
 
-	for x = 0; x < len(msg.Answer); x++ {
+	for x = range len(msg.Answer) {
 		if msg.Answer[x].TTL < n {
 			msg.Answer[x].TTL = 0
 		} else {
@@ -1015,7 +1013,7 @@ func (msg *Message) SubTTL(n uint32) {
 			msg.packet[msg.Answer[x].idxTTL:],
 			msg.Answer[x].TTL)
 	}
-	for x = 0; x < len(msg.Authority); x++ {
+	for x = range len(msg.Authority) {
 		if msg.Authority[x].TTL < n {
 			msg.Authority[x].TTL = 0
 		} else {
@@ -1025,7 +1023,7 @@ func (msg *Message) SubTTL(n uint32) {
 			msg.packet[msg.Authority[x].idxTTL:],
 			msg.Authority[x].TTL)
 	}
-	for x = 0; x < len(msg.Additional); x++ {
+	for x = range len(msg.Additional) {
 		if msg.Additional[x].Type == RecordTypeOPT {
 			continue
 		}
@@ -1050,7 +1048,7 @@ func (msg *Message) String() string {
 	fmt.Fprintf(&b, "{Header:%+v Question:%+v", msg.Header, msg.Question)
 
 	b.WriteString(" Answer:[")
-	for x = 0; x < len(msg.Answer); x++ {
+	for x = range len(msg.Answer) {
 		if x > 0 {
 			b.WriteByte(' ')
 		}
@@ -1059,7 +1057,7 @@ func (msg *Message) String() string {
 	b.WriteString("]")
 
 	b.WriteString(" Authority:[")
-	for x = 0; x < len(msg.Authority); x++ {
+	for x = range len(msg.Authority) {
 		if x > 0 {
 			b.WriteByte(' ')
 		}
@@ -1068,7 +1066,7 @@ func (msg *Message) String() string {
 	b.WriteString("]")
 
 	b.WriteString(" Additional:[")
-	for x = 0; x < len(msg.Additional); x++ {
+	for x = range len(msg.Additional) {
 		if x > 0 {
 			b.WriteByte(' ')
 		}

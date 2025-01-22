@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package hunspell
 
@@ -32,7 +32,7 @@ func unpackFlags(ftype, rawflags string) (flags []string, err error) {
 }
 
 func unpackFlagASCII(f string) (flags []string) {
-	for x := 0; x < len(f); x++ {
+	for x := range len(f) {
 		flags = append(flags, string(f[x]))
 	}
 	return
@@ -49,7 +49,8 @@ func unpackFlagLong(f string) (flags []string, err error) {
 	if len(f)%2 != 0 {
 		return nil, fmt.Errorf("invalid long flags: %q", f)
 	}
-	for x := 0; x < len(f); x += 2 {
+	var x int
+	for ; x < len(f); x += 2 {
 		flags = append(flags, f[x:x+2])
 	}
 	return
@@ -59,7 +60,7 @@ func unpackFlagNum(f string) (flags []string, err error) {
 	flags = strings.Split(f, ",")
 
 	// Trim spaces and check if all the flags is valid number.
-	for x := 0; x < len(flags); x++ {
+	for x := range len(flags) {
 		flags[x] = strings.TrimSpace(flags[x])
 
 		_, err = strconv.Atoi(flags[x])

@@ -55,7 +55,7 @@ func NewColumnString(data []string, colType int, colName string) (
 
 	col.Records = make([]*Record, datalen)
 
-	for x := 0; x < datalen; x++ {
+	for x := range datalen {
 		col.Records[x] = NewRecordString(data[x])
 	}
 
@@ -92,7 +92,7 @@ func NewColumnReal(data []float64, colName string) (col *Column) {
 
 	col.Records = make([]*Record, datalen)
 
-	for x := 0; x < datalen; x++ {
+	for x := range datalen {
 		rec := NewRecordReal(data[x])
 		col.Records[x] = rec
 	}
@@ -240,7 +240,7 @@ func (col *Column) SetValues(values []string) {
 		minlen = vallen
 	}
 
-	for x := 0; x < minlen; x++ {
+	for x := range minlen {
 		_ = col.Records[x].SetValue(values[x], col.Type)
 	}
 }

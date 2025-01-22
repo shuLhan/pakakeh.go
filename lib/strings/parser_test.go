@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package strings
 
@@ -70,7 +70,7 @@ b`,
 	for _, c := range cases {
 		p.Load(c.content, "\n")
 
-		for x := 0; x < len(c.exp); x++ {
+		for x := range len(c.exp) {
 			gotLine, gotC := p.Line()
 			test.Assert(t, ``, c.exp[x].line, gotLine)
 			test.Assert(t, ``, c.exp[x].c, gotC)

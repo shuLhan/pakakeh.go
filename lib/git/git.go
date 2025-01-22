@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package git provide a wrapper for git command line interface.
 package git
@@ -280,7 +280,7 @@ func ListTags(repoDir string) (tags []string, err error) {
 	sep := []byte{'\n'}
 	btags := bytes.Split(bout, sep)
 
-	for x := 0; x < len(btags); x++ {
+	for x := range len(btags) {
 		if len(btags[x]) == 0 {
 			continue
 		}
@@ -361,7 +361,7 @@ func RemoteBranches(repoDir string) ([]string, error) {
 
 	var branches []string
 	bHEAD := []byte("HEAD")
-	for x := 0; x < len(bbranches); x++ {
+	for x := range len(bbranches) {
 		if len(bbranches[x]) == 0 {
 			continue
 		}

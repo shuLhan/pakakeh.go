@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package runes provide a library for working with a single rune or slice of
 // rune.
@@ -107,7 +107,8 @@ func Inverse(in []rune) []rune {
 		left, right rune
 		y           = len(in) - 1
 	)
-	for x := 0; x < y; x++ {
+	var x int
+	for ; x < y; x++ {
 		left = in[x]
 		right = in[y]
 		in[x] = right

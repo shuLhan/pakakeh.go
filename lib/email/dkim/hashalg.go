@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dkim
 
@@ -26,7 +26,7 @@ var hashAlgNames = map[HashAlg][]byte{
 
 func unpackHashAlgs(v []byte) (hashAlgs []HashAlg) {
 	algs := bytes.Split(v, sepColon)
-	for x := 0; x < len(algs); x++ {
+	for x := range len(algs) {
 		for k, v := range hashAlgNames {
 			if bytes.Equal(v, algs[x]) {
 				hashAlgs = append(hashAlgs, k)

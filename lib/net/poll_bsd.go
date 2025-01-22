@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 //go:build darwin || dragonfly || freebsd || netbsd || openbsd
 
@@ -81,7 +81,6 @@ func (poll *kqueue) WaitRead() (fds []int, err error) {
 		logp = `WaitRead`
 
 		n  int
-		x  int
 		fd int
 	)
 	for n == 0 {
@@ -94,7 +93,7 @@ func (poll *kqueue) WaitRead() (fds []int, err error) {
 		}
 	}
 
-	for x = 0; x < n; x++ {
+	for x := range n {
 		if poll.events[x].Filter != unix.EVFILT_READ {
 			continue
 		}
@@ -124,7 +123,6 @@ func (poll *kqueue) WaitReadEvents() (events []PollEvent, err error) {
 		logp = `WaitReadEvents`
 
 		n  int
-		x  int
 		fd int
 	)
 
@@ -138,7 +136,7 @@ func (poll *kqueue) WaitReadEvents() (events []PollEvent, err error) {
 		}
 	}
 
-	for x = 0; x < n; x++ {
+	for x := range n {
 		if poll.events[x].Filter != unix.EVFILT_READ {
 			continue
 		}

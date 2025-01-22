@@ -231,9 +231,9 @@ func unpackDomainName(packet []byte, start uint) (name string, end uint, err err
 		logp = `unpackDomainName`
 		x    = int(start)
 
-		out      strings.Builder
-		count, y byte
-		isJump   bool
+		out    strings.Builder
+		count  byte
+		isJump bool
 	)
 
 	end = start
@@ -272,7 +272,7 @@ func unpackDomainName(packet []byte, start uint) (name string, end uint, err err
 		if out.Len() > 0 {
 			out.WriteByte('.')
 		}
-		for y = 0; y < count; y++ {
+		for range count {
 			if packet[x] >= 'A' && packet[x] <= 'Z' {
 				out.WriteByte(packet[x] + 32)
 			} else {

@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package ascii provide a library for working with ASCII characters.
 package ascii
@@ -60,7 +60,7 @@ func IsDigit(b byte) bool {
 // IsDigits will return true if all bytes are ASCII digit, otherwise it will
 // return false.
 func IsDigits(data []byte) bool {
-	for x := 0; x < len(data); x++ {
+	for x := range len(data) {
 		if !IsDigit(data[x]) {
 			return false
 		}
@@ -110,7 +110,7 @@ func Random(source []byte, n int) []byte {
 // ToLower convert slice of ASCII characters to lower cases, in places, which
 // means it will return the same slice instead of creating new one.
 func ToLower(data []byte) []byte {
-	for x := 0; x < len(data); x++ {
+	for x := range len(data) {
 		if data[x] < 'A' || data[x] > 'Z' {
 			continue
 		}
@@ -122,7 +122,7 @@ func ToLower(data []byte) []byte {
 // ToUpper convert slice of ASCII characters to upper cases, in places, which
 // means it will return the same slice instead of creating new one.
 func ToUpper(data []byte) []byte {
-	for x := 0; x < len(data); x++ {
+	for x := range len(data) {
 		if data[x] < 'a' || data[x] > 'z' {
 			continue
 		}

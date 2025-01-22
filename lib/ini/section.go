@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package ini
 
@@ -108,7 +108,7 @@ func (sec *Section) add(key, value string) bool {
 	keyLower := strings.ToLower(key)
 
 	idx := -1
-	for x := 0; x < len(sec.vars); x++ {
+	for x := range len(sec.vars) {
 		if !isLineModeVar(sec.vars[x].mode) {
 			continue
 		}
@@ -144,7 +144,7 @@ func (sec *Section) add(key, value string) bool {
 // list.
 func (sec *Section) addUniqValue(key, value string) {
 	keyLower := strings.ToLower(key)
-	for x := 0; x < len(sec.vars); x++ {
+	for x := range len(sec.vars) {
 		if sec.vars[x].keyLower == keyLower {
 			if sec.vars[x].value == value {
 				tmp := sec.vars[x]
@@ -244,7 +244,7 @@ func (sec *Section) gets(key string, defs []string) (vals []string, ok bool) {
 	}
 
 	key = strings.ToLower(key)
-	for x := 0; x < len(sec.vars); x++ {
+	for x := range len(sec.vars) {
 		if sec.vars[x].keyLower == key {
 			vals = append(vals, sec.vars[x].value)
 		}
@@ -258,7 +258,7 @@ func (sec *Section) gets(key string, defs []string) (vals []string, ok bool) {
 // merge other Section variables on this section, ignoring empty or comment
 // mode.
 func (sec *Section) merge(other *Section) {
-	for x := 0; x < len(other.vars); x++ {
+	for x := range len(other.vars) {
 		if !isLineModeVar(other.vars[x].mode) {
 			continue
 		}
@@ -346,7 +346,7 @@ func (sec *Section) unsetAll(key string) {
 	vars := make([]*variable, 0, len(sec.vars))
 	key = strings.ToLower(key)
 
-	for x := 0; x < len(sec.vars); x++ {
+	for x := range len(sec.vars) {
 		if sec.vars[x].keyLower != key {
 			// Ignore the last empty line.
 			if x == len(sec.vars)-1 &&

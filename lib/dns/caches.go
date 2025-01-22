@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -349,14 +349,10 @@ func (c *Caches) InternalPopulateZone(zone *Zone) {
 
 // InternalRemoveNames remove internal caches by domain names.
 func (c *Caches) InternalRemoveNames(names []string) {
-	var (
-		x int
-	)
-
 	c.Lock()
 	defer c.Unlock()
 
-	for ; x < len(names); x++ {
+	for x := range len(names) {
 		delete(c.internal, names[x])
 		if c.debug&DebugLevelCache != 0 {
 			log.Println(`dns: - `, names[x])

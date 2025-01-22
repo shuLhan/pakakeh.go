@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package strings provide a library for working with string or slice of
 // strings.
@@ -17,9 +17,9 @@ import (
 func AppendUniq(in []string, vals ...string) []string {
 	var found bool
 
-	for x := 0; x < len(vals); x++ {
+	for x := range len(vals) {
 		found = false
-		for y := 0; y < len(in); y++ {
+		for y := range len(in) {
 			if vals[x] == in[y] {
 				found = true
 				break
@@ -53,7 +53,7 @@ func CountMissRate(src []string, target []string) (
 		length = targetlen
 	}
 
-	for x := 0; x < length; x++ {
+	for x := range length {
 		if src[x] != target[x] {
 			nmiss++
 		}
@@ -91,7 +91,7 @@ func CountTokens(words []string, tokens []string, sensitive bool) []int {
 
 	counters := make([]int, tokenslen)
 
-	for x := 0; x < len(tokens); x++ {
+	for x := range len(tokens) {
 		counters[x] = CountToken(words, tokens[x], sensitive)
 	}
 
@@ -143,7 +143,7 @@ func FrequencyOfTokens(words, tokens []string, sensitive bool) (probs []float64)
 
 	probs = make([]float64, len(tokens))
 
-	for x := 0; x < len(tokens); x++ {
+	for x := range len(tokens) {
 		probs[x] = FrequencyOfToken(words, tokens[x], sensitive)
 	}
 
@@ -153,7 +153,7 @@ func FrequencyOfTokens(words, tokens []string, sensitive bool) (probs []float64)
 // IsContain return true if elemen `el` is in slice of string `ss`,
 // otherwise return false.
 func IsContain(ss []string, el string) bool {
-	for x := 0; x < len(ss); x++ {
+	for x := range len(ss) {
 		if ss[x] == el {
 			return true
 		}
@@ -202,7 +202,7 @@ func Longest(words []string) (string, int) {
 		outlen, idx int
 		out         string
 	)
-	for x := 0; x < len(words); x++ {
+	for x := range len(words) {
 		vlen := len(words[x])
 		if vlen > outlen {
 			outlen = vlen
@@ -237,7 +237,7 @@ func MostFrequentTokens(words []string, tokens []string, sensitive bool) string 
 func SortByIndex(ss *[]string, sortedListID []int) {
 	newd := make([]string, len(*ss))
 
-	for x := 0; x < len(sortedListID); x++ {
+	for x := range len(sortedListID) {
 		newd[x] = (*ss)[sortedListID[x]]
 	}
 
@@ -269,7 +269,7 @@ func TotalFrequencyOfTokens(words, tokens []string, sensitive bool) float64 {
 
 	var sumfreq float64
 
-	for x := 0; x < len(tokens); x++ {
+	for x := range len(tokens) {
 		sumfreq += FrequencyOfToken(words, tokens[x], sensitive)
 	}
 
@@ -283,7 +283,7 @@ func TotalFrequencyOfTokens(words, tokens []string, sensitive bool) float64 {
 func Uniq(words []string, sensitive bool) (uniques []string) {
 	var xcmp, ycmp string
 
-	for x := 0; x < len(words); x++ {
+	for x := range len(words) {
 		if len(words[x]) == 0 {
 			continue
 		}

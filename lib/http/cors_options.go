@@ -1,6 +1,6 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -121,7 +121,7 @@ func (cors *CORSOptions) handleRequestHeaders(res http.ResponseWriter, req *http
 		reqHeaders = strings.Split(preflightHeaders, `,`)
 		x          int
 	)
-	for x = 0; x < len(reqHeaders); x++ {
+	for x = range len(reqHeaders) {
 		reqHeaders[x] = strings.ToLower(strings.TrimSpace(reqHeaders[x]))
 	}
 

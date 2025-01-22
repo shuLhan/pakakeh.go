@@ -94,10 +94,8 @@ func flush(qlog chan []byte, writers map[string]NamedWriter) {
 		err  error
 		nw   NamedWriter
 		b    []byte
-		x    int
 	)
-
-	for x = 0; x < len(qlog); x++ {
+	for range len(qlog) {
 		b = <-qlog
 		for name, nw = range writers {
 			_, err = nw.Write(b)

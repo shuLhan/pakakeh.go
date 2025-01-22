@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package smtp
 
@@ -28,7 +28,7 @@ func NewAccount(name, local, domain, pass string) (acc *Account, err error) {
 	local = strings.ToLower(local)
 
 	if len(pass) > 0 {
-		for x := 0; x < 3; x++ {
+		for range 3 {
 			hpass, err = bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 			if err == nil {
 				break

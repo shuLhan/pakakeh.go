@@ -1,6 +1,6 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package mlog
 
@@ -29,7 +29,7 @@ func TestMultiLogger_Close(_ *testing.T) {
 
 	go func() {
 		var x int
-		for x = 0; x < 10; x++ {
+		for x = range 10 {
 			mlog.Outf("out: %d", x)
 			if x == 2 {
 				outq <- struct{}{}
@@ -39,7 +39,7 @@ func TestMultiLogger_Close(_ *testing.T) {
 	}()
 	go func() {
 		var x int
-		for x = 0; x < 10; x++ {
+		for x = range 10 {
 			mlog.Errf("err: %d", x)
 			if x == 2 {
 				errq <- struct{}{}

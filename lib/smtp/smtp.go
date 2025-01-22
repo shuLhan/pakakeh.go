@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package smtp
 
@@ -186,7 +186,8 @@ func parseLocalDomain(data []byte, allow []byte) (out []byte) {
 		found bool
 		isDot bool
 	)
-	for x := 0; x < len(data); x++ {
+	var x int
+	for ; x < len(data); x++ {
 		if data[x] == '(' {
 			x = skipComment(data, x)
 			if x == len(data) {
@@ -250,7 +251,8 @@ func skipComment(data []byte, x int) int {
 // %d32-126.
 func parseQuotedMailbox(data []byte) (out []byte) {
 	out = append(out, '"')
-	for x := 0; x < len(data); x++ {
+	var x int
+	for ; x < len(data); x++ {
 		if data[x] < 32 || data[x] == 34 || data[x] > 126 {
 			return nil
 		}

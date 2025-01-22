@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package spf
 
@@ -108,7 +108,8 @@ func (m *macro) parse(data []byte) (err error) {
 		state byte
 	)
 
-	for x := 0; x < len(data); x++ {
+	var x int
+	for ; x < len(data); x++ {
 		switch state {
 		case 0:
 			switch data[x] {

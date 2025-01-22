@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dkim
 
@@ -94,7 +94,7 @@ func newTag(key []byte) (t *tag, err error) {
 	if !ascii.IsAlpha(key[0]) {
 		return nil, fmt.Errorf("dkim: invalid tag key: '%s'", key)
 	}
-	for x := 0; x < len(key); x++ {
+	for x := range len(key) {
 		if ascii.IsAlnum(key[x]) || key[x] == '_' {
 			continue
 		}
@@ -126,7 +126,7 @@ func (t *tag) setValue(val []byte) (err error) {
 	if t.key == tagSignature || t.key == tagBodyHash || t.key == tagDNSPublicKey {
 		isBase64 = true
 	}
-	for x := 0; x < len(val); x++ {
+	for x := range len(val) {
 		switch {
 		case ascii.IsSpace(val[x]):
 			continue

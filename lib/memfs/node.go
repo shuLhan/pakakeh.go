@@ -454,7 +454,7 @@ func (node *Node) removeChild(child *Node) *Node {
 	if child == nil {
 		return nil
 	}
-	for x := 0; x < len(node.Childs); x++ {
+	for x := range len(node.Childs) {
 		if node.Childs[x] != child {
 			continue
 		}

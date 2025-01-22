@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 // Package totp implement Time-Based One-Time Password Algorithm based on RFC
 // 6238 [1].
 //
@@ -128,7 +132,7 @@ func (p *Protocol) generateN(mac hash.Hash, ts int64, n int) (listOTP []string, 
 		t   int64
 		x   int
 	)
-	for x = 0; x < n; x++ {
+	for x = range n {
 		t = ts - int64(x*p.timeStep)
 		otp, err = p.generateWithTimestamp(mac, t)
 		if err != nil {
@@ -170,7 +174,7 @@ func (p *Protocol) verifyWithTimestamp(mac hash.Hash, token string, steps int, t
 		x   int
 	)
 
-	for x = 0; x < steps; x++ {
+	for x = range steps {
 		t = ts - int64(x*p.timeStep)
 		otp, err = p.generateWithTimestamp(mac, t)
 		if err != nil {

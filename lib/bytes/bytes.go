@@ -154,9 +154,9 @@ func InReplace(text, allowed []byte, c byte) []byte {
 	}
 
 	var found bool
-	for x := 0; x < len(text); x++ {
+	for x := range len(text) {
 		found = false
-		for y := 0; y < len(allowed); y++ {
+		for y := range len(allowed) {
 			if text[x] == allowed[y] {
 				found = true
 				break
@@ -207,7 +207,7 @@ func IsTokenAt(text, token []byte, p int) bool {
 		return false
 	}
 
-	for x := 0; x < tokenlen; x++ {
+	for x := range tokenlen {
 		if text[p] != token[x] {
 			return false
 		}
@@ -370,7 +370,7 @@ func SplitEach(data []byte, n int) (chunks [][]byte) {
 		rows  = (size / n)
 		total int
 	)
-	for x := 0; x < rows; x++ {
+	for range rows {
 		chunks = append(chunks, data[total:total+n])
 		total += n
 	}

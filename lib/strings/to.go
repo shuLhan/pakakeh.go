@@ -12,7 +12,7 @@ import (
 
 // ToBytes convert slice of string into slice of slice of bytes.
 func ToBytes(ss []string) (sv [][]byte) {
-	for x := 0; x < len(ss); x++ {
+	for x := range len(ss) {
 		sv = append(sv, []byte(ss[x]))
 	}
 	return sv
@@ -64,7 +64,7 @@ func ToInt64(ss []string) (sv []int64) {
 
 // ToStrings convert slice of interface to slice of string.
 func ToStrings(is []any) (vs []string) {
-	for x := 0; x < len(is); x++ {
+	for x := range len(is) {
 		v := fmt.Sprintf("%v", is[x])
 		vs = append(vs, v)
 	}

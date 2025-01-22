@@ -1,6 +1,6 @@
-// Copyright 2016 Mhd Sulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2016 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package crf implement the cascaded random forest algorithm, proposed by
 // Baumann et.al in their paper:
@@ -150,7 +150,7 @@ func (crf *Runtime) Build(samples tabula.ClasetInterface) (e error) {
 	fmt.Println(tag, "Sample (one row):", samples.GetRow(0))
 	fmt.Println(tag, "Config:", crf)
 
-	for x := 0; x < crf.NStage; x++ {
+	for range crf.NStage {
 		forest, e := crf.createForest(samples)
 		if e != nil {
 			return e

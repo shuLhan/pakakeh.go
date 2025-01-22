@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dkim
 
@@ -17,7 +17,8 @@ func DecodeQP(raw []byte) (out []byte) {
 
 	out = make([]byte, 0, len(raw))
 
-	for x := 0; x < len(raw); x++ {
+	var x int
+	for ; x < len(raw); x++ {
 		if ascii.IsSpace(raw[x]) {
 			continue
 		}

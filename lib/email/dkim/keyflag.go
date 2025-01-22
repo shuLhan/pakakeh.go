@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dkim
 
@@ -31,7 +31,7 @@ var keyFlagNames = map[KeyFlag]byte{
 
 func unpackKeyFlags(in []byte) (out []KeyFlag) {
 	flags := bytes.Split(in, sepColon)
-	for x := 0; x < len(flags); x++ {
+	for x := range len(flags) {
 		if len(flags[x]) != 1 {
 			continue
 		}

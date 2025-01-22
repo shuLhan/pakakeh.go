@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dkim
 
@@ -207,7 +207,7 @@ func (sig *Signature) Pack(simple bool) []byte {
 
 	if len(sig.PresentHeaders) > 0 {
 		bb.WriteString("z=")
-		for x := 0; x < len(sig.PresentHeaders); x++ {
+		for x := range len(sig.PresentHeaders) {
 			if x > 0 {
 				bb.WriteByte('|')
 				wrap(bb, simple)
@@ -422,7 +422,7 @@ func (sig *Signature) set(t *tag) (err error) {
 			return errEmptyHeader
 		}
 		headers := bytes.Split(t.value, sepColon)
-		for x := 0; x < len(headers); x++ {
+		for x := range len(headers) {
 			headers[x] = bytes.ToLower(bytes.TrimSpace(headers[x]))
 			sig.Headers = append(sig.Headers, headers[x])
 		}
@@ -464,7 +464,7 @@ func (sig *Signature) set(t *tag) (err error) {
 
 	case tagPresentHeaders:
 		z := bytes.Split(t.value, sepVBar)
-		for x := 0; x < len(z); x++ {
+		for x := range len(z) {
 			z[x] = bytes.TrimSpace(z[x])
 			sig.PresentHeaders = append(sig.PresentHeaders, z[x])
 		}
@@ -554,7 +554,7 @@ func (sig *Signature) setQueryMethod(qtype, qopt []byte) (err error) {
 // validateHeaders validate value of header tag "h=" that it MUST contains
 // "from".
 func (sig *Signature) validateHeaders() (err error) {
-	for x := 0; x < len(sig.Headers); x++ {
+	for x := range len(sig.Headers) {
 		if bytes.Equal(sig.Headers[x], []byte("from")) {
 			return nil
 		}

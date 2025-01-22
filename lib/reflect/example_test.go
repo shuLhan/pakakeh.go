@@ -458,13 +458,12 @@ func ExampleTag() {
 		field  reflect.StructField
 		val    string
 		opts   []string
-		x      int
 		hasTag bool
 	)
 
 	vtype = reflect.TypeOf(t)
 
-	for x = 0; x < vtype.NumField(); x++ {
+	for x := range vtype.NumField() {
 		field = vtype.Field(x)
 		val, opts, hasTag = libreflect.Tag(field, "atag")
 		fmt.Println(val, opts, hasTag)

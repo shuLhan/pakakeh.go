@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package net provide constants and library for networking.
 package net
@@ -176,14 +176,14 @@ func ToDotIPv6(ip net.IP) (out []byte) {
 	addrs := strings.Split(ip.String(), ":")
 
 	var notempty int
-	for x := 0; x < len(addrs); x++ {
+	for x := range len(addrs) {
 		if len(addrs[x]) != 0 {
 			notempty++
 		}
 	}
 	gap := 8 - notempty
 
-	for x := 0; x < len(addrs); x++ {
+	for x := range len(addrs) {
 		addr := addrs[x]
 
 		// Fill the gap "::" with one or more "0.0.0.0".
@@ -205,7 +205,7 @@ func ToDotIPv6(ip net.IP) (out []byte) {
 			out = append(out, '0')
 		}
 
-		for y := 0; y < len(addr); y++ {
+		for y := range len(addr) {
 			if len(out) > 0 {
 				out = append(out, '.')
 			}

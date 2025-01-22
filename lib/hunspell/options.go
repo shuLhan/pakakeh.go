@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package hunspell
 
@@ -163,7 +163,7 @@ func (opts *affixOptions) load(content string) (err error) {
 
 	lines := p.Lines()
 
-	for x := 0; x < len(lines); x++ {
+	for x := range len(lines) {
 		// Skip comment, a line starting with '#'.
 		if lines[x][0] == '#' {
 			continue

@@ -1,6 +1,6 @@
-// Copyright 2020, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2020 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package sshconfig
 
@@ -88,7 +88,7 @@ func (p *parser) load(dir, pattern string) (lines []string, err error) {
 	dir = filepath.Dir(pattern)
 
 	// Check and parse the Include directive in each lines.
-	for x := 0; x < len(rawLines); x++ {
+	for x := range len(rawLines) {
 		if !isIncludeDirective(rawLines[x]) {
 			lines = append(lines, rawLines[x])
 			continue
@@ -200,7 +200,7 @@ func readLines(file string) (lines []string, err error) {
 	}
 
 	rawLines := bytes.Split(contents, []byte{'\n'})
-	for x := 0; x < len(rawLines); x++ {
+	for x := range len(rawLines) {
 		rawLines[x] = bytes.TrimSpace(rawLines[x])
 		if len(rawLines[x]) == 0 {
 			continue

@@ -60,7 +60,6 @@ func (qst *MessageQuestion) unpack(packet []byte) (err error) {
 		logp  = "MessageQuestion.unpack"
 		sb    strings.Builder
 		x     int
-		y     int
 		count int
 	)
 
@@ -76,7 +75,7 @@ func (qst *MessageQuestion) unpack(packet []byte) (err error) {
 		if sb.Len() > 0 {
 			sb.WriteByte('.')
 		}
-		for y = 0; y < count; y++ {
+		for range count {
 			x++
 			if packet[x] >= 'A' && packet[x] <= 'Z' {
 				sb.WriteByte(packet[x] + 32)

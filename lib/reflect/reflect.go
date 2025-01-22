@@ -638,7 +638,7 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 		if v1.Len() != v2.Len() {
 			return fmt.Errorf("len(%s): expecting %v, got %v", name1, v1.Len(), v2.Len())
 		}
-		for x = 0; x < v1.Len(); x++ {
+		for x = range v1.Len() {
 			err = doEqual(v1.Index(x), v2.Index(x))
 			if err != nil {
 				return fmt.Errorf(`%s[%d]: %w`, name1, x, err)
@@ -707,7 +707,7 @@ func doEqual(v1, v2 reflect.Value) (err error) {
 			return fmt.Errorf("len(%s): expecting %v, got %v", name1, l1, l2)
 		}
 
-		for x = 0; x < l1; x++ {
+		for x = range l1 {
 			s1 = v1.Index(x)
 			s2 = v2.Index(x)
 			err = doEqual(s1, s2)

@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -25,7 +25,7 @@ func newAnswers(an *Answer) (ans *answers) {
 // If found, it will return its element and index in slice; otherwise it will
 // return nil on answer.
 func (ans *answers) get(rtype RecordType, rclass RecordClass) (an *Answer, x int) {
-	for x = 0; x < len(ans.v); x++ {
+	for ; x < len(ans.v); x++ {
 		if ans.v[x].RType != rtype {
 			continue
 		}

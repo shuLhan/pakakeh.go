@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -284,7 +284,6 @@ func TestCachesUpsert(t *testing.T) {
 		cases   []testCase
 		c       testCase
 		gotList []*Answer
-		x       int
 	)
 
 	ca.init(0, 0, 0)
@@ -322,7 +321,7 @@ func TestCachesUpsert(t *testing.T) {
 
 		test.Assert(t, "len(caches.list)", c.expLen, len(gotList))
 
-		for x = 0; x < len(gotList); x++ {
+		for x := range len(gotList) {
 			test.Assert(t, "caches.list", c.expList[x], gotList[x])
 		}
 	}

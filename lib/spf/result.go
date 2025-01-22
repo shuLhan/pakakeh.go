@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package spf
 
@@ -101,7 +101,7 @@ func (result *Result) lookup() {
 
 	var found int
 
-	for x := 0; x < len(txts); x++ {
+	for x := range len(txts) {
 		rdata, ok := txts[x].Value.(string)
 		if !ok {
 			continue

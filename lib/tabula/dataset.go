@@ -218,7 +218,7 @@ func (dataset *Dataset) SetColumnsName(names []string) {
 		minlen = nameslen
 	}
 
-	for x := 0; x < minlen; x++ {
+	for x := range minlen {
 		dataset.Columns[x].Name = names[x]
 	}
 }
@@ -376,7 +376,7 @@ func (dataset *Dataset) TransposeToColumns() {
 	}
 
 	for _, row := range dataset.Rows {
-		for y := 0; y < minlen; y++ {
+		for y := range minlen {
 			dataset.Columns[y].PushBack((*row)[y])
 		}
 	}
@@ -473,7 +473,7 @@ func (dataset *Dataset) PushRowToColumns(row *Row) {
 		min = collen
 	}
 
-	for x := 0; x < min; x++ {
+	for x := range min {
 		dataset.Columns[x].PushBack((*row)[x])
 	}
 }
@@ -608,7 +608,7 @@ func (dataset *Dataset) PushColumnToRows(col Column) {
 	var row *Row
 	var rec *Record
 
-	for x := 0; x < minrow; x++ {
+	for x := range minrow {
 		row = dataset.Rows[x]
 		rec = col.Records[x]
 

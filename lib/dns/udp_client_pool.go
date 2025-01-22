@@ -41,16 +41,12 @@ func NewUDPClientPool(nameServers []string) (ucp *UDPClientPool, err error) {
 		New: ucp.newClient,
 	}
 
-	var (
-		cl *UDPClient
-		x  int
-	)
-
 	// Create new client for each name server, and push it to pool.
 	// This is required to check if each name server is a valid IP
 	// address because we did not want the New method return nil client
 	// later.
-	for x = 0; x < len(nameServers); x++ {
+	for x := range len(nameServers) {
+		var cl *UDPClient
 		cl, err = NewUDPClient(nameServers[x])
 		if err != nil {
 			return nil, err

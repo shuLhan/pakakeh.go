@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package email
 
@@ -219,7 +219,7 @@ func (field *Field) addMailboxes(mailboxes []byte) (err error) {
 
 func relaxedName(raw []byte) (rel []byte) {
 	rel = make([]byte, 0, len(raw))
-	for x := 0; x < len(raw); x++ {
+	for x := range len(raw) {
 		if raw[x] == ' ' || raw[x] < 33 || raw[x] > 126 {
 			break
 		}

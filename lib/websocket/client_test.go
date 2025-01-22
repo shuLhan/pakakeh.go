@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
@@ -541,7 +541,7 @@ func TestClientFragmentation2(t *testing.T) {
 		payload: []byte("Shulhan"),
 	}}
 
-	for x = 0; x < len(frames); x++ {
+	for x = range len(frames) {
 		req = frames[x].pack()
 
 		testClient.Lock()

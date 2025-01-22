@@ -908,10 +908,9 @@ func svcbEncodeValue(in string) (out string, escaped bool) {
 func svcbSplitRawValue(raw []byte) (listValue []string, err error) {
 	var (
 		val   []byte
-		x     int
 		isEsc bool
 	)
-	for ; x < len(raw); x++ {
+	for x := range len(raw) {
 		if isEsc {
 			switch raw[x] {
 			case '\\':

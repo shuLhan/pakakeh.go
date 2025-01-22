@@ -263,7 +263,7 @@ func MinRange[S []E, E cmp.Ordered](slice S, l, r int) (v E, i int) {
 // Remove val from slice if its exist and return new slice and true.
 // Otherwise, if val not found, return unmodified slice and false.
 func Remove[S []E, E comparable](slice S, v E) (S, bool) {
-	for x := 0; x < len(slice); x++ {
+	for x := range len(slice) {
 		if slice[x] == v {
 			slice = append(slice[:x], slice[x+1:]...)
 			return slice, true
@@ -285,7 +285,7 @@ func SortByIndex[S []E, E cmp.Ordered](slice *S, sortedIdx []int) {
 
 // Sum all value in slice.
 func Sum[S []E, E constraints.Integer | constraints.Float](slice S) (sum E) {
-	for x := 0; x < len(slice); x++ {
+	for x := range len(slice) {
 		sum += slice[x]
 	}
 	return sum

@@ -79,7 +79,7 @@ func NewValue(in any) (out *Value) {
 	case reflect.Struct:
 		out.Kind = Struct
 		out.StructMembers = make(map[string]*Value, reft.NumField())
-		for x := 0; x < reft.NumField(); x++ {
+		for x := range reft.NumField() {
 			var name string
 
 			field := reft.Field(x)
@@ -98,7 +98,7 @@ func NewValue(in any) (out *Value) {
 
 	case reflect.Array, reflect.Slice:
 		out.Kind = Array
-		for x := 0; x < refv.Len(); x++ {
+		for x := range refv.Len() {
 			v := NewValue(refv.Index(x).Interface())
 			if v != nil {
 				out.ArrayValues = append(out.ArrayValues, v)

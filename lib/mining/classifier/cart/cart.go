@@ -250,7 +250,7 @@ func (runtime *Runtime) SelectRandomFeature(claset tabula.ClasetInterface) {
 
 	// Select random features excluding feature in `excludeIdx`.
 	var pickedIdx []int
-	for x := 0; x < runtime.NRandomFeature; x++ {
+	for range runtime.NRandomFeature {
 		idx := numbers.IntPickRandPositive(ncols, false, pickedIdx,
 			excludeIdx)
 		pickedIdx = append(pickedIdx, idx)

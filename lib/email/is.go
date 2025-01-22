@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package email
 
@@ -26,7 +26,7 @@ func IsValidLocal(local []byte) bool {
 		return false
 	}
 	dot := false
-	for x := 0; x < len(local); x++ {
+	for x := range len(local) {
 		if local[x] < 33 || local[x] > 126 {
 			return false
 		}

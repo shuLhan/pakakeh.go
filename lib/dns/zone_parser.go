@@ -1052,7 +1052,7 @@ func (m *zoneParser) decodeString(in []byte) (out []byte, err error) {
 	}
 
 	var x int
-	for x = 0; x < size; x++ {
+	for ; x < size; x++ {
 		c = in[x]
 		if ascii.IsSpace(c) {
 			break
@@ -1118,23 +1118,19 @@ func (m *zoneParser) push(rr *ResourceRecord) error {
 }
 
 func (m *zoneParser) setMinimumTTL() {
-	var (
-		msg *Message
-		x   int
-	)
-
+	var msg *Message
 	for _, msg = range m.zone.messages {
-		for x = 0; x < len(msg.Answer); x++ {
+		for x := range len(msg.Answer) {
 			if msg.Answer[x].TTL < m.zone.SOA.Minimum {
 				msg.Answer[x].TTL = m.zone.SOA.Minimum
 			}
 		}
-		for x = 0; x < len(msg.Authority); x++ {
+		for x := range len(msg.Authority) {
 			if msg.Authority[x].TTL < m.zone.SOA.Minimum {
 				msg.Authority[x].TTL = m.zone.SOA.Minimum
 			}
 		}
-		for x = 0; x < len(msg.Additional); x++ {
+		for x := range len(msg.Additional) {
 			if msg.Additional[x].TTL < m.zone.SOA.Minimum {
 				msg.Additional[x].TTL = m.zone.SOA.Minimum
 			}
