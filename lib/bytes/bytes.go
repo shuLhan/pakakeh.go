@@ -437,25 +437,3 @@ func WordIndexes(s []byte, word []byte) (idxs []int) {
 
 	return idxs
 }
-
-// WriteUint16 write uint16 value "v" into "data" start at position "x".
-// If x is out range, the data will not change.
-func WriteUint16(data []byte, x uint, v uint16) {
-	if x+1 >= uint(len(data)) {
-		return
-	}
-	data[x] = byte(v >> 8)
-	data[x+1] = byte(v)
-}
-
-// WriteUint32 write uint32 value into "data" start at position "x".
-// If x is out range, the data will not change.
-func WriteUint32(data []byte, x uint, v uint32) {
-	if x+3 >= uint(len(data)) {
-		return
-	}
-	data[x] = byte(v >> 24)
-	data[x+1] = byte(v >> 16)
-	data[x+2] = byte(v >> 8)
-	data[x+3] = byte(v)
-}

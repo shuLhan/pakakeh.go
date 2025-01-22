@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/reflect"
 )
@@ -586,7 +585,7 @@ func (msg *Message) packTextAsDomain(rr *ResourceRecord) {
 	msg.packet = binary.BigEndian.AppendUint16(msg.packet, 0)
 
 	n = msg.packDomainName([]byte(rrText), true)
-	libbytes.WriteUint16(msg.packet, off, uint16(n))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(n))
 }
 
 func (msg *Message) packSOA(rr *ResourceRecord) {
@@ -617,7 +616,7 @@ func (msg *Message) packSOA(rr *ResourceRecord) {
 	total += 20
 
 	// Write rdlength.
-	libbytes.WriteUint16(msg.packet, off, uint16(total))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(total))
 }
 
 func (msg *Message) packWKS(rr *ResourceRecord) {
@@ -664,7 +663,7 @@ func (msg *Message) packMINFO(rr *ResourceRecord) {
 	n += msg.packDomainName([]byte(rrMInfo.EmailBox), true)
 
 	// Write rdlength.
-	libbytes.WriteUint16(msg.packet, off, uint16(n))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(n))
 }
 
 func (msg *Message) packMX(rr *ResourceRecord) {
@@ -685,7 +684,7 @@ func (msg *Message) packMX(rr *ResourceRecord) {
 	n = msg.packDomainName([]byte(rrMX.Exchange), true)
 
 	// Write rdlength.
-	libbytes.WriteUint16(msg.packet, off, uint16(n+2))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(n+2))
 }
 
 func (msg *Message) packTXT(rr *ResourceRecord) {
@@ -718,7 +717,7 @@ func (msg *Message) packSRV(rr *ResourceRecord) {
 	n = msg.packDomainName([]byte(rrSRV.Target), false) + 6
 
 	// Write rdlength.
-	libbytes.WriteUint16(msg.packet, off, uint16(n))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(n))
 }
 
 func (msg *Message) packAAAA(rr *ResourceRecord) {
@@ -765,7 +764,7 @@ func (msg *Message) packSVCB(rr *ResourceRecord) {
 	var n = svcb.pack(msg)
 
 	// Write rdlength.
-	libbytes.WriteUint16(msg.packet, off, uint16(n))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(n))
 }
 
 func (msg *Message) packHTTPS(rr *ResourceRecord) {
@@ -791,7 +790,7 @@ func (msg *Message) packHTTPS(rr *ResourceRecord) {
 	// In HTTPS (AliasMode), Params is ignored.
 
 	// Write rdlength.
-	libbytes.WriteUint16(msg.packet, off, uint16(n))
+	binary.BigEndian.PutUint16(msg.packet[off:], uint16(n))
 }
 
 func (msg *Message) packIPv4(addr string) {
@@ -952,7 +951,7 @@ func (msg *Message) SetAuthorativeAnswer(isAA bool) {
 func (msg *Message) SetID(id uint16) {
 	msg.Header.ID = id
 	if len(msg.packet) > 2 {
-		libbytes.WriteUint16(msg.packet, 0, id)
+		binary.BigEndian.PutUint16(msg.packet, id)
 	}
 }
 
@@ -1012,7 +1011,9 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Answer[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, uint(msg.Answer[x].idxTTL), msg.Answer[x].TTL)
+		binary.BigEndian.PutUint32(
+			msg.packet[msg.Answer[x].idxTTL:],
+			msg.Answer[x].TTL)
 	}
 	for x = 0; x < len(msg.Authority); x++ {
 		if msg.Authority[x].TTL < n {
@@ -1020,7 +1021,9 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Authority[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, uint(msg.Authority[x].idxTTL), msg.Authority[x].TTL)
+		binary.BigEndian.PutUint32(
+			msg.packet[msg.Authority[x].idxTTL:],
+			msg.Authority[x].TTL)
 	}
 	for x = 0; x < len(msg.Additional); x++ {
 		if msg.Additional[x].Type == RecordTypeOPT {
@@ -1031,7 +1034,9 @@ func (msg *Message) SubTTL(n uint32) {
 		} else {
 			msg.Additional[x].TTL -= n
 		}
-		libbytes.WriteUint32(msg.packet, uint(msg.Additional[x].idxTTL), msg.Additional[x].TTL)
+		binary.BigEndian.PutUint32(
+			msg.packet[msg.Additional[x].idxTTL:],
+			msg.Additional[x].TTL)
 	}
 }
 

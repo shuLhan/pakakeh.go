@@ -8,8 +8,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 )
 
 const (
@@ -156,10 +154,10 @@ func (hdr *MessageHeader) pack() []byte {
 	packet[2] = b0
 	packet[3] = b1
 
-	libbytes.WriteUint16(packet[:], 4, hdr.QDCount)
-	libbytes.WriteUint16(packet[:], 6, hdr.ANCount)
-	libbytes.WriteUint16(packet[:], 8, hdr.NSCount)
-	libbytes.WriteUint16(packet[:], 10, hdr.ARCount)
+	binary.BigEndian.PutUint16(packet[4:], hdr.QDCount)
+	binary.BigEndian.PutUint16(packet[6:], hdr.ANCount)
+	binary.BigEndian.PutUint16(packet[8:], hdr.NSCount)
+	binary.BigEndian.PutUint16(packet[10:], hdr.ARCount)
 
 	return packet[:]
 }
