@@ -15,11 +15,11 @@ func ExampleParseContentRange() {
 	fmt.Println(libhttp.ParseContentRange(`bytes -10/x`))    // Invalid, invalid "size".
 	fmt.Println(libhttp.ParseContentRange(`bytes`))          // Invalid, missing position.
 	// Output:
-	// <nil>
-	// 10-19
-	// <nil>
-	// <nil>
-	// <nil>
-	// <nil>
-	// <nil>
+	// <nil> ParseContentRange: invalid Content-Range "bytes 10-/20": strconv.ParseInt: parsing "": invalid syntax
+	// 10-19 <nil>
+	// <nil> ParseContentRange: invalid Content-Range "bytes -10/20"
+	// <nil> ParseContentRange: invalid Content-Range "10-20/20"
+	// <nil> ParseContentRange: invalid Content-Range "bytes 10-"
+	// <nil> ParseContentRange: invalid Content-Range "bytes -10/x"
+	// <nil> ParseContentRange: invalid Content-Range "bytes"
 }

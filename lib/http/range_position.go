@@ -35,49 +35,51 @@ type RangePosition struct {
 //	          end = 1*DIGIT
 //
 // It will return nil if the v is invalid.
-func ParseContentRange(v string) (pos *RangePosition) {
+func ParseContentRange(v string) (pos *RangePosition, err error) {
 	var (
-		p = libstrings.NewParser(v, ` `)
+		logp = `ParseContentRange`
+		p    = libstrings.NewParser(v, ` `)
 
 		tok   string
 		delim rune
-		err   error
 	)
 
 	pos = &RangePosition{}
 
 	tok, delim = p.ReadNoSpace()
 	if delim != ' ' {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
 
 	pos.unit = strings.ToLower(tok)
+	if !(pos.unit == AcceptRangesBytes || pos.unit == AcceptRangesNone) {
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
+	}
 
 	p.SetDelimiters(`-/`)
 
 	tok, delim = p.ReadNoSpace()
 	if len(tok) == 0 {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
 	if tok == `*` {
 		if delim != '/' {
-			return nil
+			return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 		}
 		tok, delim = p.ReadNoSpace()
 		if delim != 0 {
-			return nil
+			return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 		}
 		if tok == `*` {
 			// "*/*": invalid range requested with unknown size.
-			pos = &RangePosition{}
-			return pos
+			return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 		}
 
 		pos = &RangePosition{}
 		goto parselength
 	}
 	if delim != '-' {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
 
 	pos = &RangePosition{
@@ -88,39 +90,39 @@ func ParseContentRange(v string) (pos *RangePosition) {
 
 	*pos.start, err = strconv.ParseInt(tok, 10, 64)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q: %w`, logp, v, err)
 	}
 
 	tok, delim = p.ReadNoSpace()
 	if delim != '/' {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
 	*pos.end, err = strconv.ParseInt(tok, 10, 64)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q: %w`, logp, v, err)
 	}
 	if *pos.end < *pos.start {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
 
 	tok, delim = p.ReadNoSpace()
 	if delim != 0 {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
 	if tok == `*` {
 		// "x-y/*"
-		return pos
+		return pos, nil
 	}
 
 parselength:
 	*pos.length, err = strconv.ParseInt(tok, 10, 64)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q: %w`, logp, v, err)
 	}
 	if *pos.length < 0 {
-		return nil
+		return nil, fmt.Errorf(`%s: invalid Content-Range %q`, logp, v)
 	}
-	return pos
+	return pos, nil
 }
 
 // Content return the range content body in multipart.

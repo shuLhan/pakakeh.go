@@ -59,8 +59,9 @@ func ParseMultipartRange(body io.Reader, boundary string) (r *Range, err error) 
 			continue
 		}
 
-		var pos = ParseContentRange(contentRange)
-		if pos == nil {
+		var pos *RangePosition
+		pos, err = ParseContentRange(contentRange)
+		if err != nil {
 			continue
 		}
 
