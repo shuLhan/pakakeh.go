@@ -42,7 +42,7 @@
 /lib/email/maildir/testdata/
 /lib/git/testdata/beku_test
 /lib/git/testdata/repotest
-/lib/hunspell/testdata/out.dic
+/lib/_hunspell/testdata/out.dic
 /lib/io/testdata/output.txt
 /lib/memfs/testdata/node_save
 /lib/mining/cmd/cart/cart

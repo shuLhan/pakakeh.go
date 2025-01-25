@@ -154,10 +154,6 @@ and builtin memory file system.
 Package sseclient implement HTTP client for Server-Sent Events (SSE).
 
 
-[**hunspell**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/hunspell)::
-[WORK IN PROGRESS].
-A library to parse the Hunspell file format.
-
 [**ini**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ini)::
 A library for reading and writing INI configuration as defined by Git
 configuration file syntax.
