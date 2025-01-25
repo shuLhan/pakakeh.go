@@ -76,13 +76,8 @@ func (mfs *MemFS) AddChild(parent *Node, fi os.FileInfo) (child *Node, err error
 		return nil, nil
 	}
 	if !mfs.Opts.isIncluded(sysPath, fi) {
-		if child != nil {
-			// The path being watched, but not included.
-			// Set the generate function name to empty, to prevent
-			// GoEmbed embed the content of this node.
-			child.GenFuncName = ""
-		}
-		return child, nil
+		// The path being watched, but not included.
+		return nil, nil
 	}
 
 	child, err = parent.addChild(sysPath, fi, mfs.Opts.MaxFileSize)
