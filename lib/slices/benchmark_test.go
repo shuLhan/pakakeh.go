@@ -17,36 +17,32 @@ func BenchmarkSort_int(b *testing.B) {
 	var data = make([]int, n)
 	generateRandomInts(data, n)
 
-	var dataIndirect = make([]int, n)
-	copy(dataIndirect, data)
-
-	var dataInplaceMergesort = make([]int, n)
+	var dataUnsorted = make([]int, n)
 	var inplaceIdx = make([]int, n)
-	copy(dataInplaceMergesort, data)
 
-	var dataSortInts = make([]int, n)
-	copy(dataSortInts, data)
 	b.ResetTimer()
 
 	b.Run(`sort.Ints`, func(b *testing.B) {
 		for x := 0; x < b.N; x++ {
-			sort.Ints(dataSortInts)
+			copy(dataUnsorted, data)
+			sort.Ints(dataUnsorted)
 		}
 	})
 
 	b.Run(`IndirectSort`, func(b *testing.B) {
 		for x := 0; x < b.N; x++ {
-			slices.IndirectSort(dataIndirect, true)
+			copy(dataUnsorted, data)
+			slices.IndirectSort(dataUnsorted, true)
 		}
 	})
 
 	b.Run(`InplaceMergesort`, func(b *testing.B) {
 		for x := 0; x < b.N; x++ {
-			slices.InplaceMergesort(dataInplaceMergesort,
+			copy(dataUnsorted, data)
+			slices.InplaceMergesort(dataUnsorted,
 				inplaceIdx, 0, n, true)
 		}
 	})
-
 }
 
 func BenchmarkInplaceMergesort_float64(b *testing.B) {
@@ -65,7 +61,7 @@ func BenchmarkInplaceMergesort_float64(b *testing.B) {
 	}
 	var size = len(slice)
 	var ids = make([]int, size)
-
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		slices.InplaceMergesort(slice, ids, 0, size, true)
 	}
