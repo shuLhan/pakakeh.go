@@ -7,12 +7,12 @@ module git.sr.ht/~shulhan/pakakeh.go
 go 1.23.4
 
 require (
-	golang.org/x/crypto v0.31.0
-	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67
-	golang.org/x/net v0.33.0
-	golang.org/x/sys v0.28.0
-	golang.org/x/term v0.27.0
-	golang.org/x/tools v0.28.0
+	golang.org/x/crypto v0.32.0
+	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
+	golang.org/x/net v0.34.0
+	golang.org/x/sys v0.29.0
+	golang.org/x/term v0.28.0
+	golang.org/x/tools v0.29.0
 )
 
 require (
