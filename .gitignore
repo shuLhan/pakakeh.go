@@ -19,6 +19,7 @@
 /_bin/bcrypt
 /_bin/emaildecode
 /_bin/epoch
+/_bin/gocheck
 /_bin/gofmtcomment
 /_bin/hexo
 /_bin/httpdfs

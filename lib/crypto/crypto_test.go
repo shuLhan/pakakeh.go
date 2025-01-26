@@ -173,7 +173,7 @@ func TestLoadPrivateKeyInteractive(t *testing.T) {
 
 		_, ok = pkey.(*rsa.PrivateKey)
 		if !ok {
-			test.Assert(t, c.desc+` cast to *rsa.PrivateKey`, c.expError, err.Error())
+			t.Fatalf(`expecting pkey is *rsa.PrivateKey, got %T`, pkey)
 			continue
 		}
 	}

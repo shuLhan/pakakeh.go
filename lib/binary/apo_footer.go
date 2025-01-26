@@ -17,7 +17,7 @@ type apoFooter struct {
 
 func (foot *apoFooter) WriteTo(w io.Writer) (n int64, err error) {
 	var nidx int64 = int64(len(foot.idxMetaOff))
-	_ = binary.Write(w, binary.BigEndian, nidx)
+	err = binary.Write(w, binary.BigEndian, nidx)
 	if err != nil {
 		return 0, err
 	}
