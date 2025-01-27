@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 = pakakeh.go CHANGELOG
+:std_url: https://pkg.go.dev
 :sectanchors:
 :sectlinks:
 :toc:
@@ -26,7 +27,149 @@ This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
+//{{{
+[#v0_60_0]
+== pakakeh.go v0.60.0 (2025-02-xx)
 
+Some changes that affected almost all packages are by replacing
+"interface{}" with "any" (added since Go 1.18),
+using for-range on numeric value (supported on Go 1.22).
+
+
+[#v0_60_0__lib_bytes]
+=== lib/bytes
+
+[BREAKING CHANGES] +
+We remove Copy and Concat functions in favor of standard library.
+Since Go 1.20, the standard bytes package have the Copy function.
+Since Go 1.22, the standard slices package have the Concat function.
+
+[BREAKING CHANGES] +
+We also remove "lib/bytes.AppendXxx", "lib/bytes.ReadXxx", and
+"lib/bytes.WriteXxx" in favor of standard library.
+Since Go 1.19, package "encoding/binary" support appending byte order.
+The ReadXxx and WriteXxx can be replaced with standard library
+BigEndian/LittleEndian UintXxx and PutUintXxx.
+
+
+[#v0_60_0__lib_debug]
+=== lib/debug
+
+[BREAKING CHANGES] +
+The global Value variable has been removed.
+Using global variable inside one package is a mistake.
+If, for example, package X set debug.Value to 1, another packages that
+does need to be debugged will print unnecessary log messages.
+
+
+[#v0_60_0__lib_dns]
+=== lib/dns
+
+[BUG FIX] +
+We fix unpacking HTTPS where the response answers contains RR other than
+SVCB parameters, for example CNAME.
+
+[ENHANCEMENT] +
+This release now detect invalid response header earlier, like invalid op
+code and response code, before we continue unpacking the rest data.
+Previously, we unpack the header and then question without
+detecting whether the header itself is valid or not.
+This cause the unpacking question return an error like
+
+  label length overflow at index xxx
+
+One of the case is when someone sent random or HTTP request
+to DoT port.
+
+[ENHANCEMENT] +
+In the logging part, we improve the logging prefix on serveTCPClient.
+The serveTCPClient is used to serve TCP and DoT clients.
+Previously, the error returned from this method is prefixed based on the
+kind, for example
+
+  serveTCPClient TCP: ...
+  serveTCPClient DoT: ...
+
+This changes pass the log prefix to the method so now it become
+
+  serveTCPClient: ...
+  serveDoTClient: ...
+
+
+[#v0_60_0__lib_http]
+=== lib/http
+
+[ENHANCEMENT] +
+On server with TryDirect is true, a GET request to a directory now always
+rescan the content and the generate the new "index.html".
+
+In the generated "index.html" we display the file time in UTC instead of
+local time.
+
+The ParseContentRange function now return an error instead of nil
+"*RangePosition".
+
+
+[#v0_60_0__lib_goanalysis]
+=== lib/goanalysis
+
+[NEW FEATURE] +
+Package goanalysis implement go static analysis using
+[Analyzer] that are not included in the default "go vet", but included in
+the [passes] directory, including: fieldalignment, nilness,
+reflectvaluecompare, shadow, sortslice, unusedwrite, and waitgroup.
+This package is not mean to be imported directly by other package
+except main, like we have in [cmd/gocheck].
+
+
+[#v0_60_0__lib_hunspell]
+=== lib/hunspell
+
+This package has been renamed to "_hunspell".
+The hunspell is still in progress and we did not have time to continue
+it, so we rename it to "_hunspell" for now to prevent it being checked by
+linters or being imported.
+
+
+[#v0_60_0__lib_memfs]
+=== lib/memfs
+
+[BUG FIX] +
+Fix possible panic on AddChild if path is not included.
+
+
+[#v0_60_0__lib_play]
+=== lib/play
+
+[ENHANCEMENT] +
+One of the major issue that we previously have is the Run and Test
+functions can write file in any unsafe path.
+Another issue is default GoVersion and Timeout is set on the package level.
+
+This release introduce new type "Go" as the top level type that can be
+instantiate with different Root, GoVersion, and Timeout.
+The instance of Go then can Format, Run, or Test the Go code in their
+own scope.
+
+Any request to Run or Test Go code that requires writing new files now
+joined with the [GoOptions.Root] first.
+If the final absolute path does not have Root as the prefix it will return
+an error [os.ErrPermission].
+This fix possible security issue where file may be written outside of the
+Root directory.
+
+[#v0_60_0__lib_test]
+=== lib/test
+
+[ENHANCEMENT] +
+Inside the Assert, we call the [T.Helper] method.
+The Helper method mark the Assert function as test helper, which when
+printing file and line information, the stack trace from Assert function
+will be skipped.
+This remove manual lines skipping that previously we have.
+
+//}}}
+//{{{
 [#v0_59_0]
 == pakakeh.go v0.59.0 (2025-01-06)
 
@@ -49,7 +192,8 @@ indicates the type of changes.
 [#v0_59_0__lib_binary]
 === lib/binary
 
-The "lib/binary] is new package that complement the standard binary package.
+The "lib/binary" is the new package that complement the standard binary
+package.
 
 [NEW FEATURE] +
 Implement append-only binary that encode the data using [binary.Writer].
@@ -250,3 +394,5 @@ The channel send an empty slice if no changes.
 The implementation of file changes in this code is naive, using loop and
 comparison of mode, modification time, and size; at least it should
 works on most operating system.
+
+//}}}

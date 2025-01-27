@@ -41,8 +41,8 @@ This library is released every month, usually at the first week of month.
 
 link:CHANGELOG.html[Latest changelog^].
 
-link:CHANGELOG_2024.html[Changelog in 2023^].
-Changelog for `pakakeh.go` module since v0.42.0 until v0.58.1.
+link:CHANGELOG_2024.html[Changelog in 2024^].
+Changelog for `pakakeh.go` module since v0.52.0 until v0.58.1.
 
 link:CHANGELOG_2023.html[Changelog in 2023^].
 Changelog for `pakakeh.go` module since v0.43.0 until v0.51.0.
