@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package http
 
@@ -103,7 +103,7 @@ func TestParseResponseHeader(t *testing.T) {
 	for _, c := range cases {
 		t.Log(c.desc)
 
-		got, rest, err := ParseResponseHeader([]byte(c.raw)) //nolint: bodyclose
+		got, rest, err := ParseResponseHeader([]byte(c.raw))
 		if err != nil {
 			test.Assert(t, "error", c.expErr, err.Error())
 			continue

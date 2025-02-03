@@ -1,12 +1,12 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
 import (
 	"crypto/rand"
-	"crypto/sha1" //nolint:gosec
+	"crypto/sha1"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -132,7 +132,7 @@ func Send(fd int, packet []byte, timeout time.Duration) (err error) {
 // Section 4 of [RFC4648]) this 20-byte hash.
 func generateHandshakeAccept(key []byte) string {
 	key = append(key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"...)
-	var sum = sha1.Sum(key) //nolint:gosec
+	var sum = sha1.Sum(key)
 	return base64.StdEncoding.EncodeToString(sum[:])
 }
 

@@ -392,7 +392,7 @@ func (reader *reader) parseVariable() (err error) {
 	reader._var.format = reader.bufFormat.String()
 	reader._var.key = reader.buf.String()
 
-	return nil //nolint:nilerr
+	return nil
 }
 
 // parsePossibleValue will check if the next character after space is comment
@@ -428,7 +428,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 	reader._var.mode = lineModeKeyOnly
 	reader._var.format = reader.bufFormat.String()
 
-	return nil //nolint:nilerr
+	return nil
 }
 
 // At this point we found `=` on source, and we expect the rest of source will

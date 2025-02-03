@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package smtp
 
@@ -151,7 +151,7 @@ func (cl *Client) connect(localName string) (res *Response, err error) {
 	if cl.isTLS {
 		tlsConfig := &tls.Config{
 			ServerName:         cl.serverName,
-			InsecureSkipVerify: cl.opts.Insecure, //nolint:gosec
+			InsecureSkipVerify: cl.opts.Insecure,
 		}
 
 		cl.conn = tls.Client(cl.conn, tlsConfig)
@@ -501,7 +501,7 @@ func (cl *Client) StartTLS() (res *Response, err error) {
 
 	tlsConfig := &tls.Config{
 		ServerName:         cl.serverName,
-		InsecureSkipVerify: cl.opts.Insecure, //nolint:gosec
+		InsecureSkipVerify: cl.opts.Insecure,
 	}
 
 	cl.conn = tls.Client(cl.conn, tlsConfig)

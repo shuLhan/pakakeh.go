@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package dns
 
@@ -51,7 +51,7 @@ func NewDoHClient(nameserver string, allowInsecure bool) (cl *DoHClient, err err
 		MaxIdleConns:    1,
 		IdleConnTimeout: 30 * time.Second,
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: allowInsecure, //nolint:gosec
+			InsecureSkipVerify: allowInsecure,
 		},
 	}
 

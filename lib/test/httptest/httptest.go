@@ -1,6 +1,6 @@
-// Copyright 2024, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package httptest implement testing HTTP package.
 package httptest
@@ -29,7 +29,7 @@ func Simulate(serve http.HandlerFunc, req *SimulateRequest) (result *SimulateRes
 
 	serve(httpWriter, result.Request)
 
-	result.Response = httpWriter.Result() //nolint:bodyclose
+	result.Response = httpWriter.Result()
 
 	result.ResponseBody, err = io.ReadAll(result.Response.Body)
 	if err != nil {

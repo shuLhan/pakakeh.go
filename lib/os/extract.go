@@ -1,6 +1,6 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package os
 
@@ -334,8 +334,6 @@ func (xtrk *extractor) untar(fin io.Reader) (err error) {
 		// under the dirOutput, then we return it as error.
 		//
 		// [CWE-22]: https://cwe.mitre.org/data/definitions/22.html
-		//
-		//nolint:gosec
 		filePath = filepath.Join(xtrk.dirOutput, hdr.Name)
 
 		if !strings.HasPrefix(filePath, xtrk.dirOutput) {
@@ -421,8 +419,6 @@ func (xtrk *extractor) unzip(fin *os.File) (err error) {
 		// under the dirOutput, then we return it as error.
 		//
 		// [CWE-22]: https://cwe.mitre.org/data/definitions/22.html
-		//
-		//nolint:gosec
 		filePath = filepath.Join(xtrk.dirOutput, zipFile.Name)
 
 		if !strings.HasPrefix(filePath, xtrk.dirOutput) {

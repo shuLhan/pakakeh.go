@@ -1,6 +1,6 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 package websocket
 
@@ -612,7 +612,7 @@ func (cl *Client) handleFrame(frame *Frame) (isClosing bool) {
 func (cl *Client) handleHandshake(keyAccept string, resp []byte) (rest []byte, err error) {
 	var httpRes *http.Response
 
-	httpRes, rest, err = libhttp.ParseResponseHeader(resp) //nolint: bodyclose
+	httpRes, rest, err = libhttp.ParseResponseHeader(resp)
 	if err != nil {
 		return nil, err
 	}

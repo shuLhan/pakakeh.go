@@ -1,6 +1,6 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package sseclient implement HTTP client for Server-Sent Events (SSE).
 //
@@ -197,7 +197,7 @@ func (cl *Client) init(header http.Header) (err error) {
 func (cl *Client) dial() (err error) {
 	if cl.serverURL.Scheme == `https` {
 		var tlsConfig = &tls.Config{
-			InsecureSkipVerify: cl.Insecure, //nolint:gosec
+			InsecureSkipVerify: cl.Insecure,
 		}
 		cl.conn, err = tls.Dial(`tcp`, cl.serverURL.Host, tlsConfig)
 	} else {
@@ -227,7 +227,7 @@ func (cl *Client) handshake() (packet []byte, err error) {
 
 	var httpRes *http.Response
 
-	httpRes, packet, err = libhttp.ParseResponseHeader(packet) //nolint:bodyclose
+	httpRes, packet, err = libhttp.ParseResponseHeader(packet)
 	if err != nil {
 		return nil, err
 	}

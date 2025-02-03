@@ -131,7 +131,7 @@ func NewServer(opts *ServerOptions) (srv *Server, err error) {
 			Certificates: []tls.Certificate{
 				cert,
 			},
-			InsecureSkipVerify: opts.TLSAllowInsecure, //nolint:gosec
+			InsecureSkipVerify: opts.TLSAllowInsecure,
 		}
 	}
 

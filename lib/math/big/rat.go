@@ -304,11 +304,10 @@ func (r *Rat) Mul(g any) *Rat {
 		return nil
 	}
 	r.Rat.Mul(&r.Rat, &y.Rat)
+
 	// This security issue has been fixed since Go 1.17.7,
 	// - https://groups.google.com/g/golang-announce/c/SUsQn0aSgPQ
 	// - https://github.com/golang/go/issues/50699
-	//
-	//nolint:gosec
 	r.Rat.SetString(r.String())
 
 	return r
@@ -325,7 +324,7 @@ func (r *Rat) Quo(g any) *Rat {
 		return nil
 	}
 	r.Rat.Quo(&r.Rat, &y.Rat)
-	r.Rat.SetString(r.String()) //nolint:gosec
+	r.Rat.SetString(r.String())
 	return r
 }
 
@@ -360,7 +359,7 @@ func (r *Rat) RoundToNearestAway(prec int) *Rat {
 	if r == nil {
 		return nil
 	}
-	r.Rat.SetString(r.FloatString(prec)) //nolint:gosec
+	r.Rat.SetString(r.FloatString(prec))
 	return r
 }
 
@@ -378,7 +377,7 @@ func (r *Rat) RoundToZero(prec int) *Rat {
 		b = append(b, '.')
 		b = append(b, nums[1][:prec]...)
 	}
-	r.Rat.SetString(string(b)) //nolint:gosec
+	r.Rat.SetString(string(b))
 	return r
 }
 
@@ -443,7 +442,7 @@ func (r *Rat) Sub(g any) *Rat {
 func (r *Rat) UnmarshalJSON(in []byte) (err error) {
 	in = bytes.Trim(in, `"`)
 	r.SetInt64(0)
-	_, ok := r.Rat.SetString(string(in)) //nolint:gosec
+	_, ok := r.Rat.SetString(string(in))
 	if !ok {
 		return fmt.Errorf("Rat.UnmarshalJSON: cannot convert %T(%v) to Rat", in, in)
 	}
@@ -473,7 +472,7 @@ func toRat(g any) (out *Rat) {
 			out.SetInt64(0)
 		} else {
 			v = bytes.ReplaceAll(v, []byte{'_'}, nil)
-			_, ok := out.Rat.SetString(string(v)) //nolint:gosec
+			_, ok := out.Rat.SetString(string(v))
 			if !ok {
 				return nil
 			}
@@ -485,7 +484,7 @@ func toRat(g any) (out *Rat) {
 			// Replace the underscore character, so we can write the
 			// number as "0.000_000_1".
 			v = strings.ReplaceAll(v, "_", "")
-			_, ok := out.Rat.SetString(v) //nolint:gosec
+			_, ok := out.Rat.SetString(v)
 			if !ok {
 				return nil
 			}

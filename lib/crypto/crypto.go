@@ -1,6 +1,6 @@
-// Copyright 2019, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 // Package crypto provide a wrapper for standard crypto package and
 // golang.org/x/crypto.
@@ -39,7 +39,7 @@ var ErrStdinPassphrase = errors.New(`cannot read passhprase from stdin`)
 // List of environment variables reads when reading passphrase
 // interactively.
 const (
-	envKeySSHAskpassRequire = `SSH_ASKPASS_REQUIRE` //nolint: gosec
+	envKeySSHAskpassRequire = `SSH_ASKPASS_REQUIRE`
 	envKeySSHAskpass        = `SSH_ASKPASS`
 	envKeyDisplay           = `DISPLAY`
 )
