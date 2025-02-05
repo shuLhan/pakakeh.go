@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: BSD-3-Clause
+
 package bytes_test
 
 import (
@@ -219,15 +223,21 @@ func ExampleParser_SkipLine() {
 	)
 
 	parser.SkipLine()
-	token, _ := parser.Read()
-	fmt.Printf("token:'%s'\n", token)
+	token, c := parser.Read()
+	fmt.Printf("token=%q c=%q\n", token, c)
 
 	parser.SkipLine()
-	token, _ = parser.Read()
-	fmt.Printf("token:'%s'\n", token)
+	token, c = parser.Read()
+	fmt.Printf("token=%q c=%q\n", token, c)
+
+	parser.SkipLine()
+	token, c = parser.Read()
+	fmt.Printf("token=%q c=%q\n", token, c)
+
 	// Output:
-	// token:'b'
-	// token:'d e'
+	// token="b" c='\n'
+	// token="d e" c='\n'
+	// token="" c='\x00'
 }
 
 func ExampleParser_SkipN() {
