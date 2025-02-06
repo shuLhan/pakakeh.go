@@ -40,6 +40,15 @@ func (bp *Parser) Delimiters() []byte {
 	return bytes.Clone(bp.delims)
 }
 
+// Peek take a look on n bytes inside the buffer without using delimiters.
+// The returned bytes may empty or have length less than n.
+func (bp *Parser) Peek(n int) []byte {
+	if bp.x+n > bp.size {
+		return bp.content[bp.x:]
+	}
+	return bp.content[bp.x : bp.x+n]
+}
+
 // Read read a token until one of the delimiters found.
 // If one of delimiter match, it will return it as d.
 // When end of content encountered, the returned token may be not empty but

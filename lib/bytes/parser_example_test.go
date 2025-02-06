@@ -41,6 +41,22 @@ func ExampleParser_Delimiters() {
 	// =;
 }
 
+func ExampleParser_Peek() {
+	var (
+		content = []byte("a = b; ")
+		delims  = []byte{'=', ';'}
+		parser  = libbytes.NewParser(content, delims)
+	)
+	var stream = parser.Peek(1)
+	fmt.Printf("peek=%q\n", stream)
+
+	stream = parser.Peek(len(content) + 1)
+	fmt.Printf("peek=%q\n", stream)
+	// Output:
+	// peek="a"
+	// peek="a = b; "
+}
+
 func ExampleParser_Read() {
 	var (
 		content = []byte("a = b; ")
