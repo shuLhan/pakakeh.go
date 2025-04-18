@@ -1,0 +1,46 @@
+Test corpus for parsing zone.
+
+>>> kilabit.info.
+@  3600  IN  SOA  @  admin (
+20180832 ; SERIAL
+3600     ; REFRESH
+60       ; RETRY
+3600     ; EXPIRE
+3600 )   ; MINIMUM
+
+@  IN A   127.0.0.1
+      TXT "This is a test server"
+
+; 12 - PTR records.
+10.0.0.127.in-addr.arpa. PTR kilabit.info.
+1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa. PTR kilabit.info.
+1.0.b.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa. PTR kilabit.info.
+
+; 13 - HINFO record (obsolete).
+@ IN HINFO x86_64 ArchLinux
+
+; 14 - MINFO record (obsolete).
+  MINFO post-request admin
+
+txt_noquote TXT This\032is a text ; Without quote terminated by space.
+
+>>> pcguide.com.
+$ORIGIN pcguide.com.
+@ IN SOA ns23.pair.com. root.pair.com. (
+2001072300 ; Serial
+3600 ; Refresh
+300 ; Retry
+604800 ; Expire
+3600 ) ; Minimum
+
+@ IN NS ns23.pair.com.
+@ IN NS ns0.ns0.com.
+
+localhost IN A 127.0.0.1
+@ IN A 209.68.14.80
+  IN MX 50 qs939.pair.com.
+
+www IN CNAME @
+ftp IN CNAME @
+mail IN CNAME @
+relay IN CNAME relay.pair.com.

@@ -138,48 +138,33 @@ func (m *zoneParser) Reset(data []byte, zone *Zone) {
 //	; - Semicolon is used to start a comment; the remainder of the line is
 //	ignored.
 func (m *zoneParser) parse() (err error) {
-	var (
-		logp = `parse`
-
-		rr   *ResourceRecord
-		tok  []byte
-		stok string
-		n    int
-		c    byte
-	)
+	var logp = `parse`
 
 	for {
-		// Check if the RR start with space or not.
-		n, c = m.parser.SkipHorizontalSpaces()
-		if c == 0 {
-			break
-		}
-		if c == '\n' || c == ';' {
-			m.parser.SkipLine()
-			m.lineno++
-			continue
+		err = m.next()
+		if err != nil {
+			return
 		}
 
-		tok, c = m.parser.ReadNoSpace()
+		m.token = ascii.ToUpper(m.token)
+		var stok = string(m.token)
 
-		tok = ascii.ToUpper(tok)
-		stok = string(tok)
+		fmt.Printf(`stok=%s`, stok)
 
+		var rr *ResourceRecord
 		switch stok {
 		case `$ORIGIN`:
-			err = m.parseDirectiveOrigin(c)
+			err = m.parseDirectiveOrigin(m.delim)
 		case `$INCLUDE`:
-			err = m.parseDirectiveInclude(c)
+			err = m.parseDirectiveInclude(m.delim)
 		case `$TTL`:
-			err = m.parseDirectiveTTL(c)
+			err = m.parseDirectiveTTL(m.delim)
 		case `@`:
-			rr, err = m.parseRR(nil, tok)
+			rr, err = m.parseRR(nil, m.token)
+		case ` `:
+			rr, err = m.parseRR(m.lastRR, m.token)
 		default:
-			if n == 0 {
-				rr, err = m.parseRR(nil, tok)
-			} else {
-				rr, err = m.parseRR(m.lastRR, tok)
-			}
+			rr, err = m.parseRR(nil, m.token)
 		}
 		if err != nil {
 			return fmt.Errorf(`%s: %w`, logp, err)

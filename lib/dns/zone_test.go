@@ -15,6 +15,21 @@ import (
 )
 
 func TestParseZone(t *testing.T) {
+	type testCase struct {
+		input []byte
+	}
+	var listCase = []testCase{{
+		input: []byte(`(`),
+	}}
+	for _, tcase := range listCase {
+		_, err := ParseZone(tcase.input, ``, 60)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestParseZone_testdata(t *testing.T) {
 	var (
 		listTData []*test.Data
 		err       error

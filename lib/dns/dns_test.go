@@ -7,7 +7,6 @@ package dns
 import (
 	"flag"
 	"log"
-	"os"
 	"testing"
 	"time"
 )
@@ -21,14 +20,11 @@ const (
 	testNowEpoch = 1691222000
 )
 
-var (
-	_testServer *Server
-)
+var _testServer *Server
+var flagNoServer bool
 
 func TestMain(m *testing.M) {
 	log.SetFlags(0)
-
-	var flagNoServer bool
 
 	flag.BoolVar(&flagNoServer, `no-server`, false, `Skip running servers`)
 	flag.Parse()
@@ -38,10 +34,10 @@ func TestMain(m *testing.M) {
 	}
 
 	if !flagNoServer {
-		runServer()
+		//runServer()
 	}
 
-	os.Exit(m.Run())
+	m.Run()
 }
 
 func runServer() {
@@ -80,5 +76,5 @@ func runServer() {
 	}()
 
 	// Wait for all listeners running.
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(500 * time.Millisecond)
 }
