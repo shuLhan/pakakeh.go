@@ -28,8 +28,22 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 //{{{
+[#v0_60_1]
+== pakakeh.go v0.60.1 (2025-04-18)
+
+[#v0_60_1__lib_bytes]
+=== lib/bytes
+
+[NEW FEATURE] +
+New method Peek in Parser.
+The Peek method take a look on n bytes inside the buffer without
+using delimiters.
+The returned bytes may empty or have length less than n.
+
+//}}}
+//{{{
 [#v0_60_0]
-== pakakeh.go v0.60.0 (2025-02-xx)
+== pakakeh.go v0.60.0 (2025-02-01)
 
 Some changes that affected almost all packages are by replacing
 "interface{}" with "any" (added since Go 1.18),
