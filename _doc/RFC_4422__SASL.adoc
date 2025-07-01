@@ -280,4 +280,4 @@ services.
 
 The SASL mechanism registry is maintained by IANA.
 The registry is currently available at
-<http://www.iana.org/assignments/sasl-mechanisms>.
+https://www.iana.org/assignments/sasl-mechanisms .

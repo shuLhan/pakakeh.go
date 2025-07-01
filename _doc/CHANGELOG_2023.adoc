@@ -911,7 +911,7 @@ idea.
 lib/test: update documentation related to Assert and Data::
 +
 The documentation is based on the article published at
-https://kilabit.local/journal/2023/go_test_data/
+https://kilabit.info/journal/2023/go_test_data/
 after reviewing and explain how to use both of them to public.
 
 all: record the contributors of this module in file AUTHORS::

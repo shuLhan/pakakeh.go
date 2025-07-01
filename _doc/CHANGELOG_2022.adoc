@@ -65,8 +65,8 @@ lib/http: sanitize ServerUrl and request path::
 --
 This is to fix double slash in case the ServerUrl end with it and the
 request path begin with it.
-For example, "http://127.0.0.1/" and "/" should send request to
-"http://127.0.0.1/" not "http://127.0.0.1//".
+For example, "\http://127.0.0.1/" and "/" should send request to
+"\http://127.0.0.1/" not "\http://127.0.0.1//".
 --
 
 lib/ssh: try both ssh agent and IdentityFile::

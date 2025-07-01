@@ -282,7 +282,7 @@ handle multiple options.
 
 telegram/bot: fix Webhook URL registration::
 +
-Using [path.Join] cause "https://domain" become "https:/domain" which
+Using [path.Join] cause "\https://domain" become "\https:/domain" which
 is not a valid URL.
 This bug caused by refactoring in b89afa24f.
 
