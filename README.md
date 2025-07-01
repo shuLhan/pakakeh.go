@@ -44,7 +44,7 @@ Program httpdfs implement [libhttp.Server] with [memfs.MemFS].
 
 [**ini**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/cmd/ini)::
 Program ini provide a command line interface to get and set values in the
-[INI file format](https://godocs.io/git.sr.ht/~shulhan/pakakeh.go/lib/ini).
+[INI file format](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/ini).
 
 [**sendemail**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/cmd/sendemail)::
 Program sendemail is command line interface that use lib/email and
@@ -60,8 +60,8 @@ Program to generate Time-based One-time Password using secret key.
 This is just an example of implementation of
 [lib/totp](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/totp).
 See
-<https://sr.ht/~shulhan/gotp/> for a complete implementation that support
-encryption.
+<https://kilabit.info/project/gotp/> for a complete implementation that
+support encryption.
 
 [**xtrk**](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/cmd/xtrk)::
 Program xtrk is command line interface to uncompress and/or unarchive a
@@ -331,10 +331,74 @@ Package xmlrpc provide an implementation of
 [XML-RPC specification](http://xmlrpc.com/spec.md).
 
 
+## Simplified RFCs
+
+### MIME
+
+* [RFC 2045: MIME Part One - Format of Internet Message Bodies](RFC_2045__MIME_I_FORMAT.html).
+* [RFC 2046: MIME Part Two - Media Types](RFC_2046__MIME_II_MEDIA_TYPES.html).
+* [RFC 2049: MIME Part Five: Conformance Criteria and Examples](RFC_2049__MIME_V_CONFORMANCE.html).
+* [RFC 5322: Internet Message Format](RFC_5322__IMF.html).
+
+
+### SASL
+
+* [RFC 4422: Simple Authentication and Security Layer](RFC_4422__SASL.html).
+* [RFC 4616: The PLAIN Simple Authentication and Security Layer (SASL) Mechanism](RFC_4616__SASL_PLAIN.html).
+
+
+### DKIM
+
+* [RFC 4685: Analysis of Threats Motivating DKIM](RFC_4865__DKIM_THREATS.html).
+* [RFC 5585: DomainKeys Identified Mail Service Overview](RFC_5585__DKIM_OVERVIEW.html).
+* [RFC 5863: DKIM Development, Deployment, and Operations](RFC_5863__DKIM_DEVOPS.html).
+* [RFC 6376: DKIM Signatures](RFC_6376__DKIM_SIGNATURES.html).
+
+
+### SMTP
+
+* [RFC 3207: SMTP Service Extension for Secure SMTP over Transport Layer Security](RFC_3207__ESMTP_TLS.html).
+* [RFC 3461-3464: Delivery Status Notification](RFC_3461-3464__ESMTP_DSN.html).
+* [RFC 4954: SMTP Service Extension for Authentication](RFC_4954__ESMTP_AUTH.html).
+* [RFC 5321: Simple Mail Transfer Protocol](RFC_5321__SMTP.html).
+
+
+### SPF
+
+* [RFC 7208: Sender Policy Framework version 1](RFC_7808__SPFv1.html).
+
+
+## DNS
+
+* [RFC 6891: Extension Mechanisms for DNS (EDNS(0)](RFC_6891_EDNS0.html).
+
+* [RFC 9460: Service Binding and Parameter Specification via the DNS
+  (SVCB and HTTPS Resource Records)](RFC_9460__SVCB_and_HTTP_RR.html).
+
+
 ## Changelog
 
-Latest
-[CHANGELOG](https://git.sr.ht/~shulhan/pakakeh.go/blob/main/CHANGELOG.adoc).
+This library is released every month, usually at the first week of month.
+
+[Latest changelog](CHANGELOG.html).
+
+[Changelog in 2024](CHANGELOG_2024.html).
+Changelog for `pakakeh.go` module since v0.52.0 until v0.58.1.
+
+[Changelog in 2023](CHANGELOG_2023.html).
+Changelog for `pakakeh.go` module since v0.43.0 until v0.51.0.
+
+[Changelog in 2022](CHANGELOG_2022.html).
+Changelog for `pakakeh.go` module since v0.33.0 until v0.42.0.
+
+[Changelog in 2021](CHANGELOG_2021.html).
+Changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
+
+[Changelog in 2020](CHANGELOG_2020.html).
+Changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
+
+[Changelog from 2018 to 2019](CHANGELOG_2018-2019.html).
+Changelog for `pakakeh.go` v0.1.0 until v0.11.0.
 
 
 ## Credits
@@ -342,4 +406,48 @@ Latest
 [Autobahn testsuite](https://github.com/crossbario/autobahn-testsuite) for
 testing WebSocket library.
 
+
+##  Development
+
+<https://git.sr.ht/~shulhan/pakakeh.go>::
+Link to the source code.
+
+<https://todo.sr.ht/~shulhan/pakakeh.go>::
+List of open issues.
+
+<https://lists.sr.ht/~shulhan/pakakeh.go>::
+Link to submit the patches.
+
+
+## License
+
+Copyright (c) 2018 M. Shulhan &lt;ms@kilabit.info&gt;
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+----
 That's it! Happy hacking!
