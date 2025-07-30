@@ -101,6 +101,8 @@ type Scheduler struct {
 //   - daily = daily@00:00 = every day at 00:00.
 //   - daily@00:00,06:00,12:00,18:00 = every day at midnight, 6 AM, and 12 PM.
 //
+// # Hourly
+//
 // A hourly schedule can be divided into minutes, with the following format,
 //
 //	HOURLY  = "hourly" ["@" MINUTES]
