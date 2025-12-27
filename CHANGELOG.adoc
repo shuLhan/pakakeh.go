@@ -28,6 +28,23 @@ link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
 //{{{
+[#v0_60_2]
+== pakakeh.go v0.60.2 (2025-12-27)
+
+This is periodic and last release of pakakeh.go for year 2025.
+There is no changes on code level only on documentation.
+
+In the _doc, we merge the index.adoc into README.md so we can served the
+_doc directory under https://kilabit.info/project/pakakeh.go .
+We also fix some broken links in documentation files.
+
+In lib/time, add missing "Hourly" section in the package documentation.
+
+The go.mod is updated to use Go 1.24.0 as minimum version; and all
+dependencies has been updated to latest release.
+
+//}}}
+//{{{
 [#v0_60_1]
 == pakakeh.go v0.60.1 (2025-04-18)
 
