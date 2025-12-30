@@ -1,6 +1,5 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 package test
 
@@ -15,10 +14,12 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ascii"
 )
 
-const (
-	defDataName       = "default"
-	defDataFileSuffix = "_test.txt"
-)
+// DefDataFileSuffix the suffix of file name that will be loaded by
+// [LoadDataDir].
+const DefDataFileSuffix = "_test.txt"
+
+// defDataName default name for input or output if its empty.
+const defDataName = "default"
 
 var (
 	prefixInput  = []byte(">>>")
@@ -126,7 +127,7 @@ func LoadData(file string) (data *Data, err error) {
 }
 
 // LoadDataDir load all data inside a directory.
-// Only file that has file name suffix "_text.txt" will be loaded.
+// Only file that has file name [DefDataFileSuffix] will be loaded.
 func LoadDataDir(path string) (listData []*Data, err error) {
 	var (
 		logp = "LoadDataDir"
@@ -158,7 +159,7 @@ func LoadDataDir(path string) (listData []*Data, err error) {
 
 		name = fi.Name()
 
-		if !strings.HasSuffix(name, defDataFileSuffix) {
+		if !strings.HasSuffix(name, DefDataFileSuffix) {
 			continue
 		}
 
