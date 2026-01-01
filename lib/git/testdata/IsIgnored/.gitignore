@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2025 M. Shulhan <ms@kilabit.info>
+
+# comment
+  # comment
+  vendor/  # ignore vendor directory, but not vendor file.
+/hello.*    # ignore hello at root, but not foo/hello.go.
+!hello.go

@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
 // Package git provide a wrapper for git command line interface.
 package git
@@ -13,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/ini"
 )
@@ -27,6 +27,39 @@ var (
 	_stdout io.Writer = os.Stdout
 	_stderr io.Writer = os.Stderr
 )
+
+// Git is a type for working with single git repository.
+type Git struct {
+	listIgnore map[string]*Gitignore
+
+	// absDir define the absolute path to the repository.
+	absDir string
+}
+
+// New start working on repository in directory `dir`.
+// If the `dir` does not contains ".git" directory it will return an error,
+// even if the parent directory may contains the ".git" directory.
+func New(dir string) (git *Git, err error) {
+	var logp = `New`
+	var fi os.FileInfo
+	var pathDotGit = filepath.Join(dir, `.git`)
+	fi, err = os.Stat(pathDotGit)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %q is not a git repository`, logp, dir)
+	}
+	if !fi.IsDir() {
+		return nil, fmt.Errorf(`%s: %q is not a git repository`, logp, dir)
+	}
+	dir, err = filepath.Abs(dir)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	git = &Git{
+		absDir:     dir,
+		listIgnore: map[string]*Gitignore{},
+	}
+	return git, nil
+}
 
 // CheckoutRevision will set the HEAD to specific revision on specific branch.
 // Any untracked files and directories will be removed before checking out
@@ -186,6 +219,39 @@ func GetTag(repoDir, revision string) (tag string, err error) {
 	tag = string(bytes.TrimSpace(btag))
 
 	return tag, nil
+}
+
+// IsIgnored return true if the `path` is ignored by git.
+// This is processed by matching it with all of the patterns in the
+// ".gitignore" file inside the path directory and its parent, until the root
+// of Git repository.
+func (git *Git) IsIgnored(path string) (b bool) {
+	path = strings.TrimSpace(path)
+	if path == `` {
+		return true
+	}
+	// Traverse each directory from bottom to the top of git directory to
+	// load ".gitignore" file and match it with path.
+	var absPath = filepath.Join(git.absDir, path)
+	var dirGitignore = filepath.Dir(absPath)
+	var name = strings.TrimPrefix(absPath, dirGitignore)
+	name = strings.TrimLeft(name, `/`)
+	for strings.HasPrefix(dirGitignore, git.absDir) {
+		var ign *Gitignore
+		var ok bool
+		ign, ok = git.listIgnore[dirGitignore]
+		if !ok {
+			ign, _ = LoadGitignore(dirGitignore)
+			git.listIgnore[dirGitignore] = ign
+		}
+		if ign != nil && ign.IsIgnored(name) {
+			return true
+		}
+		dirGitignore = filepath.Dir(dirGitignore)
+		name = strings.TrimPrefix(absPath, dirGitignore)
+		name = strings.TrimLeft(name, `/`)
+	}
+	return false
 }
 
 // LatestCommit get the latest commit hash in short format from "ref".

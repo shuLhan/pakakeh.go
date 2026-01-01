@@ -1,6 +1,5 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
 package git
 
@@ -42,6 +41,27 @@ func TestMain(m *testing.M) {
 	s := m.Run()
 
 	os.Exit(s)
+}
+
+func TestNew(t *testing.T) {
+	type testCase struct {
+		dir      string
+		expError string
+	}
+	var listCase = []testCase{{
+		dir:      `testdata/New/fail_no_git`,
+		expError: `New: "testdata/New/fail_no_git" is not a git repository`,
+	}, {
+		dir:      `testdata/New/fail_not_dir`,
+		expError: `New: "testdata/New/fail_not_dir" is not a git repository`,
+	}}
+
+	var err error
+	var tcase testCase
+	for _, tcase = range listCase {
+		_, err = New(tcase.dir)
+		test.Assert(t, `error`, tcase.expError, err.Error())
+	}
 }
 
 func TestClone(t *testing.T) {
