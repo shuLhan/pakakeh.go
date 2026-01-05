@@ -134,6 +134,35 @@ Use '--' to separate paths from revisions, like this:
 	}
 }
 
+func TestGit_Equal(t *testing.T) {
+	type testCase struct {
+		v   any
+		exp bool
+	}
+	var nilgit *Git
+	var listCase = []testCase{{
+		v: nil,
+	}, {
+		v: os.ErrExist,
+	}, {
+		v: nilgit,
+	}}
+
+	var agit *Git
+	var err error
+	agit, err = New(`testdata/Equal`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var tc testCase
+	var got bool
+	for _, tc = range listCase {
+		got = agit.Equal(tc.v)
+		test.Assert(t, fmt.Sprintf(`%T`, tc.v), tc.exp, got)
+	}
+}
+
 func TestGetRemoteURL(t *testing.T) {
 	cases := []struct {
 		desc                 string
@@ -392,4 +421,23 @@ func TestRemoteChange(t *testing.T) {
 		test.Assert(t, "stderr", c.expStderr, mockStderr.String())
 		test.Assert(t, "stdout", c.expStdout, mockStdout.String())
 	}
+}
+
+func TestGit_String(t *testing.T) {
+	var agit *Git
+	var err error
+	agit, err = New(`testdata/Equal`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var wd string
+	wd, err = os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var exp = fmt.Sprintf(`git+file://%s/testdata/Equal`, wd)
+	var got = agit.String()
+	test.Assert(t, `String`, exp, got)
 }

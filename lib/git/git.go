@@ -144,6 +144,24 @@ func Clone(remoteURL, dest string) (err error) {
 	return nil
 }
 
+// Equal return true if `v` is instance of `*Git` and has the same working
+// directory.
+// This implement [git.sr.ht/~shulhan/pakakeh.go/lib/reflect.Equaler]
+// interface.
+func (git *Git) Equal(v any) bool {
+	if v == nil {
+		return false
+	}
+	got, ok := v.(*Git)
+	if !ok {
+		return false
+	}
+	if got == nil {
+		return false
+	}
+	return git.String() == got.String()
+}
+
 // FetchAll will fetch the latest commits and tags from remote.
 func FetchAll(repoDir string) (err error) {
 	cmd := exec.Command("git", "fetch")
@@ -438,4 +456,9 @@ func RemoteBranches(repoDir string) ([]string, error) {
 	}
 
 	return branches, nil
+}
+
+// String return the working directory with prefix "git+file://".
+func (git *Git) String() string {
+	return `git+file://` + git.absDir
 }

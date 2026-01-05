@@ -40,3 +40,34 @@ func ExampleGit_IsIgnored() {
 	// "hello.go": false
 	// "foo/hello.go": false
 }
+
+func ExampleGit_Equal() {
+	var agit *git.Git
+	var err error
+	agit, err = git.New(`testdata/Equal`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var vgit *git.Git
+	var dir = `testdata/IsIgnored`
+
+	vgit, err = git.New(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var got = agit.Equal(vgit)
+	fmt.Printf("On git %s: Equal is %t\n", dir, got)
+
+	dir = `testdata/Equal`
+	vgit, err = git.New(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	got = agit.Equal(vgit)
+	fmt.Printf("On git %s: Equal is %t\n", dir, got)
+
+	// Output:
+	// On git testdata/IsIgnored: Equal is false
+	// On git testdata/Equal: Equal is true
+}
