@@ -106,30 +106,33 @@ var (
 // If the node path is start with "/auth/" and cookie name "sid" exist
 // with value "authz" it will return true;
 // otherwise it will redirect to "/" and return false.
-func handleFS(node *memfs.Node, res http.ResponseWriter, req *http.Request) *memfs.Node {
-	if node == nil {
-		res.WriteHeader(http.StatusNotFound)
-		return nil
-	}
-
+func handleFS(node *memfs.Node, res http.ResponseWriter, req *http.Request) (
+	out *memfs.Node, statusCode int,
+) {
 	var (
-		lowerPath = strings.ToLower(node.Path)
-
+		lowerPath string
 		cookieSid *http.Cookie
 		err       error
 	)
+	if node == nil {
+		lowerPath = strings.ToLower(req.URL.Path)
+	} else {
+		lowerPath = strings.ToLower(node.Path)
+	}
 	if strings.HasPrefix(lowerPath, "/auth/") {
 		cookieSid, err = req.Cookie("sid")
 		if err != nil {
-			http.Redirect(res, req, "/", http.StatusSeeOther)
-			return nil
+			statusCode = http.StatusSeeOther
+			http.Redirect(res, req, "/", statusCode)
+			return nil, statusCode
 		}
 		if cookieSid.Value != "authz" {
-			http.Redirect(res, req, "/", http.StatusSeeOther)
-			return nil
+			statusCode = http.StatusSeeOther
+			http.Redirect(res, req, "/", statusCode)
+			return nil, statusCode
 		}
 	}
-	return node
+	return node, 0
 }
 
 func registerEndpoints() {

@@ -449,11 +449,13 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 // This method only works if the [ServerOptions.Memfs] is not nil.
 //
 // If the request Path exists and [ServerOptions.HandleFS] is set and
-// returning false, it will return immediately.
+// returning [*memfs.Node] with non-zero HTTP `statusCode`, server will return
+// immediately.
 //
 // If the request Path exists in file system, it will return 200 OK with the
 // header Content-Type set accordingly to the detected file type and the
 // response body set to the content of file.
+//
 // If the request Method is HEAD, only the header will be sent back to client.
 //
 // If the request Path is not exist it will return 404 Not Found.
@@ -485,10 +487,16 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if srv.Options.HandleFS != nil {
-		node = srv.Options.HandleFS(node, res, req)
-		if node == nil {
+		var statusCode int
+		node, statusCode = srv.Options.HandleFS(node, res, req)
+		if statusCode != 0 {
+			// HandleFS already response to the request.
 			return
 		}
+	}
+	if node == nil {
+		res.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	res.Header().Set(HeaderContentType, node.ContentType)

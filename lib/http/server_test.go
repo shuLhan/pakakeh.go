@@ -995,6 +995,10 @@ func TestServer_Options_HandleFS(t *testing.T) {
 		},
 		expStatusCode: http.StatusOK,
 		expResBody:    "<html><body>Hello, /auth/sub!</body></html>\n",
+	}, {
+		desc:          `With public path not exists`,
+		reqPath:       `/index.php`,
+		expStatusCode: http.StatusNotFound,
 	}}
 
 	for _, c = range cases {
@@ -1025,7 +1029,7 @@ func TestServer_Options_HandleFS(t *testing.T) {
 			t.Fatalf("%s: %s", c.desc, err)
 		}
 
-		test.Assert(t, "response body", c.expResBody, string(gotBody))
+		test.Assert(t, c.desc+`: response body`, c.expResBody, string(gotBody))
 	}
 }
 

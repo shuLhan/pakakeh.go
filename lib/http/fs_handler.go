@@ -15,11 +15,16 @@ import (
 // The node parameter contains the requested file inside the memfs or nil
 // if the file does not exist.
 //
-// If the handler return non-nil [*memfs.Node], server will continue
-// processing the node, writing the [memfs.Node] content type, body, and so
-// on.
+// This function return two values: the node `out` that is used to process the
+// request and response; and the HTTP status code `statusCode` returned in
+// response.
 //
-// If the handler return nil, server stop processing the node and return
-// immediately, which means the function should have already handle writing
-// the header, status code, and/or body.
-type FSHandler func(node *memfs.Node, res http.ResponseWriter, req *http.Request) (out *memfs.Node)
+// Non-zero status code indicates that the function already response
+// to the request, and the server will return immediately.
+//
+// Zero status code indicates that the function did not process the request,
+// it is up to server to process the returned node `out`.
+// The returned node `out` may be the same as `node`, modified, of completely
+// new.
+type FSHandler func(node *memfs.Node, res http.ResponseWriter, req *http.Request) (
+	out *memfs.Node, statusCode int)

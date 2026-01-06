@@ -27,6 +27,26 @@ This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
 link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
 This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
 
+Legend,
+
+* 🪵: Breaking changes
+* 🌱: New feature
+* 🌼: Enhancement
+* 💧: Chores
+
+//{{{
+[#v0_61_0]
+== pakakeh.go v0.61.0 (2026-xx-xx)
+
+**🪵 lib/http: add second return value, statusCode, to FSHandler**
+
+Non-zero status code indicates that the function already response
+to the request, and the server will return immediately.
+
+Zero status code indicates that the function did not process the request,
+it is up to server to process the returned node `out`.
+
+//}}}
 //{{{
 [#v0_60_2]
 == pakakeh.go v0.60.2 (2025-12-27)
