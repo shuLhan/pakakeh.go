@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 // Package os extend the standard os package to provide additional
 // functionalities.
@@ -145,56 +144,54 @@ func Environments() (envs map[string]string) {
 	return envs
 }
 
-// IsBinary will return true if content of file is binary.
+// IsBinary return true if the content has more than 75% non-printable
+// characters, excluding spaces.
 // If file is not exist or there is an error when reading or closing the file,
 // it will return false.
-func IsBinary(file string) bool {
+func IsBinary(file string) (is bool) {
 	var (
-		f         *os.File
-		err       error
-		total     int
-		printable int
+		f   *os.File
+		err error
 	)
-
 	f, err = os.Open(file)
 	if err != nil {
 		return false
 	}
 
-	var (
-		content = make([]byte, 768)
-
-		n int
-		x int
-	)
-
-	for total < 512 {
-		n, err = f.Read(content)
-		if err != nil {
-			break
-		}
-
-		content = content[:n]
-
-		for x = range len(content) {
-			if ascii.IsSpace(content[x]) {
-				continue
-			}
-			if content[x] >= 33 && content[x] <= 126 {
-				printable++
-			}
-			total++
-		}
+	is = true
+	content := make([]byte, 1024)
+	_, err = f.Read(content)
+	if err != nil {
+		is = false
 	}
-
 	err = f.Close()
 	if err != nil {
-		return false
+		is = false
 	}
+	if !is {
+		return is
+	}
+	return IsBinaryStream(content)
+}
 
-	var ratio = float64(printable) / float64(total)
-
-	return ratio <= float64(0.75)
+// IsBinaryStream return true if the content has more than 75% non-printable
+// characters, excluding spaces.
+func IsBinaryStream(content []byte) bool {
+	var (
+		total     int
+		printable int
+	)
+	for x := 0; total < 512 && x < len(content); x++ {
+		if ascii.IsSpace(content[x]) {
+			continue
+		}
+		if content[x] >= 33 && content[x] <= 126 {
+			printable++
+		}
+		total++
+	}
+	ratio := float64(printable) / float64(total)
+	return ratio <= 0.75
 }
 
 // IsDirEmpty will return true if directory is not exist or empty; otherwise

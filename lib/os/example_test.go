@@ -1,6 +1,5 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
 
 package os_test
 
@@ -22,8 +21,8 @@ func ExampleEnvironments() {
 }
 
 func ExampleIsBinary() {
-	fmt.Println(libos.IsBinary("/bin/bash"))
-	fmt.Println(libos.IsBinary("io.go"))
+	fmt.Println(libos.IsBinary(`testdata/exp.bz2`))
+	fmt.Println(libos.IsBinary(`os.go`))
 	// Output:
 	// true
 	// false

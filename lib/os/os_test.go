@@ -1,6 +1,5 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 package os
 
@@ -113,6 +112,27 @@ func TestCopy(t *testing.T) {
 		}
 
 		test.Assert(t, c.desc, string(exp), string(got))
+	}
+}
+
+func TestIsBinaryStream(t *testing.T) {
+	listCase := []struct {
+		path string
+		exp  bool
+	}{{
+		path: `testdata/exp.bz2`,
+		exp:  true,
+	}, {
+		path: `os.go`,
+		exp:  false,
+	}}
+	for _, tc := range listCase {
+		content, err := os.ReadFile(tc.path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := IsBinaryStream(content)
+		test.Assert(t, tc.path, tc.exp, got)
 	}
 }
 
