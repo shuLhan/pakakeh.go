@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
 package ini
 
@@ -30,11 +29,14 @@ const (
 	tokUnderscore  = '_'
 )
 
+// ErrVarNameChar define an error when variable name is using invalid
+// character.
+var ErrVarNameChar = errors.New(`invalid character in variable name`)
+
 var (
-	errBadConfig      = errors.New("bad config line %d at %s")
-	errVarNoSection   = "variable without section, line %d at %s"
-	errVarNameInvalid = errors.New("invalid variable name, line %d at %s")
-	errValueInvalid   = errors.New("invalid value, line %d at %s")
+	errBadConfig    = errors.New("bad config line %d at %s")
+	errVarNoSection = "variable without section, line %d at %s"
+	errValueInvalid = errors.New("invalid value, line %d at %s")
 )
 
 // reader define the INI file reader.
@@ -333,11 +335,11 @@ func (reader *reader) parseVariable() (err error) {
 
 	reader.r, _, err = reader.br.ReadRune()
 	if err != nil {
-		return errVarNameInvalid
+		return fmt.Errorf(`error when parsing variable name: %w`, err)
 	}
 
 	if !unicode.IsLetter(reader.r) {
-		return errVarNameInvalid
+		return fmt.Errorf(`%w %q`, ErrVarNameChar, reader.r)
 	}
 
 	var isNewline bool
@@ -384,7 +386,7 @@ func (reader *reader) parseVariable() (err error) {
 			return reader.parsePossibleValue()
 
 		default:
-			return errVarNameInvalid
+			return fmt.Errorf(`%w %q`, ErrVarNameChar, reader.r)
 		}
 	}
 
@@ -421,7 +423,7 @@ func (reader *reader) parsePossibleValue() (err error) {
 			reader.bufFormat.WriteByte(reader.b)
 			return reader.parseVarValue()
 		default:
-			return errVarNameInvalid
+			return fmt.Errorf(`%w %q`, ErrVarNameChar, reader.b)
 		}
 	}
 

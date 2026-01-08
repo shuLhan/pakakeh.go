@@ -1,6 +1,5 @@
-// Copyright 2018, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
 package ini
 
@@ -170,7 +169,7 @@ func TestParseVariable(t *testing.T) {
 	cases := []struct {
 		desc      string
 		in        string
-		expErr    error
+		expErr    string
 		expFormat string
 		expKey    string
 		expValue  string
@@ -178,128 +177,128 @@ func TestParseVariable(t *testing.T) {
 		expMode lineMode
 	}{{
 		desc:   `Empty`,
-		expErr: errVarNameInvalid,
+		expErr: `error when parsing variable name: EOF`,
 	}, {
 		desc:   `Empty with space`,
 		in:     `  	`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name ' '`,
 	}, {
 		desc:   `Digit at start`,
 		in:     `0name`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '0'`,
 	}, {
 		desc:      `Digit at end`,
 		in:        `name0`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expFormat: `%s`,
 		expKey:    `name0`,
 	}, {
 		desc:      `Digit at middle`,
 		in:        `na0me`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expFormat: `%s`,
 		expKey:    `na0me`,
 	}, {
 		desc:   `Hyphen at start`,
 		in:     `-name`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '-'`,
 	}, {
 		desc:      `Hyphen at end`,
 		in:        `name-`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expFormat: `%s`,
 		expKey:    `name-`,
 	}, {
 		desc:      `Gyphen at middle`,
 		in:        `na-me`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expFormat: `%s`,
 		expKey:    `na-me`,
 	}, {
-		desc:   `Invalid chart at start`,
+		desc:   `Invalid char at start`,
 		in:     `!name`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '!'`,
 	}, {
 		desc:   `Invalid chart at end`,
 		in:     `name!`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '!'`,
 	}, {
 		desc:   `Invalid char at middle`,
 		in:     `na!me`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '!'`,
 	}, {
 		desc:   `With escaped char \\`,
 		in:     `na\me`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '\\'`,
 	}, {
 		desc:      `Without space before comment`,
 		in:        `name; comment`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expKey:    `name`,
 		expFormat: `%s; comment`,
 	}, {
 		desc:      `With space before comment`,
 		in:        `name ; comment`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expKey:    `name`,
 		expFormat: `%s ; comment`,
 	}, {
 		desc:      `With empty value #1`,
 		in:        `name=`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyValue,
 		expKey:    `name`,
 		expFormat: `%s=%s`,
 	}, {
 		desc:      `With empty value #2`,
 		in:        `name =`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyValue,
 		expKey:    `name`,
 		expFormat: `%s =%s`,
 	}, {
 		desc:      `With empty value and comment`,
 		in:        `name = # a comment`,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyValue,
 		expKey:    `name`,
 		expFormat: `%s =%s# a comment`,
 	}, {
 		desc:      `With empty value #3`,
 		in:        `name     `,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expKey:    `name`,
 		expFormat: `%s     `,
 	}, {
 		desc:      `With newline`,
 		in:        "name \n",
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expMode:   lineModeKeyOnly,
 		expKey:    `name`,
 		expFormat: "%s \n",
 	}, {
 		desc:   `With space in the middle`,
 		in:     `name 1`,
-		expErr: errVarNameInvalid,
+		expErr: `invalid character in variable name '1'`,
 	}, {
 		desc:      `With dot`,
 		in:        `name.subname`,
 		expMode:   lineModeKeyOnly,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expKey:    `name.subname`,
 		expFormat: `%s`,
 	}, {
 		desc:      `With underscore char`,
 		in:        `name_subname`,
 		expMode:   lineModeKeyOnly,
-		expErr:    io.EOF,
+		expErr:    io.EOF.Error(),
 		expKey:    `name_subname`,
 		expFormat: `%s`,
 	}}
@@ -313,7 +312,7 @@ func TestParseVariable(t *testing.T) {
 
 		err := reader.parseVariable()
 		if err != nil {
-			test.Assert(t, "error", c.expErr, err)
+			test.Assert(t, c.desc, c.expErr, err.Error())
 			if !errors.Is(err, io.EOF) {
 				continue
 			}
