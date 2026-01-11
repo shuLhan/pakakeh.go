@@ -50,8 +50,7 @@ func parsePattern(line []byte) (ign ignorePattern) {
 		line = line[1:]
 	}
 	if len(line) == 0 || len(line) == 1 && line[0] == '*' {
-		// Ignore consecutive '*' pattern, since its mean match
-		// anything.
+		ign.pattern, _ = regexp.Compile(`^/?.*$`)
 		return ign
 	}
 

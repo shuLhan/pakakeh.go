@@ -163,6 +163,37 @@ func TestGit_Equal(t *testing.T) {
 	}
 }
 
+func TestGit_IsIgnored(t *testing.T) {
+	agit, err := New(`testdata/IsIgnored/`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	listCase := []struct {
+		path string
+		exp  bool
+	}{{
+		path: `a/b/c/c1`,
+		exp:  true,
+	}, {
+		path: `a/b/c`,
+		exp:  true,
+	}, {
+		path: `a/b/b1`,
+		exp:  true,
+	}, {
+		path: `a/b/.gitignore`,
+	}, {
+		path: `a/b`,
+	}, {
+		path: `a`,
+	}}
+	for _, tc := range listCase {
+		got := agit.IsIgnored(tc.path)
+		test.Assert(t, tc.path, tc.exp, got)
+	}
+}
+
 func TestGetRemoteURL(t *testing.T) {
 	cases := []struct {
 		desc                 string

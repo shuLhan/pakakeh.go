@@ -44,33 +44,33 @@ func TestParsePattern(t *testing.T) {
 	}, {
 		pattern: `*`,
 		exp: ignorePattern{
-			pattern: nil,
+			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `*/`,
 		exp: ignorePattern{
-			pattern: nil,
+			pattern: regexp.MustCompile(`^/?.*$`),
 			isDir:   true,
 		},
 	}, {
 		pattern: `**`,
 		exp: ignorePattern{
-			pattern: nil,
+			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `***`,
 		exp: ignorePattern{
-			pattern: nil,
+			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `**/**`,
 		exp: ignorePattern{
-			pattern: nil,
+			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `**/**/`,
 		exp: ignorePattern{
-			pattern: nil,
+			pattern: regexp.MustCompile(`^/?.*$`),
 			isDir:   true,
 		},
 	}, {

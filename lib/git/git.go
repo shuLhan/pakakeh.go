@@ -244,15 +244,15 @@ func GetTag(repoDir, revision string) (tag string, err error) {
 // ".gitignore" file inside the path directory and its parent, until the root
 // of Git repository.
 func (git *Git) IsIgnored(path string) (b bool) {
-	path = strings.TrimSpace(path)
+	path = strings.TrimSpace(path) // a/b/b1
 	if path == `` {
 		return true
 	}
 	// Traverse each directory from bottom to the top of git directory to
 	// load ".gitignore" file and match it with path.
-	var absPath = filepath.Join(git.absDir, path)
-	var dirGitignore = filepath.Dir(absPath)
-	var name = strings.TrimPrefix(absPath, dirGitignore)
+	var absPath = filepath.Join(git.absDir, path)        // $git/a/b/b1
+	var dirGitignore = filepath.Dir(absPath)             // $git/a/b/
+	var name = strings.TrimPrefix(absPath, dirGitignore) // b1
 	name = strings.TrimLeft(name, `/`)
 	for strings.HasPrefix(dirGitignore, git.absDir) {
 		var ign *Gitignore
