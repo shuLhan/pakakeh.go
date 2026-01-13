@@ -194,6 +194,30 @@ func TestGit_IsIgnored(t *testing.T) {
 	}
 }
 
+func TestGit_LogFollow(t *testing.T) {
+	agit, err := New(`../../`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := `lib/_hunspell/affix.go`
+	logs, err := agit.LogFollow(path, ``)
+	if err != nil {
+		t.Fatal(err)
+	}
+	exp := []string{
+		`144549f8,1737804887,Shulhan,ms@kilabit.info,lib/hunspell: rename the package to "_hunspell"`,
+		`66e6542e,1694357806,Shulhan,ms@kilabit.info,lib/hunspell: realign struct for better size allocation`,
+		`0c9abc1a,1652108042,Shulhan,ms@kilabit.info,all: reformat all codes using gofmt 1.19 (the Go tip)`,
+		`9ca9757d,1591803682,Shulhan,m.shulhan@gmail.com,all: update email address`,
+		`b0fa5a47,1585156612,Shulhan,m.shulhan@gmail.com,all: fix and suppress linter warnings`,
+		`33d58b98,1585151378,Shulhan,m.shulhan@gmail.com,hunspell: add field Parent to Stem`,
+		`367e15a8,1585139124,Shulhan,m.shulhan@gmail.com,hunspell: change the stem.apply parameter from string to *Stem`,
+		`099a24de,1579628651,Shulhan,m.shulhan@gmail.com,hunspell: split the affix options and dictionary into different types`,
+		`3d772dff,1572967023,Shulhan,m.shulhan@gmail.com,lib/hunspell: implementation of hunspell in pure Go`,
+	}
+	test.Assert(t, path, exp, logs)
+}
+
 func TestGetRemoteURL(t *testing.T) {
 	cases := []struct {
 		desc                 string

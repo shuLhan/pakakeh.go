@@ -46,6 +46,15 @@ to the request, and the server will return immediately.
 Zero status code indicates that the function did not process the request,
 it is up to server to process the returned node `out`.
 
+**🌱 lib/git: add method LogFollow**
+
+The LogFollow method return history of single file `path`, following
+rename.
+
+This method accept second paramter "format", default to
+'%h,%at,%an,%ae,%s' which print short hash, author commit timestamp,
+author name, author email, and subject; respectively separated by comma.
+
 //}}}
 //{{{
 [#v0_60_2]

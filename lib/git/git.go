@@ -272,6 +272,39 @@ func (git *Git) IsIgnored(path string) (b bool) {
 	return false
 }
 
+// LogFollow return history of single file `path`, following rename.
+//
+// The format parameter set the output format, default to '%h,%at,%an,%ae,%s'
+// which print short hash, author commit timestamp, author name, author email,
+// and subject; respectively separated by comma.
+func (git *Git) LogFollow(path, format string) (logs []string, err error) {
+	if format == `` {
+		format = `%h,%at,%an,%ae,%s`
+	}
+
+	var cmd *exec.Cmd
+	cmd = exec.Command(`git`)
+	cmd.Args = append(cmd.Args, `--no-pager`, `log`, `--follow`, `--format=`+format, path)
+	cmd.Dir = git.absDir
+	cmd.Stderr = _stderr
+
+	var stdout []byte
+	stdout, err = cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf(`LogFollow %s: %w`, path, err)
+	}
+
+	lines := bytes.Split(stdout, []byte{'\n'})
+	logs = make([]string, 0, len(lines))
+	for _, line := range lines {
+		if len(line) == 0 {
+			break
+		}
+		logs = append(logs, string(line))
+	}
+	return logs, nil
+}
+
 // LatestCommit get the latest commit hash in short format from "ref".
 // If ref is empty, its default to "origin/master".
 func LatestCommit(repoDir, ref string) (commit string, err error) {
