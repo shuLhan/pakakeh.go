@@ -284,7 +284,7 @@ func (git *Git) LogFollow(path, format string) (logs []string, err error) {
 
 	var cmd *exec.Cmd
 	cmd = exec.Command(`git`)
-	cmd.Args = append(cmd.Args, `--no-pager`, `log`, `--follow`, `--format=`+format, path)
+	cmd.Args = append(cmd.Args, `--no-pager`, `log`, `--follow`, `--format=`+format, `--`, path)
 	cmd.Dir = git.absDir
 	cmd.Stderr = _stderr
 
