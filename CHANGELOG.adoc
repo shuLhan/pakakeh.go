@@ -55,6 +55,11 @@ This method accept second paramter "format", default to
 '%h,%at,%an,%ae,%s' which print short hash, author commit timestamp,
 author name, author email, and subject; respectively separated by comma.
 
+**🌱 lib/git: expose the API for IgnorePattern**
+
+The IgnorePattern is not exclusive to git only. Some program, like
+REUSE, use the same pattern in the REUSE.toml path configuration.
+
 //}}}
 //{{{
 [#v0_60_2]

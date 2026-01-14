@@ -10,113 +10,113 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
-func TestParsePattern(t *testing.T) {
+func TestParseIgnorePattern(t *testing.T) {
 	type testCase struct {
 		pattern string
-		exp     ignorePattern
+		exp     IgnorePattern
 	}
 	var listCase = []testCase{{
 		pattern: `#`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: nil,
 		},
 	}, {
 		pattern: `a #`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?a/?$`),
 		},
 	}, {
 		pattern: `a \#`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?a \#/?$`),
 		},
 	}, {
 		pattern: `?`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?[^/]/?$`),
 		},
 	}, {
 		pattern: `!a`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern:  regexp.MustCompile(`^(.*/|/)?a/?$`),
 			isNegate: true,
 		},
 	}, {
 		pattern: `*`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `*/`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?.*$`),
 			isDir:   true,
 		},
 	}, {
 		pattern: `**`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `***`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `**/**`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?.*$`),
 		},
 	}, {
 		pattern: `**/**/`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?.*$`),
 			isDir:   true,
 		},
 	}, {
 		pattern: `**/**foo`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?[^/]*foo/?$`),
 		},
 	}, {
 		pattern: `foo`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?foo/?$`),
 		},
 	}, {
 		pattern: `foo/`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?foo/$`),
 			isDir:   true,
 		},
 	}, {
 		pattern: `/foo`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?foo/?$`),
 		},
 	}, {
 		pattern: `foo/**/bar`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^/?foo(/.*)?/bar/?$`),
 		},
 	}, {
 		pattern: `a+b|c`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?a\+b\|c/?$`),
 		},
 	}, {
 		pattern: `(a|b)`,
-		exp: ignorePattern{
+		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?\(a\|b\)/?$`),
 		},
 	}}
 	for _, tc := range listCase {
-		var got = parsePattern([]byte(tc.pattern))
+		var got = ParseIgnorePattern([]byte(tc.pattern))
 		test.Assert(t, tc.pattern, tc.exp, got)
 	}
 }
 
-func TestIgnorePattern_isMatch(t *testing.T) {
+func TestIgnorePattern_IsMatch(t *testing.T) {
 	type testCase struct {
 		listCase map[string]bool
 		pattern  string
@@ -281,9 +281,9 @@ func TestIgnorePattern_isMatch(t *testing.T) {
 		},
 	}}
 	for _, tc := range listCase {
-		var pat = parsePattern([]byte(tc.pattern))
+		var pat = ParseIgnorePattern([]byte(tc.pattern))
 		for name, exp := range tc.listCase {
-			var got = pat.isMatch(name)
+			var got = pat.IsMatch(name)
 			if exp != got {
 				t.Fatalf("%q: on %q want %t, got %t",
 					tc.pattern, name, exp, got)

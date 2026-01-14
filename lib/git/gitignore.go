@@ -23,11 +23,11 @@ type Gitignore struct {
 
 	// excludePatterns contains list of excluded pattern from
 	// ".gitignore" file.
-	excludePatterns []ignorePattern
+	excludePatterns []IgnorePattern
 
 	// includePatterns contains list of include pattern, the one that
 	// start with "!".
-	includePatterns []ignorePattern
+	includePatterns []IgnorePattern
 }
 
 // LoadGitignore load the gitignore file inside directory `dir`.
@@ -62,8 +62,8 @@ func (ign *Gitignore) Parse(dir string, content []byte) {
 	var lines = bytes.Split(content, []byte{'\n'})
 	var line []byte
 	for _, line = range lines {
-		var pat ignorePattern
-		pat = parsePattern(line)
+		var pat IgnorePattern
+		pat = ParseIgnorePattern(line)
 		if pat.pattern == nil {
 			// Skip invalid pattern.
 			continue
@@ -91,14 +91,14 @@ func (ign *Gitignore) IsIgnored(path string) bool {
 			path += "/"
 		}
 	}
-	var pat ignorePattern
+	var pat IgnorePattern
 	for _, pat = range ign.includePatterns {
-		if pat.isMatch(path) {
+		if pat.IsMatch(path) {
 			return false
 		}
 	}
 	for _, pat = range ign.excludePatterns {
-		if pat.isMatch(path) {
+		if pat.IsMatch(path) {
 			return true
 		}
 	}

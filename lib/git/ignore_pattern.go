@@ -9,16 +9,19 @@ import (
 	"regexp"
 )
 
-type ignorePattern struct {
+// IgnorePattern is a type that store the parsed ignore pattern line from
+// gitignore file.
+type IgnorePattern struct {
 	pattern  *regexp.Regexp
 	isDir    bool // True if pattern end with '/'.
 	isNegate bool // True if pattern start with '!'.
 }
 
-// parsePattern parse the line from gitignore.
+// ParseIgnorePattern parse the line from gitignore.
 // At this point, the line must be not empty and not a comment.
-// If the pattern is invalid it return with nil [Gitignore.pattern].
-func parsePattern(line []byte) (ign ignorePattern) {
+// If the pattern is invalid it will be ignored and [IsMatch] will always
+// return false.
+func ParseIgnorePattern(line []byte) (ign IgnorePattern) {
 	line = bytes.TrimSpace(line)
 	if len(line) == 0 {
 		// Skip empty line.
@@ -142,7 +145,8 @@ func removeComment(line []byte) []byte {
 	return bytes.TrimSpace(line[:x])
 }
 
-func (pat *ignorePattern) isMatch(path string) bool {
+// IsMatch return true if the `path` match with the pattern.
+func (pat *IgnorePattern) IsMatch(path string) bool {
 	if pat.pattern.MatchString(path) {
 		return true
 	}
