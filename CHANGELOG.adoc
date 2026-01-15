@@ -38,6 +38,46 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**🌼 lib/test: export the constant for default data file name suffix**
+
+Also, fix typo on the LoadDataDir regarding suffix by replacing it with
+the exported constant.
+
+**🌱 lib/test: implement method ExtractInput on Data**
+
+Given the path to directory `destDir`, create all of the
+[test.Data.Input] with key as its file name.
+
+If the input name contains "/", the path before the base name will be
+created along with its parent as long as it is under the `destDir`.
+
+For example, given input name "a/b/c.txt", it will create path "a/b/"
+inside `destDir` first, followed by file "c.txt" inside that path.
+
+**🌱 lib/git: implement Gitignore**
+
+Gitignore is a type that represent ".gitignore" file.
+
+There are two ways to populate Gitignore, by using [LoadGitignore]
+function, or by using [Gitignore.Parse] method.
+
+After the Gitignore created, one can check if a path is ignored by
+using [Gitignore.IsIgnored] method, relative to the Gitignore directory.
+
+**🌱 lib/git: add Git type with method IsIgnored**
+
+The Git type is for working with single git repository.
+
+The [Git.IsIgnored] method is to check if the `path` is ignored by
+git.
+This is processed by matching it with all of the pattern in the
+".gitignore" file from the path directory and its parent until the
+root of Git repository.
+
+The Git type implement Equaler interface.
+The Equaler interface provide the method Equal that when implemented
+can be used to compare two instances of struct.
+
 **🪵 lib/http: add second return value, statusCode, to FSHandler**
 
 Non-zero status code indicates that the function already response
@@ -45,6 +85,21 @@ to the request, and the server will return immediately.
 
 Zero status code indicates that the function did not process the request,
 it is up to server to process the returned node `out`.
+
+**🌼 lib/ini: improve error message when parsing variable name**
+
+Display the invalid character in the error message with quote, so space
+can detected.
+Also, export the error variable so external caller can detect it using the
+variable.
+
+**🌱 lib/os: add function IsBinaryStream**
+
+The IsBinaryStream return true if the content has more than 75%
+non-printable characters, excluding spaces.
+
+While at it, replace the body of IsBinary with it and update the
+test cases to use the internal files.
 
 **🌱 lib/git: add method LogFollow**
 
