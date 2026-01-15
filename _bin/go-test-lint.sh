@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2023 M. Shulhan <ms@kilabit.info>
 
 ## Script go-test-lint.sh run Go test and if its success it will run
 ## predefined linter, in the current directory.

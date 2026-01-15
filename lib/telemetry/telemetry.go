@@ -1,6 +1,5 @@
-// Copyright 2023, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2023 Shulhan <ms@kilabit.info>
 
 // Package telemetry is a library for collecting various [Metric], for example
 // from standard [runtime/metrics], and send or write it to one or more

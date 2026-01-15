@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+
 = The PLAIN Simple Authentication and Security Layer (SASL) Mechanism
 :toc:
 :sectnums:

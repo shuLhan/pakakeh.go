@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
 # simple example for affix compression (see Hunspell(4))
 PFX A Y 1
 PFX A 0 re .

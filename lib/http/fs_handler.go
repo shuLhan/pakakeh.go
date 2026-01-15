@@ -1,6 +1,5 @@
-// Copyright 2022, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 Shulhan <ms@kilabit.info>
 
 package http
 
@@ -18,7 +17,7 @@ import (
 // This function return two values: the node `out` that is used to process the
 // request and response; and the HTTP status code `statusCode` returned in
 // response.
-//
+
 // Non-zero status code indicates that the function already response
 // to the request, and the server will return immediately.
 //

@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 ## Script to get and print the latest Go module version based on the last tag
 ## and the latest commit hash from current working git directory.

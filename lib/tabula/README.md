@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info> -->
+
 [![GoDoc](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula?status.svg)](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/tabula)
 [![Go Report Card](https://goreportcard.com/badge/git.sr.ht/~shulhan/pakakeh.go/lib/tabula)](https://goreportcard.com/report/git.sr.ht/~shulhan/pakakeh.go/lib/tabula)
 ![cover.run go](https://cover.run/go/git.sr.ht/~shulhan/pakakeh.go/lib/tabula.svg)

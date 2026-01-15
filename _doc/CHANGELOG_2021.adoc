@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
+
 = Changelog 2021
 Shulhan <ms@kilabit.info>
 3 July 2022

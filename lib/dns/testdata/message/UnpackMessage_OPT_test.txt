@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+
 >>> cgv5hi6hcnsdsf1etkyqzvuzdyus.multi.surbl.org:00
 0000000 4d2d 8182 0001 0000 0000 0001 1c43 4756
 0000010 3548 6936 6843 6e73 4453 6631 6574 4b59

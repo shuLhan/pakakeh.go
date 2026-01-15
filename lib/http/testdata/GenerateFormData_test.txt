@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 
 >>> file0
 Content of file0.

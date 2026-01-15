@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2025 M. Shulhan <ms@kilabit.info>
 
 >>> graph.facebook.com
 0000000 4a42 8180 0001 0003 0000 0000 0567 7261

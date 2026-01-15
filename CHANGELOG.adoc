@@ -66,6 +66,13 @@ The first line in test data file may contains line prefixed with "//"
 as comment.
 The use case is for license and copyright lines.
 
+**💧 all: convert license and copyright to use SPDX identifiers**
+
+With help of spdxconv tool [1], we able to bulk update all files license
+and copyright format to comply with SPDX formats.
+
+[1] https://kilabit.info/project/spdxconv/
+
 //}}}
 //{{{
 [#v0_60_2]

@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info> -->
+
 [![GoDoc](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/contact?status.svg)](https://godoc.org/git.sr.ht/~shulhan/pakakeh.go/lib/contact)
 [![Go Report Card](https://goreportcard.com/badge/git.sr.ht/~shulhan/pakakeh.go/lib/contact)](https://goreportcard.com/report/git.sr.ht/~shulhan/pakakeh.go/lib/contact)
 

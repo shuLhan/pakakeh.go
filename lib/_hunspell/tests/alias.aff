@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
 # aliases for flag vectors (AF)
 # AB -> 1
 # A -> 2

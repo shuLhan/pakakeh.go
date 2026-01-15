@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2022 M. Shulhan <ms@kilabit.info>
 
 usage() {
 cat << EOF

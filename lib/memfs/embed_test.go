@@ -15,6 +15,10 @@ func TestMemFS_GoEmbed_WithoutModTime(t *testing.T) {
 			".*/node_save$",
 		},
 		Embed: EmbedOptions{
+			CommentHeader: `// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2019 M. Shulhan <ms@kilabit.info>
+
+`,
 			PackageName:    "embed",
 			GoFileName:     "./internal/test/embed_disable_modtime/embed_test.go",
 			WithoutModTime: true,
