@@ -42,8 +42,11 @@ func ParseIgnorePattern(line []byte) (ign IgnorePattern) {
 		line = line[:len(line)-1]
 	}
 
+	var sepIdx int
+
 	// The "**/foo" pattern is equal to "foo", so we can remove the "**/".
 	for bytes.HasPrefix(line, []byte("**/")) {
+		sepIdx = -1 // Flag it as zero or more directory before.
 		line = line[3:]
 	}
 	if len(line) == 0 {
@@ -57,9 +60,9 @@ func ParseIgnorePattern(line []byte) (ign IgnorePattern) {
 		return ign
 	}
 
-	// Get the index of directory separator, before we replace it some
-	// special characters with regex.
-	var sepIdx = bytes.LastIndexByte(line, '/')
+	if sepIdx == 0 {
+		sepIdx = bytes.LastIndexByte(line, '/')
+	}
 
 	var RE_EVERYTHING_INSIDE = []byte(`/(.*)`)
 	var RE_FILE_OR_DIR = []byte(`/?$`)

@@ -79,6 +79,16 @@ func TestParseIgnorePattern(t *testing.T) {
 			pattern: regexp.MustCompile(`^(.*/|/)?[^/]*foo/?$`),
 		},
 	}, {
+		pattern: `**/foo/**`,
+		exp: IgnorePattern{
+			pattern: regexp.MustCompile(`^(.*/|/)?foo/(.*)/?$`),
+		},
+	}, {
+		pattern: `foo/**`,
+		exp: IgnorePattern{
+			pattern: regexp.MustCompile(`^/?foo/(.*)/?$`),
+		},
+	}, {
 		pattern: `foo`,
 		exp: IgnorePattern{
 			pattern: regexp.MustCompile(`^(.*/|/)?foo/?$`),
