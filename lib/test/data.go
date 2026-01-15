@@ -271,6 +271,10 @@ func (data *Data) parse(content []byte) (err error) {
 	for x < len(lines) {
 		content = lines[x]
 		if state == stateFlag {
+			if bytes.HasPrefix(content, []byte("//")) {
+				x++
+				continue
+			}
 			if len(content) == 0 {
 				x++
 				continue

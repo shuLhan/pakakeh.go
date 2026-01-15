@@ -60,6 +60,12 @@ author name, author email, and subject; respectively separated by comma.
 The IgnorePattern is not exclusive to git only. Some program, like
 REUSE, use the same pattern in the REUSE.toml path configuration.
 
+**🌼 lib/test: ignore line prefixed with "//"**
+
+The first line in test data file may contains line prefixed with "//"
+as comment.
+The use case is for license and copyright lines.
+
 //}}}
 //{{{
 [#v0_60_2]
