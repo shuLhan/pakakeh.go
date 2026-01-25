@@ -38,6 +38,16 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**🌼 lib/dns: simplify log message for DebugLevelCache**
+
+For each logged request, there should be one line of response logged,
+success or fail.
+
+This changes remove redundant log "^" (request forwarded) and
+"~" (answer is expired).
+The final log would be only "+" (new answer cached), or "#" (answer
+updated), or "!" (error).
+
 **🌼 lib/dns: increase the client default timeout from 6 to 60 seconds**
 
 The 6 seconds timeout will works only on fast, stable connection.

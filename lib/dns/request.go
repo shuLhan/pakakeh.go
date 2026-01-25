@@ -6,6 +6,7 @@ package dns
 import (
 	"io"
 	"log"
+	"time"
 )
 
 // request contains UDP address and DNS query message from client.
@@ -26,16 +27,21 @@ type request struct {
 	// Message define the DNS query.
 	message *Message
 
+	// startAt set the start time the request received by server.
+	startAt time.Time
+
 	// Kind define the connection type that this request is belong to,
 	// e.g. UDP, TCP, or DoH.
 	kind connType
 }
 
 // newRequest create and initialize request.
-func newRequest() *request {
-	return &request{
+func newRequest() (req *request) {
+	req = &request{
 		message: NewMessage(),
+		startAt: time.Now(),
 	}
+	return req
 }
 
 // error set the request message as an error.
