@@ -38,6 +38,25 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**🌼 lib/dns: increase the client default timeout from 6 to 60 seconds**
+
+The 6 seconds timeout will works only on fast, stable connection.
+
+On some environment with bad network connection, it will cause I/O timeout
+during recv and this affect the whole internet connections, like
+browsing.
+Since the browser wait for domain to be resolved but it does
+not get the response, it send another query.
+The next query also got timeout again.
+
+Increasing to 10-30 seconds also does not help on that environment.
+After some tests, 60 seconds is the lower timeout limit that reduce
+the I/O timeout.
+
+It is better that we receive the response and store it to caches, so
+the next query can be handled quickly, rather than timeout and retrying
+with the same error.
+
 **🌼 lib/test: export the constant for default data file name suffix**
 
 Also, fix typo on the LoadDataDir regarding suffix by replacing it with

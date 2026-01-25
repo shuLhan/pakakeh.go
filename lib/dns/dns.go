@@ -63,7 +63,7 @@ var (
 
 var (
 	// clientTimeout define read and write timeout on client request.
-	clientTimeout = 6 * time.Second
+	clientTimeout = 60 * time.Second
 )
 
 type connType byte
