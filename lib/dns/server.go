@@ -668,16 +668,19 @@ func (srv *Server) processResponse(req *request, res *Message) (an *Answer, inse
 		err = errors.New(`response truncated`)
 		return nil, false, err
 	}
-	if res.Header.ANCount == 0 {
-		// Ignore empty answers.
+	if res.Header.ANCount == 0 && res.Question.Type == RecordTypeA {
+		// Ignore empty answers only for query type A (IPv4).
+		//
 		// The use case if one use and switch between two different
 		// networks with internal zone, frequently.
 		// For example, if on network Y they have domain MY.Y and
 		// current connection is X, request to MY.Y will return an
 		// empty answers.
 		// Once they connect to Y again, any request to MY.Y will not
-		// be possible because rescached caches contains empty answer
-		// for MY.Y.
+		// be possible because caches contains empty answer for MY.Y.
+		//
+		// Some domains that still have an empty answer for AAAA(28)
+		// and HTTPS(65) will get cached.
 		err = errors.New(`empty RR answer`)
 		return nil, false, err
 	}
