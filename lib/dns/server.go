@@ -557,9 +557,7 @@ func (srv *Server) serveTCPClient(logp string, cl *TCPClient, kind string) {
 func (srv *Server) isImplemented(msg *Message) bool {
 	switch msg.Question.Class {
 	case RecordClassCH, RecordClassHS:
-		if srv.opts.Debug&DebugLevelDNS != 0 {
-			log.Printf(`dns: class %d is not implemented`, msg.Question.Class)
-		}
+		log.Printf(`dns: class %d is not implemented`, msg.Question.Class)
 		return false
 	}
 

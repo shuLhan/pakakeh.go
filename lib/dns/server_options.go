@@ -14,21 +14,15 @@ import (
 	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
 )
 
-// List of [ServerOptions] Debug mode.
-// For example, to log DNS error and cache operations, set the Debug value
-// to 3 or (DebugLevelDNS|DebugLevelCache).
+// List of [ServerOptions.Debug] mode.
 const (
-	// Log error on DNS level, in example EMPTY answer, ERR_NAME,
-	// ERR_NOT_IMPLEMENTED, ERR_REFUSED.
-	DebugLevelDNS = 1
-
-	// Log cache operations, including new record, updating records,
-	// and pruning record in caches.
-	DebugLevelCache = 2
+	// Log cache operations, including insert, update, and deleting
+	// record into/from caches.
+	DebugLevelCache = 1
 
 	// Log low level DNS connection and packet, including request and
 	// response.
-	DebugLevelConnPacket = 4
+	DebugLevelConnPacket = 2
 )
 
 // HookFunc define type function that will be triggered on specific event.
@@ -109,7 +103,7 @@ type ServerOptions struct {
 	// accessed in the last 1 minute will be removed from cache.
 	PruneThreshold time.Duration `ini:"dns:server:cache.prune_threshold"`
 
-	// Debug level for server, accept value [DebugLevelDNS],
+	// Debug level for server, accept value
 	// [DebugLevelCache], [DebugLevelConnPacket], or any combination of
 	// it.
 	Debug int `ini:"dns:server:debug"`
