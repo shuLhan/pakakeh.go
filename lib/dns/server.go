@@ -690,6 +690,11 @@ func (srv *Server) processResponse(req *request, res *Message) (an *Answer, inse
 	}
 
 	an = newAnswer(res, false)
+
+	if srv.opts.OnAnswerReceived != nil {
+		srv.opts.OnAnswerReceived(an)
+	}
+
 	an, inserted = srv.Caches.upsert(an)
 
 	return an, inserted, nil

@@ -38,6 +38,11 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**🌼 lib/dns: add option to set hook on server when receiving answer**
+
+The hook function, OnAnswerReceived, will be triggered when server
+receive valid answer but before its put to caches.
+
 **🌼 lib/dns: add method to set TTL on Message**
 
 The SetTTL method set all RRs answer time to live.

@@ -31,6 +31,9 @@ const (
 	DebugLevelConnPacket = 4
 )
 
+// HookFunc define type function that will be triggered on specific event.
+type HookFunc func(answer *Answer)
+
 // ServerOptions describes options for running a DNS server.
 type ServerOptions struct {
 	primaryUDP []net.Addr // List of parent name server addresses using UDP.
@@ -52,6 +55,10 @@ type ServerOptions struct {
 
 	// TLSPrivateKey contains path to certificate private key file.
 	TLSPrivateKey string `ini:"dns:server:tls.private_key"`
+
+	// OnAnswerReceived define the hook to be triggered when server
+	// receive valid answer, before its put to caches.
+	OnAnswerReceived HookFunc `json:"-" ini:"-"`
 
 	// NameServers contains list of parent name servers.
 	//
