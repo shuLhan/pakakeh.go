@@ -996,6 +996,22 @@ func (msg *Message) SetResponseCode(code ResponseCode) {
 	}
 }
 
+// SetTTL set all RRs answer and authority time-to-live (TTL) to `n`.
+func (msg *Message) SetTTL(n uint32) {
+	for x := range len(msg.Answer) {
+		msg.Answer[x].TTL = n
+		binary.BigEndian.PutUint32(
+			msg.packet[msg.Answer[x].idxTTL:],
+			msg.Answer[x].TTL)
+	}
+	for x := range len(msg.Authority) {
+		msg.Authority[x].TTL = n
+		binary.BigEndian.PutUint32(
+			msg.packet[msg.Authority[x].idxTTL:],
+			msg.Authority[x].TTL)
+	}
+}
+
 // SubTTL subtract TTL in each resource records and in packet by n seconds.
 // If TTL is less than n, it will set to 0.
 func (msg *Message) SubTTL(n uint32) {
