@@ -66,24 +66,6 @@ var (
 	clientTimeout = 60 * time.Second
 )
 
-type connType byte
-
-// List of known connection type.
-const (
-	connTypeUDP connType = 1 << iota
-	connTypeTCP
-	connTypeDoH
-	connTypeDoT
-)
-
-// connTypeNames contains a mapping between connection type and its name.
-var connTypeNames = map[connType]string{
-	connTypeUDP: "UDP",
-	connTypeTCP: "TCP",
-	connTypeDoH: "DoH",
-	connTypeDoT: "DoT",
-}
-
 // OpCode define a custom type for DNS header operation code.
 type OpCode byte
 

@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+// List of connection type for [request.kind].
+const (
+	connTypeDoH = `DoH`
+	connTypeDoT = `DoT`
+	connTypeTCP = `TCP`
+	connTypeUDP = `UDP`
+)
+
 // request contains UDP address and DNS query message from client.
 //
 // If Kind is UDP, Sender and UDPAddr must be non nil.
@@ -31,9 +39,9 @@ type request struct {
 	// startAt set the start time the request received by server.
 	startAt time.Time
 
-	// Kind define the connection type that this request is belong to,
-	// e.g. UDP, TCP, or DoH.
-	kind connType
+	// kind define the connection type that this request is belong to:
+	// DOH, DOT, TCP, or UDP.
+	kind string
 }
 
 // newRequest create and initialize request.

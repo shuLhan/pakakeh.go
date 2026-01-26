@@ -522,7 +522,7 @@ func (srv *Server) incForwarder() {
 	srv.fwLocker.Unlock()
 }
 
-func (srv *Server) serveTCPClient(logp string, cl *TCPClient, kind connType) {
+func (srv *Server) serveTCPClient(logp string, cl *TCPClient, kind string) {
 	for {
 		var err error
 		var req = newRequest()
@@ -594,8 +594,7 @@ func (srv *Server) processRequest() {
 		}
 
 		if srv.opts.Debug&DebugLevelCache != 0 {
-			log.Printf(`> %s - - %s - - -`,
-				connTypeNames[req.kind], req.String())
+			log.Printf(`> %s - - %s - - -`, req.kind, req.String())
 		}
 
 		an = srv.Caches.query(req.message)
@@ -610,8 +609,7 @@ func (srv *Server) processRequest() {
 			default:
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					log.Printf(`* %s - - %s - - -: no active forwarders`,
-						connTypeNames[req.kind],
-						req.String())
+						req.kind, req.String())
 				}
 				req.error(RCodeErrServer)
 			}
@@ -630,8 +628,7 @@ func (srv *Server) processRequest() {
 			default:
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					log.Printf(`* %s - - %s - - -: answer is expired and no active forwarders`,
-						connTypeNames[req.kind],
-						req.String())
+						req.kind, req.String())
 				}
 				req.error(RCodeErrServer)
 			}
@@ -644,14 +641,12 @@ func (srv *Server) processRequest() {
 
 		_, err = req.writer.Write(res.packet)
 		if err != nil {
-			log.Printf(`! %s - - %s - - -: %s`,
-				connTypeNames[req.kind], an.String(), err)
+			log.Printf(`! %s - - %s - - -: %s`, req.kind, an.String(), err)
 			continue
 		}
 
 		if srv.opts.Debug&DebugLevelCache != 0 {
-			log.Printf(`< %s - - %s - - -`,
-				connTypeNames[req.kind], an.String())
+			log.Printf(`< %s - - %s - - -`, req.kind, an.String())
 		}
 	}
 }
@@ -785,9 +780,8 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
-						connTypeNames[req.kind],
-						tag, nameserver, req.String(),
-						err)
+						req.kind, tag, nameserver,
+						req.String(), err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
 					}
@@ -801,20 +795,20 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 				avgElapsed := time.Duration(totalElapsed / totalQuery)
 				if err != nil {
 					log.Printf(`! %s %s %s %s %v %d %v: %s`,
-						connTypeNames[req.kind],
-						tag, nameserver, req.String(),
+						req.kind, tag, nameserver,
+						req.String(),
 						elapsed, totalQuery, avgElapsed, err)
 					continue
 				}
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					if isInserted {
 						log.Printf(`+ %s %s %s %s %v %d %v`,
-							connTypeNames[req.kind],
+							req.kind,
 							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					} else {
 						log.Printf(`# %s %s %s %s %v %d %v`,
-							connTypeNames[req.kind],
+							req.kind,
 							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					}
@@ -889,9 +883,8 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
-						connTypeNames[req.kind],
-						logp, tag, req.String(),
-						err)
+						req.kind, logp, tag,
+						req.String(), err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
 					}
@@ -905,8 +898,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 				avgElapsed := time.Duration(totalElapsed / totalQuery)
 				if err != nil {
 					log.Printf(`! %s %s %s %s %v %d %v: %s`,
-						connTypeNames[req.kind],
-						tag, nameserver,
+						req.kind, tag, nameserver,
 						req.String(),
 						elapsed, totalQuery, avgElapsed, err)
 					continue
@@ -914,12 +906,12 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					if isInserted {
 						log.Printf(`+ %s %s %s %s %v %d %v`,
-							connTypeNames[req.kind],
+							req.kind,
 							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					} else {
 						log.Printf(`# %s %s %s %s %v %d %v`,
-							connTypeNames[req.kind],
+							req.kind,
 							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					}
@@ -986,8 +978,7 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 			cl.Close()
 			if err != nil {
 				log.Printf(`! %s %s %s %s - - -: forward failed %s`,
-					connTypeNames[req.kind],
-					tag, nameserver, req.String(), err)
+					req.kind, tag, nameserver, req.String(), err)
 				continue
 			}
 
@@ -998,21 +989,18 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 			avgElapsed := time.Duration(totalElapsed / totalQuery)
 			if err != nil {
 				log.Printf(`! %s %s %s %s %v %d %v: %s`,
-					connTypeNames[req.kind],
-					tag, nameserver, req.String(),
+					req.kind, tag, nameserver, req.String(),
 					elapsed, totalQuery, avgElapsed, err)
 				continue
 			}
 			if srv.opts.Debug&DebugLevelCache != 0 {
 				if isInserted {
 					log.Printf(`+ %s %s %s %s %v %d %v`,
-						connTypeNames[req.kind],
-						tag, nameserver, an.String(),
+						req.kind, tag, nameserver, an.String(),
 						elapsed, totalQuery, avgElapsed)
 				} else {
 					log.Printf(`# %s %s %s %s %v %d %v`,
-						connTypeNames[req.kind],
-						tag, nameserver, an.String(),
+						req.kind, tag, nameserver, an.String(),
 						elapsed, totalQuery, avgElapsed)
 				}
 			}
@@ -1088,9 +1076,8 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
-						connTypeNames[req.kind],
-						tag, nameserver, req.String(),
-						err)
+						req.kind, tag, nameserver,
+						req.String(), err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
 					}
@@ -1104,20 +1091,20 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 				avgElapsed := time.Duration(totalElapsed / totalQuery)
 				if err != nil {
 					log.Printf(`! %s %s %s %s %v %d %v: %s`,
-						connTypeNames[req.kind],
-						tag, nameserver, req.String(),
+						req.kind, tag, nameserver,
+						req.String(),
 						elapsed, totalQuery, avgElapsed, err)
 					continue
 				}
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					if isInserted {
 						log.Printf(`+ %s %s %s %s %v %d %v`,
-							connTypeNames[req.kind],
+							req.kind,
 							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					} else {
 						log.Printf(`# %s %s %s %s %v %d %v`,
-							connTypeNames[req.kind],
+							req.kind,
 							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					}
