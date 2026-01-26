@@ -109,7 +109,7 @@ func (c *Caches) ExternalLoad(r io.Reader) (answers []*Answer, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 	for _, answer = range answers {
-		_ = c.upsert(answer)
+		c.upsert(answer)
 	}
 	return answers, nil
 }
@@ -198,7 +198,7 @@ func (c *Caches) ExternalSave(w io.Writer) (n int, err error) {
 		item = &cachesFileV1{
 			ReceivedAt: answer.ReceivedAt,
 			AccessedAt: answer.AccessedAt,
-			Packet:     answer.msg.packet,
+			Packet:     answer.Message.packet,
 		}
 		err = enc.Encode(item)
 		if err != nil {
@@ -225,7 +225,7 @@ func (c *Caches) ExternalSearch(re *regexp.Regexp) (listMsg []*Message) {
 	for dname, ans = range c.external {
 		if re.MatchString(dname) {
 			for _, an = range ans.v {
-				listMsg = append(listMsg, an.msg)
+				listMsg = append(listMsg, an.Message)
 			}
 		}
 	}
@@ -270,10 +270,10 @@ out:
 			return nil
 		}
 		an = &Answer{
-			msg: msg,
+			Message: msg,
 		}
-		_ = an.msg.AddAuthority(zone.soaRecord())
-		an.msg.SetResponseCode(RCodeErrName)
+		_ = an.Message.AddAuthority(zone.soaRecord())
+		an.Message.SetResponseCode(RCodeErrName)
 	}
 	return an
 }
@@ -303,7 +303,7 @@ func (c *Caches) InternalPopulate(msgs []*Message, from string) {
 
 	for _, msg = range msgs {
 		an = newAnswer(msg, isLocal)
-		inserted = c.upsert(an)
+		_, inserted = c.upsert(an)
 		if inserted {
 			n++
 		}
@@ -382,7 +382,7 @@ func (c *Caches) InternalRemoveRecord(rr *ResourceRecord) (rrOut *ResourceRecord
 		if an.RClass != rr.Class {
 			continue
 		}
-		rrOut, err = an.msg.RemoveAnswer(rr)
+		rrOut, err = an.Message.RemoveAnswer(rr)
 		break
 	}
 	return rrOut, err
@@ -437,7 +437,7 @@ func (c *Caches) internalUpsertRecord(rr *ResourceRecord) (err error) {
 		return nil
 	}
 
-	return an.msg.AddAnswer(rr)
+	return an.Message.AddAnswer(rr)
 }
 
 // prune old, external answers that have access time less or equal than
@@ -460,7 +460,7 @@ func (c *Caches) prune(exp int64) (listAnswer []*Answer) {
 		}
 
 		if c.debug&DebugLevelCache != 0 {
-			log.Printf(`dns: - 0:%s`, answer.msg.Question.String())
+			log.Printf(`dns: - 0:%s`, answer.Message.Question.String())
 		}
 
 		next = el.Next()
@@ -531,15 +531,12 @@ func (c *Caches) read(r io.Reader) (answers []*Answer, err error) {
 //
 // If the answer is inserted it will return true, otherwise it will return
 // false.
-func (c *Caches) upsert(nu *Answer) (inserted bool) {
-	if nu == nil || nu.msg == nil {
-		return
+func (c *Caches) upsert(nu *Answer) (an *Answer, inserted bool) {
+	if nu == nil || nu.Message == nil {
+		return nil, false
 	}
 
-	var (
-		answers *answers
-		an      *Answer
-	)
+	var answers *answers
 
 	c.Lock()
 	defer c.Unlock()
@@ -550,11 +547,9 @@ func (c *Caches) upsert(nu *Answer) (inserted bool) {
 			answers = newAnswers(nu)
 			c.internal[nu.QName] = answers
 			inserted = true
+			an = nu
 		} else {
-			an = answers.upsert(nu)
-			if an == nil {
-				inserted = true
-			}
+			an, inserted = answers.upsert(nu)
 		}
 	} else {
 		answers = c.external[nu.QName]
@@ -562,11 +557,9 @@ func (c *Caches) upsert(nu *Answer) (inserted bool) {
 			answers = newAnswers(nu)
 			c.external[nu.QName] = answers
 			inserted = true
+			an = nu
 		} else {
-			an = answers.upsert(nu)
-			if an == nil {
-				inserted = true
-			}
+			an, inserted = answers.upsert(nu)
 		}
 		if inserted {
 			// Push the new answer to LRU if new answer is
@@ -575,7 +568,7 @@ func (c *Caches) upsert(nu *Answer) (inserted bool) {
 		}
 	}
 
-	return inserted
+	return an, inserted
 }
 
 // worker for pruning unused caches.

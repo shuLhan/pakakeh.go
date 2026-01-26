@@ -26,7 +26,7 @@ func TestCachesQuery(t *testing.T) {
 			QName:      "test",
 			RType:      1,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 1,
 				},
@@ -37,7 +37,7 @@ func TestCachesQuery(t *testing.T) {
 			QName:      "test",
 			RType:      2,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 2,
 				},
@@ -48,7 +48,7 @@ func TestCachesQuery(t *testing.T) {
 			QName:      "test",
 			RType:      3,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 3,
 				},
@@ -113,7 +113,7 @@ func TestCachesPrune(t *testing.T) {
 			QName:      "test",
 			RType:      1,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 1,
 				},
@@ -125,7 +125,7 @@ func TestCachesPrune(t *testing.T) {
 			QName:      "test",
 			RType:      2,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 2,
 				},
@@ -137,7 +137,7 @@ func TestCachesPrune(t *testing.T) {
 			QName:      "test",
 			RType:      3,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 3,
 				},
@@ -193,7 +193,7 @@ func TestCaches_ExternalSave(t *testing.T) {
 
 	srv.Caches.init(0, 0, 0)
 
-	_ = srv.Caches.upsert(answer)
+	srv.Caches.upsert(answer)
 
 	n, err = srv.Caches.ExternalSave(&w)
 	if err != nil {
@@ -202,7 +202,7 @@ func TestCaches_ExternalSave(t *testing.T) {
 
 	test.Assert(t, "Caches.ExternalSave", 1, n)
 
-	msg, err = UnpackMessage(answer.msg.packet)
+	msg, err = UnpackMessage(answer.Message.packet)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,7 +237,7 @@ func TestCachesUpsert(t *testing.T) {
 			QName:      "test",
 			RType:      1,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 1,
 				},
@@ -249,7 +249,7 @@ func TestCachesUpsert(t *testing.T) {
 			QName:      "test",
 			RType:      1,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 3,
 				},
@@ -261,7 +261,7 @@ func TestCachesUpsert(t *testing.T) {
 			QName:      "test",
 			RType:      2,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 2,
 				},
@@ -273,7 +273,7 @@ func TestCachesUpsert(t *testing.T) {
 			QName:      "test",
 			RType:      2,
 			RClass:     1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 4,
 				},

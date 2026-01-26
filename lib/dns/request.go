@@ -4,6 +4,7 @@
 package dns
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -42,6 +43,12 @@ func newRequest() (req *request) {
 		startAt: time.Now(),
 	}
 	return req
+}
+
+func (req *request) String() string {
+	return fmt.Sprintf(`{%d %s %s}`, req.message.Header.ID,
+		req.message.Question.Name,
+		RecordTypeNames[req.message.Question.Type])
 }
 
 // error set the request message as an error.

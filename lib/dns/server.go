@@ -66,18 +66,21 @@ const (
 //
 // Following the prefix is
 //
-//	SOURCE FWD-NAME NS MSG-ID:QUESTION ELAPSED TOTAL_Q AVG_ELAPSED
+//	SOURCE FWD_NAME NS {MSG_ID QNAME TYPE TTL} ELAPSED TOTAL_Q AVG_ELAPSED
 //
 // where each field is, in order,
-//   - source of connection (UDP, TCP, DoH, or DoT),
-//   - forwarder name (for example, UDP-0 if request handled by the
-//     first parent name server using UDP) or "-" if its from cache,
-//   - parent name server address for forwarded query or "-" if its from
-//     cache,
-//   - message-ID and question separated by ":",
-//   - elapsed time,
-//   - total query per-forwarder, and
-//   - average elapsed time
+//   - SOURCE: source of connection (UDP, TCP, DoH, or DoT)
+//   - FWD_NAME: forwarder name (for example, UDP-0 means request handled by
+//     the first parent name server using UDP) or "-" if its from cache
+//   - NS: parent name server address for forwarded query or "-" if its from
+//     cache
+//   - MSG_ID: message ID
+//   - QNAME: the question
+//   - TYPE: type of question
+//   - TTL: time to live of the answer, 0 if its log is request
+//   - ELAPSED: elapsed time
+//   - TOTAL_Q: total query per-forwarder
+//   - AVG_ELAPSED: average elapsed time per-forwarder
 type Server struct {
 	HostsFiles  map[string]*HostsFile
 	Caches      Caches
@@ -591,10 +594,8 @@ func (srv *Server) processRequest() {
 		}
 
 		if srv.opts.Debug&DebugLevelCache != 0 {
-			log.Printf(`> %s - - %d:%s - - -`,
-				connTypeNames[req.kind],
-				req.message.Header.ID,
-				req.message.Question.String())
+			log.Printf(`> %s - - %s - - -`,
+				connTypeNames[req.kind], req.String())
 		}
 
 		an = srv.Caches.query(req.message)
@@ -608,17 +609,16 @@ func (srv *Server) processRequest() {
 				}
 			default:
 				if srv.opts.Debug&DebugLevelCache != 0 {
-					log.Printf(`* %s - - %d:%s - - -: no active forwarders`,
+					log.Printf(`* %s - - %s - - -: no active forwarders`,
 						connTypeNames[req.kind],
-						req.message.Header.ID,
-						req.message.Question.String())
+						req.String())
 				}
 				req.error(RCodeErrServer)
 			}
 			continue
 		}
 
-		if an.msg.IsExpired() {
+		if an.Message.IsExpired() {
 			switch {
 			case srv.hasForwarders():
 				if req.kind == connTypeTCP {
@@ -629,60 +629,51 @@ func (srv *Server) processRequest() {
 
 			default:
 				if srv.opts.Debug&DebugLevelCache != 0 {
-					log.Printf(`* %s - - %d:%s - - -: answer is expired and no active forwarders`,
+					log.Printf(`* %s - - %s - - -: answer is expired and no active forwarders`,
 						connTypeNames[req.kind],
-						req.message.Header.ID,
-						req.message.Question.String())
+						req.String())
 				}
 				req.error(RCodeErrServer)
 			}
 			continue
 		}
 
-		an.msg.SetID(req.message.Header.ID)
+		an.Message.SetID(req.message.Header.ID)
 		an.updateTTL()
-		res = an.msg
+		res = an.Message
 
 		_, err = req.writer.Write(res.packet)
 		if err != nil {
-			log.Printf(`! %s - - %d:%s - - -: %s`,
-				connTypeNames[req.kind],
-				req.message.Header.ID,
-				req.message.Question.String(), err)
+			log.Printf(`! %s - - %s - - -: %s`,
+				connTypeNames[req.kind], an.String(), err)
 			continue
 		}
 
 		if srv.opts.Debug&DebugLevelCache != 0 {
-			log.Printf(`< %s - - %d:%s - - -`, connTypeNames[req.kind],
-				res.Header.ID, res.Question.String())
+			log.Printf(`< %s - - %s - - -`,
+				connTypeNames[req.kind], an.String())
 		}
 	}
 }
 
-func (srv *Server) processResponse(req *request, res *Message) (inserted bool, err error) {
+func (srv *Server) processResponse(req *request, res *Message) (an *Answer, inserted bool, err error) {
 	if !isResponseValid(req, res) {
 		req.error(RCodeErrServer)
-		return false, nil
+		return nil, false, errors.New(`invalid response`)
 	}
-
-	var an *Answer
 
 	_, err = req.writer.Write(res.packet)
 	if err != nil {
-		return false, err
+		return nil, false, err
 	}
 
 	if res.Header.RCode != 0 {
-		if srv.opts.Debug&DebugLevelDNS != 0 {
-			err = errors.New(`response has error code ` + rcodeNames[res.Header.RCode])
-		}
-		return false, err
+		err = errors.New(`response has error code ` + rcodeNames[res.Header.RCode])
+		return nil, false, err
 	}
 	if res.Header.IsTC {
-		if srv.opts.Debug&DebugLevelDNS != 0 {
-			err = errors.New(`response truncated`)
-		}
-		return false, err
+		err = errors.New(`response truncated`)
+		return nil, false, err
 	}
 	if res.Header.ANCount == 0 {
 		// Ignore empty answers.
@@ -694,16 +685,14 @@ func (srv *Server) processResponse(req *request, res *Message) (inserted bool, e
 		// Once they connect to Y again, any request to MY.Y will not
 		// be possible because rescached caches contains empty answer
 		// for MY.Y.
-		if srv.opts.Debug&DebugLevelDNS != 0 {
-			err = errors.New(`empty RR answer`)
-		}
-		return false, err
+		err = errors.New(`empty RR answer`)
+		return nil, false, err
 	}
 
 	an = newAnswer(res, false)
-	inserted = srv.Caches.upsert(an)
+	an, inserted = srv.Caches.upsert(an)
 
-	return inserted, nil
+	return an, inserted, nil
 }
 
 func (srv *Server) startAllForwarders() {
@@ -790,11 +779,9 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 				}
 				res, err = forwarder.Query(req.message)
 				if err != nil {
-					log.Printf(`! %s %s %s %d:%s: forward failed %s`,
+					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
 						connTypeNames[req.kind],
-						tag, nameserver,
-						req.message.Header.ID,
-						req.message.Question.String(),
+						tag, nameserver, req.String(),
 						err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
@@ -802,34 +789,28 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 					continue
 				}
 
-				isInserted, err := srv.processResponse(req, res)
+				an, isInserted, err := srv.processResponse(req, res)
 				elapsed := time.Since(req.startAt)
 				totalElapsed += int64(elapsed)
 				totalQuery++
 				avgElapsed := time.Duration(totalElapsed / totalQuery)
 				if err != nil {
-					log.Printf(`! %s %s %s %d:%s %v %d %v: %s`,
+					log.Printf(`! %s %s %s %s %v %d %v: %s`,
 						connTypeNames[req.kind],
-						tag, nameserver,
-						res.Header.ID,
-						res.Question.String(),
+						tag, nameserver, req.String(),
 						elapsed, totalQuery, avgElapsed, err)
 					continue
 				}
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					if isInserted {
-						log.Printf(`+ %s %s %s %d:%s %v %d %v`,
+						log.Printf(`+ %s %s %s %s %v %d %v`,
 							connTypeNames[req.kind],
-							tag, nameserver,
-							res.Header.ID,
-							res.Question.String(),
+							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					} else {
-						log.Printf(`# %s %s %s %d:%s %v %d %v`,
+						log.Printf(`# %s %s %s %s %v %d %v`,
 							connTypeNames[req.kind],
-							tag, nameserver,
-							res.Header.ID,
-							res.Question.String(),
+							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					}
 				}
@@ -902,11 +883,9 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 
 				res, err = forwarder.Query(req.message)
 				if err != nil {
-					log.Printf(`! %s %s %s %d:%s: forward failed %s`,
+					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
 						connTypeNames[req.kind],
-						logp, tag,
-						req.message.Header.ID,
-						req.message.Question.String(),
+						logp, tag, req.String(),
 						err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
@@ -914,34 +893,29 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 					continue
 				}
 
-				isInserted, err := srv.processResponse(req, res)
+				an, isInserted, err := srv.processResponse(req, res)
 				elapsed := time.Since(req.startAt)
 				totalElapsed += int64(elapsed)
 				totalQuery++
 				avgElapsed := time.Duration(totalElapsed / totalQuery)
 				if err != nil {
-					log.Printf(`! %s %s %s %d:%s %v %d %v: %s`,
+					log.Printf(`! %s %s %s %s %v %d %v: %s`,
 						connTypeNames[req.kind],
 						tag, nameserver,
-						res.Header.ID,
-						res.Question.String(),
+						req.String(),
 						elapsed, totalQuery, avgElapsed, err)
 					continue
 				}
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					if isInserted {
-						log.Printf(`+ %s %s %s %d:%s %v %d %v`,
+						log.Printf(`+ %s %s %s %s %v %d %v`,
 							connTypeNames[req.kind],
-							tag, nameserver,
-							res.Header.ID,
-							res.Question.String(),
+							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					} else {
-						log.Printf(`# %s %s %s %d:%s %v %d %v`,
+						log.Printf(`# %s %s %s %s %v %d %v`,
 							connTypeNames[req.kind],
-							tag, nameserver,
-							res.Header.ID,
-							res.Question.String(),
+							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					}
 				}
@@ -1006,42 +980,34 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 			res, err = cl.Query(req.message)
 			cl.Close()
 			if err != nil {
-				log.Printf(`! %s %s %s %d:%s: forward failed %s`,
+				log.Printf(`! %s %s %s %s - - -: forward failed %s`,
 					connTypeNames[req.kind],
-					tag, nameserver,
-					req.message.Header.ID,
-					req.message.Question.String(), err)
+					tag, nameserver, req.String(), err)
 				continue
 			}
 
-			isInserted, err := srv.processResponse(req, res)
+			an, isInserted, err := srv.processResponse(req, res)
 			elapsed := time.Since(req.startAt)
 			totalElapsed += int64(elapsed)
 			totalQuery++
 			avgElapsed := time.Duration(totalElapsed / totalQuery)
 			if err != nil {
-				log.Printf(`! %s %s %s %d:%s %v %d %v: %s`,
+				log.Printf(`! %s %s %s %s %v %d %v: %s`,
 					connTypeNames[req.kind],
-					tag, nameserver,
-					res.Header.ID,
-					res.Question.String(),
+					tag, nameserver, req.String(),
 					elapsed, totalQuery, avgElapsed, err)
 				continue
 			}
 			if srv.opts.Debug&DebugLevelCache != 0 {
 				if isInserted {
-					log.Printf(`+ %s %s %s %d:%s %v %d %v`,
+					log.Printf(`+ %s %s %s %s %v %d %v`,
 						connTypeNames[req.kind],
-						tag, nameserver,
-						res.Header.ID,
-						res.Question.String(),
+						tag, nameserver, an.String(),
 						elapsed, totalQuery, avgElapsed)
 				} else {
-					log.Printf(`# %s %s %s %d:%s: %v %d %v`,
+					log.Printf(`# %s %s %s %s %v %d %v`,
 						connTypeNames[req.kind],
-						tag, nameserver,
-						res.Header.ID,
-						res.Question.String(),
+						tag, nameserver, an.String(),
 						elapsed, totalQuery, avgElapsed)
 				}
 			}
@@ -1116,11 +1082,9 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 
 				res, err = forwarder.Query(req.message)
 				if err != nil {
-					log.Printf(`! %s %s %s %d:%s: forward failed %s`,
+					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
 						connTypeNames[req.kind],
-						tag, nameserver,
-						req.message.Header.ID,
-						req.message.Question.String(),
+						tag, nameserver, req.String(),
 						err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
@@ -1128,34 +1092,28 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 					continue
 				}
 
-				isInserted, err := srv.processResponse(req, res)
+				an, isInserted, err := srv.processResponse(req, res)
 				elapsed := time.Since(req.startAt)
 				totalElapsed += int64(elapsed)
 				totalQuery++
 				avgElapsed := time.Duration(totalElapsed / totalQuery)
 				if err != nil {
-					log.Printf(`! %s %s %s %d:%s %v %d %v: %s`,
+					log.Printf(`! %s %s %s %s %v %d %v: %s`,
 						connTypeNames[req.kind],
-						tag, nameserver,
-						res.Header.ID,
-						res.Question.String(),
+						tag, nameserver, req.String(),
 						elapsed, totalQuery, avgElapsed, err)
 					continue
 				}
 				if srv.opts.Debug&DebugLevelCache != 0 {
 					if isInserted {
-						log.Printf(`+ %s %s %s %d:%s %v %d %v`,
+						log.Printf(`+ %s %s %s %s %v %d %v`,
 							connTypeNames[req.kind],
-							tag, nameserver,
-							res.Header.ID,
-							res.Question.String(),
+							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					} else {
-						log.Printf(`# %s %s %s %d:%s %v %d %v`,
+						log.Printf(`# %s %s %s %s %v %d %v`,
 							connTypeNames[req.kind],
-							tag, nameserver,
-							res.Header.ID,
-							res.Question.String(),
+							tag, nameserver, an.String(),
 							elapsed, totalQuery, avgElapsed)
 					}
 				}

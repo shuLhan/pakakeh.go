@@ -5,6 +5,7 @@ package dns
 
 import (
 	"container/list"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -14,8 +15,8 @@ type Answer struct {
 	// el contains pointer to the cache in LRU.
 	el *list.Element
 
-	// msg contains the unpacked DNS message.
-	msg *Message
+	// Message contains the unpacked DNS message.
+	Message *Message
 
 	// QName contains DNS question name, a copy of msg.Question.Name.
 	QName string
@@ -34,6 +35,9 @@ type Answer struct {
 
 	// RClass contains record class, a copy of msg.Question.Class.
 	RClass RecordClass
+
+	// TTL contains the first TTL on RR Answer.
+	TTL uint32
 }
 
 // newAnswer create new answer from Message.
@@ -42,10 +46,10 @@ type Answer struct {
 func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	an = &Answer{
 		// Trim the dot at the end for Message that is come from zone.
-		QName:  strings.TrimSuffix(msg.Question.Name, `.`),
-		RType:  msg.Question.Type,
-		RClass: msg.Question.Class,
-		msg:    msg,
+		QName:   strings.TrimSuffix(msg.Question.Name, `.`),
+		RType:   msg.Question.Type,
+		RClass:  msg.Question.Class,
+		Message: msg,
 	}
 	if isLocal {
 		return
@@ -53,12 +57,24 @@ func newAnswer(msg *Message, isLocal bool) (an *Answer) {
 	var at = time.Now().Unix()
 	an.ReceivedAt = at
 	an.AccessedAt = at
+	if len(msg.Answer) != 0 {
+		an.TTL = msg.Answer[0].TTL
+	}
 	return
+}
+
+func (an *Answer) String() string {
+	var id uint16
+	if an.Message != nil {
+		id = an.Message.Header.ID
+	}
+	return fmt.Sprintf(`{%d %s %s %d}`, id, an.QName,
+		RecordTypeNames[an.RType], an.TTL)
 }
 
 // clear the answer fields.
 func (an *Answer) clear() {
-	an.msg = nil
+	an.Message = nil
 	an.el = nil
 }
 
@@ -69,14 +85,14 @@ func (an *Answer) clear() {
 func (an *Answer) get() (packet []byte) {
 	an.updateTTL()
 
-	packet = make([]byte, len(an.msg.packet))
-	copy(packet, an.msg.packet)
+	packet = make([]byte, len(an.Message.packet))
+	copy(packet, an.Message.packet)
 	return
 }
 
 // update the answer with new message.
 func (an *Answer) update(nu *Answer) {
-	if nu == nil || nu.msg == nil {
+	if nu == nil || nu.Message == nil {
 		return
 	}
 
@@ -85,8 +101,8 @@ func (an *Answer) update(nu *Answer) {
 		an.AccessedAt = nu.AccessedAt
 	}
 
-	an.msg = nu.msg
-	nu.msg = nil
+	an.Message = nu.Message
+	an.TTL = nu.TTL
 }
 
 // updateTTL decrease the answer TTLs based on time when message received.
@@ -96,6 +112,6 @@ func (an *Answer) updateTTL() {
 	}
 
 	an.AccessedAt = time.Now().Unix()
-	var ttl = uint32(an.AccessedAt - an.ReceivedAt)
-	an.msg.SubTTL(ttl)
+	an.TTL = uint32(an.AccessedAt - an.ReceivedAt)
+	an.Message.SubTTL(an.TTL)
 }

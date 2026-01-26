@@ -38,6 +38,15 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**lib/dns: print the answer TTL in DebugLevelCache**
+
+The log level cache changed to the following format,
+
+  ... {MSG_ID QNAME TYPE TTL} ...
+
+where MSG_ID is the message ID, QNAME is the question name, TYPE is the
+type of question, and TTL is the time-to-live of the answer.
+
 **🌼 lib/dns: simplify log message for DebugLevelCache**
 
 For each logged request, there should be one line of response logged,

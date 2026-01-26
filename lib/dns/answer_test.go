@@ -54,10 +54,10 @@ func TestNewAnswer(t *testing.T) {
 		msg:     msg1,
 		isLocal: true,
 		exp: &Answer{
-			QName:  "test",
-			RType:  1,
-			RClass: 1,
-			msg:    msg1,
+			QName:   "test",
+			RType:   1,
+			RClass:  1,
+			Message: msg1,
 		},
 		expQName:  "test",
 		expRType:  1,
@@ -67,10 +67,10 @@ func TestNewAnswer(t *testing.T) {
 		desc: "With non local message",
 		msg:  msg1,
 		exp: &Answer{
-			QName:  "test",
-			RType:  1,
-			RClass: 1,
-			msg:    msg1,
+			QName:   "test",
+			RType:   1,
+			RClass:  1,
+			Message: msg1,
 		},
 		expQName:  "test",
 		expRType:  1,
@@ -99,7 +99,7 @@ func TestNewAnswer(t *testing.T) {
 		test.Assert(t, "newAnswer.QName", c.expQName, got.QName)
 		test.Assert(t, "newAnswer.RType", c.expRType, got.RType)
 		test.Assert(t, "newAnswer.RClass", c.expRClass, got.RClass)
-		test.Assert(t, "newAnswer.msg", c.expMsg, got.msg)
+		test.Assert(t, "newAnswer.Message", c.expMsg, got.Message)
 	}
 }
 
@@ -110,8 +110,8 @@ func TestAnswerClear(t *testing.T) {
 			Value: 1,
 		}
 		an = &Answer{
-			msg: msg,
-			el:  el,
+			Message: msg,
+			el:      el,
 		}
 
 		expMsg *Message
@@ -120,7 +120,7 @@ func TestAnswerClear(t *testing.T) {
 
 	an.clear()
 
-	test.Assert(t, "answer.msg", expMsg, an.msg)
+	test.Assert(t, "answer.Message", expMsg, an.Message)
 	test.Assert(t, "answer.el", expEl, an.el)
 }
 
@@ -212,12 +212,10 @@ func TestAnswerGet(t *testing.T) {
 
 func TestAnswerUpdate(t *testing.T) {
 	type testCase struct {
-		an            *Answer
-		nu            *Answer
-		expMsg        *Message
-		desc          string
-		expReceivedAt int64
-		expAccessedAt int64
+		an   *Answer
+		nu   *Answer
+		exp  *Answer
+		desc string
 	}
 
 	var (
@@ -242,41 +240,47 @@ func TestAnswerUpdate(t *testing.T) {
 		an: &Answer{
 			ReceivedAt: 1,
 			AccessedAt: 1,
-			msg:        msg1,
+			Message:    msg1,
 		},
-		expReceivedAt: 1,
-		expAccessedAt: 1,
-		expMsg:        msg1,
+		exp: &Answer{
+			ReceivedAt: 1,
+			AccessedAt: 1,
+			Message:    msg1,
+		},
 	}, {
 		desc: "With local answer",
 		an: &Answer{
 			ReceivedAt: 0,
 			AccessedAt: 0,
-			msg:        msg1,
+			Message:    msg1,
 		},
 		nu: &Answer{
 			ReceivedAt: at,
 			AccessedAt: at,
-			msg:        msg2,
+			Message:    msg2,
 		},
-		expReceivedAt: 0,
-		expAccessedAt: 0,
-		expMsg:        nil,
+		exp: &Answer{
+			ReceivedAt: 0,
+			AccessedAt: 0,
+			Message:    msg2,
+		},
 	}, {
 		desc: "With non local answer",
 		an: &Answer{
 			ReceivedAt: 1,
 			AccessedAt: 1,
-			msg:        msg1,
+			Message:    msg1,
 		},
 		nu: &Answer{
 			ReceivedAt: at,
 			AccessedAt: at,
-			msg:        msg2,
+			Message:    msg2,
 		},
-		expReceivedAt: at,
-		expAccessedAt: at,
-		expMsg:        nil,
+		exp: &Answer{
+			ReceivedAt: at,
+			AccessedAt: at,
+			Message:    msg2,
+		},
 	}}
 
 	for _, c = range cases {
@@ -284,10 +288,6 @@ func TestAnswerUpdate(t *testing.T) {
 
 		c.an.update(c.nu)
 
-		test.Assert(t, "ReceivedAt", c.expReceivedAt, c.an.ReceivedAt)
-		test.Assert(t, "AccessedAt", c.expAccessedAt, c.an.AccessedAt)
-		if c.nu != nil {
-			test.Assert(t, "c.nu.msg", c.expMsg, c.nu.msg)
-		}
+		test.Assert(t, "ReceivedAt", c.exp, c.an)
 	}
 }

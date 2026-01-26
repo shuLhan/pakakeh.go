@@ -15,7 +15,7 @@ func newAnswers(an *Answer) (ans *answers) {
 	ans = &answers{
 		v: make([]*Answer, 0, 1),
 	}
-	if an != nil && an.msg != nil {
+	if an != nil && an.Message != nil {
 		ans.v = append(ans.v, an)
 	}
 	return
@@ -54,10 +54,9 @@ func (ans *answers) remove(rtype RecordType, rclass RecordClass) {
 }
 
 // upsert update or insert new answer to list.
-// If new answer is updated, it will return the old answer.
-// If new answer is inserted, it will return nil instead.
-func (ans *answers) upsert(nu *Answer) (an *Answer) {
-	if nu == nil || nu.msg == nil {
+// It return the new inserted answer or update answer.
+func (ans *answers) upsert(nu *Answer) (an *Answer, isInsert bool) {
+	if nu == nil || nu.Message == nil {
 		return
 	}
 	an, _ = ans.get(nu.RType, nu.RClass)
@@ -65,6 +64,8 @@ func (ans *answers) upsert(nu *Answer) (an *Answer) {
 		an.update(nu)
 	} else {
 		ans.v = append(ans.v, nu)
+		an = nu
+		isInsert = true
 	}
-	return
+	return an, isInsert
 }

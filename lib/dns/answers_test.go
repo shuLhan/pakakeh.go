@@ -34,11 +34,11 @@ func TestNewAnswers(t *testing.T) {
 	}, {
 		desc: "With valid answer",
 		an: &Answer{
-			msg: &Message{},
+			Message: &Message{},
 		},
 		expLen: 1,
 		expV: []*Answer{{
-			msg: &Message{},
+			Message: &Message{},
 		}},
 	}}
 
@@ -188,26 +188,26 @@ func TestAnswersUpdate(t *testing.T) {
 		an1 = &Answer{
 			RType:  1,
 			RClass: 1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 1,
 				},
 			},
 		}
 		an2 = &Answer{
-			RType:  2,
-			RClass: 1,
-			msg:    &Message{},
+			RType:   2,
+			RClass:  1,
+			Message: &Message{},
 		}
 		an3 = &Answer{
-			RType:  1,
-			RClass: 2,
-			msg:    &Message{},
+			RType:   1,
+			RClass:  2,
+			Message: &Message{},
 		}
 		an4 = &Answer{
 			RType:  1,
 			RClass: 1,
-			msg: &Message{
+			Message: &Message{
 				Header: MessageHeader{
 					ID: 2,
 				},
@@ -247,9 +247,9 @@ func TestAnswersUpdate(t *testing.T) {
 		exp: &answers{
 			v: []*Answer{
 				{
-					RType:  1,
-					RClass: 1,
-					msg:    an4.msg,
+					RType:   1,
+					RClass:  1,
+					Message: an4.Message,
 				},
 				an2,
 				an3,
