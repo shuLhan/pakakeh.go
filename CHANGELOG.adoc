@@ -38,6 +38,11 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**🌼 lib/dns: use separate ServeMux for handling DoH**
+
+Using the [http.DefaultServeMux] will cause panic when the server
+restarted automatically.
+
 **🌼 lib/dns: skip caching empty answer only for query type A**
 
 Previously, we did not store response with empty RR answer for all record

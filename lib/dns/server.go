@@ -15,7 +15,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 )
@@ -246,18 +245,20 @@ func (srv *Server) serveDoH() {
 	var (
 		logp = `serveDoH`
 		addr = srv.opts.getHTTPAddress().String()
-
-		err error
 	)
+
+	var mux = http.NewServeMux()
+
+	mux.Handle(`/dns-query`, srv)
 
 	srv.doh = &http.Server{
 		Addr:              addr,
 		IdleTimeout:       srv.opts.HTTPIdleTimeout,
 		ReadHeaderTimeout: 5 * time.Second,
+		Handler:           mux,
 	}
 
-	http.Handle("/dns-query", srv)
-
+	var err error
 	if srv.tlsConfig != nil && !srv.opts.DoHBehindProxy {
 		log.Printf(`%s: listening at %s`, logp, addr)
 		srv.doh.TLSConfig = srv.tlsConfig
@@ -399,26 +400,17 @@ func (srv *Server) serveUDP() {
 	}
 }
 
+// ServeHTTP the main handle for DNS-over-HTTPS.
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		hdr = w.Header()
-
-		hdrAcceptValue string
-	)
-
-	hdr.Set(dohHeaderKeyContentType, dohHeaderValDNSMessage)
-
-	hdrAcceptValue = r.Header.Get(dohHeaderKeyAccept)
-	if len(hdrAcceptValue) == 0 {
+	const acceptDNSMessage = `application/dns-message`
+	var hdrAcceptValue = r.Header.Get(`Accept`)
+	if hdrAcceptValue != acceptDNSMessage {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 		return
 	}
 
-	hdrAcceptValue = strings.ToLower(hdrAcceptValue)
-	if hdrAcceptValue != dohHeaderValDNSMessage {
-		w.WriteHeader(http.StatusUnsupportedMediaType)
-		return
-	}
+	var hdr = w.Header()
+	hdr.Set(`Content-Type`, acceptDNSMessage)
 
 	if r.Method == http.MethodGet {
 		srv.handleDoHGet(w, r)
