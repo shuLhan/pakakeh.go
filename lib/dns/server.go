@@ -721,7 +721,6 @@ func (srv *Server) startAllForwarders() {
 
 func (srv *Server) dohForwarder(tag, nameserver string) {
 	var (
-		logp    = `dohForwarder`
 		stopper = srv.newStopper()
 
 		forwarder *DoHClient
@@ -734,7 +733,7 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 	)
 
 	defer func() {
-		log.Printf(`%s %s: forwarder for %s has been stopped`, logp, tag, nameserver)
+		log.Printf(`%s: forwarder for %s has been stopped`, tag, nameserver)
 	}()
 
 	var totalElapsed int64
@@ -743,7 +742,7 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 	for {
 		forwarder, err = NewDoHClient(nameserver, false)
 		if err != nil {
-			log.Printf(`%s %s: failed to connect to %s: %s`, logp, tag, nameserver, err)
+			log.Printf(`%s: failed to connect to %s: %s`, tag, nameserver, err)
 
 			select {
 			case <-stopper:
@@ -755,7 +754,7 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 			continue
 		}
 
-		log.Printf(`%s %s: connected to namesever %s`, logp, tag, nameserver)
+		log.Printf(`%s: connected to namesever %s`, tag, nameserver)
 
 		srv.incForwarder()
 
@@ -765,8 +764,8 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 			select {
 			case req, ok = <-srv.primaryq:
 				if !ok {
-					log.Printf(`%s %s: primary queue has been closed`,
-						logp, tag)
+					log.Printf(`%s: primary queue has been closed`,
+						tag)
 					srv.stopForwarder(forwarder)
 					return
 				}
@@ -809,7 +808,7 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 
 			case <-ticker.C:
 				if srv.opts.Debug&DebugLevelConnPacket != 0 {
-					log.Printf(`%s %s: alive`, logp, tag)
+					log.Printf(`%s: alive`, tag)
 				}
 			case <-stopper:
 				srv.stopForwarder(forwarder)
@@ -817,14 +816,13 @@ func (srv *Server) dohForwarder(tag, nameserver string) {
 			}
 		}
 
-		log.Printf(`%s %s: reconnect to nameserver %s`, logp, tag, nameserver)
+		log.Printf(`%s: reconnect to nameserver %s`, tag, nameserver)
 		srv.stopForwarder(forwarder)
 	}
 }
 
 func (srv *Server) tlsForwarder(tag, nameserver string) {
 	var (
-		logp    = `tlsForwarder`
 		stopper = srv.newStopper()
 
 		forwarder *DoTClient
@@ -837,7 +835,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 	)
 
 	defer func() {
-		log.Printf(`%s %s: forwarder for %s has been stopped`, logp, tag, nameserver)
+		log.Printf(`%s: forwarder for %s has been stopped`, tag, nameserver)
 	}()
 
 	var totalElapsed int64
@@ -846,7 +844,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 	for {
 		forwarder, err = NewDoTClient(nameserver, srv.opts.TLSAllowInsecure)
 		if err != nil {
-			log.Printf(`%s %s: failed to connect to %s: %s`, logp, tag, nameserver, err)
+			log.Printf(`%s: failed to connect to %s: %s`, tag, nameserver, err)
 
 			select {
 			case <-stopper:
@@ -858,7 +856,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 			continue
 		}
 
-		log.Printf(`%s %s: connected to nameserver %s`, logp, tag, nameserver)
+		log.Printf(`%s: connected to nameserver %s`, tag, nameserver)
 
 		srv.incForwarder()
 
@@ -868,7 +866,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 			select {
 			case req, ok = <-srv.primaryq:
 				if !ok {
-					log.Printf(`%s %s: primary queue has been closed`, logp, tag)
+					log.Printf(`%s: primary queue has been closed`, tag)
 					srv.stopForwarder(forwarder)
 					return
 				}
@@ -876,7 +874,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 				res, err = forwarder.Query(req.message)
 				if err != nil {
 					log.Printf(`! %s %s %s %s - - -: forward failed %s`,
-						req.kind, logp, tag,
+						req.kind, tag, nameserver,
 						req.String(), err)
 					if !errors.Is(err, errInvalidMessage) {
 						isRunning = false
@@ -912,7 +910,7 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 
 			case <-ticker.C:
 				if srv.opts.Debug&DebugLevelConnPacket != 0 {
-					log.Printf(`%s %s: alive`, logp, tag)
+					log.Printf(`%s: alive`, tag)
 				}
 			case <-stopper:
 				srv.stopForwarder(forwarder)
@@ -920,14 +918,13 @@ func (srv *Server) tlsForwarder(tag, nameserver string) {
 			}
 		}
 
-		log.Printf(`%s %s: reconnect to nameserver %s`, logp, tag, nameserver)
+		log.Printf(`%s: reconnect to nameserver %s`, tag, nameserver)
 		srv.stopForwarder(forwarder)
 	}
 }
 
 func (srv *Server) tcpForwarder(tag, nameserver string) {
 	var (
-		logp    = `tcpForwarder`
 		stopper = srv.newStopper()
 
 		ticker *time.Ticker
@@ -938,13 +935,13 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 		ok     bool
 	)
 
-	log.Printf(`%s %s: starting forwarder for %s`, logp, tag, nameserver)
+	log.Printf(`%s: starting forwarder for %s`, tag, nameserver)
 
 	srv.incForwarder()
 
 	defer func() {
 		srv.decForwarder()
-		log.Printf(`%s %s: forwarder for %s has been stopped`, logp, tag, nameserver)
+		log.Printf(`%s: forwarder for %s has been stopped`, tag, nameserver)
 	}()
 
 	var totalElapsed int64
@@ -955,15 +952,14 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 		select {
 		case req, ok = <-srv.tcpq:
 			if !ok {
-				log.Printf(`%s %s: primary queue has been closed`,
-					logp, tag)
+				log.Printf(`%s: primary queue has been closed`, tag)
 				return
 			}
 
 			cl, err = NewTCPClient(nameserver)
 			if err != nil {
-				log.Printf(`%s %s: failed to connect to %s: %s`,
-					logp, tag, nameserver, err)
+				log.Printf(`%s: failed to connect to %s: %s`,
+					tag, nameserver, err)
 				continue
 			}
 
@@ -1000,7 +996,7 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 
 		case <-ticker.C:
 			if srv.opts.Debug&DebugLevelConnPacket != 0 {
-				log.Printf(`%s %s: alive`, logp, tag)
+				log.Printf(`%s: alive`, tag)
 			}
 		case <-stopper:
 			return
@@ -1012,7 +1008,6 @@ func (srv *Server) tcpForwarder(tag, nameserver string) {
 // and forward it to parent name server.
 func (srv *Server) udpForwarder(tag, nameserver string) {
 	var (
-		logp    = `udpForwarder`
 		stopper = srv.newStopper()
 
 		forwarder *UDPClient
@@ -1025,8 +1020,7 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 	)
 
 	defer func() {
-		log.Printf(`%s %s: forwarder for %s has been stopped`,
-			logp, tag, nameserver)
+		log.Printf(`%s: forwarder for %s has been stopped`, tag, nameserver)
 	}()
 
 	var totalElapsed int64
@@ -1036,8 +1030,8 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 	for {
 		forwarder, err = NewUDPClient(nameserver)
 		if err != nil {
-			log.Printf(`%s %s: failed to connect to %s: %s`,
-				logp, tag, nameserver, err)
+			log.Printf(`%s: failed to connect to %s: %s`,
+				tag, nameserver, err)
 
 			select {
 			case <-stopper:
@@ -1049,7 +1043,7 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 			continue
 		}
 
-		log.Printf(`%s %s: connected to %s`, logp, tag, nameserver)
+		log.Printf(`%s: connected to %s`, tag, nameserver)
 
 		srv.incForwarder()
 
@@ -1060,8 +1054,7 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 			select {
 			case req, ok = <-srv.primaryq:
 				if !ok {
-					log.Printf(`%s %s: primary queue has been closed`,
-						logp, tag)
+					log.Printf(`%s: primary queue has been closed`, tag)
 					srv.stopForwarder(forwarder)
 					return
 				}
@@ -1105,7 +1098,7 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 
 			case <-ticker.C:
 				if srv.opts.Debug&DebugLevelConnPacket != 0 {
-					log.Printf(`%s %s: alive`, logp, tag)
+					log.Printf(`%s: alive`, tag)
 				}
 			case <-stopper:
 				srv.stopForwarder(forwarder)
@@ -1113,7 +1106,7 @@ func (srv *Server) udpForwarder(tag, nameserver string) {
 			}
 		}
 
-		log.Printf(`%s %s: reconnect forwarder for %s`, logp, tag, nameserver)
+		log.Printf(`%s: reconnect forwarder for %s`, tag, nameserver)
 		srv.stopForwarder(forwarder)
 	}
 }
