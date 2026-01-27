@@ -5,7 +5,6 @@
 package dns
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -172,12 +171,13 @@ func (cl *TCPClient) Write(msg []byte) (n int, err error) {
 	}
 
 	var (
-		lenmsg = len(msg)
-		packet = make([]byte, 0, 2+lenmsg)
+		lenmsg = uint16(len(msg))
+		packet = make([]byte, 2+lenmsg)
 	)
 
-	packet = binary.BigEndian.AppendUint16(packet, uint16(lenmsg))
-	packet = append(packet, msg...)
+	packet[0] = byte(lenmsg >> 8)
+	packet[1] = byte(lenmsg)
+	copy(packet[2:], msg)
 
 	n, err = cl.conn.Write(packet)
 	if err != nil {

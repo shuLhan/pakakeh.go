@@ -476,7 +476,7 @@ func (srv *Server) handleDoHRequest(raw []byte, w http.ResponseWriter) {
 
 	req.kind = connTypeDoH
 	req.writer = cl
-	req.message.packet = append(req.message.packet[:0], raw...)
+	req.message.packet = raw
 
 	err = req.message.UnpackHeaderQuestion()
 	if err != nil {
