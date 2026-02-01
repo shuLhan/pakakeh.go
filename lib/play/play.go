@@ -99,7 +99,7 @@ var ErrEmptyFile = errors.New(`empty File`)
 
 // GoVersion define the Go tool version for go.mod to be used to run the
 // code.
-const GoVersion = `1.23.2`
+const GoVersion = `1.25.0`
 
 // Timeout define the maximum time the program can be run until it get
 // terminated.
