@@ -352,9 +352,17 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 // Start the HTTP server.
 func (srv *Server) Start() (err error) {
 	if srv.Server.TLSConfig == nil {
-		err = srv.Server.ListenAndServe()
+		if srv.Options.Listener == nil {
+			err = srv.Server.ListenAndServe()
+		} else {
+			err = srv.Server.Serve(srv.Options.Listener)
+		}
 	} else {
-		err = srv.Server.ListenAndServeTLS("", "")
+		if srv.Options.Listener == nil {
+			err = srv.Server.ListenAndServeTLS(``, ``)
+		} else {
+			err = srv.Server.ServeTLS(srv.Options.Listener, ``, ``)
+		}
 	}
 	if errors.Is(err, http.ErrServerClosed) {
 		err = nil

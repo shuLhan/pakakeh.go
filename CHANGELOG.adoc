@@ -38,6 +38,11 @@ Legend,
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-xx-xx)
 
+**🌼 lib/http: add field Listener to ServerOptions**
+
+The field Listener allow user to pass [net.Listener] for accepting new
+connection using [http.Serve] or [http.ServeTLS].
+
 **🌱 lib/systemd: new package for socket-based activation**
 
 The `lib/systemd` package implement function `Listeners` that return list of

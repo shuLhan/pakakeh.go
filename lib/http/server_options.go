@@ -6,6 +6,7 @@ package http
 import (
 	"io"
 	"log"
+	"net"
 	"net/http"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
@@ -13,6 +14,11 @@ import (
 
 // ServerOptions define an options to initialize HTTP server.
 type ServerOptions struct {
+	// Listener define the network listener to be used for serving HTTP
+	// connection.
+	// The Listener can be activated using systemd socket.
+	Listener net.Listener
+
 	// Memfs contains the content of file systems to be served in memory.
 	// The MemFS instance to be served should be already embedded in Go
 	// file, generated using memfs.MemFS.GoEmbed().
