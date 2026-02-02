@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2026 M. Shulhan <ms@kilabit.info>
+
+[Service]
+ExecStart=/home/ms/go/bin/daemonTCP
+
+[Install]
+WantedBy=multi-user.target

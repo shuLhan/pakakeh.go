@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2026 M. Shulhan <ms@kilabit.info>
+
+[Socket]
+ListenStream=127.0.0.1:20001
+
+[Install]
+WantedBy=sockets.target
