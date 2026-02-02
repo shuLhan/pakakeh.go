@@ -16,6 +16,7 @@ import (
 	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/systemd"
 )
 
 const (
@@ -90,6 +91,22 @@ func main() {
 		}
 		httpd *libhttp.Server
 	)
+
+	listeners, err := systemd.Listeners(true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(listeners) > 1 {
+		log.Fatal(`too many listeners received for activation`)
+	}
+	if len(listeners) == 1 {
+		serverOpts.Listener = listeners[0]
+		gotAddr := serverOpts.Listener.Addr().String()
+		if gotAddr != serverOpts.Address {
+			log.Fatal(`invalid Listener address, got %s, want %s`,
+				gotAddr, serverOpts.Address)
+		}
+	}
 
 	httpd, err = libhttp.NewServer(serverOpts)
 	if err != nil {
