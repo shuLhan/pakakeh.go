@@ -160,7 +160,7 @@ func IsBinary(file string) (is bool) {
 
 	is = true
 	content := make([]byte, 1024)
-	_, err = f.Read(content)
+	n, err := f.Read(content)
 	if err != nil {
 		is = false
 	}
@@ -169,8 +169,10 @@ func IsBinary(file string) (is bool) {
 		is = false
 	}
 	if !is {
+		// There is an error during Read and Close.
 		return is
 	}
+	content = content[:n]
 	return IsBinaryStream(content)
 }
 

@@ -115,6 +115,26 @@ func TestCopy(t *testing.T) {
 	}
 }
 
+func TestIsBinary(t *testing.T) {
+	listCase := []struct {
+		path string
+		exp  bool
+	}{{
+		path: `testdata/exp.bz2`,
+		exp:  true,
+	}, {
+		path: `os.go`,
+		exp:  false,
+	}, {
+		path: `testdata/IsBinary/awwan.conf`,
+		exp:  false,
+	}}
+	for _, tc := range listCase {
+		got := IsBinary(tc.path)
+		test.Assert(t, tc.path, tc.exp, got)
+	}
+}
+
 func TestIsBinaryStream(t *testing.T) {
 	listCase := []struct {
 		path string
@@ -124,6 +144,9 @@ func TestIsBinaryStream(t *testing.T) {
 		exp:  true,
 	}, {
 		path: `os.go`,
+		exp:  false,
+	}, {
+		path: `testdata/IsBinary/awwan.conf`,
 		exp:  false,
 	}}
 	for _, tc := range listCase {
