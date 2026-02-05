@@ -331,7 +331,7 @@ Package xmlrpc provide an implementation of
 
 ### DKIM
 
-- [RFC 4685: Analysis of Threats Motivating DKIM](RFC_4865__DKIM_THREATS.html).
+- [RFC 4686: Analysis of Threats Motivating DKIM](RFC_4686__DKIM_THREATS.html).
 - [RFC 5585: DomainKeys Identified Mail Service Overview](RFC_5585__DKIM_OVERVIEW.html).
 - [RFC 5863: DKIM Development, Deployment, and Operations](RFC_5863__DKIM_DEVOPS.html).
 - [RFC 6376: DKIM Signatures](RFC_6376__DKIM_SIGNATURES.html).
