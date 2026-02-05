@@ -14,32 +14,32 @@ Content-Type: text/html; charset=utf-8
 </html>
 
 <<< /dir
-HTTP/1.1 302 Found
+HTTP/1.1 301 Moved Permanently
 Connection: close
 Content-Type: text/html; charset=utf-8
 Location: /dir/
 
-<a href="/dir/">Found</a>.
+<a href="/dir/">Moved Permanently</a>.
 
 
 
 <<< /dir?q=abc
-HTTP/1.1 302 Found
+HTTP/1.1 301 Moved Permanently
 Connection: close
 Content-Type: text/html; charset=utf-8
 Location: /dir/?q=abc
 
-<a href="/dir/?q=abc">Found</a>.
+<a href="/dir/?q=abc">Moved Permanently</a>.
 
 
 
 <<< /dir?q=abc#fgh
-HTTP/1.1 302 Found
+HTTP/1.1 301 Moved Permanently
 Connection: close
 Content-Type: text/html; charset=utf-8
 Location: /dir/?q=abc#fgh
 
-<a href="/dir/?q=abc#fgh">Found</a>.
+<a href="/dir/?q=abc#fgh">Moved Permanently</a>.
 
 
 

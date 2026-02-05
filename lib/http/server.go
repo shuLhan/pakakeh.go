@@ -481,7 +481,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		// If request path is a directory and it is not end with
 		// slash, redirect request to location with slash to allow
 		// relative links works inside the HTML content.
-		http.Redirect(res, req, redirectURL.String(), http.StatusFound)
+		http.Redirect(res, req, redirectURL.String(), http.StatusMovedPermanently)
 		return
 	}
 	if srv.Options.HandleFS != nil {
