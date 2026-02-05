@@ -103,7 +103,7 @@ func main() {
 		serverOpts.Listener = listeners[0]
 		gotAddr := serverOpts.Listener.Addr().String()
 		if gotAddr != serverOpts.Address {
-			log.Fatal(`invalid Listener address, got %s, want %s`,
+			log.Fatalf(`invalid Listener address, got %s, want %s`,
 				gotAddr, serverOpts.Address)
 		}
 	}
