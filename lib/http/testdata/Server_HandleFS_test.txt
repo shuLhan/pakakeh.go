@@ -1,21 +1,93 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2025 M. Shulhan <ms@kilabit.info>
 
-<<< TestServer_HandleFS/OnEmptyRoot
+<<< /
 HTTP/1.1 200 OK
 Connection: close
 Content-Type: text/html; charset=utf-8
 
-<!DOCTYPE html><html>
-<head>
-<meta name="viewport" content="width=device-width">
-<style>
-body{font-family:monospace; white-space:pre;}
-</style>
-</head>
-<body>
-<h3>Index of /</h3>
-</body></html>
+<!doctype html>
+<html>
+  <head>
+    <title>/index.html</title>
+  </head>
+</html>
+
+<<< /dir
+HTTP/1.1 302 Found
+Connection: close
+Content-Type: text/html; charset=utf-8
+Location: /dir/
+
+<a href="/dir/">Found</a>.
+
+
+
+<<< /dir?q=abc
+HTTP/1.1 302 Found
+Connection: close
+Content-Type: text/html; charset=utf-8
+Location: /dir/?q=abc
+
+<a href="/dir/?q=abc">Found</a>.
+
+
+
+<<< /dir?q=abc#fgh
+HTTP/1.1 302 Found
+Connection: close
+Content-Type: text/html; charset=utf-8
+Location: /dir/?q=abc#fgh
+
+<a href="/dir/?q=abc#fgh">Found</a>.
+
+
+
+<<< /dir/#fgh
+HTTP/1.1 404 Not Found
+Connection: close
+
+
+
+<<< /dir/
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/html; charset=utf-8
+
+<!doctype html>
+<html>
+  <head>
+    <title>/dir/index.html</title>
+  </head>
+</html>
+
+
+<<< /b
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/html; charset=utf-8
+
+<!doctype html>
+<html>
+  <head>
+    <title>/b.html</title>
+  </head>
+</html>
+
+
+<<< /b?q=abc
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: text/html; charset=utf-8
+
+<!doctype html>
+<html>
+  <head>
+    <title>/b.html</title>
+  </head>
+</html>
+
+
 
 <<< TestServer_HandleFS/OnNewDirectory
 HTTP/1.1 200 OK
@@ -30,6 +102,6 @@ body{font-family:monospace; white-space:pre;}
 </style>
 </head>
 <body>
-<h3>Index of /</h3>
-<div>drwxr-xr-x <tt>           0</tt> 0000-00-00T00:00:00Z <a href="/dirA">dirA</a></div><br/>
+<h3>Index of newDir</h3>
+<div><a href='..'>..</a></div><br/>
 </body></html>

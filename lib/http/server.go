@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"sort"
@@ -384,60 +385,67 @@ func (srv *Server) Stop(wait time.Duration) (err error) {
 
 // getFSNode get the memfs Node based on the request path.
 //
-// If the path is not exist, try path with index.html;
-// if it still not exist try path with suffix .html.
+// If the path is not exist, try path with ".html".
 //
-// If the path is directory and contains index.html, the node for index.html
-// with true will be returned.
+// If the path is directory and contains index.html, the node content for
+// index.html will be returned.
 //
 // If the path is directory and does not contains index.html and
 // [ServerOptions.EnableIndexHTML] is true, server will generate list of
 // content for index.html.
-func (srv *Server) getFSNode(reqPath string) (node *memfs.Node) {
+//
+// The redirectPath return whether the server should redirect first before
+// serving the content to provide consistent canonical path that end with "/"
+// for directory that contains "index.html" or EnableIndexHTML is on.
+func (srv *Server) getFSNode(reqURL url.URL) (node *memfs.Node, redirectURL *url.URL) {
 	if srv.Options.Memfs == nil {
-		return nil
+		return nil, nil
 	}
 
+	reqPath := reqURL.Path
+	endWithSlash := reqPath[len(reqPath)-1] == '/'
 	var err error
 
+	// The [MemFS.Get] method check reqPath with trailing `/` removed, so
+	// "path" or "path/" will return the same node.
 	node, err = srv.Options.Memfs.Get(reqPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			return nil
+			return nil, nil
 		}
-
-		var pathHTML = path.Join(reqPath, `index.html`)
-
-		node, err = srv.Options.Memfs.Get(pathHTML)
-		if err != nil {
-			pathHTML = reqPath + `.html`
+		if !endWithSlash {
+			pathHTML := reqPath + `.html`
 			node, err = srv.Options.Memfs.Get(pathHTML)
 			if err != nil {
-				return nil
+				return nil, nil
 			}
-			return node
+			return node, nil
 		}
+		return nil, nil
+	}
+	if !node.IsDir() {
+		return node, nil
 	}
 
-	if node.IsDir() {
-		var (
-			pathHTML      = path.Join(reqPath, `index.html`)
-			nodeIndexHTML *memfs.Node
-		)
-
-		nodeIndexHTML, err = srv.Options.Memfs.Get(pathHTML)
-		if err == nil {
-			return nodeIndexHTML
+	pathIndexHTML := path.Join(reqPath, `index.html`)
+	nodeIndexHTML, err := srv.Options.Memfs.Get(pathIndexHTML)
+	if err != nil {
+		if srv.Options.EnableIndexHTML {
+			if !endWithSlash {
+				redirectURL = reqURL.JoinPath(`/`)
+				return nil, redirectURL
+			}
+			node.GenerateIndexHTML()
+			return node, nil
 		}
-
-		if !srv.Options.EnableIndexHTML {
-			return node
-		}
-
-		node.GenerateIndexHTML()
+		return nil, nil
+	}
+	if !endWithSlash {
+		redirectURL = reqURL.JoinPath(`/`)
+		return nil, redirectURL
 	}
 
-	return node
+	return nodeIndexHTML, nil
 }
 
 // handleDelete handle the DELETE request by searching the registered route
@@ -468,32 +476,14 @@ func (srv *Server) handleDelete(res http.ResponseWriter, req *http.Request) {
 //
 // If the request Path is not exist it will return 404 Not Found.
 func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
-	var (
-		logp = "HandleFS"
-
-		node *memfs.Node
-		err  error
-	)
-
-	node = srv.getFSNode(req.URL.Path)
-	if node == nil {
-		if srv.Options.HandleFS == nil {
-			res.WriteHeader(http.StatusNotFound)
-			return
-		}
-		// Fallthrough, call HandleFS below.
-	} else if node.IsDir() && req.URL.Path[len(req.URL.Path)-1] != '/' {
+	node, redirectURL := srv.getFSNode(*req.URL)
+	if redirectURL != nil {
 		// If request path is a directory and it is not end with
 		// slash, redirect request to location with slash to allow
 		// relative links works inside the HTML content.
-		var redirectPath = req.URL.Path + "/"
-		if len(req.URL.RawQuery) > 0 {
-			redirectPath += "?" + req.URL.RawQuery
-		}
-		http.Redirect(res, req, redirectPath, http.StatusFound)
+		http.Redirect(res, req, redirectURL.String(), http.StatusFound)
 		return
 	}
-
 	if srv.Options.HandleFS != nil {
 		var statusCode int
 		node, statusCode = srv.Options.HandleFS(node, res, req)
@@ -522,9 +512,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 
 	var ifModifiedSince = req.Header.Get(HeaderIfModifiedSince)
 	if len(ifModifiedSince) != 0 {
-		var timeModsince time.Time
-
-		timeModsince, err = time.Parse(time.RFC1123, ifModifiedSince)
+		timeModsince, err := time.Parse(time.RFC1123, ifModifiedSince)
 		if err == nil {
 			if nodeModtime <= timeModsince.Unix() {
 				res.WriteHeader(http.StatusNotModified)
@@ -542,8 +530,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		bodyReader = bytes.NewReader(node.Content)
 		size = node.Size()
 	} else {
-		var f *os.File
-		f, err = os.Open(node.SysPath)
+		f, err := os.Open(node.SysPath)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			return
@@ -577,7 +564,7 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	responseWrite(logp, res, req, bodyReader)
+	responseWrite(`HandleFS`, res, req, bodyReader)
 }
 
 // handleGet handle the GET request by searching the registered route and
@@ -653,8 +640,8 @@ func (srv *Server) handleHead(res http.ResponseWriter, req *http.Request) {
 func (srv *Server) handleOptions(res http.ResponseWriter, req *http.Request) {
 	methods := make(map[string]bool)
 
-	var node = srv.getFSNode(req.URL.Path)
-	if node != nil {
+	node, redirectURL := srv.getFSNode(*req.URL)
+	if node != nil || redirectURL != nil {
 		methods[http.MethodGet] = true
 		methods[http.MethodHead] = true
 	}

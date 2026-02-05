@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
 package http
 
@@ -869,7 +868,8 @@ func TestServer_HandleFS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var root = t.TempDir()
+	root := `testdata/Server_HandleFS`
+
 	var mfsOpts = memfs.Options{
 		Root:        root,
 		MaxFileSize: -1,
@@ -892,48 +892,90 @@ func TestServer_HandleFS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var redactTime = regexp.MustCompile(`\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d`)
-	var redactedTime = []byte(`0000-00-00T00:00:00`)
-	var simreq = libhttptest.SimulateRequest{
-		Path: `/`,
-	}
-	var simres *libhttptest.SimulateResult
-	var exp string
-	var got []byte
+	listCase := []struct {
+		path        string
+		expResponse string
+	}{{
+		path:        `/`,
+		expResponse: string(tdata.Output[`/`]),
+	}, {
+		path:        `/index`,
+		expResponse: string(tdata.Output[`/`]),
+	}, {
+		path:        `/dir`,
+		expResponse: string(tdata.Output[`/dir`]),
+	}, {
+		path:        `/dir?q=abc`,
+		expResponse: string(tdata.Output[`/dir?q=abc`]),
+	}, {
+		path:        `/dir?q=abc#fgh`,
+		expResponse: string(tdata.Output[`/dir?q=abc#fgh`]),
+	}, {
+		path:        `/dir#fgh`,
+		expResponse: string(tdata.Output[`/dir/#fgh`]),
+	}, {
+		path:        `/dir/#fgh`,
+		expResponse: string(tdata.Output[`/dir/#fgh`]),
+	}, {
+		path:        `/dir/`,
+		expResponse: string(tdata.Output[`/dir/`]),
+	}, {
+		path:        `/b`,
+		expResponse: string(tdata.Output[`/b`]),
+	}, {
+		path:        `/b?q=abc`,
+		expResponse: string(tdata.Output[`/b`]),
+	}, {
+		path:        `/b?q=abc#fgh`,
+		expResponse: string(tdata.Output[`/b`]),
+	}}
 
-	t.Run(`OnEmptyRoot`, func(t *testing.T) {
+	for _, tc := range listCase {
+		simreq := libhttptest.SimulateRequest{
+			Path: tc.path,
+		}
+
+		var simres *libhttptest.SimulateResult
 		simres, err = libhttptest.Simulate(httpd.ServeHTTP, &simreq)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		exp = string(tdata.Output[t.Name()])
+		var got []byte
 		got, err = simres.DumpResponse([]string{HeaderETag})
 		if err != nil {
 			t.Fatal(err)
 		}
-		test.Assert(t, `response`, exp, string(got))
-	})
+		test.Assert(t, tc.path, tc.expResponse, string(got))
+	}
 
-	t.Run(`OnNewDirectory`, func(t *testing.T) {
-		var newDir = filepath.Join(root, `dirA`)
+	newDir := filepath.Join(root, `newDir`)
+	_ = os.RemoveAll(newDir)
+
+	t.Run(`OnNewDirectory`, func(tt *testing.T) {
+		redactTime := regexp.MustCompile(`\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d`)
+		redactedTime := []byte(`0000-00-00T00:00:00`)
+
 		err = os.MkdirAll(newDir, 0755)
 		if err != nil {
-			t.Fatal(err)
+			tt.Fatal(err)
 		}
 
-		simres, err = libhttptest.Simulate(httpd.ServeHTTP, &simreq)
+		simreq := libhttptest.SimulateRequest{
+			Path: `/newDir/`,
+		}
+		simres, err := libhttptest.Simulate(httpd.ServeHTTP, &simreq)
 		if err != nil {
-			t.Fatal(err)
+			tt.Fatal(err)
 		}
 
-		exp = string(tdata.Output[t.Name()])
-		got, err = simres.DumpResponse([]string{HeaderETag})
+		exp := string(tdata.Output[tt.Name()])
+		got, err := simres.DumpResponse([]string{HeaderETag})
 		if err != nil {
-			t.Fatal(err)
+			tt.Fatal(err)
 		}
 		got = redactTime.ReplaceAll(got, redactedTime)
-		test.Assert(t, `response`, exp, string(got))
+		test.Assert(tt, tt.Name(), exp, string(got))
 	})
 }
 
