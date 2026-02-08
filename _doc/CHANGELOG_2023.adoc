@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
-=  CHANGELOG
+=  pakakeh.go Changelog 2023
 Shulhan <ms@kilabit.info>
 :toc:
 :sectanchors:

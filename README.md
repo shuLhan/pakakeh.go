@@ -347,7 +347,7 @@ Package xmlrpc provide an implementation of
 
 - [RFC 7208: Sender Policy Framework version 1](RFC_7808__SPFv1.html).
 
-## DNS
+### DNS
 
 - [RFC 6891: Extension Mechanisms for DNS (EDNS(0)](RFC_6891_EDNS0.html).
 
@@ -359,6 +359,9 @@ Package xmlrpc provide an implementation of
 This library is released every month, usually at the first week of month.
 
 [Latest changelog](CHANGELOG.html).
+
+[Changelog in 2025](CHANGELOG_2025.html).
+Changelog for `pakakeh.go` module since v0.59.0 until v0.60.2.
 
 [Changelog in 2024](CHANGELOG_2024.html).
 Changelog for `pakakeh.go` module since v0.52.0 until v0.58.1.

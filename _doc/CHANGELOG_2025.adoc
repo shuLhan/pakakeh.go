@@ -1,0 +1,426 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2025 M. Shulhan <ms@kilabit.info>
+
+= pakakeh.go Changelog 2025
+:std_url: https://pkg.go.dev
+:sectanchors:
+:toc:
+
+link:CHANGELOG_2024.html[Changelog in 2024].
+Changelog for `pakakeh.go` module since v0.52.0 until v0.58.1.
+
+link:CHANGELOG_2023.html[Changelog in 2023^].
+This is changelog for `pakakeh.go` module since v0.43.0 until v0.51.0.
+
+link:CHANGELOG_2022.html[Changelog in 2022^].
+This is changelog for `pakakeh.go` module since v0.33.0 until v0.42.0.
+
+link:CHANGELOG_2021.html[Changelog in 2021^].
+This is changelog for `pakakeh.go` module since v0.22.0 until v0.32.0.
+
+link:CHANGELOG_2020.html[Changelog in 2020^].
+This is changelog for `pakakeh.go` module since v0.12.0 until v0.21.0.
+
+link:CHANGELOG_2018-2019.html[Changelog from 2018 to 2019^].
+This is changelog for `pakakeh.go` module since v0.1.0 until v0.11.0.
+
+[#v0_60_2]
+== pakakeh.go v0.60.2 (2025-12-27)
+//{{{
+
+This is periodic and last release of pakakeh.go for year 2025.
+There is no changes on code level only on documentation.
+
+In the _doc, we merge the index.adoc into README.md so we can served the
+_doc directory under https://kilabit.info/project/pakakeh.go .
+We also fix some broken links in documentation files.
+
+In lib/time, add missing "Hourly" section in the package documentation.
+
+The go.mod is updated to use Go 1.24.0 as minimum version; and all
+dependencies has been updated to latest release.
+
+//}}}
+[#v0_60_1]
+== pakakeh.go v0.60.1 (2025-04-18)
+//{{{
+
+[#v0_60_1__lib_bytes]
+=== lib/bytes
+
+[NEW FEATURE] +
+New method Peek in Parser.
+The Peek method take a look on n bytes inside the buffer without
+using delimiters.
+The returned bytes may empty or have length less than n.
+
+//}}}
+[#v0_60_0]
+== pakakeh.go v0.60.0 (2025-02-01)
+//{{{
+
+Some changes that affected almost all packages are by replacing
+"interface{}" with "any" (added since Go 1.18),
+using for-range on numeric value (supported on Go 1.22).
+
+
+[#v0_60_0__lib_bytes]
+=== lib/bytes
+
+[BREAKING CHANGES] +
+We remove Copy and Concat functions in favor of standard library.
+Since Go 1.20, the standard bytes package have the Copy function.
+Since Go 1.22, the standard slices package have the Concat function.
+
+[BREAKING CHANGES] +
+We also remove "lib/bytes.AppendXxx", "lib/bytes.ReadXxx", and
+"lib/bytes.WriteXxx" in favor of standard library.
+Since Go 1.19, package "encoding/binary" support appending byte order.
+The ReadXxx and WriteXxx can be replaced with standard library
+BigEndian/LittleEndian UintXxx and PutUintXxx.
+
+
+[#v0_60_0__lib_debug]
+=== lib/debug
+
+[BREAKING CHANGES] +
+The global Value variable has been removed.
+Using global variable inside one package is a mistake.
+If, for example, package X set debug.Value to 1, another packages that
+does need to be debugged will print unnecessary log messages.
+
+
+[#v0_60_0__lib_dns]
+=== lib/dns
+
+[BUG FIX] +
+We fix unpacking HTTPS where the response answers contains RR other than
+SVCB parameters, for example CNAME.
+
+[ENHANCEMENT] +
+This release now detect invalid response header earlier, like invalid op
+code and response code, before we continue unpacking the rest data.
+Previously, we unpack the header and then question without
+detecting whether the header itself is valid or not.
+This cause the unpacking question return an error like
+
+  label length overflow at index xxx
+
+One of the case is when someone sent random or HTTP request
+to DoT port.
+
+[ENHANCEMENT] +
+In the logging part, we improve the logging prefix on serveTCPClient.
+The serveTCPClient is used to serve TCP and DoT clients.
+Previously, the error returned from this method is prefixed based on the
+kind, for example
+
+  serveTCPClient TCP: ...
+  serveTCPClient DoT: ...
+
+This changes pass the log prefix to the method so now it become
+
+  serveTCPClient: ...
+  serveDoTClient: ...
+
+
+[#v0_60_0__lib_http]
+=== lib/http
+
+[ENHANCEMENT] +
+On server with TryDirect is true, a GET request to a directory now always
+rescan the content and the generate the new "index.html".
+
+In the generated "index.html" we display the file time in UTC instead of
+local time.
+
+The ParseContentRange function now return an error instead of nil
+"*RangePosition".
+
+
+[#v0_60_0__lib_goanalysis]
+=== lib/goanalysis
+
+[NEW FEATURE] +
+Package goanalysis implement go static analysis using
+[Analyzer] that are not included in the default "go vet", but included in
+the [passes] directory, including: fieldalignment, nilness,
+reflectvaluecompare, shadow, sortslice, unusedwrite, and waitgroup.
+This package is not mean to be imported directly by other package
+except main, like we have in [cmd/gocheck].
+
+
+[#v0_60_0__lib_hunspell]
+=== lib/hunspell
+
+This package has been renamed to "_hunspell".
+The hunspell is still in progress and we did not have time to continue
+it, so we rename it to "_hunspell" for now to prevent it being checked by
+linters or being imported.
+
+
+[#v0_60_0__lib_memfs]
+=== lib/memfs
+
+[BUG FIX] +
+Fix possible panic on AddChild if path is not included.
+
+
+[#v0_60_0__lib_play]
+=== lib/play
+
+[ENHANCEMENT] +
+One of the major issue that we previously have is the Run and Test
+functions can write file in any unsafe path.
+Another issue is default GoVersion and Timeout is set on the package level.
+
+This release introduce new type "Go" as the top level type that can be
+instantiate with different Root, GoVersion, and Timeout.
+The instance of Go then can Format, Run, or Test the Go code in their
+own scope.
+
+Any request to Run or Test Go code that requires writing new files now
+joined with the [GoOptions.Root] first.
+If the final absolute path does not have Root as the prefix it will return
+an error [os.ErrPermission].
+This fix possible security issue where file may be written outside of the
+Root directory.
+
+[#v0_60_0__lib_test]
+=== lib/test
+
+[ENHANCEMENT] +
+Inside the Assert, we call the [T.Helper] method.
+The Helper method mark the Assert function as test helper, which when
+printing file and line information, the stack trace from Assert function
+will be skipped.
+This remove manual lines skipping that previously we have.
+
+//}}}
+[#v0_59_0]
+== pakakeh.go v0.59.0 (2025-01-06)
+//{{{
+
+This is the first release of pakakeh.go on the year 2025.
+There are many new features and cleaning up, including packages that
+merged into single package with help of type parameters.
+
+The first major changes is indicated by using "go 1.23.4" as minimum Go
+version in this module, to allow us using new packages like "slices" and
+"maps".
+
+In this release notes, we try new format.
+Instead of grouping each changes by Breaking changes, New features, Bug
+fixes, Enhancements, and/or Chores; we group them by package.
+Each paragraph in the package sections will be prefixed with tag "[BREAKING
+CHANGE]", "[NEW FEATURE]", "[BUG FIX]", "[ENHANCEMENT]", "[CHORE]" to
+indicates the type of changes.
+
+
+[#v0_59_0__lib_binary]
+=== lib/binary
+
+The "lib/binary" is the new package that complement the standard binary
+package.
+
+[NEW FEATURE] +
+Implement append-only binary that encode the data using [binary.Writer].
+We call them "Apo" for short.
+
+[NEW FEATURE] +
+Implement buffer for reading/writing in BigEndian.
+The `BigEndianBuffer` provides backing storage for writing (most of) Go
+native types into binary in big-endian order.
+The zero value of BigEndianBuffer is an empty buffer ready to use.
+
+The following basic types are supported for Write and Read: bool, byte,
+int, float, complex, and string.
+The slice and array are also supported as long as the slice's element type
+is one of basic types.
+
+
+[#v0_59_0__lib_bytes]
+=== lib/bytes
+
+[BREAKING CHANGE] +
+In the "lib/bytes" we split the `hexdump` related functions to separate
+package, "lib/hexdump".
+
+
+[#v0_59_0__lib_floats64]
+=== lib/floats64
+
+[BREAKING CHANGE] +
+This package has been removed, merged into "slices" package.
+
+
+[#v0_59_0__lib_hexdump]
+=== lib/hexdump
+
+[NEW FEATURE] +
+Package `hexdump` implements reading and writing bytes from and into
+hexadecimal number.
+It support parsing output from
+https://man.archlinux.org/man/hexdump.1[hexdump(1)] tool.
+
+
+[#v0_59_0__lib_http]
+=== lib/http
+
+[NEW FEATURE] +
+In the [lib/http.Client] we add new method `Transport` that return default
+HTTP Transport.
+The returned [http.Transport] is created after the Client instantiated.
+Their value can be customized by user when needed, which should affect
+the Transport inside the Client.
+
+
+[#v0_59_0__lib_ints]
+=== lib/ints
+
+[BREAKING CHANGE] +
+This package has been removed, merged into "slices" package.
+
+
+[#v0_59_0__lib_ints64]
+=== lib/ints64
+
+[BREAKING CHANGE] +
+This package has been removed, merged into "slices" package.
+
+
+[#v0_59_0__lib_memfs]
+=== lib/memfs
+
+[ENHANCEMENT] +
+In the "lib/memfs" we refactoring the `Watch` method to use the new
+"watchfs/v2" package.
+
+[BREAKING CHANGE] +
+The old Watcher and DirWatcher types now moved to `watchfs` package.
+This changes require exporting method [memfs.MemFS.UpdateContent].
+
+
+[#v0_59_0__lib_numbers]
+=== lib/numbers
+
+[CHORE] +
+In the package level, we remove unused README and LICENSE files.
+This package README has been merged into the package documentation and the
+LICENSE is same with the module one.
+
+We also remove some package documentation that should be in "lib/slices".
+
+
+[#v0_59_0__lib_play]
+=== lib/play
+
+[NEW FEATURE] +
+The [lib/play] now has function and HTTP handler to run Go test code.
+Since the test must run inside the directory that contains
+the Go file to be tested, the [HTTPHandleTest] API accept the following
+request format,
+
+----
+{
+	"goversion": <string>,
+	"file": <string>,
+	"body": <string>,
+	"without_race": <boolean>
+}
+----
+
+The "file" field define the path to the "_test.go" file, default to
+"test_test.go" if its empty.
+The "body" field contains the Go code that will be saved to
+"file".
+The test will run, by default, with "go test -count=1 -race $dirname"
+where "$dirname" is the path directory to the "file" relative to where
+the program is running.
+If "without_race" is true, the test command will not run with "-race"
+option.
+
+[ENHANCEMENT] +
+On package level, the home and cache directory now initialized on package
+init since there are never changes when program running.
+If Go failed to get the home and cache it will be set to system temporary
+directory.
+
+[ENHANCEMENT] +
+We also simplify running Go code by removing the field `pid` in the struct
+`command` that wait for process ID.
+Instead we execute cmd with Run directly.
+In the Run function, we use the `UnsafeRun` to store temporary directory
+and move the statements that writes `go.mod` and `main.go` into the method
+writes of `Request`.
+This remove unnecessary `unsafeRun` function.
+
+
+[#v0_59_0__lib_reflect]
+=== lib/reflect
+
+[BREAKING CHANGE] +
+This release changes the Equal signature from "Equal(v any) bool" to
+"Equal(v any) error".
+The reason for this changes is to force the method to return an error
+message that is understand-able by caller.
+
+
+[#v0_59_0__lib_slices]
+=== lib/slices
+
+[NEW FEATURE] +
+Package "lib/ints", "lib/ints64", and "lib/floats64" are merged into
+"slices".
+Now that Go has type parameter, we can use it to use the same function
+that accept different types for working with slice of int, int64, and
+float64.
+
+
+[#v0_59_0__lib_ssh]
+=== lib/ssh
+
+[ENHANCEMENT] +
+In the lib/ssh, we implement Run with context internally.
+Instead of depends on fork of crypto with CL that needs
+https://go-review.googlesource.com/c/crypto/+/552435[proposal^],
+we implement them in here so we can update crypto module to the latest
+release.
+
+
+[#v0_59_0__lib_watchfs]
+=== lib/watchfs
+
+The `watchfs` package now contains the original, v1, of the
+`Watcher` and `DirWatcher` types from "lib/memfs".
+
+
+[#v0_59_0__lib_watchfs_v2]
+=== lib/watchfs/v2
+
+[NEW FEATURE] +
+The "lib/watchfs/v2" is the new package that implement new file and
+directory watcher, that replace the Watcher and DirWatcher in the
+"lib/memfs".
+
+The new implementation, `FileWatcher`, much more simple than what
+we have in [memfs.Watcher].
+
+The new directory watcher, DirWatcher, scan the content of directory in
+[fs.DirWatcherOptions.Root] recursively for the files to be watched, using
+the [fs.DirWatcherOptions.Includes] field.
+A single file, [fs.DirWatcherOptions.FileWatcherOptions.FilePath], will
+be watched for changes that trigger re-scanning the content of Root
+recursively.
+
+The result of re-scanning is list of the Includes files (only files not
+new directory) that are changes, which send to channel C.
+On each [os.FileInfo] received from C, a deleted file have
+[os.FileInfo.Size] equal to [NodeFlagDeleted].
+The channel send an empty slice if no changes.
+
+The implementation of file changes in this code is naive, using loop and
+comparison of mode, modification time, and size; at least it should
+works on most operating system.
+
+//}}}
