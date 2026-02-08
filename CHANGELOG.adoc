@@ -4,6 +4,7 @@
 = pakakeh.go CHANGELOG
 :std_url: https://pkg.go.dev
 :sectanchors:
+:stylesheet: default, changelog.css
 :toc:
 
 This Go module usually released every month, at the first week of the month.
@@ -37,30 +38,38 @@ Legend,
 * 💧: Chores
 
 [#v0_61_0]
-== pakakeh.go v0.61.0 (2026-xx-xx)
+== pakakeh.go v0.61.0 (2026-02-09)
 //{{{
 
-**🌼 cmd/httpdfs: implement systemd socket activation**
+[#v0_61_0__all]
+=== all
 
-The httpdfs program now can be activated using systemd.socket(5).
+==== 💧 all: convert license and copyright to use SPDX identifiers
 
-**🌼 lib/http: add field Listener to ServerOptions**
+With the help of
+https://kilabit.info/project/spdxconv/[spdxconv]
+tool, we able to bulk update all files license and copyright format to
+comply with SPDX formats.
 
-The field Listener allow user to pass [net.Listener] for accepting new
-connection using [http.Serve] or [http.ServeTLS].
 
-**🌱 lib/systemd: new package for socket-based activation**
+[#v0_61_0__cmd_https]
+=== cmd/httpdfs
 
-The `lib/systemd` package implement function `Listeners` that return list of
-file descriptor as [net.Listener], that enable program to run with
-systemd.socket(5) based activation.
+==== 🌼 cmd/httpdfs: implement systemd socket activation
 
-**🌼 lib/dns: use separate ServeMux for handling DoH**
+The httpdfs program now can be activated using
+https://man.archlinux.org/man/systemd.socket.5[systemd.socket(5)].
+
+
+[#v0_61_0__lib_dns]
+=== lib/dns
+
+==== 🌼 lib/dns: use separate ServeMux for handling DoH
 
 Using the [http.DefaultServeMux] will cause panic when the server
-restarted automatically.
+restarted manually using Stop-Start flow.
 
-**🌼 lib/dns: skip caching empty answer only for query type A**
+==== 🌼 lib/dns: skip caching empty answer only for query type A
 
 Previously, we did not store response with empty RR answer for all record
 types.
@@ -69,31 +78,33 @@ set, but browser will requesting them.
 So, to minimize traffic for those query we skip caching only for query type
 A and cache the rest of types.
 
-**🌼 lib/dns: remove DebugLevelDNS**
+==== 🌼 lib/dns: remove DebugLevelDNS
 
 The DebugLevelDNS log the error on DNS level, for example empty answer,
 error on name, class not implemented, refused; which is now on by
 default.
 
-**🌼 lib/dns: add option to set hook on server when receiving answer**
+==== 🌱 lib/dns: add option to set hook on server when receiving answer
 
 The hook function, OnAnswerReceived, will be triggered when server
 receive valid answer but before its put to caches.
 
-**🌼 lib/dns: add method to set TTL on Message**
+==== 🌱 lib/dns: add method to set TTL on Message
 
 The SetTTL method set all RRs answer time to live.
 
-**lib/dns: print the answer TTL in DebugLevelCache**
+==== 🌼 lib/dns: print the answer TTL in DebugLevelCache
 
 The log level cache changed to the following format,
 
-  ... {MSG_ID QNAME TYPE TTL} ...
+----
+... {MSG_ID QNAME TYPE TTL} ...
+----
 
 where MSG_ID is the message ID, QNAME is the question name, TYPE is the
 type of question, and TTL is the time-to-live of the answer.
 
-**🌼 lib/dns: simplify log message for DebugLevelCache**
+==== 🌼 lib/dns: simplify log message for DebugLevelCache
 
 For each logged request, there should be one line of response logged,
 success or fail.
@@ -103,7 +114,7 @@ This changes remove redundant log "^" (request forwarded) and
 The final log would be only "+" (new answer cached), or "#" (answer
 updated), or "!" (error).
 
-**🌼 lib/dns: increase the client default timeout from 6 to 60 seconds**
+==== 🌼 lib/dns: increase the client default timeout from 6 to 60 seconds
 
 The 6 seconds timeout will works only on fast, stable connection.
 
@@ -122,33 +133,25 @@ It is better that we receive the response and store it to caches, so
 the next query can be handled quickly, rather than timeout and retrying
 with the same error.
 
-**🌼 lib/test: export the constant for default data file name suffix**
+This method accept second paramter "format", default to
+'%h,%at,%an,%ae,%s' which print short hash, author commit timestamp,
+author name, author email, and subject; respectively separated by comma.
 
-Also, fix typo on the LoadDataDir regarding suffix by replacing it with
-the exported constant.
 
-**🌱 lib/test: implement method ExtractInput on Data**
+[#v0_61_0__lib_git]
+=== lib/git
 
-Given the path to directory `destDir`, create all of the
-[test.Data.Input] with key as its file name.
+==== 🌱 lib/git: expose the API for IgnorePattern
 
-If the input name contains "/", the path before the base name will be
-created along with its parent as long as it is under the `destDir`.
+The IgnorePattern is not exclusive to git only. Some program, like
+REUSE, use the same pattern in the REUSE.toml path configuration.
 
-For example, given input name "a/b/c.txt", it will create path "a/b/"
-inside `destDir` first, followed by file "c.txt" inside that path.
+==== 🌱 lib/git: add method LogFollow
 
-**🌱 lib/git: implement Gitignore**
+The LogFollow method return history of single file `path`, following
+rename.
 
-Gitignore is a type that represent ".gitignore" file.
-
-There are two ways to populate Gitignore, by using [LoadGitignore]
-function, or by using [Gitignore.Parse] method.
-
-After the Gitignore created, one can check if a path is ignored by
-using [Gitignore.IsIgnored] method, relative to the Gitignore directory.
-
-**🌱 lib/git: add Git type with method IsIgnored**
+==== 🌱 lib/git: add Git type with method IsIgnored
 
 The Git type is for working with single git repository.
 
@@ -162,7 +165,49 @@ The Git type implement Equaler interface.
 The Equaler interface provide the method Equal that when implemented
 can be used to compare two instances of struct.
 
-**🪵 lib/http: add second return value, statusCode, to FSHandler**
+==== 🌱 lib/git: implement Gitignore
+
+Gitignore is a type that represent ".gitignore" file.
+
+There are two ways to populate Gitignore, by using [LoadGitignore]
+function, or by using [Gitignore.Parse] method.
+
+After the Gitignore created, one can check if a path is ignored by
+using [Gitignore.IsIgnored] method, relative to the Gitignore directory.
+
+
+[#v0_61_0__lib_http]
+=== lib/http
+
+==== 🪵 lib/http: change HandleFS redirect status code to 301
+
+According to MDN
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections[Redirections in HTTP]
+the HTTP status 302 Found use case is for "Web page (that) is temporarily
+unavailable for unforeseen reasons.".
+
+This probably to re-route the page until the original page is fixed.
+While HTTP status 301 is for "Reorganization of a website.".
+
+Since the redirection in HandleFS only happen when user access directory
+without slash, we should make it permanent.
+
+==== 🌼 lib/http: set HandleFS to always end with slash "/"
+
+Previously, if request to directory does not end with "/", the HTTP
+server will return the index.html of that directory.
+This cause relative link inside the index.html broken when visited from
+browser.
+
+This changes make the request to directory always end with "/" by
+redirecting the request with status 303 Found.
+
+==== 🌱 lib/http: add field Listener to ServerOptions
+
+The field Listener allow user to pass [net.Listener] for accepting new
+connection using [http.Serve] or [http.ServeTLS].
+
+==== 🪵 lib/http: add second return value, statusCode, to FSHandler
 
 Non-zero status code indicates that the function already response
 to the request, and the server will return immediately.
@@ -170,14 +215,22 @@ to the request, and the server will return immediately.
 Zero status code indicates that the function did not process the request,
 it is up to server to process the returned node `out`.
 
-**🌼 lib/ini: improve error message when parsing variable name**
+
+[#v0_61_0__lib_ini]
+=== lib/ini
+
+==== 🌼 lib/ini: improve error message when parsing variable name
 
 Display the invalid character in the error message with quote, so space
 can detected.
 Also, export the error variable so external caller can detect it using the
 variable.
 
-**🌱 lib/os: add function IsBinaryStream**
+
+[#v0_61_0__lib_os]
+=== lib/os
+
+==== 🌱 lib/os: add function IsBinaryStream
 
 The IsBinaryStream return true if the content has more than 75%
 non-printable characters, excluding spaces.
@@ -185,31 +238,40 @@ non-printable characters, excluding spaces.
 While at it, replace the body of IsBinary with it and update the
 test cases to use the internal files.
 
-**🌱 lib/git: add method LogFollow**
 
-The LogFollow method return history of single file `path`, following
-rename.
+[#v0_61_0__lib_systemd]
+=== lib/systemd
 
-This method accept second paramter "format", default to
-'%h,%at,%an,%ae,%s' which print short hash, author commit timestamp,
-author name, author email, and subject; respectively separated by comma.
+==== 🌱 lib/systemd: new package for socket-based activation
 
-**🌱 lib/git: expose the API for IgnorePattern**
+The `lib/systemd` package implement function `Listeners` that return list of
+file descriptor as [net.Listener], that enable program to run with
+systemd.socket(5) based activation.
 
-The IgnorePattern is not exclusive to git only. Some program, like
-REUSE, use the same pattern in the REUSE.toml path configuration.
 
-**🌼 lib/test: ignore line prefixed with "//"**
+[#v0_61_0__lib_test]
+=== lib/test
+
+==== 🌼 lib/test: ignore line prefixed with "//"
 
 The first line in test data file may contains line prefixed with "//"
 as comment.
 The use case is for license and copyright lines.
 
-**💧 all: convert license and copyright to use SPDX identifiers**
+==== 🌱 lib/test: implement method ExtractInput on Data
 
-With help of spdxconv tool [1], we able to bulk update all files license
-and copyright format to comply with SPDX formats.
+Given the path to directory `destDir`, create all of the
+[test.Data.Input] with key as its file name.
 
-[1] https://kilabit.info/project/spdxconv/
+If the input name contains "/", the path before the base name will be
+created along with its parent as long as it is under the `destDir`.
+
+For example, given input name "a/b/c.txt", it will create path "a/b/"
+inside `destDir` first, followed by file "c.txt" inside that path.
+
+==== 🌼 lib/test: export the constant for default data file name suffix
+
+Also, fix typo on the LoadDataDir regarding suffix by replacing it with
+the exported constant.
 
 //}}}
