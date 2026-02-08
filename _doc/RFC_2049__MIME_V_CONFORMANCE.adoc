@@ -3,7 +3,6 @@
 
 =  MIME Part Five: Conformance Criteria and Examples
 :toc:
-:sectlinks:
 :sectnums:
 :url-rfc2049: https://tools.ietf.org/html/rfc2049
 

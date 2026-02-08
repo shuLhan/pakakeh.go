@@ -4,7 +4,6 @@
 = Analysis of Threats Motivating DomainKeys Identified Mail (DKIM)
 :toc:
 :sectnums:
-:sectlinks:
 :url-rfc4686: https://tools.ietf.org/html/rfc4686
 
 This document provide note and summary of

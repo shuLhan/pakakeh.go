@@ -5,7 +5,6 @@
 Shulhan <ms@kilabit.info>
 :toc:
 :sectanchors:
-:sectlinks:
 
 This library is released every month, usually at the first week of month.
 

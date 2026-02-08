@@ -4,7 +4,6 @@
 = SMTP Service Extension for Secure SMTP over Transport Layer Security
 :toc:
 :toclevels: 4
-:sectlinks:
 :sectnums:
 :url-rfc3207: https://tools.ietf.org/html/rfc3207
 

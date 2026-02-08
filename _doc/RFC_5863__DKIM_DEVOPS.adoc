@@ -4,7 +4,6 @@
 = DomainKeys Identified Mail (DKIM) Development, Deployment, and Operations
 :toc:
 :sectnums:
-:sectlinks:
 :url-rfc5863: https://tools.ietf.org/html/rfc5863
 
 This document provide note and summary of {url-rfc5863}[RFC 5863^],

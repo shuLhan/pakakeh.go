@@ -3,7 +3,6 @@
 
 = The Content-Disposition Header Field
 :toc:
-:sectlinks:
 :sectnums:
 :url-rfc2183: https://tools.ietf.org/html/rfc2183
 

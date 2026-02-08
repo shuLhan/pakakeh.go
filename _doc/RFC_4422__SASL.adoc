@@ -4,7 +4,6 @@
 = Simple Authentication and Security Layer (SASL)
 :toc:
 :sectnums:
-:sectlinks:
 
 This document provide note and summary of RFC 4422, Simple Authentication and
 Security Layer (SASL).

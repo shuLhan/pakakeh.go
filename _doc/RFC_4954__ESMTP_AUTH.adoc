@@ -5,7 +5,6 @@
 :toc:
 :toclevels: 4
 :sectnums:
-:sectlinks:
 :url-rfc4954: https://tools.ietf.org/html/rfc4954
 
 This document provide note and summary of

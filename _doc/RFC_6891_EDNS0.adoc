@@ -3,7 +3,6 @@
 
 =  Extension Mechanisms for DNS - EDNS(0)
 :toc:
-:sectlinks:
 
 The
 https://datatracker.ietf.org/doc/html/rfc6891[RFC 6891]

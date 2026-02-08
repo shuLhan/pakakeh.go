@@ -4,7 +4,6 @@
 = DomainKeys Identified Mail (DKIM) Service Overview
 :toc:
 :sectnums:
-:sectlinks:
 :url-rfc5585: https://tools.ietf.org/html/rfc5585
 
 This document provide note and summary of

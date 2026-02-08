@@ -4,7 +4,6 @@
 = The PLAIN Simple Authentication and Security Layer (SASL) Mechanism
 :toc:
 :sectnums:
-:sectlinks:
 :url-rfc4616: https://tools.ietf.org/html/rfc4616
 
 This document provide note and summary of

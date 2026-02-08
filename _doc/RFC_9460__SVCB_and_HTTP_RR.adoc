@@ -3,7 +3,6 @@
 
 = RFC 9460 - Service Binding and Parameter Specification via the DNS
 :toc:
-:sectlinks:
 
 This notes is intended for user who already know DNS message format, RDATA,
 and zone file.

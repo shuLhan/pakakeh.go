@@ -6,7 +6,6 @@ Shulhan <ms@kilabit.info>
 3 July 2022
 :toc:
 :sectanchors:
-:sectlinks:
 
 link:CHANGELOG.html[Latest changelog^].
 

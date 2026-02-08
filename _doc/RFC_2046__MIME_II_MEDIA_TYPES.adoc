@@ -3,7 +3,6 @@
 
 =  MIME Part Two: Media Types
 :toc:
-:sectlinks:
 :sectnums:
 :url-rfc2046: https://tools.ietf.org/html/rfc2046
 

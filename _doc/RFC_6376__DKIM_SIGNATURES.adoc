@@ -4,7 +4,6 @@
 = DomainKeys Identified Mail (DKIM) Signatures
 :toc:
 :sectnums:
-:sectlinks:
 :url-rfc4685: https://tools.ietf.org/html/rfc4685
 :url-rfc5585: https://tools.ietf.org/html/rfc5585
 :url-rfc5863: https://tools.ietf.org/html/rfc5863

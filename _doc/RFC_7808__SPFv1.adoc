@@ -4,7 +4,6 @@
 =  Sender Policy Framework (SPF) for Authorizing Use of Domains in Email, Version 1
 :toc:
 :sectnums:
-:sectlinks:
 :url-rfc7208: https://tools.ietf.org/html/rfc7208
 
 This document provide note and summary of

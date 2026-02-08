@@ -3,7 +3,6 @@
 
 =  MIME Part One: Format of Internet Message Bodies
 :toc:
-:sectlinks:
 :sectnums:
 :url-rfc2045: https://tools.ietf.org/html/rfc2045
 
