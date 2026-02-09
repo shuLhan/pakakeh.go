@@ -148,8 +148,14 @@ func TestGit_Equal(t *testing.T) {
 		v: nilgit,
 	}}
 
+	// We cannot add and commit file under .git directory, so we must
+	// create the directory manually here.
+	err := os.MkdirAll(`testdata/Equal/.git`, 0755)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	var agit *Git
-	var err error
 	agit, err = New(`testdata/Equal`)
 	if err != nil {
 		t.Fatal(err)
@@ -164,6 +170,13 @@ func TestGit_Equal(t *testing.T) {
 }
 
 func TestGit_IsIgnored(t *testing.T) {
+	// We cannot add and commit file under .git directory, so we must
+	// create the directory manually here.
+	err := os.MkdirAll(`testdata/IsIgnored/.git`, 0755)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	agit, err := New(`testdata/IsIgnored/`)
 	if err != nil {
 		t.Fatal(err)
