@@ -212,6 +212,14 @@ func TestGit_LogFollow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	logs, err := agit.LogFollow(`.`, ``)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(logs) <= 1 {
+		t.Skip(`Repository is shallow cloned.`)
+		return
+	}
 	listCase := []struct {
 		path     string
 		expError string
