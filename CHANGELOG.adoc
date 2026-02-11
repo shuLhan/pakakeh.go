@@ -38,8 +38,8 @@ Legend,
 * 💧: Chores
 
 
-[#v0_61_1]
-== pakakeh.go v0.61.1 (2026-xx-xx)
+[#v0_62_0]
+== pakakeh.go v0.62.0 (2026-xx-xx)
 //{{{
 
 [#v0_61_1_lib_http]
@@ -56,6 +56,15 @@ to redirect URL.
 
 Any trailing slash in the BasePath will be removed.
 
+=== 🌱 Implement server auto shutdown when idle
+
+In the `ServerOptions`, we add option `ShutdownIdleDuration` when set to
+non-zero value it will start a timer.
+When the timer expired, the server will stop accepting new connection and
+then shutting down.
+
+This allow de-activating HTTP server when no connections received after
+specific duration to reduce the system resources.
 
 //}}}
 [#v0_61_0]

@@ -46,6 +46,8 @@ type Server struct {
 	// Modifying the value of Options after server has been started may
 	// cause undefined effects.
 	Options ServerOptions
+
+	shutdownIdleTimer *time.Timer
 }
 
 // NewServer create and initialize new HTTP server that serve root directory
@@ -323,6 +325,14 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 
 // ServeHTTP handle mapping of client request to registered endpoints.
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	if srv.shutdownIdleTimer != nil {
+		ok := srv.shutdownIdleTimer.Reset(srv.Options.ShutdownIdleDuration)
+		if !ok {
+			// Timer had expired or been stopped.
+			return
+		}
+	}
+
 	req.URL.Path = strings.TrimPrefix(req.URL.Path, srv.Options.BasePath)
 
 	switch req.Method {
@@ -358,6 +368,31 @@ func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 // Start the HTTP server.
 func (srv *Server) Start() (err error) {
+	if srv.Options.ShutdownIdleDuration == 0 {
+		return srv.serve()
+	}
+
+	srv.shutdownIdleTimer = time.NewTimer(srv.Options.ShutdownIdleDuration)
+	go func() {
+		err = srv.serve()
+	}()
+	ever := true
+	for ever {
+		select {
+		case <-srv.shutdownIdleTimer.C:
+			ever = false
+			ok := srv.shutdownIdleTimer.Stop()
+			if !ok {
+				// Stop has been called manually.
+				break
+			}
+			err = srv.Stop(0)
+		}
+	}
+	return err
+}
+
+func (srv *Server) serve() (err error) {
 	if srv.Server.TLSConfig == nil {
 		if srv.Options.Listener == nil {
 			err = srv.Server.ListenAndServe()
@@ -380,6 +415,13 @@ func (srv *Server) Start() (err error) {
 // Stop the server using Shutdown method. The wait is set default and minimum
 // to five seconds.
 func (srv *Server) Stop(wait time.Duration) (err error) {
+	if srv.shutdownIdleTimer != nil {
+		ok := srv.shutdownIdleTimer.Stop()
+		if !ok {
+			// The timer has been stopped by other goroutine.
+			return nil
+		}
+	}
 	var defWait = 5 * time.Second
 	if wait <= defWait {
 		wait = defWait

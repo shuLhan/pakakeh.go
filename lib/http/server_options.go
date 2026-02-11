@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
@@ -62,6 +63,11 @@ type ServerOptions struct {
 
 	// The options for Cross-Origin Resource Sharing.
 	CORS CORSOptions
+
+	// ShutdownIdleDuration define the duration where the server will
+	// automatically stop accepting new connection and then shutting down
+	// the server.
+	ShutdownIdleDuration time.Duration
 
 	// If true, server generate index.html automatically if its not
 	// exist in the directory.

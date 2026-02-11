@@ -1569,3 +1569,26 @@ func runServerFS(t *testing.T, address, dir string) (srv *Server) {
 
 	return srv
 }
+
+func TestServer_ShutdownIdleDuration(t *testing.T) {
+	opts := ServerOptions{
+		Address:              `127.0.0.1:21000`,
+		ShutdownIdleDuration: 500 * time.Millisecond,
+	}
+	srv, err := NewServer(opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	waitq := make(chan struct{}, 1)
+	waitTimer := time.NewTimer(time.Second)
+	go func() {
+		err = srv.Start()
+		waitq <- struct{}{}
+	}()
+	select {
+	case <-waitq:
+		// Server shutdown after idle.
+	case <-waitTimer.C:
+		t.Fatalf(`expecting shutdown after %v`, opts.ShutdownIdleDuration)
+	}
+}
