@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
@@ -38,6 +39,16 @@ type ServerOptions struct {
 	// This field is optional, default to ":80".
 	Address string
 
+	// BasePath define the base path or prefix to serve the HTTP request
+	// and response.
+	// Each request that server received will remove the BasePath first
+	// from the [http.Request.URL.Path] before passing to the handler.
+	// Each redirect that server sent will add the BasePath as the prefix
+	// to redirect URL.
+	//
+	// Any trailing slash in the BasePath will be removed.
+	BasePath string
+
 	// Conn contains custom HTTP server connection.
 	// This fields is optional.
 	Conn *http.Server
@@ -63,6 +74,8 @@ func (opts *ServerOptions) init() {
 	if len(opts.Address) == 0 {
 		opts.Address = ":80"
 	}
+
+	opts.BasePath = strings.TrimRight(opts.BasePath, `/`)
 
 	if opts.Conn == nil {
 		opts.Conn = &http.Server{

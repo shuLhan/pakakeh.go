@@ -1,6 +1,5 @@
-// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
-//
 // SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2018 M. Shulhan <ms@kilabit.info>
 
 package http
 
@@ -82,6 +81,11 @@ func NewServer(opts ServerOptions) (srv *Server, err error) {
 func (srv *Server) RedirectTemp(res http.ResponseWriter, redirectURL string) {
 	if len(redirectURL) == 0 {
 		redirectURL = "/"
+	}
+	endWithSlash := redirectURL[len(redirectURL)-1] == '/'
+	redirectURL = path.Join(srv.Options.BasePath, redirectURL)
+	if endWithSlash {
+		redirectURL += `/`
 	}
 	res.Header().Set(HeaderLocation, redirectURL)
 	res.WriteHeader(http.StatusTemporaryRedirect)
@@ -319,6 +323,8 @@ func (srv *Server) registerPut(ep *Endpoint) (err error) {
 
 // ServeHTTP handle mapping of client request to registered endpoints.
 func (srv *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	req.URL.Path = strings.TrimPrefix(req.URL.Path, srv.Options.BasePath)
+
 	switch req.Method {
 	case http.MethodDelete:
 		srv.handleDelete(res, req)
@@ -481,6 +487,11 @@ func (srv *Server) HandleFS(res http.ResponseWriter, req *http.Request) {
 		// If request path is a directory and it is not end with
 		// slash, redirect request to location with slash to allow
 		// relative links works inside the HTML content.
+		endWithSlash := redirectURL.Path[len(redirectURL.Path)-1] == '/'
+		redirectURL.Path = path.Join(srv.Options.BasePath, redirectURL.Path)
+		if endWithSlash {
+			redirectURL.Path += `/`
+		}
 		http.Redirect(res, req, redirectURL.String(), http.StatusMovedPermanently)
 		return
 	}

@@ -37,6 +37,27 @@ Legend,
 * 🌼: Enhancement
 * 💧: Chores
 
+
+[#v0_61_1]
+== pakakeh.go v0.61.1 (2026-xx-xx)
+//{{{
+
+[#v0_61_1_lib_http]
+=== lib/http
+
+==== 🌱 Add BasePath to the ServerOptions
+
+The BasePath allow server to serve HTTP from custom prefix, other than "/".
+
+Each request that server received will remove the BasePath first
+from the [http.Request.URL.Path] before passing to the handler.
+Each redirect that server sent will add the BasePath as the prefix
+to redirect URL.
+
+Any trailing slash in the BasePath will be removed.
+
+
+//}}}
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-02-09)
 //{{{
