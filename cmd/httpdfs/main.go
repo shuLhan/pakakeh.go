@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	pakakeh "git.sr.ht/~shulhan/pakakeh.go"
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
@@ -24,22 +25,40 @@ const (
 )
 
 func main() {
+	var serverOpts = libhttp.ServerOptions{
+		EnableIndexHTML: true,
+	}
+
 	var (
-		flagAddress string
 		flagExclude string
 		flagInclude string
 
 		flagHelp    bool
 		flagVersion bool
 	)
+	var shutdownIdleDuration string
 
-	flag.StringVar(&flagAddress, `address`, defAddress, `Listen address`)
+	flag.StringVar(&serverOpts.Address, `address`, defAddress,
+		`Set listen address.`)
+	flag.StringVar(&serverOpts.BasePath, `base-path`, ``,
+		`Set the base path (or prefix) for handling HTTP request.`)
+	flag.StringVar(&shutdownIdleDuration, `shutdown-idle`, ``,
+		`Set the duration when server will shutting down after idle.`)
+
 	flag.StringVar(&flagExclude, `exclude`, ``, `Regex to exclude files in base directory`)
 	flag.BoolVar(&flagHelp, `help`, false, `Print the command usage`)
 	flag.StringVar(&flagInclude, `include`, ``, `Regex to include files in base directory`)
 	flag.BoolVar(&flagVersion, `version`, false, `Print the program version`)
 
 	flag.Parse()
+
+	var err error
+	if shutdownIdleDuration != `` {
+		serverOpts.ShutdownIdleDuration, err = time.ParseDuration(shutdownIdleDuration)
+		if err != nil {
+			log.Fatalf(`invalid shutdown-idle %s: %s`, shutdownIdleDuration, err)
+		}
+	}
 
 	var cmdName = os.Args[0]
 
@@ -52,10 +71,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	var (
-		dirBase = flag.Arg(0)
-		err     error
-	)
+	var dirBase = flag.Arg(0)
 	if len(dirBase) == 0 {
 		dirBase, err = os.Getwd()
 		if err != nil {
@@ -69,7 +85,6 @@ func main() {
 			MaxFileSize: -1,
 			TryDirect:   true,
 		}
-		mfs *memfs.MemFS
 	)
 	if len(flagInclude) != 0 {
 		mfsOpts.Includes = []string{flagInclude}
@@ -78,19 +93,10 @@ func main() {
 		mfsOpts.Excludes = []string{flagExclude}
 	}
 
-	mfs, err = memfs.New(&mfsOpts)
+	serverOpts.Memfs, err = memfs.New(&mfsOpts)
 	if err != nil {
 		log.Fatalf(`%s: %s`, cmdName, err)
 	}
-
-	var (
-		serverOpts = libhttp.ServerOptions{
-			Memfs:           mfs,
-			Address:         flagAddress,
-			EnableIndexHTML: true,
-		}
-		httpd *libhttp.Server
-	)
 
 	listeners, err := systemd.Listeners(true)
 	if err != nil {
@@ -108,6 +114,8 @@ func main() {
 		}
 	}
 
+	var httpd *libhttp.Server
+
 	httpd, err = libhttp.NewServer(serverOpts)
 	if err != nil {
 		log.Fatalf(`%s: %s`, cmdName, err)
@@ -117,7 +125,7 @@ func main() {
 	signal.Notify(signalq, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		log.Printf(`%s: serving %q at http://%s`, cmdName, dirBase, flagAddress)
+		log.Printf(`%s: serving %q at http://%s`, cmdName, dirBase, serverOpts.Address)
 		var errStart = httpd.Start()
 		if errStart != nil {
 			log.Printf(`%s: %s`, cmdName, errStart)

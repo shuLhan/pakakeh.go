@@ -42,7 +42,18 @@ Legend,
 == pakakeh.go v0.62.0 (2026-xx-xx)
 //{{{
 
-[#v0_61_1_lib_http]
+[#v0_62_0__cmd_httpdfs]
+=== cmd/httpdfs
+
+==== 🌱 Add option to set base path and shutdown idle duration
+
+The `-base-path` option set the URL prefix for serving HTTP request.
+
+The `-shutdown-idle` option set the duration when server will stop accepting
+new connections and shutting down.
+
+
+[#v0_62_0__lib_http]
 === lib/http
 
 ==== 🌱 Add BasePath to the ServerOptions
