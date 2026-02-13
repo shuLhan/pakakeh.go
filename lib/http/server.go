@@ -33,6 +33,8 @@ const (
 type Server struct {
 	*http.Server
 
+	shutdownIdleTimer *time.Timer
+
 	evals        []Evaluator
 	routeDeletes []*route
 	routeGets    []*route
@@ -46,8 +48,6 @@ type Server struct {
 	// Modifying the value of Options after server has been started may
 	// cause undefined effects.
 	Options ServerOptions
-
-	shutdownIdleTimer *time.Timer
 }
 
 // NewServer create and initialize new HTTP server that serve root directory
