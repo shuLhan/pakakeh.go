@@ -128,12 +128,12 @@ func ExampleRoute_Set() {
 		log.Fatal(err)
 	}
 
-	rute.Set(`user`, `shuLhan`)
+	rute.Set(`user`, `~shulhan`)
 	fmt.Println(rute)
 
-	rute.Set(`repo`, `share`)
+	rute.Set(`repo`, `pakakeh.go`)
 	fmt.Println(rute)
 	// Output:
-	// /shuLhan/:repo
-	// /shuLhan/share
+	// /~shulhan/:repo
+	// /~shulhan/pakakeh.go
 }
