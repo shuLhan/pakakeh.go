@@ -77,6 +77,13 @@ then shutting down.
 This allow de-activating HTTP server when no connections received after
 specific duration to reduce the system resources.
 
+=== 🌼 lib/http: fix possible data race in SSE connection
+
+When server's handler call Write or WriteRaw, there is possibility that
+the worker for keeping the connection alive also call Write at the same
+time, which cause the data race.
+
+
 //}}}
 [#v0_61_0]
 == pakakeh.go v0.61.0 (2026-02-09)

@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -28,6 +29,10 @@ type SSEConn struct {
 
 	bufrw *bufio.ReadWriter
 	conn  net.Conn
+
+	// bufrwMtx protects the concurrent write between client and
+	// workerKeepAlive.
+	bufrwMtx sync.Mutex
 }
 
 // WriteEvent write message with optional event type and id to client.
@@ -61,21 +66,23 @@ func (ep *SSEConn) WriteEvent(event, data string, id *string) (err error) {
 
 	ep.writeData(&buf, data, id)
 
-	_, err = ep.bufrw.Write(buf.Bytes())
+	err = ep.WriteRaw(buf.Bytes())
 	if err != nil {
 		return fmt.Errorf(`WriteEvent: %w`, err)
 	}
-	ep.bufrw.Flush()
 	return nil
 }
 
 // WriteRaw write raw event message directly, without any parsing.
 func (ep *SSEConn) WriteRaw(msg []byte) (err error) {
+	ep.bufrwMtx.Lock()
 	_, err = ep.bufrw.Write(msg)
 	if err != nil {
+		ep.bufrwMtx.Unlock()
 		return fmt.Errorf(`WriteRaw: %w`, err)
 	}
 	ep.bufrw.Flush()
+	ep.bufrwMtx.Unlock()
 	return nil
 }
 
