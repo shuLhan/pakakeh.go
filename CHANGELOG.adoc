@@ -67,7 +67,7 @@ to redirect URL.
 
 Any trailing slash in the BasePath will be removed.
 
-=== 🌱 Implement server auto shutdown when idle
+==== 🌱 Implement server auto shutdown when idle
 
 In the `ServerOptions`, we add option `ShutdownIdleDuration` when set to
 non-zero value it will start a timer.
@@ -77,11 +77,23 @@ then shutting down.
 This allow de-activating HTTP server when no connections received after
 specific duration to reduce the system resources.
 
-=== 🌼 lib/http: fix possible data race in SSE connection
+==== 🌼 lib/http: fix possible data race in SSE connection
 
 When server's handler call Write or WriteRaw, there is possibility that
 the worker for keeping the connection alive also call Write at the same
 time, which cause the data race.
+
+
+[#v0_62_0__lib_uuidv7]
+=== lib/uuidv7
+
+New package that implements UUID version 7.
+
+The uuidv7 package provides type UUIDv7 as the container for UUID
+version 7 that satisfy the [database/sql], [encoding/gob], and
+[encoding/json].
+
+The implementation follow RFC 9562.
 
 
 //}}}
