@@ -77,6 +77,27 @@ func (id UUIDv7) Bytes() (data []byte) {
 	return data
 }
 
+// Equal returns nil if id and v are equals.
+// This method implements [git.sr.ht/~shulhan/pakakeh.go/lib/reflect.Equaler]
+// interface.
+func (id *UUIDv7) Equal(v any) (err error) {
+	ptr, ok := v.(*UUIDv7)
+	if !ok {
+		other, ok := v.(UUIDv7)
+		if !ok {
+			return fmt.Errorf(`uuidv7: Equal: want type %T, got %T`, &id, v)
+		}
+		ptr = &other
+	}
+	if id.high != ptr.high {
+		return fmt.Errorf(`uuidv7: not equal, want %s, got %s`, id.String(), ptr.String())
+	}
+	if id.low != ptr.low {
+		return fmt.Errorf(`uuidv7: not equal, want %s, got %s`, id.String(), ptr.String())
+	}
+	return nil
+}
+
 // IsZero returns true if all bits is zero.
 func (id UUIDv7) IsZero() bool {
 	return id.high == 0 && id.low == 0

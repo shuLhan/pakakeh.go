@@ -46,6 +46,25 @@ func ExampleParse() {
 	// false 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF 2026-03-09 14:20:01.123 +0000 UTC
 }
 
+func ExampleUUIDv7_Equal() {
+	id := uuidv7.Parse(`019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF`)
+	id2 := uuidv7.Parse(`019CD2F8-2AE3-774E-BFFF-FFFFFFFFFFFF`)
+
+	err := id.Equal(id)
+	fmt.Printf("%v\n", err)
+
+	err = id.Equal(&id)
+	fmt.Printf("%v\n", err)
+
+	err = id.Equal(&id2)
+	fmt.Printf("%v\n", err)
+
+	// Output:
+	// <nil>
+	// <nil>
+	// uuidv7: not equal, want 019CD2F8-1AE3-774E-BFFF-FFFFFFFFFFFF, got 019CD2F8-2AE3-774E-BFFF-FFFFFFFFFFFF
+}
+
 func ExampleUUIDv7_MarshalBinary() {
 	now := time.Date(2026, 3, 9, 14, 20, 0, 123456700, time.UTC)
 	uuidv7.Now = func() time.Time {
