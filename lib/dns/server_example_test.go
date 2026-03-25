@@ -51,7 +51,7 @@ func ExampleServer() {
 		serverAddress = "127.0.0.1:5300"
 		serverOptions = &ServerOptions{
 			ListenAddress:    "127.0.0.1:5300",
-			HTTPPort:         8443,
+			DoHListen:        "127.0.0.1:8443",
 			TLSCertFile:      "testdata/domain.crt",
 			TLSPrivateKey:    "testdata/domain.key",
 			TLSAllowInsecure: true,

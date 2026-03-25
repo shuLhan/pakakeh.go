@@ -14,7 +14,6 @@ import (
 const (
 	testServerAddress    = "127.0.0.1:5300"
 	testDoTServerAddress = "127.0.0.1:18053"
-	testTLSPort          = 18053
 
 	// Equal to 2023-08-05 07:53:20 +0000 UTC.
 	testNowEpoch = 1691222000
@@ -47,8 +46,8 @@ func runServer() {
 	var (
 		serverOptions = &ServerOptions{
 			ListenAddress:    "127.0.0.1:5300",
-			HTTPPort:         8443,
-			TLSPort:          testTLSPort,
+			DoHListen:        `127.0.0.1:8443`,
+			DoTListen:        testDoTServerAddress,
 			TLSCertFile:      "testdata/domain.crt",
 			TLSPrivateKey:    "testdata/domain.key",
 			TLSAllowInsecure: true,

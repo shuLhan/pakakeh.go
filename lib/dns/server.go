@@ -194,10 +194,10 @@ func (srv *Server) ListenAndServe() (err error) {
 	srv.startAllForwarders()
 
 	go srv.processRequest()
-	if srv.opts.TLSPort > 0 {
+	if srv.opts.DoTListen != `` {
 		go srv.serveDoT()
 	}
-	if srv.opts.HTTPPort > 0 {
+	if srv.opts.DoHListen != `` {
 		go srv.serveDoH()
 	}
 	go srv.serveTCP()
@@ -242,17 +242,14 @@ func (srv *Server) Stop() {
 // serveDoH listen for request over HTTPS using certificate and key
 // file in parameter.  The path to request is static "/dns-query".
 func (srv *Server) serveDoH() {
-	var (
-		logp = `serveDoH`
-		addr = srv.opts.getHTTPAddress().String()
-	)
+	logp := `serveDoH`
 
 	var mux = http.NewServeMux()
 
 	mux.Handle(`/dns-query`, srv)
 
 	srv.doh = &http.Server{
-		Addr:              addr,
+		Addr:              srv.opts.DoHListen,
 		IdleTimeout:       srv.opts.HTTPIdleTimeout,
 		ReadHeaderTimeout: 5 * time.Second,
 		Handler:           mux,
@@ -260,11 +257,11 @@ func (srv *Server) serveDoH() {
 
 	var err error
 	if srv.tlsConfig != nil && !srv.opts.DoHBehindProxy {
-		log.Printf(`%s: listening at %s`, logp, addr)
+		log.Printf(`%s: listening at %s`, logp, srv.doh.Addr)
 		srv.doh.TLSConfig = srv.tlsConfig
 		err = srv.doh.ListenAndServeTLS("", "")
 	} else {
-		log.Printf(`%s: listening behind proxy at %s`, logp, addr)
+		log.Printf(`%s: listening behind proxy at %s`, logp, srv.doh.Addr)
 		err = srv.doh.ListenAndServe()
 	}
 	if errors.Is(err, io.EOF) {
@@ -278,13 +275,18 @@ func (srv *Server) serveDoH() {
 
 func (srv *Server) serveDoT() {
 	var (
-		logp    = `serveDoT`
-		dotAddr = srv.opts.getDoTAddress()
+		logp = `serveDoT`
 
 		cl   *TCPClient
 		conn net.Conn
 		err  error
 	)
+
+	dotAddr, err := net.ResolveTCPAddr(`tcp`, srv.opts.DoTListen)
+	if err != nil {
+		log.Printf(`%s: %s`, logp, err)
+		return
+	}
 
 	for {
 		if srv.opts.DoHBehindProxy || srv.tlsConfig == nil {

@@ -41,6 +41,14 @@ type ServerOptions struct {
 	// This field is optional, default to "0.0.0.0:53".
 	ListenAddress string `ini:"dns:server:listen"`
 
+	// DoHListen address for listening DNS over HTTP (DoH).
+	// If its empty, the server will not serve DoH.
+	DoHListen string `ini:"dns:server:doh.listen"`
+
+	// DoTListen address for listening DNS over TLS (DoT).
+	// If its empty, the server will not serve DoT.
+	DoTListen string `ini:"dns:server:dot.listen"`
+
 	// TLSCertFile contains path to certificate for serving DNS over TLS
 	// and HTTPS.
 	// This field is optional, if its empty, server will listening on
@@ -108,14 +116,6 @@ type ServerOptions struct {
 	// it.
 	Debug int `ini:"dns:server:debug"`
 
-	// HTTPPort port for listening DNS over HTTP (DoH), default to 0.
-	// If its zero, the server will not serve DNS over HTTP.
-	HTTPPort uint16 `ini:"dns:server:http.port"`
-
-	// TLSPort port for listening DNS over TLS, default to 0.
-	// If its zero, the server will not serve DNS over TLS.
-	TLSPort uint16 `ini:"dns:server:tls.port"`
-
 	port uint16
 
 	// TLSAllowInsecure option to allow to serve DoH with self-signed
@@ -177,20 +177,6 @@ func (opts *ServerOptions) getTCPAddress() *net.TCPAddr {
 	return &net.TCPAddr{
 		IP:   opts.ip,
 		Port: int(opts.port),
-	}
-}
-
-func (opts *ServerOptions) getHTTPAddress() *net.TCPAddr {
-	return &net.TCPAddr{
-		IP:   opts.ip,
-		Port: int(opts.HTTPPort),
-	}
-}
-
-func (opts *ServerOptions) getDoTAddress() *net.TCPAddr {
-	return &net.TCPAddr{
-		IP:   opts.ip,
-		Port: int(opts.TLSPort),
 	}
 }
 
