@@ -6,6 +6,7 @@ package uuidv7
 
 import (
 	"crypto/rand"
+	"database/sql/driver"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -216,4 +217,11 @@ func (id *UUIDv7) Time() time.Time {
 	millis := id.high >> 16
 	t := time.UnixMilli(int64(millis))
 	return t
+}
+
+// Value returns the value for sending it to the database.
+// This method implements the [driver.Valuer] interface.
+func (id UUIDv7) Value() (v driver.Value, err error) {
+	v = id.String()
+	return v, nil
 }
