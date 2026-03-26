@@ -10,7 +10,7 @@ require (
 	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
 	golang.org/x/net v0.51.0
 	golang.org/x/sys v0.42.0
-	golang.org/x/term v0.40.0
+	golang.org/x/term v0.41.0
 	golang.org/x/tools v0.42.0
 )
 
@@ -20,6 +20,6 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 )
 
-//replace golang.org/x/crypto => ../go-x-crypto
+replace golang.org/x/crypto => git.sr.ht/~shulhan/go-x-crypto v0.49.1-0.20260326231004-e6291d138282
 
 //replace golang.org/x/term => ../../../golang.org/x/term

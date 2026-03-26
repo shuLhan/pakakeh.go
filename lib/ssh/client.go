@@ -87,7 +87,7 @@ func NewClientInteractive(section *sshconfig.Section) (cl *Client, err error) {
 		remoteAddr: fmt.Sprintf(`%s:%s`, section.Hostname(), section.Port()),
 	}
 
-	err = cl.setConfigHostKeyCallback()
+	err = cl.setConfigHostKey()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -134,13 +134,14 @@ func NewClientInteractive(section *sshconfig.Section) (cl *Client, err error) {
 	return cl, nil
 }
 
-// setConfigHostKeyCallback set the [sshconfig.HostKeyCallback] based on the
-// UserKnownHostsFile in the Section.
+// setConfigHostKey sets the [ssh.ClientConfig.HostKeyCallback] and
+// [ssh.ClientConfig.HostKeyAlgorithms] based on the UserKnownHostsFile in the
+// Section.
 // If one of the UserKnownHostsFile set to "none" it will use
 // [ssh.InsecureIgnoreHostKey].
-func (cl *Client) setConfigHostKeyCallback() (err error) {
+func (cl *Client) setConfigHostKey() (err error) {
 	var (
-		logp           = `setConfigHostKeyCallback`
+		logp           = `setConfigHostKey`
 		userKnownHosts = cl.section.UserKnownHostsFile()
 
 		knownHosts string
@@ -166,11 +167,19 @@ func (cl *Client) setConfigHostKeyCallback() (err error) {
 		}
 	}
 
-	cl.config.HostKeyCallback, err = knownhosts.New(cl.listKnownHosts...)
+	knownHostsDB, err := knownhosts.NewDB(cl.listKnownHosts...)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
+	cl.config.HostKeyAlgorithms, err = knownHostsDB.HostKeyAlgorithms(cl.remoteAddr)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+	if len(cl.config.HostKeyAlgorithms) == 0 {
+		return fmt.Errorf(`%s: no matching known_hosts for %s`, logp, cl.remoteAddr)
+	}
+	cl.config.HostKeyCallback = knownHostsDB.HostKeyCallback()
 	return nil
 }
 
@@ -250,7 +259,7 @@ func (cl *Client) dialWithPrivateKeys(sshAgent agent.ExtendedAgent) (err error) 
 		err = cl.dialError(logp, err)
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 	if cl.Client == nil {
 		// None of the private key can connect to remote address.
