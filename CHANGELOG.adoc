@@ -84,6 +84,16 @@ the worker for keeping the connection alive also call Write at the same
 time, which cause the data race.
 
 
+[#v0_62_0__lib_paseto]
+=== lib/paseto
+
+==== 🪵 Move paseto v2 under sub directory "v2"
+
+There are new versions of paseto standard: version 3 and version 4.
+To minimize conflicts in the future, we move the old implementation of
+paseto v2 to sub directory "v2" with package name "pasetov2".
+
+
 [#v0_62_0__lib_uuidv7]
 === lib/uuidv7
 

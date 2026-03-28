@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020 Shulhan <ms@kilabit.info>
 
-package paseto
+package pasetov2
 
 import "crypto/ed25519"
 

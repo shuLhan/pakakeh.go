@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
-package paseto
+package pasetov2
 
 import (
 	"encoding/base64"
