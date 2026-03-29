@@ -93,9 +93,16 @@ There are new versions of paseto standard: version 3 and version 4.
 To minimize conflicts in the future, we move the old implementation of
 paseto v2 to sub directory "v2" with package name "pasetov2".
 
+==== 🌱 lib/paseto/v4: new package that implements Paseto version 4
+
+paseto/v4 provides a simple, ready to use, opinionated
+implementation of Platform-Agnostic SEcurity TOkens (PASETO) version 4
+as defined in [paseto-v4].
+
+[paseto-v4]: https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version4.md
 
 [#v0_62_0__lib_uuidv7]
-=== lib/uuidv7
+=== 🌱 lib/uuidv7
 
 New package that implements UUID version 7.
 
