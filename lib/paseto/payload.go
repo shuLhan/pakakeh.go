@@ -11,7 +11,7 @@ import (
 
 // DriftSeconds defines the time differences in seconds allowed in
 // [Payload.ExpiredAt] and [Payload.NotBefore].
-const DriftSeconds = 5 * time.Second
+const DriftSeconds = 5
 
 // List of errors for [Payload.Validate].
 var (
@@ -27,6 +27,10 @@ var (
 // The claims follow RFC 7519 that includes issuer, subject, audience,
 // expiration time, not-before time, issued-at, and ID.
 type Payload struct {
+	// Data defines actual information to be send in message.
+	// Data must be JSON encodable.
+	Data any `json:"data"`
+
 	// Issuer defines the peer ID that issued the payload.
 	Issuer string `json:"iss,omitempty"`
 
@@ -36,23 +40,19 @@ type Payload struct {
 	// Audience defines the peer ID that receive the payload.
 	Audience string `json:"aud,omitempty"`
 
-	// ExpiredAt defines the expiration time when the payload MUST NOT
-	// be accepted for processing.
-	ExpiredAt *time.Time `json:"exp,omitempty"`
-
-	// NotBefore defines the time when the payload MUST NOT be accepted
-	// for processing.
-	NotBefore *time.Time `json:"nbf,omitempty"`
-
-	// IssuedAt defines the time at which the payload is issued.
-	IssuedAt *time.Time `json:"iat,omitempty"`
-
 	// TokenID defines the unique identifier for the payload.
 	TokenID string `json:"jti,omitempty"`
 
-	// Data defines actual information to be send in message.
-	// Data must be JSON encodable.
-	Data any `json:"data"`
+	// ExpiredAt defines the expiration time when the payload MUST NOT
+	// be accepted for processing.
+	ExpiredAt int64 `json:"exp,omitempty"`
+
+	// NotBefore defines the time when the payload MUST NOT be accepted
+	// for processing.
+	NotBefore int64 `json:"nbf,omitempty"`
+
+	// IssuedAt defines the time at which the payload is issued.
+	IssuedAt int64 `json:"iat,omitempty"`
 }
 
 // Validate validates the the payload and returns nil when all of the
@@ -77,7 +77,7 @@ type Payload struct {
 func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 	logp := `payload`
 
-	now := time.Now().Round(time.Second)
+	now := time.Now().UTC().Unix()
 	if pload.Issuer != sender.ID {
 		return fmt.Errorf(`%s: %w`, logp, ErrUnknownIssuer)
 	}
@@ -90,8 +90,8 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 	if len(recvID) != 0 && pload.Audience != recvID {
 		return fmt.Errorf(`%s: %w`, logp, ErrInvalidAudience)
 	}
-	if pload.ExpiredAt != nil {
-		diff := pload.ExpiredAt.Sub(now)
+	if pload.ExpiredAt != 0 {
+		diff := pload.ExpiredAt - now
 		diff -= DefaultTTL
 		if diff < 0 {
 			diff *= -1
@@ -100,8 +100,8 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 			return fmt.Errorf(`%s: %w`, logp, ErrExpired)
 		}
 	}
-	if pload.NotBefore != nil {
-		diff := now.Sub(*pload.NotBefore)
+	if pload.NotBefore != 0 {
+		diff := now - pload.NotBefore
 		if diff < 0 {
 			diff *= -1
 		}

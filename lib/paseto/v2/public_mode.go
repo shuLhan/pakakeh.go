@@ -106,15 +106,15 @@ func (auth *PublicMode) RemovePeer(id string) {
 func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[string]any) (
 	token string, err error,
 ) {
-	now := time.Now().Round(time.Second)
-	expiredAt := now.Add(paseto.DefaultTTL)
+	now := time.Now().UTC().Unix()
+	expiredAt := now + paseto.DefaultTTL
 	jsonToken := paseto.Payload{
 		Issuer:    auth.our.ID,
 		Subject:   subject,
 		Audience:  audience,
-		IssuedAt:  &now,
-		NotBefore: &now,
-		ExpiredAt: &expiredAt,
+		IssuedAt:  now,
+		NotBefore: now,
+		ExpiredAt: expiredAt,
 		Data:      base64.StdEncoding.EncodeToString(data),
 	}
 

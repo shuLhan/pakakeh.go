@@ -18,13 +18,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"time"
 )
 
 // DefaultTTL define the time-to-live of a message, by setting ExpiredAt to
 // current time + [DefaultTTL].
 // This value can be changes to increase the message expiration time.
-var DefaultTTL = 60 * time.Second
+var DefaultTTL int64 = 60
 
 // PreAuthEncode encodes each piece into single block.
 func PreAuthEncode(pieces ...[]byte) (b []byte, err error) {
