@@ -21,7 +21,10 @@
 // The public mode focus on signing and verifing data, everything else is
 // handled and filled automatically.
 //
-// Steps for sender when generating new token, the Pack() method,
+// === Sender side
+//
+// Steps for generating new token, the [PublicMode.Pack] method, on sender
+// side:
 //
 // (1) Prepare the JSON token claims, set
 //
@@ -35,17 +38,17 @@
 //
 // (2) Prepare the JSON footer, set
 //
-//   - Key ID "kid" to PublicMode.our.ID
+//   - Peer ID "peer_id" to PublicMode.our.ID
 //
 // The user's claims data is stored using key "data" inside the JSON token,
 // encoded using base64 (with padding).
 // Additional footer data can be added on the Data field.
 //
-// Overall, the following JSONToken and JSONFooter is generated for each
-// token,
+// Overall, the following [paseto.Payload] and [paseto.Footer] is generated
+// for each token,
 //
-//	JSONToken:{
-//		"iss": <Key.ID>,
+//	Payload:{
+//		"iss": <Peer.ID>,
 //		"sub": <Subject parameter>,
 //		"aud": <Audience parameter>
 //		"exp": <time.Now() + TTL>,
@@ -53,16 +56,18 @@
 //		"nbf": <time.Now()>,
 //		"data": <base64.StdEncoding.EncodeToString(userData)>,
 //	}
-//	JSONFooter:{
-//		"kid": <Key.ID>,
+//	Footer:{
+//		"peer_id": <Peer.ID>,
 //		"data": {}
 //	}
 //
-// On the receiver side, they will have list of registered peers Key (include
-// ID, public Key, and list of allowed subject).
+// === Receiver side
+//
+// On the receiver side, they will have list of registered peers (including
+// their ID, public key, and list of allowed subject).
 //
 //	PublicMode:{
-//		peers: map[Key.ID]Key{
+//		peers: map[Peer.ID]Peer{
 //			Public: <ed25519.PublicKey>,
 //			AllowedSubjects: map[string]struct{}{
 //				"/api/x": struct{}{},
@@ -73,29 +78,17 @@
 //		},
 //	}
 //
-// Step for receiver to process the token, the Unpack() method,
+// Step for receiver to process the token, the [PublicMode.Unpack] method,
 //
-// (1) Decode the token footer
+// (1) Decode the token footer.
 //
-// (2) Get the registered public key based on "kid" value in token footer.
-// If no peers key exist matched with "kid" value, reject the token.
+// (2) Get the registered public key based on "peer_id" value in token footer.
+// If no peers key exist matched with "peer_id" value, reject the token.
 //
-// (3) Verify the token using the peer public key.
+// (3) Verifies the token using the peer public key.
 // If verification failed, reject the token.
 //
-// (4) Validate the token.
-//   - The Issuer must equal to peer ID.
-//   - The Audience must equal to receiver ID.
-//   - If the peer AllowedSubjects is not empty, the Subject must be in
-//     one of them.
-//   - The current time must be after IssuedAt.
-//   - The current time must be after NotBefore.
-//   - The current time must be before ExpiredAt.
-//   - If one of the above condition is not passed, it will return an error.
-//
-// # References
-//
-//   - [paseto-rfc-01]
+// (4) Validates the token.
 //
 // [paseto-rfc-01]: https://github.com/paseto-standard/paseto-spec/blob/master/docs/01-Protocol-Versions/Version2.md
 package pasetov2

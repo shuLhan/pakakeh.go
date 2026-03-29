@@ -3,28 +3,32 @@
 
 package pasetov2
 
-import "sync"
+import (
+	"sync"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
+)
 
 // keys contains and maintains list of public Keys and its configuration.
 type keys struct {
-	v map[string]Key
+	v map[string]paseto.Peer
 
 	sync.Mutex
 }
 
 func newKeys() *keys {
 	return &keys{
-		v: make(map[string]Key),
+		v: make(map[string]paseto.Peer),
 	}
 }
 
-func (p *keys) upsert(k Key) {
+func (p *keys) upsert(k paseto.Peer) {
 	p.Lock()
 	p.v[k.ID] = k
 	p.Unlock()
 }
 
-func (p *keys) get(id string) (k Key, ok bool) {
+func (p *keys) get(id string) (k paseto.Peer, ok bool) {
 	p.Lock()
 	k, ok = p.v[id]
 	p.Unlock()

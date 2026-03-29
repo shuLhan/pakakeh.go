@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"git.sr.ht/~shulhan/pakakeh.go/lib/paseto"
 )
 
 const (
@@ -20,23 +22,18 @@ const (
 	keyBearer            = "bearer"
 )
 
-// DefaultTTL define the time-to-live of each token, by setting ExpiredAt to
-// current time + DefaultTTL.
-// If you want longer token, increase this value before using Pack().
-var DefaultTTL = 60 * time.Second
-
 // PublicMode implement the PASETO public mode to signing and verifying data
 // using private key and one or more shared public keys.
 // The PublicMode contains list of peer public keys for verifying the incoming
 // token.
 type PublicMode struct {
 	peers *keys
-	our   Key
+	our   paseto.Peer
 }
 
 // NewPublicMode create new PublicMode with our private key for signing
 // outgoing token.
-func NewPublicMode(our Key) (auth *PublicMode, err error) {
+func NewPublicMode(our paseto.Peer) (auth *PublicMode, err error) {
 	if len(our.ID) == 0 {
 		return nil, errors.New(`empty key ID`)
 	}
@@ -53,7 +50,7 @@ func NewPublicMode(our Key) (auth *PublicMode, err error) {
 // UnpackHTTPRequest unpack token from HTTP request header "Authorization" or
 // from query parameter "access_token".
 func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
-	publicToken *PublicToken, err error,
+	msg *paseto.Message, err error,
 ) {
 	if req == nil {
 		return nil, errors.New(`empty HTTP request`)
@@ -82,9 +79,9 @@ func (auth *PublicMode) UnpackHTTPRequest(req *http.Request) (
 	return auth.Unpack(token)
 }
 
-// AddPeer add a key to list of known peers for verifying incoming token.
-// The only required fields in Key is ID and Public.
-func (auth *PublicMode) AddPeer(k Key) (err error) {
+// AddPeer add a peer to list of known peers for verifying incoming token.
+// The only required fields in [paseto.Peer] is ID and Public.
+func (auth *PublicMode) AddPeer(k paseto.Peer) (err error) {
 	if len(k.ID) == 0 {
 		return errors.New(`empty key ID`)
 	}
@@ -96,7 +93,7 @@ func (auth *PublicMode) AddPeer(k Key) (err error) {
 }
 
 // GetPeerKey get the peer's key based on key ID.
-func (auth *PublicMode) GetPeerKey(id string) (k Key, ok bool) {
+func (auth *PublicMode) GetPeerKey(id string) (k paseto.Peer, ok bool) {
 	return auth.peers.get(id)
 }
 
@@ -110,8 +107,8 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 	token string, err error,
 ) {
 	now := time.Now().Round(time.Second)
-	expiredAt := now.Add(DefaultTTL)
-	jsonToken := JSONToken{
+	expiredAt := now.Add(paseto.DefaultTTL)
+	jsonToken := paseto.Payload{
 		Issuer:    auth.our.ID,
 		Subject:   subject,
 		Audience:  audience,
@@ -126,9 +123,9 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 		return "", err
 	}
 
-	jsonFooter := JSONFooter{
-		KID:  auth.our.ID,
-		Data: footer,
+	jsonFooter := paseto.Footer{
+		PeerID: auth.our.ID,
+		Data:   footer,
 	}
 
 	rawfooter, err := json.Marshal(&jsonFooter)
@@ -139,8 +136,8 @@ func (auth *PublicMode) Pack(audience, subject string, data []byte, footer map[s
 	return Sign(auth.our.Private, msg, rawfooter)
 }
 
-// Unpack the token to get the JSONToken and the data.
-func (auth *PublicMode) Unpack(token string) (publicToken *PublicToken, err error) {
+// Unpack the token to get the Payload and the data.
+func (auth *PublicMode) Unpack(token string) (msg *paseto.Message, err error) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) != 4 {
 		return nil, errors.New(`invalid token format`)
@@ -152,21 +149,21 @@ func (auth *PublicMode) Unpack(token string) (publicToken *PublicToken, err erro
 		return nil, errors.New(`expecting public mode, got ` + pieces[1])
 	}
 
-	publicToken = &PublicToken{}
+	msg = &paseto.Message{}
 
 	rawfooter, err := base64.RawURLEncoding.DecodeString(pieces[3])
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(rawfooter, &publicToken.Footer)
+	err = json.Unmarshal(rawfooter, &msg.Footer)
 	if err != nil {
 		return nil, err
 	}
-	peerKey, ok := auth.peers.get(publicToken.Footer.KID)
+	peerKey, ok := auth.peers.get(msg.Footer.PeerID)
 	if !ok {
 		return nil, fmt.Errorf("unknown peer key ID %s",
-			publicToken.Footer.KID)
+			msg.Footer.PeerID)
 	}
 
 	msgSig, err := base64.RawURLEncoding.DecodeString(pieces[2])
@@ -174,25 +171,26 @@ func (auth *PublicMode) Unpack(token string) (publicToken *PublicToken, err erro
 		return nil, err
 	}
 
-	msg, err := Verify(peerKey.Public, msgSig, rawfooter)
+	payload, err := Verify(peerKey.Public, msgSig, rawfooter)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(msg, &publicToken.Token)
+	err = json.Unmarshal(payload, &msg.Payload)
 	if err != nil {
 		return nil, err
 	}
 
-	err = publicToken.Token.Validate(auth.our.ID, peerKey)
+	err = msg.Payload.Validate(auth.our.ID, peerKey)
 	if err != nil {
 		return nil, err
 	}
 
-	publicToken.Data, err = base64.StdEncoding.DecodeString(publicToken.Token.Data)
+	data, err := base64.StdEncoding.DecodeString(msg.Payload.Data.(string))
 	if err != nil {
 		return nil, err
 	}
+	msg.Payload.Data = data
 
-	return publicToken, nil
+	return msg, nil
 }
