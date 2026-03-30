@@ -14,19 +14,20 @@ import (
 
 // List of error messages for [Message.Unpack].
 var (
-	ErrTokenHeader = errors.New(`invalid token header`)
-	ErrTokenFooter = errors.New(`invalid token footer`)
-	ErrTokenSize   = errors.New(`invalid token payload size`)
+	ErrTokenHeader  = errors.New(`invalid token header`)
+	ErrTokenPayload = errors.New(`invalid token payload`)
+	ErrTokenFooter  = errors.New(`invalid token footer`)
+	ErrTokenSize    = errors.New(`invalid token payload size`)
 )
 
 // Message defines the payload be signed and verified by sender/receiver.
 type Message struct {
 	// The following fields are filled after Unpack and MUST not be used
 	// directly.
-	RawPayload []byte
-	RawFooter  []byte
-	Sig        []byte
-	PAE        []byte
+	RawPayload []byte `json:"-"`
+	RawFooter  []byte `json:"-"`
+	Sig        []byte `json:"-"`
+	PAE        []byte `json:"-"`
 
 	// The Payload and optional Footer to be packed and signed into token.
 	Footer  Footer
@@ -73,7 +74,7 @@ func (msg *Message) Unpack(header, token string, implicit []byte) (err error) {
 	// Step 4: Decodes the payload.
 	paysig, err := base64.RawURLEncoding.DecodeString(token)
 	if err != nil {
-		return fmt.Errorf(`%s: %w`, logp, err)
+		return fmt.Errorf(`%s: %w: %w`, logp, ErrTokenPayload, err)
 	}
 	lenpaysig := len(paysig)
 	if lenpaysig <= ed25519.SignatureSize {

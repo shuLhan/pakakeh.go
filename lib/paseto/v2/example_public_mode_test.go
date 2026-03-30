@@ -95,5 +95,5 @@ func ExamplePublicMode() {
 	// Output:
 	// Received data: hello receiver
 	// Received footer: {Data:map[FOOTER:HERE] PeerID:sender}
-	// payload: unknown subject
+	// payload: unknown subject: unknown-subject
 }

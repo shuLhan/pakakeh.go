@@ -19,7 +19,7 @@ var (
 	ErrPayloadSubject   = errors.New(`unknown subject`)
 	ErrPayloadAudience  = errors.New(`invalid audience`)
 	ErrPayloadExpired   = errors.New(`expired`)
-	ErrPayloadNotBefore = errors.New(`payload cannot be used yet`)
+	ErrPayloadNotBefore = errors.New(`token cannot be used yet`)
 )
 
 // Payload represents the data and claims.
@@ -84,11 +84,13 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 	if len(sender.AllowedSubjects) != 0 {
 		_, ok := sender.AllowedSubjects[pload.Subject]
 		if !ok {
-			return fmt.Errorf(`%s: %w`, logp, ErrPayloadSubject)
+			return fmt.Errorf(`%s: %w: %s`, logp,
+				ErrPayloadSubject, pload.Subject)
 		}
 	}
 	if len(recvID) != 0 && pload.Audience != recvID {
-		return fmt.Errorf(`%s: %w`, logp, ErrPayloadAudience)
+		return fmt.Errorf(`%s: %w: %s`, logp, ErrPayloadAudience,
+			pload.Audience)
 	}
 	if pload.ExpiredAt != 0 {
 		diff := pload.ExpiredAt - now
@@ -97,7 +99,9 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 			diff *= -1
 		}
 		if diff > DriftSeconds {
-			return fmt.Errorf(`%s: %w`, logp, ErrPayloadExpired)
+			return fmt.Errorf(`%s: %w: exp is %s`, logp,
+				ErrPayloadExpired,
+				time.Unix(pload.ExpiredAt, 0).UTC())
 		}
 	}
 	if pload.NotBefore != 0 {
@@ -106,7 +110,9 @@ func (pload *Payload) Validate(recvID string, sender Peer) (err error) {
 			diff *= -1
 		}
 		if diff > DriftSeconds {
-			return fmt.Errorf(`%s: %w`, logp, ErrPayloadNotBefore)
+			return fmt.Errorf(`%s: %w: nbf is %s`, logp,
+				ErrPayloadNotBefore,
+				time.Unix(pload.NotBefore, 0).UTC())
 		}
 	}
 	return nil
