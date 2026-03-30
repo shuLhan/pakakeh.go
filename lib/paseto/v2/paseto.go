@@ -5,6 +5,9 @@
 // of Platform-Agnostic SEcurity TOkens (PASETOs) v2 as defined in
 // [paseto-rfc-01].
 //
+// Deprecated: This package has been replaced with new standard, paseto v4.
+// See git.sr.ht/~shulhan/pakakeh.go/lib/paseto/v4.
+//
 // See the examples below for quick reference.
 //
 // # Limitation
@@ -21,7 +24,7 @@
 // The public mode focus on signing and verifing data, everything else is
 // handled and filled automatically.
 //
-// === Sender side
+// # Sender side
 //
 // Steps for generating new token, the [PublicMode.Pack] method, on sender
 // side:
@@ -61,7 +64,7 @@
 //		"data": {}
 //	}
 //
-// === Receiver side
+// # Receiver side
 //
 // On the receiver side, they will have list of registered peers (including
 // their ID, public key, and list of allowed subject).
